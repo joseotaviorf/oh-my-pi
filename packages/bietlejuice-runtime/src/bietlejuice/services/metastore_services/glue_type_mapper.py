@@ -124,6 +124,36 @@ def map_uc_type_to_glue(uc_type: str) -> str:
     return "string"
 
 
+def coerce_glue_type_for_json(glue_type: str) -> str:
+    """Coerce Glue types that break Hive JsonSerDe reads to ``string``.
+
+    Fragile on EMR Spark 3.5 + HCatalog JsonSerDe:
+
+    - ``decimal`` — ClassCast ``String → HiveDecimal`` when JSON tokens are strings
+    - ``timestamp`` / ``date`` — format parsing / OpenX-style ISO regressions
+    - ``array`` / ``struct`` / ``map`` — ``ArrayList → HCatRecord`` ClassCast
+
+    ``binary`` is intentionally left unchanged (deferred separately).
+    Partition keys must not be passed through this helper.
+    """
+    trimmed = (glue_type or "").strip()
+    lower = trimmed.lower()
+    if not lower:
+        return "string"
+    if lower in ("timestamp", "date"):
+        return "string"
+    if lower.startswith("decimal"):
+        return "string"
+    if lower.startswith(("array<", "struct<", "map<")):
+        return "string"
+    return trimmed
+
+
+def map_uc_type_to_glue_for_json(uc_type: str) -> str:
+    """Map UC/Spark type to Glue for JSON tables (fragile types → ``string``)."""
+    return coerce_glue_type_for_json(map_uc_type_to_glue(uc_type))
+
+
 def map_glue_type_to_uc(glue_type: str) -> str:
     """Map a Glue/Hive column type to a Unity Catalog / Spark SQL type."""
     trimmed = glue_type.strip()

@@ -77,24 +77,28 @@ class SparkMetastoreHelper:
     @staticmethod
     def set_timestamps_as_string(spark_ms_table_columns):
         """
-        Forcefully set the timestamp columns to string.
+        Forcefully set fragile JSON-read column types to string for raw sync.
 
-        Some json data in Spark Metastore raw tables are automatically interpreted
-         as timestamp and the date part is automatically extracted when we select data.
-         For example, for the raw data {"revision_date":"{\"$date\": \"2021-01-10T00:00:00.157Z\"}"}
-         the command `select revision_date from table_a` will return `2021-01-10T00:00:00.157Z`
-         instead of the full json content with the key `$date`.
-        The Hive Metastore does not automatically extracts the date part for the timestamp columns,
-          but raises a parse error instead.
+        Historically only timestamps were rewritten (Hive cannot parse the same
+        Mongo-style ``$date`` tokens Spark extracts). EMR HCatalog JsonSerDe
+        also fails on decimal / date / nested types, so those are coerced to
+        ``string`` as well. ``binary`` is left unchanged.
 
         :param spark_ms_table_columns: the spark columns schema
-        :return: columns with timestamps as string
+        :return: columns with fragile types as string
         :rtype: collections.OrderedDict[(string, string)]
         """
+        from bietlejuice.services.metastore_services.glue_type_mapper import (
+            coerce_glue_type_for_json,
+            map_uc_type_to_glue,
+        )
+
         for col in spark_ms_table_columns:
-            spark_ms_table_columns[col] = spark_ms_table_columns[col].replace(
-                "timestamp", "string"
-            )
+            original = spark_ms_table_columns[col]
+            glue_type = map_uc_type_to_glue(original)
+            coerced = coerce_glue_type_for_json(glue_type)
+            if coerced != glue_type:
+                spark_ms_table_columns[col] = "string"
 
         return spark_ms_table_columns
 

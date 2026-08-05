@@ -98,6 +98,172 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         self.assertIn("'Z'", sparams["timestamp.formats"])
         self.assertEqual(ti["Parameters"].get("classification"), "json")
         self.assertNotIn("openx", sd["SerdeInfo"]["SerializationLibrary"].lower())
+        # Fragile data columns coerced to string; partition keys stay typed.
+        self.assertEqual(
+            sd["Columns"],
+            [
+                {"Name": "id", "Type": "bigint"},
+                {"Name": "created_at", "Type": "string"},
+            ],
+        )
+        self.assertEqual(ti["PartitionKeys"], [{"Name": "year", "Type": "int"}])
+
+    def test_json_coerces_decimal_and_complex_columns_to_string(self):
+        schema = OrderedDict(
+            [
+                ("id", "bigint"),
+                ("amount", "decimal(17,2)"),
+                ("tags", "array<string>"),
+                ("payload", "struct<a:int>"),
+                ("blob", "binary"),
+            ]
+        )
+        ti = GlueMetastoreService._build_table_input(
+            table_name="t",
+            table_location="s3://bucket/t",
+            table_schema=schema,
+            partition_cols=[],
+            format_str="JSON",
+        )
+        by_name = {c["Name"]: c["Type"] for c in ti["StorageDescriptor"]["Columns"]}
+        self.assertEqual(by_name["id"], "bigint")
+        self.assertEqual(by_name["amount"], "string")
+        self.assertEqual(by_name["tags"], "string")
+        self.assertEqual(by_name["payload"], "string")
+        self.assertEqual(by_name["blob"], "binary")
+
+    def test_parquet_keeps_decimal_and_timestamp_typed(self):
+        schema = OrderedDict(
+            [("id", "bigint"), ("amount", "decimal(17,2)"), ("ts", "timestamp")]
+        )
+        ti = GlueMetastoreService._build_table_input(
+            table_name="t",
+            table_location="s3://bucket/t",
+            table_schema=schema,
+            partition_cols=[],
+            format_str="PARQUET",
+        )
+        by_name = {c["Name"]: c["Type"] for c in ti["StorageDescriptor"]["Columns"]}
+        self.assertEqual(by_name["amount"], "decimal(17,2)")
+        self.assertEqual(by_name["ts"], "timestamp")
+
+    def test_update_coerces_preserved_fragile_types_on_json(self):
+        """Preserved-only columns keep merge order but get JSON type coerce."""
+        from unittest.mock import MagicMock
+
+        glue_client = MagicMock()
+        glue_client.get_table.return_value = {
+            "Name": "agreement_discounts",
+            "Parameters": {"classification": "json"},
+            "StorageDescriptor": {
+                "Columns": [
+                    {"Name": "id", "Type": "string"},
+                    {"Name": "amount", "Type": "decimal(17,2)"},
+                ]
+            },
+        }
+        svc = GlueMetastoreService(glue_client)
+        # Incoming schema omits amount (preserved) and adds a timestamp.
+        schema = OrderedDict([("id", "string"), ("created_at", "timestamp")])
+        svc.create_external_table(
+            database_name="datalake_cyber_raw",
+            table_name="agreement_discounts",
+            table_location="s3://bucket/raw/agreement_discounts",
+            table_schema=schema,
+            partition_cols=[],
+            format_options="JSON",
+        )
+        table_input = glue_client.update_table.call_args[0][1]
+        by_name = {
+            c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]
+        }
+        self.assertEqual(by_name["id"], "string")
+        self.assertEqual(by_name["amount"], "string")
+        self.assertEqual(by_name["created_at"], "string")
+
+    def test_coerce_json_table_column_types_updates_fragile_types(self):
+        from unittest.mock import MagicMock
+
+        glue_client = MagicMock()
+        glue_client.get_table.return_value = {
+            "Name": "t",
+            "Parameters": {"classification": "json"},
+            "StorageDescriptor": {
+                "Columns": [
+                    {"Name": "id", "Type": "bigint"},
+                    {"Name": "amount", "Type": "decimal(10,2)"},
+                    {"Name": "blob", "Type": "binary"},
+                ],
+                "Location": "s3://bucket/t",
+                "SerdeInfo": {
+                    "SerializationLibrary": "org.apache.hive.hcatalog.data.JsonSerDe",
+                    "Parameters": {},
+                },
+            },
+            "PartitionKeys": [{"Name": "year", "Type": "int"}],
+            "TableType": "EXTERNAL_TABLE",
+        }
+        svc = GlueMetastoreService(glue_client)
+        result = svc.coerce_json_table_column_types("db", "t", dry_run=False)
+        self.assertEqual(result["updated"], 1)
+        glue_client.update_table.assert_called_once()
+        table_input = glue_client.update_table.call_args[0][1]
+        by_name = {
+            c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]
+        }
+        self.assertEqual(by_name["amount"], "string")
+        self.assertEqual(by_name["blob"], "binary")
+        self.assertEqual(table_input["PartitionKeys"][0]["Type"], "int")
+
+    def test_coerce_json_table_column_types_drops_partition_keys_from_columns(self):
+        """Crawler/Athena tables may duplicate partition keys in Columns.
+
+        Glue rejects update_table when a name appears in both Columns and
+        PartitionKeys — the same bug create_external_table already guards.
+        """
+        from unittest.mock import MagicMock
+
+        glue_client = MagicMock()
+        glue_client.get_table.return_value = {
+            "Name": "t",
+            "Parameters": {"classification": "json"},
+            "StorageDescriptor": {
+                "Columns": [
+                    {"Name": "id", "Type": "bigint"},
+                    {"Name": "amount", "Type": "decimal(10,2)"},
+                    {"Name": "year", "Type": "int"},
+                    {"Name": "Month", "Type": "int"},
+                ],
+                "Location": "s3://bucket/t",
+                "SerdeInfo": {
+                    "SerializationLibrary": "org.apache.hive.hcatalog.data.JsonSerDe",
+                    "Parameters": {},
+                },
+            },
+            "PartitionKeys": [
+                {"Name": "year", "Type": "int"},
+                {"Name": "month", "Type": "int"},
+            ],
+            "TableType": "EXTERNAL_TABLE",
+        }
+        svc = GlueMetastoreService(glue_client)
+        result = svc.coerce_json_table_column_types("db", "t", dry_run=False)
+        self.assertGreaterEqual(result["updated"], 1)
+        table_input = glue_client.update_table.call_args[0][1]
+        column_names = [
+            c["Name"].lower() for c in table_input["StorageDescriptor"]["Columns"]
+        ]
+        self.assertEqual(column_names, ["id", "amount"])
+        self.assertEqual(
+            {c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]}[
+                "amount"
+            ],
+            "string",
+        )
+        self.assertEqual(
+            [k["Name"].lower() for k in table_input["PartitionKeys"]],
+            ["year", "month"],
+        )
 
     def test_update_preserves_unity_catalog_source(self):
         """Databricks secondary Glue tables carry UC provenance; keep it on update."""

@@ -3,8 +3,10 @@
 import unittest
 
 from bietlejuice.services.metastore_services.glue_type_mapper import (
+    coerce_glue_type_for_json,
     map_glue_type_to_uc,
     map_uc_type_to_glue,
+    map_uc_type_to_glue_for_json,
 )
 
 
@@ -53,6 +55,43 @@ class TestMapUcTypeToGlue(unittest.TestCase):
 
     def test_unknown_type_still_falls_back_to_string(self):
         self.assertEqual(map_uc_type_to_glue("variant"), "string")
+
+
+class TestCoerceGlueTypeForJson(unittest.TestCase):
+    """Fragile Hive JsonSerDe types become string; safe scalars and binary stay."""
+
+    def test_decimal_timestamp_date_and_complex_become_string(self):
+        cases = [
+            ("decimal(17,2)", "string"),
+            ("timestamp", "string"),
+            ("date", "string"),
+            ("array<string>", "string"),
+            ("struct<a:int>", "string"),
+            ("map<string,string>", "string"),
+        ]
+        for glue_type, expected in cases:
+            with self.subTest(glue_type=glue_type):
+                self.assertEqual(coerce_glue_type_for_json(glue_type), expected)
+
+    def test_safe_scalars_and_binary_unchanged(self):
+        for glue_type in (
+            "string",
+            "boolean",
+            "int",
+            "bigint",
+            "double",
+            "float",
+            "binary",
+        ):
+            with self.subTest(glue_type=glue_type):
+                self.assertEqual(coerce_glue_type_for_json(glue_type), glue_type)
+
+    def test_map_uc_type_to_glue_for_json_coerces_fragile_types(self):
+        self.assertEqual(map_uc_type_to_glue_for_json("DECIMAL(10,2)"), "string")
+        self.assertEqual(map_uc_type_to_glue_for_json("TIMESTAMP"), "string")
+        self.assertEqual(map_uc_type_to_glue_for_json("ARRAY<INT>"), "string")
+        self.assertEqual(map_uc_type_to_glue_for_json("BIGINT"), "bigint")
+        self.assertEqual(map_uc_type_to_glue_for_json("BINARY"), "binary")
 
 
 class TestMapGlueTypeToUc(unittest.TestCase):

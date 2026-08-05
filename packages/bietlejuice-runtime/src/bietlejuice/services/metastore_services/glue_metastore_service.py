@@ -27,7 +27,9 @@ from bietlejuice.services.metastore_services.glue_storage_formats import (
     get_glue_format_config,
 )
 from bietlejuice.services.metastore_services.glue_type_mapper import (
+    coerce_glue_type_for_json,
     map_uc_type_to_glue,
+    map_uc_type_to_glue_for_json,
 )
 from bietlejuice.services.metastore_services.metastore_service import (
     MetastoreService,
@@ -125,6 +127,13 @@ class GlueMetastoreService(MetastoreService):
                 existing_columns,
                 table_input["StorageDescriptor"]["Columns"],
             )
+            if format_str == "JSON":
+                # Re-registration must also coerce preserved-only columns
+                # (merge keeps their old Glue types otherwise).
+                merged_columns = [
+                    GlueMetastoreService._coerce_glue_column_for_json(column)
+                    for column in merged_columns
+                ]
             table_input["StorageDescriptor"]["Columns"] = merged_columns
             if preserved_columns:
                 logger.info(
@@ -410,7 +419,139 @@ class GlueMetastoreService(MetastoreService):
         )
         return counts
 
+    def coerce_json_table_column_types(
+        self,
+        database_name: str,
+        table_name: str,
+        *,
+        dry_run: bool = False,
+    ) -> Dict[str, int]:
+        """Rewrite fragile Glue column types to ``string`` on a JSON table.
+
+        Returns counts: ``scanned``, ``updated``, ``skipped``, ``errors``.
+        Partition keys are not coerced.
+        """
+        counts = {"scanned": 0, "updated": 0, "skipped": 0, "errors": 0}
+        table = self._client.get_table(database_name, table_name)
+        if not table:
+            logger.warning(
+                f"m=coerce_json_table_column_types, "
+                f"table={database_name}.{table_name}, "
+                "msg=table not found in Glue, skipping"
+            )
+            counts["skipped"] = 1
+            return counts
+
+        if is_delta_glue_table(table):
+            logger.info(
+                f"m=coerce_json_table_column_types, "
+                f"table={database_name}.{table_name}, "
+                "msg=Delta table, skipping"
+            )
+            counts["skipped"] = 1
+            return counts
+
+        if not is_json_glue_table(table):
+            logger.info(
+                f"m=coerce_json_table_column_types, "
+                f"table={database_name}.{table_name}, "
+                "msg=not a JSON table, skipping"
+            )
+            counts["skipped"] = 1
+            return counts
+
+        table_sd = table.get("StorageDescriptor") or {}
+        partition_key_names = {
+            str(key.get("Name", "")).lower()
+            for key in (table.get("PartitionKeys") or [])
+            if key.get("Name")
+        }
+        # Crawler / Athena DDL may put partition keys in Columns as well;
+        # Glue rejects update_table when the same name is in both lists
+        # (same guard as create_external_table).
+        existing_columns = [
+            column
+            for column in (table_sd.get("Columns") or [])
+            if str(column.get("Name", "")).lower() not in partition_key_names
+        ]
+        dropped_partition_duplicates = len(table_sd.get("Columns") or []) - len(
+            existing_columns
+        )
+        counts["scanned"] = len(existing_columns)
+
+        coerced_columns = [
+            GlueMetastoreService._coerce_glue_column_for_json(column)
+            for column in existing_columns
+        ]
+        changed = [
+            (old.get("Name"), old.get("Type"), new.get("Type"))
+            for old, new in zip(existing_columns, coerced_columns)
+            if (old.get("Type") or "") != (new.get("Type") or "")
+        ]
+        if not changed and not dropped_partition_duplicates:
+            logger.info(
+                f"m=coerce_json_table_column_types, "
+                f"table={database_name}.{table_name}, "
+                f"scanned={counts['scanned']}, msg=no fragile column types to coerce"
+            )
+            return counts
+
+        logger.info(
+            f"m=coerce_json_table_column_types, table={database_name}.{table_name}, "
+            f"scanned={counts['scanned']}, to_update={len(changed)}, "
+            f"dropped_partition_duplicates={dropped_partition_duplicates}, "
+            f"dry_run={dry_run}, changed={changed[:20]}, "
+            "msg=coercing fragile JSON column types to string"
+        )
+
+        if dry_run:
+            counts["updated"] = len(changed) + dropped_partition_duplicates
+            return counts
+
+        table_input = GlueMetastoreService._table_to_input(table)
+        table_input["StorageDescriptor"] = dict(table_sd)
+        table_input["StorageDescriptor"]["Columns"] = coerced_columns
+        try:
+            self._client.update_table(database_name, table_input)
+            counts["updated"] = len(changed) + dropped_partition_duplicates
+        except Exception:
+            counts["errors"] = 1
+            raise
+
+        return counts
+
     # -- Internal helpers ----------------------------------------------------
+
+    _TABLE_INPUT_KEYS = (
+        "Name",
+        "Description",
+        "Owner",
+        "LastAccessTime",
+        "LastAnalyzedTime",
+        "Retention",
+        "StorageDescriptor",
+        "PartitionKeys",
+        "ViewOriginalText",
+        "ViewExpandedText",
+        "TableType",
+        "Parameters",
+        "TargetTable",
+    )
+
+    @staticmethod
+    def _table_to_input(table: Dict) -> Dict:
+        """Strip GetTable-only fields so the dict is valid ``TableInput``."""
+        return {
+            key: table[key]
+            for key in GlueMetastoreService._TABLE_INPUT_KEYS
+            if key in table
+        }
+
+    @staticmethod
+    def _coerce_glue_column_for_json(column: Dict) -> Dict:
+        coerced = dict(column)
+        coerced["Type"] = coerce_glue_type_for_json(column.get("Type") or "string")
+        return coerced
 
     @staticmethod
     def _resolve_format(format_options) -> str:
@@ -451,10 +592,13 @@ class GlueMetastoreService(MetastoreService):
         if format_str.upper() == "DELTA":
             serde_params["path"] = norm_loc
 
+        is_json = format_str.upper() == "JSON"
         table_input: Dict = {
             "Name": table_name,
             "StorageDescriptor": {
-                "Columns": GlueMetastoreService._build_glue_columns(regular_columns),
+                "Columns": GlueMetastoreService._build_glue_columns(
+                    regular_columns, for_json=is_json
+                ),
                 "Location": norm_loc,
                 "InputFormat": fmt.input_format,
                 "OutputFormat": fmt.output_format,
@@ -465,8 +609,9 @@ class GlueMetastoreService(MetastoreService):
                 "Compressed": False,
                 "StoredAsSubDirectories": False,
             },
+            # Partition keys stay typed (not coerced) even for JSON tables.
             "PartitionKeys": GlueMetastoreService._build_glue_columns(
-                partition_columns
+                partition_columns, for_json=False
             ),
             "TableType": "EXTERNAL_TABLE",
             "Parameters": params,
@@ -517,11 +662,16 @@ class GlueMetastoreService(MetastoreService):
         return regular, partition_typed
 
     @staticmethod
-    def _build_glue_columns(columns: list) -> List[Dict]:
-        """Convert a list of ``(name, type)`` tuples to Glue column dicts."""
+    def _build_glue_columns(columns: list, *, for_json: bool = False) -> List[Dict]:
+        """Convert a list of ``(name, type)`` tuples to Glue column dicts.
+
+        When ``for_json`` is True, fragile Hive JsonSerDe types are coerced
+        to ``string`` (see ``map_uc_type_to_glue_for_json``).
+        """
+        mapper = map_uc_type_to_glue_for_json if for_json else map_uc_type_to_glue
         result: List[Dict] = []
         for col_name, col_type in columns:
-            result.append({"Name": col_name, "Type": map_uc_type_to_glue(col_type)})
+            result.append({"Name": col_name, "Type": mapper(col_type)})
         return result
 
     @staticmethod

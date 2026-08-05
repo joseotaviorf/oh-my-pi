@@ -79,3 +79,22 @@ class TestGetAllTablesMetadata:
         spark_metastore_helper.get_spark_metastore_table_partition_values.assert_called_once_with(
             "events"
         )
+
+
+class TestSetTimestampsAsString:
+    def test_coerces_fragile_json_types_leaves_binary(self):
+        cols = OrderedDict(
+            [
+                ("id", "bigint"),
+                ("amount", "decimal(17,2)"),
+                ("ts", "timestamp"),
+                ("tags", "array<string>"),
+                ("blob", "binary"),
+            ]
+        )
+        result = SparkMetastoreHelper.set_timestamps_as_string(cols)
+        assert result["id"] == "bigint"
+        assert result["amount"] == "string"
+        assert result["ts"] == "string"
+        assert result["tags"] == "string"
+        assert result["blob"] == "binary"
