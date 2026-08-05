@@ -5,6 +5,21 @@ cluster:
       spark.sql.adaptive.enabled: true
       spark.sql.adaptive.coalescePartitions.enabled: true
       spark.sql.adaptive.coalescePartitions.targetPostShuffleInputSize: 128MB
-      spark.sql.shuffle.partitions: 256
+      spark.sql.shuffle.partitions: 512
+      spark.executor.memoryOverhead: 8g
     core_nodes:
       target_on_demand: 3
+      target_spot: 0
+      instance_types:
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
+    task_nodes:
+      instance_types:
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
+      target_on_demand: 0
+      target_spot: 2
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
