@@ -58,4 +58,4 @@ workflow:
         escape: '"'
         multiLine: "true"
       - "--export-slot"
-      - "{{ (dag_run.conf or {}).get('export_slot', 'auto') }}"
+      - "{{ dag_run.conf.get('export_slot', 'auto') if dag_run.conf else 'auto' }}"
