@@ -111,6 +111,19 @@ yields NULL (0/0), report as "no data" rather than 0%.
 - Don't compute the escalation rate across all bots and then assume it represents Wall-E.
 - Don't use `COUNT(*)` without the `bot = 'wall-e'` filter as the denominator.
 
+## Targets and OKRs
+
+**OKR** — end-of-year target for % Escalation Rate (Wall-E); lower values indicate better
+performance.
+
+- **Source table:** no GSheets source — this is a fixed business target.
+- **Filter key / metric name:** `% Escalation Rate (Wall-E)`
+- **Period grain:** year-end
+- **Aliases / search terms:** meta de taxa de escalonamento, target escalation rate, OKR Wall-E
+- **Target:** `<= 16%`
+- **Caveat:** compare the year-end actual using the canonical Wall-E scope; values below 16%
+  meet the target, while values above 16% miss it.
+
 ## Golden Queries
 
 Computes the daily % Escalation Rate for Wall-E. The component pattern (per-day, per-bot

@@ -168,6 +168,20 @@ report as "no data" rather than 0%.
 - Don't count a `first_queue != last_queue` mismatch as an error if either queue value falls
   outside the eleven curated queues.
 
+## Targets and OKRs
+
+**OKR** — end-of-year target for % Escalation Error Rate (Wall-E); lower values indicate better
+performance.
+
+- **Source table:** no GSheets source — this is a fixed business target.
+- **Filter key / metric name:** `% Escalation Error Rate (Wall-E)`
+- **Period grain:** year-end
+- **Aliases / search terms:** meta de erro de escalonamento, target escalation error rate, OKR
+  Wall-E
+- **Target:** `<= 15%`
+- **Caveat:** compare the year-end actual using the canonical Wall-E scope and curated queue list;
+  values below 15% meet the target, while values above 15% miss it.
+
 ## Golden Queries
 
 Computes % Escalation Error Rate for Wall-E, restricted to the curated front-facing queue list.
