@@ -204,6 +204,9 @@ class TestDataFrameDeltaTableLoaderPipeline:
         """Test _load_and_register method basic functionality"""
         # Arrange
         pipeline = DataFrameDeltaTableLoaderPipeline(**pipeline_params)
+        mock_delta_loader.return_value.load_table.return_value = pipeline_params[
+            "dataframe"
+        ]
 
         # Act
         pipeline._load_and_register()

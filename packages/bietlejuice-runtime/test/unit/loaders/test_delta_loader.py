@@ -602,3 +602,114 @@ class TestDeltaLoader:
         delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         with pytest.raises(ValueError, match="Invalid SQL identifier"):
             delta_loader.optimize_table(malicious_name)
+
+    # -- target-type alignment -------------------------------------------------
+
+    @pytest.fixture
+    def mock_align(self):
+        """Patch the alignment hook, defaulting to a pass-through."""
+        with mock.patch(
+            "bietlejuice.loaders.delta_loader.align_source_to_target",
+            side_effect=lambda _spark, source_df, _table: source_df,
+        ) as align:
+            yield align
+
+    @pytest.fixture
+    def aligned_df(self):
+        """A distinct DataFrame, so we can prove the write used the cast one."""
+        df = mock.MagicMock()
+        df.alias.return_value = df
+        writer = mock.MagicMock()
+        writer.format.return_value = writer
+        writer.option.return_value = writer
+        writer.mode.return_value = writer
+        df.write = writer
+        return df
+
+    def test_aligns_source_to_target_when_table_already_exists(
+        self, mock_spark_context, mock_delta_table, mock_source_df, mock_align
+    ):
+        """Raw JSON registers timestamp/date as string; the target keeps the
+        real type, so the source is cast to what the table already declares."""
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        delta_loader.load_table("test_database.test_table", "test_path", mock_source_df)
+
+        mock_align.assert_called_once_with(
+            mock_spark_context.spark, mock_source_df, "test_database.test_table"
+        )
+
+    def test_does_not_align_a_table_created_from_the_source(
+        self, mock_spark_context, mock_delta_table, mock_source_df, mock_align
+    ):
+        """A freshly created table has the source's own types — nothing to align."""
+        mock_spark_context.spark.catalog.tableExists.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            "DELTA_TABLE_NOT_FOUND"
+        )
+        mock_delta_table.isDeltaTable.return_value = False
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        delta_loader.load_table("test_database.test_table", "test_path", mock_source_df)
+
+        mock_align.assert_not_called()
+
+    def test_aligns_after_registering_existing_delta_at_path(
+        self, mock_spark_context, mock_delta_table, mock_source_df, mock_align
+    ):
+        """Delta data already at the path keeps its own schema, so align to it."""
+        path = "s3://bucket/transactional/schema/table/"
+        mock_spark_context.spark.catalog.tableExists.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            "DELTA_TABLE_NOT_FOUND"
+        )
+        mock_delta_table.isDeltaTable.return_value = True
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        delta_loader.load_table("test_database.test_table", path, mock_source_df)
+
+        mock_align.assert_called_once_with(
+            mock_spark_context.spark, mock_source_df, "test_database.test_table"
+        )
+
+    def test_merge_uses_the_aligned_dataframe(
+        self,
+        mock_spark_context,
+        mock_delta_table,
+        mock_target_df,
+        mock_source_df,
+        aligned_df,
+    ):
+        with mock.patch(
+            "bietlejuice.loaders.delta_loader.align_source_to_target",
+            return_value=aligned_df,
+        ):
+            delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+            delta_loader.load_table(
+                "test_table", None, mock_source_df, merge_on=["column1"]
+            )
+
+        mock_target_df.merge.assert_called_once_with(
+            aligned_df, "source.column1 = target.column1"
+        )
+        mock_source_df.alias.assert_not_called()
+
+    def test_write_uses_the_aligned_dataframe(
+        self,
+        mock_spark_context,
+        mock_delta_table,
+        mock_source_df,
+        aligned_df,
+    ):
+        with mock.patch(
+            "bietlejuice.loaders.delta_loader.align_source_to_target",
+            return_value=aligned_df,
+        ):
+            delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+            delta_loader.load_table("test_table", "test_path", mock_source_df)
+
+        aligned_df.write.format.assert_called_once_with("delta")
+        aligned_df.write.saveAsTable.assert_called_once_with(
+            "test_table", partitionBy=None
+        )
+        mock_source_df.write.format.assert_not_called()

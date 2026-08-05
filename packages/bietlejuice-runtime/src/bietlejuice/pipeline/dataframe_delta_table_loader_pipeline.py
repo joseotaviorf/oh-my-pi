@@ -143,7 +143,7 @@ class DataFrameDeltaTableLoaderPipeline(AbstractPipeline):
             f"Loading DataFrame to Delta table {full_table_name} at path {s3_path}"
         )
 
-        delta_loader.load_table(
+        loaded_df = delta_loader.load_table(
             table_name=full_table_name,
             path=s3_path,
             source_df=self.dataframe,
@@ -163,7 +163,7 @@ class DataFrameDeltaTableLoaderPipeline(AbstractPipeline):
             self.target_database_name, self.table_name
         )
 
-        table_schema = SchemaService.get_schema_from_dataframe(self.dataframe)
+        table_schema = SchemaService.get_schema_from_dataframe(loaded_df)
         CatalogStrategyResolver.sync_to_secondary_catalog(
             database_name=self.target_database_name,
             table_name=self.table_name,

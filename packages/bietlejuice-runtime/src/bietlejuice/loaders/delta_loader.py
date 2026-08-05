@@ -8,6 +8,7 @@ from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.spark.base_spark import BaseSparkContext
+from bietlejuice.base.spark.schema_alignment import align_source_to_target
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 
 logger = QuintoAndarLogger("DeltaLoader")
@@ -77,9 +78,17 @@ class DeltaLoader:
         when_matched_operation: dict = None,
         when_not_matched_operation: dict = None,
         column_mapping_mode: str = None,
-    ) -> None:
+    ) -> DataFrame:
         """
         Load a DataFrame into a Delta table.
+
+        Returns the DataFrame actually written — identical to ``source_df``
+        unless the target already existed, in which case ``string`` columns
+        registered as Glue-fragile timestamp/date are cast to the target's
+        real type first. Callers that derive a schema for catalog sync
+        (e.g. ``SchemaService.get_schema_from_dataframe``) must use this
+        return value, not their original ``source_df``, or the secondary
+        catalog registers the pre-alignment type.
 
         By default, it will simply do a write operation.
 
@@ -142,6 +151,14 @@ class DeltaLoader:
                     column_mapping_mode=column_mapping_mode,
                 )
 
+        if exists and is_delta:
+            # Raw JSON tables register timestamp/date as string on Glue (the
+            # OpenX JsonSerDe cannot parse ISO-8601), while this target already
+            # holds the real type. Merge aborts on the mismatch and overwrite
+            # would degrade the target's type, so cast to what the table
+            # declares. No-op when the table was just created from source_df.
+            source_df = align_source_to_target(self.spark, source_df, table_name)
+
         if not merge_on:
             logger.info(f"Writing to table {table_name} on path {path}.")
             self._write_to_table(
@@ -165,6 +182,7 @@ class DeltaLoader:
                 when_not_matched_operation,
             )
         logger.info(f"Load of table {table_name} completed successfully.")
+        return source_df
 
     def _create_empty_table(
         self,

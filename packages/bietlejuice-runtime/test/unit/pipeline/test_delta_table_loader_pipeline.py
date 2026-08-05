@@ -62,6 +62,7 @@ class TestDeltaTableLoaderPipeline:
         )
         df = "df"
         format_options = "format_options"
+        mock_delta_loader.return_value.load_table.return_value = df
 
         # Act
         delta_table_loader_pipeline.load_and_register(df, format_options)

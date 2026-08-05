@@ -117,7 +117,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
             f"Default format for layer {self.layer} is {format_options}. However, {full_table_name} will be loaded as Delta."
         )
 
-        delta_loader.load_table(
+        loaded_df = delta_loader.load_table(
             table_name=full_table_name,
             path=s3_path,
             source_df=df,
@@ -137,7 +137,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
             self.target_database_name, self.table_name
         )
 
-        table_schema = SchemaService.get_schema_from_dataframe(df)
+        table_schema = SchemaService.get_schema_from_dataframe(loaded_df)
         CatalogStrategyResolver.sync_to_secondary_catalog(
             database_name=self.target_database_name,
             table_name=self.table_name,
