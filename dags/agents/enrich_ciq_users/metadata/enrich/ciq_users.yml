@@ -56,7 +56,7 @@ columns:
       - datalake_ebdb_clean.user_merge.status
     description: boolean to identify whether the id user of an agent is the loser of a merge process.
   is_last_status:
-    description: Characterizes a partner most recent status information.
+    description: Flags this id_user's own most recent, valid status row. A partner (id_partner) with multiple id_user identities over time (e.g. re-registration without a user_merge record) can have more than one id_user flagged TRUE simultaneously — consumers needing a single row per id_partner must dedupe explicitly.
   ts_agent_created:
     lineage:
       - datalake_ebdb_clean.partner.ts_created

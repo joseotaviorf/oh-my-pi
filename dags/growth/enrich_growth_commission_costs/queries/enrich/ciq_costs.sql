@@ -34,10 +34,6 @@ WITH upfront_payments_robinhood AS (
     datalake_robin_hood_clean.payment_request AS pr
       ON aeb.id_payment_request = pr.id
   LEFT JOIN
-    datalake_ebdb_agents.ciq_users AS ciq
-      ON ae.id_payee_external = cast(ciq.id_partner AS string)
-      AND ciq.is_last_status = TRUE
-  LEFT JOIN
     datalake_ebdb_contract.contract AS c
       ON c.id = id_contract
   WHERE

@@ -69,19 +69,14 @@ df_partners AS (
     status,
     is_active,
     is_merge_loser_account,
-    CASE
-      WHEN
-        SUM(CASE WHEN is_last_valid_user = TRUE AND is_user_last_status = TRUE THEN 1 END) OVER(PARTITION BY id_partner) > 1
-            AND is_last_valid_user = true
-            AND is_user_last_status = true
-      THEN ROW_NUMBER() OVER(PARTITION BY id_partner ORDER BY ts_agent_status_start DESC) = 1
-      WHEN
-        SUM(CASE WHEN is_last_valid_user = TRUE AND is_user_last_status = TRUE THEN 1 END) OVER(PARTITION BY id_partner) = 1
-            AND is_last_valid_user = true
-            AND is_user_last_status = true
-      THEN TRUE
-      ELSE FALSE
-    END AS is_last_status,
+    -- Grain is (id_partner, id_user): flag every id_user's own current status row as
+    -- is_last_status, instead of picking a single winner across all id_users sharing a
+    -- partner. The old partner-level tiebreak (most recent ts_agent_status_start across
+    -- ALL users of a partner) could crown a stale/INACTIVE id_user over a currently ACTIVE
+    -- one when a partner has multiple id_user identities (e.g. re-registration without a
+    -- user_merge record), silently dropping the active identity's is_last_status entirely.
+    -- Consumers that need one row per id_partner (e.g. ciq_costs) must dedupe on their own.
+    (is_last_valid_user = TRUE AND is_user_last_status = TRUE) AS is_last_status,
     ts_agent_created,
     ts_agent_status_start,
     ts_agent_status_end
