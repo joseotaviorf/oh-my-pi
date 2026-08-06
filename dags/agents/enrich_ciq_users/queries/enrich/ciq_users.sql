@@ -76,7 +76,7 @@ df_partners AS (
     -- one when a partner has multiple id_user identities (e.g. re-registration without a
     -- user_merge record), silently dropping the active identity's is_last_status entirely.
     -- Consumers that need one row per id_partner (e.g. ciq_costs) must dedupe on their own.
-    (is_last_valid_user = TRUE AND is_user_last_status = TRUE) AS is_last_status,
+    (is_last_valid_user AND is_user_last_status) AS is_last_status,
     ts_agent_created,
     ts_agent_status_start,
     ts_agent_status_end
