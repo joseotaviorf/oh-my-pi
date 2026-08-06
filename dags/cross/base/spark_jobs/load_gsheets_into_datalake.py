@@ -11,6 +11,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.gsheets_ingestion_alert import format_gsheet_ingestion_alert
 from bietlejuice.services.gsheets_service import GsheetsService
 from bietlejuice.services.messaging_services.alert_channel_service import (
     AlertChannelService,
@@ -38,26 +39,11 @@ def __get_auth(dbutils, credentials_scope, credentials_key):
     return credentials, scope
 
 
-MSG_HEADER = "⚠️ *Gsheet ingestion failures*\nThe following sheet have errors have not been ingested on this Run.\n"
 TIMEOUT_LIMIT = 5 * 60
 
 
-def __alert_not_ingesting_sheet(sheet_details, exeption, gchat_webhook):
-    msg = """🎲 Sheet: <{}|{}> (ID: {})\n _Owner team: {}._\n\tError: ```{}```"""
-    sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_details['sheet_id']}"
-    error_trace = str(exeption).split("\n")[0]
-    # remove chars that break slack messaging and limit error msg to 150 chars
-    for bad_char in ["`", '"']:
-        error_trace = error_trace.replace(bad_char, "")
-    error_trace[slice(0, 150)]
-    msg = msg.format(
-        sheet_url,
-        sheet_details["clean_table_name"],
-        sheet_details["sheet_id"],
-        sheet_details["sheet_context"],
-        error_trace,
-    )
-    message = MSG_HEADER + msg
+def __alert_not_ingesting_sheet(sheet_details, exeption, gchat_webhook, dag_name=None):
+    message = format_gsheet_ingestion_alert(sheet_details, exeption, dag_name=dag_name)
     message_error = Message(content=message, destination=gchat_webhook)
     return GChatService.send_message(message_error)
 
@@ -196,7 +182,9 @@ if __name__ == "__main__":
             alert_channel=alert_channel,
         )
 
-        message_sent = __alert_not_ingesting_sheet(sheet_details, e, gchat_webhook)
+        message_sent = __alert_not_ingesting_sheet(
+            sheet_details, e, gchat_webhook, dag_name=dag_name
+        )
         logger.error(
             f"""
                 m={JOB_NAME}, table_name={table_name}, msg=Sheet was not loaded, message_sending_result={message_sent},

@@ -22,6 +22,7 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.formatters import StringFormatter
+from bietlejuice.services.gsheets_ingestion_alert import get_metadata_owner
 
 
 def get_run_param(dag_run, param_name):
@@ -385,6 +386,13 @@ class RawGsheetsWorkflow(BaseWorkflow):
         raw_task_groups = {}
         for table_name, sheet_details in google_files:
             sheet_details["raw_table_name"] = table_name
+            # Metadata is available on Composer but not in the Spark artifact
+            # upload; inject owner so Databricks alerts can tag the metadata owner.
+            metadata_owner = get_metadata_owner(
+                self.dag_name, sheet_details["clean_table_name"]
+            )
+            if metadata_owner:
+                sheet_details["owner"] = metadata_owner
 
             raw_spark_job_extra_args = [
                 schema,
