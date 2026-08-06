@@ -31,7 +31,7 @@ F2-01 (owner, domain, substantive table description via `assess_table_descriptio
 | **Production** | `enrich_fairness_assessment` joins `datalake_people_public.org_chart` (`assignment_status_type = 'ACTIVE'`) — authoritative for tiering. |
 | **Agent (`fair-metadata`)** | [`owner_remediation.md`](../../skills/fair-metadata/reference/owner_remediation.md) — Trino kick-off (`mcp_auth` when MCP enabled) + owner SQL; **AskQuestion** for replacements or if Trino fails after kick-off. |
 
-Owner ACTIVE is **not** validated offline (no snapshot file). Use **`trino/SKILL.md`** before EXECUTE, or rely on production `enrich_fairness_assessment`.
+Owner ACTIVE is **not** validated offline (no snapshot file). Prefer **Trino MCP**; fallback **`trino/SKILL.md`** before EXECUTE, or rely on production `enrich_fairness_assessment`.
 
 ### Valid `domain` values (F2-01 / CI regex)
 

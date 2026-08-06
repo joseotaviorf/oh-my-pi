@@ -4,7 +4,7 @@ How **domains and product lines** **audit** and **fix** metadata in bi-etl-ejuic
 
 ## One rule
 
-**FAIR audit or remediation → skill `fair-metadata`** (Trino via `trino/SKILL.md`, not `@tars`).
+**FAIR audit or remediation → skill `fair-metadata`** (Trino via Trino MCP or `trino/SKILL.md`).
 
 ## Three flows
 

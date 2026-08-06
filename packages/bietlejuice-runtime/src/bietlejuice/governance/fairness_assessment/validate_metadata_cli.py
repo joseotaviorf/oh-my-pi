@@ -7,7 +7,7 @@ shape) belong to ``validate-metadata-files-content`` (Yamale).
 **Does not** honor ``skip_list.yml`` ``metadata_files_out_of_pattern`` — FAIR
 applies to every changed clean+ metadata file in the PR diff.
 
-Owner ACTIVE (F2-01) is **online only** — ``@tars`` + ``check_owner_active.sql``
+Owner ACTIVE (F2-01) is **online only** — Trino MCP or ``trino/SKILL.md`` + ``check_owner_active.sql``
 or production ``enrich_fairness_assessment`` (org_chart). No offline snapshot.
 
 Column name alignment between metadata and SQL is validated at PR time by
@@ -229,7 +229,7 @@ def collect_distinct_owners(
     """Return ((owner_email, file_count, status), ...) and YAML load warnings.
 
     Offline audit lists MISSING vs UNVERIFIED only. ACTIVE/INACTIVE requires
-    online verification (``@tars`` / org_chart). Unreadable YAML is skipped with
+    online verification (Trino MCP / ``trino/SKILL.md`` / org_chart). Unreadable YAML is skipped with
     a warning (scope scans remain resilient).
     """
     by_owner: DefaultDict[str, List[Path]] = defaultdict(list)
@@ -391,8 +391,8 @@ def print_scope_audit_report(
         for owner, count, status in result.owner_rows:
             print(f"  {owner:45} {count:4} file(s)  [{status}]")
     print(
-        "\n  NOTE: Owner ACTIVE is not verified offline. Use `@tars` with "
-        "sql/check_owner_active.sql before EXECUTE."
+        "\n  NOTE: Owner ACTIVE is not verified offline. Use Trino MCP or "
+        "`trino/SKILL.md` with sql/check_owner_active.sql before EXECUTE."
     )
     missing = [o for o, _n, s in result.owner_rows if s == "MISSING"]
     if missing:
@@ -645,7 +645,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print(
         "F2-01 table + F2-02 column descriptions on clean+ — owner/domain/min length: "
         "validate-metadata-files-content (Yamale). Owner ACTIVE: online only "
-        "(@tars / org_chart)."
+        "(Trino MCP / trino/SKILL.md / org_chart)."
     )
 
     failed = 0

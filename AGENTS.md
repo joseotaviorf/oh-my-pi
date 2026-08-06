@@ -97,9 +97,7 @@ Cursor auto-loads `.cursor/rules/*.mdc` by path/glob and applies always-on ones 
 
 - **`.cursor/rules/core_min.mdc`** — always-on essentials NOT repeated here: the five-layer
   architecture + cross-layer join rule (`raw → clean → enrich → dw → metric → qube`), the
-  **ConfigurationService / never-hardcode-environment** rule, **TARS gating** (loading
-  `data_exploration.mdc`, `.cursor/subagents/data_analyst.md`, or `docs/llm_context/**`
-  requires an explicit `@tars` prefix; never suggest it), and the hard constraints (`.yml`
+  **ConfigurationService / never-hardcode-environment** rule, and the hard constraints (`.yml`
   only; rerun `make create-dag-files` after a declaration edit; Forno run mandatory before merge).
   **Read this first for any DAG/SQL/modeling work.**
 - **Other `.cursor/rules/*.mdc`** — structured, path-scoped rules: `core.mdc` / `dag_build.mdc`

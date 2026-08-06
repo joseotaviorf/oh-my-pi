@@ -42,10 +42,9 @@ window (14 days for prod gives stable percentiles; for validation use the days
 since the wave started):
 
 ```bash
-uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
-  python plugins/tars/skills/tars/scripts/execute_trino.py \
+uv run --script .cursor/skills/trino/scripts/execute_trino.py \
   --host trino.apps.data-prd.habitat.zone --catalog delta --external-auth \
-  --query "$(cat /tmp/calibration.sql)" --csv-output /tmp/calibration.csv
+  --query "$(cat /tmp/calibration.sql)"
 ```
 
 `/tmp/calibration.sql` — one row per (dag, side):

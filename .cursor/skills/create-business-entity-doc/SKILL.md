@@ -1,11 +1,11 @@
 ---
 name: create-business-entity-doc
-description: Create a new business entity documentation file in docs/llm_context/business_entities/. Entity docs are routing guides for the Data Analyst (TARS) subagent, enabling accurate SQL generation and data discovery. Use when the user asks to document a new entity, add a new business entity, or create context for TARS about a data domain.
+description: Create a new business entity documentation file in docs/llm_context/business_entities/. Entity docs are routing guides for the data analyst agent (TARS plugin in ai-tools), enabling accurate SQL generation and data discovery. Use when the user asks to document a new entity, add a new business entity, or create context for TARS about a data domain.
 ---
 
 # Create a Business Entity Doc
 
-Entity docs are **routing guides** — they explain concepts, point to tables, give key filters, and avoid duplicating column-level documentation that already exists in governance metadata YAML files. They are consumed by the Data Analyst (TARS) subagent when answering data exploration questions.
+Entity docs are **routing guides** — they explain concepts, point to tables, give key filters, and avoid duplicating column-level documentation that already exists in governance metadata YAML files. They are consumed by the TARS data analyst plugin (ai-tools) when answering data exploration questions.
 
 ---
 

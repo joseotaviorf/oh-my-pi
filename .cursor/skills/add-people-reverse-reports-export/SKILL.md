@@ -28,7 +28,7 @@ Technical rules live in [reference.md](reference.md). Apply them when generating
 - **Do not** open a PR until validation and local Forno run are proved — unless the user explicitly waives in writing (document in PR body).
 - Reuse answers already in the thread; skip questions that are already answered.
 - **Never invent** governance consumers, owners, or integration patterns — ask.
-- **Validation:** Tier 1–3 diffs run on **Databricks** only — People data is not complete in Trino; do not use `@tars` / skill **`trino`** here.
+- **Validation:** Tier 1–3 diffs run on **Databricks** only — People data is not complete in Trino; do not use Trino here.
 
 **Shortcuts:** If the first message already picks a flow **and** includes material (DBP key, SQL/notebook, sheet URL, business description), acknowledge both, skip Flow selection and duplicate intake AskQuestions, and jump to the next missing step.
 
@@ -269,7 +269,7 @@ Ask: **"Implementação concluída. Gerar SQL de validação ou ir direto para o
 
 ## Shared — Validation
 
-**Runtime:** People DW / reverse tables are **not fully available in Trino**. Run all Tier 1–3 validation SQL on **Databricks** prod (`quintoandar_prod`). **Do not** use Trino or the `@tars` / `trino` skill for these diffs.
+**Runtime:** People DW / reverse tables are **not fully available in Trino**. Run all Tier 1–3 validation SQL on **Databricks** prod (`quintoandar_prod`). **Do not** use Trino for these diffs.
 
 ### Databricks CLI (agents)
 

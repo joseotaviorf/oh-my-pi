@@ -4,7 +4,7 @@ globs: "**/*.sql"
 ---
 # SQL Style Guide
 
-> **Scope**: These rules apply when **contributing SQL files to the repository** (pipeline queries in `dags/`). Sections 1–8 (formatting, naming, style) also apply to ad-hoc analysis queries. Sections 9–12 (SELECT *, partition filtering, PII storage, layer policy) are pipeline-specific — for data exploration, see `data_exploration.mdc` or use the `@tars` keyword to activate the Data Analyst subagent.
+> **Scope**: These rules apply when **contributing SQL files to the repository** (pipeline queries in `dags/`). Sections 1–8 (formatting, naming, style) also apply to ad-hoc analysis queries. Sections 9–12 (SELECT *, partition filtering, PII storage, layer policy) are pipeline-specific.
 
 ## General SQL Principles
 

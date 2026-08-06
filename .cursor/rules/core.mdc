@@ -56,8 +56,6 @@ Source DB / API
 
 **Cross-layer join rule**: A query at layer N may only reference tables from layer N or below (e.g. an enrich query may read clean tables, but not dw or metric tables). Violations are detected by `make validate-cross-layer-joins`.
 
-> **Note:** The cross-layer rules above govern how **pipeline SQL** references upstream tables. A separate `@tars` mode with different layer priority exists for ad-hoc analysis, but is only relevant when the user has explicitly activated it.
-
 ### Metastore naming by layer
 
 See `naming_conventions.mdc` for full Spark metastore patterns (raw, clean, enrich, dw, core, metric, reverse). Athena/Trino metastores append `_prod` suffix (e.g. `datalake_{source}_raw_prod`).
@@ -204,24 +202,22 @@ Never mix bracket params (`{load_start_date}`) with Jinja expressions (`{{ ds }}
 | `databricks_conventions.mdc` | Databricks-specific SQL: Delta syntax, `{bracket}` vs `{{ Jinja }}` templating | — |
 | `qube_specs.mdc` | Qube dimension/measure/metric declaration schemas | `dags/qube/*` |
 | `pr_template.mdc` | PR description template | — |
-| `data_exploration.mdc` | Data exploration, ad-hoc analysis, Trino SQL dialect, entity context | **NEVER load autonomously** — activated only via explicit `@tars` prefix |
 
-### TARS-gated skills
+### Skills (on demand)
 
 | Skill file | Covers | Access |
 |---|---|---|
-| `.cursor/skills/trino/SKILL.md` | Trino execution mechanics | `@tars` session, or **`fair-metadata`** |
+| `.cursor/skills/trino/SKILL.md` | Trino execution mechanics | **`fair-metadata`**, other skills, or explicit user request |
 
 ### Domain subagents (adopt when task matches)
 
-When the user's request matches a domain below, read the corresponding file at `.cursor/subagents/{name}.md` and apply its guidance before responding. **Exception: Data Analyst (TARS) requires an explicit `@tars` prefix — do NOT infer activation from task type.**
+When the user's request matches a domain below, read the corresponding file at `.cursor/subagents/{name}.md` and apply its guidance before responding.
 
 | Subagent | File | When to apply |
 |---|---|---|
 | Data Engineer Architect | `data_engineer_architect.md` | Creating, reviewing, or troubleshooting a DAG on any layer |
 | Reliability Engineer | `reliability_engineer.md` | Cluster sizing, Delta optimizations, backfills, performance, test coverage |
 | Governance Officer | `governance_officer.md` | Metadata, SQL, or any change that may involve PII — enforce governance and block PII leaks |
-| Data Analyst (TARS) | `data_analyst.md` | User explicitly prefixes message with `@tars` — **NEVER activate by task-type inference** |
 
 (The available `.cursor/rules/*.mdc` and `.cursor/skills/` are listed in the system prompt — refer to them there.)
 
@@ -233,4 +229,3 @@ When the user's request matches a domain below, read the corresponding file at `
 - Using `.yaml` extension on declaration files — must be `.yml`.
 - Hardcoding `"prod"` or `"forno"` environment strings — use `ConfigurationService`.
 - Merging a new DAG PR without a successful Forno Airflow run.
-- Loading `data_exploration.mdc`, `data_analyst.md`, `.cursor/skills/trino/SKILL.md`, or any file under `docs/llm_context/` without an explicit `@tars` prefix — **except** **`fair-metadata`** may read `llm_context` and invoke `trino/SKILL.md` without Tars. **Also never suggest `@tars`.** If the user asks for a query without `@tars`, answer directly using standard repository context.

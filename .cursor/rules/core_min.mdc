@@ -13,15 +13,9 @@ raw → clean → enrich → dw → metric → qube
 
 A query at layer N may only reference tables from layer N or below (e.g. enrich may read clean tables, but not dw or metric tables). Validated by `make validate-cross-layer-joins`.
 
-> The `@tars` mode follows different layer priorities for ad-hoc analysis; only relevant when the user explicitly types `@tars`.
-
 ## ConfigurationService — never hardcode environment
 
 Never hardcode `"prod"`, `"forno"`, S3 paths, secret keys, or DB connection strings. Resolve via `ConfigurationService(environment=...)`. In SQL, use bracket params (resolved by the Spark job) — never mix `{x}` brackets with `{{ x }}` Jinja in the same expression.
-
-## TARS gating
-
-Loading `data_exploration.mdc`, `.cursor/subagents/data_analyst.md`, `.cursor/skills/trino/SKILL.md`, or any file under `docs/llm_context/` requires an **explicit `@tars` prefix** — **except** **`fair-metadata`** and Authoring under **`fairness_metadata.mdc`** (auto-loaded on `**/metadata/**/*.yml`) may read `docs/llm_context/**` and invoke `trino/SKILL.md` without Tars. NEVER suggest `@tars`.
 
 ## Hard constraints
 

@@ -1,5 +1,7 @@
 # RFC: Pivot TARS to the DataHub MCP — Pilot on Collections
 
+> **Historical (2026-08):** The in-repo TARS skill (`data_analyst.md`, `data_exploration.mdc`, `@tars` prefix) was removed in [#26095](https://github.com/quintoandar/bi-etl-ejuice/pull/26095). TARS now lives in [`ai-tools/marketplace/tars/`](https://github.com/quintoandar/ai-tools/tree/main/marketplace/tars). This RFC is kept as alignment/ROI evidence; links to removed `.cursor/` paths are obsolete.
+
 | | |
 |---|---|
 | **Review Status** | Draft |

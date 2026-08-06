@@ -76,17 +76,12 @@ astro/generated-dag-excludes.txt
 # Git worktrees (best-of-n runners, etc.)
 .worktrees/
 
-# TARS local artifacts
-tars_query_results/
-tars_track_record.jsonl
-
 # Cursor local scratch: drafts, test SQL, logs
 .cursor/temp/
 .uv-cache
 
 # Legacy contracts directory
 /contracts/
-.tars/
 
 # Rightsizing validation trigger runtime ledger (appended per trigger; never committed)
 scripts/rightsizing_validation_trigger_ledger.jsonl

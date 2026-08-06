@@ -1,20 +1,23 @@
 ---
 name: trino
-description: "Execute SQL against QuintoAndar's Trino cluster. Dependencies are declared inline (PEP 723) and resolved by `uv run --script`; handles host resolution, SSO authentication, LIMIT safeguard, and persistence of results. Pure connectivity/execution — contains NO SQL authoring guidance (dialect, partition filters, layer choice live in data_exploration.mdc for @tars, or fair-metadata reference docs for metadata gov). Usable when `@tars` is active, or when invoked by the `fair-metadata` skill (owner ACTIVE + bounded description samples)."
+description: "Execute SQL against QuintoAndar's Trino cluster. Dependencies are declared inline (PEP 723) and resolved by `uv run --script`; handles host resolution, SSO authentication, and LIMIT safeguard. Pure connectivity/execution — contains NO SQL authoring guidance. Invoked by fair-metadata, other skills that need Trino, or explicit user request."
 ---
 
 # Trino Execution Skill
 
-Pure execution layer for the TARS loop. This skill does **not** teach SQL syntax, dialect conversion, partition filters, layer choice, or any authoring rule — those live in `.cursor/rules/data_exploration.mdc`. Authoring happens there; this skill only runs the finished SQL against the Trino cluster and returns its raw JSON output.
+Pure execution layer for running SQL against the Trino cluster. This skill does **not** teach SQL syntax, dialect conversion, partition filters, layer choice, or any authoring rule — those live in pipeline conventions (`sql_conventions.mdc`) or the invoking skill's reference docs (e.g. `fair-metadata`). This skill only runs finished SQL and returns its raw JSON output.
 
 ---
 
-## Activation gate (mandatory)
+## When to use
 
-Usable when the user activated **`@tars`**, or when **`fair-metadata`** invokes this skill (owner ACTIVE + bounded samples — **not** the Tars loop: no `tars_track_record.jsonl` or `tars_query_results/`).
+Invoke when:
 
-- Do NOT invoke for general ad-hoc SQL outside `@tars` or `fair-metadata`.
-- Do NOT tell the user to add `@tars` for fair-metadata work.
+- **`fair-metadata`** needs owner ACTIVE checks or bounded description samples.
+- Another skill explicitly delegates Trino execution.
+- The user explicitly asks to run a query against Trino.
+
+Do **not** invoke for general ad-hoc SQL unless the user or an active skill requests it.
 
 ---
 
@@ -25,6 +28,8 @@ Usable when the user activated **`@tars`**, or when **`fair-metadata`** invokes 
 Default Trino host for this repository: **`trino.apps.data-prd.habitat.zone`**. Users are expected to have `TRINO_HOST=trino.apps.data-prd.habitat.zone` in their `.env`. Always pass the host as `"${TRINO_HOST:-trino.apps.data-prd.habitat.zone}"` so the user's override wins and the default is used otherwise. Never hardcode a different host.
 
 The bundled script declares its dependencies inline via a PEP 723 header (`trino`, `pandas`, `keyring`). `uv run --script` resolves them from the global uv cache on first use and reuses them afterwards — there is no venv to bootstrap, and nothing is written under the skill folder. Never run bare `python3` or `pip install` here.
+
+Prefer **Trino MCP** (`mcp_auth` + `execute_query`) when the MCP server is available; use this skill as fallback.
 
 ### 2. LIMIT safeguard
 
@@ -62,18 +67,14 @@ The script prints exactly one JSON object to stdout:
 - On success: `{ "status": "success", "columns": [...], "data": [[...], ...], "count": N }`.
 - On failure: `{ "status": "error", "message": "..." }`.
 
-### 5. Persist the full result
+Show the JSON (or a concise preview) in chat — do not write result files under the repo.
 
-**`@tars` session:** save stdout verbatim to `<cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json` (see `data_analyst.md`).
-
-**`fair-metadata`:** chat preview is enough for owner checks; do not use TARS persistence.
-
-### 6. Error handling
+### 5. Error handling
 
 If the JSON has `status: "error"`, do NOT retry silently:
+
 - Surface the Trino error message to the user.
 - **`fair-metadata`:** follow `owner_remediation.md` — **AskQuestion** before metadata YAML edits if owners cannot be validated.
-- **`@tars` session:** still save the error JSON to the result file when applicable.
 - Wait for the user to confirm a fix before re-executing (or user acknowledgment to proceed without Gate A).
 
 ---
@@ -82,7 +83,7 @@ If the JSON has `status: "error"`, do NOT retry silently:
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Memory limit exceeded | Query scans too much data | Tighten partition filters on the correct partition columns for the table (verify via declaration or metadata YAML — see `data_exploration.mdc`) |
+| Memory limit exceeded | Query scans too much data | Tighten partition filters on the correct partition columns for the table (verify via declaration or metadata YAML) |
 | Authentication prompt loop | Token cache missing/expired | Re-run once; the script caches the token after first SSO round-trip |
 | Host resolution error | `TRINO_HOST` set to a stale value | Unset or set to `trino.apps.data-prd.habitat.zone` |
 
@@ -90,15 +91,13 @@ If the JSON has `status: "error"`, do NOT retry silently:
 
 ## Out of scope for this skill
 
-The following belong to `.cursor/rules/data_exploration.mdc`, not here:
-
 - SQL dialect conversion (Databricks → Trino).
 - Layer priority (DW → enrich → clean → metric).
 - Partition filters (`year`, `month`, `day`), column verification, entity routing.
-- Response shape (Markdown preview, row-count summary, case i vs case ii rendering).
+- Response shape (Markdown preview, row-count summary).
 - `SELECT *` policy, deduplication patterns, type-safe JOINs.
 
-If you catch yourself answering one of those questions from this file, stop — the rule is the authority.
+If you catch yourself answering one of those questions from this file, stop — the invoking skill or pipeline conventions are the authority.
 
 ---
 

@@ -213,7 +213,7 @@ Exemplos de perguntas úteis:
   recente?"
 - "Houve gaps de CDC (`total_events_missing > 0`) nos últimos 7 dias?"
 
-Para acionar o TARS, use o prefixo **`@tars`** em um chat. A documentação de
+Para consultas analíticas sobre essas métricas, instale o plugin **TARS** do marketplace ai-tools (`/tars`). A documentação de
 referência das métricas (schemas, regras e *golden queries*) está em
 `docs/llm_context/business_entities/salesforce_sst_pipeline.md`.
 
@@ -661,7 +661,7 @@ SERVICES_CONFIG = {
 | Preciso reprocessar um período grande (backfill)                            | Backfill via configuração (§8)                                                     | `cases`: `is_backfill_run=True` + partição de início; `services`: `is_backfill_run=True` + `delta_hours` por source. Ignora o skip e recompõe o SCD Type 2 |
 | Run de meia-noite lenta                                                     | `services` processa d-1 (§6)                                                       | Esperado até 4h; investigar só se estourar timeout recorrentemente                                                                                         |
 | `dw_support_journey` não subiu                                              | Datasets em `dependencies.yaml`                                                    | Confirmar se **ambos** os datasets (`cases` e `services`) foram emitidos pelo core                                                                         |
-| Latência/volume anômalos                                                    | `pipeline_events_latency`, `pipeline_stability` (via `@tars`)                      | Correlacionar com `appflow_status` antes de abrir incidente de qualidade                                                                                   |
+| Latência/volume anômalos                                                    | `pipeline_events_latency`, `pipeline_stability` (via plugin TARS)                      | Correlacionar com `appflow_status` antes de abrir incidente de qualidade                                                                                   |
 
 ---
 

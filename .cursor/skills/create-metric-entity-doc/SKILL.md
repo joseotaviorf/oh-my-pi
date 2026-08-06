@@ -1,6 +1,6 @@
 ---
 name: create-metric-entity-doc
-description: Create a new metric entity documentation file in docs/llm_context/metric_entities/. Metric entity docs are thin on schema and thick on calculation — they define ONE official, named metric with its exact formula, scope, canonical filter, weight/parameter sources, and the single canonical query that reproduces the source-of-truth number. Use when the user asks to document a new official metric, add a metric entity, or define how TARS should compute an official indicator.
+description: Create a new metric entity documentation file in docs/llm_context/metric_entities/. Metric entity docs are thin on schema and thick on calculation — they define ONE official, named metric with its exact formula, scope, canonical filter, weight/parameter sources, and the single canonical query that reproduces the source-of-truth number. Use when the user asks to document a new official metric, add a metric entity, or define how the TARS plugin should compute an official indicator.
 ---
 
 # Create a Metric Entity Doc

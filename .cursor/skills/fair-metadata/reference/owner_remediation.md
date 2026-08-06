@@ -41,7 +41,7 @@ Complete **before** posting the remediation plan. Do **not** edit `trino/SKILL.m
 - Email in scope but no row → **INACTIVE** → AskQuestion
 - `(missing)` from offline audit → AskQuestion in **PLAN**, not EXECUTE
 
-Chat preview is enough; do not use TARS `tars_query_results/` persistence.
+Chat preview is enough; do not write result files to disk.
 
 ## When to stop and ask the user
 

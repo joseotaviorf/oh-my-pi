@@ -1,5 +1,7 @@
 # DataHub / TARS pivot benchmarks
 
+> **Historical (2026-08):** The in-repo TARS skill was removed in [#26095](https://github.com/quintoandar/bi-etl-ejuice/pull/26095). TARS now lives in [`ai-tools/marketplace/tars/`](https://github.com/quintoandar/ai-tools/tree/main/marketplace/tars). Artifacts below document the pivot ROI; `.cursor/skills/trino/` remains as a standalone Trino utility.
+
 Evaluation artifacts and scripts for the [TARS → DataHub MCP pivot RFC](../../rfc/datahub/tars_pivot.md). Not part of the DataHub publish pipeline in `dags/governance/datahub_business_context/`.
 
 ## Reports and fixtures

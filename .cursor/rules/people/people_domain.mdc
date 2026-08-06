@@ -207,8 +207,6 @@ has_size_variation:
 
 **People lake tables are not available in Trino.** For triaging Inmetro alerts, validating `custom` constraints from `data_quality/**/*.yml`, or any ad-hoc query against People schemas (`datalake_people*`, `datalake_pin_*`, `dw_*` People domains), use the **Databricks CLI** against **production** — not the Trino skill.
 
-**Scope — does not override `@tars`:** `.cursor/rules/data_exploration.mdc` (Data Exploration / `@tars`) remains **Trino-only** for ad-hoc analyst queries. This section applies only to **People pipeline work** under `dags/people/` when the target tables are absent from Trino (DQ pre-merge checks, Inmetro triage, contributor validation). Do not use Databricks CLI for `@tars` sessions.
-
 #### Workspace and authentication
 
 `PROD` and `quintoandar_prod` below are **local Databricks CLI / Unity Catalog names** in `~/.databrickscfg` and the prod workspace — not pipeline environment strings. The **ConfigurationService** rule (never hardcode `"prod"` in DAG SQL or Spark jobs) does not apply to this operator runbook.

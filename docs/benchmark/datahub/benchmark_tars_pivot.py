@@ -59,7 +59,7 @@ TOKEN: Optional[str] = os.environ.get("DATAHUB_TOKEN", "").strip() or None
 # Pricing & volume assumptions for the ROI projection.
 # Override with your model's actual input price and real daily question count.
 PRICE_PER_M_INPUT_TOKENS: float = 3.00  # USD — Sonnet 4.6 input price
-DAILY_QUESTIONS: int = 100  # assumed @tars questions per day
+DAILY_QUESTIONS: int = 100  # assumed TARS questions per day
 
 OUT_DIR = Path(__file__).parent
 REPORT_PATH = OUT_DIR / "benchmark_report.md"
@@ -766,7 +766,7 @@ def render_report(
     lines += [
         "## Cost projection",
         "",
-        f"Assumptions: **{DAILY_QUESTIONS} @tars questions/day** (across all {n} question domains), "
+        f"Assumptions: **{DAILY_QUESTIONS} TARS questions/day** (across all {n} question domains), "
         f"input price **${PRICE_PER_M_INPUT_TOKENS:.2f} / M tokens** "
         f"(Sonnet 4.6 — adjust the constant in the script to compare models).",
         "",
@@ -840,7 +840,7 @@ def render_report(
                 f"entity MD (`{old.tokens:,}` vs `{new.tokens:,}` tokens). This reveals a",
                 f"natural split: **DataHub for schema / column / query lookups** and",
                 f"**entity MDs for compact glossary / synonym questions**. The hybrid",
-                f"routing in `data_exploration.mdc` already handles this — Step 2",
+                f"routing in the TARS plugin (ai-tools) already handles this — Step 2",
                 f"(entity MD) is always available as a supplementary source.",
                 "",
             ]

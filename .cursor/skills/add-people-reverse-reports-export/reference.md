@@ -219,7 +219,7 @@ WHERE
 ### Validation runtime (mandatory)
 
 - **Databricks only** — full People lake/DW data for reverse exports is **not** in Trino. Tier 1–3 diff queries must run on Databricks against `reverse_reports.*`, `dw_*`, and legacy notebook outputs as applicable.
-- **Do not** suggest Trino, `@tars`, or skill **`trino`** for validation in this workflow — results would be incomplete or wrong.
+- **Do not** suggest Trino for validation in this workflow — People data is incomplete in Trino; results would be incomplete or wrong.
 
 ### Validation (before Forno / PR)
 

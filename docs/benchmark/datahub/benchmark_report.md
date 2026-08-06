@@ -55,7 +55,7 @@ Question set: **5 Collections** (original) + **5 Offboarding/Inspection** + **5 
 
 ## Cost projection
 
-Assumptions: **100 @tars questions/day** (across all 15 question domains), input price **$3.00 / M tokens** (Sonnet 4.6 — adjust the constant in the script to compare models).
+Assumptions: **100 TARS questions/day** (across all 15 question domains), input price **$3.00 / M tokens** (Sonnet 4.6 — adjust the constant in the script to compare models).
 
 | Horizon | Token saving | Estimated saving (USD) |
 |---|---|---|
