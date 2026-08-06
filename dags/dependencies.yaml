@@ -4579,10 +4579,17 @@ bietlejuice.reverse_reports:
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-turnover-user-roles:first-run-of-day
   - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
+  - bietlejuice.pin:load-clean-allocated-task-translation:first-run-of-day
   - bietlejuice.pin:load-clean-foundation-lookup-value:first-run-of-day
+  - bietlejuice.pin:load-clean-question-answer-translation:first-run-of-day
+  - bietlejuice.pin:load-clean-question-base:first-run-of-day
   - bietlejuice.pin:load-clean-question-response:first-run-of-day
+  - bietlejuice.pin:load-clean-question-translation:first-run-of-day
+  - bietlejuice.pin:load-clean-questionnaire-base:first-run-of-day
   - bietlejuice.pin:load-clean-questionnaire-participant:first-run-of-day
+  - bietlejuice.pin:load-clean-questionnaire-question:first-run-of-day
   - bietlejuice.pin:load-clean-questionnaire-response:first-run-of-day
+  - bietlejuice.pin:load-clean-questionnaire-translation:first-run-of-day
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
 bietlejuice.reverse_sale_listings_report:
