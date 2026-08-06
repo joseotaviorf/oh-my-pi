@@ -176,6 +176,13 @@ sale_vgv_total_attribution AS (
         AND ao.id_user_ciq IS NOT NULL
         AND cfl.is_first_listing_valid IS TRUE
         AND ao.ts_contract_signed IS NOT NULL
+    -- agent_offers is an audit table: the same id_offer can carry multiple agent_profile
+    -- rows (AGENT, NEGOTIATION_EXECUTIVE, ...) and multiple revisions per profile as the
+    -- offer is updated. Unlike the AGENT-profile branch above, this branch has no profile
+    -- filter, so it can pull in more than one row per offer. Keep only each offer's latest
+    -- revision so a single first-listing<>offer pair contributes exactly one row.
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY ao.id_offer ORDER BY ao.ts_updated DESC) = 1
 ),
 sale_vgv_total_deduped_attribution AS (
     SELECT
