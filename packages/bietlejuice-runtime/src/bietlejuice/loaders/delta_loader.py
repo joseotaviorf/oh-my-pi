@@ -152,11 +152,13 @@ class DeltaLoader:
                 )
 
         if exists and is_delta:
-            # Raw JSON tables register timestamp/date as string on Glue (the
-            # OpenX JsonSerDe cannot parse ISO-8601), while this target already
-            # holds the real type. Merge aborts on the mismatch and overwrite
-            # would degrade the target's type, so cast to what the table
-            # declares. No-op when the table was just created from source_df.
+            # Raw JSON tables register timestamp/date/decimal as string on Glue
+            # (the JsonSerDe cannot parse ISO-8601 and ClassCasts String to
+            # HiveDecimal), while this target already holds the real type. Merge
+            # aborts on the mismatch and overwrite would degrade the target's
+            # type, so cast to what the table declares — for a decimal, at its
+            # declared precision. No-op when the table was just created from
+            # source_df.
             source_df = align_source_to_target(self.spark, source_df, table_name)
 
         if not merge_on:

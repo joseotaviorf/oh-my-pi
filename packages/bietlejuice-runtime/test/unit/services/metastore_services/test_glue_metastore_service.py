@@ -107,8 +107,8 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         )
         self.assertEqual(ti["PartitionKeys"], [{"Name": "year", "Type": "int"}])
 
-    def test_json_keeps_decimal_and_complex_columns_typed(self):
-        """OpenX reads decimal/nested natively; coercing them would lose data."""
+    def test_json_coerces_decimal_and_keeps_complex_columns_typed(self):
+        """OpenX reads nested types natively, but has no decimal inspector."""
         schema = OrderedDict(
             [
                 ("id", "bigint"),
@@ -129,7 +129,7 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         )
         by_name = {c["Name"]: c["Type"] for c in ti["StorageDescriptor"]["Columns"]}
         self.assertEqual(by_name["id"], "bigint")
-        self.assertEqual(by_name["amount"], "decimal(17,2)")
+        self.assertEqual(by_name["amount"], "string")
         self.assertEqual(by_name["tags"], "array<string>")
         self.assertEqual(by_name["payload"], "struct<a:int>")
         self.assertEqual(by_name["blob"], "binary")
@@ -182,9 +182,9 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
             c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]
         }
         self.assertEqual(by_name["id"], "string")
-        # decimal survives the merge untouched under OpenX...
-        self.assertEqual(by_name["amount"], "decimal(17,2)")
-        # ...while timestamp is still coerced.
+        # The preserved decimal is coerced like any other fragile type...
+        self.assertEqual(by_name["amount"], "string")
+        # ...as is the incoming timestamp.
         self.assertEqual(by_name["created_at"], "string")
 
     def test_coerce_json_table_column_types_updates_fragile_types(self):
@@ -213,15 +213,15 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         }
         svc = GlueMetastoreService(glue_client)
         result = svc.coerce_json_table_column_types("db", "t", dry_run=False)
-        # Only created_at is fragile under OpenX.
-        self.assertEqual(result["updated"], 1)
+        # created_at and amount are the fragile ones under OpenX.
+        self.assertEqual(result["updated"], 2)
         glue_client.update_table.assert_called_once()
         table_input = glue_client.update_table.call_args[0][1]
         by_name = {
             c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]
         }
         self.assertEqual(by_name["created_at"], "string")
-        self.assertEqual(by_name["amount"], "decimal(10,2)")
+        self.assertEqual(by_name["amount"], "string")
         self.assertEqual(by_name["tags"], "array<string>")
         self.assertEqual(by_name["blob"], "binary")
         self.assertEqual(table_input["PartitionKeys"][0]["Type"], "int")
@@ -269,7 +269,7 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
             {c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]}[
                 "amount"
             ],
-            "decimal(10,2)",
+            "string",
         )
         self.assertEqual(
             [k["Name"].lower() for k in table_input["PartitionKeys"]],

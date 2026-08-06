@@ -32,9 +32,11 @@ _JSON_OUTPUT = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
 #
 # OpenX cannot parse ISO-8601 timestamps -- it relies on ``Timestamp.valueOf``,
 # which rejects the ``T`` separator and ``Z`` suffix, and upstream documents no
-# ``timestamp.formats`` property. ``timestamp`` / ``date`` columns are therefore
-# registered as ``string`` (see ``coerce_glue_type_for_json``) and cast back to
-# the real type by the consumer.
+# ``timestamp.formats`` property. It also ships no decimal ObjectInspector, so a
+# ``decimal`` column falls back to Hive's, which blind-casts the JSON value and
+# raises ``ClassCastException: String -> HiveDecimal``. ``timestamp`` / ``date``
+# / ``decimal`` columns are therefore registered as ``string`` (see
+# ``coerce_glue_type_for_json``) and cast back to the real type by the consumer.
 _JSON_SERDE = "org.openx.data.jsonserde.JsonSerDe"
 # Comma-separated patterns for Hive JsonSerDe TimestampParser (Joda
 # DateTimeFormat.forPattern — not Java DateTimeFormatter).

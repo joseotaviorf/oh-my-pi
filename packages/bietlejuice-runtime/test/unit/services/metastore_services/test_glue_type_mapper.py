@@ -58,17 +58,40 @@ class TestMapUcTypeToGlue(unittest.TestCase):
 
 
 class TestCoerceGlueTypeForJson(unittest.TestCase):
-    """Only timestamp/date are fragile under OpenX; everything else stays typed."""
+    """timestamp/date/decimal are fragile under OpenX; everything else stays typed."""
 
     def test_timestamp_and_date_become_string(self):
         for glue_type in ("timestamp", "date", "TIMESTAMP", "Date"):
             with self.subTest(glue_type=glue_type):
                 self.assertEqual(coerce_glue_type_for_json(glue_type), "string")
 
-    def test_decimal_and_complex_stay_typed(self):
+    def test_decimal_becomes_string(self):
+        """OpenX has no decimal ObjectInspector, so Hive's blind-casts the JSON
+        value and every row raises ``String -> HiveDecimal``."""
+        for glue_type in (
+            "decimal(5,0)",
+            "decimal(38,18)",
+            "decimal(10, 2)",
+            "DECIMAL(17,2)",
+            "decimal",
+        ):
+            with self.subTest(glue_type=glue_type):
+                self.assertEqual(coerce_glue_type_for_json(glue_type), "string")
+
+    def test_nested_decimal_is_left_alone(self):
+        """Only top-level columns are coerced; rewriting a struct field would
+        change the shape the SerDe matches JSON keys against."""
+        for glue_type in (
+            "array<decimal(9,2)>",
+            "struct<amount:decimal(17,2)>",
+            "map<string,decimal(9,4)>",
+        ):
+            with self.subTest(glue_type=glue_type):
+                self.assertEqual(coerce_glue_type_for_json(glue_type), glue_type)
+
+    def test_complex_types_stay_typed(self):
         """OpenX reads these natively -- coercing them would lose the payload."""
         for glue_type in (
-            "decimal(17,2)",
             "array<string>",
             "array<struct<AddressId:string,FromDate:string>>",
             "struct<a:int>",
@@ -100,10 +123,10 @@ class TestCoerceGlueTypeForJson(unittest.TestCase):
         self.assertEqual(coerce_glue_type_for_json(""), "string")
         self.assertEqual(coerce_glue_type_for_json(None), "string")
 
-    def test_map_uc_type_to_glue_for_json_coerces_only_timestamp_and_date(self):
+    def test_map_uc_type_to_glue_for_json_coerces_temporals_and_decimal(self):
         self.assertEqual(map_uc_type_to_glue_for_json("TIMESTAMP"), "string")
         self.assertEqual(map_uc_type_to_glue_for_json("DATE"), "string")
-        self.assertEqual(map_uc_type_to_glue_for_json("DECIMAL(10,2)"), "decimal(10,2)")
+        self.assertEqual(map_uc_type_to_glue_for_json("DECIMAL(10,2)"), "string")
         self.assertEqual(map_uc_type_to_glue_for_json("ARRAY<INT>"), "array<int>")
         self.assertEqual(map_uc_type_to_glue_for_json("BIGINT"), "bigint")
         self.assertEqual(map_uc_type_to_glue_for_json("BINARY"), "binary")

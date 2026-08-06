@@ -324,12 +324,13 @@ class GlueMetastoreService(MetastoreService):
         *,
         dry_run: bool = False,
     ) -> Dict[str, int]:
-        """Align JSON partition SerDe with the table StorageDescriptor.
+        """Align JSON partition SerDe and columns with the table StorageDescriptor.
 
-        Updates (does not drop/recreate) partitions whose ``SerdeInfo`` differs
-        from the table. Direction-agnostic: whatever the table carries becomes
-        the target, so this works both for the original OpenX → HCatalog sweep
-        and for the HCatalog → OpenX restore. Partitions carry their own
+        Updates (does not drop/recreate) partitions whose ``SerdeInfo`` or
+        ``Columns`` differ from the table. Direction-agnostic: whatever the table
+        carries becomes the target, so this works for the original
+        OpenX → HCatalog sweep, the HCatalog → OpenX restore, and a column-type
+        coercion (``decimal`` → ``string``). Partitions carry their own
         ``SerdeInfo`` *and* ``Columns``, so a table-only update leaves them
         unreadable.
 
@@ -384,14 +385,15 @@ class GlueMetastoreService(MetastoreService):
         if not entries:
             logger.info(
                 f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
-                f"scanned={counts['scanned']}, msg=all partitions already match table SerDe"
+                f"scanned={counts['scanned']}, "
+                "msg=all partitions already match table SerDe and columns"
             )
             return counts
 
         logger.info(
             f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
             f"scanned={counts['scanned']}, to_update={len(entries)}, "
-            f"dry_run={dry_run}, msg=partitions need SerDe sync"
+            f"dry_run={dry_run}, msg=partitions need SerDe/column sync"
         )
 
         if dry_run:
@@ -408,7 +410,7 @@ class GlueMetastoreService(MetastoreService):
 
         logger.info(
             f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
-            f"updated={counts['updated']}, msg=partition SerDe synced"
+            f"updated={counts['updated']}, msg=partition SerDe and columns synced"
         )
         return counts
 

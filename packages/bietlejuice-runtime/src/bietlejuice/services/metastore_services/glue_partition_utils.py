@@ -97,7 +97,8 @@ def is_delta_glue_table(table: Dict) -> bool:
     return False
 
 
-# OpenX rejects ISO-8601 ``T``/``Z`` timestamps; HCatalog JsonSerDe is the fix.
+# Both SerDes appear in the catalog: OpenX is the current registration, HCatalog
+# survives on tables not re-registered since #27258.
 _JSON_SERDE_HCATALOG = "org.apache.hive.hcatalog.data.JsonSerDe"
 _JSON_SERDE_OPENX = "org.openx.data.jsonserde.JsonSerDe"
 
@@ -116,17 +117,42 @@ def is_json_glue_table(table: Dict) -> bool:
     return serde in (_JSON_SERDE_HCATALOG, _JSON_SERDE_OPENX)
 
 
+def _column_signature(storage_descriptor: Dict) -> List[Tuple[str, str]]:
+    """Ordered ``(name, type)`` pairs, case-folded, for drift comparison.
+
+    Order is significant: Glue column order is positional metadata for the Hive
+    reader, so a reordered partition is as broken as a retyped one.
+    """
+    return [
+        (
+            str(column.get("Name", "")).lower(),
+            str(column.get("Type", "")).strip().lower(),
+        )
+        for column in ((storage_descriptor or {}).get("Columns") or [])
+    ]
+
+
 def partition_serde_needs_update(
     table_storage_descriptor: Dict, partition_storage_descriptor: Dict
 ) -> bool:
-    """True when partition SerDe library or parameters differ from the table."""
+    """True when partition SerDe or columns differ from the table.
+
+    Partitions carry their own ``SerdeInfo`` *and* ``Columns``, and Spark builds
+    the deserializer from the partition descriptor, so a table whose column
+    types were coerced (``decimal`` -> ``string``) still reads through the old
+    partition types until the partitions are updated too.
+    """
     table_serde = (table_storage_descriptor or {}).get("SerdeInfo") or {}
     part_serde = (partition_storage_descriptor or {}).get("SerdeInfo") or {}
     if table_serde.get("SerializationLibrary") != part_serde.get(
         "SerializationLibrary"
     ):
         return True
-    return (table_serde.get("Parameters") or {}) != (part_serde.get("Parameters") or {})
+    if (table_serde.get("Parameters") or {}) != (part_serde.get("Parameters") or {}):
+        return True
+    return _column_signature(table_storage_descriptor) != _column_signature(
+        partition_storage_descriptor
+    )
 
 
 def build_partition_update_entry(

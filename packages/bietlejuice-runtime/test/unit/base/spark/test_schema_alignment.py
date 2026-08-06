@@ -1,5 +1,6 @@
-"""Unit tests for string -> timestamp/date alignment against a Delta target."""
+"""Unit tests for string -> timestamp/date/decimal alignment on a Delta target."""
 
+from decimal import Decimal
 from unittest import mock
 
 import pytest
@@ -52,17 +53,25 @@ class TestPlanAlignment:
 
         assert plan_alignment(source, target) == []
 
-    def test_non_temporal_target_is_left_alone(self):
-        """Scope is deliberately narrow: only dates were coerced to string.
+    def test_string_source_to_decimal_target_is_planned(self):
+        """Glue registers raw decimals as string too, so they align like dates.
 
-        A string -> decimal or string -> struct mismatch means something else is
-        wrong and belongs to schema evolution or a human, not to this cast.
+        Without this, Delta widens the incoming string to decimal(38,18) and
+        aborts the merge against the target's declared precision.
         """
-        source = _schema(("amount", StringType()), ("tags", StringType()))
-        target = _schema(
-            ("amount", DecimalType(17, 2)),
-            ("tags", StructType([StructField("a", StringType(), True)])),
-        )
+        source = _schema(("amount", StringType()))
+        target = _schema(("amount", DecimalType(5, 0)))
+
+        assert plan_alignment(source, target) == [("amount", DecimalType(5, 0))]
+
+    def test_unregisterable_target_is_left_alone(self):
+        """Scope is deliberately narrow: only the coerced types are aligned.
+
+        A string -> struct mismatch means something else is wrong and belongs to
+        schema evolution or a human, not to this cast.
+        """
+        source = _schema(("tags", StringType()))
+        target = _schema(("tags", StructType([StructField("a", StringType(), True)])))
 
         assert plan_alignment(source, target) == []
 
@@ -140,6 +149,21 @@ class TestApplyAlignment:
         assert dict(aligned.dtypes)["action_performed_date.1"] == "date"
         assert aligned.collect()[0][0] is not None
 
+    def test_casts_numeric_string_to_the_targets_decimal_precision(self, spark_session):
+        """Regression: cyber logs.sequence_number, decimal(5,0) on the target.
+
+        Delta reconciled the raw string against it as decimal(38,18) and failed
+        the merge, so the cast has to land on the declared precision.
+        """
+        source_df = spark_session.createDataFrame(
+            [("42",)], _schema(("sequence_number", StringType()))
+        )
+
+        aligned = apply_alignment(source_df, [("sequence_number", DecimalType(5, 0))])
+
+        assert dict(aligned.dtypes)["sequence_number"] == "decimal(5,0)"
+        assert aligned.collect()[0]["sequence_number"] == Decimal("42")
+
     def test_empty_plan_returns_the_same_dataframe(self, spark_session):
         source_df = spark_session.createDataFrame(
             [("1",)], _schema(("id", StringType()))
@@ -166,6 +190,19 @@ class TestAuditAlignmentNulls:
 
         # The already-null row is not a loss; the unparseable ones are.
         assert deltas == {"created_at": 1, "day": 1}
+
+    def test_counts_values_that_overflow_the_target_precision(self, spark_session):
+        """A value too wide for decimal(5,0) casts to NULL with ANSI mode off."""
+        source_df = spark_session.createDataFrame(
+            [("42",), ("1234567",), ("not a number",)],
+            _schema(("sequence_number", StringType())),
+        )
+
+        deltas = audit_alignment_nulls(
+            source_df, [("sequence_number", DecimalType(5, 0))]
+        )
+
+        assert deltas == {"sequence_number": 2}
 
     def test_reports_zero_when_every_value_parses(self, spark_session):
         source_df = spark_session.createDataFrame(

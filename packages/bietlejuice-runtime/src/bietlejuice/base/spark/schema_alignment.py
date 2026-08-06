@@ -1,24 +1,29 @@
 """
 Align a source DataFrame's column types to an existing Delta table's schema.
 
-Raw JSON tables are registered on Glue with their ``timestamp`` and ``date``
-columns typed as ``string``: the OpenX JsonSerDe parses those with
-``Timestamp.valueOf`` / ``Date.valueOf``, which reject the ISO-8601 ``T``
-separator and ``Z`` suffix our producers emit, and OpenX exposes no
-``timestamp.formats`` property to configure around it.  The clean-layer Delta
-tables were created before that coercion and still hold the real types, so a
-consumer reading raw and writing clean now hands Spark a ``string`` where the
-target holds a ``timestamp``.
+Raw JSON tables are registered on Glue with their ``timestamp``, ``date`` and
+``decimal`` columns typed as ``string`` (see ``coerce_glue_type_for_json``): the
+Hive JsonSerDe parses temporals with ``Timestamp.valueOf`` / ``Date.valueOf``,
+which reject the ISO-8601 ``T`` separator and ``Z`` suffix our producers emit,
+and OpenX has no decimal ObjectInspector at all, so a ``decimal`` column dies
+with ``ClassCastException: String -> HiveDecimal`` on every row.  The clean-layer
+Delta tables were created before that coercion and still hold the real types, so
+a consumer reading raw and writing clean now hands Spark a ``string`` where the
+target holds a ``timestamp`` or a ``decimal``.
 
 Neither write path tolerates that.  ``MERGE`` with
 ``spark.databricks.delta.schema.autoMerge.enabled`` plus ``whenMatchedUpdateAll``
 / ``whenNotMatchedInsertAll`` aborts on the mismatch rather than casting, and an
 overwrite with ``overwriteSchema`` would succeed by *replacing* the target's
-``timestamp`` with ``string`` — silently degrading every downstream reader.
+``timestamp`` with ``string`` — silently degrading every downstream reader.  For
+decimals the abort is doubly confusing: Delta widens the incoming ``string`` to
+``DecimalType.SYSTEM_DEFAULT`` before comparing, so a target of ``decimal(5,0)``
+fails with ``DELTA_FAILED_TO_MERGE_FIELDS`` against a ``decimal(38,18)`` that
+appears in no schema.
 
-Deliberately narrow: only ``string`` -> ``timestamp`` / ``date`` is aligned,
-because that is the only divergence the Glue JSON registration introduces.  Any
-other mismatch (a genuinely wrong type, a widened decimal, a reshaped struct) is
+Deliberately narrow: only ``string`` -> ``timestamp`` / ``date`` / ``decimal`` is
+aligned, because that is the only divergence the Glue JSON registration
+introduces.  Any other mismatch (a genuinely wrong type, a reshaped struct) is
 left to Delta schema evolution or to a human, so this never quietly reshapes
 data it was not written to handle.  Top-level columns only — a ``string`` field
 nested inside a ``struct`` is not rewritten.
@@ -33,6 +38,7 @@ from pyspark.sql import functions as F
 from pyspark.sql.types import (
     DataType,
     DateType,
+    DecimalType,
     StringType,
     StructType,
     TimestampNTZType,
@@ -49,7 +55,7 @@ AUDIT_NULLS_CONF = "spark.bietlejuice.schemaAlignment.auditNulls"
 
 # Target types worth aligning a ``string`` source column to. These are exactly
 # the types coerce_glue_type_for_json registers as ``string``.
-_ALIGNABLE_TARGET_TYPES = (DateType, TimestampType, TimestampNTZType)
+_ALIGNABLE_TARGET_TYPES = (DateType, TimestampType, TimestampNTZType, DecimalType)
 
 AlignmentPlan = List[Tuple[str, DataType]]
 
@@ -71,9 +77,11 @@ def plan_alignment(
     """Return the ``(source_column, target_type)`` casts needed before writing.
 
     A column is included only when it is ``string`` in the source, present in
-    the target, and ``timestamp`` / ``date`` there. Names are matched
-    case-insensitively because Glue lower-cases column names while Delta keeps
-    the registered spelling.
+    the target, and ``timestamp`` / ``date`` / ``decimal`` there. A decimal
+    target keeps its declared precision and scale, so the cast lands on
+    ``decimal(5,0)`` rather than on Spark's default ``decimal(38,18)``. Names are
+    matched case-insensitively because Glue lower-cases column names while Delta
+    keeps the registered spelling.
 
     Pure: takes two ``StructType``s, needs no ``SparkSession``.
 
@@ -179,7 +187,7 @@ def align_source_to_target(
     if not plan:
         logger.info(
             f"m=align_source_to_target, table={table_name}, aligned_count=0, "
-            "msg=no string column maps to a timestamp/date target"
+            "msg=no string column maps to a timestamp/date/decimal target"
         )
         return source_df
 

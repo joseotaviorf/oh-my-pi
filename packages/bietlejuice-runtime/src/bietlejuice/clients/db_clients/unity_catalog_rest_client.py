@@ -13,7 +13,8 @@ following the same pattern already used in
 from __future__ import annotations
 
 import os
-from typing import Dict, List, Optional
+import re
+from typing import Dict, List, Optional, Tuple
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -132,6 +133,11 @@ class UnityCatalogRestClient(DBClient):
     def _build_column_infos(cls, columns: List[Dict]) -> list:
         """Build ``ColumnInfo`` list with all required fields:
         ``name``, ``type_text``, ``type_name``, ``type_json``, ``position``.
+
+        A decimal column also carries ``type_precision`` / ``type_scale``:
+        without them a consumer reading the registered schema sees an unbounded
+        ``decimal`` and falls back to Spark's ``decimal(38,18)``, which no longer
+        merges into the real ``decimal(p,s)`` target.
         """
         from databricks.sdk.service.catalog import ColumnInfo, ColumnTypeName
 
@@ -142,6 +148,7 @@ class UnityCatalogRestClient(DBClient):
                 ColumnTypeName, c["type_text"]
             )
             type_json = cls._type_text_to_json(type_text)
+            precision_scale = cls._decimal_precision_scale(type_text)
 
             col_infos.append(
                 ColumnInfo(
@@ -151,6 +158,8 @@ class UnityCatalogRestClient(DBClient):
                     type_json=type_json,
                     position=idx,
                     nullable=True,
+                    type_precision=precision_scale[0] if precision_scale else None,
+                    type_scale=precision_scale[1] if precision_scale else None,
                 )
             )
         return col_infos
@@ -175,13 +184,37 @@ class UnityCatalogRestClient(DBClient):
         "void": '"void"',
     }
 
+    _DECIMAL_RE = re.compile(r"^decimal\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)$")
+
+    @classmethod
+    def _decimal_precision_scale(cls, type_text: str) -> Optional[Tuple[int, int]]:
+        """Return ``(precision, scale)`` for a decimal type_text, else ``None``.
+
+        A bare ``decimal`` means ``decimal(10,0)``, as in Spark SQL.
+        """
+        lower = type_text.strip().lower()
+        if lower == "decimal":
+            return (10, 0)
+        match = cls._DECIMAL_RE.match(lower)
+        if match:
+            return (int(match.group(1)), int(match.group(2)))
+        return None
+
     @classmethod
     def _type_text_to_json(cls, type_text: str) -> str:
         """Convert a type_text (e.g. 'string', 'bigint') to its
-        type_json representation (e.g. '"string"', '"long"')."""
+        type_json representation (e.g. '"string"', '"long"').
+
+        Decimals keep their precision and scale ('"decimal(10,0)"'), matching
+        Spark's own ``DataType.json`` and preserving the declared type for
+        whoever reads the schema back.
+        """
         lower = type_text.strip().lower()
         if lower in cls._TYPE_TEXT_TO_JSON:
             return cls._TYPE_TEXT_TO_JSON[lower]
+        precision_scale = cls._decimal_precision_scale(lower)
+        if precision_scale:
+            return f'"decimal({precision_scale[0]},{precision_scale[1]})"'
         if lower.startswith("decimal"):
             return '"decimal"'
         return '"string"'

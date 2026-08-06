@@ -127,18 +127,29 @@ def map_uc_type_to_glue(uc_type: str) -> str:
 def coerce_glue_type_for_json(glue_type: str) -> str:
     """Coerce Glue types that break OpenX JsonSerDe reads to ``string``.
 
-    Only ``timestamp`` and ``date`` are fragile: OpenX parses them with
-    ``Timestamp.valueOf`` / ``Date.valueOf``, which reject the ISO-8601 ``T``
-    separator and ``Z`` suffix emitted by our JSON producers, and OpenX has no
-    ``timestamp.formats`` property to configure around it. Registering them as
-    ``string`` keeps the read working; the consumer casts the value back to the
-    real type before writing to its target table.
+    Three types are fragile:
 
-    Everything else is left alone. ``decimal`` and ``array`` / ``struct`` /
-    ``map`` were also coerced while the catalog was on HCatalog JsonSerDe
-    (#27238) because that SerDe raised ``String → HiveDecimal`` and
-    ``ArrayList → HCatRecord`` ClassCasts; OpenX handles all of them natively,
-    so coercing them would lose the nested payload for no benefit.
+    * ``timestamp`` / ``date`` — OpenX parses them with ``Timestamp.valueOf`` /
+      ``Date.valueOf``, which reject the ISO-8601 ``T`` separator and ``Z``
+      suffix emitted by our JSON producers, and OpenX has no
+      ``timestamp.formats`` property to configure around it.
+    * ``decimal`` — OpenX's ``JsonObjectInspectorFactory`` has no ``DECIMAL``
+      case, so it falls back to Hive's ``JavaHiveDecimalObjectInspector``, which
+      blind-casts the value OpenX stored. Every row then dies with
+      ``ClassCastException: String cannot be cast to HiveDecimal``. Note that
+      integral and floating types *do* have an OpenX inspector
+      (``JavaStringIntObjectInspector`` and friends parse the JSON string), so
+      they are left typed.
+
+    Registering the fragile ones as ``string`` keeps the read working; the
+    consumer casts the value back to the target's declared type before writing
+    (see ``schema_alignment``), which is also what preserves the target's
+    decimal precision instead of Spark's ``decimal(38,18)`` default.
+
+    ``array`` / ``struct`` / ``map`` were coerced while the catalog was on
+    HCatalog JsonSerDe (#27238) because that SerDe raised
+    ``ArrayList → HCatRecord`` ClassCasts; OpenX reads them natively, so
+    coercing them would lose the nested payload for no benefit.
 
     ``binary`` is intentionally left unchanged (deferred separately).
     Partition keys must not be passed through this helper.
@@ -148,6 +159,8 @@ def coerce_glue_type_for_json(glue_type: str) -> str:
     if not lower:
         return "string"
     if lower in ("timestamp", "date"):
+        return "string"
+    if lower == "decimal" or _DECIMAL_RE.match(trimmed):
         return "string"
     return trimmed
 

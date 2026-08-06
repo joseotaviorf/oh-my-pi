@@ -204,6 +204,50 @@ class TestPartitionSerdeNeedsUpdate(unittest.TestCase):
         part["SerdeInfo"]["Parameters"] = {"serialization.format": "1"}
         self.assertTrue(partition_serde_needs_update(_hcatalog_sd(), part))
 
+    def test_coerced_column_type_needs_update(self):
+        """A table whose decimal column was coerced to string still reads through
+        the partition's own Columns until the partition is updated too."""
+        table = _openx_sd("s3://bucket/raw/t/")
+        table["Columns"] = [
+            {"Name": "id", "Type": "bigint"},
+            {"Name": "n", "Type": "string"},
+        ]
+        part = _openx_sd()
+        part["Columns"] = [
+            {"Name": "id", "Type": "bigint"},
+            {"Name": "n", "Type": "decimal(5,0)"},
+        ]
+        self.assertTrue(partition_serde_needs_update(table, part))
+
+    def test_added_column_needs_update(self):
+        table = _openx_sd("s3://bucket/raw/t/")
+        table["Columns"] = [
+            {"Name": "id", "Type": "bigint"},
+            {"Name": "n", "Type": "string"},
+        ]
+        self.assertTrue(partition_serde_needs_update(table, _openx_sd()))
+
+    def test_reordered_columns_need_update(self):
+        """Glue column order is positional metadata for the Hive reader."""
+        table = _openx_sd("s3://bucket/raw/t/")
+        table["Columns"] = [
+            {"Name": "a", "Type": "string"},
+            {"Name": "b", "Type": "string"},
+        ]
+        part = _openx_sd()
+        part["Columns"] = [
+            {"Name": "b", "Type": "string"},
+            {"Name": "a", "Type": "string"},
+        ]
+        self.assertTrue(partition_serde_needs_update(table, part))
+
+    def test_column_case_and_whitespace_differences_are_not_drift(self):
+        table = _openx_sd("s3://bucket/raw/t/")
+        table["Columns"] = [{"Name": "Id", "Type": "BIGINT"}]
+        part = _openx_sd()
+        part["Columns"] = [{"Name": "id", "Type": " bigint "}]
+        self.assertFalse(partition_serde_needs_update(table, part))
+
 
 class TestBuildPartitionUpdateEntry(unittest.TestCase):
     def test_preserves_location_and_clones_table_serde(self):

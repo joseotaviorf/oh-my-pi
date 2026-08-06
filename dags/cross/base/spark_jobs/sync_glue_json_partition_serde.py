@@ -3,15 +3,17 @@ Backfill Glue JSON table and partition metadata for EMR compatibility.
 
 Does two things per JSON table (emr-cli friendly):
 
-1. **Column types** — coerce fragile Glue types to ``string``. Only
-   ``timestamp`` and ``date`` qualify: they are the sole types the OpenX
-   JsonSerDe cannot parse (``Timestamp.valueOf`` rejects ISO-8601 ``T`` / ``Z``
-   and OpenX has no ``timestamp.formats``). ``decimal`` and
-   ``array`` / ``struct`` / ``map`` are read natively and left typed.
-2. **Partition SerDe** — for partitioned tables, align partition ``SerdeInfo``
-   and ``Columns`` with the table StorageDescriptor. Partitions carry their own
-   copies, so a table-only change leaves them unreadable. Direction-agnostic:
-   whatever the table declares becomes the target.
+1. **Column types** — coerce fragile Glue types to ``string``: ``timestamp`` and
+   ``date`` (``Timestamp.valueOf`` rejects ISO-8601 ``T`` / ``Z`` and OpenX has
+   no ``timestamp.formats``) plus ``decimal`` (OpenX has no decimal
+   ObjectInspector, so Hive's blind-casts the JSON value and every row raises
+   ``ClassCastException: String -> HiveDecimal``). Integral and floating types
+   have OpenX inspectors that parse the JSON string, and
+   ``array`` / ``struct`` / ``map`` are read natively, so both stay typed.
+2. **Partition SerDe and columns** — for partitioned tables, align partition
+   ``SerdeInfo`` and ``Columns`` with the table StorageDescriptor. Partitions
+   carry their own copies, so a table-only change leaves them unreadable.
+   Direction-agnostic: whatever the table declares becomes the target.
 
 The common case is ``--skip-type-coerce``: after the tables themselves have been
 re-registered by their production DAGs, this pushes the table's SerDe down onto

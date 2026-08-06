@@ -108,3 +108,52 @@ class TestUnityCatalogRestClient(unittest.TestCase):
         client = UnityCatalogRestClient(host="https://h", token="t")
         with self.assertRaises(NotImplementedError):
             client.run("CREATE TABLE t")
+
+
+class TestDecimalColumnRegistration(unittest.TestCase):
+    """A registered decimal must keep its precision and scale.
+
+    Dropping them leaves consumers reading an unbounded ``decimal``, which Spark
+    resolves to ``decimal(38,18)`` -- a type that no longer merges into the real
+    ``decimal(p,s)`` Delta target.
+    """
+
+    def test_type_json_keeps_precision_and_scale(self):
+        self.assertEqual(
+            UnityCatalogRestClient._type_text_to_json("decimal(10,2)"),
+            '"decimal(10,2)"',
+        )
+        self.assertEqual(
+            UnityCatalogRestClient._type_text_to_json("DECIMAL(38, 18)"),
+            '"decimal(38,18)"',
+        )
+
+    def test_bare_decimal_uses_the_spark_default(self):
+        self.assertEqual(
+            UnityCatalogRestClient._type_text_to_json("decimal"), '"decimal(10,0)"'
+        )
+        self.assertEqual(
+            UnityCatalogRestClient._decimal_precision_scale("decimal"), (10, 0)
+        )
+
+    def test_non_decimal_types_are_unaffected(self):
+        self.assertEqual(UnityCatalogRestClient._type_text_to_json("bigint"), '"long"')
+        self.assertIsNone(UnityCatalogRestClient._decimal_precision_scale("bigint"))
+
+    def test_column_info_carries_precision_and_scale(self):
+        column_info_mock = mock_databricks.sdk.service.catalog.ColumnInfo
+        column_info_mock.reset_mock()
+
+        UnityCatalogRestClient._build_column_infos(
+            [
+                {"name": "amount", "type_text": "DECIMAL(17,2)"},
+                {"name": "label", "type_text": "STRING"},
+            ]
+        )
+
+        decimal_kwargs = column_info_mock.call_args_list[0].kwargs
+        self.assertEqual(decimal_kwargs["type_precision"], 17)
+        self.assertEqual(decimal_kwargs["type_scale"], 2)
+        string_kwargs = column_info_mock.call_args_list[1].kwargs
+        self.assertIsNone(string_kwargs["type_precision"])
+        self.assertIsNone(string_kwargs["type_scale"])

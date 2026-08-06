@@ -82,8 +82,8 @@ class TestGetAllTablesMetadata:
 
 
 class TestSetTimestampsAsString:
-    def test_coerces_only_timestamp_and_date(self):
-        """OpenX reads decimal and nested types natively; only dates are fragile."""
+    def test_coerces_timestamp_date_and_decimal(self):
+        """OpenX reads nested types natively; temporals and decimals are fragile."""
         cols = OrderedDict(
             [
                 ("id", "bigint"),
@@ -96,7 +96,7 @@ class TestSetTimestampsAsString:
         )
         result = SparkMetastoreHelper.set_timestamps_as_string(cols)
         assert result["id"] == "bigint"
-        assert result["amount"] == "decimal(17,2)"
+        assert result["amount"] == "string"
         assert result["ts"] == "string"
         assert result["dt"] == "string"
         assert result["tags"] == "array<string>"
