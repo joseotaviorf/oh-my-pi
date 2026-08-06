@@ -23,6 +23,26 @@ class TestGChatService:
             "test_destination", json={"text": "test_content"}
         )
 
+    def test_send_message_with_thread_key_adds_reply_option_and_thread(
+        self, requests_post
+    ):
+        message = Message(
+            "test_content",
+            "https://chat.googleapis.com/v1/spaces/x/messages?key=a&token=b",
+            thread_key="empty_partition:db.t:year=2026|month=8|day=3",
+        )
+        GChatService.send_message(message)
+
+        requests_post.assert_called_once()
+        url, kwargs = requests_post.call_args
+        assert "messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD" in url[0]
+        assert kwargs["json"] == {
+            "text": "test_content",
+            "thread": {
+                "threadKey": "empty_partition:db.t:year=2026|month=8|day=3",
+            },
+        }
+
     def test_send_message_should_return_false_when_response_raises(self, requests_post):
         requests_post.return_value.raise_for_status.side_effect = Exception(
             "test_exception"
