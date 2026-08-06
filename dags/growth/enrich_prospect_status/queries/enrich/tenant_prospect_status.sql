@@ -1,4 +1,4 @@
-WITH rent_flows AS (
+WITH rent_flows_ranked AS (
   SELECT
     dpce.id_demand_prospect_conversion_event,
     dpce.id_prospect AS id_tenant_prospect,
@@ -6,7 +6,8 @@ WITH rent_flows AS (
     r.city_group,
     dpce.event_name,
     TRUE AS is_rent_flow_event,
-    dpce.ts_event
+    dpce.ts_event,
+    ROW_NUMBER() OVER(PARTITION BY dpce.id_prospect, dpce.id_house ORDER BY dpce.ts_event ASC) AS rn  -- Get only the first user's rent flow
   FROM
     datalake_demand_flows.conversion_events AS dpce
   LEFT JOIN
@@ -14,8 +15,21 @@ WITH rent_flows AS (
       ON dpce.id_region = r.id
   WHERE
     business_context = 'rent'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_prospect, id_house ORDER BY ts_event ASC) = 1  -- Get only the first user's rent flow 
+),
+
+rent_flows AS (
+  SELECT
+    id_demand_prospect_conversion_event,
+    id_tenant_prospect,
+    id_event_type,
+    city_group,
+    event_name,
+    is_rent_flow_event,
+    ts_event
+  FROM
+    rent_flows_ranked
+  WHERE
+    rn = 1
 ),
 tps_contracts as (
   SELECT DISTINCT
@@ -23,9 +37,9 @@ tps_contracts as (
     r.city_group,
     FALSE AS is_rent_flow_event,
     ct.ts_signed AS ts_contract_signed,
-    DATEADD(SECOND, 86399, CAST(ct.dt_termination AS TIMESTAMP)) AS ts_contract_terminated,
-    NULL::INT as cs_order
-  FROM 
+    CAST(ct.dt_termination AS TIMESTAMP) + INTERVAL 86399 seconds AS ts_contract_terminated,
+    CAST(NULL AS INT) as cs_order
+  FROM
     datalake_ebdb_contract.contract AS ct
   JOIN datalake_ebdb_rent_flow.rent_flow rf
     ON rf.id_contract = ct.id
@@ -42,7 +56,7 @@ contracts_person AS (
     r.city_group,
     FALSE AS is_rent_flow_event,
     ct.ts_signed AS ts_contract_signed,
-    DATEADD(SECOND, 86399, CAST(ct.dt_termination AS TIMESTAMP)) AS ts_contract_terminated,
+    CAST(ct.dt_termination AS TIMESTAMP) + INTERVAL 86399 seconds AS ts_contract_terminated,
     ROW_NUMBER() OVER(PARTITION BY ctp.id_user_contract_person,
                                        ctp.id_contract,
                                        ct.ts_signed 
@@ -174,8 +188,8 @@ prospect_churn_rule AS (
         THEN ts_event
       WHEN event_name = 'CONTRACT TERMINATED' AND previous_event_name =  'CONTRACT SIGNED' 
         THEN ts_event
-      WHEN is_rent_flow_event = TRUE AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 28 
-        THEN DATEADD(DAY, 28, ts_event) 
+      WHEN is_rent_flow_event = TRUE AND TIMESTAMPDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 28
+        THEN ts_event + INTERVAL 28 days
     END AS ts_prospect_churned
   FROM
     lag_and_lead_dates
@@ -219,7 +233,7 @@ churned_periods AS (
     ts_prospect_churned IS NOT NULL
 ),
 
-active_periods_dates AS (
+active_periods_dates_ranked AS (
   SELECT
     id_demand_prospect_conversion_event,
     id_tenant_prospect,
@@ -229,16 +243,32 @@ active_periods_dates AS (
     is_rent_flow_event,
     ts_event,
     MIN(ts_event) OVER (PARTITION BY id_tenant_prospect, city_group, ts_next_prospect_churn ORDER BY ts_event) AS ts_status_started,
-    ts_next_prospect_churn AS ts_status_ended
+    ts_next_prospect_churn AS ts_status_ended,
+    ROW_NUMBER() OVER (PARTITION BY id_tenant_prospect, city_group, ts_next_prospect_churn ORDER BY ts_event) AS rn
   FROM
     status_dates
   WHERE
     is_rent_flow_event = TRUE
-  QUALIFY
+),
+
+active_periods_dates AS (
+  SELECT
+    id_demand_prospect_conversion_event,
+    id_tenant_prospect,
+    event_name,
+    city_group,
+    status,
+    is_rent_flow_event,
+    ts_event,
+    ts_status_started,
+    ts_status_ended
+  FROM
+    active_periods_dates_ranked
+  WHERE
     -- Get only the event that started the active period
-    ts_event = ts_status_started 
+    ts_event = ts_status_started
     -- Remove corner cases where there are multiple activation event with the same exact timestamp
-    AND ROW_NUMBER() OVER (PARTITION BY id_tenant_prospect, city_group, ts_next_prospect_churn ORDER BY ts_event) = 1 
+    AND rn = 1
 ),
 
 active_periods AS (

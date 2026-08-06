@@ -1,4 +1,4 @@
-WITH sale_flows AS (
+WITH sale_flows_ranked AS (
   SELECT
     dpce.id_demand_prospect_conversion_event,
     dpce.id_prospect AS id_buyer_prospect,
@@ -6,18 +6,32 @@ WITH sale_flows AS (
     r.city_group,
     dpce.event_name,
     TRUE AS is_sale_flow_event,
-    dpce.ts_event
+    dpce.ts_event,
+    ROW_NUMBER() OVER(PARTITION BY dpce.id_prospect, dpce.id_house ORDER BY dpce.ts_event ASC) AS rn -- Get only the first user's sale flow
   FROM
     datalake_demand_flows.conversion_events AS dpce
   JOIN datalake_sale_flows.sale_flow sf
-    ON sf.id_sale_flow = dpce.id_sale_flow  
+    ON sf.id_sale_flow = dpce.id_sale_flow
   LEFT JOIN
     datalake_region.region AS r
       ON dpce.id_region = r.id
   WHERE
     business_context = 'sale'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_prospect, dpce.id_house ORDER BY ts_event ASC) = 1 -- Get only the first user's sale flow 
+),
+
+sale_flows AS (
+  SELECT
+    id_demand_prospect_conversion_event,
+    id_buyer_prospect,
+    id_event_type,
+    city_group,
+    event_name,
+    is_sale_flow_event,
+    ts_event
+  FROM
+    sale_flows_ranked
+  WHERE
+    rn = 1
 ),
 
 sale_agreements AS (
@@ -134,7 +148,7 @@ churned_periods AS (
     ts_prospect_churned IS NOT NULL
 ),
 
-active_periods_dates AS (
+active_periods_dates_ranked AS (
   SELECT
     id_demand_prospect_conversion_event,
     id_buyer_prospect,
@@ -142,17 +156,33 @@ active_periods_dates AS (
     event_name,
     is_sale_flow_event,
     'ACTIVE' AS status,
+    ts_event,
     MIN(ts_event) OVER (PARTITION BY id_buyer_prospect, city_group, ts_next_churn ORDER BY ts_event) AS ts_status_started,
-    ts_next_churn AS ts_status_ended
+    ts_next_churn AS ts_status_ended,
+    ROW_NUMBER() OVER (PARTITION BY id_buyer_prospect, city_group, ts_next_churn ORDER BY ts_event) AS rn
   FROM
     status_dates
   WHERE
     is_sale_flow_event = TRUE
-  QUALIFY
+),
+
+active_periods_dates AS (
+  SELECT
+    id_demand_prospect_conversion_event,
+    id_buyer_prospect,
+    city_group,
+    event_name,
+    is_sale_flow_event,
+    status,
+    ts_status_started,
+    ts_status_ended
+  FROM
+    active_periods_dates_ranked
+  WHERE
   -- Get only the event that started the active period
     ts_event = ts_status_started
   -- Remove corner cases where there are multiple activation event with the same exact timestamp
-    AND ROW_NUMBER() OVER (PARTITION BY id_buyer_prospect, city_group, ts_next_churn ORDER BY ts_event) = 1 
+    AND rn = 1
 ),
 
 active_periods AS (
