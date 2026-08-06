@@ -5,7 +5,6 @@ SELECT
     product_settings,
     deactivation_reason,
     deactivation_sub_reason,
-    deactivation_additional_comment,
-    ts_database_transaction
+    deactivation_additional_comment
 FROM
     datalake_company_raw.company_product
