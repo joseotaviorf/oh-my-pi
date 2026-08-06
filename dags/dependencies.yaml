@@ -2595,6 +2595,11 @@ bietlejuice.enrich_for_sale_experiment:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+bietlejuice.enrich_funnel_stage:
+  - bietlejuice.enrich_hubspot_crm:load-enrich-deal-stage:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-deal:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-pipeline:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-stage:first-run-of-day
 bietlejuice.enrich_golden_set:
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set:first-run-of-day
 bietlejuice.enrich_google_admin:

@@ -1,0 +1,65 @@
+---
+database_name: datalake_consorcio
+table_name: funnel_stage
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  Consórcio CRM funnel stage visits. Grain is one row per deal entering a
+  pipeline stage (id_deal, id_stage, ts_entered). Linked to Consórcio leads via
+  uuid_lead (HubSpot consorcio_id_lead). Supports multiple pipelines; filter
+  by id_pipeline / pipeline_name in queries. Column names are CRM-agnostic;
+  HubSpot deal_stage is the current upstream. Partitioned by ts_entered.
+columns:
+  id_deal:
+    lineage:
+      - datalake_hubspot.deal_stage.id_deal
+    description: CRM deal / opportunity identifier (HubSpot id_deal today).
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.deal_stage.id_pipeline
+    description: Funnel / pipeline identifier the stage belongs to.
+  id_stage:
+    lineage:
+      - datalake_hubspot.deal_stage.id_stage
+    description: Stage identifier within the pipeline.
+  id_actor:
+    lineage:
+      - datalake_hubspot.deal_stage.id_user_updated_by
+    description: >
+      HubSpot owner id of the actor that moved the deal into this stage when the
+      change was user-driven (e.g. CRM_UI); joins to datalake_hubspot.owner.id_owner.
+      Null for automation/integration changes. Owner name/email are PII-encrypted
+      in Trino, so no display label is materialized.
+  uuid_lead:
+    lineage:
+      - datalake_hubspot.deal.consorcio_id_lead
+    description: Consórcio lead UUID; joins to datalake_consorcio_clean.lead.uuid.
+  pipeline_name:
+    lineage:
+      - datalake_hubspot.pipeline.label
+    description: Human-readable pipeline name.
+  stage_name:
+    lineage:
+      - datalake_hubspot.stage.label
+    description: Human-readable stage name (e.g. Simulação, Venda fechada).
+  change_source:
+    lineage:
+      - datalake_hubspot.deal_stage.source_type
+    description: How the stage change was triggered (e.g. CRM_UI, API, AUTOMATION_PLATFORM, IMPORT).
+  ts_entered:
+    lineage:
+      - datalake_hubspot.deal_stage.ts_stage_started
+    description: Timestamp when the deal entered this stage.
+  ts_exited:
+    lineage:
+      - datalake_hubspot.deal_stage.ts_stage_ended
+    description: >
+      Timestamp when the deal left this stage; null if still current. Incremental
+      loads also select visits whose exit falls in the load window so ts_exited is
+      updated even when ts_entered is older than the rolling lookback.
+  year:
+    description: Partition column — calendar year of ts_entered.
+  month:
+    description: Partition column — calendar month of ts_entered.
+  day:
+    description: Partition column — calendar day of ts_entered.

@@ -1,0 +1,30 @@
+dag:
+  name: enrich_funnel_stage
+  schedule_start_date: 2026, 7, 1
+  owner: QCX
+  documentation:
+    dag_purpose: |
+      Materializes Consórcio CRM funnel stage visits into
+      datalake_consorcio.funnel_stage. One row per deal entering a pipeline
+      stage, linked to lead.uuid via HubSpot consorcio_id_lead. CRM-agnostic
+      column names (pipeline/stage/actor); HubSpot is the current upstream.
+      Supports multiple pipelines (filter in queries). Incremental merge on
+      (id_deal, id_stage, ts_entered); scheduled default is a rolling 60-day
+      window on ts_stage_started OR ts_stage_ended so late stage exits still
+      refresh ts_exited (override load_start_date / load_end_date for backfill).
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: consorcio
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -60), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    funnel_stage:
+      merge_on: [id_deal, id_stage, ts_entered]
+      z_order_by: [uuid_lead, ts_entered, id_pipeline]
+      run_optimize: true
+      run_vacuum: true
