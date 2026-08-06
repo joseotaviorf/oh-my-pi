@@ -73,6 +73,17 @@ columns:
     description: "Due period in year-month format (YYYYMM); month when the charge is due"
     lineage:
       - datalake_retsuko_raw.entry_partitioned.due_year_month
+  op_cdc:
+    description: "CDC operation type captured by the Debezium change-data-capture stream"
+    categories:
+      r: "Read or snapshot of an existing accounting entry"
+      c: "Creation of a new accounting entry"
+      u: "Update to an existing accounting entry"
+      d: "Deletion of an accounting entry"
+  is_not_invoicable:
+    description: "Boolean flag indicating whether the accounting entry must not be included in invoice generation"
+    lineage:
+      - datalake_retsuko_raw.entry_partitioned.not_invoicable
   ts_created:
     description: "Timestamp when the entry was created in the source system"
     lineage:
@@ -89,6 +100,10 @@ columns:
     description: "Timestamp when the entry was last updated in Retsuko system"
     lineage:
       - datalake_retsuko_raw.entry_partitioned.retsuko_updated_at
+  ts_cdc_transaction:
+    description: "Timestamp when the CDC connector captured the accounting entry change event"
+  ts_database_transaction:
+    description: "Timestamp when the source database committed the accounting entry change"
   year:
     description: "Partition year for table partitioning"
     lineage:
