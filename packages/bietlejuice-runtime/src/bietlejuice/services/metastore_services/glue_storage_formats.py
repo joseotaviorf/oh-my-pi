@@ -34,8 +34,10 @@ _JSON_OUTPUT = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
 # which rejects the ``T`` separator and ``Z`` suffix, and upstream documents no
 # ``timestamp.formats`` property. It also ships no decimal ObjectInspector, so a
 # ``decimal`` column falls back to Hive's, which blind-casts the JSON value and
-# raises ``ClassCastException: String -> HiveDecimal``. ``timestamp`` / ``date``
-# / ``decimal`` columns are therefore registered as ``string`` (see
+# raises ``ClassCastException: String -> HiveDecimal``. A ``binary`` column
+# falls back to Hive's ``JavaBinaryObjectInspector``, which blind-casts the JSON
+# value and raises ``ClassCastException: String -> [B``. ``timestamp`` / ``date``
+# / ``decimal`` / ``binary`` columns are therefore registered as ``string`` (see
 # ``coerce_glue_type_for_json``) and cast back to the real type by the consumer.
 _JSON_SERDE = "org.openx.data.jsonserde.JsonSerDe"
 # Comma-separated patterns for Hive JsonSerDe TimestampParser (Joda

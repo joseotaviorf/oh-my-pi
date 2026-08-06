@@ -106,7 +106,13 @@ class TestCoerceGlueTypeForJson(unittest.TestCase):
         glue_type = "struct<AddressId:string,__FLEX_Context:string>"
         self.assertEqual(coerce_glue_type_for_json(glue_type), glue_type)
 
-    def test_safe_scalars_and_binary_unchanged(self):
+    def test_binary_becomes_string(self):
+        """JSON stores BLOB columns as base64 text; Hive's binary OI blind-casts."""
+        for glue_type in ("binary", "BINARY"):
+            with self.subTest(glue_type=glue_type):
+                self.assertEqual(coerce_glue_type_for_json(glue_type), "string")
+
+    def test_safe_scalars_unchanged(self):
         for glue_type in (
             "string",
             "boolean",
@@ -114,7 +120,6 @@ class TestCoerceGlueTypeForJson(unittest.TestCase):
             "bigint",
             "double",
             "float",
-            "binary",
         ):
             with self.subTest(glue_type=glue_type):
                 self.assertEqual(coerce_glue_type_for_json(glue_type), glue_type)
@@ -129,7 +134,7 @@ class TestCoerceGlueTypeForJson(unittest.TestCase):
         self.assertEqual(map_uc_type_to_glue_for_json("DECIMAL(10,2)"), "string")
         self.assertEqual(map_uc_type_to_glue_for_json("ARRAY<INT>"), "array<int>")
         self.assertEqual(map_uc_type_to_glue_for_json("BIGINT"), "bigint")
-        self.assertEqual(map_uc_type_to_glue_for_json("BINARY"), "binary")
+        self.assertEqual(map_uc_type_to_glue_for_json("BINARY"), "string")
 
 
 class TestMapGlueTypeToUc(unittest.TestCase):

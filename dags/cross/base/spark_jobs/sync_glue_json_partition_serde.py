@@ -5,9 +5,11 @@ Does two things per JSON table (emr-cli friendly):
 
 1. **Column types** — coerce fragile Glue types to ``string``: ``timestamp`` and
    ``date`` (``Timestamp.valueOf`` rejects ISO-8601 ``T`` / ``Z`` and OpenX has
-   no ``timestamp.formats``) plus ``decimal`` (OpenX has no decimal
+   no ``timestamp.formats``), ``decimal`` (OpenX has no decimal
    ObjectInspector, so Hive's blind-casts the JSON value and every row raises
-   ``ClassCastException: String -> HiveDecimal``). Integral and floating types
+   ``ClassCastException: String -> HiveDecimal``), and ``binary`` (Hive's
+   ``JavaBinaryObjectInspector`` blind-casts the JSON string and every row
+   raises ``ClassCastException: String -> [B``). Integral and floating types
    have OpenX inspectors that parse the JSON string, and
    ``array`` / ``struct`` / ``map`` are read natively, so both stay typed.
 2. **Partition SerDe and columns** — for partitioned tables, align partition

@@ -132,7 +132,7 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         self.assertEqual(by_name["amount"], "string")
         self.assertEqual(by_name["tags"], "array<string>")
         self.assertEqual(by_name["payload"], "struct<a:int>")
-        self.assertEqual(by_name["blob"], "binary")
+        self.assertEqual(by_name["blob"], "string")
         self.assertEqual(by_name["created_at"], "string")
         self.assertEqual(by_name["as_of"], "string")
 
@@ -213,8 +213,8 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         }
         svc = GlueMetastoreService(glue_client)
         result = svc.coerce_json_table_column_types("db", "t", dry_run=False)
-        # created_at and amount are the fragile ones under OpenX.
-        self.assertEqual(result["updated"], 2)
+        # created_at, amount, and blob are fragile under OpenX.
+        self.assertEqual(result["updated"], 3)
         glue_client.update_table.assert_called_once()
         table_input = glue_client.update_table.call_args[0][1]
         by_name = {
@@ -223,7 +223,7 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         self.assertEqual(by_name["created_at"], "string")
         self.assertEqual(by_name["amount"], "string")
         self.assertEqual(by_name["tags"], "array<string>")
-        self.assertEqual(by_name["blob"], "binary")
+        self.assertEqual(by_name["blob"], "string")
         self.assertEqual(table_input["PartitionKeys"][0]["Type"], "int")
 
     def test_coerce_json_table_column_types_drops_partition_keys_from_columns(self):

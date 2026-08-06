@@ -82,8 +82,8 @@ class TestGetAllTablesMetadata:
 
 
 class TestSetTimestampsAsString:
-    def test_coerces_timestamp_date_and_decimal(self):
-        """OpenX reads nested types natively; temporals and decimals are fragile."""
+    def test_coerces_timestamp_date_decimal_and_binary(self):
+        """OpenX reads nested types natively; temporals, decimals, and binary are fragile."""
         cols = OrderedDict(
             [
                 ("id", "bigint"),
@@ -100,7 +100,7 @@ class TestSetTimestampsAsString:
         assert result["ts"] == "string"
         assert result["dt"] == "string"
         assert result["tags"] == "array<string>"
-        assert result["blob"] == "binary"
+        assert result["blob"] == "string"
 
     def test_nested_timestamp_is_not_rewritten(self):
         """A naive substring replace turned ``array<timestamp>`` into

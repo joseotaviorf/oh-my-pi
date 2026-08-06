@@ -127,7 +127,7 @@ def map_uc_type_to_glue(uc_type: str) -> str:
 def coerce_glue_type_for_json(glue_type: str) -> str:
     """Coerce Glue types that break OpenX JsonSerDe reads to ``string``.
 
-    Three types are fragile:
+    Four scalar types are fragile:
 
     * ``timestamp`` / ``date`` — OpenX parses them with ``Timestamp.valueOf`` /
       ``Date.valueOf``, which reject the ISO-8601 ``T`` separator and ``Z``
@@ -140,6 +140,9 @@ def coerce_glue_type_for_json(glue_type: str) -> str:
       integral and floating types *do* have an OpenX inspector
       (``JavaStringIntObjectInspector`` and friends parse the JSON string), so
       they are left typed.
+    * ``binary`` — JSON stores BLOB columns as base64 text, but Hive's
+      ``JavaBinaryObjectInspector`` expects ``byte[]``. Every row then dies with
+      ``ClassCastException: String cannot be cast to [B``.
 
     Registering the fragile ones as ``string`` keeps the read working; the
     consumer casts the value back to the target's declared type before writing
@@ -151,14 +154,13 @@ def coerce_glue_type_for_json(glue_type: str) -> str:
     ``ArrayList → HCatRecord`` ClassCasts; OpenX reads them natively, so
     coercing them would lose the nested payload for no benefit.
 
-    ``binary`` is intentionally left unchanged (deferred separately).
     Partition keys must not be passed through this helper.
     """
     trimmed = (glue_type or "").strip()
     lower = trimmed.lower()
     if not lower:
         return "string"
-    if lower in ("timestamp", "date"):
+    if lower in ("timestamp", "date", "binary"):
         return "string"
     if lower == "decimal" or _DECIMAL_RE.match(trimmed):
         return "string"

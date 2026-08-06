@@ -82,10 +82,12 @@ class SparkMetastoreHelper:
         Timestamps are rewritten because Hive cannot parse the Mongo-style
         ``$date`` tokens Spark extracts, and OpenX JsonSerDe on EMR cannot parse
         ISO-8601 ``T`` / ``Z`` timestamps either. ``date`` is coerced for the
-        same reason, and ``decimal`` because OpenX has no decimal
-        ObjectInspector (Hive's fallback raises ``String -> HiveDecimal``).
-        Everything else -- integral / floating types and nested
-        struct/array/map -- is left typed, because OpenX reads those natively.
+        same reason, ``decimal`` because OpenX has no decimal
+        ObjectInspector (Hive's fallback raises ``String -> HiveDecimal``), and
+        ``binary`` because Hive's ``JavaBinaryObjectInspector`` blind-casts the
+        JSON string (``String -> [B``). Everything else -- integral / floating
+        types and nested struct/array/map -- is left typed, because OpenX reads
+        those natively.
 
         Delegates the decision to ``coerce_glue_type_for_json`` so the raw-sync
         path and the Glue registration path can never disagree.
