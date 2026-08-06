@@ -121,6 +121,9 @@ WHERE ts_created >= TIMESTAMP '{window_start}'
 - Don't remove the `wall_e` tag — it would include sessions outside the product's scope
 - Don't calculate the percentage inside Trino with integer division — cast to `DOUBLE` or calculate it at the BI layer
 
+## Targets and OKRs
+**OKR** -  The monthly Escalation Rate of session which the Offboarding agent has participated. It must be equal or lesser than 28% of Escalation Rate by December/2026
+
 ## Golden Queries
 
 Canonical query for daily session volume segmented by escalation status. The traces/observations/sessions JOIN pattern follows `business_entities/chatbot_sessions.md`; what is exclusive to this metric is the `wall_e` + `ForRentOffboardingAgentV*` filter combination and the `is_escalated` segmentation.
