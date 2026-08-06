@@ -355,3 +355,9 @@ workflow:
       extra_spark_job_arguments:
         - "1QgICpSG4yJa1-zyvnSyTi0S8GPHf6Xg0hg0rgzg5v3Q"
         - "leiturinha_desligados"
+
+    # Former notebook: dash_turnover_v2 (Daily Pipeline).
+    turnover_dashboard:
+      extra_spark_job_arguments:
+        - "1d4zHTWcfKlp56euTnCtEMjWrhynJGQJWTfgK_dnmTr4"
+        - "base_turnover_v2"
