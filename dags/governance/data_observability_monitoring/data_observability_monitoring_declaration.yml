@@ -1,0 +1,39 @@
+dag:
+  name: data_observability_monitoring
+  owner: Data Governance
+  schedule_start_date: 2026, 8, 1
+  schedule_interval: "0 7,11,15,19,23 * * *"
+  documentation:
+    dag_purpose: |
+      Sweep the profiling store for partitioned tables whose run partition is empty
+      (partition row_count zero). An EMR Spark job reads datalake_observability metrics,
+      joins documentation_metrics for table owner and domain, applies SLA expectations
+      (published to S3 at deploy time), and posts GChat alerts (prod only unless
+      dag_run.conf.force_send). Use dag_run.conf.dry_run to log messages without sending.
+      GChat webhook: Airflow Variable GCHAT_DATA_CORE_MODEL_GOV_WEBHOOK (see
+      notification_webhooks_keys.data_observability_monitoring in env config).
+workflow:
+  type: custom_ingestion
+  layer: raw
+  has_hive_sync: false
+  load_spark_job: sweep_empty_partitions
+  default_extraction_type: full
+  default_partitions: []
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{{ dag_run.conf.get('freshness_hours', 48) if dag_run and dag_run.conf else 48 }}"
+    - "{{ 'true' if dag_run and dag_run.conf and dag_run.conf.get('dry_run') else 'false' }}"
+    - "{{ 'true' if dag_run and dag_run.conf and dag_run.conf.get('force_send') else 'false' }}"
+    - "{{ var.value.get('GCHAT_DATA_CORE_MODEL_GOV_WEBHOOK', '') }}"
+  tables_customization:
+    empty_partition_monitor:
+      extraction_type: full
+      partitions: []

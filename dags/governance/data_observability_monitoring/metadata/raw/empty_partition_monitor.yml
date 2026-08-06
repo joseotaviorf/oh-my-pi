@@ -1,0 +1,19 @@
+database_name: datalake_data_observability_monitoring_raw
+table_name: empty_partition_monitor
+owner: vitor.carneiro@quintoandar.com.br
+domain: "Data Ops & Governance"
+description: >
+  Logical workflow artifact for the empty-partition monitoring EMR sweep. The DAG does
+  not materialize a hive table; it scans datalake_observability profiling metrics and
+  posts GChat alerts when partitioned tables have an empty run partition.
+columns:
+  signal_type:
+    description: Judged signal identifier emitted by the monitor (for example empty_partition).
+  database:
+    description: Lake database name of the profiled table with an empty run partition.
+  table:
+    description: Lake table name of the profiled table with an empty run partition.
+  partition_fingerprint:
+    description: Normalized partition key fingerprint for the empty run partition.
+  environment:
+    description: Runtime environment where the sweep executed (forno or prod).
