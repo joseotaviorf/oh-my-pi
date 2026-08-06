@@ -88,8 +88,8 @@ SELECT
   day
 FROM
   datalake_demand_contact_submission_clean.contact_submissions AS cs
-GROUP BY ALL
-UNION ALL 
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+UNION ALL
 SELECT
   COALESCE(tqc.id_user_lead, tqc.lead_phone) AS id_user,
   COALESCE(tqc.id_user_lead, tqc.lead_phone, tqc.id_referral_flow) AS id_contact,
