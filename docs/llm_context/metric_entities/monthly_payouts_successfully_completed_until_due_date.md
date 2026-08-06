@@ -80,7 +80,14 @@ distinct valid invoices therefore return the same number.
 % Monthly Payouts Successfully Completed Until Due Date
     = COUNT(DISTINCT sk_contract WHERE contract_status = 'Invoice' AND payment_on_due)
     / COUNT(DISTINCT sk_contract WHERE contract_status = 'Invoice')
+
+reporting_month = accrual_year_month + 1 month
 ```
+
+The population (which contracts enter the numerator/denominator) is still grouped by
+`accrual_year_month`. Only the reporting label changes: the payout for accrual month M is
+transferred to the landlord around day 10–12 of month M+1, so publish the ratio under
+`reporting_month`, not under the raw `accrual_year_month`.
 
 where:
 
@@ -147,8 +154,9 @@ canonical query.
 - Apply the full canonical filter, all five predicates, every time.
 - Keep `payment_on_due` as a three-branch `CASE` that returns `false` for `ts_paid IS NULL`, so
   unpaid payouts count as misses instead of vanishing into NULL.
-- Group by `accrual_year_month` — this is a monthly metric, and the accrual month is the reporting
-  period, not the payment date.
+- Group the population by `accrual_year_month`, but **publish the result under
+  `reporting_month = accrual_year_month + 1`**. Never publish under the raw `accrual_year_month`
+  label.
 
 **Don't:**
 
@@ -159,8 +167,8 @@ canonical query.
   analysis and only make the query slower and harder to audit.
 - Don't derive the numerator from `invoice.status = 'paid'` alone; an estorno can leave a bounced
   payout looking paid.
-- Don't report the current accrual month before day 11 has passed — the rate is mechanically
-  incomplete until the payment window closes.
+- Don't report a `reporting_month` before day 11 of that reporting month has passed — the rate is
+  mechanically incomplete until the payment window closes.
 
 ## Golden Queries
 
@@ -195,6 +203,11 @@ WITH landlord_payouts AS (
         AND i.accrual_year_month >= 202301
 )
 SELECT
+    -- Report label; `invoice_accrual_year_month` below is the population/GROUP BY grain.
+    CAST(DATE_FORMAT(
+        DATE_ADD('month', 1, DATE_PARSE(CAST(invoice_accrual_year_month AS VARCHAR) || '01', '%Y%m%d')),
+        '%Y%m'
+    ) AS INTEGER) AS reporting_month,
     invoice_accrual_year_month,
     CAST(COUNT(DISTINCT CASE
         WHEN contract_status = 'Invoice' AND payment_on_due THEN sk_contract
@@ -203,7 +216,7 @@ SELECT
         WHEN contract_status = 'Invoice' THEN sk_contract
     END) AS DECIMAL(38, 4)), 0) AS percentage_payment_on_due
 FROM landlord_payouts
-GROUP BY 1
-ORDER BY 1 DESC
+GROUP BY invoice_accrual_year_month
+ORDER BY reporting_month DESC
 ```
 
