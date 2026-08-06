@@ -7,7 +7,8 @@ description: |
   Daily snapshot fact table with one row per agent per reference date. Expands each agent
   from creation through the load window using aux_date, reconstructs activation and capability
   flags from agent event log history, and enriches profile attributes from agent_daily when
-  available for the same agent-day key.
+  available for the same agent-day key. Profile and deactivation context are resolved from
+  datalake_agent.agent_product revisions aligned to the reference date.
 columns:
   sk_agent_daily:
     description: |
@@ -90,10 +91,23 @@ columns:
       - datalake_agent_accreditation.agent_daily.affiliation_type
       - datalake_agent_accreditation.agent.affiliation_type
   profile:
-    description: Agent profile from company membership on the reference date.
+    description: |
+      Agent company product profile name on the reference date, from the latest
+      agent_product revision valid for that day (is_lastest_by_date).
     lineage:
-      - datalake_agent_accreditation.agent_daily.profile
-      - datalake_agent_accreditation.agent.profile
+      - datalake_agent.agent_product.product_name
+  deactivation_reason:
+    description: |
+      Product deactivation reason on the reference date when the agent product revision ended
+      on that day and the membership was inactive.
+    lineage:
+      - datalake_agent.agent_product.deactivation_reason
+  deactivation_sub_reason:
+    description: |
+      Product deactivation sub-reason on the reference date when the agent product revision
+      ended on that day and the membership was inactive.
+    lineage:
+      - datalake_agent.agent_product.deactivation_sub_reason
   days_in_current_status:
     description: |
       Number of days the agent has remained in the current activation status as of the

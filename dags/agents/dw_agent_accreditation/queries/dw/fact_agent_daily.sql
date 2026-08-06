@@ -144,7 +144,9 @@ SELECT
     COALESCE(ad.creci, ds.creci) AS creci,
     COALESCE(ad.creci_uf, ds.creci_uf) AS creci_uf,
     COALESCE(ad.affiliation_type, ds.affiliation_type) AS affiliation_type,
-    COALESCE(ad.profile, ds.profile) AS profile,
+    product.product_name AS profile,
+    deactivation.deactivation_reason,
+    deactivation.deactivation_sub_reason,
     IF(ds.agent_status IS NULL, NULL, ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')) AS is_agent_active,
     IF(ds.cap_supply_aq_status IS NULL, NULL, ds.cap_supply_aq_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_supply_acquisition,
     IF(ds.cap_supply_conv_status IS NULL, NULL, ds.cap_supply_conv_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_supply_conversion,
@@ -183,6 +185,20 @@ LEFT JOIN
     core_brokers.brokers AS cb
         ON COALESCE(ad.uuid_company, ds.uuid_company) = cb.uuid_company
         AND COALESCE(ad.is_3p_partnership, ds.is_3p_partnership) = TRUE
+LEFT JOIN
+    datalake_agent.agent_unified_identity AS identity
+        ON identity.id_agent = ds.id_agent
+LEFT JOIN
+    datalake_agent.agent_product AS deactivation
+        ON ds.id_agent = deactivation.id_agent
+        AND ds.dt_ref = DATE(deactivation.ts_ended)
+        AND deactivation.is_active IS FALSE
+        AND deactivation.is_lastest_by_date IS TRUE
+LEFT JOIN
+    datalake_agent.agent_product AS product
+        ON ds.id_agent = product.id_agent
+        AND ds.dt_ref BETWEEN DATE(product.ts_started) AND DATE(product.ts_ended)
+        AND product.is_lastest_by_date IS TRUE
 WHERE
     ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')
     OR (ds.agent_status = 'AGENT_INACTIVATED' AND TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) < 1)

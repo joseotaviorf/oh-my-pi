@@ -4,7 +4,7 @@ table_name: company_product
 owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
-  Many-to-many relationship table linking companies to products/services they offer. Enables flexible business models where companies can provide multiple products and products can be offered by multiple partner companies. Includes product-specific configuration settings in JSONB format for customization. Created 2022-10-31 during major architecture refactoring to replace direct company-product foreign keys. Enhanced 2024-07 with status field for product lifecycle management. Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
+  Many-to-many relationship table linking companies to products/services they offer. Enables flexible business models where companies can provide multiple products and products can be offered by multiple partner companies. Includes product-specific configuration settings in JSONB format for customization. Created 2022-10-31 during major architecture refactoring to replace direct company-product foreign keys. Enhanced 2024-07 with status field for product lifecycle management. Deactivation reason fields capture why a company-product link was inactivated. Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 columns:
   id_company:
     lineage:
@@ -38,9 +38,25 @@ columns:
     description: |
       Granular sub-reason within deactivation_reason (VARCHAR, nullable). Valid only for the parent deactivation_reason
       configured for the product; NULL when inactive without a structured reason or when not applicable.
+  deactivation_additional_comment:
+    lineage:
+      - datalake_company_raw.company_product.deactivation_additional_comment
+    description: |
+      Free-text comment supplied when deactivating the company-product relationship. Null when
+      no comment was provided or while the relationship is active.
   op_cdc:
     description: Change operation emitted by the PostgreSQL CDC framework for this company_product row.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
   ts_cdc_transaction:
     description: UTC timestamp when the CDC framework captured this company_product change transaction.
   ts_database_transaction:
     description: UTC timestamp when the source PostgreSQL database committed this company_product change.
+      Secondary deactivation reason providing additional taxonomy detail when the company-product
+      relationship is deactivated. Null while the relationship is active.
+    lineage:
+      - datalake_company_raw.company_product.ts_database_transaction
+    description: Timestamp of the originating database transaction in the company service before CDC propagation.

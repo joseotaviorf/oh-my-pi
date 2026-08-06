@@ -1,0 +1,191 @@
+---
+database_name: datalake_agent
+table_name: agent_unified_identity
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+description: |
+  Unified agent identity across Agent Domain agent, legacy EBDB agent_data (dadosAgente), and
+  partner records. One row per person-agent-partner bridge updated within the load window.
+  Consolidates natural and surrogate keys (id_unified_agent, sk_person, sk_broker, sk_company),
+  prospect/affiliate context, 1P/3P partnership flags, and 3P broker profile flags. Built from
+  a UNION of Agent Domain rows linked to legacy/partner references and standalone legacy/partner
+  rows without an Agent Domain agent. Downstream tables join on id_unified_agent.
+columns:
+  id_unified_agent:
+    lineage:
+      - datalake_person.person_sks.uuid_person
+      - datalake_ebdb_clean.agent.id
+      - datalake_ebdb_clean.agent_data.id
+      - datalake_ebdb_clean.partner.id
+    description: |
+      Surrogate key for the unified identity row, generated with XXHASH64 from uuid_person,
+      id_agent, id_agent_data, and id_partner (each coalesced to -1 when absent). Primary merge
+      key for this table.
+  sk_person:
+    lineage:
+      - datalake_person.person_sks.sk_person
+    description: Person surrogate key from the person SK registry.
+  id_user:
+    lineage:
+      - datalake_person.person_sks.id_user
+    description: Platform user identifier linked to the person.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent.id
+    description: Agent Domain agent identifier when the person has an accredited agent record.
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_clean.agent_data.id
+    description: |
+      Legacy dadosAgente identifier from Agent Domain external reference or from user.id_agent
+      in the standalone legacy/partner UNION branch.
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner.id
+    description: |
+      Partner identifier from Agent Domain external reference or from partner_agent join in the
+      standalone legacy/partner UNION branch.
+  id_partner_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id
+    description: Partner-agent registry row identifier in EBDB.
+  sk_broker:
+    lineage:
+      - core_brokers.brokers.sk_broker
+    description: Broker surrogate key resolved from uuid_company via core_brokers.brokers.
+  sk_company:
+    lineage:
+      - datalake_company.company_sks.sk_company
+    description: Company surrogate key resolved from agent, agent_data, or partner company UUID via company_sks.
+  id_prospect_agent:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.id
+    description: Prospect agent identifier when the agent row references a prospect UUID.
+  id_affiliate:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.id
+    description: Affiliate data identifier when the user has an affiliate profile.
+  id_photographer_data:
+    lineage:
+      - datalake_ebdb_clean.user.id_photographer_data
+    description: Photographer data identifier from the user record when applicable.
+  uuid_person:
+    lineage:
+      - datalake_person.person_sks.uuid_person
+    description: Person UUID used as the cross-system join anchor for agent, prospect, and brokers_profile tables.
+  uuid_company:
+    lineage:
+      - datalake_ebdb_clean.agent.id_partnership_representative
+      - datalake_ebdb_clean.agent_data.uuid_company
+      - datalake_ebdb_clean.partner.uuid_company
+    description: Company UUID from Agent Domain partnership representative, legacy agent_data, or partner record.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_clean.agent.uuid_agent
+    description: Business UUID of the agent in the Agent Domain accreditation system.
+  uuid_prospect:
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+    description: Prospect UUID from agent external references when type is PROSPECT_UUID, linking to prospect_agent.
+  is_affiliate_active:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.is_active
+    description: Active flag from the affiliate profile when the user has affiliate data.
+  is_photographer_active:
+    lineage:
+      - datalake_ebdb_clean.photographer_data.is_active
+    description: Active flag from the photographer profile when the user has photographer data.
+  is_user_active:
+    lineage:
+      - datalake_ebdb_clean.user.is_active
+    description: Active flag from the platform user record.
+  is_partner_active:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.status
+    description: True when the partner agent status is ACTIVE for rows with a partner association.
+  is_agent_data_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data.is_active
+    description: Active flag from the legacy agent_data record for rows with an agent_data association.
+  is_agent_active:
+    lineage:
+      - datalake_ebdb_clean.agent.status
+    description: True when the Agent Domain agent status is ACTIVE.
+  is_unified_agent_active:
+    lineage:
+      - datalake_ebdb_clean.agent.status
+      - datalake_ebdb_clean.agent_data.is_active
+      - datalake_ebdb_clean.partner_agent.status
+    description: |
+      True when any linked identity source is active: Agent Domain ACTIVE status, legacy
+      agent_data is_active, or partner agent ACTIVE status depending on association type.
+  is_1p_partnership:
+    lineage:
+      - datalake_ebdb_clean.agent.affiliation_type
+      - datalake_ebdb_clean.agent_data.agent_type
+    description: |
+      True when the agent is a 1P partnership: Agent Domain affiliation_type AUTONOMOUS or
+      legacy agent_data agent_type other than CORRETOR_REDE.
+  is_3p_partnership:
+    lineage:
+      - datalake_ebdb_clean.agent.affiliation_type
+      - datalake_ebdb_clean.agent_data.agent_type
+    description: |
+      True when the agent is a 3P partnership: Agent Domain affiliation_type COMPANY_MANAGED or
+      legacy agent_data agent_type CORRETOR_REDE.
+  is_last_active_by_person:
+    description: |
+      True for the most recently updated active unified identity row per sk_person among rows
+      where is_unified_agent_active is TRUE, ranked by ts_updated and ts_created DESC.
+  is_agent_data_replace_key:
+    description: |
+      True for the preferred row per id_agent_data — ranks by is_agent_data_associated DESC,
+      is_unified_agent_active DESC, and ts_updated DESC.
+  is_partner_replace_key:
+    description: |
+      True for the preferred row per id_partner — ranks by is_partner_associated DESC,
+      is_unified_agent_active DESC, and ts_updated DESC.
+  has_3p_member_profile_active:
+    lineage:
+      - core_brokers.brokers_profile.profile_status
+      - core_brokers.brokers_profile.profile
+    description: |
+      True when the person has an active third_party_agent brokers_profile row for their broker
+      (profile_status = ACTIVE, profile = third_party_agent).
+  has_3p_member_profile_pending:
+    lineage:
+      - core_brokers.brokers_profile.profile_status
+      - core_brokers.brokers_profile.profile
+    description: |
+      True when the person has a pending third_party_agent brokers_profile row for their broker
+      (profile_status IN PENDING CONFIRMATION or PENDING INVITATION).
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.agent.ts_created
+      - datalake_ebdb_clean.agent_data.ts_created
+      - datalake_ebdb_clean.partner.ts_created
+    description: Earliest creation timestamp from agent, agent_data, or partner, used for partition derivation.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.agent.ts_updated
+      - datalake_ebdb_clean.agent_data.ts_updated
+      - datalake_ebdb_clean.partner.ts_updated
+    description: Latest update timestamp from agent, agent_data, or partner, used for incremental load filtering.
+  year:
+    lineage:
+      - datalake_ebdb_clean.agent.ts_created
+      - datalake_ebdb_clean.agent_data.ts_created
+      - datalake_ebdb_clean.partner.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+      - datalake_ebdb_clean.agent.ts_created
+      - datalake_ebdb_clean.agent_data.ts_created
+      - datalake_ebdb_clean.partner.ts_created
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_ebdb_clean.agent.ts_created
+      - datalake_ebdb_clean.agent_data.ts_created
+      - datalake_ebdb_clean.partner.ts_created
+    description: Partition day derived from ts_created.
