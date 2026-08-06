@@ -190,13 +190,13 @@ LEFT JOIN
         ON identity.id_agent = ds.id_agent
 LEFT JOIN
     datalake_agent.agent_product AS deactivation
-        ON ds.id_agent = deactivation.id_agent
+        ON identity.id_unified_agent = deactivation.id_unified_agent
         AND ds.dt_ref = DATE(deactivation.ts_ended)
         AND deactivation.is_active IS FALSE
         AND deactivation.is_lastest_by_date IS TRUE
 LEFT JOIN
     datalake_agent.agent_product AS product
-        ON ds.id_agent = product.id_agent
+        ON identity.id_unified_agent = product.id_unified_agent
         AND ds.dt_ref BETWEEN DATE(product.ts_started) AND DATE(product.ts_ended)
         AND product.is_lastest_by_date IS TRUE
 WHERE
