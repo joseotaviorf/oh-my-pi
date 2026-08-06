@@ -170,16 +170,17 @@ report as "no data" rather than 0%.
 
 ## Targets and OKRs
 
-**OKR** — end-of-year target for % Escalation Error Rate (Wall-E); lower values indicate better
+**OKR** — H2'2026 target for % Escalation Error Rate (Wall-E); lower values indicate better
 performance.
 
-- **Source table:** no GSheets source — this is a fixed business target.
+- **Source table:** no GSheets source — this is a fixed H2'2026 business target.
 - **Filter key / metric name:** `% Escalation Error Rate (Wall-E)`
-- **Period grain:** year-end
+- **Period grain:** H2'2026
 - **Aliases / search terms:** meta de erro de escalonamento, target escalation error rate, OKR
   Wall-E
-- **Target:** `<= 15%`
-- **Caveat:** compare the year-end actual using the canonical Wall-E scope and curated queue list;
+- **Baseline:** `27%`
+- **Target (H2'2026):** `<= 15%`
+- **Caveat:** compare the H2'2026 actual using the canonical Wall-E scope and curated queue list;
   values below 15% meet the target, while values above 15% miss it.
 
 ## Golden Queries
