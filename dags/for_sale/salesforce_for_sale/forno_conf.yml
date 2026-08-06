@@ -17,12 +17,16 @@ events_config:
   received_document:
     event_path: "raw/salesforce/ReceivedDocumentEvent"
     skip_quality_contracts: true
+    api_entity: "ReceivedDocument__c"
   incident:
     event_path: "raw/salesforce/IncidentEvent"
     skip_quality_contracts: true
-  case_legal_ops: 
+    api_entity: "Incident"
+  case_legal_ops:
     event_path: "raw/salesforce/CaseLegalOpsEvent"
     skip_quality_contracts: true
+    api_entity: "CaseLegalOps__c"
   pendency:
     event_path: "raw/salesforce/PendencyEvent"
     skip_quality_contracts: true
+    api_entity: "Pendency__c"
