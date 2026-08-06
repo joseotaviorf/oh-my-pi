@@ -431,6 +431,25 @@ steps:
         on_empty: false
     depends_on: [setup]
 
+  upload-sla-expectations-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sla_expectations_into_s3.py 5a-datalake-prod
+    when:
+      event: push
+      branch: [master, hotfix/*]
+      path: &sla_expectations_sync_path
+        include:
+          - "dags/**/sla/**"
+          - "dags/governance/data_observability_monitoring/data_observability_monitoring_declaration.yml"
+          - "packages/bietlejuice-core/src/bietlejuice/observability/monitoring/sla_expectations.py"
+          - "packages/bietlejuice-core/src/bietlejuice/observability/monitoring/constants.py"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_sla_expectations_into_s3.py"
+          - ".woodpecker/release.yml"
+        on_empty: false
+    depends_on: [setup]
+
   upload-sst-pipelines-s3-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
@@ -743,6 +762,17 @@ steps:
       event: push
       branch: forno
       path: *dag_artifact_spark_jobs_path
+    depends_on: [setup]
+
+  upload-sla-expectations-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sla_expectations_into_s3.py 5a-datalake-forno
+    when:
+      event: push
+      branch: forno
+      path: *sla_expectations_sync_path
     depends_on: [setup]
 
   upload-sst-pipelines-s3-forno:

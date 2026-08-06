@@ -1247,6 +1247,12 @@ create-s3-dag-files: generate-query-manifests generate-metadata-manifests genera
 		--bundle-domains --exclude-dir luigijr \
 		$(if $(filter 1,$(INCLUDE_VALIDATION)),--include-validation,)
 
+.PHONY: upload-sla-expectations
+## Publish SLA YAML expectations JSON to the datalake monitoring prefix (requires bucket=...).
+upload-sla-expectations:
+	@test -n "$(bucket)" || (echo "Usage: make upload-sla-expectations bucket=5a-datalake-forno" >&2; exit 1)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/upload_sla_expectations_into_s3.py $(bucket)
+
 .PHONY: create-luigijr-dag-files
 ## creates the DAG Python files for the luigijr sandbox ONLY (dags/luigijr/). Used by the
 ## luigijr pipeline that deploys to the dedicated luigijr Astro instance (see release.yml).
