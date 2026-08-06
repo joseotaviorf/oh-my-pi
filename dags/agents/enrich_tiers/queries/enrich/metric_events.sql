@@ -149,40 +149,53 @@ sale_vgv_total_attribution AS (
         AND ao.ts_contract_signed IS NOT NULL
     UNION ALL
     SELECT
-        ao.id_user_ciq AS id_user,
-        cfl.id_agent,
-        cfl.uuid_person,
-        ao.id_offer,
-        ao.agreement_value,
-        DATE(ao.ts_contract_signed) AS dt_contract_signed,
-        ao.dt_contract_cancelled,
-        ao.ts_updated,
-        mp_invalid.id IS NOT NULL AS is_invalid_by_cancellation
-    FROM
-        datalake_tiers.agent_offers AS ao
-    JOIN
-        datalake_tiers.ciq_first_listing AS cfl
-            ON cfl.id_house = ao.id_house
-            AND cfl.id_user = ao.id_user_ciq
-            AND cfl.business_context = ao.business_context
-    LEFT JOIN
-        metric_period_process AS mp_invalid
-            ON mp_invalid.metric = "VGV_TOTAL"
-            AND DATE(ao.ts_contract_signed) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
-            AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+        id_user,
+        id_agent,
+        uuid_person,
+        id_offer,
+        agreement_value,
+        dt_contract_signed,
+        dt_contract_cancelled,
+        ts_updated,
+        is_invalid_by_cancellation
+    FROM (
+        SELECT
+            ao.id_user_ciq AS id_user,
+            cfl.id_agent,
+            cfl.uuid_person,
+            ao.id_offer,
+            ao.agreement_value,
+            DATE(ao.ts_contract_signed) AS dt_contract_signed,
+            ao.dt_contract_cancelled,
+            ao.ts_updated,
+            mp_invalid.id IS NOT NULL AS is_invalid_by_cancellation,
+            -- agent_offers is an audit table: the same id_offer can carry multiple
+            -- agent_profile rows (AGENT, NEGOTIATION_EXECUTIVE, ...) and multiple
+            -- revisions per profile as the offer is updated. This branch has no
+            -- profile filter, so without this it pulls in every one of those rows
+            -- for a signed offer instead of just the current one.
+            ROW_NUMBER() OVER (PARTITION BY ao.id_offer ORDER BY ao.ts_updated DESC) AS rn_latest_revision
+        FROM
+            datalake_tiers.agent_offers AS ao
+        JOIN
+            datalake_tiers.ciq_first_listing AS cfl
+                ON cfl.id_house = ao.id_house
+                AND cfl.id_user = ao.id_user_ciq
+                AND cfl.business_context = ao.business_context
+        LEFT JOIN
+            metric_period_process AS mp_invalid
+                ON mp_invalid.metric = "VGV_TOTAL"
+                AND DATE(ao.ts_contract_signed) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+                AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+        WHERE
+            ao.business_context = "SALE"
+            AND ao.is_ciq_first_listing IS TRUE
+            AND ao.id_user_ciq IS NOT NULL
+            AND cfl.is_first_listing_valid IS TRUE
+            AND ao.ts_contract_signed IS NOT NULL
+    )
     WHERE
-        ao.business_context = "SALE"
-        AND ao.is_ciq_first_listing IS TRUE
-        AND ao.id_user_ciq IS NOT NULL
-        AND cfl.is_first_listing_valid IS TRUE
-        AND ao.ts_contract_signed IS NOT NULL
-    -- agent_offers is an audit table: the same id_offer can carry multiple agent_profile
-    -- rows (AGENT, NEGOTIATION_EXECUTIVE, ...) and multiple revisions per profile as the
-    -- offer is updated. Unlike the AGENT-profile branch above, this branch has no profile
-    -- filter, so it can pull in more than one row per offer. Keep only each offer's latest
-    -- revision so a single first-listing<>offer pair contributes exactly one row.
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY ao.id_offer ORDER BY ao.ts_updated DESC) = 1
+        rn_latest_revision = 1
 ),
 sale_vgv_total_deduped_attribution AS (
     SELECT
