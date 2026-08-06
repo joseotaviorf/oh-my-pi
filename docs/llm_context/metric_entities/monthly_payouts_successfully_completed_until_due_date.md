@@ -25,6 +25,8 @@ independent of the invoice's own due timestamp and of the contract's `landlord_t
 commissions, condominium bills, and other outward flows are out of scope even though they share the
 same payment rails.
 
+**Target** The target for this metric for H2 (until de end of second semester) 2026 is 99.5%
+
 ## Related Business Entities
 
 - Payouts
