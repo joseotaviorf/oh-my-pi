@@ -243,6 +243,12 @@ workflow:
         - "1-ZcEzJ1Q_bF51iweAFS7rHkgqr9WPdjic_9B6hd0T4k"
         - "base_analytics"
 
+    # Former notebook: appsheet_ferias_portugal (Daily Pipeline).
+    appsheet_vacation_portugal:
+      extra_spark_job_arguments:
+        - "1rGC0c4Y_pbvq_M2OL0-78KgkMCkFAEhg8ul11b4gNDM"
+        - "import_completa"
+
     # --- reports_dw.py notebook migration (DBP-1333) ---
     # Former notebook view: base_de_para
     cost_center_mapping_pin:
