@@ -70,11 +70,6 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        try:
-            if RuntimeDetector.is_emr():
-                spark.stop()
-        except NameError:
-            pass
+    from bietlejuice.base.spark.spark_session_factory import run_spark_entrypoint
+
+    run_spark_entrypoint(main)

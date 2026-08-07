@@ -1615,7 +1615,6 @@ emr_cluster_base: &emr_cluster_anchor
         instance_count: 0
     autotermination_minutes: 60
     emr_auto_terminate: false
-    step_concurrency_level: 4
     aws_attributes: &emr_aws_anchor
         availability: ON_DEMAND
         task_availability: SPOT
@@ -1784,6 +1783,11 @@ emr_cluster_base: &emr_cluster_anchor
         spark.openlineage.transport.type: "http"
         spark.openlineage.transport.url: "https://metadata-propagator.apps.data-prd-blue.habitat.zone"
         spark.openlineage.transport.endpoint: "/openlineage/events"
+        # NoOpCircuitBreaker let OpenLineageSparkListener.onApplicationEnd submit a Spark
+        # job into the SparkContext.stop() window and wedge the driver
+        # (j-0835817ZSRL6JVJLDX9, 2026-08-07).
+        spark.openlineage.circuitBreaker.type: "timeout"
+        spark.openlineage.circuitBreaker.timeoutInSeconds: "20"
         # Keep event logs on the EMR default path (do not set spark.eventLog.dir)
         # so Persistent Application UI / History Server can still show them.
         spark.eventLog.enabled: "true"

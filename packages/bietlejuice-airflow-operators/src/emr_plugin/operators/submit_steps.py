@@ -129,39 +129,90 @@ class QuintoAndarEmrSubmitStepsOperator(EmrAddStepsOperator):
             pool_slots=pool_slots_val,
             **kwargs,
         )
+        self._submitted_step_ids: List[str] = []
+        self._submitted_job_flow_id: Optional[str] = None
 
     def execute(self, context):
-        captured = {"step_ids": [], "job_flow_id": None}
-        original_add = self.hook.add_job_flow_steps
+        # Per-execute reset so in-process re-entry cannot cancel a prior attempt's steps.
+        self._submitted_step_ids = []
+        self._submitted_job_flow_id = None
 
-        def add_and_capture(*args, **kwargs):
-            captured["job_flow_id"] = kwargs.get("job_flow_id") or (
+        # EmrHook.add_job_flow_steps waits inside the hook when wait_for_completion=True,
+        # so wrapping the hook method only captures ids after the step finishes. Capture
+        # from the boto3 submit response instead, before the step_complete waiter runs.
+        conn = self.hook.get_conn()
+        original_get_conn = self.hook.get_conn
+        original_conn_add = conn.add_job_flow_steps
+
+        def pinned_get_conn():
+            return conn
+
+        def capture_submit(*args, **kwargs):
+            response = original_conn_add(*args, **kwargs)
+            self._submitted_job_flow_id = kwargs.get("JobFlowId") or (
                 args[0] if args else None
             )
-            step_ids = original_add(*args, **kwargs)
-            captured["step_ids"] = step_ids
-            return step_ids
+            self._submitted_step_ids = list(response.get("StepIds") or [])
+            return response
 
-        self.hook.add_job_flow_steps = add_and_capture
+        self.hook.get_conn = pinned_get_conn  # type: ignore[method-assign]
+        conn.add_job_flow_steps = capture_submit
         try:
             result = super().execute(context)
-            step_ids = captured["step_ids"] or result
+            step_ids = self._submitted_step_ids or result
             self._persist_step_ids(context, step_ids)
-            self._push_step_logs_link(context, captured["job_flow_id"], step_ids)
+            self._push_step_logs_link(context, self._submitted_job_flow_id, step_ids)
             return result
         except TaskDeferred:
-            self._persist_step_ids(context, captured["step_ids"])
+            self._persist_step_ids(context, self._submitted_step_ids)
             self._push_step_logs_link(
-                context, captured["job_flow_id"], captured["step_ids"]
+                context, self._submitted_job_flow_id, self._submitted_step_ids
             )
             raise
         except AirflowException:
             self._log_step_failures(
-                context, captured["job_flow_id"], captured["step_ids"]
+                context, self._submitted_job_flow_id, self._submitted_step_ids
             )
             raise
         finally:
-            self.hook.add_job_flow_steps = original_add
+            conn.add_job_flow_steps = original_conn_add
+            self.hook.get_conn = original_get_conn  # type: ignore[method-assign]
+
+    def on_kill(self) -> None:
+        """Cancel the EMR steps this task submitted so a killed task leaves nothing running."""
+        job_flow_id = self._submitted_job_flow_id or self.job_flow_id
+        if not job_flow_id or not self._submitted_step_ids:
+            self.log.warning(
+                "EMR step cancel skipped: no submitted step ids captured for this task instance."
+            )
+            return
+        self.log.warning(
+            "Task killed; cancelling EMR steps %s on cluster %s with TERMINATE_PROCESS.",
+            self._submitted_step_ids,
+            job_flow_id,
+        )
+        try:
+            response = self.hook.conn.cancel_steps(
+                ClusterId=job_flow_id,
+                StepIds=list(self._submitted_step_ids),
+                StepCancellationOption="TERMINATE_PROCESS",
+            )
+            for info in response.get("CancelStepsInfoList") or []:
+                status = info.get("Status")
+                step_id = info.get("StepId")
+                if status != "SUBMITTED":
+                    self.log.error(
+                        "EMR cancel_steps rejected for %s: status=%s reason=%s",
+                        step_id,
+                        status,
+                        info.get("Reason"),
+                    )
+                else:
+                    self.log.info("EMR cancel_steps submitted for %s", step_id)
+        except Exception as exc:  # noqa: BLE001 - never mask the kill
+            self.log.error(
+                "EMR cancel_steps failed for %s: %s", self._submitted_step_ids, exc
+            )
 
     def resume_execution(
         self, next_method: str, next_kwargs: Optional[Dict[str, Any]], context

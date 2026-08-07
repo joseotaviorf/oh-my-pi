@@ -104,13 +104,22 @@ def main() -> None:
     pipeline.run()
 
 
-if __name__ == "__main__":
+def _main_with_gateway_shutdown():
+    """Shut down the py4j callback server; leave SparkSession.stop() to the wrapper."""
     try:
         main()
     finally:
         try:
             if RuntimeDetector.is_emr():
+                # Must run before the bounded stop in run_spark_entrypoint. Do not
+                # call spark.stop() here — an unbounded stop would bypass the 30s
+                # guard and leave the EMR step RUNNING.
                 spark.sparkContext._gateway.shutdown_callback_server()
-                spark.stop()
         except Exception:
             pass
+
+
+if __name__ == "__main__":
+    from bietlejuice.base.spark.spark_session_factory import run_spark_entrypoint
+
+    run_spark_entrypoint(_main_with_gateway_shutdown)

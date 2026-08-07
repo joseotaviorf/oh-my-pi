@@ -52,6 +52,14 @@ AVAILABILITY_MAP = {
 }
 MASTER_MARKET = "ON_DEMAND"
 
+DEFAULT_STEP_CONCURRENCY_LEVEL = 4
+# A master-only cluster runs exactly one YARN application: with
+# yarn.scheduler.capacity.maximum-am-resource-percent=0.2 and the
+# DominantResourceCalculator, 0.2 x 4 vCores normalises to a 1-vCore AM budget,
+# and one Spark AM already consumes it. Advertising more only makes EMR report
+# steps as RUNNING while YARN keeps them ACCEPTED.
+SINGLE_NODE_STEP_CONCURRENCY_LEVEL = 1
+
 TASK_AVAILABILITY_MAP = {"SPOT": "SPOT", "ON_DEMAND": "ON_DEMAND"}
 DEFAULT_TASK_MARKET = "SPOT"
 
@@ -115,7 +123,13 @@ def translate(config: dict) -> dict:
     if ebs_root_volume_size is not None:
         overrides["EbsRootVolumeSize"] = int(ebs_root_volume_size)
 
-    overrides["StepConcurrencyLevel"] = int(cfg.pop("step_concurrency_level", 4))
+    configured_concurrency = cfg.pop("step_concurrency_level", None)
+    if configured_concurrency is not None:
+        overrides["StepConcurrencyLevel"] = int(configured_concurrency)
+    elif _is_single_node(overrides):
+        overrides["StepConcurrencyLevel"] = SINGLE_NODE_STEP_CONCURRENCY_LEVEL
+    else:
+        overrides["StepConcurrencyLevel"] = DEFAULT_STEP_CONCURRENCY_LEVEL
 
     for field in list(cfg.keys()):
         cfg.pop(field)
@@ -256,6 +270,13 @@ def _resolve_worker_topology(cfg: dict) -> Tuple[str, int, str, int]:
         task_type = legacy_task_type or core_type
 
     return core_type, core_count, task_type, task_count
+
+
+def _is_single_node(overrides: dict) -> bool:
+    """True when the translated cluster has only a master fleet/group."""
+    instances = overrides.get("Instances") or {}
+    nodes = instances.get("InstanceFleets") or instances.get("InstanceGroups") or []
+    return len(nodes) == 1
 
 
 def _is_fleet_block(block) -> bool:
