@@ -68,6 +68,12 @@ the keyword rules). Reporting periods (`ts_contact`) on or after **`2024-01-01`*
 - Contacts whose session has no identifiable first department at all (no `is_first_interaction`
   row found, or no valid session key) — these fall into an unclassified **"Outra origem"**
   bucket and must be reported separately, never folded into POST or PRE silently.
+- Contacts whose `quinto_andar_phone_number` ends in the 8 digits `50285959` (matched via
+  `LIKE '%50285959'` — this Trino version does not support `RIGHT()`; tolerant of DDD/
+  country-code prefix variations, observed in production as the full number `551150285959`).
+  This is a QuintoAndar-owned line used solely for document/image-upload support tied to
+  *other* tickets, not a standalone contact, and must be dropped from **both** numerator and
+  denominator (see Nuances).
 
 ## Calculation
 
@@ -86,7 +92,8 @@ The correct calculation is:
 where:
 
 - **Universe** ("Contatos Faturáveis") = `fact_customer_contacts` rows with `channel = 'chat'`,
-  `is_interaction_answered = TRUE`, and current department in the 22-queue canonical list.
+  `is_interaction_answered = TRUE`, current department in the 22-queue canonical list, **and**
+  `quinto_andar_phone_number` not ending in `50285959` (see Nuances).
 - **`segmento`** = derived once per underlying session from its **first** department
   (`is_first_interaction = TRUE`, earliest `ts_task_created`, one row per `session_key`) —
   classified `Pos` / `Pre` / `Outra_origem` per the keyword rules in Nuances. This is a
@@ -129,12 +136,30 @@ AND dd.department IN (
     '[AeC] CX Parceiros [FRONT] [PRE]',
     '[AeC] CX Parceiros da Portaria [FRONT] [PRE]'
 )
+AND (fcc.quinto_andar_phone_number IS NULL OR fcc.quinto_andar_phone_number NOT LIKE '%50285959')
 -- Change both bounds to the analysis window you want (half-open interval).
 AND fcc.ts_task_created - INTERVAL '3' HOUR >= TIMESTAMP '2026-07-01 00:00:00'
 AND fcc.ts_task_created - INTERVAL '3' HOUR < TIMESTAMP '2026-08-01 00:00:00'
 ```
 
 (`ts_contact` = `fcc.ts_task_created - INTERVAL '3' HOUR` — local-time reporting axis; see Nuances.)
+
+> ⚠️ **MANDATORY FILTER — do not compute this metric without it**
+>
+> Every query for `% Non Wall-E (POST)` — Golden Query or ad hoc — **must** exclude contacts whose
+> `quinto_andar_phone_number` ends in the 8 digits `50285959` (a QuintoAndar-owned support line for
+> document/image uploads on *other* tickets, not a real contact). Add this predicate to the same
+> `WHERE` clause that builds the universe (`faturaveis_rows` / Canonical Filter above), **before**
+> counting numerator or denominator:
+>
+> ```sql
+> AND (fcc.quinto_andar_phone_number IS NULL OR fcc.quinto_andar_phone_number NOT LIKE '%50285959')
+> ```
+>
+> Skipping this filter is not a rounding error: for May–Jul 2026 it roughly **doubles** the
+> reported "Non Wall-E" share (e.g. July 2026 goes from the correct 7.73% to a wrong ~19.6%),
+> because every contact on this line fails the Wall-E join and gets miscounted as "Non Wall-E" on
+> both sides of the ratio. See Scope → Excluded and Nuances for full detail.
 
 **Warning**: Using a narrower or different queue list (e.g. dropping the four non-`[AeC]`-prefixed
 entries, or the WH/OPS entries) silently shrinks the universe and distorts the Pre/Post split —
@@ -146,6 +171,10 @@ the contact window before 2024) leaves pre-2024 Wall-E sessions unmatched — th
 `is_wall_e = 0` and are mis-counted as Non Wall-E.
 Bound the reporting period on `ts_contact`, not raw `ts_task_created` — otherwise contacts near
 month boundaries fall in or out of the window relative to the golden query.
+Also: forgetting the `quinto_andar_phone_number` exclusion inflates both Pos volume and "Non
+Wall-E" share — this line contributed ~11.7k contacts in July 2026 alone (from ~5.5k in May),
+almost all landing in `CX Pagamentos [FRONT] [POS]` and `CX Rescisão [FRONT] [POS]`, and is
+growing month over month.
 
 ### Nuances
 
@@ -238,6 +267,22 @@ not to Pre or Pos. This bucket is usually near-zero (< 0.1% of volume) but spike
 caveat the latest partial period ("UTD") with this limitation rather than trusting Pos/Pre splits
 at face value for very recent dates.
 
+**Support/document-upload phone exclusion**: `quinto_andar_phone_number` values ending in the 8
+digits `50285959` (observed in production as the full number `551150285959`, i.e. country code
+55 + DDD 11 + `50285959`) identify a QuintoAndar-owned WhatsApp line used exclusively so customers
+can send documents/images in support of *other, already-open* tickets. Every interaction on this
+number is support scaffolding, not an independent contact, so it must be dropped entirely from the
+universe (`faturaveis_rows`) — never counted in numerator or denominator. Match on the **last 8
+digits only** via `LIKE '%50285959'`, not full equality and not `RIGHT(quinto_andar_phone_number,
+8)` (unsupported in this Trino version), because the stored value can carry DDD/country-code
+prefix variations. Impact is material and growing: ~59 contacts in April 2026 (line went live),
+~5.5k in May, ~10.2k in June, ~11.7k in July — concentrated in `CX Pagamentos [FRONT] [POS]`,
+`[AeC]/CX Rescisão [FRONT] [POS]`, `[AeC] CX Pagamentos [FRONT] [POS]`, and `[WH] Alteração de
+dados bancários [Front]`, i.e. almost entirely Post-contract. Excluding this line only
+meaningfully affects the metric from April 2026 onward. Applying the exclusion to May/June/July
+2026: `% Non Wall-E (POST)` = 13.02% (May, 71,380 Pos contacts), 11.80% (June, 73,784), 7.73%
+(July, 76,902) — declining month over month as Wall-E POST coverage improves.
+
 ## Dos and Don'ts
 
 **Do:**
@@ -254,6 +299,9 @@ at face value for very recent dates.
   lookback — never narrow it to the analysis start date.
 - Always report the `Outra_origem` bucket size alongside the Pos/Pre split — never silently
   redistribute it without flagging the assumption.
+- Always exclude `quinto_andar_phone_number` ending in `50285959` (last-8-digit match via
+  `LIKE`) from the universe before computing anything — it is document/image-upload scaffolding
+  for other tickets, not a real contact.
 
 **Don't:**
 
@@ -272,6 +320,9 @@ at face value for very recent dates.
 - Don't forget the `Parceiros` / `Consultores imobiliários` keyword rules — omitting them was the
   single largest classification bug found during validation (~85k mis-bucketed contacts in
   Jan–Apr 2026 alone).
+- Don't match the `50285959` exclusion with full string equality or `RIGHT()` (unsupported in this
+  Trino version) — the stored `quinto_andar_phone_number` can carry DDD/country-code prefixes; use
+  `LIKE '%50285959'` and handle `NULL` explicitly.
 
 ## Golden Queries
 
@@ -280,6 +331,11 @@ Computes `% Non Wall-E (POST)` by month. The universe CTE (`faturaveis_rows`) re
 `first_department` CTE reproduces that entity's own first-department pattern; what is exclusive
 to this metric is filtering the final aggregation to `segmento = 'Pos'` and computing the
 Non-Wall-E share within it.
+
+⚠️ **Before running this query**: confirm the `faturaveis_rows` CTE below still contains the line
+`AND (fcc.quinto_andar_phone_number IS NULL OR fcc.quinto_andar_phone_number NOT LIKE
+'%50285959')`. If that line is missing or was edited out, the result is wrong — do not report
+numbers computed without it.
 
 ```sql
 WITH departments AS (
@@ -329,6 +385,8 @@ faturaveis_rows AS (
     WHERE fcc.channel = 'chat'
       AND fcc.is_interaction_answered = TRUE
       AND dd.department IN (SELECT department FROM faturaveis22)
+      -- Mandatory: drops the document/image-upload support line — see Nuances.
+      AND (fcc.quinto_andar_phone_number IS NULL OR fcc.quinto_andar_phone_number NOT LIKE '%50285959')
       -- Change to the start of the analysis window you want.
       AND fcc.ts_task_created >= TIMESTAMP '2026-07-01 00:00:00'
 ),
