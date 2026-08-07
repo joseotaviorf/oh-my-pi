@@ -264,29 +264,6 @@ FROM VALUES
         )
     ),
 
-    -- Recs using only user profile essential filters for sale
-    (
-        "ab_beakman_search_services_feed_filter_search_profile_sale_experiment",
-        named_struct(
-            'begin_date', DATE('2026-05-07'),
-            'end_date', NULL,
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', NULL,
-            'metrics', to_json(
-                                    named_struct(
-                                                    'default_metrics', true,
-                                                    'experiment_metrics', array()
-                                                )
-                                ),
-           'running', True
-        )
-    ),
-
     -- Recs using search profile feed filter for sale
     (
         "ab_beakman_search_services_feed_filter_search_profile_sale_experiment_v2",
@@ -360,7 +337,7 @@ FROM VALUES
         "ab_beakman_search_services_search_profile_v2",
         named_struct(
             'begin_date', DATE('2026-05-04'),
-            'end_date', DATE('2026-06-29'),
+            'end_date', DATE('2026-08-07'),
             'variants', to_json(
                 named_struct(
                     'VARIANT_A', 'baseline',
@@ -374,7 +351,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
@@ -429,7 +406,7 @@ FROM VALUES
         "ab_beakman_search_services_dynamic_carousels_rent_v4",
         named_struct(
             'begin_date', DATE('2026-07-23'),
-            'end_date', NULL,
+            'end_date', DATE('2026-08-04'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -443,7 +420,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
@@ -452,29 +429,6 @@ FROM VALUES
         "ab_beakman_search_services_dynamic_carousels_sale_v4",
         named_struct(
             'begin_date', DATE('2026-07-23'),
-            'end_date', NULL,
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', "business_context = 'sale'",
-            'metrics', to_json(
-                                    named_struct(
-                                                    'default_metrics', true,
-                                                    'experiment_metrics', array()
-                                                )
-                                ),
-           'running', True
-        )
-    ),
-
-        -- Pclick Sale Agents
-    (
-        "ab_beakman_search_services_p_click_experiment_sale_v8",
-        named_struct(
-            'begin_date', DATE('2026-07-15'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
