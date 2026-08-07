@@ -6,6 +6,10 @@
 # domain prefix (`path_prefix`), e.g.:
 #   dags/tech_platform/enrich_databricks_query_history
 #
+# For hand-written Python DAG modules the same keys apply with different
+# scopes: `dag` matches the module's file stem and `path` its parent
+# directory, e.g. `dag: em_casa` / `path: dags/cross/crawlers/listings`.
+#
 # exceptions:
 #   - dag: enrich_databricks_query_history
 #     reason: "Reads Databricks system tables; cannot run on EMR"

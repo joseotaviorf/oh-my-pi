@@ -442,6 +442,7 @@ steps:
           include:
             - "dags/**/*_cluster.yml"
             - "dags/**/*_declaration.yml"
+            - "dags/**/*.py"
             - "packages/bietlejuice-compiler/scripts/ci_cd/validate_no_new_databricks_clusters.py"
             - "packages/bietlejuice-compiler/scripts/ci_cd/databricks_cluster_exceptions.yml"
           on_empty: false

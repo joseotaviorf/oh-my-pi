@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """Block new Databricks production cluster deployments in CI.
 
-Fails when a PR introduces a Databricks prod runtime via either:
-  1. A brand-new DAG whose production cluster is not EMR, or
-  2. An alteration that changes production runtime from EMR → Databricks.
+Runs two independent detectors through the same CI step:
+
+  1. Prod cluster YAML classifier — fails when a PR introduces a Databricks
+     prod runtime via a brand-new DAG whose production cluster is not EMR, or
+     an alteration that changes production runtime from EMR → Databricks.
+  2. Hand-written Python DAG import check — fails when a PR newly introduces
+     a ``databricks_plugin`` / ``databricks`` / ``airflow.providers.databricks``
+     import (or ``DatabricksJobClusterEngine``) in ``dags/**/*.py``.
 
 Existing Databricks DAGs may still be edited (Databricks → Databricks).
 Engine detection uses both ``cluster.type`` (``emr_*``) and effective
@@ -15,13 +20,14 @@ Bypass: list the DAG in ``databricks_cluster_exceptions.yml`` (owned by
 Usage (CI):
     python validate_no_new_databricks_clusters.py -b "$CI_COMMIT_BRANCH"
 
-Usage (local audit — list all Databricks prod clusters, exit 0):
+Usage (local audit — list all Databricks prod clusters and Python imports, exit 0):
     python validate_no_new_databricks_clusters.py -a
 """
 
 from __future__ import annotations
 
 import argparse
+import ast
 import os
 import subprocess
 import sys
@@ -48,12 +54,36 @@ EXCEPTIONS_PATH = Path(__file__).resolve().parent / "databricks_cluster_exceptio
 # Databricks ``cluster`` on the declaration and silently flip EMR → Databricks.
 RELEVANT_STATUSES = frozenset({"A", "M", "D"})
 
+# --- Python DAG detector (hand-written DAGs bypassing the cluster YAML) ---
+# Only A/M: a deleted file cannot introduce Databricks.
+PY_RELEVANT_STATUSES = frozenset({"A", "M"})
+# Import roots that mean "this module talks to Databricks". Matched as exact
+# module or dotted prefix, so `bietlejuice.base.databricks.*` (ACL/permission
+# enums, runtime-agnostic) is deliberately NOT matched.
+PY_BLOCKED_MODULE_PREFIXES = (
+    "databricks_plugin",
+    "databricks",
+    "airflow.providers.databricks",
+)
+# Databricks-only symbols reachable from a runtime-agnostic module path.
+PY_BLOCKED_SYMBOLS = frozenset({"DatabricksJobClusterEngine"})
+
 
 class Violation(NamedTuple):
     dag_root: str
     reason: str
     cluster_type: str
     spark_version: str
+
+
+class PythonViolation(NamedTuple):
+    path: str
+    line: int
+    imported: str
+    reason: str
+
+    def render(self) -> str:
+        return f"  {self.path}:{self.line}: imports {self.imported}: {self.reason}"
 
 
 @dataclass(frozen=True)
@@ -233,6 +263,172 @@ def read_text_from_git(git_ref: str, repo_relative: str) -> Optional[str]:
     return result.stdout
 
 
+def is_blocked_module(module: Optional[str]) -> bool:
+    """True when a module path is a Databricks entry point."""
+    if not module:
+        return False
+    return any(
+        module == prefix or module.startswith(f"{prefix}.")
+        for prefix in PY_BLOCKED_MODULE_PREFIXES
+    )
+
+
+def databricks_imports(path: str, source: str) -> List[Tuple[int, str]]:
+    """Return (line, imported_name) for every Databricks import in one module.
+
+    A syntax error is reported and the module skipped, matching
+    ``validate_emr_runtime_clients.check_source``.
+    """
+    try:
+        tree = ast.parse(source, filename=path)
+    except SyntaxError as exc:
+        print(f"  {path}:{exc.lineno}: syntax error: {exc.msg}", file=sys.stderr)
+        return []
+
+    hits: List[Tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if is_blocked_module(alias.name):
+                    hits.append((node.lineno, alias.name))
+        elif isinstance(node, ast.ImportFrom) and node.level == 0:
+            if is_blocked_module(node.module):
+                hits.append((node.lineno, node.module or ""))
+            else:
+                for alias in node.names:
+                    if alias.name in PY_BLOCKED_SYMBOLS:
+                        hits.append((node.lineno, f"{node.module}.{alias.name}"))
+    return sorted(hits, key=lambda h: (h[0], h[1]))
+
+
+def is_scanned_python_path(repo_relative: str) -> bool:
+    """Hand-written DAG modules only."""
+    path = Path(repo_relative)
+    parts = path.parts
+    return (
+        path.suffix == ".py"
+        and len(parts) >= 3
+        and parts[0] == "dags"
+        # spark_jobs/ are Databricks/EMR *job* scripts, gated by
+        # validate-emr-runtime-clients; they never import databricks_plugin.
+        and "spark_jobs" not in parts
+        # Platform migration DAGs exist to compare EMR against Databricks.
+        and not repo_relative.startswith("dags/platform/migration_")
+    )
+
+
+def python_dag_scope(repo_relative: str) -> Tuple[str, str]:
+    """Return (dag_root, dag_name) used for exceptions matching.
+
+    ``dag_root`` is the module's parent directory and ``dag_name`` its file stem,
+    so ``dags/cross/crawlers/listings/em_casa.py`` is matched by
+    ``dag: em_casa``, ``path: dags/cross/crawlers/listings`` or
+    ``path_prefix: dags/cross``.
+    """
+    path = Path(repo_relative)
+    return str(path.parent), path.stem
+
+
+def evaluate_python_module(
+    repo_relative: str,
+    from_ref: str,
+    dag_exceptions: Set[str],
+    path_exceptions: Set[str],
+    path_prefix_exceptions: Set[str],
+) -> List[PythonViolation]:
+    dag_root, dag_name = python_dag_scope(repo_relative)
+    if is_excepted(
+        dag_name, dag_root, dag_exceptions, path_exceptions, path_prefix_exceptions
+    ):
+        return []
+
+    absolute = REPO_ROOT / repo_relative
+    if not absolute.is_file():
+        return []
+
+    head = databricks_imports(repo_relative, absolute.read_text(encoding="utf-8"))
+    if not head:
+        return []
+
+    base_text = read_text_from_git(from_ref, repo_relative)
+    if base_text is not None and databricks_imports(repo_relative, base_text):
+        return []
+
+    if base_text is None:
+        reason = "new Python DAG module with Databricks runtime"
+    else:
+        reason = (
+            "Python DAG module changed from no Databricks import to Databricks "
+            "(EMR -> Databricks)"
+        )
+
+    return [
+        PythonViolation(path=repo_relative, line=line, imported=imported, reason=reason)
+        for line, imported in head
+    ]
+
+
+def changed_python_modules(changed_files: Dict[str, str]) -> List[str]:
+    return sorted(
+        path
+        for path, status in changed_files.items()
+        if status in PY_RELEVANT_STATUSES and is_scanned_python_path(path)
+    )
+
+
+def tracked_python_modules() -> List[str]:
+    """Tracked ``dags/**/*.py`` modules, via ``git ls-files``."""
+    result = subprocess.run(
+        ["git", "ls-files", "--", "dags"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return sorted(p for p in result.stdout.splitlines() if is_scanned_python_path(p))
+
+
+def collect_python_violations(
+    from_ref: str,
+    changed_files: Dict[str, str],
+    dag_exceptions: Set[str],
+    path_exceptions: Set[str],
+    path_prefix_exceptions: Set[str],
+) -> List[PythonViolation]:
+    violations: List[PythonViolation] = []
+    for repo_relative in changed_python_modules(changed_files):
+        violations.extend(
+            evaluate_python_module(
+                repo_relative,
+                from_ref,
+                dag_exceptions,
+                path_exceptions,
+                path_prefix_exceptions,
+            )
+        )
+    return violations
+
+
+def audit_all_python_databricks() -> List[PythonViolation]:
+    found: List[PythonViolation] = []
+    for repo_relative in tracked_python_modules():
+        absolute = REPO_ROOT / repo_relative
+        if not absolute.is_file():
+            continue
+        for line, imported in databricks_imports(
+            repo_relative, absolute.read_text(encoding="utf-8")
+        ):
+            found.append(
+                PythonViolation(
+                    path=repo_relative,
+                    line=line,
+                    imported=imported,
+                    reason="existing Databricks import",
+                )
+            )
+    return found
+
+
 def resolve_prod_cluster_from_texts(
     *,
     cluster_text: Optional[str],
@@ -327,7 +523,9 @@ def evaluate_dag(
     )
 
 
-def collect_violations(branch: str) -> List[Violation]:
+def collect_violations(
+    branch: str,
+) -> Tuple[List[Violation], List[PythonViolation]]:
     os.environ.setdefault("ENVIRONMENT", "prod")
     ConfigurationService._instance_cache.clear()
     config_service = ConfigurationService()
@@ -351,7 +549,15 @@ def collect_violations(branch: str) -> List[Violation]:
         )
         if violation is not None:
             violations.append(violation)
-    return violations
+
+    py_violations = collect_python_violations(
+        from_ref,
+        changed,
+        dag_exceptions,
+        path_exceptions,
+        path_prefix_exceptions,
+    )
+    return violations, py_violations
 
 
 def audit_all_databricks() -> List[Tuple[str, ClusterClassification]]:
@@ -378,7 +584,8 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description=(
             "Fail if a PR introduces Databricks production runtime "
-            "(new DAG or EMR→Databricks)."
+            "(new DAG or EMR→Databricks) or a new Databricks import in a "
+            "hand-written Python DAG module."
         )
     )
     group = parser.add_mutually_exclusive_group(required=True)
@@ -387,7 +594,10 @@ def parse_args():
         "-a",
         "--all-files",
         action="store_true",
-        help="List all DAGs with Databricks prod clusters (local audit, exit 0)",
+        help=(
+            "List all DAGs with Databricks prod clusters and hand-written "
+            "Python modules with Databricks imports (local audit, exit 0)"
+        ),
     )
     return parser.parse_args()
 
@@ -403,32 +613,67 @@ def main() -> int:
                 f"  {dag_root}: type={c.cluster_type!r} "
                 f"spark_version={c.spark_version!r}"
             )
-        return 0
-
-    violations = collect_violations(args.branch)
-    if not violations:
-        print("OK: No new Databricks production cluster introductions.")
-        return 0
-
-    print(
-        f"\nFound {len(violations)} Databricks production runtime "
-        "introduction(s) that are blocked:\n",
-        file=sys.stderr,
-    )
-    for v in violations:
+        py = audit_all_python_databricks()
+        files = {v.path for v in py}
         print(
-            f"  {v.dag_root}: {v.reason}\n"
-            f"      type={v.cluster_type!r} spark_version={v.spark_version!r}",
+            f"\nFound {len(py)} Databricks import(s) in {len(files)} "
+            "hand-written Python DAG module(s):"
+        )
+        for violation in py:
+            print(violation.render())
+        return 0
+
+    violations, py_violations = collect_violations(args.branch)
+    if not violations and not py_violations:
+        print(
+            "OK: No new Databricks production cluster or Python operator introductions."
+        )
+        return 0
+
+    if violations:
+        print(
+            f"\nFound {len(violations)} Databricks production runtime "
+            "introduction(s) that are blocked:\n",
             file=sys.stderr,
         )
-    print(
-        "\nUse an `emr_*` preset (or `custom_cluster` with "
-        "`spark_version: emr-*`). To bypass, add the DAG to "
-        "packages/bietlejuice-compiler/scripts/ci_cd/"
-        "databricks_cluster_exceptions.yml "
-        "(requires @quintoandar/data-ingestion-code-owners approval).",
-        file=sys.stderr,
-    )
+        for v in violations:
+            print(
+                f"  {v.dag_root}: {v.reason}\n"
+                f"      type={v.cluster_type!r} spark_version={v.spark_version!r}",
+                file=sys.stderr,
+            )
+        print(
+            "\nUse an `emr_*` preset (or `custom_cluster` with "
+            "`spark_version: emr-*`). To bypass, add the DAG to "
+            "packages/bietlejuice-compiler/scripts/ci_cd/"
+            "databricks_cluster_exceptions.yml "
+            "(requires @quintoandar/data-ingestion-code-owners approval).",
+            file=sys.stderr,
+        )
+
+    if py_violations:
+        py_files = {v.path for v in py_violations}
+        print(
+            f"\nFound {len(py_violations)} new Databricks import(s) in "
+            f"{len(py_files)} hand-written Python DAG module(s):",
+            file=sys.stderr,
+        )
+        for violation in py_violations:
+            print(violation.render(), file=sys.stderr)
+        print(
+            "\nHand-written DAGs must not submit new Databricks jobs. Port "
+            "the tasks to\n"
+            "emr_plugin (QuintoAndarEmrCreateClusterOperator /\n"
+            "QuintoAndarEmrSubmitStepsOperator / "
+            "QuintoAndarEmrTerminateClusterOperator), or\n"
+            "migrate the DAG to a *_declaration.yml with an `emr_*` cluster "
+            "preset. To bypass,\n"
+            "add the module to packages/bietlejuice-compiler/scripts/ci_cd/\n"
+            "databricks_cluster_exceptions.yml (requires\n"
+            "@quintoandar/data-ingestion-code-owners approval).",
+            file=sys.stderr,
+        )
+
     return 1
 
 

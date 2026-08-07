@@ -9,13 +9,20 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+import scripts.ci_cd.validate_no_new_databricks_clusters as validate_mod  # noqa: E402
 from scripts.ci_cd.validate_no_new_databricks_clusters import (  # noqa: E402
     ClusterClassification,
     affected_dag_roots,
+    changed_python_modules,
     classify_prod_cluster,
+    databricks_imports,
+    evaluate_python_module,
     extract_prod_cluster,
+    is_blocked_module,
     is_excepted,
+    is_scanned_python_path,
     load_exceptions,
+    python_dag_scope,
     resolve_prod_cluster_from_texts,
     should_fail_introduction,
 )
@@ -278,3 +285,223 @@ class TestAffectedDagRoots:
 )
 def test_classify_parametrized(cluster_args, expect_emr):
     assert classify_prod_cluster(cluster_args).is_emr is expect_emr
+
+
+class TestIsBlockedModule:
+    def test_databricks_plugin_root(self):
+        assert is_blocked_module("databricks_plugin") is True
+
+    def test_databricks_plugin_submodule(self):
+        assert is_blocked_module("databricks_plugin.hooks.databricks_hook") is True
+
+    def test_databricks_sdk(self):
+        assert is_blocked_module("databricks.sdk") is True
+
+    def test_airflow_providers_databricks(self):
+        assert (
+            is_blocked_module("airflow.providers.databricks.operators.databricks")
+            is True
+        )
+
+    def test_bietlejuice_base_databricks_not_blocked(self):
+        # Runtime-agnostic ACL/permission enums — must not be treated as a
+        # Databricks job entry point (~16 hand-written DAGs import this).
+        assert (
+            is_blocked_module("bietlejuice.base.databricks.cluster_permission_enum")
+            is False
+        )
+
+    def test_bare_substring_not_matched(self):
+        assert is_blocked_module("databricks_helpers") is False
+
+    def test_none(self):
+        assert is_blocked_module(None) is False
+
+
+class TestDatabricksImports:
+    def test_from_databricks_plugin_multiline(self):
+        source = (
+            "from databricks_plugin import (\n"
+            "    QuintoAndarDatabricksSubmitRunOperator,\n"
+            ")\n"
+        )
+        hits = databricks_imports("probe.py", source)
+        assert hits == [(1, "databricks_plugin")]
+
+    def test_import_as_alias(self):
+        source = "import databricks_plugin.operators.submit_run as sr\n"
+        assert databricks_imports("probe.py", source) == [
+            (1, "databricks_plugin.operators.submit_run")
+        ]
+
+    def test_blocked_symbol_from_agnostic_module(self):
+        source = (
+            "from bietlejuice.base.airflow.job_cluster_engine import "
+            "DatabricksJobClusterEngine\n"
+        )
+        assert databricks_imports("probe.py", source) == [
+            (
+                1,
+                "bietlejuice.base.airflow.job_cluster_engine.DatabricksJobClusterEngine",
+            )
+        ]
+
+    def test_emr_plugin_not_hit(self):
+        source = "from emr_plugin import QuintoAndarEmrSubmitStepsOperator\n"
+        assert databricks_imports("probe.py", source) == []
+
+    def test_relative_import_ignored(self):
+        source = "from . import helpers\n"
+        assert databricks_imports("probe.py", source) == []
+
+    def test_syntax_error_returns_empty(self):
+        assert databricks_imports("probe.py", "def f(:") == []
+
+
+class TestIsScannedPythonPath:
+    def test_standard_handwritten(self):
+        assert is_scanned_python_path("dags/growth/semrush/semrush.py") is True
+
+    def test_nested_handwritten(self):
+        assert is_scanned_python_path("dags/cross/crawlers/listings/em_casa.py") is True
+
+    def test_spark_jobs_excluded(self):
+        assert (
+            is_scanned_python_path("dags/cross/base/spark_jobs/load_table_full.py")
+            is False
+        )
+
+    def test_platform_migration_excluded(self):
+        assert (
+            is_scanned_python_path("dags/platform/migration_assets/comparison.py")
+            is False
+        )
+
+    def test_sql_excluded(self):
+        assert (
+            is_scanned_python_path("dags/growth/semrush/queries/clean/x.sql") is False
+        )
+
+    def test_packages_excluded(self):
+        assert is_scanned_python_path("packages/bietlejuice-core/src/x.py") is False
+
+
+class TestPythonDagScope:
+    def test_nested_module(self):
+        assert python_dag_scope("dags/cross/crawlers/listings/em_casa.py") == (
+            "dags/cross/crawlers/listings",
+            "em_casa",
+        )
+
+
+class TestChangedPythonModules:
+    def test_filters_status_and_path(self):
+        changed = {
+            "dags/growth/semrush/semrush.py": "A",
+            "dags/growth/x/x.py": "D",
+            "dags/growth/y/y_declaration.yml": "M",
+        }
+        assert changed_python_modules(changed) == ["dags/growth/semrush/semrush.py"]
+
+
+class TestEvaluatePythonModule:
+    def _write_module(self, tmp_path, relative, source):
+        absolute = tmp_path / relative
+        absolute.parent.mkdir(parents=True, exist_ok=True)
+        absolute.write_text(source, encoding="utf-8")
+        return absolute
+
+    def test_new_module_with_databricks(self, tmp_path, monkeypatch):
+        relative = "dags/growth/probe/probe.py"
+        self._write_module(
+            tmp_path,
+            relative,
+            "from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator\n",
+        )
+        monkeypatch.setattr(validate_mod, "REPO_ROOT", tmp_path)
+        monkeypatch.setattr(validate_mod, "read_text_from_git", lambda *_: None)
+
+        violations = evaluate_python_module(
+            relative, "origin/master", set(), set(), set()
+        )
+        assert len(violations) == 1
+        assert "new Python DAG module" in violations[0].reason
+
+    def test_emr_to_databricks(self, tmp_path, monkeypatch):
+        relative = "dags/growth/probe/probe.py"
+        self._write_module(
+            tmp_path,
+            relative,
+            "from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator\n",
+        )
+        monkeypatch.setattr(validate_mod, "REPO_ROOT", tmp_path)
+        monkeypatch.setattr(
+            validate_mod,
+            "read_text_from_git",
+            lambda *_: "from emr_plugin import QuintoAndarEmrSubmitStepsOperator\n",
+        )
+
+        violations = evaluate_python_module(
+            relative, "origin/master", set(), set(), set()
+        )
+        assert len(violations) == 1
+        assert "EMR -> Databricks" in violations[0].reason
+
+    def test_databricks_to_databricks(self, tmp_path, monkeypatch):
+        relative = "dags/growth/probe/probe.py"
+        self._write_module(
+            tmp_path,
+            relative,
+            "from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator\n",
+        )
+        monkeypatch.setattr(validate_mod, "REPO_ROOT", tmp_path)
+        monkeypatch.setattr(
+            validate_mod,
+            "read_text_from_git",
+            lambda *_: (
+                "from databricks_plugin import QuintoAndarDatabricksRunNowOperator\n"
+            ),
+        )
+
+        assert (
+            evaluate_python_module(relative, "origin/master", set(), set(), set()) == []
+        )
+
+    def test_databricks_to_emr(self, tmp_path, monkeypatch):
+        relative = "dags/growth/probe/probe.py"
+        self._write_module(
+            tmp_path,
+            relative,
+            "from emr_plugin import QuintoAndarEmrSubmitStepsOperator\n",
+        )
+        monkeypatch.setattr(validate_mod, "REPO_ROOT", tmp_path)
+        monkeypatch.setattr(
+            validate_mod,
+            "read_text_from_git",
+            lambda *_: (
+                "from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator\n"
+            ),
+        )
+
+        assert (
+            evaluate_python_module(relative, "origin/master", set(), set(), set()) == []
+        )
+
+    def test_excepted_module(self, tmp_path, monkeypatch):
+        relative = "dags/growth/probe/probe.py"
+        self._write_module(
+            tmp_path,
+            relative,
+            "from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator\n",
+        )
+        monkeypatch.setattr(validate_mod, "REPO_ROOT", tmp_path)
+        monkeypatch.setattr(
+            validate_mod,
+            "read_text_from_git",
+            lambda *_: "from emr_plugin import QuintoAndarEmrSubmitStepsOperator\n",
+        )
+
+        assert (
+            evaluate_python_module(relative, "origin/master", {"probe"}, set(), set())
+            == []
+        )
