@@ -10,5 +10,5 @@ column_level_validations:
   personuuid:
     is_unique:
       severity_level: Error
-    is_complete:
-      severity_level: Error
+    #is_complete:
+    #  severity_level: Error

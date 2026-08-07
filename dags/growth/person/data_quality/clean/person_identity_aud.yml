@@ -51,6 +51,7 @@ column_level_validations:
         - COGNITO
         - GOOGLE
         - APPLE
+        - WHATSAPP_BSUID
       severity_level: Warning
   scope:
     is_contained_in:
@@ -59,6 +60,7 @@ column_level_validations:
         - MX
         - COGNITO_USER_POOL_BR
         - COGNITO_USER_POOL_MX
+        - WW
       severity_level: Warning
   validation_type:
     # Non-null validation_type must match Person service enum; null is valid in historical snapshots.

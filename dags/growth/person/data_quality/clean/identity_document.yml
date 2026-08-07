@@ -28,6 +28,9 @@ column_level_validations:
     is_contained_in:
       values:
         - CPF
+        - cpf
+        - CNH
+        - CRECI
         - RG
         - RNE
         - RFC

@@ -18,7 +18,7 @@ description: |
   **Identity Types & Sources:**
   - **Contact Identities:** EMAIL, PHONE for communication-based identification
   - **Document Identities:** CPF, RFC, PASSPORT for government document matching
-  - **Social Identities:** COGNITO, GOOGLE, APPLE for social login integration
+  - **Social Identities:** COGNITO, GOOGLE, APPLE, WHATSAPP_BSUID for social and messaging login integration
   
   **Scope & Geographic Coverage:**
   - **BR:** Brazil-specific identities (CPF, Brazilian phones/emails)
@@ -74,6 +74,7 @@ columns:
     categories:
       BR: Brazil-specific identities such as CPF and Brazilian contact identifiers.
       MX: Mexico-specific identities such as RFC and Mexican contact identifiers.
+      WW: Worldwide / global scope for international identities such as WhatsApp Business identifiers.
       COGNITO_USER_POOL_BR: Identities scoped to the Brazil Cognito user pool.
       COGNITO_USER_POOL_MX: Identities scoped to the Mexico Cognito user pool.
   type:
@@ -91,6 +92,7 @@ columns:
       COGNITO: AWS Cognito user pool identity reference.
       GOOGLE: Google social login identity reference.
       APPLE: Apple social login identity reference.
+      WHATSAPP_BSUID: WhatsApp Business scoped user identifier for cross-channel identity resolution.
   validation_type:
     lineage:
     - datalake_person_raw.person_identity.validation_type
@@ -131,6 +133,23 @@ columns:
       Timestamp when the person identity was last modified.
       **Format:** UTC timestamp with timezone information
       **Usage:** Change tracking, validation status updates, identity lifecycle management.
+  op_cdc:
+    lineage:
+      - datalake_person_raw.person_identity.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_person_raw.person_identity.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this person_identity change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_person_raw.person_identity.ts_database_transaction
+    description: Timestamp of the originating database transaction in the Person service before CDC propagation.
   year:
     lineage:
     - datalake_person_raw.person_identity.year

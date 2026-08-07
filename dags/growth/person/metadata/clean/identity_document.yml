@@ -75,8 +75,11 @@ columns:
       issuing_country for KYC and compliance validation.
     categories:
       CPF: Brazilian individual taxpayer registry (Cadastro de Pessoas Físicas).
+      cpf: Legacy lowercase variant of CPF stored before enum standardization.
       RG: Brazilian national identity card (Registro Geral).
       RNE: Brazilian foreigner registry (Registro Nacional de Estrangeiro).
+      CNH: Brazilian national driver's license (Carteira Nacional de Habilitação).
+      CRECI: Real-estate professional council registration (Conselho Regional de Corretores de Imóveis).
       RFC: Mexican tax registry (Registro Federal de Contribuyentes).
       CURP: Mexican population registry (Clave Única de Registro de Población).
       PASSPORT: International travel document.
@@ -159,6 +162,23 @@ columns:
       Timestamp when the identity document was last modified.
       **Format:** UTC timestamp with timezone information
       **Usage:** Change tracking, validation status updates, document lifecycle management.
+  op_cdc:
+    lineage:
+      - datalake_person_raw.identity_document.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_person_raw.identity_document.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this identity_document change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_person_raw.identity_document.ts_database_transaction
+    description: Timestamp of the originating database transaction in the Person service before CDC propagation.
   year:
     lineage:
     - datalake_person_raw.identity_document.year

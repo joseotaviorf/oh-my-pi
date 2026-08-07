@@ -105,7 +105,7 @@ columns:
     - datalake_person_raw.contact_info.is_active
     description: |
       Boolean flag indicating whether this contact method is currently active and should be used for communications.
-      **Values:** true (active, can receive communications), false (inactive, should not be contacted)
+      **Values:** true (active, can receive communications), false (inactive, should not be contacted), null (activation status not set in source)
       **Business Rules:** Inactive contacts are excluded from notification campaigns
       **Lifecycle:** Contacts may be deactivated due to bounces, unsubscribes, or verification failures.
   ts_created:
@@ -122,6 +122,23 @@ columns:
       Timestamp when the contact information was last modified.
       **Format:** UTC timestamp with timezone information
       **Usage:** Change tracking, verification status updates, preference modifications.
+  op_cdc:
+    lineage:
+      - datalake_person_raw.contact_info.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_person_raw.contact_info.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this contact_info change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_person_raw.contact_info.ts_database_transaction
+    description: Timestamp of the originating database transaction in the Person service before CDC propagation.
   year:
     lineage:
     - datalake_person_raw.contact_info.year
