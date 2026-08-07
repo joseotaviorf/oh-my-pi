@@ -1765,6 +1765,12 @@ bietlejuice.enrich_chat_messages:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day
+bietlejuice.enrich_chat_tool_calls:
+  - bietlejuice.consorcio:load-clean-lead-external-data:first-run-of-day
+  - bietlejuice.consorcio:load-clean-lead:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+  - bietlejuice.langfuse:load-clean-observations:first-run-of-day
+  - bietlejuice.langfuse:load-clean-traces:first-run-of-day
 bietlejuice.enrich_chatbot:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day

@@ -1,0 +1,31 @@
+dag:
+  name: enrich_chat_tool_calls
+  schedule_start_date: 2026, 7, 1
+  owner: QCX
+  documentation:
+    dag_purpose: |
+      Materializes Conrado chat tool invocations into
+      datalake_consorcio.chat_tool_calls (one row per Langfuse TOOL
+      observation) with Copilot id_session and Consórcio lead/CRM/Blip
+      identifiers for conversational analytics. Incremental merge on
+      id_tool_call. Triggered by upstream dataset deps (Langfuse
+      observations/traces, Copilot session, Consórcio lead bridge). Default
+      load lookback is a rolling 30-day window via load_start_date /
+      load_end_date; override those params in the Airflow "Trigger DAG w/
+      config" form for backfill.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: consorcio
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    chat_tool_calls:
+      merge_on: [id_tool_call]
+      z_order_by: [ts_started, id_session, tool_name]
+      run_optimize: true
+      run_vacuum: true

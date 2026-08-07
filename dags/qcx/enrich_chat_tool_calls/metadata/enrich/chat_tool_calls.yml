@@ -1,0 +1,97 @@
+---
+database_name: datalake_consorcio
+table_name: chat_tool_calls
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  One row per Langfuse TOOL observation for Conrado chat sessions. Grain is
+  id_tool_call (Langfuse id_observation). Joins to chat_messages / chat_sessions
+  via Copilot id_session, and optionally to Consórcio lead / HubSpot CRM via the
+  Blip identity bridge. Includes tool name, args/output (may be encrypted today),
+  observation level, best-effort exit_code, latency in milliseconds, and start/end
+  timestamps. Incremental merge on id_tool_call; scheduled default is a rolling
+  30-day load window (override load_start_date / load_end_date for backfill).
+  Partitioned by ts_started.
+columns:
+  id_tool_call:
+    lineage:
+      - datalake_langfuse_clean.observations.id_observation
+    description: Langfuse observation primary key for the TOOL call; unique grain of this table.
+  id_session:
+    lineage:
+      - datalake_copilot_service_clean.session.id
+    description: Copilot session id; joins to chat_messages.id_session and chat_sessions.id_session.
+  id_trace:
+    lineage:
+      - datalake_langfuse_clean.observations.id_trace
+    description: Langfuse trace that contains this tool observation.
+  id_lead:
+    lineage:
+      - datalake_consorcio_clean.lead_external_data.id_lead
+    description: Consórcio lead primary key when the Blip identity is linked; null when no link exists.
+  id_bsp:
+    lineage:
+      - datalake_langfuse_clean.traces.id_user
+    description: Blip user identity for the chat (Langfuse traces.id_user, typically uuid@tunnel.msging.net).
+  id_crm:
+    lineage:
+      - datalake_consorcio_clean.lead_external_data.id_crm
+    description: HubSpot CRM deal id linked to the lead via lead_external_data; null when no CRM link exists.
+  uuid_lead:
+    lineage:
+      - datalake_consorcio_clean.lead.uuid
+    description: Consórcio lead UUID when id_lead is linked; aligns with funnel_stage.uuid_lead.
+  host_name:
+    lineage:
+      - datalake_langfuse_clean.traces.tags
+    description: Conversational host / bot name from the first Langfuse trace tag (lowercase), for example conrado.
+  tool_name:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: Name of the tool invoked (Langfuse observation name).
+  tool_args:
+    lineage:
+      - datalake_langfuse_clean.observations.input
+    description: >
+      Tool input / arguments as stored by Langfuse (STRING). May be encrypted or
+      redacted today; kept for future plaintext analytics.
+  tool_output:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: >
+      Tool output as stored by Langfuse (STRING). May be encrypted or redacted today;
+      used for error inspection and best-effort exit_code extraction.
+  observation_level:
+    lineage:
+      - datalake_langfuse_clean.observations.level
+    description: Langfuse observation level (e.g. DEFAULT, ERROR) for the tool call.
+  exit_code:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: >
+      Best-effort numeric exit / HTTP status extracted from tool_output JSON keys
+      exit_code, status_code, or http_status when present; null otherwise. Langfuse
+      does not expose a first-class exit code field.
+  latency_milliseconds:
+    lineage:
+      - datalake_langfuse_clean.observations.latency
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
+    description: >
+      Tool invocation duration in milliseconds. Derived from Langfuse latency
+      (stored in seconds, multiplied by 1000), falling back to
+      unix_millis(ts_ended) - unix_millis(ts_started) when latency is null.
+  ts_started:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Timestamp when the tool observation started.
+  ts_ended:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+    description: Timestamp when the tool observation ended; null if not recorded.
+  year:
+    description: Partition column — calendar year of ts_started.
+  month:
+    description: Partition column — calendar month of ts_started.
+  day:
+    description: Partition column — calendar day of ts_started.
