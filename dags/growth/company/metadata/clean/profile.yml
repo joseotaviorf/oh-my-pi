@@ -10,7 +10,6 @@ description: |
   ACCESS CONTROL MODEL:
   - Role-based permissions: Profiles define capabilities and access levels
   - Context-sensitive: Same profile may have different permissions across products
-  - Hierarchical relationships: Profile_hierarchy table manages role hierarchies
   - Extensible framework: New profiles can be added for emerging business needs
   
   PERMISSION FRAMEWORK:
@@ -24,7 +23,7 @@ columns:
       - datalake_company_raw.profile.id
     description: |
       Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and profile management.
-      Used by: member_profile assignments and profile_hierarchy relationships.
+      Used by: member_profile assignments relationship.
   profile_name:
     lineage:
       - datalake_company_raw.profile.profile_name
@@ -84,6 +83,23 @@ columns:
       - datalake_company_raw.profile.updated_at
     description: |
       Last modification timestamp (UTC). Tracks role definition changes for access control monitoring and audit compliance.
+  op_cdc:
+    lineage:
+      - datalake_company_raw.profile.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_company_raw.profile.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_company_raw.profile.ts_database_transaction
+    description: Timestamp of the originating database transaction in the company service before CDC propagation.
   year:
     lineage:
       - datalake_company_raw.profile.year

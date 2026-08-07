@@ -82,8 +82,6 @@ erDiagram
     product ||--o{ company_product : "product_id"
     company_product ||--o{ member_profile : "company_id+product_id"
     profile ||--o{ member_profile : "profile_id"
-    product ||--o{ profile_hierarchy : "product_id"
-    profile ||--o{ profile_hierarchy : "profile_id"
     company ||--o{ banking_information : "company_id"
     company ||--o{ revenue_share : "company_id"
     company ||--o{ contact : "company_id"
@@ -258,16 +256,6 @@ erDiagram
         bigint version
     }
 
-    profile_hierarchy {
-        bigint id PK
-        bigint product_id FK
-        bigint profile_id FK
-        integer position_number
-        timestamp created_at
-        timestamp updated_at
-        bigint version
-    }
-
     company_product_tier {
         bigint id PK
         bigint company_id FK
@@ -318,7 +306,6 @@ erDiagram
     revinfo ||--o{ contact_aud : "rev"
     revinfo ||--o{ external_reference_aud : "rev"
     revinfo ||--o{ member_profile_aud : "rev"
-    revinfo ||--o{ profile_hierarchy_aud : "rev"
     revinfo ||--o{ company_product_aud : "rev"
     revinfo ||--o{ company_document_aud : "rev"
     revinfo ||--o{ company_address_aud : "rev"
@@ -394,7 +381,6 @@ Each mirrors its base table's columns plus Envers columns: `rev` BIGINT (**PK pa
 | `contact_aud` | `contact` | `(id, rev)` |
 | `external_reference_aud` | `external_reference` | `(id, rev)` |
 | `member_profile_aud` | `member_profile` | `(id, rev)` |
-| `profile_hierarchy_aud` | `profile_hierarchy` | `(id, rev)` |
 | `company_product_aud` | `company_product` | `(company_id, product_id, rev)` |
 | `company_document_aud` | `company_document` | `(document_id, company_id, rev)` |
 | `company_address_aud` | `company_address` | `(address_id, company_id, rev)` |
@@ -760,21 +746,6 @@ Person membership: links **Person** (`person_uuid`) to a **company_product** wit
 | `updated_at` | `ts_updated` | TIMESTAMP | NOT NULL | |
 
 **Unique:** `(profile_id, person_uuid, company_product_company_id, company_product_product_id)`
-
----
-
-### `profile_hierarchy`
-
-Ordering of profiles within a product (position_number).
-
-| Column (OLTP) | Clean alias | Type | Constraints |
-|---|---|---|---|
-| `id` | `id` | BIGSERIAL | **PK** |
-| `product_id` | `id_product` | BIGINT | **FK → product.id** |
-| `profile_id` | `id_profile` | BIGINT | **FK → profile.id** |
-| `position_number` | `position_number` | INTEGER | Sort order |
-| `created_at` | `ts_created` | TIMESTAMP | |
-| `updated_at` | `ts_updated` | TIMESTAMP | |
 
 ---
 

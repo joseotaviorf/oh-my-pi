@@ -49,7 +49,6 @@ workflow:
     document: {}
     member_profile: {}
     product: {}
-    profile_hierarchy: {}
     profile: {}
     revenue_share: {}
     tier: {}
