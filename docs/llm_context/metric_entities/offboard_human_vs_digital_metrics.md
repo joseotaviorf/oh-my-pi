@@ -29,12 +29,18 @@ not tie out one-to-one.)
 
 A naive approach — e.g. counting any Zendesk ticket on the contract, or pooling NPS answers
 without the offboarding campaign filter and ticket/mediation classification — produces numbers
-that do not match the Superset MBR dashboards.
+that do not match the Superset reference dashboards.
 
 **This metric family exists exclusively for For Rent offboarding (U&J / Seamless scope).**
 
+**These metrics are no longer reported in the Post Contract MBR.** They remain defined for
+operational and ad-hoc analysis via the Superset golden assets below.
+
 ## Changelog
 
+- **2026-08-07** — Removed from Post Contract MBR (category New Offboarding). Metrics remain
+  defined for operational and ad-hoc use; dropped the `## MBR` section so CI no longer syncs
+  `data_product.mbr` / `data_product.mbr_category` to DataHub for this product.
 - **2026-07-28** — Delegated NPS geral, SPOC, and não-SPOC to
   [`nps_fr.md`](nps_fr.md) (`sandbox.nps_fr`). Reduced metric set from 13 to 7 (TF shares 1–3;
   NPS digital / human support 4–5; response volumes 6–7). NPS golden queries now read answers
@@ -77,11 +83,6 @@ that do not match the Superset MBR dashboards.
 | NPS digital (offboarding) | OKR |
 | Qtd. respostas NPS human support | Health Metric |
 | Qtd. respostas NPS digital | Health Metric |
-
-## MBR
-
-**Name** Post Contract
-**Category** New Offboarding
 
 ## Glossary and Synonyms
 
