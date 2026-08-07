@@ -9,10 +9,36 @@ DATALAKE_PREFIX = "datalake_"
 # the historical ``datalake_`` prefix (e.g. ``ops_finance`` instead of
 # ``datalake_ops_finance``). New governed schemas provisioned under this convention
 # should be added here.
+#
+# Historically these were enrich writers with a prefixless override. They are now
+# the registered consumption domains (see ``CONSUMPTION_SCHEMAS``). Keep membership
+# in sync: every consumption schema must remain prefix-free here.
 SCHEMAS_WITHOUT_DATALAKE_PREFIX = frozenset(
     {
         "ops_finance",
-        # Luigi materialization governed domains (enrich layer, prefixless naming).
+        "ops_ss",
+        "ops_public",
+        "forrent_postcontract",
+    }
+)
+
+# Semantic registry of consumption-layer schemas (prefix-free metastore names).
+# May overlap with SCHEMAS_WITHOUT_DATALAKE_PREFIX, but must not be aliased to it —
+# that constant only means "drop datalake_", not "this is consumption".
+#
+# Ambiguity / migration gate (P1):
+# For these domains, enrich naming (``datalake_{schema}`` + ``apply_naming_convention``)
+# and consumption naming (``{schema}``) produce the SAME physical metastore DB name.
+# Schema-name classification therefore always returns ``consumption`` for them — never
+# ``enrich``. Until all ``dags/luigijr/enrich_luigijr_*`` declarations flip to
+# ``workflow.layer: consumption``, any still-``enrich`` DAG that reads another
+# ``ops_*`` / ``forrent_postcontract`` table will fail source-layer policy (enrich's
+# allow-list does not include consumption). That is intentional; the bulk
+# enrich→consumption migration must close before relying on chained reads under
+# legacy enrich declarations. Do not remove this registry entry to "fix" that.
+CONSUMPTION_SCHEMAS = frozenset(
+    {
+        "ops_finance",
         "ops_ss",
         "ops_public",
         "forrent_postcontract",
@@ -46,9 +72,15 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             "core": f"{self.source}",
             "clean_staging": f"datalake_{self.source}_clean_staging",
             "enrich": f"datalake_{self.source}",
+            # Prefix-free schema name (not consumption_{source}).
+            "consumption": f"{self.source}",
             "wonka": "wonka",
         }[layer.value]
 
+        # Consumption is already prefix-free (`{source}`); skip the enrich-era
+        # datalake_ exception helper so this layer does not depend on it.
+        if layer == LayerEnum.CONSUMPTION:
+            return database_name
         return apply_naming_convention(self.source, database_name)
 
     @classmethod
@@ -82,6 +114,8 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             "core": f"s3a://{self.bucket}/core/{self.source}/",
             "clean_staging": f"s3a://{self.bucket}/clean_staging/{self.source}/",
             "enrich": f"s3a://{self.bucket}/enrich/{self.source}/",
+            # Storage layout root only — not a schema prefix (schemas stay prefix-free).
+            "consumption": f"s3a://{self.bucket}/consumption/{self.source}/",
             "wonka": f"s3a://{self.bucket}/wonka/historical/{self.source}/",
         }[layer.value]
 
@@ -100,6 +134,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
                 LayerEnum.CLEAN_STAGING,
                 LayerEnum.CORE,
                 LayerEnum.ENRICH,
+                LayerEnum.CONSUMPTION,
                 LayerEnum.WONKA,
             )
         }
@@ -112,6 +147,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
                 LayerEnum.CLEAN_STAGING,
                 LayerEnum.CORE,
                 LayerEnum.ENRICH,
+                LayerEnum.CONSUMPTION,
                 LayerEnum.WONKA,
             )
         }

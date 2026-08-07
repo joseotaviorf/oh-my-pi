@@ -1,9 +1,21 @@
 import pytest
 
-from bietlejuice.base.db.datalake_metastore_mapping import DatalakeMetastoreMapping
+from bietlejuice.base.db.datalake_metastore_mapping import (
+    CONSUMPTION_SCHEMAS,
+    SCHEMAS_WITHOUT_DATALAKE_PREFIX,
+    DatalakeMetastoreMapping,
+)
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
-_GOVERNED_SCHEMAS = ("ops_finance", "ops_ss", "ops_public", "forrent_postcontract")
+_GOVERNED_SCHEMAS = tuple(sorted(SCHEMAS_WITHOUT_DATALAKE_PREFIX))
+_CONSUMPTION_SCHEMAS = tuple(sorted(CONSUMPTION_SCHEMAS))
+
+
+class TestSchemaRegistryConsistency:
+    def test_consumption_schemas_are_subset_of_prefix_free_naming(self):
+        # Every consumption domain must remain prefix-free (no silent drift).
+        assert CONSUMPTION_SCHEMAS <= SCHEMAS_WITHOUT_DATALAKE_PREFIX
+        assert CONSUMPTION_SCHEMAS is not SCHEMAS_WITHOUT_DATALAKE_PREFIX
 
 
 class TestDatalakeMetastoreMapping:
@@ -29,6 +41,8 @@ class TestDatalakeMetastoreMapping:
             "db_raw_path": "s3a://bucket-forno/raw/_my_src_/",
             "db_enrich_name": "datalake__my_src_",
             "db_enrich_path": "s3a://bucket-forno/enrich/_my_src_/",
+            "db_consumption_name": "_my_src_",
+            "db_consumption_path": "s3a://bucket-forno/consumption/_my_src_/",
             "db_transactional_name": "datalake__my_src__transactional",
             "db_transactional_path": "s3a://bucket-forno/transactional/_my_src_/",
             "db_wonka_name": "wonka",
@@ -57,6 +71,8 @@ class TestDatalakeMetastoreMapping:
             "db_raw_path": "s3a://5a-datalake-prod/raw/_my_src_/",
             "db_enrich_name": "datalake__my_src_",
             "db_enrich_path": "s3a://5a-datalake-prod/enrich/_my_src_/",
+            "db_consumption_name": "_my_src_",
+            "db_consumption_path": "s3a://5a-datalake-prod/consumption/_my_src_/",
             "db_transactional_name": "datalake__my_src__transactional",
             "db_transactional_path": "s3a://5a-datalake-prod/transactional/_my_src_/",
             "db_wonka_name": "wonka",
@@ -222,3 +238,59 @@ class TestDatalakeMetastoreMapping:
 
         # assert
         assert schema is None
+
+    @pytest.mark.parametrize("source", _CONSUMPTION_SCHEMAS)
+    def test_consumption_schema_is_prefix_free(self, source):
+        datalake_bucket = "bucket-forno"
+
+        db_name = DatalakeMetastoreMapping(
+            source, datalake_bucket
+        ).get_full_database_name(LayerEnum.CONSUMPTION)
+
+        assert db_name == source
+        assert not db_name.startswith("datalake_")
+        assert not db_name.startswith("consumption_")
+
+    def test_consumption_new_domain_is_prefix_free(self):
+        source = "new_domain"
+        datalake_bucket = "bucket-forno"
+
+        db_name = DatalakeMetastoreMapping(
+            source, datalake_bucket
+        ).get_full_database_name(LayerEnum.CONSUMPTION)
+
+        assert db_name == "new_domain"
+        assert not db_name.startswith("datalake_")
+        assert not db_name.startswith("consumption_")
+
+    @pytest.mark.parametrize("source", _CONSUMPTION_SCHEMAS)
+    def test_consumption_path_uses_consumption_storage_root(self, source):
+        datalake_bucket = "bucket-forno"
+
+        db_path = DatalakeMetastoreMapping(
+            source, datalake_bucket
+        ).get_full_database_path(LayerEnum.CONSUMPTION)
+
+        assert db_path == f"s3a://bucket-forno/consumption/{source}/"
+
+    @pytest.mark.parametrize("source", _CONSUMPTION_SCHEMAS)
+    def test_consumption_name_roundtrips_via_get_schema_from_database(self, source):
+        db_name = DatalakeMetastoreMapping(
+            source, "bucket-forno"
+        ).get_full_database_name(LayerEnum.CONSUMPTION)
+
+        assert DatalakeMetastoreMapping.get_schema_from_database(db_name) == source
+
+    @pytest.mark.parametrize("source", _CONSUMPTION_SCHEMAS)
+    def test_enrich_and_consumption_share_physical_name_for_registered_domains(
+        self, source
+    ):
+        # Documents the P1 ambiguity: both layers resolve to the same metastore DB
+        # for registered domains; classifier therefore prefers consumption.
+        enrich_name = DatalakeMetastoreMapping(
+            source, "bucket-forno"
+        ).get_full_database_name(LayerEnum.ENRICH)
+        consumption_name = DatalakeMetastoreMapping(
+            source, "bucket-forno"
+        ).get_full_database_name(LayerEnum.CONSUMPTION)
+        assert enrich_name == consumption_name == source

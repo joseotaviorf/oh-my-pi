@@ -18,6 +18,22 @@ ALLOWED_SOURCE_LAYERS_BY_OUTPUT: Dict[str, FrozenSet[str]] = {
     "qube": frozenset({"enrich", "dw", "metric", "qube"}),
     "core": frozenset({"transactional", "clean", "core"}),
     "reverse": frozenset({"clean", "enrich", "dw", "metric"}),
+    # Consumption = final materialized output (Luigi-style scheduled query
+    # materializations into governed schemas). Not a transformation layer itself —
+    # it aggregates already-treated data from the transformation layers (clean,
+    # enrich) plus already-consolidated modeling layers (dw, metric, qube). May
+    # also read other consumption tables (chained materializations).
+    # core is intentionally excluded (master data is not a consumption input
+    # unless product explicitly opts in later).
+    #
+    # Migration note: registered consumption schemas share physical names with
+    # legacy enrich writers (ops_* / forrent_postcontract). Schema-name policy
+    # classifies those FQNs as consumption, so enrich's allow-list below must NOT
+    # gain "consumption" as a temporary escape hatch — flip declarations to
+    # layer: consumption instead (bulk enrich_luigijr_* migration).
+    "consumption": frozenset(
+        {"clean", "enrich", "dw", "metric", "qube", "consumption"}
+    ),
 }
 
 

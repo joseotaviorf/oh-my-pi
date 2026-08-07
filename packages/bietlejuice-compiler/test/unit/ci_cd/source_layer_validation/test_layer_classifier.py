@@ -53,8 +53,47 @@ class TestClassifySchemaToLayer:
         assert classify_schema_to_layer("core_listing") == "core"
         assert classify_schema_to_layer("reverse_foo") == "reverse"
 
+    def test_consumption_registry_schemas(self):
+        from bietlejuice.base.db.datalake_metastore_mapping import CONSUMPTION_SCHEMAS
+
+        for schema in CONSUMPTION_SCHEMAS:
+            assert classify_schema_to_layer(schema) == "consumption"
+
+    def test_datalake_prefixed_is_not_consumption(self):
+        assert classify_schema_to_layer("datalake_ops_finance") == "enrich"
+        assert classify_schema_to_layer("datalake_foo") == "enrich"
+        assert classify_schema_to_layer("datalake_ops_finance") != "consumption"
+
+    def test_consumption_prefixed_name_is_not_consumption(self):
+        # Layer identity is the registry of prefix-free schemas, not a consumption_ prefix.
+        assert classify_schema_to_layer("consumption_ops_finance") == "unknown"
+
+    def test_naming_classifier_round_trip_for_registered_consumption(self):
+        from bietlejuice.base.db.datalake_metastore_mapping import (
+            CONSUMPTION_SCHEMAS,
+            DatalakeMetastoreMapping,
+        )
+        from bietlejuice.base.pipeline.layer_enum import LayerEnum
+
+        for source in CONSUMPTION_SCHEMAS:
+            physical = DatalakeMetastoreMapping(
+                source, "bucket-forno"
+            ).get_full_database_name(LayerEnum.CONSUMPTION)
+            assert physical == source
+            assert classify_schema_to_layer(physical) == "consumption"
+
+    def test_registered_domain_is_never_classified_as_enrich(self):
+        # P1 durable assertion: physical ops_* names resolve to consumption, not enrich.
+        from bietlejuice.base.db.datalake_metastore_mapping import CONSUMPTION_SCHEMAS
+
+        for schema in CONSUMPTION_SCHEMAS:
+            assert classify_schema_to_layer(schema) == "consumption"
+            assert classify_schema_to_layer(schema) != "enrich"
+
     def test_unknown(self):
         assert classify_schema_to_layer("hive_prod") == "unknown"
+        # New consumption domains must be registered before schema-name classification works.
+        assert classify_schema_to_layer("new_domain") == "unknown"
 
 
 class TestClassifyTableFqn:

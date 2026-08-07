@@ -7,7 +7,10 @@ import yaml
 from sqlglot import exp, parse_one
 from yamale import yamale
 
-from bietlejuice.base.db.datalake_metastore_mapping import apply_naming_convention
+from bietlejuice.base.db.datalake_metastore_mapping import (
+    CONSUMPTION_SCHEMAS,
+    apply_naming_convention,
+)
 from bietlejuice.services.file_service import FileService
 from dags import DAG_PACKAGES_ROOT
 from scripts.services.metadata_file_info import MetadataFileInfo
@@ -22,6 +25,9 @@ _DB_NAME_FORMULA = {
     "dw": "dw_{schema}",
     "dw_staging": "dw_{schema}_staging",
     "metric": "metric_{schema}",
+    # Consumption is prefix-free: physical metastore DB name is the schema itself
+    # (e.g. ops_finance.foo). No datalake_ / consumption_ layer prefix.
+    "consumption": "{schema}",
 }
 
 _DAG_DIR_FROM_METADATA_PATH = re.compile(r"((?:.*/)?dags/[^/]+/[^/]+)/metadata/")
@@ -177,12 +183,13 @@ class MetadataFileService:
         formula = _DB_NAME_FORMULA.get(layer)
         if formula is None:
             return
-        # Governed schemas drop the historical datalake_ prefix (e.g. ops_finance
-        # instead of datalake_ops_finance). Apply the same naming convention the
-        # metastore mapping uses (get_full_database_name / get_db_info) so this
-        # validator's expected name matches what the DAG actually writes. No-op for
-        # every schema not in SCHEMAS_WITHOUT_DATALAKE_PREFIX.
-        expected_db = apply_naming_convention(schema, formula.format(schema=schema))
+        expected_db = formula.format(schema=schema)
+        # Consumption is prefix-free by formula (`{schema}`); do not route it through
+        # apply_naming_convention (enrich-era datalake_ exception list).
+        # Other layers still apply that convention so governed enrich schemas drop
+        # the historical datalake_ prefix and match runtime metastore names.
+        if layer != "consumption":
+            expected_db = apply_naming_convention(schema, expected_db)
         if declared_db != expected_db:
             raise DatabaseNameMismatchException(
                 file_path, declared_db, expected_db, dag_name, layer, schema
@@ -346,6 +353,8 @@ class MetadataFileService:
         :rtype: str
         """
 
+        if schema and schema.lower() in CONSUMPTION_SCHEMAS:
+            return "consumption"
         if re.match(r".*_raw$", schema):
             return "raw"
         elif re.match(r".*_clean$", schema):
@@ -421,7 +430,7 @@ class MetadataFileService:
             return yamale.validate(self.schemas["clean"], yaml_data)
         elif layer == "core":
             return yamale.validate(self.schemas["core"], yaml_data)
-        elif layer in ["enrich", "dw"]:
+        elif layer in ["enrich", "dw", "consumption"]:
             return yamale.validate(self.schemas["enrich_dw"], yaml_data)
         elif layer == "metric":
             return self.validate_metric_file(file_path, yaml_data)
@@ -443,7 +452,7 @@ class MetadataFileService:
         table_info = MetadataFileService._get_info_from_path(file_path)
         layer = table_info.get("layer")
 
-        if layer in {"raw", "clean", "core", "enrich", "dw", "metric"}:
+        if layer in {"raw", "clean", "core", "enrich", "dw", "metric", "consumption"}:
             return os.path.isfile(
                 file_path.replace("/queries/", "/metadata/").replace(".sql", ".yml")
             ) or os.path.isfile(

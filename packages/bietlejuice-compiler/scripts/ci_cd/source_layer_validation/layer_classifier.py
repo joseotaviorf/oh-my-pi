@@ -7,6 +7,8 @@ Used by all source-layer policy profiles (core Spark jobs today; DW/metric later
 import re
 from typing import Iterable, Optional, Tuple
 
+from bietlejuice.base.db.datalake_metastore_mapping import CONSUMPTION_SCHEMAS
+
 # Fully-qualified table: schema.table (Hive/Spark metastore style)
 TABLE_FQN_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_]*\.[a-zA-Z][a-zA-Z0-9_]*$")
 
@@ -31,12 +33,18 @@ def classify_schema_to_layer(schema: str) -> str:
     Aligns with bi-etl-ejuice metastore naming (see naming_conventions).
 
     Returns lowercase layer id: raw, clean, transactional, enrich, dw, metric, core,
-    qube, reverse, unknown.
+    qube, reverse, consumption, unknown.
     """
     if not schema:
         return "unknown"
     s = schema.lower()
 
+    # Registered consumption domains (prefix-free). Checked before prefix rules so
+    # physical names like ops_finance classify as consumption — even though legacy
+    # enrich writers historically used the same physical name via the datalake_
+    # drop-prefix exception. See CONSUMPTION_SCHEMAS docstring (migration gate).
+    if s in CONSUMPTION_SCHEMAS:
+        return "consumption"
     if s.startswith("reverse_"):
         return "reverse"
     if s.startswith("qube_"):

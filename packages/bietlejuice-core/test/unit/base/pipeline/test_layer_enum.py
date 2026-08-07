@@ -19,5 +19,6 @@ class TestLayerEnum:
             LayerEnum.METRIC.value,
             LayerEnum.REVERSE.value,
             LayerEnum.QUBE.value,
+            LayerEnum.CONSUMPTION.value,
             LayerEnum.WONKA.value,
         ]

@@ -53,8 +53,20 @@ def test_unknown_layer_returns_none():
     assert allowed_layers_for_output("") is None
 
 
+def test_consumption_allows_transformation_and_modeling_layers_not_raw():
+    allowed = allowed_layers_for_output("consumption")
+    assert allowed is not None
+    assert allowed == frozenset(
+        {"clean", "enrich", "dw", "metric", "qube", "consumption"}
+    )
+    assert "raw" not in allowed
+    assert "core" not in allowed
+    assert "transactional" not in allowed
+
+
 def test_matrix_covers_expected_outputs():
     assert "dw" in ALLOWED_SOURCE_LAYERS_BY_OUTPUT
     assert "metric" in ALLOWED_SOURCE_LAYERS_BY_OUTPUT
     assert "qube" in ALLOWED_SOURCE_LAYERS_BY_OUTPUT
     assert "reverse" in ALLOWED_SOURCE_LAYERS_BY_OUTPUT
+    assert "consumption" in ALLOWED_SOURCE_LAYERS_BY_OUTPUT
