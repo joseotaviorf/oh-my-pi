@@ -111,7 +111,7 @@ using the **same quarterly weights** as NPS True (`onb_ppm → onboarding`,
 ```
 NPS_PPMulti = NPS(onb_ppm, cnt_15_seg='<= 15') × weight_onboarding
             + NPS(ong_ppm, cnt_15_seg='<= 15') × weight_ongoing
-            + NPS(off_ppm)                      × weight_offboarding
+            + NPS(off_ppm, cnt_15_seg='<= 15') × weight_offboarding
 ```
 
 Population: in `sandbox.nps_fr`, `campanha_nps = 'ppmulti'` and
@@ -181,7 +181,7 @@ includes lost, ppm, po and other campaigns that do **not** compose the official 
 | Metric | Population selection |
 | :---- | :---- |
 | NPS True, Onboarding, Ongoing, Offboarding | `customer_journey = 'true'` AND `purpose = 'main'` |
-| PP Multi | `sandbox.nps_fr`: `campanha_category IN ('onb_ppm','ong_ppm','off_ppm')` (+ `cnt_15_seg` in onb/ong) |
+| PP Multi | `sandbox.nps_fr`: `campanha_category IN ('onb_ppm','ong_ppm','off_ppm')` + `cnt_15_seg='<= 15'` on all three journeys, including offboarding |
 | SPOC / AS IS + Ops cuts | `sandbox.nps_fr`: `campanha_nps = 'offboarding'` + the cut's flag (`is_spoc_test`, `spoc_team`, `com_ou_sem_reparos`, …) |
 | Seamless / Digital Sup / Human Support | materialized tables `sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort` |
 
@@ -248,10 +248,11 @@ END AS is_spoc_test
 `sandbox.nps_fr`** (values `'<= 15'` / `'> de 15'`); consume the column directly. For
 reference, at the source it comes from `datalake_pp_multi.pp_multi_classification_history`,
 `ACTIVE` records from **yesterday's snapshot** (partition `current_date - INTERVAL '1' day`),
-joined via `id_owner = sk_user`. The filter `cnt_15_seg = '<= 15'` applies **only** to
-`onb_ppm` and `ong_ppm`; `off_ppm` enters in full. Owners missing from the snapshot fall into
-`> de 15` (excluded from onb/ong) — if yesterday's partition does not exist in the
-materialization, onb/ong PP Multi goes to zero.
+joined via `id_owner = sk_user`. The filter `cnt_15_seg = '<= 15'` applies to **all three**
+PP Multi journeys — `onb_ppm`, `ong_ppm`, and `off_ppm` — consistent with the metric's own name
+("Up to 15 Properties"). Owners missing from the snapshot fall into `> de 15` (excluded from
+all three journeys) — if yesterday's partition does not exist in the materialization, PP Multi
+goes to zero.
 
 **`seamless_ticket_type` flag** (NPS Seamless / Digital Sup / Human Support) — classifies
 each onb/ong answer by the **support interaction type** the customer had in the window
@@ -314,7 +315,7 @@ breakdown via `customer_type` and crossable with one another):
 
 - Classify by `score_category` (lowercase) and compute `% promoters − % detractors` over `is_answered = true`.
 - **NPS True / components**: apply `business_context = 'forRent'` AND `customer_journey = 'true'` AND `purpose = 'main'`; compute each journey before weighting.
-- **PP Multi**: in `sandbox.nps_fr`, select `campanha_category IN ('onb_ppm','ong_ppm','off_ppm')`; use the ready `cnt_15_seg` (`'<= 15'` only in onb/ong); round each journey to an integer; reuse the `nps_target_share` weights.
+- **PP Multi**: in `sandbox.nps_fr`, select `campanha_category IN ('onb_ppm','ong_ppm','off_ppm')`; use the ready `cnt_15_seg = '<= 15'` on **all three** journeys, including offboarding; round each journey to an integer; reuse the `nps_target_share` weights.
 - **SPOC / AS IS**: in `sandbox.nps_fr`, filter `campanha_nps = 'offboarding'` and use the ready `is_spoc_test` / `spoc_team` (without re-joining `fact_terminations`).
 - **Offboarding cuts (Ops)**: in `sandbox.nps_fr`, filter `campanha_nps = 'offboarding'` and apply the cut's flag (see the map in Nuances).
 - **Seamless / Digital Sup / Human Support**: pool onboarding+ongoing (sum num/den before dividing) and filter the `seamless_ticket_type` value (`'seamless'` / `'digital_support'` / `'tickets'`); consume the flag directly from `sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort`.
@@ -326,7 +327,7 @@ breakdown via `customer_type` and crossable with one another):
 - Don't filter only by `business_context = 'forRent'` in NPS True — it includes lost, ppm, po and others.
 - Don't pool the journeys directly in NPS True / PP Multi — use the weighted calculation.
 - Don't hardcode the weights (e.g. 25%, 53%, 22%) — always read from `nps_target_share`.
-- Don't apply `cnt_15_seg = '<= 15'` to `off_ppm`.
+- Don't skip `cnt_15_seg = '<= 15'` on `off_ppm` — the exception that let offboarding bypass the filter was a bug (fixed; see the correction note in Overview), not intended behavior.
 - Don't confuse SPOC with AS IS / não-SPOC — the only difference is `is_spoc_test` (TRUE vs FALSE), both in offboarding. AS IS, não-SPOC, no-spoc, and sem SPOC are the same metric.
 - Don't weight NPS Seamless / Digital Sup / Human Support — it is a direct pool of onb+ong (sum num/den), not a weighted average.
 - Don't try to rebuild `seamless_ticket_type` from the raw tables — always consume from `sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort` (the exact `has_ticket` only exists in the cohorts' logic).
@@ -485,8 +486,9 @@ ORDER BY 1, 2, 3
 
 Reads directly from `sandbox.nps_fr` (which already brings `campanha_category` and `cnt_15_seg`
 ready), mapping the PP Multi categories to journeys and reusing the same quarterly weights as
-NPS True. Applies `cnt_15_seg = '<= 15'` only to onb_ppm and ong_ppm. **Each journey's NPS
-rounded to an integer before weighting** (`ROUND(…, 0)`), as in the team's gsheets.
+NPS True. Applies `cnt_15_seg = '<= 15'` to all three journeys (onb_ppm, ong_ppm, and off_ppm).
+**Each journey's NPS rounded to an integer before weighting** (`ROUND(…, 0)`), as in the team's
+gsheets.
 
 ```sql
 WITH ppmulti_answers AS (
@@ -517,8 +519,7 @@ journey_nps AS (
         ) AS nps_journey,
         COUNT(DISTINCT sk_nps_answer) AS total_answers
     FROM ppmulti_answers
-    WHERE journey = 'offboarding'
-       OR cnt_15_seg = '<= 15'
+    WHERE cnt_15_seg = '<= 15'
     GROUP BY 1, 2
 ),
 weights_raw AS (
