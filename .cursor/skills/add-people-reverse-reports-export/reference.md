@@ -201,6 +201,30 @@ WHERE
 
 > `dt_month_reference = CURRENT_DATE()` returns rows only on the exact calendar day that matches the month-end reference date. Use `is_current` to get the current snapshot reliably.
 
+### HRBP from `employee_snapshots` (mandatory remap)
+
+`es.hrbp_work_email` is stamped from **`dim_cost_center` at the snapshot cost-center version** (`sk_cost_center_version`). For **terminated** (and some edge) rows that version often has **null** HRBP, while legacy notebooks / `base_completa_hierarquia` keep the **current** cost-center HRBP.
+
+**Always** fall back to the current cost-center row when exporting `hrbp` (and when embedding HRBP in `access_list`):
+
+```sql
+LOWER(COALESCE(es.hrbp_work_email, cc_current.hrbp_work_email)) AS hrbp
+```
+
+```sql
+LEFT JOIN
+    dw_organization.dim_cost_center AS cc
+        ON cc.sk_cost_center_version = es.sk_cost_center_version
+LEFT JOIN
+    dw_organization.dim_cost_center AS cc_current
+        ON cc_current.id_organization = cc.id_organization
+        AND cc_current.is_current = TRUE
+```
+
+Reference implementations: `performa_employee_base.sql`, X-Ray exports (`xray_general_info.sql` and siblings). Active employees typically already match; the COALESCE closes the terminated gap vs hierarchy/AppSheet.
+
+Do **not** leave bare `LOWER(es.hrbp_work_email)` as the sole HRBP source in new reverse SQL.
+
 ---
 
 ## Implementation checklist

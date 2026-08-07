@@ -287,6 +287,8 @@ Save artifacts under `.cursor/temp/{JIRA_KEY}/{branch-slug}/validation/`:
 
 **`metric_people.employee_snapshots` current-state filter:** use `es.is_current = TRUE AND es.is_primary_assignment_for_snapshot = TRUE`. Do **not** use `dt_reference = CURRENT_DATE()` (month-end column; returns 0 rows most days) or `MAX(dt_reference)` as a snapshot picker — see [reference.md](reference.md#filtering-metric_peopleemployee_snapshots).
 
+**HRBP:** never export bare `es.hrbp_work_email` alone — use `LOWER(COALESCE(es.hrbp_work_email, cc_current.hrbp_work_email))` with current `dim_cost_center` fallback (terminated snapshots often null HRBP on the versioned CC). See [reference.md](reference.md#hrbp-from-employee_snapshots-mandatory-remap).
+
 ### Columns excluded from Tier 2 (do not validate)
 
 **Load-time stamps** — omit from Tier 2 `EXCEPT` compare lists:
