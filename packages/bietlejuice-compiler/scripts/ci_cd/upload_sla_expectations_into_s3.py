@@ -1,7 +1,7 @@
-"""Publish SLA YAML expectations to the datalake monitoring prefix on S3.
+"""Publish SLA YAML expectations to the data-documentation bucket on S3.
 
 Runs at CI/deploy time (not per Airflow run). The EMR ``sweep_empty_partitions``
-job reads ``datalake_observability/monitoring/sla_expectations.json``.
+job reads ``sla/sla_expectations.json`` from ``data_documentation_bucket``.
 """
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "bucket",
-        help="Datalake bucket (e.g. 5a-datalake-forno or 5a-datalake-prod)",
+        help="Data-documentation bucket (e.g. data-documentation.s3.forno.data.quintoandar.com.br)",
     )
     args = parser.parse_args()
     bucket = _bucket_name(args.bucket)

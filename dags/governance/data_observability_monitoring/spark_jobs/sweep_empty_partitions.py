@@ -17,6 +17,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.observability.monitoring.constants import (
+    DATA_DOCUMENTATION_BUCKET_CONFIG,
     OBSERVABILITY_DATABASE,
     PARTITION_METRICS_TABLE,
     SLA_EXPECTATIONS_S3_KEY,
@@ -37,6 +38,7 @@ from bietlejuice.observability.monitoring.gchat_notify import (
 from bietlejuice.observability.monitoring.sla_expectations import (
     load_expectations_from_json,
 )
+from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "sweep_empty_partitions"
 TABLES_DOCUMENTATION = "datalake_documentation_metrics_clean.tables_documentation"
@@ -59,11 +61,6 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("force_send")
     parser.add_argument("gchat_webhook_url")
     return parser.parse_args()
-
-
-def _bucket_name(datalake_bucket: str) -> str:
-    bucket = datalake_bucket.removeprefix("s3://").strip("/")
-    return bucket.split("/", 1)[0]
 
 
 def _read_s3_text(bucket: str, key: str) -> str | None:
@@ -164,10 +161,11 @@ def _load_partition_rows_with_data(
 
 def main() -> None:
     args = _parse_args()
-    bucket = _bucket_name(args.datalake_bucket)
     freshness_hours = int(args.freshness_hours)
 
-    sla_text = _read_s3_text(bucket, SLA_EXPECTATIONS_S3_KEY)
+    config_service = ConfigurationService(args.dag_name)
+    documentation_bucket = config_service.get_config(DATA_DOCUMENTATION_BUCKET_CONFIG)
+    sla_text = _read_s3_text(documentation_bucket, SLA_EXPECTATIONS_S3_KEY)
     expectations = load_expectations_from_json(sla_text) if sla_text is not None else {}
 
     partition_rows = _load_fresh_metric_rows(

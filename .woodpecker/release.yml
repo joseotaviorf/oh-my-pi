@@ -435,7 +435,7 @@ steps:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     commands:
-      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sla_expectations_into_s3.py 5a-datalake-prod
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sla_expectations_into_s3.py data-documentation.s3.data.quintoandar.com.br
     when:
       event: push
       branch: [master, hotfix/*]
@@ -768,7 +768,7 @@ steps:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     commands:
-      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sla_expectations_into_s3.py 5a-datalake-forno
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sla_expectations_into_s3.py data-documentation.s3.forno.data.quintoandar.com.br
     when:
       event: push
       branch: forno

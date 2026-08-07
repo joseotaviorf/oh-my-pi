@@ -16,9 +16,10 @@ DEFAULT_FRESHNESS_HOURS = 48
 GCHAT_TEXT_MAX = 4096
 
 DATALAKE_BUCKET_CONFIG = "datalake_bucket"
+DATA_DOCUMENTATION_BUCKET_CONFIG = "data_documentation_bucket"
 
-MONITORING_S3_PREFIX = "datalake_observability/monitoring"
-SLA_EXPECTATIONS_S3_KEY = f"{MONITORING_S3_PREFIX}/sla_expectations.json"
+SLA_EXPECTATIONS_S3_PREFIX = "sla"
+SLA_EXPECTATIONS_S3_KEY = f"{SLA_EXPECTATIONS_S3_PREFIX}/sla_expectations.json"
 
 DEFAULT_SLA_TIMEZONE = "America/Sao_Paulo"
 SLA_GLOB = "**/sla/**/*.yml"

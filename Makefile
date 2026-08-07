@@ -1248,9 +1248,9 @@ create-s3-dag-files: generate-query-manifests generate-metadata-manifests genera
 		$(if $(filter 1,$(INCLUDE_VALIDATION)),--include-validation,)
 
 .PHONY: upload-sla-expectations
-## Publish SLA YAML expectations JSON to the datalake monitoring prefix (requires bucket=...).
+## Publish SLA YAML expectations JSON to the data-documentation bucket (requires bucket=...).
 upload-sla-expectations:
-	@test -n "$(bucket)" || (echo "Usage: make upload-sla-expectations bucket=5a-datalake-forno" >&2; exit 1)
+	@test -n "$(bucket)" || (echo "Usage: make upload-sla-expectations bucket=data-documentation.s3.forno.data.quintoandar.com.br" >&2; exit 1)
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/upload_sla_expectations_into_s3.py $(bucket)
 
 .PHONY: create-luigijr-dag-files
