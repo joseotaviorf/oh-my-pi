@@ -630,22 +630,43 @@ def test_terminate_cluster_task_uses_none_skipped_trigger_rule():
     assert "trigger_rule=TriggerRule.NONE_SKIPPED" in terminate_call
 
 
-class TestStageInferenceStatusToS3:
-    """Regression coverage for the VOCS-34 task-15 review fix: committing the
-    snapshot hash to LAST_SNAPSHOT_HASH_VARIABLE_KEY must happen strictly
-    AFTER hook.load_string() (the actual S3 publish) succeeds, never before.
-    Committing it earlier would mean a failed publish (network error,
-    permissions, ...) still leaves the hash updated, so a retry of this same
-    task recomputes the same hash, sees it "already published", and
-    self-skips via AirflowSkipException instead of retrying the publish.
+def test_load_inference_status_raw_task_pulls_the_stage_task_xcom():
+    # Regression: stage_inference_status_to_s3 publishes rows under
+    # INFERENCE_STATUS_ROWS_XCOM_KEY, and load_inference_status_raw_task's
+    # spark_python_task parameters must pull that same key from that same
+    # task_id. Renaming either side independently (e.g. hardcoding a literal
+    # string instead of referencing the shared constant) would not raise an
+    # ImportError -- Task B would just silently receive `None` at runtime and
+    # fail deep inside the Spark job instead of at DAG-parse time. Asserted
+    # on source, same pattern as
+    # test_terminate_cluster_task_uses_none_skipped_trigger_rule above, since
+    # QuintoAndarDatabricksSubmitRunOperator is a MagicMock in this unit test
+    # env and drops its `json` kwarg when swapped for the inert
+    # _FakeDatabricksOperator stand-in.
+    stage_task_id = _vocs_machina_planning.stage_inference_status_task.task_id
+    source = inspect.getsource(_vocs_machina_planning)
+    load_task_call = source[source.index("load_inference_status_raw_task = ") :]
+    load_task_call = load_task_call[: load_task_call.index(")\n") + 1]
+    assert f"task_ids='{stage_task_id}'" in load_task_call
+    assert "INFERENCE_STATUS_ROWS_XCOM_KEY" in load_task_call
 
-    Note: this only fixes the failed-publish case. If load_string succeeds
+
+class TestStageInferenceStatusToS3:
+    """Regression coverage: committing the snapshot hash to
+    LAST_SNAPSHOT_HASH_VARIABLE_KEY must happen strictly AFTER the rows are
+    published via ti.xcom_push() (the hand-off to load_inference_status_raw_task),
+    never before. Committing it earlier would mean a failed publish still
+    leaves the hash updated, so a retry of this same task recomputes the
+    same hash, sees it "already published", and self-skips via
+    AirflowSkipException instead of retrying the publish.
+
+    Note: this only fixes the failed-publish case. If the XCom push succeeds
     but a downstream task (raw Spark load / enrich task group) later fails,
-    the hash is still committed at successful-publish time, so the next
-    cron-only tick will see an "unchanged" hash and self-skip, silencing the
-    safety-net timer for that case too. That is a separate, accepted
-    out-of-scope tradeoff (would need deferring the commit to a final
-    DAG-wide "all succeeded" task with XCom plumbing) -- not addressed here.
+    the hash is still committed at publish time, so the next cron-only tick
+    will see an "unchanged" hash and self-skip, silencing the safety-net
+    timer for that case too. That is a separate, accepted out-of-scope
+    tradeoff (would need deferring the commit to a final DAG-wide "all
+    succeeded" task with XCom plumbing) -- not addressed here.
     """
 
     _MANIFEST = {
@@ -660,62 +681,69 @@ class TestStageInferenceStatusToS3:
     }
 
     @staticmethod
-    def _kwargs_with_dataset_event():
+    def _kwargs_with_dataset_event(ti):
         # A non-empty triggering_dataset_events makes should_skip_stage_task
         # always proceed (see its docstring/TestShouldSkipStageTask above)
         # regardless of the hash comparison, so these tests exercise the
-        # load_string/Variable.set ordering in isolation from the skip
+        # xcom_push/Variable.set ordering in isolation from the skip
         # decision.
-        return {"triggering_dataset_events": {"some:dataset:first-run-of-day": []}}
+        return {
+            "triggering_dataset_events": {"some:dataset:first-run-of-day": []},
+            "ti": ti,
+        }
 
     @patch("dags.for_rent.vocs_machina_planning.vocs_machina_planning.Variable")
     @patch("dags.for_rent.vocs_machina_planning.vocs_machina_planning.S3Hook")
-    def test_variable_set_not_called_when_load_string_raises(
+    def test_variable_set_not_called_when_xcom_push_raises(
         self, mock_s3hook_cls, mock_variable
     ):
         mock_hook = mock_s3hook_cls.return_value
         mock_hook.read_key.return_value = json.dumps(self._MANIFEST)
         mock_hook.list_keys.return_value = []
-        mock_hook.load_string.side_effect = RuntimeError("network error")
         mock_variable.get.return_value = None
+        mock_ti = MagicMock()
+        mock_ti.xcom_push.side_effect = RuntimeError("xcom backend error")
 
         with pytest.raises(RuntimeError):
             stage_inference_status_to_s3(
-                "2026-07-30", **self._kwargs_with_dataset_event()
+                "2026-07-30", **self._kwargs_with_dataset_event(mock_ti)
             )
 
-        mock_hook.load_string.assert_called_once()
+        mock_ti.xcom_push.assert_called_once()
         mock_variable.set.assert_not_called()
 
     @patch("dags.for_rent.vocs_machina_planning.vocs_machina_planning.Variable")
     @patch("dags.for_rent.vocs_machina_planning.vocs_machina_planning.S3Hook")
-    def test_variable_set_called_only_after_load_string_succeeds(
+    def test_variable_set_called_only_after_xcom_push_succeeds(
         self, mock_s3hook_cls, mock_variable
     ):
         mock_hook = mock_s3hook_cls.return_value
         mock_hook.read_key.return_value = json.dumps(self._MANIFEST)
         mock_hook.list_keys.return_value = []
         mock_variable.get.return_value = None
+        mock_ti = MagicMock()
 
-        def _load_string(*args, **kwargs):
+        def _xcom_push(*args, **kwargs):
             # At the moment the publish happens, the hash must not have been
             # committed yet -- proves the ordering, not just that both were
             # eventually called.
             mock_variable.set.assert_not_called()
 
-        mock_hook.load_string.side_effect = _load_string
+        mock_ti.xcom_push.side_effect = _xcom_push
 
-        stage_inference_status_to_s3("2026-07-30", **self._kwargs_with_dataset_event())
+        stage_inference_status_to_s3(
+            "2026-07-30", **self._kwargs_with_dataset_event(mock_ti)
+        )
 
-        mock_hook.load_string.assert_called_once()
+        expected_rows = build_snapshot_rows(
+            iter_partition_days(active_prompts(self._MANIFEST), date(2026, 7, 30)),
+            existing_marker_keys=set(),
+        )
+        mock_ti.xcom_push.assert_called_once_with(
+            key=_vocs_machina_planning.INFERENCE_STATUS_ROWS_XCOM_KEY,
+            value=json.dumps(expected_rows),
+        )
         mock_variable.set.assert_called_once_with(
             _vocs_machina_planning.LAST_SNAPSHOT_HASH_VARIABLE_KEY,
-            hash_snapshot_rows(
-                build_snapshot_rows(
-                    iter_partition_days(
-                        active_prompts(self._MANIFEST), date(2026, 7, 30)
-                    ),
-                    existing_marker_keys=set(),
-                )
-            ),
+            hash_snapshot_rows(expected_rows),
         )

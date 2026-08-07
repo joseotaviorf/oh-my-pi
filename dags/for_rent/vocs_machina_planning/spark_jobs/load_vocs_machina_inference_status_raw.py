@@ -1,26 +1,31 @@
 """
-This spark job reads the inference-status snapshot Task A
-(stage_inference_status_to_s3 in ../vocs_machina_planning.py) staged to S3 --
-one JSON blob per DAG run, covering every active prompt's whole backfill
-window as of that run -- and registers it as
+This spark job receives the inference-status snapshot Task A
+(stage_inference_status_to_s3 in ../vocs_machina_planning.py) published via
+XCom as a JSON string -- one row set per DAG run, covering every active
+prompt's whole backfill window as of that run -- and registers it as
 datalake_vocs_machina_planning_raw.vocs_machina_inference_status.
 
-Shape mirrors dags/platform/dag_inventory/spark_jobs/load_dag_inventory_raw.py:
-read the staged JSON via boto3, build a Spark DataFrame, then
-S3Loader.load_df + SparkMetastoreLoader.update_metastore +
-SparkMetastoreService.create_new_partitions_from_df.
+The rows arrive as this job's last CLI parameter (the DAG templates it via
+`{{ ti.xcom_pull(task_ids='stage-inference-status-to-s3', key='...') }}`)
+rather than a staged S3 object: airflow-prod-role has no S3 write grant on
+this repo's own datalake bucket, only Databricks' instance profile does, so
+Task A hands the rows to this job through Airflow's own XCom store instead.
+
+Shape otherwise mirrors dags/platform/dag_inventory/spark_jobs/load_dag_inventory_raw.py:
+build a Spark DataFrame from the rows, then S3Loader.load_df +
+SparkMetastoreLoader.update_metastore + SparkMetastoreService.create_new_partitions_from_df.
 
 Partitioning: year/month/day are parsed from each row's own "day" field (the
 backfill day whose inference status the row reports) and reused as BOTH the
 partition columns and the only surviving representation of that day -- no
 separate date column, matching load_dag_inventory_raw.py's
 create_dag_dataframe (which also has no date column beyond year/month/day).
-This is deliberately different from the DAG's own staging path, which is
-keyed by the DAG's ingestion/load date: a single staged snapshot file mixes
-many different backfill days across all active prompts, so "the day this
-snapshot was taken" and "the day a given row's status is about" are genuinely
-different things. Only the latter is used for this table's partitions, so the
-raw table stays queryable per backfill day (same idea as
+This is deliberately different from load_start_date (this DAG run's own
+ingestion/load date, passed separately for logging): a single published row
+set mixes many different backfill days across all active prompts, so "the
+day this snapshot was taken" and "the day a given row's status is about" are
+genuinely different things. Only the latter is used for this table's
+partitions, so the raw table stays queryable per backfill day (same idea as
 load_vocs_machina_raw.py, which partitions by the day its content is about).
 """
 
@@ -29,7 +34,6 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
-import boto3
 from pyspark.sql import Row
 from quintoandar_logger import QuintoAndarLogger
 
@@ -51,28 +55,8 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def staged_snapshot_key(load_start_date: str) -> str:
-    """Same path Task A writes to: raw/vocs_machina_planning/inference_status_snapshot/
-    year=Y/month=MM/day=DD/inference_status_snapshot.json, keyed by the DAG's own
-    load/ingestion date (NOT the backfill day each row is about)."""
-    dt = datetime.strptime(load_start_date, DATE_FMT)
-    return (
-        "raw/vocs_machina_planning/inference_status_snapshot/"
-        f"year={dt.year}/month={dt.month:02d}/day={dt.day:02d}/"
-        "inference_status_snapshot.json"
-    )
-
-
-def read_staged_snapshot(bucket: str, load_start_date: str) -> list:
-    """Read the JSON blob Task A staged to S3 for this load date."""
-    key = staged_snapshot_key(load_start_date)
-    s3 = boto3.resource("s3")
-    body = s3.Object(bucket, key).get()["Body"].read().decode("utf-8")
-    return json.loads(body)
-
-
 def build_inference_status_dataframe(rows: list):
-    """Transform the staged JSON rows into a Spark DataFrame.
+    """Transform the published inference-status rows into a Spark DataFrame.
 
     Uses the bare global `spark` SparkSession, matching
     load_dag_inventory_raw.py's create_dag_dataframe -- Databricks injects
@@ -109,10 +93,18 @@ def main() -> None:
     parser.add_argument("table_name")
     parser.add_argument(
         "load_start_date",
-        help="Ingestion/load date Task A staged the snapshot under (YYYY-MM-DD)",
+        help="This DAG run's ingestion/load date (YYYY-MM-DD), for logging only",
     )
     parser.add_argument(
         "partitions", help="list with partition cols, e.g. \"['year', 'month', 'day']\""
+    )
+    parser.add_argument(
+        "inference_status_rows_json",
+        help=(
+            "JSON-encoded list of {day, prompt_id, prompt_hash, "
+            "inference_status} rows, as published by Task A "
+            "(stage_inference_status_to_s3) via XCom"
+        ),
     )
     args = parser.parse_args()
 
@@ -122,6 +114,7 @@ def main() -> None:
     table_name = args.table_name
     load_start_date = args.load_start_date
     partition_cols = json.loads(args.partitions.replace("'", '"'))
+    rows = json.loads(args.inference_status_rows_json)
 
     logger.info(
         f"""
@@ -147,7 +140,6 @@ def main() -> None:
 
     s3_loader = S3Loader()
 
-    rows = read_staged_snapshot(datalake_bucket, load_start_date)
     df = build_inference_status_dataframe(rows)
 
     s3_loader.load_df(
