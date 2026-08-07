@@ -13,7 +13,6 @@ import pytest
 
 from sync.document_parser import parse_entity_markdown, validate_parsed_document
 from sync.markdown_sanitizer import sanitize_uploaded_markdown
-from sync.yaml_generator import build_datahub_yaml
 
 # A metric doc carrying every section the template/skill document as required.
 # Tests that check a specific missing section omit exactly one part from this set.
@@ -491,57 +490,3 @@ def test_metric_requires_each_documented_section(omit, needle):
     parsed = parse_entity_markdown(_metric_doc(omit=omit))
     errors, _ = validate_parsed_document(parsed, data_product_type="metric")
     assert any(needle in e for e in errors), (omit, errors)
-
-
-def test_yaml_generator_emits_related_data_products_and_superset_datasets():
-    superset_urn = "urn:li:dataset:(urn:li:dataPlatform:superset,57915,PROD)"
-    doc = f"""\
-# Property Integrity
-
-## Ownership
-
-**Data Owner:**
-- owner@quintoandar.com.br
-
-**Data Steward:**
-- steward@quintoandar.com.br
-
-## Overview
-
-Metric family.
-
-## Related Business Entities
-
-- Termination
-
-## Catalog
-
-| Metric | Type |
-| :---- | :---- |
-| Property Integrity Offboarding | OKR |
-
-## MBR
-
-**Name** Post Contract
-**Category** Quality
-
-## Superset Golden Assets
-
-- **Chart** — `dw_offboarding.obt_offboarding` — URN: `{superset_urn}`
-"""
-    parsed = parse_entity_markdown(doc)
-    spec = build_datahub_yaml(
-        parsed,
-        data_product_id="metric-entity-property-integrity",
-        domain_urn="urn:li:domain:for-rent",
-        data_product_type="metric",
-    )
-    assert spec["related_data_products"] == ["termination"]
-    assert spec["mbr"] == [{"name": "Post Contract", "category": "Quality"}]
-    assert spec["catalog"] == [
-        {"name": "Property Integrity Offboarding", "type": "OKR"}
-    ]
-    assert spec["datasets"] == [
-        {"schema": "dw_offboarding", "table": "obt_offboarding"},
-        {"urn": superset_urn},
-    ]

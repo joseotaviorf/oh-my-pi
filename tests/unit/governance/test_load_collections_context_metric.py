@@ -312,7 +312,7 @@ class TestGetAssetCurrentProductUrn:
 
 class TestCreateOrUpdateDataProductDescriptionOwnership:
     """product_description has a single writer: push-datahub-business-context. Callers
-    that don't own the field (sync-tars-entities) pass ``pdesc_raw=None``, which must
+    that don't own the field pass ``pdesc_raw=None``, which must
     never appear as a ``description`` key in either the create or update mutation input
     — on create it's simply absent (unset), on update the existing value is left alone."""
 

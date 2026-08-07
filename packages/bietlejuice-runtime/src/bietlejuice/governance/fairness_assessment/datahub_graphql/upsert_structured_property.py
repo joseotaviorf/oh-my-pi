@@ -8,7 +8,7 @@ regardless of data platform (trino ``hive.db.table``, databricks ``db.table``, o
 
 **Important:** DataHub's ``upsertStructuredProperties`` *replaces* **all** structured properties on the
 asset. We therefore pre-fetch the dataset's existing SPs and merge the fairness label in (same pattern
-as ``datahub_document_client`` / ``load_collections_context``) so sibling keys — data contract, how to
+as ``load_collections_context``) so sibling keys — data contract, how to
 request access, etc. — are preserved.
 
 Fail-soft by contract: :func:`push_classifications` never raises. A DataHub outage, an unknown

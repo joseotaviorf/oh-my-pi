@@ -34,7 +34,7 @@ import sys
 from pathlib import Path
 
 # Ensure the sibling ``sync`` package is importable when run as a script from any
-# cwd (mirrors sync_tars_entities.py).
+# cwd when run as a script from any working directory.
 _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))

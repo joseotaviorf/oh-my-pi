@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 
-from sync.github_delivery import _api_request
+from sync.github_api import _api_request
 
 logger = logging.getLogger(__name__)
 

@@ -1834,8 +1834,8 @@ def _create_or_update_data_product(
     """Create the Data Product, or update it when it already exists.
 
     ``pdesc_raw`` is ``None`` for callers that don't own the description field
-    (sync-tars-entities passes ``None`` — only push-datahub-business-context supplies a
-    description, so it stays the sole writer of that field and never gets overwritten
+    (only push-datahub-business-context supplies a description, so it stays the sole
+    writer of that field and never gets overwritten
     with the condensed TARS summary). When ``None``, the description key is omitted from
     both mutations: create leaves it unset, update leaves the existing value untouched.
 
@@ -1906,8 +1906,8 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     pname = cfg.get("product_display_name") or pid
     pdesc_raw = cfg.get("product_description")
     # product_description is optional: only push-datahub-business-context supplies it
-    # (from the committed Markdown). Callers that omit it — sync-tars-entities — link
-    # datasets/owners/etc. below without ever touching the description field, so it
+    # (from the committed Markdown). Callers that omit it link datasets/owners/etc. below
+    # without ever touching the description field, so it
     # stays single-writer.
     has_description = isinstance(pdesc_raw, str) and bool(pdesc_raw.strip())
     dom = cfg.get("domain_urn") or _FALLBACK_DOMAIN_URN

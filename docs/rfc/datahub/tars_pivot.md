@@ -16,6 +16,19 @@
 |---|---|
 | 2026-05-08 | Created |
 | 2026-07-27 | `docs/llm_context/intro.md` removed — legacy file-based TARS entry point superseded by DataHub-first plugin TARS |
+| 2026-08-06 | **DataHub UI Context Document authoring retired** — entity docs are contributed only via git (Luigi/Zordon or engineer PRs). The `tars-entity` sync pipeline and Airflow DAG `governance.sync_tars_entities` were removed from the repo. |
+
+## Deprecation: UI-first authoring
+
+The pilot included a self-service path where business users authored **DataHub Context
+Documents** (tag `tars-entity`) and automation synced them into git / Data Products. That
+flow is **discontinued**. The supported contribution model is:
+
+- **Luigi (Zordon):** upload finished `.md` in Google Chat → PR → merge → Woodpecker publish
+- **Engineers:** PR directly against `docs/llm_context/{business,metric}_entities/`
+
+DataHub remains the **read surface** for TARS (MCP); git remains the **write surface** for
+curated entity documentation.
 
 ## Approvers
 

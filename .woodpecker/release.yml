@@ -129,7 +129,7 @@ steps:
         esac
         make create-s3-dag-files INCLUDE_VALIDATION="$include_validation"
         # Refuse declaration-generated stubs only (sibling *_declaration.yml).
-        # Hand-written *_dag.py without a declaration must remain (e.g. sync_tars_entities).
+        # Hand-written *_dag.py without a declaration must remain (e.g. notify_dag_rotation).
         # Skip luigijr: create-s3 excludes it from the main bag; the parallel
         # create-dag-files-luigijr-* step writes those stubs into the shared workspace.
         leftovers=""

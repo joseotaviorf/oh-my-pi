@@ -56,7 +56,7 @@ steps:
         set -eu
         # Refuse declaration-generated stubs (would double-register with bundles).
         # Hand-written *_dag.py without a sibling *_declaration.yml must remain
-        # (e.g. governance/sync_tars_entities). Platform migration_* DAG packages too.
+        # (e.g. governance/notify_dag_rotation). Platform migration_* DAG packages too.
         # Skip luigijr: create-s3 excludes it; keep parity with release.yml stub guard.
         leftovers=""
         for stub in $(find dags \( -name '*_dag.py' -o -name '*_validation_dag.py' \) \

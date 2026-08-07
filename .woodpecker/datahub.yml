@@ -14,70 +14,20 @@
 # Loader/generator/reference changes no longer auto-republish every product. When a change
 # to the generation logic must propagate to all products, run a deliberate full re-sync:
 #   uv run python packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py --all
-# (The push step still auto-detects changed MDs via git diff; --resync-if-loader-changed is
-#  intentionally NOT used so a loader edit never fans out to all 36 products.)
-#
-# The sync-tars-entities and push-context-documents steps keep their own path filters below.
 #
 # Steps:
-#   validate-entity-golden-queries-metadata — golden-query tables/columns vs repo
-#                                          metadata YAML (push + same path as MD changes)
+#   validate-entity-golden-queries-metadata — golden-query tables/columns vs repo metadata YAML
 #   get-credentials-prod — Vault OPENAI_API_KEY for LiteLLM (push only)
-#   push-datahub-business-context — LLM → ephemeral YAML → DataHub via
-#                                   generate_and_push_datahub_entities.py (push only).
-#                                   The Data Product `product_description` it writes is
-#                                   NEVER LLM-authored: it's the full Markdown body
-#                                   (verbatim, minus Ownership/MBR/Tables/Synonyms/Golden
-#                                   Queries/Catalog sections) injected deterministically —
-#                                   see _extract_description_from_md() in that script. It
-#                                   is the SOLE writer of `product_description`: sync-tars-
-#                                   entities (below) never sets that field, so the two
-#                                   steps can't race on it. depends_on sync-tars-entities
-#                                   below purely for run-order determinism (e.g. dataset
-#                                   linking happening before/after), not description
-#                                   ownership.
-#   validate-datahub-entities — smoke full catalog on pull_request (no push-only deps)
-#   validate-datahub-entities-post-push — smoke after publish (push only;
-#       must be a separate step: Woodpecker PR pipelines omit push-only steps, so
-#       depends_on push-datahub-business-context fails on pull_request)
-#                         committed Markdown). It links datasets, owners, golden queries,
-#                         glossary terms and MBR — but it NEVER writes `product_description`.
-#                         build_datahub_yaml() (sync/yaml_generator.py) omits that key from
-#                         the generated spec, and curated_push_assets()
-#                         (load_collections_context.py) leaves the field untouched when the
-#                         key is absent, so it can never clobber push-datahub-business-
-#                         context's full-Markdown description — no shared state, no race.
-#                         (Previously this step wrote a condensed preview of the description
-#                         and the two steps raced on the field; that write path was removed
-#                         entirely rather than just re-ordered.) Marked failure: ignore so a
-#                         transient error here (e.g. one of the ~36 tagged docs still being
-#                         authored) never blocks the authoritative full-Markdown publish
-#                         below. Its own path filter (sync/** code changes included) is a
-#                         superset of push-datahub-business-context's, so it is always
-#                         present whenever push-datahub-business-context runs — depends_on
-#                         can safely point at it without "unknown step" errors.
-#                         Runs with --changed-only, which is orthogonal to the description fix
-#                         above: it limits which docs get their datasets/owners/golden
-#                         queries/glossary/MBR re-synced, not the description (that's now
-#                         structurally impossible to break regardless of this flag). Without
-#                         --changed-only, this script reprocesses ALL tagged docs on every
-#                         trigger; with it, an empty changed-slugs set (e.g. a sync/** code-only
-#                         commit, since this step's own path filter is a superset of push's)
-#                         now yields ZERO documents processed — never a fan-out. Learned the
-#                         hard way: PR #26310 (a pure code fix to this same script, before the
-#                         description write was removed) re-condensed Property Integrity's
-#                         description via exactly that fan-out. A deliberate full resync (e.g.
-#                         after a generator change) must be run explicitly without
-#                         --changed-only, as a one-off outside this path-scoped pipeline.
-#   push-context-documents — push_context_documents.py on push to master / hotfix/*
-#                             (idempotent; stable document IDs)
+#   push-datahub-business-context — MD → ephemeral YAML (LiteLLM) → DataHub via
+#                                   generate_and_push_datahub_entities.py (push only)
+#   validate-datahub-entities — smoke test on pull_request (changed MDs only)
+#   validate-datahub-entities-post-push — strict smoke after publish (push only)
 #
 # Secrets required (configure in Woodpecker repo settings):
-#   datahub_graphql_url_prod — prod DataHub GraphQL endpoint (push + sync-tars-entities)
-#   datahub_api_key_prod     — prod DataHub PAT with editor role (push + sync-tars-entities)
+#   datahub_graphql_url_prod — prod DataHub GraphQL endpoint (push step)
+#   datahub_api_key_prod     — prod DataHub PAT with editor role (push step)
 #   datahub_graphql_url      — DataHub GraphQL endpoint (validate step)
 #   datahub_token            — DataHub PAT (validate step)
-#   github_token             — GitHub PAT with repo write access (gitops mode only)
 #   Vault (prod)             — OPENAI_API_KEY for LiteLLM (push step only)
 #
 # This pipeline does NOT depend on lint / tests / validations so it can run
@@ -127,9 +77,6 @@ steps:
     when:
       - event: push
         branch: [master, hotfix/*]
-        # Scope: fire ONLY when entity Markdown sources change. Loader/generator/reference
-        # edits no longer auto-trigger a run (they would process zero changed MDs anyway);
-        # use `generate_and_push_datahub_entities.py --all` for a deliberate full re-sync.
         path: &datahub_path
           include:
             - "docs/llm_context/business_entities/**"
@@ -144,26 +91,15 @@ steps:
         from_secret: datahub_graphql_url_prod
       DATAHUB_TOKEN:
         from_secret: datahub_api_key_prod
-      # Default is 16000 (see _DEFAULT_MAX_TOKENS). PR #27167 (front-sla, 9 golden
-      # queries / ~18.7KB) truncated at 4/9 under the default — same failure mode as
-      # the Cases Perspective incident this ceiling was meant to prevent. Doubling
-      # gives headroom for entities with many/large golden queries without a
-      # per-entity override; applies to every entity this step publishes.
       LITELLM_MAX_TOKENS: "32000"
     commands:
       - eval $(cat ./my-secrets)
-      # Process ONLY the entity MDs added/edited in this push (auto-detected via git diff) —
-      # never a full catalog re-sync. Editing one MD uploads/updates just that Data Product.
-      # For a deliberate full re-sync (e.g. after a generator/loader change), run the script
-      # with --all as a one-off, outside this path-scoped pipeline.
       - uv run python packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py
     when:
       - event: push
         branch: [master, hotfix/*]
         path: *datahub_path
-    # Runs after sync-tars-entities so this step's full-Markdown description is always
-    # the last write to the Data Product (see step comment above for the race it avoids).
-    depends_on: [get-credentials-prod, sync-tars-entities, validate-entity-golden-queries-metadata]
+    depends_on: [get-credentials-prod, validate-entity-golden-queries-metadata]
 
   validate-datahub-entities:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -174,10 +110,6 @@ steps:
       DATAHUB_TOKEN:
         from_secret: datahub_token
     commands:
-      # PR validation: scoped to changed MDs only (avoids failing on pre-existing empty
-      # shells unrelated to this PR). --skip-missing makes a not-yet-in-DataHub product
-      # a warning (added OR edited MD): the product is created/updated only on the
-      # post-merge push. The post-push step below is the hard gate on absence.
       - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose --changed-only --skip-missing
     when:
       - event: pull_request
@@ -192,57 +124,9 @@ steps:
       DATAHUB_TOKEN:
         from_secret: datahub_token
     commands:
-      # Post-push validation: strict + deep, scoped to the MDs republished in THIS push
-      # (--changed-only). Hard-fails if a just-published product has an empty description,
-      # zero golden queries, or zero linked assets. Scoping avoids failing on pre-existing
-      # empty/legacy products unrelated to the current change.
       - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose --strict --deep --changed-only
     when:
       - event: push
         branch: [master, hotfix/*]
         path: *datahub_path
     depends_on: [push-datahub-business-context]
-
-  sync-tars-entities:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
-    pull: true
-    environment:
-      DATAHUB_GRAPHQL_URL:
-        from_secret: datahub_graphql_url_prod
-      DATAHUB_TOKEN:
-        from_secret: datahub_api_key_prod
-      TARS_SYNC_MODE: direct
-    commands:
-      - uv run python dags/governance/datahub_business_context/sync_tars_entities.py --mode direct --changed-only
-    # A failure here (e.g. one tagged doc still being authored) must never block the
-    # authoritative push-datahub-business-context publish that depends_on this step.
-    failure: ignore
-    when:
-      - event: push
-        branch: [master, hotfix/*]
-        path:
-          include:
-            - "docs/llm_context/business_entities/**"
-            - "docs/llm_context/metric_entities/**"
-            - "dags/governance/datahub_business_context/sync/**"
-            - "dags/governance/datahub_business_context/sync_tars_entities.py"
-          on_empty: false
-
-  push-context-documents:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
-    pull: true
-    environment:
-      DATAHUB_GRAPHQL_URL:
-        from_secret: datahub_graphql_url
-      DATAHUB_TOKEN:
-        from_secret: datahub_token
-    commands:
-      - uv run python dags/governance/datahub_business_context/push_context_documents.py
-    when:
-      - event: push
-        branch: [master, hotfix/*]
-        path:
-          include:
-            - "dags/governance/datahub_business_context/context_documents/**"
-            - "dags/governance/datahub_business_context/push_context_documents.py"
-          on_empty: false

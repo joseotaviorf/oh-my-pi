@@ -52,7 +52,7 @@ splits (worse than an obvious typo a reviewer can spot). Lost spaces also
 break adjacent emphasis (``and***% Foo***`` won't render, because ``***``
 can't open a run when preceded by a letter and followed by punctuation) —
 same root cause, same limitation. It's called out in the generated PR's
-review checklist instead (see ``github_delivery.open_sync_pull_request``),
+review checklist instead,
 for a human to catch by comparing the rendered PR diff against the source.
 """
 
