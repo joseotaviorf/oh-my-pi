@@ -1,0 +1,7 @@
+database_name: datalake_tars
+table_name: datahub_asset_usage
+arrival:
+  days_of_week: all
+  earliest_hour: 8
+  reason: enrich_tars runs 0 6 * * *; observed cadence from Trino 56d lookback
+  source: inferred

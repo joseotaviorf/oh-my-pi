@@ -1,0 +1,8 @@
+database_name: datalake_documentation_metrics
+table_name: columns_documentation_metrics
+arrival:
+  days_of_week: all
+  earliest_hour: 9
+  reason: enrich_documentation_metrics has no cron (upstream-triggered); observed
+    cadence from Trino 56d lookback
+  source: inferred

@@ -1,0 +1,8 @@
+database_name: dw_pipeline
+table_name: fact_pipeline_metrics
+arrival:
+  days_of_week: all
+  earliest_hour: 9
+  reason: dw_pipeline has no cron (upstream-triggered); observed cadence from Trino
+    56d lookback
+  source: inferred

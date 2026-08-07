@@ -1,0 +1,8 @@
+database_name: datalake_data_exposure
+table_name: surface_of_access
+arrival:
+  days_of_week: all
+  earliest_hour: 9
+  reason: enrich_data_exposure has no cron (upstream-triggered); observed cadence
+    from Trino 56d lookback
+  source: inferred

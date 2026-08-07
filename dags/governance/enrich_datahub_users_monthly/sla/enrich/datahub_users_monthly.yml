@@ -1,0 +1,9 @@
+database_name: datalake_datahub_metrics
+table_name: datahub_users_monthly
+arrival:
+  days_of_week:
+  - wed
+  earliest_hour: 12
+  reason: enrich_datahub_users_monthly runs 0 10 1 * *; observed cadence from Trino
+    56d lookback
+  source: inferred

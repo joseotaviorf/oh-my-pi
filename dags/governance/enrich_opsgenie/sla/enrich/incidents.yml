@@ -1,0 +1,8 @@
+database_name: datalake_opsgenie
+table_name: incidents
+arrival:
+  days_of_week: all
+  earliest_hour: 9
+  reason: enrich_opsgenie has no cron (upstream-triggered); observed cadence from
+    Trino 56d lookback
+  source: inferred

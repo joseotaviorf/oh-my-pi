@@ -1,0 +1,7 @@
+database_name: datalake_anonymization
+table_name: columns_sample_data
+arrival:
+  days_of_week: all
+  earliest_hour: 9
+  reason: enrich_anonymization has no cron (upstream-triggered)
+  source: inferred

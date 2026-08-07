@@ -1,0 +1,8 @@
+database_name: datalake_dashboard_governance
+table_name: chart_metadata
+arrival:
+  days_of_week: all
+  earliest_hour: 9
+  reason: enrich_dashboard_governance has no cron (upstream-triggered); observed cadence
+    from Trino 56d lookback
+  source: inferred

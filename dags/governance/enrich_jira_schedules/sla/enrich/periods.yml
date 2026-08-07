@@ -1,0 +1,8 @@
+database_name: datalake_jira_schedules
+table_name: periods
+arrival:
+  days_of_week: all
+  earliest_hour: 9
+  reason: enrich_jira_schedules has no cron (upstream-triggered); observed cadence
+    from Trino 56d lookback
+  source: inferred

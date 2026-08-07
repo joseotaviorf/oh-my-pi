@@ -1,0 +1,7 @@
+database_name: datalake_fairness_assessment
+table_name: fairness_classification
+arrival:
+  days_of_week: all
+  earliest_hour: 8
+  reason: enrich_fairness_assessment runs 0 6 * * *
+  source: inferred
