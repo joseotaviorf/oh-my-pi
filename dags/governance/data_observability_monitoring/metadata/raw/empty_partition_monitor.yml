@@ -5,7 +5,8 @@ domain: "Data Ops & Governance"
 description: >
   Logical workflow artifact for the empty-partition monitoring EMR sweep. The DAG does
   not materialize a hive table; it scans datalake_observability profiling metrics and
-  posts GChat alerts when partitioned tables have an empty run partition.
+  posts GChat alerts when partitioned tables have an empty run partition. Metadata is
+  published to the documentation S3 bucket on prod release (load-metadata-files-to-s3-prod).
 columns:
   signal_type:
     description: Judged signal identifier emitted by the monitor (for example empty_partition).

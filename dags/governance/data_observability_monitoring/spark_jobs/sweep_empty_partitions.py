@@ -2,7 +2,7 @@
 EMR Spark job: read profiling store Delta tables, join documentation owners, judge
 empty partitions, and post GChat alerts (prod only unless force_send).
 
-Republish to forno S3 via CI (upload-dag-packages-spark-jobs-s3-forno).
+Republish via CI (upload-dag-packages-spark-jobs-s3-{forno,prod}).
 """
 
 from __future__ import annotations
