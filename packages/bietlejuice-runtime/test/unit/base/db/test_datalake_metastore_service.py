@@ -64,7 +64,7 @@ class TestDatalakeMetastoreService:
 
     @pytest.mark.parametrize(
         "source",
-        ("ops_finance", "ops_ss", "ops_public", "forrent_postcontract"),
+        ("ops_finance", "ops_ss", "ops_public", "bi_metrics", "forrent_postcontract"),
     )
     def test_get_db_info_governed_schema_drops_datalake_prefix(self, source):
         # arrange: a schema following the new naming convention (no datalake_ prefix)

@@ -8,6 +8,7 @@ class DAGOwnerEnum:
     """
 
     DEFAULT_OWNER = "Data Engineering"
+    BI_METRICS = "BI Metrics"
     DATA_AGENTS = "Data Agents"
     DATA_ATLAS_DB = "Data Atlas DB"
     DATA_BROKER_XP = "Data Broker XP"

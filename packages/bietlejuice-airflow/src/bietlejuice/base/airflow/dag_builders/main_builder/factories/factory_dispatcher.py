@@ -44,6 +44,9 @@ class FactoryDispatcher:
         LayerEnum.CLEAN: CleanFactory,
         LayerEnum.CORE: CoreFactory,
         LayerEnum.ENRICH: EnrichFactory,
+        # Consumption reuses EnrichFactory: same query_delta / metadata path;
+        # naming + source-layer policy differ via LayerEnum / CONSUMPTION_SCHEMAS.
+        LayerEnum.CONSUMPTION: EnrichFactory,
         LayerEnum.DW: DWFactory,
         LayerEnum.METRIC: MetricFactory,
         LayerEnum.REVERSE: ReverseFactory,

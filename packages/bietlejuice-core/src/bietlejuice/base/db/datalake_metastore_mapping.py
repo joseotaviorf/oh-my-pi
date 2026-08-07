@@ -18,6 +18,7 @@ SCHEMAS_WITHOUT_DATALAKE_PREFIX = frozenset(
         "ops_finance",
         "ops_ss",
         "ops_public",
+        "bi_metrics",
         "forrent_postcontract",
     }
 )
@@ -32,7 +33,7 @@ SCHEMAS_WITHOUT_DATALAKE_PREFIX = frozenset(
 # Schema-name classification therefore always returns ``consumption`` for them — never
 # ``enrich``. Until all ``dags/luigijr/enrich_luigijr_*`` declarations flip to
 # ``workflow.layer: consumption``, any still-``enrich`` DAG that reads another
-# ``ops_*`` / ``forrent_postcontract`` table will fail source-layer policy (enrich's
+# ``ops_*`` / ``forrent_postcontract`` / ``bi_metrics`` table will fail source-layer policy (enrich's
 # allow-list does not include consumption). That is intentional; the bulk
 # enrich→consumption migration must close before relying on chained reads under
 # legacy enrich declarations. Do not remove this registry entry to "fix" that.
@@ -41,6 +42,7 @@ CONSUMPTION_SCHEMAS = frozenset(
         "ops_finance",
         "ops_ss",
         "ops_public",
+        "bi_metrics",
         "forrent_postcontract",
     }
 )
