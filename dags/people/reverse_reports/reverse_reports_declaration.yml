@@ -283,6 +283,11 @@ workflow:
       extra_spark_job_arguments:
         - "1uyWQMdfjN1AiQ-h5xU6TWKPQO9eiVGPkFck3wHL17AI"
         - "Full Base 5A"
+    # Former notebook: eng_neotribes_study_update (Daily Pipeline).
+    tech_neotribes_study:
+      extra_spark_job_arguments:
+        - "1LZRTxkJCnJIQILmYgfMFeu7xzmd8z5YkxnafiV7FVeg"
+        - "updated_db"
     # Former notebook: recencia_cargos_tech (Daily Pipeline) — DBP-1513.
     # Governance: docs/tech_job_tenure_exports.md
     tech_job_tenure_ics_eng:
