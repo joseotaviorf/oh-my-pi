@@ -5,7 +5,8 @@ dag:
   owner: Data Agents
   documentation:
     dag_purpose: |
-      DAG containing EBDB agent-context tables that run every 30 minutes (OfferAgentLink and OfferAgentLink_AUD).
+      DAG containing EBDB agent-context tables that run every 30 minutes (OfferAgentLink, OfferAgentLink_AUD,
+      SupplyConversionConsultancy, and SupplyAcquisition).
       Writes to datalake_ebdb_raw / datalake_ebdb_clean, same tables as ebdb_agent.
 workflow:
   type: cdc
@@ -23,6 +24,12 @@ workflow:
     OfferAgentLink_AUD:
       clean_table_name: offer_agent_link_aud
       raw_primary_keys: ["id", "rev"]
+    SupplyConversionConsultancy:
+      clean_table_name: supply_conversion_consultancy
+      raw_primary_keys: ["id"]
+    SupplyAcquisition:
+      clean_table_name: supply_acquisition
+      raw_primary_keys: ["id"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

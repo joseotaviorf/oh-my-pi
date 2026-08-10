@@ -1,0 +1,58 @@
+---
+database_name: datalake_ebdb_clean
+table_name: supply_acquisition
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Agent Domain supply acquisition (SA) assignments from EBDB Main, one row per (agent, property)
+  acquisition interval. Grain is one assignment record with ACTIVE or ENDED status.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.id
+    description: Surrogate key of the supply acquisition assignment in EBDB.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.agent_uuid
+    description: UUID of the agent who acquired the property listing into QuintoAndar supply.
+  id_property:
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.property_id
+    description: Identifier of the acquired property in the Main listing catalog.
+  status:
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.status
+    description: Lifecycle status of the acquisition (ACTIVE while attributed, ENDED when the assignment closes).
+  ts_start:
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.start_datetime
+    description: Timestamp when the acquisition assignment became effective (interval start, inclusive).
+  ts_end:
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.end_datetime
+    description: Timestamp when the acquisition ended; null while the assignment remains ACTIVE.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.created_at
+    description: Timestamp when the acquisition row was first persisted in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.updated_at
+    description: Timestamp of the last update to this supply acquisition row in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this acquisition row.
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when Debezium captured the CDC event for this row (millisecond precision).
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in EBDB for this acquisition row.
+    lineage:
+      - datalake_ebdb_raw.supplyacquisition.ts_database_transaction

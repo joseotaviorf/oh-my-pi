@@ -1,0 +1,58 @@
+---
+database_name: datalake_ebdb_clean
+table_name: supply_conversion_consultancy
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Agent Domain supply conversion consultancy (SCC) assignments from EBDB Main, one row per
+  (agent, property) consultancy interval. Grain is one assignment record with ACTIVE or ENDED status.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.id
+    description: Surrogate key of the supply conversion consultancy assignment in EBDB.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.agent_uuid
+    description: UUID of the agent assigned to consult the property toward rent or sale conversion.
+  id_property:
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.property_id
+    description: Identifier of the property under consultancy in the Main listing catalog.
+  status:
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.status
+    description: Lifecycle status of the consultancy assignment (ACTIVE while consulting, ENDED when closed).
+  ts_start:
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.start_datetime
+    description: Timestamp when the consultancy assignment became effective (interval start, inclusive).
+  ts_end:
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.end_datetime
+    description: Timestamp when the consultancy ended; null while the assignment is still ACTIVE.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.created_at
+    description: Timestamp when the consultancy row was first persisted in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.updated_at
+    description: Timestamp of the last update to this consultancy assignment row in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this consultancy row.
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when Debezium captured the CDC event for this row (millisecond precision).
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in EBDB for this consultancy row.
+    lineage:
+      - datalake_ebdb_raw.supplyconversionconsultancy.ts_database_transaction
