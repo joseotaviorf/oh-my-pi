@@ -15,7 +15,7 @@
 
 The metric returns the **net liquid value** — costs and revenue offsets are summed as recorded, without `ABS()`.
 
-This metric differs from a naive sum of all cost rows in the table (which would mix Sales, Marketing, G&A, and derived P&L results) and from [Absolute Cost Post-Contract (For Rent)](./absolute_cost_post_contract_fr.md), which is a subset filtered to `bece_l2 = 'Felipe Abreu'` and `pl_line_2` IN (`Onboarding`, `Ongoing`, `Offboarding`).
+This metric differs from a naive sum of all cost rows in the table (which would mix Sales, Marketing, G&A, and derived P&L results) and from [Absolute Cost Post-Contract (For Rent)](./absolute_cost_post_contract_fr.md), which sums only the `Onboarding`, `Ongoing`, and `Offboarding` `pl_line_2` phases and nets out bank transaction fees and Finance Operations benefit-center allocations (no `bece_l2` filter).
 
 Related metrics: [Absolute Cost Post-Contract (For Rent)](./absolute_cost_post_contract_fr.md).
 
@@ -49,7 +49,7 @@ Related metrics: [Absolute Cost Post-Contract (For Rent)](./absolute_cost_post_c
 - Rows with `reporting_group = '-'` (placeholder / unclassified)
 - Operations costs from other business verticals (`For Sale`, `Corporate`, etc.)
 - Non-Operations P&L lines (`Sales`, `Marketing`, `G&A`, revenues, derived results)
-- Post-Contract-only views (those require additional `bece_l2` and `pl_line_2` filters — see [Absolute Cost Post-Contract (For Rent)](./absolute_cost_post_contract_fr.md))
+- Post-Contract-only views (those apply a different `pl_line_2` phase scope plus bank-fee and Finance Operations subtractions — see [Absolute Cost Post-Contract (For Rent)](./absolute_cost_post_contract_fr.md))
 
 ## Calculation
 
@@ -76,7 +76,7 @@ AND version = 'Actuals'
 
 Column names in the uploaded table are **lowercased**, **spaces replaced by underscores**, and **`&` removed** (e.g. `BeCe Business` → `bece_business`, `P&L Line 1` → `pl_line_1`).
 
-**Warning**: Adding `bece_l2 = '<owner>'` or restricting `pl_line_2` narrows the result to a subset (e.g. Post-Contract) and **no longer produces the total For Rent Operations cost**.
+**Warning**: Restricting `pl_line_2` (with the Post-Contract bank-fee and Finance Operations subtractions) narrows the result to a subset (e.g. Post-Contract) and **no longer produces the total For Rent Operations cost**.
 
 ### Nuances
 
@@ -109,7 +109,7 @@ Column names in the uploaded table are **lowercased**, **spaces replaced by unde
 
 - Omit the `version` filter — this mixes scenarios and produces wrong totals
 - Include rows with `reporting_group = '-'`
-- Filter `bece_l2` or `pl_line_2` when computing the **total** For Rent cost (that produces the Post-Contract subset)
+- Restrict `pl_line_2` when computing the **total** For Rent cost (that produces the Post-Contract subset)
 - Assume a `month` or `period` dimension column exists — months are wide `YYYYMM` columns
 - Treat empty cells as zero
 - Apply `ABS()` — this metric is net liquid, not absolute cost

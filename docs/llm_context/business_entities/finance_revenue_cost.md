@@ -169,7 +169,7 @@ Volume rows use `bece_l2 = 'Lucas Lima'`.
 | `Ended Rentals`            | Offboarding UC denominator                                  |
 | `Contracts Signed`         | Contract volume (not used in UC metrics)      |
 
-UC cost numerators aggregate Onboarding / Ongoing / Offboarding Operations across **all** `bece_l2` owners within For Rent (no `bece_l2` filter). The absolute Post-Contract cost metric still scopes to `bece_l2 = 'Felipe Abreu'` — see [Absolute Cost Post-Contract (For Rent)](../metric_entities/absolute_cost_post_contract_fr.md).
+UC cost numerators aggregate Onboarding / Ongoing / Offboarding Operations across **all** `bece_l2` owners within For Rent (no `bece_l2` filter). The absolute Post-Contract cost metric also has no `bece_l2` filter; it nets the same three `pl_line_2` phases against bank transaction fees and Finance Operations benefit-center allocations — see [Absolute Cost Post-Contract (For Rent)](../metric_entities/absolute_cost_post_contract_fr.md).
 
 `Ongoing (-) New Rentals` is maintained per `bece_product`; at For Rent level, `SUM(Ongoing Rentals (active)) − SUM(New Rentals (active))` equals `SUM(Ongoing (-) New Rentals)` for the same `version` and month.
 
@@ -189,7 +189,7 @@ Official For Rent post-contract metrics (exact calculation in linked metric enti
 - **Onboarding Unit Cost (For Rent):** Onboarding Operations cost ÷ `New Rentals (active)` — see [onboarding_uc_fr.md](../metric_entities/onboarding_uc_fr.md).
 - **Ongoing Unit Cost (For Rent):** Ongoing Operations cost ÷ `Ongoing (-) New Rentals` — see [ongoing_uc_fr.md](../metric_entities/ongoing_uc_fr.md).
 - **Offboarding Unit Cost (For Rent):** Offboarding Operations cost ÷ `Ended Rentals` — see [offboarding_uc_fr.md](../metric_entities/offboarding_uc_fr.md).
-- **Absolute Cost Post-Contract (For Rent):** Net Operations cost for `bece_l2 = 'Felipe Abreu'`, `pl_line_2` IN (`Onboarding`, `Ongoing`, `Offboarding`) — see [absolute_cost_post_contract_fr.md](../metric_entities/absolute_cost_post_contract_fr.md).
+- **Absolute Cost Post-Contract (For Rent):** Net cost of `pl_line_2` IN (`Onboarding`, `Ongoing`, `Offboarding`), minus bank transaction fees and Finance Operations benefit-center allocations (`135R1X` / `135R2X`) — see [absolute_cost_post_contract_fr.md](../metric_entities/absolute_cost_post_contract_fr.md).
 - **Absolute Cost Ops Total (For Rent):** Total net For Rent Operations cost — see [absolute_cost_ops_total_fr.md](../metric_entities/absolute_cost_ops_total_fr.md).
 
 ### Operations P&L Line 2 Breakdown
@@ -210,7 +210,7 @@ Relevant for post-contract cost metrics (unit economics and absolute operations 
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | **Absolute payroll cost**                | `Reporting Group` IN (`PAYROLL SALARY`, `PAYROLL BENEFITS`, `PAYROLL TAX`, …), `P&L Line Type` IN (`Capacity`, `Overhead`) |
 | **Absolute cost Ops Total (For Rent)**   | `bece_business` = `For Rent`, `pl_line_1` = `Operations`, `reporting_group` <> `'-'`, `version` = `Actuals` |
-| **Absolute cost Post-Contract (For Rent)** | Above + `bece_l2` = `Felipe Abreu`, `pl_line_2` IN (`Onboarding`, `Ongoing`, `Offboarding`), `reporting_group` <> `'-'` |
+| **Absolute cost Post-Contract (For Rent)** | `bece_business` = `For Rent`, `version` = `Actuals`, `pl_line_2` IN (`Onboarding`, `Ongoing`, `Offboarding`) minus `pl_line_4` = `Bank Transactions Fees` and `pl_line_3` = `Ongoing Team` at `benefit_center_code` IN (`135R1X`, `135R2X`) — no `bece_l2`, `pl_line_1`, or `reporting_group` filter |
 | **Gross revenue by product**             | `P&L Line 1` = `Gross Revenues`, `Reporting Group` = `BROKERAGE` / `ADVERTISING` / etc.                                    |
 | **Marketing spend**                      | `P&L Line 1` = `Marketing`, sum `Branding` + `Growth` lines                                                                |
 | **Unit economics (For Rent UC)** | Cost numerator: `bece_business` = `For Rent`, `pl_line_1` = `Operations`, `pl_line_2` = `Onboarding` / `Ongoing` / `Offboarding`, `reporting_group` <> `'-'` (no `bece_l2` filter). Volume denominator: `pl_line_4` = `New Rentals (active)` / `Ongoing (-) New Rentals` / `Ended Rentals`, `bece_l2` = `Lucas Lima`, `pl_line_1` = `-` |
@@ -306,19 +306,21 @@ P&L Line Type
 
 ## Golden Queries
 
-Canonical pattern for a single-month Operations cost aggregation (For Rent Actuals). Because months are columns, not rows:
+Canonical pattern for a single-month Operations cost aggregation (For Rent Actuals). Because months are columns, not rows. Written for March 2026:
 
 ```sql
 SELECT
-  SUM(TRY_CAST(REPLACE("<YYYYMM>", ',', '') AS DOUBLE)) AS operations_cost
-FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_<YEAR>
+  -- Change the "202603" column to the target month (YYYYMM).
+  SUM(TRY_CAST(REPLACE("202603", ',', '') AS DOUBLE)) AS operations_cost
+-- Change the _2026 suffix to the calendar year of the month above (_2025 or _2026).
+FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_2026
 WHERE bece_business = 'For Rent'
   AND pl_line_1 = 'Operations'
   AND reporting_group <> '-'
   AND version = 'Actuals'
 ```
 
-Replace `<YEAR>` with `2025` or `2026` according to the target `YYYYMM` column.
+Replace the `_2026` table suffix with `_2025` or `_2026` according to the target `YYYYMM` column.
 
 Period columns are `varchar` after upload — cast before aggregating. Sum without `ABS()` for net liquid value.
 
