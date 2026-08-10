@@ -6,7 +6,7 @@ import pytest
 import yaml
 
 _CONFIG_DIR = Path(__file__).parents[4] / "src" / "bietlejuice" / "config"
-_PINNED_OS_RELEASE_LABEL = "2023.12.20260629.0"
+_PINNED_OS_RELEASE_LABEL = "2023.12.20260622.0"
 
 
 def _load_emr_cluster_base(conf_file_name: str) -> dict:

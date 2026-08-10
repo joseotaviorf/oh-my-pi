@@ -221,7 +221,7 @@ def test_load_settings_file_rejects_unknown_keys(tmp_path: Path) -> None:
             """
             region: us-east-1
             release_label: emr-7.5.0
-            os_release_label: "2023.12.20260629.0"
+            os_release_label: "2023.12.20260622.0"
             subnet_id: subnet-x
             job_flow_role: role
             service_role: arn:aws:iam::1:role/R
@@ -256,7 +256,7 @@ def test_load_settings_file_ok(tmp_path: Path) -> None:
             """
             region: us-east-1
             release_label: emr-7.5.0
-            os_release_label: "2023.12.20260629.0"
+            os_release_label: "2023.12.20260622.0"
             subnet_id: subnet-x
             job_flow_role: role
             service_role: arn:aws:iam::1:role/R
@@ -435,7 +435,7 @@ def _write_minimal_settings(path: Path) -> Path:
             """
             region: us-east-1
             release_label: emr-7.5.0
-            os_release_label: "2023.12.20260629.0"
+            os_release_label: "2023.12.20260622.0"
             subnet_id: subnet-x
             job_flow_role: role
             service_role: arn:aws:iam::1:role/R

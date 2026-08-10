@@ -79,8 +79,8 @@ def test_explicit_step_concurrency_level_wins_on_single_node():
 
 
 def test_emr_os_release_label_maps_to_os_release_label():
-    out = translate(_fleet_base(emr_os_release_label="2023.12.20260629.0"))
-    assert out["OSReleaseLabel"] == "2023.12.20260629.0"
+    out = translate(_fleet_base(emr_os_release_label="2023.12.20260622.0"))
+    assert out["OSReleaseLabel"] == "2023.12.20260622.0"
 
 
 def test_emr_os_release_label_absent_omits_os_release_label():
@@ -92,7 +92,7 @@ def test_emr_os_release_label_and_custom_ami_id_mutually_exclusive():
     with pytest.raises(ValueError, match="mutually exclusive"):
         translate(
             _fleet_base(
-                emr_os_release_label="2023.12.20260629.0",
+                emr_os_release_label="2023.12.20260622.0",
                 emr_custom_ami_id="ami-0123456789abcdef0",
             )
         )

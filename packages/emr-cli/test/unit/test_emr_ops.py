@@ -39,11 +39,11 @@ def test_build_run_job_flow_payload_bootstrap_args() -> None:
 
 
 def test_build_run_job_flow_payload_includes_os_release_label_when_set() -> None:
-    cfg = _minimal_run_job_cfg(os_release_label="2023.12.20260629.0")
+    cfg = _minimal_run_job_cfg(os_release_label="2023.12.20260622.0")
     payload = _build_run_job_flow_payload(
         cfg, steps=[], keep_job_flow_alive_when_no_steps=False
     )
-    assert payload["OSReleaseLabel"] == "2023.12.20260629.0"
+    assert payload["OSReleaseLabel"] == "2023.12.20260622.0"
 
 
 def test_build_run_job_flow_payload_omits_os_release_label_when_unset() -> None:
