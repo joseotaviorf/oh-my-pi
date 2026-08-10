@@ -110,7 +110,7 @@ LEFT JOIN
         AND parsed.is_last_listing_purchase IS TRUE
 WHERE
     clp.is_last_available_comparison IS TRUE
-    AND clp.consultant_type = 'CIQ_FULL'
+    AND clp.consultant_type IN ('CIQ_FULL', 'PRO_ACQUIRER')
     AND clp.business_context = 'RENT'
     AND (
         parsed.id_house IS NOT NULL

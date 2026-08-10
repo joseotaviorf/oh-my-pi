@@ -2,7 +2,7 @@
 database_name: datalake_ciq
 table_name: listing_purchase_duplicity
 description: >
-  Similar-house duplicity comparison for CIQ_FULL rent listing purchase: last available capture
+  Similar-house duplicity comparison for CIQ_FULL and PRO_ACQUIRER rent listing purchase: last available capture
   per listing purchase joined to address-parsed peers and/or Atlas duplicity, keyed by
   id_listing_duplicity for acquisition pricing and portfolio exclusion rules.
 domain: Agents

@@ -88,7 +88,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
   consultant_type:
-    description: CIQ consultant type from house consultant history (for example CIQ_FULL).
+    description: >
+      CIQ consultant type from house consultant history (for example CIQ_FULL or PRO_ACQUIRER for
+      Embaixadores who converted from CIQ).
     lineage:
       - datalake_big_agent.house_consultant_history.consultant_type
   listing_status:
@@ -111,7 +113,7 @@ columns:
   initial_pricing_type_reason:
     description: >
       Full human-readable initial pricing segment from the AAREDE-470 transition rules: not-eligible
-      when business context is not RENT, consultant is not CIQ_FULL, there is no signed contract yet,
+      when business context is not RENT, consultant is not CIQ_FULL or PRO_ACQUIRER, there is no signed contract yet,
       or the contract was signed before 2026-07-01; hybrid when the house converted from sale to rent;
       new-listings when published and rented after the transition; ongoing-listings when published
       before the transition with no previous contract and first rented after it; ongoing-rentals when

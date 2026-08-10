@@ -93,7 +93,7 @@ purchase_pricing AS (
             AND plp.is_last_listing_paid IS TRUE
     WHERE
         clp.business_context = 'RENT'
-        AND clp.consultant_type = 'CIQ_FULL'
+        AND clp.consultant_type IN ('CIQ_FULL', 'PRO_ACQUIRER')
 )
 SELECT 
     ppp.id_listing_purchase,

@@ -2,7 +2,7 @@
 database_name: datalake_ciq
 table_name: listing_purchase_pricing
 description: >
-  Acquisition pricing enrich for CIQ_FULL rent captures under AAREDE-470: combines the initial
+  Acquisition pricing enrich for CIQ_FULL and PRO_ACQUIRER rent captures under AAREDE-470: combines the initial
   pricing segment from ciq_listing_purchase with previous-paid-listing and similar-house duplicity
   signals to derive the final pricing_type/acquisition_type (full-price, reduced-price, not-eligible),
   purchase_value (0, 150, or 1000 BRL), and payment_status. Grain is id_listing_purchase with optional

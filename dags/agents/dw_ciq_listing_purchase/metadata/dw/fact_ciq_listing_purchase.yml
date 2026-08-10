@@ -2,10 +2,11 @@
 database_name: dw_ciq
 table_name: fact_ciq_listing_purchase
 description: >
-  Fact for CIQ_FULL rent listing-purchase rows joining ciq_listing_purchase with
-  listing_purchase_pricing for acquisition tiers. Full enrich snapshot merged on
-  sk_listing_purchase; matched unpaid rows always refresh, and paid rows refresh
-  when portfolio-loss fields change (CCV after payment is a valid loss case).
+  Fact for CIQ_FULL and PRO_ACQUIRER (Embaixador) rent listing-purchase rows joining
+  ciq_listing_purchase with listing_purchase_pricing for acquisition tiers. Full enrich snapshot
+  merged on sk_listing_purchase; matched unpaid rows always refresh, and paid rows refresh when
+  portfolio-loss fields change (CCV after payment is a valid loss case). Filter consultant_type in
+  downstream queries when only one population should be paid.
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -60,7 +61,7 @@ columns:
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_ciq_user
   sk_enrollment:
-    description: Enrollment surrogate key for CIQ_FULL.
+    description: Enrollment surrogate key from house consultant history.
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_enrollment
   sk_owner:
@@ -87,6 +88,12 @@ columns:
     description: Rent supply funnel origin label at funnel step six.
     lineage:
       - datalake_ciq.ciq_listing_purchase.supply_source
+  consultant_type:
+    description: >
+      House consultant type at capture (CIQ_FULL or PRO_ACQUIRER for Embaixadores); use to segment
+      who receives listing-purchase payment in downstream reports.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.consultant_type
   listing_status:
     description: Listing status from house listing or business context.
     lineage:

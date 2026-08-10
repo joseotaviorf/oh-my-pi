@@ -182,7 +182,7 @@ SELECT
     hl.contract_status,
     CASE
         WHEN lbc.business_context <> 'RENT' OR lbc.business_context IS NULL THEN 'not-eligible: Business context is not RENT'
-        WHEN hch.consultant_type <> 'CIQ_FULL' OR hch.consultant_type IS NULL THEN 'not-eligible: User consultant is not CIQ_FULL'
+        WHEN hch.consultant_type NOT IN ('CIQ_FULL', 'PRO_ACQUIRER') OR hch.consultant_type IS NULL THEN 'not-eligible: User consultant is not CIQ_FULL or PRO_ACQUIRER'
         WHEN hl.ts_contract_signed IS NULL THEN "not-eligible: Don't have a contract signed yet"
         WHEN hl.ts_contract_signed < DATE("2026-07-01") THEN 'not-eligible: Contract signed before the transition'
         WHEN lbc.ts_first_publication >= DATE("2026-07-01") 

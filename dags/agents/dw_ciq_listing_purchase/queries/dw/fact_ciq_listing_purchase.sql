@@ -54,6 +54,7 @@ SELECT
     clp.city_name,
     clp.city_group,
     clp.supply_source,
+    clp.consultant_type,
     clp.listing_status,
     clp.listing_category,
     clp.contract_status,
