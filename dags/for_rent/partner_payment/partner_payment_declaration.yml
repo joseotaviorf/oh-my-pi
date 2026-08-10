@@ -35,3 +35,5 @@ workflow:
       clean_table_name: invoices_aud
     company_contract_type:
       clean_table_name: company_contract_type
+    sap_audit_response:
+      clean_table_name: sap_audit_response
