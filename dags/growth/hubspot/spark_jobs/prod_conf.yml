@@ -266,19 +266,13 @@ deal:
       - cons_user_first_message_reply
       - cons_qualificacao
       - cons_conrado_discard_classification
-      - cons_fup_inatividade_version
-      - cons_fup_inatividade_status
-      - cons_fup_inatividade_entered_at
-      - cons_fup_inatividade_stage_snapshot
-      - cons_fup_inatividade_branch
-      - cons_fup_inatividade_messages_sent
-      - cons_fup_inatividade_cadence_config_version
-      - cons_fup_inatividade_exit_reason
-      - cons_fup_inatividade_exit_at
-      - cons_fup_inatividade_recovery_flag
-      - cons_fup_inatividade_recovered_at
-      - cons_fup_inatividade_discarded_by_cadence
       - consorcio_entrou_churn
+      - cons_agent_simulation_value
+      - cons_valor_em_negociacao
+      - cons_blip_inatividade_ia
+      - cons_feedback_survey
+      - cons_codigos_das_propostas
+      - cons_abandono_c2w
     propertiesWithHistory:
       - dealstage
       - pipeline
