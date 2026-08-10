@@ -22,6 +22,9 @@ Escape hatches, in order of blast radius:
 
 To revert: delete this module, its test, and the ``apply_x86_fallback(cfg)``
 call in ``template_translator.translate``.
+
+CI note: docstring-only change to re-trigger Woodpecker deploy-astro-image-*
+via *astro_image_paths after a missed master push webhook for #27395.
 """
 
 from __future__ import annotations
