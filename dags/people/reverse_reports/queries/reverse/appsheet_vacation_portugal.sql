@@ -11,7 +11,7 @@ SELECT
     END AS status,
     LOWER(mh.manager_assignment_number) AS id_gestor,
     mgr_emp.name AS gestor,
-    snap.dt_original_hire AS dt_inicio,
+    snap.dt_employee_hired AS dt_inicio,
     snap.dt_terminated AS dt_desligamento,
     '' AS salario,
     mgr_emp.work_email AS email_gestor,
@@ -33,12 +33,12 @@ LEFT JOIN
 LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS mgr_snap
         ON mgr_snap.assignment_number = mh.manager_assignment_number
-        AND mgr_snap.is_current = TRUE
+        AND mgr_snap.is_current_for_assignment = TRUE
 LEFT JOIN
     dw_employee_details.dim_employee AS mgr_emp
         ON mgr_snap.sk_employee = mgr_emp.sk_employee
 WHERE
-    snap.is_current = TRUE
+    snap.is_current_for_employee = TRUE
     AND snap.is_primary_assignment_for_snapshot = TRUE
 ORDER BY
     bu.consolidated_business_unit_name,
