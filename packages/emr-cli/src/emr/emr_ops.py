@@ -184,6 +184,10 @@ def _build_run_job_flow_payload(
     if cfg.get("log_uri"):
         payload["LogUri"] = cfg["log_uri"]
 
+    os_release_label = cfg.get("os_release_label")
+    if os_release_label:
+        payload["OSReleaseLabel"] = str(os_release_label)
+
     emr_cfgs = cfg.get("configurations") or []
     if emr_cfgs:
         payload["Configurations"] = emr_cfgs

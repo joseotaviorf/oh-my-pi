@@ -1,3 +1,4 @@
+import pytest
 from emr_plugin.template_translator import translate
 
 
@@ -75,3 +76,23 @@ def test_single_node_instance_group_defaults_concurrency_to_1():
 def test_explicit_step_concurrency_level_wins_on_single_node():
     out = translate(_fleet_base(step_concurrency_level=3))
     assert out["StepConcurrencyLevel"] == 3
+
+
+def test_emr_os_release_label_maps_to_os_release_label():
+    out = translate(_fleet_base(emr_os_release_label="2023.12.20260629.0"))
+    assert out["OSReleaseLabel"] == "2023.12.20260629.0"
+
+
+def test_emr_os_release_label_absent_omits_os_release_label():
+    out = translate(_fleet_base())
+    assert "OSReleaseLabel" not in out
+
+
+def test_emr_os_release_label_and_custom_ami_id_mutually_exclusive():
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        translate(
+            _fleet_base(
+                emr_os_release_label="2023.12.20260629.0",
+                emr_custom_ami_id="ami-0123456789abcdef0",
+            )
+        )

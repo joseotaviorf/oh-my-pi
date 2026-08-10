@@ -107,6 +107,18 @@ def translate(config: dict) -> dict:
     if spark_version:
         overrides["ReleaseLabel"] = spark_version
 
+    os_release_label = cfg.pop("emr_os_release_label", None)
+    custom_ami_id = cfg.pop("emr_custom_ami_id", None)
+    if os_release_label and custom_ami_id:
+        raise ValueError(
+            "emr_os_release_label and emr_custom_ami_id are mutually exclusive; "
+            "use one or the other"
+        )
+    if os_release_label:
+        overrides["OSReleaseLabel"] = str(os_release_label)
+    if custom_ami_id:
+        overrides["CustomAmiId"] = str(custom_ami_id)
+
     _translate_log_conf(cfg, overrides)
     _translate_applications(cfg, overrides)
     _translate_roles(cfg, overrides)

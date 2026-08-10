@@ -77,6 +77,7 @@ def resolve_settings_path() -> str:
 SETTINGS_FILE_KEYS = frozenset[str](
     {
         "release_label",
+        "os_release_label",
         "subnet_id",
         "job_flow_role",
         "service_role",
@@ -288,6 +289,11 @@ def load_settings_file(path: str | Path) -> dict[str, Any]:
             out[key] = validate_emr_applications(val)
         elif key == "configurations":
             out[key] = validate_emr_configurations(val)
+        elif key == "os_release_label":
+            label = str(val).strip()
+            if not label:
+                raise ValueError("os_release_label must be a non-empty string")
+            out[key] = label
         else:
             out[key] = val
     return out
