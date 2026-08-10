@@ -23,6 +23,12 @@ columns:
     lineage:
       - datalake_emlio_clean.emlio_logs.inputs
     description: User identifier associated with the margin projection request.
+  id_entity:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: |
+      Business entity identifier from the inference request (e.g. event or flow id),
+      extracted from the nested request payload sent to the ECM service.
   ecm_version:
     lineage:
       - datalake_emlio_clean.emlio_logs.inputs
@@ -62,10 +68,7 @@ columns:
   ts_event:
     lineage:
       - datalake_emlio_clean.emlio_logs.inputs
-      - datalake_emlio_clean.emlio_logs.ts_log
-    description: |
-      Timestamp of the demand funnel event that triggered the ECM inference. Falls back
-      to ts_log for legacy for-sale-ecm logs that use the deprecated flat JSON structure.
+    description: Timestamp of the demand funnel event that triggered the ECM inference.
   features:
     lineage:
       - datalake_emlio_clean.emlio_logs.inputs
@@ -77,7 +80,8 @@ columns:
       - datalake_emlio_clean.emlio_logs.inputs
     description: |
       JSON string with the inference request context (event_type, UTM, risk_category,
-      analysis result, timestamps, and related fields). Null for legacy for-sale-ecm logs.
+      analysis result, timestamps, and related fields). Populated for all eltv and
+      for-sale-ecm inference requests.
   year:
     lineage:
       - datalake_emlio_clean.emlio_logs.year
