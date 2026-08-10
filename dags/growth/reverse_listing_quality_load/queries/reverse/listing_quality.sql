@@ -268,7 +268,7 @@ FROM (
         ar.id_house AS house_id,
         NULL AS job_id,
         NULL AS photographer_comment,
-        NULL AS link_video,
+        v.link_video,
         NULL AS num_internal_photos,
         NULL AS num_bathroom_photos,
         NULL AS images_per_room,
@@ -276,5 +276,6 @@ FROM (
         NULL AS has_plaque,
         0 AS analyst_queue
     FROM base_analysis_request ar
+        LEFT JOIN videos v ON (v.id_external_domain = ar.id_house)
 ) t
 ORDER BY t.analyst_queue ASC, t.property_condition ASC
