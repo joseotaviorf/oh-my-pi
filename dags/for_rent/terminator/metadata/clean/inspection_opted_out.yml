@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_terminator_raw.inspection_opted_out.termination_id
     description: Identification key of termination.
+  id_opted_out_by:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.opted_out_by
+    description: External user identifier of the operator or tenant who registered the inspection exemption; joinable to datalake_terminator_clean.application_user.id_external.
   is_exit_inspection_opt_out:
     lineage:
       - datalake_terminator_raw.inspection_opted_out.exit_inspection_opt_out
@@ -28,6 +32,29 @@ columns:
     lineage:
       - datalake_terminator_raw.inspection_opted_out.date_opt_out
     description: Inspection opted out date.
+  op_cdc:
+    description: >
+      CDC operation captured by Debezium for this row version, used to distinguish
+      inserts, updates and deletes when replaying the Terminator change stream.
+    categories:
+      r: Read/snapshot - initial load of an already existing record.
+      c: Create - new record inserted in Terminator.
+      u: Update - existing record modified in Terminator.
+      d: Delete - record removed from Terminator.
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.op_cdc
+  ts_cdc_transaction:
+    description: >
+      Wall-clock timestamp when the CDC connector captured this change event, used to
+      order row versions and measure ingestion lag against the source database.
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.ts_cdc_transaction
+  ts_database_transaction:
+    description: >
+      Timestamp of the originating transaction in the Terminator database, before CDC
+      propagation, representing when the change actually happened in the product.
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.ts_database_transaction
   year:
     lineage:
       - datalake_terminator_raw.inspection_opted_out.year
