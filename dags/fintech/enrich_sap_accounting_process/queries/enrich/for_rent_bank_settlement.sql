@@ -1,4 +1,4 @@
-WITH payments_in_retsuko AS (
+WITH payments_in_retsuko_ranked AS (
     SELECT
         c.id_external AS id_contract,
         i.id_external AS id_invoice,
@@ -16,7 +16,8 @@ WITH payments_in_retsuko AS (
         se.status,
         'Seu Barriga' AS billing_source,
         se.ts_created,
-        se.ts_synced
+        se.ts_synced,
+        ROW_NUMBER() OVER (PARTITION BY i.id_external, i.payment_company_use_number ORDER BY i.ts_created DESC) AS rn
     FROM 
         datalake_retsuko.invoice AS i
     LEFT JOIN 
@@ -37,8 +38,27 @@ WITH payments_in_retsuko AS (
         AND i.status = 'paid'
         AND i.country_code = 'BR'
         AND i.ts_paid >= CURRENT_DATE - 180
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY i.id_external, i.payment_company_use_number ORDER BY i.ts_created DESC) = 1  
+),
+payments_in_retsuko AS (
+    SELECT
+        id_contract,
+        id_invoice,
+        company_use,
+        billing_amount,
+        accrual_year_month,
+        dt_billing_source,
+        dt_billing,
+        id_sap_gateway_feature,
+        id_finance_entity,
+        version,
+        status,
+        billing_source,
+        ts_created,
+        ts_synced
+    FROM
+        payments_in_retsuko_ranked
+    WHERE
+        rn = 1
 ),
 
 francesinha AS (

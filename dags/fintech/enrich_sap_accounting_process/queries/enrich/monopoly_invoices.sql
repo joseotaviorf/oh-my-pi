@@ -38,32 +38,7 @@ monopoly AS (
       AND st.id_external_sync IS NOT NULL
      GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
-sap_gateway AS (
-  SELECT
-    f.id_finance_entity,
-    s.id_feature,
-    s.hash,
-    s.type,
-    s.status as sync_sap_job_status,
-    w.status as sap_send_status,
-    w.webhook_status as sap_processed_status,
-    w.errors AS webhook_error
-  FROM
-    datalake_sap_gateway_clean.feature f
-  LEFT JOIN
-    datalake_sap_gateway_clean.sync_sap_job s
-      ON f.id_feature = s.id_feature
-  LEFT JOIN
-    datalake_sap_gateway_clean.webhook_log w
-      ON s.idoc = w.idoc
-  WHERE 1=1
-    AND s.erp_solution IN ('S4')
-    AND s.type IN ('NF')
-    AND s.status NOT IN ('ignore', 'ignored')
-    AND DATE(f.ts_created) >= DATE('2024-01-01')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) = 1  
-),
-sap_gateway_base AS (
+sap_gateway_ranked AS (
   SELECT
     f.id_finance_entity,
     s.id_feature,
@@ -72,7 +47,8 @@ sap_gateway_base AS (
     s.status AS sync_sap_job_status,
     w.status AS sap_send_status,
     w.webhook_status AS sap_processed_status,
-    w.errors AS webhook_error
+    w.errors AS webhook_error,
+    ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) AS rn
   FROM
     datalake_sap_gateway_clean.feature f
   LEFT JOIN
@@ -81,12 +57,66 @@ sap_gateway_base AS (
   LEFT JOIN
     datalake_sap_gateway_clean.webhook_log w
       ON s.idoc = w.idoc
-  WHERE 1=1
-    AND s.erp_solution IN ('S4')
+  WHERE
+    s.erp_solution IN ('S4')
     AND s.type IN ('NF')
     AND s.status NOT IN ('ignore', 'ignored')
     AND DATE(f.ts_created) >= DATE('2024-01-01')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY s.ts_updated) = 1  
+),
+sap_gateway AS (
+  SELECT
+    id_finance_entity,
+    id_feature,
+    hash,
+    type,
+    sync_sap_job_status,
+    sap_send_status,
+    sap_processed_status,
+    webhook_error
+  FROM
+    sap_gateway_ranked
+  WHERE
+    rn = 1
+),
+sap_gateway_base_ranked AS (
+  SELECT
+    f.id_finance_entity,
+    s.id_feature,
+    s.hash,
+    s.type,
+    s.status AS sync_sap_job_status,
+    w.status AS sap_send_status,
+    w.webhook_status AS sap_processed_status,
+    w.errors AS webhook_error,
+    ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY s.ts_updated) AS rn
+  FROM
+    datalake_sap_gateway_clean.feature f
+  LEFT JOIN
+    datalake_sap_gateway_clean.sync_sap_job s
+      ON f.id_feature = s.id_feature
+  LEFT JOIN
+    datalake_sap_gateway_clean.webhook_log w
+      ON s.idoc = w.idoc
+  WHERE
+    s.erp_solution IN ('S4')
+    AND s.type IN ('NF')
+    AND s.status NOT IN ('ignore', 'ignored')
+    AND DATE(f.ts_created) >= DATE('2024-01-01')
+),
+sap_gateway_base AS (
+  SELECT
+    id_finance_entity,
+    id_feature,
+    hash,
+    type,
+    sync_sap_job_status,
+    sap_send_status,
+    sap_processed_status,
+    webhook_error
+  FROM
+    sap_gateway_base_ranked
+  WHERE
+    rn = 1
 ),
 sap_ledger AS (
 SELECT

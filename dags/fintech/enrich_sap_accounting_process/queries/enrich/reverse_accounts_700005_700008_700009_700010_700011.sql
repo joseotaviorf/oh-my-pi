@@ -199,4 +199,5 @@ LEFT JOIN
     ON (r.id_finance_entity_entry = COALESCE(se.id_finance_entity, sl.id_finance_entity_entry) AND r.account_number = sl.account_number) 
 WHERE 
   r.id_finance_entity_entry IS NULL
-GROUP BY ALL
+GROUP BY
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22

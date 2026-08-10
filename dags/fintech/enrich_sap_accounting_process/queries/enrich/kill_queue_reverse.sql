@@ -1,10 +1,11 @@
 WITH 
-sap_gateway AS (
+sap_gateway_ranked AS (
     SELECT
-        f.id_source as id_finance_entity,
+        f.id_source AS id_finance_entity,
         f.sync_sap_status,
         s.status,
-        s.hash
+        s.hash,
+        RANK() OVER (PARTITION BY f.id_source ORDER BY s.ts_updated DESC) AS rn
     FROM
         datalake_sap_gateway_clean.feature f
     LEFT JOIN
@@ -13,7 +14,17 @@ sap_gateway AS (
     WHERE
         f.source = 'kill-queue/reservation'
         AND s.type = 'NF'
-    QUALIFY RANK() OVER (PARTITION BY f.id_source ORDER BY s.ts_updated DESC) = 1
+),
+sap_gateway AS (
+    SELECT
+        id_finance_entity,
+        sync_sap_status,
+        status,
+        hash
+    FROM
+        sap_gateway_ranked
+    WHERE
+        rn = 1
 )
 
 , sap_ledger AS (
@@ -36,7 +47,7 @@ sap_gateway AS (
     GROUP BY 1, 2, 3, 4, 5, 6, 7
 )
 
-, kill_queue AS (
+, kill_queue_ranked AS (
     SELECT
         r.id_tenant AS id_business_entity,
         r.id AS id_finance_entity,
@@ -48,13 +59,31 @@ sap_gateway AS (
         r.status,
         r.last_charge_status,
         DATE(r.ts_created) AS dt_source_trigger,
-        r.ts_updated
+        r.ts_updated,
+        RANK() OVER (PARTITION BY r.id ORDER BY r.ts_updated DESC) AS rn
     FROM
         datalake_kill_queue_clean.reservation r
     WHERE
         r.status IN ('FINISHED', 'CANCELED')
         AND r.ts_created >='2024-01-01'
-    QUALIFY RANK() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+),
+kill_queue AS (
+    SELECT
+        id_business_entity,
+        id_finance_entity,
+        accounting_name,
+        business_unit,
+        source_name,
+        accounting_type,
+        source_amount,
+        status,
+        last_charge_status,
+        dt_source_trigger,
+        ts_updated
+    FROM
+        kill_queue_ranked
+    WHERE
+        rn = 1
 )
 
 SELECT
