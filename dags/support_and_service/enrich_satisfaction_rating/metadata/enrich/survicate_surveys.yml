@@ -65,7 +65,10 @@ columns:
       - datalake_survicate.salesforce_surveys.id_account
       - datalake_survicate.repairs_surveys.id_account
   id_trigger:
-    description: Salesforce trigger unique identifier extracted from the Survicate response URL. Populated only for Salesforce-originated surveys; NULL for all other sources.
+    description: >
+      Salesforce Marketing Cloud trigger ID from Survicate response_url
+      (trigger_id or mkt_cloud_trigger__c_id). Populated only for
+      Salesforce-originated surveys; NULL for all other sources.
     lineage:
       - datalake_survicate.salesforce_surveys.id_trigger
   id_origin:

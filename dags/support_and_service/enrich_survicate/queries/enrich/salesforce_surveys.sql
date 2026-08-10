@@ -6,7 +6,10 @@ WITH explode_parse_url AS (
     sr.response_url,
     IF(REGEXP_EXTRACT(response_url,'case_id=([A-Za-z0-9]{{15,18}})') = '', NULL, REGEXP_EXTRACT(response_url,'case_id=([A-Za-z0-9]{{15,18}})')) AS id_case,
     IF(REGEXP_EXTRACT(response_url,'account_id=([A-Za-z0-9]{{15,18}})') = '', NULL, REGEXP_EXTRACT(response_url,'account_id=([A-Za-z0-9]{{15,18}})')) AS id_account,
-    IF(REGEXP_EXTRACT(response_url,'trigger_id=([A-Za-z0-9]{{15,18}})') = '', NULL, REGEXP_EXTRACT(response_url,'trigger_id=([A-Za-z0-9]{{15,18}})')) AS id_trigger,
+    COALESCE(
+      IF(REGEXP_EXTRACT(response_url, 'trigger_id=([A-Za-z0-9]{{15,18}})') = '', NULL, REGEXP_EXTRACT(response_url, 'trigger_id=([A-Za-z0-9]{{15,18}})')),
+      IF(REGEXP_EXTRACT(response_url, 'mkt_cloud_trigger__c_id=([A-Za-z0-9]{{15,18}})') = '', NULL, REGEXP_EXTRACT(response_url, 'mkt_cloud_trigger__c_id=([A-Za-z0-9]{{15,18}})'))
+    ) AS id_trigger,
     sr.survey_name
   FROM
     datalake_survicate.survey_responses AS sr

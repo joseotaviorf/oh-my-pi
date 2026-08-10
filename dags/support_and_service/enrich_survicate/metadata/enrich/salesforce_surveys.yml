@@ -23,7 +23,10 @@ columns:
   id_trigger:
     lineage:
       - datalake_survicate.survey_responses.response_url
-    description: Salesforce trigger unique identifier extracted from the Survicate response URL
+    description: >
+      Salesforce Marketing Cloud trigger ID (15 or 18 chars) parsed from the
+      Survicate response_url query string. Supports legacy trigger_id and the
+      current mkt_cloud_trigger__c_id parameter name.
   id_respondent:
     lineage:
       - datalake_survicate.survey_responses.id_respondent
