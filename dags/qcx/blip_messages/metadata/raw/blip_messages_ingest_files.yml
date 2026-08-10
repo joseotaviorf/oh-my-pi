@@ -1,0 +1,29 @@
+---
+database_name: datalake_consorcio_raw
+table_name: blip_messages_ingest_files
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  File-level ingest ledger for Consórcio Blip JSONL exports. One row per incoming
+  S3 object processed by blip_messages (batch_*.jsonl or incremental {unix}.jsonl).
+  Used to skip unchanged successful keys (etag match) and to derive the incremental
+  StartAfter watermark (max successful job_start_unix). Row-level dedupe remains
+  id_message on blip_messages; clearing this table forces a safe full re-scan
+  without duplicate messages.
+columns:
+  s3_key:
+    description: Full incoming-bucket object key (primary merge key for the ledger).
+  id_dag_run:
+    description: Airflow dag_run.run_id that last processed this object.
+  s3_bucket:
+    description: Incoming S3 bucket name (e.g. 5a-datalake-incoming-prod).
+  etag:
+    description: S3 object etag at ingest time; change triggers re-processing.
+  status:
+    description: Ingest outcome for the object (success or failed).
+  size_bytes:
+    description: Object size in bytes when listed (sanity / audit).
+  row_count:
+    description: Number of valid message rows merged from the file on the last attempt.
+  ts_load:
+    description: Timestamp when the ledger row was last updated.

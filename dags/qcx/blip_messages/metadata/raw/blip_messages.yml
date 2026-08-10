@@ -1,0 +1,59 @@
+---
+database_name: datalake_consorcio_raw
+table_name: blip_messages
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  Raw landing for Consórcio Blip WhatsApp chat messages from the conrado-blip CLI.
+  One row per Blip message from JSONL under s3://5a-datalake-incoming-prod/consorcio/
+  blip/consorciois/ (backfill batch_*.jsonl and incremental {job}.jsonl). Joinable
+  to datalake_consorcio_clean.lead via id_crm (HubSpot hs_object_id). Insert-only
+  MERGE on id_message is the dedupe guarantee; s3_key records the winning source file.
+  Incoming objects expire after ~90 days — ingest promptly.
+columns:
+  id_message:
+    description: >
+      Blip message unique id (metadata uniqueId or Blip id); stable merge key across
+      backfill and incremental exports.
+  id_lead:
+    description: Lead UUID from the Consórcio domain; may be empty for some rows.
+  id_crm:
+    description: HubSpot hs_object_id used to join datalake_consorcio_clean.lead.
+  id_tunnel:
+    description: >
+      Blip tunnel contact identity ({uuid}@tunnel.msging.net); renamed from producer
+      tunnel_id to follow lake id_* convention.
+  id_run:
+    description: >
+      Backfill window folder ({from_unix}_{to_unix}) or incremental job_start_unix
+      parsed from s3_key.
+  whatsapp_identity:
+    description: >
+      Blip WhatsApp contact identity ({digits}@wa.gw.msging.net); may be empty
+      when the conversation is tunnel-only.
+  host_name:
+    description: Blip bot host name (conrado for this export).
+  role:
+    description: Message author role (human, ai, or attendant).
+  content:
+    description: Message body text; HSM templates may be JSON-serialized payloads.
+  source:
+    description: >
+      Producer label from the CLI JSONL (blip_cli_backfill or blip_cli_incremental);
+      validated against the S3 prefix family at ingest.
+  s3_key:
+    description: >
+      Incoming-bucket object key for the JSONL file that supplied this row (first
+      successful ingest wins when the same id_message appears in multiple files).
+  s3_bucket:
+    description: Incoming S3 bucket name (e.g. 5a-datalake-incoming-prod).
+  ts_created:
+    description: Message creation timestamp in UTC from Blip (ISO-8601).
+  ts_load:
+    description: Timestamp when the row was first inserted into the raw table.
+  year:
+    description: Partition column from message ts_created.
+  month:
+    description: Partition column from message ts_created.
+  day:
+    description: Partition column from message ts_created.

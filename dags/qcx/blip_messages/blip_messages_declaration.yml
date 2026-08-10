@@ -1,0 +1,56 @@
+dag:
+  name: blip_messages
+  schedule_start_date: 2026, 3, 1
+  schedule_interval: 0 */6 * * *
+  owner: QCX
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Ingests Consórcio Blip WhatsApp chat JSONL from the QuintoAndar Data incoming
+      S3 bucket into datalake_consorcio_raw.blip_messages (backfill + incremental).
+
+      Sources (prod bucket 5a-datalake-incoming-prod):
+        - backfill: consorcio/blip/consorciois/backfill/{from_unix}_{to_unix}/batch_*.jsonl
+        - incremental: consorcio/blip/consorciois/incremental/{job_start_unix}.jsonl
+
+      Ops artifacts ignored: done.jsonl, errors.jsonl, _SUCCESS (backfill);
+      watermark.json, *.errors.jsonl (incremental).
+
+      Row dedupe: insert-only MERGE on id_message (Blip unique id). First ingested
+      row wins; overlapping backfill/incremental exports cannot duplicate messages.
+
+      File ledger: datalake_consorcio_raw.blip_messages_ingest_files tracks each
+      processed S3 object (success/failed + etag). Incremental LIST uses StartAfter
+      the max successful job_start_unix. Backfill lists batch_*.jsonl via boto3 and
+      skips files already successful in the ledger. The CLI owns when files appear;
+      this DAG only records whether each file was ingested. Partial file failures
+      fail the Airflow task. Ledger loss triggers a safe full re-scan (still no
+      message dupes via id_message).
+
+      Schedule: every 6 hours (America/Sao_Paulo). Manual trigger remains available.
+
+      source column is preserved from the conrado-blip CLI (blip_cli_backfill /
+      blip_cli_incremental) and validated against the S3 prefix family.
+
+      Urgency: incoming bucket lifecycle expires objects after ~90 days (IA @ 30d).
+      Run promptly while backfill windows are still present.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: consorcio
+  load_spark_job: load_blip_messages_raw
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{{ dag_run.run_id if dag_run else 'manual' }}"
+  tables_customization:
+    blip_messages:
+      partitions: [year, month, day]
+      merge_on: [id_message]
+      when_matched_update_condition: "FALSE"
