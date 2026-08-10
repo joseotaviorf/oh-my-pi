@@ -18,20 +18,23 @@ What this DAG does:
   1. stage-inference-status-to-s3 (PythonOperator): reads quintoml's prompt
      manifest, works out which (day, prompt_id, prompt_hash) backfill
      partitions should exist, checks whether quintoml has finalized each one
-     (_SUCCESS marker present), and publishes a done/missing snapshot via
-     XCom (INFERENCE_STATUS_ROWS_XCOM_KEY) for load-vocs-machina-inference-
-     status-raw to consume directly. Selective propagation (Slice 3): if
-     this run was triggered only by the cron safety net (no upstream dataset
-     fired) and the snapshot is unchanged since the last published run, the
-     task raises AirflowSkipException, which cascades to skip every
-     downstream task (cluster creation, raw load, enrich execution) so we
-     don't wake Databricks/quintoml for nothing every 6 hours.
+     (_SUCCESS marker present), and computes a hash of the resulting
+     done/missing snapshot to decide whether anything changed since the last
+     run. Despite the task's name, it writes nothing to S3 -- see
+     spark_jobs/load_vocs_machina_inference_status_raw.py's module docstring
+     for why. Selective propagation (Slice 3): if this run was triggered only
+     by the cron safety net (no upstream dataset fired) and the snapshot is
+     unchanged since the last published run, the task raises
+     AirflowSkipException, which cascades to skip every downstream task
+     (cluster creation, raw load, enrich execution) so we don't wake
+     Databricks/quintoml for nothing every 6 hours.
   2. create-cluster -> load-vocs-machina-inference-status-raw -> <enrich task
-     group> -> terminate-cluster: a single Databricks cluster loads the
-     XCom-published rows into
-     datalake_vocs_machina_planning_raw.vocs_machina_inference_status,
-     then materializes both queries/enrich/*.sql files (Slice 2) as real
-     Delta tables via DatalakeTaskGroup.build_task_group_from_sql_files --
+     group> -> terminate-cluster: a single Databricks cluster independently
+     re-reads the same manifest (its own instance profile reaches quintoml's
+     bucket directly, separately from Task A's) and loads the result into
+     datalake_vocs_machina_planning_raw.vocs_machina_inference_status, then
+     materializes both queries/enrich/*.sql files (Slice 2) as real Delta
+     tables via DatalakeTaskGroup.build_task_group_from_sql_files --
      datalake_vocs_machina_planning.vocs_machina_backfill_status and
      .vocs_machina_backfill_status_summary. The summary's load task is the
      cross-repo contract quintoml's Slice 4 subscribes to (see the dataset
@@ -43,13 +46,12 @@ What this DAG does:
 
 Style model: dags/fintech/enrich_dai_report/enrich_dai_report.py (manual
 DAG()/create-cluster/submit-run/terminate-cluster wiring, plus
-DatalakeTaskGroup for the enrich layer) and
-dags/publisher_xp/alias_classifieds_on_demand/alias_classifieds_on_demand.py
-(PythonOperator pushing a named XCom that a downstream Databricks task's
-templated `json.parameters` pulls directly -- airflow-prod-role has no S3
-write grant on this repo's own datalake bucket, only Databricks' instance
-profile does, so this Task A -> Task B hand-off goes through XCom rather
-than a staged S3 object).
+DatalakeTaskGroup for the enrich layer). Diverges from
+dags/platform/dag_inventory/dag_inventory.py's PythonOperator + S3Hook
+staging-to-S3 pattern for the Task-A-to-Spark-job hand-off -- see
+spark_jobs/load_vocs_machina_inference_status_raw.py's module docstring for
+why (an Airflow-side S3 write grant, then a Databricks job-parameter size
+cap, were both tried and ruled out).
 """
 
 import hashlib
@@ -106,14 +108,6 @@ VOCS_MACHINA_MANIFEST_KEY = (
     "post-contract/vocs-machina/_meta/latest_active_prompts.json"
 )
 VOCS_MACHINA_RAW_PREFIX = "post-contract/vocs-machina/raw"
-
-# XCom key stage_inference_status_to_s3 publishes the built snapshot rows
-# under, for load_inference_status_raw_task to consume directly (see that
-# task's `parameters` below) -- airflow-prod-role has no S3 write grant on
-# bi-etl-ejuice's datalake bucket (only Databricks' own instance profile
-# does), so the hand-off goes through Airflow's own XCom store instead of a
-# staged S3 object.
-INFERENCE_STATUS_ROWS_XCOM_KEY = "inference_status_rows"
 
 RAW_TABLE_NAME = "vocs_machina_inference_status"
 RAW_PARTITION_COLS = "['year', 'month', 'day']"
@@ -371,7 +365,7 @@ def should_skip_stage_task(
 
 
 def stage_inference_status_to_s3(load_start_date: str, **kwargs) -> None:
-    """Task A: build today's inference-status snapshot and publish it via XCom.
+    """Task A: decide whether there's a new inference-status snapshot to load.
 
     1. Read quintoml's prompt manifest (read-only).
     2. For each active prompt, expand [today - backfill_days, today] into one
@@ -383,11 +377,22 @@ def stage_inference_status_to_s3(load_start_date: str, **kwargs) -> None:
        whether this run has anything new to publish; if not, raise
        AirflowSkipException so this task and everything downstream
        (create-cluster, the raw load, and the enrich task group) is skipped
-       instead of waking Databricks for an unchanged cron tick.
-    5. Publish the resulting rows as a JSON string via XCom (under
-       INFERENCE_STATUS_ROWS_XCOM_KEY), for load_inference_status_raw_task to
-       consume directly as a Spark job parameter, and remember the rows'
-       hash in LAST_SNAPSHOT_HASH_VARIABLE_KEY for the next run's comparison.
+       instead of waking Databricks for an unchanged cron tick. Otherwise,
+       remember the new hash in LAST_SNAPSHOT_HASH_VARIABLE_KEY for the next
+       run's comparison.
+
+    Despite the task's name, this no longer writes anything to S3:
+    airflow-prod-role has no write grant on this repo's own datalake bucket,
+    and handing these rows to Databricks via XCom/job-parameters instead hit
+    Databricks' jobs/runs/submit 10,000-byte parameter cap in production
+    (see bi-etl-ejuice#27353, reverted). The actual read + transform + load
+    now happens independently in load_vocs_machina_inference_status_raw.py,
+    on the Databricks cluster this DAG creates next -- its own instance
+    profile reaches quintoml's manifest bucket directly, so it re-derives
+    the same rows rather than receiving them from this task. This task's
+    only remaining job is computing the same hash that job's output would
+    produce, purely to decide skip vs proceed without paying for a cluster
+    + Spark job on every unchanged cron tick.
     """
     hook = S3Hook(aws_conn_id="aws_default")
 
@@ -418,7 +423,6 @@ def stage_inference_status_to_s3(load_start_date: str, **kwargs) -> None:
             "published run; skipping this task and its downstream tasks."
         )
 
-    kwargs["ti"].xcom_push(key=INFERENCE_STATUS_ROWS_XCOM_KEY, value=json.dumps(rows))
     Variable.set(LAST_SNAPSHOT_HASH_VARIABLE_KEY, new_snapshot_hash)
 
 
@@ -512,9 +516,6 @@ load_inference_status_raw_task = QuintoAndarDatabricksSubmitRunOperator(
                 RAW_TABLE_NAME,
                 "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}",
                 RAW_PARTITION_COLS,
-                "{{ ti.xcom_pull(task_ids='stage-inference-status-to-s3', key='"
-                + INFERENCE_STATUS_ROWS_XCOM_KEY
-                + "') }}",
             ],
         }
     },
