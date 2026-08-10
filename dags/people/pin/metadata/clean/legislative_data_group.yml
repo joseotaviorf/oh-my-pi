@@ -1,0 +1,69 @@
+database_name: datalake_pin_core_clean
+table_name: legislative_data_group
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Legislative Data Groups in PIN — country-level containers that define payroll legislation, default currency, and HR compliance context for each operating country.
+  One row per id_legislative_data_group (full refresh on each pin DAG run; not effective-dated).
+  Covers every LDG configured in PIN for QuintoAndar international operations.
+  Join downstream on id_legislative_data_group to resolve legislation_code and default_currency_code for grade ladders, salary bases, and compensation structures; legislation_code also maps to employee legal-employer country when a direct BU link is unavailable.
+columns:
+  id_legislative_data_group:
+    description: Primary key of the Legislative Data Group in PIN (e.g. '300000004145797'). Links grade ladders, salary bases, and other legislation-scoped reference data.
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.legislative_data_group_id
+  id_business_group:
+    description: Enterprise identifier in PIN for multi-tenant data separation (e.g. '1'). Shared across all LDGs in the QuintoAndar tenant.
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.business_group_id
+  default_currency_code:
+    description: ISO 4217 currency code used as the payroll default within this legislative context (e.g. 'BRL', 'MXN', 'PEN', 'PAB').
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.default_currency_code
+  legislation_code:
+    description: Two-letter legislation territory code assigned to the LDG in PIN (e.g. 'BR', 'PE', 'MX'). Use to derive employee country when joined through legal employer or assignment context.
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.legislation_code
+    categories:
+      AR: Argentina legislative context.
+      BR: Brazil legislative context.
+      EC: Ecuador legislative context.
+      MX: Mexico legislative context.
+      PA: Panama legislative context.
+      PE: Peru legislative context.
+      PT: Portugal legislative context.
+      UY: Uruguay legislative context.
+  created_by:
+    description: PIN user account that created the LDG record (e.g. 'jessica.lara@dbs-digital.com').
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.created_by
+  updated_by:
+    description: PIN user account that last updated the LDG record.
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.last_updated_by
+  object_version_number:
+    description: Optimistic-locking version counter incremented on each update in PIN (e.g. 1).
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.object_version_number
+  ts_created:
+    description: Timestamp when the LDG was created in PIN (e.g. 2023-11-30 17:52:49).
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.creation_date
+  ts_updated:
+    description: Timestamp when the LDG was last updated in PIN.
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.last_update_date
+  ts_load:
+    description: Timestamp when the row was loaded into the clean table by the pin DAG.
+  year:
+    description: Calendar year partition derived from ts_updated (e.g. 2026).
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.year
+  month:
+    description: Calendar month partition derived from ts_updated (e.g. 7).
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.month
+  day:
+    description: Calendar day partition derived from ts_updated (e.g. 21).
+    lineage:
+    - datalake_pin_core_raw.per_legislative_data_groups.day
