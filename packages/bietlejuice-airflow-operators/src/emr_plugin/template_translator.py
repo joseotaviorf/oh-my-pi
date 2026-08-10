@@ -31,6 +31,7 @@ from emr_plugin.constants import (
     EMR_INSTANCE_GROUP_NAME_MASTER,
     EMR_INSTANCE_GROUP_NAME_TASK,
 )
+from emr_plugin.x86_fallback import apply_x86_fallback
 
 log = logging.getLogger(__name__)
 
@@ -98,6 +99,7 @@ def translate(config: dict) -> dict:
     :return: EMR job_flow_overrides dict.
     """
     cfg = copy.deepcopy(config)
+    apply_x86_fallback(cfg)
 
     overrides = {}
 
