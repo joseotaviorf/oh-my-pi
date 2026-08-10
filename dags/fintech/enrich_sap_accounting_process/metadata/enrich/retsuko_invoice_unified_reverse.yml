@@ -85,4 +85,8 @@ columns:
     description: Reference date in SAP accounting system.
     lineage:
       - datalake_accounting_funnel.ledger.dt_reference
+  dt_filter_end:
+    description: Same value as dt_sap_reference, which already reflects the most recent SAP ledger movement for this id_finance_entity_entry and account_number.
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_reference
 

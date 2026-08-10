@@ -516,6 +516,15 @@ accounting_balance AS (
   GROUP BY 1, 2
 ),
 
+last_movement AS (
+  SELECT
+      id_finance_entity_entry,
+      account_number,
+      MAX(dt_sap_reference) AS dt_filter_end
+  FROM sap
+  GROUP BY 1, 2
+),
+
 errors_base AS (
     SELECT 
         r.id_business_entity,
@@ -546,7 +555,8 @@ errors_base AS (
         CAST(SUM(COALESCE(a.accounting_balance, 0)) AS DECIMAL(12,2)) AS accounting_balance,
         MAX(r.dt_source_trigger) AS dt_source_trigger,
         MAX(sl_hash.dt_sap_created) AS dt_sap_created,
-        MAX(sl_hash.dt_sap_reference) AS dt_sap_reference
+        MAX(sl_hash.dt_sap_reference) AS dt_sap_reference,
+        MAX(lm.dt_filter_end) AS dt_filter_end
     FROM
         retsuko AS r
     LEFT JOIN
@@ -558,9 +568,12 @@ errors_base AS (
     LEFT JOIN
         sap AS sl_hash
             ON sl_hash.hash = sg.hash AND r.account_number = sl_hash.account_number
-    LEFT JOIN 
+    LEFT JOIN
         accounting_balance a
             ON a.id_finance_entity_entry = sl_hash.id_finance_entity_entry AND a.account_number = sl_hash.account_number
+    LEFT JOIN
+        last_movement lm
+            ON lm.id_finance_entity_entry = r.id_finance_entity_entry AND lm.account_number = r.account_number
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 12
 ),
 
@@ -584,6 +597,7 @@ assertions_base AS (
     dt_source_trigger,
     dt_sap_reference,
     dt_sap_created,
+    dt_filter_end,
     IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness,
     CASE
       WHEN dt_sap_reference IS NULL OR dt_source_trigger IS NULL THEN FALSE
@@ -629,6 +643,7 @@ SELECT
   accrual_year_month,
   dt_source_trigger,
   dt_sap_reference,
-  dt_sap_created
-FROM 
+  dt_sap_created,
+  dt_filter_end
+FROM
   assertions_base

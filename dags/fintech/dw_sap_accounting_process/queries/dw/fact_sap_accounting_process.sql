@@ -24,6 +24,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_provision
@@ -56,6 +57,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_revenue_share
@@ -88,6 +90,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011
@@ -120,6 +123,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_revenue_accounting
@@ -152,6 +156,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012
@@ -184,6 +189,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_invoice
@@ -216,6 +222,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_invoice_unified
@@ -248,6 +255,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_write_off
@@ -280,6 +288,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.reverse_accounts_513020
@@ -312,6 +321,7 @@ SELECT
     dt_sap_reference,
     dt_sap_created,
     COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
     NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.kill_queue_reservation_issuance
@@ -344,6 +354,7 @@ SELECT
     dt_sap_reference,
     dt_sap_created,
     COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
     NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.for_rent_bank_settlement
@@ -376,6 +387,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.retsuko_provision_reverse
@@ -408,6 +420,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.reverse_accounts_420001_420002_420004
@@ -440,6 +453,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.monopoly_invoices
@@ -472,6 +486,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_transactional
@@ -504,6 +519,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_transactional_third_parties
@@ -536,6 +552,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_third_parties
@@ -568,6 +585,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.monopoly_revenue_share
@@ -600,6 +618,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.monopoly_provision
@@ -632,6 +651,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.kill_queue_reverse
@@ -664,6 +684,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.retsuko_invoice_unified_reverse
@@ -696,6 +717,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.monopoly_invoices_reverse
@@ -728,6 +750,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.monopoly_revenue_share_reverse
@@ -760,6 +783,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  CAST(NULL AS DATE) AS dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.monopoly_provision_reverse
@@ -792,6 +816,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.retsuko_transactional_reverse
@@ -824,6 +849,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.retsuko_third_parties_reverse
@@ -856,6 +882,7 @@ SELECT
   dt_sap_reference,
   dt_sap_created,
   COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  dt_filter_end,
   NOW() AS ts_load
 FROM
   datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse

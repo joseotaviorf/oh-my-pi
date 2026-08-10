@@ -106,4 +106,8 @@ columns:
   dt_sap_created:
     description: Creation date of transaction in SAP.
     lineage:
-      - datalake_accounting_funnel.ledger.dt_created 
+      - datalake_accounting_funnel.ledger.dt_created
+  dt_filter_end:
+    description: Same value as dt_sap_reference, which already reflects the most recent SAP ledger movement for this id_finance_entity and account_number (it already falls back to a direct id_finance_entity match when the hash-based SAP Gateway match is unavailable).
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_reference 

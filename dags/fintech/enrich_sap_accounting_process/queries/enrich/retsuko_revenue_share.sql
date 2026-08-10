@@ -111,7 +111,24 @@ retsuko_final AS (
   SELECT * FROM retsuko_aggregate
 ),
 
-sap_entity AS(
+sap_entity_ranked AS (
+  SELECT
+    id_finance_entity,
+    id_sap_gateway_feature,
+    version,
+    event,
+    status,
+    failed_status,
+    failed_reason,
+    ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) AS rn
+  FROM
+    datalake_retsuko_clean.sap_entity
+  WHERE
+    id_finance_entity IS NOT NULL
+    AND event IN ('new-accounting-entries', 'payment-accounting-entries')
+),
+
+sap_entity AS (
   SELECT
     id_finance_entity,
     id_sap_gateway_feature,
@@ -121,14 +138,12 @@ sap_entity AS(
     failed_status,
     failed_reason
   FROM
-    datalake_retsuko_clean.sap_entity
+    sap_entity_ranked
   WHERE
-    id_finance_entity IS NOT NULL
-    AND event IN ('new-accounting-entries', 'payment-accounting-entries')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
+    rn = 1
 ),
 
-sap_gateway AS (
+sap_gateway_ranked AS (
   SELECT
     f.id_finance_entity,
     s.id_feature,
@@ -136,7 +151,8 @@ sap_gateway AS (
     s.status as sync_sap_job_status,
     w.status as sap_send_status,
     w.webhook_status as sap_processed_status,
-    w.errors AS webhook_error
+    w.errors AS webhook_error,
+    ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, f.id_feature ORDER BY f.ts_updated) AS rn
   FROM
     datalake_sap_gateway_clean.feature f
   LEFT JOIN
@@ -150,7 +166,21 @@ sap_gateway AS (
     AND type = 'LCM'
     AND s.status NOT IN ('ignore', 'ignored')
     AND DATE(f.ts_created) >= DATE('2024-01-01')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, f.id_feature ORDER BY f.ts_updated) = 1
+),
+
+sap_gateway AS (
+  SELECT
+    id_finance_entity,
+    id_feature,
+    hash,
+    sync_sap_job_status,
+    sap_send_status,
+    sap_processed_status,
+    webhook_error
+  FROM
+    sap_gateway_ranked
+  WHERE
+    rn = 1
 ),
 
 sap_ledger AS (
@@ -168,6 +198,15 @@ sap_ledger AS (
     dt_reference >= DATE('2024-01-01')
     AND account_number IN ('700005','700006', '700007', '700008', '700009', '700010', '700011')
   GROUP BY 1, 2, 3, 4, 6, 7
+),
+
+last_movement AS (
+  SELECT
+      id_finance_entity_entry,
+      account_number,
+      MAX(dt_sap_reference) AS dt_filter_end
+  FROM sap_ledger
+  GROUP BY 1, 2
 ),
 
 errors_base AS (
@@ -199,7 +238,8 @@ errors_base AS (
     CAST(SUM(sl.debit_credit) AS DECIMAL(12,2)) AS sap_amount,
     MAX(r.dt_source_trigger) AS dt_source_trigger,
     MAX(sl.dt_sap_created) AS dt_sap_created,
-    MAX(sl.dt_sap_reference) AS dt_sap_reference
+    MAX(sl.dt_sap_reference) AS dt_sap_reference,
+    MAX(lm.dt_filter_end) AS dt_filter_end
   FROM
     retsuko_final r
   LEFT JOIN
@@ -212,6 +252,10 @@ errors_base AS (
     sap_ledger sl
       ON r.account_number = sl.account_number
       AND sl.hash = sg.hash
+  LEFT JOIN
+    last_movement lm
+      ON lm.id_finance_entity_entry = r.id_finance_entity_entry
+      AND lm.account_number = r.account_number
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 12
 ),
 
@@ -234,6 +278,7 @@ assertions_base AS (
     dt_source_trigger,
     dt_sap_reference,
     dt_sap_created,
+    dt_filter_end,
     IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness,
     CASE
       WHEN dt_sap_reference IS NULL OR dt_source_trigger IS NULL THEN FALSE
@@ -278,6 +323,7 @@ SELECT
   accrual_year_month,
   dt_source_trigger,
   dt_sap_reference,
-  dt_sap_created
-FROM 
+  dt_sap_created,
+  dt_filter_end
+FROM
   assertions_base

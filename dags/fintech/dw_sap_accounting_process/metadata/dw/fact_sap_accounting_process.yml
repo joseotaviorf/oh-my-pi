@@ -395,5 +395,17 @@ columns:
     description: "Indicates date that was created in SAP"
   dt_filter:
     description: "Filter date computed as COALESCE(dt_sap_reference, dt_source_trigger)"
+  dt_filter_end:
+    lineage:
+      - datalake_sap_accounting_process.retsuko_provision.dt_filter_end
+      - datalake_sap_accounting_process.retsuko_revenue_share.dt_filter_end
+      - datalake_sap_accounting_process.retsuko_revenue_accounting.dt_filter_end
+      - datalake_sap_accounting_process.retsuko_invoice.dt_filter_end
+      - datalake_sap_accounting_process.retsuko_invoice_unified.dt_filter_end
+      - datalake_sap_accounting_process.retsuko_transactional.dt_filter_end
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties.dt_filter_end
+      - datalake_sap_accounting_process.retsuko_third_parties.dt_filter_end
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.dt_filter_end
+    description: "Date of the most recent SAP ledger movement (creation, payment, write-off, chargeback, refund) for this id_finance_entity_entry and account_number. Unlike dt_filter, which can be stuck at the entry's original posting date, dt_filter_end always reflects the latest movement, so filtering by dt_filter_end for a period captures entries that had a movement (e.g. a payment or write-off) in that period even if they were originally created earlier. NULL for accounting types outside the retsuko_* family (monopoly, kill queue, bank settlement, reverse accounts), which do not carry this signal."
   ts_load:
     description: "Timestamp of when the data was inserted into the table"

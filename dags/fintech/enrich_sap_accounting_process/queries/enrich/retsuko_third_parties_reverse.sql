@@ -400,7 +400,8 @@ SELECT
     base.accrual_year_month,
     base.dt_source_trigger,
     base.dt_sap_reference,
-    base.dt_sap_created
+    base.dt_sap_created,
+    base.dt_sap_reference AS dt_filter_end
 FROM
     base
 LEFT JOIN

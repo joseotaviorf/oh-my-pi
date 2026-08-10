@@ -81,7 +81,7 @@ sap_entity AS (
       )
 ),
 
-sap_gateway AS (
+sap_gateway_ranked AS (
     SELECT
         f.id_finance_entity,
         s.id_feature,
@@ -90,7 +90,8 @@ sap_gateway AS (
         s.status as sync_sap_job_status,
         w.status as sap_send_status,
         w.webhook_status as sap_processed_status,
-        w.errors AS webhook_error
+        w.errors AS webhook_error,
+        ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY w.ts_updated DESC) AS rn
     FROM
         datalake_sap_gateway_clean.feature f
     LEFT JOIN
@@ -104,7 +105,22 @@ sap_gateway AS (
         AND s.type IN ('LCM')
         AND s.status NOT IN ('ignore', 'ignored')
         AND DATE(f.ts_created) >= DATE('2025-01-01')
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY w.ts_updated DESC) = 1
+),
+
+sap_gateway AS (
+    SELECT
+        id_finance_entity,
+        id_feature,
+        hash,
+        type,
+        sync_sap_job_status,
+        sap_send_status,
+        sap_processed_status,
+        webhook_error
+    FROM
+        sap_gateway_ranked
+    WHERE
+        rn = 1
 ),
 
 sap AS (
@@ -116,11 +132,20 @@ sap AS (
         SUM(debit_credit) AS debit_credit,
         DATE(dt_created) AS dt_sap_created,
         DATE(dt_reference) AS dt_sap_reference
-    FROM 
-        datalake_accounting_funnel.ledger 
+    FROM
+        datalake_accounting_funnel.ledger
     WHERE 1=1
         AND account_number IN (700004)
     GROUP BY 1, 2, 3, 4, 6, 7
+),
+
+last_movement AS (
+  SELECT
+      id_finance_entity_entry,
+      account_number,
+      MAX(dt_sap_reference) AS dt_filter_end
+  FROM sap
+  GROUP BY 1, 2
 ),
 
 errors_base AS (
@@ -152,7 +177,8 @@ errors_base AS (
         CAST(SUM(COALESCE(sl_hash.debit_credit, 0)) AS DECIMAL(12,2)) AS sap_amount,
         MAX(r.dt_source_trigger) AS dt_source_trigger,
         MAX(sl_hash.dt_sap_created) AS dt_sap_created,
-        MAX(sl_hash.dt_sap_reference) AS dt_sap_reference
+        MAX(sl_hash.dt_sap_reference) AS dt_sap_reference,
+        MAX(lm.dt_filter_end) AS dt_filter_end
     FROM
         retsuko AS r
     LEFT JOIN
@@ -164,6 +190,10 @@ errors_base AS (
     LEFT JOIN
         sap AS sl_hash
             ON sl_hash.hash = sg.hash AND r.account_number = sl_hash.account_number
+    LEFT JOIN
+        last_movement lm
+            ON lm.id_finance_entity_entry = r.id_finance_entity_entry
+            AND lm.account_number = r.account_number
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 12
 ),
 
@@ -186,6 +216,7 @@ assertions_base AS (
     dt_source_trigger,
     dt_sap_reference,
     dt_sap_created,
+    dt_filter_end,
     IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness,
     CASE
       WHEN dt_sap_reference IS NULL OR dt_source_trigger IS NULL THEN FALSE
@@ -230,6 +261,7 @@ SELECT
   accrual_year_month,
   dt_source_trigger,
   dt_sap_reference,
-  dt_sap_created
+  dt_sap_created,
+  dt_filter_end
 FROM 
   assertions_base

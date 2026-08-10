@@ -85,3 +85,4 @@ astro/generated-dag-excludes.txt
 
 # Rightsizing validation trigger runtime ledger (appended per trigger; never committed)
 scripts/rightsizing_validation_trigger_ledger.jsonl
+.tars/

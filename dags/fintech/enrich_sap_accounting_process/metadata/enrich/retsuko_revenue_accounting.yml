@@ -98,3 +98,7 @@ columns:
     description: Creation date of transaction in SAP.
     lineage:
       - datalake_pas.ledger.dt_created
+  dt_filter_end:
+    description: Same value as dt_sap_reference, which already reflects the most recent SAP ledger movement for this id_finance_entity_entry and account_number.
+    lineage:
+      - datalake_pas.ledger.dt_reference

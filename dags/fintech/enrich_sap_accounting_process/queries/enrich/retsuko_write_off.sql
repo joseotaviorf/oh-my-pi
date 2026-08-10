@@ -24,7 +24,7 @@ sap AS (
         account_number = '513020'
 ),
 
-sap_gateway AS (
+sap_gateway_ranked AS (
   SELECT
     f.id_finance_entity,
     s.id_feature,
@@ -32,7 +32,8 @@ sap_gateway AS (
     s.status as sync_sap_job_status,
     w.status as sap_send_status,
     w.webhook_status as sap_processed_status,
-    w.errors AS webhook_error
+    w.errors AS webhook_error,
+    ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) AS rn
   FROM
     datalake_sap_gateway_clean.feature f
   LEFT JOIN
@@ -45,11 +46,25 @@ sap_gateway AS (
     s.erp_solution IN ('S4')
     AND s.type = 'LCM'
     AND s.status NOT IN ('ignore', 'ignored')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) = 1
 ),
 
-retsuko AS (
-    SELECT DISTINCT
+sap_gateway AS (
+  SELECT
+    id_finance_entity,
+    id_feature,
+    hash,
+    sync_sap_job_status,
+    sap_send_status,
+    sap_processed_status,
+    webhook_error
+  FROM
+    sap_gateway_ranked
+  WHERE
+    rn = 1
+),
+
+retsuko_ranked AS (
+    SELECT
         ct.id_external AS id_business_entity,
         i.id_external AS id_finance_entity,
         se.id_sap_gateway_feature,
@@ -60,7 +75,8 @@ retsuko AS (
         se.failed_reason,
         i.accrual_year_month,
         CAST(i.due_amount AS DECIMAL(12,2)) AS retsuko_amount,
-        DATE(i.ts_write_off) AS dt_source_trigger
+        DATE(i.ts_write_off) AS dt_source_trigger,
+        ROW_NUMBER() OVER (PARTITION BY se.id_finance_entity, se.event ORDER BY se.ts_updated DESC) AS rn
     FROM
         datalake_retsuko.entry  e
     INNER JOIN
@@ -75,7 +91,7 @@ retsuko AS (
     LEFT JOIN
         datalake_retsuko_clean.contract AS ct
             ON ct.id = e.id_contract
-    LEFT JOIN 
+    LEFT JOIN
         datalake_retsuko_clean.sap_entity AS se
             ON se.id_finance_entity = i.id_external
     WHERE
@@ -85,7 +101,25 @@ retsuko AS (
         AND af.type IN ('contract', 'tenant','landlord')
         AND at.type IN ('contract', 'tenant','landlord')
         AND i.reason NOT IN ('write-off-negotiation-cyber', 'write-off-negotiation-5A')
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY se.id_finance_entity, se.event ORDER BY se.ts_updated DESC) = 1
+),
+
+retsuko AS (
+    SELECT DISTINCT
+        id_business_entity,
+        id_finance_entity,
+        id_sap_gateway_feature,
+        version,
+        event,
+        status,
+        failed_status,
+        failed_reason,
+        accrual_year_month,
+        retsuko_amount,
+        dt_source_trigger
+    FROM
+        retsuko_ranked
+    WHERE
+        rn = 1
 ),
 
 df AS (
@@ -172,6 +206,7 @@ SELECT
     accrual_year_month,
     dt_source_trigger,
     dt_sap_reference,
-    dt_sap_created
-FROM 
+    dt_sap_created,
+    dt_sap_reference AS dt_filter_end
+FROM
     df

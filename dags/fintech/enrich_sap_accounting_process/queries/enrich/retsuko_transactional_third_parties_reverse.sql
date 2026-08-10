@@ -72,7 +72,7 @@ sap_entity AS (
       )
 ),
 
-sap_gateway AS (
+sap_gateway_ranked AS (
     SELECT
         f.id_finance_entity,
         s.id_feature,
@@ -81,7 +81,8 @@ sap_gateway AS (
         s.status as sync_sap_job_status,
         w.status as sap_send_status,
         w.webhook_status as sap_processed_status,
-        w.errors AS webhook_error
+        w.errors AS webhook_error,
+        ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY w.ts_updated DESC) AS rn
     FROM
         datalake_sap_gateway_clean.feature f
     LEFT JOIN
@@ -95,11 +96,26 @@ sap_gateway AS (
         AND s.type IN ('LCM')
         AND s.status NOT IN ('ignore', 'ignored')
         AND DATE(f.ts_created) >= DATE('2025-01-01')
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY w.ts_updated DESC) = 1
 ),
 
-sap AS (
-    SELECT 
+sap_gateway AS (
+    SELECT
+        id_finance_entity,
+        id_feature,
+        hash,
+        type,
+        sync_sap_job_status,
+        sap_send_status,
+        sap_processed_status,
+        webhook_error
+    FROM
+        sap_gateway_ranked
+    WHERE
+        rn = 1
+),
+
+sap_ranked AS (
+    SELECT
         id_business_entity,
         id_finance_entity,
         id_finance_entity_entry,
@@ -109,13 +125,31 @@ sap AS (
         source_client,
         DATE(dt_created) AS dt_sap_created,
         DATE(dt_reference) AS dt_sap_reference,
-        debit_credit AS debit_credit
-    FROM 
-        datalake_accounting_funnel.ledger 
+        debit_credit AS debit_credit,
+        ROW_NUMBER() OVER (PARTITION BY id_finance_entity, id_finance_entity_entry ORDER BY dt_created DESC) AS rn
+    FROM
+        datalake_accounting_funnel.ledger
     WHERE
         dt_reference >= '2025-01-01'
         AND account_number IN (700004)
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, id_finance_entity_entry ORDER BY dt_created DESC) = 1
+),
+
+sap AS (
+    SELECT
+        id_business_entity,
+        id_finance_entity,
+        id_finance_entity_entry,
+        hash,
+        account_number,
+        accrual_year_month,
+        source_client,
+        dt_sap_created,
+        dt_sap_reference,
+        debit_credit
+    FROM
+        sap_ranked
+    WHERE
+        rn = 1
 )
 ,
 base AS (
@@ -187,6 +221,7 @@ SELECT
     accrual_year_month,
     dt_source_trigger,
     dt_sap_reference,
-    dt_sap_created
+    dt_sap_created,
+    dt_sap_reference AS dt_filter_end
 FROM base
 WHERE id_finance_entity_entry_r IS NULL

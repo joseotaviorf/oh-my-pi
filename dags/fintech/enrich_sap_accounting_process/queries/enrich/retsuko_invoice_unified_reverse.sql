@@ -165,7 +165,8 @@ SELECT
     CAST(sl.debit_credit AS DECIMAL(12,2)) AS sap_amount,
     r.dt_source_trigger AS dt_source_trigger,
     sl.dt_sap_created AS dt_sap_created,
-    sl.dt_sap_reference AS dt_sap_reference
+    sl.dt_sap_reference AS dt_sap_reference,
+    sl.dt_sap_reference AS dt_filter_end
   FROM
     sap_ledger sl
  LEFT JOIN

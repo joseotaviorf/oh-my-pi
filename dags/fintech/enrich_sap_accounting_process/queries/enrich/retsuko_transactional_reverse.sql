@@ -586,6 +586,7 @@ SELECT
     accrual_year_month,
     dt_source_trigger,
     dt_sap_reference,
-    dt_sap_created
+    dt_sap_created,
+    dt_sap_reference AS dt_filter_end
 FROM base
 WHERE id_finance_entity_entry_r IS NULL
