@@ -202,11 +202,17 @@ workflow:
       extra_spark_job_arguments:
         - "1JdEi_cwBzs1NsY30dUCodAW3QOlxHarQgSRJTMeKTqo"
         - "base comp"
-    # Former notebook: dashboard_controle_de_ponto (Daily Pipeline).
+    # Former notebook: dashboard_controle_de_ponto (Daily Pipeline) — DBP-1844
     time_clock_hours_bank_monthly:
       extra_spark_job_arguments:
         - "1HkKsgv9cJdtCdbc1jESL6N50V_o0wB3mKgosc8MO-U0"
         - "horas_extras"
+    # Former notebook: dashboard_controle_de_ponto (Daily Pipeline) — DBP-1845
+    # Governance: docs/time_clock_hours_bank_current.md
+    time_clock_hours_bank_current:
+      extra_spark_job_arguments:
+        - "1HkKsgv9cJdtCdbc1jESL6N50V_o0wB3mKgosc8MO-U0"
+        - "current"
     # Former notebook view: people_governance_project_management
     governance_pm_roster:
       extra_spark_job_arguments:
