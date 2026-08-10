@@ -1,11 +1,7 @@
 cluster:
-  type: consolidation_xs_memory_single_node_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_xs_memory_single_node_cluster
   custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       # vocs-machina writes its timestamp columns (submitted_at, ts_classified)
       # as pandas datetime64[ns] -> Parquet INT64 (TIMESTAMP(NANOS,true)). Since
       # Spark 3.2 (SPARK-40819) the Parquet reader refuses NANOS and raises
