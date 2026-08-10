@@ -6,10 +6,10 @@ dag:
   catchup: false
   documentation:
     dag_purpose: |
-      Ingests Consórcio Blip WhatsApp chat JSONL from the QuintoAndar Data incoming
-      S3 bucket into datalake_consorcio_raw.blip_messages (backfill + incremental).
+      Ingests Consórcio Blip WhatsApp chat JSONL from the data-science S3 bucket
+      into datalake_consorcio_raw.blip_messages (backfill + incremental).
 
-      Sources (prod bucket 5a-datalake-incoming-prod):
+      Sources (prod bucket data-science.s3.data.quintoandar.com.br):
         - backfill: consorcio/blip/consorciois/backfill/{from_unix}_{to_unix}/batch_*.jsonl
         - incremental: consorcio/blip/consorciois/incremental/{job_start_unix}.jsonl
 
@@ -32,8 +32,8 @@ dag:
       source column is preserved from the conrado-blip CLI (blip_cli_backfill /
       blip_cli_incremental) and validated against the S3 prefix family.
 
-      Urgency: incoming bucket lifecycle expires objects after ~90 days (IA @ 30d).
-      Run promptly while backfill windows are still present.
+      Urgency: source objects may expire; run promptly while backfill windows are
+      still present.
 
 workflow:
   layer: raw

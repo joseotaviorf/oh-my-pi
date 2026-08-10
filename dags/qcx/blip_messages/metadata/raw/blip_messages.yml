@@ -5,11 +5,12 @@ owner: carlos.procha@quintoandar.com.br
 domain: QCX
 description: >
   Raw landing for Consórcio Blip WhatsApp chat messages from the conrado-blip CLI.
-  One row per Blip message from JSONL under s3://5a-datalake-incoming-prod/consorcio/
-  blip/consorciois/ (backfill batch_*.jsonl and incremental {job}.jsonl). Joinable
-  to datalake_consorcio_clean.lead via id_crm (HubSpot hs_object_id). Insert-only
+  One row per Blip message from JSONL under
+  s3://data-science.s3.data.quintoandar.com.br/consorcio/blip/consorciois/
+  (backfill batch_*.jsonl and incremental {job}.jsonl). Joinable to
+  datalake_consorcio_clean.lead via id_crm (HubSpot hs_object_id). Insert-only
   MERGE on id_message is the dedupe guarantee; s3_key records the winning source file.
-  Incoming objects expire after ~90 days — ingest promptly.
+  Source objects may expire — ingest promptly.
 columns:
   id_message:
     description: >
@@ -43,10 +44,11 @@ columns:
       validated against the S3 prefix family at ingest.
   s3_key:
     description: >
-      Incoming-bucket object key for the JSONL file that supplied this row (first
+      Source-bucket object key for the JSONL file that supplied this row (first
       successful ingest wins when the same id_message appears in multiple files).
   s3_bucket:
-    description: Incoming S3 bucket name (e.g. 5a-datalake-incoming-prod).
+    description: >
+      Source S3 bucket name (e.g. data-science.s3.data.quintoandar.com.br).
   ts_created:
     description: Message creation timestamp in UTC from Blip (ISO-8601).
   ts_load:

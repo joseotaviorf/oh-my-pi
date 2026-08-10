@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Load Consórcio Blip chat JSONL (backfill + incremental) into raw Delta.
 
-Incoming layout (prod):
+Incoming layout (prod data-science bucket):
   {incoming_base_path}/backfill/{from_unix}_{to_unix}/batch_*.jsonl
   {incoming_base_path}/incremental/{job_start_unix}.jsonl
 

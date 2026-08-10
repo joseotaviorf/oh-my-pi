@@ -12,11 +12,12 @@ description: >
   without duplicate messages.
 columns:
   s3_key:
-    description: Full incoming-bucket object key (primary merge key for the ledger).
+    description: Full source-bucket object key (primary merge key for the ledger).
   id_dag_run:
     description: Airflow dag_run.run_id that last processed this object.
   s3_bucket:
-    description: Incoming S3 bucket name (e.g. 5a-datalake-incoming-prod).
+    description: >
+      Source S3 bucket name (e.g. data-science.s3.data.quintoandar.com.br).
   etag:
     description: S3 object etag at ingest time; change triggers re-processing.
   status:
