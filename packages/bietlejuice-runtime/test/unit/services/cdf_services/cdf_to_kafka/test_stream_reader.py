@@ -135,7 +135,7 @@ class TestDeltaCDFReaderPrepareCdfStream:
 
         result_df, schema_id = reader.prepare_cdf_stream(kafka_topic="test-topic")
 
-        mock_filter.assert_called_once_with(mock_cdf)
+        mock_filter.assert_called_once_with(mock_cdf, include_delete_events=False)
         mock_drop.assert_called_once_with(mock_filtered)
         mock_validate_cassandra.assert_called_once_with(
             spark=spark_session_mock,
@@ -213,3 +213,52 @@ class TestDeltaCDFReaderPrepareCdfStream:
             schema_registry_api_secret=schema_registry_api_secret,
         )
         assert schema_id == 123
+
+    @patch(
+        "bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.validate_against_cassandra_schema"
+    )
+    @patch("bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.config")
+    @patch(
+        "bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.drop_partition_columns"
+    )
+    @patch(
+        "bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.filter_cdf_events"
+    )
+    def test_skips_cassandra_validation_when_schema_validation_none(
+        self,
+        mock_filter,
+        mock_drop,
+        mock_config,
+        mock_validate_cassandra,
+        spark_session_mock,
+        delta_table,
+        entity,
+        feature_set_name,
+    ):
+        mock_config.use_schema_registry = False
+        mock_cleaned = MagicMock()
+        mock_drop.return_value = mock_cleaned
+
+        mock_stream_builder = MagicMock()
+        spark_session_mock.readStream.format.return_value = mock_stream_builder
+        mock_stream_builder.option.return_value = mock_stream_builder
+        mock_stream_builder.table.return_value = MagicMock()
+
+        reader = DeltaCDFReader(
+            spark=spark_session_mock,
+            delta_table=delta_table,
+            entity=entity,
+            feature_set_name=feature_set_name,
+        )
+
+        reader.prepare_cdf_stream(
+            kafka_topic="test-topic",
+            schema_validation="none",
+            include_delete_events=True,
+        )
+
+        mock_filter.assert_called_once_with(
+            mock_stream_builder.table.return_value,
+            include_delete_events=True,
+        )
+        mock_validate_cassandra.assert_not_called()

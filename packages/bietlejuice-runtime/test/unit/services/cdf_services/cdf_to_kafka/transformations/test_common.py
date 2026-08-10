@@ -51,6 +51,23 @@ class TestFilterCdfEvents:
 
         assert result.count() == 0
 
+    def test_includes_delete_events_when_enabled(self, spark_session):
+        """Test that delete events are kept when include_delete_events is True."""
+        data = [
+            (1, "Alice", "insert"),
+            (2, "Bob", "delete"),
+            (3, "Charlie", "update_postimage"),
+        ]
+        schema = "id INT, name STRING, _change_type STRING"
+        df = spark_session.createDataFrame(data, schema)
+
+        result = filter_cdf_events(df, include_delete_events=True)
+        rows = result.collect()
+
+        assert len(rows) == 3
+        change_types = {row._change_type for row in rows}
+        assert change_types == {"insert", "delete", "update_postimage"}
+
 
 class TestDropPartitionColumns:
     """Unit tests for drop_partition_columns function."""

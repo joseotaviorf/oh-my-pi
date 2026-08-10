@@ -72,7 +72,12 @@ class DeltaCDFReader:
             .table(self.delta_table)
         )
 
-    def prepare_cdf_stream(self, kafka_topic: str) -> Tuple[DataFrame, Optional[int]]:
+    def prepare_cdf_stream(
+        self,
+        kafka_topic: str,
+        schema_validation: str = "cassandra",
+        include_delete_events: bool = False,
+    ) -> Tuple[DataFrame, Optional[int]]:
         """
         Read, filter, clean CDF stream and optionally register schema.
 
@@ -83,16 +88,24 @@ class DeltaCDFReader:
         cdf = self.read_cdf_stream()
 
         logger.info("Filtering and cleaning CDF events...")
-        filtered_cdf = filter_cdf_events(cdf)
+        filtered_cdf = filter_cdf_events(
+            cdf, include_delete_events=include_delete_events
+        )
         cleaned_cdf = drop_partition_columns(filtered_cdf)
 
-        logger.info("Validating CDF schema against Cassandra schema...")
-        validate_against_cassandra_schema(
-            spark=self.spark,
-            dataframe=cleaned_cdf,
-            entity=self.entity,
-            feature_set_name=self.feature_set_name,
-        )
+        if schema_validation == "cassandra":
+            logger.info("Validating CDF schema against Cassandra schema...")
+            validate_against_cassandra_schema(
+                spark=self.spark,
+                dataframe=cleaned_cdf,
+                entity=self.entity,
+                feature_set_name=self.feature_set_name,
+            )
+        else:
+            logger.info(
+                "Skipping Cassandra schema validation (schema_validation=%s)",
+                schema_validation,
+            )
 
         schema_id = None
         if config.use_schema_registry:

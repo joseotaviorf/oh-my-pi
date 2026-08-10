@@ -13,10 +13,15 @@ from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.wire_format 
 logger = logging.getLogger(__name__)
 
 
-def filter_cdf_events(df: DataFrame) -> DataFrame:
-    """Filter CDF events to include only inserts and update post-images."""
-    logger.info("Filtering CDF events: insert and update_postimage only")
-    return df.filter(df._change_type.isin(["insert", "update_postimage"]))
+def filter_cdf_events(df: DataFrame, include_delete_events: bool = False) -> DataFrame:
+    """Filter CDF events to inserts and update post-images, optionally deletes."""
+    allowed_types = ["insert", "update_postimage"]
+    if include_delete_events:
+        allowed_types.append("delete")
+        logger.info("Filtering CDF events: insert, update_postimage, and delete")
+    else:
+        logger.info("Filtering CDF events: insert and update_postimage only")
+    return df.filter(df._change_type.isin(allowed_types))
 
 
 def drop_partition_columns(df: DataFrame) -> DataFrame:

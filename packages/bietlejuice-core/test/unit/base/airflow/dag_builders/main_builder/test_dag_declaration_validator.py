@@ -611,3 +611,62 @@ class TestDAGDeclarationValidatorClusterValidationExemptions:
         dag_declaration_validator.validate_cluster_validation_cluster_diff(
             dag_declaration=dag_declaration
         )
+
+
+class TestDAGDeclarationValidatorQueryDeltaDatazordWorkflow:
+    @pytest.fixture
+    def dag_declaration_validator(self):
+        from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
+            DAGDeclarationValidator,
+        )
+
+        return DAGDeclarationValidator()
+
+    def _base_declaration(self, workflow: dict) -> dict:
+        return {
+            "dag": {"name": "enrich_transactional_entities", "owner": "Data Growth"},
+            "workflow": workflow,
+        }
+
+    def test_query_delta_datazord_requires_datazord_config(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = self._base_declaration(
+            {"type": "query_delta_datazord", "layer": "enrich"}
+        )
+
+        with pytest.raises(AssertionError, match="datazord_config"):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_query_delta_datazord_accepts_datazord_config(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = self._base_declaration(
+            {
+                "type": "query_delta_datazord",
+                "layer": "enrich",
+                "datazord_config": {
+                    "entity": "business_objects",
+                    "table": "entities",
+                    "key_columns": ["sk_entity"],
+                },
+            }
+        )
+
+        dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_query_delta_rejects_datazord_config(self, dag_declaration_validator):
+        dag_declaration = self._base_declaration(
+            {
+                "type": "query_delta",
+                "layer": "enrich",
+                "datazord_config": {
+                    "entity": "business_objects",
+                    "table": "entities",
+                    "key_columns": ["sk_entity"],
+                },
+            }
+        )
+
+        with pytest.raises(AssertionError, match="query_delta_datazord"):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)

@@ -2,6 +2,12 @@ from typing import List
 
 from airflow.models.baseoperator import BaseOperator
 
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.datazord_config import (
+    resolve_checkpoint_location,
+    resolve_include_delete_events,
+    resolve_kafka_topic,
+    resolve_schema_validation,
+)
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
@@ -31,12 +37,25 @@ class LoadCDFtoDatazordTaskCreator(BaseTaskCreator):
     def _get_parameters(
         self, table_attributes: TableAttributes, key_columns: List[str]
     ) -> List[str]:
+        datazord_config = self.dag_execution_context.workflow_args["datazord_config"]
         schema = table_attributes.schema
         table = table_attributes.table_name
-        entity = self.dag_execution_context.workflow_args["datazord_config"]["entity"]
-        topic = f"{self.dag_execution_context.environment}_wonka.{entity}"
-        checkpoint_location = f"{self.checkpoint_location}/{table}"
-        return [
+        entity = datazord_config["entity"]
+        dag_name = self.dag_execution_context.dag_args["name"]
+        workflow_type = self.dag_execution_context.workflow_args.get("type")
+        topic = resolve_kafka_topic(
+            datazord_config, self.dag_execution_context.environment
+        )
+        checkpoint_location = resolve_checkpoint_location(
+            self.checkpoint_location,
+            table,
+            workflow_type=workflow_type,
+            dag_name=dag_name,
+        )
+        schema_validation = resolve_schema_validation(datazord_config)
+        include_delete_events = resolve_include_delete_events(datazord_config)
+
+        parameters = [
             "--delta-table",
             f"{schema}.{table}",
             "--key-columns",
@@ -49,7 +68,12 @@ class LoadCDFtoDatazordTaskCreator(BaseTaskCreator):
             checkpoint_location,
             "--entity",
             entity,
+            "--schema-validation",
+            schema_validation,
         ]
+        if include_delete_events:
+            parameters.append("--include-delete-events")
+        return parameters
 
     def create_task(
         self, table_attributes: TableAttributes, key_columns: List[str]

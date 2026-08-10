@@ -37,6 +37,8 @@ class DeltaCDFToKafkaService:
         schema_registry_url: Optional[str] = None,
         schema_registry_api_key: Optional[str] = None,
         schema_registry_api_secret: Optional[str] = None,
+        schema_validation: str = "cassandra",
+        include_delete_events: bool = False,
     ):
         """
         Initialize the Delta CDF to Kafka processor.
@@ -58,6 +60,8 @@ class DeltaCDFToKafkaService:
         self.checkpoint_location = checkpoint_location
         self.kafka_options = kafka_options
         self.entity = entity
+        self.schema_validation = schema_validation
+        self.include_delete_events = include_delete_events
 
         table_name = self.delta_table.split(".")[-1]
         self.feature_set_name = table_name.replace("__latest", "")
@@ -90,7 +94,9 @@ class DeltaCDFToKafkaService:
         self.reader.validate_table()
 
         cleaned_cdf, schema_id = self.reader.prepare_cdf_stream(
-            kafka_topic=self.kafka_options["topic"]
+            kafka_topic=self.kafka_options["topic"],
+            schema_validation=self.schema_validation,
+            include_delete_events=self.include_delete_events,
         )
 
         transformed_cdf = cdf_to_kafka_format(

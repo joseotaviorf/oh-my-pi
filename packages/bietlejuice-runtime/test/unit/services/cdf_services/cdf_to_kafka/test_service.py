@@ -122,7 +122,9 @@ class TestDeltaCDFToKafkaServiceRun:
 
         mock_reader_instance.validate_table.assert_called_once()
         mock_reader_instance.prepare_cdf_stream.assert_called_once_with(
-            kafka_topic="test-topic"
+            kafka_topic="test-topic",
+            schema_validation="cassandra",
+            include_delete_events=False,
         )
         mock_cdf_to_kafka_format.assert_called_once_with(
             cdf_dataframe=mock_cleaned_cdf,

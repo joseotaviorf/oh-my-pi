@@ -508,6 +508,26 @@ class DAGDeclarationValidator(Validator):
                             "required": True,
                             "empty": False,
                         },
+                        "kafka_topic": {
+                            "type": "string",
+                            "required": False,
+                            "empty": False,
+                        },
+                        "topic_namespace": {
+                            "type": "string",
+                            "required": False,
+                            "empty": False,
+                        },
+                        "schema_validation": {
+                            "type": "string",
+                            "required": False,
+                            "empty": False,
+                            "allowed": ["cassandra", "none"],
+                        },
+                        "include_delete_events": {
+                            "type": "boolean",
+                            "required": False,
+                        },
                     },
                 },
             },
@@ -629,6 +649,10 @@ class DAGDeclarationValidator(Validator):
             self._validate_api_ingestion_workflow(dag_declaration)
         if workflow_type == WorkflowEnum.QUERY_VIEW_WORKFLOW.value:
             self._validate_query_view_workflow(dag_declaration)
+        if workflow_type == WorkflowEnum.QUERY_DELTA_DATAZORD_WORKFLOW.value:
+            self._check_query_delta_datazord_config(dag_declaration)
+        if workflow_type == WorkflowEnum.QUERY_DELTA_WORKFLOW.value:
+            self._check_query_delta_rejects_datazord_config(dag_declaration)
 
     def _validate_query_view_workflow(self, dag_declaration: dict) -> None:
         workflow = dag_declaration.get("workflow", {})
@@ -654,6 +678,28 @@ class DAGDeclarationValidator(Validator):
                     f"msg=Invalid query_view sync configuration for table "
                     f"'{table_name}': {exc}"
                 ) from exc
+
+    @staticmethod
+    def _check_query_delta_datazord_config(dag_declaration: dict) -> None:
+        workflow = dag_declaration.get("workflow", {})
+        datazord_config = workflow.get("datazord_config")
+        if not datazord_config:
+            raise AssertionError(
+                "m=_check_query_delta_datazord_config, "
+                "msg='datazord_config' is required when workflow.type is "
+                "'query_delta_datazord'"
+            )
+
+    @staticmethod
+    def _check_query_delta_rejects_datazord_config(dag_declaration: dict) -> None:
+        workflow = dag_declaration.get("workflow", {})
+        if workflow.get("datazord_config"):
+            raise AssertionError(
+                "m=_check_query_delta_rejects_datazord_config, "
+                "msg='datazord_config' is only supported for workflow.type "
+                "'query_delta_datazord' (or 'wonka'); use "
+                "'query_delta_datazord' for CDF → Datazord streaming"
+            )
 
     def validate_cluster_validation_cluster_diff(self, dag_declaration: dict) -> None:
         """Validate prod vs consolidation cluster types after cluster YAML is merged."""

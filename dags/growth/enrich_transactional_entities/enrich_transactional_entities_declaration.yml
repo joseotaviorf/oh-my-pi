@@ -6,10 +6,17 @@ dag:
     dag_purpose: |
       This DAG creates enriched tables containing the CDP Transactional entities vision.
 workflow:
-  type: query_delta
+  type: query_delta_datazord
   layer: enrich
   default_extraction_type: incremental
   execution_timeout_hours: 1
+  datazord_config:
+    entity: business_objects
+    table: entities
+    key_columns: [sk_entity]
+    topic_namespace: datazord
+    schema_validation: none
+    include_delete_events: true
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

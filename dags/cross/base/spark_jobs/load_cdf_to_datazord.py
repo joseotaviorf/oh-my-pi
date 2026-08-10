@@ -57,6 +57,20 @@ def parse_arguments():
     parser.add_argument("--entity", required=True, help="Entity name")
 
     parser.add_argument(
+        "--schema-validation",
+        choices=["cassandra", "none"],
+        default="cassandra",
+        help="Schema validation mode before publishing to Kafka",
+    )
+
+    parser.add_argument(
+        "--include-delete-events",
+        action="store_true",
+        default=False,
+        help="Include CDF delete events in the Kafka stream",
+    )
+
+    parser.add_argument(
         "--extra-metadata",
         required=False,
         default="{}",
@@ -113,6 +127,8 @@ def main():
         },
         checkpoint_location=args.checkpoint_location,
         entity=args.entity,
+        schema_validation=args.schema_validation,
+        include_delete_events=args.include_delete_events,
     )
 
     service.run()

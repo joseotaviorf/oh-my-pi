@@ -19,6 +19,7 @@ class WorkflowEnum(Enum):
     LOAD_ACCESS_WORKFLOW = "load_access"
     LOAD_WORKFLOW = "load"
     QUERY_DELTA_WORKFLOW = "query_delta"
+    QUERY_DELTA_DATAZORD_WORKFLOW = "query_delta_datazord"
     QUERY_WORKFLOW = "query"
     QUERY_VIEW_WORKFLOW = "query_view"
     QUBE_DIMENSION_WORKFLOW = "qube_dimension"
