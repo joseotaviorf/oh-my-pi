@@ -38,7 +38,9 @@ class LoadCDFtoDatazordTaskCreator(BaseTaskCreator):
         self, table_attributes: TableAttributes, key_columns: List[str]
     ) -> List[str]:
         datazord_config = self.dag_execution_context.workflow_args["datazord_config"]
-        schema = table_attributes.schema
+        # Use the physical metastore database (e.g. datalake_transactional_entities),
+        # not the logical schema from the DAG name (transactional_entities).
+        database_name = table_attributes.get_prod_database_name()
         table = table_attributes.table_name
         entity = datazord_config["entity"]
         dag_name = self.dag_execution_context.dag_args["name"]
@@ -57,7 +59,7 @@ class LoadCDFtoDatazordTaskCreator(BaseTaskCreator):
 
         parameters = [
             "--delta-table",
-            f"{schema}.{table}",
+            f"{database_name}.{table}",
             "--key-columns",
             ",".join(key_columns),
             "--kafka-topic",

@@ -14,7 +14,7 @@ _CONFIGURATION_SERVICE_PATH = (
 
 def _make_table_attributes():
     return TableAttributes(
-        dag_args={"name": "enrich-transactional-entities"},
+        dag_args={"name": "enrich_transactional_entities"},
         workflow_args={
             "type": "query_delta_datazord",
             "datazord_config": {
@@ -35,7 +35,7 @@ def _make_context():
     ctx = mock.MagicMock()
     ctx.environment = "forno"
     ctx.workflow_args = _make_table_attributes().workflow_args
-    ctx.dag_args = {"name": "enrich-transactional-entities"}
+    ctx.dag_args = {"name": "enrich_transactional_entities"}
     return ctx
 
 
@@ -58,7 +58,7 @@ class TestLoadCDFtoDatazordTaskCreator:
 
         assert params == [
             "--delta-table",
-            "enrich-transactional-entities.entities",
+            "datalake_transactional_entities.entities",
             "--key-columns",
             "sk_entity",
             "--kafka-topic",
@@ -66,13 +66,35 @@ class TestLoadCDFtoDatazordTaskCreator:
             "--kafka-bootstrap-servers",
             "kafka:9092",
             "--checkpoint-location",
-            "s3://checkpoints/enrich-transactional-entities/entities",
+            "s3://checkpoints/enrich_transactional_entities/entities",
             "--entity",
             "business_objects",
             "--schema-validation",
             "none",
             "--include-delete-events",
         ]
+
+    def test_delta_table_uses_prod_database_not_logical_schema(self):
+        """Regression: CDF must resolve enrich schema via metastore mapping."""
+        creator = LoadCDFtoDatazordTaskCreator(
+            dag_execution_context=_make_context(),
+            config_service=mock.MagicMock(
+                get_config=mock.Mock(
+                    side_effect=lambda key: {
+                        "datazord_kafka_bootstrap_servers": "kafka:9092",
+                        "datazord_base_checkpoint_location": "s3://checkpoints",
+                    }[key]
+                )
+            ),
+        )
+        table_attrs = _make_table_attributes()
+
+        params = creator._get_parameters(table_attrs, ["sk_entity"])
+
+        assert table_attrs.schema == "transactional_entities"
+        assert params[params.index("--delta-table") + 1] == (
+            "datalake_transactional_entities.entities"
+        )
 
     def test_wonka_default_topic_when_kafka_topic_omitted(self):
         ctx = _make_context()
