@@ -7,7 +7,7 @@ WITH exploded_contact_associations AS (
     FROM
         datalake_hubspot.contact
 ),
-company_contacts AS (
+company_contacts_ranked AS (
     SELECT
         id_contact,
         company.id AS id_company,
@@ -16,17 +16,31 @@ company_contacts AS (
             ELSE 'SECONDARY_COMPANY'
         END AS company_association_type,
         occupation,
-        ts_contact_created
-    FROM
-        exploded_contact_associations
-    QUALIFY
+        ts_contact_created,
         ROW_NUMBER() OVER (
             PARTITION BY
                 id_contact,
-                id_company
+                company.id
             ORDER BY
-                company_association_type -- Main comes before secondary alphabetically. If the company is both main and secondary, keep only the primary record
-        ) = 1
+                CASE company.type
+                    WHEN 'contact_to_company' THEN 'MAIN_COMPANY'
+                    ELSE 'SECONDARY_COMPANY'
+                END -- Main comes before secondary alphabetically. If the company is both main and secondary, keep only the primary record
+        ) AS rn
+    FROM
+        exploded_contact_associations
+),
+company_contacts AS (
+    SELECT
+        id_contact,
+        id_company,
+        company_association_type,
+        occupation,
+        ts_contact_created
+    FROM
+        company_contacts_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     id_company,

@@ -16,11 +16,11 @@ WITH exploded_stages AS (
         datalake_hubspot_clean.ticket_pipeline
 )
 SELECT
-    stage_struct.id::BIGINT AS id_stage,
-    id_pipeline::BIGINT AS id_pipeline,
+    CAST(stage_struct.id AS BIGINT) AS id_stage,
+    CAST(id_pipeline AS BIGINT) AS id_pipeline,
     stage_struct.label AS label,
     stage_struct.metadata AS metadata,
-    stage_struct.display_order::INT AS display_order,
+    CAST(stage_struct.display_order AS INT) AS display_order,
     is_deal_stage,
     is_ticket_stage,
     stage_struct.archived AS is_archived,

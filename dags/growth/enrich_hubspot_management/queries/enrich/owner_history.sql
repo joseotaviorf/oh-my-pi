@@ -1,6 +1,6 @@
 SELECT
-    id_owner::BIGINT AS id_owner,
-    id_user::BIGINT AS id_user,
+    CAST(id_owner AS BIGINT) AS id_owner,
+    CAST(id_user AS BIGINT) AS id_user,
     email,
     first_name,
     last_name,

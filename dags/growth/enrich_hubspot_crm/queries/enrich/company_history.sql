@@ -1,11 +1,11 @@
 SELECT
-    id_company::BIGINT,
-    GET_JSON_OBJECT(properties, '$.hubspot_owner_id')::BIGINT AS id_hubspot_owner,
-    GET_JSON_OBJECT(properties, '$.hubspot_team_id')::BIGINT AS id_hubspot_team,
-    GET_JSON_OBJECT(properties, '$.hs_parent_company_id')::BIGINT AS id_parent_company,
+    CAST(id_company AS BIGINT) AS id_company,
+    CAST(GET_JSON_OBJECT(properties, '$.hubspot_owner_id') AS BIGINT) AS id_hubspot_owner,
+    CAST(GET_JSON_OBJECT(properties, '$.hubspot_team_id') AS BIGINT) AS id_hubspot_team,
+    CAST(GET_JSON_OBJECT(properties, '$.hs_parent_company_id') AS BIGINT) AS id_parent_company,
     TRANSFORM(
         SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.hs_merged_object_ids'), ''), ';'),
-        x -> x::BIGINT
+        x -> CAST(x AS BIGINT)
     ) AS ids_merged_companies,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.atuacao_da_imobiliaria'), ''), ';') AS fields_of_business,
     NULLIF(GET_JSON_OBJECT(properties, '$.address'), '') AS address,
@@ -45,49 +45,21 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.categoria_do_membro___for_rent'), '') AS rent_member_category,
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.categoria_do_membro'),
-        'array<struct<
-            value:string,
-            timestamp:timestamp,
-            sourceType:string,
-            sourceId:string,
-            sourceLabel:string,
-            updatedByUserId:string
-        >>'
+        'array<struct<value:string,timestamp:timestamp,sourceType:string,sourceId:string,sourceLabel:string,updatedByUserId:string>>'
     ) AS member_category_history,
     -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
     -- After that, lead_status will be deprecated and we will remove the row above
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.categoria_do_membro'),
-        'array<struct<
-            value:string,
-            timestamp:timestamp,
-            sourceType:string,
-            sourceId:string,
-            sourceLabel:string,
-            updatedByUserId:string
-        >>'
+        'array<struct<value:string,timestamp:timestamp,sourceType:string,sourceId:string,sourceLabel:string,updatedByUserId:string>>'
     ) AS sale_member_category_history,
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.categoria_do_membro___for_rent'),
-        'array<struct<
-            value:string,
-            timestamp:timestamp,
-            sourceType:string,
-            sourceId:string,
-            sourceLabel:string,
-            updatedByUserId:string
-        >>'
+        'array<struct<value:string,timestamp:timestamp,sourceType:string,sourceId:string,sourceLabel:string,updatedByUserId:string>>'
     ) AS rent_member_category_history,
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.esta_carteirizada_'),
-        'array<struct<
-            value:string,
-            timestamp:timestamp,
-            sourceType:string,
-            sourceId:string,
-            sourceLabel:string,
-            updatedByUserId:string
-        >>'
+        'array<struct<value:string,timestamp:timestamp,sourceType:string,sourceId:string,sourceLabel:string,updatedByUserId:string>>'
     ) AS company_cluster_history,
     NULLIF(GET_JSON_OBJECT(properties, '$.origem_do_lead'), '') AS lead_origin,
     NULLIF(GET_JSON_OBJECT(properties, '$.phone'), '') AS phone,
@@ -119,38 +91,17 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.status_do_lead___for_rent'), '') AS rent_lead_status,
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.hs_lead_status'),
-        'array<struct<
-            value:string,
-            timestamp:timestamp,
-            sourceType:string,
-            sourceId:string,
-            sourceLabel:string,
-            updatedByUserId:string
-        >>'
+        'array<struct<value:string,timestamp:timestamp,sourceType:string,sourceId:string,sourceLabel:string,updatedByUserId:string>>'
     ) AS lead_status_history,
     -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
     -- After that, lead_status will be deprecated and we will remove the row above
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.hs_lead_status'),
-        'array<struct<
-            value:string,
-            timestamp:timestamp,
-            sourceType:string,
-            sourceId:string,
-            sourceLabel:string,
-            updatedByUserId:string
-        >>'
+        'array<struct<value:string,timestamp:timestamp,sourceType:string,sourceId:string,sourceLabel:string,updatedByUserId:string>>'
     ) AS sale_lead_status_history,
     FROM_JSON(
         GET_JSON_OBJECT(properties_with_history, '$.status_do_lead___for_rent'),
-        'array<struct<
-            value:string,
-            timestamp:timestamp,
-            sourceType:string,
-            sourceId:string,
-            sourceLabel:string,
-            updatedByUserId:string
-        >>'
+        'array<struct<value:string,timestamp:timestamp,sourceType:string,sourceId:string,sourceLabel:string,updatedByUserId:string>>'
     ) AS rent_lead_status_history,
     NULLIF(GET_JSON_OBJECT(properties, '$.link_do_relatorio_consolidado'), '') AS report_link,
     NULLIF(GET_JSON_OBJECT(properties, '$.perfil_do_estoque'), '') AS inventory_profile,
@@ -159,27 +110,27 @@ SELECT
     GET_JSON_OBJECT(properties, '$.expert_supply_responsavel') AS responsible_supply_expert,
     GET_JSON_OBJECT(properties, '$.expert_demand_responsavel') AS responsible_demand_expert,
     GET_JSON_OBJECT(properties, '$.pessoas_de_ops_supply_responsavel') AS responsible_operations_supply,
-    GET_JSON_OBJECT(properties, '$.ccv_medio_mensal')::INT AS average_monthly_ccvs,
-    GET_JSON_OBJECT(properties, '$.ccvs_mes_da_imobiliaria_sem_ser_com_rede_5a')::INT AS average_monthly_ccvs_outside_rede_quintoandar,
-    GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_imoveis_a_venda')::INT AS num_properties_for_sale_farming_qualification,
-    GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_imoveis_para_locacao')::INT AS num_properties_for_rent_farming_qualification,
-    GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_corretores')::INT AS num_real_estate_agents_farming_qualification,
-    GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_gerentes')::INT AS num_managers_farming_qualification,
-    GET_JSON_OBJECT(properties, '$.qualificacao_farming___ticket_medio_de_imoveis_de_venda')::INT AS average_sale_property_ticket_farming_qualification,
-    GET_JSON_OBJECT(properties, '$.qualificacao_farming___ticket_medio_de_imoveis_para_locacao')::INT AS average_rent_property_ticket_farming_qualification,
-    COALESCE(GET_JSON_OBJECT(properties, '$.num_associated_deals')::INT, 0) AS num_associated_deals,
-    COALESCE(GET_JSON_OBJECT(properties, '$.num_associated_contacts')::INT, 0) AS num_associated_contacts,
-    GET_JSON_OBJECT(properties, '$.qual_a_media_de_novos_contratos_de_locacao_mes_')::INT AS monthly_average_new_rental_contracts,
-    GET_JSON_OBJECT(properties, '$.quantidade_de_gerentes')::INT AS num_managers,
-    GET_JSON_OBJECT(properties, '$.qual_a_quantidade_de_imoveis_administrados_')::INT AS num_managed_properties,
-    GET_JSON_OBJECT(properties, '$.quantos_leads_recebem_por_mes')::INT AS num_monthly_leads,
-    GET_JSON_OBJECT(properties, '$.ticket_medio_de_imoveis_de_venda')::INT AS average_sale_property_ticket,
-    GET_JSON_OBJECT(properties, '$.ticket_medio_de_imoveis_para_locacao')::INT AS average_rent_property_ticket,
-    GET_JSON_OBJECT(properties, '$.volume_de_repasse_mensal__vgv_r__')::INT AS monthly_repayment_volume_in_real,
-    GET_JSON_OBJECT(properties, '$.volume_de_vendas__vgv_r__')::INT AS monthly_sale_volume_in_real,
-    GET_JSON_OBJECT(properties, '$.quantidade_de_corretores')::INT AS num_real_estate_agents,
-    GET_JSON_OBJECT(properties, '$.quantidade_de_imoveis_a_venda')::INT AS num_properties_for_sale,
-    GET_JSON_OBJECT(properties, '$.quantidade_de_imoveis_para_locacao')::INT AS num_properties_for_rent,
+    CAST(GET_JSON_OBJECT(properties, '$.ccv_medio_mensal') AS INT) AS average_monthly_ccvs,
+    CAST(GET_JSON_OBJECT(properties, '$.ccvs_mes_da_imobiliaria_sem_ser_com_rede_5a') AS INT) AS average_monthly_ccvs_outside_rede_quintoandar,
+    CAST(GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_imoveis_a_venda') AS INT) AS num_properties_for_sale_farming_qualification,
+    CAST(GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_imoveis_para_locacao') AS INT) AS num_properties_for_rent_farming_qualification,
+    CAST(GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_corretores') AS INT) AS num_real_estate_agents_farming_qualification,
+    CAST(GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_gerentes') AS INT) AS num_managers_farming_qualification,
+    CAST(GET_JSON_OBJECT(properties, '$.qualificacao_farming___ticket_medio_de_imoveis_de_venda') AS INT) AS average_sale_property_ticket_farming_qualification,
+    CAST(GET_JSON_OBJECT(properties, '$.qualificacao_farming___ticket_medio_de_imoveis_para_locacao') AS INT) AS average_rent_property_ticket_farming_qualification,
+    COALESCE(CAST(GET_JSON_OBJECT(properties, '$.num_associated_deals') AS INT), 0) AS num_associated_deals,
+    COALESCE(CAST(GET_JSON_OBJECT(properties, '$.num_associated_contacts') AS INT), 0) AS num_associated_contacts,
+    CAST(GET_JSON_OBJECT(properties, '$.qual_a_media_de_novos_contratos_de_locacao_mes_') AS INT) AS monthly_average_new_rental_contracts,
+    CAST(GET_JSON_OBJECT(properties, '$.quantidade_de_gerentes') AS INT) AS num_managers,
+    CAST(GET_JSON_OBJECT(properties, '$.qual_a_quantidade_de_imoveis_administrados_') AS INT) AS num_managed_properties,
+    CAST(GET_JSON_OBJECT(properties, '$.quantos_leads_recebem_por_mes') AS INT) AS num_monthly_leads,
+    CAST(GET_JSON_OBJECT(properties, '$.ticket_medio_de_imoveis_de_venda') AS INT) AS average_sale_property_ticket,
+    CAST(GET_JSON_OBJECT(properties, '$.ticket_medio_de_imoveis_para_locacao') AS INT) AS average_rent_property_ticket,
+    CAST(GET_JSON_OBJECT(properties, '$.volume_de_repasse_mensal__vgv_r__') AS INT) AS monthly_repayment_volume_in_real,
+    CAST(GET_JSON_OBJECT(properties, '$.volume_de_vendas__vgv_r__') AS INT) AS monthly_sale_volume_in_real,
+    CAST(GET_JSON_OBJECT(properties, '$.quantidade_de_corretores') AS INT) AS num_real_estate_agents,
+    CAST(GET_JSON_OBJECT(properties, '$.quantidade_de_imoveis_a_venda') AS INT) AS num_properties_for_sale,
+    CAST(GET_JSON_OBJECT(properties, '$.quantidade_de_imoveis_para_locacao') AS INT) AS num_properties_for_rent,
     NULLIF(GET_JSON_OBJECT(properties, '$.utiliza_algum_crm_'), '') = 'Sim' AS has_crm,
     NULLIF(GET_JSON_OBJECT(properties, '$.anuncia_os_imoveis_online_'), '') = 'Sim' AS has_property_advertisement_online,
     NULLIF(GET_JSON_OBJECT(properties, '$.atua_como_correspondente_bancario_'), '') = 'Sim' AS is_correspondent_bank,
@@ -193,12 +144,12 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.digito_creci'), '') = 'PJ' AS is_juridical_person,
     is_archived,
     TRUE AS has_3p_access_control,
-    GET_JSON_OBJECT(properties, '$.first_conversion_date')::TIMESTAMP AS ts_first_conversion,
-    GET_JSON_OBJECT(properties, '$.recent_deal_close_date')::TIMESTAMP AS ts_recent_deal_close,
-    GET_JSON_OBJECT(properties, '$.hubspot_owner_assigneddate')::TIMESTAMP AS ts_hubspot_owner_assigned,
-    GET_JSON_OBJECT(properties, '$.hs_last_logged_call_date')::TIMESTAMP AS ts_last_logged_call,
-    GET_JSON_OBJECT(properties, '$.notes_last_updated')::TIMESTAMP AS ts_notes_last_updated,
-    GET_JSON_OBJECT(properties, '$.demand_only__data_da_live')::TIMESTAMP AS ts_live_demand_only,
+    CAST(GET_JSON_OBJECT(properties, '$.first_conversion_date') AS TIMESTAMP) AS ts_first_conversion,
+    CAST(GET_JSON_OBJECT(properties, '$.recent_deal_close_date') AS TIMESTAMP) AS ts_recent_deal_close,
+    CAST(GET_JSON_OBJECT(properties, '$.hubspot_owner_assigneddate') AS TIMESTAMP) AS ts_hubspot_owner_assigned,
+    CAST(GET_JSON_OBJECT(properties, '$.hs_last_logged_call_date') AS TIMESTAMP) AS ts_last_logged_call,
+    CAST(GET_JSON_OBJECT(properties, '$.notes_last_updated') AS TIMESTAMP) AS ts_notes_last_updated,
+    CAST(GET_JSON_OBJECT(properties, '$.demand_only__data_da_live') AS TIMESTAMP) AS ts_live_demand_only,
     ts_archived,
     ts_created,
     ts_updated,

@@ -1,6 +1,6 @@
 WITH exploded_stages AS (
     SELECT
-        id_deal::BIGINT,
+        CAST(id_deal AS BIGINT) AS id_deal,
         EXPLODE(id_stage_history) AS stage_struct
     FROM
         datalake_hubspot.deal
@@ -8,7 +8,7 @@ WITH exploded_stages AS (
 calculated_end_timestamps AS (
     SELECT 
         id_deal,
-        stage_struct.value::BIGINT AS id_stage,
+        CAST(stage_struct.value AS BIGINT) AS id_stage,
         stage_struct['updatedByUserId'] AS id_user_updated_by,
         stage_struct['sourceType'] AS source_type,
         stage_struct.timestamp AS ts_stage_started,

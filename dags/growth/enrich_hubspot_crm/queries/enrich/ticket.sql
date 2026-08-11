@@ -1,3 +1,34 @@
+WITH ticket_history_ranked AS (
+    SELECT
+        id_ticket,
+        id_deal,
+        id_company,
+        id_stage,
+        id_pipeline,
+        id_hubspot_owner,
+        id_stage_history,
+        id_pipeline_history,
+        content,
+        subject,
+        onboarding_type,
+        field_sales,
+        has_accepted_contact_with_agents,
+        is_archived,
+        dt_term_signed,
+        dt_term_sent,
+        dt_documents_received,
+        dt_onboarding,
+        ts_live_demand_only,
+        ts_archived,
+        ts_created,
+        ts_updated,
+        year,
+        month,
+        day,
+        ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS rn
+    FROM
+        datalake_hubspot.ticket_history
+)
 SELECT
     id_ticket,
     id_deal,
@@ -25,6 +56,6 @@ SELECT
     month,
     day
 FROM
-    datalake_hubspot.ticket_history
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
+    ticket_history_ranked
+WHERE
+    rn = 1

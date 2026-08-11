@@ -1,13 +1,13 @@
 WITH exploded_history_sale AS (
     SELECT
-        id_company::BIGINT,
+        CAST(id_company AS BIGINT) AS id_company,
         EXPLODE(sale_lead_status_history) AS lead_status_struct
     FROM
         datalake_hubspot.company
 ),
 exploded_history_rent AS (
     SELECT
-        id_company::BIGINT,
+        CAST(id_company AS BIGINT) AS id_company,
         EXPLODE(rent_lead_status_history) AS lead_status_struct
     FROM
         datalake_hubspot.company

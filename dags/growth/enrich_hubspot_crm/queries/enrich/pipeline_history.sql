@@ -50,9 +50,9 @@ pipelines_redundancies_numbered AS (
         united_pipelines
 )
 SELECT
-    id_pipeline::BIGINT,
+    CAST(id_pipeline AS BIGINT) AS id_pipeline,
     label,
-    display_order::INT,
+    CAST(display_order AS INT) AS display_order,
     is_deal_pipeline,
     is_ticket_pipeline,
     is_archived,

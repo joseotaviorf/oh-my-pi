@@ -1,7 +1,7 @@
 SELECT
-    c.id_contact::BIGINT,
-    GET_JSON_OBJECT(c.properties, '$.hubspot_owner_id')::BIGINT AS id_hubspot_owner,
-    GET_JSON_OBJECT(c.associations, '$.companies.results[0].id')::BIGINT AS id_company,
+    CAST(c.id_contact AS BIGINT) AS id_contact,
+    CAST(GET_JSON_OBJECT(c.properties, '$.hubspot_owner_id') AS BIGINT) AS id_hubspot_owner,
+    CAST(GET_JSON_OBJECT(c.associations, '$.companies.results[0].id') AS BIGINT) AS id_company,
     u.id AS id_ebdb_user,
     FROM_JSON(
           GET_JSON_OBJECT(c.associations, '$.companies.results'),
@@ -40,28 +40,21 @@ SELECT
     NULLIF(GET_JSON_OBJECT(c.properties, '$.hs_lead_status'), '') AS lead_status,
     FROM_JSON(
         GET_JSON_OBJECT(c.properties_with_history, '$.hs_lead_status'),
-        'array<struct<
-            value:string,
-            timestamp:timestamp,
-            sourceType:string,
-            sourceId:string,
-            sourceLabel:string,
-            updatedByUserId:string
-        >>'
+        'array<struct<value:string,timestamp:timestamp,sourceType:string,sourceId:string,sourceLabel:string,updatedByUserId:string>>'
     ) AS lead_status_history,
-    GET_JSON_OBJECT(c.properties, '$.num_conversion_events')::INT AS num_conversion_events,
-    GET_JSON_OBJECT(c.properties, '$.num_associated_deals')::INT AS num_associated_deals,
-    GET_JSON_OBJECT(c.properties, '$.hs_sequences_is_enrolled')::BOOLEAN AS is_enrolled_in_sequence,
+    CAST(GET_JSON_OBJECT(c.properties, '$.num_conversion_events') AS INT) AS num_conversion_events,
+    CAST(GET_JSON_OBJECT(c.properties, '$.num_associated_deals') AS INT) AS num_associated_deals,
+    CAST(GET_JSON_OBJECT(c.properties, '$.hs_sequences_is_enrolled') AS BOOLEAN) AS is_enrolled_in_sequence,
     CASE GET_JSON_OBJECT(c.properties, '$.demand_only__corretor_participou_da_live_de_onboarding_')
         WHEN 'Sim' THEN TRUE
-        ELSE COALESCE(GET_JSON_OBJECT(c.properties, '$.demand_only__corretor_participou_da_live_de_onboarding_')::BOOLEAN, FALSE)
+        ELSE COALESCE(CAST(GET_JSON_OBJECT(c.properties, '$.demand_only__corretor_participou_da_live_de_onboarding_') AS BOOLEAN), FALSE)
     END AS has_been_in_demand_only_onboarding_live,
     c.is_archived,
-    GET_JSON_OBJECT(c.properties, '$.first_conversion_date')::TIMESTAMP AS ts_first_conversion,
-    GET_JSON_OBJECT(c.properties, '$.notes_last_updated')::TIMESTAMP AS ts_notes_last_updated,
-    GET_JSON_OBJECT(c.properties, '$.notes_next_activity_date')::TIMESTAMP AS ts_notes_next_activity,
-    GET_JSON_OBJECT(c.properties, '$.closedate')::TIMESTAMP AS ts_closed,
-    GET_JSON_OBJECT(c.properties, '$.demand_only__data_da_live')::TIMESTAMP AS ts_live_demand_only,
+    CAST(GET_JSON_OBJECT(c.properties, '$.first_conversion_date') AS TIMESTAMP) AS ts_first_conversion,
+    CAST(GET_JSON_OBJECT(c.properties, '$.notes_last_updated') AS TIMESTAMP) AS ts_notes_last_updated,
+    CAST(GET_JSON_OBJECT(c.properties, '$.notes_next_activity_date') AS TIMESTAMP) AS ts_notes_next_activity,
+    CAST(GET_JSON_OBJECT(c.properties, '$.closedate') AS TIMESTAMP) AS ts_closed,
+    CAST(GET_JSON_OBJECT(c.properties, '$.demand_only__data_da_live') AS TIMESTAMP) AS ts_live_demand_only,
     c.ts_archived,
     c.ts_created,
     c.ts_updated,
@@ -77,14 +70,3 @@ WHERE
     c.year = {year}
     AND c.month = {month}
     AND c.day = {day}
-QUALIFY
-    ROW_NUMBER ()
-    OVER (
-        PARTITION BY
-            c.year,
-            c.month,
-            c.day,
-            c.id_contact
-        ORDER BY
-            u.id_agent NULLS LAST -- Prioritize agents in an eventual clash of emails
-    )

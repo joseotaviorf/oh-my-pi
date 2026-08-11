@@ -1,3 +1,31 @@
+WITH meeting_ranked AS (
+    SELECT
+        id_meeting,
+        id_hubspot_owner,
+        ids_attachments,
+        ids_associated_tickets,
+        ids_associated_contacts,
+        ids_associated_companies,
+        ids_associated_deals,
+        meeting_title,
+        meeting_body,
+        internal_meeting_notes,
+        meeting_external_url,
+        meeting_location,
+        meeting_outcome,
+        activity_type,
+        ts_meeting_start,
+        ts_meeting_end,
+        ts_meeting,
+        ts_created,
+        ts_updated,
+        year,
+        month,
+        day,
+        ROW_NUMBER() OVER(PARTITION BY id_meeting ORDER BY ts_updated DESC) AS rn
+    FROM
+        datalake_hubspot.meeting_history
+)
 SELECT
     id_meeting,
     id_hubspot_owner,
@@ -22,6 +50,6 @@ SELECT
     month,
     day
 FROM
-    datalake_hubspot.meeting_history
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_meeting ORDER BY ts_updated DESC) = 1
+    meeting_ranked
+WHERE
+    rn = 1

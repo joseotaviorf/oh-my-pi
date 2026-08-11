@@ -52,7 +52,8 @@ column_level_validations:
               id_company,
               ts_updated
           ) AS company_revisions
-          GROUP BY ALL
+          GROUP BY
+            cnpj_unique
           HAVING COUNT(*) > 1
         ) AS dup_cnpj_unique) = 0
       severity_level: Error

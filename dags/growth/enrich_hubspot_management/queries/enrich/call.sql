@@ -1,3 +1,34 @@
+WITH call_ranked AS (
+    SELECT
+        id_call,
+        id_hubspot_owner,
+        id_call_callee_object,
+        ids_attachments,
+        ids_associated_tickets,
+        ids_associated_contacts,
+        ids_associated_companies,
+        ids_associated_deals,
+        call_title,
+        call_body,
+        call_status,
+        activity_type,
+        call_direction,
+        call_callee_object_type,
+        call_disposition,
+        call_from_number,
+        call_to_number,
+        call_recording_url,
+        call_duration_in_ms,
+        ts_call,
+        ts_created,
+        ts_updated,
+        year,
+        month,
+        day,
+        ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY ts_updated DESC) AS rn
+    FROM
+        datalake_hubspot.call_history
+)
 SELECT
     id_call,
     id_hubspot_owner,
@@ -25,6 +56,6 @@ SELECT
     month,
     day
 FROM
-    datalake_hubspot.call_history
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY ts_updated DESC) = 1
+    call_ranked
+WHERE
+    rn = 1
