@@ -2,130 +2,114 @@ WITH pp_multi_owners AS (
   SELECT
     pmu.status AS pp_multi_user_status,
     u.id AS id_owner
-  FROM
-    datalake_rental_management_clean.pp_multi_user AS pmu
-      INNER JOIN
-        datalake_ebdb_clean.user AS u
-        ON u.uuid_person = pmu.person_uuid
-),
-owners_to_process AS (
+  FROM datalake_rental_management_clean.pp_multi_user AS pmu
+  INNER JOIN datalake_ebdb_clean.user AS u
+    ON u.uuid_person = pmu.person_uuid
+), owners_to_process AS (
   SELECT
     id_owner
-  FROM
-    datalake_rental_historical_follow_up.house_listings_daily_info
+  FROM datalake_rental_historical_follow_up.house_listings_daily_info
   GROUP BY
     id_owner
   HAVING
     COUNT(DISTINCT id_house) >= 5
-
   UNION
-
-  SELECT id_owner
+  SELECT
+    id_owner
   FROM pp_multi_owners
-  WHERE pp_multi_user_status = 'ACTIVE'
-),
-daily_house_listing AS (
+  WHERE
+    pp_multi_user_status = 'ACTIVE'
+), daily_house_listing AS (
   SELECT
     hldi.id_owner,
     CONCAT(
       COALESCE(l.dejavuid, CAST(hldi.id_house AS STRING)),
       CASE
-        -- Only process complement if it exists and is not empty after trimming
-        WHEN h.complement IS NOT NULL AND TRIM(h.complement) != ''
-        THEN CONCAT('.',
-          -- Remove multiple consecutive spaces and replace with empty string
-          -- This cleans up any extra spaces left after removing keywords
+        WHEN NOT h.complement IS NULL AND TRIM(h.complement) <> ''
+        THEN CONCAT(
+          '.',
           REGEXP_REPLACE(
-            -- Remove common property-related keywords that add noise
-            -- This regex matches any of the specified keywords and removes them entirely
             REGEXP_REPLACE(
-              -- Remove all special characters, keeping only letters, numbers, and spaces
-              -- [^a-zA-Z0-9\\s] matches any character that is NOT alphanumeric or space
-              -- This normalizes the text by removing punctuation, etc.
-              REGEXP_REPLACE(LOWER(TRIM(h.complement)), '[^a-zA-Z0-9\\s]', ''),
-              -- Matches common property terms that don't add uniqueness
-              -- Groups keywords with | (OR operator) to match any of them
-              '(?i)(apto|apartamento|casa|sobrado|kitnet|studio|cobertura|casas|terrea|duplex|flat|loft|bloco|torre|apt|aptm|ap[êe]|bl|ap|edificio|condominio|edif[íi]cio|condom[íi]nio|residencial|unidade|bloc|edf|predio|residence|conj)',
-              '' -- Replace matches with empty string (remove them)
-            ),
-            '\\s+', -- Match one or more consecutive whitespace characters
-            ''      -- Replace with empty string to remove all spaces
-          )
+              REGEXP_REPLACE(LOWER(TRIM(h.complement)), '[^a-zA-Z0-9\\s]', '') /* Remove all special characters, keeping only letters, numbers, and spaces */ /* [^a-zA-Z0-9\\s] matches any character that is NOT alphanumeric or space */ /* This normalizes the text by removing punctuation, etc. */,
+              '(?i)(apto|apartamento|casa|sobrado|kitnet|studio|cobertura|casas|terrea|duplex|flat|loft|bloco|torre|apt|aptm|ap[êe]|bl|ap|edificio|condominio|edif[íi]cio|condom[íi]nio|residencial|unidade|bloc|edf|predio|residence|conj)' /* Matches common property terms that don't add uniqueness */ /* Groups keywords with | (OR operator) to match any of them */,
+              '' /* Replace matches with empty string (remove them) */
+            ) /* Remove common property-related keywords that add noise */ /* This regex matches any of the specified keywords and removes them entirely */,
+            '\\s+' /* Match one or more consecutive whitespace characters */,
+            '' /* Replace with empty string to remove all spaces */
+          ) /* Remove multiple consecutive spaces and replace with empty string */ /* This cleans up any extra spaces left after removing keywords */
         )
-        ELSE '' -- If complement is null or empty, don't add anything to the unique ID
+        ELSE '' /* If complement is null or empty, don't add anything to the unique ID */
       END
     ) AS uniqueid,
     hldi.id_house,
     CASE
-      WHEN
-        hldi.status_history = 'alugado'
-        OR (
-          hldi.status_history = 'SUSPENDED'
-          AND hldi.status_change_reason = 'RENTED'
-        )
-      THEN
-        'RENTED'
-      WHEN hldi.status_history IN ('edicao', 'EDITING') THEN 'EDITING'
-      WHEN hldi.status_history IN ('excluido', 'OPTED_OUT') THEN 'OPTED_OUT'
-      WHEN hldi.status_history IN ('publicado', 'PUBLISHED') THEN 'PUBLISHED'
-      WHEN hldi.status_history IN ('despublicado', 'UNPUBLISHED') THEN 'UNPUBLISHED'
-      WHEN
-        hldi.status_history = 'suspenso'
-        OR (
-          hldi.status_history = 'SUSPENDED'
-          AND hldi.status_change_reason != 'RENTED'
-        )
-      THEN
-        'SUSPENDED'
+      WHEN hldi.status_history = 'alugado'
+      OR (
+        hldi.status_history = 'SUSPENDED' AND hldi.status_change_reason = 'RENTED'
+      )
+      THEN 'RENTED'
+      WHEN hldi.status_history IN ('edicao', 'EDITING')
+      THEN 'EDITING'
+      WHEN hldi.status_history IN ('excluido', 'OPTED_OUT')
+      THEN 'OPTED_OUT'
+      WHEN hldi.status_history IN ('publicado', 'PUBLISHED')
+      THEN 'PUBLISHED'
+      WHEN hldi.status_history IN ('despublicado', 'UNPUBLISHED')
+      THEN 'UNPUBLISHED'
+      WHEN hldi.status_history = 'suspenso'
+      OR (
+        hldi.status_history = 'SUSPENDED' AND hldi.status_change_reason <> 'RENTED'
+      )
+      THEN 'SUSPENDED'
       ELSE 'OTHER'
     END AS status,
     hldi.year,
     hldi.month,
     hldi.day
-  FROM
-    datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
-      JOIN
-        owners_to_process AS otp
-        ON hldi.id_owner = otp.id_owner
-      LEFT JOIN
-        vespucio_prod_delta.listings AS l
-        ON l.source_id::bigint = hldi.id_house
-      LEFT JOIN
-        datalake_ebdb_listing.house AS h
-        ON h.id = hldi.id_house
-),
-daily_owner_stats AS (
+  FROM datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
+  JOIN owners_to_process AS otp
+    ON hldi.id_owner = otp.id_owner
+  LEFT JOIN vespucio_prod_delta.listings AS l
+    ON CAST(l.source_id AS BIGINT) = hldi.id_house
+  LEFT JOIN datalake_ebdb_listing.house AS h
+    ON h.id = hldi.id_house
+), daily_owner_stats AS (
   SELECT
     id_owner,
     uniqueid,
-    collect_set(id_house) AS id_houses,
+    COLLECT_SET(id_house) AS id_houses,
     CASE
-      WHEN array_contains(collect_set(status), 'RENTED') THEN 'RENTED'
-      WHEN array_contains(collect_set(status), 'SUSPENDED') THEN 'SUSPENDED'
-      WHEN array_contains(collect_set(status), 'PUBLISHED') THEN 'PUBLISHED'
-      WHEN array_contains(collect_set(status), 'EDITING') THEN 'EDITING'
-      WHEN array_contains(collect_set(status), 'UNPUBLISHED') THEN 'UNPUBLISHED'
-      WHEN array_contains(collect_set(status), 'OPTED_OUT') THEN 'OPTED_OUT'
+      WHEN ARRAY_CONTAINS(COLLECT_SET(status), 'RENTED')
+      THEN 'RENTED'
+      WHEN ARRAY_CONTAINS(COLLECT_SET(status), 'SUSPENDED')
+      THEN 'SUSPENDED'
+      WHEN ARRAY_CONTAINS(COLLECT_SET(status), 'PUBLISHED')
+      THEN 'PUBLISHED'
+      WHEN ARRAY_CONTAINS(COLLECT_SET(status), 'EDITING')
+      THEN 'EDITING'
+      WHEN ARRAY_CONTAINS(COLLECT_SET(status), 'UNPUBLISHED')
+      THEN 'UNPUBLISHED'
+      WHEN ARRAY_CONTAINS(COLLECT_SET(status), 'OPTED_OUT')
+      THEN 'OPTED_OUT'
       ELSE 'OTHER'
     END AS status,
     year,
     month,
     day
-  FROM
-    daily_house_listing
-  GROUP BY
-    ALL
-),
-pp_multi_daily_stats AS (
+  FROM daily_house_listing
+  GROUP BY ALL
+), pp_multi_daily_stats AS (
   SELECT
     id_owner,
-    collect_list(struct(uniqueid, id_houses, status)) AS houses,
+    COLLECT_LIST(STRUCT(uniqueid AS uniqueid, id_houses AS id_houses, status AS status)) AS houses,
     CASE
-      WHEN MAKE_DATE(year, month, day) = DATE('{load_start_date}')  THEN 'ACTIVE'
-      WHEN MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL '2' YEAR THEN 'POTENTIAL'
+      WHEN MAKE_DATE(year, month, day) = CAST('{load_start_date}' AS DATE)
+      THEN 'ACTIVE'
+      WHEN MAKE_DATE(year, month, day) >= CAST('{load_start_date}' AS DATE) - INTERVAL '2' YEAR
+      THEN 'POTENTIAL'
       ELSE 'LIFETIME'
     END AS classification_window,
-    make_date(year, month, day) AS stats_date,
+    MAKE_DATE(year, month, day) AS stats_date,
     COUNT_IF(status IN ('RENTED', 'SUSPENDED', 'PUBLISHED')) AS ongoing_houses,
     COUNT_IF(status = 'RENTED') AS houses_rented,
     COUNT_IF(status = 'SUSPENDED') AS houses_suspended,
@@ -134,12 +118,9 @@ pp_multi_daily_stats AS (
     COUNT_IF(status = 'OPTED_OUT') AS houses_opted_out,
     COUNT_IF(status = 'UNPUBLISHED') AS houses_unpublished,
     COUNT(uniqueid) AS total_houses
-  FROM
-    daily_owner_stats
-  GROUP BY
-    ALL
-),
-pp_multi_classification_window AS (
+  FROM daily_owner_stats
+  GROUP BY ALL
+), pp_multi_classification_window AS (
   SELECT
     id_owner,
     classification_window,
@@ -152,12 +133,9 @@ pp_multi_classification_window AS (
     MAX(houses_opted_out) AS max_houses_opted_out,
     MAX(houses_unpublished) AS max_houses_unpublished,
     MAX(total_houses) AS max_total_houses
-  FROM
-    pp_multi_daily_stats
-  GROUP BY
-    ALL
-),
-pp_multi_stats AS (
+  FROM pp_multi_daily_stats
+  GROUP BY ALL
+), pp_multi_stats AS (
   SELECT
     id_owner,
     active_houses,
@@ -187,106 +165,65 @@ pp_multi_stats AS (
     lifetime_max_houses_rented,
     lifetime_max_houses_unpublished,
     lifetime_max_total_houses
-  FROM
-    pp_multi_classification_window
-      PIVOT (
-        MAX(houses) AS houses,
-        MAX(max_ongoing_houses) AS ongoing_houses,
-        MAX(max_houses_rented) AS houses_rented,
-        MAX(max_houses_suspended) AS houses_suspended,
-        MAX(max_houses_published) AS houses_published,
-        MAX(max_houses_in_edition) AS houses_in_edition,
-        MAX(max_houses_opted_out) AS houses_opted_out,
-        MAX(max_houses_unpublished) AS houses_unpublished,
-        MAX(max_total_houses) AS total_houses FOR classification_window IN (
-          'ACTIVE' AS active,
-          'POTENTIAL' AS two_year_max,
-          'LIFETIME' AS lifetime_max
-        )
-      )
+  FROM pp_multi_classification_window
+  PIVOT(MAX(houses) AS houses, MAX(max_ongoing_houses) AS ongoing_houses, MAX(max_houses_rented) AS houses_rented, MAX(max_houses_suspended) AS houses_suspended, MAX(max_houses_published) AS houses_published, MAX(max_houses_in_edition) AS houses_in_edition, MAX(max_houses_opted_out) AS houses_opted_out, MAX(max_houses_unpublished) AS houses_unpublished, MAX(max_total_houses) AS total_houses FOR classification_window IN ('ACTIVE' AS active, 'POTENTIAL' AS two_year_max, 'LIFETIME' AS lifetime_max))
   WHERE
-    id_owner IN (SELECT id_owner FROM pp_multi_owners WHERE pp_multi_user_status = 'ACTIVE')
+    id_owner IN (
+      SELECT
+        id_owner
+      FROM pp_multi_owners
+      WHERE
+        pp_multi_user_status = 'ACTIVE'
+    )
     OR active_ongoing_houses >= 5
     OR two_year_max_ongoing_houses >= 5
     OR lifetime_max_ongoing_houses >= 5
-),
-pp_multi_houses AS (
+), pp_multi_houses AS (
   SELECT DISTINCT
     pms.id_owner,
     exploded_id_house AS id_house
-  FROM
-    pp_multi_stats AS pms
-    LATERAL VIEW EXPLODE(
-      CONCAT(
-        COALESCE(pms.active_houses, ARRAY()),
-        COALESCE(pms.two_year_max_houses, ARRAY()),
-        COALESCE(pms.lifetime_max_houses, ARRAY())
-      )
-    ) exploded_houses_table AS house_struct
-    LATERAL VIEW EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
-),
-pp_multi_visits AS (
+  FROM pp_multi_stats AS pms
+  LATERAL VIEW
+  EXPLODE(
+    CONCAT(
+      COALESCE(pms.active_houses, ARRAY()),
+      COALESCE(pms.two_year_max_houses, ARRAY()),
+      COALESCE(pms.lifetime_max_houses, ARRAY())
+    )
+  ) exploded_houses_table AS house_struct
+  LATERAL VIEW
+  EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
+), pp_multi_visits AS (
   SELECT
     pmh.id_owner,
     COALESCE(NULLIF(COUNT(v.id_visit), 0), 0) AS total_visits,
-    COALESCE(
-      COUNT_IF(
-        v.is_canceled
-        AND v.cancellation_on_behalf_of = 'SUPPLY'
-      ),
-      0
-    ) AS canceled_visits,
+    COALESCE(COUNT_IF(v.is_canceled AND v.cancellation_on_behalf_of = 'SUPPLY'), 0) AS canceled_visits,
     COALESCE(canceled_visits / total_visits, 0) AS owner_cancellation_rate
-  FROM
-    pp_multi_houses AS pmh
-      LEFT JOIN
-        datalake_visit.visits AS v
-        ON pmh.id_house = v.id_house
-        AND v.ts_visit >= DATE('{load_start_date}') - INTERVAL '150' DAYS
+  FROM pp_multi_houses AS pmh
+  LEFT JOIN datalake_visit.visits AS v
+    ON pmh.id_house = v.id_house
+    AND v.ts_visit >= CAST('{load_start_date}' AS DATE) - INTERVAL '150' DAYS
   GROUP BY
     pmh.id_owner
-),
-key_location_stats AS (
+), key_location_stats AS (
   SELECT
     pmh.id_owner,
-    COALESCE(
-      MAX(
-        CASE
-          WHEN he.key_location = 'AGENT' THEN 1
-          ELSE 0
-        END
-      ) = 1,
-      false
-    ) AS agent_had_key
-  FROM
-    pp_multi_houses AS pmh
-  LEFT JOIN
-    datalake_ebdb_listing.house_entrance AS he
-        ON pmh.id_house = he.id_house
+    COALESCE(MAX(CASE WHEN he.key_location = 'AGENT' THEN 1 ELSE 0 END) = 1, FALSE) AS agent_had_key
+  FROM pp_multi_houses AS pmh
+  LEFT JOIN datalake_ebdb_listing.house_entrance AS he
+    ON pmh.id_house = he.id_house
   GROUP BY
     pmh.id_owner
-),
-contract_stats AS (
+), contract_stats AS (
   SELECT
     pmh.id_owner,
-    COALESCE(
-      MAX(
-        CASE
-          WHEN c.status IN ('Ativo', 'Finalizado') THEN 1
-          ELSE 0
-        END
-      ) = 1,
-      false
-    ) AS has_owner_singed_contract
-  FROM
-    pp_multi_houses AS pmh
-  LEFT JOIN
-    datalake_ebdb_contract.contract AS c
-      ON pmh.id_house = c.id_house
+    COALESCE(MAX(CASE WHEN c.status IN ('Ativo', 'Finalizado') THEN 1 ELSE 0 END) = 1, FALSE) AS has_owner_singed_contract
+  FROM pp_multi_houses AS pmh
+  LEFT JOIN datalake_ebdb_contract.contract AS c
+    ON pmh.id_house = c.id_house
   GROUP BY
     pmh.id_owner
-),
-possible_fraud AS (
+), possible_fraud AS (
   SELECT
     pmv.id_owner,
     pmv.total_visits,
@@ -294,34 +231,32 @@ possible_fraud AS (
     pmv.owner_cancellation_rate,
     kls.agent_had_key,
     cs.has_owner_singed_contract,
-    IF(pmv.total_visits - pmv.canceled_visits <= 0
+    IF(
+      pmv.total_visits - pmv.canceled_visits <= 0
       AND kls.agent_had_key = FALSE
-      AND cs.has_owner_singed_contract = FALSE, TRUE, FALSE
+      AND cs.has_owner_singed_contract = FALSE,
+      TRUE,
+      FALSE
     ) AS is_possible_fraud
-  FROM
-    pp_multi_visits pmv
-  JOIN
-    key_location_stats kls
-      ON pmv.id_owner = kls.id_owner
-  JOIN
-    contract_stats cs
-      ON pmv.id_owner = cs.id_owner
+  FROM pp_multi_visits AS pmv
+  JOIN key_location_stats AS kls
+    ON pmv.id_owner = kls.id_owner
+  JOIN contract_stats AS cs
+    ON pmv.id_owner = cs.id_owner
 )
 SELECT
   pms.id_owner,
-  ---
   CASE
-    WHEN pmo.pp_multi_user_status = 'ACTIVE' THEN 'ACTIVE'
-    WHEN pms.active_ongoing_houses >= 5
-      OR pms.two_year_max_ongoing_houses >= 5 THEN 'POTENTIAL'
+    WHEN pmo.pp_multi_user_status = 'ACTIVE'
+    THEN 'ACTIVE'
+    WHEN pms.active_ongoing_houses >= 5 OR pms.two_year_max_ongoing_houses >= 5
+    THEN 'POTENTIAL'
     ELSE 'LIFETIME'
-  END AS pp_multi_classification,
-  ---
-  pms.active_houses AS houses,
+  END AS pp_multi_classification, /* - */
+  pms.active_houses AS houses, /* - */
   pms.two_year_max_houses,
   pms.lifetime_max_houses,
-  ---
-  COALESCE(pms.active_ongoing_houses, 0) AS ongoing_houses,
+  COALESCE(pms.active_ongoing_houses, 0) AS ongoing_houses, /* - */
   COALESCE(pms.active_houses_in_edition, 0) AS houses_in_edition,
   COALESCE(pms.active_houses_opted_out, 0) AS houses_opted_out,
   COALESCE(pms.active_houses_published, 0) AS houses_published,
@@ -329,8 +264,7 @@ SELECT
   COALESCE(pms.active_houses_rented, 0) AS houses_rented,
   COALESCE(pms.active_houses_unpublished, 0) AS houses_unpublished,
   COALESCE(pms.active_total_houses, 0) AS total_houses,
-  ---
-  COALESCE(pms.two_year_max_ongoing_houses, 0) AS two_year_max_ongoing_houses,
+  COALESCE(pms.two_year_max_ongoing_houses, 0) AS two_year_max_ongoing_houses, /* - */
   COALESCE(pms.two_year_max_houses_in_edition, 0) AS two_year_max_houses_in_edition,
   COALESCE(pms.two_year_max_houses_opted_out, 0) AS two_year_max_houses_opted_out,
   COALESCE(pms.two_year_max_houses_published, 0) AS two_year_max_houses_published,
@@ -338,8 +272,7 @@ SELECT
   COALESCE(pms.two_year_max_houses_rented, 0) AS two_year_max_houses_rented,
   COALESCE(pms.two_year_max_houses_unpublished, 0) AS two_year_max_houses_unpublished,
   COALESCE(pms.two_year_max_total_houses, 0) AS two_year_max_total_houses,
-  ---
-  COALESCE(pms.lifetime_max_ongoing_houses, 0) AS lifetime_max_ongoing_houses,
+  COALESCE(pms.lifetime_max_ongoing_houses, 0) AS lifetime_max_ongoing_houses, /* - */
   COALESCE(pms.lifetime_max_houses_in_edition, 0) AS lifetime_max_houses_in_edition,
   COALESCE(pms.lifetime_max_houses_opted_out, 0) AS lifetime_max_houses_opted_out,
   COALESCE(pms.lifetime_max_houses_published, 0) AS lifetime_max_houses_published,
@@ -347,22 +280,17 @@ SELECT
   COALESCE(pms.lifetime_max_houses_rented, 0) AS lifetime_max_houses_rented,
   COALESCE(pms.lifetime_max_houses_unpublished, 0) AS lifetime_max_houses_unpublished,
   COALESCE(pms.lifetime_max_total_houses, 0) AS lifetime_max_total_houses,
-  ---
-  pf.total_visits,
+  pf.total_visits, /* - */
   pf.canceled_visits,
   pf.owner_cancellation_rate,
   pf.agent_had_key,
   pf.has_owner_singed_contract,
   pf.is_possible_fraud,
-  ---
-  EXTRACT(YEAR FROM DATE('{load_start_date}')) AS year,
-  EXTRACT(MONTH FROM DATE('{load_start_date}')) AS month,
-  EXTRACT(DAY FROM DATE('{load_start_date}')) AS day
-FROM
-  pp_multi_stats AS pms
-LEFT JOIN
-  pp_multi_owners AS pmo
-    ON pmo.id_owner = pms.id_owner
-LEFT JOIN
-  possible_fraud AS pf
-    ON pf.id_owner = pms.id_owner
+  EXTRACT(YEAR FROM CAST('{load_start_date}' AS DATE)) AS year, /* - */
+  EXTRACT(MONTH FROM CAST('{load_start_date}' AS DATE)) AS month,
+  EXTRACT(DAY FROM CAST('{load_start_date}' AS DATE)) AS day
+FROM pp_multi_stats AS pms
+LEFT JOIN pp_multi_owners AS pmo
+  ON pmo.id_owner = pms.id_owner
+LEFT JOIN possible_fraud AS pf
+  ON pf.id_owner = pms.id_owner

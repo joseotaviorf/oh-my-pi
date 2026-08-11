@@ -1,5 +1,4 @@
-WITH
-last_record AS (
+WITH last_record AS (
   SELECT
     id,
     id_contract,
@@ -13,13 +12,26 @@ last_record AS (
     invoice_issuer_document,
     ts_created,
     ts_updated
-  FROM
-    datalake_rental_management.condo_monitoring_actions_aud
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1
-),
-
-ordered_cdc AS (
+  FROM (
+    SELECT
+      id,
+      id_contract,
+      id_action_main_user,
+      action_type,
+      action_main_user_email,
+      action_system,
+      invoice_user_name,
+      invoice_user_document,
+      invoice_issuer_name,
+      invoice_issuer_document,
+      ts_created,
+      ts_updated,
+      ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS _w
+    FROM datalake_rental_management.condo_monitoring_actions_aud
+  ) AS _t
+  WHERE
+    _w = 1
+), ordered_cdc AS (
   SELECT
     id,
     contract_id AS id_contract,
@@ -35,21 +47,33 @@ ordered_cdc AS (
     ts_database_transaction AS ts_updated,
     op_cdc,
     ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_database_transaction) AS rn
-  FROM
-    datalake_rental_management_transactional.condo_monitoring_actions
+  FROM datalake_rental_management_transactional.condo_monitoring_actions
   WHERE
-    ( -- Condition for being on or after the start date
-      year > YEAR(DATE('{load_start_date}')) OR
-      (year = YEAR(DATE('{load_start_date}')) AND month > MONTH(DATE('{load_start_date}'))) OR
-      (year = YEAR(DATE('{load_start_date}')) AND month = MONTH(DATE('{load_start_date}')) AND day >= DAY(DATE('{load_start_date}')))
-    ) AND (-- Condition for being on or before the end date
-      year < YEAR(DATE('{load_end_date}')) OR
-      (year = YEAR(DATE('{load_end_date}')) AND month < MONTH(DATE('{load_end_date}'))) OR
-      (year = YEAR(DATE('{load_end_date}')) AND month = MONTH(DATE('{load_end_date}')) AND day <= DAY(DATE('{load_end_date}')))
-    )
-),
-
-combined AS (
+    (
+      year > YEAR(TO_DATE(CAST('{load_start_date}' AS DATE)))
+      OR (
+        year = YEAR(TO_DATE(CAST('{load_start_date}' AS DATE)))
+        AND month > MONTH(TO_DATE(CAST('{load_start_date}' AS DATE)))
+      )
+      OR (
+        year = YEAR(TO_DATE(CAST('{load_start_date}' AS DATE)))
+        AND month = MONTH(TO_DATE(CAST('{load_start_date}' AS DATE)))
+        AND day >= DAY(TO_DATE(CAST('{load_start_date}' AS DATE)))
+      )
+    ) /* Condition for being on or after the start date */
+    AND (
+      year < YEAR(TO_DATE(CAST('{load_end_date}' AS DATE)))
+      OR (
+        year = YEAR(TO_DATE(CAST('{load_end_date}' AS DATE)))
+        AND month < MONTH(TO_DATE(CAST('{load_end_date}' AS DATE)))
+      )
+      OR (
+        year = YEAR(TO_DATE(CAST('{load_end_date}' AS DATE)))
+        AND month = MONTH(TO_DATE(CAST('{load_end_date}' AS DATE)))
+        AND day <= DAY(TO_DATE(CAST('{load_end_date}' AS DATE)))
+      )
+    ) /* Condition for being on or before the end date */
+), combined AS (
   SELECT
     id,
     id_contract,
@@ -65,11 +89,8 @@ combined AS (
     NULL AS ts_updated,
     NULL AS op_cdc,
     0 AS rn
-  FROM
-    last_record
-
+  FROM last_record
   UNION ALL
-
   SELECT
     id,
     id_contract,
@@ -85,11 +106,8 @@ combined AS (
     ts_updated,
     op_cdc,
     rn
-  FROM
-    ordered_cdc
-),
-
-sequenced_changes AS (
+  FROM ordered_cdc
+), sequenced_changes AS (
   SELECT
     id,
     id_contract,
@@ -114,10 +132,8 @@ sequenced_changes AS (
     LAG(invoice_user_document) OVER (PARTITION BY id ORDER BY rn) AS prev_invoice_user_document,
     LAG(invoice_issuer_name) OVER (PARTITION BY id ORDER BY rn) AS prev_invoice_issuer_name,
     LAG(invoice_issuer_document) OVER (PARTITION BY id ORDER BY rn) AS prev_invoice_issuer_document
-  FROM
-    combined
+  FROM combined
 )
-
 SELECT
   id,
   id_contract,
@@ -131,27 +147,23 @@ SELECT
   invoice_issuer_document,
   ts_created,
   ts_updated,
-  CASE
-    WHEN op_cdc = 'c' THEN 0
-    WHEN op_cdc = 'u' THEN 1
-    WHEN op_cdc = 'd' THEN 2
-  END AS rev_type,
-  YEAR(ts_updated) AS year,
-  MONTH(ts_updated) AS month,
-  DAY(ts_updated) AS day
-FROM
-  sequenced_changes
+  CASE WHEN op_cdc = 'c' THEN 0 WHEN op_cdc = 'u' THEN 1 WHEN op_cdc = 'd' THEN 2 END AS rev_type,
+  YEAR(TO_DATE(ts_updated)) AS year,
+  MONTH(TO_DATE(ts_updated)) AS month,
+  DAY(TO_DATE(ts_updated)) AS day
+FROM sequenced_changes
 WHERE
-  rn != 0
-  AND (COALESCE(id_contract, -1) != COALESCE(prev_id_contract, -1)
-    OR COALESCE(id_action_main_user, -1) != COALESCE(prev_id_action_main_user, -1)
-    OR action_type != prev_action_type
-    OR action_main_user_email != prev_action_main_user_email
-    OR action_system != prev_action_system
-    OR invoice_user_name != prev_invoice_user_name
-    OR action_system != prev_action_system
-    OR invoice_user_name != prev_invoice_user_name
-    OR invoice_user_document != prev_invoice_user_document
-    OR invoice_issuer_name != prev_invoice_issuer_name
-    OR invoice_issuer_document != prev_invoice_issuer_document
+  rn <> 0
+  AND (
+    COALESCE(id_contract, -1) <> COALESCE(prev_id_contract, -1)
+    OR COALESCE(id_action_main_user, -1) <> COALESCE(prev_id_action_main_user, -1)
+    OR action_type <> prev_action_type
+    OR action_main_user_email <> prev_action_main_user_email
+    OR action_system <> prev_action_system
+    OR invoice_user_name <> prev_invoice_user_name
+    OR action_system <> prev_action_system
+    OR invoice_user_name <> prev_invoice_user_name
+    OR invoice_user_document <> prev_invoice_user_document
+    OR invoice_issuer_name <> prev_invoice_issuer_name
+    OR invoice_issuer_document <> prev_invoice_issuer_document
   )

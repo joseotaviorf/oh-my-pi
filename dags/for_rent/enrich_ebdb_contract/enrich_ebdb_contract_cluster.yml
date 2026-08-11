@@ -1,7 +1,5 @@
 cluster:
-  type: consolidation_l_general_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_l_general_fleet_cluster
   custom_configurations:
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
-    driver_node_type_id: r7g.xlarge
