@@ -1,4 +1,4 @@
-.PHONY: help install test lint creds generate-datasets eval-suite eval-rollup eval-check-gate
+.PHONY: help install test lint creds generate-datasets eval-suite eval-rollup eval-check-gate eval-scope drift-check eval-changed
 
 help: ## Show this help message
 	@echo "Available targets:"
@@ -35,3 +35,18 @@ eval-rollup: ## Merge logs/per_dataset/*/summary.json into rollup.json + gate_su
 
 eval-check-gate: ## Re-check gate_summary.json without re-running anything; exits non-zero on a failing gate
 	uv run python scripts/check_gate.py gate_summary.json
+
+# The three targets below mirror .woodpecker/tars_evals.yml one-for-one, so
+# `make eval-changed` answers "will the gate pass on my branch?" before you
+# push. BASE=/HEAD= override the diff range (default: merge base with
+# origin/master, the same range the PR gate diffs):
+#   make eval-scope BASE=HEAD~1
+#   DRY_RUN=1 make eval-changed
+eval-scope: ## Resolve which dataset stems the current diff affects (no eval)
+	@TARS_EVAL_BASE="$(BASE)" TARS_EVAL_HEAD="$(HEAD)" scripts/resolve_eval_scope.sh
+
+drift-check: eval-scope ## Regenerate in-scope datasets; fail if committed YAML differs
+	@scripts/check_dataset_drift.sh
+
+eval-changed: eval-scope drift-check ## Local run of the CI gate: eval only the changed stems
+	@scripts/eval_changed.sh

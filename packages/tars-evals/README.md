@@ -52,6 +52,21 @@ make eval-check-gate
 (eval stems vs scope stems for drift/regen). See orchestration tests for the
 Woodpecker pairing contract.
 
+## Local CI parity
+
+These Makefile targets mirror `.woodpecker/tars_evals.yml` so you can run the
+same scope/drift/eval flow locally before pushing:
+
+```bash
+make eval-scope
+make drift-check
+make eval-changed
+# DRY_RUN=1 make eval-changed   # scope + drift only, no LLM eval
+```
+
+Override the diff range with `BASE=` / `HEAD=` (default: merge base with
+`origin/master`).
+
 ## Quick start
 
 ```bash
