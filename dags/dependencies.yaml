@@ -1741,6 +1741,7 @@ bietlejuice.enrich_buyer_prospect:
 bietlejuice.enrich_buyer_prospect_tof_segmentation_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-schedule-page-viewed-events:first-run-of-day
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events:first-run-of-day
   - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions:first-run-of-day
   - bietlejuice.enrich_concierge_health_metrics:load-enrich-concierge-demand:first-run-of-day
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results:first-run-of-day

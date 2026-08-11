@@ -4,7 +4,7 @@ table_name: buyer_prospect_segment_metrics
 owner: catarina.freitas@quintoandar.com.br
 domain: Conversational XP
 description: |
-  Monthly top-of-funnel business metrics pivoted by buyer activity segment, concierge-prospect status, and post-activation cohort window (4w or 8w). Each row is one metric for an activation month, business context, concierge-prospect status, and cohort window, with values per segment. A range run refreshes every activation month that has at least one daily activity row within the requested interval. Segments are derived from cumulative daily activity in buyer_prospect_segmentation. Output for dashboards and experimentation monitoring.
+  Monthly top-of-funnel business metrics pivoted by buyer activity segment, buyer-prospect segment type, concierge-prospect status, and post-activation cohort window (4w or 8w). Each row is one metric for an activation month, business context, buyer-prospect segment type, concierge-prospect status, and cohort window, with values per activity segment. A range run refreshes every activation month that has at least one daily activity row within the requested interval. Segments are derived from cumulative daily activity in buyer_prospect_segmentation. Output for dashboards and experimentation monitoring.
 columns:
   dt_activation_month:
     description: Calendar month when buyers converted, used as the metrics time axis.
@@ -14,6 +14,10 @@ columns:
     description: Sale business line for the aggregated buyer cohort.
     lineage:
       - datalake_search.buyer_prospect_segmentation.business_context
+  segment_type:
+    description: "Buyer-prospect segment grouping: bp for new or recovered buyer prospects and tof for top-of-funnel users."
+    lineage:
+      - datalake_search.buyer_prospect_segmentation.segment_type
   is_concierge_prospect:
     description: Boolean flag indicating whether the buyer prospect belongs to the concierge-assisted cohort.
     lineage:

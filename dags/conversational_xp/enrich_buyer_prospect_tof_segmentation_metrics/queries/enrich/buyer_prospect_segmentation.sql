@@ -10,16 +10,17 @@ bp_daily_scope AS (
         date_scope.dt_partition,
         bp.id_user,
         bp.business_context,
+        bp.segment_type,
         bp.is_concierge_prospect,
         bp.dt_activation_month,
-        bp.ts_bp_activation,
+        bp.ts_activation,
         bp.dt_window_4w_end,
         bp.dt_window_8w_end
     FROM
         datalake_search.buyer_prospect_base AS bp
     INNER JOIN
         date_scope
-            ON date_scope.dt_partition >= DATE(bp.ts_bp_activation)
+            ON date_scope.dt_partition >= DATE(bp.ts_activation)
             AND date_scope.dt_partition <= bp.dt_window_8w_end
 ),
 
@@ -124,6 +125,22 @@ visits_booked AS (
         AND DATE(ts_first_booking_created) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
 ),
 
+offer_submitted as (
+    SELECT
+        DATE(p.ts_event) as dt_partition,
+        p.id_prospect AS id_user,
+        p.ts_event as ts_event
+    FROM
+        datalake_demand_flows.prospect_daily_results p
+    WHERE
+        MAKE_DATE(p.year, p.month, p.day) >= DATE_TRUNC('MONTH', DATE('{start_date}'))
+        AND MAKE_DATE(p.year, p.month, p.day) < ADD_MONTHS(DATE_TRUNC('MONTH', DATE('{end_date}')), 1)
+        AND LOWER(p.business_context) = 'sale'
+        AND p.event_name IN (
+            'OFFER SUBMITTED'
+        )
+),
+
 events_unioned AS (
     SELECT
         dt_partition,
@@ -172,6 +189,18 @@ events_unioned AS (
         CAST(NULL AS INT) AS is_listing_with_lpv
     FROM
         visits_booked
+    UNION ALL
+    SELECT
+        dt_partition,
+        'offer_submitted' AS event_type,
+        id_user,
+        ts_event,
+        CAST(NULL AS STRING) AS id_session,
+        CAST(NULL AS STRING) AS id_search,
+        CAST(NULL AS STRING) AS id_house,
+        CAST(NULL AS INT) AS is_listing_with_lpv
+    FROM
+        offer_submitted
 ),
 
 buyer_activity AS (
@@ -188,9 +217,7 @@ buyer_activity AS (
         eu.id_house,
         eu.is_listing_with_lpv,
         CAST(
-            eu.ts_event >= bp.ts_bp_activation
-            AND eu.ts_event < DATE_ADD(bp.dt_window_4w_end, 1)
-            AS INT
+            eu.ts_event < DATE_ADD(bp.dt_window_4w_end, 1) AS INT
         ) AS is_4w
     FROM
         bp_daily_scope AS bp
@@ -198,7 +225,7 @@ buyer_activity AS (
         events_unioned AS eu
             ON eu.dt_partition = bp.dt_partition
             AND eu.id_user = bp.id_user
-            AND eu.ts_event >= bp.ts_bp_activation
+            AND eu.ts_event >= bp.ts_activation
             AND eu.ts_event < DATE_ADD(bp.dt_window_8w_end, 1)
 ),
 
@@ -447,16 +474,42 @@ agg_vb AS (
         id_user
 ),
 
+agg_offer_submitted AS (
+    SELECT
+        dt_partition,
+        dt_activation_month,
+        business_context,
+        id_user,
+        COUNT(ts_event) AS is_os_8w,
+        COUNT(
+            CASE
+                WHEN is_4w = 1 THEN ts_event
+            END
+        ) AS is_os_4w
+    FROM
+        buyer_activity
+    WHERE
+        event_type = 'offer_submitted'
+    GROUP BY
+        dt_partition,
+        dt_activation_month,
+        business_context,
+        id_user
+),
+
 agg_activity AS (
     SELECT
         bp.dt_partition,
         bp.dt_activation_month,
-        bp.ts_bp_activation,
+        bp.ts_activation,
         bp.dt_window_4w_end,
         bp.dt_window_8w_end,
         bp.business_context,
         bp.id_user,
+        bp.segment_type,
         bp.is_concierge_prospect,
+        CASE WHEN aos.is_os_8w > 0 THEN 1 ELSE 0 END AS is_os_8w,
+        CASE WHEN aos.is_os_4w > 0 THEN 1 ELSE 0 END AS is_os_4w,
         COALESCE(ags.sum_interactions_8w, 0) AS sum_interactions_8w,
         COALESCE(ags.sum_interactions_4w, 0) AS sum_interactions_4w,
         COALESCE(ags.sum_search_8w, 0) AS sum_search_8w,
@@ -478,6 +531,12 @@ agg_activity AS (
         COALESCE(avbt.id_house_partition_vb_ts, array()) AS id_house_partition_vb_ts
     FROM
         bp_daily_scope AS bp
+    LEFT JOIN
+        agg_offer_submitted AS aos
+            ON bp.dt_partition = aos.dt_partition
+            AND bp.dt_activation_month = aos.dt_activation_month
+            AND bp.business_context = aos.business_context
+            AND bp.id_user = aos.id_user
     LEFT JOIN
         agg_searches AS ags
             ON bp.dt_partition = ags.dt_partition
@@ -523,14 +582,17 @@ agg_activity AS (
 )
 
 SELECT
-    dt_partition,
-    id_user,
-    business_context,
-    is_concierge_prospect,
     dt_activation_month,
-    ts_bp_activation,
+    id_user,
+    dt_partition,
+    ts_activation,
     dt_window_4w_end,
     dt_window_8w_end,
+    business_context,
+    segment_type,
+    is_concierge_prospect,
+    is_os_8w,
+    is_os_4w,
     sum_interactions_8w,
     sum_interactions_4w,
     sum_search_8w,

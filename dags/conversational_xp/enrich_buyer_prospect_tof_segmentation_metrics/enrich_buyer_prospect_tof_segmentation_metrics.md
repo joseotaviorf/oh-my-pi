@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This pipeline builds the top of funnel (ToF) cohort base for **sale** buyer prospects (new activations and recoveries), tracks their daily search / LPV / schedule / visit activity in post-activation windows, and publishes segment-level business metrics for dashboards and experimentation monitoring.
+This pipeline builds the top-of-funnel cohort base for **sale** buyer prospects (new activations, recoveries, and ToF users), tracks their daily search / LPV / schedule / visit / offer-submission activity in post-activation windows, and publishes segment-level business metrics for dashboards and experimentation monitoring.
 
 Each run processes the inclusive `start_date` to `end_date` interval (Airflow `load_start_date` and `load_end_date`). A daily schedule uses a one-day interval, while a backfill emits the same daily slices for every date in the requested range. The three output tables are loaded in sequence: cohort base → daily user activity → aggregated segment metrics.
 
@@ -41,7 +41,7 @@ prospect_daily_results (+ concierge_demand)
 
 #### 1. `datalake_search.buyer_prospect_base`
 
-**What each run does:** Reloads every full calendar month intersecting the input interval from `datalake_demand_flows.prospect_daily_results` (sale conversions only: first activation or recovery), deduplicates to one row per `(id_user, dt_activation_month)`, and enriches with the Concierge flag from `datalake_search.concierge_demand`. When a buyer has multiple sale conversions in the same activation month, the query retains the earliest `ts_event`; its activation type and Concierge flag are retained for the cohort row.
+**What each run does:** Reloads every full calendar month intersecting the input interval from `datalake_demand_flows.prospect_daily_results` (sale conversions: first activation or recovery) and `datalake_amplitude_page_viewed_events.schedule_search_listing_events` (ToF users), deduplicates to one row per `(id_user, dt_activation_month)`, and enriches buyer-prospect conversions with the Concierge flag from `datalake_search.concierge_demand`. Buyer-prospect conversions take precedence when the same user has a ToF event in the same month; otherwise, the earliest event is retained. The `segment_type` column identifies buyer-prospect (`bp`) and ToF (`tof`) cohort members. `is_concierge_prospect` is `FALSE` for ToF users because Concierge status applies only to buyer-prospect conversions.
 
 **Write method:** Delta **MERGE** on `(id_user, dt_activation_month)`.
 
@@ -57,7 +57,7 @@ This replaces every activation-month cohort touched by the interval. Older month
 
 #### 2. `datalake_search.buyer_prospect_segmentation`
 
-**What each run does:** For every date in the inclusive input interval, collects sale activity from search impressions, Amplitude LPV / schedule events, and visit bookings (`sale_flow`). Only users whose **8-week post-activation window includes that date** are included (read from `buyer_prospect_base`). Users with no events on a date still get a row with zero counts.
+**What each run does:** For every date in the inclusive input interval, collects sale activity from search impressions, Amplitude LPV / schedule events, visit bookings (`sale_flow`), and offer submissions (`prospect_daily_results`). Only users whose **8-week post-activation window includes that date** are included (read from `buyer_prospect_base`). Users with no events on a date still get a row with zero counts.
 
 Each row stores **that day's** activity counts within the buyer's 4w/8w windows (not a running total). The row also retains the buyer activation timestamp and 4w/8w end dates plus daily per-listing event arrays:
 
@@ -84,6 +84,7 @@ Window totals for additive metrics are built downstream by summing daily rows. D
 | Listing page views (LPV) | `datalake_amplitude_clean.170698_listing_page_viewed_events`  |
 | Schedule page views      | `datalake_amplitude_clean.170698_schedule_page_viewed_events` |
 | Visit bookings           | `datalake_sale_flows.sale_flow`                               |
+| Offer submissions        | `datalake_demand_flows.prospect_daily_results`                |
 
 #### 3. `datalake_search.buyer_prospect_segment_metrics`
 
@@ -99,7 +100,7 @@ Window totals for additive metrics are built downstream by summing daily rows. D
 
 Requires `spark.sql.sources.partitionOverwriteMode = dynamic` (configured on the cluster).
 
-**Grain:** one row per activation month × business context × Concierge-prospect status (`is_concierge_prospect`) × cohort window (`4w` / `8w`) × metric name.
+**Grain:** one row per activation month × business context × buyer-prospect segment type (`segment_type`) × Concierge-prospect status (`is_concierge_prospect`) × cohort window (`4w` / `8w`) × metric name.
 
 ### Activity segments
 
@@ -112,7 +113,7 @@ Segments are derived from cumulative search **interactions** (distinct search im
 | `active_no_search`        | 0 search interactions, but ≥ 1 LPV or schedule view |
 | `inactive`                | No search interactions, LPVs, or schedule views     |
 
-The `overall` column in `buyer_prospect_segment_metrics` holds cohort-wide metrics (e.g. `search_participation_rate`, `discovery_rate`, `bes`). `bes` is the share of buyers in the cohort who have at least three visit bookings within the applicable 4w or 8w window.
+The `overall` column in `buyer_prospect_segment_metrics` holds cohort-wide metrics (e.g. `search_participation_rate`, `discovery_rate`, `bes`). `bes` is the share of buyers in the cohort who have at least three visit bookings, or at least one visit booking after an offer submission, within the applicable 4w or 8w window.
 
 ### Outputs
 
@@ -120,8 +121,8 @@ This pipeline produces the following output tables on the enrich layer (`datalak
 
 | Table                            | Role                                                                                       |
 | -------------------------------- | ------------------------------------------------------------------------------------------ |
-| `buyer_prospect_base`            | Cohort spine: activation timestamp, 4w/8w window ends, Concierge flag |
-| `buyer_prospect_segmentation`    | Daily activity counts, cohort-window boundaries, and per-listing SPV/LPV/visit event arrays |
-| `buyer_prospect_segment_metrics` | Pivoted segment metrics for reporting, including distinct-listing and LPV-to-visit measures |
+| `buyer_prospect_base`            | Cohort spine: activation timestamp, `bp`/`tof` segment type, 4w/8w window ends, and Concierge flag |
+| `buyer_prospect_segmentation`    | Daily activity counts, offer-submission flags, cohort-window boundaries, and per-listing SPV/LPV/visit event arrays |
+| `buyer_prospect_segment_metrics` | Pivoted segment metrics by buyer-prospect segment type, including distinct-listing and LPV-to-visit measures |
 
 </details>

@@ -15,15 +15,26 @@ columns:
     lineage:
       - datalake_demand_flows.prospect_daily_results.business_context
   is_concierge_prospect:
-    description: Whether the buyer prospect's conversion is linked to a visit booked through the Concierge chatbot (direct or indirect) when user and visit id match a record in the Concierge demand funnel.
+    description: Whether the buyer-prospect conversion is linked to a visit booked through the Concierge chatbot (direct or indirect) when user and visit id match a record in the Concierge demand funnel. Always false for top-of-funnel users because Concierge status does not apply to that cohort.
     lineage:
       - datalake_search.concierge_demand.is_concierge_prospect
-  dt_activation_month:
-    description: Calendar month of the buyer conversion, truncated to the first day of the month.
+  event_name:
+    description: Conversion event label, either nbp for a new buyer prospect, rbp for a recovered buyer prospect, or tof for a top-of-funnel user.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.event_name
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  segment_type:
+    description: "Buyer-prospect segment grouping derived from event_name: bp for new or recovered buyer prospects and tof for top-of-funnel users."
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.event_name
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  ts_activation:
+    description: Timestamp of the buyer activation or top-of-funnel event that opens the post-activation cohort window.
     lineage:
       - datalake_demand_flows.prospect_daily_results.ts_event
-  ts_bp_activation:
-    description: Timestamp of the nBP or rBP conversion event that opens the post-activation cohort window.
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  dt_activation_month:
+    description: Calendar month of the buyer conversion, truncated to the first day of the month.
     lineage:
       - datalake_demand_flows.prospect_daily_results.ts_event
   dt_window_4w_end:
@@ -34,10 +45,6 @@ columns:
     description: End date of the 8-week post-activation window (55 days after activation).
     lineage:
       - datalake_demand_flows.prospect_daily_results.ts_event
-  event_name:
-    description: Conversion type label distinguishing new buyer prospect (nbp) from recovered buyer prospect (rbp).
-    lineage:
-      - datalake_demand_flows.prospect_daily_results.event_name
   year:
     description: Partition year derived from dt_activation_month for storing each buyer cohort by its activation month.
     lineage:

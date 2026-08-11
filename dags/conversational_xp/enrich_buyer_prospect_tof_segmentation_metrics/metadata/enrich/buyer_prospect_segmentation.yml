@@ -14,6 +14,10 @@ columns:
     description: Sale business line for the buyer cohort.
     lineage:
       - datalake_search.buyer_prospect_base.business_context
+  segment_type:
+    description: "Buyer-prospect segment grouping derived from the cohort activation event: bp for new or recovered buyer prospects and tof for top-of-funnel users."
+    lineage:
+      - datalake_search.buyer_prospect_base.segment_type
   is_concierge_prospect:
     description: Whether the buyer prospect's conversion is linked to a visit booked through the Concierge chatbot.
     lineage:
@@ -22,10 +26,10 @@ columns:
     description: Calendar month of the buyer conversion used to group cohort metrics.
     lineage:
       - datalake_search.buyer_prospect_base.dt_activation_month
-  ts_bp_activation:
-    description: Timestamp when the buyer prospect activated and the post-activation cohort windows begin.
+  ts_activation:
+    description: Timestamp when the buyer prospect activated or entered the top of funnel and the post-activation cohort windows begin.
     lineage:
-      - datalake_search.buyer_prospect_base.ts_bp_activation
+      - datalake_search.buyer_prospect_base.ts_activation
   dt_window_4w_end:
     description: Final calendar date included in the buyer's 4-week post-activation activity window.
     lineage:
@@ -36,6 +40,14 @@ columns:
       - datalake_search.buyer_prospect_base.dt_window_8w_end
   dt_partition:
     description: Snapshot date for the daily incremental load; activity counts reflect events on this calendar day within each buyer's post-activation window.
+  is_os_8w:
+    description: Boolean-like flag set to 1 when the buyer submitted at least one offer on dt_partition within the 8-week post-activation window; otherwise 0.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+  is_os_4w:
+    description: Boolean-like flag set to 1 when the buyer submitted at least one offer on dt_partition within the 4-week post-activation window; otherwise 0.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
   sum_interactions_8w:
     description: Distinct search impression timestamps on dt_partition within the 8-week post-activation window.
     lineage:

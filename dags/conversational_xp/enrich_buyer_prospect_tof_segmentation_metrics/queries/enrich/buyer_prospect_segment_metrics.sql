@@ -1,4 +1,4 @@
--- Monthly business metrics pivoted by buyer segment, business context, concierge-prospect status, and cohort window (4w / 8w).
+-- Monthly business metrics pivoted by buyer activity_segment, business context, concierge-prospect status, and cohort window (4w / 8w).
 -- Grain: one row per activation month, business context, concierge-prospect status, cohort window, and metric name.
 
 WITH activity_months_to_process AS (
@@ -12,14 +12,17 @@ WITH activity_months_to_process AS (
 
 activity_month_scope AS (
     SELECT
-        s.dt_partition,
-        s.id_user,
-        s.business_context,
-        bp.is_concierge_prospect,
         s.dt_activation_month,
-        s.ts_bp_activation,
+        s.id_user,
+        s.dt_partition,
+        s.ts_activation,
         s.dt_window_4w_end,
         s.dt_window_8w_end,
+        s.business_context,
+        s.segment_type,
+        bp.is_concierge_prospect,
+        s.is_os_8w,
+        s.is_os_4w,
         s.sum_interactions_8w,
         s.sum_interactions_4w,
         s.sum_search_8w,
@@ -53,12 +56,15 @@ activity_month_scope AS (
 
 activity_month_aggregation AS (
     SELECT
+        dt_activation_month,
         id_user,
         business_context,
+        segment_type,
         is_concierge_prospect,
-        dt_activation_month,
         dt_window_4w_end,
         dt_window_8w_end,
+        MAX(is_os_8w) AS is_os_8w,
+        MAX(is_os_4w) AS is_os_4w,
         SUM(sum_interactions_8w) AS sum_interactions_8w,
         SUM(sum_interactions_4w) AS sum_interactions_4w,
         SUM(sum_search_8w) AS sum_search_8w,
@@ -80,6 +86,7 @@ activity_month_aggregation AS (
     GROUP BY
         id_user,
         business_context,
+        segment_type,
         is_concierge_prospect,
         dt_activation_month,
         dt_window_4w_end,
@@ -260,10 +267,13 @@ activity_month_aggregation_with_lpv_vb AS (
     SELECT
         ama.id_user,
         ama.business_context,
+        ama.segment_type,
         ama.is_concierge_prospect,
         ama.dt_activation_month,
         ama.dt_window_4w_end,
         ama.dt_window_8w_end,
+        ama.is_os_8w,
+        ama.is_os_4w,
         ama.sum_interactions_8w,
         ama.sum_interactions_4w,
         ama.sum_search_8w,
@@ -313,16 +323,18 @@ activity_month_aggregation_with_lpv_vb AS (
 cohort_and_activity_segmentation AS (
     SELECT
         dt_activation_month,
-        business_context,
         id_user,
+        business_context,
+        segment_type,
         is_concierge_prospect,
         CASE
             WHEN sum_interactions_8w > 10 THEN 'qualified_search_active'
             WHEN sum_interactions_8w >= 1 AND sum_interactions_8w <= 10 THEN 'low_search_active'
             WHEN sum_interactions_8w = 0 AND (sum_lpv_8w >= 1 OR sum_schedule_8w >= 1) THEN 'active_no_search'
             WHEN sum_interactions_8w = 0 AND sum_lpv_8w = 0 AND sum_schedule_8w = 0 THEN 'inactive'
-        END AS segment,
+        END AS activity_segment,
         '8w' AS cohort_window,
+        is_os_8w AS is_os,
         sum_interactions_8w AS sum_interactions,
         sum_search_8w AS sum_search,
         sum_search_with_lpv_8w AS sum_search_with_lpv,
@@ -339,16 +351,18 @@ cohort_and_activity_segmentation AS (
     UNION ALL
     SELECT
         dt_activation_month,
-        business_context,
         id_user,
+        business_context,
+        segment_type,
         is_concierge_prospect,
         CASE
             WHEN sum_interactions_4w > 10 THEN 'qualified_search_active'
             WHEN sum_interactions_4w >= 1 AND sum_interactions_4w <= 10 THEN 'low_search_active'
             WHEN sum_interactions_4w = 0 AND (sum_lpv_4w >= 1 OR sum_schedule_4w >= 1) THEN 'active_no_search'
             WHEN sum_interactions_4w = 0 AND sum_lpv_4w = 0 AND sum_schedule_4w = 0 THEN 'inactive'
-        END AS segment,
+        END AS activity_segment,
         '4w' AS cohort_window,
+        is_os_4w AS is_os,
         sum_interactions_4w AS sum_interactions,
         sum_search_4w AS sum_search,
         sum_search_with_lpv_4w AS sum_search_with_lpv,
@@ -368,9 +382,10 @@ activity_segment_metrics AS (
     SELECT
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
-        segment,
+        activity_segment,
         COUNT(id_user) AS num_active_buyers,
         SUM(sum_interactions) / NULLIF(COUNT(id_user), 0) AS avg_int_per_active_buyer,
         SUM(sum_search) / NULLIF(COUNT(id_user), 0) AS avg_spv_per_active_buyer,
@@ -383,22 +398,24 @@ activity_segment_metrics AS (
     FROM
         cohort_and_activity_segmentation
     WHERE
-        segment IS NOT NULL
+        activity_segment IS NOT NULL
     GROUP BY
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
-        segment
+        activity_segment
 ),
 
 activity_segment_long_format AS (
     SELECT
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
-        segment,
+        activity_segment,
         stacked.metric,
         stacked.value
     FROM
@@ -430,12 +447,13 @@ overall_metrics AS (
     SELECT
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
         COUNT(id_user) AS num_active_buyers,
-        COUNT(CASE WHEN segment = 'qualified_search_active' THEN id_user END) AS num_qualified_search_active_buyers,
-        COUNT(CASE WHEN segment = 'low_search_active' THEN id_user END) AS num_low_search_active_buyers,
-        COUNT(CASE WHEN segment = 'active_no_search' THEN id_user END) AS num_active_no_search_buyers,
+        COUNT(CASE WHEN activity_segment = 'qualified_search_active' THEN id_user END) AS num_qualified_search_active_buyers,
+        COUNT(CASE WHEN activity_segment = 'low_search_active' THEN id_user END) AS num_low_search_active_buyers,
+        COUNT(CASE WHEN activity_segment = 'active_no_search' THEN id_user END) AS num_active_no_search_buyers,
         SUM(sum_search_lpv) / NULLIF(SUM(sum_interactions), 0) AS avg_lpv_per_int,
         SUM(sum_search_lpv) / NULLIF(SUM(sum_search), 0) AS avg_lpv_per_spv,
         SUM(sum_search_with_lpv) / NULLIF(SUM(sum_search), 0) AS pct_search_with_lpv,
@@ -444,12 +462,13 @@ overall_metrics AS (
         SUM(sum_visit) / NULLIF(SUM(sum_interactions), 0) AS avg_vb_per_int,
         SUM(sum_visit) / NULLIF(SUM(sum_search), 0) AS avg_vb_per_spv,
         SUM(sum_dist_listing_spv_with_lpv) / NULLIF(SUM(sum_dist_listing_spv), 0) AS discovery_rate,
-        COUNT(CASE WHEN sum_visit >= 3 THEN id_user END) / NULLIF(COUNT(id_user), 0) AS bes
+        COUNT(CASE WHEN (sum_visit >= 3) OR (is_os = 1 AND sum_visit >= 1) THEN id_user END) / NULLIF(COUNT(id_user), 0) AS bes
     FROM
         cohort_and_activity_segmentation
     GROUP BY
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window
 ),
@@ -458,6 +477,7 @@ overall_metrics_all AS (
     SELECT
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
         num_active_buyers,
@@ -490,9 +510,10 @@ overall_metrics_long_format AS (
     SELECT
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
-        'overall' AS segment,
+        'overall' AS activity_segment,
         stacked.metric,
         stacked.value
     FROM
@@ -530,9 +551,10 @@ metrics_long_format AS (
     SELECT
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
-        segment,
+        activity_segment,
         metric,
         value
     FROM
@@ -541,9 +563,10 @@ metrics_long_format AS (
     SELECT
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
-        segment,
+        activity_segment,
         metric,
         value
     FROM
@@ -554,32 +577,33 @@ metrics_pivoted AS (
     SELECT
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
         metric,
         MAX(
             CASE
-                WHEN segment = 'overall' THEN value
+                WHEN activity_segment = 'overall' THEN value
             END
         ) AS overall,
         MAX(
             CASE
-                WHEN segment = 'qualified_search_active' THEN value
+                WHEN activity_segment = 'qualified_search_active' THEN value
             END
         ) AS qualified_search_active,
         MAX(
             CASE
-                WHEN segment = 'low_search_active' THEN value
+                WHEN activity_segment = 'low_search_active' THEN value
             END
         ) AS low_search_active,
         MAX(
             CASE
-                WHEN segment = 'active_no_search' THEN value
+                WHEN activity_segment = 'active_no_search' THEN value
             END
         ) AS active_no_search,
         MAX(
             CASE
-                WHEN segment = 'inactive' THEN value
+                WHEN activity_segment = 'inactive' THEN value
             END
         ) AS inactive,
         YEAR(dt_activation_month) AS year,
@@ -590,6 +614,7 @@ metrics_pivoted AS (
     GROUP BY
         dt_activation_month,
         business_context,
+        segment_type,
         is_concierge_prospect,
         cohort_window,
         metric
@@ -597,6 +622,7 @@ metrics_pivoted AS (
 SELECT
     dt_activation_month,
     business_context,
+    segment_type,
     is_concierge_prospect,
     cohort_window,
     metric,
