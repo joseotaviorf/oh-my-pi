@@ -11,6 +11,14 @@ workflow:
   custom_schema: supply_flows
   default_extraction_type: incremental
   tables_customization:
+    # Incremental plan (EMR perf): conversion_lookup is the upstream bottleneck (full scan +
+    # EXPLODE fan-out). Target state: merge_on [id_house, business_context, id_lead] with
+    # load_start_date/load_end_date on ts_conversion (1p/3p/ciq sources) and rev-based filters on
+    # listing_business_context_aud. prospects_1p can then switch to default incremental using
+    # sk_supply_lead + business_context merge_on (already declared) keyed on ts_event from
+    # house_lead_aud / lead_rejection within the DAG window (-6d .. ds). acquisition_tracking
+    # should follow once prospects_* and leads_* are incremental. Validate row counts vs full
+    # reload before flipping extraction_type in prod.
     conversion_lookup:
       extraction_type: full
       z_order_by: ["id_house", "business_context", "id_lead"]
@@ -26,7 +34,7 @@ workflow:
     leads_ciq:
       merge_on: ["sk_supply_lead", "business_context"]
       z_order_by: ["sk_supply_lead", "business_context", "id_lead"]
-    prospects_1p: # This table must be revisited so that the load is incremental
+    prospects_1p:
       extraction_type: full
       merge_on: ["sk_supply_lead", "business_context"]
       z_order_by: ["sk_supply_lead", "business_context", "id_lead"]

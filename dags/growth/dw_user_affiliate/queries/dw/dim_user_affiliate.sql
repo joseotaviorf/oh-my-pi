@@ -24,63 +24,64 @@ WITH affiliates_full AS (
     ad.ts_operation_start,
     ad.ts_created,
     ad.ts_updated
-  FROM
-    datalake_ebdb_user.affiliate_data AS ad
-  JOIN
-    datalake_ebdb_user.user AS u
-      ON u.id_affiliates = ad.id
-  LEFT JOIN
-    datalake_amplitude_user.user_affiliate_origin AS uao
-      ON u.id = uao.id_user
-  LEFT JOIN
-    datalake_ebdb_user.agent_data
-      ON agent_data.id = u.id_agent
-  LEFT JOIN 
-    datalake_ebdb_clean.partner_agent pa
-      ON pa.id_user = u.id
-  WHERE pa.id_partner <> 7099
-      OR pa.id_partner IS NULL
-),
-region_ddd AS (
-  SELECT DISTINCT
-    city_group,
-    city_ddd AS ddd,
-    regional
-  FROM
-    datalake_region.region
+  FROM datalake_ebdb_user.affiliate_data AS ad
+  JOIN datalake_ebdb_user.user AS u
+    ON u.id_affiliates = ad.id
+  LEFT JOIN datalake_amplitude_user.user_affiliate_origin AS uao
+    ON u.id = uao.id_user
+  LEFT JOIN datalake_ebdb_user.agent_data
+    ON agent_data.id = u.id_agent
+  LEFT JOIN datalake_ebdb_clean.partner_agent AS pa
+    ON pa.id_user = u.id
   WHERE
-    is_city
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY city_ddd, city_group ORDER BY regional DESC) = 1
-),
-region_city AS (
-  SELECT DISTINCT
+    pa.id_partner <> 7099 OR pa.id_partner IS NULL
+), region_ddd AS (
+  SELECT
+    city_group,
+    ddd,
+    regional
+  FROM (
+    SELECT DISTINCT
+      city_group,
+      city_ddd AS ddd,
+      regional,
+      ROW_NUMBER() OVER (PARTITION BY city_ddd, city_group ORDER BY regional DESC) AS _w,
+      city_ddd
+    FROM datalake_region.region
+    WHERE
+      is_city
+  ) AS _t
+  WHERE
+    _w = 1
+), region_city AS (
+  SELECT
     city_name,
     city_group,
     regional
-  FROM
-    datalake_region.region
+  FROM (
+    SELECT DISTINCT
+      city_name,
+      city_group,
+      regional,
+      ROW_NUMBER() OVER (PARTITION BY city_name, city_group ORDER BY regional DESC) AS _w
+    FROM datalake_region.region
+    WHERE
+      is_city
+  ) AS _t
   WHERE
-    is_city
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY city_name, city_group ORDER BY regional DESC) = 1
-),
-affiliate_mkt_city_group AS (
+    _w = 1
+), affiliate_mkt_city_group AS (
   SELECT
     af_full.*,
     COALESCE(af_full.city_campaign, region_city.city_group, region_ddd.city_group) AS marketing_city_group,
     COALESCE(region_city.regional, region_ddd.regional) AS regional_ddd_city
-  FROM
-    affiliates_full AS af_full
-  LEFT JOIN
-    region_city
-      ON af_full.tracking_city = region_city.city_name
-  LEFT JOIN
-    region_ddd
-      ON af_full.main_phone_ddd = region_ddd.ddd
-      AND region_ddd.city_group = region_city.city_group
-),
-aff_city_group_with_region AS (
+  FROM affiliates_full AS af_full
+  LEFT JOIN region_city
+    ON af_full.tracking_city = region_city.city_name
+  LEFT JOIN region_ddd
+    ON af_full.main_phone_ddd = region_ddd.ddd
+    AND region_ddd.city_group = region_city.city_group
+), aff_city_group_with_region AS (
   SELECT
     aff_city_region.sk_user_affiliate,
     aff_city_region.id_user_affiliate,
@@ -106,13 +107,10 @@ aff_city_group_with_region AS (
     aff_city_region.ts_operation_start,
     aff_city_region.ts_created,
     aff_city_region.ts_updated
-  FROM
-    affiliate_mkt_city_group AS aff_city_region
-  LEFT JOIN
-    region_ddd AS region_city_group
-      ON aff_city_region.marketing_city_group = region_city_group.city_group
-),
-taxonomy AS (
+  FROM affiliate_mkt_city_group AS aff_city_region
+  LEFT JOIN region_ddd AS region_city_group
+    ON aff_city_region.marketing_city_group = region_city_group.city_group
+), taxonomy AS (
   SELECT
     affiliate_type,
     tracking_medium,
@@ -122,27 +120,38 @@ taxonomy AS (
     mkt_channel,
     mkt_medium,
     mkt_source
-  FROM
-    datalake_gsheets_clean.taxonomy_affiliates
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY affiliate_type, tracking_medium, tracking_source, tracking_campaign ORDER BY ID) = 1
-),
-applied_taxonomy AS (
+  FROM (
+    SELECT
+      affiliate_type,
+      tracking_medium,
+      tracking_source,
+      tracking_campaign,
+      mkt_origin,
+      mkt_channel,
+      mkt_medium,
+      mkt_source,
+      ROW_NUMBER() OVER (PARTITION BY affiliate_type, tracking_medium, tracking_source, tracking_campaign ORDER BY ID) AS _w,
+      ID
+    FROM datalake_gsheets_clean.taxonomy_affiliates
+  ) AS _t
+  WHERE
+    _w = 1
+), applied_taxonomy AS (
   SELECT
     acg.*,
     COALESCE(tax.mkt_origin, 'Other') AS mkt_origin,
     COALESCE(tax.mkt_channel, 'Not Mapped') AS mkt_channel,
     COALESCE(tax.mkt_medium, 'Not Mapped') AS mkt_medium,
     COALESCE(tax.mkt_source, 'Not Mapped') AS mkt_source
-  FROM
-    aff_city_group_with_region AS acg
+  FROM aff_city_group_with_region AS acg
   LEFT JOIN taxonomy AS tax
-      ON tax.affiliate_type = COALESCE(acg.affiliate_type, '')
-      AND tax.tracking_medium = COALESCE(acg.tracking_medium, '')
-      AND tax.tracking_source = COALESCE(acg.tracking_source, '')
-      AND tax.tracking_campaign = COALESCE(acg.tracking_campaign, '')
-  )
-SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+    ON tax.affiliate_type = COALESCE(acg.affiliate_type, '')
+    AND tax.tracking_medium = COALESCE(acg.tracking_medium, '')
+    AND tax.tracking_source = COALESCE(acg.tracking_source, '')
+    AND tax.tracking_campaign = COALESCE(acg.tracking_campaign, '')
+)
+/* [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings */
+SELECT
   atax.sk_user_affiliate,
   atax.id_user AS sk_user,
   atax.id_user_affiliate,
@@ -172,5 +181,4 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   atax.ts_created,
   atax.ts_updated,
   NOW() AS ts_load
-FROM
-  applied_taxonomy AS atax
+FROM applied_taxonomy AS atax

@@ -1,7 +1,5 @@
 cluster:
-  type: consolidation_xs_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    driver_node_type_id: m7g.xlarge

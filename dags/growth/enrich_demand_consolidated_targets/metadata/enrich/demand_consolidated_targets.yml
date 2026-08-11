@@ -97,6 +97,8 @@ columns:
       - datalake_gsheets_clean.sale_tof_monthly_target.medium
   metric_name:
     description: 'Indicates which metric is been evalutaed on target column'
+  submetric_name:
+    description: 'Indicates which submetric is been evaluated on target column (e.g. new, recovered, daily, weekly, monthly)'
   operation_channel:
     description: 'Growth Taxonomy Level that indicates the operation_channel of that Target.'
     lineage: 

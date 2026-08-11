@@ -1,56 +1,94 @@
-WITH contact_info_email AS (
+WITH contact_info_base AS (
   SELECT
-    ci.id AS id_contact_info_email,
-    ci.id_person
-  FROM
-    datalake_person_clean.contact_info AS ci
+    ci.id,
+    ci.id_person,
+    ci.category,
+    ci.contact_info,
+    ci.ts_updated
+  FROM datalake_person_clean.contact_info AS ci
   WHERE
-    ci.category = 'EMAIL'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) = 1
+    ci.category IN ('EMAIL', 'PHONE')
+),
+contact_info_email AS (
+  SELECT
+    id_contact_info_email,
+    id_person
+  FROM (
+    SELECT
+      ci.id AS id_contact_info_email,
+      ci.id_person,
+      ROW_NUMBER() OVER (PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) AS _w
+    FROM contact_info_base AS ci
+    WHERE
+      ci.category = 'EMAIL'
+  ) AS _t
+  WHERE
+    _w = 1
 ),
 contact_info_email_quintoandar AS (
   SELECT
-    ci.id AS id_contact_info_email_quintoandar,
-    ci.id_person
-  FROM
-    datalake_person_clean.contact_info AS ci
+    id_contact_info_email_quintoandar,
+    id_person
+  FROM (
+    SELECT
+      ci.id AS id_contact_info_email_quintoandar,
+      ci.id_person,
+      ROW_NUMBER() OVER (PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) AS _w
+    FROM contact_info_base AS ci
+    WHERE
+      ci.category = 'EMAIL'
+      AND (
+        ci.contact_info LIKE '%@quintoandar.com%'
+        OR ci.contact_info LIKE '%@br.quintoandar%'
+      )
+  ) AS _t
   WHERE
-    ci.category = 'EMAIL'
-    AND (ci.contact_info LIKE '%@quintoandar.com%' OR ci.contact_info LIKE '%@br.quintoandar%')
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) = 1
+    _w = 1
 ),
 contact_info_phone AS (
   SELECT
-    ci.id AS id_contact_info_phone,
-    ci.id_person
-  FROM
-    datalake_person_clean.contact_info AS ci
+    id_contact_info_phone,
+    id_person
+  FROM (
+    SELECT
+      ci.id AS id_contact_info_phone,
+      ci.id_person,
+      ROW_NUMBER() OVER (PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) AS _w
+    FROM contact_info_base AS ci
+    WHERE
+      ci.category = 'PHONE'
+  ) AS _t
   WHERE
-    ci.category = 'PHONE'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) = 1
-),
-main_user AS (
+    _w = 1
+), main_user AS (
   SELECT
-    cr.id_person,
-    cr.id_reference AS id_user
-  FROM
-    datalake_person_clean.credential_reference AS cr
+    id_person,
+    id_user
+  FROM (
+    SELECT
+      cr.id_person,
+      cr.id_reference AS id_user,
+      ROW_NUMBER() OVER (PARTITION BY cr.id_person ORDER BY cr.ts_updated DESC) AS _w
+    FROM datalake_person_clean.credential_reference AS cr
+    WHERE
+      cr.origin = 'main'
+  ) AS _t
   WHERE
-    cr.origin = 'main'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY cr.id_person ORDER BY cr.ts_updated DESC) = 1
+    _w = 1
 ),
 right_to_be_forgotten AS (
   SELECT
-    rf.id AS id_right_to_be_forgotten,
-    rf.id_person
-  FROM
-    datalake_person_clean.right_to_be_forgotten AS rf
-  QUALIFY
-      ROW_NUMBER() OVER(PARTITION BY rf.id_person ORDER BY rf.ts_updated DESC) = 1
+    id_right_to_be_forgotten,
+    id_person
+  FROM (
+    SELECT
+      rf.id AS id_right_to_be_forgotten,
+      rf.id_person,
+      ROW_NUMBER() OVER (PARTITION BY rf.id_person ORDER BY rf.ts_updated DESC) AS _w
+    FROM datalake_person_clean.right_to_be_forgotten AS rf
+  ) AS _t
+  WHERE
+    _w = 1
 ),
 member_profile AS (
   SELECT
@@ -74,10 +112,8 @@ member_profile AS (
     MAX(mp.id_profile) = 9 AS has_tenant_member_profile,
     MAX(mp.id_profile) = 10 AS has_tenant_prospect_member_profile,
     MAX(mp.id_profile) = 17 AS has_third_party_agent_member_profile
-  FROM
-    datalake_company_clean.member_profile AS mp
-  GROUP BY
-    ALL
+  FROM datalake_company_clean.member_profile AS mp
+  GROUP BY ALL
 )
 SELECT
   XXHASH64(p.id) AS sk_person,
@@ -110,28 +146,19 @@ SELECT
   mp.has_third_party_agent_member_profile,
   p.ts_created,
   p.ts_updated
-FROM
-  datalake_person_clean.person AS p
-LEFT JOIN
-  contact_info_email AS cie
-    ON p.id = cie.id_person
-LEFT JOIN
-  contact_info_email_quintoandar AS cie_qa
-    ON p.id = cie_qa.id_person
-LEFT JOIN
-  contact_info_phone AS cip
-    ON p.id = cip.id_person
-LEFT JOIN
-  main_user AS mu
-    ON p.id = mu.id_person
-LEFT JOIN
-  datalake_person_clean.preference_settings AS ps
-    ON p.id = ps.id_person
-LEFT JOIN
-  right_to_be_forgotten AS rf
-    ON p.id = rf.id_person
-LEFT JOIN
-  member_profile AS mp
-    ON p.uuid_person = mp.uuid_person
-GROUP BY
-  ALL
+FROM datalake_person_clean.person AS p
+LEFT JOIN contact_info_email AS cie
+  ON p.id = cie.id_person
+LEFT JOIN contact_info_email_quintoandar AS cie_qa
+  ON p.id = cie_qa.id_person
+LEFT JOIN contact_info_phone AS cip
+  ON p.id = cip.id_person
+LEFT JOIN main_user AS mu
+  ON p.id = mu.id_person
+LEFT JOIN datalake_person_clean.preference_settings AS ps
+  ON p.id = ps.id_person
+LEFT JOIN right_to_be_forgotten AS rf
+  ON p.id = rf.id_person
+LEFT JOIN member_profile AS mp
+  ON p.uuid_person = mp.uuid_person
+GROUP BY ALL
