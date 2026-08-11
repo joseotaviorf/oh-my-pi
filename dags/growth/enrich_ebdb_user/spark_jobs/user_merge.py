@@ -109,7 +109,11 @@ if __name__ == "__main__":
         """
     )
 
-    spark_client = SparkClient()
+    # EMR has no Databricks-injected global `spark`/`sc`; SparkClient creates them
+    # on EMR and reuses the active session on Databricks.
+    spark_client = SparkClient(app_name=JOB_NAME)
+    spark = spark_client.conn
+    sc = spark.sparkContext
 
     loader = DeltaLoader()
     spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(

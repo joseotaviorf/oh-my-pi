@@ -307,6 +307,11 @@ if __name__ == "__main__":
     start_date = F.lit(args.load_start_date).cast("date")
     end_date = F.lit(args.load_end_date).cast("date")
 
+    # EMR has no Databricks-injected global `spark`; SparkClient creates it on EMR
+    # and reuses the active session on Databricks.
+    spark_client = SparkClient(app_name=JOB_NAME)
+    spark = spark_client.conn
+
     candidates = _get_candidates(start_date, end_date)
     candidates_count = candidates.count()
     logger.info(f"m=__main__, candidate_houses={candidates_count:,}")
@@ -322,7 +327,6 @@ if __name__ == "__main__":
         try:
             result_df = _build_result(house_aud)
 
-            spark_client = SparkClient()
             db_info = DatalakeMetastoreService.get_db_info(
                 args.environment, args.database_name, args.datalake_bucket
             )
