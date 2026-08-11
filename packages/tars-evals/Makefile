@@ -1,4 +1,4 @@
-.PHONY: help install test lint creds generate-datasets
+.PHONY: help install test lint creds generate-datasets eval-suite eval-rollup eval-check-gate
 
 help: ## Show this help message
 	@echo "Available targets:"
@@ -23,3 +23,15 @@ generate-datasets: ## Regenerate datasets/*.yaml from metric_entities golden que
 	uv run python scripts/generate_datasets_from_context_docs.py \
 	    $(foreach stem,$(STEMS),--stem $(stem)) \
 	    $(if $(STEMS_FILE),--stems-file $(STEMS_FILE))
+
+# STEM= optional. Examples:
+#   make eval-suite
+#   make eval-suite STEM=turnover
+eval-suite: ## Per-dataset evals (parallel workers) + rollup. Optional STEM=<stem>.
+	scripts/run_dataset_queue.sh $(STEM)
+
+eval-rollup: ## Merge logs/per_dataset/*/summary.json into rollup.json + gate_summary.json
+	uv run python scripts/build_rollup.py
+
+eval-check-gate: ## Re-check gate_summary.json without re-running anything; exits non-zero on a failing gate
+	uv run python scripts/check_gate.py gate_summary.json

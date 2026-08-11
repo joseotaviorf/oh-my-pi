@@ -37,6 +37,21 @@ An empty stems file is a valid no-op that exits `0`.
 `--skip-hand-authored` downgrades an in-scope hand-authored collision from exit
 `1` to a logged skip (used by CI drift checks in a follow-up PR).
 
+## Running evals and gate orchestration
+
+Per-dataset evals run in parallel via a stem queue, then rollup and gate check:
+
+```bash
+make eval-suite              # all datasets
+make eval-suite STEM=turnover
+make eval-rollup
+make eval-check-gate
+```
+
+`changed_dataset_stems.py` resolves which dataset stems a git diff affects
+(eval stems vs scope stems for drift/regen). See orchestration tests for the
+Woodpecker pairing contract.
+
 ## Quick start
 
 ```bash
