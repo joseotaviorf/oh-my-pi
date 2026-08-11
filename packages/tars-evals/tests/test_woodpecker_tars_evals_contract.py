@@ -82,6 +82,32 @@ def test_eval_step_supports_sha_and_branch_skill_pins():
     assert '--branch "$TARS_AITOOLS_REF"' in raw
 
 
+def test_eval_step_archives_inspect_logs_to_tars_s3():
+    raw = WORKFLOW.read_text(encoding="utf-8")
+    assert "scripts/upload_inspect_logs_s3.py" in raw
+    assert "TARS_EVAL_S3_BUCKET: 5a-tars-prod-data" in raw
+    assert "TARS_EVAL_S3_PREFIX_ROOT: evals/inspect" in raw
+    assert "TARS_EVAL_REQUIRE_S3_UPLOAD" in raw
+    # Archive runs after gate reports and before propagating the eval RC.
+    eval_block = raw.split("tars-evals-changed:")[1]
+    assert eval_block.index("upload_inspect_logs_s3.py") < eval_block.index("exit $RC")
+
+
+def test_required_s3_upload_failure_actually_fails_the_step():
+    """TARS_EVAL_REQUIRE_S3_UPLOAD=1 must be able to fail this step — a plain
+    `exit $RC` at the end would silently drop UPLOAD_RC and make the toggle a
+    no-op even when upload_inspect_logs_s3.py itself returns non-zero."""
+    raw = WORKFLOW.read_text(encoding="utf-8")
+    eval_block = raw.split("tars-evals-changed:")[1]
+    upload_idx = eval_block.index("upload_inspect_logs_s3.py")
+    promote_idx = eval_block.index('RC=$UPLOAD_RC')
+    exit_idx = eval_block.index("exit $RC")
+    assert upload_idx < promote_idx < exit_idx
+    # Only promoted when the eval gate itself passed — an eval failure must
+    # stay the primary signal.
+    assert 'if [ "$RC" -eq 0 ]; then' in eval_block
+
+
 def test_unit_tests_path_filter_is_package_scoped():
     raw = WORKFLOW.read_text(encoding="utf-8")
     assert "unit-tests-tars-evals" in raw

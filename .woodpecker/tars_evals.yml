@@ -171,6 +171,12 @@ steps:
       # generate_and_push_datahub_entities.py uses).
       LITELLM_BASE_URL: https://litellm.apps.shared-prd.habitat.zone/v1
       INSPECT_DISPLAY: plain
+      # Durable Inspect archive (see scripts/upload_inspect_logs_s3.py).
+      TARS_EVAL_S3_BUCKET: 5a-tars-prod-data
+      TARS_EVAL_S3_PREFIX_ROOT: evals/inspect
+      # Flip to "1" after the bucket policy grant is applied in infrastructure.
+      TARS_EVAL_REQUIRE_S3_UPLOAD: "0"
+      AWS_DEFAULT_REGION: us-east-1
       GITHUB_TOKEN:
         from_secret: github_token
     commands:
@@ -263,6 +269,33 @@ steps:
           echo "----- $report -----"
           cat "$report"
         done
+
+        # 6. Persist Inspect transcripts to the TARS data bucket so failures remain
+        #    auditable after the runner is gone. Best-effort by default: a missing
+        #    IAM grant must not hide a legitimate gate result. Set
+        #    TARS_EVAL_REQUIRE_S3_UPLOAD=1 to fail closed once infra has landed.
+        #    Destination: s3://5a-tars-prod-data/evals/inspect/{date}/{run}/pipeline-{n}/
+        echo ""
+        echo "Archiving Inspect logs to S3 (best-effort)…"
+        set +e
+        uv run --with boto3 python scripts/upload_inspect_logs_s3.py \
+          --source logs/per_dataset \
+          --extra gate_summary.json \
+          --extra logs/per_dataset/rollup.json
+        UPLOAD_RC=$?
+        set -e
+        if [ "$UPLOAD_RC" -ne 0 ]; then
+          echo "WARN: Inspect S3 archive exited $UPLOAD_RC" >&2
+          # TARS_EVAL_REQUIRE_S3_UPLOAD=1 makes upload_inspect_logs_s3.py
+          # return non-zero on a genuine upload failure (it's 0 in the
+          # default best-effort mode). Only promote it when the eval gate
+          # itself passed — an eval failure must always win as the primary
+          # signal, but a required-and-failed archive must still propagate
+          # a failing exit code for this step, not get silently dropped.
+          if [ "$RC" -eq 0 ]; then
+            RC=$UPLOAD_RC
+          fi
+        fi
 
         exit $RC
     when:

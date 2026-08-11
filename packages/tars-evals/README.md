@@ -67,6 +67,19 @@ make eval-changed
 Override the diff range with `BASE=` / `HEAD=` (default: merge base with
 `origin/master`).
 
+## Inspect log archival (S3)
+
+Woodpecker's `tars-evals-changed` step best-effort uploads per-stem Inspect
+logs to `s3://5a-tars-prod-data/evals/inspect/…` via
+`scripts/upload_inspect_logs_s3.py`. Upload failures do not mask a gate result
+unless `TARS_EVAL_REQUIRE_S3_UPLOAD=1`.
+
+```bash
+uv run --with boto3 python scripts/upload_inspect_logs_s3.py \
+  --source logs/per_dataset \
+  --extra gate_summary.json
+```
+
 ## Quick start
 
 ```bash
