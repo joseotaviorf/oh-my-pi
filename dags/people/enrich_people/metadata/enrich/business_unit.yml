@@ -26,10 +26,17 @@ columns:
     description: Display name of the QuintoAndar business unit in the enriched org structure.
     lineage:
       - datalake_pin_core_clean.hr_organization.name
+  country:
+    description: Operating country of the business unit in English (e.g. 'Peru', 'Brazil'), derived from the majority legal-employer legislation_code on active primary assignments and overridden for Deel - QuintoAndar (United States) and Benvi MX (Mexico) where legislation_code does not match allocation country.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.legislation_code
+      - datalake_pin_core_clean.hr_organization.legislation_code
   legislation_code:
-    description: Legislation code associated with the legal entity context.
+    description: |
+      Two-letter legislation territory code for the business unit, resolved from the majority legal employer (HCM_LEMP) on active primary assignments when the BU row in PIN has no legislation_code.
     lineage:
       - datalake_pin_core_clean.hr_organization.legislation_code
+      - datalake_pin_core_clean.all_assignments.legislation_code
   organization_type:
     description: Internal or external organization flag.
     lineage:

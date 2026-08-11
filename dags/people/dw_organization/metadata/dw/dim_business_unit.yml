@@ -37,6 +37,10 @@ columns:
         Portugal operating label. Source business_unit_name Benvi PT and Remote (international contractors under Benvi PT, replacing Deel).
     lineage:
       - datalake_people.business_unit.business_unit_name
+  country:
+    description: Operating country of the business unit in English (e.g. 'Peru', 'Brazil').
+    lineage:
+      - datalake_people.business_unit.country
   cnpj:
     description: Brazilian legal-entity tax identifier (CNPJ) for the business unit, formatted as XX.XXX.XXX/XXXX-XX. NULL when no Brazilian legal-entity CNPJ applies to the business unit.
   ts_load:

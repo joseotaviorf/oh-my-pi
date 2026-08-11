@@ -76,7 +76,7 @@ columns:
     lineage:
       - datalake_people.assignment_snapshots.employment_status
   business_unit_country:
-    description: Country associated with the employee's job role on this snapshot (e.g. 'Brazil'). The main source for an employee's country; use for headcount and org allocation by country.
+    description: Country of the assignment's legal employer on the snapshot date (e.g. 'Peru', 'Brazil'). The main source for an employee's country; use for headcount and org allocation by country.
     lineage:
       - datalake_people.assignment_snapshots.business_unit_country
   employee_tenure_range:

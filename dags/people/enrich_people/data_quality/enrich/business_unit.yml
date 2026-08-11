@@ -41,6 +41,28 @@ column_level_validations:
            AND dt_valid_to <= dt_valid_from
         ) = 0
       severity_level: Error
+  brazil_main_business_units_have_legislation_code_br:
+    custom:
+      # Main Brazil business units should resolve to BR legislation_code.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.business_unit
+         WHERE is_current = TRUE
+           AND business_unit_name IN ('QuintoAndar SP', 'QuintoAndar MG', 'QuintoAndar SC', 'Atta', 'MLSP', 'Deel - QuintoAndar')
+           AND (legislation_code IS NULL OR legislation_code != 'BR')
+        ) = 0
+      severity_level: Warning
+  non_brazil_business_units_flagged_as_br_legislation:
+    custom:
+      # International business units outside the main Brazil list should not resolve to BR legislation_code.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.business_unit
+         WHERE is_current = TRUE
+           AND business_unit_name NOT IN ('QuintoAndar SP', 'QuintoAndar MG', 'QuintoAndar SC', 'Atta', 'MLSP', 'Deel - QuintoAndar')
+           AND legislation_code = 'BR'
+        ) = 0
+      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Error

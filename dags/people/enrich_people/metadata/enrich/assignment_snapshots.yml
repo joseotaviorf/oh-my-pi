@@ -52,9 +52,10 @@ columns:
     lineage:
       - datalake_people.cost_center_history.sk_cost_center_version
   business_unit_country:
-    description: |
-      Country inferred for the job row effective on dt_reference (same row as sk_job_version in job_with_salary_table). NULL when no job row matches the date window.
+    description: Country of the assignment on dt_reference, mapped from the assignment legislation_code (legal employer country in PIN) and overridden for Deel - QuintoAndar (United States) and Benvi MX (Mexico) where legislation_code does not match allocation country.
     lineage:
+      - datalake_pin_core_clean.all_assignments.legislation_code
+      - datalake_people.business_unit.business_unit_name
       - datalake_people.job_with_salary_table.country
   sk_hierarchy_version:
     description: Org structure identifier from management_hierarchy.

@@ -215,7 +215,24 @@ assignment_snapshots_ranked AS (
         ) AS sk_job_version,
         cc.sk_cost_center_version,
         cv.sk_compensation AS sk_compensation_version,
-        jwst.country AS business_unit_country,
+        /* Temporary workaround: same mapping as business_unit.sql. PIN has country names
+        in legislative_data_group, but we have not modeled that lookup yet. The first two
+        branches override business units whose legal employer is registered under a
+        legislation other than the country where the employees actually work. */
+        CASE
+            WHEN bu.business_unit_name = 'Deel - QuintoAndar' THEN 'United States'
+            WHEN bu.business_unit_name = 'Benvi MX' THEN 'Mexico'
+            WHEN all_assign.legislation_code = 'PE' THEN 'Peru'
+            WHEN all_assign.legislation_code = 'EC' THEN 'Ecuador'
+            WHEN all_assign.legislation_code = 'PA' THEN 'Panama'
+            WHEN all_assign.legislation_code = 'MX' THEN 'Mexico'
+            WHEN all_assign.legislation_code = 'AR' THEN 'Argentina'
+            WHEN all_assign.legislation_code = 'UY' THEN 'Uruguay'
+            WHEN all_assign.legislation_code = 'PT' THEN 'Portugal'
+            WHEN all_assign.legislation_code = 'BR' THEN 'Brazil'
+            WHEN all_assign.legislation_code = 'US' THEN 'United States'
+            ELSE NULL
+        END AS business_unit_country,
         mh.sk_hierarchy_version,
         im.id_termination_event_definition AS sk_termination_event_definition,
         DATE_FORMAT(ad.dt_started, 'yyyyMMdd') AS sk_hired_date,
@@ -337,6 +354,11 @@ assignment_snapshots_ranked AS (
             ON jwst.id_job = all_assign.id_job
             AND ad.dt_reference >= jwst.dt_valid_from
             AND ad.dt_reference <= COALESCE(jwst.dt_valid_to, DATE('9999-12-31'))
+    LEFT JOIN
+        datalake_people.business_unit AS bu
+            ON bu.id_organization = all_assign.id_business_unit
+            AND ad.dt_reference >= bu.dt_valid_from
+            AND ad.dt_reference <= bu.dt_valid_to
     LEFT JOIN
         datalake_people.cost_center_history AS cc
             ON cc.id_organization = all_assign.id_organization
