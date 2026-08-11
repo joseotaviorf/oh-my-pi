@@ -1,4 +1,52 @@
 SELECT
+  id_house_platform,
+  id_house,
+  platform,
+  advertiser_listing_id,
+  country,
+  state,
+  address_city,
+  neighborhood,
+  street,
+  street_number,
+  zip_code,
+  latitude,
+  longitude,
+  listing_name,
+  listing_url,
+  total_area,
+  amenities,
+  bathrooms,
+  bedrooms,
+  floors,
+  parking_spaces,
+  suites,
+  unit_type,
+  usage_type,
+  advertiser_id,
+  advertiser_name,
+  advertiser_phone,
+  advertiser_url,
+  advertiser_creci,
+  advertiser_address_state,
+  advertiser_address_city,
+  advertiser_address_zip_code,
+  advertiser_address_neighborhood,
+  advertiser_address_street,
+  advertiser_address_street_number,
+  condo_fee,
+  iptu,
+  price_rental,
+  price_sale,
+  price_m2_rental,
+  price_m2_sale,
+  is_for_rent,
+  is_for_sale,
+  is_hybrid,
+  ts_created,
+  ts_updated
+FROM (
+  SELECT
     id_house_platform,
     id_house,
     platform,
@@ -43,12 +91,13 @@ SELECT
     is_for_rent,
     is_for_sale,
     is_hybrid,
-    ts_created::TIMESTAMP AS ts_created,
-    ts_updated::TIMESTAMP AS ts_updated
-FROM
-    datalake_crawler_zap_imoveis.zap_imoveis
+    CAST(ts_created AS TIMESTAMP) AS ts_created,
+    CAST(ts_updated AS TIMESTAMP) AS ts_updated,
+    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY CAST(ts_updated AS TIMESTAMP) DESC) AS _w
+  FROM datalake_crawler_zap_imoveis.zap_imoveis
+  WHERE
+    NOT ts_updated IS NULL
+    AND MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+) AS _t
 WHERE
-    ts_updated IS NOT NULL
-    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_updated DESC) = 1
+  _w = 1

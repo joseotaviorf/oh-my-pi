@@ -1,4 +1,4 @@
-SELECT 
+SELECT
   id_house_platform,
   id_house,
   platform,
@@ -39,9 +39,52 @@ SELECT
   year,
   month,
   day
-FROM 
-  datalake_crawler_olx.olx
+FROM (
+  SELECT
+    id_house_platform,
+    id_house,
+    platform,
+    advertiser_listing_id,
+    country,
+    state,
+    address_city,
+    neighborhood,
+    street,
+    zip_code,
+    listing_name,
+    listing_url,
+    total_area,
+    amenities,
+    bathrooms,
+    bedrooms,
+    parking_spaces,
+    unit_type,
+    unit_subtype,
+    advertiser_id,
+    advertiser_name,
+    advertiser_phone,
+    advertiser_url,
+    advertiser_address_state,
+    advertiser_address_city,
+    advertiser_address_neighborhood,
+    advertiser_is_professional,
+    condo_fee,
+    iptu,
+    rent_price,
+    sale_price,
+    price_m2_rental,
+    price_m2_sale,
+    is_for_rent,
+    is_for_sale,
+    is_hybrid,
+    ts_created,
+    year,
+    month,
+    day,
+    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY MAKE_DATE(year, month, day) DESC) AS _w
+  FROM datalake_crawler_olx.olx
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+) AS _t
 WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY MAKE_DATE(year, month, day) DESC) = 1
+  _w = 1
