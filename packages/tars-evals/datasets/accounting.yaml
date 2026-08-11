@@ -1,0 +1,18 @@
+items:
+  - id: straw-compliance-monthly-2026
+    question: >-
+      Quero saber qual o % de compliance da conta 420010 em 2026, por mês
+    expected_query: |
+      SELECT
+        DATE_TRUNC('month', CAST(dt_filter AS DATE)) AS month_ref,
+        account_number,
+        accounting_name,
+        100.0 * SUM(IF(is_compliance = TRUE AND type = 'straw',
+          COALESCE(ABS(source_amount), ABS(sap_amount)), 0))
+          / NULLIF(SUM(IF(type = 'straw',
+          COALESCE(ABS(source_amount), ABS(sap_amount)), 0)), 0) AS straw_compliance_pct
+        FROM dw_sap_accounting_process.fact_sap_accounting_process
+        WHERE account_number = '420010'
+          AND CAST(dt_filter AS DATE) BETWEEN DATE '2026-01-01' AND DATE '2026-12-31'
+        GROUP BY 1, 2, 3
+        ORDER BY 1

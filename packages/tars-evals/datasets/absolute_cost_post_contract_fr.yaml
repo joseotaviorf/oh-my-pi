@@ -1,0 +1,7 @@
+# auto-generated
+# source: docs/llm_context/metric_entities/absolute_cost_post_contract_fr.md
+# Do not edit — regenerate with: make generate-datasets
+items:
+- id: absolute_cost_post_contract_fr-absolute-cost-post-contract-for-rent
+  question: Absolute Cost Post-Contract (For Rent)
+  expected_query: "SELECT\n    SUM(TRY_CAST(REPLACE(f.\"<YYYYMM>\", ',', '') AS DOUBLE)) AS absolute_cost_post_contract_fr\nFROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_<YEAR> f\nWHERE f.bece_business = 'For Rent'\n  AND f.bece_l2 = 'Felipe Abreu'\n  AND f.pl_line_1 = 'Operations'\n  AND f.pl_line_2 IN ('Onboarding', 'Ongoing', 'Offboarding')\n  AND f.reporting_group <> '-'\n  AND f.version = 'Actuals'\n  AND TRY_CAST(REPLACE(f.\"<YYYYMM>\", ',', '') AS DOUBLE) IS NOT NULL;"

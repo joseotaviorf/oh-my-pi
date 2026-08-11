@@ -1,4 +1,4 @@
-.PHONY: help install test lint creds
+.PHONY: help install test lint creds generate-datasets
 
 help: ## Show this help message
 	@echo "Available targets:"
@@ -15,3 +15,11 @@ lint: ## Lint with ruff
 
 creds: ## Verify the LiteLLM key can be fetched from Vault (via qli)
 	@scripts/fetch_litellm_key.sh >/dev/null && echo "OK: LiteLLM key reachable in Vault (apps/forno/litellm/zordon-tars-llm)"
+
+# STEMS= / STEMS_FILE= optional — scope generation *and* pruning to those stems:
+#   make generate-datasets STEMS="ongoing_listings supply_retention_sale"
+#   make generate-datasets STEMS_FILE=.tars-eval-expected-stems
+generate-datasets: ## Regenerate datasets/*.yaml from metric_entities golden queries only
+	uv run python scripts/generate_datasets_from_context_docs.py \
+	    $(foreach stem,$(STEMS),--stem $(stem)) \
+	    $(if $(STEMS_FILE),--stems-file $(STEMS_FILE))

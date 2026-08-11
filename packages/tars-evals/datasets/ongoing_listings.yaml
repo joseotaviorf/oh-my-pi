@@ -1,0 +1,11 @@
+# auto-generated
+# source: docs/llm_context/metric_entities/ongoing_listings.md
+# Do not edit — regenerate with: make generate-datasets
+items:
+- id: ongoing_listings-rent-daily-volume
+  question: RENT daily volume
+  expected_query: "WITH ongoing_listings AS (\n    SELECT /*+ RANGE_JOIN(fhls, 800) */\n        fhls.sk_house_listing,\n        fhls.country_code,\n        d.date\n    FROM dw_rent.fact_house_listing_status AS fhls\n    JOIN dw_rent.dim_house_listing AS dhl\n        ON fhls.sk_house_listing = dhl.sk_house_listing\n    JOIN dw_public.dim_region AS dr\n        ON fhls.sk_region = dr.sk_region\n    JOIN dw_public.dim_date AS d\n        ON d.date BETWEEN COALESCE(DATE(fhls.ts_status_start), DATE '2000-01-01')\n            AND COALESCE(DATE_ADD(DATE(fhls.ts_status_end), -1), CURRENT_DATE)\n    WHERE fhls.status_history IN ('publicado', 'PUBLISHED')\n      AND dhl.version <> 0\n      AND dr.city_group IS NOT NULL\n    QUALIFY ROW_NUMBER() OVER (\n        PARTITION BY fhls.sk_house_listing, d.date\n        ORDER BY fhls.ts_status_start DESC\n    ) = 1\n)\nSELECT\n    date AS day,\n    country_code,\n    COUNT(DISTINCT sk_house_listing) AS ongoing_listings\nFROM ongoing_listings\nGROUP BY 1, 2\n\
+    ORDER BY 1 DESC, 2"
+- id: ongoing_listings-sale-daily-volume
+  question: SALE daily volume
+  expected_query: "SELECT\n    MAKE_DATE(fdol.year, fdol.month, fdol.day) AS day,\n    dr.country_code,\n    COUNT(DISTINCT fdol.sk_sale_listing) AS ongoing_listings\nFROM dw_sale.fact_daily_ongoing_listing AS fdol\nJOIN dw_public.dim_region AS dr\n    ON fdol.sk_region = dr.sk_region\nWHERE dr.city_group IS NOT NULL\nGROUP BY 1, 2\nORDER BY 1 DESC, 2"

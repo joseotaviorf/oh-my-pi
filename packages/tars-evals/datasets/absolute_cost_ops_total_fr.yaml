@@ -1,0 +1,7 @@
+# auto-generated
+# source: docs/llm_context/metric_entities/absolute_cost_ops_total_fr.md
+# Do not edit — regenerate with: make generate-datasets
+items:
+- id: absolute_cost_ops_total_fr-absolute-cost-ops-total-for-rent
+  question: Absolute Cost Ops Total (For Rent)
+  expected_query: "SELECT\n    -- Change the \"202603\" column to the target month (YYYYMM).\n    SUM(TRY_CAST(REPLACE(f.\"202603\", ',', '') AS DOUBLE)) AS absolute_cost_ops_total_fr\n-- Change the _2026 suffix to the calendar year of the month above (_2025 or _2026).\nFROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_2026 f\nWHERE f.bece_business = 'For Rent'\n  AND f.pl_line_1 = 'Operations'\n  AND f.reporting_group <> '-'\n  AND f.version = 'Actuals'\n  AND TRY_CAST(REPLACE(f.\"202603\", ',', '') AS DOUBLE) IS NOT NULL;"
