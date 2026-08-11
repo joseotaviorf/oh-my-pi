@@ -32,6 +32,50 @@ WITH prospect_status_events AS (
     DATE(bps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 
+flow_results_ranked AS (
+  SELECT
+    pcr.id_demand_prospect_conversion_event,
+    pcr.id_prospect,
+    pcr.business_context,
+    'FLOW' AS event_type,
+    pcr.event_name,
+    NULL AS event_detail,
+    pcr.naming_convention_sufix,
+    pcr.id_rent_flow,
+    pcr.id_sale_flow,
+    pcr.id_booking,
+    pcr.id_visit,
+    pcr.id_offer,
+    pcr.id_talk_to_agent,
+    pcr.id_house,
+    pcr.id_region,
+    pcr.id_owner,
+    pcr.id_agent,
+    pcr.product_origin,
+    pcr.app_type,
+    pcr.origin,
+    pcr.platform,
+    pcr.content_page,
+    pcr.operation_channel,
+    pcr.referral_type,
+    pcr.utm_campaign,
+    pcr.utm_medium,
+    pcr.utm_source,
+    pcr.utm_term,
+    pcr.utm_content,
+    pcr.entrance_uri,
+    pcr.is_cqa_demand,
+    pcr.ts_event,
+    pcr.year,
+    pcr.month,
+    pcr.day,
+    ROW_NUMBER() OVER(PARTITION BY pcr.id_demand_prospect_conversion_event ORDER BY pcr.ts_event ASC) AS rn
+  FROM
+    datalake_demand_flows.prospect_results AS pcr
+  WHERE
+    DATE(pcr.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+
 prospect_results AS (
   SELECT
     pcr.id_demand_prospect_conversion_event,
@@ -76,47 +120,45 @@ prospect_results AS (
       ON pse.id_demand_prospect_conversion_event = pcr.id_demand_prospect_conversion_event
   UNION ALL
   SELECT
-    pcr.id_demand_prospect_conversion_event,
-    pcr.id_prospect,
-    pcr.business_context,
-    'FLOW' AS event_type,
-    pcr.event_name,
-    NULL AS event_detail,
-    pcr.naming_convention_sufix,
-    pcr.id_rent_flow,
-    pcr.id_sale_flow,
-    pcr.id_booking,
-    pcr.id_visit,
-    pcr.id_offer,
-    pcr.id_talk_to_agent,
-    pcr.id_house,
-    pcr.id_region,
-    pcr.id_owner,
-    pcr.id_agent,
-    pcr.product_origin,
-    pcr.app_type,
-    pcr.origin,
-    pcr.platform,
-    pcr.content_page,
-    pcr.operation_channel,
-    pcr.referral_type,
-    pcr.utm_campaign,
-    pcr.utm_medium,
-    pcr.utm_source,
-    pcr.utm_term,
-    pcr.utm_content,
-    pcr.entrance_uri,
-    pcr.is_cqa_demand,
-    pcr.ts_event,
-    pcr.year,
-    pcr.month,
-    pcr.day
+    id_demand_prospect_conversion_event,
+    id_prospect,
+    business_context,
+    event_type,
+    event_name,
+    event_detail,
+    naming_convention_sufix,
+    id_rent_flow,
+    id_sale_flow,
+    id_booking,
+    id_visit,
+    id_offer,
+    id_talk_to_agent,
+    id_house,
+    id_region,
+    id_owner,
+    id_agent,
+    product_origin,
+    app_type,
+    origin,
+    platform,
+    content_page,
+    operation_channel,
+    referral_type,
+    utm_campaign,
+    utm_medium,
+    utm_source,
+    utm_term,
+    utm_content,
+    entrance_uri,
+    is_cqa_demand,
+    ts_event,
+    year,
+    month,
+    day
   FROM
-    datalake_demand_flows.prospect_results AS pcr
+    flow_results_ranked
   WHERE
-    DATE(pcr.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_demand_prospect_conversion_event ORDER BY ts_event ASC) = 1
+    rn = 1
 )
 
 SELECT
