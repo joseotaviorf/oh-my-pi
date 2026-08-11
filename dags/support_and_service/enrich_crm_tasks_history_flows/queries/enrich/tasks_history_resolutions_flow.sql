@@ -5,64 +5,57 @@ WITH task_resolution_ranking AS (
     ROW_NUMBER() OVER (PARTITION BY id_task, id_workgroup ORDER BY ts_action DESC) AS ranking,
     NULLIF(id_user_action, '') IS NULL AS is_task_auto_completed,
     ts_action
-  FROM
-    datalake_crm_tasks_resolution.tasks_resolution_history
+  FROM datalake_crm_tasks_resolution.tasks_resolution_history
   WHERE
-    action_type in ('RESOLVE', 'REALIZE', 'FINISH', 'DISCARD')
+    action_type IN ('RESOLVE', 'REALIZE', 'FINISH', 'DISCARD')
     AND year = {year}
     AND month = {month}
     AND day = {day}
-),
-tasks_max_date AS (
+), tasks_max_date AS (
   SELECT
-      id,
-      COALESCE(id_workgroup, -1) AS id_workgroup,
-      MAX(DATE(CONCAT(year,'-', month,'-', day))) AS dt_last_updated
-  FROM
-      datalake_crm.tasks ct
-  GROUP BY 1,2
+    id,
+    COALESCE(id_workgroup, -1) AS id_workgroup,
+    MAX(CAST(CONCAT(year, '-', month, '-', day) AS DATE)) AS dt_last_updated
+  FROM datalake_crm.tasks AS ct
+  GROUP BY
+    1,
+    2
 )
 SELECT DISTINCT
   t.id AS id_task,
   t.id_workgroup,
-  CAST(t.score_factor AS INTEGER) AS score_factor,
-  CAST(t.version AS INTEGER) AS version,
+  CAST(t.score_factor AS INT) AS score_factor,
+  CAST(t.version AS INT) AS version,
   t.origin AS origin,
   t.type AS type,
-  SUBSTR(t.description, 1, 4000) AS description,
+  SUBSTRING(t.description, 1, 4000) AS description,
   t.subject AS subject,
   COLLECT_SET(COALESCE(t.subject, cw.title)) OVER (PARTITION BY t.id) AS titles,
   COLLECT_SET(COALESCE(t.id_workgroup, cw.id)) OVER (PARTITION BY t.id) AS workgroups,
-  CAST(
-    ROUND(
-      (TO_UNIX_TIMESTAMP(COALESCE(tr.ts_action, t.ts_completed), 'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(t.ts_start,'yyyy-MM-dd HH:mm:ss')) / 60.0,
-      2
-    ) AS DECIMAL(10,2)
-  ) AS hours_task_start_to_completed,
+  CAST(ROUND(
+    (
+      UNIX_TIMESTAMP(COALESCE(tr.ts_action, t.ts_completed)) - UNIX_TIMESTAMP(t.ts_start)
+    ) / 60.0,
+    2
+  ) AS DECIMAL(10, 2)) AS hours_task_start_to_completed,
   t.is_resolved,
-  COALESCE(tr.is_task_auto_completed, false) AS is_task_auto_completed,  
+  COALESCE(tr.is_task_auto_completed, FALSE) AS is_task_auto_completed,
   DATE_TRUNC('SECOND', t.ts_start) AS ts_start,
   DATE_TRUNC('SECOND', t.ts_completed) AS ts_completed,
   DATE_TRUNC('SECOND', t.ts_silenced_until) AS ts_silenced_until,
   t.year,
   t.month,
   t.day
-FROM
-  datalake_crm.tasks t
-JOIN
-  tasks_max_date md
-    ON t.id = md.id
-    AND COALESCE(t.id_workgroup, -1) = md.id_workgroup
-    AND DATE(CONCAT(year,'-', month,'-', day)) = md.dt_last_updated
-LEFT JOIN
-  datalake_crm.workgroups cw
-    ON t.type = cw.task_type
-LEFT JOIN
-  task_resolution_ranking tr
-    ON tr.id_task = t.id
-    AND tr.id_workgroup = COALESCE(t.id_workgroup, -1)
-    AND tr.ranking = 1
+FROM datalake_crm.tasks AS t
+JOIN tasks_max_date AS md
+  ON t.id = md.id
+  AND COALESCE(t.id_workgroup, -1) = md.id_workgroup
+  AND CAST(CONCAT(year, '-', month, '-', day) AS DATE) = md.dt_last_updated
+LEFT JOIN datalake_crm.workgroups AS cw
+  ON t.type = cw.task_type
+LEFT JOIN task_resolution_ranking AS tr
+  ON tr.id_task = t.id
+  AND tr.id_workgroup = COALESCE(t.id_workgroup, -1)
+  AND tr.ranking = 1
 WHERE
-  t.year = {year}
-  AND t.month = {month}
-  AND t.day = {day}
+  t.year = {year} AND t.month = {month} AND t.day = {day}

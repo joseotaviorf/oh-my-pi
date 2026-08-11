@@ -1,35 +1,31 @@
 WITH first_last_analysts_infos AS (
   SELECT DISTINCT
     id_ticket,
-    FIRST(analyst_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_name,
-    FIRST(analyst_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_name,
-    FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_email,
-    FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_email,
-    FIRST(analyst_phone) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_phone,
-    FIRST(analyst_phone) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_phone,
-    FIRST(analyst_organization) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_organization,
-    FIRST(analyst_organization) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_organization
-  FROM
-    datalake_zendesk.tickets
+    FIRST(analyst_name) OVER (PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_name,
+    FIRST(analyst_name) OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_name,
+    FIRST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_email,
+    FIRST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_email,
+    FIRST(analyst_phone) OVER (PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_phone,
+    FIRST(analyst_phone) OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_phone,
+    FIRST(analyst_organization) OVER (PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_organization,
+    FIRST(analyst_organization) OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_organization
+  FROM datalake_zendesk.tickets
   WHERE
-    ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
-    AND id_assignee IS NOT NULL
-), 
-first_last_group_infos AS (
+    ts_updated >= CAST('{load_start_date}' AS DATE) - INTERVAL '1' YEAR
+    AND NOT id_assignee IS NULL
+), first_last_group_infos AS (
   SELECT DISTINCT
     id_ticket,
-    FIRST(id_group) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_id_group,
-    FIRST(id_group) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_id_group,
-    FIRST(group_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_group_name,
-    FIRST(group_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_group_name
-  FROM
-    datalake_zendesk.tickets
+    FIRST(id_group) OVER (PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_id_group,
+    FIRST(id_group) OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_id_group,
+    FIRST(group_name) OVER (PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_group_name,
+    FIRST(group_name) OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_group_name
+  FROM datalake_zendesk.tickets
   WHERE
-    ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
-), 
-tickets AS (
+    ts_updated >= CAST('{load_start_date}' AS DATE) - INTERVAL '1' YEAR
+), tickets AS (
   SELECT
-    t.id_ticket,
+    id_ticket,
     id_ticket_form,
     id_assignee,
     id_requester,
@@ -37,25 +33,25 @@ tickets AS (
     id_group,
     id_problem_ticket,
     id_house,
-    CAST(id_contract AS INT) AS id_contract,
+    id_contract,
     id_session,
     id_call,
     id_job,
     id_house_so,
     id_house_aq,
     group_name,
-    flgi.first_id_group,
-    flgi.last_id_group,
-    flgi.first_group_name,
-    flgi.last_group_name,
-    flai.first_analyst_name,
-    flai.last_analyst_name,
-    flai.first_analyst_email,
-    flai.last_analyst_email,
-    flai.first_analyst_phone,
-    flai.last_analyst_phone,
-    flai.first_analyst_organization,
-    flai.last_analyst_organization,
+    first_id_group,
+    last_id_group,
+    first_group_name,
+    last_group_name,
+    first_analyst_name,
+    last_analyst_name,
+    first_analyst_email,
+    last_analyst_email,
+    first_analyst_phone,
+    last_analyst_phone,
+    first_analyst_organization,
+    last_analyst_organization,
     analyst_name,
     analyst_email,
     analyst_phone,
@@ -116,7 +112,7 @@ tickets AS (
     signboard_location,
     video_comments,
     has_plaquinha,
-    BOOLEAN(is_public) AS is_public,
+    is_public,
     dt_communicated_tt,
     dt_intermediate,
     dt_agreement_executed,
@@ -134,16 +130,125 @@ tickets AS (
     year,
     month,
     day
-  FROM
-    datalake_zendesk.tickets AS t
-  LEFT JOIN first_last_analysts_infos AS flai
-    ON t.id_ticket = flai.id_ticket
-  LEFT JOIN first_last_group_infos AS flgi
-    ON t.id_ticket = flgi.id_ticket
+  FROM (
+    SELECT
+      t.id_ticket,
+      id_ticket_form,
+      id_assignee,
+      id_requester,
+      id_submitter,
+      id_group,
+      id_problem_ticket,
+      id_house,
+      CAST(id_contract AS INT) AS id_contract,
+      id_session,
+      id_call,
+      id_job,
+      id_house_so,
+      id_house_aq,
+      group_name,
+      flgi.first_id_group,
+      flgi.last_id_group,
+      flgi.first_group_name,
+      flgi.last_group_name,
+      flai.first_analyst_name,
+      flai.last_analyst_name,
+      flai.first_analyst_email,
+      flai.last_analyst_email,
+      flai.first_analyst_phone,
+      flai.last_analyst_phone,
+      flai.first_analyst_organization,
+      flai.last_analyst_organization,
+      analyst_name,
+      analyst_email,
+      analyst_phone,
+      analyst_organization,
+      custom_fields,
+      task_sid_twilio,
+      contact_ticket,
+      offer_ids,
+      taxonomy_tags,
+      status,
+      channel,
+      subject,
+      description,
+      type,
+      via,
+      via_channel,
+      priority,
+      recipient,
+      tags,
+      satisfaction_rating,
+      request_type,
+      client_type,
+      step_tag,
+      customer_type_tag,
+      contact_theme_tag,
+      contact_motivation_tag,
+      contact_theme_detail_tag,
+      protection_agreement,
+      repair_class,
+      repair_type,
+      repair_detailed,
+      new_criticality,
+      criticality,
+      repair_execution_flow,
+      demand_type,
+      process_type,
+      client_description,
+      repair_reanalysis,
+      repairs_sent_to_ll,
+      interaction_ll,
+      budgeting_performed,
+      intermediation_with_parties,
+      agreement_execution,
+      finishing,
+      budget_value,
+      budget_range,
+      repair_reanalysis_tags,
+      agreement_between_parties,
+      listing_type,
+      install_reason,
+      install_agent,
+      user_sender,
+      house_classification,
+      house_classification_reason1,
+      house_classification_reason2,
+      house_classification_reason3,
+      house_classification_reason4,
+      signboard_location,
+      video_comments,
+      has_plaquinha,
+      CAST(is_public AS BOOLEAN) AS is_public,
+      dt_communicated_tt,
+      dt_intermediate,
+      dt_agreement_executed,
+      dt_finished,
+      dt_return,
+      dt_budgeted,
+      dt_analysis,
+      dt_reanalysis,
+      dt_install,
+      dt_first_fup,
+      dt_first_reply,
+      ts_analyst_started,
+      ts_created,
+      ts_updated,
+      year,
+      month,
+      day,
+      ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) AS _w
+    FROM datalake_zendesk.tickets AS t
+    LEFT JOIN first_last_analysts_infos AS flai
+      ON t.id_ticket = flai.id_ticket
+    LEFT JOIN first_last_group_infos AS flgi
+      ON t.id_ticket = flgi.id_ticket
+    WHERE
+      ts_updated >= CAST('{load_start_date}' AS DATE) - INTERVAL '1' YEAR
+  ) AS _t
   WHERE
-    ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1)
+    _w = 1
+)
 SELECT
   t.id_ticket,
   t.id_ticket_form,
@@ -273,18 +378,12 @@ SELECT
   t.ts_analyst_started,
   t.ts_created,
   t.ts_updated,
-  CASE
-    WHEN t.status = 'closed' THEN t.ts_updated
-    ELSE NULL
-  END AS ts_closed,
+  CASE WHEN t.status = 'closed' THEN t.ts_updated ELSE NULL END AS ts_closed,
   t.year,
   t.month,
   t.day
-FROM
-  tickets AS t
-LEFT JOIN
-  datalake_zendesk.ticket_metrics AS tm
-    ON tm.id_ticket = t.id_ticket
-LEFT JOIN
-  datalake_support_users.zendesk_users AS zu
-    ON zu.id_user_zendesk = t.id_requester
+FROM tickets AS t
+LEFT JOIN datalake_zendesk.ticket_metrics AS tm
+  ON tm.id_ticket = t.id_ticket
+LEFT JOIN datalake_support_users.zendesk_users AS zu
+  ON zu.id_user_zendesk = t.id_requester

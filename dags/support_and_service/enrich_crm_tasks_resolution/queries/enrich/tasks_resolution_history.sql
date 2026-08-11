@@ -1,19 +1,15 @@
-WITH tasks_resolution_history AS (
-  WITH last_updated_task AS (
-    SELECT
-      id,
-      MAX(DATE(CONCAT(year,'-',month,'-',day))) AS dt_last_updated
-    FROM
-      datalake_crm.tasks tsk
-    GROUP BY 1
-  )
+WITH last_updated_task AS (
+  SELECT
+    id,
+    MAX(CAST(CONCAT(year, '-', month, '-', day) AS DATE)) AS dt_last_updated
+  FROM datalake_crm.tasks AS tsk
+  GROUP BY
+    1
+), tasks_resolution_history AS (
   SELECT DISTINCT
     tsk.id AS id_task,
     COALESCE(tsh.id, tac.id) AS id_action,
-    CASE
-      WHEN tsh.id IS NOT NULL THEN tsh.id_user_action
-      ELSE tac.id_user_action
-    END AS id_user_action,
+    CASE WHEN NOT tsh.id IS NULL THEN tsh.id_user_action ELSE tac.id_user_action END AS id_user_action,
     tsk.id_assignee,
     tsk.id_house,
     tsk.id_rent_flow,
@@ -25,20 +21,10 @@ WITH tasks_resolution_history AS (
     tsk.id_owner,
     tsk.id_receiver,
     tsk.id_workgroup,
-    CASE
-      WHEN tsh.id IS NOT NULL THEN tsh.task_status
-    END AS task_status,
-    CASE
-      WHEN tsh.id IS NOT NULL THEN tsh.action_reason
-    END AS action_reason,
-    CASE
-      WHEN tsh.id IS NOT NULL THEN tsh.action_user_name
-      ELSE tac.action_user_name
-    END AS action_user_name,
-    CASE
-      WHEN tsh.id IS NOT NULL THEN tsh.action_type
-      ELSE tac.action_type
-    END AS action_type,
+    CASE WHEN NOT tsh.id IS NULL THEN tsh.task_status END AS task_status,
+    CASE WHEN NOT tsh.id IS NULL THEN tsh.action_reason END AS action_reason,
+    CASE WHEN NOT tsh.id IS NULL THEN tsh.action_user_name ELSE tac.action_user_name END AS action_user_name,
+    CASE WHEN NOT tsh.id IS NULL THEN tsh.action_type ELSE tac.action_type END AS action_type,
     tsk.type,
     tsk.version,
     tsk.tags,
@@ -53,10 +39,7 @@ WITH tasks_resolution_history AS (
     tsk.subject,
     tsk.visit_fup,
     tsk.is_resolved,
-    CASE
-      WHEN tsh.id IS NOT NULL THEN tsh.ts_action
-      ELSE tac.ts_action
-    END AS ts_action,
+    CASE WHEN NOT tsh.id IS NULL THEN tsh.ts_action ELSE tac.ts_action END AS ts_action,
     tsk.ts_created,
     tsk.ts_start,
     tsk.ts_completed,
@@ -67,20 +50,16 @@ WITH tasks_resolution_history AS (
     tsk.year,
     tsk.month,
     tsk.day
-  FROM
-    datalake_crm.tasks tsk
-  INNER JOIN
-    last_updated_task lut
-        ON tsk.id = lut.id
-        AND DATE(CONCAT(tsk.year,'-',tsk.month,'-',tsk.day)) = lut.dt_last_updated
-  LEFT JOIN
-    datalake_crm.tasks_actions tac
-        ON tsk.id=tac.id_task
-  LEFT JOIN
-    datalake_crm.task_status_histories tsh
-        ON tsk.id = tsh.id_task  
+  FROM datalake_crm.tasks AS tsk
+  INNER JOIN last_updated_task AS lut
+    ON tsk.id = lut.id
+    AND CAST(CONCAT(tsk.year, '-', tsk.month, '-', tsk.day) AS DATE) = lut.dt_last_updated
+  LEFT JOIN datalake_crm.tasks_actions AS tac
+    ON tsk.id = tac.id_task
+  LEFT JOIN datalake_crm.task_status_histories AS tsh
+    ON tsk.id = tsh.id_task
   WHERE
-    COALESCE(tac.id, tsh.id) IS NOT NULL
+    NOT COALESCE(tac.id, tsh.id) IS NULL
 )
 SELECT
   id_task,
@@ -115,12 +94,14 @@ SELECT
   subject,
   visit_fup,
   IF(
-        action_user_name IS NULL,
-        NULL,
-        ROUND(
-            (TO_UNIX_TIMESTAMP(LEAD(ts_action) OVER (PARTITION BY id_task ORDER BY ts_action),  'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(ts_action, 'yyyy-MM-dd HH:mm:ss'))/3600.0,
-            1
-        )
+    action_user_name IS NULL,
+    NULL,
+    ROUND(
+      (
+        UNIX_TIMESTAMP(LEAD(ts_action) OVER (PARTITION BY id_task ORDER BY ts_action)) - UNIX_TIMESTAMP(ts_action)
+      ) / 3600.0,
+      1
+    )
   ) AS task_user_resolve_hours,
   is_resolved,
   ts_action,
@@ -136,5 +117,4 @@ SELECT
   year,
   month,
   day
-FROM
-  tasks_resolution_history
+FROM tasks_resolution_history
