@@ -1,0 +1,9 @@
+cluster:
+  type: emr_7_12_consolidation_xs_memory_cluster
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
+  custom_configurations:
+    spark_conf:
+      spark.sql.legacy.json.allowEmptyString.enabled: 'true'
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
