@@ -1,10 +1,29 @@
 cluster:
   type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
+    # EMR load-enrich-payment stuck on ShuffleMapStage 278 (~20 partitions,
+    # ~98 min/task) vs ~7 min on Databricks. Scale cores for parallelism and
+    # re-enable broadcasts / smaller AQE targets — no SQL changes.
+    # payment + payment_timeline have no inner_dependencies; serialize steps so
+    # the heavy load owns the full fleet (same pattern as dw_sale_listings).
+    step_concurrency_level: 1
     core_nodes:
-      target_on_demand: 4
+      target_on_demand: 8
       target_spot: 0
       instance_types:
       - r6g.2xlarge
       - r7g.2xlarge
       - r6i.2xlarge
+    spark_conf:
+      # EMR fleet base disables broadcasts (-1); this query has small dim joins
+      # and an OR join that otherwise becomes a nested-loop without broadcast.
+      spark.sql.autoBroadcastJoinThreshold: "104857600"
+      spark.sql.adaptive.autoBroadcastJoinThreshold: "104857600"
+      # 256MB advisory coalesced stage 278 to only 20 tasks — too coarse.
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "67108864"
+      spark.sql.shuffle.partitions: "400"
+      # Cap only — with step_concurrency_level 1, DA can grow into the full fleet.
+      spark.dynamicAllocation.maxExecutors: "16"
+      spark.speculation: "true"
+      spark.speculation.multiplier: "3"
+      spark.speculation.quantile: "0.75"
