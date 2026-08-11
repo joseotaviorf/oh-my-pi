@@ -150,7 +150,25 @@ df AS (
         r.dt_source_trigger,
         MAX(s.dt_sap_reference) AS dt_sap_reference,
         MAX(s.dt_sap_created) AS dt_sap_created,
-        IF(s.hash IS NULL, FALSE, TRUE) AS is_completeness,
+        MIN(IF(s.hash IS NULL, FALSE, TRUE)) AS is_completeness
+    FROM 
+        retsuko AS r
+    LEFT JOIN
+        sap_gateway AS sg 
+            ON sg.id_feature = r.id_sap_gateway_feature
+    LEFT JOIN 
+        sap AS s
+            ON s.hash = sg.hash
+            OR s.id_finance_entity = CAST(r.id_finance_entity AS STRING)
+    WHERE
+        TRUE
+    GROUP BY
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 12
+),
+
+assertions_base AS (
+    SELECT
+        *,
         IF((ABS(retsuko_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(retsuko_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness,
         CASE
           WHEN dt_sap_reference IS NULL OR dt_source_trigger IS NULL THEN FALSE
@@ -169,19 +187,8 @@ df AS (
           THEN TRUE
           ELSE FALSE
         END AS is_temporality
-    FROM 
-        retsuko AS r
-    LEFT JOIN
-        sap_gateway AS sg 
-            ON sg.id_feature = r.id_sap_gateway_feature
-    LEFT JOIN 
-        sap AS s
-            ON s.hash = sg.hash
-            OR s.id_finance_entity = CAST(r.id_finance_entity AS STRING)
-    WHERE
-        TRUE
-    GROUP BY 
-        ALL
+    FROM
+        df
 )
 
 SELECT 
@@ -209,4 +216,4 @@ SELECT
     dt_sap_created,
     dt_sap_reference AS dt_filter_end
 FROM
-    df
+    assertions_base
