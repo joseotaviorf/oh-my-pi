@@ -60,7 +60,9 @@ WITH totals_base AS (
             ON d.id_dag = ds.id_dag
     WHERE
         ds.dt_snapshot BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    GROUP BY ALL
+    GROUP BY
+        ds.id_line,
+        ds.dt_snapshot
 )
 SELECT
     tb.id_line AS sk_line,
