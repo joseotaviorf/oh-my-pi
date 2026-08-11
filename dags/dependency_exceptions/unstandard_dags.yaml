@@ -14,15 +14,10 @@ bietlejuice.enrich_databricks_pricing:
   is_static: true
 bietlejuice.enrich_public_date:
   is_static: true
-bietlejuice.enrich_recupera:
-  is_static: true
 bietlejuice.enrich_static_files:
   is_static: true
 bietlejuice.enrich_trino_costs:
   is_static: false
-bietlejuice.recupera:
-  is_static: true
-
 bietlejuice.gsheets: &gsheets-default
   is_static: false
   custom_task_names:

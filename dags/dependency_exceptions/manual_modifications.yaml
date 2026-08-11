@@ -157,13 +157,6 @@ bietlejuice.dw_losses:
     - bietlejuice.enrich_losses:load-enrich-provision-factor:first-run-of-day
 bietlejuice.dw_collection_recovery_quintoandar:
   remove:
-    - bietlejuice.enrich_recupera:load-enrich-contract-advisory-distribution:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-installment:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
-    - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day
-    - bietlejuice.recupera:load-clean-complementary-records-written-down:first-run-of-day
-    - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
-    - bietlejuice.recupera:load-clean-operators:first-run-of-day
     - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera:first-run-of-day
 bietlejuice.dw_evictions:
   remove:
@@ -328,13 +321,6 @@ bietlejuice.enrich_ciq_comissioning:
   override: []
 bietlejuice.enrich_collections_quintoandar:
   remove:
-    - bietlejuice.recupera:load-clean-operators:first-run-of-day
-    - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day
-    - bietlejuice.recupera:load-clean-complementary-records-written-down:first-run-of-day
-    - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-installment:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-collection:first-run-of-day
     - bietlejuice.grb:load-clean-operators:first-run-of-day
     - bietlejuice.meetcall:load-clean-operators:first-run-of-day
     - bietlejuice.langfuse:load-clean-scores:first-run-of-day
@@ -453,14 +439,6 @@ bietlejuice.enrich_customer_demand:
     - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
-bietlejuice.enrich_debt_recovery:
-  remove:
-    - bietlejuice.enrich_recupera:load-enrich-invoice-debt-negotiation:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-negotiation-wallet:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
-    - bietlejuice.recupera:load-clean-complementary-records-written-down:first-run-of-day
-    - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day
-    - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
 bietlejuice.enrich_ebdb_pricing:
   add:
     - bietlejuice.ebdb_house_historical:load-clean-house-price-suggestion-historical:first-run-of-day
@@ -634,9 +612,6 @@ bietlejuice.enrich_pipeline:
     - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
     - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list:first-run-of-day
     - bietlejuice.gsheets_cross:done-clean-dags-special-scheduler:first-run-of-day
-bietlejuice.enrich_recupera:
-  # Recupera is frozen legacy data; enrich_recupera no longer waits on clean ingestion.
-  override: []
 bietlejuice.enrich_rental_historical_follow_up:
   add:
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-status:first-run-of-day
@@ -1089,10 +1064,6 @@ bietlejuice.reverse_sale_unavailable_listings_access:
 bietlejuice.enrich_atlas_pricing_report:
   remove:
     - bietlejuice.dw_smart_price:load-dw-quintoandar-fact-listing-price-changes:first-run-of-day
-bietlejuice.iaf:
-  remove:
-    - bietlejuice.gsheets_fintech:done-clean-quintocred-iaf-occurrences:first-run-of-day
-    - bietlejuice.gsheets_fintech:done-clean-quintocred-iaf-qualifies-calls:first-run-of-day
 bietlejuice.reverse_atlas_pricing_report_access:
   add:
     - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement:first-run-of-day

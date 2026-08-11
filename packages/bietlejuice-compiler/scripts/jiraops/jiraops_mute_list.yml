@@ -24,7 +24,6 @@ DAG:
     - bietlejuice.enrich_lost_listings
     - bietlejuice.enrich_sonia_journeys
     - bietlejuice.grb
-    - bietlejuice.iaf
     - bietlejuice.itbi_sp
     - bietlejuice.journey_optimizer
     - bietlejuice.knowledge_base

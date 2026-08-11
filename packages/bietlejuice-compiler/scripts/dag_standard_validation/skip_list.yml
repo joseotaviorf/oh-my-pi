@@ -7,7 +7,6 @@ dags_not_using_builder:
   - fintech/enrich_credit_evers/enrich_credit_evers.py
   - fintech/enrich_dai_report/enrich_dai_report.py
   - fintech/nexxera/nexxera.py
-  - fintech/recupera/recupera.py
   - fintech/reverse_nazare/reverse_nazare.py
   - fintech/reverse_nexxera/reverse_nexxera.py
   - fintech/sap/sap.py
@@ -161,7 +160,6 @@ dags_not_using_builder:
   - platform/migration_compare_fintech__enrich_owner_fees/migration_compare_fintech__enrich_owner_fees_dag.py
   - platform/migration_compare_fintech__enrich_payments_platform/migration_compare_fintech__enrich_payments_platform_dag.py
   - platform/migration_compare_fintech__enrich_public_date/migration_compare_fintech__enrich_public_date_dag.py
-  - platform/migration_compare_fintech__enrich_recupera/migration_compare_fintech__enrich_recupera_dag.py
   - platform/migration_compare_fintech__enrich_retsuko/migration_compare_fintech__enrich_retsuko_dag.py
   - platform/migration_compare_fintech__enrich_revenue_lines/migration_compare_fintech__enrich_revenue_lines_dag.py
   - platform/migration_compare_fintech__enrich_sap/migration_compare_fintech__enrich_sap_dag.py
@@ -399,7 +397,6 @@ dags_not_using_builder:
   - platform/migration_emr_fintech__enrich_owner_fees/migration_emr_fintech__enrich_owner_fees_dag.py
   - platform/migration_emr_fintech__enrich_payments_platform/migration_emr_fintech__enrich_payments_platform_dag.py
   - platform/migration_emr_fintech__enrich_public_date/migration_emr_fintech__enrich_public_date_dag.py
-  - platform/migration_emr_fintech__enrich_recupera/migration_emr_fintech__enrich_recupera_dag.py
   - platform/migration_emr_fintech__enrich_retsuko/migration_emr_fintech__enrich_retsuko_dag.py
   - platform/migration_emr_fintech__enrich_revenue_lines/migration_emr_fintech__enrich_revenue_lines_dag.py
   - platform/migration_emr_fintech__enrich_sap/migration_emr_fintech__enrich_sap_dag.py
@@ -637,7 +634,6 @@ dags_not_using_builder:
   - platform/migration_twin_fintech__enrich_owner_fees/migration_twin_fintech__enrich_owner_fees_dag.py
   - platform/migration_twin_fintech__enrich_payments_platform/migration_twin_fintech__enrich_payments_platform_dag.py
   - platform/migration_twin_fintech__enrich_public_date/migration_twin_fintech__enrich_public_date_dag.py
-  - platform/migration_twin_fintech__enrich_recupera/migration_twin_fintech__enrich_recupera_dag.py
   - platform/migration_twin_fintech__enrich_retsuko/migration_twin_fintech__enrich_retsuko_dag.py
   - platform/migration_twin_fintech__enrich_revenue_lines/migration_twin_fintech__enrich_revenue_lines_dag.py
   - platform/migration_twin_fintech__enrich_sap/migration_twin_fintech__enrich_sap_dag.py
@@ -819,7 +815,6 @@ database_ingestion_without_cdc:
   - godfather
   - greenseer
   - hub_services
-  - iaf
   - insider
   - journey_flow
   - klefki
