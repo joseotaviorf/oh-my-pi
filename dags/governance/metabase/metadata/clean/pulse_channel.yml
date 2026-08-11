@@ -7,6 +7,10 @@ description: >
   pulse_channel table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one
   row per delivery channel per load date. Partitioned by year, month, day — filter on ingestion
   date. Supports governance analytics on email and Slack subscription schedules.
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   id:
     lineage:
@@ -24,6 +28,8 @@ columns:
     lineage:
       - datalake_metabase_raw.pulse_channel.details
     description: JSON configuration for the channel such as Slack webhook URL, email subject, or recipient overrides.
+    privacy:
+      piiType: personal_phone
   schedule_type:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_type
@@ -64,3 +70,20 @@ columns:
     lineage:
       - datalake_metabase_raw.pulse_channel.day
     description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.
+  op_cdc:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

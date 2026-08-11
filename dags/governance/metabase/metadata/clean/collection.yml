@@ -7,6 +7,10 @@ description: >
   collection table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one
   row per collection folder per load. Supports governance analytics on dashboard organization,
   ownership, and archival status across Metabase workspaces.
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   id:
     lineage:
@@ -20,6 +24,8 @@ columns:
     lineage:
       - datalake_metabase_raw.collection.name
     description: Display title of the folder shown in the Metabase navigation sidebar and collection picker.
+    privacy:
+      piiType: full_name
   description:
     lineage:
       - datalake_metabase_raw.collection.description
@@ -36,3 +42,20 @@ columns:
     lineage:
       - datalake_metabase_raw.collection.archived
     description: Boolean flag indicating the folder was archived and hidden from default Metabase browsing views.
+  op_cdc:
+    lineage:
+      - datalake_metabase_raw.collection.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_metabase_raw.collection.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_metabase_raw.collection.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_superset_clean
+database_name: datalake_superset
 table_name: ab_user
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
@@ -15,94 +15,73 @@ privacy:
 columns:
   id:
     lineage:
-      - datalake_superset_raw.ab_user.id
+      - datalake_superset_clean.ab_user.id
     description: Primary key from Superset ab_user identifying a distinct application account record.
   id_user_created:
     lineage:
-      - datalake_superset_raw.ab_user.created_by_fk
+      - datalake_superset_clean.ab_user.created_by_fk
     description: Foreign key to ab_user.id for the account that originally created this user record.
   id_user_changed:
     lineage:
-      - datalake_superset_raw.ab_user.changed_by_fk
+      - datalake_superset_clean.ab_user.changed_by_fk
     description: Foreign key to ab_user.id for the account that last modified this user profile.
   first_name:
     lineage:
-      - datalake_superset_raw.ab_user.first_name
+      - datalake_superset_clean.ab_user.first_name
     description: User's given name as registered in the Superset account profile.
     privacy:
       piiType: full_name
   last_name:
     lineage:
-      - datalake_superset_raw.ab_user.last_name
+      - datalake_superset_clean.ab_user.last_name
     description: User's family name as registered in the Superset account profile.
     privacy:
       piiType: full_name
   username:
     lineage:
-      - datalake_superset_raw.ab_user.username
+      - datalake_superset_clean.ab_user.username
     description: Login username (typically corporate email) used to authenticate into Superset.
     privacy:
       piiType: personal_email
-  password:
-    lineage:
-      - datalake_superset_raw.ab_user.password
-    description: Hashed password credential stored by Superset for local authentication (replicated as-is from source).
   email:
     lineage:
-      - datalake_superset_raw.ab_user.email
+      - datalake_superset_clean.ab_user.email
     description: Corporate email address associated with the Superset account for notifications and SSO.
     privacy:
       piiType: personal_email
   is_active:
     lineage:
-      - datalake_superset_raw.ab_user.active
+      - datalake_superset_clean.ab_user.active
     description: Boolean flag indicating whether the account is enabled for Superset login and access.
   login_count:
     lineage:
-      - datalake_superset_raw.ab_user.login_count
+      - datalake_superset_clean.ab_user.login_count
     description: Cumulative number of successful Superset authentication events recorded for the user.
   fail_login_count:
     lineage:
-      - datalake_superset_raw.ab_user.fail_login_count
+      - datalake_superset_clean.ab_user.fail_login_count
     description: Cumulative count of failed login attempts tracked before account lockout thresholds.
   ts_created:
     lineage:
-      - datalake_superset_raw.ab_user.created_on
+      - datalake_superset_clean.ab_user.created_on
     description: Timestamp when the user record was first created in Superset (UTC).
   ts_changed:
     lineage:
-      - datalake_superset_raw.ab_user.changed_on
+      - datalake_superset_clean.ab_user.changed_on
     description: Timestamp when the user profile was last updated in Superset (UTC).
   ts_last_login:
     lineage:
-      - datalake_superset_raw.ab_user.last_login
+      - datalake_superset_clean.ab_user.last_login
     description: Timestamp of the most recent successful Superset login for the user (UTC).
   year:
     lineage:
-      - datalake_superset_raw.ab_user.year
+      - datalake_superset_clean.ab_user.year
     description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
-      - datalake_superset_raw.ab_user.month
+      - datalake_superset_clean.ab_user.month
     description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
-      - datalake_superset_raw.ab_user.day
+      - datalake_superset_clean.ab_user.day
     description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.
-  op_cdc:
-    lineage:
-      - datalake_superset_raw.ab_user.op_cdc
-    description: CDC operation type captured by Debezium change-data-capture stream.
-    categories:
-      r: Read/snapshot - initial load of existing records.
-      c: Create - new record inserted.
-      u: Update - existing record modified.
-      d: Delete - record removed.
-  ts_cdc_transaction:
-    lineage:
-      - datalake_superset_raw.ab_user.ts_cdc_transaction
-    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
-  ts_database_transaction:
-    lineage:
-      - datalake_superset_raw.ab_user.ts_database_transaction
-    description: Timestamp of the originating database transaction in the source application before CDC propagation.

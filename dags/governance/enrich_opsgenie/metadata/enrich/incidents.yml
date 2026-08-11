@@ -4,6 +4,10 @@ table_name: incidents
 domain: Cross
 owner: vitor.musachio@quintoandar.com.br
 description: This table consolidates Jira card incidents with JiraOps alert signals, DAG ownership and auxiliary date attributes for monitoring and governance.
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   id_issue_jira:
     description: The Jira issue identifier for the incident
@@ -64,10 +68,14 @@ columns:
     description: User assigned to the incident
     lineage:
       - datalake_jira.issues.assignee
+    privacy:
+      piiType: full_name
   user_acknowledged:
     description: User who acknowledged the alert related to the incident
     lineage:
       - datalake_opsgenie.alerts.acknowledged_by
+    privacy:
+      piiType: personal_email
   is_assigned:
     description: True if the incident has an assigned user; otherwise, false
     lineage:

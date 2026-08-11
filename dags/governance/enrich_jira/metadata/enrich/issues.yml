@@ -4,6 +4,10 @@ table_name: issues
 description: Detailed information from the Issues created in Jira
 domain: Data Ops & Governance
 owner: luisa.ladeira@quintoandar.com.br
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   id_issue:
     lineage:
@@ -45,10 +49,14 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Person currently assigned to the issue
+    privacy:
+      piiType: full_name
   reporter:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Person who created or reported the issue
+    privacy:
+      piiType: full_name
   owner_person:
     lineage:
       - datalake_jira_clean.issues.fields

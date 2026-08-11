@@ -6,11 +6,17 @@ description: >
   Clean history of Looker user activity events sourced from the looker_users_history Google Sheet
   via gsheets_governance. Each row records when a user entered the platform. Grain is one row per
   user_email and ts_entered.
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   user_email:
     lineage:
       - datalake_gsheets_raw.looker_users_history.user_email
     description: Email address of the Looker user associated with the activity event.
+    privacy:
+      piiType: personal_email
   platform:
     description: >
       Analytics platform where the activity occurred; currently always looker for rows loaded from

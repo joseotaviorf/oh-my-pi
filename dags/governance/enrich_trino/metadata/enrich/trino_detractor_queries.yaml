@@ -4,6 +4,10 @@ table_name: trino_detractor_queries
 owner: herivelto.junior@quintoandar.com.br
 domain: Data Ops & Governance
 description: This table materialize query executions considered detractor according to the thresholds defined on the DAG.
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   id_superset_dashboard:
     lineage:
@@ -21,6 +25,8 @@ columns:
     lineage:
       - datalake_superset.slices.last_owner
     description: Slice Last owner.
+    privacy:
+      piiType: personal_email
   line:
     lineage:
       - datalake_superset.slices.company_line

@@ -7,6 +7,10 @@ description: >
   the author, and time spent in the origin queue. Grain is one row per id_issue and id_change.
 domain: Data Ops & Governance
 owner: luisa.ladeira@quintoandar.com.br
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   id_issue:
     lineage:
@@ -40,10 +44,14 @@ columns:
     lineage:
       - datalake_jira_clean.issues.change_log
     description: Email address of the Jira user who authored the status change.
+    privacy:
+      piiType: personal_email
   author_name:
     lineage:
       - datalake_jira_clean.issues.change_log
     description: Display name of the Jira user who authored the status change.
+    privacy:
+      piiType: full_name
   minutes_in_origin_queue:
     lineage:
       - datalake_jira.issues.ts_created

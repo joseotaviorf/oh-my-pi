@@ -8,6 +8,10 @@ description:
   dashboard (latest version by change time). Combines ownership, company line parsed from the title,
   chart membership, usage in the last 90 days, tags, certification, and a popularity rank within
   each company line for prioritization of catalog and deprecation work.
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   id:
     lineage:
@@ -32,18 +36,24 @@ columns:
     description:
       Email of the Superset user who originally created the dashboard (creator account), joined from
       ab_user using id_user_created.
+    privacy:
+      piiType: personal_email
   last_owner:
     lineage:
       - datalake_superset.ab_user.email
     description:
       Email of the Superset user who last modified the dashboard record, joined from ab_user using
       id_user_changed.
+    privacy:
+      piiType: personal_email
   business_owners:
     lineage:
       - datalake_superset.ab_user.email
     description:
       Set of email addresses of users explicitly linked to the dashboard as owners in
       dashboard_user, aggregated for business accountability separate from creator/changed-by.
+    privacy:
+      piiType: personal_email
   company_line:
     lineage:
       - datalake_superset_clean.dashboards.dashboard_title

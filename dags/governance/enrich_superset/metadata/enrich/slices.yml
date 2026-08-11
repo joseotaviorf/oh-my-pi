@@ -8,6 +8,10 @@ description:
   chart at the latest version by change time. Adds parsed company line from the name, semantic-layer
   flag from the datasource, consolidated owners and certification, 90-day usage, Superset tags, and
   a direct explore URL for review workflows.
+privacy:
+  dataSubjectType:
+    - employee
+
 columns:
   id:
     lineage:
@@ -43,16 +47,22 @@ columns:
     description:
       Set of email addresses of users linked as slice owners in slice_user, aggregated for business
       accountability on the chart entity.
+    privacy:
+      piiType: personal_email
   technical_owner:
     lineage:
       - datalake_superset.ab_user.email
     description:
       Email of the Superset user who created the slice, resolved via ab_user from id_user_created.
+    privacy:
+      piiType: personal_email
   last_owner:
     lineage:
       - datalake_superset.ab_user.email
     description:
       Email of the Superset user who last modified the slice, resolved via ab_user from id_user_changed.
+    privacy:
+      piiType: personal_email
   certified_by:
     lineage:
       - datalake_superset_clean.slices.certified_by
