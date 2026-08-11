@@ -3,6 +3,8 @@ cluster:
   custom_configurations:
     spark_conf:
       spark.driver.maxResultSize: "0"
+      spark.driver.memory: "24g"
+      spark.driver.memoryOverhead: "4g"
     autotermination_minutes: 20
     core_nodes:
       target_on_demand: 2
