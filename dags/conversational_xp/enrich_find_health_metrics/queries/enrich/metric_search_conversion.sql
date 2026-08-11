@@ -18,6 +18,7 @@ WITH rent_sale_flow AS (
     AND (
       ts_booking_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
       OR ts_direct_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+      OR ts_contract_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     )
   GROUP BY
     1,
@@ -40,6 +41,7 @@ WITH rent_sale_flow AS (
     AND (
       ts_first_booking_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
       OR ts_first_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+      OR dt_sale_agreement_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     )
   GROUP BY
     1,
@@ -63,7 +65,7 @@ search_impressions_actions AS (
     TO_TIMESTAMP(GET_JSON_OBJECT(timestamps, '$.ts_contract_signed')) AS ts_contract_signed
   FROM datalake_search.search_impressions
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_45}) AND DATE('{end_date}')
     AND GET_JSON_OBJECT(metrics, '$.click') = '1'
     AND (
       GET_JSON_OBJECT(metrics, '$.direct_offer') = '1'
@@ -94,10 +96,10 @@ SELECT
   IF(sia.has_offer OR NOT rs.ts_offer IS NULL, TRUE, FALSE) AS has_offer,
   IF(sia.has_contract_signed OR NOT rs.ts_contract_signed IS NULL, TRUE, FALSE) AS has_contract_signed,
 
-  COALESCE(DATEDIFF(DAY, sia.ts_search, sia.ts_visit_booked) <= 14, FALSE) AS is_search_click_and_visit_booked_within_14_days,
-  COALESCE(DATEDIFF(DAY, sia.ts_search, sia.ts_direct_offer) <= 14, FALSE) AS is_search_click_and_direct_offer_within_14_days,
-  COALESCE(DATEDIFF(DAY, sia.ts_search, sia.ts_visit_booked) <= 14 OR DATEDIFF(DAY, sia.ts_search, sia.ts_direct_offer) <= 14, FALSE) AS is_search_click_and_vb_or_do_within_14_days,
-  COALESCE(DATEDIFF(DAY, sia.ts_search, sia.ts_offer) <= 14, FALSE) AS is_search_click_and_offer_within_14_days,
+  COALESCE(TIMESTAMPDIFF(DAY, sia.ts_search, sia.ts_visit_booked) <= 14, FALSE) AS is_search_click_and_visit_booked_within_14_days,
+  COALESCE(TIMESTAMPDIFF(DAY, sia.ts_search, sia.ts_direct_offer) <= 14, FALSE) AS is_search_click_and_direct_offer_within_14_days,
+  COALESCE(TIMESTAMPDIFF(DAY, sia.ts_search, sia.ts_visit_booked) <= 14 OR TIMESTAMPDIFF(DAY, sia.ts_search, sia.ts_direct_offer) <= 14, FALSE) AS is_search_click_and_vb_or_do_within_14_days,
+  COALESCE(TIMESTAMPDIFF(DAY, sia.ts_search, sia.ts_offer) <= 14, FALSE) AS is_search_click_and_offer_within_14_days,
 
   rs.ts_first_flow_action,  
   YEAR(rs.ts_first_flow_action) AS year,
