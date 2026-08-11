@@ -202,12 +202,23 @@ SELECT DISTINCT
     s.stage_satisfacao_credito_expense_amount AS credit_satisfaction_expense_amount,
     CASE WHEN COUNT(*) OVER (PARTITION BY BIGINT(id_contract)) > 1 THEN TRUE ELSE FALSE END AS is_reincident,
     IF(p.case_status = 'Active' AND fpc.dt_first_closure IS NOT NULL, TRUE, FALSE) AS is_reopened,
-    'not_in_cyber_legal' AS procedure,
+    CASE
+        WHEN s.stage_distribuicao_judicial_dt_start IS NULL THEN 'Arbitral'
+        WHEN s.stage_distribuicao_judicial_dt_start IS NOT NULL THEN 'Judicial'
+    END AS procedure,
     p.case_result_description AS consolidated_reason,
     p.case_final_description AS standardized_reason,
     FIRST(vl.value_description) AS first_consolidated_reason,
     FIRST(vl1.value_description) AS first_standardized_reason,
-    'not_in_cyber_legal' AS result,
+    CASE
+        WHEN p.case_result_description IN (
+            'Despejo Coercitivo',
+            'Imissao na Posse',
+            'Quitacao Escritorio',
+            'Rescisao Escritorio'
+        ) THEN 'Jurídico'
+        ELSE 'Amigável'
+    END AS result,
     'not_in_cyber_legal' AS succumbency_fee,
     p.ldt_stock,
     CASE
@@ -282,4 +293,4 @@ LEFT JOIN
 LEFT JOIN
     datalake_cyber_legal_clean.values_list vl1
         ON fpc.closure_reason = vl1.value_code
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86

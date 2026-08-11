@@ -188,3 +188,11 @@ workflow:
         - "[]"
         - False
         - "[]"
+    text_content:
+      clean_table_name: text_content
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "['TXADDDT']"
+        - False
+        - "[]"

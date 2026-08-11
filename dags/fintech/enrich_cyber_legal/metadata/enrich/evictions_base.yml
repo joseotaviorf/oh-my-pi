@@ -128,7 +128,9 @@ columns:
   is_reincident:
     description: "Flag indicating if the contract has multiple legal cases (reincident)."
   procedure:
-    description: "Procedure classification (set to 'not_in_cyber_legal')."
+    description: "Procedure classification derived from judicial distribution stage: Arbitral when dt_judiciary_distribution_start is null, Judicial otherwise."
+    lineage:
+      - datalake_cyber_legal.process_stages.dt_start
   consolidated_reason:
     description: "Consolidated reason description for the case result."
     lineage:
@@ -138,7 +140,9 @@ columns:
     lineage:
       - datalake_cyber_legal.process.case_final_description
   result:
-    description: "Result classification (set to 'not_in_cyber_legal')."
+    description: "Eviction outcome classification: Jurídico for coercive or legal-office resolutions, Amigável otherwise."
+    lineage:
+      - datalake_cyber_legal.process.case_result_description
   succumbency_fee:
     description: "Succumbency fee (set to 'not_in_cyber_legal')."
   ldt_stock:

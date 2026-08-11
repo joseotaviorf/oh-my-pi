@@ -635,7 +635,7 @@ WITH contract_features AS (
   FROM dw_evictions.fact_evictions
   WHERE
     NOT CAST(dt_registered AS DATE) IS NULL
-    AND CAST(dt_registered AS DATE) BETWEEN CAST('2023-01-01' AS DATE) AND CAST('{load_end_date}' AS DATE)
+    AND CAST(dt_registered AS DATE) BETWEEN CAST('2022-01-01' AS DATE) AND CAST('{load_end_date}' AS DATE)
     AND (
       CAST(dt_closure AS DATE) > LEAST(CAST(dt_registered AS DATE), CAST(dt_arbitral_distribution_start AS DATE))
       OR CAST(dt_closure AS DATE) IS NULL
@@ -644,7 +644,7 @@ WITH contract_features AS (
   SELECT
     *,
     SEQUENCE(
-      GREATEST(dt_begin, CAST('2023-01-01' AS DATE)),
+      GREATEST(dt_begin, CAST('2022-01-01' AS DATE)),
       LEAST(
         COALESCE(CAST(dt_elaw_closure AS DATE), CAST('{load_end_date}' AS DATE)),
         CAST('{load_end_date}' AS DATE)

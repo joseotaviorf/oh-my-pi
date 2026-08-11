@@ -17,6 +17,18 @@ columns:
     description: "Timestamp indicating when the case was added to the system."
     lineage:
       - datalake_cyber_legal_raw.text_content.TXADDDT
+  year:
+    description: "Year of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.text_content.year
+  month:
+    description: "Month of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.text_content.month
+  day:
+    description: "Day of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.text_content.day
   ts_load:
     description: "Timestamp when the record was loaded into the clean layer."
     lineage: []
