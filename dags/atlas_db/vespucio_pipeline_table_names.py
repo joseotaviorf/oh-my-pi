@@ -90,6 +90,7 @@ class Tables:
     match_pairs_v2 = "vespucio_pipeline_delta.match_pairs_v2"
     artifact_groups = "vespucio_pipeline_delta.artifact_groups"
     group_merges = "vespucio_pipeline_delta.group_merges"
+    groups_step_v2 = "vespucio_pipeline_delta.groups_step"
     resolved_identities_publish_checkpoint = (
         "vespucio_pipeline_delta.resolved_identities_publish_checkpoint"
     )

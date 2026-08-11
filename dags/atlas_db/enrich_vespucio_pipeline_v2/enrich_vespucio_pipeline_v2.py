@@ -383,6 +383,16 @@ resolve_groups_step_task = create_task(
     ],
 )
 
+groups_step_task = create_task(
+    entry_point="core_v2_groups_step",
+    parameters=[
+        f"--input_artifacts={Tables.artifacts_v2}",
+        f"--input_artifact_groups={Tables.artifact_groups}",
+        f"--input_group_merges={Tables.group_merges}",
+        f"--output_groups={Tables.groups_step_v2}",
+    ],
+)
+
 publish_artifacts_step_task = create_task(
     entry_point="core_v2_publish_artifacts_step",
     parameters=[
@@ -443,7 +453,11 @@ address_normalization_step_task >> address_enrich_step_task
     address_grouping_step_task,
     image_grouping_step_task,
 ] >> resolve_groups_step_task
-resolve_groups_step_task >> vespucio_v2_pipeline_complete_task
+[
+    resolve_groups_step_task,
+    artifacts_step_task,
+] >> groups_step_task
+groups_step_task >> vespucio_v2_pipeline_complete_task
 resolve_groups_step_task >> publish_resolved_identities_step_task
 artifacts_step_task >> vespucio_v2_pipeline_complete_task
 artifacts_step_task >> publish_artifacts_step_task
