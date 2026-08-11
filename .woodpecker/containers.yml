@@ -1,8 +1,12 @@
 # Container image builds — CI images published to ECR.
 #
-# ci-base, ci-jdk, and devcontainer are built for linux/amd64 + linux/arm64
-# via the ECR-hosted Kaniko plugin (plugins/docker) with privileged: true for QEMU
-# binfmt registration. ci-astro is amd64-only (Woodpecker CI runners only).
+# PRs smoke-build the devcontainer target twice in parallel (one plugin
+# invocation per arch: amd64 + arm64) — never one step with both platforms,
+# which Kaniko builds sequentially under QEMU. Publish steps build ci-base /
+# ci-jdk / ci-astro / ci-astro-dind / devcontainer for their configured
+# platforms via the ECR-hosted Kaniko plugin (plugins/docker) with
+# privileged: true for QEMU binfmt registration.
+# ci-astro and ci-astro-dind are amd64-only (Woodpecker CI runners only).
 # GITHUB_TOKEN is passed via settings.github_token
 # (PLUGIN_GITHUB_TOKEN); the plugin stages /kaniko/run/secrets/GITHUB_TOKEN for
 # Dockerfile RUN steps. Multi-arch targets push a
@@ -14,13 +18,12 @@
 #
 # No custom clone: default plugin-git shallow clone is enough (Docker build only; no git diff).
 #
-# Path filters scope workspace/package deps used by .container/Dockerfile:
-# packages/**/{pyproject.toml,uv.lock} covers every real workspace package
-# (incl. nested envs/, e.g. bietlejuice-runtime/envs/dbr-16-4/) minus the
-# excluded standalone projects below, which are never copied into the image
-# and must not trigger a rebuild. Woodpecker only skips a step when EVERY
-# changed file matches an exclude pattern, so a commit touching both an
-# excluded path and a real dependency still triggers the rebuild.
+# Path filters list only what .container/Dockerfile actually COPYs: the
+# bietlejuice-* workspace packages, plus bietlejuice-runtime/envs/** (which
+# holds only pyproject.toml + uv.lock per DBR env; a single * cannot cross the
+# env directory). packages/emr-cli and packages/tars-evals are standalone
+# projects never copied into any image, so they are simply not matched — no
+# exclude list, which would skip a step only when EVERY changed file matched it.
 when:
   - event: pull_request
     branch:
@@ -30,19 +33,25 @@ when:
   - event: manual
 
 steps:
-  # Validates that ci-jdk builds for both amd64 and arm64 on PRs.
-  # No push — build-only smoke test.
-  validate-multi-arch-pr:
+  # Smoke-build devcontainer per arch on PRs, in parallel.
+  # Woodpecker runs steps serially unless any step sets depends_on (DAG mode).
+  # Empty depends_on: [] opts both validates into DAG with no deps so they start
+  # together. One platform per plugin invocation on purpose: a single step
+  # listing both platforms makes Kaniko build them sequentially under QEMU,
+  # doubling PR feedback latency (~20 min). No push — build-only smoke test.
+  # Astro/DinD stages sit after devcontainer in the Dockerfile so Kaniko
+  # --target=devcontainer does not build DinD apt under QEMU.
+  validate-devcontainer-amd64-pr:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
     privileged: true
+    depends_on: []
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       dockerfile: .container/Dockerfile
       target: devcontainer
       platforms:
         - linux/amd64
-        - linux/arm64
       no_push: true
       github_token:
         from_secret: github_token
@@ -52,15 +61,33 @@ steps:
         include: &container_dep_paths
           - ".woodpecker/containers.yml"
           - ".container/Dockerfile"
+          - ".container/dind/**"
           - ".devcontainer/**"
           - "pyproject.toml"
           - "uv.lock"
-          - "packages/**/pyproject.toml"
-          - "packages/**/uv.lock"
+          - "packages/bietlejuice-*/pyproject.toml"
+          - "packages/bietlejuice-*/uv.lock"
+          - "packages/bietlejuice-runtime/envs/**"
           - "packages/bietlejuice-runtime/hatch_build.py"
-        exclude: &container_excluded_paths
-          - "packages/tars-evals/**"
-          - "packages/emr-cli/**"
+
+  validate-devcontainer-arm64-pr:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
+    pull: true
+    privileged: true
+    depends_on: []
+    settings:
+      repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
+      dockerfile: .container/Dockerfile
+      target: devcontainer
+      platforms:
+        - linux/arm64
+      no_push: true
+      github_token:
+        from_secret: github_token
+    when:
+      event: pull_request
+      path:
+        include: *container_dep_paths
 
   publish-ci-base-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
@@ -80,7 +107,6 @@ steps:
     when:
       - path:
           include: *container_dep_paths
-          exclude: *container_excluded_paths
         branch: [master]
         event: push
       - branch: [master]
@@ -104,7 +130,6 @@ steps:
     when:
       - path:
           include: *container_dep_paths
-          exclude: *container_excluded_paths
         branch: [master]
         event: push
       - branch: [master]
@@ -129,16 +154,15 @@ steps:
     when:
       - path:
           include: *container_dep_paths
-          exclude: *container_excluded_paths
         branch: [master]
         event: push
       - branch: [master]
         event: manual
 
   # amd64 only — ci-astro + Docker-in-Docker, staged after devcontainer in the
-  # Dockerfile so validate-multi-arch-pr's --target=devcontainer never builds
-  # this under QEMU. Needs its own path list (not *container_dep_paths):
-  # ci-astro-dind's DinD layer is the only target reading .container/dind/**.
+  # Dockerfile so the PR validate steps' --target=devcontainer never build this
+  # under QEMU. Consumed by development.yml deploy-astro-image and release.yml
+  # deploy-astro-image-{prod,forno} via prod-ci-astro-dind-latest.
   publish-ci-astro-dind-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
@@ -156,16 +180,7 @@ steps:
         from_secret: github_token
     when:
       - path:
-          include:
-            - ".woodpecker/containers.yml"
-            - ".container/Dockerfile"
-            - ".container/dind/**"
-            - "pyproject.toml"
-            - "uv.lock"
-            - "packages/**/pyproject.toml"
-            - "packages/**/uv.lock"
-            - "packages/bietlejuice-runtime/hatch_build.py"
-          exclude: *container_excluded_paths
+          include: *container_dep_paths
         branch: [master]
         event: push
       - branch: [master]
@@ -189,7 +204,6 @@ steps:
     when:
       - path:
           include: *container_dep_paths
-          exclude: *container_excluded_paths
         branch: [master]
         event: push
       - branch: [master]
