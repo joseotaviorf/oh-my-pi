@@ -7,57 +7,58 @@ entry point, with mocked dbutils, SparkClient, and Google Sheets API clients.
 
 import json
 import unittest
-from datetime import date, datetime
-from decimal import Decimal
 from unittest.mock import MagicMock, patch
+
+import numpy as np
+import pandas as pd
 
 from dags.people.reverse_reports.spark_jobs import load_to_gsheet as job
 
 MODULE_UNDER_TEST = "dags.people.reverse_reports.spark_jobs.load_to_gsheet"
 
 
-class TestCellValueToStr(unittest.TestCase):
-    """Tests for _cell_value_to_str helper."""
+class TestSparkDataframeToGsheetsRows(unittest.TestCase):
+    """Tests for _spark_dataframe_to_gsheets_rows helper."""
 
-    def test_none_returns_empty_string(self):
-        self.assertEqual(job._cell_value_to_str(None), "")
-
-    def test_decimal_returns_string(self):
-        self.assertEqual(job._cell_value_to_str(Decimal("1234.56")), "1234.56")
-
-    def test_date_returns_iso_format(self):
-        self.assertEqual(job._cell_value_to_str(date(2025, 3, 12)), "2025-03-12")
-
-    def test_datetime_date_only_returns_iso_date(self):
-        self.assertEqual(
-            job._cell_value_to_str(datetime(2025, 3, 12, 0, 0, 0)),
-            "2025-03-12",
+    def test_formats_datetime_date_only(self):
+        mock_df = MagicMock()
+        mock_df.toPandas.return_value = pd.DataFrame(
+            {"dt": pd.to_datetime(["2025-03-12"])},
         )
 
-    def test_datetime_with_time_returns_iso_datetime(self):
-        self.assertEqual(
-            job._cell_value_to_str(datetime(2025, 3, 12, 10, 30, 0)),
-            "2025-03-12 10:30:00",
+        rows = job._spark_dataframe_to_gsheets_rows(mock_df)
+
+        self.assertEqual(rows[0], ["dt"])
+        self.assertEqual(rows[1], ["2025-03-12"])
+
+    def test_escapes_formula_prefix_in_object_columns(self):
+        mock_df = MagicMock()
+        mock_df.toPandas.return_value = pd.DataFrame(
+            {"val": pd.Series(["=SUM(A1)", "ok"], dtype=object)}
         )
 
-    def test_bool_returns_yes_no(self):
-        self.assertEqual(job._cell_value_to_str(True), "Yes")
-        self.assertEqual(job._cell_value_to_str(False), "No")
+        rows = job._spark_dataframe_to_gsheets_rows(mock_df)
 
-    def test_nan_returns_empty_string(self):
-        self.assertEqual(job._cell_value_to_str(float("nan")), "")
+        self.assertEqual(rows[1][0], "'=SUM(A1)")
+        self.assertEqual(rows[2][0], "ok")
 
-    def test_inf_returns_empty_string(self):
-        self.assertEqual(job._cell_value_to_str(float("inf")), "")
-        self.assertEqual(job._cell_value_to_str(float("-inf")), "")
+    def test_replaces_nan_and_none_with_empty_string(self):
+        mock_df = MagicMock()
+        mock_df.toPandas.return_value = pd.DataFrame({"val": [None, np.nan]})
 
-    def test_formula_prefix_escaped(self):
-        self.assertEqual(job._cell_value_to_str("=SUM(A1)"), "'=SUM(A1)")
-        self.assertEqual(job._cell_value_to_str("+123"), "'+123")
+        rows = job._spark_dataframe_to_gsheets_rows(mock_df)
 
-    def test_plain_string_unchanged(self):
-        self.assertEqual(job._cell_value_to_str("hello"), "hello")
-        self.assertEqual(job._cell_value_to_str(42), "42")
+        self.assertEqual(rows[1][0], "")
+        self.assertEqual(rows[2][0], "")
+
+    def test_bool_values_kept_as_native_types(self):
+        mock_df = MagicMock()
+        mock_df.toPandas.return_value = pd.DataFrame({"flag": [True, False]})
+
+        rows = job._spark_dataframe_to_gsheets_rows(mock_df)
+
+        self.assertEqual(rows[1][0], True)
+        self.assertEqual(rows[2][0], False)
 
 
 class TestIsRetriableGsheetsError(unittest.TestCase):
@@ -76,6 +77,11 @@ class TestIsRetriableGsheetsError(unittest.TestCase):
     def test_resource_exhausted_is_retriable(self):
         self.assertTrue(
             job._is_retriable_gsheets_error(Exception("RESOURCE_EXHAUSTED"))
+        )
+
+    def test_500_is_retriable(self):
+        self.assertTrue(
+            job._is_retriable_gsheets_error(Exception("500 Internal Server Error"))
         )
 
     def test_404_is_not_retriable(self):
@@ -140,6 +146,22 @@ class TestWriteWithRetries(unittest.TestCase):
         self.assertIn("gsheets-people-access", str(ctx.exception))
         mock_writer.write.assert_called_once()
 
+    @patch(f"{MODULE_UNDER_TEST}.time.sleep")
+    def test_retries_on_500_when_sheet_id_in_error_message(self, mock_sleep):
+        mock_writer = MagicMock()
+        mock_writer.write.side_effect = [
+            Exception(
+                "500 Internal Server Error: "
+                "https://sheets.googleapis.com/v4/spreadsheets/bad-sheet-id"
+            ),
+            None,
+        ]
+
+        job._write_with_retries(mock_writer, "Tab", "bad-sheet-id", [["a"]])
+
+        self.assertEqual(mock_writer.write.call_count, 2)
+        mock_sleep.assert_called_once_with(job.WRITE_RETRY_DELAYS_SECONDS[0])
+
 
 class TestGetAuth(unittest.TestCase):
     """Tests for _get_auth helper."""
@@ -173,27 +195,37 @@ class TestGetAuth(unittest.TestCase):
 class TestGetPayloadsFromTable(unittest.TestCase):
     """Tests for _get_payloads_from_table helper."""
 
+    @patch(f"{MODULE_UNDER_TEST}._spark_dataframe_to_gsheets_rows")
     @patch(f"{MODULE_UNDER_TEST}.SparkClient")
-    def test_returns_header_and_rows_excluding_partition_cols(
-        self, mock_spark_client_cls
+    def test_returns_payload_excluding_partition_cols(
+        self, mock_spark_client_cls, mock_format_rows
     ):
         mock_spark_client = MagicMock()
         mock_spark_client_cls.return_value = mock_spark_client
 
         mock_df = MagicMock()
         mock_df.columns = ["id_user", "user_name", "year", "month", "day"]
-        mock_df.select.return_value.rdd.map.return_value.collect.return_value = [
+        mock_selected = MagicMock()
+        mock_df.select.return_value = mock_selected
+        mock_spark_client.get_records.return_value = mock_df
+        mock_format_rows.return_value = [
+            ["id_user", "user_name"],
             ["1", "Alice"],
             ["2", "Bob"],
         ]
-        mock_spark_client.get_records.return_value = mock_df
 
-        header, rows = job._get_payloads_from_table(
-            mock_spark_client, "jobs", "2025-03-12"
+        payload = job._get_payloads_from_table(mock_spark_client, "jobs", "2025-03-12")
+
+        self.assertEqual(
+            payload,
+            [
+                ["id_user", "user_name"],
+                ["1", "Alice"],
+                ["2", "Bob"],
+            ],
         )
-
-        self.assertEqual(header, ["id_user", "user_name"])
-        self.assertEqual(rows, [["1", "Alice"], ["2", "Bob"]])
+        mock_df.select.assert_called_once_with(["id_user", "user_name"])
+        mock_format_rows.assert_called_once_with(mock_selected)
         mock_spark_client.get_records.assert_called_once()
         call_args = mock_spark_client.get_records.call_args[0][0]
         self.assertIn("reverse_reports.jobs", call_args)
@@ -201,93 +233,33 @@ class TestGetPayloadsFromTable(unittest.TestCase):
         self.assertIn("month = 3", call_args)
         self.assertIn("day = 12", call_args)
 
-    @patch(f"{MODULE_UNDER_TEST}.SparkClient")
-    def test_converts_none_to_empty_string(self, mock_spark_client_cls):
-        mock_spark_client = MagicMock()
-        mock_spark_client_cls.return_value = mock_spark_client
-
-        mock_df = MagicMock()
-        mock_df.columns = ["id_user", "user_name"]
-        raw_rows = [["1", None]]
-
-        def collect_applies_conversion():
-            return [[str(x) if x is not None else "" for x in row] for row in raw_rows]
-
-        mock_rdd = MagicMock()
-        mock_rdd.map.return_value.collect.side_effect = collect_applies_conversion
-        mock_df.select.return_value.rdd = mock_rdd
-        mock_spark_client.get_records.return_value = mock_df
-
-        _, rows = job._get_payloads_from_table(mock_spark_client, "jobs", "2025-03-12")
-
-        self.assertEqual(rows, [["1", ""]])
-
-
-class TestEnsureWorksheetExists(unittest.TestCase):
-    """Tests for _ensure_worksheet_exists helper."""
-
-    @patch(f"{MODULE_UNDER_TEST}.gspread")
-    @patch(f"{MODULE_UNDER_TEST}.ServiceAccountCredentials")
-    def test_does_not_create_when_worksheet_exists(self, mock_creds_cls, mock_gspread):
-        mock_spreadsheet = MagicMock()
-        mock_gspread.authorize.return_value.open_by_key.return_value = mock_spreadsheet
-        mock_spreadsheet.worksheet.return_value = MagicMock()
-
-        job._ensure_worksheet_exists(
-            {"type": "service_account"}, "https://scope", "sheet-id", "Tab1"
-        )
-
-        mock_spreadsheet.add_worksheet.assert_not_called()
-
-    @patch(f"{MODULE_UNDER_TEST}.gspread")
-    @patch(f"{MODULE_UNDER_TEST}.ServiceAccountCredentials")
-    def test_creates_worksheet_when_not_found(self, mock_creds_cls, mock_gspread):
-        mock_spreadsheet = MagicMock()
-        mock_spreadsheet.worksheet.side_effect = job.WorksheetNotFound("Tab1")
-        mock_gspread.authorize.return_value.open_by_key.return_value = mock_spreadsheet
-
-        job._ensure_worksheet_exists(
-            {"type": "service_account"}, "https://scope", "sheet-id", "Tab1"
-        )
-
-        mock_spreadsheet.add_worksheet.assert_called_once_with(
-            title="Tab1", rows=1000, cols=26
-        )
-
 
 class TestMain(unittest.TestCase):
     """Tests for main entry point with full mocks."""
 
-    @patch(f"{MODULE_UNDER_TEST}.GoogleSheetsWriter")
-    @patch(f"{MODULE_UNDER_TEST}.GoogleSheetsClient")
+    @patch(f"{MODULE_UNDER_TEST}._get_gsheets_writer")
     @patch(f"{MODULE_UNDER_TEST}.SparkClient")
     @patch(f"{MODULE_UNDER_TEST}.BaseDBUtils")
     def test_main_success_prod_environment(
         self,
         mock_base_dbutils,
         mock_spark_cls,
-        mock_gsheets_client_cls,
-        mock_writer_cls,
+        mock_get_writer,
     ):
         mock_dbutils = MagicMock()
-        mock_dbutils.secrets.get.return_value = json.dumps(
-            {"type": "service_account", "project_id": "test"}
-        )
         mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
 
         mock_spark_client = MagicMock()
         mock_spark_cls.return_value = mock_spark_client
-        mock_df = MagicMock()
-        mock_df.columns = ["id_user", "user_name"]
-        mock_df.select.return_value.rdd.map.return_value.collect.return_value = [
-            ["1", "Alice"],
-        ]
-        mock_spark_client.get_records.return_value = mock_df
 
         mock_writer = MagicMock()
-        mock_writer_cls.return_value = mock_writer
+        mock_get_writer.return_value = mock_writer
 
-        with patch.object(job, "_ensure_worksheet_exists"):
+        with patch.object(
+            job,
+            "_get_payloads_from_table",
+            return_value=[["id_user", "user_name"], ["1", "Alice"]],
+        ):
             with patch(
                 "sys.argv",
                 [
@@ -301,6 +273,7 @@ class TestMain(unittest.TestCase):
             ):
                 job.main()
 
+        mock_get_writer.assert_called_once_with(mock_dbutils)
         mock_writer.write.assert_called_once_with(
             "JobsTab",
             "prod-sheet-id-123",
@@ -310,34 +283,29 @@ class TestMain(unittest.TestCase):
             ],
         )
 
-    @patch(f"{MODULE_UNDER_TEST}.GoogleSheetsWriter")
-    @patch(f"{MODULE_UNDER_TEST}.GoogleSheetsClient")
+    @patch(f"{MODULE_UNDER_TEST}._get_gsheets_writer")
     @patch(f"{MODULE_UNDER_TEST}.SparkClient")
     @patch(f"{MODULE_UNDER_TEST}.BaseDBUtils")
     def test_main_uses_forno_sheet_id_when_environment_forno(
         self,
         mock_base_dbutils,
         mock_spark_cls,
-        mock_gsheets_client_cls,
-        mock_writer_cls,
+        mock_get_writer,
     ):
         mock_dbutils = MagicMock()
-        mock_dbutils.secrets.get.return_value = json.dumps(
-            {"type": "service_account", "project_id": "test"}
-        )
         mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
 
         mock_spark_client = MagicMock()
         mock_spark_cls.return_value = mock_spark_client
-        mock_df = MagicMock()
-        mock_df.columns = ["col_a"]
-        mock_df.select.return_value.rdd.map.return_value.collect.return_value = []
-        mock_spark_client.get_records.return_value = mock_df
 
         mock_writer = MagicMock()
-        mock_writer_cls.return_value = mock_writer
+        mock_get_writer.return_value = mock_writer
 
-        with patch.object(job, "_ensure_worksheet_exists"):
+        with patch.object(
+            job,
+            "_get_payloads_from_table",
+            return_value=[["col_a"], ["x"]],
+        ):
             with patch(
                 "sys.argv",
                 [

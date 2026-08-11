@@ -3,22 +3,16 @@ Spark job that exports reverse_reports DAG tables to Google Sheets.
 
 Reads from reverse_reports.{table_name} and writes to the specified Google Sheet.
 Each table can target a different sheet (sheet_id) and tab (sheet_tab).
-
-Uses SELECT * to keep the job generic so any table shape works automatically.
-Column names are derived from the DataFrame schema after excluding partition cols.
 """
 
 import json
 import logging
 import time
 from argparse import ArgumentParser
-from datetime import date, datetime
-from decimal import Decimal
-from math import isinf, isnan
+from datetime import datetime
 
-import gspread
-from google.oauth2.service_account import Credentials as ServiceAccountCredentials
-from gspread.exceptions import WorksheetNotFound
+import numpy as np
+import pandas as pd
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 from quintoandar_gsheets_api_client.producer import GoogleSheetsWriter
 
@@ -33,7 +27,6 @@ from bietlejuice.clients.db_clients import SparkClient
 CREDENTIALS_SCOPE = "people"
 FORNO_SHEET_ID = "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU"
 JOB_NAME = "load_to_gsheet"
-TIMEOUT_LIMIT = 5 * 60
 SCHEMA = "reverse_reports"
 
 logger = logging.getLogger(JOB_NAME)
@@ -48,7 +41,7 @@ def _is_retriable_gsheets_error(e: Exception) -> bool:
     """
     Return True if the exception is a retriable Google Sheets API error.
 
-    Retriable: 429 rate limit, 503 unavailable, resource exhausted, deadline exceeded.
+    Retriable: 429 rate limit, 500/503 server errors, resource exhausted, deadline exceeded.
     """
     error_msg = str(e).upper()
     if (
@@ -58,14 +51,16 @@ def _is_retriable_gsheets_error(e: Exception) -> bool:
     ):
         return True
     if (
-        "503" in error_msg
+        "500" in error_msg
+        or "503" in error_msg
+        or "INTERNAL" in error_msg
         or "UNAVAILABLE" in error_msg
         or "DEADLINE_EXCEEDED" in error_msg
     ):
         return True
-    if hasattr(e, "code") and e.code in (429, 503):
+    if hasattr(e, "code") and e.code in (429, 500, 503):
         return True
-    if hasattr(e, "resp") and getattr(e.resp, "status", None) in (429, 503):
+    if hasattr(e, "resp") and getattr(e.resp, "status", None) in (429, 500, 503):
         return True
     return False
 
@@ -97,39 +92,42 @@ def _is_missing_sheet_tab_error(e: Exception, sheet_tab: str) -> bool:
     return any(ind in error_msg for ind in tab_error_indicators)
 
 
-def _cell_value_to_str(value) -> str:
+def _spark_dataframe_to_gsheets_rows(df, force_int_to_str: bool = False) -> list:
     """
-    Convert a Spark cell value to a GSheets-safe string.
+    Format a Spark DataFrame for the Sheets API.
 
-    Handles: None, Decimal, date/datetime, bool, NaN/inf, and formula injection
-    (values starting with = or + are prefixed with a quote).
-    Datetime with time component uses %Y-%m-%d %H:%M:%S; date-only uses %Y-%m-%d.
+    Returns a list of rows with the header as the first row.
     """
-    if value is None:
-        return ""
-    if isinstance(value, Decimal):
-        return str(value)
-    if isinstance(value, date) and not isinstance(value, datetime):
-        return value.strftime("%Y-%m-%d")
-    if isinstance(value, datetime):
-        if value.hour == 0 and value.minute == 0 and value.second == 0:
-            return value.strftime("%Y-%m-%d")
-        return value.strftime("%Y-%m-%d %H:%M:%S")
-    if isinstance(value, bool):
-        return "Yes" if value else "No"
-    if isinstance(value, float) and (isnan(value) or isinf(value)):
-        return ""
-    s = str(value)
-    if s and s[0] in ("=", "+"):
-        return "'" + s
-    return s
+    pdf = df.toPandas()
+    for col in pdf.columns:
+        if pd.api.types.is_datetime64_any_dtype(pdf[col]):
+            if all(pdf[col].dt.time == pd.to_datetime("00:00:00").time()):
+                pdf[col] = pdf[col].dt.strftime("%Y-%m-%d")
+            else:
+                pdf[col] = pdf[col].dt.strftime("%Y-%m-%d %H:%M:%S")
+        if pdf[col].dtype == "object":
+            pdf[col] = pdf[col].astype(str)
+            if any(x.startswith(("=", "+")) for x in pdf[col]):
+                pdf[col] = (
+                    pdf[col]
+                    .astype(str)
+                    .apply(lambda x: f"'{x}" if x.startswith(("=", "+")) else x)
+                )
+        if force_int_to_str and not pd.api.types.is_float_dtype(pdf[col]):
+            pdf[col] = pdf[col].apply(lambda x: "'" + str(x) if str(x).isdigit() else x)
+    pdf = pdf.replace(
+        [np.inf, -np.inf, np.nan, pd.NaT, None, "None", "nan", "'None", "'nan"],
+        "",
+    )
+    rows = pdf.values.tolist()
+    rows.insert(0, pdf.columns.tolist())
+    return rows
 
 
 def _write_with_retries(writer, sheet_tab: str, sheet_id: str, payload: list) -> None:
     """
-    Write payload to GSheets with retry and progressive backoff on retriable errors.
+    Write payload to GSheets with retry and progressive backoff.
 
-    Only retries on 429/503; fails immediately on 404, PERMISSION_DENIED, etc.
     Uses progressive backoff: [60, 60, 60, 60, 60, 120, 180] seconds.
     """
     delays = WRITE_RETRY_DELAYS_SECONDS
@@ -193,22 +191,30 @@ def _get_auth(dbutils, credentials_scope: str, credentials_key: str):
     return credentials, scope
 
 
+def _get_gsheets_writer(dbutils) -> GoogleSheetsWriter:
+    """Return a GoogleSheetsWriter configured with People credentials."""
+    credentials, scope = _get_auth(
+        dbutils, CREDENTIALS_SCOPE, APIEnum.GSHEETS_CREDENTIALS_PEOPLE
+    )
+    gsheets_client = GoogleSheetsClient(credentials, scope)
+    return GoogleSheetsWriter(gsheets_client)
+
+
 def _get_payloads_from_table(
     spark_client: SparkClient,
     table_name: str,
     execution_date: str,
     database_name: str = SCHEMA,
-) -> tuple:
+) -> list:
     """
-    Fetch data from the reverse table and convert to list of rows for GSheets.
+    Fetch data from the reverse table and convert to GSheets rows (header included).
 
-    Uses SELECT * to keep the job generic; columns are derived from the schema.
-    Partition columns (year, month, day) are excluded from the output.
+    Partition columns (year, month, day) are excluded from the export payload.
 
     :param spark_client: SparkClient to execute queries.
     :param table_name: Name of the reverse table.
     :param execution_date: Execution date in YYYY-MM-DD format for partition filter.
-    :return: Tuple of (header list, rows list).
+    :return: List of rows with column names as the first row.
     """
     execution_dt = datetime.strptime(execution_date, "%Y-%m-%d")
     year = execution_dt.year
@@ -233,43 +239,15 @@ def _get_payloads_from_table(
     """
 
     df = spark_client.get_records(query)
-    columns = df.columns
     exclude_cols = {"year", "month", "day"}
-    output_columns = [c for c in columns if c not in exclude_cols]
+    output_columns = [c for c in df.columns if c not in exclude_cols]
 
     logger.info("Exporting columns: %s", output_columns)
 
-    rows = (
-        df.select(output_columns)
-        .rdd.map(lambda row: [_cell_value_to_str(x) for x in row])
-        .collect()
-    )
-
-    logger.info("Fetched %d rows from %s.%s", len(rows), database_name, table_name)
-    return output_columns, rows
-
-
-def _ensure_worksheet_exists(
-    credentials: dict, scope: str, sheet_id: str, sheet_tab: str
-) -> None:
-    """
-    Create the worksheet if it does not exist in the spreadsheet.
-
-    :param credentials: Service account credentials dict.
-    :param scope: OAuth scope for Google Sheets API.
-    :param sheet_id: Google Sheet ID.
-    :param sheet_tab: Worksheet tab name.
-    """
-    creds = ServiceAccountCredentials.from_service_account_info(
-        credentials, scopes=[scope]
-    )
-    gc = gspread.authorize(creds)
-    spreadsheet = gc.open_by_key(sheet_id)
-    try:
-        spreadsheet.worksheet(sheet_tab)
-    except WorksheetNotFound:
-        spreadsheet.add_worksheet(title=sheet_tab, rows=1000, cols=26)
-        logger.info("Created worksheet %s in sheet %s", sheet_tab, sheet_id)
+    payload = _spark_dataframe_to_gsheets_rows(df.select(output_columns))
+    row_count = len(payload) - 1
+    logger.info("Fetched %d rows from %s.%s", row_count, database_name, table_name)
+    return payload
 
 
 def main():
@@ -310,19 +288,12 @@ def main():
     if dbutils is None:
         raise RuntimeError("DBUtils not available. This job must run on Databricks.")
 
-    credentials, scope = _get_auth(
-        dbutils, CREDENTIALS_SCOPE, APIEnum.GSHEETS_CREDENTIALS_PEOPLE
-    )
-    _ensure_worksheet_exists(credentials, scope, sheet_id, sheet_tab)
-
-    gsheets_client = GoogleSheetsClient(credentials, scope, timeout=TIMEOUT_LIMIT)
-    gsheets_producer = GoogleSheetsWriter(gsheets_client)
+    gsheets_producer = _get_gsheets_writer(dbutils)
     spark_client = SparkClient()
 
-    header, rows = _get_payloads_from_table(
+    payload = _get_payloads_from_table(
         spark_client, read_table_name, execution_date, database_name
     )
-    payload = [header] + rows
 
     _write_with_retries(gsheets_producer, sheet_tab, sheet_id, payload)
 
@@ -331,7 +302,7 @@ def main():
         table_name,
         sheet_id,
         sheet_tab,
-        len(rows),
+        len(payload) - 1,
     )
 
 
