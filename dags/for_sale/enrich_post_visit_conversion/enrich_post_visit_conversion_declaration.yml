@@ -1,0 +1,35 @@
+---
+dag:
+  name: enrich_post_visit_conversion
+  schedule_start_date: 2026, 8, 1
+  schedule_interval: 0 16 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Feeds the For Sale post-visit offer-incentive communication flow with three enrich
+      tables: the visits that can be targeted, and two daily snapshots of the arguments
+      used to persuade the visitor to send an offer.
+
+      eligible_visits selects completed visits eligible for post-visit conversion analysis.
+      Keeps visits in DONE status from the last three days, excludes visits where the
+      visitor is the agent or the property owner, and excludes visitors who are agents.
+      Every visit is kept and tagged with removal_rule, the first business rule (already
+      rated by demand, house unpublished, duplicate offer, recent notification) that
+      disqualifies it from the post-visit offer-incentive communication; downstream
+      consumers filter on removal_rule IS NULL to select eligible visits.
+
+      well_priced_listings snapshots the published listings priced at or below 95% of the
+      pricing calculator's suggested upper bound, supporting a good-price argument.
+
+      high_demand_listings snapshots the published listings whose distinct-prospect count
+      over the last 14 days beats a locality-weighted peer baseline, supporting a
+      competition argument. Both snapshots are joined to eligible_visits on id_house and
+      business_context by the consumer.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+  - year
+  - month
+  - day

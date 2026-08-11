@@ -1,0 +1,52 @@
+---
+database_name: datalake_post_visit_conversion
+table_name: well_priced_listings
+domain: For Sale
+owner: david.pinto@quintoandar.com.br
+description: >-
+  Daily snapshot of published listings priced at or below 95% of the calculator's suggested
+  upper-bound price, at one row per id_house per business_context per snapshot day. A listing
+  qualifies when its listing_business_context status is published, its current price (rent or
+  sale price, depending on business_context) is above a minimal sanity threshold, and the most
+  recently updated house_price_suggestion record for that house and business context has
+  suggestion_certainty medium or high with the listing's price at or under 95% of
+  suggested_upper_bound_price. Only the latest price suggestion per house and business context
+  is considered, guarding against fan-out from historical suggestion records. Each run rewrites
+  the partition for its own reference date with the full current state, so re-running the same
+  day replaces that day's snapshot rather than duplicating it. Consumed together with
+  eligible_visits by the For Sale post-visit offer-incentive communication flow to target users
+  who recently visited a well-priced house.
+columns:
+  id_house:
+    description: Identifier of the house whose listing is priced at or below the calculator's suggested range.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+  business_context:
+    description: Business line the listing belongs to, distinguishing rent from sale journeys.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+    categories:
+      RENT: When the listing is for rent.
+      SALE: When the listing is for sale.
+  price:
+    description: >-
+      Current listing price in BRL: the house's rent value for RENT listings, or its sale price
+      for SALE listings.
+    lineage:
+      - datalake_ebdb_clean.house.rent
+      - datalake_ebdb_clean.house.sale_price
+  price_reference:
+    description: >-
+      Upper bound of the price range suggested by the pricing calculator for this house and
+      business context, taken from the most recently updated suggestion record. The listing's
+      price qualifies as well-priced when it is at or under 95% of this value.
+    lineage:
+      - datalake_ebdb_clean.house_price_suggestion.suggested_upper_bound_price
+  ts_snapshot:
+    description: Timestamp when this snapshot row was written, used to audit when the pipeline ran.
+  year:
+    description: Year of the reference date of the run, partition column.
+  month:
+    description: Month of the reference date of the run, partition column.
+  day:
+    description: Day of the reference date of the run, partition column.

@@ -1,0 +1,32 @@
+---
+table_name: datalake_post_visit_conversion.well_priced_listings
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  price:
+    is_complete:
+      severity_level: Error
+  price_reference:
+    is_complete:
+      severity_level: Error
+  unique_house_business_context_per_snapshot:
+    custom:
+      # Guards against house_price_suggestion history fan-out: at most one row
+      # per id_house + business_context within each daily snapshot partition.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT id_house, business_context, year, month, day
+          FROM datalake_post_visit_conversion.well_priced_listings
+          GROUP BY id_house, business_context, year, month, day
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error

@@ -1,0 +1,91 @@
+---
+database_name: datalake_post_visit_conversion
+table_name: eligible_visits
+domain: For Sale
+owner: david.pinto@quintoandar.com.br
+description: >-
+  Completed visits that qualify as the starting point of the post-visit conversion funnel, at one
+  row per visit per snapshot day. A visit reaches this table when it hit DONE status, the visitor
+  is neither the agent nor the property owner of that visit, and the visitor is not a QuintoAndar
+  agent. No visit is removed from the output: every row also carries removal_rule, tagging the
+  first business rule that makes it ineligible for the post-visit offer-incentive communication
+  (visit contested, house disliked, house unpublished, offer already sent, recently notified), or
+  NULL when the visit remains eligible. Consumers must filter on removal_rule IS NULL to select only
+  eligible visits. Each run rewrites the partition for its own reference date with the visits
+  completed in the preceding three days, so the same visit appears in consecutive partitions
+  while it stays inside that window. Consumed by For Sale conversion analyses and the post-visit
+  offer-incentive communication flow.
+columns:
+  id_user:
+    description: Identifier of the platform user who visited the property, the subject of the conversion analysis.
+    lineage:
+    - datalake_ebdb_clean.user.id
+  id_house:
+    description: Identifier of the house that was visited.
+    lineage:
+    - datalake_visit.visits.id_house
+  id_visit:
+    description: Identifier of the visit, unique within a single snapshot partition.
+    lineage:
+    - datalake_visit.visits.id_visit
+  uuid_person:
+    description: Person UUID of the visitor, used to join person attributes without storing personal data here.
+    lineage:
+    - datalake_ebdb_clean.user.uuid_person
+  visit_code:
+    description: Human-readable visit code used by operations teams to reference the visit.
+    lineage:
+    - datalake_visit.visits.code
+  business_context:
+    description: Business line that the visit belongs to, distinguishing rent from sale journeys.
+    lineage:
+    - datalake_visit.visits.business_context
+    categories:
+      RENT: When the visit is for rent.
+      SALE: When the visit is for sale.
+  removal_rule:
+    description: >-
+      First business rule that disqualifies the visit from the post-visit offer-incentive
+      communication, evaluated in priority order. NULL when the visit remains eligible; consumers
+      select eligible visits with removal_rule IS NULL. A positive house rating only disqualifies
+      the visit while it is recent (under 48h); once it ages past that window the visitor is
+      allowed to receive the communication if still uncaught by a later rule (e.g. has not sent an
+      offer yet). A negative or partial house rating always disqualifies the visit.
+    lineage:
+    - datalake_visit.post_visit_demand.is_visit_completed_by_demand
+    - datalake_visit.post_visit_demand.house_rating
+    - datalake_visit.post_visit_demand.ts_creation
+    - datalake_ebdb_clean.listing_business_context.id_house
+    - datalake_sales_flow_clean.house.id_external
+    - datalake_sales_flow_clean.users.id_external
+    - datalake_rental_transact_clean.offer.id_house_external
+    - datalake_rental_transact_clean.offer.id_tenant_external
+    - datalake_cdp_clean.comms.id_user
+    categories:
+      user_contested_the_visit: The visitor's demand answer marked the visit as not completed.
+      user_finalized_and_incentivized_recently: The visitor rated the house positively less than 48 hours ago, so the finalization already covers the incentive.
+      user_did_not_like_house: The visitor rated the house negatively or partially.
+      house_unpublished: The house is no longer published for the visit's business context.
+      user_already_sent_offer: The visitor already made a sale or rent offer for this house.
+      user_received_finalization_recently: The visitor already received a visit-finalization WhatsApp notification in the last 24 hours.
+      user_received_offer_incentive_recently: The visitor already received an offer-incentive WhatsApp notification in the last 7 days.
+  ts_created:
+    description: Timestamp when the visit was created in the source system.
+    lineage:
+    - datalake_visit.visits.ts_created
+  ts_visit:
+    description: Timestamp scheduled for the visit to take place.
+    lineage:
+    - datalake_visit.visits.ts_visit
+  ts_visit_done:
+    description: Timestamp when the visit was marked as done, the event that makes it eligible here.
+    lineage:
+    - datalake_visit.visits.ts_visit_done
+  ts_snapshot:
+    description: Timestamp when this snapshot row was written, used to audit when the pipeline ran.
+  year:
+    description: Year of the reference date of the run, partition column.
+  month:
+    description: Month of the reference date of the run, partition column.
+  day:
+    description: Day of the reference date of the run, partition column.

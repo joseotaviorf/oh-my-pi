@@ -1,0 +1,57 @@
+---
+database_name: datalake_post_visit_conversion
+table_name: high_demand_listings
+domain: For Sale
+owner: david.pinto@quintoandar.com.br
+description: >-
+  Daily snapshot of published listings that attracted unusually high prospect demand over the
+  trailing 14 days, at one row per id_house per business_context per snapshot day. Demand is
+  measured as the number of distinct prospects (tenant prospects for RENT, buyers for SALE) who
+  booked a visit, completed a visit, or submitted an offer on the house in that window. A listing
+  qualifies when its prospect count reaches at least three and also reaches a locality-weighted
+  peer baseline: the blended average demand of its neighborhood, city and city group, weighted
+  50/30/20 and given a 25% margin so only clearly above-average listings are kept. Sparse
+  localities are discarded, requiring at least five houses with demand in the neighborhood and
+  twenty in the city group, so the baseline is not driven by a handful of listings. Only houses
+  with geolocation, mapped to a SubRegiao region in Brazil, and currently published in the
+  matching business context are considered. Each run rewrites the partition for its own reference
+  date with the full current state, so re-running the same day replaces that day's snapshot rather
+  than duplicating it. Consumed together with eligible_visits by the For Sale post-visit
+  offer-incentive communication flow to create urgency for users who recently visited a house that
+  other prospects are competing for.
+columns:
+  id_house:
+    description: Identifier of the house whose listing is attracting high prospect demand.
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_house
+      - datalake_sale_demand_events.sale_demand_events.id_house
+  business_context:
+    description: Business line the demand was measured in, distinguishing rent from sale journeys.
+    categories:
+      RENT: When the demand comes from tenant prospects on a rent listing.
+      SALE: When the demand comes from buyers on a sale listing.
+  num_prospects:
+    description: >-
+      Count of distinct prospects who booked a visit, completed a visit, or submitted an offer on
+      this house in the 14 days ending on the reference date. Tenant prospects are counted for
+      RENT and buyers for SALE, so a single person appearing in several events is counted once.
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+      - datalake_sale_demand_events.sale_demand_events.id_buyer
+  demand_reference:
+    description: >-
+      Peer demand baseline the listing had to beat, in the same unit as num_prospects. It blends
+      the average 14-day prospect count of the house's neighborhood, city and city group with
+      weights of 50%, 30% and 20%, then adds a 25% margin. A listing is kept when num_prospects
+      reaches at least the greater of this value and three.
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+      - datalake_sale_demand_events.sale_demand_events.id_buyer
+  ts_snapshot:
+    description: Timestamp when this snapshot row was written, used to audit when the pipeline ran.
+  year:
+    description: Year of the reference date of the run, partition column.
+  month:
+    description: Month of the reference date of the run, partition column.
+  day:
+    description: Day of the reference date of the run, partition column.
