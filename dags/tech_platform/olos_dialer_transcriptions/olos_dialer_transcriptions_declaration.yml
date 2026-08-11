@@ -18,8 +18,8 @@ workflow:
   - "{environment}"
   - "{bucket}"
   - "{schema}"
-  - "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
-  - "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}"
+  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   - "{table_name}"
   - "{partitions}"
   default_extraction_type: incremental
