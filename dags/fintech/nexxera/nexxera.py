@@ -43,7 +43,10 @@ MAIN_SCHEDULE_INTERVAL = "30 7 * * *"
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
-CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("consolidation_m_memory_cluster")
+CLUSTER_DESCRIPTION["num_workers"] = 3
+# Driver stays one tier above the workers (see #19391).
+CLUSTER_DESCRIPTION["driver_node_type_id"] = "r7g.4xlarge"
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"

@@ -29,7 +29,7 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = DatasetService.get_dag_datasets(DAG_ID)
-CLUSTER_DESCRIPTION = "custom_cluster"
+CLUSTER_DESCRIPTION = "consolidation_l_memory_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 MAIN_TABLE = config_service.get_config("main_table")
@@ -41,6 +41,8 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_configuration["num_workers"] = 4
+cluster_configuration["runtime_engine"] = "PHOTON"
 default_libraries = config_service.get_config("default_libraries")
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
 cluster_configuration["single_user_name"] = (
