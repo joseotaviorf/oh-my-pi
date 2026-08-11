@@ -41,8 +41,10 @@ clone:
   - name: clone
     image: woodpeckerci/plugin-git
     settings:
-      # Full history: the PR diff base is origin/master...HEAD (merge-base) and
-      # push diffs use CI_PREV_COMMIT_SHA..CI_COMMIT_SHA.
+      # Full history: the PR diff base is origin/master...HEAD (merge-base).
+      # Push diffs prefer CI_PREV_COMMIT_SHA..CI_COMMIT_SHA when that prev SHA
+      # is present and an ancestor of HEAD; otherwise changed_dataset_stems.py
+      # falls back to HEAD~1..HEAD (guards squash-merge / bad prev SHAs).
       partial: false
 
 steps:

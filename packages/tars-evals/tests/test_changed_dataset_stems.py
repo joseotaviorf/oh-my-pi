@@ -102,6 +102,69 @@ def test_diff_range_blank_prev_sha_falls_back(cds):
     assert r.mode == "fallback"
 
 
+def test_ensure_usable_keeps_valid_push_ancestor(cds):
+    def fake_run(cmd, **kwargs):
+        if cmd[:2] == ["git", "cat-file"]:
+            return SimpleNamespace(returncode=0, stdout=b"", stderr=b"")
+        if cmd[:2] == ["git", "merge-base"]:
+            return SimpleNamespace(returncode=0, stdout=b"", stderr=b"")
+        raise AssertionError(cmd)
+
+    original = cds.DiffRange("aaa111", "bbb222", "..", "push")
+    ensured, warning = cds.ensure_usable_diff_range(
+        original, cwd=Path("."), run=fake_run
+    )
+    assert ensured == original
+    assert warning is None
+
+
+def test_ensure_usable_falls_back_when_prev_sha_missing(cds):
+    def fake_run(cmd, **kwargs):
+        if cmd[:2] == ["git", "cat-file"]:
+            return SimpleNamespace(returncode=1, stdout=b"", stderr=b"missing")
+        raise AssertionError(f"unexpected git call: {cmd}")
+
+    original = cds.DiffRange("deadbeef", "bbb222", "..", "push")
+    ensured, warning = cds.ensure_usable_diff_range(
+        original, cwd=Path("."), run=fake_run
+    )
+    assert (ensured.base, ensured.head, ensured.dotted, ensured.mode) == (
+        "HEAD~1",
+        "HEAD",
+        "..",
+        "fallback",
+    )
+    assert warning is not None
+    assert "deadbeef" in warning
+
+
+def test_ensure_usable_falls_back_when_prev_sha_not_ancestor(cds):
+    def fake_run(cmd, **kwargs):
+        if cmd[:2] == ["git", "cat-file"]:
+            return SimpleNamespace(returncode=0, stdout=b"", stderr=b"")
+        if cmd[:2] == ["git", "merge-base"]:
+            return SimpleNamespace(returncode=1, stdout=b"", stderr=b"")
+        raise AssertionError(cmd)
+
+    original = cds.DiffRange("sidebranch", "mastertip", "..", "push")
+    ensured, warning = cds.ensure_usable_diff_range(
+        original, cwd=Path("."), run=fake_run
+    )
+    assert ensured.mode == "fallback"
+    assert warning is not None
+
+
+def test_ensure_usable_leaves_pr_mode_alone(cds):
+    original = cds.DiffRange("origin/master", "HEAD", "...", "pr")
+    ensured, warning = cds.ensure_usable_diff_range(
+        original,
+        cwd=Path("."),
+        run=lambda *a, **k: (_ for _ in ()).throw(AssertionError()),
+    )
+    assert ensured == original
+    assert warning is None
+
+
 # --------------------------------------------------------------------------
 # parse_name_status_z
 # --------------------------------------------------------------------------

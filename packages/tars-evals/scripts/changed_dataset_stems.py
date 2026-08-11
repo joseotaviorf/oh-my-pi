@@ -136,7 +136,10 @@ def resolve_diff_range(
          against where it forked from ``master``, not against master's tip.
       3. ``CI_PREV_COMMIT_SHA`` set (push event) — ``CI_PREV_COMMIT_SHA..
          CI_COMMIT_SHA`` (two-dot, literal), which correctly scopes a
-         multi-commit push in one shot.
+         multi-commit push in one shot. Callers must still run
+         :func:`ensure_usable_diff_range` before ``git diff``: Woodpecker
+         sometimes supplies a prev SHA that is not in the master clone
+         (e.g. a squash-merge's pre-squash PR tip).
       4. Fallback — ``HEAD~1..HEAD``, for local runs or a first push with no
          previous SHA.
     """
@@ -162,6 +165,72 @@ def resolve_diff_range(
 # --------------------------------------------------------------------------
 # git diff invocation (I/O)
 # --------------------------------------------------------------------------
+
+
+def _git_commit_exists(
+    sha: str,
+    *,
+    cwd: Path,
+    run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+) -> bool:
+    """True when ``sha`` resolves to a commit object in the local repo."""
+    result = run(
+        ["git", "cat-file", "-e", f"{sha}^{{commit}}"],
+        cwd=cwd,
+        check=False,
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
+def _git_is_ancestor(
+    maybe_ancestor: str,
+    head: str,
+    *,
+    cwd: Path,
+    run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+) -> bool:
+    """True when ``maybe_ancestor`` is an ancestor of ``head``."""
+    result = run(
+        ["git", "merge-base", "--is-ancestor", maybe_ancestor, head],
+        cwd=cwd,
+        check=False,
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
+def ensure_usable_diff_range(
+    diff_range: DiffRange,
+    *,
+    cwd: Path,
+    run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+) -> tuple[DiffRange, str | None]:
+    """Rewrite unusable push-mode ranges to ``HEAD~1..HEAD``.
+
+    After a squash-merge to ``master``, Woodpecker has been observed setting
+    ``CI_PREV_COMMIT_SHA`` to the pre-squash PR-branch tip (or another
+    branch's tip). That object is absent from a master-only CI clone, so
+    ``git diff PREV..HEAD`` fails with ``Invalid revision range``. Falling
+    back to ``HEAD~1..HEAD`` correctly scopes a single squash-merge commit.
+
+    Non-push modes are returned unchanged. Returns ``(range, warning)`` where
+    ``warning`` is set only when a rewrite happened.
+    """
+    if diff_range.mode != "push":
+        return diff_range, None
+    if _git_commit_exists(diff_range.base, cwd=cwd, run=run) and _git_is_ancestor(
+        diff_range.base, diff_range.head, cwd=cwd, run=run
+    ):
+        return diff_range, None
+    warning = (
+        f"CI_PREV_COMMIT_SHA={diff_range.base} is missing from the clone or "
+        f"not an ancestor of {diff_range.head}; falling back to HEAD~1..HEAD"
+    )
+    return (
+        DiffRange(base="HEAD~1", head="HEAD", dotted="..", mode="fallback"),
+        warning,
+    )
 
 
 def run_git_diff(
@@ -693,6 +762,7 @@ class ScopeResult:
     fallback_triggered: bool
     fallback_reasons: list[str]
     metadata_only_stems: list[str] = field(default_factory=list)
+    diff_range_warnings: list[str] = field(default_factory=list)
 
 
 def resolve_scope(
@@ -705,6 +775,11 @@ def resolve_scope(
     run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
 ) -> ScopeResult:
     """Full I/O orchestration: git diff -> classify -> resolve -> budget-check."""
+    diff_range, range_warning = ensure_usable_diff_range(
+        diff_range, cwd=repo_root, run=run
+    )
+    diff_range_warnings = [range_warning] if range_warning else []
+
     raw = run_git_diff(diff_range, cwd=repo_root, run=run)
     entries = parse_name_status_z(raw)
     classified = classify_paths(entries)
@@ -769,6 +844,7 @@ def resolve_scope(
         fallback_triggered=fallback_triggered,
         fallback_reasons=fallback_reasons,
         metadata_only_stems=sorted(metadata_only),
+        diff_range_warnings=diff_range_warnings,
     )
 
 
@@ -861,6 +937,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
 
+    for warning in result.diff_range_warnings:
+        print(f"WARN: {warning}", file=sys.stderr)
     for reason in result.fallback_reasons:
         print(f"WARN: {reason}", file=sys.stderr)
 

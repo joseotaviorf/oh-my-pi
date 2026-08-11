@@ -193,6 +193,41 @@ def test_push_multi_commit_covers_both_commits(cds, tmp_git_repo, parse_markdown
     result = _resolve(cds, repo, env=env, parse_markdown=parse_markdown)
 
     assert result.scope_stems == ["metric_a", "metric_b"]
+    assert result.diff_range_warnings == []
+
+
+def test_push_with_non_ancestor_prev_sha_falls_back_to_head_minus_one(
+    cds, tmp_git_repo, parse_markdown
+):
+    """Woodpecker squash-merge case: CI_PREV_COMMIT_SHA is a PR-branch tip.
+
+    The object may exist in a full clone but is not an ancestor of the
+    squash commit on master. Scope must fall back to HEAD~1..HEAD instead
+    of failing with ``Invalid revision range``.
+    """
+    repo = tmp_git_repo
+    repo.write(_METRIC_A, _METRIC_A_DOC_V1)
+    repo.write(_DATASET_A, _DATASET_A_YAML)
+    repo.commit("baseline metric_a on master")
+    repo.push_master()
+
+    repo._run("checkout", "-q", "-b", "feature")
+    repo.write(_METRIC_B, _METRIC_B_DOC)
+    repo.commit("feature-only commit")
+    feature_tip = repo.rev_parse("HEAD")
+
+    repo._run("checkout", "-q", "master")
+    repo.write(_METRIC_A, _METRIC_A_DOC_V2)
+    repo.commit("squash-like master tip: only metric_a changed")
+    master_tip = repo.rev_parse("HEAD")
+
+    env = {"CI_PREV_COMMIT_SHA": feature_tip, "CI_COMMIT_SHA": master_tip}
+    result = _resolve(cds, repo, env=env, parse_markdown=parse_markdown)
+
+    assert result.eval_stems == ["metric_a"]
+    assert "metric_b" not in result.scope_stems
+    assert result.diff_range_warnings
+    assert feature_tip in result.diff_range_warnings[0]
 
 
 def test_fallback_head_minus_one_sees_only_last_commit(
