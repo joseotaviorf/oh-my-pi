@@ -7,10 +7,10 @@ cluster:
       spark.driver.memoryOverhead: "4g"
     autotermination_minutes: 20
     core_nodes:
-      target_on_demand: 2
+      target_on_demand: 4
       target_spot: 0
     task_nodes:
       target_on_demand: 0
-      target_spot: 1
+      target_spot: 4
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
