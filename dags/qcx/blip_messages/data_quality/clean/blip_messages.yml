@@ -1,0 +1,31 @@
+---
+table_name: datalake_consorcio_clean.blip_messages
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_message:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  host_name:
+    is_complete:
+      severity_level: Error
+  role:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: [human, ai, attendant]
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
