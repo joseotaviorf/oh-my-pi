@@ -1,14 +1,11 @@
 ---
 database_name: datalake_payments_platform
 table_name: payment
-description: >
-  Unified payment attempt records across Wall Street, Checkout, and Vans boleto
-  sources for Fintech reconciliation and collections analytics. Grain is one row
-  per business payment key (charge/boleto) with the latest normalized status,
-  amounts, and acquirer identifiers used by finance and chargeback workflows.
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 columns:
+  id_payment:
+    description: Unique identifier for the payment record (generated using MONOTONICALLY_INCREASING_ID())
   id_business_key:
     description: Business key used to identify unique payment records across different sources
     lineage:
@@ -50,6 +47,8 @@ columns:
     lineage:
     - datalake_checkout_clean.order.id_requester
     - datalake_vans_clean.boleto.requested_by
+  id_last_payment_attempt_timeline:
+    description: ID of the last payment attempt timeline record
   payment_status:
     description: Current status of the payment
     lineage:
@@ -61,6 +60,8 @@ columns:
     lineage:
     - datalake_checkout_clean.charge.payment_method
     - datalake_vans_clean.boleto.status
+  origin:
+    description: Origin of the payment request
   datasource:
     description: Source system of the payment data
   requester_description:
@@ -97,9 +98,7 @@ columns:
     - datalake_checkout_clean.order.due_amount
     - datalake_vans_clean.boleto.due_amount
   installment_fee_amount:
-    description: >
-      Extra fee charged when a credit-card payment is split into installments,
-      expressed in the same currency as due_amount (typically BRL).
+    description: Fee amount for installment payments
     lineage:
     - datalake_checkout_clean.credit_card.installment_fee_amount
   fine_amount:
@@ -170,47 +169,5 @@ columns:
     lineage:
     - datalake_wall_street_clean.charge_aud.ts_updated
     - datalake_checkout_clean.charge.ts_canceled
-  our_number:
-    description: Bank boleto our-number identifier used for reconciliation
-    lineage:
-    - datalake_checkout_clean.boleto.our_number
-    - datalake_checkout_clean.bolecode.our_number
-    - datalake_vans_clean.boleto.our_number
-  your_number:
-    description: Bank boleto your-number identifier provided by the payer side
-    lineage:
-    - datalake_checkout_clean.boleto.your_number
-    - datalake_checkout_clean.bolecode.your_number
-  company_use:
-    description: Free-text company-use field carried on boleto payment instruments
-    lineage:
-    - datalake_checkout_clean.boleto.company_use
-    - datalake_checkout_clean.bolecode.company_use
-    - datalake_vans_clean.boleto.company_use
-  acquirer_auth_code:
-    description: Authorization code returned by the payment acquirer
-    lineage:
-    - datalake_checkout_clean.credit_card.acquire_auth_code
-    - datalake_wall_street_clean.charge.acquire_auth_code
-  acquire_nsu:
-    description: NSU (unique sequential number) returned by the payment acquirer
-    lineage:
-    - datalake_checkout_clean.credit_card.acquire_nsu
-    - datalake_wall_street_clean.charge.acquire_nsu
-  id_acquire_transaction:
-    description: Acquirer transaction identifier (TID) for the payment attempt
-    lineage:
-    - datalake_checkout_clean.credit_card.acquire_tid
-    - datalake_wall_street_clean.charge.id_acquire_transaction
-  acquire_return_code:
-    description: Return or response code sent back by the payment acquirer
-    lineage:
-    - datalake_checkout_clean.credit_card.acquire_return_code
-    - datalake_wall_street_clean.charge.acquire_return_code
-  error_type:
-    description: Classified error type for failed or denied payment attempts
-    lineage:
-    - datalake_checkout_clean.credit_card.error_type
-    - datalake_wall_street_clean.charge.error_type
   transaction_category:
     description: Category of the payment transaction (hardcoded as 'PAYIN' for all payment types)

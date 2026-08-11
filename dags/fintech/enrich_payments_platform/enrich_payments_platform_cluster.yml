@@ -1,31 +1,10 @@
 cluster:
-  type: emr_7_12_consolidation_m_memory_fleet_cluster
+  type: consolidation_m_memory_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    # EMR load-enrich-payment: ShuffleMapStage stuck (~20 partitions, ~98
-    # min/task) vs ~7 min on Databricks. NVMe (gd) for shuffle spill I/O;
-    # pack 2 execs/node; serialize steps so payment owns the fleet.
-    step_concurrency_level: 1
-    core_nodes:
-      target_on_demand: 8
-      target_spot: 0
-      instance_types:
-      # Local NVMe (gd/id) — shuffle spill off EBS. x86_fallback maps
-      # r6gd/r7gd → r6id when EMR_X86_FALLBACK is on.
-      - r6gd.2xlarge
-      - r7gd.2xlarge
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
     spark_conf:
-      # Preset is 24g+4g overhead → ~1 exec/node on 64GB (YARN Reserved).
-      # 18g+3g packs 2 execs × 8 nodes = 16 under maxExecutors.
-      spark.executor.memory: "18g"
-      spark.executor.memoryOverhead: "3g"
-      # EMR fleet base disables broadcasts (-1); this query has small dim joins
-      # and an OR join that otherwise becomes a nested-loop without broadcast.
-      spark.sql.autoBroadcastJoinThreshold: "104857600"
-      spark.sql.adaptive.autoBroadcastJoinThreshold: "104857600"
-      # 256MB advisory coalesced stage 278 to only 20 tasks — too coarse.
-      spark.sql.adaptive.advisoryPartitionSizeInBytes: "33554432"
-      spark.sql.shuffle.partitions: "800"
-      spark.dynamicAllocation.maxExecutors: "16"
-      spark.speculation: "true"
-      spark.speculation.multiplier: "3"
-      spark.speculation.quantile: "0.75"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
