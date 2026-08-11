@@ -35,12 +35,12 @@ columns:
     description: Self-reported score (1-5) on how clearly the respondent understands their own role, responsibilities, and
       decision rights within the team.
     lineage:
-    - datalake_gsheets_people_raw.survey_answers.how_clear_is_your_understanding_of_your_role_and_accountabilities_within_the_team__i_e___responsibilities__goals__decision_rights_
+    - datalake_gsheets_people_raw.survey_answers.how_clear_is_your_understanding_of_your_role_and_accountabilities_within_the_team_ie_responsibilities_goals_decision_rights
   score_others_role_clarity:
     description: Self-reported score (1-5) on how clearly the respondent understands the roles, responsibilities, and decision
       rights of other team members.
     lineage:
-    - datalake_gsheets_people_raw.survey_answers.how_clear_is_your_understanding_of_the_roles_and_accountabilities_of_other_members_on_the_team__i_e___responsibilities__goals__decision_rights_
+    - datalake_gsheets_people_raw.survey_answers.how_clear_is_your_understanding_of_the_roles_and_accountabilities_of_other_members_on_the_team_ie_responsibilities_goals_decision_rights
   score_team_atmosphere:
     description: Self-reported score (1-5) on the general atmosphere and psychological safety within the team.
     lineage:
@@ -57,7 +57,7 @@ columns:
   score_decision_making_effectiveness:
     description: Self-reported score (1-5) on the speed, quality, and clarity of the decision-making process within the team.
     lineage:
-    - datalake_gsheets_people_raw.survey_answers.how_effective_is_decision_making_within_the_team__i_e___speed__quality__and_clear_process_decision_rights_
+    - datalake_gsheets_people_raw.survey_answers.how_effective_is_decisionmaking_within_the_team_ie_speed_quality_and_clear_processdecision_rights
   score_meeting_effectiveness:
     description: Self-reported score (1-5) on how effective and productive team meetings are in terms of agenda, outcomes,
       and time use.
@@ -66,7 +66,7 @@ columns:
   score_team_performance:
     description: Self-reported overall score (1-5) on how effectively the team operates as a high-performing unit.
     lineage:
-    - datalake_gsheets_people_raw.survey_answers.how_effectively_does_the_team_operate_as_a_high_performing_team
+    - datalake_gsheets_people_raw.survey_answers.how_effectively_does_the_team_operate_as_a_highperforming_team
   open_top_priorities:
     description: Open-text response identifying what the respondent considers the top priorities for the team in the current
       period.
@@ -75,7 +75,7 @@ columns:
   open_team_challenges:
     description: Open-text response describing the main internal or external challenges the team faces in meeting its priorities.
     lineage:
-    - datalake_gsheets_people_raw.survey_answers.what_are_the_challenges_the_team_is_currently_facing__internally_or_externally__to_meet_these_priorities
+    - datalake_gsheets_people_raw.survey_answers.what_are_the_challenges_the_team_is_currently_facing_internally_or_externally_to_meet_these_priorities
   open_openness_issues:
     description: Open-text response identifying specific issues or topics that are impacting psychological safety and openness
       within the team.
@@ -98,11 +98,11 @@ columns:
     description: Open-text response offering specific feedback on what the team leader could do differently to improve team
       effectiveness.
     lineage:
-    - datalake_gsheets_people_raw.survey_answers.is_there_anything_you_think__team_leader_name__could_do_differently
+    - datalake_gsheets_people_raw.survey_answers.is_there_anything_you_think_team_leader_name_could_do_differently
   open_additional_comments:
     description: Optional open-text field for any additional observations or feedback the respondent wishes to share beyond
       the structured questions.
     lineage:
-    - datalake_gsheets_people_raw.survey_answers.any_additional_comments___optional
+    - datalake_gsheets_people_raw.survey_answers.any_additional_comments_optional
   ts_load:
     description: Timestamp when this survey response was ingested from the Google Sheets source into the People lake.
