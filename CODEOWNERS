@@ -16,6 +16,7 @@ dags/platform/**                                                        @quintoa
 dags/primitives/**                                                      @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives @quintoandar/data-ingestion-code-owners
 dags/qcx/**                                                             @quintoandar/new-business @quintoandar/data-ingestion-code-owners
 dags/support_and_service/**                                             @gbrunelli @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
+dags/tech_platform/olos_dialer_transcriptions/**                        @quintoandar/bi-etl-ejuice-code-owners
 dags/tech_platform/monalisa_capta_ai_evaluations/**                     @quintoandar/bi-etl-ejuice-code-owners
 dags/tech_platform/monalisa_monitoria_evaluations/**                    @quintoandar/bi-etl-ejuice-code-owners
 packages/**                                                             @quintoandar/data-ingestion-code-owners @quintoandar/data-ingestion-code-owners
