@@ -17,13 +17,23 @@ WITH process_info AS (
     LEFT JOIN datalake_cyber_clean.contracts AS c
         ON p.id_contract_cyber = c.id_contract
 ),
+ranked_process_stages AS (
+    SELECT
+        id_case,
+        stage_description,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_case
+            ORDER BY stage_order DESC
+        ) AS rn
+    FROM datalake_cyber_legal.process_stages
+    WHERE dt_start IS NOT NULL
+),
 get_last_process_stage AS (
     SELECT
         id_case,
         stage_description
-    FROM datalake_cyber_legal.process_stages
-    WHERE dt_start IS NOT NULL
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_case ORDER BY stage_order DESC) = 1
+    FROM ranked_process_stages
+    WHERE rn = 1
 )
 
 SELECT
@@ -51,15 +61,15 @@ SELECT
         WHEN DATE(a.dt_alert_expired) >= DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)) THEN 'A vencer'
         WHEN DATE(a.dt_alert_expired) < DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)) THEN 'Vencida'
     END AS task_status,
-    DATEDIFF(day, DATE(a.dt_alert_expired),DATE(COALESCE(a.dt_reviewed, CURRENT_DATE))) AS lead_time,
+    DATEDIFF(DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)), DATE(a.dt_alert_expired)) AS lead_time,
     CASE
-        WHEN DATEDIFF(day, DATE(a.dt_alert_expired), DATE(COALESCE(a.dt_reviewed, CURRENT_DATE))) = 0 THEN 'a) Vence hoje'
-        WHEN DATEDIFF(day, DATE(a.dt_alert_expired), DATE(COALESCE(a.dt_reviewed, CURRENT_DATE))) BETWEEN -3 AND -1 THEN 'b) A vencer (1 a 3 dias)'
-        WHEN DATEDIFF(day, DATE(a.dt_alert_expired), DATE(COALESCE(a.dt_reviewed, CURRENT_DATE))) BETWEEN -7 AND -4 THEN 'c) A vencer (4 a 7 dias)'
-        WHEN DATEDIFF(day, DATE(a.dt_alert_expired), DATE(COALESCE(a.dt_reviewed, CURRENT_DATE))) < -8 THEN 'd) A vencer (8+ dias)'
-        WHEN DATEDIFF(day, DATE(a.dt_alert_expired), DATE(COALESCE(a.dt_reviewed, CURRENT_DATE))) BETWEEN 1 AND 3 THEN 'e) Vencida (1 a 3 dias)'
-        WHEN DATEDIFF(day, DATE(a.dt_alert_expired), DATE(COALESCE(a.dt_reviewed, CURRENT_DATE))) BETWEEN 4 AND 7 THEN 'f) Vencida (4 a 7 dias)'
-        WHEN DATEDIFF(day, DATE(a.dt_alert_expired), DATE(COALESCE(a.dt_reviewed, CURRENT_DATE))) > 7 THEN 'g) Vencida (8+ dias)'
+        WHEN DATEDIFF(DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)), DATE(a.dt_alert_expired)) = 0 THEN 'a) Vence hoje'
+        WHEN DATEDIFF(DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)), DATE(a.dt_alert_expired)) BETWEEN -3 AND -1 THEN 'b) A vencer (1 a 3 dias)'
+        WHEN DATEDIFF(DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)), DATE(a.dt_alert_expired)) BETWEEN -7 AND -4 THEN 'c) A vencer (4 a 7 dias)'
+        WHEN DATEDIFF(DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)), DATE(a.dt_alert_expired)) < -8 THEN 'd) A vencer (8+ dias)'
+        WHEN DATEDIFF(DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)), DATE(a.dt_alert_expired)) BETWEEN 1 AND 3 THEN 'e) Vencida (1 a 3 dias)'
+        WHEN DATEDIFF(DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)), DATE(a.dt_alert_expired)) BETWEEN 4 AND 7 THEN 'f) Vencida (4 a 7 dias)'
+        WHEN DATEDIFF(DATE(COALESCE(a.dt_reviewed, CURRENT_DATE)), DATE(a.dt_alert_expired)) > 7 THEN 'g) Vencida (8+ dias)'
     END AS aging,
     DATE(a.dt_created),
     DATE(DATE_TRUNC('month',a.dt_created)) AS month_created,

@@ -1,30 +1,66 @@
 WITH
-get_first_process_closure AS (
+get_completed_case_status AS (
     SELECT
         id_case,
         closure_reason,
         closure_result,
-        dt_status_changed AS dt_first_closure
+        dt_status_changed,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_case
+            ORDER BY dt_status_changed
+        ) AS completion_order
     FROM datalake_cyber_legal_historical_clean.historical_case_status
     WHERE case_status = 'Completed'
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_case ORDER BY dt_status_changed) = 1
+),
+get_first_process_closure AS (
+    SELECT
+        first_completion.id_case,
+        CASE
+            WHEN first_completion.closure_reason = 'L_RES51'
+                AND next_completion.id_case IS NOT NULL
+            THEN next_completion.closure_reason
+            ELSE first_completion.closure_reason
+        END AS closure_reason,
+        CASE
+            WHEN first_completion.closure_reason = 'L_RES51'
+                AND next_completion.id_case IS NOT NULL
+            THEN next_completion.closure_result
+            ELSE first_completion.closure_result
+        END AS closure_result,
+        first_completion.dt_status_changed AS dt_first_closure
+    FROM get_completed_case_status AS first_completion
+    LEFT JOIN get_completed_case_status AS next_completion
+        ON first_completion.id_case = next_completion.id_case
+        AND next_completion.completion_order = 2
+    WHERE first_completion.completion_order = 1
 ),
 get_process_stages AS (
     SELECT DISTINCT
         id_case,
+        stage_order,
         stage_description,
         expense_amount,
         dt_start,
         dt_end
     FROM datalake_cyber_legal.process_stages
 ),
+ranked_process_stages AS (
+    SELECT
+        id_case,
+        stage_description,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_case
+            ORDER BY stage_order DESC
+        ) AS rn
+    FROM get_process_stages
+    WHERE dt_start IS NOT NULL
+),
 get_last_process_stage AS (
     SELECT
         id_case,
         stage_description
-    FROM datalake_cyber_legal.process_stages
-    WHERE dt_start IS NOT NULL
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_case ORDER BY stage_order DESC) = 1
+    FROM ranked_process_stages
+    WHERE rn = 1
 ),
 get_stages_data AS (
     SELECT
@@ -238,4 +274,4 @@ LEFT JOIN
 LEFT JOIN
     datalake_cyber_legal_clean.values_list vl1
         ON fpc.closure_reason = vl1.value_code
-GROUP BY ALL
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86

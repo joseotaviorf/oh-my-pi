@@ -11,6 +11,24 @@ get_external_id_contract AS (
         ts_contract_end
     FROM datalake_cyber_clean.contracts
 ),
+ranked_delqmst_data AS (
+    SELECT
+        id_contract,
+        id_agency,
+        id_client,
+        flag_account_in_agency_or_court,
+        total_package_amount,
+        overdue_amount,
+        evictions_label,
+        ts_last_update,
+        ts_last_activity,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_contract
+            ORDER BY ts_last_update DESC
+        ) AS rn
+        -- MAKE_DATE(year,month,day) AS partition
+    FROM datalake_cyber_clean.delinquent_master
+),
 get_last_delqmst_data AS (
     SELECT
         id_contract,
@@ -22,9 +40,8 @@ get_last_delqmst_data AS (
         evictions_label,
         ts_last_update,
         ts_last_activity
-        -- MAKE_DATE(year,month,day) AS partition
-    FROM datalake_cyber_clean.delinquent_master
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_last_update DESC) = 1
+    FROM ranked_delqmst_data
+    WHERE rn = 1
 )
 SELECT
     c.id_case,
@@ -124,4 +141,4 @@ LEFT JOIN
     datalake_cyber_legal_clean.values_list vl2
         ON cuda.reason = vl2.value_code
         AND vl2.id_value = 'LSTMOTO'
-GROUP BY ALL
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49
