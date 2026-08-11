@@ -490,3 +490,90 @@ def test_metric_requires_each_documented_section(omit, needle):
     parsed = parse_entity_markdown(_metric_doc(omit=omit))
     errors, _ = validate_parsed_document(parsed, data_product_type="metric")
     assert any(needle in e for e in errors), (omit, errors)
+
+
+def test_h3_under_unrelated_h2_is_not_a_golden_query():
+    # Regression: an H3 named "Golden Query — ..." nested under an arbitrary
+    # segment H2 (no ## Golden Queries heading anywhere) must NOT be picked up.
+    # generate_and_push_datahub_entities.py only opens a golden-query zone on an
+    # H2 (`## Golden query: {Name}` / `## Golden Queries`) and never on an H3
+    # under an unrelated parent — so if this parser accepted it, a doc could pass
+    # validation here while the publisher extracts zero golden queries from the
+    # same file (and the raw SQL/table names would leak into the Data Product
+    # description instead, since `## For Rent (RENT)` matches none of
+    # EXCLUDE_HEADING_PATTERNS).
+    doc = """\
+# Listing Demand Funnel
+
+## Overview
+
+Listing cohort conversions.
+
+## For Rent (RENT)
+
+### Golden Query — RENT listing cohort + demand flags (pattern)
+
+```sql
+SELECT sk_house_listing, flg_visit_completed
+FROM dw_rent.fact_listing_rent_flows
+```
+
+## Superset Golden Assets
+
+- `dw_rent.fact_listing_rent_flows`
+"""
+    parsed = parse_entity_markdown(doc)
+    assert parsed.golden_queries == []
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    assert any("Golden Queries" in e for e in errors), errors
+
+
+def test_standalone_h2_golden_query_heading_matches_publisher_shape():
+    # The legitimately-supported inline pattern: a standalone H2
+    # `## Golden query: {Name}` heading instead of a `## Golden Queries` section —
+    # exactly the shape `_GOLDEN_QUERY_SINGULAR_HEADING_RE` requires in the
+    # publisher, so both sides agree on what counts as a golden query here.
+    doc = """\
+# Listing Demand Funnel
+
+## Overview
+
+Listing cohort conversions.
+
+## Golden query: RENT listing cohort + demand flags
+
+```sql
+SELECT sk_house_listing, flg_visit_completed
+FROM dw_rent.fact_listing_rent_flows
+```
+"""
+    parsed = parse_entity_markdown(doc)
+    assert len(parsed.golden_queries) == 1
+    assert "fact_listing_rent_flows" in parsed.golden_queries[0].sql
+
+
+def test_golden_queries_section_preferred_over_inline_headings():
+    doc = """\
+# Payments
+
+## Golden Queries
+
+### Query 1 — Payment volume
+
+```sql
+SELECT 1 AS x FROM dw_a.fact_b
+```
+
+## For Rent (RENT)
+
+### Golden Query — RENT inline (must not be picked up)
+
+```sql
+SELECT 2 AS y FROM dw_a.fact_b
+```
+"""
+    parsed = parse_entity_markdown(doc)
+    assert len(parsed.golden_queries) == 1
+    assert "Payment volume" in parsed.golden_queries[0].name
+    assert "x" in parsed.golden_queries[0].sql
+    assert "y" not in parsed.golden_queries[0].sql

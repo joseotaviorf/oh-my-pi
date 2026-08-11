@@ -50,6 +50,15 @@ _MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()+\-#.!])")
 
 _SECTION_RE = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 _H3_RE = re.compile(r"^###\s+(.+)$", re.MULTILINE)
+_HEADING_RE = re.compile(r"^(#{2,3})\s+(.+)$", re.MULTILINE)
+_GOLDEN_QUERY_INDIVIDUAL_HEADING_RE = re.compile(
+    r"^golden quer(?:y|ies)\b(?:\s|$|[—:\-–(])",
+    re.IGNORECASE,
+)
+_GOLDEN_QUERY_EXCLUDE_HEADING_RE = re.compile(
+    r"superset\s+golden|golden\s+assets?",
+    re.IGNORECASE,
+)
 # DataHub's rich-text editor mangles fenced SQL blocks in two ways the naive
 # ```sql\n...``` pattern misses:
 #   1. It stores the block inline on a single line — ```sql SELECT ... — with no
@@ -267,6 +276,76 @@ def _clean_sql(sql: str) -> str:
     return "\n".join(lines)
 
 
+def _is_individual_golden_query_heading(heading: str) -> bool:
+    norm = _normalize_heading(heading)
+    if _GOLDEN_QUERY_EXCLUDE_HEADING_RE.search(norm):
+        return False
+    if norm in ("golden queries", "golden query"):
+        return False
+    return bool(_GOLDEN_QUERY_INDIVIDUAL_HEADING_RE.match(norm))
+
+
+def _collect_individual_golden_query_sections(
+    markdown: str,
+) -> list[tuple[str, str]]:
+    """Fallback for docs with several standalone ``## Golden query: {Name}`` H2s
+    instead of one ``## Golden Queries`` section (``_find_section`` only returns
+    the first matching heading's body, so a second/third such H2 is otherwise
+    dropped).
+
+    Restricted to H2 (``level == 2``) to stay in lockstep with the authoritative
+    publisher (``generate_and_push_datahub_entities.py``'s ``_GOLDEN_QUERY_SINGULAR_
+    HEADING_RE`` / ``_GOLDEN_QUERY_SECTION_HEADING_RE``), which only ever opens a
+    golden-query zone on an H2 — never on an H3 nested under an unrelated parent
+    heading (e.g. an arbitrary ``## For Rent (RENT)`` segment container). Matching
+    H3s here would let a doc pass this parser's validation while the publisher
+    extracts zero golden queries from the same file — see the regression test
+    ``test_h3_under_unrelated_h2_is_not_a_golden_query``.
+    """
+    matches = list(_HEADING_RE.finditer(markdown))
+    sections: list[tuple[str, str]] = []
+    for idx, match in enumerate(matches):
+        level = len(match.group(1))
+        if level != 2:
+            continue
+        title = match.group(2).strip()
+        if not _is_individual_golden_query_heading(title):
+            continue
+        start = match.end()
+        end = len(markdown)
+        for nxt in matches[idx + 1 :]:
+            if len(nxt.group(1)) <= level:
+                end = nxt.start()
+                break
+        sections.append((title, markdown[start:end]))
+    return sections
+
+
+def _golden_query_from_block(
+    name: str,
+    block: str,
+    *,
+    idx: int,
+) -> GoldenQuery | None:
+    sql_match = _SQL_BLOCK_RE.search(block)
+    if not sql_match:
+        return None
+    desc_lines = [
+        ln.strip()
+        for ln in block[: sql_match.start()].splitlines()
+        if ln.strip() and not ln.strip().startswith(">")
+    ]
+    description = desc_lines[0] if desc_lines else name
+    display_name = (
+        name if name.lower().startswith("query") else f"Query {idx + 1} — {name}"
+    )
+    return GoldenQuery(
+        name=display_name,
+        description=description,
+        sql=_clean_sql(sql_match.group(1)),
+    )
+
+
 def _parse_golden_queries(section_text: str) -> list[GoldenQuery]:
     queries: list[GoldenQuery] = []
     h3_matches = list(_H3_RE.finditer(section_text))
@@ -291,24 +370,20 @@ def _parse_golden_queries(section_text: str) -> list[GoldenQuery]:
             else len(section_text)
         )
         block = section_text[start:end]
-        sql_match = _SQL_BLOCK_RE.search(block)
-        if not sql_match:
-            continue
-        desc_lines = [
-            ln.strip()
-            for ln in block[: sql_match.start()].splitlines()
-            if ln.strip() and not ln.strip().startswith(">")
-        ]
-        description = desc_lines[0] if desc_lines else name
-        queries.append(
-            GoldenQuery(
-                name=name
-                if name.lower().startswith("query")
-                else f"Query {idx + 1} — {name}",
-                description=description,
-                sql=_clean_sql(sql_match.group(1)),
-            )
-        )
+        parsed = _golden_query_from_block(name, block, idx=idx)
+        if parsed:
+            queries.append(parsed)
+    return queries
+
+
+def _parse_golden_queries_from_markdown(markdown: str) -> list[GoldenQuery]:
+    queries: list[GoldenQuery] = []
+    for idx, (name, block) in enumerate(
+        _collect_individual_golden_query_sections(markdown)
+    ):
+        parsed = _golden_query_from_block(name, block, idx=idx)
+        if parsed:
+            queries.append(parsed)
     return queries
 
 
@@ -541,6 +616,8 @@ def parse_entity_markdown(
     if not datasets and not metric_dataset_rows:
         datasets = _parse_datasets(markdown)
     golden_queries = _parse_golden_queries(golden_text)
+    if not golden_queries:
+        golden_queries = _parse_golden_queries_from_markdown(markdown)
     owners = _parse_owners(ownership_text)
     mbr = _parse_mbr(mbr_text)
     catalog = _parse_catalog(catalog_text)

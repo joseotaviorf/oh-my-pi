@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[5]
@@ -15,6 +16,8 @@ from sync.document_parser import (  # noqa: E402
     parse_entity_markdown,
     validate_parsed_document,
 )
+
+from scripts.ci_cd import generate_and_push_datahub_entities as g  # noqa: E402
 
 SAMPLE_MD = """\
 # Payments
@@ -200,3 +203,103 @@ def test_extract_subjects_from_sql():
     subjects = extract_subjects_from_sql(sql)
     assert ("dw_payments_platform", "fact_payment") in subjects
     assert ("dw_payments_platform", "dim_method") in subjects
+
+
+INLINE_GOLDEN_H3_MD = """\
+# Ongoing Listings (Daily Volume)
+
+## Overview
+
+Daily published inventory.
+
+## For Rent (RENT)
+
+### Canonical filter (RENT)
+
+```sql
+fhls.status_history IN ('publicado', 'PUBLISHED')
+```
+
+### Golden Query — RENT daily volume
+
+```sql
+SELECT COUNT(DISTINCT sk_house_listing) AS ongoing_listings
+FROM dw_rent.fact_house_listing_status
+WHERE status_history IN ('publicado', 'PUBLISHED')
+```
+
+## For Sale (SALE)
+
+### Golden Query — SALE daily volume
+
+```sql
+SELECT COUNT(DISTINCT sk_sale_listing) AS ongoing_listings
+FROM dw_sale.fact_daily_ongoing_listing
+```
+"""
+
+
+def test_inline_golden_query_h3_without_golden_queries_section_agrees_with_publisher():
+    """Regression: an H3 "Golden Query — ..." nested under an arbitrary segment H2
+    (no ## Golden Queries heading anywhere) must NOT be picked up by
+    ``parse_entity_markdown`` — ``generate_and_push_datahub_entities.py`` never
+    opens a golden-query zone on an H3 under an unrelated parent, only on an H2
+    (``_GOLDEN_QUERY_SINGULAR_HEADING_RE`` / ``_GOLDEN_QUERY_SECTION_HEADING_RE``).
+    Asserts both sides agree (0 queries), so a doc shaped like this can't pass CI
+    validation while silently publishing zero golden queries.
+    """
+    parsed = parse_entity_markdown(INLINE_GOLDEN_H3_MD)
+    assert parsed.golden_queries == []
+
+    tmp_dir = Path(tempfile.mkdtemp())
+    md_path = tmp_dir / "demo.md"
+    md_path.write_text(INLINE_GOLDEN_H3_MD, encoding="utf-8")
+    assert g._count_expected_golden_queries(md_path) == 0
+    assert g._extract_golden_query_sqls(md_path) == []
+    md_path.unlink()
+    tmp_dir.rmdir()
+
+
+INLINE_GOLDEN_H2_MD = """\
+# Ongoing Listings (Daily Volume)
+
+## Overview
+
+Daily published inventory.
+
+## Golden query: RENT daily volume
+
+```sql
+SELECT COUNT(DISTINCT sk_house_listing) AS ongoing_listings
+FROM dw_rent.fact_house_listing_status
+WHERE status_history IN ('publicado', 'PUBLISHED')
+```
+"""
+
+
+def test_standalone_h2_golden_query_heading_agrees_with_publisher():
+    """The legitimately-supported inline pattern: a standalone H2
+    ``## Golden query: {Name}`` heading instead of a ``## Golden Queries``
+    section — exactly the shape ``_GOLDEN_QUERY_SINGULAR_HEADING_RE`` requires in
+    the publisher, so both sides must agree on what counts as a golden query here.
+    """
+    parsed = parse_entity_markdown(INLINE_GOLDEN_H2_MD)
+    assert len(parsed.golden_queries) == 1
+    assert "dw_rent.fact_house_listing_status" in parsed.golden_queries[0].sql
+
+    tmp_dir = Path(tempfile.mkdtemp())
+    md_path = tmp_dir / "demo.md"
+    md_path.write_text(INLINE_GOLDEN_H2_MD, encoding="utf-8")
+    assert g._count_expected_golden_queries(md_path) == len(parsed.golden_queries)
+    assert g._extract_golden_query_sqls(md_path) == [
+        q.sql for q in parsed.golden_queries
+    ]
+    md_path.unlink()
+    tmp_dir.rmdir()
+
+
+def test_standard_golden_queries_section_not_double_counted():
+    parsed = parse_entity_markdown(SAMPLE_MD)
+    assert len(parsed.golden_queries) == 1
+    assert parsed.golden_queries[0].name.startswith("Query 1")
+    assert "dw_payments_platform.fact_payment" in parsed.golden_queries[0].sql
