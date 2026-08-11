@@ -133,7 +133,15 @@ get_stages_data AS (
         stage_satisfacao_credito_dt_start,
         stage_satisfacao_credito_dt_end
 
-    FROM get_process_stages
+    FROM (
+        SELECT
+            id_case,
+            stage_description,
+            expense_amount,
+            dt_start,
+            dt_end
+        FROM get_process_stages
+    )
         PIVOT(
             SUM(COALESCE(expense_amount,0)) AS expense_amount,
             MAX(dt_start) AS dt_start,
