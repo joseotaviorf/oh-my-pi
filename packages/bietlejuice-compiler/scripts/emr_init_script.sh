@@ -560,6 +560,36 @@ _emr_install_custom_whl_libraries() {
     echo "END: Install custom_libraries whl"
 }
 
+# Spark Packages such as GraphFrames ship Python modules inside the same JAR as
+# the JVM classes. Databricks Libraries / spark --packages put those on the
+# Python path; copying the JAR into /usr/lib/spark/jars alone does not. Extract
+# top-level packages (dir/__init__.py) into site-packages so `import graphframes`
+# works on EMR.
+_emr_extract_python_packages_from_jar() {
+    local jar="$1"
+    local site_packages
+    local pkg
+    local pkgs
+
+    site_packages="$(python3 -c 'import site; print(site.getsitepackages()[0])')"
+    pkgs="$(
+        jar tf "${jar}" \
+            | awk -F/ '$0 ~ /^[A-Za-z_][A-Za-z0-9_]*\/__init__\.py$/ { print $1 }' \
+            | sort -u
+    )"
+    [ -z "${pkgs}" ] && return 0
+
+    echo "  Extracting Python packages from $(basename "${jar}") → ${site_packages}"
+    for pkg in ${pkgs}; do
+        case "${pkg}" in
+            META-INF|org|com|scala|java|javax|docs|test|tests) continue ;;
+        esac
+        echo "    ${pkg}/"
+        # jar xf needs cwd=destination; keep absolute jar path.
+        (cd "${site_packages}" && sudo jar xf "${jar}" "${pkg}/")
+    done
+}
+
 # Install DAG-level custom_libraries jars previously downloaded to CUSTOM_JAR_MANIFEST
 # into every Spark jars directory (Databricks libraries API parity on EMR).
 _emr_install_custom_jar_libraries() {
@@ -593,6 +623,7 @@ _emr_install_custom_jar_libraries() {
             sudo chmod 644 "${jdir}/${basename}"
         done
         echo "  Installed ${basename}"
+        _emr_extract_python_packages_from_jar "${local_jar}"
     done <"${CUSTOM_JAR_MANIFEST}"
 
     echo "END: Install custom_libraries jar"
