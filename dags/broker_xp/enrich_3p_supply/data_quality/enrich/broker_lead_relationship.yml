@@ -1,6 +1,6 @@
 ---
 table_name: datalake_3p_supply.broker_lead_relationship
-alert_channel: "#alerts-de-airflow-3p-partners"
+alert_channel: "#alerts-de-airflow-dags"
 
 table_level_validations:
   has_size:
