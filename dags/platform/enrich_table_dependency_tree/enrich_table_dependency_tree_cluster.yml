@@ -1,5 +1,2 @@
 cluster:
-  type: consolidation_xs_memory_cluster
-  databricks_conn_id: databricks_new_env
-  custom_configurations:
-    spark_version: 13.3.x-scala2.12
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
