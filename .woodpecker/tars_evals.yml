@@ -1,0 +1,274 @@
+# TARS SQL-generation quality gate for changed docs/llm_context markdown.
+#
+# Resolves which tars-evals dataset stems a PR/push actually affects, checks the
+# generated datasets are in sync with their source docs, and runs only the
+# affected stems through the Inspect AI eval harness. A failing judge gate fails
+# this pipeline and blocks the merge.
+#
+# Steps:
+#   resolve-eval-scope        — stdlib-only git-diff → .tars-eval-stems (what to
+#                               evaluate) + .tars-eval-expected-stems (what to
+#                               drift-check, including deleted docs). Runs before
+#                               any uv sync so an empty scope costs almost nothing.
+#   check-dataset-drift       — regenerate the in-scope datasets and assert the
+#                               committed YAML matches (catches an edited golden
+#                               query whose dataset was never regenerated, and an
+#                               orphaned dataset whose source doc was deleted).
+#   get-tars-eval-credentials — Vault LiteLLM key (same secret as datahub.yml).
+#   unit-tests-tars-evals     — the package's own suite; it is excluded from the
+#                               CI image (see containers.yml) so nothing else runs it.
+#   tars-evals-changed        — the blocking gate: clone the tars skill, evaluate
+#                               the changed stems, fail on the suite gate.
+#
+# Secrets required (configure in Woodpecker repo settings):
+#   github_token — GitHub PAT with read access to quintoandar/ai-tools
+#   Vault (prod) — OPENAI_API_KEY for LiteLLM (apps/shared/litellm/zordon-tars-llm)
+#
+# packages/tars-evals is a standalone uv project deliberately NOT baked into the
+# CI image, so both uv steps resolve their dependency tree from PyPI at runtime.
+#
+# This pipeline does not depend on lint / tests / validations so it can run
+# independently on documentation-only changes.
+
+when:
+  - event: pull_request
+    branch:
+      exclude: [development]
+  - event: push
+    branch: [master, hotfix/*]
+
+clone:
+  - name: clone
+    image: woodpeckerci/plugin-git
+    settings:
+      # Full history: the PR diff base is origin/master...HEAD (merge-base) and
+      # push diffs use CI_PREV_COMMIT_SHA..CI_COMMIT_SHA.
+      partial: false
+
+steps:
+  resolve-eval-scope:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      # Stdlib-only on purpose — no uv sync before we know whether the scope is empty.
+      # Exits 2 on a git/parse failure or a TARS_EVAL_MAX_SAMPLES budget overflow,
+      # which fails this step rather than silently under-testing.
+      - |
+        set -eu
+        python3 packages/tars-evals/scripts/changed_dataset_stems.py \
+          --write-eval-stems ./.tars-eval-stems \
+          --write-scope-stems ./.tars-eval-expected-stems
+        echo "eval stems  (run through the harness): $(tr '\n' ' ' < ./.tars-eval-stems)"
+        echo "scope stems (drift-checked)          : $(tr '\n' ' ' < ./.tars-eval-expected-stems)"
+    when:
+      - event: pull_request
+        path: &tars_evals_paths
+          include:
+            - "docs/llm_context/metric_entities/**/*.md"
+            - "docs/llm_context/business_entities/**/*.md"
+            - "packages/tars-evals/**"
+            - ".woodpecker/tars_evals.yml"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *tars_evals_paths
+
+  check-dataset-drift:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - |
+        set -eu
+        if [ ! -s ./.tars-eval-expected-stems ]; then
+          echo "No in-scope dataset stems — nothing to drift-check."
+          exit 0
+        fi
+        WORKSPACE="$(pwd)"
+        cd packages/tars-evals
+        uv sync --frozen
+        # Scoped on purpose: an unscoped run refuses to overwrite every
+        # hand-authored dataset in the tree and would fail on stems this diff
+        # never touched.
+        # --skip-hand-authored: a hand-authored dataset is never regenerated,
+        # so it cannot drift. Without this, editing the source doc of a
+        # hand-authored dataset would fail this step forever with no fix
+        # available to the author.
+        uv run python scripts/generate_datasets_from_context_docs.py \
+          --stems-file "$WORKSPACE/.tars-eval-expected-stems" \
+          --skip-hand-authored
+        cd "$WORKSPACE"
+        UNTRACKED="$(git ls-files --others --exclude-standard -- packages/tars-evals/datasets/ || true)"
+        if ! git diff --exit-code -- packages/tars-evals/datasets/ || [ -n "$UNTRACKED" ]; then
+          echo "" >&2
+          echo "ERROR: datasets/ is out of sync with docs/llm_context." >&2
+          if [ -n "$UNTRACKED" ]; then
+            echo "Untracked generated dataset(s) must be committed:" >&2
+            printf '%s\n' "$UNTRACKED" >&2
+          fi
+          echo "Reproduce and fix locally, then commit the regenerated YAML:" >&2
+          echo "  cd packages/tars-evals && make drift-check" >&2
+          exit 1
+        fi
+        echo "datasets/ is in sync with the changed context docs."
+    when:
+      - event: pull_request
+        path: *tars_evals_paths
+      - event: push
+        branch: [master, hotfix/*]
+        path: *tars_evals_paths
+    depends_on: [resolve-eval-scope]
+
+  get-tars-eval-credentials:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/vault
+    pull: true
+    settings:
+      vault_secrets:
+        - OPENAI_API_KEY=kv:/apps/shared/litellm/zordon-tars-llm#key
+      output_file: ./tars-eval-secrets
+      vault_env: prod
+    when:
+      - event: pull_request
+        path: *tars_evals_paths
+      - event: push
+        branch: [master, hotfix/*]
+        path: *tars_evals_paths
+
+  # Closes the gap where this package's 390 tests never ran in CI: it is a
+  # standalone uv project excluded from the image, so no other pipeline sees it.
+  # Independent of the markdown-triggered steps above.
+  unit-tests-tars-evals:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - |
+        set -eu
+        cd packages/tars-evals
+        uv sync --frozen
+        make test
+        make lint
+    when:
+      - event: pull_request
+        path: &tars_evals_pkg_paths
+          include:
+            - "packages/tars-evals/**"
+            - ".woodpecker/tars_evals.yml"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *tars_evals_pkg_paths
+
+  tars-evals-changed:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      # Pin to an ai-tools tag/SHA here to freeze the skill version under test.
+      # Immutable SHA keeps PR evidence reproducible across reruns.
+      TARS_AITOOLS_REF: a429d4446d0f9c73cab9141534d946d87f3d94f7
+      # Point at marketplace/unstable-srat/skills/unstable-srat to gate the
+      # pre-release channel instead of the published plugin.
+      TARS_AITOOLS_SKILL_SUBPATH: marketplace/tars/skills/tars
+      # Matches the apps/shared Vault key fetched above (the same pairing
+      # generate_and_push_datahub_entities.py uses).
+      LITELLM_BASE_URL: https://litellm.apps.shared-prd.habitat.zone/v1
+      INSPECT_DISPLAY: plain
+      GITHUB_TOKEN:
+        from_secret: github_token
+    commands:
+      - |
+        set -eu
+
+        # 1. Short-circuit on an empty scope. run_dataset_queue.sh with no stems
+        #    evaluates EVERY dataset, so this guard is load-bearing, not cosmetic.
+        if [ ! -s ./.tars-eval-stems ]; then
+          echo "No changed dataset stems — nothing to evaluate."
+          exit 0
+        fi
+        WORKSPACE="$(pwd)"
+        echo "Stems to evaluate: $(tr '\n' ' ' < ./.tars-eval-stems)"
+
+        # 2. Clone the tars skill via a short-lived askpass helper. Deliberately
+        #    not `git config url.insteadOf` or a token-in-URL remote: neither the
+        #    token nor a credential helper is persisted anywhere on disk.
+        #    `-c credential.helper=` resets the helper list for this one command:
+        #    any ambient helper baked into the image would otherwise take
+        #    precedence over GIT_ASKPASS and hang the step until the CI timeout
+        #    (reproduced locally against an osxkeychain helper — 60s hang vs a
+        #    2s clean failure once reset). GIT_TERMINAL_PROMPT=0 covers the rest.
+        [ -n "$GITHUB_TOKEN" ] || { echo "GITHUB_TOKEN secret missing" >&2; exit 1; }
+        ASKPASS="$(mktemp)"
+        trap 'rm -f "$ASKPASS"' EXIT
+        printf '%s\n' \
+          '#!/bin/sh' \
+          'case "$1" in' \
+          '  Username*) printf %s x-access-token ;;' \
+          '  Password*) printf %s "$GITHUB_TOKEN" ;;' \
+          'esac' > "$ASKPASS"
+        chmod 700 "$ASKPASS"
+        rm -rf ./.tars-skill
+        # TARS_AITOOLS_REF may be a branch/tag OR a full commit SHA. `git clone
+        # --branch` only accepts refs, so SHA pins use init+fetch+checkout.
+        if printf '%s' "$TARS_AITOOLS_REF" | grep -Eq '^[0-9a-f]{40}$'; then
+          mkdir ./.tars-skill
+          git -C ./.tars-skill init -q
+          git -C ./.tars-skill remote add origin https://github.com/quintoandar/ai-tools.git
+          GIT_ASKPASS="$ASKPASS" GIT_TERMINAL_PROMPT=0 git -C ./.tars-skill \
+            -c credential.helper= fetch --depth 1 origin "$TARS_AITOOLS_REF"
+          git -C ./.tars-skill checkout -q FETCH_HEAD
+        else
+          GIT_ASKPASS="$ASKPASS" GIT_TERMINAL_PROMPT=0 git -c credential.helper= clone \
+            --depth 1 --branch "$TARS_AITOOLS_REF" \
+            https://github.com/quintoandar/ai-tools.git ./.tars-skill
+        fi
+        rm -f "$ASKPASS"
+        trap - EXIT
+
+        TARS_AITOOLS_SHA="$(git -C ./.tars-skill rev-parse HEAD)"
+        export TARS_AITOOLS_SHA
+        export TARS_SKILL_DIR="$WORKSPACE/.tars-skill/$TARS_AITOOLS_SKILL_SUBPATH"
+        echo "ai-tools ref : $TARS_AITOOLS_REF"
+        echo "ai-tools sha : $TARS_AITOOLS_SHA"
+        echo "skill dir    : $TARS_SKILL_DIR"
+        [ -f "$TARS_SKILL_DIR/SKILL.md" ] || {
+          echo "ERROR: no SKILL.md at $TARS_SKILL_DIR (bad TARS_AITOOLS_SKILL_SUBPATH?)" >&2
+          exit 1
+        }
+
+        # 3. LiteLLM key from the Vault step. run_dataset_queue.sh honours a
+        #    pre-set OPENAI_API_KEY and never shells out to qli.
+        [ -f "$WORKSPACE/tars-eval-secrets" ] || {
+          echo "ERROR: tars-eval-secrets not found — did get-tars-eval-credentials run?" >&2
+          exit 1
+        }
+        set -a
+        # shellcheck disable=SC1091
+        . "$WORKSPACE/tars-eval-secrets"
+        set +a
+        [ -n "$OPENAI_API_KEY" ] || { echo "OPENAI_API_KEY missing from Vault" >&2; exit 1; }
+        export LITELLM_API_KEY="$OPENAI_API_KEY"
+
+        # 4. Evaluate. The queue is already fail-closed end to end: a failing
+        #    suite gate propagates build_rollup.py's exit 1 out of the script.
+        cd packages/tars-evals
+        uv sync --frozen
+        set +e
+        scripts/run_dataset_queue.sh $(cat "$WORKSPACE/.tars-eval-stems")
+        RC=$?
+        set -e
+
+        # 5. Always surface the per-stem reports — a bare exit code is not enough
+        #    to debug a judge disagreement.
+        for report in logs/per_dataset/*/gate_report.txt; do
+          [ -f "$report" ] || continue
+          echo ""
+          echo "----- $report -----"
+          cat "$report"
+        done
+
+        exit $RC
+    when:
+      - event: pull_request
+        path: *tars_evals_paths
+      - event: push
+        branch: [master, hotfix/*]
+        path: *tars_evals_paths
+    depends_on: [resolve-eval-scope, check-dataset-drift, get-tars-eval-credentials]
