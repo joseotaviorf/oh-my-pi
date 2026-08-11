@@ -1,0 +1,7 @@
+gate_summary.json
+docs/
+
+# Scope files written by `make eval-scope` (CI writes its own at the repo root).
+.tars-eval-stems
+.tars-eval-expected-stems
+logs/

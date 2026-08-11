@@ -1,0 +1,28 @@
+# Model configuration for the tars eval harness — single source of truth for
+# which model runs the eval (tars_model) and which model grades it
+# (judge_model/judge_threshold). Connection settings (LITELLM_BASE_URL,
+# dual-key OPENAI_API_KEY + LITELLM_API_KEY from Vault, TARS_SKILL_DIR) remain
+# in .env / the shell — this file only ever holds non-secret model selection,
+# never credentials.
+#
+# Model ids are LiteLLM proxy ids as returned by GET /v1/models. Both subject
+# and judge use the `openai-api/litellm/…` provider prefix (Inspect's
+# OpenAI-compatible API, NOT openai/) so temperature=0 is not stripped by the
+# gpt-5/is_latest heuristic.
+tars_model: openai-api/litellm/vertex_ai/claude-sonnet-4-6@default
+judge_model: openai-api/litellm/gpt-5.6-luna
+# Reasoning effort for the judge model: low | medium | high, or omit/blank
+# for none. When set, the judge runs with extended thinking (mapped by the
+# LiteLLM proxy), and temperature is left at its default — Claude thinking
+# can't be combined with a pinned temperature=0 (see scorer.py). Omit/blank
+# for gpt-5.6-luna unless you intentionally want reasoning_effort.
+judge_reasoning_effort:
+# gpt-5.6-luna rejects explicit temperature; omit to use the provider default.
+judge_temperature:
+# Judge grades candidate SQL 1-5 against the reference query (see
+# scorer.py:_JUDGE_PROMPT_TEMPLATE); a run only counts as CORRECT at or
+# above this threshold.
+judge_threshold: 4
+# Suite gate (eval-suite / eval-rollup): the suite passes only when the fraction of samples
+# scoring >= judge_threshold is STRICTLY greater than this.
+gate_pass_rate: 0.9

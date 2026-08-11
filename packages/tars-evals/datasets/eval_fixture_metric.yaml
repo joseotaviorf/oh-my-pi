@@ -1,0 +1,7 @@
+# auto-generated
+# source: docs/llm_context/metric_entities/eval_fixture_metric.md
+# Do not edit — regenerate with: make generate-datasets
+items:
+- id: eval_fixture_metric-daily-fixture-count
+  question: Daily Fixture Count
+  expected_query: "SELECT\n    date AS metric_date,\n    COUNT(*) AS fixture_count\nFROM dw_public.dim_date\nWHERE date >= DATE '2026-01-01'\nGROUP BY 1\nORDER BY 1"

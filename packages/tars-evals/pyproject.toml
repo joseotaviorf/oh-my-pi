@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tars-evals"
+version = "0.1.0"
+description = "Inspect AI harness that evaluates the tars skill against golden business questions"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "graphql-core>=3.2",
+    "inspect-ai>=0.3.90",
+    "openai>=1.0.0",
+    "pyyaml>=6.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tars_evals"]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.6.0",
+]
