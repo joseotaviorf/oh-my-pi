@@ -6,10 +6,12 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    emr_configurations:
-    - Classification: spark-defaults
-      Properties:
-        spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: 'true'
+    # Keep OSS Delta NOT NULL via spark_conf (not emr_configurations): custom
+    # emr_configurations lists replace the preset wholesale and wipe Glue/Delta
+    # classifications. Translator allowlists spark.databricks.delta.* into
+    # spark-defaults while still stripping UC-only spark.databricks.* keys.
+    spark_conf:
+      spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
     core_nodes:
       target_on_demand: 3
       target_spot: 0

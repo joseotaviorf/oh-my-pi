@@ -178,3 +178,87 @@ def test_emr_allow_graviton_keeps_the_declared_instance_types():
     master, core = out["Instances"]["InstanceFleets"]
     assert _instance_types(master) == ["r6g.xlarge"]
     assert _instance_types(core) == ["r6g.xlarge"]
+
+
+def _spark_defaults_props(out: dict) -> dict:
+    confs = out.get("Configurations") or []
+    spark_defaults = next(
+        (c for c in confs if c.get("Classification") == "spark-defaults"),
+        None,
+    )
+    assert spark_defaults is not None
+    return spark_defaults["Properties"]
+
+
+def test_oss_delta_spark_conf_keys_are_kept_in_spark_defaults():
+    # Regression: allowUnenforcedNotNull must survive spark_conf → spark-defaults
+    # so DAGs do not need a custom emr_configurations list (which wipes presets).
+    out = translate(
+        _fleet_base(
+            spark_conf={
+                "spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled": True,
+                "spark.databricks.delta.schema.autoMerge.enabled": "true",
+                "spark.sql.shuffle.partitions": "200",
+            }
+        )
+    )
+    props = _spark_defaults_props(out)
+    assert (
+        props["spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled"]
+        == "True"
+    )
+    assert props["spark.databricks.delta.schema.autoMerge.enabled"] == "true"
+    assert props["spark.sql.shuffle.partitions"] == "200"
+
+
+def test_unity_catalog_spark_conf_keys_are_stripped_from_spark_defaults():
+    out = translate(
+        _fleet_base(
+            spark_conf={
+                "spark.databricks.sql.initial.catalog.namespace": "quintoandar_prod",
+                "spark.sql.shuffle.partitions": "200",
+            }
+        )
+    )
+    props = _spark_defaults_props(out)
+    assert "spark.databricks.sql.initial.catalog.namespace" not in props
+    assert props["spark.sql.shuffle.partitions"] == "200"
+
+
+def test_custom_emr_configurations_merge_with_spark_conf_delta_keys():
+    # arrange — preset-like classifications must survive alongside spark_conf
+    out = translate(
+        _fleet_base(
+            emr_configurations=[
+                {
+                    "Classification": "delta-defaults",
+                    "Properties": {"delta.enabled": "true"},
+                },
+                {
+                    "Classification": "spark-hive-site",
+                    "Properties": {
+                        "hive.metastore.client.factory.class": (
+                            "com.amazonaws.glue.catalog.metastore."
+                            "AWSGlueDataCatalogHiveClientFactory"
+                        )
+                    },
+                },
+            ],
+            spark_conf={
+                "spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled": (
+                    "true"
+                ),
+            },
+        )
+    )
+
+    # assert
+    classes = {c["Classification"] for c in out["Configurations"]}
+    assert "delta-defaults" in classes
+    assert "spark-hive-site" in classes
+    assert "spark-defaults" in classes
+    props = _spark_defaults_props(out)
+    assert (
+        props["spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled"]
+        == "true"
+    )

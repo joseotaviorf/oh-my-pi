@@ -67,7 +67,22 @@ DEFAULT_TASK_MARKET = "SPOT"
 # Only keys that are popped in translate() or _translate_*() are consumed.
 # Any other key in config (unknown, Databricks-only, deprecated) is dropped
 # at the end so new or extra YAML fields never break the translator.
+#
+# Strip Databricks-only spark_conf keys, but keep OSS Delta settings that still
+# use the historical ``spark.databricks.delta.*`` prefix (e.g. allowUnenforcedNotNull,
+# schema.autoMerge). Putting those solely under custom ``emr_configurations`` is
+# unsafe: HierarchicalConf deep-merge replaces list values wholesale and wipes
+# preset Glue/Delta classifications.
 DATABRICKS_SPARK_CONF_PREFIXES = ("spark.databricks.",)
+OSS_DELTA_SPARK_CONF_PREFIX = "spark.databricks.delta."
+
+
+def _is_stripped_databricks_spark_conf(key: str) -> bool:
+    """Return True when ``key`` must be dropped from spark_conf → spark-defaults."""
+    if key.startswith(OSS_DELTA_SPARK_CONF_PREFIX):
+        return False
+    return any(key.startswith(prefix) for prefix in DATABRICKS_SPARK_CONF_PREFIXES)
+
 
 # Legacy scalar keys that only make sense for instance groups. These must never
 # be silently dropped once core_nodes/task_nodes switch to instance-fleet shape.
@@ -689,9 +704,7 @@ def _translate_configurations(cfg: dict, overrides: dict):
         filtered = {
             k: str(v)
             for k, v in spark_conf.items()
-            if not any(
-                k.startswith(prefix) for prefix in DATABRICKS_SPARK_CONF_PREFIXES
-            )
+            if not _is_stripped_databricks_spark_conf(k)
         }
         if filtered:
             existing = next(
