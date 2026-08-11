@@ -63,6 +63,52 @@ def test_substitute_sql_placeholders_replaces_common_tokens():
     assert "2024" in out
 
 
+def test_substitute_sql_placeholders_neutralizes_unknown_tokens_outside_quotes():
+    sql = "SELECT {cohort_col} FROM dw.foo.fact_bar"
+    out = substitute_sql_placeholders(sql)
+    assert "{cohort_col}" not in out
+    assert "'2024-01-01'" in out
+
+
+def test_substitute_sql_placeholders_preserves_braces_inside_string_literals():
+    sql = (
+        "SELECT * FROM (VALUES "
+        "('ig','Meta'), ('{{site_source_name}}','Meta'), ('{site_source_name}','Meta')"
+        ") AS t(utm_source, origin)"
+    )
+    out = substitute_sql_placeholders(sql)
+    assert "'{{site_source_name}}'" in out
+    assert "'{site_source_name}'" in out
+    assert "2024-01-01" not in out
+
+
+def test_substitute_sql_placeholders_preserves_braces_in_json_path_literal():
+    sql = "SELECT json_extract_scalar(variants, '$.{experiment_name}') FROM dw.foo.t"
+    out = substitute_sql_placeholders(sql)
+    assert "'$.{experiment_name}'" in out
+
+
+def test_substitute_sql_placeholders_mixes_real_placeholder_and_data_literal():
+    sql = (
+        "SELECT 1 FROM dw.foo.fact_bar "
+        "WHERE dt >= DATE '{start_date}' AND utm_source = '{{site_source_name}}'"
+    )
+    out = substitute_sql_placeholders(sql)
+    assert "{start_date}" not in out
+    assert "DATE '2024-01-01'" in out
+    assert "'{{site_source_name}}'" in out
+
+
+def test_validate_trino_sql_syntax_accepts_braced_data_literals():
+    sql = (
+        "SELECT json_extract_scalar(variants, '$.{experiment_name}') AS ab_test "
+        "FROM (VALUES ('{{site_source_name}}','Meta')) AS t(utm_source, origin) "
+        "WHERE dt >= DATE '{start_date}'"
+    )
+    errors, _ = validate_trino_sql_syntax(sql, query_label="Query 1")
+    assert errors == []
+
+
 def test_table_refs_in_sql_finds_from_and_join():
     sql = """
     WITH base AS (SELECT 1 FROM dw_a.t1)

@@ -3,6 +3,11 @@
 Placeholder tokens common in entity docs (``{start_date}``, ``{load_start_date}``, …)
 are substituted with fixed smoke-test literals before parsing.
 
+The generic catch-all for unknown ``{token}`` braces runs **outside string literals
+only**. Braces inside a quoted string are inert for the parser, while the data they
+carry is real (Meta UTM values like ``'{{site_source_name}}'``, JSON paths like
+``'$.{experiment_name}'``) — rewriting them is what produces invalid SQL.
+
 Golden-query validation runs a **Trino syntax** gate (sqlglot ``dialect="trino"`` plus
 structural ``()[]`` balance checks) before metadata table/column checks.
 """
@@ -45,6 +50,8 @@ _SQL_TABLE_REF_RE = re.compile(
 _SKIPPED_METADATA_COLUMNS = frozenset({"_placeholder"})
 _HIVE_CATALOG_PREFIX = "hive"
 _TRINO_DIALECT = "trino"
+_GENERIC_PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z_][a-zA-Z0-9_]*\}")
+_STRING_LITERAL_RE = re.compile(r"'(?:''|[^'])*'|\"(?:\"\"|[^\"])*\"")
 
 
 @dataclass(frozen=True)
@@ -70,13 +77,28 @@ def _grep_column_mentions(sql: str, columns: set[str]) -> set[str]:
     return found
 
 
+def _neutralize_braces_outside_string_literals(sql: str) -> str:
+    """Replace unknown ``{token}`` braces, skipping the inside of quoted strings."""
+
+    def _neutralize(fragment: str) -> str:
+        return _GENERIC_PLACEHOLDER_RE.sub("'2024-01-01'", fragment)
+
+    pieces: list[str] = []
+    last = 0
+    for literal in _STRING_LITERAL_RE.finditer(sql):
+        pieces.append(_neutralize(sql[last : literal.start()]))
+        pieces.append(literal.group(0))
+        last = literal.end()
+    pieces.append(_neutralize(sql[last:]))
+    return "".join(pieces)
+
+
 def substitute_sql_placeholders(sql: str) -> str:
     out = sql
     for pattern, replacement in _PLACEHOLDER_SUBSTITUTIONS:
         out = pattern.sub(replacement, out)
-    # Any remaining ``{token}`` braces would break the parser — neutralize generically.
-    out = re.sub(r"\{[a-zA-Z_][a-zA-Z0-9_]*\}", "'2024-01-01'", out)
-    return out
+    # Unknown braces outside quotes would break the parser — neutralize generically.
+    return _neutralize_braces_outside_string_literals(out)
 
 
 def _check_balanced_delimiters(sql: str) -> list[str]:
