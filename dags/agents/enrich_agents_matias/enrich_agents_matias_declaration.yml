@@ -5,7 +5,7 @@ dag:
   owner: Data Agents
   documentation:
     dag_purpose: |
-      Enrich Matias product analytics with data from Jaiminho and Chatbot sessions.
+      Enrich Matias product analytics with data from CDP comms and Chatbot sessions.
 workflow:
   type: query_delta
   layer: enrich

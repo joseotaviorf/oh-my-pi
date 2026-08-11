@@ -4,34 +4,35 @@ table_name: outbound_messages_sessions
 description: |
   One row per Jaiminho WhatsApp outbound message sent via the corretores_relacionamento
   environment, optionally linked to a Dominic broker chatbot session on the same user.
+  Sourced from datalake_cdp_clean.comms notification_status_update events (latest status
+  per notification); waentEnv is read from event_properties.destination.waentEnv.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_notification:
-    description: Unique identifier of the Jaiminho notification (merge key).
+    description: Unique identifier of the Jaiminho notification (merge key), parsed from CDP id_event.
     lineage:
-      - datalake_jaiminho_clean.notifications.id
+      - datalake_cdp_clean.comms.id_event
   id_user:
     description: Identifier of the user who received the notification.
     lineage:
-      - datalake_jaiminho_clean.notifications.id_user
+      - datalake_cdp_clean.comms.id_user
   channel:
     description: Communication channel of the notification (whatsapp).
     lineage:
-      - datalake_jaiminho_clean.notifications.channel
+      - datalake_cdp_clean.comms.channel
   status:
-    description: Current status of the notification (e.g. pending, sent, delivered, failed).
+    description: Latest delivery status of the notification (e.g. sent, delivered, read, failed).
     lineage:
-      - datalake_jaiminho_clean.notifications.status
+      - datalake_cdp_clean.comms.comms_status
   template:
     description: Jaiminho notification template name used for the outbound message body.
     lineage:
-      - datalake_jaiminho_clean.notifications.template
+      - datalake_cdp_clean.comms.comms_template
   ts_notification_sent:
-    description: Timestamp when the notification was sent (falls back to ts_created when ts_sent is null).
+    description: Timestamp when the notification was sent (from event_properties.sentAt).
     lineage:
-      - datalake_jaiminho_clean.notifications.ts_sent
-      - datalake_jaiminho_clean.notifications.ts_created
+      - datalake_cdp_clean.comms.event_properties
   id_sauron_session:
     description: Sauron session ID when a Dominic session match exists; NULL otherwise.
     lineage:
@@ -63,15 +64,12 @@ columns:
   year:
     description: Partition year derived from ts_notification_sent.
     lineage:
-      - datalake_jaiminho_clean.notifications.ts_sent
-      - datalake_jaiminho_clean.notifications.ts_created
+      - datalake_cdp_clean.comms.event_properties
   month:
     description: Partition month derived from ts_notification_sent.
     lineage:
-      - datalake_jaiminho_clean.notifications.ts_sent
-      - datalake_jaiminho_clean.notifications.ts_created
+      - datalake_cdp_clean.comms.event_properties
   day:
     description: Partition day derived from ts_notification_sent.
     lineage:
-      - datalake_jaiminho_clean.notifications.ts_sent
-      - datalake_jaiminho_clean.notifications.ts_created
+      - datalake_cdp_clean.comms.event_properties

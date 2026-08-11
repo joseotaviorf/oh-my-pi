@@ -1,23 +1,56 @@
-WITH jaiminho_notifications AS (
+WITH comms_events AS (
   SELECT
-    id,
+    CAST(SPLIT(id_event, '-')[0] AS BIGINT) AS id_notification,
+    CAST(NULLIF(TRIM(id_user), '') AS BIGINT) AS id_user,
+    channel,
+    comms_status AS status,
+    comms_template AS template,
+    CAST(
+      FROM_UNIXTIME(
+        CAST(GET_JSON_OBJECT(event_properties, '$.sentAt') AS BIGINT) / 1000
+      ) AS TIMESTAMP
+    ) AS ts_notification_sent,
+    ts_event
+  FROM
+    datalake_cdp_clean.comms
+  WHERE
+    channel = 'whatsapp'
+    AND event_name = 'notification_status_update'
+    AND GET_JSON_OBJECT(event_properties, '$.destination.waentEnv') = 'corretores_relacionamento'
+    AND month BETWEEN 1 AND 12
+    AND day BETWEEN 1 AND 31
+    AND MAKE_DATE(CAST(year AS INT), CAST(month AS INT), CAST(day AS INT))
+      BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+comms_ranked AS (
+  SELECT
+    id_notification,
+    MAX(id_user) OVER (PARTITION BY id_notification) AS id_user,
+    channel,
+    status,
+    template,
+    ts_notification_sent,
+    ROW_NUMBER() OVER (
+      PARTITION BY id_notification
+      ORDER BY ts_event DESC
+    ) AS rn_comms
+  FROM
+    comms_events
+  WHERE
+    id_notification IS NOT NULL
+),
+outbound_notifications AS (
+  SELECT
+    id_notification,
     id_user,
     channel,
     status,
     template,
-    COALESCE(ts_sent, ts_created) AS ts_notification_sent,
-    ts_created,
-    year,
-    month,
-    day
+    ts_notification_sent
   FROM
-    datalake_jaiminho_clean.notifications
+    comms_ranked
   WHERE
-    channel = 'whatsapp'
-    AND GET_JSON_OBJECT(payload, '$.waent_env') = 'corretores_relacionamento'
-    AND month BETWEEN 1 AND 12
-    AND day BETWEEN 1 AND 31
-    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    rn_comms = 1
 ),
 dominic_sessions AS (
   SELECT
@@ -36,7 +69,7 @@ dominic_sessions AS (
 ),
 joined AS (
   SELECT
-    n.id AS id_notification,
+    n.id_notification,
     n.id_user,
     n.channel,
     n.status,
@@ -53,11 +86,11 @@ joined AS (
     MONTH(n.ts_notification_sent) AS month,
     DAY(n.ts_notification_sent) AS day,
     ROW_NUMBER() OVER (
-      PARTITION BY n.id
+      PARTITION BY n.id_notification
       ORDER BY s.ts_updated DESC NULLS LAST
     ) AS rn
   FROM
-    jaiminho_notifications AS n
+    outbound_notifications AS n
   LEFT JOIN
     dominic_sessions AS s
       ON CAST(n.id_user AS STRING) = CAST(s.id_user AS STRING)
