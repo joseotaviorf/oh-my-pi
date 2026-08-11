@@ -7,7 +7,7 @@ entry point, with mocked dbutils, SparkClient, and Google Sheets API clients.
 
 import json
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import numpy as np
 import pandas as pd
@@ -61,106 +61,106 @@ class TestSparkDataframeToGsheetsRows(unittest.TestCase):
         self.assertEqual(rows[2][0], False)
 
 
-class TestIsRetriableGsheetsError(unittest.TestCase):
-    """Tests for _is_retriable_gsheets_error helper."""
+class TestGSheetsErrorClassification(unittest.TestCase):
+    """Tests for GSheets error classification helpers."""
 
-    def test_429_is_retriable(self):
-        self.assertTrue(
-            job._is_retriable_gsheets_error(Exception("429 Too Many Requests"))
+    def test_workbook_cell_limit_is_detected(self):
+        error = Exception(
+            "{'code': 400, 'message': 'This action would increase the number of "
+            "cells in the workbook above the limit of 10000000 cells.', "
+            "'status': 'INVALID_ARGUMENT'}"
         )
+        self.assertTrue(job._is_workbook_cell_limit_error(error))
 
-    def test_503_is_retriable(self):
-        self.assertTrue(
-            job._is_retriable_gsheets_error(Exception("503 Service Unavailable"))
+    def test_404_is_not_found(self):
+        self.assertTrue(job._is_not_found_gsheets_error(Exception("404 NOT_FOUND")))
+
+    def test_cell_limit_raises_actionable_runtime_error(self):
+        error = Exception(
+            "400 INVALID_ARGUMENT: cells in the workbook above the limit of 10000000 cells"
         )
-
-    def test_resource_exhausted_is_retriable(self):
-        self.assertTrue(
-            job._is_retriable_gsheets_error(Exception("RESOURCE_EXHAUSTED"))
-        )
-
-    def test_500_is_retriable(self):
-        self.assertTrue(
-            job._is_retriable_gsheets_error(Exception("500 Internal Server Error"))
-        )
-
-    def test_404_is_not_retriable(self):
-        self.assertFalse(job._is_retriable_gsheets_error(Exception("404 NOT_FOUND")))
-
-    def test_permission_denied_is_not_retriable(self):
-        self.assertFalse(
-            job._is_retriable_gsheets_error(Exception("PERMISSION_DENIED"))
-        )
-
-
-class TestWriteWithRetries(unittest.TestCase):
-    """Tests for _write_with_retries helper."""
-
-    def test_succeeds_on_first_try(self):
-        mock_writer = MagicMock()
-        job._write_with_retries(mock_writer, "Tab", "sheet-id", [["a"], ["b"]])
-
-        mock_writer.write.assert_called_once_with("Tab", "sheet-id", [["a"], ["b"]])
-
-    @patch(f"{MODULE_UNDER_TEST}.time.sleep")
-    def test_retries_on_429_then_succeeds(self, mock_sleep):
-        mock_writer = MagicMock()
-        mock_writer.write.side_effect = [Exception("429"), None]
-
-        job._write_with_retries(mock_writer, "Tab", "sheet-id", [["a"]])
-
-        self.assertEqual(mock_writer.write.call_count, 2)
-        mock_sleep.assert_called_once_with(job.WRITE_RETRY_DELAYS_SECONDS[0])
-
-    @patch(f"{MODULE_UNDER_TEST}.time.sleep")
-    def test_raises_after_all_retries_exhausted(self, mock_sleep):
-        mock_writer = MagicMock()
-        mock_writer.write.side_effect = Exception("429")
-
         with self.assertRaises(RuntimeError) as ctx:
-            job._write_with_retries(mock_writer, "Tab", "sheet-id", [["a"]])
+            job._raise_for_gsheets_error(error, "Tab")
 
-        self.assertIn("429", str(ctx.exception))
-        self.assertEqual(
-            mock_writer.write.call_count,
-            len(job.WRITE_RETRY_DELAYS_SECONDS) + 1,
-        )
+        self.assertIn("10M cells", str(ctx.exception))
 
-    def test_fails_immediately_on_404(self):
-        mock_writer = MagicMock()
-        mock_writer.write.side_effect = Exception("404 NOT_FOUND")
-
+    def test_permission_denied_raises_actionable_runtime_error(self):
         with self.assertRaises(RuntimeError) as ctx:
-            job._write_with_retries(mock_writer, "Tab", "sheet-id", [["a"]])
-
-        self.assertIn("not found", str(ctx.exception).lower())
-        mock_writer.write.assert_called_once()
-
-    def test_fails_immediately_on_permission_denied(self):
-        mock_writer = MagicMock()
-        mock_writer.write.side_effect = Exception("PERMISSION_DENIED")
-
-        with self.assertRaises(RuntimeError) as ctx:
-            job._write_with_retries(mock_writer, "Tab", "sheet-id", [["a"]])
+            job._raise_for_gsheets_error(Exception("PERMISSION_DENIED"), "Tab")
 
         self.assertIn("gsheets-people-access", str(ctx.exception))
-        mock_writer.write.assert_called_once()
+
+
+class TestIterPayloadWriteChunks(unittest.TestCase):
+    """Tests for _iter_payload_write_chunks helper."""
+
+    def test_header_only(self):
+        chunks = job._iter_payload_write_chunks([["h1", "h2"]], chunk_size=2)
+        self.assertEqual(chunks, [[["h1", "h2"]]])
+
+    def test_splits_data_rows_and_keeps_header_in_first_chunk(self):
+        payload = [["h"], ["1"], ["2"], ["3"], ["4"], ["5"]]
+        chunks = job._iter_payload_write_chunks(payload, chunk_size=2)
+
+        self.assertEqual(chunks, [[["h"], ["1"], ["2"]], [["3"], ["4"]], [["5"]]])
+
+
+class TestWritePayloadInChunks(unittest.TestCase):
+    """Tests for _write_payload_in_chunks helper."""
+
+    def _build_writer_with_worksheet(self):
+        mock_writer = MagicMock()
+        mock_worksheet = MagicMock()
+        mock_writer.google_sheets_client.gsheets.open_by_key.return_value.worksheet.return_value = mock_worksheet
+        return mock_writer, mock_worksheet
+
+    def test_small_payload_uses_single_write(self):
+        mock_writer, _ = self._build_writer_with_worksheet()
+        payload = [["h"], ["1"], ["2"]]
+
+        job._write_payload_in_chunks(
+            mock_writer, "Tab", "sheet-id", payload, chunk_size=10_000
+        )
+
+        mock_writer.write.assert_called_once_with("Tab", "sheet-id", payload)
 
     @patch(f"{MODULE_UNDER_TEST}.time.sleep")
-    def test_retries_on_500_when_sheet_id_in_error_message(self, mock_sleep):
-        mock_writer = MagicMock()
-        mock_writer.write.side_effect = [
-            Exception(
-                "500 Internal Server Error: "
-                "https://sheets.googleapis.com/v4/spreadsheets/bad-sheet-id"
-            ),
-            None,
-        ]
+    def test_large_payload_writes_first_chunk_then_appends(self, mock_sleep):
+        mock_writer, mock_worksheet = self._build_writer_with_worksheet()
+        chunk_size = 2
+        payload = [["h"], ["1"], ["2"], ["3"], ["4"], ["5"]]
 
-        job._write_with_retries(mock_writer, "Tab", "bad-sheet-id", [["a"]])
+        job._write_payload_in_chunks(
+            mock_writer, "Tab", "sheet-id", payload, chunk_size=chunk_size
+        )
 
-        self.assertEqual(mock_writer.write.call_count, 2)
-        mock_sleep.assert_called_once_with(job.WRITE_RETRY_DELAYS_SECONDS[0])
+        mock_writer.write.assert_called_once_with(
+            "Tab",
+            "sheet-id",
+            [["h"], ["1"], ["2"]],
+        )
+        mock_worksheet.append_rows.assert_has_calls(
+            [
+                call([["3"], ["4"]], value_input_option="USER_ENTERED"),
+                call([["5"]], value_input_option="USER_ENTERED"),
+            ]
+        )
+        self.assertEqual(mock_sleep.call_count, 1)
+        mock_sleep.assert_called_with(job.GSHEETS_CHUNK_PAUSE_SECONDS)
+
+    def test_cell_limit_fails_fast_without_retry(self):
+        mock_writer, _ = self._build_writer_with_worksheet()
+        mock_writer.write.side_effect = Exception(
+            "400 INVALID_ARGUMENT: cells in the workbook above the limit of 10000000 cells"
+        )
+
+        with self.assertRaises(RuntimeError) as ctx:
+            job._write_payload_in_chunks(
+                mock_writer, "Tab", "sheet-id", [["h"], ["1"]], chunk_size=10_000
+            )
+
+        self.assertIn("10M cells", str(ctx.exception))
+        mock_writer.write.assert_called_once()
 
 
 class TestGetAuth(unittest.TestCase):
@@ -237,6 +237,7 @@ class TestGetPayloadsFromTable(unittest.TestCase):
 class TestMain(unittest.TestCase):
     """Tests for main entry point with full mocks."""
 
+    @patch(f"{MODULE_UNDER_TEST}._write_payload_in_chunks")
     @patch(f"{MODULE_UNDER_TEST}._get_gsheets_writer")
     @patch(f"{MODULE_UNDER_TEST}.SparkClient")
     @patch(f"{MODULE_UNDER_TEST}.BaseDBUtils")
@@ -245,6 +246,7 @@ class TestMain(unittest.TestCase):
         mock_base_dbutils,
         mock_spark_cls,
         mock_get_writer,
+        mock_write_chunks,
     ):
         mock_dbutils = MagicMock()
         mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
@@ -255,10 +257,11 @@ class TestMain(unittest.TestCase):
         mock_writer = MagicMock()
         mock_get_writer.return_value = mock_writer
 
+        payload = [["id_user", "user_name"], ["1", "Alice"]]
         with patch.object(
             job,
             "_get_payloads_from_table",
-            return_value=[["id_user", "user_name"], ["1", "Alice"]],
+            return_value=payload,
         ):
             with patch(
                 "sys.argv",
@@ -274,15 +277,14 @@ class TestMain(unittest.TestCase):
                 job.main()
 
         mock_get_writer.assert_called_once_with(mock_dbutils)
-        mock_writer.write.assert_called_once_with(
+        mock_write_chunks.assert_called_once_with(
+            mock_writer,
             "JobsTab",
             "prod-sheet-id-123",
-            [
-                ["id_user", "user_name"],
-                ["1", "Alice"],
-            ],
+            payload,
         )
 
+    @patch(f"{MODULE_UNDER_TEST}._write_payload_in_chunks")
     @patch(f"{MODULE_UNDER_TEST}._get_gsheets_writer")
     @patch(f"{MODULE_UNDER_TEST}.SparkClient")
     @patch(f"{MODULE_UNDER_TEST}.BaseDBUtils")
@@ -291,6 +293,7 @@ class TestMain(unittest.TestCase):
         mock_base_dbutils,
         mock_spark_cls,
         mock_get_writer,
+        mock_write_chunks,
     ):
         mock_dbutils = MagicMock()
         mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
@@ -319,10 +322,10 @@ class TestMain(unittest.TestCase):
             ):
                 job.main()
 
-        mock_writer.write.assert_called_once()
-        call_args = mock_writer.write.call_args[0]
-        self.assertEqual(call_args[1], job.FORNO_SHEET_ID)
-        self.assertEqual(call_args[0], "SalaryTab")
+        mock_write_chunks.assert_called_once()
+        call_args = mock_write_chunks.call_args[0]
+        self.assertEqual(call_args[2], job.FORNO_SHEET_ID)
+        self.assertEqual(call_args[1], "SalaryTab")
 
     @patch(f"{MODULE_UNDER_TEST}.BaseDBUtils")
     def test_main_raises_when_dbutils_unavailable(self, mock_base_dbutils):

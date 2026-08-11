@@ -31,38 +31,12 @@ SCHEMA = "reverse_reports"
 
 logger = logging.getLogger(JOB_NAME)
 
-WRITE_RETRY_DELAYS_SECONDS = [60, 60, 60, 60, 60, 120, 180]
+# Aligned with the Databricks sandbox_toolkit export notebook.
+GSHEETS_WRITE_CHUNK_SIZE = 10_000
+GSHEETS_CHUNK_PAUSE_SECONDS = 2
 GSHEETS_SERVICE_ACCOUNT_EMAIL = (
     "gsheets-people-access@airflow-186119.iam.gserviceaccount.com"
 )
-
-
-def _is_retriable_gsheets_error(e: Exception) -> bool:
-    """
-    Return True if the exception is a retriable Google Sheets API error.
-
-    Retriable: 429 rate limit, 500/503 server errors, resource exhausted, deadline exceeded.
-    """
-    error_msg = str(e).upper()
-    if (
-        "429" in error_msg
-        or "RESOURCE_EXHAUSTED" in error_msg
-        or "RATE_LIMIT_EXCEEDED" in error_msg
-    ):
-        return True
-    if (
-        "500" in error_msg
-        or "503" in error_msg
-        or "INTERNAL" in error_msg
-        or "UNAVAILABLE" in error_msg
-        or "DEADLINE_EXCEEDED" in error_msg
-    ):
-        return True
-    if hasattr(e, "code") and e.code in (429, 500, 503):
-        return True
-    if hasattr(e, "resp") and getattr(e.resp, "status", None) in (429, 500, 503):
-        return True
-    return False
 
 
 def _is_not_found_gsheets_error(e: Exception) -> bool:
@@ -75,6 +49,16 @@ def _is_not_found_gsheets_error(e: Exception) -> bool:
     if hasattr(e, "resp") and getattr(e.resp, "status", None) == 404:
         return True
     return False
+
+
+def _is_workbook_cell_limit_error(e: Exception) -> bool:
+    """Return True when the workbook hit Google Sheets' 10M cell limit."""
+    error_msg = str(e).upper()
+    return (
+        "10000000" in error_msg
+        or "10,000,000" in error_msg
+        or "CELLS IN THE WORKBOOK" in error_msg
+    )
 
 
 def _is_missing_sheet_tab_error(e: Exception, sheet_tab: str) -> bool:
@@ -90,6 +74,42 @@ def _is_missing_sheet_tab_error(e: Exception, sheet_tab: str) -> bool:
         "No sheet",
     ]
     return any(ind in error_msg for ind in tab_error_indicators)
+
+
+def _raise_for_gsheets_error(e: Exception, sheet_tab: str) -> None:
+    """Translate known GSheets API failures into actionable RuntimeError messages."""
+    error_msg = str(e)
+
+    if _is_workbook_cell_limit_error(e):
+        raise RuntimeError(
+            "Google Sheets workbook cell limit exceeded (10M cells). "
+            "Remove unused tabs, archive old data, or export to a dedicated spreadsheet."
+        ) from e
+
+    if _is_not_found_gsheets_error(e):
+        raise RuntimeError(
+            "Spreadsheet or sheet not found. Check sheet link and tab name."
+        ) from e
+
+    if _is_missing_sheet_tab_error(e, sheet_tab):
+        raise RuntimeError(
+            f"Sheet tab '{sheet_tab}' not found or invalid. Check tab name."
+        ) from e
+
+    if "PERMISSION_DENIED" in error_msg.upper():
+        raise RuntimeError(
+            f"Bot does not have access to the gsheet. Share it with: {GSHEETS_SERVICE_ACCOUNT_EMAIL}"
+        ) from e
+
+
+def _run_gsheets_operation(sheet_tab: str, operation, operation_label: str) -> None:
+    """Run a single GSheets API call. Retries are handled by the Airflow EMR task."""
+    try:
+        operation()
+    except Exception as e:
+        logger.error("GSheets %s failed: %s", operation_label, e)
+        _raise_for_gsheets_error(e, sheet_tab)
+        raise
 
 
 def _spark_dataframe_to_gsheets_rows(df, force_int_to_str: bool = False) -> list:
@@ -124,54 +144,85 @@ def _spark_dataframe_to_gsheets_rows(df, force_int_to_str: bool = False) -> list
     return rows
 
 
-def _write_with_retries(writer, sheet_tab: str, sheet_id: str, payload: list) -> None:
+def _iter_payload_write_chunks(payload: list, chunk_size: int) -> list[list]:
+    """Split payload into write batches. First batch includes the header row."""
+    if not payload:
+        return []
+
+    header = payload[0]
+    data_rows = payload[1:]
+    if not data_rows:
+        return [[header]]
+
+    chunks = []
+    for start in range(0, len(data_rows), chunk_size):
+        batch = data_rows[start : start + chunk_size]
+        if start == 0:
+            chunks.append([header] + batch)
+        else:
+            chunks.append(batch)
+    return chunks
+
+
+def _get_worksheet(writer: GoogleSheetsWriter, sheet_id: str, sheet_tab: str):
+    """Return the gspread worksheet handle for one tab."""
+    return writer.google_sheets_client.gsheets.open_by_key(sheet_id).worksheet(
+        sheet_tab
+    )
+
+
+def _write_payload_in_chunks(
+    writer: GoogleSheetsWriter,
+    sheet_tab: str,
+    sheet_id: str,
+    payload: list,
+    chunk_size: int = GSHEETS_WRITE_CHUNK_SIZE,
+) -> None:
     """
-    Write payload to GSheets with retry and progressive backoff.
+    Replace worksheet content, chunking large payloads to avoid Sheets API 500s.
 
-    Uses progressive backoff: [60, 60, 60, 60, 60, 120, 180] seconds.
+    Small payloads use ``GoogleSheetsWriter.write`` (clear + single update).
+    Large payloads write the first chunk with ``writer.write`` (clear + update),
+    then ``append_rows`` for the remaining batches — same pattern as the Databricks
+    sandbox_toolkit export notebook.
     """
-    delays = WRITE_RETRY_DELAYS_SECONDS
-    for attempt, delay in enumerate(delays + [None]):
-        try:
-            writer.write(sheet_tab, sheet_id, payload)
-            return
-        except Exception as e:
-            error_msg = str(e)
-            logger.warning("GSheets write failed (attempt %d): %s", attempt + 1, e)
+    data_row_count = max(len(payload) - 1, 0)
+    if data_row_count <= chunk_size:
+        _run_gsheets_operation(
+            sheet_tab,
+            lambda: writer.write(sheet_tab, sheet_id, payload),
+            "write",
+        )
+        return
 
-            if _is_retriable_gsheets_error(e):
-                if delay is not None:
-                    logger.warning(
-                        "Rate limit or temporary error. Waiting %ds before next try...",
-                        delay,
-                    )
-                    time.sleep(delay)
-                else:
-                    raise RuntimeError(
-                        f"Quota/rate limit exceeded. All retries failed. Last error: {e}"
-                    ) from e
-                continue
+    chunks = _iter_payload_write_chunks(payload, chunk_size)
+    logger.info(
+        "Writing %d rows in %d chunks (chunk_size=%d)",
+        data_row_count,
+        len(chunks),
+        chunk_size,
+    )
 
-            if _is_not_found_gsheets_error(e):
-                raise RuntimeError(
-                    "Spreadsheet or sheet not found. Check sheet link and tab name."
-                ) from e
+    _run_gsheets_operation(
+        sheet_tab,
+        lambda: writer.write(sheet_tab, sheet_id, chunks[0]),
+        f"write chunk 1/{len(chunks)}",
+    )
 
-            if _is_missing_sheet_tab_error(e, sheet_tab):
-                raise RuntimeError(
-                    f"Sheet tab '{sheet_tab}' not found or invalid. Check tab name."
-                ) from e
+    if len(chunks) == 1:
+        return
 
-            if "PERMISSION_DENIED" in error_msg.upper():
-                raise RuntimeError(
-                    f"Bot does not have access to the gsheet. Share it with: {GSHEETS_SERVICE_ACCOUNT_EMAIL}"
-                ) from e
+    worksheet = _get_worksheet(writer, sheet_id, sheet_tab)
+    for chunk_index, chunk in enumerate(chunks[1:], start=2):
+        chunk_label = f"append chunk {chunk_index}/{len(chunks)}"
 
-            if delay is not None:
-                logger.warning("Waiting %ds before next try...", delay)
-                time.sleep(delay)
-            else:
-                raise RuntimeError(f"All retries failed. Last error: {e}") from e
+        def append_chunk(rows=chunk, label=chunk_label):
+            worksheet.append_rows(rows, value_input_option="USER_ENTERED")
+
+        _run_gsheets_operation(sheet_tab, append_chunk, chunk_label)
+
+        if chunk_index < len(chunks):
+            time.sleep(GSHEETS_CHUNK_PAUSE_SECONDS)
 
 
 def _get_auth(dbutils, credentials_scope: str, credentials_key: str):
@@ -295,7 +346,7 @@ def main():
         spark_client, read_table_name, execution_date, database_name
     )
 
-    _write_with_retries(gsheets_producer, sheet_tab, sheet_id, payload)
+    _write_payload_in_chunks(gsheets_producer, sheet_tab, sheet_id, payload)
 
     logger.info(
         "Export completed: table=%s, sheet=%s, tab=%s, rows=%d",
