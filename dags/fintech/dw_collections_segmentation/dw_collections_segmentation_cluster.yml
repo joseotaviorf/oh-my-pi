@@ -19,6 +19,9 @@ cluster:
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
     spark_conf:
+      spark.driver.memory: "16g"
+      spark.driver.memoryOverhead: "4g"
+      spark.driver.maxResultSize: "4g"
       spark.executor.memory: "48g"
       spark.executor.cores: "8"
       spark.executor.memoryOverhead: "8g"
