@@ -3,6 +3,8 @@ SELECT
   external_id AS id_external,
   session_id AS id_session,
   user_id AS id_user,
+  idempotency_key AS id_idempotency,
+  chunk_id AS id_chunk,
   message_index,
   role,
   channel,

@@ -21,6 +21,14 @@ columns:
     description: "Identifier of the user associated with the message"
     lineage:
     - datalake_copilot_service_raw.message.user_id
+  id_idempotency:
+    description: "Client-supplied idempotency key used to deduplicate message creation requests; null when the caller did not provide one."
+    lineage:
+    - datalake_copilot_service_raw.message.idempotency_key
+  id_chunk:
+    description: "Identifier of the media chunk associated with this message during chunked transcription or buffering."
+    lineage:
+    - datalake_copilot_service_raw.message.chunk_id
   message_index:
     description: "Sequential position of this message within the session conversation."
     lineage:
@@ -61,3 +69,20 @@ columns:
     description: "The message creation date"
     lineage:
     - datalake_copilot_service_raw.message.created_at
+  op_cdc:
+    description: "CDC operation type captured by Debezium."
+    lineage:
+    - datalake_copilot_service_raw.message.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: "Timestamp when the CDC system captured this transaction (millisecond precision)."
+    lineage:
+    - datalake_copilot_service_raw.message.ts_cdc_transaction
+  ts_database_transaction:
+    description: "Timestamp of the original database transaction in the source system."
+    lineage:
+    - datalake_copilot_service_raw.message.ts_database_transaction
