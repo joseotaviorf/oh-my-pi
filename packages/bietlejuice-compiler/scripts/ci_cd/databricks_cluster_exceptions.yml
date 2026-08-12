@@ -68,3 +68,10 @@ exceptions:
       adapted for EMR. Once that migration lands, this DAG will move to EMR
       (consolidation_s_memory_cluster).
     approved_by: anne.macedo@quintoandar.com.br
+  - dag: salesforce_cdc
+    path: dags/support_and_service/salesforce_cdc
+    reason: >-
+      Revert EMR migration from #27482: restore Databricks runtime after EMR
+      migration issues (struct DDL parsing / recovery flow failures on EMR
+      Spark).
+    approved_by: gabriel.firmino@quintoandar.com.br

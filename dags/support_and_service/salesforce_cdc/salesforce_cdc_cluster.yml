@@ -1,9 +1,0 @@
-cluster:
-  type: emr_7_12_small_general_2xlarge_2_workers_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
-  custom_configurations:
-    aws_attributes:
-      availability: ON_DEMAND
-      task_availability: ON_DEMAND

@@ -65,3 +65,21 @@ events_config:
     api_entity: "User"
 
 salesforce_endpoint: "https://quintoandar.my.salesforce.com"
+
+custom_cluster:
+  driver_node_type_id: c5a.2xlarge
+  node_type_id: c5a.2xlarge
+  num_workers: 2
+  spark_version: 16.4.x-scala2.12
+
+  spark_conf:
+    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.heartbeatInterval: "100s"
+    spark.network.timeout: "600s"
+    spark.metrics.appStatusSource.enabled: "true"
+  spark_env_vars:
+    GLUE_ASSUME_ROLE_ARN: "{{ var.value.get('glue_assume_role_arn', '') }}"
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
