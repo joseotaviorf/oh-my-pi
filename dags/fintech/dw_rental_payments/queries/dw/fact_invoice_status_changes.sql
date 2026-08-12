@@ -51,10 +51,10 @@ invoice_status_mob AS (
     is_written_down,
     cohort_type,
     invoice_due_amount,
-    GREATEST(DATEDIFF(MONTH, dt_cohort, current_date),0) AS max_mobs,
-    IF(dt_paid IS NOT NULL, GREATEST(DATEDIFF(MONTH, dt_cohort, dt_paid), 0), NULL) AS mob_paid,
-    IF(dt_canceled IS NOT NULL, GREATEST(DATEDIFF(MONTH, dt_cohort, dt_canceled), 0), NULL) AS mob_canceled,
-    GREATEST(DATEDIFF(MONTH,dt_cohort,dt_due),0) AS mob_due,
+    GREATEST(TIMESTAMPDIFF(MONTH, dt_cohort, current_date),0) AS max_mobs,
+    IF(dt_paid IS NOT NULL, GREATEST(TIMESTAMPDIFF(MONTH, dt_cohort, dt_paid), 0), NULL) AS mob_paid,
+    IF(dt_canceled IS NOT NULL, GREATEST(TIMESTAMPDIFF(MONTH, dt_cohort, dt_canceled), 0), NULL) AS mob_canceled,
+    GREATEST(TIMESTAMPDIFF(MONTH,dt_cohort,dt_due),0) AS mob_due,
     dt_cohort
   FROM
     union_reference_date

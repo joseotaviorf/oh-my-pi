@@ -39,12 +39,13 @@ WHERE ce.ts_created = cec.ts_max_created
 AND cep.proponent_type IS NOT NULL
 ),
 
-get_proponent_income_data AS (
-SELECT DISTINCT
+rank_proponent_income_data AS (
+SELECT
   REPLACE(REPLACE(pd.cpf, ".", ""), "-", "") AS proponent_cpf,
   pd.id_context_external AS id_proposal,
   id.monthly_salary AS proponent_gross_income,
-  id.verified_income AS proponent_verified_income
+  id.verified_income AS proponent_verified_income,
+  ROW_NUMBER() OVER (PARTITION BY pd.id_context_external, pd.cpf ORDER BY pd.ts_updated DESC) AS rn
 FROM
   datalake_docx.personal_documentation AS pd
 LEFT JOIN
@@ -54,8 +55,18 @@ LEFT JOIN
 WHERE
 -- Get only tenant's data
   pd.document_context = 'Tenant'
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY pd.id_context_external, pd.cpf ORDER BY pd.ts_updated DESC) = 1
+),
+
+get_proponent_income_data AS (
+SELECT DISTINCT
+  proponent_cpf,
+  id_proposal,
+  proponent_gross_income,
+  proponent_verified_income
+FROM
+  rank_proponent_income_data
+WHERE
+  rn = 1
 ),
 
 get_neoway_presumed_income AS (

@@ -21,7 +21,7 @@ tickets AS (
 ),
 
 
-acionamentos_rh AS (
+rank_acionamentos_rh AS (
   SELECT 
     d.id_propose AS id_proposta,
     aeb.id_payment_request,
@@ -49,8 +49,8 @@ acionamentos_rh AS (
       WHEN ae.due_amount < 0 THEN 0 
       ELSE ae.due_amount 
     END AS valor_pago_para_imobiliaria, 
-    d.is_active,
-    pr.status
+    pr.status,
+    ROW_NUMBER() OVER (PARTITION BY d.id ORDER BY aeb.id_payment_request DESC) AS rn
   FROM 
     datalake_rental_guarantee_platform_clean.delinquency d 
   LEFT JOIN 
@@ -66,8 +66,25 @@ acionamentos_rh AS (
     id_type IN (1,2) 
     AND pr.id_next_attempt IS NULL 
     AND d.original_value > 0
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY d.id ORDER BY aeb.id_payment_request DESC) = 1
+),
+acionamentos_rh AS (
+  SELECT 
+    id_proposta,
+    id_payment_request,
+    is_active,
+    id_delinquency,
+    account_entry,
+    data_vencimento,
+    id_do_pagamento,
+    pago_quando,
+    pagamento_programado_para,
+    status_pagamento,
+    valor_pago_para_imobiliaria,
+    status
+  FROM 
+    rank_acionamentos_rh
+  WHERE 
+    rn = 1
 ),
 mis_tretament_table AS (
   SELECT 
