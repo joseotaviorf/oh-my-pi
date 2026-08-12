@@ -21,6 +21,12 @@
 
 ---
 
+## Related Metric Entities
+
+<!-- None currently -- no metric entity doc references the Agents domain as of 2026-08. -->
+
+---
+
 ## Glossary and Synonyms
 
 | Term | Meaning | Notes |
