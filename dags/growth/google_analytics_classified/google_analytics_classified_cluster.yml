@@ -5,8 +5,6 @@ cluster:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_libraries:
-  - maven:
-      coordinates: com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.41.0
   - pypi:
       package: 'packaging>=23.0,<27'
       ignore_installed: true
