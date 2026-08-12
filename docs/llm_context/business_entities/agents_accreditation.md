@@ -12,10 +12,10 @@
 
 ## Overview
 
-- **Objective:** Canonical agent identity, capabilities, the prospect/accreditation funnel, and the daily/monthly snapshots that answer "what state was this agent in on date X".
+- **Objective:** Canonical agent identity, capabilities, the prospect/accreditation funnel, and the daily snapshots that answer "what state was this agent in on date X".
 - **Asset status / lifecycle:** prospect → CRECI validation → contract signature → accredited (`agent.status = 'ACTIVE'`) → activated (first commercial event) → churned/inactive.
 - **Typical actions / events:** sign-up, qualification steps, contract signature, CRECI validation, EN association, activation.
-- **Common metrics:** active agents (monthly), new-agent activation rate, days-in-status.
+- **Common metrics:** active agents (via `dw_agent.fact_agent_daily`), days-in-current-status, prospect funnel blockers by step.
 - **Source systems:** EBDB (agent, prospect, qualification, contract), Amplitude (sign-up funnel). Consolidated 2026-06-19 (ADR: Instant Accreditation).
 - **Related entities:** for the identity-migration warning (legacy vs new ID systems) and business-function definitions, see [`agents.md`](agents.md). For business profile classification, see [`agents_profile.md`](agents_profile.md).
 
@@ -27,7 +27,7 @@
 |------|---------|-------|
 | **Prospect** | A person who intends to become an agent, pre-accreditation | `datalake_agent_accreditation.prospect_step_validation` / `prospect_agent`. |
 | **Instant Accreditation** | 2026-06-19 ADR consolidating EBDB + Hub Services + Amplitude into one `agent` table | Replaced several legacy accreditation sources. |
-| **Ativação / activation** | ⚠ No single definition | `is_activated` in `agent_new_agent_activation_metrics` (first commercial event ≤60 days of registration), or first visit/listing/TQC/deal. Always confirm. |
+| **Ativação / activation** | ⚠ No single definition | Conceptually: first commercial event (first visit/listing/TQC/deal) within a window of registration. No currently-recommended published table exposes this directly — confirm the exact source with the business owner before answering. |
 | **Agente ativo / active agent** | ⚠ Ambiguous | account-available (`is_agent_active` in `dim_agent`), has-visits, or app-active (Amplitude). Always confirm. |
 
 ---
@@ -40,8 +40,6 @@
 | Point-in-time / daily capability and status history | `dw_agent.fact_agent_daily` |
 | Fine-grained capability status (per type, business context) | `datalake_ebdb_clean.capability` |
 | CRECI validation / contract / sign-up ops queue | `datalake_agent_accreditation.prospect_step_validation` |
-| Monthly status snapshot (CIQ + Demand) | `datalake_agent_reports.agent_status_by_month` |
-| New-agent activation funnel (monthly cohort) | `datalake_agent_reports.agent_new_agent_activation_metrics` |
 
 **Critical rules:**
 - **DW first for daily state:** use `dw_agent.fact_agent_daily` for per-day capability/status questions; use enrich `agent` only for canonical identity or columns not projected to DW.
@@ -84,19 +82,12 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 
 > Siblings in `dw_agent`: `dim_agent`, `dim_prospect_agent`, and `fact_visit_agent_performance` (⚠ **STALE since 2025-09-21** — historical only, no confirmed replacement as of 2026-06).
 
-## `datalake_agent_reports` (monthly snapshots)
-
-**`agent_status_by_month`** — one row per `(id_user, reference_month)`. Two independent statuses: `ciq_status` and `agent_status` (Demand, CORRETOR_5A from audit).
-
-**`agent_new_agent_activation_metrics`** — one row per `(id_user, reference_month)` for the new-agent cohort (registered ≤60 days before month-end). Key columns: `is_activated`, `is_ciq_active_in_month`, `is_tqc_active_in_month`, `is_ppa_active_in_month`, `agent_type_segment` (modern replacement for legacy subtype jargon), `agent_business_context`.
-
 ## Dos and Don'ts
 
 **Do:**
 
 - Use `datalake_agent_accreditation.agent` for canonical `id_agent` identity; for **daily state** prefer `dw_agent.fact_agent_daily`.
-- Translate legacy jargon ("Demand Agent", "CIQ-Only", "Independent Agent") to `agent_type_segment` / capability filters, not literal column values.
-- Filter monthly report tables by `reference_month` (always first day of month).
+- Translate legacy jargon ("Demand Agent", "CIQ-Only", "Independent Agent") to capability filters, not literal column values.
 
 **Don't:**
 
@@ -108,20 +99,19 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 
 ## Golden Queries
 
-### Query 1 — New agents activated this month
+### Query 1 — Prospect funnel blockers by step
 
-Activation cohort for the current month, using the modern `agent_type_segment` in place of legacy subtype jargon ("CIQ-Only", "Independent Agent").
+Ops-facing view of where prospects are currently stuck in the accreditation funnel (CRECI validation, contract signature, sign-up conflicts, EN association).
 
 ```sql
 SELECT
-    a.agent_type_segment,
-    a.agent_business_context,
-    COUNT(DISTINCT a.id_user)                                   AS agents_in_cohort,
-    SUM(CASE WHEN a.is_activated THEN 1 ELSE 0 END)             AS agents_activated
-FROM datalake_agent_reports.agent_new_agent_activation_metrics AS a
-WHERE a.reference_month = DATE_TRUNC('month', CURRENT_DATE)
-GROUP BY 1, 2
-ORDER BY agents_activated DESC;
+    p.step_name,
+    p.status_reason,
+    p.business_context_applied,
+    COUNT(DISTINCT p.id_prospect_agent) AS prospects_blocked
+FROM datalake_agent_accreditation.prospect_step_validation AS p
+GROUP BY 1, 2, 3
+ORDER BY prospects_blocked DESC;
 ```
 
-> `reference_month` is always the first day of the month. Join `datalake_agent_accreditation.agent` on `id_user` for CRECI or capability detail on the same cohort.
+> This table is a full-reload, ops-facing snapshot with no row-level history — it shows the current blocker per prospect, not a time series. Join `datalake_agent_accreditation.agent` on `id_user` for CRECI or capability detail once a prospect converts to an agent.

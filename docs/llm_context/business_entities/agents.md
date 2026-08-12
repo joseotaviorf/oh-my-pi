@@ -27,7 +27,7 @@
 |------|---------|-------|
 | **Agente / corretor** | Field agent | Multi-type — see [`agents_profile.md`](agents_profile.md) for classification rules. |
 | **Agente de visita / Visita** | Visit agent | `profile = 'Visita'`; default scope for most business questions. |
-| **Agente CIQ (program)** | Affiliation — enrolled in the CIQ (Corretor Integrado QuintoAndar) program | `ciq_status` in `agent_status_by_month`; affiliation `1P`. Overloaded with "CIQ (function)" below. |
+| **Agente CIQ (program)** | Affiliation — enrolled in the CIQ (Corretor Integrado QuintoAndar) program | affiliation `1P`; nearest capability signal is `is_allow_supply_acquisition` / `is_allow_supply_conversion` on `dw_agent.dim_agent`. Overloaded with "CIQ (function)" below. |
 | **Agente 3P / parceiro** | Third-party / partner-firm agent | `affiliation_type = '3P'` in `agent`; `is_3p_agent = true` in `dw_public.dim_agent`. |
 | **Demand Agent / agente de demanda** | Conversion function — conducts visits and converts | `profile = 'Visita'` + capability `DEMAND_VISIT_MANAGEMENT ENABLED`; `revenue_role = DEMAND`. |
 | **TQC (Traz Quem Compra)** | Demand-acquisition function on Sale — brings/qualifies the buyer lead | See [`agents_programs.md`](agents_programs.md). |
@@ -51,7 +51,7 @@ This domain is split by topic so an analyst (or TARS) loads only what a question
 |-----------|----------------|------|
 | Legacy `sk_agent ↔ id_user` bridge | `dw_public.dim_agent` | this file (Golden Query below) |
 | **Who is the agent / what type** (business profile classification), hub/NE allocation, tier performance metrics | `dw_agent.dim_agent`, `datalake_hub_services.member_hub_allocation`, `datalake_tiers.agent_performance` | [`agents_profile.md`](agents_profile.md) |
-| Canonical agent identity, capabilities, prospect/accreditation funnel, daily state, monthly lifecycle reports | `datalake_agent_accreditation.agent`, `dw_agent.fact_agent_daily` | [`agents_accreditation.md`](agents_accreditation.md) |
+| Canonical agent identity, capabilities, prospect/accreditation funnel, daily state | `datalake_agent_accreditation.agent`, `dw_agent.fact_agent_daily` | [`agents_accreditation.md`](agents_accreditation.md) |
 | BigAgent earnings, tiers, partner payments (Sale + Rent), Nazaré | `dw_agent_payments.fact_earnings`, `fact_partner_payments` | [`agents_payments.md`](agents_payments.md) |
 | Valid First Listing / property dedup, CIQ Compra de Carteira (pricing, portfolio loss, eligibility) | `datalake_listing_deduplication.valid_first_listing`, `dw_ciq.fact_ciq_listing_purchase` | [`agents_performance.md`](agents_performance.md) |
 | PFA/PPA relation and eligibility, TQC/TQA acquisition | `datalake_ebdb_agents.preferred_property_agent_relation_history`, `preferred_fixed_agent_history` | [`agents_programs.md`](agents_programs.md) |
