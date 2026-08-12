@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import os
 import shutil
+from datetime import datetime
 from pathlib import Path
 from typing import Any, List, Optional
 
@@ -62,6 +63,11 @@ def _normalize_local_path(uri: str) -> str:
     if uri.startswith("file://"):
         return uri[7:]
     return uri
+
+
+def _epoch_ms(value: Optional[datetime]) -> int:
+    # boto3 returns tz-aware UTC datetimes; Databricks FileInfo.modificationTime is epoch millis.
+    return int(value.timestamp() * 1000) if value is not None else 0
 
 
 class AwsEmrClusterUtils:
@@ -125,7 +131,15 @@ class AwsEmrClusterUtils:
             else:
                 name = child.name
                 full_path = full
-            entries.append(FsListEntry(path=full_path, name=name, is_dir=is_dir))
+            stat = child.stat()
+            entries.append(
+                FsListEntry(
+                    path=full_path,
+                    name=name,
+                    size=0 if is_dir else stat.st_size,
+                    modificationTime=int(stat.st_mtime * 1000),
+                )
+            )
         return entries
 
     def _s3_ls(self, uri: str) -> List[FsListEntry]:
@@ -135,19 +149,19 @@ class AwsEmrClusterUtils:
             prefix = prefix + "/"
         client = self._get_s3_client()
         paginator = client.get_paginator("list_objects_v2")
-        entries: List[FsListEntry] = []
-        seen: set[str] = set()
 
-        # Delimiter="/" yields one level: CommonPrefixes = subdirs, Contents = files at this level only.
+        # Delimiter="/" yields one level: CommonPrefixes = subdirs, Contents = files at this level.
+        # S3 CommonPrefixes carry no LastModified; Databricks folder FileInfo.modificationTime is
+        # non-zero, so a second undelimited pass takes max child LastModified per immediate subdir
+        # (needed by hightouch sync_run_id window filters).
+        dir_names: dict[str, str] = {}
+        file_entries: List[FsListEntry] = []
         for page in paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter="/"):
             for cp in page.get("CommonPrefixes") or []:
                 p = cp["Prefix"]
-                if p in seen:
+                if p in dir_names:
                     continue
-                seen.add(p)
-                name = p[len(prefix) :].rstrip("/") + "/"
-                full_uri = f"s3://{bucket}/{p}"
-                entries.append(FsListEntry(path=full_uri, name=name, is_dir=True))
+                dir_names[p] = p[len(prefix) :].rstrip("/") + "/"
             for obj in page.get("Contents") or []:
                 obj_key = obj["Key"]
                 if obj_key == prefix or obj_key.endswith("/"):
@@ -158,7 +172,46 @@ class AwsEmrClusterUtils:
                     continue
                 name = rel
                 full_uri = f"s3://{bucket}/{obj_key}"
-                entries.append(FsListEntry(path=full_uri, name=name, is_dir=False))
+                file_entries.append(
+                    FsListEntry(
+                        path=full_uri,
+                        name=name,
+                        size=obj.get("Size", 0),
+                        modificationTime=_epoch_ms(obj.get("LastModified")),
+                    )
+                )
+
+        dir_mtime: dict[str, Optional[datetime]] = {p: None for p in dir_names}
+        if dir_names:
+            for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+                for obj in page.get("Contents") or []:
+                    obj_key = obj["Key"]
+                    if obj_key == prefix:
+                        continue
+                    rel = obj_key[len(prefix) :] if prefix else obj_key
+                    if not rel or "/" not in rel:
+                        continue
+                    child_prefix = prefix + rel.split("/", 1)[0] + "/"
+                    if child_prefix not in dir_mtime:
+                        continue
+                    lm = obj.get("LastModified")
+                    if lm is None:
+                        continue
+                    prev = dir_mtime[child_prefix]
+                    if prev is None or lm > prev:
+                        dir_mtime[child_prefix] = lm
+
+        entries: List[FsListEntry] = []
+        for child_prefix, name in sorted(dir_names.items(), key=lambda item: item[1]):
+            entries.append(
+                FsListEntry(
+                    path=f"s3://{bucket}/{child_prefix}",
+                    name=name,
+                    size=0,
+                    modificationTime=_epoch_ms(dir_mtime.get(child_prefix)),
+                )
+            )
+        entries.extend(file_entries)
         return entries
 
     def fs_head(self, path: str, max_bytes: int) -> str:

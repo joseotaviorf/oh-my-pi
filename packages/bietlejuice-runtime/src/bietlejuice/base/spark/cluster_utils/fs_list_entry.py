@@ -1,15 +1,23 @@
 """File-system list entry compatible with Databricks ``dbutils.fs.ls`` items."""
 
+from typing import NamedTuple
 
-class FsListEntry:
-    """Mimics Databricks ``FileInfo``: ``path``, ``name``, ``isDir()``."""
 
-    __slots__ = ("path", "name", "_is_dir")
+class FsListEntry(NamedTuple):
+    """Mirrors Databricks ``FileInfo``: ``path``, ``name``, ``size``, ``modificationTime``.
 
-    def __init__(self, path: str, name: str, is_dir: bool) -> None:
-        self.path = path
-        self.name = name
-        self._is_dir = is_dir
+    A ``NamedTuple`` (not a ``__slots__`` class) so ``spark.createDataFrame(dbutils.fs.ls(...))``
+    infers a schema on EMR exactly as it does on Databricks.
+    """
+
+    path: str
+    name: str
+    size: int
+    modificationTime: int
 
     def isDir(self) -> bool:
-        return self._is_dir
+        # Both listers append "/" to directory names, matching Databricks.
+        return self.name.endswith("/")
+
+    def isFile(self) -> bool:
+        return not self.isDir()
