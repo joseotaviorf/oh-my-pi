@@ -1,18 +1,18 @@
 WITH tracking AS (
   SELECT
     id_anonymous AS id_device,
-    user_properties:egw_referrer_domain AS referrer_domain,
-    user_properties:egw_referrer_entrance_uri AS entrance_uri,
+    GET_JSON_OBJECT(user_properties, '$.egw_referrer_domain') AS referrer_domain,
+    GET_JSON_OBJECT(user_properties, '$.egw_referrer_entrance_uri') AS entrance_uri,
     egw_last_attribution_time AS ts_utm_attribution,
-    from_unixtime(user_properties:egw_referrer_ts / 1000) AS ts_referral_attribution,
+    FROM_UNIXTIME(CAST(GET_JSON_OBJECT(user_properties, '$.egw_referrer_ts') AS BIGINT) / 1000) AS ts_referral_attribution,
 
     -- UTM Medium
     CASE
       WHEN ts_utm_attribution >= ts_referral_attribution THEN egw_utm_medium
       WHEN ts_referral_attribution IS NULL THEN egw_utm_medium
-      WHEN referrer_domain LIKE ANY ('%google%', '%bing%', '%yahoo%') THEN 'seo'
-      WHEN referrer_domain LIKE ANY ('%chatgpt.%', '%gemini.%', '%copilot.%', '%perplexity.%') THEN 'llm'
-      WHEN referrer_domain LIKE ANY ('%claude.%', '%you.com%', '%poe.com%', '%deepseek.%') THEN 'other_llm'
+      WHEN EXISTS(ARRAY('%google%', '%bing%', '%yahoo%'), pattern -> referrer_domain LIKE pattern) THEN 'seo'
+      WHEN EXISTS(ARRAY('%chatgpt.%', '%gemini.%', '%copilot.%', '%perplexity.%'), pattern -> referrer_domain LIKE pattern) THEN 'llm'
+      WHEN EXISTS(ARRAY('%claude.%', '%you.com%', '%poe.com%', '%deepseek.%'), pattern -> referrer_domain LIKE pattern) THEN 'other_llm'
     END AS utm_medium,
 
     -- UTM Source
@@ -66,6 +66,23 @@ WITH tracking AS (
   WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
+latest_tracking_by_device AS (
+  SELECT
+    id_device,
+    utm_medium,
+    utm_source,
+    utm_campaign,
+    utm_content,
+    utm_term,
+    utm_hash,
+    ts_utm_attribution_start AS ts_tracking,
+    ROW_NUMBER() OVER (
+      PARTITION BY id_device
+      ORDER BY ts_utm_attribution_start DESC
+    ) AS row_number
+  FROM datalake_attribution.tracking_by_device
+  WHERE id_device IN (SELECT DISTINCT id_device FROM tracking)
+),
 tracking_by_device_union AS (
   SELECT
     id_device,
@@ -117,14 +134,20 @@ tracking_by_device_union AS (
     utm_content,
     utm_term,
     utm_hash,
-    ts_utm_attribution_start AS ts_tracking
-  FROM datalake_attribution.tracking_by_device
-  WHERE id_device IN (SELECT DISTINCT id_device FROM tracking)
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_device ORDER BY ts_utm_attribution_start DESC) = 1
+    ts_tracking
+  FROM latest_tracking_by_device
+  WHERE row_number = 1
 ),
 groups_identification AS (
   SELECT
-    *,
+    id_device,
+    utm_medium,
+    utm_source,
+    utm_campaign,
+    utm_content,
+    utm_term,
+    utm_hash,
+    ts_tracking,
     CASE
       WHEN LAG(utm_hash) OVER (PARTITION BY id_device ORDER BY ts_tracking ASC) = utm_hash THEN 0
       ELSE 1
@@ -133,7 +156,15 @@ groups_identification AS (
 ),
 groups AS (
   SELECT
-    *,
+    id_device,
+    utm_medium,
+    utm_source,
+    utm_campaign,
+    utm_content,
+    utm_term,
+    utm_hash,
+    ts_tracking,
+    is_new_group,
     SUM(is_new_group) OVER (PARTITION BY id_device ORDER BY ts_tracking ASC) AS group_id
   FROM groups_identification
 )

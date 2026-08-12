@@ -1,11 +1,11 @@
 WITH lead_base AS (
   SELECT
     house_lead.id_lead_ebdb AS id_lead,
-    house_lead.ts_created as ts_created,
-    acquisition_misc_data.acquisition_campaign:deviceId AS root_id_device,
+    house_lead.ts_created AS ts_created,
+    GET_JSON_OBJECT(acquisition_misc_data.acquisition_campaign, '$.deviceId') AS root_id_device,
     -- It's necessary to use COALESCE to handle the case where the linked_devices array is null and results
     -- in no lines instead of a line with a null id_device
-    EXPLODE(FROM_JSON(COALESCE(acquisition_misc_data.acquisition_campaign:profileTracking:linked_devices, '[null]'), 'ARRAY<STRING>')) AS id_device
+    EXPLODE(FROM_JSON(COALESCE(GET_JSON_OBJECT(acquisition_misc_data.acquisition_campaign, '$.profileTracking.linked_devices'), '[null]'), 'ARRAY<STRING>')) AS id_device
   FROM
     datalake_rene_descartes_clean.house_lead AS house_lead
   INNER JOIN
@@ -30,24 +30,38 @@ lead_devices AS (
     root_id_device AS id_device
   FROM lead_base
   WHERE root_id_device IS NOT NULL
+),
+ranked_attribution AS (
+  SELECT
+    lead_devices.id_lead,
+    tracking.id_device,
+    tracking.utm_source,
+    tracking.utm_medium,
+    tracking.utm_campaign,
+    tracking.utm_content,
+    tracking.utm_term,
+    tracking.ts_utm_attribution_start,
+    tracking.ts_utm_attribution_end,
+    ROW_NUMBER() OVER (
+      PARTITION BY lead_devices.id_lead
+      ORDER BY tracking.ts_utm_attribution_start DESC
+    ) AS row_number
+  FROM lead_devices
+    INNER JOIN datalake_attribution.tracking_by_device AS tracking
+      ON tracking.id_device = lead_devices.id_device
+      AND tracking.ts_utm_attribution_start <= lead_devices.ts_created
 )
 SELECT
-  lead_devices.id_lead,
-  tracking.id_device,
-  tracking.utm_source,
-  tracking.utm_medium,
-  tracking.utm_campaign,
-  tracking.utm_content,
-  tracking.utm_term,
-  tracking.ts_utm_attribution_start,
-  tracking.ts_utm_attribution_end
+  id_lead,
+  id_device,
+  utm_source,
+  utm_medium,
+  utm_campaign,
+  utm_content,
+  utm_term,
+  ts_utm_attribution_start,
+  ts_utm_attribution_end
 FROM
-  lead_devices
-INNER JOIN
-  datalake_attribution.tracking_by_device AS tracking
-    ON tracking.id_device = lead_devices.id_device AND tracking.ts_utm_attribution_start <= lead_devices.ts_created
-QUALIFY
-  ROW_NUMBER() OVER (
-    PARTITION BY lead_devices.id_lead
-    ORDER BY tracking.ts_utm_attribution_start DESC
-  ) = 1
+  ranked_attribution
+WHERE
+  row_number = 1
