@@ -623,7 +623,7 @@ def test_create_python_dag_bundles_stable_ids_and_file_resolution(
     }
 
 
-def test_create_python_dag_bundles_reports_all_build_failures(
+def test_create_python_dag_bundles_quarantines_build_failures(
     create_dag_files_mod, monkeypatch, tmp_path
 ):
     dags_root = tmp_path / "dags"
@@ -641,9 +641,13 @@ def test_create_python_dag_bundles_reports_all_build_failures(
     assert len(bundles) == 1
     dagbag = DagBag(dag_folder=bundles[0], include_examples=False, safe_mode=False)
 
-    error = next(iter(dagbag.import_errors.values()))
-    assert "migration_twin_broken_a" in error
-    assert "migration_twin_broken_b" in error
+    assert not dagbag.import_errors, dagbag.import_errors
+    assert set(dagbag.dags) == {
+        "migration_twin_broken_a",
+        "migration_twin_broken_b",
+    }
+    assert "broken-dag" in dagbag.dags["migration_twin_broken_a"].tags
+    assert "broken-dag" in dagbag.dags["migration_twin_broken_b"].tags
 
 
 def test_python_bundle_template_keeps_dagbag_safe_mode_tokens():

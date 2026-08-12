@@ -10,10 +10,15 @@ Airflow DagBag safe-mode still discovers it.
 """
 
 import logging
+import traceback
+from datetime import datetime
 from pathlib import Path
 from types import ModuleType
 
-from airflow.models.dag import DAG  # noqa: F401 — DagBag safe-mode + isinstance
+from airflow.models.dag import DAG
+from airflow.operators.python import PythonOperator
+
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 
 _LOG = logging.getLogger(__name__)
 
@@ -21,6 +26,33 @@ _LOG = logging.getLogger(__name__)
 _DAGS_ROOT = Path(__file__).resolve().parents[2]
 
 _DAG_RELPATHS = __DAG_RELPATHS__  # noqa: F821 — replaced by codegen
+
+QUARANTINE_TAG = "broken-dag"
+
+
+def _raise_build_error(error_text):
+    raise RuntimeError(error_text)
+
+
+def _quarantine_dag(dag_id, error_text, domain):
+    """Placeholder DAG so a failed build stays visible instead of vanishing from the UI."""
+    dag = DAG(
+        dag_id=dag_id,
+        schedule=None,
+        start_date=datetime(2023, 1, 1),
+        catchup=False,
+        is_paused_upon_creation=False,
+        default_args={"owner": DAGOwnerEnum.DATA_PLATFORM},
+        tags=[QUARANTINE_TAG, domain],
+        doc_md=f"**This DAG failed to build.**\n\n```\n{error_text}\n```",
+    )
+    PythonOperator(
+        task_id="broken-dag",
+        dag=dag,
+        python_callable=_raise_build_error,
+        op_kwargs={"error_text": error_text},
+    )
+    return dag
 
 
 def _load_dag_module(relpath: str) -> ModuleType:
@@ -34,7 +66,6 @@ def _load_dag_module(relpath: str) -> ModuleType:
     return module
 
 
-_errors = []
 _dag_index = 0
 for _relpath in _DAG_RELPATHS:
     try:
@@ -43,12 +74,13 @@ for _relpath in _DAG_RELPATHS:
             if isinstance(_attr_value, DAG):
                 globals()[f"dag_{_dag_index:03d}"] = _attr_value
                 _dag_index += 1
-    except Exception as _exc:  # noqa: BLE001 — report every broken DAG in the batch
+    except Exception as _exc:  # noqa: BLE001 — quarantine, never fail the batch
         _LOG.exception("Bundled Python DAG build failed: %s", _relpath)
-        _errors.append(f"{_relpath}: {type(_exc).__name__}: {_exc}")
-
-if _errors:
-    raise ImportError(
-        "Bundled Python DAG module failed to build "
-        f"{len(_errors)} DAG(s): {'; '.join(_errors)}"
-    )
+        _quarantine_id = Path(_relpath).stem.removesuffix("_dag")
+        _quarantine_domain = Path(_relpath).parts[0]
+        globals()[f"dag_{_dag_index:03d}"] = _quarantine_dag(
+            _quarantine_id,
+            f"{_relpath}: {type(_exc).__name__}: {_exc}\n\n{traceback.format_exc()}",
+            _quarantine_domain,
+        )
+        _dag_index += 1
