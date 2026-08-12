@@ -11,4 +11,4 @@ workflow:
   layer: enrich
   default_extraction_type: incremental
   default_partitions: [year, month, day]
-  has_hive_sync: false
+  has_hive_sync: true
