@@ -21,7 +21,7 @@ WITH invoice_closing_date AS (
     GROUP BY 1, 2, 3
 ),
 
-rent_at_closing_moment AS (
+rent_at_closing_moment_ranked AS (
     SELECT
         ca.id_contract,
         ca.rent,
@@ -49,12 +49,28 @@ rent_at_closing_moment AS (
             ON dt.sk_contract = ca.id_contract
     WHERE
         TIMESTAMP(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))) <= dt.ts_created
-    AND
-        CAST(YEAR(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))) || LPAD(MONTH(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))), 2, '0') AS INTEGER) <=  CAST(dt.invoice_accrual_year_month AS INTEGER)
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY ca.id_contract, dt.invoice_accrual_year_month ORDER BY rev DESC) = 1
+        AND CAST(YEAR(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))) || LPAD(MONTH(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))), 2, '0') AS INTEGER) <= CAST(dt.invoice_accrual_year_month AS INTEGER)
 ),
-
+rent_at_closing_moment AS (
+    SELECT
+        id_contract,
+        rent,
+        ts_invoice_created,
+        rev_accrual_year_month,
+        invoice_accrual_year_month,
+        invoice_year,
+        invoice_month,
+        dt_started,
+        dt_year_started,
+        dt_month_started,
+        dt_day_started,
+        dt_ended,
+        rn
+    FROM
+        rent_at_closing_moment_ranked
+    WHERE
+        rn = 1
+),
 rent_at_closing_moment_2 AS (
     SELECT
         id_contract,
@@ -112,7 +128,7 @@ rent_at_closing_moment_3 AS (
         rent_at_closing_moment_2
 ),
 
-adm_at_closing_moment AS (
+adm_at_closing_moment_ranked AS (
     SELECT
         ca.id,
         dt_started,
@@ -123,7 +139,8 @@ adm_at_closing_moment AS (
         ROUND(ca.monthly_administration_fee, 4) AS standard_administration_fee,
         COALESCE(ca.minimum_fee_value, 0.00) AS minimum_fee_value,
         ROUND(ca.promotional_adm_fee, 4) AS promotional_adm_fee,
-        IF(CAST(LEFT(REPLACE(ADD_MONTHS(dt.dt_started, ca.promotional_period), '-', ''), 6) AS INTEGER) >= invoice_accrual_year_month AND ca.promotional_period > 0, ROUND(ca.promotional_adm_fee, 4), ROUND(ca.monthly_administration_fee, 4)) AS monthly_administration_fee
+        IF(CAST(LEFT(REPLACE(ADD_MONTHS(dt.dt_started, ca.promotional_period), '-', ''), 6) AS INTEGER) >= invoice_accrual_year_month AND ca.promotional_period > 0, ROUND(ca.promotional_adm_fee, 4), ROUND(ca.monthly_administration_fee, 4)) AS monthly_administration_fee,
+        ROW_NUMBER() OVER (PARTITION BY ca.id, invoice_accrual_year_month ORDER BY rev DESC) AS rn
     FROM
         datalake_ebdb_clean.full_contract_aud AS ca
     LEFT JOIN
@@ -134,8 +151,23 @@ adm_at_closing_moment AS (
             ON dt.sk_contract = ca.id
     WHERE
         TIMESTAMP(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))) <= dt.ts_created
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY ca.id, invoice_accrual_year_month ORDER BY rev DESC) = 1
+),
+adm_at_closing_moment AS (
+    SELECT
+        id,
+        dt_started,
+        promotional_period,
+        accrual_promotional_ended,
+        invoice_accrual_year_month,
+        adm_fee_charge_type,
+        standard_administration_fee,
+        minimum_fee_value,
+        promotional_adm_fee,
+        monthly_administration_fee
+    FROM
+        adm_at_closing_moment_ranked
+    WHERE
+        rn = 1
 ),
 
 df AS (

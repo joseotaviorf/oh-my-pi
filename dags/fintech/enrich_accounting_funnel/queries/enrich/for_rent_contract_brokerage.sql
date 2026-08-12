@@ -20,28 +20,36 @@ contract_partnership_data AS (
     GROUP BY 1,2
 ),
 
+first_rent_from_contract_ranked AS (
+    SELECT
+        id_contract,
+        rent,
+        ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY rev) AS rn
+    FROM
+        datalake_ebdb_clean.contract_aud
+    WHERE
+        mod_ts_signed IS TRUE
+),
 first_rent_from_contract AS (
     SELECT
         id_contract,
         rent
-    FROM 
-        datalake_ebdb_clean.contract_aud
-    WHERE 
-      mod_ts_signed IS TRUE
-    QUALIFY 
-        ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY rev) = 1
+    FROM
+        first_rent_from_contract_ranked
+    WHERE
+        rn = 1
 ),
 
 dt_brokerage_share_from_contract AS (
       SELECT
         sk_contract,
         MIN(invoice_created_date) AS invoice_created_date
-    FROM 
+    FROM
         datalake_accounting_funnel.invoice_all
     WHERE (
-        (bill_item IN ('brokerage partner select', 'brokerage partner select postponed', 'brokerage third party real estate', 'brokerage third party real estate postponed')) OR 
-        (bill_item IN ('brokerage adm partner', 'brokerage adm partner postponed') AND LOWER(description) LIKE '%consultor imobiliário%') OR 
-        (bill_item IN ('brokerage estate agent', 'brokerage estate agent postponed')) OR 
+        (bill_item IN ('brokerage partner select', 'brokerage partner select postponed', 'brokerage third party real estate', 'brokerage third party real estate postponed')) OR
+        (bill_item IN ('brokerage adm partner', 'brokerage adm partner postponed') AND LOWER(description) LIKE '%consultor imobiliário%') OR
+        (bill_item IN ('brokerage estate agent', 'brokerage estate agent postponed')) OR
         (bill_item IN ('brokerage quinto andar', 'brokerage quinto andar postponed', 'brokerage installment'))
     )
     AND status != 'canceled'
@@ -51,10 +59,11 @@ dt_brokerage_share_from_contract AS (
 GROUP BY 1
 ),
 
-brokerage_share_from_contract_at_signature AS (
+brokerage_share_from_contract_at_signature_ranked AS (
     SELECT
         bsh.id_contract,
-        bsh.agent_brokerage_share
+        bsh.agent_brokerage_share,
+        ROW_NUMBER() OVER (PARTITION BY bsh.id_contract ORDER BY bsh.id_revision DESC) AS rn
     FROM
         datalake_big_agent.brokerage_share_history AS bsh
     LEFT JOIN
@@ -62,8 +71,15 @@ brokerage_share_from_contract_at_signature AS (
             ON dt.sk_contract = bsh.id_contract
     WHERE
         DATE(bsh.ts_revision) <= DATE(dt.invoice_created_date)
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY bsh.id_contract ORDER BY bsh.id_revision DESC) = 1
+),
+brokerage_share_from_contract_at_signature AS (
+    SELECT
+        id_contract,
+        agent_brokerage_share
+    FROM
+        brokerage_share_from_contract_at_signature_ranked
+    WHERE
+        rn = 1
 ),
 
 agents_by_contract AS (
@@ -88,7 +104,7 @@ agents_by_contract AS (
 df AS (
     SELECT
         c.id AS id_contract,
-        contract_rent_model:rentalAdministrator AS rental_administrator,
+        GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator') AS rental_administrator,
         ROUND(f_rent.rent,2) AS rent,
         c.fist_rent_comission_fee AS first_rent_commission_fee,
         CASE
@@ -96,18 +112,18 @@ df AS (
             WHEN a.num_agents = 1 THEN NULLIF(brokerage_aud.agent_brokerage_share, 0.00)
             WHEN a.num_agents > 1 THEN 0.20
         END AS agent_brokerage_share,
-        NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', NULL, p.brokerage_split_percentage), 0.00) AS ciq_brokerage_share,
-        NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', NULL, pp.brokerage_split_percentage), 0.00) AS select_brokerage_share,
-        NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', 0.5, NULL), 0) AS 3p_brokerage_share,
+        NULLIF(IF(GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator') = 'THIRD_PARTY', NULL, p.brokerage_split_percentage), 0.00) AS ciq_brokerage_share,
+        NULLIF(IF(GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator') = 'THIRD_PARTY', NULL, pp.brokerage_split_percentage), 0.00) AS select_brokerage_share,
+        NULLIF(IF(GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator') = 'THIRD_PARTY', 0.5, NULL), 0) AS 3p_brokerage_share,
         NULLIF(f_rent.rent *
         (CASE
             WHEN a.num_agents = 0 THEN 0.00
             WHEN a.num_agents = 1 THEN brokerage_aud.agent_brokerage_share
             WHEN a.num_agents > 1 THEN 0.20
         END), 0.00) AS agent_brokerage_amount,
-        NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', NULL, f_rent.rent * c.fist_rent_comission_fee * p.brokerage_split_percentage), 0.00) AS ciq_brokerage_amount,
-        NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', NULL, f_rent.rent * c.fist_rent_comission_fee * pp.brokerage_split_percentage), 0.00) AS select_brokerage_amount,
-        NULLIF(f_rent.rent * c.fist_rent_comission_fee * IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', 0.5, NULL), 0) AS 3p_brokerage_amount,
+        NULLIF(IF(GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator') = 'THIRD_PARTY', NULL, f_rent.rent * c.fist_rent_comission_fee * p.brokerage_split_percentage), 0.00) AS ciq_brokerage_amount,
+        NULLIF(IF(GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator') = 'THIRD_PARTY', NULL, f_rent.rent * c.fist_rent_comission_fee * pp.brokerage_split_percentage), 0.00) AS select_brokerage_amount,
+        NULLIF(f_rent.rent * c.fist_rent_comission_fee * IF(GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator') = 'THIRD_PARTY', 0.5, NULL), 0) AS 3p_brokerage_amount,
         c.dt_started AS dt_contract_started,
         c.dt_termination AS dt_contract_annulment
     FROM 
