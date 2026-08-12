@@ -39,47 +39,9 @@ validation_fields AS (
         day
     FROM
         get_validations AS gv
-),
-validation_keys AS (
-    SELECT
-        MD5(CONCAT(id_dag, database, table, validation_level, column, validation_type)) AS id_data_quality,
-        id_dag,
-        database,
-        table,
-        validation_level,
-        column,
-        validation_type,
-        validation_result,
-        validation_status,
-        table_status,
-        ts_execution_utc,
-        ts_execution_brt,
-        dt_executed,
-        year,
-        month,
-        day
-    FROM
-        validation_fields
-),
-prior_day_validations AS (
-    -- Static partition pre-filter so EMR Spark 3.5 prunes to the prior-day
-    -- partitions instead of full-scanning the whole output history. The join's
-    -- MAKE_DATE(v...) = DATE_SUB(MAKE_DATE(vf...), 1) restriction only ever
-    -- matches v dates in [load_start_date - 1, load_end_date - 1], so this
-    -- range is exact and the LEFT JOIN result is unchanged.
-    SELECT
-        id_data_quality,
-        consecutive_failure_days,
-        year,
-        month,
-        day
-    FROM
-        datalake_data_quality.validations
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{load_start_date}'), 1) AND DATE_SUB(DATE('{load_end_date}'), 1)
 )
 SELECT
-    vf.id_data_quality,
+    MD5(CONCAT(vf.id_dag, vf.database, vf.table, vf.validation_level, vf.column, vf.validation_type)) AS id_data_quality,
     vf.id_dag,
     vf.database,
     vf.table,
@@ -97,8 +59,8 @@ SELECT
     vf.month,
     vf.day
 FROM
-    validation_keys AS vf
+    validation_fields AS vf
 LEFT JOIN
-    prior_day_validations AS v
-        ON v.id_data_quality = vf.id_data_quality
+    datalake_data_quality.validations AS v
+        ON v.id_data_quality = MD5(CONCAT(vf.id_dag, vf.database, vf.table, vf.validation_level, vf.column, vf.validation_type))
         AND MAKE_DATE(v.year, v.month, v.day) = DATE_SUB(MAKE_DATE(vf.year, vf.month, vf.day), 1)
