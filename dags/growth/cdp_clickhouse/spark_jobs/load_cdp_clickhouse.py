@@ -27,19 +27,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def _iter_ingest_hours(start_time: datetime, end_time: datetime):
-    """Yield UTC hour buckets for [start_time, end_time) based on _ingested_at."""
-    current = start_time.replace(minute=0, second=0, microsecond=0)
-    while current < end_time:
-        yield current
-        current += timedelta(hours=1)
-
-
 def trigger_insert_into_clickhouse_procedure(
     database_name: str,
     table_name: str,
     clickhouse_incremental_column: str,
-    clickhouse_partition_column: str,
     target_path: str,
     role_arn: str,
     start_time: str,
@@ -71,12 +62,10 @@ def trigger_insert_into_clickhouse_procedure(
         toMonth({clickhouse_incremental_column})      AS month,
         toDayOfMonth({clickhouse_incremental_column}) AS day,
         toHour({clickhouse_incremental_column})       AS hour
-    FROM {database_name}.{table_name} FINAL
+    FROM {database_name}.{table_name}
     WHERE
         {clickhouse_incremental_column} >= '{start_time}'::TIMESTAMP
         AND {clickhouse_incremental_column} < '{end_time}'::TIMESTAMP
-        AND {clickhouse_partition_column} >= ('{start_time}'::TIMESTAMP - INTERVAL 1 DAY)
-        AND {clickhouse_partition_column} <= ('{end_time}'::TIMESTAMP + INTERVAL 3 HOUR)
     SETTINGS
         s3_truncate_on_insert = 1;
     """
@@ -145,7 +134,6 @@ if __name__ == "__main__":
     clickhouse_database = config.get_config("clickhouse_database")
     clickhouse_source_table = config.get_config("clickhouse_source_table")
     clickhouse_incremental_column = config.get_config("clickhouse_incremental_column")
-    clickhouse_partition_column = config.get_config("clickhouse_partition_column")
     target_path = config.get_config("target_path")
     source_path = config.get_config("source_path")
     s3_export_role_arn = config.get_config("s3_export_role_arn")
@@ -168,7 +156,6 @@ if __name__ == "__main__":
         f"clickhouse_database={clickhouse_database}, "
         f"clickhouse_source_table={clickhouse_source_table}, "
         f"clickhouse_incremental_column={clickhouse_incremental_column}, "
-        f"clickhouse_partition_column={clickhouse_partition_column}, "
         f"target_path={target_path}, "
         f"s3_export_role_arn={s3_export_role_arn}, "
         f"partition_columns={partition_columns}, "
@@ -207,7 +194,6 @@ if __name__ == "__main__":
         clickhouse_database,
         clickhouse_source_table,
         clickhouse_incremental_column,
-        clickhouse_partition_column,
         target_path,
         s3_export_role_arn,
         load_start_date,
@@ -220,7 +206,12 @@ if __name__ == "__main__":
     logger.info("loading data from s3...")
     start_time = datetime.strptime(load_start_date, "%Y-%m-%d %H:%M:%S")
     end_time = datetime.strptime(load_end_date, "%Y-%m-%d %H:%M:%S")
-    ingest_hours = list(_iter_ingest_hours(start_time, end_time))
+    start_hour = start_time.replace(minute=0, second=0, microsecond=0)
+    ingest_hours = [
+        start_hour + timedelta(hours=i)
+        for i in range(int((end_time - start_hour).total_seconds() // 3600) + 1)
+        if start_hour + timedelta(hours=i) < end_time
+    ]
 
     spark_client = SparkClient()
     spark = spark_client.conn
