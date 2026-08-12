@@ -41,4 +41,5 @@ workflow:
     customer_contacts_session: {}
     backlog_metrics_salesforce: {}
     segments_perspective: {}
+    satisfaction_salesforce: {}
 
