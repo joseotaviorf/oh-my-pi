@@ -40,6 +40,12 @@ from bietlejuice.services.metastore_services import MetastoreServiceFactory
 JOB_NAME = "load_hubspot_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
+for _noisy_logger in (
+    "urllib3",
+    "requests",
+    "quintoandar_hubspot_api_client",
+):
+    logging.getLogger(_noisy_logger).setLevel(logging.WARNING)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
