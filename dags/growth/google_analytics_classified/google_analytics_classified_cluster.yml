@@ -26,6 +26,9 @@ cluster:
 validation:
   cluster:
     type: emr_7_12_consolidation_s_memory_fleet_cluster
+    custom_libraries:
+    - maven:
+        coordinates: com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.43.0
     custom_configurations:
       task_nodes:
         instance_types:
