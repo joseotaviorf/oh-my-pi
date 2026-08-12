@@ -60,6 +60,7 @@ columns:
     description: Running count of notifications already sent at the assigned intent tier for message cadence control.
     lineage:
       - datalake_jaiminho_clean.user_notifications.action
+      - datalake_cdp_clean.transactional.event_properties
   is_confirmed_1_visit:
     description: Flag indicating the user has exactly one visit confirmed for the next calendar day.
     lineage:
@@ -68,14 +69,19 @@ columns:
     description: Whether a low-intent concierge WhatsApp template was sent to the user in the last seven days.
     lineage:
       - datalake_jaiminho_clean.user_notifications.action
+      - datalake_jaiminho_clean.user_notifications.ts_sent
   is_received_med_msg_7_days:
-    description: Whether a medium-intent concierge WhatsApp template was sent to the user in the last seven days.
+    description: Whether a medium-intent concierge notification was sent or a primary-market trigger was successfully processed in the last seven days.
     lineage:
       - datalake_jaiminho_clean.user_notifications.action
+      - datalake_jaiminho_clean.user_notifications.ts_sent
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.ts_event
   is_received_high_msg_7_days:
     description: Whether a high-intent concierge WhatsApp template was sent to the user in the last seven days.
     lineage:
       - datalake_jaiminho_clean.user_notifications.action
+      - datalake_jaiminho_clean.user_notifications.ts_sent
   is_favourited_scheduled_lpv:
     description: Whether the user triggered a medium-intent signal yesterday (LPV, favorite, schedule page, or direct offer).
     lineage:

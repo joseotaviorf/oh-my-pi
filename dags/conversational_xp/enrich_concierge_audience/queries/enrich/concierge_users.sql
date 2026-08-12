@@ -178,31 +178,71 @@ concierge_action_whatsapp AS (
   SELECT action FROM concierge_action_high
 ),
 
-jaiminho as (
+jaiminho_notification_events AS (
   SELECT
     id_user,
-    MAX(CASE WHEN TO_DATE(ts_sent) > DATE_SUB(current_date, 7)
-        AND action IN (SELECT action FROM concierge_action_low)
-        THEN 1 ELSE 0 END) received_low_msg_7_days,
-    MAX(CASE WHEN TO_DATE(ts_sent) > DATE_SUB(current_date, 7)
-        AND action IN (SELECT action FROM concierge_action_med)
-        THEN 1 ELSE 0 END) received_med_msg_7_days,
-    MAX(CASE WHEN TO_DATE(ts_sent) > DATE_SUB(current_date, 7)
-        AND action IN (SELECT action FROM concierge_action_high)
-        THEN 1 ELSE 0 END) received_high_msg_7_days,
-    SUM(CASE WHEN action IN (SELECT action FROM concierge_action_low)
-        THEN 1 ELSE 0 END) low_notifications,
-    SUM(CASE WHEN action IN (SELECT action FROM concierge_action_med)
-        THEN 1 ELSE 0 END) med_notifications,
-    SUM(CASE WHEN action IN (SELECT action FROM concierge_action_high)
-        THEN 1 ELSE 0 END) high_notifications
-
+    CASE
+      WHEN action IN (SELECT action FROM concierge_action_low) THEN 'LOW'
+      WHEN action IN (SELECT action FROM concierge_action_med) THEN 'MEDIUM'
+      WHEN action IN (SELECT action FROM concierge_action_high) THEN 'HIGH'
+    END AS intent_tier,
+    ts_sent AS ts_event
   FROM datalake_jaiminho_clean.user_notifications
-
   WHERE UPPER(channel) = 'WHATSAPP'
     AND UPPER(status) IN ('READ', 'SENT', 'DELIVERED')
     AND action IN (SELECT action FROM concierge_action_whatsapp)
+    AND id_user IS NOT NULL
+),
 
+primary_market_trigger_success AS (
+  SELECT
+    id_user,
+    'MEDIUM' AS intent_tier,
+    ts_event
+  FROM datalake_cdp_clean.transactional
+  WHERE event_name = 'concierge_trigger_processed'
+    AND get_json_object(event_properties, '$.outcome') = 'SUCCESS'
+    AND UPPER(get_json_object(event_properties, '$.intent')) = 'TALK_TO_CONCIERGE_PRIMARY_MARKET'
+    AND id_user IS NOT NULL
+),
+
+concierge_notification_events AS (
+  SELECT
+    id_user,
+    intent_tier,
+    ts_event
+  FROM jaiminho_notification_events
+  UNION ALL
+  SELECT
+    id_user,
+    intent_tier,
+    ts_event
+  FROM primary_market_trigger_success
+),
+
+concierge_triggers AS (
+  SELECT
+    id_user,
+    MAX(CASE
+      WHEN TO_DATE(ts_event) > DATE_SUB(current_date, 7)
+        AND intent_tier = 'LOW'
+      THEN 1 ELSE 0
+    END) AS received_low_msg_7_days,
+    MAX(CASE
+      WHEN TO_DATE(ts_event) > DATE_SUB(current_date, 7)
+        AND intent_tier = 'MEDIUM'
+      THEN 1 ELSE 0
+    END) AS received_med_msg_7_days,
+    MAX(CASE
+      WHEN TO_DATE(ts_event) > DATE_SUB(current_date, 7)
+        AND intent_tier = 'HIGH'
+      THEN 1 ELSE 0
+    END) AS received_high_msg_7_days,
+    SUM(CASE WHEN intent_tier = 'LOW' THEN 1 ELSE 0 END) AS low_notifications,
+    SUM(CASE WHEN intent_tier = 'MEDIUM' THEN 1 ELSE 0 END) AS med_notifications,
+    SUM(CASE WHEN intent_tier = 'HIGH' THEN 1 ELSE 0 END) AS high_notifications
+  FROM concierge_notification_events
+  WHERE intent_tier IS NOT NULL
   GROUP BY
     id_user
 ),
@@ -568,33 +608,33 @@ SELECT
   COALESCE(tc.has_qualified_search_cluster, FALSE) AS has_qualified_search_cluster,
   CASE
     WHEN uss.snooze_status = 'ACTIVE' THEN 'NOT_CLASSIFIED'
-    WHEN j.received_high_msg_7_days = 1 THEN 'NOT_CLASSIFIED'
+    WHEN ct.received_high_msg_7_days = 1 THEN 'NOT_CLASSIFIED'
     WHEN uovh.confirmed_1_visit = 1 THEN 'HIGH'
-    WHEN j.received_med_msg_7_days = 1 THEN 'NOT_CLASSIFIED'
+    WHEN ct.received_med_msg_7_days = 1 THEN 'NOT_CLASSIFIED'
     WHEN fsle.favourited_scheduled_lpv = 1 THEN 'MEDIUM'
-    WHEN j.received_low_msg_7_days = 1 THEN 'NOT_CLASSIFIED'
-    WHEN j.low_notifications >= 4 AND COALESCE(urc.concierge_response, 0) = 0 AND COALESCE(cle.concierge_lpv, 0) = 0 THEN 'NOT_CLASSIFIED'
+    WHEN ct.received_low_msg_7_days = 1 THEN 'NOT_CLASSIFIED'
+    WHEN ct.low_notifications >= 4 AND COALESCE(urc.concierge_response, 0) = 0 AND COALESCE(cle.concierge_lpv, 0) = 0 THEN 'NOT_CLASSIFIED'
     WHEN uss.snooze_status = 'EXPIRED' AND sss.searches_since < 10 THEN 'NOT_CLASSIFIED'
     WHEN has_top_cluster = 1 THEN 'LOW'
     ELSE 'LOW'
     END AS intent,
   CASE
     WHEN uss.snooze_status = 'ACTIVE' THEN 'SNOOZE'
-    WHEN j.received_high_msg_7_days = 1 THEN 'HIGH_INTENT_MSG_RECEIVED'
+    WHEN ct.received_high_msg_7_days = 1 THEN 'HIGH_INTENT_MSG_RECEIVED'
     WHEN uovh.confirmed_1_visit = 1 THEN 'MEETS_CONDITIONS'
-    WHEN j.received_med_msg_7_days = 1 THEN 'MED_INTENT_MSG_RECEIVED'
+    WHEN ct.received_med_msg_7_days = 1 THEN 'MED_INTENT_MSG_RECEIVED'
     WHEN fsle.favourited_scheduled_lpv = 1 THEN 'MEETS_CONDITIONS'
-    WHEN j.received_low_msg_7_days = 1 THEN 'LOW_INTENT_MSG_RECEIVED'
-    WHEN j.low_notifications >= 4 AND COALESCE(urc.concierge_response, 0) = 0 AND COALESCE(cle.concierge_lpv, 0) = 0 THEN 'REPETITION_CONTROL'
+    WHEN ct.received_low_msg_7_days = 1 THEN 'LOW_INTENT_MSG_RECEIVED'
+    WHEN ct.low_notifications >= 4 AND COALESCE(urc.concierge_response, 0) = 0 AND COALESCE(cle.concierge_lpv, 0) = 0 THEN 'REPETITION_CONTROL'
     WHEN has_top_cluster = 1 THEN 'MEETS_CONDITIONS'
     WHEN uss.snooze_status = 'EXPIRED' AND sss.searches_since < 10 THEN 'LOW_SEARCHES_AFTER_SNOOZE'
     ELSE 'CATCH_ALL'
     END AS reason,
   CASE
     WHEN uss.snooze_status = 'ACTIVE' THEN NULL
-    WHEN j.received_high_msg_7_days = 1 THEN NULL
+    WHEN ct.received_high_msg_7_days = 1 THEN NULL
     WHEN uovh.confirmed_1_visit = 1 THEN NULL
-    WHEN j.received_med_msg_7_days = 1 THEN NULL
+    WHEN ct.received_med_msg_7_days = 1 THEN NULL
     WHEN fsle.favourited_scheduled_lpv = 1 THEN
       CASE fsle.intent_source
         WHEN 3 THEN 'DIRECT_OFFER'
@@ -606,26 +646,26 @@ SELECT
     ELSE NULL
   END AS medium_intent_reason,
   sss.searches_since,
-  j.low_notifications,
+  ct.low_notifications,
   CASE
-    WHEN j.received_high_msg_7_days = 1 THEN NULL
-    WHEN uovh.confirmed_1_visit = 1 THEN COALESCE(j.high_notifications,0)
-    WHEN j.received_med_msg_7_days = 1 THEN NULL
-    WHEN fsle.favourited_scheduled_lpv = 1 THEN COALESCE(j.med_notifications,0)
-    WHEN j.received_low_msg_7_days = 1 THEN NULL
-    WHEN j.low_notifications >= 4 AND COALESCE(urc.concierge_response, 0) = 0 AND COALESCE(cle.concierge_lpv, 0) = 0 THEN NULL
-    WHEN has_top_cluster = 1 THEN COALESCE(j.low_notifications,0)
-    ELSE COALESCE(j.low_notifications, 0)
+    WHEN ct.received_high_msg_7_days = 1 THEN NULL
+    WHEN uovh.confirmed_1_visit = 1 THEN COALESCE(ct.high_notifications, 0)
+    WHEN ct.received_med_msg_7_days = 1 THEN NULL
+    WHEN fsle.favourited_scheduled_lpv = 1 THEN COALESCE(ct.med_notifications, 0)
+    WHEN ct.received_low_msg_7_days = 1 THEN NULL
+    WHEN ct.low_notifications >= 4 AND COALESCE(urc.concierge_response, 0) = 0 AND COALESCE(cle.concierge_lpv, 0) = 0 THEN NULL
+    WHEN has_top_cluster = 1 THEN COALESCE(ct.low_notifications, 0)
+    ELSE COALESCE(ct.low_notifications, 0)
     END AS notification_count,
   uovh.confirmed_1_visit AS is_confirmed_1_visit,
-  j.received_low_msg_7_days AS is_received_low_msg_7_days,
-  j.received_med_msg_7_days AS is_received_med_msg_7_days,
-  j.received_high_msg_7_days AS is_received_high_msg_7_days,
+  ct.received_low_msg_7_days AS is_received_low_msg_7_days,
+  ct.received_med_msg_7_days AS is_received_med_msg_7_days,
+  ct.received_high_msg_7_days AS is_received_high_msg_7_days,
   fsle.favourited_scheduled_lpv AS is_favourited_scheduled_lpv,
   urc.concierge_response AS is_concierge_response,
   cle.concierge_lpv AS is_concierge_lpv,
   CASE WHEN
-    COALESCE(j.low_notifications, 0)+COALESCE(j.med_notifications, 0)+COALESCE(j.high_notifications, 0) > 0 THEN False
+    COALESCE(ct.low_notifications, 0) + COALESCE(ct.med_notifications, 0) + COALESCE(ct.high_notifications, 0) > 0 THEN False
     ELSE True
   END AS is_first_notification,
   current_timestamp() AS ts_created,
@@ -649,8 +689,8 @@ LEFT JOIN datalake_ebdb_clean.contract as c
 LEFT JOIN user_one_visit_house uovh
   ON uovh.id_user=b.id_user
   AND UPPER(b.business_context)=UPPER(uovh.business_context)
-LEFT JOIN jaiminho j
-  ON b.id_user = j.id_user
+LEFT JOIN concierge_triggers ct
+  ON b.id_user = ct.id_user
 LEFT JOIN favourite_schedule_lpv_events fsle
   ON b.id_user = fsle.id_user
   AND UPPER(b.business_context)=UPPER(fsle.business_context)
@@ -680,7 +720,7 @@ WHERE NOT (
   AND b.business_context IS NOT NULL
   AND (
     owvl.id_user IS NULL
-    OR (COALESCE(j.received_high_msg_7_days, 0) = 0 AND uovh.confirmed_1_visit = 1)
+    OR (COALESCE(ct.received_high_msg_7_days, 0) = 0 AND uovh.confirmed_1_visit = 1)
   )
   AND COALESCE(bu.blocked_notifications, 0) <= 0
   AND bc.uuid_person IS NULL
