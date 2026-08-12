@@ -293,14 +293,23 @@ def main() -> None:
                 )
         except Exception as exc:
             msg = str(exc)
-            if "Path does not exist" in msg or "PATH_NOT_FOUND" in msg:
+            # vocs-machina finalizes a (day, prompt) partition (part-0000.parquet +
+            # _SUCCESS) even when 0 verbatims matched that prompt that day, and Spark
+            # cannot infer a schema from a row-less/schema-less parquet
+            # (UNABLE_TO_INFER_SCHEMA). That is exactly as "no data" as a missing
+            # path, so it gets the same skip-and-continue treatment.
+            if (
+                "Path does not exist" in msg
+                or "PATH_NOT_FOUND" in msg
+                or "UNABLE_TO_INFER_SCHEMA" in msg
+            ):
                 logger.warning(
                     f"m=main, msg=No partition for date (expected on no-data days). "
                     f"uri={day_uri}"
                 )
                 continue
-            # Any other failure (auth, corruption, schema) is a real error: do
-            # not swallow it as "no data" — that would silently write nothing.
+            # Any other failure (auth, corruption) is a real error: do not
+            # swallow it as "no data" — that would silently write nothing.
             raise
 
         day_df = _prepare_day_df(raw_df, date_str)

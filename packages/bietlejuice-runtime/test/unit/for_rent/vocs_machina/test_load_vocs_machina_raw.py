@@ -372,6 +372,72 @@ def test_main_no_data_table_exists_skips_gracefully():
     spark_metastore_loader.update_metastore.assert_not_called()
 
 
+def test_main_zero_row_day_table_exists_skips_gracefully():
+    """Zero-row finalized partition (UNABLE_TO_INFER_SCHEMA) -> skip day, no raise."""
+    spark_client = MagicMock()
+    spark_client.conn.catalog.tableExists.return_value = True
+    s3_consumer = MagicMock()
+    s3_consumer.get_data_from_file.side_effect = Exception(
+        "[UNABLE_TO_INFER_SCHEMA] Unable to infer schema for Parquet. "
+        "It must be specified manually."
+    )
+    s3_loader = MagicMock()
+    spark_metastore_service = MagicMock()
+    spark_metastore_loader = MagicMock()
+
+    argv = [
+        "load_vocs_machina_raw",
+        "prod",
+        "prod-bucket",
+        "vocs_machina",
+        "s3://data-science.s3.data.quintoandar.com.br/post-contract/vocs-machina",
+        "2026-05-29",
+        "2026-05-29",
+        "vocs_machina",
+        "['year','month','day']",
+        "parquet",
+    ]
+
+    with (
+        patch("sys.argv", argv),
+        patch.object(
+            _job, "add_validation_target_args", side_effect=_add_validation_target_args
+        ),
+        patch.object(
+            _job,
+            "resolve_datalake_write_target",
+            return_value=(
+                "datalake_vocs_machina_raw",
+                "vocs_machina",
+                "s3://prod-bucket/prod/datalake_vocs_machina_raw/",
+            ),
+        ),
+        patch.object(
+            _job.DatalakeMetastoreService,
+            "get_db_info",
+            return_value={
+                "db_raw_databricks": "datalake_vocs_machina_raw",
+                "db_raw_path": "s3://prod-bucket/prod/datalake_vocs_machina_raw/",
+            },
+        ),
+        patch.object(_job, "SparkClient", return_value=spark_client),
+        patch.object(_job, "S3Consumer", return_value=s3_consumer),
+        patch.object(_job, "S3Loader", return_value=s3_loader),
+        patch.object(
+            _job,
+            "MetastoreServiceFactory",
+            create_loader_metastore_service=MagicMock(
+                return_value=spark_metastore_service
+            ),
+        ),
+        patch.object(_job, "SparkMetastoreLoader", return_value=spark_metastore_loader),
+    ):
+        _job.main()  # must not raise
+
+    s3_loader.load_df.assert_not_called()
+    spark_metastore_loader.update_metastore.assert_not_called()
+
+
 def test_main_reads_only_finalized_part_files():
     spark_client = MagicMock()
     s3_consumer = MagicMock()
