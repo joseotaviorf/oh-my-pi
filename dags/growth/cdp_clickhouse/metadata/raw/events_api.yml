@@ -2,11 +2,11 @@
 database_name: datalake_cdp_raw
 table_name: events_api
 description: |
-  Raw Delta mirror of the ClickHouse events_api table. Loaded incrementally every
-  hour by the cdp_clickhouse Spark job: ClickHouse exports Parquet to the
-  processed-data bucket per hourly partition, Spark overwrites matching raw Delta
-  partitions with replaceWhere. Source for datalake_cdp_clean transactional,
-  user_tracking and comms event tables.
+  Raw Delta mirror of CDP Event Gateway events. Forno loads from ClickHouse
+  forno.events_parsed; prod loads from default.events_api. The Spark job exports
+  Parquet to the processed-data bucket per ingest-hour partition (_ingested_at),
+  then overwrites matching raw Delta partitions. Source for datalake_cdp_clean
+  transactional, user_tracking and comms event tables.
 domain: Growth
 owner: marcio.gomes@quintoandar.com.br
 columns:

@@ -10,10 +10,7 @@ cluster:
     spark_conf:
       spark.sql.shuffle.partitions: '400'
       spark.dynamicAllocation.maxExecutors: '8'
-    init_scripts:
-      - s3:
-          destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_cdp.sh"
-        args:
-          - "{{ var.value.artifacts_bucket }}"
-          - "{{ var.value.databricks_s3_bucket }}"
-          - "{{ dag.dag_id }}"
+  custom_libraries:
+    - pypi:
+        package: clickhouse-connect>=0.7.0
+        no_deps: true

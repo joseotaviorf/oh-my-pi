@@ -1,8 +1,8 @@
 ---
 clickhouse_host: g9ppcunt0z.us-east-1.vpce.aws.clickhouse.cloud
 clickhouse_http_port: 8443
-clickhouse_database: default
-clickhouse_source_table: events_api
+clickhouse_database: cdp
+clickhouse_source_table: events_parsed
 clickhouse_incremental_column: _ingested_at
 clickhouse_partition_column: timestamp_dt
 target_path: https://5a-cdp-processed-data-prod.s3.us-east-1.amazonaws.com/repo/clean/events/{_partition_id}/data.parquet

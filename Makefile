@@ -435,9 +435,6 @@ upload-local-init-scripts:
 	@aws s3 cp $(COMPILER_SCRIPTS)/emr_custom_libraries.py \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/emr_custom_libraries.py \
 		--acl bucket-owner-full-control
-	@aws s3 cp $(COMPILER_SCRIPTS)/init_script_cdp.sh \
-		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/init_script_cdp.sh \
-		--acl bucket-owner-full-control
 	@aws s3 cp $(COMPILER_SCRIPTS)/init_script_anonymization.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/init_script_anonymization.sh \
 		--acl bucket-owner-full-control

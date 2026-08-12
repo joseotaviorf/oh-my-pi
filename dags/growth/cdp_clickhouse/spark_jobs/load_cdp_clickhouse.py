@@ -57,7 +57,22 @@ def trigger_insert_into_clickhouse_procedure(
         '/hour=', leftPad(toString(hour), 2, '0')
     )
     SELECT
-        *,
+        event_id,
+        user_id,
+        person_uuid,
+        egw_event_type,
+        application,
+        journey_step,
+        event_name,
+        event_properties,
+        user_properties,
+        timestamp,
+        egw_timestamp,
+        egw_updated_at,
+        _ingested_at,
+        enrichments,
+        house_id,
+        contract_id,
         toYear({clickhouse_incremental_column})       AS year,
         toMonth({clickhouse_incremental_column})      AS month,
         toDayOfMonth({clickhouse_incremental_column}) AS day,
