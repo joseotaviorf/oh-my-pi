@@ -1,0 +1,74 @@
+---
+database_name: datalake_tiktok_campaigns_clean
+table_name: tiktok_campaigns
+owner: caio.francisco@quintoandar.com.br
+domain: Growth
+description: |
+  TikTok ad audience metrics by day and province, sourced from the TikTok Business API
+  integrated report. Grain is one row per ad, stat date, and province.
+  Consumed by the Growth squad for paid media cost and reach analysis alongside other platforms.
+columns:
+  id_advertiser:
+    description: TikTok advertiser account identifier for the campaign row.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.advertiser_id
+  id_campaign:
+    description: TikTok campaign identifier associated with the ad group in the report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.campaign_id
+  id_adgroup:
+    description: TikTok ad group identifier at the report grain.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.adgroup_id
+  id_ad:
+    description: TikTok ad identifier at the report grain.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.ad_id
+  campaign_name:
+    description: Human-readable TikTok campaign name from the integrated report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.campaign_name
+  adgroup_name:
+    description: Human-readable TikTok ad group name from the integrated report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.adgroup_name
+  ad_name:
+    description: Human-readable TikTok ad name from the integrated report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.ad_name
+  id_province:
+    description: TikTok province or region identifier for audience breakdown in the report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.province_id
+  spend:
+    description: Media spend in account currency for the ad group on the stat date and province.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.spend
+  impressions:
+    description: Number of ad impressions served for the ad group on the stat date and province.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.impressions
+  reach:
+    description: Estimated unique users reached for the ad group on the stat date and province.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.reach
+  clicks:
+    description: Number of clicks on ads for the ad group on the stat date and province.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.clicks
+  dt_stat:
+    description: Calendar date of the TikTok audience metrics row (stat_time_day from the API).
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.dt_stat
+  year:
+    description: Year of the TikTok audience metrics row.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.year
+  month:
+    description: Month of the TikTok audience metrics row.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.month
+  day:
+    description: Day of the TikTok audience metrics row.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns.day

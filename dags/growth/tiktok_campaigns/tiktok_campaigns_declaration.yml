@@ -1,0 +1,27 @@
+dag:
+  name: tiktok_campaigns
+  owner: Data Growth
+  schedule_start_date: 2026, 1, 1
+  schedule_interval: "0 4 * * *"
+  documentation:
+    dag_purpose: |
+      TikTok Campaigns DAG retrieves QuintoAndar marketing campaign audience metrics from the
+      TikTok Business API integrated report endpoint (ad group level, by day and province).
+      Data is ingested into the raw layer and normalized in clean for downstream growth analytics.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_tiktok_campaigns_raw
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  tables_customization:
+    tiktok_campaigns: {}

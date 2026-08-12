@@ -1,0 +1,26 @@
+---
+table_name: tiktok_campaigns
+raw_partition_cols: ["year", "month", "day"]
+api_base_url: "https://business-api.tiktok.com"
+endpoint_path: "/open_api/v1.3/report/integrated/get/"
+advertiser_ids:
+  - "6959164232126480386"
+  - "7565961310706794513"
+report_type: AUDIENCE
+data_level: AUCTION_AD
+page_size: 1000
+dimensions:
+  - ad_id
+  - stat_time_day
+  - province_id
+metrics:
+  - campaign_name
+  - spend
+  - impressions
+  - reach
+  - clicks
+  - campaign_id
+  - adgroup_id
+  - adgroup_name
+  - ad_name
+  - advertiser_id
