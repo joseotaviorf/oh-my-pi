@@ -1,37 +1,17 @@
 WITH scr_data AS (
     SELECT
-        id,
-        cpf,
-        `rev_end`,
+        aud.id,
+        aud.cpf,
+        aud.`rev_end`,
         CASE
-            WHEN aud.attributes:analysis_output:scr.scr_data IS NULL THEN 0
+            WHEN GET_JSON_OBJECT(aud.attributes, '$.analysis_output.scr.scr_data') IS NULL THEN 0
             ELSE 1
         END AS has_scr_attributes,
-        explode_outer(FROM_JSON(raw_data:analysis_output:scr.scr_data,
-            'array<
-            struct<
-                source:string,
-                indirect_risk:double,
-                reference_date:string,
-                operation_count:double,
-                operation_items:array<struct<value:double,
-                domain:string,
-                modality:string,
-                submodality:string,
-                domain_group:string,
-                modality_description:string,
-                submodality_description:string,
-                linked_to_foreign_currency:string>>,
-                assumed_coobligation:string,
-                receive_coobligation:string,
-                start_relationship_date:string,
-                subjudice_operations_count:string,
-                subjudice_operations_value:string,
-                financial_institution_count:string,
-                disagreement_operations_count:string,
-                disagreement_operations_value:string
-            >
-            >')
+        explode_outer(
+            FROM_JSON(
+                GET_JSON_OBJECT(aud.raw_data, '$.analysis_output.scr.scr_data'),
+                'array<struct<\n                source:string,\n                indirect_risk:double,\n                reference_date:string,\n                operation_count:double,\n                operation_items:array<struct<\n                  value:double,\n                  domain:string,\n                  modality:string,\n                  submodality:string,\n                  domain_group:string,\n                  modality_description:string,\n                  submodality_description:string,\n                  linked_to_foreign_currency:string\n                >>,\n                assumed_coobligation:string,\n                receive_coobligation:string,\n                start_relationship_date:string,\n                subjudice_operations_count:string,\n                subjudice_operations_value:string,\n                financial_institution_count:string,\n                disagreement_operations_count:string,\n                disagreement_operations_value:string\n            >>'
+            )
         ) AS scr_data,
         aud.ts_created,
         rev.ts_created AS ts_updated
@@ -41,22 +21,41 @@ WITH scr_data AS (
         datalake_arquivo_confidencial_clean.rev_info AS rev
             ON rev.rev = aud.rev
     WHERE
-        integration_provider = 'QI_TECH_SCR'
+        aud.integration_provider = 'QI_TECH_SCR'
         AND aud.ts_created >= DATE('2022-09-01')
 ),
 mobs AS (
     SELECT
-        *,
-        ROW_NUMBER() OVER (PARTITION BY cpf, ts_created ORDER BY scr_data.reference_date DESC) AS mob
+        id,
+        cpf,
+        `rev_end`,
+        has_scr_attributes,
+        scr_data,
+        ts_created,
+        ts_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY cpf, ts_created
+            ORDER BY scr_data.reference_date DESC
+        ) AS mob
     FROM
         scr_data
 ),
 next_up AS (
-  SELECT
-    *,
-    LEAD(ts_updated) OVER (PARTITION BY cpf, mob ORDER BY ts_created) AS ts_next_updated
-  FROM
-    mobs
+    SELECT
+        id,
+        cpf,
+        `rev_end`,
+        has_scr_attributes,
+        scr_data,
+        ts_created,
+        ts_updated,
+        mob,
+        LEAD(ts_updated) OVER (
+            PARTITION BY cpf, mob
+            ORDER BY ts_created
+        ) AS ts_next_updated
+    FROM
+        mobs
 ),
 operation_items_exploded AS (
     SELECT
@@ -75,6 +74,8 @@ operation_items_exploded AS (
     FROM
         next_up
 )
+-- DISTINCT retained: explode can emit duplicate operation_items; dropping it
+-- changes volumetry. Window CTEs above use explicit columns to shrink shuffle.
 SELECT DISTINCT
     id,
     cpf,
@@ -87,7 +88,7 @@ SELECT DISTINCT
     dat.modality_description,
     dat.submodality_description,
     dat.linked_to_foreign_currency,
-    0.01*dat.value AS `value`,
+    0.01 * dat.value AS `value`,
     financial_institution_count,
     has_scr_attributes,
     reference_date,

@@ -1,6 +1,19 @@
 cluster:
-  type: consolidation_m_general_cluster
-  databricks_conn_id: databricks_new_env
+  # Name-map from consolidation_m_general → emr_7_12_consolidation_m_general_fleet.
+  # Static analysis (windows + double explode + pivot agg) + prior r7g override →
+  # memory fleet. +50% vs preset core count (2 → 3) for shuffle headroom.
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
-    num_workers: 3
-    driver_node_type_id: r7g.xlarge
+    core_nodes:
+      target_on_demand: 3
+      target_spot: 0
+      instance_types:
+        - r6g.2xlarge
+        - r7g.2xlarge
+        - r6i.2xlarge
+    spark_conf:
+      # Small pricing / rev dims — re-enable broadcast (fleet base sets -1).
+      spark.sql.autoBroadcastJoinThreshold: "104857600"
+      spark.sql.adaptive.autoBroadcastJoinThreshold: "104857600"
+      spark.sql.shuffle.partitions: "400"
+      spark.dynamicAllocation.maxExecutors: "12"
