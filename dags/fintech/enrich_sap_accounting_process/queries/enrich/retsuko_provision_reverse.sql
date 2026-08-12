@@ -132,6 +132,48 @@ sap_ledger AS (
         dt_reference >= DATE('2025-01-01')
         AND (account_number IN ('420021', '420022', '420023') 
             OR (account_number IN ('420037') AND dt_reference >= DATE('2026-09-01')))
+),
+
+-- Rewrite OR-join as UNION of equi-joins (anti-join keys). Keep unmatched SAP rows.
+sap_matched_to_retsuko AS (
+    SELECT DISTINCT
+        sl.id_business_entity,
+        sl.id_finance_entity,
+        sl.id_finance_entity_entry,
+        sl.hash,
+        sl.id_transaction,
+        sl.account_number,
+        sl.accrual_year_month,
+        TRUE AS is_matched
+    FROM
+        sap_ledger sl
+    LEFT JOIN
+        sap_gateway sg
+            ON sl.hash = sg.hash
+    LEFT JOIN
+        sap_entity se
+            ON se.id_sap_gateway_feature = sg.id_feature
+    INNER JOIN
+        retsuko r
+            ON COALESCE(se.id_finance_entity, sl.id_finance_entity_entry) = r.id_finance_entity_entry
+
+    UNION
+
+    SELECT DISTINCT
+        sl.id_business_entity,
+        sl.id_finance_entity,
+        sl.id_finance_entity_entry,
+        sl.hash,
+        sl.id_transaction,
+        sl.account_number,
+        sl.accrual_year_month,
+        TRUE AS is_matched
+    FROM
+        sap_ledger sl
+    INNER JOIN
+        retsuko r
+            ON sl.id_finance_entity = r.id_finance_entity
+            AND r.account_number = sl.account_number
 )
 
 SELECT
@@ -144,22 +186,22 @@ SELECT
     'S4' AS source_name,
     'provision' AS accounting_type,
     sl.account_number,
-    r.accounting_name,
+    CAST(NULL AS STRING) AS accounting_name,
     sl.accrual_year_month,
     'reverse straw failure' AS accounting_process_status,
     CASE
-        WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NULL THEN 'manual transaction'
-        WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
-        WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number or postponed entry'
+        WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NULL THEN 'manual transaction'
+        WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
+        WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number or postponed entry'
         ELSE NULL
     END AS error_description,
     FALSE AS is_completeness,
     FALSE AS is_correctness,
     FALSE AS is_temporality,
     FALSE AS is_compliance,
-    CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
+    CAST(NULL AS DECIMAL(12,2)) AS source_amount,
     CAST(sl.debit_credit AS DECIMAL(12,2)) AS sap_amount,
-    r.dt_source_trigger AS dt_source_trigger,
+    CAST(NULL AS DATE) AS dt_source_trigger,
     sl.dt_sap_created AS dt_sap_created,
     sl.dt_sap_reference AS dt_sap_reference,
     sl.dt_sap_reference AS dt_filter_end
@@ -172,8 +214,13 @@ LEFT JOIN
     sap_entity se
         ON se.id_sap_gateway_feature = sg.id_feature
 LEFT JOIN
-    retsuko r
-        ON COALESCE(se.id_finance_entity, sl.id_finance_entity_entry)  = r.id_finance_entity_entry
-        OR ((sl.id_finance_entity = r.id_finance_entity) AND (r.account_number = sl.account_number))
+    sap_matched_to_retsuko m
+        ON COALESCE(sl.id_business_entity, '') = COALESCE(m.id_business_entity, '')
+        AND COALESCE(sl.id_finance_entity, '') = COALESCE(m.id_finance_entity, '')
+        AND COALESCE(sl.id_finance_entity_entry, '') = COALESCE(m.id_finance_entity_entry, '')
+        AND COALESCE(sl.hash, '') = COALESCE(m.hash, '')
+        AND COALESCE(sl.id_transaction, '') = COALESCE(m.id_transaction, '')
+        AND COALESCE(sl.account_number, '') = COALESCE(m.account_number, '')
+        AND COALESCE(CAST(sl.accrual_year_month AS STRING), '') = COALESCE(CAST(m.accrual_year_month AS STRING), '')
 WHERE
-    r.id_finance_entity_entry IS NULL
+    m.is_matched IS NULL

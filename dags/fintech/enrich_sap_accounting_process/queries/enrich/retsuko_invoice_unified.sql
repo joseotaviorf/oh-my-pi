@@ -144,6 +144,46 @@ sap_ledger AS (
   GROUP BY 1, 2, 3
 ),
 
+-- Rewrite OR-join as UNION of equi-joins (retsuko → matched SAP ledger keys).
+retsuko_matched_sap_ledger AS (
+  SELECT DISTINCT
+    r.id_finance_entity_entry,
+    r.id_finance_entity,
+    r.account_number,
+    sl.id_external_payment,
+    sl.debit_credit,
+    sl.dt_sap_created,
+    sl.dt_sap_reference
+  FROM
+    retsuko r
+  LEFT JOIN
+    sap_entity se
+      ON r.id_finance_entity_entry = se.id_finance_entity
+  LEFT JOIN
+    sap_gateway sg
+      ON se.id_sap_gateway_feature = sg.id_feature
+  INNER JOIN
+    sap_ledger sl
+      ON sl.id_external_payment = sg.doc_entry
+
+  UNION
+
+  SELECT DISTINCT
+    r.id_finance_entity_entry,
+    r.id_finance_entity,
+    r.account_number,
+    sl.id_external_payment,
+    sl.debit_credit,
+    sl.dt_sap_created,
+    sl.dt_sap_reference
+  FROM
+    retsuko r
+  INNER JOIN
+    sap_ledger sl
+      ON r.account_number = sl.account_number
+      AND r.id_finance_entity = sl.id_finance_entity
+),
+
 errors_base AS (
   SELECT
     r.id_business_entity,
@@ -189,9 +229,10 @@ errors_base AS (
     sap_gateway sg
       ON se.id_sap_gateway_feature = sg.id_feature
   LEFT JOIN
-    sap_ledger sl
-      ON sl.id_external_payment = sg.doc_entry
-      OR ( r.account_number = sl.account_number AND r.id_finance_entity = sl.id_finance_entity)
+    retsuko_matched_sap_ledger sl
+      ON COALESCE(r.id_finance_entity_entry, '') = COALESCE(sl.id_finance_entity_entry, '')
+      AND COALESCE(r.id_finance_entity, '') = COALESCE(sl.id_finance_entity, '')
+      AND COALESCE(r.account_number, '') = COALESCE(sl.account_number, '')
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 12
 ),
 
