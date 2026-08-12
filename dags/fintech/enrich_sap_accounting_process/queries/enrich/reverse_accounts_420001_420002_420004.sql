@@ -116,15 +116,19 @@ retsuko_adm_service_fee AS (
     AND at.type IN ('contract', 'tenant','landlord')
     AND i.status != 'canceled'
     AND description != 'Crédito - Parcelamento corretagem - QuintoAndar'
-    AND  e.bill_item IN ('entry.bill-item/service-fee')
-         OR (ct.landlord_legal_person = 'physical' 
-            AND e.bill_item IN (
-              'entry.bill-item/adm-fee', 
-              'entry.bill-item/igpm-adm-fee', 
-              'entry.bill-item/ipca-adm-fee', 
-              'entry.bill-item/adjustment-agreement-adm-fee', 
-              'entry.bill-item/lockin')
-            )
+    AND (
+      e.bill_item IN ('entry.bill-item/service-fee')
+      OR (
+        ct.landlord_legal_person = 'physical'
+        AND e.bill_item IN (
+          'entry.bill-item/adm-fee',
+          'entry.bill-item/igpm-adm-fee',
+          'entry.bill-item/ipca-adm-fee',
+          'entry.bill-item/adjustment-agreement-adm-fee',
+          'entry.bill-item/lockin'
+        )
+      )
+    )
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
   HAVING
       SUM(amount) != 0
@@ -199,6 +203,61 @@ sap_ledger AS (
         1, 2, 3, 4, 5, 6
     HAVING 
         SUM(debit_credit) != 0
+),
+
+-- Rewrite OR-join as UNION of equi-joins (anti-join keys). Final filter keeps only
+-- unmatched SAP rows (reverse straw failure).
+sap_matched_to_retsuko AS (
+    SELECT DISTINCT
+        sl.id_business_entity,
+        sl.id_finance_entity,
+        sl.hash,
+        sl.id_transaction,
+        sl.account_number,
+        TRUE AS is_matched
+    FROM
+        sap_ledger sl
+    LEFT JOIN
+        sap_gateway sg
+            ON sl.hash = sg.hash
+    LEFT JOIN
+        sap_entity se
+            ON sg.id_feature = se.id_sap_gateway_feature
+    INNER JOIN
+        retsuko r
+            ON r.id_entity = se.id_finance_entity
+
+    UNION
+
+    SELECT DISTINCT
+        sl.id_business_entity,
+        sl.id_finance_entity,
+        sl.hash,
+        sl.id_transaction,
+        sl.account_number,
+        TRUE AS is_matched
+    FROM
+        sap_ledger sl
+    INNER JOIN
+        retsuko r
+            ON r.account_number = sl.account_number
+            AND sl.id_finance_entity = r.id_finance_entity
+
+    UNION
+
+    SELECT DISTINCT
+        sl.id_business_entity,
+        sl.id_finance_entity,
+        sl.hash,
+        sl.id_transaction,
+        sl.account_number,
+        TRUE AS is_matched
+    FROM
+        sap_ledger sl
+    INNER JOIN
+        retsuko r
+            ON r.account_number = sl.account_number
+            AND sl.id_finance_entity = r.id_entity
 )
 
 SELECT
@@ -206,13 +265,13 @@ SELECT
     sl.id_business_entity,
     sl.id_finance_entity,
     CAST(NULL AS INT) AS id_finance_entity_entry,
-    MAX(r.accounting_version) AS version,
+    CAST(NULL AS STRING) AS version,
     'for rent' AS business_unit,
     's4' AS source_name,
     'revenue accounting' AS accounting_type,
     sl.account_number,
-    r.accounting_name,
-    CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
+    CAST(NULL AS STRING) AS accounting_name,
+    CAST(NULL AS DECIMAL(12,2)) AS source_amount,
     CAST(sl.debit_credit AS DECIMAL(12,2)) AS sap_amount,
     FALSE AS is_completeness,
     FALSE AS is_correctness,
@@ -220,13 +279,13 @@ SELECT
     FALSE AS is_compliance,
     'reverse straw failure' AS accounting_process_status,
     MIN(CASE
-      WHEN r.id_entity IS NULL AND se.id_finance_entity IS NULL AND sg.id_finance_entity IS NULL THEN 'manual transaction'
-      WHEN r.id_entity IS NULL AND se.id_finance_entity IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
-      WHEN r.id_entity IS NULL AND se.id_finance_entity IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number'
+      WHEN m.is_matched IS NULL AND se.id_finance_entity IS NULL AND sg.id_finance_entity IS NULL THEN 'manual transaction'
+      WHEN m.is_matched IS NULL AND se.id_finance_entity IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
+      WHEN m.is_matched IS NULL AND se.id_finance_entity IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number'
       ELSE NULL
     END) AS error_description,
-    r.accrual_year_month,
-    MAX(r.dt_source_trigger) AS dt_source_trigger,
+    CAST(NULL AS INT) AS accrual_year_month,
+    CAST(NULL AS DATE) AS dt_source_trigger,
     MAX(sl.dt_sap_created) AS dt_sap_created,
     MAX(sl.dt_sap_reference) AS dt_sap_reference
 FROM
@@ -238,11 +297,13 @@ LEFT JOIN
     sap_entity se
         ON sg.id_feature = se.id_sap_gateway_feature
 LEFT JOIN
-    retsuko r
-        ON (r.id_entity = se.id_finance_entity) OR 
-        (r.account_number = sl.account_number AND sl.id_finance_entity = r.id_finance_entity) OR 
-        (r.account_number = sl.account_number AND sl.id_finance_entity = r.id_entity)
+    sap_matched_to_retsuko m
+        ON COALESCE(sl.id_business_entity, '') = COALESCE(m.id_business_entity, '')
+        AND COALESCE(sl.id_finance_entity, '') = COALESCE(m.id_finance_entity, '')
+        AND COALESCE(sl.hash, '') = COALESCE(m.hash, '')
+        AND COALESCE(sl.id_transaction, '') = COALESCE(m.id_transaction, '')
+        AND COALESCE(sl.account_number, '') = COALESCE(m.account_number, '')
 WHERE   
-    r.id_finance_entity IS NULL
+    m.is_matched IS NULL
 GROUP BY
-    1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19

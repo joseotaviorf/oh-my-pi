@@ -323,6 +323,45 @@ accounting_balance AS (
   GROUP BY 1, 2
 ),
 
+-- Rewrite OR-join as UNION of equi-joins (anti-join keys). Output keeps unmatched SAP
+-- rows (and 113412 rows with no retsuko match — id_external null on unmatched).
+sap_matched_to_retsuko AS (
+    SELECT DISTINCT
+        sl_hash.id_transaction,
+        sl_hash.id_finance_entity,
+        sl_hash.id_finance_entity_entry,
+        sl_hash.hash,
+        sl_hash.account_number,
+        TRUE AS is_matched
+    FROM
+        sap AS sl_hash
+    LEFT JOIN
+        sap_gateway AS sg
+            ON sl_hash.hash = sg.hash
+    LEFT JOIN
+        sap_entity AS se
+            ON se.id_sap_gateway_feature = sg.id_feature
+    INNER JOIN
+        retsuko AS r
+            ON COALESCE(se.id_finance_entity, sl_hash.id_finance_entity_entry) = r.id_finance_entity_entry
+
+    UNION
+
+    SELECT DISTINCT
+        sl_hash.id_transaction,
+        sl_hash.id_finance_entity,
+        sl_hash.id_finance_entity_entry,
+        sl_hash.hash,
+        sl_hash.account_number,
+        TRUE AS is_matched
+    FROM
+        sap AS sl_hash
+    INNER JOIN
+        retsuko AS r
+            ON sl_hash.id_finance_entity = r.id_finance_entity
+            AND r.account_number = sl_hash.account_number
+),
+
 base AS (
 SELECT 
         ('RE-RTSK-TP-'|| sl_hash.id_transaction || '-' || COALESCE(sl_hash.account_number, '')) AS id_accounting_process,
@@ -338,7 +377,7 @@ SELECT
         CASE
             WHEN sl_hash.account_number = '211413' THEN 'Brokerage to be discounted - New Model'
             WHEN sl_hash.account_number = '211415' THEN 'Revenue to be considered - Pro Guarantor'
-            WHEN sl_hash.account_number = '113412' THEN COALESCE(r.accounting_name, 'Debit Negotiation')
+            WHEN sl_hash.account_number = '113412' THEN 'Debit Negotiation'
             ELSE NULL
         END AS accounting_name,
         sl_hash.accrual_year_month,
@@ -346,18 +385,18 @@ SELECT
         CASE
             WHEN sl_hash.created_by NOT IN ('WF-BATCH','MIGRACIONES','ERP Gateway') OR sl_hash.source_client IS NULL THEN 'manual transaction'
             WHEN sl_hash.source_client <> 'seubarriga' THEN CONCAT('source-',sl_hash.source_client)
-            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NULL THEN 'transaction missing in sap gateway'
-            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
-            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number or postponed entry'
+            WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NULL THEN 'transaction missing in sap gateway'
+            WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
+            WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number or postponed entry'
             ELSE NULL
         END AS error_description,
         FALSE AS is_completeness,
         FALSE AS is_correctness,
         FALSE AS is_temporality,
         FALSE AS is_compliance,
-        CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
+        CAST(NULL AS DECIMAL(12,2)) AS source_amount,
         CAST(SUM(COALESCE(sl_hash.debit_credit, 0)) AS DECIMAL(12,2)) AS sap_amount,
-        r.dt_source_trigger AS dt_source_trigger,
+        CAST(NULL AS DATE) AS dt_source_trigger,
         sl_hash.dt_sap_created AS dt_sap_created,
         sl_hash.dt_sap_reference AS dt_sap_reference
     FROM
@@ -369,12 +408,18 @@ SELECT
         sap_entity AS se
             ON se.id_sap_gateway_feature = sg.id_feature
     LEFT JOIN
-        retsuko AS r
-            ON COALESCE(se.id_finance_entity, sl_hash.id_finance_entity_entry)  = r.id_finance_entity_entry
-        OR ((sl_hash.id_finance_entity = r.id_finance_entity) AND (r.account_number = sl_hash.account_number))
+        sap_matched_to_retsuko AS m
+            ON COALESCE(sl_hash.id_transaction, '') = COALESCE(m.id_transaction, '')
+            AND COALESCE(sl_hash.id_finance_entity, '') = COALESCE(m.id_finance_entity, '')
+            AND COALESCE(sl_hash.id_finance_entity_entry, '') = COALESCE(m.id_finance_entity_entry, '')
+            AND COALESCE(sl_hash.hash, '') = COALESCE(m.hash, '')
+            AND COALESCE(sl_hash.account_number, '') = COALESCE(m.account_number, '')
     WHERE
-        (r.id_finance_entity_entry IS NULL AND sl_hash.account_number IN ('211413', '211415', '113406', '113411'))
-        OR (r.id_external IS NULL AND sl_hash.account_number = '113412')
+        m.is_matched IS NULL
+        AND (
+          sl_hash.account_number IN ('211413', '211415', '113406', '113411')
+          OR sl_hash.account_number = '113412'
+        )
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23
 )
 SELECT

@@ -152,6 +152,45 @@ sap AS (
         rn = 1
 )
 ,
+
+-- Rewrite OR-join as UNION of equi-joins (anti-join keys). Final SELECT keeps only
+-- unmatched SAP rows (reverse straw failure).
+sap_matched_to_retsuko AS (
+    SELECT DISTINCT
+        sl_hash.id_finance_entity,
+        sl_hash.id_finance_entity_entry,
+        sl_hash.account_number,
+        sl_hash.hash,
+        TRUE AS is_matched
+    FROM
+        sap AS sl_hash
+    LEFT JOIN
+        sap_gateway AS sg
+            ON sl_hash.hash = sg.hash
+    LEFT JOIN
+        sap_entity AS se
+            ON se.id_sap_gateway_feature = sg.id_feature
+    INNER JOIN
+        retsuko AS r
+            ON COALESCE(sl_hash.id_finance_entity_entry, se.id_finance_entity) = r.id_finance_entity_entry
+            AND r.account_number = sl_hash.account_number
+
+    UNION
+
+    SELECT DISTINCT
+        sl_hash.id_finance_entity,
+        sl_hash.id_finance_entity_entry,
+        sl_hash.account_number,
+        sl_hash.hash,
+        TRUE AS is_matched
+    FROM
+        sap AS sl_hash
+    INNER JOIN
+        retsuko AS r
+            ON sl_hash.id_finance_entity = r.id_finance_entity
+            AND r.account_number = sl_hash.account_number
+),
+
 base AS (
     SELECT 
         ('RE-RTSK-T-' || COALESCE(sl_hash.id_finance_entity,'') || '-' || COALESCE(sl_hash.account_number, '')) AS id_accounting_process,
@@ -163,26 +202,25 @@ base AS (
         'S4' AS source_name,
         'transactional' AS accounting_type,
         sl_hash.account_number,
-        r.accounting_name,
+        CAST(NULL AS STRING) AS accounting_name,
         sl_hash.accrual_year_month,
         'reverse straw failure' AS accounting_process_status,
         CASE
             WHEN sl_hash.source_client <> 'seubarriga' THEN CONCAT('source','-',sl_hash.source_client)
-            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NULL THEN 'manual transaction'
-            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
-            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number or postponed entry'
+            WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NULL THEN 'manual transaction'
+            WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
+            WHEN m.is_matched IS NULL AND se.id_sap_gateway_feature IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number or postponed entry'
             ELSE NULL
         END AS error_description,
         FALSE AS is_completeness,
         FALSE AS is_correctness,
         FALSE AS is_temporality,
         FALSE AS is_compliance,
-        CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
+        CAST(NULL AS DECIMAL(12,2)) AS source_amount,
         CAST(SUM(COALESCE(sl_hash.debit_credit, 0)) AS DECIMAL(12,2)) AS sap_amount,
-        r.dt_source_trigger AS dt_source_trigger,
+        CAST(NULL AS DATE) AS dt_source_trigger,
         sl_hash.dt_sap_created AS dt_sap_created,
-        sl_hash.dt_sap_reference AS dt_sap_reference,
-        r.id_finance_entity_entry as id_finance_entity_entry_r
+        sl_hash.dt_sap_reference AS dt_sap_reference
     FROM
         sap AS sl_hash
     LEFT JOIN
@@ -192,12 +230,14 @@ base AS (
         sap_entity AS se
             ON se.id_sap_gateway_feature = sg.id_feature
     LEFT JOIN
-        retsuko AS r
-        ON (
-            (COALESCE(sl_hash.id_finance_entity_entry,se.id_finance_entity)  = r.id_finance_entity_entry AND (r.account_number = sl_hash.account_number))
-        OR ((sl_hash.id_finance_entity = r.id_finance_entity) AND (r.account_number = sl_hash.account_number))
-            )
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23
+        sap_matched_to_retsuko AS m
+            ON COALESCE(sl_hash.id_finance_entity, '') = COALESCE(m.id_finance_entity, '')
+            AND COALESCE(sl_hash.id_finance_entity_entry, '') = COALESCE(m.id_finance_entity_entry, '')
+            AND COALESCE(sl_hash.account_number, '') = COALESCE(m.account_number, '')
+            AND COALESCE(sl_hash.hash, '') = COALESCE(m.hash, '')
+    WHERE
+        m.is_matched IS NULL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22
 )
 SELECT
     id_accounting_process||'-'||ROW_NUMBER() OVER (PARTITION BY id_accounting_process ORDER BY dt_sap_created) AS id_accounting_process,
@@ -224,4 +264,3 @@ SELECT
     dt_sap_created,
     dt_sap_reference AS dt_filter_end
 FROM base
-WHERE id_finance_entity_entry_r IS NULL
