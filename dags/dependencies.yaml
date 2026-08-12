@@ -4033,6 +4033,8 @@ bietlejuice.enrich_survicate:
 bietlejuice.enrich_table_dependency_tree:
   - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
   - bietlejuice.table_usage_in_queries:load-clean-table-usage-in-queries:first-run-of-day
+bietlejuice.enrich_tars:
+  - bietlejuice.tars_vector_logs:load-clean-vector-logs:first-run-of-day
 bietlejuice.enrich_tenant_journey:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_proposal_fast_lane:load-clean-proposal-aud:first-run-of-day

@@ -1,0 +1,34 @@
+---
+table_name: datalake_tars.datahub_tool_calls
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt_tool_call
+  incremental_date_mask: yyyy-MM-dd
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+column_level_validations:
+  id_tool_call:
+    is_complete:
+      severity_level: Error
+  id_session:
+    is_complete:
+      severity_level: Error
+  event_type:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: [datahub_probe, datahub_gql]
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,273 @@
+---
+database_name: datalake_tars_clean
+table_name: vector_logs
+description: >
+  Parsed Vector conversation-event log for Tars (prod) and unstable-srat (forno).
+  One row per emitted event (session_start, trino_query, turn_end, turn_summary,
+  turn_blocked, protocol_gap, datahub_*, user_feedback, etc.). Nested JSON fields are
+  unpacked into typed columns; arrays stay as ARRAY<STRING>; drifting payload keys
+  remain in raw_content. Grain is one telemetry event; partitioned by UTC event date.
+  Consumed by enrich_tars for query annotations, turn latency, and quality metrics.
+domain: Data Ops & Governance
+owner: aurelio.nogueira@quintoandar.com.br
+columns:
+  id_session:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: >
+      Tars conversation session identifier stamped on the event. Prefer the agent-resolved
+      session id; may equal the IDE conversation id for hook-emitted turn_end events.
+  id_turn:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Opaque turn identifier from the hook turn pointer (mainly on turn_end).
+  id_conversation:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: IDE-native conversation identifier (Cursor/Claude) carried on turn_end as conv_id.
+  service_name:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Emitting skill label (tars in prod, unstable-srat in forno).
+  env:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Log environment label from the Vector client (prod or forno).
+  event_type:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: >
+      Event taxonomy value (session_start, trino_query, datahub_probe, datahub_gql,
+      turn_summary, turn_blocked, turn_end, protocol_gap, user_feedback, self_test, …).
+  status:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Event status (success, error, or blocked).
+  level:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Log level derived from status (info, error, warning).
+  session_source:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Client that ran the session (cursor, claude, unknown).
+  session_id_source:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Which branch produced session_id on turn_end (resolved or conv_id).
+  tars_env:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Runtime surface reported at session_start (cowork or cursor).
+  skill_version:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Plugin skill version from the emitting client's plugin.json.
+  language:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: User language preference (pt or en) from session_start.
+  response_category:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Answer category (data_query, debug, data_catalog, …) when applicable.
+  business_domain:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Raw business domain string supplied by the agent (may contain aliases).
+  context_path:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Context discovery path used on turn_summary (e.g. business_entity).
+  error_class:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Canonical error class for failed tool calls (TYPE_MISMATCH, HTTP_5XX, …).
+  error_message:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Truncated error message from the failed operation (first ~300–500 chars).
+  blocking_step:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Why a turn blocked or a protocol_gap fired (access_denied, trajectory_event_skipped, …).
+  detail:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Extra protocol_gap detail (late or missing) for session_start ordering gaps.
+  outcome:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: turn_end outcome (completed, blocked, gap, no_tars_activity, hook_error).
+  start_source:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: >
+      How turn start time was obtained (prompt_submit, first_tool_call, stale). Do not average
+      duration_ms across different start_source values without splitting.
+  trigger:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Whether the turn was interactive, scheduled, or unknown.
+  answer_confidence_tier:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Agent self-rated confidence on turn_summary (high, medium, low).
+  dq_status:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Data-quality verdict from turn_summary (pass, concern, fail, not_applicable).
+  dp_urn:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Primary DataHub Data Product URN chosen for the turn, when present.
+  domain_name:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Domain name returned by datahub_access_instructions when looking up a table.
+  table_name:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Fully-qualified table looked up via datahub_access_instructions (source field table).
+  query_preview:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: First ~200 characters of a DataHub GraphQL query string.
+  user_question:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Natural-language user question (truncated to ~500 chars on emit).
+  sql:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Final SQL associated with the turn (truncated to ~4000 chars on emit).
+  last_assistant_message_preview:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Short preview of the last assistant message when a protocol_gap is logged.
+  feedback_text:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: User's open-text experience summary from the user_feedback interview (up to ~4000 chars).
+  likert_label:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: >
+      Derived Likert label on user_feedback (very_negative, negative, neutral,
+      positive, very_positive) for the 1-5 likert_score.
+  user_slug:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Email local-part of the user who submitted feedback via the feedback skill.
+  duration_ms:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Wall-clock duration of the operation or turn in milliseconds.
+  row_count:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Number of rows returned by a successful trino_query, when present.
+  response_bytes:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Response payload size in bytes for DataHub / Trino tool calls.
+  data_product_count:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Count of Data Products returned by a datahub_probe, when present.
+  likert_score:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: 1-5 satisfaction score from the user_feedback interview (5 = most positive).
+  turn_index:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: 1-based turn counter within the session since the sandbox started.
+  self_review_fix_cycles:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Number of adversarial self-review fix cycles on turn_summary.
+  is_schema_gate_passed:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: True when the schema gate nested object reports passed=true.
+  is_schema_valid:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Schema-validity flag stamped by the logging client when present.
+  is_found:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Whether datahub_access_instructions found the requested table.
+  is_query_executed:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Whether a generated SQL was actually executed (legacy / feedback fields).
+  datahub_urns:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Array of DataHub URNs attributed to the query or turn.
+  datasets_ranked:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Ranked dataset URNs from turn_summary discovery.
+  emitted_events:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Trajectory events already emitted in the turn before turn_end closed it.
+  limitations:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Agent-declared answer limitations from turn_summary (max 5 items).
+  schema_verified_tables_json:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Raw JSON for schema-verified tables (schema/table/columns structs).
+  schema_gate_json:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Raw JSON for the nested schema_gate object on turn_summary.
+  dq_json:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Raw JSON for the nested dq object (status + failures) on turn_summary.
+  self_review_json:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Raw JSON for the nested self_review object (verdicts + fix_cycles).
+  file_name:
+    lineage:
+      - datalake_tars_raw.vector_logs.file_name
+    description: Source S3 URI of the .log.gz object that contained this event.
+  line_number:
+    lineage:
+      - datalake_tars_raw.vector_logs.line_number
+    description: 1-based line index within the source file (raw merge key).
+  raw_content:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Original flattened JSON event body retained for drifting payload keys.
+  ts_event:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Event timestamp from the JSON timestamp field (UTC).
+  dt_event:
+    lineage:
+      - datalake_tars_raw.vector_logs.raw_content
+    description: Calendar date of ts_event (UTC) for daily aggregations.
+  ts_load:
+    lineage:
+      - datalake_tars_raw.vector_logs.ts_load
+    description: Timestamp when the raw row was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_tars_raw.vector_logs.year
+    description: Partition year (UTC event date from the object path).
+  month:
+    lineage:
+      - datalake_tars_raw.vector_logs.month
+    description: Partition month (UTC event date from the object path).
+  day:
+    lineage:
+      - datalake_tars_raw.vector_logs.day
+    description: Partition day (UTC event date from the object path).

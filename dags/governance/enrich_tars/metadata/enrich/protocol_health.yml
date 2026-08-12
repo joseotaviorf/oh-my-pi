@@ -1,0 +1,70 @@
+---
+database_name: datalake_tars
+table_name: protocol_health
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Own-instrumentation health signal: turns where the Tars/unstable-srat skill skipped
+  or failed a required trajectory event. Unions Vector protocol_gap events with
+  turn_end rows whose outcome is gap, hook_error, or no_tars_activity. This is not a
+  user-facing usage metric — it is a data-quality signal for the skill authors to
+  prioritize instrumentation fixes, distinct from turn_quality (which covers answers
+  that did complete, successfully or blocked by a real business reason).
+columns:
+  id_issue:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+      - datalake_tars_clean.vector_logs.event_type
+    description: Synthetic issue identifier from issue_source/session/timestamp.
+  id_session:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+    description: Session identifier for the conversation that hit this issue.
+  session_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.session_source
+    description: Client that ran the session (cursor, claude, unknown).
+  issue_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.event_type
+    description: Which source surfaced the issue (protocol_gap event, or a problem turn_end outcome).
+  event_type:
+    lineage:
+      - datalake_tars_clean.vector_logs.event_type
+    description: Source Vector event type (protocol_gap or turn_end).
+  outcome:
+    lineage:
+      - datalake_tars_clean.vector_logs.outcome
+    description: turn_end outcome when issue_source=turn_end (gap, hook_error, no_tars_activity). Null for protocol_gap rows.
+  blocking_step:
+    lineage:
+      - datalake_tars_clean.vector_logs.blocking_step
+    description: Why the protocol_gap fired (access_denied, trajectory_event_skipped, …). Null for turn_end rows.
+  detail:
+    lineage:
+      - datalake_tars_clean.vector_logs.detail
+    description: Extra protocol_gap detail (late or missing) for session_start ordering gaps. Null for turn_end rows.
+  last_assistant_message_preview:
+    lineage:
+      - datalake_tars_clean.vector_logs.last_assistant_message_preview
+    description: Short preview of the last assistant message when a protocol_gap fired. Null for turn_end rows.
+  ts_issue:
+    lineage:
+      - datalake_tars_clean.vector_logs.ts_event
+    description: Timestamp when the issue event was emitted.
+  dt_issue:
+    lineage:
+      - datalake_tars_clean.vector_logs.dt_event
+    description: Calendar date of the issue (UTC) for daily series.
+  year:
+    lineage:
+      - datalake_tars_clean.vector_logs.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars_clean.vector_logs.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars_clean.vector_logs.day
+    description: Partition day.

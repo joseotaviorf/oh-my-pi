@@ -1,0 +1,25 @@
+---
+database_name: datalake_tars_raw
+table_name: vector_logs
+description: >
+  Raw Vector / Loki conversation-event lines for Tars and unstable-srat. One row per
+  NDJSON line from gzipped objects under s3://.../tars-logs/YYYY/MM/DD/HH/. Stores the
+  full event body as raw_content for schema-flexible parsing in clean. Partitioned by
+  UTC event date (year, month, day). Always filter partitions to avoid full scans.
+domain: Data Ops & Governance
+owner: aurelio.nogueira@quintoandar.com.br
+columns:
+  file_name:
+    description: Full S3 URI of the source .log.gz object that contained this line.
+  line_number:
+    description: 1-based line index within the source file; merge key with file_name.
+  raw_content:
+    description: Full flattened JSON event body as a string (labels + metadata + payload).
+  ts_load:
+    description: Timestamp when this row was written into the datalake raw table.
+  year:
+    description: Partition year of the UTC event date derived from the object path.
+  month:
+    description: Partition month of the UTC event date derived from the object path.
+  day:
+    description: Partition day of the UTC event date derived from the object path.

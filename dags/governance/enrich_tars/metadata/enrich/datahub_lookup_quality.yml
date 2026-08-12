@@ -1,0 +1,71 @@
+---
+database_name: datalake_tars
+table_name: datahub_lookup_quality
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Table-discovery success/failure from Vector datahub_access_instructions events. One
+  row per lookup call Tars made to resolve a table name into DataHub domain/access
+  guidance. is_found=false means the requested table could not be located in the
+  catalog. Distinct from datahub_asset_usage (which URNs a query ended up using) and
+  from query_annotations (which trino_query events resolved); this table isolates the
+  catalog-navigation step itself, before any SQL is run. Powers a DataHub catalog-gap
+  panel showing which table lookups fail most often.
+columns:
+  id_lookup:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_turn
+      - datalake_tars_clean.vector_logs.id_session
+    description: Lookup identifier; turn id when present, otherwise a synthetic id from session/timestamp.
+  id_session:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+    description: Session identifier for the conversation that made this lookup.
+  session_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.session_source
+    description: Client that ran the session (cursor, claude, unknown).
+  domain_name:
+    lineage:
+      - datalake_tars_clean.vector_logs.domain_name
+    description: DataHub domain returned by the lookup, when found.
+  table_name:
+    lineage:
+      - datalake_tars_clean.vector_logs.table_name
+    description: Fully-qualified table name Tars attempted to resolve.
+  is_found:
+    lineage:
+      - datalake_tars_clean.vector_logs.is_found
+    description: Whether the requested table was located in the DataHub catalog.
+  status:
+    lineage:
+      - datalake_tars_clean.vector_logs.status
+    description: Event status (success or error) for the lookup call.
+  error_class:
+    lineage:
+      - datalake_tars_clean.vector_logs.error_class
+    description: Error class when the lookup call itself failed (distinct from is_found=false).
+  duration_ms:
+    lineage:
+      - datalake_tars_clean.vector_logs.duration_ms
+    description: Wall-clock latency of the lookup call in milliseconds.
+  ts_lookup:
+    lineage:
+      - datalake_tars_clean.vector_logs.ts_event
+    description: Timestamp when the lookup event was emitted.
+  dt_lookup:
+    lineage:
+      - datalake_tars_clean.vector_logs.dt_event
+    description: Calendar date of the lookup (UTC) for daily series.
+  year:
+    lineage:
+      - datalake_tars_clean.vector_logs.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars_clean.vector_logs.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars_clean.vector_logs.day
+    description: Partition day.

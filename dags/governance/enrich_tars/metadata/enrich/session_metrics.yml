@@ -4,10 +4,11 @@ table_name: session_metrics
 owner: aurelio.nogueira@quintoandar.com.br
 domain: Data Ops & Governance
 description: >
-  Session-grain metrics for Tars conversations. Aggregates query_annotations per id_session
-  to measure engagement depth, quality, and DataHub context usage per conversation.
-  One row per session per load day. Used by the TARS Usage Superset dashboard to track
-  adoption KPIs (WAU, sessions/week) and DataHub context attach rates.
+  Session-grain metrics for Tars conversations. Aggregates query_annotations per id_session,
+  joins turn_metrics / turn_quality for prompt-to-answer latency, gap turns, and DQ fail
+  counts, and joins session_start events for the client-surface (tars_env) and language
+  dimensions. One row per session per load day. Used by the TARS Usage Superset dashboard
+  to track adoption KPIs (WAU, sessions/week), DataHub context attach rates, and turn latency.
 columns:
   id_session:
     lineage:
@@ -73,6 +74,37 @@ columns:
     lineage:
       - datalake_tars.query_annotations.depth_tier
     description: Highest DataHub context depth tier (L0-L4) reached in the session.
+  avg_turn_duration_ms:
+    lineage:
+      - datalake_tars.turn_metrics.duration_ms
+    description: >
+      Mean turn_end duration_ms for prompt_submit + non-scheduled turns in the session.
+      Null when no qualifying turn_end events exist.
+  completed_turn_count:
+    lineage:
+      - datalake_tars.turn_metrics.outcome
+    description: Number of turn_end events with outcome=completed in the session.
+  gap_turn_count:
+    lineage:
+      - datalake_tars.turn_metrics.outcome
+    description: Number of turn_end events with outcome=gap (missing turn_summary/turn_blocked).
+  dq_fail_count:
+    lineage:
+      - datalake_tars.turn_quality.dq_status
+    description: Count of turn_summary rows with dq_status in (fail, concern).
+  avg_confidence_tier:
+    lineage:
+      - datalake_tars.turn_quality.answer_confidence_tier
+    description: >
+      Mean numeric confidence (high=3, medium=2, low=1) across turn_summary rows in the session.
+  tars_env:
+    lineage:
+      - datalake_tars_clean.vector_logs.tars_env
+    description: Runtime surface reported at session_start (cowork or cursor). Null when no session_start was logged.
+  language:
+    lineage:
+      - datalake_tars_clean.vector_logs.language
+    description: User language preference (pt or en) from session_start. Null when no session_start was logged.
   session_duration_min:
     lineage:
       - datalake_tars.query_annotations.ts_started

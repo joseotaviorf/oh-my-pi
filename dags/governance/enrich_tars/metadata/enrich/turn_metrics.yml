@@ -1,0 +1,89 @@
+---
+database_name: datalake_tars
+table_name: turn_metrics
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Turn-grain latency and completion metrics for Tars conversations, sourced from
+  Vector turn_end events in datalake_tars_clean.vector_logs. One row per TARS-active
+  turn closed by the stop hook. Carries prompt-to-answer duration_ms and the honest
+  outcome denominator (completed, blocked, gap). Never average duration_ms across
+  different start_source values without splitting — first_tool_call excludes pre-tool
+  reasoning. Partitioned by UTC turn date.
+columns:
+  id_turn:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_turn
+    description: Opaque turn identifier from the hook turn pointer (synthetic fallback when null).
+  id_session:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+    description: Session identifier for the conversation that owned this turn.
+  id_conversation:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_conversation
+    description: IDE-native conversation id (conv_id) stamped on turn_end.
+  session_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.session_source
+    description: Client that ran the session (cursor, claude, unknown).
+  session_id_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.session_id_source
+    description: Which branch produced session_id (resolved or conv_id).
+  turn_index:
+    lineage:
+      - datalake_tars_clean.vector_logs.turn_index
+    description: 1-based turn counter within the session since the sandbox started.
+  outcome:
+    lineage:
+      - datalake_tars_clean.vector_logs.outcome
+    description: Turn close outcome (completed, blocked, gap, no_tars_activity, hook_error).
+  start_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.start_source
+    description: How start time was obtained (prompt_submit, first_tool_call, stale).
+  trigger:
+    lineage:
+      - datalake_tars_clean.vector_logs.trigger
+    description: Whether the turn was interactive, scheduled, or unknown.
+  duration_ms:
+    lineage:
+      - datalake_tars_clean.vector_logs.duration_ms
+    description: End-to-end turn latency in milliseconds (omit averaging across start_source).
+  emitted_events:
+    lineage:
+      - datalake_tars_clean.vector_logs.emitted_events
+    description: Trajectory events already emitted before the turn closed.
+  service_name:
+    lineage:
+      - datalake_tars_clean.vector_logs.service_name
+    description: Emitting skill label (tars or unstable-srat).
+  env:
+    lineage:
+      - datalake_tars_clean.vector_logs.env
+    description: Log environment label (prod or forno).
+  skill_version:
+    lineage:
+      - datalake_tars_clean.vector_logs.skill_version
+    description: Plugin skill version that emitted the turn_end event.
+  ts_turn_end:
+    lineage:
+      - datalake_tars_clean.vector_logs.ts_event
+    description: Timestamp when the turn_end event was emitted.
+  dt_turn:
+    lineage:
+      - datalake_tars_clean.vector_logs.dt_event
+    description: Calendar date of the turn end (UTC) for daily series.
+  year:
+    lineage:
+      - datalake_tars_clean.vector_logs.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars_clean.vector_logs.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars_clean.vector_logs.day
+    description: Partition day.

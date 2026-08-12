@@ -5,9 +5,16 @@ dag:
   owner: Data Governance
   documentation:
     dag_purpose: |
-      Parses Tars (the AI data analyst) usage data from data_platform_metrics.trino_query_complete,
-      materialising query-grain annotations, session-grain metrics, DataHub asset usage, and a
-      product-topic coverage map. Powers the TARS: Usage and Context Coverage Superset dashboard.
+      Parses Tars (the AI data analyst) usage from Vector conversation logs in
+      datalake_tars_clean.vector_logs (hybrid join to trino_query_complete for user /
+      query_id), materialising query-grain annotations, turn latency/quality (plus a
+      turn_activity table consolidating both into one Superset-friendly row per
+      turn), session-grain metrics (incl. client surface/language), DataHub asset
+      usage, a product-topic coverage map, DataHub catalog lookup/tool-call
+      reliability, raw-table schema verification detail, own-instrumentation health
+      (protocol gaps and turn_end failure outcomes), and user-submitted feedback
+      (open text + 1-5 Likert score). Powers the TARS: Usage and Context Coverage
+      Superset dashboard.
 workflow:
   observability:
     enabled: true
@@ -21,6 +28,11 @@ workflow:
   inner_dependencies:
     session_metrics:
     - query_annotations
+    - turn_metrics
+    - turn_quality
+    turn_activity:
+    - turn_metrics
+    - turn_quality
     datahub_asset_usage:
     - query_annotations
     product_topic_coverage:

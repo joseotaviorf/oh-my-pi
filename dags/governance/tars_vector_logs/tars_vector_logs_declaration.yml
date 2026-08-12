@@ -1,0 +1,35 @@
+dag:
+  name: tars_vector_logs
+  owner: Data Governance
+  schedule_start_date: 2026, 8, 12
+  schedule_interval: 0 4 * * *
+  documentation:
+    dag_purpose: |
+      Ingests Vector-emitted Tars / unstable-srat conversation log events from S3
+      (gzipped NDJSON under tars-logs/YYYY/MM/DD/HH/) into datalake_tars_raw.vector_logs
+      and parses them into datalake_tars_clean.vector_logs. Prod reads 5a-tars-prod-data;
+      forno reads 5a-tars-forno-forno-data (env-resolved via spark_jobs/*_conf.yml).
+      Powers enrich_tars query annotations, turn latency, and quality metrics.
+
+workflow:
+  type: custom_ingestion
+  layer: raw
+  custom_schema: tars
+  load_spark_job: load_incremental_tars_vector_logs_raw
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{table_name}"
+    - "{partitions}"
+  tables_customization:
+    vector_logs:
+      partitions: [year, month, day]
+      merge_on: [file_name, line_number]

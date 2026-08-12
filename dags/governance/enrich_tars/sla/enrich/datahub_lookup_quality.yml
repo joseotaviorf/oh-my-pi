@@ -1,0 +1,7 @@
+database_name: datalake_tars
+table_name: datahub_lookup_quality
+arrival:
+  days_of_week: all
+  earliest_hour: 8
+  reason: enrich_tars runs 0 6 * * *; datahub_lookup_quality depends on tars_vector_logs clean (0 4 * * *)
+  source: inferred

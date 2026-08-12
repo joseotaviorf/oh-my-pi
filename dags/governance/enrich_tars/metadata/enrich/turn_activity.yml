@@ -1,0 +1,112 @@
+---
+database_name: datalake_tars
+table_name: turn_activity
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Turn-grain consolidation of turn_metrics (latency/outcome from turn_end) and
+  turn_quality (dq/confidence from turn_summary/turn_blocked), joined FULL OUTER on
+  id_turn so Superset can chart latency and quality together without a SQL Lab
+  join. Neither source is guaranteed present for every turn: turn_end is currently
+  forno-only (env=forno), so in prod rows come from turn_quality alone with null
+  duration_ms/outcome/start_source/trigger until turn_end reaches prod. Rows whose
+  id_turn could not be resolved on the source event use different synthetic
+  fallback ids per source table and will not match across the join, surfacing as
+  two separate rows — same limitation as querying turn_metrics/turn_quality
+  independently.
+columns:
+  id_turn:
+    lineage:
+      - datalake_tars.turn_metrics.id_turn
+      - datalake_tars.turn_quality.id_turn
+    description: Turn identifier, taken from whichever source matched (turn_metrics preferred).
+  id_session:
+    lineage:
+      - datalake_tars.turn_metrics.id_session
+      - datalake_tars.turn_quality.id_session
+    description: Session identifier for the conversation that owned this turn.
+  session_source:
+    lineage:
+      - datalake_tars.turn_metrics.session_source
+      - datalake_tars.turn_quality.session_source
+    description: Client that ran the session (cursor, claude, unknown).
+  event_type:
+    lineage:
+      - datalake_tars.turn_quality.event_type
+    description: Source quality event type (turn_summary or turn_blocked). Null when only turn_metrics matched.
+  outcome:
+    lineage:
+      - datalake_tars.turn_metrics.outcome
+    description: Turn close outcome (completed, blocked, gap, no_tars_activity, hook_error). Null when only turn_quality matched.
+  start_source:
+    lineage:
+      - datalake_tars.turn_metrics.start_source
+    description: How start time was obtained (prompt_submit, first_tool_call, stale). Null when only turn_quality matched.
+  trigger:
+    lineage:
+      - datalake_tars.turn_metrics.trigger
+    description: Whether the turn was interactive, scheduled, or unknown. Null when only turn_quality matched.
+  duration_ms:
+    lineage:
+      - datalake_tars.turn_metrics.duration_ms
+      - datalake_tars.turn_quality.duration_ms
+    description: >
+      End-to-end turn latency in milliseconds, preferring turn_metrics (turn_end)
+      over the optional duration_ms stamped on the quality event.
+  response_category:
+    lineage:
+      - datalake_tars.turn_quality.response_category
+    description: Answer category on turn_summary (data_query, debug, …).
+  business_domain:
+    lineage:
+      - datalake_tars.turn_quality.business_domain
+    description: Business domain classified for the turn.
+  answer_confidence_tier:
+    lineage:
+      - datalake_tars.turn_quality.answer_confidence_tier
+    description: Agent self-rated confidence (high, medium, low).
+  dq_status:
+    lineage:
+      - datalake_tars.turn_quality.dq_status
+    description: Data-quality verdict (pass, concern, fail, not_applicable).
+  is_schema_gate_passed:
+    lineage:
+      - datalake_tars.turn_quality.is_schema_gate_passed
+    description: True when the schema gate reported passed=true.
+  blocking_step:
+    lineage:
+      - datalake_tars.turn_quality.blocking_step
+    description: Canonical reason the turn blocked (access_denied, schema_gate_fail, …).
+  error_class:
+    lineage:
+      - datalake_tars.turn_quality.error_class
+    description: Error class associated with a blocked turn, when present.
+  turn_index:
+    lineage:
+      - datalake_tars.turn_metrics.turn_index
+    description: 1-based turn counter within the session since the sandbox started. Null when only turn_quality matched.
+  ts_turn:
+    lineage:
+      - datalake_tars.turn_quality.ts_turn
+      - datalake_tars.turn_metrics.ts_turn_end
+    description: Timestamp of the event, preferring the quality event over turn_end.
+  dt_turn:
+    lineage:
+      - datalake_tars.turn_quality.dt_turn
+      - datalake_tars.turn_metrics.dt_turn
+    description: Calendar date of the turn (UTC) for daily series.
+  year:
+    lineage:
+      - datalake_tars.turn_quality.year
+      - datalake_tars.turn_metrics.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars.turn_quality.month
+      - datalake_tars.turn_metrics.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars.turn_quality.day
+      - datalake_tars.turn_metrics.day
+    description: Partition day.

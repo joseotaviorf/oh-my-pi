@@ -1,0 +1,65 @@
+---
+database_name: datalake_tars
+table_name: user_feedback
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  User-submitted feedback about the Tars experience, from the Vector user_feedback
+  event emitted once per completed interview by the tars-feedback / unstable-srat-feedback
+  skill (open-text comment plus a 1-5 Likert satisfaction score). One row per feedback
+  submission. Distinct from turn_quality (agent self-rated confidence) — this is the
+  human's own verdict. Powers a Likert-distribution and feedback-comments panel.
+columns:
+  id_feedback:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+      - datalake_tars_clean.vector_logs.ts_event
+    description: Synthetic feedback identifier (session id + emit timestamp); user_feedback carries no natural key.
+  id_session:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+    description: Session identifier for the conversation the feedback was submitted from.
+  session_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.session_source
+    description: Client the session ran on (cursor, claude, unknown).
+  user_slug:
+    lineage:
+      - datalake_tars_clean.vector_logs.user_slug
+    description: Email local-part of the user who submitted the feedback.
+  feedback_text:
+    lineage:
+      - datalake_tars_clean.vector_logs.feedback_text
+    description: User's open-text experience summary (what worked, what frustrated, what to improve).
+  likert_score:
+    lineage:
+      - datalake_tars_clean.vector_logs.likert_score
+    description: 1-5 overall-experience satisfaction score (5 = most positive).
+  likert_label:
+    lineage:
+      - datalake_tars_clean.vector_logs.likert_label
+    description: Derived label for likert_score (very_negative, negative, neutral, positive, very_positive).
+  status:
+    lineage:
+      - datalake_tars_clean.vector_logs.status
+    description: Event status for the feedback submission (success when logged; error on emit failure).
+  ts_feedback:
+    lineage:
+      - datalake_tars_clean.vector_logs.ts_event
+    description: Timestamp when the feedback event was emitted.
+  dt_feedback:
+    lineage:
+      - datalake_tars_clean.vector_logs.dt_event
+    description: Calendar date of the feedback submission (UTC) for daily series.
+  year:
+    lineage:
+      - datalake_tars_clean.vector_logs.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars_clean.vector_logs.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars_clean.vector_logs.day
+    description: Partition day.

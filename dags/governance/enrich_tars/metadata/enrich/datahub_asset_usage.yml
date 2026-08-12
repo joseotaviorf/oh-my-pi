@@ -5,9 +5,10 @@ owner: aurelio.nogueira@quintoandar.com.br
 domain: Data Ops & Governance
 description: >
   URN-exploded table tracking which DataHub assets (Data Products and Datasets) Tars
-  referenced when answering user questions. One row per datahub_urn per Tars query.
-  Used to measure DataHub catalog coverage, identify which products are most used,
-  and surface which business topics have no product coverage in the context window.
+  referenced when answering user questions. One row per datahub_urn per Tars query,
+  exploded from query_annotations.datahub_urns (Vector-sourced). Used to measure DataHub
+  catalog coverage, identify which products are most used, and surface which business
+  topics have no product coverage in the context window.
 columns:
   id_query:
     lineage:
@@ -27,19 +28,19 @@ columns:
     description: Business domain of the session.
   datahub_urn:
     lineage:
-      - data_platform_metrics.trino_query_complete.query
+      - datalake_tars.query_annotations.datahub_urns
     description: Full DataHub URN of the asset referenced by Tars.
   asset_type:
     lineage:
-      - data_platform_metrics.trino_query_complete.query
+      - datalake_tars.query_annotations.datahub_urns
     description: Type of DataHub asset (dataProduct, dataset, other) derived from the URN pattern.
   asset_slug:
     lineage:
-      - data_platform_metrics.trino_query_complete.query
+      - datalake_tars.query_annotations.datahub_urns
     description: Extracted slug or fully-qualified name from the URN (e.g. visits, fs-transact).
   urn_hit_count:
     lineage:
-      - data_platform_metrics.trino_query_complete.query
+      - datalake_tars.query_annotations.datahub_urns
     description: Always 1 per row. Sum in Superset to count total URN references.
   ts_started:
     lineage:

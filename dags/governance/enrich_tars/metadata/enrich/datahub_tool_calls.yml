@@ -1,0 +1,78 @@
+---
+database_name: datalake_tars
+table_name: datahub_tool_calls
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  DataHub API tool-call latency and payload metrics from Vector datahub_probe (asset
+  discovery search) and datahub_gql (raw GraphQL query) events. One row per DataHub
+  API call. Lets investigations separate "DataHub was slow" from "LLM reasoning was
+  slow" when explaining turn_metrics.duration_ms outliers, and surfaces DataHub API
+  error rates independently of whether the turn eventually produced an answer.
+columns:
+  id_tool_call:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_turn
+      - datalake_tars_clean.vector_logs.id_session
+      - datalake_tars_clean.vector_logs.event_type
+    description: Tool-call identifier; turn id when present, otherwise synthetic from event_type/session/timestamp.
+  id_session:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+    description: Session identifier for the conversation that made this call.
+  event_type:
+    lineage:
+      - datalake_tars_clean.vector_logs.event_type
+    description: DataHub call type (datahub_probe = discovery search, datahub_gql = raw GraphQL query).
+  session_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.session_source
+    description: Client that ran the session (cursor, claude, unknown).
+  status:
+    lineage:
+      - datalake_tars_clean.vector_logs.status
+    description: Event status (success or error) for the DataHub call.
+  error_class:
+    lineage:
+      - datalake_tars_clean.vector_logs.error_class
+    description: Error class when the DataHub call failed (e.g. HTTP_5XX).
+  query_preview:
+    lineage:
+      - datalake_tars_clean.vector_logs.query_preview
+    description: First ~200 characters of the DataHub GraphQL query string (datahub_gql only).
+  duration_ms:
+    lineage:
+      - datalake_tars_clean.vector_logs.duration_ms
+    description: Wall-clock latency of the DataHub API call in milliseconds.
+  response_bytes:
+    lineage:
+      - datalake_tars_clean.vector_logs.response_bytes
+    description: Response payload size in bytes.
+  data_product_count:
+    lineage:
+      - datalake_tars_clean.vector_logs.data_product_count
+    description: Number of Data Products returned by a datahub_probe call.
+  row_count:
+    lineage:
+      - datalake_tars_clean.vector_logs.row_count
+    description: Number of rows/records returned by a datahub_gql call, when reported.
+  ts_tool_call:
+    lineage:
+      - datalake_tars_clean.vector_logs.ts_event
+    description: Timestamp when the tool-call event was emitted.
+  dt_tool_call:
+    lineage:
+      - datalake_tars_clean.vector_logs.dt_event
+    description: Calendar date of the tool call (UTC) for daily series.
+  year:
+    lineage:
+      - datalake_tars_clean.vector_logs.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars_clean.vector_logs.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars_clean.vector_logs.day
+    description: Partition day.

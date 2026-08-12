@@ -28,6 +28,7 @@ _JOB_PATHS = [
     "dags/governance/reverse_anonymization/spark_jobs/load_results_into_gsheet.py",
     "dags/governance/reverse_dashboard_governance/spark_jobs/load_dashboard_governance_into_mp.py",
     "dags/governance/reverse_dashboard_governance/spark_jobs/load_data_assets_into_mp.py",
+    "dags/governance/tars_vector_logs/spark_jobs/load_incremental_tars_vector_logs_raw.py",
 ]
 
 _JOBS_WITH_RESOLVE = {
@@ -52,6 +53,7 @@ _JOBS_WITH_RESOLVE = {
     "dags/governance/reverse_anonymization/spark_jobs/load_results_into_gsheet.py",
     "dags/governance/reverse_dashboard_governance/spark_jobs/load_dashboard_governance_into_mp.py",
     "dags/governance/reverse_dashboard_governance/spark_jobs/load_data_assets_into_mp.py",
+    "dags/governance/tars_vector_logs/spark_jobs/load_incremental_tars_vector_logs_raw.py",
 }
 
 

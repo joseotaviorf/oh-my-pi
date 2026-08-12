@@ -1,0 +1,125 @@
+---
+database_name: datalake_tars
+table_name: turn_quality
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Turn-grain quality and blocking outcomes for Tars, sourced from Vector
+  turn_summary and turn_blocked events. One row per closed analytical turn that
+  either delivered an answer (turn_summary) or stopped without one (turn_blocked).
+  Carries dq_status, confidence tier, schema-gate result, blocking_step, and the
+  SQL / Data Product context used. Powers trust-score and DQ-verdict panels.
+columns:
+  id_turn:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_turn
+      - datalake_tars_clean.vector_logs.id_session
+    description: Turn identifier when present; otherwise a synthetic id from event_type/session/ts.
+  id_session:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+    description: Session identifier for the conversation that owned this turn.
+  event_type:
+    lineage:
+      - datalake_tars_clean.vector_logs.event_type
+    description: Source event type (turn_summary or turn_blocked).
+  session_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.session_source
+    description: Client that ran the session (cursor, claude, unknown).
+  status:
+    lineage:
+      - datalake_tars_clean.vector_logs.status
+    description: Event status (success, error, or blocked).
+  response_category:
+    lineage:
+      - datalake_tars_clean.vector_logs.response_category
+    description: Answer category on turn_summary (data_query, debug, …).
+  business_domain:
+    lineage:
+      - datalake_tars_clean.vector_logs.business_domain
+    description: Business domain classified for the turn.
+  context_path:
+    lineage:
+      - datalake_tars_clean.vector_logs.context_path
+    description: Context discovery path used (e.g. business_entity).
+  answer_confidence_tier:
+    lineage:
+      - datalake_tars_clean.vector_logs.answer_confidence_tier
+    description: Agent self-rated confidence (high, medium, low).
+  dq_status:
+    lineage:
+      - datalake_tars_clean.vector_logs.dq_status
+    description: Data-quality verdict (pass, concern, fail, not_applicable).
+  self_review_fix_cycles:
+    lineage:
+      - datalake_tars_clean.vector_logs.self_review_fix_cycles
+    description: Number of adversarial self-review fix cycles before the turn closed.
+  is_schema_gate_passed:
+    lineage:
+      - datalake_tars_clean.vector_logs.is_schema_gate_passed
+    description: True when the schema gate reported passed=true.
+  blocking_step:
+    lineage:
+      - datalake_tars_clean.vector_logs.blocking_step
+    description: Canonical reason the turn blocked (access_denied, schema_gate_fail, …).
+  error_class:
+    lineage:
+      - datalake_tars_clean.vector_logs.error_class
+    description: Error class associated with a blocked turn, when present.
+  dp_urn:
+    lineage:
+      - datalake_tars_clean.vector_logs.dp_urn
+    description: Primary DataHub Data Product URN chosen for the turn.
+  datasets_ranked:
+    lineage:
+      - datalake_tars_clean.vector_logs.datasets_ranked
+    description: Ranked dataset URNs from discovery on turn_summary.
+  limitations:
+    lineage:
+      - datalake_tars_clean.vector_logs.limitations
+    description: Agent-declared answer limitations (max 5 items).
+  user_question:
+    lineage:
+      - datalake_tars_clean.vector_logs.user_question
+    description: Natural-language question for the turn (truncated on emit).
+  sql:
+    lineage:
+      - datalake_tars_clean.vector_logs.sql
+    description: Final SQL associated with the turn_summary (truncated on emit).
+  duration_ms:
+    lineage:
+      - datalake_tars_clean.vector_logs.duration_ms
+    description: Optional duration stamped on the quality event when present.
+  service_name:
+    lineage:
+      - datalake_tars_clean.vector_logs.service_name
+    description: Emitting skill label (tars or unstable-srat).
+  env:
+    lineage:
+      - datalake_tars_clean.vector_logs.env
+    description: Log environment label (prod or forno).
+  skill_version:
+    lineage:
+      - datalake_tars_clean.vector_logs.skill_version
+    description: Plugin skill version that emitted the event.
+  ts_turn:
+    lineage:
+      - datalake_tars_clean.vector_logs.ts_event
+    description: Timestamp when the quality/blocked event was emitted.
+  dt_turn:
+    lineage:
+      - datalake_tars_clean.vector_logs.dt_event
+    description: Calendar date of the event (UTC) for daily series.
+  year:
+    lineage:
+      - datalake_tars_clean.vector_logs.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars_clean.vector_logs.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars_clean.vector_logs.day
+    description: Partition day.

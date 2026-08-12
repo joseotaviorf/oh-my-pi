@@ -1,0 +1,29 @@
+---
+table_name: datalake_tars.user_feedback
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt_feedback
+  incremental_date_mask: yyyy-MM-dd
+
+# No has_size check: zero feedback submissions is the healthy steady state for most
+# days (interviews are user-initiated, not automatic).
+column_level_validations:
+  id_feedback:
+    is_complete:
+      severity_level: Error
+  id_session:
+    is_complete:
+      severity_level: Error
+  likert_score:
+    is_contained_in:
+      values: [1, 2, 3, 4, 5]
+      severity_level: Warning
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

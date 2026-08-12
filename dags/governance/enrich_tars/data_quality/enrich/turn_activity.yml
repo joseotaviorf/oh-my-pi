@@ -1,0 +1,33 @@
+---
+table_name: datalake_tars.turn_activity
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt_turn
+  incremental_date_mask: yyyy-MM-dd
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+# event_type/outcome/start_source/trigger/duration_ms are intentionally not
+# checked for completeness: each is populated by only one side of the
+# turn_metrics/turn_quality FULL OUTER JOIN and is expected to be null when
+# only the other side matched (e.g. outcome is null on prod today, since
+# turn_end is still forno-only).
+column_level_validations:
+  id_turn:
+    is_complete:
+      severity_level: Error
+  id_session:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

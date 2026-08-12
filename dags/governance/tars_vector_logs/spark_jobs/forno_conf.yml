@@ -1,0 +1,4 @@
+---
+raw_partition_cols: [year, month, day]
+s3_source_bucket: 5a-tars-forno-forno-data
+s3_folder: tars-logs

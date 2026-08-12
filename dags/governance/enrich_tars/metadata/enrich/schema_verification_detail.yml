@@ -1,0 +1,67 @@
+---
+database_name: datalake_tars
+table_name: schema_verification_detail
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Per-turn schema verification detail: explodes schema_gate.tables (the raw lake
+  tables Tars actually schema-checked before answering) from Vector turn_summary
+  events. Sourced from vector_logs.schema_gate_json — schema_verified_tables_json is
+  always null on the current payload; the tables array is nested under schema_gate.
+  Distinct from datahub_asset_usage (DataHub catalog URNs referenced): this table
+  tracks raw lake table.column verification, useful for cross-referencing with
+  map-table-usage on which tables Tars relies on most.
+columns:
+  id_turn:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_turn
+      - datalake_tars_clean.vector_logs.id_session
+    description: Turn identifier when present, otherwise a synthetic id from session/timestamp.
+  id_session:
+    lineage:
+      - datalake_tars_clean.vector_logs.id_session
+    description: Session identifier for the conversation that owned this turn.
+  session_source:
+    lineage:
+      - datalake_tars_clean.vector_logs.session_source
+    description: Client that ran the session (cursor, claude, unknown).
+  business_domain:
+    lineage:
+      - datalake_tars_clean.vector_logs.business_domain
+    description: Business domain classified for the turn.
+  is_schema_gate_passed:
+    lineage:
+      - datalake_tars_clean.vector_logs.schema_gate_json
+    description: True when the schema gate reported passed=true for the turn overall.
+  verified_schema:
+    lineage:
+      - datalake_tars_clean.vector_logs.schema_gate_json
+    description: Lake database/schema name of the verified table (e.g. dw_rent).
+  verified_table_name:
+    lineage:
+      - datalake_tars_clean.vector_logs.schema_gate_json
+    description: Lake table name that was schema-verified before answering (e.g. fact_rent_demand_events).
+  verified_columns:
+    lineage:
+      - datalake_tars_clean.vector_logs.schema_gate_json
+    description: Array of column names checked against the table schema for this turn.
+  ts_turn:
+    lineage:
+      - datalake_tars_clean.vector_logs.ts_event
+    description: Timestamp when the turn_summary event was emitted.
+  dt_turn:
+    lineage:
+      - datalake_tars_clean.vector_logs.dt_event
+    description: Calendar date of the turn (UTC) for daily series.
+  year:
+    lineage:
+      - datalake_tars_clean.vector_logs.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars_clean.vector_logs.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars_clean.vector_logs.day
+    description: Partition day.

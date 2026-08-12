@@ -1,0 +1,31 @@
+---
+table_name: datalake_tars.protocol_health
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt_issue
+  incremental_date_mask: yyyy-MM-dd
+
+# No has_size check: zero rows is the healthy steady state for this table
+# (it only fills when the skill actually skips or fails a trajectory event).
+column_level_validations:
+  id_issue:
+    is_complete:
+      severity_level: Error
+  id_session:
+    is_complete:
+      severity_level: Error
+  issue_source:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: [protocol_gap, turn_end]
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

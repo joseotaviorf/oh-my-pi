@@ -1,12 +1,11 @@
--- Reads from query_annotations (enrich layer) joined back to the raw source
--- to explode datahub_urns. The inner_dependency on query_annotations ensures
--- this runs after query_annotations is populated for the same window.
+-- Explodes datahub_urns already materialized on query_annotations (Vector-sourced).
 WITH annotations AS (
     SELECT
         id_query,
         id_session,
         user,
         business_domain_normalized,
+        datahub_urns,
         ts_started,
         year,
         month,
@@ -19,54 +18,20 @@ WITH annotations AS (
         AND has_tars_comment = TRUE
         AND urn_count > 0
 ),
-raw_urns AS (
-    SELECT
-        query_id AS id_query,
-        from_json(
-            get_json_object(
-                regexp_extract(query, '/\\* tars: (\\{{.*?\\}}) \\*/', 1),
-                '$.datahub_urns'
-            ),
-            'ARRAY<STRING>'
-        ) AS datahub_urns
-    FROM
-        data_platform_metrics.trino_query_complete
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN "{load_start_date}"
-        AND "{load_end_date}"
-        AND LOWER(source) LIKE 'tars%'
-),
-joined AS (
-    SELECT
-        ann.id_query,
-        ann.id_session,
-        ann.user,
-        ann.business_domain_normalized AS business_domain,
-        ann.ts_started,
-        ann.year,
-        ann.month,
-        ann.day,
-        raw.datahub_urns
-    FROM
-        annotations AS ann
-    INNER JOIN
-        raw_urns AS raw
-            ON ann.id_query = raw.id_query
-),
 exploded AS (
     SELECT
-        joined.id_query,
-        joined.id_session,
-        joined.user,
-        joined.business_domain,
-        joined.ts_started,
-        joined.year,
-        joined.month,
-        joined.day,
+        annotations.id_query,
+        annotations.id_session,
+        annotations.user,
+        annotations.business_domain_normalized AS business_domain,
+        annotations.ts_started,
+        annotations.year,
+        annotations.month,
+        annotations.day,
         urn
     FROM
-        joined
-    LATERAL VIEW OUTER EXPLODE(joined.datahub_urns) AS urn
+        annotations
+    LATERAL VIEW OUTER EXPLODE(annotations.datahub_urns) AS urn
     WHERE
         urn IS NOT NULL
         AND LENGTH(urn) > 0

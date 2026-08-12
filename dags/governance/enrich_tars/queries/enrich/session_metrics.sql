@@ -73,6 +73,66 @@ session_agg AS (
         session_base
     GROUP BY
         id_session
+),
+turn_agg AS (
+    SELECT
+        id_session,
+        AVG(
+            CASE
+                WHEN start_source = 'prompt_submit'
+                    AND trigger != 'scheduled'
+                    AND duration_ms IS NOT NULL
+                THEN duration_ms
+            END
+        ) AS avg_turn_duration_ms,
+        SUM(CASE WHEN outcome = 'completed' THEN 1 ELSE 0 END) AS completed_turn_count,
+        SUM(CASE WHEN outcome = 'gap' THEN 1 ELSE 0 END) AS gap_turn_count
+    FROM
+        datalake_tars.turn_metrics
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN "{load_start_date}"
+        AND "{load_end_date}"
+    GROUP BY
+        id_session
+),
+quality_agg AS (
+    SELECT
+        id_session,
+        SUM(
+            CASE
+                WHEN dq_status IN ('fail', 'concern') THEN 1
+                ELSE 0
+            END
+        ) AS dq_fail_count,
+        AVG(
+            CASE answer_confidence_tier
+                WHEN 'high' THEN 3.0
+                WHEN 'medium' THEN 2.0
+                WHEN 'low' THEN 1.0
+            END
+        ) AS avg_confidence_tier
+    FROM
+        datalake_tars.turn_quality
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN "{load_start_date}"
+        AND "{load_end_date}"
+        AND event_type = 'turn_summary'
+    GROUP BY
+        id_session
+),
+session_start_agg AS (
+    SELECT
+        id_session,
+        MIN(NULLIF(tars_env, 'unknown')) AS tars_env,
+        MIN(NULLIF(language, 'unknown')) AS language
+    FROM
+        datalake_tars_clean.vector_logs
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN "{load_start_date}"
+        AND "{load_end_date}"
+        AND event_type = 'session_start'
+    GROUP BY
+        id_session
 )
 SELECT
     si.id_session,
@@ -91,6 +151,13 @@ SELECT
     sa.distinct_products,
     sa.distinct_datasets,
     sa.depth_tier,
+    ROUND(ta.avg_turn_duration_ms, 1) AS avg_turn_duration_ms,
+    COALESCE(ta.completed_turn_count, 0) AS completed_turn_count,
+    COALESCE(ta.gap_turn_count, 0) AS gap_turn_count,
+    COALESCE(qa.dq_fail_count, 0) AS dq_fail_count,
+    ROUND(qa.avg_confidence_tier, 2) AS avg_confidence_tier,
+    ssa.tars_env,
+    ssa.language,
     ROUND(
         (UNIX_TIMESTAMP(si.ts_session_end) - UNIX_TIMESTAMP(si.ts_session_start)) / 60.0,
         2
@@ -109,3 +176,12 @@ INNER JOIN
 INNER JOIN
     dominant_domain AS dd
         ON si.id_session = dd.id_session
+LEFT JOIN
+    turn_agg AS ta
+        ON si.id_session = ta.id_session
+LEFT JOIN
+    quality_agg AS qa
+        ON si.id_session = qa.id_session
+LEFT JOIN
+    session_start_agg AS ssa
+        ON si.id_session = ssa.id_session

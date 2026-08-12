@@ -1,0 +1,31 @@
+---
+table_name: datalake_tars.schema_verification_detail
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt_turn
+  incremental_date_mask: yyyy-MM-dd
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+column_level_validations:
+  id_turn:
+    is_complete:
+      severity_level: Error
+  id_session:
+    is_complete:
+      severity_level: Error
+  verified_table_name:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

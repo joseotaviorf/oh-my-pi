@@ -15,12 +15,12 @@
 
 ## Overview
 
-- **Objective:** Measure how QuintoAndar's AI data analyst (**Tars** / unstable-srat) is used in Trino — session adoption, query quality, DataHub context attach rates, and catalog coverage gaps — so Data Ops & Governance can track the TARS Usage / Context Coverage Superset dashboard and investigate product gaps.
-- **Asset status / lifecycle:** Each Tars-tagged Trino query lands in `data_platform_metrics.trino_query_complete` (`source LIKE 'tars%'`). The `enrich_tars` DAG (daily, 06:00) parses the embedded `/* tars: {...} */` JSON comment into enrich tables under `datalake_tars`. Annotation logging started **2026-06-18** — earlier queries may exist without a parseable comment (`has_tars_comment = false`).
-- **Typical actions / events:** User asks a question in Claude Code / Cursor → Tars runs Trino SQL with a wire comment → `query_annotations` (query grain) → roll-ups to `session_metrics` and URN explosion to `datahub_asset_usage` → daily product×topic coverage snapshot.
-- **Common metrics:** WAU / sessions per week, DataHub attach rate (`used_datahub`), success rate (`pct_finished` / `is_success`), context depth tier (L0–L4), product coverage gaps (`is_used = false` + `expected_domain_match = true`).
-- **Source systems:** Trino query telemetry (`data_platform_metrics.trino_query_complete`); DataHub product catalog seed (`schemas/datahub_products.yml` → `datahub_product_glossary`).
-- **Related entities:** This is **not** Domi chatbot traffic (see [`chatbot_sessions.md`](chatbot_sessions.md) / [`evals.md`](evals.md)). It is also **not** the Vector/Loki trajectory events (`session_start`, `turn_summary`, `protocol_gap`) from the marketplace skill — those live in observability Loki (`service_name="unstable-srat"`), not in `datalake_tars`.
+- **Objective:** Measure how QuintoAndar's AI data analyst (**Tars** / unstable-srat) is used — session adoption, query quality, turn latency, DataHub context attach rates, and catalog coverage gaps — so Data Ops & Governance can track the TARS Usage / Context Coverage Superset dashboard and investigate product gaps.
+- **Asset status / lifecycle:** Conversation events land in S3 (`tars-logs/`) via Vector, are ingested by `tars_vector_logs` into `datalake_tars_raw.vector_logs` / `datalake_tars_clean.vector_logs`, then `enrich_tars` (daily, 06:00) builds enrich tables under `datalake_tars`. Query annotations are hybrid: Vector `trino_query` events joined best-effort to `data_platform_metrics.trino_query_complete` for `user` / `id_query`. Vector sink started **2026-08-12** — do not backfill `query_annotations` before that date (would wipe older Trino-derived history).
+- **Typical actions / events:** User asks a question in Claude Code / Cursor → Tars emits Vector events (`session_start`, `trino_query`, `turn_summary` / `turn_blocked`, `turn_end`) → clean `vector_logs` → `query_annotations` / `turn_metrics` / `turn_quality` → roll-ups to `session_metrics` and URN explosion to `datahub_asset_usage` → daily product×topic coverage snapshot.
+- **Common metrics:** WAU / sessions per week, DataHub attach rate (`used_datahub`), success rate (`pct_finished` / `is_success`), prompt-to-answer latency (`avg_turn_duration_ms` / `turn_metrics.duration_ms`), DQ fail / confidence (`dq_fail_count`, `avg_confidence_tier`), context depth tier (L0–L4), product coverage gaps (`is_used = false` + `expected_domain_match = true`).
+- **Source systems:** Vector S3 logs (`5a-tars-prod-data` / `5a-tars-forno-forno-data`); optional Trino telemetry join (`data_platform_metrics.trino_query_complete`); DataHub product catalog seed (`schemas/datahub_products.yml` → `datahub_product_glossary`).
+- **Related entities:** This is **not** Domi chatbot traffic (see [`chatbot_sessions.md`](chatbot_sessions.md) / [`evals.md`](evals.md)). It is also **not** the Conversational XP Drive-based `datalake_tars_raw.logs` table from `cross/tars_logs` — use `vector_logs` for Vector trajectory telemetry.
 
 ---
 
@@ -31,7 +31,9 @@
 | **Tars** / **TARS** / **unstable-srat** | AI data analyst skill that runs Trino for analytics | Filter source telemetry with `LOWER(source) LIKE 'tars%'` upstream; lake tables already restrict to Tars |
 | **Session** / **conversa Tars** | One agent conversation | `id_session`; synthetic ids start with `no-session-` when the wire comment lacked `session_id` |
 | **Synthetic session** | Single untagged query forced into a fake session | `is_synthetic_session = true` — exclude from adoption KPIs |
-| **Wire comment** / **tars annotation** | `/* tars: {...} */` JSON in the SQL text | Parsed into `user_question`, `response_category`, `datahub_urns`, etc. |
+| **Wire comment** / **tars annotation** | `/* tars: {...} */` JSON in the SQL text | Still stamped on Trino queries; used to recover `user` / `id_query` in the hybrid join |
+| **Vector event** / **trajectory log** | One flattened NDJSON line from Vector → S3 | Cleaned in `datalake_tars_clean.vector_logs`; enrich tables filter by `event_type` |
+| **Turn** / **turn_end** | One user prompt → answer cycle | `turn_metrics` (latency/outcome) and `turn_quality` (`turn_summary` / `turn_blocked`) |
 | **DataHub attach** / **usou DataHub** | Session/query referenced ≥1 DataHub URN | `used_datahub` (session) or `urn_count > 0` / `context_mode != 'no_datahub'` (query) |
 | **Depth tier** / **contexto L0–L4** | How deep DataHub context was | L0=none, L1=datasets only, L2=1 product, L3=2 products, L4=3+ products (`depth_tier`) |
 | **Coverage gap** / **produto sem uso** | Product expected for a topic but never referenced | `product_topic_coverage`: `is_used = false` AND `expected_domain_match = true` |
@@ -44,19 +46,23 @@
 
 | You need… | Schema / table |
 |-----------|----------------|
-| One row per Trino query Tars ran (question, domain, success, DataHub depth) | `datalake_tars.query_annotations` — grain: 1 row per `id_query`; partitioned by `year`/`month`/`day` of execution |
-| One row per conversation (engagement, success %, DataHub flags, duration) | `datalake_tars.session_metrics` — grain: 1 row per `id_session` per load day; use `dt_session` for time series |
+| Raw / parsed Vector events (all event types) | `datalake_tars_raw.vector_logs` / `datalake_tars_clean.vector_logs` — grain: 1 row per event; filter `event_type` |
+| One row per Trino query Tars ran (question, domain, success, DataHub depth) | `datalake_tars.query_annotations` — grain: 1 row per Vector `trino_query` (hybrid Trino join); partitioned by UTC event date |
+| One row per closed turn (latency, outcome, start_source) | `datalake_tars.turn_metrics` — grain: 1 row per `turn_end`; never average `duration_ms` across `start_source` |
+| One row per answered / blocked turn (DQ, confidence, SQL) | `datalake_tars.turn_quality` — grain: 1 row per `turn_summary` or `turn_blocked` |
+| One row per conversation (engagement, success %, DataHub flags, duration, latency) | `datalake_tars.session_metrics` — grain: 1 row per `id_session` per load day; use `dt_session` for time series |
 | Which DataHub products/datasets Tars referenced | `datalake_tars.datahub_asset_usage` — grain: 1 row per (`id_query`, `datahub_urn`); filter `asset_type = 'dataProduct'` or `'dataset'` |
 | Product × business-topic coverage gaps (trailing 28 days) | `datalake_tars.product_topic_coverage` — daily snapshot keyed by `dt_reference`; prefer latest `dt_reference` |
 | Static catalog of DataHub Data Products (seed) | `datalake_tars.datahub_product_glossary` — full refresh; exclude `is_test = true` from gap analysis |
 
 **Critical rules:**
-- Always filter partitions with `MAKE_DATE(year, month, day)` (or `dt_session` / `dt_reference`) — tables are daily-partitioned.
+- Always filter partitions with `MAKE_DATE(year, month, day)` (or `dt_session` / `dt_reference` / `dt_turn`) — tables are daily-partitioned (UTC for Vector-sourced tables).
 - Exclude synthetic sessions from adoption KPIs: `is_synthetic_session = false`.
 - Prefer `business_domain_normalized` over raw `business_domain` for grouping (aliases/typos are collapsed to For Rent, For Sale, Fintech, Growth, Conversational, Agents, Support and Services, Supply, Single Station, Other, unknown).
 - `product_topic_coverage` is a **cross-join snapshot** of products × observed topics over ~28 days ending at `dt_reference` — do not sum `urn_hits` across many `dt_reference` days without picking one snapshot first.
 - `urn_hit_count` is always `1` per row in `datahub_asset_usage` — use `SUM(urn_hit_count)` or `COUNT(*)` for hit volume.
-- Raw Trino SQL text is **not** stored in these enrich tables (only extracted annotation fields). For full SQL, query `data_platform_metrics.trino_query_complete` by `query_id = id_query` (platform metrics, heavier).
+- For turn latency, filter `start_source = 'prompt_submit'` and `trigger != 'scheduled'` before averaging `duration_ms`.
+- Full SQL may also live on `turn_quality.sql` / clean `vector_logs.sql` (truncated). For engine stats, join `data_platform_metrics.trino_query_complete` by `query_id = id_query` when the hybrid join succeeded.
 
 ---
 
@@ -71,6 +77,9 @@
 - **Top DataHub assets:** `SUM(urn_hit_count)` by `asset_slug` / `asset_type` on `datahub_asset_usage`.
 - **Catalog coverage gaps:** rows in `product_topic_coverage` where `expected_domain_match = true` AND `is_used = false` for the latest `dt_reference`.
 - **Session duration:** `session_duration_min` (first to last query in the session).
+- **Prompt-to-answer latency:** `AVG(duration_ms)` on `turn_metrics` where `start_source = 'prompt_submit'` and `trigger != 'scheduled'`; session roll-up `avg_turn_duration_ms`.
+- **Turn completion / gaps:** `outcome` mix on `turn_metrics`; session `completed_turn_count` / `gap_turn_count`.
+- **Answer DQ / confidence:** `dq_status` and `answer_confidence_tier` on `turn_quality`; session `dq_fail_count` / `avg_confidence_tier`.
 - **Client mix:** breakdown by `session_source` (`claude`, `cursor`, `unknown`).
 
 ---
@@ -78,10 +87,12 @@
 ## Relationships with other entities
 
 - **query_annotations → session_metrics (N:1):** many queries roll up to one `id_session`. Prefer `session_metrics` for adoption KPIs; use `query_annotations` for error/category grain.
-- **query_annotations → datahub_asset_usage (1:N):** one query explodes to zero or more URN rows. Join on `id_query` (and optionally `id_session`).
+- **turn_metrics / turn_quality → session_metrics (N:1):** turn latency and DQ roll into session-level columns (`avg_turn_duration_ms`, `gap_turn_count`, `dq_fail_count`, …).
+- **query_annotations → datahub_asset_usage (1:N):** one query explodes to zero or more URN rows from `datahub_urns`. Join on `id_query` (and optionally `id_session`).
 - **datahub_product_glossary → product_topic_coverage (1:N):** `product_slug` is the FK; coverage excludes `is_test = true` products at build time.
 - **datahub_asset_usage → product_topic_coverage:** coverage `urn_hits` / `sessions` / `queries` aggregate product (`asset_type = 'dataProduct'`) usage over the trailing window; gaps are inferred, not direct FKs from unused products.
-- **Optional bridge to raw Trino telemetry:** `query_annotations.id_query = data_platform_metrics.trino_query_complete.query_id` when full SQL or engine stats are needed.
+- **Optional bridge to raw Trino telemetry:** `query_annotations.id_query = data_platform_metrics.trino_query_complete.query_id` when the hybrid join matched and full SQL / engine stats are needed.
+- **Clean Vector events:** `datalake_tars_clean.vector_logs` is the upstream of all enrich tables above (except `datahub_product_glossary`).
 - **Not related to Domi evals / chatbot sessions:** do not join `datalake_chatbot.*` or Langfuse scores for Tars Trino usage.
 
 ---
@@ -93,12 +104,15 @@
 - Filter `is_synthetic_session = false` when reporting WAU, sessions/week, or attach rates.
 - Group domains with `business_domain_normalized` (or `dominant_business_domain` on sessions).
 - For coverage gaps, fix a single `dt_reference` (usually `MAX(dt_reference)`) before ranking unused products.
-- Partition-prune with `MAKE_DATE(year, month, day) BETWEEN …` on query/asset tables and `dt_session` on session metrics.
+- Partition-prune with `MAKE_DATE(year, month, day) BETWEEN …` on query/asset/turn tables and `dt_session` on session metrics.
 - Treat `depth_tier` as ordinal (L0–L4) when measuring “how deep” context went in a session (`MAX(depth_tier)` is already baked into `session_metrics.depth_tier`).
+- Split turn latency by `start_source` (and exclude `trigger = 'scheduled'`) before averaging.
 
 **Don't:**
 
-- Confuse these lake tables with Loki/Vector trajectory logs (`event_type` = `session_start` / `turn_summary` / `protocol_gap`) — different pipeline and grain.
+- Confuse Vector `vector_logs` with the Conversational XP Drive table `datalake_tars_raw.logs` — different DAG and grain.
+- Average `turn_metrics.duration_ms` across mixed `start_source` values — `first_tool_call` understates true prompt-to-answer latency.
+- Backfill `query_annotations` for dates before 2026-08-12 — Vector S3 has no history and would overwrite older Trino-derived rows with empties.
 - Count every `product_topic_coverage` row as a “miss” — only `expected_domain_match = true AND is_used = false` are intentional gaps; unexpected domain pairs are noise.
 - Use raw `business_domain` for dashboards without normalization — free text has typos and aliases.
 - Assume `distinct_products` / `distinct_datasets` on `session_metrics` are true distinct counts across the session — they are `MAX(...)` of per-query counts (upper-bound proxy).
