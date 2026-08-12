@@ -6,6 +6,9 @@ cluster:
     permission_level: CAN_MANAGE
   custom_libraries:
   - pypi:
+      package: 'packaging>=23.0,<27'
+      ignore_installed: true
+  - pypi:
       package: google-api-python-client
   - pypi:
       package: google-auth>=2.0.0

@@ -3,7 +3,7 @@
 
 Used by emr_init_script.sh. Modes:
 
-  pypi          — TSV: package\\tno_deps(0|1)\\tonly_binary(0|1)
+  pypi          — TSV: package\\tno_deps(0|1)\\tonly_binary(0|1)\\tignore_installed(0|1)
   whl           — one URI per line (may contain {artifacts_bucket})
   jar           — one URI per line (may contain {artifacts_bucket})
   maven         — TSV: coordinates\\trepo_or_empty\\trelative_path\\tjar_name
@@ -56,9 +56,9 @@ def _iter_custom_libraries(
 
 def extract_pypi_packages(
     data: Dict[str, Any], *, is_validation: bool = False
-) -> List[Tuple[str, int, int]]:
-    """Return unique (package, no_deps, only_binary) rows preserving order."""
-    entries: List[Tuple[str, int, int]] = []
+) -> List[Tuple[str, int, int, int]]:
+    """Return unique (package, no_deps, only_binary, ignore_installed) rows preserving order."""
+    entries: List[Tuple[str, int, int, int]] = []
     seen = set()
     for item in _iter_custom_libraries(data, is_validation=is_validation):
         if not isinstance(item, dict):
@@ -75,7 +75,8 @@ def extract_pypi_packages(
         seen.add(pkg)
         no_deps = 1 if pypi.get("no_deps") in _TRUTHY else 0
         only_binary = 1 if pypi.get("only_binary") in _TRUTHY else 0
-        entries.append((pkg, no_deps, only_binary))
+        ignore_installed = 1 if pypi.get("ignore_installed") in _TRUTHY else 0
+        entries.append((pkg, no_deps, only_binary, ignore_installed))
     return entries
 
 
@@ -335,10 +336,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     is_validation = _parse_is_validation(args.is_validation)
 
     if args.mode == "pypi":
-        for pkg, no_deps, only_binary in extract_pypi_packages(
+        for pkg, no_deps, only_binary, ignore_installed in extract_pypi_packages(
             data, is_validation=is_validation
         ):
-            print(f"{pkg}\t{no_deps}\t{only_binary}")
+            print(f"{pkg}\t{no_deps}\t{only_binary}\t{ignore_installed}")
         return 0
 
     if args.mode == "maven":

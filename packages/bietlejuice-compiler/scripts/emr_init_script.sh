@@ -118,11 +118,12 @@ _emr_download_cluster_yaml() {
 }
 
 # Parse custom_libraries pypi entries from a cluster/declaration YAML.
-# Prints TSV lines: package<TAB>no_deps(0|1)<TAB>only_binary(0|1).
+# Prints TSV lines: package<TAB>no_deps(0|1)<TAB>only_binary(0|1)<TAB>ignore_installed(0|1).
 # Always reads cluster.custom_libraries; when is_validation=1 also unions
 # validation.cluster.custom_libraries. Optional EMR-only flags under pypi:
-#   no_deps: true       → pip --no-deps
-#   only_binary: true   → pip --only-binary=:all:
+#   no_deps: true            → pip --no-deps
+#   only_binary: true         → pip --only-binary=:all:
+#   ignore_installed: true    → pip --ignore-installed (RPM overlay packages)
 _emr_extract_pypi_packages() {
     local cluster_yaml="$1"
     local is_validation="${2:-0}"
@@ -160,14 +161,14 @@ _emr_install_custom_pypi_libraries() {
     fi
 
     echo "  Packages to install:"
-    while IFS=$'\t' read -r pkg no_deps only_binary; do
+    while IFS=$'\t' read -r pkg no_deps only_binary ignore_installed; do
         [ -z "${pkg}" ] && continue
-        echo "    ${pkg} (no_deps=${no_deps:-0} only_binary=${only_binary:-0})"
+        echo "    ${pkg} (no_deps=${no_deps:-0} only_binary=${only_binary:-0} ignore_installed=${ignore_installed:-0})"
     done <<EOF
 ${packages}
 EOF
 
-    while IFS=$'\t' read -r pkg no_deps only_binary; do
+    while IFS=$'\t' read -r pkg no_deps only_binary ignore_installed; do
         [ -z "${pkg}" ] && continue
         pip_flags=(--no-cache-dir)
         if [ "${no_deps:-0}" = "1" ]; then
@@ -177,6 +178,9 @@ EOF
         fi
         if [ "${only_binary:-0}" = "1" ]; then
             pip_flags+=(--only-binary=:all:)
+        fi
+        if [ "${ignore_installed:-0}" = "1" ]; then
+            pip_flags+=(--ignore-installed)
         fi
         echo "  Installing ${pkg}..."
         if ! $PIP_EXEC install "${pip_flags[@]}" "${pkg}"; then
@@ -768,6 +772,7 @@ EOF
         'PyYAML>=6.0.1' \
         'SQLAlchemy>=1.4.54' \
         'sqlglot>=26.9.0' \
+        'tenacity>=8.0.1' \
         'trino>=0.305.0' \
         'Unidecode==1.1.1'; then
         echo "Error: pip install of bietlejuice PyPI dependencies failed."

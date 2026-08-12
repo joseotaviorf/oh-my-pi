@@ -161,8 +161,8 @@ class TestExtractWhlAndPypi:
 
         # assert
         assert packages == [
-            ("presidio-analyzer==2.2.357", 1, 0),
-            ("numpy==1.26.4", 0, 1),
+            ("presidio-analyzer==2.2.357", 1, 0, 0),
+            ("numpy==1.26.4", 0, 1, 0),
         ]
 
 
@@ -209,7 +209,7 @@ class TestMainCli:
 
         # assert
         assert rc == 0
-        assert capsys.readouterr().out.strip() == "google-auth==2.23.0\t0\t1"
+        assert capsys.readouterr().out.strip() == "google-auth==2.23.0\t0\t1\t0"
 
     def test_maven_mode_prints_tsv(self, cluster_yaml, capsys):
         # arrange
@@ -459,6 +459,34 @@ def test_emr_constraints_include_urllib3_cap_for_awscli():
     assert "Restoring python-dateutil and urllib3 for awscli compatibility" in script
 
 
+def test_emr_init_script_supports_ignore_installed_pypi_flag():
+    script = (_SCRIPTS_DIR / "emr_init_script.sh").read_text(encoding="utf-8")
+    assert "_emr_upgrade_packaging_for_pip" not in script
+    fn_start = script.index("_emr_install_custom_pypi_libraries()")
+    fn_end = script.index("\n_emr_install_system_gnupg()", fn_start)
+    fn_body = script[fn_start:fn_end]
+    assert "read -r pkg no_deps only_binary ignore_installed" in fn_body
+    assert "pip_flags+=(--ignore-installed)" in fn_body
+
+
+def test_langfuse_cluster_pins_packaging_before_client():
+    cluster_yaml = (
+        _SCRIPTS_DIR.parents[2] / "dags/conversational_xp/langfuse/langfuse_cluster.yml"
+    ).read_text(encoding="utf-8")
+    data = yaml.safe_load(cluster_yaml)
+    packages = extract_pypi_packages(data, is_validation=False)
+    assert packages[0] == ("packaging>=23.2,<25", 0, 0, 1)
+    assert packages[1][0] == "langfuse==3.0.0"
+
+
+def test_emr_bietlejuice_deps_install_includes_tenacity_floor():
+    script = (_SCRIPTS_DIR / "emr_init_script.sh").read_text(encoding="utf-8")
+    marker = "Installing bietlejuice transitive PyPI dependencies (constraints)..."
+    start = script.index(marker)
+    block = script[start : start + 1200]
+    assert "'tenacity>=8.0.1'" in block
+
+
 def _write_fake_wheel(path: Path, *, requires_dist: list) -> Path:
     """Build a minimal wheel zip with dist-info METADATA for Requires-Dist tests."""
     msg = email.message.EmailMessage()
@@ -587,6 +615,32 @@ class TestFilterRequiresDistForEmrConstraints:
         # assert
         assert kept == ["httpx>=0.27"]
         assert skipped == ["requests ==2.32.2"]
+
+    def test_skips_conflicting_tenacity_pin_when_distribution_already_installed(
+        self, tmp_path: Path, monkeypatch
+    ):
+        constraints = tmp_path / "constraints.txt"
+        constraints.write_text(
+            "tenacity>=8.0.1\nurllib3>=1.25.4,<1.27\n",
+            encoding="utf-8",
+        )
+
+        class _FakeDist:
+            def __init__(self, name: str):
+                self.metadata = {"Name": name}
+
+        monkeypatch.setattr(
+            "emr_custom_libraries.importlib.metadata.distributions",
+            lambda: [_FakeDist("tenacity")],
+        )
+
+        kept, skipped = filter_requires_dist_for_emr_constraints(
+            ["tenacity==4.12.0", "httpx>=0.27"],
+            str(constraints),
+        )
+
+        assert kept == ["httpx>=0.27"]
+        assert skipped == ["tenacity==4.12.0"]
 
     def test_cli_requires_dist_skips_conflicting_requests_pin(
         self, tmp_path: Path, capsys, monkeypatch
