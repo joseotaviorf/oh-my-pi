@@ -4,14 +4,16 @@ table_name: dim_employee
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |
-  Dimension table for active employees' public profile. Contains person_number, name,
-  and work_email for dashboards, hierarchy views, and non-sensitive reporting.
-  Grain: one record per active employee. SCD Type 1: current values only.
-  Terminated employees are excluded; use dw_employee_details for full workforce history.
+  Public profile for currently active employees: person_number, name, and work_email
+  for dashboards, hierarchy views, and non-sensitive reporting.
+  One row per active employee on the current primary assignment.
+  Covers currently active QuintoAndar employees only; terminated people live in dw_employee_details.
+  SCD Type 1: current values only. Join from fact_employees on sk_employee for name and email.
 columns:
   sk_employee:
     description: Surrogate key for the employee. Stable system identifier for the person.
     lineage:
+      - datalake_people.assignment_snapshots.id_person
       - datalake_people.identifier_mapping.id_person
   person_number:
     description: Internal person code. Unique identifier for the employee in the HR system (PIN - Oracle HCM).
