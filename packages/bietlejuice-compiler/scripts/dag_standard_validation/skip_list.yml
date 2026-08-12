@@ -64,6 +64,7 @@ dags_not_using_builder:
   - tech_platform/dw_devlake/validation/test_with_fixtures.py
   - tech_platform/dw_devlake/validation/validate_structure.py
   - platform/notify_stale_dags/notify_stale_dags.py
+  - platform/notify_broken_dags/notify_broken_dags.py
   - platform/notify_airbyte_key_rotation/notify_airbyte_key_rotation.py
   # Wonka Option-A parse-time registry factory — intentional non-Builder DAG.
   - quintoml/wonka_registry_factory.py

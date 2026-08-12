@@ -3981,6 +3981,7 @@ consolidation_xl_memory_single_node_cluster:
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
     stale_dag: GCHAT_STALE_DAG_WEBHOOK
+    broken_dag: GCHAT_BROKEN_DAG_WEBHOOK
     dag_rotation: NOTIFICATION_HUB_DAG_ROTATION_WEBHOOK
     iam_alerts: NOTIFICATION_HUB_IAM_ALERTS_WEBHOOK
     dag_runtime_monitoring: GCHAT_DAG_RUNTIME_MONITORING_WEBHOOK
