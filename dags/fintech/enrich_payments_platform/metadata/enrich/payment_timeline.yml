@@ -1,11 +1,14 @@
 ---
 database_name: datalake_payments_platform
 table_name: payment_timeline
+description: >
+  Chronological status history for payments unified from Wall Street charge
+  audits, Checkout charge status logs, and Vans boleto events. Grain is one row
+  per payment business key and status transition, ordered by timeline_order for
+  Fintech SLA and recovery analysis.
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 columns:
-  id_payment_timeline:
-    description: Unique identifier for the timeline record (generated using MONOTONICALLY_INCREASING_ID())
   id_business_key:
     description: Business key used to identify unique payment records across different sources
     lineage:

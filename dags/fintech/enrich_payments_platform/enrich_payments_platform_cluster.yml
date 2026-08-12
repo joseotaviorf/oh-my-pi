@@ -1,12 +1,33 @@
 cluster:
-  type: consolidation_m_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    num_workers: 4
-    spark_version: 16.4.x-scala2.12
+    # EMR load-enrich-payment: ShuffleMapStage stuck (~20 partitions, ~98
+    # min/task) vs ~7 min on Databricks. NVMe (gd) for shuffle spill I/O;
+    # pack 2 execs/node; serialize steps so payment owns the fleet.
+    # First retry after the webhook equi-join rewrite — slightly over-sized
+    # (12 nodes / 24 execs) until a stable run lands, then right-size.
+    step_concurrency_level: 1
+    core_nodes:
+      target_on_demand: 12
+      target_spot: 0
+      instance_types:
+      # Local NVMe (gd/id) — shuffle spill off EBS. x86_fallback maps
+      # r6gd/r7gd → r6id when EMR_X86_FALLBACK is on.
+      - r6gd.2xlarge
+      - r7gd.2xlarge
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-
-# noop: force astronomer dag bag redeploy (2026-08-11T19:40Z)
+      # Preset is 24g+4g overhead → ~1 exec/node on 64GB (YARN Reserved).
+      # 18g+3g packs 2 execs × 12 nodes = 24 under maxExecutors.
+      spark.executor.memory: "18g"
+      spark.executor.memoryOverhead: "3g"
+      # EMR fleet base disables broadcasts (-1); small dim joins (gsheets,
+      # requester, store) benefit from re-enabling at 100MB.
+      spark.sql.autoBroadcastJoinThreshold: "104857600"
+      spark.sql.adaptive.autoBroadcastJoinThreshold: "104857600"
+      # 256MB advisory coalesced stage 278 to only 20 tasks — too coarse.
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "33554432"
+      spark.sql.shuffle.partitions: "800"
+      spark.dynamicAllocation.maxExecutors: "24"
+      spark.speculation: "true"
+      spark.speculation.multiplier: "3"
+      spark.speculation.quantile: "0.75"
