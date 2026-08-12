@@ -12,19 +12,19 @@
 
 ## Overview
 
-- **Objective:** Define **who the agent is** and **what they do** in business terms — the official classification rules for agent profiles used in analytics, dashboards, and ad-hoc queries.
+- **Objective:** Define **who the agent is** and **what they do** in business terms — the official classification rules for agent profiles, plus the two adjacent domains that answer "which hub is this agent in" and "how is this agent performing for tiering": hub/NE allocation and tier performance metrics.
 - **Scope:** Human field agents and hub staff in the Agents domain. **Not** AI chatbots (Wall-E, Matthew, Matias, etc.) — see [`chatbot_sessions.md`](chatbot_sessions.md).
-- **Parent entity:** Full table catalog, earnings, hubs, identity migration, and golden queries live in [`agents.md`](agents.md). **This document is the source of truth whenever the question is about agent profile classification.**
+- **Parent entity:** Identity, accreditation, earnings/payments, and the identity-migration warning live in [`agents.md`](agents.md) and its linked sub-domain docs. This document is the source of truth for agent profile classification, hub allocation, and tier performance metrics.
 - **Status:** Implemented (ADR, Aug 3, 2026). Author: Anne Karoline Cardoso Macedo (Data Engineer @Agents).
 
-> ⚠ **Three different "profile" concepts — do not mix them.** (1) **Business profile** (this doc) — who the agent is (`dw_agent.dim_agent.profile` + capability flags + hub/prospect context). (2) **Hub member role** — `datalake_hub_services.member_hub_allocation.profile` (`Visita`, `NEGOTIATION_EXECUTIVE`, …). (3) **Business function** — what part of the deal they earn for (demand conversion, TQC/TQA, CIQ); see the business-function table in [`agents.md`](agents.md).
+> ⚠ **Three different "profile" concepts — do not mix them.** (1) **Business profile** (this doc) — who the agent is (`dw_agent.dim_agent.profile` + capability flags + hub/prospect context). (2) **Hub member role** — `datalake_hub_services.member_hub_allocation.profile` (`Visita`, `NEGOTIATION_EXECUTIVE`, …), also documented in this file. (3) **Business function** — what part of the deal they earn for (demand conversion, TQC/TQA, CIQ); see [`agents.md`](agents.md).
 
 ---
 
 ## Glossary and Synonyms
 
-| Term | Business profile | Notes |
-|------|------------------|-------|
+| Term | Meaning | Notes |
+|------|---------|-------|
 | **Agente QuintoAndar** / **corretor 5A** | QuintoAndar Agent | Default accredited broker; `profile = 'AUTONOMOUS_BROKERAGE_AGENT'`. |
 | **Agente de demanda venda** / **Demand Sale** | Demand Sale | Visit/conversion on For-Sale; `is_allow_demand_sale = true`. |
 | **Agente de demanda aluguel** / **Demand Rent** | Demand Rent | Visit/conversion on For-Rent; `is_allow_demand_rent = true`. |
@@ -36,12 +36,28 @@
 | **CIQ não-demanda venda** | Non-Demand Sale | Supply-only on Sale; no visit capability + prospect context SALE. |
 | **EN** / **Executivo de Negociação** | Negotiation Executive (EN) | Hub staff who negotiate offers until CCV; hub `profile = 'NEGOTIATION_EXECUTIVE'`. |
 | **EA** / **Executivo Associado** | Associated Executive (EA) | Hub manager over multiple business units; hub `profile = 'ASSOCIATED_EXECUTIVE'`. |
+| **Visita / Vistoria / SessãoFotos** | Hub operation types | `member_hub_allocation.profile` values — the work a member does in the hub, not the business profile above. |
 
 ---
 
-## Classification rules (source of truth)
+## Tables
 
-Evaluate profiles in **priority order** when a user asks for a single label — some agents match multiple rules (e.g. QuintoAndar Agent + Demand Sale). For reporting, use the rule that matches the user's intent; when unclear, return all matching profiles or ask.
+| You need… | Schema / table |
+|-----------|----------------|
+| Current agent identity + `profile` + capability flags | `dw_agent.dim_agent` |
+| Point-in-time profile / capabilities (historical) | `dw_agent.fact_agent_daily` |
+| Prospect `business_context_applied` (Non-Demand Rent/Sale) | `dw_agent.dim_prospect_agent` |
+| Hub role / NE / EA / daily hub workload | `datalake_hub_services.member_hub_allocation` |
+| Tier performance metrics feeding tier calculation | `datalake_tiers.agent_performance` |
+| CIQ first-listing validation for tiers | `datalake_tiers.ciq_first_listing` |
+| Enrich fallback (no DW needed for profile) | `datalake_agent_accreditation.agent` (see [`agents_accreditation.md`](agents_accreditation.md)) |
+
+**Critical rules:**
+- Evaluate business profiles in **priority order** — some agents match multiple rules (e.g. QuintoAndar Agent + Demand Sale). When unclear, return all matching profiles or ask.
+- `member_hub_allocation.profile = 'Visita'` is a **hub operation type**, not the same column or value space as `dw_agent.dim_agent.profile` (business profile).
+- `datalake_tiers.ciq_first_listing` vs `datalake_listing_deduplication.valid_first_listing` (see [`agents_performance.md`](agents_performance.md)): both validate a dedup-gated first listing, but `ciq_first_listing` is the CIQ-consultant / tiers scope (general rule: published ≥2 days, or signed contract within 60 days of first publication); `valid_first_listing` is the broader dedup/activation source.
+
+## Classification rules (source of truth)
 
 | Business profile | Rule | Source alias |
 |------------------|------|--------------|
@@ -57,80 +73,38 @@ Evaluate profiles in **priority order** when a user asks for a single label — 
 | **Negotiation Executive (EN)** | `agent.profile = 'AUTONOMOUS_BROKERAGE_AGENT' AND hub.profile = 'NEGOTIATION_EXECUTIVE'` | `agent` + `hub` |
 | **Associated Executive (EA)** | `agent.profile = 'AUTONOMOUS_BROKERAGE_AGENT' AND hub.profile = 'ASSOCIATED_EXECUTIVE'` | `agent` + `hub` |
 
-> **Legacy jargon mapping:** "Demand Agent" → Demand Sale and/or Demand Rent (confirm business context). "CIQ-Only" → Non-Demand Rent or Non-Demand Sale (confirm via `prospect.business_context_applied`). "Independent Agent" → QuintoAndar Agent with both demand and supply capabilities enabled — see capability flags on `agent` and [`agents.md`](agents.md) business-function table.
+> **Legacy jargon mapping:** "Demand Agent" → Demand Sale and/or Demand Rent (confirm business context). "CIQ-Only" → Non-Demand Rent or Non-Demand Sale. "Independent Agent" → QuintoAndar Agent with both demand and supply capabilities enabled.
+
+### Auxiliary joins
+
+- **`prospect`** — `dw_agent.dim_prospect_agent`, join `agent.uuid_person = prospect.uuid_person`. Required for Non-Demand Rent/Sale.
+- **`hub`** — `datalake_hub_services.member_hub_allocation`, join `agent.uuid_person = hub.uuid_person`, filter `hub.is_active = true` and the latest day partition. Required for EN/EA.
 
 ---
 
-## Tables
+## Hub / NE Allocation
 
-| You need… | **Start here (DW)** | Notes |
-|-----------|---------------------|-------|
-| Current agent identity + `profile` + capability flags | **`dw_agent.dim_agent`** | Alias as `agent` in classification rules. |
-| Point-in-time profile / capabilities (historical) | **`dw_agent.fact_agent_daily`** | Filter `dt_ref` (or `year`/`month`/`day` partitions). Same columns as `dim_agent` for classification. |
-| Prospect `business_context_applied` (Non-Demand Rent/Sale) | **`dw_agent.dim_prospect_agent`** | Join `agent.uuid_person = prospect.uuid_person`. |
-| Hub role EN / EA | **`datalake_hub_services.member_hub_allocation`** | Join `agent.uuid_person = hub.uuid_person`; filter `is_active = true` and latest `dt_reference` for current state. |
-| Enrich fallback (no DW needed for profile) | `datalake_agent_accreditation.agent` | Same `profile` and `is_allow_*` columns; prefer DW for consistency with other agent joins. |
+**Table:** `datalake_hub_services.member_hub_allocation`. Grain: **one row per `(id_user, dt_reference)`**, partitioned `year/month/day`. Replaces the deprecated `agent_hub_alocation` (typo: one `l`) and `agent_hub_relation`.
 
-> For earnings, tiers, visits, hubs, and identity bridging, route through [`agents.md`](agents.md) — do not duplicate that catalog here.
+| Topic | Fields |
+|-------|--------|
+| Member identity | `id_member_relationship`, `id_member_profile`, `id_user`, `id_main_user`, `id_agent`, `uuid_person`, `uuid_company` |
+| Hub / region | `id_business_unit`, `hub_name`, `id_region`, `city_group`, `city_name`, `short_region_name` |
+| Classification | `profile`, `agent_type`, `business_context`, `lead_types`, `is_active` |
+| Parent member (NE / manager) | `id_parent_user`, `id_parent_main_user`, `id_parent_agent`, `user_parent_name`, `user_parent_email` |
 
----
+> Filter `is_active = true` for current allocation. NE moved from dedicated `negotiation_executive_*` columns (old table) to **parent member** columns.
 
-## Primary dataset — `agent`
+## Tier Performance Metrics
 
-**Tables:** `dw_agent.dim_agent` or `dw_agent.fact_agent_daily` (alias **`agent`**).
+**Table:** `datalake_tiers.agent_performance` (EAV). Grain: **one row per `(id_user, id_agent, id_metric_period, metric_name)`**. All accredited agents × active periods are cross-joined; missing combos filled `metric_value = 0, is_valid = true`. Compound ratios (`BP2CCV`, `TP2CS`, `OS2CCV_BY`) capped at 1.0. Pivot on `metric_name` for wide views.
 
-| Topic | Fields used in classification |
-|-------|--------------------------------|
-| Profile type | `profile` — `AUTONOMOUS_BROKERAGE_AGENT`, `REDE`, `PRO_ACQUIRER`, `INSPECTOR`, `PHOTOGRAPHER`, … |
-| Demand capabilities | `is_allow_demand_sale`, `is_allow_demand_rent`, `is_allow_visit` |
-| Supply capability | `is_allow_supply_acquisition` |
-| Partnership | `is_3p_partnership` |
-| Join keys | `uuid_person`, `sk_agent`, `id_user` |
+**Table:** `datalake_tiers.ciq_first_listing`. Grain: **one row per `id_house`** — CIQ-consultant first-listing validity verdict feeding tier calculation, with the general publication-or-contract compliance rule: the listing must remain published at least 2 days, or have a signed contract within 60 days of first publication.
 
-`fact_agent_daily` reconstructs capability flags from the agent event log per `dt_ref` — use it when the question is "what profile did this agent have on date X?".
-
----
-
-## Auxiliary dataset — `prospect`
-
-**Table:** `dw_agent.dim_prospect_agent` (alias **`prospect`**).
-
-**Join:**
-
-```sql
-agent.uuid_person = prospect.uuid_person
-```
-
-**Required for:** **Non-Demand Rent** and **Non-Demand Sale** — distinguished by `prospect.business_context_applied` (`'RENT'` / `'SALE'`).
-
-> One `uuid_person` may have prospect history; for accreditation context prefer rows where the person converted to agent or filter to the latest prospect record when multiple exist.
-
----
-
-## Auxiliary dataset — `hub`
-
-**Table:** `datalake_hub_services.member_hub_allocation` (alias **`hub`**).
-
-**Join:**
-
-```sql
-agent.uuid_person = hub.uuid_person
-```
-
-**Required for:** **Negotiation Executive (EN)** and **Associated Executive (EA)** — `hub.profile IN ('NEGOTIATION_EXECUTIVE', 'ASSOCIATED_EXECUTIVE')`.
-
-> Filter `hub.is_active = true` and the latest partition (`year`/`month`/`day` = today) for current hub role. EN/EA are hub **staff roles**, not visit-agent operation types — do not confuse with `hub.profile = 'Visita'` (visit workload), documented in [`agents.md`](agents.md).
-
----
-
-## Relationship to other axes
-
-| Axis | Where it lives | When to use |
-|------|----------------|-------------|
-| **Business profile** (this doc) | `dw_agent.dim_agent.profile` + rules above | "Who is this agent?" / "What type of agent?" / dashboard segmentation |
-| **Business function** (earnings) | `is_allow_*` + `datalake_ebdb_clean.capability` | "What do they earn for?" — TQC, TQA, CIQ, conversion; see [`agents.md`](agents.md) |
-| **Hub operation type** | `member_hub_allocation.profile` (`Visita`, `Vistoria`, …) | Daily workload / hub allocation — not the same as `agent.profile` |
-| **Affiliation** | `affiliation_type` (`1P`/`3P`) | Program membership — orthogonal to profile rules |
+| Topic | Fields |
+|-------|--------|
+| Keys | `id_house`, `id_user`, `id_agent`, `id_partner`, `uuid_person` |
+| Validity verdict | `is_first_listing_valid`, `invalidation_reasons`, `is_valid_hybrid`, `is_valid_compliance_general_rule` |
 
 ---
 
@@ -139,16 +113,15 @@ agent.uuid_person = hub.uuid_person
 **Do:**
 
 - Use **`dw_agent.dim_agent`** (or **`fact_agent_daily`** for history) as the primary `agent` source for all profile classification.
-- Join **`dim_prospect_agent`** when classifying Non-Demand Rent/Sale.
 - Join **`member_hub_allocation`** when classifying EN/EA; filter `is_active = true` and latest day partition.
-- Confirm whether the user means **business profile** (this doc), **hub operation type** (`Visita`/`Vistoria`), or **business function** (TQC/CIQ/conversion) before writing SQL.
-- Map legacy terms ("Demand Agent", "CIQ-Only", "Independent Agent") to the rules table or capability flags — see [`agents.md`](agents.md) Synonyms.
+- Filter daily tables (`member_hub_allocation`) by integer `year = X AND month = X AND day = X`, not `dt_reference BETWEEN` (scans all partitions).
+- Confirm whether the user means **business profile** (this doc), **hub operation type** (`Visita`/`Vistoria`), or **business function** (TQC/CIQ/conversion, see [`agents.md`](agents.md)) before writing SQL.
 
 **Don't:**
 
 - Treat `member_hub_allocation.profile = 'Visita'` as equivalent to `agent.profile = 'AUTONOMOUS_BROKERAGE_AGENT'` — different columns, different semantics.
+- Use `datalake_hub_services.agent_hub_alocation` (deprecated, typo `alocation`) or `agent_hub_relation` (deprecated) — use `member_hub_allocation` with `is_active = true`.
 - Classify AI chatbots with these rules — see [`chatbot_sessions.md`](chatbot_sessions.md).
-- Use enrich `agent` when DW is available for profile questions — prefer `dw_agent.dim_agent` for join consistency.
 - Assume profiles are mutually exclusive — an agent can be QuintoAndar Agent **and** Demand Sale **and** match hub allocation separately.
 
 ---
@@ -185,7 +158,27 @@ FROM dw_agent.dim_agent AS agent
 WHERE agent.status = 'ACTIVE';
 ```
 
-> The `CASE` above is illustrative for the most common single-label questions. **Non-Demand Rent/Sale** and **EN/EA** require the auxiliary joins documented above — do not infer them from `dim_agent` alone.
+### Query 2 — Active agents per hub (latest day)
+
+Daily workload snapshot — active members per hub by business context and profile.
+
+```sql
+SELECT
+    mha.hub_name,
+    mha.city_name,
+    mha.business_context,
+    mha.profile,
+    COUNT(DISTINCT mha.id_user) AS number_agents
+FROM datalake_hub_services.member_hub_allocation AS mha
+WHERE mha.year      = YEAR(CURRENT_DATE)
+  AND mha.month     = MONTH(CURRENT_DATE)
+  AND mha.day       = DAY(CURRENT_DATE)
+  AND mha.is_active = true
+GROUP BY 1, 2, 3, 4
+ORDER BY number_agents DESC;
+```
+
+> `YEAR`/`MONTH`/`DAY` follow Trino/Presto syntax. Partition columns are integers — never filter the daily tables with `dt_reference BETWEEN`.
 
 ---
 
