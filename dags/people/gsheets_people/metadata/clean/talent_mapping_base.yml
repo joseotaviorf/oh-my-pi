@@ -146,7 +146,7 @@ columns:
     description: Assessment of the employee's readiness to be promoted to the next
       career level in the near term.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.readinesse_for_promotion
+    - datalake_gsheets_people_raw.talent_mapping_base.readiness_for_promotion
   risk_of_loss:
     description: Risk level that the employee may voluntarily leave the company, used
       to prioritize retention actions.
@@ -191,7 +191,7 @@ columns:
     description: Target position or role for which the employee has been identified
       as a potential successor.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.to_which_position_person
+    - datalake_gsheets_people_raw.talent_mapping_base.to_which_positionperson
   person_action_plan_notes:
     description: HR Business Partner notes describing the action plan needed to develop
       this employee for succession or promotion.
@@ -231,7 +231,7 @@ columns:
     description: Informal or in-progress performance notes recorded outside of the
       official review cycle.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.no_oficial___on_going_performa_updates
+    - datalake_gsheets_people_raw.talent_mapping_base.no_official_on_going_performance_updates
   last_editor:
     description: Name of the person who last updated the employee's talent mapping
       record in the source spreadsheet.
@@ -241,7 +241,7 @@ columns:
     description: Type or description of the employee's most recent salary movement,
       promotion, or formal recognition event.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.type_of_last_movement_recognition
+    - datalake_gsheets_people_raw.talent_mapping_base.type_of_last_movementrecognition
   salary:
     description: Current salary value for the employee as recorded in the talent mapping
       spreadsheet.
@@ -276,7 +276,7 @@ columns:
     description: Target completion date for the talent development or retention plan
       defined for the employee.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.deadline_mm_dd_yyyy
+    - datalake_gsheets_people_raw.talent_mapping_base.deadline_mmddyyyy
   dt_last_edited:
     description: Date when the employee's talent mapping record was last updated in
       the source spreadsheet.
@@ -296,7 +296,7 @@ columns:
     description: Date of the employee's most recent salary movement, promotion, or
       formal recognition event.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.date_of_last_movement_recognition
+    - datalake_gsheets_people_raw.talent_mapping_base.date_of_last_movementrecognition
   ts_load:
     description: Timestamp when this talent mapping record was ingested from the Google
       Sheets source into the People lake.
