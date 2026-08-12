@@ -153,7 +153,7 @@ SELECT DISTINCT
   fie.sk_contract,
   ie.accounting_transaction_identifier,
   CASE
-    WHEN CHARINDEX('.', c.version)> 0 THEN  SUBSTRING(c.version, 1, CHARINDEX('.', c.version)-1)
+    WHEN INSTR(c.version, '.') > 0 THEN SUBSTRING(c.version, 1, INSTR(c.version, '.') - 1)
     ELSE COALESCE(c.version, 'no info')
   END AS version,
   e.accounting_version,
@@ -207,14 +207,14 @@ SELECT DISTINCT
     WHEN
         i.payment_status IS NULL
         AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord')
-        AND (DATE(fie.ts_created) >= date_trunc('month',DATEADD(MONTH,-1,current_date)))
-    THEN CAST(DATE_FORMAT(DATEADD(MONTH, 1, DATE(fie.ts_created)), 'yyyyMM') AS INT)
+        AND (DATE(fie.ts_created) >= DATE_TRUNC('month', ADD_MONTHS(CURRENT_DATE(), -1)))
+    THEN CAST(DATE_FORMAT(ADD_MONTHS(DATE(fie.ts_created), 1), 'yyyyMM') AS INT)
     ELSE i.accrual_year_month
   END AS accrual_year_month,
   i.accrual_year_month AS invoice_accrual_year_month,
   ie.accrual_year_month AS entry_accrual_year_month,
   ie.due_year_month AS entry_due_year_month,
-  CAST(DATE_FORMAT(DATEADD(month, 1, DATE(fie.ts_created)), 'yyyyMM') AS INT) AS entry_creation_accrual_year_month,
+  CAST(DATE_FORMAT(ADD_MONTHS(DATE(fie.ts_created), 1), 'yyyyMM') AS INT) AS entry_creation_accrual_year_month,
   DATE(fie.ts_created) AS entry_created_date,
   DATE(i.ts_created) AS invoice_created_date,
   DATE(i.dt_due) AS invoice_due_date,
