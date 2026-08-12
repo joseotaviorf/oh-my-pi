@@ -451,6 +451,25 @@ steps:
         path: *no_new_databricks_clusters_path
     depends_on: [setup]
 
+  validate-dag-builds:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make validate-dag-builds
+    when:
+      - event: pull_request
+        path: &validate_dag_builds_path
+          include:
+            - "dags/**"
+            - "packages/bietlejuice-airflow/src/**"
+            - "packages/bietlejuice-core/src/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/validate_dag_builds.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno]
+        path: *validate_dag_builds_path
+    depends_on: [setup]
+
   # Gates only ADDED spark jobs, so pre-existing bypasses never block a PR.
   # Local audit of the whole tree: make validate-emr-runtime-clients-all
   validate-emr-runtime-clients:

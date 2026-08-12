@@ -1139,6 +1139,25 @@ validate-no-new-databricks-clusters-all:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_no_new_databricks_clusters.py -a
 
+.PHONY: validate-dag-builds
+## Fail if a changed DAG cannot be built with prod config (parse-time gate)
+validate-dag-builds: generate-query-manifests generate-metadata-manifests generate-data-quality-manifests
+	@echo ""
+	@echo "Validating changed DAGs build with prod config"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/validate_dag_builds.py -b "$(CI_COMMIT_BRANCH)"
+
+.PHONY: validate-dag-builds-all
+## Build every DAG with prod config (local audit)
+validate-dag-builds-all: generate-query-manifests generate-metadata-manifests generate-data-quality-manifests
+	@echo ""
+	@echo "Building all DAGs with prod config"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/validate_dag_builds.py -a
+
 .PHONY: validate-emr-runtime-clients
 ## Fail if a newly added spark job bypasses SparkClient/BaseDBUtils/dual-catalog registration
 validate-emr-runtime-clients:
