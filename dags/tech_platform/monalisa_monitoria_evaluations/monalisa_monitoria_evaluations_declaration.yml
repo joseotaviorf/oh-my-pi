@@ -1,7 +1,7 @@
 dag:
   name: monalisa_monitoria_evaluations
   schedule_start_date: 2026, 07, 21
-  schedule_interval: 0 1 * * *
+  schedule_interval: 0 22 * * *
   owner: Tech Platform Workforce Productivity
   documentation:
     dag_purpose: |

@@ -1,7 +1,7 @@
 dag:
   name: olos_dialer_transcriptions
   schedule_start_date: 2026, 07, 02
-  schedule_interval: 0 13 * * *
+  schedule_interval: 0 10 * * *
   owner: Tech Platform Workforce Productivity
   documentation:
     dag_purpose: |
