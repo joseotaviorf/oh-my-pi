@@ -224,7 +224,7 @@ def test_generated_bundle_loads_all_dags_with_stable_ids(
     assert set(dagbag.dags) == {"bietlejuice.dag_a", "bietlejuice.dag_b"}
 
 
-def test_generated_bundle_reports_all_build_failures(
+def test_generated_bundle_quarantines_build_failures(
     create_dag_files_mod, monkeypatch, tmp_path
 ):
     import bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser as parser_module
@@ -251,9 +251,77 @@ def test_generated_bundle_reports_all_build_failures(
     )
     dagbag = DagBag(dag_folder=bundles[0], include_examples=False, safe_mode=False)
 
-    error = next(iter(dagbag.import_errors.values()))
-    assert "broken_a" in error
-    assert "broken_b" in error
+    assert not dagbag.import_errors, dagbag.import_errors
+    assert set(dagbag.dags) == {"bietlejuice.broken_a", "bietlejuice.broken_b"}
+    assert "broken-dag" in dagbag.dags["bietlejuice.broken_a"].tags
+    assert "invalid broken_a" in dagbag.dags["bietlejuice.broken_a"].doc_md
+
+
+def test_generated_bundle_keeps_healthy_dags_when_one_fails(
+    create_dag_files_mod, monkeypatch, tmp_path
+):
+    """One broken declaration must not remove a healthy sibling from the bag."""
+    import bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser as parser_module
+    import bietlejuice.base.airflow.dag_builders.main_builder.factories.factory_dispatcher as dispatcher_module
+
+    dags_root = tmp_path / "dags"
+    _write_declaration(dags_root, "growth", "healthy")
+    _write_declaration(dags_root, "growth", "broken")
+    monkeypatch.setattr(create_dag_files_mod, "DAG_PACKAGES_ROOT", str(dags_root))
+    monkeypatch.setattr(create_dag_files_mod, "_datasets_code", lambda *_args: "None")
+    monkeypatch.setattr(
+        create_dag_files_mod.BietlejuiceDependencyHelper,
+        "read_dependencies",
+        lambda: {},
+    )
+
+    class SelectiveParser:
+        def __init__(self, dag_name):
+            self.dag_name = dag_name
+
+        def dag_declaration(self):
+            if self.dag_name == "broken":
+                raise ValueError("invalid broken")
+            return {
+                "dag": {"name": self.dag_name},
+                "workflow": {"layer": "clean"},
+                "cluster": {},
+            }
+
+    class FakeWorkflow:
+        def __init__(self, dag_name):
+            self.dag_name = dag_name
+
+        def build_dag(self):
+            return DAG(dag_id=f"bietlejuice.{self.dag_name}")
+
+    class FakeFactory:
+        def __init__(self, dag_name):
+            self.dag_name = dag_name
+
+        def get_workflow(self):
+            return FakeWorkflow(self.dag_name)
+
+    class FakeDispatcher:
+        def __init__(self, layer):
+            self.layer = layer
+
+        def get_factory(self, **kwargs):
+            return FakeFactory(kwargs["dag_args"]["name"])
+
+    monkeypatch.setattr(parser_module, "DAGYamlParser", SelectiveParser)
+    monkeypatch.setattr(dispatcher_module, "FactoryDispatcher", FakeDispatcher)
+
+    bundles = create_dag_files_mod.create_domain_bundles(
+        output_dir=str(dags_root / "_astro_bundles"),
+        exclude_file=str(tmp_path / "excludes.txt"),
+    )
+    dagbag = DagBag(dag_folder=bundles[0], include_examples=False, safe_mode=False)
+
+    assert not dagbag.import_errors, dagbag.import_errors
+    assert set(dagbag.dags) == {"bietlejuice.healthy", "bietlejuice.broken"}
+    assert "broken-dag" not in dagbag.dags["bietlejuice.healthy"].tags
+    assert "broken-dag" in dagbag.dags["bietlejuice.broken"].tags
 
 
 def _write_validation_declaration(root: Path, domain: str, dag_name: str) -> None:
@@ -426,7 +494,7 @@ def test_generated_validation_bundle_builds_validation_dags(
     assert captured["validation_config"] == {"cluster": {"type": "xs"}}
 
 
-def test_validation_bundle_fails_loudly_on_missing_validation_block(
+def test_validation_bundle_quarantines_missing_validation_block(
     create_dag_files_mod, monkeypatch, tmp_path
 ):
     """Guards against a stale bundle whose declaration lost validation.cluster."""
@@ -458,8 +526,10 @@ def test_validation_bundle_fails_loudly_on_missing_validation_block(
         dag_folder=validation_bundle, include_examples=False, safe_mode=False
     )
 
-    error = next(iter(dagbag.import_errors.values()))
-    assert "validation.cluster" in error
+    assert not dagbag.import_errors, dagbag.import_errors
+    quarantined = dagbag.dags["bietlejuice.dw_employee__validation"]
+    assert "broken-dag" in quarantined.tags
+    assert "validation.cluster" in quarantined.doc_md
 
 
 def test_domain_bundle_template_supports_both_modes():

@@ -128,10 +128,11 @@ luigijr sandbox keeps `make create-luigijr-dag-files`.
 - The line-folder scan is inherited by parse children. A brand-new top-level
   domain delivered only through a DAG bundle requires a dag-processor restart;
   existing domain contents remain safe to update without one.
-- Bundled files intentionally fail the complete batch after collecting all
-  declaration failures. Watch `_astro_bundles/*/_bundle_*.py` import errors;
-  rollback is removing the bundle-codegen command and rsync exclude file from
-  the Astro development pipeline.
+- Bundled files quarantine individual DAG build failures under the real
+  `dag_id` (tag `broken-dag`) so healthy siblings keep loading. Watch the
+  `broken-dag` tag and `airflow.notify_broken_dags`; rollback is removing the
+  bundle-codegen command and rsync exclude file from the Astro development
+  pipeline.
 - Migration twin/emr/compare bundles live under
   `_astro_bundles/platform_migration/_*_bundle_*.py`. Watch those import
   errors separately; rollback is documented in the migration cohort section
