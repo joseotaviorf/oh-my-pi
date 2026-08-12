@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 # Local mirror of the `check-dataset-drift` step in .woodpecker/tars_evals.yml.
 #
-# Regenerates the in-scope datasets and fails if the committed YAML differs,
-# catching an edited golden query whose dataset was never regenerated and an
-# orphaned dataset whose source doc was deleted.
+# Regenerates the in-scope datasets and validates drift against committed YAML.
+#
+# Blocking failures (exit 1):
+#   - tracked datasets/ differ from regeneration (stale golden queries, prune
+#     after doc deletion, rename cleanup, etc.)
+#
+# Non-blocking warnings (exit 0):
+#   - untracked generated YAML for stems that have no committed dataset yet
+#     (new metric entity docs). Lets doc-only PRs merge while eval coverage is
+#     added in a follow-up.
 #
 # Reads .tars-eval-expected-stems. Prefer `make drift-check`, which resolves
 # the scope first.
@@ -30,25 +37,37 @@ uv run python scripts/generate_datasets_from_context_docs.py \
     --stems-file "$SCOPE_FILE" \
     --skip-hand-authored
 
-# Mirrors CI: `git diff` alone misses a brand-new dataset file generated for
-# a newly-added metric_entities doc — it has no committed version to diff
-# against, so it silently stays untracked instead of failing this check.
-UNTRACKED="$(git ls-files --others --exclude-standard -- "$PKG_ROOT/datasets/" || true)"
-if ! git diff --exit-code -- "$PKG_ROOT/datasets/" || [[ -n "$UNTRACKED" ]]; then
+# Blocking: committed YAML out of sync (includes prune-after-delete and renames).
+if ! git diff --exit-code -- "$PKG_ROOT/datasets/"; then
     {
         echo ""
         echo "ERROR: datasets/ is out of sync with docs/llm_context."
-        echo "Regenerating in-scope stems changed the committed YAML above."
-        if [[ -n "$UNTRACKED" ]]; then
-            echo "Untracked generated dataset(s) must be committed:"
-            printf '%s\n' "$UNTRACKED"
-        fi
-        echo "Review it and commit:"
-        echo "    git add packages/tars-evals/datasets/"
+        echo "Regenerating in-scope stems changed committed YAML above."
+        echo "Reproduce and fix locally, then commit the regenerated YAML:"
+        echo "  cd packages/tars-evals && make drift-check"
         echo ""
         echo "(Locally this also fires on dataset edits you have not committed"
         echo " yet — CI runs against a clean tree.)"
     } >&2
     exit 1
 fi
+
+UNTRACKED="$(git ls-files --others --exclude-standard -- "$PKG_ROOT/datasets/" || true)"
+if [[ -n "$UNTRACKED" ]]; then
+    {
+        echo ""
+        echo "WARN: merge allowed — new context without committed eval dataset(s)."
+        echo "Untracked generated dataset(s) (add in a follow-up PR for TARS eval):"
+        printf '%s\n' "$UNTRACKED"
+        echo ""
+        echo "Generate and commit when ready:"
+        echo "  cd packages/tars-evals && make generate-datasets STEMS=<stem>"
+        echo ""
+        echo "Eval coverage starts once the YAML lands; existing datasets still"
+        echo "require strict drift sync when their source docs change."
+    } >&2
+    echo "datasets/ drift check passed with eval-coverage warning (uncommitted new datasets)."
+    exit 0
+fi
+
 echo "datasets/ is in sync with the changed context docs."

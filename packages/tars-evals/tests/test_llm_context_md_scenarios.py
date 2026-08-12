@@ -1,8 +1,9 @@
 """Deployment scenarios for changed ``docs/llm_context`` Markdown.
 
 These mirror the Woodpecker ``tars_evals`` path: resolve dual stem files,
-regenerate with ``--skip-hand-authored``, and assert the resulting
-``git diff --exit-code`` on ``packages/tars-evals/datasets/``.
+regenerate with ``--skip-hand-authored``, and assert drift via
+``check_dataset_drift.sh`` rules (tracked diff blocks; untracked new datasets
+warn only).
 """
 
 from __future__ import annotations
@@ -104,6 +105,7 @@ def _generate_seed_dataset(repo, stem: str = STEM) -> None:
 
 
 def _dataset_diff(repo) -> subprocess.CompletedProcess[str]:
+    """Mirror ``check_dataset_drift.sh`` after generation."""
     tracked = subprocess.run(
         ["git", "diff", "--exit-code", "--", "packages/tars-evals/datasets/"],
         cwd=repo.path,
@@ -111,6 +113,8 @@ def _dataset_diff(repo) -> subprocess.CompletedProcess[str]:
         text=True,
         check=False,
     )
+    if tracked.returncode != 0:
+        return tracked
     untracked = subprocess.run(
         [
             "git",
@@ -125,20 +129,35 @@ def _dataset_diff(repo) -> subprocess.CompletedProcess[str]:
         text=True,
         check=False,
     )
-    if tracked.returncode != 0 or untracked.stdout.strip():
+    if untracked.stdout.strip():
         return subprocess.CompletedProcess(
             args=["dataset-drift"],
-            returncode=1,
-            stdout=tracked.stdout + untracked.stdout,
-            stderr=tracked.stderr + untracked.stderr,
+            returncode=0,
+            stdout=untracked.stdout,
+            stderr="WARN: uncommitted new eval dataset(s)\n",
         )
     return tracked
 
 
-def test_new_metric_without_committed_dataset_fails_drift_on_untracked_yaml(
+def _assert_ci_parity_drift(
+    repo,
+    *,
+    expect_blocking_failure: bool,
+    scope_stems: Path,
+) -> None:
+    generation_result = _run_generator(repo, scope_stems)
+    assert generation_result.returncode == 0, generation_result.stderr
+    drift_result = _dataset_diff(repo)
+    if expect_blocking_failure:
+        assert drift_result.returncode != 0, "expected datasets/ drift to block CI"
+    else:
+        assert drift_result.returncode == 0, drift_result.stdout + drift_result.stderr
+
+
+def test_new_metric_without_committed_dataset_warns_without_blocking(
     tmp_git_repo,
 ):
-    """Woodpecker must fail when generation creates a not-yet-committed dataset."""
+    """New metric docs merge with a warning; eval starts after the YAML lands."""
     repo = tmp_git_repo
     repo.write(METRIC_PATH, _fixture("metric_v1.md"))
     repo.commit("add metric fixture without dataset")
@@ -147,23 +166,10 @@ def test_new_metric_without_committed_dataset_fails_drift_on_untracked_yaml(
     assert scope_result.returncode == 0, scope_result.stderr
     assert _read_stems(eval_stems) == []
     assert _read_stems(scope_stems) == [STEM]
-    _assert_ci_parity_drift(repo, expect_clean=False, scope_stems=scope_stems)
+    _assert_ci_parity_drift(
+        repo, expect_blocking_failure=False, scope_stems=scope_stems
+    )
     assert (repo.path / DATASET_PATH).exists()
-
-
-def _assert_ci_parity_drift(
-    repo,
-    *,
-    expect_clean: bool,
-    scope_stems: Path,
-) -> None:
-    generation_result = _run_generator(repo, scope_stems)
-    assert generation_result.returncode == 0, generation_result.stderr
-    drift_result = _dataset_diff(repo)
-    if expect_clean:
-        assert drift_result.returncode == 0, drift_result.stdout + drift_result.stderr
-    else:
-        assert drift_result.returncode == 1, "expected datasets/ to be out of sync"
 
 
 def test_new_metric_with_committed_dataset_has_clean_deployment_scope(tmp_git_repo):
@@ -173,7 +179,9 @@ def test_new_metric_with_committed_dataset_has_clean_deployment_scope(tmp_git_re
     repo.commit("add metric fixture and generated dataset")
 
     scope_result, eval_stems, scope_stems = _run_scope_cli(repo)
-    _assert_ci_parity_drift(repo, expect_clean=True, scope_stems=scope_stems)
+    _assert_ci_parity_drift(
+        repo, expect_blocking_failure=False, scope_stems=scope_stems
+    )
     items = load_golden_dataset([repo.path / DATASET_PATH])
 
     assert scope_result.returncode == 0, scope_result.stderr
@@ -197,7 +205,9 @@ def test_golden_query_edit_with_stale_dataset_fails_drift_check(tmp_git_repo):
     assert scope_result.returncode == 0, scope_result.stderr
     assert _read_stems(eval_stems) == [STEM]
     assert _read_stems(scope_stems) == [STEM]
-    _assert_ci_parity_drift(repo, expect_clean=False, scope_stems=scope_stems)
+    _assert_ci_parity_drift(
+        repo, expect_blocking_failure=True, scope_stems=scope_stems
+    )
     items = load_golden_dataset([repo.path / DATASET_PATH])
     assert "WHERE date >= DATE '2026-02-01'" in items[0].expected_query
 
@@ -215,7 +225,9 @@ def test_ownership_only_edit_is_scoped_but_not_evaluated(tmp_git_repo):
     assert _read_stems(eval_stems) == []
     assert _read_stems(scope_stems) == [STEM]
     assert "NOTE: not evaluating" in scope_result.stderr
-    _assert_ci_parity_drift(repo, expect_clean=True, scope_stems=scope_stems)
+    _assert_ci_parity_drift(
+        repo, expect_blocking_failure=False, scope_stems=scope_stems
+    )
 
 
 def test_deleted_metric_doc_prunes_generated_dataset(tmp_git_repo):
@@ -235,9 +247,11 @@ def test_deleted_metric_doc_prunes_generated_dataset(tmp_git_repo):
     generation_result = _run_generator(repo, scope_stems)
     assert generation_result.returncode == 0, generation_result.stderr
     assert not (repo.path / DATASET_PATH).exists()
-    assert _dataset_diff(repo).returncode == 1
+    assert _dataset_diff(repo).returncode != 0
     repo.commit("commit pruned dataset after doc deletion")
-    _assert_ci_parity_drift(repo, expect_clean=True, scope_stems=scope_stems)
+    _assert_ci_parity_drift(
+        repo, expect_blocking_failure=False, scope_stems=scope_stems
+    )
 
 
 def test_renamed_metric_doc_prunes_old_and_evaluates_new_stem(tmp_git_repo):
@@ -276,7 +290,9 @@ def test_renamed_metric_doc_prunes_old_and_evaluates_new_stem(tmp_git_repo):
     scope_result, eval_stems, scope_stems = _run_scope_cli(repo)
     assert scope_result.returncode == 0, scope_result.stderr
     assert _read_stems(eval_stems) == [RENAMED_STEM]
-    _assert_ci_parity_drift(repo, expect_clean=True, scope_stems=scope_stems)
+    _assert_ci_parity_drift(
+        repo, expect_blocking_failure=False, scope_stems=scope_stems
+    )
 
 
 def test_business_entity_edit_fans_out_without_dataset_drift(tmp_git_repo):
@@ -293,7 +309,9 @@ def test_business_entity_edit_fans_out_without_dataset_drift(tmp_git_repo):
     assert _read_stems(eval_stems) == [STEM]
     assert _read_stems(scope_stems) == [STEM]
     assert "falling back to all stems" not in scope_result.stderr
-    _assert_ci_parity_drift(repo, expect_clean=True, scope_stems=scope_stems)
+    _assert_ci_parity_drift(
+        repo, expect_blocking_failure=False, scope_stems=scope_stems
+    )
 
 
 def test_backlinks_only_business_fan_out(tmp_git_repo):
@@ -311,7 +329,9 @@ def test_backlinks_only_business_fan_out(tmp_git_repo):
     assert _read_stems(eval_stems) == [STEM]
     assert _read_stems(scope_stems) == [STEM]
     assert "falling back to all stems" not in scope_result.stderr
-    _assert_ci_parity_drift(repo, expect_clean=True, scope_stems=scope_stems)
+    _assert_ci_parity_drift(
+        repo, expect_blocking_failure=False, scope_stems=scope_stems
+    )
 
 
 def test_orphan_business_doc_fails_closed_and_budget_aborts(tmp_git_repo):

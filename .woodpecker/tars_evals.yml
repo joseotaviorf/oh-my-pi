@@ -14,6 +14,8 @@
 #                               committed YAML matches (catches an edited golden
 #                               query whose dataset was never regenerated, and an
 #                               orphaned dataset whose source doc was deleted).
+#                               Untracked YAML for brand-new metric docs warns
+#                               but does not block (eval added in a follow-up).
 #   get-tars-eval-credentials — Vault LiteLLM key (same secret as datahub.yml).
 #   unit-tests-tars-evals     — the package's own suite; it is excluded from the
 #                               CI image (see containers.yml) so nothing else runs it.
@@ -88,30 +90,8 @@ steps:
         WORKSPACE="$(pwd)"
         cd packages/tars-evals
         uv sync --frozen
-        # Scoped on purpose: an unscoped run refuses to overwrite every
-        # hand-authored dataset in the tree and would fail on stems this diff
-        # never touched.
-        # --skip-hand-authored: a hand-authored dataset is never regenerated,
-        # so it cannot drift. Without this, editing the source doc of a
-        # hand-authored dataset would fail this step forever with no fix
-        # available to the author.
-        uv run python scripts/generate_datasets_from_context_docs.py \
-          --stems-file "$WORKSPACE/.tars-eval-expected-stems" \
-          --skip-hand-authored
-        cd "$WORKSPACE"
-        UNTRACKED="$(git ls-files --others --exclude-standard -- packages/tars-evals/datasets/ || true)"
-        if ! git diff --exit-code -- packages/tars-evals/datasets/ || [ -n "$UNTRACKED" ]; then
-          echo "" >&2
-          echo "ERROR: datasets/ is out of sync with docs/llm_context." >&2
-          if [ -n "$UNTRACKED" ]; then
-            echo "Untracked generated dataset(s) must be committed:" >&2
-            printf '%s\n' "$UNTRACKED" >&2
-          fi
-          echo "Reproduce and fix locally, then commit the regenerated YAML:" >&2
-          echo "  cd packages/tars-evals && make drift-check" >&2
-          exit 1
-        fi
-        echo "datasets/ is in sync with the changed context docs."
+        TARS_EVAL_SCOPE_FILE="$WORKSPACE/.tars-eval-expected-stems" \
+          scripts/check_dataset_drift.sh
     when:
       - event: pull_request
         path: *tars_evals_paths

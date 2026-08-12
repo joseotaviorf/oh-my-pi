@@ -48,11 +48,13 @@ def test_resolve_writes_dual_stem_files():
 
 def test_drift_step_uses_skip_hand_authored_and_git_diff():
     raw = WORKFLOW.read_text(encoding="utf-8")
-    assert "--skip-hand-authored" in raw
-    assert "git diff --exit-code -- packages/tars-evals/datasets/" in raw
-    # Newly generated datasets are untracked until committed; plain `git diff`
-    # alone would miss them and false-green the drift step.
-    assert "git ls-files --others --exclude-standard -- packages/tars-evals/datasets/" in raw
+    drift_script = REPO_ROOT / "packages/tars-evals/scripts/check_dataset_drift.sh"
+    raw_drift = drift_script.read_text(encoding="utf-8")
+    assert "scripts/check_dataset_drift.sh" in raw
+    assert "--skip-hand-authored" in raw_drift
+    assert "WARN: merge allowed" in raw_drift
+    assert "git diff --exit-code" in raw_drift
+    assert "git ls-files --others --exclude-standard" in raw_drift
     assert ".tars-eval-expected-stems" in raw
 
 

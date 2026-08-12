@@ -37,6 +37,23 @@ An empty stems file is a valid no-op that exits `0`.
 `--skip-hand-authored` downgrades an in-scope hand-authored collision from exit
 `1` to a logged skip (used by CI drift checks in a follow-up PR).
 
+### New metric docs without datasets (CI)
+
+Adding a metric entity doc without committing the matching
+`datasets/{stem}.yaml` **does not block the PR**. CI prints a **warning** and
+merges are allowed so context contributions are not gated on eval setup.
+
+Follow up when ready:
+
+```bash
+make generate-datasets STEMS=condo_refund
+git add datasets/condo_refund.yaml
+```
+
+Once the dataset is committed, later edits to that doc run the normal blocking
+drift check and TARS eval gate. Existing datasets with committed YAML still
+fail CI when golden queries change without regenerating.
+
 ## Running evals and gate orchestration
 
 Per-dataset evals run in parallel via a stem queue, then rollup and gate check:

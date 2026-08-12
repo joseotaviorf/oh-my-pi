@@ -40,6 +40,14 @@ case "$1" in
     ;;
   rev-parse) echo "${FAKE_REPO_ROOT:-/nonexistent}" ;;
   diff) exit "${FAKE_GIT_DIFF_RC:-0}" ;;
+  ls-files)
+    if [[ "$*" == *"--others"* ]]; then
+      if [[ -n "${FAKE_UNTRACKED_DATASETS:-}" ]]; then
+        printf '%s\\n' "$FAKE_UNTRACKED_DATASETS"
+      fi
+      exit 0
+    fi
+    ;;
 esac
 """
 
@@ -216,6 +224,21 @@ def test_drift_check_fails_when_regeneration_changes_committed_yaml(tmp_path: Pa
 
     assert result.returncode == 1
     assert "out of sync" in result.stderr
+
+
+def test_drift_check_warns_on_untracked_new_datasets_without_failing(tmp_path: Path):
+    script, env = _prepare(tmp_path, "check_dataset_drift.sh")
+    Path(env["TARS_EVAL_SCOPE_FILE"]).write_text("condo_refund\n")
+    env["FAKE_UNTRACKED_DATASETS"] = (
+        f"{Path(env['TARS_EVAL_SCOPE_FILE']).parents[0]}/datasets/condo_refund.yaml"
+    )
+
+    result = _run(script, env)
+
+    assert result.returncode == 0
+    assert "WARN: merge allowed" in result.stderr
+    assert "condo_refund.yaml" in result.stderr
+    assert "make generate-datasets STEMS=" in result.stderr
 
 
 # --------------------------------------------------------------------------
