@@ -22,7 +22,6 @@ SELECT
         'Data ForRent',
         'Data ForSale',
         'Data Growth',
-        'Data People',
         'Data Primitives',
         'Data SS'
     ) AS is_data_line,
