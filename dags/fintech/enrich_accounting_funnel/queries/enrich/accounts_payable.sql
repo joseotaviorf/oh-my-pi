@@ -312,6 +312,54 @@ vans_final AS (
           ON  r.city_name = cl.city
 )
 
+-- REPARTITION (round-robin) espalha as linhas uniformemente antes da escrita Delta,
+-- eliminando o skew de write (uma task ficava presa >26min enquanto as outras
+-- terminavam em segundos). Não altera o resultado, só a distribuição física.
+SELECT /*+ REPARTITION(64) */
+  id_entry,
+  id_invoice,
+  sk_invoice_reversed_entry,
+  sk_contract,
+  version,
+  accounting_version,
+  is_contract_b2b,
+  locale,
+  localidade,
+  guarantee,
+  rental_administrator,
+  is_rental_paid_in_advance,
+  bill_item,
+  description,
+  has_negotiation,
+  has_installments,
+  purpose,
+  invoice_account_type,
+  from_account_type,
+  to_account_type,
+  account_type,
+  account_classification,
+  status,
+  closing_mode,
+  due_amount,
+  invoice_due_amount,
+  accrual_year_month,
+  entry_accrual_year_month,
+  entry_creation_accrual_year_month,
+  entry_created_date,
+  invoice_created_date,
+  invoice_due_date,
+  invoice_paid_date,
+  invoice_paid_date_next_business_day,
+  invoice_canceled_date,
+  contract_start,
+  contract_annulment,
+  ended_before_started,
+  pp_pays,
+  entry_sort_ascend,
+  entry_by_accrual_sort_ascend,
+  is_cap,
+  ts_load
+FROM (
 SELECT
   id_entry,
   id_invoice,
@@ -407,3 +455,4 @@ SELECT
   NOW() AS ts_load
 FROM
   cap_final
+) AS _final
