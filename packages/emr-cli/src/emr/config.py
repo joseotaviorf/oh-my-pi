@@ -386,10 +386,9 @@ def merge_runtime_config(
         if not sn:
             raise ValueError("step_name must be non-empty")
         cfg["step_name"] = sn
-    if job_script_args:
-        cfg["job_script_args"] = [
-            str(a).strip() for a in job_script_args if str(a).strip()
-        ]
+    if job_script_args is not None:
+        # Preserve empty strings (positional placeholders); only strip whitespace.
+        cfg["job_script_args"] = [str(a).strip() for a in job_script_args]
     if deploy_mode is not None:
         cfg["deploy_mode"] = deploy_mode.strip()
     return cfg
@@ -416,10 +415,9 @@ def merge_step_submit_config(
         if not r:
             raise ValueError("region must be non-empty when set")
         cfg["region"] = r
-    if job_script_args:
-        cfg["job_script_args"] = [
-            str(a).strip() for a in job_script_args if str(a).strip()
-        ]
+    if job_script_args is not None:
+        # Preserve empty strings (positional placeholders); only strip whitespace.
+        cfg["job_script_args"] = [str(a).strip() for a in job_script_args]
     if deploy_mode is not None:
         cfg["deploy_mode"] = deploy_mode.strip()
     return cfg

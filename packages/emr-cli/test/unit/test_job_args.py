@@ -26,6 +26,11 @@ def test_merged_job_script_args_repeated_only() -> None:
     assert out == ["--foo", "bar"]
 
 
+def test_merged_job_script_args_preserves_empty_repeated() -> None:
+    out = merged_job_script_args(None, ("--foo", "", "bar"))
+    assert out == ["--foo", "", "bar"]
+
+
 def test_merged_job_script_args_order_shlex_then_repeated() -> None:
     out = merged_job_script_args(
         "--a 1",

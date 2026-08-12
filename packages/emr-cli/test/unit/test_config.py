@@ -374,6 +374,36 @@ def test_merge_step_submit_config_job_args(tmp_path: Path) -> None:
     assert cfg["job_script_args"] == ["--foo", "bar"]
 
 
+def test_merge_runtime_config_preserves_empty_job_script_args(tmp_path: Path) -> None:
+    p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
+    from emr.config import merge_runtime_config
+
+    cfg = merge_runtime_config(
+        config_path=p,
+        s3_uri="s3://b/job.py",
+        step_name="step",
+        name="flow",
+        job_script_args=("--foo", "", "bar"),
+    )
+    assert cfg["job_script_args"] == ["--foo", "", "bar"]
+
+
+def test_merge_step_submit_config_preserves_empty_job_script_args(
+    tmp_path: Path,
+) -> None:
+    p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
+    from emr.config import merge_step_submit_config
+
+    cfg = merge_step_submit_config(
+        config_path=p,
+        s3_uri="s3://b/job.py",
+        step_name="step",
+        region="us-east-1",
+        job_script_args=["--foo", ""],
+    )
+    assert cfg["job_script_args"] == ["--foo", ""]
+
+
 def test_merge_runtime_config_overrides_use_spot(tmp_path: Path) -> None:
     p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
     from emr.config import merge_runtime_config

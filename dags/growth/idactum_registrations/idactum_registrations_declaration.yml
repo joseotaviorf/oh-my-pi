@@ -16,7 +16,6 @@ workflow:
     - "{table_name}" # "table_name"
     - "{{ ds }}" # execution_date
     - "idactum_registrations" # source
-    - "" # timestamp_ntz_fields
   tables_customization:
     idactum_registrations: {}
 

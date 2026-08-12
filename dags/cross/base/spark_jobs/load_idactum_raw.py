@@ -99,7 +99,12 @@ def transform_data(
     return df
 
 
-if __name__ == "__main__":
+def build_arg_parser() -> ArgumentParser:
+    """Build CLI parser for the Idactum raw load job.
+
+    ``timestamp_ntz_fields`` is optional: EMR may drop empty positional
+    placeholders, and several DAGs have no NTZ fields to cast.
+    """
     parser = ArgumentParser(description="Load Idactum raw data")
     parser.add_argument("env", help="Forno/Prod values")
     parser.add_argument("datalake_bucket", help="Bucket value in forno/prod")
@@ -107,11 +112,17 @@ if __name__ == "__main__":
     parser.add_argument("execution_date", help="DAG execution_date")
     parser.add_argument("source", help="Source name(e.g., idactum_houses)")
     parser.add_argument(
-        "timestamp_ntz_fields", help="Timestamp NTZ field names split by comma."
+        "timestamp_ntz_fields",
+        nargs="?",
+        default="",
+        help="Timestamp NTZ field names split by comma.",
     )
-
     add_validation_target_args(parser)
-    args = parser.parse_args()
+    return parser
+
+
+if __name__ == "__main__":
+    args = build_arg_parser().parse_args()
     source = args.source
 
     config_service = ConfigurationService(source)

@@ -16,7 +16,6 @@ workflow:
     - "{table_name}" # table_name
     - "{{ ds }}" # execution_date
     - "idactum_buyers" # source
-    - "" # timestamp_ntz_fields (none for buyers)
   tables_customization:
     idactum_buyers: {}
 
