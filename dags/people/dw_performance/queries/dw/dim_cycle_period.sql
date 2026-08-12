@@ -17,14 +17,19 @@ released_cycles AS (
   ) AS released (cycle_name)
 ),
 distinct_cycles AS (
-  SELECT DISTINCT
+  SELECT
     meeting_type,
     meeting_year,
-    reference_period
+    reference_period,
+    MAX(DATE(ts_meeting)) AS dt_last_meeting
   FROM
     dw_performance.dim_committee_meeting
   WHERE
     meeting_year IS NOT NULL
+  GROUP BY
+    meeting_type,
+    meeting_year,
+    reference_period
 ),
 cycles_with_start AS (
   SELECT
@@ -42,19 +47,14 @@ cycles_with_start AS (
       WHEN meeting_type = 'talent_review'
         THEN CONCAT('Talent Review ', CAST(meeting_year AS STRING), ' ', reference_period)
     END AS cycle_name,
-    MAKE_DATE(
-      meeting_year,
-      CASE
-        WHEN reference_period IS NULL THEN 1
-        WHEN reference_period = 'Q1' THEN 1
-        WHEN reference_period = 'Q2' THEN 4
-        WHEN reference_period = 'Q3' THEN 7
-        WHEN reference_period = 'Q4' THEN 10
-        WHEN reference_period = 'H1' THEN 1
-        WHEN reference_period = 'H2' THEN 7
-      END,
-      1
-    ) AS dt_start
+    -- Talent Review: first day of the month of the cycle's closure (latest committee meeting).
+    -- Performance Calibration: January 1st of meeting_year (calendar rule).
+    CASE
+      WHEN meeting_type = 'talent_review'
+        THEN TRUNC(dt_last_meeting, 'MM')
+      WHEN meeting_type = 'performance_calibration'
+        THEN MAKE_DATE(meeting_year, 1, 1)
+    END AS dt_start
   FROM
     distinct_cycles
 ),
