@@ -312,9 +312,6 @@ vans_final AS (
           ON  r.city_name = cl.city
 )
 
--- REPARTITION (round-robin) espalha as linhas uniformemente antes da escrita Delta,
--- eliminando o skew de write (uma task ficava presa >26min enquanto as outras
--- terminavam em segundos). Não altera o resultado, só a distribuição física.
 SELECT /*+ REPARTITION(64) */
   id_entry,
   id_invoice,
