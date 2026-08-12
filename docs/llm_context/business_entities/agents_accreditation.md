@@ -23,7 +23,7 @@
 
 ## Related Metric Entities
 
-<!-- None currently -- no metric entity doc references the Agents domain as of 2026-08. -->
+- None — no metric entity doc references the Agents domain as of 2026-08.
 
 ---
 
