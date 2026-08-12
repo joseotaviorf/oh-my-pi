@@ -1,0 +1,27 @@
+dag:
+  name: reverse_tracksale_access
+  schedule_start_date: 2026,8,11
+  owner: Data Engineering
+  documentation:
+    dag_purpose: |
+      This dag sends the Tracksale seller CCV hub cohort (campaign 297 /
+      true_seller_ccv_hub) loaded by reverse_tracksale_test to the Tracksale API.
+      During the migration validation phase it reads reverse_tracksale_test (custom
+      schema tracksale_test). Per-campaign settings are resolved from the environment
+      conf file (forno uses the test campaign 242; prod uses campaign 297). After
+      cutover, point the database arg at reverse_tracksale and expand tables as other
+      cohorts are migrated.
+workflow:
+  layer: reverse
+  type: access
+  load_spark_job: load_targets_into_tracksale
+  # The reference date is the cohort day the reverse table was partitioned by. This dag is
+  # dataset-triggered by reverse_tracksale_test, so it inherits that dag's data_interval_start
+  # (D-1, itself inherited from the daily DW dags); adding one day lands on the cohort day.
+  spark_job_arguments:
+  - "{dag_name}"
+  - "reverse_tracksale_test"
+  - "{table_name}"
+  - "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_start_date') }}"
+  tables_customization:
+    true_seller_ccv_hub: {}

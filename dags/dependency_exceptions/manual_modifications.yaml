@@ -1020,6 +1020,9 @@ bietlejuice.reverse_birdie_access:
     - bietlejuice.reverse_birdie:load-reverse-ongoing:first-run-of-day
     - bietlejuice.reverse_birdie:load-reverse-offboarding:first-run-of-day
     - bietlejuice.reverse_birdie:load-reverse-pp-multi:first-run-of-day
+bietlejuice.reverse_tracksale_access:
+  add:
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-seller-ccv-hub:first-run-of-day
 bietlejuice.reverse_dashboard_governance:
   add:
     - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata:first-run-of-day

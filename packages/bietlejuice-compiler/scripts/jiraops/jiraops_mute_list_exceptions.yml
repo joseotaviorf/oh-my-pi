@@ -15,6 +15,11 @@ DAG:
       deadline: Never
       created_by: isadora.gallerani@quintoandar.com.br
       approved_by: william.angelo@quintoandar.com.br
+    bietlejuice.reverse_tracksale_test:
+      reason: "Temporary staging DAG for reverse_tracksale DAG Builder migration (seller CCV hub). Upstream of reverse_tracksale_access; muted until Forno validation and cutover."
+      deadline: Never
+      created_by: luisa.frodrigues@quintoandar.com.br
+      approved_by: luisa.frodrigues@quintoandar.com.br
   contains:
     bietlejuice.gsheets_:
       reason: "GSheets are used to store the manual operations data for the datalake, so they are not Data Engineering on call responsibility."

@@ -4684,6 +4684,13 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-pp-dispatches:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
+bietlejuice.reverse_tracksale_access:
+  - bietlejuice.reverse_tracksale_test:load-reverse-true-seller-ccv-hub:first-run-of-day
+bietlejuice.reverse_tracksale_test:
+  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer:first-run-of-day
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
+  - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call:first-run-of-day
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
