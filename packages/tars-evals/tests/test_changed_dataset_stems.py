@@ -416,7 +416,49 @@ def test_parse_related_metric_entities_bullets(cds):
 
 
 def test_parse_related_metric_entities_no_section(cds):
-    assert cds.parse_related_metric_entities("## Overview\n\nSome text.\n") == []
+    assert cds.parse_related_metric_entities("## Overview\n\nSome text.\n") is None
+
+
+def test_parse_related_metric_entities_present_but_empty_stays_unresolved(cds):
+    """A heading with nothing filled in is indistinguishable from an
+    unfinished template — must still return ``None`` (unresolved), matching
+    the orphan-fixture contract in
+    ``tests/fixtures/llm_context/business_orphan.md`` /
+    ``test_orphan_business_doc_fails_closed_and_budget_aborts``, which relies
+    on exactly this shape still failing closed."""
+    markdown = "## Related Metric Entities\n\n## Dos and Don'ts\n"
+    assert cds.parse_related_metric_entities(markdown) is None
+
+
+def test_parse_related_metric_entities_comment_only_stays_unresolved(cds):
+    """A bare note with no explicit 'None' sentinel must not resolve the
+    doc — only an explicit sentinel (see
+    ``test_parse_related_metric_entities_explicit_none_sentinel``) does."""
+    markdown = (
+        "## Related Metric Entities\n\n"
+        "<!-- TODO: fill this in. -->\n\n"
+        "## Dos and Don'ts\n"
+    )
+    assert cds.parse_related_metric_entities(markdown) is None
+
+
+def test_parse_related_metric_entities_explicit_none_sentinel(cds):
+    """An authored 'None' bullet is an unambiguous declaration of zero
+    relationships — must resolve to ``[]``, not ``None`` (see the Agents
+    domain, PR #27459, which has no related metric entities as of 2026-08)."""
+    markdown = (
+        "## Related Metric Entities\n\n"
+        "- None — no metric entity doc references this domain as of 2026-08.\n\n"
+        "## Dos and Don'ts\n"
+    )
+    assert cds.parse_related_metric_entities(markdown) == []
+
+
+def test_parse_related_metric_entities_none_sentinel_mixed_with_real_bullet(cds):
+    """A 'None' bullet alongside a real link is a doc-authoring mistake, but
+    the real link must still be honored — 'none' only suppresses itself."""
+    markdown = "## Related Metric Entities\n\n- NPS FR\n- (none)\n"
+    assert cds.parse_related_metric_entities(markdown) == ["nps_fr"]
 
 
 def test_parse_related_metric_entities_dedupes(cds):
@@ -496,6 +538,31 @@ def test_fan_out_unresolved_when_both_sources_empty(cds):
     )
     assert fanned == set()
     assert unresolved == ["brand_new"]
+
+
+def test_fan_out_empty_section_without_sentinel_still_unresolved(cds):
+    """A bare, empty '## Related Metric Entities' heading must still fall
+    back (matches the orphan-fixture contract) — only an explicit 'None'
+    sentinel resolves a domain to zero (see the next test)."""
+    entry = _entry(cds, "M", "docs/llm_context/business_entities/orphan.md")
+    text = "## Related Metric Entities\n\n## Dos and Don'ts\n"
+    fanned, unresolved = cds.fan_out(
+        [entry], reverse_index={}, read_business_doc=lambda e: text
+    )
+    assert fanned == set()
+    assert unresolved == ["orphan"]
+
+
+def test_fan_out_explicit_none_sentinel_is_resolved_not_unresolved(cds):
+    """A domain with an explicit 'None' sentinel (e.g. Agents — see PR
+    #27459) must NOT fall back to the unresolved/evaluate-everything path."""
+    entry = _entry(cds, "M", "docs/llm_context/business_entities/agents.md")
+    text = "## Related Metric Entities\n\n- None — no related metrics.\n"
+    fanned, unresolved = cds.fan_out(
+        [entry], reverse_index={}, read_business_doc=lambda e: text
+    )
+    assert fanned == set()
+    assert unresolved == []
 
 
 def test_fan_out_deleted_doc_still_resolves_via_reverse_index(cds):

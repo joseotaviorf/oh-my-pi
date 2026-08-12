@@ -566,29 +566,62 @@ def find_metadata_only_stems(
     return metadata_only
 
 
-def parse_related_metric_entities(markdown: str) -> list[str]:
+def parse_related_metric_entities(markdown: str) -> list[str] | None:
     """Parse a business doc's own ``## Related Metric Entities`` bullets.
 
     Converts Title Case display names (e.g. ``- NPS FR``) into metric-doc
     stems (``nps_fr``) using the same bullet syntax as
     ``document_parser._parse_related_data_products``, but slugifying to
     snake_case (matching metric filenames) instead of kebab-case.
+
+    Returns ``None`` when the heading is absent, OR when it is present but
+    empty (no bullets, or only comments/whitespace) — both are "no
+    information from this doc," and the caller must still fail closed. This
+    matches the orphan-fixture contract in
+    ``tests/fixtures/llm_context/business_orphan.md`` /
+    ``test_orphan_business_doc_fails_closed_and_budget_aborts``: a heading
+    with nothing filled in looks identical to an unfinished template, so it
+    is deliberately NOT treated as a resolved "zero relationships" answer.
+
+    Returns a list — possibly empty — only when the section contains an
+    explicit sentinel bullet whose text starts with "none" (case-insensitive,
+    optionally wrapped in ``()``/``**``, e.g. ``- None`` or
+    ``- None — no metric entity doc references this domain as of 2026-08.``).
+    That is an unambiguous, authored declaration of zero relationships,
+    distinct from an empty/omitted section, and lets ``fan_out`` resolve the
+    doc without falling back to evaluating every dataset stem in the repo
+    (see the Agents-domain incident this fixes: PR #27459).
+
+    A bare HTML comment line (``<!-- ... -->``) is ignored (not parsed as a
+    stem or a sentinel), so a doc can add supplementary notes without them
+    becoming bogus stems.
     """
-    body = _split_h2_sections(markdown).get("related metric entities", "")
+    sections = _split_h2_sections(markdown)
+    if "related metric entities" not in sections:
+        return None
+    body = sections["related metric entities"]
     stems: list[str] = []
     seen: set[str] = set()
+    explicit_none = False
     for line in body.splitlines():
         stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("<!--") and stripped.endswith("-->"):
+            continue
         if stripped.startswith("- "):
             name = stripped[2:].strip().strip("*").strip()
-        elif stripped and not stripped.startswith("#"):
-            name = stripped.strip("*").strip()
         else:
+            name = stripped.strip("*").strip()
+        if name.strip("()").strip().lower().startswith("none"):
+            explicit_none = True
             continue
         stem = re.sub(r"[^a-zA-Z0-9]+", "_", name.strip().lower()).strip("_")
         if stem and stem not in seen:
             seen.add(stem)
             stems.append(stem)
+    if not stems and not explicit_none:
+        return None
     return stems
 
 
@@ -615,6 +648,13 @@ def fan_out(
     business doc couldn't be mapped to any metric via either the reverse
     index or its own back-links, and the caller should fail closed to all
     dataset stems for the whole run.
+
+    A doc that explicitly declares ``## Related Metric Entities`` with no
+    bullets underneath (``parse_related_metric_entities`` returns ``[]``, not
+    ``None``) is resolved with zero fanned-out stems and is never unresolved
+    — the author has stated there is nothing to fan out to, which is
+    different information than the heading being absent entirely (no
+    information available, so fail closed).
     """
     fanned: set[str] = set()
     unresolved: list[str] = []
@@ -623,12 +663,16 @@ def fan_out(
         if entry.old_path:
             lookup_stems.append(Path(entry.old_path).stem)
         text = read_business_doc(entry)
-        own_backlinks = parse_related_metric_entities(text) if text else []
-        matched = set(own_backlinks)
+        own_backlinks = parse_related_metric_entities(text) if text else None
+        reverse_matches: set[str] = set()
         for lookup_stem in lookup_stems:
-            matched |= set(reverse_index.get(business_kebab_id(lookup_stem), ()))
-        if not matched:
-            unresolved.append(Path(entry.path).stem)
+            reverse_matches |= set(reverse_index.get(business_kebab_id(lookup_stem), ()))
+        if own_backlinks is None:
+            matched = reverse_matches
+            if not matched:
+                unresolved.append(Path(entry.path).stem)
+        else:
+            matched = set(own_backlinks) | reverse_matches
         fanned |= matched
     return fanned, unresolved
 
