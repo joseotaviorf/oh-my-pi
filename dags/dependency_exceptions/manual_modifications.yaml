@@ -565,6 +565,7 @@ bietlejuice.enrich_marketing_manual_daily_costs:
 bietlejuice.enrich_nps_answer_drivers:
   add:
     - bietlejuice.enrich_tracksale:load-enrich-answer:first-run-of-day
+    - bietlejuice.enrich_tracksale:load-enrich-answer-tags:first-run-of-day
   remove:
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_offboarding:
