@@ -114,8 +114,10 @@ LEFT JOIN
         ON c.closure_result = vl.value_code
 LEFT JOIN
     datalake_cyber_legal_clean.values_list vl1
-        ON c.closure_reason = vl1.value_code
-        AND c.closure_result = vl1.id_value
+    ON IF(
+        c.closure_result = 'LRES_10',
+        c.closure_reason = vl1.value_code,
+        c.closure_reason = vl1.value_code AND c.closure_result = vl1.id_value)
 LEFT JOIN
     datalake_cyber_legal_clean.case_uda AS cuda
         ON c.id_case = cuda.id_case
