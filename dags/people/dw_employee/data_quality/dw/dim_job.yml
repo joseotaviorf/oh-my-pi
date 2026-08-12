@@ -72,3 +72,15 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  active_jobs_must_have_salary_range_midpoint:
+    custom:
+      # Active jobs should carry a salary range midpoint from the latest matching rate.
+      # Inactive jobs often have no rate_values (thousands of nulls); do not use is_complete.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_employee.dim_job
+         WHERE is_active = TRUE
+           AND sk_job <> '-1'
+           AND salary_range_midpoint IS NULL
+        ) = 0
+      severity_level: Warning

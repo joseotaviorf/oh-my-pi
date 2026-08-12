@@ -5,7 +5,14 @@ WITH cte_enrich_demographic_attributes_ranked AS (
     highest_education_level,
     gender,
     ts_last_update,
-    MAX(ts_last_update) OVER (PARTITION BY id_person) AS max_ts_last_update
+    ROW_NUMBER() OVER (
+      PARTITION BY id_person
+      ORDER BY
+        ts_last_update DESC,
+        highest_education_level,
+        gender,
+        marital_status
+    ) AS rn
   FROM
     datalake_hr_system.demographic_attributes
 ),
@@ -18,7 +25,7 @@ cte_enrich_demographic_attributes AS (
   FROM
     cte_enrich_demographic_attributes_ranked
   WHERE
-    ts_last_update = max_ts_last_update
+    rn = 1
 )
 SELECT
   emp_info.id_person AS sk_employee,

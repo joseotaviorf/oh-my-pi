@@ -301,84 +301,128 @@ set_id_latest AS (
         set_id_ranked
     WHERE
         rn = 1
+),
+-- One rate version per (ladder, rate); the job-level rank below picks a single rate per id_job.
+job_with_attributes AS (
+    SELECT
+        job_latest.id_job,
+        job_latest.job_code,
+        job_tl.name AS job_name,
+        job_family_tl.job_family_name AS job_category,
+        grade_tl.name AS band,
+        job_latest.contribution_level AS career_track,
+        grade_ladder_tl.name AS comp_ladder_directorate,
+        CASE
+            WHEN grade_ladder_tl.name = 'Deel' THEN 'Estados Unidos'
+            WHEN grade_ladder_tl.name = 'Classifieds Geral' THEN 'Uruguai'
+            WHEN RIGHT(grade_ladder_tl.name, 2) = 'PT' THEN 'Portugal'
+            WHEN RIGHT(grade_ladder_tl.name, 2) = 'MX' THEN 'Mexico'
+            WHEN RIGHT(grade_ladder_tl.name, 3) = 'ARG' THEN 'Argentina'
+            WHEN RIGHT(grade_ladder_tl.name, 3) = 'PER' THEN 'Peru'
+            WHEN RIGHT(grade_ladder_tl.name, 3) = 'ECU' THEN 'Ecuador'
+            WHEN RIGHT(grade_ladder_tl.name, 3) = 'PAN' THEN 'Panama'
+            ELSE 'Brasil'
+        END AS country,
+        set_id.set_name AS comp_ladder_business_unit,
+        job_latest.work_arrangement AS working_hours_regime,
+        rate.currency_code,
+        job_latest.target_sop_currency,
+        job_leg.brazilian_occupation_code,
+        job_latest.weekly_hours AS workload,
+        COALESCE(job_latest.target_plr, 0) AS target_plr,
+        COALESCE(job_latest.target_plr_salary_multiplier, 0) AS target_plr_salary_multiplier,
+        COALESCE(job_latest.target_rvv, 0) AS target_rvv,
+        COALESCE(job_latest.target_sop, 0) AS target_sop,
+        COALESCE(job_latest.target_hiring_sop, 0) AS target_hiring_sop,
+        COALESCE(job_latest.target_bonus_tech_usd, 0) AS target_bonus_tech_usd,
+        rate_val.mid_value AS salary_range_midpoint,
+        rate_val.minimum_value AS salary_range_min,
+        rate_val.maximum_value AS salary_range_max,
+        CASE
+            WHEN grade_ladder_tl.name = 'Deel' THEN 12
+            WHEN grade_ladder_tl.name = 'Classifieds Geral' THEN 13
+            WHEN RIGHT(grade_ladder_tl.name, 2) = 'PT' THEN 14
+            WHEN RIGHT(grade_ladder_tl.name, 2) = 'MX' THEN 13
+            WHEN RIGHT(grade_ladder_tl.name, 3) = 'ARG' THEN 13
+            WHEN RIGHT(grade_ladder_tl.name, 3) = 'PER' THEN 14
+            WHEN RIGHT(grade_ladder_tl.name, 3) = 'ECU' THEN 14
+            WHEN RIGHT(grade_ladder_tl.name, 3) = 'PAN' THEN 13
+            ELSE 13.33
+        END AS annual_salary_multiplier,
+        job_latest.is_active,
+        job_latest.is_time_clocking_required AS has_clock_in,
+        job_latest.dt_effective_started AS dt_effective_started,
+        job_latest.dt_effective_ended AS dt_effective_ended,
+        job_latest.ts_updated AS ts_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY job_latest.id_job
+            ORDER BY
+                rate.dt_effective_started DESC,
+                rate.object_version_number DESC,
+                rate.id_rate DESC
+        ) AS rate_rn
+    FROM
+        job_latest
+    LEFT JOIN
+        job_tl_latest AS job_tl
+            ON job_tl.id_job = job_latest.id_job
+    LEFT JOIN
+        job_family_tl_latest AS job_family_tl
+            ON job_family_tl.id_job_family = job_latest.id_job_family
+    LEFT JOIN
+        job_leg_latest AS job_leg
+            ON job_leg.id_job = job_latest.id_job
+    LEFT JOIN
+        valid_grades_latest AS valid_grades
+            ON valid_grades.id_job = job_latest.id_job
+    LEFT JOIN
+        grade_tl_latest AS grade_tl
+            ON grade_tl.id_grade = valid_grades.id_grade
+    LEFT JOIN
+        grade_ladder_tl_latest AS grade_ladder_tl
+            ON grade_ladder_tl.id_grade_ladder = job_latest.id_grade_ladder
+    LEFT JOIN
+        set_id_latest AS set_id
+            ON job_latest.id_set = set_id.id_set
+    LEFT JOIN
+        rates_latest AS rate
+            ON rate.id_grade_ladder = job_latest.id_grade_ladder
+    LEFT JOIN
+        rate_val_latest AS rate_val
+            ON rate_val.id_rate = rate.id_rate
+            AND rate_val.id_rate_object = valid_grades.id_grade
 )
 SELECT
-    job_latest.id_job AS sk_job,
-    job_latest.job_code,
-    job_tl.name AS job_name,
-    job_family_tl.job_family_name AS job_category,
-    grade_tl.name AS band,
-    job_latest.contribution_level AS career_track,
-    grade_ladder_tl.name AS comp_ladder_directorate,
-    CASE
-        WHEN grade_ladder_tl.name = 'Deel' THEN 'Estados Unidos'
-        WHEN grade_ladder_tl.name = 'Classifieds Geral' THEN 'Uruguai'
-        WHEN RIGHT(grade_ladder_tl.name, 2) = 'PT' THEN 'Portugal'
-        WHEN RIGHT(grade_ladder_tl.name, 2) = 'MX' THEN 'Mexico'
-        WHEN RIGHT(grade_ladder_tl.name, 3) = 'ARG' THEN 'Argentina'
-        WHEN RIGHT(grade_ladder_tl.name, 3) = 'PER' THEN 'Peru'
-        WHEN RIGHT(grade_ladder_tl.name, 3) = 'ECU' THEN 'Ecuador'
-        WHEN RIGHT(grade_ladder_tl.name, 3) = 'PAN' THEN 'Panama'
-        ELSE 'Brasil'
-    END AS country,
-    set_id.set_name AS comp_ladder_business_unit,
-    job_latest.work_arrangement AS working_hours_regime,
-    rate.currency_code,
-    job_latest.target_sop_currency,
-    job_leg.brazilian_occupation_code,
-    job_latest.weekly_hours AS workload,
-    COALESCE(job_latest.target_plr, 0) AS target_plr,
-    COALESCE(job_latest.target_plr_salary_multiplier, 0) AS target_plr_salary_multiplier,
-    COALESCE(job_latest.target_rvv, 0) AS target_rvv,
-    COALESCE(job_latest.target_sop, 0) AS target_sop,
-    COALESCE(job_latest.target_hiring_sop, 0) AS target_hiring_sop,
-    COALESCE(job_latest.target_bonus_tech_usd, 0) AS target_bonus_tech_usd,
-    rate_val.mid_value AS salary_range_midpoint,
-    rate_val.minimum_value AS salary_range_min,
-    rate_val.maximum_value AS salary_range_max,
-    CASE
-        WHEN grade_ladder_tl.name = 'Deel' THEN 12
-        WHEN grade_ladder_tl.name = 'Classifieds Geral' THEN 13
-        WHEN RIGHT(grade_ladder_tl.name, 2) = 'PT' THEN 14
-        WHEN RIGHT(grade_ladder_tl.name, 2) = 'MX' THEN 13
-        WHEN RIGHT(grade_ladder_tl.name, 3) = 'ARG' THEN 13
-        WHEN RIGHT(grade_ladder_tl.name, 3) = 'PER' THEN 14
-        WHEN RIGHT(grade_ladder_tl.name, 3) = 'ECU' THEN 14
-        WHEN RIGHT(grade_ladder_tl.name, 3) = 'PAN' THEN 13
-        ELSE 13.33
-    END AS annual_salary_multiplier,
-    job_latest.is_active,
-    job_latest.is_time_clocking_required AS has_clock_in,
-    job_latest.dt_effective_started AS dt_effective_started,
-    job_latest.dt_effective_ended AS dt_effective_ended,
-    job_latest.ts_updated AS ts_updated
+    job_with_attributes.id_job AS sk_job,
+    job_with_attributes.job_code,
+    job_with_attributes.job_name,
+    job_with_attributes.job_category,
+    job_with_attributes.band,
+    job_with_attributes.career_track,
+    job_with_attributes.comp_ladder_directorate,
+    job_with_attributes.country,
+    job_with_attributes.comp_ladder_business_unit,
+    job_with_attributes.working_hours_regime,
+    job_with_attributes.currency_code,
+    job_with_attributes.target_sop_currency,
+    job_with_attributes.brazilian_occupation_code,
+    job_with_attributes.workload,
+    job_with_attributes.target_plr,
+    job_with_attributes.target_plr_salary_multiplier,
+    job_with_attributes.target_rvv,
+    job_with_attributes.target_sop,
+    job_with_attributes.target_hiring_sop,
+    job_with_attributes.target_bonus_tech_usd,
+    job_with_attributes.salary_range_midpoint,
+    job_with_attributes.salary_range_min,
+    job_with_attributes.salary_range_max,
+    job_with_attributes.annual_salary_multiplier,
+    job_with_attributes.is_active,
+    job_with_attributes.has_clock_in,
+    job_with_attributes.dt_effective_started,
+    job_with_attributes.dt_effective_ended,
+    job_with_attributes.ts_updated
 FROM
-    job_latest
-LEFT JOIN
-    job_tl_latest AS job_tl
-        ON job_tl.id_job = job_latest.id_job
-LEFT JOIN
-    job_family_tl_latest AS job_family_tl
-        ON job_family_tl.id_job_family = job_latest.id_job_family
-LEFT JOIN
-    job_leg_latest AS job_leg
-        ON job_leg.id_job = job_latest.id_job
-LEFT JOIN
-    valid_grades_latest AS valid_grades
-        ON valid_grades.id_job = job_latest.id_job
-LEFT JOIN
-    grade_tl_latest AS grade_tl
-        ON grade_tl.id_grade = valid_grades.id_grade
-LEFT JOIN
-    grade_ladder_tl_latest AS grade_ladder_tl
-        ON grade_ladder_tl.id_grade_ladder = job_latest.id_grade_ladder
-LEFT JOIN
-    set_id_latest AS set_id
-        ON job_latest.id_set = set_id.id_set
-LEFT JOIN
-    rates_latest AS rate
-        ON rate.id_grade_ladder = job_latest.id_grade_ladder
-LEFT JOIN
-    rate_val_latest AS rate_val
-        ON rate_val.id_rate = rate.id_rate
-        AND rate_val.id_rate_object = valid_grades.id_grade
+    job_with_attributes
+WHERE
+    job_with_attributes.rate_rn = 1
