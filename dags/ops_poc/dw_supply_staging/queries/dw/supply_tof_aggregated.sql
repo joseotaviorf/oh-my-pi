@@ -215,6 +215,9 @@ actual_vol AS (
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 4, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w4
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) >= 5, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w5plus
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect', first_listings.sk_supply, NULL))) as qty_p2l_cohort
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=7, first_listings.sk_supply, NULL))) as qty_p2l_cohort_d7
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=14, first_listings.sk_supply, NULL))) as qty_p2l_cohort_d14
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=28, first_listings.sk_supply, NULL))) as qty_p2l_cohort_d28
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', first_listings.date) = date_trunc('WEEK', obt.date), first_listings.sk_supply, NULL))) as qty_p2l_cohort_w0
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 1, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w1
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 2, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w2
@@ -380,6 +383,9 @@ bup AS (
         ,NULL AS qty_p2o_cohort_w4
         ,NULL AS qty_p2o_cohort_w5plus
         ,NULL AS qty_p2l_cohort
+        ,NULL AS qty_p2l_cohort_d7
+        ,NULL AS qty_p2l_cohort_d14
+        ,NULL AS qty_p2l_cohort_d28
         ,NULL AS qty_p2l_cohort_w0
         ,NULL AS qty_p2l_cohort_w1
         ,NULL AS qty_p2l_cohort_w2
@@ -500,6 +506,9 @@ okr AS (
         ,NULL AS qty_p2o_cohort_w4
         ,NULL AS qty_p2o_cohort_w5plus
         ,NULL AS qty_p2l_cohort
+        ,NULL AS qty_p2l_cohort_d7
+        ,NULL AS qty_p2l_cohort_d14
+        ,NULL AS qty_p2l_cohort_d28
         ,NULL AS qty_p2l_cohort_w0
         ,NULL AS qty_p2l_cohort_w1
         ,NULL AS qty_p2l_cohort_w2
@@ -614,6 +623,9 @@ tgt_unique as (
         ,NULL AS qty_p2o_cohort_w4
         ,NULL AS qty_p2o_cohort_w5plus
         ,NULL AS qty_p2l_cohort
+        ,NULL AS qty_p2l_cohort_d7
+        ,NULL AS qty_p2l_cohort_d14
+        ,NULL AS qty_p2l_cohort_d28
         ,NULL AS qty_p2l_cohort_w0
         ,NULL AS qty_p2l_cohort_w1
         ,NULL AS qty_p2l_cohort_w2
@@ -724,6 +736,9 @@ tgt_mkt_costs AS (
         NULL AS qty_p2o_cohort_w4,
         NULL AS qty_p2o_cohort_w5plus,
         NULL AS qty_p2l_cohort,
+        NULL AS qty_p2l_cohort_d7,
+        NULL AS qty_p2l_cohort_d14,
+        NULL AS qty_p2l_cohort_d28,
         NULL AS qty_p2l_cohort_w0,
         NULL AS qty_p2l_cohort_w1,
         NULL AS qty_p2l_cohort_w2,
@@ -836,6 +851,9 @@ UNION ALL
         NULL AS qty_p2o_cohort_w4,
         NULL AS qty_p2o_cohort_w5plus,
         NULL AS qty_p2l_cohort,
+        NULL AS qty_p2l_cohort_d7,
+        NULL AS qty_p2l_cohort_d14,
+        NULL AS qty_p2l_cohort_d28,
         NULL AS qty_p2l_cohort_w0,
         NULL AS qty_p2l_cohort_w1,
         NULL AS qty_p2l_cohort_w2,
@@ -946,6 +964,9 @@ act_costs AS (
         NULL AS qty_p2o_cohort_w4,
         NULL AS qty_p2o_cohort_w5plus,
         NULL AS qty_p2l_cohort,
+        NULL AS qty_p2l_cohort_d7,
+        NULL AS qty_p2l_cohort_d14,
+        NULL AS qty_p2l_cohort_d28,
         NULL AS qty_p2l_cohort_w0,
         NULL AS qty_p2l_cohort_w1,
         NULL AS qty_p2l_cohort_w2,
@@ -1065,6 +1086,9 @@ act_last_year as (
         NULL AS qty_p2o_cohort_w4,
         NULL AS qty_p2o_cohort_w5plus,
         NULL AS qty_p2l_cohort,
+        NULL AS qty_p2l_cohort_d7,
+        NULL AS qty_p2l_cohort_d14,
+        NULL AS qty_p2l_cohort_d28,
         NULL AS qty_p2l_cohort_w0,
         NULL AS qty_p2l_cohort_w1,
         NULL AS qty_p2l_cohort_w2,
@@ -1188,6 +1212,9 @@ SELECT
     m.qty_p2o_cohort_w4,
     m.qty_p2o_cohort_w5plus,
     m.qty_p2l_cohort,
+    m.qty_p2l_cohort_d7,
+    m.qty_p2l_cohort_d14,
+    m.qty_p2l_cohort_d28,
     m.qty_p2l_cohort_w0,
     m.qty_p2l_cohort_w1,
     m.qty_p2l_cohort_w2,
