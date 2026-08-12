@@ -1,0 +1,146 @@
+---
+database_name: datalake_consorcio
+table_name: lead_scoring_population
+owner: edgar.fernandes@quintoandar.com.br
+domain: QCX
+description: >
+  Labelled deal population used to develop the Consórcio Behavioral Lead Scoring
+  scorecard. Grain is one deal (id_deal); a single lead may have several deals.
+  Holds identity, the target label (won/lost/open), the handoff population filter,
+  the temporal cutoff that every feature must respect, and the exclusion flags.
+  Conversation and CRM features are not stored here — they are built on top of this
+  table and joined on id_deal plus spec_version. Partitioned by spec_version: each
+  run rebuilds one partition on demand and leaves the others untouched, so several
+  populations coexist and an analysis can stay pinned to the one it ran against. A
+  population is identified by spec_version together with the floor_date that scoped
+  it; the maturity window and the exclusion flags are deliberately not applied at
+  build time, so those analysis parameters can change without a rebuild. Funnel
+  milestones are read raw, without the COALESCE backfill used by funnel reporting,
+  to keep ts_handoff free of outcome leakage.
+columns:
+  id_deal:
+    lineage:
+      - datalake_hubspot.deal_stage.id_deal
+    description: >
+      HubSpot deal id and primary key of this table. Also the bridge to the
+      conversation tables, where datalake_consorcio_clean.blip_messages.id_crm holds
+      the same deal id.
+  uuid_lead:
+    lineage:
+      - datalake_hubspot.deal.consorcio_id_lead
+    description: Consórcio lead uuid in consorcio-api; groups the several deals a single person may have.
+  outcome:
+    lineage:
+      - datalake_hubspot.stage.label
+      - datalake_hubspot.deal_stage.ts_stage_started
+    description: >
+      Target label. won when the deal ever entered "venda fechada"; lost when it ever
+      entered "descarte"; open otherwise. Only won and lost are used for training —
+      open cannot be distinguished between "will not close" and "has not closed yet".
+      won takes precedence when a deal carries both milestones.
+  discard_reason:
+    lineage:
+      - datalake_hubspot.deal.consorcio_discard_reason
+    description: >
+      Reason recorded when the deal was discarded. Input to the labelling rule only,
+      used to decide which discards are definitive losses. Must never be used as a
+      model feature: it is observed after the outcome.
+  inside_sales_pipeline:
+    lineage:
+      - datalake_hubspot.deal.consorcio_inside_sales_pipeline
+    description: >
+      Inside Sales flow the deal ran through (SDR IA, SIMULATOR IA, SDR Humano). Sets
+      which milestone defines ts_handoff, and therefore whether a post-simulation
+      feature is measurable at all: under SIMULATOR IA handoff is the simulation
+      acceptance, under SDR IA it is the simulation send and the window is near zero.
+  host_name:
+    lineage:
+      - datalake_hubspot.deal_stage.ts_stage_started
+    description: >
+      Conversational era the deal belongs to, derived from ts_first_stage against the
+      platconv_start_date parameter: blip or platconv. Used as a control to test
+      whether conversation-derived distributions are comparable across eras before
+      pooling them. Constant within any window that predates the platform migration.
+  number_of_messages:
+    lineage:
+      - datalake_consorcio_clean.blip_messages.id_message
+      - datalake_consorcio_clean.blip_messages.id_crm
+    description: >
+      Count of distinct Blip messages linked to this deal, across the whole
+      conversation. Zero means no conversation could be linked, which makes this column
+      the measure of the deal-to-conversation join rate. Not a feature: the
+      per-feature temporal cutoff at ts_handoff is applied downstream.
+  is_test_user:
+    lineage:
+      - datalake_hubspot.deal.deal_name
+    description: >
+      True when the deal name matches a test pattern, marking bug-bash and internal
+      testing traffic from the P&T and P&P teams. No test deal has ever reached "venda
+      fechada", so excluding them costs no positive events.
+  is_duplicated:
+    lineage:
+      - datalake_hubspot.deal.consorcio_deal_duplicado
+    description: >
+      True when HubSpot flags the deal as a duplicate. Semantics of the source property
+      are still to be confirmed with P&P: if duplicate detection is person-based, a
+      legitimate re-engagement may be flagged, and excluding it would drop a positive
+      event. Exposed as a flag rather than filtered so the cost can be measured.
+  ts_first_stage:
+    lineage:
+      - datalake_hubspot.deal_stage.ts_stage_started
+    description: >
+      Earliest funnel stage entry for the deal, and the start of the maturity window.
+      The observed cycle to a closed sale has a median of 3 days and a P95 of 34 days
+      measured on this definition. Whether the journey should instead start at lead
+      creation in consorcio-api is an open business question.
+  ts_lead_created:
+    lineage:
+      - datalake_consorcio_clean.lead.ts_created
+      - datalake_consorcio_clean.lead.uuid
+    description: >
+      Lead creation timestamp in consorcio-api, joined best-effort on uuid and null
+      when no lead row matches (roughly 8% of deals carry no consorcio_id_lead).
+      Carried alongside ts_first_stage because which of the two marks the start of the
+      journey — and therefore the maturity window — is still an open business
+      question; keeping both makes that a read-time choice instead of a rebuild.
+      lead_external_data was rejected as the source: its data only begins on
+      2026-07-13 and would not cover the analysis window.
+  ts_simulated:
+    lineage:
+      - datalake_hubspot.deal_stage.ts_stage_started
+      - datalake_hubspot.stage.label
+    description: >
+      Moment the simulation was sent, from the funnel milestone. Together with
+      ts_handoff it bounds the window in which post-simulation engagement can be
+      measured without leaking past the handoff — a window that only exists under
+      SIMULATOR IA, since under SDR IA the handoff is the simulation send itself. The
+      simulation record in datalake_consorcio_clean.simulation was rejected as the
+      source: it resolves for roughly 2% of deals against the milestone's 30%.
+  ts_handoff:
+    lineage:
+      - datalake_hubspot.deal_stage.ts_stage_started
+      - datalake_hubspot.deal.consorcio_inside_sales_pipeline
+    description: >
+      Moment the deal was handed off to Inside Sales, resolved per pipeline from raw
+      milestones with no COALESCE backfill. This is the cutoff every feature must
+      respect: only data observed strictly before it may enter the model. Null means
+      the handoff milestone was never recorded, which excludes the deal from the
+      training population.
+  ts_outcome:
+    lineage:
+      - datalake_hubspot.deal_stage.ts_stage_started
+      - datalake_hubspot.stage.label
+    description: >
+      When the outcome happened — the closing date when won, the discard date when
+      lost. Null when outcome is open, because no outcome exists; filling it with a
+      later activity timestamp would silently corrupt any time-to-outcome measure.
+  ts_load:
+    description: Timestamp of the DAG run that materialized the row; tells when a given population was last rebuilt.
+  spec_version:
+    description: >
+      Partition column — identifier of the population, stamped from the DAG conf. Each
+      value is a separate immutable population: a run overwrites only its own partition,
+      so an analysis can stay pinned to one version while another is built or rebuilt.
+      Bump it when the labelling or scoping spec changes, not when a build fails, since
+      re-running the same version is idempotent. The floor_date that scoped a given
+      population is recoverable as the minimum ts_first_stage within it.

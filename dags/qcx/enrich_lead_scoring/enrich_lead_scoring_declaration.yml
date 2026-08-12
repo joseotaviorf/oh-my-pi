@@ -1,0 +1,63 @@
+dag:
+  name: enrich_lead_scoring
+  schedule_interval: null
+  schedule_start_date: 2026, 8, 1
+  owner: QCX
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Materializes datalake_consorcio.lead_scoring_population: the labelled deal
+      population used to develop the Consórcio Behavioral Lead Scoring scorecard.
+
+      Grain is one deal (id_deal); one lead may have several deals. The table holds
+      identity, the target label, the handoff population filter, the temporal cutoff
+      used by every feature, and the exclusion flags. Conversation features are NOT
+      here — they live in a separate table built on top of this one.
+
+      Design decisions worth knowing before changing this DAG:
+
+        - Partitioned by spec_version, written with dynamic partition overwrite. Each
+          run rebuilds exactly one partition and leaves the others untouched, so
+          several populations coexist and an analysis can stay pinned to the one it
+          was run against. Re-running the same spec_version is idempotent, which keeps
+          retries cheap; bump the version when the spec itself changes, not when a
+          build fails.
+
+        - Every row of a partition is rewritten, never appended. Labels mutate: outcome
+          flips from open to won/lost, ts_handoff gets filled later, and maturity
+          advances with the calendar. An append-only load would freeze stale labels.
+
+        - schedule_interval is explicitly null, not omitted. Omitting it makes the DAG
+          fall back to dataset_dependencies and auto-trigger on upstream updates, which
+          would defeat the frozen-population intent. During the analysis phase a pinned
+          snapshot is worth more than a fresh one: an automatic rebuild would move the
+          numbers under the analysis. Add a cron later, if the scorecard reaches
+          production and needs monitoring.
+
+        - floor_date scopes the population and is part of its identity, together with
+          spec_version. Analysis parameters that are NOT part of that identity — the
+          maturity window, the exclusion flags — are deliberately left unapplied here
+          and filtered at read time, so changing one does not require a rebuild.
+
+        - Milestones are read raw, without the COALESCE backfill used by the funnel
+          reporting query. That backfill fills an absent milestone from a later stage,
+          which for ts_handoff would push the feature cutoff past the sale itself and
+          leak the outcome. A deal whose handoff milestone is missing gets a null
+          ts_handoff and falls out of the population.
+
+      Parameters (override via DAG conf):
+        spec_version         population identifier; also the partition key
+        floor_date           earliest ts_first_stage admitted into the population
+        id_pipeline          HubSpot Consórcio pipeline id
+        platconv_start_date  first day of the Conversational Platform era (host_name)
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: consorcio
+  default_extraction_type: incremental
+  default_partitions: [spec_version]
+  extra_query_template_params:
+    spec_version: "{{ dag_run.conf.get('spec_version', 1) if dag_run else 1 }}"
+    floor_date: "{{ dag_run.conf.get('floor_date', '2025-09-01') if dag_run else '2025-09-01' }}"
+    id_pipeline: "{{ dag_run.conf.get('id_pipeline', 737631007) if dag_run else 737631007 }}"
+    platconv_start_date: "{{ dag_run.conf.get('platconv_start_date', '2026-07-20') if dag_run else '2026-07-20' }}"
