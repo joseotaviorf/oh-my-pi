@@ -4,6 +4,13 @@ bietlejuice.enrich_consolidated_growth_metrics:
 bietlejuice.enrich_growth_media_platform_scd:
   remove:
     - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
+bietlejuice.dw_compensation:
+  # PLR (fact_plr_monthly) is the only query reading dw_time (fact_absence_requests, dim_absence_type),
+  # and PLR is calculated once a year, well after dw_time D-2 data is available. Removing this
+  # dependency avoids dw_compensation waiting on dw_time's slow (Oitchau-based) run every day.
+  remove:
+    - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
+    - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
 bietlejuice.enrich_criteo:
   add:
     - bietlejuice.criteo_temp:done-clean-criteo-costs:first-run-of-day
