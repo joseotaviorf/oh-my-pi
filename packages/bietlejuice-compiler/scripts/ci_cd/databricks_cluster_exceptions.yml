@@ -75,3 +75,9 @@ exceptions:
       migration issues (struct DDL parsing / recovery flow failures on EMR
       Spark).
     approved_by: gabriel.firmino@quintoandar.com.br
+  - dag: enrich_transactional_entities
+    path: dags/growth/enrich_transactional_entities
+    reason: >-
+      Temporary Databricks rollback: the enrich_transactional_entities workflow is taking too long to run on EMR.
+      We'll need to make some optimizations to the workflow to make it run faster on EMR.
+    approved_by: jose.rferreira@quintoandar.com
