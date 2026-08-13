@@ -6,14 +6,7 @@ import importlib.util
 from pathlib import Path
 
 _REPO = Path(__file__).resolve().parents[7]
-_JOB = (
-    _REPO
-    / "dags"
-    / "cross"
-    / "base"
-    / "spark_jobs"
-    / "load_milestone_dimension.py"
-)
+_JOB = _REPO / "dags" / "cross" / "base" / "spark_jobs" / "load_milestone_dimension.py"
 _spec = importlib.util.spec_from_file_location("load_milestone_dimension", _JOB)
 _mod = importlib.util.module_from_spec(_spec)
 assert _spec.loader is not None
