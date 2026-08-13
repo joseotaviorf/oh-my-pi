@@ -1541,7 +1541,6 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.checkout:load-clean-charge:first-run-of-day
   - bietlejuice.checkout:load-clean-order:first-run-of-day
   - bietlejuice.checkout:load-clean-pix:first-run-of-day
-  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-payment-platforms:first-run-of-day
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera:first-run-of-day

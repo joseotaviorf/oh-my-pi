@@ -1,6 +1,6 @@
 WITH 
 sale_offers AS (
-  SELECT DISTINCT
+  SELECT
     s.id AS id_sale,
     s.id_external_offer AS sk_offer,
     SUBSTR(CAST(sr.id_house AS VARCHAR(20)), 4) AS sk_house,
@@ -10,8 +10,20 @@ sale_offers AS (
     datalake_monopoly_clean.sale s
   LEFT JOIN
     datalake_monopoly_clean.sale_revision sr
-      ON s.id = sr.id 
+      ON s.id = sr.id
       AND s.current_revision = sr.revision
+),
+
+sale_offers_latest AS (
+  SELECT
+    id_sale,
+    sk_offer,
+    sk_house,
+    ts_created
+  FROM
+    sale_offers
+  WHERE
+    rn = 1
 ),
 
 sale_persons AS (
@@ -75,17 +87,19 @@ sale_persons AS (
 ),
 
 sale_transactions AS (
-  SELECT DISTINCT
+  SELECT
     s.id_external_offer AS sk_offer,
     substr(cast(sr.id_house AS VARCHAR (20)), 4) AS sk_house,
     st.id AS id_sale_transaction,
     st.id_sale,
     st.status,
     st.dt_accounting,
+    DATE_FORMAT(st.dt_accounting, 'yyyy-MM') AS accounting_year_month,
     st.id_income_reference,
     ir.id_income,
     st.description,
     ir.amount,
+    CAST(ir.amount AS DECIMAL(10, 2)) AS amount_decimal,
     ir.dt_income,
     ir.income_from,
     ROW_NUMBER() OVER (PARTITION BY s.id_external_offer, dt_accounting ORDER BY dt_accounting DESC) AS rn
@@ -100,7 +114,28 @@ sale_transactions AS (
   LEFT JOIN
     datalake_monopoly_clean.income_reference ir
     ON ir.id = st.id_income_reference
-  WHERE ir.amount IS NOT NULL
+  WHERE
+    ir.amount IS NOT NULL
+    AND st.dt_accounting >= DATE '2025-01-01'
+),
+
+sale_transactions_latest AS (
+  SELECT
+    sk_offer,
+    sk_house,
+    id_sale_transaction,
+    id_sale,
+    status,
+    dt_accounting,
+    accounting_year_month,
+    amount,
+    amount_decimal,
+    income_from,
+    rn
+  FROM
+    sale_transactions
+  WHERE
+    rn = 1
 ),
 
 francesinha AS (
@@ -123,28 +158,31 @@ francesinha AS (
     AND bank_account IN ('04525', '09846')
     AND occurrence_code IN ('06')
     AND UPPER(document_number) LIKE '%FS%'
+    AND dt_credit >= DATE '2025-01-01'
 ),
 
 francesinha_bypass AS (
-    SELECT DISTINCT
-      REGEXP_REPLACE(document_number, 'BY|/.*', '') AS sk_house,
-      document_number,
-      our_number,
-      document_number AS company_use,
-      dt_due,
-      dt_credit AS dt_paid,
-      occurrence_code AS last_occurrence_code,
-      bank_account,
-      due_amount,
-      net_amount AS paid_amount
-    FROM
-      datalake_nexxera.cnab_charges
-    WHERE
-      TRUE
-      AND is_latest_attempt = TRUE
-      AND bank_account IN ('04525', '09846')
-      AND occurrence_code IN ('06')
-      AND UPPER(document_number) NOT LIKE '%FS%'
+  SELECT DISTINCT
+    REGEXP_REPLACE(document_number, 'BY|/.*', '') AS sk_house,
+    document_number,
+    our_number,
+    document_number AS company_use,
+    dt_due,
+    dt_credit AS dt_paid,
+    DATE_FORMAT(dt_credit, 'yyyy-MM') AS paid_year_month,
+    occurrence_code AS last_occurrence_code,
+    bank_account,
+    due_amount,
+    net_amount AS paid_amount
+  FROM
+    datalake_nexxera.cnab_charges
+  WHERE
+    TRUE
+    AND is_latest_attempt = TRUE
+    AND bank_account IN ('04525', '09846')
+    AND occurrence_code IN ('06')
+    AND UPPER(document_number) NOT LIKE '%FS%'
+    AND dt_credit >= DATE '2025-01-01'
 ),
 
 bank_statement AS (
@@ -198,6 +236,7 @@ bank_statement AS (
     TRUE
     AND ext.operation IN ('C')
     AND ext.origin_operation IN ('PIX_RECEPCAO', 'TED_CASHIN', 'TEF_CC_CC', 'TEF_CP_CC', 'TEF_SISPAG_PJ')
+    AND CAST(ext.date_accounting AS DATE) >= DATE '2025-01-01'
     
   UNION ALL 
 
@@ -251,6 +290,7 @@ bank_statement AS (
     TRUE
     AND ext.operation IN ('C')
     AND ext.origin_operation IN ('PIX_RECEPCAO', 'TED_CASHIN', 'TEF_CC_CC', 'TEF_CP_CC', 'TEF_SISPAG_PJ')
+    AND CAST(ext.date_accounting AS DATE) >= DATE '2025-01-01'
 ),
 
 sap AS (
@@ -265,14 +305,49 @@ sap AS (
     comments,
     created_by,
     dt_reference AS dt_paid,
+    DATE_FORMAT(dt_reference, 'yyyy-MM') AS paid_year_month,
     dt_tax,
     ROUND(debit_credit, 2) AS paid_amount,
+    ABS(ROUND(debit_credit, 2)) AS abs_paid_amount,
     ROW_NUMBER() OVER (PARTITION BY id_business_entity, dt_reference ORDER BY dt_reference DESC) AS rn
   FROM
     datalake_pas.ledger
   WHERE
     TRUE
     AND account_number IN ('110360X', '110901')
+    AND dt_reference >= DATE '2025-01-01'
+),
+
+sap_latest AS (
+  SELECT
+    id_transaction,
+    sk_offer,
+    id_sale_transaction,
+    dt_paid,
+    paid_year_month,
+    paid_amount,
+    abs_paid_amount,
+    rn
+  FROM
+    sap
+  WHERE
+    rn = 1
+),
+
+-- Bypass SAP match is amount+month only (no offer key); prefilter unlinked rows.
+sap_unlinked AS (
+  SELECT
+    id_transaction,
+    sk_offer,
+    id_sale_transaction,
+    dt_paid,
+    paid_year_month,
+    paid_amount,
+    abs_paid_amount
+  FROM
+    sap
+  WHERE
+    id_sale_transaction IS NULL
 ),
 
 franc_sale_offer AS (
@@ -290,36 +365,53 @@ franc_sale_offer AS (
   FROM
     francesinha f
   LEFT JOIN
-    sale_offers so
+    sale_offers_latest so
       ON so.sk_house = f.sk_house
       AND so.ts_created <= f.dt_paid
-      AND so.rn = 1
-  ORDER BY f.dt_paid
+),
+
+-- Prefer PIX id match; fallback to document mask. Split OR into equi-joins
+-- to avoid BroadcastNestedLoopJoin (EMR Spark 3.5).
+sale_persons_latest AS (
+  SELECT
+    id_sale,
+    sk_offer,
+    sk_house,
+    id_bank_payment,
+    document_number_mask,
+    ts_created,
+    rn
+  FROM
+    sale_persons
+  WHERE
+    rn = 1
 ),
 
 bank_sale_person AS (
-   SELECT
+  SELECT
     bs.bank_account,
     bs.counterpart_document_mask AS company_use,
     bs.counterpart_document,
     bs.counterpart_name,
-    sp.sk_house,
+    COALESCE(sp_pix.sk_house, sp_doc.sk_house) AS sk_house,
     bs.date_accounting AS dt_paid,
     bs.amount_value AS paid_amount,
-    sp.sk_offer,
-    sp.id_sale,
+    COALESCE(sp_pix.sk_offer, sp_doc.sk_offer) AS sk_offer,
+    COALESCE(sp_pix.id_sale, sp_doc.id_sale) AS id_sale,
     bs.origin_operation,
-    sp.ts_created,
-    sp.rn
+    COALESCE(sp_pix.ts_created, sp_doc.ts_created) AS ts_created,
+    COALESCE(sp_pix.rn, sp_doc.rn) AS rn
   FROM
     bank_statement bs
   LEFT JOIN
-    sale_persons sp
-      ON (bs.origin_identifier = sp.id_bank_payment
-        OR sp.document_number_mask = bs.counterpart_document_mask)
-      AND sp.ts_created <= bs.date_accounting
-      AND sp.rn = 1
-  ORDER BY bs.date_accounting
+    sale_persons_latest sp_pix
+      ON bs.origin_identifier = sp_pix.id_bank_payment
+      AND sp_pix.ts_created <= bs.date_accounting
+  LEFT JOIN
+    sale_persons_latest sp_doc
+      ON sp_doc.document_number_mask = bs.counterpart_document_mask
+      AND sp_doc.ts_created <= bs.date_accounting
+      AND sp_pix.id_sale IS NULL
 ),
 
 union_franc_bank AS (
@@ -377,29 +469,23 @@ final_base AS (
       ELSE FALSE
     END AS monopoly_is_reconcilied,
     CASE
-      WHEN (s.sk_offer IS NOT NULL) AND (ABS(s.paid_amount) = ABS(ufb.paid_amount)) THEN TRUE
+      WHEN (s.sk_offer IS NOT NULL) AND (s.abs_paid_amount = ABS(ufb.paid_amount)) THEN TRUE
       ELSE FALSE
     END AS sap_is_reconcilied
   FROM
     union_franc_bank ufb
   LEFT JOIN
-    sale_transactions st
+    sale_transactions_latest st
       ON st.sk_offer = ufb.sk_offer
-      AND CAST(st.amount AS DECIMAL(10,2)) = CAST(ufb.paid_amount AS DECIMAL(10,2))
-      AND YEAR(st.dt_accounting) = YEAR(ufb.dt_paid)
-      AND MONTH(st.dt_accounting) = MONTH(ufb.dt_paid)
+      AND st.amount_decimal = CAST(ufb.paid_amount AS DECIMAL(10, 2))
+      AND st.accounting_year_month = DATE_FORMAT(ufb.dt_paid, 'yyyy-MM')
       AND st.dt_accounting <= ufb.dt_paid
-      AND st.rn = 1
   LEFT JOIN
-    sap s
+    sap_latest s
       ON s.sk_offer = ufb.sk_offer
-      AND CAST(s.paid_amount AS DECIMAL(10,2)) = CAST(ufb.paid_amount AS DECIMAL(10,2))
-      AND YEAR(s.dt_paid) = YEAR(ufb.dt_paid)
-      AND MONTH(s.dt_paid) = MONTH(ufb.dt_paid)
+      AND s.paid_amount = CAST(ufb.paid_amount AS DECIMAL(10, 2))
+      AND s.paid_year_month = DATE_FORMAT(ufb.dt_paid, 'yyyy-MM')
       AND s.dt_paid <= ufb.dt_paid
-      AND s.rn = 1
-  WHERE
-    ufb.dt_paid >= DATE '2025-01-01'
 ),
 
 final_bypass AS (
@@ -409,8 +495,8 @@ final_bypass AS (
     CAST(NULL AS VARCHAR (20)) AS counterpart_document,
     CAST(NULL AS VARCHAR (20)) AS counterpart_name,
     fb.sk_house,
-    CAST(NULL AS VARCHAR (20)) AS sk_offer, 
-    CAST(NULL AS BIGINT) AS id_sale, 
+    CAST(NULL AS VARCHAR (20)) AS sk_offer,
+    CAST(NULL AS BIGINT) AS id_sale,
     fb.dt_paid AS bank_dt_paid,
     ROUND(fb.paid_amount, 2) AS bank_paid_amount,
     'BOLETO' AS bank_type_transaction,
@@ -428,13 +514,9 @@ final_bypass AS (
   FROM
     francesinha_bypass fb
   LEFT JOIN
-    sap s
-      ON ABS(s.paid_amount) = fb.paid_amount
-      AND (YEAR(s.dt_paid) = YEAR(fb.dt_paid) AND MONTH(s.dt_paid) = MONTH(fb.dt_paid))
-      AND s.id_sale_transaction IS NULL
-  LEFT JOIN
-    dw_sale.dim_listing sl
-      ON substr(cast(sl.sk_house AS VARCHAR (20)), 4) = fb.sk_house
+    sap_unlinked s
+      ON s.abs_paid_amount = fb.paid_amount
+      AND s.paid_year_month = fb.paid_year_month
 ),
 
 final_all AS (

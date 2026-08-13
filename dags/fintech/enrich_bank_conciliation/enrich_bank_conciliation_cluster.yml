@@ -1,13 +1,10 @@
 cluster:
-  # M (4x m6g.2xlarge) left load-enrich-for-rent-cashin-collections hung on
-  # ShuffleMapStage 314 (8 tasks, 0 finished) for 20+ min while a ~1.7GiB
-  # broadcast build side + concurrent for_sale_cashin starved the fleet.
-  # XL + serialized steps — same capacity class as enrich_accounting_funnel.
+  # Keep XL capacity (same class as enrich_accounting_funnel). step_concurrency=1
+  # serialized all enrich loads and raised DAG wall clock above the ~20m target;
+  # allow limited parallelism now that the OR-join rewrite made collections ~3m.
   type: emr_7_12_consolidation_xl_general_fleet_cluster
   custom_configurations:
-    # One heavy enrich at a time — collections and for_sale were both RUNNING
-    # on the same 4-node M fleet (~35 min wall each).
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
       target_on_demand: 4
       target_spot: 0
@@ -23,12 +20,10 @@ cluster:
         - m6g.8xlarge
         - m7g.8xlarge
     spark_conf:
-      # Fleet base already sets -1; keep explicit so a partial spark_conf merge
-      # cannot re-open unbounded BHJ (Stage 314 materialized ~1.7GiB broadcast).
+      # Keep BHJ disabled — fleet base is -1; make explicit.
       spark.sql.autoBroadcastJoinThreshold: "-1"
       spark.sql.adaptive.autoBroadcastJoinThreshold: "-1"
-      # 256MB advisory coalesced the Delta write to 8 tasks. 32MB helped mid
-      # stages (679 tasks) but the final write still collapsed — use 16MB.
+      # Avoid AQE collapsing heavy stages into too few tasks.
       spark.sql.adaptive.advisoryPartitionSizeInBytes: "16777216"
       spark.sql.shuffle.partitions: "800"
       spark.speculation: "true"
