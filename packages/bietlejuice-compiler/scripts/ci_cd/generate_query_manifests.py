@@ -62,7 +62,7 @@ def generate_query_manifests(dag_name_filter: str = "*") -> int:
 
     total = 0
     for root, _dirs, files in walk(DAG_PACKAGES_ROOT):
-        # Skip strategy dirs only under milestone_delta (not every nested folder).
+        # Reserved strategy folder layout — other nested folder names unaffected.
         if is_milestone_strategy_dir(root):
             continue
         if "queries" not in root or not any(f.endswith(".sql") for f in files):
