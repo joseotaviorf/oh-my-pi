@@ -50,7 +50,7 @@ The **sinal** (advance payment) is an **optional reservation product** within a 
 - **Guarantee**, **garantia**, **fiança**, **seguro fiança** → rental guarantee chosen by the tenant (`dim_proposal.guarantee`, `dim_contract.guarantee`)
 - **Minuta** → contract draft (`dim_contract.status = 'Minuta'`; proposal draft is `dim_proposal.status = 'PreMinuta'`)
 - **Pré-assinatura**, **PreAssinaturas** → contract sent and awaiting signatures (`dim_contract.status = 'PreAssinaturas'`)
-- **Contrato assinado**, **assinatura**, **fechamento** → signed contract (`dim_contract.closing_status = 'ContratoAssinado'`, `ts_signature`) — see [`closing.md`](closing.md)
+- **Contrato assinado**, **volume de contratos assinados**, **assinaturas mensais** → [`closing.md`](closing.md) (`dim_contract`, `closing_status = 'ContratoAssinado'`, `ts_signature`). **For Rent only** — for SALE (CCV), see [`fs-transact.md`](fs-transact.md); for unscoped “contratos assinados” spanning both contexts, see [`closing.md`](closing.md) disambiguation section.
 - **Ativo** → currently active signed contract (`dim_contract.status = 'Ativo'`)
 - **CA2CC** → Credit Approved → Contract Created leadtime, pre-computed in **working minutes** (`fact_listing_rent_flows.working_min_credit_approved_to_contract_created`)
 - **CA2CS** → Credit Approved → Contract Signed leadtime, working minutes (`working_min_credit_approved_to_contract_signed`)

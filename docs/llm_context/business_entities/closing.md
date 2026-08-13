@@ -28,6 +28,30 @@ Not all closings reach signature. Some are cancelled before any signature (`OWNE
 - [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) — official rent listing-version conversion to signed contract (closing is the terminal funnel event for L2R).
 - [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) — listing-cohort demand funnel including L2TP (RENT tenant prospect) and downstream conversion steps.
 
+## Related Business Entities
+
+- [FR Transact](fr_transact.md) — For Rent pre-contract funnel upstream of closing.
+- [FS Transact](fs-transact.md) — For Sale transaction funnel; **SALE signed contracts = CCV** (`ts_sale_agreement_signed`), not `dim_contract`.
+
+### Answering “Qual é o volume mensal de contratos assinados?”
+
+**`contratos assinados` spans two business contexts.** If the user does not specify RENT vs SALE, **report both** in separate blocks (or ask which context they need).
+
+| Context | What “contrato assinado” means | Source | Anchor timestamp | Filter |
+|---------|-------------------------------|--------|------------------|--------|
+| **RENT (aluguel)** | Rental contract signed | `dw_rent.dim_contract` | `ts_signature` | `closing_status = 'ContratoAssinado'` (or `ts_signature IS NOT NULL`) |
+| **SALE (venda)** | **CCV** — Compromisso de Compra e Venda signed | `dw_sale.fact_offers` | `ts_sale_agreement_signed` | `ts_sale_agreement_signed IS NOT NULL` + **1P filters** — see [FS Transact §7](fs-transact.md#7-filtros-obrigatórios-1p) |
+
+**Do not stop at RENT only** when the question is generic “contratos assinados” / “volume mensal de contratos assinados”.
+
+**RENT pitfalls (already documented):**
+- Do **not** use `dim_contract.status = 'Ativo'` as “ever signed” — only currently active contracts.
+
+**SALE pitfalls:**
+- **CCV ≠ CD** — monthly **CCV** volume uses `ts_sale_agreement_signed`; **Closed Deal (revenue)** uses `fact_closing_flows` — see `fs-transact.md`.
+- Default FS Transact scope is **1P** — apply `payment_model <> 'CLOSING_3P'` and Casa Mineira tag exclusions unless the question explicitly includes 3P.
+- Anchor on **`ts_sale_agreement_signed`**, not `ts_offer_submitted`, for “when the contract was signed”.
+
 ## Glossary and Synonyms
 
 - **Closing**, **fechamento**, **fechamento de contrato** → the closing process that ends with a signed contract; identify in `dw_rent.dim_contract` via `closing_status` / `ts_signature`
@@ -36,7 +60,7 @@ Not all closings reach signature. Some are cancelled before any signature (`OWNE
 - **Minuta** → the contract draft (`dim_contract.status = 'Minuta'`)
 - **Pré-assinatura**, **PreAssinaturas** → contract sent and waiting for signatures (`dim_contract.status = 'PreAssinaturas'`)
 - **Contrato enviado** → `dim_contract.closing_status = 'ContratoEnviado'`
-- **Contrato assinado**, **assinatura de contrato**, **assinatura** → `dim_contract.closing_status = 'ContratoAssinado'`; signing timestamp is `dim_contract.ts_signature`
+- **Contrato assinado**, **assinatura de contrato**, **assinatura** → **RENT:** `dim_contract.closing_status = 'ContratoAssinado'`; `ts_signature`. **SALE:** CCV signed — `fact_offers.ts_sale_agreement_signed` — see [`fs-transact.md`](fs-transact.md). Generic “volume mensal de contratos assinados” → **both contexts** — see **Answering “Qual é o volume mensal de contratos assinados?”** above.
 - **Signatário**, **signatory** → a person involved in signing the contract; one row per person in `dw_rent.fact_contract_people`, identified by `contract_role`
 - **Inquilino**, **locatário**, **tenant** → `fact_contract_people.contract_role = 'tenant'`
 - **Proprietário**, **locador**, **landlord** → `fact_contract_people.contract_role = 'landlord'`
@@ -142,7 +166,8 @@ Use [Related Metric Entities](#related-metric-entities) for **official** listing
 ## Dos and Don'ts
 
 **Do:**
-- Use `dw_rent.dim_contract` as the entry point for closing-centric questions
+- Use `dw_rent.dim_contract` as the entry point for **RENT** closing-centric questions
+- When asked **“volume mensal de contratos assinados”** without context, report **RENT** (Query 1) **and SALE** (Query 6 — CCV on `fact_offers`)
 - Filter signed contracts with `closing_status = 'ContratoAssinado'` (or equivalently `ts_signature IS NOT NULL`)
 - Join through `dw_rent.fact_contracts` whenever the question mentions house, tenant, owner, or proposal — `dim_contract` does not have those FKs
 - Use `dw_rent.fact_contract_people` (one row per signatory) for any question about signatory counts, roles, or distribution
@@ -161,20 +186,22 @@ Use [Related Metric Entities](#related-metric-entities) for **official** listing
 
 ## Golden Queries
 
-### Query 1 — Contracts signed in a period
+### Query 1 — Contracts signed in a period (RENT)
 
-How many contracts were signed yesterday, last week, or this year. Pattern: filter `dim_contract` by signed state and `ts_signature`.
+Monthly (or daily) **rental** contract volume. For **SALE (CCV)** see **Query 6** below.
 
 ```sql
 SELECT
-    DATE(dc.ts_signature) AS dt_signed,
-    COUNT(*) AS total_signed
+    DATE_TRUNC('month', dc.ts_signature) AS month,
+    COUNT(*) AS contracts_signed_rent
 FROM dw_rent.dim_contract AS dc
 WHERE dc.closing_status = 'ContratoAssinado'
-  AND dc.ts_signature >= DATE '2026-01-01'
-GROUP BY DATE(dc.ts_signature)
-ORDER BY dt_signed DESC
+  AND dc.ts_signature IS NOT NULL
+GROUP BY 1
+ORDER BY 1 DESC
 ```
+
+Daily grain: replace `DATE_TRUNC('month', dc.ts_signature)` with `DATE(dc.ts_signature)`.
 
 ### Query 2 — Distribution of signatories per contract
 
@@ -278,3 +305,28 @@ SELECT
     ROUND(100.0 * COUNT_IF(total_landlords > 1 OR landlords_with_representative > 0) / COUNT(*), 2) AS pct_multi_landlord_or_rep
 FROM landlord_info
 ```
+
+### Query 6 — Contracts signed in a period (SALE / CCV)
+
+Monthly **For Sale** CCV volume. Anchor on **`ts_sale_agreement_signed`**. Apply **1P filters** — see [FS Transact §7](fs-transact.md#7-filtros-obrigatórios-1p). Default = **gross CCV** (includes later cancellations unless the question asks for net).
+
+```sql
+SELECT
+    DATE_TRUNC('month', fo.ts_sale_agreement_signed) AS month,
+    COUNT(DISTINCT fo.sk_offer) AS ccv_signed_sale
+FROM dw_sale.fact_offers AS fo
+LEFT JOIN dw_sale.dim_offer AS do
+    ON fo.sk_offer = do.sk_offer
+LEFT JOIN dw_sale.dim_sale_agreement AS dsa
+    ON fo.sk_offer = dsa.sk_offer
+WHERE fo.ts_sale_agreement_signed IS NOT NULL
+  AND (dsa.sk_offer IS NULL
+       OR (dsa.payment_model <> 'CLOSING_3P'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#fluxo-cm%'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#casa-mineira%'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#fluxo_cm%'))
+GROUP BY 1
+ORDER BY 1 DESC
+```
+
+**Not the same as Closed Deals (CD):** finance official metric uses `fact_closing_flows` — see `fs-transact.md`.

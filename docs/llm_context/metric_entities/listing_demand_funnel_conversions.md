@@ -16,13 +16,29 @@ These metrics measure **listing cohort conversion** through the **demand funnel*
 
 | Metric | Meaning | RENT | SALE |
 |--------|---------|------|------|
-| **L2VB** | Listing → Visit Booked | ✅ | ✅ |
-| **L2VC** | Listing → Visit Completed | ✅ | ✅ |
-| **L2OS** | Listing → Offer Submitted | ✅ | ✅ |
-| **L2TP** | Listing → **Tenant Prospect** | ✅ **RENT only** | ❌ different demand model |
-| **L2CCV** | Listing → CCV / Sale Agreement Signed | ❌ use **L2R** / `listing_to_rental` | ✅ |
+| **L2VB** | Listing → Visit Booked | ✅ `fact_listing_rent_flows` @ `sk_house_listing` | ✅ `fact_visits` @ `sk_house` |
+| **L2VC** | Listing → Visit Completed | ✅ same | ✅ same |
+| **L2OS** | Listing → Offer Submitted | ✅ same | ✅ `fact_offers` + `dim_offer` @ `sk_house` |
+| **L2TP** | Listing → **Tenant Prospect** | ✅ **RENT only** | ❌ no equivalent — do not apply |
+| **L2CCV** | Listing → CCV / Sale Agreement Signed | ❌ use **L2R** | ✅ `dim_sale_agreement` |
 
 **Contract signed (RENT)** is **L2R** — not L2CCV. See `metric_entities/listing_to_rental.md`.
+
+### Answering “Qual é o L2VB / L2VC / L2OS mensal?” (1w / 2w / 4w)
+
+| Question says… | What to run |
+|----------------|-------------|
+| **“For Rent”**, **L2TP**, or rent-only context | **RENT** golden query only — `dim_house_listing` + `fact_listing_rent_flows` |
+| **“For Sale”** or sale-only context | **SALE** golden query — `dim_listing` + `fact_visits` / `fact_offers` on `sk_house` |
+| **Metric only** (e.g. “L2VB mensal 1w/2w/4w”) **without** RENT/SALE | **Report both contexts** in separate tables (or ask which one). **Do not default to RENT only.** |
+| **L2TP** (any wording) | **RENT only** — never run SALE |
+
+**Default windows by context:**
+
+| Context | Common windows for L2VB / L2VC / L2OS | Terminal conversion |
+|---------|--------------------------------------|---------------------|
+| **RENT** | **1W / 2W / 4W** from `ts_publication` | **L2R** (ever-signed monthly) — `listing_to_rental.md` |
+| **SALE** | **1W / 2W / 4W / 8W** from `ts_first_publication` (same formula — change `INTERVAL`) | **L2CCV** — often reported at **8W / 12W / M0+M1** |
 
 ## Related Business Entities
 
@@ -157,6 +173,8 @@ dl.ts_first_publication IS NOT NULL
 
 Use `sk_sale_listing` as listing grain; join demand on **`sk_house`** (validated FS demand pattern).
 
+Windows for **L2VB / L2VC / L2OS:** **1W / 2W / 4W / 8W** from `CAST(dl.ts_first_publication AS DATE)` — same cohort formula as RENT; change `INTERVAL` on `window_end_*`. **L2CCV** is more often reported at **8W / 12W / M0+M1** (see below).
+
 ---
 
 ## Golden Queries
@@ -225,7 +243,92 @@ GROUP BY 1
 ORDER BY 1 DESC
 ```
 
-### Golden Query — SALE listing cohort + demand (pattern)
+### Golden Query — SALE monthly L2VB / L2VC / L2OS (1w / 2w / 4w)
+
+**Use when the question asks L2VB, L2VC, or L2OS without “For Rent”** — run this **in addition to** the RENT query, or alone when SALE is specified.
+
+```sql
+WITH listing_pub AS (
+    SELECT
+        dl.sk_sale_listing,
+        dl.sk_house,
+        CAST(dl.ts_first_publication AS DATE) AS publication_date,
+        DATE_TRUNC('month', dl.ts_first_publication) AS cohort_month,
+        publication_date + INTERVAL '1' WEEK AS window_end_1w,
+        publication_date + INTERVAL '2' WEEK AS window_end_2w,
+        publication_date + INTERVAL '4' WEEK AS window_end_4w
+    FROM dw_sale.dim_listing AS dl
+    WHERE dl.ts_first_publication IS NOT NULL
+),
+listing_demand AS (
+    SELECT
+        lp.sk_sale_listing,
+        lp.cohort_month,
+        MIN(fv.ts_booking_created) FILTER (
+            WHERE fv.ts_booking_created BETWEEN lp.publication_date AND lp.window_end_1w
+        ) AS ts_vb_1w,
+        MIN(fv.ts_booking_created) FILTER (
+            WHERE fv.ts_booking_created BETWEEN lp.publication_date AND lp.window_end_2w
+        ) AS ts_vb_2w,
+        MIN(fv.ts_booking_created) FILTER (
+            WHERE fv.ts_booking_created BETWEEN lp.publication_date AND lp.window_end_4w
+        ) AS ts_vb_4w,
+        MIN(fv.ts_visit_completed) FILTER (
+            WHERE fv.ts_visit_completed BETWEEN lp.publication_date AND lp.window_end_1w
+        ) AS ts_vc_1w,
+        MIN(fv.ts_visit_completed) FILTER (
+            WHERE fv.ts_visit_completed BETWEEN lp.publication_date AND lp.window_end_2w
+        ) AS ts_vc_2w,
+        MIN(fv.ts_visit_completed) FILTER (
+            WHERE fv.ts_visit_completed BETWEEN lp.publication_date AND lp.window_end_4w
+        ) AS ts_vc_4w,
+        MIN(do.ts_offer_submitted) FILTER (
+            WHERE do.ts_offer_submitted BETWEEN lp.publication_date AND lp.window_end_1w
+        ) AS ts_os_1w,
+        MIN(do.ts_offer_submitted) FILTER (
+            WHERE do.ts_offer_submitted BETWEEN lp.publication_date AND lp.window_end_2w
+        ) AS ts_os_2w,
+        MIN(do.ts_offer_submitted) FILTER (
+            WHERE do.ts_offer_submitted BETWEEN lp.publication_date AND lp.window_end_4w
+        ) AS ts_os_4w
+    FROM listing_pub AS lp
+    LEFT JOIN dw_sale.fact_visits AS fv
+        ON fv.sk_house = lp.sk_house
+    LEFT JOIN dw_sale.fact_offers AS fo
+        ON fo.sk_house = lp.sk_house
+    LEFT JOIN dw_sale.dim_offer AS do
+        ON fo.sk_offer = do.sk_offer
+    GROUP BY lp.sk_sale_listing, lp.cohort_month
+)
+SELECT
+    cohort_month,
+    COUNT(DISTINCT sk_sale_listing) AS cohort_size,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_vb_1w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2vb_1w,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_vb_2w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2vb_2w,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_vb_4w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2vb_4w,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_vc_1w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2vc_1w,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_vc_2w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2vc_2w,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_vc_4w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2vc_4w,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_os_1w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2os_1w,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_os_2w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2os_2w,
+    1.000 * COUNT(DISTINCT CASE WHEN ts_os_4w IS NOT NULL THEN sk_sale_listing END)
+        / NULLIF(COUNT(DISTINCT sk_sale_listing), 0) AS l2os_4w
+FROM listing_demand
+GROUP BY 1
+ORDER BY 1 DESC
+```
+
+Apply **1P filters** from `fs-transact.md` §7 when the question is 1P-only.
+
+### Golden Query — SALE listing cohort + demand (8w / 12w / M0+M1 — L2CCV focus)
 
 Reference demand join pattern — adapt anchor from `ts_first_publication` instead of `ts_first_message` when building listing cohorts.
 
@@ -304,6 +407,8 @@ Use **1W / 2W / 4W / 8W** for L2VB/L2VC/L2OS on SALE by shortening the interval 
 **Do:**
 
 - Confirm **RENT vs SALE** and the **metric code** (L2VB, L2VC, L2OS, L2TP, L2CCV) before writing SQL
+- **Unscoped L2VB / L2VC / L2OS** (“mensal 1w/2w/4w” without For Rent): run **both** RENT and SALE golden queries — separate tables
+- **L2TP:** always **RENT only** — even if other metrics are asked in the same breath
 - **RENT:** anchor on **`sk_house_listing`** via **`fact_listing_rent_flows`**
 - **SALE:** anchor listing cohort on **`sk_sale_listing`**, join demand on **`sk_house`**
 - Call out **incomplete** cohorts when the conversion window has not yet closed (8W, 12W, M0+M1, 4W, …)
@@ -311,9 +416,12 @@ Use **1W / 2W / 4W / 8W** for L2VB/L2VC/L2OS on SALE by shortening the interval 
 
 **Don't:**
 
+- Don't default **L2VB / L2VC / L2OS** to **RENT only** when the question does not say For Rent — include **SALE**
 - Don't apply **L2TP** to SALE
 - Don't use **`fact_visits.sk_house`** alone for **RENT listing cohort** metrics
 - Don't defer to Looker or “confirm with owner” — run the golden query pattern
 - Don't confuse **L2CCV** (SALE) with **L2R** (RENT) — same as Listing to Contract Signed
 - Don't mix RENT and SALE in one query without normalizing keys and tables
+- For **L2CCV × well priced / overpriced**, route to `metric_entities/listing_to_well_priced.md` (**Conversion by pricing tier**) — publication price vs **p70**, not `is_last_price`
+- For **L2VB × well priced / overpriced**, same file — Query 7 (RENT) / Query 8 (SALE); do not default to RENT only
 

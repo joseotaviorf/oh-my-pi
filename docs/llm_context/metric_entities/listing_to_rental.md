@@ -116,6 +116,8 @@ Add `dhl.country_code = 'BR'` (or `'MX'`) when country-specific. No `listing_cat
 - Don't use windowed 4W/8W SQL for the corporate monthly number without saying so
 - Don't confuse L2R with L2CCV (SALE), CC2CS, or supply-funnel metrics
 - Don't defer to external BI — the SQL patterns below are the metric
+- For **L2R × well priced / overpriced**, route to `metric_entities/listing_to_well_priced.md` (**Conversion by pricing tier**) — use **`price_score_pub`**, not `is_last_price`
+- For **L2VB × well priced / overpriced**, same file — Query 7 (RENT) / Query 8 (SALE); **report both contexts** when unscoped
 
 ---
 

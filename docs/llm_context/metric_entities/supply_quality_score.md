@@ -24,6 +24,10 @@ The metrics support segmentation by temporal views (Monthly/L5M and Weekly/Matur
 - Supply
 - Pricing
 
+## Related Metric Entities
+
+- [Listing to Well Priced (L2Wp)](listing_to_well_priced.md) — price-only cohort share from `price_score_*`; Quality Pub/4Ws add `easy_entry_*` to the same source.
+
 ## Catalog
 
 | Metric | Type |
@@ -34,7 +38,8 @@ The metrics support segmentation by temporal views (Monthly/L5M and Weekly/Matur
 ## Glossary and Synonyms
 
 - **Quality Pub**, **Quality of Supply at Publication**, **Quality at Publication**, **Qualidade de Supply na Publicação** → Quality Pub
-- **Quality 4Ws**, **Quality of Supply after 4 Weeks**, **Quality at 28 days**, **Qualidade de Supply na Coorte de 4 Semanas** → Quality 4Ws
+- **Quality 4Ws**, **Quality of Supply after 4 Weeks**, **Quality at 28 days**, **Qualidade de Supply (4-week cohort)** → Quality 4Ws
+- **L2Wp**, **Listing to Well Priced**, **Total Listings Well Priced**, **Relisting Well Priced - 4W** → see `listing_to_well_priced.md` — **price-only** cohort share (`price_score_*`); **not** the combined Quality Pub/4Ws formula
 
 ## Scope
 
@@ -193,7 +198,7 @@ SELECT * FROM agrupamento_semanal
 ORDER BY visao_temporal, data_referencia
 ```
 
-### 2. Quality 4Ws (Coorte de 28 Dias) — Mensal
+### 2. Quality 4Ws (28-day cohort) — Mensal
 
 Monthly aggregate view accounting for cohort maturation and deduplicated supply attribution. The August Bug filter and `time_completed_4w` requirement are exclusive to this metric.
 

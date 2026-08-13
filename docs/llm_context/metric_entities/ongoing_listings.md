@@ -16,7 +16,7 @@ The metric exists for **both For Rent (RENT) and For Sale (SALE)**, but **implem
 
 | Context | Source of truth | Listing key | Materialized table? |
 |---------|-----------------|-------------|---------------------|
-| **RENT** | Validated SQL on `fact_house_listing_status` + `dim_date` | `sk_house_listing` | No — former metrics table deprecated; **run the query** |
+| **RENT** | Validated SQL on `fact_house_listing_status` + bounded `dim_date` spine | `sk_house_listing` | No — former metrics table deprecated; **run the query** (see **TARS / interactive execution**) |
 | **SALE** | `dw_sale.fact_daily_ongoing_listing` | `sk_sale_listing` | Yes — one row per published listing per day |
 
 ## Related Business Entities
@@ -100,7 +100,28 @@ AND dr.city_group IS NOT NULL
 
 - **Multi-country:** group by `country_code` (BR, MX, …).
 - **1P vs 3P:** optional; join `dim_house_listing.is_rent_3p_supply` when segmenting.
-- **`house_listings_daily_info`** and visits-booked **ratio** metrics use a different path — not source of truth for volume.
+- **`house_listings_daily_info`** — partitioned daily snapshot useful for demand ratios and PP Multi; **not** source of truth for official ongoing-listings volume (different grain/edge cases). Do not substitute for this metric.
+
+### TARS / interactive execution (RENT — mandatory)
+
+The validated definition explodes PUBLISHED intervals against `dim_date`. **Joining `fact_house_listing_status` to all of `dim_date` before bounding the requested window will time out** in interactive Trars (~45s).
+
+**Always apply these rules when executing RENT ongoing listings:**
+
+1. **Confirm RENT vs SALE** — SALE uses `fact_daily_ongoing_listing` (fast, partitioned).
+2. **Bound the date window first** in a `date_spine` CTE — never scan full `dim_date` history.
+3. **Partition-prune `fact_house_listing_status`** with `country_code = 'BR'` (or requested country) in `WHERE`.
+4. **Pre-filter status intervals** that overlap the window before joining `date_spine`:
+   - `DATE(ts_status_start) <= end_of_window`
+   - `COALESCE(DATE_ADD('day', -1, DATE(ts_status_end)), CURRENT_DATE) >= start_of_window`
+5. **Default window when the user says “visão diária” without a range:** last **30 calendar days** ending yesterday; state the assumption. **Max ~90 days** per interactive query — for longer history, recommend a batch job outside TARS.
+6. **Do not retry** the same full-history pattern after timeout — rewrite with the bounded pattern below.
+
+**Answering “Me dê uma visão diária do volume de ongoing listings”:**
+
+- If context unspecified, ask **RENT vs SALE** or run both sections separately.
+- **RENT:** bounded golden query below (not unfiltered `dim_date` join).
+- **SALE:** golden query with `year` / `month` / `day` partition filters.
 
 ---
 
@@ -155,7 +176,68 @@ Add `country_code` via `dim_region` when country-specific.
 
 ## Golden Queries
 
-### Golden Query — RENT daily volume
+### Golden Query — RENT daily volume (bounded — use in TARS)
+
+**Replace the date bounds** (`start_day`, `end_day`). Default for “visão diária” without range: last 30 days.
+
+```sql
+WITH date_spine AS (
+    SELECT d.date
+    FROM dw_public.dim_date AS d
+    WHERE d.date BETWEEN DATE '2026-07-01' AND DATE '2026-07-30'  -- start_day, end_day
+),
+published_intervals AS (
+    SELECT
+        fhls.sk_house_listing,
+        fhls.country_code,
+        fhls.sk_region,
+        fhls.ts_status_start,
+        COALESCE(DATE(fhls.ts_status_start), DATE '2000-01-01') AS interval_start,
+        COALESCE(DATE_ADD('day', -1, DATE(fhls.ts_status_end)), CURRENT_DATE) AS interval_end
+    FROM dw_rent.fact_house_listing_status AS fhls
+    WHERE fhls.country_code = 'BR'
+      AND fhls.status_history IN ('publicado', 'PUBLISHED')
+      AND COALESCE(DATE(fhls.ts_status_start), DATE '2000-01-01') <= (SELECT MAX(date) FROM date_spine)
+      AND COALESCE(DATE_ADD('day', -1, DATE(fhls.ts_status_end)), CURRENT_DATE) >= (SELECT MIN(date) FROM date_spine)
+),
+exploded AS (
+    SELECT
+        pi.sk_house_listing,
+        pi.country_code,
+        ds.date,
+        ROW_NUMBER() OVER (
+            PARTITION BY pi.sk_house_listing, ds.date
+            ORDER BY pi.ts_status_start DESC
+        ) AS rn
+    FROM published_intervals AS pi
+    INNER JOIN dw_rent.dim_house_listing AS dhl
+        ON pi.sk_house_listing = dhl.sk_house_listing
+    INNER JOIN dw_public.dim_region AS dr
+        ON pi.sk_region = dr.sk_region
+    INNER JOIN date_spine AS ds
+        ON ds.date BETWEEN pi.interval_start AND pi.interval_end
+    WHERE dhl.version <> 0
+      AND dr.city_group IS NOT NULL
+),
+ongoing_listings AS (
+    SELECT sk_house_listing, country_code, date
+    FROM exploded
+    WHERE rn = 1
+)
+SELECT
+    date AS day,
+    country_code,
+    COUNT(DISTINCT sk_house_listing) AS ongoing_listings
+FROM ongoing_listings
+GROUP BY 1, 2
+ORDER BY 1 DESC, 2
+```
+
+On Databricks batch jobs (not TARS), add `RANGE_JOIN(fhls, 800)` on the interval join when exploding full history.
+
+### Golden Query — RENT daily volume (reference — full series, batch only)
+
+**Do not run in TARS** — joins all history before filtering. For pipeline validation or async batch only:
 
 ```sql
 WITH exploded AS (
@@ -220,14 +302,18 @@ Filter `year`, `month`, `day` (or `MAKE_DATE`) for partition pruning on large sc
 **Do:**
 
 - Ask **RENT vs SALE** first — different source, key, and rules
-- **RENT:** run the validated `fact_house_listing_status` + `dim_date` query
-- **SALE:** count from `fact_daily_ongoing_listing` with partition filters
+- **RENT (TARS):** use the **bounded** `date_spine` + interval-overlap query — never full-history `dim_date` join
+- **RENT:** always filter `fhls.country_code` and bound the date window (default last 30 days when unspecified)
+- **SALE:** count from `fact_daily_ongoing_listing` with `year` / `month` / `day` partition filters
 - Report volume at listing-key grain (`sk_house_listing` / `sk_sale_listing`)
+- State the date window used when defaulting the range
 
 **Don't:**
 
 - Don't use one SQL for both contexts
-- **RENT:** don't look for a materialized metrics table; don't use `house_listings_daily_info` or simplified interval checks
+- **RENT:** don't join `dim_date` over full history before filtering dates — causes interactive timeout
+- **RENT:** don't look for a materialized metrics table; don't use `house_listings_daily_info` for official volume
+- **RENT:** don't recommend “batch only” without first trying the bounded golden query
 - **SALE:** don't reimplement status explosion ad hoc unless validating the pipeline
 - Don't equate `dim_house_listing.status = 'PUBLISHED'` with the **daily historical series** — that is current state, not daily volume
 - Don't count `sk_house` without understanding listing grain and dedup rules per context

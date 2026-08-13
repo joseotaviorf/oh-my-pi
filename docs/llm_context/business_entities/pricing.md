@@ -12,6 +12,28 @@
 
 **Pricing** tracks how rental and sale prices change over time for each house on QuintoAndar as well as how the pricing calculators behave. The grain is **`(sk_house, business_context)`** — the same physical property can have independent price histories and price predictions for RENT and SALE.
 
+## Q: What is the source of truth for listing price (preço do anúncio)?
+
+**Short answer:** the **official pricing model** — **`dw_listing.dim_pricing`** + **`dw_listing.fact_price_changes`** — for **RENT and SALE**, **current and historical**.
+
+| Need | Source of truth | How |
+|------|-----------------|-----|
+| **Current** listing price (preço vigente) | `dw_listing.dim_pricing.price` | `is_last_price = TRUE` + `business_context IN ('RENT', 'SALE')` on `(sk_house, business_context)` |
+| **Historical** listing prices (timeline) | Same model | All rows on `dim_pricing` / `fact_price_changes` — `ts_price_started`, `ts_price_ended`, `change_type`; filter `is_last_price_of_day` when counting **daily** changes |
+| Join to listing / house | `dim_pricing.sk_house` = `dim_house.sk_house` (or `dim_house_listing.id_house`) | Always filter **`business_context`** — never mix RENT and SALE |
+
+**Do not use for official listing price analytics:**
+
+| Column / table | Why not |
+|----------------|---------|
+| `dw_rent.dim_house_listing.rent`, `house_rent`, `COALESCE(rent, house_rent)` | EBDB snapshot on the listing dimension — **not** the pricing DW model; can drift from registered price changes |
+| `dw_sale.dim_listing.price` | CDC snapshot of `imovel.salePrice` — convenient for some sale flows, **not** the official price-change history; use **`dw_listing.dim_pricing`** for analytics |
+| `datalake_ebdb_listing.house` rent/sale price fields | Enrich only — prefer **`dw_listing.*`** |
+
+**TARS routing:** questions like **“preço do anúncio”**, **“listing price”**, **“preço publicado”**, **“como identificar dados do listing — preço”** → answer with **`dim_pricing` + `fact_price_changes`** and link here — **not** `dim_house_listing.rent` / `sale_price`.
+
+**Exception (documented elsewhere):** offer/CCV **discount** analysis on SALE may use **`dim_offer.sale_price`** (snapshot at offer time) vs **`sale_price_agreed`** — see `business_entities/fs-transact.md` §3.4. That is **not** a substitute for the general listing-price source of truth above.
+
 ## Q: What is the source of truth for calculator data (Casio and Girafales)?
 
 **Short answer:** it depends on the analytical layer — suggestions (CPS/DW), raw calculator output (Pricing Worker), or legacy DW.
@@ -82,6 +104,8 @@ Product rule of thumb — published price **above** the reference percentile for
 
 **Well priced (binary):** listed price **≤** that reference (or within CPS bounds).
 
+For **share well priced / overpriced by NL and OL**, see `metric_entities/listing_to_well_priced.md` — **OL** uses this p90/p70 snapshot rule on current stock; **NL** cohort uses `sandbox.listing_scores` (`price_score_pub` / FL2WP, RL2WP, RC2WP).
+
 For price-vs-reference comparisons, analysts **may** exclude **`low`** and **`none`** at their discretion — **official metrics do not require this filter**; see certainty section below.
 
 ## Q: What is the best calculator reference for overpriced analysis?
@@ -122,7 +146,8 @@ WHERE dp.is_last_price = TRUE
 
 ### Related (not the same as overpriced tier)
 
-- **Quality Pub / Quality 4Ws** (RENT metric) — uses `price_score` from listing scores; see `metric_entities/supply_quality_score.md`
+- **Quality Pub / Quality 4Ws** (RENT metric) — combined `price_score` + `easy_entry`; see `metric_entities/supply_quality_score.md`
+- **L2Wp / Listing to Well Priced** (RENT) — **price-only** cohort share from the same `price_score` source; see `metric_entities/listing_to_well_priced.md`
 - **Overpriced comms** — Amplitude events `listing_overpriced_comms_routine_*`; ops in `sale_operation_management` — campaign/communication flows, not the analytics definition above
 
 ## Q: What does prediction / suggestion certainty mean? Should I filter it?
@@ -194,7 +219,7 @@ Legacy enrich paths (`rent_listing_price_changes`, `sale_listing_price_changes`)
 ## Glossary and Synonyms
 
 - **Price change**, **alteração de preço**, **mudança de preço** → one registered price value change; PK `sk_pricing` (= `id_price_change`)
-- **Current price**, **preço atual** → `dim_pricing.is_last_price = TRUE` for `(sk_house, business_context)`
+- **Current price**, **preço atual**, **preço do anúncio**, **preço publicado**, **listing price** → **`dw_listing.dim_pricing.price`** (`is_last_price = TRUE`, `business_context`) + history on **`fact_price_changes`** — **not** `dim_house_listing.rent` / `house_rent` / `dim_listing.price`
 - **Last price of day** → `is_last_price_of_day = TRUE` — use when counting daily price changes (new model)
 - **First price variation** → percent change vs the very first price ever (`first_price_variation`)
 - **Last price variation** → percent change vs immediately previous price (`last_price_variation`)
@@ -316,10 +341,12 @@ Official pricing grain is **`(sk_house, business_context)`**, not listing versio
 - Join on **`sk_house` + `business_context`** — the official pricing grain.
 - Filter `is_last_price_of_day = TRUE` when counting daily price changes.
 - Filter `is_last_price = TRUE` for current price questions.
+- Route **“preço do anúncio”** / **listing price** questions to **`dim_pricing` + `fact_price_changes`** for both RENT and SALE.
 - Use `listing_prediction_changes` / `dim_price_predicted` **only for historical** calculator analysis.
 - Use temporal range joins (`ts_price_started` / `ts_price_ended`) when attaching price to daily snapshots.
 
 **Don't:**
+- Don't answer **“preço do anúncio”** with **`dim_house_listing.rent`**, **`house_rent`**, or **`dim_listing.price`** — official source is **`dw_listing.dim_pricing` + `fact_price_changes`** (RENT and SALE, current and historical).
 - Don't answer **“overpriced?”** without stating the rule — use **p90 (RENT) / p70 (SALE)** vs `dim_pricing.price`, or CPS upper bound; certainty exclusion is optional and not used in official metrics.
 - Don't defer **certainty values** to `safe_fields` — use `high`, `medium`, `low`, `none` on `suggestion_certainty` / `prediction_certainty`.
 - Don't answer **“preço recomendado / sugerido”** with **`price_prediction.p70` or `p90`** — use **`fact_price_suggested.suggested_price`** (CPS).
