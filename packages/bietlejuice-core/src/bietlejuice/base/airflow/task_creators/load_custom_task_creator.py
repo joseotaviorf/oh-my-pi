@@ -39,6 +39,7 @@ class LoadCustomTaskCreator(LoadTaskCreator):
             parameters,
             spark_job_prefix=self._get_spark_job_prefix(table_attributes),
             execution_timeout_hours=self._get_execution_timeout_hours(table_attributes),
+            py_files=bool(table_attributes.table_customization.get("py_files", False)),
         )
 
     def _get_spark_job_prefix(self, table_attributes: TableAttributes) -> str:

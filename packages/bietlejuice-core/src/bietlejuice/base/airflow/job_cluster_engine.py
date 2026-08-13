@@ -164,6 +164,7 @@ class JobClusterEngine(ABC):
         execution_timeout_hours: int,
         python_interpreter_path: Optional[str] = None,
         task_spark_conf: Optional[Dict[str, str]] = None,
+        py_files: Optional[str] = None,
     ) -> BaseOperator:
         """``python_interpreter_path`` runs the step on the given Python
         interpreter on EMR (sets ``spark.pyspark.[driver.]python``); ignored on
@@ -171,7 +172,12 @@ class JobClusterEngine(ABC):
 
         ``task_spark_conf`` injects per-step ``spark-submit --conf`` overrides on
         EMR (appended last so they win over cluster ``spark-defaults``). Ignored
-        on Databricks, which does not support per-task resource overrides."""
+        on Databricks, which does not support per-task resource overrides.
+
+        ``py_files`` passes a comma-separated ``--py-files`` value to EMR
+        spark-submit, for spark job packages with sibling modules the single
+        entry-point script can't otherwise import. Ignored on Databricks,
+        whose job cluster resolves the whole package from the workspace."""
         pass
 
     @property
@@ -344,6 +350,7 @@ class DatabricksJobClusterEngine(JobClusterEngine):
         execution_timeout_hours: int,
         python_interpreter_path: Optional[str] = None,
         task_spark_conf: Optional[Dict[str, str]] = None,
+        py_files: Optional[str] = None,
     ) -> BaseOperator:
 
         if python_interpreter_path is not None:
@@ -361,6 +368,7 @@ class DatabricksJobClusterEngine(JobClusterEngine):
 
         _ = python_interpreter_path
         _ = task_spark_conf
+        _ = py_files
 
         return QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id=self._ctx.databricks_conn_id,
@@ -475,6 +483,7 @@ class EmrJobClusterEngine(JobClusterEngine):
         execution_timeout_hours: int,
         python_interpreter_path: Optional[str] = None,
         task_spark_conf: Optional[Dict[str, str]] = None,
+        py_files: Optional[str] = None,
     ) -> BaseOperator:
         create_id = self._ctx.emr_active_create_cluster_task_id
         if not create_id:
@@ -494,9 +503,8 @@ class EmrJobClusterEngine(JobClusterEngine):
             # task_spark_conf appended LAST so its --conf entries override any
             # matching keys emitted earlier (Delta defaults, OpenLineage,
             # cluster spark-defaults). spark-submit takes the last --conf per key.
-            extra_spark_args=_build_emr_extra_spark_submit_args(
-                self._merged_cluster_configuration
-            )
+            extra_spark_args=(["--py-files", py_files] if py_files else [])
+            + _build_emr_extra_spark_submit_args(self._merged_cluster_configuration)
             + self._python_interpreter_spark_args(python_interpreter_path)
             + [
                 "--conf",

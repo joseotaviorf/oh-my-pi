@@ -3,6 +3,9 @@ import logging
 import os
 import re
 import sys
+import tempfile
+import zipfile
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from os import path
@@ -74,6 +77,11 @@ def upload_one_file(
 func = partial(upload_one_file, s3_bucket, client)
 
 files_to_upload = []
+# dag_name -> list of local file paths under its spark_jobs/ tree, only tracked
+# for DAGs whose spark_jobs package has subdirectories (nested absolute
+# imports like `dags.agents.<dag>.spark_jobs.framework.x` can't resolve from
+# flat --py-files, so those DAGs also get a structure-preserving pkg.zip).
+nested_spark_job_files = defaultdict(list)
 
 for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
     if f"/{artifact}" not in root:
@@ -95,6 +103,20 @@ for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
             S3_DAGS_PACKAGES_PATH_PREFIX, dag_name, artifact_path.strip("/"), file_name
         )
         files_to_upload.append((spark_job_local_path, spark_job_s3_path))
+
+        if artifact == "spark_jobs" and artifact_path.strip("/"):
+            nested_spark_job_files[dag_name].append(spark_job_local_path)
+
+REPO_ROOT = path.dirname(DAG_PACKAGES_ROOT)
+_tmp_zip_dir = tempfile.mkdtemp(prefix="spark_jobs_pkg_")
+for dag_name, local_files in nested_spark_job_files.items():
+    zip_local_path = path.join(_tmp_zip_dir, f"{dag_name.replace('/', '_')}_pkg.zip")
+    with zipfile.ZipFile(zip_local_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.write(path.join(DAG_PACKAGES_ROOT, "__init__.py"), "dags/__init__.py")
+        for local_file in local_files:
+            zf.write(local_file, path.relpath(local_file, REPO_ROOT))
+    zip_s3_path = path.join(S3_DAGS_PACKAGES_PATH_PREFIX, dag_name, "pkg.zip")
+    files_to_upload.append((zip_local_path, zip_s3_path))
 
 with tqdm(
     desc=f"Uploading {artifact} into S3", total=len(files_to_upload)

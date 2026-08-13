@@ -90,6 +90,9 @@ def _parse_dag_declaration_cached(
 
     declaration_validator = DAGDeclarationValidator()
     declaration_validator.validate(dag_declaration=declaration_to_validate)
+    declaration_validator.validate_py_files_matches_spark_jobs_structure(
+        dag_declaration=declaration_to_validate
+    )
 
     merged = {**declaration_to_validate, "cluster": cluster_section}
     declaration_validator.validate_cluster_validation_cluster_diff(

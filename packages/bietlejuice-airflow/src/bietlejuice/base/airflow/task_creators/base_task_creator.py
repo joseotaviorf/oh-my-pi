@@ -41,6 +41,7 @@ class BaseTaskCreator(ABC):
         execution_timeout_hours: int = _DEFAULT_EXECUTION_TIMEOUT_HOURS,
         python_interpreter_path: str = None,
         task_spark_conf: Optional[Dict[str, str]] = None,
+        py_files: bool = False,
     ) -> BaseOperator:
         """
         Returns a task that runs a Spark Job in the base spark jobs path, with the given name, task id, and parameters.
@@ -58,6 +59,12 @@ class BaseTaskCreator(ABC):
             to right-size accessory tasks (register/sync/optimize) whose resource
             needs differ from the main load steps sharing the same cluster.
             Ignored on Databricks (per-task resource overrides are unsupported).
+        py_files: If True, passes the ``pkg.zip`` uploaded alongside this spark
+            job (see upload_dag_packages_artifact_into_s3.py) as EMR's
+            spark-submit ``--py-files``, so a multi-file spark_jobs/ package
+            with sibling modules can resolve its own absolute imports on the
+            EMR driver. Ignored on Databricks. Only needed for spark_jobs
+            packages with subdirectories.
         """
         spark_job_directory = self.dag_execution_context.base_spark_jobs_path
         if spark_job_prefix is not None:
@@ -79,6 +86,7 @@ class BaseTaskCreator(ABC):
             execution_timeout_hours=execution_timeout_hours,
             python_interpreter_path=python_interpreter_path,
             task_spark_conf=task_spark_conf,
+            py_files=path.join(spark_job_directory, "pkg.zip") if py_files else None,
         )
 
     @classmethod

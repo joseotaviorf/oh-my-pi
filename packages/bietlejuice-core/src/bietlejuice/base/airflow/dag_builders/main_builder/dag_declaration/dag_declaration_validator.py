@@ -732,6 +732,52 @@ class DAGDeclarationValidator(Validator):
                 "spec as prod 'cluster'; it would not validate any change"
             )
 
+    def validate_py_files_matches_spark_jobs_structure(
+        self, dag_declaration: dict
+    ) -> None:
+        """A table_customization ``py_files: true`` tells EMR spark-submit to
+        use the structure-preserving ``pkg.zip`` that
+        upload_dag_packages_artifact_into_s3.py only builds when spark_jobs/
+        has subdirectories. If the flag is set but there is nothing to zip,
+        the task 404s on a zip that will never exist. Catch that here, at
+        declaration-validation time, instead of on a live EMR run."""
+        from os import path, scandir
+
+        from bietlejuice.base.service.dag_packages_path_service import (
+            DAGPackagesPathService,
+        )
+
+        dag_name = (dag_declaration.get("dag") or {}).get("name")
+        workflow = dag_declaration.get("workflow", {})
+        tables_customization = workflow.get("tables_customization") or {}
+
+        tables_with_py_files = [
+            table_name
+            for table_name, customization in tables_customization.items()
+            if isinstance(customization, dict) and customization.get("py_files")
+        ]
+        if not tables_with_py_files:
+            return
+
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
+        if not dag_path:
+            # Can't resolve the local path in this context (e.g. cwd isn't
+            # rooted where DAGPackagesPathService expects) -- fail open rather
+            # than block validation on a check we can't actually perform.
+            return
+        spark_jobs_dir = path.join(dag_path, "spark_jobs")
+        has_nested_package = path.isdir(spark_jobs_dir) and any(
+            entry.is_dir() for entry in scandir(spark_jobs_dir)
+        )
+        if not has_nested_package:
+            raise AssertionError(
+                "m=validate_py_files_matches_spark_jobs_structure, "
+                f"msg=table(s) {tables_with_py_files} in dag '{dag_name}' set "
+                f"py_files: true but {spark_jobs_dir} has no subdirectories to "
+                "zip; remove the flag, or add the sibling modules it's meant to "
+                "ship via EMR --py-files."
+            )
+
     @staticmethod
     def _check_cluster_validation_config(dag_declaration: dict) -> None:
         dag_name = (dag_declaration.get("dag") or {}).get("name")
