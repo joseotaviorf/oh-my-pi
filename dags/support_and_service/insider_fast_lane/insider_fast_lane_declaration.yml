@@ -28,17 +28,11 @@ workflow:
   tables_customization:
     feature:
       raw_primary_keys: ["id"]
-    resource:
-      raw_primary_keys: ["id"]
     review_aud:
       raw_primary_keys: ["id", "rev"]
     review_feature:
       raw_primary_keys: ["id"]
     review:
-      raw_primary_keys: ["id"]
-    template_feature:
-      raw_primary_keys: ["id"]
-    template:
       raw_primary_keys: ["id"]
     user_revision_entity:
       raw_primary_keys: ["id"]
