@@ -11,27 +11,17 @@ Tracksale is an external service that monitors in real time the customer’s exp
 Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
-We incrementally load the following table into the Datalake Reverse bucket, for backup pourposes:
+Remaining campaigns still served by this legacy DAG (others already moved to
+`reverse_tracksale_test` / `reverse_tracksale_access`). Tables are written to the
+Datalake Reverse bucket for backup:
 
-- `lost_buyer_proposals`
-- `lost_buyer_visits`
+- `buyer_end_of_process`
 - `lost_iq`
-- `lost_pp`
-- `lost_seller_unpublished`
-- `true_buyer_ccv_central`
-- `true_buyer_ccv_hub`
-- `true_buyer_ccv`
-- `true_buyer_registry`
+- `seller_end_of_process`
 - `true_offboarding_iq`
 - `true_offboarding_pp`
-- `true_onboarding_iq`
-- `true_onboarding_pp`
 - `true_ongoing_iq`
 - `true_ongoing_pp`
-- `true_seller_ccv_central`
-- `true_seller_ccv_hub`
-- `true_seller_ccv`
-- `true_seller_registry`
 
 This pipeline also POST data to the Tracksale API (endpoint: `dispatches`) aiming to schedule NPS survey dispatches.
 

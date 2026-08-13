@@ -23,11 +23,8 @@ JOB_NAME = "load_targets_into_tracksale"
 DISPATCH_WINDOW_DAYS = 7
 # Minimum gap between dispatches of the same campaign to the same customer.
 DEDUP_LOOKBACK_HOURS = 24
-# Legacy reverse tables have no ts_dispatched yet; fall back to execution-day partitions.
-LEGACY_DEDUP_LOOKBACK_DAYS = 1
-# While the legacy reverse_tracksale DAG still runs, also suppress emails already dispatched
-# there for the same campaign table so forno/prod validation cannot double-hit campaign 297.
-LEGACY_DEDUP_DATABASE = "datalake_tracksale_reverse"
+# Fallback when ts_dispatched is unavailable: look back this many days on partition grain.
+PARTITION_DEDUP_LOOKBACK_DAYS = 1
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -175,12 +172,12 @@ def get_recently_dispatched_emails_by_partition(
     """
     Return emails flagged is_dispatched=TRUE on execution_date and the previous day.
 
-    Used for legacy reverse tables that have no ts_dispatched, as a coarse 24h proxy based
-    on partition grain rather than the real POST timestamp.
+    Used when ts_dispatched is unavailable, as a coarse 24h proxy based on partition grain
+    rather than the real POST timestamp.
     """
     partition_days = [
         execution_date - timedelta(days=offset)
-        for offset in range(0, LEGACY_DEDUP_LOOKBACK_DAYS + 1)
+        for offset in range(0, PARTITION_DEDUP_LOOKBACK_DAYS + 1)
     ]
     partition_predicate = " OR ".join(
         f"(year = {day.year} AND month = {day.month} AND day = {day.day})"
@@ -207,10 +204,8 @@ def get_recently_dispatched_emails(
     """
     Build the set of emails that must not receive this campaign again within 24h.
 
-    Prefer ts_dispatched on the primary reverse database (works across different reprocess
-    reference_dates). If that path fails, fall back to partition lookback. While
-    reverse_tracksale still runs, also union emails from the legacy database so migration
-    validation cannot double-hit the same Tracksale campaign.
+    Prefer ts_dispatched on the reverse database (works across different reprocess
+    reference_dates). If that path fails, fall back to partition lookback.
     """
     cutoff = datetime.now() - timedelta(hours=DEDUP_LOOKBACK_HOURS)
     dispatched_emails = set()
@@ -232,20 +227,6 @@ def get_recently_dispatched_emails(
                 database_name, table_name, execution_date
             )
         )
-
-    if database_name != LEGACY_DEDUP_DATABASE:
-        try:
-            dispatched_emails.update(
-                get_recently_dispatched_emails_by_partition(
-                    LEGACY_DEDUP_DATABASE, table_name, execution_date
-                )
-            )
-        except Exception as exc:
-            logger.warning(
-                f"m={JOB_NAME}, database_name={LEGACY_DEDUP_DATABASE}, "
-                f"table_name={table_name}, "
-                f"msg=Skipping legacy dedup source, could not read table: {exc}"
-            )
 
     return dispatched_emails
 
@@ -388,7 +369,7 @@ def main():
     Guards:
       - Skip entirely when reference_date > CURRENT_DATE (no future-dated dispatch).
       - Skip customers already dispatched for this campaign within the last 24h
-        (ts_dispatched on the primary table; partition proxy for legacy).
+        (ts_dispatched preferred; partition proxy as fallback).
       - On backfill (reference_date < CURRENT_DATE), schedule against the execution day and
         warn when customers are skipped for the 24h rule.
 

@@ -1002,6 +1002,17 @@ bietlejuice.reverse_birdie_access:
     - bietlejuice.reverse_birdie:load-reverse-pp-multi:first-run-of-day
 bietlejuice.reverse_tracksale_access:
   add:
+    - bietlejuice.reverse_tracksale_test:load-reverse-lost-buyer-proposals:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-lost-buyer-visits:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-lost-pp:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-lost-seller-unpublished:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-buyer-ccv:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-buyer-ccv-central:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-buyer-ccv-hub:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-onboarding-iq:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-onboarding-pp:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-seller-ccv:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-seller-ccv-central:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-seller-ccv-hub:first-run-of-day
 bietlejuice.reverse_dashboard_governance:
   add:

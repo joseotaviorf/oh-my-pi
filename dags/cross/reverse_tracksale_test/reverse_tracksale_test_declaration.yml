@@ -4,22 +4,22 @@ dag:
   owner: Data Engineering
   documentation:
     dag_purpose: |
-      Temporary DAG used to validate the migration of reverse_tracksale to the DAG Builder
-      standard. Scoped to the seller CCV hub cohort (Tracksale campaign 297 /
-      true_seller_ccv_hub) so the parameterized query can be compared against the legacy
-      reverse_tracksale output before a wider cutover. It never exports anything to
-      Tracksale. Delete this DAG once the cutover is done.
+      Temporary DAG Builder load for Tracksale reverse campaigns being migrated off the
+      legacy reverse_tracksale Python DAG. Writes parameterized reverse tables into
+      reverse_tracksale_test (custom_schema tracksale_test). Export to Tracksale is owned
+      by reverse_tracksale_access. Delete this DAG once the cutover is done and the load
+      moves to the final reverse_tracksale DAG Builder declaration.
 workflow:
   type: load
   layer: reverse
   custom_schema: tracksale_test
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
-  execution_timeout_hours: 2
+  execution_timeout_hours: 6
   # This DAG is dataset-triggered, so data_interval_start is inherited from the upstream DAG
   # runs (DatasetTriggeredTimetable.data_interval_for_events). The upstream DW DAGs are daily,
-  # so their data_interval_start is D-1 and adding one day lands on the cohort day the legacy
-  # queries used to read from CURRENT_DATE().
+  # so their data_interval_start is D-1 and adding one day lands on the cohort day that used
+  # to be read from CURRENT_DATE() in the legacy queries.
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"

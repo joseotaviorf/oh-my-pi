@@ -10,50 +10,40 @@ WITH brazil_regions AS (
 ),
 users AS (
     SELECT
-    	 u.email,
-    	 u.nome,
-    	 u.telefone_principal,
-    	 u.id,
-    	 u.cpf
+        u.email,
+        u.nome,
+        u.telefone_principal,
+        u.id,
+        u.cpf
     FROM
         dw_public.dim_user AS u
 ),
 ccvs AS (
     SELECT
-    	TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd') AS dt_event,
-    	fo.sk_house,
-    	fo.sk_offer,
-    	fo.sk_owner,
-    	fo.sk_buyer,
-    	DATE_ADD(TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd'), 1) AS dt_cohort
+        TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd') AS dt_event,
+        fo.sk_house,
+        fo.sk_offer,
+        fo.sk_owner,
+        fo.sk_buyer,
+        DATE_ADD(TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd'), 1) AS dt_cohort
     FROM
-        dw_sale.fact_offers fo
+        dw_sale.fact_offers AS fo
     INNER JOIN
-        dw_sale.dim_offer df
-            ON df.sk_offer = fo.sk_offer
-    JOIN
-        brazil_regions br
+        brazil_regions AS br
             ON fo.sk_region = br.sk_region
+    INNER JOIN
+        dw_sale.dim_offer AS df
+            ON df.sk_offer = fo.sk_offer
     WHERE
-    	fo.sk_sale_agreement_signed_date >= 20200101
-    	AND offer_flow = 'HUB'
+        fo.sk_sale_agreement_signed_date >= 20200101
+        AND offer_flow = 'CENTRAL'
 ),
 previous_dispatches AS (
     SELECT DISTINCT
         customer_email,
         MAKE_DATE(year, month, day) AS dt_partition
     FROM
-        reverse_tracksale_test.true_seller_ccv_hub
-    WHERE
-        is_dispatched = TRUE
-        AND customer_email IS NOT NULL
-        AND MAKE_DATE(year, month, day) >= DATE_SUB(DATE('{load_start_date}'), 90)
-    UNION
-    SELECT DISTINCT
-        customer_email,
-        MAKE_DATE(year, month, day) AS dt_partition
-    FROM
-        datalake_tracksale_reverse.true_seller_ccv_hub
+        datalake_tracksale_reverse.true_buyer_ccv_central
     WHERE
         is_dispatched = TRUE
         AND customer_email IS NOT NULL
@@ -64,7 +54,7 @@ SELECT DISTINCT
     email AS customer_email,
     telefone_principal AS customer_phone,
     'CCV' AS campaign_step,
-    'Seller' AS customer_type,
+    'Buyer' AS customer_type,
     cpf AS customer_cpf,
     u.id AS id_user,
     'true' AS campaign_type,
@@ -87,8 +77,8 @@ SELECT DISTINCT
 FROM
     ccvs AS c
 INNER JOIN
-    users u
-        ON c.sk_owner = u.id
+    users AS u
+        ON c.sk_buyer = u.id
 LEFT JOIN
     previous_dispatches AS pd
         ON u.email = pd.customer_email

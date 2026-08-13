@@ -4,13 +4,10 @@ dag:
   owner: Data Engineering
   documentation:
     dag_purpose: |
-      Sends the Tracksale seller CCV hub table (campaign 297 / true_seller_ccv_hub)
-      loaded by reverse_tracksale_test to the Tracksale API via load_targets_into_tracksale.
-
-      Source during migration validation: reverse_tracksale_test (custom schema
+      Sends Tracksale reverse tables loaded by reverse_tracksale_test to the Tracksale API
+      via load_targets_into_tracksale. Source database: reverse_tracksale_test (custom schema
       tracksale_test). Campaign settings come from the environment conf (forno uses test
-      campaign 242; prod uses campaign 297). After cutover, point the database arg at
-      reverse_tracksale and expand tables as other campaigns are migrated.
+      campaign 242; prod uses the production campaign code).
 
       Dispatch rules (reference_date = reverse table partition day; execution_date =
       CURRENT_DATE when the Spark job runs):
@@ -20,10 +17,10 @@ dag:
       2. Same-day or backfill — if reference_date <= execution_date, select rows with
          is_dispatched = FALSE on that partition, then apply same-campaign 24h dedup per
          customer:
-         - Primary: skip when ts_dispatched is within the last 24 hours on any partition of
-           this campaign table (covers reprocessing different reference_dates on the same day).
-         - Legacy fallback while reverse_tracksale still runs: also skip emails marked
-           is_dispatched = TRUE on datalake_tracksale_reverse for execution_date / yesterday.
+         - Skip when ts_dispatched is within the last 24 hours on any partition of this
+           campaign table (covers reprocessing different reference_dates on the same day).
+         - If ts_dispatched is unavailable, fall back to is_dispatched = TRUE on the
+           execution_date and previous-day partitions.
          - Skipped customers stay is_dispatched = FALSE on the reference partition (retry later)
            and are logged as warnings on backfills.
          - Customers not in the 24h window are POSTed normally.
@@ -39,11 +36,22 @@ workflow:
   # The reference date is the partition day (year/month/day) on the reverse table. This dag is
   # dataset-triggered by reverse_tracksale_test, so it inherits that dag's data_interval_start
   # (D-1, itself inherited from the daily DW dags); adding one day aligns with the load DAG
-  # date params used while migrating campaigns from the legacy reverse_tracksale flow.
+  # date params (cohort day formerly read from CURRENT_DATE in the legacy queries).
   spark_job_arguments:
   - "{dag_name}"
   - "reverse_tracksale_test"
   - "{table_name}"
   - "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_start_date') }}"
   tables_customization:
+    lost_buyer_proposals: {}
+    lost_buyer_visits: {}
+    lost_pp: {}
+    lost_seller_unpublished: {}
+    true_buyer_ccv: {}
+    true_buyer_ccv_central: {}
+    true_buyer_ccv_hub: {}
+    true_onboarding_iq: {}
+    true_onboarding_pp: {}
+    true_seller_ccv: {}
+    true_seller_ccv_central: {}
     true_seller_ccv_hub: {}

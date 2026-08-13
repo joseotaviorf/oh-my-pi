@@ -1,4 +1,4 @@
--- The cohort day of an offer is 1 day after the sale agreement was signed.
+-- The cohort day of an offer is 2 days after the sale agreement was signed.
 -- Anchoring on it (instead of CURRENT_DATE) keeps the result reproducible on backfills.
 WITH brazil_regions AS (
     SELECT
@@ -10,50 +10,40 @@ WITH brazil_regions AS (
 ),
 users AS (
     SELECT
-    	 u.email,
-    	 u.nome,
-    	 u.telefone_principal,
-    	 u.id,
-    	 u.cpf
+        u.email,
+        u.nome,
+        u.telefone_principal,
+        u.id,
+        u.cpf
     FROM
         dw_public.dim_user AS u
 ),
 ccvs AS (
     SELECT
-    	TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd') AS dt_event,
-    	fo.sk_house,
-    	fo.sk_offer,
-    	fo.sk_owner,
-    	fo.sk_buyer,
-    	DATE_ADD(TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd'), 1) AS dt_cohort
+        TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd') AS dt_event,
+        fo.sk_house,
+        fo.sk_offer,
+        fo.sk_owner,
+        fo.sk_buyer,
+        DATE_ADD(TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd'), 2) AS dt_cohort
     FROM
-        dw_sale.fact_offers fo
+        dw_sale.fact_offers AS fo
     INNER JOIN
-        dw_sale.dim_offer df
+        dw_sale.dim_offer AS df
             ON df.sk_offer = fo.sk_offer
-    JOIN
-        brazil_regions br
+    LEFT JOIN
+        brazil_regions AS br
             ON fo.sk_region = br.sk_region
     WHERE
-    	fo.sk_sale_agreement_signed_date >= 20200101
-    	AND offer_flow = 'HUB'
+        fo.sk_sale_agreement_signed_date >= 20200101
+        AND offer_flow = 'DEAL_MAKING'
 ),
 previous_dispatches AS (
     SELECT DISTINCT
         customer_email,
         MAKE_DATE(year, month, day) AS dt_partition
     FROM
-        reverse_tracksale_test.true_seller_ccv_hub
-    WHERE
-        is_dispatched = TRUE
-        AND customer_email IS NOT NULL
-        AND MAKE_DATE(year, month, day) >= DATE_SUB(DATE('{load_start_date}'), 90)
-    UNION
-    SELECT DISTINCT
-        customer_email,
-        MAKE_DATE(year, month, day) AS dt_partition
-    FROM
-        datalake_tracksale_reverse.true_seller_ccv_hub
+        datalake_tracksale_reverse.true_seller_ccv
     WHERE
         is_dispatched = TRUE
         AND customer_email IS NOT NULL
@@ -70,8 +60,7 @@ SELECT DISTINCT
     'true' AS campaign_type,
     'offer' AS driver_type,
     sk_offer AS id_driver,
-    'Sale' AS business_context,
-    '' AS cidade,
+    '' AS business_context,
     CASE
         WHEN pd.customer_email IS NOT NULL THEN TRUE
         ELSE FALSE
@@ -87,7 +76,7 @@ SELECT DISTINCT
 FROM
     ccvs AS c
 INNER JOIN
-    users u
+    users AS u
         ON c.sk_owner = u.id
 LEFT JOIN
     previous_dispatches AS pd
