@@ -1,24 +1,38 @@
 cluster:
-  # Name-map from consolidation_l_memory → emr_7_12_consolidation_l_memory_fleet.
-  # Prior Databricks: r7gd.4xlarge Photon, autoscale 5–8 workers.
+  # Parallel loads (ledger_new_template + bank_account) need capacity for
+  # TWO Spark apps. First prod run starved bank_account because one app
+  # claimed ~99% YARN with maxExecutors=28 on only ~7×4xlarge.
+  #
+  # Sizing: l_memory preset ≈ 48g+4g / 4 cores → ~2 execs per 4xlarge.
+  # 14 workers × 2 ≈ 28 exec slots. Cap maxExecutors at 16 so each app
+  # leaves headroom for the other (16+12 fits; 16+16 soft-contends).
+  # NVMe (gd) matches prior Databricks r7gd and speeds shuffle spill.
   type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
+    step_concurrency_level: 2
     core_nodes:
-      target_on_demand: 5
+      target_on_demand: 10
       target_spot: 0
       instance_types:
-        - r6g.4xlarge
-        - r7g.4xlarge
-        - r6i.4xlarge
+        # Local NVMe (gd) — shuffle spill off EBS. x86_fallback maps
+        # r6gd/r7gd → r6id when EMR_X86_FALLBACK is on.
+        - r6gd.4xlarge
+        - r7gd.4xlarge
     task_nodes:
       target_on_demand: 0
-      target_spot: 2
+      target_spot: 4
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
       instance_types:
-        - r6g.4xlarge
-        - r7g.4xlarge
-        - r6i.4xlarge
+        - r6gd.4xlarge
+        - r7gd.4xlarge
     spark_conf:
+      # Hard cap per app so ledger cannot request 28 and leave bank at 0.
+      spark.dynamicAllocation.maxExecutors: "16"
       spark.sql.shuffle.partitions: "400"
-      spark.dynamicAllocation.maxExecutors: "28"
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "33554432"
+      spark.sql.autoBroadcastJoinThreshold: "104857600"
+      spark.sql.adaptive.autoBroadcastJoinThreshold: "104857600"
+      spark.speculation: "true"
+      spark.speculation.multiplier: "3"
+      spark.speculation.quantile: "0.75"
