@@ -142,6 +142,9 @@ class LoadCustomTaskCreator(LoadTaskCreator):
                     load_start_date=self.dag_execution_context.load_start_date,
                     load_end_date=self.dag_execution_context.load_end_date,
                     table_privileges=json.dumps(table_attributes.table_privileges),
+                    merge_on=json.dumps(
+                        table_attributes.table_customization.get("merge_on") or []
+                    ),
                 )
             )
         if isinstance(unprocessed_argument, dict):

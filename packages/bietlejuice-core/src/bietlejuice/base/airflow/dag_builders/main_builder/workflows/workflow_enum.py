@@ -18,6 +18,7 @@ class WorkflowEnum(Enum):
     GSHEETS_INGESTION_WORKFLOW = "gsheets_ingestion"
     LOAD_ACCESS_WORKFLOW = "load_access"
     LOAD_WORKFLOW = "load"
+    MILESTONE_DELTA_WORKFLOW = "milestone_delta"
     QUERY_DELTA_WORKFLOW = "query_delta"
     QUERY_DELTA_DATAZORD_WORKFLOW = "query_delta_datazord"
     QUERY_WORKFLOW = "query"

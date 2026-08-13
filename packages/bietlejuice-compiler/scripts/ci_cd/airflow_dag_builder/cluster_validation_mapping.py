@@ -29,7 +29,9 @@ from bietlejuice.base.validation.cluster_args import (
 from bietlejuice.services.configuration_service import ConfigurationService
 
 # Eligibility aligned with scripts/list_cluster_validation_eligible_dags.py
-PHASE1_WORKFLOWS = frozenset({"query_delta", "query", "dw_query", "metric_query"})
+PHASE1_WORKFLOWS = frozenset(
+    {"query_delta", "query", "dw_query", "metric_query", "milestone_delta"}
+)
 PHASE2_WORKFLOWS = frozenset(
     {
         "cdc",

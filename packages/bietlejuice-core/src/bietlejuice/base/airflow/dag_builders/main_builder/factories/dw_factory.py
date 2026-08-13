@@ -10,6 +10,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_delta
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_workflow import (
     DWQueryWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.milestone_delta_workflow import (
+    MilestoneDeltaWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.query_view_workflow import (
     QueryViewWorkflow,
 )
@@ -28,6 +31,7 @@ class DWFactory(BaseFactory):
         WorkflowEnum.QUERY_WORKFLOW: DWQueryWorkflow,
         WorkflowEnum.QUERY_DELTA_WORKFLOW: DwQueryDeltaWorkflow,
         WorkflowEnum.QUERY_VIEW_WORKFLOW: QueryViewWorkflow,
+        WorkflowEnum.MILESTONE_DELTA_WORKFLOW: MilestoneDeltaWorkflow,
     }
 
     def get_workflow(self) -> BaseWorkflow:

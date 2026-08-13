@@ -672,6 +672,8 @@ class DAGDeclarationValidator(Validator):
         workflow_type = dag_declaration.get("workflow", {}).get("type")
         if workflow_type == WorkflowEnum.API_INGESTION_WORKFLOW.value:
             self._validate_api_ingestion_workflow(dag_declaration)
+        if workflow_type == WorkflowEnum.MILESTONE_DELTA_WORKFLOW.value:
+            self._validate_milestone_delta_workflow(dag_declaration)
         if workflow_type == WorkflowEnum.QUERY_VIEW_WORKFLOW.value:
             self._validate_query_view_workflow(dag_declaration)
         if workflow_type == WorkflowEnum.QUERY_DELTA_DATAZORD_WORKFLOW.value:
@@ -1015,3 +1017,71 @@ class DAGDeclarationValidator(Validator):
                         f"msg='id_expansion.correlation_field' for table '{table_name}' "
                         f"must be a non-empty string when set"
                     )
+
+    def _validate_milestone_delta_workflow(self, dag_declaration: dict) -> None:
+        """Defaults and checks for milestone_delta (one table ← many strategy SQLs)."""
+        workflow = dag_declaration.get("workflow", {})
+        tables_customization = workflow.get("tables_customization") or {}
+
+        if not tables_customization:
+            raise AssertionError(
+                "m=_validate_milestone_delta_workflow, "
+                "msg='tables_customization' is required for milestone_delta"
+            )
+
+        if not workflow.get("load_spark_job"):
+            workflow["load_spark_job"] = "load_milestone_dimension"
+        if not workflow.get("spark_job_prefix"):
+            # CI uploads dags/cross/base/spark_jobs/ under prefix "base"
+            workflow["spark_job_prefix"] = "base"
+
+        layer = workflow.get("layer")
+        if layer and layer != LayerEnum.DW.value:
+            raise AssertionError(
+                "m=_validate_milestone_delta_workflow, "
+                "msg=milestone_delta v1 only supports workflow.layer: dw"
+            )
+
+        default_args = [
+            "{environment}",
+            "{bucket}",
+            "{dag_name}",
+            "{schema}",
+            "{table_name}",
+            "--layer",
+            "dw",
+            "--merge-on",
+            "{merge_on}",
+            "--milestones-to-run",
+            "{{ (dag_run.conf.get('milestones_to_run') if dag_run.conf else none) | tojson }}",
+            "--bootstrap-milestones",
+            "{{ (dag_run.conf.get('bootstrap_milestones') if dag_run.conf else none) | tojson }}",
+        ]
+        if not workflow.get("spark_job_arguments"):
+            workflow["spark_job_arguments"] = default_args
+
+        for table_name, table_config in tables_customization.items():
+            if not isinstance(table_config, dict):
+                raise AssertionError(
+                    "m=_validate_milestone_delta_workflow, "
+                    f"msg=tables_customization.{table_name} must be a mapping"
+                )
+            merge_on = table_config.get("merge_on")
+            if not merge_on or not isinstance(merge_on, list):
+                raise AssertionError(
+                    "m=_validate_milestone_delta_workflow, "
+                    f"msg=tables_customization.{table_name}.merge_on must be a non-empty list"
+                )
+            if "milestone_type" not in merge_on:
+                raise AssertionError(
+                    "m=_validate_milestone_delta_workflow, "
+                    f"msg=tables_customization.{table_name}.merge_on must include "
+                    "'milestone_type'"
+                )
+            entity_keys = [c for c in merge_on if c != "milestone_type"]
+            if not entity_keys:
+                raise AssertionError(
+                    "m=_validate_milestone_delta_workflow, "
+                    f"msg=tables_customization.{table_name}.merge_on must include "
+                    "at least one entity key besides milestone_type"
+                )

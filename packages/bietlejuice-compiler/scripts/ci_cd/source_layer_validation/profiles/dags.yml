@@ -29,6 +29,7 @@ scan_python_spark_table_literals: true
 
 sql_scan_globs:
   - "queries/**/*.sql"
+  - "queries/**/milestones/*.sql.tpl"
 sql_read_dialect: spark
 
 # No SQL / conf table extraction for these workflow types (ingestion, sheets, etc.)
