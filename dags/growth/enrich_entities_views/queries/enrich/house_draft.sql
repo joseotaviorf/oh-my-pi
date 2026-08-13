@@ -2,10 +2,10 @@ SELECT
     hd.id AS id_entity,
     h.id AS id_house,
     r.id_main AS id_owner,
-    NULL AS id_contract,
+    CAST(NULL AS BIGINT) AS id_contract,
     'HOUSE_DRAFT' AS entity,
     'OWNER' AS persona,
-    NULL AS business_context,
+    CAST(NULL AS STRING) AS business_context,
     TO_JSON(
       STRUCT(
         hd.status AS status,

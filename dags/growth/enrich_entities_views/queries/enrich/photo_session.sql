@@ -5,7 +5,7 @@ WITH photo_session_exploded AS (
     uu.id AS id_photographer,
     'PHOTO_SESSION' AS entity,
     COALESCE(u.id, h.id_user) AS id_owner,
-    NULL AS business_context,
+    CAST(NULL AS STRING) AS business_context,
     pj.status AS status,
     CASE
       WHEN UPPER(TRIM(pj.status)) IN ('PUBLICADO', 'CANCELADO', 'COMPLETADO', 'FOTOSTIRADAS') THEN FALSE
@@ -36,7 +36,7 @@ photo_session_base AS (
   SELECT
       id_entity,
       id_house,
-      NULL::STRING AS id_contract,
+      CAST(NULL AS BIGINT) AS id_contract,
       id_owner,
       id_photographer,
       entity,

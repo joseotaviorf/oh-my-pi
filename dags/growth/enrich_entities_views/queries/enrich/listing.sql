@@ -1,11 +1,22 @@
-WITH last_contract AS (
+WITH contract_ranked AS (
+    SELECT
+        id_house,
+        id_contract,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_house
+            ORDER BY ts_created DESC
+        ) AS contract_rank
+    FROM
+        core_contract.contract
+),
+last_contract AS (
     SELECT
         id_house,
         id_contract
     FROM
-        core_contract.contract
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_created DESC) = 1
+        contract_ranked
+    WHERE
+        contract_rank = 1
 ),
 listing_base AS (
     SELECT
