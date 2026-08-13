@@ -1,0 +1,23 @@
+dag:
+  name: dw_agent_performance
+  owner: Data Agents
+  schedule_start_date: 2026, 8, 11
+  schedule_interval: "0 6 * * *"
+  documentation:
+    dag_purpose: |
+      Milestones-only DW DAG for dim_agent_milestone (workflow.type: milestone_delta).
+      Shared load_milestone_dimension MERGEs first/last timestamps per
+      (sk_user, milestone_type); sticky id_agent from
+      datalake_agent_accreditation.agent (no dw_public.dim_agent). Strategy SQLs
+      live under queries/dw/dim_agent_milestone/milestones/; registry is the
+      milestones: block on table metadata.
+workflow:
+  type: milestone_delta
+  layer: dw
+  custom_schema: agent_performance
+  tables_customization:
+    dim_agent_milestone:
+      extraction_type: full
+      merge_on:
+        - sk_user
+        - milestone_type

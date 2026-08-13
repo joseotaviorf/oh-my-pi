@@ -1,0 +1,180 @@
+database_name: dw_agent_performance
+table_name: dim_agent_milestone
+description: >
+  DW dimension of agent journey milestones. Grain is one row per
+  (sk_user, milestone_type). sk_user is the platform user id (id_user) and is the
+  MERGE key; id_agent is translated from datalake_agent_accreditation.agent
+  (no join to dw_public.dim_agent / sk_agent). Each row stores mandatory
+  ts_first / ts_last plus optional entity pointers (sk_entity_first / sk_entity_last
+  with a single entity_type = schema.table.column per milestone). Loaded by DAG
+  dw_agent_performance (workflow.type: milestone_delta + shared
+  load_milestone_dimension) on EMR. The milestones: block below allowlists types;
+  each entry points at a strategy under
+  queries/dw/dim_agent_milestone/milestones/*.sql that emits event rows
+  (sk_user, id_agent, ts_event, sk_entity, entity_type). The platform framework
+  aggregates min/max ts_event, MERGEs on (sk_user, milestone_type), keeps
+  ts_first, id_agent, sk_entity_first, and entity_type sticky on incremental
+  runs, and advances ts_last / sk_entity_last only for newer events (late events
+  ignored). First run with a missing table full-scans (watermark 1 = 1). DAG conf
+  milestones_to_run / bootstrap_milestones select subsets and force full source
+  scan + orphan delete for bootstrapped types. One strategy failure is skipped so
+  other types can still write. Upstream sources (registry-driven):
+  datalake_agent_accreditation revision history (accreditation family);
+  datalake_visit.visit_schedules (first_vb / first_vc); datalake_tiers.ciq_first_listing
+  temporary for first_fl / first_valid_fl (swap planned with AAREDE-503);
+  datalake_rent_demand_events (first_cs); datalake_sale_offer.sale_offer (first_ccv);
+  datalake_ebdb_clean.agent_lead_referral temporary for first_demand_bp (swap
+  planned with AAREDE-504). Identity joins cast both sides to STRING.
+  business_context is not in the grain.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+milestones:
+  sticky_columns:
+    - id_agent
+  types:
+    accreditation:
+      milestone_type: accreditation
+      sql_file: accreditation_events.sql
+      scan:
+        ts_column: aral.ts_revision
+        lookback_days: 2
+      params:
+        action: Accreditation
+    reaccreditation:
+      milestone_type: reaccreditation
+      sql_file: accreditation_events.sql
+      scan:
+        ts_column: aral.ts_revision
+        lookback_days: 2
+      params:
+        action: Re-accreditation
+    deaccreditation:
+      milestone_type: deaccreditation
+      sql_file: accreditation_events.sql
+      scan:
+        ts_column: aral.ts_revision
+        lookback_days: 2
+      params:
+        action: De-accreditation
+    first_activation_after_accreditation:
+      milestone_type: first_activation_after_accreditation
+      sql_file: accreditation_events.sql
+      scan:
+        ts_column: aral.ts_revision
+        lookback_days: 2
+      params:
+        action: First activation after accreditation
+    first_vb:
+      milestone_type: first_vb
+      sql_file: visit_events.sql
+      scan:
+        ts_column: vs.ts_schedule_confirmed
+        lookback_days: 2
+      params:
+        event_ts_expr: vs.ts_schedule_confirmed
+    first_vc:
+      milestone_type: first_vc
+      sql_file: visit_events.sql
+      scan:
+        ts_column: vs.ts_schedule_completed
+        lookback_days: 2
+      params:
+        event_ts_expr: vs.ts_schedule_completed
+    # Temporary upstream: datalake_tiers.ciq_first_listing — swap to AAREDE-503 later.
+    first_fl:
+      milestone_type: first_fl
+      sql_file: first_listing_events.sql
+      scan:
+        ts_column: fl.ts_original_first_listing
+        lookback_days: 2
+      params:
+        event_ts_expr: fl.ts_original_first_listing
+    first_valid_fl:
+      milestone_type: first_valid_fl
+      sql_file: first_valid_listing_events.sql
+      scan:
+        ts_column: fl.ts_final_first_listing
+        lookback_days: 2
+      params:
+        event_ts_expr: fl.ts_final_first_listing
+    first_cs:
+      milestone_type: first_cs
+      sql_file: contract_signed_rent_events.sql
+      scan:
+        ts_column: rde.ts_event
+        lookback_days: 2
+    first_ccv:
+      milestone_type: first_ccv
+      sql_file: contract_signed_sale_events.sql
+      scan:
+        ts_column: so.ts_sale_agreement_signed
+        lookback_days: 2
+    # Temporary upstream: agent_lead_referral — swap to AAREDE-504 later.
+    first_demand_bp:
+      milestone_type: first_demand_bp
+      sql_file: demand_referral_events.sql
+      scan:
+        ts_column: alr.ts_created
+        lookback_days: 2
+columns:
+  sk_user:
+    description: >
+      Platform user id (id_user) used as the MERGE grain key with milestone_type.
+      Taken from the event source user key and aligned to
+      datalake_agent_accreditation.agent.id_user. Same id_user-as-sk_user pattern
+      used elsewhere in agent DW facts; not a dim_agent surrogate.
+    lineage:
+      - datalake_agent_accreditation.agent.id_user
+  id_agent:
+    description: >
+      Canonical accreditation agent id from datalake_agent_accreditation.agent,
+      joined on id_user (or id_agent_data for demand referral). Sticky on
+      incremental updates; rewritten on bootstrap. Not part of the MERGE grain.
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+  milestone_type:
+    description: >
+      Registry-defined milestone enum (metadata milestones.types milestone_type).
+      One row per sk_user per value; allowlisted categories below.
+    categories:
+      accreditation: Agent accreditation action
+      reaccreditation: Agent re-accreditation action
+      deaccreditation: Agent de-accreditation action
+      first_activation_after_accreditation: First activation after accreditation
+      first_vb: First visit booked (confirmed schedule on enrich visit_schedules, visit_agent)
+      first_vc: First visit completed (enrich visit_schedules, visit_agent)
+      first_fl: First listing (any; from ciq_first_listing until AAREDE-503)
+      first_valid_fl: First valid listing (is_first_listing_valid)
+      first_cs: First signed rent contract (CS) from rent_demand_events event type 9
+      first_ccv: First signed sale agreement (CCV) from sale_offer.ts_sale_agreement_signed
+      first_demand_bp: First demand BP / TQC-TQA lead referral (until AAREDE-504)
+  ts_first:
+    description: >
+      Timestamp of the first observed occurrence of this milestone for the user.
+      Sticky on incremental runs; recomputed from full source history when the
+      milestone is listed in bootstrap_milestones (DAG conf). On incremental runs,
+      for brand-new users this is the first event inside the scan window.
+  ts_last:
+    description: >
+      Timestamp of the most recent observed occurrence. Incremental: advanced
+      only when a new event is strictly later (late events ignored). Bootstrap:
+      recomputed with ts_first from the full scan. Also drives the incremental
+      source watermark (max ts_last - lookback).
+  sk_entity_first:
+    description: >
+      Source entity id for the event that set ts_first. Interpretable via
+      entity_type (schema.table.column). Null when the strategy emits no entity.
+  sk_entity_last:
+    description: >
+      Source entity id for the event that set or last advanced ts_last.
+      Same entity_type as sk_entity_first (entity kind is fixed per milestone).
+  entity_type:
+    description: >
+      Fully qualified path of the entity id columns (sk_entity_first /
+      sk_entity_last), as schema.table.column (e.g.
+      datalake_visit.visit_schedules.id_schedule). Constant per milestone_type;
+      sticky on incremental updates. Null when entity pointers are null.
+  ts_row_updated:
+    description: >
+      Pipeline write timestamp when this row was last inserted or updated by the
+      load_milestone_dimension Spark job.

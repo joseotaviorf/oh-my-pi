@@ -1,0 +1,47 @@
+---
+table_name: dw_agent_performance.dim_agent_milestone
+alert_channel: "#agents-data-alarms"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_user:
+    is_complete:
+      severity_level: Error
+  id_agent:
+    is_complete:
+      severity_level: Error
+  milestone_type:
+    is_complete:
+      severity_level: Error
+  ts_first:
+    is_complete:
+      severity_level: Error
+  ts_last:
+    is_complete:
+      severity_level: Error
+  grain_sk_user_milestone_type_unique:
+    custom:
+      # Grain must be unique on (sk_user, milestone_type).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT sk_user, milestone_type, COUNT(*) AS c
+           FROM dw_agent_performance.dim_agent_milestone
+           GROUP BY sk_user, milestone_type
+           HAVING COUNT(*) > 1
+         ) d
+        ) = 0
+      severity_level: Error
+  ts_last_gte_ts_first:
+    custom:
+      # ts_last must never precede ts_first.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_agent_performance.dim_agent_milestone
+         WHERE ts_last < ts_first
+        ) = 0
+      severity_level: Error
