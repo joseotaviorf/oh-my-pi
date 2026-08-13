@@ -29,8 +29,6 @@ scan_python_spark_table_literals: true
 
 sql_scan_globs:
   - "queries/**/*.sql"
-  # Nested under milestones/ are strategy extractors (same .sql); parent-table attribution
-  # is handled by dependency / source-layer path rules — do not invent per-file tables.
 sql_read_dialect: spark
 
 # No SQL / conf table extraction for these workflow types (ingestion, sheets, etc.)
