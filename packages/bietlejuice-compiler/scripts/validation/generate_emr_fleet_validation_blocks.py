@@ -640,7 +640,6 @@ DEFAULT_DAG_NAMES = [
     "enrich_top_of_funnel_demand",
     "enrich_top_of_funnel_supply",
     "enrich_tracksale_dispatches",
-    "enrich_transactional_entities_test",
     "enrich_trino",
     "enrich_trino_costs",
     "enrich_user",
