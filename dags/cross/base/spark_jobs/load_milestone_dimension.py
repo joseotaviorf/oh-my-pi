@@ -103,10 +103,12 @@ def _default_strategies_root(dag_name: str, layer: str, table_name: str) -> str:
     dag_path = DAGPackagesPathService.get_dag_path(dag_name)
     if dag_path:
         return str(Path(dag_path) / "queries" / layer / table_name / "milestones")
-    # Repo-relative fallback when running unit tests outside Airflow packaging.
-    repo_guess = Path(__file__).resolve().parents[4] / "dags"
-    # Prefer explicit --strategies-root in tests.
-    return str(repo_guess)
+    # Repo-relative fallback for unit tests. On EMR the spark-submit path is
+    # shallow (IndexError on parents[4]); SQL strategies then resolve via S3.
+    try:
+        return str(Path(__file__).resolve().parents[4] / "dags")
+    except IndexError:
+        return "/tmp/milestone_strategies_unused"
 
 
 def _load_metadata_content(
