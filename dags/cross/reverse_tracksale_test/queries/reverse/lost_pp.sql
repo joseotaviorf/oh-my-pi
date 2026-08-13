@@ -181,16 +181,16 @@ previous_dispatches AS (
         AND MAKE_DATE(year, month, day) >= DATE_SUB(DATE('{load_start_date}'), 90)
 )
 SELECT
-    customer_name,
-    customer_email,
-    customer_phone,
-    campaign_step,
-    customer_type,
-    customer_cpf,
-    id_user,
-    campaign_type,
-    driver_type,
-    id_driver,
+    customers.customer_name,
+    customers.customer_email,
+    customers.customer_phone,
+    customers.campaign_step,
+    customers.customer_type,
+    customers.customer_cpf,
+    customers.id_user,
+    customers.campaign_type,
+    customers.driver_type,
+    customers.id_driver,
     CASE
         WHEN pd.customer_email IS NOT NULL THEN TRUE
         ELSE FALSE
@@ -199,10 +199,10 @@ SELECT
         WHEN pd.customer_email IS NOT NULL THEN CAST(DATE('{load_start_date}') AS TIMESTAMP)
         ELSE CAST(NULL AS TIMESTAMP)
     END AS ts_dispatched,
-    dt_cohort,
-    YEAR(dt_cohort) AS year,
-    MONTH(dt_cohort) AS month,
-    DAY(dt_cohort) AS day
+    customers.dt_cohort,
+    YEAR(customers.dt_cohort) AS year,
+    MONTH(customers.dt_cohort) AS month,
+    DAY(customers.dt_cohort) AS day
 FROM
     customers
 LEFT JOIN
