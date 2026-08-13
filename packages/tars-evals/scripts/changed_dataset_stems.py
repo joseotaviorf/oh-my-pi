@@ -11,8 +11,9 @@ Two changed-doc directories are tracked:
 - ``docs/llm_context/business_entities/<stem>.md`` fans out to related metric
   stems via a reverse index over metric docs' ``## Related Business Entities``
   plus the business doc's own ``## Related Metric Entities`` back-links. When a
-  changed business doc resolves to zero metric stems, the run fails closed to
-  all dataset stems.
+  changed business doc resolves to zero metric stems, the run **warns and skips**
+  eval/drift for that doc (merge allowed) instead of fail-closed fan-out to every
+  dataset stem in the repo.
 
 Two stem lists are emitted:
 
@@ -644,17 +645,12 @@ def fan_out(
     ``read_business_doc`` returns the current markdown text for a changed
     business doc, or ``None`` when it can't be read (e.g. the doc was
     deleted). Returns ``(fanned_out_metric_stems, unresolved_business_stems)``
-    — a non-empty ``unresolved_business_stems`` means at least one changed
-    business doc couldn't be mapped to any metric via either the reverse
-    index or its own back-links, and the caller should fail closed to all
-    dataset stems for the whole run.
+    — a non-empty ``unresolved_business_stems`` is surfaced as a CI warning and
+    does not expand scope to every dataset stem (see ``resolve_scope``).
 
-    A doc that explicitly declares ``## Related Metric Entities`` with no
-    bullets underneath (``parse_related_metric_entities`` returns ``[]``, not
-    ``None``) is resolved with zero fanned-out stems and is never unresolved
-    — the author has stated there is nothing to fan out to, which is
-    different information than the heading being absent entirely (no
-    information available, so fail closed).
+    A doc whose ``## Related Metric Entities`` section contains an explicit
+    ``- None`` sentinel (``parse_related_metric_entities`` returns ``[]``, not
+    ``None``) is resolved with zero fanned-out stems and is never unresolved.
     """
     fanned: set[str] = set()
     unresolved: list[str] = []
@@ -863,11 +859,13 @@ def resolve_scope(
         fallback_reasons = [
             f"business doc '{stem}' changed but has no resolvable related metric "
             "entities (neither the reverse index nor its own 'Related Metric "
-            "Entities' section) -- falling back to all stems"
+            "Entities' section) — skipping eval/drift for this doc (merge allowed)"
             for stem in unresolved
         ]
 
-    fallback_triggered = bool(fallback_reasons)
+    # Option 2: do not fail-closed to the full corpus. Unlinked business-entity
+    # edits must not inherit unrelated stems' drift checks or LLM eval cost.
+    fallback_triggered = False
     all_stems = _list_yaml_stems(datasets_dir)
 
     eval_stems, scope_stems = partition_stems(

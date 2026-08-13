@@ -334,7 +334,7 @@ def test_backlinks_only_business_fan_out(tmp_git_repo):
     )
 
 
-def test_orphan_business_doc_fails_closed_and_budget_aborts(tmp_git_repo):
+def test_orphan_business_doc_warns_and_skips_eval(tmp_git_repo):
     repo = tmp_git_repo
     repo.write(METRIC_PATH, _fixture("metric_v1.md"))
     _generate_seed_dataset(repo)
@@ -342,21 +342,17 @@ def test_orphan_business_doc_fails_closed_and_budget_aborts(tmp_git_repo):
     repo.write(ORPHAN_BUSINESS_PATH, _fixture("business_orphan.md"))
     repo.commit("add orphan business fixture")
 
-    # With room in the budget, fail-closed evaluates every existing dataset stem.
     scope_result, eval_stems, scope_stems = _run_scope_cli(repo, max_samples=60)
     assert scope_result.returncode == 0, scope_result.stderr
-    assert "falling back to all stems" in scope_result.stderr
-    assert _read_stems(eval_stems) == [STEM]
-    assert _read_stems(scope_stems) == [STEM]
+    assert "skipping eval/drift" in scope_result.stderr
+    assert "falling back to all stems" not in scope_result.stderr
+    assert _read_stems(eval_stems) == []
+    assert _read_stems(scope_stems) == []
 
-    # A zero budget aborts before stem files are rewritten.
-    eval_stems.unlink(missing_ok=True)
-    scope_stems.unlink(missing_ok=True)
     budget_result, budget_eval, budget_scope = _run_scope_cli(repo, max_samples=0)
-    assert budget_result.returncode == 2
-    assert "sample budget exceeded" in budget_result.stderr
-    assert not budget_eval.exists()
-    assert not budget_scope.exists()
+    assert budget_result.returncode == 0, budget_result.stderr
+    assert _read_stems(budget_eval) == []
+    assert _read_stems(budget_scope) == []
 
 
 def test_empty_eval_stems_queue_is_not_all_datasets_when_guarded(tmp_path: Path):

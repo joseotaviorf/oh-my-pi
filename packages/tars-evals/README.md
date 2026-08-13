@@ -54,6 +54,10 @@ Once the dataset is committed, later edits to that doc run the normal blocking
 drift check and TARS eval gate. Existing datasets with committed YAML still
 fail CI when golden queries change without regenerating.
 
+Business-entity docs with no resolvable ``## Related Metric Entities`` (and
+no reverse link from a metric doc) also merge with a **warning** — CI does not
+fail-closed to every dataset stem.
+
 ## Running evals and gate orchestration
 
 Per-dataset evals run in parallel via a stem queue, then rollup and gate check:

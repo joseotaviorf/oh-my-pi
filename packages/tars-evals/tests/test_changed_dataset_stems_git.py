@@ -326,7 +326,7 @@ def test_business_doc_change_fans_out_via_reverse_index(
     assert not result.fallback_triggered
 
 
-def test_unresolvable_business_doc_change_falls_back_to_all_stems(
+def test_unresolvable_business_doc_change_skips_eval_and_drift(
     cds, tmp_git_repo, parse_markdown
 ):
     repo = tmp_git_repo
@@ -340,8 +340,10 @@ def test_unresolvable_business_doc_change_falls_back_to_all_stems(
 
     result = _resolve(cds, repo, env={}, parse_markdown=parse_markdown)
 
-    assert result.fallback_triggered
-    assert result.eval_stems == ["metric_a"]  # every existing dataset stem
+    assert not result.fallback_triggered
+    assert result.eval_stems == []
+    assert result.scope_stems == []
+    assert any("orphan" in reason for reason in result.fallback_reasons)
 
 
 def test_deleted_business_doc_still_fans_out_via_reverse_index(
