@@ -1,0 +1,44 @@
+dag:
+  name: insider_fast_lane
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 0,30 * * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Fast lane CDC ingestion for the Insider database (PostgreSQL), running every 30 minutes
+      alongside the main `insider` DAG for EMR migration validation.
+
+      Data lands in the `insider_teste` schema (`datalake_insider_teste_raw` /
+      `datalake_insider_teste_clean`). After validation, rename `custom_schema` to `insider`
+      to cut over from the legacy pipeline.
+
+      [Insider](https://github.com/quintoandar/insider) is a manager for follow ups
+      (reviews and quality evaluations).
+
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: insider
+  custom_schema: insider_teste
+  lineage_product_database_name: insider
+  dbutils_secret_key: INSIDER_DB
+  execution_timeout_hours: 0.5
+  tables_customization:
+    feature:
+      raw_primary_keys: ["id"]
+    resource:
+      raw_primary_keys: ["id"]
+    review_aud:
+      raw_primary_keys: ["id", "rev"]
+    review_feature:
+      raw_primary_keys: ["id"]
+    review:
+      raw_primary_keys: ["id"]
+    template_feature:
+      raw_primary_keys: ["id"]
+    template:
+      raw_primary_keys: ["id"]
+    user_revision_entity:
+      raw_primary_keys: ["id"]
