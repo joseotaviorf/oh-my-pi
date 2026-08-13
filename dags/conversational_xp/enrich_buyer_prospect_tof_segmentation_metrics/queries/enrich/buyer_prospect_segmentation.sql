@@ -26,7 +26,7 @@ bp_daily_scope AS (
 
 parsed_searches AS (
     SELECT
-        MAKE_DATE(year, month, day) AS dt_partition,
+        DATE(ts_event) AS dt_partition,
         ts_event,
         GET_JSON_OBJECT(ids, '$.id_session') AS id_session,
         GET_JSON_OBJECT(ids, '$.id_search') AS id_search,
@@ -36,6 +36,7 @@ parsed_searches AS (
         datalake_search.search_impressions
     WHERE
         MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+        AND DATE(ts_event) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
         AND LOWER(GET_JSON_OBJECT(dimensions, '$.business_context')) = 'sale'
         AND GET_JSON_OBJECT(ids, '$.id_user') IS NOT NULL
         AND GET_JSON_OBJECT(ids, '$.id_session') IS NOT NULL
@@ -44,7 +45,7 @@ parsed_searches AS (
 
 parsed_lpv AS (
     SELECT
-        MAKE_DATE(year, month, day) AS dt_partition,
+        DATE(ts_event) AS dt_partition,
         id_user,
         ts_event,
         id_session,
@@ -52,7 +53,7 @@ parsed_lpv AS (
         GET_JSON_OBJECT(event_properties, '$.search_id') AS id_search,
         ROW_NUMBER() OVER (
             PARTITION BY
-                MAKE_DATE(year, month, day),
+                DATE(ts_event),
                 id_session,
                 GET_JSON_OBJECT(event_properties, '$.search_id'),
                 ep_house_id,
@@ -63,11 +64,12 @@ parsed_lpv AS (
     FROM
         datalake_amplitude_clean.170698_listing_page_viewed_events
     WHERE
-        id_user IS NOT NULL
+        MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+        AND DATE(ts_event) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+        AND LOWER(GET_JSON_OBJECT(event_properties, '$.business_context')) = 'sale'
+        AND id_user IS NOT NULL
         AND ep_house_id IS NOT NULL
         AND id_session IS NOT NULL
-        AND LOWER(GET_JSON_OBJECT(event_properties, '$.business_context')) = 'sale'
-        AND MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
 ),
 
 search_with_lpv AS (
@@ -97,16 +99,17 @@ search_with_lpv AS (
 
 parsed_schedule AS (
     SELECT
-        MAKE_DATE(year, month, day) AS dt_partition,
+        DATE(ts_event) AS dt_partition,
         id_user,
         ts_event
     FROM
         datalake_amplitude_clean.170698_schedule_page_viewed_events
     WHERE
-        id_user IS NOT NULL
-        AND ep_house_id IS NOT NULL
+        MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+        AND DATE(ts_event) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
         AND LOWER(business_context) = 'sale'
-        AND MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+        AND id_user IS NOT NULL
+        AND ep_house_id IS NOT NULL
 ),
 
 visits_booked AS (
@@ -119,26 +122,25 @@ visits_booked AS (
     FROM
         datalake_sale_flows.sale_flow
     WHERE
-        flow_type LIKE '%VB%'
+        DATE(ts_first_booking_created) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+        AND flow_type LIKE '%VB%'
         AND id_buyer IS NOT NULL
         AND id_house IS NOT NULL
-        AND DATE(ts_first_booking_created) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
 ),
 
 offer_submitted as (
     SELECT
-        DATE(p.ts_event) as dt_partition,
-        p.id_prospect AS id_user,
-        p.ts_event as ts_event
-    FROM
-        datalake_demand_flows.prospect_daily_results p
+        DISTINCT
+        DATE(ts_first_offer_submitted) as dt_partition,
+        id_buyer as id_user,
+        id_house,
+        ts_first_offer_submitted as ts_event
+    FROM datalake_sale_flows.sale_flow
     WHERE
-        MAKE_DATE(p.year, p.month, p.day) >= DATE_TRUNC('MONTH', DATE('{start_date}'))
-        AND MAKE_DATE(p.year, p.month, p.day) < ADD_MONTHS(DATE_TRUNC('MONTH', DATE('{end_date}')), 1)
-        AND LOWER(p.business_context) = 'sale'
-        AND p.event_name IN (
-            'OFFER SUBMITTED'
-        )
+        DATE(ts_first_offer_submitted) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+        AND flow_type LIKE '%OS%'
+        AND id_buyer is not null
+        AND id_house is not null
 ),
 
 events_unioned AS (
@@ -197,7 +199,7 @@ events_unioned AS (
         ts_event,
         CAST(NULL AS STRING) AS id_session,
         CAST(NULL AS STRING) AS id_search,
-        CAST(NULL AS STRING) AS id_house,
+        id_house,
         CAST(NULL AS INT) AS is_listing_with_lpv
     FROM
         offer_submitted

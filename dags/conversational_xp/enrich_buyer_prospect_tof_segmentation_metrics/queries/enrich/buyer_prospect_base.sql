@@ -17,6 +17,7 @@ WITH tof_users AS (
         MAKE_DATE(s.year, s.month, s.day) >= DATE_TRUNC('MONTH', DATE('{start_date}'))
         AND MAKE_DATE(s.year, s.month, s.day) < ADD_MONTHS(DATE_TRUNC('MONTH', DATE('{end_date}')), 1)
         AND DATE_TRUNC('month', s.ts_event) >= DATE_TRUNC('MONTH', DATE('{start_date}'))
+        AND DATE_TRUNC('month', s.ts_event) < ADD_MONTHS(DATE_TRUNC('MONTH', DATE('{end_date}')), 1)
         AND s.id_user is not null
         AND s.id_session is not null
         AND lower(s.business_context) = 'sale'
@@ -51,6 +52,8 @@ bp_users AS (
     WHERE
         MAKE_DATE(p.year, p.month, p.day) >= DATE_TRUNC('MONTH', DATE('{start_date}'))
         AND MAKE_DATE(p.year, p.month, p.day) < ADD_MONTHS(DATE_TRUNC('MONTH', DATE('{end_date}')), 1)
+        AND DATE_TRUNC('month', p.ts_event) >= DATE_TRUNC('MONTH', DATE('{start_date}'))
+        AND DATE_TRUNC('month', p.ts_event) < ADD_MONTHS(DATE_TRUNC('MONTH', DATE('{end_date}')), 1)
         AND LOWER(p.business_context) = 'sale'
         AND p.event_type = 'CONVERSION'
         AND p.event_name IN (

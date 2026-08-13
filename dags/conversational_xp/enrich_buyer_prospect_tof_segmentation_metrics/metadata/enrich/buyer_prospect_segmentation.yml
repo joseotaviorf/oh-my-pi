@@ -4,7 +4,7 @@ table_name: buyer_prospect_segmentation
 owner: catarina.freitas@quintoandar.com.br
 domain: Conversational XP
 description: |
-  Daily user-level search, LPV, schedule, and visit activity counts for buyer prospects in the 4-week and 8-week post-activation windows. A range run writes one daily slice for every requested partition date. Grain is one row per user per activation month per partition date (dt_partition). Rows are merged incrementally; buyer_prospect_segment_metrics aggregates them for cohort health reporting. Sale business context only.
+  Daily user-level search, LPV, schedule, visit, and offer-submission activity counts for buyer prospects in the 4-week and 8-week post-activation windows. A range run writes one daily slice for every requested partition date. Grain is one row per user per activation month per partition date (dt_partition). Rows are merged incrementally; buyer_prospect_segment_metrics aggregates them for cohort health reporting. Sale business context only.
 columns:
   id_user:
     description: QuintoAndar internal user identifier for the segmented buyer prospect.
@@ -43,11 +43,11 @@ columns:
   is_os_8w:
     description: Boolean-like flag set to 1 when the buyer submitted at least one offer on dt_partition within the 8-week post-activation window; otherwise 0.
     lineage:
-      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
   is_os_4w:
     description: Boolean-like flag set to 1 when the buyer submitted at least one offer on dt_partition within the 4-week post-activation window; otherwise 0.
     lineage:
-      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
   sum_interactions_8w:
     description: Distinct search impression timestamps on dt_partition within the 8-week post-activation window.
     lineage:

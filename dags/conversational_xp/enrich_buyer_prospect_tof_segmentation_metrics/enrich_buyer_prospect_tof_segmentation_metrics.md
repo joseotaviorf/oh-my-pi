@@ -41,7 +41,7 @@ prospect_daily_results (+ concierge_demand)
 
 #### 1. `datalake_search.buyer_prospect_base`
 
-**What each run does:** Reloads every full calendar month intersecting the input interval from `datalake_demand_flows.prospect_daily_results` (sale conversions: first activation or recovery) and `datalake_amplitude_page_viewed_events.schedule_search_listing_events` (ToF users), deduplicates to one row per `(id_user, dt_activation_month)`, and enriches buyer-prospect conversions with the Concierge flag from `datalake_search.concierge_demand`. Buyer-prospect conversions take precedence when the same user has a ToF event in the same month; otherwise, the earliest event is retained. The `segment_type` column identifies buyer-prospect (`bp`) and ToF (`tof`) cohort members. `is_concierge_prospect` is `FALSE` for ToF users because Concierge status applies only to buyer-prospect conversions.
+**What each run does:** Reloads every full calendar month intersecting the input interval from `datalake_demand_flows.prospect_daily_results` (sale conversions: first activation or recovery) and `datalake_amplitude_page_viewed_events.schedule_search_listing_events` (ToF users), deduplicates to one row per `(id_user, dt_activation_month)`, and enriches buyer-prospect conversions with the Concierge flag from `datalake_search.concierge_demand`. Source reads filter on both lake partition month and `DATE_TRUNC('month', ts_event)` so `dt_activation_month` reflects the event calendar month, not only the load partition. Buyer-prospect conversions take precedence when the same user has a ToF event in the same month; otherwise, the earliest event is retained. The `segment_type` column identifies buyer-prospect (`bp`) and ToF (`tof`) cohort members. `is_concierge_prospect` is `FALSE` for ToF users - Concierge status only refers to buyer-prospect conversions.
 
 **Write method:** Delta **MERGE** on `(id_user, dt_activation_month)`.
 
@@ -57,7 +57,7 @@ This replaces every activation-month cohort touched by the interval. Older month
 
 #### 2. `datalake_search.buyer_prospect_segmentation`
 
-**What each run does:** For every date in the inclusive input interval, collects sale activity from search impressions, Amplitude LPV / schedule events, visit bookings (`sale_flow`), and offer submissions (`prospect_daily_results`). Only users whose **8-week post-activation window includes that date** are included (read from `buyer_prospect_base`). Users with no events on a date still get a row with zero counts.
+**What each run does:** For every date in the inclusive input interval, collects sale activity from search impressions, Amplitude LPV / schedule events, visit bookings (`sale_flow`), and offer submissions (`sale_flow`). Only users whose **8-week post-activation window includes that date** are included (read from `buyer_prospect_base`). Users with no events on a date still get a row with zero counts.
 
 Each row stores **that day's** activity counts within the buyer's 4w/8w windows (not a running total). The row also retains the buyer activation timestamp and 4w/8w end dates plus daily per-listing event arrays:
 
@@ -70,6 +70,7 @@ Window totals for additive metrics are built downstream by summing daily rows. D
 **Write method:** Delta **MERGE** on `(dt_partition, dt_activation_month, id_user)`.
 
 - `dt_partition` is each calendar date in the requested interval.
+- Daily slices use the calendar date of the event timestamp (`DATE(ts_event)`, `DATE(ts_first_booking_created)`, `DATE(ts_first_offer_submitted)`, etc.), not the source table's load partition.
 - Re-running an interval overwrites each included daily slice for each user/cohort.
 
 **Grain:** one row per user per activation month per partition date (`dt_partition`).
@@ -84,7 +85,7 @@ Window totals for additive metrics are built downstream by summing daily rows. D
 | Listing page views (LPV) | `datalake_amplitude_clean.170698_listing_page_viewed_events`  |
 | Schedule page views      | `datalake_amplitude_clean.170698_schedule_page_viewed_events` |
 | Visit bookings           | `datalake_sale_flows.sale_flow`                               |
-| Offer submissions        | `datalake_demand_flows.prospect_daily_results`                |
+| Offer submissions        | `datalake_sale_flows.sale_flow`                               |
 
 #### 3. `datalake_search.buyer_prospect_segment_metrics`
 

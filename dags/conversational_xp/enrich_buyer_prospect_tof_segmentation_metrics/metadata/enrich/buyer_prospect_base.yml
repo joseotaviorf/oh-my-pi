@@ -15,7 +15,7 @@ columns:
     lineage:
       - datalake_demand_flows.prospect_daily_results.business_context
   is_concierge_prospect:
-    description: Whether the buyer-prospect conversion is linked to a visit booked through the Concierge chatbot (direct or indirect) when user and visit id match a record in the Concierge demand funnel. Always false for top-of-funnel users because Concierge status does not apply to that cohort.
+    description: Whether the buyer-prospect conversion is linked to a visit booked through the Concierge chatbot (direct or indirect) when user and visit id match a record in the Concierge demand funnel. Applies only to the buyer-prospect cohort; always false for the top-of-funnel user cohort.
     lineage:
       - datalake_search.concierge_demand.is_concierge_prospect
   event_name:
