@@ -58,6 +58,7 @@ SELECT
     job.salary_table,
     job.employment_type,
     bu.business_unit_name,
+    bu.consolidated_business_unit_name,
     fas.business_unit_country AS country,
     cc.cost_center_code,
     cc.cost_center_name,

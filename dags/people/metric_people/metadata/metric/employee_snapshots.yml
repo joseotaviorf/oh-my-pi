@@ -285,6 +285,23 @@ columns:
     lineage:
       - dw_organization.dim_business_unit.business_unit_name
 
+  consolidated_business_unit_name:
+    description: Consolidated business unit label used as empresa in downstream exports and reporting (e.g. 'Classifieds', 'QuintoAndar SP'). Rolls related legal entities into a single group name; unmapped values keep the PIN business_unit_name.
+    dimension: True
+    categories:
+      "QuintoAndar SP":
+        Deel contractor label for QuintoAndar Brazil operations. Source business_unit_name Deel - QuintoAndar.
+      Classifieds:
+        Consolidated Classifieds Latam umbrella covering Classifieds Latam and related legal entities.
+      ATTA:
+        Standardized Atta brand label. Source business_unit_name Atta.
+      "Benvi México":
+        Mexico consumer-facing Benvi brand. Source business_unit_name Benvi MX.
+      "QuintoAndar Portugal":
+        Portugal operating label. Source business_unit_name Benvi PT and Remote.
+    lineage:
+      - dw_organization.dim_business_unit.consolidated_business_unit_name
+
   country:
     description: Snapshot attribute for country on the employee_snapshots wide metric table.
     dimension: True
