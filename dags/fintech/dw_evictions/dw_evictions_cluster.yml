@@ -1,22 +1,30 @@
 cluster:
-  type: emr_7_12_consolidation_m_memory_fleet_cluster
+  # fact_evictions is memory-heavy (calendar cross join + COUNT DISTINCT). Was DBR
+  # s_memory × 3 workers; step_concurrency=1 + small fleet inflated wall clock ~2x.
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     aws_attributes:
       ebs_volume_size: 200
     core_nodes:
       target_on_demand: 2
       target_spot: 0
       instance_types:
-      - r6g.2xlarge
-      - r7g.2xlarge
-      - r6i.2xlarge
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
     task_nodes:
       instance_types:
-      - r6g.2xlarge
-      - r7g.2xlarge
-      - r6i.2xlarge
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
       target_on_demand: 0
-      target_spot: 1
+      target_spot: 3
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
+    spark_conf:
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "16777216"
+      spark.sql.shuffle.partitions: "800"
+      spark.speculation: "true"
+      spark.speculation.multiplier: "3"
+      spark.speculation.quantile: "0.75"

@@ -1,11 +1,13 @@
 cluster:
+  # Keep XL capacity (same class as enrich_accounting_funnel). step_concurrency=1
+  # serialized all 16 enrich loads after EMR migration and inflated DAG wall clock ~10x.
   type: emr_7_12_consolidation_xl_general_fleet_cluster
   custom_configurations:
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     aws_attributes:
       ebs_volume_size: 200
     core_nodes:
-      target_on_demand: 3
+      target_on_demand: 4
       target_spot: 0
       instance_types:
       - m6g.8xlarge
@@ -15,6 +17,14 @@ cluster:
       - m6g.8xlarge
       - m7g.8xlarge
       target_on_demand: 0
-      target_spot: 1
+      target_spot: 4
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
+    spark_conf:
+      # Heavy window/dedup SQL (collection, historical_tree_timeline); avoid AQE
+      # collapsing shuffles into too few tasks on a large fleet.
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "16777216"
+      spark.sql.shuffle.partitions: "800"
+      spark.speculation: "true"
+      spark.speculation.multiplier: "3"
+      spark.speculation.quantile: "0.75"

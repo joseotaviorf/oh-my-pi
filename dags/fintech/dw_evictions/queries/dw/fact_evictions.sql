@@ -74,6 +74,19 @@ negotiation AS (
     WHERE fn.dt_down_payment IS NOT NULL
     AND fni.installment_number >= 2
 ),
+negotiation_at_registration AS (
+    SELECT DISTINCT
+        eb.id_process,
+        TRUE AS has_active_negotiation_at_registration
+    FROM datalake_cyber_legal.evictions_base AS eb
+    INNER JOIN negotiation AS n
+        ON n.sk_contract = BIGINT(TRIM(eb.contract))
+        AND n.dt_down_payment <= DATE(eb.dt_registered)
+        AND (
+            n.dt_paid > DATE(eb.dt_registered)
+            OR n.dt_paid IS NULL
+        )
+),
 process_evictions AS (
     SELECT
         eb.id_process AS sk_process,
@@ -127,7 +140,7 @@ collection_agency_at_reference AS (
         AND COALESCE(DATE(eb.dt_closure), CURRENT_DATE) = at.dt_reference
 )
 
-SELECT DISTINCT
+SELECT
     e.id_process AS sk_process,
     e.contract AS sk_contract,
     'cyber_legal' AS source,
@@ -136,13 +149,7 @@ SELECT DISTINCT
     CASE
         WHEN o1.open_amount IS NULL THEN 'Adimplente'
         WHEN o1.fpd_invoices > 0 THEN 'FPD'
-        WHEN EXISTS (
-                SELECT 1
-                FROM negotiation n
-                WHERE n.sk_contract = BIGINT(TRIM(e.contract))
-                  AND n.dt_down_payment <= DATE(e.dt_registered)
-                  AND (n.dt_paid > DATE(e.dt_registered) OR n.dt_paid IS NULL)
-              )
+        WHEN nar.has_active_negotiation_at_registration
             OR o1.negotiation_invoices > 0 THEN 'Acordo Ativo'
         WHEN o1.monthly_invoices > 0 THEN 'Mensal'
         WHEN o1.open_amount IS NOT NULL THEN 'Demais Inadimplentes'
@@ -428,6 +435,9 @@ LEFT JOIN
 LEFT JOIN
     collection_agency_at_reference AS ca
     ON e.id_process = ca.id_process
+LEFT JOIN
+    negotiation_at_registration AS nar
+    ON e.id_process = nar.id_process
 GROUP BY
     e.id_process,
     e.contract,
@@ -483,6 +493,7 @@ GROUP BY
     c.ts_expected_termination,
     ca.id_agency_group,
     ca.dt_collection_reference,
+    nar.has_active_negotiation_at_registration,
     e.has_arbitration_defense,
     e.has_redistribution,
     e.is_reincident,

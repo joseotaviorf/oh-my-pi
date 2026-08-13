@@ -1,2 +1,30 @@
 cluster:
-  type: emr_7_12_consolidation_l_memory_single_node_fleet_cluster
+  # Was DBR single-node Photon (local[*]); EMR single-node + step_concurrency=1
+  # serialized all 6 incremental MERGE loads (~2x wall clock).
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  custom_configurations:
+    step_concurrency_level: 2
+    aws_attributes:
+      ebs_volume_size: 200
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
+    task_nodes:
+      instance_types:
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
+      target_on_demand: 0
+      target_spot: 2
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    spark_conf:
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "16777216"
+      spark.sql.shuffle.partitions: "400"
+      spark.speculation: "true"
+      spark.speculation.multiplier: "3"
+      spark.speculation.quantile: "0.75"
