@@ -123,3 +123,26 @@ def test_folder_mappings_only_target_allowlisted_domains():
     allowed = set(domain_registry.active_domains())
     for folder, domain in domain_registry._load()["repo_folder_mappings"].items():
         assert domain in allowed, f"{folder} -> {domain!r} is not in the allowlist"
+
+
+def test_catalog_mappings_only_target_allowlisted_domains():
+    allowed = set(domain_registry.active_domains())
+    for domain, row in domain_registry.catalog_mappings().items():
+        assert domain in allowed, f"{domain!r} is not in the allowlist"
+        assert row["dc_domain"].startswith("prod-")
+        assert row["datahub_urn_leaf"].startswith("urn:li:domain:")
+        if "dc_subdomain" in row:
+            assert row["dc_subdomain"].startswith("prod-")
+
+
+def test_catalog_mapping_for_resolves_subdomain_rows():
+    row = domain_registry.catalog_mapping_for("Broker XP")
+    assert row is not None
+    assert row["dc_domain"] == "prod-growth-domain"
+    assert row["dc_subdomain"] == "prod-growth-brokerxp-subdomain"
+    assert row["datahub_urn_leaf"] == "urn:li:domain:growth-brokerxp-subdomain"
+
+
+def test_catalog_mapping_for_none_when_unmapped():
+    assert domain_registry.catalog_mapping_for("Cross") is None
+    assert domain_registry.catalog_mapping_for("Journey Optimizer") is None

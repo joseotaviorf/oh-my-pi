@@ -13,9 +13,18 @@ from __future__ import annotations
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import Mapping, Optional, TypedDict
 
 import yaml
+
+
+class CatalogMapping(TypedDict, total=False):
+    """One row of ``catalog_mappings`` in ``domains.yml``."""
+
+    dc_domain: str
+    dc_subdomain: str
+    datahub_urn_leaf: str
+
 
 _DOMAINS_FILE = Path(__file__).parent / "domains.yml"
 
@@ -62,3 +71,14 @@ def folder_to_domain(folder: str) -> Optional[str]:
     leave ``domain:`` for a human to fill rather than guess.
     """
     return _load().get("repo_folder_mappings", {}).get(folder)
+
+
+@lru_cache(maxsize=1)
+def catalog_mappings() -> Mapping[str, CatalogMapping]:
+    """metadata ``domain:`` → data-contracts catalog + DataHub URN leaf."""
+    return _load().get("catalog_mappings", {}) or {}
+
+
+def catalog_mapping_for(metadata_domain: str) -> Optional[CatalogMapping]:
+    """Return the catalog row for a metadata ``domain:`` value, if mapped."""
+    return catalog_mappings().get(metadata_domain)

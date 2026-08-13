@@ -57,3 +57,67 @@ repo_folder_mappings:
   qcx: QCX
   support_and_service: Support and Services
   tech_platform: Tech Platform
+
+# metadata `domain:` → data-contracts catalog + DataHub URN leaf.
+# A bietlejuice domain may map to a DC domain root (omit dc_subdomain) or to a DC
+# subdomain (set dc_subdomain). Domains without a row here have no DC mapping yet
+# and fall back to the legacy name-derived slug (Cross, International, Journey
+# Optimizer, Rede, DS Pricing). DS Pricing is intentionally left unmapped: its
+# schemas are governed by the Growth domain in data-contracts but there is no
+# DS Pricing subdomain yet -- revisit if/when one is created under Growth.
+catalog_mappings:
+  Agents:
+    dc_domain: prod-agents-domain
+    datahub_urn_leaf: urn:li:domain:agents-domain
+  Atlas DB:
+    dc_domain: prod-growth-domain
+    dc_subdomain: prod-growth-atlas-subdomain
+    datahub_urn_leaf: urn:li:domain:growth-atlas-subdomain
+  Broker XP:
+    dc_domain: prod-growth-domain
+    dc_subdomain: prod-growth-brokerxp-subdomain
+    datahub_urn_leaf: urn:li:domain:growth-brokerxp-subdomain
+  Conversational XP:
+    dc_domain: prod-conversationalxp-domain
+    datahub_urn_leaf: urn:li:domain:conversationalxp-domain
+  Data Life Cycle:
+    dc_domain: prod-dataplatform-domain
+    dc_subdomain: prod-dataplatform-dlc-subdomain
+    datahub_urn_leaf: urn:li:domain:dataplatform-dlc-subdomain
+  Data Ops & Governance:
+    dc_domain: prod-dataplatform-domain
+    dc_subdomain: prod-dataplatform-gov-subdomain
+    datahub_urn_leaf: urn:li:domain:dataplatform-gov-subdomain
+  Data Platform:
+    dc_domain: prod-dataplatform-domain
+    datahub_urn_leaf: urn:li:domain:dataplatform-domain
+  Fintech:
+    dc_domain: prod-fintech-domain
+    datahub_urn_leaf: urn:li:domain:fintech-domain
+  For Rent:
+    dc_domain: prod-forrent-domain
+    datahub_urn_leaf: urn:li:domain:forrent-domain
+  For Sale:
+    dc_domain: prod-forsale-domain
+    datahub_urn_leaf: urn:li:domain:forsale-domain
+  Growth:
+    dc_domain: prod-growth-domain
+    datahub_urn_leaf: urn:li:domain:growth-domain
+  House and Listing:
+    dc_domain: prod-houseandlisting-domain
+    datahub_urn_leaf: urn:li:domain:houseandlisting-domain
+  MLOps:
+    dc_domain: prod-mlops-domain
+    datahub_urn_leaf: urn:li:domain:mlops-domain
+  People:
+    dc_domain: prod-people-domain
+    datahub_urn_leaf: urn:li:domain:people-domain
+  QCX:
+    dc_domain: prod-qcx-domain
+    datahub_urn_leaf: urn:li:domain:qcx-domain
+  Support and Services:
+    dc_domain: prod-ss-domain
+    datahub_urn_leaf: urn:li:domain:ss-domain
+  Tech Platform:
+    dc_domain: prod-techplatform-domain
+    datahub_urn_leaf: urn:li:domain:techplatform-domain

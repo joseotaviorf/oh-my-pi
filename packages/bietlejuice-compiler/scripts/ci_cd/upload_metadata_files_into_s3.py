@@ -1,8 +1,9 @@
 import argparse
+import glob
 import json
 import os
 import sys
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import boto3
 import requests
@@ -16,9 +17,12 @@ for _p in (_REPO_ROOT, _COMPILER_ROOT):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from bietlejuice.base.pipeline.platform_resolver import resolve_platforms
+from bietlejuice.governance.domain_registry import catalog_mapping_for
 from scripts.services.git_service import GitService
 from scripts.services.metadata_file_info import MetadataFileInfo
 from scripts.services.metadata_file_service import (
+    _DAG_DIR_FROM_METADATA_PATH,
     MetadataFileService,
 )
 
@@ -202,12 +206,84 @@ def generate_metric_payload(file_info: MetadataFileInfo) -> List[Dict]:
     return payload
 
 
+def resolve_platforms_for_file(file_info: MetadataFileInfo) -> Optional[List[str]]:
+    """Resolve the DataHub platforms a table should be propagated to.
+
+    Reads the table's DAG declaration (``*_declaration.yml`` in the DAG dir,
+    derived from the metadata file path) and delegates to
+    ``bietlejuice.base.pipeline.platform_resolver``. Returns ``None`` on any
+    problem (missing declaration/type, resolution error) so the propagator
+    falls back to its legacy single-target behavior.
+    """
+    try:
+        # Derive the DAG dir via the canonical regex, which tolerates an optional
+        # subdir under the layer (``metadata/<layer>[/<subdir>]/<table>.yml``).
+        # Counting dirname() levels breaks on that nested form (lands on ``metadata/``).
+        dag_dir_match = _DAG_DIR_FROM_METADATA_PATH.match(file_info.local_path)
+        if not dag_dir_match:
+            return None
+        dag_dir = dag_dir_match.group(1)
+        matches = glob.glob(os.path.join(dag_dir, "*_declaration.yml"))
+        if not matches:
+            return None
+        with open(matches[0]) as declaration_file:
+            declaration = yaml.safe_load(declaration_file) or {}
+        workflow = declaration.get("workflow") or {}
+        workflow_type = workflow.get("type")
+        if not workflow_type:
+            return None
+        table_customization = (workflow.get("tables_customization") or {}).get(
+            file_info.table_name, {}
+        ) or {}
+        return resolve_platforms(workflow_type, workflow, table_customization)
+    except Exception as error:  # never break the CI upload over one declaration
+        print(
+            f"m=resolve_platforms_for_file, table={file_info.table_name}, "
+            f"msg=Falling back to default platform, error={error}"
+        )
+        return None
+
+
+def resolve_datahub_domain_urn_for_file(
+    file_info: MetadataFileInfo,
+) -> Optional[str]:
+    """Resolve the DataHub domain URN leaf from metadata ``domain:`` + catalog_mappings.
+
+    Reads the table's metadata YAML and looks up ``catalog_mappings`` in
+    ``domains.yml``. Returns ``None`` when the domain is unmapped or unreadable so
+    the propagator keeps its legacy display-name normalization.
+    """
+    try:
+        with open(file_info.local_path, encoding="utf-8") as metadata_file:
+            metadata = yaml.safe_load(metadata_file) or {}
+        metadata_domain = metadata.get("domain")
+        if not metadata_domain:
+            return None
+        row = catalog_mapping_for(str(metadata_domain).strip())
+        if row is None:
+            return None
+        return row.get("datahub_urn_leaf")
+    except Exception as error:
+        print(
+            f"m=resolve_datahub_domain_urn_for_file, table={file_info.table_name}, "
+            f"msg=Falling back to legacy domain slug, error={error}"
+        )
+        return None
+
+
 def generate_documentation_payload(file_info: MetadataFileInfo) -> Dict:
-    return {
+    payload = {
         "vendor": ["datahub"],
         "database_name": file_info.database_name,
         "table_name": file_info.table_name,
     }
+    platforms = resolve_platforms_for_file(file_info)
+    if platforms:
+        payload["platforms"] = platforms
+    datahub_domain_urn = resolve_datahub_domain_urn_for_file(file_info)
+    if datahub_domain_urn:
+        payload["datahub_domain_urn"] = datahub_domain_urn
+    return payload
 
 
 def generate_payloads(files_info: List[MetadataFileInfo]):
