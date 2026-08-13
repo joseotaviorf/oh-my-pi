@@ -1,6 +1,6 @@
 import pyspark.sql.functions as F
 from pyspark.sql import Column, DataFrame
-from pyspark.sql.types import DataType, StringType, StructType
+from pyspark.sql.types import DataType, StringType, StructType, _parse_datatype_string
 
 
 def build_change_events_fields(
@@ -131,13 +131,20 @@ def parse_struct_column(dtype: str, col_name: str, target_schema: StructType):
     return F.lit(None).cast(target_schema)
 
 
+def parse_ddl(ddl: str) -> DataType:
+    if hasattr(DataType, "fromDDL"):
+        return DataType.fromDDL(ddl)
+
+    return _parse_datatype_string(ddl)
+
+
 def remap_struct_expr(col_name: str, target_col: str) -> Column:
     """
     Returns a Column expression that:
       1. parses API JSON string using lowerCamelCase fields
       2. rebuilds the struct using prod UpperCamelCase fields
     """
-    original_struct_type = DataType.fromDDL(target_col)
+    original_struct_type = parse_ddl(target_col)
 
     if not isinstance(original_struct_type, StructType):
         raise ValueError(
@@ -154,7 +161,7 @@ def remap_struct_expr(col_name: str, target_col: str) -> Column:
         + ">"
     )
 
-    api_struct_type = DataType.fromDDL(api_struct_string)
+    api_struct_type = parse_ddl(api_struct_string)
 
     parsed_col = F.from_json(F.col(col_name), api_struct_type)
 
