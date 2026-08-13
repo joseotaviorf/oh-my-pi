@@ -115,15 +115,28 @@ def _load_metadata_content(
     if metadata_file:
         return Path(metadata_file).read_text(encoding="utf-8")
 
+    from os.path import join as path_join
+
     from bietlejuice.base.service.dag_packages_path_service import (
         DAGPackagesPathService,
     )
+    from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 
     dag_path = DAGPackagesPathService.get_dag_path(dag_name)
     if dag_path:
         path = Path(dag_path) / "metadata" / layer / f"{table_name}.yml"
         if path.is_file():
             return path.read_text(encoding="utf-8")
+
+    # EMR / packaged runs: metadata lives under the DAG packages S3 prefix.
+    engine = "boto3" if RuntimeDetector.is_emr() else "databricks_volume"
+    relative = path_join("metadata", dag_name, layer, f"{table_name}.yml")
+    content = DAGPackagesPathService._read_dag_package_file_from_s3(
+        sql_file_relative_path=relative,
+        engine=engine,
+    )
+    if content:
+        return content
 
     raise FileNotFoundError(
         f"m=_load_metadata_content, dag={dag_name}, layer={layer}, "
