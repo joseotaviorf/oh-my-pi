@@ -281,7 +281,26 @@ class TestDailyMaintenanceCap:
         # assert
         assert result == "datalake_dw.fact_x"
         loader.optimize_table.assert_called_once()
+        loader.vacuum_lite_table.assert_called_once()
+
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
+    def test_run_job_uses_full_vacuum_when_vacuum_lite_disabled(self, mock_full_name):
+        # arrange
+        mock_full_name.return_value = "datalake_dw.fact_x"
+        loader = MagicMock()
+        table_configs = {
+            "schema": "dw",
+            "run_optimize": False,
+            "run_vacuum": True,
+            "vacuum_lite": False,
+        }
+
+        # act
+        run_job(loader, "fact_x", table_configs, "dw")
+
+        # assert
         loader.vacuum_table.assert_called_once()
+        loader.vacuum_lite_table.assert_not_called()
 
     @patch("dags.cross.base.spark_jobs.optimize_delta_table._persist_optimize_cursor")
     @patch(

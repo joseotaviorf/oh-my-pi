@@ -477,7 +477,7 @@ def run_job(
         )
 
     if run_vacuum:
-        if table_configs.get("vacuum_lite", False):
+        if table_configs.get("vacuum_lite", True):
             loader.vacuum_lite_table(
                 full_table_name, table_configs.get("vacuum_retention_hours", 7 * 24)
             )

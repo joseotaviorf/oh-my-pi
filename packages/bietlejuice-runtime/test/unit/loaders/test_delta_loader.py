@@ -466,6 +466,67 @@ class TestDeltaLoader:
             ]
         )
 
+    def test_vacuum_lite_table(self, mock_spark_context):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        delta_loader.vacuum_lite_table("test_table", 24)
+
+        mock_spark_context.spark.sql.assert_has_calls(
+            [
+                mock.call(
+                    "ALTER TABLE test_table SET TBLPROPERTIES ('delta.deletedFileRetentionDuration'='24 hours')"
+                ),
+                mock.call("VACUUM `test_table` LITE"),
+            ]
+        )
+
+    @pytest.mark.parametrize(
+        "lite_error",
+        [
+            # Delta 3.3+ refusing LITE because the log cannot back it.
+            RuntimeError(
+                "org.apache.spark.sql.delta.DeltaIllegalStateException: "
+                "[DELTA_CANNOT_VACUUM_LITE] VACUUM LITE cannot delete all eligible files"
+            ),
+            # DBR < 16.1 / Delta < 3.3: LITE is not valid syntax.
+            RuntimeError(
+                "[PARSE_SYNTAX_ERROR] Syntax error at or near 'VACUUM'.(line 1, pos 0)\n\n"
+                "== SQL ==\nVACUUM `test_table` LITE\n^^^"
+            ),
+        ],
+        ids=["cannot_vacuum_lite", "lite_syntax_unsupported"],
+    )
+    def test_vacuum_lite_table_falls_back_to_full_vacuum(
+        self, mock_spark_context, lite_error
+    ):
+        def sql_side_effect(command):
+            if command.endswith("LITE"):
+                raise lite_error
+            return mock.MagicMock()
+
+        mock_spark_context.spark.sql.side_effect = sql_side_effect
+
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        delta_loader.vacuum_lite_table("test_table", 24)
+
+        mock_spark_context.spark.sql.assert_has_calls(
+            [
+                mock.call("VACUUM `test_table` LITE"),
+                mock.call("VACUUM `test_table`"),
+            ]
+        )
+
+    def test_vacuum_lite_table_propagates_full_vacuum_failure(self, mock_spark_context):
+        def sql_side_effect(command):
+            if command.startswith("VACUUM"):
+                raise RuntimeError("table not found")
+            return mock.MagicMock()
+
+        mock_spark_context.spark.sql.side_effect = sql_side_effect
+
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        with pytest.raises(RuntimeError, match="table not found"):
+            delta_loader.vacuum_lite_table("test_table", 24)
+
     def test_optimize_table_without_z_order(self, mock_spark_context):
         table_name = "test_table"
 

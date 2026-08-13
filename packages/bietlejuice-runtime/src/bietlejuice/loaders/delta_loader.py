@@ -15,6 +15,10 @@ logger = QuintoAndarLogger("DeltaLoader")
 
 _VALID_COLUMN_MAPPING_MODES = {"none", "name", "id"}
 
+# Delta raises this error class when VACUUM LITE cannot see every removable file
+# (log pruned, or no full VACUUM baseline inside the log retention window).
+_VACUUM_LITE_NOT_APPLICABLE_ERROR_CLASS = "DELTA_CANNOT_VACUUM_LITE"
+
 # Matches only safe SQL identifiers: letters, digits, underscores, and dots
 # (dots are used for qualified names like schema.table). This pattern is used
 # instead of a frozenset to allow static-analysis tools to recognise it as a
@@ -362,6 +366,15 @@ class DeltaLoader:
 
         merge_builder.execute()
 
+    def _run_full_vacuum(self, table_name: str, retention_hours: int) -> None:
+        quoted_table = _quote_sql_table_name(table_name)
+        command = f"VACUUM {quoted_table}"
+        logger.info(
+            f"Running vacuum with command {command}, and retention hours {retention_hours}"
+        )
+        self.spark.sql(command)
+        logger.info(f"Vacuum successful for table {table_name}")
+
     def vacuum_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table"""
         table_name = _check_identifier_safety(table_name)
@@ -374,17 +387,15 @@ class DeltaLoader:
             property_value=f"{retention_hours} hours",
             spark=self.spark,
         )
-
-        quoted_table = _quote_sql_table_name(table_name)
-        command = f"VACUUM {quoted_table}"
-        logger.info(
-            f"Running vacuum with command {command}, and retention hours {retention_hours}"
-        )
-        self.spark.sql(command)
-        logger.info(f"Vacuum successful for table {table_name}")
+        self._run_full_vacuum(table_name, retention_hours)
 
     def vacuum_lite_table(self, table_name: str, retention_hours: int) -> None:
-        """Vacuum a Delta table in lite mode. Only available in Databricks Runtime 16.1 and above."""
+        """Vacuum a Delta table in lite mode (Delta 3.3+ / DBR 16.1+).
+
+        Falls back to a full vacuum whenever the LITE statement fails: older runtimes
+        cannot parse it at all, and Delta raises
+        ``DELTA_CANNOT_VACUUM_LITE`` when the transaction log cannot back a LITE run.
+        """
         table_name = _check_identifier_safety(table_name)
 
         # We shouldn't use RETAIN HOURS anymore
@@ -401,7 +412,19 @@ class DeltaLoader:
         logger.info(
             f"Running vacuum lite with command {command}, and retention hours {retention_hours}"
         )
-        self.spark.sql(command)
+        try:
+            self.spark.sql(command)
+        except Exception as error:  # noqa: BLE001 - see fallback rationale below
+            reason = str(error)[:500].replace("\n", " | ")
+            logger.warning(
+                f"Vacuum lite failed for table {table_name} "
+                f"({type(error).__name__}: {reason}); falling back to full vacuum. "
+                f"Expected on runtimes older than Delta 3.3 (DBR < 16.1), which cannot "
+                f"parse VACUUM ... LITE, and when Delta raises "
+                f"{_VACUUM_LITE_NOT_APPLICABLE_ERROR_CLASS}."
+            )
+            self._run_full_vacuum(table_name, retention_hours)
+            return
         logger.info(f"Vacuum lite successful for table {table_name}")
 
     def optimize_table(

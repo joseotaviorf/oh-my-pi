@@ -366,7 +366,7 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             "run_vacuum", True
         )
         default_vacuum_lite = self.dag_execution_context.workflow_args.get(
-            "vacuum_lite", False
+            "vacuum_lite", True
         )
         default_maintenance_once_per_day = self.dag_execution_context.workflow_args.get(
             "maintenance_once_per_day", True

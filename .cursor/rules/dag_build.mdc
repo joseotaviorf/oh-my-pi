@@ -371,7 +371,7 @@ workflow:
 workflow:
     run_vacuum: true  # Optional, default: true
     vacuum_retention_hours: 48  # Optional, default: 48
-    vacuum_lite: false  # Optional, default: false (requires DBR 16.1+)
+    vacuum_lite: true  # Optional, default: true; runtimes without LITE (DBR < 16.1) fall back to full VACUUM automatically
     run_optimize: true  # Optional, default: true on Databricks; on EMR, defaults to
                          # false unless the table has zorder columns (see below)
     tables_customization:
@@ -811,7 +811,7 @@ workflow:
 | `bucket_config_name` | `workflow` | Overrides default S3 bucket config for the ingestion job |
 | `callback_by_task: false` | **`dag`** | Disables per-task failure GChat callbacks; fires a single DAG-level callback instead (useful for high-task-count DAGs). Default: `true`. |
 | `has_hive_sync: true` | `workflow` | Enables Hive metastore sync so tables are queryable from Trino. Default: `true`. |
-| `vacuum_lite: true` | `workflow` (`query_delta`) | Uses lightweight vacuum (DBR 16.1+); faster but less thorough than full vacuum |
+| `vacuum_lite: false` | `workflow` (`query_delta`) | Opts out of the default log-based vacuum and forces a full storage-listing `VACUUM`. Default: `true`; when the runtime cannot run LITE (DBR < 16.1) or Delta raises `DELTA_CANNOT_VACUUM_LITE`, the job logs a warning and retries that table as full `VACUUM`. |
 
 **`callback_by_task` example** — must be under `dag:`, not `workflow:`:
 ```yaml
