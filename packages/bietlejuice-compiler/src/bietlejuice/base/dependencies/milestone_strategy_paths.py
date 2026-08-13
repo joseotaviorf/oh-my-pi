@@ -66,19 +66,6 @@ def is_milestone_delta_dag(dag_folder: str) -> bool:
     return workflow.get("type") == "milestone_delta"
 
 
-def is_milestone_strategy_sql(file_path: str) -> bool:
-    """True only for strategy extractors under a milestone_delta DAG."""
-    dag_folder = dag_folder_from_milestone_strategy_path(file_path)
-    if not dag_folder:
-        return False
-    return is_milestone_delta_dag(dag_folder)
-
-
-def is_milestone_strategy_layout(file_path: str) -> bool:
-    """True when path matches strategy layout (workflow type not checked)."""
-    return dag_folder_from_milestone_strategy_path(file_path) is not None
-
-
 def is_milestone_strategy_dir(dir_path: str) -> bool:
     """True when ``dir_path`` is ``.../queries/<layer>/<table>/milestones``.
 
@@ -88,7 +75,7 @@ def is_milestone_strategy_dir(dir_path: str) -> bool:
     normalized = dir_path.replace("\\", "/").rstrip("/")
     if not normalized.endswith("/milestones"):
         return False
-    return is_milestone_strategy_layout(f"{normalized}/_probe.sql")
+    return dag_folder_from_milestone_strategy_path(f"{normalized}/_probe.sql") is not None
 
 
 def clear_milestone_delta_dag_cache() -> None:

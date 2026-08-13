@@ -19,7 +19,7 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
 from bietlejuice.base.dependencies.milestone_strategy_paths import (
-    is_milestone_strategy_layout,
+    dag_folder_from_milestone_strategy_path,
 )
 from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -85,7 +85,7 @@ class CrossDAGDependenciesValidator:
 
         # Reserved strategy layout — never register basenames as standalone tables
         # (workflow-gated attribution lives in FileDependencyGenerator).
-        if is_milestone_strategy_layout(file_path):
+        if dag_folder_from_milestone_strategy_path(file_path):
             return None, None
 
         # DAG package path example: */bi-etl-ejuice/dags/{dag_context}/{dag_name}/queries/{query_layer}/{table_name}.sql

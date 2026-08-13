@@ -7,9 +7,8 @@ from bietlejuice.base.dependencies.file_dependency_generator import (
 )
 from bietlejuice.base.dependencies.milestone_strategy_paths import (
     clear_milestone_delta_dag_cache,
+    dag_folder_from_milestone_strategy_path,
     is_milestone_strategy_dir,
-    is_milestone_strategy_layout,
-    is_milestone_strategy_sql,
 )
 
 
@@ -50,43 +49,31 @@ def test_milestones_folder_ignored_when_dag_not_milestone_delta(monkeypatch):
     assert gen._dag_name_from_query_path("/fake/dags/agents/" + relative) is None
 
 
-def test_other_nested_folder_not_treated_as_milestone_strategy(monkeypatch):
+def test_other_nested_folder_not_treated_as_milestone_strategy():
     """Future nested layouts (e.g. strategies/) must not hit the milestones gate."""
     clear_milestone_delta_dag_cache()
     path = (
         "/repo/dags/agents/some_query_dag/queries/dw/dim_foo/strategies/extra.sql"
     )
-    assert is_milestone_strategy_layout(path) is False
-    assert is_milestone_strategy_sql(path) is False
+    assert dag_folder_from_milestone_strategy_path(path) is None
 
 
-def test_is_milestone_strategy_sql_requires_workflow_type(monkeypatch):
+def test_dag_folder_from_strategy_path():
     clear_milestone_delta_dag_cache()
     path = (
         "/repo/dags/agents/dw_agent_performance/queries/dw/"
         "dim_agent_milestone/milestones/visit_events.sql"
     )
-    monkeypatch.setattr(
-        "bietlejuice.base.dependencies.milestone_strategy_paths.is_milestone_delta_dag",
-        lambda dag: dag == "dw_agent_performance",
-    )
-    assert is_milestone_strategy_sql(path) is True
-
-    monkeypatch.setattr(
-        "bietlejuice.base.dependencies.milestone_strategy_paths.is_milestone_delta_dag",
-        lambda dag: False,
-    )
-    assert is_milestone_strategy_sql(path) is False
-    # Layout still matches — validate/manifests reserve the folder name.
-    assert is_milestone_strategy_layout(path) is True
+    assert dag_folder_from_milestone_strategy_path(path) == "dw_agent_performance"
 
 
 def test_is_milestone_strategy_dir_is_layout_only():
     clear_milestone_delta_dag_cache()
-    dir_path = (
-        "/repo/dags/agents/any_dag/queries/dw/some_table/milestones"
-    )
+    dir_path = "/repo/dags/agents/any_dag/queries/dw/some_table/milestones"
     assert is_milestone_strategy_dir(dir_path) is True
-    assert is_milestone_strategy_dir(
-        "/repo/dags/agents/any_dag/queries/dw/some_table/strategies"
-    ) is False
+    assert (
+        is_milestone_strategy_dir(
+            "/repo/dags/agents/any_dag/queries/dw/some_table/strategies"
+        )
+        is False
+    )
