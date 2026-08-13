@@ -3,6 +3,7 @@
 -- Customers already dispatched by the legacy reverse_tracksale DAG for this campaign within
 -- the last 24h (reference cohort day and the day before) keep is_dispatched = TRUE so the
 -- migration DAGs do not send them again while both pipelines can still run.
+-- ts_dispatched is null on load; reverse_tracksale_access sets it to current_timestamp() on POST.
 WITH brazil_regions AS (
     SELECT
         sk_region
@@ -68,6 +69,7 @@ SELECT DISTINCT
         WHEN pd.customer_email IS NOT NULL THEN TRUE
         ELSE FALSE
     END AS is_dispatched,
+    CAST(NULL AS TIMESTAMP) AS ts_dispatched,
     c.dt_cohort,
     YEAR(c.dt_cohort) AS year,
     MONTH(c.dt_cohort) AS month,

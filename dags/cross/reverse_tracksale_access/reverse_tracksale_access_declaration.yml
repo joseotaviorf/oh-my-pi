@@ -4,20 +4,42 @@ dag:
   owner: Data Engineering
   documentation:
     dag_purpose: |
-      This dag sends the Tracksale seller CCV hub cohort (campaign 297 /
-      true_seller_ccv_hub) loaded by reverse_tracksale_test to the Tracksale API.
-      During the migration validation phase it reads reverse_tracksale_test (custom
-      schema tracksale_test). Per-campaign settings are resolved from the environment
-      conf file (forno uses the test campaign 242; prod uses campaign 297). After
-      cutover, point the database arg at reverse_tracksale and expand tables as other
-      cohorts are migrated.
+      Sends the Tracksale seller CCV hub table (campaign 297 / true_seller_ccv_hub)
+      loaded by reverse_tracksale_test to the Tracksale API via load_targets_into_tracksale.
+
+      Source during migration validation: reverse_tracksale_test (custom schema
+      tracksale_test). Campaign settings come from the environment conf (forno uses test
+      campaign 242; prod uses campaign 297). After cutover, point the database arg at
+      reverse_tracksale and expand tables as other campaigns are migrated.
+
+      Dispatch rules (reference_date = reverse table partition day; execution_date =
+      CURRENT_DATE when the Spark job runs):
+
+      1. Future date — if reference_date > execution_date, do not schedule or POST.
+         Emit a warning that the date is later than the maximum available data date.
+      2. Same-day or backfill — if reference_date <= execution_date, select rows with
+         is_dispatched = FALSE on that partition, then apply same-campaign 24h dedup per
+         customer:
+         - Primary: skip when ts_dispatched is within the last 24 hours on any partition of
+           this campaign table (covers reprocessing different reference_dates on the same day).
+         - Legacy fallback while reverse_tracksale still runs: also skip emails marked
+           is_dispatched = TRUE on datalake_tracksale_reverse for execution_date / yesterday.
+         - Skipped customers stay is_dispatched = FALSE on the reference partition (retry later)
+           and are logged as warnings on backfills.
+         - Customers not in the 24h window are POSTed normally.
+      3. After a successful POST, set is_dispatched = TRUE and ts_dispatched =
+         current_timestamp() on the reference_date partition (ts_dispatched is null on load).
+      4. Schedule window — backfills (reference_date < execution_date) resolve schedule_time
+         from the execution day so Tracksale never receives a past window; same-day runs use
+         reference_date. After the campaign trigger hour UTC, schedule moves to the next day.
 workflow:
   layer: reverse
   type: access
   load_spark_job: load_targets_into_tracksale
-  # The reference date is the cohort day the reverse table was partitioned by. This dag is
+  # The reference date is the partition day (year/month/day) on the reverse table. This dag is
   # dataset-triggered by reverse_tracksale_test, so it inherits that dag's data_interval_start
-  # (D-1, itself inherited from the daily DW dags); adding one day lands on the cohort day.
+  # (D-1, itself inherited from the daily DW dags); adding one day aligns with the load DAG
+  # date params used while migrating campaigns from the legacy reverse_tracksale flow.
   spark_job_arguments:
   - "{dag_name}"
   - "reverse_tracksale_test"
