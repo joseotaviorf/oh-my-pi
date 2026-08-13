@@ -192,14 +192,21 @@ class FileDependencyGenerator(DependencyGenerator):
         """Resolve DAG id for a query or milestone strategy file path."""
         relative = self._get_path_without_base_or_owner(path)
         milestone_match = re.search(
-            r"^([^/]+)/queries/[^/]+/[^/]+/milestones/[^/]+\.sql\.tpl$",
+            r"^([^/]+)/queries/[^/]+/[^/]+/milestones/[^/]+\.sql$",
             relative,
         )
         if milestone_match:
-            # After stripping domain: <dag>/queries/<layer>/<table>/milestones/<file>.sql.tpl
+            # After stripping domain: <dag>/queries/<layer>/<table>/milestones/<file>.sql
             return f"bietlejuice.{milestone_match.group(1)}"
 
-        # Flat / legacy query paths (*.sql)
+        # Flat / legacy query paths (*.sql) — skip nested milestones (handled above)
+        if "/milestones/" in relative.replace("\\", "/"):
+            logger.warning(
+                "m=_dag_name_from_query_path, path=%s, msg=skip non-standard milestones path",
+                path,
+            )
+            return None
+
         try:
             _, _, _, dag, _, _ = FileService.get_table_info_from_path(relative)
             return dag
@@ -211,20 +218,8 @@ class FileDependencyGenerator(DependencyGenerator):
             return None
 
     def _get_query_files(self) -> List[str]:
-        sql_files = DAGPackagesPathService.list_artifact_file_paths("query", "**", "*")
-        from glob import glob as _glob
-        from dags import DAG_PACKAGES_ROOT
-
-        milestone_glob = f"{DAG_PACKAGES_ROOT}/**/queries/**/milestones/*.sql.tpl"
-        milestone_files = _glob(milestone_glob, recursive=True)
-        # Dedupe while preserving order
-        seen = set()
-        combined = []
-        for path in list(sql_files) + list(milestone_files):
-            if path not in seen:
-                seen.add(path)
-                combined.append(path)
-        return combined
+        # Includes flat queries and nested milestones/*.sql (same .sql extension).
+        return DAGPackagesPathService.list_artifact_file_paths("query", "**", "*")
 
     def treat_exceptions(self, dependencies: dict) -> dict:
         """

@@ -12,7 +12,7 @@ def test_dag_name_from_milestone_strategy_path(tmp_path, monkeypatch):
     # Simulate path under dags/ after stripping DAG_PACKAGES_ROOT + domain.
     relative = (
         "dw_agent_performance/queries/dw/dim_agent_milestone/"
-        "milestones/visit_events.sql.tpl"
+        "milestones/visit_events.sql"
     )
     monkeypatch.setattr(
         gen,

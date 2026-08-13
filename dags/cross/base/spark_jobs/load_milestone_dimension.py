@@ -5,7 +5,7 @@ Platform entrypoint for ``workflow.type: milestone_delta`` (and callable via
 
 Grain keys are consumer-chosen via ``--merge-on`` (must include
 ``milestone_type``). Domain sticky carries via ``--sticky-columns`` or metadata
-``milestones.sticky_columns``. All ``queries/<layer>/<table>/milestones/*.sql.tpl``
+``milestones.sticky_columns``. All ``queries/<layer>/<table>/milestones/*.sql``
 strategies MERGE into the **same** target Delta table.
 """
 

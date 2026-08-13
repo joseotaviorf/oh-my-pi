@@ -79,6 +79,12 @@ class CrossDAGDependenciesValidator:
         :rtype: str, str
         """
         table_name = None
+        normalized = file_path.replace("\\", "/")
+
+        # Milestone strategy extractors: queries/<layer>/<table>/milestones/*.sql
+        # Belong to the parent table; never register as standalone query tables.
+        if "/milestones/" in normalized and normalized.endswith(".sql"):
+            return None, None
 
         # DAG package path example: */bi-etl-ejuice/dags/{dag_context}/{dag_name}/queries/{query_layer}/{table_name}.sql
         if re.match(r"(.*)/dags/(.*)/(.*)/queries/(.*)/(.*)\.sql", file_path):
@@ -120,6 +126,9 @@ class CrossDAGDependenciesValidator:
             dag_name, table_name = self.extract_dag_and_table_from_file(
                 file_path=file_path
             )
+            # Milestone strategies (or other intentional skips) return (None, None).
+            if dag_name is None and table_name is None:
+                continue
             if not table_name:
                 if self._is_migration_dag(dag_name):
                     continue

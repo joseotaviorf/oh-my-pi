@@ -184,7 +184,7 @@ milestones:
   types:
     first_vb:
       milestone_type: first_vb
-      sql_file: visit_events.sql.tpl
+      sql_file: visit_events.sql
       scan:
         ts_column: vs.ts_schedule_confirmed
         lookback_days: 2
@@ -192,7 +192,7 @@ milestones:
     registry, sticky = load_milestones_from_metadata_yaml(yaml_text)
     assert sticky == ("id_agent",)
     assert "first_vb" in registry
-    assert registry["first_vb"]["sql_file"] == "visit_events.sql.tpl"
+    assert registry["first_vb"]["sql_file"] == "visit_events.sql"
 
 
 def test_resolve_milestones_bootstrap_flag():
@@ -201,12 +201,12 @@ def test_resolve_milestones_bootstrap_flag():
             "types": {
                 "a": {
                     "milestone_type": "a",
-                    "sql_file": "a.sql.tpl",
+                    "sql_file": "a.sql",
                     "scan": {"ts_column": "t.ts", "lookback_days": 1},
                 },
                 "b": {
                     "milestone_type": "b",
-                    "sql_file": "b.sql.tpl",
+                    "sql_file": "b.sql",
                     "scan": {"ts_column": "t.ts", "lookback_days": 1},
                 },
             }
