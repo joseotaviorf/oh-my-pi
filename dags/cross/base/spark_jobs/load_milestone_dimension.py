@@ -130,7 +130,9 @@ def _load_metadata_content(
         if path.is_file():
             return path.read_text(encoding="utf-8")
 
-    # EMR / packaged runs: metadata lives under the DAG packages S3 prefix.
+    # EMR / packaged runs: same layout as queries — uploaded by
+    # upload_dag_packages_artifact_into_s3.py with artifact=metadata →
+    # github-repos/bi-etl-ejuice/metadata/{dag_name}/{layer}/{table}.yml
     engine = "boto3" if RuntimeDetector.is_emr() else "databricks_volume"
     relative = path_join("metadata", dag_name, layer, f"{table_name}.yml")
     content = DAGPackagesPathService._read_dag_package_file_from_s3(
@@ -142,7 +144,9 @@ def _load_metadata_content(
 
     raise FileNotFoundError(
         f"m=_load_metadata_content, dag={dag_name}, layer={layer}, "
-        f"table={table_name}, msg=metadata YAML not found"
+        f"table={table_name}, relative={relative}, "
+        "msg=metadata YAML not found (ensure DAG-package metadata artifact "
+        "is uploaded; make upload-local-metadata / release upload-dag-packages-metadata)"
     )
 
 

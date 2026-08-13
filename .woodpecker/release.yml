@@ -510,6 +510,24 @@ steps:
         on_empty: false
     depends_on: [setup]
 
+  # DAG-package metadata (YAML under dags/**/metadata) for Spark jobs that read
+  # registry/config from EMR/Databricks (e.g. milestone_delta). Distinct from
+  # Atlas/data-documentation metadata propagation below.
+  upload-dag-packages-metadata-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks metadata
+    when:
+      event: push
+      branch: [master, hotfix/*]
+      path: &dag_artifact_metadata_path
+        include:
+          - "dags/**/metadata/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py"
+        on_empty: false
+    depends_on: [setup]
+
   load-metadata-files-to-s3-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
@@ -817,6 +835,17 @@ steps:
       event: push
       branch: forno
       path: *dag_artifact_schemas_path
+    depends_on: [setup]
+
+  upload-dag-packages-metadata-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br metadata
+    when:
+      event: push
+      branch: forno
+      path: *dag_artifact_metadata_path
     depends_on: [setup]
 
   load-metadata-files-to-s3-forno:

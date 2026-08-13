@@ -80,6 +80,52 @@ def test_aggregate_events_generic_entity_key(spark, house_spec):
     assert out[0].sk_entity_last == 200
 
 
+def test_aggregate_events_without_optional_entity_cols(spark, house_spec):
+    schema = StructType(
+        [
+            StructField("id_house", LongType(), False),
+            StructField("ts_event", TimestampType(), False),
+        ]
+    )
+    events = spark.createDataFrame([(7, _ts(2024, 1, 1))], schema)
+    out = aggregate_events(events, house_spec).collect()
+    assert len(out) == 1
+    assert out[0].sk_entity_first is None
+    assert out[0].sk_entity_last is None
+    assert out[0].entity_type is None
+
+
+def test_union_batches_with_and_without_entity_cols(spark, house_spec):
+    with_entity = aggregate_events(
+        spark.createDataFrame(
+            [(7, _ts(2024, 1, 1), 100, "offer")],
+            StructType(
+                [
+                    StructField("id_house", LongType(), False),
+                    StructField("ts_event", TimestampType(), False),
+                    StructField("sk_entity", LongType(), True),
+                    StructField("entity_type", StringType(), True),
+                ]
+            ),
+        ),
+        house_spec,
+    ).withColumn("milestone_type", F.lit("a"))
+    without_entity = aggregate_events(
+        spark.createDataFrame(
+            [(8, _ts(2024, 2, 1))],
+            StructType(
+                [
+                    StructField("id_house", LongType(), False),
+                    StructField("ts_event", TimestampType(), False),
+                ]
+            ),
+        ),
+        house_spec,
+    ).withColumn("milestone_type", F.lit("b"))
+    combined = with_entity.unionByName(without_entity, allowMissingColumns=True)
+    assert combined.count() == 2
+
+
 def test_aggregate_and_merge_agents_shaped(spark, agents_spec):
     event_schema = StructType(
         [

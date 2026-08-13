@@ -428,6 +428,12 @@ upload-local-schemas:
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/upload_dag_packages_artifact_into_s3.py \
 		databricks.s3.forno.data.quintoandar.com.br schemas
 
+.PHONY: upload-local-metadata
+## Upload dags/**/metadata/** into Forno DAG-packages S3 (needed by milestone_delta on EMR).
+upload-local-metadata:
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/upload_dag_packages_artifact_into_s3.py \
+		databricks.s3.forno.data.quintoandar.com.br metadata
+
 .PHONY: upload-local-init-scripts
 upload-local-init-scripts:
 	@aws s3 cp $(COMPILER_SCRIPTS)/init_script.sh \
@@ -460,6 +466,7 @@ upload-local-init-scripts:
 upload-forno-release:
 	@make upload-local-package
 	@make upload-local-queries
+	@make upload-local-metadata
 	@make upload-local-data-quality
 	@make upload-local-schemas
 	@make upload-local-qube-jobs

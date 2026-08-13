@@ -64,3 +64,19 @@ def test_milestone_delta_requires_entity_key():
 
 def test_workflow_enum_includes_milestone_delta():
     assert "milestone_delta" in WorkflowEnum.get_available_enum_values()
+
+
+def test_milestone_delta_skips_add_default_row_for_dim_tables():
+    from unittest.mock import MagicMock
+
+    from bietlejuice.base.airflow.dag_builders.main_builder.workflows.milestone_delta_workflow import (
+        MilestoneDeltaWorkflow,
+    )
+    from bietlejuice.base.pipeline.layer_enum import LayerEnum
+
+    workflow = MilestoneDeltaWorkflow.__new__(MilestoneDeltaWorkflow)
+    table = MagicMock()
+    table.layer = LayerEnum.DW
+    table.table_name = "dim_agent_milestone"
+    table.extraction_type = "full"
+    assert workflow._check_include_add_default_row_task(table) is False

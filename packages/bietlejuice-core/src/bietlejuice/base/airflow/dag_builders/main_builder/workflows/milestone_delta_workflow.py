@@ -19,6 +19,11 @@ class MilestoneDeltaWorkflow(DwQueryDeltaWorkflow):
     event extractors for that single table — never separate Airflow tables.
     """
 
+    def _check_include_add_default_row_task(self, table: TableAttributes) -> bool:
+        # Composite grain (entity keys + milestone_type) cannot use the DW
+        # default-row helper that MERGEs sk=-1 on the first column only.
+        return False
+
     def _get_tables(self) -> List[TableAttributes]:
         custom = self.workflow_args.get("tables_customization") or {}
         tables: List[TableAttributes] = []

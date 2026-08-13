@@ -232,5 +232,7 @@ def run_all_milestones(
 
     combined = batches[0]
     for extra in batches[1:]:
-        combined = combined.unionByName(extra)
+        # Strategies may omit optional entity columns; aggregate_events pads
+        # them, but allowMissingColumns keeps unions resilient to schema drift.
+        combined = combined.unionByName(extra, allowMissingColumns=True)
     return combined, bootstrap_types

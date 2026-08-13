@@ -49,6 +49,8 @@ def aggregate_events(events: DataFrame, spec: MilestoneTableSpec) -> DataFrame:
             F.col("last_row.ts_event").alias("ts_last"),
         ]
     )
+    # Always emit optional entity pointer columns so batches from strategies
+    # with/without sk_entity / entity_type share one schema for unionByName.
     if "sk_entity" in events.columns:
         select_cols.extend(
             [
@@ -56,8 +58,17 @@ def aggregate_events(events: DataFrame, spec: MilestoneTableSpec) -> DataFrame:
                 F.col("last_row.sk_entity").alias("sk_entity_last"),
             ]
         )
+    else:
+        select_cols.extend(
+            [
+                F.lit(None).cast("long").alias("sk_entity_first"),
+                F.lit(None).cast("long").alias("sk_entity_last"),
+            ]
+        )
     if "entity_type" in events.columns:
         select_cols.append(F.col("first_row.entity_type").alias("entity_type"))
+    else:
+        select_cols.append(F.lit(None).cast("string").alias("entity_type"))
 
     return (
         events.groupBy(*spec.entity_keys).agg(first_row, last_row).select(*select_cols)
