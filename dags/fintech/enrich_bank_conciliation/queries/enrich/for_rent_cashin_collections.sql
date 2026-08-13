@@ -378,23 +378,31 @@ df AS (
     SELECT DISTINCT
         f.id_bank AS bank_number,
         cs.our_number AS id_our_number,
-        COALESCE(sbs.id_invoice, tf.id_invoice, s.id_finance_entity) AS id_invoice,
+        COALESCE(
+            COALESCE(sbs_num.id_invoice, sbs_inv.id_invoice),
+            tf.id_invoice,
+            COALESCE(s_num.id_finance_entity, s_inv.id_finance_entity)
+        ) AS id_invoice,
         vc.id_pix_payment,
-        s.hash,
+        COALESCE(s_num.hash, s_inv.hash) AS hash,
         f.bank_account AS bank_account_number,
-        s.account_number AS sap_account_number,
+        COALESCE(s_num.account_number, s_inv.account_number) AS sap_account_number,
         vc.payment_method,
         vc.payment_status,
         f.amount AS bank_amount,
-        COALESCE(sbs.amount, tf.amount) AS billing_amount,
+        COALESCE(COALESCE(sbs_num.amount, sbs_inv.amount), tf.amount) AS billing_amount,
         vc.amount AS checkout_amount,
-        s.amount AS sap_amount,
+        COALESCE(s_num.amount, s_inv.amount) AS sap_amount,
         IF(f.our_number IS NULL, 'not recorded', 'ok') AS status_bank,
         CASE
-            WHEN f.amount = COALESCE(tf.amount, sbs.amount) AND f.dt_paid = DATE(COALESCE(sbs.dt_paid, tf.dt_paid)) THEN 'ok'
-            WHEN f.amount != COALESCE(tf.amount, sbs.amount) AND f.dt_paid != DATE(COALESCE(sbs.dt_paid, tf.dt_paid)) THEN 'recorded on the wrong date and value'
-            WHEN f.amount != COALESCE(tf.amount, sbs.amount) AND f.dt_paid = DATE(COALESCE(sbs.dt_paid, tf.dt_paid)) THEN 'recorded on the wrong value'
-            WHEN f.amount = COALESCE(tf.amount, sbs.amount) AND f.dt_paid != DATE(COALESCE(sbs.dt_paid, tf.dt_paid)) THEN 'recorded on the wrong date'
+            WHEN f.amount = COALESCE(tf.amount, COALESCE(sbs_num.amount, sbs_inv.amount))
+                AND f.dt_paid = DATE(COALESCE(COALESCE(sbs_num.dt_paid, sbs_inv.dt_paid), tf.dt_paid)) THEN 'ok'
+            WHEN f.amount != COALESCE(tf.amount, COALESCE(sbs_num.amount, sbs_inv.amount))
+                AND f.dt_paid != DATE(COALESCE(COALESCE(sbs_num.dt_paid, sbs_inv.dt_paid), tf.dt_paid)) THEN 'recorded on the wrong date and value'
+            WHEN f.amount != COALESCE(tf.amount, COALESCE(sbs_num.amount, sbs_inv.amount))
+                AND f.dt_paid = DATE(COALESCE(COALESCE(sbs_num.dt_paid, sbs_inv.dt_paid), tf.dt_paid)) THEN 'recorded on the wrong value'
+            WHEN f.amount = COALESCE(tf.amount, COALESCE(sbs_num.amount, sbs_inv.amount))
+                AND f.dt_paid != DATE(COALESCE(COALESCE(sbs_num.dt_paid, sbs_inv.dt_paid), tf.dt_paid)) THEN 'recorded on the wrong date'
             WHEN vc.our_number IS NULL THEN 'not recorded'
             ELSE 'not ok'
         END AS status_billing,
@@ -407,22 +415,26 @@ df AS (
             ELSE 'not ok'
         END AS status_checkout,
         CASE
-            WHEN f.amount = s.amount AND f.dt_paid = DATE(s.dt_paid) THEN 'ok'
-            WHEN f.amount != s.amount AND f.dt_paid != DATE(s.dt_paid) THEN 'recorded on the wrong date and value'
-            WHEN f.amount != s.amount AND f.dt_paid = DATE(s.dt_paid) THEN 'recorded on the wrong value'
-            WHEN f.amount = s.amount AND f.dt_paid != DATE(s.dt_paid) THEN 'recorded on the wrong date'
-            WHEN s.our_number IS NULL THEN 'not recorded'
+            WHEN f.amount = COALESCE(s_num.amount, s_inv.amount)
+                AND f.dt_paid = DATE(COALESCE(s_num.dt_paid, s_inv.dt_paid)) THEN 'ok'
+            WHEN f.amount != COALESCE(s_num.amount, s_inv.amount)
+                AND f.dt_paid != DATE(COALESCE(s_num.dt_paid, s_inv.dt_paid)) THEN 'recorded on the wrong date and value'
+            WHEN f.amount != COALESCE(s_num.amount, s_inv.amount)
+                AND f.dt_paid = DATE(COALESCE(s_num.dt_paid, s_inv.dt_paid)) THEN 'recorded on the wrong value'
+            WHEN f.amount = COALESCE(s_num.amount, s_inv.amount)
+                AND f.dt_paid != DATE(COALESCE(s_num.dt_paid, s_inv.dt_paid)) THEN 'recorded on the wrong date'
+            WHEN COALESCE(s_num.our_number, s_inv.our_number) IS NULL THEN 'not recorded'
             ELSE 'not ok'
         END AS status_sap,
         f.dt_paid AS dt_bank_paid,
-        COALESCE(sbs.dt_paid, tf.dt_paid) AS dt_billing_paid,
+        COALESCE(COALESCE(sbs_num.dt_paid, sbs_inv.dt_paid), tf.dt_paid) AS dt_billing_paid,
         vc.dt_paid AS dt_checkout_paid,
-        s.dt_paid AS dt_sap_paid
+        COALESCE(s_num.dt_paid, s_inv.dt_paid) AS dt_sap_paid
     FROM
         df_all cs
     LEFT JOIN
         francesinha f
-            on f.our_number = cs.our_number
+            ON f.our_number = cs.our_number
     LEFT JOIN
         checkout_union vc
             ON vc.our_number = cs.our_number
@@ -430,19 +442,28 @@ df AS (
         trato_feito tf
             ON tf.our_number = cs.our_number
     LEFT JOIN
-        seu_barriga_sap sbs
-            ON ((sbs.company_use = cs.our_number) AND (sbs.month_paid = cs.month_paid)) OR (sbs.id_invoice = tf.id_invoice)
+        seu_barriga_sap sbs_num
+            ON sbs_num.company_use = cs.our_number
+           AND sbs_num.month_paid = cs.month_paid
     LEFT JOIN
-        sap s
-            ON (cs.our_number = s.our_number) OR (tf.id_invoice = s.id_finance_entity) 
+        seu_barriga_sap sbs_inv
+            ON sbs_inv.id_invoice = tf.id_invoice
+           AND sbs_num.id_invoice IS NULL
+    LEFT JOIN
+        sap s_num
+            ON cs.our_number = s_num.our_number
+    LEFT JOIN
+        sap s_inv
+            ON tf.id_invoice = s_inv.id_finance_entity
+           AND s_num.id_finance_entity IS NULL
     WHERE
         cs.our_number IS NOT NULL
     AND
         (
             DATE(f.dt_paid) >= '2024-01-01' OR
             DATE(vc.dt_paid) >= '2024-01-01' OR
-            DATE(s.dt_paid) >= '2024-01-01' OR
-            DATE(sbs.dt_paid) >= '2024-01-01' OR
+            DATE(COALESCE(s_num.dt_paid, s_inv.dt_paid)) >= '2024-01-01' OR
+            DATE(COALESCE(sbs_num.dt_paid, sbs_inv.dt_paid)) >= '2024-01-01' OR
             DATE(tf.dt_paid) >= '2024-01-01'
     )
 )
