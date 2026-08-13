@@ -326,7 +326,7 @@ add_recovery_and_lagging AS (
             WHEN LEAST(dt_reference, dt_ended_official) > dt_due_deal AND invoice_life_status_timeline <> 'original-life' THEN TRUE
             ELSE FALSE
         END AS flag_delay_t1,
-        DATEDIFF(DAY, dt_due, LEAST(dt_reference, dt_ended_official)) AS delay_t2,
+        DATEDIFF(LEAST(dt_reference, dt_ended_official), dt_due) AS delay_t2,
         dt_reference,
         id_invoice,
         id_contract,
