@@ -80,5 +80,6 @@ workflow:
     share_rule_aud: {}
     tier: {}
     tier_aud: {}
+    tier_earning_configuration: {}
     unresolved_earnings: {}
     user_revision_entity: {}
