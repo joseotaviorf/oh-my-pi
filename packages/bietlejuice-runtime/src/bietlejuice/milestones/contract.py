@@ -16,7 +16,6 @@ from pyspark.sql import functions as F
 
 MILESTONE_TYPE_COLUMN = "milestone_type"
 TS_EVENT_COLUMN = "ts_event"
-OPTIONAL_ENTITY_COLUMNS = ("sk_entity", "entity_type")
 
 
 @dataclass(frozen=True)
@@ -71,8 +70,6 @@ class MilestoneRunContext:
     """Runtime context passed into each milestone strategy."""
 
     milestone_type: str
-    bootstrap: bool
-    existing: DataFrame
     scan_predicate: str
 
 

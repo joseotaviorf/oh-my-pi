@@ -53,10 +53,6 @@ def empty_dim_df(spark_session: SparkSession, spec: MilestoneTableSpec) -> DataF
     return spark_session.createDataFrame([], dim_schema(spec))
 
 
-def _table_exists(spark_session: SparkSession, full_table: str) -> bool:
-    return spark_session.catalog.tableExists(full_table)
-
-
 def read_existing_milestone(
     spark_session: SparkSession,
     full_table: str,
@@ -69,7 +65,7 @@ def read_existing_milestone(
     watermark logic never runs ``agg`` against a missing table plan.
     """
     try:
-        if not _table_exists(spark_session, full_table):
+        if not spark_session.catalog.tableExists(full_table):
             logger.info(
                 "m=read_existing_milestone, table=%s, milestone_type=%s, "
                 "msg=table missing; empty existing",
@@ -109,15 +105,9 @@ def run_strategy(
     layer: str = "",
     table_name: str = "",
 ) -> DataFrame:
-    strategy = defn.get("strategy", "sql")
-    if strategy != "sql":
-        raise ValueError(
-            f"m=run_strategy, msg=Unknown strategy={strategy!r}; only sql is supported"
-        )
-    sql_file = defn.get("sql_file") or defn.get("sql_path")
     return run_sql_strategy(
         spark_session,
-        str(sql_file),
+        str(defn["sql_file"]),
         ctx,
         strategies_root,
         dag_name=dag_name,
@@ -157,53 +147,40 @@ def process_milestone(
     strategy_runner: Callable[..., DataFrame] = run_strategy,
     layer: str = "",
     table_name: str = "",
-) -> Optional[DataFrame]:
+) -> DataFrame:
     milestone_type = defn["milestone_type"]
     bootstrap = bool(defn["bootstrap"])
-    try:
-        existing = read_existing_milestone(
-            spark_session, full_table, milestone_type, spec
-        )
-        scan_predicate = build_scan_predicate(
-            existing,
-            bootstrap=bootstrap,
-            scan=defn.get("scan"),
-        )
-        ctx = MilestoneRunContext(
-            milestone_type=milestone_type,
-            bootstrap=bootstrap,
-            existing=existing,
-            scan_predicate=scan_predicate,
-        )
-        events = strategy_runner(
-            spark_session,
-            defn,
-            ctx,
-            strategies_root,
-            dag_name,
-            layer=layer,
-            table_name=table_name,
-        )
-        batch = build_merge_batch(
-            events, existing, milestone_type, spec, bootstrap=bootstrap
-        )
-        logger.info(
-            "m=process_milestone, milestone=%s, milestone_type=%s, "
-            "bootstrap=%s, scan_predicate=%s",
-            name,
-            milestone_type,
-            bootstrap,
-            scan_predicate,
-        )
-        return batch
-    except Exception:
-        logger.exception(
-            "m=process_milestone, milestone=%s, milestone_type=%s, "
-            "msg=skipped after failure",
-            name,
-            milestone_type,
-        )
-        return None
+    existing = read_existing_milestone(spark_session, full_table, milestone_type, spec)
+    scan_predicate = build_scan_predicate(
+        existing,
+        bootstrap=bootstrap,
+        scan=defn.get("scan"),
+    )
+    ctx = MilestoneRunContext(
+        milestone_type=milestone_type,
+        scan_predicate=scan_predicate,
+    )
+    events = strategy_runner(
+        spark_session,
+        defn,
+        ctx,
+        strategies_root,
+        dag_name,
+        layer=layer,
+        table_name=table_name,
+    )
+    batch = build_merge_batch(
+        events, existing, milestone_type, spec, bootstrap=bootstrap
+    )
+    logger.info(
+        "m=process_milestone, milestone=%s, milestone_type=%s, "
+        "bootstrap=%s, scan_predicate=%s",
+        name,
+        milestone_type,
+        bootstrap,
+        scan_predicate,
+    )
+    return batch
 
 
 def run_all_milestones(
@@ -222,7 +199,7 @@ def run_all_milestones(
     """Run selected milestones for one target table; return merge batch + bootstrap types.
 
     All strategy SQLs contribute rows to the **same** ``full_table`` (entity keys ×
-    milestone_type). There is never one physical table per strategy file.
+    milestone_type). Fail-fast: any strategy error aborts the whole load.
     """
     due = resolve_milestones_for_run(
         registry,
@@ -249,15 +226,9 @@ def run_all_milestones(
             layer=layer,
             table_name=table_name,
         )
-        if batch is not None:
-            batches.append(batch)
-            if defn.get("bootstrap"):
-                bootstrap_types.append(defn["milestone_type"])
-
-    if not batches:
-        raise RuntimeError(
-            "m=run_all_milestones, msg=All milestones failed or none selected"
-        )
+        batches.append(batch)
+        if defn.get("bootstrap"):
+            bootstrap_types.append(defn["milestone_type"])
 
     combined = batches[0]
     for extra in batches[1:]:

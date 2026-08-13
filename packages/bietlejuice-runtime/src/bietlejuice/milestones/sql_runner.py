@@ -50,6 +50,12 @@ def _load_sql_text(
     if local.is_file():
         return local.read_text(encoding="utf-8")
 
+    if not (layer and table_name):
+        raise FileNotFoundError(
+            f"m=_load_sql_text, sql_file={sql_file}, strategies_root={strategies_root}, "
+            "msg=strategy SQL not found locally and layer/table_name missing for S3 path"
+        )
+
     from bietlejuice.base.service.dag_packages_path_service import (
         DAGPackagesPathService,
     )
@@ -57,23 +63,17 @@ def _load_sql_text(
 
     basename = Path(sql_file).name
     engine = "boto3" if RuntimeDetector.is_emr() else "databricks_volume"
-
-    # Packaged layout mirrors other query files: queries/{dag}/{layer}/...
-    if layer and table_name:
-        relative = path_join(
-            "queries", dag_name, layer, table_name, "milestones", basename
-        )
-        content = DAGPackagesPathService._read_dag_package_file_from_s3(
-            sql_file_relative_path=relative,
-            engine=engine,
-        )
-        if content:
-            return content
-
-    # Flat upload fallback (basename under spark_jobs/{dag}/).
-    return DAGPackagesPathService.get_config_file_content_in_spark_jobs(
-        dag_name, basename
+    relative = path_join("queries", dag_name, layer, table_name, "milestones", basename)
+    content = DAGPackagesPathService._read_dag_package_file_from_s3(
+        sql_file_relative_path=relative,
+        engine=engine,
     )
+    if not content:
+        raise FileNotFoundError(
+            f"m=_load_sql_text, sql_file={sql_file}, relative={relative}, "
+            "msg=strategy SQL not found locally or in packaged DAG path"
+        )
+    return content
 
 
 def run_sql_strategy(

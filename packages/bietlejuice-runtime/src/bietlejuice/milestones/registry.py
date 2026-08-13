@@ -2,49 +2,37 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
-from bietlejuice.milestones.contract import MilestoneTableSpec
-
-REQUIRED_TYPE_KEYS = ("milestone_type", "scan")
+REQUIRED_TYPE_KEYS = ("milestone_type", "sql_file", "scan")
 REQUIRED_SCAN_KEYS = ("ts_column", "lookback_days")
 
 
-def _normalize_milestones_block(
-    raw: Dict[str, Any],
-) -> Tuple[Tuple[str, ...], Dict[str, Dict[str, Any]]]:
-    """Accept either nested ``types:`` or a flat map of milestone entries.
-
-    Flat map form (legacy-friendly): every non-reserved top-level key is a type.
-    Reserved: ``sticky_columns``, ``types``.
-    """
-    sticky = tuple(str(c) for c in (raw.get("sticky_columns") or ()))
-    if "types" in raw:
-        types = raw["types"]
-        if not isinstance(types, dict):
-            raise ValueError("m=normalize, msg=milestones.types must be a mapping")
-        return sticky, types
-
-    types = {
-        key: value
-        for key, value in raw.items()
-        if key not in {"sticky_columns", "types"} and isinstance(value, dict)
-    }
-    if not types:
-        raise ValueError("m=normalize, msg=milestones has no type entries")
-    return sticky, types
-
-
 def validate_milestones_registry(raw: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-    """Validate milestones block; return types map keyed by entry name."""
+    """Validate milestones block; return types map keyed by entry name.
+
+    Expected shape::
+
+        sticky_columns: [...]
+        types:
+          first_vb:
+            milestone_type: first_vb
+            sql_file: visit_events.sql
+            scan: {ts_column: ..., lookback_days: N}
+            params: {...}   # optional
+    """
     if not isinstance(raw, dict):
         raise ValueError(
             "m=validate_milestones_registry, msg=milestones must be a mapping"
         )
+    types = raw.get("types")
+    if not isinstance(types, dict) or not types:
+        raise ValueError(
+            "m=validate_milestones_registry, msg=milestones.types must be a non-empty mapping"
+        )
 
-    _, types = _normalize_milestones_block(raw)
     validated: Dict[str, Dict[str, Any]] = {}
     for name, defn in types.items():
         if not isinstance(defn, dict):
@@ -70,28 +58,14 @@ def validate_milestones_registry(raw: Dict[str, Any]) -> Dict[str, Dict[str, Any
                 f"m=validate_milestones_registry, milestone={name}, "
                 f"msg=Missing scan keys: {missing_scan}"
             )
-        strategy = defn.get("strategy", "sql")
-        if strategy != "sql":
-            raise ValueError(
-                f"m=validate_milestones_registry, milestone={name}, "
-                f"msg=Invalid strategy={strategy!r}; only sql is supported"
-            )
-        sql_file = defn.get("sql_file") or defn.get("sql_path")
-        if not sql_file:
-            raise ValueError(
-                f"m=validate_milestones_registry, milestone={name}, "
-                "msg=sql_file (or sql_path) is required"
-            )
         entry = dict(defn)
-        entry["strategy"] = "sql"
-        entry["sql_file"] = str(sql_file)
+        entry["sql_file"] = str(defn["sql_file"])
         validated[name] = entry
     return validated
 
 
 def sticky_columns_from_registry(raw: Dict[str, Any]) -> Tuple[str, ...]:
-    sticky, _ = _normalize_milestones_block(raw)
-    return sticky
+    return tuple(str(c) for c in (raw.get("sticky_columns") or ()))
 
 
 def resolve_milestones_for_run(
@@ -149,10 +123,3 @@ def load_milestones_from_metadata_yaml(
             "m=load_milestones_from_metadata_yaml, msg=YAML root must be a mapping"
         )
     return parse_milestones_metadata_document(parsed)
-
-
-def build_table_spec(
-    merge_on: Sequence[str],
-    sticky_columns: Optional[Sequence[str]] = None,
-) -> MilestoneTableSpec:
-    return MilestoneTableSpec.from_merge_on(merge_on, sticky_columns=sticky_columns)

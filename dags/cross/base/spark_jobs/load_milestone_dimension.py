@@ -18,11 +18,9 @@ from typing import List, Optional, Sequence, Tuple
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.milestones.contract import MilestoneTableSpec
 from bietlejuice.milestones.orchestrator import run_all_milestones
-from bietlejuice.milestones.registry import (
-    build_table_spec,
-    load_milestones_from_metadata_yaml,
-)
+from bietlejuice.milestones.registry import load_milestones_from_metadata_yaml
 
 JOB_NAME = "load_milestone_dimension"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -155,7 +153,7 @@ def main(args: Namespace) -> None:
     )
     registry, metadata_sticky = load_milestones_from_metadata_yaml(metadata_content)
     sticky = _resolve_sticky(_parse_json_list(args.sticky_columns), metadata_sticky)
-    spec = build_table_spec(merge_on, sticky_columns=sticky)
+    spec = MilestoneTableSpec.from_merge_on(merge_on, sticky_columns=sticky)
 
     strategies_root = args.strategies_root or _default_strategies_root(
         args.dag_name, args.layer, args.table_name
