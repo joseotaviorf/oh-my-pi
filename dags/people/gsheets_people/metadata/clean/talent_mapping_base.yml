@@ -35,12 +35,12 @@ columns:
     description: Job title or role name of the employee as recorded in the talent
       mapping spreadsheet.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.job
+    - datalake_gsheets_people_raw.talent_mapping_base._job_
   job_classification:
     description: Formal job classification or family that groups similar roles for
       compensation and career ladder purposes.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.job_classification
+    - datalake_gsheets_people_raw.talent_mapping_base._job_classification_
   subdirectorate:
     description: Sub-directorate organizational unit to which the employee belongs.
     lineage:
