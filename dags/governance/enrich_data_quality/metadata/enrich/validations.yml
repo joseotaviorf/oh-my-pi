@@ -1,7 +1,7 @@
 ---
 database_name: datalake_data_quality
 table_name: validations
-description: This table consolidates the data quality validations applied to bietlejuice DAGs. Partitioned by id_dag, year, month, day. Always filter on id_dag, year, month, day in WHERE clauses to enable partition pruning and avoid full table scans.
+description: This table consolidates the data quality validations applied to bietlejuice DAGs. Partitioned by year, month, day and Z-ORDERed by id_dag. Filter on year, month, day in WHERE clauses to prune partitions; filter on id_dag together to leverage data-skipping and avoid full table scans.
 domain: Data Ops & Governance
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -13,7 +13,7 @@ columns:
       - datalake_inmetro_clean.data_validations.table
       - datalake_inmetro_clean.data_validations.validations
   id_dag:
-    description: DAG id, which is also the DAG name on Airflow. Partition key identifying the DAG whose validation results are stored; filter on id_dag together with year, month, and day in WHERE clauses.
+    description: DAG id, which is also the DAG name on Airflow. Z-ORDER (data-skipping) column identifying the DAG whose validation results are stored; filter on id_dag together with year, month, and day in WHERE clauses to leverage data-skipping within the date partitions.
     lineage:
       - datalake_dag_inventory_clean.table.dag
   database:

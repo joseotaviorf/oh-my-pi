@@ -15,10 +15,13 @@ workflow:
   layer: enrich
   default_extraction_type: incremental
   default_partitions:
-    - id_dag
     - year
     - month
     - day
+  tables_customization:
+    validations:
+      partitions: [year, month, day]
+      z_order_by: [id_dag]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
