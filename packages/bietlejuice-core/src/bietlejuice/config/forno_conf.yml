@@ -2003,10 +2003,12 @@ emr_cluster_base: &emr_cluster_anchor
         spark.eventLog.compression.codec: "zstd"
         spark.eventLog.logStageExecutorMetrics: "true"
         spark.eventLog.rolling.enabled: "true"
-        # YARN app staging on S3 (not cluster HDFS) so AM relaunches after lost NM /
-        # node blips still find __spark_conf__.zip / pyspark.zip.
-        # Recommend an S3 lifecycle rule on emr/spark-staging/.
-        spark.yarn.stagingDir: "s3a://{{ var.value.artifacts_bucket | replace('s3://', '') }}/emr/spark-staging/{{ dag.dag_id }}"
+        # YARN app staging stays on cluster HDFS (Spark default: fs.defaultFS).
+        # #26210 moved it to the artifacts bucket so an AM relaunch after a lost NM
+        # could still find __spark_conf__.zip / pyspark.zip, but every submission then
+        # pays S3 requests plus storage for the staging dirs. Reverted for cost.
+        # Trade-off accepted: after node loss an AM relaunch may not find its staged
+        # files and the application fails instead of recovering.
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"
         ARTIFACTS_BUCKET: *artifacts_bucket
