@@ -18,6 +18,9 @@ sys.path.append(BI_ETL_EJUICE_ROOT)
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
+from bietlejuice.base.dependencies.milestone_strategy_paths import (
+    is_milestone_strategy_layout,
+)
 from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.file_service import FileService
@@ -79,11 +82,10 @@ class CrossDAGDependenciesValidator:
         :rtype: str, str
         """
         table_name = None
-        normalized = file_path.replace("\\", "/")
 
-        # Milestone strategy extractors: queries/<layer>/<table>/milestones/*.sql
-        # Belong to the parent table; never register as standalone query tables.
-        if "/milestones/" in normalized and normalized.endswith(".sql"):
+        # Reserved strategy layout — never register basenames as standalone tables
+        # (workflow-gated attribution lives in FileDependencyGenerator).
+        if is_milestone_strategy_layout(file_path):
             return None, None
 
         # DAG package path example: */bi-etl-ejuice/dags/{dag_context}/{dag_name}/queries/{query_layer}/{table_name}.sql

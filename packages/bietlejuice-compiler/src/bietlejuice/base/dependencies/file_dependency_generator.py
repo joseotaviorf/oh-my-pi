@@ -7,6 +7,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.db.metastore_mapping_factory import MetastoreMappingFactory
 from bietlejuice.base.dependencies.dependency_generator import DependencyGenerator
+from bietlejuice.base.dependencies.milestone_strategy_paths import (
+    is_milestone_delta_dag,
+    match_milestone_strategy_relative,
+)
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.formatters.string_formatter import StringFormatter
@@ -191,18 +195,17 @@ class FileDependencyGenerator(DependencyGenerator):
     def _dag_name_from_query_path(self, path: str) -> Optional[str]:
         """Resolve DAG id for a query or milestone strategy file path."""
         relative = self._get_path_without_base_or_owner(path)
-        milestone_match = re.search(
-            r"^([^/]+)/queries/[^/]+/[^/]+/milestones/[^/]+\.sql$",
-            relative,
-        )
+        milestone_match = match_milestone_strategy_relative(relative)
         if milestone_match:
-            # After stripping domain: <dag>/queries/<layer>/<table>/milestones/<file>.sql
-            return f"bietlejuice.{milestone_match.group(1)}"
-
-        # Flat / legacy query paths (*.sql) — skip nested milestones (handled above)
-        if "/milestones/" in relative.replace("\\", "/"):
+            dag_folder = milestone_match.group(1)
+            if is_milestone_delta_dag(dag_folder):
+                # Strategy extractors → attribute upstream tables to parent DAG.
+                return f"bietlejuice.{dag_folder}"
+            # Reserved layout on a non-milestone_delta DAG: do not fall through to
+            # get_table_info_from_path (len=6 paths mis-parse as context.origin).
             logger.warning(
-                "m=_dag_name_from_query_path, path=%s, msg=skip non-standard milestones path",
+                "m=_dag_name_from_query_path, path=%s, "
+                "msg=skip milestones layout on non-milestone_delta dag",
                 path,
             )
             return None
@@ -218,7 +221,7 @@ class FileDependencyGenerator(DependencyGenerator):
             return None
 
     def _get_query_files(self) -> List[str]:
-        # Includes flat queries and nested milestones/*.sql (same .sql extension).
+        # Includes flat queries and nested milestone strategies (same .sql extension).
         return DAGPackagesPathService.list_artifact_file_paths("query", "**", "*")
 
     def treat_exceptions(self, dependencies: dict) -> dict:
