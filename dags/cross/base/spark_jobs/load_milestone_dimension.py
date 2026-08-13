@@ -106,10 +106,7 @@ def _default_strategies_root(dag_name: str, layer: str, table_name: str) -> str:
     if dag_path:
         return str(Path(dag_path) / "queries" / layer / table_name / "milestones")
     # Repo-relative fallback when running unit tests outside Airflow packaging.
-    repo_guess = (
-        Path(__file__).resolve().parents[4]
-        / "dags"
-    )
+    repo_guess = Path(__file__).resolve().parents[4] / "dags"
     # Prefer explicit --strategies-root in tests.
     return str(repo_guess)
 

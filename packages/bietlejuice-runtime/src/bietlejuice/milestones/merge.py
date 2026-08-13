@@ -17,7 +17,11 @@ def aggregate_events(events: DataFrame, spec: MilestoneTableSpec) -> DataFrame:
     Sticky carries and ``entity_type`` come from the first-event row.
     Does not set ``milestone_type`` — caller adds it from the registry entry.
     """
-    first_fields: List = list(spec.sticky_columns) + ["sk_entity", "entity_type", "ts_event"]
+    first_fields: List = list(spec.sticky_columns) + [
+        "sk_entity",
+        "entity_type",
+        "ts_event",
+    ]
     # Only include optional columns that exist on the events frame.
     first_struct_cols = [c for c in first_fields if c in events.columns]
     if "ts_event" not in first_struct_cols:
@@ -55,7 +59,9 @@ def aggregate_events(events: DataFrame, spec: MilestoneTableSpec) -> DataFrame:
     if "entity_type" in events.columns:
         select_cols.append(F.col("first_row.entity_type").alias("entity_type"))
 
-    return events.groupBy(*spec.entity_keys).agg(first_row, last_row).select(*select_cols)
+    return (
+        events.groupBy(*spec.entity_keys).agg(first_row, last_row).select(*select_cols)
+    )
 
 
 def prepare_merge_batch(

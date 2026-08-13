@@ -12,7 +12,9 @@ REQUIRED_TYPE_KEYS = ("milestone_type", "scan")
 REQUIRED_SCAN_KEYS = ("ts_column", "lookback_days")
 
 
-def _normalize_milestones_block(raw: Dict[str, Any]) -> Tuple[Tuple[str, ...], Dict[str, Dict[str, Any]]]:
+def _normalize_milestones_block(
+    raw: Dict[str, Any],
+) -> Tuple[Tuple[str, ...], Dict[str, Dict[str, Any]]]:
     """Accept either nested ``types:`` or a flat map of milestone entries.
 
     Flat map form (legacy-friendly): every non-reserved top-level key is a type.
@@ -38,7 +40,9 @@ def _normalize_milestones_block(raw: Dict[str, Any]) -> Tuple[Tuple[str, ...], D
 def validate_milestones_registry(raw: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     """Validate milestones block; return types map keyed by entry name."""
     if not isinstance(raw, dict):
-        raise ValueError("m=validate_milestones_registry, msg=milestones must be a mapping")
+        raise ValueError(
+            "m=validate_milestones_registry, msg=milestones must be a mapping"
+        )
 
     _, types = _normalize_milestones_block(raw)
     validated: Dict[str, Dict[str, Any]] = {}
@@ -136,10 +140,14 @@ def parse_milestones_metadata_document(
     return validate_milestones_registry(block), sticky
 
 
-def load_milestones_from_metadata_yaml(content: str) -> Tuple[Dict[str, Dict[str, Any]], Tuple[str, ...]]:
+def load_milestones_from_metadata_yaml(
+    content: str,
+) -> Tuple[Dict[str, Dict[str, Any]], Tuple[str, ...]]:
     parsed = yaml.safe_load(content) or {}
     if not isinstance(parsed, dict):
-        raise ValueError("m=load_milestones_from_metadata_yaml, msg=YAML root must be a mapping")
+        raise ValueError(
+            "m=load_milestones_from_metadata_yaml, msg=YAML root must be a mapping"
+        )
     return parse_milestones_metadata_document(parsed)
 
 

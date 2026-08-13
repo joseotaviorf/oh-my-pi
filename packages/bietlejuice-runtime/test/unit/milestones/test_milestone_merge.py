@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import pytest
+from pyspark.sql import functions as F
 from pyspark.sql.types import (
     LongType,
     StringType,
@@ -12,8 +13,6 @@ from pyspark.sql.types import (
     StructType,
     TimestampType,
 )
-
-from pyspark.sql import functions as F
 
 from bietlejuice.milestones.contract import (
     MilestoneTableSpec,
@@ -26,6 +25,7 @@ from bietlejuice.milestones.registry import (
     resolve_milestones_for_run,
     validate_milestones_registry,
 )
+
 
 def _ts(year: int, month: int, day: int, hour: int = 0) -> datetime:
     return datetime(year, month, day, hour, 0, 0)

@@ -55,7 +55,7 @@ class MilestoneTableSpec:
         cls,
         merge_on: Sequence[str],
         sticky_columns: Optional[Sequence[str]] = None,
-    ) -> "MilestoneTableSpec":
+    ) -> MilestoneTableSpec:
         keys = [str(c) for c in merge_on]
         if MILESTONE_TYPE_COLUMN not in keys:
             raise ValueError(
