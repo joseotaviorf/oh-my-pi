@@ -10,8 +10,10 @@ REQUIRED_TYPE_KEYS = ("milestone_type", "sql_file", "scan")
 REQUIRED_SCAN_KEYS = ("ts_column", "lookback_days")
 
 
-def validate_milestones_registry(raw: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-    """Validate milestones block; return types map keyed by entry name.
+def validate_milestones_registry(
+    raw: Dict[str, Any],
+) -> Tuple[Dict[str, Dict[str, Any]], Tuple[str, ...]]:
+    """Validate a ``milestones:`` block; return ``(types, sticky_columns)``.
 
     Expected shape::
 
@@ -61,11 +63,9 @@ def validate_milestones_registry(raw: Dict[str, Any]) -> Dict[str, Dict[str, Any
         entry = dict(defn)
         entry["sql_file"] = str(defn["sql_file"])
         validated[name] = entry
-    return validated
 
-
-def sticky_columns_from_registry(raw: Dict[str, Any]) -> Tuple[str, ...]:
-    return tuple(str(c) for c in (raw.get("sticky_columns") or ()))
+    sticky = tuple(str(c) for c in (raw.get("sticky_columns") or ()))
+    return validated, sticky
 
 
 def resolve_milestones_for_run(
@@ -101,25 +101,18 @@ def resolve_milestones_for_run(
     return resolved
 
 
-def parse_milestones_metadata_document(
-    document: Dict[str, Any],
-) -> Tuple[Dict[str, Dict[str, Any]], Tuple[str, ...]]:
-    """Extract validated types + sticky columns from a metadata YAML document."""
-    block = document.get("milestones")
-    if block is None:
-        raise ValueError(
-            "m=parse_milestones_metadata_document, msg=Missing milestones section"
-        )
-    sticky = sticky_columns_from_registry(block)
-    return validate_milestones_registry(block), sticky
-
-
 def load_milestones_from_metadata_yaml(
     content: str,
 ) -> Tuple[Dict[str, Dict[str, Any]], Tuple[str, ...]]:
+    """Parse table metadata YAML and validate its ``milestones:`` block."""
     parsed = yaml.safe_load(content) or {}
     if not isinstance(parsed, dict):
         raise ValueError(
             "m=load_milestones_from_metadata_yaml, msg=YAML root must be a mapping"
         )
-    return parse_milestones_metadata_document(parsed)
+    block = parsed.get("milestones")
+    if block is None:
+        raise ValueError(
+            "m=load_milestones_from_metadata_yaml, msg=Missing milestones section"
+        )
+    return validate_milestones_registry(block)

@@ -196,7 +196,7 @@ milestones:
 
 
 def test_resolve_milestones_bootstrap_flag():
-    registry = validate_milestones_registry(
+    registry, _sticky = validate_milestones_registry(
         {
             "types": {
                 "a": {
