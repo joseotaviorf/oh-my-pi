@@ -3,6 +3,7 @@ WITH new_earnings_filtered AS (
         ne.id,
         ne.id_earning_source,
         ne.id_revenue_share,
+        ne.id_tier_earning_configuration,
         ne.id_author,
         IF(ne.external_receiver_type = "COMPANY", ne.id_external_receiver, NULL) AS uuid_company,
         IF(ne.external_receiver_type = "AGENT", ne.id_external_receiver, NULL) AS uuid_person,
@@ -81,6 +82,7 @@ SELECT DISTINCT
     ei.id_replaced_by AS id_replacement_earning,
     ne.id_earning_source,
     ne.id_revenue_share,
+    ne.id_tier_earning_configuration,
     es.id_contract,
     es.id_sales_flow,
     IF(

@@ -33,6 +33,10 @@ columns:
     lineage:
       - datalake_big_agent_clean.new_earnings.id_revenue_share
     description: Revenue share identifier linked to the earning calculation.
+  id_tier_earning_configuration:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id_tier_earning_configuration
+    description: Identifier of the tier earning configuration used to calculate this earning, when applicable.
   id_contract:
     lineage:
       - datalake_big_agent_clean.earning_sources.id_external_domain

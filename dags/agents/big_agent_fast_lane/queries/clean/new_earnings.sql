@@ -2,6 +2,7 @@ SELECT
     id,
     earning_source_id AS id_earning_source,
     revenue_share_id AS id_revenue_share,
+    tier_earning_configuration_id AS id_tier_earning_configuration,
     external_receiver_id AS id_external_receiver,
     GET_JSON_OBJECT(author, "$.id") AS id_author,
     earning_uuid AS uuid_earning,
