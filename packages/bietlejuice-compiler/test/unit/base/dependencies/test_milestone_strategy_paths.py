@@ -52,9 +52,7 @@ def test_milestones_folder_ignored_when_dag_not_milestone_delta(monkeypatch):
 def test_other_nested_folder_not_treated_as_milestone_strategy():
     """Future nested layouts (e.g. strategies/) must not hit the milestones gate."""
     clear_milestone_delta_dag_cache()
-    path = (
-        "/repo/dags/agents/some_query_dag/queries/dw/dim_foo/strategies/extra.sql"
-    )
+    path = "/repo/dags/agents/some_query_dag/queries/dw/dim_foo/strategies/extra.sql"
     assert dag_folder_from_milestone_strategy_path(path) is None
 
 

@@ -14,7 +14,7 @@ separate nested-query design when introduced.
 from __future__ import annotations
 
 import re
-from functools import lru_cache
+from functools import cache
 from os.path import isfile, join
 from typing import Match, Optional
 
@@ -49,7 +49,7 @@ def dag_folder_from_milestone_strategy_path(file_path: str) -> Optional[str]:
     return None
 
 
-@lru_cache(maxsize=None)
+@cache
 def is_milestone_delta_dag(dag_folder: str) -> bool:
     """True when ``{dag_folder}_declaration.yml`` has workflow.type milestone_delta."""
     dag_path = DAGPackagesPathService.get_dag_path(dag_folder)
@@ -75,7 +75,9 @@ def is_milestone_strategy_dir(dir_path: str) -> bool:
     normalized = dir_path.replace("\\", "/").rstrip("/")
     if not normalized.endswith("/milestones"):
         return False
-    return dag_folder_from_milestone_strategy_path(f"{normalized}/_probe.sql") is not None
+    return (
+        dag_folder_from_milestone_strategy_path(f"{normalized}/_probe.sql") is not None
+    )
 
 
 def clear_milestone_delta_dag_cache() -> None:
