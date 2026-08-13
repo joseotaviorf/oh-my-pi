@@ -22,6 +22,36 @@ cap_contract_info AS (
             ON ie.sk_invoice_entry = fie.sk_invoice_entry
 ),
 
+contract_dims AS (
+    SELECT DISTINCT
+        c.sk_contract,
+        c.version,
+        c.is_contract_b2b,
+        c.guarantee,
+        c.rental_administrator,
+        c.dt_start,
+        c.dt_annulment,
+        cci.is_rental_paid_in_advance,
+        r.city_name,
+        cl.id_locale
+    FROM
+        dw_rent.dim_contract AS c
+    LEFT JOIN
+        cap_contract_info AS cci
+            ON cci.sk_contract = c.sk_contract
+    LEFT JOIN
+        dw_rent.fact_house_listings AS rf
+            ON rf.sk_contract = c.sk_contract
+    LEFT JOIN
+        dw_public.dim_region AS r
+            ON r.sk_region = rf.sk_region
+    LEFT JOIN
+        locale_ids AS cl
+            ON r.city_name = cl.city
+    WHERE
+        c.sk_contract > 0
+),
+
 cap_pre_formated AS (
     SELECT
       supplier_description,
@@ -192,14 +222,14 @@ SELECT DISTINCT
   CAST(NULL AS BIGINT) AS id_invoice,
   CAST(NULL AS BIGINT) AS sk_invoice_reversed_entry,
   COALESCE(TRY_CAST(cap.supplier_description AS INT),-1) AS sk_contract,
-    COALESCE(SPLIT(REPLACE(version,'.','P'),'P')[0], 'no info') AS version,
+    COALESCE(SPLIT(REPLACE(c.version,'.','P'),'P')[0], 'no info') AS version,
   'cap' as accounting_version,
   c.is_contract_b2b AS is_contract_b2b,
-  r.city_name AS locale,
-  cl.id_locale AS localidade,
+  c.city_name AS locale,
+  c.id_locale AS localidade,
   c.guarantee,
   c.rental_administrator,
-  cci.is_rental_paid_in_advance,
+  c.is_rental_paid_in_advance,
   'cap' AS bill_item,
   CONCAT(cap.payment_reason_classification,' CAP') AS description,
   0 AS has_negotiation,
@@ -233,20 +263,11 @@ SELECT DISTINCT
 FROM
     cap_formated as cap
 LEFT JOIN
-    dw_rent.dim_contract AS c
-        ON c.sk_contract = CAST(try_cast(cap.supplier_description AS REAL) AS INT)
-LEFT JOIN
-    cap_contract_info AS cci
-        ON cci.sk_contract = c.sk_contract
-LEFT JOIN
-    dw_rent.fact_house_listings AS rf
-        ON rf.sk_contract = c.sk_contract
-LEFT JOIN
-    dw_public.dim_region AS r
-        ON r.sk_region = rf.sk_region
-LEFT JOIN
-    locale_ids AS cl
-        ON  r.city_name = cl.city
+    contract_dims AS c
+        ON c.sk_contract = COALESCE(
+               CAST(try_cast(cap.supplier_description AS REAL) AS INT),
+               -2 - PMOD(HASH(cap.supplier_description, cap.dt_paid), 4096)
+           )
 ),
 
 vans_final AS (
@@ -255,14 +276,14 @@ vans_final AS (
     CAST(NULL AS BIGINT) AS id_invoice,
     CAST(NULL AS BIGINT) AS sk_invoice_reversed_entry,
     COALESCE(TRY_CAST(vans.supplier_description AS INT),-1) AS sk_contract,
-    COALESCE(SPLIT(REPLACE(version,'.','P'),'P')[0], 'no info') AS version,
+    COALESCE(SPLIT(REPLACE(c.version,'.','P'),'P')[0], 'no info') AS version,
     'cap' as accounting_version,
     c.is_contract_b2b AS is_contract_b2b,
-    r.city_name AS locale,
-    cl.id_locale AS localidade,
+    c.city_name AS locale,
+    c.id_locale AS localidade,
     c.guarantee,
     c.rental_administrator,
-    cci.is_rental_paid_in_advance,
+    c.is_rental_paid_in_advance,
     'cap' AS bill_item,
     CONCAT(vans.payment_reason_classification,' CAP') AS description,
     0 AS has_negotiation,
@@ -296,20 +317,11 @@ vans_final AS (
   FROM
       vans_formated as vans
   LEFT JOIN
-      dw_rent.dim_contract AS c
-          ON c.sk_contract = CAST(try_cast(vans.supplier_description AS REAL) AS INT)
-  LEFT JOIN
-      cap_contract_info AS cci
-          ON cci.sk_contract = c.sk_contract
-  LEFT JOIN
-      dw_rent.fact_house_listings AS rf
-          ON rf.sk_contract = c.sk_contract
-  LEFT JOIN
-      dw_public.dim_region AS r
-          ON r.sk_region = rf.sk_region
-  LEFT JOIN
-      locale_ids AS cl
-          ON  r.city_name = cl.city
+      contract_dims AS c
+          ON c.sk_contract = COALESCE(
+                 CAST(try_cast(vans.supplier_description AS REAL) AS INT),
+                 -2 - PMOD(HASH(vans.supplier_description, vans.dt_paid), 4096)
+             )
 )
 
 SELECT /*+ REPARTITION(64) */

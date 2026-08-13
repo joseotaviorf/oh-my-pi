@@ -194,10 +194,18 @@ WITH invoice_all AS (
             datalake_accounting_funnel.accounts_payable AS ap
         LEFT JOIN
             invoice_contract_status AS i
-                ON i.sk_contract = ap.sk_contract
+                ON i.sk_contract = CASE
+                        WHEN ap.sk_contract = -1
+                            THEN -2 - PMOD(HASH(ap.description, ap.due_amount, ap.entry_created_date), 4096)
+                        ELSE ap.sk_contract
+                    END
         LEFT JOIN
             datalake_ebdb_clean.contract AS c1
-                ON c1.id = ap.sk_contract
+                ON c1.id = CASE
+                        WHEN ap.sk_contract = -1
+                            THEN -2 - PMOD(HASH(ap.description, ap.due_amount, ap.entry_created_date), 4096)
+                        ELSE ap.sk_contract
+                    END
     ),
     invoice_and_cap AS 
     (
@@ -382,4 +390,7 @@ WITH invoice_all AS (
         invoice_classification AS i
     LEFT JOIN
         datalake_retsuko_clean.entry AS re
-            ON re.id_external = i.id_entry
+            ON re.id_external = COALESCE(
+                    i.id_entry,
+                    -2 - PMOD(HASH(i.sk_contract, i.accrual_year_month, i.due_amount, i.description), 4096)
+                )
