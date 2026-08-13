@@ -317,6 +317,8 @@ SELECT DISTINCT
   s.channel_confirmed_demand,
   s.channel_confirmed_agent,
   s.channel_confirmed_tenant_living,
+  pva.unsuccessful_reason,
+  IF(pva.id_schedule IS NOT NULL, TRUE, FALSE) AS has_post_visit_agent,
   CASE
     WHEN s.last_confirm_answer_supply = 'ANSWER_CONFIRMED' THEN TRUE
     WHEN s.last_confirm_answer_supply IN ('ANSWER_PENDING', 'ANSWER_REJECTED') THEN FALSE
@@ -355,6 +357,7 @@ SELECT DISTINCT
   s.ts_schedule_confirmed,
   IF(pva.event_type = 'VISIT_DONE', pva.ts_post_visit_agent, NULL) AS ts_schedule_completed,
   IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.ts_post_visit_agent, NULL) AS ts_schedule_unsuccessful,
+  pva.ts_post_visit_agent,
   vcu.ts_created AS ts_schedule_canceled,
   s.ts_schedule_visit,
   NOW() AS ts_load

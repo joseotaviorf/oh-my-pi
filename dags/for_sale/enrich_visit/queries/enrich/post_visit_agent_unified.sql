@@ -51,12 +51,30 @@ WITH old_source AS (
         WHERE
             rn = 1
     ),
+    casamineira AS ( -- Bookings migrated from Casa Mineira don't have a visit_fup
+        SELECT
+            b.id_visit,
+            'VaiNegociar' AS visit_fup,
+            MAX_BY(v.ts_visit, b.ts_created) AS ts_visit_fup
+        FROM
+            datalake_ebdb_clean.booking AS b
+        JOIN
+            datalake_ebdb_clean.visit AS v
+                ON b.id_visit = v.id
+        JOIN
+            datalake_ebdb_clean.visit_origin AS vo
+                ON v.id_creation_origin = vo.id
+        WHERE
+            UPPER(vo.name) = 'MIGRACAOCASAMINEIRA'
+            AND b.status = 'Realizado'
+        GROUP BY 1
+    ),
     old_source_ranked AS (
         SELECT
             b.id_visit,
             b.id AS id_schedule,
             CASE
-                WHEN COALESCE(b.visit_fup, vsl.visit_fup) IN ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez') THEN 'VISIT_DONE'
+                WHEN COALESCE(b.visit_fup, vsl.visit_fup, cm.visit_fup) IN ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez') THEN 'VISIT_DONE'
                 WHEN COALESCE(b.visit_fup, vsl.visit_fup) IN ('EntradaNaoAutorizada', 'NaoCompareceu', 'ImovelAlugado') THEN 'VISIT_UNSUCCESSFUL'
             END AS event_type,
             CASE
@@ -72,7 +90,7 @@ WITH old_source AS (
             IF(event_type = 'VISIT_UNSUCCESSFUL' AND show_demand.has_attended = FALSE, TRUE, FALSE) AS has_unsuccessful_demand_not_attended,
             IF(event_type = 'VISIT_UNSUCCESSFUL' AND show_agent.has_attended = FALSE, TRUE, FALSE) AS has_unsuccessful_agent_not_attended,
             IF(event_type = 'VISIT_UNSUCCESSFUL' AND show_supply.has_attended = FALSE, TRUE, FALSE) AS has_unsuccessful_supply_not_attended,
-            COALESCE(b.ts_visit_fup, vsl.ts_visit_fup) AS ts_post_visit_agent,
+            COALESCE(b.ts_visit_fup, vsl.ts_visit_fup, cm.ts_visit_fup) AS ts_post_visit_agent,
             ROW_NUMBER() OVER(PARTITION BY b.id_visit ORDER BY b.id DESC) AS rn
         FROM
             datalake_ebdb_clean.booking AS b
@@ -98,8 +116,11 @@ WITH old_source AS (
             visit_show AS show_supply
                 ON show_supply.id_booking = b.id
                 AND show_supply.type = 'Landlord'
+        LEFT JOIN
+            casamineira AS cm
+                ON cm.id_visit = b.id_visit
         WHERE
-            (b.visit_fup IS NOT NULL OR vsl.visit_fup IS NOT NULL)
+            (b.visit_fup IS NOT NULL OR vsl.visit_fup IS NOT NULL OR cm.visit_fup IS NOT NULL)
             AND b.type = 'Visita'
             AND DATE(v.ts_created) < '2026-06-10'
     )

@@ -84,6 +84,14 @@ columns:
     lineage:
     - datalake_visit.visit_schedules.channel_confirmed_tenant_living
     description: Channel from tenant's confirmation of schedule. Data since 2024-11.
+  unsuccessful_reason:
+    lineage:
+    - datalake_visit.visit_schedules.unsuccessful_reason
+    description: Unsuccessful reason of the schedule. Data since 2016.
+  has_post_visit_agent:
+    lineage:
+    - datalake_visit.visit_schedules.has_post_visit_agent
+    description: TRUE if the schedule has a post visit agent. Data since 2015.
   is_schedule_confirmed_by_supply:
     lineage:
     - datalake_visit.visit_schedules.is_confirmed_by_supply
@@ -156,6 +164,10 @@ columns:
     lineage:
     - datalake_visit.visit_schedules.ts_schedule_unsuccessful
     description: Timestamp with the unsuccessful event (VISIT_UNSUCCESSFUL). Data since 2015.
+  ts_post_visit_agent:
+    lineage:
+    - datalake_visit.visit_schedules.ts_post_visit_agent
+    description: Timestamp of the post visit agent event. Data since 2015.
   ts_schedule_canceled:
     lineage:
     - datalake_visit.visit_schedules.ts_schedule_canceled

@@ -15,6 +15,8 @@ SELECT
   channel_confirmed_demand,
   channel_confirmed_agent,
   channel_confirmed_tenant_living,
+  unsuccessful_reason,
+  has_post_visit_agent,
   is_confirmed_by_supply AS is_schedule_confirmed_by_supply,
   is_confirmed_by_demand AS is_schedule_confirmed_by_demand,
   is_confirmed_by_agent AS is_schedule_confirmed_by_agent,
@@ -33,6 +35,7 @@ SELECT
   ts_schedule_confirmed,
   ts_schedule_completed,
   ts_schedule_unsuccessful,
+  ts_post_visit_agent,
   ts_schedule_canceled,
   ts_schedule_visit
 FROM
