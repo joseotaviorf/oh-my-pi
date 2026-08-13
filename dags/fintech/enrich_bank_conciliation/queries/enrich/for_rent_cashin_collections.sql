@@ -2,14 +2,24 @@ WITH
 sap_entity AS (
     SELECT
         id_finance_entity,
-        e.event,
-        e.status,
-        e.failed_reason,
-        e.ts_created,
-        e.id_sap_gateway_feature
-    FROM  datalake_retsuko_clean.sap_entity e
-    WHERE event = 'payment-accounting-entries'
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity ORDER BY ts_created DESC) = 1
+        event,
+        status,
+        failed_reason,
+        ts_created,
+        id_sap_gateway_feature
+    FROM (
+        SELECT
+            id_finance_entity,
+            e.event,
+            e.status,
+            e.failed_reason,
+            e.ts_created,
+            e.id_sap_gateway_feature,
+            ROW_NUMBER() OVER (PARTITION BY id_finance_entity ORDER BY ts_created DESC) AS rn
+        FROM datalake_retsuko_clean.sap_entity e
+        WHERE event = 'payment-accounting-entries'
+    )
+    WHERE rn = 1
 ),
 sap_gateway AS (
     SELECT
@@ -135,41 +145,64 @@ sap AS (
 
 checkout AS (
     SELECT
-        NULLIF(b.our_number, '') AS company_use,
-        NULLIF(b.id_business_entity, '') AS id_contract,
-        b.id_finance_entity AS id_invoice,
-        DATE(b.ts_paid) AS ts_paid,
-        b.paid_amount,
-        b.payer_name,
-        b.status,
-        NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number
-    FROM
-        datalake_checkout_clean.boleto b
-    WHERE
-        b.requester_name = 'trato-feito'
-        AND b.id NOT IN (5855, 5856, 5857)
-        AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
-        AND (b.beneficiary_account = '45268' OR b.beneficiary_account IS NULL)
-        AND b.ts_paid >= current_date - 180
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY b.your_number ORDER BY b.ts_paid DESC) = 1
+        company_use,
+        id_contract,
+        id_invoice,
+        ts_paid,
+        paid_amount,
+        payer_name,
+        status,
+        our_number
+    FROM (
+        SELECT
+            NULLIF(b.our_number, '') AS company_use,
+            NULLIF(b.id_business_entity, '') AS id_contract,
+            b.id_finance_entity AS id_invoice,
+            DATE(b.ts_paid) AS ts_paid,
+            b.paid_amount,
+            b.payer_name,
+            b.status,
+            NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number,
+            ROW_NUMBER() OVER (PARTITION BY b.your_number ORDER BY b.ts_paid DESC) AS rn
+        FROM
+            datalake_checkout_clean.boleto b
+        WHERE
+            b.requester_name = 'trato-feito'
+            AND b.id NOT IN (5855, 5856, 5857)
+            AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
+            AND (b.beneficiary_account = '45268' OR b.beneficiary_account IS NULL)
+            AND b.ts_paid >= current_date - 180
+    )
+    WHERE rn = 1
 ),
 
 checkout_union AS (
     SELECT
-        CAST(UPPER(vc.our_number) AS INTEGER) AS our_number,
-        NULL AS id_pix_payment,
-        vc.paid_amount AS amount,
-        'BOLETO' AS payment_method,
-        vc.status AS payment_status,
-        DATE(dd.next_brz_fintech_business_day) AS dt_paid
-    FROM
-        checkout vc
-    LEFT JOIN
-        dw_public.dim_date dd
-            ON vc.ts_paid = dd.date
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1
+        our_number,
+        id_pix_payment,
+        amount,
+        payment_method,
+        payment_status,
+        dt_paid
+    FROM (
+        SELECT
+            CAST(UPPER(vc.our_number) AS INTEGER) AS our_number,
+            NULL AS id_pix_payment,
+            vc.paid_amount AS amount,
+            'BOLETO' AS payment_method,
+            vc.status AS payment_status,
+            DATE(dd.next_brz_fintech_business_day) AS dt_paid,
+            ROW_NUMBER() OVER (
+                PARTITION BY CAST(UPPER(vc.our_number) AS INTEGER), vc.paid_amount
+                ORDER BY CASE WHEN vc.id_invoice IS NOT NULL THEN vc.company_use ELSE vc.our_number END DESC
+            ) AS rn
+        FROM
+            checkout vc
+        LEFT JOIN
+            dw_public.dim_date dd
+                ON vc.ts_paid = dd.date
+    )
+    WHERE rn = 1
 
     UNION
 
@@ -221,27 +254,34 @@ checkout_union AS (
 
 trato_feito AS (
     SELECT
-        COALESCE(REGEXP_REPLACE(b.our_number , '^0+', '') , REGEXP_REPLACE(i.id_external, '^0+', '')) AS our_number,
-        b.id_external AS id_invoice,
-        i.total_amount AS amount,
-        CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
-        ELSE COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) END AS dt_paid
-    FROM
-        datalake_trato_feito_clean.installment i
-    LEFT JOIN
-        datalake_trato_feito_clean.payment p
-            ON p.id_installment = i.id
-    LEFT JOIN
-        datalake_trato_feito_clean.accounting_installment aci
-            ON aci.id_installment = i.id
-    LEFT JOIN
-        datalake_trato_feito_clean.bill b
-            ON b.id_external = aci.id_external
-    LEFT JOIN
-        dw_public.dim_date dd
-            ON COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) = dd.date
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY our_number ORDER BY date DESC) = 1
+        our_number,
+        id_invoice,
+        amount,
+        dt_paid
+    FROM (
+        SELECT
+            COALESCE(REGEXP_REPLACE(b.our_number , '^0+', '') , REGEXP_REPLACE(i.id_external, '^0+', '')) AS our_number,
+            b.id_external AS id_invoice,
+            i.total_amount AS amount,
+            CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
+            ELSE COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) END AS dt_paid,
+            ROW_NUMBER() OVER (PARTITION BY COALESCE(REGEXP_REPLACE(b.our_number , '^0+', '') , REGEXP_REPLACE(i.id_external, '^0+', '')) ORDER BY date DESC) AS rn
+        FROM
+            datalake_trato_feito_clean.installment i
+        LEFT JOIN
+            datalake_trato_feito_clean.payment p
+                ON p.id_installment = i.id
+        LEFT JOIN
+            datalake_trato_feito_clean.accounting_installment aci
+                ON aci.id_installment = i.id
+        LEFT JOIN
+            datalake_trato_feito_clean.bill b
+                ON b.id_external = aci.id_external
+        LEFT JOIN
+            dw_public.dim_date dd
+                ON COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) = dd.date
+    )
+    WHERE rn = 1
 
     UNION ALL
 
@@ -274,31 +314,44 @@ trato_feito AS (
 
 seu_barriga_sap AS (
     SELECT
-        id_external AS id_invoice,
+        id_invoice,
         id_original_invoice_external,
-        UPPER(payment_company_use_number) AS company_use,
+        company_use,
         payment_status,
         status,
         paid_via,
         reason,
-        paid_amount AS amount,
-        date_trunc('month',dd.next_brz_fintech_business_day) as month_paid,
-        dd.next_brz_fintech_business_day AS dt_paid
-    FROM
-        datalake_retsuko.invoice
-    LEFT JOIN
-        dw_public.dim_date dd
-            ON invoice.ts_paid = dd.date
-    WHERE
-        payment_company_use_number IS NOT NULL
-        AND TRIM(payment_company_use_number) != ''
-        AND lower(paid_via) IN ('cnab', 'checkout-boleto', 'cyber-boleto')
-        AND due_amount <= 0
-        AND payment_status != 'canceled'
-        AND status != 'canceled'
-        AND country_code = 'BR'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_invoice, payment_company_use_number ORDER BY ts_created DESC) = 1
+        amount,
+        month_paid,
+        dt_paid
+    FROM (
+        SELECT
+            id_external AS id_invoice,
+            id_original_invoice_external,
+            UPPER(payment_company_use_number) AS company_use,
+            payment_status,
+            status,
+            paid_via,
+            reason,
+            paid_amount AS amount,
+            date_trunc('month',dd.next_brz_fintech_business_day) as month_paid,
+            dd.next_brz_fintech_business_day AS dt_paid,
+            ROW_NUMBER() OVER (PARTITION BY id_external, payment_company_use_number ORDER BY ts_created DESC) AS rn
+        FROM
+            datalake_retsuko.invoice
+        LEFT JOIN
+            dw_public.dim_date dd
+                ON invoice.ts_paid = dd.date
+        WHERE
+            payment_company_use_number IS NOT NULL
+            AND TRIM(payment_company_use_number) != ''
+            AND lower(paid_via) IN ('cnab', 'checkout-boleto', 'cyber-boleto')
+            AND due_amount <= 0
+            AND payment_status != 'canceled'
+            AND status != 'canceled'
+            AND country_code = 'BR'
+    )
+    WHERE rn = 1
 ),
 
 df_all AS (

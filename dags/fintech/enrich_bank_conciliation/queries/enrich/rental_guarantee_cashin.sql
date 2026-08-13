@@ -42,28 +42,40 @@ WITH rental_guarantee_and_bank AS (
 ),
 sap_gateway AS (
   SELECT
-    f.id_finance_entity,
-    s.id_feature,
-    s.hash,
-    s.type,
-    s.status AS sync_sap_job_status,
-    w.status AS sap_send_status,
-    w.webhook_status AS sap_processed_status,
-    w.errors AS webhook_error
-  FROM
-    datalake_sap_gateway_clean.feature f
-  LEFT JOIN
-    datalake_sap_gateway_clean.sync_sap_job s
-      ON f.id_feature = s.id_feature
-  LEFT JOIN
-    datalake_sap_gateway_clean.webhook_log w
-      ON s.idoc = w.idoc
-  WHERE 1=1
-    AND s.erp_solution IN ('S4')
-    AND s.status NOT IN ('ignore', 'ignored')
-    AND DATE(f.ts_created) >= DATE('2024-01-01')
-    AND hash is not null
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY s.ts_updated) = 1 
+    id_finance_entity,
+    id_feature,
+    hash,
+    type,
+    sync_sap_job_status,
+    sap_send_status,
+    sap_processed_status,
+    webhook_error
+  FROM (
+    SELECT
+      f.id_finance_entity,
+      s.id_feature,
+      s.hash,
+      s.type,
+      s.status AS sync_sap_job_status,
+      w.status AS sap_send_status,
+      w.webhook_status AS sap_processed_status,
+      w.errors AS webhook_error,
+      ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY s.ts_updated) AS rn
+    FROM
+      datalake_sap_gateway_clean.feature f
+    LEFT JOIN
+      datalake_sap_gateway_clean.sync_sap_job s
+        ON f.id_feature = s.id_feature
+    LEFT JOIN
+      datalake_sap_gateway_clean.webhook_log w
+        ON s.idoc = w.idoc
+    WHERE 1=1
+      AND s.erp_solution IN ('S4')
+      AND s.status NOT IN ('ignore', 'ignored')
+      AND DATE(f.ts_created) >= DATE('2024-01-01')
+      AND hash is not null
+  )
+  WHERE rn = 1
 ),
 sap_ledger AS (
   SELECT

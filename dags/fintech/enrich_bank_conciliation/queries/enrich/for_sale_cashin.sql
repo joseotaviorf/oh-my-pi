@@ -451,12 +451,56 @@ final_all AS (
     'bypass' AS origin_transaction
   FROM
     final_bypass fb
+),
+
+final_deduped AS (
+  SELECT
+    sk_house,
+    sk_offer,
+    id_sale,
+    sap_id_sale_transaction,
+    bank_account,
+    account_number,
+    company_use,
+    counterpart_document,
+    counterpart_name,
+    bank_paid_amount,
+    bank_type_transaction,
+    monopoly_income_from,
+    monopoly_paid_amount,
+    monopoly_is_reconcilied,
+    sap_paid_amount,
+    sap_is_reconcilied,
+    origin_transaction,
+    bank_dt_paid,
+    monopoly_dt_accounting,
+    sap_dt_paid,
+    ROW_NUMBER() OVER (
+      PARTITION BY
+          CASE
+              WHEN bank_type_transaction = 'BOLETO' THEN sk_house
+              ELSE company_use
+          END,
+          CASE
+              WHEN bank_type_transaction = 'BOLETO' THEN NULL
+              ELSE counterpart_document
+          END,
+          CASE
+              WHEN bank_type_transaction = 'BOLETO' THEN NULL
+              ELSE counterpart_name
+          END,
+          bank_paid_amount,
+          bank_dt_paid
+      ORDER BY bank_dt_paid DESC
+    ) AS rn
+  FROM
+    final_all
 )
 
 SELECT
   sk_house,
-  sk_offer, 
-  id_sale, 
+  sk_offer,
+  id_sale,
   sap_id_sale_transaction as id_sap_sale_transaction,
   bank_account,
   account_number,
@@ -474,23 +518,7 @@ SELECT
   bank_dt_paid as dt_bank_paid,
   monopoly_dt_accounting as dt_monopoly_accounting,
   sap_dt_paid as dt_sap_paid
-FROM 
-  final_all
-QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY 
-        CASE 
-            WHEN bank_type_transaction = 'BOLETO' THEN sk_house 
-            ELSE company_use 
-        END,
-        CASE 
-            WHEN bank_type_transaction = 'BOLETO' THEN NULL
-            ELSE counterpart_document 
-        END,
-        CASE 
-            WHEN bank_type_transaction = 'BOLETO' THEN NULL 
-            ELSE counterpart_name 
-        END,
-        bank_paid_amount, 
-        bank_dt_paid 
-    ORDER BY bank_dt_paid DESC
-) = 1
+FROM
+  final_deduped
+WHERE
+  rn = 1

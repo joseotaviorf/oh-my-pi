@@ -2,14 +2,24 @@ WITH
 sap_entity AS (
     SELECT
         id_finance_entity,
-        e.event,
-        e.status,
-        e.failed_reason,
-        e.ts_created,
-        e.id_sap_gateway_feature
-    FROM  datalake_retsuko_clean.sap_entity e
-    WHERE event = 'payment-accounting-entries'
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity ORDER BY ts_created DESC) = 1
+        event,
+        status,
+        failed_reason,
+        ts_created,
+        id_sap_gateway_feature
+    FROM (
+        SELECT
+            id_finance_entity,
+            e.event,
+            e.status,
+            e.failed_reason,
+            e.ts_created,
+            e.id_sap_gateway_feature,
+            ROW_NUMBER() OVER (PARTITION BY id_finance_entity ORDER BY ts_created DESC) AS rn
+        FROM datalake_retsuko_clean.sap_entity e
+        WHERE event = 'payment-accounting-entries'
+    )
+    WHERE rn = 1
 ),
 sap_gateway AS (
     SELECT
