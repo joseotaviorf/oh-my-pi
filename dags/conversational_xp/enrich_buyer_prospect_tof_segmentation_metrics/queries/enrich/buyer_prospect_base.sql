@@ -1,17 +1,13 @@
 WITH tof_users AS (
     SELECT
-    s.id_user,
+    TRY_CAST(
+        REGEXP_REPLACE(TRIM(CAST(s.id_user AS STRING)), '\\.$', '')
+        AS BIGINT
+    ) AS id_user,
     s.ts_event,
     DATE_TRUNC('month', s.ts_event) AS dt_event_month,
     LOWER(s.business_context) AS business_context,
-    'tof' AS event_name,
-    ROW_NUMBER() OVER (
-        PARTITION BY
-            s.id_user,
-            DATE_TRUNC('month', s.ts_event)
-        ORDER BY
-            s.ts_event ASC
-    ) AS rn
+    'tof' AS event_name
     FROM datalake_amplitude_page_viewed_events.schedule_search_listing_events s
     WHERE
         MAKE_DATE(s.year, s.month, s.day) >= DATE_TRUNC('MONTH', DATE('{start_date}'))
@@ -21,6 +17,24 @@ WITH tof_users AS (
         AND s.id_user is not null
         AND s.id_session is not null
         AND lower(s.business_context) = 'sale'
+),
+
+tof_users_cleaned AS (
+    SELECT
+        id_user,
+        ts_event,
+        dt_event_month,
+        business_context,
+        event_name,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                id_user,
+                dt_event_month
+            ORDER BY
+                ts_event ASC
+        ) AS rn
+    FROM tof_users
+    WHERE id_user is not null
 ),
 
 bp_users AS (
@@ -86,9 +100,9 @@ all_users AS (
         event_name,
         2 as priority
     FROM
-        tof_users
+        tof_users_cleaned
     WHERE
-        tof_users.rn = 1
+        tof_users_cleaned.rn = 1
 ),
 
 deduped_users AS (
