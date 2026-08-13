@@ -121,6 +121,21 @@ class TestExtractPreservedCustomConfig:
         preserved = extract_preserved_custom_config(prod_cluster, {})
         assert preserved["spark_conf"] == {}
 
+    def test_keeps_delta_oss_drops_proprietary(self):
+        prod_cluster = {
+            "custom_configurations": {
+                "spark_conf": {
+                    "spark.databricks.delta.autoCompact.enabled": "true",
+                    "spark.databricks.delta.merge.enableLowShuffle": "true",
+                    "spark.databricks.sql.initial.catalog.namespace": "quintoandar_prod",
+                }
+            }
+        }
+        preserved = extract_preserved_custom_config(prod_cluster, {})
+        assert preserved["spark_conf"] == {
+            "spark.databricks.delta.autoCompact.enabled": "true",
+        }
+
 
 class TestBuildValidationBlock:
     def test_xs_memory_three_workers_fleet(self, monkeypatch):

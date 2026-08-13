@@ -20,6 +20,7 @@ if str(_COMPILER_ROOT) not in sys.path:
 import re
 
 from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
+from bietlejuice.base.validation.cluster_args import strip_databricks_only_spark_conf
 from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     emr_worker_core_task_split,
@@ -294,16 +295,6 @@ def build_emr_effective_from_databricks(
     }
 
 
-def _filter_spark_conf(spark_conf: Any) -> dict[str, Any]:
-    if not isinstance(spark_conf, dict):
-        return {}
-    return {
-        key: value
-        for key, value in spark_conf.items()
-        if not str(key).startswith("spark.databricks.")
-    }
-
-
 def extract_preserved_custom_config(
     prod_cluster: dict,
     effective_prod: dict,
@@ -332,7 +323,7 @@ def extract_preserved_custom_config(
 
     prod_spark_conf = prod_custom.get("spark_conf")
     if isinstance(prod_spark_conf, dict) and prod_spark_conf:
-        spark_conf = _filter_spark_conf(prod_spark_conf)
+        spark_conf = strip_databricks_only_spark_conf(prod_spark_conf)
         preserved["spark_conf"] = spark_conf or {}
 
     init_scripts = prod_custom.get("init_scripts")

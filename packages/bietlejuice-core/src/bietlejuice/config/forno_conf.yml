@@ -177,6 +177,10 @@ cluster_template:
             spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
             spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
             spark.sql.legacy.timeParserPolicy: LEGACY
+            # DESCRIBE renders data_type with simpleString, truncated past this limit
+            # ("... N more fields"). The metastore loader writes DESCRIBE output back as
+            # DDL, so a low value corrupts wide struct columns in the catalog.
+            spark.sql.debug.maxToStringFields: "4096"
             spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
             spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.forno.quintoandar.com.br"
             spark.metrics.conf.*.sink.graphite.period: "15"
@@ -268,6 +272,10 @@ cluster_template:
             spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
             spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
             spark.sql.legacy.timeParserPolicy: LEGACY
+            # DESCRIBE renders data_type with simpleString, truncated past this limit
+            # ("... N more fields"). The metastore loader writes DESCRIBE output back as
+            # DDL, so a low value corrupts wide struct columns in the catalog.
+            spark.sql.debug.maxToStringFields: "4096"
             spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
             spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.forno.quintoandar.com.br"
             spark.metrics.conf.*.sink.graphite.period: "15"
@@ -1913,6 +1921,7 @@ emr_cluster_base: &emr_cluster_anchor
         - Classification: spark-defaults
           Properties: &emr_spark_defaults_props
               spark.databricks.delta.vacuum.parallelDelete.enabled: "true"
+              spark.databricks.delta.autoCompact.enabled: "true"
     spark_conf: &emr_cluster_spark_conf_anchor
         spark.dynamicAllocation.enabled: "true"
         spark.shuffle.service.enabled: "true"
@@ -1955,6 +1964,10 @@ emr_cluster_base: &emr_cluster_anchor
         spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
         spark.sql.legacy.timeParserPolicy: LEGACY
         spark.sql.legacy.json.allowEmptyString.enabled: "true"
+        # DESCRIBE renders data_type with simpleString, truncated past this limit
+        # ("... N more fields"). The metastore loader writes DESCRIBE output back as
+        # DDL, so a low value corrupts wide struct columns in the catalog.
+        spark.sql.debug.maxToStringFields: "4096"
         spark.sql.catalogImplementation: hive
         spark.driverEnv.ARTIFACTS_BUCKET: *artifacts_bucket
         spark.driverEnv.ENVIRONMENT: "{{ var.value.environment }}"
@@ -4002,10 +4015,11 @@ wonka_cluster_emr:
     airflow_emr_create_cluster_deferrable: false
     # Overrides the anchor's list to add Delta schema autoMerge, restoring parity
     # with wonka_runtime's Databricks spark_conf. It must live here (cluster
-    # classification) and not in spark_conf: the EMR template translator drops
-    # every spark.databricks.* key from spark_conf, and OSS Delta uses that same
-    # prefix. Without it, the first schema evolution of any wonka feature set
-    # fails the write with a Delta schema mismatch.
+    # classification) rather than in spark_conf because HierarchicalConf's
+    # deep-merge replaces list values wholesale, so a spark_conf-only override
+    # would wipe the preset Glue/Delta classifications. Without it, the first
+    # schema evolution of any wonka feature set fails the write with a Delta
+    # schema mismatch.
     emr_configurations:
         - *emr_conf_iceberg_defaults
         - *emr_conf_delta_defaults

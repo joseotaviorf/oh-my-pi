@@ -20,16 +20,7 @@ _PROD_TOPOLOGY_KEYS_FOR_CONSOLIDATION_VALIDATION = frozenset(
         "driver_instance_pool_id",
     }
 )
-# EMR-only keys (see dag_cluster_validator._EMR_ONLY_CUSTOM_CONFIG_KEYS).
-_EMR_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
-    {
-        "num_task_workers",
-        "task_node_type_id",
-        "task_availability",
-        "core_nodes",
-        "task_nodes",
-    }
-)
+
 _DATABRICKS_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
     {
         "node_type_id",
@@ -46,6 +37,41 @@ _DATABRICKS_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
         "single_user_name",
     }
 )
+
+# EMR-only keys (see dag_cluster_validator._EMR_ONLY_CUSTOM_CONFIG_KEYS).
+_EMR_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
+    {
+        "num_task_workers",
+        "task_node_type_id",
+        "task_availability",
+        "core_nodes",
+        "task_nodes",
+    }
+)
+
+
+def _is_databricks_to_emr_validation(
+    prod_cluster_type: str, validation_cluster_type: str
+) -> bool:
+    return not str(prod_cluster_type).startswith("emr_") and str(
+        validation_cluster_type
+    ).startswith("emr_")
+
+
+def _is_emr_to_databricks_validation(
+    prod_cluster_type: str, validation_cluster_type: str
+) -> bool:
+    return prod_cluster_type.startswith("emr_") and validation_cluster_type.startswith(
+        CONSOLIDATION_PRESET_TYPE_PREFIXES
+    )
+
+
+def _strip_databricks_only_custom_config_keys(custom: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        key: value
+        for key, value in custom.items()
+        if key not in _DATABRICKS_ONLY_CUSTOM_CONFIG_KEYS
+    }
 
 
 def _strip_emr_only_custom_config_keys(custom: Dict[str, Any]) -> Dict[str, Any]:
@@ -66,37 +92,40 @@ def _strip_emr_only_custom_config_keys(custom: Dict[str, Any]) -> Dict[str, Any]
     return stripped
 
 
-def _is_emr_to_databricks_validation(
-    prod_cluster_type: str, validation_cluster_type: str
-) -> bool:
-    return prod_cluster_type.startswith("emr_") and validation_cluster_type.startswith(
-        CONSOLIDATION_PRESET_TYPE_PREFIXES
-    )
+# Delta OSS defines every session conf under this prefix
+# (DeltaSQLConf.SQL_CONF_PREFIX in delta-io/delta), so Delta tuning must survive
+# the Databricks → EMR hop. Everything else under spark.databricks. is
+# Databricks-platform-only (Unity Catalog, cluster profile, behaviorChange).
+DATABRICKS_SPARK_CONF_PREFIX = "spark.databricks."
+OSS_DELTA_SPARK_CONF_PREFIX = "spark.databricks.delta."
+# Delta-prefixed but absent from Delta OSS 3.3.x DeltaSQLConf: a Databricks
+# Runtime-exclusive feature. Forwarding it to EMR is a silent no-op that
+# misleads anyone reading the cluster's spark-defaults.
+# Mirrored in emr_plugin/template_translator.py (that package intentionally has
+# no bietlejuice dependency).
+DATABRICKS_PROPRIETARY_DELTA_SPARK_CONF_KEYS = frozenset(
+    {"spark.databricks.delta.merge.enableLowShuffle"}
+)
 
 
-def _is_databricks_to_emr_validation(
-    prod_cluster_type: str, validation_cluster_type: str
-) -> bool:
-    return not str(prod_cluster_type).startswith("emr_") and str(
-        validation_cluster_type
-    ).startswith("emr_")
+def is_databricks_only_spark_conf_key(key: str) -> bool:
+    """True when a spark_conf key must not reach an EMR cluster."""
+    name = str(key)
+    if name in DATABRICKS_PROPRIETARY_DELTA_SPARK_CONF_KEYS:
+        return True
+    if name.startswith(OSS_DELTA_SPARK_CONF_PREFIX):
+        return False
+    return name.startswith(DATABRICKS_SPARK_CONF_PREFIX)
 
 
-def _strip_databricks_only_custom_config_keys(custom: Dict[str, Any]) -> Dict[str, Any]:
-    return {
-        key: value
-        for key, value in custom.items()
-        if key not in _DATABRICKS_ONLY_CUSTOM_CONFIG_KEYS
-    }
-
-
-def _strip_databricks_spark_conf_keys(spark_conf: Any) -> Dict[str, Any]:
+def strip_databricks_only_spark_conf(spark_conf: Any) -> Dict[str, Any]:
+    """Drop Databricks-platform-only keys, keeping OSS Delta settings."""
     if not isinstance(spark_conf, dict):
         return {}
     return {
         key: value
         for key, value in spark_conf.items()
-        if not str(key).startswith("spark.databricks.")
+        if not is_databricks_only_spark_conf_key(key)
     }
 
 
@@ -149,7 +178,7 @@ def merge_validation_cluster_args(prod_cluster: dict, validation_cluster: dict) 
         prod_custom = _strip_databricks_only_custom_config_keys(prod_custom)
         prod_spark_conf = prod_custom.get("spark_conf")
         if isinstance(prod_spark_conf, dict):
-            stripped_spark_conf = _strip_databricks_spark_conf_keys(prod_spark_conf)
+            stripped_spark_conf = strip_databricks_only_spark_conf(prod_spark_conf)
             if stripped_spark_conf:
                 prod_custom = {**prod_custom, "spark_conf": stripped_spark_conf}
             else:

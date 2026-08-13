@@ -75,10 +75,19 @@ DEFAULT_TASK_MARKET = "SPOT"
 # preset Glue/Delta classifications.
 DATABRICKS_SPARK_CONF_PREFIXES = ("spark.databricks.",)
 OSS_DELTA_SPARK_CONF_PREFIX = "spark.databricks.delta."
+# Delta-prefixed but absent from Delta OSS 3.3.x DeltaSQLConf — Databricks
+# Runtime only, so forwarding it to EMR is a silent no-op. Mirrors
+# bietlejuice-core base/validation/cluster_args.py; this package intentionally
+# has no bietlejuice dependency (Airflow plugin entry-points).
+DATABRICKS_PROPRIETARY_DELTA_SPARK_CONF_KEYS = frozenset(
+    {"spark.databricks.delta.merge.enableLowShuffle"}
+)
 
 
 def _is_stripped_databricks_spark_conf(key: str) -> bool:
     """Return True when ``key`` must be dropped from spark_conf → spark-defaults."""
+    if key in DATABRICKS_PROPRIETARY_DELTA_SPARK_CONF_KEYS:
+        return True
     if key.startswith(OSS_DELTA_SPARK_CONF_PREFIX):
         return False
     return any(key.startswith(prefix) for prefix in DATABRICKS_SPARK_CONF_PREFIXES)

@@ -211,6 +211,21 @@ def test_oss_delta_spark_conf_keys_are_kept_in_spark_defaults():
     assert props["spark.sql.shuffle.partitions"] == "200"
 
 
+def test_proprietary_delta_spark_conf_keys_are_dropped():
+    # Databricks Runtime-exclusive Delta keys must not reach EMR spark-defaults.
+    out = translate(
+        _fleet_base(
+            spark_conf={
+                "spark.databricks.delta.autoCompact.enabled": "true",
+                "spark.databricks.delta.merge.enableLowShuffle": "true",
+            }
+        )
+    )
+    props = _spark_defaults_props(out)
+    assert props["spark.databricks.delta.autoCompact.enabled"] == "true"
+    assert "spark.databricks.delta.merge.enableLowShuffle" not in props
+
+
 def test_unity_catalog_spark_conf_keys_are_stripped_from_spark_defaults():
     out = translate(
         _fleet_base(
