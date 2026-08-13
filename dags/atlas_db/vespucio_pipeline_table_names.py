@@ -69,6 +69,9 @@ class Tables:
     source_navent_houses_composed_v2 = (
         "vespucio_sources_delta.source_navent_houses_composed_v2"
     )
+    source_navent_24mx_houses_composed_v2 = (
+        "vespucio_sources_delta.source_navent_24mx_houses_composed_v2"
+    )
     source_union_houses_v2 = "vespucio_sources_delta.source_union_house_v2"
     source_idactum_houses_v2 = "vespucio_sources_delta.source_idactum_houses_v2"
     source_idactum_transactions_v2 = (

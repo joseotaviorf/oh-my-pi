@@ -186,6 +186,15 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
+            "--script=v2/navent_24mx_house_composed.sql",
+            f"--output_table={Tables.source_navent_24mx_houses_composed_v2}",
+            "--checkpoint_column=_checkpoint",
+        ],
+        task_id="navent_24mx_house_composed",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
             "--script=v2/union_house.sql",
             f"--output_table={Tables.source_union_houses_v2}",
             "--checkpoint_column=event_timestamp",
@@ -247,6 +256,7 @@ registry_step_task = create_task(
         f"--input_source_iptu_houses={Tables.source_iptu_houses_v2}",
         f"--input_source_itbi_houses={Tables.source_itbi_houses_v2}",
         f"--input_source_navent_houses_composed={Tables.source_navent_houses_composed_v2}",
+        f"--input_source_navent_24mx_houses_composed={Tables.source_navent_24mx_houses_composed_v2}",
         f"--input_source_union_houses={Tables.source_union_houses_v2}",
         f"--input_source_zap_imoveis_houses={Tables.source_zap_imoveis_houses_v2}",
         "--overwrite_schema",
