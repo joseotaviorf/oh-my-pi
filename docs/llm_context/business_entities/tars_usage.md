@@ -291,6 +291,12 @@ LIMIT
 
 ---
 
+## Related Metric Entities
+
+- None — Tars usage analytics is a platform observability product (`datalake_tars.*`); there is no metric-entity golden-query dataset yet. Add links here when official WAU / attach-rate metric docs land.
+
+---
+
 ## DataHub catalog
 
 > Added automatically by CI after merge — do not fill in manually.
