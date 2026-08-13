@@ -86,6 +86,10 @@ if __name__ == "__main__":
         .option("project", project)
         .option("parentProject", project)
         .option("query", query)
+        # The connector materializes a query read as a view, which it refuses to do
+        # unless viewsEnabled is set; it defaults to false and pairs with
+        # materializationDataset below.
+        .option("viewsEnabled", "true")
         .option("materializationDataset", source_database_name)
         .load()
     )
