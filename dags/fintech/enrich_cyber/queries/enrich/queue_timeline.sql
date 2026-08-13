@@ -3,8 +3,15 @@ WITH deduplicate_queues AS (
               queue,
               queue_type,
               queue_name
-          FROM datalake_cyber.queue_decision_tree
-          QUALIFY ROW_NUMBER() OVER(PARTITION BY queue, queue_type ORDER BY level DESC) = 1
+          FROM (
+              SELECT
+                  queue,
+                  queue_type,
+                  queue_name,
+                  ROW_NUMBER() OVER(PARTITION BY queue, queue_type ORDER BY level DESC) AS rn
+              FROM datalake_cyber.queue_decision_tree
+          )
+          WHERE rn = 1
       ),
       base_union AS (
           SELECT
@@ -86,8 +93,8 @@ WITH deduplicate_queues AS (
               LEAD(ts_last_update_eviction_queue) OVER (PARTITION BY id_contract_external ORDER BY ts_last_update_eviction_queue, priority) AS ts_update_next_eviction_queue
           FROM
               base_union
-          )
-
+          ),
+      timeline_base AS (
       SELECT
           s.id_contract_external,
           s.segmentation_queue,
@@ -96,7 +103,11 @@ WITH deduplicate_queues AS (
           a.agreement_queue_description,
           e.eviction_queue,
           e.eviction_queue_description,
-          d.date AS dt_reference
+          d.date AS dt_reference,
+          ROW_NUMBER() OVER (
+              PARTITION BY s.id_contract_external, d.date
+              ORDER BY s.id_contract_external, d.date DESC
+          ) AS rn
       FROM
           datalake_quintoandar.aux_date AS d
       LEFT JOIN
@@ -113,5 +124,16 @@ WITH deduplicate_queues AS (
           ON DATE(d.`date`) >= DATE(e.ts_last_update_eviction_queue) AND
               IF(e.ts_update_next_eviction_queue IS NULL, DATE(d.`date`) <= CURRENT_DATE(), DATE(d.`date`) < e.ts_update_next_eviction_queue)
           AND s.id_contract_external = e.id_contract_external
-      QUALIFY
-          ROW_NUMBER() OVER (PARTITION BY s.id_contract_external, d.date ORDER BY s.id_contract_external, d.date DESC) = 1
+      )
+
+      SELECT
+          id_contract_external,
+          segmentation_queue,
+          segmentation_queue_description,
+          agreement_queue,
+          agreement_queue_description,
+          eviction_queue,
+          eviction_queue_description,
+          dt_reference
+      FROM timeline_base
+      WHERE rn = 1

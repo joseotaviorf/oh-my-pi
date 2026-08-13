@@ -3,9 +3,15 @@ WITH deduplicate_queues AS (
         queue,
         queue_type,
         queue_name
-    FROM
-        datalake_cyber.queue_decision_tree
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY queue, queue_type ORDER BY level DESC) = 1
+    FROM (
+        SELECT
+            queue,
+            queue_type,
+            queue_name,
+            ROW_NUMBER() OVER (PARTITION BY queue, queue_type ORDER BY level DESC) AS rn
+        FROM datalake_cyber.queue_decision_tree
+    )
+    WHERE rn = 1
 ),
 historical_filtered AS (
     SELECT
@@ -254,12 +260,27 @@ stacked_dedup AS (
         outstanding_balance,
         total_delayed_amount,
         dt_due_date
-    FROM
-        stacked
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY id_contract_external, dimension_key, dt_from
-        ORDER BY ts_record_insertion DESC, id DESC
-    ) = 1
+    FROM (
+        SELECT
+            id_contract_external,
+            dimension_key,
+            dt_from,
+            dim_value,
+            ts_record_insertion,
+            id,
+            id_contract,
+            contract_group,
+            days_delayed,
+            outstanding_balance,
+            total_delayed_amount,
+            dt_due_date,
+            ROW_NUMBER() OVER (
+                PARTITION BY id_contract_external, dimension_key, dt_from
+                ORDER BY ts_record_insertion DESC, id DESC
+            ) AS rn
+        FROM stacked
+    )
+    WHERE rn = 1
 ),
 stacked_intervals AS (
     SELECT
@@ -282,6 +303,22 @@ stacked_intervals AS (
     FROM
         stacked_dedup AS sd
 ),
+dimension_queue_type AS (
+    SELECT
+        dimension_key,
+        queue_type
+    FROM VALUES
+        ('segmentation', 'Segmentação'),
+        ('agreement', 'Acordo'),
+        ('digital_channel', 'Canais Digitais'),
+        ('eviction', 'Eviction'),
+        ('credit_denial', 'Negativação'),
+        ('olos_dialer_label', 'Discador Olos'),
+        ('campaign_label', 'Campaign'),
+        ('serasa_limpa_nome_label', 'Label Serasa Limpa Nome'),
+        ('evictions_label', 'Label Evictions')
+    AS (dimension_key, queue_type)
+),
 intervals AS (
     SELECT
         si.id_contract_external,
@@ -300,19 +337,11 @@ intervals AS (
         dq.queue_name AS dim_description
     FROM
         stacked_intervals AS si
+    LEFT JOIN dimension_queue_type AS dqt
+        ON si.dimension_key = dqt.dimension_key
     LEFT JOIN deduplicate_queues AS dq
         ON CAST(si.dim_value AS STRING) = CAST(dq.queue AS STRING)
-        AND (
-            (si.dimension_key = 'segmentation' AND dq.queue_type = 'Segmentação')
-            OR (si.dimension_key = 'agreement' AND dq.queue_type = 'Acordo')
-            OR (si.dimension_key = 'digital_channel' AND dq.queue_type = 'Canais Digitais')
-            OR (si.dimension_key = 'eviction' AND dq.queue_type = 'Eviction')
-            OR (si.dimension_key = 'credit_denial' AND dq.queue_type = 'Negativação')
-            OR (si.dimension_key = 'olos_dialer_label' AND dq.queue_type = 'Discador Olos')
-            OR (si.dimension_key = 'campaign_label' AND dq.queue_type = 'Campaign')
-            OR (si.dimension_key = 'serasa_limpa_nome_label' AND dq.queue_type = 'Label Serasa Limpa Nome')
-            OR (si.dimension_key = 'evictions_label' AND dq.queue_type = 'Label Evictions')
-        )
+        AND dqt.queue_type = dq.queue_type
 ),
 calendar_dim AS (
     SELECT
@@ -401,4 +430,9 @@ SELECT
     DAY(cd.aux_date) AS day
 FROM
     calendar_dim AS cd
-GROUP BY ALL
+GROUP BY
+    cd.id_contract_external,
+    DATE(cd.aux_date),
+    YEAR(cd.aux_date),
+    MONTH(cd.aux_date),
+    DAY(cd.aux_date)

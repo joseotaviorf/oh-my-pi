@@ -1,10 +1,17 @@
 WITH codes_descriptions AS (
-  SELECT DISTINCT
-    UPPER(code) AS code,
+  SELECT
+    code,
     code_type,
-    REGEXP_REPLACE(code_description, r'(F\)\s*)','') AS code_description
-  FROM datalake_cyber_clean.logs_code_description
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY code,code_type ORDER BY group) = 1
+    code_description
+  FROM (
+    SELECT
+      UPPER(code) AS code,
+      code_type,
+      REGEXP_REPLACE(code_description, r'(F\)\s*)', '') AS code_description,
+      ROW_NUMBER() OVER(PARTITION BY UPPER(code), code_type ORDER BY `group`) AS rn
+    FROM datalake_cyber_clean.logs_code_description
+  )
+  WHERE rn = 1
 ),
 map_type_occurrence AS (
   SELECT
@@ -15,15 +22,35 @@ map_type_occurrence AS (
     alo,
     cpc,
     promessa
-  FROM datalake_gsheets_clean.cyber_collection_actions
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY action_code, result_code, complement_code ORDER BY ts_load) = 1
+  FROM (
+    SELECT
+      action_code,
+      result_code,
+      complement_code,
+      esforco,
+      alo,
+      cpc,
+      promessa,
+      ROW_NUMBER() OVER(
+        PARTITION BY action_code, result_code, complement_code
+        ORDER BY ts_load
+      ) AS rn
+    FROM datalake_gsheets_clean.cyber_collection_actions
+  )
+  WHERE rn = 1
 ),
 deduplicate_agency_group AS (
   SELECT
     agency_group,
     id_agency
-  FROM datalake_cyber_clean.agency_group
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY agency_group ORDER BY percentage_remuneration DESC) = 1
+  FROM (
+    SELECT
+      agency_group,
+      id_agency,
+      ROW_NUMBER() OVER(PARTITION BY agency_group ORDER BY percentage_remuneration DESC) AS rn
+    FROM datalake_cyber_clean.agency_group
+  )
+  WHERE rn = 1
 ),
 get_agency_group_name AS (
   SELECT
@@ -86,7 +113,17 @@ concatenate_comments AS (
     ts_activity,
     CONCAT_WS('', COLLECT_LIST(comment)) AS comment
   FROM ordered_logs
-  GROUP BY ALL
+  GROUP BY
+    id_contract,
+    contract_group,
+    id_user,
+    creditor,
+    action,
+    result,
+    complement,
+    phone_number,
+    phone_extension,
+    ts_activity
 )
 SELECT
   l.creditor,
@@ -184,7 +221,4 @@ LEFT JOIN datalake_cyber_clean.logs_valid_result_code AS lvr
 LEFT JOIN map_type_occurrence AS mto
   ON mto.action_code = l.action
     AND mto.result_code = l.result
-    AND (
-      (mto.complement_code IS NULL AND l.complement IS NULL)
-        OR mto.complement_code = l.complement
-    )
+    AND COALESCE(mto.complement_code, '__NULL__') = COALESCE(l.complement, '__NULL__')

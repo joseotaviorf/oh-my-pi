@@ -3,10 +3,17 @@ WITH contract_partnership_data AS (
         id_contract,
         partner_type,
         brokerage_split_percentage
-    FROM
-        datalake_ebdb_clean.contract_partnership_data
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY id DESC) = 1
+    FROM (
+        SELECT
+            id_contract,
+            partner_type,
+            brokerage_split_percentage,
+            ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY id DESC) AS rn
+        FROM
+            datalake_ebdb_clean.contract_partnership_data
+    )
+    WHERE
+        rn = 1
 ),
 
 brokerage_fee AS (
@@ -215,32 +222,43 @@ brokerage_fee AS (
 ),
 rental_brokerage_fee_discount AS (
     SELECT
-        die.id AS id_invoice_entry
-    FROM
-        datalake_invoice.invoice_entries AS fie
-    INNER JOIN
-        datalake_retsuko.invoice_entry AS die
-            ON fie.id = die.id
+        id_invoice_entry
+    FROM (
+        SELECT
+            die.id AS id_invoice_entry,
+            ROW_NUMBER() OVER(PARTITION BY fie.id_invoice, die.description ORDER BY fie.ts_created) AS rn
+        FROM
+            datalake_invoice.invoice_entries AS fie
+        INNER JOIN
+            datalake_retsuko.invoice_entry AS die
+                ON fie.id = die.id
+        WHERE
+            die.description LIKE '%Desconto por cadastro com link de indicação%'
+            AND fie.id_invoice > 0
+    )
     WHERE
-        die.description LIKE '%Desconto por cadastro com link de indicação%'
-        AND fie.id_invoice > 0
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY fie.id_invoice, die.description ORDER BY fie.ts_created) > 1
+        rn > 1
 ),
 rental_brokerage_fee_credit AS (
     SELECT
-        die.id AS id_invoice_entry,
-        die.description
-    FROM
-        datalake_invoice.invoice_entries AS fie
-    INNER JOIN
-        datalake_retsuko.invoice_entry AS die
-            ON fie.id = die.id
+        id_invoice_entry,
+        description
+    FROM (
+        SELECT
+            die.id AS id_invoice_entry,
+            die.description,
+            ROW_NUMBER() OVER(PARTITION BY fie.id_invoice, die.description ORDER BY fie.ts_created) AS rn
+        FROM
+            datalake_invoice.invoice_entries AS fie
+        INNER JOIN
+            datalake_retsuko.invoice_entry AS die
+                ON fie.id = die.id
+        WHERE
+            die.description LIKE '%Crédito - Parcelamento corretagem - QuintoAndar%'
+            AND fie.id_invoice > 0
+    )
     WHERE
-        die.description LIKE '%Crédito - Parcelamento corretagem - QuintoAndar%'
-        AND fie.id_invoice > 0
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY fie.id_invoice, die.description ORDER BY fie.ts_created) = 1
+        rn = 1
 ),
 rental_brokerage_fee_installment AS (
   SELECT
@@ -252,18 +270,24 @@ rental_brokerage_fee_installment AS (
 ),
 credit_fix_partner AS (
     SELECT
-        die.id AS id_invoice_entry,
-        die.description
-    FROM
-        datalake_invoice.invoice_entries AS fie
-    INNER JOIN
-        datalake_retsuko.invoice_entry AS die
-            ON fie.id = die.id
+        id_invoice_entry,
+        description
+    FROM (
+        SELECT
+            die.id AS id_invoice_entry,
+            die.description,
+            ROW_NUMBER() OVER(PARTITION BY fie.id_invoice, die.description ORDER BY fie.ts_created) AS rn
+        FROM
+            datalake_invoice.invoice_entries AS fie
+        INNER JOIN
+            datalake_retsuko.invoice_entry AS die
+                ON fie.id = die.id
+        WHERE
+            die.description LIKE '%Crédito - %'
+            AND fie.id_invoice > 0
+    )
     WHERE
-        die.description LIKE '%Crédito - %'
-        AND fie.id_invoice > 0
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY fie.id_invoice, die.description ORDER BY fie.ts_created) = 1
+        rn = 1
 )
 
 SELECT

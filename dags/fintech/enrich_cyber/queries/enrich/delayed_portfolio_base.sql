@@ -13,8 +13,28 @@ WITH deduplicate_records_delinquent_master AS (
         credit_denial_queue,
         olos_dialer_label,
         id_agency
-    FROM datalake_cyber_clean.delinquent_master
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, contract_group ORDER BY MAKE_DATE(year, month, day) DESC) = 1
+    FROM (
+        SELECT
+            contract_group,
+            creditor,
+            id_contract,
+            id_client,
+            debtor_name,
+            segmentation_queue,
+            commission_queue,
+            agreement_queue,
+            digital_channel_queue,
+            eviction_queue,
+            credit_denial_queue,
+            olos_dialer_label,
+            id_agency,
+            ROW_NUMBER() OVER(
+                PARTITION BY id_contract, contract_group
+                ORDER BY MAKE_DATE(year, month, day) DESC
+            ) AS rn
+        FROM datalake_cyber_clean.delinquent_master
+    )
+    WHERE rn = 1
 )
 SELECT
     dm.id_contract,

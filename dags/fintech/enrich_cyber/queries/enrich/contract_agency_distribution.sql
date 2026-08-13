@@ -2,13 +2,26 @@ WITH
 get_last_agency_contract_distribution AS (
   SELECT
     id_contract,
-    SPLIT(id_contract,r'\.')[0] AS id_contract_external,
-    IF(DATE_DIFF(ts_distribution, ts_redistribution) = 0, new_agency, agency) AS id_agency,
+    id_contract_external,
+    id_agency,
     creditor,
     ts_distribution,
     ts_redistribution
-  FROM datalake_cyber_clean.history_contract_distribution
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract_external, ts_distribution ORDER BY ts_redistribution, id_contract DESC) = 1
+  FROM (
+    SELECT
+      id_contract,
+      SPLIT(id_contract, r'\.')[0] AS id_contract_external,
+      IF(DATE_DIFF(ts_distribution, ts_redistribution) = 0, new_agency, agency) AS id_agency,
+      creditor,
+      ts_distribution,
+      ts_redistribution,
+      ROW_NUMBER() OVER(
+        PARTITION BY SPLIT(id_contract, r'\.')[0], ts_distribution
+        ORDER BY ts_redistribution, id_contract DESC
+      ) AS rn
+    FROM datalake_cyber_clean.history_contract_distribution
+  )
+  WHERE rn = 1
 ),
 agency_distribution AS (
   SELECT

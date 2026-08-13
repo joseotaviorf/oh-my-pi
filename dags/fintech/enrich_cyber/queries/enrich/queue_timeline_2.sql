@@ -3,8 +3,15 @@ WITH deduplicate_queues AS (
                 queue,
                 queue_type,
                 queue_name
-            FROM datalake_cyber.queue_decision_tree
-            QUALIFY ROW_NUMBER() OVER(PARTITION BY queue, queue_type ORDER BY level DESC) = 1
+            FROM (
+                SELECT
+                    queue,
+                    queue_type,
+                    queue_name,
+                    ROW_NUMBER() OVER(PARTITION BY queue, queue_type ORDER BY level DESC) AS rn
+                FROM datalake_cyber.queue_decision_tree
+            )
+            WHERE rn = 1
         ),
         base_union AS (
             SELECT
@@ -99,9 +106,29 @@ WITH deduplicate_queues AS (
 ),
 deduplicate_records AS (
     SELECT
-        *
-    FROM unpivot_table
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, queue_type, dt_updated ORDER BY ts_last_activity DESC, priority) = 1
+        id_contract,
+        priority,
+        queue_type,
+        queue,
+        queue_description,
+        dt_updated,
+        ts_last_activity
+    FROM (
+        SELECT
+            id_contract,
+            priority,
+            queue_type,
+            queue,
+            queue_description,
+            dt_updated,
+            ts_last_activity,
+            ROW_NUMBER() OVER(
+                PARTITION BY id_contract, queue_type, dt_updated
+                ORDER BY ts_last_activity DESC, priority
+            ) AS rn
+        FROM unpivot_table
+    )
+    WHERE rn = 1
     ORDER BY dt_updated
 ),
 range_date_explode AS (

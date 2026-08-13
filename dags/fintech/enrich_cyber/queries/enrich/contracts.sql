@@ -3,8 +3,15 @@ WITH deduplicate_queues AS (
         queue,
         queue_type,
         queue_name
-    FROM datalake_cyber.queue_decision_tree
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY queue, queue_type ORDER BY level DESC) = 1
+    FROM (
+        SELECT
+            queue,
+            queue_type,
+            queue_name,
+            ROW_NUMBER() OVER(PARTITION BY queue, queue_type ORDER BY level DESC) AS rn
+        FROM datalake_cyber.queue_decision_tree
+    )
+    WHERE rn = 1
 )
 SELECT
     COALESCE(c.id_contract, dm.id_contract) AS id_contract,

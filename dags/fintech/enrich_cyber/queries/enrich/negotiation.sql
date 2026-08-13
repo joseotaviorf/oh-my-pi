@@ -101,8 +101,14 @@ deduplicate_agency_group AS (
   SELECT
     agency_group,
     id_agency
-  FROM datalake_cyber_clean.agency_group
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY agency_group ORDER BY percentage_remuneration DESC) = 1
+  FROM (
+    SELECT
+      agency_group,
+      id_agency,
+      ROW_NUMBER() OVER(PARTITION BY agency_group ORDER BY percentage_remuneration DESC) AS rn
+    FROM datalake_cyber_clean.agency_group
+  )
+  WHERE rn = 1
 ),
 get_agency_group_name AS (
   SELECT

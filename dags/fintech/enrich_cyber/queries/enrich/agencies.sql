@@ -38,7 +38,14 @@ get_agency_group_details AS (
         SORT_ARRAY(COLLECT_SET(agency_name)) AS agencies_name_group,
         ts_main_agency_start
     FROM agency_group_base
-    GROUP BY ALL
+    GROUP BY
+        id_agency_group,
+        id_main_agency,
+        juridical_agency,
+        conventional_agency,
+        main_agency_name,
+        main_agency_type,
+        ts_main_agency_start
 )
 SELECT
     COALESCE(ag.id_agency_group, UPPER(a.id_agency)) AS id_agency,
