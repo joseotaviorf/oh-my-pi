@@ -16,6 +16,15 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.formatters.string_formatter import StringFormatter
 from bietlejuice.services.configuration_service import ConfigurationService
 
+# Rendered by Airflow at task runtime, so the `vacuum_lite_watermark_enabled` Airflow
+# Variable can be toggled from the UI without a deploy. Read as a template rather than
+# via Variable.get() so the scheduler does not hit the metadata DB on every DAG parse.
+# The spark job treats anything other than 'true' as disabled, so an unset Variable or
+# an unrendered template is fail-safe.
+_VACUUM_LITE_WATERMARK_TEMPLATE = (
+    "{{ var.value.get('vacuum_lite_watermark_enabled', 'false') }}"
+)
+
 
 def _chunk_table_attributes(table_attributes: List, batch_size: int) -> List[List]:
     if batch_size < 1:
@@ -258,6 +267,10 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 "--load-end-date",
                 self.dag_execution_context.load_end_date,
             ]
+        parameters += [
+            "--vacuum-lite-watermark",
+            _VACUUM_LITE_WATERMARK_TEMPLATE,
+        ]
         parameters += self._build_maintenance_state_cli_args()
         return parameters
 

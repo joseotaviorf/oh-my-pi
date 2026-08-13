@@ -19,6 +19,17 @@ _VALID_COLUMN_MAPPING_MODES = {"none", "name", "id"}
 # (log pruned, or no full VACUUM baseline inside the log retention window).
 _VACUUM_LITE_NOT_APPLICABLE_ERROR_CLASS = "DELTA_CANNOT_VACUUM_LITE"
 
+# Delta records "already cleaned up to this commit version" in this file. A *full* VACUUM
+# persists a null value into it (VacuumCommand.gc computes the version only for LITE runs,
+# then persists unconditionally), which permanently disqualifies a log-truncated table from
+# LITE. We rewrite it after a successful full vacuum so the next run can use LITE again.
+# Byte format captured from a real successful `VACUUM ... LITE` on delta-spark 3.3.1:
+#   b'{"latestCommitVersionOutsideOfRetentionWindow":5}\n'
+# The trailing newline comes from LogStore.write(path, Iterator.single(json)).
+_LAST_VACUUM_INFO_FILE_NAME = "_last_vacuum_info"
+_DELTA_LOG_DIR_NAME = "_delta_log"
+_DELTA_COMMIT_FILE_RE = re.compile(r"^(\d{20})\.json$")
+
 # Matches only safe SQL identifiers: letters, digits, underscores, and dots
 # (dots are used for qualified names like schema.table). This pattern is used
 # instead of a frozenset to allow static-analysis tools to recognise it as a
@@ -375,6 +386,81 @@ class DeltaLoader:
         self.spark.sql(command)
         logger.info(f"Vacuum successful for table {table_name}")
 
+    def _delta_log_dir(self, table_name: str) -> str:
+        """Return the ``_delta_log`` directory URI for ``table_name``.
+
+        Resolved via ``DESCRIBE DETAIL`` rather than a config-derived path so it works for
+        managed and external tables, on both the Databricks and Glue/Hive catalogs.
+        """
+        quoted_table = _quote_sql_table_name(table_name)
+        location = (
+            self.spark.sql(f"DESCRIBE DETAIL {quoted_table}")
+            .select("location")
+            .first()[0]
+        )
+        return f"{location.rstrip('/')}/{_DELTA_LOG_DIR_NAME}"
+
+    def _persist_vacuum_lite_watermark(self, table_name: str) -> None:
+        """Rewrite ``_last_vacuum_info`` so the *next* run is eligible for VACUUM LITE.
+
+        A full vacuum makes Delta persist a null watermark, which permanently disqualifies a
+        log-truncated table from LITE (``DELTA_CANNOT_VACUUM_LITE``). The full vacuum that
+        just completed listed the whole table prefix and deleted everything eligible, so
+        declaring "already cleaned up to <earliest retained commit>" is true.
+
+        The earliest retained commit is the most conservative legal value: LITE's gate needs
+        ``watermark >= earliestCommitVersion``, and a lower watermark only widens the commit
+        range the next LITE scans, so it can discover more tombstones but never fewer.
+
+        Best-effort by design. The vacuum has already succeeded when this runs, so any
+        failure here is logged and swallowed: it only costs the next run a fallback.
+        """
+        try:
+            log_dir = self._delta_log_dir(table_name)
+            jvm = self.spark._jvm
+            hadoop_conf = self.spark._jsc.hadoopConfiguration()
+            log_path = jvm.org.apache.hadoop.fs.Path(log_dir)
+            fs = log_path.getFileSystem(hadoop_conf)
+
+            versions = []
+            for status in fs.listStatus(log_path):
+                match = _DELTA_COMMIT_FILE_RE.match(status.getPath().getName())
+                if match:
+                    versions.append(int(match.group(1)))
+            if not versions:
+                logger.warning(
+                    f"No Delta commit files found under {log_dir}; skipping vacuum lite "
+                    f"watermark for table {table_name}."
+                )
+                return
+
+            earliest_version = min(versions)
+            payload = (
+                '{"latestCommitVersionOutsideOfRetentionWindow":'
+                f"{earliest_version}"
+                "}\n"
+            )
+            out_path = jvm.org.apache.hadoop.fs.Path(
+                f"{log_dir}/{_LAST_VACUUM_INFO_FILE_NAME}"
+            )
+            stream = fs.create(out_path, True)
+            try:
+                stream.write(bytearray(payload.encode("utf-8")))
+            finally:
+                stream.close()
+
+            logger.info(
+                f"Persisted vacuum lite watermark {earliest_version} for table "
+                f"{table_name}; next run should use VACUUM LITE."
+            )
+        except Exception as error:  # noqa: BLE001 - optimisation only, never fail the vacuum
+            reason = str(error)[:500].replace("\n", " | ")
+            logger.warning(
+                f"Could not persist vacuum lite watermark for table {table_name} "
+                f"({type(error).__name__}: {reason}); the next run will fall back to full "
+                f"vacuum again."
+            )
+
     def vacuum_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table"""
         table_name = _check_identifier_safety(table_name)
@@ -389,12 +475,21 @@ class DeltaLoader:
         )
         self._run_full_vacuum(table_name, retention_hours)
 
-    def vacuum_lite_table(self, table_name: str, retention_hours: int) -> None:
+    def vacuum_lite_table(
+        self,
+        table_name: str,
+        retention_hours: int,
+        bootstrap_watermark: bool = False,
+    ) -> None:
         """Vacuum a Delta table in lite mode (Delta 3.3+ / DBR 16.1+).
 
         Falls back to a full vacuum whenever the LITE statement fails: older runtimes
         cannot parse it at all, and Delta raises
         ``DELTA_CANNOT_VACUUM_LITE`` when the transaction log cannot back a LITE run.
+
+        When ``bootstrap_watermark`` is set, a successful fallback also rewrites the
+        ``_last_vacuum_info`` watermark that the full vacuum just nulled out, so the next
+        run is eligible for LITE instead of falling back forever.
         """
         table_name = _check_identifier_safety(table_name)
 
@@ -424,6 +519,8 @@ class DeltaLoader:
                 f"{_VACUUM_LITE_NOT_APPLICABLE_ERROR_CLASS}."
             )
             self._run_full_vacuum(table_name, retention_hours)
+            if bootstrap_watermark:
+                self._persist_vacuum_lite_watermark(table_name)
             return
         logger.info(f"Vacuum lite successful for table {table_name}")
 

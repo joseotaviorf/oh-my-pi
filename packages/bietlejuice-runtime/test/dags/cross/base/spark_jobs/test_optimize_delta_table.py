@@ -284,6 +284,38 @@ class TestDailyMaintenanceCap:
         loader.vacuum_lite_table.assert_called_once()
 
     @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
+    def test_run_job_forwards_watermark_bootstrap_flag(self, mock_full_name):
+        # arrange
+        mock_full_name.return_value = "datalake_dw.fact_x"
+        loader = MagicMock()
+        table_configs = {"schema": "dw", "run_optimize": False, "run_vacuum": True}
+
+        # act
+        run_job(
+            loader,
+            "fact_x",
+            table_configs,
+            "dw",
+            bootstrap_lite_watermark=True,
+        )
+
+        # assert
+        assert loader.vacuum_lite_table.call_args.kwargs["bootstrap_watermark"] is True
+
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
+    def test_run_job_defaults_watermark_bootstrap_to_disabled(self, mock_full_name):
+        # arrange
+        mock_full_name.return_value = "datalake_dw.fact_x"
+        loader = MagicMock()
+        table_configs = {"schema": "dw", "run_optimize": False, "run_vacuum": True}
+
+        # act
+        run_job(loader, "fact_x", table_configs, "dw")
+
+        # assert
+        assert loader.vacuum_lite_table.call_args.kwargs["bootstrap_watermark"] is False
+
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
     def test_run_job_uses_full_vacuum_when_vacuum_lite_disabled(self, mock_full_name):
         # arrange
         mock_full_name.return_value = "datalake_dw.fact_x"

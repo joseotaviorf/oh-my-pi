@@ -305,6 +305,30 @@ class TestOptimizeDeltaTableTaskCreator:
         assert tables_param.startswith(EMR_TABLES_B64_PREFIX)
 
     @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_passes_vacuum_lite_watermark_airflow_variable_template(
+        self, mock_create_spark, dag_execution_context
+    ):
+        """The flag must reach the job as a Jinja template.
+
+        It is rendered at task runtime by the operator (EmrAddStepsOperator templates
+        `steps`; the Databricks operator templates `json`), so the
+        `vacuum_lite_watermark_enabled` Airflow Variable can be toggled without a deploy.
+        A literal "false"/"true" here would freeze the flag into the DAG file instead.
+        """
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-all", dag=dag_execution_context.dag
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([_table("t1")])
+
+        parameters = mock_create_spark.call_args[0][2]
+        assert "--vacuum-lite-watermark" in parameters
+        value = parameters[parameters.index("--vacuum-lite-watermark") + 1]
+        assert value == "{{ var.value.get('vacuum_lite_watermark_enabled', 'false') }}"
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
     def test_uses_workflow_parallelism_override(
         self, mock_create_spark, dag_execution_context
     ):

@@ -515,6 +515,146 @@ class TestDeltaLoader:
             ]
         )
 
+    # ---- VACUUM LITE watermark bootstrap ----
+
+    # Captured verbatim from a real successful `VACUUM ... LITE` on delta-spark 3.3.1.
+    # If Delta changes the shape, re-capture it; do not hand-adjust.
+    EXPECTED_WATERMARK_PAYLOAD = b'{"latestCommitVersionOutsideOfRetentionWindow":10}\n'
+
+    @staticmethod
+    def _lite_fails(command):
+        if command.endswith("LITE"):
+            raise RuntimeError(
+                "org.apache.spark.sql.delta.DeltaIllegalStateException: "
+                "[DELTA_CANNOT_VACUUM_LITE] forced"
+            )
+        return mock.MagicMock()
+
+    @staticmethod
+    def _commit_status(name):
+        status = mock.MagicMock()
+        status.getPath.return_value.getName.return_value = name
+        return status
+
+    def test_vacuum_lite_fallback_persists_watermark_when_enabled(
+        self, mock_spark_context
+    ):
+        mock_spark_context.spark.sql.side_effect = self._lite_fails
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        with mock.patch.object(
+            DeltaLoader, "_persist_vacuum_lite_watermark"
+        ) as persist:
+            delta_loader.vacuum_lite_table("test_table", 24, bootstrap_watermark=True)
+
+        mock_spark_context.spark.sql.assert_has_calls(
+            [
+                mock.call("VACUUM `test_table` LITE"),
+                mock.call("VACUUM `test_table`"),
+            ]
+        )
+        persist.assert_called_once_with("test_table")
+
+    def test_vacuum_lite_fallback_skips_watermark_by_default(self, mock_spark_context):
+        mock_spark_context.spark.sql.side_effect = self._lite_fails
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        with mock.patch.object(
+            DeltaLoader, "_persist_vacuum_lite_watermark"
+        ) as persist:
+            delta_loader.vacuum_lite_table("test_table", 24)
+
+        mock_spark_context.spark.sql.assert_has_calls(
+            [mock.call("VACUUM `test_table`")]
+        )
+        persist.assert_not_called()
+
+    def test_watermark_not_written_when_full_vacuum_fails(self, mock_spark_context):
+        def sql_side_effect(command):
+            if command.startswith("VACUUM"):
+                raise RuntimeError("table not found")
+            return mock.MagicMock()
+
+        mock_spark_context.spark.sql.side_effect = sql_side_effect
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        with mock.patch.object(
+            DeltaLoader, "_persist_vacuum_lite_watermark"
+        ) as persist:
+            with pytest.raises(RuntimeError, match="table not found"):
+                delta_loader.vacuum_lite_table(
+                    "test_table", 24, bootstrap_watermark=True
+                )
+
+        persist.assert_not_called()
+
+    def test_vacuum_table_does_not_persist_watermark(self, mock_spark_context):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        with mock.patch.object(
+            DeltaLoader, "_persist_vacuum_lite_watermark"
+        ) as persist:
+            delta_loader.vacuum_table("test_table", 24)
+
+        persist.assert_not_called()
+
+    def test_watermark_failure_does_not_fail_vacuum(self, mock_spark_context):
+        """The guardrail that matters: the vacuum itself already succeeded."""
+        mock_spark_context.spark.sql.side_effect = self._lite_fails
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        with mock.patch.object(
+            DeltaLoader, "_delta_log_dir", side_effect=RuntimeError("no location")
+        ):
+            delta_loader.vacuum_lite_table("test_table", 24, bootstrap_watermark=True)
+
+        mock_spark_context.spark.sql.assert_has_calls(
+            [mock.call("VACUUM `test_table`")]
+        )
+
+    def test_watermark_payload_matches_delta_format(self, mock_spark_context):
+        spark = mock_spark_context.spark
+        stream = mock.MagicMock()
+        fs = mock.MagicMock()
+        fs.create.return_value = stream
+        fs.listStatus.return_value = [
+            self._commit_status("00000000000000000012.json"),
+            self._commit_status("00000000000000000010.json"),
+            self._commit_status("00000000000000000010.checkpoint.parquet"),
+            self._commit_status("_last_vacuum_info"),
+        ]
+        spark._jvm.org.apache.hadoop.fs.Path.return_value.getFileSystem.return_value = (
+            fs
+        )
+
+        delta_loader = DeltaLoader(spark=spark)
+        with mock.patch.object(
+            DeltaLoader, "_delta_log_dir", return_value="s3://bucket/t/_delta_log"
+        ):
+            delta_loader._persist_vacuum_lite_watermark("test_table")
+
+        # earliest retained commit is 10 - not the checkpoint, not 12
+        assert bytes(stream.write.call_args[0][0]) == self.EXPECTED_WATERMARK_PAYLOAD
+        stream.close.assert_called_once()
+        # overwrite=True, so the null watermark left by the full vacuum is replaced
+        assert fs.create.call_args[0][1] is True
+
+    def test_watermark_skipped_when_no_commit_files(self, mock_spark_context):
+        spark = mock_spark_context.spark
+        fs = mock.MagicMock()
+        fs.listStatus.return_value = [self._commit_status("_last_vacuum_info")]
+        spark._jvm.org.apache.hadoop.fs.Path.return_value.getFileSystem.return_value = (
+            fs
+        )
+
+        delta_loader = DeltaLoader(spark=spark)
+        with mock.patch.object(
+            DeltaLoader, "_delta_log_dir", return_value="s3://bucket/t/_delta_log"
+        ):
+            delta_loader._persist_vacuum_lite_watermark("test_table")
+
+        fs.create.assert_not_called()
+
     def test_vacuum_lite_table_propagates_full_vacuum_failure(self, mock_spark_context):
         def sql_side_effect(command):
             if command.startswith("VACUUM"):

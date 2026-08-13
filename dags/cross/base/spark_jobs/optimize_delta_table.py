@@ -87,6 +87,14 @@ def main():
         f"Starting vacuum and optimize for {len(tables)} tables, "
         f"parallelism = {args.parallelism}."
     )
+    # Fail-safe: only the exact string "true" enables it, so an unrendered Jinja
+    # template or a typo in the Airflow Variable leaves the behaviour unchanged.
+    bootstrap_lite_watermark = args.vacuum_lite_watermark.strip().lower() == "true"
+    if bootstrap_lite_watermark:
+        logger.info(
+            "Vacuum lite watermark bootstrap is enabled; fallback full vacuums will "
+            "rewrite _last_vacuum_info so the next run can use VACUUM LITE."
+        )
     job_args = [
         (
             loader,
@@ -94,6 +102,7 @@ def main():
             table_configs,
             args.layer,
             partition_predicate,
+            bootstrap_lite_watermark,
         )
         for table_name, table_configs in tables.items()
     ]
@@ -136,6 +145,16 @@ def parse_arguments() -> Namespace:
         help="Number of parallel table maintenance workers (ThreadPool). S3 marker I/O "
         "runs on the main thread after each table finishes.",
         default=16,
+    )
+    parser.add_argument(
+        "--vacuum-lite-watermark",
+        dest="vacuum_lite_watermark",
+        type=str,
+        default="false",
+        help="When 'true', a fallback full vacuum also rewrites the Delta "
+        "_last_vacuum_info watermark so the next run is eligible for VACUUM LITE. "
+        "Driven by the `vacuum_lite_watermark_enabled` Airflow Variable; any value other "
+        "than 'true' (including an unrendered Jinja template) leaves it disabled.",
     )
     parser.add_argument(
         "--load-start-date",
@@ -455,6 +474,7 @@ def run_job(
     table_configs: dict,
     layer: str,
     partition_predicate: Optional[str] = None,
+    bootstrap_lite_watermark: bool = False,
 ) -> Optional[str]:
     """Run OPTIMIZE/VACUUM for one table. Returns full table name when maintenance ran."""
 
@@ -479,7 +499,9 @@ def run_job(
     if run_vacuum:
         if table_configs.get("vacuum_lite", True):
             loader.vacuum_lite_table(
-                full_table_name, table_configs.get("vacuum_retention_hours", 7 * 24)
+                full_table_name,
+                table_configs.get("vacuum_retention_hours", 7 * 24),
+                bootstrap_watermark=bootstrap_lite_watermark,
             )
         else:
             loader.vacuum_table(
