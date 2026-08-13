@@ -15,8 +15,10 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 * [In Scope](#in-scope)
 * [Data Model and Tables](#data-model-and-tables)
 * [Core Features and Business Logic](#core-features-and-business-logic)
+  * [Cycle Periods](#cycle-periods)
 * [Attention and Limitations](#attention-and-limitations)
 * [How to Use](#how-to-use)
+  * [Cycle Periods — Point-in-Time Joins](#cycle-periods--point-in-time-joins)
   * [Where to Find Evaluation Text](#where-to-find-evaluation-text)
   * [Self and Manager Evaluations](#self-and-manager-evaluations)
   * [Peer Evaluations](#peer-evaluations)
@@ -41,6 +43,8 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 **✅ Peer feedback** : Peer and upward leadership evaluations submitted during Performa cycles, including section ratings and open-text comments. Each row links the evaluated employee to the participant who provided feedback, with `participant_role_type` distinguishing colleague feedback (`PEER`) from upward leadership feedback (`LEADERSHIP`). Both received and given feedback analysis are supported.
 
 **✅ Continuous management (Check-in)** : Mid-Year Checkpoint, Individual Development Plan (PDI), and One-on-One sessions registered in PIN, including questionnaire responses and manager feedback linked to each check-in meeting.
+
+**✅ Cycle periods** : Validity windows for each Performa year and each Talent Review sub-period, so a calendar date maps to the cycle that was operative on that day.
 
 ### Out of Scope
 
@@ -70,7 +74,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 | Table | Grain | Links |
 | :--- | :--- | :--- |
 | `dim_committee_meeting` | Current state: one record per committee meeting event | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_committee_meeting,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_committee_meeting.sql) |
-| `dim_cycle_period` | Current state: one row per review-period cycle (Performance Calibration year, or Talent Review year × sub-period), with a contiguous validity window per meeting type | [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_cycle_period.sql) |
+| `dim_cycle_period` | Current state: one row per review-period cycle (Performance Calibration year, or Talent Review year × sub-period), with a contiguous validity window per meeting type | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_cycle_period,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_cycle_period.sql) |
 | `dim_performance_evaluation` | Validity window: one record per evaluation per version (each meaningful rating change opens a new version) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_performance_evaluation,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_performance_evaluation.sql) |
 | `dim_performance_calibration` | Validity window: one record per calibration per version | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_performance_calibration,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_performance_calibration.sql) |
 | `dim_performance_variation` | Current state: one record per unique combination of Impact, Behavior, and Leadership variation trends (Increased / Maintained / Decreased) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_performance_variation,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_performance_variation.sql) |
@@ -97,6 +101,8 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 * `is_latest_for_employee_in_cycle` (Talent Review only — TRUE on the official review per person per cycle; filter this when attaching one rating to employee snapshots)
 * `is_latest_for_employee` (Talent Review only — TRUE on the employee's current official review across **released** cycles; use for “latest talent review” per person. Prefer this over `is_last_cycle`, which is period-of-service grain and can duplicate people with multiple assignments)
 * `is_last_cycle` (Talent Review only — TRUE on the latest meeting per period of service / assignment; not one-row-per-employee)
+* `sk_cycle_period` (Cycle key — present in calibration and talent-review facts; join to `dim_cycle_period` for the cycle label, release flag, and validity window)
+* `is_released` (Cycle release gate on `dim_cycle_period` — TRUE when results are broadly available for analytics)
 
 ## Core Features and Business Logic
 
@@ -126,11 +132,29 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 * **Checkpoint completion status** : `checkpoint_status` (`filled`, `in_progress`, `not_started`) is derived from questionnaire answers, discussion topics, and linked notes in the lake. It may differ from the PIN list view label "Discutido com [manager]" when Oracle flags (`is_worker_questionnaire_discussed`, `is_manager_questionnaire_discussed`) remain unset.
 
+### Cycle Periods
+
+`dim_cycle_period` is the source of truth for **when** a Performa or Talent Review cycle is operative. Use it whenever the question is "which cycle was in force on this date?", not "what is the latest result regardless of date?".
+
+* **Two independent timelines** : Performa (Performance Calibration) and Talent Review each have their own sequence of cycles. A given date maps to at most one Performa cycle and at most one Talent Review cycle. Always restrict a validity join to a single meeting type.
+
+* **Performa start (calendar rule)** : Each Performa cycle becomes operative on 1 January of the calendar year when the calibration committees meet. The cycle label looks one year behind that meeting year: committees that meet in 2026 are labeled `Performa 2025`. That lag is intentional — the meetings close the prior year's review. Talent Review does **not** carry this lag: the meeting year and the cycle name share the same calendar year.
+
+* **Talent Review start (observed meeting timing)** : Each Talent Review cycle becomes operative on the first day of the calendar month when that cycle's committee meetings **conclude** (the latest meeting date for the cycle). Because start dates follow observed meeting timing rather than the nominal quarter or half, a window can cross the period named in the label — for example an H2 cycle can start in September and run into the next calendar year.
+
+* **The validity window is authoritative** : Use `dt_valid_from` / `dt_valid_to` for point-in-time joins. Treat `cycle_name` as a stable identifier, not as a calendar description of January–March or July–December.
+
+* **Released vs in-progress** : A cycle appears in the dimension as soon as committee meetings exist. Results stay `is_released = FALSE` until People Insights releases the cycle for company-wide use. Unreleased cycles have no validity window (`dt_valid_from` and `dt_valid_to` are empty) and do **not** close the previous released cycle. Filter `is_released = TRUE` for analytics.
+
+* **Current cycle** : `is_current = TRUE` marks the latest *released* cycle of each meeting type. An in-progress unreleased cycle is never current. The latest released cycle stays open until the next released cycle starts.
+
+* **Point-in-time join** : To attach the operative Performa or Talent Review result to a snapshot date, join `dim_cycle_period` on meeting type and `snapshot_date BETWEEN dt_valid_from AND dt_valid_to`, then join the matching fact on `sk_cycle_period`. Daily employee snapshots in `metric_people.employee_snapshots` already apply this pattern. See [Cycle Periods — Point-in-Time Joins](#cycle-periods--point-in-time-joins).
+
 ### Business Assumptions
 
-* **Calibration meetings lag one calendar year behind the review cycle** : Performa committee meetings for a given review cycle (e.g. cycle year 2024) typically take place in the following calendar year (meeting year 2025). When joining calibration results back to evaluation or goal data by cycle year, account for this offset (meeting_year = cycle_year + 1).
+* **Calibration meetings lag one calendar year behind the review cycle** : Performa committee meetings for a given review cycle (e.g. cycle year 2024) typically take place in the following calendar year (meeting year 2025). When joining calibration results back to evaluation or goal data by cycle year, account for this offset (`meeting_year = cycle_year + 1`).
 
-* **`dim_cycle_period` is the source of truth for validity windows** : Each review-period cycle has a contiguous, non-overlapping window (`dt_valid_from` / `dt_valid_to`) per meeting type, so any date maps to exactly one cycle — use it for point-in-time joins. Performance Calibration starts on January 1st of `meeting_year`. Talent Review becomes operative in the calendar month when that cycle's committee meetings conclude. Because Talent Review windows follow observed meeting timing, a cycle's validity window may cross the nominal quarter, half, or year named in `cycle_name` (for example an H2 cycle can start in September and extend into the next calendar year); treat `cycle_name` as an identifier and the validity window as authoritative. Unlike calibration, Talent Review does **not** carry the one-year lag: it has no separate antecedent cycle, so the meeting itself is the cycle. The `is_released` flag is a manual, PR-controlled gate: an in-progress cycle is present in the DW but stays `is_released = FALSE` (not broadly available for analytics) until it is released in a PR.
+* **Cycle names are identifiers, not calendars** : A Talent Review label such as `Talent Review 2025 H2` does not mean the window is July–December 2025. The validity dates can start later than the named period and can extend into the following year. Always use the validity window, not the label, to decide which cycle a date belongs to.
 
 ## Attention and Limitations
 
@@ -148,6 +172,12 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 * **Coverage varies by document type** : PDI and most Mid-Year Checkpoint meetings do not create discussion topics in Oracle; One-on-One sessions are more likely to have agenda topics and linked notes. Absence of discussion topics does not necessarily mean the session was not held in PIN.
 
+* **Unreleased cycles have no validity window** : While `is_released = FALSE`, `dt_valid_from` and `dt_valid_to` are empty. A `BETWEEN` join on those dates will not match the in-progress cycle, and that cycle will not shorten the previous released window. This is expected until People Insights releases the cycle.
+
+* **Do not mix Performa and Talent Review windows** : The two meeting types share the same table but are separate timelines. A date can belong to one Performa cycle *and* one Talent Review cycle at the same time. Filter `meeting_type` (or join the dimension twice, once per type) before using the window.
+
+* **A named quarter or half can overlap the next calendar year** : Talent Review windows follow when committees actually finish, so `cycle_name` is a poor filter for "what was true in Q1". Use the validity dates, or start from `metric_people.employee_snapshots` when the grain is a calendar day.
+
 ## How to Use
 
 ### Standard Join Pattern
@@ -157,8 +187,90 @@ When joining performance data with other DW domains:
 1. Join on `person_number` to reach `dw_people.dim_employee` for employee attributes.
 2. Join talent reviews on `person_number` + `is_latest_for_employee_in_cycle = TRUE` (and `sk_cycle_period`) for one official rating per employee per cycle; use `is_latest_for_employee = TRUE` for the current official released review across cycles; use `assignment_number` when you need assignment-level history.
 3. Join on `assignment_number` when linking evaluations to assignment-level dimensions.
-4. Filter peer-evaluation facts on `cycle_name` and `participation_status = 'COMP'` when analyzing completed peer feedback only.
-5. Filter continuous-management facts on `review_period_name` and `document_type` when analyzing a specific Performa cycle or check-in type.
+4. For "as of this date" questions, join `dim_cycle_period` on `meeting_type` and `reference_date BETWEEN dt_valid_from AND dt_valid_to` (released cycles only), then join calibration or talent-review facts on `sk_cycle_period`.
+5. Filter peer-evaluation facts on `cycle_name` and `participation_status = 'COMP'` when analyzing completed peer feedback only.
+6. Filter continuous-management facts on `review_period_name` and `document_type` when analyzing a specific Performa cycle or check-in type.
+
+### Cycle Periods — Point-in-Time Joins
+
+**Question:** Which released Performa and Talent Review cycles are currently operative, and what are their validity windows?
+
+```sql
+SELECT
+    cycle.cycle_name,
+    cycle.meeting_type,
+    cycle.meeting_year,
+    cycle.reference_period,
+    cycle.is_current,
+    cycle.is_released,
+    cycle.dt_valid_from,
+    cycle.dt_valid_to
+FROM
+    dw_performance.dim_cycle_period AS cycle
+WHERE
+    cycle.is_released = TRUE
+ORDER BY
+    cycle.meeting_type,
+    cycle.dt_valid_from
+LIMIT 100
+```
+
+**Question:** Which Performa cycle and which Talent Review cycle were operative on 15 March 2026?
+
+```sql
+SELECT
+    cycle.cycle_name,
+    cycle.meeting_type,
+    cycle.dt_valid_from,
+    cycle.dt_valid_to
+FROM
+    dw_performance.dim_cycle_period AS cycle
+WHERE
+    cycle.is_released = TRUE
+    AND DATE('2026-03-15') BETWEEN cycle.dt_valid_from AND cycle.dt_valid_to
+ORDER BY
+    cycle.meeting_type
+LIMIT 100
+```
+
+**Question:** What were employee `999999`'s operative Performa score and Talent Review outcome on 15 March 2026?
+
+```sql
+SELECT
+    emp.person_number,
+    emp.name,
+    calibration_cycle.cycle_name AS performa_cycle_name,
+    calibration.performa_score,
+    calibration.performa_ipa,
+    talent_cycle.cycle_name AS talent_review_cycle_name,
+    talent.is_regrettable_loss
+FROM
+    dw_people.dim_employee AS emp
+LEFT JOIN
+    dw_performance.dim_cycle_period AS calibration_cycle
+        ON calibration_cycle.meeting_type = 'performance_calibration'
+        AND calibration_cycle.is_released = TRUE
+        AND DATE('2026-03-15') BETWEEN calibration_cycle.dt_valid_from AND calibration_cycle.dt_valid_to
+LEFT JOIN
+    dw_performance.fact_performance_calibrations AS calibration
+        ON calibration.person_number = emp.person_number
+        AND calibration.sk_cycle_period = calibration_cycle.sk_cycle_period
+LEFT JOIN
+    dw_performance.dim_cycle_period AS talent_cycle
+        ON talent_cycle.meeting_type = 'talent_review'
+        AND talent_cycle.is_released = TRUE
+        AND DATE('2026-03-15') BETWEEN talent_cycle.dt_valid_from AND talent_cycle.dt_valid_to
+LEFT JOIN
+    dw_performance.fact_talent_reviews AS talent
+        ON talent.person_number = emp.person_number
+        AND talent.sk_cycle_period = talent_cycle.sk_cycle_period
+        AND talent.is_latest_for_employee_in_cycle = TRUE
+WHERE
+    emp.person_number = '999999'
+LIMIT 100
+```
+
+> **Note:** `metric_people.employee_snapshots` already applies this date-to-cycle join on every daily snapshot. Use that metric when the analysis is "as of this day" across the workforce. Use the pattern above when you need a one-off as-of date against the DW facts.
 
 ### Continuous Management (Exploratory Query)
 
@@ -650,9 +762,13 @@ LIMIT 100
 * **Mid-Year Checkpoint** : Mid-cycle performance conversation between manager and employee, usually including the manager's written assessment of first-semester delivery and second-semester direction.
 * **PDI (Individual Development Plan)** : Career development document where the employee records goals, strengths, development areas, and action plans for the review period.
 * **One-on-One** : Recurring manager–worker check-in that may include agenda topics and discussion notes.
+* **Cycle period** : The span of calendar dates during which a given Performa year or Talent Review sub-period is the operative cycle for analytics. Stored as `dt_valid_from` / `dt_valid_to` on `dim_cycle_period`.
+* **Released cycle** : A cycle whose results People Insights has made available for company-wide reporting (`is_released = TRUE`). In-progress cycles exist in the dimension but have no validity window until they are released.
+* **Meeting year** : Calendar year when the committee meetings take place. For Performa this is one year after the year in the cycle name; for Talent Review it matches the year in the cycle name.
 
 ## See Also
 
-* **[DW Performance](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4702568457/DW+Performance)** : Detailed documentation for the `dw_performance` schema — table-level descriptions, grain, SLA, and DataHub links for every dimension and fact covered in this domain.
+* **[DW Performance](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4702568457/DW+Performance)** : Older table-level notes for this schema. Cycle period dates and point-in-time joins are documented on this page under [Cycle Periods](#cycle-periods).
 * **[Goals](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4642635856/Goals)** : Detailed documentation for goal-setting and achievement data, covering the `fact_goal_achievements` table and the Impact Alignment process.
 * **`dw_compensation`** : The PLR fact table in the compensation schema consumes the IPA multiplier produced here. Use `dw_compensation.fact_plr_monthly` when the goal is to analyze the full bonus calculation, including corporate goal factors and eligibility rules.
+* **`metric_people.employee_snapshots`** : Daily employee snapshots already attach the operative Performa and Talent Review results using `dim_cycle_period` validity windows. Use that metric when the analysis is "as of this day" rather than "for this named cycle".
