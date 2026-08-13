@@ -1,0 +1,241 @@
+---
+database_name: datalake_consorcio
+table_name: deal
+owner: edgar.fernandes@quintoandar.com.br
+domain: QCX
+description: >
+  Consórcio HubSpot deal current state. One row per unique deal on pipeline
+  737631007 after dropping test names and duplicates. Holds identity,
+  attribution (origin/segment maps), ownership, C2W contact_type, Conrado
+  qualifier and discard-survey answers, simulation counts, and current_stage.
+  Funnel visit history is datalake_consorcio.deal_stage. Funil Cohort
+  first-hit times and current-position flags are datalake_consorcio.deal_milestone.
+  Partitioned by deal creation date in America/Sao_Paulo. Full rebuild daily.
+columns:
+  id_deal:
+    lineage:
+      - datalake_hubspot.deal_stage.id_deal
+    description: HubSpot deal identifier; primary key of this table (one row per unique Consórcio deal).
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot.deal.id_hubspot_owner
+    description: HubSpot owner id of the analyst currently on the deal; joins owner and the inline analyst_ops map.
+  id_device:
+    lineage:
+      - datalake_hubspot.deal.consorcio_id_device
+    description: Device identifier captured on the deal at creation (HubSpot consorcio_id_device).
+  uuid_lead:
+    lineage:
+      - datalake_hubspot.deal.consorcio_id_lead
+    description: >
+      Consórcio lead UUID from HubSpot consorcio_id_lead; joins to
+      datalake_consorcio_clean.lead.uuid.
+  deal_name:
+    lineage:
+      - datalake_hubspot.deal.deal_name
+    description: HubSpot deal name. Rows with Teste or test in the name are excluded from this table.
+  current_stage:
+    lineage:
+      - datalake_hubspot.stage.label
+    description: Lowercased HubSpot stage label of the latest visit (max ts_stage_started) for this deal.
+  origin:
+    lineage:
+      - datalake_hubspot.deal.consorcio_utm_source
+      - datalake_hubspot.deal.consorcio_utm_medium
+      - datalake_hubspot.deal.consorcio_discard_reason
+      - datalake_hubspot.deal.consorcio_quota_amount
+    description: >
+      Attribution channel (lowercased). blip_reply medium maps to repescagem;
+      otherwise the inline utm_source map; DAG Fail - Properties Null when
+      discard reason or quota is missing; else Others or Direct.
+  utm_source:
+    lineage:
+      - datalake_hubspot.deal.consorcio_utm_source
+    description: >
+      Raw HubSpot consorcio_utm_source, unmapped. Distinct from origin, which
+      applies the Funil channel taxonomy. Needed by lead scoring to flag
+      human re-engagement before training.
+  utm_medium:
+    lineage:
+      - datalake_hubspot.deal.consorcio_utm_medium
+    description: Lowercased HubSpot consorcio_utm_medium on the deal.
+  utm_campaign:
+    lineage:
+      - datalake_hubspot.deal.consorcio_utm_campaign
+    description: HubSpot consorcio_utm_campaign used for segment mapping and CRM tenant/owner cuts.
+  utm_content:
+    lineage:
+      - datalake_hubspot.deal.consorcio_utm_content
+    description: HubSpot consorcio_utm_content creative or content identifier.
+  utm_term:
+    lineage:
+      - datalake_hubspot.deal.consorcio_utm_term
+    description: HubSpot consorcio_utm_term search keyword or equivalent.
+  segment:
+    lineage:
+      - datalake_hubspot.deal.consorcio_utm_source
+      - datalake_hubspot.deal.consorcio_utm_campaign
+    description: >
+      Paid/CRM campaign segment. CRM source plus campaign name yields Tenants,
+      FS_ToF, Owners, or FR_ToF; otherwise the inline utm_campaign map
+      (Branded, Search Non Branded, Meta Ads, and similar).
+  inside_sales_pipeline:
+    lineage:
+      - datalake_hubspot.deal.consorcio_inside_sales_pipeline
+    description: Inside-sales track — SDR IA (Blip Conrado), SIMULATOR IA (Conversational Platform), or SDR Humano.
+  discard_reason:
+    lineage:
+      - datalake_hubspot.deal.consorcio_discard_reason
+    description: Reason the deal was discarded in HubSpot; also used to flag missing-property origin failures.
+  forms_origin:
+    lineage:
+      - datalake_hubspot.deal.consorcio_forms_origin
+    description: Form or landing origin recorded on the Consórcio deal in HubSpot.
+  lead_priority:
+    lineage:
+      - datalake_hubspot.deal.consorcio_lead_priority
+    description: Lead priority set on the Consórcio deal for routing and analyst work.
+  quota_amount:
+    lineage:
+      - datalake_hubspot.deal.consorcio_quota_amount
+    description: Quota / carta de crédito amount on the deal; null together with discard reason marks origin as DAG Fail.
+  installment_type:
+    lineage:
+      - datalake_hubspot.deal.consorcio_installment_type
+    description: Installment type chosen on the Consórcio deal (HubSpot consorcio_installment_type).
+  channel_origin:
+    lineage:
+      - datalake_hubspot.deal.consorcio_channel_origin
+    description: Channel origin property stored on the Consórcio HubSpot deal.
+  deal_amount:
+    lineage:
+      - datalake_hubspot.deal.amount
+    description: HubSpot deal amount (pipeline currency), distinct from negotiation_value filled at offer under negotiation.
+  customer_journey:
+    lineage:
+      - datalake_consorcio_clean.lead.metadata
+    description: customerJourney value extracted from Consórcio lead metadata JSON when the lead UUID matches the deal.
+  qualifier_goal:
+    lineage:
+      - datalake_hubspot.deal.consorcio_conrado_qualificador_responses
+    description: Conrado qualifier answer for goal, extracted from consorcio_conrado_qualificador_responses JSON.
+  qualifier_investment_type:
+    lineage:
+      - datalake_hubspot.deal.consorcio_conrado_qualificador_responses
+    description: Conrado qualifier answer for investmentType from the qualifier JSON on the deal.
+  qualifier_reason:
+    lineage:
+      - datalake_hubspot.deal.consorcio_conrado_qualificador_responses
+    description: Conrado qualifier answer for reason from the qualifier JSON on the deal.
+  qualifier_knowledge:
+    lineage:
+      - datalake_hubspot.deal.consorcio_conrado_qualificador_responses
+    description: Conrado qualifier answer for knowledge from the qualifier JSON on the deal.
+  qualifier_urgency:
+    lineage:
+      - datalake_hubspot.deal.consorcio_conrado_qualificador_responses
+    description: Conrado qualifier answer for urgency from the qualifier JSON on the deal.
+  abandoned_cart_template_sent:
+    lineage:
+      - datalake_hubspot.deal.consorcio_abandoned_cart_template_sent
+    description: >
+      Raw HubSpot flag (lowercase true/false string). true means the company
+      sent the abandoned-cart template (user did not message first). Populated
+      for deals created on or after 2026-08-10. The boolean form is is_abandoned_cart.
+  contact_type:
+    lineage:
+      - datalake_hubspot.deal.consorcio_abandoned_cart_template_sent
+    description: company_initiated or user_initiated from the abandoned-cart template flag; C2W who started WhatsApp, not contact-attempt passage.
+  negotiation_value:
+    lineage:
+      - datalake_hubspot.deal.consorcio_negotiation_value
+    description: Simulation value the analyst filled at offer under negotiation (cast to double).
+  bamaq_proposal_codes:
+    lineage:
+      - datalake_hubspot.deal.consorcio_bamaq_proposal_codes
+    description: Bamaq proposal or quota codes stored on the Consórcio deal.
+  feedback_benefits:
+    lineage:
+      - datalake_hubspot.deal.consorcio_feedback_survey
+    description: Comma-joined benefits list from the post-discard survey JSON; flow_token (WhatsApp id) is not extracted.
+  feedback_comment:
+    lineage:
+      - datalake_hubspot.deal.consorcio_feedback_survey
+    description: Free-text comment from the post-discard survey JSON; empty string stored as null.
+  analyst_name:
+    lineage:
+      - datalake_hubspot_clean.owner.first_name
+      - datalake_hubspot_clean.owner.last_name
+    description: Display name of the Consórcio-team HubSpot owner (first plus last), deduped to one row per id_owner.
+  analyst_role:
+    description: Analyst seniority (Junior, Pleno, Senior) from the inline analyst_ops map keyed by id_owner; null when unmapped.
+  supervisor_name:
+    description: Analyst supervisor first name from the inline analyst_ops map; n/a or Bamaq when that is how the team recorded it; null when unmapped.
+  feedback_score:
+    lineage:
+      - datalake_hubspot.deal.consorcio_feedback_survey
+    description: Post-discard survey score (nota) extracted from consorcio_feedback_survey JSON.
+  total_simulations:
+    lineage:
+      - datalake_consorcio_clean.simulation.id
+    description: Count of simulations for the matched lead; 0 when there is no lead match or no simulations (expected outside SIMULATOR IA).
+  is_abandoned_cart:
+    lineage:
+      - datalake_hubspot.deal.consorcio_abandoned_cart_template_sent
+    description: 1 when abandoned-cart template was sent (company_initiated), 0 when the user messaged first; null if the property is unset.
+  has_blip_agent_inactivity:
+    lineage:
+      - datalake_hubspot.deal.consorcio_blip_agent_inactivity
+    description: 1 when the deal received Conrado's inactivity follow-up on Blip, 0 when it did not; null if the HubSpot property is unset.
+  is_feedback_contact_allowed:
+    lineage:
+      - datalake_hubspot.deal.consorcio_feedback_survey
+    description: Whether the respondent authorized follow-up contact in the post-discard survey JSON; empty string stored as null.
+  dt_created:
+    lineage:
+      - datalake_hubspot.deal.ts_created
+    description: Calendar date of ts_deal_created in America/Sao_Paulo; Funil Cohort creation-date anchor.
+  dt_month_start:
+    lineage:
+      - datalake_hubspot.deal.ts_created
+    description: Month truncated from ts_deal_created in America/Sao_Paulo; convenience grain for monthly charts.
+  dt_week_start:
+    lineage:
+      - datalake_hubspot.deal.ts_created
+    description: Week truncated from ts_deal_created in America/Sao_Paulo; convenience grain for weekly charts.
+  ts_deal_created:
+    lineage:
+      - datalake_hubspot.deal.ts_created
+    description: Deal creation timestamp converted from UTC to America/Sao_Paulo; cohort analyses should use dt_created.
+  ts_lead_created:
+    lineage:
+      - datalake_consorcio_clean.lead.ts_created
+      - datalake_consorcio_clean.lead.uuid
+    description: >
+      Lead creation timestamp in consorcio-api, converted to America/Sao_Paulo.
+      Aggregated MIN per uuid so the deal grain cannot fan out. Null when no
+      lead row matches the deal uuid_lead.
+  ts_current_stage_started:
+    lineage:
+      - datalake_hubspot.deal_stage.ts_stage_started
+    description: When the deal entered current_stage (latest ts_stage_started), in America/Sao_Paulo.
+  ts_first_simulated:
+    lineage:
+      - datalake_consorcio_clean.simulation.ts_created
+    description: >
+      Earliest simulation.ts_created for the matched Consórcio lead, converted
+      from UTC to America/Sao_Paulo (same clock as ts_lead_created). Null when
+      the lead has no simulations.
+  ts_last_simulated:
+    lineage:
+      - datalake_consorcio_clean.simulation.ts_created
+    description: >
+      Latest simulation.ts_created for the matched Consórcio lead, converted
+      from UTC to America/Sao_Paulo (same clock as ts_lead_created). Null when
+      the lead has no simulations.
+  year:
+    description: Partition column — calendar year of dt_created.
+  month:
+    description: Partition column — calendar month of dt_created.
+  day:
+    description: Partition column — calendar day of dt_created.

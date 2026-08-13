@@ -1,23 +1,26 @@
 ---
 database_name: datalake_consorcio
-table_name: funnel_stage
+table_name: deal_stage
 owner: carlos.procha@quintoandar.com.br
 domain: QCX
 description: >
-  Consórcio CRM funnel stage visits. Grain is one row per deal entering a
-  pipeline stage (id_deal, id_stage, ts_entered). Linked to Consórcio leads via
-  uuid_lead (HubSpot consorcio_id_lead). Supports multiple pipelines; filter
-  by id_pipeline / pipeline_name in queries. Column names are CRM-agnostic;
-  HubSpot deal_stage is the current upstream. Partitioned by ts_entered.
+  Consórcio CRM deal stage visits for deals in datalake_consorcio.deal.
+  Grain is one row per deal entering a pipeline stage (id_deal, id_stage,
+  ts_entered). Inner-joined to the deal master so the population matches
+  unique Consórcio pipeline 737631007 deals. Path table for Funil Cohort
+  rollup in datalake_consorcio.deal_milestone. HubSpot deal_stage is the
+  upstream. ts_entered / ts_exited are converted to America/Sao_Paulo.
+  Partitioned by local ts_entered. Full rebuild daily.
 columns:
   id_deal:
     lineage:
+      - datalake_consorcio.deal.id_deal
       - datalake_hubspot.deal_stage.id_deal
-    description: CRM deal / opportunity identifier (HubSpot id_deal today).
+    description: CRM deal identifier; joins to datalake_consorcio.deal.id_deal.
   id_pipeline:
     lineage:
       - datalake_hubspot.deal_stage.id_pipeline
-    description: Funnel / pipeline identifier the stage belongs to.
+    description: Funnel / pipeline identifier the stage belongs to (Consórcio 737631007).
   id_stage:
     lineage:
       - datalake_hubspot.deal_stage.id_stage
@@ -32,8 +35,8 @@ columns:
       in Trino, so no display label is materialized.
   uuid_lead:
     lineage:
-      - datalake_hubspot.deal.consorcio_id_lead
-    description: Consórcio lead UUID; joins to datalake_consorcio_clean.lead.uuid.
+      - datalake_consorcio.deal.uuid_lead
+    description: Consórcio lead UUID from the deal master; joins to datalake_consorcio_clean.lead.uuid.
   pipeline_name:
     lineage:
       - datalake_hubspot.pipeline.label
@@ -49,14 +52,11 @@ columns:
   ts_entered:
     lineage:
       - datalake_hubspot.deal_stage.ts_stage_started
-    description: Timestamp when the deal entered this stage.
+    description: Timestamp when the deal entered this stage, converted from HubSpot UTC to America/Sao_Paulo.
   ts_exited:
     lineage:
       - datalake_hubspot.deal_stage.ts_stage_ended
-    description: >
-      Timestamp when the deal left this stage; null if still current. Incremental
-      loads also select visits whose exit falls in the load window so ts_exited is
-      updated even when ts_entered is older than the rolling lookback.
+    description: Timestamp when the deal left this stage, converted from HubSpot UTC to America/Sao_Paulo; null if still current.
   year:
     description: Partition column — calendar year of ts_entered.
   month:

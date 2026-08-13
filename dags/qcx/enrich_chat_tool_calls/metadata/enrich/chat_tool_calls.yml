@@ -40,7 +40,7 @@ columns:
   uuid_lead:
     lineage:
       - datalake_consorcio_clean.lead.uuid
-    description: Consórcio lead UUID when id_lead is linked; aligns with funnel_stage.uuid_lead.
+    description: Consórcio lead UUID when id_lead is linked; aligns with deal_stage.uuid_lead.
   host_name:
     lineage:
       - datalake_langfuse_clean.traces.tags

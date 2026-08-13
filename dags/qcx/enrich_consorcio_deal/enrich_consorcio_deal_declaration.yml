@@ -1,0 +1,41 @@
+dag:
+  name: enrich_consorcio_deal
+  schedule_start_date: 2026, 7, 1
+  owner: QCX
+  documentation:
+    dag_purpose: |
+      Consórcio CRM enrich: datalake_consorcio.deal (current deal entity),
+      datalake_consorcio.deal_stage (stage-visit path for those deals),
+      and datalake_consorcio.deal_milestone (Funil Cohort first-hit times
+      and current-position flags rolled up from visits). Deal runs first;
+      visits inner-join deal; milestone reads both. All three are a full
+      daily rebuild. HubSpot is the current CRM upstream. Visit and deal
+      timestamps are converted to America/Sao_Paulo once on deal / deal_stage;
+      deal_milestone reads those local clocks. Business-day cycle times stay
+      in metric (they join dw_public.dim_date).
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: consorcio
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  inner_dependencies:
+    deal_stage:
+      - deal
+    deal_milestone:
+      - deal
+      - deal_stage
+  tables_customization:
+    deal:
+      z_order_by: [id_deal]
+      run_optimize: true
+      run_vacuum: true
+    deal_stage:
+      z_order_by: [id_deal, ts_entered]
+      run_optimize: true
+      run_vacuum: true
+    deal_milestone:
+      z_order_by: [id_deal]
+      run_optimize: true
+      run_vacuum: true

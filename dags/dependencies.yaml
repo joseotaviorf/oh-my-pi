@@ -1973,6 +1973,14 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.google_ads:load-clean-keywords-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-videos-performance:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags:first-run-of-day
+bietlejuice.enrich_consorcio_deal:
+  - bietlejuice.consorcio:load-clean-lead:first-run-of-day
+  - bietlejuice.consorcio:load-clean-simulation:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-deal-stage:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-deal:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-pipeline:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-stage:first-run-of-day
+  - bietlejuice.hubspot:load-clean-owner:first-run-of-day
 bietlejuice.enrich_consumption_bill:
   - bietlejuice.ebdb_administration:load-clean-consumption-bill-aud:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
@@ -2613,11 +2621,6 @@ bietlejuice.enrich_for_sale_experiment:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
-bietlejuice.enrich_funnel_stage:
-  - bietlejuice.enrich_hubspot_crm:load-enrich-deal-stage:first-run-of-day
-  - bietlejuice.enrich_hubspot_crm:load-enrich-deal:first-run-of-day
-  - bietlejuice.enrich_hubspot_crm:load-enrich-pipeline:first-run-of-day
-  - bietlejuice.enrich_hubspot_crm:load-enrich-stage:first-run-of-day
 bietlejuice.enrich_golden_set:
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set:first-run-of-day
 bietlejuice.enrich_google_admin:
