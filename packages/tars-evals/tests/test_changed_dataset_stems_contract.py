@@ -66,7 +66,10 @@ def test_reverse_index_resolves_house_and_listing(real_reverse_index):
     assert real_reverse_index["house-and-listing"] == {
         "credit_metrics",
         "listing_demand_funnel_conversions",
+        "listing_performance_score",
         "listing_to_rental",
+        "listing_to_unpublish",
+        "listing_to_well_priced",
         "ongoing_listings",
         "supply_retention_sale",
     }

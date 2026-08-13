@@ -1,0 +1,13 @@
+# auto-generated
+# source: docs/llm_context/metric_entities/listing_performance_score.md
+# Do not edit — regenerate with: make generate-datasets
+items:
+- id: listing_performance_score-latest-performance-score-for-a-house-rent-or-sale
+  question: Latest performance score for a house (RENT or SALE)
+  expected_query: "SELECT\n    hms.id_house,\n    hms.business_context,\n    MAKE_DATE(hms.year, hms.month, hms.day) AS score_date,\n    hms.final_score,\n    hms.score_srpv,\n    hms.score_lpv,\n    hms.score_vb,\n    hms.score_os,\n    hms.base_srpv,\n    hms.base_lpv,\n    hms.base_vb,\n    hms.base_os,\n    hms.base_favorites,\n    hms.score_favorites,\n    hms.calculation_score_lpv,\n    hms.final_score_rule,\n    hms.similar_metric_rule,\n    hms.dt_agg_started,\n    hms.dt_agg_ended,\n    hms.ids_similar IS NOT NULL AS has_similar_set\nFROM datalake_similarity_score.house_metrics_score AS hms\nWHERE hms.id_house = 12345678\n  AND hms.business_context = 'RENT'\n  AND hms.year = 2026\n  AND hms.month = 7\n  AND hms.day = 3"
+- id: listing_performance_score-score-distribution-by-day-rent-br-houses
+  question: Score distribution by day (RENT, BR houses)
+  expected_query: "SELECT\n    MAKE_DATE(hms.year, hms.month, hms.day) AS score_date,\n    hms.final_score,\n    COUNT(*) AS n_houses\nFROM datalake_similarity_score.house_metrics_score AS hms\nINNER JOIN dw_house.dim_house AS dh\n    ON hms.id_house = dh.sk_house\nINNER JOIN dw_public.dim_region AS dr\n    ON dh.sk_region = dr.sk_region\nWHERE hms.business_context = 'RENT'\n  AND dr.country_code = 'BR'\n  AND hms.year = 2026\n  AND hms.month = 7\n  AND hms.final_score IS NOT NULL\nGROUP BY 1, 2\nORDER BY 1, 2"
+- id: listing_performance_score-base-house-with-similar-peer-count
+  question: Base house with similar peer count
+  expected_query: "SELECT\n    hms.id_house,\n    hms.business_context,\n    MAKE_DATE(hms.year, hms.month, hms.day) AS score_date,\n    hms.final_score,\n    sh.qty_similar,\n    sh.similar_rule\nFROM datalake_similarity_score.house_metrics_score AS hms\nLEFT JOIN datalake_similarity_score.similar_houses AS sh\n    ON hms.id_house = sh.id_house\n   AND hms.business_context = sh.business_context\n   AND hms.year = sh.year\n   AND hms.month = sh.month\n   AND hms.day = sh.day\nWHERE hms.id_house = 12345678\n  AND hms.business_context = 'SALE'\n  AND hms.year = 2026\n  AND hms.month = 7\n  AND hms.day = 3"
