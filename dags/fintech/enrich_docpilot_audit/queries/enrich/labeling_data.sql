@@ -14,7 +14,7 @@ WITH resend_events AS
             ON f.sk_house_listing = hl.sk_house_listing
         WHERE p.tenant_documentation_status = 'ReenvioDocumentos'
             AND p.mod_tenant_documentation_status = TRUE
-            AND hl.country_code == 'BR' GROUP  BY 1
+            AND hl.country_code = 'BR' GROUP  BY 1
     ),
     first_docs_sent AS (
         SELECT
@@ -23,7 +23,7 @@ WITH resend_events AS
         FROM dw_rent.fact_listing_rent_flows f
             LEFT JOIN dw_rent.dim_house_listing AS hl
             ON f.sk_house_listing = hl.sk_house_listing
-        WHERE hl.country_code == 'BR' GROUP  BY 1
+        WHERE hl.country_code = 'BR' GROUP  BY 1
     ),
     last_3_months AS (
         SELECT
@@ -192,12 +192,22 @@ one_rejection_per_analyst AS (
         result,
         reason,
         analyst
-    FROM
-        latest_week_analyses
+    FROM (
+        SELECT
+            id_proposal,
+            type,
+            ts_credit_analysis_updated,
+            result,
+            reason,
+            analyst,
+            ROW_NUMBER() OVER (PARTITION BY analyst ORDER BY RAND()) AS rn
+        FROM
+            latest_week_analyses
+        WHERE
+            result = 'REJECTED'
+    )
     WHERE
-        result = 'REJECTED'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY analyst ORDER BY RAND()) = 1
+        rn = 1
 ),
 missing_rejections AS (
     SELECT
@@ -257,13 +267,20 @@ id_document_deduped AS (
     id,
     name,
     id_folder
-  FROM
-    id_document_processed
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY id
-      ORDER BY ts_updated DESC
-    ) = 1
+  FROM (
+    SELECT
+      id,
+      name,
+      id_folder,
+      ROW_NUMBER() OVER (
+        PARTITION BY id
+        ORDER BY ts_updated DESC
+      ) AS rn
+    FROM
+      id_document_processed
+  )
+  WHERE
+    rn = 1
 ),
 income_document_processed AS (
   SELECT
@@ -289,13 +306,24 @@ income_document_deduped AS (
     id_proponent,
     statements_json_str,
     payslips_json_str
-  FROM
+  FROM (
+    SELECT
+      id,
+      id_proposal,
+      id_folder,
+      id_context_external,
+      id_proponent,
+      statements_json_str,
+      payslips_json_str,
+      ROW_NUMBER() OVER (
+        PARTITION BY id_proposal, id_proponent
+        ORDER BY ts_updated DESC
+      ) AS rn
+    FROM
       income_document_processed
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY id_proposal, id_proponent
-      ORDER BY ts_updated DESC
-    ) = 1
+  )
+  WHERE
+    rn = 1
 ),
 income_document_joined AS (
   SELECT
@@ -349,13 +377,29 @@ data_deduped AS (
     result,
     reason,
     analyst
-  FROM
-    data_joined
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY id_proposal, id_proponent
-      ORDER BY ts_updated_for_dedup DESC
-    ) = 1
+  FROM (
+    SELECT
+      id_proposal,
+      id_proponent,
+      id_folder,
+      id_context_external,
+      statements_json_str,
+      payslips_json_str,
+      name,
+      type,
+      ts_credit_analysis_updated,
+      result,
+      reason,
+      analyst,
+      ROW_NUMBER() OVER (
+        PARTITION BY id_proposal, id_proponent
+        ORDER BY ts_updated_for_dedup DESC
+      ) AS rn
+    FROM
+      data_joined
+  )
+  WHERE
+    rn = 1
 ),
 documents_processed AS (
   SELECT

@@ -1,14 +1,24 @@
 cluster:
-  type: consolidation_l_memory_cluster
-  databricks_conn_id: databricks_new_env
+  # Name-map from consolidation_l_memory → emr_7_12_consolidation_l_memory_fleet.
+  # Prior Databricks: r7gd.4xlarge Photon, autoscale 5–8 workers.
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
-    node_type_id: r7gd.4xlarge
-    runtime_engine: PHOTON
-    spark_version: 16.4.x-scala2.12
-    autoscale:
-      min_workers: 5
-      max_workers: 8
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    core_nodes:
+      target_on_demand: 5
+      target_spot: 0
+      instance_types:
+        - r6g.4xlarge
+        - r7g.4xlarge
+        - r6i.4xlarge
+    task_nodes:
+      target_on_demand: 0
+      target_spot: 2
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+      instance_types:
+        - r6g.4xlarge
+        - r7g.4xlarge
+        - r6i.4xlarge
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.sql.shuffle.partitions: "400"
+      spark.dynamicAllocation.maxExecutors: "28"
