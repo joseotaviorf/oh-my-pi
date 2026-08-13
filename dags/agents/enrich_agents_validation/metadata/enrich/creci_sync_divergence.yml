@@ -1,0 +1,64 @@
+---
+database_name: datalake_agents_validation
+table_name: creci_sync_divergence
+description: |
+  Validation table that identifies CRECI divergences for active agents across
+  DadosAgente, Partner, and Person.
+  All three source pairs are compared. Differences in casing or surrounding spaces
+  are ignored, while missing or different values are flagged.
+  The table stores only identifiers and boolean flags, never the raw CRECI value.
+  A sentinel row is included when no divergences are found so the data quality alert
+  can still evaluate the table.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  uuid_person:
+    description: Person UUID of the agent with a CRECI divergence.
+    lineage:
+      - datalake_ebdb_clean.agent.uuid_person
+  id_agent:
+    description: EBDB agent identifier (agent.id) of the ACTIVE agent with a CRECI divergence.
+    lineage:
+      - datalake_ebdb_clean.agent.id
+  id_agent_data:
+    description: EBDB DadosAgente identifier linked to the agent via agent_external_reference.
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+  id_partner:
+    description: EBDB Partner identifier linked to the agent via agent_external_reference.
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+  is_agent_data_missing_creci:
+    description: Flags a linked DadosAgente record with a blank CRECI.
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+      - datalake_ebdb_clean.agent_data.creci_number
+  is_partner_missing_creci:
+    description: Flags a linked Partner record with a blank CRECI.
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+      - datalake_ebdb_clean.partner.creci
+  is_person_missing_creci:
+    description: Flags an agent with no CRECI document on file in the Person service.
+    lineage:
+      - datalake_person_clean.identity_document.identification_number
+  is_agent_data_vs_person_divergent:
+    description: Flags a CRECI mismatch between the DadosAgente record and the Person CRECI document.
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+      - datalake_ebdb_clean.agent_data.creci_number
+      - datalake_person_clean.identity_document.identification_number
+  is_partner_vs_person_divergent:
+    description: Flags a CRECI mismatch between the Partner record and the Person CRECI document.
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+      - datalake_ebdb_clean.partner.creci
+      - datalake_person_clean.identity_document.identification_number
+  is_agent_data_vs_partner_divergent:
+    description: Flags a CRECI mismatch between the DadosAgente record and the Partner record.
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+      - datalake_ebdb_clean.agent_data.creci_number
+      - datalake_ebdb_clean.partner.creci
+  ts_validated:
+    description: Timestamp when this validation run produced the row.
