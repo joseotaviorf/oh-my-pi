@@ -70,7 +70,7 @@ gaps, connector health) rather than a Kimball business concept. Example:
 
 ## Step 3 — Write the entity file
 
-Create `docs/llm_context/business_entities/{entity_name}.md` following this structure exactly. **Required** sections: `## Ownership`, `## Overview`, `## Glossary and Synonyms`, `## Tables`, `## Dos and Don'ts`, `## Golden Queries` (the CI gate blocks a PR missing any of them). `## Key Metrics` and `## Relationships with Other Entities` are optional — include them when they apply; `## DataHub catalog` is filled in automatically. Keep the file concise and objective, not exhaustive.
+Create `docs/llm_context/business_entities/{entity_name}.md` following this structure exactly. **Required** sections: `## Ownership`, `## Overview`, `## Glossary and Synonyms`, `## Tables`, `## Key Metrics`, `## Relationships with other entities`, `## Dos and Don'ts`, `## Golden Queries` (the CI gate blocks a PR missing any of them). **Optional:** `## Related Metric Entities` (and `### Official metrics (metric entities)` when official metrics exist); `## DataHub catalog` is filled in automatically. Keep the file concise and objective, not exhaustive.
 
 ### Template
 
@@ -356,38 +356,31 @@ duplicate/existing-entity check (below), not asked about up front.
 and must NOT be flagged in: `## Glossary and Synonyms` entries, short parenthetical glosses of a
 local term (e.g. "eviction (despejo)"), and any code, SQL, identifiers, emails, or URLs.
 
-**No template leftovers.** Reject any unfilled placeholder (text wrapped in `{...}`) and any leftover
-`WRITING GUIDE` comment block.
+**No template leftovers.** Reject any unfilled placeholder (text wrapped in `{...}`), any `TBD`, and any leftover `WRITING GUIDE` comment block.
 
 ### Required sections — the automated gates block the PR if any is missing or empty
 
-Both the CI check (in `bi-etl-ejuice`) and Zordon's pre-check block the PR when a required
-section is **missing or empty**, and enforce the machine-checkable specifics: the Ownership
-Data Owner **and** Data Steward emails, at least one `sql` Golden Query block, and — for a
-domain doc — at least one concrete `` `schema.table` `` reference. The finer content rules in
-*What it must contain* describe what a **good** section looks like: CI surfaces them as
-**non-blocking warnings** (e.g. a Dos and Don'ts without both a Do and a Don't) and the
-responsible data engineer confirms them in review — advisory nudges, never a blocked PR.
+Both the CI check (in `bi-etl-ejuice`) and Zordon's pre-check block the PR when a required section is **missing or empty**. Machine-checkable specifics include Ownership emails, concrete `` `schema.table` `` routing, **Key Metrics**, **Relationships**, and at least one Trino ``sql`` Golden Query block (no Spark-only constructs). Reject empty optional headings — omit optional sections entirely when they do not apply.
+
+Both a **Do** and a **Don't** under **Dos and don'ts** describe what a **good** section looks like: CI may surface them as **non-blocking warnings**; the reviewer confirms them in PR review. The six labeled Overview bullets are recommended (see Step 3) — CI blocks only a missing or empty **Overview** section, not bullet labels.
 
 | Section | What it must contain |
 | :------ | :------------------- |
 | `# {Entity Name}` | The H1 title: the entity's full official name, spelled out. |
 | `## Ownership` | **Data Owner:** at least one `@quintoandar.com.br`/`@quintoandar.com` email, **and** **Data Steward:** at least one such email. The two roles may be the same person. |
-| `## Overview` | 2–4 sentences: what the entity is, why it matters, and who cares about it. |
-| `## Glossary and Synonyms` | At least one bullet mapping every PT-BR term / alias an analyst says to the technical concept. |
+| `## Overview` | Labeled bullets (Objective, lifecycle, actions, common metrics, source systems, related entities) — recommended; CI blocks only a missing or empty section. |
+| `## Glossary and Synonyms` | Term / Meaning / Notes table (or equivalent bullets) mapping PT-BR aliases to technical concepts. |
 | `## Tables` | At least one **concrete** `` `schema.table` `` reference — never a wildcard (`schema.*`, `table_*`); DataHub cannot link pattern URNs. |
-| `## Dos and Don'ts` | At least one **Do** and one **Don't**, specific to this entity's tables/filters. |
+| `## Key Metrics` | Separates official metric-entity links from component/exploratory metrics computable on this entity's tables. |
+| `## Relationships with other entities` | Cardinality and join keys (`↔` for bidirectional joins). |
+| `## Dos and don'ts` | Entity-specific table/grain/filter traps (both **Do** and **Don't** recommended). |
 | `## Golden Queries` | At least one Trino SQL block (a triple-backtick `sql` fence). No Spark-only constructs: `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-argument `DATEDIFF`, or `col:key` variant access. |
 
-> The required set is intentionally the same shape as a metric doc's — the shared sections
-> (Ownership, Overview, Glossary, Dos and Don'ts, Golden Queries) match; only the type-specific
-> ones differ (a domain doc has `## Tables`; a metric doc has Related Business Entities / Scope /
-> Calculation instead).
+> Shared sections (Ownership, Overview, Glossary, Dos and don'ts, Golden Queries) match the metric template; type-specific sections for a business entity are **Tables**, **Key Metrics**, and **Relationships** (a metric doc uses Related Business Entities / Scope / Calculation / Catalog instead).
 
 ### Optional sections — include only when they apply
 
-- `## Key Metrics` — the 5–10 most common KPIs, each referencing its table/column.
-- `## Relationships with Other Entities` — JOIN patterns to related entities, with real column names and caveats.
+- `## Related Metric Entities` — official metric-entity docs built on this domain's tables; omit when none exist (and omit `### Official metrics (metric entities)` under Key Metrics when none exist).
 - `## DataHub catalog` — added automatically by CI after publish; never fill it in by hand.
 
 ### What Zordon must NOT ask the user

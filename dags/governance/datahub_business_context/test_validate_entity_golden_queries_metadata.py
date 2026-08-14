@@ -14,6 +14,7 @@ from golden_query_schema_validator import (
     normalize_table_ref,
     substitute_sql_placeholders,
     table_refs_in_sql,
+    validate_forbidden_spark_constructs,
     validate_golden_queries,
     validate_golden_query_sql,
     validate_trino_sql_syntax,
@@ -309,6 +310,61 @@ def test_validate_trino_sql_syntax_invalid_trino_parse_is_blocking():
         "invalid Trino SQL syntax" in e or "unclosed parenthesis" in e for e in errors
     )
     assert not warnings
+
+
+@pytest.mark.parametrize(
+    "sql,construct",
+    [
+        (
+            "SELECT * FROM dw.foo.t QUALIFY ROW_NUMBER() OVER (PARTITION BY id) = 1",
+            "QUALIFY",
+        ),
+        ("SELECT COUNT(*) FROM dw.foo.t GROUP BY ALL", "GROUP BY ALL"),
+        ("SELECT IFF(x > 0, 1, 0) FROM dw.foo.t", "IFF()"),
+        (
+            "SELECT DATEDIFF('day', dt_start, dt_end) FROM dw.foo.t",
+            "DATEDIFF",
+        ),
+        ("SELECT col:field FROM dw.foo.t", "Variant accessor"),
+    ],
+)
+def test_validate_trino_sql_syntax_blocks_spark_only_constructs(sql, construct):
+    errors, _ = validate_trino_sql_syntax(sql, query_label="Query 1")
+    assert errors
+    assert any(construct.split()[0] in e for e in errors)
+    assert any("Spark-only construct" in e for e in errors)
+
+
+def test_validate_forbidden_spark_constructs_ignores_colons_in_strings():
+    sql = "SELECT * FROM dw.foo.t WHERE utm = 'a:b:c'"
+    assert validate_forbidden_spark_constructs(sql, query_label="Query 1") == []
+
+
+def test_validate_forbidden_spark_constructs_ignores_datediff_column_names():
+    sql = "SELECT DATEDIFF(day_start, dt_a, dt_b) FROM dw.foo.t"
+    assert validate_forbidden_spark_constructs(sql, query_label="Query 1") == []
+
+
+def test_validate_forbidden_spark_constructs_still_flags_qualify_after_string_dash():
+    sql = (
+        "SELECT * FROM dw.foo.t WHERE note = 'foo--bar' "
+        "QUALIFY ROW_NUMBER() OVER (PARTITION BY id) = 1"
+    )
+    errors = validate_forbidden_spark_constructs(sql, query_label="Query 1")
+    assert errors
+    assert any("QUALIFY" in e for e in errors)
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT * FROM dw.foo.t WHERE note = 'uses QUALIFY clause'",
+        "SELECT * FROM dw.foo.t WHERE note = 'GROUP BY ALL users'",
+        "SELECT x FROM dw.foo.t WHERE col = 'IFF(a,b,c)'",
+    ],
+)
+def test_validate_forbidden_spark_constructs_ignores_tokens_in_strings(sql):
+    assert validate_forbidden_spark_constructs(sql, query_label="Query 1") == []
 
 
 def test_validate_golden_query_sql_syntax_error_skips_metadata_checks(tmp_path: Path):

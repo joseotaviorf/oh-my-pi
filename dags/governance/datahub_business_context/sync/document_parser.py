@@ -111,9 +111,25 @@ _CATALOG_TYPE_OKR = "OKR"
 _CATALOG_TYPE_HEALTH = "Health Metric"
 _CATALOG_TYPE_ALIASES = {
     "okr": _CATALOG_TYPE_OKR,
+    "okrs": _CATALOG_TYPE_OKR,
     "health metric": _CATALOG_TYPE_HEALTH,
+    "health metrics": _CATALOG_TYPE_HEALTH,
+    "health-metric": _CATALOG_TYPE_HEALTH,
+    "health_metric": _CATALOG_TYPE_HEALTH,
     "health": _CATALOG_TYPE_HEALTH,
 }
+_CATALOG_VALID_TYPES = frozenset({_CATALOG_TYPE_OKR, _CATALOG_TYPE_HEALTH})
+_CATALOG_HEADER_NAMES = frozenset({"metric", "metrics", "metric name"})
+
+# Optional metric sections — omit entirely when N/A; an empty heading is invalid.
+_METRIC_OPTIONAL_SECTIONS = (
+    "mbr",
+    "targets and okrs",
+    "superset golden assets",
+)
+# Optional domain sections — omit entirely when N/A; an empty heading is invalid.
+_DOMAIN_OPTIONAL_SECTIONS = ("related metric entities",)
+_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 
 
 def _slugify(text: str) -> str:
@@ -250,7 +266,10 @@ def _parse_related_data_products(section_text: str) -> list[str]:
     """Parse ``## Related Business Entities`` bullets into kebab-case product IDs."""
     ids: list[str] = []
     seen: set[str] = set()
-    for line in section_text.splitlines():
+    # Template leftovers such as ``<!-- optional -->`` must not become product IDs
+    # (``optional``); strip HTML comments before treating leftover lines as names.
+    cleaned = _HTML_COMMENT_RE.sub("", section_text or "")
+    for line in cleaned.splitlines():
         stripped = line.strip()
         if stripped.startswith("- "):
             raw_name = stripped[2:].strip().strip("*").strip()
@@ -484,7 +503,11 @@ def _parse_catalog(section_text: str) -> list[dict[str, str]]:
         if len(cells) < 2 or set(cells[0]) <= {"-", ":", " "}:
             continue
         name = re.sub(r"[*`]+", "", cells[0]).strip()
-        if _is_placeholder(name) or name.lower() in {"metric", "metrics"}:
+        name_key = name.lower()
+        type_key = re.sub(r"[*`]+", "", cells[1]).strip().lower()
+        if name_key in _CATALOG_HEADER_NAMES or type_key == "type":
+            continue
+        if _is_placeholder(name):
             continue
         if name.lower() in seen:
             continue
@@ -554,6 +577,76 @@ def _has_exact_section(sections: dict[str, str], heading: str) -> bool:
     return any(_normalize_heading(key) == target for key in sections)
 
 
+def _has_h3_subsection(section_body: str, *candidates: str) -> bool:
+    """True when an ``###`` subsection matches one of ``candidates`` with content."""
+    targets = {c.strip().lower() for c in candidates}
+    body = section_body or ""
+    h3_matches = list(_H3_RE.finditer(body))
+    for idx, match in enumerate(h3_matches):
+        if _normalize_heading(match.group(1)) not in targets:
+            continue
+        start = match.end()
+        end = h3_matches[idx + 1].start() if idx + 1 < len(h3_matches) else len(body)
+        if _section_has_content(body[start:end]):
+            return True
+    return False
+
+
+def _relationships_section(sections: dict[str, str]) -> str:
+    """Return the body of ``## Relationships …`` (flexible heading match)."""
+    for key, body in sections.items():
+        norm = _normalize_heading(key)
+        if norm == "relationships" or norm.startswith("relationships with"):
+            return body
+    return ""
+
+
+def _validate_catalog_rows(catalog: list[dict[str, str]]) -> list[str]:
+    """Blocking errors for ``## Catalog`` rows missing or with invalid Type."""
+    errors: list[str] = []
+    if not catalog:
+        errors.append(
+            "Missing ## Catalog section with at least one metric row "
+            "(Type must be OKR or Health Metric)"
+        )
+        return errors
+    invalid = [
+        row["name"] for row in catalog if row.get("type") not in _CATALOG_VALID_TYPES
+    ]
+    if invalid:
+        errors.append(
+            "## Catalog metric(s) missing a valid Type ('OKR' or 'Health Metric'): "
+            + ", ".join(invalid)
+        )
+    return errors
+
+
+def _section_has_content(body: str) -> bool:
+    """True when section body has content beyond template HTML comments."""
+    return bool(_HTML_COMMENT_RE.sub("", body or "").strip())
+
+
+def _optional_section_has_content(body: str) -> bool:
+    return _section_has_content(body)
+
+
+def _validate_optional_sections_not_empty(
+    sections: dict[str, str],
+    *,
+    optional_headings: tuple[str, ...],
+) -> list[str]:
+    """Error when an optional ``##`` heading exists but its body is empty."""
+    optional_norm = {heading.strip().lower() for heading in optional_headings}
+    errors: list[str] = []
+    for key, body in sections.items():
+        if _normalize_heading(key) in optional_norm and not _section_has_content(body):
+            errors.append(
+                f"Optional section ## {key.strip()} is present but empty — "
+                "omit the heading entirely when it does not apply"
+            )
+    return errors
+
+
 def extract_subjects_from_sql(sql: str) -> list[tuple[str, str]]:
     found: list[tuple[str, str]] = []
     seen: set[tuple[str, str]] = set()
@@ -603,12 +696,14 @@ def parse_entity_markdown(
     overview = _find_section(sections, "overview")
     glossary_text = _find_section(sections, "glossary", "synonyms")
     tables_text = _find_section(sections, "tables", "where to query")
-    golden_text = _find_section(sections, "golden")
+    golden_text = _find_section(
+        sections, "golden queries", "golden query", exact_only=True
+    )
     ownership_text = _find_section(sections, "ownership")
     mbr_text = _find_section(sections, "mbr")
     catalog_text = _find_section(sections, "catalog", exact_only=True)
     related_text = _find_section(sections, "related business entities")
-    superset_text = _find_section(sections, "superset golden")
+    superset_text = _find_section(sections, "superset golden assets", exact_only=True)
 
     glossary_terms = _parse_glossary(glossary_text)
     metric_dataset_rows = _parse_metric_dataset_rows(superset_text)
@@ -678,7 +773,7 @@ def validate_parsed_document(
     # @quintoandar email, a Glossary, a Dos and Don'ts, and at least one Golden Query.
     if not parsed.title or parsed.title == "Untitled Entity":
         errors.append("Missing H1 title")
-    if not parsed.overview.strip():
+    if not _section_has_content(parsed.overview):
         errors.append("Missing ## Overview section")
     if not parsed.has_ownership_section:
         errors.append("Missing ## Ownership section")
@@ -687,12 +782,13 @@ def validate_parsed_document(
             errors.append("Missing Data Owner email in ## Ownership section")
         if not parsed.owners.get("data_steward"):
             errors.append("Missing Data Steward email in ## Ownership section")
-    if not _find_section(sections, "glossary and synonyms", "glossary", "synonyms"):
+    glossary = _find_section(sections, "glossary and synonyms", "glossary", "synonyms")
+    if not _section_has_content(glossary):
         errors.append("Missing ## Glossary and Synonyms section")
     dos_and_donts = _find_section(
         sections, "dos and don'ts", "dos and don", "do's and don"
     )
-    if not dos_and_donts:
+    if not _section_has_content(dos_and_donts):
         errors.append("Missing ## Dos and Don'ts section")
     elif not _has_do_and_dont(dos_and_donts):
         # Advisory (non-blocking): the section is present and non-empty, but the
@@ -702,31 +798,52 @@ def validate_parsed_document(
     if not parsed.golden_queries:
         errors.append("Missing ## Golden Queries with at least one SQL block")
 
+    errors.extend(
+        _validate_optional_sections_not_empty(
+            sections, optional_headings=_DOMAIN_OPTIONAL_SECTIONS
+        )
+    )
+
     if not is_metric:
         # Domain-specific: routes by table, so it needs concrete schema.table refs.
         if not parsed.datasets:
             errors.append("No schema.table references found in ## Tables section")
+        key_metrics = _find_section(sections, "key metrics")
+        if not _section_has_content(key_metrics):
+            errors.append("Missing ## Key Metrics section")
+        relationships = _relationships_section(sections)
+        if not _section_has_content(relationships):
+            errors.append("Missing ## Relationships with other entities section")
         return errors, warnings
 
     # Metric-specific: links to a business entity and defines the calculation.
+    errors.extend(_validate_catalog_rows(parsed.catalog))
+    errors.extend(
+        _validate_optional_sections_not_empty(
+            sections, optional_headings=_METRIC_OPTIONAL_SECTIONS
+        )
+    )
     if not parsed.has_related_business_entities_section:
         errors.append("Missing ## Related Business Entities section")
     elif not parsed.related_data_products:
-        warnings.append(
+        errors.append(
             "## Related Business Entities section is present but no entities were parsed"
         )
     scope = _find_section(sections, "scope")
-    if not scope:
+    if not _section_has_content(scope):
         errors.append("Missing ## Scope section")
     elif not ("included" in scope.lower() and "excluded" in scope.lower()):
         warnings.append(
             "## Scope should list both what is Included and what is Excluded"
         )
     calculation = _find_section(sections, "calculation")
-    if not calculation:
+    if not _section_has_content(calculation):
         errors.append("Missing ## Calculation section")
-    elif "canonical filter" not in calculation.lower():
-        warnings.append(
-            "## Calculation should include a ### Canonical Filter subsection"
-        )
+    else:
+        if not _has_h3_subsection(calculation, "canonical filter"):
+            errors.append(
+                "## Calculation must include a ### Canonical Filter subsection"
+            )
+        if not _has_h3_subsection(calculation, "nuances"):
+            errors.append("## Calculation must include a ### Nuances subsection")
     return errors, warnings

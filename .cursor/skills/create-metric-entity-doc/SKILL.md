@@ -470,21 +470,13 @@ check (below), not asked about up front.
 and must NOT be flagged in: `## Glossary and Synonyms` entries, short parenthetical glosses of a
 local term (e.g. "condominium bills (condomínio)"), and any code, SQL, identifiers, emails, or URLs.
 
-**No template leftovers.** Reject any unfilled placeholder (text wrapped in `{...}`) and any leftover
-`WRITING GUIDE` comment block.
+**No template leftovers.** Reject any unfilled placeholder (text wrapped in `{...}`), any `TBD`, and any leftover `WRITING GUIDE` comment block.
 
 ### Required sections — the automated gates block the PR if any is missing or empty
 
-Both the CI check (in `bi-etl-ejuice`) and Zordon's pre-check block the PR when a required
-section is **missing or empty**, and enforce the machine-checkable specifics: the Ownership
-Data Owner **and** Data Steward emails, at least one `sql` Golden Query block, a
-`## Related Business Entities` section, and a `## Catalog` row per metric with a valid
-`OKR`/`Health Metric` type (`_validate_catalog_types` in `generate_and_push_datahub_entities.py`
-hard-fails the publish step on a missing/invalid type). The finer content rules in *What it must
-contain* (Scope's Included/Excluded lists, both a Do and a Don't, Calculation's
-`### Canonical Filter`, …) describe what a **good** section looks like: CI surfaces them as
-**non-blocking warnings** and the responsible data engineer confirms them in review — advisory
-nudges, never a blocked PR.
+Both the CI check (in `bi-etl-ejuice`) and Zordon's pre-check block the PR when a required section is **missing or empty**. Machine-checkable specifics include Ownership emails, **Catalog** rows with Type `OKR` or `Health Metric`, at least one **Related Business Entities** bullet, **`### Canonical Filter`** and **`### Nuances`** under Calculation, and at least one Trino ``sql`` Golden Query block (no Spark-only constructs). Reject empty optional headings — omit optional sections entirely when they do not apply.
+
+Scope **Included/Excluded** lists and both a **Do** and a **Don't** describe what a **good** section looks like: CI may surface them as **non-blocking warnings**; the reviewer confirms them in PR review.
 
 | Section | What it must contain |
 | :------ | :------------------- |
@@ -492,11 +484,11 @@ nudges, never a blocked PR.
 | `## Ownership` | **Data Owner:** at least one `@quintoandar.com.br`/`@quintoandar.com` email, **and** **Data Steward:** at least one such email. The two roles may be the same person. |
 | `## Overview` | 2–4 sentences: what the metric is and why a naive/component calculation is wrong. Product-scope restriction in **bold** if it exists. |
 | `## Related Business Entities` | At least one bullet naming an existing business entity (names only — no paths, no descriptions). |
-| `## Catalog` | One row per official metric defined in the document (exact name used elsewhere in the doc), each with a `Type` of `OKR` or `Health Metric`. Missing or invalid type hard-blocks the publish step. |
+| `## Catalog` | One row per official metric defined in the document (exact name used elsewhere in the doc), each with a `Type` of `OKR` or `Health Metric`. |
 | `## Glossary and Synonyms` | At least one bullet mapping every alias/synonym a user might say to this metric. |
-| `## Scope` | Both an **Included** and an **Excluded** list. |
-| `## Calculation` | The exact formula, plus `### Canonical Filter` (every mandatory predicate, not just the obvious one) and `### Nuances`. |
-| `## Dos and Don'ts` | Both a **Do** and a **Don't** list, specific to this metric's formula. |
+| `## Scope` | Both an **Included** and an **Excluded** list (recommended — CI warns if either is missing). |
+| `## Calculation` | The exact formula, plus **`### Canonical Filter`** (every mandatory predicate) and **`### Nuances`**. |
+| `## Dos and Don'ts` | Both a **Do** and a **Don't** list recommended — specific to this metric's formula. |
 | `## Golden Queries` | At least one Trino SQL block (a triple-backtick `sql` fence). No Spark-only constructs: `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-argument `DATEDIFF`, or `col:key` variant access. |
 
 ### Optional sections — never required; include only when they apply

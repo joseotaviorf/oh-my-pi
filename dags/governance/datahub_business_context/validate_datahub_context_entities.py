@@ -61,6 +61,9 @@ _INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
 # before committing; leaving them in leaks guide prose into the DataHub Data
 # Product description.
 _WRITING_GUIDE_RE = re.compile(r"WRITING GUIDE", re.IGNORECASE)
+_TBD_RE = re.compile(r"\bTBD\b", re.IGNORECASE)
+_MARKDOWN_LINK_RE = re.compile(r"\[[^\]]*\]\([^)]*\)")
+_URL_RE = re.compile(r"https?://\S+", re.IGNORECASE)
 
 
 def _resolve_diff_from_ref(branch: str) -> str:
@@ -155,6 +158,33 @@ def _strip_code(markdown: str) -> str:
     return _INLINE_CODE_RE.sub("", markdown)
 
 
+def _strip_code_preserve_newlines(markdown: str) -> str:
+    """Blank fenced blocks but keep line count for actionable TBD locations."""
+    markdown = _FENCED_CODE_RE.sub(
+        lambda match: "\n" * match.group(0).count("\n"), markdown
+    )
+    return _INLINE_CODE_RE.sub("", markdown)
+
+
+def _strip_urls_and_links(markdown: str) -> str:
+    markdown = _MARKDOWN_LINK_RE.sub("", markdown)
+    return _URL_RE.sub("", markdown)
+
+
+def _find_tbd_snippets(markdown: str, *, limit: int = 5) -> list[str]:
+    scanned = _strip_urls_and_links(_strip_code_preserve_newlines(markdown))
+    snippets: list[str] = []
+    for line_no, line in enumerate(scanned.splitlines(), start=1):
+        if _TBD_RE.search(line):
+            snippet = line.strip()
+            if len(snippet) > 120:
+                snippet = snippet[:117] + "..."
+            snippets.append(f"line {line_no}: {snippet}")
+            if len(snippets) >= limit:
+                break
+    return snippets
+
+
 def _static_checks(path: Path, content: str) -> tuple[list[str], list[str]]:
     """Static template-contract checks the parser doesn't cover; returns (errors, warnings).
 
@@ -182,6 +212,13 @@ def _static_checks(path: Path, content: str) -> tuple[list[str], list[str]]:
     if placeholders:
         shown = ", ".join(placeholders[:5])
         errors.append(f"Unfilled template placeholder(s) left in the document: {shown}")
+
+    tbd_snippets = _find_tbd_snippets(content)
+    if tbd_snippets:
+        errors.append(
+            "Unresolved 'TBD' placeholder left in the document: "
+            + "; ".join(tbd_snippets)
+        )
 
     return errors, warnings
 

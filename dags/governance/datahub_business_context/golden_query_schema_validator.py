@@ -52,6 +52,27 @@ _HIVE_CATALOG_PREFIX = "hive"
 _TRINO_DIALECT = "trino"
 _GENERIC_PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z_][a-zA-Z0-9_]*\}")
 _STRING_LITERAL_RE = re.compile(r"'(?:''|[^'])*'|\"(?:\"\"|[^\"])*\"")
+_COMMENT_RE = re.compile(r"--.*$", re.MULTILINE)
+
+# Spark/Databricks-only constructs forbidden in Tars golden queries (Trino dialect).
+_FORBIDDEN_GOLDEN_QUERY_CONSTRUCTS: list[tuple[str, re.Pattern[str]]] = [
+    ("QUALIFY", re.compile(r"\bQUALIFY\b", re.IGNORECASE)),
+    ("GROUP BY ALL", re.compile(r"\bGROUP\s+BY\s+ALL\b", re.IGNORECASE)),
+    ("IFF()", re.compile(r"\bIFF\s*\(", re.IGNORECASE)),
+    (
+        "DATEDIFF with unit (3-arg form)",
+        re.compile(
+            r"\bDATEDIFF\s*\(\s*'?"
+            r"(YEAR|QUARTER|MONTH|WEEK|DAY|HOUR|MINUTE|SECOND|MILLISECOND|MICROSECOND)"
+            r"'?\s*[,)]",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "Variant accessor (column:key)",
+        re.compile(r"\w+:(?!:)(?:\w|\[)", re.IGNORECASE),
+    ),
+]
 
 
 @dataclass(frozen=True)
@@ -151,6 +172,45 @@ def _check_balanced_delimiters(sql: str) -> list[str]:
     return errors
 
 
+def _sql_without_string_literals(sql: str) -> str:
+    """Drop quoted literals so pattern checks skip string contents."""
+    return _STRING_LITERAL_RE.sub("", sql)
+
+
+_DATEDIFF_QUOTED_UNIT_RE = re.compile(
+    r"\bDATEDIFF\s*\(\s*'"
+    r"(YEAR|QUARTER|MONTH|WEEK|DAY|HOUR|MINUTE|SECOND|MILLISECOND|MICROSECOND)"
+    r"'\s*,",
+    re.IGNORECASE,
+)
+
+
+def _sql_for_spark_construct_scan(sql: str) -> str:
+    """Return SQL with quoted literals and line comments removed for pattern checks."""
+    text = _DATEDIFF_QUOTED_UNIT_RE.sub(
+        lambda match: f"DATEDIFF({match.group(1).upper()},", sql or ""
+    )
+    without_strings = _sql_without_string_literals(text)
+    return _COMMENT_RE.sub("", without_strings)
+
+
+def validate_forbidden_spark_constructs(
+    sql: str,
+    *,
+    query_label: str,
+) -> list[str]:
+    """Return blocking errors for Spark-only SQL the Tars template forbids."""
+    haystack = _sql_for_spark_construct_scan(sql)
+    errors: list[str] = []
+    for name, pattern in _FORBIDDEN_GOLDEN_QUERY_CONSTRUCTS:
+        if pattern.search(haystack):
+            errors.append(
+                f"{query_label}: Spark-only construct {name!r} is not allowed in "
+                "Golden Queries — use Trino SQL (see entity template)"
+            )
+    return errors
+
+
 def parse_trino_golden_query_sql(
     prepared_sql: str,
 ) -> tuple[Any | None, str | None]:
@@ -178,6 +238,9 @@ def validate_trino_sql_syntax(
     prepared = substitute_sql_placeholders(sql)
     for message in _check_balanced_delimiters(prepared):
         errors.append(f"{query_label}: {message}")
+    errors.extend(
+        validate_forbidden_spark_constructs(prepared, query_label=query_label)
+    )
     if errors:
         return errors, warnings
 

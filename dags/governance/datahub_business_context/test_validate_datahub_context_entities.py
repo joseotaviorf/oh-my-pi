@@ -51,6 +51,12 @@ My Metric is the official indicator for something, computed monthly.
 
 - Contact
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| My Metric | OKR |
+
 ## Glossary and Synonyms
 
 - **My Metric** → this metric
@@ -64,6 +70,18 @@ My Metric is the official indicator for something, computed monthly.
 ## Calculation
 
 My Metric = numerator / denominator.
+
+### Canonical Filter
+
+Apply on `schema.my_table`:
+
+```sql
+is_current = true
+```
+
+### Nuances
+
+No external weight table.
 
 ## Dos and Don'ts
 
@@ -104,6 +122,14 @@ Business context for the domain.
 ## Tables
 
 The canonical table is `schema.my_table`.
+
+## Key Metrics
+
+- **Volume:** `COUNT(*)` on `schema.my_table`.
+
+## Relationships with other entities
+
+- **My Domain ↔ Contact:** join on `sk_contact`.
 
 ## Dos and Don'ts
 
@@ -240,6 +266,29 @@ def test_filename_casing_is_warning_not_error(tmp_path: Path):
     errors, warnings = _static_checks(Path("Bad-Name.md"), "# M\n\n## Overview\n\nx\n")
     assert not any("snake_case" in e for e in errors)
     assert any("snake_case" in w for w in warnings)
+
+
+def test_tbd_outside_code_fence_is_error(tmp_path: Path):
+    errors, _ = _static_checks(
+        Path("m.md"), "# M\n\n## Overview\n\nFormula TBD on weights.\n"
+    )
+    assert any("TBD" in e and "line" in e for e in errors)
+
+
+def test_tbd_in_url_is_allowed(tmp_path: Path):
+    errors, _ = _static_checks(
+        Path("m.md"),
+        "# M\n\n## Overview\n\nSee https://wiki.corp/tbd/page for details.\n",
+    )
+    assert not any("TBD" in e for e in errors)
+
+
+def test_tbd_inside_code_fence_is_allowed(tmp_path: Path):
+    errors, _ = _static_checks(
+        Path("m.md"),
+        "# M\n\n## Overview\n\n```sql\n-- status TBD\nSELECT 1\n```\n",
+    )
+    assert not any("TBD" in e for e in errors)
 
 
 def test_inline_html_comment_is_allowed(tmp_path: Path):

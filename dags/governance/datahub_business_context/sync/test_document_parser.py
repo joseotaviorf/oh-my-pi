@@ -24,6 +24,10 @@ _METRIC_PARTS = [
     ),
     ("## Overview", "What it measures and why the naive path is wrong."),
     ("## Related Business Entities", "- Contact"),
+    (
+        "## Catalog",
+        "| Metric | Type |\n| :---- | :---- |\n| My Metric | OKR |",
+    ),
     ("## Glossary and Synonyms", "- **My Metric** → this metric"),
     ("## Scope", "**Included**: x\n\n**Excluded**: y"),
     (
@@ -284,6 +288,29 @@ Body.
     assert parsed.has_related_business_entities_section is True
 
 
+def test_related_business_entities_html_comment_is_not_an_entity():
+    # Regression: ``<!-- optional -->`` slugifies to ``optional`` if comments are
+    # not stripped, so CI would accept a template leftover as a related product.
+    parsed = parse_entity_markdown(
+        _metric_doc().replace("- Contact", "<!-- optional -->")
+    )
+    assert parsed.has_related_business_entities_section is True
+    assert parsed.related_data_products == []
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    assert any("no entities were parsed" in e for e in errors)
+
+
+def test_related_business_entities_keeps_bullets_beside_html_comments():
+    parsed = parse_entity_markdown(
+        _metric_doc().replace(
+            "- Contact", "- House and Listing\n<!-- template hint -->"
+        )
+    )
+    assert parsed.related_data_products == ["house-and-listing"]
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    assert not any("Related Business Entities" in e for e in errors)
+
+
 def test_superset_golden_assets_parsed_for_metric_datasets():
     dataset_urn = "urn:li:dataset:(urn:li:dataPlatform:superset,16266,PROD)"
     chart_urn = "urn:li:chart:(superset,chart.56400)"
@@ -406,7 +433,7 @@ Body.
     assert not any("Ownership" in e for e in errors)
 
 
-def test_metric_validation_warns_when_related_section_unparsed():
+def test_metric_validation_errors_when_related_section_unparsed():
     doc = """\
 # Metric
 
@@ -420,9 +447,101 @@ Body.
 """
     parsed = parse_entity_markdown(doc)
     errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
-    # Section PRESENT but empty → warning, not the missing-section error.
-    assert any("Related Business Entities" in warn for warn in warnings)
-    assert not any("Related Business Entities" in e for e in errors)
+    assert any("Related Business Entities" in err for err in errors)
+    assert not any("Related Business Entities" in warn for warn in warnings)
+
+
+def test_calculation_without_canonical_filter_or_nuances_is_blocking():
+    doc = _metric_doc().replace(
+        "### Canonical Filter\n\n`where is_current = true`\n\n"
+        "### Nuances\n\nMind the denominator.",
+        "Just the formula.",
+    )
+    errors, warnings = validate_parsed_document(
+        parse_entity_markdown(doc), data_product_type="metric"
+    )
+    assert any("Canonical Filter" in e for e in errors)
+    assert any("Nuances" in e for e in errors)
+    assert not any("Canonical Filter" in w for w in warnings)
+
+
+def test_calculation_with_empty_canonical_filter_or_nuances_is_blocking():
+    doc = _metric_doc().replace(
+        "### Canonical Filter\n\n`where is_current = true`\n\n"
+        "### Nuances\n\nMind the denominator.",
+        "### Canonical Filter\n\n\n### Nuances\n\n",
+    )
+    errors, _ = validate_parsed_document(
+        parse_entity_markdown(doc), data_product_type="metric"
+    )
+    assert any("Canonical Filter" in e for e in errors)
+    assert any("Nuances" in e for e in errors)
+
+
+def test_empty_optional_mbr_section_is_blocking():
+    doc = _metric_doc() + "\n## MBR\n\n"
+    errors, _ = validate_parsed_document(
+        parse_entity_markdown(doc), data_product_type="metric"
+    )
+    assert any("mbr" in e.lower() and "empty" in e.lower() for e in errors)
+
+
+def test_optional_mbr_with_html_comment_only_is_blocking():
+    doc = _metric_doc() + "\n## MBR\n\n<!-- [OPTIONAL] Monthly business review -->\n"
+    errors, _ = validate_parsed_document(
+        parse_entity_markdown(doc), data_product_type="metric"
+    )
+    assert any("mbr" in e.lower() and "empty" in e.lower() for e in errors)
+
+
+def test_golden_queries_not_stolen_by_superset_section():
+    doc = _metric_doc().replace(
+        "## Golden Queries",
+        "## Superset Golden Assets\n\nNo SQL here.\n\n## Golden Queries",
+    )
+    parsed = parse_entity_markdown(doc)
+    assert len(parsed.golden_queries) == 1
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    assert not any("Golden Queries" in e for e in errors)
+
+
+def test_catalog_missing_or_invalid_type_is_blocking():
+    doc = _metric_doc(omit="## Catalog")
+    errors, _ = validate_parsed_document(
+        parse_entity_markdown(doc), data_product_type="metric"
+    )
+    assert any("Catalog" in e for e in errors)
+
+    doc_invalid = _metric_doc().replace("| My Metric | OKR |", "| My Metric | TBD |")
+    errors, _ = validate_parsed_document(
+        parse_entity_markdown(doc_invalid), data_product_type="metric"
+    )
+    assert any("valid Type" in e for e in errors)
+
+
+def test_catalog_escaped_pipe_parses_correctly():
+    doc = _metric_doc().replace("| My Metric | OKR |", "| EC\\|ES2CS | OKR |")
+    parsed = parse_entity_markdown(doc)
+    assert parsed.catalog == [{"name": "EC|ES2CS", "type": "OKR"}]
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    assert not any("Catalog" in e for e in errors)
+
+
+def test_catalog_skips_metric_name_header_row():
+    doc = _metric_doc().replace(
+        "| Metric | Type |\n| :---- | :---- |\n| My Metric | OKR |",
+        "| Metric Name | Type |\n| :---- | :---- |\n| My Metric | OKR |",
+    )
+    parsed = parse_entity_markdown(doc)
+    assert parsed.catalog == [{"name": "My Metric", "type": "OKR"}]
+
+
+def test_catalog_accepts_health_metric_aliases():
+    for alias in ("health-metric", "health metrics", "OKRs"):
+        expected = "OKR" if alias == "OKRs" else "Health Metric"
+        doc = _metric_doc().replace("| My Metric | OKR |", f"| My Metric | {alias} |")
+        parsed = parse_entity_markdown(doc)
+        assert parsed.catalog[0]["type"] == expected
 
 
 def test_complete_metric_doc_passes():
@@ -442,19 +561,6 @@ def test_scope_without_included_or_excluded_warns_not_blocks():
     )
     assert not any("Scope" in e for e in errors)
     assert any("Scope" in w and "Included" in w for w in warnings)
-
-
-def test_calculation_without_canonical_filter_warns_not_blocks():
-    doc = _metric_doc().replace(
-        "### Canonical Filter\n\n`where is_current = true`\n\n"
-        "### Nuances\n\nMind the denominator.",
-        "Just the formula.",
-    )
-    errors, warnings = validate_parsed_document(
-        parse_entity_markdown(doc), data_product_type="metric"
-    )
-    assert not any("Calculation" in e for e in errors)
-    assert any("Canonical Filter" in w for w in warnings)
 
 
 def test_dos_and_donts_missing_a_dont_warns_not_blocks():
@@ -482,6 +588,7 @@ def test_dos_and_donts_missing_a_dont_warns_not_blocks():
         ("## Calculation", "Missing ## Calculation section"),
         ("## Dos and Don'ts", "Missing ## Dos and Don'ts section"),
         ("## Golden Queries", "Golden Queries"),
+        ("## Catalog", "Catalog"),
     ],
 )
 def test_metric_requires_each_documented_section(omit, needle):
@@ -490,6 +597,57 @@ def test_metric_requires_each_documented_section(omit, needle):
     parsed = parse_entity_markdown(_metric_doc(omit=omit))
     errors, _ = validate_parsed_document(parsed, data_product_type="metric")
     assert any(needle in e for e in errors), (omit, errors)
+
+
+_DOMAIN_PARTS = [
+    (
+        "## Ownership",
+        "**Data Owner:**\n- owner@quintoandar.com.br\n\n"
+        "**Data Steward:**\n- steward@quintoandar.com.br",
+    ),
+    ("## Overview", "Business context for the domain."),
+    ("## Glossary and Synonyms", "- **termo** → maps to something"),
+    ("## Tables", "The canonical table is `schema.my_table`."),
+    ("## Key Metrics", "- **Volume:** `COUNT(*)` on `schema.my_table`."),
+    (
+        "## Relationships with other entities",
+        "- **My Domain ↔ Contact:** join on `sk_contact`.",
+    ),
+    ("## Dos and Don'ts", "**Do:**\n\n- use canonical\n\n**Don't:**\n\n- raw"),
+    ("## Golden Queries", "```sql\nSELECT count(*) FROM schema.my_table\n```"),
+]
+
+
+def _domain_doc(omit: str | None = None) -> str:
+    out = "# My Domain\n\n"
+    for heading, content in _DOMAIN_PARTS:
+        if heading == omit:
+            continue
+        out += f"{heading}\n\n{content}\n\n"
+    return out
+
+
+@pytest.mark.parametrize(
+    "omit,needle",
+    [
+        ("## Key Metrics", "Key Metrics"),
+        ("## Relationships with other entities", "Relationships"),
+    ],
+)
+def test_domain_requires_key_metrics_and_relationships(omit, needle):
+    parsed = parse_entity_markdown(_domain_doc(omit=omit))
+    errors, _ = validate_parsed_document(parsed, data_product_type="domain")
+    assert any(needle in e for e in errors), (omit, errors)
+
+
+def test_domain_key_metrics_html_comment_only_is_empty():
+    doc = _domain_doc().replace(
+        "## Key Metrics\n\n- **Volume:** `COUNT(*)` on `schema.my_table`.\n\n",
+        "## Key Metrics\n\n<!-- template hint -->\n\n",
+    )
+    parsed = parse_entity_markdown(doc)
+    errors, _ = validate_parsed_document(parsed, data_product_type="domain")
+    assert any("Key Metrics" in e for e in errors)
 
 
 def test_h3_under_unrelated_h2_is_not_a_golden_query():

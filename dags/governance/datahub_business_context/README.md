@@ -33,8 +33,8 @@ The DataHub UI Context Document flow (`tars-entity` tag → sync → PR) has bee
 
 | Step | When | Action |
 |------|------|--------|
-| `validate-datahub-context-entities` | pull request | Offline template contract (sections, placeholders) |
-| `validate-entity-golden-queries-metadata` | push to master / hotfix | Golden-query Trino SQL syntax + tables/columns vs repo `dags/**/metadata` YAML |
+| `validate-datahub-context-entities` | pull request | Offline template contract: required sections (metric: Catalog+type, Canonical Filter, Nuances; domain: Key Metrics, Relationships), placeholders/TBD/WRITING GUIDE, empty optional headings; Scope Included/Excluded and Do+Don't are warnings only |
+| `validate-entity-golden-queries-metadata` | pull request / push to master / hotfix | Golden-query Trino SQL syntax (blocks Spark-only constructs), plus tables/columns vs repo `dags/**/metadata` YAML |
 | `push-datahub-business-context` | push to master / hotfix | MD → YAML → push (changed MDs only) |
 | `validate-datahub-entities-post-push` | push (after generate) | smoke test: changed MDs have a live Data Product |
 | `validate-datahub-entities` | pull request | smoke test: changed MDs |
