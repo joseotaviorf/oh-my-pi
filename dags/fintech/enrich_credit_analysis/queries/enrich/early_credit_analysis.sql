@@ -21,31 +21,68 @@ rent_flow AS (
   FROM datalake_ebdb_rent_flow.rent_flow AS rf
   LEFT JOIN datalake_ebdb_clean.offer AS offer
       ON offer.id = rf.id_offer
-)
-SELECT
-    eca.id_house, 
-    rf.id_visit, 
-    rf.id_offer, 
+),
+eca_base AS (
+  SELECT
+    eca.id_house,
     eca.id_user,
-    rf.id_rent_flow, 
     eca.id_credit_evaluation,
     eca.result,
-    IF(rf.id_offer IS NOT NULL, DATEDIFF(rf.ts_offer_created, eca.ts_created), NULL) AS days_offer_after_early_credit_evaluation,
-    IF(rf.id_booking IS NOT NULL, DATEDIFF(rf.dt_booking_created, eca.ts_created), NULL) AS days_booking_after_early_credit_evaluation,
-    IF(rf.id_visit IS NOT NULL, DATEDIFF(rf.dt_visit, eca.ts_created), NULL) AS days_visit_after_early_credit_evaluation,
-    IF(eval.rank = 1, TRUE, FALSE) AS is_most_recent_evaluation,
+    eca.ts_expired,
+    eca.ts_created,
+    eval.rank
+  FROM datalake_sorting_hat_clean.early_credit_analysis AS eca
+  JOIN evaluation AS eval
+      ON eval.id_credit_evaluation = eca.id_credit_evaluation
+),
+matched_rent_flow AS (
+  SELECT
+    e.id_credit_evaluation,
+    rf.id_visit,
+    rf.id_offer,
+    rf.id_booking,
+    rf.id_rent_flow,
+    rf.dt_visit,
+    rf.dt_booking_created,
+    rf.ts_offer_created
+  FROM eca_base AS e
+  INNER JOIN rent_flow AS rf
+      ON e.id_user = rf.id_client
+      AND e.id_house = rf.id_house
+      AND e.ts_created BETWEEN rf.ts_offer_created - INTERVAL '1' MONTH AND rf.ts_offer_created
+  UNION
+  SELECT
+    e.id_credit_evaluation,
+    rf.id_visit,
+    rf.id_offer,
+    rf.id_booking,
+    rf.id_rent_flow,
+    rf.dt_visit,
+    rf.dt_booking_created,
+    rf.ts_offer_created
+  FROM eca_base AS e
+  INNER JOIN rent_flow AS rf
+      ON e.id_user = rf.id_client
+      AND e.id_house = rf.id_house
+      AND e.ts_created BETWEEN rf.dt_booking_created - INTERVAL '1' MONTH AND rf.dt_booking_created
+)
+SELECT
+    e.id_house,
+    rf.id_visit,
+    rf.id_offer,
+    e.id_user,
+    rf.id_rent_flow,
+    e.id_credit_evaluation,
+    e.result,
+    IF(rf.id_offer IS NOT NULL, DATEDIFF(rf.ts_offer_created, e.ts_created), NULL) AS days_offer_after_early_credit_evaluation,
+    IF(rf.id_booking IS NOT NULL, DATEDIFF(rf.dt_booking_created, e.ts_created), NULL) AS days_booking_after_early_credit_evaluation,
+    IF(rf.id_visit IS NOT NULL, DATEDIFF(rf.dt_visit, e.ts_created), NULL) AS days_visit_after_early_credit_evaluation,
+    IF(e.rank = 1, TRUE, FALSE) AS is_most_recent_evaluation,
     rf.dt_visit,
     rf.dt_booking_created AS ts_booking_created,
     rf.ts_offer_created,
-    eca.ts_expired AS ts_early_credit_analysis_expired,
-    eca.ts_created AS ts_early_credit_analysis_created
-FROM datalake_sorting_hat_clean.early_credit_analysis AS eca
-JOIN evaluation AS eval
-    ON eval.id_credit_evaluation = eca.id_credit_evaluation
-LEFT JOIN rent_flow AS rf
-    ON eca.id_user = rf.id_client
-    AND eca.id_house = rf.id_house
-    AND (
-      eca.ts_created between rf.ts_offer_created -  interval '1' month and rf.ts_offer_created
-      OR eca.ts_created between rf.dt_booking_created -  interval '1' month and rf.dt_booking_created
-    )
+    e.ts_expired AS ts_early_credit_analysis_expired,
+    e.ts_created AS ts_early_credit_analysis_created
+FROM eca_base AS e
+LEFT JOIN matched_rent_flow AS rf
+    ON rf.id_credit_evaluation = e.id_credit_evaluation
