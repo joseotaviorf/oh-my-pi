@@ -18,12 +18,48 @@ last_contract AS (
     WHERE
         contract_rank = 1
 ),
+-- Resolves the PROPERTY_OWNER relation to a user id. `hl.id_related` is a STRING that
+-- holds either a numeric `user.id` or a `user.uuid_person`, so the original wrote this as
+-- a single join with a disjunctive predicate:
+--     ON u.id = hl.id_related OR u.uuid_person = hl.id_related
+-- An OR across two different columns is not an equi-join, so Spark has no hash-join option
+-- and plans a BroadcastNestedLoopJoin against the whole `user` table. On EMR that never
+-- completed (see j-08413162U8TCNFF0AB8Q, stage 453 stuck at 358/734).
+--
+-- UNION (not UNION ALL) reproduces OR semantics exactly: a single `user` row matching both
+-- predicates contributes one row, while two distinct users matching one predicate each
+-- still contribute two.
+owner_resolved AS (
+    SELECT
+        hl.id_house,
+        u.id AS id_owner
+    FROM
+        datalake_ebdb_clean.house_listing_relation AS hl
+    INNER JOIN
+        datalake_ebdb_clean.user AS u
+            ON u.id = hl.id_related
+    WHERE
+        hl.related_as = 'PROPERTY_OWNER'
+
+    UNION
+
+    SELECT
+        hl.id_house,
+        u.id AS id_owner
+    FROM
+        datalake_ebdb_clean.house_listing_relation AS hl
+    INNER JOIN
+        datalake_ebdb_clean.user AS u
+            ON u.uuid_person = hl.id_related
+    WHERE
+        hl.related_as = 'PROPERTY_OWNER'
+),
 listing_base AS (
     SELECT
         CONCAT(lbc.id_house, '_', lbc.business_context) AS id_entity,
         lbc.id_house,
         IF(lbc.business_context = 'RENT', c.id_contract, NULL) AS id_contract,
-        COALESCE(u.id, h.id_user) AS id_owner,
+        COALESCE(u.id_owner, h.id_user) AS id_owner,
         'LISTING' AS entity,
         lbc.business_context,
         TO_JSON(
@@ -51,13 +87,8 @@ listing_base AS (
         datalake_ebdb_clean.house AS h
             ON h.id = lbc.id_house
      LEFT JOIN
-        datalake_ebdb_clean.house_listing_relation AS hl
-            ON hl.id_house = lbc.id_house
-            AND hl.related_as = 'PROPERTY_OWNER'
-    LEFT JOIN
-        datalake_ebdb_clean.user AS u
-            ON u.id = hl.id_related
-            OR u.uuid_person = hl.id_related
+        owner_resolved AS u
+            ON u.id_house = lbc.id_house
     LEFT JOIN
         last_contract AS c
             ON c.id_house = lbc.id_house
