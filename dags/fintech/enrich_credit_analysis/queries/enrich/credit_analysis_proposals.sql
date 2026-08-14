@@ -1,30 +1,16 @@
-WITH credit_analysis_ordered AS (
+WITH credit_analysis_proposals AS (
   SELECT
     id_proposal,
-    id_credit_analysis,
-    id_variant,
-    category,
-    bypass,
-    ts_updated
-  FROM
-    datalake_sorting_hat_clean.credit_analysis
-  ORDER BY
-    id_proposal, ts_updated
-),
-
-credit_analysis_proposals AS (
-  SELECT
-    id_proposal,
-    FIRST(id_credit_analysis) AS id_first_credit_analysis,
-    LAST(id_credit_analysis) AS id_last_credit_analysis,
-    FIRST(id_variant) AS id_first_variant,
-    LAST(id_variant, true) AS id_last_variant_not_null,
-    FIRST(category) AS first_category,
-    LAST(category) AS last_category,
-    LAST(category, true) AS last_category_not_null,
+    min_by(id_credit_analysis, ts_updated) AS id_first_credit_analysis,
+    max_by(id_credit_analysis, ts_updated) AS id_last_credit_analysis,
+    min_by(id_variant, ts_updated) AS id_first_variant,
+    max_by(id_variant, IF(id_variant IS NOT NULL, ts_updated, NULL)) AS id_last_variant_not_null,
+    min_by(category, ts_updated) AS first_category,
+    max_by(category, ts_updated) AS last_category,
+    max_by(category, IF(category IS NOT NULL, ts_updated, NULL)) AS last_category_not_null,
     MAX(bypass) AS max_bypass
   FROM
-    credit_analysis_ordered
+    datalake_sorting_hat_clean.credit_analysis
   WHERE
     id_proposal IS NOT NULL
   GROUP BY 1
@@ -37,7 +23,7 @@ credit_evaluations_prev AS (
     proposal_number_evaluations,
     ts_proposal_first_credit_evaluation_positive,
     ts_proposal_last_credit_evaluation_positive,
-    ROW_NUMBER() OVER(PARTITION BY id_proposal ORDER BY ts_updated DESC, ts_created DESC) AS rn
+    ROW_NUMBER() OVER (PARTITION BY id_proposal ORDER BY ts_updated DESC, ts_created DESC) AS rn
   FROM
     datalake_docx.credit_evaluation
 ),
@@ -58,10 +44,10 @@ credit_evaluations AS (
 dti AS (
   SELECT
     p.id AS id_proposal,
-    NULLIF(SUM(p2.monthly_income),0) AS income,
-    MAX(p.rent_value + COALESCE(p.condo_value,0) + COALESCE(p.iptu_value,0) + COALESCE(p.home_insurance_value,0)) AS package,
+    NULLIF(SUM(p2.monthly_income), 0) AS income,
+    MAX(p.rent_value + COALESCE(p.condo_value, 0) + COALESCE(p.iptu_value, 0) + COALESCE(p.home_insurance_value, 0)) AS package,
     CASE
-      WHEN SUM(p2.monthly_income) != 0 THEN CAST(MAX(p.rent_value + COALESCE(p.condo_value,0) + COALESCE(p.iptu_value,0) + COALESCE(p.home_insurance_value,0))/SUM(p2.monthly_income) AS DECIMAL(9,2))
+      WHEN SUM(p2.monthly_income) != 0 THEN CAST(MAX(p.rent_value + COALESCE(p.condo_value, 0) + COALESCE(p.iptu_value, 0) + COALESCE(p.home_insurance_value, 0)) / SUM(p2.monthly_income) AS DECIMAL(9, 2))
       ELSE NULL
     END AS dti
   FROM
@@ -79,7 +65,7 @@ sorting_hat_proposals_prev AS (
     p.ts_analyzed,
     p.ts_processed,
     pv.ts_analyzed AS ts_analyzed_version,
-    ROW_NUMBER() OVER (PARTITION by p.id ORDER BY pv.ts_analyzed) AS rn
+    ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY pv.ts_analyzed) AS rn
   FROM
     datalake_sorting_hat_clean.proposal AS p
   LEFT JOIN
@@ -106,9 +92,18 @@ latest_screening_result AS (
     liquidity,
     risk_category,
     score
-  FROM
-    datalake_sorting_hat_clean.screening_result
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_proposal ORDER BY ts_database_transaction DESC) = 1
+  FROM (
+    SELECT
+      id_proposal,
+      liquidity,
+      risk_category,
+      score,
+      ROW_NUMBER() OVER (PARTITION BY id_proposal ORDER BY ts_database_transaction DESC) AS rn
+    FROM
+      datalake_sorting_hat_clean.screening_result
+  ) AS _t
+  WHERE
+    rn = 1
 )
 
 SELECT

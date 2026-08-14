@@ -13,9 +13,18 @@ latest_screening_result AS (
     liquidity,
     risk_category_canon,
     score
-  FROM
-    datalake_sorting_hat_clean.screening_result
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_proposal ORDER BY ts_database_transaction DESC) = 1
+  FROM (
+    SELECT
+      id_proposal,
+      liquidity,
+      risk_category_canon,
+      score,
+      ROW_NUMBER() OVER (PARTITION BY id_proposal ORDER BY ts_database_transaction DESC) AS rn
+    FROM
+      datalake_sorting_hat_clean.screening_result
+  ) AS _t
+  WHERE
+    rn = 1
 ),
 
 credit_analysis AS (
