@@ -34,13 +34,19 @@ _IMPORT_TIME_MOCKS = {
     "bietlejuice.base": MagicMock(),
     "bietlejuice.base.service": MagicMock(),
     "bietlejuice.base.service.dag_packages_path_service": MagicMock(),
+    "bietlejuice.clients": MagicMock(),
+    "bietlejuice.clients.db_clients": MagicMock(),
     "bietlejuice.loaders": MagicMock(),
     "bietlejuice.loaders.delta_loader": MagicMock(),
     "bietlejuice.services": MagicMock(),
     "bietlejuice.services.configuration_service": MagicMock(),
+    "bietlejuice.services.metastore_services": MagicMock(),
     "quintoandar_logger": MagicMock(),
     "requests": MagicMock(),
     "yaml": MagicMock(),
+    "pyspark": MagicMock(),
+    "pyspark.sql": MagicMock(),
+    "pyspark.sql.functions": MagicMock(),
 }
 
 with patch.dict("sys.modules", _IMPORT_TIME_MOCKS):

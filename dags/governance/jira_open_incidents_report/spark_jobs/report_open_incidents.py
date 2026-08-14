@@ -7,19 +7,20 @@ route, ?space=agents-data-alarms (base URL from spark_jobs/{environment}_conf.ym
 
 from __future__ import annotations
 
-import os
 from argparse import ArgumentParser, Namespace
 from collections import defaultdict
 from datetime import datetime, timezone
 
 import requests
 import yaml
-from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "report_open_incidents"
 TABLE_NAME = "open_incidents_snapshot"
@@ -153,17 +154,8 @@ def main() -> None:
     args = parse_arguments()
     logical_ts = _parse_logical_ts(args.logical_ts)
 
-    under_pytest = bool(os.environ.get("PYTEST_CURRENT_TEST"))
-    if under_pytest:
-        spark = SparkSession.getActiveSession() or SparkSession.builder.getOrCreate()
-        spark_client = type("_TestSparkClient", (), {"conn": spark})()
-    else:
-        from bietlejuice.clients.db_clients import SparkClient
-
-        spark_client = SparkClient(app_name=JOB_NAME)
-        spark = spark_client.conn
-
-    from pyspark.sql import functions as F
+    spark_client = SparkClient(app_name=JOB_NAME)
+    spark = spark_client.conn
 
     open_df = (
         spark.sql(OPEN_INCIDENTS_QUERY)
@@ -179,22 +171,15 @@ def main() -> None:
     write_db = f"datalake_{args.schema}"
     table = f"{write_db}.{TABLE_NAME}"
     path = f"s3://{args.datalake_bucket}/enrich/{args.schema}/{TABLE_NAME}"
-    if not under_pytest:
-        from bietlejuice.services.metastore_services import MetastoreServiceFactory
-
-        MetastoreServiceFactory.create_loader_metastore_service(
-            spark_client
-        ).create_database(write_db)
+    metastore = MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+    metastore.create_database(write_db)
     DeltaLoader(spark_client.conn).load_table(
         table_name=table,
         path=path,
         source_df=open_df,
         partition_by=PARTITION_COLS,
     )
-    if not under_pytest:
-        MetastoreServiceFactory.create_loader_metastore_service(
-            spark_client
-        ).refresh_table(write_db, TABLE_NAME)
+    metastore.refresh_table(write_db, TABLE_NAME)
     logging_logger.info(f"m={JOB_NAME}, table={table}")
 
     _notify(args.dag_name, args.environment, message, len(rows))
