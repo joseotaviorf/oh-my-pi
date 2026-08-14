@@ -1,4 +1,4 @@
-database_name: metric_metric_ss__segments
+database_name: metric_ss
 table_name: transfers
 description: This table contains Transfer Rate KPI with target per many dimensions.
 domain: Support and Services
@@ -55,19 +55,19 @@ columns:
       acronym: Amount interactions
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Count of transferred interactions for front CX call and chat contacts.
   amount_contacts:
     metric:
-      name: DSAT Amount Contacts
+      name: Transfer Amount Contacts
       description: Total Contacts, considering the following business rules WHEN channel
         IN ('call', 'chat') AND area = 'CX' AND front_or_back = 'front
       acronym: Amount Contacts
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Count of distinct front CX call and chat contacts in the segment.
@@ -79,7 +79,7 @@ columns:
       acronym: Transfer Rate
       is_additive: false
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Transfer rate calculated as amount_interactions divided by amount_contacts.

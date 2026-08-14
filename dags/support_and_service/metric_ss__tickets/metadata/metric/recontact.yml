@@ -1,4 +1,4 @@
-database_name: metric_metric_ss__tickets
+database_name: metric_ss
 table_name: recontact
 description: This table contains Recontact KPI with target per many dimensions.
 domain: Support and Services
@@ -53,7 +53,7 @@ columns:
       acronym: Amount Recontact
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Number of classified tickets that contacted us again within 4 days
@@ -62,10 +62,10 @@ columns:
     metric:
       name: Amount Recontact Tickets
       description: Amount of tickets that correspond or do not correspond to recontact
-      acronym: Amoun Recontact Responses
+      acronym: Amount Recontact Responses
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Amount of tickets that correspond or do not correspond to recontact
@@ -74,10 +74,10 @@ columns:
       name: Recontact Rate
       description: Semi-additive metrics representing the Sum of tickets that are
         recontacted divided by the overall number of recontact tickets
-      acronym: DSAT Rate
+      acronym: Recontact Rate
       is_additive: false
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Semi-additive metrics representing the Sum of tickets that are recontacted

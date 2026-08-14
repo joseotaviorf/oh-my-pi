@@ -1,4 +1,4 @@
-database_name: metric_metric_ss__tickets
+database_name: metric_ss
 table_name: fcr
 description: This table contains FCR (First Call Resolution)  KPI with target per
   many dimensions.
@@ -48,41 +48,41 @@ columns:
     - dw_customer_support.dim_taxonomy.customer_type
   amount_resolutions:
     metric:
-      name: Amount recontact tickets
-      description: Number of classified tickets that contacted us again within 4 days
-        of the first contact
-      acronym: Amount Recontact
+      name: Amount FCR resolutions
+      description: Number of classified tickets resolved on first contact without recontact
+        within 4 days
+      acronym: Amount FCR
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: https://docs.google.com/document/d/1X-cyvwZdQTsTVVkzeA1rjqDrtLt1XIryozl7VBWiqkU/edit?usp=sharing
-    description: Number of classified tickets that contacted us again within 4 days
-      of the first contact
+    description: Number of classified tickets resolved on first contact without recontact
+      within 4 days
   amount_tickets:
     metric:
-      name: Amount Recontact Tickets
-      description: Amount of tickets that correspond or do not correspond to recontact
-      acronym: Amoun Recontact Responses
+      name: Amount FCR Tickets
+      description: Total number of classified tickets in the FCR denominator
+      acronym: Amount FCR Tickets
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: https://docs.google.com/document/d/1X-cyvwZdQTsTVVkzeA1rjqDrtLt1XIryozl7VBWiqkU/edit?usp=sharing
-    description: Amount of tickets that correspond or do not correspond to recontact
+    description: Total number of classified tickets in the FCR denominator
   fcr_rate:
     metric:
-      name: Recontact Rate
-      description: Semi-additive metrics representing the Sum of tickets that are
-        recontacted divided by the overall number of recontact tickets
-      acronym: DSAT Rate
+      name: FCR Rate
+      description: Semi-additive metric representing first-call resolutions divided
+        by the total number of classified tickets
+      acronym: FCR Rate
       is_additive: false
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: https://docs.google.com/document/d/1X-cyvwZdQTsTVVkzeA1rjqDrtLt1XIryozl7VBWiqkU/edit?usp=sharing
-    description: Semi-additive metrics representing the Sum of tickets that are recontacted
-      divided by the overall number of recontact tickets
+    description: Semi-additive metric representing first-call resolutions divided
+      by the total number of classified tickets
   dt_ticket_created:
     description: The created date of ticket.
     dimension: true

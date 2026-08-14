@@ -1,4 +1,4 @@
-database_name: metric_metric_ss__tickets
+database_name: metric_ss
 table_name: dsat
 description: This table contains DSAT KPI with target per many dimensions.
 domain: Support and Services
@@ -52,7 +52,7 @@ columns:
       acronym: Amount Dissatisfied
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Sum of dissatisfied responses
@@ -63,7 +63,7 @@ columns:
       acronym: Amount Responses
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Total count of DSAT survey responses at the metric grain.
@@ -74,7 +74,7 @@ columns:
       acronym: DSAT Rate
       is_additive: false
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Semi-additive metrics representing the DSAT rate

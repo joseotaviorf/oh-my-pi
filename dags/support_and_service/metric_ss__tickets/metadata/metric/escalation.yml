@@ -1,4 +1,4 @@
-database_name: metric_metric_ss__tickets
+database_name: metric_ss
 table_name: escalation
 description: This table contains Escalation Rate KPI with target per many dimensions.
 domain: Support and Services
@@ -57,7 +57,7 @@ columns:
       acronym: Amount Escalation
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Number of tickets that were escalated to the departments '[MX] Media
@@ -77,10 +77,10 @@ columns:
         Repairs [Back]' 'Offboarding Repairs [OFF] [POS] [BACK]' 'QuintoAndar Protection
         [OFF] [POS] [BACK]' 'Repairs [BACK]' 'Self-Service Repairs [BACK]' And they
         were not originated on WhatsApp
-      acronym: Amoun Escalation Responses
+      acronym: Amount Escalation Responses
       is_additive: true
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Number of tickets that were escalated to departments 'CX Partners
@@ -97,10 +97,10 @@ columns:
       description: Semi-additive metric representing the sum of tickets that are escalation
         tickets for given departments divided by the overall sum of the number of
         escalation tickets
-      acronym: DSAT Rate
+      acronym: Escalation Rate
       is_additive: false
       business_stage: CX
-      hierarchy: User analisys
+      hierarchy: User analysis
       approved_by: vicente.neto@quintoandar.com.br
       link_to_metric: ''
     description: Semi-additive metric representing the sum of tickets that are escalation
