@@ -95,12 +95,6 @@ sheets_info:
     clean_table_name: encm_coefficients_backward_looking
     sheet_context: growth
 
-  encm_coefficients_forward_looking:
-    sheet_id: 1qAmeLFiO_W2vufA2oNK0326W5V_wbSjIYY7z32ahXns
-    sheet_name: coefficients_forward_looking
-    clean_table_name: encm_coefficients_forward_looking
-    sheet_context: growth
-
   encm_conversion_probability_backward_looking:
     sheet_id: 1XZK73ooCchsUEDnpn5YhcVfdTU7Owz0GPniGKykX4gY
     sheet_name: conversion_probability_backward_looking
