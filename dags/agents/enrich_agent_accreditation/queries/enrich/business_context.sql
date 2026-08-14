@@ -18,6 +18,14 @@ agent_data_updated AS (
     WHERE
         DATE(u.ts_revision) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
+-- NOTE: considered replacing this ad hoc resolution with datalake_agent.agent_unified_identity
+-- (which has a proper deterministic tiebreak per id_agent_data, is_agent_data_replace_key) --
+-- but that table only covers ~6.4k of the ~51k agents in business_context (it only accumulates
+-- identities touched since its own DAG's 2024-01-01 start, not a full historical backfill), so
+-- swapping it in drops coverage for the vast majority of legacy agents. Not usable as a direct
+-- substitute without first backfilling agent_unified_identity itself -- out of scope here.
+-- The duplicate-row symptom this CTE can produce is instead guarded downstream, right before
+-- the ts_revision_ended LEAD() that it corrupts (see the business_contexts CTE below).
 agent_external_reference AS (
     SELECT
         ps.uuid_person,
@@ -46,7 +54,11 @@ legacy_agent_data_business_contexts AS (
         aer.uuid_person,
         aud.business_context,
         aud.rev_type,
-        ROW_NUMBER() OVER(PARTITION BY aud.id_agent_data, DATE(u.ts_revision) ORDER BY u.ts_revision DESC) = 1 AS is_last_update_by_date,
+        -- each real transition writes a same-instant pair: the closed value (rev_type=2/DEL)
+        -- and the new value (rev_type=0/ADD). Ties on ts_revision need a deterministic
+        -- tiebreaker or Trino/Spark can pick either row, non-deterministically flipping which
+        -- context "wins" that day (AAREDE-526) -- rev_type ASC prefers ADD (0) over DEL (2).
+        ROW_NUMBER() OVER(PARTITION BY aud.id_agent_data, DATE(u.ts_revision) ORDER BY u.ts_revision DESC, aud.rev_type ASC) = 1 AS is_last_update_by_date,
         u.ts_revision AS ts_revision_started
     FROM
         agent_external_reference AS aer
@@ -78,7 +90,12 @@ new_business_contexts AS (
 ),
 legacy_business_contexts AS (
     SELECT
-        XXHASH64(bc.uuid_person, new.id_agent, bc.business_context, DATE(bc.ts_revision_started)) AS id_agent_business_context,
+        -- keyed on id_agent_data (stable, native to the legacy row), not new.id_agent:
+        -- new.id_agent depends on whether Agent Domain has resolved a first event for this
+        -- person yet, which changes across incremental runs as Agent Domain data arrives.
+        -- Keying on it made the merge key unstable and left orphaned stale-dated duplicate
+        -- rows once Agent Domain caught up (AAREDE-526).
+        XXHASH64(bc.uuid_person, bc.id_agent_data, bc.business_context, DATE(bc.ts_revision_started)) AS id_agent_business_context,
         new.id_agent,
         bc.id_agent_data,
         bc.id_user,
@@ -100,7 +117,7 @@ legacy_business_contexts AS (
             OR DATE(bc.ts_revision_started) < DATE(new.ts_revision_started)
         )
 ),
-business_contexts AS (
+business_contexts_raw AS (
     SELECT
         id_agent_business_context,
         id_agent,
@@ -124,6 +141,26 @@ business_contexts AS (
         ts_revision_started
     FROM
         legacy_business_contexts
+),
+-- agent_external_reference can legitimately emit more than one row per (uuid_person,
+-- id_agent_data) when a person has multiple id_user accounts mapped to the same
+-- id_agent_data. Those rows differ only in id_user, so UNION (which dedupes on full-row
+-- equality) does not collapse them, and two rows for the same id_agent_data can end up
+-- sharing the identical ts_revision_started. The LEAD() below has no tiebreaker for ties,
+-- so it can pick a tied row's own timestamp as "the next one," producing a
+-- ts_revision_ended before its own ts_revision_started -- a degenerate, permanently-closed
+-- interval that silently erases coverage (AAREDE-526). Collapsing to one row per the real
+-- merge key here, before LEAD() ever sees the data, prevents that.
+business_contexts AS (
+    SELECT
+        id_agent_business_context, id_agent, id_agent_data, id_user, uuid_person,
+        business_context, system_name, ts_revision_started
+    FROM (
+        SELECT *,
+            ROW_NUMBER() OVER (PARTITION BY id_agent_business_context ORDER BY system_name DESC) AS rn
+        FROM business_contexts_raw
+    ) t
+    WHERE rn = 1
 )
 SELECT
     id_agent_business_context,
@@ -134,6 +171,16 @@ SELECT
     business_context,
     system_name,
     ts_revision_started,
-    LEAD(ts_revision_started) OVER (PARTITION BY id_user, id_agent ORDER BY ts_revision_started) - INTERVAL 1 DAY AS ts_revision_ended
+    -- partitioned by id_agent_data (stable across both branches), not id_agent: id_agent is
+    -- null for legacy rows until Agent Domain resolves a first event for the person, which
+    -- silently split one continuous per-agent timeline into two partitions and broke interval
+    -- closure once Agent Domain data arrived (AAREDE-526).
+    -- subtracting a flat 1 DAY (not 1 second) meant that whenever the next revision's
+    -- time-of-day was earlier than this row's own time-of-day, the computed end could land
+    -- before this row's own start -- an inverted, unsatisfiable interval that silently erased
+    -- coverage for that agent even though the two revisions were on consecutive calendar
+    -- days, not the same one (AAREDE-526). 1 SECOND guarantees the end is always strictly
+    -- before the next start and never before this row's own start.
+    LEAD(ts_revision_started) OVER (PARTITION BY id_agent_data ORDER BY ts_revision_started) - INTERVAL 1 SECOND AS ts_revision_ended
 FROM
     business_contexts
