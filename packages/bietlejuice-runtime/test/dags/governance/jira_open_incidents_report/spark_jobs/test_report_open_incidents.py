@@ -120,7 +120,7 @@ _ADF_TEMPLATE = (
     '{"type":"hardBreak"},'
     '{"type":"text","text":"Problem:","marks":[{"type":"strong"}]},'
     '{"type":"text","text":" Here we describe what happened, bringing inputs '
-    'like which DAG is broken, on which task, and available task Logs from '
+    "like which DAG is broken, on which task, and available task Logs from "
     'Airflow/Databricks that are relevant to the incident"}'
     "]}]}]}"
 )
