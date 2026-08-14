@@ -125,7 +125,22 @@ concatenate_comments AS (
     phone_extension,
     ts_activity
 )
-SELECT
+-- The BROADCAST hints below are required for this query to finish on EMR, not cosmetic.
+--
+-- Every dimension joined here is small (18 KB - 3 MB), but each is either a Delta table
+-- without usable row stats or a CTE wrapped in a window function (`codes_descriptions`,
+-- `map_type_occurrence`, `get_agency_group_name`). The planner therefore falls back to
+-- `defaultSizeInBytes` and never broadcasts: on cluster j-084138821QBBI4TV9MTO all 12
+-- LEFT JOINs planned as SortMergeJoins, each shuffling the ~7 GB `logs` fact table.
+--
+-- The keys make that fatal. `code_type` plus the action / result / complement codes carry
+-- only a few dozen distinct values, so hash partitioning piles nearly everything into a
+-- handful of partitions -- 18-46x max/mean task skew across the join chain, with a single
+-- 870s task holding up a 190-task stage whose mean task was 19s.
+--
+-- `datalake_cyber_clean.contracts` (~300 MB) is deliberately NOT broadcast: it joins on
+-- the high-cardinality `id_contract` and does not skew.
+SELECT /*+ BROADCAST(u, ag, agg, cda, cdaf, cdr, cdrf, cdc, cdcf, lvr, mto) */
   l.creditor,
   l.id_contract,
   l.contract_group,
