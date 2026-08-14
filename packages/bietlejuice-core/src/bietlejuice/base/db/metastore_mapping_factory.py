@@ -27,4 +27,5 @@ class MetastoreMappingFactory:
             LayerEnum.REVERSE: ReverseMetastoreMapping,
             LayerEnum.QUBE: QubeMetastoreMapping,
             LayerEnum.WONKA: DatalakeMetastoreMapping,
+            LayerEnum.CONSUMPTION: DatalakeMetastoreMapping,
         }[layer](source, bucket)
