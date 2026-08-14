@@ -7,7 +7,9 @@ dag:
     dag_purpose: |
       Weekly (Monday 9am BRT) digest of open DEI incident cards (current_status_category
       != 'Done'). Snapshot grain is one row per open incident. Google Chat digest is a
-      Line (incident_owner) leaderboard: count, newest age, oldest age. Posts to space
+      Line (incident_owner) leaderboard: count, newest/oldest age, on going
+      (card workflow In Progress), unassigned, description not filled. Open =
+      on going + backlog; concluded (Done) is excluded. Posts to space
       "agents-data-alarms" via Notification Hub (inmetro route, webhook base co-located
       in spark_jobs/{environment}_conf.yml).
 workflow:

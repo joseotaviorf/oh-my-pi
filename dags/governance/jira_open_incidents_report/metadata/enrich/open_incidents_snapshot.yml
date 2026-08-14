@@ -27,6 +27,24 @@ columns:
     lineage:
       - datalake_jira.issues.ts_created
     description: Timestamp the incident card was created, used to compute how long it has been open.
+  issue_description:
+    lineage:
+      - datalake_jira.issues.issue_description
+    description: >
+      Jira description body at report time (ADF JSON or markdown). Used to detect
+      whether Problem/Cause/Solution is still the pre-filled on-call template.
+  current_status:
+    lineage:
+      - datalake_jira.issues.current_status
+    description: >
+      Jira card workflow status name at report time (Backlog, On going, Concluded,
+      or locale equivalents such as Tarefas pendentes / Em andamento).
+  current_status_category:
+    lineage:
+      - datalake_jira.issues.current_status_category
+    description: >
+      Jira status category at report time. Open digest is To Do (backlog) plus
+      In Progress (on going); Done (concluded) is excluded.
   year:
     lineage: []
     description: Year the report DAG ran, used for Delta partitioning — filter for partition pruning.
