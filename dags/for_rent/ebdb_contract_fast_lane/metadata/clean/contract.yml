@@ -48,6 +48,13 @@ columns:
     lineage:
       - datalake_ebdb_raw.contrato.dadosBanco_bankAccountValidation_id
     description: Foreign key to bank account validation data for payout setup.
+  uuid_contract:
+    lineage:
+      - datalake_ebdb_raw.contrato.contractUUID
+    description: >-
+      Canonical UUID of the rent contract, decoded from the base64 text of the BINARY(16) value
+      stored in the source column. Use it to join contract records against services that reference
+      contracts by UUID instead of the numeric id, such as rental management.
   invoice_email:
     lineage:
       - datalake_ebdb_raw.contrato.emailfatura
@@ -64,6 +71,16 @@ columns:
     lineage:
       - datalake_ebdb_raw.contrato.status
     description: Current processing state of the record in the source workflow.
+  user_source_of_truth:
+    lineage:
+      - datalake_ebdb_raw.contrato.userSourceOfTruth
+    description: >-
+      System that owns the user record linked to the contract, telling consumers where tenant and
+      owner identity data must be read from. Contracts flagged RMS are almost entirely enrolled in
+      the managed rental program.
+    categories:
+      MAIN: User identity is owned by the main QuintoAndar platform (ebdb).
+      RMS: User identity is owned by the rental management system.
   contract_rent_model:
     lineage:
       - datalake_ebdb_raw.contrato.contractRentModel
@@ -360,3 +377,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.contrato.fairfaxstartdate
     description: Timestamp when the Fairfax process started.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.contrato.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.contrato.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.contrato.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

@@ -10,10 +10,22 @@ SELECT
     contractVersion_id AS id_contract_version,
     correspondencia_estado_id AS id_mailing_state,
     dadosBanco_bankAccountValidation_id AS id_bank_account_validation_bank_data,
+    -- source stores the UUID as the base64 text of the MySQL BINARY(16) value
+    LOWER(
+        CONCAT_WS(
+            '-',
+            SUBSTRING(HEX(UNBASE64(CAST(contractUUID AS STRING))), 1, 8),
+            SUBSTRING(HEX(UNBASE64(CAST(contractUUID AS STRING))), 9, 4),
+            SUBSTRING(HEX(UNBASE64(CAST(contractUUID AS STRING))), 13, 4),
+            SUBSTRING(HEX(UNBASE64(CAST(contractUUID AS STRING))), 17, 4),
+            SUBSTRING(HEX(UNBASE64(CAST(contractUUID AS STRING))), 21, 12)
+        )
+    ) AS uuid_contract,
     emailFatura AS invoice_email,
     observacao AS observation,
     valorAluguel AS rent,
     status,
+    userSourceOfTruth AS user_source_of_truth,
     contractRentModel AS contract_rent_model,
     numImovel AS house_number,
     diaMesCobranca AS billing_day_of_month,
