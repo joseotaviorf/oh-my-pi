@@ -22,8 +22,8 @@ WITH origin_mapping AS (
     ('referral', 'Internal'),
     ('fb', 'Meta'),
     ('ig', 'Meta'),
-    -- HubSpot unresolved token; REPEAT builds the two-brace wrapper without str.format placeholders.
-    (CONCAT(REPEAT('{', 2), 'site_source_name', REPEAT('}', 2)), 'Meta'),
+    -- HubSpot token is {{site_source_name}} in data; double braces in REPEAT survive str.format.
+    (CONCAT(REPEAT('{{', 2), 'site_source_name', REPEAT('}}', 2)), 'Meta'),
     ('(none)', 'Direct'),
     ('instagram', 'Meta'),
     ('imovelweb', 'Imovelweb'),
@@ -328,10 +328,10 @@ LEFT JOIN
     ON segment_mapping.utm_campaign = base_deal.utm_campaign
 LEFT JOIN
   owner_name
-    ON owner_name.id_owner = CAST(base_deal.id_hubspot_owner AS VARCHAR)
+    ON owner_name.id_owner = CAST(base_deal.id_hubspot_owner AS STRING)
 LEFT JOIN
   analyst_ops
-    ON analyst_ops.id_owner = CAST(base_deal.id_hubspot_owner AS VARCHAR)
+    ON analyst_ops.id_owner = CAST(base_deal.id_hubspot_owner AS STRING)
 LEFT JOIN
   lead_created
     ON lead_created.uuid_lead = base_deal.uuid_lead
