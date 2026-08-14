@@ -150,8 +150,12 @@ SELECT
     system_name,
     ts_revision_started,
     -- partitioned by id_agent_data (stable), not id_agent (null until Agent Domain resolves
-    -- it), and -1 SECOND not -1 DAY so the end never lands before this row's own start
-    -- when the next revision's time-of-day is earlier (AAREDE-526).
-    LEAD(ts_revision_started) OVER (PARTITION BY id_agent_data ORDER BY ts_revision_started) - INTERVAL 1 SECOND AS ts_revision_ended
+    -- it). COALESCE to id_user so Agent Domain rows with null user.id_agent do not share
+    -- one Spark NULL partition. -1 SECOND not -1 DAY so the end never lands before this
+    -- row's own start when the next revision's time-of-day is earlier (AAREDE-526).
+    LEAD(ts_revision_started) OVER (
+        PARTITION BY COALESCE(CAST(id_agent_data AS STRING), CAST(id_user AS STRING))
+        ORDER BY ts_revision_started
+    ) - INTERVAL 1 SECOND AS ts_revision_ended
 FROM
     business_contexts
