@@ -1,0 +1,38 @@
+database_name: datalake_jira_reports
+table_name: open_incidents_snapshot
+owner: gustavo.rompe@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Weekly (Monday) snapshot of open DEI incident cards (current_status_category != 'Done')
+  at the time the jira_open_incidents_report DAG ran. One row per open incident per report
+  run — audit trail for the Google Chat digest sent to the agents-data-alarms space.
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira.issues.id_issue
+    description: Jira issue key (e.g. DEI-1234) of the open incident.
+  summary:
+    lineage:
+      - datalake_jira.issues.summary
+    description: Incident card summary/title at the time of the report run.
+  assignee:
+    lineage:
+      - datalake_jira.issues.assignee
+    description: Display name of the card's assignee at the time of the report run.
+  incident_owner:
+    lineage:
+      - datalake_jira.issues.incident_owner
+    description: Owning team/Line value (Jira custom field) at the time of the report run.
+  ts_created:
+    lineage:
+      - datalake_jira.issues.ts_created
+    description: Timestamp the incident card was created, used to compute how long it has been open.
+  year:
+    lineage: []
+    description: Year the report DAG ran, used for Delta partitioning — filter for partition pruning.
+  month:
+    lineage: []
+    description: Month the report DAG ran, used for Delta partitioning — filter for partition pruning.
+  day:
+    lineage: []
+    description: Day the report DAG ran, used for Delta partitioning — filter for partition pruning.
