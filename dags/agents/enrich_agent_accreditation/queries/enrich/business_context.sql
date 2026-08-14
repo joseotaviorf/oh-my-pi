@@ -50,7 +50,10 @@ legacy_agent_data_business_contexts AS (
         aud.rev_type,
         -- rev_type ASC breaks ties between a transition's DEL (2) and ADD (0) row,
         -- which share the same instant (AAREDE-526).
-        ROW_NUMBER() OVER(PARTITION BY aud.id_agent_data, DATE(u.ts_revision) ORDER BY u.ts_revision DESC, aud.rev_type ASC) = 1 AS is_last_update_by_date,
+        ROW_NUMBER() OVER (
+            PARTITION BY aud.id_agent_data, u.ts_revision
+            ORDER BY aud.rev_type ASC
+        ) = 1 AS is_last_update_by_instant,
         u.ts_revision AS ts_revision_started
     FROM
         agent_external_reference AS aer
@@ -60,6 +63,36 @@ legacy_agent_data_business_contexts AS (
     JOIN
         datalake_ebdb_user.user_revision_entity AS u
             ON u.id = aud.rev
+),
+-- one row per context run: drop DEL-only, then keep the ADD that starts a new
+-- business_context. Same-day N switches become N sequential boxes (AAREDE-526).
+legacy_context_changes AS (
+    SELECT
+        id_agent_data,
+        id_user,
+        uuid_person,
+        business_context,
+        ts_revision_started
+    FROM (
+        SELECT
+            id_agent_data,
+            id_user,
+            uuid_person,
+            business_context,
+            ts_revision_started,
+            LAG(business_context) OVER (
+                PARTITION BY id_agent_data
+                ORDER BY ts_revision_started
+            ) AS previous_business_context
+        FROM
+            legacy_agent_data_business_contexts
+        WHERE
+            rev_type <> 2
+            AND is_last_update_by_instant IS TRUE
+    )
+    WHERE
+        previous_business_context IS NULL
+        OR previous_business_context <> business_context
 ),
 new_business_contexts AS (
     SELECT
@@ -87,7 +120,9 @@ legacy_business_contexts AS (
     SELECT
         -- id_agent_data is stable; new.id_agent is not (null until Agent Domain resolves
         -- this person), so keying on it left orphaned duplicates (AAREDE-526).
-        XXHASH64(bc.uuid_person, bc.id_agent_data, bc.business_context, DATE(bc.ts_revision_started)) AS id_agent_business_context,
+        -- Hash the change-start timestamp, not DATE(), so two same-day switches
+        -- cannot collide and get collapsed in the dedup below.
+        XXHASH64(bc.uuid_person, bc.id_agent_data, bc.business_context, bc.ts_revision_started) AS id_agent_business_context,
         new.id_agent,
         bc.id_agent_data,
         bc.id_user,
@@ -96,18 +131,14 @@ legacy_business_contexts AS (
         "LEGACY_SYSTEM" AS system_name,
         bc.ts_revision_started
     FROM
-        legacy_agent_data_business_contexts AS bc
+        legacy_context_changes AS bc
     LEFT JOIN
         new_business_contexts AS new
             ON new.id_agent_data = bc.id_agent_data
             AND new.is_first_event IS TRUE
     WHERE
-        bc.rev_type <> 2
-        AND bc.is_last_update_by_date IS TRUE
-        AND (
-            new.id_agent_data IS NULL
-            OR DATE(bc.ts_revision_started) < DATE(new.ts_revision_started)
-        )
+        new.id_agent_data IS NULL
+        OR bc.ts_revision_started < new.ts_revision_started
 ),
 -- dedupe on the real merge key before ts_revision_ended's LEAD() below, else duplicate
 -- rows sharing a key can invert that window and erase coverage (AAREDE-526).
