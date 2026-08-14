@@ -5,13 +5,26 @@ cluster:
       spark.dynamicAllocation.enabled: "false"
       spark.executor.instances: "2"
       spark.executor.cores: "4"
-      spark.executor.memory: "19g"
+      # 19g here yielded only ONE executor on j-0841187MENJHVTMYAJZ: the container
+      # (19g + 2g overhead = 21504 MB) fits alone on an r6g.xlarge NodeManager but not
+      # alongside the 2g ApplicationMaster, so the second CORE node sat idle.
+      # dw_data_quality, on the bare preset (12g -> 14336 MB), gets both executors.
+      # 16g + 2g = 18432 MB leaves room for the AM and still beats the 12g preset default.
+      spark.executor.memory: "16g"
       spark.executor.memoryOverhead: "2g"
       spark.driver.memory: "8g"
       spark.driver.maxResultSize: "4g"
       spark.sql.adaptive.enabled: "true"
       spark.sql.adaptive.coalescePartitions.enabled: "true"
-      spark.sql.adaptive.advisoryPartitionSizeInBytes: "128MB"
+      # The MERGE "materialize source" stages (250 / 252 on j-0841187MENJHVTMYAJZ) ran the
+      # whole 26-branch union through just FIVE partitions: emr_spark_base starts at
+      # spark.sql.shuffle.partitions=100 and AQE coalesced that to 5 at 128MB advisory.
+      # Each task then carried ~1/5 of a 22-table, 18-join query. 32MB gives ~20 partitions.
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "32MB"
+      # emr_spark_base sets this to -1, which stops AQE from ever converting a join to a
+      # broadcast at runtime, so all 18 joins stay SortMergeJoins. `house` and `user` are
+      # joined at the top of entities.sql and are exactly what AQE should broadcast.
+      spark.sql.adaptive.autoBroadcastJoinThreshold: "10MB"
       spark.sql.adaptive.skewJoin.enabled: "true"
       spark.sql.adaptive.skewJoin.skewedPartitionFactor: "5"
       spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes: "256MB"
