@@ -1,6 +1,6 @@
 ---
 name: databricks-emr-sql-lint
-description: Lints SQL files under bi-etl-ejuice dags/ for Databricks-only constructs that break, change behavior, or silently degrade performance on EMR Spark 3.5. Operates in dual-runtime mode (queries must run on both Databricks DBR 16.4 and EMR Spark 3.5). Auto-invokes when editing or creating any .sql file in dags/. Detects QUALIFY, GROUP BY ALL, IFF, DECODE, DATEDIFF 3-arg, variant access (column:key), legacy DATE_FORMAT pattern letters, and Databricks-only optimizer hints (RANGE_JOIN, SKEW) that EMR ignores and silently turn into nested-loop/cartesian joins; reports findings with severity (critical / performance / attention), line numbers, snippets, and dual-runtime-safe rewrite suggestions; uses the database MCP to inspect column types before suggesting variant rewrites; never rewrites automatically (lint-only) unless the user explicitly asks. Use when modifying any .sql file in dags/, when the user mentions EMR migration, Spark 3.5 compatibility, dual-runtime, a query that is fast on Databricks but slow on EMR, or asks "is this query EMR-compatible?".
+description: Lints SQL files under bi-etl-ejuice dags/ for Databricks-only constructs that break, change behavior, or silently degrade performance on EMR Spark 3.5. Operates in dual-runtime mode (queries must run on both Databricks DBR 16.4 and EMR Spark 3.5). Auto-invokes when editing or creating any .sql file in dags/. Detects QUALIFY, GROUP BY ALL, IFF, DECODE, DATEDIFF 3-arg, variant access (column:key), legacy DATE_FORMAT pattern letters, Databricks-only optimizer hints (RANGE_JOIN, SKEW) that EMR ignores, and — via validate_join_shapes.py's sqlglot-based join-shape analysis — any join whose ON condition has no extractable hash key (a written-out range join, or a disjunctive/OR join across two columns), which Spark can only plan as a BroadcastNestedLoopJoin; reports findings with severity (critical / performance / attention), line numbers, snippets, and dual-runtime-safe rewrite suggestions; uses the database MCP to inspect column types before suggesting variant rewrites; never rewrites automatically (lint-only) unless the user explicitly asks. Use when modifying any .sql file in dags/, when the user mentions EMR migration, Spark 3.5 compatibility, dual-runtime, nested loop, OR join, range join, BroadcastNestedLoopJoin, a query that is fast on Databricks but slow on EMR, or asks "is this query EMR-compatible?".
 disable-model-invocation: false
 ---
 
@@ -57,6 +57,37 @@ When in doubt, keep the match and let the report show it; the engineer can dismi
 
 **Exception — optimizer hints are NOT comments for this lint.** The 🟠 performance patterns (`RANGE_JOIN`, `SKEW`) live inside Spark hint blocks `/*+ ... */`, which look like block comments but are semantically significant. Do **not** discard a `RANGE_JOIN` / `SKEW` match just because it sits inside `/*+ ... */` — that is exactly where it belongs. Only discard these when they appear inside a string literal or a *plain* comment (`-- ...` or `/* ... */` without the leading `+`).
 
+### Step 1b — Join-shape analysis (`validate_join_shapes.py`)
+
+Grep catches the `RANGE_JOIN` *hint* — it cannot tell whether a join is actually a range or
+disjunctive join written **without** the hint, which is what actually shipped in both
+incidents this check exists for (`enrich_cyber/queue_timeline.sql`, a `BETWEEN` join with no
+hint; `enrich_transactional_entities/entities.sql`, `ON a = b OR c = d`). Both built
+multi-hundred-MB broadcasts and hung production DAGs. A line-based regex is not accurate
+enough for this: it produced 82 false positives across this repo's corpus and missed real
+cases by truncating multi-line conditions. Use the AST-based script instead:
+
+```bash
+uv run --project packages/bietlejuice-compiler python \
+  packages/bietlejuice-compiler/scripts/ci_cd/validate_join_shapes.py \
+  --paths <the edited file> --json
+```
+
+Parse the JSON `violations` array. Each finding has `kind` (`OR_JOIN`, `NO_EQUI_KEY`, or
+`UNPARSEABLE`), `line_no`, and `text` (the flagged condition). Fold both `OR_JOIN` and
+`NO_EQUI_KEY` into the Step 4 report as 🟠 **performance** findings — same severity class as
+`RANGE_JOIN`/`SKEW`, since the result is identical on both runtimes and only parallelism is
+lost. `UNPARSEABLE` means the file has a construct sqlglot's Spark dialect cannot handle
+(distinct from EMR incompatibility) — mention it but do not guess at a rewrite.
+
+Also runnable directly by a DE checking their own work, without going through this skill:
+
+```bash
+make validate-join-shapes paths=dags/<domain>/<dag>     # a DAG folder
+make validate-join-shapes domain=<domain>               # a whole domain
+make validate-join-shapes-all                           # whole-repo audit
+```
+
 ### Step 3 — Resolve variant column types via Database MCP
 
 For every variant access match, the rewrite depends on the column's Spark type. Before suggesting a rewrite:
@@ -83,6 +114,7 @@ Output **one markdown table** at the end of the agent's reply for this turn (aft
 | 🔴  | QUALIFY          | 42   | `QUALIFY ROW_NUMBER() OVER (...) = 1`| Wrap as CTE with `rn`; filter `WHERE rn = 1` outside. See RECIPES.md §1. |
 | 🔴  | variant access   | 7    | `event_properties:id_house`          | `GET_JSON_OBJECT(event_properties, '$.id_house')` — column is STRING (DataHub). |
 | 🟠  | RANGE_JOIN hint  | 35   | `SELECT /*+ RANGE_JOIN(eb, 150) */`  | Hint ignored on EMR → BETWEEN join becomes nested-loop/cartesian. Equi-join + running window. See RECIPES.md §8. |
+| 🟠  | OR_JOIN          | 61   | `ON u.id = hl.id_related OR u.uuid_person = hl.id_related` | No hash key across the OR → BroadcastNestedLoopJoin. UNION of equi-joins. See RECIPES.md §9. |
 | 🟡  | DATE_FORMAT 'u'  | 88   | `DATE_FORMAT(ts, 'u')`               | `u` changed semantics in Spark 3.0; use `'E'` for day-of-week or `'EEEE'` for full name. |
 ```
 
@@ -97,12 +129,12 @@ If the user says "reescreve", "fix the lint", "make this EMR-compatible", or sim
 
 1. Apply the recipes from `RECIPES.md` deterministically.
 2. Preserve `sql_conventions.mdc` style (UPPERCASE keywords, snake_case columns, joins on new lines, no `SELECT *`, CTEs over subqueries).
-3. After edits, re-run Step 1 (Grep) on the file to verify no critical or performance pattern remains.
+3. After edits, re-run **both** Step 1 (Grep) and Step 1b (`validate_join_shapes.py --paths <file> --json`) to verify no critical or performance pattern remains.
 4. Report final state:
-   - `✅ EMR-compatible — all critical and performance constructs eliminated.` if Step 1 returns empty.
+   - `✅ EMR-compatible — all critical and performance constructs eliminated.` if both Step 1 and Step 1b return empty.
    - Otherwise, repeat the table with what's left.
 
-> A 🟠 performance rewrite must be **behavior-preserving**: results are already identical across runtimes, so the only goal is restoring parallelism. State the equivalence assumption explicitly (e.g. "cumulative window equals the `BETWEEN` count because the exploded rows cover every day in the range") so a reviewer can confirm it.
+> A 🟠 performance rewrite must be **behavior-preserving**: results are already identical across runtimes, so the only goal is restoring parallelism. State the equivalence assumption explicitly (e.g. "cumulative window equals the `BETWEEN` count because the exploded rows cover every day in the range", or for §9 "UNION reproduces OR semantics: one row matching both predicates still yields one row, two distinct matches still yield two") so a reviewer can confirm it. **A rewrite of this kind is not done until it has been verified against synthetic data** — plan-only confirmation (no more `BroadcastNestedLoopJoin` in the output) is necessary but not sufficient; also diff the before/after row sets on a fixture covering the join's boundary cases (match by each key independently, match by neither, one row matching multiple keys, duplicate relation rows).
 
 ## Out of scope (do NOT report or touch)
 

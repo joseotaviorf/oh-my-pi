@@ -813,6 +813,7 @@ validate-no-new-cyclic-dependencies:
 
 level ?= warning
 domain ?=
+paths ?=
 export ENVIRONMENT ?= forno
 .PHONY: validate-dag-declaration-files
 ## validates the content of DAG declaration YAML files, returning which keys of which files are not following requirements.
@@ -1173,6 +1174,28 @@ validate-emr-runtime-clients-all:
 	@echo "=========="
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_emr_runtime_clients.py -a
+
+.PHONY: validate-join-shapes
+## Fail if a new/changed join has no extractable hash key (BroadcastNestedLoopJoin risk on EMR).
+## Local use: `make validate-join-shapes paths=dags/<domain>/<dag>` or `domain=<domain>`.
+validate-join-shapes:
+	@echo ""
+	@echo "Validating join shapes (range / disjunctive joins that plan as BroadcastNestedLoopJoin on EMR)"
+	@echo "=========="
+	@echo ""
+	@if [ -z "$(paths)" ] && [ -z "$(domain)" ]; then \
+		git fetch --no-tags origin +refs/heads/master; \
+	fi
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_join_shapes.py $(if $(paths),--paths $(paths),$(if $(domain),--domain $(domain),-b "$(CI_COMMIT_BRANCH)"))
+
+.PHONY: validate-join-shapes-all
+## Scan all .sql files under dags/ for nested-loop join risks (local audit)
+validate-join-shapes-all:
+	@echo ""
+	@echo "Scanning all SQL files for nested-loop join risks"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_join_shapes.py -a
 
 MAKE_TARGET ?=
 MAKE_EXTRA_ARGS ?=
