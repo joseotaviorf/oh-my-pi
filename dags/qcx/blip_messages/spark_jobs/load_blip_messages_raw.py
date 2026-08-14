@@ -16,9 +16,12 @@ Discovery:
   and etag changes are reprocessed.
 
 Dedupe guarantee (row level):
-  Insert-only MERGE on id_message — first ingested row wins; later files with
-  the same id_message are ignored. s3_key reflects the winning file.
-  Producer tunnel_id is landed as id_tunnel (lake id_* convention).
+  Within each source file, keep the row with the latest ts_created per
+  id_message before MERGE so a single JSONL cannot produce
+  DELTA_MULTIPLE_SOURCE_ROW_MATCHING_TARGET_ROW.
+  Across files, insert-only MERGE on id_message — first ingested row wins;
+  later files with the same id_message are ignored. s3_key reflects the
+  winning file. Producer tunnel_id is landed as id_tunnel (lake id_*).
 
 File ledger (best-effort skip + audit):
   blip_messages_ingest_files tracks each processed object. The CLI owns when
@@ -52,6 +55,7 @@ from pyspark.sql.types import (
     StructType,
     TimestampType,
 )
+from pyspark.sql.window import Window
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -524,6 +528,10 @@ def _enrich_file_df(df: DataFrame, obj: S3ObjectRef) -> DataFrame:
 
     # IDs → characteristics → timestamps → partitions (naming conventions).
     # Reject source/prefix mismatches without an extra count() action.
+    # Keep latest ts_created per id_message so MERGE source is unique.
+    latest_per_message = Window.partitionBy("id_message").orderBy(
+        F.col("ts_created").desc_nulls_last()
+    )
     return (
         df.filter(F.col("source") == F.lit(expected_source))
         .filter(F.col("id_message").isNotNull())
@@ -547,6 +555,9 @@ def _enrich_file_df(df: DataFrame, obj: S3ObjectRef) -> DataFrame:
             "month",
             "day",
         )
+        .withColumn("_rn", F.row_number().over(latest_per_message))
+        .filter(F.col("_rn") == 1)
+        .drop("_rn")
     )
 
 

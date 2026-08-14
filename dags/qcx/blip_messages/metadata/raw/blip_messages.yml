@@ -8,9 +8,11 @@ description: >
   One row per Blip message from JSONL under
   s3://data-science.s3.data.quintoandar.com.br/consorcio/blip/consorciois/
   (backfill batch_*.jsonl and incremental {job}.jsonl). Joinable to
-  datalake_consorcio_clean.lead via id_crm (HubSpot hs_object_id). Insert-only
-  MERGE on id_message is the dedupe guarantee; s3_key records the winning source file.
-  Source objects may expire — ingest promptly.
+  datalake_consorcio_clean.lead via id_crm (HubSpot hs_object_id). Within each
+  source file, keep the latest ts_created per id_message before MERGE; across
+  files, insert-only MERGE on id_message is the dedupe guarantee (first ingested
+  wins). s3_key records the winning source file. Source objects may expire —
+  ingest promptly.
 columns:
   id_message:
     description: >

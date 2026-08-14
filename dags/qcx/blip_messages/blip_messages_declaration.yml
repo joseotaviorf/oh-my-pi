@@ -18,8 +18,10 @@ dag:
       Ops artifacts ignored: done.jsonl, errors.jsonl, _SUCCESS (backfill);
       watermark.json, *.errors.jsonl (incremental).
 
-      Row dedupe: insert-only MERGE on id_message (Blip unique id). First ingested
-      row wins; overlapping backfill/incremental exports cannot duplicate messages.
+      Row dedupe: within each JSONL, keep the latest ts_created per id_message
+      before MERGE; across files, insert-only MERGE on id_message (Blip unique
+      id). First ingested row wins; overlapping backfill/incremental exports
+      cannot duplicate messages.
 
       File ledger: datalake_consorcio_raw.blip_messages_ingest_files tracks each
       processed S3 object (success/failed + etag). Incremental LIST uses StartAfter
