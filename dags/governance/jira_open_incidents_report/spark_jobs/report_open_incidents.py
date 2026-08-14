@@ -37,7 +37,6 @@ OPEN_INCIDENTS_QUERY = f"""
     WHERE id_project = '{DEI_PROJECT_ID}'
       AND is_deleted = false
       AND (current_status_category IS NULL OR current_status_category != 'Done')
-    ORDER BY ts_created ASC
 """
 
 
@@ -91,14 +90,10 @@ def _format_message(rows, as_of: datetime) -> str:
     for line_name, ages in ranked:
         known_ages = [age for age in ages if age >= 0]
         if known_ages:
-            age_part = (
-                f" (newest: {min(known_ages)}d, oldest: {max(known_ages)}d)"
-            )
+            age_part = f" (newest: {min(known_ages)}d, oldest: {max(known_ages)}d)"
         else:
             age_part = " (newest: unknown, oldest: unknown)"
-        lines.append(
-            f"{line_name}: {len(ages)} opened DEI incidents{age_part}"
-        )
+        lines.append(f"{line_name}: {len(ages)} opened DEI incidents{age_part}")
     return "\n".join(lines)
 
 
@@ -187,9 +182,9 @@ def main() -> None:
     if not under_pytest:
         from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
-        MetastoreServiceFactory.create_loader_metastore_service(spark_client).create_database(
-            write_db
-        )
+        MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        ).create_database(write_db)
     DeltaLoader(spark_client.conn).load_table(
         table_name=table,
         path=path,
@@ -197,9 +192,9 @@ def main() -> None:
         partition_by=PARTITION_COLS,
     )
     if not under_pytest:
-        MetastoreServiceFactory.create_loader_metastore_service(spark_client).refresh_table(
-            write_db, TABLE_NAME
-        )
+        MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        ).refresh_table(write_db, TABLE_NAME)
     logging_logger.info(f"m={JOB_NAME}, table={table}")
 
     _notify(args.dag_name, args.environment, message, len(rows))

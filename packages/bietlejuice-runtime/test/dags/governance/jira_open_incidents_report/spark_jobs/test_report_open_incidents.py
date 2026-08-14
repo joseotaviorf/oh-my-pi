@@ -50,10 +50,7 @@ _AS_OF = datetime(2026, 8, 14)
 
 
 def test_format_message_empty():
-    assert (
-        _job._format_message([], _AS_OF)
-        == "No open DEI incidents as of 2026-08-14."
-    )
+    assert _job._format_message([], _AS_OF) == "No open DEI incidents as of 2026-08-14."
 
 
 def test_format_message_leaderboard_by_line_count_desc():
