@@ -1,4 +1,4 @@
-"""Weekly digest of open DEI incident cards — snapshot to Delta, then notify Google Chat.
+"""Daily digest of open DEI incident cards — snapshot to Delta, then notify Google Chat.
 
 Query source: datalake_jira.issues (enrich layer). "Open" = current_status_category != 'Done'.
 Chat body is a Line (incident_owner) leaderboard plus hygiene: unassigned,

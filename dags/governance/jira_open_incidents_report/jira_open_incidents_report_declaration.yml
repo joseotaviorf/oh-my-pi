@@ -2,10 +2,10 @@ dag:
   name: jira_open_incidents_report
   owner: Data Governance
   schedule_start_date: 2026, 8, 13
-  schedule_interval: "0 9 * * 1"
+  schedule_interval: "0 9 * * *"
   documentation:
     dag_purpose: |
-      Weekly (Monday 9am BRT) digest of open DEI incident cards (current_status_category
+      Daily (9am BRT) digest of open DEI incident cards (current_status_category
       != 'Done'). Snapshot grain is one row per open incident. Google Chat digest is a
       Line (incident_owner) leaderboard: count, newest/oldest age, on going
       (card workflow In Progress), unassigned, description not filled. Open =

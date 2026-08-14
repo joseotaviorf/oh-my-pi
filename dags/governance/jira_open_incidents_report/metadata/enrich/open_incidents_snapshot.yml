@@ -3,7 +3,7 @@ table_name: open_incidents_snapshot
 owner: gustavo.rompe@quintoandar.com.br
 domain: Data Ops & Governance
 description: >
-  Weekly (Monday) snapshot of open DEI incident cards (current_status_category != 'Done')
+  Daily (9am BRT) snapshot of open DEI incident cards (current_status_category != 'Done')
   at the time the jira_open_incidents_report DAG ran. One row per open incident per report
   run — audit trail for the Google Chat digest sent to the agents-data-alarms space.
 columns:
