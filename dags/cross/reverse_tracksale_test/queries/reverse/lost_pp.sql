@@ -174,6 +174,16 @@ previous_dispatches AS (
         customer_email,
         MAKE_DATE(year, month, day) AS dt_partition
     FROM
+        reverse_tracksale_test.lost_pp
+    WHERE
+        is_dispatched = TRUE
+        AND customer_email IS NOT NULL
+        AND MAKE_DATE(year, month, day) >= DATE_SUB(DATE('{load_start_date}'), 90)
+    UNION
+    SELECT DISTINCT
+        customer_email,
+        MAKE_DATE(year, month, day) AS dt_partition
+    FROM
         datalake_tracksale_reverse.lost_pp
     WHERE
         is_dispatched = TRUE
