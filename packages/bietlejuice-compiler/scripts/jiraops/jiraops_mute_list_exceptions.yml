@@ -5,11 +5,36 @@
 
 DAG:
   equals:
+    bietlejuice.blip_messages:
+      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
+      deadline: Never
+      created_by: edgar.fernandes@quintoandar.com.br
+      approved_by: edgar.fernandes@quintoandar.com.br
+    bietlejuice.consorcio_chatbot_offline_eval:
+      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
+      deadline: Never
+      created_by: edgar.fernandes@quintoandar.com.br
+      approved_by: edgar.fernandes@quintoandar.com.br
     bietlejuice.demand_balancer_service:
       reason: "Pipeline owned by Data Science/MLOps teams."
       deadline: Never
       created_by: isadora.gallerani@quintoandar.com.br
       approved_by: william.angelo@quintoandar.com.br
+    bietlejuice.enrich_chat_messages:
+      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
+      deadline: Never
+      created_by: edgar.fernandes@quintoandar.com.br
+      approved_by: edgar.fernandes@quintoandar.com.br
+    bietlejuice.enrich_chat_tool_calls:
+      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
+      deadline: Never
+      created_by: edgar.fernandes@quintoandar.com.br
+      approved_by: edgar.fernandes@quintoandar.com.br
+    bietlejuice.enrich_lead_scoring:
+      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
+      deadline: Never
+      created_by: edgar.fernandes@quintoandar.com.br
+      approved_by: edgar.fernandes@quintoandar.com.br
     bietlejuice.reverse_demand_classifieds_ranking:
       reason: "Reverse pipeline owned by Data Science/MLOps teams."
       deadline: Never
