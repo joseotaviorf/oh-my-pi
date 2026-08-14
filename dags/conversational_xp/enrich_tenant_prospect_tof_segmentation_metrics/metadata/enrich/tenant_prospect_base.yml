@@ -1,0 +1,66 @@
+---
+database_name: datalake_search
+table_name: tenant_prospect_base
+owner: catarina.freitas@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Active tenant prospects (first-time activation, recovery, and ToF users) deduplicated per user and activation month. The cohort includes CONVERSION events in the rent business context (USER FIRST ACTIVATION, USER RECOVERY, USER RECOVERY IN OTHER CITY GROUP) and ToF users from schedule search listing events. Each run rebuilds every full calendar month intersecting the requested date interval. ToF user identifiers are normalized from string (trim, trailing-dot removal, cast to bigint) before deduplication. Tenant-prospect conversions take precedence over ToF when both occur in the same month. Each row defines the 4-week and 8-week post-activation cohort windows used by downstream top of funnel (ToF) metrics. Grain is one row per user per activation month.
+columns:
+  id_user:
+    description: QuintoAndar internal user identifier for the tenant prospect or top-of-funnel user. ToF users are cast to bigint after trimming and removing a trailing dot from the Amplitude id_user string.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_prospect
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_user
+  business_context:
+    description: Business line for the tenant prospect cohort. Always rent for this pipeline.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.business_context
+  is_concierge_prospect:
+    description: Whether the tenant-prospect conversion is linked to a visit booked through the Concierge chatbot (direct or indirect) when user and visit id match a record in the Concierge demand funnel. Always false for top-of-funnel users because Concierge status does not apply to that cohort.
+    lineage:
+      - datalake_search.concierge_demand.is_concierge_prospect
+  event_name:
+    description: Conversion event label, either ntp for a new tenant prospect, rtp for a recovered tenant prospect, or tof for a top-of-funnel user.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.event_name
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  segment_type:
+    description: "Tenant-prospect segment grouping derived from event_name: tp for new or recovered tenant prospects and tof for top-of-funnel users."
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.event_name
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  ts_activation:
+    description: Timestamp of the tenant prospect activation or top-of-funnel event that opens the post-activation cohort window.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  dt_activation_month:
+    description: Calendar month of the tenant prospect conversion, truncated to the first day of the month.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  dt_window_4w_end:
+    description: End date of the 4-week post-activation window (27 days after activation).
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  dt_window_8w_end:
+    description: End date of the 8-week post-activation window (55 days after activation).
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  year:
+    description: Partition year derived from dt_activation_month for storing each tenant prospect cohort by its activation month.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  month:
+    description: Partition month derived from dt_activation_month for storing each tenant prospect cohort by its activation month.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  day:
+    description: Partition day derived from dt_activation_month; always the first day of the tenant prospect activation month.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event

@@ -1,0 +1,39 @@
+dag:
+  name: enrich_tenant_prospect_tof_segmentation_metrics
+  schedule_start_date: 2026, 1, 1
+  schedule_interval: 0 3 * * *
+  owner: Data Conversational XP
+  catchup: false
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: search
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    window_4w_days: 27
+    window_8w_days: 55
+    start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    tenant_prospect_segmentation:
+      - tenant_prospect_base
+    tenant_prospect_segment_metrics:
+      - tenant_prospect_segmentation
+  tables_customization:
+    tenant_prospect_base:
+      merge_on: [id_user, dt_activation_month]
+      when_not_matched_by_source_delete_condition: |
+        target.dt_activation_month >= DATE_TRUNC('MONTH', DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}'))
+        AND target.dt_activation_month < ADD_MONTHS(
+          DATE_TRUNC('MONTH', DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}')),
+          1)
+      partitions: [year, month, day]
+      z_order_by: [id_user]
+    tenant_prospect_segmentation:
+      merge_on: [dt_partition, dt_activation_month, id_user]
+      partitions: [year, month, day]
+      z_order_by: [id_user]
+    tenant_prospect_segment_metrics:
+      partitions: [year, month, day]

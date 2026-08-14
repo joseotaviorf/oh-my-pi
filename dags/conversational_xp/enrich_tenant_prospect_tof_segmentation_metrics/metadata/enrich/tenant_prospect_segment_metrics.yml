@@ -1,0 +1,50 @@
+---
+database_name: datalake_search
+table_name: tenant_prospect_segment_metrics
+owner: catarina.freitas@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Monthly top-of-funnel business metrics pivoted by tenant prospect activity segment, tenant-prospect segment type, concierge-prospect status, and post-activation cohort window (4w or 8w). Each row is one metric for an activation month, business context, tenant-prospect segment type, concierge-prospect status, and cohort window, with values per activity segment. A range run refreshes every activation month that has at least one daily activity row within the requested interval. Segments are derived from cumulative daily activity in tenant_prospect_segmentation, including visit bookings and offer submissions from datalake_rent_flows.rent_flows at id_rent_flow grain. Output for dashboards and experimentation monitoring.
+columns:
+  dt_activation_month:
+    description: Calendar month when tenant prospects converted, used as the metrics time axis.
+    lineage:
+      - datalake_search.tenant_prospect_segmentation.dt_activation_month
+  business_context:
+    description: Rent business line for the aggregated tenant prospect cohort.
+    lineage:
+      - datalake_search.tenant_prospect_segmentation.business_context
+  segment_type:
+    description: "Tenant-prospect segment grouping: tp for new or recovered tenant prospects and tof for top-of-funnel users."
+    lineage:
+      - datalake_search.tenant_prospect_segmentation.segment_type
+  is_concierge_prospect:
+    description: Boolean flag indicating whether the tenant prospect belongs to the concierge-assisted cohort.
+    lineage:
+      - datalake_search.tenant_prospect_base.is_concierge_prospect
+  cohort_window:
+    description: Post-activation activity window label, either 4w (27 days) or 8w (55 days) after tenant prospect conversion.
+  metric:
+    description: Business metric identifier, including activity averages, conversion rates, visits per interaction or search page view, and BES, the share of tenant prospects with at least three first visit bookings per rent flow or at least one first visit booking after a first offer submission per rent flow.
+  overall:
+    description: Metric value calculated across every tenant prospect in the activation-month cohort, including cohort-level rates such as BES, the share of tenant prospects with at least three first visit bookings per rent flow or at least one first visit booking after a first offer submission per rent flow, not broken out by segment.
+  qualified_search_active:
+    description: Metric value for tenant prospects with more than 10 search interactions in the cohort window.
+  low_search_active:
+    description: Metric value for tenant prospects with 1 to 10 search interactions in the cohort window.
+  active_no_search:
+    description: Metric value for tenant prospects with zero search interactions but at least one LPV or schedule page view in the cohort window.
+  inactive:
+    description: Metric value for tenant prospects with no search interactions, LPVs, or schedule page views in the cohort window.
+  year:
+    description: Partition year derived from dt_activation_month for partition pruning.
+    lineage:
+      - datalake_search.tenant_prospect_segmentation.dt_activation_month
+  month:
+    description: Partition month derived from dt_activation_month for partition pruning.
+    lineage:
+      - datalake_search.tenant_prospect_segmentation.dt_activation_month
+  day:
+    description: Partition day derived from dt_activation_month (always first of month).
+    lineage:
+      - datalake_search.tenant_prospect_segmentation.dt_activation_month
