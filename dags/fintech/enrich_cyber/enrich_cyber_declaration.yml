@@ -29,3 +29,7 @@ workflow:
     historical_tree_timeline:
       extraction_type: incremental
       partitions: [year, month, day]
+    queue_timeline:
+      execution_timeout_hours: 6
+    queue_timeline_2:
+      execution_timeout_hours: 6

@@ -1,11 +1,11 @@
 cluster:
   type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
-    step_concurrency_level: 4
+    step_concurrency_level: 2
     aws_attributes:
       ebs_volume_size: 200
     core_nodes:
-      target_on_demand: 6
+      target_on_demand: 8
       target_spot: 0
       instance_types:
         - r6g.8xlarge
@@ -17,10 +17,18 @@ cluster:
         - r7g.8xlarge
         - r6i.8xlarge
       target_on_demand: 0
-      target_spot: 6
+      target_spot: 8
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
     spark_conf:
+      spark.driver.memory: "16g"
+      spark.driver.memoryOverhead: "4g"
+      spark.driver.maxResultSize: "4g"
+      spark.executor.memory: "96g"
+      spark.executor.cores: "8"
+      spark.executor.memoryOverhead: "8g"
+      spark.dynamicAllocation.minExecutors: "8"
+      spark.dynamicAllocation.maxExecutors: "24"
       spark.sql.adaptive.advisoryPartitionSizeInBytes: "16777216"
       spark.sql.shuffle.partitions: "800"
       spark.speculation: "true"
