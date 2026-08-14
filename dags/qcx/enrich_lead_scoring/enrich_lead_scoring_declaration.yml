@@ -14,6 +14,12 @@ dag:
       used by every feature, and the exclusion flags. Conversation features are NOT
       here — they live in a separate table built on top of this one.
 
+      Reads datalake_consorcio.deal (entity, current_stage, ts_lead_created),
+      datalake_consorcio.deal_milestone (ts_handoff), and
+      datalake_consorcio.deal_stage (other first-hit timestamps, already
+      America/Sao_Paulo). Does not convert clocks. Grain matches deal (tests
+      and duplicates already dropped).
+
       Design decisions worth knowing before changing this DAG:
 
         - Partitioned by spec_version, written with dynamic partition overwrite. Each
@@ -39,16 +45,14 @@ dag:
           maturity window, the exclusion flags — are deliberately left unapplied here
           and filtered at read time, so changing one does not require a rebuild.
 
-        - Milestones are read raw, without the COALESCE backfill used by the funnel
-          reporting query. That backfill fills an absent milestone from a later stage,
-          which for ts_handoff would push the feature cutoff past the sale itself and
-          leak the outcome. A deal whose handoff milestone is missing gets a null
-          ts_handoff and falls out of the population.
+        - ts_handoff is copied from datalake_consorcio.deal_milestone, which fills
+          HubSpot skip-steps forward. Null ts_handoff means the lead was handled
+          by a human from the beginning; those rows stay in the table. A value
+          means the handoff happened, so is_handoff is not stored.
 
       Parameters (override via DAG conf):
         spec_version         population identifier; also the partition key
         floor_date           earliest ts_first_stage admitted into the population
-        id_pipeline          HubSpot Consórcio pipeline id
         platconv_start_date  first day of the Conversational Platform era (host_name)
 workflow:
   type: query_delta
@@ -59,5 +63,4 @@ workflow:
   extra_query_template_params:
     spec_version: "{{ dag_run.conf.get('spec_version', 1) if dag_run else 1 }}"
     floor_date: "{{ dag_run.conf.get('floor_date', '2025-09-01') if dag_run else '2025-09-01' }}"
-    id_pipeline: "{{ dag_run.conf.get('id_pipeline', 737631007) if dag_run else 737631007 }}"
     platconv_start_date: "{{ dag_run.conf.get('platconv_start_date', '2026-07-20') if dag_run else '2026-07-20' }}"
