@@ -63,7 +63,10 @@ legacy_agent_data_business_contexts AS (
 ),
 new_business_contexts AS (
     SELECT
-        XXHASH64(aer.uuid_person, settings.id_agent, settings.business_context, DATE(settings.ts_started)) AS id_agent_business_context,
+        -- id_agent_data is in the key too: one Agent Domain identity can map to more than
+        -- one legacy id_agent_data, and omitting it let two such rows collide on the same
+        -- key, silently dropping one id_agent_data's row in the dedup below (AAREDE-526).
+        XXHASH64(aer.uuid_person, settings.id_agent, aer.id_agent_data, settings.business_context, DATE(settings.ts_started)) AS id_agent_business_context,
         settings.id_agent,
         aer.id_agent_data,
         aer.id_user,
