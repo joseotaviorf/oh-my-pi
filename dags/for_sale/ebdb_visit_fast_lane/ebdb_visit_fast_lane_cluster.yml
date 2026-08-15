@@ -1,2 +1,7 @@
 cluster:
-  type: emr_7_12_consolidation_m_memory_single_node_fleet_cluster
+  # Four CDC tables share one cluster. The previous single-node preset forced
+  # step_concurrency_level: 1, so load-clean-* queued on EMR and p95 hit the
+  # 30 min task timeout (DAG wall clock ~73 min vs 30 min schedule).
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  custom_configurations:
+    step_concurrency_level: 4
