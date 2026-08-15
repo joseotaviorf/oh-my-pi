@@ -46,7 +46,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   COALESCE(pa_b2b_online.id_partner, pa_b2b_prime.id_partner, -1) AS sk_partner,
   COALESCE(aa_info.sk_autonomous_agent, -1) AS sk_autonomous_agent,
   CAST(COALESCE(hlco.id_user, -1) AS BIGINT) AS sk_user_consultant,
-  COALESCE(cs_supply.sk_company, -1) AS sk_company_supply,
+  COALESCE(cs_company.sk_company, cs_hubspot.sk_company, cs_tag.sk_company, -1) AS sk_company_supply,
   COALESCE(CAST(DATE_FORMAT(hl.dt_stranded, 'yyyyMMdd') AS BIGINT), -1) AS sk_stranded_date,
   -- SparkSQL's datediff ignores the time part, so we get the seconds diff and convert it to integer days.
   -- 60s*60m*24h = 86400s
@@ -92,19 +92,19 @@ LEFT JOIN
     AND hlco.business_context = 'RENT'
     AND hlco.is_last_ciq_on_listing = True
 LEFT JOIN
-  datalake_company.company_sks AS cs_supply
-    ON (
-        h.uuid_company IS NOT NULL
-        AND h.uuid_company = cs_supply.uuid_company
-    ) OR (
-        h.uuid_company IS NULL
-        AND h.id_company_hubspot IS NOT NULL
-        AND h.id_company_hubspot = cs_supply.id_hubspot
-    ) OR (
-          h.uuid_company IS NULL
-          AND h.id_company_hubspot IS NULL
-          AND h.partner_3p_supply = cs_supply.extracted_3p_tag
-    )
+  datalake_company.company_sks AS cs_company
+    ON h.uuid_company IS NOT NULL
+    AND h.uuid_company = cs_company.uuid_company
+LEFT JOIN
+  datalake_company.company_sks AS cs_hubspot
+    ON h.uuid_company IS NULL
+    AND h.id_company_hubspot IS NOT NULL
+    AND h.id_company_hubspot = cs_hubspot.id_hubspot
+LEFT JOIN
+  datalake_company.company_sks AS cs_tag
+    ON h.uuid_company IS NULL
+    AND h.id_company_hubspot IS NULL
+    AND h.partner_3p_supply = cs_tag.extracted_3p_tag
 WHERE
   (lbc.id_house IS NULL
   OR lbc.is_for_rent)

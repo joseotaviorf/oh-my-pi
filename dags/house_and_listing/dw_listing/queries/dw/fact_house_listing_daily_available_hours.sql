@@ -1,8 +1,37 @@
-WITH house_listings_ranked AS (
+WITH published_status AS (
+    SELECT
+        hls.id_house,
+        hls.id_house_listing,
+        hls.ts_status_started,
+        GREATEST(DATE(hls.ts_status_started), DATE("{load_start_date}")) AS dt_range_start,
+        LEAST(
+            COALESCE(DATE(hls.ts_status_ended), CURRENT_DATE) - 1,
+            DATE("{load_end_date}")
+        ) AS dt_range_end
+    FROM
+        datalake_ebdb_listing.house_listing_status AS hls
+    WHERE
+        hls.status_history IN ('publicado', 'PUBLISHED')
+        AND hls.version <> 0
+        AND DATE(hls.ts_status_started) <= DATE("{load_end_date}")
+        AND COALESCE(DATE(hls.ts_status_ended), CURRENT_DATE) - 1 >= DATE("{load_start_date}")
+),
+published_days AS (
+    SELECT
+        id_house,
+        id_house_listing,
+        ts_status_started,
+        EXPLODE(SEQUENCE(dt_range_start, dt_range_end, INTERVAL 1 DAY)) AS date
+    FROM
+        published_status
+    WHERE
+        dt_range_start <= dt_range_end
+),
+house_listings_ranked AS (
     SELECT
         d.id_date AS sk_date,
-        hls.id_house AS sk_house,
-        hls.id_house_listing AS sk_house_listing,
+        pd.id_house AS sk_house,
+        pd.id_house_listing AS sk_house_listing,
         d.is_brz_business_day,
         d.week_day,
         d.week_start,
@@ -10,16 +39,12 @@ WITH house_listings_ranked AS (
         d.year,
         d.month,
         d.day,
-        ROW_NUMBER() OVER (PARTITION BY hls.id_house_listing, d.date ORDER BY hls.ts_status_started DESC) AS rn
+        ROW_NUMBER() OVER (PARTITION BY pd.id_house_listing, d.date ORDER BY pd.ts_status_started DESC) AS rn
     FROM
-        datalake_ebdb_listing.house_listing_status AS hls
-    JOIN
+        published_days AS pd
+    INNER JOIN
         datalake_quintoandar.aux_date AS d
-            ON d.date BETWEEN DATE(hls.ts_status_started) AND COALESCE(DATE(hls.ts_status_ended), CURRENT_DATE) - 1
-    WHERE
-        MAKE_DATE(d.year, d.month, d.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
-        AND hls.status_history IN ('publicado', 'PUBLISHED')
-        AND hls.version <> 0
+            ON d.date = pd.date
 ),
 house_listings AS (
     SELECT

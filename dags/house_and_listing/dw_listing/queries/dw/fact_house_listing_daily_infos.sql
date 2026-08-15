@@ -20,7 +20,7 @@ SELECT
   COALESCE(hldi.id_partner_big_agent, -1) AS sk_partner_big_agent,
   COALESCE(hldi.id_region, -1) AS sk_region,
   COALESCE(hldi.id_house_status, -1) AS sk_house_status,
-  COALESCE(cs.sk_company, -1) AS sk_company_supply,
+  COALESCE(cs_company.sk_company, cs_hubspot.sk_company, cs_tag.sk_company, -1) AS sk_company_supply,
   COALESCE(hldi.id_price_change, -1) AS sk_pricing,
   COALESCE(hldi.id_suggestion_change, -1) AS sk_suggestion_change,
   BIGINT(DATE_FORMAT(DATE(ts_status_started), 'yyyyMMdd')) AS sk_status_started_date,
@@ -60,20 +60,22 @@ LEFT JOIN
     AND MAKE_DATE(hldi.year, hldi.month, hldi.day) >= am.dt_account_manager_started
     AND MAKE_DATE(hldi.year, hldi.month, hldi.day) < COALESCE(am.dt_account_manager_started, CURRENT_DATE())
 LEFT JOIN
-  datalake_company.company_sks AS cs
+  datalake_company.company_sks AS cs_company
     ON hldi.is_rent_3p_supply
-    AND ((
-      hldi.uuid_company IS NOT NULL
-      AND hldi.uuid_company = cs.uuid_company
-    ) OR (
-      hldi.uuid_company IS NULL
-      AND hldi.id_company_hubspot IS NOT NULL
-      AND hldi.id_company_hubspot = cs.id_hubspot
-    ) OR (
-       hldi.uuid_company IS NULL
-       AND hldi.id_company_hubspot IS NULL
-       AND hldi.partner_3p_supply = cs.extracted_3p_tag
-    ))
+    AND hldi.uuid_company IS NOT NULL
+    AND hldi.uuid_company = cs_company.uuid_company
+LEFT JOIN
+  datalake_company.company_sks AS cs_hubspot
+    ON hldi.is_rent_3p_supply
+    AND hldi.uuid_company IS NULL
+    AND hldi.id_company_hubspot IS NOT NULL
+    AND hldi.id_company_hubspot = cs_hubspot.id_hubspot
+LEFT JOIN
+  datalake_company.company_sks AS cs_tag
+    ON hldi.is_rent_3p_supply
+    AND hldi.uuid_company IS NULL
+    AND hldi.id_company_hubspot IS NULL
+    AND hldi.partner_3p_supply = cs_tag.extracted_3p_tag
 LEFT JOIN
   dw_listing.fact_house_listing_daily_available_hours AS avh
     ON avh.sk_house_listing = hldi.id_house_listing
