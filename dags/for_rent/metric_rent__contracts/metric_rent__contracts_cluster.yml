@@ -1,8 +1,13 @@
 cluster:
-  type: emr_7_12_consolidation_l_memory_single_node_fleet_cluster
+  # 34 independent metric tables split across 2 job clusters. The previous
+  # single-node preset forced step_concurrency_level: 1 and maxExecutors: 1,
+  # so loads queued (~110 min DAG vs ~22 min Databricks baseline) and Rubinho
+  # paged. Multi-node default concurrency is 4; set it explicitly.
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    step_concurrency_level: 4
