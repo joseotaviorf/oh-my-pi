@@ -54,12 +54,12 @@ AVAILABILITY_MAP = {
 MASTER_MARKET = "ON_DEMAND"
 
 DEFAULT_STEP_CONCURRENCY_LEVEL = 4
-# A master-only cluster runs exactly one YARN application: with
-# yarn.scheduler.capacity.maximum-am-resource-percent=0.2 and the
-# DominantResourceCalculator, 0.2 x 4 vCores normalises to a 1-vCore AM budget,
-# and one Spark AM already consumes it. Advertising more only makes EMR report
-# steps as RUNNING while YARN keeps them ACCEPTED.
-SINGLE_NODE_STEP_CONCURRENCY_LEVEL = 1
+# Master-only clusters share one node's YARN AM budget. Allow two concurrent
+# steps so CDC-style overlap (optimize layer N + load layer N+1) can proceed
+# when YARN capacity permits; YARN may queue the second application on the
+# smallest tier. Keep this aligned with step_concurrency_level on single-node
+# presets in prod_conf/forno_conf.
+SINGLE_NODE_STEP_CONCURRENCY_LEVEL = 2
 
 TASK_AVAILABILITY_MAP = {"SPOT": "SPOT", "ON_DEMAND": "ON_DEMAND"}
 DEFAULT_TASK_MARKET = "SPOT"

@@ -40,6 +40,14 @@ Payments tracks every charge processed through Checkout.
 |------|---------|-------------------|
 | **Pagamento** | Payment | `dw_payments_platform.fact_payment` |
 
+## Key Metrics
+
+- **Payment volume:** `COUNT(*)` on `dw_payments_platform.fact_payment`.
+
+## Relationships with other entities
+
+- **Payments ↔ Contracts:** join on `sk_contract`.
+
 ## Tables
 
 | You need… | Use this table |
@@ -107,6 +115,10 @@ DATAHUB_INLINE_MD = (
     "**Data Steward:**\n- steward@quintoandar.com.br\n\n"
     "## Overview\n\nNPS overview for For Rent.\n\n"
     "## Glossary and Synonyms\n\n- **NPS** → net promoter score\n\n"
+    "## Key Metrics\n\n- **NPS volume:** `COUNT(*)` on "
+    "`dw_customer_satisfaction.fact_nps_dispatches`.\n\n"
+    "## Relationships with other entities\n\n"
+    "- **NPS ↔ Customer:** join on `sk_customer`.\n\n"
     "## Tables\n\nUse `dw_customer_satisfaction.fact_nps_dispatches`.\n\n"
     "## Golden Query\n\n"
     "\\`\\``sql WITH j AS ( SELECT 1 AS x "
@@ -137,10 +149,13 @@ def test_metric_document_skips_tables_but_requires_documented_sections():
         "**Data Steward:**\n- steward@quintoandar.com.br\n\n"
         "## Overview\n\nOfficial weighted NPS for For Rent.\n\n"
         "## Related Business Entities\n\n- NPS\n\n"
+        "## Catalog\n\n"
+        "| Metric | Type |\n| :---- | :---- |\n| NPS FR | OKR |\n\n"
         "## Glossary and Synonyms\n\n- **NPS FR** → this metric\n\n"
         "## Scope\n\n**Included**: For Rent journeys\n\n**Excluded**: test campaigns\n\n"
         "## Calculation\n\nWeighted sum of journey components.\n\n"
         "### Canonical Filter\n\n```sql\nbusiness_context = 'forRent'\n```\n\n"
+        "### Nuances\n\nDo not pool journey components directly.\n\n"
         "## Dos and Don'ts\n\n**Do:**\n\n- apply the canonical filter\n\n"
         "**Don't:**\n\n- pool components directly\n\n"
         "## Golden Queries\n\n"

@@ -2389,7 +2389,7 @@ emr_7_12_med_general_2_workers_fleet_cluster:
 emr_7_12_small_general_2xlarge_single_node_cluster:
     <<: *emr_cluster_anchor
     master_node_type_id: m6g.2xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     task_nodes:
@@ -2403,7 +2403,7 @@ emr_7_12_small_general_2xlarge_single_node_cluster:
 emr_7_12_small_general_2xlarge_single_node_fleet_cluster:
     <<: *emr_cluster_anchor
     master_node_type_id: m6g.2xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -2961,11 +2961,12 @@ emr_7_12_consolidation_xl_general_fleet_cluster:
         <<: [*emr_spark_xl_general, *emr_spark_base]
 
 ##### EMR General single-node (master-only) #####
+# step_concurrency_level: 2 (EMR StepConcurrencyLevel) on all presets below.
 
 emr_7_12_consolidation_xs_general_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: m6g.xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2974,7 +2975,7 @@ emr_7_12_consolidation_xs_general_single_node_cluster:
 emr_7_12_consolidation_xs_general_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: m6g.xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -2993,7 +2994,7 @@ emr_7_12_consolidation_xs_general_single_node_fleet_cluster:
 emr_7_12_consolidation_s_general_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: m6g.xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3002,7 +3003,7 @@ emr_7_12_consolidation_s_general_single_node_cluster:
 emr_7_12_consolidation_s_general_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: m6g.xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -3021,7 +3022,7 @@ emr_7_12_consolidation_s_general_single_node_fleet_cluster:
 emr_7_12_consolidation_m_general_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: m6g.2xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3030,7 +3031,7 @@ emr_7_12_consolidation_m_general_single_node_cluster:
 emr_7_12_consolidation_m_general_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: m6g.2xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -3049,7 +3050,7 @@ emr_7_12_consolidation_m_general_single_node_fleet_cluster:
 emr_7_12_consolidation_l_general_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: m6g.4xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3058,7 +3059,7 @@ emr_7_12_consolidation_l_general_single_node_cluster:
 emr_7_12_consolidation_l_general_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: m6g.4xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -3077,7 +3078,7 @@ emr_7_12_consolidation_l_general_single_node_fleet_cluster:
 emr_7_12_consolidation_xl_general_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: m6g.8xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3088,7 +3089,7 @@ emr_7_12_consolidation_xl_general_single_node_cluster:
 emr_7_12_consolidation_xl_general_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: m6g.8xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -3273,7 +3274,7 @@ emr_7_12_consolidation_xl_memory_fleet_cluster:
 emr_7_12_consolidation_xs_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: r6g.xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3282,7 +3283,7 @@ emr_7_12_consolidation_xs_memory_single_node_cluster:
 emr_7_12_consolidation_xs_memory_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: r6g.xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -3303,7 +3304,7 @@ emr_7_12_consolidation_xs_memory_single_node_fleet_cluster:
 emr_7_12_consolidation_s_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: r6g.xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3312,7 +3313,7 @@ emr_7_12_consolidation_s_memory_single_node_cluster:
 emr_7_12_consolidation_s_memory_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: r6g.xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -3333,7 +3334,7 @@ emr_7_12_consolidation_s_memory_single_node_fleet_cluster:
 emr_7_12_consolidation_m_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: r6g.2xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3342,7 +3343,7 @@ emr_7_12_consolidation_m_memory_single_node_cluster:
 emr_7_12_consolidation_m_memory_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: r6g.2xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -3363,7 +3364,7 @@ emr_7_12_consolidation_m_memory_single_node_fleet_cluster:
 emr_7_12_consolidation_l_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: r6g.4xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3372,7 +3373,7 @@ emr_7_12_consolidation_l_memory_single_node_cluster:
 emr_7_12_consolidation_l_memory_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: r6g.4xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0
@@ -3393,7 +3394,7 @@ emr_7_12_consolidation_l_memory_single_node_fleet_cluster:
 emr_7_12_consolidation_xl_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
     master_node_type_id: r6g.8xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -3409,7 +3410,7 @@ emr_7_12_consolidation_xl_memory_single_node_cluster:
 emr_7_12_consolidation_xl_memory_single_node_fleet_cluster:
     <<: *emr_fleet_consolidation_anchor
     master_node_type_id: r6g.8xlarge
-    step_concurrency_level: 1
+    step_concurrency_level: 2
     core_nodes:
         target_on_demand: 0
         target_spot: 0

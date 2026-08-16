@@ -31,9 +31,9 @@ def _fleet_base(**overrides):
     return cfg
 
 
-def test_single_node_fleet_defaults_concurrency_to_1():
+def test_single_node_fleet_defaults_concurrency_to_2():
     out = translate(_fleet_base())
-    assert out["StepConcurrencyLevel"] == 1
+    assert out["StepConcurrencyLevel"] == 2
     assert len(out["Instances"]["InstanceFleets"]) == 1
 
 
@@ -51,7 +51,7 @@ def test_multi_node_fleet_defaults_concurrency_to_4():
     assert len(out["Instances"]["InstanceFleets"]) == 2
 
 
-def test_single_node_instance_group_defaults_concurrency_to_1():
+def test_single_node_instance_group_defaults_concurrency_to_2():
     out = translate(
         {
             "cluster_name": "test",
@@ -69,7 +69,7 @@ def test_single_node_instance_group_defaults_concurrency_to_1():
             "emr_service_role": "EMR_DefaultRole",
         }
     )
-    assert out["StepConcurrencyLevel"] == 1
+    assert out["StepConcurrencyLevel"] == 2
     assert len(out["Instances"]["InstanceGroups"]) == 1
 
 
