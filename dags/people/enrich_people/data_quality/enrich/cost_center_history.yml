@@ -51,6 +51,33 @@ column_level_validations:
           HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) <> 1
         )) = 0
       severity_level: Error
+  current_version_must_cover_as_of_when_a_covering_version_exists:
+    custom:
+      # When any version of the org+code covers D-1, the is_current row must cover D-1 too (stale current windows).
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            current_row.id_organization,
+            current_row.cost_center_code
+          FROM datalake_people.cost_center_history AS current_row
+          WHERE
+            current_row.is_current = TRUE
+            AND NOT (
+              current_row.dt_valid_from <= DATE_ADD(CURRENT_DATE(), -1)
+              AND current_row.dt_valid_to >= DATE_ADD(CURRENT_DATE(), -1)
+            )
+            AND EXISTS (
+              SELECT
+                1
+              FROM datalake_people.cost_center_history AS covering_row
+              WHERE
+                covering_row.id_organization = current_row.id_organization
+                AND covering_row.cost_center_code = current_row.cost_center_code
+                AND covering_row.dt_valid_from <= DATE_ADD(CURRENT_DATE(), -1)
+                AND covering_row.dt_valid_to >= DATE_ADD(CURRENT_DATE(), -1)
+            )
+        )) = 0
+      severity_level: Warning
   dt_valid_from:
     is_complete:
       severity_level: Error

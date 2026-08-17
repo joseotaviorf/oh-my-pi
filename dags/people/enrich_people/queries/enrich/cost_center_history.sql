@@ -445,10 +445,10 @@ SELECT
             id_organization,
             cost_center_code
         ORDER BY
-            is_active DESC,
             is_future_version ASC,
             dt_valid_from DESC,
             dt_valid_to DESC,
+            is_active DESC,
             sk_cost_center_version DESC
     ) = 1 AS is_current,
     dt_valid_from,
