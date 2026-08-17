@@ -5,6 +5,7 @@ WITH new_earnings_filtered AS (
         ne.id_revenue_share,
         ne.id_tier_earning_configuration,
         ne.id_author,
+        ne.id_external_receiver,
         IF(ne.external_receiver_type = "COMPANY", ne.id_external_receiver, NULL) AS uuid_company,
         IF(ne.external_receiver_type = "AGENT", ne.id_external_receiver, NULL) AS uuid_person,
         ne.author_role,
@@ -45,7 +46,7 @@ earning_sources AS (
             incentive_systems_calculation_status,
             'MAP<STRING,STRING>'
         ) AS calculation_status
-    FROM 
+    FROM
         datalake_big_agent_clean.earning_sources AS es
 ),
 sales_flow_offer AS (
@@ -86,8 +87,8 @@ SELECT DISTINCT
     es.id_contract,
     es.id_sales_flow,
     IF(
-        GET_JSON_OBJECT(ei.author, "$.type") = 'PERSON', 
-        GET_JSON_OBJECT(ei.author, "$.id"), 
+        GET_JSON_OBJECT(ei.author, "$.type") = 'PERSON',
+        GET_JSON_OBJECT(ei.author, "$.id"),
         NULL
     ) AS id_invalidation_author,
     IF(ne.author_role <> "SYSTEM", ne.id_author, NULL) AS id_author,
@@ -157,7 +158,10 @@ LEFT JOIN
         ON rs.id_revenue_share = ne.id_revenue_share
 LEFT JOIN
     datalake_big_agent.unresolved_earnings AS ue
-        ON ue.id_earning = ne.id
+        ON ue.id_earning_source = ne.id_earning_source
+        AND ue.id_external_receiver = ne.id_external_receiver
+        AND ue.external_receiver_type = ne.external_receiver_type
+        AND ue.incentive_system = ne.incentive_system
         AND ue.is_first_solved_by_earning IS TRUE
 LEFT JOIN
     datalake_big_agent.partner_tier AS person_tier
@@ -172,7 +176,7 @@ LEFT JOIN
     sales_flow_offer AS sf
         ON sf.id_sales_flow = es.id_sales_flow
 LEFT JOIN
-    datalake_ebdb_clean.contract AS c 
+    datalake_ebdb_clean.contract AS c
         ON c.id = es.id_contract
 LEFT JOIN
     rent_brokerage_share_history AS fee

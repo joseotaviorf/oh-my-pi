@@ -10,9 +10,6 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  id_earning:
-    is_complete:
-      severity_level: Error
   id_earning_source:
     is_complete:
       severity_level: Error

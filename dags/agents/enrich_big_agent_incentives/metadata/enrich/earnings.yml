@@ -16,7 +16,9 @@ columns:
   id_unresolved_earning:
     lineage:
       - datalake_big_agent.unresolved_earnings.id_unresolved_earning
-    description: Identifier of the unresolved earning queue item that first triggered this earning's calculation, when one exists.
+    description: |
+      Identifier of the unresolved earning marked is_first_solved_by_earning for this earning's
+      source, receiver, receiver type, and incentive system, when such a solved record exists.
   id_earning_invalidation:
     lineage:
       - datalake_big_agent_clean.earning_invalidations.id

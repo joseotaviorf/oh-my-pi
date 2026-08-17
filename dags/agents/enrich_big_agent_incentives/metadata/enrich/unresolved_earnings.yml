@@ -1,10 +1,11 @@
 database_name: datalake_big_agent
 table_name: unresolved_earnings
 description: |
-  Enriched Big Agent unresolved earnings matched to the new earning that eventually
-  originated from the same earning source and receiver. One row per unresolved earning
-  updated within the load window; is_first_solved_by_earning flags the earliest solved
-  record per matched earning, used downstream to link an earning to its unresolved history.
+  Enriched Big Agent unresolved earnings for earning sources that had at least one
+  new_earnings row updated within the load window. One row per unresolved earning
+  (id_unresolved_earning); merge upserts on that key. is_first_solved_by_earning marks
+  the earliest solved unresolved per earning source, receiver, and incentive system,
+  used downstream in earnings to link calculated earnings to unresolved queue history.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -12,10 +13,6 @@ columns:
     lineage:
       - datalake_big_agent_clean.unresolved_earnings.id
     description: Primary identifier of the unresolved earning record in Big Agent.
-  id_earning:
-    lineage:
-      - datalake_big_agent_clean.new_earnings.id
-    description: Identifier of the new earning matched to this unresolved earning by earning source, receiver, incentive system, and timing.
   id_earning_source:
     lineage:
       - datalake_big_agent_clean.unresolved_earnings.id_earning_source
@@ -42,11 +39,16 @@ columns:
     description: True when ts_solved is populated, indicating the unresolved earning was cleared.
   is_first_solved_by_earning:
     lineage:
+      - datalake_big_agent_clean.unresolved_earnings.id_earning_source
+      - datalake_big_agent_clean.unresolved_earnings.id_external_receiver
+      - datalake_big_agent_clean.unresolved_earnings.external_receiver_type
+      - datalake_big_agent_clean.unresolved_earnings.incentive_system
       - datalake_big_agent_clean.unresolved_earnings.ts_solved
       - datalake_big_agent_clean.unresolved_earnings.ts_created
     description: |
-      True for the earliest solved unresolved earning per matched new earning, ordered by
-      ts_solved then ts_created; false for later solved duplicates and for records not yet solved.
+      True for the earliest solved unresolved earning per earning source, external receiver,
+      receiver type, and incentive system (ordered by ts_solved then ts_created); false for
+      later solved rows in the same group and for records not yet solved.
   ts_solved:
     lineage:
       - datalake_big_agent_clean.unresolved_earnings.ts_solved

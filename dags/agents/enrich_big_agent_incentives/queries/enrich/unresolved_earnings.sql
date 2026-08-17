@@ -1,6 +1,13 @@
+WITH earning_source_updated AS (
+    SELECT DISTINCT
+        id_earning_source
+    FROM
+        datalake_big_agent_clean.new_earnings
+    WHERE
+        DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+)
 SELECT
     ue.id AS id_unresolved_earning,
-    ne.id AS id_earning,
     ue.id_earning_source,
     ue.id_external_receiver,
     ue.external_receiver_type,
@@ -9,7 +16,17 @@ SELECT
     IF(ue.ts_solved IS NOT NULL, TRUE, FALSE) AS is_solved,
     IF(
         ue.ts_solved IS NOT NULL,
-        ROW_NUMBER() OVER(PARTITION BY ne.id, (ue.ts_solved IS NOT NULL) ORDER BY ue.ts_solved ASC, ue.ts_created ASC) = 1,
+        ROW_NUMBER() OVER(
+            PARTITION BY
+                ue.id_earning_source,
+                ue.id_external_receiver,
+                ue.external_receiver_type,
+                ue.incentive_system,
+                (ue.ts_solved IS NOT NULL)
+            ORDER BY
+                ue.ts_solved ASC,
+                ue.ts_created ASC
+        ) = 1,
         FALSE
     ) AS is_first_solved_by_earning,
     ue.ts_solved,
@@ -19,13 +36,7 @@ SELECT
     MONTH(ue.ts_created) AS month,
     DAY(ue.ts_created) AS day
 FROM
-    datalake_big_agent_clean.unresolved_earnings AS ue
+    earning_source_updated AS esu
 JOIN
-    datalake_big_agent_clean.new_earnings AS ne
-        ON ue.id_earning_source = ne.id_earning_source
-        AND ue.id_external_receiver = ne.id_external_receiver
-        AND ue.external_receiver_type = ne.external_receiver_type
-        AND ue.incentive_system = ne.incentive_system
-        AND ue.ts_created <= ne.ts_updated
-WHERE
-    DATE(ue.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    datalake_big_agent_clean.unresolved_earnings AS ue
+        ON ue.id_earning_source = esu.id_earning_source
