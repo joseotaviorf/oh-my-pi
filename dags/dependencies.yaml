@@ -4578,7 +4578,10 @@ bietlejuice.reverse_reports:
   - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-job:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-dim-cycle-period:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-dim-talent-rating:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-fact-talent-reviews:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-dim-hours-bank-rule:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
