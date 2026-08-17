@@ -14,3 +14,78 @@ column_level_validations:
       # No duplicate rows for the same (id_job, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.job GROUP BY id_job, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
+  active_current_jobs_have_salary_range_min_mid_max:
+    custom:
+      # Current active jobs must have at least one complete salary min/mid/max combo
+      # (open valid grade + open SALARY rate + open rate_values). Fail only when
+      # no complete combo exists, not when extra unmatched join rows are null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             job.id_job
+           FROM datalake_pin_core_clean.job AS job
+           LEFT JOIN datalake_pin_core_clean.valid_grades AS valid_grades
+             ON valid_grades.id_job = job.id_job
+             AND valid_grades.dt_effective_ended = DATE('9999-12-31')
+           LEFT JOIN datalake_pin_core_clean.rates AS rates
+             ON rates.id_grade_ladder = job.id_grade_ladder
+             AND rates.dt_effective_ended = DATE('9999-12-31')
+             AND rates.rate_type = 'SALARY'
+           LEFT JOIN datalake_pin_core_clean.rate_values AS rate_values
+             ON rate_values.id_rate = rates.id_rate
+             AND rate_values.id_rate_object = valid_grades.id_grade
+             AND rate_values.dt_effective_ended = DATE('9999-12-31')
+           WHERE job.dt_effective_ended = DATE('9999-12-31')
+             AND job.is_active = TRUE
+           GROUP BY job.id_job
+           HAVING MAX(
+             CASE
+               WHEN rate_values.minimum_value IS NOT NULL
+                 AND rate_values.mid_value IS NOT NULL
+                 AND rate_values.maximum_value IS NOT NULL
+               THEN 1
+               ELSE 0
+             END
+           ) = 0
+         )
+        ) = 0
+      severity_level: Warning
+  active_current_jobs_have_career_track:
+    custom:
+      # Current active jobs must have contribution_level (career track) populated.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.job
+         WHERE dt_effective_ended = DATE('9999-12-31')
+           AND is_active = TRUE
+           AND contribution_level IS NULL
+        ) = 0
+      severity_level: Warning
+  active_current_jobs_have_job_family:
+    custom:
+      # Current active jobs must have id_job_family populated.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.job
+         WHERE dt_effective_ended = DATE('9999-12-31')
+           AND is_active = TRUE
+           AND id_job_family IS NULL
+        ) = 0
+      severity_level: Warning
+  active_current_jobs_have_valid_grade:
+    custom:
+      # Current active jobs must have at least one current valid_grades row.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.job AS job
+         WHERE job.dt_effective_ended = DATE('9999-12-31')
+           AND job.is_active = TRUE
+           AND NOT EXISTS (
+             SELECT 1
+             FROM datalake_pin_core_clean.valid_grades AS valid_grades
+             WHERE valid_grades.id_job = job.id_job
+               AND valid_grades.dt_effective_ended = DATE('9999-12-31')
+           )
+        ) = 0
+      severity_level: Warning

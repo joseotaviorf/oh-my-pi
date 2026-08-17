@@ -34,6 +34,16 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  # Joined tables load before DQs that reference them; sibling DQs stay parallel.
+  clean_inner_dependencies:
+    job:
+      - valid_grades
+      - rates
+      - rate_values
+    rate_values:
+      - rates
+    external_application_identifier:
+      - all_people
   default_table_privileges:
     people-team:
     - ALL PRIVILEGES

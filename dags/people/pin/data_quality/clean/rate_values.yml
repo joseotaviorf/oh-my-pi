@@ -104,3 +104,34 @@ column_level_validations:
             )
         )) = 0
       severity_level: Warning
+  salary_range_min_mid_max_ordered:
+    custom:
+      # Open rate_values with all three range points must keep min <= mid <= max.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.rate_values
+         WHERE dt_effective_ended = DATE('9999-12-31')
+           AND minimum_value IS NOT NULL
+           AND mid_value IS NOT NULL
+           AND maximum_value IS NOT NULL
+           AND (
+             minimum_value > mid_value
+             OR mid_value > maximum_value
+             OR minimum_value > maximum_value
+           )
+        ) = 0
+      severity_level: Warning
+  salary_range_values_must_not_be_negative:
+    custom:
+      # Open rate_values must not have a negative min, mid, or max when that point is set.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.rate_values
+         WHERE dt_effective_ended = DATE('9999-12-31')
+           AND (
+             (minimum_value IS NOT NULL AND minimum_value < 0)
+             OR (mid_value IS NOT NULL AND mid_value < 0)
+             OR (maximum_value IS NOT NULL AND maximum_value < 0)
+           )
+        ) = 0
+      severity_level: Warning
