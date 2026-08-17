@@ -35,6 +35,23 @@ workflow:
     - "{load_start_date}"
     - "{environment}"
 
+  # X-Ray sibling tabs read org context from reverse_reports.xray_general_info (infos_gerais).
+  inner_dependencies:
+    xray_performa_edc:
+      - xray_general_info
+    xray_talent_review_edc:
+      - xray_general_info
+    xray_legacy_performa:
+      - xray_general_info
+    xray_manager_history_edc:
+      - xray_general_info
+    xray_cost_center_history_edc:
+      - xray_general_info
+    xray_job_history_edc:
+      - xray_general_info
+    xray_salary_history_edc:
+      - xray_general_info
+
   tables_customization:
     # --- Compensation ---
     salary_tables:
@@ -367,6 +384,46 @@ workflow:
       extra_spark_job_arguments:
         - "1RNvYAYC2KlpigkQ5Xz9nmjuaoIOf5GHbmUX-AG9M8bE"
         - "certificados_base"
+
+    # Former notebook: xray_update (Daily Pipeline) — AppSheet X-Ray / Employee Data Center. DBP-1447.
+    # Wiring-only: sheet id + tab for every X-Ray export. SQL/docs land in the per-tab PRs.
+    xray_general_info:
+      extra_spark_job_arguments:
+        - "1srO0ZeUk-nhoTwX8d0tj7aY0g71qtHBOjR4Ysp7QaTs"
+        - "infos_gerais"
+    xray_performa_edc:
+      extra_spark_job_arguments:
+        - "1Ka3EGuF-DSHrHFNQYH3Mh9G9GwogRf4lEsDO1sLjExs"
+        - "base_performa_edc"
+    xray_talent_review_edc:
+      extra_spark_job_arguments:
+        - "1EiKVbJVWgjx976a1CUZp8sGSxgGf47XHL-TFPLkxL9A"
+        - "base_tr_edc"
+    xray_manager_history_edc:
+      extra_spark_job_arguments:
+        - "1HzlNmwFOKyLajnnQrvGOqPVqZg2lh2XGIWIWuBTR-4U"
+        - "historico_gestores"
+    xray_cost_center_history_edc:
+      extra_spark_job_arguments:
+        - "1FstByzd87F4D7HhXAYtZww4rOCGx2hiiLrl_ffVjtEA"
+        - "historico_ccs"
+    xray_job_history_edc:
+      extra_spark_job_arguments:
+        - "1SNGQmGyj9rMCUkfQgPg2T5TAbpre-3yMPEt-2_aPux4"
+        - "historico_cargos"
+    xray_salary_history_edc:
+      extra_spark_job_arguments:
+        - "1uYKAbG8G9NfO1GuTHouuorTlzKxucHMyX-jSndHVBsk"
+        - "historico_salarial"
+    xray_legacy_performa:
+      extra_spark_job_arguments:
+        - "1Ka3EGuF-DSHrHFNQYH3Mh9G9GwogRf4lEsDO1sLjExs"
+        - "legacy_performa"
+    xray_demographics_base:
+      extra_spark_job_arguments:
+        - "1PxwVEi5_S8YbyN8j4jMeHuKnk2wEQajPHcGmLqlvrSg"
+        - "base_demographics"
+
     blitz_regulatory_training_extended_deadlines:
       extra_spark_job_arguments:
         - "18eCVoI2krrzU9oS2x7BPpHfaVZN4MAVXIUGUeJLe9I4"

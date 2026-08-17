@@ -49,28 +49,34 @@ class ReverseLoadAccessWorkflow(BaseWorkflow):
         )
 
         table_attributes, tables_with_queries = self._get_tables()
-        reverse_load_access_tasks = []
+        table_first_tasks = {}
+        table_last_tasks = {}
         for table in table_attributes:
             export_reverse_task = self.export_task_creator.create_task(table)
-            reverse_load_access_tasks.append(export_reverse_task)
 
             if table.table_name in tables_with_queries:
                 load_reverse_task = self.load_reverse_task_creator.create_task(table)
-                reverse_load_access_tasks.append(load_reverse_task)
                 optimize_delta_table_task = (
                     self.optimize_delta_table_task_creator.create_task([table])
                 )
-                (
-                    execute_job_cluster_task
-                    >> load_reverse_task
-                    >> optimize_delta_table_task
-                    >> cluster_completion_sink
-                )
+                table_first_tasks[table.table_name] = load_reverse_task
+                table_last_tasks[table.table_name] = optimize_delta_table_task
+                load_reverse_task >> optimize_delta_table_task
                 load_reverse_task >> export_reverse_task
+                optimize_delta_table_task >> cluster_completion_sink
             else:
+                table_first_tasks[table.table_name] = export_reverse_task
+                table_last_tasks[table.table_name] = export_reverse_task
                 execute_job_cluster_task >> export_reverse_task
 
             export_reverse_task >> cluster_completion_sink
+
+        self._set_inner_dependencies(
+            table_first_tasks,
+            table_last_tasks,
+            previous_task_if_no_dependencies=execute_job_cluster_task,
+            next_task_if_no_dependents=cluster_completion_sink,
+        )
 
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()
