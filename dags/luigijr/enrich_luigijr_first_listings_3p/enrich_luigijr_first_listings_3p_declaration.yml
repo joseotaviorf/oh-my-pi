@@ -1,0 +1,12 @@
+dag:
+  name: enrich_luigijr_first_listings_3p
+  schedule_interval: 40 8 * * *
+  owner: BI Metrics
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:gustavo.geiger
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: bi_metrics

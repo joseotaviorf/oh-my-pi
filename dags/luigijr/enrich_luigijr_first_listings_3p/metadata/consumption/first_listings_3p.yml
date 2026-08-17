@@ -1,0 +1,40 @@
+database_name: bi_metrics
+table_name: first_listings_3p
+owner: gustavo.geiger@quintoandar.com.br
+domain: Data Ops & Governance
+description: Table `first_listings_3p` materialized on a schedule by Luigi from a user-provided SQL query (BI Metrics domain).
+columns:
+  count_first_listing:
+    description: Column `count_first_listing` produced by the scheduled materialization query.
+  gran_day_or_week:
+    description: Column `gran_day_or_week` produced by the scheduled materialization query.
+  month_start:
+    description: Column `month_start` produced by the scheduled materialization query.
+  hubspot_company_tag:
+    description: Column `hubspot_company_tag` produced by the scheduled materialization query.
+  is_3p_fr_test:
+    description: Column `is_3p_fr_test` produced by the scheduled materialization query.
+  specific_city_group:
+    description: Column `specific_city_group` produced by the scheduled materialization query.
+  city_group:
+    description: Column `city_group` produced by the scheduled materialization query.
+  planning_conversion:
+    description: Column `planning_conversion` produced by the scheduled materialization query.
+  status_1w:
+    description: Column `status_1w` produced by the scheduled materialization query.
+  time_completed_1w:
+    description: Column `time_completed_1w` produced by the scheduled materialization query.
+  sum_price_score_pub:
+    description: Column `sum_price_score_pub` produced by the scheduled materialization query.
+  sum_easy_entry_pub:
+    description: Column `sum_easy_entry_pub` produced by the scheduled materialization query.
+  is_ops:
+    description: Column `is_ops` produced by the scheduled materialization query.
+  is_organic:
+    description: Column `is_organic` produced by the scheduled materialization query.
+  is_bsp:
+    description: Column `is_bsp` produced by the scheduled materialization query.
+  tipo_envio:
+    description: Column `tipo_envio` produced by the scheduled materialization query.
+  broker_trade_name_tag:
+    description: Column `broker_trade_name_tag` produced by the scheduled materialization query.

@@ -24,7 +24,7 @@ from bietlejuice.services.file_service import FileService
 from dags import DAG_PACKAGES_ROOT
 from scripts.ci_cd.domain_cli import domain_arg_type
 
-LAYERS = ["clean", "core", "enrich", "dw", "metric", "raw"]
+LAYERS = ["clean", "consumption", "core", "enrich", "dw", "metric", "raw"]
 
 PRINT_ALL_PARSING_ERRORS = False
 COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice"
