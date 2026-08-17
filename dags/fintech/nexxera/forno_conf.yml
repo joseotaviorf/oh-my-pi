@@ -288,7 +288,7 @@ tables:
       - col_3
       - col_4
   - table_name: cnab_charges_recupera_quintoandar
-    source_root_path: "s3://5a-vans-prod-recupera/prod/nexxera/return/quintoandar/ArquivosBaixados"
+    source_root_path: "s3://5a-vans-prod-recupera/prod/nexxera/return/quintoandar"
     format: "ret_cob"
   - table_name: cnab_charges_recupera_velo
     source_root_path: "s3://5a-vans-prod-recupera/prod/nexxera/return/velo/ArquivosBaixados"
