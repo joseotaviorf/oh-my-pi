@@ -3,36 +3,36 @@ WITH bianca_signal_actions AS (
     -- A1: greeting with property context → BiancaFollowupVisitSeeker
     SELECT
         'greeting_context' AS trigger_type,
-        'BiancaWelcomeContextSeeker_whatsapp_message' AS action
+        'biancaWelcomeContextSeeker_whatsapp_message' AS action
     UNION ALL
     -- A2, D1: generic greeting (no property/filter context) → BiancaFollowupSeeker
     SELECT
         'greeting_generic',
-        'BiancaWelcomeSeekerTest_whatsapp_message'
+        'biancaWelcomeSeekerTest_whatsapp_message'
     UNION ALL
     -- D2: greeting with saved search filters → BiancaFollowupFiltersSeeker
     SELECT
         'greeting_filters',
-        'BiancaWelcomeFiltersSeeker_whatsapp_message'
+        'biancaWelcomeFiltersSeeker_whatsapp_message'
     UNION ALL
     -- B1: confirm contact (agency), first-time user → BiancaFollowupVisitConfirmSeeker
     SELECT
         'confirm_contact',
-        'BiancaConfirmDataTycSeeker_whatsapp_message'
+        'biancaConfirmDataTycSeeker_whatsapp_message'
     UNION ALL
     -- B2: confirm contact (agency), returning user (ToS already accepted) → BiancaFollowupVisitConfirm2Seeker
     SELECT
         'confirm_contact_returning',
-        'BiancaConfirmDataSeeker_whatsapp_message'
+        'biancaConfirmDataSeeker_whatsapp_message'
     UNION ALL
     -- C1, C2: confirm contact (pre-schedule visit) → BiancaFollowupScheduleVisitSeeker
     SELECT
         'confirm_contact_visit',
-        'BiancaConfirmDataVisitSeeker_whatsapp_message'
+        'biancaConfirmDataVisitSeeker_whatsapp_message'
     UNION ALL
     SELECT
         'confirm_contact_visit',
-        'BiancaConfirmDataVisitTycSeeker_whatsapp_message'
+        'biancaConfirmDataVisitTycSeeker_whatsapp_message'
     UNION ALL
     -- E1: after property recommendations carousel → BiancaFollowupRecSeeker
     SELECT
