@@ -43,15 +43,22 @@ workflow:
   - "{table_name}"
   - "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_start_date') }}"
   tables_customization:
+    buyer_end_of_process: {}
     lost_buyer_proposals: {}
     lost_buyer_visits: {}
+    lost_iq: {}
     lost_pp: {}
     lost_seller_unpublished: {}
+    seller_end_of_process: {}
     true_buyer_ccv: {}
     true_buyer_ccv_central: {}
     true_buyer_ccv_hub: {}
+    true_offboarding_iq: {}
+    true_offboarding_pp: {}
     true_onboarding_iq: {}
     true_onboarding_pp: {}
+    true_ongoing_iq: {}
+    true_ongoing_pp: {}
     true_seller_ccv: {}
     true_seller_ccv_central: {}
     true_seller_ccv_hub: {}

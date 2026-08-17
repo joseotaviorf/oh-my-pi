@@ -1002,15 +1002,22 @@ bietlejuice.reverse_birdie_access:
     - bietlejuice.reverse_birdie:load-reverse-pp-multi:first-run-of-day
 bietlejuice.reverse_tracksale_access:
   add:
+    - bietlejuice.reverse_tracksale_test:load-reverse-buyer-end-of-process:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-lost-buyer-proposals:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-lost-buyer-visits:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-lost-iq:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-lost-pp:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-lost-seller-unpublished:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-seller-end-of-process:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-buyer-ccv:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-buyer-ccv-central:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-buyer-ccv-hub:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-offboarding-iq:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-offboarding-pp:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-onboarding-iq:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-onboarding-pp:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-ongoing-iq:first-run-of-day
+    - bietlejuice.reverse_tracksale_test:load-reverse-true-ongoing-pp:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-seller-ccv:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-seller-ccv-central:first-run-of-day
     - bietlejuice.reverse_tracksale_test:load-reverse-true-seller-ccv-hub:first-run-of-day
@@ -1076,10 +1083,10 @@ bietlejuice.reverse_anonymization:
   remove:
     - bietlejuice.astro:load-clean-dag:first-run-of-day
 bietlejuice.reverse_tracksale:
+  # Legacy DAG has no remaining campaign queries; keep it out of the dataset graph.
+  override: []
+bietlejuice.reverse_tracksale_test:
   remove:
-    - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
-    - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer:first-run-of-day
-    - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits:first-run-of-day
     - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline:first-run-of-day
 bietlejuice.reverse_webhelp_access:
   add:
