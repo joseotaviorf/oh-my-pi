@@ -270,6 +270,11 @@ workflow:
       extra_spark_job_arguments:
         - "1-ZcEzJ1Q_bF51iweAFS7rHkgqr9WPdjic_9B6hd0T4k"
         - "base_analytics"
+    # Former notebook: talent_review_performa.
+    talent_review_performa_base:
+      extra_spark_job_arguments:
+        - "15ffVBTOETsHI_Xp2KIEwMqec7A1OOkg4vL-D37JcCZQ"
+        - "base"
 
     # Former notebook: appsheet_ferias_portugal (Daily Pipeline).
     appsheet_vacation_portugal:
