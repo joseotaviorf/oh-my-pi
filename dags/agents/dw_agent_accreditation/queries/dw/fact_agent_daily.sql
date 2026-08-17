@@ -144,7 +144,7 @@ SELECT
     COALESCE(ad.creci, ds.creci) AS creci,
     COALESCE(ad.creci_uf, ds.creci_uf) AS creci_uf,
     COALESCE(ad.affiliation_type, ds.affiliation_type) AS affiliation_type,
-    product.product_name AS profile,
+    COALESCE(ad.profile, ds.profile) AS profile,
     deactivation.deactivation_reason,
     deactivation.deactivation_sub_reason,
     IF(ds.agent_status IS NULL, NULL, ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')) AS is_agent_active,
@@ -194,11 +194,6 @@ LEFT JOIN
         AND ds.dt_ref = DATE(deactivation.ts_ended)
         AND deactivation.is_active IS FALSE
         AND deactivation.is_lastest_by_date IS TRUE
-LEFT JOIN
-    datalake_agent.agent_product AS product
-        ON identity.id_unified_agent = product.id_unified_agent
-        AND ds.dt_ref BETWEEN DATE(product.ts_started) AND DATE(product.ts_ended)
-        AND product.is_lastest_by_date IS TRUE
 WHERE
     ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')
     OR (ds.agent_status = 'AGENT_INACTIVATED' AND TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) < 1)
