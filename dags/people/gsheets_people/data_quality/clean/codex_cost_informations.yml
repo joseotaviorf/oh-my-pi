@@ -33,3 +33,16 @@ column_level_validations:
             AND CAST(dt_updated AS STRING) NOT RLIKE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
         ) = 0
       severity_level: Error
+  closing_month_must_not_be_before_current_month:
+    custom:
+      # Warn when dt_updated (GSheets closing month) is before the current calendar month.
+      constraint: |-
+        (
+          SELECT COUNT(*)
+          FROM datalake_gsheets_people_clean.codex_cost_informations
+          WHERE
+            dt_updated IS NOT NULL
+            AND YEAR(dt_updated) * 100 + MONTH(dt_updated)
+              < YEAR(CURRENT_DATE()) * 100 + MONTH(CURRENT_DATE())
+        ) = 0
+      severity_level: Warning
