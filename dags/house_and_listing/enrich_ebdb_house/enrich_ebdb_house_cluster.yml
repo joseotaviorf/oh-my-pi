@@ -1,11 +1,6 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
-    driver_node_type_id: r7g.large
-    spark_version: 13.3.x-scala2.12
+    master_node_type_id: r6g.large
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER

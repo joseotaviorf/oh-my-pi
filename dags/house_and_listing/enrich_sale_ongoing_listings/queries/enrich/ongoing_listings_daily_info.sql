@@ -1,153 +1,253 @@
 WITH lpv AS (
+  SELECT
+    COUNT(*) AS listing_page_viewed,
+    ep_house_id AS id_house,
+    year,
+    month,
+    day
+  FROM datalake_amplitude_clean.170698_listing_page_viewed_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+    AND NOT ep_house_id IS NULL
+    AND UPPER(business_context) = 'SALE'
+  GROUP BY
+    id_house,
+    year,
+    month,
+    day
+), srpv_explode AS (
+  SELECT
+    EXPLODE(ids_search_results_list) AS id_house,
+    year,
+    month,
+    day
+  FROM datalake_amplitude_clean.170698_search_results_page_viewed_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+    AND NOT ids_search_results_list IS NULL
+    AND UPPER(business_context) = 'SALE'
+), srpv AS (
+  SELECT
+    COUNT(*) AS search_results_page_viewed,
+    id_house,
+    year,
+    month,
+    day
+  FROM srpv_explode
+  GROUP BY
+    id_house,
+    year,
+    month,
+    day
+), favorite_set AS (
+  SELECT
+    COUNT(*) AS favorites,
+    ep_house_id AS id_house,
+    year,
+    month,
+    day
+  FROM datalake_amplitude_clean.170698_listing_favorite_set_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+    AND NOT ep_house_id IS NULL
+    AND UPPER(business_context) = 'SALE'
+  GROUP BY
+    id_house,
+    year,
+    month,
+    day
+), demand_data AS (
+  SELECT
+    id_house,
+    YEAR(TO_DATE(dt_event)) AS year,
+    MONTH(TO_DATE(dt_event)) AS month,
+    DAY(TO_DATE(dt_event)) AS day,
+    COUNT_IF(event_name = 'VISIT_BOOKED') AS visits_booked,
+    COUNT_IF(event_name = 'VISIT_COMPLETED') AS visits_completed,
+    COUNT_IF(event_name = 'OFFER_SUBMITTED') AS offers_submitted,
+    COUNT_IF(event_name = 'OFFER_ACCEPTED') AS offers_accepted,
+    COUNT_IF(event_name = 'SALE_AGREEMENT_CREATED') AS sale_agreements_created,
+    COUNT_IF(event_name = 'SALE_AGREEMENT_SIGNED') AS sale_agreements_signed
+  FROM datalake_sale_demand_events.sale_demand_events
+  WHERE
+    dt_event BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+  GROUP BY
+    id_house,
+    year,
+    month,
+    day
+), status_changes_aux AS (
+  SELECT
+    id_sale_listing,
+    id_house,
+    id_region,
+    status,
+    ts_first_publication,
+    ts_last_publication,
+    ts_revision
+  FROM (
     SELECT
-        COUNT(*) AS listing_page_viewed,
-        ep_house_id AS id_house,
-        year,
-        month,
-        day
-    FROM
-        datalake_amplitude_clean.170698_listing_page_viewed_events
+      sl.id_sale_listing,
+      lbc.id_house,
+      h.id_region,
+      lbc.status,
+      lbc.ts_first_publication,
+      lbc.ts_last_publication,
+      ure.ts_revision,
+      LAG(lbc.status) OVER (PARTITION BY lbc.id_house ORDER BY ure.ts_revision) AS _w
+    FROM datalake_ebdb_clean.listing_business_context_aud AS lbc
+    JOIN datalake_ebdb_user.user_revision_entity AS ure
+      ON lbc.rev = ure.id
+    JOIN datalake_sale_listings.sale_listing AS sl
+      ON lbc.id_house = sl.id_house
+    JOIN datalake_ebdb_clean.house AS h
+      ON lbc.id_house = h.id
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND ep_house_id IS NOT NULL
-        AND UPPER(business_context) = 'SALE'
-    GROUP BY
-        id_house,
-        year,
-        month,
-        day
-),
-srpv_explode AS (
-    SELECT
-        EXPLODE(ids_search_results_list) AS id_house,
-        year,
-        month,
-        day
-    FROM
-        datalake_amplitude_clean.170698_search_results_page_viewed_events
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND ids_search_results_list IS NOT NULL
-        AND UPPER(business_context) = 'SALE'
-),
-srpv AS (
-    SELECT
-        COUNT(*) AS search_results_page_viewed,
-        id_house,
-        year,
-        month,
-        day
-    FROM
-        srpv_explode
-    GROUP BY
-        id_house,
-        year,
-        month,
-        day
-),
-favorite_set AS (
-    SELECT
-        COUNT(*) AS favorites,
-        ep_house_id AS id_house,
-        year,
-        month,
-        day
-    FROM
-        datalake_amplitude_clean.170698_listing_favorite_set_events
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND ep_house_id IS NOT NULL
-        AND UPPER(business_context) = 'SALE'
-    GROUP BY
-        id_house,
-        year,
-        month,
-        day
-),
-demand_data AS (
-    SELECT
-        id_house,
-        YEAR(dt_event) AS year,
-        MONTH(dt_event) AS month,
-        DAY(dt_event) AS day,
-        COUNT_IF(event_name = 'VISIT_BOOKED') AS visits_booked,
-        COUNT_IF(event_name = 'VISIT_COMPLETED') AS visits_completed,
-        COUNT_IF(event_name = 'OFFER_SUBMITTED') AS offers_submitted,
-        COUNT_IF(event_name = 'OFFER_ACCEPTED') AS offers_accepted,
-        COUNT_IF(event_name = 'SALE_AGREEMENT_CREATED') AS sale_agreements_created,
-        COUNT_IF(event_name = 'SALE_AGREEMENT_SIGNED') AS sale_agreements_signed
-    FROM
-        datalake_sale_demand_events.sale_demand_events
-    WHERE
-        dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    GROUP BY
-        id_house,
-        year,
-        month,
-        day
-),
-status_changes_aux AS (
-    SELECT
-        sl.id_sale_listing,
-        lbc.id_house,
-        h.id_region,
-        lbc.status,
-        lbc.ts_first_publication,
-        lbc.ts_last_publication,
-        ure.ts_revision
-    FROM
-        datalake_ebdb_clean.listing_business_context_aud AS lbc
-    JOIN
-        datalake_ebdb_user.user_revision_entity AS ure
-            ON lbc.rev = ure.id
-    JOIN
-        datalake_sale_listings.sale_listing AS sl
-            ON lbc.id_house = sl.id_house
-    JOIN
-        datalake_ebdb_clean.house AS h
-            ON lbc.id_house = h.id
-    WHERE
-        lbc.business_context = 'SALE'
-    QUALIFY
-        LAG(lbc.status) OVER (PARTITION BY lbc.id_house ORDER BY ure.ts_revision) IS DISTINCT FROM lbc.status
-),
-status_changes AS (
-    SELECT
-        id_sale_listing,
-        id_house,
-        id_region,
-        status,
-        ts_first_publication,
-        ts_last_publication,
-        ts_revision AS ts_status_started,
-        LEAD(ts_revision) OVER (PARTITION BY id_house ORDER BY ts_revision) AS ts_status_ended
-    FROM
-        status_changes_aux AS sc
-),
-daily_ongoing_listings AS (
-    SELECT
-        d.id_date AS id_snapshot_date,
-        sc.id_sale_listing,
-        sc.id_house,
-        sc.id_region,
-        DATEDIFF(DAY, DATE(sc.ts_last_publication), d.date) + 1 AS days_published,
-        sc.ts_first_publication,
-        sc.ts_last_publication,
-        d.date AS dt_snapshot,
-        d.year,
-        d.month,
-        d.day
-    FROM
-        status_changes AS sc
-    JOIN
-        datalake_quintoandar.aux_date AS d
-            ON d.date >= sc.ts_status_started::DATE
-            AND d.date < COALESCE(sc.ts_status_ended::DATE, NOW())
-    WHERE
-        MAKE_DATE(d.year, d.month, d.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND sc.status = 'PUBLISHED'
+      lbc.business_context = 'SALE'
+  ) AS _t
+  WHERE
+    _w IS DISTINCT FROM status
+), status_changes AS (
+  SELECT
+    id_sale_listing,
+    id_house,
+    id_region,
+    status,
+    ts_first_publication,
+    ts_last_publication,
+    ts_revision AS ts_status_started,
+    LEAD(ts_revision) OVER (PARTITION BY id_house ORDER BY ts_revision) AS ts_status_ended
+  FROM status_changes_aux AS sc
+), published_intervals AS (
+  -- Clip [started, ended) to the load window, then explode days for an equi-join to aux_date
+  -- (avoids BroadcastNestedLoopJoin on EMR from a pure range join).
+  SELECT
+    id_sale_listing,
+    id_house,
+    id_region,
+    ts_first_publication,
+    ts_last_publication,
+    GREATEST(
+      CAST(ts_status_started AS DATE),
+      CAST('{load_start_date}' AS DATE)
+    ) AS dt_from,
+    LEAST(
+      CASE
+        WHEN ts_status_ended IS NULL THEN CAST(NOW() AS DATE)
+        ELSE DATE_SUB(CAST(ts_status_ended AS DATE), 1)
+      END,
+      CAST('{load_end_date}' AS DATE)
+    ) AS dt_to
+  FROM status_changes
+  WHERE
+    status = 'PUBLISHED'
+), published_days AS (
+  SELECT
+    id_sale_listing,
+    id_house,
+    id_region,
+    ts_first_publication,
+    ts_last_publication,
+    EXPLODE(SEQUENCE(dt_from, dt_to)) AS dt_snapshot
+  FROM published_intervals
+  WHERE
+    dt_from <= dt_to
+), daily_ongoing_listings AS (
+  SELECT
+    d.id_date AS id_snapshot_date,
+    pd.id_sale_listing,
+    pd.id_house,
+    pd.id_region,
+    CAST(
+      DATEDIFF(TO_DATE(d.date), TO_DATE(CAST(pd.ts_last_publication AS DATE))) + 1 AS BIGINT
+    ) AS days_published,
+    pd.ts_first_publication,
+    pd.ts_last_publication,
+    d.date AS dt_snapshot,
+    d.year,
+    d.month,
+    d.day
+  FROM published_days AS pd
+  JOIN datalake_quintoandar.aux_date AS d
+    ON d.date = pd.dt_snapshot
+), company_sk_resolved AS (
+  -- Prioritized fallback (uuid → hubspot → 3p tag) as UNION of equi-joins (§9).
+  SELECT
+    h.id AS id_house,
+    cs.sk_company
+  FROM datalake_ebdb_listing.house AS h
+  INNER JOIN datalake_company.company_sks AS cs
+    ON h.uuid_company = cs.uuid_company
+  WHERE
+    h.is_sale_3p_supply
+    AND h.uuid_company IS NOT NULL
+
+  UNION
+
+  SELECT
+    h.id AS id_house,
+    cs.sk_company
+  FROM datalake_ebdb_listing.house AS h
+  INNER JOIN datalake_company.company_sks AS cs
+    ON h.id_company_hubspot = cs.id_hubspot
+  WHERE
+    h.is_sale_3p_supply
+    AND h.uuid_company IS NULL
+    AND h.id_company_hubspot IS NOT NULL
+
+  UNION
+
+  SELECT
+    h.id AS id_house,
+    cs.sk_company
+  FROM datalake_ebdb_listing.house AS h
+  INNER JOIN datalake_company.company_sks AS cs
+    ON h.partner_3p_supply = cs.extracted_3p_tag
+  WHERE
+    h.is_sale_3p_supply
+    AND h.uuid_company IS NULL
+    AND h.id_company_hubspot IS NULL
 )
 SELECT
+  id_snapshot,
+  id_snapshot_date,
+  id_sale_listing,
+  id_house,
+  id_region,
+  sk_company,
+  id_suggestion_change,
+  sale_price,
+  calculator_min_price,
+  calculator_p20_price,
+  calculator_p30_price,
+  calculator_p40_price,
+  calculator_price,
+  calculator_p60_price,
+  calculator_p70_price,
+  calculator_p80_price,
+  calculator_max_price,
+  lower_bound_limit,
+  suggested_lower_bound_price,
+  suggested_upper_bound_price,
+  upper_bound_limit,
+  suggestion_certainty,
+  qt_search_results_page_viewed,
+  qt_listing_page_viewed,
+  qt_favorites,
+  qt_visits_booked,
+  qt_visits_completed,
+  qt_offers_submitted,
+  qt_offers_accepted,
+  qt_sale_agreements_created,
+  qt_sale_agreements_signed,
+  days_published,
+  ts_first_publication,
+  ts_last_publication,
+  year,
+  month,
+  day
+FROM (
+  SELECT
     dol.id_house * 100000000 + dol.id_snapshot_date AS id_snapshot,
     dol.id_snapshot_date,
     dol.id_sale_listing,
@@ -184,73 +284,50 @@ SELECT
     dol.ts_last_publication,
     dol.year,
     dol.month,
-    dol.day
-FROM
-    daily_ongoing_listings AS dol
-LEFT JOIN
-    lpv
-        ON lpv.year = dol.year
-        AND lpv.month = dol.month
-        AND lpv.day = dol.day
-        AND lpv.id_house = dol.id_house
-LEFT JOIN
-    srpv
-        ON srpv.year = dol.year
-        AND srpv.month = dol.month
-        AND srpv.day = dol.day
-        AND srpv.id_house = dol.id_house
-LEFT JOIN
-    favorite_set AS fav
-        ON fav.year = dol.year
-        AND fav.month = dol.month
-        AND fav.day = dol.day
-        AND fav.id_house = dol.id_house
-LEFT JOIN
-    demand_data AS dd
-        ON dd.year = dol.year
-        AND dd.month = dol.month
-        AND dd.day = dol.day
-        AND dd.id_house = dol.id_house
-LEFT JOIN
-    datalake_ebdb_pricing.listing_price_change AS lpc
-        ON dol.id_house = lpc.id_house
-        AND dol.dt_snapshot >= DATE(lpc.ts_price_started)
-        AND dol.dt_snapshot < COALESCE(DATE(lpc.ts_price_ended), '2100-01-01')
-        AND lpc.is_last_price_of_day
-        AND lpc.business_context = 'SALE'
-LEFT JOIN
-    datalake_ebdb_pricing.listing_prediction_changes AS pred
-        ON dol.id_house = pred.id_house
-        AND dol.dt_snapshot >= DATE(pred.ts_calculator_result_started)
-        AND dol.dt_snapshot < COALESCE(DATE(pred.ts_calculator_result_ended), '2100-01-01')
-        AND pred.is_last_prediction_of_day
-        AND pred.business_context = 'SALE'
-LEFT JOIN
-    datalake_ebdb_pricing.house_suggestion_changes AS hsc
-        ON dol.id_house = hsc.id_house
-        AND dol.dt_snapshot >= DATE(hsc.ts_suggestion_started)
-        AND dol.dt_snapshot < COALESCE(DATE(hsc.ts_suggestion_ended), '2100-01-01')
-        AND hsc.is_last_suggestion_of_day
-        AND hsc.business_context = 'SALE'
-LEFT JOIN
-    datalake_ebdb_listing.house AS h
-        ON dol.id_house = h.id
-        AND h.is_sale_3p_supply
-LEFT JOIN
-    datalake_company.company_sks AS cs_supply
-        ON (
-            h.uuid_company IS NOT NULL
-            AND h.uuid_company = cs_supply.uuid_company
-        )
-        OR (
-            h.uuid_company IS NULL
-            AND h.id_company_hubspot IS NOT NULL
-            AND h.id_company_hubspot = cs_supply.id_hubspot
-        )
-        OR (
-            h.uuid_company IS NULL
-            AND h.id_company_hubspot IS NULL
-            AND h.partner_3p_supply = cs_supply.extracted_3p_tag
-        )
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY dol.id_sale_listing, dol.id_snapshot_date ORDER BY lpc.ts_price_started DESC) = 1
+    dol.day,
+    ROW_NUMBER() OVER (PARTITION BY dol.id_sale_listing, dol.id_snapshot_date ORDER BY lpc.ts_price_started DESC) AS _w,
+    lpc.ts_price_started
+  FROM daily_ongoing_listings AS dol
+  LEFT JOIN lpv
+    ON lpv.year = dol.year
+    AND lpv.month = dol.month
+    AND lpv.day = dol.day
+    AND lpv.id_house = dol.id_house
+  LEFT JOIN srpv
+    ON srpv.year = dol.year
+    AND srpv.month = dol.month
+    AND srpv.day = dol.day
+    AND srpv.id_house = dol.id_house
+  LEFT JOIN favorite_set AS fav
+    ON fav.year = dol.year
+    AND fav.month = dol.month
+    AND fav.day = dol.day
+    AND fav.id_house = dol.id_house
+  LEFT JOIN demand_data AS dd
+    ON dd.year = dol.year
+    AND dd.month = dol.month
+    AND dd.day = dol.day
+    AND dd.id_house = dol.id_house
+  LEFT JOIN datalake_ebdb_pricing.listing_price_change AS lpc
+    ON dol.id_house = lpc.id_house
+    AND dol.dt_snapshot >= CAST(lpc.ts_price_started AS DATE)
+    AND dol.dt_snapshot < COALESCE(CAST(lpc.ts_price_ended AS DATE), '2100-01-01')
+    AND lpc.is_last_price_of_day
+    AND lpc.business_context = 'SALE'
+  LEFT JOIN datalake_ebdb_pricing.listing_prediction_changes AS pred
+    ON dol.id_house = pred.id_house
+    AND dol.dt_snapshot >= CAST(pred.ts_calculator_result_started AS DATE)
+    AND dol.dt_snapshot < COALESCE(CAST(pred.ts_calculator_result_ended AS DATE), '2100-01-01')
+    AND pred.is_last_prediction_of_day
+    AND pred.business_context = 'SALE'
+  LEFT JOIN datalake_ebdb_pricing.house_suggestion_changes AS hsc
+    ON dol.id_house = hsc.id_house
+    AND dol.dt_snapshot >= CAST(hsc.ts_suggestion_started AS DATE)
+    AND dol.dt_snapshot < COALESCE(CAST(hsc.ts_suggestion_ended AS DATE), '2100-01-01')
+    AND hsc.is_last_suggestion_of_day
+    AND hsc.business_context = 'SALE'
+  LEFT JOIN company_sk_resolved AS cs_supply
+    ON dol.id_house = cs_supply.id_house
+) AS _t
+WHERE
+  _w = 1
