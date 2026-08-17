@@ -1,0 +1,238 @@
+database_name: forrent_postcontract
+table_name: obt_property_integrity
+owner: gustavo.silva@quintoandar.com.br
+domain: For Rent
+description: Table `obt_property_integrity` materialized on a schedule by Luigi from a user-provided SQL query (ForRent PostContract domain).
+columns:
+  auto_pricing_group:
+    description: Column `auto_pricing_group` produced by the scheduled materialization query.
+  auto_pricing_result:
+    description: Column `auto_pricing_result` produced by the scheduled materialization query.
+  user_experience_flow:
+    description: Column `user_experience_flow` produced by the scheduled materialization query.
+  dispute_overview_flow:
+    description: Column `dispute_overview_flow` produced by the scheduled materialization query.
+  first_review_tenant_flow:
+    description: Column `first_review_tenant_flow` produced by the scheduled materialization query.
+  is_kirk_test:
+    description: Column `is_kirk_test` produced by the scheduled materialization query.
+  is_eviction_kirk_test:
+    description: Column `is_eviction_kirk_test` produced by the scheduled materialization query.
+  kirk_analysis_mode:
+    description: Column `kirk_analysis_mode` produced by the scheduled materialization query.
+  conversational_mediation_group:
+    description: Column `conversational_mediation_group` produced by the scheduled materialization query.
+  ts_conversational_mediation_assigned:
+    description: Column `ts_conversational_mediation_assigned` produced by the scheduled materialization query.
+  mediation_due_to_lack_of_response:
+    description: Column `mediation_due_to_lack_of_response` produced by the scheduled materialization query.
+  mediation_due_to_disagreement:
+    description: Column `mediation_due_to_disagreement` produced by the scheduled materialization query.
+  has_tenant_contestation_media:
+    description: Column `has_tenant_contestation_media` produced by the scheduled materialization query.
+  has_disputes:
+    description: Column `has_disputes` produced by the scheduled materialization query.
+  total_ar_cost_contested_repairs:
+    description: Column `total_ar_cost_contested_repairs` produced by the scheduled materialization query.
+  has_lia_mediation_record:
+    description: Column `has_lia_mediation_record` produced by the scheduled materialization query.
+  lia_mediation_is_completed:
+    description: Column `lia_mediation_is_completed` produced by the scheduled materialization query.
+  lia_mediation_is_tenant_agreed:
+    description: Column `lia_mediation_is_tenant_agreed` produced by the scheduled materialization query.
+  lia_applied_discount_amount:
+    description: Column `lia_applied_discount_amount` produced by the scheduled materialization query.
+  lia_ts_completed:
+    description: Column `lia_ts_completed` produced by the scheduled materialization query.
+  lia_conversation_interaction_category:
+    description: Column `lia_conversation_interaction_category` produced by the scheduled materialization query.
+  has_fallback_review_discount:
+    description: Column `has_fallback_review_discount` produced by the scheduled materialization query.
+  has_human_contestation_analysis:
+    description: Column `has_human_contestation_analysis` produced by the scheduled materialization query.
+  ts_human_contestation_analysis:
+    description: Column `ts_human_contestation_analysis` produced by the scheduled materialization query.
+  is_lia_matured:
+    description: Column `is_lia_matured` produced by the scheduled materialization query.
+  ts_lia_matured:
+    description: Column `ts_lia_matured` produced by the scheduled materialization query.
+  sk_contract:
+    description: Column `sk_contract` produced by the scheduled materialization query.
+  sk_house:
+    description: Column `sk_house` produced by the scheduled materialization query.
+  sk_termination:
+    description: Column `sk_termination` produced by the scheduled materialization query.
+  sk_inspection:
+    description: Column `sk_inspection` produced by the scheduled materialization query.
+  sk_assessment:
+    description: Column `sk_assessment` produced by the scheduled materialization query.
+  sk_client_side:
+    description: Column `sk_client_side` produced by the scheduled materialization query.
+  is_spoc_test_group_contract:
+    description: Column `is_spoc_test_group_contract` produced by the scheduled materialization query.
+  is_spoc_eligible:
+    description: Column `is_spoc_eligible` produced by the scheduled materialization query.
+  is_eviction:
+    description: Column `is_eviction` produced by the scheduled materialization query.
+  is_high_value:
+    description: Column `is_high_value` produced by the scheduled materialization query.
+  is_exit_inspection_opt_out:
+    description: Column `is_exit_inspection_opt_out` produced by the scheduled materialization query.
+  is_automated_ar:
+    description: Column `is_automated_ar` produced by the scheduled materialization query.
+  no_human_ar:
+    description: Column `no_human_ar` produced by the scheduled materialization query.
+  rent_value:
+    description: Column `rent_value` produced by the scheduled materialization query.
+  fee_final_amount:
+    description: Column `fee_final_amount` produced by the scheduled materialization query.
+  total_tenant_repair_review_cost:
+    description: Column `total_tenant_repair_review_cost` produced by the scheduled materialization query.
+  total_tenant_repair_review_contestation_cost:
+    description: Column `total_tenant_repair_review_contestation_cost` produced by the scheduled materialization query.
+  final_tenant_inspection_cost:
+    description: Column `final_tenant_inspection_cost` produced by the scheduled materialization query.
+  termination_category:
+    description: Column `termination_category` produced by the scheduled materialization query.
+  termination_status:
+    description: Column `termination_status` produced by the scheduled materialization query.
+  termination_reason:
+    description: Column `termination_reason` produced by the scheduled materialization query.
+  abc_variant:
+    description: Column `abc_variant` produced by the scheduled materialization query.
+  inspection_status:
+    description: Column `inspection_status` produced by the scheduled materialization query.
+  automation_group:
+    description: Column `automation_group` produced by the scheduled materialization query.
+  mediation_squad:
+    description: Column `mediation_squad` produced by the scheduled materialization query.
+  has_repairs:
+    description: Column `has_repairs` produced by the scheduled materialization query.
+  has_tenant_access_review:
+    description: Column `has_tenant_access_review` produced by the scheduled materialization query.
+  has_owner_access_review:
+    description: Column `has_owner_access_review` produced by the scheduled materialization query.
+  has_tenant_approved_review:
+    description: Column `has_tenant_approved_review` produced by the scheduled materialization query.
+  has_owner_approved_review:
+    description: Column `has_owner_approved_review` produced by the scheduled materialization query.
+  has_tenant_access_budget_approval:
+    description: Column `has_tenant_access_budget_approval` produced by the scheduled materialization query.
+  has_owner_access_budget_approval:
+    description: Column `has_owner_access_budget_approval` produced by the scheduled materialization query.
+  has_tenant_approved_budget_approval:
+    description: Column `has_tenant_approved_budget_approval` produced by the scheduled materialization query.
+  has_owner_approved_budget_approval:
+    description: Column `has_owner_approved_budget_approval` produced by the scheduled materialization query.
+  has_agreement:
+    description: Column `has_agreement` produced by the scheduled materialization query.
+  has_early_agreement:
+    description: Column `has_early_agreement` produced by the scheduled materialization query.
+  has_late_agreement:
+    description: Column `has_late_agreement` produced by the scheduled materialization query.
+  has_discount_agreement:
+    description: Column `has_discount_agreement` produced by the scheduled materialization query.
+  has_compulsory_agreement:
+    description: Column `has_compulsory_agreement` produced by the scheduled materialization query.
+  has_mediation_ticket:
+    description: Column `has_mediation_ticket` produced by the scheduled materialization query.
+  has_early_mediation:
+    description: Column `has_early_mediation` produced by the scheduled materialization query.
+  total_repairs_requested:
+    description: Column `total_repairs_requested` produced by the scheduled materialization query.
+  repairs_added_by_5a_review:
+    description: Column `repairs_added_by_5a_review` produced by the scheduled materialization query.
+  repairs_added_by_owner_review:
+    description: Column `repairs_added_by_owner_review` produced by the scheduled materialization query.
+  total_unset_repairs:
+    description: Column `total_unset_repairs` produced by the scheduled materialization query.
+  repairs_exempted_in_ar:
+    description: Column `repairs_exempted_in_ar` produced by the scheduled materialization query.
+  total_tentant_repair_ar:
+    description: Column `total_tentant_repair_ar` produced by the scheduled materialization query.
+  repairs_exempted_by_owner_review:
+    description: Column `repairs_exempted_by_owner_review` produced by the scheduled materialization query.
+  total_tentant_repair_review:
+    description: Column `total_tentant_repair_review` produced by the scheduled materialization query.
+  total_tenant_contestation:
+    description: Column `total_tenant_contestation` produced by the scheduled materialization query.
+  repairs_exempted_ac:
+    description: Column `repairs_exempted_ac` produced by the scheduled materialization query.
+  repairs_absorbed_ac:
+    description: Column `repairs_absorbed_ac` produced by the scheduled materialization query.
+  total_tentant_repair_ac:
+    description: Column `total_tentant_repair_ac` produced by the scheduled materialization query.
+  total_repairs_final_report:
+    description: Column `total_repairs_final_report` produced by the scheduled materialization query.
+  checkpoint_journey:
+    description: Column `checkpoint_journey` produced by the scheduled materialization query.
+  model_discount_type:
+    description: Column `model_discount_type` produced by the scheduled materialization query.
+  discount_value_type:
+    description: Column `discount_value_type` produced by the scheduled materialization query.
+  discount_stage:
+    description: Column `discount_stage` produced by the scheduled materialization query.
+  has_discount_try:
+    description: Column `has_discount_try` produced by the scheduled materialization query.
+  is_discount_accepted:
+    description: Column `is_discount_accepted` produced by the scheduled materialization query.
+  invoice_discount_value:
+    description: Column `invoice_discount_value` produced by the scheduled materialization query.
+  leadtime_total:
+    description: Column `leadtime_total` produced by the scheduled materialization query.
+  leadtime_vt:
+    description: Column `leadtime_vt` produced by the scheduled materialization query.
+  leadtime_vt_to_ar:
+    description: Column `leadtime_vt_to_ar` produced by the scheduled materialization query.
+  leadtime_ar:
+    description: Column `leadtime_ar` produced by the scheduled materialization query.
+  leadtime_owner_tenant_review:
+    description: Column `leadtime_owner_tenant_review` produced by the scheduled materialization query.
+  leadtime_ac:
+    description: Column `leadtime_ac` produced by the scheduled materialization query.
+  leadtime_budget_approval:
+    description: Column `leadtime_budget_approval` produced by the scheduled materialization query.
+  leadtime_mediation:
+    description: Column `leadtime_mediation` produced by the scheduled materialization query.
+  ts_termination_request:
+    description: Column `ts_termination_request` produced by the scheduled materialization query.
+  dt_ended_rental_confirmed:
+    description: Column `dt_ended_rental_confirmed` produced by the scheduled materialization query.
+  ts_inspected:
+    description: Column `ts_inspected` produced by the scheduled materialization query.
+  dt_termination:
+    description: Column `dt_termination` produced by the scheduled materialization query.
+  ts_automatic_repair_processing:
+    description: Column `ts_automatic_repair_processing` produced by the scheduled materialization query.
+  ts_sent_to_repair_analysis:
+    description: Column `ts_sent_to_repair_analysis` produced by the scheduled materialization query.
+  ts_sent_to_owner_review:
+    description: Column `ts_sent_to_owner_review` produced by the scheduled materialization query.
+  ts_review_started_by_owner:
+    description: Column `ts_review_started_by_owner` produced by the scheduled materialization query.
+  ts_sent_to_tenant_review:
+    description: Column `ts_sent_to_tenant_review` produced by the scheduled materialization query.
+  ts_review_started_by_tenant:
+    description: Column `ts_review_started_by_tenant` produced by the scheduled materialization query.
+  ts_sent_to_contestation_analysis:
+    description: Column `ts_sent_to_contestation_analysis` produced by the scheduled materialization query.
+  ts_contestation_analysis_finished:
+    description: Column `ts_contestation_analysis_finished` produced by the scheduled materialization query.
+  ts_budget_approval:
+    description: Column `ts_budget_approval` produced by the scheduled materialization query.
+  ts_budget_approval_sent_to_owner:
+    description: Column `ts_budget_approval_sent_to_owner` produced by the scheduled materialization query.
+  ts_budget_approval_started_by_owner:
+    description: Column `ts_budget_approval_started_by_owner` produced by the scheduled materialization query.
+  ts_budget_approval_sent_to_tenant:
+    description: Column `ts_budget_approval_sent_to_tenant` produced by the scheduled materialization query.
+  ts_budget_approval_started_by_tenant:
+    description: Column `ts_budget_approval_started_by_tenant` produced by the scheduled materialization query.
+  ts_reviewed:
+    description: Column `ts_reviewed` produced by the scheduled materialization query.
+  dt_discount_invoice_creation:
+    description: Column `dt_discount_invoice_creation` produced by the scheduled materialization query.
+  dt_mediation_started:
+    description: Column `dt_mediation_started` produced by the scheduled materialization query.
+  ts_termination_finished:
+    description: Column `ts_termination_finished` produced by the scheduled materialization query.
