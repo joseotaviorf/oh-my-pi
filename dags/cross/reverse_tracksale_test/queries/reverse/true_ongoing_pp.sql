@@ -113,47 +113,105 @@ contracts_to_send AS (
         (MAX(birth_type) = 'birthday' AND MAX(flg_not_send) = 0)
         OR (MAX(birth_type) = 'recap_birthday' AND MAX(flg_recap_send) = 1)
 ),
-people_to_send AS (
+contract_owners AS (
     SELECT
-        cp.name AS customer_name,
-        cp.email AS customer_email,
-        cp.phone_number AS customer_phone,
-        CASE
-            WHEN cs.birth_type = 'birthday' THEN STRING(cs.age) || ' meses'
-            ELSE STRING(cs.age_recap) || ' meses'
-        END AS campaign_step,
-        'Proprietário' AS customer_type,
-        cp.cpf AS customer_cpf,
+        cp.name,
+        cp.email,
+        cp.phone_number,
+        cp.cpf,
         cp.id_user,
-        'true' AS campaign_type,
-        'id_contract' AS driver_type,
-        cp.id_contract AS id_driver,
-        DATE('{load_start_date}') AS dt_cohort
+        cp.id_contract,
+        cs.birth_type,
+        cs.age,
+        cs.age_recap
     FROM
         datalake_ebdb_clean.contract_person AS cp
     INNER JOIN
         contracts_to_send AS cs
             ON cp.id_contract = cs.sk_contract
-    LEFT JOIN
-        datalake_ebdb_clean.user AS u
-            ON (
-                cp.email = u.email
-                OR cp.email = u.alternative_email
-            )
-    LEFT JOIN
-        datalake_ebdb_customer_contact_identification.customer_contact_identification AS cci
-            ON cp.email = cci.customer_contact
-    LEFT JOIN
-        datalake_ebdb_clean.user_pro_owner AS po
-            ON (
-                cp.id_user = po.id_user
-                OR u.id = po.id_user
-                OR cci.id_user = po.id_user
-            )
-            AND po.is_active = TRUE
     WHERE
         cp.type IN ('Proprietario')
-        AND po.is_active IS NULL
+),
+user_by_email AS (
+    SELECT
+        co.id_contract,
+        u.id AS matched_user_id
+    FROM
+        contract_owners AS co
+    INNER JOIN
+        datalake_ebdb_clean.user AS u
+            ON co.email = u.email
+    UNION
+    SELECT
+        co.id_contract,
+        u.id AS matched_user_id
+    FROM
+        contract_owners AS co
+    INNER JOIN
+        datalake_ebdb_clean.user AS u
+            ON co.email = u.alternative_email
+),
+owner_contact_identification AS (
+    SELECT
+        co.id_contract,
+        cci.id_user AS cci_id_user
+    FROM
+        contract_owners AS co
+    INNER JOIN
+        datalake_ebdb_customer_contact_identification.customer_contact_identification AS cci
+            ON co.email = cci.customer_contact
+),
+active_pro_owner_contracts AS (
+    SELECT
+        co.id_contract
+    FROM
+        contract_owners AS co
+    INNER JOIN
+        datalake_ebdb_clean.user_pro_owner AS po
+            ON co.id_user = po.id_user
+            AND po.is_active = TRUE
+    UNION
+    SELECT
+        ube.id_contract
+    FROM
+        user_by_email AS ube
+    INNER JOIN
+        datalake_ebdb_clean.user_pro_owner AS po
+            ON ube.matched_user_id = po.id_user
+            AND po.is_active = TRUE
+    UNION
+    SELECT
+        oci.id_contract
+    FROM
+        owner_contact_identification AS oci
+    INNER JOIN
+        datalake_ebdb_clean.user_pro_owner AS po
+            ON oci.cci_id_user = po.id_user
+            AND po.is_active = TRUE
+),
+people_to_send AS (
+    SELECT
+        co.name AS customer_name,
+        co.email AS customer_email,
+        co.phone_number AS customer_phone,
+        CASE
+            WHEN co.birth_type = 'birthday' THEN STRING(co.age) || ' meses'
+            ELSE STRING(co.age_recap) || ' meses'
+        END AS campaign_step,
+        'Proprietário' AS customer_type,
+        co.cpf AS customer_cpf,
+        co.id_user,
+        'true' AS campaign_type,
+        'id_contract' AS driver_type,
+        co.id_contract AS id_driver,
+        DATE('{load_start_date}') AS dt_cohort
+    FROM
+        contract_owners AS co
+    LEFT JOIN
+        active_pro_owner_contracts AS apoc
+            ON co.id_contract = apoc.id_contract
+    WHERE
+        apoc.id_contract IS NULL
 ),
 customers AS (
     SELECT
@@ -187,6 +245,16 @@ customers AS (
         DATE('{load_start_date}') AS dt_cohort
 ),
 previous_dispatches AS (
+    SELECT DISTINCT
+        customer_email,
+        MAKE_DATE(year, month, day) AS dt_partition
+    FROM
+        reverse_tracksale_test.true_ongoing_pp
+    WHERE
+        is_dispatched = TRUE
+        AND customer_email IS NOT NULL
+        AND MAKE_DATE(year, month, day) >= DATE_SUB(DATE('{load_start_date}'), 90)
+    UNION
     SELECT DISTINCT
         customer_email,
         MAKE_DATE(year, month, day) AS dt_partition
