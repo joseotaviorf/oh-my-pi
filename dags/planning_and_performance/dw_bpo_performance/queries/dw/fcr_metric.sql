@@ -7,12 +7,13 @@ WITH fact_service AS (
         queue_name AS fila_twilio,
         SUBSTR(theme, 3, LENGTH(theme) - 4) AS theme,
         SUBSTR(theme_detail, 3, LENGTH(theme_detail) - 4) AS theme_detail,
-        ROW_NUMBER() OVER(PARTITION BY sk_support_session ORDER BY ts_task_created DESC) AS rn_task 
+        ROW_NUMBER() OVER(PARTITION BY sk_support_session ORDER BY ts_task_created DESC, sk_task_event DESC) AS rn_task 
     FROM dw_support_journey.fact_services
      WHERE dt_task_created >= DATE('2026-06-25')
           AND is_current = true
           AND sk_support_session IS NOT NULL
           AND sk_support_session != '-1'
+          AND queue_name not in ('IVR Events (no workers)')
 ),
 
 customer_contacts AS (
@@ -46,39 +47,83 @@ customer_contacts AS (
         dd.front_or_back as front_or_back,
         dd.team AS team,
         
-        CASE
+         CASE
             WHEN dd.team IN (
-                'Repairs/Ongoing Front', 'Repairs/Ongoing Back', 'Reparos - Autosserviço',
-                'Reparos - Comum e Urgente', 'Reparos - Emergencial', 'Reparos - Reembolso', 'Reparos - Contestação'
+                'Reparos - Autosserviço',
+                'Reparos - Comum e Urgente',
+                'Reparos - Emergencial',
+                'Reparos - Reembolso',
+                'Reparos - Contestação'
             ) THEN 'Reparos'
             WHEN dd.team IN (
-                'Ongoing Back', 'Ong Back', 'Ongoing FR - Geral', 'Ongoing FR - Informe de Rendimentos'
+                'Repairs/Ongoing Front',
+                'Repairs/Ongoing Back',
+                'Ongoing Back',
+                'Ong Back',
+                'Ongoing FR - Geral', 
+                'Ongoing FR - Informe de Rendimentos'
             ) THEN 'Ongoing'
             WHEN dd.team IN (
-                'Rental Manager', 'Rental Manager Gold', 'Rental Manager CTL'
+                'Rental Manager',
+                'Rental Manager Gold',
+                'Rental Manager CTL'
             ) THEN 'Rental Manager'
             WHEN dd.team IN (
-                'Payments', 'Payments Ativo Back', 'Payment FR - Reembolso de Condomínio', 
-                'Payment FR - Condomínio Geral', 'Payment FR - Aluguel', 'Payment FR - PP Multi', 
-                'Payment_FR_GeneralCondominium', 'Payment FR - Dados Bancários', 'Payment FR - Dados Bancários Front'
+                'Payments',
+                'Payments Ativo Back',
+                'Payment FR - Reembolso de Condomínio', 
+                'Payment FR - Condomínio Geral', 
+                'Payment FR - Aluguel', 
+                'Payment FR - PP Multi', 
+                'Payment_FR_GeneralCondominium',
+                'Payment FR - Dados Bancários',
+                'Payment FR - Dados Bancários Front'
             ) THEN 'Payments'
             WHEN dd.team IN (
-                'CX Partners', 'CX Compra e Venda', 'CX Partners For Sale'
+                'CX Partners',
+                'CX Compra e Venda',
+                'CX Partners For Sale'
             ) THEN 'Partners'
             WHEN dd.team IN (
-                'Onboarding Back', 'Moving'
+                'Onboarding Back',
+                'Moving',
+                'Onboarding ForRent'
             ) THEN 'Onboarding'
             WHEN dd.team IN (
-                'Offboarding Front', 'Offboarding Back', 'Offboarding - CNX', 'Offboarding - AEC', 'Offboarding - Atento'
+                'Offboarding Front',
+                'Offboarding Back',
+                'Offboarding - CNX',
+                'Offboarding - AEC',
+                'Offboarding - Atento'
             ) THEN 'Offboarding'
             WHEN dd.team IN (
-                'ReclameAqui', 'Privacy', 'Casos Especiais', 'PROCON', 'Dados Bancários', 'Conta Comigo',
-                'Subsídios', 'Consumidor.Gov', 'Notificação Extrajudicial', 'Midias Ops', 'ReclameAqui - Grupo5A',
-                'Reversão de NPS', 'Escalados - consumidor.gov', 'Escalados - Procon Reclamante',
-                'Escalados - Mídias Sociais', 'Escalados - Conta Comigo', 'Escalados - Processo Cívil',
-                'Escalados - Casos Esp Outros', 'Escalados - Casos Esp Fraude', 'Escalados - Casos Esp Int. Humana',
-                'Escalados - Casos Esp Int. Imóvel', 'Escalados - CC Colaboradores', 'Escalados - Casos Especiais',
-                'Escalados - Procon Subsídios', 'Escalados - Reclame AQUI', 'Escalados - Conta Comigo Entrada', 'Escalados - CC Diretoria Ops'
+                'ReclameAqui',
+                'Privacy',
+                'Casos Especiais',
+                'PROCON',
+                'Dados Bancários',
+                'Conta Comigo',
+                'Subsídios',
+                'Consumidor.Gov',
+                'Notificação Extrajudicial',
+                'Midias Ops',
+                'ReclameAqui - Grupo5A',
+                'Reversão de NPS',
+                'Escalados - consumidor.gov',
+                'Escalados - Procon Reclamante',
+                'Escalados - Mídias Sociais',
+                'Escalados - Conta Comigo',
+                'Escalados - Processo Cívil',
+                'Escalados - Casos Esp Outros',
+                'Escalados - Casos Esp Fraude',
+                'Escalados - Casos Esp Int. Humana',
+                'Escalados - Casos Esp Int. Imóvel',
+                'Escalados - CC Colaboradores',
+                'Escalados - Casos Especiais',
+                'Escalados - Procon Subsídios',
+                'Escalados - Reclame AQUI',
+                'Escalados - Conta Comigo Entrada',
+                'Escalados - CC Diretoria Ops'
             ) THEN 'CSI'
             ELSE dd.team
         END AS team_adjusted,
@@ -146,39 +191,83 @@ cases_perspective as (
         ts_solved,
         last_agent_email,
         front_or_back,
-        CASE
+            CASE
             WHEN last_team IN (
-                'Repairs/Ongoing Front', 'Repairs/Ongoing Back', 'Reparos - Autosserviço',
-                'Reparos - Comum e Urgente', 'Reparos - Emergencial', 'Reparos - Reembolso', 'Reparos - Contestação'
+                'Reparos - Autosserviço',
+                'Reparos - Comum e Urgente',
+                'Reparos - Emergencial',
+                'Reparos - Reembolso',
+                'Reparos - Contestação'
             ) THEN 'Reparos'
             WHEN last_team IN (
-                'Ongoing Back', 'Ong Back', 'Ongoing FR - Geral', 'Ongoing FR - Informe de Rendimentos'
+                'Repairs/Ongoing Back',
+                'Ongoing Back',
+                'Ong Back',
+                'Repairs/Ongoing Front',
+                'Ongoing FR - Geral', 
+                'Ongoing FR - Informe de Rendimentos'
             ) THEN 'Ongoing'
             WHEN last_team IN (
-                'Rental Manager', 'Rental Manager Gold', 'Rental Manager CTL'
+                'Rental Manager',
+                'Rental Manager Gold',
+                'Rental Manager CTL'
             ) THEN 'Rental Manager'
             WHEN last_team IN (
-                'Payments', 'Payments Ativo Back', 'Payment FR - Reembolso de Condomínio', 
-                'Payment FR - Condomínio Geral', 'Payment FR - Aluguel', 'Payment FR - PP Multi', 
-                'Payment_FR_GeneralCondominium', 'Payment FR - Dados Bancários', 'Payment FR - Dados Bancários Front'
+                'Payments',
+                'Payments Ativo Back',
+                'Payment FR - Reembolso de Condomínio', 
+                'Payment FR - Condomínio Geral', 
+                'Payment FR - Aluguel', 
+                'Payment FR - PP Multi', 
+                'Payment_FR_GeneralCondominium',
+                'Payment FR - Dados Bancários',
+                'Payment FR - Dados Bancários Front'
             ) THEN 'Payments'
             WHEN last_team IN (
-                'CX Partners', 'CX Compra e Venda', 'CX Partners For Sale'
+                'CX Partners',
+                'CX Compra e Venda',
+                'CX Partners For Sale'
             ) THEN 'Partners'
             WHEN last_team IN (
-                'Onboarding Back', 'Moving'
+                'Onboarding Back',
+                'Onboarding ForRent',
+                'Moving'
             ) THEN 'Onboarding'
             WHEN last_team IN (
-                'Offboarding Front', 'Offboarding Back', 'Offboarding - CNX', 'Offboarding - AEC', 'Offboarding - Atento'
+                'Offboarding Front',
+                'Offboarding Back',
+                'Offboarding - CNX',
+                'Offboarding - AEC',
+                'Offboarding - Atento'
             ) THEN 'Offboarding'
             WHEN last_team IN (
-                'ReclameAqui', 'Privacy', 'Casos Especiais', 'PROCON', 'Dados Bancários', 'Conta Comigo',
-                'Subsídios', 'Consumidor.Gov', 'Notificação Extrajudicial', 'Midias Ops', 'ReclameAqui - Grupo5A',
-                'Reversão de NPS', 'Escalados - consumidor.gov', 'Escalados - Procon Reclamante',
-                'Escalados - Mídias Sociais', 'Escalados - Conta Comigo', 'Escalados - Processo Cívil',
-                'Escalados - Casos Esp Outros', 'Escalados - Casos Esp Fraude', 'Escalados - Casos Esp Int. Humana',
-                'Escalados - Casos Esp Int. Imóvel', 'Escalados - CC Colaboradores', 'Escalados - Casos Especiais',
-                'Escalados - Procon Subsídios', 'Escalados - Reclame AQUI', 'Escalados - Conta Comigo Entrada', 'Escalados - CC Diretoria Ops'
+                'ReclameAqui',
+                'Privacy',
+                'Casos Especiais',
+                'PROCON',
+                'Dados Bancários',
+                'Conta Comigo',
+                'Subsídios',
+                'Consumidor.Gov',
+                'Notificação Extrajudicial',
+                'Midias Ops',
+                'ReclameAqui - Grupo5A',
+                'Reversão de NPS',
+                'Escalados - consumidor.gov',
+                'Escalados - Procon Reclamante',
+                'Escalados - Mídias Sociais',
+                'Escalados - Conta Comigo',
+                'Escalados - Processo Cívil',
+                'Escalados - Casos Esp Outros',
+                'Escalados - Casos Esp Fraude',
+                'Escalados - Casos Esp Int. Humana',
+                'Escalados - Casos Esp Int. Imóvel',
+                'Escalados - CC Colaboradores',
+                'Escalados - Casos Especiais',
+                'Escalados - Procon Subsídios',
+                'Escalados - Reclame AQUI',
+                'Escalados - Conta Comigo Entrada',
+                'Escalados - CC Diretoria Ops'
             ) THEN 'CSI'
             ELSE last_team
         END AS team_adjusted,
@@ -211,51 +300,149 @@ back_penalizations as (
     FROM cases_perspective as cp
     WHERE rn_case = 1 
         AND cp.sk_user > 0 
-),
+)
         
-recontact_drilldown_per_bpo AS (
-    SELECT 
-        sk_session_key,
-        sk_user,
-        team,
-        DATE(CASE WHEN is_first_interaction = TRUE THEN ts_created END) AS ts_started,
-        LAG(sk_session_key) OVER (PARTITION BY sk_user, team ORDER BY ts_created) AS prev_sk_task,
-        LAG(ts_created) OVER (PARTITION BY sk_user, team ORDER BY DATE(CASE WHEN is_first_interaction = TRUE THEN ts_created END)) AS prev_ts_started,
-        LAG(agent_email) OVER (PARTITION BY sk_user, team ORDER BY ts_created) AS prev_agent_email,
-        LAG(agent_organization) OVER (PARTITION BY sk_user, team ORDER BY ts_created) AS prev_agent_organization,   
-        LAG(theme) OVER (PARTITION BY sk_user, team ORDER BY ts_created) AS prev_theme_task,  
-        
-        CASE
-            WHEN datediff(
-                    LEAD(DATE(ts_created)) OVER (PARTITION BY sk_user, team, theme, agent_organization ORDER BY ts_created),
-                    DATE(ts_created)
-                 ) <= 4
-            THEN CASE
-                     WHEN sk_session_key != LEAD(sk_session_key) OVER (PARTITION BY sk_user, team, theme, agent_organization ORDER BY ts_created)
-                      AND ts_created != LEAD(DATE(ts_created)) OVER (PARTITION BY sk_user, team, agent_organization ORDER BY DATE(ts_created))
-                      AND theme IS NOT NULL
-                     THEN 1 ELSE 0
-                 END
-            ELSE 0
-        END AS theme_recontact_flag_bpo,
+, recontact_drilldown_per_bpo AS (
 
-        CASE
-            WHEN datediff(
-                    LEAD(DATE(ts_created)) OVER (PARTITION BY sk_user, team, theme ORDER BY DATE(ts_created)),
-                    DATE(ts_created)
-                 ) <= 4
-            THEN CASE
-                     WHEN sk_session_key != LEAD(sk_session_key) OVER (PARTITION BY sk_user, team, theme ORDER BY DATE(ts_created))
-                      AND DATE(ts_created) != LEAD(DATE(ts_created)) OVER (PARTITION BY sk_user, team ORDER BY DATE(ts_created))
-                      AND theme IS NOT NULL
-                     THEN 1 ELSE 0
-                 END
-            ELSE 0
-        END AS theme_recontact_flag
-    FROM customer_contacts
-    WHERE rn_task = 1 
+SELECT 
+    sk_session_key,
+    sk_user,
+    team,
+    sk_task AS original_sk_task,
+    ts_created AS original_ts_started,
+    agent_email AS original_agent_email,
+    agent_organization AS original_agent_organization,
+
+    LEAD(sk_session_key) OVER (
+        PARTITION BY sk_user, team, theme, agent_organization
+        ORDER BY ts_created
+    ) AS recontact_sk_4sat_join_key,
+
+    LEAD(sk_task) OVER (
+        PARTITION BY sk_user, team, theme, agent_organization
+        ORDER BY ts_created
+    ) AS recontact_sk_task,
+
+    LEAD(ts_created) OVER (
+        PARTITION BY sk_user, team, theme, agent_organization
+        ORDER BY ts_created
+    ) AS recontact_ts_started,
+
+    LEAD(agent_email) OVER (
+        PARTITION BY sk_user, team, theme, agent_organization
+        ORDER BY ts_created
+    ) AS recontact_agent_email,
+
+    LEAD(agent_organization) OVER (
+        PARTITION BY sk_user, team, theme, agent_organization
+        ORDER BY ts_created
+    ) AS recontact_agent_organization,
+
+    CAST(CASE WHEN is_first_interaction = TRUE THEN ts_created END AS DATE) AS ts_started,
+
+    ------ SK TASK contato anterior
+    LAG(sk_session_key) OVER (
+        PARTITION BY sk_user, team
+        ORDER BY ts_created
+    ) AS prev_sk_task,
+
+    ------ Data Contato Anterior    
+    LAG(ts_created) OVER (
+        PARTITION BY sk_user, team
+        ORDER BY CAST(CASE WHEN is_first_interaction = TRUE THEN ts_created END AS DATE)
+    ) AS prev_ts_started,
+
+    ------ Agente Contato Anterior  
+    LAG(agent_email) OVER (
+        PARTITION BY sk_user, team
+        ORDER BY ts_created
+    ) AS prev_agent_email,
+
+    ------ Organização Contato Anterior
+    LAG(agent_organization) OVER (
+        PARTITION BY sk_user, team
+        ORDER BY ts_created
+    ) AS prev_agent_organization,   
+
+    ------ Theme Contato Anterior
+    LAG(theme) OVER (
+        PARTITION BY sk_user, team
+        ORDER BY ts_created
+    ) AS prev_theme_task,  
+
+    -----------------------------------------
+    -------- FLAG RECONTATO
+    CASE
+        -- 1. Verifica se o intervalo até o próximo contato é <= 4 dias
+        WHEN DATEDIFF(
+                CAST(LEAD(ts_created) OVER (
+                    PARTITION BY sk_user, team, theme, agent_organization
+                    ORDER BY ts_created ASC
+                ) AS DATE),
+                CAST(ts_created AS DATE)
+             ) <= 4
+        THEN CASE
+                 -- 2. Garante que o recontato é em uma task/join_key diferente
+                 WHEN sk_session_key != LEAD(sk_session_key) OVER (
+                         PARTITION BY sk_user, team, theme, agent_organization
+                         ORDER BY ts_created ASC
+                      )
+                  -- 3. Garante que não é a exata mesma interação (compara timestamps inteiros)
+                  AND ts_created != LEAD(ts_created) OVER (
+                         PARTITION BY sk_user, team, agent_organization
+                         ORDER BY ts_created ASC
+                      )
+                  AND theme IS NOT NULL
+                 THEN 1 ELSE 0
+             END
+        ELSE 0
+    END AS theme_recontact_flag_bpo,
+
+    ---- Recontato Flag Sem BPO
+    CASE
+        WHEN DATEDIFF(
+                CAST(LEAD(ts_created) OVER (
+                    PARTITION BY sk_user, team, theme
+                    ORDER BY ts_created
+                ) AS DATE),
+                CAST(ts_created AS DATE)
+             ) <= 4
+        THEN CASE
+                 WHEN sk_session_key != LEAD(sk_session_key) OVER (
+                         PARTITION BY sk_user, team, theme
+                         ORDER BY ts_created
+                      )
+                  AND ts_created != LEAD(ts_created) OVER (
+                         PARTITION BY sk_user, team
+                         ORDER BY ts_created
+                      )
+                  AND theme IS NOT NULL
+                 THEN 1 ELSE 0
+             END
+        ELSE 0
+    END AS theme_recontact_flag,
+
+    -- Intervalo em Horas (Diferença em segundos / 3600)
+    (
+        CAST(LEAD(ts_created) OVER (
+            PARTITION BY sk_user, team, theme, agent_organization
+            ORDER BY ts_created
+        ) AS LONG) - CAST(ts_created AS LONG)
+    ) / 3600 AS recontact_interval_hours,
+
+    -- Intervalo em Dias
+    DATEDIFF(
+        CAST(LEAD(ts_created) OVER (
+            PARTITION BY sk_user, team, theme, agent_organization
+            ORDER BY ts_created
+        ) AS DATE),
+        CAST(ts_created AS DATE)
+    ) AS recontact_interval_days
+
+FROM customer_contacts
+WHERE rn_task = 1 
+
 ),
-
 first_resolution as (
   SELECT 
     last_agent_email, 
@@ -321,5 +508,8 @@ WHERE rn_task = 1
             '[WH] Closing [FRONT]', '[AeC] CX Pagamentos [FRONT] [POS]', '[AeC] CX Rescisão [FRONT] [POS]',
             '[AeC] CX Mudança [FRONT] [POS]', '[AeC] CX Reparos [FRONT] [POS]', '[AeC] CX Propostas [FRONT] [PRE]',
             '[AeC] CX Visitas [FRONT] [PRE]', '[AeC] CX Parceiros [FRONT] [PRE]', '[AeC] CX Ongoing [FRONT] [POS]',
-            'CX Ongoing [FRONT] [POS]', '[AeC] Consultores imobiliários 5A', '[AeC] CX Parceiros Compra e Venda [FRONT]'
-        );
+            'CX Ongoing [FRONT] [POS]', '[AeC] Consultores imobiliários 5A', '[AeC] CX Parceiros Compra e Venda [FRONT]',
+    '[WH] CX Propostas [FRONT] [PRE]'
+        )
+
+
