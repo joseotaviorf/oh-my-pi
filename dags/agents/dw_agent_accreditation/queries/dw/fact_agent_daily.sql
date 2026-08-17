@@ -24,21 +24,21 @@ agent_date AS (
     SELECT
         MD5(CONCAT(agent.id_agent, agent.dt_ref)) AS id_agent_daily,
         agent.id_agent,
-        agent.id_agent_data,
-        agent.id_partner,
-        agent.id_user,
-        agent.uuid_company,
-        agent.uuid_agent,
-        agent.uuid_person,
-        agent.creci,
-        agent.creci_uf,
-        agent.affiliation_type,
-        agent.profile,
-        agent.is_1p_partnership,
-        agent.is_3p_partnership,
-        agent.days_in_current_status,
-        agent.ts_last_status_changed,
-        agent.ts_created,
+        MAX(agent.id_agent_data) AS id_agent_data,
+        MAX(agent.id_partner) AS id_partner,
+        MAX(agent.id_user) AS id_user,
+        MAX(agent.uuid_company) AS uuid_company,
+        MAX(agent.uuid_agent) AS uuid_agent,
+        MAX(agent.uuid_person) AS uuid_person,
+        MAX(agent.creci) AS creci,
+        MAX(agent.creci_uf) AS creci_uf,
+        MAX(agent.affiliation_type) AS affiliation_type,
+        MAX(agent.profile) AS profile,
+        MAX(agent.is_1p_partnership) AS is_1p_partnership,
+        MAX(agent.is_3p_partnership) AS is_3p_partnership,
+        MAX(agent.days_in_current_status) AS days_in_current_status,
+        MAX(agent.ts_last_status_changed) AS ts_last_status_changed,
+        MAX(agent.ts_created) AS ts_created,
         agent.dt_ref,
         YEAR(agent.dt_ref) AS year,
         MONTH(agent.dt_ref) AS month,
@@ -47,6 +47,9 @@ agent_date AS (
         agent_spine AS agent
     WHERE
         agent.dt_ref BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    GROUP BY
+        agent.id_agent,
+        agent.dt_ref
 ),
 activation_history AS (
     SELECT
@@ -65,22 +68,32 @@ activation_history AS (
         event_type IN ('AGENT_CAPABILITY_DISABLED', 'AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED', 'AGENT_ACTIVATED', 'AGENT_INACTIVATED', 'AGENT_REACTIVATED')
 ),
 segmentation_activation_history AS (
-    SELECT
-        ah.id_agent,
-        ah.id_capability,
-        ah.event_type,
-        ah.event_level,
-        ah.capability_type,
-        ah.ts_started,
-        EXPLODE(
-            SEQUENCE(
-                ah.dt_started,
-                COALESCE(ah.dt_ended, CURRENT_DATE),
-                INTERVAL 1 DAY
-            )
-        ) AS dt_reference
-    FROM
-        activation_history AS ah
+    SELECT DISTINCT
+        segmented.id_agent,
+        segmented.id_capability,
+        segmented.event_type,
+        segmented.event_level,
+        segmented.capability_type,
+        segmented.ts_started,
+        segmented.dt_reference
+    FROM (
+        SELECT
+            ah.id_agent,
+            ah.id_capability,
+            ah.event_type,
+            ah.event_level,
+            ah.capability_type,
+            ah.ts_started,
+            EXPLODE(
+                SEQUENCE(
+                    ah.dt_started,
+                    COALESCE(ah.dt_ended - INTERVAL 1 DAY, CURRENT_DATE),
+                    INTERVAL 1 DAY
+                )
+            ) AS dt_reference
+        FROM
+            activation_history AS ah
+    ) AS segmented
 ),
 daily_status AS (
     SELECT
