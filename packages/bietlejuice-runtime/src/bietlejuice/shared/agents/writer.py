@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from argparse import Namespace
-from typing import Tuple
+from typing import FrozenSet, Tuple
 
 from pyspark.sql import DataFrame
 from quintoandar_logger import QuintoAndarLogger
@@ -15,6 +15,8 @@ from bietlejuice.base.validation.spark_args import resolve_datalake_write_target
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import MetastoreServiceFactory
+
+LAKE_WRITE_MODES: FrozenSet[str] = frozenset({"prod", "write"})
 
 
 def resolve_write_target(
@@ -54,10 +56,15 @@ def write_delta_or_dev_view(
 ) -> None:
     """MERGE ``result_df`` into the enrich target, or register a temp view.
 
-    ``run_mode != write``: no lake write; temp view ``dev_{table}_{view_suffix}``.
+    ``run_mode`` ``prod`` or ``write``: lake MERGE. ``dev``: temp view
+    ``dev_{table}_{view_suffix}``.
     """
     run_mode = getattr(args, "run_mode", "dev")
-    if run_mode != "write":
+    if run_mode not in LAKE_WRITE_MODES:
+        if run_mode != "dev":
+            raise ValueError(
+                f"Invalid run_mode: {run_mode!r}. Expected 'dev', 'prod', or 'write'."
+            )
         view_name = f"dev_{args.table_name}_{view_suffix}"
         result_df.createOrReplaceTempView(view_name)
         logger.info(

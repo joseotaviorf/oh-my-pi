@@ -62,6 +62,18 @@ class DateColumnFilter:
 SourceFilter = Union[PartitionDateFilter, DateColumnFilter]
 
 
+def _filter_column_names(source_filter: SourceFilter) -> Tuple[str, ...]:
+    if isinstance(source_filter, PartitionDateFilter):
+        return (
+            source_filter.year_column,
+            source_filter.month_column,
+            source_filter.day_column,
+        )
+    if isinstance(source_filter, DateColumnFilter):
+        return (source_filter.date_column,)
+    raise TypeError(f"Unsupported source filter type: {type(source_filter)!r}")
+
+
 @dataclass(frozen=True)
 class SourceSpec:
     """One source table: ``schema.table`` name, columns to project, optional prune filter.
@@ -113,9 +125,7 @@ class SourceCatalog:
                 F.col(source_filter.month_column),
                 F.col(source_filter.day_column),
             )
-            upper_bound = self._scan_end + timedelta(
-                days=source_filter.update_lag_days
-            )
+            upper_bound = self._scan_end + timedelta(days=source_filter.update_lag_days)
             return projection.filter(
                 (partition_day >= F.lit(self._scan_start))
                 & (partition_day <= F.lit(upper_bound))
@@ -142,11 +152,18 @@ class SourceCatalog:
             return self._read_cache[spec]
 
         session = self._require_spark()
-        projection = session.table(spec.table_name).select(*spec.columns)
-        dataframe = (
-            projection
-            if spec.filter is None
-            else self._apply_filter(projection, spec.filter)
-        )
+        table = session.table(spec.table_name)
+        if spec.filter is None:
+            dataframe = table.select(*spec.columns)
+        else:
+            extra = [
+                column
+                for column in _filter_column_names(spec.filter)
+                if column not in spec.columns
+            ]
+            projection = table.select(*spec.columns, *extra)
+            dataframe = self._apply_filter(projection, spec.filter)
+            if extra:
+                dataframe = dataframe.drop(*extra)
         self._read_cache[spec] = dataframe
         return dataframe
