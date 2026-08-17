@@ -110,6 +110,7 @@ def main() -> None:
     dags_with_nested_spark_jobs = set()
 
     for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
+        dirs[:] = [d for d in dirs if d not in {"__pycache__", ".mypy_cache"}]
         if f"/{artifact}" not in root:
             continue
         if include_dir and f"/{include_dir}/" not in f"{root}/":
@@ -118,6 +119,8 @@ def main() -> None:
             continue
 
         for file_name in files:
+            if file_name.endswith((".pyc", ".pyo")):
+                continue
             dag_path, artifact_path = re.split(f"/{artifact}", root)
             dag_path = f"{dag_path}/"
             dag_name = "/".join(
