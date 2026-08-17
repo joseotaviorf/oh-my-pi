@@ -6,19 +6,33 @@ dag:
   catchup: false
   documentation:
     dag_purpose: |
-      Materializes datalake_consorcio.lead_scoring_population: the labelled deal
-      population used to develop the Consórcio Behavioral Lead Scoring scorecard.
+      Materializes two tables for the Consórcio Behavioral Lead Scoring scorecard:
 
-      Grain is one deal (id_deal); one lead may have several deals. The table holds
-      identity, the target label, the handoff population filter, the temporal cutoff
-      used by every feature, and the exclusion flags. Conversation features are NOT
-      here — they live in a separate table built on top of this one.
+      - datalake_consorcio.lead_scoring_population: the labelled deal population.
+        Grain is one deal (id_deal); one lead may have several deals. The table
+        holds identity, the target label, the handoff cutoff, and exclusion flags.
 
-      Reads datalake_consorcio.deal (entity, current_stage, ts_lead_created),
-      datalake_consorcio.deal_milestone (ts_handoff), and
-      datalake_consorcio.deal_stage (other first-hit timestamps, already
-      America/Sao_Paulo). Does not convert clocks. Grain matches deal (tests
-      and duplicates already dropped).
+      - datalake_consorcio.lead_scoring_features: qualifier features joined 1:1 to
+        lead_scoring_population by (id_deal, spec_version). Maps Conrado
+        Qualificador answers from datalake_consorcio.deal onto canonical
+        labels or null, and counts how many of the five were captured (0 to 5).
+        Adds n_simulations_at_handoff and last_simulated_value from
+        datalake_consorcio_clean.simulation with ts_created < ts_handoff.
+        Adds n_lead_turns_blip, n_lead_turns_platconv, and n_lead_turns
+        (human speaker-runs before ts_handoff; combined prefers PlatConv
+        when present), plus n_lead_turns_post_simulation after the last
+        pre-handoff simulation, plus seconds_bot_turn_to_lead_reply from
+        bot-turn end to the next lead-turn start.
+        Adds is_user_initiated from datalake_consorcio.deal.contact_type
+        (true = lead opened WhatsApp, false = company template first, null
+        when unset); not from first chat speaker; sparse before 2026-08-10.
+        investment_type is mapped but almost empty in the current window.
+
+      Population reads datalake_consorcio.deal, deal_milestone (ts_handoff), and
+      deal_stage. Features read the population partition, deal, clean.lead,
+      clean.simulation, clean.blip_messages, and chat_messages. Converts
+      simulation and chat clocks from UTC to Sao Paulo to compare with
+      ts_handoff. Grain matches deal (tests and duplicates already dropped).
 
       Design decisions worth knowing before changing this DAG:
 
@@ -60,6 +74,9 @@ workflow:
   custom_schema: consorcio
   default_extraction_type: incremental
   default_partitions: [spec_version]
+  inner_dependencies:
+    lead_scoring_features:
+      - lead_scoring_population
   extra_query_template_params:
     spec_version: "{{ dag_run.conf.get('spec_version', 1) if dag_run else 1 }}"
     floor_date: "{{ dag_run.conf.get('floor_date', '2025-09-01') if dag_run else '2025-09-01' }}"

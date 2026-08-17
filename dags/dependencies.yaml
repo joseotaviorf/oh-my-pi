@@ -2911,6 +2911,9 @@ bietlejuice.enrich_lead:
   - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
 bietlejuice.enrich_lead_scoring:
   - bietlejuice.blip_messages:load-clean-blip-messages:first-run-of-day
+  - bietlejuice.consorcio:load-clean-lead:first-run-of-day
+  - bietlejuice.consorcio:load-clean-simulation:first-run-of-day
+  - bietlejuice.enrich_chat_messages:load-enrich-chat-messages:first-run-of-day
   - bietlejuice.enrich_consorcio_deal:load-enrich-deal-milestone:first-run-of-day
   - bietlejuice.enrich_consorcio_deal:load-enrich-deal-stage:first-run-of-day
   - bietlejuice.enrich_consorcio_deal:load-enrich-deal:first-run-of-day

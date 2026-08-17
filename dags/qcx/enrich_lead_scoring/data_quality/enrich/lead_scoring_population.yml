@@ -9,7 +9,18 @@ column_level_validations:
   id_deal:
     is_complete:
       severity_level: Error
-    is_unique:
+  one_row_per_deal_and_spec_version:
+    custom:
+      # Grain is (id_deal, spec_version); partitions coexist. is_unique on
+      # id_deal would fail as soon as a second spec is written.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT 1
+           FROM datalake_consorcio.lead_scoring_population
+           GROUP BY id_deal, spec_version
+           HAVING COUNT(*) > 1
+         )) = 0
       severity_level: Error
   outcome:
     is_complete:

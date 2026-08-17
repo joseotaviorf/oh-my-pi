@@ -1,0 +1,110 @@
+---
+table_name: datalake_consorcio.lead_scoring_features
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_deal:
+    is_complete:
+      severity_level: Error
+  spec_version:
+    is_complete:
+      severity_level: Error
+  one_row_per_deal_and_spec_version:
+    custom:
+      # Grain is (id_deal, spec_version); partitions coexist. is_unique on
+      # id_deal would fail as soon as a second spec is written.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT 1
+           FROM datalake_consorcio.lead_scoring_features
+           GROUP BY id_deal, spec_version
+           HAVING COUNT(*) > 1
+         )) = 0
+      severity_level: Error
+  # Null is a valid unanswered state; is_contained_in forbids nulls, so custom.
+  qualifier_goal_canonical_or_null:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_consorcio.lead_scoring_features
+         WHERE qualifier_goal IS NOT NULL
+           AND qualifier_goal NOT IN ('moradia', 'investimento', 'other')) = 0
+  qualifier_investment_type_canonical_or_null:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_consorcio.lead_scoring_features
+         WHERE qualifier_investment_type IS NOT NULL
+           AND qualifier_investment_type NOT IN (
+             'renda_ou_patrimonio', 'revenda', 'other'
+           )) = 0
+  qualifier_reason_canonical_or_null:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_consorcio.lead_scoring_features
+         WHERE qualifier_reason IS NOT NULL
+           AND qualifier_reason NOT IN (
+             'aluguel_ou_divida', 'casa_propria', 'investimento', 'other'
+           )) = 0
+  qualifier_knowledge_canonical_or_null:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_consorcio.lead_scoring_features
+         WHERE qualifier_knowledge IS NOT NULL
+           AND qualifier_knowledge NOT IN ('leigo', 'experiente', 'other')) = 0
+  qualifier_urgency_canonical_or_null:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_consorcio.lead_scoring_features
+         WHERE qualifier_urgency IS NOT NULL
+           AND qualifier_urgency NOT IN ('agora', 'futuro', 'other')) = 0
+  n_qualifiers_captured:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: [0, 1, 2, 3, 4, 5]
+      severity_level: Error
+  # Null is valid (no handoff or that chat source has no rows); min ignores nulls.
+  n_lead_turns_blip:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_lead_turns_platconv:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_lead_turns:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_lead_turns_post_simulation_blip:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_lead_turns_post_simulation_platconv:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_lead_turns_post_simulation:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  seconds_bot_turn_to_lead_reply_blip:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  seconds_bot_turn_to_lead_reply_platconv:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  seconds_bot_turn_to_lead_reply:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error

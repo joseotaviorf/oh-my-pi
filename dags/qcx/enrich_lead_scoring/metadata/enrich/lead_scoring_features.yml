@@ -1,0 +1,274 @@
+---
+database_name: datalake_consorcio
+table_name: lead_scoring_features
+owner: edgar.fernandes@quintoandar.com.br
+domain: QCX
+description: >
+  Qualifier features for Consórcio Behavioral Lead Scoring. Grain is one deal
+  (id_deal), scoped to the datalake_consorcio.lead_scoring_population partition
+  of the same spec_version. Maps all five Conrado Qualificador answers from
+  datalake_consorcio.deal onto canonical labels, or null when the question was
+  not answered. n_qualifiers_captured counts how many of those five are
+  non-null (0 to 5). Also counts simulations and takes the last credit_value
+  strictly before ts_handoff. Count is null when there is no handoff, 0 when
+  there is a handoff but no simulation row; last_simulated_value is null in both
+  of those cases. investment_type is almost always null in spec_version 1
+  (~80 filled rows) and will not pass the 20-sales rule in this window.
+  Answers, simulations, and chat turns used here are observed before
+  ts_handoff. n_lead_turns counts human speaker-runs (consecutive bubbles
+  from the same person collapse to one) on Blip and PlatConv; the combined
+  column prefers PlatConv when that log exists in the window, else Blip.
+  Null when there is no handoff or that source has no pre-handoff messages;
+  0 when the log exists but the lead never took the floor.
+  n_lead_turns_post_simulation is the same speaker-run count for lead turns
+  that still have a message after the last pre-handoff simulation; null when
+  there is no simulation. seconds_bot_turn_to_lead_reply is the median seconds
+  from the end of a bot turn to the start of the next lead turn. Null when
+  there is no bot-to-lead pair; combined follows PlatConv presence (does not
+  fall back to Blip when PlatConv exists but has no pair). is_user_initiated
+  is true when the lead opened WhatsApp, false when the company sent the C2W
+  / abandoned-cart template, null when HubSpot did not set the flag (typical
+  before 2026-08-10). Not inferred from first chat speaker. Partitioned by
+  spec_version; each run overwrites one partition in full.
+columns:
+  id_deal:
+    lineage:
+      - datalake_consorcio.lead_scoring_population.id_deal
+    description: >
+      HubSpot deal id and primary key of this table. Joins 1:1 to
+      datalake_consorcio.lead_scoring_population within the same spec_version.
+  qualifier_goal:
+    lineage:
+      - datalake_consorcio.deal.qualifier_goal
+    description: >
+      Canonical goal from the Conrado Qualificador: moradia, investimento, or
+      other. moradia includes morar, casa própria, and moradia* strings that
+      do not mention investimento. investimento includes investir and
+      investimento* strings that do not mention moradia. other is a real
+      third class for low-volume answers (quitar, construção, reforma, troca,
+      both). Null when empty or unanswered (não informado, aguardando,
+      simulação).
+  qualifier_investment_type:
+    lineage:
+      - datalake_consorcio.deal.qualifier_investment_type
+    description: >
+      Canonical investment type when the goal is investimento:
+      renda_ou_patrimonio (keep the asset working: rent, Airbnb, diversificação,
+      comercial), revenda (flip), or other. Mixed alugar+revenda is other. Null
+      when empty or unanswered. Almost never filled in spec_version 1
+      (~80 deals); keep the column so a later spec can use it.
+  qualifier_reason:
+    lineage:
+      - datalake_consorcio.deal.qualifier_reason
+    description: >
+      Canonical reason for seeking a consórcio: aluguel_ou_divida (stop paying
+      rent or a debt that does not build ownership: aluguel, locação, quitar,
+      financiamento, juros), casa_propria (have your own place, including
+      leaving family or living de favor), investimento (put idle money to
+      work: patrimônio, renda, comprar para alugar), or other (troca, leftover
+      prose, and bare casamento). Null when empty or unanswered. Do not use
+      substring loca (that matched localização) or unguarded casa (that
+      matched casamento).
+  qualifier_knowledge:
+    lineage:
+      - datalake_consorcio.deal.qualifier_knowledge
+    description: >
+      Canonical prior knowledge about consórcio: leigo, experiente, or other.
+      leigo includes leigo* (leigo mas já entendeu), leiga, intermediário,
+      conhecedor, básico, and conhece um pouco. Strings that mention both
+      leigo and experiente are null (ambiguous). experiente includes
+      experiente* when leigo is not also mentioned. Null when empty or
+      unanswered.
+  qualifier_urgency:
+    lineage:
+      - datalake_consorcio.deal.qualifier_urgency
+    description: >
+      Canonical urgency to close: agora, futuro, or other. agora includes
+      agora* without futuro, futuro próximo / breve, o quanto antes, and
+      pressa. futuro includes futuro* without agora (except próximo/breve,
+      which already mapped to agora). agora ou futuro stays other. Null when
+      empty or unanswered.
+  n_qualifiers_captured:
+    lineage:
+      - datalake_consorcio.deal.qualifier_goal
+      - datalake_consorcio.deal.qualifier_investment_type
+      - datalake_consorcio.deal.qualifier_reason
+      - datalake_consorcio.deal.qualifier_knowledge
+      - datalake_consorcio.deal.qualifier_urgency
+    description: >
+      Count of non-null normalized qualifier answers (0 to 5). other counts as
+      captured; unanswered maps (não informado, aguardando) do not. Proxy for
+      how far the lead went in the discretized qualification questions.
+  n_simulations_at_handoff:
+    lineage:
+      - datalake_consorcio_clean.simulation.id
+      - datalake_consorcio_clean.simulation.id_lead
+      - datalake_consorcio_clean.simulation.ts_created
+      - datalake_consorcio_clean.lead.id
+      - datalake_consorcio_clean.lead.uuid
+      - datalake_consorcio.lead_scoring_population.uuid_lead
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      Count of Consórcio simulations for the deal's lead with ts_created
+      (converted from UTC to America/Sao_Paulo) strictly before ts_handoff.
+      Null when ts_handoff is null (out of the modelling population), so the
+      feature is undefined. 0 when there was a handoff but no pre-handoff
+      simulation row is linked via simulation.id_lead = lead.id. That join is
+      the same as deal.total_simulations. BLIP_AGENT_CONRADO almost never
+      persists lead_id (~0.1%); PlatConv fills it (~99.9%). A 0 in the Blip
+      window therefore means "no linked row", not "the lead never simulated".
+      Does not copy HubSpot quota_amount or consorcio_agent_simulation_value.
+  last_simulated_value:
+    lineage:
+      - datalake_consorcio_clean.simulation.credit_value
+      - datalake_consorcio_clean.simulation.ts_created
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      credit_value of the last simulation strictly before ts_handoff, in the
+      same Sao Paulo clock as the cutoff. Null when there is no pre-handoff
+      simulation. Not the HubSpot deal amount or negotiation_value.
+  n_lead_turns_blip:
+    lineage:
+      - datalake_consorcio_clean.blip_messages.role
+      - datalake_consorcio_clean.blip_messages.ts_created
+      - datalake_consorcio_clean.blip_messages.id_crm
+      - datalake_consorcio_clean.blip_messages.id_message
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+      - datalake_consorcio.lead_scoring_population.id_deal
+    description: >
+      Count of lead speaker-runs on Blip before ts_handoff. A turn is a
+      contiguous run of human (or user) messages until the bot speaks;
+      consecutive bubbles from the same speaker count as one. Attendant
+      messages are dropped. Null when ts_handoff is null or Blip has no
+      pre-handoff human/ai row. 0 when Blip logged the window but the lead
+      never took the floor. Not a raw message count.
+  n_lead_turns_platconv:
+    lineage:
+      - datalake_consorcio.chat_messages.role
+      - datalake_consorcio.chat_messages.ts_created
+      - datalake_consorcio.chat_messages.id_crm
+      - datalake_consorcio.chat_messages.id_message
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+      - datalake_consorcio.lead_scoring_population.id_deal
+    description: >
+      Count of lead speaker-runs on PlatConv (Copilot chat_messages) before
+      ts_handoff, same turn definition as n_lead_turns_blip. Copilot user maps
+      to the lead; hardcoded and attendant are dropped. Null when ts_handoff
+      is null or PlatConv has no pre-handoff human/ai row. 0 when Copilot
+      logged the window but the lead never took the floor. Prefer this over
+      Blip when present.
+  n_lead_turns:
+    lineage:
+      - datalake_consorcio.chat_messages.role
+      - datalake_consorcio.chat_messages.ts_created
+      - datalake_consorcio.chat_messages.id_crm
+      - datalake_consorcio_clean.blip_messages.role
+      - datalake_consorcio_clean.blip_messages.ts_created
+      - datalake_consorcio_clean.blip_messages.id_crm
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      Combined lead speaker-run count before ts_handoff. Uses PlatConv when
+      that log has any pre-handoff human/ai row (including 0 lead turns),
+      otherwise Blip. Null when there is no handoff or neither source logged
+      the window. Does not union the two logs, which would double-count the
+      overlap.
+  n_lead_turns_post_simulation_blip:
+    lineage:
+      - datalake_consorcio_clean.blip_messages.role
+      - datalake_consorcio_clean.blip_messages.ts_created
+      - datalake_consorcio_clean.blip_messages.id_crm
+      - datalake_consorcio_clean.simulation.ts_created
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      Count of Blip lead speaker-runs that still have a message after the last
+      simulation strictly before ts_handoff. Same turn definition as
+      n_lead_turns_blip. A run that starts before the simulation and continues
+      after it counts as one. Null when there is no pre-handoff simulation or
+      Blip has no pre-handoff rows. 0 when there was a simulation and Blip
+      logged the window but the lead did not take the floor after it.
+  n_lead_turns_post_simulation_platconv:
+    lineage:
+      - datalake_consorcio.chat_messages.role
+      - datalake_consorcio.chat_messages.ts_created
+      - datalake_consorcio.chat_messages.id_crm
+      - datalake_consorcio_clean.simulation.ts_created
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      Count of PlatConv lead speaker-runs after the last pre-handoff
+      simulation, same rule as n_lead_turns_post_simulation_blip. Prefer this
+      over Blip when PlatConv logged the window.
+  n_lead_turns_post_simulation:
+    lineage:
+      - datalake_consorcio.chat_messages.role
+      - datalake_consorcio.chat_messages.ts_created
+      - datalake_consorcio.chat_messages.id_crm
+      - datalake_consorcio_clean.blip_messages.role
+      - datalake_consorcio_clean.blip_messages.ts_created
+      - datalake_consorcio_clean.blip_messages.id_crm
+      - datalake_consorcio_clean.simulation.ts_created
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      Combined post-simulation lead speaker-run count. Uses PlatConv when that
+      log exists (including 0), otherwise Blip. Null when there is no
+      pre-handoff simulation or neither source logged the window.
+  seconds_bot_turn_to_lead_reply_blip:
+    lineage:
+      - datalake_consorcio_clean.blip_messages.role
+      - datalake_consorcio_clean.blip_messages.ts_created
+      - datalake_consorcio_clean.blip_messages.id_crm
+      - datalake_consorcio_clean.blip_messages.id_message
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      Median seconds the lead took to reply after a bot turn on Blip, before
+      ts_handoff. Each pair is the start of a human speaker-run minus the end
+      of the previous ai speaker-run (clamped at 0). The first human turn is
+      skipped when there is no prior bot turn. Null when ts_handoff is null,
+      Blip has no rows, or there is no bot-to-lead pair. 0 means an instant
+      reply, not a missing conversation.
+  seconds_bot_turn_to_lead_reply_platconv:
+    lineage:
+      - datalake_consorcio.chat_messages.role
+      - datalake_consorcio.chat_messages.ts_created
+      - datalake_consorcio.chat_messages.id_crm
+      - datalake_consorcio.chat_messages.id_message
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      Median seconds from bot-turn end to lead-turn start on PlatConv
+      (SLA name seconds_{from}_to_{to}), same pairing as
+      seconds_bot_turn_to_lead_reply_blip. Null when ts_handoff is null,
+      PlatConv has no rows, or Copilot logged no bot-to-lead pair.
+  seconds_bot_turn_to_lead_reply:
+    lineage:
+      - datalake_consorcio.chat_messages.role
+      - datalake_consorcio.chat_messages.ts_created
+      - datalake_consorcio.chat_messages.id_crm
+      - datalake_consorcio_clean.blip_messages.role
+      - datalake_consorcio_clean.blip_messages.ts_created
+      - datalake_consorcio_clean.blip_messages.id_crm
+      - datalake_consorcio.lead_scoring_population.ts_handoff
+    description: >
+      Combined median lead-reply latency in seconds before ts_handoff. Uses
+      the PlatConv median whenever PlatConv logged the window (even if that
+      median is null because there was no bot-to-lead pair); otherwise Blip.
+      Does not COALESCE the two medians: 0 is a real instant reply, and a
+      missing PlatConv pair must not be filled from Blip.
+  is_user_initiated:
+    lineage:
+      - datalake_consorcio.deal.contact_type
+    description: >
+      True when the lead opened WhatsApp (user_initiated C2W), false when the
+      company sent the abandoned-cart / C2W template first. Copied from
+      datalake_consorcio.deal.contact_type, not inferred from the first Blip
+      or PlatConv speaker. Null when HubSpot did not set the flag, which is
+      typical before 2026-08-10. Keep the column so a later spec can use it
+      once fill and events are enough; bivariate analysis may drop it in
+      spec_version 1.
+  ts_load:
+    description: Timestamp of the DAG run that materialized the row.
+  spec_version:
+    lineage:
+      - datalake_consorcio.lead_scoring_population.spec_version
+    description: >
+      Partition column, copied from the lead_scoring_population partition this
+      row was built against. Not independently versioned: this table always
+      tracks the population it was scoped from.
