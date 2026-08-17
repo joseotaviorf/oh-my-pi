@@ -23,27 +23,43 @@ sap_entity AS (
 ),
 sap_gateway AS (
     SELECT
-        f.id_finance_entity,
-        s.id_feature,
-        s.hash,
-        s.type,
-        s.status as sync_sap_job_status,
-        w.status as sap_send_status,
-        w.webhook_status as sap_processed_status,
-        w.errors AS webhook_error
-    FROM
-        datalake_sap_gateway_clean.feature f
-    LEFT JOIN
-        datalake_sap_gateway_clean.sync_sap_job s
-          ON f.id_feature = s.id_feature
-    LEFT JOIN
-        datalake_sap_gateway_clean.webhook_log w
-          ON s.idoc = w.idoc
-    WHERE
-        s.erp_solution IN ('S4')
-        AND s.type IN ('LCM')
-        AND s.status NOT IN ('ignore', 'ignored')
-        AND DATE(f.ts_created) >= DATE('2025-01-01')
+        id_finance_entity,
+        id_feature,
+        hash,
+        type,
+        sync_sap_job_status,
+        sap_send_status,
+        sap_processed_status,
+        webhook_error
+    FROM (
+        SELECT
+            f.id_finance_entity,
+            s.id_feature,
+            s.hash,
+            s.type,
+            s.status AS sync_sap_job_status,
+            w.status AS sap_send_status,
+            w.webhook_status AS sap_processed_status,
+            w.errors AS webhook_error,
+            ROW_NUMBER() OVER (
+                PARTITION BY s.id_feature
+                ORDER BY s.ts_created DESC
+            ) AS rn
+        FROM
+            datalake_sap_gateway_clean.feature f
+        LEFT JOIN
+            datalake_sap_gateway_clean.sync_sap_job s
+                ON f.id_feature = s.id_feature
+        LEFT JOIN
+            datalake_sap_gateway_clean.webhook_log w
+                ON s.idoc = w.idoc
+        WHERE
+            s.erp_solution IN ('S4')
+            AND s.type IN ('LCM')
+            AND s.status NOT IN ('ignore', 'ignored')
+            AND DATE(f.ts_created) >= DATE('2025-01-01')
+    )
+    WHERE rn = 1
 ),
 francesinha_base AS (
     SELECT
@@ -83,6 +99,31 @@ francesinha_base AS (
         AND ext.literal_code in ('9489')
 ),
 
+-- Same CNAB credit can appear with different bank_number; keep one row per payment (company_use + date + amount)
+francesinha_dedup AS (
+    SELECT
+        company_use,
+        bank_number,
+        bank_account,
+        dt_paid,
+        amount
+    FROM (
+        SELECT
+            company_use,
+            bank_number,
+            bank_account,
+            dt_paid,
+            amount,
+            ROW_NUMBER() OVER (
+                PARTITION BY company_use, dt_paid, amount
+                ORDER BY bank_number
+            ) AS dedup_rn
+        FROM
+            francesinha_base
+    )
+    WHERE dedup_rn = 1
+),
+
 francesinha AS (
     SELECT
         *,
@@ -92,7 +133,8 @@ francesinha AS (
             PARTITION BY company_use, YEAR(dt_paid), MONTH(dt_paid)
             ORDER BY dt_paid
         ) AS rn
-    FROM francesinha_base
+    FROM
+        francesinha_dedup
 ),
 
 seu_barriga_base AS (
@@ -249,6 +291,8 @@ vans_checkout_union AS (
                 CASE
                     WHEN UPPER(TRIM(b.your_number)) LIKE 'CK%' THEN NULLIF(TRIM(b.your_number), '')
                     WHEN TRIM(b.your_number) RLIKE '^[0-9]+C[0-9]+$' THEN NULLIF(TRIM(b.your_number), '')
+                    -- P67, P607, P66, B65, Q606, etc.; BL barcodes excluded (do not start with digits)
+                    WHEN TRIM(b.your_number) RLIKE '^[0-9]+[A-Z][0-9]+$' THEN NULLIF(TRIM(b.your_number), '')
                     ELSE NULL
                 END,
                 NULLIF(TRIM(b.our_number), ''),
@@ -340,6 +384,8 @@ vans_checkout_union AS (
                 CASE
                     WHEN UPPER(TRIM(b.your_number)) LIKE 'CK%' THEN NULLIF(TRIM(b.your_number), '')
                     WHEN TRIM(b.your_number) RLIKE '^[0-9]+C[0-9]+$' THEN NULLIF(TRIM(b.your_number), '')
+                    -- P67, P607, P66, B65, Q606, etc.; BL barcodes excluded (do not start with digits)
+                    WHEN TRIM(b.your_number) RLIKE '^[0-9]+[A-Z][0-9]+$' THEN NULLIF(TRIM(b.your_number), '')
                     ELSE NULL
                 END,
                 NULLIF(TRIM(b.our_number), ''),
@@ -486,6 +532,102 @@ vans_checkout AS (
     FROM vans_checkout_base
 ),
 
+-- Numeric bank/SAP/checkout keys (no CK prefix) for Retsuko CK-alias join
+primary_payment_keys AS (
+    SELECT
+        company_use,
+        pay_year,
+        pay_month
+    FROM (
+        SELECT company_use, pay_year, pay_month FROM francesinha
+        UNION
+        SELECT company_use, pay_year, pay_month FROM sap
+        UNION
+        SELECT company_use, pay_year, pay_month FROM vans_checkout
+    ) keys
+    WHERE
+        company_use IS NOT NULL
+),
+
+-- Retsuko often stores CK907744 while bank uses 907744; expose stripped join_key via UNION (no OR join)
+seu_barriga_for_join AS (
+    SELECT
+        company_use AS join_key,
+        company_use,
+        id_invoice,
+        amount,
+        dt_paid,
+        pay_year,
+        pay_month,
+        rn
+    FROM
+        seu_barriga
+
+    UNION ALL
+
+    SELECT
+        SUBSTRING(sb.company_use, 3) AS join_key,
+        sb.company_use,
+        sb.id_invoice,
+        sb.amount,
+        sb.dt_paid,
+        sb.pay_year,
+        sb.pay_month,
+        sb.rn
+    FROM
+        seu_barriga sb
+    INNER JOIN
+        primary_payment_keys pk
+            ON pk.company_use = SUBSTRING(sb.company_use, 3)
+            AND pk.pay_year = sb.pay_year
+            AND pk.pay_month = sb.pay_month
+    WHERE
+        UPPER(sb.company_use) LIKE 'CK%'
+        AND SUBSTRING(sb.company_use, 3) RLIKE '^[0-9]+$'
+        AND NOT EXISTS (
+            SELECT
+                1
+            FROM
+                primary_payment_keys pk_ck
+            WHERE
+                pk_ck.company_use = sb.company_use
+                AND pk_ck.pay_year = sb.pay_year
+                AND pk_ck.pay_month = sb.pay_month
+        )
+),
+
+seu_barriga_matched AS (
+    SELECT
+        join_key,
+        company_use,
+        id_invoice,
+        amount,
+        dt_paid,
+        pay_year,
+        pay_month,
+        rn
+    FROM (
+        SELECT
+            join_key,
+            company_use,
+            id_invoice,
+            amount,
+            dt_paid,
+            pay_year,
+            pay_month,
+            rn,
+            ROW_NUMBER() OVER (
+                PARTITION BY join_key, pay_year, pay_month, rn
+                ORDER BY
+                    CASE WHEN join_key = company_use THEN 0 ELSE 1 END,
+                    dt_paid
+            ) AS dedup_rn
+        FROM
+            seu_barriga_for_join
+    )
+    WHERE dedup_rn = 1
+),
+
 -- Join keys: company_use and our_number (covers BL bank rows keyed by numeric our_number)
 vans_checkout_for_join AS (
     SELECT
@@ -576,11 +718,43 @@ known_company_use AS (
 ),
 
 df_all AS (
-    SELECT company_use, pay_year, pay_month, rn FROM seu_barriga
-    UNION DISTINCT
     SELECT company_use, pay_year, pay_month, rn FROM francesinha
     UNION DISTINCT
     SELECT company_use, pay_year, pay_month, rn FROM sap
+    UNION DISTINCT
+    -- Drop CK-only Retsuko keys when the numeric key already exists in bank/SAP/checkout (e.g. CK907744 vs 907744)
+    SELECT
+        sb.company_use,
+        sb.pay_year,
+        sb.pay_month,
+        sb.rn
+    FROM
+        seu_barriga sb
+    WHERE
+        NOT (
+            UPPER(sb.company_use) LIKE 'CK%'
+            AND SUBSTRING(sb.company_use, 3) RLIKE '^[0-9]+$'
+            AND EXISTS (
+                SELECT
+                    1
+                FROM
+                    primary_payment_keys pk
+                WHERE
+                    pk.company_use = SUBSTRING(sb.company_use, 3)
+                    AND pk.pay_year = sb.pay_year
+                    AND pk.pay_month = sb.pay_month
+            )
+            AND NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    primary_payment_keys pk_ck
+                WHERE
+                    pk_ck.company_use = sb.company_use
+                    AND pk_ck.pay_year = sb.pay_year
+                    AND pk_ck.pay_month = sb.pay_month
+            )
+        )
     UNION DISTINCT
     -- FIX: drop checkout-only orphan keys (e.g. our_number 483365 with no bank/retsuko match)
     SELECT vc.company_use, vc.pay_year, vc.pay_month, vc.rn
@@ -617,7 +791,7 @@ df AS (
             WHEN f.amount != sb.amount AND f.dt_paid != DATE(sb.dt_paid) AND f.dt_paid != DATE(sb.dt_paid) THEN 'recorded with a divergent date and value'
             WHEN f.amount != sb.amount AND (f.dt_paid = DATE(sb.dt_paid) OR f.dt_paid = DATE(sb.dt_paid)) THEN 'recorded with a divergent value'
             WHEN f.amount = sb.amount AND f.dt_paid != DATE(sb.dt_paid) AND f.dt_paid != DATE(sb.dt_paid) THEN 'recorded with a divergent date'
-            WHEN sb.company_use IS NULL THEN 'not recorded'
+            WHEN sb.join_key IS NULL THEN 'not recorded'
             ELSE 'not ok'
         END AS status_retsuko,
         CASE
@@ -647,8 +821,8 @@ df AS (
             AND vc.pay_month = cs.pay_month
             AND vc.rn = cs.rn
     LEFT JOIN
-        seu_barriga sb
-            ON sb.company_use = cs.company_use
+        seu_barriga_matched sb
+            ON sb.join_key = cs.company_use
             AND sb.pay_year = cs.pay_year
             AND sb.pay_month = cs.pay_month
             AND sb.rn = cs.rn
@@ -667,6 +841,55 @@ df AS (
             DATE(sb.dt_paid) >= current_date - 120 OR
             DATE(s.dt_paid) >= current_date - 120
     )
+),
+
+df_dedup AS (
+    SELECT
+        id_company_use,
+        id_invoice,
+        hash,
+        bank_number,
+        bank_account_number,
+        sap_account_number,
+        payment_method,
+        payment_status,
+        bank_amount,
+        retsuko_amount,
+        vans_checkout_amount,
+        sap_amount,
+        status_bank,
+        status_retsuko,
+        status_vans_checkout,
+        status_sap,
+        dt_bank_paid,
+        dt_retsuko_paid,
+        dt_vans_checkout_paid,
+        dt_sap_paid
+    FROM (
+        SELECT
+            df.*,
+            ROW_NUMBER() OVER (
+                PARTITION BY
+                    id_company_use,
+                    bank_amount,
+                    retsuko_amount,
+                    vans_checkout_amount,
+                    sap_amount,
+                    dt_bank_paid,
+                    dt_retsuko_paid,
+                    dt_vans_checkout_paid,
+                    dt_sap_paid,
+                    bank_number,
+                    id_invoice,
+                    hash
+                ORDER BY
+                    bank_account_number,
+                    sap_account_number
+            ) AS dedup_rn
+        FROM
+            df
+    )
+    WHERE dedup_rn = 1
 )
 
 SELECT
@@ -714,8 +937,8 @@ SELECT
     df.dt_sap_paid,
     coalesce(dt_bank_paid, dt_sap_paid,dt_retsuko_paid, dt_vans_checkout_paid) as dt_paid
 FROM
-    df
-LEFT JOIN 
+    df_dedup df
+LEFT JOIN
         sap_entity e
             ON df.id_invoice = e.id_finance_entity
 LEFT JOIN 
