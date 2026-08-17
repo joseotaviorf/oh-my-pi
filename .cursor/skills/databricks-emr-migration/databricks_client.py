@@ -27,12 +27,37 @@ def _normalize_cell(value: Any) -> Any:
     return str(value)
 
 
+def _format_command_failure(results: Dict[str, Any]) -> str:
+    """Build a readable message from Commands API error payloads."""
+    summary = results.get("summary")
+    cause = results.get("cause")
+    if summary and cause:
+        return f"{summary}\n{cause}"
+    if cause:
+        return str(cause)
+    if summary:
+        return str(summary)
+    return json.dumps(results, default=str)
+
+
 def parse_command_result(results: Optional[Dict[str, Any]]) -> ParsedResult:
-    """Parse Databricks Commands API ``results`` payload into columns and rows."""
+    """Parse Databricks Commands API ``results`` payload into columns and rows.
+
+    Raises ``RuntimeError`` when the command finished with an error payload
+    (``resultType=error`` or a ``cause`` field). The Commands API often returns
+    HTTP status Finished with the failure nested in ``results``; treating that
+    as an empty table hides permission / analysis failures as 0-row baselines.
+    """
     if not results:
         return ParsedResult(columns=[], rows=[], row_dicts=[])
 
-    result_type = results.get("resultType", "")
+    result_type = str(results.get("resultType", "") or "")
+    # Finished + nested error (e.g. INSUFFICIENT_PERMISSIONS on UC tables).
+    if result_type.lower() == "error" or results.get("cause"):
+        raise RuntimeError(
+            f"Databricks SQL error: {_format_command_failure(results)}"
+        )
+
     data = results.get("data")
 
     if result_type == "table":

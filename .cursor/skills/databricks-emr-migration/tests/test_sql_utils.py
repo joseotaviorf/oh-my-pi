@@ -20,7 +20,7 @@ class PinSqlTests(unittest.TestCase):
         )
         pinned = pin_sql(sql, "2026-06-04", "2026-06-05")
         self.assertIn("DATE '2026-06-05'", pinned)
-        self.assertIn("TIMESTAMP '2026-06-04 00:00:00'", pinned)
+        self.assertIn("TIMESTAMP '2026-06-05 23:59:59'", pinned)
         self.assertNotIn("current_date()", pinned.lower())
         self.assertNotIn("current_timestamp()", pinned.lower())
         self.assertNotIn("now()", pinned.lower())
@@ -30,9 +30,20 @@ class PinSqlTests(unittest.TestCase):
         pinned = pin_sql(sql, "2026-06-04", "2026-06-05")
         self.assertEqual(
             pinned,
-            "SELECT DATE '2026-06-05', TIMESTAMP '2026-06-04 00:00:00', "
-            "TIMESTAMP '2026-06-04 00:00:00'",
+            "SELECT DATE '2026-06-05', TIMESTAMP '2026-06-05 23:59:59', "
+            "TIMESTAMP '2026-06-05 23:59:59'",
         )
+
+    def test_pins_now_to_load_end_for_open_ended_ranges(self) -> None:
+        sql = (
+            "WHERE d BETWEEN DATE '{load_start_date}' AND DATE '{load_end_date}' "
+            "AND ts <= COALESCE(ts_ended, NOW())"
+        )
+        pinned = pin_sql(sql, "2026-08-12", "2026-08-13")
+        self.assertIn("DATE '2026-08-12'", pinned)
+        self.assertIn("DATE '2026-08-13'", pinned)
+        self.assertIn("TIMESTAMP '2026-08-13 23:59:59'", pinned)
+        self.assertNotIn("TIMESTAMP '2026-08-12 00:00:00'", pinned)
 
     def test_pins_bare_current_date(self) -> None:
         pinned = pin_sql("WHERE x = CURRENT_DATE", "2026-06-04", "2026-06-05")

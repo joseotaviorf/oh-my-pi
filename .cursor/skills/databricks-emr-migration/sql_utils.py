@@ -38,14 +38,20 @@ def pin_sql(
     load_start_date: str,
     load_end_date: str,
 ) -> str:
-    """Inject load dates and pin non-deterministic time functions."""
+    """Inject load dates and pin non-deterministic time functions.
+
+    ``NOW()`` / ``CURRENT_TIMESTAMP()`` pin to end-of-day on ``load_end_date`` so
+    open-ended ranges such as ``COALESCE(ts_ended, NOW())`` still cover the full
+    validation window. ``CURRENT_DATE`` also resolves to ``load_end_date``.
+    """
     validate_iso_date(load_start_date, "load_start_date")
     validate_iso_date(load_end_date, "load_end_date")
     pinned = sql.replace("{load_start_date}", load_start_date)
     pinned = pinned.replace("{load_end_date}", load_end_date)
     # Mirror production query.format(): {{ }} in file → single braces in executed SQL.
     pinned = pinned.replace("{{", "{").replace("}}", "}")
-    ts_literal = f"TIMESTAMP '{load_start_date} 00:00:00'"
+    # End of load_end day: covers SCD/ongoing joins that use NOW() as an open upper bound.
+    ts_literal = f"TIMESTAMP '{load_end_date} 23:59:59'"
     current_date_literal = f"DATE '{load_end_date}'"
     pinned = re.sub(
         r"\bCURRENT_TIMESTAMP\s*\(\s*\)",

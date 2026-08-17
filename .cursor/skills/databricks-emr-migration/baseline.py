@@ -154,9 +154,9 @@ class DatabricksBaseline:
             sample=[],
             order_by_cols=[],
             time_pinned_functions=[
-                "NOW() -> TIMESTAMP",
+                "NOW() -> TIMESTAMP (load_end_date 23:59:59)",
                 "CURRENT_DATE() -> DATE (load_end_date)",
-                "CURRENT_TIMESTAMP() -> TIMESTAMP",
+                "CURRENT_TIMESTAMP() -> TIMESTAMP (load_end_date 23:59:59)",
             ],
             non_comparable_cols=[],
             sql_hash=sql_hash(pinned_sql),

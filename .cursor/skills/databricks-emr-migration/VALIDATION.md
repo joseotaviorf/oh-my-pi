@@ -247,12 +247,13 @@ Sized above `emr_7_12_consolidation_m_general` (1 core + 1 task) for executor th
 For each SQL file:
 
 1. Load SQL from disk or `--git-ref` (use `master` for pre-rewrite baseline)
-2. Pin `{load_start_date}`, `{load_end_date}`, `NOW()`, `CURRENT_DATE()`
+2. Pin `{load_start_date}`, `{load_end_date}`, `NOW()` / `CURRENT_TIMESTAMP()` → end of `load_end_date` (`23:59:59`), `CURRENT_DATE()` → `load_end_date`
 3. Run on Databricks via Commands API 1.2:
    - `DESCRIBE ({sql})`
    - **Profile query** (default): `COUNT(*)` + per-column `COUNT_IF(null)` + fixed-width checksum in one scan
    - `SELECT COUNT(*) …` only when `--no-profile`
    - `SELECT * FROM ({sql}) ORDER BY {order_cols} LIMIT 100` — **only when `--with-sample`**
+   - Nested command failures (`resultType=error` / `cause`, e.g. UC `INSUFFICIENT_PERMISSIONS`) raise explicitly — they must **not** be treated as 0-row baselines
 4. Save JSON to `baseline/{domain}/{dag}/{table}.json`
 
 Baseline JSON includes `load_start_date`, `load_end_date`, `sql_hash`, `pinned_sql`, `schema`, `count`, `profile` (null counts + checksum per column), `sample` (empty when sample skipped), `order_by_cols`, `non_comparable_cols`.
