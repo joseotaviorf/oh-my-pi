@@ -1,6 +1,5 @@
-WITH agent_date AS (
+WITH agent_spine AS (
     SELECT
-        MD5(CONCAT(agent.id_agent, aux_date.date)) AS id_agent_daily,
         agent.id_agent,
         agent.id_agent_data,
         agent.id_partner,
@@ -17,18 +16,37 @@ WITH agent_date AS (
         agent.days_in_current_status,
         agent.ts_last_status_changed,
         agent.ts_created,
-        aux_date.date AS dt_ref,
-        YEAR(aux_date.date) AS year,
-        MONTH(aux_date.date) AS month,
-        DAY(aux_date.date) AS day
+        EXPLODE(SEQUENCE(DATE(agent.ts_created), CURRENT_DATE, INTERVAL 1 DAY)) AS dt_ref
     FROM
-        datalake_agent_accreditation.agent
-    JOIN
-        datalake_quintoandar.aux_date
-            ON aux_date.date >= DATE(agent.ts_created)
-            AND aux_date.date <= CURRENT_DATE
+        datalake_agent_accreditation.agent AS agent
+),
+agent_date AS (
+    SELECT
+        MD5(CONCAT(agent.id_agent, agent.dt_ref)) AS id_agent_daily,
+        agent.id_agent,
+        agent.id_agent_data,
+        agent.id_partner,
+        agent.id_user,
+        agent.uuid_company,
+        agent.uuid_agent,
+        agent.uuid_person,
+        agent.creci,
+        agent.creci_uf,
+        agent.affiliation_type,
+        agent.profile,
+        agent.is_1p_partnership,
+        agent.is_3p_partnership,
+        agent.days_in_current_status,
+        agent.ts_last_status_changed,
+        agent.ts_created,
+        agent.dt_ref,
+        YEAR(agent.dt_ref) AS year,
+        MONTH(agent.dt_ref) AS month,
+        DAY(agent.dt_ref) AS day
+    FROM
+        agent_spine AS agent
     WHERE
-        aux_date.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        agent.dt_ref BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 activation_history AS (
     SELECT
@@ -45,6 +63,24 @@ activation_history AS (
         datalake_agent_accreditation.agent_event_log
     WHERE
         event_type IN ('AGENT_CAPABILITY_DISABLED', 'AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED', 'AGENT_ACTIVATED', 'AGENT_INACTIVATED', 'AGENT_REACTIVATED')
+),
+segmentation_activation_history AS (
+    SELECT
+        ah.id_agent,
+        ah.id_capability,
+        ah.event_type,
+        ah.event_level,
+        ah.capability_type,
+        ah.ts_started,
+        EXPLODE(
+            SEQUENCE(
+                ah.dt_started,
+                COALESCE(ah.dt_ended, CURRENT_DATE),
+                INTERVAL 1 DAY
+            )
+        ) AS dt_reference
+    FROM
+        activation_history AS ah
 ),
 daily_status AS (
     SELECT
@@ -78,10 +114,9 @@ daily_status AS (
     FROM
         agent_date AS ad
     LEFT JOIN
-        activation_history AS ah
+        segmentation_activation_history AS ah
             ON ad.id_agent = ah.id_agent
-            AND ad.dt_ref >= ah.dt_started
-            AND ad.dt_ref < COALESCE(ah.dt_ended, CURRENT_DATE+1)
+            AND ad.dt_ref = ah.dt_reference
     GROUP BY 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
 ),
 visit_demand_history AS (
