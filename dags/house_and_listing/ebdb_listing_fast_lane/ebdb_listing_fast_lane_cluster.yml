@@ -1,2 +1,22 @@
 cluster:
-  type: emr_7_12_consolidation_m_memory_single_node_fleet_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
+  custom_configurations:
+    step_concurrency_level: 4
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+        - r6g.2xlarge
+        - r7g.2xlarge
+        - r6i.2xlarge
+    task_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+        - r6g.2xlarge
+        - r7g.2xlarge
+        - r6i.2xlarge
+    spark_conf:
+      spark.dynamicAllocation.minExecutors: "4"
+      spark.dynamicAllocation.initialExecutors: "4"
+      spark.dynamicAllocation.maxExecutors: "8"

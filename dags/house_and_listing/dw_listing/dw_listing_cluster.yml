@@ -1,18 +1,12 @@
 cluster:
   type: emr_7_12_consolidation_l_general_cluster
   custom_configurations:
-    # Serialize Spark steps so heavy facts (status / daily_infos) get the full
-    # fleet instead of sharing ~4 concurrent apps on 5 workers (FAIR). Same
-    # pattern as dw_sale_listings after EMR contention regressions.
     step_concurrency_level: 1
     task_nodes:
-      instance_count: 6
+      instance_count: 2
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: dynamic
-      # Override EMR base preset (broadcast disabled, shuffle.partitions=100),
-      # which hurts large joins without Photon.
-      # 2 core + 6 task m6g.4xlarge ≈ 2×(24g/4core) executors per node → 16 slots.
-      spark.dynamicAllocation.maxExecutors: "16"
+      spark.dynamicAllocation.maxExecutors: "8"
       spark.sql.shuffle.partitions: "400"
       spark.sql.autoBroadcastJoinThreshold: "104857600"
       spark.sql.adaptive.autoBroadcastJoinThreshold: "104857600"
