@@ -64,6 +64,7 @@ dags_out_of_pattern:
         "reverse_regions_polygon",
         "reverse_sale_unavailable_listings_load",
         "reverse_supply",
+        "reverse_s3",
         "reverse_tracksale",
         "reverse_tracksale_test",
         "reverse_tracksale_access",
