@@ -193,11 +193,12 @@ SELECT
     cwr.business_unit_name,
     /* Temporary workaround: PIN has country names in legislative_data_group, but we have
     not modeled that lookup yet. Map legislation_code to English country names in a CASE.
-    The first two branches override business units whose legal employer is registered
-    under a legislation other than the country where the employees actually work. */
+    Named branches override BUs whose PIN legislation (or missing assignment fallback)
+    does not match the country where the unit operates. */
     CASE
         WHEN cwr.business_unit_name = 'Deel - QuintoAndar' THEN 'United States'
         WHEN cwr.business_unit_name = 'Benvi MX' THEN 'Mexico'
+        WHEN cwr.business_unit_name = 'QuintoAndar SC' THEN 'Brazil'
         WHEN COALESCE(cwr.legislation_code, bl.legislation_code) = 'PE' THEN 'Peru'
         WHEN COALESCE(cwr.legislation_code, bl.legislation_code) = 'EC' THEN 'Ecuador'
         WHEN COALESCE(cwr.legislation_code, bl.legislation_code) = 'PA' THEN 'Panama'
@@ -209,7 +210,10 @@ SELECT
         WHEN COALESCE(cwr.legislation_code, bl.legislation_code) = 'US' THEN 'United States'
         ELSE NULL
     END AS country,
-    COALESCE(cwr.legislation_code, bl.legislation_code) AS legislation_code,
+    CASE
+        WHEN cwr.business_unit_name = 'QuintoAndar SC' THEN 'BR'
+        ELSE COALESCE(cwr.legislation_code, bl.legislation_code)
+    END AS legislation_code,
     cwr.organization_type,
     cwr.created_by,
     cwr.updated_by,

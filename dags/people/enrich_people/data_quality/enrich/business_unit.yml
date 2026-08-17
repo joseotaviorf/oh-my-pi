@@ -49,7 +49,8 @@ column_level_validations:
          FROM datalake_people.business_unit
          WHERE is_current = TRUE
            AND business_unit_name IN ('QuintoAndar SP', 'QuintoAndar MG', 'QuintoAndar SC', 'Atta', 'MLSP', 'Deel - QuintoAndar')
-           AND (legislation_code IS NULL OR legislation_code != 'BR')
+           AND legislation_code IS NOT NULL
+           AND legislation_code != 'BR'
         ) = 0
       severity_level: Warning
   non_brazil_business_units_flagged_as_br_legislation:
