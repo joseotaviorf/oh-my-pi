@@ -1,6 +1,10 @@
 ###############################################################################
 ######################### CI Docker images ####################################
 ###############################################################################
+# Set shell to bash for better compatibility with shell functions and RC file sourcing.
+# The default /bin/sh can't properly source zsh-specific RC files (e.g. Oh My Zsh).
+SHELL := /bin/bash
+
 # PLATFORM: set to build for a specific arch (e.g. PLATFORM=linux/arm64).
 # Omit for native-arch builds (the default).
 PLATFORM ?=
