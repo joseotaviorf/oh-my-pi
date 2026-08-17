@@ -23,6 +23,10 @@ dag:
       First export (v1): base_app_org_health — org roster feeding the Base44 / S.A.R.A
       app and the Org Health Data Studio dashboard.
 
+      Second export: base_app_org_access — row-level access matrix for the same app
+      (`orghealth/base_app_org_health_access.csv`). Depends on
+      `datalake_gsheets_people_clean.org_health_user_roles`.
+
       IAM prerequisite per new destination bucket: this DAG runs on EMR under the People
       EMR instance profile (emr_instance_profile_arn_people / emr-people-prod role). Any
       new external bucket added to tables_customization must first grant that role
@@ -70,5 +74,12 @@ workflow:
       extra_spark_job_arguments:
         - "5a-base44-office"
         - "orghealth/base_app_org_health.csv"
+        - "csv"
+        - "bucket-owner-full-control"
+    # Org Health row-level access matrix — Base44 / S.A.R.A app
+    base_app_org_access:
+      extra_spark_job_arguments:
+        - "5a-base44-office"
+        - "orghealth/base_app_org_health_access.csv"
         - "csv"
         - "bucket-owner-full-control"

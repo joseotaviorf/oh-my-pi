@@ -4637,6 +4637,7 @@ bietlejuice.reverse_s3:
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
+  - bietlejuice.gsheets_people:done-clean-org-health-user-roles:first-run-of-day
   - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
 bietlejuice.reverse_sale_listings_report:
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
