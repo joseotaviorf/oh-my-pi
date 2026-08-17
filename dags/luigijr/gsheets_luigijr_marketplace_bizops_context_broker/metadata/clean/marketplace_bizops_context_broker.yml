@@ -1,0 +1,78 @@
+---
+database_name: datalake_gsheets_clean
+table_name: marketplace_bizops_context_broker
+domain: Broker XP
+owner: caio.saud@quintoandar.com.br
+description: |
+  BizOps reference table for Marketplace (3P) partner real-estate agencies (brokers) in For Sale.
+  One row per partner agency at sk_broker grain. Consolidates operational attributes maintained
+  by BizOps in a Google Sheet (Mão Dupla cohort, CRM platform, Demand Only, Listing Representative,
+  tier, and Decola Express) for analytics, segmentation, and partner operations reporting.
+columns:
+  sk_broker:
+    description: |
+      Surrogate key identifying the partner agency. Primary key of this table; must remain stable
+      and must not be reused for a different broker. Join to dw_brokers.dim_broker.sk_broker.
+  nome_imobiliaria:
+    description: |
+      Display name of the partner agency as maintained in the BizOps spreadsheet. Useful for human
+      review only; prefer sk_broker when joining to other broker dimensions because names can repeat
+      or change over time.
+  cohort_mao_dupla:
+    description: |
+      Mão Dupla program cohort indicating the period when the agency started receiving QuintoAndar
+      listings into its CRM. Agencies not enrolled receive No MD.
+    categories:
+      "No MD": Agency is not enrolled in the Mão Dupla program.
+      "Cohort 1": First Mão Dupla enrollment cohort.
+      "Cohort 2": Second Mão Dupla enrollment cohort.
+  status_mao_dupla:
+    description: |
+      Operational status of the broker within the Mão Dupla program (for example Active, Inactive,
+      or Paused), as curated by BizOps in the source spreadsheet.
+    categories:
+      Active: Broker is currently active in the Mão Dupla program.
+      Inactive: Broker is not currently active in the Mão Dupla program.
+      Paused: Broker participation in Mão Dupla is temporarily paused.
+  decola_express:
+    description: |
+      Flag indicating whether the partner agency participates in the Decola Express program,
+      maintained by BizOps in the source spreadsheet.
+    categories:
+      "Yes": Broker participates in Decola Express.
+      "No": Broker does not participate in Decola Express.
+  demand_only:
+    description: |
+      Flags brokers that operate exclusively under the 3PD (Marketplace) model with no 1P listings.
+      Demand First brokers are intentionally out of scope and are flagged Não here.
+    categories:
+      "Sim": All active listings are managed under the 3PD (Marketplace) operating model.
+      "Não": Broker has listings outside the Demand Only scope or is not Demand Only.
+  listing_representative:
+    description: |
+      Indicates whether the partner agency acts as a Listing Representative (LR), connecting property
+      owners with a trusted partner agency for pricing support, descriptions, and centralized
+      communication throughout the listing journey.
+    categories:
+      "Sim": Partner agency is flagged as a Listing Representative.
+      "Não": Partner agency is not a Listing Representative.
+  tier_broker:
+    description: |
+      Broker performance tier for the current quarter, used to determine the commission table
+      applied to the partner agency based on gross sales volume (VGV).
+    categories:
+      Bronze: Lowest performance tier in the quarterly broker tiering model.
+      Prata: Mid-tier performance level in the quarterly broker tiering model.
+      Ouro: High performance tier in the quarterly broker tiering model.
+      Diamante: Top performance tier in the quarterly broker tiering model.
+  crm_sistem:
+    description: |
+      CRM platform used by the partner agency. Univen 1.0 refers to the legacy Univen platform;
+      Univen 2.0 refers to brokers migrated to the Tokko-based stack. Not Univen marks brokers
+      outside the Univen/Tokko stack. Column name follows the spreadsheet header (crm_sistem).
+    categories:
+      "Univen 1.0": Broker operates on the legacy Univen 1.0 CRM platform.
+      "Univen 2.0": Broker operates on Univen 2.0 built on the Tokko platform.
+      "Not Univen": Broker does not use the Univen/Tokko CRM stack.
+  ts_load:
+    description: Timestamp in UTC when the Google Sheets ingestion job last refreshed this table.

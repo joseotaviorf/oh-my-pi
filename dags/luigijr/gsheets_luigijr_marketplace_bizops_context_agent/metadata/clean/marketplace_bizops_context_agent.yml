@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: marketplace_bizops_context_agent
+domain: Broker XP
+owner: caio.saud@quintoandar.com.br
+description: |
+  BizOps reference table for individual Marketplace (3P) agents (corretores) active in For Sale.
+  One row per agent at sk_agent grain. Consolidates agent-level operational attributes maintained
+  by BizOps in a Google Sheet, currently covering Matias communication-channel status for partner
+  agents linked to their parent agency.
+columns:
+  sk_agent:
+    description: |
+      Surrogate key identifying the individual partner agent. Primary key of this table; must remain
+      stable and must not be reused for a different agent. Join to agent dimensions via sk_agent.
+  imob:
+    description: |
+      Partner agency name associated with the agent as maintained in the BizOps spreadsheet.
+      Provided for human review and manual reconciliation only; prefer sk_broker from the broker
+      reference table when a stable join key is available.
+  matias_status:
+    description: |
+      Indicates whether the agent's communication with QuintoAndar is handled exclusively through
+      Matias (AI channel) or also includes the human secretaria channel. In the source sheet this
+      is stored as Yes/No, where Yes means Matias-only (no secretaria access) and No means the
+      agent also has secretaria access.
+    categories:
+      "Yes": Agent receives communication only via Matias and has no secretaria channel access.
+      "No": Agent has access to both the Matias (AI) channel and the human secretaria channel.
+  ts_load:
+    description: Timestamp in UTC when the Google Sheets ingestion job last refreshed this table.
