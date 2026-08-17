@@ -39,8 +39,9 @@ columns:
       surfaced to consumers so a value is always read as "as of" a point in time.
   collection_method:
     description: >-
-      Provenance of the measurement (spark_log for Delta log reads, spark_partition_agg for a
-      single-partition aggregation, or pydeequ for the content tier).
+      Provenance of the measurement (spark_log for Delta log/stats reads,
+      spark_count_fallback when file stats are incomplete and COUNT(*) is used, or
+      pydeequ for the content tier).
   metric_schema_version:
     description: >-
       Schema version of this observability metric row, allowing forward-compatible evolution

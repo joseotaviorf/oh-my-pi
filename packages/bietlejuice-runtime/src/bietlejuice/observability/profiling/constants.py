@@ -16,3 +16,4 @@ class CollectionMethod(Enum):
     """Provenance of a measurement, persisted on every metric row."""
 
     SPARK_LOG = "spark_log"
+    SPARK_COUNT_FALLBACK = "spark_count_fallback"

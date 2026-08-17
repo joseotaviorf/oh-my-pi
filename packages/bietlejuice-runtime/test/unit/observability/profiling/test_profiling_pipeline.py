@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 
 from bietlejuice.observability.profiling import profiling_pipeline as pipeline_module
+from bietlejuice.observability.profiling.constants import CollectionMethod
 from bietlejuice.observability.profiling.profiling_pipeline import ProfilingPipeline
 
 
@@ -36,8 +37,11 @@ def reader():
         "tableFeatures": [],
     }
     reader.schema_fields.return_value = [{"name": "id", "type": "bigint"}]
-    reader.count.return_value = 100
-    reader.partition_specs.return_value = ["year=2026/month=07/day=23"]
+    reader.row_count_from_log.return_value = (100, True)
+    reader.partition_row_count_from_log.return_value = (100, True)
+    reader.latest_partition_with_data_from_log.return_value = (
+        "year=2026/month=07/day=22"
+    )
     return reader
 
 
@@ -136,15 +140,26 @@ class TestCaptureHappyPath:
         assert record["layer"] == "dw"
         assert record["environment"] == "forno"
         assert record["run_logical_date"] == "2026-07-23"
-        assert record["collection_method"] == "spark_log"
+        assert record["collection_method"] == CollectionMethod.SPARK_LOG.value
         assert record["metric_schema_version"] == 1
         assert isinstance(record["profiled_at"], datetime)
         assert record["row_count"] == 100
+        assert record["latest_partition_value"] == "year=2026/month=07/day=22"
+        assert record["profiled_delta_version"] == 7
+        assert partition_rows[0]["partition_key"] == [
+            {"name": "year", "value": "2026"},
+            {"name": "month", "value": "07"},
+            {"name": "day", "value": "23"},
+        ]
+        assert partition_rows[0]["profiled_delta_version"] == 7
         # partition parts stamped from the logical date
         assert (record["year"], record["month"], record["day"]) == (2026, 7, 23)
 
-    def test_profiled_delta_version_stamped_on_every_grain(self, reader):
-        # Arrange
+    def test_collection_method_override_on_count_fallback(self, reader):
+        reader.row_count_from_log.return_value = (None, False)
+        reader.partition_row_count_from_log.return_value = (None, False)
+        reader.count.side_effect = [50, 7]
+
         pipeline = _pipeline(_config_service())
         with (
             mock.patch.object(
@@ -154,18 +169,19 @@ class TestCaptureHappyPath:
                 pipeline_module, "ObservabilityStoreWriter"
             ) as writer_cls,
         ):
-            # Act
             pipeline.run()
 
-        # Assert — version 7 stamped on every grain
-        writer = writer_cls.return_value
+        table_row = writer_cls.return_value.append_table_metrics.call_args[0][0][0]
+        partition_row = writer_cls.return_value.append_partition_metrics.call_args[0][
+            0
+        ][0]
         assert (
-            writer.append_table_metrics.call_args[0][0][0]["profiled_delta_version"]
-            == 7
+            table_row["collection_method"]
+            == CollectionMethod.SPARK_COUNT_FALLBACK.value
         )
         assert (
-            writer.append_partition_metrics.call_args[0][0][0]["profiled_delta_version"]
-            == 7
+            partition_row["collection_method"]
+            == CollectionMethod.SPARK_COUNT_FALLBACK.value
         )
 
 
@@ -197,9 +213,14 @@ class TestPartitionsFallback:
         # Assert — partition metrics collected via DAG-declared columns
         writer = writer_cls.return_value
         assert len(writer.append_partition_metrics.call_args[0][0]) == 1
-        reader.partition_specs.assert_called_with(
-            "dw_rent.fact_contracts", ["year", "month", "day"]
-        )
+        reader.partition_row_count_from_log.assert_called_once()
+        call_args = reader.partition_row_count_from_log.call_args
+        assert call_args.args[0] == "dw_rent.fact_contracts"
+        assert call_args.args[1] == [
+            {"name": "year", "value": "2026"},
+            {"name": "month", "value": "07"},
+            {"name": "day", "value": "23"},
+        ]
 
 
 class TestFailOpen:
@@ -232,7 +253,10 @@ class TestFailOpen:
         # Arrange — every metadata read raises
         reader.last_commit.side_effect = RuntimeError("no log")
         reader.detail.side_effect = RuntimeError("no detail")
-        reader.partition_specs.side_effect = RuntimeError("no partitions")
+        reader.row_count_from_log.side_effect = RuntimeError("no log count")
+        reader.partition_row_count_from_log.side_effect = RuntimeError(
+            "no partition log count"
+        )
         pipeline = _pipeline(_config_service())
         with (
             mock.patch.object(

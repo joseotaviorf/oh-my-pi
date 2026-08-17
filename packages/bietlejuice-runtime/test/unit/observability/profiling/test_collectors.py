@@ -5,23 +5,16 @@ from bietlejuice.observability.profiling.collectors import (
     collect_table_metrics,
     compute_schema_hash,
 )
+from bietlejuice.observability.profiling.constants import CollectionMethod
 
 
 class TestComputeSchemaHash:
-    def test_is_deterministic(self):
-        # Arrange
+    def test_stable_fingerprint_changes_on_drift(self):
         fields = [{"name": "id", "type": "bigint"}, {"name": "ts", "type": "timestamp"}]
-
-        # Act / Assert
         assert compute_schema_hash(fields) == compute_schema_hash(list(fields))
-
-    def test_changes_on_drift(self):
-        # Arrange
-        before = [{"name": "id", "type": "bigint"}]
-        after = [{"name": "id", "type": "string"}]
-
-        # Act / Assert
-        assert compute_schema_hash(before) != compute_schema_hash(after)
+        assert compute_schema_hash([{"name": "id", "type": "bigint"}]) != (
+            compute_schema_hash([{"name": "id", "type": "string"}])
+        )
 
 
 class TestCollectTableMetrics:
@@ -41,122 +34,134 @@ class TestCollectTableMetrics:
             {"name": "id", "type": "bigint"},
             {"name": "amount", "type": "double"},
         ]
-        reader.count.return_value = 1000
-        reader.partition_specs.return_value = [
-            "year=2026/month=07/day=22",
-            "year=2026/month=07/day=23",
-        ]
+        reader.row_count_from_log.return_value = (1000, True)
+        reader.latest_partition_with_data_from_log.return_value = (
+            "year=2026/month=07/day=22"
+        )
         return reader
 
-    def test_maps_detail_and_derived_fields(self):
-        # Arrange
+    def test_maps_detail_and_log_row_count(self):
         reader = self._reader()
 
-        # Act
         metrics = collect_table_metrics(reader, "dw_rent", "fact_contracts")
 
-        # Assert
         assert metrics["row_count"] == 1000
+        assert metrics["collection_method"] == CollectionMethod.SPARK_LOG.value
         assert metrics["num_files"] == 12
         assert metrics["size_bytes"] == 2048
         assert metrics["num_columns"] == 2
         assert metrics["partition_columns"] == ["year", "month", "day"]
-        assert metrics["latest_partition_value"] == "year=2026/month=07/day=23"
+        # Latest with data — not the run-day partition (SLA lives at partition grain).
+        assert metrics["latest_partition_value"] == "year=2026/month=07/day=22"
         assert metrics["table_features"] == ["deletionVectors"]
-        assert len(metrics["schema_hash"]) == 64  # sha256 hex digest
-        reader.count.assert_called_once_with("dw_rent.fact_contracts")
-        reader.partition_specs.assert_called_once_with(
+        assert len(metrics["schema_hash"]) == 64
+        reader.row_count_from_log.assert_called_once_with("dw_rent.fact_contracts")
+        reader.latest_partition_with_data_from_log.assert_called_once_with(
             "dw_rent.fact_contracts", ["year", "month", "day"]
         )
+        reader.count.assert_not_called()
 
-    def test_keeps_table_metrics_when_partition_listing_fails(self):
-        # Arrange — EMR Delta often rejects SHOW PARTITIONS; reader may raise
+    def test_falls_back_to_count_when_log_stats_incomplete(self):
         reader = self._reader()
-        reader.partition_specs.side_effect = RuntimeError(
-            "INVALID_PARTITION_OPERATION.PARTITION_MANAGEMENT_IS_UNSUPPORTED"
-        )
+        reader.row_count_from_log.return_value = (None, False)
+        reader.count.return_value = 500
 
-        # Act
         metrics = collect_table_metrics(reader, "dw_rent", "fact_contracts")
 
-        # Assert — structural metrics survive; latest partition soft-skipped
-        assert metrics["row_count"] == 1000
-        assert metrics["schema_hash"]
-        assert metrics["latest_partition_value"] is None
+        assert metrics["row_count"] == 500
+        assert (
+            metrics["collection_method"] == CollectionMethod.SPARK_COUNT_FALLBACK.value
+        )
+        reader.count.assert_called_once_with("dw_rent.fact_contracts")
 
 
 class TestCollectPartitionMetrics:
     def test_returns_empty_when_unpartitioned(self):
-        # Arrange
         reader = mock.MagicMock()
-
-        # Act
-        result = collect_partition_metrics(reader, "dw_rent", "dim_user", [], None)
-
-        # Assert
-        assert result == []
-
-    def test_profiles_latest_partition_with_rows_written(self):
-        # Arrange
-        reader = mock.MagicMock()
-        reader.partition_specs.return_value = [
-            "year=2026/month=07/day=22",
-            "year=2026/month=07/day=23",
-        ]
-        reader.count.return_value = 42
-        last_commit = {"operationMetrics": {"numOutputRows": "42"}}
-
-        # Act
-        result = collect_partition_metrics(
-            reader, "dw_rent", "fact_contracts", ["year", "month", "day"], last_commit
+        assert (
+            collect_partition_metrics(
+                reader, "dw_rent", "dim_user", [], None, "2026-07-23"
+            )
+            == []
         )
 
-        # Assert
+    def test_profiles_run_day_inventory_independent_of_rows_written(self):
+        """SLA uses inventory (row_count); rows_written is commit context only."""
+        reader = mock.MagicMock()
+        reader.partition_row_count_from_log.return_value = (1000, True)
+        last_commit = {"operationMetrics": {"numOutputRows": "0"}}
+
+        result = collect_partition_metrics(
+            reader,
+            "dw_rent",
+            "fact_contracts",
+            ["year", "month", "day"],
+            last_commit,
+            "2026-07-23",
+        )
+
         assert len(result) == 1
         record = result[0]
-        assert record["row_count"] == 42
-        assert record["rows_written"] == 42
+        assert record["row_count"] == 1000
+        assert record["rows_written"] == 0
+        assert record["collection_method"] == CollectionMethod.SPARK_LOG.value
         assert record["partition_key"] == [
             {"name": "year", "value": "2026"},
             {"name": "month", "value": "07"},
             {"name": "day", "value": "23"},
         ]
+        reader.count.assert_not_called()
+
+    def test_rows_written_none_when_commit_missing(self):
+        reader = mock.MagicMock()
+        reader.partition_row_count_from_log.return_value = (5, True)
+
+        result = collect_partition_metrics(
+            reader,
+            "dw_rent",
+            "fact_contracts",
+            ["year", "month", "day"],
+            None,
+            "2026-07-23",
+        )
+
+        assert result[0]["rows_written"] is None
+
+    def test_falls_back_to_count_when_log_stats_incomplete(self):
+        reader = mock.MagicMock()
+        reader.partition_row_count_from_log.return_value = (None, False)
+        reader.count.return_value = 17
+
+        result = collect_partition_metrics(
+            reader,
+            "dw_rent",
+            "fact_contracts",
+            ["year", "month", "day"],
+            None,
+            "2026-07-23",
+        )
+
+        assert result[0]["row_count"] == 17
+        assert (
+            result[0]["collection_method"]
+            == CollectionMethod.SPARK_COUNT_FALLBACK.value
+        )
         reader.count.assert_called_once_with(
             "dw_rent.fact_contracts",
             "`year` = '2026' AND `month` = '07' AND `day` = '23'",
         )
 
-    def test_rows_written_none_when_commit_missing(self):
-        # Arrange
+    def test_skips_non_standard_partition_columns(self):
         reader = mock.MagicMock()
-        reader.partition_specs.return_value = ["year=2026/month=07/day=23"]
-        reader.count.return_value = 5
-
-        # Act
-        result = collect_partition_metrics(
-            reader, "dw_rent", "fact_contracts", ["year", "month", "day"], None
+        assert (
+            collect_partition_metrics(
+                reader,
+                "dw_rent",
+                "fact_contracts",
+                ["dt"],
+                None,
+                "2026-07-23",
+            )
+            == []
         )
-
-        # Assert
-        assert result[0]["rows_written"] is None
-
-    def test_picks_latest_partition_chronologically_not_lexicographically(self):
-        # Arrange — month=9 must beat month=12 lexicographically but lose chronologically
-        reader = mock.MagicMock()
-        reader.partition_specs.return_value = [
-            "year=2026/month=9/day=15",
-            "year=2026/month=12/day=01",
-        ]
-        reader.count.return_value = 10
-
-        # Act
-        result = collect_partition_metrics(
-            reader, "dw_rent", "fact_contracts", ["year", "month", "day"], None
-        )
-
-        # Assert
-        assert result[0]["partition_key"] == [
-            {"name": "year", "value": "2026"},
-            {"name": "month", "value": "12"},
-            {"name": "day", "value": "01"},
-        ]
+        reader.partition_row_count_from_log.assert_not_called()

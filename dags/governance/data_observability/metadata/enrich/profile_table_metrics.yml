@@ -39,8 +39,9 @@ columns:
       surfaced to consumers so a value is always read as "as of" a point in time.
   collection_method:
     description: >-
-      Provenance of the measurement (spark_log for Delta log reads, spark_partition_agg for a
-      single-partition aggregation, or pydeequ for the content tier).
+      Provenance of the measurement (spark_log for Delta log/stats reads,
+      spark_count_fallback when file stats are incomplete and COUNT(*) is used, or
+      pydeequ for the content tier).
   metric_schema_version:
     description: >-
       Schema version of this observability metric row, allowing forward-compatible evolution
@@ -67,8 +68,11 @@ columns:
       details. Primary recency signal for "was the table written recently".
   latest_partition_value:
     description: >-
-      Highest partition value present in the profiled table, read for free from the partition
-      list as a cheap recency signal for partitioned tables.
+      Chronologically latest year/month/day partition that still has rows
+      (numRecords > 0 in the Delta transaction log), for example
+      year=2026/month=07/day=22. Null when the table is unpartitioned, uses a
+      non-standard partition scheme, or no partition with data can be confirmed.
+      Distinct from the run-day partition profiled at partition grain for SLA.
   num_columns:
     description: >-
       Number of columns in the profiled table schema at the profiled version.

@@ -4,8 +4,9 @@ Called by the post-load profiling Spark job. In one pass it:
 
 1. resolves the runtime gate (:class:`ProfilingConfig`: kill-switch + per-DAG
    opt-in) and no-ops when profiling is inactive;
-2. captures table- and latest-partition-grain metrics from Delta metadata,
-   fail-open *per collector* so one failure never sinks the others;
+2. captures table-grain metrics (incl. latest partition *with data*) and
+   run-day partition-grain metrics from Delta metadata, fail-open *per
+   collector* so one failure never sinks the others;
 3. stamps the run's ``year``/``month``/``day`` and appends the rows to
    ``datalake_observability`` (append-only).
 
@@ -58,7 +59,7 @@ class ProfilingPipeline:
         table: str,
         layer: str,
         partitions: list[str] | None = None,
-        column_checks: bool = False,
+        column_checks: bool = False,  # reserved for future column-level profiling
         dag_enabled: bool | None = None,
         spark: SparkSession = None,
         config_service: ConfigurationService = None,
@@ -69,6 +70,7 @@ class ProfilingPipeline:
         self.table = table
         self.layer = layer
         self.partitions = partitions or []
+        # Reserved for future column-level profiling; unused in fresh-tier capture.
         self.column_checks = column_checks
         self.dag_enabled = dag_enabled
         if spark is None:
@@ -123,7 +125,7 @@ class ProfilingPipeline:
     def _capture(
         self, reader: DeltaMetadataReader
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-        """Collect table- and latest-partition-grain records (fail-open per collector).
+        """Collect table- and run-day partition-grain records (fail-open per collector).
 
         Each record is stamped with the common header (incl. ``profiled_at`` and
         the profiled Delta version) so downstream reads are reproducible and
@@ -150,7 +152,12 @@ class ProfilingPipeline:
             lambda: [
                 {**header, **record}
                 for record in collect_partition_metrics(
-                    reader, self.database, self.table, partition_columns, last_commit
+                    reader,
+                    self.database,
+                    self.table,
+                    partition_columns,
+                    last_commit,
+                    self.run_logical_date,
                 )
             ],
             [],

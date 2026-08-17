@@ -1,9 +1,9 @@
 """Fresh-tier metric collectors (metadata/log-only, Delivery 0).
 
-Table grain: physical/schema/recency signals from DESCRIBE DETAIL + a
-stats-served COUNT(*). Partition grain (thin slice): the latest partition's
-row count and the rows written by the last commit. Per-partition file/size and
-``min_ts``/``max_ts`` recency are deliberately deferred to later deliveries.
+Table grain: physical/schema signals from DESCRIBE DETAIL, row counts from Delta
+log stats (fallback COUNT), and the chronologically latest partition that still
+has rows. Partition grain: the run-day partition's total row count and rows
+written by the last commit (SLA input — separate from table-grain recency).
 """
 
 from __future__ import annotations
@@ -13,8 +13,11 @@ from typing import Any
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.observability.profiling.constants import CollectionMethod
 from bietlejuice.observability.profiling.delta_metadata_reader import (
     DeltaMetadataReader,
+    partition_key_from_logical_date,
+    partition_key_to_predicate,
 )
 
 logger = QuintoAndarLogger("ProfilingCollectors")
@@ -27,22 +30,30 @@ def compute_schema_hash(schema_fields: list[dict[str, str]]) -> str:
 
 
 def collect_table_metrics(
-    reader: DeltaMetadataReader, database: str, table: str
+    reader: DeltaMetadataReader,
+    database: str,
+    table: str,
 ) -> dict[str, Any]:
     """Table-grain fresh metrics for ``database.table``."""
     fqtn = f"{database}.{table}"
     detail = reader.detail(fqtn)
     schema_fields = reader.schema_fields(fqtn)
     partition_columns = detail.get("partitionColumns") or []
+    row_count, stats_complete = reader.row_count_from_log(fqtn)
+    collection_method = CollectionMethod.SPARK_LOG.value
+    if not stats_complete or row_count is None:
+        row_count = reader.count(fqtn)
+        collection_method = CollectionMethod.SPARK_COUNT_FALLBACK.value
+    latest_partition_value = reader.latest_partition_with_data_from_log(
+        fqtn, partition_columns
+    )
     return {
-        "row_count": reader.count(fqtn),
+        "row_count": row_count,
         "num_files": detail.get("numFiles"),
         "size_bytes": detail.get("sizeInBytes"),
         "created_at": detail.get("createdAt"),
         "last_modified": detail.get("lastModified"),
-        "latest_partition_value": _latest_partition_spec(
-            reader, fqtn, partition_columns
-        ),
+        "latest_partition_value": latest_partition_value,
         "num_columns": len(schema_fields),
         "schema_hash": compute_schema_hash(schema_fields),
         "columns": schema_fields,
@@ -50,6 +61,7 @@ def collect_table_metrics(
         "clustering_columns": detail.get("clusteringColumns") or [],
         "table_properties": detail.get("properties") or {},
         "table_features": detail.get("tableFeatures") or [],
+        "collection_method": collection_method,
     }
 
 
@@ -59,76 +71,37 @@ def collect_partition_metrics(
     table: str,
     partition_columns: list[str],
     last_commit: dict[str, Any] | None,
+    run_logical_date: str,
 ) -> list[dict[str, Any]]:
-    """Partition-grain fresh metrics for the latest partition (thin slice)."""
+    """Partition-grain fresh metrics for the run-day partition."""
     if not partition_columns:
         return []
-    fqtn = f"{database}.{table}"
-    latest_spec = _latest_partition_spec(reader, fqtn, partition_columns)
-    if latest_spec is None:
+    partition_key = partition_key_from_logical_date(run_logical_date, partition_columns)
+    if partition_key is None:
+        logger.warning(
+            f"Skipping partition metrics for {database}.{table}: cannot map "
+            f"run_logical_date={run_logical_date} to partition columns "
+            f"{partition_columns}"
+        )
         return []
+    fqtn = f"{database}.{table}"
+    row_count, stats_complete = reader.partition_row_count_from_log(fqtn, partition_key)
+    collection_method = CollectionMethod.SPARK_LOG.value
+    if not stats_complete or row_count is None:
+        row_count = reader.count(fqtn, partition_key_to_predicate(partition_key))
+        collection_method = CollectionMethod.SPARK_COUNT_FALLBACK.value
     return [
         {
-            "partition_key": _spec_to_key(latest_spec),
-            "row_count": reader.count(fqtn, _spec_to_predicate(latest_spec)),
+            "partition_key": partition_key,
+            "row_count": row_count,
             "rows_written": _rows_written(last_commit),
             "num_files": None,
             "size_bytes": None,
             "min_ts": None,
             "max_ts": None,
+            "collection_method": collection_method,
         }
     ]
-
-
-def _latest_partition_spec(
-    reader: DeltaMetadataReader, fqtn: str, partition_columns: list[str]
-) -> str | None:
-    """Highest partition spec (lexicographic max; date parts are zero-padded).
-
-    Soft-fails to ``None`` when partition listing is unavailable so table-grain
-    metrics (row_count, schema_hash, …) still persist — EMR Delta often rejects
-    ``SHOW PARTITIONS`` and the reader falls back to DISTINCT when possible.
-    """
-    if not partition_columns:
-        return None
-    try:
-        specs = reader.partition_specs(fqtn, partition_columns)
-    except Exception as error:
-        logger.error(
-            f"Could not list partitions for {fqtn} (latest_partition_value skipped): {error}"
-        )
-        return None
-    if not specs:
-        return None
-    return max(specs, key=_partition_spec_sort_key)
-
-
-def _partition_spec_sort_key(spec: str) -> tuple:
-    """Sort key for chronological max (numeric parts compared as ints)."""
-    key: list[tuple[int, int | str]] = []
-    for item in _spec_to_key(spec):
-        value = item["value"]
-        try:
-            key.append((0, int(value)))
-        except ValueError:
-            key.append((1, value))
-    return tuple(key)
-
-
-def _spec_to_key(spec: str) -> list[dict[str, str]]:
-    """Parse ``year=2026/month=07/day=23`` into name/value structs."""
-    parts = [segment for segment in spec.split("/") if "=" in segment]
-    key = []
-    for segment in parts:
-        name, _, value = segment.partition("=")
-        key.append({"name": name, "value": value})
-    return key
-
-
-def _spec_to_predicate(spec: str) -> str:
-    """Build a SQL predicate for a partition spec (string literals; Spark casts)."""
-    key = _spec_to_key(spec)
-    return " AND ".join(f"`{item['name']}` = '{item['value']}'" for item in key)
 
 
 def _rows_written(last_commit: dict[str, Any] | None) -> int | None:
