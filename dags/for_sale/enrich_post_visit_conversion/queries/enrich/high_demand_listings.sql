@@ -97,19 +97,33 @@ listings_with_demand AS (
         published_listings AS pli
             ON pli.id_house = evt.id_house
             AND pli.business_context = evt.business_context
+),
+listings_snapshot AS (
+    SELECT
+        id_house,
+        business_context,
+        num_prospects,
+        demand_reference,
+        CURRENT_TIMESTAMP() AS ts_snapshot,
+        YEAR(CURRENT_DATE()) AS year,
+        MONTH(CURRENT_DATE()) AS month,
+        DAY(CURRENT_DATE()) AS day
+    FROM
+        listings_with_demand
+    WHERE
+        num_prospects >= GREATEST(3, demand_reference)
+        AND num_houses_neighborhood >= 5
+        AND num_houses_city_group >= 20
 )
 SELECT
+    CONCAT_WS('_', CAST(id_house AS STRING), business_context, CAST(year AS STRING), CAST(month AS STRING), CAST(day AS STRING)) AS id,
     id_house,
     business_context,
     num_prospects,
     demand_reference,
-    CURRENT_TIMESTAMP() AS ts_snapshot,
-    YEAR(CURRENT_DATE()) AS year,
-    MONTH(CURRENT_DATE()) AS month,
-    DAY(CURRENT_DATE()) AS day
+    ts_snapshot,
+    year,
+    month,
+    day
 FROM
-    listings_with_demand
-WHERE
-    num_prospects >= GREATEST(3, demand_reference)
-    AND num_houses_neighborhood >= 5
-    AND num_houses_city_group >= 20
+    listings_snapshot

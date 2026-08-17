@@ -2,7 +2,7 @@
 dag:
   name: enrich_post_visit_conversion
   schedule_start_date: 2026, 8, 1
-  schedule_interval: 0 16 * * *
+  schedule_interval: 0 17 * * *
   owner: Data ForSale
   documentation:
     dag_purpose: |

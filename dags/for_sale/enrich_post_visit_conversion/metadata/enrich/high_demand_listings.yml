@@ -20,6 +20,13 @@ description: >-
   offer-incentive communication flow to create urgency for users who recently visited a house that
   other prospects are competing for.
 columns:
+  id:
+    description: >-
+      Primary key of the snapshot row, concatenating id_house, business_context and the partition
+      year, month and day so each listing is unique within a snapshot day across business lines.
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_house
+      - datalake_sale_demand_events.sale_demand_events.id_house
   id_house:
     description: Identifier of the house whose listing is attracting high prospect demand.
     lineage:

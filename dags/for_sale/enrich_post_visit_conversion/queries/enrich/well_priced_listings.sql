@@ -26,22 +26,36 @@ ranked_house_price_suggestion AS (
         ) AS suggestion_recency_rank
     FROM
         datalake_ebdb_clean.house_price_suggestion
+),
+listings_snapshot AS (
+    SELECT
+        pli.id_house,
+        pli.business_context,
+        pli.price,
+        hps.suggested_upper_bound_price AS price_reference,
+        CURRENT_TIMESTAMP() AS ts_snapshot,
+        YEAR(CURRENT_DATE()) AS year,
+        MONTH(CURRENT_DATE()) AS month,
+        DAY(CURRENT_DATE()) AS day
+    FROM
+        published_listings AS pli
+    INNER JOIN
+        ranked_house_price_suggestion AS hps
+            ON hps.id_house = pli.id_house
+            AND hps.business_context = pli.business_context
+            AND hps.suggestion_recency_rank = 1
+            AND hps.suggestion_certainty IN ('medium', 'high')
+            AND pli.price <= (0.95 * hps.suggested_upper_bound_price)
 )
 SELECT
-    pli.id_house,
-    pli.business_context,
-    pli.price,
-    hps.suggested_upper_bound_price AS price_reference,
-    CURRENT_TIMESTAMP() AS ts_snapshot,
-    YEAR(CURRENT_DATE()) AS year,
-    MONTH(CURRENT_DATE()) AS month,
-    DAY(CURRENT_DATE()) AS day
+    CONCAT_WS('_', CAST(id_house AS STRING), business_context, CAST(year AS STRING), CAST(month AS STRING), CAST(day AS STRING)) AS id,
+    id_house,
+    business_context,
+    price,
+    price_reference,
+    ts_snapshot,
+    year,
+    month,
+    day
 FROM
-    published_listings AS pli
-INNER JOIN
-    ranked_house_price_suggestion AS hps
-        ON hps.id_house = pli.id_house
-        AND hps.business_context = pli.business_context
-        AND hps.suggestion_recency_rank = 1
-        AND hps.suggestion_certainty IN ('medium', 'high')
-        AND pli.price <= (0.95 * hps.suggested_upper_bound_price)
+    listings_snapshot

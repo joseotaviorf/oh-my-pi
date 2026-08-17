@@ -3310,11 +3310,14 @@ bietlejuice.enrich_post_visit_conversion:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events:first-run-of-day
-  - bietlejuice.enrich_visit:load-enrich-post-visit-demand:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
+  - bietlejuice.insider:load-clean-feature:first-run-of-day
+  - bietlejuice.insider:load-clean-review-feature:first-run-of-day
+  - bietlejuice.insider:load-clean-review:first-run-of-day
   - bietlejuice.rental_transact_fast_lane:load-clean-offer:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-sales-flow:first-run-of-day

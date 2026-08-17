@@ -17,6 +17,13 @@ description: >-
   eligible_visits by the For Sale post-visit offer-incentive communication flow to target users
   who recently visited a well-priced house.
 columns:
+  id:
+    description: >-
+      Primary key of the snapshot row, concatenating id_house, business_context and the partition
+      year, month and day so each listing is unique within a snapshot day across business lines.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+      - datalake_ebdb_clean.listing_business_context.business_context
   id_house:
     description: Identifier of the house whose listing is priced at or below the calculator's suggested range.
     lineage:

@@ -16,6 +16,13 @@ description: >-
   while it stays inside that window. Consumed by For Sale conversion analyses and the post-visit
   offer-incentive communication flow.
 columns:
+  id:
+    description: >-
+      Primary key of the snapshot row, concatenating id_visit with the partition year, month and
+      day so each visit is unique within a snapshot day and the same visit can still appear across
+      consecutive partitions while it stays in the eligibility window.
+    lineage:
+    - datalake_visit.visits.id_visit
   id_user:
     description: Identifier of the platform user who visited the property, the subject of the conversion analysis.
     lineage:
@@ -50,17 +57,24 @@ columns:
       select eligible visits with removal_rule IS NULL. A positive house rating only disqualifies
       the visit while it is recent (under 48h); once it ages past that window the visitor is
       allowed to receive the communication if still uncaught by a later rule (e.g. has not sent an
-      offer yet). A negative or partial house rating always disqualifies the visit.
+      offer yet). A negative or partial house rating always disqualifies the visit. The demand
+      answer and house rating are read directly from the intraday-updating visit status log and
+      review sources (rather than the once-daily post_visit_demand snapshot) so the removal rule
+      reflects same-day visitor feedback. Recently-notified matching considers both the platform
+      user id and the person UUID to widen comms coverage for users identified only by uuid_person.
     lineage:
-    - datalake_visit.post_visit_demand.is_visit_completed_by_demand
-    - datalake_visit.post_visit_demand.house_rating
-    - datalake_visit.post_visit_demand.ts_creation
+    - datalake_ebdb_clean.visit_status_log.event_type
+    - datalake_ebdb_clean.visit_status_log.id_visit
+    - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review.dt_creation
+    - datalake_insider_clean.review.id_reviewed
     - datalake_ebdb_clean.listing_business_context.id_house
     - datalake_sales_flow_clean.house.id_external
     - datalake_sales_flow_clean.users.id_external
     - datalake_rental_transact_clean.offer.id_house_external
     - datalake_rental_transact_clean.offer.id_tenant_external
     - datalake_cdp_clean.comms.id_user
+    - datalake_cdp_clean.comms.id_person
     categories:
       user_contested_the_visit: The visitor's demand answer marked the visit as not completed.
       user_finalized_and_incentivized_recently: The visitor rated the house positively less than 48 hours ago, so the finalization already covers the incentive.
