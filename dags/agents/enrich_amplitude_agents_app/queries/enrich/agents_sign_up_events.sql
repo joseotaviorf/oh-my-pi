@@ -1,10 +1,12 @@
 SELECT
     e.id_app,
     e.id_session,
+    e.id_device,
     CAST(e.id_user AS BIGINT) AS id_user,
     e.id_amplitude,
     e.id_event,
     GET_JSON_OBJECT(e.user_properties, "$.personUUID") AS uuid_person,
+    e.uuid AS uuid_amplitude_event,
     e.city,
     e.os_name,
     e.event_type,
@@ -12,6 +14,12 @@ SELECT
     e.device_type,
     e.country,
     GET_JSON_OBJECT(e.event_properties, '$.uri') AS uri,
+    GET_JSON_OBJECT(e.user_properties, '$.platform') AS up_platform,
+    GET_JSON_OBJECT(e.user_properties, '$.utm_source') AS up_utm_source,
+    GET_JSON_OBJECT(e.user_properties, '$.utm_medium') AS up_utm_medium,
+    GET_JSON_OBJECT(e.user_properties, '$.utm_campaign') AS up_utm_campaign,
+    GET_JSON_OBJECT(e.user_properties, '$.utm_content') AS up_utm_content,
+    GET_JSON_OBJECT(e.user_properties, '$.utm_term') AS up_utm_term,
     GET_JSON_OBJECT(e.user_properties, "$.login_status") AS login_status,
     GET_JSON_OBJECT(e.user_properties, "$.app_type") AS app_type,
     e.user_properties,
@@ -44,5 +52,6 @@ WHERE
         'business_context_screen_viewed',
         'region_screen_viewed',
         'document_screen_viewed',
-        'acquisition_channel_screen_viewed'
+        'acquisition_channel_screen_viewed',
+        'ub_page_view'
     )

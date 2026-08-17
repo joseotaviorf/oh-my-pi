@@ -1,7 +1,7 @@
 ---
 database_name: datalake_amplitude_agents_app
 table_name: agents_sign_up_events
-description: Amplitude events from the Agents mobile app signup and onboarding funnel (error screens, pending analysis, welcome, and agent status views), filtered for the Agents app and selected event types within the load window.
+description: Amplitude signup and onboarding funnel events from the Agents mobile app (one row per event), including Amplitude event UUID, UTM attribution fields, and ub_page_view, filtered to Agents app projects and selected event types within the load window.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -13,6 +13,10 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.id_session
     description: Session unique identifier for the user session that generated the event.
+  id_device:
+    lineage:
+      - datalake_amplitude_clean.events.id_device
+    description: Device unique identifier assigned by Amplitude for the client that generated the event.
   id_user:
     lineage:
       - datalake_amplitude_clean.events.id_user
@@ -27,8 +31,12 @@ columns:
     description: Amplitude event unique identifier.
   uuid_person:
     lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Person UUID extracted from event properties (personUUID), when present.
+      - datalake_amplitude_clean.events.user_properties
+    description: Person UUID extracted from user properties (personUUID), when present.
+  uuid_amplitude_event:
+    lineage:
+      - datalake_amplitude_clean.events.uuid
+    description: Universally unique Amplitude event identifier (uuid) used as the natural key for deduplication across signup funnel events.
   city:
     lineage:
       - datalake_amplitude_clean.events.city
@@ -57,6 +65,30 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.event_properties
     description: URI value parsed from event properties when available.
+  up_platform:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Platform value parsed from user properties, used for signup attribution context.
+  up_utm_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: UTM source parsed from user properties for marketing attribution of the signup event.
+  up_utm_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: UTM medium parsed from user properties for marketing attribution of the signup event.
+  up_utm_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: UTM campaign parsed from user properties for marketing attribution of the signup event.
+  up_utm_content:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: UTM content parsed from user properties for marketing attribution of the signup event.
+  up_utm_term:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: UTM term parsed from user properties for marketing attribution of the signup event.
   login_status:
     lineage:
       - datalake_amplitude_clean.events.user_properties
