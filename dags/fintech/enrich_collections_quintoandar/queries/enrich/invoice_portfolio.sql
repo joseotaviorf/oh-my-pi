@@ -23,49 +23,78 @@ base AS (
 ),
 negotiation_child AS (
     SELECT
-        dn.id_invoice AS id_invoice,
-        dn.id_negotiation AS id_negotiation_child,
-        n.advisory AS agency,
-        n.origin_agreement,
-        n.down_payment_amount,
-        n.original_debt_amount,
-        n.dt_promisse
-    FROM
-        datalake_collections_quintoandar.debt_negotiated AS dn
-    LEFT JOIN
-        datalake_collections_quintoandar.negotiation AS n
-            ON dn.id_negotiation = n.id_negotiation
-                AND dn.id_contract = n.id_contract
-    WHERE
-        n.dt_down_payment IS NOT NULL
-        AND n.negotiation_status IN ('offset', 'finished', 'broken-requested-by-client', 'broken')
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY dn.id_invoice ORDER BY n.dt_promisse DESC) = 1
+        id_invoice,
+        id_negotiation_child,
+        agency,
+        origin_agreement,
+        down_payment_amount,
+        original_debt_amount,
+        dt_promisse
+    FROM (
+        SELECT
+            dn.id_invoice AS id_invoice,
+            dn.id_negotiation AS id_negotiation_child,
+            n.advisory AS agency,
+            n.origin_agreement,
+            n.down_payment_amount,
+            n.original_debt_amount,
+            n.dt_promisse,
+            ROW_NUMBER() OVER(
+                PARTITION BY dn.id_invoice
+                ORDER BY n.dt_promisse DESC
+            ) AS rn
+        FROM
+            datalake_collections_quintoandar.debt_negotiated AS dn
+        LEFT JOIN
+            datalake_collections_quintoandar.negotiation AS n
+                ON dn.id_negotiation = n.id_negotiation
+                    AND dn.id_contract = n.id_contract
+        WHERE
+            n.dt_down_payment IS NOT NULL
+            AND n.negotiation_status IN ('offset', 'finished', 'broken-requested-by-client', 'broken')
+    )
+    WHERE rn = 1
 ),
 negotiation_parent AS (
     SELECT
-        ni.id_invoice_extra AS id_invoice,
-        d.id_invoice AS id_invoice_parent,
-        ni.id_negotiation AS id_negotiation_parent,
-        ni.installment_number,
-        n.promisse_payment_method,
-        DATE(i.ts_due) AS dt_due_parent,
-        i.dt_due_adjusted AS dt_due_adjusted_parent,
-        n.dt_promisse
-    FROM
-        datalake_collections_quintoandar.installment AS ni
-    LEFT JOIN
-        datalake_collections_quintoandar.negotiation AS n
-            ON ni.id_negotiation = n.id_negotiation
-                AND ni.id_contract = n.id_contract
-    LEFT JOIN
-        datalake_collections_quintoandar.debt_negotiated AS d
-            ON d.id_negotiation = ni.id_negotiation
-                AND d.id_contract = ni.id_contract
-    LEFT JOIN
-        datalake_retsuko.invoice AS i
-            ON d.id_invoice = i.id_external
-                AND d.id_contract = i.id_contract_external
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY ni.id_invoice_extra ORDER BY DATE(i.ts_due), ni.id_invoice_extra) = 1
+        id_invoice,
+        id_invoice_parent,
+        id_negotiation_parent,
+        installment_number,
+        promisse_payment_method,
+        dt_due_parent,
+        dt_due_adjusted_parent,
+        dt_promisse
+    FROM (
+        SELECT
+            ni.id_invoice_extra AS id_invoice,
+            d.id_invoice AS id_invoice_parent,
+            ni.id_negotiation AS id_negotiation_parent,
+            ni.installment_number,
+            n.promisse_payment_method,
+            DATE(i.ts_due) AS dt_due_parent,
+            i.dt_due_adjusted AS dt_due_adjusted_parent,
+            n.dt_promisse,
+            ROW_NUMBER() OVER(
+                PARTITION BY ni.id_invoice_extra
+                ORDER BY DATE(i.ts_due), ni.id_invoice_extra
+            ) AS rn
+        FROM
+            datalake_collections_quintoandar.installment AS ni
+        LEFT JOIN
+            datalake_collections_quintoandar.negotiation AS n
+                ON ni.id_negotiation = n.id_negotiation
+                    AND ni.id_contract = n.id_contract
+        LEFT JOIN
+            datalake_collections_quintoandar.debt_negotiated AS d
+                ON d.id_negotiation = ni.id_negotiation
+                    AND d.id_contract = ni.id_contract
+        LEFT JOIN
+            datalake_retsuko.invoice AS i
+                ON d.id_invoice = i.id_external
+                    AND d.id_contract = i.id_contract_external
+    )
+    WHERE rn = 1
 ),
 base_negotiation AS (
     SELECT DISTINCT

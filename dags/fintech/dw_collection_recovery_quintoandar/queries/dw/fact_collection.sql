@@ -23,7 +23,23 @@ WITH aggregate_metrics AS (
         SUM(IFNULL(agreement,0)) AS total_agreement,
         SUM(IFNULL(agreement,0)) AS total_failure
     FROM datalake_collections_quintoandar.collection_events
-    GROUP BY ALL
+    GROUP BY
+        id_customer,
+        id_contract,
+        id_operator,
+        operator_agency,
+        creditor,
+        action,
+        action_code_type,
+        action_description,
+        result,
+        result_code_type,
+        result_description,
+        complement,
+        complement_code_type,
+        complement_description,
+        source,
+        DATE(ts_occurrence)
 )
 SELECT
      md5(CONCAT(COALESCE(id_customer,0), COALESCE(id_contract,0), creditor, COALESCE(id_operator, ''),

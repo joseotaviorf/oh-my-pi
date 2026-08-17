@@ -1,8 +1,27 @@
 cluster:
-  type: consolidation_l_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
-      ebs_volume_size: 200
-    num_workers: 3
-    driver_node_type_id: r7g.2xlarge
+      ebs_volume_size: 300
+    master_node_type_id: r6g.2xlarge
+    spark_conf:
+      spark.driver.memory: 12g
+      spark.driver.memoryOverhead: 3g
+      spark.yarn.am.memory: 3g
+      spark.sql.shuffle.partitions: "576"
+    core_nodes:
+      target_on_demand: 3
+      target_spot: 0
+      instance_types:
+        - r6g.4xlarge
+        - r7g.4xlarge
+        - r6i.4xlarge
+    task_nodes:
+      instance_types:
+        - r6g.4xlarge
+        - r7g.4xlarge
+        - r6i.4xlarge
+      target_on_demand: 0
+      target_spot: 3
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100

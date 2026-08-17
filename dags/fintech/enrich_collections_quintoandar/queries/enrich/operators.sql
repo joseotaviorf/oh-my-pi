@@ -116,7 +116,7 @@ union_all_sources AS (
         TIMESTAMP(dt_admission) AS ts_user_created
     FROM datalake_meetcall_clean.operators
 )
-SELECT DISTINCT
+SELECT
     id_operator,
     id_agency,
     user_name,
@@ -129,5 +129,23 @@ SELECT DISTINCT
     source,
     ts_user_created,
     NOW() AS ts_load
-FROM union_all_sources
-QUALIFY ROW_NUMBER() OVER(PARTITION BY id_operator ORDER BY priority, ts_user_created DESC) = 1
+FROM (
+    SELECT
+        id_operator,
+        id_agency,
+        user_name,
+        user_email,
+        user_type,
+        user_department,
+        agency_type,
+        agency_name,
+        company_name,
+        source,
+        ts_user_created,
+        ROW_NUMBER() OVER(
+            PARTITION BY id_operator
+            ORDER BY priority, ts_user_created DESC
+        ) AS rn
+    FROM union_all_sources
+)
+WHERE rn = 1

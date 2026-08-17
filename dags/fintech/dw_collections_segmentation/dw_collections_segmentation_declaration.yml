@@ -12,6 +12,7 @@ workflow:
   custom_schema: collections_segmentation
   default_extraction_type: incremental
   default_partitions: [year, month, day]
+  incremental_optimize: True
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"

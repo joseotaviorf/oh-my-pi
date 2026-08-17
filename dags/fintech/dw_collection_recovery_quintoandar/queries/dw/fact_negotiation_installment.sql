@@ -2,16 +2,27 @@ WITH
 nexxera_confirmation AS (
   SELECT
       dt_due,
-      dt_occurrence_code AS dt_paid,
-      substr(our_number, 1,8) AS our_number,
-      net_amount AS paid_amount,
+      dt_paid,
+      our_number,
+      paid_amount,
       due_amount
-  FROM
-      datalake_nexxera.cnab_charges_recupera
-  WHERE
-      occurrence_code = '06'
-  QUALIFY
-      ROW_NUMBER() OVER(PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) = 1
+  FROM (
+    SELECT
+        dt_due,
+        dt_occurrence_code AS dt_paid,
+        substr(our_number, 1, 8) AS our_number,
+        net_amount AS paid_amount,
+        due_amount,
+        ROW_NUMBER() OVER(
+          PARTITION BY substr(our_number, 1, 8), occurrence_code
+          ORDER BY dt_occurrence_code DESC
+        ) AS rn
+    FROM
+        datalake_nexxera.cnab_charges_recupera
+    WHERE
+        occurrence_code = '06'
+  )
+  WHERE rn = 1
 ),
 calculate_discounts AS (
 SELECT DISTINCT

@@ -1,38 +1,71 @@
 WITH deduplicate_creditor_pending AS (
-  SELECT DISTINCT
+  SELECT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice,
-    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
-  FROM datalake_recupera_clean.creditor_pending
-  WHERE
-    installment_code IS NOT NULL
-    AND id_creditor NOT IN (3,5)
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
+    id_invoice,
+    id_negotiation
+  FROM (
+    SELECT DISTINCT
+      id_creditor,
+      id_contract,
+      id_installment AS id_invoice,
+      IF(ASCII(TRIM(installment_code)) = 0, NULL, installment_code) AS id_negotiation,
+      ROW_NUMBER() OVER(
+        PARTITION BY id_installment, installment_code
+        ORDER BY dt_table_insertion DESC, ts_load DESC
+      ) AS rn
+    FROM datalake_recupera_clean.creditor_pending
+    WHERE
+      installment_code IS NOT NULL
+      AND id_creditor NOT IN (3, 5)
+  )
+  WHERE rn = 1
 ),
 deduplicate_complementary_records AS (
-  SELECT DISTINCT
+  SELECT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice,
-    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
-  FROM datalake_recupera_clean.complementary_records
-  WHERE
-    installment_code IS NOT NULL
-    AND id_creditor NOT IN (3,5)
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY ts_last_debt_update DESC) = 1
+    id_invoice,
+    id_negotiation
+  FROM (
+    SELECT DISTINCT
+      id_creditor,
+      id_contract,
+      id_installment AS id_invoice,
+      IF(ASCII(TRIM(installment_code)) = 0, NULL, installment_code) AS id_negotiation,
+      ROW_NUMBER() OVER(
+        PARTITION BY id_installment, installment_code
+        ORDER BY ts_last_debt_update DESC
+      ) AS rn
+    FROM datalake_recupera_clean.complementary_records
+    WHERE
+      installment_code IS NOT NULL
+      AND id_creditor NOT IN (3, 5)
+  )
+  WHERE rn = 1
 ),
 deduplicate_complementary_records_written_down AS (
-  SELECT DISTINCT
+  SELECT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice,
-    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
-  FROM datalake_recupera_clean.complementary_records_written_down
-  WHERE
-    installment_code IS NOT NULL
-    AND id_creditor NOT IN (3,5)
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY ts_last_debt_update DESC) = 1
+    id_invoice,
+    id_negotiation
+  FROM (
+    SELECT DISTINCT
+      id_creditor,
+      id_contract,
+      id_installment AS id_invoice,
+      IF(ASCII(TRIM(installment_code)) = 0, NULL, installment_code) AS id_negotiation,
+      ROW_NUMBER() OVER(
+        PARTITION BY id_installment, installment_code
+        ORDER BY ts_last_debt_update DESC
+      ) AS rn
+    FROM datalake_recupera_clean.complementary_records_written_down
+    WHERE
+      installment_code IS NOT NULL
+      AND id_creditor NOT IN (3, 5)
+  )
+  WHERE rn = 1
 ),
 recupera_debts AS (
   SELECT
@@ -54,18 +87,30 @@ recupera_debts AS (
 ),
 trato_feito_debts AS (
   SELECT
-    d.id_external AS id_invoice,
-    n.id_contract,
-    IFNULL(CAST(n.id_negotiation_external AS BIGINT),n.id_negotiation_external) AS id_negotiation,
-    "Trato Feito" AS source,
-    1 AS priority
-  FROM datalake_trato_feito_clean.debt AS d
-  LEFT JOIN datalake_debt_recovery.negotiation AS n
-    ON d.id_negotiation = n.id_negotiation
-  WHERE
-    d.id_negotiation IS NOT NULL
-    AND n.debtor != "velo_delinquency_tenant"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY  n.id_contract, d.id_external, d.id_negotiation ORDER BY  d.ts_created DESC) = 1
+    id_invoice,
+    id_contract,
+    id_negotiation,
+    source,
+    priority
+  FROM (
+    SELECT
+      d.id_external AS id_invoice,
+      n.id_contract,
+      IFNULL(CAST(n.id_negotiation_external AS BIGINT), n.id_negotiation_external) AS id_negotiation,
+      "Trato Feito" AS source,
+      1 AS priority,
+      ROW_NUMBER() OVER(
+        PARTITION BY n.id_contract, d.id_external, d.id_negotiation
+        ORDER BY d.ts_created DESC
+      ) AS rn
+    FROM datalake_trato_feito_clean.debt AS d
+    LEFT JOIN datalake_debt_recovery.negotiation AS n
+      ON d.id_negotiation = n.id_negotiation
+    WHERE
+      d.id_negotiation IS NOT NULL
+      AND n.debtor != "velo_delinquency_tenant"
+  )
+  WHERE rn = 1
 ),
 cyber_debts AS (
   SELECT
@@ -97,5 +142,16 @@ SELECT
   id_negotiation,
   source,
   NOW() AS ts_load
-FROM union_sources
-QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract,id_invoice, id_negotiation ORDER BY priority) = 1
+FROM (
+  SELECT
+    id_contract,
+    id_invoice,
+    id_negotiation,
+    source,
+    ROW_NUMBER() OVER(
+      PARTITION BY id_contract, id_invoice, id_negotiation
+      ORDER BY priority
+    ) AS rn
+  FROM union_sources
+)
+WHERE rn = 1

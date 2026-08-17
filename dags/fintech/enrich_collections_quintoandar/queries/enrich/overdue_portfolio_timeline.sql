@@ -136,31 +136,33 @@ tainted_dataset as (
                 AND it.dt_paid > it.dt_due_adjusted
             THEN it.dt_paid
         END AS dt_paid_timeline,
-        DATEDIFF(DAY, it.dt_due_adjusted,
+        DATEDIFF(
             CASE
                 WHEN it.dt_paid BETWEEN it.dt_month_start AND it.dt_reference
                     AND it.dt_paid > it.dt_due_adjusted
                 THEN it.dt_paid
-        END) AS delay_invoice_at_payment,
-        DATEDIFF(DAY, it.dt_due_adjusted, it.dt_reference) AS delay_invoice_at_reference,
+            END,
+            it.dt_due_adjusted
+        ) AS delay_invoice_at_payment,
+        DATEDIFF(it.dt_reference, it.dt_due_adjusted) AS delay_invoice_at_reference,
         CASE
             WHEN it.dt_due_adjusted <= it.dt_month_end
-                AND it.dt_paid IS NULL THEN DATEDIFF(DAY, it.dt_due_adjusted, it.dt_month_end)
+                AND it.dt_paid IS NULL THEN DATEDIFF(it.dt_month_end, it.dt_due_adjusted)
             WHEN it.dt_due_adjusted <= it.dt_month_end
                 AND it.dt_paid IS NOT NULL
-                AND it.dt_paid > it.dt_month_end THEN DATEDIFF(DAY, it.dt_due_adjusted, it.dt_month_end)
+                AND it.dt_paid > it.dt_month_end THEN DATEDIFF(it.dt_month_end, it.dt_due_adjusted)
             WHEN it.dt_due_adjusted <= it.dt_month_end
                 AND it.dt_paid IS NOT NULL
-                AND it.dt_paid <= it.dt_month_end THEN DATEDIFF(DAY, it.dt_due_adjusted, it.dt_paid)
+                AND it.dt_paid <= it.dt_month_end THEN DATEDIFF(it.dt_paid, it.dt_due_adjusted)
             ELSE NULL
         END AS delay_invoice_at_closure,
         CASE
             WHEN td.contract_due_date_min >= it.dt_month_start
                 AND (it.dt_paid IS NULL
-                    OR it.dt_paid > it.dt_month_end) THEN DATEDIFF(DAY, td.contract_due_date_min, it.dt_month_end)
+                    OR it.dt_paid > it.dt_month_end) THEN DATEDIFF(it.dt_month_end, td.contract_due_date_min)
             WHEN td.contract_due_date_min >= it.dt_month_start
-                AND it.dt_paid <= it.dt_month_end THEN DATEDIFF(DAY, td.contract_due_date_min, it.dt_paid)
-            WHEN td.contract_due_date_min < it.dt_month_start THEN DATEDIFF(DAY, td.contract_due_date_min, it.dt_month_start)
+                AND it.dt_paid <= it.dt_month_end THEN DATEDIFF(it.dt_paid, td.contract_due_date_min)
+            WHEN td.contract_due_date_min < it.dt_month_start THEN DATEDIFF(it.dt_month_start, td.contract_due_date_min)
             ELSE NULL
         END AS delay_contamined_at_closure,
         CASE

@@ -61,6 +61,36 @@ get_agency_group_name AS (
   LEFT JOIN datalake_cyber_clean.agency AS a
     ON ag.id_agency = a.id_agency
 ),
+ranked_logs AS (
+  SELECT
+    id_contract,
+    id_user,
+    contract_group,
+    creditor,
+    region_code,
+    action,
+    result,
+    complement,
+    sequence_number,
+    comment,
+    phone_number,
+    phone_extension,
+    ts_activity,
+    ts_load_cyber,
+    ROW_NUMBER() OVER (
+      PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity
+      ORDER BY
+        sequence_number,
+        comment,
+        ts_load_cyber,
+        action,
+        result,
+        complement,
+        phone_extension,
+        region_code
+    ) AS log_sequence_rn
+  FROM datalake_cyber_clean.logs
+),
 ordered_logs AS (
   SELECT
     id_contract,
@@ -70,34 +100,50 @@ ordered_logs AS (
     region_code,
     CASE
       WHEN action = '..' THEN
-        LAG(IF(action = '..', NULL, action)) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+        LAG(IF(action = '..', NULL, action)) IGNORE NULLS OVER(
+          PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity
+          ORDER BY log_sequence_rn
+        )
       ELSE action
     END AS action,
     CASE
       WHEN action = '..' THEN
-        LAG(result) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+        LAG(result) IGNORE NULLS OVER(
+          PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity
+          ORDER BY log_sequence_rn
+        )
       ELSE result
     END AS result,
     CASE
       WHEN action = '..' THEN
-        LAG(complement) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+        LAG(complement) IGNORE NULLS OVER(
+          PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity
+          ORDER BY log_sequence_rn
+        )
       ELSE complement
     END AS complement,
     sequence_number,
     comment,
     CASE
       WHEN action = '..' THEN
-        LAG(phone_number) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+        LAG(phone_number) IGNORE NULLS OVER(
+          PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity
+          ORDER BY log_sequence_rn
+        )
       ELSE phone_number
     END AS phone_number,
     CASE
       WHEN action = '..' THEN
-        LAG(phone_extension) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+        LAG(phone_extension) IGNORE NULLS OVER(
+          PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity
+          ORDER BY log_sequence_rn
+        )
       ELSE phone_extension
     END AS phone_extension,
     ts_activity,
-    ts_load_cyber
-  FROM datalake_cyber_clean.logs
+    ts_load_cyber,
+    log_sequence_rn
+  FROM ranked_logs
 ),
 concatenate_comments AS (
   SELECT
@@ -111,7 +157,13 @@ concatenate_comments AS (
     phone_number,
     phone_extension,
     ts_activity,
-    CONCAT_WS('', COLLECT_LIST(comment)) AS comment
+    CONCAT_WS(
+      '',
+      TRANSFORM(
+        SORT_ARRAY(COLLECT_LIST(NAMED_STRUCT('rn', log_sequence_rn, 'c', comment))),
+        x -> x.c
+      )
+    ) AS comment
   FROM ordered_logs
   GROUP BY
     id_contract,
@@ -236,4 +288,7 @@ LEFT JOIN datalake_cyber_clean.logs_valid_result_code AS lvr
 LEFT JOIN map_type_occurrence AS mto
   ON mto.action_code = l.action
     AND mto.result_code = l.result
-    AND COALESCE(mto.complement_code, '__NULL__') = COALESCE(l.complement, '__NULL__')
+    AND (
+      (mto.complement_code IS NULL AND l.complement IS NULL)
+      OR mto.complement_code = l.complement
+    )
