@@ -9,6 +9,38 @@ WITH lookup AS (
         state,
         locality,
         start_range
+),
+-- EMR-safe replacement for the zip-code range join. The previous
+-- `ON cc.zip_code BETWEEN lk.start_range AND lk.end_range` is a non-equi
+-- predicate that Databricks optimized as a RANGE_JOIN but EMR Spark 3.5 can
+-- only plan as BroadcastNestedLoopJoin (O(N x M), 1-2 tasks). Since start_range
+-- and end_range are 5-digit CEP prefixes, every range spans at most a handful of
+-- 2-digit prefixes; we explode each range into its 2-digit prefix bins so the
+-- join gains an equi key (SUBSTR(zip_code, 1, 2) = zip_bin) and the BETWEEN
+-- stays only as a residual filter. Verified row-for-row identical to the range
+-- join on the full plaintext source (datalake_gsheets_clean.criteo_costs).
+lookup_exploded AS (
+    SELECT
+        state,
+        locality,
+        start_range,
+        end_range,
+        EXPLODE(
+            SEQUENCE(
+                CAST(SUBSTR(start_range, 1, 2) AS INT),
+                CAST(SUBSTR(end_range, 1, 2) AS INT)
+            )
+        ) AS zip_bin_int
+    FROM lookup
+),
+lookup_binned AS (
+    SELECT
+        state,
+        locality,
+        start_range,
+        end_range,
+        LPAD(CAST(zip_bin_int AS STRING), 2, '0') AS zip_bin
+    FROM lookup_exploded
 )
 
 SELECT
@@ -42,7 +74,8 @@ SELECT
     DAY(cc.dt_report) AS day
 FROM
     datalake_criteo.criteo_campaigns AS cc
-LEFT JOIN lookup AS lk
-    ON cc.zip_code BETWEEN lk.start_range AND lk.end_range
+LEFT JOIN lookup_binned AS lk
+    ON SUBSTR(cc.zip_code, 1, 2) = lk.zip_bin
+    AND cc.zip_code BETWEEN lk.start_range AND lk.end_range
 WHERE
     CAST(dt_report AS DATE) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
