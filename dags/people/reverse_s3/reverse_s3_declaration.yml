@@ -1,0 +1,74 @@
+dag:
+  name: reverse_s3
+  owner: Data People
+  callback_by_task: False
+  documentation:
+    dag_purpose: |
+      Generic reverse DAG for the People domain that exports lake tables to external S3
+      buckets, in a configurable file format. Not tied to any single dataset — each table
+      in tables_customization is an independent export with its own destination bucket,
+      key prefix, and file format.
+
+      To add a new export:
+        1. Create queries/reverse/{table_name}.sql (produces the reverse-layer table).
+        2. Add docs/{table_name}.md (governance: owner, consumers, grain, delivery
+           contract, and destination path — see docs/base_app_org_health.md).
+        3. Add the table under tables_customization with extra_spark_job_arguments:
+           [bucket, key, file_format] and, for a cross-account partner bucket,
+           a fourth argument bucket-owner-full-control. Omit the ACL for internal
+           buckets (Object Ownership Enforced rejects canned ACLs).
+        4. In the SQL, use {load_start_date} / {load_end_date} for business-logic date
+           filters (never CURRENT_DATE()) so scheduler reruns are deterministic.
+
+      First export (v1): base_app_org_health — org roster feeding the Base44 / S.A.R.A
+      app and the Org Health Data Studio dashboard.
+
+      IAM prerequisite per new destination bucket: this DAG runs on EMR under the People
+      EMR instance profile (emr_instance_profile_arn_people / emr-people-prod role). Any
+      new external bucket added to tables_customization must first grant that role
+      s3:GetObject, s3:PutObject, s3:ListBucket, and s3:DeleteObject. GetObject is
+      required for copy_object from the staging prefix; DeleteObject cleans
+      `{destination_prefix}/_staging/` and leftover Spark part directories at the
+      consumer key. Staging is written under the destination key's parent directory
+      (e.g. `orghealth/_staging/load_to_s3/...` for `orghealth/export.csv`) so
+      prefix-scoped partner grants still work in prod. Staging cleanup is
+      best-effort so a missing DeleteObject does not fail the task after a
+      successful promote. If the bucket
+      belongs to another AWS account, add a bucket policy on the destination allowing
+      that access, or explicit bucket-owner-full-control ACL on write — request via
+      the infrastructure/platform IAM process, not in this repo.
+
+      Forno safety: the declared bucket/key_prefix below are the prod destination only.
+      load_to_s3.py requires ENVIRONMENT (same var every DAG already resolves through).
+      Only prod writes to the declared bucket; any other value redirects to our own
+      people_bucket under reverse_s3_test/. A missing or blank ENVIRONMENT fails the
+      job instead of defaulting to prod. Canned ACL is applied in prod only.
+
+workflow:
+  type: load_access
+  layer: reverse
+  custom_schema: s3
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  load_spark_job: load_to_s3
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "reverse_s3" # datalake schema (layer + custom_schema)
+    - "{table_name}"
+
+  tables_customization:
+    # Org Health employee roster — Base44 / S.A.R.A app
+    # bucket/key here are the prod destination; load_to_s3.py redirects to our
+    # own people_bucket outside prod (see dag_purpose / Forno safety above).
+    # Fourth argument is the canned ACL required by the partner bucket; ignored
+    # on Forno because the redirect target is internal.
+    base_app_org_health:
+      extra_spark_job_arguments:
+        - "5a-base44-office"
+        - "orghealth/base_app_org_health.csv"
+        - "csv"
+        - "bucket-owner-full-control"

@@ -14,6 +14,7 @@ _JOB_PATHS = [
     "dags/people/hr_system/spark_jobs/load_hr_system_raw.py",
     "dags/people/pin/spark_jobs/load_pin_raw.py",
     "dags/people/reverse_reports/spark_jobs/load_to_gsheet.py",
+    "dags/people/reverse_s3/spark_jobs/load_to_s3.py",
 ]
 
 _JOBS_WITH_RESOLVE_CALL = {

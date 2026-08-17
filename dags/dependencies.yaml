@@ -4631,6 +4631,13 @@ bietlejuice.reverse_reports:
   - bietlejuice.pin:load-clean-questionnaire-translation:first-run-of-day
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
+bietlejuice.reverse_s3:
+  - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-dim-cycle-period:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
+  - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
+  - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
+  - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
 bietlejuice.reverse_sale_listings_report:
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
