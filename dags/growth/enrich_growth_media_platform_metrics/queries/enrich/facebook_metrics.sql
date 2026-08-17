@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     -- Dimensions
     id_account,
     id_campaign,
@@ -13,7 +13,7 @@ SELECT
     -- Regions
     country_code,
     regexp_replace(region, '\\(.*?\\)', '') AS state,
-    CASE 
+    CASE
         WHEN region = 'Minas Gerais' THEN 'Belo Horizonte'
         WHEN region = 'Rio de Janeiro (state)' THEN 'Rio de Janeiro'
         WHEN region = 'Rio Grande do Sul' THEN 'Porto Alegre'
@@ -22,12 +22,12 @@ SELECT
         WHEN region = 'Santa Catarina' THEN 'Florianópolis'
         WHEN region = 'Goiás' THEN 'Goiânia'
         WHEN region = 'Paraná' THEN 'Curitiba'
-        WHEN region IN ('Distrito Federal', 'Federal District' ) THEN 'Brasília'
-      ELSE NULL::STRING 
+        WHEN region IN ('Distrito Federal', 'Federal District') THEN 'Brasília'
+        ELSE CAST(NULL AS STRING)
     END AS city, -- not available in the table
     -- Metrics
     clicks,
-    NULL::BIGINT AS conversions,
+    CAST(NULL AS BIGINT) AS conversions,
     impressions,
     spend AS total_cost,
     -- Date Reference
@@ -35,7 +35,7 @@ SELECT
     YEAR(dt_start) AS year,
     MONTH(dt_start) AS month,
     DAY(dt_start) AS day
-FROM 
+FROM
     datalake_growth_facebook_insights.facebook_insights_region
-WHERE 
-    dt_start::DATE BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE
+WHERE
+    CAST(dt_start AS DATE) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
