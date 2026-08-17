@@ -13,6 +13,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import spark
+from bietlejuice.base.spark.delta_secondary_catalog_sync import (
+    partition_columns_present,
+    sync_delta_write_to_secondary_catalog,
+)
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
@@ -194,6 +198,14 @@ def main():
         source_df=clean_data_frame,
         partition_by=args.partition_cols,
         merge_on=_MERGE_ON,
+    )
+
+    sync_delta_write_to_secondary_catalog(
+        spark,
+        f"{write_database_name}.{write_table_name}",
+        write_path,
+        clean_data_frame,
+        partition_columns_present(clean_data_frame, args.partition_cols),
     )
 
 

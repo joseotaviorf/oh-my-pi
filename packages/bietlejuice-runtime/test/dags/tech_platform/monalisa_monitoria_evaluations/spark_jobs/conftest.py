@@ -17,6 +17,7 @@ _BIETLEJUICE_MOCKS = [
     "bietlejuice.base.pipeline",
     "bietlejuice.base.pipeline.layer_enum",
     "bietlejuice.base.spark",
+    "bietlejuice.base.spark.delta_secondary_catalog_sync",
     "bietlejuice.base.validation",
     "bietlejuice.base.validation.spark_args",
     "bietlejuice.loaders",
