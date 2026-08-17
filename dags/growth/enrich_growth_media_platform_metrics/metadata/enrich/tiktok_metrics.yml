@@ -1,0 +1,84 @@
+---
+database_name: datalake_growth_media_platform
+table_name: tiktok_metrics
+owner: caio.francisco@quintoandar.com.br
+domain: Growth
+description: |
+  Growth media platform metrics for tiktok metrics used in marketing cost allocation. Partitioned by origin, year, month, and day — filter all partition columns in WHERE.
+columns:
+  id_account:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.id_account
+    description: The account id of the TikTok Business Platform.
+  id_campaign:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.id_campaign
+    description: The id of the campaign in TikTok Business Platform.
+  id_adset:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.id_adset
+    description: The id of the adset in TikTok Business Platform.
+  id_ad:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.id_ad
+    description: The id of the ad in TikTok Business Platform.
+  account_name:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.account_name
+    description: The name of the account in TikTok Business Platform.
+  origin:
+    description: The origin of the data. For this table, it is always TikTok.
+  report_type:
+    description: The type of report. For this table, it is always tiktok_campaigns.
+  utm_campaign:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.campaign_name
+    description: The UTM campaign name of the ad.
+  utm_term:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.adset_name
+    description: The UTM term of the adset in Facebook Ads.
+  utm_content:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.ad_name
+    description: The UTM content of the ad in TikTok.
+  country_code:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.country_code
+    description: The country code of the report.
+  state:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.region
+    description: The state of the spend in the report. Parentheses in the name are removed for formatting.
+  city:
+    description: City of the spend in the report. This information is not available for this table.
+  clicks:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.clicks
+    description: Number of clicks in TikTok.
+  conversions:
+    description: Number of conversions in TikTok. This information is not available for this table.
+  impressions:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.impressions
+    description: Number of impressions in TikTok.
+  total_cost:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.spend
+    description: Total paid media cost aggregated across device platforms for the marketing channel. of the ads in TikTok.
+  dt_cost:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.dt_start
+    description: Calendar date when the media platform cost was incurred and attributed.
+  year:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.dt_start
+    description: Year of the report.
+  month:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.dt_start
+    description: Month of the report.
+  day:
+    lineage:
+      - datalake_growth_tiktok_campaigns.tiktok_campaigns.dt_start
+    description: Day of the report.

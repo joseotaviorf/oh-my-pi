@@ -83,6 +83,34 @@ WITH all_metrics AS (
         datalake_growth_media_platform.google_metrics
     WHERE
         CAST(dt_cost AS DATE) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+    -- TikTok Metrics
+    UNION ALL
+    SELECT
+        id_account,
+        id_campaign,
+        id_adset,
+        id_ad,
+        account_name,
+        origin,
+        report_type,
+        utm_campaign,
+        utm_term,
+        utm_content,
+        country_code,
+        state,
+        city,
+        clicks,
+        conversions,
+        impressions,
+        total_cost,
+        dt_cost,
+        year,
+        month,
+        day
+    FROM
+        datalake_growth_media_platform.tiktok_metrics
+    WHERE
+        CAST(dt_cost AS DATE) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
     -- Trovit Metrics
     UNION ALL
     SELECT

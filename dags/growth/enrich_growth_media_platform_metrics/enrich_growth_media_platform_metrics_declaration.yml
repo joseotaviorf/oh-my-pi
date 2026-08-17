@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: |
       This DAG is responsible for consolidate metrics like clicks, impressions and cost from 
-      Media Platforms like Google, Facebook, Criteo and Trovit.
+      Media Platforms like Google, Facebook, Criteo, TikTok and Trovit.
 workflow:
   type: query_delta
   layer: enrich
@@ -22,4 +22,5 @@ workflow:
     - google_metrics
     - facebook_metrics
     - criteo_metrics
+    - tiktok_metrics
     - trovit_metrics
