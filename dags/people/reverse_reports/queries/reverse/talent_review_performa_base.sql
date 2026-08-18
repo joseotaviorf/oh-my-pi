@@ -98,11 +98,15 @@ SELECT
     emp.name,
     emp.work_email,
     job.job_name,
-    job.band,
+    COALESCE(TRY_CAST(job.band AS INT), 1) AS band,
     fc.months_tenure_in_position,
     fc.months_tenure_in_band,
     fc.months_tenure_in_company,
+    fc.months_tenure_in_position AS months_tenure_in_position_years,
+    fc.months_tenure_in_band AS months_tenure_in_band_years,
+    fc.months_tenure_in_company AS months_tenure_in_company_years,
     hier.manager_assignment_number,
+    man_emp.name AS manager_name,
     lr.last_raise_date,
     lr.last_raise_reason,
     pr.performa_score,
@@ -111,12 +115,17 @@ SELECT
     es.country,
     fact.is_manager,
     fs.assignment_number AS hrbp_assignment_number,
+    cc.hrbp_name,
     hier.assignment_number_l1,
+    hier.name_l1 AS l1_name,
     hier.assignment_number_l2,
+    hier.name_l2 AS l2_name,
     hier.assignment_number_l3,
+    hier.name_l3 AS l3_name,
     hier.assignment_number_l4,
+    hier.name_l4 AS l4_name,
     CASE
-        WHEN TRY_CAST(job.band AS INT) >= 6
+        WHEN COALESCE(TRY_CAST(job.band AS INT), 1) >= 6
             AND fc.months_tenure_in_company >= 3
         THEN 'Sim'
         ELSE 'Não'
@@ -179,6 +188,13 @@ LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS fs
         ON cc.sk_business_partner = fs.sk_employee
         AND fs.is_current_for_employee = TRUE
+LEFT JOIN
+    dw_employee_details.fact_assignment_snapshots AS man_fas
+        ON man_fas.assignment_number = hier.manager_assignment_number
+        AND man_fas.is_current_for_assignment = TRUE
+LEFT JOIN
+    dw_employee_details.dim_employee AS man_emp
+        ON man_emp.sk_employee = man_fas.sk_employee
 WHERE
     fact.is_current_for_employee = TRUE
     AND fact.is_active = TRUE
