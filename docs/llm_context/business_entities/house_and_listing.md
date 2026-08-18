@@ -27,6 +27,8 @@ The end-to-end lifecycle typically follows:
 
 Not every house follows every step. Some are created during supply acquisition and never list; others are delisted and relisted months later under the same `sk_house`. At the EBDB source, each business context has its own row in `listing_business_context`.
 
+**TARS — RENT vs SALE on tables:** state whether a table is rent, sale, or both **only** when this document (or the linked business entity for that table) **explicitly** documents that scope on the table entry — e.g. **just rent**, **just sale**, **both** (`business_context = 'RENT' | 'SALE'`). Do not use **“RENT only” / “SALE only”** for table scope (here “only” means non-hybrid; hybrids can still exist). Do not infer from `dw_rent` / `dw_sale` prefixes or column names alone.
+
 ## Related Metric Entities
 
 - [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) — official rent listing-version cohort conversion to signed contract (monthly/weekly/daily grains).
@@ -38,6 +40,7 @@ Not every house follows every step. Some are created during supply acquisition a
 - [FL (First Listings)](../metric_entities/first_listings_1p.md) — first-time published inventory (also referenced from Supply for acquisition funnel).
 - [Supply Retention (Sale)](../metric_entities/supply_retention_sale.md) — month-over-month Sale listing stock flow (FL, republished, churn, CCV) — **local definitions differ from corporate FL/OL**; use only for Supply Retention questions.
 - [Credit Metrics](../metric_entities/credit_metrics.md) — credit-policy monitoring metrics that join to listing/proposal grain (Evers, FPD, EC|ES2CS, etc.).
+- Owner Activation Listing Churn (H2 2026) — cohort churn OKR (`COUNT DISTINCT` churned / matured at 4w RENT, 8w SALE); **not** unpublish transition volume — see [`metric_entities/owner_activation_listing_churn.md`](metric_entities/owner_activation_listing_churn.md)
 
 ## RENT listing versioning
 
@@ -359,8 +362,8 @@ The table can also include **sale-only** houses (`is_for_rent = FALSE`, `is_for_
 | Rent listing attributes at version grain | `dw_rent.dim_house_listing` (`dhl`) — PK `sk_house_listing`; house via `id_house`; `listing_category_start`; hybrid: sale attrs in `*sale*` columns; sale-only: generic attrs for SALE; flags `is_for_rent`, `is_for_sale` |
 | **Listing price** (RENT or SALE, current or historical) | **`dw_listing.dim_pricing` + `fact_price_changes`** — join `sk_house` + `business_context`; see `business_entities/pricing.md` — **not** `dhl.rent` / `house_rent` |
 | Rent lifetime metrics (days-to-contract, next listing, rental count) | `dw_rent.fact_house_listings` (`fhl`) — rent-filtered at build time; join on `sk_house_listing` |
-| Rent listing status history (intervals) — **RENT only** | **`dw_rent.fact_house_listing_status`** — `status_change_reason` (default reason) + `deactivation_*` (1P owner deactivation, from 2026-02-03); grain `sk_house_listing` |
-| 1P owner deactivation reason (enriched) — **RENT only** | `deactivation_reason`, `deactivation_reason_category`, `deactivation_additional_context` on **`dw_rent.fact_house_listing_status`** — when populated; otherwise `status_change_reason` |
+| Rent listing status history (intervals) — **just rent** | **`dw_rent.fact_house_listing_status`** — `status_change_reason` (default reason) + `deactivation_*` (1P owner deactivation, from 2026-02-03); grain `sk_house_listing` |
+| 1P owner deactivation reason (enriched) — **just rent** | `deactivation_reason`, `deactivation_reason_category`, `deactivation_additional_context` on **`dw_rent.fact_house_listing_status`** — when populated; otherwise `status_change_reason` |
 | Current LBC status per context | `listing_business_context` or `dim_house_listing.house_rent_status` / `house_sale_status` |
 | Deactivation audit events (raw) | `datalake_ebdb_clean.house_listing_status_log` |
 | Daily listing snapshot (PP Multi, partner, occupant) | `dw_rent.fact_house_listing_daily_infos` — PK `sk_house_listing_day` |
@@ -382,7 +385,7 @@ Sale has **no business listing versioning** — only `order_version` **0** (edit
 | **Listing price** (SALE, current or historical) | **`dw_listing.dim_pricing` + `fact_price_changes`** — `business_context = 'SALE'`; **not** `dl.price` for official analytics |
 | Sale lifetime metrics (publication funnel, demand totals) | `dw_sale.fact_listings` (`fl`) — join on `sk_sale_listing`; first publication via `sk_first_publication_date`; last publication via `sk_last_publication_date` |
 | Daily published inventory + demand | `dw_sale.fact_daily_ongoing_listing` — only `PUBLISHED` days; PK `sk_snapshot`                                                                                 |
-| Sale listing status history (intervals) — **SALE only** | **`dw_sale.fact_listing_status`** — `status_change_reason` (default reason) + `deactivation_*` (1P owner deactivation, from 2026-02-03); includes `sk_broker` for 3P; grain `sk_sale_listing` |
+| Sale listing status history (intervals) — **just sale** | **`dw_sale.fact_listing_status`** — `status_change_reason` (default reason) + `deactivation_*` (1P owner deactivation, from 2026-02-03); includes `sk_broker` for 3P; grain `sk_sale_listing` |
 | Sale status transition enrich (not versioning) | `datalake_sale_listings.sale_status_version_order` — status transitions; `order_version` does not increment beyond 1 for business relistings |
 | Definitive exclusion audit events (EXCLUDED) | `datalake_ebdb_clean.house_listing_status_log` — filter `business_context = 'SALE'` via event log join |
 
@@ -470,7 +473,7 @@ Use [Related Metric Entities](#related-metric-entities) for **official** L2R, de
 
 **Excluded (unless requested):** `SUSPENDED`, `OPTED_OUT`, `EDITING`, `PUBLISHED`; counting **current** unpublished listings without a transition event.
 
-**Not the same as:** deactivation totals that merge UNPUBLISHED + SUSPENDED — clarify if the question says “unpublished **or** suspended”.
+**Not the same as:** deactivation totals that merge UNPUBLISHED + SUSPENDED — clarify if the question says “unpublished **or** suspended”. **Not the same as** Owner Activation **cohort churn OKR** — point-in-time status at publication + N weeks; includes EDITING (SALE) and filtered SUSPENDED (RENT); see [`metric_entities/owner_activation_listing_churn.md`](metric_entities/owner_activation_listing_churn.md).
 
 **Unpublish reason:** on the **event**, use **`deactivation_*`** for **1P owner deactivation** when populated; otherwise **`status_change_reason`**. See **Status reasons — which column to use**. `dim_house_listing.house_unpublished_reason` is a snapshot field only.
 
@@ -610,6 +613,8 @@ Same event definition; bucket on **interval start**.
 - For **suspension volume**: same pattern with `SUSPENDED` — see **Listing suspensions** above; report **RENT and SALE** when the question does not specify context.
 
 **Don't:**
+
+- Don't tell the user a table is **just rent** or **just sale** unless this document **explicitly** states that scope for that `schema.table` — schema prefix (`dw_rent`, `dw_sale`) is not enough. Do not label table scope as **“RENT only” / “SALE only”** (that wording implies non-hybrid exclusivity).
 - Don't infer **RENT/SALE operational status** from **`house_status`** (`publicado`, `despublicado`, etc.) — use **LBC** columns.
 - Don't describe **`SUSPENDED`** as only “owner temporary pause” — **`status_reason = 'RENTED'`** means **alugado**; other reasons mean funnel-in-progress or owner pause; see **SUSPENDED + `status_reason`**.
 - Don't **COALESCE** `deactivation_reason` over **`status_change_reason`** — pick the correct column per row (1P deactivation enriched vs all other cases).

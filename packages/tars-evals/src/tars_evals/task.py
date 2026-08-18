@@ -14,6 +14,7 @@ from inspect_ai.solver import Generate, Solver, TaskState, solver
 from tars_evals.config import EvalConfig, load_config
 from tars_evals.dataset import golden_items_to_samples, load_golden_dataset
 from tars_evals.prompt import load_system_prompt
+from tars_evals.retry import generate_config_kwargs
 from tars_evals.scorer import judge_query_match
 from tars_evals.tools import read_file, run_bash
 
@@ -48,7 +49,7 @@ def _subject_model(cfg: EvalConfig) -> Model:
     leaking into the reasoning judge."""
     return get_model(
         cfg.tars_model,
-        config=GenerateConfig(temperature=0.0, max_retries=0),
+        config=GenerateConfig(temperature=0.0, **generate_config_kwargs()),
     )
 
 
@@ -142,8 +143,9 @@ def make_tars_eval_task(
             temperature=config.judge_temperature,
         ),
         model=_subject_model(config),
-        # max_retries=0: Inspect defaults to unlimited HTTP retries when unset.
-        config=GenerateConfig(max_tool_output=200_000, max_retries=0),
+        # Retry policy (bounded attempts + wall clock) comes from retry.py, so
+        # the task config, the subject model and the judge can't drift apart.
+        config=GenerateConfig(max_tool_output=200_000, **generate_config_kwargs()),
         message_limit=80,
     )
 

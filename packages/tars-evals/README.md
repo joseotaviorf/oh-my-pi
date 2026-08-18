@@ -73,6 +73,56 @@ make eval-check-gate
 (eval stems vs scope stems for drift/regen). See orchestration tests for the
 Woodpecker pairing contract.
 
+## Exit codes — what actually gates CI
+
+`build_rollup.py` is the one authoritative gate; the queue and
+`eval_changed.sh` propagate its code unchanged.
+
+| Code | Meaning | What to do |
+|------|---------|------------|
+| 0 | The suite cleared `gate_pass_rate`. | Nothing. |
+| 1 | **SQL quality regressed.** Samples were graded and too few passed. | Read the failing samples in `gate_report.txt` and fix the context docs or the skill. |
+| 2 | **The harness or its infrastructure broke.** A malformed/missing summary, or an *inconclusive* run. | Rerun. Do not read it as a quality signal. |
+
+**In CI the eval gate is advisory.** `.woodpecker/tars_evals.yml` marks the
+`tars-evals-changed` step `failure: ignore`, so neither exit code blocks a PR
+or a deployment — the step goes red, prints a banner naming which failure mode
+it hit, and the pipeline carries on. An LLM judge grading generated SQL is not
+a deterministic check, and this suite has measurable run-to-run variance, so a
+red gate is evidence to read rather than a wall to climb.
+
+The deterministic steps around it still block, because each has a single
+correct answer: `resolve-eval-scope`, `check-dataset-drift` (an edited golden
+query whose dataset was never regenerated) and `unit-tests-tars-evals`.
+
+Locally nothing is suppressed — `make eval-suite` and `make eval-changed`
+return the real exit code.
+
+A run is **INCONCLUSIVE** when the share of samples that never produced a
+verdict (connection failures, judge parse errors) exceeds `max_error_rate` in
+`config.yaml`. This exists because an outage otherwise looks exactly like a
+regression: on 2026-08-17 the LiteLLM ingress dropped mid-run, 58 of 77 samples
+died in the TLS handshake, and the gate reported "13% passed" as though the SQL
+had gotten worse. Errors below the ceiling still count against the pass rate, so
+flakiness is never free.
+
+Model calls retry with bounded exponential backoff before a sample is written
+off — see `src/tars_evals/retry.py`:
+
+```bash
+TARS_EVAL_MAX_RETRIES=6        # HTTP retries per model request (0 = fail fast)
+TARS_EVAL_REQUEST_TIMEOUT=300  # ceiling per request INCLUDING its retries; 0 = none
+TARS_EVAL_RETRY_ON_ERROR=0     # whole-sample retries — replays the full ReAct loop
+```
+
+Concurrency knobs, if the proxy pushes back (aggregate connections ≈ workers ×
+per-stem connections):
+
+```bash
+TARS_EVAL_WORKERS=2            # concurrent per-stem processes
+TARS_EVAL_MAX_CONNECTIONS=4    # caps per-stem sample concurrency (default: stem size)
+```
+
 ## Local CI parity
 
 These Makefile targets mirror `.woodpecker/tars_evals.yml` so you can run the

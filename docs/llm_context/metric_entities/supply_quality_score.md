@@ -27,6 +27,7 @@ The metrics support segmentation by temporal views (Monthly/L5M and Weekly/Matur
 ## Related Metric Entities
 
 - [Listing to Well Priced (L2Wp)](listing_to_well_priced.md) — price-only cohort share from `price_score_*`; Quality Pub/4Ws add `easy_entry_*` to the same source.
+- Supply Pricing Score (Owner Activation H2 2026) — RENT+SALE **price-only** OKR scores (0–4); see [`supply_pricing_score.md`](supply_pricing_score.md). Although there is no official **Quality Pub / Quality 4Ws** metric for **SALE**, SALE-specific **pricing_score** calculations for Owner Activation are defined in that file.
 
 ## Catalog
 

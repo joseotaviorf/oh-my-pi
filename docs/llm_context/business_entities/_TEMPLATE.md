@@ -11,6 +11,7 @@ Rules:
   • Plain language. No DataHub URNs in prose — catalog links live in `## DataHub catalog`.
   • CI publishes to DataHub from this MD via `generate_and_push_datahub_entities.py`.
   • Every table section must state grain, key dedup flags, and common join keys.
+  • **RENT / SALE scope:** every `schema.table` entry must state explicitly whether the table is **just rent**, **just sale**, **both** (with `business_context` or equivalent filter), or **neither** (house-level / cross-product). **Do not use “RENT only” / “SALE only” for table scope** — in this repo “only” often means non-hybrid; hybrids can still exist. TARS must not label a table as rent or sale unless that scope is written in this doc for that table.
   • Every synonym that has a Portuguese name should be listed in the Glossary and Synonyms table.
   • Golden Queries: the single most important / most-asked metric for this entity.
   • Cross-link to sibling .md files instead of duplicating their content.
@@ -93,9 +94,9 @@ No DataHub links here — those are auto-generated.
 
 | You need… | Schema / table |
 |-----------|----------------|
-| {High-level use case, e.g. "Daily overdue timeline per invoice"} | `{dw_schema}.{fact_table}` |
-| {Another use case} | `{dw_schema}.{dim_table}` |
-| {Cross-entity use case referencing another schema} | `{other_schema}.{table}` (see [`{sibling}.md`]({sibling}.md)) |
+| {High-level use case, e.g. "Daily overdue timeline per invoice"} | `{dw_schema}.{fact_table}` — **{just rent / just sale / both + filter}** |
+| {Another use case} | `{dw_schema}.{dim_table}` — **{just rent / just sale / both + filter}** |
+| {Cross-entity use case referencing another schema} | `{other_schema}.{table}` (see [`{sibling}.md`]({sibling}.md)) — **{scope if not obvious from sibling}** |
 
 ---
 
@@ -158,6 +159,7 @@ wrong schema names, missing filters, cast issues, methodology distinctions.
 **Don't:**
 
 - {Anti-pattern, e.g. "Confuse `{schema_a}` with `{schema_b}` — they are different DAGs with different grains."}
+- Don't tell the user a table is **For Rent** or **For Sale** unless this document **explicitly** states that scope on the table row or section — do not infer from schema name (`dw_rent`, `dw_sale`) or column names alone.
 - {Another anti-pattern.}
 
 ---

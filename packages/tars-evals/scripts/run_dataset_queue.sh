@@ -15,6 +15,11 @@
 # Inspect's max_tasks cannot preserve per-stem log/summary dirs, so the
 # queue parallelizes separate run_single_dataset_eval.py processes instead.
 #
+# Transient-failure tolerance (see src/tars_evals/retry.py):
+#   TARS_EVAL_MAX_RETRIES=6          # HTTP retries per model request
+#   TARS_EVAL_REQUEST_TIMEOUT=300    # ceiling per request INCLUDING retries
+#   TARS_EVAL_RETRY_ON_ERROR=0       # whole-sample retries (expensive)
+#
 # Writes per-dataset output under logs/per_dataset/<stem>/ and a combined
 # batch log at logs/per_dataset/_batch_run.log. Ends with build_rollup.py.
 
@@ -46,12 +51,26 @@ if ! [[ "$WORKERS" =~ ^[1-9][0-9]*$ ]]; then
 fi
 
 mkdir -p "$LOG_BASE"
-rm -f "$LOG_BASE/rollup.json" "gate_summary.json"
 
 # Non-secret config from .env; LiteLLM key from Vault when not already set.
 [ -f ./.env ] && { set -a; . ./.env; set +a; } || true
-KEY="${OPENAI_API_KEY:-$(scripts/fetch_litellm_key.sh)}"
+if [[ -n "${OPENAI_API_KEY:-}" ]]; then
+    KEY="$OPENAI_API_KEY"
+elif ! KEY="$(scripts/fetch_litellm_key.sh)"; then
+    # Explicit rather than inline command substitution: under `set -e` the
+    # inline form aborted the whole queue with no message at all.
+    echo "ERROR: could not obtain the LiteLLM key (see above). Nothing was evaluated." >&2
+    exit 2
+fi
 export OPENAI_API_KEY="$KEY" LITELLM_API_KEY="$KEY"
+
+# Drop the previous run's aggregates — but only here, at the point of no
+# return, once the stems resolved and the key is in hand. Anything that aborts
+# before this (an expired Vault session, an unresolvable stem) leaves the last
+# gate result intact, which is exactly the evidence needed to debug the abort.
+# Anything that aborts after it must not leave a stale summary that a later
+# check_gate.py could mistake for this run's verdict.
+rm -f "$LOG_BASE/rollup.json" "gate_summary.json"
 
 failed=0
 ran=0
@@ -148,11 +167,18 @@ set -e
 # return); propagate it explicitly rather than relying on this being the
 # script's last line under `set -o pipefail`.
 if [[ $rollup_rc -ne 0 ]]; then
-    echo "ERROR: suite gate failed (build_rollup.py exit $rollup_rc)" >&2
-    if [[ $rollup_rc -eq 1 && -f "gate_summary.json" ]]; then
-        # exit 1 means a valid run produced a legitimately failing gate (see
-        # build_rollup.py's exit-code convention) — check_gate.py renders the
-        # failing-samples report so CI logs show more than a bare exit code.
+    if [[ $rollup_rc -eq 1 ]]; then
+        echo "ERROR: suite gate failed on SQL quality (build_rollup.py exit 1)" >&2
+    else
+        # exit 2 is "the harness or its infrastructure broke", not a verdict on
+        # the SQL: a malformed/missing summary, or a run whose samples mostly
+        # errored (LiteLLM outage, VPN drop). Do not read it as a regression.
+        echo "ERROR: run did not produce a usable gate result (build_rollup.py exit $rollup_rc)" >&2
+    fi
+    if [[ -f "gate_summary.json" ]]; then
+        # check_gate.py renders the failing/errored samples so CI logs show
+        # more than a bare exit code. Its own exit code is redundant here —
+        # build_rollup.py already made the authoritative call.
         uv run python scripts/check_gate.py gate_summary.json || true
     fi
     exit "$rollup_rc"

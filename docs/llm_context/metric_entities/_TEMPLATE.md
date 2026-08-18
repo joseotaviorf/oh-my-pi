@@ -23,6 +23,10 @@ Rules:
   • File name: lowercase_snake_case.md (e.g. nps_fr.md, gmv_fs.md).
   • After creating: add a "Related Metric Entities" back-link from the related
     business entity(ies).
+  • **Product scope (RENT / SALE):** state explicitly in **Scope** and whenever citing
+    source tables — use **just rent** / **just sale** / **both** for table context (not
+    “RENT only” / “SALE only” for table scope). TARS must not classify a table as rent
+    or sale unless documented in this metric entity or the linked business entity.
   • Golden Query must use Trino SQL dialect (TARS runs on Trino). No Spark-only
     constructs (QUALIFY, GROUP BY ALL, IFF, 3-arg DATEDIFF, variant `col:key`).
   • Optional sections: MBR, Targets and OKRs (Budget and/or OKR lookup — see section
@@ -181,6 +185,7 @@ AND {field_2} = '{value}'
 
 - {Anti-pattern — e.g. directly pooling the components}
 - {Don't hardcode weights/parameters}
+- Don't state that a source table is **just rent** or **just sale** unless **Scope** or the linked business entity **explicitly** documents that scope for that table. Do not use **“RENT only” / “SALE only”** for table scope.
 
 ## Targets and OKRs
 

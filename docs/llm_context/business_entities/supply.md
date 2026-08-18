@@ -12,8 +12,6 @@
 
 Supply represents all channels and products QuintoAndar uses to acquire property owners and generate new listings on the platform, covering both for-rent and for-sale contexts. It tracks the owner journey from initial lead capture through a six-stage funnel to the creation of the first active listing.
 
-> **Supply Revamp (WIP):** Rene Descartes is rolling out a contact-centric model (`contact_info`, `intent` — lake tables `lead_contact_info`, `lead_intent` today). That slice is documented separately in [`supply_revamp.md`](supply_revamp.md). **This file remains the source of truth for production funnel analysis** (`obt_supply`, `fact_supply_events`) — do not mix revamp clean tables with legacy funnel metrics until the full revamp DW is in prod.
-
 The lifecycle has six stages:
 1. **Lead** — owner contact is registered (`cd_funnel_step = 'lead'`)
 2. **Prospect** — lead is validated and prospecting begins (`cd_funnel_step = 'prospect'`)
@@ -329,6 +327,8 @@ Use [Related Metric Entities](#related-metric-entities) for **official** first-l
 - Use Langfuse (`datalake_langfuse_clean`, tag `isaias_react`) only for ad-hoc session-behaviour exploration — never for conversion, funnel, or escalation metrics
 
 **Don't:**
+
+- Don't classify a table as **just rent** or **just sale** unless the linked business entity **explicitly** documents that scope for that `schema.table` — do not infer from `dw_rent` / `dw_sale` / `nm_business_context` column names. Do not use **“RENT only” / “SALE only”** for table scope.
 - Don't use cohort date anchoring unless the user explicitly asks for it — coincident date is the default for all supply conversion analyses (both regular leads and Isaias).
 - Don't mix cohort and coincident anchors within the same analysis — doing so produces lead/conversion counts from different time bases that are not comparable.
 - Don't conflate Isaias-created leads (`tp_origin_acquisition = 'isaias'`), Isaias-retrieved leads (`lead_acquisition_type = 'retrieved_lead'`), and Isaias touchpoint leads (union of both) — each answers a different question

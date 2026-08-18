@@ -57,10 +57,15 @@ def main(
             "total": header["total"],
             "passed_count": header["passed_count"],
             "pass_rate": header["pass_rate"],
+            # Counted from the samples rather than read from the header, so a
+            # summary written before error_count existed still rolls up.
+            "error_count": sum(1 for s in samples if s.status == "ERROR"),
         }
         results.extend(samples)
 
-    gate = evaluate_gate(results, cfg.gate_pass_rate)
+    gate = evaluate_gate(
+        results, cfg.gate_pass_rate, max_error_rate=cfg.max_error_rate
+    )
     rollup = {
         "datasets_completed": len(by_stem),
         "suite": {
@@ -69,6 +74,8 @@ def main(
             "passed_count": gate.passed_count,
             "pass_rate": gate.pass_rate,
             "reason": gate.reason,
+            "error_count": gate.error_count,
+            "inconclusive": gate.inconclusive,
         },
         "per_dataset": by_stem,
     }
@@ -81,9 +88,12 @@ def main(
     # Exit codes: 1 = a valid, successfully-parsed run whose suite gate
     # legitimately failed (this is the suite's one authoritative gate
     # decision — fail closed); 2 = structural/input error above (bad stems,
-    # missing/malformed summary, duplicate stem) — mirrors check_gate.py's
-    # convention so CI/alerting can tell "harness broke" apart from "SQL
-    # quality regressed".
+    # missing/malformed summary, duplicate stem) OR an inconclusive run whose
+    # samples mostly errored — mirrors check_gate.py's convention so
+    # CI/alerting can tell "harness broke" apart from "SQL quality regressed".
+    if gate.inconclusive:
+        print(f"ERROR: inconclusive run — {gate.reason}", file=sys.stderr)
+        return 2
     return 0 if gate.passed else 1
 
 

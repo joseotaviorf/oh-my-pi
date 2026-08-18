@@ -20,8 +20,11 @@ Usage:
     uv run python scripts/check_gate.py gate_summary.json
     uv run python scripts/check_gate.py logs/per_dataset/turnover/summary.json
 
-Exit codes: 0 = gate passed; 1 = gate failed; 2 = the file is missing,
-unreadable, or not a valid gate summary.
+Exit codes: 0 = gate passed; 1 = the gate failed on SQL quality; 2 = the file
+is missing, unreadable, or not a valid gate summary, OR the run was
+inconclusive (too many samples errored to measure quality at all — see
+gate.evaluate_gate). 1 vs 2 is the "quality regressed" vs "harness broke"
+split CI and alerting key off.
 """
 
 from __future__ import annotations
@@ -52,9 +55,11 @@ def load_gate_summary(path: Path) -> dict:
 
 
 def render_failure_report(data: dict) -> str:
+    inconclusive = bool(data.get("inconclusive"))
     reason = data.get("reason") or "pass-rate below threshold"
+    headline = "GATE INCONCLUSIVE" if inconclusive else "GATE FAILED"
     lines = [
-        f"GATE FAILED: {data['passed_count']}/{data['total']} passed "
+        f"{headline}: {data['passed_count']}/{data['total']} passed "
         f"({data['pass_rate']:.1%}) \u2014 {reason}"
     ]
     failing = [s for s in data.get("samples") or [] if s.get("status") != "PASS"]
@@ -93,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not data["passed"]:
         print(render_failure_report(data), file=sys.stderr)
-        return 1
+        return 2 if data.get("inconclusive") else 1
 
     print(
         f"GATE PASSED: {data['passed_count']}/{data['total']} passed "

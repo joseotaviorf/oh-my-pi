@@ -110,6 +110,42 @@ def test_required_s3_upload_failure_actually_fails_the_step():
     assert 'if [ "$RC" -eq 0 ]; then' in eval_block
 
 
+def test_eval_gate_is_advisory_and_cannot_block_a_pr():
+    """An LLM judge grading SQL is not a deterministic check, so the gate
+    reports rather than blocks. `failure: ignore` is what makes a red gate
+    non-fatal to the workflow, the PR, and any deployment."""
+    data = _load_workflow()
+
+    assert data["steps"]["tars-evals-changed"]["failure"] == "ignore"
+
+
+def test_deterministic_steps_still_block():
+    """Only the judge-scored gate is advisory. Scope resolution, dataset drift
+    and the package unit suite have a single correct answer, so a failure there
+    is a real mistake and must keep failing the pipeline."""
+    data = _load_workflow()
+
+    for step in ("resolve-eval-scope", "check-dataset-drift", "unit-tests-tars-evals"):
+        assert "failure" not in data["steps"][step], (
+            f"{step} must stay blocking — it does not depend on a judge's opinion"
+        )
+
+
+def test_advisory_gate_still_announces_its_failure_mode():
+    """A quiet red step inside a green pipeline gets ignored. The step must
+    still distinguish 'SQL quality regressed' from 'the harness broke'."""
+    raw = WORKFLOW.read_text(encoding="utf-8")
+    eval_block = raw.split("tars-evals-changed:")[1]
+
+    assert "TARS EVAL GATE FAILED ON SQL QUALITY" in eval_block
+    assert "TARS EVAL GATE PRODUCED NO RESULT" in eval_block
+    assert 'if [ "$RC" -eq 1 ]; then' in eval_block
+    # The banner must come after the archive and before the step exits.
+    assert eval_block.index("TARS EVAL GATE FAILED") > eval_block.index(
+        "upload_inspect_logs_s3.py"
+    )
+
+
 def test_unit_tests_path_filter_is_package_scoped():
     raw = WORKFLOW.read_text(encoding="utf-8")
     assert "unit-tests-tars-evals" in raw

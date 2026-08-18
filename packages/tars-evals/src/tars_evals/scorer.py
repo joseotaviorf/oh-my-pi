@@ -22,6 +22,8 @@ from inspect_ai.scorer import (
 )
 from inspect_ai.solver import TaskState
 
+from tars_evals.retry import generate_config_kwargs
+
 _JUDGE_PROMPT_TEMPLATE = """You are grading whether a candidate SQL query would answer a business question with the SAME INFORMATION as a known-correct reference query. Both use Trino SQL syntax.
 
 Your job is to judge RESULT EQUIVALENCE, not textual or structural similarity. Two queries can look very different yet return the same answer, and can look similar yet return different answers. Grade the answer they would return, not how they are written.
@@ -134,9 +136,10 @@ def _judge_config(
     - temperature=None: omit temperature (provider default; required for models
       like gpt-5.6-luna that reject any explicit non-default value).
     - Otherwise pin the given temperature (default 0.0 for determinism).
-    Always pin max_retries=0 — Inspect retries forever when max_retries is unset.
+    The retry policy always comes from retry.py — Inspect retries forever when
+    max_retries is unset, and dies on the first blip when it is pinned to 0.
     """
-    kwargs: dict = {"max_retries": 0}
+    kwargs: dict = dict(generate_config_kwargs())
     if reasoning_effort:
         kwargs["reasoning_effort"] = reasoning_effort
     elif temperature is not None:

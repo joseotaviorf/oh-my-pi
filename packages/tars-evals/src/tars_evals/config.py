@@ -9,6 +9,8 @@ from pathlib import Path
 
 import yaml
 
+from tars_evals.gate import DEFAULT_MAX_ERROR_RATE
+
 
 @dataclass(frozen=True)
 class EvalConfig:
@@ -25,6 +27,10 @@ class EvalConfig:
     # Suite gate: the run passes only when (passed / total) is STRICTLY greater
     # than this (see gate.py). Default 0.9.
     gate_pass_rate: float = 0.9
+    # Above this share of samples that never produced a verdict, the run is
+    # reported as INCONCLUSIVE (harness/infra broke) instead of as a quality
+    # regression — see gate.evaluate_gate. Default 0.1.
+    max_error_rate: float = DEFAULT_MAX_ERROR_RATE
 
 
 def _parse_judge_temperature(raw: dict) -> float | None:
@@ -46,6 +52,7 @@ def load_config(path: Path) -> EvalConfig:
     raw = yaml.safe_load(Path(path).read_text())
     reasoning_effort = raw.get("judge_reasoning_effort") or None
     gate_pass_rate = float(raw.get("gate_pass_rate", 0.9))
+    max_error_rate = float(raw.get("max_error_rate", DEFAULT_MAX_ERROR_RATE))
     return EvalConfig(
         tars_model=raw["tars_model"],
         judge_model=raw["judge_model"],
@@ -53,4 +60,5 @@ def load_config(path: Path) -> EvalConfig:
         judge_reasoning_effort=reasoning_effort,
         judge_temperature=_parse_judge_temperature(raw),
         gate_pass_rate=gate_pass_rate,
+        max_error_rate=max_error_rate,
     )

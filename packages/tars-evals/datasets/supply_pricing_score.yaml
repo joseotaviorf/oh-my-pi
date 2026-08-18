@@ -1,0 +1,10 @@
+# auto-generated
+# source: docs/llm_context/metric_entities/supply_pricing_score.md
+# Do not edit — regenerate with: make generate-datasets
+items:
+- id: supply_pricing_score-pricing-score-okr-rent-monthly
+  question: Pricing Score OKR (RENT, monthly)
+  expected_query: "WITH rent_pub_cohort AS (\n    SELECT\n        sk_house_listing,\n        CAST(ts_publication AS DATE) AS dt_pub,\n        DATE_TRUNC('month', CAST(ts_publication AS DATE)) AS month_pub,\n        CAST(ts_publication AS DATE) + INTERVAL '28' DAY AS dt_cohort_4w\n    FROM dw_rent.dim_house_listing\n    WHERE version > 0\n      AND ts_publication >= DATE '2026-01-01'\n      AND ts_publication < CURRENT_DATE\n      AND listing_category_start IN ('First Listing', 'Re-Listing', 'Recovered')\n),\nrent_scores AS (\n    SELECT\n        c.sk_house_listing,\n        c.month_pub,\n        TRY_CAST(ps.price_score_4w AS DOUBLE) AS score_4w,\n        c.dt_cohort_4w < CURRENT_DATE AS is_matured_4w\n    FROM rent_pub_cohort AS c\n    INNER JOIN sandbox.listing_score_pricing AS ps\n        ON ps.sk_house_listing = c.sk_house_listing\n)\nSELECT\n    month_pub,\n    AVG(score_4w) AS pricing_score_okr_rent_4w\nFROM rent_scores\nWHERE is_matured_4w = TRUE\nGROUP BY month_pub\nORDER BY month_pub"
+- id: supply_pricing_score-pricing-score-okr-sale-monthly
+  question: Pricing Score OKR (SALE, monthly)
+  expected_query: "-- After building sale_final (or equivalent) with score_8w and is_matured_8w:\nSELECT\n    month_pub,\n    AVG(score_8w) AS pricing_score_okr_sale_8w\nFROM sale_final\nWHERE is_matured_8w = TRUE\nGROUP BY month_pub\nORDER BY month_pub"

@@ -30,6 +30,38 @@ def test_passing_gate_exits_zero(tmp_path: Path, capsys):
     assert "GATE PASSED" in capsys.readouterr().out
 
 
+def test_inconclusive_gate_exits_two_and_says_so(tmp_path: Path, capsys):
+    """Same split as build_rollup.py: 1 = SQL quality, 2 = the harness broke."""
+    path = _write(
+        tmp_path / "gate_summary.json",
+        {
+            "passed": False,
+            "total": 3,
+            "passed_count": 1,
+            "pass_rate": 0.333,
+            "error_count": 2,
+            "inconclusive": True,
+            "reason": "2/3 samples (66.7%) failed with harness or infrastructure errors",
+            "samples": [
+                {
+                    "dataset": "turnover",
+                    "id": "boom",
+                    "judge_score": None,
+                    "status": "ERROR",
+                    "reasoning": "RetryError(APIConnectionError)",
+                }
+            ],
+        },
+    )
+
+    rc = _load_check_gate().main([str(path)])
+
+    err = capsys.readouterr().err
+    assert rc == 2
+    assert "GATE INCONCLUSIVE" in err
+    assert "infrastructure errors" in err
+
+
 def test_failing_gate_exits_one_with_reason_and_samples(tmp_path: Path, capsys):
     path = _write(
         tmp_path / "gate_summary.json",

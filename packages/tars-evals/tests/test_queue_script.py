@@ -33,10 +33,12 @@ case "$*" in
     exit "${FAKE_EVAL_RC:-0}"
     ;;
   *build_rollup.py*)
-    if [[ "${FAKE_ROLLUP_RC:-0}" == "1" ]]; then
+    if [[ "${FAKE_ROLLUP_RC:-0}" == "1" || "${FAKE_ROLLUP_WROTE_SUMMARY:-0}" == "1" ]]; then
       # exit 1 = a valid run whose gate legitimately failed (mirrors the
       # real build_rollup.py contract): it writes gate_summary.json before
       # returning, so the queue's check_gate.py re-check has something to read.
+      # exit 2 writes one too when the run was INCONCLUSIVE (mostly errored
+      # samples) rather than structurally broken — hence the explicit flag.
       printf '{"passed": false}' >gate_summary.json
     fi
     exit "${FAKE_ROLLUP_RC:-0}"
@@ -170,10 +172,59 @@ def test_queue_skips_check_gate_report_on_a_structural_rollup_error(
     )
 
     assert result.returncode == 2
-    assert "suite gate failed" in result.stderr
+    # rc=2 is "the harness broke", never "SQL quality regressed" — the wording
+    # must not send anyone hunting for a regression that didn't happen.
+    assert "did not produce a usable gate result" in result.stderr
+    assert "quality" not in result.stderr
     assert "FAKE_CHECK_GATE_REPORT" not in result.stderr
     calls = Path(env["UV_CALL_LOG"]).read_text().splitlines()
     assert not any("check_gate.py" in call for call in calls)
+
+
+def test_queue_keeps_the_previous_gate_summary_when_it_aborts_early(
+    tmp_path: Path,
+):
+    """An abort before the rollup (expired Vault session, empty stem list) must
+    not delete the last run's evidence — that is precisely what you need to
+    debug the abort."""
+    queue, env = _prepare_queue(tmp_path)
+    previous = queue.parent.parent / "gate_summary.json"
+    previous.write_text('{"passed": false, "run": "previous"}')
+    env["FAKE_LIST_RC"] = "1"
+
+    result = subprocess.run(
+        [str(queue), "alpha"],
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "previous" in previous.read_text()
+
+
+def test_queue_reports_the_errored_samples_of_an_inconclusive_rollup(
+    tmp_path: Path,
+):
+    """rc=2 with a gate summary on disk = an INCONCLUSIVE run (an outage, not a
+    structural error). The errored samples must still be printed, or CI shows a
+    bare exit code for the one failure mode that most needs diagnosing."""
+    queue, env = _prepare_queue(tmp_path)
+    env["FAKE_EVAL_RC"] = "0"
+    env["FAKE_ROLLUP_RC"] = "2"
+    env["FAKE_ROLLUP_WROTE_SUMMARY"] = "1"
+
+    result = subprocess.run(
+        [str(queue), "alpha"],
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert "FAKE_CHECK_GATE_REPORT" in result.stderr
 
 
 def test_queue_fails_when_rollup_gate_fails_even_if_evals_succeed(tmp_path: Path):

@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from inspect_ai import eval as inspect_eval
+from tars_evals import retry
 from tars_evals.config import load_config
 from tars_evals.dataset import (
     DatasetValidationError,
@@ -147,17 +148,23 @@ def main() -> int:
             task,
             epochs=1,
             max_connections=max_conn,
-            # Explicit zeros: Inspect HTTP retries are unlimited when unset;
-            # sample retries also default off but pin for CI clarity.
-            max_retries=0,
-            retry_on_error=0,
+            # Bounded retries from retry.py rather than Inspect's unbounded
+            # default — see that module for why 0 is not the safe choice.
+            max_retries=retry.max_retries(),
+            retry_on_error=retry.retry_on_error(),
             fail_on_error=False,
             display=display,
             log_dir=str(log_dir),
         )
         results = sample_results_from_logs(logs, config.judge_threshold)
 
-    gate = evaluate_gate(results, config.gate_pass_rate)
+    gate = evaluate_gate(
+        results, config.gate_pass_rate, max_error_rate=config.max_error_rate
+    )
+    if gate.inconclusive:
+        # Still exit 0 (see the contract note below) — but say plainly in this
+        # stem's log that the numbers below are an outage, not a verdict.
+        print(f"WARNING: {stem} is INCONCLUSIVE — {gate.reason}", file=sys.stderr)
     out_dir = _write_outputs(stem, gate, results, config)
     print(
         render_report(

@@ -107,6 +107,59 @@ def test_rollup_fails_closed_when_suite_pass_rate_too_low(tmp_path: Path):
     assert gate_summary["passed"] is False
 
 
+def test_rollup_exits_2_when_errors_make_the_run_inconclusive(
+    tmp_path: Path, capsys
+):
+    """An outage must not be reported as a quality regression: exit 2 ("the
+    harness broke") rather than 1 ("the SQL got worse")."""
+    root = tmp_path / "package"
+    per_dataset_dir = root / "logs" / "per_dataset"
+    root.mkdir()
+    _write_config(root)
+    _write_dataset(root, "up")
+    _write_dataset(root, "down")
+    _write_summary(per_dataset_dir, "up")
+    _write_summary(per_dataset_dir, "down", status="ERROR")
+
+    rc = _load_build_rollup().main(
+        ["up", "down"], root=root, per_dataset_dir=per_dataset_dir
+    )
+
+    assert rc == 2
+    assert "inconclusive" in capsys.readouterr().err.lower()
+    gate_summary = json.loads((root / "gate_summary.json").read_text())
+    assert gate_summary["inconclusive"] is True
+    assert gate_summary["error_count"] == 1
+    rollup = json.loads((per_dataset_dir / "rollup.json").read_text())
+    assert rollup["suite"]["inconclusive"] is True
+    assert rollup["per_dataset"]["down"]["error_count"] == 1
+
+
+def test_rollup_still_exits_1_for_a_genuine_quality_failure(tmp_path: Path):
+    """A FAIL is a verdict; only ERRORs invalidate the run."""
+    root = tmp_path / "package"
+    per_dataset_dir = root / "logs" / "per_dataset"
+    root.mkdir()
+    (root / "config.yaml").write_text(
+        "tars_model: subject\n"
+        "judge_model: judge\n"
+        "judge_threshold: 4\n"
+        "gate_pass_rate: 0.9\n"
+    )
+    _write_dataset(root, "up")
+    _write_dataset(root, "down")
+    _write_summary(per_dataset_dir, "up")
+    _write_summary(per_dataset_dir, "down", status="FAIL")
+
+    rc = _load_build_rollup().main(
+        ["up", "down"], root=root, per_dataset_dir=per_dataset_dir
+    )
+
+    assert rc == 1
+    gate_summary = json.loads((root / "gate_summary.json").read_text())
+    assert gate_summary["inconclusive"] is False
+
+
 def test_rollup_rejects_missing_selected_summary(tmp_path: Path, capsys):
     root = tmp_path / "package"
     per_dataset_dir = root / "logs" / "per_dataset"

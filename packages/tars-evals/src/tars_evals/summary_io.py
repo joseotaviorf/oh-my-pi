@@ -57,6 +57,10 @@ def per_dataset_summary_dict(stem: str, gate: GateResult) -> dict[str, object]:
         "total": gate.total,
         "passed_count": gate.passed_count,
         "pass_rate": gate.pass_rate,
+        # Not in _HEADER_KEYS: build_rollup re-derives the suite verdict from
+        # the samples, so these are for humans reading a single stem's file.
+        "error_count": gate.error_count,
+        "inconclusive": gate.inconclusive,
         "samples": [sample_result_to_dict(r) for r in gate.results],
     }
 
@@ -68,6 +72,8 @@ def gate_summary_dict(gate: GateResult) -> dict[str, object]:
         "passed_count": gate.passed_count,
         "pass_rate": gate.pass_rate,
         "reason": gate.reason,
+        "error_count": gate.error_count,
+        "inconclusive": gate.inconclusive,
         "samples": [sample_result_to_dict(r) for r in gate.results],
     }
 

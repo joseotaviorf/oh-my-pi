@@ -71,6 +71,8 @@ def test_reverse_index_resolves_house_and_listing(real_reverse_index):
         "listing_to_unpublish",
         "listing_to_well_priced",
         "ongoing_listings",
+        "owner_activation_listing_churn",
+        "supply_pricing_score",
         "supply_retention_sale",
     }
 

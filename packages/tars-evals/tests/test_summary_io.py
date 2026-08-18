@@ -55,6 +55,8 @@ def test_sample_result_roundtrip_via_per_dataset_summary():
         "total",
         "passed_count",
         "pass_rate",
+        "error_count",
+        "inconclusive",
         "samples",
     ]
     roundtripped = [SampleResult(**s) for s in payload["samples"]]  # type: ignore[arg-type]
@@ -86,6 +88,8 @@ def test_per_dataset_summary_dict_matches_current_schema():
         "total": 1,
         "passed_count": 1,
         "pass_rate": 1.0,
+        "error_count": 0,
+        "inconclusive": False,
         "samples": [
             {
                 "dataset": "alpha",
@@ -108,6 +112,8 @@ def test_gate_summary_dict_matches_rollup_schema():
         "passed_count",
         "pass_rate",
         "reason",
+        "error_count",
+        "inconclusive",
         "samples",
     ]
     assert "aitools_sha" not in payload

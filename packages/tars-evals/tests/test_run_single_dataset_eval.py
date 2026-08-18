@@ -7,6 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 from tars_evals.dataset import DatasetValidationError, select_import_log_samples
+from tars_evals.retry import DEFAULT_MAX_RETRIES, DEFAULT_RETRY_ON_ERROR
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = PACKAGE_ROOT / "scripts" / "run_single_dataset_eval.py"
@@ -236,8 +237,8 @@ def test_live_eval_defaults_max_connections_to_sample_count(
     rc = module.main()
 
     assert rc == 0
-    assert captured["max_retries"] == 0
-    assert captured["retry_on_error"] == 0
+    assert captured["max_retries"] == DEFAULT_MAX_RETRIES
+    assert captured["retry_on_error"] == DEFAULT_RETRY_ON_ERROR
     assert captured["max_connections"] == 3
     assert captured["epochs"] == 1
     assert (tmp_path / "logs" / "per_dataset" / "alpha" / "summary.json").is_file()

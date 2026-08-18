@@ -3,6 +3,7 @@ import asyncio
 from inspect_ai.model import ChatMessageAssistant
 from inspect_ai.scorer import CORRECT, INCORRECT
 from inspect_ai.tool import ToolCall
+from tars_evals.retry import DEFAULT_MAX_RETRIES, DEFAULT_REQUEST_TIMEOUT
 from tars_evals.scorer import _extract_generated_sql, judge_query_match
 
 
@@ -302,10 +303,10 @@ def test_judge_query_match_passes_reasoning_effort_without_pinning_temperature(
     assert fake_model.requested_config.reasoning_effort == "low"
     # Claude thinking can't be combined with a pinned temperature=0.
     assert fake_model.requested_config.temperature is None
-    assert fake_model.requested_config.max_retries == 0
+    assert fake_model.requested_config.max_retries == DEFAULT_MAX_RETRIES
 
 
-def test_judge_config_pins_zero_retries_without_reasoning(monkeypatch):
+def test_judge_config_uses_shared_retry_policy_without_reasoning(monkeypatch):
     fake_model = _FakeModel("REASONING: equivalent.\nSCORE: 5")
     monkeypatch.setattr("tars_evals.scorer.get_model", lambda *a, **k: fake_model)
 
@@ -313,7 +314,8 @@ def test_judge_config_pins_zero_retries_without_reasoning(monkeypatch):
     asyncio.run(scorer_fn(_state_with_sql("SELECT 1"), target=None))
 
     assert fake_model.requested_config is not None
-    assert fake_model.requested_config.max_retries == 0
+    assert fake_model.requested_config.max_retries == DEFAULT_MAX_RETRIES
+    assert fake_model.requested_config.timeout == DEFAULT_REQUEST_TIMEOUT
     assert fake_model.requested_config.temperature == 0.0
 
 
@@ -331,7 +333,7 @@ def test_judge_query_match_omits_temperature_when_none(monkeypatch):
 
     assert fake_model.requested_config is not None
     assert fake_model.requested_config.temperature is None
-    assert fake_model.requested_config.max_retries == 0
+    assert fake_model.requested_config.max_retries == DEFAULT_MAX_RETRIES
     assert "temperature" not in fake_model.requested_config.model_fields_set
 
 

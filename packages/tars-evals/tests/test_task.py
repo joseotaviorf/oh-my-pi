@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from inspect_ai.dataset import Sample
 from tars_evals.config import EvalConfig
+from tars_evals.retry import DEFAULT_MAX_RETRIES, DEFAULT_REQUEST_TIMEOUT
 
 
 @pytest.fixture
@@ -58,18 +59,35 @@ def test_make_tars_eval_task_preserves_samples_and_limits(
     assert task.dataset[1].metadata["dataset"] == "nps_fr"
     assert task.message_limit == 80
     assert task.config.max_tool_output == 200_000
-    assert task.config.max_retries == 0
+    assert task.config.max_retries == DEFAULT_MAX_RETRIES
+    assert task.config.timeout == DEFAULT_REQUEST_TIMEOUT
     # Task-level config must stay temperature-free (judge uses reasoning).
     assert task.config.temperature is None
 
 
-def test_subject_model_pins_zero_retries(eval_config):
+def test_subject_model_uses_bounded_retry_policy(eval_config):
+    """max_retries=0 would end a sample on the first connection blip and count
+    it against the gate as if the SQL were wrong (see retry.py)."""
     from tars_evals.task import _subject_model
 
     model = _subject_model(eval_config)
 
-    assert model.config.max_retries == 0
+    assert model.config.max_retries == DEFAULT_MAX_RETRIES
+    assert model.config.timeout == DEFAULT_REQUEST_TIMEOUT
     assert model.config.temperature == 0.0
+
+
+def test_retry_policy_is_env_overridable(eval_config, monkeypatch):
+    from tars_evals.task import _subject_model
+
+    monkeypatch.setenv("TARS_EVAL_MAX_RETRIES", "2")
+    monkeypatch.setenv("TARS_EVAL_REQUEST_TIMEOUT", "0")
+
+    model = _subject_model(eval_config)
+
+    assert model.config.max_retries == 2
+    # 0 means "no wall-clock ceiling" — the key must be omitted, not zeroed.
+    assert model.config.timeout is None
 
 
 def test_make_tars_eval_task_wires_subject_model_and_scorer(

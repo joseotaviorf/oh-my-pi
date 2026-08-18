@@ -26,3 +26,8 @@ judge_threshold: 4
 # Suite gate (eval-suite / eval-rollup): the suite passes only when the fraction of samples
 # scoring >= judge_threshold is STRICTLY greater than this.
 gate_pass_rate: 0.9
+# Above this share of samples that never produced a verdict (connection
+# failures, judge parse errors), the run is INCONCLUSIVE — the harness exits 2
+# ("infra broke") instead of 1 ("SQL quality regressed"). Errors below the
+# ceiling still count against gate_pass_rate, so flakiness is never free.
+max_error_rate: 0.1

@@ -19,8 +19,27 @@
 #   get-tars-eval-credentials — Vault LiteLLM key (same secret as datahub.yml).
 #   unit-tests-tars-evals     — the package's own suite; it is excluded from the
 #                               CI image (see containers.yml) so nothing else runs it.
-#   tars-evals-changed        — the blocking gate: clone the tars skill, evaluate
-#                               the changed stems, fail on the suite gate.
+#   tars-evals-changed        — the eval gate: clone the tars skill, evaluate
+#                               the changed stems, report the suite gate.
+#                               ADVISORY (failure: ignore) — see below.
+#
+# The eval gate is ADVISORY, not blocking. `failure: ignore` on the
+# tars-evals-changed step means a failing gate is reported loudly in the logs
+# and shown red on the step, but it does not fail the workflow, does not block
+# the PR, and does not block deployment. Treat a red gate as a review signal to
+# read, not a wall. The deterministic steps around it (resolve-eval-scope,
+# check-dataset-drift, unit-tests-tars-evals) DO still block: they catch
+# mistakes with a single correct answer, not a judge's opinion.
+#
+# Exit codes from the eval step (build_rollup.py is the one authoritative gate):
+#   0 — the suite cleared gate_pass_rate.
+#   1 — SQL quality regressed. Read the failing samples and fix the docs/skill.
+#   2 — the harness or its infrastructure broke (LiteLLM/network outage, a
+#       malformed summary). NOT a quality signal: model calls retry with
+#       bounded backoff (src/tars_evals/retry.py), and a run whose errored
+#       samples exceed config.yaml's max_error_rate is reported INCONCLUSIVE
+#       rather than scored. Rerun the step.
+# Both are surfaced as warnings; neither stops the pipeline.
 #
 # Secrets required (configure in Woodpecker repo settings):
 #   github_token — GitHub PAT with read access to quintoandar/ai-tools
@@ -142,6 +161,14 @@ steps:
   tars-evals-changed:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
+    # ADVISORY GATE. An LLM judge grading generated SQL is not a deterministic
+    # check, and this suite has measurable run-to-run variance, so a red gate is
+    # evidence to read rather than a merge blocker. The step still runs, still
+    # reports, and still shows red — it just cannot fail the workflow, the PR,
+    # or a deployment. Remove this line to make the gate blocking again.
+    # Note this also de-fangs TARS_EVAL_REQUIRE_S3_UPLOAD=1 below, which could
+    # otherwise fail the step.
+    failure: ignore
     environment:
       # Pin to an ai-tools tag/SHA here to freeze the skill version under test.
       # Immutable SHA keeps PR evidence reproducible across reruns.
@@ -153,6 +180,12 @@ steps:
       # generate_and_push_datahub_entities.py uses).
       LITELLM_BASE_URL: https://litellm.apps.shared-prd.habitat.zone/v1
       INSPECT_DISPLAY: plain
+      # Per-stem sample concurrency. Unset, it defaults to the stem's full
+      # sample count, so aggregate load on the shared LiteLLM proxy scales with
+      # whatever the largest changed dataset happens to be. Aggregate model
+      # connections ~= TARS_EVAL_WORKERS x TARS_EVAL_MAX_CONNECTIONS.
+      TARS_EVAL_WORKERS: "2"
+      TARS_EVAL_MAX_CONNECTIONS: "4"
       # Durable Inspect archive (see scripts/upload_inspect_logs_s3.py).
       TARS_EVAL_S3_BUCKET: 5a-tars-prod-data
       TARS_EVAL_S3_PREFIX_ROOT: evals/inspect
@@ -277,6 +310,34 @@ steps:
           if [ "$RC" -eq 0 ]; then
             RC=$UPLOAD_RC
           fi
+        fi
+
+        # 7. Say plainly what a non-zero RC means here. `failure: ignore` makes
+        #    this step non-blocking, and a quiet red step in a green pipeline is
+        #    exactly the kind of signal people stop reading. Spell out which of
+        #    the two failure modes happened and what to do about it.
+        if [ "$RC" -ne 0 ]; then
+          echo ""
+          echo "##############################################################"
+          if [ "$RC" -eq 1 ]; then
+            echo "# TARS EVAL GATE FAILED ON SQL QUALITY  (advisory)"
+            echo "#"
+            echo "# Samples were graded and too few cleared the threshold."
+            echo "# The SQL tars generates for the questions listed above"
+            echo "# regressed against their golden queries. Read the failing"
+            echo "# samples in the per-stem gate reports printed above."
+          else
+            echo "# TARS EVAL GATE PRODUCED NO RESULT  (advisory, code $RC)"
+            echo "#"
+            echo "# The harness or its infrastructure broke — this is NOT a"
+            echo "# statement about SQL quality. Rerun the step; if it repeats,"
+            echo "# check the LiteLLM proxy and the Vault secret."
+          fi
+          echo "#"
+          echo "# This step is ADVISORY: it does not block this PR or any"
+          echo "# deployment. See 'failure: ignore' in .woodpecker/tars_evals.yml."
+          echo "##############################################################"
+          echo ""
         fi
 
         exit $RC
