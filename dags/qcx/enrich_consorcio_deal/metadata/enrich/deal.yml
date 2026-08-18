@@ -34,6 +34,10 @@ columns:
     lineage:
       - datalake_hubspot.deal.deal_name
     description: HubSpot deal name. Rows with Teste or test in the name are excluded from this table.
+  phone_number:
+    lineage:
+      - datalake_hubspot.deal.consorcio_phone_number
+    description: Phone number of the user attached to the Consorcio deal, unformatted.
   current_stage:
     lineage:
       - datalake_hubspot.stage.label
@@ -191,6 +195,58 @@ columns:
     lineage:
       - datalake_hubspot.deal.consorcio_feedback_survey
     description: Whether the respondent authorized follow-up contact in the post-discard survey JSON; empty string stored as null.
+  template_first_contact:
+    lineage:
+      - datalake_hubspot.deal.consorcio_template_first_contact
+    description: Name of the template used to contact the user for the first time after the lead was generated.
+  template_last_contact:
+    lineage:
+      - datalake_hubspot.deal.consorcio_template_last_contact
+    description: Name of the last template used to contact the user on BLIP.
+  group:
+    lineage:
+      - datalake_hubspot.deal.consorcio_group
+    description: Informs which consorcio group the user joined.
+  user_first_message_reply:
+    lineage:
+      - datalake_hubspot.deal.consorcio_user_first_message_reply
+    description: It shows the reply message of the user to the first template message sent by Conrado.
+  has_entered_rehabilitation:
+    lineage:
+      - datalake_hubspot.deal.consorcio_entered_rehabilitation
+    description: Boolean if the discarded deal was eligible and entered the rehabilitation flow or not.
+  rehabilitation_exit_reason:
+    lineage:
+      - datalake_hubspot.deal.consorcio_rehabilitation_exit_reason
+    description: Reason why that deal exited the rehabilitation flow, whether because it was ineligible before entering or became ineligible while already on the flow.
+  rehabilitation_variant:
+    lineage:
+      - datalake_hubspot.deal.consorcio_rehabilitation_variant
+    description: Which variant of the rehabilitation flow the deal took part of.
+  rehabilitation_trigger_count:
+    lineage:
+      - datalake_hubspot.deal.consorcio_rehabilitation_trigger_count
+    description: Integer number of messages the user from that deal received while active on the rehabilitation flow.
+  has_entered_churn:
+    lineage:
+      - datalake_hubspot.deal.consorcio_entered_churn
+    description: Whether the deal entered the churn initiative or not, meaning they have already been a part of rehabilitation, were never recovered and have received a churn communication.
+  agent_simulation_value:
+    lineage:
+      - datalake_hubspot.deal.consorcio_agent_simulation_value
+    description: Value filled on hubspot with the latest simulation Conrado did before handing the deal to the human analyst or before discarding the deal.
+  first_simulation_amount:
+    lineage:
+      - datalake_consorcio_clean.simulation.credit_value
+    description: First amount simulated by Conrado Agent.
+  last_simulation_amount:
+    lineage:
+      - datalake_consorcio_clean.simulation.credit_value
+    description: Latest amount simulated by Conrado Agent.
+  avg_simulation_amount:
+    lineage:
+      - datalake_consorcio_clean.simulation.credit_value
+    description: Average Simulation amount per deal
   dt_created:
     lineage:
       - datalake_hubspot.deal.ts_created
@@ -233,6 +289,25 @@ columns:
       Latest simulation.ts_created for the matched Consórcio lead, converted
       from UTC to America/Sao_Paulo (same clock as ts_lead_created). Null when
       the lead has no simulations.
+  ts_rehabilitation_entered:
+    lineage:
+      - datalake_hubspot.deal.ts_consorcio_rehabilitation_entered
+    description: >
+      Timestamp of when the discarded deal entered rehabilitation, converted
+      from UTC to America/Sao_Paulo (same clock as ts_deal_created). Null when
+      the deal was never discarded or never matched the rehabilitation entering rules.
+  ts_rehabilitation_exited:
+    lineage:
+      - datalake_hubspot.deal.ts_consorcio_rehabilitation_exit
+    description: >
+      Timestamp of when the deal exited the rehabilitation flow, either because the client was rehabilitated or because it reached the end of the flow. converted
+      from UTC to America/Sao_Paulo.
+  ts_last_template_sent:
+    lineage:
+      - datalake_hubspot.deal.ts_consorcio_template_last_sent
+    description: >
+      Timestamp of when the last template was sent to the user via Blip, converted
+      from UTC to America/Sao_Paulo.
   year:
     description: Partition column — calendar year of dt_created.
   month:

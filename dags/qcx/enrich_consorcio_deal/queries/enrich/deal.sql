@@ -101,44 +101,47 @@ analyst_ops AS (
     role,
     supervisor
   FROM VALUES
-    ('83834497', 'Senior', 'Beatriz'),
-    ('84909664', 'Pleno', 'Erick'),
+    ('83834497', 'Senior', 'n/a'),
+    ('84909664', 'Pleno',  'Erick'),
     ('81197710', 'Junior', 'Bianca'),
     ('83834581', 'Senior', 'n/a'),
-    ('84909665', 'Pleno', 'n/a'),
-    ('84864479', 'Pleno', 'Bianca'),
+    ('84909665', 'Pleno',  'n/a'),
+    ('84864479', 'Pleno',  'Bianca'),
     ('84050436', 'Senior', 'Erick'),
-    ('84050487', 'Pleno', 'Erick'),
-    ('83263494', 'Pleno', 'n/a'),
+    ('84050487', 'Pleno',  'Erick'),
+    ('83263494', 'Pleno',  'n/a'),
     ('82473891', 'Senior', 'Erick'),
-    ('86362795', 'Pleno', 'Beatriz'),
-    ('85434798', 'Senior', 'Bianca'),
-    ('83834547', 'Senior', 'Erick'),
-    ('85655480', 'Pleno', 'Erick'),
-    ('83263457', 'Pleno', 'Beatriz'),
+    ('86362795', 'Pleno',  'Beatriz'),
+    ('85434798', 'Senior', 'n/a'),
+    ('83834547', 'Senior', 'n/a'),
+    ('85655480', 'Pleno',  'Bianca'),
+    ('83263457', 'Pleno',  'n/a'),
     ('83777915', 'Senior', 'n/a'),
-    ('85321623', 'Pleno', 'Bianca'),
-    ('84050586', 'Pleno', 'Erick'),
+    ('85321623', 'Pleno',  'n/a'),
+    ('84050586', 'Pleno',  'Erick'),
     ('81552418', 'Senior', 'Beatriz'),
-    ('85180360', 'Pleno', 'n/a'),
+    ('85180360', 'Pleno',  'n/a'),
     ('85180405', 'Senior', 'Bianca'),
     ('84050544', 'Senior', 'Erick'),
-    ('85434858', 'Pleno', 'Beatriz'),
+    ('85434858', 'Pleno',  'Beatriz'),
     ('80570949', 'Senior', 'n/a'),
-    ('85325992', 'Pleno', 'Bianca'),
-    ('85321594', 'Pleno', 'Beatriz'),
-    ('82032559', 'Pleno', 'n/a'),
-    ('83263567', 'Pleno', 'Beatriz'),
-    ('82467411', 'Senior', 'Beatriz'),
+    ('85325992', 'Pleno',  'n/a'),
+    ('85321594', 'Pleno',  'Beatriz'),
+    ('82032559', 'Pleno',  'n/a'),
+    ('83263567', 'Pleno',  'Beatriz'),
+    ('82467411', 'Senior', 'n/a'),
     ('90624808', 'Senior', 'Erick'),
-    ('90628391', 'Pleno', 'Bianca'),
-    ('90728482', 'Pleno', 'Erick'),
+    ('90628391', 'Pleno',  'Bianca'),
+    ('90728482', 'Pleno',  'Erick'),
     ('81556428', 'Senior', 'Bianca'),
     ('84306295', 'Senior', 'Bamaq'),
     ('85173258', 'Senior', 'Bamaq'),
     ('84306345', 'Senior', 'Bamaq'),
-    ('92712595', 'Pleno', 'Bianca'),
-    ('93485724', 'Pleno', 'Beatriz')
+    ('92712595', 'Pleno',  'n/a'),
+    ('93485724', 'Pleno',  'n/a'),
+    ('85173280', 'Senior', 'Bamaq'),
+    ('85139671', 'n/a',    'Bamaq'),
+    ('84305470', 'Senior', 'Bamaq')
     AS analyst_map(id_owner, role, supervisor)
 ),
 simulation_agg AS (
@@ -150,7 +153,19 @@ simulation_agg AS (
     MAX(
       FROM_UTC_TIMESTAMP(consorcio_simulation.ts_created, 'America/Sao_Paulo')
     ) AS last_simulation_at,
-    COUNT(*) AS total_simulations
+    COUNT(*) AS total_simulations,
+   MIN_BY(
+      consorcio_simulation.credit_value, consorcio_simulation.ts_created
+   ) AS first_simulation_credit_value,
+   MAX_BY(
+      consorcio_simulation.credit_value, consorcio_simulation.ts_created
+   ) AS last_simulation_credit_value,
+   ROUND(
+      AVG(
+        consorcio_simulation.credit_value
+      ),
+     2
+   )                          AS avg_simulation_credit_value,
   FROM
     datalake_consorcio_clean.simulation AS consorcio_simulation
   GROUP BY
@@ -181,6 +196,7 @@ base_all AS (
     hubspot_deal.consorcio_id_lead AS uuid_lead,
     hubspot_deal.consorcio_id_device AS id_device,
     hubspot_deal.deal_name,
+    hubspot_deal.consorcio_phone_number AS phone_number,
     hubspot_deal.consorcio_utm_source AS utm_source,
     hubspot_deal.consorcio_utm_medium AS utm_medium,
     hubspot_deal.consorcio_utm_campaign AS utm_campaign,
@@ -199,6 +215,16 @@ base_all AS (
     hubspot_deal.consorcio_negotiation_value,
     hubspot_deal.consorcio_blip_agent_inactivity,
     hubspot_deal.consorcio_bamaq_proposal_codes,
+    hubspot_deal.consorcio_template_first_contact,
+    hubspot_deal.consorcio_template_last_contact,
+    hubspot_deal.consorcio_group,
+    hubspot_deal.consorcio_user_first_message_reply,
+    hubspot_deal.consorcio_entered_rehabilitation,
+    hubspot_deal.consorcio_rehabilitation_exit_reason,
+    hubspot_deal.consorcio_rehabilitation_variant,
+    hubspot_deal.consorcio_rehabilitation_trigger_count,
+    hubspot_deal.consorcio_entered_churn,
+    hubspot_deal.consorcio_agent_simulation_value,
     TRY_CAST(GET_JSON_OBJECT(hubspot_deal.consorcio_feedback_survey, '$.nota') AS INTEGER) AS feedback_score,
     ARRAY_JOIN(
       FROM_JSON(
@@ -218,6 +244,12 @@ base_all AS (
     simulation_agg.first_simulation_at AS ts_first_simulated,
     simulation_agg.last_simulation_at AS ts_last_simulated,
     COALESCE(simulation_agg.total_simulations, 0) AS total_simulations,
+    NUllIF(simulation_agg.first_simulation_credit_value, '') AS first_simulation_amount,
+    NUllIF(simulation_agg.last_simulation_credit_value, '') AS last_simulation_amount,
+    NUllIF(simulation_agg.avg_simulation_credit_value, '') AS avg_simulation_amount,
+    FROM_UTC_TIMESTAMP(hubspot_deal.ts_consorcio_rehabilitation_entered, 'America/Sao_Paulo') AS ts_rehabilitation_entered,
+    FROM_UTC_TIMESTAMP(hubspot_deal.ts_consorcio_rehabilitation_exit, 'America/Sao_Paulo') AS ts_rehabilitation_exited,
+    FROM_UTC_TIMESTAMP(hubspot_deal.ts_consorcio_template_last_sent, 'America/Sao_Paulo') AS ts_last_template_sent,
     ROW_NUMBER() OVER (
       PARTITION BY hubspot_deal_stage.id_deal
       ORDER BY hubspot_deal_stage.ts_stage_started DESC, CAST(hubspot_deal_stage.id_stage AS BIGINT) DESC
@@ -245,6 +277,7 @@ SELECT
   base_deal.id_device,
   base_deal.uuid_lead,
   base_deal.deal_name,
+  base_deal.phone_number,
   base_deal.stage_name AS current_stage,
   LOWER(
     CASE
@@ -307,6 +340,19 @@ SELECT
     WHEN LOWER(CAST(base_deal.consorcio_blip_agent_inactivity AS STRING)) = 'false' THEN 0
   END AS has_blip_agent_inactivity,
   base_deal.is_feedback_contact_allowed,
+  base_deal.consorcio_template_first_contact AS template_first_contact,
+  base_deal.consorcio_template_last_contact AS template_last_contact,
+  base_deal.consorcio_group AS group,
+  base_deal.consorcio_user_first_message_reply AS user_first_message_reply,
+  base_deal.consorcio_entered_rehabilitation AS has_entered_rehabilitation,
+  base_deal.consorcio_rehabilitation_exit_reason AS rehabilitation_exit_reason,
+  base_deal.consorcio_rehabilitation_variant AS rehabilitation_variant,
+  base_deal.consorcio_rehabilitation_trigger_count AS rehabilitation_trigger_count,
+  base_deal.consorcio_entered_churn AS has_entered_churn,
+  base_deal.consorcio_agent_simulation_value AS agent_simulation_value,
+  base_deal.first_simulation_amount,
+  base_deal.last_simulation_amount,
+  base_deal.avg_simulation_amount,
   DATE(base_deal.ts_deal_created) AS dt_created,
   DATE_TRUNC('month', base_deal.ts_deal_created) AS dt_month_start,
   DATE_TRUNC('week', base_deal.ts_deal_created) AS dt_week_start,
@@ -315,6 +361,9 @@ SELECT
   base_deal.ts_stage_started AS ts_current_stage_started,
   base_deal.ts_first_simulated,
   base_deal.ts_last_simulated,
+  base_deal.ts_rehabilitation_entered,
+  base_deal.ts_rehabilitation_exited,
+  base_deal.ts_last_template_sent,
   YEAR(base_deal.ts_deal_created) AS year,
   MONTH(base_deal.ts_deal_created) AS month,
   DAY(base_deal.ts_deal_created) AS day
@@ -340,4 +389,4 @@ WHERE
   AND base_deal.deal_name NOT LIKE '%Teste%'
   AND base_deal.deal_name NOT LIKE '%test%'
   AND base_deal.rn = 1
-  AND COALESCE(base_deal.duplication_status, 'unique') = 'unique'
+  AND (COALESCE(base_deal.duplication_status, 'unique') = 'unique' OR base_deal.stage_name = 'venda fechada')
