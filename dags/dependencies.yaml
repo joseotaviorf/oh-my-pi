@@ -558,7 +558,6 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits:first-run-of-day
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   - bietlejuice.sales_flow_daily:load-clean-sales-flow-aud:first-run-of-day

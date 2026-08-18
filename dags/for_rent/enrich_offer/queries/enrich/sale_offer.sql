@@ -545,6 +545,70 @@ WITH agent_contract_aud AS (
       THEN TO_TIMESTAMP('2022-01-01 00:00:00', 'yyyy-MM-dd HH:mm:ss')
     END AS offer_portfolio_start_date
   FROM business_unit AS bu
+), offer_flow_for_ds AS (
+  SELECT
+    COALESCE(ds.id_offer, ds.ohc_id_offer) AS ds_offer_key,
+    off.offer_flow
+  FROM
+    data_sources AS ds
+  INNER JOIN
+    offer_flow AS off
+      ON off.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
+
+  UNION
+
+  SELECT
+    COALESCE(ds.id_offer, ds.ohc_id_offer) AS ds_offer_key,
+    off.offer_flow
+  FROM
+    data_sources AS ds
+  INNER JOIN
+    offer_flow AS off
+      ON off.ohc_id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
+), business_unit_for_ds AS (
+  SELECT
+    COALESCE(ds.id_offer, ds.ohc_id_offer) AS ds_offer_key,
+    bu.id_business_unit,
+    bu.business_unit,
+    bu.offer_flow
+  FROM
+    data_sources AS ds
+  INNER JOIN
+    business_unit AS bu
+      ON bu.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
+
+  UNION
+
+  SELECT
+    COALESCE(ds.id_offer, ds.ohc_id_offer) AS ds_offer_key,
+    bu.id_business_unit,
+    bu.business_unit,
+    bu.offer_flow
+  FROM
+    data_sources AS ds
+  INNER JOIN
+    business_unit AS bu
+      ON bu.ohc_id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
+), offer_portfolio_for_ds AS (
+  SELECT
+    COALESCE(ds.id_offer, ds.ohc_id_offer) AS ds_offer_key,
+    ofp.offer_portfolio_start_date
+  FROM
+    data_sources AS ds
+  INNER JOIN
+    offer_portfolio AS ofp
+      ON ofp.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
+
+  UNION
+
+  SELECT
+    COALESCE(ds.id_offer, ds.ohc_id_offer) AS ds_offer_key,
+    ofp.offer_portfolio_start_date
+  FROM
+    data_sources AS ds
+  INNER JOIN
+    offer_portfolio AS ofp
+      ON ofp.ohc_id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
 ), rank_offers /* RANK OFFER */ AS (
   SELECT
     COALESCE(vo.id_offer, g.id) AS id,
@@ -838,8 +902,6 @@ WITH agent_contract_aud AS (
     ds.partner_3p_supply,
     ds.partner_3p_demand,
     ds.is_3p_supply,
-    COALESCE(h.is_3p_supply_5a AND h.is_sale_3p_supply, FALSE) AS is_3p_supply_5a,
-    COALESCE(h.is_3p_supply_bh AND h.is_sale_3p_supply, FALSE) AS is_3p_supply_bh,
     ds.is_3p_demand,
     ds.is_3p_lead_gen,
     ds.has_3p_access_control,
@@ -886,17 +948,14 @@ WITH agent_contract_aud AS (
   FROM data_sources AS ds
   LEFT JOIN regions AS dr
     ON dr.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
-  LEFT JOIN offer_flow AS off
-    ON off.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
-    OR off.ohc_id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
+  LEFT JOIN offer_flow_for_ds AS off
+    ON off.ds_offer_key = COALESCE(ds.id_offer, ds.ohc_id_offer)
   LEFT JOIN rank_offers AS rk
     ON rk.id = ds.id_offer
-  LEFT JOIN business_unit AS bu
-    ON bu.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
-    OR bu.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
-  LEFT JOIN offer_portfolio AS ofp
-    ON ofp.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
-    OR ofp.id_offer = COALESCE(ds.id_offer, ds.ohc_id_offer)
+  LEFT JOIN business_unit_for_ds AS bu
+    ON bu.ds_offer_key = COALESCE(ds.id_offer, ds.ohc_id_offer)
+  LEFT JOIN offer_portfolio_for_ds AS ofp
+    ON ofp.ds_offer_key = COALESCE(ds.id_offer, ds.ohc_id_offer)
   LEFT JOIN business_unit_by_hub_id AS busf
     ON busf.id_hub = ds.id_hub AND busf.row = 1 AND NOT ds.id_hub IS NULL
   LEFT JOIN datalake_ebdb_listing.house AS h
@@ -1151,8 +1210,6 @@ SELECT DISTINCT
   is_buyer_first_offer,
   is_house_first_offer,
   is_ccv_canceled,
-  is_3p_supply_5a,
-  is_3p_supply_bh,
   is_a_rescued_ccv,
   is_a_rescued_offer,
   is_ccv_5a_model,

@@ -547,22 +547,6 @@ base_booking AS (
         b.is_closed,
         b.is_agent_fixed,
         IF(bha.id IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
-        CASE
-          WHEN COALESCE(
-            (hl.is_sale_3p_supply AND b.business_context = 'SALE')
-            OR (hl.is_rent_3p_supply AND b.business_context = 'RENT'),
-            FALSE
-          ) THEN COALESCE(hl.is_3p_supply_5a, FALSE)
-          ELSE FALSE
-        END AS is_3p_supply_5a,
-        CASE
-          WHEN COALESCE(
-            (hl.is_sale_3p_supply AND b.business_context = 'SALE')
-            OR (hl.is_rent_3p_supply AND b.business_context = 'RENT'),
-            FALSE
-          ) THEN COALESCE(hl.is_3p_supply_bh, FALSE)
-          ELSE FALSE
-        END AS is_3p_supply_bh,
         IF(COALESCE(b.visit_fup, fup_vsl.visit_fup) = 'VaiNegociar', TRUE, FALSE) AS is_entrance_successful,
         (b.status = 'Cancelado') AS is_canceled,
         (b.business_context = 'SALE') AS is_sale_visit,
@@ -753,8 +737,6 @@ SELECT
     bb.is_closed,
     bb.is_agent_fixed,
     bb.is_hub_flow,
-    bb.is_3p_supply_5a,
-    bb.is_3p_supply_bh,
     bb.is_entrance_successful,
     bb.is_canceled,
     bb.is_sale_visit,

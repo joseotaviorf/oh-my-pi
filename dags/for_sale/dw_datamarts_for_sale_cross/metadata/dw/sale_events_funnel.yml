@@ -104,10 +104,6 @@ columns:
     - dw_sale.fact_visits.partner_3p_demand
     - dw_sale.dim_offer.partner_3p_demand
     description: Name of the 3P demand partner.
-  supply_3pbh_partner:
-    lineage:
-    - datalake_ebdb_listing.house.partner_3p_supply
-    description: Name of the 3P BH supply partner.
   is_3p_supply:
     lineage:
     - dw_rent.dim_house_listing.is_3p_supply
@@ -119,10 +115,6 @@ columns:
     - dw_sale.fact_visits.is_3p_demand
     - dw_sale.dim_offer.is_3p_demand
     description: Flag indicating if the transaction has a 3P demand partner.
-  is_3pbh_supply:
-    lineage:
-    - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: Flag indicating if the transaction has a 3P BH supply partner.
   leads:
     description: Count of leads generated.
   prospects:

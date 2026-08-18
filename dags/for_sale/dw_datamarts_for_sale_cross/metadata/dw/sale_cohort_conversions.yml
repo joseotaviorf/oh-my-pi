@@ -90,10 +90,6 @@ columns:
     - dw_sale.dim_offer.business_unit
   weeks_conversion:
     description: Weeks between conversion events (W0 to W20+)
-  supply_3pbh_partner:
-    description: 3P BH partner name for supply side
-    lineage:
-    - datalake_ebdb_listing.house.partner_3p_supply
   supply_3p_partner:
     description: 3P partner name for supply side
     lineage:
@@ -107,10 +103,6 @@ columns:
     - dw_brokers.dim_broker.broker_name
     - dw_sale.fact_visits.partner_3p_demand
     - dw_sale.dim_offer.partner_3p_demand
-  is_3pbh_supply:
-    description: Flag indicating if supply is 3P BH partner (1 = yes, 0 = no)
-    lineage:
-    - datalake_ebdb_listing.house.is_3p_supply_bh
   is_3p_supply:
     description: Flag indicating if supply is 3P partner (1 = yes, 0 = no)
     lineage:

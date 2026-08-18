@@ -501,14 +501,6 @@ columns:
       - datalake_firestore.monday.is_ccv_canceled
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_canceled
     description: True when the CCV contract was canceled after being created. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
-  is_3p_supply_5a:
-    lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: If the house is 3P supply 5A
-  is_3p_supply_bh:
-    lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: If the house is 3P supply BH
   is_a_rescued_ccv:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_ccv

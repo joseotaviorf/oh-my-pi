@@ -397,16 +397,6 @@ columns:
     - datalake_booking.booking.is_3p_supply
     description: |
       Boolean column that identifies if the listing is from a real estate partner (Rede Supply). Regardless if it is from QuintoAndar or CasaMineira.
-  is_3p_supply_5a:
-    lineage:
-    - datalake_booking.booking.is_3p_supply_5a
-    description: |
-      Boolean column that identifies if the listing is from a real estate partner (Rede Supply) of QuintoAndar. (except from Belo Horizonte city, in Brazil).
-  is_3p_supply_bh:
-    lineage:
-    - datalake_booking.booking.is_3p_supply_bh
-    description: |
-      Boolean column that identifies if the listing is from a real estate partner (Rede Supply) in Belo Horizonte (is a city from Brazil).
   is_3p_demand:
     lineage:
     - datalake_booking.booking.is_3p_demand

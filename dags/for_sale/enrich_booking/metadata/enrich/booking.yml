@@ -407,14 +407,6 @@ columns:
     lineage:
     - datalake_ebdb_clean.booking.is_agent_fixed
     description: Boolean column that identifies whether an agent has been fixed/assigned to the booking. This agent may or may not be the PFA.
-  is_3p_supply_5a:
-    lineage:
-    - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: Boolean column that identifies if the listing is from a real estate partner (Rede Supply) of QuintoAndar.
-  is_3p_supply_bh:
-    lineage:
-    - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte.
   is_entrance_successful:
     lineage:
     - datalake_ebdb_clean.booking.visit_fup
