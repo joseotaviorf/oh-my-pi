@@ -4,7 +4,7 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
   Localized names, descriptions, and intro text for questionnaire definitions in PIN.
-  One row per questionnaire per language.
+  One row per questionnaire per language per questionnaire version.
   Covers all questionnaire translations ingested from PIN.
   HTML tags are stripped from intro_text in the clean layer; timestamps are cast to TIMESTAMP.
 columns:

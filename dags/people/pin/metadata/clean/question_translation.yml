@@ -4,7 +4,7 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
   Localized question text and instructions for question definitions in PIN.
-  One row per question per language.
+  One row per question per language per question version.
   Covers all question translations ingested from PIN.
   HTML tags are stripped from instructions_text in the clean layer; timestamps are cast to TIMESTAMP.
 columns:

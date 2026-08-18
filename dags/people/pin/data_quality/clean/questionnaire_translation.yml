@@ -9,8 +9,8 @@ column_level_validations:
   id_questionnaire:
     is_complete:
       severity_level: Warning
-  one_row_per_questionnaire_language_and_object_version:
+  one_row_per_questionnaire_language_and_questionnaire_version:
     custom:
-      # id_questionnaire + language + object_version_number should be unique
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_questionnaires_clean.questionnaire_translation GROUP BY id_questionnaire, language, object_version_number HAVING COUNT(*) > 1)) = 0"
+      # id_questionnaire + language + questionnaire_version_number should be unique
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_questionnaires_clean.questionnaire_translation GROUP BY id_questionnaire, language, questionnaire_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
