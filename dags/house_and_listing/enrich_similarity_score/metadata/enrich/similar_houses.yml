@@ -31,7 +31,9 @@ columns:
         - datalake_sale_ongoing_listings.ongoing_listings_daily_info.id_house
       description: List of house IDs similar to the "base" house (id_house).
     similar_rule:
-      description: Similarity rule applied to generate the list of similar houses.
+      description: Similarity rule applied to generate the list of similar houses. Price
+        bounds use CPS fields from the upstream daily info tables (lower_bound_limit as
+        p10, suggested_upper_bound_price as p70 ceiling, upper_bound_limit as p90).
     qty_similar:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.id_house

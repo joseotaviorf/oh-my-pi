@@ -4,10 +4,11 @@ owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
 description: Enrich table that contains, for both Rent and Sale contexts, the daily view of a "base" house, its possible
   list of similar houses, the aggregated metrics of both in a specific interval, the calculation of the score of each metric,
-  the result and the final score. A "base" house will only appear if it's published and may or may not have similar houses
-  associated with it. For now, it only includes For Rent houses. Each row of this table is a "base" house and its possible
-  list of similar houses in a specific business context and on a specific date. Partitioned by year, month, day. Always filter
-  on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans.
+  the result and the final score. Similar houses are selected in datalake_similarity_score.similar_houses using CPS price
+  bounds (lower_bound_limit, suggested_upper_bound_price, upper_bound_limit). A "base" house will only appear if it's published
+  and may or may not have similar houses associated with it. For now, it only includes For Rent houses. Each row of this table
+  is a "base" house and its possible list of similar houses in a specific business context and on a specific date. Partitioned
+  by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans.
 columns:
   id:
     lineage:

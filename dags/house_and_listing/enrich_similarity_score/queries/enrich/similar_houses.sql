@@ -22,9 +22,9 @@ sale_with_visits AS (
     SELECT
         oldi.id_house,
         oldi.sale_price AS price,
-        oldi.calculator_min_price AS p_10,
-        oldi.calculator_max_price AS p_90,
-        COALESCE(oldi.sale_price <= oldi.calculator_p70_price, FALSE) AS is_below_predicted_price_70,
+        oldi.lower_bound_limit AS p_10,
+        oldi.upper_bound_limit AS p_90,
+        COALESCE(oldi.sale_price <= oldi.suggested_upper_bound_price, FALSE) AS is_below_predicted_price_70,
         COALESCE(v.qt_visits_booked_last_30d > 0, FALSE) AS has_visits_booked_last_30d,
         h.city,
         h.type,
@@ -56,9 +56,9 @@ get_rent_sale_houses AS (
     SELECT
         hldi.id_house,
         hldi.rent AS price,
-        hldi.p_10,
-        hldi.p_90,
-        COALESCE(hldi.rent <= hldi.p_70, FALSE) AS is_below_predicted_price_70,
+        hldi.lower_bound_limit AS p_10,
+        hldi.upper_bound_limit AS p_90,
+        COALESCE(hldi.rent <= hldi.suggested_upper_bound_price, FALSE) AS is_below_predicted_price_70,
         NULL AS has_visits_booked_last_30d,
         h.city,
         h.type,
@@ -214,20 +214,20 @@ SELECT
         WHEN rule_id = 1 THEN
             IF(
                 business_context = 'RENT',
-                "1. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2; at least 3 similar",
-                "1. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2; at least 3 similar"
+                "1. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= CPS suggested_upper_bound_price; similar_price between base lower_bound_limit and base upper_bound_limit; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2; at least 3 similar",
+                "1. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= CPS suggested_upper_bound_price; similar_price between base lower_bound_limit and base upper_bound_limit; similar_area between base_area * 0.7 and base_area * 1.3; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2; at least 3 similar"
             )
         WHEN rule_id = 2 THEN
             IF(
                 business_context = 'RENT',
-                "2. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5; at least 3 similar",
-                "2. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5; at least 3 similar"
+                "2. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= CPS suggested_upper_bound_price; similar_price between base lower_bound_limit and base upper_bound_limit; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5; at least 3 similar",
+                "2. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= CPS suggested_upper_bound_price; similar_price between base lower_bound_limit and base upper_bound_limit; similar_area between base_area * 0.7 and base_area * 1.3; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5; at least 3 similar"
             )
         WHEN rule_id = 3 THEN
             IF(
                 business_context = 'RENT',
-                "3. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar city, type and business context are the same as the base; similar is not the base; at least 3 similar",
-                "3. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; at least 3 similar"
+                "3. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= CPS suggested_upper_bound_price; similar city, type and business context are the same as the base; similar is not the base; at least 3 similar",
+                "3. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= CPS suggested_upper_bound_price; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; at least 3 similar"
             )
     END AS similar_rule,
     SIZE(ids_similar) AS qty_similar,
