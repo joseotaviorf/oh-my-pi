@@ -2,14 +2,25 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import date, datetime, timedelta
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
+from pyspark.sql.types import (
+    BooleanType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+)
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_tracksale_api_client.clients import TracksaleClient
 from quintoandar_tracksale_api_client.requesters import REQUESTERS
+from requests import RequestException
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.sst.domains.salesforce.api.api_logs import (
+    conform_and_save_tracksale_api_logs,
+)
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     is_validation_run,
@@ -323,6 +334,86 @@ def send_targets_to_tracksale(token: str, campaign_code: str, payload: dict):
     return requester_instance.sync(campaign_code, payload)
 
 
+TRACKSALE_API_LOG_SCHEMA = StructType(
+    [
+        StructField("id_record", StringType(), True),
+        StructField("idx", IntegerType(), True),
+        StructField("status_code", IntegerType(), True),
+        StructField("api_logs", StringType(), True),
+        StructField("success", BooleanType(), True),
+        StructField("error", StringType(), True),
+    ]
+)
+
+
+def build_tracksale_api_log_rows(dispatch_result: dict) -> List[dict]:
+    """Build one log row per Tracksale dispatch chunk response."""
+    rows = []
+    for idx, chunk in enumerate(dispatch_result.get("chunks") or []):
+        rows.append(
+            {
+                "id_record": chunk.get("dispatch_code"),
+                "idx": idx,
+                "status_code": 200,
+                "api_logs": json.dumps(chunk),
+                "success": True,
+                "error": None,
+            }
+        )
+    return rows
+
+
+def build_tracksale_api_error_row(error: Exception) -> dict:
+    """Build a single failure row when the Tracksale API call raises."""
+    status_code = None
+    response = getattr(error, "response", None)
+    if response is not None:
+        status_code = response.status_code
+
+    return {
+        "id_record": None,
+        "idx": 0,
+        "status_code": status_code,
+        "api_logs": None,
+        "success": False,
+        "error": str(error),
+    }
+
+
+def save_tracksale_api_logs(
+    log_rows: List[dict],
+    api_entity: str,
+    target_table: str,
+    job_name: str,
+    partition_date: str,
+    bucket: str,
+):
+    """Persist Tracksale API responses to datalake_sst_metrics.api_logs.
+
+    Never raises: observability must not fail a task whose targets were already
+    dispatched, since a retry would re-send the same customers to Tracksale.
+    """
+    if not log_rows:
+        return
+
+    try:
+        logs_df = spark.createDataFrame(log_rows, schema=TRACKSALE_API_LOG_SCHEMA)
+        conform_and_save_tracksale_api_logs(
+            spark=spark,
+            df=logs_df,
+            api_entity=api_entity,
+            target_table=target_table,
+            job_name=job_name,
+            partition_date=partition_date,
+            bucket=bucket,
+        )
+    except Exception:  # noqa: BLE001 - logging must never break the dispatch flow
+        logger.exception(
+            f"m={JOB_NAME}, target_table={target_table}, "
+            "msg=Failed to persist Tracksale API logs."
+        )
+
+
 def mark_campaign_targets_as_dispatched(
     database_name: str,
     table_name: str,
@@ -459,21 +550,57 @@ def main():
         dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.TRACKSALE)
     )
 
-    send_targets_to_tracksale(
-        credentials["token"],
-        campaign_code,
-        build_payload(rows, tags, schedule_time, finish_time),
-    )
+    config_service = ConfigurationService(dag_name)
+    datalake_bucket = config_service.get_config("datalake_bucket")
+    job_name = f"{dag_name}.{JOB_NAME}"
+    target_table = f"{database_name}.{table_name}"
+    partition_date = reference_day.isoformat()
 
+    try:
+        dispatch_result = send_targets_to_tracksale(
+            credentials["token"],
+            campaign_code,
+            build_payload(rows, tags, schedule_time, finish_time),
+        )
+    except RequestException as error:
+        save_tracksale_api_logs(
+            log_rows=[build_tracksale_api_error_row(error)],
+            api_entity=str(campaign_code),
+            target_table=target_table,
+            job_name=job_name,
+            partition_date=partition_date,
+            bucket=datalake_bucket,
+        )
+        raise
+
+    # Tracksale already accepted the payload, so mark the targets before doing
+    # any further work: anything that fails while they are still unmarked lets a
+    # retry re-send the same customers and duplicate their surveys.
     mark_campaign_targets_as_dispatched(
         database_name, table_name, reference_date, suppressed_emails
     )
+
+    save_tracksale_api_logs(
+        log_rows=build_tracksale_api_log_rows(dispatch_result),
+        api_entity=str(campaign_code),
+        target_table=target_table,
+        job_name=job_name,
+        partition_date=partition_date,
+        bucket=datalake_bucket,
+    )
+
+    dispatch_status = dispatch_result.get("status") or {}
+    inserted = dispatch_status.get("inserted", 0)
+    invalid = dispatch_status.get("invalid", 0)
+    duplicated = dispatch_status.get("duplicated", 0)
+
     logger.info(
         f"m={JOB_NAME}, table_name={table_name}, reference_date={reference_day}, "
         f"execution_date={execution_date}, dispatch_date={execution_date}, "
         f"pending_before_dedup_targets={pending_before_dedup_count}, "
         f"dispatched_targets={dispatched_targets}, "
         f"skipped_targets={skipped_already_dispatched}, "
+        f"inserted={inserted}, invalid={invalid}, duplicated={duplicated}, "
         "msg=Campaign targets dispatched to Tracksale and marked as is_dispatched=TRUE "
         "with ts_dispatched=current_timestamp() on the reference_date partition."
     )
