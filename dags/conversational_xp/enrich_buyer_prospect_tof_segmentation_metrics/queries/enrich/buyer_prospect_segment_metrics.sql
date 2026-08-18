@@ -14,13 +14,13 @@ activity_month_scope AS (
     SELECT
         s.dt_activation_month,
         s.id_user,
-        s.dt_partition,
-        s.ts_activation,
-        s.dt_window_4w_end,
-        s.dt_window_8w_end,
         s.business_context,
-        s.segment_type,
+        bp.ts_activation,
+        bp.dt_window_4w_end,
+        bp.dt_window_8w_end,
+        bp.segment_type,
         bp.is_concierge_prospect,
+        s.dt_partition,
         s.is_os_8w,
         s.is_os_4w,
         s.sum_interactions_8w,
@@ -52,6 +52,9 @@ activity_month_scope AS (
         ON s.id_user = bp.id_user
         AND s.dt_activation_month = bp.dt_activation_month
         AND s.business_context = bp.business_context
+        AND s.ts_activation = bp.ts_activation
+        AND s.segment_type = bp.segment_type
+        AND s.is_concierge_prospect = bp.is_concierge_prospect
 ),
 
 activity_month_aggregation AS (

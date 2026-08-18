@@ -17,7 +17,7 @@ columns:
   segment_type:
     description: "Buyer-prospect segment grouping: bp for new or recovered buyer prospects and tof for top-of-funnel users."
     lineage:
-      - datalake_search.buyer_prospect_segmentation.segment_type
+      - datalake_search.buyer_prospect_base.segment_type
   is_concierge_prospect:
     description: Boolean flag indicating whether the buyer prospect belongs to the concierge-assisted cohort.
     lineage:

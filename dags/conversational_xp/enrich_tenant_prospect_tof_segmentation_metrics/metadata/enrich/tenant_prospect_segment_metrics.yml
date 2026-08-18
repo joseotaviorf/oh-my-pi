@@ -17,7 +17,7 @@ columns:
   segment_type:
     description: "Tenant-prospect segment grouping: tp for new or recovered tenant prospects and tof for top-of-funnel users."
     lineage:
-      - datalake_search.tenant_prospect_segmentation.segment_type
+      - datalake_search.tenant_prospect_base.segment_type
   is_concierge_prospect:
     description: Boolean flag indicating whether the tenant prospect belongs to the concierge-assisted cohort.
     lineage:

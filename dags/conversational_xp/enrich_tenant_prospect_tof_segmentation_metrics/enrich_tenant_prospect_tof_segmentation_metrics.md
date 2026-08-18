@@ -23,7 +23,7 @@ schedule_search_listing_events (ToF users) ───┼──► tenant_prospect
                                               │
                                               ▼
 search_impressions, Amplitude LPV/schedule,   │
-  rent_flows (visit + offer per id_rent_flow) ─┼──► tenant_prospect_segmentation  ← daily activity slice (merge upsert)
+  rent_flows (visit + offer per id_rent_flow) ─┼──► tenant_prospect_segmentation  ← daily activity slice (merge upsert + delete)
                                               │
                                               ▼
                         tenant_prospect_segment_metrics ← monthly metrics rebuild (partition overwrite)
@@ -72,6 +72,7 @@ Window totals for additive metrics are built downstream by summing daily rows. D
 
 - `dt_partition` is each calendar date in the requested interval.
 - Re-running an interval overwrites each included daily slice for each user/cohort.
+- Rows in the requested `dt_partition` interval and intersecting activation months that are **not** in the new batch are **deleted** (`when_not_matched_by_source_delete_condition`), so cohort removals or window exits from `tenant_prospect_base` do not leave stale daily slices.
 
 **Grain:** one row per user per activation month per partition date (`dt_partition`).
 

@@ -33,6 +33,13 @@ workflow:
       z_order_by: [id_user]
     buyer_prospect_segmentation:
       merge_on: [dt_partition, dt_activation_month, id_user]
+      when_not_matched_by_source_delete_condition: |
+        target.dt_partition >= DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}')
+        AND target.dt_partition <= DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}')
+        AND target.dt_activation_month >= DATE_TRUNC('MONTH', DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}'))
+        AND target.dt_activation_month < ADD_MONTHS(
+          DATE_TRUNC('MONTH', DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}')),
+          1)
       partitions: [year, month, day]
       z_order_by: [id_user]
     buyer_prospect_segment_metrics:

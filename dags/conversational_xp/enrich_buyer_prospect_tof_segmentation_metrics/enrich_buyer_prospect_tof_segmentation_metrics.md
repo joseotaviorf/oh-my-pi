@@ -24,7 +24,7 @@ prospect_daily_results (+ concierge_demand)
   buyer_prospect_base          ← monthly cohort refresh (merge + delete)
         │
         ▼
-  buyer_prospect_segmentation  ← daily activity slice (merge upsert)
+  buyer_prospect_segmentation  ← daily activity slice (merge upsert + delete)
         │
         ▼
   buyer_prospect_segment_metrics ← monthly metrics rebuild (partition overwrite)
@@ -72,6 +72,7 @@ Window totals for additive metrics are built downstream by summing daily rows. D
 - `dt_partition` is each calendar date in the requested interval.
 - Daily slices use the calendar date of the event timestamp (`DATE(ts_event)`, `DATE(ts_first_booking_created)`, `DATE(ts_first_offer_submitted)`, etc.), not the source table's load partition.
 - Re-running an interval overwrites each included daily slice for each user/cohort.
+- Rows in the requested `dt_partition` interval and intersecting activation months that are **not** in the new batch are **deleted** (`when_not_matched_by_source_delete_condition`), so cohort removals or window exits from `buyer_prospect_base` do not leave stale daily slices.
 
 **Grain:** one row per user per activation month per partition date (`dt_partition`).
 
