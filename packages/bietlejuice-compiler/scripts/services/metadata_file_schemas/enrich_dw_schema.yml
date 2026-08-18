@@ -5,6 +5,7 @@ owner: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*')
 domain: regex('Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|Growth|International|Journey Optimizer|MLOps|People|QCX|Rede|Support and Services|Tech Platform|Data Platform|Conversational XP|DS Pricing|Atlas DB|Broker XP|House and Listing')
 description: str(min=10)
 privacy: include("table_privacy_schema", required=False)
+milestones: include("milestones_schema", required=False)
 columns: map(include("column"), key=str(min=1, max=280))
 ---
 column:
@@ -12,3 +13,14 @@ column:
   lineage: list(str(min=1, max=280), required=False)
   categories: map(str(), key=str(), required=False)
   privacy: include("privacy_schema", required=False)
+milestones_schema:
+  sticky_columns: list(str(min=1, max=280), required=False)
+  types: map(include("milestone_type_entry"), key=str(min=1, max=280))
+milestone_type_entry:
+  milestone_type: str(min=1, max=280)
+  sql_file: str(min=1, max=280)
+  scan: include("milestone_scan")
+  params: map(str(), key=str(min=1, max=280), required=False)
+milestone_scan:
+  ts_column: str(min=1, max=280)
+  lookback_days: int(min=0)
