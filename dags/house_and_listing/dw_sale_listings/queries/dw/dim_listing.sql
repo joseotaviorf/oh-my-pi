@@ -9,7 +9,6 @@ WITH currentHLR AS (
 SELECT
   sl.id_sale_listing AS sk_sale_listing,
   lbc.id_house AS sk_house,
-  h.id_company_hubspot AS sk_company_hubspot,
   hsc.id_suggestion_change AS sk_suggestion_change,
   hlco.consultant_type,
   hlco.first_consultant_type,
@@ -48,8 +47,6 @@ SELECT
     WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
   END AS partner_3p_supply,
   h.is_sale_3p_supply AS is_3p_supply,
-  h.is_3p_supply_5a AND h.is_sale_3p_supply AS is_3p_supply_5a,
-  h.is_3p_supply_bh AND h.is_sale_3p_supply AS is_3p_supply_bh,
   h.is_casa_mineira_migration,
   h.sale_price > 1000000 AS is_high_ticket,
   h.is_sale_primary_market AS is_primary_market,

@@ -2,7 +2,6 @@ SELECT
   sl.id_sale_listing AS sk_sale_listing,
   sl.id_house AS sk_house,
   h.id_user AS sk_owner,
-  h.id_company_hubspot AS sk_company_hubspot,
   CAST(hlco.id_user AS BIGINT) AS sk_user_consultant,
   h.id_region AS sk_region, 
   COALESCE(
@@ -56,18 +55,8 @@ LEFT JOIN
     AND hlco.is_last_ciq_on_listing = True
 LEFT JOIN
   datalake_company.company_sks AS cs_supply
-    ON (
-      h.uuid_company IS NOT NULL
-      AND h.uuid_company = cs_supply.uuid_company
-    ) OR (
-      h.uuid_company IS NULL
-      AND h.id_company_hubspot IS NOT NULL
-      AND h.id_company_hubspot = cs_supply.id_hubspot
-    ) OR (
-       h.uuid_company IS NULL
-       AND h.id_company_hubspot IS NULL
-       AND h.partner_3p_supply = cs_supply.extracted_3p_tag
-    )
+    ON h.uuid_company IS NOT NULL
+    AND h.uuid_company = cs_supply.uuid_company
 LEFT JOIN
   core_brokers.brokers AS cb
     ON h.uuid_company = cb.uuid_company
