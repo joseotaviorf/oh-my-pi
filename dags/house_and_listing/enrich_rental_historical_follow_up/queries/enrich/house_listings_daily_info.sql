@@ -14,7 +14,7 @@ WITH daily_base AS (
     -- If a status ends in the current day, but the listing still existing and there's a new status
     -- we are not consuming the ended status in this day. In order to update the ts_status_ended
     -- for this status, we need to go back 1 day and rewrite its partition.
-        date BETWEEN DATE('{year}-{month}-{day}') - INTERVAL 1 DAY AND DATE('{year}-{month}-{day}')
+        date BETWEEN DATE_SUB(MAKE_DATE({year}, {month}, {day}), 1) AND MAKE_DATE({year}, {month}, {day})
 ),
 lbc AS (
     SELECT
@@ -38,22 +38,39 @@ last_ciq_of_day AS (
     the same time. It's an error, and we are treating it in this CTE.
 
     */
-    SELECT /*+ RANGE_JOIN(hch, 340) */
-        id_house,
-        id_partner,
-        consultant_type,
-        MAX(rev) OVER(PARTITION BY id_house, dbase.dt_day) = rev AS is_last_status_house_of_day,
-        dbase.dt_day,
-        ts_enrollment_started,
-        ts_enrollment_ended
-    FROM
-        datalake_big_agent.house_consultant_history AS hch
-    JOIN
+    SELECT
+        ced.id_house,
+        ced.id_partner,
+        ced.consultant_type,
+        MAX(ced.rev) OVER (PARTITION BY ced.id_house, ced.dt_day) = ced.rev AS is_last_status_house_of_day,
+        ced.dt_day,
+        ced.ts_enrollment_started,
+        ced.ts_enrollment_ended
+    FROM (
+        SELECT
+            hch.id_house,
+            hch.id_partner,
+            hch.consultant_type,
+            hch.rev,
+            hch.ts_enrollment_started,
+            hch.ts_enrollment_ended,
+            EXPLODE(
+                SEQUENCE(
+                    DATE(hch.ts_enrollment_started),
+                    DATE_SUB(COALESCE(DATE(hch.ts_enrollment_ended), DATE('2100-01-01')), 1)
+                )
+            ) AS dt_day
+        FROM
+            datalake_big_agent.house_consultant_history AS hch
+        WHERE
+            hch.is_last_status_of_day = TRUE
+            AND DATE(hch.ts_enrollment_started) <= DATE_SUB(
+                COALESCE(DATE(hch.ts_enrollment_ended), DATE('2100-01-01')), 1
+            )
+    ) AS ced
+    INNER JOIN
         daily_base AS dbase
-            ON dbase.dt_day >= DATE(hch.ts_enrollment_started)
-            AND dbase.dt_day < COALESCE(DATE(hch.ts_enrollment_ended), '2100-01-01')
-    WHERE
-        hch.is_last_status_of_day = True
+            ON dbase.dt_day = ced.dt_day
 ),
 rent_listing as (
     SELECT
@@ -220,8 +237,60 @@ favorite_set AS (
     GROUP BY
         2, 3
 ),
+listing_status_days AS (
+    SELECT
+        hls.id_house_listing,
+        EXPLODE(
+            SEQUENCE(
+                DATE(hls.ts_status_started),
+                DATE_SUB(COALESCE(DATE(hls.ts_status_ended), DATE('2100-01-01')), 1)
+            )
+        ) AS dt_day
+    FROM
+        datalake_ebdb_listing.house_listing_status AS hls
+    WHERE
+        hls.is_last_status_of_day = TRUE
+        AND DATE(hls.ts_status_started) <= DATE_SUB(
+            COALESCE(DATE(hls.ts_status_ended), DATE('2100-01-01')), 1
+        )
+),
+listing_contract_days AS (
+    SELECT
+        hl.id_house_listing,
+        EXPLODE(
+            SEQUENCE(
+                DATE(c.ts_created),
+                DATE_SUB(COALESCE(c.dt_termination, CURRENT_DATE()), 1)
+            )
+        ) AS dt_day
+    FROM
+        datalake_ebdb_listing.house_listing AS hl
+    INNER JOIN
+        previous_listing_early_demand AS pled
+            ON hl.id_house_listing = pled.id_house_listing
+    INNER JOIN
+        datalake_ebdb_contract.contract AS c
+            ON pled.id_contract = c.id
+    WHERE
+        DATE(c.ts_created) <= DATE_SUB(COALESCE(c.dt_termination, CURRENT_DATE()), 1)
+),
+listing_calendar_days AS (
+    SELECT
+        id_house_listing,
+        dt_day
+    FROM
+        listing_status_days
+
+    UNION
+
+    SELECT
+        id_house_listing,
+        dt_day
+    FROM
+        listing_contract_days
+),
 listings_states_per_day AS (
-    SELECT /*+ RANGE_JOIN(heh, 1180) */
+    SELECT
         CONCAT(COALESCE(pled.id_house_listing, hl.id_house_listing), DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
         COALESCE(pled.id_house_listing, hl.id_house_listing) AS id_house_listing,
         COALESCE(pled.id_house, hl.id_house) AS id_house,
@@ -236,7 +305,6 @@ listings_states_per_day AS (
         lpc.id_price_change,
         hsc.id_suggestion_change,
         IF(h.is_rent_3p_supply, h.uuid_company, NULL) AS uuid_company,
-        IF(h.is_rent_3p_supply, h.id_company_hubspot, NULL) AS id_company_hubspot,
         IF(h.is_rent_3p_supply, h.partner_3p_supply, NULL) AS partner_3p_supply,
         h.country_code,
         COALESCE(rl.rental_administrator, 'QUINTOANDAR') AS rental_administrator,
@@ -311,12 +379,12 @@ listings_states_per_day AS (
     LEFT JOIN
         datalake_ebdb_contract.contract AS c
             ON pled.id_contract = c.id
-    JOIN
+    INNER JOIN
+        listing_calendar_days AS lcd
+            ON hl.id_house_listing = lcd.id_house_listing
+    INNER JOIN
         daily_base AS dbase
-            ON (dbase.dt_day >= DATE(hls.ts_status_started)
-                AND dbase.dt_day < COALESCE(DATE(hls.ts_status_ended), '2100-01-01'))
-            OR (dbase.dt_day >= c.ts_created
-                AND dbase.dt_day < COALESCE(c.dt_termination, CURRENT_DATE()))
+            ON dbase.dt_day = lcd.dt_day
     LEFT JOIN
         lbc
             ON lbc.id_house = hl.id_house
@@ -358,8 +426,14 @@ listings_states_per_day AS (
             ON COALESCE(pled.id_house, hl.id_house) = b2b.id_house
     LEFT JOIN
         datalake_ebdb_listing.house_status AS hs
-            ON hls.status_history <=> hs.house_status
-            AND hls.status_change_reason <=> hs.status_reason
+            ON hls.status_history = hs.house_status
+            AND (
+                hls.status_change_reason = hs.status_reason
+                OR (
+                    hls.status_change_reason IS NULL
+                    AND hs.status_reason IS NULL
+                )
+            )
     LEFT JOIN
         datalake_ebdb_listing.listing_business_context_status_history AS lbcsh
             ON COALESCE(pled.id_house, hl.id_house) = lbcsh.id_house
@@ -411,8 +485,20 @@ listings_states_per_day AS (
     we are removing houses that are pure Sales from here.
     */
     WHERE
-        lbc.id_house IS NULL
-        OR lbc.is_for_rent
+        (
+            (
+                dbase.dt_day >= DATE(hls.ts_status_started)
+                AND dbase.dt_day < COALESCE(DATE(hls.ts_status_ended), DATE('2100-01-01'))
+            )
+            OR (
+                dbase.dt_day >= c.ts_created
+                AND dbase.dt_day < COALESCE(c.dt_termination, CURRENT_DATE())
+            )
+        )
+        AND (
+            lbc.id_house IS NULL
+            OR lbc.is_for_rent
+        )
 )
 SELECT
     id_house_listing_day,
@@ -429,7 +515,6 @@ SELECT
     id_price_change,
     id_suggestion_change,
     uuid_company,
-    id_company_hubspot,
     partner_3p_supply,
     country_code,
     rental_administrator,

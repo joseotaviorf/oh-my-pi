@@ -26,10 +26,6 @@ columns:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_region
     description: Identifier of the region where the sale listing is active.
-  id_company_hubspot:
-    lineage:
-      - datalake_ebdb_listing.house.id_company_hubspot
-    description: The id of the Rede company in Hubspot.
   uuid_company:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
