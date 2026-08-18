@@ -1,2 +1,29 @@
 cluster:
   type: emr_7_12_consolidation_l_memory_cluster
+  custom_configurations:
+    # NVMe-backed Graviton (same 16 vCPU / 122 GB as r6g.4xlarge, + 950 GB local
+    # SSD). j-09460182FMK2IS61UIRE spilled 76 GiB from a single sort thread onto
+    # the preset's 400 GB gp3 (125 MiB/s baseline), which is what made the
+    # obt_supply straggler take 17 min at 7% node CPU. Keeping the preset's gp3
+    # volume as overflow headroom rather than dropping it (untested in this repo
+    # and unverified against a live cluster launch) -- YARN's local-dirs use
+    # both the NVMe and the EBS volume, so most spill still lands on the NVMe.
+    master_node_type_id: r6gd.4xlarge
+    core_nodes:
+      node_type_id: r6gd.4xlarge
+      instance_count: 2
+    spark_conf:
+      # 48g + 4g overhead = 52 GB containers, so only 2 fit in the node's
+      # 116736 MB YARN capacity -> 8 of 16 vCores allocatable per node.
+      # 32g + 4g = 36 GB fits 3 executors (110592 MB) + the 4 GB AM, and
+      # 3 x 5 + 1 AM core = exactly 16 vCores. 30 task slots instead of 16.
+      spark.executor.cores: "5"
+      spark.executor.memory: "32g"
+      spark.executor.memoryOverhead: "4g"
+      spark.dynamicAllocation.minExecutors: "1"
+      spark.dynamicAllocation.maxExecutors: "6"
+      # 100 partitions is too coarse for stages carrying tens of GiB, and AQE
+      # coalescePartitions can only merge, never split.
+      spark.sql.shuffle.partitions: "600"
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "134217728"
+      spark.driver.maxResultSize: "4g"

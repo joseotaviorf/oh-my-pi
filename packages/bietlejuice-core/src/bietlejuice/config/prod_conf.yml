@@ -1744,8 +1744,15 @@ emr_cluster_base: &emr_cluster_anchor
         spark.sql.adaptive.skewJoin.enabled: "true"
         spark.sql.adaptive.localShuffleReader.enabled: "true"
         spark.sql.shuffle.partitions: "100"
+        # Planner-time broadcast stays off: #26363 hit multi-GB BroadcastHashJoins
+        # because Catalyst underestimates build-side size from Glue stats /
+        # compressed parquet file lengths (Wonka, fact_tickets).
         spark.sql.autoBroadcastJoinThreshold: "-1"
-        spark.sql.adaptive.autoBroadcastJoinThreshold: "-1"
+        # AQE re-plans after a shuffle stage completes, so JoinSelection sees
+        # measured MapOutputStatistics bytes (Statistics.isRuntime) instead of an
+        # estimate; the SortMergeJoin -> BroadcastHashJoin promotion is bounded by
+        # the shuffle compression ratio, not by cardinality-estimation error.
+        spark.sql.adaptive.autoBroadcastJoinThreshold: "67108864"
         spark.serializer: "org.apache.spark.serializer.KryoSerializer"
         spark.scheduler.mode: FAIR
         spark.speculation: "false"
