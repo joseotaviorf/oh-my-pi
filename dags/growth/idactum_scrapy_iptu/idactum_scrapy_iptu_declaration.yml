@@ -4,9 +4,9 @@ dag:
   schedule_start_date: 2026, 05, 07
   documentation:
     dag_purpose: |
-      Ingest Idactum Scrapy IPTU crawler output (Osasco extrato IPTU) from
-      crawler-scrapy-{forno|prod} into the shared crawled_idactum_houses raw/clean
-      databases. Clean layer is a passthrough until PDF/OCR extraction is implemented.
+      Ingest Idactum Scrapy IPTU crawler outputs (Osasco extrato IPTU, Brasilia debitos and
+      pauta) from crawler-scrapy-{forno|prod} into the shared crawled_idactum_houses raw/clean
+      databases. Osasco extrato remains passthrough until PDF/OCR extraction is implemented.
 workflow:
   layer: raw
   type: custom_ingestion
@@ -26,4 +26,8 @@ workflow:
     - "{table_name}"
   tables_customization:
     sp_osasco_extrato_iptu:
+      partitions: [year, month, day]
+    bsb_main_debitos:
+      partitions: [year, month, day]
+    bsb_main_pauta:
       partitions: [year, month, day]
