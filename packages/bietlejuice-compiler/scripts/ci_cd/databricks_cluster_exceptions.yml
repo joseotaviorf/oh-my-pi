@@ -81,3 +81,20 @@ exceptions:
       Temporary Databricks rollback: the enrich_transactional_entities workflow is taking too long to run on EMR.
       We'll need to make some optimizations to the workflow to make it run faster on EMR.
     approved_by: jose.rferreira@quintoandar.com
+  - dag: amplitude_new
+    path: dags/growth/amplitude_new
+    reason: >-
+      Temporary EMR→Databricks revert for performance: load-clean-events does
+      not complete on the EMR fleet (timed out after ~2h on the 2026-08-18 prod
+      run). The clean write is skewed on the id_app/event_type partitions and
+      spills heavily; cluster/spark_conf tuning alone did not resolve it.
+      Returns to EMR once the write skew is addressed.
+    approved_by: eduardo.soares@quintoandar.com.br
+  - dag: braze_events
+    path: dags/support_and_service/braze_events
+    reason: >-
+      Temporary EMR→Databricks revert for performance: the load-raw-events-*
+      tasks do not complete on the EMR fleet (still running after ~1h30 on the
+      2026-08-18 prod run, no terminal state). Returns to EMR once the raw
+      ingestion is optimized.
+    approved_by: eduardo.soares@quintoandar.com.br
