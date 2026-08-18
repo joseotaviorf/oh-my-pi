@@ -1,13 +1,7 @@
 cluster:
-  type: consolidation_xs_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
   custom_libraries:
   - jar: '{artifacts_bucket}/jars/mssql-jdbc-12.8.1.jre8.jar'
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    driver_node_type_id: r7g.xlarge
-validation:
-  cluster:
-    type: emr_7_12_consolidation_xs_memory_fleet_cluster
-  allow_custom_spark_job: true

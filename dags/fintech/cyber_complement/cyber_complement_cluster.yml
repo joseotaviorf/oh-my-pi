@@ -1,9 +1,4 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_libraries:
   - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
-validation:
-  cluster:
-    type: emr_7_12_consolidation_s_memory_fleet_cluster
-  allow_custom_spark_job: true
