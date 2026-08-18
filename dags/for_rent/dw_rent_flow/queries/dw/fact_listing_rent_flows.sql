@@ -44,7 +44,8 @@ WITH listing_rent_flows AS (
             COALESCE(advance_payment.id_advance_payment, -1) AS sk_advance_payment,
             COALESCE(reservation.id_reservation, -1) AS sk_reservation,
             COALESCE(dim_booking.sk_rent_flow_taxonomy, -1) AS sk_rent_flow_taxonomy,
-            COALESCE(cs_company.sk_company, cs_hubspot.sk_company, cs_tag.sk_company, -1) AS sk_company_supply,
+            COALESCE(cs_company.sk_company, -1) AS sk_company_supply,
+            COALESCE(IF(h.is_rent_3p_supply, cb.sk_broker, NULL), '-1') AS sk_broker_supply,
             h.country_code,
             proposal.status AS proposal_status,
             dim_booking.utm_campaign AS booking_utm_campaign,
@@ -192,15 +193,11 @@ WITH listing_rent_flows AS (
         LEFT JOIN
             datalake_company.company_sks AS cs_company
                 ON h.is_rent_3p_supply
+                AND h.uuid_company IS NOT NULL
                 AND h.uuid_company = cs_company.uuid_company
         LEFT JOIN
-            datalake_company.company_sks AS cs_hubspot
-                ON h.is_rent_3p_supply
-                AND h.id_company_hubspot = cs_hubspot.id_hubspot
-        LEFT JOIN
-            datalake_company.company_sks AS cs_tag
-                ON h.is_rent_3p_supply
-                AND h.partner_3p_supply = cs_tag.extracted_3p_tag
+            core_brokers.brokers AS cb
+                ON h.uuid_company = cb.uuid_company
         LEFT JOIN
             advance_payment
                 ON rent_flow.id_rent_flow = advance_payment.id_rent_flow
@@ -387,6 +384,7 @@ SELECT
     sk_advance_payment,
     sk_rent_flow_taxonomy,
     sk_company_supply,
+    sk_broker_supply,
     sk_house_first_listing_date,
     sk_house_listing_date,
     sk_house_listing_de_publication_date,

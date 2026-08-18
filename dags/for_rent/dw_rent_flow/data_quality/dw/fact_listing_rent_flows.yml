@@ -50,6 +50,9 @@ column_level_validations:
   sk_rent_flow_taxonomy:
     is_complete:
       severity_level: Error
+  sk_broker_supply:
+    is_complete:
+      severity_level: Error
   sk_house_first_listing_date:
     is_complete:
       severity_level: Error

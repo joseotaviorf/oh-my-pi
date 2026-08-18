@@ -70,7 +70,7 @@ min_max_events AS (
 last_rent_flow_event AS (
     /** As this model is dedicated to the very last update of the rent flow, we decided to always get
         the most recent update of it (since the enriched base table has multiple lines for each rent flow),
-        so we need to apply a QUALIFY() based on the rent flow and its last event. **/
+        so we dedupe with ROW_NUMBER() on the rent flow and its last event. **/
     SELECT
         id_rent_flow,
         id_house,
@@ -78,7 +78,6 @@ last_rent_flow_event AS (
         id_owner,
         id_region,
         uuid_company,
-        id_company_hubspot,
         partner_3p_supply,
         country_code,
         first_touchpoint,
@@ -91,10 +90,33 @@ last_rent_flow_event AS (
         has_tta_flow,
         ts_created,
         ts_updated
-    FROM
-        datalake_rent_flows.rent_flows
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_rent_flow ORDER BY ts_rent_flow_event DESC) = 1
+    FROM (
+        SELECT
+            id_rent_flow,
+            id_house,
+            id_tenant_prospect,
+            id_owner,
+            id_region,
+            uuid_company,
+            partner_3p_supply,
+            country_code,
+            first_touchpoint,
+            status,
+            is_step_rejected,
+            is_valid_rent_flow,
+            has_visit_flow,
+            has_offer_flow,
+            has_direct_offer_flow,
+            has_tta_flow,
+            ts_created,
+            ts_updated,
+            ts_rent_flow_event,
+            ROW_NUMBER() OVER (PARTITION BY id_rent_flow ORDER BY ts_rent_flow_event DESC) AS _w
+        FROM
+            datalake_rent_flows.rent_flows
+    ) AS _t
+    WHERE
+        _w = 1
 )
 SELECT
   rf.id_rent_flow AS sk_rent_flow,
@@ -116,6 +138,7 @@ SELECT
   COALESCE(m.id_last_advance_payment, -1) AS sk_last_advance_payment,
   COALESCE(rf.id_region, -1) AS sk_region,
   COALESCE(cs.sk_company, -1) AS sk_company_supply,
+  COALESCE(IF(rf.uuid_company IS NOT NULL, cb.sk_broker, NULL), '-1') AS sk_broker_supply,
   COALESCE(CAST(DATE_FORMAT(m.ts_first_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_event_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_first_booking_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_booking_created_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_first_visit_completed, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_visit_completed_date,
@@ -193,27 +216,20 @@ JOIN
     AND rf.id_tenant_prospect = m.id_tenant_prospect
 JOIN
     datalake_rent_flows.rent_flows_types AS rt
-        ON rf.country_code <=> rt.country_code
-        AND rf.first_touchpoint <=> rt.first_touchpoint
-        AND rf.status <=> rt.status
-        AND rf.is_step_rejected <=> rt.is_step_rejected
-        AND rf.is_valid_rent_flow <=> rt.is_valid_rent_flow
-        AND rf.has_visit_flow <=> rt.has_visit_flow
-        AND rf.has_offer_flow <=> rt.has_offer_flow
-        AND rf.has_direct_offer_flow <=> rt.has_direct_offer_flow
-        AND rf.has_tta_flow <=> rt.has_tta_flow
-        AND IF(c.nbr_contracts_signed > 0, TRUE, FALSE) <=> rt.had_contract_signed
+        ON COALESCE(rf.country_code, -1) = COALESCE(rt.country_code, -1)
+        AND COALESCE(rf.first_touchpoint, -1) = COALESCE(rt.first_touchpoint, -1)
+        AND COALESCE(rf.status, -1) = COALESCE(rt.status, -1)
+        AND COALESCE(CAST(rf.is_step_rejected AS INT), -1) = COALESCE(CAST(rt.is_step_rejected AS INT), -1)
+        AND COALESCE(CAST(rf.is_valid_rent_flow AS INT), -1) = COALESCE(CAST(rt.is_valid_rent_flow AS INT), -1)
+        AND COALESCE(CAST(rf.has_visit_flow AS INT), -1) = COALESCE(CAST(rt.has_visit_flow AS INT), -1)
+        AND COALESCE(CAST(rf.has_offer_flow AS INT), -1) = COALESCE(CAST(rt.has_offer_flow AS INT), -1)
+        AND COALESCE(CAST(rf.has_direct_offer_flow AS INT), -1) = COALESCE(CAST(rt.has_direct_offer_flow AS INT), -1)
+        AND COALESCE(CAST(rf.has_tta_flow AS INT), -1) = COALESCE(CAST(rt.has_tta_flow AS INT), -1)
+        AND IF(c.nbr_contracts_signed > 0, TRUE, FALSE) = COALESCE(rt.had_contract_signed, FALSE)
 LEFT JOIN
     datalake_company.company_sks AS cs
-        ON (
-            rf.uuid_company IS NOT NULL
-            AND rf.uuid_company = cs.uuid_company
-        ) OR (
-            rf.uuid_company IS NULL
-            AND rf.id_company_hubspot IS NOT NULL
-            AND rf.id_company_hubspot = cs.id_hubspot
-        ) OR (
-             rf.uuid_company IS NULL
-             AND rf.id_company_hubspot IS NULL
-             AND rf.partner_3p_supply = cs.extracted_3p_tag
-        )
+        ON rf.uuid_company IS NOT NULL
+        AND rf.uuid_company = cs.uuid_company
+LEFT JOIN
+    core_brokers.brokers AS cb
+        ON rf.uuid_company = cb.uuid_company

@@ -87,11 +87,6 @@ columns:
       - datalake_ebdb_listing.house.uuid_company
       - datalake_rent_demand_events.rent_demand_events.uuid_company
     description: UUID of the Rede company.
-  id_company_hubspot:
-    lineage:
-      - datalake_ebdb_listing.house.id_company_hubspot
-      - datalake_rent_demand_events.rent_demand_events.id_company_hubspot
-    description: Id of the Rede company in Hubspot.
   partner_3p_supply:
     lineage:
       - datalake_ebdb_listing.house.partner_3p_supply

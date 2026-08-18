@@ -47,7 +47,8 @@ SELECT
   COALESCE(rde.id_region, -1) AS sk_region,
   COALESCE(rde.id_owner, -1) AS sk_owner,
   COALESCE(rde.id_owner_category, -1) AS sk_owner_category,
-  COALESCE(supply_company.sk_company, supply_hubspot.sk_company, supply_tag.sk_company, -1) AS sk_company_supply,
+  COALESCE(supply_company.sk_company, -1) AS sk_company_supply,
+  COALESCE(IF(rde.uuid_company IS NOT NULL, cb.sk_broker, NULL), '-1') AS sk_broker_supply,
   COALESCE(CAST(DATE_FORMAT(rde.ts_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_event_date,
   rde.country_code,
   rde.is_during_termination,
@@ -60,8 +61,7 @@ FROM datalake_rent_demand_events.rent_demand_events AS rde
 LEFT JOIN rent_flow_type AS rt
   ON rt.id_rent_flow = rde.id_rent_flow
 LEFT JOIN datalake_company.company_sks AS supply_company
-  ON rde.uuid_company = supply_company.uuid_company
-LEFT JOIN datalake_company.company_sks AS supply_hubspot
-  ON rde.id_company_hubspot = supply_hubspot.id_hubspot
-LEFT JOIN datalake_company.company_sks AS supply_tag
-  ON rde.partner_3p_supply = supply_tag.extracted_3p_tag
+  ON rde.uuid_company IS NOT NULL
+  AND rde.uuid_company = supply_company.uuid_company
+LEFT JOIN core_brokers.brokers AS cb
+  ON rde.uuid_company = cb.uuid_company
