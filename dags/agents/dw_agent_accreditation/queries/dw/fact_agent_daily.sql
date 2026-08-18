@@ -16,7 +16,13 @@ WITH agent_spine AS (
         agent.days_in_current_status,
         agent.ts_last_status_changed,
         agent.ts_created,
-        EXPLODE(SEQUENCE(DATE(agent.ts_created), CURRENT_DATE, INTERVAL 1 DAY)) AS dt_ref
+        EXPLODE(
+            SEQUENCE(
+                DATE(agent.ts_created),
+                GREATEST(DATE(agent.ts_created), CURRENT_DATE),
+                INTERVAL 1 DAY
+            )
+        ) AS dt_ref
     FROM
         datalake_agent_accreditation.agent AS agent
 ),
@@ -87,7 +93,10 @@ segmentation_activation_history AS (
             EXPLODE(
                 SEQUENCE(
                     ah.dt_started,
-                    COALESCE(ah.dt_ended - INTERVAL 1 DAY, CURRENT_DATE),
+                    GREATEST(
+                        ah.dt_started,
+                        COALESCE(ah.dt_ended - INTERVAL 1 DAY, CURRENT_DATE)
+                    ),
                     INTERVAL 1 DAY
                 )
             ) AS dt_reference
