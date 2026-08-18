@@ -237,6 +237,8 @@ And add/adjust tests:
 - [`packages/bietlejuice-core/test/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py`](../../packages/bietlejuice-core/test/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py)
 - [`packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py`](../../packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py)
 
+Static session headers (`workflow.http_headers` plus a per-table overlay) and cursor `*_location` knobs (`header` | `param`) are wired in the loader and validated in Cerberus / `_validate_api_ingestion_workflow`. Keep `http_user_agent` as the `User-Agent` knob; do not add vendor-specific header helpers.
+
 ---
 
 ## Common pitfalls

@@ -231,6 +231,13 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "http_headers": {
+                    "type": "dict",
+                    "empty": False,
+                    "required": False,
+                    "keysrules": {"type": "string", "empty": False},
+                    "valuesrules": {"type": "string", "empty": False},
+                },
                 "authentication": {
                     "type": "dict",
                     "empty": False,
@@ -394,6 +401,24 @@ class DAGDeclarationValidator(Validator):
                                     "type": "string",
                                     "empty": False,
                                     "required": False,
+                                },
+                                "cursor_location": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                    "allowed": ["header", "param"],
+                                },
+                                "context_location": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                    "allowed": ["header", "param"],
+                                },
+                                "page_size_location": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                    "allowed": ["header", "param"],
                                 },
                                 "cursor_response_path": {
                                     "type": "string",
@@ -654,6 +679,48 @@ class DAGDeclarationValidator(Validator):
         if workflow_type == WorkflowEnum.QUERY_DELTA_WORKFLOW.value:
             self._check_query_delta_rejects_datazord_config(dag_declaration)
 
+    _PAGINATION_LOCATION_KEYS = (
+        "cursor_location",
+        "context_location",
+        "page_size_location",
+    )
+    _ALLOWED_PAGINATION_LOCATIONS = ("header", "param")
+
+    def _check_http_headers_map(self, http_headers, scope_label: str) -> None:
+        if http_headers is None:
+            return
+        if not isinstance(http_headers, dict):
+            raise AssertionError(
+                "m=_validate_api_ingestion_workflow, "
+                f"msg='http_headers' {scope_label} must be a mapping of "
+                "header name to string value"
+            )
+        for header_name, header_value in http_headers.items():
+            if not isinstance(header_name, str) or not header_name.strip():
+                raise AssertionError(
+                    "m=_validate_api_ingestion_workflow, "
+                    f"msg='http_headers' {scope_label} keys must be non-empty strings"
+                )
+            if not isinstance(header_value, str) or not header_value.strip():
+                raise AssertionError(
+                    "m=_validate_api_ingestion_workflow, "
+                    f"msg='http_headers' {scope_label} values must be non-empty strings"
+                )
+
+    def _check_pagination_locations(self, pagination_config, scope_label: str) -> None:
+        if not isinstance(pagination_config, dict):
+            return
+        for location_key in self._PAGINATION_LOCATION_KEYS:
+            location_value = pagination_config.get(location_key)
+            if location_value is None:
+                continue
+            if location_value not in self._ALLOWED_PAGINATION_LOCATIONS:
+                raise AssertionError(
+                    "m=_validate_api_ingestion_workflow, "
+                    f"msg='{location_key}' {scope_label} must be one of "
+                    f"{list(self._ALLOWED_PAGINATION_LOCATIONS)}, got {location_value!r}"
+                )
+
     def _validate_query_view_workflow(self, dag_declaration: dict) -> None:
         workflow = dag_declaration.get("workflow", {})
         tables_customization = workflow.get("tables_customization", {})
@@ -839,6 +906,12 @@ class DAGDeclarationValidator(Validator):
         workflow = dag_declaration.get("workflow", {})
         tables_customization = workflow.get("tables_customization", {})
 
+        self._check_http_headers_map(workflow.get("http_headers"), "at workflow level")
+        workflow_pagination = workflow.get("pagination") or (
+            workflow.get("api_policies") or {}
+        ).get("pagination")
+        self._check_pagination_locations(workflow_pagination, "at workflow level")
+
         if not workflow.get("load_spark_job"):
             workflow["load_spark_job"] = "load_api_ingestion_raw"
 
@@ -885,6 +958,17 @@ class DAGDeclarationValidator(Validator):
         for table_name, table_config in tables_customization.items():
             if not isinstance(table_config, dict):
                 continue
+
+            self._check_http_headers_map(
+                table_config.get("http_headers"),
+                f"for table '{table_name}'",
+            )
+            table_pagination = table_config.get("pagination") or (
+                table_config.get("api_policies") or {}
+            ).get("pagination")
+            self._check_pagination_locations(
+                table_pagination, f"for table '{table_name}'"
+            )
 
             endpoint_path = table_config.get("endpoint_path")
             if not endpoint_path:

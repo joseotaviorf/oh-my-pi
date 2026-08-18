@@ -197,6 +197,77 @@ class TestAPIConfigurationLoaderCreateAPIClient:
 
         assert client.session.headers.get("User-Agent") == "CustomIntegration/1.0"
 
+    def test_create_api_client_applies_workflow_http_headers(self):
+        """Workflow http_headers are set on the session."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "http_headers": {"anthropic-version": "2023-06-01"},
+            "authentication": {"strategy": "none"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert client.session.headers.get("anthropic-version") == "2023-06-01"
+
+    def test_create_api_client_http_headers_table_overlay_merges_and_overrides(self):
+        """Table http_headers overlay workflow; table wins on the same key."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "http_headers": {
+                "anthropic-version": "2023-06-01",
+                "X-Tenant": "workflow",
+            },
+            "authentication": {"strategy": "none"},
+        }
+        table_config = {
+            "endpoint_path": "groups",
+            "http_headers": {
+                "anthropic-beta": "ce-user-management-2026-07-13",
+                "X-Tenant": "table",
+            },
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert client.session.headers.get("anthropic-version") == "2023-06-01"
+        assert (
+            client.session.headers.get("anthropic-beta")
+            == "ce-user-management-2026-07-13"
+        )
+        assert client.session.headers.get("X-Tenant") == "table"
+
+    def test_create_api_client_http_headers_absent_table_keeps_workflow(self):
+        """Missing table http_headers inherits the workflow map."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "http_headers": {"anthropic-version": "2023-06-01"},
+            "authentication": {"strategy": "none"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert client.session.headers.get("anthropic-version") == "2023-06-01"
+
+    def test_create_api_client_http_user_agent_wins_over_http_headers(self):
+        """http_user_agent remains the User-Agent knob when both are set."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "http_headers": {"User-Agent": "FromHeaders/1.0"},
+            "http_user_agent": "FromKnob/1.0",
+            "authentication": {"strategy": "none"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert client.session.headers.get("User-Agent") == "FromKnob/1.0"
+
     def test_create_api_client_with_retry_policy(self):
         """Test that retry policy is configured correctly."""
         workflow_config = {
@@ -422,6 +493,47 @@ class TestAPIConfigurationLoaderCreatePaginator:
         paginator = loader.create_paginator(client, "events", {})
 
         assert isinstance(paginator, CursorPaginator)
+        assert paginator.cursor_location == "header"
+        assert paginator.context_location == "header"
+        assert paginator.page_size_location == "header"
+
+    def test_create_paginator_cursor_location_param_puts_cursor_in_query_params(self):
+        """YAML cursor_location param sends the next cursor as a query param."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {
+                "pagination": {
+                    "strategy": "cursor",
+                    "cursor_location": "param",
+                    "cursor_param": "page",
+                    "cursor_response_path": "next_page",
+                }
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+        first_page = Mock()
+        first_page.json.return_value = {
+            "results": [{"id": 1}],
+            "next_page": "cursor-2",
+        }
+        last_page = Mock()
+        last_page.json.return_value = {
+            "results": [{"id": 2}],
+            "next_page": None,
+        }
+        client.get.side_effect = [first_page, last_page]
+
+        paginator = loader.create_paginator(client, "events", {})
+        list(paginator.fetch_all())
+
+        assert paginator.cursor_location == "param"
+        assert paginator.cursor_param == "page"
+        assert paginator.cursor_response_path == "next_page"
+        second_call_kwargs = client.get.call_args_list[1].kwargs
+        assert second_call_kwargs["params"]["page"] == "cursor-2"
+        assert "page" not in (second_call_kwargs.get("headers") or {})
 
     def test_create_paginator_none_strategy(self):
         """Test that 'none' pagination strategy returns None."""

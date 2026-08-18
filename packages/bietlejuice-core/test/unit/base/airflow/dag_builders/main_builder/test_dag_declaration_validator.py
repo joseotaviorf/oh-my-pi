@@ -119,6 +119,124 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
 
         dag_declaration_validator.validate(dag_declaration=dag_declaration)
 
+    def test_validate_api_ingestion_workflow_http_headers_map_passes(
+        self, dag_declaration_validator
+    ):
+        """Valid workflow and table http_headers maps pass validation."""
+        dag_declaration = {
+            "dag": {"name": "test_api_dag", "owner": "Data Engineering"},
+            "workflow": {
+                "type": "api_ingestion",
+                "layer": "raw",
+                "api_base_url": "https://api.example.com/",
+                "authentication": {"strategy": "none"},
+                "http_headers": {"anthropic-version": "2023-06-01"},
+                "tables_customization": {
+                    "events": {"endpoint_path": "events"},
+                    "rbac_groups": {
+                        "endpoint_path": "groups",
+                        "http_headers": {
+                            "anthropic-beta": "ce-user-management-2026-07-13"
+                        },
+                    },
+                },
+            },
+        }
+
+        dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_api_ingestion_workflow_invalid_http_headers_type_raises(
+        self, dag_declaration_validator
+    ):
+        """Non-dict http_headers is rejected."""
+        dag_declaration = {
+            "dag": {"name": "test_api_dag", "owner": "Data Engineering"},
+            "workflow": {
+                "type": "api_ingestion",
+                "layer": "raw",
+                "api_base_url": "https://api.example.com/",
+                "authentication": {"strategy": "none"},
+                "http_headers": ["anthropic-version: 2023-06-01"],
+                "tables_customization": {"events": {"endpoint_path": "events"}},
+            },
+        }
+
+        with pytest.raises(AssertionError, match="http_headers"):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_api_ingestion_workflow_invalid_table_http_headers_type_raises(
+        self, dag_declaration_validator
+    ):
+        """Non-dict table http_headers is rejected."""
+        dag_declaration = {
+            "dag": {"name": "test_api_dag", "owner": "Data Engineering"},
+            "workflow": {
+                "type": "api_ingestion",
+                "layer": "raw",
+                "api_base_url": "https://api.example.com/",
+                "authentication": {"strategy": "none"},
+                "tables_customization": {
+                    "events": {
+                        "endpoint_path": "events",
+                        "http_headers": "anthropic-version: 2023-06-01",
+                    }
+                },
+            },
+        }
+
+        with pytest.raises(AssertionError, match="http_headers"):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_api_ingestion_workflow_invalid_cursor_location_raises(
+        self, dag_declaration_validator
+    ):
+        """Invalid cursor_location is rejected."""
+        dag_declaration = {
+            "dag": {"name": "test_api_dag", "owner": "Data Engineering"},
+            "workflow": {
+                "type": "api_ingestion",
+                "layer": "raw",
+                "api_base_url": "https://api.example.com/",
+                "authentication": {"strategy": "none"},
+                "api_policies": {
+                    "pagination": {
+                        "strategy": "cursor",
+                        "cursor_location": "query",
+                    }
+                },
+                "tables_customization": {"events": {"endpoint_path": "events"}},
+            },
+        }
+
+        with pytest.raises(AssertionError, match="cursor_location"):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_api_ingestion_workflow_invalid_table_cursor_location_raises(
+        self, dag_declaration_validator
+    ):
+        """Invalid table-level cursor_location is rejected."""
+        dag_declaration = {
+            "dag": {"name": "test_api_dag", "owner": "Data Engineering"},
+            "workflow": {
+                "type": "api_ingestion",
+                "layer": "raw",
+                "api_base_url": "https://api.example.com/",
+                "authentication": {"strategy": "none"},
+                "tables_customization": {
+                    "events": {
+                        "endpoint_path": "events",
+                        "pagination": {
+                            "strategy": "cursor",
+                            "cursor_location": "body",
+                        },
+                    }
+                },
+            },
+        }
+
+        with pytest.raises(AssertionError, match="cursor_location"):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
     def test_validate_api_ingestion_workflow_missing_api_base_url(
         self, dag_declaration_validator
     ):

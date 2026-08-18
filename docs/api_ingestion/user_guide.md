@@ -110,6 +110,7 @@ This section describes the parameters you can configure in the `workflow` sectio
 - **payload_column_name** (string): column that will store the raw JSON string
   - Default: `payload`
 - **http_user_agent** (string): optional `User-Agent` for API and OAuth2 token HTTP calls (see parameter reference)
+- **http_headers** (dict): optional static HTTP headers merged onto the `requests` session (workflow map, then per-table overlay; table wins on the same key). Quote values in YAML. Do **not** use this for `User-Agent` — that stays **`http_user_agent`**.
 - **date_format_mask** (string): `strftime` mask used to format `load_start_date` / `load_end_date` placeholders into strings (e.g. `%Y%m%d`)
   - Table-level override: `workflow.tables_customization.<table>.date_format`
 - **api_policies** (dict): `rate_limiting`, `pagination`, `error_handling`
@@ -128,6 +129,7 @@ Below are the workflow-level parameters **implemented/consumed by the current MV
   - If `string`: used for all environments.
   - If `dict`: keys are environments (e.g. `prod`, `forno`). Runtime env is read from `ENVIRONMENT` (default: `forno`).
 - **`http_user_agent`** string (optional): custom HTTP `User-Agent` on the `requests` session and on OAuth2 token requests. Omit to keep library defaults.
+- **`http_headers`** dict (optional): static HTTP headers (`Header-Name: value`) applied to the API `requests` session after auth/`Accept`. Per-table `tables_customization.<table>.http_headers` overlays the workflow map (table wins on the same key; omitted table keys inherit workflow). Quote values (e.g. `"2023-06-01"`). `User-Agent` still uses **`http_user_agent`**.
 - **`credentials_scope`** string (optional): Databricks Secrets scope to read API credentials from (e.g. `people`).
   - If omitted, falls back to `DATABRICKS_SECRET_SCOPE` (default: `quintoandar`).
 - **`tables_customization`** dict (required): mapping of table names → per-table config.
@@ -195,6 +197,7 @@ Each entry under `tables_customization` is a dictionary keyed by the **raw table
     - Supports placeholders `load_start_date` / `load_end_date`.
     - If omitted, the loader defaults to `after_time`/`before_time` when dates are provided.
   - **`tables_customization.<table>.authentication`** dict (required\*): overrides workflow authentication for this table.
+  - **`tables_customization.<table>.http_headers`** dict (optional): overlays `workflow.http_headers` for this table (same merge rules as the workflow key).
   - **`tables_customization.<table>.api_policies`** dict (optional): overrides workflow `api_policies` for this table.
   - **`tables_customization.<table>.payload_column_name`** string (optional): overrides the payload column name.
     - Default: workflow `payload_column_name` → `payload`.
@@ -508,7 +511,7 @@ For **`strategy: oauth2_client_credentials`**:
 - **`authentication.expires_at_field`** string (optional, default: `expires_at`): absolute expiry field in token response.
 - **`authentication.expires_in_field`** string (optional, default: `expires_in`): relative expiry field in token response.
 
-**Workflow-level (not under `authentication`):** **`http_user_agent`** applies to the HTTP session for API calls and, when using OAuth2, to token requests as well. See the workflow parameter reference.
+**Workflow-level (not under `authentication`):** **`http_user_agent`** applies to the HTTP session for API calls and, when using OAuth2, to token requests as well. **`http_headers`** are session-level static headers for API calls only (not OAuth token requests). See the workflow parameter reference.
 
 For **`strategy: api_key`**:
 
@@ -551,7 +554,7 @@ Supported strategies:
 - `none`
 - `offset_limit`
 - `page_per_page` (1-based `page` / `per_page` query params; optional **`results_response_path`**)
-- `cursor` (**Point-In-Time style, header-based**)
+- `cursor` (Point-In-Time **or** query-param cursor; location is configurable)
 
 ### `strategy: offset_limit`
 
@@ -568,22 +571,37 @@ The paginator will:
 
 ### `strategy: cursor`
 
-This implementation is designed for “PIT + search_after” APIs (Greenhouse Audit Log style).
+This implementation covers Point-In-Time “search_after” APIs (Greenhouse Audit Log style) and standard query-param cursors.
 
-Config (defaults shown):
+Config (defaults shown — PIT / header-based):
 
-- **cursor_param**: `Search-After` (sent as a **header**)
+- **cursor_param**: `Search-After`
+- **cursor_location**: `header` (`header` or `param`)
 - **cursor_response_path**: `paging.next_search_after` (read from response JSON)
-- **context_param**: `Pit-Id` (sent as a **header**)
+- **context_param**: `Pit-Id`
+- **context_location**: `header` (`header` or `param`)
 - **context_response_path**: `paging.pit_id` (read from response JSON)
-- **page_size_param**: `Size` (sent as a **header**)
+- **page_size_param**: `Size`
+- **page_size_location**: `header` (`header` or `param`)
 - **page_size**: `500`
 - **results_response_path** (string, optional): field name in the response JSON containing the paginated results array. If not specified, the paginator automatically tries common field names (`results`, `items`, `data`, `records`, `entries`).
 
 Important behavior:
 
-- Cursor + context + page size are always sent via **headers** in the current loader.
+- Cursor, context, and page size are sent via **headers** unless the matching `*_location` key is set to `param`.
+- Pagination stops when the results list is empty or `cursor_response_path` is empty (no extra `has_more` hook).
 - If `results_response_path` is not specified, results are automatically extracted from common field names (`results`, `items`, `data`, `records`, `entries`). If specified, only that field is used.
+
+Query-param example (`next_page` in the JSON body becomes `?page=` on the next request):
+
+```yaml
+api_policies:
+  pagination:
+    strategy: "cursor"
+    cursor_location: "param"
+    cursor_param: "page"
+    cursor_response_path: "next_page"
+```
 
 ### `strategy: page_per_page`
 
@@ -940,7 +958,7 @@ Longer-term, shared/reused token handling across parallel tasks is not implement
 ### Pagination
 
 - No `link_header` pagination strategy.
-- **`_create_cursor_paginator`** wires **`cursor_location` / `context_location` / `page_size_location` to `"header"`** — query-param cursor APIs need loader changes.
+- **`_create_cursor_paginator`** reads **`cursor_location` / `context_location` / `page_size_location`** from pagination YAML (`header` or `param`). The default is **`header`** so existing PIT configs stay unchanged.
 - For **cursor** pagination, result lists are resolved with **`CursorPaginator._default_extract_results`**, which scans `results`, `items`, `data`, `records`, `entries` (or a configured `results_response_path`).
 - **`page_per_page`** uses body **`metadata`** (`totalPages` / `page`, including snake_case) when present; otherwise it stops on short/empty pages (see [`PagePerPagePaginator`](../../bietlejuice/base/api/pagination/page_per_page.py)).
 - For a **single-page** fetch (no paginator), `load_api_ingestion_raw` reads **`table_config.results_response_path`** (default key name **`"results"`**), then falls back to **`data`** if the list is empty — it does **not** scan all common names like the cursor paginator.

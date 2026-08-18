@@ -118,6 +118,34 @@ class APIConfigurationLoader:
         stripped = ua.strip()
         return stripped or None
 
+    def get_http_headers(self) -> Dict[str, str]:
+        """
+        Returns static HTTP headers merged from workflow then table config.
+
+        Table keys overlay workflow keys. A missing table map inherits the
+        workflow map. ``http_user_agent`` remains the User-Agent knob and is
+        applied after these headers in ``create_api_client``.
+
+        Returns:
+            Dict[str, str]: Merged header name → value. Empty if unset.
+
+        Raises:
+            ValueError: If a present ``http_headers`` value is not a mapping.
+        """
+        merged: Dict[str, str] = {}
+        for source in (
+            self.workflow_config.get("http_headers"),
+            self.table_config.get("http_headers"),
+        ):
+            if source is None:
+                continue
+            if not isinstance(source, dict):
+                raise ValueError(
+                    "'http_headers' must be a mapping of header name to string value"
+                )
+            merged.update(source)
+        return merged
+
     def create_api_client(self) -> BaseAPIClient:
         """
         Creates and configures a BaseAPIClient with authentication applied.
@@ -247,6 +275,10 @@ class APIConfigurationLoader:
             LOGGER.info(
                 "No alert channel configured. Alerts will not be sent for HTTP errors."
             )
+
+        http_headers = self.get_http_headers()
+        if http_headers:
+            client.session.headers.update(http_headers)
 
         http_user_agent = self.get_http_user_agent()
         if http_user_agent:
@@ -522,11 +554,15 @@ class APIConfigurationLoader:
         """
         Creates a CursorPaginator for Point-In-Time pagination (Greenhouse Audit Log style).
 
-        This method configures a CursorPaginator for Point-In-Time (PIT) pagination strategy,
-        which uses both a cursor parameter (Search-After) and a context parameter (Pit-Id) sent
-        via HTTP headers. The paginator is configured with rate limiting delays if specified,
-        and includes automatic retry logic for expired Point-In-Time contexts. The extract_results
-        function defaults to extracting data from the "results" array in the API response.
+        This method configures a CursorPaginator for cursor pagination.
+
+        Point-In-Time (PIT) APIs send cursor, context, and page size via HTTP
+        headers (the loader default). Query-param cursor APIs set
+        ``cursor_location`` / ``context_location`` / ``page_size_location`` to
+        ``param`` in pagination YAML. The paginator is configured with rate
+        limiting delays if specified, and includes automatic retry logic for
+        expired Point-In-Time contexts. The extract_results function defaults
+        to extracting data from the "results" array in the API response.
 
         Args:
             client: The configured API client with authentication applied
@@ -551,19 +587,19 @@ class APIConfigurationLoader:
         delay_seconds = rate_limiting.get("delay_seconds", 0.0)
 
         cursor_param = pagination_config.get("cursor_param", "Search-After")
-        cursor_location = "header"
+        cursor_location = pagination_config.get("cursor_location", "header")
         cursor_response_path = pagination_config.get(
             "cursor_response_path", "paging.next_search_after"
         )
 
         context_param = pagination_config.get("context_param", "Pit-Id")
-        context_location = "header"
+        context_location = pagination_config.get("context_location", "header")
         context_response_path = pagination_config.get(
             "context_response_path", "paging.pit_id"
         )
 
         page_size_param = pagination_config.get("page_size_param", "Size")
-        page_size_location = "header"
+        page_size_location = pagination_config.get("page_size_location", "header")
         page_size = pagination_config.get("page_size", 500)
 
         results_response_path = pagination_config.get("results_response_path")
