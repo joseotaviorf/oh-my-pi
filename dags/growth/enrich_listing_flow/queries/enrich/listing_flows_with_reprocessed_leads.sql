@@ -584,7 +584,6 @@ SELECT
     acq.id_user_lead_first_discarder,
     acq.id_user_lead_last_discarder,
     IF(h.is_rent_3p_supply, h.uuid_company, NULL) AS uuid_company,
-    IF(h.is_rent_3p_supply, h.id_company_hubspot, NULL) AS id_company_hubspot,
     IF(h.is_rent_3p_supply, h.partner_3p_supply, NULL) AS partner_3p_supply,
     acq.country_code,
     acq.is_self_service_photo_job_scheduled,
