@@ -396,14 +396,6 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.is_rent_3p_supply
     description: Boolean indicating if this is from Rede 3P supply (For Rent).
-  is_3p_supply_5a:
-    lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: Boolean indicating if this is from Quinto Andar's Rede 3P supply.
-  is_3p_supply_bh:
-    lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: Boolean indicating if this is from Casa Mineira's Rede 3P supply.
   is_casa_mineira_migration:
     lineage:
       - datalake_ebdb_listing.house.is_casa_mineira_migration

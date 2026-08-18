@@ -47,6 +47,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   COALESCE(aa_info.sk_autonomous_agent, -1) AS sk_autonomous_agent,
   CAST(COALESCE(hlco.id_user, -1) AS BIGINT) AS sk_user_consultant,
   COALESCE(cs_company.sk_company, cs_hubspot.sk_company, cs_tag.sk_company, -1) AS sk_company_supply,
+  COALESCE(IF(h.is_rent_3p_supply, cb.sk_broker, NULL), '-1') AS sk_broker_supply,
   COALESCE(CAST(DATE_FORMAT(hl.dt_stranded, 'yyyyMMdd') AS BIGINT), -1) AS sk_stranded_date,
   -- SparkSQL's datediff ignores the time part, so we get the seconds diff and convert it to integer days.
   -- 60s*60m*24h = 86400s
@@ -105,6 +106,9 @@ LEFT JOIN
     ON h.uuid_company IS NULL
     AND h.id_company_hubspot IS NULL
     AND h.partner_3p_supply = cs_tag.extracted_3p_tag
+LEFT JOIN
+  core_brokers.brokers AS cb
+    ON h.uuid_company = cb.uuid_company
 WHERE
   (lbc.id_house IS NULL
   OR lbc.is_for_rent)
