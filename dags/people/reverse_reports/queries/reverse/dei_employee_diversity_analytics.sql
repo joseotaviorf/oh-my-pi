@@ -65,7 +65,10 @@ snapshot_base AS (
         es.person_number,
         es.months_employee_tenure AS tenure,
         es.band AS band,
-        LOWER(es.status) AS status,
+        CASE
+            WHEN LOWER(es.status) = 'active' THEN 'ativo'
+            ELSE 'desligado'
+        END AS status,
         LOWER(es.country) AS country,
         NULLIF(LOWER(es.vertical), '-1') AS vertical,
         NULLIF(LOWER(es.structure), '-1') AS directorate,
