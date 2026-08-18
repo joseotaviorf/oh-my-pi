@@ -8,9 +8,9 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*) FROM (
-          SELECT id_house, id_contract, id_partner
+          SELECT id_house, id_house_listing, id_contract, id_offer, id_partner, business_context
           FROM datalake_ciq.ciq_listing_purchase
-          GROUP BY id_house, id_contract, id_partner
+          GROUP BY id_house, id_house_listing, id_contract, id_offer, id_partner, business_context
           HAVING COUNT(*) > 1
         )) = 0
       severity_level: Error

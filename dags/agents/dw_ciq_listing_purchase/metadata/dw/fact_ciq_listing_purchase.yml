@@ -2,11 +2,11 @@
 database_name: dw_ciq
 table_name: fact_ciq_listing_purchase
 description: >
-  Fact for CIQ_FULL and PRO_ACQUIRER (Embaixador) rent listing-purchase rows joining
-  ciq_listing_purchase with listing_purchase_pricing for acquisition tiers. Full enrich snapshot
-  merged on sk_listing_purchase; matched unpaid rows always refresh, and paid rows refresh when
-  portfolio-loss fields change (CCV after payment is a valid loss case). Filter consultant_type in
-  downstream queries when only one population should be paid.
+  Fact for CIQ_FULL and PRO_ACQUIRER (Embaixador) rent listing-purchase rows plus SALE-context
+  duplicity rows, joining ciq_listing_purchase with listing_purchase_pricing for acquisition tiers.
+  Full enrich snapshot merged on sk_listing_purchase; matched unpaid rows always refresh, and paid
+  rows refresh when portfolio-loss fields change (CCV after payment is a valid loss case). Filter
+  business_context and consultant_type in downstream queries when only one population should be paid.
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -45,9 +45,13 @@ columns:
     lineage:
       - datalake_ciq.listing_purchase_pricing.id_similar_house_paid
   sk_contract:
-    description: Rent contract surrogate key.
+    description: Rent contract surrogate key; NULL on SALE duplicity rows.
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_contract
+  sk_offer:
+    description: Sale offer surrogate key for SALE duplicity rows; NULL on RENT payment rows.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_offer
   sk_accounting_entry:
     description: Robin Hood accounting entry id when paid; null while pending.
     lineage:
@@ -234,6 +238,12 @@ columns:
     description: Contract signature timestamp from enrich.
     lineage:
       - datalake_ciq.ciq_listing_purchase.ts_contract_signed
+  ts_contract_signed_local_tz:
+    description: >
+      Contract signature in America/Sao_Paulo; aligns with transition and portfolio-loss rules that
+      compare calendar dates on or after 2026-07-01 in local time.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_contract_signed_local_tz
   ts_next_contract_signed:
     description: Next contract signature timestamp on the same house when present.
     lineage:
@@ -258,6 +268,12 @@ columns:
     description: First publication timestamp from listing business context.
     lineage:
       - datalake_ciq.ciq_listing_purchase.ts_first_listing
+  ts_first_listing_local_tz:
+    description: >
+      First rent publication in America/Sao_Paulo; audit reference for compra de carteira pricing
+      transition (same source as initial_pricing_type publication cutover).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_first_listing_local_tz
   ts_load:
     description: Timestamp when this DW row was materialized.
   year:

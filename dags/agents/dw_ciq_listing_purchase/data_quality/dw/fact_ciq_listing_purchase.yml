@@ -5,9 +5,6 @@ column_level_validations:
   sk_house:
     is_complete:
       severity_level: Error
-  sk_contract:
-    is_complete:
-      severity_level: Error
   sk_partner:
     is_complete:
       severity_level: Error

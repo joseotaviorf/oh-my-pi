@@ -25,7 +25,7 @@ portfolio_loss_flags AS (
         -- Rules are mutually exclusive on one row (90d needs null CS; CCV needs CS).
         COALESCE(
             clp.ts_contract_signed IS NOT NULL
-            AND clp.ts_contract_signed >= DATE('2026-07-01')
+            AND CAST(FROM_UTC_TIMESTAMP(clp.ts_contract_signed, 'America/Sao_Paulo') AS DATE) >= DATE('2026-07-01')
             AND hsa.ts_last_sale_agreement_signed IS NOT NULL
             AND hsa.ts_last_sale_agreement_signed > clp.ts_contract_signed,
             FALSE
@@ -44,6 +44,7 @@ SELECT
     lpp.id_previous_listing_paid AS sk_previous_listing_paid,
     lpp.id_similar_house_paid AS sk_similar_house_paid,
     clp.id_contract AS sk_contract,
+    clp.id_offer AS sk_offer,
     clp.id_accounting_entry AS sk_accounting_entry,
     clp.id_partner AS sk_partner,
     clp.id_ciq_user AS sk_user,
@@ -110,12 +111,14 @@ SELECT
     clp.is_paid,
     clp.dt_paid,
     clp.ts_contract_signed,
+    clp.ts_contract_signed_local_tz,
     clp.ts_next_contract_signed,
     clp.ts_previous_contract_signed,
     clp.ts_publicated,
     clp.ts_house_inactived,
     clp.ts_house_registration,
     clp.ts_first_listing,
+    clp.ts_first_listing_local_tz,
     NOW() AS ts_load,
     clp.year,
     clp.month,

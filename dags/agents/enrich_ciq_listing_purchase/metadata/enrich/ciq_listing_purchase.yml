@@ -2,11 +2,10 @@
 database_name: datalake_ciq
 table_name: ciq_listing_purchase
 description: >
-  Enrich grain per house listing version in CIQ context: rent listing and contract path, Robin Hood
-  listing-purchase payment, address-parsed and Atlas duplicity keys, city group, supply source,
-  initial pricing segment from the AAREDE-470 transition rules (business context, consultant type,
-  contract signature date versus the 2026-07-01 cutover), and inactivity days from house_listing
-  version windows.
+  CIQ listing-purchase enrich: one row per signed rent id_contract (house_listing path, RENT LBC or
+  legacy NULL context) plus separate SALE-context rows for duplicity only (not eligible for payment).
+  Robin Hood listing-purchase payment and AAREDE-470 initial pricing apply on the rent arm; consultant
+  is the last CIQ on the listing from house_listing_consultant (is_last_ciq_on_listing), same grain as FL Valid.
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -17,39 +16,51 @@ columns:
     lineage:
       - core_house.house.id_house
       - datalake_ebdb_listing.house_listing.id_house_listing
-      - datalake_big_agent.house_consultant_history.id_partner
+      - datalake_big_agent.house_listing_consultant.id_partner
   id_house:
     description: House identifier in CIQ capture context.
     lineage:
       - core_house.house.id_house
   id_partner:
-    description: CIQ partner id from house consultant history.
+    description: >
+      Partner company of the last CIQ on the listing (house_listing_consultant.is_last_ciq_on_listing);
+      used as the Compra de Carteira payment partner key.
     lineage:
-      - datalake_big_agent.house_consultant_history.id_partner
+      - datalake_big_agent.house_listing_consultant.id_partner
   id_house_listing:
     description: House listing id from the rent listing version joined to contract.
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
   id_contract:
-    description: Rent contract id when present on the house listing row.
+    description: >
+      Rent contract id from house_listing on RENT rows; NULL on SALE duplicity rows because SALE
+      captures an offer rather than a rent contract.
     lineage:
       - datalake_ebdb_listing.house_listing.id_contract
+  id_offer:
+    description: >
+      Latest non-canceled sale offer id from the CCV selected for SALE duplicity rows; NULL on RENT
+      rows.
+    lineage:
+      - datalake_sale_offer.sale_offer.id_offer
   id_owner:
     description: Owner user id from core house.
     lineage:
       - core_house.house.id_owner
   id_ciq_user:
-    description: CIQ user id from house consultant history.
+    description: >
+      Platform user of the last CIQ attributed to the listing version; null when the listing has no
+      last-CIQ row in house_listing_consultant.
     lineage:
-      - datalake_big_agent.house_consultant_history.id_user
+      - datalake_big_agent.house_listing_consultant.id_user
   id_internal_agent:
     description: Big-agent internal agent id linked to CIQ enrollment.
     lineage:
-      - datalake_big_agent.house_consultant_history.id_internal_agent
+      - datalake_big_agent.agent_enrollment.id_internal_agent
   id_enrollment:
     description: Big-agent enrollment id for CIQ assignment.
     lineage:
-      - datalake_big_agent.house_consultant_history.id_enrollment
+      - datalake_big_agent.house_listing_consultant.id_enrollment
   id_accounting_entry:
     description: Robin Hood accounting entry id when matched on house, contract, and ciq-listing-purchase source.
     lineage:
@@ -84,15 +95,17 @@ columns:
     lineage:
       - datalake_ciq.ciq_supply_events_tracking.company_report_origin
   business_context:
-    description: Listing business context from EBDB clean (for example RENT or SALE).
+    description: >
+      RENT or SALE from listing_business_context on payment/duplicity rows; NULL on legacy rent
+      contracts when the house has no listing_business_context row (explicit not-eligible).
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
   consultant_type:
     description: >
-      CIQ consultant type from house consultant history (for example CIQ_FULL or PRO_ACQUIRER for
-      Embaixadores who converted from CIQ).
+      CIQ consultant type from house_listing_consultant last CIQ on the listing (CIQ_FULL, PRO_ACQUIRER,
+      Core, or other Big Agent tiers); null when the listing has no last-CIQ row.
     lineage:
-      - datalake_big_agent.house_consultant_history.consultant_type
+      - datalake_big_agent.house_listing_consultant.consultant_type
   listing_status:
     description: >
       Listing status (uppercased for consistent comparisons) from house listing version or listing
@@ -114,14 +127,15 @@ columns:
     description: >
       Full human-readable initial pricing segment from the AAREDE-470 transition rules: not-eligible
       when business context is not RENT, consultant is not CIQ_FULL or PRO_ACQUIRER, there is no signed contract yet,
-      or the contract was signed before 2026-07-01; hybrid when the house converted from sale to rent;
+      or the contract was signed before 2026-07-01; not-eligible when the house has a rent contract in house_listing
+      but no row in listing_business_context (legacy data gap, surfaced explicitly); hybrid when the house converted from sale to rent;
       new-listings when published and rented after the transition; ongoing-listings when published
       before the transition with no previous contract and first rented after it; ongoing-rentals when
       published before the transition with a previous contract and re-rented after it.
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
-      - datalake_big_agent.house_consultant_history.consultant_type
+      - datalake_big_agent.house_listing_consultant.consultant_type
       - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
       - datalake_ebdb_listing.house_listing.ts_contract_signed
   initial_pricing_type:
@@ -132,7 +146,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
-      - datalake_big_agent.house_consultant_history.consultant_type
+      - datalake_big_agent.house_listing_consultant.consultant_type
       - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
       - datalake_ebdb_listing.house_listing.ts_contract_signed
   amount_paid:
@@ -201,6 +215,12 @@ columns:
     description: Contract signature timestamp from house listing.
     lineage:
       - datalake_ebdb_listing.house_listing.ts_contract_signed
+  ts_contract_signed_local_tz:
+    description: >
+      Contract signature timestamp in America/Sao_Paulo. Same instant used for the 2026-07-01
+      compra de carteira transition when classifying initial_pricing_type (ongoing vs new listings).
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
   ts_next_contract_signed:
     description: Next contract signature timestamp on the same house when present.
     lineage:
@@ -225,6 +245,12 @@ columns:
       - datalake_big_agent.house_consultant_history.ts_agency_created
   ts_first_listing:
     description: First publication timestamp from listing business context.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+  ts_first_listing_local_tz:
+    description: >
+      First rent publication timestamp in America/Sao_Paulo from listing business context. Reference
+      for payment transition rules (new-listings vs ongoing-listings) alongside initial_pricing_type.
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
   ts_load:

@@ -52,7 +52,7 @@
 **Critical rules:**
 - **DW first:** analyst queries for Compra de Carteira must start at `dw_ciq.fact_ciq_listing_purchase`. Use `datalake_ciq.ciq_listing_purchase` only for `initial_pricing_type*` or pipeline debugging.
 - `payment_status` and `is_eligible` live on `listing_purchase_pricing` / the DW fact — they are **not** on `ciq_listing_purchase` anymore.
-- Grain of `fact_ciq_listing_purchase` is one row per **house listing version** in CIQ context, not one row per house.
+- Grain of `datalake_ciq.ciq_listing_purchase`: **Rent arm** — one row per signed rent `id_contract` (`house_listing`; 1:1 with contract id in prod). **Sale arm** — one row per house with SALE `listing_business_context` and latest CCV (`id_offer` populated, `id_contract` / `id_house_listing` null, always `not-eligible` for Compra payment). Hybrid houses can have both a RENT and a SALE row; that is not a duplicate rent contract. CIQ partner/user comes from `house_listing_consultant` last CIQ on the listing (`is_last_ciq_on_listing = true`; same grain as FL Valid / `first_listing`). The DW fact follows that enrich grain after the pricing merge; filter `consultant_type` and use DW columns for final pricing.
 
 ---
 
@@ -73,6 +73,24 @@ Pricing has two layers — do not conflate: **initial** (`initial_pricing_type` 
 Anti-repurchase keys on the fact: `sk_previous_listing_paid` (same house already purchased), `sk_similar_house_paid` (similar-address house already **paid**), `sk_listing_duplicity` (join `fact_listing_purchase_duplicity` for peer detail).
 
 **Portfolio loss** (`is_portfolio_loss` / `portfolio_loss_reason`, DW-only): exactly one of (1) `listing_category = 'Re-Listing'` AND `listing_status IN ('PUBLISHED','PUBLICADO')` AND no signed rent contract AND `total_days_since_publish > 90`, or (2) rent `ts_contract_signed >= 2026-07-01` AND a later non-canceled CCV on the same house. Rules are mutually exclusive per row (90d needs null CS; CCV needs CS).
+
+## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) when the question asks for an **official**, **MBR**, or **OKR** number. None exist for this entity yet.
+
+### Component / exploratory metrics
+
+- **Portfolio loss volume:** `COUNT(*)` on `dw_ciq.fact_ciq_listing_purchase` where `is_portfolio_loss = true`; split by `portfolio_loss_reason`.
+- **Compra de Carteira paid amount:** `SUM(amount_paid)` on `dw_ciq.fact_ciq_listing_purchase` where `is_paid = true`.
+- **Valid first listings:** `COUNT(DISTINCT id_house)` on `datalake_listing_deduplication.valid_first_listing`.
+
+## Relationships with other entities
+
+- **Listing purchase → house:** `fact_ciq_listing_purchase.sk_house` / enrich `id_house` is the house grain; SALE rows are one CCV per house, RENT rows are one signed contract.
+- **Listing purchase → partner / CIQ user:** `sk_partner` / `sk_user` join accreditation identity (`agent.id_partner`, `agent.id_user`); last CIQ is a LEFT JOIN so both can be null. See [`agents_accreditation.md`](agents_accreditation.md).
+- **Listing purchase → sale offer:** SALE enrich `id_offer` / fact `sk_offer` is the latest non-canceled CCV; RENT rows leave it null.
+- **Listing purchase → rent contract:** RENT `sk_contract` / `id_contract`; SALE rows leave it null.
+- **Valid first listing → listing purchase:** `valid_first_listing.id_house` aligns with listing-purchase `id_house` for hybrid / first-listing order (`hybrid_creation_order`).
 
 ## Dos and Don'ts
 
