@@ -1,5 +1,5 @@
 WITH aud_ts AS (
-  SELECT /*+ RANGE_JOIN(aud, 50000) */
+  SELECT
     aud.id_user AS id_owner,
     LAG(aud.id_account_manager) OVER (PARTITION BY aud.id_user ORDER BY aud.rev, aud.id DESC) AS id_previous_account_manager,
     aud.id_account_manager,

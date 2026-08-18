@@ -1,4 +1,4 @@
-WITH cluster_ppmulti_per_month AS (
+WITH cluster_ppmulti_per_month_ranked AS (
     SELECT 
         CAST(doq.id_owner AS INTEGER) AS id_owner,
         CASE 
@@ -12,22 +12,34 @@ WITH cluster_ppmulti_per_month AS (
         doq.ongoing_houses,
         doq.is_pp_multi_active,
         doq.dt_houses_owned,
-        DATE(DATE_TRUNC('MONTH',doq.dt_houses_owned)) AS dt_month_cluster_pp_multi
+        DATE(DATE_TRUNC('MONTH',doq.dt_houses_owned)) AS dt_month_cluster_pp_multi,
+        ROW_NUMBER() OVER(PARTITION BY doq.id_owner, DATE_TRUNC('MONTH',doq.dt_houses_owned) ORDER BY doq.dt_houses_owned DESC) AS month_owner_rn
     FROM 
         datalake_pro_owners.daily_owner_houses_quantity_history AS doq    
     WHERE 
         doq.dt_houses_owned >= CURRENT_DATE - INTERVAL '6' MONTH 
         AND (doq.ongoing_houses >= 5 OR doq.is_pp_multi_active)
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY doq.id_owner, DATE_TRUNC('MONTH',doq.dt_houses_owned) ORDER BY doq.dt_houses_owned DESC) = 1
-
 ),
-assistants AS (
-    SELECT DISTINCT
+cluster_ppmulti_per_month AS (
+    SELECT
+        id_owner,
+        type_pp,
+        ongoing_houses,
+        is_pp_multi_active,
+        dt_houses_owned,
+        dt_month_cluster_pp_multi
+    FROM
+        cluster_ppmulti_per_month_ranked
+    WHERE
+        month_owner_rn = 1
+),
+assistants_ranked AS (
+    SELECT
         lc.id_house,
         CAST(c.id AS INTEGER) AS sk_contract,
-        coalesce(c.dt_started, c.dt_entered) dt_start_contract,
-        CAST((CASE WHEN cp.contract_role = 'landlord' THEN COALESCE(cp.id_user_contract_person, -1) ELSE NULL END) AS INTEGER) AS contract_user      
+        COALESCE(c.dt_started, c.dt_entered) AS dt_start_contract,
+        CAST((CASE WHEN cp.contract_role = 'landlord' THEN COALESCE(cp.id_user_contract_person, -1) ELSE NULL END) AS INTEGER) AS contract_user,
+        DENSE_RANK() OVER(PARTITION BY lc.id_house ORDER BY lc.id_house, COALESCE(c.dt_started, c.dt_entered) DESC) AS contract_dense_rank
     FROM 
         datalake_ebdb_contract.contract AS c        
     INNER JOIN 
@@ -38,8 +50,17 @@ assistants AS (
         ON c.id = cp.id_contract     
     WHERE 
         c.status = 'Ativo'
-    QUALIFY  
-      DENSE_RANK() OVER(PARTITION BY lc.id_house ORDER BY lc.id_house, coalesce(c.dt_started, c.dt_entered) DESC) = 1
+),
+assistants AS (
+    SELECT DISTINCT
+        id_house,
+        sk_contract,
+        dt_start_contract,
+        contract_user
+    FROM
+        assistants_ranked
+    WHERE
+        contract_dense_rank = 1
 ),
 pp_multi_proprety_info AS (
     SELECT 
@@ -115,11 +136,39 @@ ppmulti_and_assistants AS (
     LEFT JOIN 
         pp_multi_last_status AS base_pp 
         ON base_pp.id_owner = ca.id_owner
+),
+ppmulti_with_user AS (
+    SELECT
+        paa.id_user_contract_final,
+        paa.role_user_contract_final,
+        paa.id_owner,
+        paa.id_user_assistant,
+        paa.cluster_pp_multi,
+        paa.ongoing_houses_pp_multi,
+        paa.is_active_pp_multi,
+        paa.dt_month_cluster_pp_multi,
+        paa.dt_last_pro_owner_started,
+        paa.dt_last_pro_owner_finished,
+        u.name AS user_name,
+        u.email AS user_email
+    FROM
+        ppmulti_and_assistants AS paa
+    LEFT JOIN 
+        datalake_ebdb_user.user AS u 
+            ON paa.id_user_contract_final = u.id
+),
+ppmulti_ranked AS (
+    SELECT
+        *,
+        DENSE_RANK() OVER(PARTITION BY id_user_contract_final, dt_month_cluster_pp_multi ORDER BY role_user_contract_final DESC) AS role_dense_rank,
+        DENSE_RANK() OVER(PARTITION BY id_user_contract_final, role_user_contract_final, dt_month_cluster_pp_multi ORDER BY ongoing_houses_pp_multi DESC, dt_last_pro_owner_started DESC) AS houses_dense_rank
+    FROM
+        ppmulti_with_user
 )
 SELECT
     id_user_contract_final AS id_user,
-    u.name AS user_name,
-    u.email AS user_email, 
+    user_name,
+    user_email, 
     role_user_contract_final AS user_role,
     id_owner,
     id_user_assistant,
@@ -129,12 +178,7 @@ SELECT
     dt_last_pro_owner_started,
     dt_last_pro_owner_finished  
 FROM
-    ppmulti_and_assistants AS paa
-LEFT JOIN 
-    datalake_ebdb_user.user AS u 
-        ON id_user_contract_final = u.id
-QUALIFY
-    -- If the user is PPM and ASS, the priority relationship is PPM
-    DENSE_RANK() OVER( PARTITION BY id_user_contract_final, dt_month_cluster_pp_multi ORDER BY role_user_contract_final DESC) = 1
-    -- If the user has an ASS of more than two PPM, the priority relationship is the one associated with the PPM with the highest number of ongoing houses
-    AND DENSE_RANK() OVER( PARTITION BY id_user_contract_final, role_user_contract_final, dt_month_cluster_pp_multi ORDER BY ongoing_houses_pp_multi DESC, dt_last_pro_owner_started DESC) = 1
+    ppmulti_ranked
+WHERE
+    role_dense_rank = 1
+    AND houses_dense_rank = 1

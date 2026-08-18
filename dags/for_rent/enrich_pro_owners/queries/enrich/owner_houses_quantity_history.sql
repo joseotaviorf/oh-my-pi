@@ -136,4 +136,4 @@ FROM
     qtd_houses_changes_trimmed
 WHERE
     houses != COALESCE(previous_houses, -1)
-    AND ts_status_started <= DATE_ADD(DATE('{year}-{month}-{day}'),1) -- To avoid a retroactive change we only retrieve D-1 data.
+    AND ts_status_started <= DATE_ADD(DATE('{load_start_date}'), 1) -- To avoid a retroactive change we only retrieve D-1 data.

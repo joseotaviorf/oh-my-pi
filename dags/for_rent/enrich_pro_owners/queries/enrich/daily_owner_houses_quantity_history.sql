@@ -23,7 +23,7 @@ user_merge AS (
 ),
 
 owner_houses_history AS (
-  SELECT /*+ RANGE_JOIN(hbh, 2000) */
+  SELECT
     h.id AS id_house,
     COALESCE(um.id_user, hbh.id_user) AS id_owner,
     ur.country_code,
@@ -73,7 +73,7 @@ owner_houses_history AS (
     datalake_ebdb_country.user AS ur
       ON hbh.id_user = ur.id_user
   WHERE
-    dd.date = MAKE_DATE({year}, {month}, {day})
+    dd.date = DATE('{load_start_date}')
     AND ur.country_code = 'BR'
 ),
 
@@ -156,9 +156,9 @@ SELECT
   oqh.is_merged_user,
   IF(pmo.id_owner IS NOT NULL AND pmo.pp_multi_user_status = 'ACTIVE', TRUE, FALSE) AS is_pp_multi_active,
   oqh.dt_houses_owned,
-  {year} AS year,
-  {month} AS month,
-  {day} AS day
+  YEAR(DATE('{load_start_date}')) AS year,
+  MONTH(DATE('{load_start_date}')) AS month,
+  DAY(DATE('{load_start_date}')) AS day
 FROM
   owner_qtd_houses AS oqh
 LEFT JOIN

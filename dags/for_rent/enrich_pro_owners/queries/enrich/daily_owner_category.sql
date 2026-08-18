@@ -1,12 +1,21 @@
-WITH pp_multi_cluster AS (
+WITH pp_multi_cluster_ranked AS (
+  SELECT
+    id_owner,
+    cluster,
+    ts_load,
+    ROW_NUMBER() OVER (PARTITION BY id_owner ORDER BY ts_load DESC) AS rn
+  FROM
+    datalake_gsheets_clean.pp_multi_cluster
+),
+pp_multi_cluster AS (
   SELECT
     id_owner,
     cluster,
     ts_load
   FROM
-    datalake_gsheets_clean.pp_multi_cluster
-  QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY id_owner ORDER BY ts_load DESC) = 1
+    pp_multi_cluster_ranked
+  WHERE
+    rn = 1
 ),
 owner_house_category AS(
   SELECT
@@ -31,9 +40,9 @@ owner_house_category AS(
     pp_multi_cluster AS pmc
       ON ohqh.id_owner = pmc.id_owner
   WHERE
-    ohqh.year = {year}
-    AND ohqh.month = {month}
-    AND ohqh.day = {day}
+    ohqh.year = YEAR(DATE('{load_start_date}'))
+    AND ohqh.month = MONTH(DATE('{load_start_date}'))
+    AND ohqh.day = DAY(DATE('{load_start_date}'))
 ),
 owner_house_category_changes AS (
   SELECT
@@ -81,9 +90,9 @@ SELECT
   ohc.cluster_pp_multi,
   COALESCE(oc.owner_category, 0) = COALESCE(cc.last_category, 0) AS is_current_category,
   ohc.dt_houses_owned AS dt_owner_category,
-  {year} AS year,
-  {month} AS month,
-  {day} AS day
+  YEAR(DATE('{load_start_date}')) AS year,
+  MONTH(DATE('{load_start_date}')) AS month,
+  DAY(DATE('{load_start_date}')) AS day
 FROM
   owner_house_category AS ohc
 LEFT JOIN
