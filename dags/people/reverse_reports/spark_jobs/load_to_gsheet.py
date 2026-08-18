@@ -230,7 +230,7 @@ def _write_payload_in_chunks(
         chunk_label = f"update chunk {chunk_index}/{len(chunks)} ({range_a1})"
 
         def update_chunk(values=chunk, cell_range=range_a1):
-            worksheet.update(range_name=cell_range, values=values, raw=False)
+            worksheet.update(cell_range, values, raw=False)
 
         _run_gsheets_operation(sheet_tab, update_chunk, chunk_label)
         start_row += len(chunk)

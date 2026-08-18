@@ -127,9 +127,7 @@ class TestWritePayloadInChunks(unittest.TestCase):
         mock_writer.write.assert_not_called()
         mock_worksheet.append_rows.assert_not_called()
         mock_worksheet.clear.assert_called_once()
-        mock_worksheet.update.assert_called_once_with(
-            range_name="A1", values=payload, raw=False
-        )
+        mock_worksheet.update.assert_called_once_with("A1", payload, raw=False)
 
     def test_grows_grid_when_below_payload_size(self):
         mock_writer, mock_worksheet = self._build_writer_with_worksheet()
@@ -166,9 +164,9 @@ class TestWritePayloadInChunks(unittest.TestCase):
         mock_worksheet.clear.assert_called_once()
         mock_worksheet.update.assert_has_calls(
             [
-                call(range_name="A1", values=[["h"], ["1"], ["2"]], raw=False),
-                call(range_name="A4", values=[["3"], ["4"]], raw=False),
-                call(range_name="A6", values=[["5"]], raw=False),
+                call("A1", [["h"], ["1"], ["2"]], raw=False),
+                call("A4", [["3"], ["4"]], raw=False),
+                call("A6", [["5"]], raw=False),
             ]
         )
         self.assertEqual(mock_sleep.call_count, 2)
@@ -188,12 +186,12 @@ class TestWritePayloadInChunks(unittest.TestCase):
         mock_worksheet.append_rows.assert_not_called()
         mock_worksheet.resize.assert_called_once_with(rows=10_012, cols=26)
         self.assertEqual(mock_worksheet.update.call_count, 2)
-        first_kwargs = mock_worksheet.update.call_args_list[0][1]
-        second_kwargs = mock_worksheet.update.call_args_list[1][1]
-        self.assertEqual(first_kwargs["range_name"], "A1")
-        self.assertEqual(len(first_kwargs["values"]), 10_001)
-        self.assertEqual(second_kwargs["range_name"], "A10002")
-        self.assertEqual(second_kwargs["values"], [["10000"]])
+        first_call = mock_worksheet.update.call_args_list[0]
+        second_call = mock_worksheet.update.call_args_list[1]
+        self.assertEqual(first_call.args[0], "A1")
+        self.assertEqual(len(first_call.args[1]), 10_001)
+        self.assertEqual(second_call.args[0], "A10002")
+        self.assertEqual(second_call.args[1], [["10000"]])
 
     def test_cell_limit_fails_fast_without_retry(self):
         mock_writer, mock_worksheet = self._build_writer_with_worksheet()
