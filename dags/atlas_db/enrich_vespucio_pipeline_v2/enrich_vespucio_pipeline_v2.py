@@ -246,6 +246,65 @@ source_tasks = [
     ),
 ]
 
+# Raw claim sources for claims_step_task below. These aren't registry sources (no
+# HouseAdapter/normalization involved) and don't gate registry_step_task, so they're kept
+# out of source_tasks and wired directly to claims_step_task instead.
+claims_source_tasks = [
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            "--script=v2/ebdb_condo_observations.sql",
+            f"--output_table={Tables.source_ebdb_condo_observations_v2}",
+            "--checkpoint_column=_checkpoint",
+        ],
+        task_id="ebdb_condo_observations",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            "--script=v2/ebdb_condo_kodak_inference.sql",
+            f"--output_table={Tables.source_ebdb_condo_kodak_inference_v2}",
+        ],
+        task_id="ebdb_condo_kodak_inference",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            "--script=v2/ebdb_condo_description_inference.sql",
+            f"--output_table={Tables.source_ebdb_condo_description_inference_v2}",
+        ],
+        task_id="ebdb_condo_description_inference",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            "--script=v2/ebdb_house_amenities_kodak_inference.sql",
+            f"--output_table={Tables.source_ebdb_house_amenities_kodak_inference_v2}",
+        ],
+        task_id="ebdb_house_amenities_kodak_inference",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            "--script=v2/ebdb_house_amenities_description_inference.sql",
+            f"--output_table={Tables.source_ebdb_house_amenities_description_inference_v2}",
+        ],
+        task_id="ebdb_house_amenities_description_inference",
+    ),
+]
+
+claims_step_task = create_task(
+    entry_point="core_v2_claims_step",
+    parameters=[
+        f"--input_ebdb_condo_observations={Tables.source_ebdb_condo_observations_v2}",
+        f"--input_ebdb_condo_kodak_inference={Tables.source_ebdb_condo_kodak_inference_v2}",
+        f"--input_ebdb_condo_description_inference={Tables.source_ebdb_condo_description_inference_v2}",
+        f"--input_ebdb_house_amenities_kodak_inference={Tables.source_ebdb_house_amenities_kodak_inference_v2}",
+        f"--input_ebdb_house_amenities_description_inference={Tables.source_ebdb_house_amenities_description_inference_v2}",
+        f"--output_claims={Tables.claims_step_v2}",
+    ],
+)
+
 registry_step_task = create_task(
     entry_point="core_v2_registry_step",
     parameters=[
@@ -444,6 +503,9 @@ execute_job_cluster_task >> source_tasks
 execute_job_cluster_task >> kodak_atlas_images_task
 kodak_atlas_images_task >> photo_duplication_step_task
 execute_job_cluster_task >> image_grouping_step_task
+execute_job_cluster_task >> claims_source_tasks
+claims_source_tasks >> claims_step_task
+claims_step_task >> vespucio_v2_pipeline_complete_task
 source_tasks >> registry_step_task
 registry_step_task >> address_normalization_step_task
 registry_step_task >> general_normalization_step_task

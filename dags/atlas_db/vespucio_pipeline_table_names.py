@@ -81,7 +81,24 @@ class Tables:
     source_iptu_houses_v2 = "vespucio_sources_delta.source_iptu_house_v2"
     source_zap_imoveis_houses_v2 = "vespucio_sources_delta.source_zap_imoveis_house_v2"
 
+    source_ebdb_condo_observations_v2 = (
+        "vespucio_sources_delta.source_ebdb_condo_observations"
+    )
+    source_ebdb_condo_kodak_inference_v2 = (
+        "vespucio_sources_delta.source_ebdb_condo_kodak_inference"
+    )
+    source_ebdb_condo_description_inference_v2 = (
+        "vespucio_sources_delta.source_ebdb_condo_description_inference"
+    )
+    source_ebdb_house_amenities_kodak_inference_v2 = (
+        "vespucio_sources_delta.source_ebdb_house_amenities_kodak_inference"
+    )
+    source_ebdb_house_amenities_description_inference_v2 = (
+        "vespucio_sources_delta.source_ebdb_house_amenities_description_inference"
+    )
+
     registry_step_v2 = "vespucio_pipeline_delta.registry_step"
+    claims_step_v2 = "vespucio_pipeline_delta.claims_step"
     address_normalization_step_v2 = "vespucio_pipeline_delta.address_normalization_step"
     image_normalization_step_v2 = "vespucio_pipeline_delta.image_normalization_step"
     general_normalization_step_v2 = "vespucio_pipeline_delta.general_normalization_step"
