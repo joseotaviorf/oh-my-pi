@@ -325,7 +325,7 @@ listing_purchase_rent AS (
                 THEN 'ongoing-rentals: House listing published before the transition and re-rented after the transition'
         END AS initial_pricing_type_reason,
         SPLIT(initial_pricing_type_reason, ':')[0] AS initial_pricing_type,
-        ae.due_amount AS amount_paid,
+        CAST(ae.due_amount AS DECIMAL(10, 2)) AS amount_paid,
         IF(
             hl.is_house_inactive IS TRUE,
             TIMESTAMPDIFF(DAY, hl.ts_listing_version_start, COALESCE(hl.ts_listing_version_end, DATE(NOW()))),
@@ -437,7 +437,7 @@ listing_purchase_sale AS (
         CAST(NULL AS STRING) AS contract_status,
         'not-eligible: Business context is not RENT' AS initial_pricing_type_reason,
         CAST('not-eligible' AS STRING) AS initial_pricing_type,
-        CAST(NULL AS DOUBLE) AS amount_paid,
+        CAST(NULL AS DECIMAL(10, 2)) AS amount_paid,
         CAST(0 AS INT) AS total_days_since_house_inactived,
         CAST(NULL AS INT) AS total_days_since_publish,
         ld.has_duplicates AS has_similiar_house_by_address_parsed,
