@@ -1,12 +1,7 @@
 cluster:
-  type: consolidation_xs_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
   custom_libraries:
   - whl: '{artifacts_bucket}/survicate-api-client-python/quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl'
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-validation:
-  cluster:
-    type: emr_7_12_consolidation_xs_memory_fleet_cluster
-  allow_custom_spark_job: true
