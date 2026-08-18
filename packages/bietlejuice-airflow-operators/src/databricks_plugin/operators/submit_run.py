@@ -217,6 +217,7 @@ class QuintoAndarDatabricksSubmitRunOperator(QuintoAndarDatabricksBaseOperator):
 
         self.run_id = None
         self.cluster_id = None
+        self._cluster_resolved = False
 
         if run_name or "run_name" not in self.json:
             self.json["run_name"] = run_name or self.task_id
@@ -244,13 +245,25 @@ class QuintoAndarDatabricksSubmitRunOperator(QuintoAndarDatabricksBaseOperator):
         """
         Performs run's existing cluster validation and startup.
         """
+        self._resolve_cluster(context)
+
+    def _resolve_cluster(self, context):
+        """Resolve cluster config from JSON/XCom; start cluster if terminated.
+
+        Idempotent: safe to call from both pre_execute and execute.
+        Needed because Astronomer Airflow 2.11+ may skip pre_execute.
+        """
+        if self._cluster_resolved:
+            return
         self.json = self._deep_string_coerce(self.json)
 
         if self.json.get("new_cluster"):
+            self._cluster_resolved = True
             return
 
         self.cluster_id = self.json.get(
-            "existing_cluster_id", self.xcom_pull(context, key=self.XCOM_CLUSTER_ID_KEY)
+            "existing_cluster_id",
+            self.xcom_pull(context, key=self.XCOM_CLUSTER_ID_KEY),
         )
         if not self.cluster_id:
             raise DatabricksNotFoundError(
@@ -291,6 +304,7 @@ class QuintoAndarDatabricksSubmitRunOperator(QuintoAndarDatabricksBaseOperator):
                 execution_timeout,
                 self.polling_period_seconds,
             )
+        self._cluster_resolved = True
 
     def execute(self, context):
         """
@@ -304,6 +318,7 @@ class QuintoAndarDatabricksSubmitRunOperator(QuintoAndarDatabricksBaseOperator):
         4. Periodically checks the state of the run;
         5. Logs either the output or the error and stack trace when done.
         """
+        self._resolve_cluster(context)
         execution_timeout = context["task"].execution_timeout
         start_date = context["ti"].start_date
 

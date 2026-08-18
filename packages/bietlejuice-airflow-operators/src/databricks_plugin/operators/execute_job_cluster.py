@@ -182,6 +182,7 @@ class QuintoAndarDatabricksExecuteJobClusterOperator(QuintoAndarDatabricksBaseOp
         self.run_id = None
         self.run_page_url = None
         self.cluster_ids = []
+        self._job_settings_built = False
 
     def pre_execute(self, context):
         """
@@ -195,6 +196,16 @@ class QuintoAndarDatabricksExecuteJobClusterOperator(QuintoAndarDatabricksBaseOp
         6. Define job access control list;
         7. If exists, retrieves `job_id` from XCom.
         """
+        self._build_job_settings(context)
+
+    def _build_job_settings(self, context):
+        """Build job_settings from cluster_configuration and DAG tasks.
+
+        Idempotent: safe to call from both pre_execute and execute.
+        Needed because Astronomer Airflow 2.11+ may skip pre_execute.
+        """
+        if self._job_settings_built:
+            return
         # Work on a rendered copy so pre_execute is idempotent and any
         # Jinja templates (e.g. {{ dag.dag_id }} in custom_tags) are resolved.
         cluster_config = self.render_template(dict(self.cluster_configuration), context)
@@ -246,6 +257,7 @@ class QuintoAndarDatabricksExecuteJobClusterOperator(QuintoAndarDatabricksBaseOp
                 self.run_page_url = self.databricks_hook.generate_run_page_url(
                     self.job_id, self.run_id
                 )
+        self._job_settings_built = True
 
     def execute(self, context):
         """
@@ -256,6 +268,7 @@ class QuintoAndarDatabricksExecuteJobClusterOperator(QuintoAndarDatabricksBaseOp
         3. Gets the `cluster_ids` parameter from the tasks of the newly job run;
         4. Checks if the cluster is up and running.
         """
+        self._build_job_settings(context)
         execution_timeout = context["task"].execution_timeout
         start_date = context["ti"].start_date
 

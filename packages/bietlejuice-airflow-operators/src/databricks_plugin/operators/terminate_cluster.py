@@ -108,6 +108,9 @@ class QuintoAndarDatabricksTerminateClusterOperator(QuintoAndarDatabricksBaseOpe
         )
 
     def execute(self, context):
+        # Guard: pull cluster_id from XCom if pre_execute was skipped (Astro 2.11+)
+        if not self.cluster_id:
+            self.cluster_id = self.xcom_pull(context, key=self.XCOM_CLUSTER_ID_KEY)
         execution_timeout = context["task"].execution_timeout
         start_date = context["ti"].start_date
 

@@ -158,6 +158,10 @@ class QuintoAndarDatabricksCreateClusterOperator(QuintoAndarDatabricksBaseOperat
         2. Pushes the `cluster_id` into an XCom;
         3. Monitors the cluster until it's up an running;
         """
+        # Guard: coerce types if pre_execute was skipped (Astro 2.11+)
+        self.cluster_configuration = self._deep_string_coerce(
+            self.cluster_configuration
+        )
         execution_timeout = context["task"].execution_timeout
         start_date = context["ti"].start_date
 
