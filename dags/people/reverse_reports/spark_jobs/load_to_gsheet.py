@@ -33,6 +33,7 @@ logger = logging.getLogger(JOB_NAME)
 
 # Aligned with the Databricks sandbox_toolkit export notebook.
 GSHEETS_WRITE_CHUNK_SIZE = 10_000
+GSHEETS_GRID_ROW_BUFFER = 10
 GSHEETS_CHUNK_PAUSE_SECONDS = 2
 GSHEETS_SERVICE_ACCOUNT_EMAIL = (
     "gsheets-people-access@airflow-186119.iam.gserviceaccount.com"
@@ -171,6 +172,20 @@ def _get_worksheet(writer: GoogleSheetsWriter, sheet_id: str, sheet_tab: str):
     )
 
 
+def _grow_worksheet_grid(worksheet, n_rows: int, n_cols: int) -> None:
+    """Expand the tab grid so later chunks are not clipped at the default 10k rows."""
+    target_rows = max(n_rows, 1)
+    target_cols = max(n_cols, 1)
+    current_rows = worksheet.row_count
+    current_cols = worksheet.col_count
+    if current_rows >= target_rows and current_cols >= target_cols:
+        return
+    worksheet.resize(
+        rows=max(current_rows, target_rows),
+        cols=max(current_cols, target_cols),
+    )
+
+
 def _write_payload_in_chunks(
     writer: GoogleSheetsWriter,
     sheet_tab: str,
@@ -181,20 +196,16 @@ def _write_payload_in_chunks(
     """
     Replace worksheet content, chunking large payloads to avoid Sheets API 500s.
 
-    Small payloads use ``GoogleSheetsWriter.write`` (clear + single update).
-    Large payloads write the first chunk with ``writer.write`` (clear + update),
-    then ``append_rows`` for the remaining batches — same pattern as the Databricks
-    sandbox_toolkit export notebook.
+    Grow the sheet grid first, then ``update`` each chunk at an explicit A1
+    range. ``append_rows`` is not used: a tab that still has the default
+    10k-row grid silently drops rows past that limit, which truncated
+    compensation_base (~10.2k employees) after the first chunk.
     """
-    data_row_count = max(len(payload) - 1, 0)
-    if data_row_count <= chunk_size:
-        _run_gsheets_operation(
-            sheet_tab,
-            lambda: writer.write(sheet_tab, sheet_id, payload),
-            "write",
-        )
+    if not payload:
         return
 
+    data_row_count = max(len(payload) - 1, 0)
+    n_cols = len(payload[0])
     chunks = _iter_payload_write_chunks(payload, chunk_size)
     logger.info(
         "Writing %d rows in %d chunks (chunk_size=%d)",
@@ -203,24 +214,26 @@ def _write_payload_in_chunks(
         chunk_size,
     )
 
+    worksheet = _get_worksheet(writer, sheet_id, sheet_tab)
     _run_gsheets_operation(
         sheet_tab,
-        lambda: writer.write(sheet_tab, sheet_id, chunks[0]),
-        f"write chunk 1/{len(chunks)}",
+        lambda: _grow_worksheet_grid(
+            worksheet, len(payload) + GSHEETS_GRID_ROW_BUFFER, n_cols
+        ),
+        "resize grid",
     )
+    _run_gsheets_operation(sheet_tab, worksheet.clear, "clear")
 
-    if len(chunks) == 1:
-        return
+    start_row = 1
+    for chunk_index, chunk in enumerate(chunks, start=1):
+        range_a1 = f"A{start_row}"
+        chunk_label = f"update chunk {chunk_index}/{len(chunks)} ({range_a1})"
 
-    worksheet = _get_worksheet(writer, sheet_id, sheet_tab)
-    for chunk_index, chunk in enumerate(chunks[1:], start=2):
-        chunk_label = f"append chunk {chunk_index}/{len(chunks)}"
+        def update_chunk(values=chunk, cell_range=range_a1):
+            worksheet.update(range_name=cell_range, values=values, raw=False)
 
-        def append_chunk(rows=chunk, label=chunk_label):
-            worksheet.append_rows(rows, value_input_option="USER_ENTERED")
-
-        _run_gsheets_operation(sheet_tab, append_chunk, chunk_label)
-
+        _run_gsheets_operation(sheet_tab, update_chunk, chunk_label)
+        start_row += len(chunk)
         if chunk_index < len(chunks):
             time.sleep(GSHEETS_CHUNK_PAUSE_SECONDS)
 

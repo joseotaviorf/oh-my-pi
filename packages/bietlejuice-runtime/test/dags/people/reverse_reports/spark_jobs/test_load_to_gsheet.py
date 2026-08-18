@@ -114,19 +114,46 @@ class TestWritePayloadInChunks(unittest.TestCase):
         mock_writer.google_sheets_client.gsheets.open_by_key.return_value.worksheet.return_value = mock_worksheet
         return mock_writer, mock_worksheet
 
-    def test_small_payload_uses_single_write(self):
-        mock_writer, _ = self._build_writer_with_worksheet()
+    def test_small_payload_grows_grid_and_updates_from_a1(self):
+        mock_writer, mock_worksheet = self._build_writer_with_worksheet()
+        mock_worksheet.row_count = 1_000
+        mock_worksheet.col_count = 26
         payload = [["h"], ["1"], ["2"]]
 
         job._write_payload_in_chunks(
             mock_writer, "Tab", "sheet-id", payload, chunk_size=10_000
         )
 
-        mock_writer.write.assert_called_once_with("Tab", "sheet-id", payload)
+        mock_writer.write.assert_not_called()
+        mock_worksheet.append_rows.assert_not_called()
+        mock_worksheet.clear.assert_called_once()
+        mock_worksheet.update.assert_called_once_with(
+            range_name="A1", values=payload, raw=False
+        )
+
+    def test_grows_grid_when_below_payload_size(self):
+        mock_writer, mock_worksheet = self._build_writer_with_worksheet()
+        mock_worksheet.row_count = 1_000
+        mock_worksheet.col_count = 26
+
+        job._grow_worksheet_grid(mock_worksheet, n_rows=10_210, n_cols=42)
+
+        mock_worksheet.resize.assert_called_once_with(rows=10_210, cols=42)
+
+    def test_does_not_shrink_existing_grid(self):
+        mock_writer, mock_worksheet = self._build_writer_with_worksheet()
+        mock_worksheet.row_count = 50_000
+        mock_worksheet.col_count = 50
+
+        job._grow_worksheet_grid(mock_worksheet, n_rows=10_210, n_cols=42)
+
+        mock_worksheet.resize.assert_not_called()
 
     @patch(f"{MODULE_UNDER_TEST}.time.sleep")
-    def test_large_payload_writes_first_chunk_then_appends(self, mock_sleep):
+    def test_large_payload_resizes_then_updates_chunks_by_range(self, mock_sleep):
         mock_writer, mock_worksheet = self._build_writer_with_worksheet()
+        mock_worksheet.row_count = 1_000
+        mock_worksheet.col_count = 26
         chunk_size = 2
         payload = [["h"], ["1"], ["2"], ["3"], ["4"], ["5"]]
 
@@ -134,23 +161,45 @@ class TestWritePayloadInChunks(unittest.TestCase):
             mock_writer, "Tab", "sheet-id", payload, chunk_size=chunk_size
         )
 
-        mock_writer.write.assert_called_once_with(
-            "Tab",
-            "sheet-id",
-            [["h"], ["1"], ["2"]],
-        )
-        mock_worksheet.append_rows.assert_has_calls(
+        mock_writer.write.assert_not_called()
+        mock_worksheet.resize.assert_not_called()
+        mock_worksheet.clear.assert_called_once()
+        mock_worksheet.update.assert_has_calls(
             [
-                call([["3"], ["4"]], value_input_option="USER_ENTERED"),
-                call([["5"]], value_input_option="USER_ENTERED"),
+                call(range_name="A1", values=[["h"], ["1"], ["2"]], raw=False),
+                call(range_name="A4", values=[["3"], ["4"]], raw=False),
+                call(range_name="A6", values=[["5"]], raw=False),
             ]
         )
-        self.assertEqual(mock_sleep.call_count, 1)
+        self.assertEqual(mock_sleep.call_count, 2)
         mock_sleep.assert_called_with(job.GSHEETS_CHUNK_PAUSE_SECONDS)
 
+    def test_payload_just_over_10k_uses_range_updates_not_append(self):
+        mock_writer, mock_worksheet = self._build_writer_with_worksheet()
+        mock_worksheet.row_count = 10_000
+        mock_worksheet.col_count = 26
+        payload = [["h"]] + [[str(i)] for i in range(10_001)]
+
+        job._write_payload_in_chunks(
+            mock_writer, "Tab", "sheet-id", payload, chunk_size=10_000
+        )
+
+        mock_writer.write.assert_not_called()
+        mock_worksheet.append_rows.assert_not_called()
+        mock_worksheet.resize.assert_called_once_with(rows=10_012, cols=26)
+        self.assertEqual(mock_worksheet.update.call_count, 2)
+        first_kwargs = mock_worksheet.update.call_args_list[0][1]
+        second_kwargs = mock_worksheet.update.call_args_list[1][1]
+        self.assertEqual(first_kwargs["range_name"], "A1")
+        self.assertEqual(len(first_kwargs["values"]), 10_001)
+        self.assertEqual(second_kwargs["range_name"], "A10002")
+        self.assertEqual(second_kwargs["values"], [["10000"]])
+
     def test_cell_limit_fails_fast_without_retry(self):
-        mock_writer, _ = self._build_writer_with_worksheet()
-        mock_writer.write.side_effect = Exception(
+        mock_writer, mock_worksheet = self._build_writer_with_worksheet()
+        mock_worksheet.row_count = 1_000
+        mock_worksheet.col_count = 26
+        mock_worksheet.update.side_effect = Exception(
             "400 INVALID_ARGUMENT: cells in the workbook above the limit of 10000000 cells"
         )
 
@@ -160,7 +209,7 @@ class TestWritePayloadInChunks(unittest.TestCase):
             )
 
         self.assertIn("10M cells", str(ctx.exception))
-        mock_writer.write.assert_called_once()
+        mock_worksheet.update.assert_called_once()
 
 
 class TestGetAuth(unittest.TestCase):
