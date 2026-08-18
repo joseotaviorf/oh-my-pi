@@ -1,4 +1,20 @@
-WITH base_outbound_notifications AS (
+WITH concierge_trigger AS (
+  SELECT DISTINCT
+    CASE 
+      WHEN intent LIKE 'medium_reprocess%' THEN 'Medium FUP'
+      WHEN intent LIKE 'medium_fup%' THEN 'Medium FUP'
+      WHEN intent LIKE 'visit_cancellation_fup%' THEN 'Visit cancellation FUP'
+      ELSE intent
+    END AS trigger_intent,
+    uuid_trigger_id
+  FROM datalake_house_listing_search_clean.concierge_trigger
+  WHERE 
+    DATE(ts_created) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+    AND outcome = 'SUCCESS'
+    AND chatbot = 'JULIA'
+)
+
+, base_outbound_notifications AS (
   SELECT
     un.id_user,
     m.id_session AS id_copilot_session,
@@ -18,12 +34,16 @@ WITH base_outbound_notifications AS (
       WHEN un.action LIKE 'ConciergeContactSubmissionClassifieds%' THEN 'Classifieds'
       WHEN un.action LIKE 'ConciergeContactSubmissionTtcQac%' THEN 'TTC QAC Outbound'
       WHEN un.action LIKE 'ConciergeContactSubmissionTtc%' THEN 'TTC Outbound'
-      ELSE 'Undefined'
+      WHEN un.action = 'ConciergeOutboundNotification_whatsapp' AND un.template = 'concierge_placas_agents_reproc_trigger' THEN 'Placas agent FUP'
+      WHEN un.action = 'ConciergeOutboundNotification_whatsapp' THEN COALESCE(t.trigger_intent, 'Undefined')
+    ELSE 'Undefined'
     END AS concierge_flow_type,
     'outbound' AS concierge_flow
   FROM datalake_jaiminho_clean.user_notifications un
   LEFT JOIN datalake_copilot_service_clean.message m -- gets the outbound template message
     ON m.id_external = un.id_entity
+  LEFT JOIN concierge_trigger t
+    ON m.id_idempotency = t.uuid_trigger_id
   LEFT JOIN datalake_copilot_service_clean.session s 
     ON m.id_session = s.id
   WHERE un.channel = 'whatsapp'
@@ -32,7 +52,8 @@ WITH base_outbound_notifications AS (
     AND un.action NOT ILIKE '%carousel%'
     AND un.action NOT ILIKE '%cancelation%'
     AND un.action NOT ILIKE '%optout%'
-    AND un.action NOT LIKE '%ConciergeSharedLpvAdsTrigger%'
+    AND un.action <> 'ConciergeSharedLpvAdsTrigger'
+    AND un.action NOT LIKE 'ConciergeSendLeadConfirmation_whatsapp_message%'
     AND un.status IN ('delivered', 'read')
     AND MAKE_DATE(un.year, un.month, un.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
