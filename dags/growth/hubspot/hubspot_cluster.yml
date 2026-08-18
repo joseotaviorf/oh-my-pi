@@ -1,27 +1,15 @@
 cluster:
-  type: consolidation_l_memory_single_node_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_libraries:
   - whl: '{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.3.0-py2.py3-none-any.whl'
-validation:
-  cluster:
-    type: emr_7_12_consolidation_l_memory_fleet_cluster
-    custom_configurations:
-      # 10 raw tables fan out in Airflow; default single-node preset runs one EMR step
-      # at a time (step_concurrency_level: 1). Fleet + concurrency parallelizes API pulls.
-      step_concurrency_level: 3
-      core_nodes:
-        target_on_demand: 2
-        target_spot: 0
-        instance_types:
-        - r6g.4xlarge
-        - r7g.4xlarge
-        - r6i.4xlarge
-      task_nodes:
-        instance_types:
-        - r6g.4xlarge
-        - r7g.4xlarge
-        - r6i.4xlarge
-        target_on_demand: 0
-        target_spot: 0
-  allow_custom_spark_job: true
+  custom_configurations:
+    # 10 raw tables fan out in Airflow; default single-node preset runs one EMR step
+    # at a time (step_concurrency_level: 1). Fleet + concurrency parallelizes API pulls.
+    step_concurrency_level: 3
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge

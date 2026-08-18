@@ -1,47 +1,29 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_libraries:
+  - maven:
+      coordinates: com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.43.0
   - pypi:
       package: 'packaging>=23.0,<27'
       ignore_installed: true
   - pypi:
-      package: google-api-python-client
-  - pypi:
       package: google-auth>=2.0.0
-  - pypi:
-      package: google-cloud-bigquery>=3.10.0
-  - pypi:
-      package: google-cloud-bigquery-storage>=2.0.0
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    spark_version: 13.3.x-scala2.12
-    num_workers: 3
-validation:
-  cluster:
-    type: emr_7_12_consolidation_s_memory_fleet_cluster
-    custom_libraries:
-    - maven:
-        coordinates: com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.43.0
-    custom_configurations:
-      task_nodes:
-        instance_types:
-        - r6g.xlarge
-        - r7g.xlarge
-        - r6i.xlarge
-        target_on_demand: 0
-        target_spot: 1
-        allocation_strategy: price-capacity-optimized
-        bid_price_percentage: 100
-      core_nodes:
-        target_on_demand: 2
-        target_spot: 0
-        instance_types:
-        - r6g.xlarge
-        - r7g.xlarge
-        - r6i.xlarge
-  allow_custom_spark_job: true
+    task_nodes:
+      instance_types:
+      - r6g.xlarge
+      - r7g.xlarge
+      - r6i.xlarge
+      target_on_demand: 0
+      target_spot: 1
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - r6g.xlarge
+      - r7g.xlarge
+      - r6i.xlarge

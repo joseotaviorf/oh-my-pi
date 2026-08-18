@@ -1,39 +1,31 @@
 cluster:
-  type: consolidation_m_compute_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
-    driver_node_type_id: r7g.2xlarge
-    num_workers: 4
-validation:
-  cluster:
-    type: emr_7_12_consolidation_xl_memory_fleet_cluster
-    custom_configurations:
-      step_concurrency_level: 2
-      aws_attributes:
-        ebs_volume_size: 500
-      spark_conf:
-        spark.executor.cores: "5"
-        spark.executor.memory: 32g
-        spark.executor.memoryOverhead: 4g
-        spark.driver.memory: 32g
-        spark.driver.maxResultSize: "0"
-        spark.dynamicAllocation.maxExecutors: "16"
-        # m_compute default is 100; fewer/larger shuffle tasks to cut spill (ref j-08499842SI8PCGBRSQXL).
-        spark.sql.shuffle.partitions: "50"
-      core_nodes:
-        target_on_demand: 4
-        target_spot: 0
-        instance_types:
-        - r6g.8xlarge
-        - r7g.8xlarge
-        - r6i.8xlarge
-      task_nodes:
-        target_on_demand: 0
-        target_spot: 4
-        allocation_strategy: price-capacity-optimized
-        bid_price_percentage: 100
-        instance_types:
-        - r6g.8xlarge
-        - r7g.8xlarge
-        - r6i.8xlarge
-  allow_custom_spark_job: true
+    step_concurrency_level: 2
+    aws_attributes:
+      ebs_volume_size: 500
+    spark_conf:
+      spark.executor.cores: '5'
+      spark.executor.memory: 32g
+      spark.executor.memoryOverhead: 4g
+      spark.driver.memory: 32g
+      spark.driver.maxResultSize: '0'
+      spark.dynamicAllocation.maxExecutors: '16'
+      # m_compute default is 100; fewer/larger shuffle tasks to cut spill (ref j-08499842SI8PCGBRSQXL).
+      spark.sql.shuffle.partitions: '50'
+    core_nodes:
+      target_on_demand: 4
+      target_spot: 0
+      instance_types:
+      - r6g.8xlarge
+      - r7g.8xlarge
+      - r6i.8xlarge
+    task_nodes:
+      target_on_demand: 0
+      target_spot: 4
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+      instance_types:
+      - r6g.8xlarge
+      - r7g.8xlarge
+      - r6i.8xlarge
