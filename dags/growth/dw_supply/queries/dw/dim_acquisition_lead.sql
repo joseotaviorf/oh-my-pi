@@ -1,25 +1,51 @@
 WITH acq_lead AS (
-  SELECT 
+  SELECT
     sk_supply_lead,
-    supply_source AS cd_supply_source,
-    business_context AS nm_business_context,
+    cd_supply_source,
+    nm_business_context,
     id_lead,
     id_lead_ebdb,
-    original_lead AS id_original_lead,
+    id_original_lead,
     id_prospect,
     id_house,
-    aux_database_tracking_campaign AS tp_track_campaign,
-    aux_database_tracking_medium AS tp_track_medium,
-    aux_database_tracking_source AS tp_track_source,
-    medium AS nm_medium, 
-    source AS nm_source, 
-    campaign AS nm_campaign,
-    lead_type AS tp_lead,
-    NOW() AS ts_updated
-  FROM datalake_supply_flows.supply_events_tracking
-  WHERE funnel_step = 'PROSPECT'
-    AND sk_supply_lead IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY sk_supply_lead, supply_source, business_context ORDER BY ts_event_adjusted DESC) = 1
+    tp_track_campaign,
+    tp_track_medium,
+    tp_track_source,
+    nm_medium,
+    nm_source,
+    nm_campaign,
+    tp_lead,
+    ts_updated
+  FROM (
+    SELECT
+      sk_supply_lead,
+      supply_source AS cd_supply_source,
+      business_context AS nm_business_context,
+      id_lead,
+      id_lead_ebdb,
+      original_lead AS id_original_lead,
+      id_prospect,
+      id_house,
+      aux_database_tracking_campaign AS tp_track_campaign,
+      aux_database_tracking_medium AS tp_track_medium,
+      aux_database_tracking_source AS tp_track_source,
+      medium AS nm_medium,
+      source AS nm_source,
+      campaign AS nm_campaign,
+      lead_type AS tp_lead,
+      NOW() AS ts_updated,
+      ROW_NUMBER() OVER (
+        PARTITION BY sk_supply_lead, supply_source, business_context
+        ORDER BY ts_event_adjusted DESC
+      ) AS rn
+    FROM
+      datalake_supply_flows.supply_events_tracking
+    WHERE
+      funnel_step = 'PROSPECT'
+      AND sk_supply_lead IS NOT NULL
+  ) AS ranked_acq_lead
+  WHERE
+    rn = 1
 )
 
 SELECT

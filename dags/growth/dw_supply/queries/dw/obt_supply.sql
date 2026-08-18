@@ -1,37 +1,58 @@
 WITH descartes AS (
+  SELECT
+    sk_supply,
+    sk_date,
+    discard_order,
+    nm_business_context,
+    sk_user_conversion,
+    cd_funnel_step,
+    cd_discard_reason,
+    ds_discard_reason,
+    nm_agent,
+    nm_partner,
+    nm_assigned_partner
+  FROM (
     SELECT
-        fse.sk_supply,
-        fse.sk_date,
-        ROW_NUMBER() OVER (PARTITION BY fse.sk_supply, fse.nm_business_context ORDER BY fse.ts_event DESC) AS discard_order,
-        fse.nm_business_context,
-        fse.sk_user_conversion,
-        dsd.cd_funnel_step,
-        dsd.cd_discard_reason,
-        dsd.ds_discard_reason,
-        dsof.nm_agent,
-        dsof.nm_partner,
-        dsof.nm_assigned_partner
+      fse.sk_supply,
+      fse.sk_date,
+      ROW_NUMBER() OVER (PARTITION BY fse.sk_supply, fse.nm_business_context ORDER BY fse.ts_event DESC) AS discard_order,
+      fse.nm_business_context,
+      fse.sk_user_conversion,
+      dsd.cd_funnel_step,
+      dsd.cd_discard_reason,
+      dsd.ds_discard_reason,
+      dsof.nm_agent,
+      dsof.nm_partner,
+      dsof.nm_assigned_partner
     FROM
-        dw_growth.fact_supply_events AS fse
+      dw_growth.fact_supply_events AS fse
     LEFT JOIN
-        dw_growth.dim_supply_discards AS dsd
-            ON fse.sk_discard = dsd.sk_discard
+      dw_growth.dim_supply_discards AS dsd
+        ON fse.sk_discard = dsd.sk_discard
     LEFT JOIN
-        dw_growth.dim_funnel_step AS dfs
-            ON dfs.sk_funnel_step = fse.sk_funnel_step
+      dw_growth.dim_funnel_step AS dfs
+        ON dfs.sk_funnel_step = fse.sk_funnel_step
     LEFT JOIN
-        dw_growth.dim_supply_operation_flow AS dsof
-            ON fse.sk_ops = dsof.sk_ops
+      dw_growth.dim_supply_operation_flow AS dsof
+        ON fse.sk_ops = dsof.sk_ops
     WHERE dfs.tp_business_event = 'drop'
-    QUALIFY discard_order = 1
+  ) AS ranked_descartes
+  WHERE
+    discard_order = 1
 ),
 status AS (
   SELECT
-        olc.id_lead,
-        ROW_NUMBER() OVER (PARTITION BY id_lead ORDER BY olc.ts_call_started) first_call
+    id_lead,
+    first_call
+  FROM (
+    SELECT
+      olc.id_lead,
+      ROW_NUMBER() OVER (PARTITION BY id_lead ORDER BY olc.ts_call_started) AS first_call
     FROM
-        datalake_olos_dialer.outbound_contact_attempts AS olc
-    QUALIFY first_call = 1
+      datalake_olos_dialer.outbound_contact_attempts AS olc
+  ) AS ranked_status
+  WHERE
+    first_call = 1
 ),
 pp_multi_segmentation AS (
 SELECT
@@ -77,7 +98,9 @@ hybrid_houses AS (
       ON fse.sk_funnel_step = dfs.sk_funnel_step
   WHERE 
       fse.sk_house != -1
-  GROUP BY ALL
+  GROUP BY
+      fse.sk_house,
+      dfs.cd_funnel_step
 ),
 base AS (
     SELECT
@@ -435,9 +458,16 @@ affiliate_volumetry_cluster AS (
         sk_user,
         affiliate_volumetry
     FROM
-        datalake_gsheets_clean.affiliate_volumetry_cluster
-    QUALIFY 
-        ROW_NUMBER() OVER (PARTITION BY sk_user ORDER BY start_date DESC) = 1
+        (
+            SELECT
+                sk_user,
+                affiliate_volumetry,
+                ROW_NUMBER() OVER (PARTITION BY sk_user ORDER BY start_date DESC) AS rn
+            FROM
+                datalake_gsheets_clean.affiliate_volumetry_cluster
+        ) AS ranked_affiliate_volumetry
+    WHERE
+        rn = 1
 )
 SELECT
     obt.date,

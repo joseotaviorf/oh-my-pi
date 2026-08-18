@@ -8,7 +8,7 @@ WITH discards AS (
     drop_step_reason IS NOT NULL
 ),
 stg_supply_discards AS (
-  SELECT
+  SELECT DISTINCT
     CONCAT_WS('#', ds.funnel_step, ds.discard_reason) AS bk_discard,
     ds.funnel_step AS cd_funnel_step,
     ds.discard_reason AS cd_discard_reason,
@@ -16,7 +16,6 @@ stg_supply_discards AS (
     NOW() AS ts_updated
   FROM
     discards AS ds
-  GROUP BY ALL
 )
 
 SELECT 
