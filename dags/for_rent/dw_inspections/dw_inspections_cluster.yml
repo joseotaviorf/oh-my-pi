@@ -1,9 +1,31 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    master_node_type_id: r6g.2xlarge
+    aws_attributes:
+      ebs_volume_size: 200
+    # The s_memory preset pins spark.driver.memory at 8g regardless of
+    # master_node_type_id; raising the master alone does not grow the driver heap.
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    driver_node_type_id: r7g.2xlarge
+      spark.driver.memory: 16g
+      spark.driver.memoryOverhead: 4g
+      spark.yarn.am.memory: 4g
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - r6g.xlarge
+      - r7g.xlarge
+      - r6i.xlarge
+    task_nodes:
+      target_on_demand: 0
+      target_spot: 1
+      instance_types:
+      - r6g.xlarge
+      - r7g.xlarge
+      - r6i.xlarge
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

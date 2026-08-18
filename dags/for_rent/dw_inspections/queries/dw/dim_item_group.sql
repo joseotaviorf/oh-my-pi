@@ -36,30 +36,51 @@ WITH item_group_comments AS (
         AND i.month = {month}
         AND i.day = {day}
     GROUP BY 1
+),
+ranked_item_group AS (
+    SELECT
+        ig.id_item_group AS sk_item_group,
+        ig.item_group_name,
+        ig.item_group_type,
+        ig.status,
+        COALESCE(igc.has_item_checklist, FALSE) AS has_item_checklist,
+        COALESCE(igc.has_item_chip_choice, FALSE) AS has_item_chip_choice,
+        COALESCE(igc.has_inspector_open_comment, FALSE) AS has_inspector_open_comment,
+        ig.is_inferior_quality,
+        ig.is_active_status,
+        ig.is_active_inferior_quality,
+        ig.ts_created,
+        ig.ts_updated,
+        ig.year,
+        ig.month,
+        ig.day,
+        ROW_NUMBER() OVER (PARTITION BY ig.id_item_group ORDER BY ig.ts_updated DESC) AS rn
+    FROM
+        datalake_inspections.item_group AS ig
+    LEFT JOIN
+        item_group_comments AS igc
+            ON igc.id_item_group = ig.id_item_group
+    WHERE
+        MAKE_DATE(ig.year, ig.month, ig.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT DISTINCT
-    ig.id_item_group AS sk_item_group,
-    ig.item_group_name,
-    ig.item_group_type,
-    ig.status,
-    COALESCE(igc.has_item_checklist, FALSE) AS has_item_checklist,
-    COALESCE(igc.has_item_chip_choice, FALSE) AS has_item_chip_choice,
-    COALESCE(igc.has_inspector_open_comment, FALSE) AS has_inspector_open_comment,
-    ig.is_inferior_quality,
-    ig.is_active_status,
-    ig.is_active_inferior_quality,
-    ig.ts_created,
-    ig.ts_updated,
+    sk_item_group,
+    item_group_name,
+    item_group_type,
+    status,
+    has_item_checklist,
+    has_item_chip_choice,
+    has_inspector_open_comment,
+    is_inferior_quality,
+    is_active_status,
+    is_active_inferior_quality,
+    ts_created,
+    ts_updated,
     NOW() AS ts_load,
-    ig.year,
-    ig.month,
-    ig.day
+    year,
+    month,
+    day
 FROM
-    datalake_inspections.item_group AS ig
-LEFT JOIN
-    item_group_comments AS igc
-        ON igc.id_item_group = ig.id_item_group
+    ranked_item_group
 WHERE
-    MAKE_DATE(ig.year, ig.month, ig.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ig.id_item_group ORDER BY ig.ts_updated DESC) = 1
+    rn = 1

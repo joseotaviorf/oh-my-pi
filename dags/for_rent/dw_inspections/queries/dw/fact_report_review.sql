@@ -1,12 +1,22 @@
-WITH repair_exempted AS (
+WITH ranked_repair_exempted AS (
     SELECT
         re.id_repair_request,
         re.id_granted_by,
-        re.is_exempted
+        re.is_exempted,
+        re.ts_granted,
+        MAX(re.ts_granted) OVER (PARTITION BY re.id_repair_request) AS max_ts_granted
     FROM
         datalake_inspections.repair_exempted AS re
-    QUALIFY
-        re.ts_granted = MAX(re.ts_granted) OVER(PARTITION BY re.id_repair_request)
+),
+repair_exempted AS (
+    SELECT
+        id_repair_request,
+        id_granted_by,
+        is_exempted
+    FROM
+        ranked_repair_exempted
+    WHERE
+        ts_granted = max_ts_granted
 )
 SELECT
     r.id_assessment AS sk_assessment,
