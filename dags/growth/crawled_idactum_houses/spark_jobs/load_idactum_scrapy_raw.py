@@ -1,9 +1,16 @@
 from argparse import ArgumentParser
 from datetime import date, datetime
-from typing import List
+from typing import List, Optional
 
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
+from pyspark.sql.types import (
+    ArrayType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+)
 from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
@@ -20,26 +27,196 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 PARTITION_COLS: List[str] = ["year", "month", "day"]
 
+METADATA_STRUCT = StructType(
+    [
+        StructField("source", StringType(), True),
+        StructField("url", StringType(), True),
+        StructField("accessed_at", StringType(), True),
+        StructField("referer_url", StringType(), True),
+    ]
+)
+
+# Union of response.* fields referenced across Idactum scrapy clean SQL files.
+_RESPONSE_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "_inscricao",
+            "inscricao",
+            "inscricao_cadastral",
+            "cdc",
+            "endereco",
+            "setor",
+            "cpf_cnpj",
+            "numero_certidao",
+            "cartorio_de_registro",
+            "valor_da_transacao",
+            "valor_venal_do_imovel",
+            "valor_venal_da_edificacao",
+            "natureza_da_operacao",
+            "proprietario",
+            "adquirente",
+            "situacao",
+            "numero_guia",
+            "numero_protocolo",
+            "numero_autenticacao",
+            "inscricao_imobiliaria",
+            "endereco_imovel",
+            "natureza_transacao",
+            "parte_transferida",
+            "parcela",
+            "valor_declarado",
+            "base_calculo",
+            "valor_total_devido",
+            "valor_total_pago",
+            "data_vencimento",
+            "data_pagamento",
+            "transmitente",
+            "folha_suplementar",
+            "observacao",
+        )
+    ]
+)
+
+_OSASCO_PESQUISA_CDC_ITEM_STRUCT = StructType(
+    [
+        StructField("inscricao", StringType(), True),
+        StructField("cdc", StringType(), True),
+        StructField("endereco", StringType(), True),
+        StructField("no_matricula", StringType(), True),
+        StructField("proprietario_compromissario", StringType(), True),
+        StructField("situacao", StringType(), True),
+    ]
+)
+
+_CADASTRAL_INFO_ITEM_STRUCT = StructType(
+    [
+        StructField("nrinscr", StringType(), True),
+        StructField("nmbairro", StringType(), True),
+        StructField("nmlogradou", StringType(), True),
+        StructField("nrimovel", StringType(), True),
+        StructField("incompl", StringType(), True),
+        StructField("areaterr", StringType(), True),
+        StructField("areaedif", StringType(), True),
+        StructField("areatest", StringType(), True),
+        StructField("vlvenal", StringType(), True),
+        StructField("uso", StringType(), True),
+        StructField("formauso", StringType(), True),
+        StructField("tpedif1", StringType(), True),
+        StructField("tpedif2", StringType(), True),
+        StructField("x_coord", StringType(), True),
+        StructField("y_coord", StringType(), True),
+        StructField("ci", StringType(), True),
+        StructField("nmedificio", StringType(), True),
+    ]
+)
+
+_REGISTRATION_ITEM_STRUCT = StructType(
+    [
+        StructField("registration_number", StringType(), True),
+        StructField("ci", StringType(), True),
+    ]
+)
+
+_EMPTY_RAW_SCHEMAS = {
+    "sp_osasco_pesquisa_cdc": StructType(
+        [
+            StructField(
+                "response",
+                ArrayType(_OSASCO_PESQUISA_CDC_ITEM_STRUCT),
+                True,
+            ),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+    "go_goiania_informacoes_cadastrais": StructType(
+        [
+            StructField("registration_number", StringType(), True),
+            StructField(
+                "cadastral_info",
+                ArrayType(_CADASTRAL_INFO_ITEM_STRUCT),
+                True,
+            ),
+            StructField("total_records", LongType(), True),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+    "go_goiania_cadastro_imobiliario": StructType(
+        [
+            StructField("neighborhood_id", LongType(), True),
+            StructField(
+                "registrations",
+                ArrayType(_REGISTRATION_ITEM_STRUCT),
+                True,
+            ),
+            StructField("total_registrations", LongType(), True),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+}
+
 
 def _is_missing_feed_error(exc: Exception) -> bool:
     msg = str(exc)
     return "Path does not exist" in msg or "PATH_NOT_FOUND" in msg
 
 
-def _skip_missing_feed(
+def _empty_raw_schema(table_name: str) -> StructType:
+    return _EMPTY_RAW_SCHEMAS.get(
+        table_name,
+        StructType(
+            [
+                StructField("response", _RESPONSE_STRUCT, True),
+                StructField("metadata", METADATA_STRUCT, True),
+            ]
+        ),
+    )
+
+
+def _empty_raw_dataframe(table_name: str) -> DataFrame:
+    spark_client = SparkClient()
+    return spark_client.conn.createDataFrame([], _empty_raw_schema(table_name))
+
+
+def bootstrap_empty_raw_table(
     logger: QuintoAndarLogger,
+    *,
+    environment: str,
+    datalake_bucket: str,
+    table_name: str,
     source: str,
     spider: str,
-    execution_date: str,
+    execution_date: date,
     ingestion_path: str,
-    exc: Exception,
+    reason: str,
+    error: Optional[Exception] = None,
 ) -> None:
+    error_suffix = f", error={error}" if error is not None else ""
     logger.warning(
         f"m=__main__, source={source}, spider={spider}, "
-        f"execution_date={execution_date}, ingestion_path={ingestion_path}, "
-        f"error={exc}, msg=No scrapy feed found; skipping load without failing"
+        f"execution_date={execution_date.isoformat()}, ingestion_path={ingestion_path}, "
+        f"reason={reason}{error_suffix}, "
+        f"msg=Bootstrapping empty raw table for downstream tasks"
     )
-    raise SystemExit(0) from None
+
+    dataframe_to_save = transform_data(
+        _empty_raw_dataframe(table_name),
+        crawler_name=spider,
+        execution_date=execution_date,
+    )
+    save_to_datalake(
+        dataframe=dataframe_to_save,
+        environment=environment,
+        datalake_bucket=datalake_bucket,
+        table_name=table_name,
+        source=source,
+    )
+
+    logger.info(
+        f"m=__main__, source={source}, table_name={table_name}, "
+        f"execution_date={execution_date.isoformat()}, partitions={PARTITION_COLS}, "
+        f"msg=Bootstrapped empty scrapy raw table"
+    )
 
 
 def load_from_s3(path: str) -> DataFrame:
@@ -157,22 +334,33 @@ if __name__ == "__main__":
     try:
         raw_dataframe = load_from_s3(path=ingestion_path)
         if raw_dataframe.isEmpty():
-            logger.warning(
-                f"m=__main__, source={source}, spider={spider}, "
-                f"execution_date={args.execution_date}, ingestion_path={ingestion_path}, "
-                f"msg=Scrapy feed path resolved but dataframe is empty; skipping load"
+            bootstrap_empty_raw_table(
+                logger,
+                environment=args.env,
+                datalake_bucket=args.datalake_bucket,
+                table_name=args.table_name,
+                source=source,
+                spider=spider,
+                execution_date=execution_date,
+                ingestion_path=ingestion_path,
+                reason="empty_feed_dataframe",
             )
             raise SystemExit(0)
     except AnalysisException as exc:
         if _is_missing_feed_error(exc):
-            _skip_missing_feed(
+            bootstrap_empty_raw_table(
                 logger,
-                source,
-                spider,
-                args.execution_date,
-                ingestion_path,
-                exc,
+                environment=args.env,
+                datalake_bucket=args.datalake_bucket,
+                table_name=args.table_name,
+                source=source,
+                spider=spider,
+                execution_date=execution_date,
+                ingestion_path=ingestion_path,
+                reason="missing_feed_path",
+                error=exc,
             )
+            raise SystemExit(0) from None
         raise
 
     dataframe_to_save = transform_data(
