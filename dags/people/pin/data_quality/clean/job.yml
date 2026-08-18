@@ -19,6 +19,8 @@ column_level_validations:
       # Current active jobs must have at least one complete salary min/mid/max combo
       # (open valid grade + open SALARY rate + open rate_values). Fail only when
       # no complete combo exists, not when extra unmatched join rows are null.
+      # Exception: id_job 300000025651356 (job 10499, Classifieds Geral) — one-employee
+      # BU, no salary range. When this check fails again, add or replace this id.
       constraint: |-
         (SELECT COUNT(*)
          FROM (
@@ -38,6 +40,7 @@ column_level_validations:
              AND rate_values.dt_effective_ended = DATE('9999-12-31')
            WHERE job.dt_effective_ended = DATE('9999-12-31')
              AND job.is_active = TRUE
+             AND job.id_job NOT IN ('300000025651356')
            GROUP BY job.id_job
            HAVING MAX(
              CASE
