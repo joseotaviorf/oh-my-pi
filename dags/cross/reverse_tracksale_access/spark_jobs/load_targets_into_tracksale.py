@@ -1,7 +1,8 @@
 import json
 import logging
+import time
 from argparse import ArgumentParser
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 
 from pyspark.sql.types import (
@@ -19,6 +20,8 @@ from requests import RequestException
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.base.sst.domains.salesforce.api.api_logs import (
+    LOGS_TARGET_TABLE,
+    TRACKSALE_SERVICE_NAME,
     conform_and_save_tracksale_api_logs,
 )
 from bietlejuice.base.validation.spark_args import (
@@ -36,6 +39,10 @@ DISPATCH_WINDOW_DAYS = 7
 DEDUP_LOOKBACK_HOURS = 24
 # Fallback when ts_dispatched is unavailable: look back this many days on partition grain.
 PARTITION_DEDUP_LOOKBACK_DAYS = 1
+# Attempts to mark the dispatched targets before giving up (1 initial + 2 retries).
+MARK_DISPATCH_MAX_ATTEMPTS = 3
+# Linear backoff between marking attempts, to let a competing Delta writer finish.
+MARK_DISPATCH_RETRY_WAIT_SECONDS = 10
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -346,8 +353,16 @@ TRACKSALE_API_LOG_SCHEMA = StructType(
 )
 
 
-def build_tracksale_api_log_rows(dispatch_result: dict) -> List[dict]:
-    """Build one log row per Tracksale dispatch chunk response."""
+def build_tracksale_api_log_rows(
+    dispatch_result: dict, error: Optional[Exception] = None
+) -> List[dict]:
+    """Build one log row per Tracksale dispatch chunk response.
+
+    ``error`` describes a failure that happened *after* Tracksale accepted the
+    payload (the is_dispatched marking). The chunk payload is kept so the
+    counters and dispatch codes survive for forensics, while success is recorded
+    as False because the dispatch as a whole did not complete.
+    """
     rows = []
     for idx, chunk in enumerate(dispatch_result.get("chunks") or []):
         rows.append(
@@ -356,8 +371,8 @@ def build_tracksale_api_log_rows(dispatch_result: dict) -> List[dict]:
                 "idx": idx,
                 "status_code": 200,
                 "api_logs": json.dumps(chunk),
-                "success": True,
-                "error": None,
+                "success": error is None,
+                "error": None if error is None else str(error),
             }
         )
     return rows
@@ -407,11 +422,110 @@ def save_tracksale_api_logs(
             partition_date=partition_date,
             bucket=bucket,
         )
-    except Exception:  # noqa: BLE001 - logging must never break the dispatch flow
+    except Exception:
         logger.exception(
             f"m={JOB_NAME}, target_table={target_table}, "
             "msg=Failed to persist Tracksale API logs."
         )
+
+
+def get_accepted_dispatch_chunk_logs(
+    campaign_code: str,
+    target_table: str,
+    job_name: str,
+    partition_date: str,
+) -> List[str]:
+    """
+    Read the chunk payloads Tracksale already answered with HTTP 200 for this partition.
+
+    A row logged with status_code 200 proves Tracksale accepted the customers, even when
+    success is False because the run failed to mark them afterwards. Rows are restricted to
+    the DEDUP_LOOKBACK_HOURS window, matching the dedup applied on the campaign table.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=DEDUP_LOOKBACK_HOURS)
+    cutoff_literal = cutoff.strftime("%Y-%m-%d %H:%M:%S")
+    rows = spark.sql(
+        f"""
+            SELECT
+                api_logs
+            FROM
+                {LOGS_TARGET_TABLE}
+            WHERE
+                partition_date = '{partition_date}'
+                AND entity_type = '{campaign_code}'
+                AND job_name = '{job_name}'
+                AND service_name = '{TRACKSALE_SERVICE_NAME}'
+                AND target_table = '{target_table}'
+                AND status_code = 200
+                AND api_logs IS NOT NULL
+                AND TO_TIMESTAMP(load_ts) >= TIMESTAMP '{cutoff_literal}'
+            ORDER BY
+                query_idx
+        """
+    ).collect()
+    return [row.api_logs for row in rows]
+
+
+def rebuild_dispatch_result(chunk_logs: List[str]) -> Optional[dict]:
+    """
+    Rebuild a dispatch result from logged chunk payloads, as the client would return it.
+
+    Returning the same shape lets the caller reuse the regular logging and counter code on
+    the recovery path. Unparseable payloads are dropped; None means nothing usable was
+    logged, so there is no accepted dispatch to reuse.
+    """
+    chunks = []
+    for chunk_log in chunk_logs:
+        try:
+            chunks.append(json.loads(chunk_log))
+        except (TypeError, ValueError):
+            logger.warning(
+                f"m={JOB_NAME}, msg=Ignoring unparseable api_logs chunk payload."
+            )
+
+    if not chunks:
+        return None
+
+    totals = {"inserted": 0, "invalid": 0, "duplicated": 0}
+    for chunk in chunks:
+        status = chunk.get("status") or {}
+        for counter in totals:
+            totals[counter] += int(status.get(counter) or 0)
+
+    return {"status": totals, "chunks": chunks}
+
+
+def get_previously_accepted_dispatch(
+    campaign_code: str,
+    target_table: str,
+    job_name: str,
+    partition_date: str,
+) -> Optional[dict]:
+    """
+    Return the dispatch Tracksale already accepted for this partition, or None.
+
+    An Airflow task retry re-runs this job from scratch. When the previous attempt POSTed
+    successfully but failed to mark the targets, they are still is_dispatched=FALSE with a
+    null ts_dispatched, so neither dedup path on the campaign table suppresses them and the
+    retry would send the same customers twice. api_logs is the only record of that POST.
+
+    Degrades to None when the log cannot be read: api_logs does not exist before the first
+    dispatch of an environment, and observability must not block the daily run. The marking
+    on the campaign table therefore remains the primary dedup guard.
+    """
+    try:
+        chunk_logs = get_accepted_dispatch_chunk_logs(
+            campaign_code, target_table, job_name, partition_date
+        )
+    except Exception as exc:
+        logger.warning(
+            f"m={JOB_NAME}, target_table={target_table}, "
+            f"msg=Could not read {LOGS_TARGET_TABLE} to look for an accepted dispatch, "
+            f"proceeding with the POST: {exc}"
+        )
+        return None
+
+    return rebuild_dispatch_result(chunk_logs)
 
 
 def mark_campaign_targets_as_dispatched(
@@ -453,6 +567,54 @@ def mark_campaign_targets_as_dispatched(
     )
 
 
+def mark_campaign_targets_as_dispatched_with_retry(
+    database_name: str,
+    table_name: str,
+    reference_date: datetime,
+    suppressed_emails: set,
+):
+    """Mark the dispatched targets, retrying before giving up.
+
+    Losing this marking is expensive: Tracksale already accepted the payload, so
+    the next run would re-send the same customers as duplicate surveys. The
+    UPDATE only touches ``is_dispatched = FALSE`` rows, so it is idempotent and a
+    retry can never mark anything twice — which makes retrying the transient
+    failures here (typically a competing Delta writer on the partition) safe.
+
+    Raises the last error once MARK_DISPATCH_MAX_ATTEMPTS is exhausted.
+    """
+    for attempt in range(1, MARK_DISPATCH_MAX_ATTEMPTS + 1):
+        try:
+            mark_campaign_targets_as_dispatched(
+                database_name, table_name, reference_date, suppressed_emails
+            )
+        except Exception as error:
+            if attempt == MARK_DISPATCH_MAX_ATTEMPTS:
+                logger.error(
+                    f"m={JOB_NAME}, table_name={table_name}, "
+                    f"attempts={attempt}, error={error}, "
+                    "msg=Giving up on marking dispatched targets. Targets stay "
+                    "is_dispatched=FALSE and the next run will re-send them."
+                )
+                raise
+
+            wait_seconds = MARK_DISPATCH_RETRY_WAIT_SECONDS * attempt
+            logger.warning(
+                f"m={JOB_NAME}, table_name={table_name}, "
+                f"attempt={attempt}/{MARK_DISPATCH_MAX_ATTEMPTS}, "
+                f"error={error}, retry_in_seconds={wait_seconds}, "
+                "msg=Failed to mark dispatched targets; retrying."
+            )
+            time.sleep(wait_seconds)
+        else:
+            if attempt > 1:
+                logger.info(
+                    f"m={JOB_NAME}, table_name={table_name}, attempts={attempt}, "
+                    "msg=Marked dispatched targets after retrying."
+                )
+            return
+
+
 def main():
     """
     Export one reverse campaign partition to Tracksale and record the dispatch outcome.
@@ -461,6 +623,8 @@ def main():
       - Skip entirely when reference_date > CURRENT_DATE (no future-dated dispatch).
       - Skip customers already dispatched for this campaign within the last 24h
         (ts_dispatched preferred; partition proxy as fallback).
+      - Skip the POST altogether when api_logs already holds an accepted dispatch for this
+        partition, so an Airflow task retry recovers the marking instead of re-sending.
       - On backfill (reference_date < CURRENT_DATE), schedule against the execution day and
         warn when customers are skipped for the 24h rule.
 
@@ -556,15 +720,54 @@ def main():
     target_table = f"{database_name}.{table_name}"
     partition_date = reference_day.isoformat()
 
-    try:
-        dispatch_result = send_targets_to_tracksale(
-            credentials["token"],
-            campaign_code,
-            build_payload(rows, tags, schedule_time, finish_time),
+    dispatch_result = get_previously_accepted_dispatch(
+        str(campaign_code), target_table, job_name, partition_date
+    )
+    reused_accepted_dispatch = dispatch_result is not None
+
+    if reused_accepted_dispatch:
+        logger.warning(
+            f"m={JOB_NAME}, table_name={table_name}, reference_date={reference_day}, "
+            f"execution_date={execution_date}, "
+            f"lookback_hours={DEDUP_LOOKBACK_HOURS}, "
+            "msg=Tracksale already accepted this partition's payload on an earlier attempt "
+            "that failed to mark the targets. Skipping the POST and retrying the marking "
+            "so the customers are not sent twice."
         )
-    except RequestException as error:
+    else:
+        try:
+            dispatch_result = send_targets_to_tracksale(
+                credentials["token"],
+                campaign_code,
+                build_payload(rows, tags, schedule_time, finish_time),
+            )
+        except RequestException as error:
+            save_tracksale_api_logs(
+                log_rows=[build_tracksale_api_error_row(error)],
+                api_entity=str(campaign_code),
+                target_table=target_table,
+                job_name=job_name,
+                partition_date=partition_date,
+                bucket=datalake_bucket,
+            )
+            raise
+
+    # Tracksale has accepted the payload by this point, either now or on the attempt
+    # this run is recovering from, so mark the targets before doing any further work:
+    # anything that fails while they are still unmarked lets a retry re-send the same
+    # customers and duplicate their surveys.
+    try:
+        mark_campaign_targets_as_dispatched_with_retry(
+            database_name, table_name, reference_date, suppressed_emails
+        )
+    except Exception as marking_error:
+        error_rows = build_tracksale_api_log_rows(dispatch_result, error=marking_error)
+        if not error_rows:
+            # No chunk to attach the error to; still record that it happened.
+            error_rows = [build_tracksale_api_error_row(marking_error)]
+
         save_tracksale_api_logs(
-            log_rows=[build_tracksale_api_error_row(error)],
+            log_rows=error_rows,
             api_entity=str(campaign_code),
             target_table=target_table,
             job_name=job_name,
@@ -572,13 +775,6 @@ def main():
             bucket=datalake_bucket,
         )
         raise
-
-    # Tracksale already accepted the payload, so mark the targets before doing
-    # any further work: anything that fails while they are still unmarked lets a
-    # retry re-send the same customers and duplicate their surveys.
-    mark_campaign_targets_as_dispatched(
-        database_name, table_name, reference_date, suppressed_emails
-    )
 
     save_tracksale_api_logs(
         log_rows=build_tracksale_api_log_rows(dispatch_result),
@@ -601,8 +797,10 @@ def main():
         f"dispatched_targets={dispatched_targets}, "
         f"skipped_targets={skipped_already_dispatched}, "
         f"inserted={inserted}, invalid={invalid}, duplicated={duplicated}, "
+        f"reused_accepted_dispatch={reused_accepted_dispatch}, "
         "msg=Campaign targets dispatched to Tracksale and marked as is_dispatched=TRUE "
-        "with ts_dispatched=current_timestamp() on the reference_date partition."
+        "with ts_dispatched=current_timestamp() on the reference_date partition. Counters "
+        "come from the earlier accepted dispatch when reused_accepted_dispatch is True."
     )
 
 

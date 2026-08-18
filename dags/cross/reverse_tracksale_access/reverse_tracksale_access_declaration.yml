@@ -26,7 +26,14 @@ dag:
          - Customers not in the 24h window are POSTed normally.
       3. After a successful POST, set is_dispatched = TRUE and ts_dispatched =
          current_timestamp() on the reference_date partition (ts_dispatched is null on load).
-      4. Schedule window — backfills (reference_date < execution_date) resolve schedule_time
+         The marking is retried before the task gives up, and every outcome is recorded in
+         datalake_sst_metrics.api_logs.
+      4. Recovery — the targets stay is_dispatched = FALSE when the marking fails, so an
+         Airflow task retry would re-POST them. Before sending, the job looks for an already
+         accepted dispatch (status_code 200) for this campaign, table and partition in
+         api_logs within the last 24h: when it finds one, it skips the POST and only retries
+         the marking, so customers are never sent twice.
+      5. Schedule window — backfills (reference_date < execution_date) resolve schedule_time
          from the execution day so Tracksale never receives a past window; same-day runs use
          reference_date. After the campaign trigger hour UTC, schedule moves to the next day.
 workflow:
