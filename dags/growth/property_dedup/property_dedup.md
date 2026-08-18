@@ -147,6 +147,8 @@ erDiagram
         text complement_raw
         varchar mode_requested
         varchar strategy_used
+        varchar address_number
+        varchar address_number_normalized
         text primary_hit_ids_pre_cep
         text shadow_hit_ids_pre_cep
         text primary_hit_ids_post_cep
@@ -513,9 +515,13 @@ Complement parser shadow audit — one row per dedup request when audit is enabl
 | `mode_requested` | `mode_requested` | VARCHAR | NULL | LEGACY, ATLAS, AUTO, SHADOW |
 | `strategy_used` | `strategy_used` | VARCHAR | NULL | NONE, LEGACY, ATLAS, LEGACY_FALLBACK |
 | `fallback_reason` | `fallback_reason` | VARCHAR | NULL | Atlas fallback reason |
+| `address_number` | `address_number` | VARCHAR | NULL | Street number from request (V13) |
+| `address_number_normalized` | `address_number_normalized` | VARCHAR | NULL | Normalized number from vespucio metadata (V13) |
 | `legacy_unit` / `legacy_building` | same | VARCHAR | NULL | Legacy parser output |
+| `legacy_unit_normalized` / `legacy_building_normalized` | same | VARCHAR | NULL | Normalized legacy parser output (V13) |
 | `legacy_empty` | `legacy_empty` | BOOLEAN | NULL | |
 | `atlas_unit` / `atlas_building` | same | VARCHAR | NULL | Atlas parser output |
+| `atlas_unit_normalized` / `atlas_building_normalized` | same | VARCHAR | NULL | Normalized Atlas parser output (V13) |
 | `atlas_empty` | `atlas_empty` | BOOLEAN | NULL | |
 | `atlas_error` | `atlas_error` | TEXT | NULL | |
 | `components_match` | `components_match` | BOOLEAN | NULL | Parsers agree on unit+building |
@@ -572,7 +578,7 @@ Contextual CEP neighborhood filter shadow audit — one row per dedup request wh
 | Table | Columns | Handling |
 |---|---|---|
 | `similar_property` | `address` (street, lat/lng) | Location PII — may contain full address |
-| `dedup_complement_parse_audit` | `complement_raw` | May contain apartment/building complement text |
+| `dedup_complement_parse_audit` | `complement_raw`, `address_number` | May contain apartment/building complement text or street number |
 | `dedup_contextual_cep_neighborhood_shadow_audit` | `request_state`, `request_city`, `request_neighborhood` | Location context from dedup request |
 
 ---
