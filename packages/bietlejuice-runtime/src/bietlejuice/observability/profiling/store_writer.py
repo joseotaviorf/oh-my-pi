@@ -8,12 +8,16 @@ required so history accumulates.
 Tables are created lazily as external Delta tables on first write, partitioned by
 ``year``/``month``/``day``; subsequent runs append. ``mergeSchema`` allows the
 row shape to evolve forward-compatibly (paired with ``metric_schema_version``).
+
+After each append, access is published the same way as ``DeltaTableLoaderPipeline``:
+secondary-catalog sync (Glue on Databricks → Trino ``hive`` catalog) and default UC
+grants via ``TablePrivileges.from_environment_default``.
 """
 
 from __future__ import annotations
 
 from delta.tables import DeltaTable
-from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
 
@@ -66,7 +70,42 @@ class ObservabilityStoreWriter:
                 .saveAsTable(fqtn)
             )
         logger.info(f"Appended {len(rows)} row(s) to {fqtn} at {location}.")
+        self._publish_table_access(table, fqtn, location, dataframe)
         return len(rows)
+
+    def _publish_table_access(
+        self, table: str, fqtn: str, location: str, dataframe: DataFrame
+    ) -> None:
+        """Mirror ``DeltaTableLoaderPipeline.load_and_register`` post-write hooks."""
+        from bietlejuice.base.databricks.table_privileges import TablePrivileges
+        from bietlejuice.base.spark.catalog_strategy_resolver import (
+            CatalogStrategyResolver,
+        )
+        from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+        from bietlejuice.services.schema_service import SchemaService
+
+        if not self.spark.catalog.tableExists(fqtn):
+            return
+
+        table_schema = SchemaService.get_schema_from_dataframe(dataframe)
+        try:
+            CatalogStrategyResolver.sync_to_secondary_catalog(
+                database_name=DATABASE,
+                table_name=table,
+                table_location=location,
+                table_schema=table_schema,
+                partitions=PARTITION_COLUMNS,
+                format_str="DELTA",
+            )
+        except Exception as error:
+            logger.error(f"Failed to sync {fqtn} to secondary catalog: {error}")
+
+        if not UnityCatalogHelper.is_cluster_unity_catalog_enabled():
+            return
+        try:
+            TablePrivileges.from_environment_default(fqtn).apply()
+        except Exception as error:
+            logger.error(f"Failed to apply default table privileges on {fqtn}: {error}")
 
     def _ensure_store_table(self, table: str, fqtn: str, location: str) -> None:
         """Register an existing Delta location in the metastore when needed (EMR).

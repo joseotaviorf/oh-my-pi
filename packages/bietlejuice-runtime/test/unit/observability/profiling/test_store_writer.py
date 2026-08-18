@@ -28,8 +28,9 @@ class TestProject:
         assert projected["row_count"] is None
 
 
+@mock.patch.object(ObservabilityStoreWriter, "_publish_table_access")
 class TestAppend:
-    def test_empty_records_do_not_write(self):
+    def test_empty_records_do_not_write(self, _publish_access):
         # Arrange
         spark = mock.MagicMock()
 
@@ -39,12 +40,13 @@ class TestAppend:
         # Assert
         assert count == 0
         spark.createDataFrame.assert_not_called()
+        _publish_access.assert_not_called()
 
     @mock.patch(
         "bietlejuice.observability.profiling.store_writer.DeltaTable.isDeltaTable",
         return_value=False,
     )
-    def test_append_projects_and_writes_delta(self, _is_delta):
+    def test_append_projects_and_writes_delta(self, _is_delta, _publish_access):
         # Arrange
         spark = mock.MagicMock()
         spark.catalog.tableExists.return_value = False
@@ -61,12 +63,15 @@ class TestAppend:
         assert rows[0]["database"] == "db"
         spark.createDataFrame.return_value.write.format.assert_called_with("delta")
         spark.sql.assert_any_call(f"CREATE DATABASE IF NOT EXISTS `{DATABASE}`")
+        _publish_access.assert_called_once()
 
     @mock.patch(
         "bietlejuice.observability.profiling.store_writer.DeltaTable.isDeltaTable",
         return_value=True,
     )
-    def test_append_registers_existing_delta_location_on_emr(self, _is_delta):
+    def test_append_registers_existing_delta_location_on_emr(
+        self, _is_delta, _publish_access
+    ):
         # Arrange — S3 already has Delta data (e.g. from Databricks), EMR catalog empty
         spark = mock.MagicMock()
         spark.catalog.tableExists.side_effect = [False, True]
@@ -85,12 +90,15 @@ class TestAppend:
         spark.createDataFrame.return_value.write.format.return_value.mode.return_value.option.return_value.insertInto.assert_called_once_with(
             "datalake_observability.profile_table_metrics"
         )
+        _publish_access.assert_called_once()
 
     @mock.patch(
         "bietlejuice.observability.profiling.store_writer.DeltaTable.isDeltaTable",
         return_value=True,
     )
-    def test_append_uses_insert_into_when_table_already_registered(self, _is_delta):
+    def test_append_uses_insert_into_when_table_already_registered(
+        self, _is_delta, _publish_access
+    ):
         # Arrange
         spark = mock.MagicMock()
         spark.catalog.tableExists.return_value = True
@@ -110,13 +118,14 @@ class TestAppend:
         spark.createDataFrame.return_value.write.format.return_value.mode.return_value.option.return_value.insertInto.assert_called_once_with(
             "datalake_observability.profile_table_metrics"
         )
+        _publish_access.assert_called_once()
 
     @mock.patch(
         "bietlejuice.observability.profiling.store_writer.DeltaTable.isDeltaTable",
         return_value=True,
     )
     def test_append_uses_insert_into_when_delta_exists_but_catalog_empty(
-        self, _is_delta
+        self, _is_delta, _publish_access
     ):
         # Arrange — delta at location; catalog still empty after ensure (race guard)
         spark = mock.MagicMock()
@@ -134,3 +143,4 @@ class TestAppend:
         )
         save_as_table = write_chain.mode.return_value.option.return_value.partitionBy
         save_as_table.assert_not_called()
+        _publish_access.assert_called_once()

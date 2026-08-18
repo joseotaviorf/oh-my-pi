@@ -8,6 +8,7 @@ the runtime kill-switch; fail-open so it never breaks the host DAG (NFR1).
 
 import json
 import logging
+import os
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
@@ -82,6 +83,7 @@ def main() -> None:
         spark = create_emr_spark_session(JOB_NAME)
 
     args = parse_args()
+    os.environ.setdefault("ENVIRONMENT", args.env.lower())
     logger.info(
         f"m={JOB_NAME}, env={args.env}, database={args.database}, table={args.table}, "
         f"layer={args.layer}, run_logical_date={args.run_logical_date}, "
