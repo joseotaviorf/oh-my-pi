@@ -314,6 +314,7 @@ job_with_salary_table_base_ranked AS (
             sb.dt_effective_started IS NULL
             OR sb.dt_effective_started <= DATE('{load_start_date}')
         )
+        -- PIN effective dates are inclusive, so from = to is a valid one-day version.
         AND GREATEST(
             j.dt_effective_started,
             COALESCE(vg.dt_effective_started, j.dt_effective_started),
@@ -324,7 +325,7 @@ job_with_salary_table_base_ranked AS (
             COALESCE(r.dt_effective_started, j.dt_effective_started),
             COALESCE(rv.dt_effective_started, j.dt_effective_started),
             COALESCE(sb.dt_effective_started, j.dt_effective_started)
-        ) < LEAST(
+        ) <= LEAST(
             j.dt_effective_ended,
             COALESCE(vg.dt_effective_ended, DATE('9999-12-31')),
             COALESCE(gl.dt_effective_ended, DATE('9999-12-31')),
