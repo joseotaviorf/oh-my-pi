@@ -16,7 +16,6 @@ table_level_validations:
 
 column_level_validations:
   cost_center_code:
-    # has_pattern: enforced at ingest on datalake_gsheets_people_clean.codex_cost_centers (see codex_history_base DQ note).
     is_complete:
       severity_level: Error
   one_row_per_cost_center_and_valid_from:

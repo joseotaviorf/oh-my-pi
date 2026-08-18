@@ -17,10 +17,19 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Warning
-    has_pattern:
+  cost_center_code_matches_six_character_pattern:
+    custom:
       # 6 characters: 3 digits, 1 letter, 1 digit, 1 letter (e.g. 001K3X).
-      pattern: '^[0-9]{3}[A-Za-z][0-9][A-Za-z]$'
-      severity_level: Error
+      # Inmetro has_pattern false-fails at validation_result 1.0; use Spark RLIKE instead.
+      constraint: |-
+        (
+          SELECT COUNT(*)
+          FROM datalake_gsheets_people_clean.codex_cost_centers
+          WHERE
+            cost_center_code IS NOT NULL
+            AND cost_center_code NOT RLIKE '^[0-9]{3}[A-Za-z][0-9][A-Za-z]$'
+        ) = 0
+      severity_level: Warning
   dt_updated:
     is_complete:
       severity_level: Error
