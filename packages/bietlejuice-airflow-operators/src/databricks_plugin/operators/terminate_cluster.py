@@ -17,9 +17,7 @@
 # under the License.
 #
 from airflow.exceptions import AirflowNotFoundException
-from airflow.utils.decorators import apply_defaults
 
-from databricks_plugin.hooks.databricks_hook import QuintoAndarDatabricksHook
 from databricks_plugin.operators.base_operator import QuintoAndarDatabricksBaseOperator
 
 
@@ -73,7 +71,6 @@ class QuintoAndarDatabricksTerminateClusterOperator(QuintoAndarDatabricksBaseOpe
     ui_color = "#FF3621"
     ui_fgcolor = "#fff"
 
-    @apply_defaults
     def __init__(
         self,
         cluster_id=None,
@@ -101,15 +98,11 @@ class QuintoAndarDatabricksTerminateClusterOperator(QuintoAndarDatabricksBaseOpe
         self.cluster_id = cluster_id
         self.databricks_conn_id = databricks_conn_id
         self.polling_period_seconds = polling_period_seconds
-        self.databricks_hook = None
-        self.cluster_id = cluster_id
 
     def pre_execute(self, context):
         """
-        1. Creates a databricks_hook instance;
-        2. Gets the cluster_id from the XCom key.
+        Gets the cluster_id from the XCom key.
         """
-        self.databricks_hook = QuintoAndarDatabricksHook(self.databricks_conn_id)
         self.cluster_id = self.cluster_id or self.xcom_pull(
             context, key=self.XCOM_CLUSTER_ID_KEY
         )

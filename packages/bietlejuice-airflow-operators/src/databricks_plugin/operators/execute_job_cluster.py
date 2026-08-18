@@ -18,12 +18,7 @@
 #
 import re
 
-from airflow.utils.decorators import apply_defaults
-
-from databricks_plugin.hooks.databricks_hook import (
-    JOBS_API_VERSION,
-    QuintoAndarDatabricksHook,
-)
+from databricks_plugin.hooks.databricks_hook import JOBS_API_VERSION
 from databricks_plugin.operators.base_operator import QuintoAndarDatabricksBaseOperator
 from databricks_plugin.operators.check_job_task import (
     QuintoAndarDatabricksCheckJobTaskOperator,
@@ -147,7 +142,6 @@ class QuintoAndarDatabricksExecuteJobClusterOperator(QuintoAndarDatabricksBaseOp
     ui_color = "#FF3621"
     ui_fgcolor = "#fff"
 
-    @apply_defaults
     def __init__(
         self,
         cluster_configuration,
@@ -183,7 +177,6 @@ class QuintoAndarDatabricksExecuteJobClusterOperator(QuintoAndarDatabricksBaseOp
         self.access_control_list = access_control_list
         self.polling_period_seconds = polling_period_seconds
         self.databricks_conn_id = databricks_conn_id
-        self.databricks_hook = None
         self.job_settings = {}
         self.job_id = None
         self.run_id = None
@@ -194,26 +187,26 @@ class QuintoAndarDatabricksExecuteJobClusterOperator(QuintoAndarDatabricksBaseOp
         """
         Sets the job_settings content:
 
-        1. Creates a databricks_hook instance;
-        2. Removes autotermination_minutes cluster configuration;
-        3. Defines the cluster name;
-        4. Retrieves tags from cluster configurations;
-        5. Generate job tasks from Airflow DAG tasks;
-        6. Define job cluster specs from cluster configurations;
-        7. Define job access control list;
-        8. If exists, retrieves `job_id` from XCom.
+        1. Removes autotermination_minutes cluster configuration;
+        2. Defines the cluster name;
+        3. Retrieves tags from cluster configurations;
+        4. Generate job tasks from Airflow DAG tasks;
+        5. Define job cluster specs from cluster configurations;
+        6. Define job access control list;
+        7. If exists, retrieves `job_id` from XCom.
         """
-        self.databricks_hook = QuintoAndarDatabricksHook(self.databricks_conn_id)
-        autotermination = self.cluster_configuration.pop(
-            "autotermination_minutes", None
-        )
+        # Work on a rendered copy so pre_execute is idempotent and any
+        # Jinja templates (e.g. {{ dag.dag_id }} in custom_tags) are resolved.
+        cluster_config = self.render_template(dict(self.cluster_configuration), context)
+
+        autotermination = cluster_config.pop("autotermination_minutes", None)
         if autotermination:
             self.log.info(
                 f"Provided autotermination limit of '{autotermination}' "
                 "will be ignored for this job cluster."
             )
         cluster_name = (
-            self.cluster_configuration.pop(
+            cluster_config.pop(
                 "cluster_name",
                 "{dag_id}_{run_id}".format(
                     dag_id=self.dag_id, run_id=context["run_id"]
@@ -228,15 +221,16 @@ class QuintoAndarDatabricksExecuteJobClusterOperator(QuintoAndarDatabricksBaseOp
         if execute_job_cluster_task_id:
             cluster_name = f"{cluster_name}{execute_job_cluster_task_id.group()}"
         self.job_settings["name"] = cluster_name
-        self.job_settings["tags"] = self.tags or self.cluster_configuration.get(
-            "custom_tags", []
+        self.job_settings["tags"] = self.render_template(
+            self.tags or cluster_config.get("custom_tags", []),
+            context,
         )
         self.job_settings["tasks"] = self.tasks or self._generate_job_tasks_from_dag(
             context, cluster_name, self.libraries
         )
         self.job_settings["job_clusters"] = {
             "job_cluster_key": cluster_name,
-            "new_cluster": self.cluster_configuration,
+            "new_cluster": cluster_config,
         }
         self.job_settings["access_control_list"] = self.access_control_list
         self.job_settings = self._deep_string_coerce(self.job_settings)

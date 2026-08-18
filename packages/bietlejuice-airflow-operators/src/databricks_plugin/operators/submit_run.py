@@ -16,9 +16,6 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-from airflow.utils.decorators import apply_defaults
-
-from databricks_plugin.hooks.databricks_hook import QuintoAndarDatabricksHook
 from databricks_plugin.operators.base_operator import QuintoAndarDatabricksBaseOperator
 from databricks_plugin.states.errors import (
     DatabricksNotFoundError,
@@ -177,7 +174,6 @@ class QuintoAndarDatabricksSubmitRunOperator(QuintoAndarDatabricksBaseOperator):
     ui_color = "#FF6952"
     ui_fgcolor = "#fff"
 
-    @apply_defaults
     def __init__(
         self,
         json: dict = None,
@@ -217,7 +213,6 @@ class QuintoAndarDatabricksSubmitRunOperator(QuintoAndarDatabricksBaseOperator):
         self.libraries = libraries or []
         self.access_control_list = access_control_list
         self.databricks_conn_id = databricks_conn_id
-        self.databricks_hook = None
         self.json = json or {}
 
         self.run_id = None
@@ -249,7 +244,6 @@ class QuintoAndarDatabricksSubmitRunOperator(QuintoAndarDatabricksBaseOperator):
         """
         Performs run's existing cluster validation and startup.
         """
-        self.databricks_hook = QuintoAndarDatabricksHook(self.databricks_conn_id)
         self.json = self._deep_string_coerce(self.json)
 
         if self.json.get("new_cluster"):

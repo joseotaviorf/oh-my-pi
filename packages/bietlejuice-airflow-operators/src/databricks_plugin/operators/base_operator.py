@@ -23,6 +23,8 @@ from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from six import integer_types, string_types
 
+from databricks_plugin.hooks.databricks_hook import QuintoAndarDatabricksHook
+
 
 class QuintoAndarDatabricksBaseOperator(BaseOperator):
     """
@@ -58,6 +60,17 @@ class QuintoAndarDatabricksBaseOperator(BaseOperator):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._databricks_hook = None
+
+    @property
+    def databricks_hook(self):
+        if self._databricks_hook is None:
+            self._databricks_hook = QuintoAndarDatabricksHook(self.databricks_conn_id)
+        return self._databricks_hook
+
+    @databricks_hook.setter
+    def databricks_hook(self, value):
+        self._databricks_hook = value
 
     @classmethod
     def _deep_string_coerce(cls, content, json_path="json"):

@@ -16,9 +16,6 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-from airflow.utils.decorators import apply_defaults
-
-from databricks_plugin.hooks.databricks_hook import QuintoAndarDatabricksHook
 from databricks_plugin.operators.base_operator import QuintoAndarDatabricksBaseOperator
 
 
@@ -111,7 +108,6 @@ class QuintoAndarDatabricksCreateClusterOperator(QuintoAndarDatabricksBaseOperat
     ui_color = "#FF3621"
     ui_fgcolor = "#fff"
 
-    @apply_defaults
     def __init__(
         self,
         cluster_configuration,
@@ -143,16 +139,13 @@ class QuintoAndarDatabricksCreateClusterOperator(QuintoAndarDatabricksBaseOperat
         self.cluster_configuration = cluster_configuration
         self.access_control_list = access_control_list
         self.databricks_conn_id = databricks_conn_id
-        self.databricks_hook = None
         self.cluster_id = None
         self.cluster_page_url = None
 
     def pre_execute(self, context):
         """
-        1. Creates a databricks_hook instance;
-        2. Coerces the content of the cluster configuration string.
+        Coerces the content of the cluster configuration string.
         """
-        self.databricks_hook = QuintoAndarDatabricksHook(self.databricks_conn_id)
         self.cluster_configuration = self._deep_string_coerce(
             self.cluster_configuration
         )

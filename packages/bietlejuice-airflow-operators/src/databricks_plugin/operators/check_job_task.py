@@ -16,72 +16,62 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-from airflow.utils.decorators import apply_defaults
 from requests.exceptions import HTTPError
 
-from databricks_plugin.hooks.databricks_hook import (
-    JOBS_API_VERSION,
-    QuintoAndarDatabricksHook,
-)
+from databricks_plugin.hooks.databricks_hook import JOBS_API_VERSION
 from databricks_plugin.operators.base_operator import QuintoAndarDatabricksBaseOperator
 from databricks_plugin.states.errors import DatabricksTerminalStateError
 
 
 class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperator):
     """
-    Checks periodically the state of a task executed within a Databricks job run,
-    retrieving its errors when failed.
+    This operator is made specifically to be used in JobCluster DAGs.
 
-    Docs:
-    - [Databricks Jobs docs](https://docs.databricks.com/workflows/jobs/jobs.html)
-    - [Databricks API: Get single job run](https://docs.databricks.com/api-explorer/workspace/jobs/getrun)
-    - [Databricks API: Get job run output](https://docs.databricks.com/api-explorer/workspace/jobs/getrunoutput)
+    Checks for specific task_id is in a bad state - like ``FAILED`` or ``CANCELLED``.
 
-    :param json: (templated) A JSON object containing task specifications, which will
-        be used as the job's cluster.
-        e.g.:
-        json = {
-            "spark_python_task": {
-                "python_file": s3:/my_bucket/my_spark_script.py",
-                "parameters": [
-                    "prod",
-                    "{{ ds }}",
-                    "table",
-                ],
-            }
-        },
-    :type json: dict
-    :param databricks_conn_id: The name of the Airflow connection to use.
-        By default and in the common case this will be ``databricks_default``. To use
-        token based authentication, provide the key ``token`` in the extra field for
-        the connection.
-    :type databricks_conn_id: string
-    :param polling_period_seconds: Controls the rate which the task polls for the
-        result each request made. When not set the default `API_POLLING_PERIOD_SECONDS`
-        value (10 seconds) will be used as the waiting time between any recurrent
-        requests inside the operator.
-    :type polling_period_seconds: int
-    :param retries: the number of Airflow task retries that should be performed before
-        failing the task. When not set the default `TASK_RETRIES` value (1) will be
-        used as the number of maximum retries for the task.
-    :type retries: int
-    :param retry_delay: delay between Airflow task retries. When not set the default
-        `TASK_RETRY_DELAY` value (3 minutes) will be used as waiting time between
-        task retries.
-    :type retry_delay: datetime.timedelta
-    :param retry_exponential_backoff: enables Airflow to perform retries waiting for
-        intervals that grow exponentially and also with an increment of a jitter value.
-        This avoids the client request traffic to overload servers. Defaults to `True`.
-    :param max_retry_delay: maximum delay interval between Airflow task retries. Only
-        Used when `retry_exponential_backoff` is set to `True`. When not set the default
-        `TASK_MAX_RETRY_DELAY` value (7 minutes) will be used as the highest waiting
-        time between task retries. When this interval is reached, it is used for all
-        retries remaining.
-    :type max_retry_delay: datetime.timedelta
-    :param execution_timeout: the airflow BaseOperator execution_timeout. When not set
-        the default `TASK_EXECUTION_TIMEOUT` (2 hours) will be set.
-        When set as `None` then no timeout will be applied (not recommended).
-    :type execution_timeout: datetime.timedelta
+    A use case is if we have a
+    data_ingestion_task --> preprocessing_task --> spark-submit
+
+    We'd need to run a check like
+    data_ingestion_task --> preprocessing_task --> spark-submit --> check_preprocessing_task
+
+    where we check if the preprocessing task executed properly and repair the run if not.
+
+    The repair (or retry) is useful for when we have cluster-related issues like
+    NotEnoughResources or spot instance interruptions.
+
+    In Airflow, this task is not required for every spark-task, but it's a good practice to
+    add it for longer jobs. This is because when retrying, Airflow will resubmit the DAG to
+    the cluster as a new job run. Which will create a new cluster, rerun all tasks and then
+    reach your spark task. This would create an even more considerable cost. Especially given
+    that the time spent provisioning and warming up the cluster may exceed the task itself.
+
+    Another thing to note is that this task is not idempotent. If you run it twice, it will
+    repair the job twice. This is because we don't have a way to check if a repair has already
+    been done. So, if you run this task twice, it will repair the job twice. This is not a
+    problem for the Airflow DAG, but it's something to keep in mind.
+
+    This operator requires a task to be launched first:
+
+    **Example**::
+
+        t1 = QuintoAndarDatabricksExecuteJobClusterOperator(
+            task_id="execute_job_cluster",
+            ...
+        )
+        t2 = QuintoAndarDatabricksSubmitRunJobClusterOperator(
+            task_id="task-id",
+            ...
+        )
+        t3 = QuintoAndarDatabricksCheckJobTaskOperator(
+            task_id="check-task-id",
+            ...
+        )
+        t1 >> t2 >> t3
+
+    .. seealso::
+        For more information on how to use this operator, take a look at the guide:
+        :ref:`howto/operator:QuintoAndarDatabricksCheckJobTaskOperator`
     """
 
     TASK_RETRIES = 2
@@ -90,7 +80,6 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
     ui_color = "#FF6952"
     ui_fgcolor = "#fff"
 
-    @apply_defaults
     def __init__(
         self,
         json: list,
@@ -117,18 +106,16 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
         super().__init__(**kwargs)
         self.polling_period_seconds = polling_period_seconds
         self.databricks_conn_id = databricks_conn_id
-        self.databricks_hook = None
         self.json = json
         self.run_id = None
         self.execute_job_cluster_task_id = None
+        self.job_id = None
 
     def pre_execute(self, context):
         """
-        1. Creates a databricks_hook instance;
-        2. Gets the job_id from the XCom key.
-        3. Gets the run_id from the XCom key.
+        1. Gets the job_id from the XCom key.
+        2. Gets the run_id from the XCom key.
         """
-        self.databricks_hook = QuintoAndarDatabricksHook(self.databricks_conn_id)
         self.execute_job_cluster_task_id = self._get_execute_job_cluster_task_id()
 
         if not self.execute_job_cluster_task_id:
@@ -165,6 +152,34 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
          6.1 retrieves and logs error and stack trace;
          6.2 raises exception without traceback, to reduce verbosity on Airflow logs UI.
         """
+        # Guard: ensure run_id and job_id are available even if pre_execute was skipped
+        if not self.execute_job_cluster_task_id:
+            self.execute_job_cluster_task_id = self._get_execute_job_cluster_task_id()
+        if not self.execute_job_cluster_task_id:
+            raise Exception(
+                "m=execute, error=Failed to find `execute-job-cluster` task, "
+                "make sure that this is a JobCluster DAG."
+            )
+        if self.job_id is None:
+            self.job_id = self.xcom_pull(
+                context,
+                key=self.XCOM_JOB_ID_KEY.format(
+                    execute_job_cluster_task_id=self.execute_job_cluster_task_id
+                ),
+            )
+        if self.run_id is None:
+            self.run_id = self.xcom_pull(
+                context,
+                key=self.XCOM_RUN_ID_KEY.format(
+                    execute_job_cluster_task_id=self.execute_job_cluster_task_id
+                ),
+            )
+        if self.run_id is None:
+            raise Exception(
+                f"m=execute, error=run_id is None after XCom pull. "
+                f"XCom key: {self.XCOM_RUN_ID_KEY.format(execute_job_cluster_task_id=self.execute_job_cluster_task_id)}"
+            )
+
         execution_timeout = context["task"].execution_timeout
         start_date = context["ti"].start_date
 
@@ -219,68 +234,67 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
         Monitors if the job run of the provided run task ID is terminated, polling
         to retrieve the current task run status, during the time interval between the
         provided `start_date` and `execution_timeout`.
-
-        :param run_id: The canonical identifier of the run for which to retrieve the state.
-        :type run_id: integer
-        :param start_date: Airflow task start date
-        :type start_date: datetime.datetime
-        :param execution_timeout: Airflow task time delta in which execution will timeout
-        :type execution_timeout: datetime.timedelta
-        :rtype: None
         """
         while self._check_task_timeout(start_date, execution_timeout):
             self._log_timeout_remaining(start_date, execution_timeout)
-            repair_state = self.databricks_hook.get_task_repair_state(
-                run_id, task_run_id, version=JOBS_API_VERSION
+
+            job_run_task_state = self.databricks_hook.get_job_run_task_state(
+                run_id, self.task_id, version=JOBS_API_VERSION
             )
-            if repair_state.is_terminal:
+            if job_run_task_state.is_terminal:
                 break
             self._wait_polling_period(5)
 
     def _request_repair(self, run_id, context):
         """
-        Performs the repair request by retrieving the `latest_repair_id`, using it
-        in the repair call and pushing the new repair ID into an XCom.
-        If the repair request returns a "Repair is not allowed on an active run" error,
-        it logs a warning message instead of raising the exception.
-
-        :param run_id: The canonical identifier of the run for which to send the repair.
-        :type run_id: integer
-        :param context: Airflow execution context object
-        :type context: dict
-        :rtype: None
+        Requests repair of a specific job run. It will rerun only the errored task and
+        downstream ones, not all tasks from the run.
         """
-        latest_repair_id = self.databricks_hook.get_repair_id(run_id)
+        rerun_tasks = [self.task_id]
+        latest_repair_id = None
         try:
-            latest_repair_id = self.databricks_hook.repair_job_run(
-                run_id, latest_repair_id, rerun_all_failed_tasks=True
+            self.databricks_hook.repair_run(
+                run_id, rerun_tasks, latest_repair_id, version=JOBS_API_VERSION
             )
-            self.xcom_push(
-                context, key=self.XCOM_LATEST_REPAIR_ID_KEY, value=latest_repair_id
-            )
-            self._wait_polling_period(self.polling_period_seconds)
         except HTTPError as ex:
-            if "Repair is not allowed on an active run" in ex.args[0]:
-                self.log.warn(
-                    "Repair not started: the job run is currently active and running "
-                    "either as the original run or as a previous repair."
+            # if RESOURCE_CONFLICT, it means the run is already being repaired. We
+            # shouldn't worry with this error, because on retry we'll process the new run
+            if ex.response.status_code == 409:
+                resource_conflict_message = (
+                    f"m=execute task={self.task_id} error=Run {self.run_id} has already "
+                    "been repaired; will check for latest task "
+                    f"attempt on retry. HTTPError={ex.response.text}"
                 )
+                self.log.error(resource_conflict_message)
+                return
+            # if INVALID_STATE, it means that the task is already running.
+            # That means the repair was issued by another
+            # `QuintoAndarDatabricksCheckJobTaskOperator`.
+            if ex.response.status_code == 400 and "INVALID_STATE" in ex.response.text:
+                already_running_message = (
+                    f"m=execute task={self.task_id} error=Run {self.run_id} is already "
+                    "running; will check for latest task "
+                    f"attempt on retry. HTTPError={ex.response.text}"
+                )
+                self.log.error(already_running_message)
+                return
             else:
                 raise ex
 
     def _get_execute_job_cluster_task_id(self, task=None) -> str:
         """
-        Finds and returns task that uses QuintoAndarDatabricksExecuteJobClusterOperator.
-        Return None in case that the task does not exists.
+        Gets the id of the execute_job_cluster_operator task that this operator depends on
+        recursively through the parents.
         """
-        # We need to import this here to avoid a circular dependency
         from databricks_plugin.operators.execute_job_cluster import (
             QuintoAndarDatabricksExecuteJobClusterOperator,
         )
 
-        task = task or self
-        if isinstance(task, QuintoAndarDatabricksExecuteJobClusterOperator):
-            return task.task_id
-        if task.upstream_list:
-            return self._get_execute_job_cluster_task_id(task.upstream_list[0])
+        if task is None:
+            task = self
+
+        for parent in task.upstream_list:
+            if isinstance(parent, QuintoAndarDatabricksExecuteJobClusterOperator):
+                return parent.task_id
+            return self._get_execute_job_cluster_task_id(parent)
         return None
