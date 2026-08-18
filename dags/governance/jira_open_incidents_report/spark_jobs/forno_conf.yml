@@ -1,2 +1,2 @@
-# Notification Hub Internal — inmetro route (?space=agents-data-alarms).
-notification_hub_inmetro_webhook_base: "https://notification-hub-internal-api.quintoandar.com.br/webhook/inmetro"
+# Notification Hub Internal — generic route (cardsV2). ?space=agents-data-alarms
+notification_hub_inmetro_webhook_base: "https://notification-hub-internal-api.quintoandar.com.br/webhook/generic"

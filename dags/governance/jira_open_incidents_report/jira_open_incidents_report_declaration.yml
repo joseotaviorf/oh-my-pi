@@ -10,7 +10,7 @@ dag:
       Line (incident_owner) leaderboard: count, newest/oldest age, on going
       (card workflow In Progress), unassigned, description not filled. Open =
       on going + backlog; concluded (Done) is excluded. Posts to space
-      "agents-data-alarms" via Notification Hub (inmetro route, webhook base co-located
+      "agents-data-alarms" via Notification Hub (generic cardsV2 route, webhook base co-located
       in spark_jobs/{environment}_conf.yml).
 workflow:
   type: query_delta

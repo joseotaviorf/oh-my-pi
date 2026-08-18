@@ -5,8 +5,9 @@ Chat body is a Line (incident_owner) leaderboard plus hygiene: unassigned,
 description not filled (empty or still the Jira pre-filled template), and
 on going vs backlog from the card workflow status (In Progress / On going vs
 To Do / Backlog). Concluded (Done) is excluded from this open digest.
-Notification: Notification Hub inmetro route, ?space=agents-data-alarms
-(base URL from spark_jobs/{environment}_conf.yml).
+Notification: Notification Hub generic route (cardsV2 so Chat renders line
+breaks; inmetro nl2br becomes literal ``<br>`` in GChat text).
+Space agents-data-alarms (base URL from spark_jobs/{environment}_conf.yml).
 """
 
 from __future__ import annotations
@@ -33,6 +34,8 @@ TABLE_NAME = "open_incidents_snapshot"
 DEI_PROJECT_ID = "11446"
 PARTITION_COLS = ["year", "month", "day"]
 NOTIFICATION_HUB_INMETRO_BASE_KEY = "notification_hub_inmetro_webhook_base"
+INMETRO_WEBHOOK_PATH = "/webhook/inmetro"
+GENERIC_WEBHOOK_PATH = "/webhook/generic"
 GCHAT_SPACE = "agents-data-alarms"
 NO_LINE_LABEL = "no owner"
 INCIDENT_TEMPLATE_MARKER = "Incident format template"
@@ -234,6 +237,30 @@ def _format_message(rows, as_of: datetime) -> str:
     return "\n".join(lines)
 
 
+def _gchat_cards_v2(message: str) -> dict:
+    """GChat card: textParagraph renders ``<br>``; Hub inmetro text field does not."""
+    header, _, rest = message.partition("\n")
+    body = rest.replace("\n", "<br>")
+    paragraph = f"<b>{header}</b>"
+    if body:
+        paragraph = f"{paragraph}<br>{body}"
+    return {
+        "cardsV2": [
+            {
+                "cardId": JOB_NAME,
+                "card": {
+                    "header": {"title": "Open DEI incidents"},
+                    "sections": [{"widgets": [{"textParagraph": {"text": paragraph}}]}],
+                },
+            }
+        ]
+    }
+
+
+def _generic_webhook_base(base_url: str) -> str:
+    return base_url.replace(INMETRO_WEBHOOK_PATH, GENERIC_WEBHOOK_PATH)
+
+
 def _notification_hub_inmetro_base(dag_name: str, environment: str) -> str | None:
     """Resolve Hub base URL from co-located spark_jobs/{environment}_conf.yml, then wheel config."""
     conf_file = f"{environment}_conf.yml"
@@ -271,13 +298,13 @@ def _notify(dag_name: str, environment: str, message: str, row_count: int) -> No
         )
         return
 
-    separator = "&" if "?" in base_url else "?"
-    webhook_url = f"{base_url.rstrip('/')}{separator}space={GCHAT_SPACE}"
-    payload = {
-        "suite_name": "jira_open_incidents_report",
-        "status": "ERROR" if row_count > 0 else "OK",
-        "message": message,
-    }
+    generic_base = _generic_webhook_base(base_url)
+    separator = "&" if "?" in generic_base else "?"
+    webhook_url = f"{generic_base.rstrip('/')}{separator}space={GCHAT_SPACE}"
+    payload = {"space": GCHAT_SPACE, **_gchat_cards_v2(message)}
+    logging_logger.info(
+        f"m={JOB_NAME}, msg=Posting GChat card, open_incidents={row_count}"
+    )
     try:
         response = requests.post(webhook_url, json=payload, timeout=30)
         response.raise_for_status()
