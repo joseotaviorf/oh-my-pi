@@ -5,9 +5,9 @@ dag:
   documentation:
     dag_purpose: |
       Ingest Idactum Scrapy ITBI crawler outputs (Rio de Janeiro ITBI main, Osasco ITBI,
-      Goiânia ITBI and ITBI certidão) from crawler-scrapy-{forno|prod} into the shared
-      crawled_idactum_houses raw/clean databases. One EMR cluster per DAG run with
-      parallel raw+clean tasks per spider.
+      Goiania ITBI and ITBI certidao, Santo Andre ITBI) from crawler-scrapy-{forno|prod}
+      into the shared crawled_idactum_houses raw/clean databases. One EMR cluster per DAG run
+      with parallel raw+clean tasks per spider.
 workflow:
   layer: raw
   type: custom_ingestion
@@ -33,4 +33,6 @@ workflow:
     go_goiania_itbi:
       partitions: [year, month, day]
     go_goiania_itbi_certidao:
+      partitions: [year, month, day]
+    sp_santo_andre_itbi:
       partitions: [year, month, day]
