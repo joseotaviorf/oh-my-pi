@@ -490,9 +490,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), fc2q AS (
   SELECT
     slf.sk_first_contact_date AS base_date,
@@ -603,9 +601,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), p2q AS (
   SELECT
     slf.sk_prospect_date AS base_date,
@@ -710,9 +706,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), q2aq AS (
   SELECT
     slf.sk_qualified_date AS base_date,
@@ -823,9 +817,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), aq2o AS (
   SELECT
     slf.sk_available_qualified_date AS base_date,
@@ -936,9 +928,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), q2o AS (
   SELECT
     slf.sk_qualified_date AS base_date,
@@ -1043,9 +1033,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), o2fl AS (
   SELECT
     slf.sk_opportunity_date AS base_date,
@@ -1150,9 +1138,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), fl2ccv AS (
   SELECT
     slf.sk_first_listing_date AS base_date,
@@ -1265,9 +1251,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), vb2vc AS (
   SELECT
     CAST(REPLACE(CAST(dt_created AS DATE), '-', '') AS INT) AS base_date,
@@ -1372,9 +1356,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), vb2os AS (
   SELECT
     CAST(REPLACE(CAST(dt_created AS DATE), '-', '') AS INT) AS base_date,
@@ -1479,9 +1461,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), vb2oa AS (
   SELECT
     CAST(REPLACE(CAST(dt_created AS DATE), '-', '') AS INT) AS base_date,
@@ -1586,9 +1566,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), vb2ccv AS (
   SELECT
     CAST(REPLACE(CAST(dt_created AS DATE), '-', '') AS INT) AS base_date,
@@ -1693,9 +1671,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), vc2ccv AS (
   SELECT
     CAST(REPLACE(CAST(dt_completed AS DATE), '-', '') AS INT) AS base_date,
@@ -1800,9 +1776,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), vc2os AS (
   SELECT
     CAST(REPLACE(CAST(dt_completed AS DATE), '-', '') AS INT) AS base_date,
@@ -1907,9 +1881,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), vc2oa AS (
   SELECT
     CAST(REPLACE(CAST(dt_completed AS DATE), '-', '') AS INT) AS base_date,
@@ -2014,9 +1986,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), os2oa AS (
   SELECT
     CAST(REPLACE(CAST(dt_offer_sent AS DATE), '-', '') AS INT) AS base_date,
@@ -2121,9 +2091,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), os2dq AS (
   SELECT
     CAST(REPLACE(CAST(dt_offer_sent AS DATE), '-', '') AS INT) AS base_date,
@@ -2228,9 +2196,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), dq2oa AS (
   SELECT
     CAST(REPLACE(CAST(dt_deal_qualified AS DATE), '-', '') AS INT) AS base_date,
@@ -2335,9 +2301,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), os2ccv AS (
   SELECT
     CAST(REPLACE(CAST(dt_offer_sent AS DATE), '-', '') AS INT) AS base_date,
@@ -2442,9 +2406,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), oa2ccv AS (
   SELECT
     CAST(REPLACE(CAST(dt_offer_accepted AS DATE), '-', '') AS INT) AS base_date,
@@ -2549,9 +2511,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), ccv2lts AS (
   SELECT
     CAST(REPLACE(CAST(dt_ccv_signed AS DATE), '-', '') AS INT) AS base_date,
@@ -2656,9 +2616,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), lts2lte AS (
   SELECT
     CAST(REPLACE(CAST(dt_diligence_started_legaut AS DATE), '-', '') AS INT) AS base_date,
@@ -2763,9 +2721,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), lte2lrs AS (
   SELECT
     CAST(REPLACE(CAST(dt_diligence_ended_legaut AS DATE), '-', '') AS INT) AS base_date,
@@ -2870,9 +2826,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), lrs2lre AS (
   SELECT
     CAST(REPLACE(CAST(dt_diligence_started_legal AS DATE), '-', '') AS INT) AS base_date,
@@ -2977,9 +2931,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), lre2de AS (
   SELECT
     CAST(REPLACE(CAST(dt_diligence_ended_legal AS DATE), '-', '') AS INT) AS base_date,
@@ -3084,9 +3036,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), ccv2credstart AS (
   SELECT
     CAST(REPLACE(CAST(dt_ccv_signed AS DATE), '-', '') AS INT) AS base_date,
@@ -3191,9 +3141,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), credstart2credsent AS (
   SELECT
     CAST(REPLACE(CAST(dt_credit_started AS DATE), '-', '') AS INT) AS base_date,
@@ -3298,9 +3246,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), ccv2crnended AS (
   SELECT
     CAST(REPLACE(CAST(dt_ccv_signed AS DATE), '-', '') AS INT) AS base_date,
@@ -3405,9 +3351,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), credsent2finstart AS (
   SELECT
     CAST(REPLACE(CAST(dt_credit_approved AS DATE), '-', '') AS INT) AS base_date,
@@ -3512,9 +3456,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), ccv2finstart AS (
   SELECT
     CAST(REPLACE(CAST(dt_ccv_signed AS DATE), '-', '') AS INT) AS base_date,
@@ -3619,9 +3561,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), finstart2finended AS (
   SELECT
     CAST(REPLACE(CAST(dt_finan_started AS DATE), '-', '') AS INT) AS base_date,
@@ -3726,9 +3666,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), ccv2mi AS (
   SELECT
     CAST(REPLACE(CAST(dt_ccv_signed AS DATE), '-', '') AS INT) AS base_date,
@@ -3833,9 +3771,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), mi2ma AS (
   SELECT
     CAST(REPLACE(CAST(dt_matricula_inicio AS DATE), '-', '') AS INT) AS base_date,
@@ -3940,9 +3876,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), ccv2ma AS (
   SELECT
     CAST(REPLACE(CAST(dt_ccv_signed AS DATE), '-', '') AS INT) AS base_date,
@@ -4047,9 +3981,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), ccv2pc AS (
   SELECT
     CAST(REPLACE(CAST(dt_ccv_signed AS DATE), '-', '') AS INT) AS base_date,
@@ -4154,9 +4086,7 @@ WITH sale_listing_flows_adjust AS (
     19,
     20,
     21,
-    22,
-    23,
-    24
+    22
 ), union_all AS (
   SELECT
     *

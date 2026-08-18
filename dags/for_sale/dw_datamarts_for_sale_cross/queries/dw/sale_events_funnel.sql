@@ -500,7 +500,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_lead_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 prospect AS (
 SELECT
@@ -559,7 +559,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 first_contacts AS (
 SELECT
@@ -618,7 +618,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_contact_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 qualified AS (
 SELECT
@@ -677,7 +677,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 available_qualified AS (
 SELECT
@@ -736,7 +736,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_available_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 opportunity AS (
 SELECT
@@ -795,7 +795,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_opportunity_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 first_listing AS (
 SELECT
@@ -854,7 +854,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_listing_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 tta_sent AS (
 SELECT
@@ -914,7 +914,7 @@ FROM
 WHERE
     sdc.tta_started IS NOT NULL
 --  DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 tta_completed AS (
 SELECT
@@ -974,7 +974,7 @@ FROM
 WHERE
     sdc.tta_started IS NOT NULL
 --  DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 visits_booked AS (
 SELECT
@@ -1033,7 +1033,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_created IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 order by 1 desc
 ),
 visits_completed AS (
@@ -1093,7 +1093,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_completed IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 offers_sent AS (
 SELECT
@@ -1152,7 +1152,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_offer_sent IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 offers_deal_qualified AS (
 SELECT
@@ -1211,7 +1211,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_deal_qualified IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 offers_accepted AS (
 SELECT
@@ -1270,7 +1270,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_offer_accepted IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 ccv_signed AS (
 SELECT
@@ -1329,7 +1329,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_ccv_signed IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 diligence_started_legaut AS (
 SELECT
@@ -1388,7 +1388,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_started_legaut IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 diligence_ended_legaut AS (
 SELECT
@@ -1447,7 +1447,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended_legaut IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 diligence_ended AS (
 SELECT
@@ -1506,7 +1506,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 diligence_started_legal AS (
 SELECT
@@ -1565,7 +1565,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_started_legal IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 diligence_ended_legal AS (
 SELECT
@@ -1624,7 +1624,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended_legal IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 credit_sent AS (
 SELECT
@@ -1683,7 +1683,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_credit_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 credit_approved AS (
 SELECT
@@ -1742,7 +1742,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_credit_approved IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 finan_started AS (
 SELECT
@@ -1801,7 +1801,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_finan_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 finan_ended AS (
 SELECT
@@ -1860,7 +1860,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_finan_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 payment_concluded AS (
 SELECT
@@ -1919,7 +1919,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_payment_concluded IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 notes_registry_started AS (
 SELECT
@@ -1978,7 +1978,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_notes_registry_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 notes_registry_ended AS (
 SELECT
@@ -2037,7 +2037,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_notes_registry_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 matricula_inicio AS (
 SELECT
@@ -2096,7 +2096,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_matricula_inicio IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 matricula_atualizada AS (
 SELECT
@@ -2155,7 +2155,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_matricula_atualizada IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 entrega_chave AS (
 SELECT
@@ -2214,7 +2214,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_entrega_chaves IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 union_all AS (
 SELECT * FROM lead_
