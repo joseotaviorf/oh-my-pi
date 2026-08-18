@@ -17,11 +17,12 @@ class EnrichQueryDeltaDatazordWorkflow(BaseQueryDeltaDatazordWorkflow):
         dataset_dependencies: BaseDataset = None,
         **kwargs,
     ):
+        layer = LayerEnum(workflow_args.get("layer", LayerEnum.ENRICH.value))
         super().__init__(
             dag_args,
             workflow_args,
             cluster_args,
-            LayerEnum.ENRICH,
+            layer,
             dataset_dependencies,
             **kwargs,
         )

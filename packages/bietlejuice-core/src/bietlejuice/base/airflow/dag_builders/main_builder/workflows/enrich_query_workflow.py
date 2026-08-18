@@ -73,15 +73,15 @@ class EnrichQueryWorkflow(BaseWorkflow):
         return dag
 
     def _get_tables(self) -> List[TableAttributes]:
-        """Returns the table attributes for all the tables in the enrich layer."""
+        """Returns the table attributes for all the tables in the workflow layer."""
+
+        layer = LayerEnum(self.workflow_args.get("layer", LayerEnum.ENRICH.value))
 
         query_table_names = DAGPackagesPathService.list_queries_files_in_composer(
-            dag_name=self.dag_name, layer=LayerEnum.ENRICH.value
+            dag_name=self.dag_name, layer=layer.value
         )
         tables = [
-            TableAttributes(
-                self.dag_args, self.workflow_args, LayerEnum.ENRICH, table_name
-            )
+            TableAttributes(self.dag_args, self.workflow_args, layer, table_name)
             for table_name in query_table_names
         ]
         custom_table_names = self.workflow_args.get("tables_customization", {}).keys()
@@ -89,7 +89,7 @@ class EnrichQueryWorkflow(BaseWorkflow):
             if table_name in query_table_names:
                 continue
             custom_table = TableAttributes(
-                self.dag_args, self.workflow_args, LayerEnum.ENRICH, table_name
+                self.dag_args, self.workflow_args, layer, table_name
             )
             # If this is false, it means that the table in tables_customization does not exist in any way
             if custom_table.has_custom_spark_job:

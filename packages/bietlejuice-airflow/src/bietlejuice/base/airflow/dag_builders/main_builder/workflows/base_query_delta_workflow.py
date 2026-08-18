@@ -72,6 +72,12 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
 
         tables = self._get_tables()
         n_tables = len(tables)
+        if n_tables == 0:
+            raise ValueError(
+                f"m=build_dag, msg=No tables found for layer {self.layer.value} "
+                f"in DAG {self.dag_name}. Check queries/{self.layer.value}/ "
+                f"and workflow.layer in the declaration file."
+            )
         # Tables with inner dependencies between them must be in the same cluster
         if "inner_dependencies" in self.workflow_args:
             n_clusters = 1

@@ -72,6 +72,34 @@ class TestValidationWorkflow:
         )
         assert len(tables) == 1
 
+    def test_consumption_layer_uses_workflow_layer_not_enrich(self):
+        with mock.patch.dict("os.environ", {"ENVIRONMENT": EnvironmentEnum.PROD}):
+            workflow = EnrichQueryDeltaWorkflow(
+                dag_args={"name": "pilot", "owner": "Data Engineering"},
+                workflow_args={
+                    "type": "query_delta",
+                    "layer": "consumption",
+                    "custom_schema": "bi_metrics",
+                },
+                cluster_args={"type": "consolidation_s_general_single_node_cluster"},
+                dataset_dependencies=mock.MagicMock(),
+            )
+
+        assert workflow.layer == LayerEnum.CONSUMPTION
+
+        with mock.patch.object(
+            DAGPackagesPathService,
+            "list_queries_files_in_composer",
+            return_value=["table_a"],
+        ) as list_queries:
+            tables = workflow._get_tables()
+
+        list_queries.assert_called_once_with(
+            dag_name="pilot", layer=LayerEnum.CONSUMPTION.value
+        )
+        assert len(tables) == 1
+        assert tables[0].layer == LayerEnum.CONSUMPTION
+
     def test_base_workflow_dag_id_suffix_only_when_validation(self):
         with mock.patch.dict("os.environ", {"ENVIRONMENT": EnvironmentEnum.PROD}):
             prod = BaseWorkflow(
