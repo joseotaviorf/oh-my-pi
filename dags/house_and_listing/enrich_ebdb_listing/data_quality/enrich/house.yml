@@ -7,3 +7,13 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
+  matching_broker_when_3p_supply:
+    custom:
+      # Alert when is_3p_supply is true but no uuid_company was resolved.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_ebdb_listing.house
+         WHERE is_3p_supply = TRUE
+           AND uuid_company IS NULL
+        ) = 0
+      severity_level: Warning

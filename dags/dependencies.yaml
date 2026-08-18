@@ -2440,10 +2440,7 @@ bietlejuice.enrich_ebdb_house:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-user:first-run-of-day
 bietlejuice.enrich_ebdb_listing:
-  - bietlejuice.company:load-clean-address:first-run-of-day
-  - bietlejuice.company:load-clean-company-product:first-run-of-day
-  - bietlejuice.company:load-clean-company:first-run-of-day
-  - bietlejuice.company:load-clean-product:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned-aud:first-run-of-day
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned:first-run-of-day
   - bietlejuice.ebdb_administration:load-clean-property-fee-aud:first-run-of-day
@@ -2483,12 +2480,10 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_visit:load-clean-entry-access:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-house-visit-information:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-key-holder:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_consumption_bill:load-enrich-consumption-bill-history:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
-  - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
   - bietlejuice.request_logging:load-clean-entryaccess:first-run-of-day
   - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.enrich_ebdb_photo_jobs:

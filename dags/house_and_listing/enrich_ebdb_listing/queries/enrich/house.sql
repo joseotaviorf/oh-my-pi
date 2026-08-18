@@ -35,18 +35,18 @@ WITH special_condition AS (
     lbc.id_house,
     BOOL_OR(
       (
-        lbc.ownership = 'THIRD_PARTY' AND cp.id_product <> 29
+        lbc.ownership = 'THIRD_PARTY' AND cb.uuid_company IS NOT NULL
       )
       OR (
-        COALESCE(lrm.rental_administrator = 'THIRD_PARTY', FALSE) AND cp.id_product <> 29
+        COALESCE(lrm.rental_administrator = 'THIRD_PARTY', FALSE) AND cb.uuid_company IS NOT NULL
       )
     ) AS is_3p_supply,
     BOOL_OR(
       lbc.ownership = 'THIRD_PARTY'
       AND lbc.business_context = 'SALE'
-      AND cp.id_product <> 29
+      AND cb.uuid_company IS NOT NULL
     ) AS is_sale_3p_supply,
-    BOOL_OR(lrm.rental_administrator = 'THIRD_PARTY' AND cp.id_product <> 29) AS is_rent_3p_supply,
+    BOOL_OR(lrm.rental_administrator = 'THIRD_PARTY' AND cb.uuid_company IS NOT NULL) AS is_rent_3p_supply,
     BOOL_OR(lsm.is_primary_market) AS is_sale_primary_market,
     BOOL_OR(lsm.has_great_sale_price_tag) AS has_sale_great_price_tag
   FROM datalake_ebdb_clean.listing_business_context AS lbc
@@ -56,51 +56,37 @@ WITH special_condition AS (
     ON lbc.id = lrm.id_listing_business_context AND lbc.business_context = 'RENT'
   LEFT JOIN datalake_ebdb_clean.house_listing_relation AS hlr
     ON lbc.id_house = hlr.id_house
-  LEFT JOIN datalake_company_clean.company AS c
-    ON hlr.id_related = c.uuid_company
-  LEFT JOIN datalake_company_clean.company_product AS cp
-    ON c.id = cp.id_company
+  LEFT JOIN core_brokers.brokers AS cb
+    ON hlr.id_related = cb.uuid_company
   GROUP BY
     1
 ), listing_ownership_aux AS (
   SELECT
     hlr.id_house,
-    MIN(id_related) AS uuid_company,
-    MAX(lbc.business_context = 'SALE') AS is_sale_3p_supply,
-    MAX(lbc.business_context = 'RENT') AS is_rent_3p_supply
+    MIN(hlr.id_related) AS uuid_company,
+    BOOL_OR(lbc.business_context = 'SALE') AS is_sale_3p_supply,
+    BOOL_OR(lbc.business_context = 'RENT') AS is_rent_3p_supply
   FROM datalake_ebdb_clean.house_listing_relation AS hlr
-  JOIN datalake_ebdb_clean.listing_business_context AS lbc
+  INNER JOIN datalake_ebdb_clean.listing_business_context AS lbc
     ON lbc.id = hlr.id_listing_business_context
-  JOIN datalake_company_clean.company AS c
-    ON hlr.id_related = c.uuid_company
-  JOIN datalake_company_clean.company_product AS cp
-    ON c.id = cp.id_company
-  JOIN datalake_company_clean.product AS p
-    ON p.id = cp.id_product
+  INNER JOIN core_brokers.brokers AS cb
+    ON hlr.id_related = cb.uuid_company
   WHERE
-    hlr.related_as = 'LISTING_OWNER'
+    lbc.ownership = 'THIRD_PARTY'
     AND hlr.source_type = 'COMPANY_REF'
-    AND cp.id_product <> 29 /* PP_MULTI */
+    AND hlr.related_as = 'LISTING_OWNER'
   GROUP BY
     1
 ), listing_ownership AS (
   SELECT
     loa.id_house,
-    hc.id_company AS id_hubspot,
     loa.uuid_company,
-    COALESCE(hc.extracted_3p_tag, cc.company_name) AS partner_3p_supply,
-    ca.state IS NOT DISTINCT FROM 'MG' OR hc.state IS NOT DISTINCT FROM 'MG' AS is_3p_bh,
+    cb.broker_name AS partner_3p_supply,
     loa.is_sale_3p_supply,
     loa.is_rent_3p_supply
   FROM listing_ownership_aux AS loa
-  LEFT JOIN datalake_company.company_sks AS cs
-    ON cs.uuid_company = loa.uuid_company
-  LEFT JOIN datalake_company_clean.company AS cc
-    ON cc.id = cs.id_company
-  LEFT JOIN datalake_company_clean.address AS ca
-    ON ca.id = cs.id_address
-  LEFT JOIN datalake_hubspot.company AS hc
-    ON hc.uuid_company = loa.uuid_company
+  LEFT JOIN core_brokers.brokers AS cb
+    ON loa.uuid_company = cb.uuid_company
 ), smart_price AS (
   SELECT
     l.id_house,
@@ -121,7 +107,6 @@ SELECT
   id_user_registrant,
   id_external,
   id_condo_parent,
-  id_company_hubspot,
   uuid_company,
   house_short_id,
   rent,
@@ -230,8 +215,6 @@ SELECT
   is_3p_supply,
   is_sale_3p_supply,
   is_rent_3p_supply,
-  is_3p_supply_5a,
-  is_3p_supply_bh,
   is_imovel_v3,
   is_casa_mineira_migration,
   is_sale_primary_market,
@@ -276,7 +259,6 @@ FROM (
     h.id_user_registrant,
     h.id_external,
     h.id_condo_parent,
-    lo.id_hubspot AS id_company_hubspot,
     lo.uuid_company,
     h.id % 892700000 AS house_short_id,
     h.rent,
@@ -335,14 +317,7 @@ FROM (
     h.listing_type,
     h.admin_info,
     h.internal_admin_info,
-    CASE
-      WHEN li.is_3p_supply OR NOT lo.id_house IS NULL
-      THEN COALESCE(
-        lo.partner_3p_supply,
-        NULLIF(REGEXP_EXTRACT(h.internal_admin_info, '\\[3(?i:p)(?i:BH)?\\-(.+?)\\]'), ''),
-        'Unknown' /* Sometimes, listing_business_context sets ownership to THIRD_PARTY, but internal_admin_info is empty */
-      )
-    END AS partner_3p_supply,
+    lo.partner_3p_supply,
     h.photo_booking_historic,
     h.default_neighborhood,
     h.condo_type,
@@ -437,14 +412,6 @@ FROM (
     COALESCE(NOT lo.id_house IS NULL OR li.is_3p_supply, FALSE) AS is_3p_supply,
     COALESCE(li.is_sale_3p_supply OR lo.is_sale_3p_supply, FALSE) AS is_sale_3p_supply,
     COALESCE(li.is_rent_3p_supply OR lo.is_rent_3p_supply, FALSE) AS is_rent_3p_supply,
-    (
-      NOT COALESCE(lo.is_3p_bh, FALSE)
-      AND COALESCE(UPPER(h.internal_admin_info) LIKE '%[3P-%]%', li.is_3p_supply, FALSE)
-    ) AS is_3p_supply_5a,
-    (
-      COALESCE(lo.is_3p_bh, FALSE)
-      OR COALESCE(UPPER(h.internal_admin_info) LIKE '%[3PBH-%]%', FALSE)
-    ) AS is_3p_supply_bh,
     (
       NOT COALESCE(h.announced_by, h.id_announced_by) IS NULL
     ) AS is_imovel_v3,

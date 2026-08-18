@@ -42,14 +42,9 @@ columns:
       - datalake_ebdb_clean.house.id_condo_parent
     description: Foreign key to the parent condominium when the house belongs to a condo
       complex.
-  id_company_hubspot:
-    lineage:
-      - datalake_hubspot.company.id_company
-    description: HubSpot company identifier for the Rede QuintoAndar partner when the house is
-      third-party supply.
   uuid_company:
     lineage:
-      - datalake_company.company_sks.uuid_company
+      - datalake_ebdb_clean.house_listing_relation.id_related
     description: UUID of the Rede QuintoAndar partner company linked to this house listing.
   house_short_id:
     lineage:
@@ -315,9 +310,7 @@ columns:
       markers.
   partner_3p_supply:
     lineage:
-      - datalake_hubspot.company.extracted_3p_tag
-      - datalake_company_clean.company.company_name
-      - datalake_ebdb_clean.house.internal_admin_info
+      - core_brokers.brokers.broker_name
     description: Display name of the Rede QuintoAndar real-estate partner agency linked to this
       house.
   photo_booking_historic:
@@ -612,18 +605,21 @@ columns:
     description: Whether the house has an active or eligible sale listing business context on
       QuintoAndar.
   is_3p_supply:
+    lineage:
+      - datalake_ebdb_clean.house_listing_relation.id_related
+      - datalake_ebdb_clean.listing_business_context.ownership
     description: Whether the house belongs to Rede QuintoAndar third-party supply in sale or
       rent context.
   is_sale_3p_supply:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+      - datalake_ebdb_clean.listing_business_context.ownership
     description: Whether the house is third-party supply in the sale business context.
   is_rent_3p_supply:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+      - datalake_ebdb_clean.listing_business_context.ownership
     description: Whether the house is third-party supply in the rental business context.
-  is_3p_supply_5a:
-    description: Whether third-party supply is operated by QuintoAndar, excluding Casa Mineira
-      (BH) partners.
-  is_3p_supply_bh:
-    description: Whether third-party supply is operated by Casa Mineira partners in Minas
-      Gerais.
   is_imovel_v3:
     lineage:
       - datalake_ebdb_clean.house.announced_by
