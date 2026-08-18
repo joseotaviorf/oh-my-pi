@@ -34,10 +34,10 @@ WITH ticket_history_base AS (
   FROM
     datalake_zendesk.tickets AS t
   WHERE
-    MAKE_DATE(t.year,t.month,t.day) >= CURRENT_DATE - INTERVAL 1 YEAR
-    AND t.ts_updated >= CURRENT_DATE - INTERVAL 1 YEAR
+    MAKE_DATE(t.year,t.month,t.day) >= DATE('{load_start_date}') - INTERVAL 1 YEAR
+    AND t.ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
   GROUP BY
-    ALL
+    t.id_ticket
 )
 ,repair_tickets AS (
   SELECT DISTINCT
@@ -58,7 +58,7 @@ WITH ticket_history_base AS (
     END AS contestation_task_origin,
     IF(tc.tags LIKE '%closed_by_merge%', TRUE, FALSE) AS is_closed_by_merge,
     IF(
-      ww.dt_end_1 > (CURRENT_DATE - INTERVAL 1 DAY)
+      ww.dt_end_1 > (DATE('{load_start_date}') - INTERVAL 1 DAY)
       AND ts_resolution_contestation IS NULL
       AND DATE(tc.ts_solved - INTERVAL 3 HOUR
     ) IS NULL, TRUE, FALSE) AS is_contestation_backlog,
@@ -74,7 +74,7 @@ WITH ticket_history_base AS (
     datalake_date.workday_window AS ww
       ON ww.dt_Ref = DATE(th.ts_contestation) AND id_city = 39
   WHERE
-    tc.year >= YEAR(CURRENT_DATE - INTERVAL 1 YEAR)
+    tc.year >= YEAR(DATE('{load_start_date}') - INTERVAL 1 YEAR)
     AND tc.group_name IN (
       'FullService [Back]',
       'Prestadores Parceiros [SO]',
@@ -104,7 +104,7 @@ WITH ticket_history_base AS (
       datalake_ebdb_listing.house AS h
         ON rf.id_house = h.id
     WHERE
-      hl.ts_listing_version_start BETWEEN CURRENT_DATE - INTERVAL 3 YEAR AND CURRENT_DATE - 1
+      hl.ts_listing_version_start BETWEEN DATE('{load_start_date}') - INTERVAL 3 YEAR AND DATE('{load_start_date}') - 1
       AND (hl.listing_category = 'Re-Listing')
       AND ((h.country_code <> 'MX') OR (h.country_code IS NULL))
 )
@@ -117,51 +117,88 @@ WITH ticket_history_base AS (
   WHERE
     id_contract IS NOT NULL
   GROUP BY
-    ALL
+    id_contract
 )
-,repairs_interaction AS (
+,repairs_interaction_ranked AS (
   SELECT
     rr.id AS id_request,
     rr.id_contract,
-    rr.ts_updated
+    rr.ts_updated,
+    ROW_NUMBER() OVER (
+      PARTITION BY rr.id, rr.id_third_party_crm_ticket_external
+      ORDER BY rr.ts_updated ASC
+    ) AS rn
   FROM
     datalake_repairs_clean.repair_request AS rr
   WHERE
     (STRING(GET_JSON_OBJECT(rr.owner_approval, '$.approved')) IS NOT NULL)
-    AND CAST(rr.ts_created AS DATE) >= CURRENT_DATE - INTERVAL 1 YEAR
+    AND CAST(rr.ts_created AS DATE) >= DATE('{load_start_date}') - INTERVAL 1 YEAR
     AND rr.id_third_party_crm_ticket_external IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY rr.id, rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated ASC) = 1
 )
-,repair_interaction_pp AS (
+,repairs_interaction AS (
   SELECT
-    sr.id_repair_request
-    , ri.ts_updated
-    , sr.id_third_party_crm_ticket_external
+    id_request,
+    id_contract,
+    ts_updated
   FROM
-    datalake_repairs_clean.service_request sr
+    repairs_interaction_ranked
+  WHERE
+    rn = 1
+)
+,repair_interaction_pp_ranked AS (
+  SELECT
+    sr.id_repair_request,
+    ri.ts_updated,
+    sr.id_third_party_crm_ticket_external,
+    ROW_NUMBER() OVER (
+      PARTITION BY sr.id_repair_request, ri.id_contract
+      ORDER BY sr.id_third_party_crm_ticket_external ASC
+    ) AS rn
+  FROM
+    datalake_repairs_clean.service_request AS sr
   LEFT JOIN
     repairs_interaction AS ri
       ON ri.id_request = sr.id_repair_request
   WHERE
-    CAST(sr.ts_created AS DATE) >= CURRENT_DATE - INTERVAL 1 YEAR
+    CAST(sr.ts_created AS DATE) >= DATE('{load_start_date}') - INTERVAL 1 YEAR
     AND sr.id_third_party_crm_ticket_external IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY sr.id_repair_request, ri.id_contract ORDER BY sr.id_third_party_crm_ticket_external ASC) = 1
 )
-,service_provider AS (
+,repair_interaction_pp AS (
+  SELECT
+    id_repair_request,
+    ts_updated,
+    id_third_party_crm_ticket_external
+  FROM
+    repair_interaction_pp_ranked
+  WHERE
+    rn = 1
+)
+,service_provider_ranked AS (
   SELECT
     rr.id_third_party_crm_ticket_external AS sk_ticket,
     rr.id AS id_repair_request,
     rr.service_provider,
-    rr.ts_created
+    rr.ts_created,
+    ROW_NUMBER() OVER (
+      PARTITION BY rr.id_third_party_crm_ticket_external
+      ORDER BY rr.ts_updated DESC
+    ) AS rn
   FROM
     datalake_repairs_clean.repair_request AS rr
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated DESC) = 1
 )
-,first_interaction AS(
+,service_provider AS (
   SELECT
+    sk_ticket,
+    id_repair_request,
+    service_provider,
+    ts_created
+  FROM
+    service_provider_ranked
+  WHERE
+    rn = 1
+)
+,first_interaction AS (
+  SELECT DISTINCT
     sr.id_third_party_crm_ticket_external,
     IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation,
     CASE
@@ -181,8 +218,6 @@ WITH ticket_history_base AS (
   LEFT JOIN
     repairs_interaction AS ri
       ON ri.id_request = rr.id
-  GROUP BY
-    ALL
 )
 ,ticket_comment_metrics AS (
   SELECT
@@ -196,6 +231,7 @@ WITH ticket_history_base AS (
       ON zu.id_user_zendesk = tc.id_author
   GROUP BY 1
 )
+,ongoing_repair_tickets_ranked AS (
 SELECT
   tc.id_ticket,
   REPLACE(CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Ticket do contato"]') AS STRING),'#','') AS id_contact_ticket,
@@ -238,7 +274,7 @@ SELECT
   CAST(tc.replies AS INT) AS replies,
   rd.relisting,
   CAST(tc.reply_time_min_calendar AS INT) AS minutes_first_reply_time_calendar,
-  DATE(tc.custom_fields['[Data] Definição do prestador']) AS dt_definition,
+  TRY_CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["[Data] Definição do prestador"]') AS DATE) AS dt_definition,
   fi.dt_chat,
   c.dt_entered AS entrance_date,
   th.ts_contestation,
@@ -265,7 +301,8 @@ SELECT
   tcm.ts_latest_analyst_comment,
   YEAR(tc.ts_updated - INTERVAL 3 HOUR ) AS year,
   MONTH(tc.ts_updated - INTERVAL 3 HOUR ) AS month,
-  DAY(tc.ts_updated - INTERVAL 3 HOUR ) AS day
+  DAY(tc.ts_updated - INTERVAL 3 HOUR ) AS day,
+  ROW_NUMBER() OVER (PARTITION BY tc.id_ticket ORDER BY tc.ts_updated DESC) AS rn
 FROM
   datalake_zendesk.tickets_current AS tc
 LEFT JOIN
@@ -319,12 +356,71 @@ WHERE
       'Atendimento [Porto]',
       'ReparAção Emergencial [BACK]'
     )
-  AND tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
+  AND tc.ts_created >= DATE('{load_start_date}') - INTERVAL 3 YEAR
   AND tc.channel NOT IN ('call', 'whatsapp')
   AND tc.status NOT IN ('deleted')
   AND tc.tags NOT LIKE '%caso_ticket_agregador%'
   AND (tc.client_type != 'prestador_de_serviço' OR tc.client_type IS NULL)
   AND tc.tags NOT LIKE '%reembolso_sem_autorização%'
   AND tc.tags NOT LIKE '%whatsapp_reparos%'
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY tc.id_ticket ORDER BY tc.ts_updated DESC) = 1
+)
+SELECT
+  id_ticket,
+  id_contact_ticket,
+  id_request,
+  id_contract,
+  group_name,
+  client_type,
+  status,
+  custom_fields,
+  tags,
+  ticket_via,
+  channel,
+  agent_name,
+  agent_email,
+  email_assigned,
+  email_requester,
+  agent_organization,
+  contestation_task_origin,
+  service_provider,
+  theme,
+  theme_detail,
+  request_type,
+  customer_type_tag,
+  motivation,
+  front_or_back,
+  comment_csat,
+  csat_tags,
+  csat_score,
+  csat_partes,
+  is_closed_by_merge,
+  is_contestation_backlog,
+  is_ticket_followup,
+  has_chat_negociation,
+  reopens,
+  replies,
+  relisting,
+  minutes_first_reply_time_calendar,
+  dt_definition,
+  dt_chat,
+  entrance_date,
+  ts_contestation,
+  ts_resolution_contestation,
+  ts_first_interaction,
+  ts_created_local,
+  ts_updated_local,
+  ts_closed_local,
+  ts_solved_local,
+  ts_request_created,
+  ts_csat_response_submitted,
+  ts_initially_assigned_local,
+  ts_last_assigned_local,
+  ts_latest_customer_comment,
+  ts_latest_analyst_comment,
+  year,
+  month,
+  day
+FROM
+  ongoing_repair_tickets_ranked
+WHERE
+  rn = 1
