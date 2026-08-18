@@ -1,4 +1,4 @@
-.PHONY: help install test lint creds generate-datasets eval-suite eval-rollup eval-check-gate eval-scope drift-check eval-changed
+.PHONY: help install test lint creds generate-datasets eval-suite eval-rollup eval-check-gate eval-scope drift-check eval-changed inspect-view-s3
 
 help: ## Show this help message
 	@echo "Available targets:"
@@ -15,6 +15,20 @@ lint: ## Lint with ruff
 
 creds: ## Verify the LiteLLM key can be fetched from Vault (via qli)
 	@scripts/fetch_litellm_key.sh >/dev/null && echo "OK: LiteLLM key reachable in Vault (apps/forno/litellm/zordon-tars-llm)"
+
+# View archived Inspect logs directly from S3 (no sync). Opens http://127.0.0.1:7575
+# after QLI/ConsoleMe auth. Overrides:
+#   make inspect-view-s3 S3_URI=s3://5a-tars-prod-data/evals/inspect/2026/08/07/pr-26512/pipeline-89418
+#   make inspect-view-s3 ROLE_ARN=arn:aws:iam::ACCOUNT:role/ROLE PORT=7576
+#   make inspect-view-s3 USE_AMBIENT=1   # skip QLI; use ambient/Weep credentials
+#   make inspect-view-s3 LIST=1         # list child prefixes under S3_URI (or archive root)
+inspect-view-s3: ## Start Inspect View against S3 archive (QLI auth → http://127.0.0.1:7575)
+	uv run python scripts/view_inspect_logs_s3.py \
+	    $(if $(S3_URI),--log-dir $(S3_URI)) \
+	    $(if $(ROLE_ARN),--role-arn $(ROLE_ARN)) \
+	    $(if $(PORT),--port $(PORT)) \
+	    $(if $(USE_AMBIENT),--use-ambient-credentials) \
+	    $(if $(LIST),--list)
 
 # STEMS= / STEMS_FILE= optional — scope generation *and* pruning to those stems:
 #   make generate-datasets STEMS="ongoing_listings supply_retention_sale"

@@ -171,7 +171,10 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"Uploaded {len(uploaded)} object(s)")
     print(f"INSPECT_S3_URI={uri_root}")
-    print(f"Open with: aws s3 sync '{uri_root}/' ./inspect-archive/ && uv run inspect view")
+    print(
+        "Open with: uv run python scripts/view_inspect_logs_s3.py "
+        f"--log-dir '{uri_root}'"
+    )
     return 0
 
 

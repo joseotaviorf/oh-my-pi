@@ -101,6 +101,61 @@ uv run --with boto3 python scripts/upload_inspect_logs_s3.py \
   --extra gate_summary.json
 ```
 
+### Viewing archived logs locally
+
+`scripts/view_inspect_logs_s3.py` starts Inspect View against the S3 archive
+directly (no `aws s3 sync`). It authenticates with **QLI → ConsoleMe**, applies
+temporary credentials only for the duration of the in-process viewer, and binds
+to **http://127.0.0.1:7575**.
+
+Prerequisites:
+
+1. [QLI](https://github.com/quintoandar/qli) installed and logged in (`qli login`).
+2. A ConsoleMe role that can read `s3://5a-tars-prod-data/evals/inspect/` —
+   pick one via [ConsoleMe](https://consoleme.sre.quintoandar.com.br/) /
+   `qli aws list --arn-only`.
+
+```bash
+# Discover what was actually uploaded (archive root → year → day → pr → pipeline):
+make inspect-view-s3 LIST=1
+make inspect-view-s3 LIST=1 S3_URI=s3://5a-tars-prod-data/evals/inspect/2026/08/07
+
+# Open a concrete CI run (example that exists in the archive):
+make inspect-view-s3 \
+  S3_URI=s3://5a-tars-prod-data/evals/inspect/2026/08/07/pr-26512/pipeline-89418
+
+# Pin the role (skips interactive QLI role selection):
+make inspect-view-s3 \
+  ROLE_ARN=arn:aws:iam::ACCOUNT_ID:role/YOUR_ROLE \
+  S3_URI=s3://5a-tars-prod-data/evals/inspect/2026/08/07/pr-26512/pipeline-89418
+```
+
+Equivalent without Make:
+
+```bash
+uv run python scripts/view_inspect_logs_s3.py --list
+uv run python scripts/view_inspect_logs_s3.py \
+  --log-dir s3://5a-tars-prod-data/evals/inspect/2026/08/07/pr-26512/pipeline-89418 \
+  --role-arn arn:aws:iam::ACCOUNT_ID:role/YOUR_ROLE
+```
+
+Then open **http://127.0.0.1:7575** in your browser (CTRL+C stops the server).
+
+**Legacy / ambient credentials:** if you already exported temporary credentials
+in the shell (Weep `weep export …` or a prior `eval "$(qli aws export …)"`),
+skip the launcher's QLI step:
+
+```bash
+make inspect-view-s3 USE_AMBIENT=1 S3_URI=s3://5a-tars-prod-data/evals/inspect/...
+# or:
+uv run python scripts/view_inspect_logs_s3.py --use-ambient-credentials \
+  --log-dir s3://5a-tars-prod-data/evals/inspect/...
+```
+
+Environment overrides: `TARS_EVAL_S3_URI`, `TARS_EVAL_S3_BUCKET`,
+`TARS_EVAL_S3_PREFIX_ROOT`, `TARS_EVAL_S3_ROLE_ARN`,
+`TARS_EVAL_INSPECT_VIEW_PORT`.
+
 ## Quick start
 
 ```bash
