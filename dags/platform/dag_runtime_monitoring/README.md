@@ -11,18 +11,27 @@ Every 30 minutes this DAG:
    based on each DAG's own historical first-start offset within the daily cycle
    (anchored at `sla_cycle_anchor_local_time`, default 20:55 America/Sao_Paulo),
    with dependency-based root-cause suppression so one stalled root produces one
-   alert instead of hundreds of downstream noise. Missing-run findings are
-   **Chat-only** (no JiraOps).
+   alert instead of hundreds of downstream noise.
 
 **Every anomaly goes to Google Chat** and is tracked to closure (ledger Variable
 `DAG_RUNTIME_MONITORING_ALERTED_RUNS`: initial alert, 30-min updates, ✅/❌ close).
 
-When `critical_dags` is non-empty, *slow* findings that are **in the list** or that
-**transitively block** one (via `dependencies.yaml`) **also** page JiraOps once.
+When `critical_dags` is non-empty, findings also page JiraOps as follows:
 
-- **Empty `critical_dags`** (prod soft-launch): Chat only; nothing pages Jira.
-- **Critical / blocking critical** (slow tier only) → Chat **+** JiraOps.
-- **Neither / missing-run** → Chat only.
+- **slow**, in `critical_dags` or transitively blocking one → Chat **+** JiraOps
+- **missing-run**, in `critical_dags` → Chat **+** JiraOps
+- **missing-run**, blocking a critical DAG but not a member → Chat only
+  (the 208 transitive upstreams of the 5 prod critical DAGs include ~28 chronically
+  late DAGs — `ebdb_house`, `ebdb_listing`, `bob`, `wololo`, … — late 13–15 of 14
+  days; expanding paging to that layer would be an alert storm)
+- **everything else** → Chat only
+
+Root suppression is unchanged: a priority DAG that is late because an upstream is
+late is not a root, produces no finding, and therefore no page. The upstream's own
+Chat alert remains the signal.
+
+JiraOps alerts are closed by on-call in JSM, never by Rubinho (the Chat thread
+still posts the ✅ close).
 
 **Elapsed clock (slowness):** when a run has an `execute-job-cluster` / `execute-job-cluster-N`
 task, both live elapsed and the historical baseline start from that task’s earliest

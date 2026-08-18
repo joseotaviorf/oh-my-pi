@@ -27,7 +27,8 @@ Alerting is tiered by ``critical_dags`` (soft-launch: empty list → Chat only):
     to closure** (threaded updates while running/missing, final message on resolve).
   * Additionally, *slow* DAGs in ``critical_dags`` **or** that transitively block one
     (via ``dependencies.yaml``) also open a JiraOps on-caller alert once.
-  * Missing-run findings are Chat-only (no JiraOps), by design.
+  * Missing-run findings in ``critical_dags`` (membership only — never the
+    transitive-blocking expansion) also page JiraOps.
 
 Elapsed time and historical baselines for the slowness check are anchored on the
 earliest ``execute-job-cluster*`` task start when that task exists for the run
@@ -134,7 +135,7 @@ _DEFAULT_CONFIG = {
     # Absolute floor: only alert on runs that have been executing at least this long,
     # so quick DAGs never page no matter how large their relative swing.
     "min_alert_duration_minutes": 90,
-    # SLA start / missing-run guard (Chat-only).
+    # SLA start / missing-run guard (Chat; JiraOps when the DAG is in critical_dags).
     "sla_enabled": True,
     "sla_lookback_days": 14,
     "sla_min_history_cycles": 10,
@@ -1708,13 +1709,19 @@ def _assign_alert_tiers(
 ) -> None:
     """Set ``tier`` on each finding for Chat vs Chat+JiraOps routing.
 
-    * Empty ``critical_dags`` → all ``standard`` (Chat only; soft-launch).
-    * Non-empty → ``critical`` (Chat + JiraOps) if the DAG is in the set or
-      transitively blocks one; otherwise ``standard`` (Chat only).
+    * Empty ``critical_dags`` → all ``standard`` (Chat only).
+    * ``slow`` → ``critical`` when the DAG is in the set or transitively blocks one.
+    * ``missing_run`` → ``critical`` on **membership only**. The transitive expansion
+      the slow tier uses would page on the chronically-late upstream layer (~28 DAGs
+      late on 13-15 of 14 days) every night, so a late upstream stays Chat-only.
     """
     critical = set(critical_dags or ())
     for finding in findings:
-        if _impacts_critical(finding["dag_id"], critical, downstream_index):
+        if finding.get("kind") == _KIND_MISSING_RUN:
+            finding["tier"] = (
+                "critical" if finding["dag_id"] in critical else "standard"
+            )
+        elif _impacts_critical(finding["dag_id"], critical, downstream_index):
             finding["tier"] = "critical"
         else:
             finding["tier"] = "standard"
@@ -1750,29 +1757,36 @@ def _send_jira_alert(
     """
     dag_id = finding.get("dag_id", "<unknown>")
     run_id = finding.get("run_id", "<unknown>")
-    tags = [dag_id, "runtime anomaly", "critical"]
+    is_missing_run = finding.get("kind") == _KIND_MISSING_RUN
+    kind_tag = "sla missing run" if is_missing_run else "runtime anomaly"
+    tags = [dag_id, kind_tag, "critical"]
     if test:
         tags.append("test")
     try:
         # Title/description must stay inside try: a bad finding must not abort the
         # whole monitor_dag_runtimes task — log and skip this page instead.
+        headline = "DAG missed SLA start" if is_missing_run else "DAG runtime anomaly"
         title = _truncate_text(
-            f"{'[TEST] ' if test else ''}DAG runtime anomaly: {dag_id}",
-            _JIRA_MESSAGE_MAX,
+            f"{'[TEST] ' if test else ''}{headline}: {dag_id}", _JIRA_MESSAGE_MAX
         )
         description = _truncate_text(_build_alert_text(finding), _JIRA_DESCRIPTION_MAX)
+        extra_properties = {
+            "DAG": dag_id,
+            "RunId": run_id,
+            "DAGOwner": _owner_label(finding),
+        }
+        if is_missing_run:
+            extra_properties["DueAt"] = finding.get("due_at")
+            extra_properties["LateBy"] = _format_duration(finding.get("late_by_s") or 0)
+        else:
+            extra_properties["PctOverBaseline"] = finding.get("pct_over")
         creds = json.loads(Variable.get(JIRA_OPS_VARIABLE))
         client = JiraOpsClient(creds)
         response = client.create_alert(
             message=title,
             description=description,
             tags=tags,
-            extra_properties={
-                "DAG": dag_id,
-                "RunId": run_id,
-                "DAGOwner": _owner_label(finding),
-                "PctOverBaseline": finding["pct_over"],
-            },
+            extra_properties=extra_properties,
             responder_team_id=responder_team_id,
             alias=f"dag-runtime-{dag_id}-{run_id}",
         )
@@ -2247,6 +2261,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         if opts["simulate_missing_runs"]:
             findings = _synthetic_missing_run_findings(config, opts["simulate_dags"])
             _enrich_findings_with_dw_impact(findings, downstream_index)
+            _assign_alert_tiers(findings, config["critical_dags"], downstream_index)
             _attach_owners(
                 findings,
                 _fetch_dag_owners(session, {f["dag_id"] for f in findings}),
@@ -2257,7 +2272,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
                 f"fabricated {len(findings)} synthetic finding(s)."
             )
             for f in findings:
-                print(f"   • [missing_run] {_build_alert_text(f)}")
+                print(f"   • [missing_run/{f['tier']}] {_build_alert_text(f)}")
             if opts["dry_run"] or not deliver:
                 print("ℹ️  Not delivering (simulate dry-run / gate). Logging only.")
                 return
@@ -2330,7 +2345,6 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
             session, {row.dag_id for row in running_rows}, since
         )
         findings = _evaluate_all(running_rows, durations_by_dag, now, config)
-    _assign_alert_tiers(findings, config["critical_dags"], downstream_index)
 
     # Resolved once per cycle: missing-run detection needs the eligible set, and
     # follow-up needs it to stop tracking DAGs that left it (paused/deactivated).
@@ -2362,6 +2376,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     )
 
     all_findings = findings + sla_findings
+    _assign_alert_tiers(all_findings, config["critical_dags"], downstream_index)
     _enrich_findings_with_dw_impact(all_findings, downstream_index)
     ledger = _normalize_ledger(
         _load_dedup_state(), critical_dags=config["critical_dags"]
@@ -2375,7 +2390,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     for f in findings:
         print(f"   • [{f['tier']}] {_build_alert_text(f)}")
     for f in sla_findings:
-        print(f"   • [missing_run] {_build_alert_text(f)}")
+        print(f"   • [missing_run/{f['tier']}] {_build_alert_text(f)}")
     print(
         f"⏱️ {len(findings)} anomalous run(s); "
         f"⏰ {len(sla_findings)} missing-run root(s); "
@@ -2414,13 +2429,13 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         if key in ledger or key in already_tracked:
             continue
         entry = _entry_from_finding(finding, first_alert_ts=now.isoformat())
-        # Every anomaly goes to Chat (lifecycle). Critical *slow* tier also pages JiraOps.
-        # Missing-run findings are Chat-only.
+        # Every anomaly goes to Chat (lifecycle). The critical tier also pages JiraOps —
+        # slow DAGs in critical_dags or blocking one, missing-run DAGs in critical_dags.
         # Gate ledger on *all* required deliveries: if Chat succeeds but Jira fails,
         # do not track yet — otherwise later cycles skip the finding and on-call is
         # never paged despite _send_jira_alert's "retry next cycle" log.
         jira_ok = True
-        if finding.get("kind") != _KIND_MISSING_RUN and finding["tier"] == "critical":
+        if finding["tier"] == "critical":
             if is_test and not jira_team:
                 print(
                     f"⚠️  Refusing to page real on-call from a test trigger for "
@@ -2508,9 +2523,9 @@ def _collect_sla_findings(
 def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
     """Send the initial alert for one finding (used by simulate mode).
 
-    Chat always; JiraOps additionally for critical *slow* tier (when test team is set).
+    Chat always; JiraOps additionally for the critical tier (slow or missing-run).
     """
-    if finding.get("kind") != _KIND_MISSING_RUN and finding["tier"] == "critical":
+    if finding["tier"] == "critical":
         if is_test and not jira_team:
             print(
                 f"⚠️  Refusing to page real on-call from a test trigger for "
@@ -2714,7 +2729,8 @@ with DAG(
         "recent successful runs, and DAGs that have not started by their historical SLA "
         "window (missing-run guard with dependency root suppression). "
         "Every anomaly goes to Google Chat (tracked to closure); slow DAGs in "
-        "critical_dags or that block them also page JiraOps on-caller."
+        "critical_dags or that block them also page JiraOps on-caller; "
+        "missing-run DAGs in critical_dags page too."
     ),
     schedule="*/30 * * * *",
     catchup=False,

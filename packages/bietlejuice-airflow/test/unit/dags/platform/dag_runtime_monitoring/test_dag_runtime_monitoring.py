@@ -651,6 +651,34 @@ class TestAssignAlertTiers:
         assert findings[0]["tier"] == "standard"
         assert not _impacts_critical(self._ORPHAN, {_CRITICAL_DAG}, self._INDEX)
 
+    def _missing_run_finding(self, dag_id):
+        cycle = datetime(2026, 8, 16, 23, 55, tzinfo=timezone.utc)
+        return {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": dag_id,
+            "run_id": _sla_run_id(cycle),
+            "tier": "standard",
+            "late_by_s": 3600.0,
+            "due_at": "2026-08-17T04:55:00+00:00",
+        }
+
+    def test_missing_run_member_pages_jira(self):
+        findings = [self._missing_run_finding(_CRITICAL_DAG)]
+        _assign_alert_tiers(findings, [_CRITICAL_DAG], self._INDEX)
+        assert findings[0]["tier"] == "critical"
+
+    def test_missing_run_upstream_of_critical_stays_standard(self):
+        # Regression: the slow tier's transitive expansion must not page missing-run
+        # upstreams (chronic-late layer of ~28 DAGs).
+        findings = [self._missing_run_finding(_STANDARD_DAG)]
+        _assign_alert_tiers(findings, [_CRITICAL_DAG], self._INDEX)
+        assert findings[0]["tier"] == "standard"
+
+    def test_missing_run_empty_critical_stays_standard(self):
+        findings = [self._missing_run_finding(_CRITICAL_DAG)]
+        _assign_alert_tiers(findings, [], self._INDEX)
+        assert findings[0]["tier"] == "standard"
+
 
 @mock.patch(
     f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
@@ -883,6 +911,37 @@ class TestSendJiraAlertTruncation:
         assert _send_jira_alert(finding) is False
         mock_client_cls.assert_not_called()
         mock_var.get.assert_not_called()
+
+    @mock.patch(f"{_MODULE}.JiraOpsClient")
+    @mock.patch(f"{_MODULE}.Variable")
+    def test_missing_run_payload_has_sla_fields(self, mock_var, mock_client_cls):
+        mock_var.get.return_value = json.dumps(
+            {"username": "u", "token": "t", "cloud_id": "c"}
+        )
+        client = mock_client_cls.return_value
+        client.create_alert.return_value = mock.MagicMock()
+        cycle = datetime(2026, 8, 16, 23, 55, tzinfo=timezone.utc)
+        finding = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": _CRITICAL_DAG,
+            "run_id": _sla_run_id(cycle),
+            "tier": "critical",
+            "late_by_s": 3600.0,
+            "due_at": "2026-08-17T04:55:00+00:00",
+            "owner": "Data Platform",
+        }
+        from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
+            _send_jira_alert,
+        )
+
+        assert _send_jira_alert(finding) is True
+        kwargs = client.create_alert.call_args.kwargs
+        assert kwargs["message"].startswith("DAG missed SLA start:")
+        assert "sla missing run" in kwargs["tags"]
+        extra = kwargs["extra_properties"]
+        assert extra["DueAt"] == finding["due_at"]
+        assert "LateBy" in extra
+        assert "PctOverBaseline" not in extra
 
 
 def _db_session():
@@ -1572,6 +1631,36 @@ def test_force_send_critical_without_test_team_is_not_paged(
 
     mock_jira.assert_not_called()  # critical refused without test team
     assert mock_post.call_count == 2  # both critical + standard still Chat
+    mock_var.set.assert_not_called()
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SIMULATE_DEPS,
+)
+def test_force_send_missing_run_without_test_team_is_not_paged(
+    mock_deps, mock_cfg, mock_var, mock_jira, mock_post
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory(environment="forno")
+
+    monitor_dag_runtimes(
+        session=_db_session(),
+        run_conf={
+            "simulate": True,
+            "simulate_missing_runs": True,
+            "simulate_dags": [_CRITICAL_DAG],
+            "force_send": True,
+            "test_webhook": "https://chat.example.com/TEST",
+        },
+    )
+
+    mock_jira.assert_not_called()
+    mock_post.assert_called_once()
     mock_var.set.assert_not_called()
 
 
@@ -2523,6 +2612,76 @@ class TestMonitorEnrichesSlaFindings:
             calls and calls[0].get("kind") == _KIND_MISSING_RUN
             for calls in enrich_calls
         )
+
+
+class TestMonitorPagesCriticalMissingRun:
+    _CYCLE = datetime(2026, 8, 16, 23, 55, tzinfo=timezone.utc)
+
+    def _sla_finding(self, dag_id):
+        return {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": dag_id,
+            "run_id": _sla_run_id(self._CYCLE),
+            "tier": "standard",
+            "late_by_s": 3600.0,
+            "elapsed_s": 3600.0,
+            "due_at": "2026-08-17T04:55:00+00:00",
+            "expected_start": "2026-08-17T03:55:00+00:00",
+            "grace_minutes": 60,
+            "percentile": 90,
+            "history_count": 14,
+            "lookback_days": 14,
+            "also_waiting_count": 0,
+        }
+
+    def test_critical_member_pages_jira_and_tracks(self):
+        sla_run_id = _sla_run_id(self._CYCLE)
+        finding = self._sla_finding(_CRITICAL_DAG)
+        with (
+            mock.patch(f"{_MODULE}.ConfigurationService") as mock_cfg,
+            mock.patch(f"{_MODULE}.Variable") as mock_var,
+            mock.patch(f"{_MODULE}._load_downstream_index_safe", return_value={}),
+            mock.patch(f"{_MODULE}._fetch_running_runs", return_value=[]),
+            mock.patch(
+                f"{_MODULE}._collect_sla_findings", return_value=[dict(finding)]
+            ),
+            mock.patch(f"{_MODULE}._fetch_run_states", return_value={}),
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True) as mock_post,
+            mock.patch(f"{_MODULE}._send_jira_alert", return_value=True) as mock_jira,
+        ):
+            mock_cfg.return_value.get_config.side_effect = _config_get
+            mock_var.get.side_effect = _variable_get_factory(environment="prod")
+            monitor_dag_runtimes(session=_db_session(), run_conf={})
+
+        mock_jira.assert_called_once()
+        passed = mock_jira.call_args.args[0]
+        assert passed["tier"] == "critical"
+        assert passed["kind"] == _KIND_MISSING_RUN
+        mock_post.assert_called_once()
+        saved = _saved_ledger(mock_var)
+        assert saved[f"{_CRITICAL_DAG}|{sla_run_id}"]["tier"] == "critical"
+
+    def test_upstream_missing_run_is_chat_only(self):
+        finding = self._sla_finding("bietlejuice.enrich_region")
+        index = {"bietlejuice.enrich_region": {_CRITICAL_DAG}}
+        with (
+            mock.patch(f"{_MODULE}.ConfigurationService") as mock_cfg,
+            mock.patch(f"{_MODULE}.Variable") as mock_var,
+            mock.patch(f"{_MODULE}._load_downstream_index_safe", return_value=index),
+            mock.patch(f"{_MODULE}._fetch_running_runs", return_value=[]),
+            mock.patch(
+                f"{_MODULE}._collect_sla_findings", return_value=[dict(finding)]
+            ),
+            mock.patch(f"{_MODULE}._fetch_run_states", return_value={}),
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True) as mock_post,
+            mock.patch(f"{_MODULE}._send_jira_alert", return_value=True) as mock_jira,
+        ):
+            mock_cfg.return_value.get_config.side_effect = _config_get
+            mock_var.get.side_effect = _variable_get_factory(environment="prod")
+            monitor_dag_runtimes(session=_db_session(), run_conf={})
+
+        mock_jira.assert_not_called()
+        mock_post.assert_called_once()
 
 
 # --------------------------------------------------------------------------- #
