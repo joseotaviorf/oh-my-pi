@@ -9,15 +9,18 @@ import pytest
 
 from dags.governance.notify_dag_rotation.notify_dag_rotation import (
     _OWNER_DISPLAY_NAME_MAP,
+    INCIDENT_OWNER_FIELD,
     JIRA_OPS_SCHEDULE_ID,
     _clean_dag_owner,
     _count_voice_wakeups,
+    _display_owner_name,
     _environment_suffix,
     _extract_dag_from_alert,
     _fetch_dei_issues,
     _get_oncall_recipients,
     _get_schedule_timeline,
     _get_user_display,
+    _incident_owner_from_dag,
     _is_gchat_webhook,
     _parse_rfc3339,
     _resolve_issue_owners,
@@ -93,6 +96,34 @@ class TestOwnerDisplayNameMap:
     def test_unknown_owner_not_in_map(self):
         assert "Unknown Team" not in _OWNER_DISPLAY_NAME_MAP
 
+    def test_display_owner_falls_back_to_raw_enum_value(self):
+        assert _display_owner_name("Data House and Listing") == "Data House and Listing"
+        assert _display_owner_name("AE All") == "AE All"
+        assert _display_owner_name("Search") == "MLOps"
+
+
+class TestIncidentOwnerFromDag:
+    def test_wonka_prefix_maps_to_mlops_even_without_airflow_owner(self):
+        assert (
+            _incident_owner_from_dag("quintoml.wonka.user_sale_houses_viewed", None)
+            == "MLOps"
+        )
+
+    def test_wonka_search_owner_maps_to_mlops(self):
+        assert (
+            _incident_owner_from_dag("quintoml.wonka.user_sale_houses_viewed", "Search")
+            == "MLOps"
+        )
+
+    def test_non_wonka_uses_airflow_owner(self):
+        assert (
+            _incident_owner_from_dag("bietlejuice.dw_listing", "Data House and Listing")
+            == "Data House and Listing"
+        )
+
+    def test_non_wonka_missing_owner_is_ae_all(self):
+        assert _incident_owner_from_dag("bietlejuice.unknown", None) == "AE All"
+
 
 class TestEnvironmentSuffix:
     def test_forno_suffix(self, monkeypatch):
@@ -123,7 +154,7 @@ class TestFetchDeiIssues:
                     "fields": {
                         "summary": "domain.failing_dag",
                         "created": "2026-05-05T01:00:00Z",
-                        "customfield_12078": {"value": "Data People"},
+                        "customfield_31231": {"value": "Data People"},
                     },
                 }
             ],
@@ -139,6 +170,9 @@ class TestFetchDeiIssues:
         assert issues[0]["key"] == "DEI-42"
         assert issues[0]["incident_owner"] == "Data People"
         assert issues[0]["summary"] == "domain.failing_dag"
+        requested_fields = mock_post.call_args[1]["json"]["fields"]
+        assert INCIDENT_OWNER_FIELD in requested_fields
+        assert "customfield_12078" not in requested_fields
 
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.post")
     def test_returns_none_incident_owner_when_field_missing(self, mock_post):
@@ -152,7 +186,7 @@ class TestFetchDeiIssues:
                     "fields": {
                         "summary": "domain.another_dag",
                         "created": "2026-05-05T02:00:00Z",
-                        "customfield_12078": None,
+                        "customfield_31231": None,
                     },
                 }
             ],
@@ -188,7 +222,7 @@ class TestFetchDeiIssues:
                     "fields": {
                         "summary": "dag1",
                         "created": "2026-05-05T01:00:00Z",
-                        "customfield_12078": None,
+                        "customfield_31231": None,
                     },
                 }
             ],
@@ -205,7 +239,7 @@ class TestFetchDeiIssues:
                     "fields": {
                         "summary": "dag2",
                         "created": "2026-05-05T02:00:00Z",
-                        "customfield_12078": None,
+                        "customfield_31231": None,
                     },
                 }
             ],
@@ -235,6 +269,10 @@ class TestResolveIssueOwners:
 
         assert result[0]["owner"] == "Data People"
         mock_put.assert_called_once()
+        put_payload = mock_put.call_args[1]["json"]
+        assert put_payload == {
+            "fields": {INCIDENT_OWNER_FIELD: {"value": "Data People"}}
+        }
 
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.put")
     def test_falls_back_to_ae_all_when_dag_not_found(self, mock_put):
@@ -273,6 +311,91 @@ class TestResolveIssueOwners:
         result = _resolve_issue_owners(issues, dag_owner_map, HTTPBasicAuth("u", "t"))
 
         assert result[0]["owner"] == "Data For Rent"
+        mock_put.assert_called_once()
+        put_payload = mock_put.call_args[1]["json"]
+        assert put_payload == {
+            "fields": {INCIDENT_OWNER_FIELD: {"value": "Data ForRent"}}
+        }
+
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.put")
+    def test_preserves_house_and_listing_already_set_on_31231(self, mock_put):
+        from requests.auth import HTTPBasicAuth
+
+        issues = [
+            {
+                "key": "DEI-26333",
+                "summary": "bietlejuice.dw_listing",
+                "incident_owner": "Data House and Listing",
+            }
+        ]
+        result = _resolve_issue_owners(issues, {}, HTTPBasicAuth("u", "t"))
+
+        assert result[0]["owner"] == "Data House and Listing"
+        mock_put.assert_not_called()
+
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.put")
+    def test_house_and_listing_owner_is_written_to_31231(self, mock_put):
+        """DEI-26333: DAG owner exists even if missing from the legacy display map."""
+        mock_put.return_value = mock.MagicMock(status_code=204)
+        from requests.auth import HTTPBasicAuth
+
+        issues = [
+            {
+                "key": "DEI-26333",
+                "summary": "bietlejuice.dw_listing",
+                "incident_owner": None,
+            }
+        ]
+        dag_owner_map = {"bietlejuice.dw_listing": "Data House and Listing"}
+
+        result = _resolve_issue_owners(issues, dag_owner_map, HTTPBasicAuth("u", "t"))
+
+        assert result[0]["owner"] == "Data House and Listing"
+        mock_put.assert_called_once()
+        put_payload = mock_put.call_args[1]["json"]
+        assert put_payload == {
+            "fields": {INCIDENT_OWNER_FIELD: {"value": "Data House and Listing"}}
+        }
+
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.put")
+    def test_wonka_search_dag_is_written_as_mlops(self, mock_put):
+        """DEI-26370: Search-owned Wonka DAGs land on MLOps in customfield_31231."""
+        mock_put.return_value = mock.MagicMock(status_code=204)
+        from requests.auth import HTTPBasicAuth
+
+        issues = [
+            {
+                "key": "DEI-26370",
+                "summary": "quintoml.wonka.user_sale_houses_viewed",
+                "incident_owner": None,
+            }
+        ]
+        dag_owner_map = {"quintoml.wonka.user_sale_houses_viewed": "Search"}
+
+        result = _resolve_issue_owners(issues, dag_owner_map, HTTPBasicAuth("u", "t"))
+
+        assert result[0]["owner"] == "MLOps"
+        mock_put.assert_called_once()
+        put_payload = mock_put.call_args[1]["json"]
+        assert put_payload == {"fields": {INCIDENT_OWNER_FIELD: {"value": "MLOps"}}}
+
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.put")
+    def test_wonka_prefix_maps_to_mlops_when_dag_missing_from_airflow(self, mock_put):
+        mock_put.return_value = mock.MagicMock(status_code=204)
+        from requests.auth import HTTPBasicAuth
+
+        issues = [
+            {
+                "key": "DEI-26370",
+                "summary": "quintoml.wonka.user_sale_houses_viewed",
+                "incident_owner": None,
+            }
+        ]
+        result = _resolve_issue_owners(issues, {}, HTTPBasicAuth("u", "t"))
+
+        assert result[0]["owner"] == "MLOps"
+        put_payload = mock_put.call_args[1]["json"]
+        assert put_payload == {"fields": {INCIDENT_OWNER_FIELD: {"value": "MLOps"}}}
 
 
 class TestGetScheduleTimeline:

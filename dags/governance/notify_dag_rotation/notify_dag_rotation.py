@@ -37,6 +37,9 @@ DEI_BOARD_URL = (
 )
 JIRA_SERVER = "https://quintoandar.atlassian.net"
 JIRA_OPS_API_BASE = "https://api.atlassian.com/jsm/ops/api"
+# DAGOwnerEnum-aligned Incident Owner. customfield_12078 is the deactivated legacy field.
+INCIDENT_OWNER_FIELD = "customfield_31231"
+WONKA_DAG_ID_PREFIX = "quintoml.wonka."
 
 _OWNER_DISPLAY_NAME_MAP = {
     "Data ForRent": "Data For Rent",
@@ -63,6 +66,13 @@ _OWNER_DISPLAY_NAME_MAP = {
     "Tech Platform Engineering Productivity": "Tech Platform Engineering Productivity",
     "QCX": "QCX",
     "Data DS Pricing": "Data DS Pricing",
+    "Search": "MLOps",
+}
+
+# Airflow owners that are not DAGOwnerEnum values but must land on a 31231 option.
+_AIRFLOW_OWNER_TO_INCIDENT_OWNER = {
+    "Search": "MLOps",
+    "MLOps Team": "MLOps",
 }
 
 
@@ -92,6 +102,24 @@ def _clean_dag_owner(raw_owners: str) -> str:
     return raw_owners.replace("airflow, ", "").replace(" ,airflow", "").strip()
 
 
+def _incident_owner_from_dag(dag_id: str, raw_owner: str | None) -> str:
+    """Resolve the Jira Incident Owner (customfield_31231) for a DAG.
+
+    Wonka DAGs always map to MLOps. Other DAGs use the Airflow owner, remapped
+    when that owner is not a DAGOwnerEnum / 31231 option.
+    """
+    if dag_id.startswith(WONKA_DAG_ID_PREFIX):
+        return "MLOps"
+    if not raw_owner:
+        return "AE All"
+    return _AIRFLOW_OWNER_TO_INCIDENT_OWNER.get(raw_owner, raw_owner)
+
+
+def _display_owner_name(owner: str) -> str:
+    """Map a DAGOwnerEnum value to the label used in the on-call notification."""
+    return _OWNER_DISPLAY_NAME_MAP.get(owner, owner)
+
+
 def _fetch_dei_issues(
     jira_auth: HTTPBasicAuth, dt_start: str, dt_end: str
 ) -> list[dict]:
@@ -110,7 +138,7 @@ def _fetch_dei_issues(
     while True:
         payload: dict = {
             "jql": jql,
-            "fields": ["id", "key", "summary", "created", "customfield_12078"],
+            "fields": ["id", "key", "summary", "created", INCIDENT_OWNER_FIELD],
             "maxResults": max_results,
         }
         if next_page_token:
@@ -121,7 +149,7 @@ def _fetch_dei_issues(
         data = resp.json()
 
         for issue in data.get("issues", []):
-            owner_field = issue["fields"].get("customfield_12078")
+            owner_field = issue["fields"].get(INCIDENT_OWNER_FIELD)
             incident_owner = owner_field.get("value") if owner_field else None
             all_issues.append(
                 {
@@ -153,32 +181,31 @@ def _resolve_issue_owners(
     """
     Resolve missing owners via the Airflow DagModel lookup and write them back to Jira.
 
-    Issues where incident_owner is None or 'AE All' are resolved by treating the
-    issue summary as a DAG ID and looking it up in the dag_owner_map (derived from
-    the Airflow DagModel, equivalent to datalake_astro_clean.dag).
+    Issues where incident_owner (customfield_31231) is None or 'AE All' are
+    resolved by treating the issue summary as a DAG ID and looking it up in
+    the dag_owner_map (derived from the Airflow DagModel). The value written
+    back to Jira is the DAGOwnerEnum string; the notification may use a
+    friendlier label from _OWNER_DISPLAY_NAME_MAP.
     """
     issues_to_update: dict[str, str] = {}
 
     for idx, issue in enumerate(issues):
         if issue["incident_owner"] in (None, "AE All"):
             raw_owner = dag_owner_map.get(issue["summary"])
-            display_owner = (
-                _OWNER_DISPLAY_NAME_MAP.get(raw_owner, "AE All")
-                if raw_owner
-                else "AE All"
-            )
+            jira_owner = _incident_owner_from_dag(issue["summary"], raw_owner)
+            display_owner = _display_owner_name(jira_owner)
             issues[idx]["owner"] = display_owner
-            if display_owner != "AE All":
-                issues_to_update[issue["key"]] = display_owner
+            if jira_owner != "AE All":
+                issues_to_update[issue["key"]] = jira_owner
         else:
-            issues[idx]["owner"] = issue["incident_owner"]
+            issues[idx]["owner"] = _display_owner_name(issue["incident_owner"])
 
     headers = {"Accept": "application/json", "Content-Type": "application/json"}
     problematic = []
     for issue_key, owner in issues_to_update.items():
         try:
             url = f"{JIRA_SERVER}/rest/api/3/issue/{issue_key}"
-            payload = {"fields": {"customfield_12078": {"value": owner}}}
+            payload = {"fields": {INCIDENT_OWNER_FIELD: {"value": owner}}}
             resp = requests.put(url, json=payload, headers=headers, auth=jira_auth)
             resp.raise_for_status()
             logger.info(
