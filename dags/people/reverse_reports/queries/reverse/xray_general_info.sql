@@ -127,6 +127,69 @@ final_tech_recency AS (
     WHERE
         bp.fechamento = lbf.max_fechamento
 ),
+primary_disability_ranked AS (
+    SELECT
+        dis.person_number,
+        dis.disability_status,
+        dis.documented_subclassification,
+        dis.work_restriction,
+        ROW_NUMBER() OVER (
+            PARTITION BY dis.person_number
+            ORDER BY dis.legislation_code
+        ) AS rn
+    FROM
+        dw_demographics.dim_employee_disability AS dis
+    WHERE
+        dis.is_primary = TRUE
+        AND DATE('{load_start_date}') >= dis.dt_valid_from
+        AND DATE('{load_start_date}') <= dis.dt_valid_to
+),
+primary_disability AS (
+    SELECT
+        person_number,
+        disability_status,
+        documented_subclassification,
+        work_restriction
+    FROM
+        primary_disability_ranked
+    WHERE
+        rn = 1
+),
+last_compensation_movement_ranked AS (
+    SELECT
+        fc.person_number,
+        fc.dt_valid_from AS dt_ultimo_movimento,
+        ed.reason_name_ptb AS tipo_ultimo_movimento,
+        fc.pct_adjustment / 100.0 AS pct_ultimo_movimento,
+        ROW_NUMBER() OVER (
+            PARTITION BY fc.person_number
+            ORDER BY fc.dt_valid_from DESC
+        ) AS rn
+    FROM
+        dw_compensation.fact_compensations AS fc
+    INNER JOIN
+        dw_compensation.dim_event_definition AS ed
+            ON fc.sk_event_definition = ed.sk_event_definition
+    WHERE
+        ed.reason_name_ptb IN ('Mérito', 'Promoção', 'Recrutamento Interno')
+        AND fc.dt_valid_from <= DATE('{load_start_date}')
+        AND COALESCE(fc.amount_adjustment, 0) > 0
+        AND (
+            fc.pct_adjustment IS NULL
+            OR fc.pct_adjustment >= 1
+        )
+),
+last_compensation_movement AS (
+    SELECT
+        person_number,
+        dt_ultimo_movimento,
+        tipo_ultimo_movimento,
+        pct_ultimo_movimento
+    FROM
+        last_compensation_movement_ranked
+    WHERE
+        rn = 1
+),
 employee_base AS (
     SELECT
         es.consolidated_business_unit_name AS empresa,
@@ -424,8 +487,14 @@ SELECT
     eb.motivo_desligamento,
     eb.sexo,
     eb.dt_nascimento,
+    dis.disability_status,
+    dis.documented_subclassification,
+    dis.work_restriction,
     eb.tabela_salarial,
     eb.salario,
+    lcm.pct_ultimo_movimento,
+    lcm.tipo_ultimo_movimento,
+    lcm.dt_ultimo_movimento,
     eb.address,
     eb.address_city_state_zip,
     eb.numero_celular,
@@ -449,6 +518,12 @@ SELECT
     DAY(DATE('{load_start_date}')) AS day
 FROM
     employee_base AS eb
+LEFT JOIN
+    primary_disability AS dis
+        ON eb.matricula = dis.person_number
+LEFT JOIN
+    last_compensation_movement AS lcm
+        ON eb.matricula = lcm.person_number
 LEFT JOIN
     manager_org AS mo
         ON eb.manager_assignment_number = mo.assignment_number
