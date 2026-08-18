@@ -1,7 +1,9 @@
 database_name: datalake_fairness_assessment
 table_name: fairness_classification
 arrival:
-  days_of_week: all
-  earliest_hour: 8
-  reason: enrich_fairness_assessment runs 0 6 * * *
-  source: inferred
+  mute: true
+  reason: >-
+    Unpartitioned Delta table (full-table MERGE). Empty-partition monitor invents
+    a run-day partition from DAG default_partitions and false-alerts when
+    row_count for that key is 0 despite rows_written > 0 on the table grain.
+  source: manual

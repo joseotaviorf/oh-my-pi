@@ -3,9 +3,10 @@ name: infer-sla-expectations
 description: >-
   Propose domain-owned arrival SLA files for empty-partition monitoring. Combines
   producer DAG schedule, Trino partition history, and dependencies.yaml to infer
-  days_of_week and earliest_hour, then opens a PR for domain review. Use when
-  auto-filling sla/<layer>/<table>.yml files, reducing empty-partition alert
-  noise, or onboarding tables to calendar-aware SLAs.
+  days_of_week and earliest_hour, then opens a PR for domain review. Mute
+  unpartitioned tables (out of empty-partition scope). Use when auto-filling
+  sla/<layer>/<table>.yml files, reducing empty-partition alert noise, or
+  onboarding tables to calendar-aware SLAs.
 ---
 
 # Infer SLA Expectations
@@ -24,6 +25,8 @@ the domain approves via PR (`CODEOWNERS` routes `dags/<domain>/**`).
   expected load hour.
 - Bulk onboarding noisy tables after the monitor ships.
 - User asks to "infer SLA", "auto-fill arrival SLA", or "reduce empty partition noise".
+- An **unpartitioned** table is alerting (or would alert) — mute it; do not invent a
+  calendar SLA (see **§1a**).
 
 ---
 
@@ -44,8 +47,8 @@ the domain approves via PR (`CODEOWNERS` routes `dags/<domain>/**`).
 1. **Trino MCP** (`plugin-trino-mcp-Trino MCP`): if the server needs auth, call `mcp_auth`
    with `{}` via `CallMcpTool` before the first query. Use fully qualified names
    (`hive.<schema>.<table>`).
-2. **`describe_table`** — confirm `year` / `month` / `day` partition columns before
-   running history SQL.
+2. **`describe_table`** — confirm **physical** `year` / `month` / `day` partition columns
+   before running history SQL. If none exist, stop cadence inference and follow **§1a**.
 3. **`execute_query`** — run the cadence SQL below (aggregates only; never `SELECT *`).
 4. **Fallback** if MCP is unavailable or still fails after auth: `uv run --script
    .cursor/skills/trino/scripts/execute_trino.py` with `--external-auth` (same pattern as
@@ -63,7 +66,7 @@ Accept one of:
 | Input | Action |
 |-------|--------|
 | Single table | `database_name.table_name` or path to `metadata/<layer>/<table>.yml` |
-| DAG | All partitioned tables in `queries/<layer>/` for that DAG |
+| DAG | All **physically partitioned** tables in `queries/<layer>/` for that DAG; mute any unpartitioned ones per **§1a** |
 | Domain folder | All DAGs under `dags/<domain>/` (batch; prefer DAG-by-DAG PRs) |
 
 ---
@@ -77,7 +80,47 @@ For each target table:
 1. Locate the producing DAG folder (`dags/<domain>/<dag>/`).
 2. Read `metadata/<layer>/<table>.yml` → `database_name`, `table_name`.
 3. Read `<dag>_declaration.yml` → `dag.schedule_interval` (cron).
-4. Confirm the table is partitioned (`year`/`month`/`day` in declaration or metadata).
+4. Decide **partitioned vs unpartitioned** using **§1a** (hard gate before §2).
+
+### 1a. Unpartitioned tables — mute, do not alert
+
+Empty-partition monitoring is **only** for tables with a real partition grain (typically
+`year` / `month` / `day`). Unpartitioned tables must **not** receive calendar SLAs and
+must **not** stay on the default alert path.
+
+**Why mute is required:** a missing `sla/<layer>/<table>.yml` still alerts on empty
+run-day keys (`missing SLA file = alert on empty`). Profiling may also invent a
+partition key from DAG `default_partitions` even when Delta/`DESCRIBE` has
+`partitionColumns = []`, producing `row_count = 0` false positives while the table
+grain still has data (`rows_written > 0`). Do **not** “fix” that by gating the judge
+on `rows_written`; mute the table instead.
+
+**Treat as unpartitioned when any of these hold** (physical truth wins over DAG
+defaults):
+
+| Signal | Unpartitioned if… |
+|--------|-------------------|
+| Trino / metastore | No partition columns on `describe_table` / table detail |
+| Delta | `partitionColumns` empty (or equivalent DESCRIBE DETAIL) |
+| Declaration | Effective partitions are `[]` (per-table `partitions: []` overrides `default_partitions`) **and** load/SQL writes the full table (e.g. MERGE without `partition_by`) |
+| Schema / load | No `year`/`month`/`day` partition layout; full-table overwrite/MERGE |
+
+**Do not** trust workflow-root `default_partitions: [year, month, day]` alone — that
+config can apply to a DAG while an individual table remains unpartitioned.
+
+When unpartitioned: **skip §2–§4**. Write a mute SLA and continue to §6–§7:
+
+```yaml
+database_name: <from metadata>
+table_name: <from metadata>
+
+arrival:
+  mute: true
+  reason: "Unpartitioned table (full-table load/MERGE); empty-partition monitor out of scope"
+  source: manual
+```
+
+PR title example: `chore(<domain>): mute empty-partition SLA for unpartitioned <table_name>`.
 
 ### 2. Query Trino for observed cadence (~8 weeks)
 
@@ -152,7 +195,8 @@ arrival:
 
 **Do not** add `owner` — ownership lives in `metadata/`.
 
-For full suppression (replaces legacy `empty_partition_suppression.yml`):
+For full suppression (replaces legacy `empty_partition_suppression.yml`), including
+**all unpartitioned tables** (§1a):
 
 ```yaml
 arrival:
@@ -201,12 +245,18 @@ PR description must include:
 
 1. Start with the **noisiest** tables (most empty-partition alerts in GChat).
 2. Prefer **small PRs** (one DAG or ≤10 tables) for faster review via `CODEOWNERS`.
-3. Do **not** set `mute: true` unless the domain explicitly requests full suppression.
+3. **Always** set `mute: true` for **unpartitioned** tables (§1a) — empty-partition
+   alerts are out of scope for them.
+4. For **partitioned** tables, do **not** set `mute: true` unless the domain
+   explicitly requests full suppression (calendar/cadence is preferred over mute).
 
 ---
 
 ## Out of scope
 
+- Changing the empty-partition **judge** to skip when `rows_written > 0` (keep
+  inventory `row_count` as the trigger; use mute / correct partitioning for
+  unpartitioned false positives).
 - `dag_sla_information` migration (Phase 2 —
   `docs/superpowers/specs/2026-08-04-dag-sla-migration-phase2-design.md`).
 - `freshness` / `volume` facets (schema allows; not implemented in v1).
