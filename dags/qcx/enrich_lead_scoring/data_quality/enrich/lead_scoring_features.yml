@@ -68,8 +68,16 @@ column_level_validations:
   n_qualifiers_captured:
     is_complete:
       severity_level: Error
+    # PyDeequ isContainedIn takes a Java String[]; YAML ints crash the
+    # suite at build time (Cannot convert java.lang.Integer to java.lang.String).
     is_contained_in:
-      values: [0, 1, 2, 3, 4, 5]
+      values:
+        - "0"
+        - "1"
+        - "2"
+        - "3"
+        - "4"
+        - "5"
       severity_level: Error
   # Null is valid (no handoff or that chat source has no rows); min ignores nulls.
   n_lead_turns_blip:
