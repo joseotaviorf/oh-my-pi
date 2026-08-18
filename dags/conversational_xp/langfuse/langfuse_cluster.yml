@@ -1,11 +1,10 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_libraries:
   # langfuse==3.0.0 requires packaging>=23.2,<25; overlay RPM packaging via
   # ignore_installed before the client install (EMR bootstrap only).
   - pypi:
-      package: 'packaging>=23.2,<25'
+      package: packaging>=23.2,<25
       ignore_installed: true
   - pypi:
       package: langfuse==3.0.0
@@ -14,29 +13,19 @@ cluster:
       availability: ON_DEMAND
     spark_conf:
       spark.driver.maxResultSize: '0'
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    num_workers: 7
-    driver_node_type_id: r7g.2xlarge
-validation:
-  cluster:
-    type: emr_7_12_consolidation_s_memory_fleet_cluster
-    custom_configurations:
-      master_node_type_id: r6g.2xlarge
-      task_nodes:
-        instance_types:
-        - r6g.xlarge
-        - r7g.xlarge
-        - r6i.xlarge
-        target_on_demand: 5
-        target_spot: 0
-      core_nodes:
-        target_on_demand: 2
-        target_spot: 0
-        instance_types:
-        - r6g.xlarge
-        - r7g.xlarge
-        - r6i.xlarge
-      spark_conf:
-        spark.driver.maxResultSize: '0'
-        spark.yarn.am.memory: 3g
-  allow_custom_spark_job: true
+      spark.yarn.am.memory: 3g
+    master_node_type_id: r6g.2xlarge
+    task_nodes:
+      instance_types:
+      - r6g.xlarge
+      - r7g.xlarge
+      - r6i.xlarge
+      target_on_demand: 5
+      target_spot: 0
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - r6g.xlarge
+      - r7g.xlarge
+      - r6i.xlarge
