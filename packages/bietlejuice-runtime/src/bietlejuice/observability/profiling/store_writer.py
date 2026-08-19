@@ -9,9 +9,12 @@ Tables are created lazily as external Delta tables on first write, partitioned b
 ``year``/``month``/``day``; subsequent runs append. ``mergeSchema`` allows the
 row shape to evolve forward-compatibly (paired with ``metric_schema_version``).
 
-After each append, access is published the same way as ``DeltaTableLoaderPipeline``:
-secondary-catalog sync (Glue on Databricks → Trino ``hive`` catalog) and default UC
-grants via ``TablePrivileges.from_environment_default``.
+After each append, catalog publication mirrors custom Delta spark jobs
+(CDC / Monalisa / Olos) and ``DeltaTableLoaderPipeline``: ``sync_delta_write_to_secondary_catalog``
+(``REFRESH TABLE`` + Glue on Databricks / UC REST on EMR) and default UC grants via
+``TablePrivileges.from_environment_default`` when Unity Catalog is enabled (EMR never
+applies UC grants). Trino ``hive`` visibility comes from Glue, not from SST
+``sync_trino_metadata``.
 """
 
 from __future__ import annotations
@@ -70,32 +73,34 @@ class ObservabilityStoreWriter:
                 .saveAsTable(fqtn)
             )
         logger.info(f"Appended {len(rows)} row(s) to {fqtn} at {location}.")
-        self._publish_table_access(table, fqtn, location, dataframe)
+        self._publish_table_access(fqtn, location, dataframe)
         return len(rows)
 
     def _publish_table_access(
-        self, table: str, fqtn: str, location: str, dataframe: DataFrame
+        self, fqtn: str, location: str, dataframe: DataFrame
     ) -> None:
-        """Mirror ``DeltaTableLoaderPipeline.load_and_register`` post-write hooks."""
+        """Mirror post-write hooks from ``DeltaTableLoaderPipeline`` / custom Delta jobs."""
         from bietlejuice.base.databricks.table_privileges import TablePrivileges
-        from bietlejuice.base.spark.catalog_strategy_resolver import (
-            CatalogStrategyResolver,
+        from bietlejuice.base.spark.delta_secondary_catalog_sync import (
+            sync_delta_write_to_secondary_catalog,
         )
         from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
-        from bietlejuice.services.schema_service import SchemaService
 
         if not self.spark.catalog.tableExists(fqtn):
+            logger.warning(
+                f"Skipping access publish for {fqtn}: table missing from Spark catalog."
+            )
             return
 
-        table_schema = SchemaService.get_schema_from_dataframe(dataframe)
+        # Glue/UC helpers log success/failure internally and do not re-raise; only
+        # REFRESH TABLE failures surface here (same as DeltaTableLoaderPipeline).
         try:
-            CatalogStrategyResolver.sync_to_secondary_catalog(
-                database_name=DATABASE,
-                table_name=table,
-                table_location=location,
-                table_schema=table_schema,
-                partitions=PARTITION_COLUMNS,
-                format_str="DELTA",
+            sync_delta_write_to_secondary_catalog(
+                spark=self.spark,
+                full_table_name=fqtn,
+                table_location_s3=location,
+                source_df=dataframe,
+                partition_col_names=PARTITION_COLUMNS,
             )
         except Exception as error:
             logger.error(f"Failed to sync {fqtn} to secondary catalog: {error}")
@@ -104,6 +109,7 @@ class ObservabilityStoreWriter:
             return
         try:
             TablePrivileges.from_environment_default(fqtn).apply()
+            logger.info(f"Applied default UC table privileges on {fqtn}.")
         except Exception as error:
             logger.error(f"Failed to apply default table privileges on {fqtn}: {error}")
 

@@ -1,3 +1,4 @@
+import sys
 from unittest import mock
 
 from bietlejuice.observability.profiling.store_schemas import TABLE_METRICS_SCHEMA
@@ -144,3 +145,83 @@ class TestAppend:
         save_as_table = write_chain.mode.return_value.option.return_value.partitionBy
         save_as_table.assert_not_called()
         _publish_access.assert_called_once()
+
+
+class TestPublishTableAccess:
+    @staticmethod
+    def _publish_access_modules(mock_sync_secondary, uc_enabled=False):
+        mock_uc_helper = mock.MagicMock()
+        mock_uc_helper.is_cluster_unity_catalog_enabled.return_value = uc_enabled
+
+        fake_delta_module = mock.MagicMock()
+        fake_delta_module.sync_delta_write_to_secondary_catalog = mock_sync_secondary
+
+        fake_uc_module = mock.MagicMock()
+        fake_uc_module.UnityCatalogHelper = mock_uc_helper
+
+        return {
+            "bietlejuice.base.spark": mock.MagicMock(),
+            "bietlejuice.base.spark.delta_secondary_catalog_sync": fake_delta_module,
+            "bietlejuice.base.spark.unity_catalog_helper": fake_uc_module,
+            "bietlejuice.base.databricks.table_privileges": mock.MagicMock(),
+        }
+
+    def test_secondary_catalog_sync_does_not_log_false_success(self):
+        # Arrange — Glue/UC helpers swallow failures; sync returns without raising
+        mock_sync_secondary = mock.MagicMock()
+        spark = mock.MagicMock()
+        spark.catalog.tableExists.return_value = True
+        writer = _writer(spark)
+        dataframe = mock.MagicMock()
+        fqtn = "datalake_observability.profile_table_metrics"
+        location = "s3://bucket/datalake_observability/profile_table_metrics"
+
+        # Act
+        with (
+            mock.patch.dict(
+                sys.modules,
+                self._publish_access_modules(mock_sync_secondary),
+            ),
+            mock.patch(
+                "bietlejuice.observability.profiling.store_writer.logger"
+            ) as mock_logger,
+        ):
+            writer._publish_table_access(fqtn, location, dataframe)
+
+        # Assert — rely on helper-level logs, not a blanket success message
+        mock_sync_secondary.assert_called_once()
+        success_logs = [
+            call
+            for call in mock_logger.info.call_args_list
+            if "secondary catalog" in str(call).lower()
+        ]
+        assert success_logs == []
+
+    def test_secondary_catalog_refresh_failure_is_logged(self):
+        # Arrange
+        mock_sync_secondary = mock.MagicMock(
+            side_effect=RuntimeError("REFRESH TABLE failed")
+        )
+        spark = mock.MagicMock()
+        spark.catalog.tableExists.return_value = True
+        writer = _writer(spark)
+        dataframe = mock.MagicMock()
+        fqtn = "datalake_observability.profile_table_metrics"
+        location = "s3://bucket/datalake_observability/profile_table_metrics"
+
+        # Act
+        with (
+            mock.patch.dict(
+                sys.modules,
+                self._publish_access_modules(mock_sync_secondary),
+            ),
+            mock.patch(
+                "bietlejuice.observability.profiling.store_writer.logger"
+            ) as mock_logger,
+        ):
+            writer._publish_table_access(fqtn, location, dataframe)
+
+        # Assert — REFRESH TABLE errors still surface; UC grants skipped (UC off)
+        mock_logger.error.assert_any_call(
+            f"Failed to sync {fqtn} to secondary catalog: REFRESH TABLE failed"
+        )

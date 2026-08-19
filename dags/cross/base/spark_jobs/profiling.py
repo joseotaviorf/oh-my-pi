@@ -83,7 +83,7 @@ def main() -> None:
         spark = create_emr_spark_session(JOB_NAME)
 
     args = parse_args()
-    os.environ.setdefault("ENVIRONMENT", args.env.lower())
+    os.environ["ENVIRONMENT"] = args.env.lower()
     logger.info(
         f"m={JOB_NAME}, env={args.env}, database={args.database}, table={args.table}, "
         f"layer={args.layer}, run_logical_date={args.run_logical_date}, "
