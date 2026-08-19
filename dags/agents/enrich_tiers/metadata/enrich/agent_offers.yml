@@ -64,7 +64,9 @@ columns:
   dt_contract_cancelled:
     lineage:
       - datalake_sale_offer.sale_offer.dt_sale_agreement_cancelled
-    description: Contract cancellation date when applicable (SALE only).
+    description: |
+      Contract cancellation date when applicable (SALE only), as America/Sao_Paulo
+      calendar date from the UTC cancellation timestamp.
   ts_contract_signed:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.ts_event

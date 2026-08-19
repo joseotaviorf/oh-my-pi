@@ -1,3 +1,5 @@
+-- Contract-signed period keys use America/Sao_Paulo calendar date, not DATE(utc_ts).
+-- DATE(ts) on UTC timestamps moves late-evening BRT signatures into the next month.
 WITH metric_period_process AS (
     SELECT DISTINCT
         mp.id,
@@ -44,7 +46,7 @@ sale_contract_signed_simple_metrics AS (
         mp_invalid.id IS NULL AS is_valid,
         FALSE AS is_compound_metric_part,
         IF(mp.metric IN ("GMV", "VGV_CONV"), TRUE, FALSE) AS is_cumulative_metric,
-        DATE(ao.ts_contract_signed) AS dt_become_valid,
+        DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
         IF(mp_invalid.id IS NOT NULL, ao.dt_contract_cancelled, NULL) AS ts_invalidation,
         ao.ts_updated,
         mp.year,
@@ -54,11 +56,11 @@ sale_contract_signed_simple_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(ao.ts_contract_signed) BETWEEN mp.dt_init AND mp.dt_end
+            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
             AND mp.metric IN ("CCV", "CCV_TQC", "GMV", "VGV_CONV")
     LEFT JOIN
         metric_period_process AS mp_invalid
-            ON DATE(ao.ts_contract_signed) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
             AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
             AND mp_invalid.metric = mp.metric
     WHERE
@@ -93,7 +95,7 @@ sale_contract_signed_with_ciq_simple_metrics AS (
         mp_invalid.id IS NULL AND cfl.is_first_listing_valid IS TRUE AS is_valid,
         FALSE AS is_compound_metric_part,
         IF(mp.metric = "VGV_ACQ", TRUE, FALSE) AS is_cumulative_metric,
-        DATE(ao.ts_contract_signed) AS dt_become_valid,
+        DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
         IF(
             mp_invalid.id IS NOT NULL OR cfl.is_first_listing_valid IS FALSE, 
             COALESCE(ao.dt_contract_cancelled, mp.dt_end), 
@@ -112,11 +114,11 @@ sale_contract_signed_with_ciq_simple_metrics AS (
             AND cfl.business_context = ao.business_context
     JOIN
         metric_period_process AS mp
-            ON DATE(ao.ts_contract_signed) BETWEEN mp.dt_init AND mp.dt_end
+            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
             AND mp.metric IN ("CCV_CIQ", "VGV_ACQ")
     LEFT JOIN
         metric_period_process AS mp_invalid
-            ON DATE(ao.ts_contract_signed) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
             AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
             AND mp_invalid.metric = mp.metric
     WHERE
@@ -132,7 +134,7 @@ sale_vgv_total_attribution AS (
         ao.uuid_person,
         ao.id_offer,
         ao.agreement_value,
-        DATE(ao.ts_contract_signed) AS dt_contract_signed,
+        DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_contract_signed,
         ao.dt_contract_cancelled,
         ao.ts_updated,
         mp_invalid.id IS NOT NULL AS is_invalid_by_cancellation
@@ -141,7 +143,7 @@ sale_vgv_total_attribution AS (
     LEFT JOIN
         metric_period_process AS mp_invalid
             ON mp_invalid.metric = "VGV_TOTAL"
-            AND DATE(ao.ts_contract_signed) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            AND DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
             AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
     WHERE
         ao.business_context = "SALE"
@@ -165,7 +167,7 @@ sale_vgv_total_attribution AS (
             cfl.uuid_person,
             ao.id_offer,
             ao.agreement_value,
-            DATE(ao.ts_contract_signed) AS dt_contract_signed,
+            DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_contract_signed,
             ao.dt_contract_cancelled,
             ao.ts_updated,
             mp_invalid.id IS NOT NULL AS is_invalid_by_cancellation,
@@ -185,7 +187,7 @@ sale_vgv_total_attribution AS (
         LEFT JOIN
             metric_period_process AS mp_invalid
                 ON mp_invalid.metric = "VGV_TOTAL"
-                AND DATE(ao.ts_contract_signed) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+                AND DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
                 AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
         WHERE
             ao.business_context = "SALE"
@@ -276,7 +278,7 @@ sale_contract_signed_compound_metrics AS (
         mp_invalid.id IS NULL AS is_valid,
         TRUE AS is_compound_metric_part,
         FALSE AS is_cumulative_metric,
-        DATE(ao.ts_contract_signed) AS dt_become_valid,
+        DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
         IF(mp_invalid.id IS NOT NULL, ao.dt_contract_cancelled, NULL) AS ts_invalidation,
         ao.ts_updated,
         mp.year,
@@ -286,11 +288,11 @@ sale_contract_signed_compound_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(ao.ts_contract_signed) BETWEEN mp.dt_init AND mp.dt_end
+            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
             AND mp.metric IN ("OS2CCV_BY", "BP2CCV")
     LEFT JOIN
         metric_period_process AS mp_invalid
-            ON DATE(ao.ts_contract_signed) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
             AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
             AND mp_invalid.metric = mp.metric
     WHERE
@@ -313,7 +315,7 @@ rent_contract_signed_simple_metrics AS (
         TRUE AS is_valid,
         FALSE AS is_compound_metric_part,
         FALSE AS is_cumulative_metric,
-        DATE(ao.ts_contract_signed) AS dt_become_valid,
+        DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
         NULL AS ts_invalidation,
         ao.ts_updated,
         mp.year,
@@ -323,7 +325,7 @@ rent_contract_signed_simple_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(ao.ts_contract_signed) BETWEEN mp.dt_init AND mp.dt_end
+            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
             AND mp.metric IN ("CS")
     WHERE
         ao.business_context = "RENT"
@@ -345,7 +347,7 @@ rent_contract_signed_compound_metrics AS (
         TRUE AS is_valid,
         TRUE AS is_compound_metric_part,
         FALSE AS is_cumulative_metric,
-        DATE(ao.ts_contract_signed) AS dt_become_valid,
+        DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
         NULL AS ts_invalidation,
         ao.ts_updated,
         mp.year,
@@ -355,7 +357,7 @@ rent_contract_signed_compound_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(ao.ts_contract_signed) BETWEEN mp.dt_init AND mp.dt_end
+            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
             AND mp.metric IN ("TP2CS")
     WHERE
         ao.business_context = "RENT"

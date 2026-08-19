@@ -11,7 +11,7 @@ WITH sale_offer_agents AS (
         os.id_offer IS NOT NULL AS has_broker_tqc,
         os2.id_offer IS NOT NULL AS has_negotiation_executive_tqc,
         IF(
-            DATE(so.ts_sale_agreement_signed) <= so.ts_sale_agreement_canceled,
+            DATE(FROM_UTC_TIMESTAMP(so.ts_sale_agreement_signed, 'America/Sao_Paulo')) <= so.ts_sale_agreement_canceled,
             so.ts_sale_agreement_canceled,
             NULL
         ) AS dt_contract_cancelled,
@@ -151,7 +151,7 @@ SELECT
     uoa.is_ciq_first_listing,
     uoa.dt_contract_cancelled IS NOT NULL AS is_contract_cancelled,
     uoa.ts_contract_signed IS NOT NULL AS is_contract_signed,
-    CAST(uoa.dt_contract_cancelled AS DATE) AS dt_contract_cancelled,
+    DATE(FROM_UTC_TIMESTAMP(uoa.dt_contract_cancelled, 'America/Sao_Paulo')) AS dt_contract_cancelled,
     uoa.ts_contract_signed,
     uoa.ts_offer_submitted,
     uoa.ts_updated,

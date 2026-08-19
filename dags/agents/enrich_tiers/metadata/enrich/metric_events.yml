@@ -92,6 +92,8 @@ columns:
     description: |
       Date when the event becomes valid for the metric period (contract signed,
       offer submitted or prospect event date, depending on the domain/metric).
+      Contract-signed metrics convert ts_contract_signed with FROM_UTC_TIMESTAMP
+      to America/Sao_Paulo before DATE(), matching Nazaré civil date / BRT.
   ts_invalidation:
     lineage:
       - datalake_tiers.metric_period.dt_end
