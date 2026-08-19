@@ -1,6 +1,6 @@
 dag:
   name: claude_admin_api
-  owner: Tech Platform Enterprise Engineering
+  owner: Data People
   callback_by_task: False
   catchup: false
   schedule_interval: 0 6 * * *
@@ -33,7 +33,7 @@ workflow:
     - month
     - day
   default_table_privileges:
-    auditlogs:
+    people-team:
       - ALL PRIVILEGES
 
   extra_query_template_params:
