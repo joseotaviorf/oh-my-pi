@@ -1,63 +1,74 @@
 database_name: datalake_expected_contribution_margin
 table_name: fs_ecm_by_events
 domain: Growth
-description: This table contains the estimated revenue that each ForSale contract will bring to QuintoAndar.
+description: |
+  For Sale expected contribution margin projections at the VB (visit booked) event
+  grain. One row per for-sale-ecm EMLIO inference request, keyed by id_request.
+  id_event retains the legacy booking id (id_booking) for schema compatibility.
+  id_flow is the canonical sale flow id (buyer x house). Event time uses ts_log
+  because the online for-sale-ecm service does not populate ts_event.
+owner: vinicius.araujo@quintoandar.com.br
 columns:
   id_flow:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    description: Unique key of the sale flow
+      - datalake_expected_contribution_margin.expected_contribution_margin.id_user
+      - datalake_expected_contribution_margin.expected_contribution_margin.id_house
+    description: |
+      Canonical sale flow identifier: CONCAT(id_prospect, '_', id_house), matching
+      datalake_sale_flows.sale_flow.id_sale_flow.
   id_house:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    description: QuintoAndar property identifier associated with the contract in the margin projection.
+      - datalake_expected_contribution_margin.expected_contribution_margin.id_house
+    description: QuintoAndar property identifier associated with the VB event.
   id_prospect:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    description: Unique key of the buyer prospect (also known as id_user or id_buyer in other tables)
+      - datalake_expected_contribution_margin.expected_contribution_margin.id_user
+    description: Buyer prospect user id (id_user in the EMLIO request payload).
+  id_request:
+    lineage:
+      - datalake_expected_contribution_margin.expected_contribution_margin.id_request
+    description: Unique EMLIO inference request id (outputs.request_id).
   id_event:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    description: Unique key of the event (equal to the id_booking)
+      - datalake_booking.booking.id
+    description: |
+      Legacy booking identifier (id_booking) of the earliest sale booking for the visit
+      code as of the ECM request (ROW_NUMBER by booking.ts_created). Null when the visit
+      code has no sale booking.
+  visit_code:
+    lineage:
+      - datalake_expected_contribution_margin.expected_contribution_margin.id_entity
+    description: Visit alphanumeric code scored by the online ECM service (id_entity).
   event_type:
-    lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    description: Always equals to VB (Visit Booked)
-  ts_event:
-    lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    description: Timestamp of when the event was generated
+    description: Demand funnel event type scored by ECM. Always VB for this table.
   estimated_conversion:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    - datalake_batch_inference_clean.batch_inference.output_data
-    description: The estimated probability of conversion of the event.
+      - datalake_expected_contribution_margin.expected_contribution_margin.estimated_conversion_probability
+    description: Estimated probability of conversion returned by the online ECM service.
   estimated_discount:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    - datalake_batch_inference_clean.batch_inference.output_data
-    description: The estimated discount that will be negotiated on the listing price.
+      - datalake_expected_contribution_margin.expected_contribution_margin.estimated_discount
+    description: Estimated discount rate returned by the online ECM service.
   estimated_gross_revenue:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    - datalake_batch_inference_clean.batch_inference.output_data
-    description: Projected gross revenue for the contract month before taxes and revenue sharing.
+      - datalake_expected_contribution_margin.expected_contribution_margin.estimated_gross_revenue
+    description: Projected gross revenue returned by the online ECM service.
   estimated_net_revenue:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    - datalake_batch_inference_clean.batch_inference.output_data
-    description: Projected net revenue after sales tax and brokerage revenue sharing deductions.
+      - datalake_expected_contribution_margin.expected_contribution_margin.estimated_net_revenue
+    description: Projected net revenue returned by the online ECM service.
   estimated_contribution_margin:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    - datalake_batch_inference_clean.batch_inference.output_data
-    description: Projected contribution margin for the contract month after revenue and loss adjustments.
+      - datalake_expected_contribution_margin.expected_contribution_margin.estimated_contribution_margin
+    description: Projected contribution margin returned by the online ECM service.
   dt_event_time:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    description: Timestamp of the demand funnel event that triggered the margin projection.
-  dt_inference:
+      - datalake_expected_contribution_margin.expected_contribution_margin.ts_log
+    description: Date partition key derived from ts_log (EMLIO write time).
+  ts_event:
     lineage:
-    - datalake_batch_inference_clean.batch_inference.input_data
-    description: Date when the machine learning inference was run; partition key for incremental scoring loads.
-owner: vinicius.araujo@quintoandar.com
+      - datalake_booking.booking.ts_created
+      - datalake_expected_contribution_margin.expected_contribution_margin.ts_log
+    description: |
+      Timestamp of the earliest sale booking for the visit code (booking.ts_created);
+      falls back to ts_log (EMLIO write time) when there is no booking match.

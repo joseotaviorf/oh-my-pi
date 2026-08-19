@@ -68,7 +68,16 @@ columns:
   ts_event:
     lineage:
       - datalake_emlio_clean.emlio_logs.inputs
-    description: Timestamp of the demand funnel event that triggered the ECM inference.
+    description: |
+      Timestamp of the demand funnel event that triggered the ECM inference, parsed from
+      request.ts_event in the EMLIO inputs payload. Null for for-sale-ecm when the
+      service does not populate ts_event in the request.
+  ts_log:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.ts_log
+    description: |
+      Timestamp when the EMLIO log record was written. Used as the event-time fallback
+      for for-sale-ecm rows where request.ts_event is not populated.
   features:
     lineage:
       - datalake_emlio_clean.emlio_logs.inputs

@@ -8,6 +8,9 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
+  inner_dependencies:
+    fs_ecm_by_events:
+      - expected_contribution_margin
   tables_customization:
     expected_contribution_margin:
       partitions: [year, month, day]
@@ -22,8 +25,8 @@ workflow:
     fs_ecm_by_events:
       partitions: [dt_event_time]
       extra_query_template_params:
-        start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'start_date') }}"
-        end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'end_date') }}"
+        load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+        load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
     observed_contribution_margin:
       partitions: [month_of_year]
       extra_query_template_params:

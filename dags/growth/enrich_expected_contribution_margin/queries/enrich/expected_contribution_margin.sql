@@ -14,6 +14,7 @@ SELECT
     CAST(GET_JSON_OBJECT(outputs, '$.estimated_duration') AS DOUBLE) AS estimated_duration,
     CAST(GET_JSON_OBJECT(outputs, '$.estimated_default_probability') AS DOUBLE) AS estimated_default_probability,
     CAST(GET_JSON_OBJECT(inputs, '$.request.ts_event') AS TIMESTAMP) AS ts_event,
+    ts_log,
     GET_JSON_OBJECT(inputs, '$.features') AS features,
     GET_JSON_OBJECT(inputs, '$.request') AS request,
     year,
