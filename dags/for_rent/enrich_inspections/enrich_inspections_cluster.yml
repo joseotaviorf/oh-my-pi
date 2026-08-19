@@ -1,24 +1,22 @@
 cluster:
   type: emr_7_12_consolidation_l_general_fleet_cluster
   custom_configurations:
-    # The tier default (2 CORE, no TASK) mirrors num_workers: 2, but this DAG ran on
-    # Databricks with num_workers: 3. Two TASK nodes keep worker capacity above what it
-    # replaces, since each EMR node yields 8 task slots (2 executors x 4 cores) against
-    # the 16 of a Databricks worker.
-    # Master is one tier up because emr_deploy_mode is client: every table's driver runs
-    # on the master, and this DAG starts ~12 tables in parallel.
+    # Was defaulting to StepConcurrencyLevel 4 (~12 first-wave tables queued
+    # PENDING); doubled, matching the fix pattern used on dw_evictions /
+    # enrich_ai_collections_quintoandar. See PR description for the full analysis.
+    step_concurrency_level: 8
     master_node_type_id: m6g.8xlarge
     core_nodes:
       target_on_demand: 2
       target_spot: 0
       instance_types:
-        - m6g.4xlarge
-        - m7g.4xlarge
+        - m6g.8xlarge
+        - m7g.8xlarge
     task_nodes:
       target_on_demand: 0
       target_spot: 2
       instance_types:
-        - m6g.4xlarge
-        - m7g.4xlarge
+        - m6g.8xlarge
+        - m7g.8xlarge
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
