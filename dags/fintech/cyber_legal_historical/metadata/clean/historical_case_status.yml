@@ -17,6 +17,10 @@ columns:
     description: "Client unique identification (CPF/CNPJ)"
     lineage:
       - datalake_cyber_legal_historical_raw.case.CESSNUM
+  id_attorney_agency:
+    description: "Identifier of the external law firm or agency assigned to the case at the time of the status change."
+    lineage:
+      - datalake_cyber_legal_historical_raw.case.CELWYRAGENCY
   case_status:
     description: "Legal process status (New, Active, Finalized, Pending, Completed)"
     lineage:

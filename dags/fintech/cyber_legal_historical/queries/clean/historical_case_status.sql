@@ -2,6 +2,7 @@ SELECT
     CECASENO AS id_case,
     CEDOSSIERID AS id_dossier,
     CESSNUM AS id_client,
+    CELWYRAGENCY AS id_attorney_agency,
     CASE
         WHEN CESTATUS = 'N' THEN 'New'
         WHEN CESTATUS = 'A' THEN 'Active'
