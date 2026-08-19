@@ -20,17 +20,21 @@ workflow:
       clean_primary_keys: [id]
       clean_table_name: house_listing_relation
       clean_z_order_by: [id_house]
+      run_optimize: false
     ImovelListingRelation_AUD:
       clean_primary_keys: [id_house_listing_relation, rev]
       clean_table_name: house_listing_relation_aud
       clean_z_order_by: [id_house]
+      run_optimize: false
     ListingBusinessContext:
       clean_primary_keys: [id]
       clean_table_name: listing_business_context
       clean_z_order_by: [id_house, status]
+      run_optimize: false
     ListingBusinessContext_AUD:
       clean_primary_keys: [id_listing_business_context, rev]
       clean_table_name: listing_business_context_aud
       clean_z_order_by: [id_house, status]
+      run_optimize: false
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"

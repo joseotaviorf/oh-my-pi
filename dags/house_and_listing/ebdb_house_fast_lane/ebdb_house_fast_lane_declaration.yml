@@ -20,9 +20,11 @@ workflow:
       clean_primary_keys: [id]
       clean_table_name: house
       clean_z_order_by: [id_user, id_region, status]
+      run_optimize: false
     Imovel_AUD:
       clean_primary_keys: [id_house, rev]
       clean_table_name: house_aud
       clean_z_order_by: [id_house]
+      run_optimize: false
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
