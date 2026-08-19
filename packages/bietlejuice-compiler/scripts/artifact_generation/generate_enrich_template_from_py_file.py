@@ -41,6 +41,7 @@ class DAGOwnerEnum:
     TECH_PLATAFORM_CYBER_SECURITY = "Tech Platform Cyber Security"
     TECH_PLATAFORM_DEV_FOUNDATION = "Tech Platform Dev Foundation"
     TECH_PLATAFORM_ENGINEERING_PRODUCTIVITY = "Tech Platform Engineering Productivity"
+    TECH_PLATAFORM_ENTERPRISE_ENGINEERING = "Tech Platform Enterprise Engineering"
     TECH_PLATAFORM_WORKFORCE_PRODUCTIVITY = "Tech Platform Workforce Productivity"
 
     @classmethod

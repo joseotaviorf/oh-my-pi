@@ -101,6 +101,10 @@ class TestOwnerDisplayNameMap:
         assert _display_owner_name("Data House and Listing") == "Data House and Listing"
         assert _display_owner_name("AE All") == "AE All"
         assert _display_owner_name("Search") == "MLOps"
+        assert (
+            _display_owner_name("Tech Platform Enterprise Engineering")
+            == "Tech Platform Enterprise Engineering"
+        )
 
 
 class TestIncidentOwnerFromDag:

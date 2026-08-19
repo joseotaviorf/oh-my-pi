@@ -64,6 +64,7 @@ _OWNER_DISPLAY_NAME_MAP = {
     "Tech Platform Workforce Productivity": "Tech Platform Workforce Productivity",
     "Data Planning and Performance": "Data Planning and Performance",
     "Tech Platform Engineering Productivity": "Tech Platform Engineering Productivity",
+    "Tech Platform Enterprise Engineering": "Tech Platform Enterprise Engineering",
     "QCX": "QCX",
     "Data DS Pricing": "Data DS Pricing",
     "Search": "MLOps",
