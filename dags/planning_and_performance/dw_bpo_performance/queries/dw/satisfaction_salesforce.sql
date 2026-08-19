@@ -11,7 +11,18 @@ WHERE event_type IN ('DELETE')
 
 ),
 
-base_csat AS (
+----- Regra incremental 
+----- Retorna ID que teve atualização de resposta 
+answers as ( 
+SELECT 
+      COALESCE(NULLIF(fa.sk_trigger, '-1'), NULLIF(fa.sk_account, '-1'), NULLIF(fa.sk_case, '-1')) AS key_csat 
+FROM dw_satisfaction_rating.fact_answer AS fa
+WHERE 
+      fa.sk_case IS NOT NULL AND
+      fa.ts_submitted BETWEEN DATE('{load_start_date}') - INTERVAL 3 DAYS AND DATE('{load_end_date}')  
+)
+
+,base_csat AS (
     SELECT DISTINCT  
         fa.sk_case, 
         fa.ts_submitted,
@@ -39,7 +50,7 @@ base_csat AS (
        AND fa.sk_case = member_csat.case__c
        AND member_csat.type__c IN ('Owner','Tenant','Landlord')
     WHERE fa.sk_case IS NOT NULL
-    AND fa.ts_submitted BETWEEN DATE('{load_start_date}') - INTERVAL 3 DAYS AND DATE('{load_end_date}')  
+       AND        COALESCE(NULLIF(fa.sk_trigger, '-1'), NULLIF(fa.sk_account, '-1'), NULLIF(fa.sk_case, '-1')) IN (SELECT key_csat FROM answers )
 ),
 
 CSAT AS (
@@ -56,28 +67,28 @@ CSAT AS (
         -- Busca o satisfaction_score preenchido mais recente no Spark SQL
         FIRST_VALUE(satisfaction_score) OVER (
             PARTITION BY key_join 
-            ORDER BY CASE WHEN satisfaction_score IS NOT NULL THEN 1 ELSE 2 END, ts_submitted DESC
+            ORDER BY CASE WHEN satisfaction_score IS NOT NULL THEN 1 ELSE 2 END, ts_submitted ASC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS satisfaction_score,
 
         -- Busca o comentário do satisfaction_score preenchido mais recente
         FIRST_VALUE(respondent_comments) OVER (
             PARTITION BY key_join 
-            ORDER BY CASE WHEN satisfaction_score IS NOT NULL THEN 1 ELSE 2 END, ts_submitted DESC
+            ORDER BY CASE WHEN satisfaction_score IS NOT NULL THEN 1 ELSE 2 END, ts_submitted ASC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS respondent_comments,
 
         -- Busca o status is_solved preenchido mais recente
         FIRST_VALUE(is_solved) OVER (
             PARTITION BY key_join 
-            ORDER BY CASE WHEN is_solved IS NOT NULL THEN 1 ELSE 2 END, ts_submitted DESC
+            ORDER BY CASE WHEN is_solved IS NOT NULL THEN 1 ELSE 2 END, ts_submitted ASC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS is_solved,
 
         -- Marca a linha mais recente da chave
         ROW_NUMBER() OVER (
             PARTITION BY key_join 
-            ORDER BY ts_submitted DESC
+            ORDER BY ts_submitted ASC
         ) AS rn
     FROM base_csat
 ),
