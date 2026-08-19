@@ -63,18 +63,30 @@ sap_gateway AS (
 ),
 francesinha_base AS (
     SELECT
-        UPPER(REPLACE(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', ''), 'C|', '')) AS company_use,
+        -- occ 06 (liquidacao normal / boleto): key by document_number, as before.
+        -- occ 10 (baixa por ter sido liquidado / PIX bolecode): bank keys the credit by our_number,
+        -- while checkout/SAP/Retsuko use the stripped our_number (leading zeros + trailing check digit removed).
+        CASE
+            WHEN occurrence_code = '10'
+                THEN REGEXP_REPLACE(REGEXP_REPLACE(our_number, '^0+', ''), '[0-9]$', '')
+            ELSE UPPER(REPLACE(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', ''), 'C|', ''))
+        END AS company_use,
         document_number AS bank_number,
         bank_account,
-        dt_credit AS dt_paid,
+        -- occ 10 credits have no dt_credit; use the occurrence date (settlement day) instead.
+        COALESCE(dt_credit, dt_occurrence_code) AS dt_paid,
         SUM(net_amount) AS amount
     FROM
         datalake_nexxera.cnab_charges
     WHERE
         bank_account = '03922'
-        AND occurrence_code = '06'
+        AND occurrence_code IN ('06', '10')
         AND document_number IS NOT NULL
         AND TRIM(document_number) != ''
+        AND (
+            occurrence_code = '06'
+            OR (occurrence_code = '10' AND our_number IS NOT NULL AND TRIM(our_number) != '')
+        )
     GROUP BY
         1,2,3,4
     
