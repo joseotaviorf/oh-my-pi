@@ -595,7 +595,7 @@ negotiation_executive_prospects_compound_metrics AS (
         AND aa.id_parent_user IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
 ),
-sale_first_listing_simple_metrics AS (
+fl_fs_first_listing_candidates AS (
     SELECT
         cfl.id_user,
         cfl.id_agent,
@@ -607,7 +607,7 @@ sale_first_listing_simple_metrics AS (
         NULL AS partial_metric,
         mp.metric AS final_metric,
         IF(
-            cfl.is_first_listing_valid IS FALSE, 
+            cfl.is_first_listing_valid IS FALSE,
             ARRAY_JOIN(cfl.invalidation_reasons, ' | '),
             "FIRST LISTING VALID"
         ) AS reason,
@@ -621,7 +621,12 @@ sale_first_listing_simple_metrics AS (
         DATE('{load_end_date}') AS ts_updated,
         mp.year,
         mp.month,
-        mp.day
+        mp.day,
+        cfl.ts_original_first_listing,
+        CASE
+            WHEN cfl.business_context = "SALE" THEN 0
+            ELSE 1
+        END AS fl_fs_source_rank
     FROM
         datalake_tiers.ciq_first_listing AS cfl
     JOIN
@@ -630,7 +635,73 @@ sale_first_listing_simple_metrics AS (
             AND DATE_TRUNC('MONTH', cfl.ts_original_first_listing) = DATE_TRUNC('MONTH', mp.ts_interval_started)
             AND mp.metric IN ("FL_FS")
     WHERE
-        cfl.business_context = "SALE"
+        cfl.business_context IN ("SALE", "RENT")
+),
+fl_fs_first_listing_ranked AS (
+    SELECT
+        ffc.id_user,
+        ffc.id_agent,
+        ffc.uuid_person,
+        ffc.id_external_domain,
+        ffc.id_metric_period,
+        ffc.external_domain,
+        ffc.agent_profile,
+        ffc.partial_metric,
+        ffc.final_metric,
+        ffc.reason,
+        ffc.cumulative_value_type,
+        ffc.cumulative_value,
+        ffc.is_valid,
+        ffc.is_compound_metric_part,
+        ffc.is_cumulative_metric,
+        ffc.dt_become_valid,
+        ffc.ts_invalidation,
+        ffc.ts_updated,
+        ffc.year,
+        ffc.month,
+        ffc.day,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                ffc.id_user,
+                ffc.id_external_domain
+            ORDER BY
+                CASE
+                    WHEN ffc.is_valid IS TRUE THEN 0
+                    ELSE 1
+                END ASC,
+                ffc.ts_original_first_listing ASC,
+                ffc.fl_fs_source_rank ASC
+        ) AS fl_fs_lifetime_rank
+    FROM
+        fl_fs_first_listing_candidates AS ffc
+),
+sale_first_listing_simple_metrics AS (
+    SELECT
+        ffr.id_user,
+        ffr.id_agent,
+        ffr.uuid_person,
+        ffr.id_external_domain,
+        ffr.id_metric_period,
+        ffr.external_domain,
+        ffr.agent_profile,
+        ffr.partial_metric,
+        ffr.final_metric,
+        ffr.reason,
+        ffr.cumulative_value_type,
+        ffr.cumulative_value,
+        ffr.is_valid,
+        ffr.is_compound_metric_part,
+        ffr.is_cumulative_metric,
+        ffr.dt_become_valid,
+        ffr.ts_invalidation,
+        ffr.ts_updated,
+        ffr.year,
+        ffr.month,
+        ffr.day
+    FROM
+        fl_fs_first_listing_ranked AS ffr
+    WHERE
+        ffr.fl_fs_lifetime_rank = 1
 ),
 rent_first_listing_simple_metrics AS (
     SELECT
