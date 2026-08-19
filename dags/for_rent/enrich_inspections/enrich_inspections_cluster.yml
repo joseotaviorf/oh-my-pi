@@ -9,14 +9,29 @@ cluster:
     core_nodes:
       target_on_demand: 2
       target_spot: 0
+      # NVMe (gd) absorbs the inspector_reports fan-out spill; gp3 at 125 MB/s
+      # was the only scratch path. m6gd/m7gd → m6id when EMR_X86_FALLBACK is on.
       instance_types:
-        - m6g.8xlarge
-        - m7g.8xlarge
+        - m6gd.8xlarge
+        - m7gd.8xlarge
     task_nodes:
       target_on_demand: 0
       target_spot: 2
       instance_types:
-        - m6g.8xlarge
-        - m7g.8xlarge
+        - m6gd.8xlarge
+        - m7gd.8xlarge
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
+    spark_conf:
+      # emr_spark_base pins this to -1, so the four small type-lookup joins
+      # became SortMergeJoins over the already-exploded fan-out instead of
+      # BroadcastHashJoins. Same knobs + values as dw_listing_cluster.yml.
+      spark.sql.autoBroadcastJoinThreshold: "104857600"
+      spark.sql.adaptive.autoBroadcastJoinThreshold: "104857600"
+      # emr_spark_base fixes this at 100, and AQE only coalesces below the
+      # initial count, so it was a hard parallelism ceiling for the fan-out
+      # joins and the SELECT DISTINCT.
+      spark.sql.shuffle.partitions: "400"
+      spark.speculation: "true"
+      spark.speculation.multiplier: "3"
+      spark.speculation.quantile: "0.75"
