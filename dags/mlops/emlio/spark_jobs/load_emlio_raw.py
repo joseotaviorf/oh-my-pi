@@ -240,6 +240,14 @@ if __name__ == "__main__":
             max_records_per_file=max_records_per_file,
             maxRecordsPerFile=max_records_per_file,
         )
+        # Register per batch: this is a foreachBatch sink, so a single call after
+        # awaitTermination would only cover the last batch.
+        spark_metastore_service.create_new_partitions_from_df(
+            df=batch_df,
+            database_name=write_database_name,
+            table_name=write_table_name,
+            partition_cols=partition_cols,
+        )
 
     streaming_query = (
         part_df.writeStream.foreachBatch(write_batch)
@@ -250,7 +258,8 @@ if __name__ == "__main__":
 
     streaming_query.awaitTermination()
 
-    # Partition VALUES for this run are registered by the sync-metadata-raw task
-    # (incremental_partition_sync) right after this job; no MSCK here to avoid a full
-    # partition rescan on every run.
+    # Partition VALUES are registered per batch in write_batch above. The
+    # sync-metadata-raw task (incremental_partition_sync) also runs after this job, but
+    # it targets the external thrift Hive metastore that Trino reads -- not Glue, which
+    # is the Spark catalog on EMR. Still no MSCK here, to avoid a full partition rescan.
     spark_metastore_service.refresh_table(write_database_name, write_table_name)

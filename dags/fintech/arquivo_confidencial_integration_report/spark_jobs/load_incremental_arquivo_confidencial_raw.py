@@ -118,6 +118,16 @@ if __name__ == "__main__":
             partitions=["year", "month", "day"],
             force_recreate=False,
         )
+        # force_recreate=False leaves update_metastore on the
+        # ensure_secondary_catalog_table path once the table exists and the schema is
+        # stable, which syncs the table definition but not its partition values. Without
+        # this call the daily year/month/day partitions never reach Glue.
+        metastore_service.create_new_partitions_from_df(
+            df=df,
+            database_name=write_database_name,
+            table_name=write_table_name,
+            partition_cols=["year", "month", "day"],
+        )
     else:
         logger.warning(
             f"""m=__main__, table_name={table_name}, execution_date={execution_date},

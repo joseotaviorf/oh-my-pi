@@ -632,6 +632,16 @@ def _run_load_for_window(
                 apply_table_privileges=False,
                 refresh_table_after_load=False,
             )
+            # metastore_force_recreate=False skips the drop/recreate that would have
+            # repaired partitions, and finalize_raw_layer_visibility only grants
+            # privileges and refreshes. Register here, per batch, or the daily
+            # partitions never reach Glue.
+            raw_loader.metastore_service.create_new_partitions_from_df(
+                df=df,
+                database_name=raw_loader.write_database_name,
+                table_name=raw_loader.write_table_name,
+                partition_cols=raw_loader.partition_cols,
+            )
         else:
             raw_loader.load_to_raw(df)
         batch.clear()

@@ -20,12 +20,15 @@ from bietlejuice.base.validation.spark_args import (
     resolve_datalake_write_target,
 )
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 # Job configuration
 JOB_NAME = "Load Comms Manager Rules"
 
-spark = SparkClient(app_name=JOB_NAME).conn
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def collect_all_files(path, file_extension=".json"):
@@ -282,9 +285,17 @@ def process_communication_rules(file_path):
         raise
 
 
-def write_dataframe_with_s3_loader(df, s3_path, partitions=None):
+def write_dataframe_with_s3_loader(
+    df,
+    s3_path,
+    partitions=None,
+    metastore_service=None,
+    database_name=None,
+    table_name=None,
+    database_location=None,
+):
     """
-    Writes a DataFrame using S3Loader for raw layer data.
+    Writes a DataFrame using S3Loader for raw layer data and registers it in the metastore.
 
     Uses the bietlejuice S3Loader class with JSON format (DEFAULT_RAW) for raw layer ingestion,
     following the same pattern as other raw data jobs like amplitude_new.
@@ -293,6 +304,10 @@ def write_dataframe_with_s3_loader(df, s3_path, partitions=None):
         df (DataFrame): Spark DataFrame to write
         s3_path (str): S3 path where data should be written
         partitions (str, optional): Partition specification from YAML, or None for no partitioning
+        metastore_service: Glue-aware metastore service used to register the table
+        database_name (str): Target database in the metastore
+        table_name (str): Target table in the metastore
+        database_location (str): Base S3 location of the target database
 
     Raises:
         Exception: If writing fails
@@ -337,6 +352,27 @@ def write_dataframe_with_s3_loader(df, s3_path, partitions=None):
 
         logging.info("Successfully wrote DataFrame using S3Loader")
         logging.info(f"Total records written: {df.count()}")
+
+        # The S3 write alone leaves the data unregistered: without this the table is
+        # absent from Glue, and with partitions the daily values never appear either.
+        metastore_loader = SparkMetastoreLoader(metastore_service)
+        metastore_loader.update_metastore(
+            df=df,
+            database_name=database_name,
+            table_name=table_name,
+            format_options=SparkTableStorageFormat.DEFAULT_RAW,
+            database_location=database_location,
+            partitions=partition_cols or [],
+            force_recreate=False,
+        )
+        if partition_cols:
+            metastore_service.create_new_partitions_from_df(
+                df=df,
+                database_name=database_name,
+                table_name=table_name,
+                partition_cols=partition_cols,
+            )
+        logging.info("Successfully registered table and partitions in the metastore")
 
     except Exception as e:
         logging.error(f"Failed to write DataFrame using S3Loader: {str(e)}")
@@ -452,9 +488,22 @@ def main():
             write_table_name,
         )
 
+        metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        )
+        metastore_service.create_database(write_database_name)
+
         # Write the processed data using S3Loader (same pattern as amplitude_new)
         output_path = f"{write_location}{write_table_name}"
-        write_dataframe_with_s3_loader(processed_df, output_path, partitions)
+        write_dataframe_with_s3_loader(
+            processed_df,
+            output_path,
+            partitions,
+            metastore_service=metastore_service,
+            database_name=write_database_name,
+            table_name=write_table_name,
+            database_location=write_location,
+        )
 
         # Show the schema for verification
         logging.info("Processed DataFrame schema:")

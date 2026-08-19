@@ -193,16 +193,34 @@ if __name__ == "__main__":
         )
 
     if is_able_to_load:
+        table_partitions = partitions_cols if sheet_details.get("partitioned") else []
+
         s3_loader.load_df(
             df=df,
             s3_path=f"{database_location}{table_name}",
             format_options=format_options,
-            partitions=partitions_cols if sheet_details.get("partitioned") else None,
+            partitions=table_partitions or None,
         )
 
+        # partitions must be passed through: update_metastore defaults it to [], so a
+        # partitioned sheet was previously registered as a flat table over a directory
+        # of year=/month=/day= subdirs, with the partition keys declared as ordinary
+        # columns that do not exist in the files.
         spark_metastore_loader.update_metastore(
-            df, database_name, table_name, format_options, database_location
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+            partitions=table_partitions,
         )
+        if table_partitions:
+            spark_metastore_service.create_new_partitions_from_df(
+                df=df,
+                database_name=database_name,
+                table_name=table_name,
+                partition_cols=table_partitions,
+            )
         logger.info(
             f"""
                 m={JOB_NAME}, table_name={table_name}, msg=sheet fully loaded!"
