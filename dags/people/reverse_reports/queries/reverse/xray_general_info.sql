@@ -334,7 +334,14 @@ employee_base AS (
         END AS criticidade,
         CAST(FROM_UTC_TIMESTAMP(es.ts_load, 'America/Sao_Paulo') AS DATE) AS dt_last_update,
         es.country AS pais,
-        es.target_variable_pay AS target_rv,
+        NULLIF(
+            CASE
+                WHEN comp_job.target_plr_salary_multiplier > 0
+                THEN CAST(comp_job.target_plr_salary_multiplier AS DOUBLE)
+                ELSE CAST(comp_job.target_plr AS DOUBLE)
+            END,
+            0
+        ) AS target_rv,
         CASE CAST(es.perf_impact_score AS INT)
             WHEN 150 THEN 'A. Outstanding'
             WHEN 120 THEN 'B. Above Expectations'
@@ -430,6 +437,9 @@ employee_base AS (
     LEFT JOIN
         dw_employee_details.dim_employee AS mgr_emp
             ON mgr_emp.sk_employee = mgr_fas.sk_employee
+    LEFT JOIN
+        dw_compensation.dim_job AS comp_job
+            ON comp_job.sk_job_version = es.sk_job_version
     WHERE
         es.is_current_for_employee = TRUE
 )
