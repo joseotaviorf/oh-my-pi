@@ -1282,6 +1282,7 @@ bietlejuice.dw_support_journey:
   add:
     - bietlejuice.core_support_journey:load_core_support_journey_cases
     - bietlejuice.core_support_journey:load_core_support_journey_services
+    - bietlejuice.salesforce_api_v2:load_datalake_salesforce_clean_record_type_v2
 bietlejuice.dw_performance_rent:
   remove:
     - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day

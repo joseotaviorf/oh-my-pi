@@ -1,0 +1,53 @@
+---
+database_name: dw_support_journey
+table_name: dim_record_type
+description: Dimension table with Salesforce RecordType definitions used to classify support journey objects (primarily Cases). One row per active record type (current SCD version from API_v2), exposing name, developer name and sObject type attributes for support journey DW facts and SS/BPO analytics.
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+columns:
+  sk_record_type:
+    description: Surrogate key referencing the Salesforce RecordType. Sourced from id_record in the API_v2 clean layer, which is the Salesforce RecordType Id.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.id_record
+  sk_business_process:
+    description: Surrogate key referencing the Salesforce BusinessProcess associated with the record type. Defaults to -1 when the record type has no linked business process.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.id_business_process
+  name:
+    description: Human-readable name of the Salesforce record type as displayed in the Salesforce UI.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.name
+  developer_name:
+    description: API developer name of the Salesforce record type, used for programmatic identification in Salesforce integrations.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.developer_name
+  sobject_type:
+    description: Salesforce sObject type that this record type applies to (for example Case or Task).
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.sobject_type
+  namespace_prefix:
+    description: Namespace prefix of the Salesforce record type when defined in a managed package.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.namespace_prefix
+  description:
+    description: Free-text description of the record type purpose as configured in Salesforce.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.description
+  is_active:
+    description: Flag indicating whether the record type is currently active in Salesforce.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.is_active
+  is_person_type:
+    description: Flag indicating whether the record type is configured as a person account type in Salesforce.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.is_person_type
+  ts_created:
+    description: Timestamp when the record type was created in Salesforce.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.created_date
+  ts_last_modified:
+    description: Timestamp when the record type was last modified in Salesforce.
+    lineage:
+      - datalake_salesforce_clean.record_type_v2.last_modified_date
+  ts_load:
+    description: Timestamp when the record was loaded into the data warehouse table by the ingestion pipeline. Built from NOW() at load time.
