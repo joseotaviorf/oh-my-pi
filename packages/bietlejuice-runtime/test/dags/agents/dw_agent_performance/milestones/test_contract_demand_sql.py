@@ -57,6 +57,15 @@ def test_first_valid_listing_hardcodes_valid_flag():
     assert "{extra_filter}" not in text
 
 
+def test_ccv_uses_numeric_id_house_not_string_id_offer():
+    """sale_offer.id_offer is Firestore STRING; CAST to BIGINT is always NULL."""
+    path = resolve_sql_path(str(STRATEGIES_ROOT), "contract_signed_sale_events.sql")
+    text = path.read_text(encoding="utf-8")
+    assert "CAST(so.id_house AS BIGINT) AS sk_entity" in text
+    assert "CAST(so.id_offer AS BIGINT)" not in text
+    assert "datalake_sale_offer.sale_offer.id_house" in text
+
+
 def test_metadata_milestones_registry_loads():
     from bietlejuice.milestones.registry import load_milestones_from_metadata_yaml
 
@@ -73,6 +82,28 @@ def test_metadata_milestones_registry_loads():
         meta.read_text(encoding="utf-8")
     )
     assert sticky == ("id_agent",)
-    assert "first_vb" in registry
-    assert registry["first_vb"]["sql_file"] == "visit_events.sql"
-    assert registry["accreditation"]["params"]["action"] == "Accreditation"
+    assert "VB" in registry
+    assert registry["VB"]["sql_file"] == "visit_events.sql"
+    assert registry["ACCREDITATION"]["params"]["action"] == "Accreditation"
+    assert "TQC" in registry
+    assert "TQC_TQA" not in registry
+    assert "TQA" not in registry
+    assert registry["TQC"]["params"]["business_context"] == "SALE"
+
+
+def test_tqc_sql_renders_sale_business_context():
+    path = resolve_sql_path(str(STRATEGIES_ROOT), "demand_referral_events.sql")
+    text = path.read_text(encoding="utf-8")
+    out = _apply_sql_params(
+        text,
+        {"scan_predicate": "1 = 1", "business_context": "SALE"},
+    )
+    assert "alr.business_context = 'SALE'" in out
+    assert "{business_context}" not in out
+    assert "{scan_predicate}" not in out
+    rent = _apply_sql_params(
+        text,
+        {"scan_predicate": "1 = 1", "business_context": "RENT"},
+    )
+    assert "alr.business_context = 'RENT'" in rent
+    assert "'RENT' = 'SALE'" in rent

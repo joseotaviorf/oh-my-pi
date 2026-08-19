@@ -20,10 +20,10 @@ description: >
   scan + orphan delete for bootstrapped types. Fail-fast: any strategy error aborts
   the whole load. Upstream sources (registry-driven):
   datalake_agent_accreditation revision history (accreditation family);
-  datalake_visit.visit_schedules (first_vb / first_vc); datalake_tiers.ciq_first_listing
-  temporary for first_fl / first_valid_fl (swap planned with AAREDE-503);
-  datalake_rent_demand_events (first_cs); datalake_sale_offer.sale_offer (first_ccv);
-  datalake_ebdb_clean.agent_lead_referral temporary for first_demand_bp (swap
+  datalake_visit.visit_schedules (VB / VC); datalake_tiers.ciq_first_listing
+  temporary for FL / FL_VALID (swap planned with AAREDE-503);
+  datalake_rent_demand_events (CS); datalake_sale_offer.sale_offer (CCV);
+  datalake_ebdb_clean.agent_lead_referral temporary for TQC (swap
   planned with AAREDE-504). Identity joins cast both sides to STRING.
   business_context is not in the grain.
 domain: Agents
@@ -32,48 +32,48 @@ milestones:
   sticky_columns:
     - id_agent
   types:
-    accreditation:
-      milestone_type: accreditation
+    ACCREDITATION:
+      milestone_type: ACCREDITATION
       sql_file: accreditation_events.sql
       scan:
         ts_column: aral.ts_revision
         lookback_days: 2
       params:
         action: Accreditation
-    reaccreditation:
-      milestone_type: reaccreditation
+    REACCREDITATION:
+      milestone_type: REACCREDITATION
       sql_file: accreditation_events.sql
       scan:
         ts_column: aral.ts_revision
         lookback_days: 2
       params:
         action: Re-accreditation
-    deaccreditation:
-      milestone_type: deaccreditation
+    DEACCREDITATION:
+      milestone_type: DEACCREDITATION
       sql_file: accreditation_events.sql
       scan:
         ts_column: aral.ts_revision
         lookback_days: 2
       params:
         action: De-accreditation
-    first_activation_after_accreditation:
-      milestone_type: first_activation_after_accreditation
+    ACTIVATION_AFTER_ACCREDITATION:
+      milestone_type: ACTIVATION_AFTER_ACCREDITATION
       sql_file: accreditation_events.sql
       scan:
         ts_column: aral.ts_revision
         lookback_days: 2
       params:
         action: First activation after accreditation
-    first_vb:
-      milestone_type: first_vb
+    VB:
+      milestone_type: VB
       sql_file: visit_events.sql
       scan:
         ts_column: vs.ts_schedule_confirmed
         lookback_days: 2
       params:
         event_ts_expr: vs.ts_schedule_confirmed
-    first_vc:
-      milestone_type: first_vc
+    VC:
+      milestone_type: VC
       sql_file: visit_events.sql
       scan:
         ts_column: vs.ts_schedule_completed
@@ -81,41 +81,44 @@ milestones:
       params:
         event_ts_expr: vs.ts_schedule_completed
     # Temporary upstream: datalake_tiers.ciq_first_listing — swap to AAREDE-503 later.
-    first_fl:
-      milestone_type: first_fl
+    FL:
+      milestone_type: FL
       sql_file: first_listing_events.sql
       scan:
         ts_column: fl.ts_original_first_listing
         lookback_days: 2
       params:
         event_ts_expr: fl.ts_original_first_listing
-    first_valid_fl:
-      milestone_type: first_valid_fl
+    FL_VALID:
+      milestone_type: FL_VALID
       sql_file: first_valid_listing_events.sql
       scan:
         ts_column: fl.ts_final_first_listing
         lookback_days: 2
       params:
         event_ts_expr: fl.ts_final_first_listing
-    first_cs:
-      milestone_type: first_cs
+    CS:
+      milestone_type: CS
       sql_file: contract_signed_rent_events.sql
       scan:
         ts_column: rde.ts_event
         lookback_days: 2
-    first_ccv:
-      milestone_type: first_ccv
+    CCV:
+      milestone_type: CCV
       sql_file: contract_signed_sale_events.sql
       scan:
         ts_column: so.ts_sale_agreement_signed
         lookback_days: 2
     # Temporary upstream: agent_lead_referral — swap to AAREDE-504 later.
-    first_demand_bp:
-      milestone_type: first_demand_bp
+    # TQA can reuse demand_referral_events.sql with business_context = 'RENT'.
+    TQC:
+      milestone_type: TQC
       sql_file: demand_referral_events.sql
       scan:
         ts_column: alr.ts_created
         lookback_days: 2
+      params:
+        business_context: SALE
 columns:
   sk_user:
     description: >
@@ -137,17 +140,17 @@ columns:
       Registry-defined milestone enum (metadata milestones.types milestone_type).
       One row per sk_user per value; allowlisted categories below.
     categories:
-      accreditation: Agent accreditation action
-      reaccreditation: Agent re-accreditation action
-      deaccreditation: Agent de-accreditation action
-      first_activation_after_accreditation: First activation after accreditation
-      first_vb: First visit booked (confirmed schedule on enrich visit_schedules, visit_agent)
-      first_vc: First visit completed (enrich visit_schedules, visit_agent)
-      first_fl: First listing (any; from ciq_first_listing until AAREDE-503)
-      first_valid_fl: First valid listing (is_first_listing_valid)
-      first_cs: First signed rent contract (CS) from rent_demand_events event type 9
-      first_ccv: First signed sale agreement (CCV) from sale_offer.ts_sale_agreement_signed
-      first_demand_bp: First demand BP / TQC-TQA lead referral (until AAREDE-504)
+      ACCREDITATION: Agent accreditation action
+      REACCREDITATION: Agent re-accreditation action
+      DEACCREDITATION: Agent de-accreditation action
+      ACTIVATION_AFTER_ACCREDITATION: Activation after accreditation (source action label)
+      VB: Visit booked (confirmed schedule on enrich visit_schedules, visit_agent)
+      VC: Visit completed (enrich visit_schedules, visit_agent)
+      FL: Listing published (any; from ciq_first_listing until AAREDE-503)
+      FL_VALID: Valid listing (is_first_listing_valid)
+      CS: Signed rent contract from rent_demand_events event type 9
+      CCV: Signed sale agreement; entity pointer is sale_offer.id_house (id_offer is STRING)
+      TQC: TQC (sale) demand lead referral from agent_lead_referral until AAREDE-504
   ts_first:
     description: >
       Timestamp of the first observed occurrence of this milestone for the user.

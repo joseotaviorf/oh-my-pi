@@ -1,6 +1,7 @@
--- Demand BP (TQC/TQA) referrals — temporary until AAREDE-504.
+-- TQC demand lead referrals — temporary until AAREDE-504.
 -- Source: datalake_ebdb_clean.agent_lead_referral
--- Params: {scan_predicate}
+-- Params: {scan_predicate}, {business_context} (SALE = TQC; RENT = TQA later).
+-- NULL business_context counts as SALE only (same as dw_agent_accreditation.dim_agent).
 --
 -- Key trap: agent_lead_referral.id_agent is misnamed — it is legacy id_agent_data
 -- (dadosAgent), not accreditation id_agent. Join only to acc.id_agent_data.
@@ -23,6 +24,13 @@ FROM (
         alr.ts_created IS NOT NULL
         AND alr.id_agent IS NOT NULL
         AND COALESCE(alr.status, '') <> 'NOT_ELIGIBLE'
+        AND (
+            alr.business_context = '{business_context}'
+            OR (
+                '{business_context}' = 'SALE'
+                AND alr.business_context IS NULL
+            )
+        )
         AND ({scan_predicate})
 ) AS bp
 INNER JOIN

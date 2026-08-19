@@ -15,12 +15,12 @@ _sql_string_list = _mod._sql_string_list
 
 
 def test_sql_string_list_escapes_quotes():
-    assert _sql_string_list(["first_vb"]) == "'first_vb'"
+    assert _sql_string_list(["VB"]) == "'VB'"
     assert _sql_string_list(["a", "b'c"]) == "'a', 'b''c'"
 
 
 def test_bootstrap_orphan_delete_condition_shape():
-    bootstrap_types = ["first_vb", "first_vc"]
+    bootstrap_types = ["VB", "VC"]
     delete_orphans = f"target.milestone_type IN ({_sql_string_list(bootstrap_types)})"
-    assert delete_orphans == "target.milestone_type IN ('first_vb', 'first_vc')"
+    assert delete_orphans == "target.milestone_type IN ('VB', 'VC')"
     assert _sql_string_list([]) == ""
