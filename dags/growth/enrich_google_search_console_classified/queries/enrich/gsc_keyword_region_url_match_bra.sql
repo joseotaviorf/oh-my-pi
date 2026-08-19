@@ -128,6 +128,47 @@ imovelweb_region_patterns_group AS (
     imovelweb_region_patterns
   GROUP BY page
 ),
+-- Explode each page into its length-3 windows so the region-url containment
+-- match can be driven by an equi-join on the leading trigram (hash key) instead
+-- of a bare LOCATE(...) > 0 predicate, which plans as a BroadcastNestedLoopJoin
+-- on EMR. The exact LOCATE(...) residual below restores identical results.
+casamineira_match_windows AS (
+  SELECT DISTINCT
+    cmrpg.page AS page,
+    SUBSTRING(cmrpg.page, seq.pos, 3) AS window3
+  FROM
+    casamineira_region_patterns_group AS cmrpg
+  LATERAL VIEW POSEXPLODE(SEQUENCE(1, GREATEST(LENGTH(cmrpg.page) - 2, 0))) seq AS seq_idx, pos
+),
+casamineira_match_ranked AS (
+  SELECT
+    page,
+    state,
+    city,
+    neighborhood,
+    ROW_NUMBER() OVER(
+      PARTITION BY page
+      ORDER BY match_length DESC
+    ) AS rn
+  FROM (
+    -- All casamineira region-url fragments are >= 3 chars, so the trigram
+    -- equi-join is complete; the LOCATE residual keeps only real substrings.
+    SELECT DISTINCT
+      cmw.page AS page,
+      bru.state AS state,
+      bru.city AS city,
+      bru.neighborhood AS neighborhood,
+      LENGTH(bru.url_casamineira_region) AS match_length
+    FROM
+      casamineira_match_windows AS cmw
+    JOIN
+      datalake_gsheets_clean.brazilian_regions_url AS bru
+        ON cmw.window3 = SUBSTRING(bru.url_casamineira_region, 1, 3)
+    WHERE
+      LENGTH(bru.url_casamineira_region) >= 3
+      AND LOCATE(bru.url_casamineira_region, cmw.page) > 0
+  ) casamineira_candidates
+),
 casamineira_match_grouped AS (
   SELECT
     page,
@@ -135,14 +176,9 @@ casamineira_match_grouped AS (
     city,
     neighborhood
   FROM
-    casamineira_region_patterns_group AS cmrpg
-  LEFT JOIN
-    datalake_gsheets_clean.brazilian_regions_url AS bru
-      ON CHARINDEX(bru.url_casamineira_region, cmrpg.page) > 0
-  QUALIFY ROW_NUMBER() OVER(
-    PARTITION BY cmrpg.page
-    ORDER BY LENGTH(bru.url_casamineira_region) DESC
-  ) = 1
+    casamineira_match_ranked
+  WHERE
+    rn = 1
 ),
 casamineira_match AS (
   SELECT
@@ -174,6 +210,61 @@ casamineira_match AS (
     casamineira_match_grouped AS cmmg
       ON cmrp.page = cmmg.page
 ),
+wimoveis_match_windows AS (
+  SELECT DISTINCT
+    wirpg.page AS page,
+    SUBSTRING(wirpg.page, seq.pos, 3) AS window3
+  FROM
+    wimoveis_region_patterns_group AS wirpg
+  LATERAL VIEW POSEXPLODE(SEQUENCE(1, GREATEST(LENGTH(wirpg.page) - 2, 0))) seq AS seq_idx, pos
+),
+wimoveis_match_ranked AS (
+  SELECT
+    page,
+    state,
+    city,
+    neighborhood,
+    ROW_NUMBER() OVER(
+      PARTITION BY page
+      ORDER BY match_length DESC
+    ) AS rn
+  FROM (
+    -- Region-url fragments >= 3 chars: trigram equi-join + LOCATE residual.
+    SELECT DISTINCT
+      wmw.page AS page,
+      bru.state AS state,
+      bru.city AS city,
+      bru.neighborhood AS neighborhood,
+      LENGTH(bru.url_wimoveis_region) AS match_length
+    FROM
+      wimoveis_match_windows AS wmw
+    JOIN
+      datalake_gsheets_clean.brazilian_regions_url AS bru
+        ON wmw.window3 = SUBSTRING(bru.url_wimoveis_region, 1, 3)
+    WHERE
+      LENGTH(bru.url_wimoveis_region) >= 3
+      AND LOCATE(bru.url_wimoveis_region, wmw.page) > 0
+
+    UNION ALL
+
+    -- Short/empty fragments (< 3 chars, incl. '' which LOCATE matches everywhere)
+    -- are too short for a trigram key; there are only a handful, so a CROSS JOIN
+    -- (exempt from the equi-key rule) + LOCATE residual preserves them exactly.
+    SELECT DISTINCT
+      wirpg.page AS page,
+      bru.state AS state,
+      bru.city AS city,
+      bru.neighborhood AS neighborhood,
+      LENGTH(bru.url_wimoveis_region) AS match_length
+    FROM
+      wimoveis_region_patterns_group AS wirpg
+    CROSS JOIN
+      datalake_gsheets_clean.brazilian_regions_url AS bru
+    WHERE
+      LENGTH(bru.url_wimoveis_region) < 3
+      AND LOCATE(bru.url_wimoveis_region, wirpg.page) > 0
+  ) wimoveis_candidates
+),
 wimoveis_match_grouped AS (
   SELECT
     page,
@@ -181,14 +272,9 @@ wimoveis_match_grouped AS (
     city,
     neighborhood
   FROM
-    wimoveis_region_patterns_group AS wirpg
-  LEFT JOIN
-    datalake_gsheets_clean.brazilian_regions_url AS bru
-      ON CHARINDEX(bru.url_wimoveis_region, wirpg.page) > 0
-  QUALIFY ROW_NUMBER() OVER(
-    PARTITION BY wirpg.page
-    ORDER BY LENGTH(bru.url_wimoveis_region) DESC
-  ) = 1
+    wimoveis_match_ranked
+  WHERE
+    rn = 1
 ),
 wimoveis_match AS (
   SELECT
@@ -220,6 +306,59 @@ wimoveis_match AS (
     wimoveis_match_grouped AS wimg
       ON wirp.page = wimg.page
 ),
+imovelweb_match_windows AS (
+  SELECT DISTINCT
+    iwrp.page AS page,
+    SUBSTRING(iwrp.page, seq.pos, 3) AS window3
+  FROM
+    imovelweb_region_patterns_group AS iwrp
+  LATERAL VIEW POSEXPLODE(SEQUENCE(1, GREATEST(LENGTH(iwrp.page) - 2, 0))) seq AS seq_idx, pos
+),
+imovelweb_match_ranked AS (
+  SELECT
+    page,
+    state,
+    city,
+    neighborhood,
+    ROW_NUMBER() OVER(
+      PARTITION BY page
+      ORDER BY match_length DESC
+    ) AS rn
+  FROM (
+    -- Region-url fragments >= 3 chars: trigram equi-join + LOCATE residual.
+    SELECT DISTINCT
+      imw.page AS page,
+      bru.state AS state,
+      bru.city AS city,
+      bru.neighborhood AS neighborhood,
+      LENGTH(bru.url_imovelweb_region) AS match_length
+    FROM
+      imovelweb_match_windows AS imw
+    JOIN
+      datalake_gsheets_clean.brazilian_regions_url AS bru
+        ON imw.window3 = SUBSTRING(bru.url_imovelweb_region, 1, 3)
+    WHERE
+      LENGTH(bru.url_imovelweb_region) >= 3
+      AND LOCATE(bru.url_imovelweb_region, imw.page) > 0
+
+    UNION ALL
+
+    -- Short/empty fragments (< 3 chars): CROSS JOIN + LOCATE residual (few rows).
+    SELECT DISTINCT
+      iwrp.page AS page,
+      bru.state AS state,
+      bru.city AS city,
+      bru.neighborhood AS neighborhood,
+      LENGTH(bru.url_imovelweb_region) AS match_length
+    FROM
+      imovelweb_region_patterns_group AS iwrp
+    CROSS JOIN
+      datalake_gsheets_clean.brazilian_regions_url AS bru
+    WHERE
+      LENGTH(bru.url_imovelweb_region) < 3
+      AND LOCATE(bru.url_imovelweb_region, iwrp.page) > 0
+  ) imovelweb_candidates
+),
 imovelweb_match_grouped AS (
   SELECT
     page,
@@ -227,14 +366,9 @@ imovelweb_match_grouped AS (
     city,
     neighborhood
   FROM
-    imovelweb_region_patterns_group AS iwrp
-  LEFT JOIN
-    datalake_gsheets_clean.brazilian_regions_url AS bru
-      ON CHARINDEX(bru.url_imovelweb_region, iwrp.page) > 0
-  QUALIFY ROW_NUMBER() OVER(
-    PARTITION BY iwrp.page
-    ORDER BY LENGTH(bru.url_imovelweb_region) DESC
-  ) = 1
+    imovelweb_match_ranked
+  WHERE
+    rn = 1
 ),
 imovelweb_match AS (
   SELECT
