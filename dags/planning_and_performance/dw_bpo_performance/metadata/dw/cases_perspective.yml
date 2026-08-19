@@ -298,4 +298,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp when this BPO performance record was loaded into the data warehouse.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse

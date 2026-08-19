@@ -30,7 +30,6 @@ workflow:
     general_metric: {}
     email: {}
     recontact: {}
-    tickets_perspective: {}
     speech_call: {}
     speech_chat: {}
     taxonomy: {}

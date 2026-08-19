@@ -22,7 +22,6 @@ workflow:
     - "('aec', 'AeC')"
     
   tables_customization:
-    tickets_perspective: {}
     backlog_metric: {}
     tickets_contract: {}
     fcr_metric: {}

@@ -9,9 +9,6 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: bpo_performance
-  inner_dependencies:
-    cases_perspective:
-      - tickets_perspective
   default_extraction_type: full
   default_partitions: [year, month, day]
   extra_query_template_params:
@@ -73,9 +70,6 @@ workflow:
       partitions: [year, month, day]
       extraction_type: full
     tickets_contract:
-      partitions: [year, month, day]
-      extraction_type: full
-    tickets_perspective:
       partitions: [year, month, day]
       extraction_type: full
     tickets_transferred:
