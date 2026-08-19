@@ -18,6 +18,7 @@ dag:
       anthropic-version 2023-06-01; group and group_members add anthropic-beta
       ce-user-management-2026-07-13. group_members expands from raw groups via
       group_id.
+      Bootstraps datalake_claude_usage_clean via spend_limits (payload pass-through).
 
 workflow:
   layer: raw
@@ -29,6 +30,10 @@ workflow:
   has_hive_sync: false
   default_extraction_type: incremental
   default_raw_partitions:
+    - year
+    - month
+    - day
+  default_clean_partitions:
     - year
     - month
     - day

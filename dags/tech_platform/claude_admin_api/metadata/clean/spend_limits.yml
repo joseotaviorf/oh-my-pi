@@ -1,0 +1,30 @@
+database_name: datalake_claude_usage_clean
+table_name: spend_limits
+owner: gabriel.berger@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Claude Enterprise Admin effective spend-limit records for QuintoAndar workforce seats, passed through from the Admin API raw ingest.
+  One row per API spend-limit record in a load batch, with the vendor JSON kept in payload.
+  Covers organization effective spend limits returned by the Admin spend_limits endpoint.
+  Used to create datalake_claude_usage_clean so Data Contracts can attach; explode payload in a later clean revision.
+columns:
+  payload:
+    description: Vendor JSON string for one Admin effective spend-limit record from the Claude Enterprise API, retained for schema-stable clean bootstrap until fields are projected.
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+  ts_load:
+    description: Timestamp when the Spark api_ingestion job wrote the raw row into the lake for this spend-limit record.
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.ts_load
+  year:
+    description: Airflow ingestion partition year derived from the load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.year
+  month:
+    description: Airflow ingestion partition month derived from the load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.month
+  day:
+    description: Airflow ingestion partition day derived from the load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.day

@@ -1,0 +1,30 @@
+database_name: datalake_claude_usage_clean
+table_name: user_activity
+owner: gabriel.berger@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Claude Enterprise Analytics daily user activity records for QuintoAndar workforce seats, passed through from the Analytics API raw ingest.
+  One row per API activity record in a load batch, with the vendor JSON kept in payload.
+  Covers members returned by the Analytics users activity endpoint for the load_end_date calendar day.
+  Used to create datalake_claude_usage_clean so Data Contracts can attach; explode payload in a later clean revision.
+columns:
+  payload:
+    description: Vendor JSON string for one Analytics user-activity record from the Claude Enterprise API, retained for schema-stable clean bootstrap until fields are projected.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+  ts_load:
+    description: Timestamp when the Spark api_ingestion job wrote the raw row into the lake for this activity record.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.ts_load
+  year:
+    description: Airflow ingestion partition year derived from the activity date or load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.year
+  month:
+    description: Airflow ingestion partition month derived from the activity date or load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.month
+  day:
+    description: Airflow ingestion partition day derived from the activity date or load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.day
