@@ -7,8 +7,8 @@ cluster:
       target_on_demand: 3
       target_spot: 0
       instance_types:
-      - r6g.xlarge
-      - r7g.xlarge
+      - r6g.2xlarge
+      - r7g.2xlarge
     spark_conf:
-      spark.executor.memory: 6g
-      spark.driver.memory: 3g
+      spark.executor.memory: 16g
+      spark.driver.memory: 8g
