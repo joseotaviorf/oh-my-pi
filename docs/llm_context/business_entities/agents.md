@@ -46,6 +46,10 @@
 | **Valid First Listing** | A first listing that survives property deduplication — a re-listed / duplicated property does NOT count again | Feeds CIQ payment eligibility and activation. See [`agents_performance.md`](agents_performance.md). |
 | **Compra de Carteira** | CIQ_FULL rent listing-purchase — pricing, portfolio loss, eligibility | See [`agents_performance.md`](agents_performance.md). |
 | **Ativação / activation** | ⚠ No single definition — first commercial event ≤60 days of registration, or first visit/listing/TQC/deal | See [`agents_accreditation.md`](agents_accreditation.md). Always confirm which definition the user means. |
+| **Corretor Capacity** | Capacity Agent. Agent that receives leads from QuintoAndar. | `is_passive_lead_receiver=TRUE`. |
+| **Corretor Non-Capacity** | Non-Capacity Agent. Agent that doesn't receive leads from QuintoAndar. | `is_passive_lead_receiver=FALSE`. |
+| **Imóveis na carteira** | Houses in the agent's wallet. Houses that were acquired by the agent. | agents’ `sk_user` on `id_ciq_user_sale` or `id_ciq_user_rent` (from `datalake_listing_deduplication.valid_first_listing`). |
+
 
 ---
 
@@ -62,10 +66,34 @@ This domain is split by topic so an analyst (or TARS) loads only what a question
 | Valid First Listing / property dedup, CIQ Compra de Carteira (pricing, portfolio loss, eligibility) | `datalake_listing_deduplication.valid_first_listing`, `dw_ciq.fact_ciq_listing_purchase` | [`agents_performance.md`](agents_performance.md) |
 | PFA/PPA relation and eligibility, TQC/TQA acquisition | `datalake_ebdb_agents.preferred_property_agent_relation_history`, `preferred_fixed_agent_history` | [`agents_programs.md`](agents_programs.md) |
 | Visit funnel / completion metrics | `dw_visit.fact_visits` | [`visits.md`](visits.md) |
+| Leads distributed to agent | `dw_visit.dim_visit` (`sk_visitor` where `visit_request_user_role <> 'AGENT'`) | [`visits.md`](visits.md) |
 
 **Critical rules:**
 - QuintoAndar is **mid-migration** from legacy agent services to the new Agent Domain — two ID systems coexist and are NOT interchangeable: `sk_agent_data`/`id_agent_data` (LEGACY, `dadosAgent` service) vs `sk_agent`/`id_agent` (NEW, Agent Domain). The column name `sk_agent` exists in BOTH `dw_public.dim_agent` (legacy) and `dw_agent.*` (new) with **different value spaces** (confirmed: they are two distinct tables in the repo, same `table_name`, different `database_name`) — never join them directly. Bridge through a table that carries both keys (`dw_agent.fact_agent_daily`, documented in [`agents_accreditation.md`](agents_accreditation.md)), or through `id_user` as in the Golden Query below.
 - Three orthogonal axes describe an agent — always confirm which the user means: **business profile** (who they are, [`agents_profile.md`](agents_profile.md)), **hub operation type** (what work they do in the hub, `member_hub_allocation.profile`), and **business function** (what they earn for — demand conversion, TQC/TQA, CIQ, see [`agents_payments.md`](agents_payments.md) and [`agents_programs.md`](agents_programs.md)). Affiliation (`1P`/`3P`) is a fourth, independent axis.
+
+## Key Metrics
+
+No metric entity doc owns the Agents domain yet — use [Related Metric Entities](#related-metric-entities). The bullets below are **component** metrics; each linked doc is the source of truth for grain and filters.
+
+### Component / exploratory metrics
+
+- **Active agents (monthly):** `COUNT(DISTINCT id_agent)` on `dw_agent.fact_agent_daily` where `is_agent_active = true` — see [`agents_accreditation.md`](agents_accreditation.md).
+- **CIQ-active agents:** agents with supply-acquisition capability (`is_allow_supply_acquisition` / `is_allow_supply_conversion`) on `dw_agent.dim_agent` / `fact_agent_daily` — see [`agents_profile.md`](agents_profile.md).
+- **Agents per hub:** `COUNT(DISTINCT id_user)` on `datalake_hub_services.member_hub_allocation` where `is_active = true` — see [`agents_profile.md`](agents_profile.md).
+- **Brokerage / revenue earned per agent:** `SUM` on `dw_agent_payments.fact_earnings` / `fact_partner_payments` — see [`agents_payments.md`](agents_payments.md).
+- **Active PFA relations:** current rows on `datalake_ebdb_agents.preferred_fixed_agent_history` — see [`agents_programs.md`](agents_programs.md).
+- **New-agent activation rate:** first commercial event within the accreditation window — definition is ambiguous; confirm with [`agents_accreditation.md`](agents_accreditation.md) before computing.
+
+## Relationships with other entities
+
+- **Agents ↔ Accreditation (1:1 identity):** `dw_public.dim_agent.id_user = datalake_agent_accreditation.agent.id_user` (legacy → new Agent Domain). Do **not** join the two `sk_agent` columns — see [`agents_accreditation.md`](agents_accreditation.md).
+- **Agents ↔ Profile / hub (1:N daily allocation):** `agent.uuid_person = member_hub_allocation.uuid_person` (`is_active = true`) — see [`agents_profile.md`](agents_profile.md).
+- **Agents ↔ Payments (1:N):** `sk_agent` / `sk_partner` on `dw_agent_payments.fact_earnings` and `fact_partner_payments` — see [`agents_payments.md`](agents_payments.md).
+- **Agents ↔ Performance (1:N listings):** `sk_user` on `id_ciq_user_sale` / `id_ciq_user_rent` in `datalake_listing_deduplication.valid_first_listing` — see [`agents_performance.md`](agents_performance.md).
+- **Agents ↔ Programs (1:N PFA/PPA):** `preferred_fixed_agent_history` / `preferred_property_agent_relation_history` — see [`agents_programs.md`](agents_programs.md).
+- **Agents ↔ Visits (1:N):** `dw_visit.fact_visits` / `dim_visit.sk_visitor` — see [`visits.md`](visits.md).
+- **Agents ↛ Chatbot sessions:** Wall-E, Matthew, Sauron, Dominic/Matias are **not** field agents — see [`chatbot_sessions.md`](chatbot_sessions.md).
 
 ## Dos and Don'ts
 

@@ -182,10 +182,13 @@ The supply funnel is powered by a set of microservices, each responsible for a d
   - `outbound_mailing` — mailing assignment; `id_lead`, `sales_company`, `ts_created`
   - `outbound_last_contact` — latest contact snapshot per lead
 
-- **Bob (Bob o Construtor)** — house draft management service. During the qualification stage, the ops agent (or Isaias) fills in the property details — pricing, blueprint, availability, owner and administrator info — which are stored as a draft in Bob. The draft carries a reference back to the original lead (`id_original_lead`). When the lead converts to opportunity, Bob's draft data is promoted to create the actual house record on the main platform, generating the `id_house` used throughout the supply model. Schema: `datalake_bob_clean`. Funnel stage: **qualified → opportunity**. Key tables:
+- **Bob (Bob o Construtor)** — house draft management service. During the qualification stage, the ops agent (or Isaias) fills in the property details — pricing, blueprint, availability, owner and administrator info — which are stored as a draft in Bob. The draft carries a reference back to the original lead (`id_original_lead`). The draft identifier can also appear with the name of `id_house_draft`. When the lead converts to opportunity, Bob's draft data is promoted to create the actual house record on the main platform, generating the `id_house` used throughout the supply model. Schema: `datalake_bob_clean`. Funnel stage: **qualified → opportunity**. Key tables:
   - `house_draft` — one row per draft; `id`, `id_client_side`, `id_original_lead`, pricing JSON (rent, sale, condo), blueprint JSON (bedrooms, bathrooms, area), `status`, `ts_created`, `ts_updated`
   - `house_draft_aud` — audit log of draft changes
   - Join to supply: `bob.id_original_lead = id_lead` (via `datalake_supply_flows.conversion_lookup`)
+  - `attribution_progress` — tracks owner confirmation progress during Bob lead attribution. To identify houses with pending confirmation from the owner use `status= 'WAITING_CONFIRMATION'`.
+  - `location` — location information of house drafts. A house's address usually consists of the fields `address`, `number` and `complement` combined. Additional fields are also available.
+  - Join to supply: `bob.id_house_draft = sk_lead` (via `dw_growth.obt_supply`)
 
 - **Photojob** *(Photographer Job)* — records the photography session that is the operational event converting a qualified lead into an opportunity. When a photojob is scheduled for a property, the supply event transitions from `qualified` to `opportunity`. The table tracks photographer assignment, scheduled date, session lifecycle (accepted → started → photos uploaded → completed), and cancellation or problem events. Tables are in `datalake_ebdb_clean`. Funnel stage: **qualified → opportunity**. Key tables:
   - `photographer_job` — current snapshot; `id`, `id_house`, `status`, `ts_scheduled`, `ts_session_started`, `ts_photos_uploaded`
