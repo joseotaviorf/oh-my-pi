@@ -247,39 +247,40 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
 
     def _request_repair(self, run_id, context):
         """
-        Requests repair of a specific job run. It will rerun only the errored task and
-        downstream ones, not all tasks from the run.
+        Requests repair of a specific job run by retrieving the latest_repair_id,
+        issuing the repair call, and pushing the new repair ID into XCom.
         """
-        rerun_tasks = [self.task_id]
-        latest_repair_id = None
+        latest_repair_id = self.databricks_hook.get_repair_id(run_id)
         try:
-            self.databricks_hook.repair_run(
-                run_id, rerun_tasks, latest_repair_id, version=JOBS_API_VERSION
+            latest_repair_id = self.databricks_hook.repair_job_run(
+                run_id,
+                latest_repair_id=latest_repair_id,
+                rerun_tasks=[self.task_id],
+                version=JOBS_API_VERSION,
             )
+            self.xcom_push(
+                context, key=self.XCOM_LATEST_REPAIR_ID_KEY, value=latest_repair_id
+            )
+            self._wait_polling_period(self.polling_period_seconds)
         except HTTPError as ex:
-            # if RESOURCE_CONFLICT, it means the run is already being repaired. We
-            # shouldn't worry with this error, because on retry we'll process the new run
+            # RESOURCE_CONFLICT: the run is already being repaired — safe to ignore,
+            # the next retry will pick up the in-progress repair.
             if ex.response.status_code == 409:
-                resource_conflict_message = (
-                    f"m=execute task={self.task_id} error=Run {self.run_id} has already "
+                self.log.error(
+                    f"m=execute task={self.task_id} error=Run {run_id} has already "
                     "been repaired; will check for latest task "
                     f"attempt on retry. HTTPError={ex.response.text}"
                 )
-                self.log.error(resource_conflict_message)
                 return
-            # if INVALID_STATE, it means that the task is already running.
-            # That means the repair was issued by another
-            # `QuintoAndarDatabricksCheckJobTaskOperator`.
+            # INVALID_STATE: the task is already running (repaired by another operator).
             if ex.response.status_code == 400 and "INVALID_STATE" in ex.response.text:
-                already_running_message = (
-                    f"m=execute task={self.task_id} error=Run {self.run_id} is already "
+                self.log.error(
+                    f"m=execute task={self.task_id} error=Run {run_id} is already "
                     "running; will check for latest task "
                     f"attempt on retry. HTTPError={ex.response.text}"
                 )
-                self.log.error(already_running_message)
                 return
-            else:
-                raise ex
+            raise
 
     def _get_execute_job_cluster_task_id(self, task=None) -> str:
         """
