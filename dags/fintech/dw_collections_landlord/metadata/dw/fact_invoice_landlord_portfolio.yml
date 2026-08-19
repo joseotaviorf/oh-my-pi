@@ -28,7 +28,7 @@ columns:
     lineage:
     - datalake_retsuko.bill_items.bill_item_description
     description: Parent invoice external identifier parsed from COLLECTIONS DEAL bill_item_description
-      using pattern suffix - ID digits aggregated per invoice
+      (patterns - ID digits, ID-digits, ID:digits, or IDdigits) aggregated per invoice
   tipo_fat:
     lineage:
     - datalake_retsuko.invoice.purpose

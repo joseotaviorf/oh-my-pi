@@ -75,7 +75,11 @@ negotiation_parent_invoice AS (
     FROM (
         SELECT
             b.id_invoice,
-            REGEXP_EXTRACT(bill_item_description, r' - ID (\d+)', 1) AS id_parent_parsed
+            COALESCE(
+                NULLIF(REGEXP_EXTRACT(b.bill_item_description, r' - ID (\d+)', 1), ''),
+                NULLIF(REGEXP_EXTRACT(b.bill_item_description, r'ID[-:](\d+)', 1), ''),
+                NULLIF(REGEXP_EXTRACT(b.bill_item_description, r'ID(\d+)', 1), '')
+            ) AS id_parent_parsed
         FROM
             base_bill_items AS b
         WHERE
