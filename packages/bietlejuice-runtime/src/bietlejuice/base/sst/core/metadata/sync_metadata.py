@@ -214,9 +214,9 @@ def sync_trino_metadata(
     except Exception as e:
         logger.error(
             f"m={logger.name}, db_name={db_name}, table_name={tname}, "
-            f"table_location={table_location}, msg=Trino metadata sync failed with: {e}"
+            f"table_location={table_location}, "
+            f"msg=Trino metadata sync failed; skipping sync and continuing write: {e}"
         )
-        raise
 
 
 def sync_trino_tables_metadata(bucket, layer, schema, table_name, all_tables_flag):

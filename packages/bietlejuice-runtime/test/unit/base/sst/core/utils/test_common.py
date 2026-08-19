@@ -185,3 +185,36 @@ class TestValidateAndWriteCatalogSync:
 
         # assert
         mock_sync_secondary.assert_not_called()
+
+    @mock.patch.object(
+        _secondary_catalog_sync_module,
+        "sync_delta_write_to_secondary_catalog",
+    )
+    @mock.patch.object(common_module, "sync_trino_metadata")
+    @mock.patch.object(common_module, "_table_exists")
+    def test_continues_when_trino_sync_raises(
+        self, mock_table_exists, mock_sync_trino, mock_sync_secondary
+    ):
+        # arrange
+        spark = mock.MagicMock()
+        df = mock.MagicMock()
+        df.write = _mock_df_writer()
+        mock_table_exists.side_effect = [False, True]
+        mock_sync_trino.side_effect = RuntimeError("trino unavailable")
+        table_location = "s3a://bucket/quality/contract_checks"
+        target_table = "datalake_quality.contract_checks"
+
+        # act / assert — must not raise
+        common_module.validate_and_write(
+            spark=spark,
+            df=df,
+            target_table=target_table,
+            table_location=table_location,
+            partition_filter="metric_name = 'freshness'",
+            partition_cols=["metric_name", "table_name"],
+            sync_hive=True,
+            sync_secondary_catalog=False,
+        )
+
+        mock_sync_trino.assert_called_once_with(target_table, table_location, df)
+        mock_sync_secondary.assert_not_called()

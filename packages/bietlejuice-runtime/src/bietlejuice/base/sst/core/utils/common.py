@@ -364,11 +364,17 @@ def _post_write_catalog_sync(
 ) -> None:
     """Register table metadata in Trino and/or the secondary catalog after a write."""
     if sync_hive:
-        sync_trino_metadata(target_table, table_location, df)
-        logger.info(
-            f"m=validate_and_write, target_table={target_table}, "
-            "msg=Trino metadata sync completed"
-        )
+        try:
+            sync_trino_metadata(target_table, table_location, df)
+            logger.info(
+                f"m=validate_and_write, target_table={target_table}, "
+                "msg=Trino metadata sync completed"
+            )
+        except Exception as e:
+            logger.error(
+                f"m=validate_and_write, target_table={target_table}, "
+                f"msg=Trino metadata sync failed; data write is unaffected: {e}"
+            )
     else:
         logger.info(
             f"m=validate_and_write, target_table={target_table}, "
