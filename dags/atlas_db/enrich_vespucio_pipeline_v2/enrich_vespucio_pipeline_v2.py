@@ -296,11 +296,11 @@ claims_source_tasks = [
 claims_step_task = create_task(
     entry_point="core_v2_claims_step",
     parameters=[
-        f"--input_ebdb_condo_observations={Tables.source_ebdb_condo_observations_v2}",
-        f"--input_ebdb_condo_kodak_inference={Tables.source_ebdb_condo_kodak_inference_v2}",
-        f"--input_ebdb_condo_description_inference={Tables.source_ebdb_condo_description_inference_v2}",
-        f"--input_ebdb_house_amenities_kodak_inference={Tables.source_ebdb_house_amenities_kodak_inference_v2}",
-        f"--input_ebdb_house_amenities_description_inference={Tables.source_ebdb_house_amenities_description_inference_v2}",
+        f"--input_source_ebdb_condo_observations={Tables.source_ebdb_condo_observations_v2}",
+        f"--input_source_ebdb_condo_kodak_inference={Tables.source_ebdb_condo_kodak_inference_v2}",
+        f"--input_source_ebdb_condo_description_inference={Tables.source_ebdb_condo_description_inference_v2}",
+        f"--input_source_ebdb_house_amenities_kodak_inference={Tables.source_ebdb_house_amenities_kodak_inference_v2}",
+        f"--input_source_ebdb_house_amenities_description_inference={Tables.source_ebdb_house_amenities_description_inference_v2}",
         f"--output_claims={Tables.claims_step_v2}",
     ],
 )
