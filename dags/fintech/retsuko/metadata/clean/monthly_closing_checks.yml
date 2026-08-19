@@ -16,6 +16,10 @@ columns:
     description: "Internal Contract ID from retsuko table"
     lineage:
       - datalake_retsuko_raw.monthly_closing_checks.contract_id
+  cdc_transaction_id:
+    description: "CDC replication transaction identifier from the source change event that produced or updated this monthly closing check row"
+    lineage:
+      - datalake_retsuko_raw.monthly_closing_checks.cdc_transaction_id
   checks:
     description: "Checks, alerts and information about monthly closing"
     lineage:
@@ -24,6 +28,10 @@ columns:
     description: "Year/month invoice accrual"
     lineage:
       - datalake_retsuko_raw.monthly_closing_checks.accrual_year_month
+  type:
+    description: "Monthly closing check type classification from Retsuko, discriminating the kind of validation or alert recorded in the checks payload"
+    lineage:
+      - datalake_retsuko_raw.monthly_closing_checks.type
   ts_created:
     description: "Timestamp that refers to when the monthly check was created"
     lineage:
@@ -32,3 +40,20 @@ columns:
     description: "Timestamp from the last update"
     lineage:
       - datalake_retsuko_raw.monthly_closing_checks.updated_at
+  op_cdc:
+    description: "CDC operation type for this monthly closing check row (insert, update, or delete)"
+    lineage:
+      - datalake_retsuko_raw.monthly_closing_checks.op_cdc
+    categories:
+      r: "Read or snapshot of an existing monthly closing check"
+      c: "Creation of a new monthly closing check"
+      u: "Update to an existing monthly closing check"
+      d: "Deletion of a monthly closing check"
+  ts_cdc_transaction:
+    description: "Timestamp when the CDC connector captured the monthly closing check change event"
+    lineage:
+      - datalake_retsuko_raw.monthly_closing_checks.ts_cdc_transaction
+  ts_database_transaction:
+    description: "Timestamp when the source database committed the monthly closing check change"
+    lineage:
+      - datalake_retsuko_raw.monthly_closing_checks.ts_database_transaction
