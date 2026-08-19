@@ -284,6 +284,52 @@ def _build_result(house_aud_df: DataFrame) -> DataFrame:
     )
 
 
+def _delete_stale_price_changes(
+    spark,
+    full_table_name: str,
+    result_df: DataFrame,
+) -> None:
+    """
+    For each house rebuilt in this run, drop target rows whose id_price_change
+    is missing from the new result.
+
+    OSS Delta Lake (EMR) rejects DELETE conditions with IN (SELECT …); build the
+    stale key set via joins and remove them with MERGE … WHEN MATCHED DELETE.
+
+    Stale keys are localCheckpoint'd before MERGE so the source no longer
+    references the target Delta table (self-referential MERGE fails on OSS Delta).
+    """
+    target_df = DeltaTable.forName(spark, full_table_name).toDF()
+    processed_houses = result_df.select("id_house").distinct()
+    current_keys = result_df.select("id_price_change").distinct()
+
+    stale_keys = (
+        target_df.join(processed_houses, "id_house", "inner")
+        .join(current_keys, "id_price_change", "left_anti")
+        .select("id_price_change")
+        .distinct()
+        .localCheckpoint(eager=True)
+    )
+
+    stale_count = stale_keys.count()
+    if stale_count == 0:
+        logger.info("m=_delete_stale_price_changes, msg=No stale rows to delete")
+        return
+
+    logger.info(f"m=_delete_stale_price_changes, stale_rows={stale_count:,}")
+
+    (
+        DeltaTable.forName(spark, full_table_name)
+        .alias("target")
+        .merge(
+            stale_keys.alias("source"),
+            "target.id_price_change = source.id_price_change",
+        )
+        .whenMatchedDelete()
+        .execute()
+    )
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="Environment: forno/prod")
@@ -354,17 +400,6 @@ if __name__ == "__main__":
                 else write_location
             )
 
-            # Temp views used in the DELETE condition below.
-            # _current_price_changes_in_run: all id_price_change values produced
-            #   by this run — the authoritative set for processed houses.
-            # _processed_houses_in_run: distinct id_house values in this run —
-            #   used to scope the DELETE only to houses the run touched, leaving
-            #   all other houses' records untouched.
-            result_df.createOrReplaceTempView("_current_price_changes_in_run")
-            result_df.select("id_house").distinct().createOrReplaceTempView(
-                "_processed_houses_in_run"
-            )
-
             DeltaLoader().load_table(
                 table_name=full_table_name,
                 path=s3_path,
@@ -372,22 +407,7 @@ if __name__ == "__main__":
                 merge_on=["id_price_change"],
             )
 
-            # Step 2: DELETE stale rows — for each processed house, remove any
-            # id_price_change that did not appear in this run's result. Without
-            # this step those rows would keep their outdated flags indefinitely
-            # The condition has two parts:
-            #   id_house IN (...):          restrict to houses processed this run;
-            #                               records for untouched houses are preserved.
-            #   id_price_change NOT IN (...): within those houses, delete only the
-            #                               price changes absent from the current result.
-            DeltaTable.forName(spark, full_table_name).delete(
-                """
-                id_house IN (SELECT id_house FROM _processed_houses_in_run)
-                AND id_price_change NOT IN (
-                    SELECT id_price_change FROM _current_price_changes_in_run
-                )
-                """
-            )
+            _delete_stale_price_changes(spark, full_table_name, result_df)
 
             MetastoreServiceFactory.create_loader_metastore_service(
                 spark_client
