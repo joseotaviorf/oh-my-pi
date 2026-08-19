@@ -13,7 +13,7 @@ SELECT
   o.original_home_insurance_value,
   o.original_tenant_service_fee_value,
   o.last_proposed_rent_value,
-  DATEDIFF(DAY, o.ts_last_iteration, o.ts_first_iteration) AS days_of_negotiation,
+  CAST(DATEDIFF(o.ts_first_iteration, o.ts_last_iteration) AS BIGINT) AS days_of_negotiation,
   COALESCE(o.qtd_topics_negotiated, 0) AS qtd_topics_negotiated,
   o.original_rent - o.last_proposed_rent_value AS original_to_final_value_difference,
   o.ts_first_iteration,

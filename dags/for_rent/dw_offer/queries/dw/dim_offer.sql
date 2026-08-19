@@ -200,10 +200,10 @@ offer_enriched AS (
             AND ose_id_firestore.rn_id_firestore = 1
             AND o.id_firestore = ose_id_firestore.id_firestore
 ),
-taxonomy_demand AS (
+taxonomy_demand_ranked AS (
     /*
         As flg_branded is used to define a relationship with offer, it is necessary to make sure that this CTE will be deduplicated 
-        considering this column to. In this way offer: taxonomy will be 1:1
+        considering this column too. Each offer maps to at most one taxonomy row (one-to-one).
     */
     SELECT
         id,
@@ -218,15 +218,36 @@ taxonomy_demand AS (
         medium AS mkt_medium,
         origin AS mkt_origin,
         source AS mkt_source,
-        platform AS mkt_platform
+        platform AS mkt_platform,
+        ROW_NUMBER() OVER (
+            PARTITION BY LOWER(app_type), LOWER(utm_source), LOWER(utm_medium), branded = 'Branded'
+            ORDER BY LOWER(app_type), LOWER(utm_source), LOWER(utm_medium), branded = 'Branded', id
+        ) AS rn
 	FROM
 		datalake_gsheets_clean.taxonomy_demand
 	WHERE
 		first_update_source = 'Inquilinos'
 		AND flg_via_reschedule = 0
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY LOWER(app_type), LOWER(utm_source), LOWER(utm_medium), branded = 'Branded'
-            ORDER BY LOWER(app_type), LOWER(utm_source), LOWER(utm_medium), branded = 'Branded', id) = 1
+),
+taxonomy_demand AS (
+    SELECT
+        id,
+        app_type,
+        utm_source,
+        utm_medium,
+        flg_branded,
+        mkt_category,
+        mkt_flow,
+        mkt_completion,
+        mkt_channel,
+        mkt_medium,
+        mkt_origin,
+        mkt_source,
+        mkt_platform
+    FROM
+        taxonomy_demand_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     o.sk_offer_history,
