@@ -2,6 +2,7 @@ SELECT
     id,
     external_id AS id_external,
     contract_id AS id_contract,
+    cdc_transaction_id,
     reference_id AS id_reference,
     reference_type,
     status,
@@ -9,6 +10,7 @@ SELECT
     timestamp(verified_at) AS ts_verified,
     fixed_by AS id_fixed_by,
     timestamp(fixed_at) AS ts_fixed,
+    timestamp(jira_sent_at) AS ts_jira_sent,
     timestamp(created_at) AS ts_created,
     timestamp(updated_at) AS ts_updated
 FROM

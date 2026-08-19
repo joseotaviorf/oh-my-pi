@@ -16,6 +16,10 @@ columns:
     description: "Identifier of the related contract"
     lineage:
       - datalake_retsuko_raw.overlimit_check.contract_id
+  cdc_transaction_id:
+    description: "CDC replication transaction identifier from the source change event that produced or updated this overlimit check row"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.cdc_transaction_id
   id_reference:
     description: "Identifier of the referenced entity (e.g. agreement or related record)"
     lineage:
@@ -44,6 +48,10 @@ columns:
     description: "Datetime when the overlimit issue was fixed"
     lineage:
       - datalake_retsuko_raw.overlimit_check.fixed_at
+  ts_jira_sent:
+    description: "Datetime when the overlimit check was sent to Jira for operational follow-up"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.jira_sent_at
   ts_created:
     description: "Record creation datetime in source"
     lineage:
@@ -52,3 +60,20 @@ columns:
     description: "Record last update datetime in source"
     lineage:
       - datalake_retsuko_raw.overlimit_check.updated_at
+  op_cdc:
+    description: "CDC operation type for this overlimit check row (insert, update, or delete)"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.op_cdc
+    categories:
+      r: "Read or snapshot of an existing overlimit check"
+      c: "Creation of a new overlimit check"
+      u: "Update to an existing overlimit check"
+      d: "Deletion of an overlimit check"
+  ts_cdc_transaction:
+    description: "Timestamp when the CDC connector captured the overlimit check change event"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.ts_cdc_transaction
+  ts_database_transaction:
+    description: "Timestamp when the source database committed the overlimit check change"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.ts_database_transaction
