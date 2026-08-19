@@ -675,7 +675,7 @@ fl_fs_first_listing_ranked AS (
     FROM
         fl_fs_first_listing_candidates AS ffc
 ),
-sale_first_listing_simple_metrics AS (
+fl_fs_first_listing_with_winner AS (
     SELECT
         ffr.id_user,
         ffr.id_agent,
@@ -697,11 +697,54 @@ sale_first_listing_simple_metrics AS (
         ffr.ts_updated,
         ffr.year,
         ffr.month,
-        ffr.day
+        ffr.day,
+        ffr.fl_fs_lifetime_rank,
+        MAX(
+            CASE
+                WHEN ffr.fl_fs_lifetime_rank = 1 THEN ffr.id_metric_period
+            END
+        ) OVER (
+            PARTITION BY
+                ffr.id_user,
+                ffr.id_external_domain
+        ) AS fl_fs_winner_metric_period
     FROM
         fl_fs_first_listing_ranked AS ffr
+),
+sale_first_listing_simple_metrics AS (
+    SELECT
+        ffw.id_user,
+        ffw.id_agent,
+        ffw.uuid_person,
+        ffw.id_external_domain,
+        ffw.id_metric_period,
+        ffw.external_domain,
+        ffw.agent_profile,
+        ffw.partial_metric,
+        ffw.final_metric,
+        CASE
+            WHEN ffw.fl_fs_lifetime_rank = 1 THEN ffw.reason
+            ELSE "FL_FS already credited for this id_user and id_house"
+        END AS reason,
+        ffw.cumulative_value_type,
+        ffw.cumulative_value,
+        (ffw.is_valid AND ffw.fl_fs_lifetime_rank = 1) AS is_valid,
+        ffw.is_compound_metric_part,
+        ffw.is_cumulative_metric,
+        ffw.dt_become_valid,
+        CASE
+            WHEN ffw.is_valid AND ffw.fl_fs_lifetime_rank = 1 THEN NULL
+            ELSE COALESCE(ffw.ts_invalidation, ffw.ts_updated)
+        END AS ts_invalidation,
+        ffw.ts_updated,
+        ffw.year,
+        ffw.month,
+        ffw.day
+    FROM
+        fl_fs_first_listing_with_winner AS ffw
     WHERE
-        ffr.fl_fs_lifetime_rank = 1
+        ffw.fl_fs_lifetime_rank = 1
+        OR ffw.id_metric_period <> ffw.fl_fs_winner_metric_period
 ),
 rent_first_listing_simple_metrics AS (
     SELECT

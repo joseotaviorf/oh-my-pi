@@ -14,7 +14,8 @@ description: |
   FL_FR stays RENT context. FL_FS is SALE context plus RENT context so FR-only
   houses also score on FL_FS. Same id_user and id_house keep a single FL_FS event
   (valid rows first, then earliest ts_original_first_listing; SALE wins ties), so a later hybrid on the
-  same agent does not add a second FL_FS. A different CIQ who brings the other
+  same agent does not add a second FL_FS. Later-period FL_FS losers stay in metric_events with
+  is_valid false so incremental MERGE does not leave a second credited house. A different CIQ who brings the other
   context still receives their own FL_FS. Same-cycle hybrid remains one FL_FS and
   one FL_FR. Other metrics use DATE() on source timestamps.
 domain: Agents
