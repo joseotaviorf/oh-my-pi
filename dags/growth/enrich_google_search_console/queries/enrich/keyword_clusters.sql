@@ -170,7 +170,7 @@ WITH categories_and_subcategories AS (
       WHEN has_mention_to_street = 1 AND has_mention_to_number = 1 THEN 'Address'
       WHEN has_mention_to_street = 1 THEN 'Street'
       WHEN has_mention_to_neighborhood = 1 AND (LENGTH(match_operation_neighborhood) >= LENGTH(match_igbe_city)) AND (LENGTH(match_operation_neighborhood) >= LENGTH(match_operation_city)) THEN 'Neighborhood'
-      WHEN has_mention_to_neighborhood = 1 AND LENGTH(match_operation_neighborhood) > 0 AND ((CHARINDEX(match_operation_neighborhood, match_igbe_city) = 0) AND (CHARINDEX(match_operation_neighborhood, match_operation_city) = 0)) THEN 'Neighborhood'
+      WHEN has_mention_to_neighborhood = 1 AND LENGTH(match_operation_neighborhood) > 0 AND ((LOCATE(match_operation_neighborhood, match_igbe_city) = 0) AND (LOCATE(match_operation_neighborhood, match_operation_city) = 0)) THEN 'Neighborhood'
       WHEN match_igbe_city = match_operation_neighborhood AND match_operation_neighborhood != match_operation_city THEN 'Neighborhood'
       WHEN has_mention_to_neighborhood = 1 AND LENGTH(match_operation_neighborhood) = 0 THEN 'Neighborhood'
       WHEN has_mention_to_neighborhood = 1 AND keyword_clean LIKE '%bairro%' THEN 'Neighborhood'
