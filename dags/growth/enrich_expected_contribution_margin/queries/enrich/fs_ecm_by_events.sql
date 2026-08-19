@@ -1,6 +1,6 @@
 WITH ecm_bookings AS (
     SELECT
-        CONCAT(CAST(ecm.id_user AS VARCHAR), '_', CAST(ecm.id_house AS VARCHAR)) AS id_flow,
+        CONCAT(CAST(ecm.id_user AS STRING), '_', CAST(ecm.id_house AS STRING)) AS id_flow,
         CAST(ecm.id_user AS INT) AS id_prospect,
         CAST(ecm.id_house AS INT) AS id_house,
         ecm.id_request,
