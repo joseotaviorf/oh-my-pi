@@ -16,7 +16,8 @@ WITH metric_period_process AS (
         datalake_tiers.metric_period AS mp
     JOIN
         datalake_quintoandar.aux_date AS ad
-            ON ad.date BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(ad.date) = mp.year
+            AND MONTH(ad.date) = mp.month
     WHERE
         ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND mp.status = "VALID"
@@ -56,12 +57,15 @@ sale_contract_signed_simple_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.month
             AND mp.metric IN ("CCV", "CCV_TQC", "GMV", "VGV_CONV")
     LEFT JOIN
         metric_period_process AS mp_invalid
-            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
-            AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.month
+            AND YEAR(ao.dt_contract_cancelled) = mp_invalid.year
+            AND MONTH(ao.dt_contract_cancelled) = mp_invalid.month
             AND mp_invalid.metric = mp.metric
     WHERE
         ao.business_context = "SALE"
@@ -114,12 +118,15 @@ sale_contract_signed_with_ciq_simple_metrics AS (
             AND cfl.business_context = ao.business_context
     JOIN
         metric_period_process AS mp
-            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.month
             AND mp.metric IN ("CCV_CIQ", "VGV_ACQ")
     LEFT JOIN
         metric_period_process AS mp_invalid
-            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
-            AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.month
+            AND YEAR(ao.dt_contract_cancelled) = mp_invalid.year
+            AND MONTH(ao.dt_contract_cancelled) = mp_invalid.month
             AND mp_invalid.metric = mp.metric
     WHERE
         ao.business_context = "SALE"
@@ -143,8 +150,10 @@ sale_vgv_total_attribution AS (
     LEFT JOIN
         metric_period_process AS mp_invalid
             ON mp_invalid.metric = "VGV_TOTAL"
-            AND DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
-            AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            AND YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.month
+            AND YEAR(ao.dt_contract_cancelled) = mp_invalid.year
+            AND MONTH(ao.dt_contract_cancelled) = mp_invalid.month
     WHERE
         ao.business_context = "SALE"
         AND ao.agent_profile = "AGENT"
@@ -187,8 +196,10 @@ sale_vgv_total_attribution AS (
         LEFT JOIN
             metric_period_process AS mp_invalid
                 ON mp_invalid.metric = "VGV_TOTAL"
-                AND DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
-                AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+                AND YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.month
+                AND YEAR(ao.dt_contract_cancelled) = mp_invalid.year
+            AND MONTH(ao.dt_contract_cancelled) = mp_invalid.month
         WHERE
             ao.business_context = "SALE"
             AND ao.is_ciq_first_listing IS TRUE
@@ -253,12 +264,15 @@ sale_vgv_total_cumulative_metrics AS (
         sale_vgv_total_deduped_attribution AS vtd
     JOIN
         metric_period_process AS mp
-            ON vtd.dt_contract_signed BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(vtd.dt_contract_signed) = mp.year
+            AND MONTH(vtd.dt_contract_signed) = mp.month
             AND mp.metric = "VGV_TOTAL"
     LEFT JOIN
         metric_period_process AS mp_invalid
-            ON vtd.dt_contract_signed BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
-            AND vtd.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            ON YEAR(vtd.dt_contract_signed) = mp_invalid.year
+            AND MONTH(vtd.dt_contract_signed) = mp_invalid.month
+            AND YEAR(vtd.dt_contract_cancelled) = mp_invalid.year
+            AND MONTH(vtd.dt_contract_cancelled) = mp_invalid.month
             AND mp_invalid.metric = "VGV_TOTAL"
 ),
 sale_contract_signed_compound_metrics AS (
@@ -288,12 +302,15 @@ sale_contract_signed_compound_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.month
             AND mp.metric IN ("OS2CCV_BY", "BP2CCV")
     LEFT JOIN
         metric_period_process AS mp_invalid
-            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
-            AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
+            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.month
+            AND YEAR(ao.dt_contract_cancelled) = mp_invalid.year
+            AND MONTH(ao.dt_contract_cancelled) = mp_invalid.month
             AND mp_invalid.metric = mp.metric
     WHERE
         ao.business_context = "SALE"
@@ -325,7 +342,8 @@ rent_contract_signed_simple_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.month
             AND mp.metric IN ("CS")
     WHERE
         ao.business_context = "RENT"
@@ -357,7 +375,8 @@ rent_contract_signed_compound_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.year
+            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.month
             AND mp.metric IN ("TP2CS")
     WHERE
         ao.business_context = "RENT"
@@ -389,7 +408,8 @@ buyer_with_offer_submited_simple_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(ao.ts_offer_submitted) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(ao.ts_offer_submitted) = mp.year
+            AND MONTH(ao.ts_offer_submitted) = mp.month
             AND mp.metric = "OS_BY"
     WHERE
         ao.business_context = "SALE"
@@ -421,7 +441,8 @@ buyer_with_offer_submited_compound_metrics AS (
         datalake_tiers.agent_offers AS ao
     JOIN
         metric_period_process AS mp
-            ON DATE(ao.ts_offer_submitted) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(ao.ts_offer_submitted) = mp.year
+            AND MONTH(ao.ts_offer_submitted) = mp.month
             AND mp.metric IN ("OS2CCV_BY")
     WHERE
         ao.business_context = "SALE"
@@ -453,7 +474,8 @@ broker_prospects_simple_metrics AS (
         datalake_tiers.agent_prospects AS ap
     JOIN
         metric_period_process AS mp
-            ON DATE(ap.ts_event) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(ap.ts_event) = mp.year
+            AND MONTH(ap.ts_event) = mp.month
             AND mp.metric IN ("BP", "TP")
     WHERE
         (ap.business_context = "SALE" AND mp.metric = "BP")
@@ -487,7 +509,8 @@ broker_prospects_compound_metrics AS (
         datalake_tiers.agent_prospects AS ap
     JOIN
         metric_period_process AS mp
-            ON DATE(ap.ts_event) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(ap.ts_event) = mp.year
+            AND MONTH(ap.ts_event) = mp.month
             AND mp.metric IN ("BP2CCV", "TP2CS")
     WHERE
         (ap.business_context = "SALE" AND mp.metric = "BP2CCV")
@@ -521,7 +544,8 @@ negotiation_executive_prospects_simple_metrics AS (
         datalake_tiers.agent_prospects AS ap
     JOIN
         metric_period_process AS mp
-            ON DATE(ap.ts_event) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(ap.ts_event) = mp.year
+            AND MONTH(ap.ts_event) = mp.month
             AND mp.metric IN ("BP")
     JOIN
         datalake_tiers.agent_allocation AS aa
@@ -559,7 +583,8 @@ negotiation_executive_prospects_compound_metrics AS (
         datalake_tiers.agent_prospects AS ap
     JOIN
         metric_period_process AS mp
-            ON DATE(ap.ts_event) BETWEEN mp.dt_init AND mp.dt_end
+            ON YEAR(ap.ts_event) = mp.year
+            AND MONTH(ap.ts_event) = mp.month
             AND mp.metric IN ("BP2CCV")
     JOIN
         datalake_tiers.agent_allocation AS aa
