@@ -57,10 +57,12 @@ current_names AS (
         documented_full_name, display_name, first_social_name, last_social_name
     FROM current_names_ranked WHERE rn = 1
 ),
+-- Spark TRIM() only strips 0x20 spaces. Strip CR/LF first, then TRIM, so a
+-- space that sat next to a line break does not remain after the break is gone.
 work_emails_ranked AS (
     SELECT
         id_person,
-        email_address,
+        NULLIF(TRIM(REGEXP_REPLACE(email_address, '[\n\r]+', '')), '') AS email_address,
         ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_ended DESC) AS rn
     FROM
         datalake_pin_core_clean.email_address
@@ -74,7 +76,7 @@ work_emails AS (
 personal_emails_ranked AS (
     SELECT
         id_person,
-        email_address,
+        NULLIF(TRIM(REGEXP_REPLACE(email_address, '[\n\r]+', '')), '') AS email_address,
         ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_ended DESC) AS rn
     FROM
         datalake_pin_core_clean.email_address
@@ -539,7 +541,7 @@ LEFT JOIN
         ON cp.id_person = tu.id_person
 LEFT JOIN
     datalake_gsheets_people_clean.legacy_registration AS lr
-        ON LOWER(lr.work_email) = LOWER(we.email_address)
+        ON LOWER(TRIM(lr.work_email)) = LOWER(TRIM(we.email_address))
 LEFT JOIN
     person_tmf AS ptmf
         ON cp.id_person = ptmf.id_person

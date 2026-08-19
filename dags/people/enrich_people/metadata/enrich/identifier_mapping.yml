@@ -107,11 +107,11 @@ columns:
       - datalake_pin_core_clean.person_name.display_name
       - datalake_pin_core_clean.person_name.documented_full_name
   work_email:
-    description: The employee's primary work email (W1), in lowercase.
+    description: The employee's primary work email (W1), with spaces and line breaks stripped.
     lineage:
       - datalake_pin_core_clean.email_address.email_address
   personal_email:
-    description: The employee's personal email (H1), in lowercase.
+    description: The employee's personal email (H1), with spaces and line breaks stripped.
     lineage:
       - datalake_pin_core_clean.email_address.email_address
   is_user_test:
