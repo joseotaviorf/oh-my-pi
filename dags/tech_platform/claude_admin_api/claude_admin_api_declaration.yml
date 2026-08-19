@@ -1,0 +1,154 @@
+dag:
+  name: claude_admin_api
+  owner: Tech Platform Enterprise Engineering
+  callback_by_task: False
+  catchup: false
+  schedule_interval: 0 6 * * *
+  schedule_start_date: "2026, 8, 18"
+  documentation:
+    dag_purpose: |
+      Claude Enterprise Admin effective spend limits and seat roster for
+      QuintoAndar workforce seats.
+      One raw JSON payload per API record per daily load, partitioned by year,
+      month, and day; group_members is membership grain after fan-out from groups.
+      Covers current members, RBAC groups, memberships, and effective spend
+      limits from the Admin API.
+      Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo. Auth is
+      CLAUDE_ADMIN_API_KEY in the quintoandar secret scope (x-api-key) plus
+      anthropic-version 2023-06-01; group and group_members add anthropic-beta
+      ce-user-management-2026-07-13. group_members expands from raw groups via
+      group_id.
+
+workflow:
+  layer: raw
+  type: api_ingestion
+  custom_schema: claude_usage
+  api_base_url: https://api.anthropic.com
+  bucket_config_name: datalake_bucket
+  credentials_scope: quintoandar
+  has_hive_sync: false
+  default_extraction_type: incremental
+  default_raw_partitions:
+    - year
+    - month
+    - day
+  default_table_privileges:
+    auditlogs:
+      - ALL PRIVILEGES
+
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+
+  http_headers:
+    anthropic-version: "2023-06-01"
+
+  authentication:
+    strategy: api_key
+    secret_key: CLAUDE_ADMIN_API_KEY
+    api_key_field: api_key
+    location: header
+    header_name: x-api-key
+
+  api_policies:
+    pagination:
+      strategy: none
+    rate_limiting:
+      strategy: fixed_delay
+      delay_seconds: 0.2
+
+  raw_inner_dependencies:
+    group_members:
+      - groups
+
+  tables_customization:
+    spend_limits:
+      endpoint_path: v1/organizations/spend_limits/effective
+      extraction_type: incremental
+      params: {}
+      api_policies:
+        pagination:
+          strategy: cursor
+          cursor_location: param
+          cursor_param: page
+          cursor_response_path: next_page
+          results_response_path: data
+          page_size_location: param
+          page_size_param: limit
+          page_size: 1000
+        rate_limiting:
+          strategy: fixed_delay
+          delay_seconds: 0.2
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    members:
+      endpoint_path: v1/organizations/users
+      extraction_type: incremental
+      params: {}
+      api_policies:
+        pagination:
+          strategy: cursor
+          cursor_location: param
+          cursor_param: after_id
+          cursor_response_path: last_id
+          results_response_path: data
+          page_size_location: param
+          page_size_param: limit
+          page_size: 1000
+        rate_limiting:
+          strategy: fixed_delay
+          delay_seconds: 0.2
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    groups:
+      endpoint_path: v1/organizations/rbac_groups
+      extraction_type: incremental
+      params: {}
+      http_headers:
+        anthropic-beta: "ce-user-management-2026-07-13"
+      api_policies:
+        pagination:
+          strategy: cursor
+          cursor_location: param
+          cursor_param: page
+          cursor_response_path: next_page
+          results_response_path: data
+          page_size_location: param
+          page_size_param: limit
+          page_size: 1000
+        rate_limiting:
+          strategy: fixed_delay
+          delay_seconds: 0.2
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    group_members:
+      endpoint_path: v1/organizations/rbac_groups/{group_id}/members
+      extraction_type: incremental
+      execution_timeout_hours: 3
+      http_headers:
+        anthropic-beta: "ce-user-management-2026-07-13"
+      id_expansion:
+        source_table: groups
+        id_field: id
+        path_param: group_id
+        correlation_field: group_id
+        max_workers: 8
+      params: {}
+      api_policies:
+        pagination:
+          strategy: cursor
+          cursor_location: param
+          cursor_param: page
+          cursor_response_path: next_page
+          results_response_path: data
+          page_size_location: param
+          page_size_param: limit
+          page_size: 1000
+        rate_limiting:
+          strategy: fixed_delay
+          delay_seconds: 0.2
+      vacuum_retention_hours: 168
+      vacuum_lite: true
