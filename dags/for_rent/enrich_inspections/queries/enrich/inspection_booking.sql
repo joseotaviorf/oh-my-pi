@@ -1,19 +1,37 @@
 WITH union_inspection_history AS (
-    WITH last_inspection_update AS (
+    WITH last_inspection_update_ranked AS (
+        SELECT
+            ia.*,
+            -- RANK, not ROW_NUMBER: the original ts_updated = FIRST(ts_updated) OVER (...)
+            -- kept every row tied on the latest ts_updated.
+            RANK() OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC) AS rn
+        FROM
+            datalake_inspection_services_clean.inspection_aud AS ia
+    ),
+    last_inspection_update AS (
         SELECT
             *
         FROM
-            datalake_inspection_services_clean.inspection_aud AS ia
-        QUALIFY
-            ia.ts_updated = FIRST(ia.ts_updated) OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC)
+            last_inspection_update_ranked
+        WHERE
+            rn = 1
+    ),
+    last_appointment_update_ranked AS (
+        SELECT
+            a.*,
+            -- RANK, not ROW_NUMBER: the original ts_created = FIRST(ts_created) OVER (...)
+            -- kept every row tied on the latest ts_created.
+            RANK() OVER (PARTITION BY a.id_inspection ORDER BY a.ts_created DESC) AS rn
+        FROM
+            datalake_inspection_services_clean.appointment AS a
     ),
     last_appointment_update AS (
         SELECT
             *
-        FROM 
-            datalake_inspection_services_clean.appointment AS a 
-        QUALIFY 
-            a.ts_created = FIRST(a.ts_created) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_created DESC) 
+        FROM
+            last_appointment_update_ranked
+        WHERE
+            rn = 1
     )
     SELECT
         i.id_inspection,
@@ -45,11 +63,11 @@ WITH union_inspection_history AS (
     LEFT JOIN
         last_appointment_update AS a
           ON i.id_inspection = a.id_inspection
-    LEFT JOIN 
+    LEFT JOIN
         datalake_schedules_clean.appointment AS asd
           ON a.id_schedules = asd.id
-    LEFT JOIN 
-        datalake_ebdb_clean.inspection AS im 
+    LEFT JOIN
+        datalake_ebdb_clean.inspection AS im
           ON asd.id_internal_reference = im.id
     UNION
     SELECT
@@ -76,6 +94,43 @@ WITH union_inspection_history AS (
         i.ts_first_synced
     FROM
         datalake_inspections.main_inspection_booking AS i
+),
+inspection_join_keys AS (
+    -- Distinct pairs of the two columns that decide which appointments match an
+    -- inspection. id_booking is nullable, so both keys carry a sentinel to keep the
+    -- join back below null-safe with plain equality.
+    SELECT DISTINCT
+        id_inspection,
+        id_booking,
+        COALESCE(CAST(id_inspection AS STRING), '__NULL__') AS join_key_inspection,
+        COALESCE(CAST(id_booking AS STRING), '__NULL__') AS join_key_booking
+    FROM
+        union_inspection_history
+),
+appointment_match AS (
+    -- Resolves `ad.id_inspection = i.id_inspection OR ad.id_main_appointment = i.id_booking`
+    -- as the union of two equi-joins: the set of pairs satisfying a disjunction is the
+    -- union of the sets satisfying each side. UNION (not UNION ALL) drops the pairs
+    -- matched by both sides, which a single join would have emitted only once.
+    SELECT
+        ijk.join_key_inspection,
+        ijk.join_key_booking,
+        ad.id_appointment AS matched_id_appointment
+    FROM
+        inspection_join_keys AS ijk
+    JOIN
+        datalake_inspections.appointment_inspection AS ad
+            ON ad.id_inspection = ijk.id_inspection
+    UNION
+    SELECT
+        ijk.join_key_inspection,
+        ijk.join_key_booking,
+        ad.id_appointment AS matched_id_appointment
+    FROM
+        inspection_join_keys AS ijk
+    JOIN
+        datalake_inspections.appointment_inspection AS ad
+            ON ad.id_main_appointment = ijk.id_booking
 ),
 inspection_contract AS (
     SELECT
@@ -108,118 +163,177 @@ inspection_contract AS (
         datalake_region.region AS r
             ON r.id = h.id_region
     GROUP BY 1, 2, 3, 4, 9
+),
+inspection_booking_ranked AS (
+    SELECT DISTINCT
+        i.id_inspection,
+        i.id_previous_inspection,
+        i.id_external,
+        a.id_assessment,
+        i.id_booking,
+        ad.id_appointment,
+        i.id_contract,
+        i.id_client_side,
+        i.id_house,
+        i.id_inspector,
+        ic.id_country,
+        ic.id_city,
+        ic.city_name,
+        COALESCE(i.country_code, ic.country_code) AS country_code,
+        c.default_timezone AS country_default_timezone,
+        i.inspection_type,
+        ad.type AS booking_type,
+        i.source,
+        a.source AS assessment_source,
+        i.status,
+        i.has_owner_accompanying,
+        CASE
+            WHEN FIRST(i.id_inspection) OVER(PARTITION BY i.id_contract, i.inspection_type ORDER BY i.ts_created) == i.id_inspection THEN TRUE
+            ELSE FALSE
+        END AS is_first_schedule,
+        CASE
+            WHEN ic.total_rescheduling = 1
+                AND (
+                    i.status = 'received'
+                    OR (i.status IN ('reviewed','Comentada', 'Finalizada') AND i.source = 'PWA')
+                )
+                THEN TRUE
+            ELSE FALSE
+        END AS is_executed_in_first_schedule,
+        CASE
+            WHEN DATE(ad.ts_first_appointment_cancelled_utc) = DATE(ad.ts_appointment_inspected_utc) THEN True
+            ELSE False
+        END AS is_d0_canceled,
+        CASE
+            WHEN DATE(ad.ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(ad.ts_appointment_inspected_utc), 1) THEN True
+            ELSE False
+        END AS is_d1_canceled,
+        CASE
+            WHEN ad.cancellation_reason NOT IN (
+                    'INSPECTOR_BLOCKED_SCHEDULE',
+                    'CANCELED_PROBLEM_INSPECTOR',
+                    'CANCELED_INSPECTOR_NOT_ATTEND',
+                    'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'
+                )
+                THEN TRUE
+            WHEN ad.cancellation_reason IS NULL THEN NULL
+            ELSE FALSE
+        END AS is_not_canceled_by_inspector,
+        COALESCE(i.has_early_mediation, FALSE) AS has_early_mediation,
+        a.ai_processing_failure_reason,
+        a.repair_request_ai_flow,
+        a.ai_repair_analysis_control_group,
+        a.ai_repair_analysis_wave_name,
+        ic.dt_contract_entrance,
+        ic.dt_contract_termination,
+        ic.dt_execution_limit,
+        ad.ts_appointment_inspected_utc AS ts_booking_inspected_utc,
+        ad.ts_appointment_inspected_utc AS ts_booking_inspected_local_tz,
+        ad.ts_appointment_created_utc AS ts_booking_created_utc,
+        ad.ts_appointment_created_local_tz AS ts_booking_created_local_tz,
+        ad.ts_first_appointment_cancelled_utc AS ts_booking_cancelled_utc,
+        ad.ts_first_appointment_cancelled_local_tz AS ts_booking_cancelled_local_tz,
+        ic.ts_termination_canceled,
+        a.ts_started AS ts_execution_started_local_tz,
+        a.ts_finished AS ts_execution_finished_local_tz,
+        COALESCE(
+            TO_UTC_TIMESTAMP(a.ts_finished, c.default_timezone),
+            i.ts_inspected
+        ) AS ts_inspected,
+        CASE
+            WHEN i.source = "PWA" THEN i.ts_first_synced
+            ELSE a.ts_created
+        END AS ts_synced,
+        i.ts_created,
+        i.ts_updated,
+        YEAR(i.ts_updated) AS year,
+        MONTH(i.ts_updated) AS month,
+        DAY(i.ts_updated) AS day,
+        ROW_NUMBER() OVER (
+            PARTITION BY i.id_inspection
+            ORDER BY
+                i.ts_updated DESC,
+                CASE ad.status
+                    WHEN 'DONE' THEN 0
+                    WHEN 'SCHEDULED' THEN 1
+                    WHEN 'WAITING_CONFIRMATION' THEN 2
+                    WHEN 'CANCELLED' THEN 3
+                    ELSE 4
+                END ASC,
+                ad.ts_appointment_updated_utc DESC
+        ) AS rn
+    FROM
+        union_inspection_history AS i
+    LEFT JOIN
+        datalake_inspection_services_clean.assessment AS a
+            ON a.id_inspection = i.id_inspection
+    LEFT JOIN
+        inspection_contract AS ic
+            ON ic.id_contract = i.id_contract
+            AND ic.inspection_type = i.inspection_type
+    LEFT JOIN
+        datalake_ebdb_clean.country c
+            ON c.id = ic.id_country
+    LEFT JOIN
+        appointment_match AS am
+          ON am.join_key_inspection = COALESCE(CAST(i.id_inspection AS STRING), '__NULL__')
+          AND am.join_key_booking = COALESCE(CAST(i.id_booking AS STRING), '__NULL__')
+    LEFT JOIN
+        datalake_inspections.appointment_inspection AS ad
+          ON ad.id_appointment = am.matched_id_appointment
 )
-SELECT DISTINCT
-    i.id_inspection,
-    i.id_previous_inspection,
-    i.id_external,
-    a.id_assessment,
-    i.id_booking,
-    ad.id_appointment,
-    i.id_contract,
-    i.id_client_side,
-    i.id_house,
-    i.id_inspector,
-    ic.id_country,
-    ic.id_city,
-    ic.city_name,
-    COALESCE(i.country_code, ic.country_code) AS country_code,
-    c.default_timezone AS country_default_timezone,
-    i.inspection_type,
-    ad.type AS booking_type,
-    i.source,
-    a.source AS assessment_source,
-    i.status,
-    i.has_owner_accompanying,
-    CASE
-        WHEN FIRST(i.id_inspection) OVER(PARTITION BY i.id_contract, i.inspection_type ORDER BY i.ts_created) == i.id_inspection THEN TRUE
-        ELSE FALSE
-    END AS is_first_schedule,
-    CASE
-        WHEN ic.total_rescheduling = 1
-            AND (
-                i.status = 'received'
-                OR (i.status IN ('reviewed','Comentada', 'Finalizada') AND i.source = 'PWA')
-            )
-            THEN TRUE
-        ELSE FALSE
-    END AS is_executed_in_first_schedule,
-    CASE
-        WHEN DATE(ad.ts_first_appointment_cancelled_utc) = DATE(ad.ts_appointment_inspected_utc) THEN True
-        ELSE False
-    END AS is_d0_canceled,
-    CASE
-        WHEN DATE(ad.ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(ad.ts_appointment_inspected_utc), 1) THEN True
-        ELSE False
-    END AS is_d1_canceled,
-    CASE
-        WHEN ad.cancellation_reason NOT IN (
-                'INSPECTOR_BLOCKED_SCHEDULE',
-                'CANCELED_PROBLEM_INSPECTOR',
-                'CANCELED_INSPECTOR_NOT_ATTEND',
-                'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'
-            )
-            THEN TRUE
-        WHEN ad.cancellation_reason IS NULL THEN NULL
-        ELSE FALSE
-    END AS is_not_canceled_by_inspector,
-    COALESCE(i.has_early_mediation, FALSE) AS has_early_mediation,
-    a.ai_processing_failure_reason,
-    a.repair_request_ai_flow,
-    a.ai_repair_analysis_control_group,
-    a.ai_repair_analysis_wave_name,
-    ic.dt_contract_entrance,
-    ic.dt_contract_termination,
-    ic.dt_execution_limit,
-    ad.ts_appointment_inspected_utc AS ts_booking_inspected_utc,
-    ad.ts_appointment_inspected_utc AS ts_booking_inspected_local_tz,
-    ad.ts_appointment_created_utc AS ts_booking_created_utc,
-    ad.ts_appointment_created_local_tz AS ts_booking_created_local_tz,
-    ad.ts_first_appointment_cancelled_utc AS ts_booking_cancelled_utc,
-    ad.ts_first_appointment_cancelled_local_tz AS ts_booking_cancelled_local_tz,
-    ic.ts_termination_canceled,
-    a.ts_started AS ts_execution_started_local_tz,
-    a.ts_finished AS ts_execution_finished_local_tz,
-    COALESCE(
-        TO_UTC_TIMESTAMP(a.ts_finished, c.default_timezone),
-        i.ts_inspected
-    ) AS ts_inspected,
-    CASE
-        WHEN i.source = "PWA" THEN i.ts_first_synced
-        ELSE a.ts_created
-    END AS ts_synced,
-    i.ts_created,
-    i.ts_updated,
-    YEAR(i.ts_updated) AS year,
-    MONTH(i.ts_updated) AS month,
-    DAY(i.ts_updated) AS day
+SELECT
+    id_inspection,
+    id_previous_inspection,
+    id_external,
+    id_assessment,
+    id_booking,
+    id_appointment,
+    id_contract,
+    id_client_side,
+    id_house,
+    id_inspector,
+    id_country,
+    id_city,
+    city_name,
+    country_code,
+    country_default_timezone,
+    inspection_type,
+    booking_type,
+    source,
+    assessment_source,
+    status,
+    has_owner_accompanying,
+    is_first_schedule,
+    is_executed_in_first_schedule,
+    is_d0_canceled,
+    is_d1_canceled,
+    is_not_canceled_by_inspector,
+    has_early_mediation,
+    ai_processing_failure_reason,
+    repair_request_ai_flow,
+    ai_repair_analysis_control_group,
+    ai_repair_analysis_wave_name,
+    dt_contract_entrance,
+    dt_contract_termination,
+    dt_execution_limit,
+    ts_booking_inspected_utc,
+    ts_booking_inspected_local_tz,
+    ts_booking_created_utc,
+    ts_booking_created_local_tz,
+    ts_booking_cancelled_utc,
+    ts_booking_cancelled_local_tz,
+    ts_termination_canceled,
+    ts_execution_started_local_tz,
+    ts_execution_finished_local_tz,
+    ts_inspected,
+    ts_synced,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day
 FROM
-    union_inspection_history AS i
-LEFT JOIN
-    datalake_inspection_services_clean.assessment AS a
-        ON a.id_inspection = i.id_inspection
-LEFT JOIN
-    inspection_contract AS ic
-        ON ic.id_contract = i.id_contract
-        AND ic.inspection_type = i.inspection_type
-LEFT JOIN
-    datalake_ebdb_clean.country c
-        ON c.id = ic.id_country
-LEFT JOIN
-    datalake_inspections.appointment_inspection AS ad
-      ON ad.id_inspection = i.id_inspection
-      OR ad.id_main_appointment = i.id_booking
-QUALIFY 
-    ROW_NUMBER() OVER (
-    PARTITION BY i.id_inspection 
-    ORDER BY 
-        i.ts_updated DESC, 
-        CASE ad.status
-            WHEN 'DONE' THEN 0
-            WHEN 'SCHEDULED' THEN 1
-            WHEN 'WAITING_CONFIRMATION' THEN 2
-            WHEN 'CANCELLED' THEN 3
-            ELSE 4
-        END ASC,
-        ad.ts_appointment_updated_utc DESC
-    ) = 1
+    inspection_booking_ranked
+WHERE
+    rn = 1

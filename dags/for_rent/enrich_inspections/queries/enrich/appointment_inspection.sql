@@ -1,24 +1,41 @@
-WITH booking_status AS (
+WITH booking_status_ranked AS (
     SELECT
         bsc.id_booking,
         bsc.status,
-        bsc.reason_enum
+        bsc.reason_enum,
+        ROW_NUMBER() OVER (PARTITION BY bsc.id_booking, bsc.status ORDER BY bsc.id DESC) AS rn
     FROM
         datalake_ebdb_clean.booking_status_change AS bsc
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY bsc.id_booking, bsc.status ORDER BY bsc.id DESC) = 1
+),
+booking_status AS (
+    SELECT
+        id_booking,
+        status,
+        reason_enum
+    FROM
+        booking_status_ranked
+    WHERE
+        rn = 1
+),
+status_log_ranked AS (
+    SELECT
+        id_schedule,
+        id_author_user,
+        ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) AS rn
+    FROM
+        datalake_ebdb_clean.visit_status_log
+    WHERE
+        event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+        AND ts_created >= '2024-08-01'
 ),
 status_log AS (
-  SELECT
-    id_schedule,
-    id_author_user
-  FROM
-    datalake_ebdb_clean.visit_status_log
-  WHERE
-    event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
-    AND ts_created >= '2024-08-01'
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) = 1
+    SELECT
+        id_schedule,
+        id_author_user
+    FROM
+        status_log_ranked
+    WHERE
+        rn = 1
 ),
 first_booking_author_sc AS (
     SELECT DISTINCT
@@ -43,17 +60,27 @@ first_booking_author AS (
         first_booking_author_sc AS fbasc
             ON b.id = fbasc.id_booking
 ),
-min_canceled_date AS (
+min_canceled_date_ranked AS (
     SELECT
         b_aud.id AS id_booking,
-        b_aud.REV AS rev_canceled
+        b_aud.rev AS rev_canceled,
+        -- RANK, not ROW_NUMBER: the original MIN(rev) OVER (...) = rev kept every row
+        -- tied on the lowest revision.
+        RANK() OVER (PARTITION BY b_aud.id ORDER BY b_aud.rev ASC) AS rn
     FROM
         datalake_ebdb_clean.booking_aud AS b_aud
     WHERE
         b_aud.status = 'Cancelado'
         AND b_aud.mod_status = 1
-    QUALIFY
-        MIN(b_aud.REV) OVER (PARTITION BY b_aud.id) = b_aud.REV
+),
+min_canceled_date AS (
+    SELECT
+        id_booking,
+        rev_canceled
+    FROM
+        min_canceled_date_ranked
+    WHERE
+        rn = 1
 ),
 canceled_date AS (
     SELECT
@@ -69,35 +96,58 @@ canceled_date AS (
         datalake_ebdb_clean.user_revision_entity AS ure
           ON ure.id = mcd.rev_canceled
 ),
+appointment_history_ranked AS (
+    SELECT
+        ah.*,
+        ROW_NUMBER() OVER (PARTITION BY ah.id_appointment ORDER BY ah.ts_updated DESC) AS rn
+    FROM
+        datalake_schedules_clean.appointment_history AS ah
+),
 appointment_history AS (
     SELECT
         *
     FROM
-        datalake_schedules_clean.appointment_history
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated DESC) = 1
+        appointment_history_ranked
+    WHERE
+        rn = 1
 ),
-creation_users AS (
+creation_users_ranked AS (
     SELECT
         id_appointment,
-        id_updated_by_reference AS id_user_who_created
+        id_updated_by_reference AS id_user_who_created,
+        ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated ASC) AS rn
     FROM
         datalake_schedules_clean.appointment_history
     WHERE
         status = 'WAITING_CONFIRMATION'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated ASC) = 1
 ),
-canceled_users AS (
+creation_users AS (
     SELECT
         id_appointment,
-        id_updated_by_reference AS id_user_who_canceled
+        id_user_who_created
+    FROM
+        creation_users_ranked
+    WHERE
+        rn = 1
+),
+canceled_users_ranked AS (
+    SELECT
+        id_appointment,
+        id_updated_by_reference AS id_user_who_canceled,
+        ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated ASC) AS rn
     FROM
         datalake_schedules_clean.appointment_history
     WHERE
         status = 'CANCELED'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated ASC) = 1
+),
+canceled_users AS (
+    SELECT
+        id_appointment,
+        id_user_who_canceled
+    FROM
+        canceled_users_ranked
+    WHERE
+        rn = 1
 ),
 inspection_appointment_data AS (
     SELECT
@@ -245,82 +295,138 @@ coalesce_appointment_sources AS (
         inspection_appointment_data AS iad
     FULL OUTER JOIN
         main_appointment_data AS md
-            ON iad.id_is_appointment = md.id_is_appointment
-            OR iad.id_main_appointment = md.id_main_appointment
+            -- md.id_is_appointment only exists for bookings joined to an IS appointment
+            -- through id_external_appointment, which is the very column iad exposes as
+            -- id_main_appointment. Matching on id_is_appointment therefore implies matching
+            -- on id_main_appointment, and this single key covers both cases.
+            ON iad.id_main_appointment = md.id_main_appointment
+),
+inspection_data_ranked AS (
+    SELECT
+        id_inspection,
+        id_contract,
+        type AS inspection_type,
+        ts_updated,
+        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) AS rn
+    FROM
+        datalake_inspection_services_clean.inspection
 ),
 inspection_data AS (
     SELECT
         id_inspection,
         id_contract,
-        type AS inspection_type,
+        inspection_type,
         ts_updated
     FROM
-        datalake_inspection_services_clean.inspection
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
+        inspection_data_ranked
+    WHERE
+        rn = 1
+),
+appointment_inspection_ranked AS (
+    SELECT
+        MD5(COALESCE(CONCAT(cas.id_is_appointment, 'IS'), CONCAT(cas.id_main_appointment, 'PWA'))) AS id_appointment,
+        cas.id_is_appointment,
+        cas.id_main_appointment,
+        cas.id_inspection,
+        cas.id_inspector,
+        cas.id_user_who_created,
+        cas.id_user_who_canceled,
+        cas.type,
+        cas.status,
+        cas.status_made_by,
+        cas.status_description,
+        cas.cancellation_reason,
+        cas.observation,
+        cas.source,
+        cas.slot_of_day,
+        cas.duration_in_slots,
+        cas.is_fixed_agent,
+        cas.is_confirmed,
+        CASE
+            WHEN FIRST(i.id_inspection) OVER (PARTITION BY i.id_contract, i.inspection_type ORDER BY i.ts_updated) == cas.id_inspection THEN TRUE
+            ELSE FALSE
+        END AS is_first_schedule,
+        CASE
+            -- This 194233 value, is the system user id to identify if it was an automatic schedule.
+            WHEN cas.id_user_who_created = 194233 THEN TRUE
+            ELSE FALSE
+        END AS is_first_schedule_auto,
+        CASE
+            WHEN DATE(cas.ts_first_appointment_cancelled_utc) = DATE(TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC')) THEN TRUE
+            ELSE FALSE
+        END AS is_d0_canceled,
+        CASE
+            WHEN DATE(cas.ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC')), 1) THEN TRUE
+            ELSE FALSE
+        END AS is_d1_canceled,
+        CASE
+            WHEN cas.cancellation_reason NOT IN (
+                    'INSPECTOR_BLOCKED_SCHEDULE',
+                    'CANCELED_PROBLEM_INSPECTOR',
+                    'CANCELED_INSPECTOR_NOT_ATTEND',
+                    'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'
+                )
+                THEN TRUE
+            WHEN cas.cancellation_reason IS NULL THEN NULL
+            ELSE FALSE
+        END AS is_not_canceled_by_inspector,
+        TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC') AS ts_appointment_inspected_utc,
+        cas.ts_appointment_inspected_local_tz,
+        cas.ts_appointment_created_utc,
+        cas.ts_appointment_updated_utc,
+        cas.ts_appointment_created_local_tz,
+        cas.ts_appointment_updated_local_tz,
+        cas.ts_first_appointment_cancelled_utc,
+        cas.ts_first_appointment_cancelled_local_tz,
+        cas.year,
+        cas.month,
+        cas.day,
+        ROW_NUMBER() OVER (
+            PARTITION BY MD5(COALESCE(CONCAT(cas.id_is_appointment, 'IS'), CONCAT(cas.id_main_appointment, 'PWA')))
+            ORDER BY cas.ts_appointment_updated_utc DESC
+        ) AS rn
+    FROM
+        coalesce_appointment_sources AS cas
+    LEFT JOIN
+        inspection_data AS i
+          ON cas.id_inspection = i.id_inspection
 )
 SELECT
-    MD5(COALESCE(CONCAT(cas.id_is_appointment, 'IS'), CONCAT(cas.id_main_appointment, 'PWA'))) AS id_appointment,
-    cas.id_is_appointment,
-    cas.id_main_appointment,
-    cas.id_inspection,
-    cas.id_inspector,
-    cas.id_user_who_created,
-    cas.id_user_who_canceled,
-    cas.type,
-    cas.status,
-    cas.status_made_by,
-    cas.status_description,
-    cas.cancellation_reason,
-    cas.observation,
-    cas.source,
-    cas.slot_of_day,
-    cas.duration_in_slots,
-    cas.is_fixed_agent,
-    cas.is_confirmed,
-    CASE
-        WHEN FIRST(i.id_inspection) OVER (PARTITION BY i.id_contract, i.inspection_type ORDER BY i.ts_updated) == cas.id_inspection THEN TRUE
-        ELSE FALSE
-    END AS is_first_schedule,
-    CASE
-        -- This 194233 value, is the system user id to identify if it was an automatic schedule.
-        WHEN cas.id_user_who_created = 194233 THEN TRUE
-        ELSE FALSE
-    END AS is_first_schedule_auto,
-    CASE
-        WHEN DATE(cas.ts_first_appointment_cancelled_utc) = DATE(TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC')) THEN TRUE
-        ELSE FALSE
-    END AS is_d0_canceled,
-    CASE
-        WHEN DATE(cas.ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC')), 1) THEN TRUE
-        ELSE FALSE
-    END AS is_d1_canceled,
-    CASE
-        WHEN cas.cancellation_reason NOT IN (
-                'INSPECTOR_BLOCKED_SCHEDULE',
-                'CANCELED_PROBLEM_INSPECTOR',
-                'CANCELED_INSPECTOR_NOT_ATTEND',
-                'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'
-            )
-            THEN TRUE
-        WHEN cas.cancellation_reason IS NULL THEN NULL
-        ELSE FALSE
-    END AS is_not_canceled_by_inspector,
-    TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC') AS ts_appointment_inspected_utc,
-    cas.ts_appointment_inspected_local_tz,
-    cas.ts_appointment_created_utc,
-    cas.ts_appointment_updated_utc,
-    cas.ts_appointment_created_local_tz,
-    cas.ts_appointment_updated_local_tz,
-    cas.ts_first_appointment_cancelled_utc,
-    cas.ts_first_appointment_cancelled_local_tz,
-    cas.year,
-    cas.month,
-    cas.day
+    id_appointment,
+    id_is_appointment,
+    id_main_appointment,
+    id_inspection,
+    id_inspector,
+    id_user_who_created,
+    id_user_who_canceled,
+    type,
+    status,
+    status_made_by,
+    status_description,
+    cancellation_reason,
+    observation,
+    source,
+    slot_of_day,
+    duration_in_slots,
+    is_fixed_agent,
+    is_confirmed,
+    is_first_schedule,
+    is_first_schedule_auto,
+    is_d0_canceled,
+    is_d1_canceled,
+    is_not_canceled_by_inspector,
+    ts_appointment_inspected_utc,
+    ts_appointment_inspected_local_tz,
+    ts_appointment_created_utc,
+    ts_appointment_updated_utc,
+    ts_appointment_created_local_tz,
+    ts_appointment_updated_local_tz,
+    ts_first_appointment_cancelled_utc,
+    ts_first_appointment_cancelled_local_tz,
+    year,
+    month,
+    day
 FROM
-    coalesce_appointment_sources AS cas
-LEFT JOIN
-    inspection_data AS i
-      ON cas.id_inspection = i.id_inspection
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY MD5(COALESCE(CONCAT(cas.id_is_appointment, 'IS'), CONCAT(cas.id_main_appointment, 'PWA'))) ORDER BY cas.ts_appointment_updated_utc DESC) = 1
+    appointment_inspection_ranked
+WHERE
+    rn = 1

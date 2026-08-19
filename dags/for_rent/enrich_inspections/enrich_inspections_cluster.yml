@@ -1,10 +1,24 @@
 cluster:
-  type: consolidation_l_general_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_l_general_fleet_cluster
   custom_configurations:
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    # The tier default (2 CORE, no TASK) mirrors num_workers: 2, but this DAG ran on
+    # Databricks with num_workers: 3. Two TASK nodes keep worker capacity above what it
+    # replaces, since each EMR node yields 8 task slots (2 executors x 4 cores) against
+    # the 16 of a Databricks worker.
+    # Master is one tier up because emr_deploy_mode is client: every table's driver runs
+    # on the master, and this DAG starts ~12 tables in parallel.
+    master_node_type_id: m6g.8xlarge
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+        - m6g.4xlarge
+        - m7g.4xlarge
+    task_nodes:
+      target_on_demand: 0
+      target_spot: 2
+      instance_types:
+        - m6g.4xlarge
+        - m7g.4xlarge
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100

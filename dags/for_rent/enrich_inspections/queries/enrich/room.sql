@@ -1,11 +1,21 @@
-WITH room_type AS (
+WITH room_type_ranked AS (
     SELECT
         rt.id_room_type,
-        rt.type AS room_type
+        rt.type AS room_type,
+        -- RANK, not ROW_NUMBER: the original ts_updated = FIRST(ts_updated) OVER (...)
+        -- kept every row tied on the latest ts_updated.
+        RANK() OVER (PARTITION BY rt.id_room_type ORDER BY rt.ts_updated DESC) AS rn
     FROM
         datalake_inspection_services_clean.room_type rt
-    QUALIFY
-        rt.ts_updated= FIRST(rt.ts_updated) OVER(PARTITION BY rt.id_room_type ORDER BY rt.ts_updated DESC)
+),
+room_type AS (
+    SELECT
+        id_room_type,
+        room_type
+    FROM
+        room_type_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     r.id_room,

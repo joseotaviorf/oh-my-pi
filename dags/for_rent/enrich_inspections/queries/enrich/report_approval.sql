@@ -1,4 +1,4 @@
-WITH approval AS (  
+WITH approval_ranked AS (
     SELECT
         r.id_assessment,
         r.id_reviewer,
@@ -6,13 +6,26 @@ WITH approval AS (
         CAST(r.is_approved AS SMALLINT) AS approved,
         r.dt_limit_revision,
         r.ts_created,
-        r.ts_updated
+        r.ts_updated,
+        ROW_NUMBER() OVER (PARTITION BY r.id_assessment, r.id_reviewer ORDER BY r.ts_updated DESC) AS rn
     FROM
-        datalake_inspections.reviewer AS r 
+        datalake_inspections.reviewer AS r
     WHERE
         r.mod_is_approved IS TRUE
-    QUALIFY
-        r.ts_updated = LAST(r.ts_updated) OVER(PARTITION BY r.id_assessment, r.id_reviewer ORDER BY r.ts_updated)
+),
+approval AS (
+    SELECT
+        id_assessment,
+        id_reviewer,
+        reviewer_type,
+        approved,
+        dt_limit_revision,
+        ts_created,
+        ts_updated
+    FROM
+        approval_ranked
+    WHERE
+        rn = 1
 ),
 count_approval AS (
     SELECT
@@ -33,8 +46,8 @@ count_approval AS (
 )
 SELECT
     id_assessment,
-    (sum_owner_approval/count_owner_approval) = 1 AS has_owners_approval, 
-    (sum_tenant_approval/count_tenant_approval) = 1 AS has_tenants_approval, 
+    (sum_owner_approval/count_owner_approval) = 1 AS has_owners_approval,
+    (sum_tenant_approval/count_tenant_approval) = 1 AS has_tenants_approval,
     (sum_admin_approval/count_admin_approval) = 1 AS has_analysts_approval,
     dt_owner_limit_revision,
     dt_tenant_limit_revision,

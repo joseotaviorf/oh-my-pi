@@ -7,13 +7,22 @@ WITH main_inspection_aud_sync as(
     WHERE
         ia.status = 'Revisada'
 ),
+last_inspection_update_ranked AS (
+    SELECT
+        ia.*,
+        -- RANK, not ROW_NUMBER: the original ts_updated = FIRST(ts_updated) OVER (...)
+        -- kept every row tied on the latest ts_updated.
+        RANK() OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC) AS rn
+    FROM
+        datalake_inspection_services_clean.inspection_aud AS ia
+),
 last_inspection_update AS (
     SELECT
         *
     FROM
-        datalake_inspection_services_clean.inspection_aud AS ia
-    QUALIFY
-        ia.ts_updated = FIRST(ia.ts_updated) OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC)
+        last_inspection_update_ranked
+    WHERE
+        rn = 1
 ),
 main_exception AS (
     SELECT

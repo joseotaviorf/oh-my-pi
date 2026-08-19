@@ -1,32 +1,53 @@
-WITH owner_approvals AS (
+WITH owner_approvals_ranked AS (
+    SELECT
+        r.*,
+        ROW_NUMBER() OVER (PARTITION BY r.id_assessment ORDER BY r.ts_updated DESC) AS rn
+    FROM
+        datalake_inspection_services_clean.reviewer AS r
+    WHERE
+        r.reviewer_type = 'OWNER'
+),
+owner_approvals AS (
     SELECT
         *
     FROM
-        datalake_inspection_services_clean.reviewer
+        owner_approvals_ranked
     WHERE
-        reviewer_type = 'OWNER'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_assessment ORDER BY ts_updated DESC) = 1
+        rn = 1
+),
+tenant_approvals_ranked AS (
+    SELECT
+        r.*,
+        ROW_NUMBER() OVER (PARTITION BY r.id_assessment ORDER BY r.ts_updated DESC) AS rn
+    FROM
+        datalake_inspection_services_clean.reviewer AS r
+    WHERE
+        r.reviewer_type = 'TENANT'
 ),
 tenant_approvals AS (
     SELECT
         *
     FROM
-        datalake_inspection_services_clean.reviewer
+        tenant_approvals_ranked
     WHERE
-        reviewer_type = 'TENANT'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_assessment ORDER BY ts_updated DESC) = 1
+        rn = 1
+),
+assessment_ranked AS (
+    SELECT
+        a.*,
+        ROW_NUMBER() OVER (PARTITION BY a.id_inspection ORDER BY a.ts_updated DESC) AS rn
+    FROM
+        datalake_inspection_services_clean.assessment AS a
 ),
 assessment AS (
     SELECT
         *
     FROM
-        datalake_inspection_services_clean.assessment
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
+        assessment_ranked
+    WHERE
+        rn = 1
 ),
-union_reviewer_approvals AS (
+reviewer_approvals_base AS (
     SELECT
         a.id_inspection,
         COALESCE(ra_owner.id_assessment, ra_tenant.id_assessment) AS id_assessment,
@@ -62,13 +83,29 @@ union_reviewer_approvals AS (
           ON ra_owner.id_assessment = ra_tenant.id_assessment
     FULL OUTER JOIN
         assessment AS a
-          ON a.id_assessment = ra_owner.id_assessment
-          OR a.id_assessment = ra_tenant.id_assessment
+          -- The join above already equates both id_assessment columns, so the reviewer
+          -- side always exposes a single key: whichever of the two is present.
+          ON a.id_assessment = COALESCE(ra_owner.id_assessment, ra_tenant.id_assessment)
     WHERE
         DATE(COALESCE(ra_owner.ts_updated, ra_tenant.ts_updated)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY a.id_inspection ORDER BY COALESCE(ra_owner.ts_updated, ra_tenant.ts_updated) DESC) = 1
-    UNION ALL
+),
+reviewer_approvals AS (
+    SELECT
+        *
+    FROM (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (
+                PARTITION BY id_inspection
+                ORDER BY ts_updated DESC
+            ) AS rn
+        FROM
+            reviewer_approvals_base
+    )
+    WHERE
+        rn = 1
+),
+budget_approvals_base AS (
     SELECT
         b.id_inspection,
         a.id_assessment,
@@ -100,40 +137,138 @@ union_reviewer_approvals AS (
             ON a.id_inspection = b.id_inspection
     WHERE
         MAKE_DATE(b.year, b.month, b.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY b.id_inspection ORDER BY b.ts_updated DESC) = 1
+),
+budget_approvals AS (
+    SELECT
+        *
+    FROM (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) AS rn
+        FROM
+            budget_approvals_base
+    )
+    WHERE
+        rn = 1
+),
+union_reviewer_approvals AS (
+    SELECT
+        id_inspection,
+        id_assessment,
+        id_previous_assessment,
+        id_budget,
+        owner_approved_by,
+        tenant_approved_by,
+        owner_approval_comment,
+        tenant_approval_comment,
+        owner_approval_reason,
+        tenant_approval_reason,
+        approval_type,
+        owner_approved,
+        tenant_approved,
+        is_early_both_agree,
+        ts_owner_approved,
+        ts_tenant_approved,
+        dt_owner_limit_revision,
+        dt_tenant_limit_revision,
+        ts_created,
+        ts_updated,
+        year,
+        month,
+        day
+    FROM
+        reviewer_approvals
+    UNION ALL
+    SELECT
+        id_inspection,
+        id_assessment,
+        id_previous_assessment,
+        id_budget,
+        owner_approved_by,
+        tenant_approved_by,
+        owner_approval_comment,
+        tenant_approval_comment,
+        owner_approval_reason,
+        tenant_approval_reason,
+        approval_type,
+        owner_approved,
+        tenant_approved,
+        is_early_both_agree,
+        ts_owner_approved,
+        ts_tenant_approved,
+        dt_owner_limit_revision,
+        dt_tenant_limit_revision,
+        ts_created,
+        ts_updated,
+        year,
+        month,
+        day
+    FROM
+        budget_approvals
+),
+report_approvals_ranked AS (
+    SELECT
+        ura.id_inspection,
+        ura.id_assessment,
+        ura.id_previous_assessment,
+        ura.id_budget,
+        b.total_cost,
+        b.owner_amount_payment,
+        b.tenant_amount_payment,
+        ura.owner_approved_by,
+        ura.tenant_approved_by,
+        ura.owner_approval_comment,
+        ura.tenant_approval_comment,
+        ura.owner_approval_reason,
+        ura.tenant_approval_reason,
+        ura.approval_type,
+        ura.owner_approved,
+        ura.tenant_approved,
+        ura.is_early_both_agree,
+        ura.ts_owner_approved,
+        ura.ts_tenant_approved,
+        ura.dt_owner_limit_revision,
+        ura.dt_tenant_limit_revision,
+        ura.ts_created,
+        ura.ts_updated,
+        ura.year,
+        ura.month,
+        ura.day,
+        ROW_NUMBER() OVER (PARTITION BY ura.id_inspection ORDER BY ura.ts_updated DESC) AS rn
+    FROM
+        union_reviewer_approvals AS ura
+    LEFT JOIN
+        datalake_inspection_services_clean.budget AS b
+          ON b.id_inspection = ura.id_inspection
 )
 SELECT
-    ura.id_inspection,
-    ura.id_assessment,
-    ura.id_previous_assessment,
-    ura.id_budget,
-    b.total_cost,
-    b.owner_amount_payment,
-    b.tenant_amount_payment,
-    ura.owner_approved_by,
-    ura.tenant_approved_by,
-    ura.owner_approval_comment,
-    ura.tenant_approval_comment,
-    ura.owner_approval_reason,
-    ura.tenant_approval_reason,
-    ura.approval_type,
-    ura.owner_approved,
-    ura.tenant_approved,
-    ura.is_early_both_agree,
-    ura.ts_owner_approved,
-    ura.ts_tenant_approved,
-    ura.dt_owner_limit_revision,
-    ura.dt_tenant_limit_revision,
-    ura.ts_created,
-    ura.ts_updated,
-    ura.year,
-    ura.month,
-    ura.day
+    id_inspection,
+    id_assessment,
+    id_previous_assessment,
+    id_budget,
+    total_cost,
+    owner_amount_payment,
+    tenant_amount_payment,
+    owner_approved_by,
+    tenant_approved_by,
+    owner_approval_comment,
+    tenant_approval_comment,
+    owner_approval_reason,
+    tenant_approval_reason,
+    approval_type,
+    owner_approved,
+    tenant_approved,
+    is_early_both_agree,
+    ts_owner_approved,
+    ts_tenant_approved,
+    dt_owner_limit_revision,
+    dt_tenant_limit_revision,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day
 FROM
-    union_reviewer_approvals AS ura
-LEFT JOIN
-    datalake_inspection_services_clean.budget AS b
-      ON b.id_inspection = ura.id_inspection
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ura.id_inspection ORDER BY ura.ts_updated DESC) = 1
+    report_approvals_ranked
+WHERE
+    rn = 1
