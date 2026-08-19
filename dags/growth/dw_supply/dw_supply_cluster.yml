@@ -7,5 +7,5 @@ cluster:
     task_nodes:
       target_spot: 2
     spark_conf:
-      spark.executor.cores: 16
-      spark.executor.memory: 48524M
+      spark.executor.cores: 15
+      spark.executor.memory: 45g
