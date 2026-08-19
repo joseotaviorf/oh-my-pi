@@ -11,6 +11,7 @@
 | **Business purpose** | Feeds the AppSheet X-Ray / Employee Data Center so the company can view current employee data. Migrated from Daily Pipeline notebook `xray_update` ([DBP-1447](https://quintoandar.atlassian.net/browse/DBP-1447)). |
 | **Business consumer** | People (company-wide via AppSheet). |
 | **Delivery channel** | Google Sheets tab **infos_gerais** in workbook [https://docs.google.com/spreadsheets/d/1srO0ZeUk-nhoTwX8d0tj7aY0g71qtHBOjR4Ysp7QaTs/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1srO0ZeUk-nhoTwX8d0tj7aY0g71qtHBOjR4Ysp7QaTs/edit?usp=sharing). Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
+| **Contract notes** | `access_list` always includes `gbraga@quintoandar.com.br` (legacy X-Ray L0 ACL, confirmed with People Insights), then hierarchy L0–L7, HRBP, and the employee email, de-duplicated. Emails come from `identifier_mapping` (spaces and CR/LF already stripped there). Other `xray_*` EDC tabs inherit this list from `xray_general_info`. |
 
 
 ## Notebook usage context (X-Ray / Employee Data Center)

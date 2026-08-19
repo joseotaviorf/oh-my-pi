@@ -375,24 +375,35 @@ employee_base AS (
             THEN NULL
             ELSE es.talent_risk_of_loss
         END AS risco_de_perda,
-        CONCAT_WS(
-            ',',
-            LOWER(es.email_l0),
-            LOWER(es.email_l1),
-            LOWER(es.email_l2),
-            LOWER(es.email_l3),
-            LOWER(es.email_l4),
-            LOWER(es.email_l5),
-            LOWER(es.email_l6),
-            LOWER(es.email_l7),
-            LOWER(
-                COALESCE(
-                    es.hrbp_work_email,
-                    cc_current.hrbp_work_email,
-                    hrbp_by_code.hrbp_work_email
+        -- Legacy X-Ray always injected gbraga as L0 (People Insights ACL for
+        -- terminated rows whose hierarchy L0 is empty). Dedup when email_l0 is
+        -- already that address.
+        ARRAY_JOIN(
+            ARRAY_DISTINCT(
+                FILTER(
+                    ARRAY(
+                        'gbraga@quintoandar.com.br',
+                        LOWER(es.email_l0),
+                        LOWER(es.email_l1),
+                        LOWER(es.email_l2),
+                        LOWER(es.email_l3),
+                        LOWER(es.email_l4),
+                        LOWER(es.email_l5),
+                        LOWER(es.email_l6),
+                        LOWER(es.email_l7),
+                        LOWER(
+                            COALESCE(
+                                es.hrbp_work_email,
+                                cc_current.hrbp_work_email,
+                                hrbp_by_code.hrbp_work_email
+                            )
+                        ),
+                        LOWER(es.work_email)
+                    ),
+                    x -> x IS NOT NULL AND x <> ''
                 )
             ),
-            LOWER(es.work_email)
+            ','
         ) AS access_list
     FROM
         metric_people.employee_snapshots AS es
