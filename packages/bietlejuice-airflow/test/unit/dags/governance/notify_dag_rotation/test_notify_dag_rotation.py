@@ -24,6 +24,7 @@ from dags.governance.notify_dag_rotation.notify_dag_rotation import (
     _is_gchat_webhook,
     _parse_rfc3339,
     _resolve_issue_owners,
+    _should_include_oncall_period,
     _wrap_for_gchat,
     dag,
     notify_dag_rotation,
@@ -564,7 +565,7 @@ class TestGetOncallRecipients:
     def test_sunday_morning_fetches_exceptional_shift_on_today(
         self, mock_schedule, mock_user_display
     ):
-        """Sunday 09:00: no overnight on-call, but exceptional shift starts today at 09:00."""
+        """Sunday 09:00: timeline starts at 09:00 BRT (T12:00:00Z) to get the short shift."""
         from datetime import datetime
         from zoneinfo import ZoneInfo
 
@@ -581,6 +582,7 @@ class TestGetOncallRecipients:
                             {
                                 "startDate": "2026-07-26T12:00:00Z",
                                 "endDate": "2026-07-26T15:00:00Z",
+                                "type": "override",
                                 "responder": {"id": "user-1"},
                             }
                         ],
@@ -601,9 +603,202 @@ class TestGetOncallRecipients:
         assert mock_schedule.call_count == 1
         call_args, call_kwargs = mock_schedule.call_args
         assert call_args[2] == "2026-07-26"
-        assert call_kwargs.get("time_suffix") == "T00:00:00Z"
+        assert call_kwargs.get("time_suffix") == "T12:00:00Z"
         assert len(recipients) == 1
         assert recipients[0]["emailAddress"] == "weekend@example.com"
+
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._get_user_display"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._get_schedule_timeline"
+    )
+    def test_sunday_morning_prefers_0900_over_midnight_primary(
+        self, mock_schedule, mock_user_display
+    ):
+        """Prod 2026-08-16: Guilherme 09:00-12:00 must win over Isadora hour=0 Primary."""
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        from requests.auth import HTTPBasicAuth
+
+        sp_tz = ZoneInfo("America/Sao_Paulo")
+        sunday_anchor = datetime(2026, 8, 16, 9, 0, 0, tzinfo=sp_tz)
+
+        def schedule_side_effect(*args, **kwargs):
+            suffix = kwargs.get("time_suffix")
+            if suffix == "T12:00:00Z":
+                return {
+                    "finalTimeline": {
+                        "rotations": [
+                            {
+                                "name": "Primary",
+                                "periods": [
+                                    {
+                                        # 09:00-12:00 BRT — Guilherme (correct Sunday plantonista)
+                                        "startDate": "2026-08-16T12:00:00Z",
+                                        "endDate": "2026-08-16T15:00:00Z",
+                                        "type": "override",
+                                        "responder": {"id": "user-guilherme"},
+                                    }
+                                ],
+                            }
+                        ]
+                    }
+                }
+            # Midnight window only sees the earlier Primary (what prod logged).
+            return {
+                "finalTimeline": {
+                    "rotations": [
+                        {
+                            "name": "Primary",
+                            "periods": [
+                                {
+                                    "startDate": "2026-08-16T03:00:00Z",
+                                    "endDate": "2026-08-16T15:00:00Z",
+                                    "type": "historical",
+                                    "responder": {"id": "user-isadora"},
+                                }
+                            ],
+                        }
+                    ]
+                }
+            }
+
+        mock_schedule.side_effect = schedule_side_effect
+        mock_user_display.side_effect = lambda account_id, _auth: {
+            "user-guilherme": {
+                "displayName": "GUILHERME DOMINGOS SACRAMENTO",
+                "emailAddress": "guilherme@example.com",
+            },
+            "user-isadora": {
+                "displayName": "Isadora Eliziario Gallerani",
+                "emailAddress": "isadora@example.com",
+            },
+        }.get(account_id, {"displayName": account_id, "emailAddress": ""})
+
+        recipients, periods_length = _get_oncall_recipients(
+            "cloud-id", HTTPBasicAuth("u", "t"), now_sp=sunday_anchor
+        )
+
+        assert periods_length == 1
+        assert mock_schedule.call_count == 1
+        assert mock_schedule.call_args.kwargs.get("time_suffix") == "T12:00:00Z"
+        assert len(recipients) == 1
+        assert recipients[0]["emailAddress"] == "guilherme@example.com"
+
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._get_user_display"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._get_schedule_timeline"
+    )
+    def test_sunday_morning_retries_midnight_window_if_needed(
+        self, mock_schedule, mock_user_display
+    ):
+        """If T12:00:00Z has no hour=9 period, fall back to T00:00:00Z still requiring hour=9."""
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        from requests.auth import HTTPBasicAuth
+
+        sp_tz = ZoneInfo("America/Sao_Paulo")
+        sunday_anchor = datetime(2026, 8, 16, 9, 0, 0, tzinfo=sp_tz)
+
+        def schedule_side_effect(*args, **kwargs):
+            suffix = kwargs.get("time_suffix")
+            if suffix == "T12:00:00Z":
+                return {
+                    "finalTimeline": {"rotations": [{"name": "Primary", "periods": []}]}
+                }
+            return {
+                "finalTimeline": {
+                    "rotations": [
+                        {
+                            "name": "Primary",
+                            "periods": [
+                                {
+                                    "startDate": "2026-08-16T03:00:00Z",
+                                    "endDate": "2026-08-16T12:00:00Z",
+                                    "responder": {"id": "user-isadora"},
+                                },
+                                {
+                                    "startDate": "2026-08-16T12:00:00Z",
+                                    "endDate": "2026-08-16T15:00:00Z",
+                                    "responder": {"id": "user-guilherme"},
+                                },
+                            ],
+                        }
+                    ]
+                }
+            }
+
+        mock_schedule.side_effect = schedule_side_effect
+        mock_user_display.side_effect = lambda account_id, _auth: {
+            "user-guilherme": {
+                "displayName": "GUILHERME DOMINGOS SACRAMENTO",
+                "emailAddress": "guilherme@example.com",
+            },
+            "user-isadora": {
+                "displayName": "Isadora Eliziario Gallerani",
+                "emailAddress": "isadora@example.com",
+            },
+        }.get(account_id, {"displayName": account_id, "emailAddress": ""})
+
+        recipients, periods_length = _get_oncall_recipients(
+            "cloud-id", HTTPBasicAuth("u", "t"), now_sp=sunday_anchor
+        )
+
+        assert periods_length == 1
+        assert mock_schedule.call_count == 2
+        assert mock_schedule.call_args_list[0].kwargs.get("time_suffix") == "T12:00:00Z"
+        assert mock_schedule.call_args_list[1].kwargs.get("time_suffix") == "T00:00:00Z"
+        assert len(recipients) == 1
+        assert recipients[0]["emailAddress"] == "guilherme@example.com"
+
+
+class TestShouldIncludeOncallPeriod:
+    def test_sunday_and_holiday_require_hour_9(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        sp_tz = ZoneInfo("America/Sao_Paulo")
+        assert _should_include_oncall_period(
+            datetime(2026, 8, 16, 9, 0, tzinfo=sp_tz),
+            periods_length_exception=1,
+            sunday_morning=True,
+        )
+        assert not _should_include_oncall_period(
+            datetime(2026, 8, 16, 0, 0, tzinfo=sp_tz),
+            periods_length_exception=1,
+            sunday_morning=True,
+        )
+        assert _should_include_oncall_period(
+            datetime(2026, 5, 4, 9, 0, tzinfo=sp_tz),
+            periods_length_exception=1,
+            sunday_morning=False,
+        )
+        assert not _should_include_oncall_period(
+            datetime(2026, 5, 4, 0, 0, tzinfo=sp_tz),
+            periods_length_exception=1,
+            sunday_morning=False,
+        )
+
+    def test_normal_day_requires_hour_21(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        sp_tz = ZoneInfo("America/Sao_Paulo")
+        assert _should_include_oncall_period(
+            datetime(2026, 5, 4, 21, 0, tzinfo=sp_tz),
+            periods_length_exception=2,
+            sunday_morning=False,
+        )
+        assert not _should_include_oncall_period(
+            datetime(2026, 5, 4, 9, 0, tzinfo=sp_tz),
+            periods_length_exception=2,
+            sunday_morning=False,
+        )
 
 
 class TestExtractDagFromAlert:

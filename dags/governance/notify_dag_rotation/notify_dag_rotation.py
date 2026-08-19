@@ -235,7 +235,8 @@ def _get_schedule_timeline(
 
     time_suffix controls the UTC start of the query window:
     - "T21:00:00Z" (default): 18:00 BRT on shift_date, captures 21:00 BRT overnight shifts.
-    - "T00:00:00Z": 21:00 BRT on shift_date-1, captures exception shifts starting at 09:00 BRT.
+    - "T00:00:00Z": 21:00 BRT on shift_date-1, captures holiday exception shifts at 09:00 BRT.
+    - "T12:00:00Z": 09:00 BRT on shift_date, captures the Sunday exceptional 09:00-12:00 shift.
     """
     url = (
         f"{JIRA_OPS_API_BASE}/{cloud_id}/v1/schedules/{JIRA_OPS_SCHEDULE_ID}/timeline"
@@ -270,6 +271,66 @@ def _is_sunday_morning_report(anchor: datetime) -> bool:
     return anchor.weekday() == 6
 
 
+def _should_include_oncall_period(
+    start_dt: datetime,
+    *,
+    periods_length_exception: int,
+    sunday_morning: bool,
+) -> bool:
+    """Decide whether a Jira Ops timeline period is the shift this report should attribute.
+
+    - Sunday morning / holiday exception: include the 09:00 BRT day shift.
+    - Normal overnight shifts: include the 21:00 BRT start.
+    """
+    if sunday_morning or periods_length_exception == 1:
+        return start_dt.hour == 9
+    return start_dt.hour == 21
+
+
+def _dedupe_recipients(recipients: list[dict]) -> list[dict]:
+    """Preserve first-seen order while dropping duplicate emails."""
+    return list({r["emailAddress"]: r for r in recipients}.values())
+
+
+def _recipients_from_rotations(
+    rotations: list[dict],
+    jira_ops_auth: HTTPBasicAuth,
+    *,
+    periods_length_exception: int,
+    sunday_morning: bool,
+) -> list[dict]:
+    """Resolve timeline periods into notification recipients using the shift hour rules."""
+    recipients: list[dict] = []
+    for rotation in rotations:
+        rotation_name = rotation.get("name", "")
+        for period in rotation.get("periods", []):
+            start_dt = _parse_rfc3339(period["startDate"]).astimezone(SP_TZ)
+            account_id = (period.get("responder") or {}).get("id")
+            user = _get_user_display(account_id, jira_ops_auth)
+            # endDate is logged raw: Jira Ops emits non-RFC-3339 values such as "T24:00:00Z".
+            logger.info(
+                "rotation=%s, responder=%s, hour=%s, start=%s, end_raw=%s, type=%s",
+                rotation_name,
+                user["displayName"],
+                start_dt.hour,
+                start_dt.isoformat(),
+                period.get("endDate"),
+                period.get("type"),
+            )
+
+            include = _should_include_oncall_period(
+                start_dt,
+                periods_length_exception=periods_length_exception,
+                sunday_morning=sunday_morning,
+            )
+
+            if include:
+                recipients.append(user)
+                logger.info("→ included")
+
+    return _dedupe_recipients(recipients)
+
+
 def _get_oncall_recipients(
     cloud_id: str,
     jira_ops_auth: HTTPBasicAuth,
@@ -284,12 +345,15 @@ def _get_oncall_recipients(
 
     Sunday 09:00 is special: there is no Sat 21:00 → Sun 09:00 overnight shift, but the
     report still covers DEI errors from that window. The recipient is the engineer on the
-    exceptional Sun 09:00-12:00 shift (fetched from today's timeline, not D-1).
+    exceptional Sun 09:00-12:00 shift (fetched from today's timeline starting at 09:00 BRT,
+    not D-1 / midnight). Querying from midnight can return an earlier Primary period
+    (e.g. 00:00 BRT) and miss the 09:00-12:00 override/short shift.
     """
     anchor = now_sp or datetime.now(tz=SP_TZ)
     today = anchor.strftime("%Y-%m-%d")
+    sunday_morning = _is_sunday_morning_report(anchor)
 
-    if _is_sunday_morning_report(anchor):
+    if sunday_morning:
         shift_date = today
         periods_length_exception = 1
         logger.info(
@@ -297,54 +361,61 @@ def _get_oncall_recipients(
             "DEI errors still cover Sat 21:00 → Sun 09:00 (no overnight on-call).",
             shift_date,
         )
+        # Start the timeline at 09:00 BRT so finalTimeline is anchored on the exceptional
+        # short shift. A midnight (T00:00:00Z) window can surface an earlier Primary
+        # period (hour=0) and omit the 09:00-12:00 responder (prod 2026-08-16).
         timeline = _get_schedule_timeline(
-            cloud_id, jira_ops_auth, shift_date, time_suffix="T00:00:00Z"
+            cloud_id, jira_ops_auth, shift_date, time_suffix="T12:00:00Z"
         )
         rotations = timeline.get("finalTimeline", {}).get("rotations", [])
-    else:
-        shift_date = (anchor - timedelta(days=1)).strftime("%Y-%m-%d")
-        logger.info("today=%s, shift_date=%s", today, shift_date)
-
-        timeline = _get_schedule_timeline(cloud_id, jira_ops_auth, shift_date)
-        rotations = timeline.get("finalTimeline", {}).get("rotations", [])
-        periods_length_exception = (
-            len(rotations[0].get("periods", [])) if rotations else 2
+        recipients = _recipients_from_rotations(
+            rotations,
+            jira_ops_auth,
+            periods_length_exception=periods_length_exception,
+            sunday_morning=True,
         )
-        logger.info("periods_length_exception=%s", periods_length_exception)
-
-        if periods_length_exception == 1:
-            logger.info(
-                "Exception day detected on D-1 (%s) — re-fetching with midnight UTC window "
-                "to capture the 09:00 BRT exception shift.",
-                shift_date,
+        if not recipients:
+            logger.warning(
+                "No 09:00 BRT recipient in T12:00:00Z timeline — retrying Sunday fetch "
+                "with T00:00:00Z fallback window."
             )
             timeline = _get_schedule_timeline(
                 cloud_id, jira_ops_auth, shift_date, time_suffix="T00:00:00Z"
             )
             rotations = timeline.get("finalTimeline", {}).get("rotations", [])
-
-    recipients: list[dict] = []
-    for rotation in rotations:
-        rotation_name = rotation.get("name", "")
-        for period in rotation.get("periods", []):
-            start_dt = _parse_rfc3339(period["startDate"]).astimezone(SP_TZ)
-            account_id = (period.get("responder") or {}).get("id")
-            user = _get_user_display(account_id, jira_ops_auth)
-            logger.info(
-                "rotation=%s, responder=%s, hour=%s",
-                rotation_name,
-                user["displayName"],
-                start_dt.hour,
+            recipients = _recipients_from_rotations(
+                rotations,
+                jira_ops_auth,
+                periods_length_exception=periods_length_exception,
+                sunday_morning=True,
             )
+        return recipients, periods_length_exception
 
-            include = (periods_length_exception == 1 and start_dt.hour == 9) or (
-                periods_length_exception != 1 and start_dt.hour == 21
-            )
+    shift_date = (anchor - timedelta(days=1)).strftime("%Y-%m-%d")
+    logger.info("today=%s, shift_date=%s", today, shift_date)
 
-            if include:
-                recipients.append(user)
-                logger.info("→ included")
+    timeline = _get_schedule_timeline(cloud_id, jira_ops_auth, shift_date)
+    rotations = timeline.get("finalTimeline", {}).get("rotations", [])
+    periods_length_exception = len(rotations[0].get("periods", [])) if rotations else 2
+    logger.info("periods_length_exception=%s", periods_length_exception)
 
+    if periods_length_exception == 1:
+        logger.info(
+            "Exception day detected on D-1 (%s) — re-fetching with midnight UTC window "
+            "to capture the 09:00 BRT exception shift.",
+            shift_date,
+        )
+        timeline = _get_schedule_timeline(
+            cloud_id, jira_ops_auth, shift_date, time_suffix="T00:00:00Z"
+        )
+        rotations = timeline.get("finalTimeline", {}).get("rotations", [])
+
+    recipients = _recipients_from_rotations(
+        rotations,
+        jira_ops_auth,
+        periods_length_exception=periods_length_exception,
+        sunday_morning=False,
+    )
     return recipients, periods_length_exception
 
 
