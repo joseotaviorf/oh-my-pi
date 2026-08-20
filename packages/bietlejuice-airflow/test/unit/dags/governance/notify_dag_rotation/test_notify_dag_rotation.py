@@ -11,17 +11,26 @@ from dags.governance.notify_dag_rotation.notify_dag_rotation import (
     _OWNER_DISPLAY_NAME_MAP,
     INCIDENT_OWNER_FIELD,
     JIRA_OPS_SCHEDULE_ID,
+    SOURCE_AIRFLOW_ERROR,
+    SOURCE_RUNTIME_ANOMALY,
+    SOURCE_UNKNOWN,
+    _alert_matches_issue,
+    _classify_incident_source,
     _clean_dag_owner,
     _count_voice_wakeups,
     _display_owner_name,
+    _enrich_issues_from_alerts,
     _environment_suffix,
     _extract_dag_from_alert,
+    _fetch_classified_alerts,
     _fetch_dei_issues,
+    _format_issue_alert_text,
     _get_oncall_recipients,
     _get_schedule_timeline,
     _get_user_display,
     _incident_owner_from_dag,
     _is_gchat_webhook,
+    _parse_optional_datetime,
     _parse_rfc3339,
     _resolve_issue_owners,
     _should_include_oncall_period,
@@ -828,6 +837,211 @@ class TestExtractDagFromAlert:
     def test_placeholder_when_message_empty(self):
         assert _extract_dag_from_alert("", {"domain.dag"}) == "Alerta sem descrição"
 
+    def test_matches_known_dag_id_in_alias(self):
+        result = _extract_dag_from_alert(
+            "DAG runtime anomaly",
+            {"bietlejuice.dw_listing"},
+            extra_texts=["dag-runtime-bietlejuice.dw_listing-run1"],
+        )
+        assert result == "bietlejuice.dw_listing"
+
+
+class TestClassifyIncidentSource:
+    def test_rubinho_alias_is_runtime_anomaly(self):
+        assert (
+            _classify_incident_source(
+                "anything",
+                alias="dag-runtime-bietlejuice.dw_listing-scheduled__1",
+            )
+            == SOURCE_RUNTIME_ANOMALY
+        )
+
+    def test_runtime_anomaly_in_message(self):
+        assert (
+            _classify_incident_source("DAG runtime anomaly: bietlejuice.dw_listing")
+            == SOURCE_RUNTIME_ANOMALY
+        )
+
+    def test_runtime_anomaly_in_tags(self):
+        assert (
+            _classify_incident_source(
+                "slow dag",
+                tags=["bietlejuice.dw_listing", "runtime anomaly", "critical"],
+            )
+            == SOURCE_RUNTIME_ANOMALY
+        )
+
+    def test_airflow_task_failure_message(self):
+        assert (
+            _classify_incident_source("DAG: domain.dag - Task: execute-job-cluster")
+            == SOURCE_AIRFLOW_ERROR
+        )
+
+    def test_airflow_dag_failure_message(self):
+        assert (
+            _classify_incident_source("DAG: domain.dag Failed") == SOURCE_AIRFLOW_ERROR
+        )
+
+    def test_airflow_tags(self):
+        assert (
+            _classify_incident_source(
+                "domain.dag",
+                tags=["domain.dag", "execute-job-cluster", "task failed"],
+            )
+            == SOURCE_AIRFLOW_ERROR
+        )
+
+    def test_unknown_when_no_signal(self):
+        assert _classify_incident_source("manual page") == SOURCE_UNKNOWN
+
+
+class TestParseOptionalDatetime:
+    def test_parses_rfc3339(self):
+        result = _parse_optional_datetime("2026-05-05T01:00:00Z")
+        assert result is not None
+        assert result.year == 2026
+
+    def test_parses_epoch_milliseconds(self):
+        result = _parse_optional_datetime(1746406800000)
+        assert result is not None
+
+    def test_none_and_empty(self):
+        assert _parse_optional_datetime(None) is None
+        assert _parse_optional_datetime("") is None
+
+
+class TestEnrichIssuesFromAlerts:
+    def test_matches_closest_alert_and_does_not_reuse(self):
+        issues = [
+            {
+                "key": "DEI-1",
+                "summary": "domain.dag",
+                "created": "2026-05-05T01:00:00Z",
+            },
+            {
+                "key": "DEI-2",
+                "summary": "domain.dag",
+                "created": "2026-05-05T01:20:00Z",
+            },
+        ]
+        alerts = [
+            {
+                "alert_id": "a1",
+                "dag": "domain.dag",
+                "message": "DAG: domain.dag - Task: t1",
+                "created_at": "2026-05-05T01:01:00Z",
+                "source_label": SOURCE_AIRFLOW_ERROR,
+                "had_voice": True,
+            },
+            {
+                "alert_id": "a2",
+                "dag": "domain.dag",
+                "message": "DAG runtime anomaly: domain.dag",
+                "created_at": "2026-05-05T01:19:00Z",
+                "source_label": SOURCE_RUNTIME_ANOMALY,
+                "had_voice": False,
+            },
+        ]
+
+        result = _enrich_issues_from_alerts(issues, alerts)
+
+        assert result[0]["source_label"] == SOURCE_AIRFLOW_ERROR
+        assert result[0]["had_voice"] is True
+        assert result[1]["source_label"] == SOURCE_RUNTIME_ANOMALY
+        assert result[1]["had_voice"] is False
+
+    def test_unmatched_issue_is_unknown_without_voice(self):
+        issues = [
+            {
+                "key": "DEI-9",
+                "summary": "manual.card",
+                "created": "2026-05-05T01:00:00Z",
+            }
+        ]
+        result = _enrich_issues_from_alerts(issues, [])
+        assert result[0]["source_label"] == SOURCE_UNKNOWN
+        assert result[0]["had_voice"] is False
+
+    def test_matches_dag_id_inside_alert_message(self):
+        issues = [{"key": "DEI-3", "summary": "bietlejuice.dw_listing"}]
+        alerts = [
+            {
+                "alert_id": "a1",
+                "dag": "DAG runtime anomaly: bietlejuice.dw_listing",
+                "message": "DAG runtime anomaly: bietlejuice.dw_listing",
+                "source_label": SOURCE_RUNTIME_ANOMALY,
+                "had_voice": False,
+            }
+        ]
+        result = _enrich_issues_from_alerts(issues, alerts)
+        assert result[0]["source_label"] == SOURCE_RUNTIME_ANOMALY
+        assert result[0]["had_voice"] is False
+
+    def test_does_not_match_shorter_dag_id_inside_longer_dag(self):
+        issues = [{"key": "DEI-1", "summary": "bietlejuice.dw_listing"}]
+        alerts = [
+            {
+                "alert_id": "a1",
+                "dag": "bietlejuice.dw_listing_owners",
+                "message": "DAG: bietlejuice.dw_listing_owners - Task: t1",
+                "source_label": SOURCE_AIRFLOW_ERROR,
+                "had_voice": True,
+            }
+        ]
+        result = _enrich_issues_from_alerts(issues, alerts)
+        assert result[0]["source_label"] == SOURCE_UNKNOWN
+        assert result[0]["had_voice"] is False
+
+    def test_matches_dag_id_in_rubinho_alias(self):
+        assert _alert_matches_issue(
+            {
+                "dag": "Alerta sem descrição",
+                "message": "DAG runtime anomaly",
+                "alias": "dag-runtime-bietlejuice.dw_listing-scheduled__1",
+                "tags": [],
+            },
+            "bietlejuice.dw_listing",
+        )
+
+    def test_pairs_earlier_card_first_even_when_listed_later(self):
+        issues = [
+            {
+                "key": "DEI-2",
+                "summary": "domain.dag",
+                "created": "2026-05-05T01:02:00Z",
+            },
+            {
+                "key": "DEI-1",
+                "summary": "domain.dag",
+                "created": "2026-05-05T01:00:00Z",
+            },
+        ]
+        alerts = [
+            {
+                "alert_id": "a1",
+                "dag": "domain.dag",
+                "created_at": "2026-05-05T01:01:00Z",
+                "source_label": SOURCE_AIRFLOW_ERROR,
+                "had_voice": True,
+            },
+            {
+                "alert_id": "a2",
+                "dag": "domain.dag",
+                "created_at": "2026-05-05T01:03:00Z",
+                "source_label": SOURCE_RUNTIME_ANOMALY,
+                "had_voice": False,
+            },
+        ]
+
+        result = _enrich_issues_from_alerts(issues, alerts)
+
+        by_key = {issue["key"]: issue for issue in result}
+        assert result[0]["key"] == "DEI-2"
+        assert by_key["DEI-1"]["source_label"] == SOURCE_AIRFLOW_ERROR
+        assert by_key["DEI-1"]["had_voice"] is True
+        assert by_key["DEI-2"]["source_label"] == SOURCE_RUNTIME_ANOMALY
+        assert by_key["DEI-2"]["had_voice"] is False
+
 
 class TestCountVoiceWakeups:
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.get")
@@ -867,6 +1081,61 @@ class TestCountVoiceWakeups:
         assert len(result) == 1
         assert result[0]["alert_id"] == "alert-1"
         assert result[0]["dag"] == "domain.dag"
+        assert result[0]["had_voice"] is True
+
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.get")
+    def test_keeps_alerts_without_voice_in_classified_list(self, mock_get):
+        alerts_resp = mock.MagicMock()
+        alerts_resp.status_code = 200
+        alerts_resp.json.return_value = {
+            "values": [
+                {
+                    "id": "alert-1",
+                    "message": "DAG runtime anomaly: domain.dag",
+                    "tags": ["domain.dag", "runtime anomaly"],
+                    "alias": "dag-runtime-domain.dag-r1",
+                    "createdAt": "2026-05-05T01:00:00Z",
+                },
+                {
+                    "id": "alert-2",
+                    "message": "DAG: other.dag - Task: execute-job-cluster",
+                    "tags": ["other.dag", "task failed"],
+                    "createdAt": "2026-05-05T01:10:00Z",
+                },
+            ]
+        }
+        voice_logs = mock.MagicMock()
+        voice_logs.status_code = 200
+        voice_logs.json.return_value = {
+            "values": [
+                {"log": "Notification sent [voice] -> Sent to zacarias@example.com"}
+            ]
+        }
+        silent_logs = mock.MagicMock()
+        silent_logs.status_code = 200
+        silent_logs.json.return_value = {
+            "values": [
+                {"log": "Notification sent [email] -> Sent to zacarias@example.com"}
+            ]
+        }
+        mock_get.side_effect = [alerts_resp, voice_logs, silent_logs]
+        from requests.auth import HTTPBasicAuth
+
+        classified = _fetch_classified_alerts(
+            "cloud-id",
+            HTTPBasicAuth("u", "t"),
+            2,
+            known_dag_ids={"domain.dag", "other.dag"},
+        )
+        assert len(classified) == 2
+        by_id = {item["alert_id"]: item for item in classified}
+        assert by_id["alert-1"]["source_label"] == SOURCE_RUNTIME_ANOMALY
+        assert by_id["alert-1"]["had_voice"] is True
+        assert by_id["alert-1"]["dag"] == "domain.dag"
+        assert by_id["alert-2"]["source_label"] == SOURCE_AIRFLOW_ERROR
+        assert by_id["alert-2"]["had_voice"] is False
+        wakeups = [item for item in classified if item["had_voice"]]
+        assert [item["alert_id"] for item in wakeups] == ["alert-1"]
 
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.get")
     def test_returns_empty_when_api_fails(self, mock_get):
@@ -940,7 +1209,7 @@ class TestCountVoiceWakeups:
 class TestNotifyDagRotationCallable:
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.post")
     @mock.patch(
-        "dags.governance.notify_dag_rotation.notify_dag_rotation._count_voice_wakeups"
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._fetch_classified_alerts"
     )
     @mock.patch(
         "dags.governance.notify_dag_rotation.notify_dag_rotation._get_oncall_recipients"
@@ -987,9 +1256,27 @@ class TestNotifyDagRotationCallable:
             2,
         )
         mock_wakeups.return_value = [
-            {"alert_id": "a1", "message": "domain.dag boom", "dag": "domain.dag"},
-            {"alert_id": "a2", "message": "other.dag boom", "dag": "other.dag"},
-            {"alert_id": "a3", "message": "domain.dag boom again", "dag": "domain.dag"},
+            {
+                "alert_id": "a1",
+                "message": "DAG: domain.dag - Task: t1",
+                "dag": "domain.dag",
+                "source_label": SOURCE_AIRFLOW_ERROR,
+                "had_voice": True,
+            },
+            {
+                "alert_id": "a2",
+                "message": "DAG: other.dag - Task: t1",
+                "dag": "other.dag",
+                "source_label": SOURCE_AIRFLOW_ERROR,
+                "had_voice": True,
+            },
+            {
+                "alert_id": "a3",
+                "message": "DAG runtime anomaly: domain.dag",
+                "dag": "domain.dag",
+                "source_label": SOURCE_RUNTIME_ANOMALY,
+                "had_voice": True,
+            },
         ]
 
         mock_resp = mock.MagicMock()
@@ -1008,6 +1295,8 @@ class TestNotifyDagRotationCallable:
         # Deduplicated, first-seen order preserved.
         assert payload["wakeup_dags"] == ["domain.dag", "other.dag"]
         assert len(payload["error_list"]) == 1
+        assert payload["error_list"][0]["source_label"] == SOURCE_AIRFLOW_ERROR
+        assert payload["error_list"][0]["had_voice"] is True
         assert payload["email"] == "zacarias@example.com"
 
     @mock.patch(
@@ -1051,7 +1340,7 @@ class TestNotifyDagRotationCallable:
             mock_post.assert_not_called()
 
     @mock.patch(
-        "dags.governance.notify_dag_rotation.notify_dag_rotation._count_voice_wakeups"
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._fetch_classified_alerts"
     )
     @mock.patch(
         "dags.governance.notify_dag_rotation.notify_dag_rotation._get_oncall_recipients"
@@ -1161,6 +1450,45 @@ class TestWrapForGchat:
         assert "Data People" in issue_widget["textParagraph"]["text"]
         assert len(alerts_widgets) == 2
 
+    def test_annotates_source_and_acordamento_on_issue_lines(self):
+        payload = {
+            "email": "zacarias@example.com",
+            "start_time": "2026-06-07T21:00",
+            "called_count": "1",
+            "error_list": [
+                {
+                    "url": "https://jira/DEI-26333",
+                    "key": "DEI-26333",
+                    "owner": "Data House and Listing",
+                    "source_label": SOURCE_RUNTIME_ANOMALY,
+                    "had_voice": True,
+                },
+                {
+                    "url": "https://jira/DEI-26334",
+                    "key": "DEI-26334",
+                    "owner": "QCX",
+                    "source_label": SOURCE_AIRFLOW_ERROR,
+                    "had_voice": False,
+                },
+            ],
+        }
+        result = _wrap_for_gchat(payload)
+        alerts_widgets = result["cardsV2"][0]["card"]["sections"][1]["widgets"]
+        assert (
+            "Tivemos 2 erros (1 com chamada):"
+            in alerts_widgets[0]["textParagraph"]["text"]
+        )
+        listing_line = alerts_widgets[1]["textParagraph"]["text"]
+        qcx_line = alerts_widgets[2]["textParagraph"]["text"]
+        assert "DEI-26333" in listing_line
+        assert "Data House and Listing" in listing_line
+        assert "Runtime anomaly" in listing_line
+        assert "Acordamento" in listing_line
+        assert "DEI-26334" in qcx_line
+        assert "QCX" in qcx_line
+        assert "Airflow error" in qcx_line
+        assert "Acordamento" not in qcx_line
+
     def test_card_has_two_sections_with_divider_widget(self):
         payload = {
             "email": "zacarias@example.com",
@@ -1222,6 +1550,35 @@ class TestWrapForGchat:
         }
         result = _wrap_for_gchat(payload)
         assert "['a@example.com', 'b@example.com']" in self._card_text(result)
+
+
+class TestFormatIssueAlertText:
+    def test_includes_source_and_acordamento(self):
+        text = _format_issue_alert_text(
+            {
+                "url": "https://jira/DEI-1",
+                "key": "DEI-1",
+                "owner": "QCX",
+                "source_label": SOURCE_AIRFLOW_ERROR,
+                "had_voice": True,
+            }
+        )
+        assert text == (
+            '<a href="https://jira/DEI-1">DEI-1</a> - QCX - Airflow error - Acordamento'
+        )
+
+    def test_omits_acordamento_when_no_voice(self):
+        text = _format_issue_alert_text(
+            {
+                "url": "https://jira/DEI-2",
+                "key": "DEI-2",
+                "owner": "QCX",
+                "source_label": SOURCE_RUNTIME_ANOMALY,
+                "had_voice": False,
+            }
+        )
+        assert "Acordamento" not in text
+        assert "Runtime anomaly" in text
 
 
 class TestNotifyDagRotationDAG:

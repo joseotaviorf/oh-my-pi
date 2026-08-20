@@ -76,6 +76,11 @@ _AIRFLOW_OWNER_TO_INCIDENT_OWNER = {
     "MLOps Team": "MLOps",
 }
 
+SOURCE_RUNTIME_ANOMALY = "Runtime anomaly"
+SOURCE_AIRFLOW_ERROR = "Airflow error"
+SOURCE_UNKNOWN = "Unknown"
+RUBINHO_ALIAS_PREFIX = "dag-runtime-"
+
 
 def _parse_rfc3339(datetime_str: str) -> datetime:
     """Parse an RFC 3339 datetime string with or without fractional seconds."""
@@ -83,6 +88,56 @@ def _parse_rfc3339(datetime_str: str) -> datetime:
         return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%f%z")
     except ValueError:
         return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S%z")
+
+
+def _parse_optional_datetime(value) -> datetime | None:
+    """Parse Jira / Jira Ops timestamps (RFC 3339 strings or Unix epoch)."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            return value.replace(tzinfo=SP_TZ)
+        return value
+    if isinstance(value, (int, float)):
+        ts = value / 1000.0 if value > 1e12 else float(value)
+        return datetime.fromtimestamp(ts, tz=SP_TZ)
+    if not isinstance(value, str):
+        return None
+    try:
+        return _parse_rfc3339(value)
+    except ValueError:
+        return None
+
+
+def _normalize_tags(tags) -> list[str]:
+    """Coerce Jira Ops ``tags`` (list or string) into a list of strings."""
+    if not tags:
+        return []
+    if isinstance(tags, str):
+        return [tags]
+    return [str(tag) for tag in tags if tag]
+
+
+def _classify_incident_source(
+    message: str,
+    tags: list[str] | None = None,
+    alias: str | None = None,
+) -> str:
+    """Classify a Jira Ops alert as Rubinho slowness, Airflow failure, or unknown."""
+    if alias and str(alias).startswith(RUBINHO_ALIAS_PREFIX):
+        return SOURCE_RUNTIME_ANOMALY
+    msg = (message or "").lower()
+    tag_blob = " ".join(_normalize_tags(tags)).lower()
+    if "runtime anomaly" in msg or "runtime anomaly" in tag_blob:
+        return SOURCE_RUNTIME_ANOMALY
+    if (
+        msg.startswith("dag:")
+        or ("dag:" in msg and "task:" in msg)
+        or "task failed" in tag_blob
+        or "dag failed" in tag_blob
+    ):
+        return SOURCE_AIRFLOW_ERROR
+    return SOURCE_UNKNOWN
 
 
 def _resolve_now_sp(load_start_date: str | None) -> datetime:
@@ -450,8 +505,7 @@ def _fetch_alerts_in_window(
 ) -> list[dict]:
     """List all alerts in the time window, following Jira Ops offset pagination.
 
-    Returns a list of ``{"id", "message"}`` dicts (the ``message`` is the alert
-    title, used to resolve which DAG triggered the wakeup).
+    Returns dicts with ``id``, ``message``, ``tags``, ``alias`` and ``created_at``.
     ``start_ts_ms`` and ``end_ts_ms`` are Unix epoch milliseconds (Jira Ops API format).
     """
     alerts: list[dict] = []
@@ -482,11 +536,19 @@ def _fetch_alerts_in_window(
             break
 
         batch = resp.json().get("values", [])
-        alerts.extend(
-            {"id": alert_id, "message": item.get("message", "")}
-            for item in batch
-            if (alert_id := item.get("id"))
-        )
+        for item in batch:
+            alert_id = item.get("id")
+            if not alert_id:
+                continue
+            alerts.append(
+                {
+                    "id": alert_id,
+                    "message": item.get("message", "") or "",
+                    "tags": _normalize_tags(item.get("tags")),
+                    "alias": item.get("alias") or "",
+                    "created_at": item.get("createdAt") or item.get("created_at"),
+                }
+            )
 
         if len(batch) < page_size:
             break
@@ -532,43 +594,34 @@ def _alert_had_voice_call(
     return False
 
 
-def _extract_dag_from_alert(message: str, known_dag_ids: set[str] | None) -> str:
+def _extract_dag_from_alert(
+    message: str,
+    known_dag_ids: set[str] | None,
+    extra_texts: list[str] | None = None,
+) -> str:
     """Best-effort resolution of the DAG behind a wakeup alert.
 
-    Matches the alert message against the set of known active DAG IDs (longest
-    match wins, so a more specific 'domain.sub.dag' is preferred over 'domain.sub').
-    Falls back to the raw message when no known DAG ID is found, and to a
-    placeholder when the message is empty.
+    Matches the alert message (plus optional alias/tags) against the set of known
+    active DAG IDs (longest match wins, so a more specific 'domain.sub.dag' is
+    preferred over 'domain.sub'). Falls back to the raw message when no known DAG
+    ID is found, and to a placeholder when the message is empty.
     """
-    text = (message or "").strip()
+    parts = [(message or "").strip()]
+    if extra_texts:
+        parts.extend(text for text in extra_texts if text)
+    text = " ".join(parts).strip()
     if known_dag_ids:
         matches = [dag_id for dag_id in known_dag_ids if dag_id and dag_id in text]
         if matches:
             return max(matches, key=len)
-    return text or "Alerta sem descrição"
+    return (message or "").strip() or text or "Alerta sem descrição"
 
 
-def _count_voice_wakeups(
-    cloud_id: str,
-    jira_ops_auth: HTTPBasicAuth,
+def _alert_query_window(
     periods_length_exception: int,
     now_sp: datetime | None = None,
-    known_dag_ids: set[str] | None = None,
-) -> list[dict]:
-    """List distinct alerts that triggered a voice call (acordamentos) in the shift window.
-
-    Returns one ``{"alert_id", "message", "dag"}`` entry per alert that generated
-    at least one sent voice notification; ``len()`` of the result is the wakeup count.
-    ``dag`` is resolved from the alert message via ``known_dag_ids`` (see
-    ``_extract_dag_from_alert``).
-
-    Normal day: shift ran D-1 21:00 → D 09:00 SP. Query window: D-1 21:00 → D noon.
-    Exception day (holiday): shift ran D 09:00 → 21:00 SP. Query window: 09:00 → noon.
-    Sunday 09:00 report: no overnight on-call Sat 21:00 → Sun 09:00, but alerts in that
-    window are still attributed to the Sun 09:00-12:00 engineer. Query window: Sat 21:00 → noon.
-    Both windows are expressed as SP-local timestamps to match the worker environment.
-    Retries on the same alert count once; separate alerts (e.g. from different DAGs) count separately.
-    """
+) -> tuple[datetime, datetime]:
+    """Return the Jira Ops alert query window for the shift being reported."""
     now = now_sp or datetime.now(tz=SP_TZ)
     if _is_sunday_morning_report(now) and periods_length_exception == 1:
         start_dt = (now - timedelta(days=1)).replace(
@@ -583,7 +636,22 @@ def _count_voice_wakeups(
     else:
         start_dt = now.replace(hour=9, minute=0, second=0, microsecond=0)
         end_dt = now.replace(hour=12, minute=0, second=0, microsecond=0)
+    return start_dt, end_dt
 
+
+def _fetch_classified_alerts(
+    cloud_id: str,
+    jira_ops_auth: HTTPBasicAuth,
+    periods_length_exception: int,
+    now_sp: datetime | None = None,
+    known_dag_ids: set[str] | None = None,
+) -> list[dict]:
+    """Fetch shift-window alerts and classify origin + whether voice was sent.
+
+    Returns one dict per alert with ``alert_id``, ``message``, ``tags``, ``alias``,
+    ``created_at``, ``dag``, ``source_label`` and ``had_voice``.
+    """
+    start_dt, end_dt = _alert_query_window(periods_length_exception, now_sp=now_sp)
     start_ts_ms = int(start_dt.timestamp() * 1000)
     end_ts_ms = int(end_dt.timestamp() * 1000)
     jql_query = (
@@ -606,19 +674,144 @@ def _count_voice_wakeups(
 
     logger.info("Found %d alerts in window", len(alerts))
 
-    wakeups: list[dict] = []
+    classified: list[dict] = []
     for alert in alerts:
-        if _alert_had_voice_call(cloud_id, jira_ops_auth, alert["id"]):
-            message = alert.get("message", "")
-            wakeups.append(
-                {
-                    "alert_id": alert["id"],
-                    "message": message,
-                    "dag": _extract_dag_from_alert(message, known_dag_ids),
-                }
-            )
-    logger.info("%d alerts with voice calls", len(wakeups))
-    return wakeups
+        message = alert.get("message", "")
+        tags = _normalize_tags(alert.get("tags"))
+        alias = alert.get("alias") or ""
+        had_voice = _alert_had_voice_call(cloud_id, jira_ops_auth, alert["id"])
+        classified.append(
+            {
+                "alert_id": alert["id"],
+                "message": message,
+                "tags": tags,
+                "alias": alias,
+                "created_at": alert.get("created_at"),
+                "dag": _extract_dag_from_alert(
+                    message, known_dag_ids, extra_texts=[alias, *tags]
+                ),
+                "source_label": _classify_incident_source(message, tags, alias),
+                "had_voice": had_voice,
+            }
+        )
+    voice_count = sum(1 for alert in classified if alert["had_voice"])
+    logger.info("%d alerts with voice calls", voice_count)
+    return classified
+
+
+def _count_voice_wakeups(
+    cloud_id: str,
+    jira_ops_auth: HTTPBasicAuth,
+    periods_length_exception: int,
+    now_sp: datetime | None = None,
+    known_dag_ids: set[str] | None = None,
+) -> list[dict]:
+    """List distinct alerts that triggered a voice call (acordamentos) in the shift window.
+
+    Returns one classified-alert dict per alert that generated at least one sent
+    voice notification; ``len()`` of the result is the wakeup count.
+    """
+    classified = _fetch_classified_alerts(
+        cloud_id,
+        jira_ops_auth,
+        periods_length_exception,
+        now_sp=now_sp,
+        known_dag_ids=known_dag_ids,
+    )
+    return [alert for alert in classified if alert.get("had_voice")]
+
+
+def _dag_id_in_text(dag_id: str, text: str) -> bool:
+    """Return True when ``dag_id`` appears as a whole DAG token in ``text``.
+
+    Avoids matching ``bietlejuice.dw_listing`` inside ``bietlejuice.dw_listing_owners``.
+    Hyphens are allowed as separators so Rubinho aliases
+    (``dag-runtime-{dag_id}-{run_id}``) still match.
+    """
+    if not dag_id or not text:
+        return False
+    pattern = rf"(?<![A-Za-z0-9._]){re.escape(dag_id)}(?![A-Za-z0-9._])"
+    return re.search(pattern, text) is not None
+
+
+def _alert_matches_issue(alert: dict, dag_id: str) -> bool:
+    """Return True when the alert is associated with the DEI issue DAG id."""
+    if not dag_id:
+        return False
+    if alert.get("dag") == dag_id:
+        return True
+    haystack = " ".join(
+        [alert.get("message") or "", alert.get("alias") or "", alert.get("dag") or ""]
+        + list(alert.get("tags") or [])
+    )
+    return _dag_id_in_text(dag_id, haystack)
+
+
+def _issue_created_sort_key(issue: dict) -> datetime:
+    """Sort key so earlier DEI cards are paired before later ones."""
+    parsed = _parse_optional_datetime(issue.get("created"))
+    if parsed is None:
+        return datetime.max.replace(tzinfo=SP_TZ)
+    return parsed
+
+
+def _enrich_issues_from_alerts(issues: list[dict], alerts: list[dict]) -> list[dict]:
+    """Attach ``source_label`` and ``had_voice`` to each DEI issue from Jira Ops alerts.
+
+    Matches on DAG id (issue summary) and, when several alerts share that DAG,
+    picks the unused alert whose ``created_at`` is closest to the issue ``created``.
+    Issues are paired in created order so Jira search order cannot steal the
+    nearer alert for a later card. The returned list keeps the original order.
+    """
+    used_alert_ids: set[str] = set()
+    for issue in sorted(issues, key=_issue_created_sort_key):
+        dag_id = (issue.get("summary") or "").strip()
+        issue_created = _parse_optional_datetime(issue.get("created"))
+        candidates = [
+            alert
+            for alert in alerts
+            if alert.get("alert_id") not in used_alert_ids
+            and _alert_matches_issue(alert, dag_id)
+        ]
+        if not candidates:
+            issue["source_label"] = SOURCE_UNKNOWN
+            issue["had_voice"] = False
+            continue
+
+        def _delta(alert: dict, created: datetime | None = issue_created) -> timedelta:
+            alert_created = _parse_optional_datetime(alert.get("created_at"))
+            if alert_created is None or created is None:
+                return timedelta.max
+            return abs(alert_created - created)
+
+        best = min(candidates, key=_delta)
+        used_alert_ids.add(best["alert_id"])
+        issue["source_label"] = best.get("source_label") or SOURCE_UNKNOWN
+        issue["had_voice"] = bool(best.get("had_voice"))
+    return issues
+
+
+def _issue_error_entry(issue: dict) -> dict:
+    """Build one ``error_list`` item for the notification payload."""
+    return {
+        "url": f"{DEI_BOARD_URL}?selectedIssue={issue['key']}",
+        "key": issue["key"],
+        "owner": issue.get("owner"),
+        "source_label": issue.get("source_label") or SOURCE_UNKNOWN,
+        "had_voice": bool(issue.get("had_voice")),
+    }
+
+
+def _format_issue_alert_text(issue: dict) -> str:
+    """Render one DEI issue line for the Google Chat card."""
+    owner = issue.get("owner") or "N/A"
+    parts = [f'<a href="{issue["url"]}">{issue["key"]}</a>', owner]
+    source_label = issue.get("source_label")
+    if source_label:
+        parts.append(source_label)
+    if issue.get("had_voice"):
+        parts.append("Acordamento")
+    return " - ".join(parts)
 
 
 def _is_gchat_webhook(url: str) -> bool:
@@ -651,14 +844,12 @@ def _wrap_for_gchat(payload: dict) -> dict:
         summary_text += "".join(f"<br>• {dag_name}" for dag_name in wakeup_dags)
 
     if error_list:
-        alerts_widgets: list[dict] = [
-            {"textParagraph": {"text": f"Tivemos {len(error_list)} erros:"}}
-        ] + [
-            {
-                "textParagraph": {
-                    "text": f'<a href="{issue["url"]}">{issue["key"]}</a> - {issue.get("owner", "N/A")}'
-                }
-            }
+        voice_count = sum(1 for issue in error_list if issue.get("had_voice"))
+        header = f"Tivemos {len(error_list)} erros:"
+        if voice_count:
+            header = f"Tivemos {len(error_list)} erros ({voice_count} com chamada):"
+        alerts_widgets: list[dict] = [{"textParagraph": {"text": header}}] + [
+            {"textParagraph": {"text": _format_issue_alert_text(issue)}}
             for issue in error_list
         ]
     else:
@@ -707,9 +898,11 @@ def notify_dag_rotation(session=None, **context):
     2. Resolve missing incident owners using the Airflow DagModel (DAG summary = DAG ID).
     3. Write back inferred owners to the DEI Jira issues.
     4. Retrieve the current on-call engineer(s) from the Jira Ops schedule.
-    5. Count voice wakeups from Jira Ops alerts and resolve which DAG triggered each one.
-    6. POST summary payload to notification-hub (DAG_Rotation space).
-    7. Optionally POST to iam-alerts space for Cyber Security issues (best-effort, non-fatal).
+    5. Fetch Jira Ops alerts in the shift window, classify Airflow vs Rubinho
+       (runtime anomaly), and mark which ones sent a voice wakeup.
+    6. Attach source + acordamento flags to each DEI issue from the matching alert.
+    7. POST summary payload to notification-hub (DAG_Rotation space).
+    8. Optionally POST to iam-alerts space for Cyber Security issues (best-effort, non-fatal).
 
     DAG run conf (optional):
     - load_start_date: YYYY-MM-DD — simulate the 09:00 SP notification for a past date (backtests).
@@ -771,13 +964,15 @@ def notify_dag_rotation(session=None, **context):
         logger.warning("No on-call recipients found — skipping notification.")
         return
 
-    wakeups = _count_voice_wakeups(
+    classified_alerts = _fetch_classified_alerts(
         cloud_id,
         jira_ops_auth,
         periods_length_exception,
         now_sp=now_sp,
         known_dag_ids=set(dag_owner_map),
     )
+    issues = _enrich_issues_from_alerts(issues, classified_alerts)
+    wakeups = [alert for alert in classified_alerts if alert.get("had_voice")]
     wakeup_count = len(wakeups)
     # Unique DAG names woken during the shift, preserving first-seen order.
     wakeup_dags = list(dict.fromkeys(w["dag"] for w in wakeups))
@@ -797,14 +992,7 @@ def notify_dag_rotation(session=None, **context):
         "start_time": start_time,
         "called_count": str(wakeup_count) if wakeup_count > 0 else "0",
         "wakeup_dags": wakeup_dags,
-        "error_list": [
-            {
-                "url": f"{DEI_BOARD_URL}?selectedIssue={issue['key']}",
-                "key": issue["key"],
-                "owner": issue.get("owner"),
-            }
-            for issue in issues
-        ],
+        "error_list": [_issue_error_entry(issue) for issue in issues],
     }
 
     if not webhook_url:
@@ -839,14 +1027,7 @@ def notify_dag_rotation(session=None, **context):
     if cyber_sec_issues and iam_alerts_url:
         iam_payload = {
             **payload,
-            "error_list": [
-                {
-                    "url": f"{DEI_BOARD_URL}?selectedIssue={issue['key']}",
-                    "key": issue["key"],
-                    "owner": issue.get("owner"),
-                }
-                for issue in cyber_sec_issues
-            ],
+            "error_list": [_issue_error_entry(issue) for issue in cyber_sec_issues],
         }
         iam_send_payload = (
             _wrap_for_gchat(iam_payload)
@@ -875,8 +1056,9 @@ with DAG(
     description=(
         "Daily post on-call rotation notification. Fetches DEI Jira incidents from "
         "the previous on-call window (D-1 21:00 → D 09:00 SP), infers missing "
-        "incident owners from the Airflow DagModel, counts voice wakeups from Jira Ops "
-        "alerts, and POSTs the summary to notification-hub (DAG_Rotation space). "
+        "incident owners from the Airflow DagModel, classifies Jira Ops alerts as "
+        "Airflow failure vs Rubinho runtime anomaly, counts voice wakeups, "
+        "and POSTs the summary to notification-hub (DAG_Rotation space). "
         "Migrated from the Databricks Post-OnCall notebook (DBP-1491)."
     ),
     schedule="0 9 * * *",
