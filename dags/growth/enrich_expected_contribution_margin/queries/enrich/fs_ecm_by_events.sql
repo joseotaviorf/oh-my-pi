@@ -12,7 +12,7 @@ WITH ecm_bookings AS (
         ecm.estimated_gross_revenue,
         ecm.estimated_net_revenue,
         ecm.estimated_contribution_margin,
-        DATE(ecm.ts_log) AS dt_event_time,
+        MAKE_DATE(ecm.year, ecm.month, ecm.day) AS dt_event_time,
         COALESCE(bk.ts_created, ecm.ts_log) AS ts_event,
         ROW_NUMBER() OVER (
             PARTITION BY ecm.id_request

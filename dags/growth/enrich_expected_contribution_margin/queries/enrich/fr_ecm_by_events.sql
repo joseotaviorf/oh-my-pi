@@ -11,7 +11,8 @@ WITH eltv_requests AS (
         ecm.estimated_net_revenue,
         ecm.estimated_contribution_margin,
         ecm.ts_event,
-        ecm.ts_log
+        ecm.ts_log,
+        MAKE_DATE(ecm.year, ecm.month, ecm.day) AS dt_event_time
     FROM
         datalake_expected_contribution_margin.expected_contribution_margin AS ecm
     WHERE
@@ -35,7 +36,7 @@ ecm_entities AS (
         ecm.estimated_net_revenue,
         ecm.estimated_net_revenue AS estimated_net_revenue_after_losses,
         ecm.estimated_contribution_margin,
-        DATE(ecm.ts_log) AS dt_event_time,
+        ecm.dt_event_time,
         COALESCE(ecm.ts_event, bk.ts_created, off.ts_created, ecm.ts_log) AS ts_event,
         ROW_NUMBER() OVER (
             PARTITION BY ecm.id_request

@@ -76,8 +76,14 @@ columns:
     description: Projected contribution margin returned by the online ECM service.
   dt_event_time:
     lineage:
-      - datalake_expected_contribution_margin.expected_contribution_margin.ts_log
-    description: Date partition key derived from ts_log (EMLIO write time).
+      - datalake_expected_contribution_margin.expected_contribution_margin.year
+      - datalake_expected_contribution_margin.expected_contribution_margin.month
+      - datalake_expected_contribution_margin.expected_contribution_margin.day
+    description: |
+      Date partition key, aligned with the source EMLIO log partition so each run
+      writes exactly one partition. The EMLIO partition window is offset from
+      midnight, so this is the log batch date rather than the exact event date;
+      use ts_event for per-row event time.
   ts_event:
     lineage:
       - datalake_expected_contribution_margin.expected_contribution_margin.ts_event
