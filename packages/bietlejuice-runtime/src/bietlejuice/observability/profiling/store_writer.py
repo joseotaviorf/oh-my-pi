@@ -11,10 +11,16 @@ row shape to evolve forward-compatibly (paired with ``metric_schema_version``).
 
 After each append, catalog publication mirrors custom Delta spark jobs
 (CDC / Monalisa / Olos) and ``DeltaTableLoaderPipeline``: ``sync_delta_write_to_secondary_catalog``
-(``REFRESH TABLE`` + Glue on Databricks / UC REST on EMR) and default UC grants via
-``TablePrivileges.from_environment_default`` when Unity Catalog is enabled (EMR never
-applies UC grants). Trino ``hive`` visibility comes from Glue, not from SST
-``sync_trino_metadata``.
+(``REFRESH TABLE`` + the runtime's *secondary* catalog — Glue on Databricks, UC REST on
+EMR) and default UC grants via ``TablePrivileges.from_environment_default`` when Unity
+Catalog is enabled (EMR never applies UC grants).
+
+Trino reads the **Glue** catalog, so Glue must be registered on both runtimes. On
+Databricks Glue *is* the secondary catalog, so the sync above already covers it. On EMR
+(the default runtime) the secondary catalog is UC, so that sync never touches Glue — the
+store then lands in Databricks (UC) but stays invisible in Trino/Glue. To close that gap,
+EMR registers the table in Glue explicitly here, via the same ``GlueCatalogHelper`` path
+Databricks exercises through the secondary sync.
 """
 
 from __future__ import annotations
@@ -84,6 +90,7 @@ class ObservabilityStoreWriter:
         from bietlejuice.base.spark.delta_secondary_catalog_sync import (
             sync_delta_write_to_secondary_catalog,
         )
+        from bietlejuice.base.spark.runtime_detector import RuntimeDetector
         from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 
         if not self.spark.catalog.tableExists(fqtn):
@@ -105,6 +112,12 @@ class ObservabilityStoreWriter:
         except Exception as error:
             logger.error(f"Failed to sync {fqtn} to secondary catalog: {error}")
 
+        # On EMR the secondary catalog is UC, so the sync above never reaches Glue —
+        # the catalog Trino queries. Register it explicitly (Databricks already syncs
+        # Glue as its secondary, so skip there to avoid a redundant write).
+        if RuntimeDetector.is_emr():
+            self._register_in_glue(fqtn, location, dataframe)
+
         if not UnityCatalogHelper.is_cluster_unity_catalog_enabled():
             return
         try:
@@ -112,6 +125,31 @@ class ObservabilityStoreWriter:
             logger.info(f"Applied default UC table privileges on {fqtn}.")
         except Exception as error:
             logger.error(f"Failed to apply default table privileges on {fqtn}: {error}")
+
+    def _register_in_glue(self, fqtn: str, location: str, dataframe: DataFrame) -> None:
+        """Register the Delta table in the AWS Glue Data Catalog (what Trino reads).
+
+        Mirrors the Databricks secondary-catalog path
+        (``CatalogStrategyResolver.sync_to_secondary_catalog`` → ``GlueCatalogHelper``),
+        which EMR does not exercise because its secondary catalog is UC.
+        ``sync_table_to_glue`` no-ops when Glue is unreachable and logs its own
+        success/failure, so profiling stays fail-open (NFR1).
+        """
+        from bietlejuice.base.spark.glue_catalog_helper import GlueCatalogHelper
+        from bietlejuice.services.schema_service import SchemaService
+
+        database_name, _, table_name = fqtn.partition(".")
+        try:
+            GlueCatalogHelper.sync_table_to_glue(
+                database_name=database_name,
+                table_name=table_name,
+                table_location=location,
+                table_schema=SchemaService.get_schema_from_dataframe(dataframe),
+                partitions=list(PARTITION_COLUMNS),
+                format_str="DELTA",
+            )
+        except Exception as error:
+            logger.error(f"Failed to register {fqtn} in Glue: {error}")
 
     def _ensure_store_table(self, table: str, fqtn: str, location: str) -> None:
         """Register an existing Delta location in the metastore when needed (EMR).

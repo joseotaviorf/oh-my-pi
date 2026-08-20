@@ -149,7 +149,9 @@ class TestAppend:
 
 class TestPublishTableAccess:
     @staticmethod
-    def _publish_access_modules(mock_sync_secondary, uc_enabled=False):
+    def _publish_access_modules(
+        mock_sync_secondary, uc_enabled=False, is_emr=False, mock_glue_helper=None
+    ):
         mock_uc_helper = mock.MagicMock()
         mock_uc_helper.is_cluster_unity_catalog_enabled.return_value = uc_enabled
 
@@ -159,11 +161,22 @@ class TestPublishTableAccess:
         fake_uc_module = mock.MagicMock()
         fake_uc_module.UnityCatalogHelper = mock_uc_helper
 
+        mock_runtime = mock.MagicMock()
+        mock_runtime.is_emr.return_value = is_emr
+        fake_runtime_module = mock.MagicMock()
+        fake_runtime_module.RuntimeDetector = mock_runtime
+
+        fake_glue_module = mock.MagicMock()
+        fake_glue_module.GlueCatalogHelper = mock_glue_helper or mock.MagicMock()
+
         return {
             "bietlejuice.base.spark": mock.MagicMock(),
             "bietlejuice.base.spark.delta_secondary_catalog_sync": fake_delta_module,
+            "bietlejuice.base.spark.runtime_detector": fake_runtime_module,
+            "bietlejuice.base.spark.glue_catalog_helper": fake_glue_module,
             "bietlejuice.base.spark.unity_catalog_helper": fake_uc_module,
             "bietlejuice.base.databricks.table_privileges": mock.MagicMock(),
+            "bietlejuice.services.schema_service": mock.MagicMock(),
         }
 
     def test_secondary_catalog_sync_does_not_log_false_success(self):
@@ -224,4 +237,86 @@ class TestPublishTableAccess:
         # Assert — REFRESH TABLE errors still surface; UC grants skipped (UC off)
         mock_logger.error.assert_any_call(
             f"Failed to sync {fqtn} to secondary catalog: REFRESH TABLE failed"
+        )
+
+    def test_emr_registers_table_in_glue(self):
+        # Arrange — on EMR the secondary catalog is UC, so Glue (what Trino reads)
+        # must be registered explicitly or the store stays invisible in Trino/Glue.
+        mock_glue_helper = mock.MagicMock()
+        spark = mock.MagicMock()
+        spark.catalog.tableExists.return_value = True
+        writer = _writer(spark)
+        dataframe = mock.MagicMock()
+        fqtn = "datalake_observability.profile_table_metrics"
+        location = "s3://bucket/datalake_observability/profile_table_metrics"
+
+        # Act
+        with mock.patch.dict(
+            sys.modules,
+            self._publish_access_modules(
+                mock.MagicMock(), is_emr=True, mock_glue_helper=mock_glue_helper
+            ),
+        ):
+            writer._publish_table_access(fqtn, location, dataframe)
+
+        # Assert — Glue registration invoked with the table's FQN split + Delta format
+        mock_glue_helper.sync_table_to_glue.assert_called_once()
+        _, kwargs = mock_glue_helper.sync_table_to_glue.call_args
+        assert kwargs["database_name"] == DATABASE
+        assert kwargs["table_name"] == "profile_table_metrics"
+        assert kwargs["table_location"] == location
+        assert kwargs["partitions"] == ["year", "month", "day"]
+        assert kwargs["format_str"] == "DELTA"
+
+    def test_databricks_does_not_double_register_glue(self):
+        # Arrange — on Databricks Glue is the secondary catalog, already synced above,
+        # so the explicit EMR-only registration must not fire (no redundant write).
+        mock_glue_helper = mock.MagicMock()
+        spark = mock.MagicMock()
+        spark.catalog.tableExists.return_value = True
+        writer = _writer(spark)
+        dataframe = mock.MagicMock()
+        fqtn = "datalake_observability.profile_table_metrics"
+        location = "s3://bucket/datalake_observability/profile_table_metrics"
+
+        # Act
+        with mock.patch.dict(
+            sys.modules,
+            self._publish_access_modules(
+                mock.MagicMock(), is_emr=False, mock_glue_helper=mock_glue_helper
+            ),
+        ):
+            writer._publish_table_access(fqtn, location, dataframe)
+
+        # Assert
+        mock_glue_helper.sync_table_to_glue.assert_not_called()
+
+    def test_emr_glue_registration_failure_is_logged_and_swallowed(self):
+        # Arrange — Glue failure must never break profiling (fail-open, NFR1)
+        mock_glue_helper = mock.MagicMock()
+        mock_glue_helper.sync_table_to_glue.side_effect = RuntimeError("Glue down")
+        spark = mock.MagicMock()
+        spark.catalog.tableExists.return_value = True
+        writer = _writer(spark)
+        dataframe = mock.MagicMock()
+        fqtn = "datalake_observability.profile_table_metrics"
+        location = "s3://bucket/datalake_observability/profile_table_metrics"
+
+        # Act
+        with (
+            mock.patch.dict(
+                sys.modules,
+                self._publish_access_modules(
+                    mock.MagicMock(), is_emr=True, mock_glue_helper=mock_glue_helper
+                ),
+            ),
+            mock.patch(
+                "bietlejuice.observability.profiling.store_writer.logger"
+            ) as mock_logger,
+        ):
+            writer._publish_table_access(fqtn, location, dataframe)
+
+        # Assert — error logged, exception not propagated
+        mock_logger.error.assert_any_call(
+            f"Failed to register {fqtn} in Glue: Glue down"
         )
