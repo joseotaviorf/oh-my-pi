@@ -157,6 +157,11 @@ Use [Related Metric Entities](#related-metric-entities) for **official** escalat
 - For Matthew-specific session analysis (collections context, escalation pillars, outbound replies, tool/helper flags), use `datalake_ai_collections_quintoandar.sessions` / `observation` / `messages` and the OBT `dw_collection_ai_agents.fact_ai_agents_interaction`.
 - Matthew runs both as `bot = 'matthew'` (WhatsApp) and as a sub-agent inside `bot = 'wall-e'` (in-app); the canonical attribution lives in `ai_agent_source`. See `business_entities/matthew.md`.
 
+### Concierge (demand and search assistant)
+
+- Filter `datalake_chatbot.sessions.bot = 'concierge'` for the generic chatbot-session view.
+- For Concierge contact-to-visit attribution, prospect activation, and booking funnel analysis, use `datalake_search.concierge_demand`; see `business_entities/concierge.md`.
+
 ### Alias (B2B partner-agency agent)
 
 - Alias sessions appear in `datalake_chatbot.sessions` with `bot = 'alias'`. Bridge to the Alias DW funnel via `sessions.id_langfuse_session = dw_alias.fact_alias_sessions.id_langfuse_session`.
