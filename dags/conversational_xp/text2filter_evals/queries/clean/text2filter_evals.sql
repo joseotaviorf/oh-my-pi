@@ -2,6 +2,7 @@ WITH ranked_evals AS (
     SELECT
         uuid,
         ts_log,
+        service_version,
         user_query,
         current_filters,
         extracted_filters,
@@ -20,6 +21,7 @@ WITH ranked_evals AS (
 SELECT
     uuid,
     ts_log,
+    service_version,
     user_query,
     current_filters,
     extracted_filters,
