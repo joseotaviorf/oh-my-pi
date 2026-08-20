@@ -12,8 +12,13 @@ WITH standard_names AS (
     funnel_side,
     landing_page AS campaign_landing_page,
     owner
-    FROM datalake_gsheets_clean.dict_taxonomy_supply
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY campaign, medium, source ORDER BY id) = 1
+    FROM (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (PARTITION BY campaign, medium, source ORDER BY id) AS rn
+        FROM datalake_gsheets_clean.dict_taxonomy_supply
+    ) ranked
+    WHERE rn = 1
 ),
 
 base AS (

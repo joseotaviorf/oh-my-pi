@@ -1,5 +1,5 @@
 WITH union_tb AS (
-  SELECT 
+  SELECT
     utm_campaign,
     utm_medium,
     utm_source,
@@ -15,7 +15,7 @@ WITH union_tb AS (
     'demand' AS dict_source
   FROM datalake_growth_taxonomy.demand_taxonomy_dictionary
   UNION ALL
-  SELECT 
+  SELECT
     utm_campaign,
     utm_medium,
     utm_source,
@@ -32,7 +32,7 @@ WITH union_tb AS (
   FROM datalake_growth_taxonomy.supply_taxonomy_dictionary
 ),
 unified_dict AS (
-    SELECT 
+    SELECT
     SF_NORMALIZE_STRING(utm_campaign) AS utm_campaign,
     SF_NORMALIZE_STRING(utm_medium) AS utm_medium,
     SF_NORMALIZE_STRING(utm_source) AS utm_source,
@@ -72,19 +72,45 @@ naming_convention_prefixes AS (
     dict_source
   FROM
     unified_dict
-)    
-
+),
+ranked AS (
+  SELECT
+    sk_media_setup,
+    CONCAT_WS(".",
+        prefix_campaign_business_context,
+        prefix_campaign_strategy_intent,
+        prefix_behavior_type,
+        prefix_campaign_landing_page,
+        prefix_funnel_side,
+        prefix_medium,
+        prefix_source
+    ) AS naming_convention_sufix,
+    utm_campaign,
+    utm_medium,
+    utm_source,
+    campaign_strategy_intent,
+    behavior_type,
+    medium,
+    source,
+    campaign_business_context,
+    campaign_landing_page,
+    owner,
+    funnel_side,
+    dict_source,
+    ROW_NUMBER() OVER (
+        PARTITION BY
+          utm_campaign,
+          utm_medium,
+          utm_source
+        ORDER BY
+          dict_source = 'demand' DESC
+      ) AS rn
+  FROM
+    naming_convention_prefixes
+)
 SELECT
   sk_media_setup,
-  CONCAT_WS(".",
-      prefix_campaign_business_context,
-      prefix_campaign_strategy_intent,
-      prefix_behavior_type,
-      prefix_campaign_landing_page,
-      prefix_funnel_side,
-      prefix_medium,
-      prefix_source
-  ) AS naming_convention_sufix,
+  naming_convention_sufix,
   utm_campaign,
   utm_medium,
   utm_source,
@@ -97,13 +123,7 @@ SELECT
   owner,
   funnel_side,
   dict_source
-  FROM
-    naming_convention_prefixes 
-  QUALIFY ROW_NUMBER() OVER (
-      PARTITION BY 
-        utm_campaign,
-        utm_medium,
-        utm_source
-      ORDER BY
-        dict_source = 'demand' DESC
-    ) = 1
+FROM
+  ranked
+WHERE
+  rn = 1

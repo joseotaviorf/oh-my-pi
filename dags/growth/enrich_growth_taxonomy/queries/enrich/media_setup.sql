@@ -43,8 +43,36 @@ SELECT
   ts_load
 FROM
   datalake_growth_taxonomy.ad_hoc_rules
+),
+deduped AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY naming_convention_sufix
+      ORDER BY ts_load DESC
+    ) AS rn
+  FROM base
 )
 SELECT
-  *
-FROM base 
-QUALIFY ROW_NUMBER() OVER (PARTITION BY naming_convention_sufix ORDER BY ts_load DESC) = 1
+  id_media_setup,
+  naming_convention_sufix,
+  campaign_business_context,
+  campaign_strategy_intent,
+  behavior_type,
+  campaign_landing_page,
+  funnel_side,
+  medium,
+  source,
+  prefix_campaign_business_context,
+  prefix_campaign_strategy_intent,
+  prefix_behavior_type,
+  prefix_campaign_landing_page,
+  prefix_funnel_side,
+  prefix_medium,
+  prefix_source,
+  ts_combination_created,
+  ts_load
+FROM
+  deduped
+WHERE
+  rn = 1
