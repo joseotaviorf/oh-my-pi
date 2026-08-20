@@ -1,0 +1,98 @@
+database_name: datalake_sap_accounting_process
+table_name: rental_guarantee_invoice_reverse
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description:
+  Table to track the reverse route of the Rental Guarantee share of revenue account 420010, identifying postings that exist in the SAP ledger but have no corresponding revenue recognition dispatch on the rental-guarantee side. It is the mirror of rental_guarantee_invoice, which starts from the dispatch and therefore cannot see ledger entries that no source event explains.
+  The scope matches the forward straw line by line so the two tables partition the same ledger population - account 420010 restricted to the pro-guarantor-nf and standalone-nf accounting rules, which is what separates Rental Guarantee from the Seu Barriga postings on the same account, and the gateway leg joined to datalake_sap_gateway_clean.feature on source = 'rental-guarantee'.
+  Postings issued through the legacy B1 ERP during the 2024 migration never travelled through the S4 gateway and are excluded by design rather than reported as failures. Ledger lines without a nota fiscal hash are also out of scope, since hash is the only key the ledger shares with the gateway.
+  All four assertion flags are FALSE by construction and every record carries the 'reverse straw failure' status, so the table is read through error_description for root-cause analysis.
+columns:
+  id_accounting_process:
+    description: Unique key for each record on this table, formatted as 'RE-RGRT-I-{hash}'. The ledger is aggregated by hash before the key is built, so one record represents all 420010 lines sharing the same nota fiscal.
+    lineage:
+      - datalake_pas.ledger.hash
+  id_business_entity:
+    description: Business key for the guarantee as recorded in the SAP ledger. Values from Rental Guarantee and Seu Barriga can collide on this account, so it must be read together with accounting_name.
+    lineage:
+      - datalake_pas.ledger.id_business_entity
+  id_finance_entity:
+    description: Business key for the charge as recorded in the SAP ledger.
+    lineage:
+      - datalake_pas.ledger.id_finance_entity
+  id_finance_entity_entry:
+    description: Business key for the accounting entry in the SAP ledger. On the rental-guarantee route this field carries the literal 'rental-guarantee' instead of an entry id, which is why it is not used to scope the table.
+    lineage:
+      - datalake_pas.ledger.id_finance_entity_entry
+  version:
+    description: Version identifier from the source system, kept for schema compatibility with the forward straw. Always NULL here, since by definition these records have no source dispatch to read the trigger from.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.version
+  business_unit:
+    description: Identifier created in this table to segment the business unit, fixed as for rent.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.business_unit
+  source_name:
+    description: Origin system label, fixed as S4 because these records are anchored on SAP rather than on a source event, following the convention of the other reverse straws.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.source_name
+  accounting_type:
+    description: Type indicator used to segregate accounts, fixed as invoice to match the forward straw.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.accounting_type
+  account_number:
+    description: Identifier of accounts used by controllership accounting process in SAP, fixed as 420010.
+    lineage:
+      - datalake_pas.ledger.account_number
+  accounting_name:
+    description: Human readable name for the SAP account, fixed as rental guarantee, which is what distinguishes these 420010 records from the Seu Barriga ones.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.accounting_name
+  source_amount:
+    description: Value from the source system. Always NULL here, since these postings have no corresponding rental-guarantee dispatch.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.source_amount
+  sap_amount:
+    description: Value recorded in SAP, summed over the 420010 ledger lines that share the same nota fiscal hash.
+    lineage:
+      - datalake_pas.ledger.debit_credit
+  is_completeness:
+    description: Indicates whether the posting has a matching source dispatch. Always FALSE for reverse straw records.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.is_completeness
+  is_correctness:
+    description: TRUE if the deviation between source and SAP amounts is under R$0.05. Always FALSE for reverse straw records, since there is no source amount to compare against.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.is_correctness
+  is_temporality:
+    description: TRUE if the SAP reference date falls in the accepted window around the source trigger. Always FALSE for reverse straw records, since there is no source trigger date.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.is_temporality
+  is_compliance:
+    description: TRUE if completeness, correctness and temporality are all TRUE. Always FALSE for reverse straw records.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.is_compliance
+  accounting_process_status:
+    description: Classification of accounting status. Always 'reverse straw failure' for records in this table.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.accounting_process_status
+  error_description:
+    description: Textual reason for the reverse straw failure. 'source not dispatched by rental guarantee' covers postings whose nota fiscal job exists on a rental-guarantee feature but whose feature never produced a revenue recognition dispatch; 'transaction missing in sap gateway' covers postings with no nota fiscal job on the S4 gateway; jobs that reached the gateway in error report the job type together with the webhook error or job status.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.error_description
+  accrual_year_month:
+    description: Account reference in the format YYYYMM taken from the SAP ledger.
+    lineage:
+      - datalake_pas.ledger.accrual_year_month
+  dt_source_trigger:
+    description: Date of the source event that triggered the accounting entry. Always NULL here, since these postings have no source dispatch.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice_reverse.dt_source_trigger
+  dt_sap_reference:
+    description: Reference date of the 420010 SAP posting.
+    lineage:
+      - datalake_pas.ledger.dt_reference
+  dt_sap_created:
+    description: Creation date of the 420010 SAP posting.
+    lineage:
+      - datalake_pas.ledger.dt_created
