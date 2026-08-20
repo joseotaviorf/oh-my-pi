@@ -1,0 +1,188 @@
+database_name: datalake_big_agent
+table_name: earnings_unified
+description: |
+  Unified For-Rent agent earnings that normalizes two eras of earnings calculation into one
+  schema, one row per earning. For contracts created before 2026-08-01, rows are computed
+  directly from EBDB contract, rent flow, and partnership data (legacy demand-conversion and
+  supply-acquisition logic). For contracts created on or after 2026-08-01, rows come from the
+  Big Agent Incentives Engine (datalake_big_agent.earnings). Built to give downstream reporting
+  a single, continuous view of agent earnings across the incentive-system migration cutover.
+  Loaded incrementally: legacy rows are picked up by contract signature date and Big Agent rows
+  by their last update timestamp, both bounded by the DAG's load_start_date/load_end_date
+  window, and merged into the target table on id_earning_unified.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_earning_unified:
+    lineage:
+      - datalake_ebdb_clean.agent_rent_flow.id_rent_flow
+      - datalake_ebdb_clean.agent_rent_flow.id_agent
+      - datalake_ebdb_clean.contract_partnership_data.id_contract
+      - datalake_ebdb_clean.partner_agent.id
+      - datalake_big_agent.earnings.id_earning
+    description: |
+      Deterministic unique identifier for the unified earning row. Built as an MD5 hash of the
+      originating record's natural keys plus the incentive system label (DEMAND_CONVERSION_FR,
+      SUPPLY_ACQUISITION_FR, or BIG_AGENT), so the same source record always maps to the same id.
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+      - datalake_ebdb_clean.contract_partnership_data.id_contract
+      - datalake_big_agent.earnings.id_contract
+    description: EBDB contract identifier the earning is attached to.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+      - datalake_big_agent.earnings.uuid_person
+    description: Person UUID of the agent who receives the earning.
+  revenue_receiver_type:
+    lineage:
+      - datalake_big_agent.earnings.external_receiver_type
+    description: |
+      Type of the earning receiver. Hardcoded to AGENT for legacy For-Rent earnings (agent rent
+      flow and partnership data); taken from the Big Agent earning's external_receiver_type for
+      contracts created on or after 2026-08-01.
+  incentive_system:
+    lineage:
+      - datalake_big_agent.earnings.incentive_system
+    description: |
+      Incentive system that produced the earning. Hardcoded to DEMAND_CONVERSION_FR or
+      SUPPLY_ACQUISITION_FR for legacy earnings depending on the source branch; taken from the
+      Big Agent earning's incentive_system for the migrated flow.
+  business_context:
+    lineage:
+      - datalake_big_agent.earnings.business_context
+    description: |
+      Business context of the earning. Hardcoded to RENT for legacy For-Rent earnings; taken
+      from the Big Agent earning's business_context for the migrated flow.
+  participant_role:
+    description: |
+      Role of the agent in the earning's originating flow. Hardcoded to PRO_ACQUIRER for
+      supply-acquisition legacy earnings; null for demand-conversion legacy earnings and for
+      earnings sourced from the Big Agent engine.
+  tier_name:
+    lineage:
+      - datalake_big_agent.earnings.tier_name
+    description: |
+      Display name of the agent's incentive tier at earning creation time. Null for legacy
+      For-Rent earnings, which predate tier-based calculation; populated from the Big Agent
+      earning for the migrated flow.
+  revenue_source:
+    description: |
+      System or table that originated the earning. Hardcoded per branch: AGENT_RENT_FLOW for
+      legacy demand-conversion earnings, CONTRACT_PARTNERSHIP_DATA for legacy supply-acquisition
+      earnings, and BIG_AGENT for earnings sourced from the Big Agent Incentives Engine.
+  revenue_role:
+    lineage:
+      - datalake_big_agent.earnings.incentive_system
+    description: |
+      High-level role of the earning within the incentive funnel (DEMAND or SUPPLY). Hardcoded
+      per branch for legacy earnings; derived from the first segment of the Big Agent earning's
+      incentive_system (split on underscore) for the migrated flow.
+  revenue_share_type:
+    lineage:
+      - datalake_ebdb_clean.agent_rent_flow.id_agent
+      - datalake_ebdb_clean.rent_flow.id_current_contract
+      - datalake_ebdb_clean.user.uuid_person
+      - datalake_big_agent.earnings.revenue_share_type
+    description: |
+      Classification of how the revenue share was split (for example FIFTY or TIER). For legacy
+      demand-conversion earnings, built as FIFTY when more than one distinct agent person is
+      involved in the contract's rent flow, otherwise TIER; null for legacy supply-acquisition
+      earnings; taken from the Big Agent earning's revenue_share_type for the migrated flow.
+  revenue_share_value:
+    lineage:
+      - datalake_ebdb_clean.contract.agent_brokerage_share
+      - datalake_big_agent.earnings.revenue_share_value
+    description: |
+      Configured revenue share value applied to the earning. For legacy For-Rent earnings, taken
+      directly from the contract's agent_brokerage_share; taken from the Big Agent earning's
+      revenue_share_value for the migrated flow.
+  brokerage_amount:
+    lineage:
+      - datalake_ebdb_clean.contract.rent
+      - datalake_big_agent.earnings.calculation_base_amount
+    description: |
+      Monetary base amount used to calculate the earning's revenue. For legacy For-Rent earnings,
+      taken directly from the contract's monthly rent; taken from the Big Agent earning's
+      calculation_base_amount for the migrated flow.
+  revenue_percentage:
+    lineage:
+      - datalake_ebdb_clean.contract.agent_brokerage_share
+      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+      - datalake_big_agent.earnings.revenue_percentage
+    description: |
+      Percentage of the brokerage amount attributed to this earning. For legacy demand-conversion
+      earnings, the contract's agent_brokerage_share split evenly when more than one agent person
+      is involved; for legacy supply-acquisition earnings, the partnership data's
+      brokerage_split_percentage; taken from the Big Agent earning's revenue_percentage for the
+      migrated flow.
+  revenue_amount:
+    lineage:
+      - datalake_ebdb_clean.contract.rent
+      - datalake_ebdb_clean.contract.agent_brokerage_share
+      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+      - datalake_big_agent.earnings.revenue_amount
+    description: |
+      Monetary amount earned by the agent, in the contract's currency. For legacy For-Rent
+      earnings, computed as brokerage_amount times revenue_percentage; taken from the Big Agent
+      earning's revenue_amount for the migrated flow.
+  is_3p_lead_gen_offer:
+    lineage:
+      - datalake_big_agent.earnings.is_3p_lead_gen_offer
+    description: |
+      Boolean flag indicating whether the earning is linked to a 3P lead-gen offer. Always null
+      for legacy For-Rent earnings, which predate this classification; populated from the Big
+      Agent earning for the migrated flow.
+  is_fifty_revenue_share:
+    lineage:
+      - datalake_ebdb_clean.agent_rent_flow.id_agent
+      - datalake_ebdb_clean.rent_flow.id_current_contract
+      - datalake_ebdb_clean.user.uuid_person
+      - datalake_big_agent.earnings.is_fifty_revenue_share
+    description: |
+      Boolean flag that is true when the revenue share type is FIFTY. For legacy demand-conversion
+      earnings, true when more than one distinct agent person is involved in the contract's rent
+      flow; null for legacy supply-acquisition earnings; taken from the Big Agent earning's
+      is_fifty_revenue_share for the migrated flow.
+  is_crcc_revenue_share:
+    lineage:
+      - datalake_big_agent.earnings.is_crcc_revenue_share
+    description: |
+      Boolean flag that is true when the revenue share type is CRCC. Always false for legacy
+      For-Rent earnings, which predate this classification; taken from the Big Agent earning's
+      is_crcc_revenue_share for the migrated flow.
+  is_tier_revenue_share:
+    lineage:
+      - datalake_ebdb_clean.agent_rent_flow.id_agent
+      - datalake_ebdb_clean.rent_flow.id_current_contract
+      - datalake_ebdb_clean.user.uuid_person
+      - datalake_big_agent.earnings.is_tier_revenue_share
+    description: |
+      Boolean flag that is true when the revenue share type is TIER. For legacy demand-conversion
+      earnings, true when exactly one distinct agent person is involved in the contract's rent
+      flow; null for legacy supply-acquisition earnings; taken from the Big Agent earning's
+      is_tier_revenue_share for the migrated flow.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_big_agent.earnings.ts_created
+    description: |
+      Timestamp when the earning was created. For legacy For-Rent earnings, taken from the
+      contract's signature timestamp; taken from the Big Agent earning's ts_created for the
+      migrated flow.
+  year:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_big_agent.earnings.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_big_agent.earnings.ts_created
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_big_agent.earnings.ts_created
+    description: Partition day derived from ts_created.

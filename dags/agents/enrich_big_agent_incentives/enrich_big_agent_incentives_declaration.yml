@@ -21,6 +21,8 @@ workflow:
       - revenue_share
       - unresolved_earnings
       - brokerage_share_history
+    earnings_unified:
+      - earnings
   tables_customization:
     brokerage_share_history:
       merge_on: [id_revision, id_contract]
@@ -29,6 +31,9 @@ workflow:
     earnings:
       merge_on: [id_earning, id_earning_source]
       z_order_by: [id_earning_source, id_earning]
+    earnings_unified:
+      merge_on: [id_earning_unified]
+      z_order_by: [id_contract, ts_created]
     partner_tier:
       merge_on: [id_partner_tier]
       z_order_by: [id_partner_tier, ts_updated]

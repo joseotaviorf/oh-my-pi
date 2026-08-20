@@ -221,6 +221,22 @@ columns:
     lineage:
       - datalake_big_agent_clean.new_earnings.status
     description: True when the earning status is CALCULATED.
+  is_3p_lead_gen_offer:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.is_3p_lead_gen_offer
+    description: True when the earning source is linked to a 3p lead gen offer.
+  is_fifty_revenue_share:
+    lineage:
+      - datalake_big_agent.revenue_share.revenue_share_type
+    description: True when the revenue share type is FIFTY.
+  is_crcc_revenue_share:
+    lineage:
+      - datalake_big_agent.revenue_share.revenue_share_type
+    description: True when the revenue share type is CRCC.
+  is_tier_revenue_share:
+    lineage:
+      - datalake_big_agent.revenue_share.revenue_share_type
+    description: True when the revenue share type is TIER.
   dt_payment_due:
     lineage:
       - datalake_big_agent_clean.new_earnings.dt_payment_due
