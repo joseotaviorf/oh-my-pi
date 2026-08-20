@@ -251,6 +251,10 @@ class SupportJourneyAnalystCoreModelPipeline(BaseCoreModelSparkJob):
             )
             .withColumn("bpo", F.col("bpo__c"))
             .withColumn("operations", F.col("operations__c"))
+            # The CDC clean layer delivers IsPartner as a string ("true"/"false"),
+            # while the schema contract declares it boolean. Cast explicitly so
+            # schema validation passes regardless of the source column type.
+            .withColumn("is_partner", F.col("is_partner").cast("boolean"))
             .withColumn("_created_at", now)
             .withColumn("_updated_at", now)
             .withColumn("_ts_load", now)
