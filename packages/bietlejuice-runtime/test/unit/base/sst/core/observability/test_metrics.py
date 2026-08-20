@@ -1,9 +1,16 @@
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from pyspark.sql.types import StringType
+from pyspark.sql.types import (
+    BooleanType,
+    StringType,
+    StructField,
+    StructType,
+)
 
 from bietlejuice.base.sst.core.observability.metrics import (
+    build_quality_check_metric_dataframe,
+    save_quality_check_metric,
     save_scd_change_metric,
     save_table_metadata_metric,
     save_volume_metric,
@@ -123,6 +130,60 @@ def test_save_volume_metric_writes_zero_row_metric_for_empty_df():
     assert mock_validate_and_write.call_count == 1
     assert mock_validate_and_write.call_args.kwargs["df"] == fallback_df
     assert fallback_df.withColumn.call_count >= 9
+
+
+def test_save_volume_metric_uses_fallback_grain_values_for_empty_df():
+    # A caller that already knows which partition it processed (e.g. it just
+    # wrote it, empty on purpose) can pass that value through so the zero-row
+    # metric lands under the real partition instead of a NULL one.
+    spark = MagicMock()
+    initial_metric_df = MagicMock()
+    initial_metric_df.isEmpty.return_value = True
+    initial_metric_df.withColumn.return_value = initial_metric_df
+    initial_metric_df.select.return_value = initial_metric_df
+
+    fallback_df = MagicMock()
+    fallback_df.withColumn.return_value = fallback_df
+    fallback_df.select.return_value = fallback_df
+    spark.range.return_value = fallback_df
+
+    grouped_df = MagicMock()
+    grouped_df.agg.return_value = initial_metric_df
+
+    empty_df = MagicMock()
+    empty_df.groupby.return_value = grouped_df
+    empty_df.schema.fields = [
+        SimpleNamespace(name="partition_date", dataType=StringType()),
+    ]
+
+    with (
+        patch("bietlejuice.base.sst.core.observability.metrics.validate_and_write"),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.coalesce",
+            return_value=DummyExpr(),
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.count",
+            return_value=DummyExpr(),
+        ),
+        patch("bietlejuice.base.sst.core.observability.metrics.F.lit") as mock_lit,
+    ):
+        mock_lit.return_value = DummyExpr()
+
+        save_volume_metric(
+            spark=spark,
+            df=empty_df,
+            grain=["partition_date"],
+            metric_name="clean_volume",
+            table_name="datalake_sfmc_clean.send",
+            env="forno",
+            layer="clean",
+            partition_cols=["partition_date"],
+            table_location="s3://bucket/path/to/table",
+            fallback_grain_values={"partition_date": "2026-08-05"},
+        )
+
+    mock_lit.assert_any_call("2026-08-05")
 
 
 def test_save_scd_change_metric_writes_to_metric_name_table():
@@ -387,3 +448,141 @@ def test_save_table_metadata_metric_handles_none_new_cols():
     assert mock_save_metric_dataframe.call_count == 1
     assert captured["metric_values"]["new_cols"] == []
     assert captured["metric_values"]["new_cols_count"] == 0
+
+
+CHECK_COLS = [
+    "failed_missing_event_id",
+    "failed_missing_source_data_extension",
+    "failed_duplicate_grain",
+]
+
+_FLAGGED_SCHEMA = StructType(
+    [
+        StructField("event_id", StringType(), True),
+        StructField("failed_missing_event_id", BooleanType(), False),
+        StructField("failed_missing_source_data_extension", BooleanType(), False),
+        StructField("failed_duplicate_grain", BooleanType(), False),
+    ]
+)
+
+
+def _flagged_df(spark_session, rows):
+    return spark_session.createDataFrame(rows, _FLAGGED_SCHEMA)
+
+
+def _metric_by_check(metric_df):
+    return {row["check_name"]: row for row in metric_df.collect()}
+
+
+def test_build_quality_check_metric_dataframe_counts_failures_per_check(spark_session):
+    """One metric row per check, each carrying its own failure count and the
+    shared total, so a failure rate can be read straight off the table."""
+    flagged_df = _flagged_df(
+        spark_session,
+        [
+            ("E1", False, False, False),
+            ("E2", True, False, False),
+            ("E3", True, True, False),
+            ("E4", False, False, True),
+        ],
+    )
+
+    metric_df = build_quality_check_metric_dataframe(
+        spark=spark_session,
+        flagged_df=flagged_df,
+        check_cols=CHECK_COLS,
+        target_table="datalake_sfmc_clean.send",
+        partition_date="2026-08-05",
+        env="forno",
+        layer="clean",
+        metric_name="sfmc_clean_quality_checks",
+    )
+
+    rows = _metric_by_check(metric_df)
+    assert set(rows) == set(CHECK_COLS)
+    assert rows["failed_missing_event_id"]["failed_row_count"] == 2
+    assert rows["failed_missing_source_data_extension"]["failed_row_count"] == 1
+    assert rows["failed_duplicate_grain"]["failed_row_count"] == 1
+    assert all(row["total_row_count"] == 4 for row in rows.values())
+    assert all(row["metric_category"] == "quality" for row in rows.values())
+    assert all(
+        row["source_table"] == "datalake_sfmc_clean.send" for row in rows.values()
+    )
+    assert all(row["partition_date"] == "2026-08-05" for row in rows.values())
+    assert all(row["layer"] == "clean" for row in rows.values())
+    assert all(row["environment"] == "forno" for row in rows.values())
+
+
+def test_build_quality_check_metric_dataframe_emits_zeros_for_a_clean_day(
+    spark_session,
+):
+    """A day where nothing failed still emits a row per check, so a gap in the
+    metric means the job did not run, not that it found nothing."""
+    flagged_df = _flagged_df(spark_session, [("E1", False, False, False)])
+
+    metric_df = build_quality_check_metric_dataframe(
+        spark=spark_session,
+        flagged_df=flagged_df,
+        check_cols=CHECK_COLS,
+        target_table="datalake_sfmc_clean.send",
+        partition_date="2026-08-05",
+        env="forno",
+        layer="clean",
+        metric_name="sfmc_clean_quality_checks",
+    )
+
+    rows = _metric_by_check(metric_df)
+    assert len(rows) == len(CHECK_COLS)
+    assert all(row["failed_row_count"] == 0 for row in rows.values())
+    assert all(row["total_row_count"] == 1 for row in rows.values())
+
+
+def test_build_quality_check_metric_dataframe_handles_an_empty_frame(spark_session):
+    flagged_df = _flagged_df(spark_session, [])
+
+    metric_df = build_quality_check_metric_dataframe(
+        spark=spark_session,
+        flagged_df=flagged_df,
+        check_cols=CHECK_COLS,
+        target_table="datalake_sfmc_clean.send",
+        partition_date="2026-08-05",
+        env="forno",
+        layer="clean",
+        metric_name="sfmc_clean_quality_checks",
+    )
+
+    rows = _metric_by_check(metric_df)
+    assert len(rows) == len(CHECK_COLS)
+    assert all(row["failed_row_count"] == 0 for row in rows.values())
+    assert all(row["total_row_count"] == 0 for row in rows.values())
+
+
+def test_save_quality_check_metric_overwrites_the_day_for_that_table(spark_session):
+    """The metric write is scoped to (source_table, partition_date) so a rerun
+    replaces its counts instead of appending a second set."""
+    flagged_df = _flagged_df(spark_session, [("E1", True, False, False)])
+
+    with patch(
+        "bietlejuice.base.sst.core.observability.metrics.save_metric_dataframe"
+    ) as mock_save:
+        save_quality_check_metric(
+            spark=spark_session,
+            flagged_df=flagged_df,
+            check_cols=CHECK_COLS,
+            bucket="test-bucket",
+            target_table="datalake_sfmc_clean.send",
+            partition_date="2026-08-05",
+            env="forno",
+            layer="clean",
+            metric_name="sfmc_clean_quality_checks",
+        )
+
+    kwargs = mock_save.call_args.kwargs
+    assert kwargs["bucket"] == "test-bucket"
+    assert kwargs["metric_table"] == "pipeline_quality_checks"
+    assert kwargs["partition_cols"] == ["source_table", "partition_date"]
+    assert kwargs["partition_filter_values"] == {
+        "source_table": "datalake_sfmc_clean.send",
+        "partition_date": "2026-08-05",
+    }
+    assert kwargs["df"].count() == len(CHECK_COLS)

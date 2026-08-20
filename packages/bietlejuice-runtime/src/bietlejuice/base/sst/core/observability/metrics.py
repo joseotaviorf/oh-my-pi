@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
+from typing import List, Optional
 
 from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as F
+from pyspark.sql.types import LongType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.sst.core.observability.common import (
@@ -417,7 +419,20 @@ def save_volume_metric(
     layer,
     partition_cols,
     table_location: str,
+    fallback_grain_values: Optional[dict] = None,
 ):
+    """Record a per-grain row count, even when ``df`` has zero rows.
+
+    ``df`` being empty means the ``groupby`` below produces no groups at all —
+    there is no row for any grain value to attach a ``row_count`` of 0 to — so
+    the code falls back to emitting a single synthetic row. Without
+    ``fallback_grain_values``, that row's grain columns (e.g.
+    ``partition_date``) are NULL, since an empty DataFrame carries no values to
+    read them from, only their declared types. A caller that already knows
+    which grain value it was processing (typically the partition it just
+    wrote, or tried to) should pass it here so the zero-row metric still lands
+    under the right partition instead of a NULL one.
+    """
     write_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     _metric = (
         df.groupby(grain)
@@ -449,7 +464,15 @@ def save_volume_metric(
 
         for grain_col in grain:
             col_type = grain_types.get(grain_col)
-            grain_col_expr = F.lit(None).cast(col_type) if col_type else F.lit(None)
+            if fallback_grain_values and grain_col in fallback_grain_values:
+                fallback_value = fallback_grain_values[grain_col]
+                grain_col_expr = (
+                    F.lit(fallback_value).cast(col_type)
+                    if col_type
+                    else F.lit(fallback_value)
+                )
+            else:
+                grain_col_expr = F.lit(None).cast(col_type) if col_type else F.lit(None)
             _metric = _metric.withColumn(grain_col, grain_col_expr)
 
         _metric = (
@@ -560,3 +583,128 @@ def save_table_metadata_metric(
             "partition_hour": partition_hour,
         },
     )
+
+
+def build_quality_check_metric_dataframe(
+    spark,
+    flagged_df: DataFrame,
+    check_cols: List[str],
+    target_table: str,
+    partition_date: str,
+    env: str,
+    layer: str,
+    metric_name: str,
+) -> DataFrame:
+    """Count how many rows failed each contract check, one metric row per check.
+
+    ``flagged_df`` is expected to carry one boolean column per check (see
+    ``domains/sfmc/clean/quality.py``), covering *every* row considered — both
+    accepted and rejected — so ``failed_row_count`` can be read against
+    ``total_row_count`` as a failure rate.
+
+    The counts are aggregated in a single pass and pivoted into long format on
+    the driver: one row per check keeps the metric queryable without knowing
+    the check names up front, and the row count is bounded by the number of
+    checks.
+    """
+    totals = flagged_df.agg(
+        F.count("*").cast("long").alias("total_row_count"),
+        *[
+            F.coalesce(F.sum(F.col(check_col).cast("long")), F.lit(0)).alias(check_col)
+            for check_col in check_cols
+        ],
+    ).collect()[0]
+
+    check_schema = StructType(
+        [
+            StructField("check_name", StringType(), False),
+            StructField("failed_row_count", LongType(), False),
+            StructField("total_row_count", LongType(), False),
+        ]
+    )
+    check_rows = [
+        (check_col, int(totals[check_col]), int(totals["total_row_count"]))
+        for check_col in check_cols
+    ]
+    base_df = spark.createDataFrame(check_rows, check_schema).withColumn(
+        "partition_date", F.lit(partition_date)
+    )
+
+    metric_values = {
+        "metric_category": "quality",
+        "metric_name": metric_name,
+        "source_table": target_table,
+        "environment": env,
+        "layer": layer,
+        "write_timestamp": current_write_timestamp(),
+    }
+    select_columns = [
+        "metric_category",
+        "metric_name",
+        "source_table",
+        "environment",
+        "layer",
+        "partition_date",
+        "check_name",
+        "failed_row_count",
+        "total_row_count",
+        "write_timestamp",
+    ]
+
+    return build_metric_dataframe(
+        df=base_df,
+        metric_values=metric_values,
+        select_columns=select_columns,
+    )
+
+
+@logger(exclude=["spark", "flagged_df"], exclude_return=True)
+def save_quality_check_metric(
+    spark,
+    flagged_df: DataFrame,
+    check_cols: List[str],
+    bucket: str,
+    target_table: str,
+    partition_date: str,
+    env: str,
+    layer: str,
+    metric_name: str = "pipeline_quality_checks",
+    metric_table: str = "pipeline_quality_checks",
+) -> DataFrame:
+    """Record per-check failure counts for one table and day.
+
+    Written with a day overwrite scoped to ``(source_table, partition_date)``,
+    so re-running a day replaces its counts instead of appending a second set —
+    which matters because the pipelines that emit this are themselves
+    re-runnable.
+    """
+    results_df = build_quality_check_metric_dataframe(
+        spark=spark,
+        flagged_df=flagged_df,
+        check_cols=check_cols,
+        target_table=target_table,
+        partition_date=partition_date,
+        env=env,
+        layer=layer,
+        metric_name=metric_name,
+    )
+
+    logger.info(
+        f"m=save_quality_check_metric, msg=Writing quality metric, "
+        f"metric_table=datalake_sst_metrics.{metric_table}, "
+        f"source_table={target_table}, checks={len(check_cols)}"
+    )
+
+    save_metric_dataframe(
+        spark=spark,
+        df=results_df,
+        bucket=bucket,
+        metric_table=metric_table,
+        partition_cols=["source_table", "partition_date"],
+        partition_filter_values={
+            "source_table": target_table,
+            "partition_date": partition_date,
+        },
+    )
+
+    return results_df
