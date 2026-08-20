@@ -607,9 +607,14 @@ workflow:
                 retries: 3
                 delay: 5
                 backoff_factor: 2
+    extra_query_template_params:     # Optional — DAG-wide load_start_date / load_end_date
+        load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+        load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
     tables_customization:            # Required
         my_endpoint:
             endpoint_path: "/v1/resources"   # Required per table
+            # extra_query_template_params: # Optional: per-table date window (replaces workflow extra)
+            #   load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
             # authentication:              # Optional: override per-table authentication
             #     strategy: "api_key"
             #     api_key_field: "MY_KEY"

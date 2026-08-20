@@ -54,3 +54,108 @@ class TestLoadAPIRawTaskCreator:
         assert params[6] == "full"
         assert params[7] == "2025-01-01"
         assert params[8] == "2025-01-16"
+
+    def test_get_parameters_uses_workflow_extra_when_table_has_none(
+        self, dag_execution_context, table_attributes
+    ):
+        dag_execution_context.workflow_args["extra_query_template_params"] = {
+            "load_start_date": "wf-start",
+            "load_end_date": "wf-end",
+        }
+
+        creator = LoadAPIRawTaskCreator(dag_execution_context)
+        params = creator._get_parameters(table_attributes)
+
+        assert params[7] == "wf-start"
+        assert params[8] == "wf-end"
+
+    def test_get_parameters_table_extra_overrides_load_end_date_only(
+        self, dag_execution_context
+    ):
+        dag_execution_context.workflow_args["extra_query_template_params"] = {
+            "load_start_date": "wf-start",
+            "load_end_date": "wf-end",
+        }
+        table_attributes = TableAttributes(
+            dag_args={"name": "dag_api_raw"},
+            workflow_args={"default_raw_partitions": ["year", "month", "day"]},
+            layer=LayerEnum.RAW,
+            table_name="my_table",
+            table_customization={
+                "extra_query_template_params": {
+                    "load_end_date": (
+                        "{{ get_date_param(dag_run, "
+                        "macros.ds_add(data_interval_start | ds, 1), "
+                        "'load_end_date') }}"
+                    )
+                }
+            },
+        )
+
+        creator = LoadAPIRawTaskCreator(dag_execution_context)
+        params = creator._get_parameters(table_attributes)
+
+        assert params[7] == "2025-01-01"
+        assert params[8] == (
+            "{{ get_date_param(dag_run, "
+            "macros.ds_add(data_interval_start | ds, 1), "
+            "'load_end_date') }}"
+        )
+
+    def test_get_parameters_table_extra_overrides_both_dates(
+        self, dag_execution_context
+    ):
+        dag_execution_context.workflow_args["extra_query_template_params"] = {
+            "load_start_date": "wf-start",
+            "load_end_date": "wf-end",
+        }
+        table_attributes = TableAttributes(
+            dag_args={"name": "dag_api_raw"},
+            workflow_args={"default_raw_partitions": ["year", "month", "day"]},
+            layer=LayerEnum.RAW,
+            table_name="my_table",
+            table_customization={
+                "extra_query_template_params": {
+                    "load_start_date": "table-start",
+                    "load_end_date": "table-end",
+                }
+            },
+        )
+
+        creator = LoadAPIRawTaskCreator(dag_execution_context)
+        params = creator._get_parameters(table_attributes)
+
+        assert params[7] == "table-start"
+        assert params[8] == "table-end"
+
+    def test_get_parameters_does_not_mutate_table_extra_dict(
+        self, dag_execution_context
+    ):
+        table_extra = {"load_end_date": "table-end"}
+        table_attributes = TableAttributes(
+            dag_args={"name": "dag_api_raw"},
+            workflow_args={"default_raw_partitions": ["year", "month", "day"]},
+            layer=LayerEnum.RAW,
+            table_name="my_table",
+            table_customization={"extra_query_template_params": table_extra},
+        )
+
+        creator = LoadAPIRawTaskCreator(dag_execution_context)
+        creator._get_parameters(table_attributes)
+
+        assert table_extra == {"load_end_date": "table-end"}
+
+    def test_get_parameters_does_not_mutate_workflow_extra_dict(
+        self, dag_execution_context, table_attributes
+    ):
+        workflow_extra = {"load_start_date": "wf-start"}
+        dag_execution_context.workflow_args["extra_query_template_params"] = (
+            workflow_extra
+        )
+
+        creator = LoadAPIRawTaskCreator(dag_execution_context)
+        params = creator._get_parameters(table_attributes)
+
+        assert workflow_extra == {"load_start_date": "wf-start"}
+        assert params[7] == "wf-start"
+        assert params[8] == "2025-01-16"

@@ -12,9 +12,11 @@ dag:
       One raw JSON payload per API record per daily load, partitioned by year,
       month, and day.
       Covers members returned by Analytics (usage, cost, activity, and summaries).
-      Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo; usage,
-      cost, and summaries use a 28-day trailing window; activity is the
-      load_end_date calendar day because the vendor publishes with a one-day lag.
+      Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo; usage
+      and cost use a 28-day trailing window with inclusive ending_at; summaries
+      use the same start and an exclusive ending_date (interval day + 1);
+      activity requests the interval day minus two because the vendor
+      publishes that endpoint a day behind and rejects unpublished dates.
       Auth is CLAUDE_ANALYTICS_API_KEY in the quintoandar secret scope (x-api-key)
       plus anthropic-version 2023-06-01. Usage, cost, and activity paginate
       next_page as query param page; summaries unpack summaries[] without a cursor.
@@ -119,6 +121,10 @@ workflow:
       extraction_type: incremental
       date_format: "%Y-%m-%d"
       date_filter_column: date
+      # Vendor publishes analytics/users a day behind and rejects unpublished
+      # dates with a 400; shift back two days for margin on the 09:00 UTC run.
+      extra_query_template_params:
+        load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_end_date') }}"
       params:
         date: load_end_date
       api_policies:
@@ -143,6 +149,9 @@ workflow:
       results_response_path: summaries
       date_filter_column: starting_at
       date_format: "%Y-%m-%d"
+      # Vendor ending_date is exclusive; shift forward one day to include the interval day.
+      extra_query_template_params:
+        load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
       params:
         starting_date: load_start_date
         ending_date: load_end_date

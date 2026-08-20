@@ -50,6 +50,7 @@ New **`api_ingestion`** DAGs must use a **`dag.name`** (folder + `{dag_name}_dec
 - **Building the API raw Spark task** (fixed positional args, no `extra_details`):  
   [`bietlejuice/base/airflow/task_creators/load_api_raw_task_creator.py`](../../bietlejuice/base/airflow/task_creators/load_api_raw_task_creator.py)
   - Implements `LoadAPIRawTaskCreator`, which calls `load_api_ingestion_raw` with: environment, bucket, dag name, table name, execution date, partitions JSON, extraction type, `load_start_date`, `load_end_date`.
+  - `load_start_date` / `load_end_date` are resolved like query/CDC: table `extra_query_template_params` replaces the workflow dict; missing date keys are filled from the DAG execution context. The returned dict is copied so declaration maps are not mutated.
   - Request query params are **not** passed from Airflow as `extra_details`; the Spark job reloads the DAG declaration and `APIConfigurationLoader.get_initial_params()` derives params from YAML plus those dates.
 
 ### **API runtime**

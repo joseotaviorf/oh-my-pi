@@ -113,6 +113,7 @@ This section describes the parameters you can configure in the `workflow` sectio
 - **http_headers** (dict): optional static HTTP headers merged onto the `requests` session (workflow map, then per-table overlay; table wins on the same key). Quote values in YAML. Do **not** use this for `User-Agent` — that stays **`http_user_agent`**.
 - **date_format_mask** (string): `strftime` mask used to format `load_start_date` / `load_end_date` placeholders into strings (e.g. `%Y%m%d`)
   - Table-level override: `workflow.tables_customization.<table>.date_format`
+- **extra_query_template_params** (dict): DAG-wide `load_start_date` / `load_end_date` Jinja templates. Override per table with `tables_customization.<table>.extra_query_template_params` (same replace-then-fill rules as query/CDC).
 - **api_policies** (dict): `rate_limiting`, `pagination`, `error_handling`
 - **alert_channel** (string): accepted in the declaration schema; today `APIConfigurationLoader` only **logs** that a channel was configured — it is **not** wired to `BaseAPIClient` yet
 - **load_spark_job** (string): defaults to `load_api_ingestion_raw`
@@ -144,9 +145,10 @@ Below are the workflow-level parameters **implemented/consumed by the current MV
     - **`non_fatal_status_codes`** list[int] (optional, default: `[]`): accepted in YAML and **logged** at client creation; **not** enforced by `BaseAPIClient` yet (HTTP errors still fail the job like any other non-2xx after retries).
 - **`payload_column_name`** string (optional, default: `payload`): JSON payload column name (can be overridden per table).
 - **`date_format_mask`** string (optional, default: `null`): `strftime` mask used when replacing `load_start_date` / `load_end_date` placeholders (workflow-level alias **`date_format`** is also accepted by the Cerberus schema and resolved the same way in `get_initial_params`).
-- **`extra_query_template_params`** dict (optional): used by DAG Builder macros and template rendering.
+- **`extra_query_template_params`** dict (optional): DAG-wide Jinja templates for the Spark `load_start_date` / `load_end_date` CLI args (the values substituted into `params` placeholders). `BaseWorkflow` copies these into the DAG execution context.
   - **`load_start_date`** string (optional, default): `{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}`
   - **`load_end_date`** string (optional, default): `{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}`
+  - Per-table override: `tables_customization.<table>.extra_query_template_params` **replaces** this dict for that table (same as query/CDC). Missing `load_start_date` / `load_end_date` are filled from the DAG execution context. Only those two keys are passed to Spark; other extra keys are ignored.
 - **`execution_timeout_hours`** float (optional, default: `2`): task timeout in hours (table-level override supported).
 - **`default_extraction_type`** string (optional, default: `full`): default extraction type for tables.
 - **`default_partitions`** list (optional, default: `[]`): default partitions list (commonly `[year, month, day]`).
@@ -203,6 +205,7 @@ Each entry under `tables_customization` is a dictionary keyed by the **raw table
     - Default: workflow `payload_column_name` → `payload`.
   - **`tables_customization.<table>.date_filter_column`** string (optional): JSON field name used for partitioning.
   - **`tables_customization.<table>.date_format`** string (optional): overrides `workflow.date_format_mask` for placeholders.
+  - **`tables_customization.<table>.extra_query_template_params`** dict (optional): per-table `load_start_date` / `load_end_date` (and only those keys are sent to Spark). Replaces `workflow.extra_query_template_params` for this table; omitted date keys fall back to the DAG execution context. Use this when one endpoint needs a different window than the rest of the DAG (for example an exclusive vendor `ending_date` via `macros.ds_add(data_interval_start | ds, 1)`).
   - **`tables_customization.<table>.clean_table_name`** string (optional, default: `<table>`): clean query filename mapping.
   - **`tables_customization.<table>.extraction_type`** string (optional, default: workflow `default_extraction_type` → `full`).
   - **`tables_customization.<table>.partitions`** list (optional, default: workflow `default_partitions` → `[]`).
@@ -541,7 +544,15 @@ If the table sets **`params: {}` explicitly**, **no** query parameters are added
 
 ### Runtime params and `extra_details`
 
-`load_api_ingestion_raw` does **not** take an `extra_details` argument and **does not** merge Airflow-provided param overrides. Query parameters come from the DAG declaration (`tables_customization.<table>.params`) and from `load_start_date` / `load_end_date` passed as fixed Spark job arguments. To change params for a run, use declaration config, `extra_query_template_params` / macros where applicable, or extend the job (see [`contributing.md`](contributing.md)).
+`load_api_ingestion_raw` does **not** take an `extra_details` argument and **does not** merge Airflow-provided param overrides. Query parameters come from the DAG declaration (`tables_customization.<table>.params`) and from `load_start_date` / `load_end_date` passed as Spark job arguments 7–8.
+
+Those dates are resolved by `LoadAPIRawTaskCreator` from `extra_query_template_params`:
+
+1. `tables_customization.<table>.extra_query_template_params` if present (replaces the workflow dict).
+2. Else `workflow.extra_query_template_params`.
+3. Missing `load_start_date` / `load_end_date` are filled from the DAG execution context.
+
+To change the window for one table without shifting the rest of the DAG, set table-level `extra_query_template_params` (see the per-table parameter reference). To change params for a run, use declaration config / macros, or extend the job (see [`contributing.md`](contributing.md)).
 
 ---
 

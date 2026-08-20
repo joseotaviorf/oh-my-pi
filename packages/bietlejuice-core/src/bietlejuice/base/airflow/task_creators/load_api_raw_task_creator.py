@@ -36,7 +36,14 @@ class LoadAPIRawTaskCreator(LoadTaskCreator):
 
         Must stay in sync with ``dags/cross/base/spark_jobs/load_api_ingestion_raw.py``
         positional arguments (no ``--table-privileges`` on that job).
+
+        ``load_start_date`` / ``load_end_date`` follow the same extra-params
+        resolution as query/CDC task creators so a table can shift its window
+        without changing Spark or the rest of the DAG.
         """
+        extra_query_template_params = self._get_extra_query_template_params(
+            table_attributes
+        )
         parameters = [
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
@@ -45,8 +52,8 @@ class LoadAPIRawTaskCreator(LoadTaskCreator):
             self.dag_execution_context.execution_date,
             json.dumps(table_attributes.partitions),
             table_attributes.extraction_type,
-            self.dag_execution_context.load_start_date,
-            self.dag_execution_context.load_end_date,
+            extra_query_template_params["load_start_date"],
+            extra_query_template_params["load_end_date"],
         ]
         if getattr(self.dag_execution_context, "is_validation", False):
             target_db, target_table = table_attributes.get_validation_write_target()
@@ -59,6 +66,40 @@ class LoadAPIRawTaskCreator(LoadTaskCreator):
                 ]
             )
         return parameters
+
+    def _get_extra_query_template_params(
+        self, table_attributes: TableAttributes
+    ) -> dict:
+        """
+        Resolves per-table ``extra_query_template_params`` for API raw loads.
+
+        Table extra replaces the workflow dict (same as query/CDC). Missing
+        ``load_start_date`` / ``load_end_date`` are filled from the DAG
+        execution context. The Spark job only substitutes those two keys in
+        ``params`` placeholders; other extra keys are ignored.
+
+        The returned dict is a copy so declaration maps are not mutated.
+        """
+        default_extra_query_template_params = (
+            self.dag_execution_context.workflow_args.get(
+                "extra_query_template_params", {}
+            )
+        )
+        extra_query_template_params = dict(
+            table_attributes.table_customization.get(
+                "extra_query_template_params",
+                default_extra_query_template_params,
+            )
+        )
+        if "load_start_date" not in extra_query_template_params:
+            extra_query_template_params["load_start_date"] = (
+                self.dag_execution_context.load_start_date
+            )
+        if "load_end_date" not in extra_query_template_params:
+            extra_query_template_params["load_end_date"] = (
+                self.dag_execution_context.load_end_date
+            )
+        return extra_query_template_params
 
     def _create_base_load_task(
         self, table_attributes: TableAttributes
