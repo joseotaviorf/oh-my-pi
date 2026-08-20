@@ -154,18 +154,18 @@ simulation_agg AS (
       FROM_UTC_TIMESTAMP(consorcio_simulation.ts_created, 'America/Sao_Paulo')
     ) AS last_simulation_at,
     COUNT(*) AS total_simulations,
-   MIN_BY(
+    MIN_BY(
       consorcio_simulation.credit_value, consorcio_simulation.ts_created
-   ) AS first_simulation_credit_value,
-   MAX_BY(
+    ) AS first_simulation_credit_value,
+    MAX_BY(
       consorcio_simulation.credit_value, consorcio_simulation.ts_created
-   ) AS last_simulation_credit_value,
-   ROUND(
+    ) AS last_simulation_credit_value,
+    ROUND(
       AVG(
         consorcio_simulation.credit_value
       ),
-     2
-   )                          AS avg_simulation_credit_value,
+      2
+    ) AS avg_simulation_credit_value
   FROM
     datalake_consorcio_clean.simulation AS consorcio_simulation
   GROUP BY
