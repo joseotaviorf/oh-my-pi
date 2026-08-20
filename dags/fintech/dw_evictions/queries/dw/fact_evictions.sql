@@ -24,6 +24,62 @@ aux_calendar AS (
     FROM dw_public.dim_date AS d
         WHERE d.month_start <= DATE(DATE_TRUNC('month',CURRENT_DATE()))
 ),
+-- Original join was `dt_registered <= d.date` with timestamp vs date (midnight).
+-- A registration with time after 00:00 excludes that calendar day; DATE() SEQUENCE
+-- would include it and add one business-day to LDTs.
+eviction_spine_bounds AS (
+    SELECT
+        eb.id_process,
+        eb.contract,
+        eb.dt_registered,
+        eb.dt_closure,
+        CASE
+            WHEN eb.dt_registered IS NULL THEN NULL
+            WHEN eb.dt_registered <= CAST(DATE(eb.dt_registered) AS TIMESTAMP)
+            THEN DATE(eb.dt_registered)
+            ELSE DATE_ADD(DATE(eb.dt_registered), 1)
+        END AS dt_spine_from,
+        COALESCE(
+            DATE(eb.dt_closure),
+            (SELECT MAX(ac.date) FROM aux_calendar AS ac)
+        ) AS dt_spine_to
+    FROM
+        datalake_cyber_legal.evictions_base AS eb
+),
+eviction_date_spine AS (
+    SELECT
+        esb.id_process,
+        esb.contract,
+        esb.dt_registered,
+        esb.dt_closure,
+        EXPLODE_OUTER(
+            CASE
+                WHEN esb.dt_spine_from IS NOT NULL
+                    AND esb.dt_spine_from <= esb.dt_spine_to
+                THEN SEQUENCE(esb.dt_spine_from, esb.dt_spine_to)
+                ELSE ARRAY()
+            END
+        ) AS date
+    FROM
+        eviction_spine_bounds AS esb
+),
+eviction_calendar AS (
+    SELECT
+        eds.id_process,
+        eds.contract,
+        eds.dt_registered,
+        eds.dt_closure,
+        ac.sk_date,
+        ac.date,
+        ac.is_brz_holiday,
+        ac.weekend,
+        ac.arbitration_recess
+    FROM
+        eviction_date_spine AS eds
+    LEFT JOIN
+        aux_calendar AS ac
+            ON eds.date = ac.date
+),
 fpd AS (
     SELECT id_invoice
     FROM (SELECT
@@ -416,9 +472,11 @@ SELECT
 FROM
     datalake_cyber_legal.evictions_base e
 LEFT JOIN
-    aux_calendar d
-    ON e.dt_registered <= d.date
-    AND (e.dt_closure >= d.date OR e.dt_closure IS NULL)
+    eviction_calendar AS d
+        ON COALESCE(e.id_process, '') = COALESCE(d.id_process, '')
+        AND COALESCE(e.contract, '') = COALESCE(d.contract, '')
+        AND e.dt_registered <=> d.dt_registered
+        AND e.dt_closure <=> d.dt_closure
 LEFT JOIN
     overdue_final AS ovf
     ON ovf.sk_process = e.id_process

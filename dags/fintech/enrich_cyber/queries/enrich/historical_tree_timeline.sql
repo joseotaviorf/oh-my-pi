@@ -343,7 +343,10 @@ intervals AS (
         ON CAST(si.dim_value AS STRING) = CAST(dq.queue AS STRING)
         AND dqt.queue_type = dq.queue_type
 ),
-calendar_dim AS (
+-- Expand each validity interval to one row per day, then equi-join aux_date so the
+-- result set matches the original range join (membership in aux_date), without assuming
+-- the calendar dimension is gap-free between MIN and MAX.
+intervals_daily AS (
     SELECT
         i.id_contract_external,
         i.dimension_key,
@@ -357,18 +360,61 @@ calendar_dim AS (
         i.outstanding_balance,
         i.total_delayed_amount,
         i.dt_due_date,
-        d.date AS aux_date
+        GREATEST(
+            i.dt_from,
+            DATE('{load_start_date}')
+        ) AS dt_valid_from,
+        LEAST(
+            IF(
+                i.dt_next IS NULL,
+                CURRENT_DATE(),
+                DATE_ADD(i.dt_next, -1)
+            ),
+            DATE('{load_end_date}')
+        ) AS dt_valid_to
     FROM
-        datalake_quintoandar.aux_date AS d
-    INNER JOIN intervals AS i
-        ON DATE(d.date) >= i.dt_from
-        AND IF(
-            i.dt_next IS NULL,
-            DATE(d.date) <= CURRENT_DATE(),
-            DATE(d.date) < i.dt_next
-        )
+        intervals AS i
+),
+intervals_exploded AS (
+    SELECT
+        id_contract_external,
+        dimension_key,
+        dim_value,
+        dim_description,
+        ts_record_insertion,
+        id,
+        id_contract,
+        contract_group,
+        days_delayed,
+        outstanding_balance,
+        total_delayed_amount,
+        dt_due_date,
+        EXPLODE(SEQUENCE(dt_valid_from, dt_valid_to, INTERVAL 1 DAY)) AS aux_date
+    FROM
+        intervals_daily
     WHERE
-        DATE(d.date) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        dt_valid_from <= dt_valid_to
+),
+calendar_dim AS (
+    SELECT
+        ie.id_contract_external,
+        ie.dimension_key,
+        ie.dim_value,
+        ie.dim_description,
+        ie.ts_record_insertion,
+        ie.id,
+        ie.id_contract,
+        ie.contract_group,
+        ie.days_delayed,
+        ie.outstanding_balance,
+        ie.total_delayed_amount,
+        ie.dt_due_date,
+        ie.aux_date
+    FROM
+        intervals_exploded AS ie
+    INNER JOIN
+        datalake_quintoandar.aux_date AS d
+            ON DATE(d.date) = ie.aux_date
 )
 SELECT
     cd.id_contract_external,
