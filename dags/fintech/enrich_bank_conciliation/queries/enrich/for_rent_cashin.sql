@@ -61,37 +61,25 @@ sap_gateway AS (
     )
     WHERE rn = 1
 ),
-francesinha_base AS (
+francesinha_cnab_06 AS (
     SELECT
-        -- occ 06 (liquidacao normal / boleto): key by document_number, as before.
-        -- occ 10 (baixa por ter sido liquidado / PIX bolecode): bank keys the credit by our_number,
-        -- while checkout/SAP/Retsuko use the stripped our_number (leading zeros + trailing check digit removed).
-        CASE
-            WHEN occurrence_code = '10'
-                THEN REGEXP_REPLACE(REGEXP_REPLACE(our_number, '^0+', ''), '[0-9]$', '')
-            ELSE UPPER(REPLACE(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', ''), 'C|', ''))
-        END AS company_use,
+        UPPER(REPLACE(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', ''), 'C|', '')) AS company_use,
         document_number AS bank_number,
         bank_account,
-        -- occ 10 credits have no dt_credit; use the occurrence date (settlement day) instead.
-        COALESCE(dt_credit, dt_occurrence_code) AS dt_paid,
+        dt_credit AS dt_paid,
         SUM(net_amount) AS amount
     FROM
         datalake_nexxera.cnab_charges
     WHERE
         bank_account = '03922'
-        AND occurrence_code IN ('06', '10')
+        AND occurrence_code = '06'
         AND document_number IS NOT NULL
         AND TRIM(document_number) != ''
-        AND (
-            occurrence_code = '06'
-            OR (occurrence_code = '10' AND our_number IS NOT NULL AND TRIM(our_number) != '')
-        )
     GROUP BY
         1,2,3,4
-    
-    UNION ALL 
+),
 
+francesinha_itau AS (
     SELECT
         CASE
             WHEN ext.origin_complement like '%BL%' THEN regexp_replace(
@@ -109,6 +97,100 @@ francesinha_base AS (
     WHERE
         ext.operation in ('C')
         AND ext.literal_code in ('9489')
+),
+
+-- occ 10 (baixa por ter sido liquidado / PIX bolecode): keyed by normalized our_number.
+-- Keep only when Itaú statement does not already have the same payment in the month
+-- (same key + amount). Otherwise occ 10 is D-1 vs Itaú D0 and seeds a duplicate rn.
+francesinha_cnab_10 AS (
+    SELECT
+        company_use,
+        bank_number,
+        bank_account,
+        dt_paid,
+        amount
+    FROM (
+        SELECT
+            o.company_use,
+            o.bank_number,
+            o.bank_account,
+            o.dt_paid,
+            o.amount,
+            ROW_NUMBER() OVER (
+                PARTITION BY o.company_use, o.amount, o.pay_year, o.pay_month
+                ORDER BY o.dt_paid
+            ) AS occ10_rn
+        FROM (
+            SELECT
+                REGEXP_REPLACE(REGEXP_REPLACE(our_number, '^0+', ''), '[0-9]$', '') AS company_use,
+                document_number AS bank_number,
+                bank_account,
+                COALESCE(dt_credit, dt_occurrence_code) AS dt_paid,
+                SUM(net_amount) AS amount,
+                YEAR(COALESCE(dt_credit, dt_occurrence_code)) AS pay_year,
+                MONTH(COALESCE(dt_credit, dt_occurrence_code)) AS pay_month
+            FROM
+                datalake_nexxera.cnab_charges
+            WHERE
+                bank_account = '03922'
+                AND occurrence_code = '10'
+                AND document_number IS NOT NULL
+                AND TRIM(document_number) != ''
+                AND our_number IS NOT NULL
+                AND TRIM(our_number) != ''
+            GROUP BY
+                1,2,3,4,6,7
+        ) o
+        LEFT JOIN (
+            SELECT
+                company_use,
+                amount,
+                YEAR(dt_paid) AS pay_year,
+                MONTH(dt_paid) AS pay_month
+            FROM
+                francesinha_itau
+        ) i
+            ON i.company_use = o.company_use
+            AND i.amount = o.amount
+            AND i.pay_year = o.pay_year
+            AND i.pay_month = o.pay_month
+        WHERE
+            i.company_use IS NULL
+    )
+    WHERE occ10_rn = 1
+),
+
+francesinha_base AS (
+    SELECT
+        company_use,
+        bank_number,
+        bank_account,
+        dt_paid,
+        amount
+    FROM
+        francesinha_cnab_06
+
+    UNION ALL
+
+    SELECT
+        company_use,
+        bank_number,
+        bank_account,
+        dt_paid,
+        amount
+    FROM
+        francesinha_itau
+
+    UNION ALL
+
+    SELECT
+        company_use,
+        bank_number,
+        bank_account,
+        dt_paid,
+        amount
+    FROM
+        francesinha_cnab_10
 ),
 
 -- Same CNAB credit can appear with different bank_number; keep one row per payment (company_use + date + amount)
