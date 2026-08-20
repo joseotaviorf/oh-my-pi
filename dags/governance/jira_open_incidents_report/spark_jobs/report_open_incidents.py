@@ -2,7 +2,7 @@
 
 Query source: datalake_jira.issues (enrich layer). "Open" = current_status_category != 'Done'.
 Chat body is a Line (incident_owner) leaderboard plus hygiene: unassigned,
-description not filled (empty or still the Jira pre-filled template), and
+not filled (empty or still the Jira pre-filled template), and
 on going vs backlog from the card workflow status (In Progress / On going vs
 To Do / Backlog). Concluded (Done) is excluded from this open digest.
 Notification: Notification Hub generic route (cardsV2 so Chat renders line
@@ -226,21 +226,25 @@ def _format_message(rows, as_of: datetime) -> str:
             age_part = f" (newest: {min(known_ages)}d, oldest: {max(known_ages)}d)"
         else:
             age_part = " (newest: unknown, oldest: unknown)"
+        # GChat wraps at `|`; keep hygiene on the next line, no pipes.
         hygiene = (
-            f" | on going {on_going_by_line[line_name]}"
-            f" | unassigned {unassigned_by_line[line_name]}"
-            f" | description not filled {unfilled_by_line[line_name]}"
+            f"on going {on_going_by_line[line_name]}"
+            f" · unassigned {unassigned_by_line[line_name]}"
+            f" · not filled {unfilled_by_line[line_name]}"
         )
-        lines.append(
-            f"{line_name}: {len(ages)} opened DEI incidents{age_part}{hygiene}"
-        )
+        lines.append(f"• {line_name}: {len(ages)} opened{age_part}")
+        lines.append(hygiene)
     return "\n".join(lines)
 
 
 def _gchat_cards_v2(message: str) -> dict:
     """GChat card: textParagraph renders ``<br>``; Hub inmetro text field does not."""
     header, _, rest = message.partition("\n")
-    body = rest.replace("\n", "<br>")
+    body = "<br>".join(
+        raw_line if raw_line.startswith("•") else f"&nbsp;&nbsp;{raw_line}"
+        for raw_line in rest.split("\n")
+        if raw_line
+    )
     paragraph = f"<b>{header}</b>"
     if body:
         paragraph = f"{paragraph}<br>{body}"

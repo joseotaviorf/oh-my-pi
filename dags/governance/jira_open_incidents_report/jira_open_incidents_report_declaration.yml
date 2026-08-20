@@ -8,7 +8,7 @@ dag:
       Daily (9am BRT) digest of open DEI incident cards (current_status_category
       != 'Done'). Snapshot grain is one row per open incident. Google Chat digest is a
       Line (incident_owner) leaderboard: count, newest/oldest age, on going
-      (card workflow In Progress), unassigned, description not filled. Open =
+      (card workflow In Progress), unassigned, not filled. Open =
       on going + backlog; concluded (Done) is excluded. Posts to space
       "agents-data-alarms" via Notification Hub (generic cardsV2 route, webhook base co-located
       in spark_jobs/{environment}_conf.yml).
