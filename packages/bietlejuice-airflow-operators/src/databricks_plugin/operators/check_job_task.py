@@ -272,8 +272,12 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
                     f"attempt on retry. HTTPError={ex.response.text}"
                 )
                 return
-            # INVALID_STATE: the task is already running (repaired by another operator).
-            if ex.response.status_code == 400 and "INVALID_STATE" in ex.response.text:
+            # Repair is not allowed on an active run: the run/task is still transitioning
+            # out of its terminal state (e.g. cancellation not yet propagated) or is already
+            # being repaired by another operator invocation.
+            if ex.response.status_code == 400 and (
+                "Repair is not allowed on an active run" in ex.response.text
+            ):
                 self.log.error(
                     f"m=execute task={self.task_id} error=Run {run_id} is already "
                     "running; will check for latest task "
