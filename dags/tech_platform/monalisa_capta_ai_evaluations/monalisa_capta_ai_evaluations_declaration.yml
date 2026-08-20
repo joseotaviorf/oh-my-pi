@@ -18,7 +18,7 @@ workflow:
   - "{environment}"
   - "{bucket}"
   - "{schema}"
-  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  - "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
   - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   - "{table_name}"
   - "{partitions}"
