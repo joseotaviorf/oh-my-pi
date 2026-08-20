@@ -20,9 +20,9 @@ dags/tech_platform/olos_dialer_transcriptions/**                        @quintoa
 dags/tech_platform/monalisa_capta_ai_evaluations/**                     @quintoandar/bi-etl-ejuice-code-owners
 dags/tech_platform/monalisa_monitoria_evaluations/**                    @quintoandar/bi-etl-ejuice-code-owners
 packages/**                                                             @quintoandar/data-ingestion-code-owners @quintoandar/data-ingestion-code-owners
-# Agent metric Spark kit — DE can edit without a platform-only review.
-packages/bietlejuice-runtime/src/bietlejuice/shared/agents/**           @quintoandar/bi-etl-ejuice-code-owners @quintoandar/data-ingestion-code-owners
-packages/bietlejuice-runtime/test/unit/shared/agents/**                 @quintoandar/bi-etl-ejuice-code-owners @quintoandar/data-ingestion-code-owners
+# Agent metric Spark kit — data-agents owns shared.agents (overrides packages/**).
+packages/bietlejuice-runtime/src/bietlejuice/shared/agents/**           @quintoandar/data-agents
+packages/bietlejuice-runtime/test/unit/shared/agents/**                 @quintoandar/data-agents
 # DAG spark-job tests mirror dags/ — either platform or DE team can approve.
 packages/bietlejuice-runtime/test/dags/**                               @quintoandar/bi-etl-ejuice-code-owners @quintoandar/data-ingestion-code-owners
 packages/bietlejuice-runtime/**/governance/**                           @quintoandar/data-ops-governance @quintoandar/data-ingestion-code-owners
