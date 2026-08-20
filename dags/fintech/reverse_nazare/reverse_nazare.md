@@ -16,13 +16,9 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 We incrementally load the following table into the Datalake Reverse bucket, for backup pourposes:
 
-- `advance`
 - `agent`
-- `associate_executive_bonus`
 - `brokerage_fee_baseline`
 - `business_unit`
-- `campaign`
-- `hub_bonus`
 - `offer_agent`
 - `offer_partner`
 - `offer`
