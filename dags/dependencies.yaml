@@ -4256,6 +4256,8 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-round:first-run-of-day
 bietlejuice.enrich_zscaler:
   - bietlejuice.zscaler:load-clean-managed-devices:first-run-of-day
+bietlejuice.jira_open_incidents_report:
+  - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
 bietlejuice.metric_fintech__collections_segmentation:
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-features-timeline:first-run-of-day
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day

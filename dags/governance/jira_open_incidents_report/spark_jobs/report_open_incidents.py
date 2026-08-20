@@ -7,7 +7,7 @@ on going vs backlog from the card workflow status (In Progress / On going vs
 To Do / Backlog). Concluded (Done) is excluded from this open digest.
 Notification: Notification Hub generic route (cardsV2 so Chat renders line
 breaks; inmetro nl2br becomes literal ``<br>`` in GChat text).
-Space agents-data-alarms (base URL from spark_jobs/{environment}_conf.yml).
+Space DAG_Rotation (base URL from spark_jobs/{environment}_conf.yml).
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ PARTITION_COLS = ["year", "month", "day"]
 NOTIFICATION_HUB_INMETRO_BASE_KEY = "notification_hub_inmetro_webhook_base"
 INMETRO_WEBHOOK_PATH = "/webhook/inmetro"
 GENERIC_WEBHOOK_PATH = "/webhook/generic"
-GCHAT_SPACE = "agents-data-alarms"
+GCHAT_SPACE = "DAG_Rotation"
 NO_LINE_LABEL = "no owner"
 INCIDENT_TEMPLATE_MARKER = "Incident format template"
 ON_GOING_STATUS_NAMES = frozenset(
