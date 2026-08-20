@@ -391,7 +391,7 @@ steps:
         [ -n "$ASTRO_DEPLOYMENT_ID" ] || { echo "ASTRO_DEPLOYMENT_ID missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
         [ -n "$ASTRO_WORKSPACE_ID" ] || { echo "ASTRO_WORKSPACE_ID missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
         [ -n "$GITHUB_TOKEN" ] || { echo "GITHUB_TOKEN secret missing" >&2; exit 1; }
-        sh -c 'dockerd-entrypoint.sh --registry-mirror=http://docker-registry.shared.quintoandar.com.br:5000 1>/dev/null 2>/dev/null' &
+        sh -c 'dockerd-entrypoint.sh --registry-mirror=http://docker-registry.apps.shared-prd.habitat.zone:5000 1>/dev/null 2>/dev/null' &
         while ! docker stats --no-stream >/dev/null 2>&1; do
           echo "Waiting Docker daemon to start..."
           sleep 1
@@ -746,7 +746,7 @@ steps:
         [ -n "$ASTRO_DEPLOYMENT_ID" ] || { echo "ASTRO_DEPLOYMENT_ID missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
         [ -n "$ASTRO_WORKSPACE_ID" ] || { echo "ASTRO_WORKSPACE_ID missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
         [ -n "$GITHUB_TOKEN" ] || { echo "GITHUB_TOKEN secret missing" >&2; exit 1; }
-        sh -c 'dockerd-entrypoint.sh --registry-mirror=http://docker-registry.shared.quintoandar.com.br:5000 1>/dev/null 2>/dev/null' &
+        sh -c 'dockerd-entrypoint.sh --registry-mirror=http://docker-registry.apps.shared-prd.habitat.zone:5000 1>/dev/null 2>/dev/null' &
         while ! docker stats --no-stream >/dev/null 2>&1; do
           echo "Waiting Docker daemon to start..."
           sleep 1
