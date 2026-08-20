@@ -410,7 +410,9 @@ columns:
     description: |
       Detailed contract segmentation using the daily calculated payment probability (prob_payment_at_dt_reference).
       This segmentation changes daily as contract conditions evolve. Includes categories like active-new-defaulter-early-high,
-      ended-stock-roll1-low, evictions, etc., differentiated by status, delay range, and daily probability assessment
+      ended-stock-roll1-low, and evictions sub-segments (evictions-late, evictions-early-low,
+      evictions-early-reincident-high, evictions-early-first-high), differentiated by status, delay range, and daily
+      probability assessment.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -428,7 +430,8 @@ columns:
     description: |
       Detailed contract segmentation using the frozen payment probability band (prob_payment), constant within each
       macro_segmentation island. Same label set as segmentation_with_prob_payment_at_dt_reference but driven by
-      prob_payment instead of daily prob_payment_at_dt_reference.
+      prob_payment instead of daily prob_payment_at_dt_reference. Evictions contracts split into evictions-late,
+      evictions-early-low, evictions-early-reincident-high, evictions-early-first-high, or evictions-undefined.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -513,7 +516,11 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
   macro_segmentation:
-    description: High-level classification of the contract state (e.g., active-current, active-stock-pre-evictions, ended-stock-roll1) based on status, delay ranges, and deal flags, evaluated before payment probabilities are applied.
+    description: |
+      High-level classification of the contract state (e.g., active-current, active-stock-pre-evictions,
+      evictions, ended-stock-361over) based on status, delay ranges, and deal flags, evaluated before
+      payment probabilities are applied. Evictions contracts always map to the single macro label evictions;
+      tactical evictions sub-segments are derived downstream in segmentation.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -564,6 +571,38 @@ columns:
     lineage:
       - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
       - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+  payment_probability_at_entrance:
+    description: |
+      Raw propagated collections score frozen at macro-segment entry: the payment_probability_propagated value on the
+      first day of each macro_segmentation island (except active-current and ended-current, which use the daily value).
+      Used to classify evictions early sub-segments and to anchor entrance-based decision rules.
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.payment_probability_propagated
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
+  major_segmentation:
+    description: |
+      Macro-level rollup for dashboard grouping. Collapses active-new-defaulter-special into active-new-defaulter and
+      maps ended-had-forgiveness into delay-bucket macro labels; all other macro_segmentation values pass through unchanged.
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+  hyper_segmentation:
+    description: |
+      Hyper-level rollup grouping active tactical segments into active-segments, ended tactical segments into
+      ended-segments, and all evictions macro contracts into evictions; other labels pass through unchanged.
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.segmentation
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
+  clustered_segmentation:
+    description: |
+      Clustered tactical rollup for dashboard building. Rolls mob3, low, and good-payer segments; maps forgiveness
+      rows by prob_payment; groups evictions-early-* sub-segments into evictions-early and keeps evictions-late unchanged.
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.segmentation
+      - dw_collections_segmentation.fact_contract_features_timeline.prob_payment
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
   payment_probability:
     description: |
       Raw payment probability from collections score v3 batch inference for this contract and dt_reference (latest

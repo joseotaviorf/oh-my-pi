@@ -254,71 +254,68 @@ WITH deduplication_score AS (
     END AS pct_invoices_paid_ontime_t1_l12m,
     CASE WHEN n_reparos_invoices = n_invoices_in_wallet THEN TRUE ELSE FALSE END AS flag_full_repair,
     CASE
-      WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 <= 0
-      THEN 'active-current'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 <= 0
-      THEN 'ended-current'
-      WHEN is_evictions
-      THEN 'evictions'
-      WHEN reference_contract_status = 'Ativo' AND has_fpd_in_wallet_general
-      THEN 'active-new-defaulter-first-payment-default'
-      WHEN reference_contract_status = 'Ativo'
-      AND has_negotiation_in_contract
-      AND max_delay_contaminated_contract_t1 <= 0
-      THEN 'active-ongoing-deal'
-      WHEN reference_contract_status = 'Ativo'
-      AND mob_months <= 3
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-under-mob3'
-      WHEN reference_contract_status = 'Ativo'
-      AND (
-        n_days_over1_t2_l180 - 3
-      ) <= 0
-      AND max_delay_contaminated_contract_t2 <= 3
-      THEN 'active-new-defaulter-special'
-      WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        (
-          n_overdue_monthlys_t1 > 1
-        ) OR flag_broken_global_deal
-      )
-      THEN 'active-stock-pre-evictions'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND n_overdue_monthlys_t1 <= 1
-      THEN 'active-stock-hold'
-      WHEN reference_contract_status = 'Ativo'
-      THEN 'UNCLASSIFIED'
-      WHEN reference_contract_status = 'Finalizado'
-      AND has_negotiation_in_contract
-      AND max_delay_contaminated_contract_t1 <= 0
-      THEN 'ended-ongoing-deal'
-      WHEN reference_contract_status = 'Finalizado'
-      AND acc_deals_principal_discount_lifetime > 0
-      THEN 'ended-had-forgiveness'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'ended-new-defaulter'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND max_delay_contaminated_contract_t2 <= 90
-      THEN 'ended-stock-31to90'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 90
-      AND max_delay_contaminated_contract_t2 <= 180
-      THEN 'ended-stock-91to180'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 180
-      AND max_delay_contaminated_contract_t2 <= 360
-      THEN 'ended-stock-181to360'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 360
-      THEN 'ended-stock-361over'
-      ELSE 'UNCLASSIFIED'
+        WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 <= 0
+            THEN 'active-current'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 <= 0
+            THEN 'ended-current'
+        WHEN is_evictions
+            THEN 'evictions'
+        WHEN reference_contract_status = 'Ativo' AND has_fpd_in_wallet_general
+            THEN 'active-new-defaulter-first-payment-default'
+        WHEN reference_contract_status = 'Ativo'
+            AND has_negotiation_in_contract
+            AND max_delay_contaminated_contract_t1 <= 0
+            THEN 'active-ongoing-deal'
+        WHEN reference_contract_status = 'Ativo'
+            AND (
+                max_delay_contaminated_contract_t2 > 30
+                OR n_overdue_monthlys_t1 > 1
+                OR flag_broken_global_deal
+            )
+            THEN 'active-stock-pre-evictions'
+        WHEN reference_contract_status = 'Ativo'
+            AND mob_months <= 3
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-under-mob3'
+        WHEN reference_contract_status = 'Ativo'
+            AND (n_days_over1_t2_l180 - 3) <= 0
+            AND max_delay_contaminated_contract_t2 <= 3
+            THEN 'active-new-defaulter-special'
+        WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter'
+        WHEN reference_contract_status = 'Ativo'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND n_overdue_monthlys_t1 <= 1
+            THEN 'active-stock-hold'
+        WHEN reference_contract_status = 'Ativo'
+            THEN 'UNCLASSIFIED'
+        WHEN reference_contract_status = 'Finalizado'
+            AND has_negotiation_in_contract
+            AND max_delay_contaminated_contract_t1 <= 0
+            THEN 'ended-ongoing-deal'
+        WHEN reference_contract_status = 'Finalizado'
+            AND acc_deals_principal_discount_lifetime > 0
+            THEN 'ended-had-forgiveness'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'ended-new-defaulter'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND max_delay_contaminated_contract_t2 <= 90
+            THEN 'ended-stock-31to90'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 90
+            AND max_delay_contaminated_contract_t2 <= 180
+            THEN 'ended-stock-91to180'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 180
+            AND max_delay_contaminated_contract_t2 <= 360
+            THEN 'ended-stock-181to360'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 360
+            THEN 'ended-stock-361over'
+        ELSE 'UNCLASSIFIED'
     END AS macro_segmentation,
     COALESCE(
       LAST_VALUE(payment_probability) IGNORE NULLS OVER (PARTITION BY sk_contract ORDER BY dt_reference),
@@ -539,93 +536,101 @@ WITH deduplication_score AS (
       ELSE 'NULL UNDEFINED'
     END AS legacy_prob_payment_at_dt_reference,
     CASE
-      WHEN f.reference_contract_status = 'Ativo'
-      THEN CASE
-        WHEN f.max_delay_contaminated_contract_t2 <= 30
-        THEN CASE
-          WHEN (
-            f.n_days_over1_t2_l180 - 3
-          ) <= 0
-          AND f.max_delay_contaminated_contract_t2 <= 3
-          THEN 'VERY_HIGH'
-          WHEN f.payment_probability_propagated >= 0.838
-          THEN 'HIGH'
-          WHEN f.payment_probability_propagated >= 0.645
-          THEN 'MEDIUM'
-          WHEN f.payment_probability_propagated < 0.645
-          THEN 'LOW'
-          ELSE 'NULL PROB ACTIVE [1-30]'
-        END
-        WHEN f.max_delay_contaminated_contract_t2 > 30
-        THEN CASE
-          WHEN f.avg_days_overdue_invoices_paid_t1 <= 5
-          OR f.avg_days_overdue_invoices_paid_t1 > 40
-          OR (
-            f.n_evictions_processes_lifetime >= 1 AND f.mob_months <= 6
-          )
-          THEN 'LOW'
-          WHEN f.mob_months <= 12
-          OR (
-            f.n_evictions_processes_lifetime >= 1
-            AND f.mob_months > 12
-            AND f.avg_days_overdue_invoices_paid_t1 > 30
-          )
-          THEN 'MEDIUM'
-          WHEN (
-            f.n_evictions_processes_lifetime >= 1
-            AND f.mob_months > 12
-            AND f.avg_days_overdue_invoices_paid_t1 <= 30
-          )
-          OR (
-            f.n_evictions_processes_lifetime = 0 AND f.mob_months > 12
-          )
-          THEN 'HIGH'
-          ELSE 'NULL PROB ACTIVE [31+]'
-        END
-      END
-      WHEN f.reference_contract_status = 'Finalizado'
-      THEN CASE
-        WHEN f.max_delay_contaminated_contract_t2 <= 30
-        THEN CASE
-          WHEN f.payment_probability_propagated >= 0.7
-          THEN 'HIGH'
-          WHEN f.payment_probability_propagated < 0.7
-          THEN 'LOW'
-          ELSE 'NULL UNDEFINED'
-        END
-        WHEN f.max_delay_contaminated_contract_t2 <= 90
-        THEN CASE
-          WHEN f.n_reparos_invoices = f.n_invoices_in_wallet
-          THEN 'VERY_LOW'
-          WHEN f.payment_probability_propagated >= 0.186
-          THEN 'HIGH'
-          WHEN f.payment_probability_propagated < 0.186
-          THEN 'LOW'
-          ELSE 'NULL UNDEFINED'
-        END
-        WHEN f.max_delay_contaminated_contract_t2 <= 180
-        THEN CASE
-          WHEN f.n_reparos_invoices = f.n_invoices_in_wallet
-          THEN 'VERY_LOW'
-          WHEN f.payment_probability_propagated >= 0.091
-          THEN 'HIGH'
-          WHEN f.payment_probability_propagated < 0.091
-          THEN 'LOW'
-          ELSE 'NULL UNDEFINED'
-        END
-        WHEN f.max_delay_contaminated_contract_t2 > 180
-        THEN CASE
-          WHEN f.max_delay_contaminated_contract_t2 <= 360
-          AND f.n_reparos_invoices = f.n_invoices_in_wallet
-          THEN 'VERY_LOW'
-          WHEN f.payment_probability_propagated >= 0.06
-          THEN 'HIGH'
-          WHEN f.payment_probability_propagated < 0.06
-          THEN 'LOW'
-          ELSE 'NULL UNDEFINED'
-        END
-      END
-      ELSE 'NULL UNDEFINED'
+        WHEN COALESCE(f.is_evictions, FALSE) = TRUE
+            THEN CASE
+                WHEN f.payment_probability_propagated >= 0.223
+                    THEN 'HIGH'
+                WHEN f.payment_probability_propagated < 0.223
+                    THEN 'LOW'
+            END
+        WHEN f.reference_contract_status = 'Ativo'
+            THEN CASE
+                WHEN f.max_delay_contaminated_contract_t2 > 30
+                    OR f.macro_segmentation = 'active-stock-pre-evictions'
+                    THEN CASE
+                        WHEN f.avg_days_overdue_invoices_paid_t1 <= 5
+                            OR f.avg_days_overdue_invoices_paid_t1 > 40
+                            OR (
+                                f.n_evictions_processes_lifetime >= 1
+                                AND f.mob_months <= 6
+                            )
+                            THEN 'LOW'
+                        WHEN f.mob_months <= 12
+                            OR (
+                                f.n_evictions_processes_lifetime >= 1
+                                AND f.mob_months > 12
+                                AND f.avg_days_overdue_invoices_paid_t1 > 30
+                            )
+                            THEN 'MEDIUM'
+                        WHEN (
+                            f.n_evictions_processes_lifetime >= 1
+                            AND f.mob_months > 12
+                            AND f.avg_days_overdue_invoices_paid_t1 <= 30
+                        )
+                            OR (
+                                f.n_evictions_processes_lifetime = 0
+                                AND f.mob_months > 12
+                            )
+                            THEN 'HIGH'
+                        ELSE 'NULL PROB ACTIVE [31+]'
+                    END
+                WHEN f.max_delay_contaminated_contract_t2 <= 30
+                    THEN CASE
+                        WHEN (f.n_days_over1_t2_l180 - 3) <= 0
+                            AND f.max_delay_contaminated_contract_t2 <= 3
+                            THEN 'VERY_HIGH'
+                        WHEN f.payment_probability_propagated >= 0.838
+                            THEN 'HIGH'
+                        WHEN f.payment_probability_propagated >= 0.645
+                            THEN 'MEDIUM'
+                        WHEN f.payment_probability_propagated < 0.645
+                            THEN 'LOW'
+                        ELSE 'NULL PROB ACTIVE [1-30]'
+                    END
+            END
+        WHEN f.reference_contract_status = 'Finalizado'
+            THEN CASE
+                WHEN f.max_delay_contaminated_contract_t2 <= 30
+                    THEN CASE
+                        WHEN f.payment_probability_propagated >= 0.7
+                            THEN 'HIGH'
+                        WHEN f.payment_probability_propagated < 0.7
+                            THEN 'LOW'
+                        ELSE 'NULL UNDEFINED'
+                    END
+                WHEN f.max_delay_contaminated_contract_t2 <= 90
+                    THEN CASE
+                        WHEN f.n_reparos_invoices = f.n_invoices_in_wallet
+                            THEN 'VERY_LOW'
+                        WHEN f.payment_probability_propagated >= 0.186
+                            THEN 'HIGH'
+                        WHEN f.payment_probability_propagated < 0.186
+                            THEN 'LOW'
+                        ELSE 'NULL UNDEFINED'
+                    END
+                WHEN f.max_delay_contaminated_contract_t2 <= 180
+                    THEN CASE
+                        WHEN f.n_reparos_invoices = f.n_invoices_in_wallet
+                            THEN 'VERY_LOW'
+                        WHEN f.payment_probability_propagated >= 0.091
+                            THEN 'HIGH'
+                        WHEN f.payment_probability_propagated < 0.091
+                            THEN 'LOW'
+                        ELSE 'NULL UNDEFINED'
+                    END
+                WHEN f.max_delay_contaminated_contract_t2 > 180
+                    THEN CASE
+                        WHEN f.max_delay_contaminated_contract_t2 <= 360
+                            AND f.n_reparos_invoices = f.n_invoices_in_wallet
+                            THEN 'VERY_LOW'
+                        WHEN f.payment_probability_propagated >= 0.06
+                            THEN 'HIGH'
+                        WHEN f.payment_probability_propagated < 0.06
+                            THEN 'LOW'
+                        ELSE 'NULL UNDEFINED'
+                    END
+            END
+        ELSE 'NULL UNDEFINED'
     END AS prob_payment_at_dt_reference,
     CAST(DATE_TRUNC('MONTH', dt_reference) AS DATE) AS dt_month_start
   FROM calculate_monthly_payment_ratios AS f
@@ -671,341 +676,346 @@ WITH deduplication_score AS (
   SELECT
     *,
     CASE
-      WHEN macro_segmentation = 'UNCLASSIFIED'
-      THEN NULL
-      WHEN macro_segmentation IN ('active-current', 'ended-current')
-      THEN prob_payment_at_dt_reference
-      ELSE FIRST_VALUE(prob_payment_at_dt_reference) OVER (PARTITION BY sk_contract, macro_segmentation, macro_island_id ORDER BY dt_reference ASC)
-    END AS prob_payment
+        WHEN macro_segmentation = 'UNCLASSIFIED'
+            THEN NULL
+        WHEN macro_segmentation IN ('active-current', 'ended-current')
+            THEN prob_payment_at_dt_reference
+        ELSE FIRST_VALUE(prob_payment_at_dt_reference) OVER (PARTITION BY sk_contract, macro_segmentation, macro_island_id ORDER BY dt_reference ASC)
+    END AS prob_payment,
+    CASE
+        WHEN macro_segmentation = 'UNCLASSIFIED'
+            THEN NULL
+        WHEN macro_segmentation IN ('active-current', 'ended-current')
+            THEN payment_probability_propagated
+        ELSE FIRST_VALUE(payment_probability_propagated) OVER (PARTITION BY sk_contract, macro_segmentation, macro_island_id ORDER BY dt_reference ASC)
+    END AS payment_probability_at_entrance
   FROM calculate_the_correct_prob_order
 ), segmentation_features AS (
   SELECT
     *,
     CASE
-      WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 <= 0
-      THEN 'active-current'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 <= 0
-      THEN 'ended-current'
-      WHEN is_evictions
-      THEN 'evictions'
-      WHEN reference_contract_status = 'Ativo' AND has_fpd_in_wallet_general
-      THEN 'active-new-defaulter-first-payment-default'
-      WHEN reference_contract_status = 'Ativo'
-      AND has_negotiation_in_contract
-      AND max_delay_contaminated_contract_t1 <= 0
-      THEN 'active-ongoing-deal'
-      WHEN reference_contract_status = 'Ativo'
-      AND mob_months <= 3
-      AND max_delay_contaminated_contract_t2 <= 15
-      THEN 'active-new-defaulter-under-mob3-early'
-      WHEN reference_contract_status = 'Ativo'
-      AND mob_months <= 3
-      AND max_delay_contaminated_contract_t2 >= 16
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-under-mob3-late'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 <= 30
-      AND prob_payment_at_dt_reference = 'VERY_HIGH'
-      THEN 'active-new-defaulter-good-payers'
-      WHEN reference_contract_status = 'Ativo'
-      AND prob_payment_at_dt_reference = 'HIGH'
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-high'
-      WHEN reference_contract_status = 'Ativo'
-      AND prob_payment_at_dt_reference = 'MEDIUM'
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-medium'
-      WHEN reference_contract_status = 'Ativo'
-      AND prob_payment_at_dt_reference = 'LOW'
-      AND max_delay_contaminated_contract_t2 <= 4
-      THEN 'active-new-defaulter-early-low'
-      WHEN reference_contract_status = 'Ativo'
-      AND prob_payment_at_dt_reference = 'LOW'
-      AND max_delay_contaminated_contract_t2 > 4
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-late-low'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        macro_segmentation = 'active-stock-pre-evictions' AND flag_broken_global_deal
-      )
-      AND prob_payment_at_dt_reference = 'LOW'
-      THEN 'active-stock-risk-deal-low'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        macro_segmentation = 'active-stock-pre-evictions' AND flag_broken_global_deal
-      )
-      AND prob_payment_at_dt_reference IN ('HIGH', 'MEDIUM')
-      THEN 'active-stock-risk-deal-high'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        macro_segmentation = 'active-stock-pre-evictions'
-        AND NOT (
-          flag_broken_global_deal
-        )
-      )
-      AND prob_payment_at_dt_reference = 'LOW'
-      THEN 'active-stock-risk-nodeal-low'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        macro_segmentation = 'active-stock-pre-evictions'
-        AND NOT (
-          flag_broken_global_deal
-        )
-      )
-      AND prob_payment_at_dt_reference IN ('HIGH', 'MEDIUM')
-      THEN 'active-stock-risk-nodeal-high'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        (
-          n_overdue_monthlys_t1 > 1
-        ) OR flag_broken_global_deal
-      )
-      THEN 'active-stock-pre-evictions-legacy'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND n_overdue_monthlys_t1 <= 1
-      THEN 'active-stock-hold'
-      WHEN reference_contract_status = 'Ativo'
-      THEN 'UNCLASSIFIED-ACTIVE'
-      WHEN reference_contract_status = 'Finalizado'
-      AND has_negotiation_in_contract
-      AND max_delay_contaminated_contract_t1 <= 7
-      THEN 'ended-ongoing-deal'
-      WHEN reference_contract_status = 'Finalizado'
-      AND acc_deals_principal_discount_lifetime > 0
-      THEN 'ended-had-forgiveness'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 <= 30
-      AND prob_payment_at_dt_reference = 'HIGH'
-      THEN 'ended-new-defaulter-high'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 <= 30
-      AND prob_payment_at_dt_reference = 'LOW'
-      THEN 'ended-new-defaulter-low'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND max_delay_contaminated_contract_t2 <= 90
-      AND prob_payment_at_dt_reference = 'HIGH'
-      THEN 'ended-stock-31-90-high'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND max_delay_contaminated_contract_t2 <= 90
-      AND prob_payment_at_dt_reference = 'LOW'
-      THEN 'ended-stock-31-90-low'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND max_delay_contaminated_contract_t2 <= 90
-      AND prob_payment_at_dt_reference = 'VERY_LOW'
-      THEN 'ended-stock-31-90-repair'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 90
-      AND max_delay_contaminated_contract_t2 <= 180
-      AND prob_payment_at_dt_reference = 'HIGH'
-      THEN 'ended-stock-91-180-high'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 90
-      AND max_delay_contaminated_contract_t2 <= 180
-      AND prob_payment_at_dt_reference = 'LOW'
-      THEN 'ended-stock-91-180-low'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 90
-      AND max_delay_contaminated_contract_t2 <= 180
-      AND prob_payment_at_dt_reference = 'VERY_LOW'
-      THEN 'ended-stock-91-180-repair'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 180
-      AND max_delay_contaminated_contract_t2 <= 360
-      AND prob_payment_at_dt_reference = 'HIGH'
-      THEN 'ended-stock-181-360-high'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 180
-      AND max_delay_contaminated_contract_t2 <= 360
-      AND prob_payment_at_dt_reference = 'LOW'
-      THEN 'ended-stock-181-360-low'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 180
-      AND max_delay_contaminated_contract_t2 <= 360
-      AND prob_payment_at_dt_reference = 'VERY_LOW'
-      THEN 'ended-stock-181-360-repair'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 360
-      AND max_delay_contaminated_contract_t2 <= 1440
-      THEN 'ended-stock-361-1440'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 1440
-      THEN 'ended-stock-over1440'
-      WHEN reference_contract_status = 'Finalizado'
-      THEN 'UNCLASSIFIED-ENDED'
-      ELSE 'MISTERY'
+        WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 <= 0
+            THEN 'active-current'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 <= 0
+            THEN 'ended-current'
+        WHEN macro_segmentation = 'evictions'
+            AND rn_prob_payment_by_tree > 30
+            THEN 'evictions-late'
+        WHEN macro_segmentation = 'evictions'
+            AND payment_probability_at_entrance < 0.223
+            THEN 'evictions-early-low'
+        WHEN macro_segmentation = 'evictions'
+            AND payment_probability_at_entrance >= 0.223
+            AND n_evictions_processes_lifetime > 1
+            THEN 'evictions-early-reincident-high'
+        WHEN macro_segmentation = 'evictions'
+            AND payment_probability_at_entrance >= 0.223
+            AND n_evictions_processes_lifetime <= 1
+            THEN 'evictions-early-first-high'
+        WHEN macro_segmentation = 'evictions'
+            THEN 'evictions-undefined'
+        WHEN reference_contract_status = 'Ativo' AND has_fpd_in_wallet_general
+            THEN 'active-new-defaulter-first-payment-default'
+        WHEN reference_contract_status = 'Ativo'
+            AND has_negotiation_in_contract
+            AND max_delay_contaminated_contract_t1 <= 0
+            THEN 'active-ongoing-deal'
+        WHEN reference_contract_status = 'Ativo'
+            AND macro_segmentation = 'active-stock-pre-evictions'
+            AND flag_broken_global_deal
+            AND prob_payment_at_dt_reference = 'LOW'
+            THEN 'active-stock-risk-deal-low'
+        WHEN reference_contract_status = 'Ativo'
+            AND macro_segmentation = 'active-stock-pre-evictions'
+            AND flag_broken_global_deal
+            AND prob_payment_at_dt_reference IN ('HIGH', 'MEDIUM')
+            THEN 'active-stock-risk-deal-high'
+        WHEN reference_contract_status = 'Ativo'
+            AND macro_segmentation = 'active-stock-pre-evictions'
+            AND NOT flag_broken_global_deal
+            AND prob_payment_at_dt_reference = 'LOW'
+            THEN 'active-stock-risk-nodeal-low'
+        WHEN reference_contract_status = 'Ativo'
+            AND macro_segmentation = 'active-stock-pre-evictions'
+            AND NOT flag_broken_global_deal
+            AND prob_payment_at_dt_reference IN ('HIGH', 'MEDIUM')
+            THEN 'active-stock-risk-nodeal-high'
+        WHEN reference_contract_status = 'Ativo'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND (
+                n_overdue_monthlys_t1 > 1
+                OR flag_broken_global_deal
+            )
+            THEN 'active-stock-pre-evictions-legacy'
+        WHEN reference_contract_status = 'Ativo'
+            AND mob_months <= 3
+            AND max_delay_contaminated_contract_t2 <= 15
+            THEN 'active-new-defaulter-under-mob3-early'
+        WHEN reference_contract_status = 'Ativo'
+            AND mob_months <= 3
+            AND max_delay_contaminated_contract_t2 >= 16
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-under-mob3-late'
+        WHEN reference_contract_status = 'Ativo'
+            AND max_delay_contaminated_contract_t2 <= 30
+            AND prob_payment_at_dt_reference = 'VERY_HIGH'
+            THEN 'active-new-defaulter-good-payers'
+        WHEN reference_contract_status = 'Ativo'
+            AND prob_payment_at_dt_reference = 'HIGH'
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-high'
+        WHEN reference_contract_status = 'Ativo'
+            AND prob_payment_at_dt_reference = 'MEDIUM'
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-medium'
+        WHEN reference_contract_status = 'Ativo'
+            AND prob_payment_at_dt_reference = 'LOW'
+            AND max_delay_contaminated_contract_t2 <= 4
+            THEN 'active-new-defaulter-early-low'
+        WHEN reference_contract_status = 'Ativo'
+            AND prob_payment_at_dt_reference = 'LOW'
+            AND max_delay_contaminated_contract_t2 > 4
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-late-low'
+        WHEN reference_contract_status = 'Ativo'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND n_overdue_monthlys_t1 <= 1
+            THEN 'active-stock-hold'
+        WHEN reference_contract_status = 'Ativo'
+            THEN 'UNCLASSIFIED-ACTIVE'
+        WHEN reference_contract_status = 'Finalizado'
+            AND has_negotiation_in_contract
+            AND max_delay_contaminated_contract_t1 <= 7
+            THEN 'ended-ongoing-deal'
+        WHEN reference_contract_status = 'Finalizado'
+            AND acc_deals_principal_discount_lifetime > 0
+            THEN 'ended-had-forgiveness'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 <= 30
+            AND prob_payment_at_dt_reference = 'HIGH'
+            THEN 'ended-new-defaulter-high'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 <= 30
+            AND prob_payment_at_dt_reference = 'LOW'
+            THEN 'ended-new-defaulter-low'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND max_delay_contaminated_contract_t2 <= 90
+            AND prob_payment_at_dt_reference = 'HIGH'
+            THEN 'ended-stock-31-90-high'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND max_delay_contaminated_contract_t2 <= 90
+            AND prob_payment_at_dt_reference = 'LOW'
+            THEN 'ended-stock-31-90-low'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND max_delay_contaminated_contract_t2 <= 90
+            AND prob_payment_at_dt_reference = 'VERY_LOW'
+            THEN 'ended-stock-31-90-repair'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 90
+            AND max_delay_contaminated_contract_t2 <= 180
+            AND prob_payment_at_dt_reference = 'HIGH'
+            THEN 'ended-stock-91-180-high'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 90
+            AND max_delay_contaminated_contract_t2 <= 180
+            AND prob_payment_at_dt_reference = 'LOW'
+            THEN 'ended-stock-91-180-low'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 90
+            AND max_delay_contaminated_contract_t2 <= 180
+            AND prob_payment_at_dt_reference = 'VERY_LOW'
+            THEN 'ended-stock-91-180-repair'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 180
+            AND max_delay_contaminated_contract_t2 <= 360
+            AND prob_payment_at_dt_reference = 'HIGH'
+            THEN 'ended-stock-181-360-high'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 180
+            AND max_delay_contaminated_contract_t2 <= 360
+            AND prob_payment_at_dt_reference = 'LOW'
+            THEN 'ended-stock-181-360-low'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 180
+            AND max_delay_contaminated_contract_t2 <= 360
+            AND prob_payment_at_dt_reference = 'VERY_LOW'
+            THEN 'ended-stock-181-360-repair'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 360
+            AND max_delay_contaminated_contract_t2 <= 1440
+            THEN 'ended-stock-361-1440'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 1440
+            THEN 'ended-stock-over1440'
+        WHEN reference_contract_status = 'Finalizado'
+            THEN 'UNCLASSIFIED-ENDED'
+        ELSE 'MISTERY'
     END AS segmentation_with_prob_payment_at_dt_reference,
     CASE
-      WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 <= 0
-      THEN 'active-current'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 <= 0
-      THEN 'ended-current'
-      WHEN is_evictions
-      THEN 'evictions'
-      WHEN reference_contract_status = 'Ativo' AND has_fpd_in_wallet_general
-      THEN 'active-new-defaulter-first-payment-default'
-      WHEN reference_contract_status = 'Ativo'
-      AND has_negotiation_in_contract
-      AND max_delay_contaminated_contract_t1 <= 0
-      THEN 'active-ongoing-deal'
-      WHEN reference_contract_status = 'Ativo'
-      AND mob_months <= 3
-      AND max_delay_contaminated_contract_t2 <= 15
-      THEN 'active-new-defaulter-under-mob3-early'
-      WHEN reference_contract_status = 'Ativo'
-      AND mob_months <= 3
-      AND max_delay_contaminated_contract_t2 >= 16
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-under-mob3-late'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 <= 30
-      AND prob_payment = 'VERY_HIGH'
-      THEN 'active-new-defaulter-good-payers'
-      WHEN reference_contract_status = 'Ativo'
-      AND prob_payment = 'HIGH'
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-high'
-      WHEN reference_contract_status = 'Ativo'
-      AND prob_payment = 'MEDIUM'
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-medium'
-      WHEN reference_contract_status = 'Ativo'
-      AND prob_payment = 'LOW'
-      AND max_delay_contaminated_contract_t2 <= 4
-      THEN 'active-new-defaulter-early-low'
-      WHEN reference_contract_status = 'Ativo'
-      AND prob_payment = 'LOW'
-      AND max_delay_contaminated_contract_t2 > 4
-      AND max_delay_contaminated_contract_t2 <= 30
-      THEN 'active-new-defaulter-late-low'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        macro_segmentation = 'active-stock-pre-evictions' AND flag_broken_global_deal
-      )
-      AND prob_payment = 'LOW'
-      THEN 'active-stock-risk-deal-low'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        macro_segmentation = 'active-stock-pre-evictions' AND flag_broken_global_deal
-      )
-      AND prob_payment IN ('HIGH', 'MEDIUM')
-      THEN 'active-stock-risk-deal-high'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        macro_segmentation = 'active-stock-pre-evictions'
-        AND NOT (
-          flag_broken_global_deal
-        )
-      )
-      AND prob_payment = 'LOW'
-      THEN 'active-stock-risk-nodeal-low'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        macro_segmentation = 'active-stock-pre-evictions'
-        AND NOT (
-          flag_broken_global_deal
-        )
-      )
-      AND prob_payment IN ('HIGH', 'MEDIUM')
-      THEN 'active-stock-risk-nodeal-high'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND (
-        (
-          n_overdue_monthlys_t1 > 1
-        ) OR flag_broken_global_deal
-      )
-      THEN 'active-stock-pre-evictions-legacy'
-      WHEN reference_contract_status = 'Ativo'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND n_overdue_monthlys_t1 <= 1
-      THEN 'active-stock-hold'
-      WHEN reference_contract_status = 'Ativo'
-      THEN 'UNCLASSIFIED-ACTIVE'
-      WHEN reference_contract_status = 'Finalizado'
-      AND has_negotiation_in_contract
-      AND max_delay_contaminated_contract_t1 <= 7
-      THEN 'ended-ongoing-deal'
-      WHEN reference_contract_status = 'Finalizado'
-      AND acc_deals_principal_discount_lifetime > 0
-      THEN 'ended-had-forgiveness'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 <= 30
-      AND prob_payment = 'HIGH'
-      THEN 'ended-new-defaulter-high'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 <= 30
-      AND prob_payment = 'LOW'
-      THEN 'ended-new-defaulter-low'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND max_delay_contaminated_contract_t2 <= 90
-      AND prob_payment = 'HIGH'
-      THEN 'ended-stock-31-90-high'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND max_delay_contaminated_contract_t2 <= 90
-      AND prob_payment = 'LOW'
-      THEN 'ended-stock-31-90-low'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 30
-      AND max_delay_contaminated_contract_t2 <= 90
-      AND prob_payment = 'VERY_LOW'
-      THEN 'ended-stock-31-90-repair'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 90
-      AND max_delay_contaminated_contract_t2 <= 180
-      AND prob_payment = 'HIGH'
-      THEN 'ended-stock-91-180-high'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 90
-      AND max_delay_contaminated_contract_t2 <= 180
-      AND prob_payment = 'LOW'
-      THEN 'ended-stock-91-180-low'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 90
-      AND max_delay_contaminated_contract_t2 <= 180
-      AND prob_payment = 'VERY_LOW'
-      THEN 'ended-stock-91-180-repair'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 180
-      AND max_delay_contaminated_contract_t2 <= 360
-      AND prob_payment = 'HIGH'
-      THEN 'ended-stock-181-360-high'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 180
-      AND max_delay_contaminated_contract_t2 <= 360
-      AND prob_payment = 'LOW'
-      THEN 'ended-stock-181-360-low'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 180
-      AND max_delay_contaminated_contract_t2 <= 360
-      AND prob_payment = 'VERY_LOW'
-      THEN 'ended-stock-181-360-repair'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 360
-      AND max_delay_contaminated_contract_t2 <= 1440
-      THEN 'ended-stock-361-1440'
-      WHEN reference_contract_status = 'Finalizado'
-      AND max_delay_contaminated_contract_t2 > 1440
-      THEN 'ended-stock-over1440'
-      WHEN reference_contract_status = 'Finalizado'
-      THEN 'UNCLASSIFIED-ENDED'
-      ELSE 'MISTERY'
+        WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 <= 0
+            THEN 'active-current'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 <= 0
+            THEN 'ended-current'
+        WHEN macro_segmentation = 'evictions'
+            AND rn_prob_payment_by_tree > 30
+            THEN 'evictions-late'
+        WHEN macro_segmentation = 'evictions'
+            AND payment_probability_at_entrance < 0.223
+            THEN 'evictions-early-low'
+        WHEN macro_segmentation = 'evictions'
+            AND payment_probability_at_entrance >= 0.223
+            AND n_evictions_processes_lifetime > 1
+            THEN 'evictions-early-reincident-high'
+        WHEN macro_segmentation = 'evictions'
+            AND payment_probability_at_entrance >= 0.223
+            AND n_evictions_processes_lifetime <= 1
+            THEN 'evictions-early-first-high'
+        WHEN macro_segmentation = 'evictions'
+            THEN 'evictions-undefined'
+        WHEN reference_contract_status = 'Ativo' AND has_fpd_in_wallet_general
+            THEN 'active-new-defaulter-first-payment-default'
+        WHEN reference_contract_status = 'Ativo'
+            AND has_negotiation_in_contract
+            AND max_delay_contaminated_contract_t1 <= 0
+            THEN 'active-ongoing-deal'
+        WHEN reference_contract_status = 'Ativo'
+            AND macro_segmentation = 'active-stock-pre-evictions'
+            AND flag_broken_global_deal
+            AND prob_payment = 'LOW'
+            THEN 'active-stock-risk-deal-low'
+        WHEN reference_contract_status = 'Ativo'
+            AND macro_segmentation = 'active-stock-pre-evictions'
+            AND flag_broken_global_deal
+            AND prob_payment IN ('HIGH', 'MEDIUM')
+            THEN 'active-stock-risk-deal-high'
+        WHEN reference_contract_status = 'Ativo'
+            AND macro_segmentation = 'active-stock-pre-evictions'
+            AND NOT flag_broken_global_deal
+            AND prob_payment = 'LOW'
+            THEN 'active-stock-risk-nodeal-low'
+        WHEN reference_contract_status = 'Ativo'
+            AND macro_segmentation = 'active-stock-pre-evictions'
+            AND NOT flag_broken_global_deal
+            AND prob_payment IN ('HIGH', 'MEDIUM')
+            THEN 'active-stock-risk-nodeal-high'
+        WHEN reference_contract_status = 'Ativo'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND (
+                n_overdue_monthlys_t1 > 1
+                OR flag_broken_global_deal
+            )
+            THEN 'active-stock-pre-evictions-legacy'
+        WHEN reference_contract_status = 'Ativo'
+            AND mob_months <= 3
+            AND max_delay_contaminated_contract_t2 <= 15
+            THEN 'active-new-defaulter-under-mob3-early'
+        WHEN reference_contract_status = 'Ativo'
+            AND mob_months <= 3
+            AND max_delay_contaminated_contract_t2 >= 16
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-under-mob3-late'
+        WHEN reference_contract_status = 'Ativo'
+            AND max_delay_contaminated_contract_t2 <= 30
+            AND prob_payment = 'VERY_HIGH'
+            THEN 'active-new-defaulter-good-payers'
+        WHEN reference_contract_status = 'Ativo'
+            AND prob_payment = 'HIGH'
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-high'
+        WHEN reference_contract_status = 'Ativo'
+            AND prob_payment = 'MEDIUM'
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-medium'
+        WHEN reference_contract_status = 'Ativo'
+            AND prob_payment = 'LOW'
+            AND max_delay_contaminated_contract_t2 <= 4
+            THEN 'active-new-defaulter-early-low'
+        WHEN reference_contract_status = 'Ativo'
+            AND prob_payment = 'LOW'
+            AND max_delay_contaminated_contract_t2 > 4
+            AND max_delay_contaminated_contract_t2 <= 30
+            THEN 'active-new-defaulter-late-low'
+        WHEN reference_contract_status = 'Ativo'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND n_overdue_monthlys_t1 <= 1
+            THEN 'active-stock-hold'
+        WHEN reference_contract_status = 'Ativo'
+            THEN 'UNCLASSIFIED-ACTIVE'
+        WHEN reference_contract_status = 'Finalizado'
+            AND has_negotiation_in_contract
+            AND max_delay_contaminated_contract_t1 <= 7
+            THEN 'ended-ongoing-deal'
+        WHEN reference_contract_status = 'Finalizado'
+            AND acc_deals_principal_discount_lifetime > 0
+            THEN 'ended-had-forgiveness'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 <= 30
+            AND prob_payment = 'HIGH'
+            THEN 'ended-new-defaulter-high'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 <= 30
+            AND prob_payment = 'LOW'
+            THEN 'ended-new-defaulter-low'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND max_delay_contaminated_contract_t2 <= 90
+            AND prob_payment = 'HIGH'
+            THEN 'ended-stock-31-90-high'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND max_delay_contaminated_contract_t2 <= 90
+            AND prob_payment = 'LOW'
+            THEN 'ended-stock-31-90-low'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 30
+            AND max_delay_contaminated_contract_t2 <= 90
+            AND prob_payment = 'VERY_LOW'
+            THEN 'ended-stock-31-90-repair'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 90
+            AND max_delay_contaminated_contract_t2 <= 180
+            AND prob_payment = 'HIGH'
+            THEN 'ended-stock-91-180-high'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 90
+            AND max_delay_contaminated_contract_t2 <= 180
+            AND prob_payment = 'LOW'
+            THEN 'ended-stock-91-180-low'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 90
+            AND max_delay_contaminated_contract_t2 <= 180
+            AND prob_payment = 'VERY_LOW'
+            THEN 'ended-stock-91-180-repair'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 180
+            AND max_delay_contaminated_contract_t2 <= 360
+            AND prob_payment = 'HIGH'
+            THEN 'ended-stock-181-360-high'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 180
+            AND max_delay_contaminated_contract_t2 <= 360
+            AND prob_payment = 'LOW'
+            THEN 'ended-stock-181-360-low'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 180
+            AND max_delay_contaminated_contract_t2 <= 360
+            AND prob_payment = 'VERY_LOW'
+            THEN 'ended-stock-181-360-repair'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 360
+            AND max_delay_contaminated_contract_t2 <= 1440
+            THEN 'ended-stock-361-1440'
+        WHEN reference_contract_status = 'Finalizado'
+            AND max_delay_contaminated_contract_t2 > 1440
+            THEN 'ended-stock-over1440'
+        WHEN reference_contract_status = 'Finalizado'
+            THEN 'UNCLASSIFIED-ENDED'
+        ELSE 'MISTERY'
     END AS segmentation
   FROM calculate_frozen_prob_payment
 ), micro_islands_prep AS (
@@ -1122,6 +1132,146 @@ SELECT
   pct_invoices_paid_ontime_t2_l12m,
   pct_invoices_paid_ontime_t1_l12m,
   share_monthly_paid_ontime_t1,
+  CASE
+      WHEN macro_segmentation IN ('active-new-defaulter-special')
+          THEN 'active-new-defaulter'
+      WHEN macro_segmentation IN ('ended-had-forgiveness')
+          THEN CASE
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 <= 30
+                  THEN 'ended-new-defaulter'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 30
+                  AND max_delay_contaminated_contract_t2 <= 90
+                  THEN 'ended-stock-31to90'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 90
+                  AND max_delay_contaminated_contract_t2 <= 180
+                  THEN 'ended-stock-91to180'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 180
+                  AND max_delay_contaminated_contract_t2 <= 360
+                  THEN 'ended-stock-181to360'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 360
+                  THEN 'ended-stock-361over'
+              ELSE 'ended-had-forgiveness'
+          END
+      ELSE macro_segmentation
+  END AS major_segmentation,
+  CASE
+      WHEN segmentation IN (
+          'active-new-defaulter-first-payment-default', 'active-new-defaulter-good-payers',
+          'active-new-defaulter-under-mob3-early', 'active-new-defaulter-under-mob3-late',
+          'active-new-defaulter-high', 'active-new-defaulter-medium',
+          'active-new-defaulter-early-low', 'active-new-defaulter-late-low',
+          'active-stock-hold', 'active-stock-risk-deal-high', 'active-stock-risk-deal-low',
+          'active-stock-risk-nodeal-high', 'active-stock-risk-nodeal-low',
+          'active-ongoing-deal'
+      )
+          THEN 'active-segments'
+      WHEN segmentation IN (
+          'ended-new-defaulter-high', 'ended-new-defaulter-low',
+          'ended-stock-31-90-high', 'ended-stock-31-90-low', 'ended-stock-31-90-repair',
+          'ended-stock-91-180-high', 'ended-stock-91-180-low', 'ended-stock-91-180-repair',
+          'ended-stock-181-360-high', 'ended-stock-181-360-low', 'ended-stock-181-360-repair',
+          'ended-stock-361-1440', 'ended-stock-over1440', 'ended-ongoing-deal', 'ended-had-forgiveness'
+      )
+          THEN 'ended-segments'
+      WHEN macro_segmentation IN ('evictions')
+          THEN 'evictions'
+      ELSE segmentation
+  END AS hyper_segmentation,
+  CASE
+      WHEN segmentation = 'evictions-late'
+          THEN 'evictions-late'
+      WHEN segmentation IN (
+          'evictions-early-low',
+          'evictions-early-reincident-high',
+          'evictions-early-first-high'
+      )
+          THEN 'evictions-early'
+      WHEN segmentation IN (
+          'active-new-defaulter-under-mob3-early',
+          'active-new-defaulter-under-mob3-late'
+      )
+          THEN 'active-new-defaulter-under-mob3'
+      WHEN segmentation IN (
+          'active-new-defaulter-early-low',
+          'active-new-defaulter-late-low'
+      )
+          THEN 'active-new-defaulter-low'
+      WHEN segmentation IN (
+          'active-new-defaulter-good-payers'
+      )
+          THEN 'active-new-defaulter-high'
+      WHEN segmentation IN ('ended-had-forgiveness')
+          THEN CASE
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 <= 30
+                  AND prob_payment = 'HIGH'
+                  THEN 'ended-new-defaulter-high'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 <= 30
+                  AND prob_payment = 'LOW'
+                  THEN 'ended-new-defaulter-low'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 30
+                  AND max_delay_contaminated_contract_t2 <= 90
+                  AND prob_payment = 'HIGH'
+                  THEN 'ended-stock-31-90-high'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 30
+                  AND max_delay_contaminated_contract_t2 <= 90
+                  AND prob_payment = 'LOW'
+                  THEN 'ended-stock-31-90-low'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 30
+                  AND max_delay_contaminated_contract_t2 <= 90
+                  AND prob_payment = 'VERY_LOW'
+                  THEN 'ended-stock-31-90-repair'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 90
+                  AND max_delay_contaminated_contract_t2 <= 180
+                  AND prob_payment = 'HIGH'
+                  THEN 'ended-stock-91-180-high'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 90
+                  AND max_delay_contaminated_contract_t2 <= 180
+                  AND prob_payment = 'LOW'
+                  THEN 'ended-stock-91-180-low'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 90
+                  AND max_delay_contaminated_contract_t2 <= 180
+                  AND prob_payment = 'VERY_LOW'
+                  THEN 'ended-stock-91-180-repair'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 180
+                  AND max_delay_contaminated_contract_t2 <= 360
+                  AND prob_payment = 'HIGH'
+                  THEN 'ended-stock-181-360-high'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 180
+                  AND max_delay_contaminated_contract_t2 <= 360
+                  AND prob_payment = 'LOW'
+                  THEN 'ended-stock-181-360-low'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 180
+                  AND max_delay_contaminated_contract_t2 <= 360
+                  AND prob_payment = 'VERY_LOW'
+                  THEN 'ended-stock-181-360-repair'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 360
+                  AND max_delay_contaminated_contract_t2 <= 1440
+                  THEN 'ended-stock-361-1440'
+              WHEN reference_contract_status = 'Finalizado'
+                  AND max_delay_contaminated_contract_t2 > 1440
+                  THEN 'ended-stock-over1440'
+              ELSE segmentation
+          END
+      ELSE segmentation
+  END AS clustered_segmentation,
+  payment_probability_at_entrance,
   array_open_invoices,
   array_paid_invoices,
   array_negotiated_invoices,
