@@ -1,0 +1,15 @@
+# `base_app_ai_adoption` — reverse export governance
+
+| Field | Value |
+| --- | --- |
+| **Metastore table** | `reverse_s3.base_app_ai_adoption` |
+| **Business owner** | AI Governance |
+| **Technical owner** | Enterprise Engineering |
+| **Domain** | People |
+| **One-line summary** | Daily roster of active employees (work email, assignment number, and layer-1 leader's work email) exported as a single CSV object to the Base44 office bucket for the AI Governance team. |
+| **Business purpose** | Feeds the AI Governance team's AI adoption tracking with the current active workforce and each person's vertical leadership (L1) so adoption metrics can be aggregated by top-level organizational vertical. |
+| **Business consumer** | AI Governance team. |
+| **Operational source of truth** | `metric_people.employee_snapshots` (`is_current_for_employee = TRUE`, `status = 'active'`). |
+| **Delivery channel** | S3 object **`s3://5a-base44-office/aiadoption/vertical_information.csv`** (prod). Canned ACL `bucket-owner-full-control` on write. Forno redirects to `people_bucket` under `reverse_s3_test/aiadoption/vertical_information.csv` (no partner ACL). |
+| **Grain** | One row per active employee assignment on `metric_people.employee_snapshots` with `is_current_for_employee = TRUE` and `status = 'active'`. |
+| **Contract notes** | Column order: `email`, `assignment_number`, `email_l1`. All values lowercase. `email_l1` is the work email of the person at organizational layer 1 (one level below the CEO) in the assignment's reporting chain — not the direct manager; `-1` hierarchy sentinels are exported as empty/null. CSV written by Spark (`header=true`, comma separator, UTF-8, empty nulls). No date filters — the export is a full snapshot of the current active roster on each run. |

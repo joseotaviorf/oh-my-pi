@@ -27,6 +27,10 @@ dag:
       (`orghealth/base_app_org_health_access.csv`). Depends on
       `datalake_gsheets_people_clean.org_health_user_roles`.
 
+      Third export: base_app_ai_adoption — active-employee roster (work email,
+      assignment number, L1 leader's work email) for the AI Governance team
+      (`aiadoption/vertical_information.csv`).
+
       IAM prerequisite per new destination bucket: this DAG runs on EMR under the People
       EMR instance profile (emr_instance_profile_arn_people / emr-people-prod role). Any
       new external bucket added to tables_customization must first grant that role
@@ -81,5 +85,12 @@ workflow:
       extra_spark_job_arguments:
         - "5a-base44-office"
         - "orghealth/base_app_org_health_access.csv"
+        - "csv"
+        - "bucket-owner-full-control"
+    # Active-employee AI adoption roster — AI Governance team
+    base_app_ai_adoption:
+      extra_spark_job_arguments:
+        - "5a-base44-office"
+        - "aiadoption/vertical_information.csv"
         - "csv"
         - "bucket-owner-full-control"
