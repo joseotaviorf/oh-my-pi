@@ -283,9 +283,13 @@ base AS (
     LEFT JOIN
         ciq_id_users as cu
             on fse.sk_user_conversion = cu.id_user
-    LEFT JOIN 
-        hybrid_houses AS hh 
-        ON fse.sk_house = hh.sk_house 
+    LEFT JOIN
+        hybrid_houses AS hh
+        -- SKEW FIX: 81% of rows have sk_house = -1, concentrating the shuffle in two tasks.
+        -- hybrid_houses excludes -1, so remapping it to deterministic synthetic non-matching
+        -- keys preserves this LEFT JOIN's NULL result while distributing rows across partitions.
+        -- The range [-1000001, -2] avoids real keys and -1; HASH(sk_supply) is deterministic.
+        ON hh.sk_house = COALESCE(NULLIF(fse.sk_house, -1), -(PMOD(HASH(fse.sk_supply), 1000000) + 2))
         AND dfs.cd_funnel_step = hh.cd_funnel_step
     WHERE
         fse.sk_funnel_step IN (5,9,2,10,7,12)

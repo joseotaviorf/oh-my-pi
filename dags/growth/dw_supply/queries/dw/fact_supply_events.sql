@@ -99,8 +99,14 @@ WITH stg_fact_supply AS (
         AND (LOWER(ses.campaign) = LOWER(dic.utm_campaign))
 )
 
-SELECT 
-  sfs.sk_supply, 
+SELECT
+  -- SKEW FIX: 87% of supply_events_tracking rows (137.4M of 158M) have id_house NULL, so the
+  -- shuffle for the house join sends them all to a single partition/task. house (2.8M rows,
+  -- only id/id_user read) is small enough to broadcast, which removes that shuffle entirely.
+  -- Verify the plan shows BroadcastHashJoin for this join; the hint is silently ignored if
+  -- it cannot be applied.
+  /*+ BROADCAST(h) */
+  sfs.sk_supply,
   sfs.nm_business_context,
   sfs.nm_supply_source,
   COALESCE(sfs.sk_supply_lead, -1) AS sk_supply_lead,
