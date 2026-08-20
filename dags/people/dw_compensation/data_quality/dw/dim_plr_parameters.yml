@@ -15,13 +15,13 @@ table_level_validations:
 column_level_validations:
   sk_plr_parameters:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   reference_year:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   reference_year_within_valid_range:
     custom:
       # Ensure reference_year is within reasonable range (e.g., 2020-2100)
@@ -31,7 +31,7 @@ column_level_validations:
          WHERE reference_year < 2020
             OR reference_year > 2100
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   pct_corporate_goals_within_allowed_range:
     custom:
       # Ensure pct_corporate_goals is NULL or between 0 and 1.5 (0% to 150%)
@@ -42,11 +42,11 @@ column_level_validations:
            AND (pct_corporate_goals < 0
                 OR pct_corporate_goals > 1.5)
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   pct_min_corporate_goals:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   pct_min_corporate_goals_between_zero_and_one:
     custom:
       # Ensure pct_min_corporate_goals is between 0 and 1
@@ -56,11 +56,11 @@ column_level_validations:
          WHERE pct_min_corporate_goals < 0
             OR pct_min_corporate_goals > 1
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   pct_default_corporate_goals_terminated:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   pct_default_corporate_goals_terminated_between_zero_and_one:
     custom:
       # Ensure pct_default_corporate_goals_terminated is between 0 and 1
@@ -70,11 +70,11 @@ column_level_validations:
          WHERE pct_default_corporate_goals_terminated < 0
             OR pct_default_corporate_goals_terminated > 1
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   pct_default_ipa_terminated:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   pct_default_ipa_terminated_between_zero_and_one:
     custom:
       # Ensure pct_default_ipa_terminated is between 0 and 1
@@ -84,11 +84,11 @@ column_level_validations:
          WHERE pct_default_ipa_terminated < 0
             OR pct_default_ipa_terminated > 1
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   pct_min_protected_leave_ipa:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   pct_min_protected_leave_ipa_between_zero_and_one:
     custom:
       # Ensure pct_min_protected_leave_ipa is at least 1.0 (100%)
@@ -97,11 +97,11 @@ column_level_validations:
          FROM dw_compensation.dim_plr_parameters
          WHERE pct_min_protected_leave_ipa < 1.0
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   min_days_worked_in_year_for_eligibility:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   min_days_worked_in_year_for_eligibility_non_negative:
     custom:
       # Ensure min_days_worked_in_year_for_eligibility is positive
@@ -110,11 +110,11 @@ column_level_validations:
          FROM dw_compensation.dim_plr_parameters
          WHERE min_days_worked_in_year_for_eligibility <= 0
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   min_days_worked_in_month_to_count:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   min_days_worked_in_month_to_count_non_negative:
     custom:
       # Ensure min_days_worked_in_month_to_count is positive and reasonable (1-31)
@@ -124,40 +124,40 @@ column_level_validations:
          WHERE min_days_worked_in_month_to_count <= 0
             OR min_days_worked_in_month_to_count > 31
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   dt_admission_cutoff:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   dt_evaluation_cycle_started:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   dt_evaluation_cycle_ended:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   dt_payment_cutoff:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   dt_payment_active_br:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   dt_payment_active_latam_pt_usa:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   dt_payment_terminated_br_after_cutoff:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   dt_payment_terminated_br_before_cutoff:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning

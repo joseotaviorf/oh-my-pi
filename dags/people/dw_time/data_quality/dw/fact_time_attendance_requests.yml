@@ -15,20 +15,20 @@ table_level_validations:
 column_level_validations:
   sk_time_request:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_employee:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_request:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   id_request:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

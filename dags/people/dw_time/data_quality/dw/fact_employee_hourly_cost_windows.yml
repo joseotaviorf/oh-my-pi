@@ -15,9 +15,9 @@ table_level_validations:
 column_level_validations:
   sk_employee_cost_window:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_employee:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

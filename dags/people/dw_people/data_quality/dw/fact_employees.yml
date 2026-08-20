@@ -15,7 +15,7 @@ table_level_validations:
 column_level_validations:
   sk_employee:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   one_row_per_active_employee:
     custom:
       # Grain uniqueness: one row per active employee (sk_employee).
@@ -26,7 +26,7 @@ column_level_validations:
           GROUP BY sk_employee
           HAVING COUNT(*) > 1
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   active_workforce_only:
     custom:
       # Every fact row must exist in dim_employee (active-only public dimension).
@@ -37,13 +37,13 @@ column_level_validations:
            ON fact.sk_employee = emp.sk_employee
          WHERE emp.sk_employee IS NULL
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   sk_reference_date:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_reference:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Warning

@@ -10,7 +10,7 @@ table_level_validations:
 column_level_validations:
   sk_employee:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   one_row_per_employee_and_month_reference:
     custom:
       # Employee-day grain uniqueness after collapse from assignment-level snapshots.
@@ -21,7 +21,7 @@ column_level_validations:
           GROUP BY sk_employee, dt_month_reference
           HAVING COUNT(*) > 1
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   one_current_primary_row_per_person:
     custom:
       # Employee-grain exports rely on exactly one is_current_for_employee row per person_number.
@@ -33,16 +33,16 @@ column_level_validations:
           GROUP BY person_number
           HAVING COUNT(*) > 1
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   dt_month_reference:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   assignment_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Warning

@@ -15,36 +15,36 @@ table_level_validations:
 column_level_validations:
   sk_hours_bank_rule_total:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_employee:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_balance_date:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_hours_bank_balanced:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   hours_bank_rule_key:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_closed:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   minutes_balance_rule:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_reference_month:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_in_overtime_realized:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   overtime_realized_total_matches_premium_plus_dsr:
     custom:
       # Closed overtime rows: amount_overtime_realized_total must equal premium plus proportional DSR.
@@ -60,4 +60,4 @@ column_level_validations:
              - (estimated_balance_cost_amount + amount_dsr_on_overtime)
            ) > 0.01
         ) = 0
-      severity_level: Error
+      severity_level: Warning

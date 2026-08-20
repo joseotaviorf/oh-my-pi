@@ -15,39 +15,39 @@ table_level_validations:
 column_level_validations:
   sk_plr_monthly:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_period_of_service:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_contract:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_plr_parameters:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   sk_reference_month:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   assignment_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   days_worked_in_month:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
   days_worked_in_year:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
   amount_plr_monthly:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

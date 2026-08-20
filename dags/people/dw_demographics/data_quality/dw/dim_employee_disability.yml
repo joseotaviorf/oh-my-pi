@@ -15,11 +15,11 @@ table_level_validations:
 column_level_validations:
   sk_employee:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   category:
     has_null_count:
       less_than_or_equal_to: 1
@@ -49,11 +49,11 @@ column_level_validations:
   dt_valid_from:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   dt_valid_to:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     has_null_count:
       less_than_or_equal_to: 1

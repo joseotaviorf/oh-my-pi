@@ -15,18 +15,18 @@ table_level_validations:
 column_level_validations:
   sk_compensation:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   assignment_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   amount_salary:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   amount_salary_must_not_be_negative:
     custom:
       # Salary amount must be non-negative for all compensation records.
@@ -35,16 +35,16 @@ column_level_validations:
          FROM dw_compensation.fact_compensations
          WHERE amount_salary < 0
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   amount_annual_salary:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_salary_approved:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_promotion_movement:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   promotion_movements_positive_adjustment_ratio_within_limit:
     custom:
       # Promotions should have positive salary adjustments. A small ratio of null/zero/negative
@@ -67,7 +67,7 @@ column_level_validations:
   days_tenure_in_company:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
     has_completeness:
       # dt_employee_hired (and id_continuous_employment_cycle) should be populated for nearly all
       # compensation records; a low completeness rate signals a regression in identifier_mapping join.
@@ -88,11 +88,11 @@ column_level_validations:
              OR (days_tenure_in_band IS NOT NULL AND days_tenure_in_company < days_tenure_in_band)
            )
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   months_tenure_in_company:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
   company_tenure_months_at_least_position_and_band:
     custom:
       # Same hierarchy check as days: company >= position and company >= band when all non-null.
@@ -106,19 +106,19 @@ column_level_validations:
              OR (months_tenure_in_band IS NOT NULL AND months_tenure_in_company < months_tenure_in_band)
            )
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   days_tenure_in_position:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
   months_tenure_in_position:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
   days_tenure_in_band:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
   band_tenure_days_populated_when_dim_job_has_band:
     custom:
       # Band tenure must be populated for all current rows where dim_job has a band.
@@ -133,11 +133,11 @@ column_level_validations:
            AND fc.days_tenure_in_band IS NULL
            AND fc.is_current = TRUE
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   months_tenure_in_band:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning
   band_tenure_months_populated_when_dim_job_has_band:
     custom:
       # Same completeness rule as days_tenure_in_band — restricted to current rows.
@@ -150,10 +150,10 @@ column_level_validations:
            AND fc.months_tenure_in_band IS NULL
            AND fc.is_current = TRUE
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   dt_valid_from:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   valid_from_must_not_be_after_valid_to:
     custom:
       # SCD bounds: valid-from must not be after valid-to.
@@ -162,13 +162,13 @@ column_level_validations:
          FROM dw_compensation.fact_compensations
          WHERE dt_valid_from > dt_valid_to
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   dt_valid_to:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_current:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

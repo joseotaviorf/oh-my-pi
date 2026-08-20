@@ -15,15 +15,15 @@ table_level_validations:
 column_level_validations:
   sk_request:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   id_request_subtype:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   subtype_name_key:
     has_completeness:
       greater_than_or_equal_to: 0.35

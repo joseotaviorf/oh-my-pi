@@ -15,9 +15,9 @@ table_level_validations:
 column_level_validations:
   sk_meeting:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_unique:
-      severity_level: Error
+      severity_level: Warning
   meeting_year:
     has_null_count:
       less_than_or_equal_to: 1

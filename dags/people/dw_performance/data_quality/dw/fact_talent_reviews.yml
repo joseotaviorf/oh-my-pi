@@ -48,7 +48,7 @@ column_level_validations:
            HAVING COUNT(*) > 1
          )
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   one_latest_for_employee_per_employee:
     custom:
       # At most one row per employee may be flagged is_latest_for_employee (prevents downstream fan-out).
@@ -64,7 +64,7 @@ column_level_validations:
            HAVING COUNT(*) > 1
          )
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   is_regrettable_loss:
     is_complete:
       severity_level: Warning

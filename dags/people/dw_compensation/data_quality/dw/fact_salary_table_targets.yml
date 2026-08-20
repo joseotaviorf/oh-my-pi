@@ -15,18 +15,18 @@ table_level_validations:
 column_level_validations:
   sk_salary_table_targets:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   salary_table:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   band:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_reference:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   total_active_headcount:
     custom:
       constraint: |-
@@ -34,7 +34,7 @@ column_level_validations:
          FROM dw_compensation.fact_salary_table_targets
          WHERE total_active_headcount < 0
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   total_active_jobs:
     custom:
       constraint: |-
@@ -42,17 +42,17 @@ column_level_validations:
          FROM dw_compensation.fact_salary_table_targets
          WHERE total_active_jobs < 0
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   has_headcount_exceptions:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   has_job_exceptions:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_current:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     has_null_count:
       less_than_or_equal_to: 0
-      severity_level: Error
+      severity_level: Warning

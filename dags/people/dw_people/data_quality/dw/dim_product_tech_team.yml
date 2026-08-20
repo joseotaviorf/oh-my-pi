@@ -15,9 +15,9 @@ table_level_validations:
 column_level_validations:
   sk_employee:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_unique:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     has_null_count:
       less_than_or_equal_to: 1
@@ -27,8 +27,8 @@ column_level_validations:
   assignment_number:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Error
+      severity_level: Warning

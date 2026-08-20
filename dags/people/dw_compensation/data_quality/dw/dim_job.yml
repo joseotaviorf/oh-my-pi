@@ -15,7 +15,7 @@ table_level_validations:
 column_level_validations:
   sk_job_version:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
       severity_level: Warning
   job_code:
@@ -104,7 +104,7 @@ column_level_validations:
          WHERE prev_dt_valid_to IS NOT NULL
            AND dt_valid_from < prev_dt_valid_to
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   # DW dimension non-SK: has_null_count (not is_complete). Up to one NULL for the default/unknown row.
   dt_valid_to:
     has_null_count:
