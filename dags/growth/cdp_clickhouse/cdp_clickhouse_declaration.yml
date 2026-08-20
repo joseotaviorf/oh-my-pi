@@ -6,16 +6,14 @@ dag:
   max_active_runs: 1
   documentation:
     dag_purpose: |
-      Incrementally ingests CDP events from the ClickHouse events_api table every 30
-      minutes (UTC). Each run exports rows newly ingested in the load window
-      (_ingested_at) whose event timestamp_dt falls between load_start_date minus 1
-      day and load_end_date plus 3 hours. The timestamp_dt predicate uses the table
-      sort key for partition pruning; _ingested_at limits rows per run. ClickHouse
-      writes Parquet partitioned by _ingested_at (year/month/day/hour). Spark loads
-      the matching ingest-hour range from S3 into raw Delta partitions with replaceWhere,
-      then builds transactional_events, user_tracking_events and comms_events in clean
-      by filtering egw_event_type. Clean tables partition by event timestamp (year/month/day).
-      Overlapping runs are safe because only affected ingest-time raw partitions are overwritten.
+      Incrementally ingests CDP Event Gateway events from ClickHouse every 30 minutes
+      (UTC). Each run exports rows newly ingested in the load window (_ingested_at) into
+      Parquet on the processed-data bucket partitioned by ingest hour (dt as
+      YYYY-MM-DD-HH), then loads matching dt partitions into raw Delta tables. Four
+      independent raw ingestion tasks read from ClickHouse events_parsed,
+      user_tracking_events, transactional_events and comms_events. Clean tables partition
+      by event_name and event-date dt where applicable. Overlapping runs are safe because
+      only affected ingest-hour raw dt partitions are overwritten.
 
 workflow:
   layer: raw
@@ -24,11 +22,11 @@ workflow:
   custom_schema: cdp
   load_spark_job: load_cdp_clickhouse
   default_extraction_type: incremental
-  default_partitions: [year, month, day, hour]
+  default_partitions: [dt]
   execution_timeout_hours: 2
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=2)).strftime('%Y-%m-%d %H:%M:%S'), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, (data_interval_end + macros.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'), 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=2)).strftime('%Y-%m-%d %H:00:00'), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, (data_interval_end + macros.timedelta(hours=1)).strftime('%Y-%m-%d %H:00:00'), 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
@@ -39,27 +37,34 @@ workflow:
     - "{load_start_date}"
     - "{load_end_date}"
   tables_customization:
-    events_api:
+    events:
       extraction_type: incremental
-      partitions: [egw_event_type, year, month, day, hour]
-    transactional_events:
-      raw_table_dependency: events_api
+      partitions: [dt]
       clean_extraction_type: incremental
-      clean_partitions: [year, month, day]
-      merge_on: [id_event, event_name, year, month, day]
+      clean_partitions: [dt]
+      merge_on: [id_event, event_name, dt]
+      when_matched_update_condition: source.ts_egw >= target.ts_egw
+    user_tracking_events:
+      extraction_type: incremental
+      partitions: [dt]
+      clean_extraction_type: incremental
+      clean_partitions: [event_name, dt]
+      merge_on: [id_event, event_name, dt]
       when_matched_update_condition: source.ts_egw >= target.ts_egw
       clean_z_order_by: [event_name, id_user]
-    user_tracking_events:
-      raw_table_dependency: events_api
+    transactional_events:
+      extraction_type: incremental
+      partitions: [dt]
       clean_extraction_type: incremental
-      clean_partitions: [year, month, day]
-      merge_on: [id_event, event_name, year, month, day]
+      clean_partitions: [event_name, dt]
+      merge_on: [id_event, event_name, dt]
       when_matched_update_condition: source.ts_egw >= target.ts_egw
       clean_z_order_by: [event_name, id_user]
     comms_events:
-      raw_table_dependency: events_api
+      extraction_type: incremental
+      partitions: [dt]
       clean_extraction_type: incremental
-      clean_partitions: [year, month, day]
-      merge_on: [id_event, event_name, year, month, day]
+      clean_partitions: [event_name, dt]
+      merge_on: [id_event, event_name, dt]
       when_matched_update_condition: source.ts_egw >= target.ts_egw
       clean_z_order_by: [event_name, id_user]

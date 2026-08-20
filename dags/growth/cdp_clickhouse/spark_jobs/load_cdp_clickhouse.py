@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import clickhouse_connect
 from pyspark.sql import Window
-from pyspark.sql.functions import col, desc, row_number
+from pyspark.sql.functions import col, current_timestamp, desc, row_number
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -28,6 +28,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def trigger_insert_into_clickhouse_procedure(
+    clickhouse_client,
     database_name: str,
     table_name: str,
     clickhouse_incremental_column: str,
@@ -37,7 +38,10 @@ def trigger_insert_into_clickhouse_procedure(
     end_time: str,
 ):
     """
-    Trigger the insert into clickhouse procedure to dump the data from Clickhouse into S3 bucket.
+    Dump ClickHouse rows to S3 Parquet staging files.
+
+    Raw staging exports are partitioned by ingest hour (dt as yyyy-MM-dd-HH).
+    event_name partitioning is applied later in clean Delta tables.
     """
 
     query = f"""
@@ -49,38 +53,14 @@ def trigger_insert_into_clickhouse_procedure(
             ),
             'Parquet'
         )
-    PARTITION BY concat(
-        'egw_event_type=', egw_event_type,
-        '/year=', toString(year),
-        '/month=', leftPad(toString(month), 2, '0'),
-        '/day=', leftPad(toString(day), 2, '0'),
-        '/hour=', leftPad(toString(hour), 2, '0')
-    )
+    PARTITION BY concat('dt=', dt)
     SELECT
-        event_id,
-        user_id,
-        person_uuid,
-        egw_event_type,
-        application,
-        journey_step,
-        event_name,
-        event_properties,
-        user_properties,
-        timestamp,
-        egw_timestamp,
-        egw_updated_at,
-        _ingested_at,
-        enrichments,
-        house_id,
-        contract_id,
-        toYear({clickhouse_incremental_column})       AS year,
-        toMonth({clickhouse_incremental_column})      AS month,
-        toDayOfMonth({clickhouse_incremental_column}) AS day,
-        toHour({clickhouse_incremental_column})       AS hour
+        *,
+        formatDateTime(_ingested_at, '%Y-%m-%d-%H') AS dt
     FROM {database_name}.{table_name}
     WHERE
         {clickhouse_incremental_column} >= '{start_time}'::TIMESTAMP
-        AND {clickhouse_incremental_column} < '{end_time}'::TIMESTAMP
+        AND {clickhouse_incremental_column} <= '{end_time}'::TIMESTAMP
     SETTINGS
         s3_truncate_on_insert = 1;
     """
@@ -143,17 +123,17 @@ if __name__ == "__main__":
     env_prefix = environment.upper()
 
     config = ConfigurationService(dag_name)
+    table_config = config.get_config(table_name)
 
     clickhouse_host = config.get_config("clickhouse_host")
     clickhouse_http_port = config.get_config("clickhouse_http_port")
     clickhouse_database = config.get_config("clickhouse_database")
-    clickhouse_source_table = config.get_config("clickhouse_source_table")
     clickhouse_incremental_column = config.get_config("clickhouse_incremental_column")
-    target_path = config.get_config("target_path")
-    source_path = config.get_config("source_path")
+    clickhouse_source_table = table_config["clickhouse_source_table"]
+    target_path = table_config["target_path"]
+    source_path = table_config["source_path"]
     s3_export_role_arn = config.get_config("s3_export_role_arn")
-    partition_columns = config.get_config("partition_columns")
-    event_types = config.get_config("event_types")
+    partition_columns = table_config["partition_columns"]
 
     logger.info(
         f"environment={environment}, "
@@ -173,8 +153,7 @@ if __name__ == "__main__":
         f"clickhouse_incremental_column={clickhouse_incremental_column}, "
         f"target_path={target_path}, "
         f"s3_export_role_arn={s3_export_role_arn}, "
-        f"partition_columns={partition_columns}, "
-        f"event_types={event_types}"
+        f"partition_columns={partition_columns}"
     )
 
     """
@@ -206,6 +185,7 @@ if __name__ == "__main__":
     )
 
     trigger_insert_into_clickhouse_procedure(
+        clickhouse_client,
         clickhouse_database,
         clickhouse_source_table,
         clickhouse_incremental_column,
@@ -219,31 +199,22 @@ if __name__ == "__main__":
     Materialize raw table.
     """
     logger.info("loading data from s3...")
-    start_time = datetime.strptime(load_start_date, "%Y-%m-%d %H:%M:%S")
-    end_time = datetime.strptime(load_end_date, "%Y-%m-%d %H:%M:%S")
-    start_hour = start_time.replace(minute=0, second=0, microsecond=0)
-    ingest_hours = [
-        start_hour + timedelta(hours=i)
-        for i in range(int((end_time - start_hour).total_seconds() // 3600) + 1)
-        if start_hour + timedelta(hours=i) < end_time
-    ]
+    scan_start = datetime.strptime(load_start_date, "%Y-%m-%d %H:%M:%S") - timedelta(
+        hours=1
+    )
+    scan_end = datetime.strptime(load_end_date, "%Y-%m-%d %H:%M:%S") + timedelta(
+        hours=1
+    )
 
     spark_client = SparkClient()
     spark = spark_client.conn
 
-    source_paths = [
-        (
-            f"{source_path}/"
-            f"egw_event_type={event_type}/"
-            f"year={dt.year:04d}/"
-            f"month={dt.month:02d}/"
-            f"day={dt.day:02d}/"
-            f"hour={dt.hour:02d}/"
-            f"data.parquet"
-        )
-        for event_type in event_types
-        for dt in ingest_hours
-    ]
+    source_paths = []
+    scan_hour = scan_start
+    while scan_hour <= scan_end:
+        dt_partition = scan_hour.strftime("%Y-%m-%d-%H")
+        source_paths.append(f"{source_path.rstrip('/')}/dt={dt_partition}/data.parquet")
+        scan_hour += timedelta(hours=1)
 
     source_paths_filtered = [
         path for path in source_paths if _does_this_path_exist(spark, path)
@@ -255,18 +226,28 @@ if __name__ == "__main__":
         )
 
     df = spark.read.parquet(*source_paths_filtered)
+
     logger.info("data loaded successfully!")
 
     """
     Deduplicate raw events by event_id (latest egw_timestamp).
     """
-    dedup_window = Window.partitionBy("event_id").orderBy(desc("egw_timestamp"))
+    dedup_key_column = "id_event" if "id_event" in df.columns else "event_id"
+    dedup_order_column = "ts_egw" if "ts_egw" in df.columns else "egw_timestamp"
+    dedup_window = Window.partitionBy(dedup_key_column).orderBy(
+        desc(dedup_order_column)
+    )
     df = (
         df.withColumn("_rn", row_number().over(dedup_window))
         .filter(col("_rn") == 1)
         .drop("_rn")
     )
-    logger.info("raw events deduplicated by event_id (latest egw_timestamp)")
+    logger.info(
+        f"raw events deduplicated by {dedup_key_column} (latest {dedup_order_column})"
+    )
+
+    df = df.withColumn("ts_load", current_timestamp())
+    df = df.withColumnRenamed("_ingested_at", "ts_ingested_at")
 
     """
     Load data to datalake.

@@ -1,0 +1,111 @@
+---
+database_name: datalake_cdp_clean
+table_name: events
+description: |
+  Clean-layer CDP Event Gateway events from datalake_cdp_raw.events (ClickHouse
+  events_parsed). Normalizes raw hub fields to lake naming (id_*, ts_*) with
+  event-date dt partitioning from ts_event. Primary key grain: id_event with
+  the dt partition.
+domain: Growth
+owner: marcio.gomes@quintoandar.com.br
+columns:
+  id_event:
+    description: |
+      Unique event identifier from the CDP Event Gateway hub; merge key together
+      with event_name and dt partitions.
+    lineage:
+      - datalake_cdp_raw.events.event_id
+  id_person:
+    description: |
+      Person identifier from person_uuid on the governed hub event when identity
+      resolution is available.
+    lineage:
+      - datalake_cdp_raw.events.person_uuid
+  id_user:
+    description: |
+      Application user identifier attached to the event from events_parsed.
+    lineage:
+      - datalake_cdp_raw.events.user_id
+  id_house:
+    description: |
+      Native house identifier from the source event when present on events_parsed.
+    lineage:
+      - datalake_cdp_raw.events.house_id
+  id_contract:
+    description: |
+      Native contract identifier from the source event when present on
+      events_parsed.
+    lineage:
+      - datalake_cdp_raw.events.contract_id
+  egw_event_type:
+    description: |
+      Event Gateway event type used to route downstream CDP workflows.
+    lineage:
+      - datalake_cdp_raw.events.egw_event_type
+  application:
+    description: |
+      Lowercased application or product surface that generated the event.
+    lineage:
+      - datalake_cdp_raw.events.application
+  journey_step:
+    description: |
+      Funnel or journey step label associated with the event.
+    lineage:
+      - datalake_cdp_raw.events.journey_step
+  event_name:
+    description: |
+      Lowercased event name from the application or SDK on the governed hub record.
+    lineage:
+      - datalake_cdp_raw.events.event_name
+  event_properties:
+    description: |
+      Raw JSON string of event-specific properties from events_parsed.
+    lineage:
+      - datalake_cdp_raw.events.event_properties
+  user_properties:
+    description: |
+      Raw JSON string of user-level properties at capture time from
+      events_parsed.
+    lineage:
+      - datalake_cdp_raw.events.user_properties
+  enrichments:
+    description: |
+      JSON string of enrichment fields such as device_id and domain_user_id
+      from events_parsed.
+    lineage:
+      - datalake_cdp_raw.events.enrichments
+  ts_event:
+    description: |
+      Client-reported event time in UTC, converted from timestamp epoch
+      milliseconds on events_parsed.
+    lineage:
+      - datalake_cdp_raw.events.timestamp
+  ts_egw:
+    description: |
+      Time when Event Gateway ingested the event in UTC, converted from
+      egw_timestamp epoch milliseconds; used for merge deduplication.
+    lineage:
+      - datalake_cdp_raw.events.egw_timestamp
+  ts_egw_updated_at:
+    description: |
+      Event Gateway update time in UTC, converted from egw_updated_at epoch
+      milliseconds; ReplacingMergeTree version column from ClickHouse.
+    lineage:
+      - datalake_cdp_raw.events.egw_updated_at
+  ts_ingested_at:
+    description: |
+      Timestamp when ClickHouse ingested the event, mapped from `_ingested_at`
+      via the raw table. Distinct from ts_egw (Event Gateway) and ts_event
+      (client clock).
+    lineage:
+      - datalake_cdp_raw.events.ts_ingested_at
+  ts_load:
+    description: |
+      Timestamp when the clean query executed, set with CURRENT_TIMESTAMP at
+      write time. Distinct from ts_ingested_at (ClickHouse) and ts_egw
+      (Event Gateway).
+  dt:
+    description: |
+      Partition key; calendar date of ts_event formatted as YYYY-MM-DD for partition pruning.
+    lineage:
+      - datalake_cdp_clean.events.ts_event

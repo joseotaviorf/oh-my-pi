@@ -1,12 +1,10 @@
 ---
 database_name: datalake_cdp_raw
-table_name: events_api
+table_name: events
 description: |
-  Raw Delta mirror of CDP Event Gateway events. Forno loads from ClickHouse
-  forno.events_parsed; prod loads from default.events_api. The Spark job exports
-  Parquet to the processed-data bucket per ingest-hour partition (_ingested_at),
-  then overwrites matching raw Delta partitions. Source for datalake_cdp_clean
-  transactional, user_tracking and comms event tables.
+  Raw Delta mirror of CDP Event Gateway events from ClickHouse events_parsed. The Spark
+  job exports Parquet to the processed-data bucket partitioned by ingest hour
+  (dt as YYYY-MM-DD-HH), then overwrites matching raw Delta partitions.
 domain: Growth
 owner: marcio.gomes@quintoandar.com.br
 columns:
@@ -35,22 +33,25 @@ columns:
   egw_updated_at:
     description: |
       Event Gateway update epoch in milliseconds; ReplacingMergeTree version column
-      used for deduplication ordering in the clean layer.
-  _ingested_at:
+      used for deduplication ordering in downstream layers.
+  ts_ingested_at:
     description: |
-      ClickHouse ingestion timestamp used to filter incremental exports from
-      events_api and as a secondary dedup tie-breaker in the clean layer.
+      Timestamp when ClickHouse ingested the event, mapped from the ClickHouse
+      `_ingested_at` column. Used to filter incremental exports and as a
+      secondary dedup tie-breaker in downstream layers.
+  ts_kafka:
+    description: |
+      Kafka produce or consume timestamp from ClickHouse events_parsed when the
+      source column is present. Kept on raw only; not projected into clean.
+  ts_load:
+    description: |
+      Timestamp when the cdp_clickhouse Spark job wrote the row into the raw
+      Delta table, set to current_timestamp at job execution.
   enrichments:
     description: JSON string of enrichment fields such as device_id and domain_user_id.
   house_id:
-    description: Native house identifier from events_api when present.
+    description: Native house identifier from the source event when present.
   contract_id:
-    description: Native contract identifier from events_api when present.
-  year:
-    description: UTC year partition derived from ClickHouse _ingested_at at export.
-  month:
-    description: UTC month partition derived from ClickHouse _ingested_at at export.
-  day:
-    description: UTC day partition derived from ClickHouse _ingested_at at export.
-  hour:
-    description: UTC hour partition derived from ClickHouse _ingested_at at export.
+    description: Native contract identifier from the source event when present.
+  dt:
+    description: Ingest hour partition derived from ts_ingested_at, formatted as YYYY-MM-DD-HH.

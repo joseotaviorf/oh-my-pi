@@ -1,41 +1,23 @@
 SELECT
-    raw.event_id AS id_event,
-    raw.person_uuid AS id_person,
-    TRY_CAST(raw.user_id AS BIGINT) AS id_user,
-    COALESCE(
-        get_json_object(raw.user_properties, '$.domain_user_id'),
-        get_json_object(raw.enrichments, '$.domain_user_id')
-    ) AS id_domain_user,
-    COALESCE(
-        get_json_object(raw.enrichments, '$.device_id'),
-        get_json_object(raw.user_properties, '$.device_id')
-    ) AS id_entity,
-    COALESCE(
-        CAST(raw.house_id AS STRING),
-        get_json_object(raw.event_properties, '$.houseId')
-    ) AS id_house,
-    LOWER(raw.application) AS application,
+    raw.id_event,
+    raw.id_person,
+    raw.id_user,
+    raw.id_domain_user,
+    raw.id_entity,
+    raw.id_house,
+    raw.id_contract,
+    raw.application,
     raw.journey_step,
-    LOWER(raw.event_name) AS event_name,
+    raw.event_name,
     raw.event_properties,
     raw.user_properties,
-    TIMESTAMP_MILLIS(raw.timestamp) AS ts_event,
-    TIMESTAMP_MILLIS(raw.egw_timestamp) AS ts_egw,
-    MAKE_TIMESTAMP(
-        YEAR(TIMESTAMP_MILLIS(raw.timestamp)),
-        MONTH(TIMESTAMP_MILLIS(raw.timestamp)),
-        DAY(TIMESTAMP_MILLIS(raw.timestamp)),
-        HOUR(TIMESTAMP_MILLIS(raw.timestamp)),
-        MINUTE(TIMESTAMP_MILLIS(raw.timestamp)),
-        0
-    ) AS ts_kafka,
+    raw.ts_event,
+    raw.ts_egw,
+    raw.ts_ingested_at,
     CURRENT_TIMESTAMP() AS ts_load,
-    YEAR(TIMESTAMP_MILLIS(raw.timestamp)) AS year,
-    MONTH(TIMESTAMP_MILLIS(raw.timestamp)) AS month,
-    DAY(TIMESTAMP_MILLIS(raw.timestamp)) AS day
+    DATE_FORMAT(raw.ts_event, 'yyyy-MM-dd') AS dt
 FROM
-    datalake_cdp_raw.events_api AS raw
+    datalake_cdp_raw.transactional_events AS raw
 WHERE
-    raw.egw_event_type = 'TRANSACTIONAL'
-    AND MAKE_TIMESTAMP(raw.year, raw.month, raw.day, raw.hour, 0, 0) >= TIMESTAMP('{load_start_date}')
-    AND MAKE_TIMESTAMP(raw.year, raw.month, raw.day, raw.hour, 0, 0) < TIMESTAMP('{load_end_date}')
+    raw.dt >= DATE_FORMAT(TIMESTAMP('{load_start_date}'), 'yyyy-MM-dd-HH')
+    AND raw.dt <= DATE_FORMAT(TIMESTAMP('{load_end_date}'), 'yyyy-MM-dd-HH')
