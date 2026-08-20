@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 from pyspark.sql.types import StringType
 
 from bietlejuice.base.sst.core.observability.metrics import (
+    save_scd_change_metric,
     save_table_metadata_metric,
     save_volume_metric,
 )
@@ -122,6 +123,138 @@ def test_save_volume_metric_writes_zero_row_metric_for_empty_df():
     assert mock_validate_and_write.call_count == 1
     assert mock_validate_and_write.call_args.kwargs["df"] == fallback_df
     assert fallback_df.withColumn.call_count >= 9
+
+
+def test_save_scd_change_metric_writes_to_metric_name_table():
+    """save_scd_change_metric writes one aggregated row to
+    datalake_sst_metrics.<metric_name>, partitioned by source_table +
+    partition keys so a rerun overwrites its own row.
+    """
+    spark = MagicMock()
+
+    metric_df = MagicMock()
+    df = MagicMock()
+    df.agg.return_value = metric_df
+
+    with (
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.save_metric_dataframe"
+        ) as mock_save_metric_dataframe,
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.build_metric_dataframe",
+            return_value=metric_df,
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.count",
+            return_value=DummyExpr(),
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.sum",
+            return_value=DummyExpr(),
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.when",
+            return_value=MagicMock(),
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.col",
+            return_value=MagicMock(),
+        ),
+    ):
+        result = save_scd_change_metric(
+            spark=spark,
+            df=df,
+            bucket="my-bucket",
+            metric_name="core_model_scd_changes",
+            target_table="core_support_journey.analyst",
+            partition_date="2026-08-11",
+            partition_hour="19",
+            env="prod",
+            layer="core",
+        )
+
+    assert result == metric_df
+    assert mock_save_metric_dataframe.call_count == 1
+    call_kwargs = mock_save_metric_dataframe.call_args.kwargs
+    assert call_kwargs["df"] == metric_df
+    assert call_kwargs["bucket"] == "my-bucket"
+    assert call_kwargs["metric_table"] == "core_model_scd_changes"
+    assert call_kwargs["partition_cols"] == [
+        "source_table",
+        "partition_date",
+        "partition_hour",
+    ]
+    assert call_kwargs["partition_filter_values"] == {
+        "source_table": "core_support_journey.analyst",
+        "partition_date": "2026-08-11",
+        "partition_hour": "19",
+    }
+
+
+def test_save_scd_change_metric_builds_inserted_and_updated_counts():
+    """The metric row carries scd_change category metadata and the aggregation
+    produces row_count, inserted_count (is_current true) and updated_count
+    (is_current false).
+    """
+    spark = MagicMock()
+
+    metric_df = MagicMock()
+    df = MagicMock()
+    df.agg.return_value = metric_df
+
+    captured = {}
+
+    def _capture_build(df, metric_values, select_columns):
+        captured["metric_values"] = metric_values
+        captured["select_columns"] = select_columns
+        return metric_df
+
+    with (
+        patch("bietlejuice.base.sst.core.observability.metrics.save_metric_dataframe"),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.build_metric_dataframe",
+            side_effect=_capture_build,
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.count",
+            return_value=DummyExpr(),
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.sum",
+            return_value=DummyExpr(),
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.when",
+            return_value=MagicMock(),
+        ),
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.F.col",
+            return_value=MagicMock(),
+        ) as mock_col,
+    ):
+        save_scd_change_metric(
+            spark=spark,
+            df=df,
+            bucket="my-bucket",
+            metric_name="core_model_scd_changes",
+            target_table="core_support_journey.analyst",
+            partition_date="2026-08-11",
+            partition_hour="19",
+            env="forno",
+            layer="core",
+        )
+
+    metric_values = captured["metric_values"]
+    assert metric_values["metric_category"] == "scd_change"
+    assert metric_values["metric_name"] == "core_model_scd_changes"
+    assert metric_values["source_table"] == "core_support_journey.analyst"
+    assert metric_values["environment"] == "forno"
+    assert metric_values["layer"] == "core"
+
+    assert "row_count" in captured["select_columns"]
+    assert "inserted_count" in captured["select_columns"]
+    assert "updated_count" in captured["select_columns"]
+    mock_col.assert_any_call("_is_current")
 
 
 def test_save_table_metadata_metric_writes_single_table_partitioned_by_source_table():

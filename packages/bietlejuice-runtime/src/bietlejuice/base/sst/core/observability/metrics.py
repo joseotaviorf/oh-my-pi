@@ -298,6 +298,114 @@ def save_stability_metric(
     return results_df
 
 
+def build_scd_change_metric_dataframe(
+    df: DataFrame,
+    metric_name: str,
+    target_table: str,
+    partition_date: str,
+    partition_hour: str,
+    env: str,
+    layer: str,
+    is_current_col: str = "_is_current",
+) -> DataFrame:
+    """
+    Aggregate an SCD Type 2 batch into a single metric row.
+
+    ``inserted_count`` counts rows with ``is_current_col`` true (new current
+    versions) and ``updated_count`` counts rows with it false (previous
+    versions expired by this batch).
+    """
+    aggregated_df = df.agg(
+        F.count("*").cast("bigint").alias("row_count"),
+        F.sum(F.when(F.col(is_current_col), 1).otherwise(0))
+        .cast("bigint")
+        .alias("inserted_count"),
+        F.sum(F.when(~F.col(is_current_col), 1).otherwise(0))
+        .cast("bigint")
+        .alias("updated_count"),
+    )
+
+    metric_values = {
+        "metric_category": "scd_change",
+        "metric_name": metric_name,
+        "source_table": target_table,
+        "environment": env,
+        "layer": layer,
+        "partition_date": partition_date,
+        "partition_hour": partition_hour,
+        "write_timestamp": current_write_timestamp(),
+    }
+
+    select_columns = [
+        "metric_category",
+        "metric_name",
+        "source_table",
+        "environment",
+        "layer",
+        "partition_date",
+        "partition_hour",
+        "row_count",
+        "inserted_count",
+        "updated_count",
+        "write_timestamp",
+    ]
+
+    return build_metric_dataframe(
+        df=aggregated_df,
+        metric_values=metric_values,
+        select_columns=select_columns,
+    )
+
+
+@logger(exclude=["spark", "df"], exclude_return=True)
+def save_scd_change_metric(
+    spark,
+    df: DataFrame,
+    bucket: str,
+    metric_name: str,
+    target_table: str,
+    partition_date: str,
+    partition_hour: str,
+    env: str,
+    layer: str,
+    is_current_col: str = "_is_current",
+) -> DataFrame:
+    """
+    Write inserted/updated counts for an SCD Type 2 batch to
+    ``datalake_sst_metrics.<metric_name>``.
+
+    ``df`` is the batch written by the run (e.g. the versioned dataframe fed to
+    the delta loader), not the full target table. The metric table is
+    partitioned by ``source_table`` + partition keys, so rerunning a partition
+    overwrites its own row instead of duplicating it.
+    """
+    results_df = build_scd_change_metric_dataframe(
+        df=df,
+        metric_name=metric_name,
+        target_table=target_table,
+        partition_date=partition_date,
+        partition_hour=partition_hour,
+        env=env,
+        layer=layer,
+        is_current_col=is_current_col,
+    )
+
+    save_metric_dataframe(
+        spark=spark,
+        df=results_df,
+        bucket=bucket,
+        metric_table=metric_name,
+        partition_cols=["source_table", "partition_date", "partition_hour"],
+        partition_filter_values={
+            "source_table": target_table,
+            "partition_date": partition_date,
+            "partition_hour": partition_hour,
+        },
+    )
+
+    return results_df
+
+
 @logger(exclude=["spark", "df"], exclude_return=True)
 def save_volume_metric(
     spark,

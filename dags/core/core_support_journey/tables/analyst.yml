@@ -1,0 +1,142 @@
+target_schema: core_support_journey
+target_table: analyst
+partition_cols: ["partition_date", "partition_hour"]
+merge_on: ["id_event"]
+when_matched_update_condition: "source.partition_date = target.partition_date AND source.partition_hour = target.partition_hour"
+is_backfill_run: false
+
+sources:
+  user:
+    table_name: "datalake_salesforce_clean.events_user"
+    key_cols: ["id_record"]
+    sort_col: ["committed_at"]
+    cols:
+      [
+        "id_record",
+        "event_type",
+        "username",
+        "email",
+        "alias",
+        "id_manager",
+        "operations__c",
+        "bpo__c",
+        "is_active",
+        "is_partner",
+        "transaction_key",
+        "commit_number",
+        "commit_ts",
+        "committed_at",
+        "created_date",
+        "changed_field",
+        "partition_date",
+        "partition_hour",
+      ]
+    tracked_cols:
+      [
+        "Username",
+        "Email",
+        "Alias",
+        "ManagerId",
+        "Operations__c",
+        "BPO__c",
+        "IsPartner",
+        "IsActive",
+      ]
+
+schema:
+  columns:
+    id_analyst:
+      type: string
+      required: true
+      is_nullable: false
+    id_type:
+      type: string
+      required: true
+      is_nullable: false
+    id_event:
+      type: string
+      required: true
+      is_nullable: false
+    id_event_type:
+      type: string
+      required: true
+      is_nullable: false
+    id_manager:
+      type: string
+      required: true
+      is_nullable: true
+    username:
+      type: string
+      required: true
+      is_nullable: true
+    email:
+      type: string
+      required: true
+      is_nullable: true
+    alias:
+      type: string
+      required: true
+      is_nullable: true
+    operations:
+      type: string
+      required: true
+      is_nullable: true
+    bpo:
+      type: string
+      required: true
+      is_nullable: true
+    is_active:
+      type: boolean
+      required: true
+      is_nullable: true
+    is_partner:
+      type: boolean
+      required: true
+      is_nullable: true
+    is_deleted:
+      type: boolean
+      required: true
+      is_nullable: false
+    created_date:
+      type: string
+      required: true
+      is_nullable: true
+    committed_at:
+      type: string
+      required: true
+      is_nullable: false
+    partition_date:
+      type: string
+      required: true
+      is_nullable: false
+    partition_hour:
+      type: string
+      required: true
+      is_nullable: false
+    _created_at:
+      type: string
+      required: true
+      is_nullable: false
+    _last_updated_at:
+      type: string
+      required: true
+      is_nullable: false
+    _effective_timestamp:
+      type: string
+      required: true
+      is_nullable: false
+    _expired_timestamp:
+      type: string
+      required: true
+      is_nullable: false
+    _is_current:
+      type: boolean
+      required: true
+      is_nullable: false
+    _ts_load:
+      type: string
+      required: true
+      is_nullable: false
+  min_columns: 23
+  max_columns: 23
+  strict: true

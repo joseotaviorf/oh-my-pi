@@ -1,3 +1,16 @@
+"""
+Hourly core-model loads for the Support Journey domain (Salesforce CDC).
+
+Every ``load_core_support_journey_<table>`` task runs a Spark job from
+``bietlejuice/base/sst/pipelines/core_model/support_journey/<table>.py`` that
+follows the patterns defined by ``BaseCoreModelSparkJob``
+(``bietlejuice.base.spark.base_core_model_spark_job``): standard CLI contract
+(``parse_parameters`` <-> ``default_args``), table spec loaded from
+``tables/<table>.yml``, SCD Type 2 versioning helpers, schema validation, and
+Delta merge via ``DataFrameDeltaTableLoaderPipeline``. New tables should extend
+that base class rather than introducing ad-hoc job structures.
+"""
+
 import os
 from datetime import datetime, timedelta
 from functools import partial

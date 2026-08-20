@@ -109,3 +109,68 @@ def basic_quality_checks(
                 )
 
     return report
+
+
+@logger(exclude=["df"], exclude_return=False)
+def validate_non_nullable_columns(
+    df: pyspark.sql.DataFrame,
+    column_schema: Dict[str, Any],
+    fail: bool = True,
+) -> Dict[str, int]:
+    """
+    Validate that columns declared ``is_nullable: false`` contain no null values.
+
+    Reads the per-column ``is_nullable`` flag from a table-spec schema definition
+    (``schema.columns`` in ``tables/*.yml``) and checks the actual data. All
+    non-nullable columns are counted in a single aggregation pass. Columns
+    absent from the DataFrame are skipped (existence is the schema validator's
+    concern, not this check's).
+
+    Parameters
+    ----------
+    df : pyspark.sql.DataFrame
+        DataFrame to validate (e.g. the versioned batch before load).
+    column_schema : dict
+        Mapping of column name to column definition. A column is checked only
+        when its definition has ``is_nullable`` explicitly set to False.
+    fail : bool, default True
+        When True, raises ``ValueError`` if any non-nullable column contains
+        nulls. When False, returns the per-column null counts instead.
+
+    Returns
+    -------
+    dict
+        Column name -> null count, only for violating columns. Empty when all
+        checks pass.
+    """
+    df_columns = set(df.columns)
+    non_nullable_cols = [
+        column_name
+        for column_name, column_def in column_schema.items()
+        if column_def.get("is_nullable", True) is False and column_name in df_columns
+    ]
+
+    if not non_nullable_cols:
+        return {}
+
+    null_counts_row = df.select(
+        [
+            F.sum(F.col(column_name).isNull().cast("int")).alias(column_name)
+            for column_name in non_nullable_cols
+        ]
+    ).collect()[0]
+
+    # sum() over an empty DataFrame returns null; treat it as zero nulls.
+    null_counts = {
+        column_name: int(null_counts_row[column_name] or 0)
+        for column_name in non_nullable_cols
+        if (null_counts_row[column_name] or 0) > 0
+    }
+
+    logger.info(
+        f"m=validate_non_nullable_columns, msg=null_counts check: {null_counts}"
+    )
+    if null_counts and fail:
+        raise ValueError(f"Null values found in non-nullable columns: {null_counts}")
+
+    return null_counts
