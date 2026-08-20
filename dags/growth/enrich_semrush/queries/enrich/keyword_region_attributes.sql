@@ -56,49 +56,87 @@ keywords_grouped AS (
 ),
 
 -- Enrichment of keywords from a IGBE database contains all Brazilian cities.
+-- The "keyword contains city_name" match is driven by a trigram equi-join (hash
+-- key = leading 3 chars) + an exact LOCATE(...) residual, instead of a bare
+-- CHARINDEX(...) > 0 join that plans as a BroadcastNestedLoopJoin on EMR. All
+-- ibge city_name values are >= 3 chars, so the trigram equi-join is complete.
+igbe_city_windows AS (
+  SELECT DISTINCT
+    keyword_clean,
+    SUBSTRING(LOWER(keyword_clean), seq.pos, 3) AS window3
+  FROM keywords_grouped
+  LATERAL VIEW POSEXPLODE(SEQUENCE(1, GREATEST(LENGTH(keyword_clean) - 2, 0))) seq AS seq_idx, pos
+),
+igbe_city_matches AS (
+  SELECT DISTINCT
+    cw.keyword_clean AS keyword_clean,
+    c.city_name AS city_name
+  FROM igbe_city_windows cw
+  JOIN cities c
+    ON cw.window3 = SUBSTRING(LOWER(c.city_name), 1, 3)
+  WHERE LENGTH(c.city_name) >= 3
+    AND LOCATE(LOWER(c.city_name), LOWER(cw.keyword_clean)) > 0
+),
+general_city_level_candidates AS (
+  SELECT
+    kg.player,
+    kg.keyword,
+    kg.keyword_clean,
+    CASE
+      WHEN CONTAINS(cm.city_name, ' ') THEN cm.city_name
+      WHEN ARRAY_CONTAINS(SPLIT(kg.keyword_clean, ' '), LOWER(cm.city_name)) THEN cm.city_name
+      WHEN CONTAINS(kg.keyword_clean, 'sao paulo') THEN COALESCE(cm.city_name, 'sao paulo')
+      WHEN RLIKE(kg.keyword_clean, r'.*(\bsp\b).*') THEN COALESCE(cm.city_name, 'sao paulo')
+      WHEN RLIKE(kg.keyword_clean, r'.*(\brj\b).*') THEN COALESCE(cm.city_name, 'rio de janeiro')
+      WHEN CONTAINS(kg.keyword_clean, ' bh') THEN COALESCE(cm.city_name, 'belo horizonte')
+      WHEN CONTAINS(kg.keyword_clean, ' sjc') THEN COALESCE(cm.city_name, 'sao jose dos campos')
+      WHEN CONTAINS(kg.keyword_clean, ' santo andre') THEN COALESCE(cm.city_name, 'santo andre')
+      WHEN CONTAINS(kg.keyword_clean, ' sao caetano') THEN COALESCE(cm.city_name, 'sao caetano do sul')
+      WHEN CONTAINS(kg.keyword_clean, ' goiania') THEN COALESCE(cm.city_name, 'goiania')
+      WHEN CONTAINS(kg.keyword_clean, ' nova iguacu') THEN COALESCE(cm.city_name, 'nova iguacu')
+      WHEN CONTAINS(kg.keyword_clean, ' sao goncalo') THEN COALESCE(cm.city_name, 'sao goncalo')
+      WHEN CONTAINS(kg.keyword_clean, ' carapicuiba') THEN COALESCE(cm.city_name, 'carapicuiba')
+      WHEN CONTAINS(kg.keyword_clean, ' sbc') THEN COALESCE(cm.city_name, 'sao bernardo do campo')
+      WHEN CONTAINS(kg.keyword_clean, ' sbo') THEN COALESCE(cm.city_name, 'santa barbara do oeste')
+      WHEN CONTAINS(kg.keyword_clean, ' vcp') THEN COALESCE(cm.city_name, 'campinas')
+      WHEN CONTAINS(kg.keyword_clean, ' vix') THEN COALESCE(cm.city_name, 'vitória')
+      WHEN CONTAINS(kg.keyword_clean, ' gru') THEN COALESCE(cm.city_name, 'guarulhos')
+      WHEN CONTAINS(kg.keyword_clean, ' sao bernardo do campo') THEN COALESCE(cm.city_name, 'sao bernardo do campo')
+      ELSE COALESCE(cm.city_name, '')
+    END AS match_igbe_city,
+    kg.url
+  FROM
+    keywords_grouped AS kg
+  LEFT JOIN
+    igbe_city_matches AS cm
+      ON kg.keyword_clean = cm.keyword_clean
+),
 general_city_level_enrichment AS (
   SELECT
     player,
     keyword,
     keyword_clean,
-    CASE
-      WHEN CONTAINS(c.city_name, ' ') THEN city_name
-      WHEN ARRAY_CONTAINS(SPLIT(keyword_clean, ' '), LOWER(c.city_name)) THEN city_name
-      WHEN CONTAINS(keyword_clean, 'sao paulo') THEN COALESCE(c.city_name, 'sao paulo')
-      WHEN RLIKE(keyword_clean, r'.*(\bsp\b).*') THEN COALESCE(c.city_name, 'sao paulo')
-      WHEN RLIKE(keyword_clean, r'.*(\brj\b).*') THEN COALESCE(c.city_name, 'rio de janeiro')
-      WHEN CONTAINS(keyword_clean, ' bh') THEN COALESCE(c.city_name, 'belo horizonte')
-      WHEN CONTAINS(keyword_clean, ' sjc') THEN COALESCE(c.city_name, 'sao jose dos campos')
-      WHEN CONTAINS(keyword_clean, ' santo andre') THEN COALESCE(c.city_name, 'santo andre')
-      WHEN CONTAINS(keyword_clean, ' sao caetano') THEN COALESCE(c.city_name, 'sao caetano do sul')
-      WHEN CONTAINS(keyword_clean, ' goiania') THEN COALESCE(c.city_name, 'goiania')
-      WHEN CONTAINS(keyword_clean, ' nova iguacu') THEN COALESCE(c.city_name, 'nova iguacu')
-      WHEN CONTAINS(keyword_clean, ' sao goncalo') THEN COALESCE(c.city_name, 'sao goncalo')
-      WHEN CONTAINS(keyword_clean, ' carapicuiba') THEN COALESCE(c.city_name, 'carapicuiba')
-      WHEN CONTAINS(keyword_clean, ' sbc') THEN COALESCE(c.city_name, 'sao bernardo do campo')
-      WHEN CONTAINS(keyword_clean, ' sbo') THEN COALESCE(c.city_name, 'santa barbara do oeste')
-      WHEN CONTAINS(keyword_clean, ' vcp') THEN COALESCE(c.city_name, 'campinas')
-      WHEN CONTAINS(keyword_clean, ' vix') THEN COALESCE(c.city_name, 'vitória')
-      WHEN CONTAINS(keyword_clean, ' gru') THEN COALESCE(c.city_name, 'guarulhos')
-      WHEN CONTAINS(keyword_clean, ' sao bernardo do campo') THEN COALESCE(c.city_name, 'sao bernardo do campo')
-      ELSE COALESCE(c.city_name, '')
-    END AS match_igbe_city,
+    match_igbe_city,
     url
-  FROM
-    keywords_grouped AS kg
-  LEFT JOIN 
-    cities AS c 
-      ON CHARINDEX(LOWER(c.city_name), LOWER(kg.keyword_clean)) > 0
-  QUALIFY
-    ROW_NUMBER() OVER(
-      PARTITION BY 
-        player,
-        keyword,
-        url
-      ORDER BY 
-        LENGTH(match_igbe_city) DESC, 
-        CHARINDEX(match_igbe_city, keyword) DESC
-        ) = 1
+  FROM (
+    SELECT
+      player,
+      keyword,
+      keyword_clean,
+      match_igbe_city,
+      url,
+      ROW_NUMBER() OVER(
+        PARTITION BY
+          player,
+          keyword,
+          url
+        ORDER BY
+          LENGTH(match_igbe_city) DESC,
+          LOCATE(match_igbe_city, keyword) DESC
+      ) AS rn
+    FROM general_city_level_candidates
+  ) ranked
+  WHERE rn = 1
 ),
 
 operation_cities AS (
@@ -124,60 +162,105 @@ operation_cities AS (
 
 -- Enrichment of keywords on city level based on our internal regions dataset. 
 -- This dataset comprehends only our operations area.
-operation_city_level_enrichment AS (
-  SELECT
-    r.id AS id_region_match_operation_city,
-    player,
-    keyword,
+-- Trigram equi-join + LOCATE residual (replaces CHARINDEX containment join).
+-- All operation-city names are >= 3 chars, so the trigram key is complete.
+opcity_windows AS (
+  SELECT DISTINCT
     keyword_clean,
-    match_igbe_city,
+    SUBSTRING(keyword_clean, seq.pos, 3) AS window3
+  FROM general_city_level_enrichment
+  LATERAL VIEW POSEXPLODE(SEQUENCE(1, GREATEST(LENGTH(keyword_clean) - 2, 0))) seq AS seq_idx, pos
+),
+opcity_matches AS (
+  SELECT DISTINCT
+    ow.keyword_clean AS keyword_clean,
+    r.id AS id,
+    r.name AS name
+  FROM opcity_windows ow
+  JOIN operation_cities r
+    ON ow.window3 = SUBSTRING(r.name, 1, 3)
+  WHERE LENGTH(r.name) >= 3
+    AND LOCATE(r.name, ow.keyword_clean) > 0
+),
+operation_city_level_candidates AS (
+  SELECT
+    om.id AS id_region_match_operation_city,
+    gcle.player,
+    gcle.keyword,
+    gcle.keyword_clean,
+    gcle.match_igbe_city,
     CASE
-      WHEN CONTAINS(keyword_clean, r.name) THEN r.name
-      WHEN CONTAINS(r.name, ' ') THEN r.name
-      WHEN ARRAY_CONTAINS(SPLIT(keyword_clean, ' '), r.name) THEN r.name
-      WHEN CONTAINS(keyword_clean, 'sao paulo') THEN COALESCE(r.name, 'sao paulo')
-      WHEN RLIKE(keyword_clean, r'.*(\bsp\b).*') THEN COALESCE(r.name, 'sao paulo')
-      WHEN RLIKE(keyword_clean, r'.*(\brj\b).*') THEN COALESCE(r.name, 'rio de janeiro')
-      WHEN CONTAINS(keyword_clean, ' bh') THEN COALESCE(r.name, 'belo horizonte')
-      WHEN CONTAINS(keyword_clean, ' sjc') THEN COALESCE(r.name, 'sao jose dos campos')
-      WHEN CONTAINS(keyword_clean, ' santo andre') THEN COALESCE(r.name, 'santo andre')
-      WHEN CONTAINS(keyword_clean, ' sao caetano') THEN COALESCE(r.name, 'sao caetano do sul')
-      WHEN CONTAINS(keyword_clean, ' goiania') THEN COALESCE(r.name, 'goiania')
-      WHEN CONTAINS(keyword_clean, ' nova iguacu') THEN COALESCE(r.name, 'nova iguacu')
-      WHEN CONTAINS(keyword_clean, ' sao goncalo') THEN COALESCE(r.name, 'sao goncalo')
-      WHEN CONTAINS(keyword_clean, ' carapicuiba') THEN COALESCE(r.name, 'carapicuiba')
-      WHEN CONTAINS(keyword_clean, ' sbc') THEN COALESCE(r.name, 'sao bernardo do campo')
-      WHEN CONTAINS(keyword_clean, ' sbo') THEN COALESCE(r.name, 'santa barbara do oeste')
-      WHEN CONTAINS(keyword_clean, ' vcp') THEN COALESCE(r.name, 'campinas')
-      WHEN CONTAINS(keyword_clean, ' vix') THEN COALESCE(r.name, 'vitória')
-      WHEN CONTAINS(keyword_clean, ' gru') THEN COALESCE(r.name, 'guarulhos')
-      WHEN CONTAINS(keyword_clean, ' sao bernardo do campo') THEN COALESCE(r.name, 'sao bernardo do campo')
-      ELSE COALESCE(r.name, '')
+      WHEN CONTAINS(gcle.keyword_clean, om.name) THEN om.name
+      WHEN CONTAINS(om.name, ' ') THEN om.name
+      WHEN ARRAY_CONTAINS(SPLIT(gcle.keyword_clean, ' '), om.name) THEN om.name
+      WHEN CONTAINS(gcle.keyword_clean, 'sao paulo') THEN COALESCE(om.name, 'sao paulo')
+      WHEN RLIKE(gcle.keyword_clean, r'.*(\bsp\b).*') THEN COALESCE(om.name, 'sao paulo')
+      WHEN RLIKE(gcle.keyword_clean, r'.*(\brj\b).*') THEN COALESCE(om.name, 'rio de janeiro')
+      WHEN CONTAINS(gcle.keyword_clean, ' bh') THEN COALESCE(om.name, 'belo horizonte')
+      WHEN CONTAINS(gcle.keyword_clean, ' sjc') THEN COALESCE(om.name, 'sao jose dos campos')
+      WHEN CONTAINS(gcle.keyword_clean, ' santo andre') THEN COALESCE(om.name, 'santo andre')
+      WHEN CONTAINS(gcle.keyword_clean, ' sao caetano') THEN COALESCE(om.name, 'sao caetano do sul')
+      WHEN CONTAINS(gcle.keyword_clean, ' goiania') THEN COALESCE(om.name, 'goiania')
+      WHEN CONTAINS(gcle.keyword_clean, ' nova iguacu') THEN COALESCE(om.name, 'nova iguacu')
+      WHEN CONTAINS(gcle.keyword_clean, ' sao goncalo') THEN COALESCE(om.name, 'sao goncalo')
+      WHEN CONTAINS(gcle.keyword_clean, ' carapicuiba') THEN COALESCE(om.name, 'carapicuiba')
+      WHEN CONTAINS(gcle.keyword_clean, ' sbc') THEN COALESCE(om.name, 'sao bernardo do campo')
+      WHEN CONTAINS(gcle.keyword_clean, ' sbo') THEN COALESCE(om.name, 'santa barbara do oeste')
+      WHEN CONTAINS(gcle.keyword_clean, ' vcp') THEN COALESCE(om.name, 'campinas')
+      WHEN CONTAINS(gcle.keyword_clean, ' vix') THEN COALESCE(om.name, 'vitória')
+      WHEN CONTAINS(gcle.keyword_clean, ' gru') THEN COALESCE(om.name, 'guarulhos')
+      WHEN CONTAINS(gcle.keyword_clean, ' sao bernardo do campo') THEN COALESCE(om.name, 'sao bernardo do campo')
+      ELSE COALESCE(om.name, '')
     END AS match_operation_city,
-    url,
+    gcle.url,
     CASE
-      WHEN match_igbe_city != '' THEN 1
+      WHEN gcle.match_igbe_city != '' THEN 1
       ELSE 0
     END AS has_mention_to_location,
     CASE
-      WHEN match_igbe_city != '' THEN 1
+      WHEN gcle.match_igbe_city != '' THEN 1
       ELSE 0
     END AS has_mention_to_city
   FROM
     general_city_level_enrichment AS gcle
-  LEFT JOIN 
-    operation_cities AS r
-      ON CHARINDEX(r.name, gcle.keyword_clean) > 0
-  QUALIFY
-    ROW_NUMBER() OVER(
-      PARTITION BY 
-        player,
-        keyword,
-        url
-      ORDER BY 
-        LENGTH(match_operation_city) DESC, 
-        CHARINDEX(match_operation_city, keyword) DESC
-        ) = 1
+  LEFT JOIN
+    opcity_matches AS om
+      ON gcle.keyword_clean = om.keyword_clean
+),
+operation_city_level_enrichment AS (
+  SELECT
+    id_region_match_operation_city,
+    player,
+    keyword,
+    keyword_clean,
+    match_igbe_city,
+    match_operation_city,
+    url,
+    has_mention_to_location,
+    has_mention_to_city
+  FROM (
+    SELECT
+      id_region_match_operation_city,
+      player,
+      keyword,
+      keyword_clean,
+      match_igbe_city,
+      match_operation_city,
+      url,
+      has_mention_to_location,
+      has_mention_to_city,
+      ROW_NUMBER() OVER(
+        PARTITION BY
+          player,
+          keyword,
+          url
+        ORDER BY
+          LENGTH(match_operation_city) DESC,
+          LOCATE(match_operation_city, keyword) DESC
+      ) AS rn
+    FROM operation_city_level_candidates
+  ) ranked
+  WHERE rn = 1
 ),
 
 operation_neighborhoodies AS (
@@ -203,49 +286,113 @@ operation_neighborhoodies AS (
 
 -- Enrichment of keywords on neighborhood level based on our internal regions dataset. 
 -- This dataset comprehends only our operation area.
-operation_neighborhood_level_enrichment AS (
-  SELECT
-    id_region_match_operation_city,
-    r.id AS id_region_match_operation_neighborhood,
-    player,
-    keyword,
+-- Trigram equi-join + LOCATE residual (replaces CHARINDEX containment join).
+-- A few SubRegiao names are < 3 chars; they can't form a trigram key, so a small
+-- validator-exempt CROSS JOIN branch preserves them exactly.
+opnbhd_keywords AS (
+  SELECT DISTINCT keyword_clean FROM operation_city_level_enrichment
+),
+opnbhd_windows AS (
+  SELECT DISTINCT
     keyword_clean,
-    match_igbe_city,
-    match_operation_city,
+    SUBSTRING(keyword_clean, seq.pos, 3) AS window3
+  FROM opnbhd_keywords
+  LATERAL VIEW POSEXPLODE(SEQUENCE(1, GREATEST(LENGTH(keyword_clean) - 2, 0))) seq AS seq_idx, pos
+),
+opnbhd_matches AS (
+  SELECT DISTINCT
+    ow.keyword_clean AS keyword_clean,
+    r.id AS id,
+    r.name AS name
+  FROM opnbhd_windows ow
+  JOIN operation_neighborhoodies r
+    ON ow.window3 = SUBSTRING(r.name, 1, 3)
+  WHERE LENGTH(r.name) >= 3
+    AND LOCATE(r.name, ow.keyword_clean) > 0
+
+  UNION ALL
+
+  SELECT DISTINCT
+    ok.keyword_clean AS keyword_clean,
+    r.id AS id,
+    r.name AS name
+  FROM opnbhd_keywords ok
+  CROSS JOIN operation_neighborhoodies r
+  WHERE LENGTH(r.name) < 3
+    AND LOCATE(r.name, ok.keyword_clean) > 0
+),
+operation_neighborhood_level_candidates AS (
+  SELECT
+    gcle.id_region_match_operation_city,
+    om.id AS id_region_match_operation_neighborhood,
+    gcle.player,
+    gcle.keyword,
+    gcle.keyword_clean,
+    gcle.match_igbe_city,
+    gcle.match_operation_city,
     CASE
-      WHEN CONTAINS(r.name, ' ') THEN r.name
-      WHEN ARRAY_CONTAINS(SPLIT(keyword_clean, ' '), LOWER(r.name)) THEN r.name
-      WHEN r.name IS NULL THEN ''
+      WHEN CONTAINS(om.name, ' ') THEN om.name
+      WHEN ARRAY_CONTAINS(SPLIT(gcle.keyword_clean, ' '), LOWER(om.name)) THEN om.name
+      WHEN om.name IS NULL THEN ''
       ELSE ''
     END AS match_operation_neighborhood,
-    url,
+    gcle.url,
     COALESCE(
       gcle.has_mention_to_location,
       CASE
-        WHEN match_operation_city != '' THEN 1
+        WHEN gcle.match_operation_city != '' THEN 1
         ELSE 0
       END) AS has_mention_to_location,
     COALESCE(
       gcle.has_mention_to_city,
       CASE
-        WHEN match_operation_city != '' THEN 1
+        WHEN gcle.match_operation_city != '' THEN 1
         ELSE 0
       END) AS has_mention_to_city
   FROM
     operation_city_level_enrichment AS gcle
-  LEFT JOIN 
-    operation_neighborhoodies AS r
-      ON CHARINDEX(r.name, gcle.keyword_clean) > 0
-  QUALIFY
-    ROW_NUMBER() OVER(
-      PARTITION BY 
-        player,
-        keyword,
-        url
-      ORDER BY 
-        LENGTH(match_operation_neighborhood) DESC, 
-        CHARINDEX(match_operation_neighborhood, keyword) DESC
-        ) = 1
+  LEFT JOIN
+    opnbhd_matches AS om
+      ON gcle.keyword_clean = om.keyword_clean
+),
+operation_neighborhood_level_enrichment AS (
+  SELECT
+    id_region_match_operation_city,
+    id_region_match_operation_neighborhood,
+    player,
+    keyword,
+    keyword_clean,
+    match_igbe_city,
+    match_operation_city,
+    match_operation_neighborhood,
+    url,
+    has_mention_to_location,
+    has_mention_to_city
+  FROM (
+    SELECT
+      id_region_match_operation_city,
+      id_region_match_operation_neighborhood,
+      player,
+      keyword,
+      keyword_clean,
+      match_igbe_city,
+      match_operation_city,
+      match_operation_neighborhood,
+      url,
+      has_mention_to_location,
+      has_mention_to_city,
+      ROW_NUMBER() OVER(
+        PARTITION BY
+          player,
+          keyword,
+          url
+        ORDER BY
+          LENGTH(match_operation_neighborhood) DESC,
+          LOCATE(match_operation_neighborhood, keyword) DESC
+      ) AS rn
+    FROM operation_neighborhood_level_candidates
+  ) ranked
+  WHERE rn = 1
 )
 
 SELECT
