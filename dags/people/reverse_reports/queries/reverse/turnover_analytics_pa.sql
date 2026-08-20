@@ -403,12 +403,15 @@ monthly_base AS (
         NULLIF(LOWER(es.vertical), '-1') AS vertical,
         NULLIF(LOWER(es.structure), '-1') AS structure,
         NULLIF(LOWER(es.team), '-1') AS team,
-        -- Legacy notebook bucketed tenure in months (letter-prefixed for sheet sort order);
-        -- DW 2.0's own employee_tenure_range uses coarser, differently-worded buckets, so the
-        -- legacy boundaries are rebuilt here from the numeric months_employee_tenure field.
+        -- First bucket matches TARS 3moTO / New Hire Attrition via the canonical
+        -- days_employee_tenure column (< 90 days). On closed monthly snapshots this
+        -- matches hire→termination (leavers) and hire→month-end (actives). The
+        -- in-progress month can drift at the 90-day boundary until month-end close.
+        -- Later buckets keep the legacy whole-month cuts; months < 3 with days >= 90
+        -- fall into 'b. 3 a 5 meses' so the 90-day boundary does not leave a NULL hole.
         CASE
-            WHEN es.months_employee_tenure < 3 THEN 'a. menos de 3 meses'
-            WHEN es.months_employee_tenure BETWEEN 3 AND 5 THEN 'b. 3 a 5 meses'
+            WHEN es.days_employee_tenure < 90 THEN 'a. menos de 3 meses'
+            WHEN es.months_employee_tenure <= 5 THEN 'b. 3 a 5 meses'
             WHEN es.months_employee_tenure BETWEEN 6 AND 12 THEN 'c. 6 a 12 meses'
             WHEN es.months_employee_tenure BETWEEN 13 AND 18 THEN 'd. 13 a 18 meses'
             WHEN es.months_employee_tenure BETWEEN 19 AND 24 THEN 'e. 19 a 24 meses'
