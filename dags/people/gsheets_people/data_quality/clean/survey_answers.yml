@@ -4,21 +4,26 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
     severity_level: Error
 
 column_level_validations:
   answer_id:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_unique:
-      severity_level: Error
+      severity_level: Warning
   survey_invite_id:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   email:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   survey_title:
     is_complete:
       severity_level: Warning

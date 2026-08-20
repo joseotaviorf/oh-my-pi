@@ -8,9 +8,9 @@ table_level_validations:
     severity_level: Error
   has_size_variation:
     variation_type: percentage
-    greater_than_or_equal_to: 0
-    less_than_or_equal_to: 50
-    severity_level: Warning
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
 
 column_level_validations:
   id_organization:

@@ -3,18 +3,18 @@ table_name: datalake_performance.talent_review
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 8000
+    greater_than: 1
     severity_level: Error
 column_level_validations:
   assignment_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   id_period_of_service:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   has_calibrated_rating:
     is_complete:
       severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

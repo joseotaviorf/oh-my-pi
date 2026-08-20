@@ -3,18 +3,17 @@ table_name: datalake_gsheets_people_clean.codex_cost_centers
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    # Baseline (Databricks prod, 2026-03-25): 14,900 rows. 90% of baseline (~10% buffer); aligns with has_size_variation ±10%.
-    greater_than: 13410
+    greater_than: 1
     severity_level: Error
   has_size_variation:
     variation_type: percentage
     greater_than_or_equal_to: -10
-    less_than_or_equal_to: 10
-    severity_level: Warning
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   cost_center_code:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_unique:
       severity_level: Warning
   cost_center_code_matches_six_character_pattern:
@@ -32,7 +31,7 @@ column_level_validations:
       severity_level: Warning
   dt_updated:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_updated_string_matches_yyyy_mm_dd:
     custom:
       # DATE column: string form must be YYYY-MM-DD (e.g. 2026-03-01).
@@ -44,7 +43,7 @@ column_level_validations:
             dt_updated IS NOT NULL
             AND CAST(dt_updated AS STRING) NOT RLIKE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   closing_month_must_not_be_before_current_month:
     custom:
       # Warn when dt_updated (GSheets closing month) is before the current calendar month.

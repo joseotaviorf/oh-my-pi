@@ -4,15 +4,15 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
 
 column_level_validations:
   id_user:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_unique:
-      severity_level: Error
+      severity_level: Warning
   work_email:
     # Max 0.5% nulls to cover cases such as external users to QA (e.g. users with email ending in @ext.quintoandar.com.br).
     has_completeness:

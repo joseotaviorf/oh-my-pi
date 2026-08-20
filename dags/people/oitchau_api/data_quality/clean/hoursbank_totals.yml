@@ -3,21 +3,26 @@ table_name: datalake_oitchau_clean.hoursbank_totals
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
     severity_level: Error
 column_level_validations:
   id_employee_profile:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_balanced:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   year:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   month:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   day:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

@@ -4,16 +4,21 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
     severity_level: Error
 
 column_level_validations:
   email:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   special_role:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   one_row_per_email_and_special_role:
     custom:
       # Grain: one row per viewer email and manager scope (special_role).

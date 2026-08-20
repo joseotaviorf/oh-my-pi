@@ -4,8 +4,7 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    # Baseline (Databricks prod, 2026-06-26): ~3,134 active employees.
-    greater_than: 3000
+    greater_than: 1
     severity_level: Error
   has_size_variation:
     variation_type: percentage
@@ -16,13 +15,13 @@ table_level_validations:
 column_level_validations:
   assignment_number:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_hired:
     is_complete:
       severity_level: Warning
   assignment_status_type:
     is_contained_in:
       values: ['ACTIVE']
-      severity_level: Error
+      severity_level: Warning

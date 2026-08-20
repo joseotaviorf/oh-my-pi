@@ -17,15 +17,16 @@ Do not copy this policy into repo-wide rules.
 
 ## 1. Severity Classification (Error vs. Warning)
 
-A check class must maintain the **same severity level across all layers** (clean, enrich, DW, metric).
+A check class must maintain the **same severity level across all layers** (clean, enrich, DW, metric), **except** `has_size_variation` (Error on clean, Warning on DW).
 
 `severity_level: Error` is **strictly restricted** to:
 
 1. **Emptiness**: `table_level_validations.has_size` with `greater_than: 1` (fails on 0 or 1 row). Default floor is `1`.
 2. **Surrogate Keys**: `sk_*` `is_complete` and `is_unique` (omit on tables without `sk_*`).
 3. **Grain Uniqueness**: Custom `one_row_per_*` checks (`HAVING COUNT(*) > 1`).
+4. **Clean size variation**: `table_level_validations.has_size_variation` on clean tables (ingestion lost or exploded a large share of rows).
 
-`severity_level: Warning` applies to **everything else**: source completeness, enums, patterns, value ranges, `has_size_variation`, SCD overlap/abutment, snapshot `is_current` uniqueness, fact–dim SK coverage, unknown-row presence, and hierarchy roll-ups.
+`severity_level: Warning` applies to **everything else**: source completeness, enums, patterns, value ranges, DW `has_size_variation`, SCD overlap/abutment, snapshot `is_current` uniqueness, fact–dim SK coverage, unknown-row presence, and hierarchy roll-ups.
 
 Error and Warning have the **same operational behavior** today (Inmetro suite result and `PEOPLE_ALERTS`). The only difference is the name, which is stored in `datalake_data_quality.validations`.
 
@@ -33,20 +34,20 @@ In every check block (`has_size`, `has_size_variation`, `is_complete`, `custom`,
 
 ## 2. Table Size Floors and `has_size_variation`
 
-- **`has_size`**: Error floor must always be `greater_than: 1`. Replace any historical frozen baseline `> 1` with `1`. Do not use `greater_than: 0`.
-- **`has_size_variation`**: Always `Warning`. Compares this run’s row count to history as a **percentage change**. `greater_than_or_equal_to: 0` forbids shrinkage. `less_than_or_equal_to` is the maximum allowed growth.
+- **`has_size`**: Error floor must always be `greater_than: 1`. Replace any historical frozen baseline `> 1` with `1`. Do not use `greater_than: 0`. Delete comments that document a previous row-count baseline (they are meaningless with floor `1`). Volume change is monitored with `has_size_variation`, not a frozen row count.
+- **`has_size_variation`**: Compares this run’s row count to history as a **percentage change**. **Required on every clean table.** Default bounds (clean and DW): `greater_than_or_equal_to: -10` (fires on a drop larger than 10% — buffer against small churn; the goal is a failed ingest that loses a significant share of rows) and `less_than_or_equal_to: 25` (fires on growth above 25%). Clean uses `severity_level: Error`; DW uses `Warning`.
 
-**Tables that grow every load** (facts, SCD history): allow up to 25% growth.
+Any other bounds need a comment on that YAML block that **justifies the new value**.
 
 ```yaml
 has_size_variation:
   variation_type: percentage
-  greater_than_or_equal_to: 0
+  greater_than_or_equal_to: -10
   less_than_or_equal_to: 25
-  severity_level: Warning
+  severity_level: Error
 ```
 
-**Tables that barely change** (small catalogs such as `dim_job`, `dim_business_unit`): use `less_than_or_equal_to: 10` — a 25% jump would be abnormal for those tables.
+On DW, use the same bounds with `severity_level: Warning`.
 
 ## 3. Check Placement by Layer
 
@@ -54,7 +55,7 @@ Place checks at the **first landing table** that receives the raw data (e.g. PIN
 
 | Layer | Allowed Checks | Prohibited Checks |
 | --- | --- | --- |
-| **Clean** | Emptiness (`Error`); source completeness, enums, patterns, uniqueness (`Warning`). | Enrich-only model behaviors (SCD abutment, snapshot `is_current` logic). |
+| **Clean** | Emptiness (`Error`); `has_size_variation` (`Error`, required); source completeness, enums, patterns, uniqueness (`Warning`). | Enrich-only model behaviors (SCD abutment, snapshot `is_current` logic). |
 | **Enrich** | Emptiness (`Error`); grain `one_row_per_*` (`Error`); source quality and model behavior (`Warning`). | — |
 | **DW** | Emptiness (`Error`); `sk_*` complete/unique (`Error`); `has_size_variation` (`Warning`); DW modeling contracts (`is_current` uniqueness, SK coverage, unknown rows) (`Warning`). | Source completeness/enums on non-SKs; copies of enrich grain (`one_row_per_*`); SCD overlap/abutment owned by enrich. |
 
@@ -91,8 +92,9 @@ column_level_validations:
 
 ## Agent Checklist
 
-- [ ] `severity_level: Error` is applied **only** to `has_size.greater_than: 1`, `sk_*` complete/unique, or `one_row_per_*` grain.
+- [ ] `severity_level: Error` is applied **only** to `has_size.greater_than: 1`, `sk_*` complete/unique, `one_row_per_*` grain, or clean `has_size_variation`.
 - [ ] No `has_size` Error floor is set to `0` or `> 1`.
+- [ ] Every clean table has `has_size_variation` (Error, default `-10` / `25`). Other bounds need a comment that justifies the new value.
 - [ ] Source data defects are validated on the first landing table in Clean.
 - [ ] DW layer does not duplicate source completeness, enrich grain, or enrich SCD logic.
 - [ ] Standard Deequ checks and `custom` rules use separate sibling keys with descriptive names and intent comments.
