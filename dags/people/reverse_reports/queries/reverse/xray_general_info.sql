@@ -202,10 +202,10 @@ employee_base AS (
             ELSE 'Dismissed'
         END AS status,
         LOWER(es.band) AS banda,
-        LOWER(
+        INITCAP(
             COALESCE(
-                es.manager_work_email,
-                mgr_emp.work_email
+                NULLIF(es.manager_name, ''),
+                mgr_emp.name
             )
         ) AS gestor,
         INITCAP(es.job_name) AS cargo,
@@ -269,13 +269,13 @@ employee_base AS (
             THEN ftr.tempo_na_banda_em_meses
             ELSE NULL
         END AS tempo_na_banda_em_meses,
-        LOWER(es.email_l1) AS L1,
-        LOWER(es.email_l2) AS L2,
-        LOWER(es.email_l3) AS L3,
-        LOWER(es.email_l4) AS L4,
-        LOWER(es.email_l5) AS L5,
-        LOWER(es.email_l6) AS L6,
-        LOWER(es.email_l7) AS L7,
+        INITCAP(NULLIF(es.name_l1, '')) AS L1,
+        INITCAP(NULLIF(es.name_l2, '')) AS L2,
+        INITCAP(NULLIF(es.name_l3, '')) AS L3,
+        INITCAP(NULLIF(es.name_l4, '')) AS L4,
+        INITCAP(NULLIF(es.name_l5, '')) AS L5,
+        INITCAP(NULLIF(es.name_l6, '')) AS L6,
+        INITCAP(NULLIF(es.name_l7, '')) AS L7,
         LOWER(
             COALESCE(
                 es.hrbp_work_email,
