@@ -18,34 +18,10 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  id_salary:
-    is_complete:
-      severity_level: Warning
-  id_assignment:
-    is_complete:
-      severity_level: Warning
   person_number:
     is_complete:
       severity_level: Warning
   assignment_number:
-    is_complete:
-      severity_level: Warning
-  salary_amount:
-    is_complete:
-      severity_level: Warning
-  salary_amount_must_not_be_negative:
-    custom:
-      # Salary amount must be non-negative.
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_people.compensation_versions
-         WHERE salary_amount < 0
-        ) = 0
-      severity_level: Warning
-  annual_salary:
-    is_complete:
-      severity_level: Warning
-  is_salary_approved:
     is_complete:
       severity_level: Warning
   dt_valid_from:

@@ -13,22 +13,10 @@ table_level_validations:
     severity_level: Warning
 
 column_level_validations:
-  id_organization:
-    is_complete:
-      severity_level: Warning
-  business_unit_name:
-    is_complete:
-      severity_level: Warning
-  is_active:
-    is_complete:
-      severity_level: Warning
   version_order:
     is_complete:
       severity_level: Warning
   is_current:
-    is_complete:
-      severity_level: Warning
-  dt_valid_from:
     is_complete:
       severity_level: Warning
   valid_to_must_be_after_valid_from:

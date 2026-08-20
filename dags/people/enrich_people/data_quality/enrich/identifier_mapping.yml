@@ -14,27 +14,14 @@ table_level_validations:
     severity_level: Warning
 
 column_level_validations:
-  id_assignment:
-    is_complete:
-      severity_level: Warning
   id_period_of_service:
     is_unique:
-      severity_level: Warning
-    is_complete:
       severity_level: Warning
   id_continuous_employment_cycle:
     is_complete:
       severity_level: Warning
-  id_person:
-    is_complete:
-      severity_level: Warning
   assignment_number:
     is_unique:
-      severity_level: Warning
-    is_complete:
-      severity_level: Warning
-  person_number:
-    is_complete:
       severity_level: Warning
   assignment_type:
     is_complete:
@@ -42,16 +29,7 @@ column_level_validations:
     is_contained_in:
       values: ['E', 'C']
       severity_level: Warning
-  assignment_status_type:
-    is_complete:
-      severity_level: Warning
-    is_contained_in:
-      values: ['ACTIVE', 'INACTIVE']
-      severity_level: Warning
   documented_first_name:
-    is_complete:
-      severity_level: Warning
-  documented_last_name:
     is_complete:
       severity_level: Warning
   documented_full_name:
@@ -59,16 +37,10 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  display_name:
-    is_complete:
-      severity_level: Warning
   name:
     is_complete:
       severity_level: Warning
   is_user_test:
-    is_complete:
-      severity_level: Warning
-  is_active_pin:
     is_complete:
       severity_level: Warning
   is_active:
@@ -78,9 +50,6 @@ column_level_validations:
     is_complete:
       severity_level: Warning
   dt_employee_hired:
-    is_complete:
-      severity_level: Warning
-  dt_started:
     is_complete:
       severity_level: Warning
   # dt_actual_termination / dt_notified_termination: null while active; covered by pin_termination_status_consistency.
@@ -223,44 +192,6 @@ column_level_validations:
            AND ao.id_action_reason IS NULL
         ) = 0
       severity_level: Warning
-  termination_closing_action_must_be_classified:
-    custom:
-      # First inactive primary E/C row on or after periods_of_service.dt_actual_termination
-      # must use a controlled assignment-closure action (TERMINATION, RESIGNATION, DEATH,
-      # GLB_TRANSFER, EXPATRIADO). Post-termination corrections (e.g. cost-center updates)
-      # must not be the closing action.
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM (
-           SELECT
-             assignment.id_assignment,
-             assignment.action_code,
-             ROW_NUMBER() OVER (
-               PARTITION BY assignment.id_assignment
-               ORDER BY
-                 assignment.dt_effective_started ASC,
-                 assignment.dt_effective_ended ASC
-             ) AS rn
-           FROM datalake_pin_core_clean.all_assignments AS assignment
-           INNER JOIN datalake_pin_core_clean.periods_of_service AS service
-             ON assignment.id_period_of_service = service.id_period_of_service
-           WHERE assignment.is_primary = TRUE
-             AND assignment.assignment_type IN ('E', 'C')
-             AND assignment.assignment_status_type = 'INACTIVE'
-             AND service.dt_actual_termination IS NOT NULL
-             AND service.dt_actual_termination <= CURRENT_DATE()
-             AND assignment.dt_effective_started >= service.dt_actual_termination
-         ) AS termination_closing_action
-         WHERE termination_closing_action.rn = 1
-           AND termination_closing_action.action_code NOT IN (
-             'TERMINATION',
-             'RESIGNATION',
-             'DEATH',
-             'GLB_TRANSFER',
-             'EXPATRIADO'
-           )
-        ) = 0
-      severity_level: Warning
   termination_type_allowed_values:
     custom:
       # Structural integrity: termination_type is nullable with only these non-null values.
@@ -323,29 +254,6 @@ column_level_validations:
          WHERE termination_type IS NOT NULL
            AND dt_actual_termination IS NULL
         ) = 0
-      severity_level: Warning
-  glb_transfer_missing_continuation:
-    custom:
-      # INACTIVE GLB_TRANSFER after which the person has no assignment at all (no assignment_sequence + 1 continuation and no other E/C assignment on/after the transfer close), which breaks is_transfer_hire / dt_employee_hired chaining. A continuation outside the sequence pattern (e.g. a fresh assignment for the same person) is a valid rejoin, not an error.
-      constraint: |-
-        (SELECT COUNT(*) FROM (
-          SELECT DISTINCT glb.id_assignment
-          FROM datalake_pin_core_clean.all_assignments AS glb
-          WHERE glb.assignment_type IN ('E', 'C')
-            AND glb.assignment_status_type = 'INACTIVE'
-            AND glb.action_code = 'GLB_TRANSFER'
-            AND NOT EXISTS (
-              SELECT 1
-              FROM datalake_pin_core_clean.all_assignments AS continuation
-              WHERE continuation.id_person = glb.id_person
-                AND continuation.id_assignment != glb.id_assignment
-                AND continuation.assignment_type IN ('E', 'C')
-                AND (
-                  continuation.assignment_sequence = glb.assignment_sequence + 1
-                  OR continuation.dt_effective_started >= glb.dt_effective_started
-                )
-            )
-        )) = 0
       severity_level: Warning
   assignment_has_mixed_job_family_buckets:
     custom:

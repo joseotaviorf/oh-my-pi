@@ -14,8 +14,81 @@ column_level_validations:
   id_assignment:
     is_complete:
       severity_level: Warning
+  id_period_of_service:
+    is_complete:
+      severity_level: Warning
+  assignment_number:
+    is_complete:
+      severity_level: Warning
+  assignment_status_type:
+    is_complete:
+      severity_level: Warning
+    is_contained_in:
+      values: ['ACTIVE', 'INACTIVE']
+      severity_level: Warning
   one_row_per_assignment_action_occurrence_and_effective_start:
     custom:
       # No duplicate rows for the same (id_action_occurrence, id_assignment, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.all_assignments GROUP BY id_action_occurrence, id_assignment, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
+  termination_closing_action_must_be_classified:
+    custom:
+      # First inactive primary E/C row on or after periods_of_service.dt_actual_termination
+      # must use a controlled assignment-closure action (TERMINATION, RESIGNATION, DEATH,
+      # GLB_TRANSFER, EXPATRIADO). Post-termination corrections (e.g. cost-center updates)
+      # must not be the closing action.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             assignment.id_assignment,
+             assignment.action_code,
+             ROW_NUMBER() OVER (
+               PARTITION BY assignment.id_assignment
+               ORDER BY
+                 assignment.dt_effective_started ASC,
+                 assignment.dt_effective_ended ASC
+             ) AS rn
+           FROM datalake_pin_core_clean.all_assignments AS assignment
+           INNER JOIN datalake_pin_core_clean.periods_of_service AS service
+             ON assignment.id_period_of_service = service.id_period_of_service
+           WHERE assignment.is_primary = TRUE
+             AND assignment.assignment_type IN ('E', 'C')
+             AND assignment.assignment_status_type = 'INACTIVE'
+             AND service.dt_actual_termination IS NOT NULL
+             AND service.dt_actual_termination <= CURRENT_DATE()
+             AND assignment.dt_effective_started >= service.dt_actual_termination
+         ) AS termination_closing_action
+         WHERE termination_closing_action.rn = 1
+           AND termination_closing_action.action_code NOT IN (
+             'TERMINATION',
+             'RESIGNATION',
+             'DEATH',
+             'GLB_TRANSFER',
+             'EXPATRIADO'
+           )
+        ) = 0
+      severity_level: Warning
+  glb_transfer_missing_continuation:
+    custom:
+      # INACTIVE GLB_TRANSFER after which the person has no assignment at all (no assignment_sequence + 1 continuation and no other E/C assignment on/after the transfer close), which breaks is_transfer_hire / dt_employee_hired chaining. A continuation outside the sequence pattern (e.g. a fresh assignment for the same person) is a valid rejoin, not an error.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT DISTINCT glb.id_assignment
+          FROM datalake_pin_core_clean.all_assignments AS glb
+          WHERE glb.assignment_type IN ('E', 'C')
+            AND glb.assignment_status_type = 'INACTIVE'
+            AND glb.action_code = 'GLB_TRANSFER'
+            AND NOT EXISTS (
+              SELECT 1
+              FROM datalake_pin_core_clean.all_assignments AS continuation
+              WHERE continuation.id_person = glb.id_person
+                AND continuation.id_assignment != glb.id_assignment
+                AND continuation.assignment_type IN ('E', 'C')
+                AND (
+                  continuation.assignment_sequence = glb.assignment_sequence + 1
+                  OR continuation.dt_effective_started >= glb.dt_effective_started
+                )
+            )
+        )) = 0
+      severity_level: Warning

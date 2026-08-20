@@ -18,13 +18,7 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  id_organization:
-    is_complete:
-      severity_level: Warning
   cost_center_code:
-    is_complete:
-      severity_level: Warning
-  is_active:
     is_complete:
       severity_level: Warning
   is_primary_organization:

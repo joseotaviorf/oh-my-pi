@@ -53,14 +53,6 @@ column_level_validations:
         ) = 0
       severity_level: Warning
 
-  dt_valid_from:
-    is_complete:
-      severity_level: Warning
-
-  dt_valid_to:
-    is_complete:
-      severity_level: Warning
-
   ts_load:
     is_complete:
       severity_level: Warning

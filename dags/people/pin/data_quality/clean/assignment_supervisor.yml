@@ -14,6 +14,12 @@ column_level_validations:
   id_assignment_supervisor:
     is_complete:
       severity_level: Warning
+  dt_effective_started:
+    is_complete:
+      severity_level: Warning
+  dt_effective_ended:
+    is_complete:
+      severity_level: Warning
   one_row_per_assignment_supervisor_and_effective_start:
     custom:
       # No duplicate rows for the same (id_assignment_supervisor, dt_effective_started).
