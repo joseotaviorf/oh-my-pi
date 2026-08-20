@@ -33,11 +33,11 @@ columns:
     lineage:
     - datalake_visit.visits.id_user_visit_request
   sk_first_associated_agent:
-    description: Is the Id of the first agent who was associated with the visit.
+    description: Is the sk_user of the first agent who was associated with the visit.
     lineage:
     - datalake_visit.visits.id_first_associated_agent
   sk_last_associated_agent:
-    description: Is the Id of the last agent who was associated with the visit.
+    description: Is the sk_user of the last agent who was associated with the visit.
     lineage:
     - datalake_visit.visits.id_last_associated_agent
   sk_fixed_agent:
