@@ -120,7 +120,8 @@ workflow:
       endpoint_path: v1/organizations/analytics/users
       extraction_type: incremental
       date_format: "%Y-%m-%d"
-      date_filter_column: date
+      # "date" is only the request param name; the response field is last_activity_date.
+      date_filter_column: last_activity_date
       # Vendor publishes analytics/users a day behind and rejects unpublished
       # dates with a 400; shift back two days for margin on the 09:00 UTC run.
       extra_query_template_params:
