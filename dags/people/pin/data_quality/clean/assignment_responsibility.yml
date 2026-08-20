@@ -4,7 +4,12 @@ alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
     greater_than: 1
-    severity_level: Warning
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   id_assignment_responsibility:
     is_complete:
@@ -21,7 +26,7 @@ column_level_validations:
     custom:
       # No duplicate rows for the same (responsibility_name, id_person).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.assignment_responsibility GROUP BY responsibility_name, id_person HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
+      severity_level: Error
   responsibility_type:
     is_complete:
       severity_level: Warning

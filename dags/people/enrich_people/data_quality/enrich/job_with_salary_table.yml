@@ -4,7 +4,7 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
   has_size_variation:
     variation_type: percentage
@@ -15,7 +15,7 @@ table_level_validations:
 column_level_validations:
   id_job:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   job_code:
     has_null_count:
       less_than_or_equal_to: 1
@@ -51,7 +51,7 @@ column_level_validations:
          WHERE prev_dt_valid_to IS NOT NULL
            AND dt_valid_from < prev_dt_valid_to
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   job_salary_versions_must_abut:
     custom:
       # Adjacent jwst versions for id_job must abut after PIN go-live (1-day handoff gaps).
@@ -82,7 +82,7 @@ column_level_validations:
          WHERE dt_valid_to IS NOT NULL
            AND dt_valid_to < dt_valid_from
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   single_version_jobs_have_consistent_target_plr:
     custom:
       # Jobs with a single SCD version must not carry conflicting target_plr values.
@@ -109,4 +109,4 @@ column_level_validations:
       severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

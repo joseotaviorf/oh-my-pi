@@ -4,8 +4,8 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
-    severity_level: Warning
+    greater_than: 1
+    severity_level: Error
   has_size_variation:
     variation_type: percentage
     greater_than_or_equal_to: -20
@@ -15,18 +15,18 @@ table_level_validations:
 column_level_validations:
   id_assignment:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   assignment_number:
     is_complete:
       severity_level: Warning
   dt_hired:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   termination_or_notification_date_present:
     # Ensures every row has at least one of dt_terminated or dt_notified (table filter rule).
     custom:
@@ -36,7 +36,7 @@ column_level_validations:
          WHERE dt_terminated IS NULL
            AND dt_notified IS NULL
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

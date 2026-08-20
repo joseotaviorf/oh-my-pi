@@ -4,23 +4,23 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
   has_size_variation:
     variation_type: percentage
-    greater_than_or_equal_to: 0
+    greater_than_or_equal_to: -10
     less_than_or_equal_to: 25
-    severity_level: Warning
+    severity_level: Error
 
 column_level_validations:
   id_discussion_topic:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_unique:
-      severity_level: Error
+      severity_level: Warning
   id_check_in_meeting:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   topic_type:
     is_complete:
       severity_level: Warning

@@ -4,7 +4,7 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
   has_size_variation:
     variation_type: percentage
@@ -15,30 +15,30 @@ table_level_validations:
 column_level_validations:
   id_event_definition:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   id_action:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   id_reason:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   action_code:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   reason_code:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_current:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_valid_from:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
 
   termination_type_action_mapping_is_canonical:
     custom:

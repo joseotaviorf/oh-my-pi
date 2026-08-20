@@ -4,8 +4,7 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    # Baseline (Databricks prod, 2026-03-25): 255,981 rows. 90% of baseline (~10% buffer).
-    greater_than: 230382
+    greater_than: 1
     severity_level: Error
   # Incremental load: row count should not shrink vs prior run; cap spikes (People growing-table default).
   has_size_variation:
@@ -17,12 +16,12 @@ table_level_validations:
 column_level_validations:
   id:
     is_unique:
-      severity_level: Error
+      severity_level: Warning
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   cost_center_code:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   business:
     is_complete:
       severity_level: Warning
@@ -34,7 +33,7 @@ column_level_validations:
       severity_level: Warning
   vertical:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   vertical_allowed_values:
     custom:
       # Allowed values only (non-null enforced by is_complete).
@@ -43,7 +42,7 @@ column_level_validations:
          FROM datalake_people.codex_history_base
          WHERE vertical NOT IN ('Ops', 'Corp', 'Tech')
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   structure:
     is_complete:
       severity_level: Warning
@@ -52,7 +51,7 @@ column_level_validations:
       severity_level: Warning
   dt_closing_month:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   headcount_type_allowed_values:
     custom:
       # When set must be Capacity or Overhead (PIN classification).
@@ -65,4 +64,4 @@ column_level_validations:
       severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

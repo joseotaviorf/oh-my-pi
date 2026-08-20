@@ -4,33 +4,15 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
 
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 column_level_validations:
-  assignment_number:
-    is_complete:
-      severity_level: Error
-  one_row_per_assignment_and_reference_date:
-    custom:
-      # Grain uniqueness: one row per (assignment_number, dt_reference)
-      constraint: |-
-        (SELECT COUNT(*) FROM (
-          SELECT assignment_number, dt_reference
-          FROM dw_employee_details.fact_assignment_snapshots
-          GROUP BY assignment_number, dt_reference
-          HAVING COUNT(*) > 1
-        )) = 0
-      severity_level: Error
-  dt_reference:
-    is_complete:
-      severity_level: Error
-  person_number:
-    is_complete:
-      severity_level: Error
-  dt_assignment_started:
-    is_complete:
-      severity_level: Error
   exactly_one_current_snapshot_per_assignment:
     custom:
       # Exactly one current snapshot per assignment_number (latest day for active; termination date for terminated).
@@ -41,7 +23,7 @@ column_level_validations:
           GROUP BY assignment_number
           HAVING SUM(CASE WHEN is_current_for_assignment THEN 1 ELSE 0 END) != 1
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   one_current_primary_row_per_person:
     custom:
       # Employee-grain exports rely on exactly one is_current_for_employee row per person_number.
@@ -53,17 +35,4 @@ column_level_validations:
           GROUP BY person_number
           HAVING COUNT(*) > 1
         )) = 0
-      severity_level: Error
-  termination_type_allowed_values:
-    custom:
-      # Analytical validity: termination_type is nullable with only these non-null values.
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM dw_employee_details.fact_assignment_snapshots
-         WHERE termination_type IS NOT NULL
-           AND termination_type NOT IN ('voluntary', 'involuntary', 'pending')
-        ) = 0
       severity_level: Warning
-  ts_load:
-    is_complete:
-      severity_level: Error

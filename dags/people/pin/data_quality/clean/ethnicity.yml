@@ -5,6 +5,11 @@ table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   id_ethnicity:
     is_complete:
@@ -13,5 +18,5 @@ column_level_validations:
     custom:
       # No duplicate rows for the same (id_ethnicity, object_version_number).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.ethnicity GROUP BY id_ethnicity, object_version_number HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
+      severity_level: Error
 

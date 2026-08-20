@@ -5,6 +5,11 @@ table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   id_question:
     is_complete:
@@ -13,4 +18,4 @@ column_level_validations:
     custom:
       # id_question + question_version_number should be unique (versioned grain, not object_version_number)
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_questionnaires_clean.question_base GROUP BY id_question, question_version_number HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
+      severity_level: Error

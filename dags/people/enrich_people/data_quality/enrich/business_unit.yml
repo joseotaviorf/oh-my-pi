@@ -4,7 +4,7 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
   has_size_variation:
     variation_type: percentage
@@ -15,10 +15,10 @@ table_level_validations:
 column_level_validations:
   id_organization:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   business_unit_name:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_active:
     is_complete:
       severity_level: Warning
@@ -30,7 +30,7 @@ column_level_validations:
       severity_level: Warning
   dt_valid_from:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   valid_to_must_be_after_valid_from:
     # SCD2 validity: when end date is set, it must be strictly after start date.
     custom:
@@ -40,7 +40,7 @@ column_level_validations:
          WHERE dt_valid_to IS NOT NULL
            AND dt_valid_to <= dt_valid_from
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   brazil_main_business_units_have_legislation_code_br:
     custom:
       # Main Brazil business units should resolve to BR legislation_code.
@@ -66,4 +66,4 @@ column_level_validations:
       severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

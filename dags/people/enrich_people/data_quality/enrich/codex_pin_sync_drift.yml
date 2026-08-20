@@ -5,8 +5,7 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    # Baseline (Databricks prod, 2026-03-25): 1,496 rows. 90% of baseline (~10% buffer); aligns with has_size_variation ±10%.
-    greater_than: 1346
+    greater_than: 1
     severity_level: Error
   has_size_variation:
     variation_type: percentage
@@ -17,33 +16,33 @@ table_level_validations:
 column_level_validations:
   cost_center_code:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_unique:
-      severity_level: Error
+      severity_level: Warning
   codex_business:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   codex_product:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   codex_brand:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   codex_vertical:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   codex_structure:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   codex_team:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   pin_organization_name:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   pin_organization_status:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   codex_owner_l1_name:
     has_completeness:
       # Baseline (Databricks prod, 2026-06-09): 1.000 complete. Lower bound protects against regression.

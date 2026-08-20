@@ -5,6 +5,11 @@ table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   id_valid_grade:
     is_complete:
@@ -13,7 +18,7 @@ column_level_validations:
     custom:
       # No duplicate rows for the same (id_valid_grade, dt_effective_started, dt_effective_ended).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.valid_grades GROUP BY id_valid_grade, dt_effective_started, dt_effective_ended HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
+      severity_level: Error
   valid_grade_versions_must_abut:
     custom:
       # Adjacent SCD versions for (id_job, id_grade) must abut after PIN go-live (jobs may have multiple grades).

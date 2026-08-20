@@ -5,6 +5,11 @@ table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   id_allocated_task:
     is_complete:
@@ -13,4 +18,4 @@ column_level_validations:
     custom:
       # id_allocated_task + language + object_version_number should be unique
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.allocated_task_translation GROUP BY id_allocated_task, language, object_version_number HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
+      severity_level: Error

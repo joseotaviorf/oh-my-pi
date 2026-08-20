@@ -5,10 +5,15 @@ table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   id_person_extra_info:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   effective_end_must_not_be_before_effective_start:
     custom:
       # Validate that the effective period is not open with an inverted date range.

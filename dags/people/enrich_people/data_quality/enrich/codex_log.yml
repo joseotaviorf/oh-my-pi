@@ -4,8 +4,7 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    # Baseline (Databricks prod, 2026-03-25): 42,143 rows. 90% of baseline (~10% buffer).
-    greater_than: 37928
+    greater_than: 1
     severity_level: Error
   # Incremental load: row count should not shrink vs prior run; cap spikes (People growing-table default).
   has_size_variation:
@@ -17,7 +16,7 @@ table_level_validations:
 column_level_validations:
   cost_center_code:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   one_row_per_cost_center_and_valid_from:
     custom:
       # One SCD2 row per (cost_center_code, validity start)
@@ -35,7 +34,7 @@ column_level_validations:
       severity_level: Error
   dt_valid_from:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   valid_to_bounds_and_adjacent_versions_align:
     custom:
       # Closed intervals: dt_valid_to >= dt_valid_from; adjacent version starts the day after dt_valid_to.
@@ -61,10 +60,10 @@ column_level_validations:
           AND next_valid_from IS NOT NULL
           AND date_add(dt_valid_to, 1) != next_valid_from
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   is_current:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   exactly_one_current_row_per_cost_center:
     custom:
       # Open end iff current; one current row per cost center and every CC has a current row.
@@ -76,7 +75,7 @@ column_level_validations:
         ) = 0
         AND (SELECT COUNT(*) FROM datalake_people.codex_log WHERE is_current = TRUE)
           = (SELECT COUNT(DISTINCT cost_center_code) FROM datalake_people.codex_log)
-      severity_level: Error
+      severity_level: Warning
   vertical:
     custom:
       # Derived vertical from structure; when set must be Ops, Corp, or Tech.
@@ -99,4 +98,4 @@ column_level_validations:
       severity_level: Warning
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning

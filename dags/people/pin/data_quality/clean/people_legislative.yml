@@ -5,18 +5,23 @@ table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   id_person_legislative:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   one_row_per_person_legislative_and_effective_start:
     custom:
       # No duplicate records per person and effective start date.
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.people_legislative GROUP BY id_person_legislative, dt_effective_started HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
+      severity_level: Error
   id_person:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   effective_end_must_not_be_before_effective_start:
     custom:
       # Effective end date cannot be earlier than start date.

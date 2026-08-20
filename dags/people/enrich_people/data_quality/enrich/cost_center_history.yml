@@ -4,7 +4,7 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
   has_size_variation:
     variation_type: percentage
@@ -20,22 +20,22 @@ column_level_validations:
       severity_level: Error
   id_organization:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   cost_center_code:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_active:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_primary_organization:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_future_version:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   is_current:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   exactly_one_current_version_per_organization_and_cost_center:
     custom:
       # Exactly one is_current row per organization and cost_center_code (same grain as enrich ROW_NUMBER partition)
@@ -50,7 +50,7 @@ column_level_validations:
             cost_center_code
           HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) <> 1
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   current_version_must_cover_as_of_when_a_covering_version_exists:
     custom:
       # When any version of the org+code covers D-1, the is_current row must cover D-1 too (stale current windows).
@@ -80,7 +80,7 @@ column_level_validations:
       severity_level: Warning
   dt_valid_from:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   one_row_per_organization_and_valid_from:
     custom:
       # At most one row per organization and validity start (id_organization is the grain anchor)

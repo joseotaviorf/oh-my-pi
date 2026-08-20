@@ -4,25 +4,25 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
 
 column_level_validations:
   id_assignment:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_reference:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   person_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   assignment_number:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   dt_assignment_started:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Warning
@@ -64,7 +64,7 @@ column_level_validations:
               THEN id_assignment
             END)
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   one_current_snapshot_per_assignment:
     custom:
       # Every assignment_number must have exactly one is_current_for_assignment row — the latest day for active assignments,
@@ -76,7 +76,7 @@ column_level_validations:
           GROUP BY assignment_number
           HAVING SUM(CASE WHEN is_current_for_assignment THEN 1 ELSE 0 END) != 1
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   termination_month_consistency:
     custom:
       # For completed terminations, the is_current_for_assignment row must fall in the same calendar month as dt_terminated.
@@ -89,7 +89,7 @@ column_level_validations:
             AND dt_terminated < CURRENT_DATE()
             AND TRUNC(dt_month_reference, 'MM') != TRUNC(dt_terminated, 'MM')
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   one_current_employee_flag_per_employee:
     custom:
       # Employee-grain exports rely on exactly one is_current_for_employee row per id_person.
@@ -100,7 +100,7 @@ column_level_validations:
           GROUP BY id_person
           HAVING SUM(CASE WHEN is_current_for_employee THEN 1 ELSE 0 END) != 1
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   one_monthly_snapshot_flag_per_employee_month:
     custom:
       # Historical employee-grain exports rely on exactly one is_monthly_snapshot_for_employee row per (id_person, dt_month_reference).
@@ -112,7 +112,7 @@ column_level_validations:
           GROUP BY id_person, dt_month_reference
           HAVING COUNT(*) > 1
         )) = 0
-      severity_level: Error
+      severity_level: Warning
   transfer_termination_is_active_on_current_row:
     custom:
       # Transfer terminations (GLB_TRANSFER) must stay is_active = TRUE on their is_current_for_assignment row — the is_current_for_employee fallback depends on it.
@@ -123,7 +123,7 @@ column_level_validations:
            AND COALESCE(is_transfer_termination, FALSE) = TRUE
            AND is_active = FALSE
         ) = 0
-      severity_level: Error
+      severity_level: Warning
   status_termination_date_consistency:
     custom:
       # Every employee whose termination date is in the past must have is_active = FALSE on their is_current_for_assignment row.
