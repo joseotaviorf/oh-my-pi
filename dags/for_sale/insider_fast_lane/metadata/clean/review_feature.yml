@@ -1,51 +1,51 @@
-database_name: datalake_insider_teste_clean
+database_name: datalake_insider_clean
 table_name: review_feature
 description: >
   One row per feature evaluated within a review in the Insider platform. Represents
   the granular score given to a specific evaluation feature for a given resource,
   linking the review to its feature and resource dimensions. Includes the selected
   rating value and an optional comment for that feature. Source system is Insider.
-domain: Support and Services
-owner: gabriel.firmino@quintoandar.com.br
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_insider_teste_raw.review_feature.id
+      - datalake_insider_raw.review_feature.id
     description: Unique identifier for the review feature score record in Insider.
   id_review:
     lineage:
-      - datalake_insider_teste_raw.review_feature.review_id
+      - datalake_insider_raw.review_feature.review_id
     description: Identifier of the parent review (from review table) this feature score belongs to.
   id_feature:
     lineage:
-      - datalake_insider_teste_raw.review_feature.feature_id
+      - datalake_insider_raw.review_feature.feature_id
     description: Identifier of the evaluation feature (from feature table) being scored in this record.
   id_resource:
     lineage:
-      - datalake_insider_teste_raw.review_feature.resource_id
+      - datalake_insider_raw.review_feature.resource_id
     description: Identifier of the resource (from resource table) being evaluated on this feature within the review.
   rating_selected:
     lineage:
-      - datalake_insider_teste_raw.review_feature.rating_selected
+      - datalake_insider_raw.review_feature.rating_selected
     description: The rating option chosen by the reviewer for this feature, matching one of the values defined in feature.rating_options.
   comment:
     lineage:
-      - datalake_insider_teste_raw.review_feature.comment
+      - datalake_insider_raw.review_feature.comment
     description: Optional free-text comment provided by the reviewer to explain the rating given for this specific feature.
   op_cdc:
-    description: CDC operation type captured by Debezium for this row.
     lineage:
-      - datalake_insider_teste_raw.review_feature.op_cdc
+      - datalake_insider_raw.review_feature.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
     categories:
       r: Read/snapshot - initial load of existing records.
       c: Create - new record inserted.
       u: Update - existing record modified.
       d: Delete - record removed.
   ts_cdc_transaction:
-    description: Timestamp when Debezium captured the CDC event for this row (millisecond precision).
     lineage:
-      - datalake_insider_teste_raw.review_feature.ts_cdc_transaction
+      - datalake_insider_raw.review_feature.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
   ts_database_transaction:
-    description: Timestamp of the original database transaction in Insider for this row.
     lineage:
-      - datalake_insider_teste_raw.review_feature.ts_database_transaction
+      - datalake_insider_raw.review_feature.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
