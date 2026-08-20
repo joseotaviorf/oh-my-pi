@@ -44,7 +44,7 @@ SELECT
     CAST(d.ts_report AS TIMESTAMP) AS ts_report,
     GET_JSON_OBJECT(
         d.json_data,
-        CONCAT('$.metric_results["', e.metric_id, '"]')
+        CONCAT("$.metric_results['", e.metric_id, "']")
     ) AS metric_result_json
 FROM
     deduped AS d
