@@ -1,0 +1,104 @@
+database_name: datalake_sap_accounting_process
+table_name: rental_guarantee_invoice
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description:
+  Table to track the Rental Guarantee share of revenue account 420010, following the route between source (rental-guarantee) and SAP through the SAP Gateway payload system.
+  Account 420010 is fed by two independent producers - Seu Barriga (Retsuko), reconciled by retsuko_invoice, and Rental Guarantee, reconciled here. The two are separated by the SAP accounting_rule - pro-guarantor-nf and standalone-nf belong to Rental Guarantee, while the invoice-*-pro-guarantor-5A-installment rules belong to Seu Barriga - and by source_name and accounting_name in the output.
+  It applies business rules for IPO to assess completeness, correctness (up to R$0.05 deviation), and temporality (same calendar month as the source trigger, or the next month with at most three Brazilian business days between trigger and SAP reference dates).
+  The final output includes a status classification and failure reason to support monitoring and root-cause analysis.
+columns:
+  id_accounting_process:
+    description: Unique key for each record on this table, derived from the rental-guarantee SAP dispatch id and the account number.
+    lineage:
+      - .id_accounting_process
+  id_business_entity:
+    description: Business key for the guarantee. Rental Guarantee always sends the guarantee id in this field, unlike Seu Barriga which sends the contract id, so values from the two sources can collide and must be read together with source_name.
+    lineage:
+      - datalake_rental_guarantee_clean.sap.id_business_entity
+  id_finance_entity:
+    description: Business key for the charge, or for the internal invoice when the shouldRefactorRevenueRecognition flag is active on revenue recognition triggers.
+    lineage:
+      - datalake_rental_guarantee_clean.sap.id_finance_entity
+  id_finance_entity_entry:
+    description: Identifier of the rental-guarantee SAP dispatch row, which is the grain of this table. Rental Guarantee does not expose an entry level id on this route, so the dispatch id plays that role - the SAP ledger itself carries the literal 'rental-guarantee' in its id_finance_entity_entry column for these postings.
+    lineage:
+      - datalake_rental_guarantee_clean.sap.id
+  version:
+    description: Revenue recognition flow that produced the dispatch, in lower case (pix_revenue_recognition, credit_card_revenue_recognition, standalone_revenue_recognition).
+    lineage:
+      - datalake_rental_guarantee_clean.sap.trigger
+  business_unit:
+    description: Identifier created into this table for segmented the business unit (e.g. for rent).
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice.business_unit
+  source_name:
+    description: Origin system of the transaction, fixed as rental guarantee, which is what distinguishes these 420010 records from the Seu Barriga ones produced by retsuko_invoice. The scope is enforced on three independent legs - the dispatch table only holds rental-guarantee events, the gateway leg is joined to datalake_sap_gateway_clean.feature on source = 'rental-guarantee', and the ledger leg is restricted to the pro-guarantor-nf and standalone-nf accounting rules.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice.source_name
+  accounting_type:
+    description: Information of type using for segregated accounts (e.g. invoice or revenue share).
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice.accounting_type
+  account_number:
+    description: Identifier of accounts used by controllership accounting process in SAP, fixed as 420010.
+    lineage:
+      - datalake_pas.ledger.account_number
+  accounting_name:
+    description: Human readable name for the SAP account as used by Finance, fixed as rental guarantee.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice.accounting_name
+  source_amount:
+    description: Recognized revenue amount sent by rental-guarantee in the dispatch payload.
+    lineage:
+      - datalake_rental_guarantee_clean.sap.amount
+  sap_amount:
+    description: Value recorded in SAP for the dispatch, summed over the 420010 ledger lines that share the nota fiscal hash produced by the SAP Gateway for that feature.
+    lineage:
+      - datalake_pas.ledger.debit_credit
+  is_completeness:
+    description: Indicates whether the dispatch reached a 420010 posting in SAP under the pro-guarantor-nf or standalone-nf accounting rules.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice.is_completeness
+  is_correctness:
+    description: TRUE if the difference between source and SAP amount is less than R$0.05.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice.is_correctness
+  is_temporality:
+    description: TRUE if dt_sap_reference and dt_source_trigger are in the same calendar month, or if dt_sap_reference is in the month immediately after dt_source_trigger and there are at most three Brazilian business days (datalake_quintoandar.aux_date) between the two dates, inclusive. FALSE if either date is NULL or neither rule applies.
+    lineage:
+      - datalake_pas.ledger.dt_reference
+      - datalake_quintoandar.aux_date.is_brz_business_day
+  is_compliance:
+    description: TRUE if completeness, correctness, and temporality checks are all TRUE.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice.is_compliance
+  accounting_process_status:
+    description: Classification of accounting status. source failure covers dispatches that never obtained a feature id from the gateway (status REPROCESS, FAILED_PAYLOAD, INVALID_PAYLOAD or FAILED_SAP on the rental-guarantee side); gateway failure covers features whose nota fiscal job is missing or errored; unknown failure covers dispatches that passed the gateway without an error but produced no 420010 posting.
+    lineage:
+      - datalake_sap_accounting_process.rental_guarantee_invoice.accounting_process_status
+  error_description:
+    description: Textual reason for accounting process failure, carrying the rental-guarantee dispatch status for source failures and the gateway job type plus webhook error for gateway failures.
+    lineage:
+      - datalake_rental_guarantee_clean.sap.sap_status
+      - datalake_sap_gateway_clean.webhook_log.errors
+  accrual_year_month:
+    description: Account reference in the format YYYYMM, taken from the reference year month sent in the dispatch payload.
+    lineage:
+      - datalake_rental_guarantee_clean.sap.reference_year_month
+  dt_source_trigger:
+    description: Date on which the revenue recognition event was meant to be posted, taken from the event date of the dispatch payload.
+    lineage:
+      - datalake_rental_guarantee_clean.sap.dt_event_date
+  dt_sap_reference:
+    description: Reference date of the 420010 SAP posting associated with the same event as dt_source_trigger.
+    lineage:
+      - datalake_pas.ledger.dt_reference
+  dt_sap_created:
+    description: Creation date of the 420010 SAP posting used for temporality.
+    lineage:
+      - datalake_pas.ledger.dt_created
+  dt_filter_end:
+    description: Same value as dt_sap_reference, which already reflects the most recent SAP ledger movement for this dispatch and account number.
+    lineage:
+      - datalake_pas.ledger.dt_reference
