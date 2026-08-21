@@ -3,7 +3,9 @@
 -- Grain: one row per id_message
 -- Source: datalake_consorcio_raw.blip_messages
 -- Window: raw ts_load >= {load_start_date} (insert-only merge on
--- id_message keeps re-runs idempotent)
+-- id_message). MERGE requires a unique source key: collapse to one
+-- row per id_message with ROW_NUMBER (no QUALIFY) after the lead
+-- lookups, because those joins can fan out even when raw is unique.
 -- Schema aligned with datalake_consorcio.chat_messages:
 --   id_lead, id_bsp, id_crm, id_message, host_name, role, content,
 --   ts_created, year, month, day
@@ -77,7 +79,8 @@ lead_by_tunnel AS (
         END
       ORDER BY
         lead_external.ts_updated DESC NULLS LAST,
-        lead_external.ts_created DESC
+        lead_external.ts_created DESC,
+        lead_external.id_lead DESC
     ) AS rn
   FROM
     datalake_consorcio_clean.lead_external_data AS lead_external
@@ -103,7 +106,8 @@ lead_by_contact AS (
         END
       ORDER BY
         lead_external.ts_updated DESC NULLS LAST,
-        lead_external.ts_created DESC
+        lead_external.ts_created DESC,
+        lead_external.id_lead DESC
     ) AS rn
   FROM
     datalake_consorcio_clean.lead_external_data AS lead_external
@@ -127,47 +131,87 @@ lead_by_uuid AS (
   WHERE
     lead.uuid IS NOT NULL
     AND TRIM(CAST(lead.uuid AS STRING)) <> ''
+),
+enriched AS (
+  SELECT
+    CASE
+      WHEN normalized.producer_id_lead_numeric IS NOT NULL
+        THEN normalized.producer_id_lead_numeric
+      WHEN lead_uuid.id_lead IS NOT NULL THEN lead_uuid.id_lead
+      WHEN lead_tunnel.id_lead IS NOT NULL THEN lead_tunnel.id_lead
+      WHEN lead_contact.id_lead IS NOT NULL THEN lead_contact.id_lead
+      ELSE NULL
+    END AS id_lead,
+    normalized.id_bsp,
+    CASE
+      WHEN normalized.producer_id_lead_numeric IS NOT NULL
+        OR lead_uuid.id_lead IS NOT NULL
+        THEN normalized.id_crm
+      WHEN lead_tunnel.id_lead IS NOT NULL
+        THEN COALESCE(CAST(lead_tunnel.id_crm AS STRING), normalized.id_crm)
+      WHEN lead_contact.id_lead IS NOT NULL
+        THEN COALESCE(CAST(lead_contact.id_crm AS STRING), normalized.id_crm)
+      ELSE normalized.id_crm
+    END AS id_crm,
+    normalized.id_message,
+    normalized.host_name,
+    normalized.role,
+    normalized.content,
+    normalized.ts_created,
+    YEAR(normalized.ts_created) AS year,
+    MONTH(normalized.ts_created) AS month,
+    DAY(normalized.ts_created) AS day
+  FROM
+    normalized
+  LEFT JOIN
+    lead_by_uuid AS lead_uuid
+      ON normalized.producer_id_lead_numeric IS NULL
+      AND lead_uuid.uuid_lead = normalized.producer_id_lead
+      AND lead_uuid.rn = 1
+  LEFT JOIN
+    lead_by_tunnel AS lead_tunnel
+      ON lead_tunnel.id_bsp = normalized.id_bsp
+      AND lead_tunnel.rn = 1
+  LEFT JOIN
+    lead_by_contact AS lead_contact
+      ON lead_contact.id_bsp_contact_normalized = normalized.id_bsp_contact_normalized
+      AND lead_contact.rn = 1
+),
+ranked AS (
+  SELECT
+    enriched.id_lead,
+    enriched.id_bsp,
+    enriched.id_crm,
+    enriched.id_message,
+    enriched.host_name,
+    enriched.role,
+    enriched.content,
+    enriched.ts_created,
+    enriched.year,
+    enriched.month,
+    enriched.day,
+    ROW_NUMBER() OVER (
+      PARTITION BY enriched.id_message
+      ORDER BY
+        enriched.ts_created DESC NULLS LAST,
+        enriched.id_lead DESC NULLS LAST
+    ) AS rn_message
+  FROM
+    enriched
 )
 SELECT
-  CASE
-    WHEN normalized.producer_id_lead_numeric IS NOT NULL
-      THEN normalized.producer_id_lead_numeric
-    WHEN lead_uuid.id_lead IS NOT NULL THEN lead_uuid.id_lead
-    WHEN lead_tunnel.id_lead IS NOT NULL THEN lead_tunnel.id_lead
-    WHEN lead_contact.id_lead IS NOT NULL THEN lead_contact.id_lead
-    ELSE NULL
-  END AS id_lead,
-  normalized.id_bsp,
-  CASE
-    WHEN normalized.producer_id_lead_numeric IS NOT NULL
-      OR lead_uuid.id_lead IS NOT NULL
-      THEN normalized.id_crm
-    WHEN lead_tunnel.id_lead IS NOT NULL
-      THEN COALESCE(CAST(lead_tunnel.id_crm AS STRING), normalized.id_crm)
-    WHEN lead_contact.id_lead IS NOT NULL
-      THEN COALESCE(CAST(lead_contact.id_crm AS STRING), normalized.id_crm)
-    ELSE normalized.id_crm
-  END AS id_crm,
-  normalized.id_message,
-  normalized.host_name,
-  normalized.role,
-  normalized.content,
-  normalized.ts_created,
-  YEAR(normalized.ts_created) AS year,
-  MONTH(normalized.ts_created) AS month,
-  DAY(normalized.ts_created) AS day
+  ranked.id_lead,
+  ranked.id_bsp,
+  ranked.id_crm,
+  ranked.id_message,
+  ranked.host_name,
+  ranked.role,
+  ranked.content,
+  ranked.ts_created,
+  ranked.year,
+  ranked.month,
+  ranked.day
 FROM
-  normalized
-LEFT JOIN
-  lead_by_uuid AS lead_uuid
-    ON normalized.producer_id_lead_numeric IS NULL
-    AND lead_uuid.uuid_lead = normalized.producer_id_lead
-    AND lead_uuid.rn = 1
-LEFT JOIN
-  lead_by_tunnel AS lead_tunnel
-    ON lead_tunnel.id_bsp = normalized.id_bsp
-    AND lead_tunnel.rn = 1
-LEFT JOIN
-  lead_by_contact AS lead_contact
-    ON lead_contact.id_bsp_contact_normalized = normalized.id_bsp_contact_normalized
-    AND lead_contact.rn = 1
+  ranked
+WHERE
+  ranked.rn_message = 1

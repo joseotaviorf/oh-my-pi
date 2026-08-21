@@ -21,7 +21,9 @@ dag:
       Row dedupe: within each JSONL, keep the latest ts_created per id_message
       before MERGE; across files, insert-only MERGE on id_message (Blip unique
       id). First ingested row wins; overlapping backfill/incremental exports
-      cannot duplicate messages.
+      cannot duplicate messages. Clean MERGE source is collapsed to one row
+      per id_message with ROW_NUMBER after lead lookups (Delta rejects
+      duplicate source keys even on insert-only MERGE).
 
       File ledger: datalake_consorcio_raw.blip_messages_ingest_files tracks each
       processed S3 object (success/failed + etag). Incremental LIST uses StartAfter
