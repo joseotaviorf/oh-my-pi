@@ -128,7 +128,7 @@ duplicate_experiment_searches AS
     FROM
         union_spvs
     INNER JOIN datalake_search.experiment_config_processed AS experiments
-        ON experiments.variant_name = get_json_object(union_spvs.user_properties, CONCAT('$.', experiments.experiment_name))
+        ON experiments.variant_name = get_json_object(union_spvs.user_properties, CONCAT("$['[Experiment] ", experiments.experiment_name, "']"))
         AND (
             (ts_event >= experiments.begin_date)
             AND (experiments.end_date IS NULL OR ts_event <= experiments.end_date)

@@ -70,7 +70,7 @@ duplicate_experiment_lpvs AS (
         datalake_search.experiment_config_processed AS experiments
         ON experiments.variant_name = get_json_object(
             listing_page_viewed.user_properties,
-            CONCAT('$.', experiments.experiment_name)
+            CONCAT("$['[Experiment] ", experiments.experiment_name, "']")
         )
         AND listing_page_viewed.ts_lpv >= experiments.begin_date
         AND (

@@ -15,7 +15,7 @@ WITH duplicate_experiment_recs AS (
         CONCAT('"', experiments.experiment_name, '":"', variant_standard_name, '"') AS variants
     FROM datalake_search.recs_impressions
     INNER JOIN datalake_search.experiment_config_processed AS experiments
-        ON experiments.variant_name = get_json_object(recs_impressions.user_properties, CONCAT('$.', experiments.experiment_name))
+        ON experiments.variant_name = get_json_object(recs_impressions.user_properties, CONCAT("$['[Experiment] ", experiments.experiment_name, "']"))
         AND ts_recommendation >= experiments.begin_date
         AND (
             experiments.end_date IS NULL
