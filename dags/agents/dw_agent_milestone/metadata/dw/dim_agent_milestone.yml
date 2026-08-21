@@ -7,7 +7,7 @@ description: >
   (no join to dw_public.dim_agent / sk_agent). Each row stores mandatory
   ts_first / ts_last plus optional entity pointers (sk_entity_first / sk_entity_last
   with a single entity_type = schema.table.column per milestone). Loaded by DAG
-  dw_agent_performance (workflow.type: milestone_delta + shared
+  dw_agent_milestone (workflow.type: milestone_delta + shared)
   load_milestone_dimension) on EMR. The milestones: block below allowlists types;
   each entry points at a strategy under
   queries/dw/dim_agent_milestone/milestones/*.sql that emits event rows

@@ -11,7 +11,7 @@ STRATEGIES_ROOT = (
     _REPO
     / "dags"
     / "agents"
-    / "dw_agent_performance"
+    / "dw_agent_milestone"
     / "queries"
     / "dw"
     / "dim_agent_milestone"
@@ -73,7 +73,7 @@ def test_metadata_milestones_registry_loads():
         _REPO
         / "dags"
         / "agents"
-        / "dw_agent_performance"
+        / "dw_agent_milestone"
         / "metadata"
         / "dw"
         / "dim_agent_milestone.yml"

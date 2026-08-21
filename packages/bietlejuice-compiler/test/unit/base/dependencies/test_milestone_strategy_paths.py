@@ -15,8 +15,7 @@ from bietlejuice.base.dependencies.milestone_strategy_paths import (
 def test_dag_name_from_milestone_strategy_path(monkeypatch):
     gen = FileDependencyGenerator()
     relative = (
-        "dw_agent_performance/queries/dw/dim_agent_milestone/"
-        "milestones/visit_events.sql"
+        "dw_agent_milestone/queries/dw/dim_agent_milestone/milestones/visit_events.sql"
     )
     monkeypatch.setattr(
         gen,
@@ -25,11 +24,11 @@ def test_dag_name_from_milestone_strategy_path(monkeypatch):
     )
     monkeypatch.setattr(
         "bietlejuice.base.dependencies.file_dependency_generator.is_milestone_delta_dag",
-        lambda dag: dag == "dw_agent_performance",
+        lambda dag: dag == "dw_agent_milestone",
     )
     assert (
         gen._dag_name_from_query_path("/fake/dags/agents/" + relative)
-        == "bietlejuice.dw_agent_performance"
+        == "bietlejuice.dw_agent_milestone"
     )
 
 
@@ -59,10 +58,10 @@ def test_other_nested_folder_not_treated_as_milestone_strategy():
 def test_dag_folder_from_strategy_path():
     clear_milestone_delta_dag_cache()
     path = (
-        "/repo/dags/agents/dw_agent_performance/queries/dw/"
+        "/repo/dags/agents/dw_agent_milestone/queries/dw/"
         "dim_agent_milestone/milestones/visit_events.sql"
     )
-    assert dag_folder_from_milestone_strategy_path(path) == "dw_agent_performance"
+    assert dag_folder_from_milestone_strategy_path(path) == "dw_agent_milestone"
 
 
 def test_is_milestone_strategy_dir_is_layout_only():
