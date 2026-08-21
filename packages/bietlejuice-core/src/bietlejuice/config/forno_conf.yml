@@ -2011,11 +2011,11 @@ emr_cluster_base: &emr_cluster_anchor
         spark.openlineage.circuitBreaker.timeoutInSeconds: "20"
         # Keep event logs on the EMR default path (do not set spark.eventLog.dir)
         # so Persistent Application UI / History Server can still show them.
-        spark.eventLog.enabled: "true"
-        spark.eventLog.compress: "true"
-        spark.eventLog.compression.codec: "zstd"
-        spark.eventLog.logStageExecutorMetrics: "true"
-        spark.eventLog.rolling.enabled: "true"
+        # spark.eventLog.enabled: "true"
+        # spark.eventLog.compress: "true"
+        # spark.eventLog.compression.codec: "zstd"
+        # spark.eventLog.logStageExecutorMetrics: "true"
+        # spark.eventLog.rolling.enabled: "true"
         # YARN app staging on S3 (not cluster HDFS) so AM relaunches after lost NM /
         # node blips still find __spark_conf__.zip / pyspark.zip.
         # Recommend an S3 lifecycle rule on emr/spark-staging/.
@@ -2185,7 +2185,6 @@ emr_spark_xl_memory: &emr_spark_xl_memory
     spark.executor.memory: 96g
     spark.executor.memoryOverhead: 8g
     spark.executor.cores: "4"
-
 
 ##### EMR single-node spark conf (tier + base + instance-aware executor sizing) #####
 
