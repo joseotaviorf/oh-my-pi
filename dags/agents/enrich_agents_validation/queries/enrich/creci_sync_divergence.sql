@@ -30,7 +30,9 @@ agent AS (
 agent_data_creci AS (
     SELECT
         ad.id,
-        ad.creci_number
+        ad.creci_number,
+        ad.agent_type,
+        ad.ts_database_transaction AS ts_database_transaction_agent_data
     FROM
         datalake_ebdb_clean.agent_data AS ad
     WHERE
@@ -39,7 +41,8 @@ agent_data_creci AS (
 partner_creci AS (
     SELECT
         p.id,
-        p.creci
+        p.creci,
+        p.ts_database_transaction AS ts_database_transaction_partner
     FROM
         datalake_ebdb_clean.partner AS p
     WHERE
@@ -48,7 +51,8 @@ partner_creci AS (
 person_creci AS (
     SELECT
         p.uuid_person,
-        idoc.identification_number
+        idoc.identification_number,
+        idoc.ts_database_transaction AS ts_database_transaction_identity_document
     FROM
         datalake_person_clean.person AS p
     JOIN
@@ -64,6 +68,7 @@ creci_divergence AS (
         a.id_agent,
         a.id_agent_data,
         a.id_partner,
+        adc.agent_type,
         a.id_agent_data IS NOT NULL AND NULLIF(TRIM(adc.creci_number), '') IS NULL AS is_agent_data_missing_creci,
         a.id_partner IS NOT NULL AND NULLIF(TRIM(pc.creci), '') IS NULL AS is_partner_missing_creci,
         NULLIF(TRIM(pec.identification_number), '') IS NULL AS is_person_missing_creci,
@@ -76,7 +81,10 @@ creci_divergence AS (
         a.id_agent_data IS NOT NULL
             AND a.id_partner IS NOT NULL
             AND COALESCE(UPPER(TRIM(adc.creci_number)), '') <> COALESCE(UPPER(TRIM(pc.creci)), '')
-            AS is_agent_data_vs_partner_divergent
+            AS is_agent_data_vs_partner_divergent,
+        adc.ts_database_transaction_agent_data,
+        pc.ts_database_transaction_partner,
+        pec.ts_database_transaction_identity_document
     FROM
         agent AS a
     LEFT JOIN
@@ -94,12 +102,16 @@ SELECT
     id_agent,
     id_agent_data,
     id_partner,
+    agent_type,
     is_agent_data_missing_creci,
     is_partner_missing_creci,
     is_person_missing_creci,
     is_agent_data_vs_person_divergent,
     is_partner_vs_person_divergent,
     is_agent_data_vs_partner_divergent,
+    ts_database_transaction_agent_data,
+    ts_database_transaction_partner,
+    ts_database_transaction_identity_document,
     CURRENT_TIMESTAMP() AS ts_validated
 FROM
     creci_divergence
@@ -113,10 +125,14 @@ SELECT
     NULL AS id_agent,
     NULL AS id_agent_data,
     NULL AS id_partner,
+    NULL AS agent_type,
     FALSE AS is_agent_data_missing_creci,
     FALSE AS is_partner_missing_creci,
     FALSE AS is_person_missing_creci,
     FALSE AS is_agent_data_vs_person_divergent,
     FALSE AS is_partner_vs_person_divergent,
     FALSE AS is_agent_data_vs_partner_divergent,
+    NULL AS ts_database_transaction_agent_data,
+    NULL AS ts_database_transaction_partner,
+    NULL AS ts_database_transaction_identity_document,
     CURRENT_TIMESTAMP() AS ts_validated

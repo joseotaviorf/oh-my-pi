@@ -28,6 +28,12 @@ columns:
     description: EBDB Partner identifier linked to the agent via agent_external_reference.
     lineage:
       - datalake_ebdb_clean.agent_external_reference.value
+  agent_type:
+    description: |
+      DadosAgente agent type of the linked record, typically CORRETOR_5A or
+      CORRETOR_REDE. Null when the agent has no DadosAgente link.
+    lineage:
+      - datalake_ebdb_clean.agent_data.agent_type
   is_agent_data_missing_creci:
     description: Flags a linked DadosAgente record with a blank CRECI.
     lineage:
@@ -60,5 +66,23 @@ columns:
       - datalake_ebdb_clean.agent_external_reference.value
       - datalake_ebdb_clean.agent_data.creci_number
       - datalake_ebdb_clean.partner.creci
+  ts_database_transaction_agent_data:
+    description: |
+      Timestamp of the last source-database transaction captured by CDC for the
+      linked DadosAgente row. Null when the agent has no DadosAgente link.
+    lineage:
+      - datalake_ebdb_clean.agent_data.ts_database_transaction
+  ts_database_transaction_partner:
+    description: |
+      Timestamp of the last source-database transaction captured by CDC for the
+      linked Partner row. Null when the agent has no Partner link.
+    lineage:
+      - datalake_ebdb_clean.partner.ts_database_transaction
+  ts_database_transaction_identity_document:
+    description: |
+      Timestamp of the last source-database transaction captured by CDC for the
+      Person CRECI identity document. Null when the person has no CRECI document.
+    lineage:
+      - datalake_person_clean.identity_document.ts_database_transaction
   ts_validated:
     description: Timestamp when this validation run produced the row.
