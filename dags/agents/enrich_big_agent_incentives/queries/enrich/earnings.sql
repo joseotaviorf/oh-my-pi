@@ -19,6 +19,10 @@ WITH new_earnings_filtered AS (
         ne.reason,
         ne.revenue_amount,
         ne.revenue_percentage,
+        CASE
+            WHEN ne.status = "CALCULATED" AND ne.external_receiver_type = "AGENT" THEN SUM(CASE WHEN ne.status = "CALCULATED" AND ne.external_receiver_type = "AGENT" THEN ne.revenue_percentage ELSE 0 END) OVER(PARTITION BY id_earning_source, incentive_system)
+            ELSE NULL
+        END AS brokerage_fee_by_incentive_system,
         ne.dt_payment_due,
         ne.ts_created,
         ne.ts_updated
@@ -67,14 +71,6 @@ sales_flow_offer AS (
     LEFT JOIN
         datalake_sales_flow_clean.brokerage AS fee
             ON fee.id_sales_flow = sf.id
-),
-rent_brokerage_share_history AS (
-    SELECT
-        id_contract,
-        agent_brokerage_share,
-        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_revision DESC) = 1 AS is_last_revision
-    FROM
-        datalake_big_agent.brokerage_share_history
 )
 SELECT DISTINCT
     ne.id AS id_earning,
@@ -120,7 +116,7 @@ SELECT DISTINCT
     es.revenue_share_total_amount,
     CASE
         WHEN es.business_context = "SALE" THEN sf.brokerage_fee
-        WHEN es.business_context = "RENT" THEN fee.agent_brokerage_share
+        WHEN es.business_context = "RENT" THEN ne.brokerage_fee_by_incentive_system
     END AS brokerage_fee,
     CASE
         WHEN ne.calculated_from = 'REVENUE_SHARE_TOTAL_AMOUNT' THEN es.revenue_share_total_amount
@@ -182,7 +178,3 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.contract AS c
         ON c.id = es.id_contract
-LEFT JOIN
-    rent_brokerage_share_history AS fee
-        ON fee.id_contract = es.id_contract
-        AND fee.is_last_revision IS TRUE

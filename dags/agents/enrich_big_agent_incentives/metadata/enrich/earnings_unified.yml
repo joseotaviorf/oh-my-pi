@@ -98,6 +98,14 @@ columns:
       Configured revenue share value applied to the earning. For legacy For-Rent earnings, taken
       directly from the contract's agent_brokerage_share; taken from the Big Agent earning's
       revenue_share_value for the migrated flow.
+  brokerage_fee:
+    lineage:
+      - datalake_ebdb_clean.contract.agent_brokerage_share
+      - datalake_big_agent.earnings.brokerage_fee
+    description: |
+      Configured brokerage fee applied to the earning. For legacy For-Rent earnings, taken
+      directly from the contract's agent_brokerage_share; taken from the Big Agent earning's
+      brokerage_fee for the migrated flow.
   brokerage_amount:
     lineage:
       - datalake_ebdb_clean.contract.rent

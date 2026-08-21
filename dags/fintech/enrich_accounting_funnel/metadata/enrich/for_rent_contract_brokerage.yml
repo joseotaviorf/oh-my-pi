@@ -25,10 +25,10 @@ columns:
     description: "Indicates 5A brokerage split share in percentage"
   agent_brokerage_share:
     lineage:
-      - datalake_big_agent.brokerage_share_history.agent_brokerage_share
+      - datalake_big_agent.earnings_unified.brokerage_fee
     description: |
-     Agent brokerage split share at first brokerage invoice date, from brokerage_share_history
-     point-in-time (revision on or before invoice date).
+      Agent brokerage share in decimals from the latest revision in earnings_unified
+      per contract; null when no earnings_unified row exists for the contract.
   ciq_brokerage_share:
     lineage:
       - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
@@ -46,7 +46,7 @@ columns:
     description: "Indicates 5A brokerage split share in percentage in amount of cash"
   agent_brokerage_amount:
     lineage:
-      - datalake_big_agent.brokerage_share_history.agent_brokerage_share
+      - datalake_big_agent.earnings_unified.brokerage_fee
       - datalake_ebdb_clean.contract_aud.rent
     description: "Agent brokerage amount derived from first rent and agent_brokerage_share at signature."
   ciq_brokerage_amount:

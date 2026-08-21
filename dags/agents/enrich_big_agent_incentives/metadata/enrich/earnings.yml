@@ -172,10 +172,10 @@ columns:
   brokerage_fee:
     lineage:
       - datalake_sales_flow_clean.brokerage.brokerage_fee
-      - datalake_big_agent.brokerage_share_history.agent_brokerage_share
+      - datalake_big_agent_clean.new_earnings.revenue_percentage
     description: |
       Brokerage fee percentage for the transaction context: sales-flow brokerage fee on SALE
-      or latest rent contract brokerage share on RENT.
+      or sum of revenue_percentage for the earning source for each incentive system on RENT.
   calculation_base_amount:
     lineage:
       - datalake_big_agent_clean.earning_sources.revenue_share_total_amount

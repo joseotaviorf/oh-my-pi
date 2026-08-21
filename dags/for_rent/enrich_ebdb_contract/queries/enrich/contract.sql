@@ -196,9 +196,13 @@ WITH max_cancellation AS (
 ), last_brokerage_share_revision AS (
   SELECT
     id_contract,
-    agent_brokerage_share,
-    ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_revision DESC) = 1 AS is_last_revision
-  FROM datalake_big_agent.brokerage_share_history
+    brokerage_fee AS agent_brokerage_share,
+    ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_created DESC) = 1 AS is_last_revision
+  FROM
+    datalake_big_agent.earnings_unified
+  WHERE
+    incentive_system = 'DEMAND_CONVERSION_FR'
+    AND revenue_receiver_type = 'AGENT'
 )
 SELECT
   c.id,

@@ -4,7 +4,7 @@ WITH pre_contract_partnership_data AS (
         partner_type,
         brokerage_split_percentage,
         ROW_NUMBER() OVER (PARTITION BY id_contract, partner_type ORDER BY id DESC) as rn
-    FROM 
+    FROM
         datalake_ebdb_clean.contract_partnership_data
 ),
 
@@ -13,9 +13,9 @@ contract_partnership_data AS (
         id_contract,
         partner_type,
         SUM(brokerage_split_percentage) AS brokerage_split_percentage
-    FROM 
+    FROM
         pre_contract_partnership_data
-    WHERE 
+    WHERE
         NOT(partner_type = 'AUTONOMOUS_AGENT' AND rn > 1)
     GROUP BY 1,2
 ),
@@ -61,16 +61,18 @@ GROUP BY 1
 
 brokerage_share_from_contract_at_signature_ranked AS (
     SELECT
-        bsh.id_contract,
-        bsh.agent_brokerage_share,
-        ROW_NUMBER() OVER (PARTITION BY bsh.id_contract ORDER BY bsh.id_revision DESC) AS rn
+        eu.id_contract,
+        eu.brokerage_fee AS agent_brokerage_share,
+        ROW_NUMBER() OVER (PARTITION BY eu.id_contract ORDER BY eu.ts_created DESC) AS rn
     FROM
-        datalake_big_agent.brokerage_share_history AS bsh
+        datalake_big_agent.earnings_unified AS eu
     LEFT JOIN
         dt_brokerage_share_from_contract AS dt
-            ON dt.sk_contract = bsh.id_contract
+            ON dt.sk_contract = eu.id_contract
     WHERE
-        DATE(bsh.ts_revision) <= DATE(dt.invoice_created_date)
+        DATE(eu.ts_created) <= DATE(dt.invoice_created_date)
+        AND incentive_system = 'DEMAND_CONVERSION_FR'
+        AND revenue_receiver_type = 'AGENT'
 ),
 brokerage_share_from_contract_at_signature AS (
     SELECT
@@ -86,13 +88,13 @@ agents_by_contract AS (
     SELECT
         con.id AS id_contract,
         COALESCE(COUNT(DISTINCT b.id_agent), 0) AS num_agents
-    FROM 
+    FROM
         datalake_ebdb_rent_flow.rent_flow a
-    INNER JOIN 
+    INNER JOIN
         datalake_ebdb_clean.contract AS con
           ON con.id_house = a.id_house
           AND con.id = a.id_contract
-    LEFT JOIN 
+    LEFT JOIN
         datalake_ebdb_clean.agent_rent_flow b
           ON a.id_rent_flow = b.id_rent_flow
     WHERE
@@ -126,23 +128,23 @@ df AS (
         NULLIF(f_rent.rent * c.fist_rent_comission_fee * IF(GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator') = 'THIRD_PARTY', 0.5, NULL), 0) AS 3p_brokerage_amount,
         c.dt_started AS dt_contract_started,
         c.dt_termination AS dt_contract_annulment
-    FROM 
+    FROM
         datalake_ebdb_clean.contract c
-    LEFT JOIN 
+    LEFT JOIN
         contract_partnership_data p
             ON c.id = p.id_contract
             AND p.partner_type = 'AUTONOMOUS_AGENT'
-    LEFT JOIN 
+    LEFT JOIN
         contract_partnership_data pp
             ON c.id = pp.id_contract
             AND pp.partner_type = 'EXECUTIVE_FOR_RENT'
-    LEFT JOIN 
+    LEFT JOIN
         first_rent_from_contract f_rent
             ON f_rent.id_contract = c.id
-    LEFT JOIN 
+    LEFT JOIN
         brokerage_share_from_contract_at_signature brokerage_aud
             ON brokerage_aud.id_contract = c.id
-    LEFT JOIN 
+    LEFT JOIN
         agents_by_contract a
             ON a.id_contract = c.id
 ),
@@ -165,7 +167,7 @@ df_final AS (
     COALESCE(ROUND(3p_brokerage_amount,2),0) AS 3p_brokerage_amount,
     dt_contract_started,
     dt_contract_annulment
-    FROM 
+    FROM
         df
 )
 
@@ -174,7 +176,7 @@ SELECT
     rental_administrator,
     rent,
     first_rent_commission_fee,
-    CASE 
+    CASE
         WHEN ((agent_brokerage_share + ciq_brokerage_share) >= 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0
         WHEN ((agent_brokerage_share + ciq_brokerage_share) < 0.4) AND (rental_administrator = 'THIRD_PARTY') AND (dt_contract_started > dt_contract_annulment) THEN (0.4 - (agent_brokerage_share + ciq_brokerage_share))/2
         WHEN ((agent_brokerage_share + ciq_brokerage_share) < 0.4) AND (rental_administrator != 'THIRD_PARTY') AND (dt_contract_started > dt_contract_annulment) THEN 0.4 - (agent_brokerage_share + ciq_brokerage_share)
@@ -186,25 +188,25 @@ SELECT
     CASE
         WHEN rental_administrator != 'THIRD_PARTY' THEN 0
         WHEN (ciq_brokerage_share + agent_brokerage_share) < 0.4 AND (dt_contract_started > dt_contract_annulment) THEN ((0.4) - (ciq_brokerage_share + agent_brokerage_share))/2
-        WHEN (ciq_brokerage_share + agent_brokerage_share) >= 0.4 AND (dt_contract_started > dt_contract_annulment) THEN 0 
+        WHEN (ciq_brokerage_share + agent_brokerage_share) >= 0.4 AND (dt_contract_started > dt_contract_annulment) THEN 0
         ELSE 3p_brokerage_share
     END AS 3p_brokerage_share,
-    CASE 
+    CASE
         WHEN ((agent_brokerage_share + ciq_brokerage_share) >= (0.4)) AND (dt_contract_started > dt_contract_annulment) THEN 0
         WHEN ((agent_brokerage_share + ciq_brokerage_share) < (0.4)) AND (rental_administrator = 'THIRD_PARTY') AND (dt_contract_started > dt_contract_annulment) THEN ((rent * 0.4) - (agent_brokerage_amount + ciq_brokerage_amount))/2
         WHEN ((agent_brokerage_share + ciq_brokerage_share) < (0.4)) AND (rental_administrator != 'THIRD_PARTY') AND (dt_contract_started > dt_contract_annulment) THEN (rent * 0.4) - (agent_brokerage_amount + ciq_brokerage_amount)
-        ELSE 5A_brokerage_amount 
+        ELSE 5A_brokerage_amount
     END AS 5A_brokerage_amount,
     agent_brokerage_amount,
     ciq_brokerage_amount,
     IF((dt_contract_started > dt_contract_annulment), 0, select_brokerage_amount) AS select_brokerage_amount,
-    CASE 
+    CASE
         WHEN rental_administrator != 'THIRD_PARTY' THEN 0
         WHEN (ciq_brokerage_share + agent_brokerage_share) < (rent * 0.4) AND (dt_contract_started > dt_contract_annulment) THEN ((rent * 0.4) - (ciq_brokerage_amount + agent_brokerage_amount))/2
-        WHEN (ciq_brokerage_share + agent_brokerage_share) >= (rent * 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0 
+        WHEN (ciq_brokerage_share + agent_brokerage_share) >= (rent * 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0
         ELSE 3p_brokerage_amount
     END AS 3p_brokerage_amount,
     dt_contract_started,
     dt_contract_annulment
-FROM 
+FROM
     df_final
