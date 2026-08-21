@@ -947,8 +947,10 @@ class TestEnrichIssuesFromAlerts:
 
         assert result[0]["source_label"] == SOURCE_AIRFLOW_ERROR
         assert result[0]["had_voice"] is True
+        assert result[0]["dag"] == "domain.dag"
         assert result[1]["source_label"] == SOURCE_RUNTIME_ANOMALY
         assert result[1]["had_voice"] is False
+        assert result[1]["dag"] == "domain.dag"
 
     def test_unmatched_issue_is_unknown_without_voice(self):
         issues = [
@@ -961,6 +963,7 @@ class TestEnrichIssuesFromAlerts:
         result = _enrich_issues_from_alerts(issues, [])
         assert result[0]["source_label"] == SOURCE_UNKNOWN
         assert result[0]["had_voice"] is False
+        assert result[0]["dag"] == "manual.card"
 
     def test_matches_dag_id_inside_alert_message(self):
         issues = [{"key": "DEI-3", "summary": "bietlejuice.dw_listing"}]
@@ -976,6 +979,7 @@ class TestEnrichIssuesFromAlerts:
         result = _enrich_issues_from_alerts(issues, alerts)
         assert result[0]["source_label"] == SOURCE_RUNTIME_ANOMALY
         assert result[0]["had_voice"] is False
+        assert result[0]["dag"] == "bietlejuice.dw_listing"
 
     def test_does_not_match_shorter_dag_id_inside_longer_dag(self):
         issues = [{"key": "DEI-1", "summary": "bietlejuice.dw_listing"}]
@@ -991,6 +995,7 @@ class TestEnrichIssuesFromAlerts:
         result = _enrich_issues_from_alerts(issues, alerts)
         assert result[0]["source_label"] == SOURCE_UNKNOWN
         assert result[0]["had_voice"] is False
+        assert result[0]["dag"] == "bietlejuice.dw_listing"
 
     def test_matches_dag_id_in_rubinho_alias(self):
         assert _alert_matches_issue(
@@ -1297,6 +1302,7 @@ class TestNotifyDagRotationCallable:
         assert len(payload["error_list"]) == 1
         assert payload["error_list"][0]["source_label"] == SOURCE_AIRFLOW_ERROR
         assert payload["error_list"][0]["had_voice"] is True
+        assert payload["error_list"][0]["dag"] == "domain.dag"
         assert payload["email"] == "zacarias@example.com"
 
     @mock.patch(
@@ -1460,6 +1466,7 @@ class TestWrapForGchat:
                     "url": "https://jira/DEI-26333",
                     "key": "DEI-26333",
                     "owner": "Data House and Listing",
+                    "dag": "bietlejuice.dw_supply",
                     "source_label": SOURCE_RUNTIME_ANOMALY,
                     "had_voice": True,
                 },
@@ -1467,6 +1474,7 @@ class TestWrapForGchat:
                     "url": "https://jira/DEI-26334",
                     "key": "DEI-26334",
                     "owner": "QCX",
+                    "dag": "other.dag",
                     "source_label": SOURCE_AIRFLOW_ERROR,
                     "had_voice": False,
                 },
@@ -1482,10 +1490,12 @@ class TestWrapForGchat:
         qcx_line = alerts_widgets[2]["textParagraph"]["text"]
         assert "DEI-26333" in listing_line
         assert "Data House and Listing" in listing_line
+        assert "bietlejuice.dw_supply" in listing_line
         assert "Runtime anomaly" in listing_line
-        assert "Acordamento" in listing_line
+        assert "<b>Acordamento</b>" in listing_line
         assert "DEI-26334" in qcx_line
         assert "QCX" in qcx_line
+        assert "other.dag" in qcx_line
         assert "Airflow error" in qcx_line
         assert "Acordamento" not in qcx_line
 
@@ -1515,8 +1525,9 @@ class TestWrapForGchat:
             "textParagraph"
         ]["text"]
         assert "Acordamentos:" in summary
-        assert "domain.dag" in summary
-        assert "other.dag" in summary
+        assert "domain.dag" not in summary
+        assert "other.dag" not in summary
+        assert "•" not in summary
 
     def test_no_dag_bullets_when_wakeup_dags_absent(self):
         payload = {
@@ -1559,12 +1570,14 @@ class TestFormatIssueAlertText:
                 "url": "https://jira/DEI-1",
                 "key": "DEI-1",
                 "owner": "QCX",
+                "dag": "bietlejuice.dw_supply",
                 "source_label": SOURCE_AIRFLOW_ERROR,
                 "had_voice": True,
             }
         )
         assert text == (
-            '<a href="https://jira/DEI-1">DEI-1</a> - QCX - Airflow error - Acordamento'
+            '<a href="https://jira/DEI-1">DEI-1</a> - QCX - bietlejuice.dw_supply'
+            " - Airflow error - <b>Acordamento</b>"
         )
 
     def test_omits_acordamento_when_no_voice(self):
@@ -1579,6 +1592,18 @@ class TestFormatIssueAlertText:
         )
         assert "Acordamento" not in text
         assert "Runtime anomaly" in text
+
+    def test_omits_dag_when_empty(self):
+        text = _format_issue_alert_text(
+            {
+                "url": "https://jira/DEI-3",
+                "key": "DEI-3",
+                "owner": "QCX",
+                "source_label": SOURCE_UNKNOWN,
+                "had_voice": False,
+            }
+        )
+        assert text == ('<a href="https://jira/DEI-3">DEI-3</a> - QCX - Unknown')
 
 
 class TestNotifyDagRotationDAG:

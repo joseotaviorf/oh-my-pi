@@ -776,6 +776,7 @@ def _enrich_issues_from_alerts(issues: list[dict], alerts: list[dict]) -> list[d
         if not candidates:
             issue["source_label"] = SOURCE_UNKNOWN
             issue["had_voice"] = False
+            issue["dag"] = dag_id or None
             continue
 
         def _delta(alert: dict, created: datetime | None = issue_created) -> timedelta:
@@ -788,6 +789,7 @@ def _enrich_issues_from_alerts(issues: list[dict], alerts: list[dict]) -> list[d
         used_alert_ids.add(best["alert_id"])
         issue["source_label"] = best.get("source_label") or SOURCE_UNKNOWN
         issue["had_voice"] = bool(best.get("had_voice"))
+        issue["dag"] = dag_id or (best.get("dag") or "").strip() or None
     return issues
 
 
@@ -797,6 +799,7 @@ def _issue_error_entry(issue: dict) -> dict:
         "url": f"{DEI_BOARD_URL}?selectedIssue={issue['key']}",
         "key": issue["key"],
         "owner": issue.get("owner"),
+        "dag": issue.get("dag") or None,
         "source_label": issue.get("source_label") or SOURCE_UNKNOWN,
         "had_voice": bool(issue.get("had_voice")),
     }
@@ -806,11 +809,14 @@ def _format_issue_alert_text(issue: dict) -> str:
     """Render one DEI issue line for the Google Chat card."""
     owner = issue.get("owner") or "N/A"
     parts = [f'<a href="{issue["url"]}">{issue["key"]}</a>', owner]
+    dag_id = (issue.get("dag") or "").strip()
+    if dag_id:
+        parts.append(dag_id)
     source_label = issue.get("source_label")
     if source_label:
         parts.append(source_label)
     if issue.get("had_voice"):
-        parts.append("Acordamento")
+        parts.append("<b>Acordamento</b>")
     return " - ".join(parts)
 
 
@@ -832,7 +838,6 @@ def _wrap_for_gchat(payload: dict) -> dict:
         oncall = str(oncall)
     start_time = payload.get("start_time", "?")
     called_count = payload.get("called_count", "0")
-    wakeup_dags = payload.get("wakeup_dags", [])
     error_list = payload.get("error_list", [])
 
     summary_text = (
@@ -840,8 +845,6 @@ def _wrap_for_gchat(payload: dict) -> dict:
         f"<b>Início:</b> {start_time}<br>"
         f"<b>Acordamentos:</b> {called_count}"
     )
-    if wakeup_dags:
-        summary_text += "".join(f"<br>• {dag_name}" for dag_name in wakeup_dags)
 
     if error_list:
         voice_count = sum(1 for issue in error_list if issue.get("had_voice"))
