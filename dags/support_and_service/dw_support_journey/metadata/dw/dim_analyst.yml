@@ -1,0 +1,90 @@
+---
+database_name: dw_support_journey
+table_name: dim_analyst
+description: Dimension of support analysts (Salesforce User) in the Support Journey, one row per analyst event version sourced from the core support journey analyst model. Preserves SCD history via ts_effective / ts_expired (is_current flags the active version) so SS/BPO analytics can join fact_requests.sk_owner and reconstruct who the analyst was at a given instant. sk_analyst is the unified join key (Salesforce User Id today; COALESCE with Twilio worker id when that mapping exists). sk_twillio is a placeholder (-1) until then.
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+columns:
+  sk_event:
+    description: Surrogate key uniquely identifying an analyst event version (grain of the table). System-generated upstream as a hash of id_record, transaction_key, commit_number and committed_at, so it is unique per CDC event.
+    lineage:
+      - core_support_journey.analyst.id_event
+  sk_analyst:
+    description: Unified surrogate key of the analyst, used as the default join key on this dimension. Built as COALESCE(id_analyst, -1) so Salesforce User Id wins when present; when Twilio identity is available this becomes COALESCE(id_analyst, id_twillio). Join fact_requests.sk_owner to this column for Salesforce-origin cases. Inspect sk_id_type to see which identifier populated the key.
+    lineage:
+      - core_support_journey.analyst.id_analyst
+  sk_salesforce:
+    description: Surrogate key of the analyst in Salesforce, sourced from the User id_record. Nullable only if a future Twilio-only analyst has no Salesforce User. Prefer sk_analyst for default joins; use this column when the consumer must match Salesforce Ids specifically.
+    lineage:
+      - core_support_journey.analyst.id_analyst
+  sk_twillio:
+    description: Surrogate key of the analyst in Twilio Flex (worker identifier). Hardcoded to -1 until the Salesforce-to-Twilio identity mapping is available in the core analyst model; do not use this column for joins yet.
+  sk_event_type:
+    description: Surrogate key describing which source fields composed the event hash (id_record, transaction_key, commit_number and committed_at).
+    lineage:
+      - core_support_journey.analyst.id_event_type
+  sk_manager:
+    description: Surrogate key referencing the Salesforce User who is the analyst's manager. Nullable when the analyst has no manager assigned in Salesforce.
+    lineage:
+      - core_support_journey.analyst.id_manager
+  sk_id_type:
+    description: Discriminator of which source identifier populated sk_analyst. 'salesforce' means sk_analyst is the Salesforce User Id (id_record); 'twilio' means it fell back to the Twilio worker id. Today every row is 'salesforce' because the core model only ingests Salesforce User CDC.
+    lineage:
+      - core_support_journey.analyst.id_analyst
+    categories:
+      salesforce: sk_analyst is the Salesforce User Id (id_record).
+      twilio: sk_analyst is the Twilio worker identifier (not yet populated).
+  username:
+    description: Salesforce login username of the analyst, used as the operational login identifier in Service Cloud.
+    lineage:
+      - core_support_journey.analyst.username
+  email:
+    description: Work email of the analyst. Used as the cross-source join key to Twilio/Flex and service events (fact_services hashes worker_email) until sk_twillio is populated.
+    lineage:
+      - core_support_journey.analyst.email
+  alias:
+    description: Short Salesforce alias of the analyst, used as a compact display name in the Service Cloud UI.
+    lineage:
+      - core_support_journey.analyst.alias
+  operations:
+    description: Operations grouping assigned to the analyst in Salesforce (Operations__c), used to classify which support operation the person belongs to.
+    lineage:
+      - core_support_journey.analyst.operations
+  bpo:
+    description: BPO (outsourced operation) the analyst belongs to in Salesforce (BPO__c), distinguishing in-house QuintoAndar agents from partner BPOs such as Atento or Webhelp.
+    lineage:
+      - core_support_journey.analyst.bpo
+  is_active:
+    description: Flag indicating whether the Salesforce User is currently active. Inactive analysts should be excluded from headcount and productivity denominators unless historical attribution is required.
+    lineage:
+      - core_support_journey.analyst.is_active
+  is_partner:
+    description: Flag indicating whether the Salesforce User is a partner user (IsPartner), typically a BPO analyst rather than a QuintoAndar employee.
+    lineage:
+      - core_support_journey.analyst.is_partner
+  is_deleted:
+    description: Flag indicating whether the Salesforce User was deleted in the source CDC event. A user can be undeleted; use this together with is_current when reconstructing the latest state.
+    lineage:
+      - core_support_journey.analyst.is_deleted
+  is_current:
+    description: Flag indicating whether this is the most recent version of the analyst (SCD current record). Use this for fast filtering on the current version of the analyst; for point-in-time state use ts_effective / ts_expired.
+    lineage:
+      - core_support_journey.analyst._is_current
+  ts_created:
+    description: Timestamp when the Salesforce User was created in the source system.
+    lineage:
+      - core_support_journey.analyst.created_date
+  ts_committed:
+    description: Timestamp when this CDC event was committed in the source stream. Used upstream as the SCD event clock (together with commit_number) to order analyst versions.
+    lineage:
+      - core_support_journey.analyst.committed_at
+  ts_effective:
+    description: SCD valid-from timestamp - the moment this analyst version became the active record. To reconstruct the state of an analyst at a given instant T, filter ts_effective <= T AND ts_expired > T; for the latest state use is_current = true.
+    lineage:
+      - core_support_journey.analyst._effective_timestamp
+  ts_expired:
+    description: SCD valid-to timestamp - the moment this analyst version was superseded by a newer one; the current version carries a 9999 sentinel (year 9999) instead of a real date, so it is never expired. Each [ts_effective, ts_expired) window is half-open and non-overlapping per sk_analyst.
+    lineage:
+      - core_support_journey.analyst._expired_timestamp
+  ts_load:
+    description: Timestamp when the record was loaded into the data warehouse table by the ingestion pipeline. Built from NOW() at load time.

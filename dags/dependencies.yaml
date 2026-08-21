@@ -1209,6 +1209,7 @@ bietlejuice.dw_supply_staging:
   - bietlejuice.wololo:load-clean-prospect-aud:first-run-of-day
   - bietlejuice.wololo:load-clean-prospect:first-run-of-day
 bietlejuice.dw_support_journey:
+  - bietlejuice.core_support_journey:load_core_support_journey_analyst
   - bietlejuice.core_support_journey:load_core_support_journey_cases
   - bietlejuice.core_support_journey:load_core_support_journey_services
 bietlejuice.dw_table_snapshot:

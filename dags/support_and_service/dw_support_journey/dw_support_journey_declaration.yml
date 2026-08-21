@@ -11,6 +11,9 @@ dag:
       Builds fact_requests from the core_support_journey.cases core model, one row
       per support case event version, preserving SCD history via the
       ts_effective / ts_expired validity window (is_current flags the active version).
+      Also builds dim_analyst from core_support_journey.analyst (Salesforce User CDC),
+      one row per analyst event version, with the same SCD window so cases can be
+      attributed to the analyst who owned them at a given instant.
 
 workflow:
   type: query_delta
@@ -27,6 +30,9 @@ workflow:
       merge_on: [sk_event]
     dim_record_type:
       merge_on: [sk_record_type]
+    dim_analyst:
+      z_order_by: [sk_analyst]
+      merge_on: [sk_event]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start.strftime('%Y-%m-%d %H:%M:%S'), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end.strftime('%Y-%m-%d %H:%M:%S'), 'load_end_date') }}"
