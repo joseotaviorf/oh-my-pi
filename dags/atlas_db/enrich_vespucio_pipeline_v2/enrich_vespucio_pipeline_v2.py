@@ -530,6 +530,9 @@ address_normalization_step_task >> address_enrich_step_task
     artifacts_step_task,
 ] >> groups_step_task
 groups_step_task >> vespucio_v2_pipeline_complete_task
-resolve_groups_step_task >> publish_resolved_identities_step_task
 artifacts_step_task >> vespucio_v2_pipeline_complete_task
 artifacts_step_task >> publish_artifacts_step_task
+[
+    resolve_groups_step_task,
+    publish_artifacts_step_task,
+] >> publish_resolved_identities_step_task
