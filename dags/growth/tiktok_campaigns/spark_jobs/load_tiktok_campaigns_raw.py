@@ -114,6 +114,7 @@ if __name__ == "__main__":
     parser.add_argument("source")
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
+    parser.add_argument("table_name")
 
     add_validation_target_args(parser)
     args = parser.parse_args()
@@ -124,17 +125,23 @@ if __name__ == "__main__":
             f"load_end_date ({args.load_end_date})"
         )
 
+    table_name = args.table_name
     config_service = ConfigurationService(args.source)
-    table_name = config_service.get_config("table_name")
+    reports = config_service.get_config("reports") or {}
+    if table_name not in reports:
+        raise ValueError(
+            f"Unknown table_name={table_name}. Valid reports: {sorted(reports.keys())}"
+        )
+    report_config = reports[table_name]
     raw_partition_cols = config_service.get_config("raw_partition_cols")
     api_base_url = config_service.get_config("api_base_url")
     endpoint_path = config_service.get_config("endpoint_path")
     advertiser_ids = config_service.get_config("advertiser_ids")
-    report_type = config_service.get_config("report_type")
-    data_level = config_service.get_config("data_level")
     page_size = config_service.get_config("page_size")
-    dimensions = config_service.get_config("dimensions")
-    metrics = config_service.get_config("metrics")
+    report_type = report_config["report_type"]
+    data_level = report_config["data_level"]
+    dimensions = report_config["dimensions"]
+    metrics = report_config["metrics"]
 
     credentials = json.loads(
         dbutils.secrets.get(scope=SECRET_SCOPE, key=APIEnum.TIKTOK)
@@ -208,6 +215,7 @@ if __name__ == "__main__":
         )
     else:
         logger.warning(
-            f"m={JOB_NAME}, load_start_date={args.load_start_date}, "
+            f"m={JOB_NAME}, table_name={table_name}, "
+            f"load_start_date={args.load_start_date}, "
             f"load_end_date={args.load_end_date}, msg=No data returned from TikTok API."
         )

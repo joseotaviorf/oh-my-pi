@@ -1,0 +1,16 @@
+---
+table_name: datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt_stat
+  incremental_date_mask: yyyy-MM-dd
+table_level_validations:
+  has_size:
+    greater_than: 0
+column_level_validations:
+  advertiser_id:
+    is_complete:
+  adgroup_id:
+    is_complete:
+  dt_stat:
+    is_complete:

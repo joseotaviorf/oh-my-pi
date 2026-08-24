@@ -1,0 +1,71 @@
+---
+database_name: datalake_tiktok_campaigns_clean
+table_name: tiktok_campaigns_without_region
+owner: caio.francisco@quintoandar.com.br
+domain: Growth
+description: |
+  TikTok ad delivery and spend metrics by day without province breakdown, sourced from the
+  TikTok Business API BASIC integrated report. Grain is one row per ad and stat date.
+  Loaded so Growth can reconcile paid-media costs without geographic clustering, alongside
+  the audience-by-province table.
+columns:
+  id_advertiser:
+    description: TikTok advertiser account identifier for the campaign row.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.advertiser_id
+  id_campaign:
+    description: TikTok campaign identifier associated with the ad in the report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.campaign_id
+  id_adgroup:
+    description: TikTok ad group identifier at the report grain.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.adgroup_id
+  id_ad:
+    description: TikTok ad identifier at the report grain.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.ad_id
+  campaign_name:
+    description: Human-readable TikTok campaign name from the integrated report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.campaign_name
+  adgroup_name:
+    description: Human-readable TikTok ad group name from the integrated report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.adgroup_name
+  ad_name:
+    description: Human-readable TikTok ad name from the integrated report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.ad_name
+  spend:
+    description: Media spend in account currency for the ad on the stat date, not split by region.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.spend
+  impressions:
+    description: Number of ad impressions served for the ad on the stat date, not split by region.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.impressions
+  reach:
+    description: Estimated unique users reached for the ad on the stat date, not split by region.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.reach
+  clicks:
+    description: Number of clicks on the ad on the stat date, not split by region.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.clicks
+  dt_stat:
+    description: Calendar date of the TikTok BASIC metrics row (stat_time_day from the API).
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.dt_stat
+  year:
+    description: Year of the TikTok BASIC metrics row, derived from the stat date.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.year
+  month:
+    description: Month of the TikTok BASIC metrics row, derived from the stat date.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.month
+  day:
+    description: Day of the TikTok BASIC metrics row, derived from the stat date.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_without_region.day
