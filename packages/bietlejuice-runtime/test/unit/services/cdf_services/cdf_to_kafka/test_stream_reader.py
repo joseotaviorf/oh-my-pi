@@ -7,6 +7,13 @@ import pytest
 from bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader import DeltaCDFReader
 
 
+def _stream_builder(spark_session_mock):
+    mock_stream_builder = MagicMock()
+    spark_session_mock.readStream.format.return_value = mock_stream_builder
+    mock_stream_builder.option.return_value = mock_stream_builder
+    return mock_stream_builder
+
+
 @pytest.fixture
 def spark_session_mock():
     return MagicMock()
@@ -88,6 +95,33 @@ class TestDeltaCDFReaderValidateTable:
         spark_session_mock.catalog.tableExists.assert_called_once_with(delta_table)
 
 
+class TestDeltaCDFReaderReadCdfStream:
+    def test_sets_fail_on_data_loss_false_without_starting_version(
+        self, spark_session_mock, delta_table, entity, feature_set_name
+    ):
+        mock_stream_builder = _stream_builder(spark_session_mock)
+        mock_cdf = MagicMock()
+        mock_stream_builder.table.return_value = mock_cdf
+
+        reader = DeltaCDFReader(
+            spark=spark_session_mock,
+            delta_table=delta_table,
+            entity=entity,
+            feature_set_name=feature_set_name,
+        )
+
+        result = reader.read_cdf_stream()
+
+        spark_session_mock.readStream.format.assert_called_once_with("delta")
+        assert [call.args for call in mock_stream_builder.option.call_args_list] == [
+            ("readChangeFeed", "true"),
+            ("failOnDataLoss", "false"),
+        ]
+        mock_stream_builder.table.assert_called_once_with(delta_table)
+        spark_session_mock.sql.assert_not_called()
+        assert result is mock_cdf
+
+
 class TestDeltaCDFReaderPrepareCdfStream:
     """Tests for DeltaCDFReader.prepare_cdf_stream method."""
 
@@ -121,9 +155,7 @@ class TestDeltaCDFReaderPrepareCdfStream:
         mock_filter.return_value = mock_filtered
         mock_drop.return_value = mock_cleaned
 
-        mock_stream_builder = MagicMock()
-        spark_session_mock.readStream.format.return_value = mock_stream_builder
-        mock_stream_builder.option.return_value = mock_stream_builder
+        mock_stream_builder = _stream_builder(spark_session_mock)
         mock_stream_builder.table.return_value = mock_cdf
 
         reader = DeltaCDFReader(
@@ -177,9 +209,7 @@ class TestDeltaCDFReaderPrepareCdfStream:
         mock_drop.return_value = mock_cleaned
         mock_register_schema.return_value = 123
 
-        mock_stream_builder = MagicMock()
-        spark_session_mock.readStream.format.return_value = mock_stream_builder
-        mock_stream_builder.option.return_value = mock_stream_builder
+        mock_stream_builder = _stream_builder(spark_session_mock)
         mock_stream_builder.table.return_value = MagicMock()
 
         schema_registry_url = "http://registry:8081"
@@ -239,9 +269,7 @@ class TestDeltaCDFReaderPrepareCdfStream:
         mock_cleaned = MagicMock()
         mock_drop.return_value = mock_cleaned
 
-        mock_stream_builder = MagicMock()
-        spark_session_mock.readStream.format.return_value = mock_stream_builder
-        mock_stream_builder.option.return_value = mock_stream_builder
+        mock_stream_builder = _stream_builder(spark_session_mock)
         mock_stream_builder.table.return_value = MagicMock()
 
         reader = DeltaCDFReader(

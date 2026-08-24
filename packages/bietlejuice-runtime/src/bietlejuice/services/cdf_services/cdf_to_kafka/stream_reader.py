@@ -19,6 +19,16 @@ from bietlejuice.services.cdf_services.schema_registry import (
 
 logger = logging.getLogger(__name__)
 
+# A CDF streaming checkpoint that still points at a vacuumed log version fails
+# with DELTA_TRUNCATED_TRANSACTION_LOG. failOnDataLoss=false skips those missing
+# versions when a checkpoint exists. Do not set startingVersion: an empty
+# checkpoint must bootstrap from the latest snapshot as inserts. Pinning the
+# earliest retained log version would replay CDF (missing unchanged rows), can
+# land before CDF was enabled, and can target versions whose _change_data
+# files were already removed (deletedFileRetentionDuration is often shorter
+# than logRetentionDuration).
+_FAIL_ON_DATA_LOSS = "false"
+
 
 class DeltaCDFReader:
     """Reads and validates Delta Change Data Feed streams."""
@@ -65,10 +75,22 @@ class DeltaCDFReader:
         logger.info(f"Validated Delta table {self.delta_table} has CDF enabled")
 
     def read_cdf_stream(self) -> DataFrame:
-        """Read from Delta Change Data Feed as a streaming DataFrame."""
+        """Read from Delta Change Data Feed as a streaming DataFrame.
+
+        ``failOnDataLoss=false`` lets the query continue when a checkpoint
+        points at versions already removed from the Delta transaction log.
+        ``startingVersion`` is intentionally omitted so an empty checkpoint
+        bootstraps from the latest snapshot as inserts.
+        """
+        logger.info(
+            "Reading CDF stream from %s with failOnDataLoss=%s",
+            self.delta_table,
+            _FAIL_ON_DATA_LOSS,
+        )
         return (
             self.spark.readStream.format("delta")
             .option("readChangeFeed", "true")
+            .option("failOnDataLoss", _FAIL_ON_DATA_LOSS)
             .table(self.delta_table)
         )
 
