@@ -82,11 +82,11 @@ columns:
     lineage:
       - datalake_cyber_legal_clean.case_expense.expense_description
   is_authorized:
-    description: "Expense authorization flag (TRUE=authorized, FALSE=not authorized)."
+    description: "Expense authorization status. TRUE means authorized and eligible to charge the client; FALSE means rejected after analysis; NULL means pending analysis and must not be treated as rejected."
     lineage:
       - datalake_cyber_legal_clean.case_expense.is_authorized
   is_payment_made:
-    description: "Payment made flag indicating if payment was realized (TRUE/FALSE)."
+    description: "Payment status. TRUE means payment was made; FALSE means payment was not made; NULL means the flag is empty or pending and must not be treated as unpaid."
     lineage:
       - datalake_cyber_legal_clean.case_expense.is_payment_made
   is_reimbursed:

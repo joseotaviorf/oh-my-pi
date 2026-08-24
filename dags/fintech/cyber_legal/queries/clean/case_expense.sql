@@ -15,8 +15,16 @@ WITH ranked_expenses AS (
         EXDESC AS expense_description,
         EXIDESC AS invoice_description,
         EXSUPPLIER AS supplier_name,
-        IF(EXAUTFLG = 'Y', TRUE, FALSE) AS is_authorized,
-        IF(EXPAYEXP = 'Y', TRUE, FALSE) AS is_payment_made,
+        CASE
+            WHEN EXAUTFLG = 'Y' THEN TRUE
+            WHEN EXAUTFLG = 'N' THEN FALSE
+            ELSE NULL
+        END AS is_authorized,
+        CASE
+            WHEN EXPAYEXP = 'Y' THEN TRUE
+            WHEN EXPAYEXP = 'N' THEN FALSE
+            ELSE NULL
+        END AS is_payment_made,
         IF(EXSTATUS = '1', TRUE, FALSE) AS is_recovered,
         IF(EXSTATUSAGN = '1', TRUE, FALSE) AS is_reimbursed,
         EXAMT AS expense_amount,

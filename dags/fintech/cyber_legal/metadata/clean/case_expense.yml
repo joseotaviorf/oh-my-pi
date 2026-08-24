@@ -66,11 +66,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.caexpns.EXSUPPLIER
   is_authorized:
-    description: "Expense authorization flag (SIM/Y=authorized, NÃO/N=not authorized)"
+    description: "Expense authorization status from Cyber EXAUTFLG. TRUE (Y) means authorized and eligible to charge the client; FALSE (N) means rejected after analysis; NULL means pending analysis (empty or any value other than Y/N), so pending expenses are not treated as rejected."
     lineage:
       - datalake_cyber_legal_raw.caexpns.EXAUTFLG
   is_payment_made:
-    description: "Payment made flag indicating if payment was realized (SIM/NÃO)"
+    description: "Payment status from Cyber EXPAYEXP. TRUE (Y) means payment was made; FALSE (N) means payment was not made after the flag was set; NULL means the payment flag is empty or pending (any value other than Y/N), so it is not treated as unpaid."
     lineage:
       - datalake_cyber_legal_raw.caexpns.EXPAYEXP
   is_recovered:
