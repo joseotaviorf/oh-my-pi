@@ -1,0 +1,19 @@
+dag:
+  name: dw_voc_classifications
+  schedule_start_date: 2026, 6, 1
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      DW layer for Voice of Customer (VOC) LLM classifications produced by vocs-machina.
+      Builds fact_voc_classifications with typed sk_contract and sk_user for OBT joins to
+      dim_contract and dim_user, while verbatim text and reasoning remain on clean.
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: voc
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  tables_customization:
+    fact_voc_classifications:
+      z_order_by: [sk_contract, sk_user]

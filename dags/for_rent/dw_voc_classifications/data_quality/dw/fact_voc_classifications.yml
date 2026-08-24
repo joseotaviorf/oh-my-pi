@@ -1,0 +1,49 @@
+---
+table_name: dw_voc.fact_voc_classifications
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_feedback:
+    is_complete:
+      severity_level: Error
+  id_prompt:
+    is_complete:
+      severity_level: Error
+  prompt_hash:
+    is_complete:
+      severity_level: Error
+  sk_user:
+    has_completeness:
+      greater_than_or_equal_to: 0.99
+      severity_level: Warning
+  one_row_per_feedback_prompt_hash_partition:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_voc.fact_voc_classifications GROUP BY id_feedback, id_prompt, prompt_hash, year, month, day HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  nps_rental_contract_derivation:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            f.id_feedback
+          FROM dw_voc.fact_voc_classifications AS f
+          INNER JOIN datalake_vocs_machina_clean.vocs_machina AS c
+            ON f.id_feedback = c.id_feedback
+            AND f.id_prompt = c.id_prompt
+            AND f.prompt_hash = c.prompt_hash
+            AND f.year = c.year
+            AND f.month = c.month
+            AND f.day = c.day
+          WHERE c.feedback_kind = 'nps'
+            AND c.source_name IN ('ongoing', 'offboarding', 'onboarding', 'pp_multi')
+            AND REGEXP_LIKE(c.id_account, '^[0-9]+_(tenant|landlord)$')
+            AND f.sk_contract IS NULL
+        )) = 0
+      severity_level: Error
+  sk_contract_sentinel_values:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM dw_voc.fact_voc_classifications WHERE sk_contract IN (-1, 0)) = 0"
+      severity_level: Error

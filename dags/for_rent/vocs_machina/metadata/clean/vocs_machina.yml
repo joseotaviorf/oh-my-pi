@@ -27,8 +27,9 @@ columns:
       - datalake_vocs_machina_raw.vocs_machina.author_id
   id_account:
     description: >
-      sk_contract (rental) or sk_offer (sale) associated with the feedback. Null when
-      not available from source.
+      opaque reverse_birdie composite key (NPS `{sk}_{tenant|landlord}`, CSAT
+      `{message_id}_{sk_user}_{role}`). Typed contract lives on
+      `dw_voc.fact_voc_classifications.sk_contract`.
     lineage:
       - datalake_vocs_machina_raw.vocs_machina.account_id
   uuid_run:

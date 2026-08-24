@@ -1,0 +1,102 @@
+---
+database_name: dw_voc
+table_name: fact_voc_classifications
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+description: >
+  DW fact at grain one row per (id_feedback, id_prompt, prompt_hash) per ingestion partition
+  (year, month, day), sourced from vocs-machina LLM classifications on clean. Typed sk_contract
+  and sk_user enable OBT joins to dim_contract and dim_user for For Rent post-contract VOC
+  analytics in Superset and downstream metrics without exposing verbatim text or LLM reasoning
+  (those stay on clean). Partitioned by ingestion date; Z-ordered by sk_contract and sk_user.
+columns:
+  id_feedback:
+    description: >
+      Unique identifier of the NPS or CSAT feedback record (maps to sk_nps_answer or Survicate
+      id_response for CSAT).
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.id_feedback
+  id_prompt:
+    description: >
+      Identifier of the vocs-machina prompt used for classification; stable until the prompt
+      template or taxonomy changes.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.id_prompt
+  prompt_hash:
+    description: >
+      12-character hash of the compiled prompt content; changes when the prompt template or
+      taxonomy changes.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.prompt_hash
+  sk_contract:
+    description: >
+      Typed rental contract surrogate key for OBT joins to dim_contract and
+      dw_offboarding.obt_offboarding. Nullable for sale feedback, NPS lost rows, and CSAT rows
+      where contractid/ticket resolution fails. Termination, SPOC, and region attributes are
+      reached via contract OBT joins, not columns on this fact.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.id_account
+      - datalake_survicate.survey_responses.response_url
+      - dw_customer_support.fact_tickets.sk_contract
+  sk_user:
+    description: >
+      Respondent user surrogate key normalized from id_author. Nullable when id_author is missing
+      or not numeric. Join to dw_public.dim_user on sk_user for respondent attributes. Contract,
+      termination, SPOC, and region context are reached via sk_contract joins to dw_rent.dim_contract
+      or dw_offboarding.obt_offboarding, not columns on this fact.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.id_author
+  feedback_kind:
+    description: Type of feedback — "nps" or "csat".
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.feedback_kind
+  source_name:
+    description: >
+      NPS/CSAT campaign or source name from reverse_birdie (nps_campanha or csat_campanha).
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.source_name
+  customer_type:
+    description: Respondent type — "tenant" or "landlord". Null when unavailable from source.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.customer_type
+  campaign_name:
+    description: Fine-grained campaign name. Null when unavailable from source.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.campaign_name
+  rating:
+    description: NPS score (0–10) or CSAT score associated with the feedback.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.rating
+  is_label:
+    description: >
+      Boolean LLM classification for this (feedback, prompt) pair: true when the model assigned
+      the prompt's label, false otherwise. Join back to clean on the full grain for
+      verbatim_text and reasoning.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.is_label
+  sk_submitted_date:
+    description: >
+      Date surrogate key (yyyyMMdd) for the calendar date when the respondent submitted the
+      feedback; join to dim_date.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.ts_submitted
+  ts_submitted:
+    description: Timestamp when the respondent submitted the NPS/CSAT feedback.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.ts_submitted
+  ts_classified:
+    description: UTC timestamp when vocs-machina performed the LLM classification.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.ts_classified
+  year:
+    description: Hive partition year from the vocs-machina ingestion date.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.year
+  month:
+    description: Hive partition month from the vocs-machina ingestion date.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.month
+  day:
+    description: Hive partition day from the vocs-machina ingestion date.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.day
