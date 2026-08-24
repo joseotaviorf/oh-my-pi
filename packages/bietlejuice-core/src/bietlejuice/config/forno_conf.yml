@@ -220,8 +220,6 @@ cluster_template:
             DATABRICKS_S3_BUCKET: "{{ var.value.databricks_s3_bucket }}"
             AIRFLOW_DAG_ID: "{{ dag.dag_id }}"
             DATAHUB_GRAPHQL_URL: "https://datahub-gms.apps.data-frn.habitat.zone/api/graphql"
-            # Cross-account Glue Data Catalog (Databricks workspace → data account); Airflow Variable: glue_assume_role_arn
-            GLUE_ASSUME_ROLE_ARN: "{{ var.value.glue_assume_role_arn }}"
         ssh_public_keys: []
         node_type_id: m5a.large
         driver_node_type_id: m5a.large
@@ -317,8 +315,6 @@ cluster_template:
             DATABRICKS_S3_BUCKET: "{{ var.value.databricks_s3_bucket }}"
             AIRFLOW_DAG_ID: "{{ dag.dag_id }}"
             DATAHUB_GRAPHQL_URL: "https://datahub-gms.apps.data-frn.habitat.zone/api/graphql"
-            # Cross-account Glue Data Catalog (Databricks workspace → data account); Airflow Variable: glue_assume_role_arn
-            GLUE_ASSUME_ROLE_ARN: "{{ var.value.glue_assume_role_arn }}"
         ssh_public_keys: []
         spark_version: 10.4.x-scala2.12
         data_security_mode: SINGLE_USER
