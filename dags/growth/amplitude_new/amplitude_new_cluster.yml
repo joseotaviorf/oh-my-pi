@@ -1,35 +1,21 @@
 cluster:
-  type: consolidation_xl_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    master_node_type_id: r6g.2xlarge
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+        - r6gd.8xlarge
+    task_nodes:
+      instance_types:
+        - r6gd.8xlarge
+      target_on_demand: 4
+      target_spot: 0
     aws_attributes:
-      availability: ON_DEMAND
       ebs_volume_size: 500
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      spark.driver.maxResultSize: '0'
-      spark.databricks.delta.optimizeWrite.enabled: 'true'
-    driver_node_type_id: r7g.xlarge
-    node_type_id: r7gd.8xlarge
-    num_workers: 6
-validation:
-  cluster:
-    type: emr_7_12_consolidation_xl_memory_fleet_cluster
-    custom_configurations:
-      core_nodes:
-        target_on_demand: 2
-        target_spot: 0
-        instance_types:
-        - r6gd.8xlarge
-      task_nodes:
-        instance_types:
-        - r6gd.8xlarge
-        target_on_demand: 4
-        target_spot: 0
-      aws_attributes:
-        ebs_volume_size: 500
-      spark_conf:
-        spark.driver.maxResultSize: '0'
-  allow_custom_spark_job: true
+      spark.driver.maxResultSize: "0"
+      spark.databricks.delta.optimizeWrite.enabled: "true"
+      spark.driver.memory: "20g"
+      spark.driver.memoryOverhead: "4g"
