@@ -19,3 +19,7 @@ cluster:
       spark.databricks.delta.optimizeWrite.enabled: "true"
       spark.driver.memory: "20g"
       spark.driver.memoryOverhead: "4g"
+      spark.executor.memory: "128g"
+      spark.executor.memoryOverhead: "10g"
+      spark.executor.cores: "8"
+      spark.sql.shuffle.partitions: "800"
