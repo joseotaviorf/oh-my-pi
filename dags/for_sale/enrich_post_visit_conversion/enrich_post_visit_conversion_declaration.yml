@@ -14,9 +14,9 @@ dag:
       Keeps visits in DONE status from the last three days, excludes visits where the
       visitor is the agent or the property owner, and excludes visitors who are agents.
       Every visit is kept and tagged with removal_rule, the first business rule (already
-      rated by demand, house unpublished, duplicate offer, recent notification) that
-      disqualifies it from the post-visit offer-incentive communication; downstream
-      consumers filter on removal_rule IS NULL to select eligible visits.
+      rated by demand, house unpublished, duplicate offer, contract signed recently, recent
+      notification) that disqualifies it from the post-visit offer-incentive communication;
+      downstream consumers filter on removal_rule IS NULL to select eligible visits.
 
       well_priced_listings snapshots the published listings priced at or below 95% of the
       pricing calculator's suggested upper bound, supporting a good-price argument.

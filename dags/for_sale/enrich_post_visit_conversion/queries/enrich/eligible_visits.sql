@@ -8,13 +8,14 @@ WITH done_visits AS (
         vis.id_visit,
         vis.code AS visit_code,
         vis.business_context,
+        (DATE(vis.ts_visit_done) >= DATE_SUB(CURRENT_DATE(), 3)) AS is_eligible,
         vis.ts_created,
         vis.ts_visit,
         vis.ts_visit_done
     FROM
         datalake_visit.visits AS vis
     WHERE
-        DATE(vis.ts_visit_done) BETWEEN DATE_SUB(CURRENT_DATE(), 3) AND DATE_SUB(CURRENT_DATE(), 1)
+        DATE(vis.ts_visit_done) BETWEEN DATE_SUB(CURRENT_DATE(), 14) AND DATE_SUB(CURRENT_DATE(), 1)
         AND vis.computed_status = 'DONE'
         AND vis.id_visitor <> vis.id_agent
         AND vis.id_visitor <> vis.id_owner
@@ -30,52 +31,85 @@ non_agent_users AS (
     WHERE
         usr.id_agent IS NULL
 ),
-users_already_notified_last_7d AS (
+visits_already_notified_last_7d AS (
     SELECT DISTINCT
-        CAST(cms.id_user AS BIGINT) AS id_user,
-        cms.id_person AS uuid_person
+        -- EMR-safe rewrite of Databricks variant access: event_properties is JSON text.
+        COALESCE(
+            GET_JSON_OBJECT(cms.event_properties, '$.metadata.visit_code'),
+            GET_JSON_OBJECT(cms.event_properties, '$.metadata.visitCode')
+        ) AS visit_code
     FROM
         datalake_cdp_clean.comms AS cms
     WHERE
-        MAKE_DATE(cms.year, cms.month, cms.day) >= DATE_SUB(CURRENT_DATE(), 14)
-        AND cms.event_name = 'notification_status_update'
-        AND cms.channel = 'whatsapp'
+        MAKE_DATE(cms.year, cms.month, cms.day) >= DATE_SUB(CURRENT_DATE(), 10)
         AND cms.comms_template IN (
             'visits_fearmissingoutsingle_tnt_wpp_v1',
             'visits_pricingsingle_tnt_wpp_v1'
         )
-        AND DATE(cms.ts_event) >= DATE_SUB(CURRENT_DATE(), 7)
-        AND (cms.id_user IS NOT NULL OR cms.id_person IS NOT NULL)
+        AND cms.ts_event >= DATE_SUB(CURRENT_DATE(), 7)
 ),
-users_received_finalization_last_24h AS (
+users_already_notified_last_7d AS (
     SELECT DISTINCT
-        CAST(cms.id_user AS BIGINT) AS id_user,
-        cms.id_person AS uuid_person
+        dvi.id_visitor AS id_user
+    FROM
+        done_visits AS dvi
+    INNER JOIN
+        visits_already_notified_last_7d AS van
+            ON van.visit_code = dvi.visit_code
+),
+visits_received_finalization_last_24h AS (
+    SELECT DISTINCT
+        -- EMR-safe rewrite of Databricks variant access: event_properties is JSON text.
+        COALESCE(
+            GET_JSON_OBJECT(cms.event_properties, '$.metadata.visit_code'),
+            GET_JSON_OBJECT(cms.event_properties, '$.metadata.visitCode')
+        ) AS visit_code
     FROM
         datalake_cdp_clean.comms AS cms
     WHERE
         MAKE_DATE(cms.year, cms.month, cms.day) >= DATE_SUB(CURRENT_DATE(), 3)
-        AND cms.event_name = 'notification_status_update'
-        AND cms.channel = 'whatsapp'
         AND cms.comms_template = 'visits_confirm_finalization_demand_wpp'
         AND cms.ts_event >= (CURRENT_TIMESTAMP() - INTERVAL 1 DAY)
-        AND (cms.id_user IS NOT NULL OR cms.id_person IS NOT NULL)
+),
+users_received_finalization_last_24h AS (
+    SELECT DISTINCT
+        dvi.id_visitor AS id_user
+    FROM
+        done_visits AS dvi
+    INNER JOIN
+        visits_received_finalization_last_24h AS vrf
+            ON vrf.visit_code = dvi.visit_code
 ),
 sale_offers AS (
-    SELECT DISTINCT
+    SELECT
         hse.id_external AS id_house,
-        byr.id_external AS id_user
+        byr.id_external AS id_user,
+        MAX(IF(ccv.status = 'SIGNED', TRUE, FALSE)) AS is_contract_signed
     FROM
-        datalake_sales_flow_clean.sales_flow AS sf
+        datalake_sales_flow_clean.sales_flow AS sfl
     INNER JOIN
         datalake_sales_flow_clean.house AS hse
-            ON hse.id = sf.id_house
+            ON hse.id = sfl.id_house
     INNER JOIN
         datalake_sales_flow_clean.users AS byr
-            ON byr.id = sf.id_buyer
+            ON byr.id = sfl.id_buyer
+    LEFT JOIN
+        datalake_sales_flow_clean.ccv AS ccv
+            ON ccv.id_sales_flow = sfl.id
     WHERE
-        MAKE_DATE(sf.year, sf.month, sf.day) >= DATE_SUB(CURRENT_DATE(), 60)
-        AND DATE(sf.ts_created) >= DATE_SUB(CURRENT_DATE(), 30)
+        MAKE_DATE(sfl.year, sfl.month, sfl.day) >= DATE_SUB(CURRENT_DATE(), 45)
+        AND sfl.ts_updated >= DATE_SUB(CURRENT_DATE(), 30)
+    GROUP BY
+        hse.id_external,
+        byr.id_external
+),
+sale_contracts AS (
+    SELECT DISTINCT
+        sof.id_user
+    FROM
+        sale_offers AS sof
+    WHERE
+        sof.is_contract_signed = TRUE
 ),
 rent_offers AS (
     SELECT DISTINCT
@@ -84,7 +118,16 @@ rent_offers AS (
     FROM
         datalake_rental_transact_clean.offer AS off
     WHERE
-        DATE(off.ts_created) >= DATE_SUB(CURRENT_DATE(), 30)
+        off.ts_updated >= DATE_SUB(CURRENT_DATE(), 30)
+),
+rent_contracts AS (
+    SELECT DISTINCT
+        id_user
+    FROM
+        datalake_ebdb_clean.contract AS ctr
+    WHERE
+        ctr.ts_signed >= DATE_SUB(CURRENT_DATE(), 30)
+        AND status = 'Ativo'
 ),
 visit_status_by_demand AS (
     WITH visit_status_by_demand_ranked AS (
@@ -141,42 +184,6 @@ visit_house_rating AS (
     WHERE
         rn = 1
 ),
--- Resolve id_user OR uuid_person matches via UNION of equi-joins (EMR-safe; avoids
--- BroadcastNestedLoopJoin from disjunctive ON predicates).
-users_already_notified_by_visitor AS (
-    SELECT
-        nau.id_user
-    FROM
-        non_agent_users AS nau
-    INNER JOIN
-        users_already_notified_last_7d AS uan
-            ON uan.id_user = nau.id_user
-    UNION
-    SELECT
-        nau.id_user
-    FROM
-        non_agent_users AS nau
-    INNER JOIN
-        users_already_notified_last_7d AS uan
-            ON uan.uuid_person = nau.uuid_person
-),
-users_received_finalization_by_visitor AS (
-    SELECT
-        nau.id_user
-    FROM
-        non_agent_users AS nau
-    INNER JOIN
-        users_received_finalization_last_24h AS urf
-            ON urf.id_user = nau.id_user
-    UNION
-    SELECT
-        nau.id_user
-    FROM
-        non_agent_users AS nau
-    INNER JOIN
-        users_received_finalization_last_24h AS urf
-            ON urf.uuid_person = nau.uuid_person
-),
 eligible_visits_snapshot AS (
     SELECT
         nau.id_user,
@@ -191,8 +198,10 @@ eligible_visits_snapshot AS (
                 AND vhr.ts_created >= (CURRENT_TIMESTAMP() - INTERVAL 2 DAY) THEN 'user_finalized_and_incentivized_recently'
             WHEN vhr.house_rating IN ('partially', 'no') THEN 'user_did_not_like_house'
             WHEN lbc.id_house IS NULL THEN 'house_unpublished'
-            WHEN sof.id_house IS NOT NULL
-                OR rof.id_house IS NOT NULL THEN 'user_already_sent_offer'
+            WHEN sof.id_house IS NOT NULL THEN 'user_already_sent_house_sale_offer'
+            WHEN sco.id_user IS NOT NULL THEN 'user_signed_sale_contract_recently'
+            WHEN rof.id_house IS NOT NULL THEN 'user_already_sent_house_rent_offer'
+            WHEN rco.id_user IS NOT NULL THEN 'user_signed_rent_contract_recently'
             WHEN urf.id_user IS NOT NULL THEN 'user_received_finalization_recently'
             WHEN uan.id_user IS NOT NULL THEN 'user_received_offer_incentive_recently'
             ELSE NULL
@@ -224,10 +233,10 @@ eligible_visits_snapshot AS (
         visit_house_rating AS vhr
             ON vhr.visit_code = dvi.visit_code
     LEFT JOIN
-        users_already_notified_by_visitor AS uan
+        users_already_notified_last_7d AS uan
             ON uan.id_user = dvi.id_visitor
     LEFT JOIN
-        users_received_finalization_by_visitor AS urf
+        users_received_finalization_last_24h AS urf
             ON urf.id_user = dvi.id_visitor
     LEFT JOIN
         sale_offers AS sof
@@ -235,10 +244,20 @@ eligible_visits_snapshot AS (
             AND sof.id_house = dvi.id_house
             AND dvi.business_context = 'SALE'
     LEFT JOIN
+        sale_contracts AS sco
+            ON sco.id_user = dvi.id_visitor
+            AND dvi.business_context = 'SALE'
+    LEFT JOIN
         rent_offers AS rof
             ON rof.uuid_person = nau.uuid_person
             AND rof.id_house = dvi.id_house
             AND dvi.business_context = 'RENT'
+    LEFT JOIN
+        rent_contracts AS rco
+            ON rco.id_user = dvi.id_visitor
+            AND dvi.business_context = 'RENT'
+    WHERE
+        dvi.is_eligible = TRUE
 )
 SELECT
     CONCAT_WS('_', CAST(id_visit AS STRING), CAST(year AS STRING), CAST(month AS STRING), CAST(day AS STRING)) AS id,

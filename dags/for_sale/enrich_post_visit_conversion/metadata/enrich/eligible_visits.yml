@@ -9,12 +9,16 @@ description: >-
   is neither the agent nor the property owner of that visit, and the visitor is not a QuintoAndar
   agent. No visit is removed from the output: every row also carries removal_rule, tagging the
   first business rule that makes it ineligible for the post-visit offer-incentive communication
-  (visit contested, house disliked, house unpublished, offer already sent, recently notified), or
-  NULL when the visit remains eligible. Consumers must filter on removal_rule IS NULL to select only
-  eligible visits. Each run rewrites the partition for its own reference date with the visits
-  completed in the preceding three days, so the same visit appears in consecutive partitions
-  while it stays inside that window. Consumed by For Sale conversion analyses and the post-visit
-  offer-incentive communication flow.
+  (visit contested, house disliked, house unpublished, offer already sent, contract signed
+  recently, recently notified), or NULL when the visit remains eligible. Consumers must filter on
+  removal_rule IS NULL to select only eligible visits. Each run rewrites the partition for its own
+  reference date with the visits completed in the preceding three days, so the same visit appears
+  in consecutive partitions while it stays inside that window. Recently-notified matching resolves
+  comms events to visit_code (instead of the platform user id), fixing a prior mismatch from the
+  visit dispatch tool that affected roughly 5% of comms and could leave already-notified visitors
+  undetected. A new removal rule also covers users who recently signed a sale or rent contract for
+  the visited house, on top of users who already sent an offer. Consumed by For Sale conversion
+  analyses and the post-visit offer-incentive communication flow.
 columns:
   id:
     description: >-
@@ -60,8 +64,19 @@ columns:
       offer yet). A negative or partial house rating always disqualifies the visit. The demand
       answer and house rating are read directly from the intraday-updating visit status log and
       review sources (rather than the once-daily post_visit_demand snapshot) so the removal rule
-      reflects same-day visitor feedback. Recently-notified matching considers both the platform
-      user id and the person UUID to widen comms coverage for users identified only by uuid_person.
+      reflects same-day visitor feedback. Recently-notified matching resolves the comms event to
+      its visit_code (parsed from event_properties) and joins that back to the visit, instead of
+      comparing id_user/id_person directly against the comms payload; the direct comparison missed
+      matches whenever the visit dispatch tool recorded a mismatched user id on the comms event
+      (roughly 5% of dispatches), which could leave an already-notified visitor undetected. Rules
+      are evaluated in this priority order: user_contested_the_visit,
+      user_finalized_and_incentivized_recently, user_did_not_like_house, house_unpublished,
+      user_already_sent_house_sale_offer, user_signed_sale_contract_recently,
+      user_already_sent_house_rent_offer, user_signed_rent_contract_recently,
+      user_received_finalization_recently, user_received_offer_incentive_recently. The two new
+      contract-signed rules sit right after their respective offer-sent rule for the same business
+      context (sale contract-signed after sale offer-sent; rent contract-signed after rent
+      offer-sent), since a signed contract implies an offer was already sent.
     lineage:
     - datalake_ebdb_clean.visit_status_log.event_type
     - datalake_ebdb_clean.visit_status_log.id_visit
@@ -73,14 +88,22 @@ columns:
     - datalake_sales_flow_clean.users.id_external
     - datalake_rental_transact_clean.offer.id_house_external
     - datalake_rental_transact_clean.offer.id_tenant_external
-    - datalake_cdp_clean.comms.id_user
-    - datalake_cdp_clean.comms.id_person
+    - datalake_cdp_clean.comms.event_properties
+    - datalake_visit.visits.code
+    - datalake_sales_flow_clean.ccv.status
+    - datalake_sales_flow_clean.ccv.id_sales_flow
+    - datalake_ebdb_clean.contract.ts_signed
+    - datalake_ebdb_clean.contract.status
+    - datalake_ebdb_clean.contract.id_user
     categories:
       user_contested_the_visit: The visitor's demand answer marked the visit as not completed.
       user_finalized_and_incentivized_recently: The visitor rated the house positively less than 48 hours ago, so the finalization already covers the incentive.
       user_did_not_like_house: The visitor rated the house negatively or partially.
       house_unpublished: The house is no longer published for the visit's business context.
-      user_already_sent_offer: The visitor already made a sale or rent offer for this house.
+      user_already_sent_house_sale_offer: The visitor already made a sale offer for this house.
+      user_signed_sale_contract_recently: The visitor recently signed the sale purchase agreement (CCV) for this house.
+      user_already_sent_house_rent_offer: The visitor already made a rent offer for this house.
+      user_signed_rent_contract_recently: The visitor recently signed and activated a rent contract for this house.
       user_received_finalization_recently: The visitor already received a visit-finalization WhatsApp notification in the last 24 hours.
       user_received_offer_incentive_recently: The visitor already received an offer-incentive WhatsApp notification in the last 7 days.
   ts_created:
