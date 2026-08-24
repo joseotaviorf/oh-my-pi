@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.blitz_regulatory_training_extended_deadlines` |
 | **Business owner** | julia.mesquita@quintoandar.com.br (Learning) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active employees who gained extended days to complete Blitz regulatory training pathways. |
 | **Business purpose** | Roster of employees with extended campaign deadlines (`dias_ganhos > 0`) for the Blitz regulatory training program. One row per employee and primary pathway. Managed by the Learning team. |

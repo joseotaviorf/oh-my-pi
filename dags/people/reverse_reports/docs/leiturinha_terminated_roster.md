@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.leiturinha_terminated_roster` |
 | **Business owner** | Benefits |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Terminated BR employees for Leiturinha benefit offboarding. |
 | **Business purpose** | Benefits team export of terminated employees for Leiturinha partner offboarding (Brazil employees). |

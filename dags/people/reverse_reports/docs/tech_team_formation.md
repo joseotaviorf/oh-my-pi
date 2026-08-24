@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.tech_team_formation` |
 | **Business owner** | People Analytics — Leonardo Oliveira |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Product & Tech team formation roster for L1-scoped active employees on the Full Base 5A sheet. |
 | **Business purpose** | Refreshes employee master data on the Product & Tech team formation workbook while preserving team-structure columns maintained in the sheet. Migrated from Daily Pipeline notebook `team_formation_update` ([DBP-1451](https://quintoandar.atlassian.net/browse/DBP-1451)). Interim Google Sheets delivery during the Databricks Exodus cutover. |

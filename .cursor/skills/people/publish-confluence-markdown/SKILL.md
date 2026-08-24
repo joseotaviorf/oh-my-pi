@@ -26,7 +26,7 @@ Do **not** copy long ID tables into this skill. For **`cloudId`**, numeric **`sp
 - **Avoid double titles:** Confluence shows the page title in the header. **Omit the leading `# H1` line** from the body passed to **`updateConfluencePage`** if the **`title`** argument matches that heading.
 - **Draft-first (required):** always set **`status`** to **`draft`** unless the user explicitly asks otherwise.
 - **Version message:** include a short description (e.g. `Sync from bi-etl-ejuice Git: docs/dw_compensation.md`).
-- **Parent IDs:** new **People DW 2.0** pages use **`parentId: 4635951235`** (People Data Catalog) — confirm in **`people_domain.mdc`**. If hierarchy is unclear, ask the user before creating a page.
+- **Parent IDs:** new **People DW 2.0** pages use **`parentId: 5474320386`** (People Data Catalog) — confirm in **`people_domain.mdc`**. If hierarchy is unclear, ask the user before creating a page.
 
 ## Before overwriting wiki-only edits (optional)
 

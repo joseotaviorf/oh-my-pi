@@ -68,9 +68,9 @@ Data is organized by functional domain for schema-level governance and access co
 | `dw_equity` | Equity data |
 | `dw_survey` | Survey data |
 
-### Query preference — `dw_employee_details` vs `dw_people` (People Data)
+### Query preference — `dw_employee_details` vs `dw_people` (Enterprise Engineering)
 
-**People Data:** prefer **`dw_employee_details`** (and sibling domain `dw_*`) for internal queries — fuller model. **`dw_people`** is a slimmer, **public** schema for **non–People** consumers. **Avoid `dw_people`** internally when the need is covered by `dw_employee_details`, unless there is an explicit exception.
+**Enterprise Engineering:** prefer **`dw_employee_details`** (and sibling domain `dw_*`) for internal queries — fuller model. **`dw_people`** is a slimmer, **public** schema for **non–People** consumers. **Avoid `dw_people`** internally when the need is covered by `dw_employee_details`, unless there is an explicit exception.
 
 When adding new tables, place them in the schema that matches the business domain.
 
@@ -99,7 +99,7 @@ Use this when syncing Markdown from `dags/people/**/docs/dw_*.md` via **`publish
 |------------|-------|-------|
 | **cloudId** | `8a4667b7-87a1-4c6c-805c-fc0d6e60a7a0` | QuintoAndar Cloud site; resolve with `getAccessibleAtlassianResources` if needed. |
 | **spaceId** (API) | `4636409985` | **Numeric** space id for Confluence Cloud REST / MCP. Do **not** use the space **key** from the URL (e.g. `team162449…`) as `spaceId` — the API expects a Long and returns `400 INVALID_REQUEST_BODY` otherwise. Confirm with `getConfluencePage` on a page in the space if the space is ever migrated. |
-| **[People Data Catalog](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4635951235/People+Data+Catalog)** | pageId `4635951235` | **Parent** for new **People DW 2.0** schema wiki pages: set **`parentId`** to this value in **`createConfluencePage`** so the doc lives **under** the catalog hierarchy. Use this hub in links from repo Markdown. |
+| **[People Data Catalog](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/5474320386/People+Data+Catalog)** | pageId `5474320386` | **Parent** for new **People DW 2.0** schema wiki pages: set **`parentId`** to this value in **`createConfluencePage`** so the doc lives **under** the catalog hierarchy. Use this hub in links from repo Markdown. |
 | **Refining — DW 2.0** | pageId `4954423298` | Planning / wave narrative; **not** the default **`parentId`** for DW schema documentation pages. Do not place new `dw_*` wiki pages here unless the **user** explicitly asks. |
 | **Uncertainty** | — | If it is unclear whether a page should be a **direct** child of People Data Catalog or nested under another Catalog subpage, **ask the user** before creating or moving content. |
 

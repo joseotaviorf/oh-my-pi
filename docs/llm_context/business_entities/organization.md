@@ -153,5 +153,5 @@ ORDER BY cc.cost_center_name
 
 - **Data Product:** [urn:li:dataProduct:organization](https://datahub.apps.data-prd.habitat.zone/dataProducts/urn%3Ali%3AdataProduct%3Aorganization)
 - **Datasets (TARS pilot):** `dw_organization.dim_cost_center`, `dim_business_unit`, `dim_job` — published to DataHub by CI from this Markdown (`organization.md` → `organization`).
-- **People Data Catalog:** [People Data Catalog](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4635951235/People+Data+Catalog)
+- **People Data Catalog:** [People Data Catalog](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/5474320386/People+Data+Catalog)
 - **Codex reference:** [Codex spreadsheet](https://docs.google.com/spreadsheets/d/1-85ApczFAw1B7ZfU59WJ_qwTaYGVmkw8efSa9K9umeA/edit?usp=sharing)

@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.blitz_regulatory_training_sections` |
 | **Business owner** | julia.mesquita@quintoandar.com.br (Learning) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Section-level regulatory training progress for active employees on the Blitz dashboard. |
 | **Business purpose** | Feeds the Blitz Looker dashboard (90-day regulatory training compliance) with one row per employee and pathway section. Managed by the Learning team and Julia. Migrated from Daily Pipeline notebook `dash_blitz_degreed` ([DBP-1454](https://quintoandar.atlassian.net/browse/DBP-1454)). |

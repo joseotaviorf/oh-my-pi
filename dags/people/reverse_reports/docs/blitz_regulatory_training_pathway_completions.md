@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.blitz_regulatory_training_pathway_completions` |
 | **Business owner** | julia.mesquita@quintoandar.com.br (Learning) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Employees with 100% completed Degreed pathways eligible for certificate tracking. |
 | **Business purpose** | Supplies the certificate base tab with completed pathway records for Learning operations. Migrated from Daily Pipeline notebook `dash_blitz_degreed` view `invite_final` ([DBP-1454](https://quintoandar.atlassian.net/browse/DBP-1454)). |

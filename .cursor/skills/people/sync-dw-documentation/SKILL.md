@@ -45,7 +45,7 @@ Build links using these formats:
 
 ### 5. Domain logic and finding related tables
 * **Mapping Placeholders by Domain:** adapt the template placeholders to your target domain.
-    * **People DW mappings:** if domain is 'people', translate placeholders: `{data_catalog_name}` becomes `People Data Catalog`, `{data_catalog_url}` becomes `https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4635951235/People+Data+Catalog`, `{main_dimension}` becomes `dw_people.dim_employee`, `{primary_key}` becomes `sk_employee`, and `{alternate_key}` becomes `person_number` (unless DAG SQL proves otherwise).
+    * **People DW mappings:** if domain is 'people', translate placeholders: `{data_catalog_name}` becomes `People Data Catalog`, `{data_catalog_url}` becomes `https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/5474320386/People+Data+Catalog`, `{main_dimension}` becomes `dw_people.dim_employee`, `{primary_key}` becomes `sk_employee`, and `{alternate_key}` becomes `person_number` (unless DAG SQL proves otherwise).
     * **Other Domains:** map corresponding values based on domain logic.
 * **Related Scopes discovery:**
   * Scan sibling folders in `dags/{domain}/`.
