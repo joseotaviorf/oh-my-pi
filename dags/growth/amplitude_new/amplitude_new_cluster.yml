@@ -1,33 +1,35 @@
 cluster:
-  type: emr_7_12_consolidation_xl_memory_fleet_cluster
+  type: consolidation_xl_memory_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
-    master_node_type_id: r6g.2xlarge
-    core_nodes:
-      target_on_demand: 2
-      target_spot: 0
-      instance_types:
-        - r6gd.8xlarge
-    task_nodes:
-      instance_types:
-        - r6gd.8xlarge
-      target_on_demand: 4
-      target_spot: 0
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
     aws_attributes:
+      availability: ON_DEMAND
       ebs_volume_size: 500
     spark_conf:
-      spark.driver.maxResultSize: "0"
-      spark.databricks.delta.optimizeWrite.enabled: "true"
-      spark.driver.memory: "20g"
-      spark.driver.memoryOverhead: "4g"
-      # One 96g executor × 16 cores per r6gd.8xlarge → ~96 parallel tasks (6 workers),
-      # closer to Databricks UI (~100+). j-0885277283GXQAEQV84H spilled ~3.3–3.4 GiB/task
-      # at 128g/8c; keep 96g and watch spill after skew salt + REPARTITION(400).
-      spark.executor.memory: "96g"
-      spark.executor.memoryOverhead: "8g"
-      spark.executor.cores: "16"
-      spark.dynamicAllocation.maxExecutors: "6"
-      spark.sql.shuffle.partitions: "400"
-      spark.sql.adaptive.advisoryPartitionSizeInBytes: "512MB"
-      # Parallelize classic checkpoints (single-file default hung stage 93 on j-09208432).
-      # Checkpoint frequency is delta.checkpointInterval on the table (declaration).
-      spark.databricks.delta.checkpoint.partSize: "20000"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.driver.maxResultSize: '0'
+      spark.databricks.delta.optimizeWrite.enabled: 'true'
+    driver_node_type_id: r7g.xlarge
+    node_type_id: r7gd.8xlarge
+    num_workers: 6
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xl_memory_fleet_cluster
+    custom_configurations:
+      core_nodes:
+        target_on_demand: 2
+        target_spot: 0
+        instance_types:
+        - r6gd.8xlarge
+      task_nodes:
+        instance_types:
+        - r6gd.8xlarge
+        target_on_demand: 4
+        target_spot: 0
+      aws_attributes:
+        ebs_volume_size: 500
+      spark_conf:
+        spark.driver.maxResultSize: '0'
+  allow_custom_spark_job: true
