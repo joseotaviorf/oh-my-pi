@@ -18,16 +18,18 @@ workflow:
   layer: enrich
   default_extraction_type: incremental
   inner_dependencies:
+    agent_accreditation_events:
+      - agent_unified_identity
     agent_product:
       - agent_unified_identity
   tables_customization:
+    agent_accreditation_events:
+      merge_on: [id_event]
+      z_order_by: [id_unified_agent, ts_created]
     agent_product:
-      custom_schema: agent
       merge_on: [id_agent_product]
-      partitions: [dt_updated]
       z_order_by: [id_unified_agent, ts_started]
     agent_unified_identity:
-      custom_schema: agent
       merge_on: [id_unified_agent]
       partitions: [year, month, day]
       z_order_by: [id_unified_agent, ts_updated]

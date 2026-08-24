@@ -1,11 +1,12 @@
 ---
-database_name: datalake_agent
+database_name: datalake_ebdb_agent_events
 table_name: agent_unified_identity
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
 description: |
   Unified agent identity across Agent Domain agent, legacy EBDB agent_data (dadosAgente), and
-  partner records. One row per person-agent-partner bridge updated within the load window.
+  partner records. One row per person-agent-partner bridge with at least one agent identifier
+  (id_agent, id_agent_data, or id_partner), updated within the load window.
   Consolidates natural and surrogate keys (id_unified_agent, sk_person, sk_broker, sk_company),
   prospect/affiliate context, 1P/3P partnership flags, and 3P broker profile flags. Built from
   a UNION of Agent Domain rows linked to legacy/partner references and standalone legacy/partner
@@ -87,6 +88,19 @@ columns:
     lineage:
       - datalake_ebdb_clean.agent_external_reference.value
     description: Prospect UUID from agent external references when type is PROSPECT_UUID, linking to prospect_agent.
+  creci:
+    lineage:
+      - datalake_person_clean.identity_document.identification_number
+      - datalake_ebdb_clean.agent_data.creci_number
+      - datalake_ebdb_clean.partner.creci
+      - datalake_ebdb_clean.quintoandar_prospect_agent.creci
+    description: |
+      CRECI license number resolved from person identity document, legacy agent_data,
+      partner record, or prospect agent registration.
+  creci_uf:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.creci_uf
+    description: State (UF) of the CRECI license from prospect agent registration when available.
   is_affiliate_active:
     lineage:
       - datalake_ebdb_clean.affiliate_data.is_active
@@ -164,7 +178,10 @@ columns:
       - datalake_ebdb_clean.agent.ts_created
       - datalake_ebdb_clean.agent_data.ts_created
       - datalake_ebdb_clean.partner.ts_created
-    description: Earliest creation timestamp from agent, agent_data, or partner, used for partition derivation.
+    description: |
+      Creation timestamp for the unified identity row. For Agent Domain rows linked to legacy
+      agent_data or partner, uses LEAST(agent.ts_created, person.ts_created); otherwise uses
+      agent.ts_created. Used for partition derivation.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.agent.ts_updated

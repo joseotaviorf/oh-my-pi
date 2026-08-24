@@ -1,0 +1,94 @@
+---
+database_name: datalake_ebdb_agent_events
+table_name: agent_accreditation_events
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+description: |
+  Unified accreditation event history per agent identity. One row per activation,
+  inactivation, reactivation, or migration event, reconciling Agent Domain event logs
+  with legacy agent_data and partner_agent audit trails. Built incrementally for
+  unified identities updated within the load window.
+columns:
+  id_event:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
+      - datalake_ebdb_clean.agent_event_log.ts_created
+      - datalake_ebdb_clean.agent_data_aud.rev
+      - datalake_ebdb_clean.partner_agent_aud.rev
+    description: |
+      Surrogate key for the accreditation event row, generated with XXHASH64 from
+      id_unified_agent, source, event, and event timestamp. Primary merge key.
+  id_unified_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
+    description: Foreign key to the unified identity row in agent_unified_identity.
+  id_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent
+    description: Agent Domain agent identifier when the identity has an accredited agent record.
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent_data
+    description: Legacy dadosAgente identifier from unified identity when present.
+  id_partner:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_partner
+    description: Partner identifier from unified identity when present.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+    description: Person UUID anchor for the unified identity.
+  source:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.event_type
+      - datalake_ebdb_clean.agent_data_aud.rev_type
+      - datalake_ebdb_clean.partner_agent_aud.status
+    description: Origin system of the accreditation event.
+    categories:
+      AGENT_DOMAIN: Event derived from Agent Domain agent_event_log status changes.
+      AGENT_DATA: Event reconstructed from legacy agent_data_aud revision history.
+      PARTNER_DATA: Event reconstructed from partner_agent_aud status changes for autonomous agents.
+  event:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.event_type
+      - datalake_ebdb_clean.agent_data_aud.is_active
+      - datalake_ebdb_clean.partner_agent_aud.status
+    description: Normalized accreditation lifecycle event for the identity.
+    categories:
+      ACTIVATED: Agent became active through accreditation or first activation.
+      INACTIVATED: Agent became inactive through deaccreditation.
+      REACTIVATED: Agent was reactivated after a prior inactivation from a different source.
+      MIGRATED: Agent Domain migration event (legacy agent migrated to Agent Domain).
+  event_reason:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.reason
+      - datalake_ebdb_clean.agent_data_aud.is_active
+      - datalake_ebdb_clean.partner_agent_aud.status
+    description: Business reason behind the accreditation event, normalized across sources.
+    categories:
+      AGENT_ACCREDITATION: Standard accreditation or activation of an agent profile.
+      AGENT_DEACCREDITATION: Standard deaccreditation or inactivation of an agent profile.
+      INACTIVE_AGENT_REENROLLMENT: Reenrollment of an existing inactive legacy agent.
+      LEGACY_AGENT_MIGRATION: Initial automatic migration attempt from legacy systems to Agent Domain.
+      LEGACY_AGENT_MIGRATION_BACKFILL: Migration reprocessing after manual remediation.
+  has_source_migrated:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.reason
+      - datalake_ebdb_clean.agent_event_log.event_type
+    description: |
+      True when the event is the first Agent Domain migration event for the identity
+      (source is AGENT_DOMAIN, source changed from a prior event, and event_reason
+      contains MIGRATION).
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.event_type
+      - datalake_ebdb_clean.agent_data_aud.is_active
+      - datalake_ebdb_clean.partner_agent_aud.status
+    description: True when the normalized event is not INACTIVATED.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_created
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: |
+      Timestamp when the accreditation event occurred in the source system. For legacy
+      sources, mapped from user_revision_entity.ts_revision.

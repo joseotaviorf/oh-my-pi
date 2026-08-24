@@ -1,50 +1,48 @@
 ---
-database_name: datalake_agent
+database_name: datalake_ebdb_agent_events
 table_name: agent_product
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
 description: |
-  Historical company product membership per agent unified identity. One row per product change
-  revision for an agent (id_unified_agent), sourced from company member_profile and company_product.
-  Tracks product name, active status, deactivation reasons, legacy product flags, and validity
-  window (ts_started, ts_ended). Legacy products (e.g. CIQ, PP MULTI) superseded by
-  AUTONOMOUS_BROKERAGE_AGENT are flagged via is_legacy_product; revisions before the first
-  non-legacy transition are trimmed via ts_legacy_product_limit. Product id 40 (Alias AI/ML) is
-  excluded at source because it does not represent the agent profile and coexists with Rede
-  Sale and Rede Rent memberships.
+  Company product membership per unified agent identity. One row per member_profile
+  record linked to agent_unified_identity through uuid_person and company uuid_company.
+  Enriches product catalog attributes and company_product deactivation context, and flags
+  legacy products (ids 1, 32, 29) versus valid agent-profile products (excludes legacy
+  ids and product id 40 Alias). Latest valid product flag supports downstream snapshots.
 columns:
   id_agent_product:
     lineage:
-      - datalake_agent.agent_unified_identity.id_unified_agent
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
       - datalake_company_clean.company.id
       - datalake_company_clean.product.id
-      - datalake_company_transactional.member_profile.updated_at
+      - datalake_company_clean.member_profile.ts_created
     description: |
-      Surrogate key for the agent product revision, generated with XXHASH64 from id_unified_agent,
-      id_company, id_product, and ts_updated. Primary merge key for this table.
+      Surrogate key for the agent product row, generated with XXHASH64 from id_unified_agent,
+      id_company, id_product, and member_profile ts_created. Primary merge key for this table.
   id_unified_agent:
     lineage:
-      - datalake_agent.agent_unified_identity.id_unified_agent
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
     description: Foreign key to the unified identity row in agent_unified_identity.
-  id_company:
+  id_agent:
     lineage:
-      - datalake_company_clean.company.id
-    description: Company identifier from the company domain, resolved via uuid_company on unified identity.
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent
+    description: Agent Domain agent identifier from unified identity when present.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+    description: Person UUID used to join member_profile with unified identity.
+  uuid_company:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_company
+    description: Company UUID from unified identity, used to resolve company and member_profile.
   id_product:
     lineage:
       - datalake_company_clean.product.id
-    description: |
-      Product identifier from the company product catalog linked to the member profile. Product
-      id 40 (Alias) is excluded in the SQL filter because it is an AI/ML association that does
-      not represent the agent profile and coexists with Rede Sale and Rede Rent products.
-  uuid_person:
-    lineage:
-      - datalake_agent.agent_unified_identity.uuid_person
-    description: Person UUID from unified identity, used to join member_profile in the source query.
+    description: Product identifier from the member_profile company-product link.
   product_name:
     lineage:
       - datalake_company_clean.product.name
-    description: Human-readable product name (e.g. company membership profile type) at revision time.
+    description: Human-readable product name from the company product catalog.
   deactivation_reason:
     lineage:
       - datalake_company_clean.company_product.deactivation_reason
@@ -55,32 +53,37 @@ columns:
     description: Deactivation sub-reason from company_product when the membership is inactive.
   is_active:
     lineage:
-      - datalake_company_clean.company_product.status
-    description: True when company_product status is ACTIVE for this agent-product revision.
-  is_lastest:
-    description: True when this row is the latest product revision for id_unified_agent (prefers active status).
-  is_lastest_by_date:
-    description: True when this row is the latest product revision for id_unified_agent on the calendar day of ts_started.
+      - datalake_company_clean.member_profile.status
+    description: True when member_profile status is ACTIVE for this company-product pair.
   is_legacy_product:
     lineage:
       - datalake_company_clean.product.id
     description: |
-      True when the product is a legacy membership profile superseded by AUTONOMOUS_BROKERAGE_AGENT
-      (currently product ids 1, 32, and 29 — e.g. CIQ and PP MULTI). These products may remain
-      erroneously active in member_profile; flagging them enables historical cleanup while
-      ts_legacy_product_limit excludes stale legacy revisions after the first modern product.
-  dt_updated:
+      True when the product is a legacy membership profile superseded by
+      AUTONOMOUS_BROKERAGE_AGENT (product ids 1, 32, and 29).
+  is_valid_product:
     lineage:
-      - datalake_company_transactional.member_profile.updated_at
-    description: Calendar date of the product revision, derived from member_profile update timestamp. Partition key.
+      - datalake_company_clean.product.id
+    description: |
+      True when the product represents a valid agent profile membership, excluding legacy
+      product ids (1, 32, 29) and product id 40 (Alias AI/ML).
+  is_lastest_valid:
+    description: |
+      True when this row is the preferred valid product for id_unified_agent, ranking by
+      valid product flag, active member_profile status, and unified identity update time.
   ts_started:
     lineage:
-      - datalake_company_transactional.member_profile.updated_at
-    description: Timestamp when this product membership revision became effective.
+      - datalake_company_clean.member_profile.ts_created
+    description: Timestamp when the member_profile record was created in the company service.
   ts_ended:
     lineage:
-      - datalake_company_transactional.member_profile.updated_at
       - datalake_company_clean.company_product.ts_database_transaction
+      - datalake_company_clean.member_profile.ts_updated
     description: |
-      End of the product revision validity window: company_product update timestamp when inactive
-      and latest, otherwise day or second before the next revision for the same id_unified_agent.
+      Timestamp when the product membership ended, from company_product deactivation or
+      member_profile inactivation when applicable.
+  ts_updated:
+    lineage:
+      - datalake_company_clean.member_profile.ts_updated
+      - datalake_ebdb_agent_events.agent_unified_identity.ts_updated
+    description: Latest update timestamp from member_profile or unified identity.

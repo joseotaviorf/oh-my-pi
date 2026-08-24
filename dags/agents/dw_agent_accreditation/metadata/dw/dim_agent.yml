@@ -63,16 +63,24 @@ columns:
     description: Current lifecycle status of the agent.
     lineage:
     - datalake_agent_accreditation.agent.status
-  company_product_name:
-    description: Name of the company product tied to the agent via company membership
-      profile (latest by update time).
-    lineage:
-    - datalake_agent_accreditation.agent.company_product_name
   profile:
-    description: Profile of the agent via company membership profile (latest by update
-      time).
+    description: |
+      Agent company product profile name from the latest valid agent_product membership
+      (is_valid_product and is_lastest_valid).
     lineage:
-    - datalake_agent_accreditation.agent.profile
+    - datalake_ebdb_agent_events.agent_product.product_name
+  deactivation_reason:
+    description: |
+      Product deactivation reason from the latest valid agent_product membership when
+      the company-product link is inactive.
+    lineage:
+    - datalake_ebdb_agent_events.agent_product.deactivation_reason
+  deactivation_sub_reason:
+    description: |
+      Product deactivation sub-reason from the latest valid agent_product membership when
+      the company-product link is inactive.
+    lineage:
+    - datalake_ebdb_agent_events.agent_product.deactivation_sub_reason
   is_reactivated:
     description: True when the agent was reactivated.
     lineage:

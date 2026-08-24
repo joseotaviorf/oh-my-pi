@@ -23,8 +23,9 @@ SELECT
   a.creci_uf,
   a.affiliation_type,
   a.status,
-  a.company_product_name,
-  a.profile,
+  product.product_name AS profile,
+  product.deactivation_reason,
+  product.deactivation_sub_reason,
   a.is_reactivated,
   a.is_allow_supply_acquisition,
   a.is_allow_demand_acquisition,
@@ -51,3 +52,8 @@ LEFT JOIN
 LEFT JOIN
   agent_lead_referral AS alr
     ON a.id_agent_data = alr.id_agent_data
+LEFT JOIN
+  datalake_ebdb_agent_events.agent_product AS product
+    ON a.id_agent = product.id_agent
+    AND product.is_valid_product IS TRUE
+    AND product.is_lastest_valid IS TRUE

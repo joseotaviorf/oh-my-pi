@@ -26,6 +26,7 @@ agent_data AS (
     SELECT
         agent_data.id AS id_agent_data,
         agent_data.uuid_company,
+        agent_data.creci_number,
         agent_data.is_active,
         agent_data.agent_type <> 'CORRETOR_REDE' AS is_1p_partnership,
         agent_data.agent_type = 'CORRETOR_REDE' AS is_3p_partnership,
@@ -42,6 +43,7 @@ partner AS (
         partner_agent.id AS id_partner_agent,
         partner_agent.id_user,
         partner.uuid_company,
+        partner.creci,
         partner_agent.status,
         partner.ts_created,
         GREATEST(partner.ts_updated, partner_agent.ts_updated) AS ts_updated
@@ -54,6 +56,27 @@ partner AS (
         DATE(partner.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         OR DATE(partner_agent.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
+person_creci_number AS (
+    SELECT
+        document.id_person,
+        document.identification_number AS creci
+    FROM
+        datalake_person_clean.identity_document AS document
+    WHERE
+        document.document_type = "CRECI"
+),
+prospect_agent AS (
+    SELECT
+        prospect.id AS id_prospect_agent,
+        prospect.uuid_prospect,
+        prospect_creci.creci,
+        prospect_creci.creci_uf
+    FROM
+        datalake_ebdb_clean.prospect_agent AS prospect
+    JOIN
+        datalake_ebdb_clean.quintoandar_prospect_agent AS prospect_creci
+            ON prospect_creci.id_prospect_agent = prospect.id
+),
 person_data AS (
     SELECT
         person.sk_person,
@@ -65,6 +88,11 @@ person_data AS (
         user.id_photographer_data,
         COALESCE(agent_data.uuid_company, partner.uuid_company) AS uuid_company,
         person.uuid_person,
+        COALESCE(
+            person_creci.creci,
+            agent_data.creci_number,
+            partner.creci
+        ) AS creci,
         affiliate.is_active AS is_affiliate_active,
         photographer.is_active AS is_photographer_active,
         agent_data.is_active AS is_agent_data_active,
@@ -94,6 +122,9 @@ person_data AS (
     LEFT JOIN
         datalake_ebdb_clean.photographer_data AS photographer
             ON photographer.id = user.id_photographer_data
+    LEFT JOIN
+        person_creci_number AS person_creci
+            ON person_creci.id_person = person.id_person
     WHERE
         agent.id_agent IS NOT NULL
         OR agent_data.id_agent_data IS NOT NULL
@@ -107,7 +138,7 @@ unified_identity AS (
         agent.id_agent_data,
         agent.id_partner,
         IF(agent.id_partner IS NOT NULL, person.id_partner_agent, NULL) AS id_partner_agent,
-        prospect.id AS id_prospect_agent,
+        prospect.id_prospect_agent,
         person.id_affiliate,
         person.id_photographer_data,
         CASE
@@ -120,6 +151,8 @@ unified_identity AS (
         person.uuid_person,
         agent.uuid_agent,
         agent.uuid_prospect,
+        COALESCE(person.creci, prospect.creci) AS creci,
+        prospect.creci_uf,
         agent.id_agent_data IS NOT NULL AS is_agent_data_associated,
         agent.id_partner IS NOT NULL AS is_partner_associated,
         person.is_affiliate_active,
@@ -135,7 +168,11 @@ unified_identity AS (
         ) AS is_unified_agent_active,
         COALESCE(agent.is_1p_partnership, person.is_1p_partnership) AS is_1p_partnership,
         COALESCE(agent.is_3p_partnership, person.is_3p_partnership) AS is_3p_partnership,
-        agent.ts_created,
+        IF(
+            COALESCE(agent.id_agent_data, agent.id_partner) IS NOT NULL,
+            LEAST(agent.ts_created, person.ts_created),
+            agent.ts_created
+        ) AS ts_created,
         GREATEST(agent.ts_updated, person.ts_updated) AS ts_updated
     FROM
         person_data AS person
@@ -143,16 +180,16 @@ unified_identity AS (
         agent AS agent
             ON agent.uuid_person = person.uuid_person
     LEFT JOIN
-        datalake_ebdb_clean.prospect_agent AS prospect
+        prospect_agent AS prospect
             ON prospect.uuid_prospect = agent.uuid_prospect
     UNION
     SELECT
         person.sk_person,
         person.id_user,
         NULL AS id_agent,
-        MAX(IF(agent.id_agent_data IS NULL, person.id_agent_data, NULL)) AS id_agent_data,
-        MAX(IF(agent.id_partner IS NULL, person.id_partner, NULL)) AS id_partner,
-        MAX(IF(agent.id_partner IS NULL, person.id_partner_agent, NULL)) AS id_partner_agent,
+        MAX(IF(agent_data_exception.id_agent_data IS NULL, person.id_agent_data, NULL)) AS id_agent_data,
+        MAX(IF(partner_exception.id_partner IS NULL, person.id_partner, NULL)) AS id_partner,
+        MAX(IF(partner_exception.id_partner IS NULL, person.id_partner_agent, NULL)) AS id_partner_agent,
         NULL AS id_prospect_agent,
         person.id_affiliate,
         person.id_photographer_data,
@@ -160,17 +197,19 @@ unified_identity AS (
         person.uuid_person,
         NULL AS uuid_agent,
         NULL AS uuid_prospect,
+        person.creci,
+        NULL AS creci_uf,
         FALSE AS is_agent_data_associated,
         FALSE AS is_partner_associated,
         person.is_affiliate_active,
         person.is_photographer_active,
         person.is_user_active,
         NULL AS is_agent_active,
-        MAX(IF(agent.id_agent_data IS NULL, person.is_agent_data_active, NULL)) AS is_agent_data_active,
-        MAX(IF(agent.id_partner IS NULL, person.is_partner_active, NULL)) AS is_partner_active,
+        MAX(IF(agent_data_exception.id_agent_data IS NULL, person.is_agent_data_active, NULL)) AS is_agent_data_active,
+        MAX(IF(partner_exception.id_partner IS NULL, person.is_partner_active, NULL)) AS is_partner_active,
         MAX(
-            (agent.id_agent_data IS NULL AND person.is_agent_data_active IS TRUE)
-            OR (agent.id_partner IS NULL AND person.is_partner_active IS TRUE)
+            (agent_data_exception.id_agent_data IS NULL AND person.is_agent_data_active IS TRUE)
+            OR (partner_exception.id_partner IS NULL AND person.is_partner_active IS TRUE)
         ) AS is_unified_agent_active,
         person.is_1p_partnership,
         person.is_3p_partnership,
@@ -179,15 +218,17 @@ unified_identity AS (
     FROM
         person_data AS person
     LEFT JOIN
-        agent AS agent
-            ON agent.uuid_person = person.uuid_person
-    GROUP BY 1, 2, 3, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 23, 24, 25, 26
-    HAVING
-        MAX(agent.id_agent) IS NULL
-        OR (
-            COALESCE(id_agent_data, -1) <> MAX(COALESCE(agent.id_agent_data, -1))
-            AND COALESCE(id_partner, -1) <> MAX(COALESCE(agent.id_partner, -1))
-        )
+        agent AS agent_data_exception
+            ON agent_data_exception.uuid_person = person.uuid_person
+            AND agent_data_exception.id_agent_data = person.id_agent_data
+    LEFT JOIN
+        agent AS partner_exception
+            ON partner_exception.uuid_person = person.uuid_person
+            AND partner_exception.id_partner = person.id_partner
+    WHERE
+        agent_data_exception.id_agent_data IS NULL
+        OR partner_exception.id_partner IS NULL
+    GROUP BY 1, 2, 3, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 26, 27, 28
 ),
 brokers_profile AS (
     SELECT
@@ -223,6 +264,8 @@ SELECT
     p.uuid_company,
     p.uuid_agent,
     p.uuid_prospect,
+    p.creci,
+    p.creci_uf,
     p.is_affiliate_active,
     p.is_photographer_active,
     p.is_user_active,
@@ -273,3 +316,5 @@ LEFT JOIN
     brokers_profile AS bp
         ON p.uuid_person = bp.uuid_person
         AND b.sk_broker = bp.sk_broker
+WHERE
+    COALESCE(p.id_agent, p.id_agent_data, p.id_partner) IS NOT NULL
