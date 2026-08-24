@@ -11,6 +11,7 @@
 | **Business purpose** | Feeds Performa cycles into X-Ray / Employee Data Center. Migrated from Daily Pipeline notebook `xray_update` ([DBP-1447](https://quintoandar.atlassian.net/browse/DBP-1447)). |
 | **Business consumer** | People (company-wide via AppSheet). |
 | **Delivery channel** | Google Sheets tab **base_performa_edc** in workbook [https://docs.google.com/spreadsheets/d/1Ka3EGuF-DSHrHFNQYH3Mh9G9GwogRf4lEsDO1sLjExs/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1Ka3EGuF-DSHrHFNQYH3Mh9G9GwogRf4lEsDO1sLjExs/edit?usp=sharing). Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
+| **Contract notes** | Org context (including `banda`) comes from the same-day `reverse_reports.xray_general_info` partition. `banda` sits after `team` so the Performa EDC tab matches the other X-Ray sibling exports. |
 
 
 ## Notebook usage context (X-Ray / Employee Data Center)
