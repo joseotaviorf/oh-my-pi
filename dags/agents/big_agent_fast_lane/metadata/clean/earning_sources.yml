@@ -77,6 +77,11 @@ columns:
       - datalake_big_agent_raw.earning_sources.occurred_at
     description: |
       Source-system timestamp when the underlying earning event occurred (timezone as in source).
+  ts_sent_to_finance:
+    lineage:
+      - datalake_big_agent_raw.earning_sources.sent_to_finance_at
+    description: |
+      Source-system timestamp when the earning source was sent to finance (timezone as in source).
   ts_created:
     lineage:
       - datalake_big_agent_raw.earning_sources.created_at
@@ -87,6 +92,23 @@ columns:
       - datalake_big_agent_raw.earning_sources.updated_at
     description: |
       Timestamp of the last update to this row in the Big Agent database.
+  op_cdc:
+    description: CDC operation type captured by Debezium.
+    lineage:
+      - datalake_big_agent_raw.earning_sources.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+    lineage:
+      - datalake_big_agent_raw.earning_sources.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in the source system.
+    lineage:
+      - datalake_big_agent_raw.earning_sources.ts_database_transaction
   year:
     lineage:
       - datalake_big_agent_raw.earning_sources.year

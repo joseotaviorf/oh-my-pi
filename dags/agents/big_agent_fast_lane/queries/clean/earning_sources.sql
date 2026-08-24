@@ -12,6 +12,7 @@ SELECT
     incentive_systems_calculation_status,
     DATE(competence_date) AS dt_competence,
     TIMESTAMP(occurred_at) AS ts_occurred,
+    TIMESTAMP(sent_to_finance_at) AS ts_sent_to_finance,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
     year,
