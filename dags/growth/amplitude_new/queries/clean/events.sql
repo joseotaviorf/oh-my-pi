@@ -60,7 +60,7 @@ WITH source AS (
 
 )
 
-SELECT /*+ REPARTITION(1000, id_app, event_type, year, month, day, _salt) */
+SELECT /*+ REPARTITION(400, id_app, event_type, year, month, day, _salt) */
     id_amplitude,
     ids_amplitude_attributed,
     adid,

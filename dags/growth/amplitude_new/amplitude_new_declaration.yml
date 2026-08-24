@@ -29,3 +29,6 @@ workflow:
       run_optimize: false
       run_vacuum: false
       has_hive_sync: false
+      # Applied on clean load via ALTER TABLE; default commit interval is 10.
+      table_properties:
+        delta.checkpointInterval: "50"
