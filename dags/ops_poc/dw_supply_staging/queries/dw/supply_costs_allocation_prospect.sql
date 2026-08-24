@@ -65,7 +65,7 @@ leads_share AS (
         AND obt.campaign_business_context IS NOT NULL
         AND obt.source IS NOT NULL
         AND obt.medium IS NOT NULL
-        AND obt.date >= DATE '2025-01-01'
+        AND obt.date >= DATE '2023-01-01'
         AND company_report_origin IN (
             'Price Calculator',
             'Price Calculator - Sale',
@@ -109,7 +109,7 @@ prospects_share AS (
         AND obt.campaign_business_context IS NOT NULL
         AND obt.source IS NOT NULL
         AND obt.medium IS NOT NULL
-        AND obt.date >= DATE '2025-01-01'
+        AND obt.date >= DATE '2023-01-01'
         AND obt.company_report_origin IN (
             'Price Calculator',
             'Price Calculator - Sale',
@@ -157,6 +157,7 @@ costs AS (
             )
     WHERE
         ms.funnel_side = 'Supply'
+        AND mc.year >= 2023
     GROUP BY ALL
 ),
 -- -----------------------------------------------------------------------------
