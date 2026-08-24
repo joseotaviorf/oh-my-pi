@@ -33,8 +33,8 @@
 |------|---------|-------|
 | **PPA (Preferred Property Agent)** | Agent fixed to a **listing** (agent brought the supply) | `preferred_property_agent_relation_history` — a **separate table from PFA**, despite the similar name. |
 | **PFA (Preferred Fixed Agent)** | Agent fixed to a **lead/visitor** (usually first-visit) | `preferred_fixed_agent_history` — a **different table and pipeline** from PPA, not a shared one. |
-| **TQC (Traz Quem Compra)** | Demand-acquisition function on Sale — agent who brings/qualifies the buyer lead | Capability `DEMAND_ACQUISITION`; `business_context = 'SALE'` in `agent_lead_referral`. |
-| **TQA (Traz Quem Aluga)** | Demand-acquisition function on Rent — rent counterpart of TQC | Capability `DEMAND_ACQUISITION`; `business_context = 'RENT'` in `agent_lead_referral`. |
+| **TQC (Traz Quem Compra)** | Demand-acquisition function on Sale — agent who brings/qualifies the buyer lead | Capability `DEMAND_ACQUISITION`; `business_context = 'SALE'` in `agent_lead_referral`; `status` of referral  invite (pending, accepted, expired, or cancelled) in `agent_lead_referral` |
+| **TQA (Traz Quem Aluga)** | Demand-acquisition function on Rent — rent counterpart of TQC | Capability `DEMAND_ACQUISITION`; `business_context = 'RENT'` in `agent_lead_referral`; `status` of referral  invite (pending, accepted, expired, or cancelled) in `agent_lead_referral` |
 
 ---
 
@@ -79,6 +79,27 @@ Grain: **one row per PFA status period** — a timeline of agent-visitor prefere
 ## TQC / TQA
 
 No dedicated table — identified via capability `DEMAND_ACQUISITION` and rows in `datalake_ebdb_clean.agent_lead_referral` (`business_context = 'SALE'` for TQC, `'RENT'` for TQA). Payment lines land on `dw_agent_payments.fact_partner_payments` with `incentive_system = DEMAND_ACQUISITION_FS` / `DEMAND_ACQUISITION_FR`.
+
+## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) when the question asks for an **official**, **MBR**, or **OKR** number. None exist for this entity yet.
+
+### Component / exploratory metrics
+
+- **Active PPA relations:** `COUNT(DISTINCT id_house)` / `COUNT(DISTINCT id_related_agent)` on `datalake_ebdb_agents.preferred_property_agent_relation_history` where `ts_relation_ended IS NULL`.
+- **PPA-eligible agents:** `COUNT(DISTINCT id_agent)` on `datalake_ebdb_agents.preferred_property_agent_program_eligibility` where `is_eligible = true` and `ts_status_ended IS NULL`.
+- **Active PFA relations:** `COUNT(DISTINCT id_visitor)` on `datalake_ebdb_agents.preferred_fixed_agent_history` where `is_enabled = true` and `ts_status_ended IS NULL`.
+- **TQC referrals:** `COUNT(*)` on `datalake_ebdb_clean.agent_lead_referral` where `business_context = 'SALE'`; split by `status` (pending, accepted, expired, cancelled).
+- **TQA referrals:** same table where `business_context = 'RENT'`.
+- **TQC/TQA payment lines:** `SUM(revenue_amount)` on `dw_agent_payments.fact_partner_payments` where `incentive_system IN ('DEMAND_ACQUISITION_FS', 'DEMAND_ACQUISITION_FR')` — see [`agents_payments.md`](agents_payments.md).
+
+## Relationships with other entities
+
+- **Programs ↔ Agent identity (1:N):** PPA joins on `id_related_agent` / `id_user_related_agent`; PFA joins on `id_user_agent` (**not** `id_agent`, which is the legacy `id_agent_data` key); PPA eligibility `id_agent` is also the **legacy** `id_agent_data` key. Bridge through [`agents_accreditation.md`](agents_accreditation.md) / the identity-migration warning in [`agents.md`](agents.md).
+- **Programs ↔ House / listing (PPA, 1:N):** `preferred_property_agent_relation_history.id_house` / `id_listing_business_context` — one relation revision per house and business context.
+- **Programs ↔ Visitor / lead (PFA, 1:N):** `preferred_fixed_agent_history.id_visitor`; TQC/TQA referrals join `agent_lead_referral.id_lead` to `dim_user.sk_user`.
+- **Programs ↔ Payments (TQC/TQA, 1:N):** `dw_agent_payments.fact_partner_payments` with `incentive_system = DEMAND_ACQUISITION_FS` (Sale / TQC) or `DEMAND_ACQUISITION_FR` (Rent / TQA). See [`agents_payments.md`](agents_payments.md).
+- **Programs ↔ Profile:** enrollment is independent of business profile — classify who the agent is in [`agents_profile.md`](agents_profile.md), then join the program tables above.
 
 ## Dos and Don'ts
 

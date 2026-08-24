@@ -46,6 +46,7 @@
 | **Valid First Listing** | A first listing that survives property deduplication — a re-listed / duplicated property does NOT count again | Feeds CIQ payment eligibility and activation. See [`agents_performance.md`](agents_performance.md). |
 | **Compra de Carteira** | CIQ_FULL rent listing-purchase — pricing, portfolio loss, eligibility | See [`agents_performance.md`](agents_performance.md). |
 | **Ativação / activation** | ⚠ No single definition — first commercial event ≤60 days of registration, or first visit/listing/TQC/deal | See [`agents_accreditation.md`](agents_accreditation.md). Always confirm which definition the user means. |
+| **Lead** | New visitor associated to an agent. Could be associated through demand-acquisition or distribution from QuintoAndar. | See this file (Tables) or [`agents_programs.md`](agents_programs.md). |
 | **Corretor Capacity** | Capacity Agent. Agent that receives leads from QuintoAndar. | `is_passive_lead_receiver=TRUE`. |
 | **Corretor Non-Capacity** | Non-Capacity Agent. Agent that doesn't receive leads from QuintoAndar. | `is_passive_lead_receiver=FALSE`. |
 | **Imóveis na carteira** | Houses in the agent's wallet. Houses that were acquired by the agent. | agents’ `sk_user` on `id_ciq_user_sale` or `id_ciq_user_rent` (from `datalake_listing_deduplication.valid_first_listing`). |
@@ -66,7 +67,7 @@ This domain is split by topic so an analyst (or TARS) loads only what a question
 | Valid First Listing / property dedup, CIQ Compra de Carteira (pricing, portfolio loss, eligibility) | `datalake_listing_deduplication.valid_first_listing`, `dw_ciq.fact_ciq_listing_purchase` | [`agents_performance.md`](agents_performance.md) |
 | PFA/PPA relation and eligibility, TQC/TQA acquisition | `datalake_ebdb_agents.preferred_property_agent_relation_history`, `preferred_fixed_agent_history` | [`agents_programs.md`](agents_programs.md) |
 | Visit funnel / completion metrics | `dw_visit.fact_visits` | [`visits.md`](visits.md) |
-| Leads distributed to agent | `dw_visit.dim_visit` (`sk_visitor` where `visit_request_user_role <> 'AGENT'`) | [`visits.md`](visits.md) |
+| Leads distributed to agent | `dw_visit.dim_visit` (`sk_visitor` is the lead and `sk_first_associated_agent` is the agent receiving this lead in visits where `visit_request_user_role <> 'AGENT'`) | [`visits.md`](visits.md) |
 
 **Critical rules:**
 - QuintoAndar is **mid-migration** from legacy agent services to the new Agent Domain — two ID systems coexist and are NOT interchangeable: `sk_agent_data`/`id_agent_data` (LEGACY, `dadosAgent` service) vs `sk_agent`/`id_agent` (NEW, Agent Domain). The column name `sk_agent` exists in BOTH `dw_public.dim_agent` (legacy) and `dw_agent.*` (new) with **different value spaces** (confirmed: they are two distinct tables in the repo, same `table_name`, different `database_name`) — never join them directly. Bridge through a table that carries both keys (`dw_agent.fact_agent_daily`, documented in [`agents_accreditation.md`](agents_accreditation.md)), or through `id_user` as in the Golden Query below.
