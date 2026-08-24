@@ -94,6 +94,8 @@ Contacts flow through the following system architecture:
 | `sk_first_department`, `sk_last_department` | First and last departments |
 | `sk_analyst` | Analyst who handled the contact |
 | `origin`, `direction`, `channel`, `status` | Contact classification |
+| `completion_reason` | Bucketed/normalized reason the interaction ended (chat only) |
+| `outcome` | Raw Twilio conversation outcome (chat only, e.g. resolved, transferred, abandoned); unlike `status`/`completion_reason` it is not bucketed. NULL for call and email. |
 | `worker_email` | Analyst email |
 | `total_talk_time`, `total_queue_time`, `total_wrap_up_time` | Time metrics |
 | `total_waiting_time`, `first_reply_time`, `total_handling_time` | Time metrics |

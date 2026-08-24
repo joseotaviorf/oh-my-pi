@@ -85,6 +85,7 @@ twilio_demand AS (
       ELSE 'transferred'
     END AS status,
     NULL AS completion_reason,
+    NULL AS outcome,
     worker_email,
     CASE
       WHEN direction = 'inbound' THEN to_phone_number
@@ -135,6 +136,7 @@ twilio_demand AS (
       ELSE 'transferred'
     END AS status,
     COALESCE(task_completion_reason, task_outcome) AS completion_reason,
+    task_outcome AS outcome,
     worker_email,
     twilio_phone_number AS quinto_andar_phone_number,
     customer_phone_number,
@@ -163,6 +165,44 @@ twilio_demand AS (
   WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 3 YEAR AND DATE('{load_end_date}')
 ),
+-- Resolves the time_metrics <-> twilio_demand link without a top-level OR in the ON
+-- clause (Spark has no hash key across an OR, so it plans as BroadcastNestedLoopJoin
+-- on EMR). UNION reproduces the OR semantics: a task/reservation pair matching both
+-- predicates still yields one row; two distinct time_metrics rows each matching one
+-- predicate still yield two. id_reservation is coalesced to a sentinel so a NULL
+-- reservation (chats never have one) matches only through the id_task predicate,
+-- never spuriously through the reservation one. See RECIPES.md §9.
+time_metrics_resolved AS (
+  SELECT DISTINCT
+    d_key.id_task,
+    COALESCE(d_key.id_reservation, '__no_reservation__') AS id_reservation_key,
+    tm.total_talk_time,
+    tm.total_queue_time,
+    tm.total_wrap_up_time,
+    tm.total_waiting_time,
+    tm.total_handling_time
+  FROM
+    twilio_demand AS d_key
+  INNER JOIN
+    time_metrics AS tm
+      ON tm.id_task = d_key.id_task
+
+  UNION
+
+  SELECT DISTINCT
+    d_key.id_task,
+    COALESCE(d_key.id_reservation, '__no_reservation__') AS id_reservation_key,
+    tm.total_talk_time,
+    tm.total_queue_time,
+    tm.total_wrap_up_time,
+    tm.total_waiting_time,
+    tm.total_handling_time
+  FROM
+    twilio_demand AS d_key
+  INNER JOIN
+    time_metrics AS tm
+      ON tm.id_reservation = d_key.id_reservation
+),
 twilio_contacts AS (
   SELECT DISTINCT
     CASE
@@ -189,6 +229,7 @@ twilio_contacts AS (
     d.origin,
     d.status,
     d.completion_reason,
+    d.outcome,
     d.quinto_andar_phone_number,
     d.customer_phone_number,
     d.customer_email,
@@ -215,9 +256,9 @@ twilio_contacts AS (
   FROM
     twilio_demand AS d
   LEFT JOIN
-    time_metrics AS tm
+    time_metrics_resolved AS tm
       ON tm.id_task = d.id_task
-      OR tm.id_reservation = d.id_reservation
+      AND tm.id_reservation_key = COALESCE(d.id_reservation, '__no_reservation__')
   LEFT JOIN
     datalake_customer_support.tickets AS t1
       ON t1.id_twilio = d.id_call
@@ -267,6 +308,7 @@ front_contacts AS (
     origin,
     status,
     completion_reason,
+    outcome,
     quinto_andar_phone_number,
     customer_phone_number,
     customer_email,
@@ -331,6 +373,7 @@ front_contacts AS (
       ELSE 'in progress'
     END AS status,
     NULL AS completion_reason,
+    NULL AS outcome,
     NULL AS quinto_andar_phone_number,
     NULL AS customer_phone_number,
     ce.email AS customer_email,
@@ -392,6 +435,7 @@ front_contacts_ranked AS (
     status,
     worker_email,
     completion_reason,
+    outcome,
     quinto_andar_phone_number,
     REPLACE(REPLACE(customer_phone_number, "+", ""), "whatsapp:", "") AS customer_phone_number,
     customer_email,
@@ -441,6 +485,7 @@ SELECT
   status,
   worker_email,
   completion_reason,
+  outcome,
   quinto_andar_phone_number,
   customer_phone_number,
   customer_email,

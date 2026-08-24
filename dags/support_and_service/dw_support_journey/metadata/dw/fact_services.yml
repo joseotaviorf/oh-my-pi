@@ -96,6 +96,10 @@ columns:
       - core_support_journey.services.task_completion_reason
       - core_support_journey.services.task_outcome
       - core_support_journey.services.task_cancelation_reason
+  outcome:
+    description: Raw business outcome reported by Twilio for the conversation once the chat task finished (e.g. resolved, transferred, abandoned), unlike status it is not bucketed. Only populated for chat events; NULL for call events, which have no equivalent source field.
+    lineage:
+      - core_support_journey.services.task_outcome
   task_cancelation_reason:
     description: Reason why the task associated with the service event was cancelled, when applicable.
     lineage:

@@ -35,6 +35,7 @@ SELECT
                 ELSE 'transferred'
             END
     END AS status,
+    se.task_outcome AS outcome,
     se.task_cancelation_reason,
     se.url_source_ctwa,
     se.type_source_ctwa,

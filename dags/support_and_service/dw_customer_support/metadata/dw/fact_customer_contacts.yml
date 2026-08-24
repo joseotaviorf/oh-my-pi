@@ -127,6 +127,10 @@ columns:
       - datalake_customer_support.chats.task_completion_reason
       - datalake_customer_support.chats.task_outcome
     description: Completion reason or outcome of the interaction.
+  outcome:
+    lineage:
+      - datalake_customer_support.chats.task_outcome
+    description: Raw business outcome reported by Twilio for the conversation once finished (e.g. resolved, transferred, abandoned), unlike status/completion_reason it is not bucketed. Only populated for chat interactions; NULL for call and email, which have no equivalent source field.
   customer_phone_number:
     lineage:
       - datalake_customer_support.calls.from_phone_number
