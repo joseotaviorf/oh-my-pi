@@ -1,0 +1,22 @@
+---
+dag:
+  name: enrich_agent_acquisition
+  schedule_start_date: 2026, 1, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Agent acquisition funnel analytics: enriches Agents App signup events with marketing
+      attribution and taxonomy, then assembles ToF/MoF/EoF funnel steps with prospect,
+      contract, first listing, and capacity activation milestones.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: agent_acquisition
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  inner_dependencies:
+    agent_acquisition_funnel:
+      - prospect_agent_funnel_events
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

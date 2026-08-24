@@ -1,0 +1,124 @@
+---
+database_name: datalake_agent_acquisition
+table_name: prospect_agent_funnel_events
+description: Agents App signup and onboarding funnel events enriched with UTM attribution, growth taxonomy media setup, and last-touch campaign naming for agent acquisition analytics.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_tof_user:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.id_user
+      - datalake_amplitude_agents_app.agents_sign_up_events.id_device
+    description: Top-of-funnel user identifier; coalesce of Amplitude user id and device id for anonymous sessions.
+  id_user:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.id_user
+      - datalake_person.person_sks.id_user
+    description: QuintoAndar user identifier when the session is logged in or mapped via person_sks.
+  id_device:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.id_device
+    description: Amplitude device identifier for the client that generated the funnel event.
+  sk_media_setup:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.sk_media_setup
+    description: Surrogate key of the growth taxonomy media setup matched to the campaign naming convention.
+  uuid_person:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.uuid_person
+      - datalake_person.person_sks.uuid_person
+    description: Person UUID associated with the funnel user when available from Amplitude or person_sks.
+  event_type:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.event_type
+    description: Amplitude event type for signup and onboarding steps in the Agents App funnel.
+  campaign_naming:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.naming_convention_sufix
+      - datalake_gsheets_clean.taxonomy_demand_exception_flow.correct_utm_campaign
+    description: Normalized campaign naming convention suffix used to join growth taxonomy dimensions.
+  app_type:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.app_type
+    description: Agents App product surface that generated the event (mobile or web context).
+  platform:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.up_platform
+    description: Platform reported in user properties or attribution, defaulting to N/A when absent.
+  campaign_business_context:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.campaign_business_context
+    description: Business context dimension from the matched growth taxonomy media setup.
+  campaign_strategy_intent:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.campaign_strategy_intent
+    description: Strategy intent dimension from the matched growth taxonomy media setup.
+  behavior_type:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.behavior_type
+    description: Behavior type dimension from the matched growth taxonomy media setup.
+  medium:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.medium
+    description: Medium dimension from the matched growth taxonomy media setup.
+  campaign_landing_page:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.campaign_landing_page
+    description: Landing page dimension from the matched growth taxonomy media setup.
+  source:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.source
+    description: Source dimension from the matched growth taxonomy media setup.
+  dict_source:
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.dict_source
+    description: Dictionary source label from the matched growth taxonomy media setup.
+  utm_source:
+    lineage:
+      - datalake_attribution.tracking_by_device.utm_source
+      - datalake_amplitude_agents_app.agents_sign_up_events.up_utm_source
+    description: UTM source after device-level attribution fallback to Amplitude user properties.
+  utm_medium:
+    lineage:
+      - datalake_attribution.tracking_by_device.utm_medium
+      - datalake_amplitude_agents_app.agents_sign_up_events.up_utm_medium
+    description: UTM medium after device-level attribution fallback to Amplitude user properties.
+  utm_campaign:
+    lineage:
+      - datalake_attribution.tracking_by_device.utm_campaign
+      - datalake_amplitude_agents_app.agents_sign_up_events.up_utm_campaign
+    description: UTM campaign after device-level attribution fallback to Amplitude user properties.
+  utm_content:
+    lineage:
+      - datalake_attribution.tracking_by_device.utm_content
+      - datalake_amplitude_agents_app.agents_sign_up_events.up_utm_content
+    description: UTM content after device-level attribution fallback to Amplitude user properties.
+  utm_term:
+    lineage:
+      - datalake_attribution.tracking_by_device.utm_term
+      - datalake_amplitude_agents_app.agents_sign_up_events.up_utm_term
+    description: UTM term after device-level attribution fallback to Amplitude user properties.
+  is_logged_in:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.login_status
+    description: Whether the user was logged in when the funnel event was recorded.
+  is_lost_tracking_channel:
+    description: True when all UTM dimensions and platform are missing and the lost-tracking adhoc rule applies.
+  is_direct_channel:
+    description: True when UTM dimensions are missing but platform is present and the direct-channel adhoc rule applies.
+  ts_event:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.ts_event
+    description: Timestamp when the Amplitude funnel event occurred.
+  year:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.year
+    description: Partition year derived from the event timestamp.
+  month:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.month
+    description: Partition month derived from the event timestamp.
+  day:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.day
+    description: Partition day derived from the event timestamp.

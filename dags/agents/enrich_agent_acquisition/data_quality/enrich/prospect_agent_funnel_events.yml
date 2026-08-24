@@ -1,0 +1,26 @@
+---
+table_name: datalake_agent_acquisition.prospect_agent_funnel_events
+alert_channel: "#agents-data-alarms"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  id_tof_user:
+    is_complete:
+      severity_level: Error
+  event_type:
+    is_complete:
+      severity_level: Error
+  ts_event:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

@@ -1387,6 +1387,19 @@ bietlejuice.enrich_agent_accreditation:
   - bietlejuice.enrich_ebdb_agent_events:load-enrich-capability-settings:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
+bietlejuice.enrich_agent_acquisition:
+  - bietlejuice.enrich_agent:load-enrich-prospect-agent:first-run-of-day
+  - bietlejuice.enrich_amplitude_agents_app:load-enrich-agents-sign-up-events:first-run-of-day
+  - bietlejuice.enrich_attribution:load-enrich-tracking-by-device:first-run-of-day
+  - bietlejuice.enrich_big_agent:load-enrich-house-listing-consultant:first-run-of-day
+  - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-unified-identity:first-run-of-day
+  - bietlejuice.enrich_ebdb_agent_events:load-enrich-capability-settings:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
+  - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-specialist:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-users:first-run-of-day
 bietlejuice.enrich_agent_payments:
   - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day
   - bietlejuice.enrich_big_agent_incentives:load-enrich-earnings:first-run-of-day

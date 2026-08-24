@@ -1,0 +1,90 @@
+---
+database_name: datalake_agent_acquisition
+table_name: agent_acquisition_funnel
+description: Agent acquisition funnel milestones (ToF, MoF, EoF) with last-touch attribution dimensions, combining enriched signup events with prospect, contract, first listing, and capacity activation milestones.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.id_user
+      - datalake_ebdb_clean.prospect_agent.uuid_person
+      - datalake_person.person_sks.id_user
+    description: QuintoAndar user identifier for the agent at the funnel milestone.
+  id_tof_user:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.id_tof_user
+    description: Top-of-funnel user identifier used to stitch anonymous and logged-in sessions.
+  id_device:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.id_device
+    description: Amplitude device identifier from the last-touch attribution event when available.
+  uuid_person:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.uuid_person
+      - datalake_ebdb_clean.prospect_agent.uuid_person
+    description: Person UUID for the agent prospect linked across funnel steps.
+  funnel_step:
+    description: Funnel macro stage label (ToF, MoF, or EoF).
+  substep:
+    description: Human-readable funnel substep name for the milestone reached.
+  event_type:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.event_type
+    description: Amplitude event type from the last-touch attribution row when the milestone is event-driven.
+  campaign_naming:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.campaign_naming
+    description: Normalized campaign naming from the last-touch attribution dimensions.
+  app_type:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.app_type
+    description: Agents App surface from the last-touch attribution row.
+  platform:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.platform
+    description: Platform from the last-touch attribution row.
+  campaign_business_context:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.campaign_business_context
+    description: Growth taxonomy business context from the last-touch attribution row.
+  campaign_strategy_intent:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.campaign_strategy_intent
+    description: Growth taxonomy strategy intent from the last-touch attribution row.
+  behavior_type:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.behavior_type
+    description: Growth taxonomy behavior type from the last-touch attribution row.
+  medium:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.medium
+    description: Growth taxonomy medium from the last-touch attribution row.
+  campaign_landing_page:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.campaign_landing_page
+    description: Growth taxonomy landing page from the last-touch attribution row.
+  source:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.source
+    description: Growth taxonomy source from the last-touch attribution row.
+  dict_source:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.dict_source
+    description: Growth taxonomy dictionary source from the last-touch attribution row.
+  is_logged_in:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.is_logged_in
+    description: Login status from the last-touch attribution row when available.
+  ts_event:
+    lineage:
+      - datalake_agent_acquisition.prospect_agent_funnel_events.ts_event
+      - datalake_ebdb_clean.prospect_agent.ts_created
+      - datalake_agent_accreditation.prospect_agent.ts_contract_signed
+    description: Timestamp when the funnel milestone occurred (event, signup, contract, acquisition, or activation).
+  year:
+    description: Partition year derived from ts_event.
+  month:
+    description: Partition month derived from ts_event.
+  day:
+    description: Partition day derived from ts_event.
