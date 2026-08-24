@@ -108,3 +108,20 @@ columns:
     lineage:
       - datalake_retsuko_raw.manual_entry.updated_at
     description: Last update timestamp of the record in the upstream source system.
+  op_cdc:
+    lineage:
+      - datalake_retsuko_raw.manual_entry.op_cdc
+    description: CDC operation type for this row (insert, update, delete, or snapshot read).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_retsuko_raw.manual_entry.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event.
+  ts_database_transaction:
+    lineage:
+      - datalake_retsuko_raw.manual_entry.ts_database_transaction
+    description: Timestamp of the source database transaction that produced this row version.
