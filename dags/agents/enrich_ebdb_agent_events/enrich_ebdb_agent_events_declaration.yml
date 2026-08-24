@@ -32,7 +32,7 @@ workflow:
     agent_unified_identity:
       merge_on: [id_unified_agent]
       partitions: [year, month, day]
-      z_order_by: [id_unified_agent, ts_updated]
+      z_order_by: [id_unified_agent]
     capability_settings:
       merge_on: [id_event_log]
       partitions: [year, month, day]
