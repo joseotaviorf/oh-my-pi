@@ -240,14 +240,16 @@ SELECT DISTINCT
       ,'paypal'
       ,'unknown'
       ,'internet-banking'
-      ,'non-specified')
+      ,'non-specified'
+      ,'checkout-bolecode-qrcode')
       THEN invoice_paid_date
     WHEN lower(i.paid_via) IN (
       'cnab'
       ,'checkout-boleto'
       ,'cyber-boleto'
       ,'recupera'
-      ,'collector-5a')
+      ,'collector-5a'
+      ,'checkout-bolecode-barcode')
       THEN invoice_paid_date_next_business_day
     ELSE
       invoice_paid_date

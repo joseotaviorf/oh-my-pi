@@ -140,25 +140,6 @@ columns:
       - datalake_accounting_funnel.invoice_all.contract_status
       - datalake_accounting_funnel.accounts_payable.contract_status
     description: "Contract status description"
-  conta_contabil:
-    lineage:
-      - datalake_accounting_funnel.invoice_all.bill_item
-      - datalake_accounting_funnel.invoice_all.description
-      - datalake_accounting_funnel.invoice_all.accounting_version
-      - datalake_accounting_funnel.invoice_all.from_account_type
-      - datalake_accounting_funnel.invoice_all.to_account_type
-      - datalake_accounting_funnel.accounts_payable.bill_item
-      - datalake_accounting_funnel.accounts_payable.description
-      - datalake_accounting_funnel.accounts_payable.accounting_version
-    description: "Accounting classification based on bill item and accounting version (e.g. ALUGUEL, Condomínio, IPTU)"
-  conta_contabil_secundaria:
-    lineage:
-      - datalake_accounting_funnel.invoice_all.bill_item
-      - datalake_accounting_funnel.invoice_all.accounting_version
-      - datalake_accounting_funnel.invoice_all.description
-      - datalake_accounting_funnel.accounts_payable.bill_item
-      - datalake_accounting_funnel.accounts_payable.accounting_version
-    description: "Secondary accounting classification for specific bill items (e.g. ALUGUEL, Corretagem a ser descontada)"
   is_contract_b2b:
     lineage:
       - datalake_accounting_funnel.invoice_all.is_contract_b2b
@@ -179,12 +160,7 @@ columns:
       - datalake_accounting_funnel.invoice_all.is_write_off
       - datalake_accounting_funnel.accounts_payable.is_write_off
     description: "Flag that indicates if an invoice was written off"
-  is_not_invoiceable_inconsiderable:
-    lineage:
-      - datalake_accounting_funnel.invoice_all.is_not_invoiceable_inconsiderable
-      - datalake_accounting_funnel.accounts_payable.is_not_invoiceable_inconsiderable
-    description: "Flag that indicates, if true, that an entry is a not-invoiceable/reversed inconsiderable"
-  is_not_invoicable:
+  is_not_invoiceable:
     lineage:
       - datalake_retsuko_clean.entry.is_not_invoicable
     description: "Flag from Retsuko indicating whether the entry is not-invoiceable; NULL on CAP rows without id_entry"
@@ -287,15 +263,6 @@ columns:
       - datalake_accounting_funnel.accounts_payable.account_type
       - datalake_accounting_funnel.accounts_payable.rental_administrator
     description: "Flag indicating post-divergence conditions (e.g. open adm partner with past due, repair offboarding scenarios)"
-  conta_resultado:
-    lineage:
-      - datalake_accounting_funnel.invoice_all.bill_item
-      - datalake_accounting_funnel.invoice_all.description
-      - datalake_accounting_funnel.invoice_all.accounting_version
-      - datalake_accounting_funnel.accounts_payable.bill_item
-      - datalake_accounting_funnel.accounts_payable.description
-      - datalake_accounting_funnel.accounts_payable.accounting_version
-    description: "Flag indicating if the accounting classification is a result account type (e.g. Late Payment Fee, Multa Condomínio)"
   has_paid_amount:
     lineage:
       - datalake_accounting_funnel.invoice_all.bill_item
@@ -304,7 +271,7 @@ columns:
       - datalake_accounting_funnel.accounts_payable.bill_item
       - datalake_accounting_funnel.accounts_payable.sk_contract
       - datalake_accounting_funnel.accounts_payable.accrual_year_month
-    description: "Flag indicating if there is at least one CAP entry for the contract/accrual/accounting classification"
+    description: "Flag indicating if there is at least one CAP entry for the same contract and accrual year-month."
   has_receivable_amount:
     lineage:
       - datalake_accounting_funnel.invoice_all.bill_item
@@ -313,29 +280,7 @@ columns:
       - datalake_accounting_funnel.accounts_payable.bill_item
       - datalake_accounting_funnel.accounts_payable.sk_contract
       - datalake_accounting_funnel.accounts_payable.accrual_year_month
-    description: "Flag indicating if there is at least one non-CAP entry for the contract/accrual/accounting classification"
-  is_not_invoiceable_inconsiderable_workaround:
-    lineage:
-      - datalake_accounting_funnel.invoice_all.status
-      - datalake_accounting_funnel.invoice_all.entry_accrual_year_month
-      - datalake_accounting_funnel.invoice_all.to_account_type
-      - datalake_accounting_funnel.invoice_all.bill_item
-      - datalake_accounting_funnel.accounts_payable.status
-      - datalake_accounting_funnel.accounts_payable.entry_accrual_year_month
-      - datalake_accounting_funnel.accounts_payable.to_account_type
-      - datalake_accounting_funnel.accounts_payable.bill_item
-    description: "Workaround flag for not-invoiceable inconsiderable entries based on status and bill item rules"
-  is_not_invoiceable_inconsiderable_early_termination:
-    lineage:
-      - datalake_accounting_funnel.invoice_all.status
-      - datalake_accounting_funnel.invoice_all.entry_accrual_year_month
-      - datalake_accounting_funnel.invoice_all.to_account_type
-      - datalake_accounting_funnel.invoice_all.bill_item
-      - datalake_accounting_funnel.accounts_payable.status
-      - datalake_accounting_funnel.accounts_payable.entry_accrual_year_month
-      - datalake_accounting_funnel.accounts_payable.to_account_type
-      - datalake_accounting_funnel.accounts_payable.bill_item
-    description: "Flag for early termination fee not-invoiceable inconsiderable exceptions (from 202506)"
+    description: "Flag indicating if there is at least one non-CAP entry for the same contract and accrual year-month."
   entry_created_date:
     lineage:
       - datalake_accounting_funnel.invoice_all.entry_created_date
@@ -380,7 +325,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.invoice_all.real_invoice_paid_date
       - datalake_accounting_funnel.accounts_payable.invoice_paid_date
-    description: "Real invoice paid date considering payment method (immediate for some, next business day for others)"
+    description: "Compensation date of the invoice payment by paid_via, inherited from invoice_all for invoices (D0 or D+1) and equal to invoice_paid_date for CAP rows."
   contract_start:
     lineage:
       - datalake_accounting_funnel.invoice_all.contract_start

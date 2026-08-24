@@ -14,7 +14,6 @@ WITH invoice_all AS (
         is_rental_paid_in_advance,
         is_reversed,
         is_write_off,
-        is_not_invoiceable_inconsiderable,
         bill_item,
         description,
         has_negotiation,
@@ -74,7 +73,6 @@ WITH invoice_all AS (
         i.is_rental_paid_in_advance,
         i.is_reversed,
         i.is_write_off,
-        i.is_not_invoiceable_inconsiderable,
         i.bill_item,
         i.description,
         i.has_negotiation,
@@ -148,7 +146,6 @@ WITH invoice_all AS (
             ap.is_rental_paid_in_advance,
             false as is_reversed,
             false as is_write_off,
-            false as is_not_invoiceable_inconsiderable,
             ap.bill_item,
             ap.description,
             ap.has_negotiation,
@@ -217,71 +214,6 @@ WITH invoice_all AS (
     (
         SELECT
             i.*,
-            CASE
-                WHEN (i.bill_item IN ('light water or gas', 'utilities defaulting') OR UPPER(i.description) = 'CONTAS DE CONSUMO CAP') AND i.accounting_version = 'v1' THEN 'Contas de Consumo' 
-                WHEN (i.bill_item IN ('iptu', 'iptu adjustment', 'iptu defaulting') OR UPPER(i.description) = 'IPTU CAP') AND i.accounting_version = 'v1' THEN 'IPTU'
-                WHEN i.bill_item IN ('repair work', 'improvement work','repair ongoing') AND i.accounting_version = 'v1' THEN 'Reparos Ongoing'
-                WHEN i.bill_item IN ('debit negotiation', 'collections negotiation', 'evictions debt relief negotiation', 'evictions costs', 'evictions negotiation', 'evictions lawyers') THEN 'Valores em Negociação'
-                WHEN (i.bill_item IN ('condominium fine') AND (from_account_type = 'contract expenses' OR to_account_type = 'contract expenses')) OR (i.bill_item IN ('condominium 5A paid') AND to_account_type IN ('quinto andar') AND (lower(description) like '%orreios%')) THEN 'Multa Condomínio'
-                WHEN (
-                        i.bill_item IN ('condominium' , 'condominium usage', 'condominium defaulting', 'condominium reserves funds 5A paid', 'condominium reserves funds') 
-                    OR 
-                        UPPER(i.description) = 'CONDOMÍNIO CAP'
-                    OR 
-                        (i.bill_item IN ('condominium 5A paid') AND to_account_type NOT IN ('contract expenses', 'quinto andar') )
-                    ) 
-                    AND i.accounting_version = 'v1' 
-                    THEN 'Condomínio'
-                WHEN i.bill_item IN ('early termination fee', 'early termination fee non protection') AND i.accounting_version = 'v1' THEN 'Multa Rescisória'
-                WHEN i.bill_item IN ('postponement') THEN 'Valores Postergados'
-                WHEN i.bill_item IN ('rental guarantee fee', 'pro guarantor 5A installment') AND guarantee = 'RentalGuarantee' AND i.accounting_version = 'v1' THEN 'Garantia a Receber - Garantia 2.0' 
-                WHEN i.bill_item IN ('rental guarantee fee refund', 'pro guarantor 5A installment refund') AND guarantee = 'RentalGuarantee' AND i.accounting_version = 'v1' THEN 'Devolução de títulos a receber - Garantia 2.0'
-                WHEN i.bill_item IN ('rental guarantee', 'pro guarantor 5A installment') AND guarantee != 'RentalGuarantee' AND i.accounting_version = 'v1' THEN 'Garantia a Receber - Fianças' 
-                WHEN i.bill_item IN ('rental guarantee fee refund', 'pro guarantor 5A installment refund') AND guarantee != 'RentalGuarantee' AND i.accounting_version = 'v1' THEN 'Devolução de títulos a receber - Fianças'  
-                WHEN i.bill_item IN ('adm fee adm partner','igpm adm partner adm fee', 'ipca adm partner adm fee', 'adjustment agreement adm partner adm fee', 'adm fee tax pcc adm partner') THEN 'Taxa de administração - Imobiliária Parceira'
-                WHEN i.bill_item IN ('brokerage adm partner', 'brokerage adm partner postponed', 'brokerage fee tax ir adm partner') AND i.accounting_version = 'v1' THEN 'Taxa de corretagem - Imobiliária Parceira'
-                WHEN i.bill_item IN ('repair offboarding') THEN 'Projeto Reparos - Novo Modelo'
-                WHEN i.bill_item IN ('payment adjustment') THEN 'Payment Adjustment'   
-                WHEN i.bill_item IN ('fine and interest', 'fine', 'negotiation fine') THEN 'Late Payment Fee - Fine'
-                WHEN i.bill_item IN ('negotiation fine and interest') THEN 'Late Payment Fee - Negotiation'
-                WHEN i.bill_item IN ('interest', 'negotiation interest') THEN 'Late Payment Fee - Interest'
-                WHEN i.bill_item IN ('rental anticipation', 'rental anticipation 5A paid') THEN 'Aluguel pago antecipadamente'
-                WHEN i.bill_item IN ('rental anticipation fee') THEN 'Receita - Antecipação MRA'
-                WHEN i.bill_item IN ('residential protection 5A acquittance', 'residential protection 5A fund transfer') AND i.accounting_version = 'v1' THEN 'Proteção Residencial 5A' 
-                WHEN i.bill_item IN ('non protection 5a') AND i.accounting_version = 'v1' THEN 'Não proteção'
-                WHEN i.bill_item IN ('property damage fine') THEN 'Multa Danos'
-                WHEN i.bill_item IN ('home insurance', 'home insurance claim', 'insurance guarantee') AND i.accounting_version = 'v1' THEN 'Seguro Incêndio'
-                WHEN i.bill_item IN ('home insurance', 'home insurance claim', 'insurance guarantee') AND i.accounting_version = 'v2' THEN 'Seguro Incêndio - Novo Modelo'
-                WHEN i.bill_item IN ('brokerage installment fee') THEN 'Corretagem Parcelada'
-                WHEN i.bill_item IN ('brokerage loan fidc') THEN 'Adiantamentos Mova' 
-                WHEN i.bill_item IN ('brokerage fidc') THEN 'Corretagem FIDC a repassar' 
-                WHEN i.bill_item IN ('brokerage settlement') AND (i.account_classification = 'v2') THEN 'Corretagem a ser descontada'
-                WHEN (
-                        (
-                        (i.bill_item IN ('igpm rental', 'ipca rental', 'adjustment agreement rental', 'rental', 'loss', 'property damage fine', 'campaign discount', 'campaign', 'others', 'lockin',  'brokerage estate agent', 'brokerage estate agent postponed', 'brokerage adm partner', 'brokerage adm partner postponed', 'installment lra', 'brokerage installment', 'adm fee tax pcc adm partner', 'brokerage fee tax ir adm partner', 'non resident landlord', 'between contracts', 'duplicate refund', 'brokerage third party real estate', 'brokerage third party real estate postponed', 'brokerage partner select', 'brokerage partner select postponed', 'adm fee adm partner', 'adjustment agreement adm partner adm fee', 'ipca adm partner adm fee', 'igpm adm partner adm fee',  'evictions debt relief', 'brokerage compensation', 'adm fee', 'service fee', 'brokerage quinto andar postponed'))
-                        ) 
-                        AND i.accounting_version = 'v1'
-                    )                
-                    THEN 'ALUGUEL'
-                WHEN (
-                        (i.bill_item IN ('igpm rental', 'ipca rental', 'adjustment agreement rental', 'rental', 'loss', 'property damage fine', 'campaign discount', 'campaign', 'others',  'lockin',  'brokerage estate agent', 'brokerage estate agent postponed', 'brokerage adm partner', 'brokerage adm partner postponed', 'installment lra', 'brokerage installment', 'adm fee tax pcc adm partner', 'brokerage fee tax ir adm partner', 'non resident landlord', 'between contracts', 'duplicate refund', 'brokerage third party real estate',  'brokerage third party real estate postponed', 'brokerage partner select', 'brokerage partner select postponed', 'adm fee adm partner', 'adjustment agreement adm partner adm fee', 'ipca adm partner adm fee', 'igpm adm partner adm fee', 'brokerage compensation', 'condominium', 'repair work', 'light water or gas', 'condominium reserves funds', 'condominium reserves funds',  'residential protection 5A fund transfer', 'iptu',  'iptu adjustment',  'early termination fee',  'early termination fee non protection',  'non protection 5a',  'payment adjustment',  'repair ongoing',  'home insurance',  'rental guarantee fee', 'rental guarantee fee refund', 'condominium usage',  'residential protection 5A acquittance', 'repair offboarding',  'utilities defaulting', 'pro guarantor 5A installment', 'iptu defaulting', 'rental anticipation 5A paid',  'condominium reserves funds 5a paid', 'home insurance claim', 'rental guarantee',  'pro guarantor 5A installment') -- 'postponement',  
-                        OR
-                        (i.bill_item IN ('condominium 5A paid') AND to_account_type NOT IN ('contract expenses', 'quinto andar'))
-                        )
-                        AND 
-                        (i.accounting_version = 'v2') 
-                    )
-                THEN 'ALUGUEL - Novo Modelo'
-                ELSE 'Outro'
-            END AS conta_contabil,
-
-            CASE  
-                WHEN i.bill_item IN ('brokerage adm partner postponed', 'brokerage adm partner', 'brokerage estate agent postponed', 'brokerage estate agent', 'property damage fine') THEN 'ALUGUEL'
-                WHEN i.bill_item IN ('home insurance', 'home insurance claim') AND (i.accounting_version = 'v2') THEN 'ALUGUEL - Novo Modelo'
-                WHEN ( i.bill_item IN ('brokerage installment') OR (i.bill_item IN ('brokerage quinto andar') AND i.description ILIKE '%Crédito - Parcelamento corretagem%') ) THEN 'Corretagem a ser descontada'
-                WHEN i.bill_item IN ('condominium 5A paid', 'condominium fine', 'condominium usage', 'repair ongoing', 'residential protection 5A acquittance', 'utilities defaulting', 'iptu defaulting', 'evictions costs') AND  (i.accounting_version = 'v2') THEN 'Valores pagos antecipados - Novo modelo'
-            END AS conta_contabil_secundaria,
-
                 (i.bill_item IN ('brokerage adm partner', 'brokerage adm partner postponed', 'brokerage fee tax ir adm partner'))
                 OR (i.bill_item IN ('rental anticipation') AND i.description LIKE '%antecipação do repasse do aluguel%')      
                 OR (i.bill_item IN ('brokerage installment fee', 'brokerage loan fidc', 'brokerage fidc', 'postponement', 'rental guarantee fee','rental guarantee fee refund', 'pro guarantor 5A installment', 'pro guarantor 5A installment refund',
@@ -326,14 +258,11 @@ WITH invoice_all AS (
         i.paid_via,
         i.entry_created_time,
         i.contract_status,
-        i.conta_contabil,
-        i.conta_contabil_secundaria,
         i.is_contract_b2b,
         i.is_rental_paid_in_advance,
         i.is_reversed,
         i.is_write_off,
-        i.is_not_invoiceable_inconsiderable,
-        re.is_not_invoicable,
+        re.is_not_invoicable AS is_not_invoiceable,
         i.has_negotiation,
         i.has_installments,
         i.due_amount,
@@ -349,31 +278,18 @@ WITH invoice_all AS (
         i.is_cap,
         i.only_one_sided,
         i.post_divergence,
-        CASE
-            WHEN conta_contabil IN ('Cálculo Impostos', 'Late Payment Fee', 'Receita - Antecipação MRA', 'Multa Condomínio', 'Multa Danos', 'Receita de Cartão de Crédito', 'Reserva', 'Receitas Financeiras', 'Notas Fiscais') THEN true
-            ELSE false 
-        END AS conta_resultado,
         SUM(
             CASE 
                 WHEN i.bill_item = 'cap' THEN 1
                 ELSE 0
             END
-        ) OVER (PARTITION BY i.sk_contract, i.accrual_year_month, i.conta_contabil) > 0 AS has_paid_amount,
+        ) OVER (PARTITION BY i.sk_contract, i.accrual_year_month) > 0 AS has_paid_amount,
         SUM(
             CASE 
                 WHEN NOT(i.bill_item = 'cap') THEN 1
                 ELSE 0
             END
-        ) OVER (PARTITION BY i.sk_contract, i.accrual_year_month, conta_contabil) > 0 AS has_receivable_amount,
-        IF(NOT(
-        (i.status != 'not-invoiceable') OR 
-        (i.status = 'not-invoiceable' AND i.entry_accrual_year_month >= 202508) OR 
-        (i.status = 'not-invoiceable' AND i.entry_accrual_year_month >= 202506 AND to_account_type = 'contract' AND i.bill_item IN ('early termination fee', 'early termination fee non protection')) OR
-        (i.status = 'not-invoiceable' AND i.bill_item = 'condominium fine') 
-        ), TRUE, FALSE) AS is_not_invoiceable_inconsiderable_workaround,
-        IF(
-        NOT(i.status = 'not-invoiceable' AND entry_accrual_year_month >= 202506 AND to_account_type = 'contract' AND i.bill_item IN ('early termination fee', 'early termination fee non protection')), TRUE, FALSE
-        ) AS is_not_invoiceable_inconsiderable_early_termination,
+        ) OVER (PARTITION BY i.sk_contract, i.accrual_year_month) > 0 AS has_receivable_amount,
         i.entry_created_date,
         i.invoice_created_date,
         i.invoice_due_date,

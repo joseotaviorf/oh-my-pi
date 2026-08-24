@@ -224,7 +224,7 @@ columns:
       - dw_public.dim_date.date
     description: "First business day after the invoice payment"
   real_invoice_paid_date:
-    description: "Real invoice paid date considering payment method (immediate for some methods, next business day for others)"
+    description: "Compensation date of the invoice payment by paid_via: D0 (invoice_paid_date) for cards, PIX, bank transfer, checkout-bolecode-qrcode and similar; D+1 (invoice_paid_date_next_business_day) for boleto/CNAB and checkout-bolecode-barcode."
     lineage:
       - dw_payment.dim_invoice.paid_via
       - dw_payment.dim_invoice.dt_paid
