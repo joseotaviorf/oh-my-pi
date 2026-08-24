@@ -58,6 +58,7 @@ dags_not_using_builder:
   - support_and_service/salesforce_api_v2/salesforce_api_v2.py
   - platform/datahub_connection_test/datahub_connection_test.py
   - support_and_service/salesforce_marketing_cloud/salesforce_marketing_cloud.py
+  - support_and_service/sfmc/sfmc.py
   - platform/trigger_datasets/trigger_datasets.py
   - platform/reset_datasets/reset_datasets.py
   - tech_platform/dw_devlake/tools/generate_lineage_diagram.py

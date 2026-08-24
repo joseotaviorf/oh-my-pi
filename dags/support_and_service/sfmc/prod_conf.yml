@@ -1,0 +1,32 @@
+webhook_sfmc: WEBHOOK_SALESFORCE_CDC_PROD # TODO: Change to WEBHOOK_SFMC_PROD
+
+dag_documentation:
+  dag_purpose:
+    "SFMC tracking-extract ingestion DAG. Runs daily and, for each configured
+    team, loads the CSVs SFMC delivers over SFTP into the raw layer
+    (sfmc/raw_v2), then enforces the clean row contract per data extension
+    (sfmc/clean_v2), publishing accepted rows to the clean layer and rejected
+    rows to the DLQ. Consumed downstream via clean-layer dataset events."
+
+datalake_bucket: "5a-datalake-prod"
+
+raw_schema: "datalake_sfmc_raw"
+clean_schema: "datalake_sfmc_clean"
+dlq_schema: "datalake_sfmc_dlq"
+
+# Prefix SFMC's SFTP transfer drops the files into. Overrides the pipeline
+# default of raw/sfmc/tracking-data.
+source_prefix: "raw/sfmc"
+
+# The DAG prefixes every table with the team name, so teams sharing the schemas
+# above never write the same table.
+teams_config:
+  agents_supply_acquisition:
+    de_types:
+      - send
+
+cluster:
+  type: emr_7_12_small_general_2xlarge_single_node_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
