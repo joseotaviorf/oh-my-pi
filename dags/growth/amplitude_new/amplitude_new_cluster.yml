@@ -19,13 +19,13 @@ cluster:
       spark.databricks.delta.optimizeWrite.enabled: "true"
       spark.driver.memory: "20g"
       spark.driver.memoryOverhead: "4g"
-      # Pack 2 executors × 4 cores per r6gd.8xlarge (32 vCPU / 256 GiB). j-09208432
-      # could not scale past one 128g/8c executor per node; j-0885277283GXQAEQV84H
-      # spilled ~3.3–3.4 GiB/task on shuffle/sort — keep 96g (not 64g) for headroom.
+      # One 96g executor × 16 cores per r6gd.8xlarge → ~96 parallel tasks (6 workers),
+      # closer to Databricks UI (~100+). j-0885277283GXQAEQV84H spilled ~3.3–3.4 GiB/task
+      # at 128g/8c; keep 96g and watch spill after skew salt + REPARTITION(400).
       spark.executor.memory: "96g"
       spark.executor.memoryOverhead: "8g"
-      spark.executor.cores: "4"
-      spark.dynamicAllocation.maxExecutors: "12"
+      spark.executor.cores: "16"
+      spark.dynamicAllocation.maxExecutors: "6"
       spark.sql.shuffle.partitions: "400"
       spark.sql.adaptive.advisoryPartitionSizeInBytes: "512MB"
       # Parallelize classic checkpoints (single-file default hung stage 93 on j-09208432).
