@@ -3,13 +3,22 @@ cluster:
   custom_libraries:
   - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
   custom_configurations:
-    # The DAG runs ~60 short Spark apps per run (one load + one sync_metadata per
-    # table, ~30-50s startup each) serialized on a single m6g.8xlarge. The XL preset
-    # gives each app a 48g executor, so only 2 fit in 128g -> step_concurrency_level
-    # is capped at 2. These collections tables are small; right-size the executor so
-    # more apps run concurrently on the SAME node (no extra cluster cost), and raise
-    # step concurrency to match. Validate spill in Forno; bump a table back if needed.
-    step_concurrency_level: 4
+    # The DAG runs ~60-74 short Spark apps per run (one load + one clean per table,
+    # ~30-50s cold start each) serialized on a single m6g.8xlarge (32 vCPU / 128g).
+    # The remaining cost vs pre-EMR is startup x serialization, not query time: on
+    # Databricks these SQLs shared a warm session (~0 startup); on EMR each step is a
+    # fresh application. So the lever is concurrency -> fewer startup waves.
+    # These are small collections tables, so shrink each app's footprint further:
+    # executor 8g+2g + driver 4g+2g = 16g/app -> ~6 fit in the usable ~116g (was 4 at
+    # 16g executors). executor.cores 2 keeps cores from binding (6 apps x 3 = 18/32).
+    # dynamicAllocation off: apps pin 1 executor (preset spark.executor.instances=1),
+    # so skip the AM/shuffle ramp negotiation per app. Validate spill in Forno; bump a
+    # table's executor back up if it OOMs/spills.
+    step_concurrency_level: 6
     spark_conf:
-      spark.executor.memory: 16g
+      spark.executor.memory: 8g
       spark.executor.memoryOverhead: 2g
+      spark.executor.cores: "2"
+      spark.driver.memory: 4g
+      spark.driver.memoryOverhead: 2g
+      spark.dynamicAllocation.enabled: "false"

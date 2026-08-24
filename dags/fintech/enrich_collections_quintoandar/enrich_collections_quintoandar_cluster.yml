@@ -8,6 +8,17 @@ cluster:
       spark.driver.memoryOverhead: 3g
       spark.yarn.am.memory: 4g
       spark.sql.shuffle.partitions: "768"
+      # SHS: overdue_portfolio_timeline's ~23min load is dozens of serial
+      # "Optimizing N files in partition" stages, each a single (1/1) task ~55s
+      # (~114MiB) — Delta OSS auto-compact compacting one partition at a time on
+      # ONE core, so the m_memory fleet and the shuffle.partitions bump (#27948,
+      # query-side) never touched it. optimizeWrite writes ~1 right-sized file per
+      # partition in one parallel shuffle so auto-compact finds nothing, and
+      # autoCompact off drops the serial per-partition compaction. File layout only,
+      # table data unchanged; applies to all enrich_collections Delta writes.
+      # Validate wall time + file sizes in Forno.
+      spark.databricks.delta.optimizeWrite.enabled: "true"
+      spark.databricks.delta.autoCompact.enabled: "false"
     core_nodes:
       target_on_demand: 3
       target_spot: 0

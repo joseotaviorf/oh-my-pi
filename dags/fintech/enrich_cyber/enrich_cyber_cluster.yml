@@ -34,3 +34,12 @@ cluster:
       spark.speculation: "true"
       spark.speculation.multiplier: "3"
       spark.speculation.quantile: "0.75"
+      # SHS: delayed_portfolio_base's 59min load was ~51min in a single "Optimizing
+      # 133 files" stage (1/1 task, ~125MiB) — Delta OSS auto-compact merging 133
+      # tiny write files on ONE core, S3-latency-bound, so more nodes never helped.
+      # optimizeWrite rebalances the write into a few right-sized files in parallel
+      # (removes the tiny-file source), and autoCompact off drops the serial 51min
+      # compaction entirely. File layout only, table data unchanged. Applies to all
+      # enrich_cyber Delta writes. Validate wall time + file sizes in Forno.
+      spark.databricks.delta.optimizeWrite.enabled: "true"
+      spark.databricks.delta.autoCompact.enabled: "false"

@@ -2,3 +2,29 @@ cluster:
   type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_libraries:
   - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
+  custom_configurations:
+    spark_conf:
+      # Spark History Server showed the 21min delinquent_master clean split as
+      # ~6.2min in `head at schema_alignment.py` + ~14min in the saveAsTable write.
+      # The 6.2min is the post-cast NULL audit: schema_alignment aggregates a
+      # count(isnull) over every string->date/timestamp/decimal column (~250 cols)
+      # across the full JSON history, purely to LOG cast losses. It does not change
+      # the written data (the casts happen either way), and the framework exposes an
+      # opt-out for exactly this. Disable it for this hot job to drop that full-scan
+      # aggregation. Validate wall time in Forno.
+      spark.bietlejuice.schemaAlignment.auditNulls: "false"
+      # The ~14min saveAsTable is not CPU-bound: the SHS Stages tab shows ~265
+      # serial "Optimizing 16 files in partition (year=..,day=..)" stages, each a
+      # single (1/1) task ~2s (run at ForkJoinTask). The write emits ~16 files per
+      # date partition and Delta auto-compact then compacts each partition on its
+      # own, one at a time -> single-core, so more nodes don't help. optimizeWrite
+      # rebalances by partition and writes ~1 file/partition (partitions are tiny,
+      # ~1MB) in one parallel shuffle, so auto-compact finds nothing to do and the
+      # serial per-partition compaction disappears. File layout only, data
+      # unchanged. Validate wall time in Forno.
+      spark.databricks.delta.optimizeWrite.enabled: "true"
+      # Belt-and-suspenders: also disable auto-compact. Across the fintech enrich
+      # DAGs the SHS consistently shows Delta-OSS auto-compact running single-task
+      # (1/1) per partition and dominating wall time; optimizeWrite already sizes
+      # files correctly, so auto-compact only risks re-introducing the serial pass.
+      spark.databricks.delta.autoCompact.enabled: "false"
