@@ -4,15 +4,15 @@ table_name: comms_events
 description: |
   Clean-layer CDP communication Event Gateway events from datalake_cdp_raw.comms_events.
   Transformations are applied in the ClickHouse comms_events view; clean SQL adds
-  event-date dt partitioning from ts_event.
-  Primary key grain: id_event with event_name and dt partitions.
+  event_date partitioning from ts_event.
+  Primary key grain: id_event with application, event_name and event_date partitions.
 domain: Growth
 owner: marcio.gomes@quintoandar.com.br
 columns:
   id_event:
     description: |
       Unique event identifier from the EGW hub payload; merge key together with
-      event_name and dt partitions.
+      application, event_name and event_date partitions.
     lineage:
       - datalake_cdp_raw.comms_events.id_event
   id_person:
@@ -96,6 +96,12 @@ columns:
       Source application that originated the communication from the ClickHouse view.
     lineage:
       - datalake_cdp_raw.comms_events.comms_source
+  application:
+    description: |
+      Application or product surface that generated the communication event; part of
+      the merge key together with id_event and event_name.
+    lineage:
+      - datalake_cdp_raw.comms_events.application
   event_properties:
     description: |
       Raw JSON string of communication event properties from the governed EGW hub
@@ -122,11 +128,16 @@ columns:
       Time when Event Gateway ingested the event in UTC from the ClickHouse view.
     lineage:
       - datalake_cdp_raw.comms_events.ts_egw
+  ts_egw_updated_at:
+    description: |
+      Event Gateway update time in UTC from the ClickHouse view; merge version
+      column on incremental load (source.ts_egw_updated_at >= target).
+    lineage:
+      - datalake_cdp_raw.comms_events.ts_egw_updated_at
   ts_ingested_at:
     description: |
-      Timestamp when ClickHouse ingested the event, mapped from ClickHouse
-      `_ingested_at` via the raw table. Distinct from ts_egw (Event Gateway)
-      and ts_event (client clock).
+      Timestamp when ClickHouse ingested the event, from ts_ingested_at on the
+      raw table. Distinct from ts_egw (Event Gateway) and ts_event (client clock).
     lineage:
       - datalake_cdp_raw.comms_events.ts_ingested_at
   ts_load:
@@ -134,7 +145,7 @@ columns:
       Timestamp when the clean query executed, set with CURRENT_TIMESTAMP at
       write time. Distinct from ts_ingested_at (ClickHouse) and ts_egw
       (Event Gateway).
-  dt:
+  event_date:
     description: |
       Partition key; calendar date of ts_event formatted as YYYY-MM-DD for partition pruning.
     lineage:

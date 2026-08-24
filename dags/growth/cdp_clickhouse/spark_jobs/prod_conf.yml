@@ -2,33 +2,26 @@
 clickhouse_host: g9ppcunt0z.us-east-1.vpce.aws.clickhouse.cloud
 clickhouse_http_port: 8443
 clickhouse_database: cdp
-clickhouse_incremental_column: _ingested_at
+clickhouse_incremental_column: ts_ingested_at
 s3_export_role_arn: arn:aws:iam::632540934959:role/event-gateway-clickhouse-s3-access
-
-events:
-  clickhouse_source_table: events_parsed
-  target_path: https://5a-cdp-processed-data-prod.s3.us-east-1.amazonaws.com/repo/clean/events/{_partition_id}/data.parquet
-  source_path: s3://5a-cdp-processed-data-prod/repo/clean/events
-  partition_columns:
-    - dt
 
 user_tracking_events:
   clickhouse_source_table: user_tracking_events
   target_path: https://5a-cdp-processed-data-prod.s3.us-east-1.amazonaws.com/repo/clean/user_tracking_events/{_partition_id}/data.parquet
   source_path: s3://5a-cdp-processed-data-prod/repo/clean/user_tracking_events
   partition_columns:
-    - dt
+    - ingestion_date
 
 transactional_events:
   clickhouse_source_table: transactional_events
   target_path: https://5a-cdp-processed-data-prod.s3.us-east-1.amazonaws.com/repo/clean/transactional_events/{_partition_id}/data.parquet
   source_path: s3://5a-cdp-processed-data-prod/repo/clean/transactional_events
   partition_columns:
-    - dt
+    - ingestion_date
 
 comms_events:
   clickhouse_source_table: comms_events
   target_path: https://5a-cdp-processed-data-prod.s3.us-east-1.amazonaws.com/repo/clean/comms_events/{_partition_id}/data.parquet
   source_path: s3://5a-cdp-processed-data-prod/repo/clean/comms_events
   partition_columns:
-    - dt
+    - ingestion_date

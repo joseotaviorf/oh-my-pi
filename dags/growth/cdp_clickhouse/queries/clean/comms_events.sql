@@ -16,16 +16,18 @@ SELECT
     raw.comms_action,
     raw.comms_template,
     raw.comms_source,
+    raw.application,
     raw.event_properties,
     raw.user_properties,
     raw.event_name,
     raw.ts_event,
     raw.ts_egw,
+    raw.ts_egw_updated_at,
     raw.ts_ingested_at,
     CURRENT_TIMESTAMP() AS ts_load,
-    DATE_FORMAT(raw.ts_event, 'yyyy-MM-dd') AS dt
+    DATE_FORMAT(raw.ts_event, 'yyyy-MM-dd') AS event_date
 FROM
     datalake_cdp_raw.comms_events AS raw
 WHERE
-    raw.dt >= DATE_FORMAT(TIMESTAMP('{load_start_date}'), 'yyyy-MM-dd-HH')
-    AND raw.dt <= DATE_FORMAT(TIMESTAMP('{load_end_date}'), 'yyyy-MM-dd-HH')
+    raw.ingestion_date >= DATE_FORMAT(TIMESTAMP('{load_start_date}'), 'yyyy-MM-dd-HH')
+    AND raw.ingestion_date <= DATE_FORMAT(TIMESTAMP('{load_end_date}'), 'yyyy-MM-dd-HH')

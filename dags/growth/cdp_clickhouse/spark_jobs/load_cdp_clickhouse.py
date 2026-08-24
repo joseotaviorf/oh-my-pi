@@ -40,8 +40,9 @@ def trigger_insert_into_clickhouse_procedure(
     """
     Dump ClickHouse rows to S3 Parquet staging files.
 
-    Raw staging exports are partitioned by ingest hour (dt as yyyy-MM-dd-HH).
-    event_name partitioning is applied later in clean Delta tables.
+    Raw staging exports are partitioned by ingest hour
+    (ingestion_date as yyyy-MM-dd-HH). event_name partitioning is applied later
+    in clean Delta tables.
     """
 
     query = f"""
@@ -53,10 +54,10 @@ def trigger_insert_into_clickhouse_procedure(
             ),
             'Parquet'
         )
-    PARTITION BY concat('dt=', dt)
+    PARTITION BY concat('ingestion_date=', ingestion_date)
     SELECT
         *,
-        formatDateTime(_ingested_at, '%Y-%m-%d-%H') AS dt
+        formatDateTime({clickhouse_incremental_column}, '%Y-%m-%d-%H') AS ingestion_date
     FROM {database_name}.{table_name}
     WHERE
         {clickhouse_incremental_column} >= '{start_time}'::TIMESTAMP
@@ -212,8 +213,10 @@ if __name__ == "__main__":
     source_paths = []
     scan_hour = scan_start
     while scan_hour <= scan_end:
-        dt_partition = scan_hour.strftime("%Y-%m-%d-%H")
-        source_paths.append(f"{source_path.rstrip('/')}/dt={dt_partition}/data.parquet")
+        ingestion_date_partition = scan_hour.strftime("%Y-%m-%d-%H")
+        source_paths.append(
+            f"{source_path.rstrip('/')}/ingestion_date={ingestion_date_partition}/data.parquet"
+        )
         scan_hour += timedelta(hours=1)
 
     source_paths_filtered = [
@@ -230,12 +233,11 @@ if __name__ == "__main__":
     logger.info("data loaded successfully!")
 
     """
-    Deduplicate raw events by event_id (latest egw_timestamp).
+    Deduplicate raw events by id_event, application and event_name
+    (latest ts_egw_updated_at).
     """
-    dedup_key_column = "id_event" if "id_event" in df.columns else "event_id"
-    dedup_order_column = "ts_egw" if "ts_egw" in df.columns else "egw_timestamp"
-    dedup_window = Window.partitionBy(dedup_key_column).orderBy(
-        desc(dedup_order_column)
+    dedup_window = Window.partitionBy("id_event", "application", "event_name").orderBy(
+        desc("ts_egw_updated_at")
     )
     df = (
         df.withColumn("_rn", row_number().over(dedup_window))
@@ -243,11 +245,11 @@ if __name__ == "__main__":
         .drop("_rn")
     )
     logger.info(
-        f"raw events deduplicated by {dedup_key_column} (latest {dedup_order_column})"
+        "raw events deduplicated by id_event, application, event_name "
+        "(latest ts_egw_updated_at)"
     )
 
     df = df.withColumn("ts_load", current_timestamp())
-    df = df.withColumnRenamed("_ingested_at", "ts_ingested_at")
 
     """
     Load data to datalake.

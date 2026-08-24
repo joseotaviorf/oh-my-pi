@@ -1,24 +1,72 @@
 SELECT
-    raw.event_id AS id_event,
-    raw.person_uuid AS id_person,
-    raw.user_id AS id_user,
-    raw.house_id AS id_house,
-    raw.contract_id AS id_contract,
-    raw.egw_event_type,
-    LOWER(raw.application) AS application,
-    raw.journey_step,
-    LOWER(raw.event_name) AS event_name,
+    raw.id_event,
+    raw.id_person,
+    CAST(raw.id_user AS STRING) AS id_user,
+    CAST(NULL AS STRING) AS id_house,
+    CAST(NULL AS STRING) AS id_contract,
+    raw.application,
+    CAST(NULL AS STRING) AS journey_step,
+    raw.event_name,
     raw.event_properties,
     raw.user_properties,
-    raw.enrichments,
-    TIMESTAMP_MILLIS(raw.timestamp) AS ts_event,
-    TIMESTAMP_MILLIS(raw.egw_timestamp) AS ts_egw,
-    TIMESTAMP_MILLIS(raw.egw_updated_at) AS ts_egw_updated_at,
+    raw.ts_event,
+    raw.ts_egw,
+    raw.ts_egw_updated_at,
     raw.ts_ingested_at,
     CURRENT_TIMESTAMP() AS ts_load,
-    DATE_FORMAT(TIMESTAMP_MILLIS(raw.timestamp), 'yyyy-MM-dd') AS dt
+    DATE_FORMAT(raw.ts_event, 'yyyy-MM-dd') AS event_date
 FROM
-    datalake_cdp_raw.events AS raw
+    datalake_cdp_raw.user_tracking_events AS raw
 WHERE
-    raw.dt >= DATE_FORMAT(TIMESTAMP('{load_start_date}'), 'yyyy-MM-dd-HH')
-    AND raw.dt <= DATE_FORMAT(TIMESTAMP('{load_end_date}'), 'yyyy-MM-dd-HH')
+        raw.ingestion_date >= DATE_FORMAT(TIMESTAMP('{load_start_date}'), 'yyyy-MM-dd-HH')
+        AND raw.ingestion_date <= DATE_FORMAT(TIMESTAMP('{load_end_date}'), 'yyyy-MM-dd-HH')
+
+UNION ALL
+
+SELECT
+    raw.id_event,
+    raw.id_person,
+    CAST(raw.id_user AS STRING) AS id_user,
+    CAST(raw.id_house AS STRING) AS id_house,
+    CAST(raw.id_contract AS STRING) AS id_contract,
+    raw.application,
+    raw.journey_step,
+    raw.event_name,
+    raw.event_properties,
+    raw.user_properties,
+    raw.ts_event,
+    raw.ts_egw,
+    raw.ts_egw_updated_at,
+    raw.ts_ingested_at,
+    CURRENT_TIMESTAMP() AS ts_load,
+    DATE_FORMAT(raw.ts_event, 'yyyy-MM-dd') AS event_date
+FROM
+    datalake_cdp_raw.transactional_events AS raw
+WHERE
+        raw.ingestion_date >= DATE_FORMAT(TIMESTAMP('{load_start_date}'), 'yyyy-MM-dd-HH')
+        AND raw.ingestion_date <= DATE_FORMAT(TIMESTAMP('{load_end_date}'), 'yyyy-MM-dd-HH')
+
+UNION ALL
+
+SELECT
+    raw.id_event,
+    raw.id_person,
+    CAST(raw.id_user AS STRING) AS id_user,
+    CAST(NULL AS STRING) AS id_house,
+    CAST(NULL AS STRING) AS id_contract,
+    raw.application,
+    CAST(NULL AS STRING) AS journey_step,
+    raw.event_name,
+    raw.event_properties,
+    raw.user_properties,
+    raw.ts_event,
+    raw.ts_egw,
+    raw.ts_egw_updated_at,
+    raw.ts_ingested_at,
+    CURRENT_TIMESTAMP() AS ts_load,
+    DATE_FORMAT(raw.ts_event, 'yyyy-MM-dd') AS event_date
+FROM
+    datalake_cdp_raw.comms_events AS raw
+WHERE
+        raw.ingestion_date >= DATE_FORMAT(TIMESTAMP('{load_start_date}'), 'yyyy-MM-dd-HH')
+        AND raw.ingestion_date <= DATE_FORMAT(TIMESTAMP('{load_end_date}'), 'yyyy-MM-dd-HH')
