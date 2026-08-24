@@ -1,0 +1,95 @@
+---
+database_name: datalake_crawled_idactum_houses_clean
+table_name: rj_niteroi_e_cidade
+description: |
+  Flattened Niteroi e-Cidade cadastral fields mapped toward the idactum_houses legacy contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.response.dados_cadastrais.matricula
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.response.dados_cadastrais.referencia_anterior
+    description: |
+      Niteroi property matricula or prior reference identifier.
+  real_estate_registry:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.response.dados_cadastrais.matricula
+    description: |
+      Property registry matricula from cadastral data.
+  state:
+    description: |
+      Brazilian state abbreviation for Niteroi properties (constant RJ).
+  city:
+    description: |
+      Municipality name for Niteroi properties (constant Niteroi).
+  neighborhood:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.response.proprietario.bairro
+    description: |
+      Neighborhood from owner address data.
+  street:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.response.proprietario.nomepri
+    description: |
+      Street name from owner address data.
+  address_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.response.proprietario.j39_numero
+    description: |
+      Street number from owner address data.
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.response.proprietario.j39_compl
+    description: |
+      Address complement from owner address data.
+  property_address:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.response.proprietario.enderecoimovel
+    description: |
+      Full property address string from owner data.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_niteroi_e_cidade.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

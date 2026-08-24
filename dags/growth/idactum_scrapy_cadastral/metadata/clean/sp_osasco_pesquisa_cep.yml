@@ -1,0 +1,90 @@
+---
+database_name: datalake_crawled_idactum_houses_clean
+table_name: sp_osasco_pesquisa_cep
+description: |
+  Flattened Osasco CEP search results mapped toward the idactum_houses legacy contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.response.inscricao
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.response.cdc
+    description: |
+      Municipal property identifier from CEP search.
+  municipal_inscription:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.response.inscricao
+    description: |
+      Formatted municipal cadastral inscription.
+  cdc:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.response.cdc
+    description: |
+      Osasco CDC numeric identifier.
+  state:
+    description: |
+      Brazilian state abbreviation for Osasco properties (constant SP).
+  city:
+    description: |
+      Municipality name for Osasco properties (constant Osasco).
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.response.endereco
+    description: |
+      Full address string from CEP search.
+  real_estate_registry:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.response.no_matricula
+    description: |
+      Property registry number from CEP search.
+  is_active:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.response.situacao
+    description: |
+      Active status flag parsed from situacao field.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cep.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

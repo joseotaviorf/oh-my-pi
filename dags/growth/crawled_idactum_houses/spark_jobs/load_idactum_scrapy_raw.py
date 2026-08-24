@@ -24,6 +24,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.schema_service import SchemaService
 
 PARTITION_COLS: List[str] = ["year", "month", "day"]
 
@@ -118,12 +119,229 @@ _REGISTRATION_ITEM_STRUCT = StructType(
     ]
 )
 
+_OSASCO_PESQUISA_CEP_ITEM_STRUCT = StructType(
+    [
+        StructField("inscricao", StringType(), True),
+        StructField("cdc", StringType(), True),
+        StructField("endereco", StringType(), True),
+        StructField("no_matricula", StringType(), True),
+        StructField("situacao", StringType(), True),
+    ]
+)
+
+_OSASCO_COMPROMISSARIOS_ITEM_STRUCT = StructType(
+    [
+        StructField("cpf_cnpj", StringType(), True),
+        StructField("nome", StringType(), True),
+    ]
+)
+
+_OSASCO_PROPRIETARIOS_ITEM_STRUCT = StructType(
+    [
+        StructField("cpf_cnpj", StringType(), True),
+        StructField("nome", StringType(), True),
+        StructField("percentual_posse", StringType(), True),
+    ]
+)
+
+_AM_MANAUS_BCI_RESPONSE_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "inscricao",
+            "matricula",
+            "bairro",
+            "logradouro",
+            "numero",
+            "cep",
+            "complemento",
+            "ano_construcao",
+            "area_terreno",
+            "area_construcao_unidade",
+            "area_edificada",
+            "tipo_imovel",
+        )
+    ]
+)
+
+_BA_SALVADOR_CERTIDAO_CADASTRAL_RESPONSE_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "incricao_imobiliaria",
+            "bairro",
+            "logradouro",
+            "numero_porta",
+            "numero_metrico",
+            "cep",
+            "complemento_endereco",
+            "area_terreno",
+            "area_construida",
+            "utilizacao",
+        )
+    ]
+)
+
+_BSB_MAIN_FICHAS_RESPONSE_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "inscricao",
+            "cidade",
+            "bairro_de_correspondencia",
+            "endereco_do_imovel",
+            "cep_do_imovel",
+            "area_terreno",
+            "area_da_construcao_do_alvara",
+            "area_declarada",
+            "natureza_do_imovel",
+        )
+    ]
+)
+
+_SP_DADOS_CADASTRAIS_RECADASTRAMENTO_RESPONSE_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "NumIPTU",
+            "Bairro",
+            "Endereco",
+            "Numero",
+            "Complemento",
+            "CepImovel",
+        )
+    ]
+)
+
+_RJ_DADOS_CADASTRAIS_RESPONSE_STRUCT = StructType(
+    [
+        StructField("inscription_sem_dv", StringType(), True),
+    ]
+)
+
+_RJ_NITEROI_DADOS_CADASTRAIS_STRUCT = StructType(
+    [
+        StructField("matricula", StringType(), True),
+        StructField("referencia_anterior", StringType(), True),
+    ]
+)
+
+_RJ_NITEROI_PROPRIETARIO_STRUCT = StructType(
+    [
+        StructField("bairro", StringType(), True),
+        StructField("nomepri", StringType(), True),
+        StructField("j39_numero", StringType(), True),
+        StructField("j39_compl", StringType(), True),
+        StructField("enderecoimovel", StringType(), True),
+    ]
+)
+
+_RJ_NITEROI_E_CIDADE_RESPONSE_STRUCT = StructType(
+    [
+        StructField("dados_cadastrais", _RJ_NITEROI_DADOS_CADASTRAIS_STRUCT, True),
+        StructField("proprietario", _RJ_NITEROI_PROPRIETARIO_STRUCT, True),
+    ]
+)
+
+_BSB_FEATURES_PROPERTIES_CADASTRAL_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "objectid",
+            "lt_nome",
+            "lt_endereco",
+            "lt_cep",
+            "ac_area_ct",
+            "ac_area_ce",
+        )
+    ]
+)
+
+_BSB_FEATURES_PROPERTIES_GEOMETRIA_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "objectid",
+            "iptu_imovel",
+            "lt_nome",
+            "iptu_endereco",
+            "lt_cep",
+            "iptu_area_terr",
+            "iptu_areac_dec",
+        )
+    ]
+)
+
+_BSB_FEATURES_ITEM_STRUCT = StructType(
+    [
+        StructField("properties", _BSB_FEATURES_PROPERTIES_CADASTRAL_STRUCT, True),
+    ]
+)
+
+_BSB_GEOMETRIA_FEATURES_ITEM_STRUCT = StructType(
+    [
+        StructField("properties", _BSB_FEATURES_PROPERTIES_GEOMETRIA_STRUCT, True),
+    ]
+)
+
+_BSB_FEATURES_RESPONSE_STRUCT = StructType(
+    [
+        StructField("features", ArrayType(_BSB_FEATURES_ITEM_STRUCT), True),
+    ]
+)
+
+_BSB_GEOMETRIA_RESPONSE_STRUCT = StructType(
+    [
+        StructField("features", ArrayType(_BSB_GEOMETRIA_FEATURES_ITEM_STRUCT), True),
+    ]
+)
+
+
+def _response_metadata_schema(response_struct: StructType) -> StructType:
+    return StructType(
+        [
+            StructField("response", response_struct, True),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    )
+
+
 _EMPTY_RAW_SCHEMAS = {
     "sp_osasco_pesquisa_cdc": StructType(
         [
             StructField(
                 "response",
                 ArrayType(_OSASCO_PESQUISA_CDC_ITEM_STRUCT),
+                True,
+            ),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+    "sp_osasco_pesquisa_cep": StructType(
+        [
+            StructField(
+                "response",
+                ArrayType(_OSASCO_PESQUISA_CEP_ITEM_STRUCT),
+                True,
+            ),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+    "sp_osasco_compromissarios": StructType(
+        [
+            StructField(
+                "response",
+                ArrayType(_OSASCO_COMPROMISSARIOS_ITEM_STRUCT),
+                True,
+            ),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+    "sp_osasco_proprietarios": StructType(
+        [
+            StructField(
+                "response",
+                ArrayType(_OSASCO_PROPRIETARIOS_ITEM_STRUCT),
                 True,
             ),
             StructField("metadata", METADATA_STRUCT, True),
@@ -153,6 +371,32 @@ _EMPTY_RAW_SCHEMAS = {
             StructField("metadata", METADATA_STRUCT, True),
         ]
     ),
+    "am_manaus_bci": _response_metadata_schema(_AM_MANAUS_BCI_RESPONSE_STRUCT),
+    "ba_salvador_certidao_cadastral": _response_metadata_schema(
+        _BA_SALVADOR_CERTIDAO_CADASTRAL_RESPONSE_STRUCT
+    ),
+    "bsb_main_fichas": _response_metadata_schema(_BSB_MAIN_FICHAS_RESPONSE_STRUCT),
+    "sp_dados_cadastrais_recadastramento_main": _response_metadata_schema(
+        _SP_DADOS_CADASTRAIS_RECADASTRAMENTO_RESPONSE_STRUCT
+    ),
+    "rj_dados_cadastrais_main_busca": _response_metadata_schema(
+        _RJ_DADOS_CADASTRAIS_RESPONSE_STRUCT
+    ),
+    "rj_dados_cadastrais_main_nirf": _response_metadata_schema(
+        _RJ_DADOS_CADASTRAIS_RESPONSE_STRUCT
+    ),
+    "rj_dados_cadastrais_main_predio": _response_metadata_schema(
+        _RJ_DADOS_CADASTRAIS_RESPONSE_STRUCT
+    ),
+    "rj_niteroi_e_cidade": _response_metadata_schema(
+        _RJ_NITEROI_E_CIDADE_RESPONSE_STRUCT
+    ),
+    "bsb_main_cadastro_territorial": _response_metadata_schema(
+        _BSB_FEATURES_RESPONSE_STRUCT
+    ),
+    "bsb_main_certidao_geometria": _response_metadata_schema(
+        _BSB_GEOMETRIA_RESPONSE_STRUCT
+    ),
 }
 
 
@@ -176,6 +420,32 @@ def _empty_raw_schema(table_name: str) -> StructType:
 def _empty_raw_dataframe(table_name: str) -> DataFrame:
     spark_client = SparkClient()
     return spark_client.conn.createDataFrame([], _empty_raw_schema(table_name))
+
+
+def _normalize_schema_type(schema_type: str) -> str:
+    return schema_type.lower().replace(" ", "")
+
+
+def _response_schema_type_mismatch(
+    spark_metastore_service: SparkMetastoreService,
+    database_name: str,
+    table_name: str,
+    dataframe: DataFrame,
+) -> bool:
+    if table_name not in spark_metastore_service.get_table_names(database_name):
+        return False
+
+    table_schema = spark_metastore_service.get_table_schema(database_name, table_name)
+    dataframe_schema = SchemaService.get_schema_from_dataframe(dataframe)
+
+    table_response_type = table_schema.get("response")
+    dataframe_response_type = dataframe_schema.get("response")
+    if table_response_type is None or dataframe_response_type is None:
+        return False
+
+    return _normalize_schema_type(table_response_type) != _normalize_schema_type(
+        dataframe_response_type
+    )
 
 
 def bootstrap_empty_raw_table(
@@ -210,6 +480,7 @@ def bootstrap_empty_raw_table(
         datalake_bucket=datalake_bucket,
         table_name=table_name,
         source=source,
+        force_recreate=True,
     )
 
     logger.info(
@@ -230,6 +501,70 @@ def load_from_s3(path: str) -> DataFrame:
     )
 
 
+def _sanitize_rj_niteroi_e_cidade_response(dataframe: DataFrame) -> DataFrame:
+    """Project response to known fields so numeric JSON keys never reach metastore DDL."""
+    return dataframe.withColumn(
+        "response",
+        F.struct(
+            F.struct(
+                F.col("response.dados_cadastrais.matricula")
+                .cast(StringType())
+                .alias("matricula"),
+                F.col("response.dados_cadastrais.referencia_anterior")
+                .cast(StringType())
+                .alias("referencia_anterior"),
+            ).alias("dados_cadastrais"),
+            F.struct(
+                F.col("response.proprietario.bairro")
+                .cast(StringType())
+                .alias("bairro"),
+                F.col("response.proprietario.nomepri")
+                .cast(StringType())
+                .alias("nomepri"),
+                F.col("response.proprietario.j39_numero")
+                .cast(StringType())
+                .alias("j39_numero"),
+                F.col("response.proprietario.j39_compl")
+                .cast(StringType())
+                .alias("j39_compl"),
+                F.col("response.proprietario.enderecoimovel")
+                .cast(StringType())
+                .alias("enderecoimovel"),
+            ).alias("proprietario"),
+        ),
+    )
+
+
+def _sanitize_sp_osasco_proprietarios_response(dataframe: DataFrame) -> DataFrame:
+    """Cast array item fields to string so JSON inference cannot drift to long."""
+    return dataframe.withColumn(
+        "response",
+        F.transform(
+            F.col("response"),
+            lambda item: F.struct(
+                item.getField("cpf_cnpj").cast(StringType()).alias("cpf_cnpj"),
+                item.getField("nome").cast(StringType()).alias("nome"),
+                item.getField("percentual_posse")
+                .cast(StringType())
+                .alias("percentual_posse"),
+            ),
+        ),
+    )
+
+
+_RAW_RESPONSE_SANITIZERS = {
+    "rj_niteroi_e_cidade": _sanitize_rj_niteroi_e_cidade_response,
+    "sp_osasco_proprietarios": _sanitize_sp_osasco_proprietarios_response,
+}
+
+
+def _sanitize_raw_dataframe(table_name: str, dataframe: DataFrame) -> DataFrame:
+    sanitizer = _RAW_RESPONSE_SANITIZERS.get(table_name)
+    if sanitizer is None:
+        return dataframe
+    return sanitizer(dataframe)
+
+
 def transform_data(
     dataframe: DataFrame, crawler_name: str, execution_date: date
 ) -> DataFrame:
@@ -248,6 +583,8 @@ def save_to_datalake(
     datalake_bucket: str,
     table_name: str,
     source: str,
+    *,
+    force_recreate: bool = False,
 ) -> None:
     spark_client = SparkClient()
 
@@ -258,6 +595,19 @@ def save_to_datalake(
 
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_service.create_database(database_name)
+
+    if not force_recreate and _response_schema_type_mismatch(
+        spark_metastore_service,
+        database_name,
+        table_name,
+        dataframe,
+    ):
+        logger.warning(
+            f"m=save_to_datalake, db={database_name}, table={table_name}, "
+            f"msg=Existing metastore response schema differs from incoming dataframe; "
+            f"forcing table recreation"
+        )
+        force_recreate = True
 
     s3_loader = S3Loader()
     s3_loader.load_df(
@@ -276,7 +626,7 @@ def save_to_datalake(
         format_options=format_options,
         database_location=database_location,
         partitions=PARTITION_COLS,
-        force_recreate=False,
+        force_recreate=force_recreate,
     )
     spark_metastore_service.create_new_partitions_from_df(
         database_name=database_name,
@@ -363,8 +713,9 @@ if __name__ == "__main__":
             raise SystemExit(0) from None
         raise
 
+    sanitized_dataframe = _sanitize_raw_dataframe(args.table_name, raw_dataframe)
     dataframe_to_save = transform_data(
-        raw_dataframe, crawler_name=spider, execution_date=execution_date
+        sanitized_dataframe, crawler_name=spider, execution_date=execution_date
     )
 
     save_to_datalake(

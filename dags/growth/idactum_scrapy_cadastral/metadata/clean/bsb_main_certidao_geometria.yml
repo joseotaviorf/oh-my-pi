@@ -1,0 +1,95 @@
+---
+database_name: datalake_crawled_idactum_houses_clean
+table_name: bsb_main_certidao_geometria
+description: |
+  Flattened Brasilia geometry certificate GeoJSON features mapped toward the idactum_houses legacy contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.response.features.properties.iptu_imovel
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.response.features.properties.objectid
+    description: |
+      DF IPTU property inscription from geometry certificate.
+  municipal_inscription:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.response.features.properties.iptu_imovel
+    description: |
+      DF IPTU property inscription.
+  state:
+    description: |
+      Brazilian state abbreviation for DF properties (constant DF).
+  city:
+    description: |
+      Municipality name for DF properties (constant Brasilia).
+  neighborhood:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.response.features.properties.lt_nome
+    description: |
+      Lot neighborhood from geometry certificate properties.
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.response.features.properties.iptu_endereco
+    description: |
+      Property address from geometry certificate properties.
+  zipcode:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.response.features.properties.lt_cep
+    description: |
+      Postal code from geometry certificate properties.
+  lot_area:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.response.features.properties.iptu_area_terr
+    description: |
+      Territorial area from geometry certificate properties.
+  building_area:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.response.features.properties.iptu_areac_dec
+    description: |
+      Built area from geometry certificate properties.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.bsb_main_certidao_geometria.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

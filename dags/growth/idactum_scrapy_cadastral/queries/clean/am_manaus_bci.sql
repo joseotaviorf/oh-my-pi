@@ -1,0 +1,27 @@
+SELECT
+  COALESCE(response.inscricao, CAST(response.matricula AS STRING)) AS id_municipal_house,
+  response.inscricao AS municipal_inscription,
+  CAST(response.matricula AS STRING) AS real_estate_registry,
+  'AM' AS state,
+  'Manaus' AS city,
+  response.bairro AS neighborhood,
+  response.logradouro AS street,
+  CAST(response.numero AS STRING) AS address_number,
+  response.cep AS zipcode,
+  response.complemento AS address_details,
+  CAST(response.ano_construcao AS DOUBLE) AS building_year,
+  CAST(response.area_terreno AS DOUBLE) AS lot_area,
+  CAST(response.area_construcao_unidade AS DOUBLE) AS building_area,
+  CAST(response.area_edificada AS DOUBLE) AS private_area,
+  response.tipo_imovel AS kind,
+  metadata.source AS feed_source,
+  metadata.url AS feed_url,
+  metadata.accessed_at AS ts_accessed,
+  metadata.referer_url AS referer_url,
+  crawler_name,
+  dt_load,
+  year,
+  month,
+  day
+FROM
+  datalake_crawled_idactum_houses_raw.am_manaus_bci

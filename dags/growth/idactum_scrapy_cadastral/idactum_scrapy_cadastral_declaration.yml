@@ -4,10 +4,11 @@ dag:
   schedule_start_date: 2026, 05, 07
   documentation:
     dag_purpose: |
-      Ingest Idactum Scrapy cadastral crawler outputs (Goiânia informações cadastrais,
-      cadastro imobiliário, comprovação de pagamento, Osasco pesquisa CDC) from
-      crawler-scrapy-{forno|prod} into the shared crawled_idactum_houses raw/clean
-      databases. One EMR cluster per DAG run with parallel raw+clean tasks per spider.
+      Ingest Idactum Scrapy cadastral crawler outputs from crawler-scrapy-{forno|prod}
+      into the shared crawled_idactum_houses raw/clean databases. Covers Goiania cadastral
+      spiders, Osasco CDC/CEP/people lookups, Rio de Janeiro and Niteroi cadastral feeds,
+      Sao Paulo recadastramento, Brasilia territorial cadastre, and other municipal
+      certificate crawlers. One EMR cluster per DAG run with parallel raw+clean tasks per spider.
 workflow:
   layer: raw
   type: custom_ingestion
@@ -33,4 +34,34 @@ workflow:
     go_goiania_comprovacao_pagamento:
       partitions: [year, month, day]
     sp_osasco_pesquisa_cdc:
+      partitions: [year, month, day]
+    am_manaus_bci:
+      partitions: [year, month, day]
+    ba_salvador_certidao_cadastral:
+      partitions: [year, month, day]
+    bh_cnd_main:
+      partitions: [year, month, day]
+    bsb_main_cadastro_territorial:
+      partitions: [year, month, day]
+    bsb_main_certidao_geometria:
+      partitions: [year, month, day]
+    bsb_main_fichas:
+      partitions: [year, month, day]
+    pe_recife_certidao_narrativa_imob:
+      partitions: [year, month, day]
+    rj_dados_cadastrais_main_busca:
+      partitions: [year, month, day]
+    rj_dados_cadastrais_main_nirf:
+      partitions: [year, month, day]
+    rj_dados_cadastrais_main_predio:
+      partitions: [year, month, day]
+    rj_niteroi_e_cidade:
+      partitions: [year, month, day]
+    sp_dados_cadastrais_recadastramento_main:
+      partitions: [year, month, day]
+    sp_osasco_pesquisa_cep:
+      partitions: [year, month, day]
+    sp_osasco_compromissarios:
+      partitions: [year, month, day]
+    sp_osasco_proprietarios:
       partitions: [year, month, day]

@@ -1,0 +1,58 @@
+---
+database_name: datalake_crawled_idactum_houses_clean
+table_name: sp_osasco_compromissarios
+description: |
+  Clean passthrough of sp_osasco_compromissarios Scrapy crawler output with crawl metadata flattened.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  response:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.response
+    description: |
+      Nested scraped payload returned by the spider (schema-on-read JSONL).
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_compromissarios.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

@@ -1,0 +1,94 @@
+---
+database_name: datalake_crawled_idactum_houses_clean
+table_name: sp_dados_cadastrais_recadastramento_main
+description: |
+  Flattened Sao Paulo recadastramento results mapped toward the idactum_houses legacy contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.response.NumIPTU
+    description: |
+      Sao Paulo municipal IPTU inscription number.
+  municipal_inscription:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.response.NumIPTU
+    description: |
+      Formatted Sao Paulo IPTU inscription.
+  state:
+    description: |
+      Brazilian state abbreviation for Sao Paulo properties (constant SP).
+  city:
+    description: |
+      Municipality name for Sao Paulo properties (constant Sao Paulo).
+  neighborhood:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.response.Bairro
+    description: |
+      Neighborhood from recadastramento lookup.
+  street:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.response.Endereco
+    description: |
+      Street name from recadastramento lookup.
+  address_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.response.Numero
+    description: |
+      Street number from recadastramento lookup.
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.response.Complemento
+    description: |
+      Address complement from recadastramento lookup.
+  zipcode:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.response.CepImovel
+    description: |
+      Postal code from recadastramento lookup.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_dados_cadastrais_recadastramento_main.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.
