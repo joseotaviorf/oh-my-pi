@@ -7,7 +7,7 @@ cluster:
       spark.driver.memory: 12g
       spark.driver.memoryOverhead: 3g
       spark.yarn.am.memory: 4g
-      spark.sql.shuffle.partitions: "384"
+      spark.sql.shuffle.partitions: "768"
     core_nodes:
       target_on_demand: 3
       target_spot: 0

@@ -1,7 +1,7 @@
 dag:
   name: cyber_legal
   schedule_start_date: 2025, 8, 1
-  schedule_interval: 0 8 * * *
+  schedule_interval: 40 7 * * *
   owner: Data Fintech
   callback_by_task: False
   documentation:

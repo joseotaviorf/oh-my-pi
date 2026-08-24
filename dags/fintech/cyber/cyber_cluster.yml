@@ -2,3 +2,14 @@ cluster:
   type: emr_7_12_consolidation_xl_general_single_node_fleet_cluster
   custom_libraries:
   - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
+  custom_configurations:
+    # The DAG runs ~60 short Spark apps per run (one load + one sync_metadata per
+    # table, ~30-50s startup each) serialized on a single m6g.8xlarge. The XL preset
+    # gives each app a 48g executor, so only 2 fit in 128g -> step_concurrency_level
+    # is capped at 2. These collections tables are small; right-size the executor so
+    # more apps run concurrently on the SAME node (no extra cluster cost), and raise
+    # step concurrency to match. Validate spill in Forno; bump a table back if needed.
+    step_concurrency_level: 4
+    spark_conf:
+      spark.executor.memory: 16g
+      spark.executor.memoryOverhead: 2g
