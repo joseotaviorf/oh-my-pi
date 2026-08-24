@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Block Databricks-specific SQL constructs in new/changed .sql files.
+"""Block Databricks-only SQL constructs and Spark-rejected trailing commas.
 
 Scans every SQL file that appears in the current git diff (new or modified) and
-fails if any Databricks-only syntax is found.  Existing, unmodified files are
-never inspected.
+fails if Databricks-only syntax is found, or if a SELECT list ends with a comma
+immediately before FROM / WHERE / GROUP BY / etc. (Spark ParseException; PR
+#27712). Existing, unmodified files are never inspected in branch mode.
 
 Usage (CI — branch resolved via CI_COMMIT_BRANCH):
     python validate_databricks_sql_constructs.py -b "$CI_COMMIT_BRANCH"
@@ -66,11 +67,24 @@ _CONSTRUCTS = [
 ]
 
 _COMMENT_RE = re.compile(r"--.*$")
+_LINE_COMMENT_RE = re.compile(r"--[^\n]*")
+_BLOCK_COMMENT_RE = re.compile(r"/\*(?!\+).*?\*/", re.DOTALL)
 # Matches single- and double-quoted string literals (handles \' and \" escapes).
 # Used to blank out string contents before pattern matching so that colons inside
 # format strings like 'HH:mm:ss' or "yyyy-MM-dd HH:mm:ss" don't trip the variant
-# accessor rule.
-_STRING_LITERAL_RE = re.compile(r"'(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\"")
+# accessor rule. DOTALL so a comma + FROM inside a multiline string is ignored.
+_STRING_LITERAL_RE = re.compile(
+    r"'(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\"",
+    re.DOTALL,
+)
+
+# Spark / Trino reject a comma as the last SELECT-list item. SQLGlot accepts it.
+_TRAILING_COMMA_RE = re.compile(
+    r",\s*\n\s*(FROM|WHERE|GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|UNION|"
+    r"EXCEPT|INTERSECT|WINDOW)\b(?!\s*,)",
+    re.IGNORECASE,
+)
+_TRAILING_COMMA_CONSTRUCT = "trailing comma before FROM/WHERE/..."
 
 
 class Violation(NamedTuple):
@@ -88,28 +102,67 @@ def _strip_string_literals(line: str) -> str:
     return _STRING_LITERAL_RE.sub("''", line)
 
 
-def scan_file(path: Path) -> List[Violation]:
-    violations: List[Violation] = []
-    try:
-        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-    except OSError as exc:
-        print(f"WARNING: cannot read {path}: {exc}", file=sys.stderr)
-        return violations
+def _blank_preserving_newlines(match: "re.Match[str]") -> str:
+    return " " + "\n" * match.group(0).count("\n")
 
+
+def _replace_string_preserving_newlines(match: "re.Match[str]") -> str:
+    return "''" + "\n" * match.group(0).count("\n")
+
+
+def _normalize_sql_for_trailing_comma(sql: str) -> str:
+    sql = _BLOCK_COMMENT_RE.sub(_blank_preserving_newlines, sql)
+    sql = _LINE_COMMENT_RE.sub("", sql)
+    return _STRING_LITERAL_RE.sub(_replace_string_preserving_newlines, sql)
+
+
+def _scan_trailing_select_commas(text: str, filepath: str) -> List[Violation]:
+    normalized = _normalize_sql_for_trailing_comma(text)
+    raw_lines = text.splitlines()
+    violations: List[Violation] = []
+    for match in _TRAILING_COMMA_RE.finditer(normalized):
+        line_no = normalized[: match.start()].count("\n") + 1
+        raw_line = (
+            raw_lines[line_no - 1].strip() if 0 < line_no <= len(raw_lines) else ""
+        )
+        violations.append(
+            Violation(
+                filepath=filepath,
+                line_no=line_no,
+                construct=_TRAILING_COMMA_CONSTRUCT,
+                text=raw_line,
+            )
+        )
+    return violations
+
+
+def scan_sql_text(sql: str, filepath: str) -> List[Violation]:
+    violations: List[Violation] = []
+    lines = sql.splitlines()
     for line_no, raw_line in enumerate(lines, start=1):
         stripped = _strip_string_literals(_strip_line_comment(raw_line))
         for construct, pattern in _CONSTRUCTS:
             if pattern.search(stripped):
                 violations.append(
                     Violation(
-                        filepath=str(path),
+                        filepath=filepath,
                         line_no=line_no,
                         construct=construct,
                         text=raw_line.strip(),
                     )
                 )
-                break  # one violation per line is enough
+                break  # one Databricks-construct violation per line is enough
+    violations.extend(_scan_trailing_select_commas(sql, filepath))
     return violations
+
+
+def scan_file(path: Path) -> List[Violation]:
+    try:
+        sql = path.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        print(f"WARNING: cannot read {path}: {exc}", file=sys.stderr)
+        return []
+    return scan_sql_text(sql, str(path))
 
 
 def get_changed_sql_files(branch: str) -> List[Path]:
@@ -131,7 +184,10 @@ def get_all_sql_files() -> List[Path]:
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Fail if changed SQL files contain Databricks-only constructs."
+        description=(
+            "Fail if changed SQL files contain Databricks-only constructs "
+            "or Spark-rejected trailing commas in SELECT lists."
+        )
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-b", "--branch", help="Current branch (CI_COMMIT_BRANCH)")
@@ -163,12 +219,12 @@ def main() -> int:
             all_violations.extend(scan_file(path))
 
     if not all_violations:
-        print("OK: No Databricks-specific constructs found.")
+        print("OK: No Databricks-specific constructs or trailing SELECT commas found.")
         return 0
 
     print(
-        f"\n❌  Found {len(all_violations)} Databricks-only construct(s) "
-        "that are incompatible with EMR Spark 3.5:\n",
+        f"\n❌  Found {len(all_violations)} Spark-incompatible construct(s) "
+        "(Databricks-only syntax or trailing SELECT comma):\n",
         file=sys.stderr,
     )
     for v in all_violations:
@@ -177,8 +233,10 @@ def main() -> int:
             file=sys.stderr,
         )
     print(
-        "\nRewrite these constructs to standard Spark SQL before merging. "
-        "See .cursor/skills/databricks-emr-migration/ for rewrite recipes.",
+        "\nRewrite Databricks-only constructs to standard Spark SQL "
+        "(see .cursor/skills/databricks-emr-migration/). "
+        "Remove trailing commas immediately before FROM / WHERE / GROUP BY / "
+        "HAVING / ORDER BY / LIMIT / UNION / EXCEPT / INTERSECT / WINDOW.",
         file=sys.stderr,
     )
     return 1

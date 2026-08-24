@@ -1111,7 +1111,7 @@ validate-source-layer-policy-all-core:
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -a --core-only
 
 .PHONY: validate-databricks-sql-constructs
-## Fail if new/changed SQL files introduce Databricks-only constructs incompatible with EMR Spark 3.5
+## Fail if new/changed SQL files introduce Databricks-only constructs or trailing SELECT commas incompatible with EMR Spark 3.5
 validate-databricks-sql-constructs:
 	@echo ""
 	@echo "Validating SQL for Databricks-specific constructs (EMR compatibility)"
