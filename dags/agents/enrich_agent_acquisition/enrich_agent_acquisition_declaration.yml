@@ -17,6 +17,13 @@ workflow:
   inner_dependencies:
     agent_acquisition_funnel:
       - prospect_agent_funnel_events
+  tables_customization:
+    agent_acquisition_funnel:
+      merge_on: [id_tof_user, funnel_step, substep, ts_event]
+      z_order_by: [id_tof_user]
+    prospect_agent_funnel_events:
+      merge_on: [id_tof_user, event_type, ts_event]
+      z_order_by: [id_tof_user]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

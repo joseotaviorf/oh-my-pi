@@ -1,48 +1,14 @@
-WITH events_touchpoint AS (
-    SELECT
-        id_tof_user,
-        id_user,
-        id_device,
-        sk_media_setup,
-        uuid_person,
-        event_type,
-        campaign_naming,
-        app_type,
-        platform,
-        campaign_business_context,
-        campaign_strategy_intent,
-        behavior_type,
-        medium,
-        campaign_landing_page,
-        source,
-        dict_source,
-        is_logged_in,
-        ROW_NUMBER() OVER (
-            PARTITION BY id_tof_user, event_type
-            ORDER BY
-            is_lost_tracking_channel,
-            is_direct_channel,
-            ts_event DESC
-        ) = 1 AS is_last_touchpoint_by_event,
-        ROW_NUMBER() OVER (
-            PARTITION BY id_tof_user
-            ORDER BY
-            is_lost_tracking_channel,
-            is_direct_channel,
-            ts_event DESC
-        ) = 1 AS is_last_touchpoint,
-        ts_event,
-        year,
-        month,
-        day
+WITH pre_conversion_device AS (
+    SELECT DISTINCT
+        id_tof_user
     FROM
         datalake_agent_acquisition.prospect_agent_funnel_events
     WHERE
-        DATE(ts_event) BETWEEN (DATE('{load_start_date}') - INTERVAL 1 DAY) AND DATE('{load_end_date}')
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 prospect_user AS (
     SELECT
-        MAX(sks.id_user) AS id_user,
+        CAST(MAX(sks.id_user) AS BIGINT) AS id_user,
         pa.uuid_person,
         pa.contract_signature_status,
         pa.ts_created,
@@ -56,9 +22,78 @@ prospect_user AS (
         DATE(pa.ts_updated) <= DATE('{load_end_date}')
     GROUP BY 2, 3, 4, 5
 ),
+pre_conversion_events_touchpoint AS (
+    SELECT
+        e.id_tof_user,
+        CAST(e.id_user AS BIGINT) AS id_user,
+        e.id_device,
+        e.sk_media_setup,
+        e.uuid_person,
+        e.event_type,
+        e.campaign_naming,
+        e.app_type,
+        e.platform,
+        e.campaign_business_context,
+        e.campaign_strategy_intent,
+        e.behavior_type,
+        e.medium,
+        e.campaign_landing_page,
+        e.source,
+        e.dict_source,
+        e.is_logged_in,
+        e.is_lost_tracking_channel,
+        e.is_direct_channel,
+        e.ts_event,
+        e.year,
+        e.month,
+        e.day
+    FROM
+        pre_conversion_device AS u
+    JOIN
+        datalake_agent_acquisition.prospect_agent_funnel_events AS e
+            ON u.id_tof_user = e.id_tof_user
+),
+prospect_events_touchpoint AS (
+    SELECT
+        e.id_tof_user,
+        u.id_user,
+        e.id_device,
+        e.sk_media_setup,
+        u.uuid_person,
+        e.event_type,
+        e.campaign_naming,
+        e.app_type,
+        e.platform,
+        e.campaign_business_context,
+        e.campaign_strategy_intent,
+        e.behavior_type,
+        e.medium,
+        e.campaign_landing_page,
+        e.source,
+        e.dict_source,
+        e.is_logged_in,
+        ROW_NUMBER() OVER (
+            PARTITION BY u.id_user
+            ORDER BY
+                IF(e.event_type IN ('pending_analysis_success_screen_viewed'), 1, 0) DESC,
+                e.is_lost_tracking_channel,
+                e.is_direct_channel,
+                e.ts_event DESC
+        ) = 1 AS is_last_touchpoint,
+        u.ts_created AS ts_event,
+        YEAR(u.ts_created) AS year,
+        MONTH(u.ts_created) AS month,
+        DAY(u.ts_created) AS day
+    FROM
+        prospect_user AS u
+    JOIN
+        datalake_agent_acquisition.prospect_agent_funnel_events AS e
+            ON u.uuid_person = e.uuid_person
+            AND e.ts_event <= u.ts_created
+),
 demand_supply_acquisition AS (
     SELECT
-        sfu.id_external AS id_user,
+        CAST(sfu.id_external AS BIGINT) AS id_user,
         sp.ts_created AS ts_acquisition
     FROM
         datalake_sales_flow_clean.specialist AS sp
@@ -70,7 +105,7 @@ demand_supply_acquisition AS (
         AND DATE(sp.ts_created) <= DATE('{load_end_date}')
     UNION ALL
     SELECT
-        fl.id_user,
+        CAST(fl.id_user AS BIGINT) AS id_user,
         lbc.ts_first_listing AS ts_acquisition
     FROM
         datalake_big_agent.house_listing_consultant AS fl
@@ -108,14 +143,228 @@ capacity_activation AS (
             ON a.id_agent = cs.id_agent
     WHERE
         DATE(cs.ts_started) <= DATE('{load_end_date}')
+),
+union_funnel_events AS (
+    SELECT -- ToF – Landing page viewed
+        events.id_user,
+        events.id_tof_user,
+        events.id_device,
+        events.uuid_person,
+        "ToF" AS funnel_step,
+        "Landing page viewed" AS substep,
+        events.event_type,
+        events.campaign_naming,
+        events.app_type,
+        events.platform,
+        events.campaign_business_context,
+        events.campaign_strategy_intent,
+        events.behavior_type,
+        events.medium,
+        events.campaign_landing_page,
+        events.source,
+        events.dict_source,
+        events.is_logged_in,
+        ROW_NUMBER() OVER (
+            PARTITION BY events.id_tof_user
+            ORDER BY
+                events.is_lost_tracking_channel,
+                events.is_direct_channel,
+                events.ts_event DESC
+        ) = 1 AS is_last_touchpoint,
+        events.ts_event,
+        events.year,
+        events.month,
+        events.day
+    FROM
+        pre_conversion_events_touchpoint AS events
+    WHERE
+        events.event_type = 'ub_page_view'
+
+    UNION
+
+    SELECT -- MoF – Logged in completed
+        events.id_user,
+        events.id_tof_user,
+        events.id_device,
+        events.uuid_person,
+        "MoF" AS funnel_step,
+        "Logged in completed" AS substep,
+        events.event_type,
+        events.campaign_naming,
+        events.app_type,
+        events.platform,
+        events.campaign_business_context,
+        events.campaign_strategy_intent,
+        events.behavior_type,
+        events.medium,
+        events.campaign_landing_page,
+        events.source,
+        events.dict_source,
+        events.is_logged_in,
+        ROW_NUMBER() OVER (
+            PARTITION BY events.id_tof_user
+            ORDER BY
+                events.is_lost_tracking_channel,
+                events.is_direct_channel,
+                events.ts_event DESC
+        ) = 1 AS is_last_touchpoint,
+        events.ts_event,
+        events.year,
+        events.month,
+        events.day
+    FROM
+        pre_conversion_events_touchpoint AS events
+    LEFT JOIN
+        pre_conversion_events_touchpoint AS excp
+            ON excp.id_tof_user = events.id_tof_user
+            AND excp.event_type IN ("partner_agent_active_status_viewed", "agent_pending_status_viewed", "agent_inactive_status_viewed")
+    WHERE
+        events.event_type IN ('welcome_screen_viewed', 'personal_data_screen_viewed')
+        AND excp.id_tof_user IS NULL
+
+    UNION
+
+    SELECT -- MoF – Sign-up completed
+        events.id_user,
+        events.id_tof_user,
+        events.id_device,
+        events.uuid_person,
+        "MoF" AS funnel_step,
+        "Sign-up completed" AS substep,
+        events.event_type,
+        events.campaign_naming,
+        events.app_type,
+        events.platform,
+        events.campaign_business_context,
+        events.campaign_strategy_intent,
+        events.behavior_type,
+        events.medium,
+        events.campaign_landing_page,
+        events.source,
+        events.dict_source,
+        events.is_logged_in,
+        events.is_last_touchpoint,
+        events.ts_event,
+        events.year,
+        events.month,
+        events.day
+    FROM
+        prospect_events_touchpoint AS events
+
+    UNION
+
+    SELECT -- EoF – Contract signed
+        pu.id_user,
+        events.id_tof_user,
+        events.id_device,
+        pu.uuid_person,
+        "EoF" AS funnel_step,
+        "Contract signed" AS substep,
+        events.event_type,
+        events.campaign_naming,
+        events.app_type,
+        events.platform,
+        events.campaign_business_context,
+        events.campaign_strategy_intent,
+        events.behavior_type,
+        events.medium,
+        events.campaign_landing_page,
+        events.source,
+        events.dict_source,
+        events.is_logged_in,
+        events.is_last_touchpoint,
+        pu.ts_contract_signed AS ts_event,
+        YEAR(pu.ts_contract_signed) AS year,
+        MONTH(pu.ts_contract_signed) AS month,
+        DAY(pu.ts_contract_signed) AS day
+    FROM
+        prospect_user AS pu
+    LEFT JOIN
+        prospect_events_touchpoint AS events
+            ON pu.uuid_person = events.uuid_person
+    WHERE
+        pu.contract_signature_status = "COMPLETED"
+
+    UNION
+
+    SELECT -- First acquisition (FL/TQC)
+        pu.id_user,
+        events.id_tof_user,
+        events.id_device,
+        pu.uuid_person,
+        "EoF" AS funnel_step,
+        "First Acquisition (FL/TQC)" AS substep,
+        events.event_type,
+        events.campaign_naming,
+        events.app_type,
+        events.platform,
+        events.campaign_business_context,
+        events.campaign_strategy_intent,
+        events.behavior_type,
+        events.medium,
+        events.campaign_landing_page,
+        events.source,
+        events.dict_source,
+        events.is_logged_in,
+        events.is_last_touchpoint,
+        acq.ts_acquisition AS ts_event,
+        YEAR(acq.ts_acquisition) AS year,
+        MONTH(acq.ts_acquisition) AS month,
+        DAY(acq.ts_acquisition) AS day
+    FROM
+        prospect_user AS pu
+    JOIN
+        acquisition_by_user AS acq
+            ON acq.id_user = pu.id_user
+            AND acq.is_first_acquisition_by_user IS TRUE
+    LEFT JOIN
+        prospect_events_touchpoint AS events
+            ON pu.uuid_person = events.uuid_person
+
+    UNION
+
+    SELECT -- First capacity activation
+        pu.id_user,
+        events.id_tof_user,
+        events.id_device,
+        pu.uuid_person,
+        "EoF" AS funnel_step,
+        "First capacity activation" AS substep,
+        events.event_type,
+        events.campaign_naming,
+        events.app_type,
+        events.platform,
+        events.campaign_business_context,
+        events.campaign_strategy_intent,
+        events.behavior_type,
+        events.medium,
+        events.campaign_landing_page,
+        events.source,
+        events.dict_source,
+        events.is_logged_in,
+        events.is_last_touchpoint,
+        ca.ts_started AS ts_event,
+        YEAR(ca.ts_started) AS year,
+        MONTH(ca.ts_started) AS month,
+        DAY(ca.ts_started) AS day
+    FROM
+        prospect_user AS pu
+    JOIN
+        capacity_activation AS ca
+            ON ca.id_user = pu.id_user
+    LEFT JOIN
+        prospect_events_touchpoint AS events
+            ON pu.uuid_person = events.uuid_person
+    WHERE
+        ca.is_first_capacity_activation IS TRUE
 )
-SELECT -- ToF – Landing page viewed
+SELECT
+    COALESCE(events.id_tof_user, CAST(events.id_user AS STRING)) AS id_tof_user,
     events.id_user,
-    events.id_tof_user,
     events.id_device,
     events.uuid_person,
-    "ToF" AS funnel_step,
-    "Landing page viewed" AS substep,
+    events.funnel_step,
+    events.substep,
     events.event_type,
     events.campaign_naming,
     events.app_type,
@@ -133,196 +382,7 @@ SELECT -- ToF – Landing page viewed
     events.month,
     events.day
 FROM
-    events_touchpoint AS events
+    union_funnel_events AS events
 WHERE
-    events.is_last_touchpoint_by_event IS TRUE
-    AND events.event_type = 'ub_page_view'
-
-UNION ALL
-
-SELECT -- MoF – Logged in completed
-    events.id_user,
-    events.id_tof_user,
-    events.id_device,
-    events.uuid_person,
-    "MoF" AS funnel_step,
-    "Logged in completed" AS substep,
-    events.event_type,
-    events.campaign_naming,
-    events.app_type,
-    events.platform,
-    events.campaign_business_context,
-    events.campaign_strategy_intent,
-    events.behavior_type,
-    events.medium,
-    events.campaign_landing_page,
-    events.source,
-    events.dict_source,
-    events.is_logged_in,
-    events.ts_event,
-    events.year,
-    events.month,
-    events.day
-FROM
-    events_touchpoint AS events
-LEFT JOIN
-    events_touchpoint AS excp
-        ON excp.id_tof_user = events.id_tof_user
-        AND excp.event_type IN ("partner_agent_active_status_viewed", "agent_pending_status_viewed", "agent_inactive_status_viewed")
-WHERE
-    events.is_last_touchpoint_by_event IS TRUE
-    AND events.event_type IN ('welcome_screen_viewed', 'personal_data_screen_viewed')
-    AND excp.id_tof_user IS NULL
-
-UNION ALL
-
-SELECT -- MoF – Sign-up completed
-    pu.id_user,
-    COALESCE(events.id_tof_user, events_except.id_tof_user) AS id_tof_user,
-    COALESCE(events.id_device, events_except.id_device) AS id_device,
-    pu.uuid_person,
-    "MoF" AS funnel_step,
-    "Sign-up completed" AS substep,
-    COALESCE(events.event_type, events_except.event_type) AS event_type,
-    COALESCE(events.campaign_naming, events_except.campaign_naming) AS campaign_naming,
-    COALESCE(events.app_type, events_except.app_type) AS app_type,
-    COALESCE(events.platform, events_except.platform) AS platform,
-    COALESCE(events.campaign_business_context, events_except.campaign_business_context) AS campaign_business_context,
-    COALESCE(events.campaign_strategy_intent, events_except.campaign_strategy_intent) AS campaign_strategy_intent,
-    COALESCE(events.behavior_type, events_except.behavior_type) AS behavior_type,
-    COALESCE(events.medium, events_except.medium) AS medium,
-    COALESCE(events.campaign_landing_page, events_except.campaign_landing_page) AS campaign_landing_page,
-    COALESCE(events.source, events_except.source) AS source,
-    COALESCE(events.dict_source, events_except.dict_source) AS dict_source,
-    COALESCE(events.is_logged_in, events_except.is_logged_in) AS is_logged_in,
-    pu.ts_created AS ts_event,
-    YEAR(pu.ts_created) AS year,
-    MONTH(pu.ts_created) AS month,
-    DAY(pu.ts_created) AS day
-FROM
-    prospect_user AS pu
-LEFT JOIN
-    events_touchpoint AS events
-        ON pu.uuid_person = events.uuid_person
-        AND events.is_last_touchpoint_by_event IS TRUE
-        AND events.event_type IN ('pending_analysis_success_screen_viewed')
-        AND events.ts_event <= pu.ts_created
-LEFT JOIN
-    events_touchpoint AS events_except
-        ON pu.uuid_person = events_except.uuid_person
-        AND events.uuid_person IS NULL
-        AND events_except.is_last_touchpoint IS TRUE
-        AND events_except.ts_event <= pu.ts_created
-WHERE
-    DATE(pu.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-
-UNION ALL
-
-SELECT -- EoF – Contract signed
-    pu.id_user,
-    events.id_tof_user,
-    events.id_device,
-    pu.uuid_person,
-    "EoF" AS funnel_step,
-    "Contract signed" AS substep,
-    events.event_type,
-    events.campaign_naming,
-    events.app_type,
-    events.platform,
-    events.campaign_business_context,
-    events.campaign_strategy_intent,
-    events.behavior_type,
-    events.medium,
-    events.campaign_landing_page,
-    events.source,
-    events.dict_source,
-    events.is_logged_in,
-    pu.ts_contract_signed AS ts_event,
-    YEAR(pu.ts_contract_signed) AS year,
-    MONTH(pu.ts_contract_signed) AS month,
-    DAY(pu.ts_contract_signed) AS day
-FROM
-    prospect_user AS pu
-LEFT JOIN
-    events_touchpoint AS events
-        ON pu.uuid_person = events.uuid_person
-        AND events.is_last_touchpoint IS TRUE
-WHERE
-    pu.contract_signature_status = "COMPLETED"
-    AND DATE(pu.ts_contract_signed) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-
-UNION ALL
-
-SELECT -- First acquisition (FL/TQC)
-    pu.id_user,
-    events.id_tof_user,
-    events.id_device,
-    pu.uuid_person,
-    "EoF" AS funnel_step,
-    "First Acquisition (FL/TQC)" AS substep,
-    events.event_type,
-    events.campaign_naming,
-    events.app_type,
-    events.platform,
-    events.campaign_business_context,
-    events.campaign_strategy_intent,
-    events.behavior_type,
-    events.medium,
-    events.campaign_landing_page,
-    events.source,
-    events.dict_source,
-    events.is_logged_in,
-    acq.ts_acquisition AS ts_event,
-    YEAR(acq.ts_acquisition) AS year,
-    MONTH(acq.ts_acquisition) AS month,
-    DAY(acq.ts_acquisition) AS day
-FROM
-    prospect_user AS pu
-JOIN
-    acquisition_by_user AS acq
-        ON acq.id_user = pu.id_user
-        AND acq.is_first_acquisition_by_user IS TRUE
-LEFT JOIN
-    events_touchpoint AS events
-        ON pu.uuid_person = events.uuid_person
-        AND events.is_last_touchpoint IS TRUE
-WHERE
-    DATE(acq.ts_acquisition) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-
-UNION ALL
-
-SELECT -- First capacity activation
-    pu.id_user,
-    events.id_tof_user,
-    events.id_device,
-    pu.uuid_person,
-    "EoF" AS funnel_step,
-    "First capacity activation" AS substep,
-    events.event_type,
-    events.campaign_naming,
-    events.app_type,
-    events.platform,
-    events.campaign_business_context,
-    events.campaign_strategy_intent,
-    events.behavior_type,
-    events.medium,
-    events.campaign_landing_page,
-    events.source,
-    events.dict_source,
-    events.is_logged_in,
-    ca.ts_started AS ts_event,
-    YEAR(ca.ts_started) AS year,
-    MONTH(ca.ts_started) AS month,
-    DAY(ca.ts_started) AS day
-FROM
-    prospect_user AS pu
-JOIN
-    capacity_activation AS ca
-        ON ca.id_user = pu.id_user
-LEFT JOIN
-    events_touchpoint AS events
-        ON pu.uuid_person = events.uuid_person
-        AND events.is_last_touchpoint IS TRUE
-WHERE
-    ca.is_first_capacity_activation IS TRUE
-    AND DATE(ca.ts_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    events.is_last_touchpoint IS TRUE
+    AND DATE(events.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
