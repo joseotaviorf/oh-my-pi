@@ -9,10 +9,10 @@ columns:
     lineage:
       - datalake_schedules_raw.appointment.id
     description: Unique ID of the schedule.
-  id_parente:
+  id_main_appointment:
     lineage:
-      - datalake_schedules_raw.appointment.parent_id
-    description: Parent appointment identifier when the schedule is linked to a rescheduled or derived booking.
+      - datalake_schedules_raw.appointment.main_appointment_id
+    description: Identifier of the main appointment this schedule is linked to, when applicable.
   id_location_reference:
     lineage:
       - datalake_schedules_raw.appointment.location_reference_id
@@ -23,10 +23,6 @@ columns:
     description:
       Reference to the scheduled service (number). If the appointment refers to an inspection,
       the id_internal_reference will be the inspection ID, if it is a Visit it will be the visit ID, and so on.
-  id_visitant_reference:
-    lineage:
-      - datalake_schedules_raw.appointment.visitant_reference_id
-    description: Unique property visitor identifier
   version:
     lineage:
       - datalake_schedules_raw.appointment.version
@@ -53,6 +49,10 @@ columns:
     lineage:
       - datalake_schedules_raw.appointment.duration_in_slots
     description: Duration in slots in the agent's schedule
+  slot_mask:
+    lineage:
+      - datalake_schedules_raw.appointment.slot_mask
+    description: Bitmask representing the occupied slots in the agent's schedule for the appointment.
   status:
     lineage:
       - datalake_schedules_raw.appointment.status
@@ -62,10 +62,6 @@ columns:
       DONE: ""
       CANCELED: The appointment has been canceled
       SCHEDULED: ""
-  check_in_status:
-    lineage:
-      - datalake_schedules_raw.appointment.check_in_status
-    description: Check-in progress status for field operations tied to the scheduled appointment.
   last_app_origin:
     lineage:
       - datalake_schedules_raw.appointment.last_app_origin
@@ -78,34 +74,6 @@ columns:
     lineage:
       - datalake_schedules_raw.appointment.business_context
     description: Indicates the business context, which can be Rent or Sale.
-  location_reference_name:
-    lineage:
-      - datalake_schedules_raw.appointment.location_reference_name
-    description: Source system or entity type for the property location linked to the appointment.
-  internal_reference_name:
-    lineage:
-      - datalake_schedules_raw.appointment.internal_reference_name
-    description: Source system or entity type for the scheduled service reference identifier.
-  visitant_date_time:
-    lineage:
-      - datalake_schedules_raw.appointment.visitant_date_time
-    description: Scheduled date and time for the visitor or field agent attendance at the property.
-  visitant_reference_name:
-    lineage:
-      - datalake_schedules_raw.appointment.visitant_reference_name
-    description: Source system or entity type for the visitor or attendee reference identifier.
-  business_metadata:
-    lineage:
-      - datalake_schedules_raw.appointment.business_metadata
-    description: JSON metadata with business-specific attributes attached to the appointment.
-  datetime:
-    lineage:
-      - datalake_schedules_raw.appointment.datetime
-    description: Canonical scheduled date and time of the appointment in local context.
-  timezone:
-    lineage:
-      - datalake_schedules_raw.appointment.timezone
-    description: IANA timezone identifier applied to the appointment scheduled datetime.
   is_confirmed:
     lineage:
       - datalake_schedules_raw.appointment.confirmed
@@ -124,6 +92,23 @@ columns:
     lineage:
       - datalake_schedules_raw.appointment.updated_at
     description: Appointment update date.
+  op_cdc:
+    description: CDC operation type captured by Debezium.
+    lineage:
+      - datalake_schedules_raw.appointment.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+    lineage:
+      - datalake_schedules_raw.appointment.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in the source system.
+    lineage:
+      - datalake_schedules_raw.appointment.ts_database_transaction
   year:
     lineage:
       - datalake_schedules_raw.appointment.year
