@@ -14,5 +14,26 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       ebs_volume_size: 200
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
+validation:
+  cluster:
+    type: emr_7_12_consolidation_l_general_fleet_cluster
+    custom_configurations:
+      master_node_type_id: m6g.xlarge
+      core_nodes:
+        target_on_demand: 2
+        target_spot: 0
+        instance_types:
+        - m6gd.4xlarge
+      task_nodes:
+        instance_types:
+        - m6gd.4xlarge
+        target_on_demand: 0
+        target_spot: 2
+        allocation_strategy: price-capacity-optimized
+        bid_price_percentage: 100
+      aws_attributes:
+        ebs_volume_size: 200
+      spark_conf:
+        spark.metrics.namespace: data_products.enrich_search

@@ -17,3 +17,18 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     runtime_engine: PHOTON
     node_type_id: r7gd.2xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_m_memory_fleet_cluster
+    custom_configurations:
+      core_nodes:
+        target_on_demand: 2
+        target_spot: 0
+        instance_types:
+        - r6gd.2xlarge
+      task_nodes:
+        target_on_demand: 0
+        target_spot: 0
+        instance_types:
+        - r6gd.2xlarge
+      spark_conf: {}
