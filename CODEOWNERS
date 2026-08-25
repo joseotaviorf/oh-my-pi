@@ -9,13 +9,13 @@ dags/publisher_xp/**                                                    @quintoa
 dags/dependencies.yaml                                                  @quintoandar/bi-etl-ejuice-code-owners @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-ingestion-code-owners
 dags/for_rent/vocs_machina_planning/**                                  @quintoandar/fr-poscontrato-data-ai @quintoandar/data-ingestion-code-owners
 dags/mlops/**                                                           @quintoandar/mlcops @quintoandar/data-ingestion-code-owners
-dags/ops_poc/**                                                         @luisarodriguees @GabriellRodrigues @henriquedepaulo @quintoandar/data-ingestion-code-owners
+dags/ops_poc/**                                                         @luisarodriguees @quintoandar/data-sst @henriquedepaulo @quintoandar/data-ingestion-code-owners
 dags/people/**                                                          @quintoandar/enterprise-engineering @quintoandar/data-ingestion-code-owners
-dags/planning_and_performance/**                                        @luisarodriguees @gbrunelli  @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
+dags/planning_and_performance/**                                        @luisarodriguees @quintoandar/data-sst @quintoandar/data-ingestion-code-owners
 dags/platform/**                                                        @quintoandar/data-ingestion-code-owners @quintoandar/data-ingestion-code-owners
 dags/primitives/**                                                      @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives @quintoandar/data-ingestion-code-owners
 dags/qcx/**                                                             @quintoandar/new-business @quintoandar/data-ingestion-code-owners
-dags/support_and_service/**                                             @gbrunelli @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
+dags/support_and_service/**                                             @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners
 dags/tech_platform/olos_dialer_transcriptions/**                        @quintoandar/bi-etl-ejuice-code-owners
 dags/tech_platform/monalisa_capta_ai_evaluations/**                     @quintoandar/bi-etl-ejuice-code-owners
 dags/tech_platform/monalisa_monitoria_evaluations/**                    @quintoandar/bi-etl-ejuice-code-owners
@@ -34,6 +34,9 @@ packages/bietlejuice-core/src/bietlejuice/governance/domain_registry.py @quintoa
 packages/bietlejuice-compiler/scripts/governance_metadata_validation/sync_domain_allowlist.py @quintoandar/data-governance
 # Databricks prod-runtime CI bypass — data-ingestion must approve exceptions.
 packages/bietlejuice-compiler/scripts/ci_cd/databricks_cluster_exceptions.yml @quintoandar/data-ingestion-code-owners
-packages/bietlejuice-runtime/src/bietlejuice/base/sst/**                @gbrunelli @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
-packages/bietlejuice-runtime/test/unit/base/sst/**                      @gbrunelli @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
-packages/bietlejuice-airflow/src/bietlejuice/base/sst/**                @gbrunelli @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
+packages/bietlejuice-runtime/src/bietlejuice/base/sst/**                @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners
+packages/bietlejuice-runtime/test/unit/base/sst/**                      @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners
+packages/bietlejuice-airflow/src/bietlejuice/base/sst/**                @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners
+
+
+
