@@ -1,14 +1,164 @@
 -- Current and terminated employee roster for the X-Ray / Employee Data Center AppSheet.
-WITH manager_org AS (
+-- Org overlay (vertical / structure / team) for inclusion CC 906x1x and JA pool
+-- 907x1x: match on cost_center_code so accented names (inclusão) still qualify.
+-- Spark 3.5 has no recursive CTE, so the manager chain is a fixed 8-hop self-join.
+-- Overlay values come from the first manager who is not PwD and not on 906x1x.
+-- PwD from dim_employee_disability matches laudo elsewhere: active PIN status only
+-- (is_active); pending/inactive rows do not skip a manager as org source.
+WITH pwd_people AS (
+    SELECT DISTINCT
+        dis.person_number
+    FROM
+        dw_demographics.dim_employee_disability AS dis
+    WHERE
+        dis.is_active = TRUE
+        AND DATE('{load_start_date}') >= dis.dt_valid_from
+        AND DATE('{load_start_date}') <= dis.dt_valid_to
+),
+leadership_org AS (
     SELECT
         LOWER(es.assignment_number) AS assignment_number,
+        LOWER(es.manager_assignment_number) AS manager_assignment_number,
         NULLIF(LOWER(es.structure), '-1') AS structure,
         NULLIF(LOWER(es.team), '-1') AS team,
-        NULLIF(LOWER(es.vertical), '-1') AS vertical
+        NULLIF(LOWER(es.vertical), '-1') AS vertical,
+        LOWER(es.cost_center_code) = '906x1x' AS is_inclusion_cc,
+        (
+            COALESCE(es.has_medical_disability_record, FALSE)
+            OR COALESCE(es.has_self_declared_pwd, FALSE)
+            OR pwd.person_number IS NOT NULL
+        ) AS is_pwd
     FROM
         metric_people.employee_snapshots AS es
+    LEFT JOIN
+        pwd_people AS pwd
+            ON es.person_number = pwd.person_number
     WHERE
         es.is_current_for_employee = TRUE
+),
+manager_chain AS (
+    SELECT
+        emp.assignment_number,
+        CASE
+            WHEN m1.assignment_number IS NOT NULL
+                AND NOT COALESCE(m1.is_pwd, FALSE)
+                AND NOT COALESCE(m1.is_inclusion_cc, FALSE)
+            THEN 1
+            WHEN m2.assignment_number IS NOT NULL
+                AND NOT COALESCE(m2.is_pwd, FALSE)
+                AND NOT COALESCE(m2.is_inclusion_cc, FALSE)
+            THEN 2
+            WHEN m3.assignment_number IS NOT NULL
+                AND NOT COALESCE(m3.is_pwd, FALSE)
+                AND NOT COALESCE(m3.is_inclusion_cc, FALSE)
+            THEN 3
+            WHEN m4.assignment_number IS NOT NULL
+                AND NOT COALESCE(m4.is_pwd, FALSE)
+                AND NOT COALESCE(m4.is_inclusion_cc, FALSE)
+            THEN 4
+            WHEN m5.assignment_number IS NOT NULL
+                AND NOT COALESCE(m5.is_pwd, FALSE)
+                AND NOT COALESCE(m5.is_inclusion_cc, FALSE)
+            THEN 5
+            WHEN m6.assignment_number IS NOT NULL
+                AND NOT COALESCE(m6.is_pwd, FALSE)
+                AND NOT COALESCE(m6.is_inclusion_cc, FALSE)
+            THEN 6
+            WHEN m7.assignment_number IS NOT NULL
+                AND NOT COALESCE(m7.is_pwd, FALSE)
+                AND NOT COALESCE(m7.is_inclusion_cc, FALSE)
+            THEN 7
+            WHEN m8.assignment_number IS NOT NULL
+                AND NOT COALESCE(m8.is_pwd, FALSE)
+                AND NOT COALESCE(m8.is_inclusion_cc, FALSE)
+            THEN 8
+        END AS org_hop,
+        m1.vertical AS m1_vertical,
+        m1.structure AS m1_structure,
+        m1.team AS m1_team,
+        m2.vertical AS m2_vertical,
+        m2.structure AS m2_structure,
+        m2.team AS m2_team,
+        m3.vertical AS m3_vertical,
+        m3.structure AS m3_structure,
+        m3.team AS m3_team,
+        m4.vertical AS m4_vertical,
+        m4.structure AS m4_structure,
+        m4.team AS m4_team,
+        m5.vertical AS m5_vertical,
+        m5.structure AS m5_structure,
+        m5.team AS m5_team,
+        m6.vertical AS m6_vertical,
+        m6.structure AS m6_structure,
+        m6.team AS m6_team,
+        m7.vertical AS m7_vertical,
+        m7.structure AS m7_structure,
+        m7.team AS m7_team,
+        m8.vertical AS m8_vertical,
+        m8.structure AS m8_structure,
+        m8.team AS m8_team
+    FROM
+        leadership_org AS emp
+    LEFT JOIN
+        leadership_org AS m1
+            ON emp.manager_assignment_number = m1.assignment_number
+    LEFT JOIN
+        leadership_org AS m2
+            ON m1.manager_assignment_number = m2.assignment_number
+    LEFT JOIN
+        leadership_org AS m3
+            ON m2.manager_assignment_number = m3.assignment_number
+    LEFT JOIN
+        leadership_org AS m4
+            ON m3.manager_assignment_number = m4.assignment_number
+    LEFT JOIN
+        leadership_org AS m5
+            ON m4.manager_assignment_number = m5.assignment_number
+    LEFT JOIN
+        leadership_org AS m6
+            ON m5.manager_assignment_number = m6.assignment_number
+    LEFT JOIN
+        leadership_org AS m7
+            ON m6.manager_assignment_number = m7.assignment_number
+    LEFT JOIN
+        leadership_org AS m8
+            ON m7.manager_assignment_number = m8.assignment_number
+),
+first_non_pwd_leader_org AS (
+    SELECT
+        mc.assignment_number,
+        CASE mc.org_hop
+            WHEN 1 THEN mc.m1_vertical
+            WHEN 2 THEN mc.m2_vertical
+            WHEN 3 THEN mc.m3_vertical
+            WHEN 4 THEN mc.m4_vertical
+            WHEN 5 THEN mc.m5_vertical
+            WHEN 6 THEN mc.m6_vertical
+            WHEN 7 THEN mc.m7_vertical
+            WHEN 8 THEN mc.m8_vertical
+        END AS vertical,
+        CASE mc.org_hop
+            WHEN 1 THEN mc.m1_structure
+            WHEN 2 THEN mc.m2_structure
+            WHEN 3 THEN mc.m3_structure
+            WHEN 4 THEN mc.m4_structure
+            WHEN 5 THEN mc.m5_structure
+            WHEN 6 THEN mc.m6_structure
+            WHEN 7 THEN mc.m7_structure
+            WHEN 8 THEN mc.m8_structure
+        END AS structure,
+        CASE mc.org_hop
+            WHEN 1 THEN mc.m1_team
+            WHEN 2 THEN mc.m2_team
+            WHEN 3 THEN mc.m3_team
+            WHEN 4 THEN mc.m4_team
+            WHEN 5 THEN mc.m5_team
+            WHEN 6 THEN mc.m6_team
+            WHEN 7 THEN mc.m7_team
+            WHEN 8 THEN mc.m8_team
+        END AS team
+    FROM
+        manager_chain AS mc
 ),
 tech_team_ranked AS (
     SELECT
@@ -242,21 +392,17 @@ employee_base AS (
                 END
             )
         ) AS centro_de_custo,
-        LOWER(
-            CONCAT(
-                LOWER(es.cost_center_code),
-                ' - ',
-                CASE
-                    WHEN es.cost_center_name ILIKE CONCAT(es.cost_center_code, ' - %')
-                        THEN LOWER(SUBSTRING(es.cost_center_name, LENGTH(es.cost_center_code) + 4))
-                    ELSE LOWER(COALESCE(es.cost_center_name, ''))
-                END
+        LOWER(es.cost_center_code) AS cost_center_code,
+        (
+            (
+                LOWER(es.band) LIKE '%ja%'
+                AND LOWER(es.cost_center_code) = '907x1x'
             )
-        ) AS centro_de_custo_key,
+            OR LOWER(es.cost_center_code) = '906x1x'
+        ) AS needs_org_overlay,
         NULLIF(LOWER(es.vertical), '-1') AS vertical_raw,
         NULLIF(LOWER(es.structure), '-1') AS structure_raw,
         NULLIF(LOWER(es.team), '-1') AS team_raw,
-        LOWER(es.manager_assignment_number) AS manager_assignment_number,
         INITCAP(NULLIF(LOWER(es.business), '-1')) AS business,
         INITCAP(NULLIF(LOWER(es.product), '-1')) AS product,
         tt.primary_team_tech_exclusive AS primary_team_tech_exclusive,
@@ -459,34 +605,22 @@ SELECT
     eb.centro_de_custo,
     INITCAP(
         CASE
-            WHEN (
-                LOWER(CAST(eb.banda AS STRING)) LIKE '%ja%'
-                AND eb.centro_de_custo_key = '907x1x - jovem aprendiz'
-            )
-                OR eb.centro_de_custo_key = '906x1x - inclusao e acessibilidade'
-            THEN COALESCE(mo.vertical, eb.vertical_raw)
+            WHEN eb.needs_org_overlay = TRUE
+            THEN COALESCE(fnpl.vertical, eb.vertical_raw)
             ELSE eb.vertical_raw
         END
     ) AS vertical,
     INITCAP(
         CASE
-            WHEN (
-                LOWER(CAST(eb.banda AS STRING)) LIKE '%ja%'
-                AND eb.centro_de_custo_key = '907x1x - jovem aprendiz'
-            )
-                OR eb.centro_de_custo_key = '906x1x - inclusao e acessibilidade'
-            THEN COALESCE(mo.structure, eb.structure_raw)
+            WHEN eb.needs_org_overlay = TRUE
+            THEN COALESCE(fnpl.structure, eb.structure_raw)
             ELSE eb.structure_raw
         END
     ) AS structure,
     INITCAP(
         CASE
-            WHEN (
-                LOWER(CAST(eb.banda AS STRING)) LIKE '%ja%'
-                AND eb.centro_de_custo_key = '907x1x - jovem aprendiz'
-            )
-                OR eb.centro_de_custo_key = '906x1x - inclusao e acessibilidade'
-            THEN COALESCE(mo.team, eb.team_raw)
+            WHEN eb.needs_org_overlay = TRUE
+            THEN COALESCE(fnpl.team, eb.team_raw)
             ELSE eb.team_raw
         END
     ) AS team,
@@ -548,5 +682,5 @@ LEFT JOIN
     last_compensation_movement AS lcm
         ON eb.matricula = lcm.person_number
 LEFT JOIN
-    manager_org AS mo
-        ON eb.manager_assignment_number = mo.assignment_number
+    first_non_pwd_leader_org AS fnpl
+        ON eb.id_colaborador = fnpl.assignment_number
