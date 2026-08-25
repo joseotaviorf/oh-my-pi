@@ -12,9 +12,12 @@ bietlejuice.dw_compensation:
   # PLR (fact_plr_monthly) is the only query reading dw_time (fact_absence_requests, dim_absence_type),
   # and PLR is calculated once a year, well after dw_time D-2 data is available. Removing this
   # dependency avoids dw_compensation waiting on dw_time's slow (Oitchau-based) run every day.
+  # Same reasoning applies to enrich_employment: fact_plr_monthly is the only query reading
+  # enrich_employment (employee_details), so dw_compensation shouldn't wait on it every day either.
   remove:
     - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
     - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
+    - bietlejuice.enrich_employment:load-enrich-employee-details:first-run-of-day
 bietlejuice.enrich_criteo:
   add:
     - bietlejuice.criteo_temp:done-clean-criteo-costs:first-run-of-day
