@@ -7,121 +7,50 @@ import json
 import logging
 import os
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal, Union
 
 import yaml
 
-from bietlejuice.observability.monitoring.constants import (
-    DEFAULT_SLA_TIMEZONE,
-    SLA_GLOB,
-    WEEKDAY_INDEX,
-    WEEKDAY_SUGAR,
-)
+from bietlejuice.observability.monitoring.constants import SLA_GLOB
 
 logger = logging.getLogger(__name__)
 
-_WEEKDAY_NAMES = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
-_TZ_SHORT = {"America/Sao_Paulo": "BRT", "UTC": "UTC"}
+CHECK_EMPTY_PARTITION = "empty_partition"
+CHECK_STALE_DATA = "stale_data"
 
 
 @dataclass(frozen=True)
-class ArrivalExpectation:
-    days_of_week: set[int] | None = None
-    earliest_hour: int | None = None
-    mute: bool = False
-    timezone: str = DEFAULT_SLA_TIMEZONE
-    reason: str | None = None
+class EmptyPartitionCheck:
+    type: Literal["empty_partition"] = CHECK_EMPTY_PARTITION
 
 
-def format_arrival_expectation_brief(
-    expectation: ArrivalExpectation | None,
-) -> str:
-    """Compact SLA line for GChat alerts."""
-    if expectation is None:
-        return "no SLA (any empty partition alerts)"
-
-    if expectation.days_of_week is None:
-        cadence = "daily"
-    elif expectation.days_of_week == WEEKDAY_SUGAR["weekdays"]:
-        cadence = "weekdays"
-    else:
-        cadence = "custom days"
-
-    if expectation.earliest_hour is not None:
-        tz_label = _TZ_SHORT.get(expectation.timezone, expectation.timezone)
-        return f"{cadence} from {expectation.earliest_hour:02d}h {tz_label}"
-    return cadence
+@dataclass(frozen=True)
+class StaleDataCheck:
+    column: str
+    max_age_hours: int
+    type: Literal["stale_data"] = CHECK_STALE_DATA
 
 
-def format_arrival_expectation_summary(
-    expectation: ArrivalExpectation | None,
-) -> str:
-    """Human-readable arrival SLA for alert messages."""
-    if expectation is None:
-        return "none configured (alert on any empty run partition)"
-
-    parts: list[str] = []
-    if expectation.days_of_week is None:
-        parts.append("every day")
-    elif expectation.days_of_week == WEEKDAY_SUGAR["weekdays"]:
-        parts.append("weekdays (Mon–Fri)")
-    else:
-        day_labels = [
-            _WEEKDAY_NAMES[index]
-            for index in sorted(expectation.days_of_week)
-            if 0 <= index < len(_WEEKDAY_NAMES)
-        ]
-        parts.append(", ".join(day_labels) if day_labels else "custom days")
-
-    if expectation.earliest_hour is not None:
-        parts.append(
-            f"data expected from {expectation.earliest_hour:02d}:00 "
-            f"({expectation.timezone}) on run day"
-        )
-    else:
-        parts.append("no earliest-hour gate")
-
-    summary = "; ".join(parts)
-    if expectation.reason:
-        return f"{summary} — {expectation.reason}"
-    return summary
+SlaCheck = Union[EmptyPartitionCheck, StaleDataCheck]
 
 
-def _parse_days_of_week(value: object) -> set[int] | None:
-    if value is None:
-        return None
-    if isinstance(value, str):
-        sugar = WEEKDAY_SUGAR.get(value.lower())
-        if sugar is not None or value.lower() == "all":
-            return sugar
-        day_index = WEEKDAY_INDEX.get(value.lower())
-        if day_index is not None:
-            return {day_index}
-        return None
-    if isinstance(value, list):
-        days: set[int] = set()
-        for entry in value:
-            if not isinstance(entry, str):
-                continue
-            day_index = WEEKDAY_INDEX.get(entry.lower())
-            if day_index is not None:
-                days.add(day_index)
-        return days or None
-    return None
+@dataclass(frozen=True)
+class TableSla:
+    checks: tuple[SlaCheck, ...]
+
+    def has_empty_partition(self) -> bool:
+        return any(check.type == CHECK_EMPTY_PARTITION for check in self.checks)
+
+    def stale_data_checks(self) -> tuple[StaleDataCheck, ...]:
+        return tuple(check for check in self.checks if check.type == CHECK_STALE_DATA)
 
 
-def _parse_arrival_expectation(arrival: dict) -> ArrivalExpectation:
-    earliest_hour = arrival.get("earliest_hour")
-    if earliest_hour is not None:
-        earliest_hour = int(earliest_hour)
-    timezone = arrival.get("timezone") or DEFAULT_SLA_TIMEZONE
-    return ArrivalExpectation(
-        days_of_week=_parse_days_of_week(arrival.get("days_of_week")),
-        earliest_hour=earliest_hour,
-        mute=bool(arrival.get("mute", False)),
-        timezone=str(timezone),
-        reason=_optional_str(arrival.get("reason")),
-    )
+def format_empty_partition_sla_brief() -> str:
+    return "empty_partition opt-in"
+
+
+def format_stale_data_sla_brief(check: StaleDataCheck) -> str:
+    return f"stale_data on `{check.column}` within {check.max_age_hours}h"
 
 
 def _optional_str(value: object) -> str | None:
@@ -131,69 +60,114 @@ def _optional_str(value: object) -> str | None:
     return text or None
 
 
-def _expectation_to_dict(expectation: ArrivalExpectation) -> dict[str, Any]:
-    days = expectation.days_of_week
-    if days is None:
-        days_payload: Any = None
-    else:
-        days_payload = sorted(days)
+def _parse_check(entry: dict[str, Any], path: str) -> SlaCheck:
+    check_type = entry.get("type")
+    if check_type == CHECK_EMPTY_PARTITION:
+        return EmptyPartitionCheck()
+    if check_type == CHECK_STALE_DATA:
+        column = _optional_str(entry.get("column"))
+        if not column:
+            raise ValueError(f"stale_data check missing column in {path}")
+        max_age_hours = entry.get("max_age_hours")
+        if max_age_hours is None:
+            raise ValueError(f"stale_data check missing max_age_hours in {path}")
+        try:
+            max_age_hours_int = int(max_age_hours)
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"stale_data max_age_hours must be a positive integer in {path}"
+            ) from error
+        if max_age_hours_int <= 0:
+            raise ValueError(f"stale_data max_age_hours must be positive in {path}")
+        return StaleDataCheck(column=column, max_age_hours=max_age_hours_int)
+    raise ValueError(f"unknown SLA check type '{check_type}' in {path}")
+
+
+def _parse_checks(raw_checks: object, path: str) -> tuple[SlaCheck, ...]:
+    if raw_checks is None:
+        raise ValueError(f"SLA file missing checks list: {path}")
+    if not isinstance(raw_checks, list):
+        raise ValueError(f"SLA checks must be a list in {path}")
+    if not raw_checks:
+        raise ValueError(f"SLA checks list is empty in {path}")
+    seen_types: set[str] = set()
+    parsed: list[SlaCheck] = []
+    for entry in raw_checks:
+        if not isinstance(entry, dict):
+            raise ValueError(f"SLA check entry must be a mapping in {path}")
+        check = _parse_check(entry, path)
+        if check.type in seen_types:
+            raise ValueError(f"duplicate SLA check type '{check.type}' in {path}")
+        seen_types.add(check.type)
+        parsed.append(check)
+    return tuple(parsed)
+
+
+def _check_to_dict(check: SlaCheck) -> dict[str, Any]:
+    if isinstance(check, EmptyPartitionCheck):
+        return {"type": CHECK_EMPTY_PARTITION}
     return {
-        "days_of_week": days_payload,
-        "earliest_hour": expectation.earliest_hour,
-        "mute": expectation.mute,
-        "timezone": expectation.timezone,
-        "reason": expectation.reason,
+        "type": CHECK_STALE_DATA,
+        "column": check.column,
+        "max_age_hours": check.max_age_hours,
     }
 
 
-def _expectation_from_dict(payload: dict[str, Any]) -> ArrivalExpectation:
-    days_raw = payload.get("days_of_week")
-    days_of_week: set[int] | None
-    if days_raw is None:
-        days_of_week = None
-    else:
-        days_of_week = {int(day) for day in days_raw}
-    earliest_hour = payload.get("earliest_hour")
-    if earliest_hour is not None:
-        earliest_hour = int(earliest_hour)
-    return ArrivalExpectation(
-        days_of_week=days_of_week,
-        earliest_hour=earliest_hour,
-        mute=bool(payload.get("mute", False)),
-        timezone=str(payload.get("timezone") or DEFAULT_SLA_TIMEZONE),
-        reason=_optional_str(payload.get("reason")),
-    )
+def _sla_to_dict(sla: TableSla) -> dict[str, Any]:
+    return {"checks": [_check_to_dict(check) for check in sla.checks]}
+
+
+def _sla_from_dict(payload: dict[str, Any]) -> TableSla:
+    checks = payload.get("checks")
+    if checks is None:
+        raise ValueError("SLA payload missing checks")
+    if not isinstance(checks, list):
+        raise ValueError("SLA checks must be a list")
+    parsed: list[SlaCheck] = []
+    seen_types: set[str] = set()
+    for entry in checks:
+        if not isinstance(entry, dict):
+            raise ValueError("SLA check entry must be a mapping")
+        check = _parse_check(entry, "json")
+        if check.type in seen_types:
+            raise ValueError(f"duplicate SLA check type '{check.type}'")
+        seen_types.add(check.type)
+        parsed.append(check)
+    return TableSla(checks=tuple(parsed))
 
 
 def dump_expectations_json(
-    expectations: dict[tuple[str, str], ArrivalExpectation],
+    expectations: dict[tuple[str, str], TableSla],
 ) -> str:
     """Serialize expectations for staging on S3 (EMR spark job input)."""
     payload = {
-        f"{database}|{table}": _expectation_to_dict(expectation)
-        for (database, table), expectation in expectations.items()
+        f"{database}|{table}": _sla_to_dict(sla)
+        for (database, table), sla in expectations.items()
     }
     return json.dumps(payload, sort_keys=True)
 
 
-def load_expectations_from_json(text: str) -> dict[tuple[str, str], ArrivalExpectation]:
+def load_expectations_from_json(text: str) -> dict[tuple[str, str], TableSla]:
     """Deserialize expectations staged for the EMR spark job."""
     raw = json.loads(text or "{}")
     if not isinstance(raw, dict):
         return {}
-    expectations: dict[tuple[str, str], ArrivalExpectation] = {}
+    expectations: dict[tuple[str, str], TableSla] = {}
     for key, value in raw.items():
         if not isinstance(key, str) or "|" not in key or not isinstance(value, dict):
             continue
         database, table = key.split("|", 1)
-        expectations[(database, table)] = _expectation_from_dict(value)
+        try:
+            expectations[(database, table)] = _sla_from_dict(value)
+        except ValueError:
+            logger.warning("Skipping invalid SLA JSON entry for %s", key)
     return expectations
 
 
-def load_sla_expectations(dags_root: str) -> dict[tuple[str, str], ArrivalExpectation]:
+def load_sla_expectations(dags_root: str) -> dict[tuple[str, str], TableSla]:
     """Glob ``dags/**/sla/**/*.yml`` and index by ``(database_name, table_name)``."""
     pattern = os.path.join(dags_root, SLA_GLOB)
-    expectations: dict[tuple[str, str], ArrivalExpectation] = {}
+    expectations: dict[tuple[str, str], TableSla] = {}
     for path in sorted(glob.glob(pattern, recursive=True)):
         try:
             with open(path, encoding="utf-8") as handle:
@@ -201,19 +175,18 @@ def load_sla_expectations(dags_root: str) -> dict[tuple[str, str], ArrivalExpect
             if not isinstance(content, dict):
                 logger.warning("SLA file is not a mapping: %s", path)
                 continue
+            if "arrival" in content:
+                raise ValueError(f"legacy arrival facet is no longer supported: {path}")
             database_name = content.get("database_name")
             table_name = content.get("table_name")
             if not database_name or not table_name:
                 logger.warning("SLA file missing database_name/table_name: %s", path)
                 continue
-            arrival = content.get("arrival")
-            if arrival is None:
-                continue
-            if not isinstance(arrival, dict):
-                logger.warning("SLA arrival facet is not a mapping: %s", path)
-                continue
+            checks = _parse_checks(content.get("checks"), path)
             key = (str(database_name).strip(), str(table_name).strip())
-            expectations[key] = _parse_arrival_expectation(arrival)
+            expectations[key] = TableSla(checks=checks)
+        except ValueError as error:
+            logger.warning("Invalid SLA file %s: %s", path, error)
         except Exception:
             logger.warning("Failed to parse SLA file: %s", path, exc_info=True)
     return expectations

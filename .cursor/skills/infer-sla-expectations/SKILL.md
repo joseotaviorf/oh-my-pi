@@ -1,12 +1,11 @@
 ---
 name: infer-sla-expectations
 description: >-
-  Propose domain-owned arrival SLA files for empty-partition monitoring. Combines
-  producer DAG schedule, Trino partition history, and dependencies.yaml to infer
-  days_of_week and earliest_hour, then opens a PR for domain review. Mute
-  unpartitioned tables (out of empty-partition scope). Use when auto-filling
-  sla/<layer>/<table>.yml files, reducing empty-partition alert noise, or
-  onboarding tables to calendar-aware SLAs.
+  Propose domain-owned SLA files for observability checks (`empty_partition`,
+  `stale_data`). Combines producer DAG schedule and Trino partition history to
+  onboard partitioned tables. Unpartitioned tables stay opt-out (no SLA file).
+  Use when auto-filling sla/<layer>/<table>.yml files or onboarding tables to
+  empty-partition / stale-data monitoring.
 ---
 
 # Infer SLA Expectations
@@ -82,18 +81,14 @@ For each target table:
 3. Read `<dag>_declaration.yml` → `dag.schedule_interval` (cron).
 4. Decide **partitioned vs unpartitioned** using **§1a** (hard gate before §2).
 
-### 1a. Unpartitioned tables — mute, do not alert
+### 1a. Unpartitioned tables — opt-out, do not alert
 
 Empty-partition monitoring is **only** for tables with a real partition grain (typically
-`year` / `month` / `day`). Unpartitioned tables must **not** receive calendar SLAs and
-must **not** stay on the default alert path.
+`year` / `month` / `day`). Unpartitioned tables must **not** receive SLA files.
 
-**Why mute is required:** a missing `sla/<layer>/<table>.yml` still alerts on empty
-run-day keys (`missing SLA file = alert on empty`). Profiling may also invent a
-partition key from DAG `default_partitions` even when Delta/`DESCRIBE` has
-`partitionColumns = []`, producing `row_count = 0` false positives while the table
-grain still has data (`rows_written > 0`). Do **not** “fix” that by gating the judge
-on `rows_written`; mute the table instead.
+**Why opt-out is required:** without an SLA file (or without an `empty_partition` check),
+the judge does not alert. Profiling no longer invents partition keys from DAG
+`default_partitions` when Delta `partitionColumns` is empty.
 
 **Treat as unpartitioned when any of these hold** (physical truth wins over DAG
 defaults):
@@ -105,24 +100,9 @@ defaults):
 | Declaration | Effective partitions are `[]` (per-table `partitions: []` overrides `default_partitions`) **and** load/SQL writes the full table (e.g. MERGE without `partition_by`) |
 | Schema / load | No `year`/`month`/`day` partition layout; full-table overwrite/MERGE |
 
-**Do not** trust workflow-root `default_partitions: [year, month, day]` alone — that
-config can apply to a DAG while an individual table remains unpartitioned.
+When unpartitioned: **skip §2–§5**. Do **not** create `sla/<layer>/<table>.yml`.
 
-When unpartitioned: **skip §2–§4**. Write a mute SLA and continue to §6–§7:
-
-```yaml
-database_name: <from metadata>
-table_name: <from metadata>
-
-arrival:
-  mute: true
-  reason: "Unpartitioned table (full-table load/MERGE); empty-partition monitor out of scope"
-  source: manual
-```
-
-PR title example: `chore(<domain>): mute empty-partition SLA for unpartitioned <table_name>`.
-
-### 2. Query Trino for observed cadence (~8 weeks)
+### 2. Query Trino for partition history (~8 weeks)
 
 Use **Trino MCP** `execute_query` (preferred) or the `execute_trino.py` fallback. Example
 pattern (adjust catalog/schema for environment):
@@ -142,9 +122,8 @@ HAVING COUNT(*) > 0
 ORDER BY 1, 2, 3
 ```
 
-Derive **observed weekdays**: map each partition date to `mon`…`sun`; the set of
-weekdays with at least one non-empty partition in the lookback window becomes the
-candidate `days_of_week` list.
+Derive partition cadence context for the PR description (weekday histogram). The
+`checks[]` contract no longer stores `days_of_week` or `earliest_hour`.
 
 ### 3. Read dependencies for consistency
 
@@ -157,53 +136,40 @@ Open `dags/dependencies.yaml`:
 Use dependency keys like `bietlejuice.<dag_name>` and task suffixes
 (`:first-run-of-day`, `:load-clean-*`).
 
-### 4. Derive SLA fields
+### 4. Derive optional stale_data fields
 
 | Field | Source | Rule |
 |-------|--------|------|
-| `days_of_week` | Trino history (primary) | Weekdays with observed data in lookback |
-| `earliest_hour` | Cron hour + buffer | Cron start hour + ~1–2 h completion lag (America/Sao_Paulo) |
-| `reason` | All sources | Human-readable line citing cron, Trino, and any inference caveats |
-| `source` | — | `inferred` or `manual` (documentation only; loader ignores it) |
+| `column` | Metadata / domain | Operational timestamp (`ts_*`) that reflects freshness |
+| `max_age_hours` | Cron + domain SLA | Hours since MAX(column); no auto-inference in bulk onboarding |
 
-**Conflict rule (history wins):**
-
-- If Trino shows data on a weekday the cron does not cover (e.g. Saturday data but
-  cron `0 9 * * 1-5`), emit the **observed** `days_of_week` and document the conflict
-  in `reason` (e.g. `note: observed weekend partitions but cron is weekdays-only`).
-- If history is sparse (< 4 weeks of data), still infer and add a `note:` in `reason`.
-
-Domain validation happens via the normal PR review (`CODEOWNERS`); do not add
-`reviewed_by` or `# REVIEW:` YAML comments.
+Domain validation happens via the normal PR review (`CODEOWNERS`).
 
 ### 5. Write the SLA file
 
 Path: `dags/<domain>/<dag>/sla/<layer>/<table>.yml`
 
-Template:
+Template (empty partition only):
 
 ```yaml
 database_name: <from metadata>
 table_name: <from metadata>
 
-arrival:
-  days_of_week: [mon, tue, wed, thu, fri]   # or weekdays / all
-  earliest_hour: 9
-  reason: "Upstream ebdb_contract_fast_lane runs 0 9 * * 1-5; observed data Mon-Fri"
-  source: inferred
+checks:
+  - type: empty_partition
+```
+
+Optional stale-data check (domain must pick column and threshold):
+
+```yaml
+checks:
+  - type: empty_partition
+  - type: stale_data
+    column: ts_load
+    max_age_hours: 36
 ```
 
 **Do not** add `owner` — ownership lives in `metadata/`.
-
-For full suppression (replaces legacy `empty_partition_suppression.yml`), including
-**all unpartitioned tables** (§1a):
-
-```yaml
-arrival:
-  mute: true
-  reason: "<why alerts are disabled>"
-  source: manual
-```
 
 ### 6. Validate locally
 
@@ -226,15 +192,15 @@ print(len(load_sla_expectations('dags')))
 Use [`create-or-update-pr`](../create-or-update-pr/SKILL.md). PR title example:
 
 ```
-feat(<domain>): add arrival SLA for <table_name>
+feat(<domain>): add SLA checks for <table_name>
 ```
 
 PR description must include:
 
 - Observed weekday histogram (from Trino).
 - Producer cron and upstream dependencies consulted.
-- Any inference caveats documented in `reason` fields.
-- Note: **no behavior change until merged**; missing SLA file = alert on empty (default).
+- For `stale_data`: column choice and `max_age_hours` rationale.
+- Note: **no SLA file = no alert** (opt-in checks).
 
 `CODEOWNERS` routes review to the domain team (e.g. `dags/people/**` →
 `@quintoandar/enterprise-engineering`).
@@ -245,17 +211,15 @@ PR description must include:
 
 1. Start with the **noisiest** tables (most empty-partition alerts in GChat).
 2. Prefer **small PRs** (one DAG or ≤10 tables) for faster review via `CODEOWNERS`.
-3. **Always** set `mute: true` for **unpartitioned** tables (§1a) — empty-partition
-   alerts are out of scope for them.
-4. For **partitioned** tables, do **not** set `mute: true` unless the domain
-   explicitly requests full suppression (calendar/cadence is preferred over mute).
+3. **Do not** create SLA files for **unpartitioned** tables (§1a).
+4. Add `stale_data` only when the domain can name column + threshold.
 
 ---
 
 ## Out of scope
 
 - Changing the empty-partition **judge** to skip when `rows_written > 0` (keep
-  inventory `row_count` as the trigger; use mute / correct partitioning for
+  inventory `row_count` as the trigger; use opt-out / correct partitioning for
   unpartitioned false positives).
 - `dag_sla_information` migration (Phase 2 —
   `docs/superpowers/specs/2026-08-04-dag-sla-migration-phase2-design.md`).

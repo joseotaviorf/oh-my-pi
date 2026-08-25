@@ -1,9 +1,0 @@
-database_name: datalake_fairness_assessment
-table_name: fairness_classification
-arrival:
-  mute: true
-  reason: >-
-    Unpartitioned Delta table (full-table MERGE). Empty-partition monitor invents
-    a run-day partition from DAG default_partitions and false-alerts when
-    row_count for that key is 0 despite rows_written > 0 on the table grain.
-  source: manual

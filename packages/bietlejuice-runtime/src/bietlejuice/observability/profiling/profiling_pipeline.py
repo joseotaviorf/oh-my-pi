@@ -144,9 +144,9 @@ class ProfilingPipeline:
             },
             None,
         )
-        partition_columns = self.partitions
-        if table_record:
-            partition_columns = table_record.get("partition_columns") or self.partitions
+        partition_columns = (
+            table_record.get("partition_columns") if table_record else []
+        )
         partition_records = self._safe(
             "partition_metrics",
             lambda: [

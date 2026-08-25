@@ -1,8 +1,10 @@
+from datetime import datetime, timezone
 from unittest import mock
 
 from bietlejuice.observability.profiling.delta_metadata_reader import (
     DeltaMetadataReader,
     _latest_partition_spec_with_data,
+    _max_column_from_stats,
     _parse_num_records,
     _sum_num_records,
     partition_key_from_logical_date,
@@ -136,6 +138,28 @@ def _fake_files_df(files: list[tuple[dict[str, str], int | None]]):
     df = mock.MagicMock()
     df.select.return_value.collect.return_value = rows
     return df
+
+
+class TestMaxColumnFromStats:
+    def test_returns_max_from_complete_stats(self):
+        stats = [
+            {"maxValues": {"ts_load": "2026-08-01T10:00:00Z"}},
+            {"maxValues": {"ts_load": "2026-08-03T08:00:00Z"}},
+        ]
+        latest, complete = _max_column_from_stats(stats, "ts_load")
+        assert complete is True
+        assert latest == datetime(2026, 8, 3, 8, 0, tzinfo=timezone.utc)
+
+    def test_incomplete_stats_when_missing_column(self):
+        stats = [{"maxValues": {"other": "2026-08-01"}}]
+        latest, complete = _max_column_from_stats(stats, "ts_load")
+        assert latest is None
+        assert complete is False
+
+    def test_empty_table_returns_none_complete(self):
+        latest, complete = _max_column_from_stats([], "ts_load")
+        assert latest is None
+        assert complete is True
 
 
 class TestLatestPartitionWithDataFromLog:

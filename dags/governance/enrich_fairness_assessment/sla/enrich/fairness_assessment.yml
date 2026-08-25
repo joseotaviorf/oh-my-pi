@@ -1,8 +1,7 @@
 database_name: datalake_fairness_assessment
 table_name: fairness_assessment
-arrival:
-  days_of_week: all
-  earliest_hour: 8
-  reason: DAG enrich_fairness_assessment runs daily at 06:00 America/Sao_Paulo (0
-    6 * * *)
-  source: manual
+checks:
+  - type: empty_partition
+  - type: stale_data
+    column: ts_assessed
+    max_age_hours: 36

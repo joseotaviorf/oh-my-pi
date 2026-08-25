@@ -1,8 +1,4 @@
 database_name: datalake_pipeline
 table_name: dag_sla_information
-arrival:
-  days_of_week: all
-  earliest_hour: 9
-  reason: enrich_pipeline runs 0 7-13,16,18 * * *; observed data all weekdays in last
-    56d
-  source: inferred
+checks:
+  - type: empty_partition

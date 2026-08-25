@@ -71,6 +71,33 @@ class TestGchatNotify:
 
         send_message.assert_called_once()
 
+    def test_notify_sends_stale_data_on_prod(self):
+        finding = {
+            "signal_type": "stale_data",
+            "database": "datalake_example",
+            "table": "example",
+            "column": "ts_load",
+            "max_age_hours": 36,
+            "latest_data_at": None,
+            "age_hours": None,
+            "environment": "prod",
+            "table_owner": "owner@example.com",
+            "team_owner": "growth",
+        }
+        with mock.patch.object(
+            gchat_notify.GChatService, "send_message"
+        ) as send_message:
+            gchat_notify.notify_observability_findings(
+                [finding],
+                environment="prod",
+                gchat_webhook_url="https://webhook",
+            )
+
+        send_message.assert_called_once()
+        message = send_message.call_args.args[0]
+        assert "stale_data" in message.thread_key
+        assert "ts_load" in message.thread_key
+
     def test_notify_skips_when_webhook_empty(self, sample_finding):
         with mock.patch.object(
             gchat_notify.GChatService, "send_message"

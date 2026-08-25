@@ -42,6 +42,7 @@ class DeltaMetadataReader:
         self.spark = spark
         # One snapshot collect per FQTN per reader lifetime (table + partition grains).
         self._active_files_cache: dict[str, _ActiveFiles] = {}
+        self._active_file_stats_cache: dict[str, list[dict[str, Any] | None]] = {}
 
     def _delta_table(self, fqtn: str) -> DeltaTable:
         return DeltaTable.forName(self.spark, fqtn)
@@ -95,6 +96,46 @@ class DeltaMetadataReader:
             )
             return None, False
 
+    def has_deletion_vectors(self, fqtn: str) -> bool:
+        """True when the table enables deletion vectors (stats may be unreliable)."""
+        try:
+            detail = self.detail(fqtn)
+        except Exception as error:
+            logger.warning(f"Could not read detail for {fqtn}: {error}")
+            return True
+        features = detail.get("tableFeatures") or []
+        return "deletionVectors" in features
+
+    def max_column_from_log(
+        self, fqtn: str, column: str
+    ) -> tuple[datetime | None, bool]:
+        """Latest value for ``column`` from active-file stats maxValues."""
+        try:
+            self._active_files(fqtn)
+            stats_payloads = self._active_file_stats_cache.get(fqtn, [])
+            return _max_column_from_stats(stats_payloads, column)
+        except Exception as error:
+            logger.warning(
+                f"Could not read max column from log for {fqtn}.{column}: {error}"
+            )
+            return None, False
+
+    def max_column_fallback(self, fqtn: str, column: str) -> datetime | None:
+        """``SELECT MAX(column)`` fallback when log stats are incomplete."""
+        quoted = _quote_identifier(column)
+        query = f"SELECT MAX({quoted}) AS max_value FROM {fqtn}"
+        raw = self.spark.sql(query).collect()[0]["max_value"]
+        return _parse_timestamp_value(raw)
+
+    def is_temporal_column(self, fqtn: str, column: str) -> bool:
+        """True when ``column`` exists and is date or timestamp typed."""
+        for field in self.schema_fields(fqtn):
+            if field.get("name") != column:
+                continue
+            data_type = str(field.get("type") or "").lower()
+            return data_type.startswith("timestamp") or data_type == "date"
+        return False
+
     def latest_partition_with_data_from_log(
         self, fqtn: str, partition_columns: list[str]
     ) -> str | None:
@@ -126,10 +167,13 @@ class DeltaMetadataReader:
         files_df = self._all_files_dataframe(fqtn)
         rows = files_df.select("partitionValues", "stats").collect()
         active_files: _ActiveFiles = []
+        stats_payloads: list[dict[str, Any] | None] = []
         for row in rows:
             partition_values = _row_partition_values(row["partitionValues"])
             active_files.append((partition_values, _parse_num_records(row["stats"])))
+            stats_payloads.append(_parse_stats_payload(row["stats"]))
         self._active_files_cache[fqtn] = active_files
+        self._active_file_stats_cache[fqtn] = stats_payloads
         return active_files
 
     def _all_files_dataframe(self, fqtn: str) -> DataFrame:
@@ -373,3 +417,65 @@ def _format_partition_value(column: str, value: object) -> str:
         except (TypeError, ValueError):
             pass
     return str(value)
+
+
+def _quote_identifier(name: str) -> str:
+    escaped = str(name).replace("`", "``")
+    return f"`{escaped}`"
+
+
+def _parse_stats_payload(stats: object) -> dict[str, Any] | None:
+    if stats is None:
+        return None
+    if isinstance(stats, dict):
+        return stats
+    try:
+        payload = json.loads(str(stats))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def _parse_timestamp_value(value: object) -> datetime | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    text = str(value).strip()
+    if not text:
+        return None
+    normalized = text.replace("Z", "+00:00")
+    try:
+        return datetime.fromisoformat(normalized)
+    except ValueError:
+        pass
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(text, fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def _max_column_from_stats(
+    stats_payloads: list[dict[str, Any] | None],
+    column: str,
+) -> tuple[datetime | None, bool]:
+    if not stats_payloads:
+        return None, True
+    candidates: list[datetime] = []
+    for stats in stats_payloads:
+        if stats is None:
+            return None, False
+        max_values_payload = stats.get("maxValues")
+        if not isinstance(max_values_payload, dict):
+            return None, False
+        if column not in max_values_payload:
+            return None, False
+        parsed = _parse_timestamp_value(max_values_payload[column])
+        if parsed is None:
+            return None, False
+        candidates.append(parsed)
+    if not candidates:
+        return None, True
+    return max(candidates), True

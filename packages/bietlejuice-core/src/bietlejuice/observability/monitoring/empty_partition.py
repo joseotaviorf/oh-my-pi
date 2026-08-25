@@ -5,7 +5,6 @@ from __future__ import annotations
 import math
 from datetime import date, datetime
 from typing import Any, Iterable
-from zoneinfo import ZoneInfo
 
 from bietlejuice.observability.monitoring.constants import (
     DEFAULT_FRESHNESS_HOURS,
@@ -16,8 +15,8 @@ from bietlejuice.observability.monitoring.constants import (
     UNKNOWN_TEAM,
 )
 from bietlejuice.observability.monitoring.sla_expectations import (
-    ArrivalExpectation,
-    format_arrival_expectation_brief,
+    TableSla,
+    format_empty_partition_sla_brief,
 )
 
 ALERT_HEADER = "⚠️ Empty Partition Detected"
@@ -113,60 +112,6 @@ def is_cdc_ingestion_row(row: PartitionRow) -> bool:
     return str(row.get("layer") or "").lower() == "raw"
 
 
-def _partition_date(row: PartitionRow) -> date | None:
-    values = {
-        entry.get("name"): entry.get("value")
-        for entry in normalize_partition_key(row.get("partition_key"))
-        if entry.get("name") is not None
-    }
-    if not all(column in values for column in ("year", "month", "day")):
-        return None
-    try:
-        return date(
-            int(str(values["year"])),
-            int(str(values["month"])),
-            int(str(values["day"])),
-        )
-    except (TypeError, ValueError):
-        return None
-
-
-def _now_in_timezone(timezone_name: str, now: datetime | None = None) -> datetime:
-    tz = ZoneInfo(timezone_name)
-    if now is None:
-        return datetime.now(tz)
-    if now.tzinfo is None:
-        return now.replace(tzinfo=tz)
-    return now.astimezone(tz)
-
-
-def _should_skip_by_arrival_expectation(
-    row: PartitionRow,
-    expectation: ArrivalExpectation | None,
-    *,
-    now: datetime | None = None,
-) -> bool:
-    if expectation is None:
-        return False
-    if expectation.mute:
-        return True
-
-    partition_d = _partition_date(row)
-    if partition_d is None:
-        return False
-
-    if expectation.days_of_week is not None:
-        if partition_d.weekday() not in expectation.days_of_week:
-            return True
-
-    if expectation.earliest_hour is not None:
-        now_dt = _now_in_timezone(expectation.timezone, now=now)
-        if partition_d == now_dt.date() and now_dt.hour < expectation.earliest_hour:
-            return True
-
-    return False
-
-
 def dedupe_to_latest(rows: Iterable[PartitionRow]) -> list[PartitionRow]:
     """Keep the latest row per (database, table, partition_key) by delta version."""
     best: dict[tuple[str, str, str], PartitionRow] = {}
@@ -219,15 +164,23 @@ def _is_candidate_row(row: PartitionRow) -> bool:
     return True
 
 
+def _has_exact_year_month_day_partition(row: PartitionRow) -> bool:
+    values = {
+        entry.get("name")
+        for entry in normalize_partition_key(row.get("partition_key"))
+        if entry.get("name") is not None
+    }
+    return values == {"year", "month", "day"}
+
+
 def judge_empty_partitions(
     rows: Iterable[PartitionRow],
     *,
-    expectations: dict[tuple[str, str], ArrivalExpectation] | None = None,
+    expectations: dict[tuple[str, str], TableSla] | None = None,
     freshness_hours: int = DEFAULT_FRESHNESS_HOURS,
-    now: datetime | None = None,
 ) -> list[Finding]:
     """
-    Pure judgment: run partition with row_count = 0.
+    Pure judgment: run partition with row_count = 0 for opt-in tables.
 
     ``row_count`` is measured on the partition from ``run_logical_date`` (profiling thin
     slice). ``rows_written`` is retained on findings for context only — it is often
@@ -241,13 +194,15 @@ def judge_empty_partitions(
     for row in dedupe_to_latest(rows):
         if not _is_candidate_row(row):
             continue
+        if not _has_exact_year_month_day_partition(row):
+            continue
         row_count = _as_optional_int(row.get("row_count"))
         if row_count is None or row_count != 0:
             continue
         database = row.get("database") or ""
         table = row.get("table") or ""
-        expectation = expectations.get((database, table))
-        if _should_skip_by_arrival_expectation(row, expectation, now=now):
+        sla = expectations.get((database, table))
+        if sla is None or not sla.has_empty_partition():
             continue
         partition_fp = partition_key_fingerprint(row.get("partition_key"))
         findings.append(
@@ -264,7 +219,7 @@ def judge_empty_partitions(
                 "profiled_at": row.get("profiled_at"),
                 "run_logical_date": row.get("run_logical_date"),
                 "environment": row.get("environment"),
-                "arrival_sla_summary": format_arrival_expectation_brief(expectation),
+                "sla_summary": format_empty_partition_sla_brief(),
             }
         )
     return findings
@@ -423,9 +378,7 @@ def format_finding_message(finding: Finding) -> str:
     )
     table_owner = _display_owner(finding.get("table_owner"), UNKNOWN_OWNER)
     team_owner = _display_owner(finding.get("team_owner"), UNKNOWN_TEAM)
-    sla_brief = finding.get("arrival_sla_summary") or format_arrival_expectation_brief(
-        None
-    )
+    sla_brief = finding.get("sla_summary") or format_empty_partition_sla_brief()
     env_tag = format_environment_tag(finding.get("environment"))
     contact = (
         f"{table_owner} · {team_owner}"

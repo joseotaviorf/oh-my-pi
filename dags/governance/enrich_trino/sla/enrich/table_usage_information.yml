@@ -1,7 +1,4 @@
 database_name: datalake_trino
 table_name: table_usage_information
-arrival:
-  days_of_week: all
-  earliest_hour: 7
-  reason: enrich_trino runs 0 5 * * *; observed cadence from Trino 56d lookback
-  source: inferred
+checks:
+  - type: empty_partition

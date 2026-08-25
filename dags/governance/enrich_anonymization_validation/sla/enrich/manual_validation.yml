@@ -1,7 +1,4 @@
 database_name: datalake_anonymization_validation
 table_name: manual_validation
-arrival:
-  days_of_week: all
-  earliest_hour: 9
-  reason: enrich_anonymization_validation has no cron (upstream-triggered)
-  source: inferred
+checks:
+  - type: empty_partition

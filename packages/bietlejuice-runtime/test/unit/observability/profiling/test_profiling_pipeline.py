@@ -186,8 +186,8 @@ class TestCaptureHappyPath:
 
 
 class TestPartitionsFallback:
-    def test_uses_dag_partitions_when_delta_partition_columns_empty(self, reader):
-        # Arrange — DESCRIBE DETAIL returns no partition columns; DAG supplies them
+    def test_skips_partition_metrics_when_delta_partition_columns_empty(self, reader):
+        # Arrange — DESCRIBE DETAIL returns no partition columns; DAG hint ignored
         reader.detail.return_value = {
             "numFiles": 3,
             "sizeInBytes": 512,
@@ -210,23 +210,25 @@ class TestPartitionsFallback:
             # Act
             pipeline.run()
 
-        # Assert — partition metrics collected via DAG-declared columns
+        # Assert — partition metrics not collected from DAG declaration
         writer = writer_cls.return_value
-        assert len(writer.append_partition_metrics.call_args[0][0]) == 1
-        reader.partition_row_count_from_log.assert_called_once()
-        call_args = reader.partition_row_count_from_log.call_args
-        assert call_args.args[0] == "dw_rent.fact_contracts"
-        assert call_args.args[1] == [
-            {"name": "year", "value": "2026"},
-            {"name": "month", "value": "07"},
-            {"name": "day", "value": "23"},
-        ]
+        assert writer.append_partition_metrics.call_args[0][0] == []
+        reader.partition_row_count_from_log.assert_not_called()
 
 
 class TestFailOpen:
     def test_collector_exception_is_swallowed(self, reader):
-        # Arrange — table collector blows up; the run must not raise and the
-        # partition grain (driven by the ``partitions`` arg) still survives.
+        # Arrange — table collector blows up; partition metrics need Delta columns
+        reader.detail.return_value = {
+            "numFiles": 3,
+            "sizeInBytes": 512,
+            "createdAt": "2026-01-01",
+            "lastModified": "2026-07-23",
+            "partitionColumns": ["year", "month", "day"],
+            "clusteringColumns": [],
+            "properties": {},
+            "tableFeatures": [],
+        }
         pipeline = _pipeline(_config_service(), partitions=["year", "month", "day"])
         with (
             mock.patch.object(
@@ -244,10 +246,8 @@ class TestFailOpen:
             # Act
             pipeline.run()
 
-        # Assert — table grain dropped, partition grain survives, no exception
-        writer = writer_cls.return_value
-        assert writer.append_table_metrics.call_args[0][0] == []
-        assert len(writer.append_partition_metrics.call_args[0][0]) == 1
+        # Assert — table collector failed; no partition columns from Delta, nothing written
+        writer_cls.assert_not_called()
 
     def test_no_write_when_every_read_fails(self, reader):
         # Arrange — every metadata read raises

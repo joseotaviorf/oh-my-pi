@@ -1,7 +1,4 @@
 database_name: datalake_tars
 table_name: turn_activity
-arrival:
-  days_of_week: all
-  earliest_hour: 8
-  reason: enrich_tars runs 0 6 * * *; turn_activity depends on turn_metrics + turn_quality (same DAG, upstream inner steps)
-  source: inferred
+checks:
+  - type: empty_partition

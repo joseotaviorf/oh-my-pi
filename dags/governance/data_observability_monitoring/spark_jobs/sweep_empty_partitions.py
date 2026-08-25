@@ -1,6 +1,6 @@
 """
 EMR Spark job: read profiling store Delta tables, join documentation owners, judge
-empty partitions, and post GChat alerts (prod only unless force_send).
+empty partitions and stale data, and post GChat alerts (prod only unless force_send).
 
 Republish via CI (upload-dag-packages-spark-jobs-s3-{forno,prod}).
 """
@@ -33,15 +33,21 @@ from bietlejuice.observability.monitoring.empty_partition import (
     normalize_partition_key,
 )
 from bietlejuice.observability.monitoring.gchat_notify import (
-    notify_empty_partition_findings,
+    notify_observability_findings,
 )
 from bietlejuice.observability.monitoring.sla_expectations import (
     load_expectations_from_json,
+)
+from bietlejuice.observability.monitoring.stale_data import judge_stale_data
+from bietlejuice.observability.profiling.delta_metadata_reader import (
+    DeltaMetadataReader,
 )
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "sweep_empty_partitions"
 TABLES_DOCUMENTATION = "datalake_documentation_metrics_clean.tables_documentation"
+COLLECTION_DELTA_LOG = "delta_log"
+COLLECTION_SPARK_MAX_FALLBACK = "spark_max_fallback"
 
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient(app_name=JOB_NAME)
@@ -159,6 +165,53 @@ def _load_partition_rows_with_data(
     return _collect_rows(df)
 
 
+def _collect_stale_data_findings(
+    reader: DeltaMetadataReader,
+    expectations: dict[tuple[str, str], Any],
+) -> list[dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    for (database, table), sla in expectations.items():
+        for check in sla.stale_data_checks():
+            fqtn = f"{database}.{table}"
+            try:
+                if not reader.is_temporal_column(fqtn, check.column):
+                    logger.warning(
+                        "Skipping stale_data for %s: column %s missing or not temporal",
+                        fqtn,
+                        check.column,
+                    )
+                    continue
+                use_fallback = reader.has_deletion_vectors(fqtn)
+                collection_method = COLLECTION_DELTA_LOG
+                latest_data_at = None
+                if not use_fallback:
+                    latest_data_at, stats_complete = reader.max_column_from_log(
+                        fqtn, check.column
+                    )
+                    if not stats_complete:
+                        use_fallback = True
+                if use_fallback:
+                    collection_method = COLLECTION_SPARK_MAX_FALLBACK
+                    latest_data_at = reader.max_column_fallback(fqtn, check.column)
+                finding = judge_stale_data(
+                    database=database,
+                    table=table,
+                    check=check,
+                    latest_data_at=latest_data_at,
+                    collection_method=collection_method,
+                )
+                if finding is not None:
+                    findings.append(finding)
+            except Exception as error:  # noqa: BLE001 — isolate per table/check
+                logger.error(
+                    "stale_data collection failed for %s column=%s: %s",
+                    fqtn,
+                    check.column,
+                    error,
+                )
+    return findings
+
+
 def main() -> None:
     args = _parse_args()
     freshness_hours = int(args.freshness_hours)
@@ -193,33 +246,40 @@ def main() -> None:
         owner_index[(str(database), str(table))] = (owner, domain)
 
     table_index = build_table_metrics_index(table_rows)
-    findings = judge_empty_partitions(
+    empty_findings = judge_empty_partitions(
         partition_rows,
         expectations=expectations,
         freshness_hours=freshness_hours,
     )
-    attach_table_context(findings, table_index)
+    attach_table_context(empty_findings, table_index)
     finding_tables = {
         (finding.get("database") or "", finding.get("table") or "")
-        for finding in findings
+        for finding in empty_findings
     }
     partition_rows_with_data = _load_partition_rows_with_data(
         spark,
         environment=args.environment,
         table_keys=finding_tables,
     )
-    attach_latest_partition_with_data(findings, partition_rows_with_data)
+    attach_latest_partition_with_data(empty_findings, partition_rows_with_data)
+
+    reader = DeltaMetadataReader(spark)
+    stale_findings = _collect_stale_data_findings(reader, expectations)
+    findings = empty_findings + stale_findings
+
     for finding in findings:
         finding["environment"] = args.environment
     _attach_owner_fields(findings, owner_index)
 
     logger.info(
-        "Completed sweep with %s empty-partition finding(s) for environment=%s",
+        "Completed sweep with %s finding(s) (%s empty, %s stale) for environment=%s",
         len(findings),
+        len(empty_findings),
+        len(stale_findings),
         args.environment,
     )
 
-    notify_empty_partition_findings(
+    notify_observability_findings(
         findings,
         environment=args.environment,
         gchat_webhook_url=args.gchat_webhook_url,

@@ -5,12 +5,13 @@ dag:
   schedule_interval: "0 7,11,15,19,23 * * *"
   documentation:
     dag_purpose: |
-      Sweep the profiling store for partitioned tables whose run partition is empty
-      (partition row_count zero). An EMR Spark job reads datalake_observability metrics,
-      joins documentation_metrics for table owner and domain, applies SLA expectations
-      (published to S3 at deploy time), and posts GChat alerts (prod only unless
-      dag_run.conf.force_send). Use dag_run.conf.dry_run to log messages without sending.
-      GChat webhook: Airflow Variable GCHAT_DATA_CORE_MODEL_GOV_WEBHOOK (see
+      Sweep the profiling store for opt-in SLA checks: empty run-day partitions
+      (partition row_count zero) and stale table data (MAX of a configured column).
+      An EMR Spark job reads datalake_observability metrics, joins documentation_metrics
+      for table owner and domain, applies SLA expectations published to S3 at deploy time,
+      and posts GChat alerts (prod only unless dag_run.conf.force_send). Use
+      dag_run.conf.dry_run to log messages without sending. GChat webhook: Airflow
+      Variable GCHAT_DATA_CORE_MODEL_GOV_WEBHOOK (see
       notification_webhooks_keys.data_observability_monitoring in env config).
 workflow:
   type: custom_ingestion

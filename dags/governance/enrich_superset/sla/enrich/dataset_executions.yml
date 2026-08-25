@@ -1,8 +1,4 @@
 database_name: datalake_superset
 table_name: dataset_executions
-arrival:
-  days_of_week: all
-  earliest_hour: 9
-  reason: enrich_superset has no cron (upstream-triggered); observed cadence from
-    Trino 56d lookback
-  source: inferred
+checks:
+  - type: empty_partition
