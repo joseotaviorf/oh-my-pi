@@ -1,0 +1,278 @@
+# Notify a Google Chat channel when TARS/Luigi opens a PR with Data Product
+# documentation under docs/llm_context/**.
+#
+# Scope: only PRs opened by the Zordon bot whose title carries a `tars-*-sync`
+# marker — i.e. docs submitted through TARS/Luigi, not the hand-written ones
+# people open directly against docs/llm_context.
+#
+# Base branch is deliberately NOT filtered: these PRs alternate between `master`
+# and `forno` depending on where the doc is published from.
+#
+# Setup (one-time):
+#   1. In the target GChat space: Apps & integrations → Incoming Webhooks → create webhook.
+#   2. In GitHub repo settings → Secrets and variables → Actions:
+#        GCHAT_TARS_PR_WEBHOOK = <webhook URL>
+#
+# The webhook URL is never committed to the repo.
+
+name: TARS llm_context PR GChat Alert
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - "docs/llm_context/**"
+
+jobs:
+  notify-gchat:
+    if: >-
+      contains(github.event.pull_request.user.login, 'zordon')
+      && contains(github.event.pull_request.title, 'tars')
+    runs-on: github-actions-developers-runner
+    permissions:
+      pull-requests: read
+      contents: read
+    steps:
+      - name: Post alert to Google Chat
+        env:
+          WEBHOOK_URL: ${{ secrets.GCHAT_TARS_PR_WEBHOOK }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+          REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_ACTION: ${{ github.event.action }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${WEBHOOK_URL}" ]; then
+            echo "Secret GCHAT_TARS_PR_WEBHOOK is not configured."
+            exit 1
+          fi
+
+          payload=$(
+            PR_NUMBER="${PR_NUMBER}" \
+            PR_TITLE="${PR_TITLE}" \
+            PR_BODY="${PR_BODY}" \
+            PR_URL="${PR_URL}" \
+            PR_BRANCH="${PR_BRANCH}" \
+            PR_BASE="${PR_BASE}" \
+            REPOSITORY="${REPOSITORY}" \
+            GITHUB_TOKEN="${GITHUB_TOKEN}" \
+            EVENT_ACTION="${EVENT_ACTION}" \
+            python3 <<'PY'
+          import json
+          import os
+          import re
+          import urllib.error
+          import urllib.request
+
+          LLM_CONTEXT_PREFIX = "docs/llm_context/"
+
+          SLUG_RE = re.compile(r"\*\*Slug:\*\*\s*`([^`]+)`")
+          DOMAIN_RE = re.compile(r"\*\*Domain:\*\*\s*`([^`]+)`")
+          OWNER_RE = re.compile(r"\*\*Owner:\*\*\s*(\S+)")
+          SUBMITTED_BY_RE = re.compile(r"\*\*Submitted by:\*\*\s*(\S+)")
+          ENTITY_TYPE_RE = re.compile(r"\*\*([A-Za-z]+ entity)\*\*")
+          TITLE_ACTION_RE = re.compile(r"tars-[a-z]+-sync\):\s*(\w+)")
+
+          ENTITY_TYPE_PT = {
+              "metric entity": "Metric entity",
+              "business entity": "Business entity",
+              "domain entity": "Domain entity",
+          }
+          DIRECTORY_TYPE_PT = {
+              "metric_entities": "Metric entity",
+              "business_entities": "Business entity",
+              "domain_entities": "Domain entity",
+          }
+
+
+          def github_get(path: str) -> object:
+              request = urllib.request.Request(
+                  f"https://api.github.com{path}",
+                  headers={
+                      "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                      "Accept": "application/vnd.github+json",
+                      "User-Agent": "tars-llm-context-pr-gchat-alert",
+                  },
+              )
+              with urllib.request.urlopen(request) as response:
+                  return json.load(response)
+
+
+          def first_match(pattern: re.Pattern[str], text: str) -> str:
+              match = pattern.search(text)
+              return match.group(1).strip() if match else ""
+
+
+          def format_person(email: str) -> str:
+              local_part = email.split("@")[0]
+              parts = [part for part in re.split(r"[._-]", local_part) if part]
+              return " ".join(part.capitalize() for part in parts) or email
+
+
+          def person_line(email: str) -> str:
+              return (
+                  f"<b>{format_person(email)}</b> "
+                  f'<font face="monospace">({email})</font>'
+              )
+
+
+          repository = os.environ["REPOSITORY"]
+          pr_number = os.environ["PR_NUMBER"].strip()
+          pr_title = os.environ["PR_TITLE"]
+          pr_body = os.environ.get("PR_BODY") or ""
+          pr_url = os.environ["PR_URL"]
+          pr_branch = os.environ["PR_BRANCH"]
+          pr_base = os.environ["PR_BASE"]
+          event_action = os.environ["EVENT_ACTION"]
+
+          try:
+              pr_files = github_get(
+                  f"/repos/{repository}/pulls/{pr_number}/files?per_page=100"
+              )
+          except urllib.error.HTTPError:
+              pr_files = []
+
+          doc_paths = sorted(
+              {
+                  item["filename"]
+                  for item in pr_files
+                  if item["filename"].startswith(LLM_CONTEXT_PREFIX)
+              }
+          )
+
+          # Entity type: prefer the phrase Luigi writes in the PR body, fall back to
+          # the directory the doc lives in (survives the business→domain rename).
+          entity_type = ENTITY_TYPE_PT.get(
+              first_match(ENTITY_TYPE_RE, pr_body).lower(), ""
+          )
+          if not entity_type:
+              directories = {
+                  path[len(LLM_CONTEXT_PREFIX):].split("/")[0] for path in doc_paths
+              }
+              entity_type = ", ".join(
+                  sorted(
+                      DIRECTORY_TYPE_PT.get(directory, directory)
+                      for directory in directories
+                  )
+              )
+          if not entity_type:
+              entity_type = "não identificado"
+
+          action = first_match(TITLE_ACTION_RE, pr_title).lower()
+          if event_action == "reopened":
+              event_title = "PR reaberto — Data Product doc (TARS)"
+          elif action == "add":
+              event_title = "Novo Data Product doc via TARS"
+          elif action == "update":
+              event_title = "Data Product doc atualizado via TARS"
+          else:
+              event_title = "PR de Data Product doc via TARS"
+
+          slug = first_match(SLUG_RE, pr_body)
+          domain = first_match(DOMAIN_RE, pr_body)
+          owner = first_match(OWNER_RE, pr_body)
+          submitted_by = first_match(SUBMITTED_BY_RE, pr_body)
+
+          summary_bits = [f"<b>PR:</b> #{pr_number}", f"<b>Tipo:</b> {entity_type}"]
+
+          if slug:
+              summary_bits.append(
+                  f'<b>Slug:</b> <font face="monospace">{slug}</font>'
+              )
+          if domain:
+              summary_bits.append(
+                  f'<b>Domínio:</b> <font face="monospace">{domain}</font>'
+              )
+
+          if submitted_by and submitted_by == owner:
+              summary_bits.append(f"<b>Solicitante / owner:</b> {person_line(owner)}")
+          else:
+              if submitted_by:
+                  summary_bits.append(f"<b>Solicitante:</b> {person_line(submitted_by)}")
+              if owner:
+                  summary_bits.append(f"<b>Owner:</b> {person_line(owner)}")
+          if not submitted_by and not owner:
+              summary_bits.append("<b>Solicitante:</b> não identificado")
+
+          summary_bits.append(
+              f'<b>Branch:</b> <font face="monospace">{pr_branch}</font> → '
+              f'<font face="monospace">{pr_base}</font>'
+          )
+
+          if not doc_paths:
+              docs_text = "(nenhum arquivo em docs/llm_context identificado)"
+          elif len(doc_paths) == 1:
+              docs_text = f'<font face="monospace">{doc_paths[0]}</font>'
+          else:
+              shown = doc_paths[:10]
+              docs_text = "<br>".join(
+                  f'• <font face="monospace">{path}</font>' for path in shown
+              )
+              if len(doc_paths) > len(shown):
+                  docs_text += f"<br>… e mais {len(doc_paths) - len(shown)} arquivo(s)"
+
+          widgets = [
+              {
+                  "decoratedText": {
+                      "topLabel": "Título",
+                      "text": pr_title,
+                      "wrapText": True,
+                  }
+              },
+              {
+                  "textParagraph": {
+                      "text": "<br>".join(summary_bits),
+                  }
+              },
+              {
+                  "decoratedText": {
+                      "topLabel": "Docs alterados",
+                      "text": docs_text,
+                      "wrapText": True,
+                  }
+              },
+              {
+                  "buttonList": {
+                      "buttons": [
+                          {
+                              "text": "Abrir no GitHub",
+                              "onClick": {
+                                  "openLink": {"url": pr_url},
+                              },
+                          }
+                      ]
+                  }
+              },
+          ]
+
+          payload = {
+              "cardsV2": [
+                  {
+                      "cardId": "tars-llm-context-pr-alert",
+                      "card": {
+                          "header": {
+                              "title": event_title,
+                              "subtitle": "bi-etl-ejuice · docs/llm_context",
+                              "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                              "imageType": "CIRCLE",
+                          },
+                          "sections": [{"widgets": widgets}],
+                      },
+                  }
+              ]
+          }
+
+          print(json.dumps(payload, ensure_ascii=False))
+          PY
+          )
+
+          curl -fsSL -X POST \
+            -H "Content-Type: application/json; charset=UTF-8" \
+            -d "${payload}" \
+            "${WEBHOOK_URL}"
