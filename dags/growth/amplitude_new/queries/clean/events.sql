@@ -52,7 +52,7 @@ WITH source AS (
         CAST(day AS INT) AS day,
 
         -- Temporary salt to distribute skewed partitions
-        pmod(xxhash64(event_id), 32) AS _salt
+        pmod(xxhash64(event_id), 64) AS _salt
 
     FROM datalake_amplitude_new_raw.events
     WHERE
@@ -60,7 +60,7 @@ WITH source AS (
 
 )
 
-SELECT /*+ REPARTITION(400, id_app, event_type, year, month, day, _salt) */
+SELECT /*+ REPARTITION(2400, id_app, event_type, year, month, day, _salt) */
     id_amplitude,
     ids_amplitude_attributed,
     adid,

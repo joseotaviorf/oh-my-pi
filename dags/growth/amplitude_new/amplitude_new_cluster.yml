@@ -10,7 +10,7 @@ cluster:
     task_nodes:
       instance_types:
         - r6gd.8xlarge
-      target_on_demand: 6
+      target_on_demand: 10
       target_spot: 0
     aws_attributes:
       ebs_volume_size: 500
@@ -19,13 +19,13 @@ cluster:
       spark.databricks.delta.optimizeWrite.enabled: "true"
       spark.driver.memory: "20g"
       spark.driver.memoryOverhead: "4g"
-      # 8 workers × ~2 × 8c/96g executors (DA uncapped). j-08995243 failed with 16c/96g
-      # heartbeat timeouts; more shuffle partitions for heavy spill (was ~3 GiB/task at 8c/128g).
+      # 12 workers × ~2 × 4c/96g executors. Smaller shuffle chunks (2400 partitions,
+      # REPARTITION hint aligned) + more heap per task vs 8c to cut clean/events spill.
       spark.executor.memory: "96g"
       spark.executor.memoryOverhead: "8g"
-      spark.executor.cores: "8"
-      spark.sql.shuffle.partitions: "800"
-      spark.sql.adaptive.advisoryPartitionSizeInBytes: "256MB"
+      spark.executor.cores: "4"
+      spark.sql.shuffle.partitions: "2400"
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "128MB"
       spark.databricks.delta.checkpoint.partSize: "10000"
 validation:
   cluster:
@@ -49,8 +49,8 @@ validation:
         spark.driver.memoryOverhead: "4g"
         spark.executor.memory: "96g"
         spark.executor.memoryOverhead: "8g"
-        spark.executor.cores: "8"
-        spark.sql.shuffle.partitions: "800"
-        spark.sql.adaptive.advisoryPartitionSizeInBytes: "256MB"
+        spark.executor.cores: "4"
+        spark.sql.shuffle.partitions: "2400"
+        spark.sql.adaptive.advisoryPartitionSizeInBytes: "128MB"
         spark.databricks.delta.checkpoint.partSize: "10000"
   allow_custom_spark_job: true
