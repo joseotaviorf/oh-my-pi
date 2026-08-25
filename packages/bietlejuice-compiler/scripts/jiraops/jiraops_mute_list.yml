@@ -14,6 +14,7 @@ DAG:
     - bietlejuice.enrich_atlas_db_quality_metrics
     - bietlejuice.enrich_chat_messages
     - bietlejuice.enrich_chat_tool_calls
+    - bietlejuice.enrich_concierge_privacy_facts
     - bietlejuice.enrich_crawler_chaves_na_mao
     - bietlejuice.enrich_crawler_df_imoveis
     - bietlejuice.enrich_crawler_loft

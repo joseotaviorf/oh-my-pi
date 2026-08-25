@@ -1,0 +1,25 @@
+dag:
+  name: enrich_concierge_privacy_facts
+  schedule_start_date: 2026, 8, 24
+  schedule_interval: 0 5 * * *
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Privacy facts used by concierge audiences and the placas LPV-reprocess
+      POC. The DAG materializes concierge snooze and informative-message
+      opt-out purposes from Privacy Hub so consumers do not repeatedly explode
+      purpose_acceptances. Each daily run stores the latest purpose state per
+      person after Privacy Hub's daily source refresh.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: search
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  tables_customization:
+    concierge_privacy_user:
+      merge_on: [id_person, year, month, day]
+      partitions: [year, month, day]
+      z_order_by: [id_person]

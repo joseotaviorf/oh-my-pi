@@ -1,0 +1,78 @@
+---
+database_name: datalake_search
+table_name: concierge_privacy_user
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Privacy snapshot for concierge use cases, with one row per CDP person per
+  snapshot day. Each daily run captures the latest
+  SNOOZE_CONCIERGE and TENANT_MESSAGE_AI_INFORMATIVE purpose states, so the
+  concierge audience combiner and placas LPV-reprocess eligibility checks read
+  one current row per person plus the history of previous days. The cadence
+  follows the daily refresh of the Privacy Hub source table. Users without a
+  CDP person identifier are excluded because id_person is part of the merge
+  key. This analytical snapshot never replaces the live Privacy Hub send-time
+  gate.
+columns:
+  id_user:
+    description: |
+      Internal QuintoAndar user identifier parsed from the Privacy Hub external
+      subject identifier and used to join concierge datasets.
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.id_external
+  id_person:
+    description: |
+      CDP person identifier associated with the QuintoAndar user. Together with
+      the snapshot partition columns it forms the merge key, so only users with
+      a CDP person mapping are included.
+    lineage:
+      - datalake_cdp.users.id_person
+  snooze_concierge_status:
+    description: |
+      Latest Privacy Hub status for the SNOOZE_CONCIERGE purpose, such as
+      ACTIVE or EXPIRED, for the user at snapshot time.
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.purpose_acceptances
+  tenant_message_ai_informative_status:
+    description: |
+      Latest Privacy Hub status for TENANT_MESSAGE_AI_INFORMATIVE, used to
+      identify users who withdrew consent for informative AI messages.
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.purpose_acceptances
+  ts_snooze_concierge_updated:
+    description: |
+      Timestamp of the latest SNOOZE_CONCIERGE purpose-state update in Privacy
+      Hub for this user.
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.purpose_acceptances
+  ts_tenant_message_ai_informative_updated:
+    description: |
+      Timestamp of the latest TENANT_MESSAGE_AI_INFORMATIVE purpose-state
+      update in Privacy Hub for this user.
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.purpose_acceptances
+  is_snooze_concierge_active:
+    description: |
+      Whether the latest SNOOZE_CONCIERGE state is ACTIVE and concierge
+      targeting should treat the user as snoozed.
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.purpose_acceptances
+  is_tenant_message_ai_informative_withdrawn:
+    description: |
+      Whether the latest TENANT_MESSAGE_AI_INFORMATIVE state is WITHDRAWN and
+      informative AI messaging should treat the user as opted out.
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.purpose_acceptances
+  is_concierge_privacy_suppressed:
+    description: |
+      Combined analytical suppression flag that is true when concierge snooze
+      is active or informative AI messaging is withdrawn. Live dispatch must
+      still revalidate Privacy Hub.
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.purpose_acceptances
+  year:
+    description: Snapshot year partition.
+  month:
+    description: Snapshot month partition.
+  day:
+    description: Snapshot day partition.
