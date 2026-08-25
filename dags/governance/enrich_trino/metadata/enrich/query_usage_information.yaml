@@ -6,9 +6,6 @@ domain: Data Ops & Governance
 description: This table contains information about queries events on Trino.
   Each line will have information about the query, bi tool and query purpose, if is a
   exploratory query or is used in a dashboards.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id_query:
@@ -63,8 +60,6 @@ columns:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.id_resource_group
     description: User to request to run the query.
-    privacy:
-      piiType: personal_email
   session_user:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.id_resource_group

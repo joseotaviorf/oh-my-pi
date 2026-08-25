@@ -42,8 +42,7 @@ Return: exit code and any error lines per DAG.
 For every changed `.sql` file, verify that a matching `.yml` exists in `metadata/{layer}/` with the same base name. Also check:
 - `description:` field is present and ≥ 10 chars
 - All columns have `lineage:` (enrich/dw) or `dimension:`/`metric:` block (metric layer)
-- **Phase 1 — do not suggest PII classification:** omit `privacy` on routine PRs. Do **not** flag missing `privacy` on cpf/email/name columns. If the diff adds `personal_data_classification`, flag for **removal** (CI rejects it) — do not suggest `privacy` as replacement unless the PR is an explicit classification effort.
-- If the diff **already includes** `privacy`: validate `piiType` exists in `governance/pii_catalog/pii_catalog.yml`; `dataSubjectType` ∈ {customer, employee, partner}; RAE rows match `governance/pii_anonymization_controls/` when applicable.
+- **Do not suggest PII classification in metadata:** omit `privacy`, `piiType`, `dataSubjectType`, and `personal_data_classification`. If the diff adds any of those keys, flag for **removal** (CI rejects them). Lake-column PII scanning is the `enrich_anonymization` DAG.
 - **Python `str.format` on query files:** For `dags/**/queries/**/*.sql` loaded by `query_delta`-style pipelines (`TableLoaderPipeline` applies `.format(**query_template_params)`), scan for `{` inside string literals. Regex quantifiers (e.g. `{4}`, `{2,3}`), JSON, or other literals must use **`{{` / `}}`** so Spark receives single braces; otherwise the job fails at runtime with `KeyError` or `IndexError` (see **`databricks_conventions.mdc`** — Literal Braces, and **`sql_conventions.mdc`** §13). Flag obvious mistakes as **blocking** when the pattern is clearly a literal brace, not a declared `{load_start_date}`-style key.
 
 Return: list of missing or incomplete metadata files.
@@ -123,9 +122,7 @@ Group all issues by severity:
 - Lint errors (`make lint`)
 - Missing metadata files
 - DAG declaration schema errors
-- `personal_data_classification` on a column (deprecated — remove; CI rejects it)
-- Invalid `privacy.piiType` or `dataSubjectType` **when `privacy` is already in the diff** (`make validate-pii-privacy`)
-- RAE control without matching `privacy` + `customer` on the same `id_entity` (when RAE file is in the diff)
+- `personal_data_classification` or `privacy` / `piiType` on a column (not a metadata field — remove; CI rejects it)
 
 **Non-blocking but should fix:**
 - Python convention violations
@@ -155,7 +152,6 @@ If all checks pass (or after fixes are applied), draft the PR description using 
 [Describe how the change was validated]
 - make validate-dag-declaration-files dag_name={dag_name} ✅
 - make validate-metadata-files-content ✅
-- make validate-pii-privacy ✅ (only when diff includes `privacy` or `governance/pii_*`)
 - make check-style ✅
 - make check-style-dags ✅
 - make lint ✅

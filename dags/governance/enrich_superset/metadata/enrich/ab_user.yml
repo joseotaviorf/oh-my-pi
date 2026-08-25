@@ -8,9 +8,6 @@ description: >
   database via CDC (superset_internal, daily 00:00 UTC). Grain is one row per registered user
   account per load date. Partitioned by year, month, day — filter on ingestion date. Supports
   governance analytics on Superset identity, login activity, and account lifecycle.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id:
@@ -29,26 +26,18 @@ columns:
     lineage:
       - datalake_superset_clean.ab_user.first_name
     description: User's given name as registered in the Superset account profile.
-    privacy:
-      piiType: full_name
   last_name:
     lineage:
       - datalake_superset_clean.ab_user.last_name
     description: User's family name as registered in the Superset account profile.
-    privacy:
-      piiType: full_name
   username:
     lineage:
       - datalake_superset_clean.ab_user.username
     description: Login username (typically corporate email) used to authenticate into Superset.
-    privacy:
-      piiType: personal_email
   email:
     lineage:
       - datalake_superset_clean.ab_user.email
     description: Corporate email address associated with the Superset account for notifications and SSO.
-    privacy:
-      piiType: personal_email
   is_active:
     lineage:
       - datalake_superset_clean.ab_user.active

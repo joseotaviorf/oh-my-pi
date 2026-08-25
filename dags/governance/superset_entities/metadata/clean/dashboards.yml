@@ -8,9 +8,6 @@ description: >
   PostgreSQL dashboards table via CDC (superset_entities, daily 00:00 UTC). Grain is one row per
   dashboard per load date. Partitioned by year, month, day — filter on ingestion date. Supports
   governance analytics on dashboard inventory, publication status, certification, and layout metadata.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id:
@@ -61,8 +58,6 @@ columns:
     lineage:
       - datalake_superset_raw.dashboards.certified_by
     description: Name or team label of the person or group that certified the dashboard as trusted for consumption.
-    privacy:
-      piiType: full_name
   certification_details:
     lineage:
       - datalake_superset_raw.dashboards.certification_details

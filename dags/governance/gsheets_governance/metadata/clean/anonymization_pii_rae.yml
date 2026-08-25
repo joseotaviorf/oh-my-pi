@@ -7,9 +7,6 @@ description: >
   Sheet and ingested by gsheets_governance. Each row documents a column exempt from standard PII
   anonymization, including approval workflow, LGPD impact, and review dates. Grain is one row per
   id_rae.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id_rae:
@@ -36,8 +33,6 @@ columns:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.requester
     description: Person who submitted the RAE use case for governance review.
-    privacy:
-      piiType: personal_email
   justification:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.justification
@@ -58,14 +53,10 @@ columns:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.focal_points
     description: Governance contacts responsible for ongoing review of the RAE case.
-    privacy:
-      piiType: personal_email
   approved_by:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.approved_by
     description: Person who formally approved the RAE exception for production use.
-    privacy:
-      piiType: personal_email
   dt_activation:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.date_of_activation

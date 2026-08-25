@@ -29,7 +29,7 @@ from bietlejuice.governance.domain_registry import domain_allowlist_pattern
 
 _COMPILER_ROOT = Path(__file__).resolve().parents[2]
 _SCHEMA_DIR = _COMPILER_ROOT / "scripts" / "services" / "metadata_file_schemas"
-# Only these layers carry a `domain:` field. privacy_schema.yml does not.
+# Only these layers carry a `domain:` field.
 _SCHEMA_LAYERS = ("raw", "clean", "core", "enrich_dw", "metric")
 
 # Captures the literal `domain: regex('<alternation>')` line, preserving prefix

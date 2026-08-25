@@ -4,9 +4,6 @@ table_name: jira_alert_actions
 domain: Cross
 description: This table contains enriched information about actions and notifications of Jira alerts.
 owner: anne.macedo@quintoandar.com.br
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id_alert:
@@ -25,8 +22,6 @@ columns:
     description: The user of the person who acknowledged the alert
     lineage:
     - datalake_jira_ops_clean.alert_log.owner
-    privacy:
-      piiType: personal_email
   card_creation_status:
     description: The status of the DEI Automation card creation for this alert
     lineage:

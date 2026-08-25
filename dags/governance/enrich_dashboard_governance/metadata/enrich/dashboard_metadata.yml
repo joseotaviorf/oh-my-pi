@@ -8,9 +8,6 @@ description: >
   view activity, and linked chart ids. Built from datalake_metabase_clean sources as of the
   load partition date. Grain is one row per dashboard id per load date. Partitioned by year,
   month, day.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   platform:
@@ -44,8 +41,6 @@ columns:
       - datalake_metabase_clean.core_user.email
       - datalake_looker_clean.users.email
     description: Work email of the Metabase user who created or owns the dashboard record.
-    privacy:
-      piiType: personal_email
   domain:
     lineage:
       - datalake_metabase_clean.collection.name

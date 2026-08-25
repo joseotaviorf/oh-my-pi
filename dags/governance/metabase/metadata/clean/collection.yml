@@ -7,9 +7,6 @@ description: >
   collection table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one
   row per collection folder per load. Supports governance analytics on dashboard organization,
   ownership, and archival status across Metabase workspaces.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id:
@@ -24,8 +21,6 @@ columns:
     lineage:
       - datalake_metabase_raw.collection.name
     description: Display title of the folder shown in the Metabase navigation sidebar and collection picker.
-    privacy:
-      piiType: full_name
   description:
     lineage:
       - datalake_metabase_raw.collection.description

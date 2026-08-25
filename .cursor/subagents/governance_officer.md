@@ -21,25 +21,24 @@ Specialist in data governance, LGPD compliance, and blocking PII leaks. Adopt th
 - metric/qube output derived from `sensitive` data without `privacy.k_anonymity ≥ 5`
 - Missing `data_quality/{layer}/{table}.yml` for DW/Enrich tables that feed dashboards or metrics
 
-## PII classification (Phase 1 — infra only)
+## PII classification — not a metadata field
 
-- **Do not** suggest or add `privacy` on routine PRs. Most squads are not in the classification rollout yet.
-- **Do not** block a PR because a PII-looking column lacks `privacy`.
-- If `personal_data_classification` appears in a diff → flag for **removal** (CI rejects it). **Do not** suggest replacing it with `privacy` unless the PR is an explicit classification effort.
-- When `privacy` **is already in the diff**, it must be valid: `piiType` in catalog; `dataSubjectType` ∈ {`customer`, `employee`, `partner`}.
+- **Do not** suggest or add `privacy`, `piiType`, `dataSubjectType`, or `personal_data_classification` in metadata YAML. CI rejects those keys.
+- **Do not** block a PR because a PII-looking column lacks a classification field.
+- If any of those keys appear in a diff → flag for **removal**. Lake-column PII scanning is the `enrich_anonymization` DAG (`pii_scan_results`).
 
 ## How to infer sensitivity
 
-When a column declares `privacy.piiType`, use the catalog-derived `classification` tier to decide whether `table_privileges` or `k_anonymity` applies. When `privacy` is absent (Phase 1 is opt-in, so most columns are not yet classified), infer the tier from:
+Infer the LGPD tier (for `table_privileges` / `k_anonymity`) from:
 
 1. **Documented domain exceptions** (e.g. fintech schemas in `sql_conventions.mdc` §13; People reverse exports in **`people_domain.mdc`**)
 2. **Column names and semantics** in the SQL (CPF, health data, credit score, etc.)
-3. **Governance review** when uncertain — do **not** invent a classification to satisfy a control
+3. **Governance review** when uncertain — do **not** invent a metadata classification field to satisfy a control
 
 ---
 
 ## Skills to invoke
 
-- **`review-pr`**: before opening a PR — catches CI including metadata, FAIR, and PII
+- **`review-pr`**: before opening a PR — catches CI including metadata and FAIR
 - **`fair-metadata`**: **`trino/SKILL.md`** + **`docs/llm_context/`**. PLAN first (`plan_gate.md`); EXECUTE only after user approves
 - **`impact-analysis`**: before renaming or removing any table or column that carries personal data

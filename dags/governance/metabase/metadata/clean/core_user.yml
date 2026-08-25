@@ -7,9 +7,6 @@ description: >
   table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one row per
   registered user per load date. Partitioned by year, month, day — filter on ingestion date.
   Supports governance analytics on BI adoption, admin privileges, and login activity.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id:
@@ -20,20 +17,14 @@ columns:
     lineage:
       - datalake_metabase_raw.core_user.email
     description: Corporate email address used for Metabase login and Pulse subscription delivery.
-    privacy:
-      piiType: personal_email
   first_name:
     lineage:
       - datalake_metabase_raw.core_user.first_name
     description: Given name of the person associated with the Metabase account profile.
-    privacy:
-      piiType: full_name
   last_name:
     lineage:
       - datalake_metabase_raw.core_user.last_name
     description: Family name of the person associated with the Metabase account profile.
-    privacy:
-      piiType: full_name
   sso_source:
     lineage:
       - datalake_metabase_raw.core_user.sso_source

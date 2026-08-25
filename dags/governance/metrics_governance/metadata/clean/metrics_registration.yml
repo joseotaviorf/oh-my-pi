@@ -8,9 +8,6 @@ description: >
   form. Each row describes an approved business metric including definition, calculation,
   ownership, and materialization status. Grain is one row per registered metric per load
   date. Partitioned by year, month, day.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
     metric_name:
@@ -49,20 +46,14 @@ columns:
       description: Email of the person who originally registered the metric in the catalog.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.created_by
-      privacy:
-        piiType: personal_email
     updated_by:
       description: Email of the person who last edited the metric registration record.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.updated_by
-      privacy:
-        piiType: personal_email
     approved_by:
       description: Email of the governance approver who validated the metric for official use.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.approved_by
-      privacy:
-        piiType: personal_email
     is_additive:
       description: Flag indicating whether the metric values can be summed safely across dimensions.
       lineage:

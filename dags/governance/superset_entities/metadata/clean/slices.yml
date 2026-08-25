@@ -8,9 +8,6 @@ description: >
   PostgreSQL slices table via CDC (superset_entities, daily 00:00 UTC). Grain is one row per chart
   per load date. Partitioned by year, month, day — filter on ingestion date. Supports governance
   analytics on chart inventory, visualization types, dataset bindings, and certification status.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id:
@@ -85,8 +82,6 @@ columns:
     lineage:
       - datalake_superset_raw.slices.certified_by
     description: Name or team label of the person or group that certified the chart as trusted for consumption.
-    privacy:
-      piiType: full_name
   certification_details:
     lineage:
       - datalake_superset_raw.slices.certification_details

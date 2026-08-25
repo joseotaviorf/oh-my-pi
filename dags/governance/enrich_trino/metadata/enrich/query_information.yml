@@ -7,9 +7,6 @@ description: >
   data_platform_metrics by enrich_trino (daily 05:00 UTC). Grain is one row per query and referenced
   table per execution date. Partitioned by year, month, day — filter on extraction date. Supports
   query observability and table usage analytics.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id_query:
@@ -36,8 +33,6 @@ columns:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.resourceGroupId
     description: Username of the person or service account that executed the query in Trino.
-    privacy:
-      piiType: personal_email
   state:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.state

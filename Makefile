@@ -932,15 +932,6 @@ validate-domain-allowlist-sync:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/sync_domain_allowlist.py --check
 
-.PHONY: validate-pii-privacy
-validate-pii-privacy:
-	@echo ""
-	@echo "Validating PII privacy sections in metadata files"
-	@echo "=========="
-	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
-	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_pii_privacy.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
-
 .PHONY: validate-metadata-files-exist
 validate-metadata-files-exist:
 	@echo ""

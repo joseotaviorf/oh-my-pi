@@ -6,9 +6,6 @@ description: >
   and diagnosing issues in ingestion and transformation processes.
 domain: Data Ops & Governance
 owner: luisa.ladeira@quintoandar.com.br
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id_alert:
@@ -23,8 +20,6 @@ columns:
     lineage:
       - datalake_jira_ops_raw.alert_log.log
     description: Detailed message or content of the alert log.
-    privacy:
-      piiType: cookies
   owner:
     lineage:
       - datalake_jira_ops_raw.alert_log.owner

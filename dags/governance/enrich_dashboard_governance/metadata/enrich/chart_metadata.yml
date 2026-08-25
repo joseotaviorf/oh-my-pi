@@ -4,9 +4,6 @@ table_name: chart_metadata
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
 description: It aims to extract detailed information about Metabase charts
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   chart_path:
@@ -46,8 +43,6 @@ columns:
     lineage:
       - datalake_metabase_clean.core_user.email
     description: It shows the email addresses of the people who created the chart
-    privacy:
-      piiType: personal_email
   platform:
     description: BI platform identifier for the chart source (metabase).
   status:

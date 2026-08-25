@@ -54,9 +54,6 @@ Exception: a skill that *intentionally* isolates a CLI tool may do so — but pr
 - **`astro/`** — local + Astro "dev" Airflow project (same image as CI). Forno/prod still use
   `make create-dag-files` (stubs + gitignored parse-time manifests). Astro "dev" uses
   `make create-astro-dag-files` (domain + migration bundles; see `.woodpecker/development.yml`).
-- **`governance/`** — normative **policy-as-data** (CI-enforced): `pii_catalog/` (PII type catalog)
-  and `pii_anonymization_controls/` (RAE registry). Owned by `@quintoandar/data-ops-governance`.
-  Distinct from `dags/governance/` (pipelines) and `packages/*/src/bietlejuice/governance/` (Python code).
 - **`Makefile`** — all dev/CI targets (`install`, `create-dag-files`, `create-astro-dag-files`,
   `run-local-environment`, `check-style`, `tests`, the `validate-*` governance checks, …).
 

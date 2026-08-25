@@ -7,9 +7,6 @@ description: >
   pulse_channel table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one
   row per delivery channel per load date. Partitioned by year, month, day — filter on ingestion
   date. Supports governance analytics on email and Slack subscription schedules.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id:
@@ -28,8 +25,6 @@ columns:
     lineage:
       - datalake_metabase_raw.pulse_channel.details
     description: JSON configuration for the channel such as Slack webhook URL, email subject, or recipient overrides.
-    privacy:
-      piiType: personal_phone
   schedule_type:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_type

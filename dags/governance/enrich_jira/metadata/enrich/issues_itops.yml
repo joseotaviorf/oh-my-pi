@@ -7,9 +7,6 @@ description: >
   resolution timestamps parsed from custom fields. Grain is one row per id_issue.
 domain: Data Ops & Governance
 owner: luisa.ladeira@quintoandar.com.br
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   id:
@@ -44,26 +41,18 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Display name of the Jira user who reported the ticket.
-    privacy:
-      piiType: full_name
   reporter_email:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Email address of the Jira user who reported the ticket.
-    privacy:
-      piiType: personal_email
   creator_name:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Display name of the Jira user who created the ticket record.
-    privacy:
-      piiType: full_name
   creator_email:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Email address of the Jira user who created the ticket record.
-    privacy:
-      piiType: personal_email
   departament:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -76,14 +65,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Display name of the agent currently assigned to resolve the ticket.
-    privacy:
-      piiType: full_name
   assignee_email:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Email address of the agent currently assigned to resolve the ticket.
-    privacy:
-      piiType: personal_email
   support_level:
     lineage:
       - datalake_jira_clean.issues.fields

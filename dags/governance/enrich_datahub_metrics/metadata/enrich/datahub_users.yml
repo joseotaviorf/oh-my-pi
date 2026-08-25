@@ -3,9 +3,6 @@ table_name: datahub_users
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
 description: It aims to extract detailed information about DataHub Users, enriching org_chart data with tool usage flags to analyze adoption.
-privacy:
-  dataSubjectType:
-    - employee
 
 columns:
   user_email:
@@ -13,8 +10,6 @@ columns:
       - datalake_people_public.org_chart.work_email
       - datalake_amplitude_clean.events.event_properties
     description: The unique corporate email of the employee. Extracted by parsing the DataHub URN (split on 'urn:li:corpuser:') or directly from the Org Chart.
-    privacy:
-      piiType: personal_email
   area_class:
     lineage:
       - datalake_people_public.org_chart.chapter
