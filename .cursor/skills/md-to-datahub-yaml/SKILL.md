@@ -27,7 +27,6 @@ Authoring templates (source of truth for section names):
 
 - Retrofitting: an existing entity `.md` has no companion YAML yet.
 - Standalone invocation: a single entity's YAML needs updating after the Markdown changed.
-- Called from `create-business-entity-doc` / `create-metric-entity-doc` after writing a new Markdown.
 
 ---
 
@@ -351,8 +350,8 @@ Before presenting the YAML to the user:
 - [ ] `stable_urn` is `"TBD"` on every golden query (CI assigns)
 - [ ] `sql:` is a short placeholder on every golden query (e.g. `"(injected by CI from Markdown)"`)
   — do NOT hand-author the query text; CI injects the exact Markdown SQL by position after
-  generation (Trino-dialect validity is checked at authoring time by the
-  `create-business-entity-doc` / `create-metric-entity-doc` skills, not here)
+  generation (Trino-dialect validity is checked at authoring time by TARS when creating
+  context docs, not here)
 - [ ] Each glossary term has `id` (snake_case), `name`, and `description` populated
 - [ ] `documentation_link.url` points to the correct `{subdir}/{entity}.md` path
 - [ ] `structured_property.qualified_name` is `br.com.quintoandar.datahub.data_product.golden_query`
