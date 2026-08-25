@@ -187,64 +187,109 @@ old_agent_history AS (
             AND daily_status.dt_ref >= DATE(ure.ts_revision)
 )
 SELECT
-    ds.id_agent_daily AS sk_agent_daily,
-    ds.id_agent AS sk_agent,
-    COALESCE(ad.id_agent_data, ds.id_agent_data) AS sk_agent_data,
-    COALESCE(ad.id_partner, ds.id_partner) AS sk_partner,
-    COALESCE(ad.id_user, ds.id_user) AS sk_user,
-    COALESCE(cb.sk_broker, -1) AS sk_broker,
-    IF(ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED'), t.sk_tier_demand_conversion_fr, NULL) AS sk_tier_demand_conversion_fr,
-    IF(ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED'), t.sk_tier_demand_conversion_fs, NULL) AS sk_tier_demand_conversion_fs,
-    COALESCE(ad.uuid_company, ds.uuid_company) AS uuid_company,
-    COALESCE(ad.uuid_agent, ds.uuid_agent) AS uuid_agent,
-    COALESCE(ad.uuid_person, ds.uuid_person) AS uuid_person,
-    COALESCE(ad.creci, ds.creci) AS creci,
-    COALESCE(ad.creci_uf, ds.creci_uf) AS creci_uf,
-    COALESCE(ad.affiliation_type, ds.affiliation_type) AS affiliation_type,
-    product.product_name AS profile,
-    IF(ds.agent_status IS NULL, NULL, ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')) AS is_agent_active,
-    IF(ds.cap_supply_aq_status IS NULL, NULL, ds.cap_supply_aq_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_supply_acquisition,
-    IF(ds.cap_supply_conv_status IS NULL, NULL, ds.cap_supply_conv_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_supply_conversion,
-    IF(ds.cap_demand_visit_status IS NULL, NULL, ds.cap_demand_visit_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_demand_visit,
-    IF(ds.cap_demand_aq_status IS NULL, NULL, ds.cap_demand_aq_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_demand_acquisition,
-    IF(ds.cap_negotiation_status IS NULL, NULL, ds.cap_negotiation_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_negotiation,
-    vdh.is_allow_demand_sale,
-    vdh.is_allow_demand_rent,
-    COALESCE(oah.is_passive_lead_receiver, vdh.is_passive_lead_receiver) AS is_passive_lead_receiver,
-    COALESCE(ad.is_1p_partnership, ds.is_1p_partnership) AS is_1p_partnership,
-    COALESCE(ad.is_3p_partnership, ds.is_3p_partnership) AS is_3p_partnership,
-    TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) AS days_in_current_status,
-    ds.ts_last_status_changed,
-    COALESCE(ad.ts_created, ds.ts_created) AS ts_created,
-    ds.dt_ref,
-    ds.year,
-    ds.month,
-    ds.day
-FROM
-    daily_status AS ds
-LEFT JOIN
-    visit_demand_history AS vdh
-        ON vdh.id_agent_daily = ds.id_agent_daily
-        AND vdh.is_last_update IS TRUE
-LEFT JOIN
-    datalake_agent_accreditation.agent_daily AS ad
-        ON ad.id_agent_daily = ds.id_agent_daily
-LEFT JOIN
-    old_agent_history AS oah
-        ON oah.id_agent_daily = ds.id_agent_daily
-        AND oah.is_last_update IS TRUE
-LEFT JOIN
-    tier AS t
-        ON t.id_agent_daily = ds.id_agent_daily
-LEFT JOIN
-    core_brokers.brokers AS cb
-        ON COALESCE(ad.uuid_company, ds.uuid_company) = cb.uuid_company
-        AND COALESCE(ad.is_3p_partnership, ds.is_3p_partnership) = TRUE
-LEFT JOIN
-    datalake_ebdb_agent_events.agent_product AS product
-        ON ds.id_agent = product.id_agent
-        AND product.is_valid_product IS TRUE
-        AND product.is_lastest_valid IS TRUE
+    sk_agent_daily,
+    sk_agent,
+    sk_agent_data,
+    sk_partner,
+    sk_user,
+    sk_broker,
+    sk_tier_demand_conversion_fr,
+    sk_tier_demand_conversion_fs,
+    uuid_company,
+    uuid_agent,
+    uuid_person,
+    creci,
+    creci_uf,
+    affiliation_type,
+    profile,
+    is_agent_active,
+    is_allow_supply_acquisition,
+    is_allow_supply_conversion,
+    is_allow_demand_visit,
+    is_allow_demand_acquisition,
+    is_allow_negotiation,
+    is_allow_demand_sale,
+    is_allow_demand_rent,
+    is_passive_lead_receiver,
+    is_1p_partnership,
+    is_3p_partnership,
+    days_in_current_status,
+    ts_last_status_changed,
+    ts_created,
+    dt_ref,
+    year,
+    month,
+    day
+FROM (
+    SELECT
+        ds.id_agent_daily AS sk_agent_daily,
+        ds.id_agent AS sk_agent,
+        COALESCE(ad.id_agent_data, ds.id_agent_data) AS sk_agent_data,
+        COALESCE(ad.id_partner, ds.id_partner) AS sk_partner,
+        COALESCE(ad.id_user, ds.id_user) AS sk_user,
+        COALESCE(cb.sk_broker, -1) AS sk_broker,
+        IF(ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED'), t.sk_tier_demand_conversion_fr, NULL) AS sk_tier_demand_conversion_fr,
+        IF(ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED'), t.sk_tier_demand_conversion_fs, NULL) AS sk_tier_demand_conversion_fs,
+        COALESCE(ad.uuid_company, ds.uuid_company) AS uuid_company,
+        COALESCE(ad.uuid_agent, ds.uuid_agent) AS uuid_agent,
+        COALESCE(ad.uuid_person, ds.uuid_person) AS uuid_person,
+        COALESCE(ad.creci, ds.creci) AS creci,
+        COALESCE(ad.creci_uf, ds.creci_uf) AS creci_uf,
+        COALESCE(ad.affiliation_type, ds.affiliation_type) AS affiliation_type,
+        product.product_name AS profile,
+        IF(ds.agent_status IS NULL, NULL, ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')) AS is_agent_active,
+        IF(ds.cap_supply_aq_status IS NULL, NULL, ds.cap_supply_aq_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_supply_acquisition,
+        IF(ds.cap_supply_conv_status IS NULL, NULL, ds.cap_supply_conv_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_supply_conversion,
+        IF(ds.cap_demand_visit_status IS NULL, NULL, ds.cap_demand_visit_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_demand_visit,
+        IF(ds.cap_demand_aq_status IS NULL, NULL, ds.cap_demand_aq_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_demand_acquisition,
+        IF(ds.cap_negotiation_status IS NULL, NULL, ds.cap_negotiation_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_negotiation,
+        vdh.is_allow_demand_sale,
+        vdh.is_allow_demand_rent,
+        COALESCE(oah.is_passive_lead_receiver, vdh.is_passive_lead_receiver) AS is_passive_lead_receiver,
+        COALESCE(ad.is_1p_partnership, ds.is_1p_partnership) AS is_1p_partnership,
+        COALESCE(ad.is_3p_partnership, ds.is_3p_partnership) AS is_3p_partnership,
+        TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) AS days_in_current_status,
+        ds.ts_last_status_changed,
+        COALESCE(ad.ts_created, ds.ts_created) AS ts_created,
+        ds.dt_ref,
+        ds.year,
+        ds.month,
+        ds.day,
+        -- EMR-safe dedupe backstop: guarantees one row per sk_agent_daily so the
+        -- incremental MERGE never sees multiple source rows for the same key.
+        -- QUALIFY is not supported on EMR Spark, so we use ROW_NUMBER + outer filter.
+        ROW_NUMBER() OVER (
+            PARTITION BY ds.id_agent_daily
+            ORDER BY ds.dt_ref
+        ) AS rn_dedup
+    FROM
+        daily_status AS ds
+    LEFT JOIN
+        visit_demand_history AS vdh
+            ON vdh.id_agent_daily = ds.id_agent_daily
+            AND vdh.is_last_update IS TRUE
+    LEFT JOIN
+        datalake_agent_accreditation.agent_daily AS ad
+            ON ad.id_agent_daily = ds.id_agent_daily
+    LEFT JOIN
+        old_agent_history AS oah
+            ON oah.id_agent_daily = ds.id_agent_daily
+            AND oah.is_last_update IS TRUE
+    LEFT JOIN
+        tier AS t
+            ON t.id_agent_daily = ds.id_agent_daily
+    LEFT JOIN
+        core_brokers.brokers AS cb
+            ON COALESCE(ad.uuid_company, ds.uuid_company) = cb.uuid_company
+            AND COALESCE(ad.is_3p_partnership, ds.is_3p_partnership) = TRUE
+    LEFT JOIN
+        datalake_ebdb_agent_events.agent_product AS product
+            ON ds.id_agent = product.id_agent
+            AND product.is_valid_product IS TRUE
+            AND product.is_lastest_valid IS TRUE
+    WHERE
+        ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')
+        OR (ds.agent_status = 'AGENT_INACTIVATED' AND TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) < 1)
+) AS deduped
 WHERE
-    ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')
-    OR (ds.agent_status = 'AGENT_INACTIVATED' AND TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) < 1)
+    rn_dedup = 1
