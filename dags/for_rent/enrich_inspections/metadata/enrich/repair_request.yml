@@ -56,17 +56,22 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_clean.repair_request.type
-    description: "Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories)."
-    categories:
-      REPAIR: Make item repair.
-      CLEAN: Clean the item.
-      TAKE AWAY: Remove item left in the property.
-      GIVE BACK: Replace item that was in the property.
-      OTHER: Other types not listed.
+    description: >
+      Cause or nature of the item identified on the inspection report. It is not a
+      closed enum of process actions (repair, clean, take away, give back, other),
+      and values are written with underscores. The column is open-ended, holding
+      dozens of distinct values. The ten most frequent on
+      dw_inspections.dim_repair_request are PREEXISTING, OTHER, REPAIR,
+      MALFUNCTIONING, LACK_OF_MAINTENANCE, DIRT, STRUCTURAL_DAMAGE, ABSENT_ITEM,
+      MILD_DAMAGE and STRUCTURAL_MOISTURE. Query the column for the full current
+      list before relying on any fixed set of values.
   item_name:
     lineage:
       - datalake_inspection_services_clean.repair_request.name
-    description: Name of the item to be repaired
+    description: >
+      Name of the item to be repaired. Values are not normalized at source:
+      leading/trailing spaces, capitalization variants, and numbered suffixes are
+      common. Distinct counts without TRIM(UPPER(...)) overestimate real cardinality.
   room_name:
     lineage:
       - datalake_inspection_services_clean.repair_request.room_name
@@ -88,7 +93,10 @@ columns:
   repair_type:
     lineage:
       - datalake_inspection_services_clean.repair_request.type
-    description: Type of repair requested
+    description: >
+      Mirror of type (same source column). Use type as the canonical field in new
+      queries. On dw_inspections.dim_repair_request, type and repair_type had zero
+      divergences in the full table.
   comment:
     lineage:
       - datalake_inspection_services_clean.repair_request.comment
@@ -100,7 +108,10 @@ columns:
   repair_service:
     lineage:
       - datalake_inspection_services_clean.repair_request.repair_service
-    description: Repair service requested
+    description: >
+      Repair service requested. Values are not normalized at source: leading/trailing
+      spaces, capitalization variants, and numbered suffixes are common. Distinct
+      counts without TRIM(UPPER(...)) overestimate real cardinality.
   total_media:
     lineage:
       - datalake_inspections.report_review_media.id_media

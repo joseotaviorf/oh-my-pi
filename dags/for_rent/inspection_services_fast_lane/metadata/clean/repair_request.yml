@@ -44,13 +44,15 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.repair_request.type
-    description: Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories).
-    categories:
-      REPAIR: Make item repair.
-      CLEAN: Clean the item.
-      TAKE AWAY: Remove item left in the property.
-      GIVE BACK: Replace item that was in the property.
-      OTHER: Other types not listed.
+    description: >
+      Cause or nature of the item identified on the inspection report. It is not a
+      closed enum of process actions (repair, clean, take away, give back, other),
+      and values are written with underscores. The column is open-ended, holding
+      dozens of distinct values. The ten most frequent on
+      dw_inspections.dim_repair_request are PREEXISTING, OTHER, REPAIR,
+      MALFUNCTIONING, LACK_OF_MAINTENANCE, DIRT, STRUCTURAL_DAMAGE, ABSENT_ITEM,
+      MILD_DAMAGE and STRUCTURAL_MOISTURE. Query the column for the full current
+      list before relying on any fixed set of values.
   comment:
     lineage:
       - datalake_inspection_services_raw.repair_request.comment
@@ -131,6 +133,31 @@ columns:
     lineage:
       - datalake_inspection_services_raw.repair_request.updated_at
     description: Update date
+  op_cdc:
+    lineage:
+      - datalake_inspection_services_raw.repair_request.op_cdc
+    description: >
+      CDC operation captured by Debezium for this row version, appended by the clean
+      CDC load. Used to tell an initial snapshot apart from a change written by the
+      source system.
+    categories:
+      r: Read/snapshot - row present at the initial load of the table.
+      c: Create - record inserted in the source system.
+      u: Update - record modified in the source system.
+      d: Delete - record removed in the source system. Not kept as a row here; the CDC merge deletes the matching row instead.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_inspection_services_raw.repair_request.ts_cdc_transaction
+    description: >
+      Timestamp when the CDC connector captured this change event. Drives the
+      incremental load window and can be compared against ts_database_transaction to
+      measure ingestion lag.
+  ts_database_transaction:
+    lineage:
+      - datalake_inspection_services_raw.repair_request.ts_database_transaction
+    description: >
+      Timestamp of the originating transaction in the source database, before CDC
+      propagation. Represents when the change actually happened in the product.
   year:
     lineage:
       - datalake_inspection_services_raw.repair_request.year

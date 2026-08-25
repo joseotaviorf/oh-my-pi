@@ -30,12 +30,15 @@ columns:
   reason:
     lineage:
       - datalake_inspection_services_raw.contestation.reason
-    description: "Reason/Justification for dispute"
+    description: >
+      Reason or justification for the contestation. This is the usable field for why
+      the repair was contested.
     categories:
-      DISAGREE: ""
-      SAME: ""
-      REPAIR_NEGOTIATED: ""
-      OTHER: ""
+      SAME: Written by the current flow.
+      OTHER: Written by the current flow.
+      REPAIR_NEGOTIATED: Written by the current flow.
+      VALUE_HIGHER_THAN_EXPECTED: Written by the current flow. The enum name alone is not a confirmed product definition.
+      DISAGREE: Legacy. Only appears on rows loaded from the historical snapshot, never on rows written by the current flow.
   origin:
     lineage:
       - datalake_inspection_services_raw.contestation.origin
@@ -46,10 +49,13 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.contestation.type
-    description: Descriptive information indicating the type of contestation made.
+    description: >
+      Legacy contestation type. The current flow almost never fills this column, so it
+      is not a reliable way to classify contestations. Use reason for the contestation
+      motive.
     categories:
-      RESPONSIBILITY: If it was a contestation of responsibility for the repair.
-      COST: If it was a contestation of cost for the repair.
+      RESPONSIBILITY: Contestation of who is responsible for the repair.
+      COST: Contestation of the cost of the repair.
   cost:
     lineage:
       - datalake_inspection_services_raw.contestation.cost
@@ -62,6 +68,31 @@ columns:
     lineage:
       - datalake_inspection_services_raw.contestation.updated_at
     description: Record update date
+  op_cdc:
+    lineage:
+      - datalake_inspection_services_raw.contestation.op_cdc
+    description: >
+      CDC operation captured by Debezium for this row version, appended by the clean
+      CDC load. Used to tell an initial snapshot apart from a change written by the
+      source system.
+    categories:
+      r: Read/snapshot - row present at the initial load of the table.
+      c: Create - record inserted in the source system.
+      u: Update - record modified in the source system.
+      d: Delete - record removed in the source system. Not kept as a row here; the CDC merge deletes the matching row instead.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_inspection_services_raw.contestation.ts_cdc_transaction
+    description: >
+      Timestamp when the CDC connector captured this change event. Drives the
+      incremental load window and can be compared against ts_database_transaction to
+      measure ingestion lag.
+  ts_database_transaction:
+    lineage:
+      - datalake_inspection_services_raw.contestation.ts_database_transaction
+    description: >
+      Timestamp of the originating transaction in the source database, before CDC
+      propagation. Represents when the change actually happened in the product.
   year:
     lineage:
       - datalake_inspection_services_raw.contestation.year

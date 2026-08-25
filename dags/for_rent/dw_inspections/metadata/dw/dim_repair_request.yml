@@ -12,13 +12,15 @@ columns:
   type:
     lineage:
       - datalake_inspections.repair_request.type
-    description: "Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories)."
-    categories:
-      REPAIR: Make item repair.
-      CLEAN: Clean the item.
-      TAKE AWAY: Remove item left in the property.
-      GIVE BACK: Replace item that was in the property.
-      OTHER: Other types not listed.
+    description: >
+      Cause or nature of the item identified on the inspection report. It is not a
+      closed enum of process actions (repair, clean, take away, give back, other),
+      and values are written with underscores. The column is open-ended, holding
+      dozens of distinct values. The ten most frequent on
+      dw_inspections.dim_repair_request are PREEXISTING, OTHER, REPAIR,
+      MALFUNCTIONING, LACK_OF_MAINTENANCE, DIRT, STRUCTURAL_DAMAGE, ABSENT_ITEM,
+      MILD_DAMAGE and STRUCTURAL_MOISTURE. Query the column for the full current
+      list before relying on any fixed set of values.
   cost:
     lineage:
       - datalake_inspections.repair_request.cost
@@ -26,7 +28,11 @@ columns:
   repair_type:
     lineage:
       - datalake_inspections.repair_request.type
-    description: Type of repair requested.
+    description: >
+      Mirror of type (same source column). No diverging rows versus type in the full
+      history of dw_inspections.dim_repair_request. Use type as the canonical field
+      in new queries. Physical deprecation is an engineering follow-up and is not
+      part of this documentation change.
   comment:
     lineage:
       - datalake_inspections.repair_request.comment
@@ -38,11 +44,20 @@ columns:
   repair_service:
     lineage:
       - datalake_inspections.repair_request.repair_service
-    description: Repair service requested
+    description: >
+      Repair service requested. Values are not normalized at source: leading/trailing
+      spaces, capitalization variants, and numbered suffixes are common. Distinct counts
+      without TRIM(UPPER(...)) overestimate real cardinality. Source-side or DW-side
+      normalization is an engineering follow-up, not covered here.
   item_name:
     lineage:
       - datalake_inspections.repair_request.item_name
-    description: Name of the item to be repaired
+    description: >
+      Name of the item to be repaired. Values are not normalized at source:
+      leading/trailing spaces, capitalization variants, and numbered suffixes are common
+      (for example Armários, Armário, Armários 2, Armario). Distinct counts without
+      TRIM(UPPER(...)) overestimate real cardinality. Source-side or DW-side
+      normalization is an engineering follow-up, not covered here.
   room_name:
     lineage:
       - datalake_inspections.repair_request.room_name
