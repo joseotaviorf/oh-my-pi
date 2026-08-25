@@ -14,7 +14,9 @@ dag:
       Covers members returned by Analytics (usage, cost, activity, and summaries).
       Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo; usage
       and cost use a 28-day trailing window with inclusive ending_at; summaries
-      use the same start and an exclusive ending_date (interval day + 1);
+      use the same start and an exclusive ending_date equal to the default
+      load_end_date (interval day), so the latest included day is interval day
+      minus one and stays within vendor publish lag;
       activity requests the interval day minus two because the vendor
       publishes that endpoint a day behind and rejects unpublished dates.
       Auth is CLAUDE_ANALYTICS_API_KEY in the quintoandar secret scope (x-api-key)
@@ -150,9 +152,8 @@ workflow:
       results_response_path: summaries
       date_filter_column: starting_at
       date_format: "%Y-%m-%d"
-      # Vendor ending_date is exclusive; shift forward one day to include the interval day.
-      extra_query_template_params:
-        load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+      # Vendor ending_date is exclusive; default load_end_date (interval day) is
+      # sufficient — latest included day is interval day minus one.
       params:
         starting_date: load_start_date
         ending_date: load_end_date
