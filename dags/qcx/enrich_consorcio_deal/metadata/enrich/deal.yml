@@ -6,10 +6,18 @@ domain: QCX
 description: >
   Consórcio HubSpot deal current state. One row per unique deal on pipeline
   737631007 after dropping test names and duplicates. Holds identity,
-  attribution (origin/segment maps), ownership, C2W contact_type, Conrado
-  qualifier and discard-survey answers, simulation counts, and current_stage.
+  channel attribution, ownership, C2W contact_type, Conrado qualifier and
+  discard-survey answers, simulation counts, and current_stage.
   Funnel visit history is datalake_consorcio.deal_stage. Funil Cohort
   first-hit times and current-position flags are datalake_consorcio.deal_milestone.
+  Three team-maintained Google Sheets in datalake_gsheets_clean drive the
+  lookups, replacing previously hard-coded CTEs: consorcio_origin_mapping
+  (utm_source -> origin), consorcio_segment_mapping (utm_campaign -> segment),
+  and consorcio_inside_sales_operation (one row per analyst relationship).
+  None has a primary key, so each is deduped to one row per key before
+  joining. Analyst attribution (analyst_name, analyst_role, supervisor_name,
+  team) is resolved as of each deal's creation date so promotions and
+  supervisor changes do not rewrite history.
   Partitioned by deal creation date in America/Sao_Paulo. Full rebuild daily.
 columns:
   id_deal:
@@ -19,7 +27,10 @@ columns:
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.deal.id_hubspot_owner
-    description: HubSpot owner id of the analyst currently on the deal; joins owner and the inline analyst_ops map.
+    description: >
+      HubSpot owner id of the analyst currently on the deal. Join key into the
+      inside-sales operation sheet (which is keyed on this id and has no
+      primary key of its own) and into datalake_hubspot_clean.owner.
   id_device:
     lineage:
       - datalake_hubspot.deal.consorcio_id_device
@@ -46,12 +57,18 @@ columns:
     lineage:
       - datalake_hubspot.deal.consorcio_utm_source
       - datalake_hubspot.deal.consorcio_utm_medium
+      - datalake_hubspot.deal.consorcio_phone_number
       - datalake_hubspot.deal.consorcio_discard_reason
       - datalake_hubspot.deal.consorcio_quota_amount
+      - datalake_gsheets_clean.consorcio_origin_mapping.utm_source
+      - datalake_gsheets_clean.consorcio_origin_mapping.origin
     description: >
       Attribution channel (lowercased). blip_reply medium maps to repescagem;
-      otherwise the inline utm_source map; DAG Fail - Properties Null when
-      discard reason or quota is missing; else Others or Direct.
+      otherwise the utm_source lookup in the consorcio_origin_mapping sheet;
+      DAG Fail - Properties Null when phone number and discard reason or quota is missing; else
+      Others or Direct. A utm_source with no row in the sheet falls through to
+      Others rather than failing, so an unmapped or misspelled key is silently
+      absorbed — check the sheet before reading a spike in Others as real.
   utm_source:
     lineage:
       - datalake_hubspot.deal.consorcio_utm_source
@@ -79,10 +96,14 @@ columns:
     lineage:
       - datalake_hubspot.deal.consorcio_utm_source
       - datalake_hubspot.deal.consorcio_utm_campaign
+      - datalake_gsheets_clean.consorcio_segment_mapping.utm_campaign
+      - datalake_gsheets_clean.consorcio_segment_mapping.segment
     description: >
       Paid/CRM campaign segment. CRM source plus campaign name yields Tenants,
-      FS_ToF, Owners, or FR_ToF; otherwise the inline utm_campaign map
-      (Branded, Search Non Branded, Meta Ads, and similar).
+      FS_ToF, Owners, or FR_ToF; otherwise the utm_campaign lookup in the
+      consorcio_segment_mapping sheet (Branded, Search Non Branded, Meta Ads,
+      and similar). A campaign with no row in the sheet yields null, so new
+      campaigns stay unsegmented until the sheet is updated.
   inside_sales_pipeline:
     lineage:
       - datalake_hubspot.deal.consorcio_inside_sales_pipeline
@@ -166,19 +187,14 @@ columns:
     lineage:
       - datalake_hubspot.deal.consorcio_feedback_survey
     description: Free-text comment from the post-discard survey JSON; empty string stored as null.
-  analyst_name:
-    lineage:
-      - datalake_hubspot_clean.owner.first_name
-      - datalake_hubspot_clean.owner.last_name
-    description: Display name of the Consórcio-team HubSpot owner (first plus last), deduped to one row per id_owner.
-  analyst_role:
-    description: Analyst seniority (Junior, Pleno, Senior) from the inline analyst_ops map keyed by id_owner; null when unmapped.
-  supervisor_name:
-    description: Analyst supervisor first name from the inline analyst_ops map; n/a or Bamaq when that is how the team recorded it; null when unmapped.
   feedback_score:
     lineage:
       - datalake_hubspot.deal.consorcio_feedback_survey
     description: Post-discard survey score (nota) extracted from consorcio_feedback_survey JSON.
+  is_feedback_contact_allowed:
+    lineage:
+      - datalake_hubspot.deal.consorcio_feedback_survey
+    description: Whether the respondent authorized follow-up contact in the post-discard survey JSON; empty string stored as null.
   total_simulations:
     lineage:
       - datalake_consorcio_clean.simulation.id
@@ -191,10 +207,6 @@ columns:
     lineage:
       - datalake_hubspot.deal.consorcio_blip_agent_inactivity
     description: 1 when the deal received Conrado's inactivity follow-up on Blip, 0 when it did not; null if the HubSpot property is unset.
-  is_feedback_contact_allowed:
-    lineage:
-      - datalake_hubspot.deal.consorcio_feedback_survey
-    description: Whether the respondent authorized follow-up contact in the post-discard survey JSON; empty string stored as null.
   template_first_contact:
     lineage:
       - datalake_hubspot.deal.consorcio_template_first_contact
@@ -247,6 +259,60 @@ columns:
     lineage:
       - datalake_consorcio_clean.simulation.credit_value
     description: Average Simulation amount per deal
+  analyst_name:
+    lineage:
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.id_hubspot_owner
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.analyst_name
+      - datalake_hubspot_clean.owner.first_name
+      - datalake_hubspot_clean.owner.last_name
+    description: >
+      Analyst display name. Read from the inside-sales operation sheet by
+      HubSpot owner id, falling back to the Consórcio-team HubSpot owner name
+      (first plus last) when the owner has no sheet row. Not time-dependent —
+      keyed on the owner id alone, so a promotion or supervisor change does not
+      alter it. Null only when the owner is absent from both sources.
+  analyst_role:
+    lineage:
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.id_hubspot_owner
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.role
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.dt_created
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.dt_ended
+      - datalake_hubspot.deal.ts_created
+    description: >
+      Analyst seniority (Junior, Pleno, Senior) as of the deal's creation date,
+      resolved against the relationship period in the inside-sales operation
+      sheet — so a later promotion does not rewrite historical deals. Deals
+      predating the analyst's first dt_created use the earliest row; deals after
+      the last dt_ended carry the last row forward. Null when the owner has no
+      sheet row (the HubSpot fallback fills analyst_name only).
+  supervisor_name:
+    lineage:
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.id_hubspot_owner
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.supervisor
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.dt_created
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.dt_ended
+      - datalake_hubspot.deal.ts_created
+    description: >
+      Supervisor first name as of the deal's creation date, resolved against the
+      relationship period in the inside-sales operation sheet — so deals stay
+      with the supervisor who actually owned them at the time. Deals predating
+      the analyst's first dt_created use the earliest row. Deals created after
+      the analyst's last dt_ended (analyst left, deal still assigned to them)
+      are set to 'other' rather than carrying the old supervisor forward. Null
+      when the owner has no sheet row.
+  team:
+    lineage:
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.id_hubspot_owner
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.team
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.dt_created
+      - datalake_gsheets_clean.consorcio_inside_sales_operation.dt_ended
+      - datalake_hubspot.deal.ts_created
+    description: >
+      Inside-sales team the analyst belonged to (Consórcio, BAMAQ) as of the
+      deal's creation date, resolved from the inside-sales operation sheet using
+      the same period rules as analyst_role: earliest row for deals predating
+      the first dt_created, last row carried forward for deals after the final
+      dt_ended. Null when the owner has no sheet row.
   dt_created:
     lineage:
       - datalake_hubspot.deal.ts_created

@@ -6,77 +6,99 @@
 -- deal_stage; Funil Cohort is_*/ts_* rollup lives in deal_milestone.
 -- Pipeline 737631007. Timestamps in America/Sao_Paulo.
 -- Full rebuild each run.
+--
+-- Attribution lookups are sourced from Google Sheets in
+-- datalake_gsheets_clean: consorcio_origin_mapping (utm_source ->
+-- origin), consorcio_segment_mapping (utm_campaign -> segment) and
+-- consorcio_inside_sales_operation (analyst relationships), all of
+-- which replace hard-coded CTEs. None of the three has a primary key,
+-- so each is deduped to one row per key before joining.
+--
+-- The inside-sales sheet holds one row per analyst RELATIONSHIP: a
+-- promotion or a supervisor change closes the old row (dt_ended) and
+-- opens a new one. Analyst attribution is therefore resolved as of
+-- the deal's creation date, not from the analyst's current row.
+--
+-- Resolution rules for team / supervisor_name / analyst_role:
+--   1. Deal created inside [dt_created, dt_ended] -> that row.
+--   2. Deal created before the analyst's first dt_created
+--      -> the earliest row (back-fills history the sheet predates).
+--   3. Deal created after the analyst's last dt_ended (analyst left,
+--      deal still assigned to them) -> team and analyst_role carried
+--      forward from the last row; supervisor_name pinned to 'other'.
+--   4. A blank dt_created means "in effect from the beginning"
+--      (floored to 1900-01-01), so rule 1 covers it.
+--   5. Blank dt_ended means the relationship is open (9999-12-31).
+-- analyst_name is NOT time-dependent — it is keyed on the owner id
+-- alone, and is NULL when the owner has no row in the sheet.
 -- ================================================================
-WITH origin_mapping AS (
+WITH
+-- ----------------------------------------------------------------
+-- Attribution maps, now sourced from Google Sheets instead of inline
+-- VALUES. Both sheets are two-column key/value lookups maintained by
+-- the team. Keys are trimmed and blank-to-NULL'd, and each is deduped
+-- to one row per key so a duplicated sheet row cannot fan out the
+-- deal grain (a hand-maintained sheet has no primary key).
+-- ----------------------------------------------------------------
+origin_mapping AS (
   SELECT
-    utm_source,
-    origin
-  FROM VALUES
-    ('newsletter', 'Internal'),
-    ('none', 'Direct'),
-    ('internal', 'Internal'),
-    ('crm', 'CRM'),
-    ('insidesales', 'Internal'),
-    ('google', 'Google'),
-    ('youtube', 'youtube'),
-    ('referral', 'Internal'),
-    ('fb', 'Meta'),
-    ('ig', 'Meta'),
-    -- HubSpot token is {{site_source_name}} in data; double braces in REPEAT survive str.format.
-    (CONCAT(REPEAT('{{', 2), 'site_source_name', REPEAT('}}', 2)), 'Meta'),
-    ('(none)', 'Direct'),
-    ('instagram', 'Meta'),
-    ('imovelweb', 'Imovelweb'),
-    ('buzzlead', 'Others'),
-    ('(Nenhum valor)', 'Direct'),
-    ('TikTok', 'Others'),
-    ('qa_consorcio_lp', 'C2W'),
-    ('display', 'Meta'),
-    ('repescagem', 'repescagem'),
-    ('sfmc', 'crm')
-    AS origin_map(utm_source, origin)
+    NULLIF(TRIM(utm_source), '') AS utm_source,
+    MAX(NULLIF(TRIM(origin), '')) AS origin
+  FROM
+    datalake_gsheets_clean.consorcio_origin_mapping
+  WHERE
+    NULLIF(TRIM(utm_source), '') IS NOT NULL
+  GROUP BY
+    NULLIF(TRIM(utm_source), '')
 ),
 segment_mapping AS (
   SELECT
-    utm_campaign,
-    segment
-  FROM VALUES
-    ('consorcio_launch___ED_Institucional_EX', 'Branded'),
-    ('sitelinks_branded_consorcio', 'Branded'),
-    ('comunicacao__lançamento', 'Branded'),
-    ('consorcio_launch___ED_Institucional_FR', 'Branded'),
-    ('RJ_BRANDED', 'Branded'),
-    ('SP_BRANDED', 'Branded'),
-    ('FLN_BRANDED', 'Branded'),
-    ('POA_branded', 'Branded'),
-    ('consorcio_launch___ED_Concorrentes_AM', 'Non-Branded'),
-    ('consorcio_launch___ED_Consorcio_de_Casa_AM', 'Non-Branded'),
-    ('consorcio_launch___ED_Carta_de_Credito_AM', 'Non-Branded'),
-    ('consorcio_launch___ED_Consorcio_de_Imoveis_AM', 'Non-Branded'),
-    ('consorcio_launch___ED_Consorcio_Imobiliario_AM', 'Non-Branded'),
-    ('consorcio_launch___ED_Investimento_AM', 'Non-Branded'),
-    ('consorcio_launch___ED_Planejamento_Financeiro_AM', 'Non-Branded'),
-    ('consorcio_launch___ED_Taxa_de_Administracao_AM', 'Non-Branded'),
-    ('[ED] Institucional_EX', 'Search Branded'),
-    ('[ED] Institucional_FR', 'Search Branded'),
-    ('[ED] Concorrentes_AM', 'Search Non Branded'),
-    ('[ED] Carta de Crédito_AM', 'Search Non Branded'),
-    ('[ED] Consórcio Imobiliário_AM', 'Search Non Branded'),
-    ('[ED] Consórcio de Casa_AM', 'Search Non Branded'),
-    ('[ED] Investimento_AM', 'Search Non Branded'),
-    ('[ED] Consórcio de Imóveis_AM', 'Search Non Branded'),
-    ('[ED] Planejamento Financeiro_AM', 'Search Non Branded'),
-    ('[ED] Taxa de Administração_AM', 'Search Non Branded'),
-    ('[ED] Consórcio+Valor_AM', 'Search Non Branded'),
-    ('[ED] Concorrentes_EX', 'Search Non Branded'),
-    ('[ED] PMáx - Consórcio', 'Google PMAX'),
-    ('consorcio_launch___ED_PMáx_Consórcio', 'Google PMAX'),
-    ('[ED] YouTube - Demand Gen - SP + PortoAlegre', 'YouTube'),
-    ('[ED] display_aquisição_consorcio', 'Meta Ads'),
-    ('[ED]ASC/amplo_consorcio_launch', 'Meta Ads'),
-    ('[ED] display_remarketing_consorcio', 'Meta Ads')
-    AS segment_map(utm_campaign, segment)
+    NULLIF(TRIM(utm_campaign), '') AS utm_campaign,
+    MAX(NULLIF(TRIM(segment), '')) AS segment
+  FROM
+    datalake_gsheets_clean.consorcio_segment_mapping
+  WHERE
+    NULLIF(TRIM(utm_campaign), '') IS NOT NULL
+  GROUP BY
+    NULLIF(TRIM(utm_campaign), '')
 ),
+
+-- ----------------------------------------------------------------
+-- Inside-sales operation sheet: one row per analyst relationship.
+-- Everything arrives as VARCHAR and "empty" is '' rather than NULL,
+-- so every column is trimmed and NULLIF'd before casting.
+-- The sheet's dt_created/dt_ended are RELATIONSHIP dates and are
+-- renamed here to dt_relationship_start/_end so they cannot be
+-- confused with the deal's own dt_created further down.
+-- ----------------------------------------------------------------
+inside_sales_operation AS (
+  SELECT
+    NULLIF(TRIM(id_hubspot_owner), '') AS id_owner,
+    NULLIF(TRIM(analyst_name), '')     AS analyst_name,
+    NULLIF(TRIM(team), '')             AS team,
+    NULLIF(TRIM(supervisor), '')       AS supervisor_name,
+    NULLIF(TRIM(`role`), '')           AS analyst_role,
+    -- blank dt_created = relationship in effect from the beginning
+    COALESCE(
+      TRY_CAST(NULLIF(TRIM(dt_created), '') AS DATE),
+      DATE('1900-01-01')
+    ) AS dt_relationship_start,
+    -- blank dt_ended = relationship still open
+    COALESCE(
+      TRY_CAST(NULLIF(TRIM(dt_ended), '') AS DATE),
+      DATE('9999-12-31')
+    ) AS dt_relationship_end
+  FROM
+    datalake_gsheets_clean.consorcio_inside_sales_operation
+  WHERE
+    NULLIF(TRIM(id_hubspot_owner), '') IS NOT NULL
+),
+
+-- HubSpot fallback for analyst_name ONLY, used when the owner has no
+-- row in the sheet. team / supervisor_name / analyst_role stay NULL in
+-- that case — the sheet is the sole source for the temporal fields.
+-- Note: archived owners have an empty teams array, so the Consorcio
+-- team filter below does not recover them.
 owner_name AS (
   SELECT
     id_owner,
@@ -95,54 +117,71 @@ owner_name AS (
   GROUP BY
     id_owner
 ),
-analyst_ops AS (
+
+-- analyst_name is keyed on the owner id only, not on the period:
+-- collapses the multi-relationship analysts to one name.
+analyst_identity AS (
   SELECT
     id_owner,
-    role,
-    supervisor
-  FROM VALUES
-    ('83834497', 'Senior', 'n/a'),
-    ('84909664', 'Pleno',  'Erick'),
-    ('81197710', 'Junior', 'Bianca'),
-    ('83834581', 'Senior', 'n/a'),
-    ('84909665', 'Pleno',  'n/a'),
-    ('84864479', 'Pleno',  'Bianca'),
-    ('84050436', 'Senior', 'Erick'),
-    ('84050487', 'Pleno',  'Erick'),
-    ('83263494', 'Pleno',  'n/a'),
-    ('82473891', 'Senior', 'Erick'),
-    ('86362795', 'Pleno',  'Beatriz'),
-    ('85434798', 'Senior', 'n/a'),
-    ('83834547', 'Senior', 'n/a'),
-    ('85655480', 'Pleno',  'Bianca'),
-    ('83263457', 'Pleno',  'n/a'),
-    ('83777915', 'Senior', 'n/a'),
-    ('85321623', 'Pleno',  'n/a'),
-    ('84050586', 'Pleno',  'Erick'),
-    ('81552418', 'Senior', 'Beatriz'),
-    ('85180360', 'Pleno',  'n/a'),
-    ('85180405', 'Senior', 'Bianca'),
-    ('84050544', 'Senior', 'Erick'),
-    ('85434858', 'Pleno',  'Beatriz'),
-    ('80570949', 'Senior', 'n/a'),
-    ('85325992', 'Pleno',  'n/a'),
-    ('85321594', 'Pleno',  'Beatriz'),
-    ('82032559', 'Pleno',  'n/a'),
-    ('83263567', 'Pleno',  'Beatriz'),
-    ('82467411', 'Senior', 'n/a'),
-    ('90624808', 'Senior', 'Erick'),
-    ('90628391', 'Pleno',  'Bianca'),
-    ('90728482', 'Pleno',  'Erick'),
-    ('81556428', 'Senior', 'Bianca'),
-    ('84306295', 'Senior', 'Bamaq'),
-    ('85173258', 'Senior', 'Bamaq'),
-    ('84306345', 'Senior', 'Bamaq'),
-    ('92712595', 'Pleno',  'n/a'),
-    ('93485724', 'Pleno',  'n/a'),
-    ('85173280', 'Senior', 'Bamaq'),
-    ('85139671', 'n/a',    'Bamaq'),
-    ('84305470', 'Senior', 'Bamaq')
-    AS analyst_map(id_owner, role, supervisor)
+    MAX(analyst_name) AS analyst_name
+  FROM
+    inside_sales_operation
+  GROUP BY
+    id_owner
+),
+
+-- first / last relationship per analyst, for the out-of-range rules
+analyst_relationship_bounds AS (
+  SELECT
+    id_owner,
+    MIN(dt_relationship_start) AS dt_first_start,
+    MAX(dt_relationship_end) AS dt_last_end
+  FROM
+    inside_sales_operation
+  GROUP BY
+    id_owner
+),
+analyst_first_relationship AS (
+  SELECT
+    id_owner,
+    team,
+    supervisor_name,
+    analyst_role
+  FROM (
+    SELECT
+      id_owner,
+      team,
+      supervisor_name,
+      analyst_role,
+      ROW_NUMBER() OVER (
+        PARTITION BY id_owner
+        ORDER BY dt_relationship_start ASC, dt_relationship_end ASC
+      ) AS rn_first
+    FROM
+      inside_sales_operation
+  ) AS ranked_first
+  WHERE
+    rn_first = 1
+),
+analyst_last_relationship AS (
+  SELECT
+    id_owner,
+    team,
+    analyst_role
+  FROM (
+    SELECT
+      id_owner,
+      team,
+      analyst_role,
+      ROW_NUMBER() OVER (
+        PARTITION BY id_owner
+        ORDER BY dt_relationship_end DESC, dt_relationship_start DESC
+      ) AS rn_last
+    FROM
+      inside_sales_operation
+  ) AS ranked_last
+  WHERE
+    rn_last = 1
 ),
 simulation_agg AS (
   SELECT
@@ -270,6 +309,99 @@ base_all AS (
       ON simulation_agg.id_lead = consorcio_lead.id
   WHERE
     hubspot_deal_stage.id_pipeline = 737631007
+),
+
+-- ----------------------------------------------------------------
+-- Temporal resolution of the analyst relationship, one row per deal.
+-- deal_owner_key is deduped to rn = 1 first, and the interval match
+-- is collapsed with ROW_NUMBER so overlapping sheet rows can never
+-- fan out and duplicate a deal. Latest start wins on an overlap.
+-- ----------------------------------------------------------------
+deal_owner_key AS (
+  SELECT
+    id_deal,
+    CAST(id_hubspot_owner AS STRING) AS id_owner,
+    DATE(ts_deal_created) AS dt_created
+  FROM
+    base_all
+  WHERE
+    rn = 1
+),
+relationship_matched AS (
+  SELECT
+    id_deal,
+    team,
+    supervisor_name,
+    analyst_role
+  FROM (
+    SELECT
+      deal_owner_key.id_deal,
+      inside_sales_operation.team,
+      inside_sales_operation.supervisor_name,
+      inside_sales_operation.analyst_role,
+      ROW_NUMBER() OVER (
+        PARTITION BY deal_owner_key.id_deal
+        ORDER BY
+          inside_sales_operation.dt_relationship_start DESC,
+          inside_sales_operation.dt_relationship_end DESC
+      ) AS rn_rel
+    FROM
+      deal_owner_key
+    INNER JOIN
+      inside_sales_operation
+        ON inside_sales_operation.id_owner = deal_owner_key.id_owner
+        AND deal_owner_key.dt_created
+              BETWEEN inside_sales_operation.dt_relationship_start
+                  AND inside_sales_operation.dt_relationship_end
+  ) AS ranked_rel
+  WHERE
+    rn_rel = 1
+),
+deal_relationship AS (
+  SELECT
+    deal_owner_key.id_deal,
+    COALESCE(
+      relationship_matched.team,
+      CASE
+        WHEN deal_owner_key.dt_created < analyst_relationship_bounds.dt_first_start
+          THEN analyst_first_relationship.team
+        WHEN deal_owner_key.dt_created > analyst_relationship_bounds.dt_last_end
+          THEN analyst_last_relationship.team
+      END
+    ) AS team,
+    COALESCE(
+      relationship_matched.supervisor_name,
+      CASE
+        WHEN deal_owner_key.dt_created < analyst_relationship_bounds.dt_first_start
+          THEN analyst_first_relationship.supervisor_name
+        -- analyst already left: team and role carry forward, supervisor does not
+        WHEN deal_owner_key.dt_created > analyst_relationship_bounds.dt_last_end
+          THEN 'other'
+      END
+    ) AS supervisor_name,
+    COALESCE(
+      relationship_matched.analyst_role,
+      CASE
+        WHEN deal_owner_key.dt_created < analyst_relationship_bounds.dt_first_start
+          THEN analyst_first_relationship.analyst_role
+        WHEN deal_owner_key.dt_created > analyst_relationship_bounds.dt_last_end
+          THEN analyst_last_relationship.analyst_role
+      END
+    ) AS analyst_role
+  FROM
+    deal_owner_key
+  LEFT JOIN
+    relationship_matched
+      ON relationship_matched.id_deal = deal_owner_key.id_deal
+  LEFT JOIN
+    analyst_relationship_bounds
+      ON analyst_relationship_bounds.id_owner = deal_owner_key.id_owner
+  LEFT JOIN
+    analyst_first_relationship
+      ON analyst_first_relationship.id_owner = deal_owner_key.id_owner
+  LEFT JOIN
+    analyst_last_relationship
+      ON analyst_last_relationship.id_owner = deal_owner_key.id_owner
 )
 SELECT
   base_deal.id_deal,
@@ -283,10 +415,10 @@ SELECT
     CASE
       WHEN base_deal.utm_medium = 'blip_reply' THEN 'repescagem'
       WHEN origin_mapping.origin IS NOT NULL THEN origin_mapping.origin
-      WHEN (
+      WHEN (base_deal.phone_number IS NULL AND (
         base_deal.consorcio_discard_reason IS NULL
         OR base_deal.consorcio_quota_amount IS NULL
-      ) THEN 'DAG Fail - Properties Null'
+      )) THEN 'DAG Fail - Properties Null'
       WHEN base_deal.utm_source IS NOT NULL THEN 'Others'
       ELSE 'Direct'
     END
@@ -324,12 +456,12 @@ SELECT
   END AS contact_type,
   TRY_CAST(base_deal.consorcio_negotiation_value AS DOUBLE) AS negotiation_value,
   base_deal.consorcio_bamaq_proposal_codes AS bamaq_proposal_codes,
+  -- ---------------- feedback survey ----------------
   base_deal.feedback_benefits,
   base_deal.feedback_comment,
-  owner_name.analyst_name,
-  analyst_ops.role AS analyst_role,
-  analyst_ops.supervisor AS supervisor_name,
   base_deal.feedback_score,
+  base_deal.is_feedback_contact_allowed,
+
   base_deal.total_simulations,
   CASE
     WHEN LOWER(base_deal.consorcio_abandoned_cart_template_sent) = 'true' THEN 1
@@ -339,7 +471,6 @@ SELECT
     WHEN LOWER(CAST(base_deal.consorcio_blip_agent_inactivity AS STRING)) = 'true' THEN 1
     WHEN LOWER(CAST(base_deal.consorcio_blip_agent_inactivity AS STRING)) = 'false' THEN 0
   END AS has_blip_agent_inactivity,
-  base_deal.is_feedback_contact_allowed,
   base_deal.consorcio_template_first_contact AS template_first_contact,
   base_deal.consorcio_template_last_contact AS template_last_contact,
   base_deal.consorcio_group AS group,
@@ -353,6 +484,14 @@ SELECT
   base_deal.first_simulation_amount,
   base_deal.last_simulation_amount,
   base_deal.avg_simulation_amount,
+
+  -- ---------------- operational: inside-sales attribution ----------------
+  COALESCE(analyst_identity.analyst_name, owner_name.analyst_name) AS analyst_name,
+  deal_relationship.analyst_role,
+  deal_relationship.supervisor_name,
+  deal_relationship.team,
+
+  -- ---------------- dates and timestamps ----------------
   DATE(base_deal.ts_deal_created) AS dt_created,
   DATE_TRUNC('month', base_deal.ts_deal_created) AS dt_month_start,
   DATE_TRUNC('week', base_deal.ts_deal_created) AS dt_week_start,
@@ -376,11 +515,14 @@ LEFT JOIN
   segment_mapping
     ON segment_mapping.utm_campaign = base_deal.utm_campaign
 LEFT JOIN
+  analyst_identity
+    ON analyst_identity.id_owner = CAST(base_deal.id_hubspot_owner AS STRING)
+LEFT JOIN
   owner_name
     ON owner_name.id_owner = CAST(base_deal.id_hubspot_owner AS STRING)
 LEFT JOIN
-  analyst_ops
-    ON analyst_ops.id_owner = CAST(base_deal.id_hubspot_owner AS STRING)
+  deal_relationship
+    ON deal_relationship.id_deal = base_deal.id_deal
 LEFT JOIN
   lead_created
     ON lead_created.uuid_lead = base_deal.uuid_lead
