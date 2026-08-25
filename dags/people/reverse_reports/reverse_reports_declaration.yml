@@ -69,6 +69,10 @@ workflow:
       extra_spark_job_arguments:
         - "1lf1CIn8GRvHOnNm0imZ8z01w_NXtjv16zbPqD5GP8-k"
         - "base - PIN"
+    all_5a_demographics:
+      extra_spark_job_arguments:
+        - "1I-DQpGOmGYUMJeJojsbFvWeG7YhkjU_g0VzlSFoo3Po"
+        - "ALL5A1"
 
     # --- P&T headcount (FP&A / P&T leadership) ---
     # Use context: Weekly P&T headcount base (active + terminated) with termination date,
