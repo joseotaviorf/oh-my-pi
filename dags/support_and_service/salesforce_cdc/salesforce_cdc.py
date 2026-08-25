@@ -95,6 +95,10 @@ def create_execute_job_cluster_task(dag: DAG, task_id: str):
     )
 
 
+DEDICATED_CLUSTER_EVENTS = ("case", "email_message")
+NUMBER_OF_POOLED_CLUSTERS = 2
+
+
 def build_metrics_tasks(event_table):
 
     return [
@@ -122,11 +126,98 @@ def build_metrics_tasks(event_table):
     ]
 
 
-def create_start_end_operator(task_id: str):
+def wire_event_lineage(execute_job_cluster, event: str, end_cluster):
+    parameters = EVENTS_CONFIG[event]
+    event_table = f"events_{event.lower()}"
+    parameters["salesforce_endpoint"] = SALESFORCE_ENDPOINT
+    threshold_time_hours = parameters.get("threshold_time_hours", THRESHOLD_TIME_HOURS)
+    threshold_partition_hours = parameters.get(
+        "threshold_partition_hours", THRESHOLD_PARTITION_HOURS
+    )
 
-    start = SStPlaceholderOperator(task_id=f"start_{task_id}")
-    end = SStPlaceholderOperator(task_id=f"end_{task_id}")
-    return start, end
+    raw_task = create_sst_task(
+        target_schema="datalake_salesforce_raw",
+        target_table=event_table,
+        entry_point="salesforce/cdc_raw",
+        parameters=parameters,
+    )
+
+    clean_task = create_sst_task(
+        target_schema="datalake_salesforce_clean",
+        target_table=event_table,
+        entry_point="salesforce/cdc_clean",
+        parameters={
+            "source_schema": "datalake_salesforce_raw",
+            "sync_hive": "True",
+        },
+    )
+    # Emit a per-table dataset event for the clean layer so downstream
+    # DAGs can trigger on this DAG via dependencies.yaml.
+    DatasetAdder.attach_dataset_to_task(clean_task)
+
+    metrics_tasks = build_metrics_tasks(event_table)
+    dlq_task = create_sst_task(
+        target_schema="datalake_salesforce_raw",
+        target_table=event_table,
+        entry_point="salesforce/dlq",
+        parameters={
+            "api_entity": parameters["api_entity"],
+            "salesforce_endpoint": SALESFORCE_ENDPOINT,
+        },
+        task_id=f"dlq_{event_table}",
+    )
+    if parameters.get("skip_quality_contracts", False):
+        (
+            execute_job_cluster
+            >> raw_task
+            >> clean_task
+            >> metrics_tasks
+            >> dlq_task
+            >> end_cluster
+        )
+        return
+
+    quality_contract_raw = create_sst_task(
+        target_schema="datalake_salesforce_raw",
+        target_table=event_table,
+        entry_point="quality/contracts/generic",
+        parameters={
+            "threshold_time_hours": threshold_time_hours,
+            "threshold_partition_hours": threshold_partition_hours,
+        },
+        task_id=f"quality_contract_checks_raw_{event_table}",
+    )
+    quality_contract_clean = create_sst_task(
+        target_schema="datalake_salesforce_clean",
+        target_table=event_table,
+        entry_point="quality/contracts/generic",
+        parameters={
+            "threshold_time_hours": threshold_time_hours,
+            "threshold_partition_hours": threshold_partition_hours,
+        },
+        task_id=f"quality_contract_checks_clean_{event_table}",
+    )
+    (
+        execute_job_cluster
+        >> raw_task
+        >> quality_contract_raw
+        >> clean_task
+        >> quality_contract_clean
+        >> metrics_tasks
+        >> dlq_task
+        >> end_cluster
+    )
+
+
+def build_cluster_lineage(cluster_id: str, events):
+    if not events:
+        return
+    execute_job_cluster = create_execute_job_cluster_task(
+        dag=dag, task_id=f"execute_cdc_cluster_{cluster_id}"
+    )
+    end_cluster = SStPlaceholderOperator(task_id=f"end_cdc_cluster_{cluster_id}")
+    for event in events:
+        wire_event_lineage(execute_job_cluster, event, end_cluster)
 
 
 jiraops_callback = JiraOpsCallback()
@@ -152,97 +243,25 @@ with DAG(
     on_failure_callback=gchat_callback.dag_failure_alert,
     # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # on_failure_callback=jiraops_callback.dag_failure_alert,
-    max_active_runs=1,
+    # Independent cluster lineages (case, email_message, pooled events) should
+    # not block each other across hours via a shared start/end.
+    max_active_runs=4,
 ) as dag:
-    start, end = create_start_end_operator("salesforce")
-
-    NUMBER_OF_CLUSTERS = 2
-    events_lst = list(EVENTS_CONFIG.keys())
-    pool_max_size = math.ceil(len(events_lst) / NUMBER_OF_CLUSTERS) or 1
-    job_pool = [
-        events_lst[i : i + pool_max_size]
-        for i in range(0, len(events_lst), pool_max_size)
+    dedicated_events = [
+        event for event in DEDICATED_CLUSTER_EVENTS if event in EVENTS_CONFIG
+    ]
+    pooled_events = [
+        event for event in EVENTS_CONFIG if event not in DEDICATED_CLUSTER_EVENTS
     ]
 
-    execute_job_clusters = []
-    for i, pool_events in enumerate(job_pool):
-        execute_job_cluster = create_execute_job_cluster_task(
-            dag=dag, task_id=f"execute_cdc_cluster_{i}"
-        )
-        execute_job_clusters.append(execute_job_cluster)
-        end_pool = SStPlaceholderOperator(task_id=f"end_pool_{i}")
+    for event in dedicated_events:
+        build_cluster_lineage(event, [event])
 
-        for event in pool_events:
-            parameters = EVENTS_CONFIG[event]
-            event_table = f"events_{event.lower()}"
-            parameters["salesforce_endpoint"] = SALESFORCE_ENDPOINT
-            threshold_time_hours = parameters.get(
-                "threshold_time_hours", THRESHOLD_TIME_HOURS
-            )
-            threshold_partition_hours = parameters.get(
-                "threshold_partition_hours", THRESHOLD_PARTITION_HOURS
-            )
-
-            raw_task = create_sst_task(
-                target_schema="datalake_salesforce_raw",
-                target_table=event_table,
-                entry_point="salesforce/cdc_raw",
-                parameters=parameters,
-            )
-
-            clean_task = create_sst_task(
-                target_schema="datalake_salesforce_clean",
-                target_table=event_table,
-                entry_point="salesforce/cdc_clean",
-                parameters={
-                    "source_schema": "datalake_salesforce_raw",
-                    "sync_hive": "True",
-                },
-            )
-            # Emit a per-table dataset event for the clean layer so downstream
-            # DAGs can trigger on this DAG via dependencies.yaml.
-            DatasetAdder.attach_dataset_to_task(clean_task)
-
-            metrics_tasks = build_metrics_tasks(event_table)
-            if parameters.get("skip_quality_contracts", False):
-                (
-                    execute_job_cluster
-                    >> raw_task
-                    >> clean_task
-                    >> metrics_tasks
-                    >> end_pool
-                    >> end
-                )
-            else:
-                quality_contract_raw = create_sst_task(
-                    target_schema="datalake_salesforce_raw",
-                    target_table=event_table,
-                    entry_point="quality/contracts/generic",
-                    parameters={
-                        "threshold_time_hours": threshold_time_hours,
-                        "threshold_partition_hours": threshold_partition_hours,
-                    },
-                    task_id=f"quality_contract_checks_raw_{event_table}",
-                )
-                quality_contract_clean = create_sst_task(
-                    target_schema="datalake_salesforce_clean",
-                    target_table=event_table,
-                    entry_point="quality/contracts/generic",
-                    parameters={
-                        "threshold_time_hours": threshold_time_hours,
-                        "threshold_partition_hours": threshold_partition_hours,
-                    },
-                    task_id=f"quality_contract_checks_clean_{event_table}",
-                )
-                (
-                    execute_job_cluster
-                    >> raw_task
-                    >> quality_contract_raw
-                    >> clean_task
-                    >> quality_contract_clean
-                    >> metrics_tasks
-                    >> end_pool
-                    >> end
-                )
-
-    start >> execute_job_clusters
+    if pooled_events:
+        pool_max_size = math.ceil(len(pooled_events) / NUMBER_OF_POOLED_CLUSTERS) or 1
+        job_pool = [
+            pooled_events[i : i + pool_max_size]
+            for i in range(0, len(pooled_events), pool_max_size)
+        ]
+        for i, pool_events in enumerate(job_pool):
+            build_cluster_lineage(str(i), pool_events)
