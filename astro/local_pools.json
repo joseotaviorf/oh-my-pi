@@ -15,6 +15,26 @@
       "pool_name": "gsheets_several_daily_runs_pool",
       "slots": 16,
       "description": "Limits concurrent gsheets_several_daily_runs DAG tasks (see gsheets_several_daily_runs_task_pool variable)."
+    },
+    {
+      "pool_name": "salesforce_cdc_cluster_case",
+      "slots": 1,
+      "description": "One active hour at a time for salesforce_cdc Case lineage."
+    },
+    {
+      "pool_name": "salesforce_cdc_cluster_email_message",
+      "slots": 1,
+      "description": "One active hour at a time for salesforce_cdc Email Message lineage."
+    },
+    {
+      "pool_name": "salesforce_cdc_cluster_0",
+      "slots": 1,
+      "description": "One active hour at a time for salesforce_cdc pooled cluster 0."
+    },
+    {
+      "pool_name": "salesforce_cdc_cluster_1",
+      "slots": 1,
+      "description": "One active hour at a time for salesforce_cdc pooled cluster 1."
     }
   ]
 }

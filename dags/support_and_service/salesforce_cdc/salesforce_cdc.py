@@ -51,12 +51,35 @@ BASE_PARAMETERS = {
 }
 
 
+def lineage_pool_name(cluster_id: str) -> str:
+    return f"salesforce_cdc_cluster_{cluster_id}"
+
+
+def ensure_lineage_pool(cluster_id: str) -> str:
+    """One Airflow pool slot = at most one hour executing this lineage."""
+    from airflow.models.pool import Pool
+
+    pool_name = lineage_pool_name(cluster_id)
+    try:
+        Pool.create_or_update_pool(
+            name=pool_name,
+            slots=1,
+            description=(f"Serialize {DAG_ID} cluster {cluster_id} to one active hour"),
+            include_deferred=False,
+        )
+    except Exception:
+        # Dag-file parse in tests / without a metadata DB still assigns pool=.
+        pass
+    return pool_name
+
+
 def create_sst_task(
     target_schema: str,
     target_table: str,
     entry_point: str,
     parameters: Dict[str, str],
     task_id: str = None,
+    pool: str = None,
 ):
 
     task_id = f"load_{target_schema}_{target_table}" if not task_id else task_id
@@ -81,10 +104,12 @@ def create_sst_task(
             }
         },
         execution_timeout=timedelta(hours=1),
+        depends_on_past=False,
+        pool=pool,
     )
 
 
-def create_execute_job_cluster_task(dag: DAG, task_id: str):
+def create_execute_job_cluster_task(dag: DAG, task_id: str, pool: str):
     return QuintoAndarDatabricksExecuteJobClusterOperator(
         databricks_conn_id="databricks_new",
         dag=dag,
@@ -92,6 +117,20 @@ def create_execute_job_cluster_task(dag: DAG, task_id: str):
         cluster_configuration=get_cluster_config(CONFIG_SERVICE),
         access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         libraries=get_libs(ENV),
+        pool=pool,
+        # Do not start hour N+1's cluster until hour N's execute succeeded and
+        # end_cdc_cluster_* (full lineage) succeeded. See execute >> end.
+        depends_on_past=True,
+        wait_for_downstream=True,
+    )
+
+
+def create_previous_lineage_gate(cluster_id: str, pool: str):
+    return SStPlaceholderOperator(
+        task_id=f"wait_previous_lineage_{cluster_id}",
+        depends_on_past=True,
+        wait_for_downstream=True,
+        pool=pool,
     )
 
 
@@ -99,7 +138,7 @@ DEDICATED_CLUSTER_EVENTS = ("case", "email_message")
 NUMBER_OF_POOLED_CLUSTERS = 2
 
 
-def build_metrics_tasks(event_table):
+def build_metrics_tasks(event_table, pool: str):
 
     return [
         create_sst_task(
@@ -108,6 +147,7 @@ def build_metrics_tasks(event_table):
             entry_point="quality/metrics/stability",
             parameters={},
             task_id=f"metrics_pipeline_stability_{event_table}",
+            pool=pool,
         ),
         create_sst_task(
             target_schema="",
@@ -115,6 +155,7 @@ def build_metrics_tasks(event_table):
             entry_point="quality/metrics/latency",
             parameters={},
             task_id=f"metrics_pipeline_latency_{event_table}",
+            pool=pool,
         ),
         create_sst_task(
             target_schema="",
@@ -122,11 +163,12 @@ def build_metrics_tasks(event_table):
             entry_point="salesforce/metrics/missing_events",
             parameters={},
             task_id=f"metrics_pipeline_missing_events_{event_table}",
+            pool=pool,
         ),
     ]
 
 
-def wire_event_lineage(execute_job_cluster, event: str, end_cluster):
+def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
     parameters = EVENTS_CONFIG[event]
     event_table = f"events_{event.lower()}"
     parameters["salesforce_endpoint"] = SALESFORCE_ENDPOINT
@@ -140,6 +182,7 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster):
         target_table=event_table,
         entry_point="salesforce/cdc_raw",
         parameters=parameters,
+        pool=pool,
     )
 
     clean_task = create_sst_task(
@@ -150,12 +193,13 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster):
             "source_schema": "datalake_salesforce_raw",
             "sync_hive": "True",
         },
+        pool=pool,
     )
     # Emit a per-table dataset event for the clean layer so downstream
     # DAGs can trigger on this DAG via dependencies.yaml.
     DatasetAdder.attach_dataset_to_task(clean_task)
 
-    metrics_tasks = build_metrics_tasks(event_table)
+    metrics_tasks = build_metrics_tasks(event_table, pool)
     dlq_task = create_sst_task(
         target_schema="datalake_salesforce_raw",
         target_table=event_table,
@@ -165,6 +209,7 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster):
             "salesforce_endpoint": SALESFORCE_ENDPOINT,
         },
         task_id=f"dlq_{event_table}",
+        pool=pool,
     )
     if parameters.get("skip_quality_contracts", False):
         (
@@ -186,6 +231,7 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster):
             "threshold_partition_hours": threshold_partition_hours,
         },
         task_id=f"quality_contract_checks_raw_{event_table}",
+        pool=pool,
     )
     quality_contract_clean = create_sst_task(
         target_schema="datalake_salesforce_clean",
@@ -196,6 +242,7 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster):
             "threshold_partition_hours": threshold_partition_hours,
         },
         task_id=f"quality_contract_checks_clean_{event_table}",
+        pool=pool,
     )
     (
         execute_job_cluster
@@ -212,12 +259,23 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster):
 def build_cluster_lineage(cluster_id: str, events):
     if not events:
         return
+    pool = ensure_lineage_pool(cluster_id)
+    wait_previous_lineage = create_previous_lineage_gate(cluster_id, pool)
     execute_job_cluster = create_execute_job_cluster_task(
-        dag=dag, task_id=f"execute_cdc_cluster_{cluster_id}"
+        dag=dag, task_id=f"execute_cdc_cluster_{cluster_id}", pool=pool
     )
-    end_cluster = SStPlaceholderOperator(task_id=f"end_cdc_cluster_{cluster_id}")
+    end_cluster = SStPlaceholderOperator(
+        task_id=f"end_cdc_cluster_{cluster_id}",
+        depends_on_past=False,
+        pool=pool,
+    )
+    wait_previous_lineage >> execute_job_cluster
     for event in events:
-        wire_event_lineage(execute_job_cluster, event, end_cluster)
+        wire_event_lineage(execute_job_cluster, event, end_cluster, pool)
+    # Immediate downstream of the gate and execute includes the lineage leaf
+    # so wait_for_downstream waits for the full hour, not only cluster start.
+    wait_previous_lineage >> end_cluster
+    execute_job_cluster >> end_cluster
 
 
 jiraops_callback = JiraOpsCallback()
@@ -244,8 +302,9 @@ with DAG(
     # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # on_failure_callback=jiraops_callback.dag_failure_alert,
     # Independent cluster lineages (case, email_message, pooled events) should
-    # not block each other across hours via a shared start/end.
-    max_active_runs=4,
+    # not block each other across hours via a shared start/end. 24 open hours
+    # keeps Case/Email moving if a pooled lineage lags up to a day.
+    max_active_runs=24,
 ) as dag:
     dedicated_events = [
         event for event in DEDICATED_CLUSTER_EVENTS if event in EVENTS_CONFIG
