@@ -26,6 +26,10 @@ column_level_validations:
     is_contained_in:
       values: ['ACTIVE', 'INACTIVE']
       severity_level: Warning
+  assignment_type:
+    is_contained_in:
+      values: ['E', 'ET', 'P', 'PT', 'C', 'CT', 'N', 'NT']
+      severity_level: Warning
   one_row_per_assignment_action_occurrence_and_effective_start:
     custom:
       # No duplicate rows for the same (id_action_occurrence, id_assignment, dt_effective_started).

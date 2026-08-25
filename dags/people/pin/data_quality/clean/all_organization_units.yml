@@ -14,6 +14,10 @@ column_level_validations:
   id_organization:
     is_complete:
       severity_level: Warning
+  cost_center_code:
+    has_completeness:
+      greater_than_or_equal_to: 0.99
+      severity_level: Warning
   one_row_per_organization_and_effective_start:
     custom:
       # No duplicate rows for the same (id_organization, dt_effective_started).
