@@ -14,3 +14,28 @@ column_level_validations:
   id_grade:
     is_complete:
       severity_level: Warning
+  grade_translation_versions_must_abut:
+    custom:
+      # Adjacent SCD versions for (id_grade, language) must abut after PIN go-live.
+      # job_with_salary_table.sql joins valid_grades to this table with inclusive
+      # bounds on both ends, which double-matches if two adjacent versions share a
+      # boundary date.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            id_grade,
+            language,
+            dt_effective_started,
+            COALESCE(dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
+            LEAD(dt_effective_started) OVER (
+              PARTITION BY id_grade, language
+              ORDER BY dt_effective_started
+            ) AS next_started
+          FROM datalake_pin_core_clean.grade_translation
+          WHERE COALESCE(dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
+        ) versions
+        WHERE next_started IS NOT NULL
+          AND DATE_ADD(dt_effective_ended, 1) != next_started
+          AND next_started >= DATE('2024-03-01')
+        ) = 0
+      severity_level: Warning

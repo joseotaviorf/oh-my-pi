@@ -219,35 +219,37 @@ job_with_salary_table_base_ranked AS (
         datalake_pin_core_clean.job_translation AS jt
             ON jt.id_job = j.id_job
             AND jt.language = 'US'
-            AND j.dt_effective_started < jt.dt_effective_ended
-            AND j.dt_effective_ended > jt.dt_effective_started
+            -- PIN effective dates are inclusive, so a one-day job version
+            -- (dt_effective_started = dt_effective_ended) must still match.
+            AND j.dt_effective_started <= jt.dt_effective_ended
+            AND j.dt_effective_ended >= jt.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.job_family_translation AS jft
             ON jft.id_job_family = j.id_job_family
-            AND j.dt_effective_started < jft.dt_effective_ended
-            AND j.dt_effective_ended > jft.dt_effective_started
+            AND j.dt_effective_started <= jft.dt_effective_ended
+            AND j.dt_effective_ended >= jft.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.job_legislative AS jl
             ON jl.id_job = j.id_job
-            AND j.dt_effective_started < jl.dt_effective_ended
-            AND j.dt_effective_ended > jl.dt_effective_started
+            AND j.dt_effective_started <= jl.dt_effective_ended
+            AND j.dt_effective_ended >= jl.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.valid_grades AS vg
             ON vg.id_job = j.id_job
-            AND j.dt_effective_started < COALESCE(vg.dt_effective_ended, DATE('9999-12-31'))
-            AND j.dt_effective_ended > vg.dt_effective_started
+            AND j.dt_effective_started <= COALESCE(vg.dt_effective_ended, DATE('9999-12-31'))
+            AND j.dt_effective_ended >= vg.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.grade_translation AS gt
             ON gt.id_grade = vg.id_grade
             AND gt.language = 'US'
-            AND j.dt_effective_started < gt.dt_effective_ended
-            AND j.dt_effective_ended > gt.dt_effective_started
+            AND j.dt_effective_started <= gt.dt_effective_ended
+            AND j.dt_effective_ended >= gt.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.grade_translation AS gt_ptb
             ON gt_ptb.id_grade = vg.id_grade
             AND gt_ptb.language = 'PTB'
-            AND j.dt_effective_started < gt_ptb.dt_effective_ended
-            AND j.dt_effective_ended > gt_ptb.dt_effective_started
+            AND j.dt_effective_started <= gt_ptb.dt_effective_ended
+            AND j.dt_effective_ended >= gt_ptb.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.set_identifiers AS si
             ON si.id_set = j.id_set
@@ -255,31 +257,31 @@ job_with_salary_table_base_ranked AS (
     LEFT JOIN
         datalake_pin_core_clean.grade_ladder AS gl
             ON gl.id_grade_ladder = j.id_grade_ladder
-            AND j.dt_effective_started < gl.dt_effective_ended
-            AND j.dt_effective_ended > gl.dt_effective_started
+            AND j.dt_effective_started <= gl.dt_effective_ended
+            AND j.dt_effective_ended >= gl.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.grade_ladder_translation AS glt
             ON glt.id_grade_ladder = j.id_grade_ladder
             AND glt.language = 'PTB'
-            AND j.dt_effective_started < glt.dt_effective_ended
-            AND j.dt_effective_ended > glt.dt_effective_started
+            AND j.dt_effective_started <= glt.dt_effective_ended
+            AND j.dt_effective_ended >= glt.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.rates AS r
             ON r.id_grade_ladder = j.id_grade_ladder
             AND r.rate_type = 'SALARY'
-            AND j.dt_effective_started < r.dt_effective_ended
-            AND j.dt_effective_ended > r.dt_effective_started
+            AND j.dt_effective_started <= r.dt_effective_ended
+            AND j.dt_effective_ended >= r.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.rate_values AS rv
             ON rv.id_rate = r.id_rate
             AND rv.id_rate_object = vg.id_grade
-            AND j.dt_effective_started < rv.dt_effective_ended
-            AND j.dt_effective_ended > rv.dt_effective_started
+            AND j.dt_effective_started <= rv.dt_effective_ended
+            AND j.dt_effective_ended >= rv.dt_effective_started
     LEFT JOIN
         salary_bases_history AS sb
             ON sb.id_grade_rate = r.id_rate
-            AND j.dt_effective_started < sb.dt_effective_ended
-            AND j.dt_effective_ended > sb.dt_effective_started
+            AND j.dt_effective_started <= sb.dt_effective_ended
+            AND j.dt_effective_ended >= sb.dt_effective_started
     WHERE
         j.dt_effective_started <= DATE('{load_start_date}')
         AND (

@@ -14,3 +14,27 @@ column_level_validations:
   id_job:
     is_complete:
       severity_level: Warning
+  job_translation_versions_must_abut:
+    custom:
+      # Adjacent SCD versions for (id_job, language) must abut after PIN go-live.
+      # job_with_salary_table.sql joins job to this table with inclusive bounds on
+      # both ends, which double-matches if two adjacent versions share a boundary date.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            id_job,
+            language,
+            dt_effective_started,
+            COALESCE(dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
+            LEAD(dt_effective_started) OVER (
+              PARTITION BY id_job, language
+              ORDER BY dt_effective_started
+            ) AS next_started
+          FROM datalake_pin_core_clean.job_translation
+          WHERE COALESCE(dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
+        ) versions
+        WHERE next_started IS NOT NULL
+          AND DATE_ADD(dt_effective_ended, 1) != next_started
+          AND next_started >= DATE('2024-03-01')
+        ) = 0
+      severity_level: Warning
