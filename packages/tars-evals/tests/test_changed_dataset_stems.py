@@ -242,7 +242,7 @@ def test_classify_paths_metric_doc(cds):
 
 
 def test_classify_paths_business_doc(cds):
-    entries = [_entry(cds, "M", "docs/llm_context/business_entities/nps.md")]
+    entries = [_entry(cds, "M", "docs/llm_context/domain_entities/nps.md")]
     classified = cds.classify_paths(entries)
     assert classified.business_entries == tuple(entries)
     assert classified.metric_entries == ()
@@ -251,7 +251,7 @@ def test_classify_paths_business_doc(cds):
 def test_classify_paths_excludes_template(cds):
     entries = [
         _entry(cds, "M", "docs/llm_context/metric_entities/_TEMPLATE.md"),
-        _entry(cds, "M", "docs/llm_context/business_entities/_TEMPLATE.md"),
+        _entry(cds, "M", "docs/llm_context/domain_entities/_TEMPLATE.md"),
     ]
     classified = cds.classify_paths(entries)
     assert classified.metric_entries == ()
@@ -277,7 +277,7 @@ def test_classify_paths_rename_across_directories_matches_both(cds):
         cds,
         "R",
         "docs/llm_context/metric_entities/foo.md",
-        old_path="docs/llm_context/business_entities/foo.md",
+        old_path="docs/llm_context/domain_entities/foo.md",
     )
     classified = cds.classify_paths([entry])
     assert classified.metric_entries == (entry,)
@@ -341,7 +341,7 @@ def test_metric_stems_renamed(cds):
 
 
 def test_metric_stems_renamed_out_of_metric_entities_only_pruned_not_queued(cds):
-    """A rename OUT of metric_entities/ (e.g. into business_entities/) is kept
+    """A rename OUT of metric_entities/ (e.g. into domain_entities/) is kept
     by classify_paths (via old_path) so the old dataset gets pruned, but the
     new path is no longer a metric doc — it must NOT be queued for eval."""
     changed, deleted = cds.metric_stems_from_entries(
@@ -349,7 +349,7 @@ def test_metric_stems_renamed_out_of_metric_entities_only_pruned_not_queued(cds)
             _entry(
                 cds,
                 "R",
-                "docs/llm_context/business_entities/moved_out.md",
+                "docs/llm_context/domain_entities/moved_out.md",
                 old_path="docs/llm_context/metric_entities/moved_out.md",
             )
         ]
@@ -499,7 +499,7 @@ def test_business_kebab_id(cds, stem, expected):
 
 
 def test_fan_out_resolves_via_reverse_index(cds):
-    entry = _entry(cds, "M", "docs/llm_context/business_entities/nps.md")
+    entry = _entry(cds, "M", "docs/llm_context/domain_entities/nps.md")
     fanned, unresolved = cds.fan_out(
         [entry],
         reverse_index={"nps": {"nps_fr"}},
@@ -510,7 +510,7 @@ def test_fan_out_resolves_via_reverse_index(cds):
 
 
 def test_fan_out_resolves_via_own_backlinks(cds):
-    entry = _entry(cds, "A", "docs/llm_context/business_entities/house_and_listing.md")
+    entry = _entry(cds, "A", "docs/llm_context/domain_entities/house_and_listing.md")
     text = "## Related Metric Entities\n\n- Listing To Rental\n"
     fanned, unresolved = cds.fan_out(
         [entry], reverse_index={}, read_business_doc=lambda e: text
@@ -520,7 +520,7 @@ def test_fan_out_resolves_via_own_backlinks(cds):
 
 
 def test_fan_out_unions_both_sources(cds):
-    entry = _entry(cds, "M", "docs/llm_context/business_entities/nps.md")
+    entry = _entry(cds, "M", "docs/llm_context/domain_entities/nps.md")
     text = "## Related Metric Entities\n\n- Offboard Human vs Digital Metrics\n"
     fanned, unresolved = cds.fan_out(
         [entry],
@@ -532,7 +532,7 @@ def test_fan_out_unions_both_sources(cds):
 
 
 def test_fan_out_unresolved_when_both_sources_empty(cds):
-    entry = _entry(cds, "A", "docs/llm_context/business_entities/brand_new.md")
+    entry = _entry(cds, "A", "docs/llm_context/domain_entities/brand_new.md")
     fanned, unresolved = cds.fan_out(
         [entry], reverse_index={}, read_business_doc=lambda e: "## Overview\n"
     )
@@ -544,7 +544,7 @@ def test_fan_out_empty_section_without_sentinel_still_unresolved(cds):
     """A bare, empty '## Related Metric Entities' heading must still fall
     back (matches the orphan-fixture contract) — only an explicit 'None'
     sentinel resolves a domain to zero (see the next test)."""
-    entry = _entry(cds, "M", "docs/llm_context/business_entities/orphan.md")
+    entry = _entry(cds, "M", "docs/llm_context/domain_entities/orphan.md")
     text = "## Related Metric Entities\n\n## Dos and Don'ts\n"
     fanned, unresolved = cds.fan_out(
         [entry], reverse_index={}, read_business_doc=lambda e: text
@@ -556,7 +556,7 @@ def test_fan_out_empty_section_without_sentinel_still_unresolved(cds):
 def test_fan_out_explicit_none_sentinel_is_resolved_not_unresolved(cds):
     """A domain with an explicit 'None' sentinel (e.g. Agents — see PR
     #27459) must NOT fall back to the unresolved/evaluate-everything path."""
-    entry = _entry(cds, "M", "docs/llm_context/business_entities/agents.md")
+    entry = _entry(cds, "M", "docs/llm_context/domain_entities/agents.md")
     text = "## Related Metric Entities\n\n- None — no related metrics.\n"
     fanned, unresolved = cds.fan_out(
         [entry], reverse_index={}, read_business_doc=lambda e: text
@@ -566,7 +566,7 @@ def test_fan_out_explicit_none_sentinel_is_resolved_not_unresolved(cds):
 
 
 def test_fan_out_deleted_doc_still_resolves_via_reverse_index(cds):
-    entry = _entry(cds, "D", "docs/llm_context/business_entities/nps.md")
+    entry = _entry(cds, "D", "docs/llm_context/domain_entities/nps.md")
     fanned, unresolved = cds.fan_out(
         [entry], reverse_index={"nps": {"nps_fr"}}, read_business_doc=lambda e: None
     )
@@ -578,8 +578,8 @@ def test_fan_out_rename_resolves_via_old_path_reverse_index(cds):
     entry = _entry(
         cds,
         "R",
-        "docs/llm_context/business_entities/renamed_entity.md",
-        old_path="docs/llm_context/business_entities/original_entity.md",
+        "docs/llm_context/domain_entities/renamed_entity.md",
+        old_path="docs/llm_context/domain_entities/original_entity.md",
     )
     fanned, unresolved = cds.fan_out(
         [entry],
@@ -592,8 +592,8 @@ def test_fan_out_rename_resolves_via_old_path_reverse_index(cds):
 
 def test_fan_out_multiple_entries_mixed_resolution(cds):
     entries = [
-        _entry(cds, "M", "docs/llm_context/business_entities/nps.md"),
-        _entry(cds, "A", "docs/llm_context/business_entities/mystery.md"),
+        _entry(cds, "M", "docs/llm_context/domain_entities/nps.md"),
+        _entry(cds, "A", "docs/llm_context/domain_entities/mystery.md"),
     ]
     fanned, unresolved = cds.fan_out(
         entries,
@@ -790,6 +790,46 @@ def test_is_metadata_only_change_false_when_golden_query_changes(cds):
     old = "# T\n\n## Ownership\n\n- a@x.com\n\n## Golden Queries\n\nSELECT 1\n"
     new = "# T\n\n## Ownership\n\n- b@x.com\n\n## Golden Queries\n\nSELECT 2\n"
     assert cds.is_metadata_only_change(old, new) is False
+
+
+def test_normalize_entity_rename_contract_maps_heading_and_paths(cds):
+    old = "## Related Business Entities\nsee `business_entities/visits.md`\n"
+    new = "## Related Domain Entities\nsee `domain_entities/visits.md`\n"
+    assert cds.normalize_entity_rename_contract(
+        old
+    ) == cds.normalize_entity_rename_contract(new)
+
+
+def test_normalize_entity_rename_contract_ignores_line_endings(cds):
+    old = "## Related Business Entities\r\n\r\n- Visits\r\n"
+    new = "## Related Domain Entities\n\n- Visits\n"
+    assert cds.normalize_entity_rename_contract(
+        old
+    ) == cds.normalize_entity_rename_contract(new)
+
+
+def test_is_eval_irrelevant_change_true_for_heading_rename(cds):
+    old = "# T\n\n## Related Business Entities\n\n- Visits\n\n## Golden Queries\n\nSELECT 1\n"
+    new = "# T\n\n## Related Domain Entities\n\n- Visits\n\n## Golden Queries\n\nSELECT 1\n"
+    assert cds.is_eval_irrelevant_change(old, new) is True
+
+
+def test_is_contract_rename_only_true_for_heading_rename(cds):
+    old = "# T\n\n## Related Business Entities\n\n- Visits\n"
+    new = "# T\n\n## Related Domain Entities\n\n- Visits\n"
+    assert cds.is_contract_rename_only(old, new) is True
+
+
+def test_is_contract_rename_only_false_for_heading_plus_ownership(cds):
+    old = "## Ownership\n\n- old@x.com\n\n## Related Business Entities\n\n- Visits\n"
+    new = "## Ownership\n\n- new@x.com\n\n## Related Domain Entities\n\n- Visits\n"
+    assert cds.is_contract_rename_only(old, new) is False
+
+
+def test_is_eval_irrelevant_change_false_when_golden_query_changes(cds):
+    old = "# T\n\n## Related Business Entities\n\n- Visits\n\n## Golden Queries\n\nSELECT 1\n"
+    new = "# T\n\n## Related Domain Entities\n\n- Visits\n\n## Golden Queries\n\nSELECT 2\n"
+    assert cds.is_eval_irrelevant_change(old, new) is False
 
 
 def test_partition_stems_fallback_to_all_uses_full_corpus(cds):

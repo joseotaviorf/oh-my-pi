@@ -27,7 +27,7 @@ same payment rails.
 
 **Target** The target for this metric for H2 (until de end of second semester) 2026 is 99.5%
 
-## Related Business Entities
+## Related Domain Entities
 
 - Payouts
 
@@ -136,7 +136,7 @@ which matches nothing. The bug is harmless there only because not-payable invoic
 value; do not re-introduce the space, and do not remove the `due_amount > 0` guard that covers for it.
 
 **The MOB breakdown uses a different denominator and will not tie out.** The contract-age view in
-[Payouts](../business_entities/payouts.md) Query 3 counts at invoice grain, with the denominator
+[Payouts](../domain_entities/payouts.md) Query 3 counts at invoice grain, with the denominator
 `total invoices - canceled - not-payable`. That is a deliberate second view for cohort diagnosis,
 not a competing version of the headline number. Never present the two side by side as if they should
 match.
@@ -175,12 +175,12 @@ canonical query.
 ## Golden Queries
 
 The official number, monthly. The `landlord_payouts` CTE is the component pattern already documented
-in [Payouts](../business_entities/payouts.md) Query 1; what is exclusive to this metric is the
+in [Payouts](../domain_entities/payouts.md) Query 1; what is exclusive to this metric is the
 contract-grain distinct-count ratio over the valid-payout universe.
 
 ```sql
 WITH landlord_payouts AS (
-    -- Component pattern: see ../business_entities/payouts.md, Query 1.
+    -- Component pattern: see ../domain_entities/payouts.md, Query 1.
     SELECT
         c.id_external AS sk_contract,
         i.accrual_year_month AS invoice_accrual_year_month,

@@ -40,7 +40,7 @@ These metrics measure **listing cohort conversion** through the **demand funnel*
 | **RENT** | **1W / 2W / 4W** from `ts_publication` | **L2R** (ever-signed monthly) — `listing_to_rental.md` |
 | **SALE** | **1W / 2W / 4W / 8W** from `ts_first_publication` (same formula — change `INTERVAL`) | **L2CCV** — often reported at **8W / 12W / M0+M1** |
 
-## Related Business Entities
+## Related Domain Entities
 
 - House and Listing
 - FR Transact

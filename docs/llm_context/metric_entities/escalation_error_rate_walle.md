@@ -20,7 +20,7 @@ part of the official metric's universe.
 **Exists exclusively for the Wall-E bot, and only for escalations that both started and ended in
 one of the eleven curated front-facing queues listed in Scope below.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Chatbot Sessions
 
@@ -38,7 +38,7 @@ one of the eleven curated front-facing queues listed in Scope below.**
 ## DataHub Catalog
 
 - **This metric's data product**: `urn:li:dataProduct:escalation-error-rate-wall-e`
-- **Upstream business entity data product**: `urn:li:dataProduct:chatbot-sessions`
+- **Upstream domain entity data product**: `urn:li:dataProduct:chatbot-sessions`
 
 ## Glossary and Synonyms
 
@@ -126,7 +126,7 @@ AND ts_created < TIMESTAMP '2026-08-01 00:00:00'
 ```
 
 **Warning**: Filtering only on `bot = 'wall-e'` and `is_escalated` (the pattern used by the
-generic golden query in the Chatbot Sessions business entity) — without also restricting
+generic golden query in the Chatbot Sessions domain entity) — without also restricting
 `first_queue`/`last_queue` to the eleven curated queues — includes back-office and non-front
 queue transitions that do not compose the official metric. Both `first_queue` AND `last_queue`
 must be in the list; a session with only one side in-list is out of scope.
@@ -162,7 +162,7 @@ report as "no data" rather than 0%.
 
 **Don't:**
 
-- Don't reuse the Chatbot Sessions business entity's generic "Escalation error rate" golden
+- Don't reuse the Chatbot Sessions domain entity's generic "Escalation error rate" golden
   query as-is — it lacks the `bot = 'wall-e'` and queue-whitelist restrictions that make this the
   official metric.
 - Don't count a `first_queue != last_queue` mismatch as an error if either queue value falls
@@ -187,7 +187,7 @@ performance.
 
 Computes % Escalation Error Rate for Wall-E, restricted to the curated front-facing queue list.
 The component pattern (per bot/queue-pair escalation counts) reproduces the "Escalation error
-rate" golden query already documented in the Chatbot Sessions business entity; what is exclusive
+rate" golden query already documented in the Chatbot Sessions domain entity; what is exclusive
 to this metric is the `bot = 'wall-e'` filter plus the `first_queue`/`last_queue` queue whitelist
 applied to the shared universe.
 

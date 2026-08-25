@@ -20,11 +20,11 @@ converted listing version = fact_house_listings.sk_contract <> -1
 
 **How you report L2R depends on the time grain asked for** — monthly cohort rate (official corporate definition), weekly/daily cohort rates (same formula, different `DATE_TRUNC`), or windowed cuts (4W/8W). This file is the **single entry point** for all of them.
 
-**Applies to For Rent only.** Schema and listing grain → `business_entities/house_and_listing.md`.
+**Applies to For Rent only.** Schema and listing grain → `domain_entities/house_and_listing.md`.
 
 **Tables:** `dw_rent.dim_house_listing` (`dhl`) + `dw_rent.fact_house_listings` (`fhl`) on `sk_house_listing`. No materialized L2R metric table — run SQL.
 
-## Related Business Entities
+## Related Domain Entities
 
 - House and Listing
 - Closing
@@ -51,7 +51,7 @@ converted listing version = fact_house_listings.sk_contract <> -1
 
 **Not the same as:**
 
-- **CC2CS** (`business_entities/closing.md`) — contract created → contract signed inside the pre-contract funnel
+- **CC2CS** (`domain_entities/closing.md`) — contract created → contract signed inside the pre-contract funnel
 - **Supply funnel O2L** (`metric_entities/funnel_conversions_supply.md`) — opportunity → first listing acquisition
 - **L2CCV** (SALE) — see `metric_entities/listing_demand_funnel_conversions.md`
 

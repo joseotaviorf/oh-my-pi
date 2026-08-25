@@ -131,7 +131,7 @@ Prompt-to-query mapping for this specific active test:
 
 ### CDP (N:1 via `id_user` — attribution only)
 
-- **UTM and click IDs** before or after recs exposure → `datalake_cdp_clean.user_tracking` on `ids.id_user` (event grain); see `business_entities/cdp.md`.
+- **UTM and click IDs** before or after recs exposure → `datalake_cdp_clean.user_tracking` on `ids.id_user` (event grain); see `domain_entities/cdp.md`.
 - Recs impression and CTR metrics stay on `datalake_search.recs_impressions_processed` — do not substitute CDP event tables.
 
 ### Visits (N:1 via user-house journey keys)

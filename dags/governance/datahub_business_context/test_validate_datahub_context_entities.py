@@ -15,8 +15,10 @@ from validate_datahub_context_entities import (
     _data_product_type,
     _filter_entity_paths,
     _is_entity_md,
+    _is_rename_contract_only,
     _maybe_comment_on_pr,
     _maybe_comment_success,
+    _normalize_entity_rename_contract,
     _pr_comment_body,
     _static_checks,
     _validate_file,
@@ -47,7 +49,7 @@ _VALID_METRIC = """\
 
 My Metric is the official indicator for something, computed monthly.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Contact
 
@@ -158,9 +160,7 @@ def _write(dir_: Path, subdir: str, name: str, content: str) -> Path:
 
 def test_data_product_type_routes_by_directory(tmp_path: Path):
     metric = _write(tmp_path / "llm_context", "metric_entities", "m.md", _VALID_METRIC)
-    domain = _write(
-        tmp_path / "llm_context", "business_entities", "d.md", _VALID_DOMAIN
-    )
+    domain = _write(tmp_path / "llm_context", "domain_entities", "d.md", _VALID_DOMAIN)
     assert _data_product_type(metric) == "metric"
     assert _data_product_type(domain) == "domain"
 
@@ -186,7 +186,7 @@ def test_valid_metric_doc_has_no_errors(tmp_path: Path):
 
 def test_valid_domain_doc_has_no_errors(tmp_path: Path):
     p = _write(
-        tmp_path / "llm_context", "business_entities", "my_domain.md", _VALID_DOMAIN
+        tmp_path / "llm_context", "domain_entities", "my_domain.md", _VALID_DOMAIN
     )
     errors, _ = _validate_file(p)
     assert errors == []
@@ -209,7 +209,7 @@ def test_missing_h1_and_overview_are_errors(tmp_path: Path):
 
 def test_domain_requires_tables_and_golden_queries(tmp_path: Path):
     md = "# D\n\n## Overview\n\ncontext only, no tables or queries\n"
-    p = _write(tmp_path / "llm_context", "business_entities", "d.md", md)
+    p = _write(tmp_path / "llm_context", "domain_entities", "d.md", md)
     errors, _ = _validate_file(p)
     assert any("Tables" in e for e in errors)
     assert any("Golden Queries" in e for e in errors)
@@ -388,6 +388,48 @@ def test_maybe_comment_success_posts_on_every_luigi_pr_pass(monkeypatch):
     with patch("sync.pr_comment.post_validation_success", return_value=True) as done:
         _maybe_comment_success()
     done.assert_called_once_with("42")
+
+
+def test_normalize_entity_rename_contract_maps_heading_and_paths():
+    old = (
+        "## Related Business Entities\n"
+        "see `business_entities/visits.md` and a business entity.\n"
+    )
+    new = (
+        "## Related Domain Entities\n"
+        "see `domain_entities/visits.md` and a domain entity.\n"
+    )
+    assert _normalize_entity_rename_contract(old) == _normalize_entity_rename_contract(
+        new
+    )
+
+
+def test_is_rename_contract_only_when_base_blob_matches(tmp_path, monkeypatch):
+    p = tmp_path / "nps_fr.md"
+    p.write_text("## Related Domain Entities\n", encoding="utf-8")
+    monkeypatch.setattr(
+        "validate_datahub_context_entities._rel",
+        lambda path: Path("docs/llm_context/metric_entities/nps_fr.md"),
+    )
+    monkeypatch.setattr(
+        "validate_datahub_context_entities._git_file_at_ref",
+        lambda _ref, _rel: "## Related Business Entities\n",
+    )
+    assert _is_rename_contract_only(p, "origin/master") is True
+
+
+def test_is_rename_contract_only_false_for_new_authoring(tmp_path, monkeypatch):
+    p = tmp_path / "nps_fr.md"
+    p.write_text("## Related Domain Entities\n\n## Extra\n", encoding="utf-8")
+    monkeypatch.setattr(
+        "validate_datahub_context_entities._rel",
+        lambda path: Path("docs/llm_context/metric_entities/nps_fr.md"),
+    )
+    monkeypatch.setattr(
+        "validate_datahub_context_entities._git_file_at_ref",
+        lambda _ref, _rel: "## Related Business Entities\n",
+    )
+    assert _is_rename_contract_only(p, "origin/master") is False
 
 
 def test_maybe_comment_success_is_a_noop_off_a_pr(monkeypatch):

@@ -29,7 +29,7 @@ not redefine those cuts.
 **This product exists exclusively for For Rent — there is no equivalent weighted NPS for FS
 or other products.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - NPS
 
@@ -188,7 +188,7 @@ includes lost, ppm, po and other campaigns that do **not** compose the official 
 ### Nuances
 
 Mechanics shared by the metrics in this file. (Tables/columns and the generic component
-calculation live in `business_entities/nps.md` — here, only what is specific to these
+calculation live in `domain_entities/nps.md` — here, only what is specific to these
 metrics.)
 
 **Campaign taxonomy** — dictionary mapping `dnc.metric_group` (raw value in
@@ -351,7 +351,7 @@ the same GSheet table (informational — **not** used in the NPS calculation).
 ## Golden Queries
 
 The per-journey NPS CTEs reproduce the component pattern already documented in
-`business_entities/nps.md`; what is exclusive to these metrics is the weighting layer
+`domain_entities/nps.md`; what is exclusive to these metrics is the weighting layer
 (NPS True, PP Multi) and the cuts (`is_spoc_test`, `cnt_15_seg`, `customer_type`).
 
 **Answer counting — always `COUNT(DISTINCT sk_nps_answer)`** (numerator and denominator),

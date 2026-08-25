@@ -29,7 +29,7 @@ LL report.
 
 **Exists exclusively for For Rent — there is no equivalent product for FS or other products.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Collections
 

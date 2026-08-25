@@ -19,7 +19,7 @@ The metric exists for **both For Rent (RENT) and For Sale (SALE)**, but **implem
 | **RENT** | Validated SQL on `fact_house_listing_status` + bounded `dim_date` spine | `sk_house_listing` | No — former metrics table deprecated; **run the query** (see **TARS / interactive execution**) |
 | **SALE** | `dw_sale.fact_daily_ongoing_listing` | `sk_sale_listing` | Yes — one row per published listing per day |
 
-## Related Business Entities
+## Related Domain Entities
 
 - House and Listing
 

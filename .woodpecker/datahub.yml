@@ -8,7 +8,7 @@
 # Workflow triggers on pull_request or push to master / hotfix/* only.
 #
 # Triggers on changes to:
-#   • docs/llm_context/business_entities/**  (business entity Markdown — versioned source)
+#   • docs/llm_context/domain_entities/**  (business entity Markdown — versioned source)
 #   • docs/llm_context/metric_entities/**    (metric entity Markdown — versioned source)
 #
 # Loader/generator/reference changes no longer auto-republish every product. When a change
@@ -62,7 +62,7 @@ steps:
         branch: [master, hotfix/*]
         path:
           include:
-            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/domain_entities/**"
             - "docs/llm_context/metric_entities/**"
           on_empty: false
 
@@ -79,7 +79,7 @@ steps:
         branch: [master, hotfix/*]
         path: &datahub_path
           include:
-            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/domain_entities/**"
             - "docs/llm_context/metric_entities/**"
           on_empty: false
 

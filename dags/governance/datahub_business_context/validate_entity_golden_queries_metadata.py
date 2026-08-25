@@ -37,7 +37,7 @@ from golden_query_schema_validator import (  # noqa: E402
     validate_golden_queries,
 )
 from validate_datahub_context_entities import (  # noqa: E402
-    _BUSINESS_DIR,
+    _DOMAIN_DIR,
     _METRIC_DIR,
     _all_entity_files,
     _data_product_type,
@@ -119,7 +119,7 @@ def main(argv: list[str] | None = None) -> int:
         if not files:
             print(
                 "✗ none of the given --paths are entity .md files under "
-                f"{_BUSINESS_DIR}/ or {_METRIC_DIR}/",
+                f"{_DOMAIN_DIR}/ or {_METRIC_DIR}/",
                 file=sys.stderr,
             )
             return 1

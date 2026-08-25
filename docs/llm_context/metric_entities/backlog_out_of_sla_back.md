@@ -27,7 +27,7 @@ Backlog is a **stock** metric. Each date represents a snapshot of the tickets an
 
 **Known active limitations**: the Zendesk zero-contribution issue from 2026-06-25 onward (see [Data Sources — Zendesk](#zendesk)) and the "Out of SLA" residual in Onboarding/Offboarding (see [Confirmed field limitations](#confirmed-field-limitations-2026-07-23--known-out-of-sla-residual)) — see [Validation](#validation) for the full evidence.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Ticket
 - Department

@@ -16,7 +16,7 @@ The naive path — dividing every attributed conversion by every session — is 
 
 **Every Isaias session is end-to-end. Brazil (BR), RENT and SALE.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Supply
 
@@ -33,7 +33,7 @@ The naive path — dividing every attributed conversion by every session — is 
 ## DataHub Catalog
 
 - **This metric's data product**: `urn:li:dataProduct:isaias-conversions`
-- **Upstream business entity data product**: `urn:li:dataProduct:supply`
+- **Upstream domain entity data product**: `urn:li:dataProduct:supply`
 
 ## Glossary and Synonyms
 
@@ -67,7 +67,7 @@ D2L_auto  = COUNT(DISTINCT supply_key WHERE funnel_step = 'first_listing'  AND  
 % Escalation to IS = COUNT(DISTINCT id_langfuse_session WHERE LOWER(department) LIKE '%is%') / sessions
 ```
 
-where `supply_key = CONCAT(CAST(sk_supply AS VARCHAR), '_', nm_business_context)` — the deduplication key **never** includes `cd_funnel_step` (a supply can appear at both `opportunity` and `first_listing`), and `autonomous` / `human` are the ledger's `isaias_autonomous_conversion` / `isaias_human_conversion` flags (Autonomous takes priority; a supply is Human only if not Autonomous). The full ledger construction — session isolation, both attribution keys, last-session validity, the OPPORTUNITY 24 h window for Human — is documented in the **Supply** business entity (`../business_entities/supply.md`, Golden Query 2) and reproduced (trimmed to this metric's columns) in the golden query below.
+where `supply_key = CONCAT(CAST(sk_supply AS VARCHAR), '_', nm_business_context)` — the deduplication key **never** includes `cd_funnel_step` (a supply can appear at both `opportunity` and `first_listing`), and `autonomous` / `human` are the ledger's `isaias_autonomous_conversion` / `isaias_human_conversion` flags (Autonomous takes priority; a supply is Human only if not Autonomous). The full ledger construction — session isolation, both attribution keys, last-session validity, the OPPORTUNITY 24 h window for Human — is documented in the **Supply** domain entity (`../domain_entities/supply.md`, Golden Query 2) and reproduced (trimmed to this metric's columns) in the golden query below.
 
 ### Canonical Filter
 
@@ -111,7 +111,7 @@ There are no external weights or parameters — every input comes from the ledge
 
 **Division guard**: wrap each rate with `NULLIF(sessions, 0)` (or `TRY(...)`) so an empty segment yields NULL rather than an error; report NULL as "no data", not 0%.
 
-**Attribution & autonomy definitions live in Supply**: do not re-derive them here — see `../business_entities/supply.md` (Critical Rules and Golden Query 2).
+**Attribution & autonomy definitions live in Supply**: do not re-derive them here — see `../domain_entities/supply.md` (Critical Rules and Golden Query 2).
 
 **Segmentation and time grain**: the ledger output carries `bot` (Isaias vs Wall-E / Mora), `source_environment`, `nm_business_context` (RENT / SALE), `lead_acquisition_type`, and both date axes. Add any of these to the outer `GROUP BY` to segment. For a time series, add `DATE_TRUNC('month' | 'week' | 'day', event_date)` to the `SELECT` and `GROUP BY` and widen the `event_date` window. Because `event_date` = session-start day for `session_start` rows and conversion day for `conversao` rows, bucketing by it gives the **coincident** rate at that grain (sessions counted in the period they started, conversions in the period they occurred). Use `DATE_TRUNC(..., session_date)` instead only for an explicitly requested cohort view.
 
@@ -134,7 +134,7 @@ There are no external weights or parameters — every input comes from the ledge
 
 ## Golden Queries
 
-Produces the Isaias conversion rates and volumes by `bot` and `source_environment`. The subquery is a **trimmed copy** of the session-supply ledger documented in the **Supply** business entity (`../business_entities/supply.md`, Golden Query 2) — only the columns this metric consumes; the full attribute set is available there if needed. What is exclusive to this metric is the outer aggregation layer (the D2O / D2L / autonomous / total ratios and the escalation share), with the `OR` predicates correctly parenthesized.
+Produces the Isaias conversion rates and volumes by `bot` and `source_environment`. The subquery is a **trimmed copy** of the session-supply ledger documented in the **Supply** domain entity (`../domain_entities/supply.md`, Golden Query 2) — only the columns this metric consumes; the full attribute set is available there if needed. What is exclusive to this metric is the outer aggregation layer (the D2O / D2L / autonomous / total ratios and the escalation share), with the `OR` predicates correctly parenthesized.
 
 ```sql
 SELECT

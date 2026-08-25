@@ -30,7 +30,7 @@ lease lifecycle stage.
 > the denominator. Only keep eviction cases in when the user explicitly asks to analyze
 > or compare Despejo separately.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Inspection
 

@@ -40,7 +40,7 @@ approval/comment signals from the raw clean review chain and access signals from
 — Property Integrity. No FS equivalent; do not mix with Property Integrity
 Offboarding.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Inspection
 

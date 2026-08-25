@@ -32,7 +32,7 @@ How to write table and column `description` fields and `categories` blocks in ev
 
 Write the table `description` as a `|` block with one component per line or short paragraph, in this order:
 
-1. **Entity** — one sentence naming the business entity or process the table represents (no name echo, no "table containing…" filler).
+1. **Entity** — one sentence naming the domain entity or process the table represents (no name echo, no "table containing…" filler).
 2. **Grain** — explicit: "One row per `<key>` [× `<key>`]". For SCD Type 2, state the versioning behavior (new version when any attribute changes; consecutive identical periods merged). For snapshots, state the cadence and how the current period is represented.
 3. **Scope** — the population covered, stated affirmatively and in business terms: "Covers all employees, active and terminated." Engineering filters that define the population (assignment types, test-user exclusion) stay in the SQL.
 4. **Usage** *(dw/metric)* — the analyses it supports and the canonical way in: official flags to filter, `sk_*` relationships to join. **Behavior** *(clean/enrich)* — update and effective-dating semantics, and the guarantees downstream consumers rely on.

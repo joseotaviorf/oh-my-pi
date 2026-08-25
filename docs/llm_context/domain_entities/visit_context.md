@@ -58,7 +58,7 @@ A visit is the strongest signal of transaction intent and feeds downstream offer
 
 | You need… | Use this table |
 | --- | --- |
-| Funnel conversion metrics (VB2VC, offer, contract) | `dw_visit.fact_visits` (owned by the **visits** data product — see `business_entities/visits.md`); one row per visit, pre-aggregated `num_*` measures and full SK dimension set |
+| Funnel conversion metrics (VB2VC, offer, contract) | `dw_visit.fact_visits` (owned by the **visits** data product — see `domain_entities/visits.md`); one row per visit, pre-aggregated `num_*` measures and full SK dimension set |
 | Visit attributes (status, cancellation reason, source, business context, timestamps) | `dw_visit.dim_visit` (owned by **visits**) — enriches `fact_visits` on `sk_visit`; use `ts_visit` as the partition/time column |
 | History of individual booking attempts (reschedules, operational analysis) | `dw_visit.fact_visit_schedules` (owned by **visits**) — one row per schedule attempt; join to `dim_visit_schedule` on `sk_schedule` |
 | Schedule-level attributes (channel, confirmation flags, `is_last_schedule`) | `dw_visit.dim_visit_schedule` (owned by **visits**) — use `is_last_schedule = TRUE` to isolate the final/valid attempt |

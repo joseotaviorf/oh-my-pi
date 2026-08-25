@@ -148,7 +148,7 @@ def test_metric_document_skips_tables_but_requires_documented_sections():
         "**Data Owner:**\n- owner@quintoandar.com.br\n\n"
         "**Data Steward:**\n- steward@quintoandar.com.br\n\n"
         "## Overview\n\nOfficial weighted NPS for For Rent.\n\n"
-        "## Related Business Entities\n\n- NPS\n\n"
+        "## Related Domain Entities\n\n- NPS\n\n"
         "## Catalog\n\n"
         "| Metric | Type |\n| :---- | :---- |\n| NPS FR | OKR |\n\n"
         "## Glossary and Synonyms\n\n- **NPS FR** → this metric\n\n"

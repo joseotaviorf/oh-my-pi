@@ -2,7 +2,7 @@
 
 Entity configs are generated ephemerally in CI from Markdown:
 
-- Source: `docs/llm_context/business_entities/*.md`
+- Source: `docs/llm_context/domain_entities/*.md`
 - Generator: `packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py`
 - Schema examples: `../reference/`
 

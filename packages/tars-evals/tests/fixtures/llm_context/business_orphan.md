@@ -15,7 +15,7 @@ scope resolver must fail closed.
 
 ## Glossary and Synonyms
 
-- **orphan fixture** → a business entity with no linked metric
+- **orphan fixture** → a domain entity with no linked metric
 
 ## Tables
 

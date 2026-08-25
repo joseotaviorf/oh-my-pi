@@ -36,7 +36,7 @@ ongoing stages only).**
 contract with both tenant (IQ) and landlord (PP) roles contributes **two** client slots and is
 counted independently for each role. This is intentional and matches the official spreadsheet.
 
-## Related Business Entities
+## Related Domain Entities
 
 - ticket
 - chatbot_sessions

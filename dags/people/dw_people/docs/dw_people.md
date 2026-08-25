@@ -195,7 +195,7 @@ ORDER BY
 
 Use `INNER JOIN` when the question is only about Product & Tech. Use `LEFT JOIN` when mixing non–P&T employees.
 
-For conversational “which team does this person belong to?” routing outside Product & Tech (cost center + direct reports + manager), see the TARS entity `docs/llm_context/business_entities/people_public.md`.
+For conversational “which team does this person belong to?” routing outside Product & Tech (cost center + direct reports + manager), see the TARS entity `docs/llm_context/domain_entities/people_public.md`.
 
 ### Analytical Snapshot (Management Chain for an Employee)
 

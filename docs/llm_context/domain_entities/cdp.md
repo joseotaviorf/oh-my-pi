@@ -193,7 +193,7 @@ Consolidated **business objects** produced by the Airflow DAG `enrich_transactio
 
 | `entity` | Domain (summary) | Typical `business_context` | Analytics (prefer DW / entity doc) |
 |----------|------------------|----------------------------|-------------------------------------|
-| `VISIT` | Scheduled or completed property visit | RENT / SALE | `dw_visit.*` — `business_entities/visits.md` |
+| `VISIT` | Scheduled or completed property visit | RENT / SALE | `dw_visit.*` — `domain_entities/visits.md` |
 | `FR_OFFER` | ForRent offer (Rental Transact) | RENT | `dw_rent.dim_offer` / offer dims |
 | `FR_CONTRACT` | Rental contract | RENT | `dw_rent.dim_contract`, facts |
 | `FR_TERMINATION` | Contract termination | RENT | terminator / rent DW |
@@ -267,7 +267,7 @@ Parse `properties` with `GET_JSON_OBJECT` / struct access when filtering; field 
 ### Visits (event grain vs analytics grain)
 
 - **EGW visit events** (e.g. filters on `event_name` like `visit_*`) → `datalake_cdp_clean.transactional` on `id_user`, `id_house`, `ts_event`.
-- **Visit KPIs** (VB2VC, completion, cancellations, entrance model) → `dw_visits.fact_visits`, `dw_visits.dim_visit` — see `business_entities/visits.md`.
+- **Visit KPIs** (VB2VC, completion, cancellations, entrance model) → `dw_visits.fact_visits`, `dw_visits.dim_visit` — see `domain_entities/visits.md`.
 - **AI cross-entity visit context** → `datalake_transactional_entities.entities` with `entity = 'VISIT'` and `properties` parsed for status/time — not for reporting funnels.
 - Follows the same rules for different entities (offer, contract, etc.)
 
@@ -278,14 +278,14 @@ Parse `properties` with `GET_JSON_OBJECT` / struct access when filtering; field 
 
 ### Matthew / chatbots (session grain vs user journey)
 
-- Chatbot **session** metrics stay in `datalake_chatbot.sessions` / `business_entities/chatbot_sessions.md` and `business_entities/matthew.md`.
+- Chatbot **session** metrics stay in `datalake_chatbot.sessions` / `domain_entities/chatbot_sessions.md` and `domain_entities/matthew.md`.
 - **Cross-entity user state** for Domi/Matthew (visits, offers, contracts in one slice) → `datalake_transactional_entities.entities` on `id_user`, or Datazord `/user-context` — see `### datalake_transactional_entities.entities` below.
 - Active role at interaction time → `datalake_cdp.persona` on `id_user` (not persona history from `datalake_cdp_personas.persona` unless the question is explicitly historical).
 
 ### Recs / Search (attribution vs impression grain)
 
 - **UTM and click IDs at event grain** → `datalake_cdp_clean.user_tracking` (`egw_initial_utm_*`, `egw_gclid`, `egw_fbclid`, …); aggregate per `id_user` in SQL when needed.
-- **Recommendation or search impression metrics** → `datalake_search.recs_impressions_processed` / `business_entities/recs.md` and `business_entities/search.md` — join on `ids.id_user` / `ids.id_house` from those tables, not from CDP event tables.
+- **Recommendation or search impression metrics** → `datalake_search.recs_impressions_processed` / `domain_entities/recs.md` and `domain_entities/search.md` — join on `ids.id_user` / `ids.id_house` from those tables, not from CDP event tables.
 
 ## Identity model
 

@@ -16,7 +16,7 @@ This metric entity is a **separate document from the Cohort View** because of on
 
 **A reply is not necessarily caused by the cadence.** A customer can re-engage on WhatsApp in the 2-day gap before the first trigger (`rehabilitation_trigger_count = '0'`) or long after leaving the cadence. Read recapture by cadence stage rather than assuming attribution.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Consórcio (Inside Sales Funnel)
 
@@ -102,7 +102,7 @@ Every discarded-deal attribute read on a recaptured deal — **original acquisit
 
 **The survey was introduced recently, so low volume is expected** — 78 answered discards in the Jun–Aug 2026 window. Report the base size alongside any feedback breakdown; the cuts are directional until volume builds up.
 
-(The `qualifier_*` fields — the customer's answers to Conrado's qualifying questions — are documented in the Consórcio business entity.)
+(The `qualifier_*` fields — the customer's answers to Conrado's qualifying questions — are documented in the Consórcio domain entity.)
 
 ### Canonical Filter
 

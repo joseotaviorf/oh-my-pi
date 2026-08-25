@@ -55,7 +55,7 @@ show 8w/12w values that are still climbing** — this is not a bug, it's the sam
 "MTD" phenomenon that applies to the current month's 4w number, just extended
 further out on the calendar for the higher horizons.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Termination
 

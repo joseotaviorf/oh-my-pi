@@ -16,7 +16,7 @@
 
 **Exists exclusively for For Rent (BR).**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Credit Analysis
 - Credit Policy
@@ -42,7 +42,7 @@
 ## DataHub Catalog
 
 - **This metric's data product**: `urn:li:dataProduct:credit-metrics` (published by CI from this file)
-- **Upstream business-entity data products** (schema/datasets documented there): `urn:li:dataProduct:credit-analysis`, `urn:li:dataProduct:credit-policy`, `urn:li:dataProduct:credit-experiments`
+- **Upstream domain-entity data products** (schema/datasets documented there): `urn:li:dataProduct:credit-analysis`, `urn:li:dataProduct:credit-policy`, `urn:li:dataProduct:credit-experiments`
 
 The specific upstream datasets each metric touches are named in that metric's section (and in the
 "Shared Table Skeleton" below); their columns/grain live in the linked business entities' catalogs.
@@ -100,10 +100,10 @@ These metrics draw from a small shared set of tables. **Column semantics, enums,
 join caveats are not repeated here** — they live in the linked business entities and in
 DataHub / governance metadata:
 
-- funnel flags, stage dates, `sk_*` keys on `fact_proposal_credit_flows` / `fact_early_credit`, the 8-stage funnel and right-censoring → [`credit_analysis.md`](../business_entities/credit_analysis.md)
-- `policy_report_credit_policy` scores / `analysis_category_name` / `risk_category_range` → [`credit_policy.md`](../business_entities/credit_policy.md); `experiment_groups` arms, house-level randomization → [`credit_experiments.md`](../business_entities/credit_experiments.md)
-- `dim_house_listing` (listing status / SCD versioning) → [`house_and_listing.md`](../business_entities/house_and_listing.md)
-- `fact_ever_clean` (delinquency) → [`losses.md`](../business_entities/losses.md); `datalake_retsuko.*` invoices → [`payments.md`](../business_entities/payments.md)
+- funnel flags, stage dates, `sk_*` keys on `fact_proposal_credit_flows` / `fact_early_credit`, the 8-stage funnel and right-censoring → [`credit_analysis.md`](../domain_entities/credit_analysis.md)
+- `policy_report_credit_policy` scores / `analysis_category_name` / `risk_category_range` → [`credit_policy.md`](../domain_entities/credit_policy.md); `experiment_groups` arms, house-level randomization → [`credit_experiments.md`](../domain_entities/credit_experiments.md)
+- `dim_house_listing` (listing status / SCD versioning) → [`house_and_listing.md`](../domain_entities/house_and_listing.md)
+- `fact_ever_clean` (delinquency) → [`losses.md`](../domain_entities/losses.md); `datalake_retsuko.*` invoices → [`payments.md`](../domain_entities/payments.md)
 
 The table below is a quick key-column reminder for the golden queries; each metric section adds the layer exclusive to it.
 
@@ -134,11 +134,11 @@ WHERE ts_created >= TIMESTAMP '2026-05-20 00:00:00 UTC'
   AND COALESCE(retenant_type, 'NEW_USER') = 'NEW_USER'
 ```
 
-Retenants use separate policy matrices and are excluded from in-policy experiments — always apply the retenant filter when comparing experiment arms ([`credit_experiments.md`](../business_entities/credit_experiments.md)).
+Retenants use separate policy matrices and are excluded from in-policy experiments — always apply the retenant filter when comparing experiment arms ([`credit_experiments.md`](../domain_entities/credit_experiments.md)).
 
 Deduplicate when the unit of analysis repeats across decision events: by `id_house` (keep the first event via `ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_created) = 1`) for house-grain metrics, or by proposal/contract joins for proposal-grain metrics. When the question is not about an experiment, drop the `experiment_groups` filter and keep the rest of the logic.
 
-> For experiment comparisons, [`credit_experiments.md`](../business_entities/credit_experiments.md) is
+> For experiment comparisons, [`credit_experiments.md`](../domain_entities/credit_experiments.md) is
 > the methodology source: randomization is **house-level** (validate the split with
 > `count(DISTINCT id_house)` per arm; report/proposal counts are **post-treatment** and are not a
 > split check), and the outcome transition to measure depends on the **flip kind** (reject↔paid/free
@@ -318,7 +318,7 @@ Apply on `datalake_sorting_hat.policy_report_credit_policy`:
 id_proposal IS NOT NULL
 ```
 
-**Warning**: any `analysis_category_name` outside the mapped values must land in "Others" — never silently drop it. In practice, **most "Others" volume is `analysis_category_name IS NULL`** (policy bypass or override), not unmapped guarantee strings — see [`credit_policy.md`](../business_entities/credit_policy.md). `CLEAR_NO` is a rejection; include it for the full decision picture, but exclude it (and usually NULL) if the question is strictly about the mix among guarantee offers.
+**Warning**: any `analysis_category_name` outside the mapped values must land in "Others" — never silently drop it. In practice, **most "Others" volume is `analysis_category_name IS NULL`** (policy bypass or override), not unmapped guarantee strings — see [`credit_policy.md`](../domain_entities/credit_policy.md). `CLEAR_NO` is a rejection; include it for the full decision picture, but exclude it (and usually NULL) if the question is strictly about the mix among guarantee offers.
 
 ---
 
@@ -804,7 +804,7 @@ ORDER BY 1
 - Don't compute EC|ES2CS as CS ÷ ES from `fact_proposal_credit_flows` alone — it ignores Early Credit entries and re-evaluations. Use `datalake_sorting_hat.early_credit_analysis` (not `fact_early_credit`) for the earliest EC date per flow.  
 - Don't count rows instead of `DISTINCT sk_contract` for CS volume.  
 - Don't sum weekly CS volume buckets when the axis is `p.ts_created` — contracts with policy events in multiple weeks appear in more than one bucket; use signature-date bucketing for totals.  
-- Don't compare experiment arms without excluding retenants — they use separate policy matrices ([`credit_experiments.md`](../business_entities/credit_experiments.md)).  
+- Don't compare experiment arms without excluding retenants — they use separate policy matrices ([`credit_experiments.md`](../domain_entities/credit_experiments.md)).  
 - Don't use listing versions other than `is_last_version = TRUE` for unpublishing status.  
 - Don't hardcode experiment dates/names when the user's question references a different experiment.  
 - Don't include immature OA weeks in OA2CA — the W2 window needs one full week after the OA week to close; exclude the last two OA weeks with a rolling `date_trunc('week', dt_oa)` cap.

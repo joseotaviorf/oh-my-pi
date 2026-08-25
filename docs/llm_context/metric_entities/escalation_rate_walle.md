@@ -19,7 +19,7 @@ denominator, otherwise it silently reports the escalation rate across all bots.
 Isaias, old bot) — those need their own escalation rate computed with the same pattern but a
 different bot filter.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Chatbot Sessions
 
@@ -37,7 +37,7 @@ different bot filter.**
 ## DataHub Catalog
 
 - **This metric's data product**: `urn:li:dataProduct:escalation-rate-wall-e`
-- **Upstream business entity data product**: `urn:li:dataProduct:chatbot-sessions`
+- **Upstream domain entity data product**: `urn:li:dataProduct:chatbot-sessions`
 
 ## Glossary and Synonyms
 
@@ -129,7 +129,7 @@ performance.
 
 Computes the daily % Escalation Rate for Wall-E. The component pattern (per-day, per-bot
 escalation count over total count) reproduces the general "Session volume by bot and channel"
-golden query documented in the Chatbot Sessions business entity; what is exclusive to this
+golden query documented in the Chatbot Sessions domain entity; what is exclusive to this
 metric is the `bot = 'wall-e'` restriction applied to the whole universe (not just the
 numerator).
 

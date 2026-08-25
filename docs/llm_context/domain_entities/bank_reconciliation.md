@@ -4,7 +4,7 @@
 
 Bank reconciliation (conciliação bancária) is the **FinOps control process** that verifies a payment or payout was recorded consistently across every system in the chain: **billing/origin** (Retsuko, Trato Feito, Monopoly, CAP), **payment rail** (Checkout, Vans), **bank evidence** (Itaú statements and/or Nexxera CNAB — francesinha), and **accounting** (SAP via `datalake_pas.ledger`).
 
-**Scope note:** The focus of `datalake_bank_conciliation` is **SAP ↔ Bank** reconciliation — confirming that amounts and dates in the bank (CNAB / Itaú statements) match SAP ledger postings. For **SAP ↔ Product** reconciliation (whether product systems correctly triggered accounting entries), use `business_entities/accounting_funnel.md` instead.
+**Scope note:** The focus of `datalake_bank_conciliation` is **SAP ↔ Bank** reconciliation — confirming that amounts and dates in the bank (CNAB / Itaú statements) match SAP ledger postings. For **SAP ↔ Product** reconciliation (whether product systems correctly triggered accounting entries), use `domain_entities/accounting_funnel.md` instead.
 
 The Data Fintech squad materializes this in the enrich schema **`datalake_bank_conciliation`** (DAG `enrich_bank_conciliation`). There is **no DW layer** for this domain — analysts and FinOps query the enrich tables directly.
 
@@ -78,19 +78,19 @@ Not every transaction achieves full automatic reconciliation. Manual SAP posting
 ### Payments (N:1 — reconciliation row validates a payment event)
 
 - Cash-in models join Checkout (`datalake_checkout_clean.boleto`, `bolecode`, `pix`), Vans (`datalake_vans_clean.boleto`), and billing (`datalake_retsuko.invoice`).
-- For payment-method analytics and unified charge grain, see `business_entities/payments.md` (`dw_payments_platform.fact_payment`).
+- For payment-method analytics and unified charge grain, see `domain_entities/payments.md` (`dw_payments_platform.fact_payment`).
 - Reconciliation answers "did the paid amount land in bank and SAP?" — payments answers "how was the charge processed?".
 
 ### Collections (N:1 — collections cash-in is a subset)
 
 - `for_rent_cashin_collections` tracks Trato Feito installments and Retsuko invoices from debt recovery.
-- For negotiation and overdue context, see `business_entities/collections.md` (`dw_collection_recovery_quintoandar.*`).
+- For negotiation and overdue context, see `domain_entities/collections.md` (`dw_collection_recovery_quintoandar.*`).
 - Do not confuse with collections operational metrics — bank reconciliation is a **post-payment accounting control**.
 
 ### For Sale / FS Transact (N:1 — offer-level cash-in)
 
 - `for_sale_cashin` links Monopoly offers (`sk_offer`, `sk_house`) to bank/SAP via pseudo-IDs (CPF fragment + `id_house`) or Checkout Pix (`id_bank_payment` ↔ `origin_identifier` after Dec/2025).
-- For transaction funnel context, see `business_entities/fs-transact.md`.
+- For transaction funnel context, see `domain_entities/fs-transact.md`.
 
 ### SAP / Accounting funnel (1:1 per ledger posting)
 

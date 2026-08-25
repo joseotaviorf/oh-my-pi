@@ -944,13 +944,13 @@ validate-metadata-files-exist:
 
 .PHONY: validate-datahub-context-entities
 ## Deterministic, offline gate for changed DataHub context entity .md files
-## (docs/llm_context/{business,metric}_entities). Reuses the authoritative
+## (docs/llm_context/{domain,metric}_entities). Reuses the authoritative
 ## parser+validator; needs NO DataHub/LLM credentials. Runs on PRs (see
 ## .woodpecker/validations.yml) so a malformed entity doc is blocked before it
 ## reaches master and the DataHub publish step.
 validate-datahub-context-entities:
 	@echo ""
-	@echo "Validating changed DataHub context entity docs (business + metric)"
+	@echo "Validating changed DataHub context entity docs (domain + metric)"
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master

@@ -23,7 +23,7 @@ _METRIC_PARTS = [
         "**Data Steward:**\n- steward@quintoandar.com.br",
     ),
     ("## Overview", "What it measures and why the naive path is wrong."),
-    ("## Related Business Entities", "- Contact"),
+    ("## Related Domain Entities", "- Contact"),
     (
         "## Catalog",
         "| Metric | Type |\n| :---- | :---- |\n| My Metric | OKR |",
@@ -270,7 +270,7 @@ Metric family.
     assert parsed.glossary_terms[1].term_id == "offb_w_o_mediation"
 
 
-def test_related_business_entities_parsed_to_product_ids():
+def test_related_domain_entities_parsed_to_product_ids():
     doc = """\
 # Metric
 
@@ -278,29 +278,29 @@ def test_related_business_entities_parsed_to_product_ids():
 
 Body.
 
-## Related Business Entities
+## Related Domain Entities
 
 - NPS
 - House and Listing
 """
     parsed = parse_entity_markdown(doc)
     assert parsed.related_data_products == ["nps", "house-and-listing"]
-    assert parsed.has_related_business_entities_section is True
+    assert parsed.has_related_domain_entities_section is True
 
 
-def test_related_business_entities_html_comment_is_not_an_entity():
+def test_related_domain_entities_html_comment_is_not_an_entity():
     # Regression: ``<!-- optional -->`` slugifies to ``optional`` if comments are
     # not stripped, so CI would accept a template leftover as a related product.
     parsed = parse_entity_markdown(
         _metric_doc().replace("- Contact", "<!-- optional -->")
     )
-    assert parsed.has_related_business_entities_section is True
+    assert parsed.has_related_domain_entities_section is True
     assert parsed.related_data_products == []
     errors, _ = validate_parsed_document(parsed, data_product_type="metric")
     assert any("no entities were parsed" in e for e in errors)
 
 
-def test_related_business_entities_keeps_bullets_beside_html_comments():
+def test_related_domain_entities_keeps_bullets_beside_html_comments():
     parsed = parse_entity_markdown(
         _metric_doc().replace(
             "- Contact", "- House and Listing\n<!-- template hint -->"
@@ -308,7 +308,7 @@ def test_related_business_entities_keeps_bullets_beside_html_comments():
     )
     assert parsed.related_data_products == ["house-and-listing"]
     errors, _ = validate_parsed_document(parsed, data_product_type="metric")
-    assert not any("Related Business Entities" in e for e in errors)
+    assert not any("Related Domain Entities" in e for e in errors)
 
 
 def test_superset_golden_assets_parsed_for_metric_datasets():
@@ -441,14 +441,14 @@ def test_metric_validation_errors_when_related_section_unparsed():
 
 Body.
 
-## Related Business Entities
+## Related Domain Entities
 
 
 """
     parsed = parse_entity_markdown(doc)
     errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
-    assert any("Related Business Entities" in err for err in errors)
-    assert not any("Related Business Entities" in warn for warn in warnings)
+    assert any("Related Domain Entities" in err for err in errors)
+    assert not any("Related Domain Entities" in warn for warn in warnings)
 
 
 def test_calculation_without_canonical_filter_or_nuances_is_blocking():
@@ -580,8 +580,8 @@ def test_dos_and_donts_missing_a_dont_warns_not_blocks():
         ("## Ownership", "Missing ## Ownership section"),
         ("## Overview", "Missing ## Overview section"),
         (
-            "## Related Business Entities",
-            "Missing ## Related Business Entities section",
+            "## Related Domain Entities",
+            "Missing ## Related Domain Entities section",
         ),
         ("## Glossary and Synonyms", "Missing ## Glossary and Synonyms section"),
         ("## Scope", "Missing ## Scope section"),

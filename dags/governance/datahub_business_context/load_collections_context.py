@@ -20,7 +20,7 @@ property + legacy ``removeLink`` cleanup). Payload and default URNs are supplied
 such as ``collections_recovery_bundle.py`` — not by this orchestrator.
 
 ``data_product_curated_entity``: declarative YAML only — the shape produced by CI from
-``docs/llm_context/business_entities/_TEMPLATE.md`` (``data_product_type: domain``) or
+``docs/llm_context/domain_entities/_TEMPLATE.md`` (``data_product_type: domain``) or
 ``docs/llm_context/metric_entities/_TEMPLATE.md`` (``data_product_type: metric``). See
 ``reference/_TEMPLATE.datahub.yaml`` for the full schema.
 
@@ -2658,7 +2658,7 @@ def _ensure_type_sp_definition() -> bool:
             "displayName": "Data Product Type",
             "description": (
                 "Classification of this Data Product. "
-                "domain = business entity / schema reference; "
+                "domain = domain entity / schema reference; "
                 "metric = official calculated metric with a golden query."
             ),
             "valueType": _STRUCTURED_PROPERTY_VALUE_TYPE_STRING,

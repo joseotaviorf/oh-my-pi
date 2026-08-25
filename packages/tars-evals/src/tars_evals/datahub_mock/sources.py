@@ -24,7 +24,7 @@ def load_data_products() -> dict[str, DataProduct]:
     which the entity model tolerates."""
     parser = _document_parser()
     out: dict[str, DataProduct] = {}
-    for subdir in ("business_entities", "metric_entities"):
+    for subdir in ("domain_entities", "metric_entities"):
         md_dir = repo_root() / "docs/llm_context" / subdir
         for md in sorted(md_dir.glob("*.md")):
             if md.name == "_TEMPLATE.md":

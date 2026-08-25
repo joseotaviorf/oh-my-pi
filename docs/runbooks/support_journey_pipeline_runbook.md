@@ -215,7 +215,7 @@ Exemplos de perguntas úteis:
 
 Para consultas analíticas sobre essas métricas, instale o plugin **TARS** do marketplace ai-tools (`/tars`). A documentação de
 referência das métricas (schemas, regras e *golden queries*) está em
-`docs/llm_context/business_entities/salesforce_sst_pipeline.md`.
+`docs/llm_context/domain_entities/salesforce_sst_pipeline.md`.
 
 > Cuidado ao correlacionar: um pico de `z_score` **durante recovery do AppFlow**
 > é esperado — sempre cheque `appflow_status` antes de abrir um incidente de
@@ -679,4 +679,4 @@ SERVICES_CONFIG = {
 | Jobs Spark CDC                                                                                                       | `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/salesforce/{cdc_raw,cdc_clean}.py`              |
 | Guarda de partição (`partition_has_data`)                                                                            | `packages/bietlejuice-runtime/src/bietlejuice/base/sst/core/observability/sensors.py`                            |
 | Deps do DW (Datasets)                                                                                                | `dags/dependencies.yaml` (+ `dags/dependency_exceptions/manual_modifications.yaml`)                              |
-| Doc de métricas SST (TARS)                                                                                           | `docs/llm_context/business_entities/salesforce_sst_pipeline.md`                                                  |
+| Doc de métricas SST (TARS)                                                                                           | `docs/llm_context/domain_entities/salesforce_sst_pipeline.md`                                                  |

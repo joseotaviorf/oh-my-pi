@@ -18,7 +18,7 @@ from golden_query_schema_validator import (
 )
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
-_BUSINESS_DIR = _REPO_ROOT / "docs/llm_context/business_entities"
+_DOMAIN_DIR = _REPO_ROOT / "docs/llm_context/domain_entities"
 _METRIC_DIR = _REPO_ROOT / "docs/llm_context/metric_entities"
 
 _DAG_METADATA_RE = re.compile(
@@ -52,7 +52,7 @@ def _rel(path: Path) -> str:
 
 def _all_entity_files() -> list[Path]:
     found: list[Path] = []
-    for directory in (_BUSINESS_DIR, _METRIC_DIR):
+    for directory in (_DOMAIN_DIR, _METRIC_DIR):
         if directory.is_dir():
             found.extend(
                 p for p in directory.glob("*.md") if not p.name.startswith("_")

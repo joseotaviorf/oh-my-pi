@@ -131,7 +131,7 @@ class Question:
     # Old flow: which entity MD files to load (one or more).
     # First item is the primary entity; additional items are loaded for multi-domain questions.
     entity_mds: list[str] = field(
-        default_factory=lambda: ["docs/llm_context/business_entities/collections.md"]
+        default_factory=lambda: ["docs/llm_context/domain_entities/collections.md"]
     )
     needs_yaml: Optional[str] = None  # YAML_PATHS key
     needs_sql: Optional[str] = None  # SQL_PATHS key
@@ -166,16 +166,16 @@ class FlowResult:
 # ---------------------------------------------------------------------------
 # Collections questions (Q1-Q5) — original benchmark set
 # ---------------------------------------------------------------------------
-_COLLECTIONS_MD = "docs/llm_context/business_entities/collections.md"
+_COLLECTIONS_MD = "docs/llm_context/domain_entities/collections.md"
 
 # ---------------------------------------------------------------------------
 # Offboarding / Inspection questions (OBQ1-OBQ5) — from PDF eval (Offboarding tab)
 # Old flow reads intro.md + inspection.md (+ termination.md for OBQ2/OBQ5).
 # New flow searches DataHub for the Inspection Data Product and key datasets.
 # ---------------------------------------------------------------------------
-_INSPECTION_MD = "docs/llm_context/business_entities/inspection.md"
-_TERMINATION_MD = "docs/llm_context/business_entities/termination.md"
-_NPS_MD = "docs/llm_context/business_entities/nps.md"
+_INSPECTION_MD = "docs/llm_context/domain_entities/inspection.md"
+_TERMINATION_MD = "docs/llm_context/domain_entities/termination.md"
+_NPS_MD = "docs/llm_context/domain_entities/nps.md"
 
 _INSPECTION_GOLDEN_QUERY_URN = "urn:li:query:41049d19-cfb6-4561-8dfb-edd8bf43caaa"
 
@@ -184,7 +184,7 @@ _INSPECTION_GOLDEN_QUERY_URN = "urn:li:query:41049d19-cfb6-4561-8dfb-edd8bf43caa
 # Old flow reads intro.md + supply.md.
 # New flow searches DataHub for the Supply Data Product.
 # ---------------------------------------------------------------------------
-_SUPPLY_MD = "docs/llm_context/business_entities/supply.md"
+_SUPPLY_MD = "docs/llm_context/domain_entities/supply.md"
 
 _SUPPLY_GOLDEN_QUERY_URN = "urn:li:query:d2200c86-3938-402c-9586-15d16d6b771b"
 

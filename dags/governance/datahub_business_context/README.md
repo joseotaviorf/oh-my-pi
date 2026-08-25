@@ -83,7 +83,7 @@ Google Chat thread.
 
 ## Authoring a new entity
 
-1. Create `docs/llm_context/business_entities/{entity_slug}.md` from [`_TEMPLATE.md`](../../docs/llm_context/business_entities/_TEMPLATE.md).
+1. Create `docs/llm_context/domain_entities/{entity_slug}.md` from [`_TEMPLATE.md`](../../docs/llm_context/domain_entities/_TEMPLATE.md).
 2. Open a PR — CI validates the template contract.
 3. Merge to master (or push to hotfix) — CI generates YAML and publishes to DataHub.
 4. Verify: `python dags/governance/datahub_business_context/smoke_test_datahub.py`
@@ -103,7 +103,7 @@ export OPENAI_API_KEY="<litellm-proxy-key>"
 
 # Push one entity (generates ephemeral YAML + publishes)
 uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py \
-  docs/llm_context/business_entities/payments.md
+  docs/llm_context/domain_entities/payments.md
 
 # Push all entities (LLM cost — full refresh)
 uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py --all
@@ -117,7 +117,7 @@ make validate-datahub-context-entities
 # Golden-query schema gate (Trino syntax + tables/columns vs repo metadata; no execution).
 uv run --project packages/bietlejuice-compiler python \
   dags/governance/datahub_business_context/validate_entity_golden_queries_metadata.py \
-  --paths docs/llm_context/business_entities/payments.md
+  --paths docs/llm_context/domain_entities/payments.md
 
 # Loader only (debug with reference example)
 python dags/governance/datahub_business_context/load_collections_context.py \

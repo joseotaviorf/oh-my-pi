@@ -23,7 +23,7 @@ Aggregate by `week_pub` or `month_pub` (publication date). **Well priced** = sco
 
 **Applies to For Rent and For Sale (Brazil), 1P and 3P, First listing and Relisting/Recovered.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Pricing
 - House and Listing

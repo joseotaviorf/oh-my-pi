@@ -20,7 +20,7 @@ this document's Golden Queries section only. Do not use listing, rent,
 sale, contract, or customer-contact tables. The only allowed source table
 is `dw_public.dim_date`.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Eval Fixture Domain
 

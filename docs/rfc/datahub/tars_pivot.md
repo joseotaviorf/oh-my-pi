@@ -46,17 +46,17 @@ curated entity documentation.
 
 We propose pivoting the TARS data analyst subagent from its current repo-bound
 context (16 hand-curated entity markdowns under
-[docs/llm_context/business_entities/](../../llm_context/business_entities/) plus
+[docs/llm_context/domain_entities/](../../llm_context/domain_entities/) plus
 ad-hoc reads of `dags/**/metadata/*.yml` and `dags/**/queries/*.sql`) to a
 DataHub-first context, served via the existing DataHub MCP server
 (`user-datahub`). The pilot scope is the **collections** entity, end-to-end:
 push the curated knowledge that today lives in
-[collections.md](../../llm_context/business_entities/collections.md) into
+[collections.md](../../llm_context/domain_entities/collections.md) into
 DataHub as first-class assets (Domain, Glossary, Data Product, schemaField docs,
 Query entities), and rewire TARS to consume only those assets via MCP for any
 collections question.
 
-The medium-term target is to retire `docs/llm_context/business_entities/`
+The medium-term target is to retire `docs/llm_context/domain_entities/`
 entirely. DataHub becomes the single source of truth for both 5A users (UI) and
 TARS (MCP), aligned with FAIR. The pilot is the proof point that lets us move
 the remaining 15 entities on the same template.
@@ -69,7 +69,7 @@ the remaining 15 entities on the same template.
 
 - Establish DataHub as the canonical source of business context for the
   collections entity, replacing
-  [collections.md](../../llm_context/business_entities/collections.md).
+  [collections.md](../../llm_context/domain_entities/collections.md).
 - Rewire TARS (rules + subagent) to read collections context exclusively via the
   DataHub MCP (`search`, `get_entities`, `list_schema_fields`,
   `get_dataset_queries`).
@@ -102,7 +102,7 @@ TARS today is stitched together from four parallel knowledge surfaces, all
 repo-bound:
 
 - **16 hand-curated entity files** in
-  [docs/llm_context/business_entities/](../../llm_context/business_entities/) —
+  [docs/llm_context/domain_entities/](../../llm_context/domain_entities/) —
   narrative, glossary, golden queries, dos/don'ts.
 - **Per-table metadata YAMLs** in `dags/**/metadata/{layer}/*.yml` —
   descriptions, lineage, owner, PII classification.
@@ -158,7 +158,7 @@ for the privilege.
   Generates Trino SQL from natural-language questions and executes via the
   Trino skill.
 - **Entity MD** — A markdown file in
-  [docs/llm_context/business_entities/](../../llm_context/business_entities/)
+  [docs/llm_context/domain_entities/](../../llm_context/domain_entities/)
   carrying narrative, glossary, table catalogue, and golden queries for one
   business domain.
 - **MDM** — Master Data Management. The principle that a given fact lives in
@@ -213,7 +213,7 @@ cost.
 **Today's TARS turn (typical question on a known entity):**
 
 - Loads [intro.md](../../llm_context/intro.md) (~57 lines) plus the relevant
-  entity MD ([collections.md](../../llm_context/business_entities/collections.md)
+  entity MD ([collections.md](../../llm_context/domain_entities/collections.md)
   is ~250 lines) into context, every time.
 - If the column needs verification, additionally `Grep`s `dags/`, `Read`s the
   SQL file, and `Read`s the metadata YAML — three more files materialized in
@@ -327,7 +327,7 @@ One entity, both tracks proven, before scaling to the other 15.
    relevant table (e.g. `is_most_recent_record_month` rule lands on
    `fact_overdue_portfolio_timeline`).
 6. Push the AR Recovery Rate golden query (currently the SQL block at the
-   bottom of [collections.md](../../llm_context/business_entities/collections.md))
+   bottom of [collections.md](../../llm_context/domain_entities/collections.md))
    as a `Query` entity attached to its three subjects
    (`fact_accounts_receivable`, `fact_overdue_portfolio_timeline`,
    `fact_delay`).
@@ -358,7 +358,7 @@ regression cleanly.
      that domain (gives a clean rollback path if DataHub coverage is
      insufficient).
 9. Mark
-   [docs/llm_context/business_entities/collections.md](../../llm_context/business_entities/collections.md)
+   [docs/llm_context/domain_entities/collections.md](../../llm_context/domain_entities/collections.md)
    with a `STATUS: deprecated — see DataHub domain
    urn:li:domain:fintech-collections` banner at the top, but keep the file
    during the pilot so fallback works.
@@ -401,7 +401,7 @@ addresses the gap before rollout continues.
 - **Stage 3:** flip
   [.cursor/rules/data_exploration.mdc](../../../.cursor/rules/data_exploration.mdc)
   to DataHub-only routing, delete
-  [docs/llm_context/business_entities/](../../llm_context/business_entities/),
+  [docs/llm_context/domain_entities/](../../llm_context/domain_entities/),
   retire the `entity_files_consulted` field, and add a CI rule that any new
   business context lands as DataHub assets (not MDs).
 
@@ -462,7 +462,7 @@ MD — synonyms, table routing, column verification, and a golden query.
 |---|---|---|---|
 | 1 | Load entity index | [intro.md](../../llm_context/intro.md) | ~1.5 K |
 | 2 | Map "AR / recuperação / OKR" → `collections` entity via Synonyms | (still in `intro.md`) | — |
-| 3 | Load entity context | [collections.md](../../llm_context/business_entities/collections.md) | ~10 K |
+| 3 | Load entity context | [collections.md](../../llm_context/domain_entities/collections.md) | ~10 K |
 | 4 | Locate the AR Recovery Rate Golden Query inside the MD | (still in `collections.md`) | — |
 | 5 | Verify `delay_contamined_range` on `fact_overdue_portfolio_timeline`: `Grep` `dags/` | grep results | ~0.5 K |
 | 6 | `Read` SQL file | `dags/fintech/dw_collection_recovery_quintoandar/queries/dw/fact_overdue_portfolio_timeline.sql` | ~2 K |
@@ -512,7 +512,7 @@ Files this RFC plans to **change** during the pilot:
 - [.cursor/subagents/data_analyst.md](../../../.cursor/subagents/data_analyst.md)
   — add `datahub_urns_consulted` field; expand `mcp_tools_called` canonical
   list; add MCP-first routing with MD fallback.
-- [docs/llm_context/business_entities/collections.md](../../llm_context/business_entities/collections.md)
+- [docs/llm_context/domain_entities/collections.md](../../llm_context/domain_entities/collections.md)
   — prepend deprecation banner only; keep content during pilot.
 
 Files this RFC plans to **create** during the pilot (separate engineering

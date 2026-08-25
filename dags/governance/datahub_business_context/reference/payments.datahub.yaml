@@ -64,7 +64,7 @@ product_description: |
   - Trato Feito (id_requester = '3') requires joining datalake_debt_recovery.negotiation for
     collector attribution.
 
-  Further detail and table routing: docs/llm_context/business_entities/payments.md
+  Further detail and table routing: docs/llm_context/domain_entities/payments.md
 
 data_product_id: payments
 domain_urn: urn:li:domain:fintech
@@ -85,7 +85,7 @@ golden_query:
     calculations, and payment punctuality segmentation. Wall Street amounts divided by 100
     (stored in cents). BOLECODE subtypes resolved from charge.paid_via. Weekend-adjusted
     dt_business_due used for punctuality. Filters id_requester NOT IN ('4','10').
-    Source: docs/llm_context/business_entities/payments.md
+    Source: docs/llm_context/domain_entities/payments.md
   subjects:
     - schema: dw_payments_platform
       table: fact_payment
@@ -219,6 +219,6 @@ glossary_terms:
         Maps to product_origin = 'Rental'.
 
 documentation_link:
-  label: "Business entity documentation (payments.md)"
+  label: "Domain entity documentation (payments.md)"
   url: >-
-    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/payments.md
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/domain_entities/payments.md

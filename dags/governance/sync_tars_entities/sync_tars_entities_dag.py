@@ -225,7 +225,7 @@ def audit_document(**context) -> dict[str, Any]:
 def classify_entity(**context) -> dict[str, Any]:
     """Check GitHub and DataHub to classify each document as NEW or EDIT.
 
-    GitHub check: does ``docs/llm_context/business_entities/{slug}.md`` already
+    GitHub check: does ``docs/llm_context/domain_entities/{slug}.md`` already
     exist on master? If yes → EDIT (PR will show a diff). If no → NEW.
 
     DataHub check: does ``urn:li:dataProduct:{slug}`` exist? If yes, and the
@@ -471,7 +471,7 @@ audit_document  →  classify_entity  →  open_pr  →  [human review]  →  me
 
 | DataHub tag | Data Product type | MD output directory |
 |---|---|---|
-| `tars-entity` | `domain` | `docs/llm_context/business_entities/` |
+| `tars-entity` | `domain` | `docs/llm_context/domain_entities/` |
 | `tars-metrics` | `metric` | `docs/llm_context/metric_entities/` |
 
 Both tags are audited in a single run. Each document's type is detected automatically
@@ -490,7 +490,7 @@ Fails (Task 2 skipped) if any document fails validation.
 
 For each document from Task 1:
 - **GitHub check**: does the MD file already exist on master?
-  - Domain: `docs/llm_context/business_entities/<slug>.md`
+  - Domain: `docs/llm_context/domain_entities/<slug>.md`
   - Metric: `docs/llm_context/metric_entities/<slug>.md`
   - Yes → `EDIT` (PR shows a diff). No → `NEW`.
 - **DataHub check**: does `urn:li:dataProduct:<slug>` already exist? If yes and
@@ -504,7 +504,7 @@ to Task 3.
 
 Opens a GitHub PR to `master` labelled `[NEW]` or `[EDIT]` with the MD file committed
 to the correct directory based on document type:
-- Domain: `tars-entity-sync/<slug>` branch → `docs/llm_context/business_entities/<slug>.md`
+- Domain: `tars-entity-sync/<slug>` branch → `docs/llm_context/domain_entities/<slug>.md`
 - Metric: `tars-metrics-sync/<slug>` branch → `docs/llm_context/metric_entities/<slug>.md`
 
 On merge, Woodpecker `sync-tars-entities` runs `sync_tars_entities.py --mode direct`

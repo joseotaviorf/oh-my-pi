@@ -16,7 +16,7 @@ The score is **calculated in Data** (DAG **`enrich_similarity_score`**) and forw
 
 **Applies to RENT and SALE** (`business_context`). Grain: **`id_house` + `business_context` + reference day** (daily snapshot).
 
-## Related Business Entities
+## Related Domain Entities
 
 - House and Listing
 - Pricing

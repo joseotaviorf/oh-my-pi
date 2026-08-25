@@ -8,25 +8,25 @@ Goal: define ONE official, named metric — its exact calculation, scope, canoni
       filter, and weight/parameter sources — so TARS reproduces the source-of-truth
       number instead of a naive approximation.
 
-ROLE CONTRACT (this is what makes a metric entity different from a business entity):
+ROLE CONTRACT (this is what makes a metric entity different from a domain entity):
   • A metric entity documents the OFFICIAL METRIC. The schema (tables, columns,
     grain, joins) and the component/generic metric live in the linked
-    business entity under ../business_entities/. NEVER re-document columns or
-    re-teach the component calculation here — LINK to the business entity instead.
+    domain entity under ../domain_entities/. NEVER re-document columns or
+    re-teach the component calculation here — LINK to the domain entity instead.
   • Keep this file thin on schema, thick on calculation: overview, scope,
     exact formula, canonical filter, parameter/weight sources, dos/don'ts, and
     the single golden query that produces the official number.
   • Its Calculation / Canonical Filter / Dos and Don'ts OVERRIDE generic logic in the
-    business entity when both touch the same domain.
+    domain entity when both touch the same domain.
 
 Rules:
   • File name: lowercase_snake_case.md (e.g. nps_fr.md, gmv_fs.md).
   • After creating: add a "Related Metric Entities" back-link from the related
-    business entity(ies).
+    domain entity(ies).
   • **Product scope (RENT / SALE):** state explicitly in **Scope** and whenever citing
     source tables — use **just rent** / **just sale** / **both** for table context (not
     “RENT only” / “SALE only” for table scope). TARS must not classify a table as rent
-    or sale unless documented in this metric entity or the linked business entity.
+    or sale unless documented in this metric entity or the linked domain entity.
   • Golden Query must use Trino SQL dialect (TARS runs on Trino). No Spark-only
     constructs (QUALIFY, GROUP BY ALL, IFF, 3-arg DATEDIFF, variant `col:key`).
   • Optional sections: MBR, Targets and OKRs (Budget and/or OKR lookup — see section
@@ -59,17 +59,17 @@ metadata, not narrative content.
 
 **{Product-scope restriction, if any — e.g. "Exists exclusively for For Rent."}**
 
-## Related Business Entities
+## Related Domain Entities
 
 <!--
-Plain list of the business entity NAMES this metric draws its schema from — no
-paths, no descriptions. Business entities live in ../business_entities/, metric
+Plain list of the domain entity NAMES this metric draws its schema from — no
+paths, no descriptions. Business entities live in ../domain_entities/, metric
 entities in ../metric_entities/ (one file per entity). Add back-links in the
-related business entity's "Related Metric Entities" section. One bullet per
+related domain entity's "Related Metric Entities" section. One bullet per
 related entity.
 -->
 
-- {Business Entity Name}
+- {Domain Entity Name}
 
 ## Catalog
 
@@ -132,7 +132,7 @@ the `data_product.mbr` structured property and Category to `data_product.mbr_cat
 ## Calculation
 
 <!-- The official formula. If there is non-trivial pooling/weighting/aggregation, explain WHY the
-     naive path is wrong. This section is the source of truth and overrides the business entity. -->
+     naive path is wrong. This section is the source of truth and overrides the domain entity. -->
 
 {Explain the error of the naive path, if applicable.}
 
@@ -174,7 +174,7 @@ AND {field_2} = '{value}'
 
 ## Dos and Don'ts
 
-<!-- Traps SPECIFIC to the official metric. Do not repeat generic dos/don'ts from the business entity. -->
+<!-- Traps SPECIFIC to the official metric. Do not repeat generic dos/don'ts from the domain entity. -->
 
 **Do:**
 
@@ -185,7 +185,7 @@ AND {field_2} = '{value}'
 
 - {Anti-pattern — e.g. directly pooling the components}
 - {Don't hardcode weights/parameters}
-- Don't state that a source table is **just rent** or **just sale** unless **Scope** or the linked business entity **explicitly** documents that scope for that table. Do not use **“RENT only” / “SALE only”** for table scope.
+- Don't state that a source table is **just rent** or **just sale** unless **Scope** or the linked domain entity **explicitly** documents that scope for that table. Do not use **“RENT only” / “SALE only”** for table scope.
 
 ## Targets and OKRs
 
@@ -221,13 +221,13 @@ Folded INTO the DataHub product_description (unlike MBR / Golden Queries).
 ## Golden Queries
 
 <!-- The single canonical query that PRODUCES the official metric. Reuse the component pattern from
-     the business entity (reference it) and add ONLY the layer exclusive to this metric. Trino dialect. -->
+     the domain entity (reference it) and add ONLY the layer exclusive to this metric. Trino dialect. -->
 
-{One sentence on what the query computes.} The component CTE reproduces the pattern already documented in the related business entity; what is exclusive to this metric is {the weighting / official aggregation layer}.
+{One sentence on what the query computes.} The component CTE reproduces the pattern already documented in the related domain entity; what is exclusive to this metric is {the weighting / official aggregation layer}.
 
 ```sql
 WITH component AS (
-    -- Component metric — same pattern as the related business entity.
+    -- Component metric — same pattern as the related domain entity.
     SELECT
         {dimension},
         {component_expression} AS component_value

@@ -28,7 +28,7 @@ Not all closings reach signature. Some are cancelled before any signature (`OWNE
 - [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) — official rent listing-version conversion to signed contract (closing is the terminal funnel event for L2R).
 - [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) — listing-cohort demand funnel including L2TP (RENT tenant prospect) and downstream conversion steps.
 
-## Related Business Entities
+## Related Domain Entities
 
 - [FR Transact](fr_transact.md) — For Rent pre-contract funnel upstream of closing.
 - [FS Transact](fs-transact.md) — For Sale transaction funnel; **SALE signed contracts = CCV** (`ts_sale_agreement_signed`), not `dim_contract`.
@@ -139,7 +139,7 @@ Use [Related Metric Entities](#related-metric-entities) for **official** listing
 
 - `fc.sk_contract = dc.sk_contract`, then `fc.sk_house` for the house and `fc.sk_house_listing` for the listing
 - Use this JOIN whenever the question references a property (e.g., "houses with multiple contracts", "houses already rented")
-- For house grain, listing version grain, and Early Demand flags see [`business_entities/house_and_listing.md`](house_and_listing.md)
+- For house grain, listing version grain, and Early Demand flags see [`domain_entities/house_and_listing.md`](house_and_listing.md)
 
 ### Signatories (1:N — one contract has multiple signatories)
 

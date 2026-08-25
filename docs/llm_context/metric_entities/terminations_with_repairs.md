@@ -14,7 +14,7 @@
 
 **Exists exclusively for For Rent offboarding.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Termination
 

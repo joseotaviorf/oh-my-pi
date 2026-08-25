@@ -22,7 +22,7 @@ All conversions use **cohort logic**: a property is counted as converted when it
 
 **Applies to both For Rent (RENT) and For Sale (SALE) verticals, Brazil (BR).**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Supply
 
@@ -40,7 +40,7 @@ All conversions use **cohort logic**: a property is counted as converted when it
 
 ## DataHub Catalog
 
-- **Upstream business entity data product**: `urn:li:dataProduct:supply`
+- **Upstream domain entity data product**: `urn:li:dataProduct:supply`
 
 ## Glossary and Synonyms
 
@@ -131,7 +131,7 @@ The base CTE (`actual_vol`) produces a wide, pre-aggregated table with volume co
 
 For week-0 variants, replace `qty_*_cohort` with `qty_*_cohort_w0`.
 
-**Carteirização and 3P FR test flags**: the base CTE includes `is_carteirizacao`, `is_exec_carteirizacao`, and `is_3p_fr_test` boolean flags. `is_carteirizacao` flags prospects that ever reached `PORTFOLIO` status in Wololo (`prospect_aud`, bridged via `prospect.id_reference = obt.sk_lead`); `is_exec_carteirizacao` flags a fixed `sk_user_conversion` ID list instead, and is `NULL` — not `FALSE` — when `sk_user_conversion` is null. Both also require `country_code = 'BR'` and `planning_operation = 'Outbound'`, and both exclude RENT rows after 2025-09-01 matching a separate `sk_user_conversion`/`sk_user_affiliate` list. See [Supply](../business_entities/supply.md) for the Wololo join details. Use all three flags as segmentation dimensions, not exclusion filters, unless the analysis requires it.
+**Carteirização and 3P FR test flags**: the base CTE includes `is_carteirizacao`, `is_exec_carteirizacao`, and `is_3p_fr_test` boolean flags. `is_carteirizacao` flags prospects that ever reached `PORTFOLIO` status in Wololo (`prospect_aud`, bridged via `prospect.id_reference = obt.sk_lead`); `is_exec_carteirizacao` flags a fixed `sk_user_conversion` ID list instead, and is `NULL` — not `FALSE` — when `sk_user_conversion` is null. Both also require `country_code = 'BR'` and `planning_operation = 'Outbound'`, and both exclude RENT rows after 2025-09-01 matching a separate `sk_user_conversion`/`sk_user_affiliate` list. See [Supply](../domain_entities/supply.md) for the Wololo join details. Use all three flags as segmentation dimensions, not exclusion filters, unless the analysis requires it.
 
 **Click-to-WhatsApp (`is_click_to_wpp`)**: a fallback-based flag identifying contacts originating from WhatsApp campaigns, derived from phone numbers, campaign names, or source environments mapped in `datalake_gsheets_clean.supply_inputs_click_to_whatsapp`.
 

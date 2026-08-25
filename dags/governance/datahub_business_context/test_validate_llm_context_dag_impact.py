@@ -45,7 +45,7 @@ def _write_metadata(
 
 
 def _write_entity_doc(repo_root: Path, *, name: str, sql: str) -> Path:
-    doc_dir = repo_root / "docs" / "llm_context" / "business_entities"
+    doc_dir = repo_root / "docs" / "llm_context" / "domain_entities"
     doc_dir.mkdir(parents=True, exist_ok=True)
     content = f"""# Visits
 
@@ -81,7 +81,7 @@ def test_filter_dag_impact_paths_keeps_metadata_only():
         [
             "dags/rent/dw_visit/queries/dw/fact_visits.sql",
             "dags/rent/dw_visit/metadata/dw/fact_visits.yml",
-            "docs/llm_context/business_entities/visits.md",
+            "docs/llm_context/domain_entities/visits.md",
         ]
     )
     assert paths == ["dags/rent/dw_visit/metadata/dw/fact_visits.yml"]
@@ -137,7 +137,7 @@ def test_validate_table_impacts_unparseable_sql_blocks_when_column_still_present
         name="visits",
         sql="SELECT sk_visit FROM dw_visit.fact_visits WHERE {{{bad",
     )
-    doc = tmp_path / "docs/llm_context/business_entities/visits.md"
+    doc = tmp_path / "docs/llm_context/domain_entities/visits.md"
     index = build_golden_query_index([doc])
     impact = type(
         "Impact",
@@ -175,7 +175,7 @@ def test_validate_table_impacts_unparseable_sql_blocks_even_without_text_match(
         name="visits",
         sql="SELECT 1 FROM dw_visit.fact_visits WHERE {{{bad",
     )
-    doc = tmp_path / "docs/llm_context/business_entities/visits.md"
+    doc = tmp_path / "docs/llm_context/domain_entities/visits.md"
     index = build_golden_query_index([doc])
     impact = type(
         "Impact",
@@ -205,7 +205,7 @@ def test_validate_table_impacts_removed_column_is_blocking(tmp_path: Path, monke
         name="visits",
         sql="SELECT sk_visit FROM dw_visit.fact_visits",
     )
-    doc = tmp_path / "docs/llm_context/business_entities/visits.md"
+    doc = tmp_path / "docs/llm_context/domain_entities/visits.md"
     index = build_golden_query_index([doc])
     impact = type(
         "Impact",
@@ -235,7 +235,7 @@ def test_validate_table_impacts_added_column_emits_warning(tmp_path: Path, monke
         name="visits",
         sql="SELECT sk_visit FROM dw_visit.fact_visits",
     )
-    doc = tmp_path / "docs/llm_context/business_entities/visits.md"
+    doc = tmp_path / "docs/llm_context/domain_entities/visits.md"
     index = build_golden_query_index([doc])
     impact = type(
         "Impact",
@@ -267,7 +267,7 @@ def test_validate_table_impacts_remove_does_not_warn_on_add(
         name="visits",
         sql="SELECT sk_visit FROM dw_visit.fact_visits",
     )
-    doc = tmp_path / "docs/llm_context/business_entities/visits.md"
+    doc = tmp_path / "docs/llm_context/domain_entities/visits.md"
     index = build_golden_query_index([doc])
     impact = type(
         "Impact",

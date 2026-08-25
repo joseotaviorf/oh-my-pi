@@ -23,7 +23,7 @@ The metrics are: post-service satisfaction (**DSat Front**), perceived resolutio
 
 **"Front" in the name "DSat Front" is a reporting/naming convention, not a channel or layer filter** — none of the four documented formulas restrict by `channel` or `front_or_back`. If an indicator needs to be restricted to a specific channel or layer, the filter must be added by the user.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Contact
 - Ticket

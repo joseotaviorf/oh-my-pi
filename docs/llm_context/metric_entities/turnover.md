@@ -22,7 +22,7 @@ Real exits are identified by `termination_type IS NOT NULL`, scoped to effective
 
 **Non-standard calculations:** this document defines the official formula. When a user requests a different formula, exclusion, or aggregation, direct them to the People Insights team rather than approximating a custom variant.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Employee Details
 

@@ -346,7 +346,7 @@ These values are literal team labels, not a documented enum. **`is_outbound_cart
 
 - **OLOS** — the outsourced call-center vendor QuintoAndar contracts to make outbound calls to prospects. In Wololo, a prospect is OLOS's responsibility when `sales_company = 'OLOS'` (~99.99% of prospects). OLOS only dials prospects in `status = 'PROSPECTING'`; it is signaled to stop when a prospect exits to `PROSPECTING_EXTERNALLY` and to resume on a new `start`. Source tables: `datalake_olos_dialer.outbound_contact_attempts`, `outbound_mailing`, `outbound_last_contact`. In the DW, OLOS-sourced conversions surface as `operation_channel = 'is_outbound'` (hardcoded `'IS_OUTBOUND'` team label), rolling up to `planning_operation = 'Outbound'`.
 - **CIQ** — QuintoAndar's in-house broker-agent channel (as opposed to the outsourced Rede/3P network). `acquisition_origin = 'ciq'` (lead came via a CIQ agent) or `conversion_origin = 'ciq'` / `operation_channel = 'ciq'` (a CIQ agent closed the deal). Also has a `ciq_pj` operation-channel variant tied to the 2025-09-01 test cohort (meaning of the "PJ" suffix unconfirmed). Source: `datalake_ebdb_agents.ciq_users`; DW rollup: `planning_operation = 'CIQ'`.
-- **Rede / 3P** (third-party broker network) — external partner brokers who submit leads through the **BSP (Broker Supply Processor / Portal do Parceiro)**. `acquisition_origin = 'rede'` (`nm_supply_source = '3P'` or `tp_origin = 'supplyprocessor'`). Rede leads have their own granular sub-funnel model, `dw_3p_supply` (see `business_entities/3p_supply.md`), bridged to `obt_supply` via `sk_house`. DW rollup: `planning_operation = 'Rede'`. **Do not confuse with the `ciq_pj` / `3p_fr` test-cohort channel values** — those are `operation_channel` labels for a specific test, not synonyms for the Rede channel as a whole.
+- **Rede / 3P** (third-party broker network) — external partner brokers who submit leads through the **BSP (Broker Supply Processor / Portal do Parceiro)**. `acquisition_origin = 'rede'` (`nm_supply_source = '3P'` or `tp_origin = 'supplyprocessor'`). Rede leads have their own granular sub-funnel model, `dw_3p_supply` (see `domain_entities/3p_supply.md`), bridged to `obt_supply` via `sk_house`. DW rollup: `planning_operation = 'Rede'`. **Do not confuse with the `ciq_pj` / `3p_fr` test-cohort channel values** — those are `operation_channel` labels for a specific test, not synonyms for the Rede channel as a whole.
 - **IS / Inside Sales** — QuintoAndar's internal phone/chat sales-and-qualification team, split into three sub-teams distinguished by `operation_channel` / `planning_operation`:
   - **IS Inbound** — `operation_channel = 'is_inbound'` (also matches `tp_origin IN ('inbound', 'isaias')` on either the acquisition or conversion side — meaning Isaias-driven inbound conversions are grouped into IS Inbound at the `operation_channel` level, distinct from the Isaias-specific `tp_origin_acquisition` / `tp_origin_conversion = 'isaias'` fields documented in the Glossary). Rolls up to `planning_operation = 'Inbound'`.
   - **IS Outbound** — `operation_channel = 'is_outbound'` (OLOS-sourced) or `is_outbound_carteirizado` (**the Navent / "carteirizados" team** — confirmed; see its own subsection below). Both roll up to `planning_operation = 'Outbound'`. Also the catch-all: any Reprocessamento (`tp_reprocessing != '-1'`) or unmatched operations fallback rolls up to Outbound.
@@ -804,7 +804,7 @@ These are current-state counts over the Wololo prospect tables, **not** `obt_sup
 
 ### 3P Supply (sub-funnel — drill-in for `acquisition_origin = 'rede'`)
 
-- The `dw_3p_supply` schema is the granular model for the rede (third-party broker) channel — partner-submitted leads ingested via the BSP. See `business_entities/3p_supply.md`.
+- The `dw_3p_supply` schema is the granular model for the rede (third-party broker) channel — partner-submitted leads ingested via the BSP. See `domain_entities/3p_supply.md`.
 - Bridge via `obt_supply.sk_house = dw_3p_supply.fact_lead_3p_flows.sk_house` (filter `<> -1` on both sides).
 - Use `obt_supply` for cross-channel funnel (1P / CIQ / 3P) and `dw_3p_supply` for partner / broker / BSP-reason analysis on rede leads.
 
@@ -816,8 +816,8 @@ These are current-state counts over the Wololo prospect tables, **not** `obt_sup
 ### House / Listing (N:1)
 
 - `obt_supply.sk_house` links to the house entity; populated from QUALIFIED stage onward (`-1` before that)
-- For house grain, listing versions, publication status, and first-listing filters, see [`business_entities/house_and_listing.md`](house_and_listing.md)
-- For price changes during or after acquisition, see [`business_entities/pricing.md`](pricing.md)
+- For house grain, listing versions, publication status, and first-listing filters, see [`domain_entities/house_and_listing.md`](house_and_listing.md)
+- For price changes during or after acquisition, see [`domain_entities/pricing.md`](pricing.md)
 
 ## Dos and Don'ts
 
@@ -846,7 +846,7 @@ These are current-state counts over the Wololo prospect tables, **not** `obt_sup
 
 **Don't:**
 
-- Don't classify a table as **just rent** or **just sale** unless the linked business entity **explicitly** documents that scope for that `schema.table` — do not infer from `dw_rent` / `dw_sale` / `nm_business_context` column names. Do not use **“RENT only” / “SALE only”** for table scope.
+- Don't classify a table as **just rent** or **just sale** unless the linked domain entity **explicitly** documents that scope for that `schema.table` — do not infer from `dw_rent` / `dw_sale` / `nm_business_context` column names. Do not use **“RENT only” / “SALE only”** for table scope.
 - **Don't answer a prospect-status question with `obt_supply.status`** — it has only 4 coarse values (`new lead`, `started prospecting`, `converted opp`, `discarded`) and no `PROSPECTING_EXTERNALLY` / `ONGOING` / `PORTFOLIO`. Use `datalake_wololo_clean.prospect.status`.
 - **Don't read `PROSPECTING_EXTERNALLY` as "actively prospected"** — it means OLOS was told to stop dialing. "Being dialed" is `status = 'PROSPECTING'` only.
 - **Don't treat `DISCARDED` as terminal** — a discarded prospect can still convert later; only `CONVERTED` is protected.

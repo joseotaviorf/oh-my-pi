@@ -26,7 +26,7 @@ The naive way to compute this — diffing month-over-month counts — does not w
 
 **Use the definitions in this document only when the question is specifically about Supply Retention.** For general questions about the corporate FL or Ongoing Listings metrics, use their own DataHub entries (`first-listings-1p`, `ongoing-listings`) instead — do not mix the two.
 
-## Related Business Entities
+## Related Domain Entities
 
 *   House and Listing
     
@@ -149,7 +149,7 @@ This metric has no weight/parameter table — it is fully derived from status lo
 
 ## Golden Queries
 
-Base query computing FL, OL, Republished, Churn, CCV, CCV_exit and the stock reconciliation, monthly, by `city_group` × `operation`, for the current 6 closed months + current partial month, plus the same 4 months one year prior for YoY comparison. This snapshot-reconstruction and 1P/3P classification pattern is exclusive to Supply Retention — it is not shared with an existing component CTE in the House and Listing business entity, which documents the underlying raw tables but not this specific reconciliation pattern.
+Base query computing FL, OL, Republished, Churn, CCV, CCV_exit and the stock reconciliation, monthly, by `city_group` × `operation`, for the current 6 closed months + current partial month, plus the same 4 months one year prior for YoY comparison. This snapshot-reconstruction and 1P/3P classification pattern is exclusive to Supply Retention — it is not shared with an existing component CTE in the House and Listing domain entity, which documents the underlying raw tables but not this specific reconciliation pattern.
 
 
 ```sql

@@ -23,11 +23,11 @@ The end-to-end lifecycle typically follows:
 2. **Enrichment** — amenities, entrance keys, catalog info (`fact_house_information_filling`, `dim_house_entrance_history`)
 3. **Listing draft** — property prepared for publication (`status = 'EDITING'`)
 4. **Publication** — visible on platform (`status = 'PUBLISHED'`, `ts_publication`)
-5. **Conversion** — rent listing → contract (`fact_house_listings.sk_contract`); sale listing → CCV (see `business_entities/fs-transact.md`)
+5. **Conversion** — rent listing → contract (`fact_house_listings.sk_contract`); sale listing → CCV (see `domain_entities/fs-transact.md`)
 
 Not every house follows every step. Some are created during supply acquisition and never list; others are delisted and relisted months later under the same `sk_house`. At the EBDB source, each business context has its own row in `listing_business_context`.
 
-**TARS — RENT vs SALE on tables:** state whether a table is rent, sale, or both **only** when this document (or the linked business entity for that table) **explicitly** documents that scope on the table entry — e.g. **just rent**, **just sale**, **both** (`business_context = 'RENT' | 'SALE'`). Do not use **“RENT only” / “SALE only”** for table scope (here “only” means non-hybrid; hybrids can still exist). Do not infer from `dw_rent` / `dw_sale` prefixes or column names alone.
+**TARS — RENT vs SALE on tables:** state whether a table is rent, sale, or both **only** when this document (or the linked domain entity for that table) **explicitly** documents that scope on the table entry — e.g. **just rent**, **just sale**, **both** (`business_context = 'RENT' | 'SALE'`). Do not use **“RENT only” / “SALE only”** for table scope (here “only” means non-hybrid; hybrids can still exist). Do not infer from `dw_rent` / `dw_sale` prefixes or column names alone.
 
 ## Related Metric Entities
 
@@ -57,7 +57,7 @@ A new version **begins at the next `PUBLISHED` status**, even when the trigger e
 | First publication ever | **First Listing** |
 | Publication after the house was rented (`SUSPENDED+RENTED`) | **Re-Listing** (takes priority over Recovered when both apply) |
 | Publication after **84+ days** (12 weeks) unpublished | **Recovered** |
-| Publication during **Early Demand** (active contract termination in progress) | New version; flag `is_early_demand = TRUE` — see `business_entities/closing.md` |
+| Publication during **Early Demand** (active contract termination in progress) | New version; flag `is_early_demand = TRUE` — see `domain_entities/closing.md` |
 
 Republication **within 12 weeks** (< 84 days unpublished) **reuses the same** `sk_house_listing`.
 
@@ -96,7 +96,7 @@ Sale does **not** follow rent-style listing versioning. Despite enrich tables su
 - **Listing key (SALE)** → depends on the table: in **hybrid/cross-context tables** (RENT and SALE in the same table), the listing key is **`sk_house_listing`** — filter **`business_context = 'SALE'`** to scope sale rows. In **SALE-only tables** (`dw_sale.*`), the key is **`sk_sale_listing`**. In both cases there is no rent-style versioning; where `order_version` exists on sale-only tables, it is only **0** (editing) or **1** (published)
 - **Sale status history** → `sale_status_version_order` — status transitions only; do not interpret as listing version increments
 - **Shared house key** → `sk_house` / `id_house` links rent versions, sale star-schema rows, and hybrid cross-context tables
-- **Hybrid house**, **imóvel híbrido** → same **`sk_house`**, rent **and** sale active in parallel. Rent cycles through multiple **`sk_house_listing`** versions. For sale: use **`sk_house_listing` + `business_context = 'SALE'`** in hybrid tables, or **`sk_sale_listing`** in `dw_sale.*` only tables. In **`dw_rent.dim_house_listing`**, **RENT takes priority** on hybrid rows — sale status/flags in columns with **`sale`** in the name (e.g. `house_sale_status`, `is_for_sale`). **Prices and calculators** for either context → `business_entities/pricing.md` — filter **`business_context`** (**Casio** = RENT, **Girafales** = SALE).
+- **Hybrid house**, **imóvel híbrido** → same **`sk_house`**, rent **and** sale active in parallel. Rent cycles through multiple **`sk_house_listing`** versions. For sale: use **`sk_house_listing` + `business_context = 'SALE'`** in hybrid tables, or **`sk_sale_listing`** in `dw_sale.*` only tables. In **`dw_rent.dim_house_listing`**, **RENT takes priority** on hybrid rows — sale status/flags in columns with **`sale`** in the name (e.g. `house_sale_status`, `is_for_sale`). **Prices and calculators** for either context → `domain_entities/pricing.md` — filter **`business_context`** (**Casio** = RENT, **Girafales** = SALE).
 - **id_house / sk_house** → same numeric value; listing tables often use `id_house`, house dims use `sk_house`
 - **First Listing**, **primeira captação**, **FL** → **RENT:** `listing_category_start = 'First Listing'` on `dim_house_listing`. **SALE:** first publication detected via `fact_listings.sk_first_publication_date` / `listing_business_context.ts_first_listing` — no `listing_category_start`. Official metric: `metric_entities/first_listings_1p.md`
 - **Re-Listing**, **relistagem**, **RL** → **RENT only** — new rent version after prior rental ended (`listing_category_start = 'Re-Listing'`)
@@ -104,10 +104,10 @@ Sale does **not** follow rent-style listing versioning. Despite enrich tables su
 - **NL**, **New Listings**, **novas publicações** → listings **published in a reference period**. **RENT:** FL + RL + RC. **SALE:** FL only. Well-priced cohort variants → **FL2WP / RL2WP / RC2WP** in `metric_entities/listing_to_well_priced.md`
 - **OL**, **Ongoing Listings** (corporate) → **published inventory snapshot** on a day — see `metric_entities/ongoing_listings.md`. **Not** the same as Supply Retention (Sale) local OL definition
 - **Published**, **publicado** → on-market (`status = 'PUBLISHED'`)
-- **Preço do anúncio**, **listing price**, **preço publicado** → **`dw_listing.dim_pricing` + `fact_price_changes`** (`business_context` RENT/SALE) — see `business_entities/pricing.md`; **not** `dim_house_listing.rent` / `house_rent` / `dim_listing.price`
+- **Preço do anúncio**, **listing price**, **preço publicado** → **`dw_listing.dim_pricing` + `fact_price_changes`** (`business_context` RENT/SALE) — see `domain_entities/pricing.md`; **not** `dim_house_listing.rent` / `house_rent` / `dim_listing.price`
 - **Performance Score**, **Listing Performance Score**, **demand score**, **score de performance** → **`datalake_similarity_score.house_metrics_score`** (`final_score`) — DAG **`enrich_similarity_score`**; see `metric_entities/listing_performance_score.md` — **not** EBDB/OPL/`reverse_demand_score`
 - **Last version (RENT)** → current rent listing version (`is_last_version = TRUE` on `dim_house_listing`)
-- **Early Demand** → rent listing published during active contract termination; triggers a **new rent version** (`is_early_demand = TRUE`); see **RENT listing versioning** and `business_entities/closing.md`
+- **Early Demand** → rent listing published during active contract termination; triggers a **new rent version** (`is_early_demand = TRUE`); see **RENT listing versioning** and `domain_entities/closing.md`
 - **Amenities** → property features; `dw_house.dim_house_amenities` (current), `dim_house_amenities_version` (history)
 - **Entrance model**, **modelo de entrada** → property access method; history in `dim_house_entrance_history`
 - **Ongoing listing** → published inventory on a given day; **RENT** and **SALE** use different sources — see `metric_entities/ongoing_listings.md`
@@ -214,7 +214,7 @@ State machine → EXCLUDED (audit log)
 
 | Question | Use (DW first) |
 |----------|----------------|
-| **Listing price** — current or historical (**preço do anúncio**, RENT or SALE) | **`dw_listing.dim_pricing`** + **`dw_listing.fact_price_changes`** — `is_last_price = TRUE` for current; full history via `ts_price_started` / `ts_price_ended` + `business_context`. See `business_entities/pricing.md` — **not** `dim_house_listing.rent` / `house_rent` / `dim_listing.price` |
+| **Listing price** — current or historical (**preço do anúncio**, RENT or SALE) | **`dw_listing.dim_pricing`** + **`dw_listing.fact_price_changes`** — `is_last_price = TRUE` for current; full history via `ts_price_started` / `ts_price_ended` + `business_context`. See `domain_entities/pricing.md` — **not** `dim_house_listing.rent` / `house_rent` / `dim_listing.price` |
 | **Performance Score** / **demand score** (RENT or SALE) | **`datalake_similarity_score.house_metrics_score`** — column **`final_score`**; peers in **`similar_houses`**. DAG **`enrich_similarity_score`**. See `metric_entities/listing_performance_score.md` |
 | Current status per context (RENT/SALE) | **`dw_rent.dim_house_listing.house_rent_status`** / **`house_sale_status`** — fallback: `datalake_ebdb_clean.listing_business_context.status` |
 | Why the listing is inactive | **`house_rent_status_reason`** / **`house_sale_status_reason`** on `dim_house_listing` — fallback: `listing_business_context.status_reason` |
@@ -228,7 +228,7 @@ State machine → EXCLUDED (audit log)
 - **`excluido`** (legacy house) ≠ **`OPTED_OUT`** (one LBC context) ≠ **`EXCLUDED`** (audit event)
 - **`OPTED_OUT`** ≠ **`UNPUBLISHED`** — UNPUBLISHED is reversible deactivation; OPTED_OUT is permanent context exclusion
 - **`status`** on `dim_house_listing` (rent version) vs **`house_rent_status`** / **`house_sale_status`** (latest LBC) — on hybrid rows, prefer LBC columns for current context status
-- **Listing price** on **`dim_house_listing.rent` / `house_rent`** or **`dim_listing.price`** ≠ official price — use **`dw_listing.dim_pricing`** + **`fact_price_changes`** (`business_entities/pricing.md`)
+- **Listing price** on **`dim_house_listing.rent` / `house_rent`** or **`dim_listing.price`** ≠ official price — use **`dw_listing.dim_pricing`** + **`fact_price_changes`** (`domain_entities/pricing.md`)
 
 ## House.status vs ListingBusinessContext (LBC)
 
@@ -353,14 +353,14 @@ Raw events: `datalake_ebdb_clean.house_listing_status_log` (+ join to `house_eve
 
 Rent is the only context with **`listing_category_start`** (First Listing / Re-Listing / Recovered). Each row in `dim_house_listing` is one rent listing version; republication rules determine whether a new `sk_house_listing` is created.
 
-**`dw_rent.dim_house_listing` is rent-first.** On **hybrid** houses, the row grain, versioning, and core listing attributes (`status`, `listing_category_start`, `rent`, etc.) reflect **RENT** — not sale. Sale-side status/flags on the same row appear in columns with **`sale`** in the name (e.g. `house_sale_status`, `is_for_sale`, `is_sale_3p_supply`). **Official price changes and calculator output** for either context are not on this table — use `business_entities/pricing.md` with **`business_context`** (Casio = RENT, Girafales = SALE). For full sale listing analysis, use **`dw_sale.dim_listing`**.
+**`dw_rent.dim_house_listing` is rent-first.** On **hybrid** houses, the row grain, versioning, and core listing attributes (`status`, `listing_category_start`, `rent`, etc.) reflect **RENT** — not sale. Sale-side status/flags on the same row appear in columns with **`sale`** in the name (e.g. `house_sale_status`, `is_for_sale`, `is_sale_3p_supply`). **Official price changes and calculator output** for either context are not on this table — use `domain_entities/pricing.md` with **`business_context`** (Casio = RENT, Girafales = SALE). For full sale listing analysis, use **`dw_sale.dim_listing`**.
 
 The table can also include **sale-only** houses (`is_for_rent = FALSE`, `is_for_sale = TRUE`) — properties with a SALE business context but no rent listing versioning history. On those rows, **generic attributes** not exclusive to RENT (e.g. `status`) reflect **SALE**; RENT-only fields (`listing_category_start`, `rent`, etc.) do not apply. Use `dw_sale.*` for full sale listing metrics.
 
 | You need... | Use this table |
 |-------------|----------------|
 | Rent listing attributes at version grain | `dw_rent.dim_house_listing` (`dhl`) — PK `sk_house_listing`; house via `id_house`; `listing_category_start`; hybrid: sale attrs in `*sale*` columns; sale-only: generic attrs for SALE; flags `is_for_rent`, `is_for_sale` |
-| **Listing price** (RENT or SALE, current or historical) | **`dw_listing.dim_pricing` + `fact_price_changes`** — join `sk_house` + `business_context`; see `business_entities/pricing.md` — **not** `dhl.rent` / `house_rent` |
+| **Listing price** (RENT or SALE, current or historical) | **`dw_listing.dim_pricing` + `fact_price_changes`** — join `sk_house` + `business_context`; see `domain_entities/pricing.md` — **not** `dhl.rent` / `house_rent` |
 | Rent lifetime metrics (days-to-contract, next listing, rental count) | `dw_rent.fact_house_listings` (`fhl`) — rent-filtered at build time; join on `sk_house_listing` |
 | Rent listing status history (intervals) — **just rent** | **`dw_rent.fact_house_listing_status`** — `status_change_reason` (default reason) + `deactivation_*` (1P owner deactivation, from 2026-02-03); grain `sk_house_listing` |
 | 1P owner deactivation reason (enriched) — **just rent** | `deactivation_reason`, `deactivation_reason_category`, `deactivation_additional_context` on **`dw_rent.fact_house_listing_status`** — when populated; otherwise `status_change_reason` |
@@ -395,7 +395,7 @@ Sale has **no business listing versioning** — only `order_version` **0** (edit
 |------------------------------------------------------------|----------------|
 | **Listing Performance Score** (1–5 demand vs similars)   | **`datalake_similarity_score.house_metrics_score`** — `final_score`; DAG **`enrich_similarity_score`**. Peers: **`similar_houses`**. See `metric_entities/listing_performance_score.md` |
 | Lead → first listing supply funnel                         | `dw_public.fact_house_listing_flows` |
-| Termination → relisting / rerental on next listing version | `dw_offboarding.fact_house_listing_terminations` — see `business_entities/termination.md` |
+| Termination → relisting / rerental on next listing version | `dw_offboarding.fact_house_listing_terminations` — see `domain_entities/termination.md` |
 
 **Critical rules:**
 - **`listing_category_start` is RENT-only** — never filter it on sale tables; sale FL uses first-publication dates (`metric_entities/first_listings_1p.md`).
@@ -404,7 +404,7 @@ Sale has **no business listing versioning** — only `order_version` **0** (edit
 - **Sale listing key depends on table type** — hybrid tables: `sk_house_listing` + `business_context = 'SALE'`; SALE-only tables (`dw_sale.*`): `sk_sale_listing`. Do not join `dw_sale.*` to hybrid tables on `sk_sale_listing = sk_house_listing`.
 - **`sk_house` bridges hybrid houses** — same house, separate rent version lifecycle vs sale rows keyed as above.
 - **Hybrid houses** — same `sk_house`; rent and sale are separate tracks with different key conventions per table layer.
-- **`dim_house` does not carry 3P flags, current rent/sale price, or broker keys** — use listing dims or enrich `datalake_ebdb_listing.house` for 3P; for **price** use **`dw_listing.dim_pricing`** (`business_entities/pricing.md`), not `dim_house_listing.rent` / `dim_listing.price`. For 3P broker at house grain: `fact_house_information_filling.sk_broker <> -1`.
+- **`dim_house` does not carry 3P flags, current rent/sale price, or broker keys** — use listing dims or enrich `datalake_ebdb_listing.house` for 3P; for **price** use **`dw_listing.dim_pricing`** (`domain_entities/pricing.md`), not `dim_house_listing.rent` / `dim_listing.price`. For 3P broker at house grain: `fact_house_information_filling.sk_broker <> -1`.
 - **Join key naming:** `dim_house_listing.id_house = dim_house.sk_house` (rent); `dim_listing.sk_house = dim_house.sk_house` (sale).
 - **Schema vs DAG name:** DAG `dw_listing` → `dw_rent.*`; DAG `dw_sale_listings` → `dw_sale.*`.
 - **Next listing navigation (RENT):** `sk_house_listing + 1` for the next rent version. **SALE:** do not use `+ 1`.
@@ -549,23 +549,23 @@ Same event definition; bucket on **interval start**.
 ### Pricing (1:N — price changes per house and business context)
 
 - `dw_listing.dim_pricing.sk_house = dim_house.sk_house`; join listing via `fact_price_changes.sk_house_listing` + `business_context` to scope RENT vs SALE
-- See `business_entities/pricing.md`.
+- See `domain_entities/pricing.md`.
 
 ### Supply (N:1 — first listing completes acquisition funnel)
 
 - `obt_supply.sk_house` populated from qualified stage (`-1` before); `cd_funnel_step = 'first_listing'`
-- See `business_entities/supply.md`.
+- See `domain_entities/supply.md`.
 
 ### Offer (downstream demand — not listing)
 
 - Rent: `dw_rent.dim_offer` — tenant bid on a house; joins via `id_property` (= `sk_house`), not via listing PK alone
 - Sale: `dw_sale.fact_offers` — buyer offer on a sale listing
-- Listing funnel columns like `days_first_publication_to_first_offer_submitted` measure listing → offer conversion; see `business_entities/closing.md` for rent offer → contract path
+- Listing funnel columns like `days_first_publication_to_first_offer_submitted` measure listing → offer conversion; see `domain_entities/closing.md` for rent offer → contract path
 
 ### Contract / Closing (N:1 house; 1:0..1 per rent listing version)
 
 - `fact_contracts.sk_house = dim_house.sk_house`; `fact_house_listings.sk_contract = fact_contracts.sk_contract`
-- Early Demand: see `business_entities/closing.md`.
+- Early Demand: see `domain_entities/closing.md`.
 
 ### Visits (N:1 at house grain)
 
@@ -573,13 +573,13 @@ Same event definition; bucket on **interval start**.
 
 ### Termination / Offboarding (relisting and rerental)
 
-- `fact_house_listing_terminations` — relisting and rerental after termination; see `business_entities/termination.md`
-- See `business_entities/termination.md`.
+- `fact_house_listing_terminations` — relisting and rerental after termination; see `domain_entities/termination.md`
+- See `domain_entities/termination.md`.
 
 ### 3P / Broker XP
 
 - `is_3p_supply` on listing dims; broker detail via sale facts or `fact_house_information_filling`.
-- See `business_entities/broker_xp.md`.
+- See `domain_entities/broker_xp.md`.
 
 ### Region (N:1)
 
@@ -619,13 +619,13 @@ Same event definition; bucket on **interval start**.
 - Don't describe **`SUSPENDED`** as only “owner temporary pause” — **`status_reason = 'RENTED'`** means **alugado**; other reasons mean funnel-in-progress or owner pause; see **SUSPENDED + `status_reason`**.
 - Don't **COALESCE** `deactivation_reason` over **`status_change_reason`** — pick the correct column per row (1P deactivation enriched vs all other cases).
 - Don't label **`status_change_reason`** as legacy or deprecated — it remains the valid reason source outside enriched 1P deactivation.
-- Don't read **`status`**, **`listing_category_start`**, or **`rent`** on **hybrid** rows in `dim_house_listing` as sale context — use `house_sale_status` and other `*sale*` columns for sale-side status/flags. **Prices or calculators** for either context must come from `business_entities/pricing.md` (e.g. `dw_listing.dim_pricing` + **`business_context`**; Casio = RENT, Girafales = SALE).
+- Don't read **`status`**, **`listing_category_start`**, or **`rent`** on **hybrid** rows in `dim_house_listing` as sale context — use `house_sale_status` and other `*sale*` columns for sale-side status/flags. **Prices or calculators** for either context must come from `domain_entities/pricing.md` (e.g. `dw_listing.dim_pricing` + **`business_context`**; Casio = RENT, Girafales = SALE).
 - Don't apply `listing_category_start` to sale — that taxonomy is RENT-only.
 - Don't treat `sale_status_version_order` as sale listing versioning — `order_version` is only 0 or 1; no relisting increments above 1.
 - Don't join sale rows from hybrid tables to `dw_sale.*` on `sk_sale_listing = sk_house_listing` — use `sk_house` or match the key convention of each table layer.
 - Don't conflate hybrid houses with a single key everywhere — rent uses versioned `sk_house_listing`; sale uses `sk_house_listing` + `business_context` or `sk_sale_listing` depending on the table.
 - Don't use `dim_house` alone for current price or publication status.
-- Don't use **`dim_house_listing.rent`**, **`house_rent`**, or **`dim_listing.price`** as **preço do anúncio** — official source is **`dw_listing.dim_pricing` + `fact_price_changes`** (`business_entities/pricing.md`).
+- Don't use **`dim_house_listing.rent`**, **`house_rent`**, or **`dim_listing.price`** as **preço do anúncio** — official source is **`dw_listing.dim_pricing` + `fact_price_changes`** (`domain_entities/pricing.md`).
 - Don't answer **Performance Score** from EBDB `ListingPerformance`, OPL, or **`reverse_demand_score`** — use **`enrich_similarity_score`** → `datalake_similarity_score.house_metrics_score`.
 - Don't count listing rows as distinct houses without `COUNT(DISTINCT sk_house)`.
 - Don't use `sk_house_listing + 1` on **SALE** — no version sequence.

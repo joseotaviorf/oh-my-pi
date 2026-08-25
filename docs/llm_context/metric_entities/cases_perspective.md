@@ -30,7 +30,7 @@ The metrics covered by this document:
 - DSAT Response Analysis
 - Open, Created and Solved Case Analysis
 
-## Related Business Entities
+## Related Domain Entities
 
 - Contact
 - Ticket

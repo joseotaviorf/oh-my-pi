@@ -22,7 +22,7 @@ The metric is not a simple "answered on time / answered" ratio. Two rules make t
 
 Abandonment and queue time for Call come from Twilio-reconciled fields (`is_abandoned_twilio`, `queue_time_twilio`), not from `calls.ends_in_abandon` and not from the ring-time column `queue_time`.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Contact
 - Department
@@ -240,7 +240,7 @@ Tables actually required to reproduce the SLA:
 | `datalake_twilio_flex_insights_clean.conversation_time_metrics` | `total_queue_time`, `total_talk_time`, `first_reply_time` | `id_reservation`, and `id_segment` (= Task SID) `= fcc.sk_task` |
 | `dw_customer_support.dim_department` (deduplicated) | Queue / department name, team, area | `sk_department = fcc.sk_department` |
 
-`fact_customer_contacts` and `dim_department` are documented in the **Contact** and **Department** business entities respectively — see those files for the general schema. The Twilio-side tables (`call_flex_events`, `call_flex_reservations`, `conversation_time_metrics`) are not yet covered by any business entity in this repo; see "Known Limitations" below.
+`fact_customer_contacts` and `dim_department` are documented in the **Contact** and **Department** domain entities respectively — see those files for the general schema. The Twilio-side tables (`call_flex_events`, `call_flex_reservations`, `conversation_time_metrics`) are not yet covered by any domain entity in this repo; see "Known Limitations" below.
 
 Tables present in the full v2 dataset but not used by any SLA field — safe to drop from an SLA-only query: `dw_support_journey.fact_services`, `dw_customer_support.dim_ticket`, `dim_analyst`, `dim_taxonomy`, `fact_ivr_interactions`, `dw_satisfaction_rating.fact_answer`, `fact_ticket_csat`, `datalake_satisfaction_rating.satisfaction_answers`, `datalake_chatbot.sessions`, `datalake_customer_support.calls` (the latter feeds only the ring-time column `queue_time`).
 

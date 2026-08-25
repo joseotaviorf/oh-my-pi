@@ -36,7 +36,7 @@ instead of `is_eviction` — see Scope and Calculation below.
 **Exists exclusively for For Rent offboarding — these metrics have no equivalent for FS or
 other products. Do not mix with Property Integrity Onboarding.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Termination
 - Inspection
@@ -183,7 +183,7 @@ other.
 
 **Band-aid flag**: the band-aid (automatic discount) is `has_discount_agreement`
 ("agreement reached through the application of automatic discounts"). This is the canonical
-band-aid flag documented in `business_entities/termination.md`. Do **not** use
+band-aid flag documented in `domain_entities/termination.md`. Do **not** use
 `model_discount_type` (also a column in `obt_offboarding`) to identify band-aid — it only
 distinguishes the discount application mode (`AUTOMATIC_BANDAID` vs `OFFERED_DISCOUNT`), not
 whether a band-aid agreement happened.

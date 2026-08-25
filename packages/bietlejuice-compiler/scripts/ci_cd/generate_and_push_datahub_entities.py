@@ -10,7 +10,7 @@ Markdown is the only versioned source of truth. Generated YAML is written to a
 temporary directory (never committed).
 
 Entity kinds (see docs/llm_context/{business,metric}_entities/_TEMPLATE.md):
-  domain — business_entities/*.md: table routing, Synonyms, owned datasets
+  domain — domain_entities/*.md: table routing, Synonyms, owned datasets
   metric — metric_entities/*.md: calculation contract, upstream related_data_products,
            no owned datasets
 
@@ -46,7 +46,7 @@ Resync all entities when the loader changed in this commit, else changed MDs onl
 
 Usage locally — pass one or more MD file paths directly:
     uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py \\
-        docs/llm_context/business_entities/my_entity.md
+        docs/llm_context/domain_entities/my_entity.md
 
 Exit codes:
     0 — all entities processed and published successfully (or no MDs to process)
@@ -85,7 +85,7 @@ from datahub_domain_catalog import (  # noqa: E402
 # Entity Markdown source directories. Both business and metric entities become Data
 # Products in DataHub (the Woodpecker pipeline triggers on both paths).
 _MD_DIRS = (
-    _REPO_ROOT / "docs/llm_context/business_entities",
+    _REPO_ROOT / "docs/llm_context/domain_entities",
     _REPO_ROOT / "docs/llm_context/metric_entities",
 )
 _MD_PREFIXES = tuple(str(d.relative_to(_REPO_ROOT)) + "/" for d in _MD_DIRS)
@@ -146,7 +146,7 @@ _DEFAULT_MAX_TOKENS = 16000
 #   both    — Ownership → routing metadata only, never narrative content (Data Owner /
 #             Data Steward emails must not leak into the public Data Product description)
 #   domain  — Where to query what → datasets; Synonyms → glossary; Golden query(ies) → Query entities
-#   metric  — Related Business Entities → related_data_products SP; Glossary → glossary;
+#   metric  — Related Domain Entities → related_data_products SP; Glossary → glossary;
 #             Golden Queries → Query entities; DataHub Catalog → tooling pointer only;
 #             MBR → data_product.mbr / data_product.mbr_category structured properties;
 #             Catalog → data_product.metrics structured property, one entry per metric
@@ -163,7 +163,7 @@ EXCLUDE_HEADING_PATTERNS = [
     re.compile(r"^## (Synonyms|Glossary and Synonyms)$", re.I),
     re.compile(r"^## Golden [Qq]uer(y|ies)\b.*$", re.I),
     re.compile(r"^## DataHub [Cc]atalog$"),
-    re.compile(r"^## Related Business Entities$", re.I),
+    re.compile(r"^## Related Domain Entities$", re.I),
     re.compile(r"^## Superset Golden Assets$", re.I),
 ]
 
@@ -247,7 +247,7 @@ def _md_to_data_product_type(md_path: Path) -> str:
 
 def _llm_context_subdir(md_path: Path) -> str:
     return (
-        "metric_entities" if "metric_entities" in md_path.parts else "business_entities"
+        "metric_entities" if "metric_entities" in md_path.parts else "domain_entities"
     )
 
 
@@ -309,8 +309,8 @@ def _extract_section_body(
 
 
 def _extract_related_data_products(md_path: Path) -> list[str]:
-    """Parse ``## Related Business Entities`` bullets into kebab-case product IDs."""
-    section = _extract_section_body(md_path.read_text(), "related business entities")
+    """Parse ``## Related Domain Entities`` bullets into kebab-case product IDs."""
+    section = _extract_section_body(md_path.read_text(), "related domain entities")
     ids: list[str] = []
     seen: set[str] = set()
     for line in section.splitlines():
@@ -1162,13 +1162,13 @@ LIVE DATAHUB DOMAIN CATALOG ({domain_count} domains):
   `**Name**` / `**Category**` pairs; any hand-authored `mbr:` is discarded).
 - Do NOT emit a `catalog:` block — CI injects it from the `## Catalog` table (one
   `{{name, type}}` row per official metric; any hand-authored `catalog:` is discarded).
-- Do NOT hand-author `related_data_products` — CI injects from `## Related Business Entities`.{related_rule}"""
+- Do NOT hand-author `related_data_products` — CI injects from `## Related Domain Entities`.{related_rule}"""
         )
 
     return (
         common
         + """
-- This is a **domain entity** (`docs/llm_context/business_entities/`). Follow the business
+- This is a **domain entity** (`docs/llm_context/domain_entities/`). Follow the domain
   template: table routing + canonical golden query.
 - Parse glossary from `## Synonyms` table (Term | Meaning | Notes) OR bullet list if present.
 - In `datasets`, include only concrete `schema.table` pairs from `## Where to query what`
@@ -1358,7 +1358,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument(
         "--all",
         action="store_true",
-        help="Process every entity MD under docs/llm_context/business_entities/",
+        help="Process every entity MD under docs/llm_context/domain_entities/",
     )
     parser.add_argument(
         "--resync-if-loader-changed",

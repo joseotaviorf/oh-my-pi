@@ -23,7 +23,7 @@ Related metrics: [Absolute Cost Post-Contract (For Rent)](./absolute_cost_post_c
 
 **Exists exclusively for For Rent.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Finance Revenue and Cost
 
@@ -159,7 +159,7 @@ Both numerator and denominator use the `version` column in the year-matching tab
 
 **Budget (Target)** — orçamento mensal da métrica na tabela financeira; `version` label `Budget <YYYY> - <MM>`.
 
-- **Source table:** `datalake_luigijr_ops_finance_clean.finance_revenue_cost_2025` / `finance_revenue_cost_2026` (ver [table selection](../business_entities/finance_revenue_cost.md#table-selection-by-year))
+- **Source table:** `datalake_luigijr_ops_finance_clean.finance_revenue_cost_2025` / `finance_revenue_cost_2026` (ver [table selection](../domain_entities/finance_revenue_cost.md#table-selection-by-year))
 - **Filter key / metric name:** coluna `version` = `Budget <YYYY> - <MM>` (label varia por refresh)
 - **Period grain:** mensal — coluna `YYYYMM` wide-format
 - **Aliases / search terms:** orçamento, budget, target

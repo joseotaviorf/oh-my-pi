@@ -33,11 +33,11 @@ Aggregate by `week_pub` or `month_pub` (publication date). Shares the same publi
 
 **Not the same as:**
 
-- **Listing unpublishes** — transition volume into `UNPUBLISHED` per calendar period; see House and Listing business entity
+- **Listing unpublishes** — transition volume into `UNPUBLISHED` per calendar period; see House and Listing domain entity
 - **Supply Retention (Sale) Churn** — month-over-month stock reconciliation; see [`supply_retention_sale.md`](supply_retention_sale.md)
 - **Unpublishing Rate** (credit policy) — credit-monitoring metric; see [`credit_metrics.md`](credit_metrics.md)
 
-## Related Business Entities
+## Related Domain Entities
 
 - House and Listing
 - Pricing

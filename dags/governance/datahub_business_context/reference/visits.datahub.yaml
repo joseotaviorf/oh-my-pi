@@ -54,7 +54,7 @@ product_description: |
   - Do not mix house_entrance data with visit status without validating entrance model availability
     at time of visit.
 
-  Further detail and table routing: docs/llm_context/business_entities/visits.md
+  Further detail and table routing: docs/llm_context/domain_entities/visits.md
 
 data_product_id: visits
 domain_urn: urn:li:domain:growth
@@ -73,7 +73,7 @@ golden_query:
   description: >-
     Primary scheduling efficiency metric: monthly VB2VC rate from fact_visits. Uses
     num_visit_booked and num_visit_completed columns. Date filter uses CAST(ts_visit_local_tz AS DATE).
-    Source: docs/llm_context/business_entities/visits.md
+    Source: docs/llm_context/domain_entities/visits.md
   subjects:
     - schema: dw_visit
       table: fact_visits
@@ -110,7 +110,7 @@ glossary_terms:
       name: "Visit (Visita)"
       description: >-
         A prospective tenant or buyer physically viewing a property before renting or buying.
-        The consolidated business entity (can contain one or more schedules for the same
+        The consolidated domain entity (can contain one or more schedules for the same
         property/customer interaction). Table: dw_visit.fact_visits. NOT the same as
         inspection (vistoria), which is a technical property assessment.
     - id: visit_vb
@@ -172,6 +172,6 @@ glossary_terms:
         num_visit_completed.
 
 documentation_link:
-  label: "Business entity documentation (visits.md)"
+  label: "Domain entity documentation (visits.md)"
   url: >-
-    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/visits.md
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/domain_entities/visits.md

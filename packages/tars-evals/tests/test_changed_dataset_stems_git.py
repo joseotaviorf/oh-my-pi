@@ -23,12 +23,12 @@ _MODULE_NAME = "test_changed_dataset_stems_git_script"
 
 _METRIC_A = "docs/llm_context/metric_entities/metric_a.md"
 _METRIC_B = "docs/llm_context/metric_entities/metric_b.md"
-_BUSINESS_NPS = "docs/llm_context/business_entities/biz_nps.md"
+_BUSINESS_NPS = "docs/llm_context/domain_entities/biz_nps.md"
 _DATASET_A = "packages/tars-evals/datasets/metric_a.yaml"
 
 _METRIC_A_DOC_V1 = (
     "# Metric A\n\n## Overview\n\nv1\n\n"
-    "## Related Business Entities\n\n- Biz NPS\n\n## Golden Queries\n\nn/a\n"
+    "## Related Domain Entities\n\n- Biz NPS\n\n## Golden Queries\n\nn/a\n"
 )
 _METRIC_A_DOC_V2 = _METRIC_A_DOC_V1.replace("v1", "v2")
 _METRIC_B_DOC = "# Metric B\n\n## Overview\n\nv1\n\n## Golden Queries\n\nn/a\n"
@@ -159,6 +159,63 @@ def test_overview_edit_alongside_ownership_still_evaluates(
 
     assert result.eval_stems == ["metric_a"]
     assert result.metadata_only_stems == []
+
+
+def test_related_domain_heading_rename_is_not_evaluated(
+    cds, tmp_git_repo, parse_markdown
+):
+    """CI case for the business→domain rename: heading-only must not eval."""
+    repo = tmp_git_repo
+    doc_v1 = (
+        "# Metric A\n\n## Overview\n\nv1\n\n"
+        "## Related Business Entities\n\n- Biz NPS\n\n## Golden Queries\n\nn/a\n"
+    )
+    repo.write(_METRIC_A, doc_v1)
+    repo.write(_DATASET_A, _DATASET_A_YAML)
+    repo.commit("add metric_a")
+    repo.push_master()
+
+    repo.write(
+        _METRIC_A,
+        doc_v1.replace("Related Business Entities", "Related Domain Entities"),
+    )
+    repo.commit("rename related-entities heading")
+
+    result = _resolve(
+        cds,
+        repo,
+        env={"CI_PIPELINE_EVENT": "pull_request"},
+        parse_markdown=parse_markdown,
+    )
+
+    assert result.eval_stems == []
+    assert result.scope_stems == []
+    assert result.metadata_only_stems == []
+    assert result.contract_rename_only_stems == ["metric_a"]
+
+
+def test_domain_folder_rename_does_not_fan_out_evals(cds, tmp_git_repo, parse_markdown):
+    """git mv business_entities → domain_entities must not explode the sample budget."""
+    repo = tmp_git_repo
+    old_biz = "docs/llm_context/business_entities/biz_nps.md"
+    repo.write(_METRIC_A, _METRIC_A_DOC_V1)
+    repo.write(_DATASET_A, _DATASET_A_YAML)
+    repo.write(old_biz, _BUSINESS_NPS_DOC)
+    repo.commit("baseline: metric_a relates to biz_nps")
+    repo.push_master()
+
+    repo.rename(old_biz, _BUSINESS_NPS)
+    repo.commit("move domain entity folder")
+
+    result = _resolve(
+        cds,
+        repo,
+        env={"CI_PIPELINE_EVENT": "pull_request"},
+        parse_markdown=parse_markdown,
+    )
+
+    assert result.eval_stems == []
+    assert result.scope_stems == []
 
 
 def test_newly_added_doc_is_always_evaluated(cds, tmp_git_repo, parse_markdown):
@@ -333,7 +390,7 @@ def test_unresolvable_business_doc_change_skips_eval_and_drift(
     repo.write(_DATASET_A, _DATASET_A_YAML)
     repo.commit("baseline: unrelated dataset present")
     repo.write(
-        "docs/llm_context/business_entities/orphan.md",
+        "docs/llm_context/domain_entities/orphan.md",
         "# Orphan\n\n## Overview\n\nno relations\n",
     )
     repo.commit("add business doc with no metric relations")

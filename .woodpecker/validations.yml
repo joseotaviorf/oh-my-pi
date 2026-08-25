@@ -34,7 +34,7 @@ steps:
             - ".woodpecker/validations.yml"
             - "Makefile"
             - "docs/platform/cluster_validation_dags.md"
-            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/domain_entities/**"
             - "docs/llm_context/metric_entities/**"
           on_empty: false
       - event: push
@@ -503,7 +503,7 @@ steps:
       - event: pull_request
         path: &datahub_context_entities_path
           include:
-            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/domain_entities/**"
             - "docs/llm_context/metric_entities/**"
             - "dags/governance/datahub_business_context/validate_datahub_context_entities.py"
             - "dags/governance/datahub_business_context/sync/document_parser.py"
@@ -534,7 +534,7 @@ steps:
       - event: pull_request
         path: &golden_queries_metadata_path
           include:
-            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/domain_entities/**"
             - "docs/llm_context/metric_entities/**"
             - "dags/governance/datahub_business_context/validate_entity_golden_queries_metadata.py"
             - "dags/governance/datahub_business_context/golden_query_metadata_validator.py"

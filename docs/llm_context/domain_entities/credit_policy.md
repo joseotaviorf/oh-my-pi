@@ -26,7 +26,7 @@ governance metadata** for the tables below — this doc is the routing & methodo
 > All keyed by **`cpf`** (PII — only on `fact_proponent_income_sources` here), so it's PII-gated in
 > practice and can't be joined to the funnel without CPF.
 
-## Related Business Entities
+## Related Domain Entities
 
 - [`credit_analysis.md`](credit_analysis.md) — funnel & outcomes (`fpcf`, `dim_credit_analysis`).
 - [`credit_experiments.md`](credit_experiments.md) — experiment registry & policy dimensions.

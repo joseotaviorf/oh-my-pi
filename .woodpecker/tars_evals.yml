@@ -88,7 +88,7 @@ steps:
         path: &tars_evals_paths
           include:
             - "docs/llm_context/metric_entities/**/*.md"
-            - "docs/llm_context/business_entities/**/*.md"
+            - "docs/llm_context/domain_entities/**/*.md"
             - "packages/tars-evals/**"
             - ".woodpecker/tars_evals.yml"
           on_empty: false

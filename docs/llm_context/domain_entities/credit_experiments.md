@@ -26,7 +26,7 @@ of that matrix.
 > Column semantics, enums, and join/coverage rules → DataHub metadata for
 > `datalake_sorting_hat.policy_report_credit_policy`.
 
-## Related Business Entities
+## Related Domain Entities
 
 - [`credit_analysis.md`](credit_analysis.md) — funnel & outcomes.
 - [`credit_policy.md`](credit_policy.md) — scores, policy, models, rejection internals.

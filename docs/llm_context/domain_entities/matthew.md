@@ -141,13 +141,13 @@ When investigating escalations, decompose hierarchically:
 ### Chatbot Sessions (1:1 — Matthew sessions are a subset of chatbot sessions)
 
 - `datalake_ai_collections_quintoandar.sessions` is built from `datalake_chatbot.sessions` filtered to `bot IN ('matthew', 'wall-e')`.
-- For broader chatbot context (other bots: `sonia`, `isaias`, `concierge`, `vandinha`, `old bot`), see `business_entities/chatbot_sessions.md`.
+- For broader chatbot context (other bots: `sonia`, `isaias`, `concierge`, `vandinha`, `old bot`), see `domain_entities/chatbot_sessions.md`.
 - JOIN back: `datalake_ai_collections_quintoandar.sessions.id_sauron_session = datalake_chatbot.sessions.id_sauron_session`.
 
 ### Collections (N:1 — many Matthew sessions per contract / user)
 
 - A user touched by Matthew typically has open invoices in `dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline`. The flag `has_matthew_interaction` on that timeline is the cross-reference.
-- For deeper collections context (negotiations, deals, recovery channels, T1/T2/T3 delays, evictions), see `business_entities/collections.md`.
+- For deeper collections context (negotiations, deals, recovery channels, T1/T2/T3 delays, evictions), see `domain_entities/collections.md`.
 
 ### User Wallet (1:1 at session date)
 
@@ -156,9 +156,9 @@ When investigating escalations, decompose hierarchically:
 
 ### CDP (N:1 — user journey and persona outside session grain)
 
-- For **cross-entity user context** (visits, offers, contracts, invoices in one row set for Domi/Matthew-style products) → `datalake_transactional_entities.entities` on `sessions.id_user = entities.id_user`; see `business_entities/cdp.md`.
+- For **cross-entity user context** (visits, offers, contracts, invoices in one row set for Domi/Matthew-style products) → `datalake_transactional_entities.entities` on `sessions.id_user = entities.id_user`; see `domain_entities/cdp.md`.
 - For **current platform role / journey step** → `datalake_cdp.persona` (external system, not in this repo) on `id_user` — not `datalake_cdp_personas.persona` (the repo-built table) unless the question is historical.
-- Session-level chatbot metrics stay in this doc and `business_entities/chatbot_sessions.md` — CDP does not replace `datalake_chatbot.sessions`.
+- Session-level chatbot metrics stay in this doc and `domain_entities/chatbot_sessions.md` — CDP does not replace `datalake_chatbot.sessions`.
 
 ### Support Tickets (1:1 — one ticket per escalated session)
 

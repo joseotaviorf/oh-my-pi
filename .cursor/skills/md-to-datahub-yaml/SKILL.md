@@ -1,7 +1,7 @@
 ---
 name: md-to-datahub-yaml
 description: >
-  Convert an existing entity Markdown file (docs/llm_context/business_entities/*.md or
+  Convert an existing entity Markdown file (docs/llm_context/domain_entities/*.md or
   docs/llm_context/metric_entities/*.md) into ephemeral DataHub YAML (CI generates and
   pushes; not committed to git). Use when retrofitting older Markdown files that predate
   automated YAML generation, or when generating the YAML for a single entity without
@@ -17,7 +17,7 @@ Authoring templates (source of truth for section names):
 
 | Type | Template |
 |------|----------|
-| Domain / business entity | `docs/llm_context/business_entities/_TEMPLATE.md` |
+| Domain entity | `docs/llm_context/domain_entities/_TEMPLATE.md` |
 | Metric entity | `docs/llm_context/metric_entities/_TEMPLATE.md` |
 | YAML schema | `dags/governance/datahub_business_context/reference/_TEMPLATE.datahub.yaml` |
 
@@ -34,8 +34,8 @@ Authoring templates (source of truth for section names):
 
 | Item | Source | Notes |
 |------|--------|-------|
-| **MD file path** | User or filename | `docs/llm_context/business_entities/{entity}.md` **or** `docs/llm_context/metric_entities/{metric}.md` |
-| **data_product_type** | Directory | `domain` for `business_entities/`; `metric` for `metric_entities/` |
+| **MD file path** | User or filename | `docs/llm_context/domain_entities/{entity}.md` **or** `docs/llm_context/metric_entities/{metric}.md` |
+| **data_product_type** | Directory | `domain` for `domain_entities/`; `metric` for `metric_entities/` |
 | **domain_urn** | Live catalog (CI) or user | **CI flow:** CI fetches all domains from DataHub via GraphQL and injects the catalog into the prompt; the LLM infers the best match from that list. **Interactive flow:** ask the user for the URN from the DataHub UI — do not guess. |
 | **stable_urn** | Prompt (CI) or generated | If the caller supplies a `stable_urn` value in the prompt (CI flow), use it verbatim. Otherwise generate once with `python -c "import uuid; print(uuid.uuid4())"` and never change it after first push. |
 
@@ -51,7 +51,7 @@ Read the full Markdown file. Map sections to YAML fields using the extraction ta
 |---|---|---|
 | `product_display_name` | H1 title (`# Entity Name`) | Verbatim title |
 | `data_product_id` | Filename | Convert `{entity}.md` → kebab-case: `broker_xp.md` → `broker-xp` |
-| `data_product_type` | Directory | `domain` (business_entities) or `metric` (metric_entities) |
+| `data_product_type` | Directory | `domain` (domain_entities) or `metric` (metric_entities) |
 | `domain_urn` | Collected from user / CI catalog | Direct use, e.g. `urn:li:domain:growth` |
 | `lifecycle_stage` | Default | `prod` unless Markdown indicates draft/review/deprecated |
 | `structured_property.qualified_name` | Fixed | `br.com.quintoandar.datahub.data_product.golden_query` |
@@ -62,10 +62,10 @@ Read the full Markdown file. Map sections to YAML fields using the extraction ta
 | `golden_queries[].subjects` | SQL `FROM` / `JOIN` clauses in that query | Extract `schema.table` pairs; map to `- schema: ...\n  table: ...` |
 | `golden_queries[].sql` | SQL code block under the golden-query section | **Do NOT hand-author.** CI overwrites it with the exact SQL from the Markdown, by position, after generation (same pattern as `product_description`). Emit a short placeholder, e.g. `sql: "(injected by CI from Markdown)"` — see Step 5. |
 | `glossary_terms.parent_node_urn` | `domain_urn` | `urn:li:glossaryNode:{domain}` (the part after `urn:li:domain:`) |
-| `documentation_link.label` | Entity kind + filename | `"Business entity documentation ({entity}.md)"` or `"Metric entity documentation ({entity}.md)"` |
+| `documentation_link.label` | Entity kind + filename | `"Domain entity documentation ({entity}.md)"` or `"Metric entity documentation ({entity}.md)"` |
 | `documentation_link.url` | Filename + directory | `https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/{subdir}/{entity}.md` |
 
-### Domain entity only (`business_entities/`)
+### Domain entity only (`domain_entities/`)
 
 | YAML field | Source in Markdown | Extraction rule |
 |---|---|---|
@@ -79,7 +79,7 @@ Read the full Markdown file. Map sections to YAML fields using the extraction ta
 | YAML field | Source in Markdown | Extraction rule |
 |---|---|---|
 | `datasets` | `## Superset Golden Assets` | Extract every `` `schema.table` `` backtick pair **and** every Superset ``urn:li:dataset:(urn:li:dataPlatform:superset,...)`` URN. CI injects both as reference assets on the product Summary (nps-fr pattern). |
-| `related_data_products` | `## Related Business Entities` bullets | Convert each entity display name to kebab-case id (`NPS` → `nps`, `House and Listing` → `house-and-listing`). CI also injects this list. |
+| `related_data_products` | `## Related Domain Entities` bullets | Convert each entity display name to kebab-case id (`NPS` → `nps`, `House and Listing` → `house-and-listing`). CI also injects this list. |
 | `mbr` | `## MBR` `**Name**` / `**Category**` pairs | **Do NOT hand-author** — CI injects `- name: … / category: …` mappings. |
 | `catalog` | `## Catalog` `\| Metric \| Type \|` table | **Do NOT hand-author** — CI injects one `- name: … / type: …` row per official metric. |
 | `glossary_terms.terms[].id` | `## Glossary and Synonyms` bullets | snake_case slug from the primary bold term |
@@ -100,7 +100,7 @@ other DataHub features:
 | `## Synonyms` / `## Glossary and Synonyms` | glossary terms |
 | `## Golden query:` / `## Golden Queries` | Query entities |
 | `## DataHub catalog` / `## DataHub Catalog` | tooling pointer only |
-| `## Related Business Entities` | upstream data products SP (metric only) |
+| `## Related Domain Entities` | upstream data products SP (metric only) |
 | `## MBR` | `data_product.mbr` + `data_product.mbr_category` SPs (metric only) |
 | `## Catalog` | `data_product.metrics` + `data_product.metric_type` SPs (metric only) |
 
@@ -164,7 +164,7 @@ For each bullet `- **{term}**, **{synonym}** → {mapping}`:
 
 ## Step 4 — Extract `datasets`
 
-### Domain entities (`business_entities/`)
+### Domain entities (`domain_entities/`)
 
 Scan `## Where to query what` and per-schema H2 sections for every `` `schema.table` `` backtick pair.
 
@@ -296,7 +296,7 @@ glossary_terms:
       description: >-
         ...
 documentation_link:
-  label: "Business entity documentation ({entity}.md)"  # or Metric entity ...
+  label: "Domain entity documentation ({entity}.md)"  # or Metric entity ...
   url: >-
     https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/{subdir}/{entity}.md
 ```
@@ -364,7 +364,7 @@ Before presenting the YAML to the user:
 - **Gold standard descriptions:** `dags/governance/datahub_business_context/reference/payments.datahub.yaml`
 - **Gold standard glossary with `related_terms`:** `dags/governance/datahub_business_context/reference/visits.datahub.yaml`
 - **Template:** `dags/governance/datahub_business_context/reference/_TEMPLATE.datahub.yaml`
-- **Domain MD template:** `docs/llm_context/business_entities/_TEMPLATE.md`
+- **Domain MD template:** `docs/llm_context/domain_entities/_TEMPLATE.md`
 - **Metric MD template:** `docs/llm_context/metric_entities/_TEMPLATE.md`
 
 ---
@@ -376,7 +376,7 @@ Inform the user that CI will publish on merge. To push locally:
 ```bash
 export OPENAI_API_KEY=... DATAHUB_GRAPHQL_URL=... DATAHUB_TOKEN=...
 uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py \
-  docs/llm_context/business_entities/{entity}.md
+  docs/llm_context/domain_entities/{entity}.md
 # or
 uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py \
   docs/llm_context/metric_entities/{metric}.md

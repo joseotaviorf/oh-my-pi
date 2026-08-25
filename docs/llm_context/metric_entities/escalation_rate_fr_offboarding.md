@@ -16,7 +16,7 @@
 
 **This metric exists exclusively for the For Rent offboarding agent (`ForRentOffboardingAgentV1`).**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Chatbot Sessions
 
@@ -126,7 +126,7 @@ WHERE ts_created >= TIMESTAMP '{window_start}'
 
 ## Golden Queries
 
-Canonical query for daily session volume segmented by escalation status. The traces/observations/sessions JOIN pattern follows `business_entities/chatbot_sessions.md`; what is exclusive to this metric is the `wall_e` + `ForRentOffboardingAgentV*` filter combination and the `is_escalated` segmentation.
+Canonical query for daily session volume segmented by escalation status. The traces/observations/sessions JOIN pattern follows `domain_entities/chatbot_sessions.md`; what is exclusive to this metric is the `wall_e` + `ForRentOffboardingAgentV*` filter combination and the `is_escalated` segmentation.
 
 ```sql
 SELECT date_trunc('month', CAST(ts_created AS TIMESTAMP)) AS ts_created, CAST(COUNT(DISTINCT CASE WHEN is_escalated THEN id_session END) AS DOUBLE) / (COUNT(DISTINCT id_session)) AS "Escalation Rate" 

@@ -20,7 +20,7 @@ Squad: Owner XP / Listing Management.
 
 **Pricing** tracks how rental and sale prices change over time for each house on QuintoAndar as well as how the pricing calculators behave. The grain is `**(sk_house, business_context)`** — the same physical property can have independent price histories and price predictions for RENT and SALE.
 
-**TARS — RENT vs SALE on tables:** classify a table as rent, sale, or both only when **this document** (or the linked business entity) **explicitly** documents that scope on the table — e.g. `dw_listing.*` = **both** (`business_context` filter required); `dw_rent.*` / `dw_sale.*` entries should say **just rent** / **just sale** (not “RENT only” / “SALE only” — hybrids can still exist). Do not infer from naming alone.
+**TARS — RENT vs SALE on tables:** classify a table as rent, sale, or both only when **this document** (or the linked domain entity) **explicitly** documents that scope on the table — e.g. `dw_listing.*` = **both** (`business_context` filter required); `dw_rent.*` / `dw_sale.*` entries should say **just rent** / **just sale** (not “RENT only” / “SALE only” — hybrids can still exist). Do not infer from naming alone.
 
 ## Related Metric Entities
 
@@ -48,7 +48,7 @@ Squad: Owner XP / Listing Management.
 
 **TARS routing:** questions like **“preço do anúncio”**, **“listing price”**, **“preço publicado”**, **“como identificar dados do listing — preço”** → answer with **`dim_pricing` + `fact_price_changes`** and link here — **not** `dim_house_listing.rent` / `sale_price`.
 
-**Exception (documented elsewhere):** offer/CCV **discount** analysis on SALE may use **`dim_offer.sale_price`** (snapshot at offer time) vs **`sale_price_agreed`** — see `business_entities/fs-transact.md` §3.4. That is **not** a substitute for the general listing-price source of truth above.
+**Exception (documented elsewhere):** offer/CCV **discount** analysis on SALE may use **`dim_offer.sale_price`** (snapshot at offer time) vs **`sale_price_agreed`** — see `domain_entities/fs-transact.md` §3.4. That is **not** a substitute for the general listing-price source of truth above.
 
 ## Q: What is the source of truth for calculator data (Casio and Girafales)?
 
@@ -390,13 +390,13 @@ Use [Related Metric Entities](#related-metric-entities) for **official** Quality
 ### House (N:1)
 
 - `dw_listing.dim_pricing.sk_house = dw_house.dim_house.sk_house`
-- See `business_entities/house_and_listing.md`.
+- See `domain_entities/house_and_listing.md`.
 
 
 
 ### Listing (reference only — prefer house + context)
 
-Official pricing grain is `**(sk_house, business_context)**`, not listing version. `sk_house_listing` still exists on some tables today but **will be removed** — do not use it in new queries. To relate price to a listing publication window, join `dim_pricing` on `sk_house` and align timestamps with listing tables from `business_entities/house_and_listing.md`.
+Official pricing grain is `**(sk_house, business_context)**`, not listing version. `sk_house_listing` still exists on some tables today but **will be removed** — do not use it in new queries. To relate price to a listing publication window, join `dim_pricing` on `sk_house` and align timestamps with listing tables from `domain_entities/house_and_listing.md`.
 
 ## Dos and Don'ts
 
@@ -604,8 +604,8 @@ WhatsApp agent (**Maria**) that negotiates listing price reductions with propert
 
 - Price changes and CPS suggestions — sections above in this file (`dw_listing.dim_pricing`, `fact_price_changes`, `fact_price_suggested`)
 - Published inventory denominators — `metric_entities/ongoing_listings.md`
-- Listing keys and publication status — `business_entities/house_and_listing.md`
-- LLM eval host — `business_entities/evals.md` (`eval_host = 'maria'`)
+- Listing keys and publication status — `domain_entities/house_and_listing.md`
+- LLM eval host — `domain_entities/evals.md` (`eval_host = 'maria'`)
 
 
 

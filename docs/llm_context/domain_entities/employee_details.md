@@ -54,7 +54,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 
 **Not in this pilot (Databricks-only):** `dim_contact`, `dim_documentation`, `dim_emergency_contact`, `metric_people.employee_snapshots`, `dw_compensation`, `dw_demographics`.
 
-## Related Business Entities
+## Related Domain Entities
 
 - `organization.md` — cost center, business unit, and job reference dimensions joined via `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version` on the fact.
 - `people_public.md` — **preferred** public active-workforce DW (`dw_people`) replacing `org_chart` for new consumers; **Product & Tech team formation** lives there (`dim_product_tech_team`).

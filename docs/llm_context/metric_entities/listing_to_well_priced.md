@@ -20,13 +20,13 @@ well priced listing = price_score flag = 1 on sandbox.listing_scores for the cho
 
 **L2Wp is a publication-cohort pricing-health rate**, not a demand-funnel conversion (not L2VB/L2R) and not the combined **Quality Pub / Quality 4Ws** score (which adds `easy_entry`).
 
-**Exists exclusively for For Rent (Brazil).** Schema and listing grain → `business_entities/house_and_listing.md`. **Well priced definition** (p90 rule) → `business_entities/pricing.md`.
+**Exists exclusively for For Rent (Brazil).** Schema and listing grain → `domain_entities/house_and_listing.md`. **Well priced definition** (p90 rule) → `domain_entities/pricing.md`.
 
 **Data Product:** **supply-quality-score** (DataHub) — `price_score` is the pricing lever; L2Wp is the **price-only** cohort share derived from the same `sandbox.listing_scores` source used in `metric_entities/supply_quality_score.md`.
 
 **Tables:** `sandbox.listing_scores` + `dw_rent.dim_house_listing` (+ `dw_growth.obt_supply` for 1P channel when matching the official dashboard). Optional pre-aggregates: `metric_rent.relisting_well_priced_monthly`, `metric_rent.relisting_well_priced_weekly` (`pct_well_priced`).
 
-## Related Business Entities
+## Related Domain Entities
 
 - House and Listing
 - Pricing
@@ -49,7 +49,7 @@ well priced listing = price_score flag = 1 on sandbox.listing_scores for the cho
 - **Well priced volume** → `COUNT(DISTINCT sk_house_listing)` with `price_score_* = 1` — numerator only; state cohort and snapshot (Pub vs 4W)
 - **pct_well_priced** → column on `metric_rent.relisting_well_priced_*` pre-aggregates — use when reproducing dashboard cuts without rebuilding from `listing_scores`
 - **Quality Pub / Quality 4Ws** → **different metrics** — `(price_score + easy_entry) / listings`; see `metric_entities/supply_quality_score.md`
-- **Overpriced / imóvel overpriced** → complement of well priced at the ideal limit — see `business_entities/pricing.md`
+- **Overpriced / imóvel overpriced** → complement of well priced at the ideal limit — see `domain_entities/pricing.md`
 - **NL**, **New Listings**, **novas publicações** → listings **published in a reference period** (cohort). **RENT:** FL + RL + RC (`listing_category_start`). **SALE:** **FL only** (no rent-style versioning)
 - **OL**, **Ongoing Listings**, **estoque publicado** → listings **currently PUBLISHED** on a reference day (inventory snapshot) — see `metric_entities/ongoing_listings.md`
 - **FL**, **First Listing** → `listing_category_start = 'First Listing'` (**RENT**); SALE first publication — see `metric_entities/first_listings_1p.md`
@@ -143,7 +143,7 @@ well_priced_listings = COUNT(DISTINCT sk_house_listing WHERE price_score_* = 1)
 | Slice | Preferred source | Well priced | Overpriced |
 |-------|------------------|-------------|------------|
 | **NL** (official L2Wp / dashboard) | `sandbox.listing_scores` | `price_score_pub = 1` (Pub) or `price_score_4w = 1` (4W) | `price_score_* = 0` or `1 - price_score_*` |
-| **OL** (inventory snapshot) | `dw_listing.dim_pricing` + `price_prediction` | `price <= p90` (RENT) / `price <= p70` (SALE) | `price > p90` / `price > p70` — see `business_entities/pricing.md` |
+| **OL** (inventory snapshot) | `dw_listing.dim_pricing` + `price_prediction` | `price <= p90` (RENT) / `price <= p70` (SALE) | `price > p90` / `price > p70` — see `domain_entities/pricing.md` |
 
 Do **not** use the OL snapshot SQL for **NL cohort** questions (or vice versa). State the period for **NL** and the reference day for **OL**.
 
@@ -251,7 +251,7 @@ WHERE dp.is_last_price = TRUE
 - Route **L2Wp** questions to this file — explain **Pub vs 4W** and **First Listing vs Relisting** before SQL
 - Use `sandbox.listing_scores` + `price_score_pub` / `price_score_4w` for official parity with **supply-quality-score**
 - Apply **`time_completed_4w = TRUE`** on all **4W** cuts
-- Link **well priced** semantics to `business_entities/pricing.md` (ideal limit / p90 rule)
+- Link **well priced** semantics to `domain_entities/pricing.md` (ideal limit / p90 rule)
 - Report **volume** and **rate** explicitly when the question says “volume” vs “share” / “%”
 - When asked for **NL and OL**, produce **two tables** (or two sections) — snapshot OL + cohort NL
 - Break **RENT** NL/OL by **FL / RL / RC** (`listing_category_start`); **SALE** NL is **FL only**

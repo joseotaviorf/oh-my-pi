@@ -25,8 +25,8 @@ STEM = "eval_fixture_metric"
 RENAMED_STEM = "eval_fixture_metric_renamed"
 METRIC_PATH = f"docs/llm_context/metric_entities/{STEM}.md"
 RENAMED_METRIC_PATH = f"docs/llm_context/metric_entities/{RENAMED_STEM}.md"
-BUSINESS_PATH = "docs/llm_context/business_entities/eval_fixture_domain.md"
-ORPHAN_BUSINESS_PATH = "docs/llm_context/business_entities/orphan_fixture_domain.md"
+BUSINESS_PATH = "docs/llm_context/domain_entities/eval_fixture_domain.md"
+ORPHAN_BUSINESS_PATH = "docs/llm_context/domain_entities/orphan_fixture_domain.md"
 DATASET_PATH = f"packages/tars-evals/datasets/{STEM}.yaml"
 RENAMED_DATASET_PATH = f"packages/tars-evals/datasets/{RENAMED_STEM}.yaml"
 
@@ -295,7 +295,7 @@ def test_renamed_metric_doc_prunes_old_and_evaluates_new_stem(tmp_git_repo):
     )
 
 
-def test_business_entity_edit_fans_out_without_dataset_drift(tmp_git_repo):
+def test_domain_entity_edit_fans_out_without_dataset_drift(tmp_git_repo):
     repo = tmp_git_repo
     repo.write(METRIC_PATH, _fixture("metric_v1.md"))
     repo.write(BUSINESS_PATH, _fixture("business_v1.md"))

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deterministic, offline gate for DataHub context entity ``.md`` files.
 
-Validates ``docs/llm_context/{business,metric}_entities/**`` on every PR, before they
+Validates ``docs/llm_context/{domain,metric}_entities/**`` on every PR, before they
 reach ``master`` and the DataHub publish step. It reuses the SAME authoritative parser
 and validator the publish path relies on
 (:func:`sync.document_parser.parse_entity_markdown` +
@@ -43,7 +43,7 @@ _REPO_ROOT = _SCRIPT_DIR.parents[
     2
 ]  # dags/governance/datahub_business_context → repo root
 
-_BUSINESS_DIR = "docs/llm_context/business_entities"
+_DOMAIN_DIR = "docs/llm_context/domain_entities"
 _METRIC_DIR = "docs/llm_context/metric_entities"
 
 # Entity filenames are lowercase_snake_case (matches the on-disk slug the DataHub
@@ -79,6 +79,70 @@ def _resolve_diff_from_ref(branch: str) -> str:
     return "origin/master"
 
 
+_LEGACY_DOMAIN_DIR = "docs/llm_context/business_entities"
+
+# Mechanical rename of the domain-entity concept. Applied when deciding whether
+# a changed entity doc is "new authoring" vs the same document after the
+# folder/heading/path/prose rename. Do not fold ``business_domain`` into this.
+_RENAME_CONTRACT_REPLACEMENTS = (
+    ("docs/llm_context/business_entities/", "docs/llm_context/domain_entities/"),
+    ("## Related Business Entities", "## Related Domain Entities"),
+    ("business_entities/", "domain_entities/"),
+    ("Business Entities", "Domain Entities"),
+    ("business entities", "domain entities"),
+    ("Business Entity", "Domain Entity"),
+    ("business entity", "domain entity"),
+    ("business-entity", "domain-entity"),
+    ("business_entity", "domain_entity"),
+)
+
+
+def _normalize_entity_rename_contract(text: str) -> str:
+    """Collapse the business→domain rename so identical docs compare equal."""
+    for old, new in _RENAME_CONTRACT_REPLACEMENTS:
+        text = text.replace(old, new)
+    return text
+
+
+def _git_file_at_ref(from_ref: str, rel: str) -> str | None:
+    result = subprocess.run(
+        ["git", "show", f"{from_ref}:{rel}"],
+        capture_output=True,
+        text=True,
+        cwd=_REPO_ROOT,
+    )
+    if result.returncode != 0:
+        return None
+    return result.stdout
+
+
+def _is_rename_contract_only(path: Path, from_ref: str) -> bool:
+    """True when the working-tree doc matches the base after the rename mapping.
+
+    Folder move + ``## Related Domain Entities`` + path/prose substitutions must
+    not re-gate pre-existing template gaps that ``--changed-only`` never ran on
+    master. A genuine authoring edit (new section, new file) returns False.
+    """
+    rel = _rel(path).as_posix()
+    try:
+        new = path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    candidates = [rel]
+    if rel.startswith(f"{_DOMAIN_DIR}/"):
+        candidates.append(rel.replace(_DOMAIN_DIR, _LEGACY_DOMAIN_DIR, 1))
+    old = None
+    for candidate in candidates:
+        old = _git_file_at_ref(from_ref, candidate)
+        if old is not None:
+            break
+    if old is None:
+        return False
+    return _normalize_entity_rename_contract(old) == _normalize_entity_rename_contract(
+        new
+    )
+
+
 def _git_changed_entity_files(branch: str) -> list[Path]:
     """Repo-relative entity ``.md`` paths added/modified vs the diff base."""
     from_ref = _resolve_diff_from_ref(branch)
@@ -87,14 +151,18 @@ def _git_changed_entity_files(branch: str) -> list[Path]:
     result = subprocess.run(
         cmd, capture_output=True, text=True, check=True, cwd=_REPO_ROOT
     )
-    return _filter_entity_paths(
-        line.strip() for line in result.stdout.splitlines() if line.strip()
-    )
+    return [
+        path
+        for path in _filter_entity_paths(
+            line.strip() for line in result.stdout.splitlines() if line.strip()
+        )
+        if not _is_rename_contract_only(path, from_ref)
+    ]
 
 
 def _all_entity_files() -> list[Path]:
     found: list[Path] = []
-    for rel in (_BUSINESS_DIR, _METRIC_DIR):
+    for rel in (_DOMAIN_DIR, _METRIC_DIR):
         d = _REPO_ROOT / rel
         if d.is_dir():
             found.extend(p for p in d.glob("*.md") if not p.name.startswith("_"))
@@ -106,7 +174,7 @@ def _is_entity_md(path: Path) -> bool:
     parts = path.parts
     return (
         "llm_context" in parts
-        and ("metric_entities" in parts or "business_entities" in parts)
+        and ("metric_entities" in parts or "domain_entities" in parts)
         and path.suffix == ".md"
         and not path.name.startswith("_")
     )
@@ -148,7 +216,7 @@ def _data_product_type(path: Path) -> str:
 
 def _template_hint(path: Path) -> str:
     """Repo-relative authoring template for this doc's type (shown on failure)."""
-    base = _METRIC_DIR if "metric_entities" in path.parts else _BUSINESS_DIR
+    base = _METRIC_DIR if "metric_entities" in path.parts else _DOMAIN_DIR
     return f"{base}/_TEMPLATE.md"
 
 
@@ -316,7 +384,7 @@ def _maybe_comment_success() -> None:
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Validate DataHub context entity .md files (business + metric) "
+            "Validate DataHub context entity .md files (domain + metric) "
             "against the authoring template contract."
         )
     )
@@ -355,7 +423,7 @@ def main(argv: list[str] | None = None) -> int:
         if not files:
             print(
                 "✗ none of the given --paths are entity .md files under "
-                f"{_BUSINESS_DIR}/ or {_METRIC_DIR}/",
+                f"{_DOMAIN_DIR}/ or {_METRIC_DIR}/",
                 file=sys.stderr,
             )
             return 1

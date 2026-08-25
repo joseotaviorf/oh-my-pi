@@ -24,7 +24,7 @@ _GENERATE_SCRIPT = (
     _REPO_ROOT
     / "packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py"
 )
-_MD_DIR = _REPO_ROOT / "docs/llm_context/business_entities"
+_MD_DIR = _REPO_ROOT / "docs/llm_context/domain_entities"
 
 
 def _md_for_slug(slug: str) -> Path:

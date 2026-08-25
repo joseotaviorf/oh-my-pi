@@ -16,7 +16,7 @@ The metric supports segmentation by **supply source** (1P vs 3P) and by **busine
 
 **Applies to both For Rent (Locação) and For Sale (Vendas) verticals, Brazil (BR).**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Supply
 
@@ -31,7 +31,7 @@ The metric supports segmentation by **supply source** (1P vs 3P) and by **busine
 ## DataHub Catalog
 
 - **This metric's data product**: `urn:li:dataProduct:first-listings-1p`
-- **Upstream business entity data product**: `urn:li:dataProduct:supply`
+- **Upstream domain entity data product**: `urn:li:dataProduct:supply`
 
 ## Glossary and Synonyms
 

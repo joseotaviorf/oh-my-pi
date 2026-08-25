@@ -21,7 +21,7 @@ Related metrics: [Absolute Cost Ops Total (For Rent)](./absolute_cost_ops_total_
 
 **Exists exclusively for For Rent.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Finance Revenue and Cost
 
@@ -99,7 +99,7 @@ Equivalent `SUMIFS` pattern for month column `X`:
 
 ### Canonical Filter
 
-Apply on `datalake_luigijr_ops_finance_clean.finance_revenue_cost_2025` or `finance_revenue_cost_2026` (see [table selection](../business_entities/finance_revenue_cost.md#table-selection-by-year)).
+Apply on `datalake_luigijr_ops_finance_clean.finance_revenue_cost_2025` or `finance_revenue_cost_2026` (see [table selection](../domain_entities/finance_revenue_cost.md#table-selection-by-year)).
 
 **Base scope** (all six components):
 
@@ -179,7 +179,7 @@ The canonical filter uses `version = 'Actuals'` for realized costs. The same `YY
 
 **Budget (Target)** — orçamento mensal do custo Pós-Contrato For Rent na tabela financeira.
 
-- **Source table:** `datalake_luigijr_ops_finance_clean.finance_revenue_cost_2025` / `finance_revenue_cost_2026` (ver [table selection](../business_entities/finance_revenue_cost.md#table-selection-by-year))
+- **Source table:** `datalake_luigijr_ops_finance_clean.finance_revenue_cost_2025` / `finance_revenue_cost_2026` (ver [table selection](../domain_entities/finance_revenue_cost.md#table-selection-by-year))
 - **Filter key / metric name:** coluna `version` = `Budget <YYYY> - <MM>` (label varia por refresh); aplicar o mesmo canonical filter de Calculation (três somas aditivas menos três subtrativas) com `version` substituído nos seis componentes
 - **Period grain:** mensal — coluna `YYYYMM` wide-format
 - **Aliases / search terms:** orçamento, budget, target, custo Pós-Contrato

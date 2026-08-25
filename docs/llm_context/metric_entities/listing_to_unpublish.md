@@ -22,11 +22,11 @@ converted listing version = at least one UNPUBLISHED interval on the listing key
 
 **How you report L2Unp depends on the time grain asked for** — monthly cohort rate (default), weekly/daily cohort rates (same formula, different `DATE_TRUNC`), or windowed cuts (4W/8W). This file is the **single entry point** for all of them.
 
-**RENT and SALE use different tables and listing keys.** Confirm context before writing SQL — see `business_entities/house_and_listing.md`.
+**RENT and SALE use different tables and listing keys.** Confirm context before writing SQL — see `domain_entities/house_and_listing.md`.
 
 **Tables:** publication cohort from `dw_rent.dim_house_listing` (RENT) or `dw_sale.dim_listing` (SALE); unpublish signal from `dw_rent.fact_house_listing_status` or `dw_sale.fact_listing_status`. No materialized L2Unp metric table — run SQL.
 
-## Related Business Entities
+## Related Domain Entities
 
 - House and Listing
 
@@ -42,7 +42,7 @@ converted listing version = at least one UNPUBLISHED interval on the listing key
 - **Listing unpublish rate**, **taxa de despublicação (publication cohort)** → synonyms for **L2Unp** when the denominator is listings **published** in the cohort period
 - **Unpublishing Rate**, **taxa de despublicação** → **generic label** — used in Owner XP / listing health **and** in other domains; **always confirm context** before SQL. The calculation depends on the question:
   - **Listing health (this file — default):** same as **L2Unp** — share of listings **published in the cohort** that eventually entered **UNPUBLISHED** after publication
-  - **Unpublish event volume:** count of UNPUBLISHED **transitions** bucketed by **unpublish event date** (publication month irrelevant) — see `business_entities/house_and_listing.md` (**Listing unpublishes**)
+  - **Unpublish event volume:** count of UNPUBLISHED **transitions** bucketed by **unpublish event date** (publication month irrelevant) — see `domain_entities/house_and_listing.md` (**Listing unpublishes**)
   - **Credit policy experiment:** share of houses unpublished within a credit-policy decision cohort on `dim_house_listing` — see `metric_entities/credit_metrics.md` (**Metric 4 — Unpublishing Rate**)
 - **Despublicações / unpublish volume** → shorthand for the **event-volume** definition above (not L2Unp)
 
@@ -268,4 +268,4 @@ GROUP BY 1, 2
 ORDER BY 1 DESC, 2
 ```
 
-For unpublish **volume** by event date (not L2Unp), see golden queries 6–8 in `business_entities/house_and_listing.md`.
+For unpublish **volume** by event date (not L2Unp), see golden queries 6–8 in `domain_entities/house_and_listing.md`.

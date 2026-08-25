@@ -5,7 +5,7 @@ WRITING GUIDE — delete this block before committing.
 
 Audience: TARS (text-to-SQL AI agent) and human analysts.
 Goal: give TARS enough routing context to pick the right table and write correct SQL
-      for any reasonable question about this business entity.
+      for any reasonable question about this domain entity.
 
 Rules:
   • Plain language. No DataHub URNs in prose — catalog links live in `## DataHub catalog`.
@@ -56,12 +56,12 @@ data architecture, upstream source systems, and pointers to related entities.
 ## Related Metric Entities
 
 <!--
-List every metric entity that defines OFFICIAL metrics built on this business entity's tables.
+List every metric entity that defines OFFICIAL metrics built on this domain entity's tables.
 One bullet per metric entity file — use markdown links so TARS can route to the exact
 calculation doc. Include a one-line description of what metrics live there.
 
 When a metric entity exists, its Calculation / Canonical Filter / Golden Query OVERRIDE
-generic logic in this business entity's Key Metrics section.
+generic logic in this domain entity's Key Metrics section.
 -->
 
 - [{Official Metric Family Name}](../metric_entities/{metric_entity_slug}.md) — {one-line: which official metrics this file defines}

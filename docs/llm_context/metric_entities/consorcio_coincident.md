@@ -14,7 +14,7 @@
 
 **Consórcio Funnel — Coincident View** is the family of official **coincident** operational metrics for Consórcio: volumes and production counted by **each stage's own timestamp** (not by lead-creation cohort). It is the lens for Inside Sales / operations management — production, handoff, and per-analyst / per-supervisor throughput. It differs from the Cohort View because a Closed Deal counts in the period it was *closed*, a handoff in the period the handoff *happened*, etc. — answering "how much did the operation move this period", not "how efficient was this lead cohort".
 
-## Related Business Entities
+## Related Domain Entities
 
 - Consórcio (Inside Sales Funnel)
 

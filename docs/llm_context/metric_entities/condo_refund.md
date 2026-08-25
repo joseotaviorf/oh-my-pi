@@ -18,12 +18,12 @@ The naive calculation — Heimdall auto-approvals divided by Heimdall total — 
 
 **Exists exclusively for For Rent, SelfCondo contracts.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Collections
 
 <!-- Note for reviewer: Heimdall and the Retsuko `manual_entry` (P2) reimbursement flow are not yet
-     documented as a dedicated business entity in this repo. Collections is linked here because it
+     documented as a dedicated domain entity in this repo. Collections is linked here because it
      already covers Retsuko/SeuBarriga billing and is the sibling link used by the related
      `condo_garantido.md` metric entity in the same MBR. The Heimdall/Retsuko schema this metric
      depends on is described inline below (Canonical Filter / Nuances) until a proper business

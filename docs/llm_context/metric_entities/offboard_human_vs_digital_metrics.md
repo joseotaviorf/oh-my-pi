@@ -62,7 +62,7 @@ operational and ad-hoc analysis via the Superset golden assets below.
   Also fixed Query 2: `dim_nps_answer` has no `score` column — the raw 0–10 score is
   `nps_answer`. See Nuances for details.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Termination
 - NPS

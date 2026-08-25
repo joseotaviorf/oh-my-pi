@@ -40,7 +40,7 @@ columns:
     lineage:
       - datalake_tars_raw.logs.raw_content
   entity_files_consulted:
-    description: JSON array of business entity reference files consulted by TARS to generate the answer.
+    description: JSON array of domain entity reference files consulted by TARS to generate the answer.
     lineage:
       - datalake_tars_raw.logs.raw_content
   iteration_count:

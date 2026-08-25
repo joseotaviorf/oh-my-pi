@@ -54,12 +54,12 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 |-------------|----------------|
 | Session-level data (bot, channel, status, escalation, queues) | `datalake_chatbot.sessions` (`s`) — one row per session, merge key `id_sauron_session`. Legacy (old bot) rows have `id_langfuse_session` as NULL. |
 | Message-level data (text, role, timing, conversation type) | `datalake_chatbot.messages` (`m`) — one row per message, merge key `id_message`. Excludes SPOC sessions. |
-| LLM evaluation scores | `datalake_chatbot.evals` (`e`, owned by the **evals** data product — see `business_entities/evals.md`) — one row per Langfuse session. `evals` is a MAP column; use `element_at()` in Trino or UNNEST. |
+| LLM evaluation scores | `datalake_chatbot.evals` (`e`, owned by the **evals** data product — see `domain_entities/evals.md`) — one row per Langfuse session. `evals` is a MAP column; use `element_at()` in Trino or UNNEST. |
 | Pre-bot bypass | `datalake_chatbot.bypass` (`b`) — one row per bypass per session. Includes `inside_sales_bypass` from observations. |
 | Isaias lead qualification funnel | `datalake_chatbot.isaias_conversational_flow` (`icf`) — one row per Langfuse session with boolean flags for each qualification step. |
 | Raw LLM traces (latency, model, input/output) | `datalake_langfuse_clean.traces` (`t`) — one row per trace. JOIN to sessions via `t.id_session = s.id_langfuse_session`. |
 | LLM span/generation details (model, tokens, cost), specific sub agent or tool calling | `datalake_langfuse_clean.observations` (`o`) — one row per observation. JOIN via `o.id_trace = t.id_trace`. Filter specific observations for exact sub agent or tool via `o.name`|
-| Sampled Wall-E session **categorization** (domain, user problem, resolution, friction — daily Conversation Explorer extract) | `datalake_conversation_explorer_clean.categorisation` (`ce_cat`) — JOIN `ce_cat.id_langfuse_session = s.id_langfuse_session` and **`s.bot = 'wall-e'`** (CE is Wall-E-only for now). Daily sample (~7.5K sessions); **not a source of truth for escalation rate or any global bot metric** — percentages must use CE denominators only (`business_entities/conversation_explorer.md`) and be explicit about the sampling. |
+| Sampled Wall-E session **categorization** (domain, user problem, resolution, friction — daily Conversation Explorer extract) | `datalake_conversation_explorer_clean.categorisation` (`ce_cat`) — JOIN `ce_cat.id_langfuse_session = s.id_langfuse_session` and **`s.bot = 'wall-e'`** (CE is Wall-E-only for now). Daily sample (~7.5K sessions); **not a source of truth for escalation rate or any global bot metric** — percentages must use CE denominators only (`domain_entities/conversation_explorer.md`) and be explicit about the sampling. |
 
 **Critical rules:**
 - **Three session IDs**: `id_sauron_session` (always present — stable key), `id_session` (Copilot, NULL for old bot), `id_langfuse_session` (Langfuse, NULL for old bot). Prefer JOIN through `id_langfuse_session` for session-level analysis, fallback to `id_sauron_session` if `id_langfuse_session` is missing in the table, e.g. `datalake_chatbot.messages`
@@ -104,7 +104,7 @@ Use [Related Metric Entities](#related-metric-entities) for **official** escalat
 
 - `sessions.id_langfuse_session = evals.id_langfuse_session`
 - Only available for non-legacy sessions (where `id_langfuse_session IS NOT NULL`)
-- For LLM-as-a-judge eval semantics, evaluator names, numeric vs categorical scores, and golden queries, see `business_entities/evals.md`
+- For LLM-as-a-judge eval semantics, evaluator names, numeric vs categorical scores, and golden queries, see `domain_entities/evals.md`
 
 ### Bypass (1:N — one session may have multiple bypasses)
 
@@ -134,7 +134,7 @@ Use [Related Metric Entities](#related-metric-entities) for **official** escalat
 ### Supply Funnel / Isaias (1:N — one Isaias session may match many supply leads)
 
 - `sessions.id_sauron_session = dw_growth.obt_supply.sk_chat_session` (filter `sessions.bot = 'isaias'`)
-- For full supply funnel context, see `business_entities/supply.md`
+- For full supply funnel context, see `domain_entities/supply.md`
 - Lead qualification flags: `datalake_chatbot.isaias_conversational_flow.id_langfuse_session = sessions.id_langfuse_session`
 
 ### Support Tickets (1:1 — latest ticket per session)
@@ -144,28 +144,28 @@ Use [Related Metric Entities](#related-metric-entities) for **official** escalat
 
 ### Full message exchange — bot and human (DW)
 
-**`dw_customer_support.fact_chat_messages`** is the primary DW table for message-level analysis — one row per message. It covers the **entire session**: bot-side messages (pre-escalation) and human-side messages (post-escalation). Everything in `datalake_chatbot.messages` is also present here. Use `user_type` (`User`, `Analyst`, `Bot`) to filter by sender role — no join needed. Link via `sk_session` (Sauron session id) or `sk_task` (Twilio task id). To get the ticket from a session, join through `dw_customer_support.fact_tickets` using `sk_session`. See `business_entities/contact.md` for full column reference and golden queries.
+**`dw_customer_support.fact_chat_messages`** is the primary DW table for message-level analysis — one row per message. It covers the **entire session**: bot-side messages (pre-escalation) and human-side messages (post-escalation). Everything in `datalake_chatbot.messages` is also present here. Use `user_type` (`User`, `Analyst`, `Bot`) to filter by sender role — no join needed. Link via `sk_session` (Sauron session id) or `sk_task` (Twilio task id). To get the ticket from a session, join through `dw_customer_support.fact_tickets` using `sk_session`. See `domain_entities/contact.md` for full column reference and golden queries.
 
 ### CDP (N:1 — user state beyond the chat session)
 
-- When the question needs **what else the user is involved in** (visits, offers, contracts) or **active persona**, not session/message grain → `business_entities/cdp.md` (`datalake_transactional_entities.entities`, `datalake_cdp.persona`).
+- When the question needs **what else the user is involved in** (visits, offers, contracts) or **active persona**, not session/message grain → `domain_entities/cdp.md` (`datalake_transactional_entities.entities`, `datalake_cdp.persona`).
 - Join on `datalake_chatbot.sessions.id_user` = CDP `id_user` when `id_user` is populated.
 - Do not use CDP tables for global bot escalation rate or session volume — keep those on `datalake_chatbot.sessions`.
 
 ### Matthew (collections AI agent)
 
 - For Matthew-specific session analysis (collections context, escalation pillars, outbound replies, tool/helper flags), use `datalake_ai_collections_quintoandar.sessions` / `observation` / `messages` and the OBT `dw_collection_ai_agents.fact_ai_agents_interaction`.
-- Matthew runs both as `bot = 'matthew'` (WhatsApp) and as a sub-agent inside `bot = 'wall-e'` (in-app); the canonical attribution lives in `ai_agent_source`. See `business_entities/matthew.md`.
+- Matthew runs both as `bot = 'matthew'` (WhatsApp) and as a sub-agent inside `bot = 'wall-e'` (in-app); the canonical attribution lives in `ai_agent_source`. See `domain_entities/matthew.md`.
 
 ### Concierge (demand and search assistant)
 
 - Filter `datalake_chatbot.sessions.bot = 'concierge'` for the generic chatbot-session view.
-- For Concierge contact-to-visit attribution, prospect activation, and booking funnel analysis, use `datalake_search.concierge_demand`; see `business_entities/concierge.md`.
+- For Concierge contact-to-visit attribution, prospect activation, and booking funnel analysis, use `datalake_search.concierge_demand`; see `domain_entities/concierge.md`.
 
 ### Alias (B2B partner-agency agent)
 
 - Alias sessions appear in `datalake_chatbot.sessions` with `bot = 'alias'`. Bridge to the Alias DW funnel via `sessions.id_langfuse_session = dw_alias.fact_alias_sessions.id_langfuse_session`.
-- For lead lifecycle, resolution outcomes, conversational funnel flags, LLM cost/latency, and agency-level metrics, use `dw_alias.*` — see `business_entities/alias.md`. Always filter `fact_alias_sessions.is_test = FALSE` for production metrics.
+- For lead lifecycle, resolution outcomes, conversational funnel flags, LLM cost/latency, and agency-level metrics, use `dw_alias.*` — see `domain_entities/alias.md`. Always filter `fact_alias_sessions.is_test = FALSE` for production metrics.
 
 ## Dos and Don'ts
 

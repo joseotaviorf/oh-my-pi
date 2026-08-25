@@ -33,7 +33,7 @@ def test_shared_path_filter_covers_docs_package_and_workflow():
     raw = WORKFLOW.read_text(encoding="utf-8")
     for needle in (
         "docs/llm_context/metric_entities/**/*.md",
-        "docs/llm_context/business_entities/**/*.md",
+        "docs/llm_context/domain_entities/**/*.md",
         "packages/tars-evals/**",
         ".woodpecker/tars_evals.yml",
     ):

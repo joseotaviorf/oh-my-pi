@@ -28,7 +28,7 @@ from `2024-01-01` — the metric is validated for reporting periods on or after 
 Do not apply this definition to call-channel volume or to the Pre-contract segment — those need
 their own cut using the same mechanics but a different `segmento` filter.**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Ticket
 - Chatbot Sessions
@@ -327,7 +327,7 @@ meaningfully affects the metric from April 2026 onward. Applying the exclusion t
 ## Golden Queries
 
 Computes `% Non Wall-E (POST)` by month. The universe CTE (`faturaveis_rows`) reproduces the
-"Contatos Faturáveis" pattern documented in the Ticket business entity, and the
+"Contatos Faturáveis" pattern documented in the Ticket domain entity, and the
 `first_department` CTE reproduces that entity's own first-department pattern; what is exclusive
 to this metric is filtering the final aggregation to `segmento = 'Pos'` and computing the
 Non-Wall-E share within it.

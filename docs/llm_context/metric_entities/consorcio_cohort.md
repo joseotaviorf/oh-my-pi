@@ -16,7 +16,7 @@
 
 **Measured from `Lead` onward** — top-of-funnel conversions (PV2L, Sent → Page View) and Consentimento → Lead are out of scope.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Consórcio (Inside Sales Funnel)
 

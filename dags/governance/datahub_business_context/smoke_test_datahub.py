@@ -1,6 +1,6 @@
 """Smoke-test: verify entity Markdown files have a live Data Product in DataHub.
 
-For each non-template ``docs/llm_context/business_entities/*.md`` the script:
+For each non-template ``docs/llm_context/domain_entities/*.md`` the script:
   1. Derives ``data_product_id`` from the filename (``accounting_funnel`` → ``accounting-funnel``).
   2. Calls the DataHub GraphQL API and checks the Data Product exists with a name.
 
@@ -54,7 +54,7 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _SCRIPT_DIR.parents[2]
 # Both business and metric entities are Data Products (mirrors the generate script).
 _MD_DIRS = (
-    _REPO_ROOT / "docs" / "llm_context" / "business_entities",
+    _REPO_ROOT / "docs" / "llm_context" / "domain_entities",
     _REPO_ROOT / "docs" / "llm_context" / "metric_entities",
 )
 _MD_PREFIXES = tuple(str(d.relative_to(_REPO_ROOT)) + "/" for d in _MD_DIRS)

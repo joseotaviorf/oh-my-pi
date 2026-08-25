@@ -10,7 +10,7 @@ Run this check whenever any of the following is touched:
 - `.sql` file under `dags/{domain}/{dag_name}/queries/`
 - `*_declaration.yml`
 - `dags/{domain}/{dag_name}/metadata/{layer}/*.yml`
-- User asks to open a PR, or to run the necessary validations, or mentions golden queries / business entities / `docs/llm_context/`
+- User asks to open a PR, or to run the necessary validations, or mentions golden queries / domain entities / `docs/llm_context/`
 
 ## Step 1 — Gather the changeset
 
@@ -49,7 +49,7 @@ Extract from the diff:
 For a deleted `.sql`, all columns are removed and the table is being deprecated.
 
 ### 2.3 Search entity context docs
-Grep `docs/llm_context/business_entities/*.md` for `{database_name}.{table_name}`.
+Grep `docs/llm_context/domain_entities/*.md` for `{database_name}.{table_name}`.
 Fall back to bare `{table_name}` only when it is reasonably unique (skip generic names like `events`, `users`, `tickets`).
 
 For each matched file, record which section the hit belongs to (`## Tables`, `## Key Metrics`, `## Relationships with Other Entities`, `## Dos and Don'ts`, `## Golden Queries`).
@@ -76,7 +76,7 @@ If no entity doc references the table, record explicit "no entity-doc impact" �
 ### 3.1 Description quality
 For each `description:` field in new declaration and metadata YAMLs, check:
 - **Length** ≥ 80 characters (shorter = likely a shallow one-liner)
-- **Depth** — answers at least 2 of: what business entity it represents, who consumes it, what the grain is, why it exists
+- **Depth** — answers at least 2 of: what domain entity it represents, who consumes it, what the grain is, why it exists
 - **Business vocabulary** — includes PT-BR / business terms analysts use (e.g. "ticket", "contrato", "visita"), not just the technical identifier
 
 For each failing description, **propose an improved version inline** — do not just say "expand it".
@@ -86,7 +86,7 @@ For each new table, map `dags/{domain}/` + the `domain:` field in the metadata Y
 
 Verdict per new table (choose one):
 - **Belongs in existing entity doc** — list path + sections to extend (`## Tables` row at minimum; add a Golden Query if it is a fact/metric table analysts will commonly query)
-- **No good fit, but analytically important** (`dw_*` fact, `dw_*` dimension without coverage, `metric_*`) — recommend creating a new entity doc via the **TARS** plugin (business entity or metric context), not a repo-local skill
+- **No good fit, but analytically important** (`dw_*` fact, `dw_*` dimension without coverage, `metric_*`) — recommend creating a new entity doc via the **TARS** plugin (domain entity or metric context), not a repo-local skill
 - **Internal / not analyst-facing** (raw, clean, infra, pure plumbing) — state this explicitly; no coverage needed
 
 ### 3.3 Path B findings
@@ -102,19 +102,19 @@ For each new DAG / table:
 
 ### Action required (Golden Queries or Tables sections likely broken)
 - `dw_customer_support.fact_tickets` — removed column: `dt_signed_legacy`
-  - `docs/llm_context/business_entities/ticket.md`
+  - `docs/llm_context/domain_entities/ticket.md`
     - `## Golden Queries` — Query 2, line 268: SELECT references `dt_signed_legacy`. Remove or replace with `dt_signed`.
     - `## Tables` — row at line 41 mentions "signed-date timeline". Verify it still applies.
 
 ### Should review (context may be stale)
 - `dw_rent.dim_contract` — grain change: new DISTINCT added.
-  - `docs/llm_context/business_entities/contract.md` — `## Dos and Don'ts` (lines 92–104) should mention new dedup semantics.
+  - `docs/llm_context/domain_entities/contract.md` — `## Dos and Don'ts` (lines 92–104) should mention new dedup semantics.
 
 ### New DAGs / tables
 - `payments_invoices_recovery` (new DAG)
   - Description too short. Suggested:
     > "Loads recovery-stage invoice events from Salesforce CRM, producing `dw_collections.fact_recovery_invoices` consumed by the Collections squad for SLA dashboards and the cobrança_recuperação report."
-  - `dw_collections.fact_recovery_invoices` → add row in `## Tables` of `docs/llm_context/business_entities/recovery_collections_fr_tenants.md`
+  - `dw_collections.fact_recovery_invoices` → add row in `## Tables` of `docs/llm_context/domain_entities/recovery_collections_fr_tenants.md`
 
 ### Informational
 - `dw_customer_support.fact_ticket_events` touched; only referenced in `## Tables` (line 42) — no Golden Query update needed.
@@ -132,7 +132,7 @@ After the report, ask whether to apply the updates. **Match the user's language*
 
 If yes:
 1. Edit each entity doc with scoped replacements using the line ranges from the report.
-2. Follow section conventions from `docs/llm_context/business_entities/_TEMPLATE.md` (and `docs/llm_context/metric_entities/_TEMPLATE.md` when the hit is a metric entity): Trino SQL in Golden Queries, bullet-list in Glossary, no column duplication from metadata YAML.
+2. Follow section conventions from `docs/llm_context/domain_entities/_TEMPLATE.md` (and `docs/llm_context/metric_entities/_TEMPLATE.md` when the hit is a metric entity): Trino SQL in Golden Queries, bullet-list in Glossary, no column duplication from metadata YAML.
 3. Re-grep entity docs to confirm no stale references remain.
 4. Report what changed, file by file.
 

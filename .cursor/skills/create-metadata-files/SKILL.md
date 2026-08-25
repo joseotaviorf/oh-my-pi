@@ -194,7 +194,7 @@ Quality rules:
 ### Table description checklist
 
 A good table description should answer:
-1. what business entity or process the table represents;
+1. what domain entity or process the table represents;
 2. which layer/business context it serves (analytics, reporting, monitoring, etc.);
 3. grain (one row per contract, per ticket, per user-day, etc.);
 4. main use cases and decision context.

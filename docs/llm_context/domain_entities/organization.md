@@ -42,7 +42,7 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 | `dim_business_unit` | Business unit code and name only. Reference data, no PII. |
 | `dim_job` | Job catalog: name, family, career track. No compensation bands. |
 
-## Related Business Entities
+## Related Domain Entities
 
 - `employee_details.md` — daily assignment snapshots and employee identity; join on `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version`.
 - `people_public.md` — **preferred** public active-workforce DW (`dw_people`) for current org placement, company-wide management hierarchy, and P&T team formation (P&T only: wide `dim_product_tech_team`; other areas use cost center from this entity).

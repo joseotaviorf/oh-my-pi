@@ -14,7 +14,7 @@
 
 **Exists exclusively for For Rent Brazil.** The numerator (`fact_customer_contacts` / `dim_department`) has no country column at all — the billable queues are Brazil-only operations by construction, so no filter is needed or possible there. The denominator (`sandbox.summary_table_fr`) is the only side with country granularity, mixing Brazil (`BR`), Mexico (`MX`), and an unclassified `NULL` `country_code` — the canonical filter below restricts it to `country_code = 'BR'` so the whole metric stays Brazil-only end to end.
 
-## Related Business Entities
+## Related Domain Entities
 
 - Contact
 - Department
@@ -180,7 +180,7 @@ mart as the denominator.
 
 ## Golden Queries
 
-Computes Ticket Rate Front - Pós Contrato per month, as a plain number rounded to 2 decimals. The official value is `ticket_rate_front_pos_contrato` (call + chat combined); `ticket_rate_front_pos_contrato_call` and `ticket_rate_front_pos_contrato_chat` are the same metric cut by channel, included because they share the denominator and can be produced by the same query — lead with the combined total unless the user asks for the channel breakdown. The numerator CTE reproduces the interaction-count pattern documented in the `Contact` business entity (unified call + chat via `fact_customer_contacts`); what is exclusive to this metric is the queue whitelist and the join to the `Ongoing Rental` denominator from `sandbox.summary_table_fr`. Call and chat use the **same dedup column** (`sk_interaction` — segments), split only by `channel`, and both exclude `origin = 'outbound'` and unanswered interactions. Reference values for Apr–Jul/2026: total 0.47 / 0.46 / 0.53 / 0.47; call 0.19 / 0.15 / 0.18 / 0.19; chat 0.28 / 0.31 / 0.35 / 0.28. Validated against a reference report for Jun/2026 (0.17 call) and Jul/2026 (0.18 call) — within 0.01, consistent with chat's residual gap.
+Computes Ticket Rate Front - Pós Contrato per month, as a plain number rounded to 2 decimals. The official value is `ticket_rate_front_pos_contrato` (call + chat combined); `ticket_rate_front_pos_contrato_call` and `ticket_rate_front_pos_contrato_chat` are the same metric cut by channel, included because they share the denominator and can be produced by the same query — lead with the combined total unless the user asks for the channel breakdown. The numerator CTE reproduces the interaction-count pattern documented in the `Contact` domain entity (unified call + chat via `fact_customer_contacts`); what is exclusive to this metric is the queue whitelist and the join to the `Ongoing Rental` denominator from `sandbox.summary_table_fr`. Call and chat use the **same dedup column** (`sk_interaction` — segments), split only by `channel`, and both exclude `origin = 'outbound'` and unanswered interactions. Reference values for Apr–Jul/2026: total 0.47 / 0.46 / 0.53 / 0.47; call 0.19 / 0.15 / 0.18 / 0.19; chat 0.28 / 0.31 / 0.35 / 0.28. Validated against a reference report for Jun/2026 (0.17 call) and Jul/2026 (0.18 call) — within 0.01, consistent with chat's residual gap.
 
 ```sql
 WITH interactions AS (

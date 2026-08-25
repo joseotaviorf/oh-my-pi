@@ -37,7 +37,7 @@ class ParsedEntityDocument:
     catalog: list[dict[str, str]] = field(default_factory=list)
     related_data_products: list[str] = field(default_factory=list)
     has_ownership_section: bool = False
-    has_related_business_entities_section: bool = False
+    has_related_domain_entities_section: bool = False
     raw_markdown: str = ""
 
 
@@ -263,7 +263,7 @@ def _parse_metric_dataset_rows(section_text: str) -> list[dict[str, str]]:
 
 
 def _parse_related_data_products(section_text: str) -> list[str]:
-    """Parse ``## Related Business Entities`` bullets into kebab-case product IDs."""
+    """Parse ``## Related Domain Entities`` bullets into kebab-case product IDs."""
     ids: list[str] = []
     seen: set[str] = set()
     # Template leftovers such as ``<!-- optional -->`` must not become product IDs
@@ -702,7 +702,7 @@ def parse_entity_markdown(
     ownership_text = _find_section(sections, "ownership")
     mbr_text = _find_section(sections, "mbr")
     catalog_text = _find_section(sections, "catalog", exact_only=True)
-    related_text = _find_section(sections, "related business entities")
+    related_text = _find_section(sections, "related domain entities")
     superset_text = _find_section(sections, "superset golden assets", exact_only=True)
 
     glossary_terms = _parse_glossary(glossary_text)
@@ -720,8 +720,8 @@ def parse_entity_markdown(
     # Exact heading only — substring false positives like "## Pre-ownership" must
     # not flip this flag and force Data Owner/Steward validation.
     has_ownership_section = _has_exact_section(sections, "ownership")
-    has_related_business_entities_section = any(
-        "related business entities" in _normalize_heading(key) for key in sections
+    has_related_domain_entities_section = any(
+        "related domain entities" in _normalize_heading(key) for key in sections
     )
 
     return ParsedEntityDocument(
@@ -736,7 +736,7 @@ def parse_entity_markdown(
         catalog=catalog,
         related_data_products=related_data_products,
         has_ownership_section=has_ownership_section,
-        has_related_business_entities_section=has_related_business_entities_section,
+        has_related_domain_entities_section=has_related_domain_entities_section,
         raw_markdown=markdown,
     )
 
@@ -756,7 +756,7 @@ def validate_parsed_document(
     Both types share the same core: H1, ``## Overview``, ``## Ownership`` (Data Owner
     AND Data Steward), ``## Glossary and Synonyms``, ``## Dos and Don'ts`` and
     ``## Golden Queries``. Only the type-specific sections differ — domain adds
-    ``## Tables`` (concrete ``schema.table``); metric adds ``## Related Business
+    ``## Tables`` (concrete ``schema.table``); metric adds ``## Related Domain
     Entities``, ``## Scope`` and ``## Calculation``.
 
     Legacy docs missing a newly-required section aren't retroactively broken: the CI
@@ -816,18 +816,18 @@ def validate_parsed_document(
             errors.append("Missing ## Relationships with other entities section")
         return errors, warnings
 
-    # Metric-specific: links to a business entity and defines the calculation.
+    # Metric-specific: links to a domain entity and defines the calculation.
     errors.extend(_validate_catalog_rows(parsed.catalog))
     errors.extend(
         _validate_optional_sections_not_empty(
             sections, optional_headings=_METRIC_OPTIONAL_SECTIONS
         )
     )
-    if not parsed.has_related_business_entities_section:
-        errors.append("Missing ## Related Business Entities section")
+    if not parsed.has_related_domain_entities_section:
+        errors.append("Missing ## Related Domain Entities section")
     elif not parsed.related_data_products:
         errors.append(
-            "## Related Business Entities section is present but no entities were parsed"
+            "## Related Domain Entities section is present but no entities were parsed"
         )
     scope = _find_section(sections, "scope")
     if not _section_has_content(scope):

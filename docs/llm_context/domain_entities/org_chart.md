@@ -35,7 +35,7 @@
 
 This table is a **lighter alternative** to joining `dw_employee_details` + `dw_organization` when the question is only about the **current** org structure of active employees.
 
-## Related Business Entities
+## Related Domain Entities
 
 - `people_public.md` — **preferred** public DW replacement (`dw_people`: hierarchy company-wide; wide `dim_product_tech_team`; cost center via `organization.md` for other areas).
 - `employee_details.md` — full employee identity, daily snapshots, management hierarchy (L0–L9), and terminated workforce.

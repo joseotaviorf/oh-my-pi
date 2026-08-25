@@ -12,7 +12,7 @@
 
 **Eval Fixture Domain** provides synthetic calendar data for deployment
 tests of the `docs/llm_context` evaluation pipeline. It is not a
-production business domain. It exists so business-entity edits can fan
+production business domain. It exists so domain-entity edits can fan
 out to **Eval Fixture Metric** without touching production entities.
 
 ## Glossary and Synonyms

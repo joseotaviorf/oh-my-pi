@@ -19,7 +19,7 @@ The metrics support segmentation by temporal views (Monthly/L5M and Weekly/Matur
 
 **Exists exclusively for For Rent (Brazil).**
 
-## Related Business Entities
+## Related Domain Entities
 
 - Supply
 - Pricing

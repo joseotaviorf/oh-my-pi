@@ -81,7 +81,7 @@ The bad version would read identically if you swapped in any other table name. T
 
 | Priority | Source | What to extract |
 |----------|--------|-----------------|
-| 1 | `docs/llm_context/business_entities/*.md` | Entity glossary |
+| 1 | `docs/llm_context/domain_entities/*.md` | Entity glossary |
 | 2 | `queries/{layer}/{table}.sql` | Grain, joins, selected fields |
 | 3 | `spark_jobs/*.py` | Raw ingest shape |
 | 4 | `*_declaration.yml` | Workflow intent |

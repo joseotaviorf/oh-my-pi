@@ -175,7 +175,7 @@ class MetricDescriptionTest(unittest.TestCase):
 
 Official weighted NPS.
 
-## Related Business Entities
+## Related Domain Entities
 
 - NPS
 
@@ -253,7 +253,7 @@ SELECT 1
             "## Ownership",
             "nps-owner@quintoandar.com.br",
             "nps-steward@quintoandar.com.br",
-            "## Related Business Entities",
+            "## Related Domain Entities",
             "## MBR",
             "Support MBR",
             "Retention MBR",
@@ -298,7 +298,7 @@ class RelatedDataProductsTest(unittest.TestCase):
         metric_dir.mkdir()
         md_path = metric_dir / "demo_metric.md"
         md_path.write_text(
-            "# Demo\n\n## Related Business Entities\n\n- NPS\n- Supply\n",
+            "# Demo\n\n## Related Domain Entities\n\n- NPS\n- Supply\n",
             encoding="utf-8",
         )
         self.assertEqual(g._extract_related_data_products(md_path), ["nps", "supply"])

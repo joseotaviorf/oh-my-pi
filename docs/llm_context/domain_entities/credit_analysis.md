@@ -21,7 +21,7 @@ definitions, value enums, and join caveats live in **DataHub / governance metada
 do not duplicate them here. Decisioning internals (scores, policy, experiments) live in
 [`credit_policy.md`](credit_policy.md) and [`credit_experiments.md`](credit_experiments.md).
 
-## Related Business Entities
+## Related Domain Entities
 
 - [`credit_policy.md`](credit_policy.md) — scores, policy, models, rejection internals,
   rent-liquidity, credit-evaluation lifecycle.

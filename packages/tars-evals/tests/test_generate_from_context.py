@@ -186,7 +186,7 @@ def test_render_dataset_yaml_loads_via_dataset_loader(tmp_path: Path):
 def test_generate_datasets_metric_entities_only(tmp_path: Path):
     """Business markdown must not produce YAML; metric markdown must."""
     root = tmp_path / "repo"
-    biz = root / "docs/llm_context/business_entities"
+    biz = root / "docs/llm_context/domain_entities"
     met = root / "docs/llm_context/metric_entities"
     biz.mkdir(parents=True)
     met.mkdir(parents=True)
@@ -204,7 +204,7 @@ def test_generate_datasets_metric_entities_only(tmp_path: Path):
     # Stale business auto-gen that must be pruned:
     stale = datasets / "agents.yaml"
     stale.write_text(
-        "# auto-generated\n# source: docs/llm_context/business_entities/agents.md\nitems: []\n",
+        "# auto-generated\n# source: docs/llm_context/domain_entities/agents.md\nitems: []\n",
         encoding="utf-8",
     )
     # Hand-authored must survive prune:
@@ -241,7 +241,7 @@ def test_generate_datasets_metric_entities_only(tmp_path: Path):
 
 def test_generate_datasets_writes_and_prunes(tmp_path: Path):
     llm = tmp_path / "docs" / "llm_context"
-    (llm / "business_entities").mkdir(parents=True)
+    (llm / "domain_entities").mkdir(parents=True)
     (llm / "metric_entities").mkdir(parents=True)
     md = llm / "metric_entities" / "turnover.md"
     md.write_text(
@@ -281,7 +281,7 @@ def test_generate_datasets_writes_and_prunes(tmp_path: Path):
 
 def test_generate_datasets_prunes_when_goldens_disappear(tmp_path: Path):
     llm = tmp_path / "docs" / "llm_context"
-    (llm / "business_entities").mkdir(parents=True)
+    (llm / "domain_entities").mkdir(parents=True)
     (llm / "metric_entities").mkdir(parents=True)
     md = llm / "metric_entities" / "turnover.md"
     md.write_text("# Turnover\n\n## Overview\n\nx\n")  # no golden section
@@ -310,7 +310,7 @@ def test_generate_datasets_prunes_when_goldens_disappear(tmp_path: Path):
 
 def test_generate_datasets_dry_run_writes_nothing(tmp_path: Path):
     llm = tmp_path / "docs" / "llm_context"
-    (llm / "business_entities").mkdir(parents=True)
+    (llm / "domain_entities").mkdir(parents=True)
     (llm / "metric_entities").mkdir(parents=True)
     (llm / "metric_entities" / "turnover.md").write_text(
         "# Turnover\n\n## Golden Queries\n\n### Query 1 — Monthly\n\n```sql\nSELECT 1\n```\n"
@@ -362,7 +362,7 @@ def test_generate_datasets_dry_run_skips_mkdir_when_dir_missing(tmp_path: Path):
 
 def test_generate_datasets_refuses_hand_collision_without_writes(tmp_path: Path):
     llm = tmp_path / "docs" / "llm_context"
-    (llm / "business_entities").mkdir(parents=True)
+    (llm / "domain_entities").mkdir(parents=True)
     (llm / "metric_entities").mkdir(parents=True)
     (llm / "metric_entities" / "accounting.md").write_text(
         "# Accounting\n\n## Golden Queries\n\n### Query 1 — Rate\n\n```sql\nSELECT 1\n```\n"
@@ -401,9 +401,9 @@ def test_generate_datasets_refuses_hand_collision_without_writes(tmp_path: Path)
 
 def test_generate_datasets_skips_zero_goldens(tmp_path: Path):
     llm = tmp_path / "docs" / "llm_context"
-    (llm / "business_entities").mkdir(parents=True)
+    (llm / "domain_entities").mkdir(parents=True)
     (llm / "metric_entities").mkdir(parents=True)
-    (llm / "business_entities" / "empty.md").write_text("# Empty\n\n## Overview\n\nx\n")
+    (llm / "domain_entities" / "empty.md").write_text("# Empty\n\n## Overview\n\nx\n")
     datasets = tmp_path / "datasets"
     datasets.mkdir()
 

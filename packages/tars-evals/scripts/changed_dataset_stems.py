@@ -8,8 +8,8 @@ standalone package cannot depend on the workspace.
 Two changed-doc directories are tracked:
 
 - ``docs/llm_context/metric_entities/<stem>.md`` maps 1:1 to a dataset stem.
-- ``docs/llm_context/business_entities/<stem>.md`` fans out to related metric
-  stems via a reverse index over metric docs' ``## Related Business Entities``
+- ``docs/llm_context/domain_entities/<stem>.md`` fans out to related metric
+  stems via a reverse index over metric docs' ``## Related Domain Entities``
   plus the business doc's own ``## Related Metric Entities`` back-links. When a
   changed business doc resolves to zero metric stems, the run **warns and skips**
   eval/drift for that doc (merge allowed) instead of fail-closed fan-out to every
@@ -25,9 +25,14 @@ A metric doc modified *only* inside an eval-irrelevant H2 section (see
 ``_EVAL_IRRELEVANT_H2``) is dropped from the **eval** list but kept in the
 **scope** list: a Data Steward email edit cannot change what SQL is correct,
 so it must not cost a ~4-minute, ~1.7M-token re-evaluation nor block the PR on
-an LLM judge's opinion of SQL the author never touched. The drift check is
-cheap and stays broad. The filter only ever shrinks the scope on positive
-evidence — additions, deletions, renames and unreadable blobs still evaluate.
+an LLM judge's opinion of SQL the author never touched. The same skip applies
+to the mechanical business→domain **contract rename** (folder, ``## Related
+Domain Entities`` heading, path/prose substitutions): that cannot change SQL
+either, so it must not fan-out every domain doc into the sample budget.
+The drift check is cheap and stays broad. The filter only ever shrinks the
+scope on positive evidence — additions, deletions and unreadable blobs still
+evaluate. A rename still evaluates when the blobs differ after the contract
+mapping (real authoring on the moved file).
 
 Exit codes: 0 = resolved (empty scope is valid); 2 = structural error or
 sample budget exceeded. Exit code 1 is reserved for ``build_rollup.py`` gate
@@ -67,7 +72,7 @@ from tars_evals.repo_bootstrap import load_document_parser, repo_root  # noqa: E
 _DEFAULT_MAX_SAMPLES = 60
 _TEMPLATE_NAME = "_TEMPLATE.md"
 _METRIC_PREFIX = "docs/llm_context/metric_entities/"
-_BUSINESS_PREFIX = "docs/llm_context/business_entities/"
+_BUSINESS_PREFIX = "docs/llm_context/domain_entities/"
 _LONG_LIVED_BRANCHES = frozenset({"master", "forno"})
 
 
@@ -345,7 +350,7 @@ def _is_context_doc(path: str | None, prefix: str) -> bool:
 
 
 def classify_paths(entries: Iterable[DiffEntry]) -> ClassifiedDiff:
-    """Partition diff entries into metric_entities / business_entities changes.
+    """Partition diff entries into metric_entities / domain_entities changes.
 
     Everything else (unrelated repo paths) is silently dropped. A rename's
     old and new path are both considered, so a doc renamed into or out of a
@@ -396,7 +401,7 @@ def metric_stems_from_entries(
 
 
 # --------------------------------------------------------------------------
-# 2.4 — business-entity fan-out
+# 2.4 — domain-entity fan-out
 # --------------------------------------------------------------------------
 
 
@@ -417,7 +422,7 @@ def build_reverse_index(
     *,
     parse_markdown: Callable[..., Any],
 ) -> dict[str, set[str]]:
-    """Pure: invert every metric doc's ``## Related Business Entities`` field.
+    """Pure: invert every metric doc's ``## Related Domain Entities`` field.
 
     Returns ``{business_kebab_id: {metric_stem, ...}}``. This is the
     authoritative direction — ``document_parser.parse_entity_markdown``
@@ -465,6 +470,32 @@ def _split_h2_sections(markdown: str) -> dict[str, str]:
 # cannot classify falls through to "evaluate".
 _EVAL_IRRELEVANT_H2 = frozenset({"ownership", "changelog"})
 
+# Same mapping as ``validate_datahub_context_entities._RENAME_CONTRACT_REPLACEMENTS``.
+# Duplicated here because this script is stdlib-only and must not import dags/.
+# Do not fold ``business_domain`` into this list.
+_RENAME_CONTRACT_REPLACEMENTS = (
+    ("docs/llm_context/business_entities/", "docs/llm_context/domain_entities/"),
+    ("## Related Business Entities", "## Related Domain Entities"),
+    ("business_entities/", "domain_entities/"),
+    ("Business Entities", "Domain Entities"),
+    ("business entities", "domain entities"),
+    ("Business Entity", "Domain Entity"),
+    ("business entity", "domain entity"),
+    ("business-entity", "domain-entity"),
+    ("business_entity", "domain_entity"),
+)
+
+
+def normalize_entity_rename_contract(text: str) -> str:
+    """Collapse the business→domain rename so identical docs compare equal."""
+    # ``git show`` returns decoded bytes while ``Path.read_text`` applies
+    # universal-newline translation. Normalize explicitly so a CRLF source
+    # file moved unchanged is not mistaken for semantic authoring.
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    for old, new in _RENAME_CONTRACT_REPLACEMENTS:
+        text = text.replace(old, new)
+    return text
+
 
 def strip_h2_sections(markdown: str, headings: frozenset[str]) -> str:
     """Return ``markdown`` with the named H2 sections (heading + body) removed."""
@@ -491,6 +522,32 @@ def is_metadata_only_change(old_text: str, new_text: str) -> bool:
     return strip_h2_sections(old_text, _EVAL_IRRELEVANT_H2) == strip_h2_sections(
         new_text, _EVAL_IRRELEVANT_H2
     )
+
+
+def is_eval_irrelevant_change(old_text: str, new_text: str) -> bool:
+    """True when the delta cannot change what SQL is correct.
+
+    Applies the business→domain contract mapping first, then the ownership/
+    changelog filter, so a heading/path rename (optionally plus a steward
+    email edit) does not enqueue LLM evals.
+    """
+    return is_metadata_only_change(
+        normalize_entity_rename_contract(old_text),
+        normalize_entity_rename_contract(new_text),
+    )
+
+
+def is_contract_rename_only(old_text: str, new_text: str) -> bool:
+    """True when normalizing business→domain is the complete content delta."""
+    return normalize_entity_rename_contract(
+        old_text
+    ) == normalize_entity_rename_contract(new_text)
+
+
+def _old_blob_path(entry: DiffEntry) -> str:
+    if entry.status in {"R", "C"} and entry.old_path:
+        return entry.old_path
+    return entry.path
 
 
 def resolve_old_ref(
@@ -544,27 +601,96 @@ def find_metadata_only_stems(
     old_ref: str | None,
     run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
 ) -> set[str]:
-    """Stems whose modification touched only eval-irrelevant sections.
+    """Stems whose modification cannot change what SQL is correct.
 
-    Only plain modifications (``M``) are considered. Additions, deletions and
-    renames always evaluate, and any doc whose old or new text can't be read
-    falls through to evaluating — the filter may only ever *shrink* the scope
+    Plain modifications (``M``) and folder/path renames (``R``) are considered
+    when the old blob is readable. Additions, deletions and unreadable blobs
+    fall through to evaluating — the filter may only ever *shrink* the scope
     on positive evidence.
     """
     metadata_only: set[str] = set()
     for entry in entries:
-        if entry.status != "M":
+        if entry.status == "M":
+            pass
+        elif (
+            entry.status == "R"
+            and Path(_old_blob_path(entry)).stem == Path(entry.path).stem
+        ):
+            pass
+        else:
             continue
-        old_text = read_blob_at(old_ref, entry.path, cwd=repo_root, run=run)
+        old_text = read_blob_at(old_ref, _old_blob_path(entry), cwd=repo_root, run=run)
         if old_text is None:
             continue
         try:
             new_text = (repo_root / entry.path).read_text(encoding="utf-8")
         except OSError:
             continue
-        if is_metadata_only_change(old_text, new_text):
+        if is_eval_irrelevant_change(old_text, new_text):
             metadata_only.add(Path(entry.path).stem)
     return metadata_only
+
+
+def find_contract_rename_only_stems(
+    entries: Iterable[DiffEntry],
+    *,
+    repo_root: Path,
+    old_ref: str | None,
+    run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+) -> set[str]:
+    """Metric stems whose complete delta is the mechanical contract rename."""
+    contract_only: set[str] = set()
+    for entry in entries:
+        if entry.status == "M":
+            pass
+        elif (
+            entry.status == "R"
+            and Path(_old_blob_path(entry)).stem == Path(entry.path).stem
+        ):
+            pass
+        else:
+            continue
+        old_text = read_blob_at(old_ref, _old_blob_path(entry), cwd=repo_root, run=run)
+        if old_text is None:
+            continue
+        try:
+            new_text = (repo_root / entry.path).read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if is_contract_rename_only(old_text, new_text):
+            contract_only.add(Path(entry.path).stem)
+    return contract_only
+
+
+def entry_is_contract_rename_only(
+    entry: DiffEntry,
+    *,
+    repo_root: Path,
+    old_ref: str | None,
+    run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+) -> bool:
+    """True when a domain/metric diff entry is only the contract rename.
+
+    A rename that changes the file stem (``metric_a.md`` → ``metric_a_renamed.md``)
+    is a new eval identity and must still evaluate.
+    """
+    if entry.status == "M":
+        pass
+    elif (
+        entry.status == "R"
+        and Path(_old_blob_path(entry)).stem == Path(entry.path).stem
+    ):
+        pass
+    else:
+        return False
+    old_text = read_blob_at(old_ref, _old_blob_path(entry), cwd=repo_root, run=run)
+    if old_text is None:
+        return False
+    try:
+        new_text = (repo_root / entry.path).read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return is_contract_rename_only(old_text, new_text)
 
 
 def parse_related_metric_entities(markdown: str) -> list[str] | None:
@@ -662,7 +788,9 @@ def fan_out(
         own_backlinks = parse_related_metric_entities(text) if text else None
         reverse_matches: set[str] = set()
         for lookup_stem in lookup_stems:
-            reverse_matches |= set(reverse_index.get(business_kebab_id(lookup_stem), ()))
+            reverse_matches |= set(
+                reverse_index.get(business_kebab_id(lookup_stem), ())
+            )
         if own_backlinks is None:
             matched = reverse_matches
             if not matched:
@@ -802,6 +930,7 @@ class ScopeResult:
     fallback_triggered: bool
     fallback_reasons: list[str]
     metadata_only_stems: list[str] = field(default_factory=list)
+    contract_rename_only_stems: list[str] = field(default_factory=list)
     diff_range_warnings: list[str] = field(default_factory=list)
 
 
@@ -828,16 +957,34 @@ def resolve_scope(
         classified.metric_entries
     )
 
-    metadata_only = find_metadata_only_stems(
+    old_ref = resolve_old_ref(diff_range, cwd=repo_root, run=run)
+    contract_only = find_contract_rename_only_stems(
         classified.metric_entries,
         repo_root=repo_root,
-        old_ref=resolve_old_ref(diff_range, cwd=repo_root, run=run),
+        old_ref=old_ref,
         run=run,
     )
+    metadata_only = (
+        find_metadata_only_stems(
+            classified.metric_entries,
+            repo_root=repo_root,
+            old_ref=old_ref,
+            run=run,
+        )
+        - contract_only
+    )
+    changed_metric -= contract_only
 
     fanned: set[str] = set()
     fallback_reasons: list[str] = []
-    if classified.business_entries:
+    business_for_fanout = tuple(
+        entry
+        for entry in classified.business_entries
+        if not entry_is_contract_rename_only(
+            entry, repo_root=repo_root, old_ref=old_ref, run=run
+        )
+    )
+    if business_for_fanout:
         metric_docs = load_metric_docs(
             repo_root / "docs" / "llm_context" / "metric_entities"
         )
@@ -852,7 +999,7 @@ def resolve_scope(
                 return None
 
         fanned, unresolved = fan_out(
-            classified.business_entries,
+            business_for_fanout,
             reverse_index=reverse_index,
             read_business_doc=_read_business_doc,
         )
@@ -863,7 +1010,7 @@ def resolve_scope(
             for stem in unresolved
         ]
 
-    # Option 2: do not fail-closed to the full corpus. Unlinked business-entity
+    # Option 2: do not fail-closed to the full corpus. Unlinked domain-entity
     # edits must not inherit unrelated stems' drift checks or LLM eval cost.
     fallback_triggered = False
     all_stems = _list_yaml_stems(datasets_dir)
@@ -886,6 +1033,7 @@ def resolve_scope(
         fallback_triggered=fallback_triggered,
         fallback_reasons=fallback_reasons,
         metadata_only_stems=sorted(metadata_only),
+        contract_rename_only_stems=sorted(contract_only),
         diff_range_warnings=diff_range_warnings,
     )
 
@@ -988,8 +1136,14 @@ def main(argv: list[str] | None = None) -> int:
         print(
             "NOTE: not evaluating "
             f"{', '.join(result.metadata_only_stems)} — changed only in "
-            f"eval-irrelevant section(s): {', '.join(sorted(_EVAL_IRRELEVANT_H2))}. "
-            "Still drift-checked.",
+            f"eval-irrelevant ownership/changelog sections. Still drift-checked.",
+            file=sys.stderr,
+        )
+    if result.contract_rename_only_stems:
+        print(
+            "NOTE: excluding "
+            f"{', '.join(result.contract_rename_only_stems)} from eval and drift "
+            "scope — changed only by the business→domain contract rename.",
             file=sys.stderr,
         )
 

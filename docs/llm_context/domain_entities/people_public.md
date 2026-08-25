@@ -75,7 +75,7 @@ Users usually ask in business language — for example which team someone is on,
 
 Do **not** invent team-formation attributes outside Product & Tech. Do **not** run Product & Tech **headcount-by-squad** rollups from this wide table (teams are spread across `team_1`…`team_10`). Prefer person-level answers. Legacy wide columns on `org_chart` used `product_and_tech_team_*` names; public DW uses `team_*`.
 
-## Related Business Entities
+## Related Domain Entities
 
 - `organization.md` — cost center, business unit, and job labels via fact FKs.
 - `employee_details.md` — full internal People DW (history, terminations, restricted attributes). **`dw_employee_details` is exclusive to the People team** — access **only on IDN request** with data-owner approval. **Do not** route general consumers here; use `dw_people`.
