@@ -184,6 +184,7 @@ def sfmc_raw_v2_pipeline(cfg):
                 partition_cols=["partition_date"],
                 overwrite_schema=True,
                 table_location=f"s3a://{cfg.bucket}/raw/{cfg.target_schema}/{table_name}",
+                sync_secondary_catalog=True,
             )
             logger.info(
                 "m=sfmc_raw_v2_pipeline, msg=Raw table written, "

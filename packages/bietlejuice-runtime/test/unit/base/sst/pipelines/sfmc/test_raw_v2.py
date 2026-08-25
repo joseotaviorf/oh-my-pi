@@ -105,7 +105,21 @@ class TestSfmcRawV2Pipeline:
             partition_cols=["partition_date"],
             overwrite_schema=True,
             table_location=f"s3a://{BUCKET}/raw/{TARGET_SCHEMA}/send",
+            sync_secondary_catalog=True,
         )
+
+    def test_every_table_is_synced_to_the_secondary_catalog(self, patched):
+        pipeline.sfmc_raw_v2_pipeline(args=_args(de_types="send,return"))
+
+        assert [
+            call.kwargs["sync_secondary_catalog"]
+            for call in patched.write.call_args_list
+        ] == [True, True]
+
+    def test_the_raw_table_is_not_registered_in_trino(self, patched):
+        pipeline.sfmc_raw_v2_pipeline(args=_args(de_types="send"))
+
+        assert "sync_hive" not in patched.write.call_args.kwargs
 
     def test_skips_a_delivery_type_that_was_not_delivered(self, patched):
         patched.read.side_effect = [patched.read.return_value, None]
