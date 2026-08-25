@@ -91,3 +91,15 @@ class TestIncrementalPartitionSyncFlag:
 
         params = creator._create_spark_job_task.call_args.args[2]
         assert "--partition-values" not in params
+
+
+class TestSyncMetadataParameters:
+    def test_parameters_use_metadata_type_flag(self):
+        creator = make_creator({})
+
+        creator.create_task(make_table_attributes(LayerEnum.RAW, {}))
+
+        params = creator._create_spark_job_task.call_args.args[2]
+        metadata_type_index = params.index("--metadata-type")
+        assert params[metadata_type_index + 1] == "tags"
+        assert params[metadata_type_index + 2] == "emlio"

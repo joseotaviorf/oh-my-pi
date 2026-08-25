@@ -30,6 +30,7 @@ class DagExecutionContext:
     aws_conn_id: str = "aws_default"
     emr_active_create_cluster_task_id: Optional[str] = None
     job_cluster_engine: Optional[JobClusterEngine] = None  # noqa: F821
+    databricks_submission_mode: str = "job_cluster"
     is_validation: bool = False
     validation_config: Optional[dict] = None
 

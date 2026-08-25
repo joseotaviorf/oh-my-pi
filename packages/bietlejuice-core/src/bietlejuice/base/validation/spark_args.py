@@ -1,18 +1,34 @@
 from argparse import ArgumentParser
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
+
+CLI_NONE = "None"
+
+
+def encode_cli_arg(value: Any) -> str:
+    """Encode empty/None job parameters for EMR spark-submit (empty argv is dropped)."""
+    if value is None or value == "":
+        return CLI_NONE
+    return str(value)
+
+
+def decode_cli_arg(arg: Optional[str]) -> Optional[str]:
+    """Decode CLI tokens from Databricks (empty) or EMR (literal 'None') to Python None."""
+    if not arg or arg == CLI_NONE:
+        return None
+    return arg
 
 
 def add_validation_target_args(parser: ArgumentParser) -> None:
     """Register optional flags appended by LoadCustomTaskCreator in validation mode."""
     parser.add_argument(
         "--target-database-name",
-        type=lambda arg: None if not arg else arg,
+        type=decode_cli_arg,
         required=False,
         default=None,
     )
     parser.add_argument(
         "--target-table-name",
-        type=lambda arg: None if not arg else arg,
+        type=decode_cli_arg,
         required=False,
         default=None,
     )

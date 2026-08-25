@@ -444,7 +444,7 @@ def propagate_raw_metadata(
 base_logger = set_logger(JOB_NAME)
 
 
-def main():
+def build_arg_parser():
     parser = ArgumentParser(JOB_NAME)
     parser.add_argument("bucket", type=str)
     parser.add_argument("layer", type=str)
@@ -466,8 +466,8 @@ def main():
         help="flag to sync all tables from database",
     )
     parser.add_argument(
-        "metadata_type_value",
-        type=str,
+        "--metadata-type",
+        dest="metadata_type_value",
         default=None,
         help="One of MetadataTypeEnum values",
     )
@@ -511,7 +511,11 @@ def main():
         ),
     )
 
-    args = parser.parse_args()
+    return parser
+
+
+def main():
+    args = build_arg_parser().parse_args()
     global spark
     if RuntimeDetector.is_emr():
         from bietlejuice.base.spark.spark_session_factory import (

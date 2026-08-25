@@ -2,6 +2,11 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
     BaseWorkflow,
 )
 from bietlejuice.base.airflow.enums.task_enum import TaskEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
+    get_job_cluster_completion_sink,
+)
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -58,6 +63,12 @@ class RawGsheetsIngestionWorkflow(BaseWorkflow):
         dummy_job_cluster_finished_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            dag_execution_context,
+            execute_job_cluster_task,
+            dummy_job_cluster_finished_task,
+            None,
+        )
 
         for table_name in self.workflow_args["tables_customization"]:
             # A tabela vive no schema final (clean): datalake_<custom_schema>_clean.<table>.
@@ -83,7 +94,19 @@ class RawGsheetsIngestionWorkflow(BaseWorkflow):
                 load_task >> sync_trino_task
                 last_table_task = sync_trino_task
 
-            last_table_task >> dummy_job_cluster_finished_task
+            last_table_task >> cluster_completion_sink
+
+        attach_emr_terminate_cluster_work_prerequisites(
+            dag_execution_context,
+            cluster_completion_sink,
+            execute_job_cluster_task=execute_job_cluster_task,
+            job_cluster_finished_task=dummy_job_cluster_finished_task,
+        )
+        attach_emr_job_cluster_finished_work_prerequisites(
+            dag_execution_context,
+            dummy_job_cluster_finished_task,
+            cluster_completion_sink=cluster_completion_sink,
+        )
 
         return dag
 

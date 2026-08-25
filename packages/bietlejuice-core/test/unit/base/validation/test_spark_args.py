@@ -3,7 +3,10 @@ from argparse import ArgumentParser
 import pytest
 
 from bietlejuice.base.validation.spark_args import (
+    CLI_NONE,
     add_validation_target_args,
+    decode_cli_arg,
+    encode_cli_arg,
     resolve_datalake_write_target,
 )
 
@@ -13,6 +16,23 @@ def _parse(argv):
     parser.add_argument("env")
     add_validation_target_args(parser)
     return parser.parse_args(argv)
+
+
+class TestCliNoneSentinel:
+    def test_encode_empty_and_none(self):
+        assert encode_cli_arg("") == CLI_NONE
+        assert encode_cli_arg(None) == CLI_NONE
+
+    def test_encode_preserves_non_empty(self):
+        assert encode_cli_arg("gsheets") == "gsheets"
+        assert encode_cli_arg(42) == "42"
+
+    @pytest.mark.parametrize("value", ["", "None", None])
+    def test_decode_maps_sentinel_and_empty_to_none(self, value):
+        assert decode_cli_arg(value) is None
+
+    def test_decode_preserves_real_values(self):
+        assert decode_cli_arg("my_tree") == "my_tree"
 
 
 class TestAddValidationTargetArgs:

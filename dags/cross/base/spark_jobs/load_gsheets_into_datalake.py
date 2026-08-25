@@ -110,12 +110,11 @@ if __name__ == "__main__":
 
     # Initializing clients
     base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
+    dbutils = base_dbutils.get_dbutils()
 
     credentials, scope = __get_auth(dbutils, credentials_scope, credentials_key)
     gsheets_client = GoogleSheetsClient(credentials, scope, timeout=TIMEOUT_LIMIT)
-    spark_client = SparkClient()
+    spark_client = SparkClient(app_name=JOB_NAME)
     gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
 
     datalake_info = DatalakeMetastoreService.get_db_info(

@@ -3,6 +3,7 @@ from datetime import timedelta
 from os import path
 from typing import Dict, Optional, Set
 
+from airflow.models.baseoperator import BaseOperator
 from airflow.utils.helpers import chain
 from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 
@@ -39,6 +40,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         databricks_conn_id="databricks_default",
         default_table_privileges=None,
         is_validation: bool = False,
+        job_cluster_engine=None,
     ):
         """
         :param dag: main dag instance
@@ -65,6 +67,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         self.databricks_conn_id = databricks_conn_id
         self.default_table_privileges = default_table_privileges
         self.is_validation = is_validation
+        self.job_cluster_engine = job_cluster_engine
         self._config_services: Dict[str, ConfigurationService] = {}
         self._metadata_tables_cache: Dict[str, Set[str]] = {}
         self._dq_cache = DataQualityLayerCache(self.relative_query_path)
@@ -98,6 +101,18 @@ class DatalakeTaskGroup(BaseTaskGroup):
         """Return cached set of table paths with data quality files, loading once per layer."""
         return self._dq_cache.get(layer)
 
+    def _metadata_task_spark_conf(self) -> Optional[dict]:
+        if (
+            self.job_cluster_engine is not None
+            and self.job_cluster_engine.uses_emr_terminate_after_optimize
+        ):
+            from bietlejuice.base.airflow.job_cluster_engine import (
+                METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
+            )
+
+            return METADATA_TASK_LIGHTWEIGHT_SPARK_CONF
+        return None
+
     def _build_load_task(
         self,
         task_id: str,
@@ -105,22 +120,32 @@ class DatalakeTaskGroup(BaseTaskGroup):
         do_output_xcom_push: bool,
         pool: str = AIRFLOW_DEFAULT_POOL,
         spark_job_extra_args: list = [],
-    ) -> QuintoAndarDatabricksSubmitRunOperator:
-        load_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=task_id,
-            pool=pool,
-            dag=self.dag,
-            json={
-                "spark_python_task": {
-                    "python_file": extraction_spark_job_file,
-                    "parameters": [self.env, self.datalake_bucket]
-                    + spark_job_extra_args,
-                }
-            },
-            do_output_xcom_push=do_output_xcom_push,
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            databricks_conn_id=self.databricks_conn_id,
-        )
+    ) -> BaseOperator:
+        job_parameters = [self.env, self.datalake_bucket] + spark_job_extra_args
+        if self.job_cluster_engine is not None:
+            load_table_task = self.job_cluster_engine.create_spark_python_task(
+                spark_job_path=extraction_spark_job_file,
+                task_id=task_id,
+                job_parameters=job_parameters,
+                execution_timeout_hours=self.execution_timeout_hours,
+                pool=pool if pool != AIRFLOW_DEFAULT_POOL else None,
+                do_output_xcom_push=do_output_xcom_push,
+            )
+        else:
+            load_table_task = QuintoAndarDatabricksSubmitRunOperator(
+                task_id=task_id,
+                pool=pool,
+                dag=self.dag,
+                json={
+                    "spark_python_task": {
+                        "python_file": extraction_spark_job_file,
+                        "parameters": job_parameters,
+                    }
+                },
+                do_output_xcom_push=do_output_xcom_push,
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
+                databricks_conn_id=self.databricks_conn_id,
+            )
         if not self.is_validation:
             DatasetAdder.attach_dataset_to_task(load_table_task)
 
@@ -135,7 +160,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name: str,
         metadata_file_type: str = None,
         bypass: str = "",
-    ) -> QuintoAndarDatabricksSubmitRunOperator:
+    ) -> BaseOperator:
         config_service = self._get_config_service(source)
         product_db_name = ""
         if "lineage_product_database_name" in config_service.configs:
@@ -159,27 +184,45 @@ class DatalakeTaskGroup(BaseTaskGroup):
             if layer == LayerEnum.RAW.value and product_db_name
             else []
         )
+        task_id = self.generate_default_task_id(
+            task_prefix=self.SYNC_METADATA_TASK_PREFIX,
+            layer=LayerEnum(layer),
+            schema=source,
+            table_name=table_name,
+        )
+        type_args = (
+            ["--metadata-type", metadata_file_type] if metadata_file_type else []
+        )
+        sync_parameters = (
+            [
+                self.datalake_bucket,
+                layer,
+                database_name,
+                sync_mode,
+            ]
+            + ([table_name] if table_name else [True])
+            + type_args
+            + [self.relative_query_path]
+            + raw_params
+            + bypass.split()
+        )
+        sync_job_path = path.join(self.spark_jobs_path, "sync_metadata.py")
+        if self.job_cluster_engine is not None:
+            return self.job_cluster_engine.create_spark_python_task(
+                spark_job_path=sync_job_path,
+                task_id=task_id,
+                job_parameters=sync_parameters,
+                execution_timeout_hours=0.5,
+                task_spark_conf=self._metadata_task_spark_conf(),
+            )
+
         sync_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=self.generate_default_task_id(
-                task_prefix=self.SYNC_METADATA_TASK_PREFIX,
-                layer=LayerEnum(layer),
-                schema=source,
-                table_name=table_name,
-            ),
+            task_id=task_id,
             dag=self.dag,
             json={
                 "spark_python_task": {
-                    "python_file": path.join(self.spark_jobs_path, "sync_metadata.py"),
-                    "parameters": [
-                        self.datalake_bucket,
-                        layer,
-                        database_name,
-                        sync_mode,
-                    ]
-                    + ([table_name] if table_name else [True])
-                    + [metadata_file_type, self.relative_query_path]
-                    + raw_params
-                    + bypass.split(),
+                    "python_file": sync_job_path,
+                    "parameters": sync_parameters,
                 }
             },
             execution_timeout=timedelta(minutes=30),
@@ -216,33 +259,43 @@ class DatalakeTaskGroup(BaseTaskGroup):
             return data_quality_tasks
 
         for table in tables_names:
-            data_quality_task = QuintoAndarDatabricksSubmitRunOperator(
-                dag=self.dag,
-                task_id=self.generate_default_task_id(
-                    task_prefix=self.DATA_QUALITY_TESTS_TASK_PREFIX,
-                    layer=LayerEnum(layer),
-                    schema=source,
-                    table_name=table_name,
-                ),
-                json={
-                    "spark_python_task": {
-                        "python_file": path.join(
-                            self.spark_jobs_path, "data_quality_tests.py"
-                        ),
-                        "parameters": [
-                            self.env,
-                            execution_date,
-                            self.inmetro_bucket,
-                            layer,
-                            self.relative_query_path,
-                            table,
-                            tree_path,
-                        ],
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-                databricks_conn_id=self.databricks_conn_id,
+            dq_task_id = self.generate_default_task_id(
+                task_prefix=self.DATA_QUALITY_TESTS_TASK_PREFIX,
+                layer=LayerEnum(layer),
+                schema=source,
+                table_name=table_name,
             )
+            dq_parameters = [
+                self.env,
+                execution_date,
+                self.inmetro_bucket,
+                layer,
+                self.relative_query_path,
+                table,
+                tree_path,
+            ]
+            dq_job_path = path.join(self.spark_jobs_path, "data_quality_tests.py")
+            if self.job_cluster_engine is not None:
+                data_quality_task = self.job_cluster_engine.create_spark_python_task(
+                    spark_job_path=dq_job_path,
+                    task_id=dq_task_id,
+                    job_parameters=dq_parameters,
+                    execution_timeout_hours=self.execution_timeout_hours,
+                    task_spark_conf=self._metadata_task_spark_conf(),
+                )
+            else:
+                data_quality_task = QuintoAndarDatabricksSubmitRunOperator(
+                    dag=self.dag,
+                    task_id=dq_task_id,
+                    json={
+                        "spark_python_task": {
+                            "python_file": dq_job_path,
+                            "parameters": dq_parameters,
+                        }
+                    },
+                    execution_timeout=timedelta(hours=self.execution_timeout_hours),
+                    databricks_conn_id=self.databricks_conn_id,
+                )
 
             data_quality_tasks.append(data_quality_task)
 

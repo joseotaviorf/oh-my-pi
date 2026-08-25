@@ -66,6 +66,7 @@ class SyncMetadataTaskCreator(BaseTaskCreator):
             table_attributes.schema,
             "--table-name",
             table_attributes.table_name,
+            "--metadata-type",
             metadata_type.value,
             self.dag_execution_context.dag_args["name"],
         ]

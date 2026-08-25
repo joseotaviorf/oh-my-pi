@@ -142,6 +142,7 @@ class DWTaskGroup(BaseTaskGroup):
                         schema,
                         sync_mode,
                         table_name,
+                        "--metadata-type",
                         metadata_file_type,
                         self.relative_query_path,
                     ],

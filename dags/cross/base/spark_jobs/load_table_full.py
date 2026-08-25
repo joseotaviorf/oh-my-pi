@@ -10,6 +10,7 @@ from bietlejuice.base.db import DatalakeMetastoreService, MetricMetastoreMapping
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+from bietlejuice.base.validation.spark_args import decode_cli_arg
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
 
 JOB_NAME = "load_table"
@@ -18,7 +19,7 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def main():
+def build_arg_parser():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket", type=str, help="datalake bucket")
@@ -49,18 +50,18 @@ def main():
     )
     parser.add_argument(
         "schema",
-        type=lambda arg: None if not arg else arg,
+        type=decode_cli_arg,
         help="table schema used in the query path",
     )
     parser.add_argument(
         "tree_path",
-        type=lambda arg: None if not arg else arg,
+        type=decode_cli_arg,
         help="path to reach the query place",
     )
     parser.add_argument(
         "-tp",
         "--table-privileges",
-        type=lambda arg: None if not arg else arg,
+        type=decode_cli_arg,
         help="json string mapping each principal to a list of permissions for the table",
         required=False,
         default=None,
@@ -68,19 +69,23 @@ def main():
     parser.add_argument(
         "-tdn",
         "--target-database-name",
-        type=lambda arg: None if not arg else arg,
+        type=decode_cli_arg,
         required=False,
         default=None,
     )
     parser.add_argument(
         "-ttn",
         "--target-table-name",
-        type=lambda arg: None if not arg else arg,
+        type=decode_cli_arg,
         required=False,
         default=None,
     )
 
-    args = parser.parse_args()
+    return parser
+
+
+def main():
+    args = build_arg_parser().parse_args()
 
     global spark
     if RuntimeDetector.is_emr():

@@ -8,6 +8,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+from bietlejuice.base.validation.spark_args import decode_cli_arg
 from bietlejuice.pipeline.data_quality_tests_pipeline import DataQualityTestsPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -37,7 +38,7 @@ def parse_args():
     parser.add_argument("table_name", type=str)
     parser.add_argument(
         "intermediate_path",
-        type=str,
+        type=lambda arg: decode_cli_arg(arg) or "",
         nargs="?",
         default="",
         help="partial path used in some DAGs off of our pattern",

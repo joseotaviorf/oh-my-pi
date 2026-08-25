@@ -13,7 +13,10 @@ from airflow.models.baseoperator import BaseOperator
 from airflow.utils.task_group import TaskGroup
 from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
+    QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
 )
 
 from bietlejuice.base.airflow.cluster_config_resolver import (
@@ -28,9 +31,12 @@ from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHe
 from bietlejuice.base.databricks.spark_event_log_cluster import (
     apply_validation_event_log_overrides,
 )
+from bietlejuice.base.validation.spark_args import encode_cli_arg
 from bietlejuice.services.configuration_service import ConfigurationService
 
 _EXECUTE_JOB_CLUSTER_TASK_ID = "execute-job-cluster"
+_CREATE_CLUSTER_TASK_ID = "create-cluster"
+_TERMINATE_CLUSTER_TASK_ID = "terminate-cluster"
 
 # Merged cluster YAML (preset + declaration ``custom_configurations``) may set this.
 # Governs opt-in deferrable wait mode for EMR Airflow operators when set true.
@@ -165,6 +171,8 @@ class JobClusterEngine(ABC):
         python_interpreter_path: Optional[str] = None,
         task_spark_conf: Optional[Dict[str, str]] = None,
         py_files: Optional[str] = None,
+        do_output_xcom_push: bool = False,
+        pool: Optional[str] = None,
     ) -> BaseOperator:
         """``python_interpreter_path`` runs the step on the given Python
         interpreter on EMR (sets ``spark.pyspark.[driver.]python``); ignored on
@@ -183,6 +191,10 @@ class JobClusterEngine(ABC):
     @property
     def uses_emr_terminate_after_optimize(self) -> bool:
         return False
+
+    def create_databricks_terminate_cluster_task(self) -> BaseOperator:
+        """Databricks all-purpose cluster teardown (``terminate-cluster``)."""
+        raise NotImplementedError
 
     def create_emr_terminate_cluster_task(
         self,
@@ -351,6 +363,8 @@ class DatabricksJobClusterEngine(JobClusterEngine):
         python_interpreter_path: Optional[str] = None,
         task_spark_conf: Optional[Dict[str, str]] = None,
         py_files: Optional[str] = None,
+        do_output_xcom_push: bool = False,
+        pool: Optional[str] = None,
     ) -> BaseOperator:
 
         if python_interpreter_path is not None:
@@ -381,6 +395,100 @@ class DatabricksJobClusterEngine(JobClusterEngine):
                 }
             },
             execution_timeout=timedelta(hours=execution_timeout_hours),
+        )
+
+
+class DatabricksTaskSubmissionEngine(DatabricksJobClusterEngine):
+    """Databricks all-purpose cluster: CreateCluster + SubmitRun + Terminate.
+
+    Used by classic ``gsheets`` DAGs to preserve task submission (``existing_cluster_id``)
+    instead of ephemeral job clusters (ExecuteJobCluster + CheckJob).
+    """
+
+    def create_execute_cluster_task(
+        self,
+        *,
+        config_service: ConfigurationService,
+        minimum_cluster_runtime_version: Optional[str],
+        execute_job_cluster_local_id: Optional[int],
+    ) -> BaseOperator:
+        _ = config_service
+        _ = execute_job_cluster_local_id
+        cluster_configuration = self._get_cluster_configuration()
+        cluster_configuration = self._input_spark_env_vars(cluster_configuration)
+        if self._ctx.is_validation:
+            cluster_configuration = apply_validation_event_log_overrides(
+                cluster_configuration
+            )
+        self._validate_minimum_cluster_runtime_version(
+            cluster_configuration, minimum_cluster_runtime_version
+        )
+
+        return QuintoAndarDatabricksCreateClusterOperator(
+            databricks_conn_id=self._ctx.databricks_conn_id,
+            dag=self._ctx.dag,
+            task_id=_CREATE_CLUSTER_TASK_ID,
+            cluster_configuration=cluster_configuration,
+            libraries=self._get_libraries(),
+            access_control_list=self._get_access_control_list(),
+            execution_timeout=timedelta(
+                hours=BaseTaskCreator._DEFAULT_EXECUTION_TIMEOUT_HOURS
+            ),
+        )
+
+    def create_spark_python_task(
+        self,
+        *,
+        spark_job_path: str,
+        task_id: str,
+        job_parameters: List[Any],
+        execution_timeout_hours: int,
+        python_interpreter_path: Optional[str] = None,
+        task_spark_conf: Optional[Dict[str, str]] = None,
+        py_files: Optional[str] = None,
+        do_output_xcom_push: bool = False,
+        pool: Optional[str] = None,
+    ) -> BaseOperator:
+        if python_interpreter_path is not None:
+            logging.warning(
+                "[DatabricksTaskSubmissionEngine] The 'python_interpreter_path' argument"
+                " is ignored: interpreter is set at the cluster level."
+            )
+        if task_spark_conf:
+            logging.debug(
+                "[DatabricksTaskSubmissionEngine] Ignoring task_spark_conf for task %s.",
+                task_id,
+            )
+        if py_files:
+            logging.debug(
+                "[DatabricksTaskSubmissionEngine] Ignoring py_files for task %s.",
+                task_id,
+            )
+
+        operator_kwargs: Dict[str, Any] = {
+            "task_id": task_id,
+            "dag": self._ctx.dag,
+            "json": {
+                "spark_python_task": {
+                    "python_file": spark_job_path,
+                    "parameters": job_parameters,
+                }
+            },
+            "do_output_xcom_push": do_output_xcom_push,
+            "execution_timeout": timedelta(hours=execution_timeout_hours),
+            "databricks_conn_id": self._ctx.databricks_conn_id,
+        }
+        if pool is not None:
+            operator_kwargs["pool"] = pool
+
+        return QuintoAndarDatabricksSubmitRunOperator(**operator_kwargs)
+
+    def create_databricks_terminate_cluster_task(self) -> BaseOperator:
+        return QuintoAndarDatabricksTerminateClusterOperator(
+            dag=self._ctx.dag,
+            task_id=_TERMINATE_CLUSTER_TASK_ID,
+            trigger_rule="all_done",
+            databricks_conn_id=self._ctx.databricks_conn_id,
         )
 
 
@@ -484,6 +592,8 @@ class EmrJobClusterEngine(JobClusterEngine):
         python_interpreter_path: Optional[str] = None,
         task_spark_conf: Optional[Dict[str, str]] = None,
         py_files: Optional[str] = None,
+        do_output_xcom_push: bool = False,
+        pool: Optional[str] = None,
     ) -> BaseOperator:
         create_id = self._ctx.emr_active_create_cluster_task_id
         if not create_id:
@@ -496,7 +606,7 @@ class EmrJobClusterEngine(JobClusterEngine):
         step = QuintoAndarEmrSubmitStepsOperator.build_spark_submit_step(
             name=task_id,
             script_uri=spark_job_path,
-            args=[str(p) for p in job_parameters],
+            args=[encode_cli_arg(p) for p in job_parameters],
             deploy_mode=str(
                 self._merged_cluster_configuration.get("emr_deploy_mode", "client")
             ),
@@ -514,17 +624,20 @@ class EmrJobClusterEngine(JobClusterEngine):
             ]
             + _spark_conf_to_submit_args(task_spark_conf),
         )
-        return QuintoAndarEmrSubmitStepsOperator(
-            task_id=task_id,
-            job_flow_id=job_flow_id,
-            steps=[step],
-            wait_for_completion=True,
-            aws_conn_id=self._ctx.aws_conn_id,
-            dag=self._ctx.dag,
-            execution_timeout=timedelta(hours=execution_timeout_hours),
+        operator_kwargs: Dict[str, Any] = {
+            "task_id": task_id,
+            "job_flow_id": job_flow_id,
+            "steps": [step],
+            "wait_for_completion": True,
+            "aws_conn_id": self._ctx.aws_conn_id,
+            "dag": self._ctx.dag,
+            "execution_timeout": timedelta(hours=execution_timeout_hours),
             **self._emr_operator_retry_kwargs(),
             **self._emr_deferrable_opt_in_kwargs(),
-        )
+        }
+        if pool is not None:
+            operator_kwargs["pool"] = pool
+        return QuintoAndarEmrSubmitStepsOperator(**operator_kwargs)
 
     def create_emr_terminate_cluster_task(
         self,
@@ -670,6 +783,11 @@ def _attach_emr_cluster_work_prerequisites(
         cluster_completion_sink.set_upstream(task)
         job_cluster_finished_task.set_upstream(task)
 
+    # Work includes both BranchPythonOperator arms (e.g. classic gsheets). One arm is
+    # always skipped, so the default all_success would skip job-cluster-finished.
+    # none_failed_min_one_success is the DAG-level analog of done's one_success join:
+    # skipped branch arms do not skip the task, but a failed Spark/EMR task still does.
+    job_cluster_finished_task.trigger_rule = "none_failed_min_one_success"
     cluster_completion_sink.set_downstream(job_cluster_finished_task)
 
 
@@ -684,8 +802,9 @@ def attach_emr_job_cluster_finished_work_prerequisites(
     EMR: ``job-cluster-finished`` must not succeed on failed Spark/EMR work, but
     ``terminate-emr-cluster`` is ``all_done`` and always succeeds if the API
     call works. Add direct upstreams from the work tasks that must succeed
-    (same set that feeds the cluster completion sink) so the finished task
-    uses the default ``all_success`` and reflects failures. No-op on Databricks.
+    (same set that feeds the cluster completion sink). The finished task uses
+    ``none_failed_min_one_success`` so skipped branch arms (classic gsheets) do
+    not skip it, while failed work still does. No-op on Databricks.
 
     Also call :func:`attach_emr_terminate_cluster_work_prerequisites` with
     ``execute_job_cluster_task`` and ``cluster_completion_sink`` so
@@ -831,6 +950,8 @@ def build_job_cluster_engine(
         if dag_execution_context.is_validation:
             merged = apply_validation_event_log_overrides(merged)
         return EmrJobClusterEngine(dag_execution_context, merged, config_service)
+    if dag_execution_context.databricks_submission_mode == "task_submission":
+        return DatabricksTaskSubmissionEngine(dag_execution_context, config_service)
     return DatabricksJobClusterEngine(dag_execution_context, config_service)
 
 

@@ -10,6 +10,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.gsheets_ingest_output import emit_gsheets_ingest_output
 from bietlejuice.services.gsheets_service import GsheetsService
 
 JOB_NAME = "load_ingested_gsheets_id_info"
@@ -62,6 +63,18 @@ if __name__ == "__main__":
         "credentials_key", help="Credentials to access the Google Sheets API"
     )
     parser.add_argument("credentials_scope", help="Databricks secret scope")
+    parser.add_argument(
+        "airflow_dag_id",
+        nargs="?",
+        default=None,
+        help="Airflow dag_id for EMR ingest sidecar path",
+    )
+    parser.add_argument(
+        "airflow_run_id",
+        nargs="?",
+        default=None,
+        help="Airflow run_id for EMR ingest sidecar path",
+    )
 
     args = parser.parse_args()
 
@@ -75,8 +88,7 @@ if __name__ == "__main__":
     sheet_details = config_service.get_config("sheets_info")
 
     base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
+    dbutils = base_dbutils.get_dbutils()
 
     credentials, scope = __get_auth(dbutils, credentials_scope, credentials_key)
     gsheets_client = GoogleSheetsClient(credentials, scope)
@@ -129,4 +141,10 @@ if __name__ == "__main__":
             "success_run": success_run,
             "sheets_to_be_ingested": sheets_to_be_ingested,
         }
-        dbutils.notebook.exit(json.dumps(output_json))
+        emit_gsheets_ingest_output(
+            dbutils,
+            output_json,
+            datalake_bucket,
+            args.airflow_dag_id,
+            args.airflow_run_id,
+        )

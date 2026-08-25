@@ -86,7 +86,7 @@ if __name__ == "__main__":
         dbutils, args.credentials_scope, args.credentials_key
     )
     gsheets_client = GoogleSheetsClient(credentials, scope, timeout=TIMEOUT_LIMIT)
-    spark_client = SparkClient()
+    spark_client = SparkClient(app_name=JOB_NAME)
     gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
 
     # Destino = schema FINAL (clean). Sem raw.

@@ -6,22 +6,22 @@ from airflow.datasets import BaseDataset
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import BranchPythonOperator
 from airflow.utils.helpers import chain
-from databricks_plugin import (
-    QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
-)
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
+    get_job_cluster_completion_sink,
+)
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.formatters import StringFormatter
+from bietlejuice.services.gsheets_ingest_output import pull_gsheets_ingest_output_json
 from bietlejuice.services.gsheets_ingestion_alert import get_metadata_owner
 
 
@@ -102,18 +102,20 @@ class RawGsheetsWorkflow(BaseWorkflow):
             self.config_service.get_config("sheets_info").items()
         )
 
-        cluster_params = self.get_cluster_params()
+        dag_execution_context = self._get_dag_execution_context(
+            self.dag,
+            self.datalake_bucket,
+            databricks_submission_mode="task_submission",
+        )
+        engine = dag_execution_context.job_cluster_engine
 
         self.dag.user_defined_macros = {"get_run_param": get_run_param}
         self.dag.doc_md = self._get_dag_documentation()
 
-        create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-            dag=self.dag,
-            task_id="create-cluster",
-            cluster_configuration=cluster_params["cluster_config"],
-            libraries=cluster_params["libraries"],
-            access_control_list=cluster_params["access_control_list"],
-            databricks_conn_id=self.databricks_conn_id,
+        create_cluster_task = engine.create_execute_cluster_task(
+            config_service=self.config_service,
+            minimum_cluster_runtime_version=None,
+            execute_job_cluster_local_id=None,
         )
 
         default_table_privileges = self.workflow_args.get(
@@ -125,13 +127,16 @@ class RawGsheetsWorkflow(BaseWorkflow):
             datalake_bucket=self.datalake_bucket,
             relative_query_path=self.dag_name,
             spark_jobs_path=self.base_spark_jobs_path,
-            databricks_conn_id=self.databricks_conn_id,
+            databricks_conn_id=dag_execution_context.databricks_conn_id,
             default_table_privileges=default_table_privileges,
             is_validation=self.is_validation,
+            job_cluster_engine=engine,
         )
 
         load_ids_to_be_ingested_task_group = self._set_load_ingestion_ids_info_task(
-            task_pool=self.task_pool, dag_name=self.dag_name, dag=self.dag
+            engine=engine,
+            task_pool=self.task_pool,
+            dag_name=self.dag_name,
         )
 
         raw_task_groups = self._set_raw_tasks(
@@ -157,12 +162,17 @@ class RawGsheetsWorkflow(BaseWorkflow):
 
         done_tasks = self._set_done_tasks(tables_customization)
 
-        terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-            dag=self.dag,
-            task_id="terminate-cluster",
-            trigger_rule="all_done",
-            databricks_conn_id=self.databricks_conn_id,
-        )
+        if dag_execution_context.use_airflow_emr:
+            job_cluster_finished_task = DummyOperator(
+                task_id="job-cluster-finished", dag=self.dag
+            )
+            terminate_cluster_task = get_job_cluster_completion_sink(
+                dag_execution_context,
+                create_cluster_task,
+                job_cluster_finished_task,
+            )
+        else:
+            terminate_cluster_task = engine.create_databricks_terminate_cluster_task()
 
         self.set_dependencies(
             create_cluster_task=create_cluster_task,
@@ -174,6 +184,19 @@ class RawGsheetsWorkflow(BaseWorkflow):
             done_task_groups=done_tasks,
             terminate_cluster_task=terminate_cluster_task,
         )
+
+        if dag_execution_context.use_airflow_emr:
+            attach_emr_terminate_cluster_work_prerequisites(
+                dag_execution_context,
+                terminate_cluster_task,
+                execute_job_cluster_task=create_cluster_task,
+                job_cluster_finished_task=job_cluster_finished_task,
+            )
+            attach_emr_job_cluster_finished_work_prerequisites(
+                dag_execution_context,
+                job_cluster_finished_task,
+                cluster_completion_sink=terminate_cluster_task,
+            )
 
         return self.dag
 
@@ -212,6 +235,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
                     "gsheet_raw_task_group": raw_task_groups[gsheet],
                     "dummy_task": dummy_tasks[gsheet],
                     "bypass_update_check_list": "{{ get_run_param(dag_run, 'bypass_update_check_list') }}",
+                    "datalake_bucket": self.datalake_bucket,
                 },
                 provide_context=True,
             )
@@ -262,43 +286,12 @@ class RawGsheetsWorkflow(BaseWorkflow):
         if independent_tasks:
             terminate_cluster_task.set_upstream(independent_tasks)
 
-    def get_cluster_params(self):
-        cluster_configuration = self.config_service.get_config(
-            self.cluster_args["type"]
-        )
-        cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
-            cluster_configuration
-        )
-        default_libraries = self.config_service.get_config("default_libraries")
-        custom_libraries = [
-            (
-                {
-                    lib_type: lib_name.format(
-                        artifacts_bucket=self.config_service.get_config(
-                            "artifacts_bucket"
-                        )
-                    )
-                }
-                if isinstance(lib_name, str)
-                else {lib_type: lib_name}
-            )
-            for custom_libraries in self.cluster_args["custom_libraries"]
-            for lib_type, lib_name in custom_libraries.items()
-        ]
-
-        acl = self.cluster_args["access_control_list"]
-        databricks_access_control_list = [acl] if isinstance(acl, dict) else acl
-        return {
-            "cluster_config": cluster_configuration,
-            "libraries": default_libraries + custom_libraries,
-            "access_control_list": databricks_access_control_list,
-        }
-
     def decide_branch(
         self,
         table_name: str,
-        gsheet_raw_task_group: QuintoAndarDatabricksSubmitRunOperator,
+        gsheet_raw_task_group,
         dummy_task: DummyOperator,
+        datalake_bucket: str,
         bypass_update_check_list=[],
         **kwargs,
     ) -> AnyStr:
@@ -316,9 +309,20 @@ class RawGsheetsWorkflow(BaseWorkflow):
         @param kwargs: Task kwargs according to BranchOperator docs.
         @return: Next task name from the branch that will run.
         """
-        to_ingest_output_json = kwargs["ti"].xcom_pull(
-            task_ids=self.IDS_TO_BE_INGESTED_TASK_ID, key="output"
+        ti = kwargs["ti"]
+        dag_run = kwargs.get("dag_run")
+        run_id = dag_run.run_id if dag_run else ti.run_id
+        dag_id = kwargs["dag"].dag_id
+
+        to_ingest_output_json = pull_gsheets_ingest_output_json(
+            task_instance=ti,
+            ingest_task_id=self.IDS_TO_BE_INGESTED_TASK_ID,
+            datalake_bucket=datalake_bucket,
+            dag_id=dag_id,
+            run_id=run_id,
         )
+        if not to_ingest_output_json:
+            return DatalakeTaskGroup.first_tasks(gsheet_raw_task_group)[0].task_id
 
         to_ingest_output = json.loads(to_ingest_output_json)
         if (
@@ -330,35 +334,29 @@ class RawGsheetsWorkflow(BaseWorkflow):
         else:
             return dummy_task.task_id
 
-    def _set_load_ingestion_ids_info_task(
-        self, task_pool: str, dag_name: str, dag
-    ) -> QuintoAndarDatabricksSubmitRunOperator:
+    def _set_load_ingestion_ids_info_task(self, engine, task_pool: str, dag_name: str):
         """
         This task is the first to run and will define which gsheet should run on this DAG Run.
         It will search for the gsheets with modification on the last 24h and the ones that uses
         the IMPORTRANGE function.
         @param task_pool: Task pool name.
         @param dag_name: DAG name that will be passed as param to the spark job.
-        @param dag: DAG instance.
-        @return: QuintoAndarDatabricksSubmitRunOperator
+        @return: Spark task operator (SubmitRun on Databricks, SubmitSteps on EMR).
         """
-        return QuintoAndarDatabricksSubmitRunOperator(
+        return engine.create_spark_python_task(
+            spark_job_path=f"{self.base_spark_jobs_path}load_modified_gsheets_id.py",
             task_id=self.IDS_TO_BE_INGESTED_TASK_ID,
-            databricks_conn_id=self.databricks_conn_id,
-            dag=dag,
+            job_parameters=[
+                self.env,
+                self.datalake_bucket,
+                dag_name,
+                self.credentials_key,
+                self.credentials_scope,
+                self.dag_id,
+                "{{ run_id }}",
+            ],
+            execution_timeout_hours=2,
             pool=task_pool,
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.base_spark_jobs_path}load_modified_gsheets_id.py",
-                    "parameters": [
-                        self.env,
-                        self.datalake_bucket,
-                        dag_name,
-                        self.credentials_key,
-                        self.credentials_scope,
-                    ],
-                }
-            },
             do_output_xcom_push=True,
         )
 

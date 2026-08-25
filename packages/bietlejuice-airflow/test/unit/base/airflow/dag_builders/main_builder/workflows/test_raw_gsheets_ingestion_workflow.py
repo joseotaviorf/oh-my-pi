@@ -87,6 +87,16 @@ class TestRawGsheetsIngestionWorkflow:
             patch.object(
                 workflow_class, "_initialize_task_creators", side_effect=_init
             ),
+            patch(
+                "bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_gsheets_ingestion_workflow.get_job_cluster_completion_sink",
+                side_effect=lambda _ctx, execute, finished, _local: finished,
+            ),
+            patch(
+                "bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_gsheets_ingestion_workflow.attach_emr_terminate_cluster_work_prerequisites"
+            ),
+            patch(
+                "bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_gsheets_ingestion_workflow.attach_emr_job_cluster_finished_work_prerequisites"
+            ),
         ):
             wf.build_dag()
         return creators

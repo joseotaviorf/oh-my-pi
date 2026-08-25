@@ -44,6 +44,7 @@ BASE_ARGV = [
     "test-bucket",
     "raw",
     "emlio",
+    "--metadata-type",
     "tags",
     "emlio",
     "--bypass-propagate",
@@ -137,3 +138,35 @@ class TestMainDispatch:
     def test_all_tables_with_partition_values_raises(self):
         with pytest.raises(ValueError, match="single-table mode"):
             self._run_main(["--all-tables", "--partition-values", '[["2026","7","3"]]'])
+
+
+class TestSyncMetadataEmptyCliArgs:
+    def test_gsheets_argv_without_metadata_type(self):
+        argv = [
+            "prod-datalake",
+            "clean",
+            "gsheets_agents",
+            "--table-name",
+            "agents",
+            "gsheets_agents",
+            "--bypass-propagate",
+        ]
+        args = sync_metadata.build_arg_parser().parse_args(argv)
+        assert args.metadata_type_value is None
+        assert args.relative_file_path == "gsheets_agents"
+        assert args.bypass_propagate is True
+
+    def test_metadata_type_flag_sets_relative_file_path(self):
+        argv = [
+            "prod-datalake",
+            "raw",
+            "emlio",
+            "--table-name",
+            "emlio_logs",
+            "--metadata-type",
+            "tags",
+            "emlio",
+        ]
+        args = sync_metadata.build_arg_parser().parse_args(argv)
+        assert args.metadata_type_value == "tags"
+        assert args.relative_file_path == "emlio"

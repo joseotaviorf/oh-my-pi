@@ -9,6 +9,7 @@ from airflow.operators.empty import EmptyOperator
 from bietlejuice.base.airflow.job_cluster_engine import (
     METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
     DatabricksJobClusterEngine,
+    DatabricksTaskSubmissionEngine,
     EmrJobClusterEngine,
     attach_emr_job_cluster_finished_work_prerequisites,
     attach_emr_terminate_cluster_work_prerequisites,
@@ -124,6 +125,105 @@ class TestBuildJobClusterEngine:
 
         assert isinstance(engine, DatabricksJobClusterEngine)
         assert base_ctx.use_airflow_emr is False
+
+    def test_returns_task_submission_engine_when_mode_set(self, base_ctx):
+        base_ctx.databricks_submission_mode = "task_submission"
+        config = MagicMock()
+        config._deep_update = lambda a, b: {**a, **(b or {})}
+        config.get_config.side_effect = lambda key: {
+            "cluster_key": {
+                "spark_version": "16.4.x-scala2.12",
+                "data_security_mode": "NONE",
+                "spark_env_vars": {},
+            },
+            "default_access_control_list": [
+                {"group_name": "g", "permission_level": "CAN_MANAGE"}
+            ],
+            "default_libraries": [],
+            "artifacts_bucket": "art",
+            "databricks_default_service_credential_name": "x",
+        }.get(key, {})
+
+        engine = build_job_cluster_engine(base_ctx, config)
+
+        assert isinstance(engine, DatabricksTaskSubmissionEngine)
+        assert base_ctx.use_airflow_emr is False
+
+
+class TestDatabricksTaskSubmissionEngine:
+    @pytest.fixture
+    def databricks_ctx(self):
+        dag = DAG(dag_id="gsheets_test", schedule=None)
+        return DagExecutionContext(
+            dag=dag,
+            environment="forno",
+            bucket="b",
+            base_spark_jobs_path="/repo/spark_jobs/base/",
+            dag_args={},
+            workflow_args={},
+            cluster_args={
+                "type": "consolidation_s_memory_cluster",
+                "databricks_conn_id": "databricks_new",
+            },
+            databricks_submission_mode="task_submission",
+        )
+
+    def test_create_execute_cluster_uses_create_cluster_task_id(self, databricks_ctx):
+        config = MagicMock()
+        config._deep_update = lambda a, b: {**a, **(b or {})}
+        config.get_config.side_effect = lambda key: {
+            "consolidation_s_memory_cluster": {
+                "spark_version": "16.4.x-scala2.12",
+                "data_security_mode": "SINGLE_USER",
+                "spark_env_vars": {},
+            },
+            "default_access_control_list": [
+                {"group_name": "g", "permission_level": "CAN_MANAGE"}
+            ],
+            "default_libraries": [],
+            "artifacts_bucket": "art",
+            "databricks_default_service_credential_name": "x",
+        }.get(key, [])
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine.QuintoAndarDatabricksCreateClusterOperator"
+        ) as mock_create:
+            engine = DatabricksTaskSubmissionEngine(databricks_ctx, config)
+            engine.create_execute_cluster_task(
+                config_service=config,
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=None,
+            )
+            mock_create.assert_called_once()
+            assert mock_create.call_args.kwargs["task_id"] == "create-cluster"
+
+    def test_create_spark_python_task_uses_submit_run(self, databricks_ctx):
+        config = MagicMock()
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine.QuintoAndarDatabricksSubmitRunOperator"
+        ) as mock_submit:
+            engine = DatabricksTaskSubmissionEngine(databricks_ctx, config)
+            engine.create_spark_python_task(
+                spark_job_path="/repo/spark_jobs/base/job.py",
+                task_id="load-gsheets-t",
+                job_parameters=["forno", "bucket"],
+                execution_timeout_hours=2,
+                pool="gsheets_pool",
+                do_output_xcom_push=True,
+            )
+            mock_submit.assert_called_once()
+            kwargs = mock_submit.call_args.kwargs
+            assert kwargs["do_output_xcom_push"] is True
+            assert kwargs["pool"] == "gsheets_pool"
+
+    def test_create_databricks_terminate_cluster_task(self, databricks_ctx):
+        config = MagicMock()
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine.QuintoAndarDatabricksTerminateClusterOperator"
+        ) as mock_terminate:
+            engine = DatabricksTaskSubmissionEngine(databricks_ctx, config)
+            engine.create_databricks_terminate_cluster_task()
+            mock_terminate.assert_called_once()
+            assert mock_terminate.call_args.kwargs["task_id"] == "terminate-cluster"
 
 
 class TestEmrJobClusterEngineRetries:
@@ -392,6 +492,21 @@ class TestEmrJobClusterEngineRetries:
         flat = " ".join(extra)
         assert "spark.hadoop.fs.s3a.acl.default=BucketOwnerFullControl" in flat
         assert "spark.hadoop.fs.s3a.canned.acl=BucketOwnerFullControl" in flat
+
+    def test_submit_steps_encodes_empty_job_parameters_as_none_literal(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="load-foo",
+                job_parameters=["forno", "", None, "my_tree"],
+                execution_timeout_hours=2,
+            )
+        step_kwargs = mock_submit.build_spark_submit_step.call_args.kwargs
+        assert step_kwargs["args"] == ["forno", "None", "None", "my_tree"]
 
     def test_submit_steps_uses_client_deploy_mode_by_default(self, emr_ctx):
         mock_submit = MagicMock()
@@ -1107,6 +1222,38 @@ class TestAttachEmrTerminateClusterWorkPrerequisites:
         finished = dag.get_task("job-cluster-finished")
         assert finished.upstream_task_ids >= {"load", "register", "sync", "optimize"}
         assert finished.upstream_task_ids >= {"terminate-emr-cluster"}
+        assert finished.trigger_rule == "none_failed_min_one_success"
+
+    def test_gsheets_branch_arms_do_not_use_all_success_on_finished(self):
+        dag = DAG(dag_id="term_gsheets_branch", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        branch = EmptyOperator(task_id="check-sheet", dag=dag)
+        load = EmptyOperator(task_id="load-raw-sheet", dag=dag)
+        dummy = EmptyOperator(task_id="dummy-sheet", dag=dag)
+        done = EmptyOperator(task_id="done-sheet", dag=dag, trigger_rule="one_success")
+        term = EmptyOperator(
+            task_id="terminate-emr-cluster",
+            dag=dag,
+            trigger_rule="all_done",
+        )
+        finished = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        execute >> branch
+        branch >> load >> done
+        branch >> dummy >> done
+        done >> term
+        ctx = MagicMock()
+        ctx.use_airflow_emr = True
+
+        attach_emr_terminate_cluster_work_prerequisites(
+            ctx, term, execute_job_cluster_task=execute
+        )
+
+        assert finished.upstream_task_ids >= {
+            "load-raw-sheet",
+            "dummy-sheet",
+            "done-sheet",
+        }
+        assert finished.trigger_rule == "none_failed_min_one_success"
 
 
 class TestDatabricksAttachIsNoop:

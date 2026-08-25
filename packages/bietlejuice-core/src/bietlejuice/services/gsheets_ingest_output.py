@@ -1,0 +1,85 @@
+"""Resolve classic gsheets ingest-id task output (Databricks XCom or EMR S3 sidecar)."""
+
+from __future__ import annotations
+
+import json
+import logging
+from typing import Any, Optional
+from urllib.parse import urlparse
+
+logger = logging.getLogger(__name__)
+
+GSHEETS_INGEST_OUTPUT_PREFIX = "GSHEETS_INGEST_OUTPUT="
+GSHEETS_INGEST_S3_PREFIX = "_gsheets_ingest"
+
+
+def gsheets_ingest_sidecar_s3_uri(
+    datalake_bucket: str, dag_id: str, run_id: str
+) -> str:
+    """S3 URI where ``load_modified_gsheets_id`` writes JSON on EMR."""
+    return f"s3://{datalake_bucket}/{GSHEETS_INGEST_S3_PREFIX}/{dag_id}/{run_id}.json"
+
+
+def emit_gsheets_ingest_output(
+    dbutils: Any,
+    output_payload: dict,
+    datalake_bucket: str,
+    airflow_dag_id: Optional[str],
+    airflow_run_id: Optional[str],
+) -> None:
+    """Publish ingest-id JSON for Databricks XCom or EMR S3 sidecar + stdout marker."""
+    from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+
+    output_str = json.dumps(output_payload)
+    if RuntimeDetector.is_emr():
+        if airflow_dag_id and airflow_run_id:
+            import boto3
+
+            sidecar_uri = gsheets_ingest_sidecar_s3_uri(
+                datalake_bucket, airflow_dag_id, airflow_run_id
+            )
+            parsed = urlparse(sidecar_uri)
+            boto3.client("s3").put_object(
+                Bucket=parsed.netloc,
+                Key=parsed.path.lstrip("/"),
+                Body=output_str.encode("utf-8"),
+            )
+        print(f"{GSHEETS_INGEST_OUTPUT_PREFIX}{output_str}")
+        return
+    dbutils.notebook.exit(output_str)
+
+
+def pull_gsheets_ingest_output_json(
+    *,
+    task_instance: Any,
+    ingest_task_id: str,
+    datalake_bucket: str,
+    dag_id: str,
+    run_id: str,
+) -> Optional[str]:
+    """Return ingest-id JSON from XCom or, on EMR, from the S3 sidecar."""
+    output = task_instance.xcom_pull(task_ids=ingest_task_id, key="output")
+    if output:
+        return output
+
+    sidecar_uri = gsheets_ingest_sidecar_s3_uri(datalake_bucket, dag_id, run_id)
+    try:
+        import boto3
+
+        parsed = urlparse(sidecar_uri)
+        body = (
+            boto3.client("s3")
+            .get_object(Bucket=parsed.netloc, Key=parsed.path.lstrip("/"))
+            .get("Body")
+            .read()
+            .decode("utf-8")
+        )
+        json.loads(body)
+        return body
+    except Exception as exc:
+        logger.warning(
+            "m=pull_gsheets_ingest_output_json, sidecar=%s, msg=Failed to read sidecar: %s",
+            sidecar_uri,
+            exc,
+        )
+        return None
