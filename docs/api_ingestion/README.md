@@ -4,6 +4,7 @@ English-language reference for the DAG Builder **`api_ingestion`** workflow (`wo
 
 | Document | Audience | Description |
 |----------|----------|-------------|
+| [prerequisites.md](prerequisites.md) | Pipeline authors | Approval-gated setup to request before implementing: Data Contract, Cybersec network access, Vault → EMR Secrets Manager mirror |
 | [user_guide.md](user_guide.md) | Pipeline authors | Declaration parameters, YAML examples, runtime behavior, limitations |
 | [contributing.md](contributing.md) | Contributors | Code map (loader, Spark job, task creator, validator), extension checklist |
 

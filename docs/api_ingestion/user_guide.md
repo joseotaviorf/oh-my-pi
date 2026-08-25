@@ -456,6 +456,13 @@ tables_customization:
 
 ## Authentication (`workflow.authentication`)
 
+> **Databricks → EMR migration:** Databricks is being phased out; all new `api_ingestion` DAGs
+> run on EMR, where credentials are resolved from **AWS Secrets Manager** (mirrored from Vault),
+> not Databricks Secrets. Before implementing a new ingestion, see
+> [prerequisites.md](prerequisites.md) for the Vault → EMR Secrets Manager mirror request. The
+> secret-scope mechanics below describe the legacy Databricks Secrets path and are being updated
+> for the EMR equivalent.
+
 The secret scope is read from:
 
 - `workflow.credentials_scope` (preferred, per-DAG), otherwise
