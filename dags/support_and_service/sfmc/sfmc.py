@@ -33,6 +33,7 @@ DLQ_SCHEMA = CONFIG_SERVICE.get_config("dlq_schema")
 
 TEAMS_CONFIG = CONFIG_SERVICE.get_config("teams_config")
 SOURCE_PREFIX = CONFIG_SERVICE.get_config("source_prefix")
+CSV_ENCODING = CONFIG_SERVICE.get_config("csv_encoding")
 CLUSTER_ARGS = CONFIG_SERVICE.get_config("cluster")
 
 bucket = CONFIG_SERVICE.get_config("datalake_bucket")
@@ -147,6 +148,7 @@ with DAG(
                 "de_types": ",".join(de_types),
                 "source_prefix": SOURCE_PREFIX,
                 "table_prefix": f"{team_name}_",
+                "csv_encoding": CSV_ENCODING,
             },
             task_id=f"load_{RAW_SCHEMA}_{team_name}",
         )

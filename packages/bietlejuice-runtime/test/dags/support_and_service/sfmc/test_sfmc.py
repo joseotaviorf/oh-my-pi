@@ -83,6 +83,15 @@ class TestRawTasks:
             assert parameters["target_schema"] == config["raw_schema"]
             assert parameters["source_prefix"] == config["source_prefix"]
 
+    def test_csv_encoding_is_forwarded(self, raw_calls, config):
+        # SFMC delivers UTF-16 with a BOM; read as the pipeline's UTF-8 default
+        # the header is mangled and the clean layer rejects every row, so this
+        # has to reach the job rather than rely on the default.
+        for call in raw_calls:
+            parameters = parameters_as_dict(call.kwargs["job_parameters"])
+
+            assert parameters["csv_encoding"] == config["csv_encoding"]
+
     def test_runs_the_uploaded_entry_point(self, raw_calls, config):
         repo_path = config["databricks_bietlejuice_repo_path"]
 

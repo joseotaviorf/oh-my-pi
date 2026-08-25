@@ -18,6 +18,9 @@ dlq_schema: "datalake_sfmc_dlq"
 # default of raw/sfmc/tracking-data.
 source_prefix: "raw/sfmc"
 
+# SFMC exports these extracts as UTF-16 with a BOM.
+csv_encoding: "UTF-16"
+
 # The DAG prefixes every table with the team name, so teams sharing the schemas
 # above never write the same table.
 teams_config:

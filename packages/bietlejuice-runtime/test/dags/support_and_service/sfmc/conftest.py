@@ -33,6 +33,7 @@ RAW_SCHEMA = "datalake_sfmc_raw"
 CLEAN_SCHEMA = "datalake_sfmc_clean"
 DLQ_SCHEMA = "datalake_sfmc_dlq"
 SOURCE_PREFIX = "raw/sfmc"
+CSV_ENCODING = "UTF-16"
 BUCKET = "test-bucket"
 REPO_PATH = "/test/bietlejuice"
 
@@ -43,6 +44,7 @@ _CONFIG_VALUES = {
     "clean_schema": CLEAN_SCHEMA,
     "dlq_schema": DLQ_SCHEMA,
     "source_prefix": SOURCE_PREFIX,
+    "csv_encoding": CSV_ENCODING,
     "teams_config": TEAMS_CONFIG,
     "cluster": {"type": "emr_7_12_small_general_2xlarge_single_node_cluster"},
     "webhook_sfmc": "WEBHOOK_TEST",
