@@ -1,7 +1,8 @@
 dag_documentation:
   dag_purpose:
-    "Vespúcio plugins: Elasticsearch indexers, classifieds, zordominium, and related jobs that run after the core
-    Vespúcio pipeline. For background, see the [Vespucio Repository](https://github.com/quintoandar/vespucio)."
+    "Vespúcio plugins: Elasticsearch indexers, classifieds, listing_external_references, zordominium, and related
+    jobs that run after the core Vespúcio pipeline. For background, see the
+    [Vespucio Repository](https://github.com/quintoandar/vespucio)."
 elastic_search_url: "https://vpc-vespucio-prod-us-east-1-o56l6pbmnwaphvb7rqxzsapso4.us-east-1.es.amazonaws.com/"
 sqs_url_house_enrichment: "https://sqs.us-east-1.amazonaws.com/632540934959/ProdMainHouseEnrichmentHousesToBeReEnriched"
 sqs_url_internal_linking: "https://sqs.us-east-1.amazonaws.com/632540934959/ProdInternalLinkingPageIngestion"

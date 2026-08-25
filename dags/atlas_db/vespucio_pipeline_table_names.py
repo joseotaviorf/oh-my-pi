@@ -131,6 +131,13 @@ class Tables:
     )
     classifieds_to_delete = "vespucio_classifieds.classifieds_to_delete"
 
+    external_references = "vespucio_external_references.external_references"
+    external_references_to_delete = (
+        "vespucio_external_references.external_references_to_delete"
+    )
+    external_references_publish_log = "vespucio_external_references.publish_log"
+    external_references_published = "vespucio_external_references.published"
+
     # golden_set_condo_compounds = (
     #     "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
     # )

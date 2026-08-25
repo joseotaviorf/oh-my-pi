@@ -272,6 +272,20 @@ classifieds_tasks = [
     ),
 ]
 
+listing_external_references_task = create_task(
+    entry_point="plugins_listing_external_references",
+    parameters=[
+        f"--input_navent_houses_composed={Tables.source_navent_houses_composed}",
+        f"--output_external_references={Tables.external_references}",
+        f"--output_external_references_to_delete={Tables.external_references_to_delete}",
+        f"--logging_table={Tables.external_references_publish_log}",
+        f"--output_published_listings={Tables.external_references_published}",
+        f"--deployment_env={ENV}",
+        "--running_mode=prod",
+        "--run_mode=update",
+    ],
+)
+
 NEIGHBORHOOD_RECOMMENDATION_DATABASE = "neighborhood_recommendation_vespucio_plugin"
 
 neighborhood_recommendation_task = create_task(
@@ -319,6 +333,7 @@ join_plugins >> plugin_tasks
 join_plugins >> property_search_indexer_task
 property_search_indexer_task >> compound_indexer_task
 join_plugins >> classifieds_tasks[0]
+join_plugins >> listing_external_references_task
 join_plugins >> zordominium_tasks[0]
 join_plugins >> neighborhood_recommendation_task
 neighborhood_recommendation_task >> prices_exporter_task
