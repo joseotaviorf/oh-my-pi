@@ -11,3 +11,5 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      # Incremental loads MUST replace only the year/month/day partitions in the window.
+      spark.databricks.delta.dynamicPartitionOverwrite.enabled: "true"

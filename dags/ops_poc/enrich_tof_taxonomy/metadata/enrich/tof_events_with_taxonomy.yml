@@ -3,7 +3,8 @@ database_name: datalake_tof_taxonomy
 table_name: tof_events_with_taxonomy
 description: |
   Consolidates Top of Funnel events triggered by each user enriched with taxonomy classifications from Amplitude.
-  Partitioned by funnel_side — always filter on this column for partition pruning.
+  Partitioned by year/month/day (the source ingestion partition date). Always filter on those columns for partition pruning.
+  Loaded incrementally on Sundays over a 14-day window.
 domain: Growth
 owner: fabio.soeiro@quintoandar.com.br
 columns:
@@ -98,23 +99,19 @@ columns:
     description: "Second-level taxonomy grouping from the taxonomy management sheet, providing finer channel classification within level 1."
     lineage:
       - datalake_gsheets_clean.taxonomy_management_aggregation.taxonomy_aggregation_level_2
-  tof_event_order_at_all:
-    description: "The order in which the Top of Funnel event occurred for the user across all business contexts."
-  tof_event_order_per_business_context:
-    description: "The order in which the Top of Funnel event occurred for the user within the specific business context."
   ts_event:
     description: "Timestamp indicating when the Top of Funnel event occurred."
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
   year:
-    description: Year extracted from the event timestamp for partitioning and time-based analysis.
+    description: Ingestion partition year carried from schedule_search_listing_events (the day the event landed in the lake, which for ~0.9% of events is later than ts_event), not a decomposition of the event timestamp.
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.year
   month:
-    description: Month extracted from the event timestamp for partitioning and time-based analysis.
+    description: Ingestion partition month carried from schedule_search_listing_events (the day the event landed in the lake, which for ~0.9% of events is later than ts_event), not a decomposition of the event timestamp.
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.month
   day:
-    description: Day extracted from the event timestamp for partitioning and time-based analysis.
+    description: Ingestion partition day carried from schedule_search_listing_events (the day the event landed in the lake, which for ~0.9% of events is later than ts_event), not a decomposition of the event timestamp.
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.day

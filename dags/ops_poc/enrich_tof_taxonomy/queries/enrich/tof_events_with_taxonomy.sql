@@ -17,18 +17,6 @@ WITH tof_events_merged AS (
     LOWER(business_context) AS business_context,
     up_platform AS platform,
     COALESCE(CAST(ep_house_id AS STRING), top5_house_id[1]) AS id_house,
-    ROW_NUMBER() OVER (
-      PARTITION BY COALESCE(
-        CAST(u.id_user AS VARCHAR(1000)),
-        CAST(tof.id_user AS VARCHAR(1000)),
-        CAST(tof.id_amplitude AS VARCHAR(1000))
-        ) ORDER BY tof.ts_event) AS tof_event_order_at_all,
-    ROW_NUMBER() OVER (
-      PARTITION BY COALESCE(
-        CAST(u.id_user AS VARCHAR(1000)),
-        CAST(tof.id_user AS VARCHAR(1000)),
-        CAST(tof.id_amplitude AS VARCHAR(1000))
-        ), LOWER(business_context) ORDER BY tof.ts_event) AS tof_event_order_per_business_context,
     tof.year,
     tof.month,
     tof.day
@@ -38,7 +26,7 @@ WITH tof_events_merged AS (
     datalake_tof_taxonomy.amplitude_user_merge AS u
       ON u.id_amplitude_all = tof.id_amplitude
   WHERE
-    tof.YEAR >= YEAR(CURRENT_DATE) - 1
+    MAKE_DATE(tof.year, tof.month, tof.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 filtered_taxonomy_dict AS (
   SELECT
@@ -76,8 +64,6 @@ tof_users_merged_with_naming_convention AS (
     tof.utm_source,
     tof.id_house,
     tof.platform,
-    tof.tof_event_order_at_all,
-    tof.tof_event_order_per_business_context,
     tof.year,
     tof.month,
     tof.day
@@ -96,18 +82,29 @@ tof_users_merged_with_naming_convention AS (
 ),
 dim_media_setup_dedup AS (
   SELECT
-    ms.naming_convention_sufix,
-    ms.campaign_business_context,
-    ms.funnel_side,
-    ms.campaign_strategy_intent,
-    ms.behavior_type,
-    ms.medium,
-    ms.source,
-    ms.ts_load
-FROM
-  datalake_growth_taxonomy.media_setup AS ms
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY ms.naming_convention_sufix ORDER BY ms.ts_load DESC) = 1
+    naming_convention_sufix,
+    campaign_business_context,
+    funnel_side,
+    campaign_strategy_intent,
+    behavior_type,
+    medium,
+    source,
+    ts_load
+  FROM (
+    SELECT
+      ms.naming_convention_sufix,
+      ms.campaign_business_context,
+      ms.funnel_side,
+      ms.campaign_strategy_intent,
+      ms.behavior_type,
+      ms.medium,
+      ms.source,
+      ms.ts_load,
+      ROW_NUMBER() OVER (PARTITION BY ms.naming_convention_sufix ORDER BY ms.ts_load DESC) AS rn
+    FROM
+      datalake_growth_taxonomy.media_setup AS ms
+  )
+  WHERE rn = 1
 )
 -- include taxonomy data
 SELECT
@@ -129,8 +126,6 @@ SELECT
   dms.source,
   COALESCE(dtma.taxonomy_aggregation_level_1, 'Other') AS taxonomy_aggregation_level_1,
   COALESCE(dtma.taxonomy_aggregation_level_2, 'Other') AS taxonomy_aggregation_level_2,
-  tof.tof_event_order_at_all,
-  tof.tof_event_order_per_business_context,
   tof.ts_event,
   tof.year,
   tof.month,

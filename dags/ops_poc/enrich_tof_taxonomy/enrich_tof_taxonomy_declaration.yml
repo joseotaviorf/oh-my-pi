@@ -4,14 +4,22 @@ dag:
   owner: Ops POC
   documentation:
     dag_purpose: |
-      This DAG enrich provides Top of Funnel events from the past year with taxonomy data from Amplitude.
+      This DAG enriches Top of Funnel events with taxonomy data from Amplitude.
       It joins the event data with user merge data to associate events with the correct taxonomy classifications.
+      It runs on Sundays and loads incrementally: each run rewrites the source ingestion partitions
+      (year/month/day) inside the 14-day window ending on the run's data_interval_start, so a skipped week is
+      healed by the next run. Backfills are manual runs with the load_start_date/load_end_date trigger form
+      fields; the Sunday gate is evaluated on load_end_date, so a backfill window must end on a Sunday.
 workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: full
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -13), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   short_circuit_customization:
     function: CHECK_IS_SPECIFIC_WEEKDAY
+    execution_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
     function_params:
       weekday: 6
   spark_session_configs:
@@ -22,5 +30,5 @@ workflow:
   tables_customization:
     amplitude_user_merge: {}
     tof_events_with_taxonomy:
-      partitions: [funnel_side]
-
+      extraction_type: incremental
+      partitions: [year, month, day]
