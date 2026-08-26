@@ -28,6 +28,7 @@ class GchatWebhooksEnum:
     BIG_AGENT_ALERTS = "GCHAT_BIG_AGENT_ALERTS_WEBHOOK"
     STALE_DAG = "GCHAT_STALE_DAG_WEBHOOK"
     AUTHX_ALERTS = "GCHAT_AUTHX_ALERTS_WEBHOOK"
+    BPO_REVERSE_ALERTS = "GCHAT_BPO_REVERSE_ALERTS_WEBHOOK"
 
     # --- Alias mapping for legacy or alternative names ---
     _ALIAS_MAP = {

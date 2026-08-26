@@ -92,6 +92,25 @@ class TestDAGDeclarationValidator:
                 is None
             )
 
+    def test_validate_reverse_access_workflow_allows_gchat_export_summary(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "dag": {"name": "reverse_aec", "owner": "Data Planning and Performance"},
+            "workflow": {
+                "type": "access",
+                "layer": "reverse",
+                "bucket_config_name": "planning_and_performance_bucket",
+                "gchat_export_summary": True,
+                "load_spark_job": "load_reverse_aec",
+                "tables_customization": {"cases_perspective": {}},
+            },
+        }
+
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )
+
 
 class TestDAGDeclarationValidatorAPIIngestionWorkflow:
     """Test suite for api_ingestion workflow-specific validation."""

@@ -11,6 +11,9 @@ from bietlejuice.base.validation.spark_args import (
     resolve_datalake_write_target,
 )
 from bietlejuice.base.validation.target_resolver import get_prod_database_name
+from bietlejuice.jobs.planning_and_performance.reverse_bpo_file_notifier import (
+    notify_reverse_bpo_file_saved,
+)
 
 JOB_NAME = "load_reverse_aec"
 
@@ -57,6 +60,7 @@ if __name__ == "__main__":
     parser.add_argument("load_end_date")
     parser.add_argument("partner_name")
     parser.add_argument("organization_filters")
+    parser.add_argument("dag_run_id")
 
     add_validation_target_args(parser)
     args = parser.parse_args()
@@ -70,6 +74,7 @@ if __name__ == "__main__":
     load_end_date = args.load_end_date
     partner_name = args.partner_name
     organization_filters = args.organization_filters
+    dag_run_id = args.dag_run_id
 
     prod_database = get_prod_database_name(LayerEnum.REVERSE, partner_name, bucket)
     prod_s3_prefix = f"s3a://{bucket}/{partner_name.lower()}/{table_name}/"
@@ -203,6 +208,7 @@ if __name__ == "__main__":
                 file_name = f"{table_name}_{year}_{month}_{day}.parquet"
 
                 try:
+                    row_count = df.count()
                     logger.info(f"m=Loading Dataframe into s3, s3_path={s3_path}")
                     df = cast_void_columns_to_string(df)
                     df.coalesce(1).write.mode("overwrite").parquet(s3_path)
@@ -219,6 +225,18 @@ if __name__ == "__main__":
                             dbutils.fs.rm(source_path)
                             logger.info(
                                 f"m=Successfully renamed S3 file to {file_name}, s3_path={destination_path}"
+                            )
+                            notify_reverse_bpo_file_saved(
+                                dbutils=dbutils,
+                                environment=environment,
+                                dag_name=dag_name,
+                                file_name=file_name,
+                                destination_path=destination_path,
+                                s3_path=s3_path,
+                                execution_date=execution_date,
+                                row_count=row_count,
+                                dag_run_id=dag_run_id,
+                                bucket=bucket,
                             )
                             break
                 except Exception as e:

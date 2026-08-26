@@ -30,6 +30,16 @@ class ReverseLoadAccessWorkflow(BaseWorkflow):
     :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
     """
 
+    def dag_instance(self, **kwargs):
+        if self.workflow_args.get("gchat_export_summary"):
+            from bietlejuice.base.notification.reverse_bpo_summary_callback import (
+                reverse_bpo_export_summary_alert,
+            )
+
+            if kwargs.get("on_success_callback") is None:
+                kwargs["on_success_callback"] = reverse_bpo_export_summary_alert
+        return super().dag_instance(**kwargs)
+
     def build_dag(self):
         dag = self.dag_instance()
         bucket_config = self.workflow_args.get("bucket_config_name", "datalake_bucket")

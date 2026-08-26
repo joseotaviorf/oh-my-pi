@@ -513,6 +513,11 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "gchat_export_summary": {
+                    "type": "boolean",
+                    "empty": False,
+                    "required": False,
+                },
                 "qube_specs": {"type": "dict", "empty": False},
                 "wonka_config": {
                     "type": "dict",
