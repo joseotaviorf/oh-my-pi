@@ -23,7 +23,10 @@ columns:
       - datalake_pipeline.dag_sla_information.is_in_ignoring_list
       - datalake_pipeline.dag_sla_information.is_special_scheduler_executed
       - datalake_pipeline.dag_sla_information.is_intraday_dag
-    description: Line SLA percentage calculated as DAGs inside SLA divided by eligible active unpaused DAGs plus special-scheduler DAGs that executed, excluding ignored DAGs.
+    description: >
+      Line SLA percentage of DAGs inside SLA over eligible DAGs. Eligible means
+      active unpaused and not ignored, or a special-scheduler DAG that executed
+      that day. Intraday DAGs are excluded from both numerator and denominator.
   total_active_dags:
     lineage:
       - datalake_pipeline.dag_sla_information.id_dag

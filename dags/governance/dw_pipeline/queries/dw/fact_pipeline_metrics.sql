@@ -28,25 +28,30 @@ WITH totals_base AS (
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'metric' AND ds.is_executed = TRUE) AS total_metric_dags_executed,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'reverse' AND ds.is_executed = TRUE) AS total_reverse_dags_executed,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.is_datamart = TRUE AND ds.is_executed = TRUE) AS total_datamart_dags_executed,
+        -- Intraday DAGs are excluded from both sides. Special-scheduler
+        -- runs that executed still count, but only when they are not intradaily.
         ROUND(
             100 * (
                 COUNT(DISTINCT ds.id_dag) FILTER (
                     WHERE ds.is_inside_sla = TRUE
-                        AND ds.is_intraday_dag IS FALSE
+                        AND ds.is_intraday_dag = FALSE
                         AND (
-                                (
-                                    ds.is_active_and_unpaused
-                                    AND NOT ds.is_in_ignoring_list
-                                ) 
-                            OR ds.is_special_scheduler_executed
+                            (
+                                ds.is_active_and_unpaused = TRUE
+                                AND ds.is_in_ignoring_list = FALSE
+                            )
+                            OR ds.is_special_scheduler_executed = TRUE
                         )
                 ) / (
                     COUNT(DISTINCT ds.id_dag) FILTER (
-                        WHERE (
-                            ds.is_active_and_unpaused
-                            AND NOT ds.is_in_ignoring_list
-                            AND ds.is_intraday_dag IS FALSE
-                        ) OR ds.is_special_scheduler_executed
+                        WHERE ds.is_intraday_dag = FALSE
+                            AND (
+                                (
+                                    ds.is_active_and_unpaused = TRUE
+                                    AND ds.is_in_ignoring_list = FALSE
+                                )
+                                OR ds.is_special_scheduler_executed = TRUE
+                            )
                     )
                 )
             ),
