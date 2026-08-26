@@ -1,5 +1,5 @@
 WITH conversion_taxonomy AS (
-    SELECT 
+    SELECT
         hda.id AS id_draft,
         sp.id_external AS id_house,
         EXPLODE(
@@ -18,20 +18,20 @@ WITH conversion_taxonomy AS (
         h.id_region,
         r.id_main AS id_user_registrant,
         hda.ts_created AS ts_event
-    FROM 
+    FROM
         datalake_bob.house_draft AS hda
-    JOIN 
+    JOIN
         datalake_bob_clean.submission_progress AS sp
             ON hda.id = sp.id_house_draft
-    LEFT JOIN 
+    LEFT JOIN
         datalake_bob_clean.registrar AS r
             ON hda.registrar = r.id
-    LEFT JOIN 
+    LEFT JOIN
         datalake_ebdb_clean.house AS h
             ON sp.id_external = h.id
 ),
-extract_context_discard AS (
-    SELECT 
+extract_context_discard_ranked AS (
+    SELECT
         cd.id,
         cd.id_prospect,
         cd.id_user AS id_user_registrant,
@@ -43,37 +43,59 @@ extract_context_discard AS (
         cd.reason,
         sds.funnel_step,
         cd.ts_created,
-        cd.ts_updated
-    FROM 
+        cd.ts_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY cd.id_prospect, cd.business_context, sds.funnel_step
+            ORDER BY cd.ts_created DESC
+        ) AS rn
+    FROM
         datalake_wololo_clean.context_discard AS cd
     JOIN
         datalake_supply_flows.supply_discards_settings AS sds
             ON cd.reason = sds.discards_reason
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY cd.id_prospect, cd.business_context, sds.funnel_step ORDER BY cd.ts_created DESC) = 1
+),
+extract_context_discard AS (
+    SELECT
+        id,
+        id_prospect,
+        id_user_registrant,
+        business_context,
+        team,
+        company,
+        contact_type,
+        contact_channel,
+        reason,
+        funnel_step,
+        ts_created,
+        ts_updated
+    FROM
+        extract_context_discard_ranked
+    WHERE
+        rn = 1
 ),
 extract_wololo AS (
-  SELECT
+    SELECT
         p.id AS id_prospect,
         p.id_reference AS id_lead_ebdb,
         p.id_external AS id_lead_rene,
         'owner_conversion' AS origin,
         EXPLODE(
-          CASE 
-            WHEN (p.is_for_rent IS FALSE) AND (p.is_for_sale IS FALSE) THEN ARRAY('RENT', 'SALE')
-            WHEN (p.is_for_rent IS TRUE) AND (p.is_for_sale IS FALSE) THEN ARRAY('RENT', NULL)
-            WHEN (p.is_for_rent IS FALSE) AND (p.is_for_sale IS TRUE) THEN ARRAY(NULL, 'SALE')
-            ELSE ARRAY('RENT', 'SALE')
-          END
+            CASE
+                WHEN (p.is_for_rent IS FALSE) AND (p.is_for_sale IS FALSE) THEN ARRAY('RENT', 'SALE')
+                WHEN (p.is_for_rent IS TRUE) AND (p.is_for_sale IS FALSE) THEN ARRAY('RENT', NULL)
+                WHEN (p.is_for_rent IS FALSE) AND (p.is_for_sale IS TRUE) THEN ARRAY(NULL, 'SALE')
+                ELSE ARRAY('RENT', 'SALE')
+            END
         ) AS business_context,
         l.id_region
     FROM
         datalake_wololo_clean.prospect AS p
-    LEFT JOIN 
+    LEFT JOIN
         datalake_ebdb_clean.lead AS l
             ON p.id_reference = l.id
 ),
 discards_taxonomy AS (
-    SELECT 
+    SELECT
         p.id_lead_ebdb,
         p.business_context,
         p.id_region,
@@ -89,12 +111,12 @@ discards_taxonomy AS (
         td.ts_created AS ts_event
     FROM
         extract_wololo AS p
-    JOIN 
+    JOIN
         extract_context_discard AS td
             USING (id_prospect, business_context)
 ),
 original_flow AS (
-    SELECT 
+    SELECT
         NULL AS id_lead,
         id_house,
         business_context,
@@ -103,7 +125,7 @@ original_flow AS (
         type AS application,
         funnel_step,
         id_region,
-        CASE 
+        CASE
             WHEN ops_team = 'CAPTA_AI' THEN 'acquisition'
             WHEN ops_team IS NOT NULL THEN 'conversion'
             ELSE NULL
@@ -114,13 +136,13 @@ original_flow AS (
         ops_contact_channel AS ops_contact_medium,
         ts_event,
         NOW() AS ts_load
-    FROM 
+    FROM
         conversion_taxonomy
-    WHERE 
+    WHERE
         business_context IS NOT NULL
         AND id_house IS NOT NULL
-    UNION ALL 
-    SELECT 
+    UNION ALL
+    SELECT
         id_lead_ebdb AS id_lead,
         NULL AS id_house,
         business_context,
@@ -129,7 +151,7 @@ original_flow AS (
         application,
         funnel_step,
         id_region,
-        CASE 
+        CASE
             WHEN ops_agent = 'CAPTA_AI' THEN 'acquisition'
             WHEN ops_agent IS NOT NULL THEN 'conversion'
             ELSE NULL
@@ -140,13 +162,13 @@ original_flow AS (
         ops_contact_medium,
         ts_event,
         NOW() AS ts_load
-    FROM 
+    FROM
         discards_taxonomy
-    WHERE 
+    WHERE
         id_lead_ebdb IS NOT NULL
 ),
 all_tables AS (
-    SELECT 
+    SELECT
         id_lead,
         id_house,
         business_context,
@@ -162,54 +184,79 @@ all_tables AS (
         ops_contact_medium,
         ts_event,
         ts_load
-    FROM 
+    FROM
         original_flow
     UNION ALL
-    SELECT 
-      id_lead,
-      id_house,
-      business_context,
-      id_user_registrant,
-      source,
-      application,
-      funnel_step,
-      id_region,
-      ops_objective,
-      ops_agent,
-      ops_partner,
-      ops_approach,
-      ops_contact_medium,
-      ts_event,
-      ts_load
-    FROM 
+    SELECT
+        id_lead,
+        id_house,
+        business_context,
+        id_user_registrant,
+        source,
+        application,
+        funnel_step,
+        id_region,
+        ops_objective,
+        ops_agent,
+        ops_partner,
+        ops_approach,
+        ops_contact_medium,
+        ts_event,
+        ts_load
+    FROM
         datalake_supply_flows.fallback_taxonomy
+),
+ranked AS (
+    SELECT
+        COALESCE(b.id_lead, cl.id_lead) AS id_lead,
+        b.id_house,
+        id_user_registrant,
+        id_region,
+        b.business_context,
+        b.source,
+        SF_NORMALIZE_STRING(b.application) AS application,
+        funnel_step,
+        SF_NORMALIZE_STRING(COALESCE(b.ops_objective, oa.ops_objective)) AS ops_objective,
+        SF_NORMALIZE_STRING(COALESCE(b.ops_agent, oa.ops_agent)) AS ops_agent,
+        SF_NORMALIZE_STRING(COALESCE(b.ops_partner, oa.ops_partner)) AS ops_partner,
+        SF_NORMALIZE_STRING(b.ops_approach) AS ops_approach,
+        SF_NORMALIZE_STRING(b.ops_contact_medium) AS ops_contact_medium,
+        IF(b.id_user_registrant IS NOT NULL AND oa.id_user IS NOT NULL, TRUE, FALSE) AS has_ops_agents_table,
+        ts_event,
+        ts_load,
+        ROW_NUMBER() OVER (
+            PARTITION BY b.id_house, COALESCE(b.id_lead, cl.id_lead), b.business_context
+            ORDER BY b.source ASC
+        ) AS rn
+    FROM
+        all_tables AS b
+    LEFT JOIN
+        datalake_supply_flows.conversion_lookup AS cl
+            ON b.id_house = cl.id_house
+                AND b.business_context = cl.business_context
+                AND cl.supply_source = '1P'
+    LEFT JOIN
+        datalake_supply_flows.operations_agents AS oa
+            ON b.id_user_registrant = oa.id_user
 )
-
-SELECT 
-    COALESCE(b.id_lead, cl.id_lead) AS id_lead,
-    b.id_house,
+SELECT
+    id_lead,
+    id_house,
     id_user_registrant,
     id_region,
-    b.business_context,
-    b.source,
-    SF_NORMALIZE_STRING(b.application) AS application,
+    business_context,
+    source,
+    application,
     funnel_step,
-    SF_NORMALIZE_STRING(COALESCE(b.ops_objective, oa.ops_objective)) AS ops_objective,
-    SF_NORMALIZE_STRING(COALESCE(b.ops_agent, oa.ops_agent)) AS ops_agent,
-    SF_NORMALIZE_STRING(COALESCE(b.ops_partner, oa.ops_partner)) AS ops_partner,
-    SF_NORMALIZE_STRING(b.ops_approach) AS ops_approach,
-    SF_NORMALIZE_STRING(b.ops_contact_medium) AS ops_contact_medium,
-    IF(b.id_user_registrant IS NOT NULL AND oa.id_user IS NOT NULL, TRUE, FALSE) AS has_ops_agents_table,
+    ops_objective,
+    ops_agent,
+    ops_partner,
+    ops_approach,
+    ops_contact_medium,
+    has_ops_agents_table,
     ts_event,
     ts_load
-FROM 
-    all_tables AS b
-LEFT JOIN 
-    datalake_supply_flows.conversion_lookup AS cl
-        ON (b.id_house = cl.id_house)
-        AND (b.business_context = cl.business_context)
-        AND (cl.supply_source = '1P')
-LEFT JOIN 
-    datalake_supply_flows.operations_agents AS oa
-        ON (b.id_user_registrant = oa.id_user)
-QUALIFY ROW_NUMBER() OVER (PARTITION BY b.id_house, COALESCE(b.id_lead, cl.id_lead), b.business_context ORDER BY b.source ASC) = 1
+FROM
+    ranked
+WHERE
+    rn = 1
