@@ -24,7 +24,7 @@ support_sessions AS (
     s.id AS id_session,
     s.source_environment,
     s.department,
-    REGEXP_EXTRACT(COALESCE(s.user_phone, s.user_data:["user_phone"]), '[0-9]+', 0) AS phone_number,
+    REGEXP_EXTRACT(COALESCE(s.user_phone, GET_JSON_OBJECT(s.user_data, '$.user_phone')), '[0-9]+', 0) AS phone_number,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') AS ctwa_clid,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id') AS id_source_ctwa,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url') AS url_source_ctwa,
@@ -35,19 +35,19 @@ support_sessions AS (
     datalake_sauron_clean.session AS s
   WHERE 1=1
     AND ( -- hardcoded fix regarding support session migration
-          (s.ts_created < DATE('2025-10-11') AND s.source IN ('call_in_app', 'call')) 
+          (s.ts_created < DATE('2025-10-11') AND s.source IN ('call_in_app', 'call'))
           OR s.source NOT IN ('call_in_app', 'call')
     )
     AND s.ts_created >= DATE("{load_start_date}") - INTERVAL 365 DAYS
-    AND COALESCE(s.user_phone, s.user_data:["user_phone"]) IS NOT NULL
+    AND COALESCE(s.user_phone, GET_JSON_OBJECT(s.user_data, '$.user_phone')) IS NOT NULL
 
-  UNION ALL 
-  
+  UNION ALL
+
   SELECT
     s.id AS id_session,
     s.source_env AS source_environment,
     s.department,
-    REGEXP_EXTRACT(COALESCE(s.user_phone, s.user_data:["user_phone"]), '[0-9]+', 0) AS phone_number,
+    REGEXP_EXTRACT(COALESCE(s.user_phone, GET_JSON_OBJECT(s.user_data, '$.user_phone')), '[0-9]+', 0) AS phone_number,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') AS ctwa_clid,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id') AS id_source_ctwa,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url') AS url_source_ctwa,
@@ -57,14 +57,14 @@ support_sessions AS (
   FROM
     datalake_support_session_service_clean.support_session AS s
   LEFT ANTI JOIN datalake_sauron_clean.session AS sauron
-    ON s.id = sauron.id 
+    ON s.id = sauron.id
     AND s.source = 'internal_chat'
     AND sauron.ts_created >= DATE("{load_start_date}") - INTERVAL 365 DAYS
   WHERE 1=1
     AND s.ts_created >= DATE('2025-10-11') -- hardcoded fix regarding support session migration
     AND s.source IN ('call_in_app', 'call', 'internal_chat')
     AND s.ts_created >= DATE("{load_start_date}") - INTERVAL 365 DAYS
-    AND COALESCE(s.user_phone, s.user_data:["user_phone"]) IS NOT NULL
+    AND COALESCE(s.user_phone, GET_JSON_OBJECT(s.user_data, '$.user_phone')) IS NOT NULL
 ),
 support_tasks AS (
   SELECT
@@ -80,7 +80,7 @@ support_tasks AS (
   SELECT
     ca.id_task,
     ca.id_session,
-    CASE 
+    CASE
       WHEN ca.direction = 'inbound' THEN 2
       WHEN ca.direction = 'outbound' THEN 3
     END task_priority,
@@ -93,99 +93,160 @@ support_tasks AS (
   FROM
     datalake_customer_support.calls AS ca
 ),
+attribution_by_task AS (
+  SELECT
+    id_lead_ebdb,
+    id_session,
+    id_task,
+    source_environment,
+    department,
+    phone_number,
+    quinto_andar_phone_number,
+    ctwa_clid,
+    id_source_ctwa,
+    url_source_ctwa,
+    type_source_ctwa,
+    ts_created
+  FROM (
+    SELECT
+      inbound_leads.id_lead_ebdb,
+      support_sessions.id_session,
+      inbound_leads.id_task,
+      support_sessions.source_environment,
+      support_tasks.department,
+      COALESCE(inbound_leads.phone_number, support_sessions.phone_number) AS phone_number,
+      support_tasks.quinto_andar_phone_number,
+      COALESCE(inbound_leads.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,
+      support_sessions.id_source_ctwa,
+      support_sessions.url_source_ctwa,
+      support_sessions.type_source_ctwa,
+      support_sessions.ts_created,
+      ROW_NUMBER() OVER (
+        PARTITION BY inbound_leads.id_lead_ebdb
+        ORDER BY support_tasks.ts_task_created DESC
+      ) AS rn
+    FROM
+      inbound_leads
+    INNER JOIN
+      support_tasks
+        ON support_tasks.id_task = inbound_leads.id_task
+    INNER JOIN
+      support_sessions
+        ON support_tasks.id_session = support_sessions.id_session
+  )
+  WHERE
+    rn = 1
+),
+attribution_by_session AS (
+  SELECT
+    id_lead_ebdb,
+    id_session,
+    id_task,
+    source_environment,
+    department,
+    phone_number,
+    quinto_andar_phone_number,
+    ctwa_clid,
+    id_source_ctwa,
+    url_source_ctwa,
+    type_source_ctwa,
+    ts_created
+  FROM (
+    SELECT
+      il.id_lead_ebdb,
+      cs.id_sauron_session AS id_session,
+      '-1' AS id_task,
+      support_sessions.source_environment,
+      support_sessions.department,
+      COALESCE(il.phone_number, support_sessions.phone_number) AS phone_number,
+      REGEXP_EXTRACT(wpp_channel.twilio_phone_number, '[0-9]+', 0) AS quinto_andar_phone_number,
+      COALESCE(il.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,
+      support_sessions.id_source_ctwa,
+      support_sessions.url_source_ctwa,
+      support_sessions.type_source_ctwa,
+      support_sessions.ts_created,
+      ROW_NUMBER() OVER (
+        PARTITION BY il.id_lead_ebdb
+        ORDER BY wpp_channel.ts_created DESC
+      ) AS rn
+    FROM
+      inbound_leads AS il
+    INNER JOIN
+      datalake_copilot_service_clean.session AS cs
+        ON il.id_ai_core_session = cs.id_external
+          AND cs.ts_created >= DATE("{load_start_date}") - INTERVAL 7 DAYS
+    INNER JOIN
+      support_sessions
+        ON cs.id_sauron_session = support_sessions.id_session
+    LEFT JOIN
+      datalake_quinto_messenger_clean.channel AS wpp_channel
+        ON wpp_channel.id_session = cs.id_sauron_session
+          AND wpp_channel.ts_created >= DATE("{load_start_date}") - INTERVAL 7 DAYS
+  )
+  WHERE
+    rn = 1
+),
 attribution AS (
-  SELECT -- best-case scenario where the task id comes from the source system
-    inbound_leads.id_lead_ebdb,
-    support_sessions.id_session,
-    inbound_leads.id_task,
-    support_sessions.source_environment,
-    support_tasks.department,
-    COALESCE(inbound_leads.phone_number, support_sessions.phone_number) AS phone_number,
-    support_tasks.quinto_andar_phone_number,
-    COALESCE(inbound_leads.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,
-    support_sessions.id_source_ctwa,
-    support_sessions.url_source_ctwa,
-    support_sessions.type_source_ctwa,
-    support_sessions.ts_created
-  FROM 
-    inbound_leads
-  INNER JOIN
-    support_tasks
-      ON support_tasks.id_task = inbound_leads.id_task
-  INNER JOIN 
-    support_sessions
-      ON support_tasks.id_session = support_sessions.id_session
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY inbound_leads.id_lead_ebdb ORDER BY support_tasks.ts_task_created DESC) = 1
-
+  SELECT * FROM attribution_by_task
   UNION
-
-  SELECT -- best-case scenario where the session id comes from the source system
-    il.id_lead_ebdb,
-    cs.id_sauron_session AS id_session,
-    '-1' AS id_task,
-    support_sessions.source_environment,
-    support_sessions.department,
-    COALESCE(il.phone_number, support_sessions.phone_number) AS phone_number,
-    REGEXP_EXTRACT(wpp_channel.twilio_phone_number, '[0-9]+', 0) AS quinto_andar_phone_number,
-    COALESCE(il.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,
-    support_sessions.id_source_ctwa,
-    support_sessions.url_source_ctwa,
-    support_sessions.type_source_ctwa,
-    support_sessions.ts_created
-  FROM
-    inbound_leads AS il
-  INNER JOIN 
-    datalake_copilot_service_clean.session AS cs
-      ON il.id_ai_core_session = cs.id_external
-        AND cs.ts_created >= DATE("{load_start_date}") - INTERVAL 7 DAYS
-  INNER JOIN 
-    support_sessions
-      ON cs.id_sauron_session = support_sessions.id_session
-  LEFT JOIN
-    datalake_quinto_messenger_clean.channel AS wpp_channel
-      ON wpp_channel.id_session = cs.id_sauron_session
-        AND wpp_channel.ts_created >= DATE("{load_start_date}") - INTERVAL 7 DAYS
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY il.id_lead_ebdb ORDER BY wpp_channel.ts_created DESC) = 1
+  SELECT * FROM attribution_by_session
 ),
 indirect_attribution AS ( -- when we don't have the identifier coming from source system or we want to fix it
   SELECT
-    il.id_lead_ebdb,
-    ss.id_session,
-    st.id_task,
-    ss.source_environment,
-    st.department,
-    il.phone_number,
-    st.quinto_andar_phone_number,
-    ss.ctwa_clid,
-    ss.id_source_ctwa,
-    ss.url_source_ctwa,
-    ss.type_source_ctwa,
-    ss.ts_created
-  FROM 
-    inbound_leads AS il
-  INNER JOIN 
-    support_sessions AS ss
-      ON il.phone_number = ss.phone_number
-        AND il.ts_created >= ss.ts_created - interval '30' minutes
-        AND il.ts_created <= ss.ts_updated + interval '30' minutes
-  INNER JOIN
-    support_tasks AS st
-      ON st.id_session = ss.id_session
-        AND il.ts_created > st.ts_task_created
-        AND il.ts_created <= st.ts_task_created + interval '150' minutes
-  LEFT JOIN
-    support_tasks AS ops_deviation_fix
-      ON ops_deviation_fix.id_task = il.id_task
+    id_lead_ebdb,
+    id_session,
+    id_task,
+    source_environment,
+    department,
+    phone_number,
+    quinto_andar_phone_number,
+    ctwa_clid,
+    id_source_ctwa,
+    url_source_ctwa,
+    type_source_ctwa,
+    ts_created
+  FROM (
+    SELECT
+      il.id_lead_ebdb,
+      ss.id_session,
+      st.id_task,
+      ss.source_environment,
+      st.department,
+      il.phone_number,
+      st.quinto_andar_phone_number,
+      ss.ctwa_clid,
+      ss.id_source_ctwa,
+      ss.url_source_ctwa,
+      ss.type_source_ctwa,
+      ss.ts_created,
+      ROW_NUMBER() OVER (
+        PARTITION BY il.id_lead_ebdb
+        ORDER BY st.task_priority ASC, st.ts_task_created DESC
+      ) AS rn
+    FROM
+      inbound_leads AS il
+    INNER JOIN
+      support_sessions AS ss
+        ON il.phone_number = ss.phone_number
+          AND il.ts_created >= ss.ts_created - INTERVAL '30' MINUTES
+          AND il.ts_created <= ss.ts_updated + INTERVAL '30' MINUTES
+    INNER JOIN
+      support_tasks AS st
+        ON st.id_session = ss.id_session
+          AND il.ts_created > st.ts_task_created
+          AND il.ts_created <= st.ts_task_created + INTERVAL '150' MINUTES
+    LEFT JOIN
+      support_tasks AS ops_deviation_fix
+        ON ops_deviation_fix.id_task = il.id_task
+    WHERE
+      il.origin = 'OwnerConversionPWA'
+      AND COALESCE(ops_deviation_fix.task_priority, 0) <> 1 -- ignores chat tasks and fix possible calls tasks input deviations or the absence of an input
+  )
   WHERE
-    il.origin = 'OwnerConversionPWA'
-    AND COALESCE(ops_deviation_fix.task_priority, 0) <> 1 -- ignores chat tasks and fix possible calls tasks input deviations or the absence of an input
-  QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY il.id_lead_ebdb ORDER BY st.task_priority ASC, st.ts_task_created DESC) = 1
+    rn = 1
 ),
 final_attribution AS (
-  SELECT 
+  SELECT
     id_lead_ebdb,
     id_session,
     id_task,
@@ -203,7 +264,7 @@ final_attribution AS (
 
   UNION
 
-  SELECT 
+  SELECT
     att.id_lead_ebdb,
     att.id_session,
     att.id_task,
@@ -216,33 +277,54 @@ final_attribution AS (
     att.url_source_ctwa,
     att.type_source_ctwa,
     att.ts_created
-  FROM 
+  FROM
     attribution AS att
   LEFT JOIN
     indirect_attribution
       ON indirect_attribution.id_lead_ebdb = att.id_lead_ebdb
   WHERE
     indirect_attribution.id_lead_ebdb IS NULL
+),
+ranked_final AS (
+  SELECT
+    final_attribution.id_lead_ebdb,
+    final_attribution.id_session,
+    final_attribution.id_task,
+    COALESCE(final_attribution.id_source_ctwa, support_sessions.id_source_ctwa) AS id_source_ctwa,
+    final_attribution.source_environment,
+    final_attribution.department,
+    final_attribution.phone_number,
+    final_attribution.quinto_andar_phone_number,
+    COALESCE(final_attribution.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,
+    COALESCE(final_attribution.url_source_ctwa, support_sessions.url_source_ctwa) AS url_source_ctwa,
+    COALESCE(final_attribution.type_source_ctwa, support_sessions.type_source_ctwa) AS type_source_ctwa,
+    final_attribution.ts_created,
+    ROW_NUMBER() OVER (
+      PARTITION BY final_attribution.id_lead_ebdb
+      ORDER BY support_sessions.ts_created DESC
+    ) AS rn
+  FROM
+    final_attribution
+  LEFT JOIN
+    support_sessions
+      ON support_sessions.phone_number = final_attribution.phone_number
+        AND support_sessions.ts_created <= final_attribution.ts_created
+        AND support_sessions.ctwa_clid IS NOT NULL
 )
-SELECT 
-  final_attribution.id_lead_ebdb,
-  final_attribution.id_session,
-  final_attribution.id_task,
-  COALESCE(final_attribution.id_source_ctwa, support_sessions.id_source_ctwa) AS id_source_ctwa,
-  final_attribution.source_environment,
-  final_attribution.department,
-  final_attribution.phone_number,
-  final_attribution.quinto_andar_phone_number,
-  COALESCE(final_attribution.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,
-  COALESCE(final_attribution.url_source_ctwa, support_sessions.url_source_ctwa) AS url_source_ctwa,
-  COALESCE(final_attribution.type_source_ctwa, support_sessions.type_source_ctwa) AS type_source_ctwa,
-  final_attribution.ts_created
-FROM 
-  final_attribution
-LEFT JOIN 
-  support_sessions
-    ON support_sessions.phone_number = final_attribution.phone_number
-      AND support_sessions.ts_created <= final_attribution.ts_created
-      AND support_sessions.ctwa_clid IS NOT NULL
-QUALIFY 
-  ROW_NUMBER() OVER (PARTITION BY final_attribution.id_lead_ebdb ORDER BY support_sessions.ts_created DESC) = 1
+SELECT
+  id_lead_ebdb,
+  id_session,
+  id_task,
+  id_source_ctwa,
+  source_environment,
+  department,
+  phone_number,
+  quinto_andar_phone_number,
+  ctwa_clid,
+  url_source_ctwa,
+  type_source_ctwa,
+  ts_created
+FROM
+  ranked_final
+WHERE
+  rn = 1

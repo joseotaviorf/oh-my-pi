@@ -42,43 +42,74 @@ affiliate_type_fix AS (
 ),
 lead_origin_amplitude AS (
   SELECT
-    id_lead AS id_lead_ebdb,
-    NULLIF(utm_campaign, '') AS campaign,
-    NULLIF(utm_medium, '') AS medium,
-    NULLIF(utm_source, '') AS source,
-    NULLIF(utm_content, '') AS content,
-    NULLIF(utm_term, '') AS term,
-    NULLIF(city, '') AS city,
-    NULLIF(platform, '') AS platform,
+    id_lead_ebdb,
+    campaign,
+    medium,
+    source,
+    content,
+    term,
+    city,
+    platform,
     ts_event
-  FROM
-    datalake_amplitude_lead.lead_origin AS lo
+  FROM (
+    SELECT
+      id_lead AS id_lead_ebdb,
+      NULLIF(utm_campaign, '') AS campaign,
+      NULLIF(utm_medium, '') AS medium,
+      NULLIF(utm_source, '') AS source,
+      NULLIF(utm_content, '') AS content,
+      NULLIF(utm_term, '') AS term,
+      NULLIF(city, '') AS city,
+      NULLIF(platform, '') AS platform,
+      ts_event,
+      ROW_NUMBER() OVER (PARTITION BY id_lead ORDER BY ts_event) AS rn
+    FROM
+      datalake_amplitude_lead.lead_origin AS lo
+    WHERE
+      DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  )
   WHERE
-    DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_lead ORDER BY ts_event) = 1
+    rn = 1
 ),
 inbound_leads AS (
   SELECT
-    ia.id_lead_ebdb,
-    ia.id_session,
-    ia.id_task,
-    ia.id_source_ctwa,
-    ia.quinto_andar_phone_number,
-    ia.ctwa_clid,
-    ia.url_source_ctwa,
-    ia.type_source_ctwa,
-    fm.utm_campaign,
-    fm.utm_term,
-    fm.utm_content,
-    fm.origin AS utm_source,
-    'whatsapp' AS utm_medium
-  FROM
-    datalake_supply_flows.inbound_attribution AS ia
-  LEFT JOIN
-    datalake_growth_media_platform.facebook_metrics AS fm
-      ON ia.id_source_ctwa = fm.id_ad
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY ia.id_lead_ebdb ORDER BY fm.dt_cost DESC) = 1
+    id_lead_ebdb,
+    id_session,
+    id_task,
+    id_source_ctwa,
+    quinto_andar_phone_number,
+    ctwa_clid,
+    url_source_ctwa,
+    type_source_ctwa,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    utm_source,
+    utm_medium
+  FROM (
+    SELECT
+      ia.id_lead_ebdb,
+      ia.id_session,
+      ia.id_task,
+      ia.id_source_ctwa,
+      ia.quinto_andar_phone_number,
+      ia.ctwa_clid,
+      ia.url_source_ctwa,
+      ia.type_source_ctwa,
+      fm.utm_campaign,
+      fm.utm_term,
+      fm.utm_content,
+      fm.origin AS utm_source,
+      'whatsapp' AS utm_medium,
+      ROW_NUMBER() OVER (PARTITION BY ia.id_lead_ebdb ORDER BY fm.dt_cost DESC) AS rn
+    FROM
+      datalake_supply_flows.inbound_attribution AS ia
+    LEFT JOIN
+      datalake_growth_media_platform.facebook_metrics AS fm
+        ON ia.id_source_ctwa = fm.id_ad
+  )
+  WHERE
+    rn = 1
 ),
 mid_table AS (
   SELECT
