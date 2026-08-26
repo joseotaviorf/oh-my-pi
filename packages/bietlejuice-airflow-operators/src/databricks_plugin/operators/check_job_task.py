@@ -20,7 +20,10 @@ from requests.exceptions import HTTPError
 
 from databricks_plugin.hooks.databricks_hook import JOBS_API_VERSION
 from databricks_plugin.operators.base_operator import QuintoAndarDatabricksBaseOperator
-from databricks_plugin.states.errors import DatabricksTerminalStateError
+from databricks_plugin.states.errors import (
+    DatabricksNotFoundError,
+    DatabricksTerminalStateError,
+)
 
 
 class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperator):
@@ -189,14 +192,42 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
         try:
             job_run_task_state.raise_for_state()
         except DatabricksTerminalStateError:
-            self.databricks_hook.cancel_job_run(self.run_id, version=JOBS_API_VERSION)
+            job_run_state = self.databricks_hook.get_job_run_state(
+                self.run_id, version=JOBS_API_VERSION
+            )
+            if job_run_state.life_cycle_state in (
+                "RUNNING",
+                "PENDING",
+                "WAITING_FOR_RETRY",
+                "BLOCKED",
+            ):
+                self.databricks_hook.cancel_job_run(
+                    self.run_id, version=JOBS_API_VERSION
+                )
             self.task_run_id = self.databricks_hook.get_job_run_task_run_id(
                 self.run_id, self.task_id, version=JOBS_API_VERSION
             )
             self._monitor_latest_repair_execution(
                 self.run_id, self.task_run_id, start_date, execution_timeout
             )
-            self._request_repair(self.run_id, context)
+            failed_task_run_id = self.task_run_id
+            while self._check_task_timeout(start_date, execution_timeout):
+                if self._request_repair(self.run_id, context):
+                    break
+                self._wait_polling_period(self.polling_period_seconds)
+            while self._check_task_timeout(start_date, execution_timeout):
+                self.task_run_id = self.databricks_hook.get_job_run_task_run_id(
+                    self.run_id, self.task_id, version=JOBS_API_VERSION
+                )
+                latest_state = self.databricks_hook.get_job_run_task_state(
+                    self.run_id, self.task_id, version=JOBS_API_VERSION
+                )
+                if (
+                    self.task_run_id != failed_task_run_id
+                    or not latest_state.is_terminal
+                ):
+                    break
+                self._wait_polling_period(self.polling_period_seconds)
 
         self.task_run_id = self.databricks_hook.get_job_run_task_run_id(
             self.run_id, self.task_id, version=JOBS_API_VERSION
@@ -238,14 +269,21 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
         while self._check_task_timeout(start_date, execution_timeout):
             self._log_timeout_remaining(start_date, execution_timeout)
 
-            job_run_task_state = self.databricks_hook.get_job_run_task_state(
-                run_id, self.task_id, version=JOBS_API_VERSION
-            )
-            if job_run_task_state.is_terminal:
-                break
+            try:
+                repair_state = self.databricks_hook.get_task_repair_state(
+                    run_id, task_run_id, version=JOBS_API_VERSION
+                )
+                if repair_state.is_terminal:
+                    break
+            except DatabricksNotFoundError:
+                job_run_state = self.databricks_hook.get_job_run_state(
+                    run_id, version=JOBS_API_VERSION
+                )
+                if job_run_state.is_terminal:
+                    break
             self._wait_polling_period(5)
 
-    def _request_repair(self, run_id, context):
+    def _request_repair(self, run_id, context) -> bool:
         """
         Requests repair of a specific job run by retrieving the latest_repair_id,
         issuing the repair call, and pushing the new repair ID into XCom.
@@ -255,13 +293,14 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
             latest_repair_id = self.databricks_hook.repair_job_run(
                 run_id,
                 latest_repair_id=latest_repair_id,
-                rerun_tasks=[self.task_id],
+                rerun_all_failed_tasks=True,
                 version=JOBS_API_VERSION,
             )
             self.xcom_push(
                 context, key=self.XCOM_LATEST_REPAIR_ID_KEY, value=latest_repair_id
             )
             self._wait_polling_period(self.polling_period_seconds)
+            return True
         except HTTPError as ex:
             # RESOURCE_CONFLICT: the run is already being repaired — safe to ignore,
             # the next retry will pick up the in-progress repair.
@@ -271,7 +310,7 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
                     "been repaired; will check for latest task "
                     f"attempt on retry. HTTPError={ex.response.text}"
                 )
-                return
+                return True
             # Repair is not allowed on an active run: the run/task is still transitioning
             # out of its terminal state (e.g. cancellation not yet propagated) or is already
             # being repaired by another operator invocation.
@@ -283,7 +322,7 @@ class QuintoAndarDatabricksCheckJobTaskOperator(QuintoAndarDatabricksBaseOperato
                     "running; will check for latest task "
                     f"attempt on retry. HTTPError={ex.response.text}"
                 )
-                return
+                return False
             raise
 
     def _get_execute_job_cluster_task_id(self, task=None) -> str:
