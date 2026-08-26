@@ -6,12 +6,21 @@ domain: QCX
 description: >
   Funil Cohort scorecard at deal grain. One row per datalake_consorcio.deal.
   First-hit funnel timestamps with skip-step COALESCE (contact attempt is a
-  branch), current-position is_* flags, Conrado-to-human handoff, and
-  discarded_from_stage. Built only from datalake_consorcio.deal_stage visits
-  plus deal current_stage and inside_sales_pipeline. Join deal for origin,
-  owner, and Conrado attributes. Closed-then-discarded keeps ts_closed_deal
-  and turns is_closed_deal off. No business-day cycle times (those join
-  dw_public.dim_date and belong in metric). Partitioned by deal creation date.
+  branch), current-position is_* flags, Conrado-to-human handoff,
+  discarded_from_stage, and materialized business-day cycle times against
+  dw_public.dim_date. Built only from datalake_consorcio.deal_stage visits
+  plus deal current_stage, inside_sales_pipeline, ts_deal_created, and
+  ts_current_stage_started. Join deal for origin, owner, and Conrado
+  attributes. Closed-then-discarded keeps ts_closed_deal and turns
+  is_closed_deal off. The Agendamento de pagamento stage was retired and is no
+  longer read (it never produced a deal_stage visit). Cycle times are business
+  days on the Brazilian calendar, counted inclusively minus 1 and floored at 0;
+  every business_days_* column is immutable once its milestone is reached,
+  while aging_opened_leads and days_in_current_stage are relative to the run
+  date and only valid as of the last rebuild. A cycle-time column is null,
+  never 0, when a milestone timestamp is missing or its date falls outside the
+  calendar window; 0 always means a genuine same-day transition.
+  Partitioned by deal creation date.
 columns:
   id_deal:
     lineage:
@@ -98,6 +107,12 @@ columns:
       - datalake_consorcio.deal_stage.stage_name
       - datalake_consorcio.deal.current_stage
     description: 1 when the deal has a Descarte visit and current_stage is descarte.
+  ts_deal_created:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+    description: >
+      Deal creation timestamp from the deal master. Anchor for every
+      business_days_from_created_to_* column and for aging_opened_leads.
   dt_created:
     lineage:
       - datalake_consorcio.deal.dt_created
@@ -106,7 +121,10 @@ columns:
     lineage:
       - datalake_consorcio.deal_stage.ts_entered
       - datalake_consorcio.deal_stage.stage_name
-    description: First Leads visit, backfilled from a later funnel timestamp when the Lead visit is missing.
+    description: >
+      First Leads visit, backfilled from a later funnel timestamp when the Lead
+      visit is missing. Funnel-entry timestamp only — cycle times measure from
+      ts_deal_created, not from here.
   ts_contact_attempt:
     lineage:
       - datalake_consorcio.deal_stage.ts_entered
@@ -137,11 +155,6 @@ columns:
       - datalake_consorcio.deal_stage.ts_entered
       - datalake_consorcio.deal_stage.stage_name
     description: First Offer accepted timestamp, backfilled from a later stage when skipped.
-  ts_payment_scheduled:
-    lineage:
-      - datalake_consorcio.deal_stage.ts_entered
-      - datalake_consorcio.deal_stage.stage_name
-    description: First Agendamento de pagamento timestamp; not used as a conversion flag in the cohort model.
   ts_contract_created:
     lineage:
       - datalake_consorcio.deal_stage.ts_entered
@@ -166,6 +179,206 @@ columns:
       Conrado-to-human handoff time. SDR IA uses simulation sent (or later);
       SIMULATOR IA uses simulation accepted (or later); SDR Humano uses Lead
       or Successful Contact.
+  business_days_from_created_to_lead:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Lead, or the subsequent next stage reached down the funnel, if lead stage is skipped.
+      Inclusive day count minus 1 and floored at
+      0, so a same-day transition is 0. Null unless
+      is_lead is 1, which shouldn't happen. Anchored on ts_deal_created, not ts_lead —
+      'lead' here is the concept (the deal exists), not the Leads stage visit;
+      the two agree on the same calendar day for ~99.9% of deals.
+  business_days_from_created_to_contact_attempt:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Contact Attempt. Inclusive day count minus 1 and floored at
+      0, so a same-day transition is 0. Null unless
+      is_contact_attempted is 1. Anchored on ts_deal_created, not ts_lead —
+      'lead' here is the concept (the deal exists), not the Leads stage visit;
+      the two agree on the same calendar day for ~99.9% of deals.
+  business_days_from_created_to_success_contact:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Successful Contact or the subsequent next stage reached down the funnel, if success contact is skipped.
+      Inclusive day count minus 1 and floored at
+      0, so a same-day transition is 0. Null unless
+      is_success_contact is 1. Anchored on ts_deal_created, not ts_lead —
+      'lead' here is the concept (the deal exists), not the Leads stage visit;
+      the two agree on the same calendar day for ~99.9% of deals.
+  business_days_from_created_to_simulation_sent:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Simulation sent or the subsequent next stage reached down the funnel, if Simulation Sent is skipped.
+      Inclusive day count minus 1 and floored at 0,
+      so a same-day transition is 0. Null unless is_simulation_sent
+      is 1. Anchored on ts_deal_created, not ts_lead — 'lead' here is the
+      concept (the deal exists), not the Leads stage visit; the two agree on the
+      same calendar day for ~99.9% of deals.
+  business_days_from_created_to_simulation_accepted:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Simulation accepted or the subsequent next stage reached down the funnel, if Simulation accepted is skipped.
+      Inclusive day count minus 1 and floored at
+      0, so a same-day transition is 0. Null unless
+      is_simulation_accepted is 1. Anchored on ts_deal_created, not
+      ts_lead — 'lead' here is the concept (the deal exists), not the Leads
+      stage visit; the two agree on the same calendar day for ~99.9% of deals.
+  business_days_from_created_to_offer_under_negotiation:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Offer under negotiation or the subsequent next stage reached down the funnel, if Offer under negotiation is skipped.
+      Inclusive day count minus 1 and floored
+      at 0, so a same-day transition is 0. Null unless
+      is_offer_under_negotiation is 1. Anchored on ts_deal_created, not
+      ts_lead — 'lead' here is the concept (the deal exists), not the Leads
+      stage visit; the two agree on the same calendar day for ~99.9% of deals.
+  business_days_from_created_to_offer_accepted:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Offer accepted or the subsequent next stage reached down the funnel, if Offer Accepted is skipped.
+      Inclusive day count minus 1 and floored at 0, so
+      a same-day transition is 0. Null unless is_offer_accepted is
+      1. Anchored on ts_deal_created, not ts_lead — 'lead' here is the
+      concept (the deal exists), not the Leads stage visit; the two agree on the
+      same calendar day for ~99.9% of deals.
+  business_days_from_created_to_contract_created:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Contract issued or the subsequent next stage reached down the funnel, if Contract created is skipped.
+      Inclusive day count minus 1 and floored at 0,
+      so a same-day transition is 0. Null unless is_contract_created
+      is 1. Anchored on ts_deal_created, not ts_lead — 'lead' here is the
+      concept (the deal exists), not the Leads stage visit; the two agree on the
+      same calendar day for ~99.9% of deals.
+  business_days_from_created_to_closed_deal:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Venda fechada. Inclusive day count minus 1 and floored at 0, so
+      a same-day transition is 0. Null unless is_closed_deal is 1.
+      Anchored on ts_deal_created, not ts_lead — 'lead' here is the
+      concept (the deal exists), not the Leads stage visit; the two agree on the
+      same calendar day for ~99.9% of deals.
+  business_days_from_created_to_handoff:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal.inside_sales_pipeline
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the Conrado-to-human handoff. Inclusive day count minus 1 and floored at
+      0, so a same-day transition is 0. Null unless is_handoff is 1.
+      Anchored on ts_deal_created, not ts_lead — 'lead' here is the
+      concept (the deal exists), not the Leads stage visit; the two agree on the
+      same calendar day for ~99.9% of deals.
+  business_days_from_created_to_discarded:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the first Descarte. Inclusive day count minus 1 and floored at 0, so a
+      same-day transition is 0. Null unless is_discarded is 1.
+      Anchored on ts_deal_created, not ts_lead — 'lead' here is the concept (the
+      deal exists), not the Leads stage visit; the two agree on the same
+      calendar day for ~99.9% of deals.
+  aging_opened_leads:
+    lineage:
+      - datalake_consorcio.deal.ts_deal_created
+      - datalake_consorcio.deal.current_stage
+      - datalake_consorcio.deal_stage.ts_entered
+      - datalake_consorcio.deal_stage.stage_name
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from deal creation (ts_deal_created) to
+      the day before the run date. Inclusive day count minus 1, floored at 0.
+      Null unless is_lead is 1 and current_stage is not venda fechada, descarte,
+      or carrinho abandonado. Relative to the run date — only valid as of the
+      last rebuild, unlike every days_to_convert_* column, which is immutable
+      once the milestone is reached.
+  days_in_current_stage:
+    lineage:
+      - datalake_consorcio.deal.ts_current_stage_started
+      - dw_public.dim_date.date
+      - dw_public.dim_date.is_brz_business_day
+    description: >
+      Business days (Brazilian calendar) from ts_current_stage_started to the
+      day before the run date. Inclusive day count minus 1, floored at 0. The
+      only cycle-time column with no is_* gate, so it is populated for every
+      deal whose ts_current_stage_started resolves inside the calendar window,
+      and null otherwise. Relative to the run date — only valid as of the last
+      rebuild.
   year:
     description: Partition column — calendar year of dt_created.
   month:
