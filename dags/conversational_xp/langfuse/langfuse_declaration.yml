@@ -29,10 +29,13 @@ workflow:
     scores:
       merge_on: [id_score]
       z_order_by: [ts_created]
+      run_optimize: false
     traces:
       merge_on: [id_trace]
       z_order_by: [ts_created]
+      run_optimize: false
     observations:
       merge_on: [id_observation]
       z_order_by: [ts_started]
+      run_optimize: false
 
