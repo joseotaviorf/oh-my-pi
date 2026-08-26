@@ -1,8 +1,17 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
+  custom_libraries:
+  # DAG-scoped Sedona with H3 (ST_H3CellIDs); does not bump the house default 1.2.1.
+  - maven:
+      coordinates: org.apache.sedona:sedona-spark-shaded-3.5_2.12:1.6.1
+  - maven:
+      coordinates: org.datasyslab:geotools-wrapper:1.6.1-28.2
+  - pypi:
+      package: apache-sedona==1.6.1
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    runtime_engine: PHOTON
-    driver_node_type_id: r7g.large
+    spark_conf:
+      spark.serializer: org.apache.spark.serializer.KryoSerializer
+      spark.sql.extensions: org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions
+      spark.kryo.registrator: org.apache.sedona.core.serde.SedonaKryoRegistrator
