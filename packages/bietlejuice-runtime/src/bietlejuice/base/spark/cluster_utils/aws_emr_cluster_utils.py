@@ -11,7 +11,9 @@ of the default id). Override with ``BIETL_SECRETS_MANAGER_SECRET_ID_TEMPLATE`` (
 
 from __future__ import annotations
 
+import base64
 import os
+import re
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -70,6 +72,28 @@ def _epoch_ms(value: Optional[datetime]) -> int:
     return int(value.timestamp() * 1000) if value is not None else 0
 
 
+_B64_ALPHABET = re.compile(r"^[A-Za-z0-9+/]+={0,2}$")
+
+
+def _maybe_b64decode(raw: str) -> str:
+    """Decode standard base64 when the secret is encoded; otherwise return as-is.
+
+    Vault/SM mirrors for some EMR keys store Databricks payloads as base64.
+    Plain JSON (``{"user":...}``) is not valid base64 and is left unchanged.
+    """
+    if not raw:
+        return raw
+    compact = "".join(raw.split())
+    if not _B64_ALPHABET.fullmatch(compact):
+        return raw
+    padded = compact + ("=" * ((-len(compact)) % 4))
+    try:
+        decoded = base64.b64decode(padded, validate=True).decode("utf-8")
+    except (ValueError, UnicodeDecodeError):
+        return raw
+    return decoded if decoded else raw
+
+
 class AwsEmrClusterUtils:
     """
     EMR implementation: Secrets Manager for secrets, boto3 S3 + stdlib for paths.
@@ -100,10 +124,12 @@ class AwsEmrClusterUtils:
         client = self._get_secrets_client()
         resp = client.get_secret_value(SecretId=secret_id)
         if "SecretString" in resp and resp["SecretString"] is not None:
-            return resp["SecretString"]
+            return _maybe_b64decode(resp["SecretString"])
         # Binary secrets: decode as UTF-8 for callers that expect str (same idea as Databricks string secrets).
         if "SecretBinary" in resp and resp["SecretBinary"] is not None:
-            return resp["SecretBinary"].decode("utf-8", errors="replace")
+            return _maybe_b64decode(
+                resp["SecretBinary"].decode("utf-8", errors="replace")
+            )
         return ""
 
     def fs_ls(self, path: str) -> List[FsListEntry]:
