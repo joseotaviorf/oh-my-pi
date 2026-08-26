@@ -1305,6 +1305,139 @@ class TestNotifyDagRotationCallable:
         assert payload["error_list"][0]["dag"] == "domain.dag"
         assert payload["email"] == "zacarias@example.com"
 
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.post")
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._fetch_classified_alerts"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._get_oncall_recipients"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._resolve_issue_owners"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._fetch_dei_issues"
+    )
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.Variable.get")
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation.ConfigurationService"
+    )
+    def test_webhook_token_goes_only_to_dag_rotation_route(
+        self,
+        mock_cfg_cls,
+        mock_var_get,
+        mock_fetch,
+        mock_resolve,
+        mock_oncall,
+        mock_wakeups,
+        mock_post,
+    ):
+        mock_cfg_cls.return_value.get_config.return_value = _MOCK_WEBHOOK_KEYS
+        mock_var_get.side_effect = lambda key, default_var=None: {
+            "NOTIFICATION_HUB_DAG_ROTATION_WEBHOOK": "https://notification-hub.example.com/webhook/analytics-eng-oncall",
+            "NOTIFICATION_HUB_IAM_ALERTS_WEBHOOK": "https://notification-hub.example.com/webhook/iam-alerts",
+            "SECRET_NOTIFICATION_HUB_DAG_ROTATION_TOKEN": "token-under-test",
+            "SECRET_JIRA_API": _MOCK_JIRA_SECRET,
+            "SECRET_JIRA_OPS_API": _MOCK_JIRA_OPS_SECRET,
+        }.get(key, default_var)
+        cyber_issue = {
+            "key": "DEI-9",
+            "summary": "domain.dag",
+            "incident_owner": "Tech Platform Cyber Security",
+            "owner": "Tech Platform Cyber Security",
+        }
+        mock_fetch.return_value = [cyber_issue]
+        mock_resolve.return_value = [cyber_issue]
+        mock_oncall.return_value = (
+            [{"displayName": "Zacarias", "emailAddress": "zacarias@example.com"}],
+            2,
+        )
+        mock_wakeups.return_value = []
+
+        mock_resp = mock.MagicMock()
+        mock_resp.raise_for_status = mock.MagicMock()
+        mock_post.return_value = mock_resp
+
+        mock_session = mock.MagicMock()
+        mock_session.query.return_value.filter.return_value.all.return_value = []
+
+        notify_dag_rotation(session=mock_session)
+
+        assert mock_post.call_count == 2, (
+            "Expected a DAG_Rotation POST and an iam-alerts POST, "
+            f"got {mock_post.call_count}"
+        )
+        dag_rotation_headers = mock_post.call_args_list[0][1]["headers"]
+        iam_alerts_headers = mock_post.call_args_list[1][1]["headers"]
+        assert dag_rotation_headers["X-Webhook-Token"] == "token-under-test"
+        assert "X-Webhook-Token" not in iam_alerts_headers, (
+            "The DAG_Rotation token must not leak into the iam-alerts POST"
+        )
+
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.post")
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._fetch_classified_alerts"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._get_oncall_recipients"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._resolve_issue_owners"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._fetch_dei_issues"
+    )
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.Variable.get")
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation.ConfigurationService"
+    )
+    def test_posts_without_token_header_when_variable_unset(
+        self,
+        mock_cfg_cls,
+        mock_var_get,
+        mock_fetch,
+        mock_resolve,
+        mock_oncall,
+        mock_wakeups,
+        mock_post,
+    ):
+        mock_cfg_cls.return_value.get_config.return_value = _MOCK_WEBHOOK_KEYS
+        mock_var_get.side_effect = lambda key, default_var=None: {
+            "NOTIFICATION_HUB_DAG_ROTATION_WEBHOOK": "https://notification-hub.example.com/webhook/analytics-eng-oncall",
+            "SECRET_JIRA_API": _MOCK_JIRA_SECRET,
+            "SECRET_JIRA_OPS_API": _MOCK_JIRA_OPS_SECRET,
+        }.get(key, default_var)
+        mock_fetch.return_value = [
+            {"key": "DEI-1", "summary": "domain.dag", "incident_owner": "Data People"}
+        ]
+        mock_resolve.return_value = [
+            {
+                "key": "DEI-1",
+                "summary": "domain.dag",
+                "incident_owner": "Data People",
+                "owner": "Data People",
+            }
+        ]
+        mock_oncall.return_value = (
+            [{"displayName": "Zacarias", "emailAddress": "zacarias@example.com"}],
+            2,
+        )
+        mock_wakeups.return_value = []
+
+        mock_resp = mock.MagicMock()
+        mock_resp.raise_for_status = mock.MagicMock()
+        mock_post.return_value = mock_resp
+
+        mock_session = mock.MagicMock()
+        mock_session.query.return_value.filter.return_value.all.return_value = []
+
+        notify_dag_rotation(session=mock_session)
+
+        mock_post.assert_called_once()
+        headers = mock_post.call_args[1]["headers"]
+        assert "X-Webhook-Token" not in headers
+        assert headers["Content-type"] == "application/json"
+
     @mock.patch(
         "dags.governance.notify_dag_rotation.notify_dag_rotation._get_oncall_recipients"
     )

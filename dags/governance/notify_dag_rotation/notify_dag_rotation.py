@@ -81,6 +81,9 @@ SOURCE_AIRFLOW_ERROR = "Airflow error"
 SOURCE_UNKNOWN = "Unknown"
 RUBINHO_ALIAS_PREFIX = "dag-runtime-"
 
+WEBHOOK_TOKEN_VARIABLE = "SECRET_NOTIFICATION_HUB_DAG_ROTATION_TOKEN"
+WEBHOOK_TOKEN_HEADER = "X-Webhook-Token"
+
 
 def _parse_rfc3339(datetime_str: str) -> datetime:
     """Parse an RFC 3339 datetime string with or without fractional seconds."""
@@ -924,6 +927,7 @@ def notify_dag_rotation(session=None, **context):
 
     dag_rotation_variable_key = webhook_keys["dag_rotation"]
     webhook_url = Variable.get(dag_rotation_variable_key, default_var=None)
+    webhook_token = Variable.get(WEBHOOK_TOKEN_VARIABLE, default_var=None)
 
     jira_secret = json.loads(Variable.get("SECRET_JIRA_API"))
     jira_ops_secret = json.loads(Variable.get("SECRET_JIRA_OPS_API"))
@@ -1007,11 +1011,23 @@ def notify_dag_rotation(session=None, **context):
         return
 
     notification_headers = {"Content-type": "application/json"}
+    # The notification-hub authenticates /webhook/analytics-eng-oncall with a static
+    # token. Keep it in its own dict: notification_headers is reused by the iam-alerts
+    # POST below, which is a different route and must not receive this token.
+    dag_rotation_headers = dict(notification_headers)
+    if webhook_token:
+        dag_rotation_headers[WEBHOOK_TOKEN_HEADER] = webhook_token
+    else:
+        logger.warning(
+            "Airflow Variable '%s' is not set — posting DAG_Rotation without the %s header.",
+            WEBHOOK_TOKEN_VARIABLE,
+            WEBHOOK_TOKEN_HEADER,
+        )
     outgoing_payload = (
         _wrap_for_gchat(payload) if _is_gchat_webhook(webhook_url) else payload
     )
     resp = requests.post(
-        webhook_url, json=outgoing_payload, headers=notification_headers
+        webhook_url, json=outgoing_payload, headers=dag_rotation_headers
     )
     resp.raise_for_status()
     logger.info(
