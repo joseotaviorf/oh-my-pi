@@ -9,6 +9,7 @@ workflow:
   layer: reverse
   type: access
   bucket_config_name: planning_and_performance_bucket
+  gchat_export_summary: true
   load_spark_job: load_reverse_concentrix
   spark_job_arguments:
     - "{environment}"
@@ -20,6 +21,7 @@ workflow:
     - "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
     - "cnx"
     - "('webhelp','concentrix','cnx')"
+    - "{{ dag_run.run_id }}"
 
   tables_customization:
     tickets_contract: {}
