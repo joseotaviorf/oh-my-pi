@@ -2,12 +2,13 @@ cluster:
   type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_libraries:
   # DAG-scoped Sedona with H3 (ST_H3CellIDs); does not bump the house default 1.2.1.
+  # JARs only: ST_* SQL is registered via spark.sql.extensions. Do not add
+  # apache-sedona PyPI — 1.6.1 pulls rasterio, which has no aarch64 wheel on
+  # EMR 3.9 and fails bootstrap compiling against GDAL.
   - maven:
       coordinates: org.apache.sedona:sedona-spark-shaded-3.5_2.12:1.6.1
   - maven:
       coordinates: org.datasyslab:geotools-wrapper:1.6.1-28.2
-  - pypi:
-      package: apache-sedona==1.6.1
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
