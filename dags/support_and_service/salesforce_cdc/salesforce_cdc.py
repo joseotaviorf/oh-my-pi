@@ -1,5 +1,6 @@
 import math
 import os
+from copy import deepcopy
 from datetime import datetime, timedelta
 from typing import Dict
 
@@ -109,12 +110,18 @@ def create_sst_task(
     )
 
 
-def create_execute_job_cluster_task(dag: DAG, task_id: str, pool: str):
+def create_execute_job_cluster_task(dag: DAG, cluster_id: str, task_id: str, pool: str):
+    # The operator only disambiguates job names by the digits it finds in the
+    # task_id, so digit-less lineages (case, email_message) would resolve to the
+    # same Databricks job for a given hour and overwrite each other's task list.
+    # get_cluster_config returns the shared ConfigurationService dict, hence the copy.
+    cluster_configuration = deepcopy(get_cluster_config(CONFIG_SERVICE))
+    cluster_configuration["cluster_name"] = f"{DAG_ID}_{{{{ run_id }}}}_{cluster_id}"
     return QuintoAndarDatabricksExecuteJobClusterOperator(
         databricks_conn_id="databricks_new",
         dag=dag,
         task_id=task_id,
-        cluster_configuration=get_cluster_config(CONFIG_SERVICE),
+        cluster_configuration=cluster_configuration,
         access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         libraries=get_libs(ENV),
         pool=pool,
@@ -262,7 +269,10 @@ def build_cluster_lineage(cluster_id: str, events):
     pool = ensure_lineage_pool(cluster_id)
     wait_previous_lineage = create_previous_lineage_gate(cluster_id, pool)
     execute_job_cluster = create_execute_job_cluster_task(
-        dag=dag, task_id=f"execute_cdc_cluster_{cluster_id}", pool=pool
+        dag=dag,
+        cluster_id=cluster_id,
+        task_id=f"execute_cdc_cluster_{cluster_id}",
+        pool=pool,
     )
     end_cluster = SStPlaceholderOperator(
         task_id=f"end_cdc_cluster_{cluster_id}",
