@@ -30,6 +30,11 @@ DAG:
       deadline: Never
       created_by: edgar.fernandes@quintoandar.com.br
       approved_by: edgar.fernandes@quintoandar.com.br
+    bietlejuice.enrich_concierge_privacy_facts:
+      reason: "Concierge targeting support without an overnight SLA. It is upstream of the placas LPV-reprocess POC, which runs four hours later and re-checks Privacy Hub live at dispatch, so a late run does not page the DE on-call."
+      deadline: Never
+      created_by: akira@quintoandar.com.br
+      approved_by: akira@quintoandar.com.br
     bietlejuice.enrich_lead_scoring:
       reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
       deadline: Never

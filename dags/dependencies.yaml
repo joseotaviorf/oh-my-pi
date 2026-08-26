@@ -1959,6 +1959,14 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.person:load-clean-credential-reference:first-run-of-day
   - bietlejuice.request_logging:load-clean-visits:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
+bietlejuice.enrich_concierge_placas_lpv_reproc:
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+  - bietlejuice.enrich_concierge_privacy_facts:load-enrich-concierge-privacy-user:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-agent-data:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+  - bietlejuice.enrich_tqc_referral:load-enrich-unified-lead-referral-flow:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
+  - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
 bietlejuice.enrich_concierge_privacy_facts:
   - bietlejuice.privacy_hub:load-clean-data-subject:first-run-of-day
 bietlejuice.enrich_concierge_ranking_metrics:

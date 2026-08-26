@@ -1,0 +1,57 @@
+---
+database_name: datalake_search
+table_name: concierge_placas_lpv_reproc_daily
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  POC daily eligibility list for sale placas leads that may receive a concierge
+  LPV-ads reprocess. Grain is lead user, listing, and agent send date after a
+  7-day wait, excluding TQC, sale VB with that agent, users suppressed in the
+  shared concierge privacy snapshot, and a 14-day LPV-ads cooldown.
+columns:
+  id_user:
+    description: "Registered lead user matched from the placas WhatsApp template phone."
+    lineage:
+      - datalake_cdp.users.id_user
+  id_person:
+    description: |
+      CDP person identifier for the registered lead, used to join the
+      eligibility row with SFMC and with the shared concierge privacy snapshot.
+    lineage:
+      - datalake_cdp.users.id_person
+  id_house:
+    description: "Listing advertised in the leads_placas_cr_v2 template."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.payload
+  business_context:
+    description: "Hardcoded SALE context for this placas reprocess cohort."
+  city:
+    description: "City of the advertised listing still on sale."
+    lineage:
+      - datalake_ebdb_clean.house.city
+  region_name:
+    description: "Neighborhood of the advertised listing still on sale."
+    lineage:
+      - datalake_ebdb_clean.house.neighborhood
+  price_arred:
+    description: "Current sale price of the advertised listing."
+    lineage:
+      - datalake_ebdb_clean.house.sale_price
+  house_link:
+    description: "Buy listing URL with the placas WhatsApp UTM recipe used by the live send."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.payload
+  dt_envio:
+    description: "Calendar date of the first leads_placas_cr_v2 send for this agent, day, phone, and house."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.ts_sent
+  group_ab:
+    description: "Experiment cell from the last three digits of the lead phone: Control when <= 499, else Test."
+    lineage:
+      - datalake_cdp.users.phone_number
+  year:
+    description: "Snapshot year partition."
+  month:
+    description: "Snapshot month partition."
+  day:
+    description: "Snapshot day partition."

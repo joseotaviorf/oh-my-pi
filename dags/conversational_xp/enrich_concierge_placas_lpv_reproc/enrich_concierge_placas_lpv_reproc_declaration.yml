@@ -1,0 +1,33 @@
+dag:
+  name: enrich_concierge_placas_lpv_reproc
+  schedule_start_date: 2026, 8, 21
+  schedule_interval: 0 9 * * *
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      POC eligibility snapshot for sale placas leads that may receive a
+      concierge LPV-ads reprocess 7 days after leads_placas_cr_v2.
+      It consumes the shared concierge privacy snapshot rather than parsing
+      Privacy Hub data directly. Not part of enrich_concierge_audience.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: search
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    days_maturity: 7
+    days_trigger_cooldown: 14
+    poc_start_date: "2026-06-09"
+    excluded_agent_phone_1: "5551983019582"
+    excluded_agent_phone_2: "5511973481919"
+  tables_customization:
+    concierge_placas_lpv_reproc_daily:
+      merge_on: [id_user, id_house, dt_envio, year, month, day]
+      when_not_matched_by_source_delete_condition: |
+        target.year = YEAR(CURRENT_DATE())
+        AND target.month = MONTH(CURRENT_DATE())
+        AND target.day = DAY(CURRENT_DATE())
+      partitions: [year, month, day]
+      z_order_by: [id_user, id_house]
