@@ -203,6 +203,8 @@ WITH max_cancellation AS (
   WHERE
     incentive_system = 'DEMAND_CONVERSION_FR'
     AND revenue_receiver_type = 'AGENT'
+    AND is_calculated
+    AND business_model = '1P'
 )
 SELECT
   c.id,

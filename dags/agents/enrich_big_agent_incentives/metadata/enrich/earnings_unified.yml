@@ -49,6 +49,10 @@ columns:
       Incentive system that produced the earning. Hardcoded to DEMAND_CONVERSION_FR or
       SUPPLY_ACQUISITION_FR for legacy earnings depending on the source branch; taken from the
       Big Agent earning's incentive_system for the migrated flow.
+  business_model:
+    description: |
+      Business model of the earning. Hardcoded to 1P for legacy For-Rent earnings; taken from the
+      Big Agent earning's business_model for the migrated flow.
   business_context:
     lineage:
       - datalake_big_agent.earnings.business_context
@@ -135,6 +139,15 @@ columns:
       Monetary amount earned by the agent, in the contract's currency. For legacy For-Rent
       earnings, computed as brokerage_amount times revenue_percentage; taken from the Big Agent
       earning's revenue_amount for the migrated flow.
+  administration_percentage:
+    lineage:
+      - datalake_big_agent_clean.contract_partnership_data.administration_split_percentage
+    description: |
+      Percentage of the brokerage amount attributed to the administration. For legacy demand-conversion
+      earnings, the contract's agent_brokerage_share split evenly when more than one agent person
+      is involved; for legacy supply-acquisition earnings, the partnership data's
+      brokerage_split_percentage; taken from the Big Agent earning's administration_percentage for the
+      migrated flow.
   is_3p_lead_gen_offer:
     lineage:
       - datalake_big_agent.earnings.is_3p_lead_gen_offer
@@ -171,6 +184,13 @@ columns:
       earnings, true when exactly one distinct agent person is involved in the contract's rent
       flow; null for legacy supply-acquisition earnings; taken from the Big Agent earning's
       is_tier_revenue_share for the migrated flow.
+  is_calculated:
+    lineage:
+      - datalake_big_agent.earnings.is_calculated
+    description: |
+      Boolean flag indicating whether the earning was calculated by the Big Agent Incentives Engine.
+      Always false for legacy For-Rent earnings, which predate this classification; populated from the Big
+      Agent earning for the migrated flow.
   ts_created:
     lineage:
       - datalake_ebdb_clean.contract.ts_signed

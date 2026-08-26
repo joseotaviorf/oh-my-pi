@@ -1,23 +1,17 @@
-WITH pre_contract_partnership_data AS (
+WITH contract_partnership_data AS (
     SELECT
         id_contract,
-        partner_type,
-        brokerage_split_percentage,
-        ROW_NUMBER() OVER (PARTITION BY id_contract, partner_type ORDER BY id DESC) as rn
+        CASE
+            WHEN revenue_share_type IS NULL THEN 'AUTONOMOUS_AGENT'
+            ELSE revenue_share_type
+        END AS partner_type,
+        revenue_percentage AS brokerage_split_percentage
     FROM
-        datalake_ebdb_clean.contract_partnership_data
-),
-
-contract_partnership_data AS (
-    SELECT
-        id_contract,
-        partner_type,
-        SUM(brokerage_split_percentage) AS brokerage_split_percentage
-    FROM
-        pre_contract_partnership_data
+        datalake_big_agent.earnings_unified
     WHERE
-        NOT(partner_type = 'AUTONOMOUS_AGENT' AND rn > 1)
-    GROUP BY 1,2
+        is_calculated
+        AND incentive_system = 'SUPPLY_ACQUISITION_FR'
+        AND business_model = '1P'
 ),
 
 first_rent_from_contract_ranked AS (
@@ -71,8 +65,10 @@ brokerage_share_from_contract_at_signature_ranked AS (
             ON dt.sk_contract = eu.id_contract
     WHERE
         DATE(eu.ts_created) <= DATE(dt.invoice_created_date)
-        AND incentive_system = 'DEMAND_CONVERSION_FR'
-        AND revenue_receiver_type = 'AGENT'
+        AND eu.incentive_system = 'DEMAND_CONVERSION_FR'
+        AND eu.revenue_receiver_type = 'AGENT'
+        AND eu.is_calculated
+        AND eu.business_model = '1P'
 ),
 brokerage_share_from_contract_at_signature AS (
     SELECT

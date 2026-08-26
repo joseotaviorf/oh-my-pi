@@ -6,16 +6,22 @@ WITH contract_partnership_data AS (
     FROM (
         SELECT
             id_contract,
-            partner_type,
-            brokerage_split_percentage,
-            ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY id DESC) AS rn
+            CASE
+                WHEN revenue_share_type IS NULL THEN 'AUTONOMOUS_AGENT'
+                ELSE revenue_share_type
+            END AS partner_type,
+            revenue_percentage AS brokerage_split_percentage,
+            ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_created DESC) AS rn
         FROM
-            datalake_ebdb_clean.contract_partnership_data
+            datalake_big_agent.earnings_unified
+        WHERE
+            is_calculated
+            AND incentive_system = 'SUPPLY_ACQUISITION_FR'
+            AND business_model = '1P'
     )
     WHERE
         rn = 1
 ),
-
 brokerage_fee AS (
     WITH rental_brokerage_fee AS (
         SELECT

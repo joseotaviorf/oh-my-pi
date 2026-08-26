@@ -15,19 +15,21 @@ columns:
     description: ISO country code of the property linked to the B2B rent contract.
   contract_plan:
     lineage:
-    - datalake_ebdb_clean.contract_partnership_data.contract_plan
+    - datalake_big_agent.earnings_unified.incentive_system
+    - datalake_big_agent.earnings_unified.revenue_share_type
     description: Partnership plan tier negotiated with the B2B partner on the contract.
   contract_partner_type:
     lineage:
-    - datalake_ebdb_clean.contract_partnership_data.partner_type
+    - datalake_big_agent.earnings_unified.incentive_system
+    - datalake_big_agent.earnings_unified.revenue_share_type
     description: Type of partner related to the contract.
   administration_split_percentage:
     lineage:
-    - datalake_ebdb_clean.contract_partnership_data.administration_split_percentage
+    - datalake_big_agent.earnings_unified.administration_percentage
     description: The administrative percentage of the contract.
   brokerage_split_percentage:
     lineage:
-    - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+    - datalake_big_agent.earnings_unified.revenue_percentage
     description: Percentage of brokerage commission allocated to partners on the contract.
   b2b_type:
     description: Type of the B2B client origin related to the contract.

@@ -31,11 +31,11 @@ columns:
       per contract; null when no earnings_unified row exists for the contract.
   ciq_brokerage_share:
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+      - datalake_big_agent.earnings_unified.revenue_percentage
     description: "Indicates CIQ brokerage split share in percentage"
   select_brokerage_share:
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+      - datalake_big_agent.earnings_unified.revenue_percentage
     description: "Indicates SELECT brokerage split share in percentage"
   3p_brokerage_share:
     description: "Indicates 3P brokerage split share in percentage. At the moment it was created, it was always 50 perc of the rent"
@@ -51,13 +51,13 @@ columns:
     description: "Agent brokerage amount derived from first rent and agent_brokerage_share at signature."
   ciq_brokerage_amount:
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+      - datalake_big_agent.earnings_unified.revenue_percentage
       - datalake_ebdb_clean.contract_aud.rent
       - datalake_ebdb_clean.contract.fist_rent_comission_fee
     description: "Indicates CIQ brokerage split share in percentage in amount of cash"
   select_brokerage_amount:
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+      - datalake_big_agent.earnings_unified.revenue_percentage
       - datalake_ebdb_clean.contract_aud.rent
       - datalake_ebdb_clean.contract.fist_rent_comission_fee
     description: "Indicates SELECT brokerage split share in percentage in amount of cash"

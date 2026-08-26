@@ -24,31 +24,50 @@ WITH b2b_house_contracts AS (
     ON partner_agent.id_user = h.id_user
   LEFT JOIN datalake_ebdb_clean.partner AS partner
     ON partner.id = partner_agent.id_partner
-), contracts_partner_quantity AS (
+),
+contracts_partner_quantity AS (
   SELECT
     id_contract,
-    COUNT(DISTINCT id_partner) AS partner_quantity,
-    MAX(IF(partner_type = 'EXECUTIVE_FOR_RENT', TRUE, FALSE)) AS is_executive_partner
-  FROM datalake_ebdb_clean.contract_partnership_data
+    COUNT(DISTINCT uuid_person) AS partner_quantity,
+    MAX(IF(revenue_share_type = 'EXECUTIVE_FOR_RENT', TRUE, FALSE)) AS is_executive_partner
+  FROM
+    datalake_big_agent.earnings_unified
+  WHERE
+    is_calculated
+    AND incentive_system = 'SUPPLY_ACQUISITION_FR'
+    AND business_model = '1P'
   GROUP BY
     id_contract
-), contracts_partner_selection AS (
+),
+contracts_partner_selection AS (
   SELECT
     cpd.id_contract,
-    cpd.partner_type,
-    cpd.contract_plan,
-    cpd.administration_split_percentage,
-    cpd.brokerage_split_percentage,
-    IF(cpd.partner_type = 'PRIME', TRUE, FALSE) AS is_contract_b2b,
+    CASE
+      WHEN revenue_share_type IS NULL THEN 'AUTONOMOUS_AGENT'
+      ELSE revenue_share_type
+    END AS partner_type,
+    CASE
+      WHEN cpd.revenue_share_type IS NULL OR cpd.revenue_share_type = 'EXECUTIVE_FOR_RENT' THEN 'REGULAR'
+      WHEN cpd.revenue_share_type = 'PRIME' THEN 'PRIME'
+      ELSE 'OTHER'
+    END AS contract_plan,
+    cpd.administration_percentage AS administration_split_percentage,
+    cpd.revenue_percentage AS brokerage_split_percentage,
+    IF(partner_type = 'PRIME', TRUE, FALSE) AS is_contract_b2b,
     pq.partner_quantity,
     pq.is_executive_partner,
-    IF(cpd.partner_type = 'EXECUTIVE_FOR_RENT', 2, 1) AS partner_weight
-  FROM datalake_ebdb_clean.contract_partnership_data AS cpd
+    IF(partner_type = 'EXECUTIVE_FOR_RENT', 2, 1) AS partner_weight
+  FROM datalake_big_agent.earnings_unified AS cpd
   JOIN contracts_partner_quantity AS pq
     ON pq.id_contract = cpd.id_contract
   LEFT JOIN datalake_ebdb_clean.contract AS c
     ON c.id = cpd.id_contract
-), b2b_contracts AS (
+  WHERE
+    cpd.is_calculated
+    AND cpd.incentive_system = 'SUPPLY_ACQUISITION_FR'
+    AND cpd.business_model = '1P'
+),
+b2b_contracts AS (
   /* * This CTE checks if a contract exists in contract_partnership_data table. If so, there is a Partner involved and we may be talking about a B2B contract, depending on
   the Partner type. This logic can cover cases where there have been house plan updates (from B2B to not, vice-versa) or user exchanges for a house, where it may led to change
   the contract type when looking to the b2b_house_contracts information. * */

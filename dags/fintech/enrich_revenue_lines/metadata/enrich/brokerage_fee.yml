@@ -34,11 +34,11 @@ columns:
   brokerage_split_percentage:
     description: Financial attribute representing brokerage split percentage on the brokerage_fee dataset.
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+      - datalake_big_agent.earnings_unified.revenue_percentage
   select_agent_brokerage_split_percentage:
     description: "Split Percentage for the brokerage fee, just for SELECT agent (partner_type = EXECUTIVE_FOR_RENT)"
     lineage:
-      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+      - datalake_big_agent.earnings_unified.revenue_percentage
   prod_theorical_amount:
     description: "Total amount that appears on the invoice"
   invoice_theorical_amount:

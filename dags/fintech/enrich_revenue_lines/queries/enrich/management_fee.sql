@@ -1,3 +1,14 @@
+WITH contract_partnership_data AS (
+    SELECT
+        id_contract,
+        administration_percentage AS administration_split_percentage
+    FROM
+        datalake_big_agent.earnings_unified
+    WHERE
+        is_calculated
+        AND incentive_system = 'SUPPLY_ACQUISITION_FR'
+        AND business_model = '1P'
+)
 SELECT
   c.sk_contract AS id_contract_ebdb,
   'quintoandar' AS management_fee_share,
@@ -20,7 +31,7 @@ LEFT JOIN datalake_retsuko.invoice i
     ON di.id_invoice = i.id_external
 LEFT JOIN dw_rent.dim_contract c
     ON c.sk_contract = fie.id_contract
-LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
+LEFT JOIN contract_partnership_data p
     ON c.sk_contract = p.id_contract
     AND p.administration_split_percentage IS NOT NULL
 WHERE
@@ -56,7 +67,7 @@ LEFT JOIN datalake_retsuko.invoice i
     ON di.id_invoice = i.id_external
 LEFT JOIN dw_rent.dim_contract c
     ON c.sk_contract = fie.id_contract
-LEFT JOIN datalake_ebdb_clean.contract_partnership_data p
+LEFT JOIN contract_partnership_data p
     ON c.sk_contract = p.id_contract
     AND p.administration_split_percentage IS NOT NULL
 WHERE
