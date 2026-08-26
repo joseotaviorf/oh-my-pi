@@ -2,7 +2,7 @@
 AWS-backed cluster utilities for EMR (Secrets Manager + S3 via boto3).
 
 Exposes a ``dbutils``-like surface: ``.secrets.get(scope=..., key=...)`` and
-``.fs.ls`` / ``.fs.head`` / ``.fs.rm`` for existing job code.
+``.fs.ls`` / ``.fs.head`` / ``.fs.rm`` / ``.fs.cp`` for existing job code.
 
 Default Secrets Manager secret id is ``{key}`` only (Databricks ``scope`` is not part
 of the default id). Override with ``BIETL_SECRETS_MANAGER_SECRET_ID_TEMPLATE`` (e.g.
@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, List, Optional
 
 import boto3
+from botocore.exceptions import ClientError
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.spark.cluster_utils.fs_list_entry import FsListEntry
@@ -52,6 +53,7 @@ def _secret_id_for(scope: str, key: str) -> str:
 
 def _parse_s3_uri(uri: str) -> tuple[str, str]:
     # Returns (bucket, key) with key possibly "" for bucket root.
+    uri = _normalize_fs_path(uri)
     if not uri.startswith("s3://"):
         raise ValueError(f"Expected s3:// URI, got: {uri!r}")
     rest = uri[5:]
@@ -59,6 +61,13 @@ def _parse_s3_uri(uri: str) -> tuple[str, str]:
     if slash < 0:
         return rest, ""
     return rest[:slash], rest[slash + 1 :]
+
+
+def _normalize_fs_path(path: str) -> str:
+    path = path.strip()
+    if path.startswith("s3a://"):
+        return "s3://" + path[6:]
+    return path
 
 
 def _normalize_local_path(uri: str) -> str:
@@ -133,7 +142,7 @@ class AwsEmrClusterUtils:
         return ""
 
     def fs_ls(self, path: str) -> List[FsListEntry]:
-        path = path.strip()
+        path = _normalize_fs_path(path)
         if path.startswith("dbfs:"):
             raise ValueError(
                 "dbfs: paths are not supported on EMR AwsEmrClusterUtils; use s3:// or local paths."
@@ -241,6 +250,7 @@ class AwsEmrClusterUtils:
         return entries
 
     def fs_head(self, path: str, max_bytes: int) -> str:
+        path = _normalize_fs_path(path)
         if not path.startswith("s3://"):
             p = Path(_normalize_local_path(path))
             data = p.read_bytes()[:max_bytes]
@@ -255,6 +265,7 @@ class AwsEmrClusterUtils:
         return resp["Body"].read().decode("utf-8", errors="replace")
 
     def fs_rm(self, path: str, recurse: bool = False) -> bool:
+        path = _normalize_fs_path(path)
         if path.startswith("dbfs:"):
             raise ValueError("dbfs: paths are not supported on EMR")
         if not path.startswith("s3://"):
@@ -287,6 +298,107 @@ class AwsEmrClusterUtils:
                 client.delete_objects(Bucket=bucket, Delete={"Objects": batch})
         return True
 
+    def fs_cp(self, source: str, dest: str, recurse: bool = False) -> bool:
+        source = _normalize_fs_path(source)
+        dest = _normalize_fs_path(dest)
+        if source.startswith("dbfs:") or dest.startswith("dbfs:"):
+            raise ValueError("dbfs: paths are not supported on EMR")
+        if source.startswith("s3://") or dest.startswith("s3://"):
+            if not source.startswith("s3://") or not dest.startswith("s3://"):
+                raise ValueError(
+                    "S3 copy requires both source and dest to be s3:// URIs"
+                )
+            return self._s3_cp(source, dest, recurse=recurse)
+        return self._local_cp(
+            _normalize_local_path(source), _normalize_local_path(dest), recurse
+        )
+
+    def _s3_cp(self, source: str, dest: str, recurse: bool = False) -> bool:
+        src_bucket, src_key = _parse_s3_uri(source)
+        dest_bucket, dest_key = _parse_s3_uri(dest)
+        client = self._get_s3_client()
+        if not recurse:
+            client.copy_object(
+                Bucket=dest_bucket,
+                CopySource={"Bucket": src_bucket, "Key": src_key},
+                Key=dest_key,
+            )
+            return True
+
+        # Mirror _local_cp: recurse copies directories; single objects still copy once.
+        if src_key.endswith("/"):
+            return self._s3_cp_prefix(
+                client, src_bucket, src_key, dest_bucket, dest_key
+            )
+        if self._s3_key_exists(client, src_bucket, src_key):
+            dest_object_key = dest_key
+            if dest_key.endswith("/"):
+                dest_object_key = f"{dest_key}{src_key.rsplit('/', 1)[-1]}"
+            client.copy_object(
+                Bucket=dest_bucket,
+                CopySource={"Bucket": src_bucket, "Key": src_key},
+                Key=dest_object_key,
+            )
+            return True
+        return self._s3_cp_prefix(
+            client, src_bucket, f"{src_key}/", dest_bucket, dest_key
+        )
+
+    def _s3_key_exists(self, client: Any, bucket: str, key: str) -> bool:
+        try:
+            client.head_object(Bucket=bucket, Key=key)
+            return True
+        except ClientError as exc:
+            code = exc.response.get("Error", {}).get("Code", "")
+            if code in ("404", "NoSuchKey", "NotFound"):
+                return False
+            raise
+
+    def _s3_cp_prefix(
+        self,
+        client: Any,
+        src_bucket: str,
+        src_prefix: str,
+        dest_bucket: str,
+        dest_key: str,
+    ) -> bool:
+        if not src_prefix.endswith("/"):
+            src_prefix = f"{src_prefix}/"
+        dest_prefix = dest_key if dest_key.endswith("/") else f"{dest_key}/"
+        paginator = client.get_paginator("list_objects_v2")
+        copied = False
+        for page in paginator.paginate(Bucket=src_bucket, Prefix=src_prefix):
+            for obj in page.get("Contents") or []:
+                obj_key = obj["Key"]
+                if obj_key == src_prefix or obj_key.endswith("/"):
+                    continue
+                rel_key = obj_key[len(src_prefix) :]
+                client.copy_object(
+                    Bucket=dest_bucket,
+                    CopySource={"Bucket": src_bucket, "Key": obj_key},
+                    Key=dest_prefix + rel_key,
+                )
+                copied = True
+        if not copied:
+            raise FileNotFoundError(
+                f"No objects found to copy under s3://{src_bucket}/{src_prefix}"
+            )
+        return True
+
+    def _local_cp(self, source: str, dest: str, recurse: bool = False) -> bool:
+        src = Path(source)
+        dst = Path(dest)
+        if recurse and src.is_dir():
+            if dst.exists() and not dst.is_dir():
+                raise ValueError(f"Cannot copy directory into file: {dest}")
+            shutil.copytree(src, dst, dirs_exist_ok=True)
+        else:
+            if dst.is_dir():
+                dst = dst / src.name
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+        return True
+
 
 class _SecretsFacade:
     """Thin wrapper so callers can use ``dbutils.secrets.get(scope, key)``."""
@@ -299,7 +411,7 @@ class _SecretsFacade:
 
 
 class _FsFacade:
-    """Thin wrapper so callers can use ``dbutils.fs.ls|head|rm``."""
+    """Thin wrapper so callers can use ``dbutils.fs.ls|head|rm|cp``."""
 
     def __init__(self, parent: AwsEmrClusterUtils) -> None:
         self._parent = parent
@@ -312,3 +424,6 @@ class _FsFacade:
 
     def rm(self, path: str, recurse: bool = False) -> bool:
         return self._parent.fs_rm(path, recurse)
+
+    def cp(self, source: str, dest: str, recurse: bool = False) -> bool:
+        return self._parent.fs_cp(source, dest, recurse=recurse)

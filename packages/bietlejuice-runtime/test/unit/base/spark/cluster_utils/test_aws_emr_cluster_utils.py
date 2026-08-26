@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
 import boto3
+import pytest
 from moto import mock_aws as mock_s3
 from pyspark.sql.types import StructType, _infer_schema
 
@@ -31,6 +32,12 @@ class TestParseS3Uri:
 
     def test_bucket_only(self):
         assert _parse_s3_uri("s3://my-bucket") == ("my-bucket", "")
+
+    def test_s3a_scheme_is_normalized(self):
+        assert _parse_s3_uri("s3a://my-bucket/path/to/obj") == (
+            "my-bucket",
+            "path/to/obj",
+        )
 
 
 class TestSecretsManagerRegion:
@@ -273,6 +280,124 @@ class TestAwsEmrFsLsS3:
         assert [
             e.path for e in dirs if past_start <= e.modificationTime < past_end
         ] == []
+
+
+class TestAwsEmrFsCpS3:
+    @mock_s3
+    def test_s3_cp_single_object(self):
+        bucket = "reverse-export-test"
+        s3 = boto3.client("s3", region_name="us-east-1")
+        s3.create_bucket(Bucket=bucket)
+        src_key = "aec/table/year=2024/month=01/day=01/part-00000.parquet"
+        dest_key = "aec/table/year=2024/month=01/day=01/table_2024_01_01.parquet"
+        s3.put_object(Bucket=bucket, Key=src_key, Body=b"parquet-bytes")
+
+        utils = AwsEmrClusterUtils()
+        utils.fs_cp(f"s3://{bucket}/{src_key}", f"s3://{bucket}/{dest_key}")
+
+        copied = s3.get_object(Bucket=bucket, Key=dest_key)["Body"].read()
+        assert copied == b"parquet-bytes"
+
+    @mock_s3
+    def test_s3_cp_accepts_s3a_scheme(self):
+        bucket = "reverse-export-s3a-test"
+        s3 = boto3.client("s3", region_name="us-east-1")
+        s3.create_bucket(Bucket=bucket)
+        src_key = "atento/table/year=2024/month=01/day=01/part-00000.parquet"
+        dest_key = "atento/table/year=2024/month=01/day=01/table_2024_01_01.parquet"
+        s3.put_object(Bucket=bucket, Key=src_key, Body=b"parquet-bytes")
+
+        utils = AwsEmrClusterUtils()
+        utils.fs_cp(
+            f"s3a://{bucket}/{src_key}",
+            f"s3a://{bucket}/{dest_key}",
+        )
+
+        copied = s3.get_object(Bucket=bucket, Key=dest_key)["Body"].read()
+        assert copied == b"parquet-bytes"
+
+    @mock_s3
+    def test_s3_ls_accepts_s3a_scheme(self):
+        bucket = "reverse-export-ls-test"
+        prefix = "concentrix/table/year=2024/month=01/day=01/"
+        s3 = boto3.client("s3", region_name="us-east-1")
+        s3.create_bucket(Bucket=bucket)
+        s3.put_object(
+            Bucket=bucket,
+            Key=f"{prefix}part-00000.parquet",
+            Body=b"parquet-bytes",
+        )
+
+        entries = AwsEmrClusterUtils().fs_ls(f"s3a://{bucket}/{prefix}")
+        assert [e.name for e in entries] == ["part-00000.parquet"]
+
+    @mock_s3
+    def test_s3_cp_recurse_true_copies_single_object(self):
+        bucket = "reverse-export-recurse-file-test"
+        s3 = boto3.client("s3", region_name="us-east-1")
+        s3.create_bucket(Bucket=bucket)
+        src_key = "aec/table/year=2024/month=01/day=01/part-00000.parquet"
+        dest_key = "aec/table/year=2024/month=01/day=01/table_2024_01_01.parquet"
+        s3.put_object(Bucket=bucket, Key=src_key, Body=b"parquet-bytes")
+
+        AwsEmrClusterUtils().fs_cp(
+            f"s3://{bucket}/{src_key}",
+            f"s3://{bucket}/{dest_key}",
+            recurse=True,
+        )
+
+        copied = s3.get_object(Bucket=bucket, Key=dest_key)["Body"].read()
+        assert copied == b"parquet-bytes"
+
+    @mock_s3
+    def test_s3_cp_recurse_true_copies_directory_prefix(self):
+        bucket = "reverse-export-recurse-dir-test"
+        s3 = boto3.client("s3", region_name="us-east-1")
+        s3.create_bucket(Bucket=bucket)
+        src_prefix = "aec/table/year=2024/month=01/day=01/"
+        dest_prefix = "aec/staging/year=2024/month=01/day=01/"
+        s3.put_object(
+            Bucket=bucket,
+            Key=f"{src_prefix}part-00000.parquet",
+            Body=b"part-a",
+        )
+        s3.put_object(
+            Bucket=bucket,
+            Key=f"{src_prefix}nested/part-00001.parquet",
+            Body=b"part-b",
+        )
+
+        AwsEmrClusterUtils().fs_cp(
+            f"s3://{bucket}/{src_prefix}",
+            f"s3://{bucket}/{dest_prefix}",
+            recurse=True,
+        )
+
+        assert (
+            s3.get_object(Bucket=bucket, Key=f"{dest_prefix}part-00000.parquet")[
+                "Body"
+            ].read()
+            == b"part-a"
+        )
+        assert (
+            s3.get_object(Bucket=bucket, Key=f"{dest_prefix}nested/part-00001.parquet")[
+                "Body"
+            ].read()
+            == b"part-b"
+        )
+
+    @mock_s3
+    def test_s3_cp_recurse_true_raises_when_prefix_is_empty(self):
+        bucket = "reverse-export-recurse-empty-test"
+        s3 = boto3.client("s3", region_name="us-east-1")
+        s3.create_bucket(Bucket=bucket)
+
+        with pytest.raises(FileNotFoundError):
+            AwsEmrClusterUtils().fs_cp(
+                f"s3://{bucket}/missing/prefix/",
+                f"s3://{bucket}/dest/",
+                recurse=True,
+            )
 
 
 class TestFsListEntrySchema:

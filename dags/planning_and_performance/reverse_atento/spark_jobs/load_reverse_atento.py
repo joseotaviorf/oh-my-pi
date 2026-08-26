@@ -6,16 +6,21 @@ from pyspark.sql.types import NullType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
 )
 from bietlejuice.base.validation.target_resolver import get_prod_database_name
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.jobs.planning_and_performance.reverse_bpo_file_notifier import (
     notify_reverse_bpo_file_saved,
 )
 
 JOB_NAME = "load_reverse_atento"
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
+dbutils = BaseDBUtils().get_dbutils()
 
 
 def cast_void_columns_to_string(df):
