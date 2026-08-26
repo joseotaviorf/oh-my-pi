@@ -1,5 +1,5 @@
 ---
 database_name: datalake_tiktok_campaigns_raw
-table_name: tiktok_campaigns_without_region
+table_name: tiktok_campaigns_by_campaign
 owner: caio.francisco@quintoandar.com.br
 domain: Growth

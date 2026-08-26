@@ -5,11 +5,10 @@ dag:
   schedule_interval: "0 4 * * *"
   documentation:
     dag_purpose: |
-      TikTok Campaigns DAG retrieves QuintoAndar marketing campaign metrics from the TikTok
-      Business API integrated report endpoint at ad level by day. It loads two grains: an
-      AUDIENCE report broken down by province, and a BASIC report without region so spend
-      and delivery can be compared without geographic clustering. Data is ingested into the
-      raw layer and normalized in clean for downstream growth analytics.
+      TikTok Campaigns DAG retrieves QuintoAndar marketing campaign audience metrics from the
+      TikTok Business API integrated report endpoint. It loads two grains, both broken down
+      by province: ad level (AUCTION_AD) and campaign level (AUCTION_CAMPAIGN). Data is
+      ingested into the raw layer and normalized in clean for downstream growth analytics.
 workflow:
   type: custom_ingestion
   layer: raw
@@ -28,4 +27,4 @@ workflow:
     - "{table_name}"
   tables_customization:
     tiktok_campaigns: {}
-    tiktok_campaigns_without_region: {}
+    tiktok_campaigns_by_campaign: {}

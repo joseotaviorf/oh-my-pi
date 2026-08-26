@@ -1,13 +1,11 @@
 ---
-table_name: datalake_tiktok_campaigns_clean.tiktok_campaigns_without_region
+table_name: datalake_tiktok_campaigns_clean.tiktok_campaigns_by_campaign
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
     greater_than: 0
 column_level_validations:
   id_advertiser:
-    is_complete:
-  id_adgroup:
     is_complete:
   id_campaign:
     is_complete:

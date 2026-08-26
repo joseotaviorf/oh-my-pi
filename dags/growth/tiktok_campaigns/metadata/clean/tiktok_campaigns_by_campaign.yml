@@ -1,0 +1,59 @@
+---
+database_name: datalake_tiktok_campaigns_clean
+table_name: tiktok_campaigns_by_campaign
+owner: caio.francisco@quintoandar.com.br
+domain: Growth
+description: |
+  TikTok campaign audience metrics by day and province, sourced from the TikTok Business
+  API AUDIENCE integrated report at campaign data level. Grain is one row per campaign,
+  stat date, and province. Loaded so Growth can compare paid-media costs at campaign grain
+  alongside the ad-level audience table.
+columns:
+  id_advertiser:
+    description: TikTok advertiser account identifier for the campaign row.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.advertiser_id
+  id_campaign:
+    description: TikTok campaign identifier at the report grain.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.campaign_id
+  campaign_name:
+    description: Human-readable TikTok campaign name from the integrated report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.campaign_name
+  id_province:
+    description: TikTok province or region identifier for audience breakdown in the report.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.province_id
+  spend:
+    description: Media spend in account currency for the campaign on the stat date and province.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.spend
+  impressions:
+    description: Number of ad impressions served for the campaign on the stat date and province.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.impressions
+  reach:
+    description: Estimated unique users reached for the campaign on the stat date and province.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.reach
+  clicks:
+    description: Number of clicks for the campaign on the stat date and province.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.clicks
+  dt_stat:
+    description: Calendar date of the TikTok campaign audience metrics row (stat_time_day from the API).
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.dt_stat
+  year:
+    description: Year of the TikTok campaign audience metrics row, derived from the stat date.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.year
+  month:
+    description: Month of the TikTok campaign audience metrics row, derived from the stat date.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.month
+  day:
+    description: Day of the TikTok campaign audience metrics row, derived from the stat date.
+    lineage:
+      - datalake_tiktok_campaigns_raw.tiktok_campaigns_by_campaign.day
