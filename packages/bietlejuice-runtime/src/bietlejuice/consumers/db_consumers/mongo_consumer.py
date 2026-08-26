@@ -21,6 +21,17 @@ NB_DOCUMENTS = 100000
 BATCH_SIZE = 20_000
 
 
+def _summarize_batch(batch) -> str:
+    """Compact batch metadata for logs (never dump document payloads)."""
+    if not batch:
+        return "batch_len=0"
+    first = batch[0]
+    if not isinstance(first, dict):
+        return f"batch_len={len(batch)}"
+    sample_id = first.get("_id", first.get("id", "-"))
+    return f"batch_len={len(batch)}, field_count={len(first)}, sample_id={sample_id!r}"
+
+
 class MongoConsumer(DBConsumer):
     """
     Gets data from a Mongo database through MongoClient passed by param and
@@ -98,7 +109,7 @@ class MongoConsumer(DBConsumer):
 
         return converted_data
 
-    @logger(exclude_return=True)
+    @logger.elapsed_time
     def __convert_batch_to_spark_dataframe(self, batch):
         """
         Converts a list of BSON documents to a Spark DataFrame.
@@ -222,7 +233,7 @@ class MongoConsumer(DBConsumer):
         ):
             logger.info(
                 f"m=get_data_from_query, table_name={table_name}, "
-                f"nb_documents={nb_documents}, batch_size={len(batch)}, "
+                f"nb_documents={nb_documents}, {_summarize_batch(batch)}, "
                 f"msg=Processing batch..."
             )
             df = self.__convert_batch_to_spark_dataframe(batch)
