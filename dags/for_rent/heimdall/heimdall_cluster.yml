@@ -26,5 +26,8 @@ validation:
         - r7g.xlarge
         - r6i.xlarge
       spark_conf:
-        spark.yarn.am.memory: 3g
-        spark.driver.memory: 8g
+        # Mongo full pull materializes documents in the PySpark driver process.
+        # EMR submit is client mode: the driver runs on the master node, not in the
+        # YARN AM. Leave AM at the fleet default (~1g); do not size it like the driver.
+        spark.driver.memory: 24g
+        spark.driver.memoryOverhead: 8g
