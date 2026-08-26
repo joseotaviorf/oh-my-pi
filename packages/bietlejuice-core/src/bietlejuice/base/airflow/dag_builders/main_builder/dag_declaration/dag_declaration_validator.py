@@ -159,6 +159,12 @@ class DAGDeclarationValidator(Validator):
                             "empty": False,
                             "required": False,
                         },
+                        "tables": {
+                            "type": "list",
+                            "empty": False,
+                            "required": False,
+                            "schema": {"type": "string", "empty": False},
+                        },
                     },
                 },
                 "serialize_dq_after_default_row": {

@@ -17,6 +17,8 @@ Rollout model (see the RFC "Concrete names & decisions"):
   explicitly opts in. Phase 2 = flip to True (profiling becomes opt-out).
 * ``dag_enabled`` — the per-DAG ``observability: {enabled: ...}`` declaration,
   passed in per capture; ``None`` means the DAG did not declare the block.
+* Optional ``observability.tables`` (handled at DAG-build time, not here) is a
+  clean-table allowlist so a large CDC DAG can opt in a subset of tables.
 """
 
 from __future__ import annotations

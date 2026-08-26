@@ -344,6 +344,10 @@ class BaseWorkflow(BuilderInterface):
         Gated by the ``observability`` declaration block (opt-in per DAG) and the
         global runtime kill-switch / default (``ProfilingConfig``). Validation DAGs
         never profile. The gate config is resolved once per workflow.
+
+        Optional ``observability.tables`` is a clean-table allowlist: when present
+        and non-empty, only those tables get a profiling task (so a large CDC DAG
+        can opt in a TARS subset without profiling every table).
         """
         if self.is_validation:
             return False
@@ -353,7 +357,12 @@ class BaseWorkflow(BuilderInterface):
             self._profiling_config = ProfilingConfig.from_configuration_service(
                 self.config_service
             )
-        return self._profiling_config.is_profiling_active(dag_enabled)
+        if not self._profiling_config.is_profiling_active(dag_enabled):
+            return False
+        tables = observability.get("tables") or []
+        if not tables:
+            return True
+        return table_attributes.table_name in {str(name) for name in tables}
 
     def _check_include_propagate_metadata_task(
         self, table_attributes: TableAttributes

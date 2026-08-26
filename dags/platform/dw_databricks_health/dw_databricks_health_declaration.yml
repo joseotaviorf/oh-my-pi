@@ -32,6 +32,9 @@ dag:
       databricks_usage. Actual deletion happens in follow-up PRs once this
       fact proves parity (~2 weeks of side-by-side runs).
 workflow:
+  observability:
+    enabled: true
+    tables: [fact_databricks_task_run]
   type: query_delta
   layer: dw
   custom_schema: databricks_health

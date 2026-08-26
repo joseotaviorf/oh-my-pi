@@ -1,7 +1,7 @@
 """Unit tests for RawCDCWorkflow max_tables_per_cluster configuration."""
 
 from contextlib import nullcontext as does_not_raise
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -165,3 +165,77 @@ class TestRawCDCWorkflowMaxTablesPerCluster:
 
         with expectation:
             DAGDeclarationValidator().validate(dag_declaration=dag_declaration)
+
+
+class TestRawCDCWorkflowProfiling:
+    @pytest.fixture
+    def workflow(self):
+        from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_cdc_workflow import (
+            RawCDCWorkflow,
+        )
+
+        with patch(
+            "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow.ConfigurationService"
+        ):
+            return RawCDCWorkflow(
+                {
+                    "name": "test_cdc_dag",
+                    "owner": "Data Engineering",
+                    "schedule_interval": "0 0 * * *",
+                },
+                {
+                    "type": "cdc",
+                    "layer": "raw",
+                    "database_type": "postgres",
+                    "tables_customization": {"traces": {}},
+                },
+                {
+                    "type": "databricks_16_4_min_memory_cluster",
+                    "databricks_conn_id": "databricks_new",
+                },
+            )
+
+    def test_create_clean_tasks_adds_profiling_when_gated_on(self, workflow):
+        # arrange
+        load_task = MagicMock(name="load_clean")
+        profiling_task = MagicMock(name="profiling_clean")
+        dag_final_tasks = MagicMock(name="dag_final")
+        optimize_clean_task = MagicMock(name="optimize_clean")
+        table_attrs = Mock()
+        workflow._check_include_sync_hive_tasks = Mock(return_value=False)
+        workflow._check_include_data_quality_task = Mock(return_value=False)
+        workflow._check_include_profiling_task = Mock(return_value=True)
+        workflow.load_cdc_clean_task_creator = Mock()
+        workflow.load_cdc_clean_task_creator.create_task.return_value = load_task
+        workflow.profiling_task_creator = Mock()
+        workflow.profiling_task_creator.create_task.return_value = profiling_task
+
+        # act
+        first, last = workflow._create_clean_tasks(
+            table_attrs, optimize_clean_task, dag_final_tasks
+        )
+
+        # assert
+        assert first is load_task
+        assert last is load_task
+        workflow.profiling_task_creator.create_task.assert_called_once_with(table_attrs)
+        load_task.__rshift__.assert_any_call(profiling_task)
+
+    def test_create_clean_tasks_skips_profiling_when_gated_off(self, workflow):
+        # arrange
+        load_task = MagicMock(name="load_clean")
+        dag_final_tasks = MagicMock(name="dag_final")
+        optimize_clean_task = MagicMock(name="optimize_clean")
+        table_attrs = Mock()
+        workflow._check_include_sync_hive_tasks = Mock(return_value=False)
+        workflow._check_include_data_quality_task = Mock(return_value=False)
+        workflow._check_include_profiling_task = Mock(return_value=False)
+        workflow.load_cdc_clean_task_creator = Mock()
+        workflow.load_cdc_clean_task_creator.create_task.return_value = load_task
+        workflow.profiling_task_creator = Mock()
+
+        # act
+        workflow._create_clean_tasks(table_attrs, optimize_clean_task, dag_final_tasks)
+
+        # assert
+        workflow.profiling_task_creator.create_task.assert_not_called()

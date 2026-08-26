@@ -30,6 +30,31 @@ class TestDAGDeclarationValidator:
                     "workflow": {
                         "type": "query_delta",
                         "layer": "enrich",
+                        "observability": {
+                            "enabled": True,
+                            "tables": ["traces", "sessions"],
+                        },
+                    },
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                },
+                does_not_raise(),
+            ),
+            (
+                {
+                    "workflow": {
+                        "type": "query_delta",
+                        "layer": "enrich",
+                        "observability": {"enabled": True, "tables": [1]},
+                    },
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                },
+                pytest.raises(AssertionError),
+            ),
+            (
+                {
+                    "workflow": {
+                        "type": "query_delta",
+                        "layer": "enrich",
                         "observability": {"enabled": "yes"},
                     },
                     "dag": {"name": "any_dag_name", "owner": "Data Engineering"},

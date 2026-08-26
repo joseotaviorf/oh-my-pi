@@ -115,6 +115,9 @@ class RawCDCWorkflow(BaseWorkflow):
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
+        self.profiling_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.PROFILING
+        )
         self.generate_database_table_metrics_task_creator = (
             task_creator_factory.get_task_creator(
                 TaskEnum.GENERATE_DATABASE_TABLE_METRICS
@@ -375,6 +378,12 @@ class RawCDCWorkflow(BaseWorkflow):
                 clean_table_attributes
             )
             (load_clean_task >> data_quality_tests_clean_task >> dag_final_tasks)
+
+        if self._check_include_profiling_task(clean_table_attributes):
+            profiling_clean_task = self.profiling_task_creator.create_task(
+                clean_table_attributes
+            )
+            (load_clean_task >> profiling_clean_task >> dag_final_tasks)
 
         return load_clean_task, last_clean_task
 

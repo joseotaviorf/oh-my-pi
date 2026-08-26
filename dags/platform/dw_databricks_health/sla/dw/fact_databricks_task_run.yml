@@ -1,0 +1,7 @@
+database_name: dw_databricks_health
+table_name: fact_databricks_task_run
+checks:
+  - type: empty_partition
+  - type: stale_data
+    column: ts_load
+    max_age_hours: 36
