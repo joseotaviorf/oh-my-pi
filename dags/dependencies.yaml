@@ -1421,6 +1421,13 @@ bietlejuice.enrich_agent_payments:
   - bietlejuice.enrich_big_agent_incentives:load-enrich-partner-tier:first-run-of-day
   - bietlejuice.enrich_hub_services:load-enrich-member-profile:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
+bietlejuice.enrich_agent_performance:
+  - bietlejuice.ebdb_agent:load-clean-agent-lead-referral:first-run-of-day
+  - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day
 bietlejuice.enrich_agent_reports:
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
