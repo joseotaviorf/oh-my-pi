@@ -1,4 +1,24 @@
 alerts:
+  creci_out_of_sync_2d:
+    description: Active 1P agents with CRECI divergence across DadosAgente, Partner, and Person for over 2 days.
+    channel: "#alerts_agent_domain_inconsistencies"
+    cron: "0 12 * * *"
+    threshold: 0
+    severity: Error
+    id_column: uuid_person
+    value_column: agent_type
+    criteria_sql: |
+      SELECT
+        csd.uuid_person,
+        csd.agent_type
+      FROM datalake_agents_validation.creci_sync_divergence AS csd
+      WHERE csd.uuid_person IS NOT NULL
+        AND csd.agent_type = 'CORRETOR_5A'
+        AND GREATEST(
+              COALESCE(csd.ts_database_transaction_agent_data, TIMESTAMP '1970-01-01'),
+              COALESCE(csd.ts_database_transaction_partner, TIMESTAMP '1970-01-01'),
+              COALESCE(csd.ts_database_transaction_identity_document, TIMESTAMP '1970-01-01')
+            ) < CURRENT_TIMESTAMP() - INTERVAL 2 DAYS
   prospect_waiting_conversion_6h:
     description: Prospect agents stuck in WAITING_CONVERSION for more than 6 hours.
     channel: "#alerts_agent_accreditation"
