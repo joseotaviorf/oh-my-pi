@@ -11,6 +11,9 @@ dag:
       crm_recommendation_email_disengaged_users is the Braze "geladeira"
       set: users with at least 14 recommendation-canvas sends and zero opens
       in the 14 days before their last send, still in the 30-day quarantine.
+      crm_recommendation_sale_users is the sale-context equivalent of the
+      listing-view set, excluding recent rent signers and buyers who closed a
+      sale agreement in the last year, and it also carries the contact phone.
       Scheduling is dataset-driven (no cron): the DAG runs after the first
       successful daily run of every upstream in dags/dependencies.yaml, so
       tables are ready before the 09:00 Hightouch sync. Output columns match
@@ -26,4 +29,6 @@ workflow:
     crm_recommendation_email_users:
       z_order_by: [id_user]
     crm_recommendation_email_disengaged_users:
+      z_order_by: [id_user]
+    crm_recommendation_sale_users:
       z_order_by: [id_user]
