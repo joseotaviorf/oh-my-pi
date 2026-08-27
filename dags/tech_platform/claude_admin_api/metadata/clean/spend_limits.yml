@@ -3,28 +3,93 @@ table_name: spend_limits
 owner: gabriel.berger@quintoandar.com.br
 domain: Tech Platform
 description: |
-  Claude Enterprise Admin effective spend-limit records for QuintoAndar workforce seats, passed through from the Admin API raw ingest.
-  One row per API spend-limit record in a load batch, with the vendor JSON kept in payload.
-  Covers organization effective spend limits returned by the Admin spend_limits endpoint.
-  Used to create datalake_claude_usage_clean so Data Contracts can attach; explode payload in a later clean revision.
+  Claude Enterprise effective spend limits for QuintoAndar workforce seats.
+  One row per member (id_user) and period, from the latest daily snapshot.
+  id_spend_limit is not the grain: inherited org/group/seat limits reuse the
+  same value across members. Flattens vendor JSON from the Admin spend limits
+  endpoint into typed columns.
 columns:
-  payload:
-    description: Vendor JSON string for one Admin effective spend-limit record from the Claude Enterprise API, retained for schema-stable clean bootstrap until fields are projected.
+  id_spend_limit:
+    description: Vendor identifier for the effective spend limit record (e.g. 'spl_011CReAqK5DGX6fqXqoBSpFn').
     lineage:
       - datalake_claude_usage_raw.spend_limits.payload
+
+  id_user:
+    description: Claude user identifier in the spend limit scope when scope type is user (e.g. 'user_011CReAqK5DGX6fqXqoBSpFn').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  id_actor_user:
+    description: Claude user identifier for the actor associated with the spend limit (e.g. 'user_011CReAqK5DGX6fqXqoBSpFn').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  id_source_user:
+    description: Claude user identifier in the spend limit source when source type is user (e.g. 'user_011CReAqK5DGX6fqXqoBSpFn').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  id_source_rbac_group:
+    description: RBAC group identifier in the spend limit source when source type is rbac_group (e.g. 'rbac_group_011CReAqK5DGX6fqXqoBSpFn').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  email_actor:
+    description: Work email address for the actor associated with the spend limit (e.g. 'jane.doe@quintoandar.com').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  name_actor:
+    description: Display name for the actor associated with the spend limit (e.g. 'Jane Doe').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  type_actor:
+    description: Vendor actor type for the spend limit record (e.g. 'user_actor').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  type_scope:
+    description: Vendor scope type for the spend limit (for example user).
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  type_source:
+    description: Vendor source type for the spend limit (for example rbac_group).
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  seat_tier:
+    description: Seat tier associated with the spend limit source when provided by the vendor (e.g. 'standard').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  period:
+    description: Spend limit period cadence reported by the vendor (for example monthly).
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  currency:
+    description: Currency code for the spend limit amount (e.g. 'USD').
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  sum_spend_limit_amount:
+    description: Configured spend limit amount for the period.
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  sum_period_to_date_spend:
+    description: Spend accumulated in the current period to date.
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
+  is_actor_deleted:
+    description: Whether the vendor marks the associated actor as deleted.
+    lineage:
+      - datalake_claude_usage_raw.spend_limits.payload
+
   ts_load:
-    description: Timestamp when the Spark api_ingestion job wrote the raw row into the lake for this spend-limit record.
+    description: Timestamp when the Spark api_ingestion job wrote the source raw row.
     lineage:
       - datalake_claude_usage_raw.spend_limits.ts_load
-  year:
-    description: Airflow ingestion partition year derived from the load timestamp.
-    lineage:
-      - datalake_claude_usage_raw.spend_limits.year
-  month:
-    description: Airflow ingestion partition month derived from the load timestamp.
-    lineage:
-      - datalake_claude_usage_raw.spend_limits.month
-  day:
-    description: Airflow ingestion partition day derived from the load timestamp.
-    lineage:
-      - datalake_claude_usage_raw.spend_limits.day
