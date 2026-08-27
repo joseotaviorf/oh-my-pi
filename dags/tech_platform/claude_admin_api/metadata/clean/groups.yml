@@ -1,0 +1,66 @@
+database_name: datalake_claude_usage_clean
+table_name: groups
+owner: gabriel.berger@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Claude Enterprise RBAC groups used to manage role-based access for QuintoAndar workforce seats.
+  One row per id after deduplication from overlapping admin snapshot loads.
+  Flattens vendor JSON from the Admin RBAC Groups endpoint into typed columns.
+columns:
+  id:
+    description: Vendor RBAC group identifier (rbac_group_...) (e.g. 'rbac_group_011CReAqK5DGX6fqXqoBSpFn').
+    lineage:
+      - datalake_claude_usage_raw.groups.payload
+
+  name_group:
+    description: Display name of the RBAC group, as shown in the organization's admin settings (e.g. 'Engineering Team').
+    lineage:
+      - datalake_claude_usage_raw.groups.payload
+
+  type_group:
+    description: Vendor object type discriminator for the record; always rbac_group (e.g. 'rbac_group').
+    lineage:
+      - datalake_claude_usage_raw.groups.payload
+
+  type_source:
+    description: How the RBAC group was created (e.g. 'direct').
+    lineage:
+      - datalake_claude_usage_raw.groups.payload
+    categories:
+      direct: Created in the organization's admin settings.
+      scim: Provisioned by the identity provider; membership cannot be modified via the Admin API.
+
+  roles:
+    description: RBAC role IDs attached to the group. Role attachment is managed in the organization's admin settings and is read-only via this API (e.g. ['role_01AbCdEfGhIjKlMnOpQrStUv']).
+    lineage:
+      - datalake_claude_usage_raw.groups.payload
+
+  ts_created:
+    description: Timestamp when the RBAC group was created.
+    lineage:
+      - datalake_claude_usage_raw.groups.payload
+
+  ts_updated:
+    description: Timestamp when the RBAC group was last updated, for example renamed or had its roles changed.
+    lineage:
+      - datalake_claude_usage_raw.groups.payload
+
+  ts_load:
+    description: Timestamp when the Spark api_ingestion job wrote the source raw row.
+    lineage:
+      - datalake_claude_usage_raw.groups.ts_load
+
+  year:
+    description: Ingestion partition year, derived from ts_load (job run time); this endpoint has no date_filter_column, so it is not derived from the API payload.
+    lineage:
+      - datalake_claude_usage_raw.groups.year
+
+  month:
+    description: Ingestion partition month, derived from ts_load (job run time); this endpoint has no date_filter_column, so it is not derived from the API payload.
+    lineage:
+      - datalake_claude_usage_raw.groups.month
+
+  day:
+    description: Ingestion partition day, derived from ts_load (job run time); this endpoint has no date_filter_column, so it is not derived from the API payload.
+    lineage:
+      - datalake_claude_usage_raw.groups.day

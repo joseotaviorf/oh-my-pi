@@ -110,6 +110,8 @@ workflow:
     groups:
       endpoint_path: v1/organizations/rbac_groups
       extraction_type: incremental
+      merge_on:
+        - id
       params: {}
       http_headers:
         anthropic-beta: "ce-user-management-2026-07-13"
