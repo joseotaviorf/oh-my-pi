@@ -1,0 +1,33 @@
+dag:
+  name: dw_crm_homes_property_matched
+  owner: Data SS
+  catchup: false
+  max_active_runs: 1
+  schedule_interval: "0 * * * *"
+  schedule_start_date: "2026, 8, 26"
+  documentation:
+    dag_purpose: |
+      Hourly incremental load of CDP homes_property_matched events for Salesforce
+      Homes push and WhatsApp journeys. Each run processes exactly its own hour,
+      the half-open window [load_start_date, load_end_date), and writes the
+      matching partition_date / partition_hour partition. The window comes from the Airflow
+      data interval rather than CURRENT_TIMESTAMP, so re-running an interval
+      reproduces the same rows. Output columns match the Hightouch model,
+      including listing URLs with ZEBRA UTM params, contact phone/email from
+      dim_user, and parsed listing/alert properties. daily_entry_count is ranked
+      over the whole source day partition, so it stays a true per-day counter.
+      Runs on a single-node EMR cluster. CDP transactional is real-time;
+      dim_user is joined as-of the latest warehouse snapshot.
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: crm_recommendations
+  default_extraction_type: incremental
+  default_partitions: [partition_date, partition_hour]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start.strftime('%Y-%m-%d %H:00:00'), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end.strftime('%Y-%m-%d %H:00:00'), 'load_end_date') }}"
+  tables_customization:
+    crm_homes_property_matched:
+      z_order_by: [id_user]

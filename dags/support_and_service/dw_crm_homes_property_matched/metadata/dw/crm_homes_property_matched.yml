@@ -1,0 +1,428 @@
+---
+database_name: dw_crm_recommendations
+table_name: crm_homes_property_matched
+description: >
+  Hourly incremental load of CDP homes_property_matched events for one hour,
+  inner-joined to dim_user so only users with a main phone remain. Grain is one
+  row per matching event. Columns follow the Hightouch Salesforce Homes model,
+  including listing URLs with ZEBRA push and WhatsApp UTM parameters, alert
+  conditions, and Event Gateway attribution fields.
+domain: Support and Services
+owner: gustavo.brunelli@quintoandar.com.br
+columns:
+  id_event:
+    description: >
+      Unique CDP event id of this homes_property_matched emission. Grain of the snapshot is
+      one row per event inside the run's hour window that also passed the dim_user phone
+      filter. Runs do not overlap, so an id_event appears in exactly one hour partition.
+    lineage:
+      - datalake_cdp_clean.transactional.id_event
+  id_person:
+    description: >
+      Person identifier resolved on the transactional event when identity resolution is
+      available. Null when the Event Gateway payload has no person uuid.
+    lineage:
+      - datalake_cdp_clean.transactional.id_person
+  id_user:
+    description: >
+      Platform user id of the alert subscriber who received the property match. Join key to
+      dim_user.sk_user; required for Salesforce contact mapping and UTM id params.
+    lineage:
+      - datalake_cdp_clean.transactional.id_user
+      - dw_public.dim_user.sk_user
+  telefone_principal:
+    description: >
+      Main phone from dim_user with a leading plus stripped so Salesforce/WhatsApp can dial
+      it. Rows without a main phone are excluded before URL assembly.
+    lineage:
+      - dw_public.dim_user.telefone_principal
+  email:
+    description: >
+      Primary email from dim_user copied for the Hightouch Salesforce sync. Not filtered
+      beyond the inner join that requires a non-null main phone.
+    lineage:
+      - dw_public.dim_user.email
+  id_entity:
+    description: >
+      Device or entity identifier from the transactional event payload. Used for debugging
+      which client surface emitted the match.
+    lineage:
+      - datalake_cdp_clean.transactional.id_entity
+  id_house:
+    description: >
+      House identifier attached on the transactional event when present. Complements
+      event_house_id parsed from event_properties.
+    lineage:
+      - datalake_cdp_clean.transactional.id_house
+  application:
+    description: >
+      Application or product surface that emitted the homes_property_matched event, lowercased
+      by CDP.
+    lineage:
+      - datalake_cdp_clean.transactional.application
+  journey_step:
+    description: >
+      Journey or funnel step label on the transactional event when tracking defined one.
+    lineage:
+      - datalake_cdp_clean.transactional.journey_step
+  event_name:
+    description: >
+      Transactional event name. This table only keeps homes_property_matched rows from the
+      hour each run loads.
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+  event_house_id:
+    description: >
+      House id extracted from event_properties.houseId. The listing that matched the user's
+      Homes alert.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_alert_id:
+    description: >
+      Homes alert id extracted from event_properties.alertId. Appended to listing URLs as the
+      alert query param.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_business_context:
+    description: >
+      Business context extracted from event_properties.businessContext (rent or sale).
+      Lowercased into the ZEBRA UTM campaign path.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_area:
+    description: >
+      Listing area in square meters from event_properties.area, stored as the original JSON
+      scalar string.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_bedrooms:
+    description: >
+      Bedroom count advertised on the matched listing, from event_properties.bedrooms.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_bathrooms:
+    description: >
+      Bathroom count advertised on the matched listing, from event_properties.bathrooms.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_suites:
+    description: >
+      Suite count advertised on the matched listing, from event_properties.suites.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_parking_spaces:
+    description: >
+      Parking-space count advertised on the matched listing, from
+      event_properties.parkingSpaces.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_total_cost:
+    description: >
+      Total cost shown on the matched listing (rent plus condo/taxes when applicable), from
+      event_properties.totalCost.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_city:
+    description: >
+      City name of the matched listing from event_properties.city.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_region_name:
+    description: >
+      Neighborhood or region name of the matched listing from event_properties.regionName.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_address:
+    description: >
+      Street address of the matched listing from event_properties.address.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_listing_url:
+    description: >
+      Base listing URL from event_properties.listingUrl before Salesforce UTM parameters are
+      appended.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.id_user
+  event_ios_listing_deeplink:
+    description: >
+      iOS listing deeplink from event_properties.iosListingDeeplink for the push journey.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_cover_image:
+    description: >
+      Cover image URL of the matched listing from event_properties.coverImage.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_short_id:
+    description: >
+      Short public listing id from event_properties.shortId, used in quin.to links.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_rent:
+    description: >
+      Monthly rent of the matched listing from event_properties.rent, stored as the original
+      JSON scalar string.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_sale_price:
+    description: >
+      Sale price of the matched listing from event_properties.salePrice when the alert is for
+      sale.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_condo_iptu:
+    description: >
+      Condo plus IPTU amount from event_properties.condoIptu, stored as the original JSON
+      scalar string.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_property_type:
+    description: >
+      Property type of the matched listing from event_properties.propertyType (apartment,
+      house, and similar).
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_search_with_filters_url:
+    description: >
+      Search-results URL that reproduces the alert filters, from
+      event_properties.searchWithFiltersUrl.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_alert_region_name:
+    description: >
+      Region name saved on the Homes alert from event_properties.alertRegionName, which may
+      differ from the listing region.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_conditions_price_max:
+    description: >
+      Maximum price filter on the Homes alert from event_properties.conditions.priceMax.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_conditions_area_min:
+    description: >
+      Minimum area filter on the Homes alert from event_properties.conditions.areaMin.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_conditions_area_max:
+    description: >
+      Maximum area filter on the Homes alert from event_properties.conditions.areaMax.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_conditions_house_type:
+    description: >
+      JSON array of house types selected on the Homes alert, from
+      event_properties.conditions.houseType.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_conditions_bedrooms:
+    description: >
+      JSON array of bedroom filters on the Homes alert, from
+      event_properties.conditions.bedrooms.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_conditions_parking_spaces:
+    description: >
+      JSON array of parking-space filters on the Homes alert, from
+      event_properties.conditions.parkingSpaces.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_conditions_amenities:
+    description: >
+      JSON array of amenity filters on the Homes alert, from
+      event_properties.conditions.amenities.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_listing_url_push1:
+    description: >
+      Listing URL with Salesforce Push1 UTM parameters (ZEBRA Homes push campaign, term
+      Push1.24.07) for the first push variant.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.id_user
+  event_listing_url_push2:
+    description: >
+      Listing URL with Salesforce Push2 UTM parameters (ZEBRA Homes push campaign, term
+      Push2.24.07) for the second push variant.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.id_user
+  event_listing_url__push3:
+    description: >
+      Listing URL with Salesforce Push3 UTM parameters (ZEBRA Homes push campaign, term
+      Push3.24.07). Column name keeps the original double underscore from the Hightouch model.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.id_user
+  event_listing_url_wppsfmc:
+    description: >
+      Listing URL with Salesforce Marketing Cloud WhatsApp UTM parameters
+      (whatsapp_sfmc.24.07) for the SFMC WhatsApp journey.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.id_user
+  event_listing_url_wpp:
+    description: >
+      Listing URL with Twilio WhatsApp UTM parameters (whatsapp_twilio.24.07) for the Twilio
+      WhatsApp journey.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.id_user
+  event_listing_url_wppsfmc_cta:
+    description: >
+      SFMC WhatsApp listing URL with the https://quin.to/ prefix stripped so Salesforce can
+      use it as a short CTA path.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.id_user
+  event_listing_url_wpp_cta:
+    description: >
+      Twilio WhatsApp listing URL with the https://quin.to/ prefix stripped so Salesforce can
+      use it as a short CTA path.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.id_user
+  event_subs_whatsapp:
+    description: >
+      Whether the user is subscribed to WhatsApp Homes alerts, from
+      event_properties.subscriptions.whatsapp.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_subs_email:
+    description: >
+      Whether the user is subscribed to email Homes alerts, from
+      event_properties.subscriptions.email.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_subs_push:
+    description: >
+      Whether the user is subscribed to push Homes alerts, from
+      event_properties.subscriptions.push.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_device_id:
+    description: >
+      Event Gateway device id from event_properties.egw_device_id at match time.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_session_id:
+    description: >
+      Event Gateway session id from event_properties.egw_session_id at match time.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_user_agent:
+    description: >
+      User agent captured by Event Gateway on the match event, from
+      event_properties.egw_user_agent.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_ip:
+    description: >
+      Client IP captured by Event Gateway on the match event, from event_properties.egw_ip.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_platform:
+    description: >
+      Client platform captured by Event Gateway on the match event, from
+      event_properties.egw_platform.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_apps_flyer_id:
+    description: >
+      AppsFlyer id captured by Event Gateway on the match event, from
+      event_properties.egw_apps_flyer_id.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_referrer_domain:
+    description: >
+      Last referrer domain captured by Event Gateway, from
+      event_properties.egw_referrer_domain.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_initial_referrer_domain:
+    description: >
+      First referrer domain of the session captured by Event Gateway, from
+      event_properties.egw_initial_referrer_domain.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_utm_source:
+    description: >
+      Last UTM source captured by Event Gateway on the match event, from
+      event_properties.egw_utm_source.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_utm_medium:
+    description: >
+      Last UTM medium captured by Event Gateway on the match event, from
+      event_properties.egw_utm_medium.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_utm_campaign:
+    description: >
+      Last UTM campaign captured by Event Gateway on the match event, from
+      event_properties.egw_utm_campaign.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_initial_utm_source:
+    description: >
+      First UTM source of the session captured by Event Gateway, from
+      event_properties.egw_initial_utm_source.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_initial_utm_medium:
+    description: >
+      First UTM medium of the session captured by Event Gateway, from
+      event_properties.egw_initial_utm_medium.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_initial_utm_campaign:
+    description: >
+      First UTM campaign of the session captured by Event Gateway, from
+      event_properties.egw_initial_utm_campaign.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_gclid:
+    description: >
+      Google Click Identifier captured by Event Gateway on the match event, from
+      event_properties.egw_gclid.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  event_egw_fbclid:
+    description: >
+      Facebook Click Identifier captured by Event Gateway on the match event, from
+      event_properties.egw_fbclid.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  ts_event:
+    description: >
+      Client-reported match timestamp formatted as yyyy-MM-dd HH:mm:ss for Salesforce. Bounded
+      by the run window [load_start_date, load_end_date), and the source of both partition keys.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+  daily_entry_count:
+    description: >
+      1-based rank of this match for the user on that calendar day, ordered by ts_event
+      ascending. The first match of the day is 1. Ranked over the full day partition before
+      the hour load window is applied, so it counts every match that day, not only the
+      ones in this run.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+  alert_creation_date:
+    description: >
+      Homes alert creation time from event_properties.alertCreationDate, parsed from ISO-8601
+      and formatted as yyyy-MM-dd HH:mm:ss for Salesforce.
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+  partition_date:
+    description: >
+      Calendar date (UTC) of ts_event. First partition key: each hourly run writes only the
+      partition_date / partition_hour partition covered by its load window.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+  partition_hour:
+    description: >
+      Hour of day (0-23, UTC) of ts_event. Second partition key, matching the hourly run
+      window so a re-run replaces exactly the hour it loaded.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event

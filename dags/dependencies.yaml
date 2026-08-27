@@ -466,6 +466,8 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts:first-run-of-day
   - bietlejuice.enrich_offer:load-enrich-offer:first-run-of-day
   - bietlejuice.heimdall:load-clean-activity:first-run-of-day
+bietlejuice.dw_crm_homes_property_matched:
+  - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
 bietlejuice.dw_crm_inspections:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow:first-run-of-day
