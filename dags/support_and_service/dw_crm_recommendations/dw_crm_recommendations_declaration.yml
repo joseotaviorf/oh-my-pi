@@ -1,0 +1,29 @@
+dag:
+  name: dw_crm_recommendations
+  owner: Data SS
+  catchup: false
+  schedule_start_date: "2026, 8, 25"
+  documentation:
+    dag_purpose: |
+      Daily full snapshots of CRM recommendation-email audiences for Hightouch.
+      crm_recommendation_email_users is the listing-view eligibility set
+      for [FR][CRM] Recommendations_Email_Salesforce.
+      crm_recommendation_email_disengaged_users is the Braze "geladeira"
+      set: users with at least 14 recommendation-canvas sends and zero opens
+      in the 14 days before their last send, still in the 30-day quarantine.
+      Scheduling is dataset-driven (no cron): the DAG runs after the first
+      successful daily run of every upstream in dags/dependencies.yaml, so
+      tables are ready before the 09:00 Hightouch sync. Output columns match
+      the Hightouch models (id_user, email/email_address, uuid_person).
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: crm_recommendations
+  default_extraction_type: full
+  default_partitions: []
+  tables_customization:
+    crm_recommendation_email_users:
+      z_order_by: [id_user]
+    crm_recommendation_email_disengaged_users:
+      z_order_by: [id_user]

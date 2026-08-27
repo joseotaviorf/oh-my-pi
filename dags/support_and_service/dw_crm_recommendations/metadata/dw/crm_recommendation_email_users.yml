@@ -1,0 +1,38 @@
+---
+database_name: dw_crm_recommendations
+table_name: crm_recommendation_email_users
+description: >
+  Daily snapshot of rent-context users eligible for the Salesforce CRM listing-recommendation
+  email (Hightouch sync [FR][CRM] Recommendations_Email_Salesforce). Grain is one row per
+  user currently in the audience: odd-id users with more than two rent listing_page_viewed
+  events in the last 30 days, excluding tenants who signed a contract in that window,
+  broker-domain emails, empty emails, and non-BR country codes. Columns match the Hightouch
+  model: id_user, email_address, uuid_person.
+domain: Support and Services
+owner: gustavo.brunelli@quintoandar.com.br
+columns:
+  id_user:
+    description: >
+      Platform user id of the eligible user, stored as a string so Hightouch can map it
+      to the Salesforce Contact without a type cast. Equals dim_user.sk_user / EBDB user
+      id. Built from CDP listing_page_viewed events (id_user not null, odd ids only, more
+      than two rent views in 30 days) anti-joined to tenants who signed a contract in
+      the same window.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_user
+      - dw_public.dim_user.sk_user
+      - core_contract.contract.id_tenant
+  email_address:
+    description: >
+      Contact email of the eligible user, copied from dim_user for the Hightouch Salesforce
+      sync. Empty strings and @corretores.quintoandar.com.br addresses are excluded; only
+      BR or null country_code users are kept.
+    lineage:
+      - dw_public.dim_user.email
+  uuid_person:
+    description: >
+      Person UUID of the eligible user, copied from dim_user so Hightouch can map the
+      Salesforce Contact without a second identity lookup. Null only if dim_user has no
+      uuid_person for that user.
+    lineage:
+      - dw_public.dim_user.uuid_person

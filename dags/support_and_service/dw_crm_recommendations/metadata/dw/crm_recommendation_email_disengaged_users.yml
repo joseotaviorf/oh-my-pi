@@ -1,0 +1,38 @@
+---
+database_name: dw_crm_recommendations
+table_name: crm_recommendation_email_disengaged_users
+description: >
+  Daily snapshot of rent-context users in the CRM recommendation-email "geladeira"
+  (disengaged) audience. Grain is one row per user who received at least 14 sends
+  from the Rent Recommendations Braze canvases in the 14 days before their last send,
+  opened none of those sends, is still inside the 30-day quarantine from last send,
+  and has no later open that would pardon them. Columns match the Hightouch model:
+  id_user, email, uuid_person.
+domain: Support and Services
+owner: gustavo.brunelli@quintoandar.com.br
+columns:
+  id_user:
+    description: >
+      Platform user id of the disengaged user. Equals dim_user.sk_user. Built from
+      tenant email dispatches of canvases Growth_Ret.D.GERAL.Rent.Recommendations
+      and ZEBRA.rent.eng.nonorg.na.d.email.braze.recommendations.diversas since 2026-01-01,
+      keeping users with at least 14 sends and zero opens in the 14-day window before
+      last send, last send within 30 days, and no open after that last send.
+    lineage:
+      - dw_braze.fact_canvas_user_dispatch.sk_user
+      - dw_braze.dim_canvas.canvas_name
+      - dw_public.dim_user.sk_user
+  email:
+    description: >
+      Contact email of the disengaged user, copied from dim_user for the Hightouch
+      Salesforce sync. Empty strings and @corretores.quintoandar.com.br addresses are
+      excluded; only BR or null country_code users are kept.
+    lineage:
+      - dw_public.dim_user.email
+  uuid_person:
+    description: >
+      Person UUID of the disengaged user, copied from dim_user so Hightouch can map the
+      Salesforce Contact without a second identity lookup. Null only if dim_user has no
+      uuid_person for that user.
+    lineage:
+      - dw_public.dim_user.uuid_person
