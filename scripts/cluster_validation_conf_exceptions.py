@@ -39,7 +39,6 @@ DAG_TEXT2FILTER_EVALS = "bietlejuice.text2filter_evals"
 DAG_CYBER_LEGAL = "bietlejuice.cyber_legal"
 DAG_GREENHOUSE_V3 = "bietlejuice.greenhouse_v3"
 DAG_DEMAND_BALANCER_SERVICE = "bietlejuice.demand_balancer_service"
-DAG_SEARCH_METRICS_SERVICE = "bietlejuice.search_metrics_service"
 DAG_CONVERSATION_EXPLORER = "bietlejuice.conversation_explorer"
 
 
@@ -167,7 +166,6 @@ VALIDATION_CONF_EXCEPTIONS: dict[str, ValidationConfResolver] = {
     DAG_CYBER_LEGAL: resolve_cyber_legal_conf,
     DAG_GREENHOUSE_V3: resolve_greenhouse_v3_conf,
     DAG_DEMAND_BALANCER_SERVICE: resolve_maestro_next_day_ingest_conf,
-    DAG_SEARCH_METRICS_SERVICE: resolve_maestro_next_day_ingest_conf,
     DAG_CONVERSATION_EXPLORER: resolve_conversation_explorer_conf,
 }
 

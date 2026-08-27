@@ -40,7 +40,6 @@ DAG:
     - bietlejuice.reverse_sale_listings_report
     - bietlejuice.reverse_tracksale_access
     - bietlejuice.reverse_tracksale_test
-    - bietlejuice.search_metrics_service
     - bietlejuice.services_integration_validations
     - bietlejuice.signup
     - bietlejuice.vocs_machina_planning

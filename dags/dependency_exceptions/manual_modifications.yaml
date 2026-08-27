@@ -1214,9 +1214,6 @@ bietlejuice.concierge_propensity_model_service:
 bietlejuice.demand_balancer_service:
   add:
     - quintoml.search.maestro.inference:first-run-of-day
-bietlejuice.search_metrics_service:
-  add:
-    - quintoml.search.search_monitoring.inference:first-run-of-day
 bietlejuice.text2filter_evals:
   add:
     - quintoml.copilot.text2filter_evals.inference:first-run-of-day

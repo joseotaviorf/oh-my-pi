@@ -4860,8 +4860,6 @@ bietlejuice.reverse_webhelp_access:
 bietlejuice.rightsizing_outcomes:
   - bietlejuice.astro:load-clean-dag-run:first-run-of-day
   - bietlejuice.dw_databricks_health:load-dw-databricks-health-fact-databricks-dag-run:first-run-of-day
-bietlejuice.search_metrics_service:
-  - quintoml.search.search_monitoring.inference:first-run-of-day
 bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.survicate_survey_attributes:

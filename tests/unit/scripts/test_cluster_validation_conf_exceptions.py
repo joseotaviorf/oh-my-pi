@@ -181,18 +181,6 @@ class TestResolveValidationConfForDag:
         assert conf["load_start_date"] == "2026-06-16"
         assert source == "exception:maestro_next_day_ingest"
 
-    def test_search_metrics_registered(self) -> None:
-        run = {
-            "data_interval_start": "2026-06-15T03:00:00+00:00",
-            "data_interval_end": "2026-06-16T03:00:00+00:00",
-        }
-        result = exc.resolve_validation_conf_for_dag(
-            exc.DAG_SEARCH_METRICS_SERVICE, run
-        )
-        assert result is not None
-        _, source = result
-        assert source == "exception:maestro_next_day_ingest"
-
     def test_conversation_explorer_registered(self) -> None:
         run = {
             "data_interval_start": "2026-06-16T07:00:00+00:00",
