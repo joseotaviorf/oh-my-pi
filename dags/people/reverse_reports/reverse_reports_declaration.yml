@@ -315,6 +315,11 @@ workflow:
         - "1PEy7dd54tor157fVI_UK7J3t4SLIDKtgk92x6dHJbmg"
         - "base_pin"
 
+    tech_recruiters_information:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "1IT4SH0_iSfsSW7oJgaA0SezdHV31Enm93xvCij43YVg"
+        - "Sheet1"
     # Former notebook: team_formation_update (Daily Pipeline).
     tech_team_formation:
       column_mapping_mode: name

@@ -4667,6 +4667,7 @@ bietlejuice.reverse_reports:
   - bietlejuice.dw_organization:load-dw-organization-dim-business-unit:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-job:first-run-of-day
+  - bietlejuice.dw_people:load-dw-people-dim-product-tech-team:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-cycle-period:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-talent-rating:first-run-of-day
