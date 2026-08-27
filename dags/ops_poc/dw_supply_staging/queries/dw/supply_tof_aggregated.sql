@@ -80,6 +80,22 @@ latest_campaign_name AS (
           AND campaign_id_order = 1
 ),
 
+aux_planning_operation AS (
+    SELECT
+        cp.*,
+        CAST(CAST(cp.skuser AS DOUBLE) AS BIGINT) AS sk_user_id,
+        DATE(cp.Data_Mudanca_Area) as periodo_inicio,
+        COALESCE(
+            LEAD(DATE(cp.Data_Mudanca_Area)) OVER (PARTITION BY CAST(CAST(cp.skuser AS DOUBLE) AS BIGINT) ORDER BY DATE(cp.Data_Mudanca_Area)) 
+            , current_date
+        ) AS periodo_fim
+    FROM 
+        datalake_gsheets_clean.supply_user_match_is cp
+    WHERE 
+        cp.skuser IS NOT NULL 
+        AND trim(cp.skuser) NOT IN ('', '-')    
+),
+
 actual_vol AS (
     SELECT
       'actual_vol' as aux_reference,
@@ -89,6 +105,7 @@ actual_vol AS (
         ,obt.nm_supply_source AS supply_source
         ,obt.company_report_origin
         ,obt.planning_operation
+        ,COALESCE(TRIM(SPLIT_PART(apo.area, '-',1)), obt.planning_operation) AS planning_operation_adj
         ,obt.planning_conversion
         ,obt.planning_cluster
         ,obt.behavior_type
@@ -317,7 +334,11 @@ actual_vol AS (
     LEFT JOIN
       datalake_supply_flows.inbound_attribution AS ia
         ON ia.id_lead_ebdb = obt.sk_lead
-
+    LEFT JOIN 
+      aux_planning_operation apo
+        ON obt.sk_user_conversion = apo.sk_user_id
+        AND obt.date >= apo.periodo_inicio
+        AND obt.date < apo.periodo_fim
     WHERE
       YEAR(obt.date) >= YEAR(current_date) - 3
 
@@ -337,6 +358,7 @@ bup AS (
         END AS supply_source
         ,company_report_origin
         ,planning_operation
+        ,NULL AS planning_operation_adj
         ,planning_conversion
         ,planning_cluster
         ,NULL AS behavior_type
@@ -460,6 +482,7 @@ okr AS (
             ELSE planning_cluster
         END AS company_report_origin
         ,planning_operation
+        ,NULL AS planning_operation_adj
         ,planning_conversion
         ,planning_cluster
         ,NULL AS behavior_type
@@ -577,6 +600,7 @@ tgt_unique as (
         END AS supply_source
         ,company_report_origin
         ,planning_operation
+        ,NULL AS planning_operation_adj
         ,planning_conversion
         ,planning_cluster
         ,NULL AS behavior_type
@@ -690,6 +714,7 @@ tgt_mkt_costs AS (
             ELSE supply_origin
         END AS company_report_origin,
         NULL AS planning_operation,
+        NULL AS planning_operation_adj,
         NULL AS planning_conversion,
         NULL AS planning_cluster,
         NULL AS behavior_type,
@@ -805,6 +830,7 @@ UNION ALL
             ELSE supply_origin
         END AS company_report_origin,
         NULL AS planning_operation,
+        NULL AS planning_operation_adj,
         NULL AS planning_conversion,
         NULL AS planning_cluster,
         NULL AS behavior_type,
@@ -918,6 +944,7 @@ act_costs AS (
         NULL AS supply_source,
         sca.company_report_origin,
         NULL AS planning_operation,
+        NULL AS planning_operation_adj,
         NULL AS planning_conversion,
         sca.planning_cluster,
         sca.behavior_type,
@@ -1040,6 +1067,7 @@ act_last_year as (
         supply_source,
         company_report_origin,
         planning_operation,
+        planning_operation_adj,
         planning_conversion,
         planning_cluster,
         behavior_type,
@@ -1166,6 +1194,7 @@ SELECT
     m.supply_source,
     m.company_report_origin,
     m.planning_operation,
+    m.planning_operation_adj,
     m.planning_conversion,
     m.planning_cluster,
     m.behavior_type,

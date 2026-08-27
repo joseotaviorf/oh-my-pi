@@ -58,6 +58,11 @@ columns:
     lineage:
       - dw_growth.obt_supply.planning_operation
       - datalake_supply_staging.supply_targets.planning_operation
+  planning_operation_adj:
+    description: Identifies the conversion operation type considering a manual match for the IS team.
+    lineage:
+      - datalake_gsheets_clean.supply_user_match_is
+      - dw_growth.obt_supply.planning_operation
   planning_conversion:
     description: Detailed conversion operation type; distinguishes Inside Sales inbound, outbound, and expert flows.
     lineage:
