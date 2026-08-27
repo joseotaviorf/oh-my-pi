@@ -1,0 +1,36 @@
+---
+table_name: datalake_claude_usage_clean.user_activity
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
+
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Warning
+
+  dt_last_activity:
+    is_complete:
+      severity_level: Warning
+
+  one_row_per_user_and_activity_date:
+    custom:
+      # Grain uniqueness: exactly one row per id_user and dt_last_activity after deduplication.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_user, dt_last_activity
+           FROM datalake_claude_usage_clean.user_activity
+           GROUP BY id_user, dt_last_activity
+           HAVING COUNT(*) > 1
+         )
+        ) = 0
+      severity_level: Error

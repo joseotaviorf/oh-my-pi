@@ -3,28 +3,431 @@ table_name: user_activity
 owner: gabriel.berger@quintoandar.com.br
 domain: Tech Platform
 description: |
-  Claude Enterprise Analytics daily user activity records for QuintoAndar workforce seats, passed through from the Analytics API raw ingest.
-  One row per API activity record in a load batch, with the vendor JSON kept in payload.
-  Covers members returned by the Analytics users activity endpoint for the load_end_date calendar day.
-  Used to create datalake_claude_usage_clean so Data Contracts can attach; explode payload in a later clean revision.
+  Claude Enterprise Analytics daily user activity for QuintoAndar workforce seats.
+  One row per user and activity date after deduplication from overlapping raw loads.
+  Flattens vendor JSON activity metrics from the Analytics users endpoint into typed columns.
 columns:
-  payload:
-    description: Vendor JSON string for one Analytics user-activity record from the Claude Enterprise API, retained for schema-stable clean bootstrap until fields are projected.
+  id_user:
+    description: Claude Enterprise user identifier for the workforce seat (e.g. 'user_011CReAqK5DGX6fqXqoBSpFn').
     lineage:
       - datalake_claude_usage_raw.user_activity.payload
+
+  email_user:
+    description: Work email address associated with the Claude user seat (e.g. 'jane.doe@quintoandar.com').
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  type_user:
+    description: Vendor user type for the activity record (for example user).
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_connectors_used:
+    description: Number of MCP connector invocations in Claude.ai chat.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_distinct_artifacts_created:
+    description: Number of distinct artifacts created in Claude.ai chat.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_distinct_connectors_used:
+    description: Number of distinct Claude.ai connectors used. Excludes calls whose connector could not be identified and organizations with zero data retention.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_distinct_conversations:
+    description: Number of distinct chat conversations the user participated in.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_distinct_files_uploaded:
+    description: Number of distinct files uploaded in chat conversations.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_distinct_projects_created:
+    description: Number of distinct chat projects created.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_distinct_projects_used:
+    description: Number of distinct chat projects used.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_distinct_shared_artifacts_viewed:
+    description: Count of unique shared artifacts the user opened in chat, deduplicated by artifact id. Zero when the user opened none.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_distinct_skills_used:
+    description: Number of distinct chat skills used.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_messages:
+    description: Number of messages sent in Claude.ai chat.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_shared_conversations_viewed:
+    description: Number of times the user opened a chat conversation shared with them in a project.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_chat_thinking_messages:
+    description: Number of chat messages that used extended thinking.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_artifacts_created:
+    description: Number of artifacts created via Claude Code.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_commits:
+    description: Number of commits made via Claude Code.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_distinct_sessions:
+    description: Number of distinct Claude Code sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_lines_added:
+    description: Total lines inserted across the user's Claude Code sessions, summed from the tool's diff stats. Zero when no lines were added.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_lines_removed:
+    description: Total lines deleted across the user's Claude Code sessions, summed from the tool's diff stats. Zero when no lines were removed.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_pull_requests:
+    description: Number of pull requests created via Claude Code.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_edit_tool_accepted:
+    description: Number of Claude Code Edit tool calls the user accepted.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_edit_tool_rejected:
+    description: Number of Claude Code Edit tool calls the user rejected.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_multi_edit_tool_accepted:
+    description: Number of Claude Code MultiEdit tool calls the user accepted.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_multi_edit_tool_rejected:
+    description: Number of Claude Code MultiEdit tool calls the user rejected.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_notebook_edit_tool_accepted:
+    description: Number of Claude Code NotebookEdit tool calls the user accepted.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_notebook_edit_tool_rejected:
+    description: Number of Claude Code NotebookEdit tool calls the user rejected.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_write_tool_accepted:
+    description: Number of Claude Code Write tool calls the user accepted.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_claude_code_write_tool_rejected:
+    description: Number of Claude Code Write tool calls the user rejected.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_actions:
+    description: Number of tool actions completed in Cowork sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_artifacts_created:
+    description: Number of artifacts created in Cowork sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_connectors_used:
+    description: Total number of connector invocations in Cowork sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_dispatch_turns:
+    description: Number of Dispatch (background agent) turns completed in Cowork.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_distinct_connectors_used:
+    description: Number of distinct connectors used in Cowork sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_distinct_plugins_used:
+    description: Number of distinct plugins used in Cowork sessions. Null while Cowork plugin-use metrics are not enabled for the organization.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_distinct_sessions:
+    description: Number of distinct Cowork sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_distinct_skills_used:
+    description: Number of distinct skills used in Cowork sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_edit_tools:
+    description: Number of successful Edit tool calls in Cowork sessions. Null while file-edit metrics are not enabled for the organization.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_file_edits:
+    description: Number of successful file-edit tool calls (Edit, MultiEdit, Write, NotebookEdit) in Cowork sessions. Null while file-edit metrics are not enabled for the organization.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_messages:
+    description: Number of messages sent in Cowork sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_multi_edit_tools:
+    description: Number of successful MultiEdit tool calls in Cowork sessions. Null while file-edit metrics are not enabled for the organization.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_notebook_edit_tools:
+    description: Number of successful NotebookEdit tool calls in Cowork sessions. Null while file-edit metrics are not enabled for the organization.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_plugins_used:
+    description: Total number of plugin invocations in Cowork sessions. Null while Cowork plugin-use metrics are not enabled for the organization.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_sessions_with_file_edits:
+    description: Number of distinct Cowork sessions with at least one successful file-edit tool call. Null while file-edit metrics are not enabled for the organization.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_skills_used:
+    description: Total number of skill invocations in Cowork sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_cowork_write_tools:
+    description: Number of successful Write tool calls in Cowork sessions. Null while file-edit metrics are not enabled for the organization.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_design_distinct_projects_created:
+    description: Count of unique Claude Design projects the user created, deduplicated by project id. Zero when the user created none.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_design_distinct_projects_used:
+    description: Number of distinct Claude Design projects the user worked in.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_design_distinct_sessions:
+    description: Number of distinct Claude Design sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_design_messages:
+    description: Number of messages sent in Claude Design sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_excel_connectors_used:
+    description: Number of MCP connector invocations in the Office Agent for Excel.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_excel_distinct_connectors_used:
+    description: Number of distinct MCP connectors used in the Office Agent for Excel.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_excel_distinct_sessions:
+    description: Number of distinct Office Agent sessions in Excel.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_excel_distinct_skills_used:
+    description: Number of distinct skills used in the Office Agent for Excel.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_excel_messages:
+    description: Number of messages sent in the Office Agent for Excel.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_excel_skills_used:
+    description: Number of skill invocations in the Office Agent for Excel.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_outlook_connectors_used:
+    description: Number of MCP connector invocations in the Office Agent for Outlook.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_outlook_distinct_connectors_used:
+    description: Number of distinct MCP connectors used in the Office Agent for Outlook.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_outlook_distinct_sessions:
+    description: Number of distinct Office Agent sessions in Outlook.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_outlook_distinct_skills_used:
+    description: Number of distinct skills used in the Office Agent for Outlook.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_outlook_messages:
+    description: Number of messages sent in the Office Agent for Outlook.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_outlook_skills_used:
+    description: Number of skill invocations in the Office Agent for Outlook.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_powerpoint_connectors_used:
+    description: Number of MCP connector invocations in the Office Agent for PowerPoint.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_powerpoint_distinct_connectors_used:
+    description: Number of distinct MCP connectors used in the Office Agent for PowerPoint.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_powerpoint_distinct_sessions:
+    description: Number of distinct Office Agent sessions in PowerPoint.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_powerpoint_distinct_skills_used:
+    description: Number of distinct skills used in the Office Agent for PowerPoint.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_powerpoint_messages:
+    description: Number of messages sent in the Office Agent for PowerPoint.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_powerpoint_skills_used:
+    description: Number of skill invocations in the Office Agent for PowerPoint.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_word_connectors_used:
+    description: Number of MCP connector invocations in the Office Agent for Word.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_word_distinct_connectors_used:
+    description: Number of distinct MCP connectors used in the Office Agent for Word.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_word_distinct_sessions:
+    description: Number of distinct Office Agent sessions in Word.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_word_distinct_skills_used:
+    description: Number of distinct skills used in the Office Agent for Word.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_word_messages:
+    description: Number of messages sent in the Office Agent for Word.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_office_word_skills_used:
+    description: Number of skill invocations in the Office Agent for Word.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_science_delegations:
+    description: Number of delegations (handoffs to a specialized agent) in Claude Science sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_science_distinct_sessions:
+    description: Number of distinct Claude Science sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_science_messages:
+    description: Number of messages sent in Claude Science sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_science_remote_compute_jobs:
+    description: Number of remote compute jobs launched from Claude Science sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_science_skills_used:
+    description: Total number of skill invocations in Claude Science sessions.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  count_web_searches:
+    description: Number of web searches performed by the user across Claude products on the day.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
+  dt_last_activity:
+    description: Calendar date of the user's last Claude activity reported by the vendor.
+    lineage:
+      - datalake_claude_usage_raw.user_activity.payload
+
   ts_load:
-    description: Timestamp when the Spark api_ingestion job wrote the raw row into the lake for this activity record.
+    description: Timestamp when the Spark api_ingestion job wrote the source raw row.
     lineage:
       - datalake_claude_usage_raw.user_activity.ts_load
+
   year:
-    description: Airflow ingestion partition year derived from the activity date or load timestamp.
+    description: Airflow ingestion partition year derived from the activity date.
     lineage:
       - datalake_claude_usage_raw.user_activity.year
+
   month:
-    description: Airflow ingestion partition month derived from the activity date or load timestamp.
+    description: Airflow ingestion partition month derived from the activity date.
     lineage:
       - datalake_claude_usage_raw.user_activity.month
+
   day:
-    description: Airflow ingestion partition day derived from the activity date or load timestamp.
+    description: Airflow ingestion partition day derived from the activity date.
     lineage:
       - datalake_claude_usage_raw.user_activity.day
