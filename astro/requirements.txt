@@ -10,3 +10,21 @@ apache-airflow-providers-hashicorp==4.7.1
 # Wonka orchestration (S3-synced) imports MlflowClient at DAG parse time.
 # Same pin as beethoven/airflow/requirements.txt and QuintoML wonka.txt.
 mlflow[databricks]<3.0.0
+
+# DataHub Airflow lineage plugin — restores the task-level lineage emission that ran on
+# beethoven's image (beethoven/airflow/requirements.txt:25) until the 2026-07-28 image
+# cutover (aa58f89c33). Registers plugin `datahub_plugin` + a task listener that emits
+# dataFlow/dataJob/lineage to the `datahub_rest_default` connection.
+#
+# PIN IS LOAD-BEARING: >=1.6.0.9 requires apache-airflow>=3.0.0, so it cannot be used on
+# Runtime 13.8.0 (Airflow 2.11.2). 1.5.0.19 is the newest release of the Airflow-2 line
+# (apache-airflow>=2.5.0,<4.0.0). Do not un-pin; do not add the [airflow2] extra — it
+# pulls openlineage-airflow==1.41.0, which hard-pins openlineage-python==1.40.0 and would
+# downgrade the base image's 1.47.1 below apache-airflow-providers-openlineage==2.18.0's
+# >=1.47.0 requirement. Provider mode is the supported path (see
+# datahub_airflow_plugin/airflow2/_openlineage_compat.py).
+acryl-datahub-airflow-plugin==1.5.0.19
+
+# acryl-datahub excludes click 8.2.0; the Runtime freeze pins it, so the
+# Dockerfile drops that pin before the constrained uv install.
+click!=8.2.0,<9

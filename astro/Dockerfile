@@ -41,9 +41,17 @@ COPY packages/bietlejuice-airflow /tmp/packages/bietlejuice-airflow
 COPY packages/bietlejuice-airflow-operators /tmp/packages/bietlejuice-airflow-operators
 COPY packages/bietlejuice-airflow-plugins /tmp/packages/bietlejuice-airflow-plugins
 
+# Runtime freeze pins click==8.2.0; acryl-datahub excludes it. Drop the pin so
+# the version from requirements.txt survives this constrained install.
+RUN sed -i '/^click==/d' /tmp/runtime-constraints.txt
+
 RUN --mount=type=secret,id=GITHUB_TOKEN \
   ["/bin/bash", "-c", "set -euo pipefail; set +x; TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); if [ -z \"${TOKEN}\" ]; then echo 'GITHUB_TOKEN secret empty' >&2; exit 1; fi; git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; set -x; uv pip install --system --no-cache --no-sources --constraint /tmp/runtime-constraints.txt \"quintoandar-logger @ git+https://github.com/quintoandar/python-logger@0.8.1\" /tmp/packages/bietlejuice-core /tmp/packages/bietlejuice-airflow-plugins /tmp/packages/bietlejuice-airflow /tmp/packages/bietlejuice-airflow-operators; set +x; git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; rm -rf /tmp/packages /tmp/runtime-constraints.txt"]
 
+# DataHub lineage is opt-in per deployment: with enabled=True the plugin builds its
+# listener at plugin-import time and resolves the `datahub_rest_default` connection, which
+# only the prod deployment has. Prod turns it on with AIRFLOW__DATAHUB__ENABLED=True in
+# the Astro deployment env vars (same override mechanism as ENVIRONMENT=prod).
 ENV PYTHONPATH="/usr/local/bietlejuice/core-src:/usr/local/bietlejuice/airflow-src:/usr/local/bietlejuice/operators-src:/usr/local/bietlejuice/plugins-src:/usr/local/airflow" \
   ENVIRONMENT=forno \
   BIETLEJUICE_TRUST_MANIFESTS=1 \
@@ -51,7 +59,8 @@ ENV PYTHONPATH="/usr/local/bietlejuice/core-src:/usr/local/bietlejuice/airflow-s
   AIRFLOW__CORE__DAG_IGNORE_FILE_SYNTAX=glob \
   AIRFLOW__CORE__MAX_TEMPLATED_FIELD_LENGTH=16384 \
   AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT=False \
-  AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS=True
+  AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS=True \
+  AIRFLOW__DATAHUB__ENABLED=False
 
 # Parse-time pre-warm: imported by Airflow as airflow_local_settings from $AIRFLOW_HOME/config
 # (added to sys.path in settings.prepare_syspath_for_config_and_plugins).
