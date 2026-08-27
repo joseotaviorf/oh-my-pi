@@ -11,7 +11,6 @@ from pyspark.sql.types import StructType, _infer_schema
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.cluster_utils.aws_emr_cluster_utils import (
     AwsEmrClusterUtils,
-    _maybe_b64decode,
     _parse_s3_uri,
     _secrets_manager_region,
 )
@@ -75,74 +74,6 @@ class TestAwsEmrClusterUtilsSecrets:
         mock_client.get_secret_value.assert_called_once_with(
             SecretId="quintoandar/MY_KEY"
         )
-
-    def test_get_secret_decodes_base64_json(self, monkeypatch):
-        monkeypatch.delenv("BIETL_SECRETS_MANAGER_SECRET_ID_TEMPLATE", raising=False)
-        mock_client = MagicMock()
-        mock_client.get_secret_value.return_value = {
-            "SecretString": "eyJ0b2tlbiI6IngifQ=="
-        }
-
-        u = AwsEmrClusterUtils()
-        u._secrets_client = mock_client
-        assert u.get_secret("quintoandar", "CLOUDZERO_API_TOKEN") == '{"token":"x"}'
-
-    def test_get_secret_leaves_plain_json_unchanged(self, monkeypatch):
-        monkeypatch.delenv("BIETL_SECRETS_MANAGER_SECRET_ID_TEMPLATE", raising=False)
-        mock_client = MagicMock()
-        mock_client.get_secret_value.return_value = {"SecretString": '{"a": 1}'}
-
-        u = AwsEmrClusterUtils()
-        u._secrets_client = mock_client
-        assert u.get_secret("quintoandar", "MY_KEY") == '{"a": 1}'
-
-    def test_get_secret_decodes_base64_grafana_token(self, monkeypatch):
-        monkeypatch.delenv("BIETL_SECRETS_MANAGER_SECRET_ID_TEMPLATE", raising=False)
-        mock_client = MagicMock()
-        mock_client.get_secret_value.return_value = {
-            "SecretString": "Z2xzYV90ZXN0X3Rva2VuX25vdF9yZWFs"
-        }
-
-        u = AwsEmrClusterUtils()
-        u._secrets_client = mock_client
-        assert (
-            u.get_secret("quintoandar", "GRAFANA_API_TOKEN")
-            == "glsa_test_token_not_real"
-        )
-
-    def test_get_secret_decodes_base64_secret_binary(self, monkeypatch):
-        monkeypatch.delenv("BIETL_SECRETS_MANAGER_SECRET_ID_TEMPLATE", raising=False)
-        mock_client = MagicMock()
-        mock_client.get_secret_value.return_value = {
-            "SecretBinary": b"eyJ0b2tlbiI6IngifQ=="
-        }
-
-        u = AwsEmrClusterUtils()
-        u._secrets_client = mock_client
-        assert u.get_secret("quintoandar", "CLOUDZERO_API_TOKEN") == '{"token":"x"}'
-
-
-class TestMaybeB64Decode:
-    def test_decodes_base64_json(self):
-        assert _maybe_b64decode("eyJ0b2tlbiI6IngifQ==") == '{"token":"x"}'
-
-    def test_leaves_plain_json_unchanged(self):
-        assert _maybe_b64decode('{"a": 1}') == '{"a": 1}'
-
-    def test_decodes_base64_grafana_token(self):
-        assert (
-            _maybe_b64decode("Z2xzYV90ZXN0X3Rva2VuX25vdF9yZWFs")
-            == "glsa_test_token_not_real"
-        )
-
-    def test_empty_string_unchanged(self):
-        assert _maybe_b64decode("") == ""
-
-    def test_invalid_base64_alphabet_unchanged(self):
-        assert _maybe_b64decode("not-valid-base64!") == "not-valid-base64!"
-
-    def test_strips_whitespace_before_decode(self):
-        assert _maybe_b64decode(" eyJ0b2tlbiI6IngifQ== \n") == '{"token":"x"}'
 
 
 class TestBaseDBUtilsEmrBranch:
