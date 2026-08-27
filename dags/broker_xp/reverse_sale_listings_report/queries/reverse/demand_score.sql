@@ -8,7 +8,8 @@ WITH lpvs_consolidated AS (
     dw_sale.fact_daily_ongoing_listing AS ol
   WHERE
     MAKE_DATE(ol.year, ol.month, ol.day) >= DATE('{load_end_date}') - INTERVAL 60 DAY
-  GROUP BY ALL
+    GROUP BY
+        ol.sk_house
 ),
 demand_score AS (
   SELECT

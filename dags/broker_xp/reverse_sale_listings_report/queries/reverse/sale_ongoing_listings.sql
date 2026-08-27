@@ -5,7 +5,7 @@ SELECT
     COALESCE(cb.uuid_company, '1P') AS company_uuid,
     'SALE' AS business_context,
     COUNT(*) AS ongoing_listings_count,
-    MAKE_DATE(fdol.year, fdol.month, fdol.day)::TIMESTAMP AS ts_event,
+    CAST(MAKE_DATE(fdol.year, fdol.month, fdol.day) AS TIMESTAMP) AS ts_event,
     fdol.year,
     fdol.month,
     fdol.day

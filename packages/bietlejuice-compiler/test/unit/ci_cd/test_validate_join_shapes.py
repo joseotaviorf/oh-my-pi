@@ -178,6 +178,30 @@ def test_normalize_handles_quoted_bracket_params():
     assert "'DUMMY'" in normalized
 
 
+def test_normalize_handles_composite_quoted_year_month_day():
+    """DATE('{year}-{month}-{day}') must stay one string literal, not DATE(''DUMMY'-'DUMMY'-'DUMMY'')."""
+    sql = (
+        "SELECT * FROM t WHERE d = DATE('{year}-{month}-{day}') "
+        "OR d = DATE_SUB('{year}-{month}-{day}', 1)"
+    )
+    normalized = normalize_sql_for_join_lint(sql)
+    assert normalized.count("''") == 0
+    assert normalized.count("'DUMMY'") == 2
+    assert "{year}" not in normalized
+
+
+def test_composite_year_month_day_date_filter_is_parseable():
+    sql = """
+    SELECT a.id
+    FROM t AS a
+    JOIN u AS b ON a.id = b.id
+    WHERE a.dt = DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd')
+    """
+    violations = scan_sql_text(sql, "bic_ss.sql")
+    assert all(v.kind != "UNPARSEABLE" for v in violations)
+    assert violations == []
+
+
 def test_normalize_preserves_line_count_across_multiline_block_comment():
     sql = "SELECT 1\n/* a\nmulti\nline\ncomment */\nFROM t\nJOIN u ON t.id = u.id"
     normalized = normalize_sql_for_join_lint(sql)

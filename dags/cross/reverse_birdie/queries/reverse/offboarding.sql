@@ -31,9 +31,37 @@ ppm_ongoing_rentals AS (
         END AS cluster_ppm,
         dc.sk_contract
     FROM dw_rent.dim_contract dc
-    JOIN dw_public.dim_date dd 
-        ON dd.date BETWEEN COALESCE(dc.dt_start, dc.dt_entrance)
-        AND COALESCE(dc.dt_annulment, DATE('{load_start_date}') - INTERVAL '1' DAY)
+    INNER JOIN (
+        SELECT
+            bounds.sk_contract,
+            EXPLODE(
+                CASE
+                    WHEN bounds.seq_start IS NOT NULL
+                        AND bounds.seq_end IS NOT NULL
+                        AND bounds.seq_start <= bounds.seq_end
+                    THEN SEQUENCE(bounds.seq_start, bounds.seq_end, INTERVAL 1 MONTH)
+                    ELSE CAST(ARRAY() AS ARRAY<DATE>)
+                END
+            ) AS month_end_date
+        FROM (
+            SELECT
+                dc2.sk_contract,
+                LAST_DAY(COALESCE(dc2.dt_start, dc2.dt_entrance)) AS seq_start,
+                LAST_DAY(
+                    COALESCE(
+                        dc2.dt_annulment,
+                        DATE('{load_start_date}') - INTERVAL '1' DAY
+                    )
+                ) AS seq_end
+            FROM
+                dw_rent.dim_contract dc2
+        ) bounds
+    ) AS contract_month_ends
+        ON contract_month_ends.sk_contract = dc.sk_contract
+    INNER JOIN dw_public.dim_date dd
+        ON dd.date = contract_month_ends.month_end_date
+        AND dd.date BETWEEN COALESCE(dc.dt_start, dc.dt_entrance)
+            AND COALESCE(dc.dt_annulment, DATE('{load_start_date}') - INTERVAL '1' DAY)
     LEFT JOIN dw_rent.fact_house_listings fhl 
         ON fhl.sk_contract = dc.sk_contract
     JOIN actual_pps ppmh

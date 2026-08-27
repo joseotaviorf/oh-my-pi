@@ -5,7 +5,7 @@ SELECT
     fsde.sk_house AS property_id,
     COALESCE(cb.uuid_company, '1P') AS company_uuid,
     'SALE' AS business_context,
-    dsa.sale_price_agreed::FLOAT AS contract_value,
+    CAST(dsa.sale_price_agreed AS FLOAT) AS contract_value,
     fsde.ts_event,
     fsde.year,
     fsde.month,

@@ -80,6 +80,9 @@ _BLOCK_COMMENT_RE = re.compile(r"/\*(?!\+).*?\*/", re.DOTALL)  # not /*+ hint */
 _LINE_COMMENT_RE = re.compile(
     r"--[^\n]*"
 )  # does not consume \n: line count is preserved
+_COMPOSITE_QUOTED_PARAM_RE = re.compile(
+    r"'(?:\{[A-Za-z_]\w*\}[-/:\s]?)+\{[A-Za-z_]\w*\}'"
+)  # '{year}-{month}-{day}' -> 'DUMMY'  (must run before single-param)
 _QUOTED_PARAM_RE = re.compile(
     r"'\{[A-Za-z_]\w*\}'"
 )  # '{param}' -> 'DUMMY'  (order matters)
@@ -117,6 +120,10 @@ def normalize_sql_for_join_lint(sql: str) -> str:
     sql = _BLOCK_COMMENT_RE.sub(_blank_preserving_newlines, sql)
     sql = _LINE_COMMENT_RE.sub("", sql)
     sql = sql.replace("{{", "{").replace("}}", "}")
+    # Composite quoted templates first. Replacing {year}/{month}/{day} independently
+    # inside DATE('{year}-{month}-{day}') produces DATE(''DUMMY'-'DUMMY'-'DUMMY''),
+    # which sqlglot reports as UNPARSEABLE (false positive on reverse DAG SQL).
+    sql = _COMPOSITE_QUOTED_PARAM_RE.sub("'DUMMY'", sql)
     sql = _QUOTED_PARAM_RE.sub("'DUMMY'", sql)  # must run before the bare-param pass
     sql = _BARE_PARAM_RE.sub("'DUMMY'", sql)
     return sql
