@@ -1,19 +1,16 @@
-from airflow.datasets import BaseDataset
-from databricks_plugin import (
-    QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
-)
+from airflow.operators.dummy_operator import DummyOperator
 
-from bietlejuice.base.airflow.cluster_config_resolver import (
-    apply_custom_configurations,
-)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
+    get_job_cluster_completion_sink,
+)
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.base.pipeline import LayerEnum
 
 
@@ -26,25 +23,7 @@ class MetricQueryWorkflow(BaseWorkflow):
     """
 
     BUSINESS_DOMAIN_DELIMITER = "__"
-
-    def __init__(
-        self,
-        dag_args,
-        workflow_args,
-        cluster_args,
-        dataset_dependencies: BaseDataset = None,
-        **kwargs,
-    ):
-        super().__init__(
-            dag_args,
-            workflow_args,
-            cluster_args,
-            dataset_dependencies,
-            **kwargs,
-        )
-        self.databricks_conn_id = self.cluster_args.get(
-            "databricks_conn_id", "databricks_default"
-        )
+    DEFAULT_DATABRICKS_CONN_ID = "databricks_default"
 
     def build_dag(self):
         tables_customization = self.workflow_args.get("tables_customization", {})
@@ -56,7 +35,6 @@ class MetricQueryWorkflow(BaseWorkflow):
         extra_query_template_params = self.workflow_args.get(
             "extra_query_template_params"
         )
-        cluster_params = self.get_cluster_params()
 
         metrics_bucket = self.config_service.get_config("metrics_bucket")
         databricks_bietlejuice_repo_path = self.config_service.get_config(
@@ -68,6 +46,22 @@ class MetricQueryWorkflow(BaseWorkflow):
         target_database_base_name = source_database_base_name
 
         dag = self.dag_instance()
+        self.cluster_args.setdefault(
+            "databricks_conn_id", self.DEFAULT_DATABRICKS_CONN_ID
+        )
+
+        dag_execution_context = self._get_dag_execution_context(
+            dag,
+            metrics_bucket,
+            databricks_submission_mode="task_submission",
+        )
+        engine = dag_execution_context.job_cluster_engine
+
+        create_cluster_task = engine.create_execute_cluster_task(
+            config_service=self.config_service,
+            minimum_cluster_runtime_version=None,
+            execute_job_cluster_local_id=None,
+        )
 
         task_group = DatalakeTaskGroup(
             is_validation=self.is_validation,
@@ -76,7 +70,8 @@ class MetricQueryWorkflow(BaseWorkflow):
             datalake_bucket=metrics_bucket,
             relative_query_path=self.dag_name,
             spark_jobs_path=base_spark_jobs_path,
-            databricks_conn_id=self.databricks_conn_id,
+            databricks_conn_id=dag_execution_context.databricks_conn_id,
+            job_cluster_engine=engine,
         )
 
         metric_task_group = task_group.build_task_group_from_sql_files(
@@ -89,19 +84,18 @@ class MetricQueryWorkflow(BaseWorkflow):
             extra_query_template_params=extra_query_template_params,
         )
 
-        create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-            dag=dag,
-            task_id="create-cluster",
-            cluster_configuration=cluster_params["cluster_config"],
-            libraries=cluster_params["default_libraries"],
-            access_control_list=cluster_params["access_control_list"],
-            databricks_conn_id=self.databricks_conn_id,
-        )
-        terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-            dag=dag,
-            task_id="terminate-cluster",
-            databricks_conn_id=self.databricks_conn_id,
-        )
+        job_cluster_finished_task = None
+        if dag_execution_context.use_airflow_emr:
+            job_cluster_finished_task = DummyOperator(
+                task_id="job-cluster-finished", dag=dag
+            )
+            terminate_cluster_task = get_job_cluster_completion_sink(
+                dag_execution_context,
+                create_cluster_task,
+                job_cluster_finished_task,
+            )
+        else:
+            terminate_cluster_task = engine.create_databricks_terminate_cluster_task()
 
         self.set_dependencies(
             inner_dependencies,
@@ -111,30 +105,22 @@ class MetricQueryWorkflow(BaseWorkflow):
             metric_task_group,
         )
 
+        if dag_execution_context.use_airflow_emr:
+            attach_emr_terminate_cluster_work_prerequisites(
+                dag_execution_context,
+                terminate_cluster_task,
+                execute_job_cluster_task=create_cluster_task,
+                job_cluster_finished_task=job_cluster_finished_task,
+            )
+            attach_emr_job_cluster_finished_work_prerequisites(
+                dag_execution_context,
+                job_cluster_finished_task,
+                cluster_completion_sink=terminate_cluster_task,
+            )
+
         DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
         return dag
-
-    def get_cluster_params(self):
-        cluster_configuration = self.config_service.get_config(
-            self.cluster_args["type"]
-        )
-        cluster_configuration = apply_custom_configurations(
-            cluster_configuration,
-            self.cluster_args.get("custom_configurations", {}),
-            self.config_service,
-        )
-        cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
-            cluster_configuration
-        )
-        default_libraries = self.config_service.get_config("default_libraries")
-        acl = self.cluster_args["access_control_list"]
-        databricks_access_control_list = [acl] if isinstance(acl, dict) else acl
-        return {
-            "cluster_config": cluster_configuration,
-            "default_libraries": default_libraries,
-            "access_control_list": databricks_access_control_list,
-        }
 
     def set_dependencies(
         self,
