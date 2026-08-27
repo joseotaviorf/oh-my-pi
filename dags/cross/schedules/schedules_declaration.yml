@@ -34,4 +34,34 @@ workflow:
       clean_primary_keys: [id]
       get_table_metrics:
         count: "id"
+    calendar:
+      clean_table_name: calendar
+      raw_primary_keys: [calendar_id]
+      clean_primary_keys: [id_calendar]
+      get_table_metrics:
+        count: "id_calendar"
+    week_calendar:
+      clean_table_name: week_calendar
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      get_table_metrics:
+        count: "id"
+    specific_calendar:
+      clean_table_name: specific_calendar
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      get_table_metrics:
+        count: "id"
+    agent_data:
+      clean_table_name: agent_data
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      get_table_metrics:
+        count: "id"
+    location_data:
+      clean_table_name: location_data
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      get_table_metrics:
+        count: "id"
 
