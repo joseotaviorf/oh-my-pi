@@ -161,7 +161,10 @@ having_last_changes AS (
 SELECT
     hlc.id_agent,
     wc.id AS id_work_contract,
-    wc.3p_partner,
+    NULLIF(
+        REGEXP_EXTRACT(wc.contract_name, '(?i)(?<=\\[3P\\-)(.+?)(?=\\])'),
+        ''
+    ) AS 3p_partner,
     hlc.action,
     hlc.days_in_status,
     hlc.is_agent_active,
@@ -177,7 +180,7 @@ SELECT
 FROM
     having_last_changes AS hlc
 LEFT JOIN
-    datalake_ebdb_work_contract.work_contract AS wc
+    datalake_ebdb_clean.work_contract AS wc
         ON wc.id = hlc.id_work_contract
 WHERE
     hlc.ts_status_started IS NOT NULL

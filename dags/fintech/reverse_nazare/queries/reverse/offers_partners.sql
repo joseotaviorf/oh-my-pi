@@ -5,15 +5,18 @@ cte_demand AS (
             ac.id_agent,
             ac.ts_work_contract_started,
             ac.ts_work_contract_ended,
-            NULLIF(wc.`3p_partner`, '') AS demand_3p_partner,
-            wc.is_3p_contract
+            NULLIF(
+                REGEXP_EXTRACT(wc.contract_name, '(?i)(?<=\\[3P\\-)(.+?)(?=\\])'),
+                ''
+            ) AS demand_3p_partner,
+            LOWER(wc.contract_name) LIKE '%[3p-%]%' AS is_3p_contract
         FROM
             datalake_ebdb_agents.agent_contract AS ac
         JOIN
-            datalake_ebdb_work_contract.work_contract AS wc
+            datalake_ebdb_clean.work_contract AS wc
                 ON ac.id_work_contract = wc.id
         WHERE
-            is_3p_contract
+            LOWER(wc.contract_name) LIKE '%[3p-%]%'
     ),
     demand_3p AS (
         SELECT DISTINCT

@@ -13,19 +13,19 @@ owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_work_contract:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.id
+      - datalake_ebdb_clean.work_contract.id
     description: Primary key of the table. It is formed by concatenating id_work_contract, is_active, is_sale_contract and is_rent_contract
   id_work_contract:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.id
+      - datalake_ebdb_clean.work_contract.id
     description: Natural key coming from EBDB. It is not a primary key, because it shows up in 8 different combinations of the flags.
   contract_name:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.contract_name
+      - datalake_ebdb_clean.work_contract.contract_name
     description: Display name of the work contract template in EBDB (brackets removed for reporting consistency).
   3p_partner:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.3p_partner
+      - datalake_ebdb_clean.work_contract.contract_name
     description: Name of the third-party partner parsed from the EBDB contract [3P-*] tag. N/A when the contract is not 3P.
   is_active:
     lineage:
@@ -33,7 +33,7 @@ columns:
     description: Tells if the agent is active or not, as specified by Main's agent data.
   is_3p_contract:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.is_3p_contract
+      - datalake_ebdb_clean.work_contract.contract_name
     description: True when the work contract is a third-party partner contract, based on a [3P-*] tag in the EBDB contract name.
   is_for_sale_contract:
     description: Tells if the contract is a Sale contract. This will come from the agent's business context.
@@ -41,11 +41,11 @@ columns:
     description: Tells if the contract is a Rent contract. This will come from the agent's business context.
   ts_created:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.ts_created
+      - datalake_ebdb_clean.work_contract.ts_created
     description: Timestamp of when the contract was created.
   ts_updated:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.ts_updated
+      - datalake_ebdb_clean.work_contract.ts_updated
     description: Timestamp of when the contract was last updated.
   ts_load:
     description: Timestamp of when the table was last processed.

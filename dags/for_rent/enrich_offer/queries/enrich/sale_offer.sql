@@ -182,19 +182,29 @@ WITH agent_contract_aud AS (
   FROM visit_before_offer AS vo
   FULL OUTER JOIN booking_before_offer AS bo
     ON bo.id_offer = vo.id_offer
+), hub_work_contract AS (
+  SELECT
+    hub_name_wc,
+    MAX(id_business_unit_teams) AS id_hub_teams,
+    MAX(hub_name_teams) AS hub_name_teams
+  FROM datalake_gsheets_clean.sale_business_unit_standardization
+  WHERE
+    hub_name_wc IS NOT NULL
+  GROUP BY
+    hub_name_wc
 ), work_contract /* WORK CONTRACT */ AS (
   SELECT
     ac.id_agent,
     ac.id_user_agent,
-    wc.id_hub_teams,
-    wc.hub_name_teams,
+    hwc.id_hub_teams,
+    hwc.hub_name_teams,
     ac.previous_work_contract_name,
     ac.work_contract_name AS contract_name,
     ac.ts_work_contract_started AS ts_work_contract_start,
     COALESCE(ac.ts_work_contract_ended, CURRENT_DATE) AS ts_work_contract_end
   FROM datalake_ebdb_agents.agent_contract AS ac
-  LEFT JOIN datalake_ebdb_work_contract.work_contract AS wc
-    ON ac.id_work_contract = wc.id
+  LEFT JOIN hub_work_contract AS hwc
+    ON hwc.hub_name_wc = ac.work_contract_name
 ), giroffer_regions AS (
   SELECT
     COALESCE(vo.id_offer, g.id) AS id_offer,

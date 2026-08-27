@@ -14,11 +14,11 @@ columns:
   id_work_contract:
     description: Foreign key of the work contract.
     lineage:
-      - datalake_ebdb_work_contract.work_contract.id
+      - datalake_ebdb_clean.work_contract.id
   3p_partner:
     description: Short name of the Rede company.
     lineage:
-      - datalake_ebdb_work_contract.work_contract.3p_partner
+      - datalake_ebdb_clean.work_contract.contract_name
   action:
     lineage:
       - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.action

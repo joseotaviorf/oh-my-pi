@@ -115,7 +115,7 @@ columns:
   id_business_unit:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_hub
-      - datalake_ebdb_work_contract.work_contract.id_hub_teams
+      - datalake_gsheets_clean.sale_business_unit_standardization.id_business_unit_teams
     description: Identification key of the business unit where the buyer was served.
   sk_broker_supply:
     lineage:
@@ -182,7 +182,7 @@ columns:
   business_unit:
     lineage:
       - datalake_gsheets.sale_hub_offer.offer_flow
-      - datalake_ebdb_work_contract.work_contract
+      - datalake_gsheets_clean.sale_business_unit_standardization.hub_name_teams
     description: Name of the business unit where the buyer was served.
   offer_platform:
     lineage:

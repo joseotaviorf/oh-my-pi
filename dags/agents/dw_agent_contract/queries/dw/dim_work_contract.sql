@@ -13,12 +13,18 @@ WITH contract_with_default AS (
     SELECT
         wc.id,
         wc.contract_name,
-        COALESCE(NULLIF(wc.3p_partner, ''), 'N/A') AS 3p_partner,
-        wc.is_3p_contract,
+        COALESCE(
+            NULLIF(
+                REGEXP_EXTRACT(wc.contract_name, '(?i)(?<=\\[3P\\-)(.+?)(?=\\])'),
+                ''
+            ),
+            'N/A'
+        ) AS 3p_partner,
+        LOWER(wc.contract_name) LIKE '%[3p-%]%' AS is_3p_contract,
         wc.ts_created,
         wc.ts_updated
     FROM
-        datalake_ebdb_work_contract.work_contract AS wc
+        datalake_ebdb_clean.work_contract AS wc
     UNION ALL
     SELECT
         NULL AS id,
