@@ -90,6 +90,8 @@ workflow:
     members:
       endpoint_path: v1/organizations/users
       extraction_type: incremental
+      merge_on:
+        - id
       params: {}
       api_policies:
         pagination:
