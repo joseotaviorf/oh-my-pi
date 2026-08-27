@@ -35,6 +35,12 @@ columns:
       - datalake_person.person_sks.sk_person
       - datalake_big_agent.partner_tier.uuid_overwritten_by
     description: Surrogate key of the person who authored the overwrite, resolved from the Person data model when the actor type is PERSON.
+  sk_broker:
+    lineage:
+      - core_brokers.brokers.sk_broker
+      - core_brokers.brokers.uuid_company
+      - datalake_big_agent.partner_tier.uuid_company
+    description: Surrogate key of the 3P broker company from the Brokers Core Model, resolved by uuid_company. -1 when the partner company is not a registered 3P broker.
   incentive_system:
     lineage:
       - datalake_big_agent.partner_tier.incentive_system

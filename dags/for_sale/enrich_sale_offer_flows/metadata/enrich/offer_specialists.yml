@@ -102,6 +102,14 @@ columns:
     lineage:
     - datalake_sales_flow_clean.specialist.id_specialist
     description: Foreign key to the broker or agent user coordinating the visit or sale.
+  id_user_fifty_agent:
+    lineage:
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the Fifty agent (FIFTY_AGENT kind) who participated in the offer negotiation.
+  id_fifty_agent_specialist:
+    lineage:
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the Fifty agent (FIFTY_AGENT kind) who participated in the offer negotiation.
   id_user_post_dd_specialist:
     lineage:
     - datalake_ebdb_clean.user.id
@@ -214,6 +222,14 @@ columns:
     lineage:
     - datalake_sales_flow_clean.users.email
     description: Email of the agent (AGENT kind) coordinating the offer's visit or sale.
+  fifty_agent_name:
+    lineage:
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the Fifty agent (FIFTY_AGENT kind) who participated in the offer negotiation.
+  fifty_agent_email:
+    lineage:
+    - datalake_sales_flow_clean.users.email
+    description: Email of the Fifty agent (FIFTY_AGENT kind) who participated in the offer negotiation.
   post_dd_specialist_name:
     lineage:
     - datalake_sales_flow_clean.users.name

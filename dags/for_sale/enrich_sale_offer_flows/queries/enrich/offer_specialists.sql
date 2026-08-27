@@ -59,6 +59,8 @@ SELECT
     lr.id_specialist AS id_legal_risk_analyst,
     ag.id_user AS id_user_agent,
     ag.id_specialist AS id_agent,
+    fa.id_user AS id_user_fifty_agent,
+    fa.id_specialist AS id_fifty_agent_specialist,
     pdd.id_user AS id_user_post_dd_specialist,
     pdd.id_specialist AS id_post_dd_specialist,
     alr.id_user AS id_user_agent_lead_referral,
@@ -87,6 +89,8 @@ SELECT
     lr.email AS legal_risk_analyst_email,
     ag.specialist_name AS agent_name,
     ag.email AS agent_email,
+    fa.specialist_name AS fifty_agent_name,
+    fa.email AS fifty_agent_email,
     pdd.specialist_name AS post_dd_specialist_name,
     pdd.email AS post_dd_specialist_email,
     alr.ts_updated AS ts_agent_lead_referral_updated
@@ -152,6 +156,11 @@ LEFT JOIN
     ON ag.id_sales_flow = o.id_sales_flow
     AND ag.kind = 'AGENT'
     AND ag.row = 1
+LEFT JOIN
+    last_specialist AS fa
+    ON fa.id_sales_flow = o.id_sales_flow
+    AND fa.kind = 'FIFTY_AGENT'
+    AND fa.row = 1
 LEFT JOIN
     last_specialist AS pdd
     ON pdd.id_sales_flow = o.id_sales_flow

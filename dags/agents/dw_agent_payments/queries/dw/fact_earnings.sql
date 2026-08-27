@@ -11,6 +11,7 @@ SELECT
     person.sk_person AS sk_person,
     company.sk_company AS sk_company,
     cart.id AS sk_cart,
+    COALESCE(cb.sk_broker, -1) AS sk_broker,
     e.incentive_system,
     e.invalidation_reason,
     e.invalidation_description,
@@ -56,6 +57,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_cart_system_clean.cart AS cart
         ON e.uuid_cart = cart.uuid_cart
+LEFT JOIN
+    core_brokers.brokers AS cb
+        ON e.uuid_company = cb.uuid_company
 WHERE
     e.invalidation_reason <> "PRODUCT_TESTING"
     AND DATE(e.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -61,6 +61,12 @@ columns:
       - datalake_cart_system_clean.cart.id
       - datalake_big_agent.earnings.uuid_cart
     description: Surrogate key of the cart linked to the earning source, when a matching cart exists.
+  sk_broker:
+    lineage:
+      - core_brokers.brokers.sk_broker
+      - core_brokers.brokers.uuid_company
+      - datalake_big_agent.earnings.uuid_company
+    description: Surrogate key of the 3P broker company from the Brokers Core Model, resolved by uuid_company. -1 when the partner company is not a registered 3P broker.
   incentive_system:
     lineage:
       - datalake_big_agent.earnings.incentive_system

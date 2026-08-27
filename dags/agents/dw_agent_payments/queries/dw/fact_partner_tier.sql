@@ -5,6 +5,7 @@ SELECT
     person.sk_person AS sk_person,
     company.sk_company AS sk_company,
     overwritten_by.sk_person AS sk_overwritten_by,
+    COALESCE(cb.sk_broker, -1) AS sk_broker,
     pt.incentive_system,
     pt.tier_name,
     pt.overwritten_reason,
@@ -31,5 +32,8 @@ LEFT JOIN
 LEFT JOIN
     datalake_company.company_sks AS company
         ON pt.uuid_company = company.uuid_company
+LEFT JOIN
+    core_brokers.brokers AS cb
+        ON pt.uuid_company = cb.uuid_company
 WHERE
     DATE(pt.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
