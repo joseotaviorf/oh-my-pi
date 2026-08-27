@@ -59,6 +59,7 @@ class TestGetProdDatabaseName:
             (LayerEnum.DW, "payments", "dw_payments"),
             (LayerEnum.METRIC, "payments", "metric_payments"),
             (LayerEnum.REVERSE, "payments", "reverse_payments"),
+            (LayerEnum.QUBE, "dimensions", "qube_dimensions"),
         ],
     )
     def test_all_layers_resolve_prod_database_name(self, layer, schema, expected):

@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from pathlib import Path
 from typing import List, Optional, Tuple
 
 from quintoandar_logger import QuintoAndarLogger
@@ -10,6 +11,9 @@ from bietlejuice.base.dependencies.dependency_generator import DependencyGenerat
 from bietlejuice.base.dependencies.milestone_strategy_paths import (
     is_milestone_delta_dag,
     match_milestone_strategy_relative,
+)
+from bietlejuice.base.dependencies.qube_source_extractor import (
+    qube_table_dependencies_from_dags_root,
 )
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -190,7 +194,20 @@ class FileDependencyGenerator(DependencyGenerator):
             if not dag:
                 continue
             dags_query_paths[dag].append(path)
-        return self._find_all_tables_in_query_files(dags_query_paths)
+        dependencies = self._find_all_tables_in_query_files(dags_query_paths)
+        dependencies = self._merge_qube_table_dependencies(dependencies)
+        return dependencies
+
+    def _merge_qube_table_dependencies(self, dependencies: dict) -> dict:
+        """Add Qube dimension/measure source tables for lineage-based DAG deps."""
+        from dags import DAG_PACKAGES_ROOT
+
+        qube_deps = qube_table_dependencies_from_dags_root(Path(DAG_PACKAGES_ROOT))
+        merged = dict(dependencies)
+        for dag_id, tables in qube_deps.items():
+            existing = set(merged.get(dag_id, []))
+            merged[dag_id] = sorted(existing | tables)
+        return merged
 
     def _dag_name_from_query_path(self, path: str) -> Optional[str]:
         """Resolve DAG id for a query or milestone strategy file path."""

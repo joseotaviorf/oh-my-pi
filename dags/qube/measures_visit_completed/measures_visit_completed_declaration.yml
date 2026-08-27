@@ -1,0 +1,31 @@
+dag:
+  name: qube_measure_visit_completed
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0 6 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Builds QUBE measure for visits completed (ts_visit_done)
+  folder_name: measures_visit_completed
+workflow:
+  type: qube_measure
+  layer: qube
+  has_hive_sync: true
+  custom_schema: measures
+  qube_specs:
+    entity: visit
+    name: visit_completed
+    source:
+      table: datalake_ebdb_clean.visit_status_log
+      layer: clean
+      entity_id_col: id_visit
+      date_expr: unix_timestamp(ts_created)
+      select:
+      - id_visit
+      - ts_created
+      - event_type
+    logic:
+      filter_sql: event_type = 'VISIT_DONE' AND ts_created IS NOT NULL
+    windows:
+    - 1
+    - 7
+    - 28

@@ -37,7 +37,12 @@ different bot filter.**
 ## DataHub Catalog
 
 - **This metric's data product**: `urn:li:dataProduct:escalation-rate-wall-e`
-- **Upstream domain entity data product**: `urn:li:dataProduct:chatbot-sessions`
+- **Upstream business entity data product**: `urn:li:dataProduct:chatbot-sessions`
+- **QUBE materialization** (exploration):
+  - Dimensions: `qube_dimensions.chatbot_session__channel__*`
+  - Measures: `qube_measures.chatbot_session__walle_session_total__*`, `qube_measures.chatbot_session__walle_session_escalated__*`
+  - Metric: `qube_metrics.chatbot_session__escalation_rate_walle__*`
+  - Rate at query time: `walle_session_escalated / walle_session_total` (both counters scoped to `bot = 'wall-e'`)
 
 ## Glossary and Synonyms
 
@@ -152,5 +157,18 @@ SELECT
     ROUND(CAST(escalated_sessions AS DOUBLE) / total_sessions, 4) AS escalation_rate_wall_e
 FROM component
 ORDER BY 1
+```
+
+QUBE exploration (after Forno run) — example 7d window with channel slice:
+
+```sql
+SELECT
+    channel,
+    walle_session_total,
+    walle_session_escalated,
+    CAST(walle_session_escalated AS DOUBLE) / NULLIF(walle_session_total, 0) AS escalation_rate_wall_e
+FROM qube_metrics.chatbot_session__escalation_rate_walle__7d
+WHERE dt_reference = CURRENT_DATE - INTERVAL '1' DAY
+ORDER BY 1;
 ```
 

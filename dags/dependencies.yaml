@@ -4382,6 +4382,24 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
 bietlejuice.offboarding_categorization:
   - quintoml.post_contract.wall_e_offboarding_categoriser.inference:first-run-of-day
+bietlejuice.qube_dimension_chatbot_session_channel:
+  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+bietlejuice.qube_dimension_nps_answer_score_category:
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer:first-run-of-day
+bietlejuice.qube_dimension_visit_business_context:
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+bietlejuice.qube_dimension_visit_status:
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+bietlejuice.qube_measure_chatbot_session_walle_session_escalated:
+  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
+bietlejuice.qube_measure_chatbot_session_walle_session_total:
+  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
+bietlejuice.qube_measure_nps_answer_total:
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer:first-run-of-day
+bietlejuice.qube_measure_visit_booked:
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
+bietlejuice.qube_measure_visit_completed:
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
 bietlejuice.reverse_aec:
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metric:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metrics-salesforce:first-run-of-day

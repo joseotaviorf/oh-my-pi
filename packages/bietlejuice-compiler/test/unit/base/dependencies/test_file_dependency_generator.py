@@ -105,6 +105,31 @@ class TestFileDependencyGenerator:
                 }
             )
 
+    def test_table_dependencies_merges_qube_sources(self):
+        with (
+            mock.patch(
+                "bietlejuice.base.dependencies.file_dependency_generator.DAGPackagesPathService.list_artifact_file_paths",
+                return_value=[],
+            ),
+            mock.patch(
+                "bietlejuice.base.dependencies.file_dependency_generator.FileDependencyGenerator._find_all_tables_in_query_files",
+                return_value={},
+            ),
+            mock.patch(
+                "bietlejuice.base.dependencies.file_dependency_generator.qube_table_dependencies_from_dags_root",
+                return_value={
+                    "bietlejuice.qube_dimension_visit_status": {
+                        "enrich_visit.visit_events"
+                    }
+                },
+            ),
+        ):
+            file_dependency_generator = FileDependencyGenerator()
+            dependencies = file_dependency_generator.table_dependencies_from_all_dags()
+            assert dependencies == {
+                "bietlejuice.qube_dimension_visit_status": ["enrich_visit.visit_events"]
+            }
+
     def test_exception_treatment(self):
         unstandard_dags = {"bietlejuice.gsheets.static": {"is_static": True}}
         # Below, there is a cycle in a-b-c-a.

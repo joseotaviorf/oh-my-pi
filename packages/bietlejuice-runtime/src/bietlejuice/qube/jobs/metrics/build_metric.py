@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
+from bietlejuice.base.qube.qube_table_naming import qube_windowed_table_name
 from bietlejuice.base.validation.target_resolver import validation_database_location
 from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
     DataFrameDeltaTableLoaderPipeline,
@@ -204,7 +205,9 @@ def _determine_target_date(
         # Try to infer from first dimension table
         first_dim_spec = spec.get("dimensions", [])[0]
         check_win = windows[0]
-        first_dim_table = f"{first_dim_spec['name']}_{check_win}d"
+        first_dim_table = qube_windowed_table_name(
+            entity, first_dim_spec["name"], check_win
+        )
         first_dim_path = conf.get_table_path("dim", first_dim_table)
 
         logger.info(f"Attempting to infer date from: {first_dim_path}")
@@ -282,6 +285,10 @@ def _process_window(
         logger.warning(
             f"Proceeding with {len(loaded_meas_specs)}/{len(metric_config.meas_specs)} measures. Skipped: {skipped}"
         )
+
+    if not loaded_meas_specs:
+        logger.warning(f"Window {window_days}d skipped: no measure data available.")
+        return
 
     # Aggregate metrics — use only the measures that were actually loaded
     result_df = _aggregate_metrics(
@@ -403,6 +410,13 @@ def _load_and_join_measures(
                 f"Skipping measure '{m_name}' for window {window_days}d: table not available"
             )
             continue
+
+        # Dimensions and measures may source from different tables that name the
+        # entity id differently (e.g. dimension emits `id`, measure emits
+        # `id_visit`). Align the measure's id column to the dimension-derived join
+        # key so the join below matches on entity id instead of failing / joining
+        # empty.
+        m_df = _align_measure_entity_id_column(m_df, entity_id_col, m_name)
 
         loaded_meas_specs.append(m_spec)
 
@@ -618,7 +632,10 @@ def _load_single_dimension(
     env: str,
 ) -> Optional[DataFrame]:
     """Load a single dimension table, returning None if it does not exist yet."""
-    table_name = f"{dim_name}_{window_days}d"
+    # Physical table name is {entity}_{clean_name}_{window}d (see build_dimension /
+    # qube_table_naming). Using the spec name verbatim would miss the entity prefix
+    # for dimensions whose name does not already start with "{entity}_".
+    table_name = qube_windowed_table_name(entity, dim_name, window_days)
     path = conf.get_table_path("dim", table_name)
 
     logger.debug(f"Loading dimension: {table_name}")
@@ -666,7 +683,10 @@ def _load_single_measure(
     env: str,
 ) -> Optional[DataFrame]:
     """Load a single measure table, returning None if it does not exist yet."""
-    table_name = f"{meas_name}_{window_days}d"
+    # Physical table name is {entity}_{clean_name}_{window}d (see build_measure /
+    # qube_table_naming). Using the spec name verbatim would miss the entity prefix
+    # for measures whose name does not already start with "{entity}_".
+    table_name = qube_windowed_table_name(entity, meas_name, window_days)
     path = conf.get_table_path("meas", table_name)
 
     logger.debug(f"Loading measure: {table_name}")
@@ -675,6 +695,36 @@ def _load_single_measure(
     except Exception as e:
         logger.warning(f"Measure table not found, skipping: {path}\nError: {e}")
         return None
+
+
+def _align_measure_entity_id_column(
+    df: DataFrame,
+    entity_id_col: str,
+    meas_name: str,
+) -> DataFrame:
+    """Rename a measure's entity id column to the shared metric join key.
+
+    Measure tables carry exactly ``[<entity_id_col>, date]``. When the measure's
+    entity id column differs from the dimension-derived join key (because the two
+    sources name the same entity id differently), rename it so the downstream join
+    on ``[date, entity_id_col]`` matches. No-op when the column already matches.
+    """
+    if entity_id_col in df.columns:
+        return df
+
+    candidates = [c for c in df.columns if c != "date"]
+    if len(candidates) == 1:
+        logger.info(
+            f"Aligning measure '{meas_name}' entity id column "
+            f"'{candidates[0]}' -> '{entity_id_col}' for the metric join"
+        )
+        return df.withColumnRenamed(candidates[0], entity_id_col)
+
+    logger.warning(
+        f"Cannot unambiguously align measure '{meas_name}' entity id to "
+        f"'{entity_id_col}'; columns present: {df.columns}"
+    )
+    return df
 
 
 def _prepare_measure_flag_column(

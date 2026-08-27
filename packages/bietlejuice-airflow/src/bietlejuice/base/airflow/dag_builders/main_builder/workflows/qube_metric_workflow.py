@@ -106,6 +106,8 @@ class QubeMetricWorkflow(BaseWorkflow):
             self.dag_args,
             self.workflow_args,
             self.cluster_args,
+            is_validation=self.is_validation,
+            validation_config=self.validation_config,
             **kwargs,
         )
         attach_job_cluster_engine_to_context(ctx, self.config_service)

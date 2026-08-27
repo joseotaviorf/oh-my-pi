@@ -1,0 +1,18 @@
+cluster:
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  # Qube-only Python deps (bietlejuice.qube.jobs.common.spec_models uses pydantic).
+  # EMR: emr_init_script.sh installs these after the inmetro/pydeequ block, so the
+  # typing_extensions entry overrides pydeequ's typing-extensions==4.12.2 pin.
+  # Databricks: applied via the libraries API (DBR already ships both; harmless).
+  custom_libraries:
+    - pypi:
+        package: "typing_extensions>=4.12.0"
+        ignore_installed: true
+    - pypi:
+        package: "pydantic>=2.0,<3"
+        only_binary: true
+validation:
+  cluster:
+    # Must differ from prod (CI: validate_cluster_validation_cluster_diff).
+    type: emr_7_12_consolidation_xs_memory_single_node_fleet_cluster
+  allow_custom_spark_job: true

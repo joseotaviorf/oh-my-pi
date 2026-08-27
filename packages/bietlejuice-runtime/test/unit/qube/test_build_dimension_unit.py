@@ -7,6 +7,8 @@ making them easier to maintain and faster to run.
 
 from unittest.mock import MagicMock, Mock, patch
 
+import pytest
+
 from bietlejuice.qube.jobs.common.conf import Config
 from bietlejuice.qube.jobs.dimensions.build_dimension import (
     LogicConfig,
@@ -113,6 +115,78 @@ class TestExtractDimensionConfig:
         config = _extract_dimension_config(spec, conf)
 
         assert config.windows == [1, 7, 28]  # Default windows
+
+    def test_extract_config_default_universe_is_core_entity_table(self):
+        """Test universe_table defaults to core_{entity}.{entity} when unset."""
+        spec = {
+            "entity": "visit",
+            "name": "visit_status",
+            "source": {"date_expr": "unix_timestamp(dt_visit, 'yyyy-MM-dd')"},
+        }
+        conf = Config(env="test", config_root="qube")
+
+        config = _extract_dimension_config(spec, conf)
+
+        assert config.universe_table == "core_visit.visit"
+        assert config.universe_entity_id_col == "id_visit"
+        assert config.source_layer == "core"
+
+    def test_extract_config_with_structured_layer_reference(self):
+        """Test structured layer + source_schema + table_name resolves source_layer."""
+        spec = {
+            "entity": "contract",
+            "name": "contract_status",
+            "source": {
+                "layer": "dw",
+                "source_schema": "dw_rent",
+                "table_name": "dim_contract",
+                "date_expr": "unix_timestamp(ts_updated)",
+            },
+        }
+        conf = Config(env="test", config_root="qube")
+
+        config = _extract_dimension_config(spec, conf)
+
+        assert config.source_layer == "dw"
+        assert "dw_rent.dim_contract" in config.source_table
+        # Universe table still defaults to core entity table for closed-world join
+        assert config.universe_table == "core_contract.contract"
+
+    def test_extract_config_with_explicit_universe_override(self):
+        """Test explicit universe_table/universe_entity_id_col override defaults."""
+        spec = {
+            "entity": "contract",
+            "name": "contract_status",
+            "source": {
+                "table": "dw_rent.dim_contract",
+                "date_expr": "unix_timestamp(ts_updated)",
+                "universe_table": "dw_rent.dim_contract",
+                "universe_entity_id_col": "id_contract",
+            },
+        }
+        conf = Config(env="test", config_root="qube")
+
+        config = _extract_dimension_config(spec, conf)
+
+        assert "dw_rent.dim_contract" in config.universe_table
+        assert config.universe_entity_id_col == "id_contract"
+
+    def test_extract_config_raw_layer_source_raises(self):
+        """Test raw-layer sources are rejected at extraction time."""
+        from bietlejuice.qube.jobs.common.source_resolver import SourceLayerError
+
+        spec = {
+            "entity": "visit",
+            "name": "visit_status",
+            "source": {
+                "table": "raw_ebdb.visit",
+                "date_expr": "unix_timestamp(dt_visit)",
+            },
+        }
+        conf = Config(env="test", config_root="qube")
+
+        with pytest.raises(SourceLayerError, match="Raw layer"):
+            _extract_dimension_config(spec, conf)
 
 
 class TestExtractLogicConfig:
@@ -521,6 +595,32 @@ class TestJoinWithSupportedEntitiesIfNeeded:
         # Should join with supported IDs
         mock_sup_df.join.assert_called_once()
         assert result == mock_result_df
+
+    def test_join_uses_explicit_universe_entity_id_col_when_provided(self):
+        """Test universe_entity_id_col overrides the default id_{entity} lookup."""
+        mock_result_df = MagicMock()
+        mock_result_df.columns = ["entity_id", "value"]
+        mock_sup_df = MagicMock()
+        mock_sup_df.count.return_value = 5
+        mock_sup_df.join.return_value = mock_result_df
+
+        with patch(
+            "bietlejuice.qube.jobs.dimensions.build_dimension._get_supported_ids",
+            return_value=mock_sup_df,
+        ) as mock_get_supported_ids:
+            _join_with_supported_entities_if_needed(
+                mock_result_df,
+                MagicMock(),
+                "contract",
+                "id_contract",
+                True,
+                1751155200,
+                "custom_universe_id",
+            )
+
+        # Should use the explicit universe_entity_id_col, not f"id_{entity}"
+        called_args = mock_get_supported_ids.call_args[0]
+        assert called_args[1] == "custom_universe_id"
 
 
 # class TestApplyDefaults:

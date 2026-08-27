@@ -36,9 +36,8 @@ class TestConfig:
         assert config.config_root == "/custom/specs"
         assert config.db_prefix == "test_"
         assert config.warehouse_path == "/custom/warehouse"
-        # Prod environment should have Unity Catalog prefix
-        assert config.core_db == "test_quintoandar_prod.core"
-        assert config.dim_db == "test_quintoandar_prod.qube_dimensions"
+        assert config.core_db == "test_core"
+        assert config.dim_db == "test_qube_dimensions"
 
     def test_config_db_prefix(self):
         """Test that db_prefix is applied to database names."""
@@ -74,25 +73,25 @@ class TestConfig:
         assert config.warehouse_path == "/tmp/warehouse"
 
     def test_config_forno_environment(self):
-        """Test Config for forno environment with Unity Catalog."""
+        """Test Config for forno environment (Glue metastore / EMR)."""
         config = Config(env="forno")
 
         assert config.env == "forno"
-        assert config.core_db == "quintoandar_forno.core"
-        assert config.dim_db == "quintoandar_forno.qube_dimensions"
-        assert config.meas_db == "quintoandar_forno.qube_measures"
-        assert config.met_db == "quintoandar_forno.qube_metrics"
+        assert config.core_db == "core"
+        assert config.dim_db == "qube_dimensions"
+        assert config.meas_db == "qube_measures"
+        assert config.met_db == "qube_metrics"
         assert config.warehouse_path == "s3a://5a-datalake-forno"
 
     def test_config_prod_environment(self):
-        """Test Config for prod environment with Unity Catalog."""
+        """Test Config for prod environment (Glue metastore / EMR)."""
         config = Config(env="prod")
 
         assert config.env == "prod"
-        assert config.core_db == "quintoandar_prod.core"
-        assert config.dim_db == "quintoandar_prod.qube_dimensions"
-        assert config.meas_db == "quintoandar_prod.qube_measures"
-        assert config.met_db == "quintoandar_prod.qube_metrics"
+        assert config.core_db == "core"
+        assert config.dim_db == "qube_dimensions"
+        assert config.meas_db == "qube_measures"
+        assert config.met_db == "qube_metrics"
         assert config.warehouse_path == "s3a://5a-datalake-prod"
 
     def test_get_table_path_core(self):
@@ -161,9 +160,8 @@ class TestConfig:
 
         assert result["env"] == "prod"
         assert result["config_root"] == "qube/specs"
-        # Prod environment includes Unity Catalog prefix
-        assert result["core_db"] == "test_quintoandar_prod.core"
-        assert result["dim_db"] == "test_quintoandar_prod.qube_dimensions"
+        assert result["core_db"] == "test_core"
+        assert result["dim_db"] == "test_qube_dimensions"
         assert result["warehouse_path"] == "/warehouse"
 
     def test_get_schema_name_dev(self):
@@ -176,7 +174,7 @@ class TestConfig:
         assert config.get_schema_name("met") == "qube_metrics"
 
     def test_get_schema_name_forno(self):
-        """Test get_schema_name for forno environment (with catalog prefix)."""
+        """Test get_schema_name for forno environment."""
         config = Config(env="forno")
 
         # Should extract schema name without catalog prefix
@@ -186,7 +184,7 @@ class TestConfig:
         assert config.get_schema_name("met") == "qube_metrics"
 
     def test_get_schema_name_prod(self):
-        """Test get_schema_name for prod environment (with catalog prefix)."""
+        """Test get_schema_name for prod environment."""
         config = Config(env="prod")
 
         # Should extract schema name without catalog prefix

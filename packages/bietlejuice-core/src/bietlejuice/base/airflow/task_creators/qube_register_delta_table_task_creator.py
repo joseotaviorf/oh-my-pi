@@ -7,6 +7,8 @@ from bietlejuice.base.airflow.task_creators.register_delta_table_task_creator im
     RegisterDeltaTableTaskCreator,
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.airflow.validation_aware import validation_spark_extra_args
+from bietlejuice.base.qube.qube_table_naming import qube_output_base_table_name
 
 
 class QubeRegisterDeltaTableTaskCreator(RegisterDeltaTableTaskCreator):
@@ -34,14 +36,26 @@ class QubeRegisterDeltaTableTaskCreator(RegisterDeltaTableTaskCreator):
         # Convert windows list to comma-separated string
         windows_str = ",".join(str(w) for w in windows)
 
+        entity = qube_specs.get("entity", "")
+        spec_name = qube_specs.get("name", table_attributes.table_name)
+        base_table_name = qube_output_base_table_name(entity, spec_name)
+
         parameters = [
             self.dag_execution_context.bucket,
             table_attributes.layer.value,
             table_attributes.schema,
-            table_attributes.table_name,
+            base_table_name,
             "--windows",
             windows_str,
         ]
+        parameters.extend(
+            validation_spark_extra_args(
+                getattr(self.dag_execution_context, "is_validation", False),
+                table_attributes.layer,
+                table_attributes.schema,
+                base_table_name,
+            )
+        )
 
         # The base path for QUBE is: {repo}/qube/jobs/
         # The register_delta_table.py is at: {repo}/qube/jobs/common/register_delta_table.py

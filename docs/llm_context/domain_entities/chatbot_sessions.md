@@ -77,7 +77,7 @@ Use [Related Metric Entities](#related-metric-entities) for **official** escalat
 |----------------|---------------|
 | % Seamless / Digital / Human Support clients (onboarding+ongoing) | [Journey PC](../metric_entities/journey_pc.md) |
 | Escalation rate (For Rent offboarding agent) | [Escalation Rate FR Offboarding](../metric_entities/escalation_rate_fr_offboarding.md) |
-| Escalation rate (Wall-E) | [% Escalation Rate (Wall-E)](../metric_entities/escalation_rate_walle.md) |
+| Escalation rate (Wall-E) | [% Escalation Rate (Wall-E)](../metric_entities/escalation_rate_walle.md) — QUBE: `qube_metrics.chatbot_session__escalation_rate_walle__*` |
 | Escalation error rate (Wall-E) | [% Escalation Error Rate (Wall-E)](../metric_entities/escalation_error_rate_walle.md) |
 | % Non Wall-E billable Post-contract chat contacts | [% Non Wall-E (POST)](../metric_entities/non_walle_post.md) |
 

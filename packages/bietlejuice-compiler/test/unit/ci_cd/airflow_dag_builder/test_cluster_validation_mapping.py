@@ -11,6 +11,7 @@ from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_confi
 from bietlejuice.base.validation.cluster_args import merge_validation_cluster_args
 from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
+    _has_load_spark_job,
     _instance_family,
     _is_legacy_nvme_instance_type,
     _mapped_worker_and_driver,
@@ -549,6 +550,25 @@ class TestComputeValidationOverrides:
         )
         assert resolved.get("master_node_type_id") == "r6g.xlarge"
         assert "driver_node_type_id" not in resolved
+
+
+class TestHasLoadSparkJob:
+    @pytest.mark.parametrize(
+        "workflow_type", ["qube_dimension", "qube_measure", "qube_metric"]
+    )
+    def test_qube_workflows_always_report_custom_spark_job(self, workflow_type):
+        declaration = {
+            "dag": {"name": "dimensions_chatbot_session_channel"},
+            "workflow": {"type": workflow_type},
+        }
+        assert _has_load_spark_job(declaration) is True
+
+    def test_query_delta_without_load_spark_job_is_false(self):
+        declaration = {
+            "dag": {"name": "core_aux_listing"},
+            "workflow": {"type": "query_delta", "layer": "core"},
+        }
+        assert _has_load_spark_job(declaration) is False
 
 
 class TestBuildValidationClusterSpec:

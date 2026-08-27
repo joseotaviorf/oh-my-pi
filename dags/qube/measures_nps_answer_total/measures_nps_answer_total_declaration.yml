@@ -1,0 +1,41 @@
+dag:
+  name: qube_measure_nps_answer_total
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0 6 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: >
+      Total NPS answers in the rolling window, sourced from the governed
+      dim_nps_answer (dw layer). This is a scoped-down building block: it
+      counts every answer platform-wide, NOT just For Rent or a specific
+      journey (onboarding/ongoing/offboarding/PP Multi/etc.), because the
+      journey/business_context/purpose fields needed for that scoping live on
+      dim_nps_campaign (keyed by sk_nps_campaign), a different grain than
+      dim_nps_answer (keyed by sk_nps_answer). QUBE sources must be a single
+      physical table — no joins — so reproducing the real "NPS FR" metric
+      requires a new enrich-layer table joining fact_nps_dispatches +
+      dim_nps_answer + dim_nps_campaign first. Combine with the
+      score_category dimension to get promoter/passive/detractor counts.
+  folder_name: measures_nps_answer_total
+workflow:
+  type: qube_measure
+  layer: qube
+  has_hive_sync: true
+  custom_schema: measures
+  qube_specs:
+    entity: nps_answer
+    name: total
+    source:
+      table: dw_customer_satisfaction.dim_nps_answer
+      layer: dw
+      entity_id_col: sk_nps_answer
+      date_expr: unix_timestamp(ts_answered)
+      select:
+      - sk_nps_answer
+      - ts_answered
+    logic:
+      filter_sql: "TRUE"
+    windows:
+    - 1
+    - 7
+    - 28

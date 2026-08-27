@@ -24,6 +24,7 @@ from bietlejuice.qube.jobs.common.data_quality import (
 )
 from bietlejuice.qube.jobs.common.logging_config import get_logger, setup_logging
 from bietlejuice.qube.jobs.common.path_validator import validate_spec_path
+from bietlejuice.qube.jobs.common.source_resolver import resolve_source
 from bietlejuice.qube.jobs.common.specs_loader import load_spec
 from bietlejuice.qube.jobs.common.utils import (
     get_spark_session,
@@ -148,9 +149,9 @@ def _extract_measure_config(spec: Dict[str, Any], conf: Config) -> MeasureConfig
     windows = [raw_windows] if isinstance(raw_windows, int) else raw_windows
 
     source = spec["source"]
-    source_table_raw = source.get("table") or f"core_{entity}.{entity}"
-    source_table = conf.get_table_path("core", source_table_raw)
-    entity_id_col = source.get("entity_id_col") or f"id_{entity}"
+    resolved = resolve_source(conf, source, entity)
+    source_table = resolved.table
+    entity_id_col = resolved.entity_id_col
     date_expr_sql = source["date_expr"]
     filter_sql = spec["logic"]["filter_sql"]
 

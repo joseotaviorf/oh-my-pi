@@ -26,6 +26,7 @@ Before answering any visit question, decide which lens applies:
 ## Related Metric Entities
 
 - [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) — L2VB (listing → visit booked) and L2VC (listing → visit completed) at listing-cohort grain for RENT and SALE.
+- [Visit Funnel Dashboard](../metric_entities/visit_funnel_dashboard.md) — visit-grain booked/completed counts by business context and status (QUBE materialization).
 
 ## Synonyms
 
@@ -97,6 +98,16 @@ Use [Related Metric Entities](#related-metric-entities) for **official** listing
 - **VB2VC rate** — `SUM(num_visit_completed) / SUM(num_visit_booked)` on `fact_visits`
 - **Visits cancelled / unsuccessful** — `num_visit_canceled`, `num_visit_unsuccessful`
 - **Offers submitted / contracts signed** (visit-attributed funnel) — `num_offer_submitted`, `num_contract_signed`
+
+## Relationships with other entities
+
+- **Visit ↔ Schedule (1 → many):** `dw_visit.fact_visits` ↔ `dw_visit.fact_visit_schedules` join on `sk_visit`. One consolidated visit contains one or more scheduling attempts; filter `is_last_schedule = TRUE` on the schedules side to keep only the final/valid attempt per visit.
+- **Visit → dimensions:** `fact_visits.sk_visit` references `dw_visit.dim_visit` and `dw_visit.dim_post_visit_demand`; `fact_visit_schedules.sk_schedule` references `dw_visit.dim_visit_schedule`.
+- **Visit → House / entrance:** `fact_visits.sk_house` references the house entity in `dw_house.*`, and `fact_visits.sk_house_entrance` references `dw_house.dim_house_entrance_history.sk_house_entrance` (see Golden query 2 for the entrance-model join).
+- **Visit → Demand (visitor):** `fact_visits.sk_visitor` identifies the demand-side user (potential tenant/buyer) for the visit.
+- **Schedule → Broker:** `fact_visit_schedules.sk_broker` identifies the broker attached to a scheduling attempt.
+- **Visit ↔ CDP events:** for governed EGW `visit_*` **events** and tracking attribution (event grain, not the consolidated visit grain), see [`cdp.md`](cdp.md) — do not mix event tables with `dw_visit.*` funnel metrics.
+- **Metric overlap:** official listing-cohort **L2VB / L2VC** live in [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) (listing grain); visit-grain booked/completed counts by business context and status live in [Visit Funnel Dashboard](../metric_entities/visit_funnel_dashboard.md).
 
 ## Dos and Don'ts
 

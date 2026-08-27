@@ -11,6 +11,10 @@ from typing import Any, Dict, List, Optional, Set
 
 import yaml
 
+from bietlejuice.base.dependencies.qube_source_extractor import (
+    QUBE_WORKFLOW_TYPES,
+    extract_tables_from_qube_dag_root,
+)
 from scripts.ci_cd.source_layer_validation.layer_classifier import parse_table_fqn
 from scripts.ci_cd.source_layer_validation.sql_table_extractor import (
     extract_table_fqns_from_sql_file_path,
@@ -165,6 +169,11 @@ def extract_tables_by_source_file(
                     for m in SPARK_TABLE_LITERAL_RE.finditer(text):
                         tables.add(m.group(1))
                     add_for_path(path, tables)
+
+    if wtype in QUBE_WORKFLOW_TYPES:
+        decl_path, qube_tables = extract_tables_from_qube_dag_root(root)
+        if decl_path and qube_tables:
+            add_for_path(Path(decl_path), qube_tables)
 
     return out
 

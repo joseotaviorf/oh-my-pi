@@ -25,6 +25,10 @@ from bietlejuice.qube.jobs.common.data_quality import (
 )
 from bietlejuice.qube.jobs.common.logging_config import get_logger, setup_logging
 from bietlejuice.qube.jobs.common.path_validator import validate_spec_path
+from bietlejuice.qube.jobs.common.source_resolver import (
+    resolve_source,
+    resolve_universe,
+)
 from bietlejuice.qube.jobs.common.specs_loader import load_spec
 from bietlejuice.qube.jobs.common.utils import (
     get_default_json,
@@ -46,7 +50,10 @@ class DimensionConfig:
     name: str
     windows: List[int]
     source_table: str
+    source_layer: str
     entity_id_col: str
+    universe_table: str
+    universe_entity_id_col: str
     date_expr_sql: str
     required_cols: List[str]
 
@@ -98,10 +105,10 @@ def build_dimension(args: Namespace) -> None:
         target_date = datetime.fromtimestamp(fixed_hi).strftime("%Y-%m-%d")
         logger.info(f"Target date: {target_date} (timestamp: {fixed_hi})")
 
-        core_df_full = _load_core_entity_table(
+        core_df_full = _load_universe_table(
             spark,
             dim_config.source_table,
-            f"core_{dim_config.entity}.{dim_config.entity}",
+            dim_config.universe_table,
             df_source,
             args.env,
         )
@@ -178,12 +185,13 @@ def _extract_dimension_config(spec: Dict[str, Any], conf: Config) -> DimensionCo
     windows = [raw_windows] if isinstance(raw_windows, int) else raw_windows
 
     source = spec["source"]
-    source_table_raw = source.get("table") or f"core_{entity}.{entity}"
-    source_table = conf.get_table_path("core", source_table_raw)
-    entity_id_col = source.get("entity_id_col") or f"id_{entity}"
+    resolved = resolve_source(conf, source, entity)
+    universe_table, universe_entity_id_col = resolve_universe(
+        conf, source, entity, resolved.entity_id_col
+    )
     date_expr_sql = source["date_expr"]
 
-    required_cols = [entity_id_col]
+    required_cols = [resolved.entity_id_col]
     if "select" in source:
         required_cols.extend(source["select"])
 
@@ -191,8 +199,11 @@ def _extract_dimension_config(spec: Dict[str, Any], conf: Config) -> DimensionCo
         entity=entity,
         name=name,
         windows=windows,
-        source_table=source_table,
-        entity_id_col=entity_id_col,
+        source_table=resolved.table,
+        source_layer=resolved.layer,
+        entity_id_col=resolved.entity_id_col,
+        universe_table=universe_table,
+        universe_entity_id_col=universe_entity_id_col,
         date_expr_sql=date_expr_sql,
         required_cols=required_cols,
     )
@@ -258,25 +269,25 @@ def _determine_target_date(date_str: str, df_source: DataFrame) -> int:
     return fixed_hi
 
 
-def _load_core_entity_table(
+def _load_universe_table(
     spark: SparkSession,
     source_table: str,
-    core_table: str,
+    universe_table: str,
     df_source: DataFrame,
     env: str,
 ) -> DataFrame:
-    """Load core entity table for supported IDs."""
-    if source_table == core_table or (
+    """Load entity universe table for the closed-world join."""
+    if source_table == universe_table or (
         "." not in source_table
-        and source_table.split(".")[-1] == core_table.split(".")[-1]
+        and source_table.split(".")[-1] == universe_table.split(".")[-1]
     ):
-        logger.info("Source table is core entity table, reusing")
+        logger.info("Source table is universe table, reusing")
         return df_source
     else:
-        logger.info(f"Loading core entity table: {core_table}")
-        core_df = load_table(spark, core_table, env=env)
-        core_df.persist()
-        return core_df
+        logger.info(f"Loading universe table: {universe_table}")
+        universe_df = load_table(spark, universe_table, env=env)
+        universe_df.persist()
+        return universe_df
 
 
 def _process_window(
@@ -325,6 +336,7 @@ def _process_window(
         dim_config.entity_id_col,
         logic_config.include_all_entities,
         hi,
+        dim_config.universe_entity_id_col,
     )
 
     final_df = _apply_defaults(final_df, logic_config)
@@ -410,13 +422,14 @@ def _join_with_supported_entities_if_needed(
     entity_id_col: str,
     include_all_entities: bool,
     hi: int,
+    universe_entity_id_col: Optional[str] = None,
 ) -> DataFrame:
     """Join with supported entities if include_all_entities is True."""
     if not include_all_entities:
         logger.debug("Using aggregated results directly (include_all_entities=False)")
         return result_df.withColumnRenamed("entity_id", entity_id_col)
 
-    sup_id_col = f"id_{entity}"
+    sup_id_col = universe_entity_id_col or f"id_{entity}"
     sup_df = _get_supported_ids(core_df_full, sup_id_col, entity_id_col, hi)
     logger.debug(f"Joining with {sup_df.count()} supported IDs")
     return sup_df.join(

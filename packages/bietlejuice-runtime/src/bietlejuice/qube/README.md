@@ -140,6 +140,42 @@ source:
   date_expr: "..."
 ```
 
+### Non-Core governed sources (Clean / Enrich / DW / Metric)
+
+Dimensions and measures can read directly from any allowed governed layer:
+
+```yaml
+source:
+  layer: enrich
+  source_schema: enrich_visit
+  table_name: visit_events
+  date_expr: "unix_timestamp(ts_created)"
+```
+
+Or use a fully qualified reference:
+
+```yaml
+source:
+  table: dw_rent.dim_contract
+  date_expr: "unix_timestamp(ts_updated)"
+```
+
+**Raw layer sources are rejected** at runtime and in CI layer-policy validation.
+
+### Universe table (closed-world join)
+
+When `logic.include_all_entities: true`, aggregated values are left-joined onto
+all supported entity IDs. Defaults: `universe_table` = `core_{entity}.{entity}`,
+`universe_entity_id_col` = `entity_id_col`.
+
+```yaml
+source:
+  table: enrich_visit.visit_events
+  universe_table: core_visit.visit
+  universe_entity_id_col: id_visit
+  date_expr: "..."
+```
+
 ## Output Tables
 
 ### Naming Convention

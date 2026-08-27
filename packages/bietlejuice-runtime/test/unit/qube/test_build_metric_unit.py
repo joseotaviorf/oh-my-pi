@@ -5,10 +5,13 @@ from unittest.mock import MagicMock, patch
 
 from bietlejuice.qube.jobs.metrics.build_metric import (
     MetricConfig,
+    _align_measure_entity_id_column,
     _build_measure_aggregation,
     _determine_use_approx_counter,
     _extract_metric_config,
     _identify_entity_id_column,
+    _load_single_dimension,
+    _load_single_measure,
     _setup_configuration,
 )
 
@@ -173,6 +176,87 @@ class TestIdentifyEntityIdColumn(unittest.TestCase):
             _identify_entity_id_column(df)
 
         self.assertIn("Could not identify entity_id column", str(context.exception))
+
+
+class TestLoadSingleTableNaming(unittest.TestCase):
+    """Regression tests: metric must load the physical {entity}_{name}_{window}d table.
+
+    Pins the bug where the metric resolved ``{name}_{window}d`` and therefore never
+    found tables whose spec name does not already start with ``{entity}_`` (e.g.
+    ``business_context`` -> ``visit_business_context_28d``).
+    """
+
+    @patch("bietlejuice.qube.jobs.metrics.build_metric.load_table")
+    def test_dimension_table_name_includes_entity_prefix(self, mock_load_table):
+        # Arrange
+        conf = MagicMock()
+        conf.get_table_path.return_value = "qube_dimensions.visit_business_context_28d"
+        # Act
+        _load_single_dimension(
+            MagicMock(), "visit", "business_context", 28, conf, "prod"
+        )
+        # Assert
+        conf.get_table_path.assert_called_once_with("dim", "visit_business_context_28d")
+
+    @patch("bietlejuice.qube.jobs.metrics.build_metric.load_table")
+    def test_dimension_table_name_not_double_prefixed(self, mock_load_table):
+        # Arrange — spec name already carries the entity prefix
+        conf = MagicMock()
+        conf.get_table_path.return_value = "qube_dimensions.visit_status_7d"
+        # Act
+        _load_single_dimension(MagicMock(), "visit", "visit_status", 7, conf, "prod")
+        # Assert
+        conf.get_table_path.assert_called_once_with("dim", "visit_status_7d")
+
+    @patch("bietlejuice.qube.jobs.metrics.build_metric.load_table")
+    def test_measure_table_name_includes_entity_prefix(self, mock_load_table):
+        # Arrange
+        conf = MagicMock()
+        conf.get_table_path.return_value = "qube_measures.chatbot_session_walle_1d"
+        # Act
+        _load_single_measure(
+            MagicMock(), "chatbot_session", "walle_session_total", 1, conf, "prod"
+        )
+        # Assert
+        conf.get_table_path.assert_called_once_with(
+            "meas", "chatbot_session_walle_session_total_1d"
+        )
+
+
+class TestAlignMeasureEntityIdColumn(unittest.TestCase):
+    """Regression tests for the dimension/measure entity-id join alignment (issue #1)."""
+
+    def test_renames_mismatched_measure_id_column(self):
+        # Arrange — dimension emits `id`, measure emits `id_visit`
+        df = MagicMock()
+        df.columns = ["id_visit", "date"]
+        renamed = MagicMock()
+        df.withColumnRenamed.return_value = renamed
+        # Act
+        result = _align_measure_entity_id_column(df, "id", "visit_booked")
+        # Assert
+        df.withColumnRenamed.assert_called_once_with("id_visit", "id")
+        self.assertEqual(result, renamed)
+
+    def test_noop_when_column_already_matches(self):
+        # Arrange — measure already emits the join key (e.g. nps_answer case)
+        df = MagicMock()
+        df.columns = ["sk_nps_answer", "date"]
+        # Act
+        result = _align_measure_entity_id_column(df, "sk_nps_answer", "total")
+        # Assert
+        df.withColumnRenamed.assert_not_called()
+        self.assertEqual(result, df)
+
+    def test_noop_when_alignment_is_ambiguous(self):
+        # Arrange — unexpected extra columns: do not guess
+        df = MagicMock()
+        df.columns = ["id_a", "id_b", "date"]
+        # Act
+        result = _align_measure_entity_id_column(df, "id", "weird")
+        # Assert
+        df.withColumnRenamed.assert_not_called()
+        self.assertEqual(result, df)
 
 
 class TestDetermineUseApproxCounter(unittest.TestCase):

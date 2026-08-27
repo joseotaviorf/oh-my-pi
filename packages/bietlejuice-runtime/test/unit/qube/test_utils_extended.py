@@ -16,6 +16,17 @@ from bietlejuice.qube.jobs.common.utils import (
 class TestLoadTable:
     """Tests for load_table function."""
 
+    def test_load_table_forno_uses_hive_name(self, spark):
+        """forno/prod must not prepend a Unity Catalog namespace on EMR."""
+        from unittest.mock import MagicMock, patch
+
+        expected = MagicMock(name="dataframe")
+        with patch.object(spark, "table", return_value=expected) as table_mock:
+            result = load_table(spark, "core_visit.visit", env="forno")
+
+        table_mock.assert_called_once_with("core_visit.visit")
+        assert result is expected
+
     # def test_load_table_from_metastore(self, spark):
     #     """Test loading table from metastore."""
     #     # Create a test table

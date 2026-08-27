@@ -309,6 +309,34 @@ breakdown via `customer_type` and crossable with one another):
 | Ldt > 15d / ≤ 15d | `leadtime_total` (= `DATE_DIFF('day', dt_termination, dt_tf)`) | `> 15` / `<= 15` |
 | w/ Tkt Back | `ticket_off_escalado` | `= true` |
 
+**QUBE precompute (exploration only — not the official NPS FR number)**. `dags/qube/`
+materializes a scoped-down building block, not NPS FR itself:
+
+- Dimension: `qube_dimensions.nps_answer__score_category__*`
+- Measure: `qube_measures.nps_answer__total__*`
+- Metric: `qube_metrics.nps_answer__score_breakdown__*` — counts grouped by
+  `score_category` (promoter/passive/detractor), from which
+  `(promoters - detractors) / (promoters + passive + detractor)` can be derived at query
+  time, same pattern as `escalation_rate_walle`'s "rate at query time".
+
+**This is global across all NPS campaigns — it does NOT apply the `business_context =
+'forRent'`, `customer_journey = 'true'`, or `purpose = 'main'` filters**, and has no journey
+(onboarding/ongoing/offboarding), IQ/PP, or weighting dimension. It will not match NPS True,
+any journey component, PP Multi, SPOC/AS IS, or the interaction-type metrics in this file.
+
+**Why it's scoped down**: QUBE dimension/measure sources must be a single physical table
+(`clean`/`enrich`/`dw`/`metric`/`core`/`qube` layer, no joins — see
+`bietlejuice/qube/jobs/common/source_resolver.py`). The journey/business_context/purpose
+fields live on `dim_nps_campaign` (keyed by `sk_nps_campaign`), a different grain than
+`dim_nps_answer` (keyed by `sk_nps_answer`), so this measure reads `dim_nps_answer` alone
+(`dw_customer_satisfaction.dim_nps_answer`) with no campaign filter. Reproducing the real
+NPS FR population in QUBE requires a new `enrich`-layer table joining
+`fact_nps_dispatches` + `dim_nps_answer` + `dim_nps_campaign` first (not yet built — would
+be a new pipeline in `dw_customer_satisfaction`'s domain). The weighted NPS True / PP Multi
+composition and per-metric rounding rules also cannot be computed inside QUBE at all (it
+only produces `COUNT(DISTINCT entity_id)` per dimension cut) — that math stays downstream
+regardless.
+
 ## Dos and Don'ts
 
 **Do:**

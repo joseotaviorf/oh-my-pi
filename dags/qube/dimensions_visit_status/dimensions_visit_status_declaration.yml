@@ -1,0 +1,37 @@
+dag:
+  name: qube_dimension_visit_status
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0 5 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Builds QUBE dimension table for visit.visit_status (computed_status)
+  folder_name: dimensions_visit_status
+workflow:
+  type: qube_dimension
+  layer: qube
+  has_hive_sync: true
+  custom_schema: dimensions
+  qube_specs:
+    entity: visit
+    name: visit_status
+    source:
+      # Forno EMR smoke: clean CDC visit has checkpoints (readable); core_visit.visit log is truncated.
+      table: datalake_ebdb_clean.visit
+      layer: clean
+      universe_table: datalake_ebdb_clean.visit
+      entity_id_col: id
+      date_expr: unix_timestamp(ts_updated)
+      select:
+      - id
+      - computed_status
+      - ts_updated
+    logic:
+      card: single
+      type: string
+      agg: last
+      value_col: computed_status
+    order_by:
+      ts_col: ts_updated
+      nulls_last: true
+    defaults:
+      unknown_string: UNKNOWN

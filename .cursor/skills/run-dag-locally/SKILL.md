@@ -11,7 +11,7 @@ description: Run and monitor a specific DAG on the local Airflow environment via
 - User says "run my DAG locally", "test this DAG", "trigger the DAG", or "kick the DAG"
 - Validating that a DAG parses correctly and its tasks execute on Databricks (Forno)
 
-**Important**: The local Airflow orchestrates the DAG, but Spark jobs execute on Databricks via the configured `databricks_conn_id`. This is not a purely offline test — it runs against the Forno staging environment.
+**Important**: Spark execution depends on the DAG cluster config. **EMR pilot DAGs** (e.g. Qube) run Spark on **AWS EMR**; most other DAGs still use **Databricks** via `databricks_conn_id`. Local Airflow only orchestrates — jobs run in Forno.
 
 ---
 
@@ -92,26 +92,29 @@ This step uploads artifacts that Databricks needs to execute jobs in the Forno s
 
 | Artifact | Local source | S3 bucket | S3 path |
 |---|---|---|---|
-| `bietlejuice` wheels | `dist/*.whl` | `artifacts.s3.forno` | `bi-etl-ejuice-local/{username}/` (personal) |
+| `bietlejuice` wheels (EMR bootstrap) | `dist/*.whl` | `artifacts.s3.forno` | `bi-etl-ejuice/bietlejuice_{core,runtime}-latest-py3-none-any.whl` |
+| `bietlejuice` wheels (personal / Databricks) | `dist/*.whl` | `artifacts.s3.forno` | `bi-etl-ejuice-local/{username}/` |
 | Spark job scripts | `dags/**/spark_jobs/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice-local/{username}/spark_jobs/` |
 | SQL queries | `dags/**/queries/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice/queries/` |
 | Data quality files | `dags/**/data_quality/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice/data_quality/` |
 | JSON schemas | `dags/**/schemas/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice/schemas/` |
-| Qube Python modules | `packages/bietlejuice-runtime/src/bietlejuice/qube/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice/bietlejuice/qube/` |
-| Init scripts | `packages/bietlejuice-compiler/scripts/init_script.sh`, etc. | `artifacts.s3.forno` | `bi-etl-ejuice/` |
+| Qube Python modules | `packages/bietlejuice-runtime/src/bietlejuice/qube/jobs/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice/qube/jobs/` |
+| Init scripts | `packages/bietlejuice-compiler/scripts/emr_init_script.sh`, etc. | `artifacts.s3.forno` | `bi-etl-ejuice/` |
 
 ### Decision matrix — upload only what changed
 
 | Changed path | Upload needed | Make target |
 |---|---|---|
 | `packages/bietlejuice-runtime/src/bietlejuice/qube/jobs/**/*.py` | Qube modules only | `make upload-local-qube-jobs` |
-| `packages/*/src/bietlejuice/**/*.py` (non-qube) | Wheel + spark jobs | `make upload-local-package` |
+| `packages/*/src/bietlejuice/**/*.py` (non-qube, EMR DAG) | EMR wheels + qube jobs | `make upload-local-wheel-emr upload-local-qube-jobs` |
+| `packages/*/src/bietlejuice/**/*.py` (non-qube, Databricks DAG) | Wheel + spark jobs | `make upload-local-package` |
 | `dags/**/spark_jobs/**/*.py` | Spark jobs only | `make upload-local-spark-jobs` |
 | `dags/**/queries/**/*.sql` | Queries | `make upload-local-queries` |
 | `dags/**/data_quality/**/*.yml` | Data quality | `make upload-local-data-quality` |
 | `dags/**/schemas/**/*.json` | Schemas | `make upload-local-schemas` |
-| `packages/bietlejuice-compiler/scripts/init_script.sh` or `wonka/*.sh` | Init scripts | `make upload-local-init-scripts` |
-| Multiple / unsure | Everything | `make upload-forno-release` |
+| `packages/bietlejuice-compiler/scripts/emr_init_script.sh` or `wonka/*.sh` | Init scripts | `make upload-local-init-scripts` |
+| Multiple / unsure (EMR pilot) | EMR wheels + qube jobs + init scripts | `make upload-local-wheel-emr upload-local-qube-jobs upload-local-init-scripts` |
+| Multiple / unsure (Databricks) | Everything | `make upload-forno-release` |
 
 ### Full Forno release
 
@@ -119,17 +122,18 @@ This step uploads artifacts that Databricks needs to execute jobs in the Forno s
 make upload-forno-release
 ```
 
-Runs in sequence: wheel build → spark_jobs → queries → data_quality → schemas → qube modules → init scripts.
+Runs in sequence: wheel build → spark_jobs → queries → data_quality → schemas → qube modules → init scripts. For **EMR pilot DAGs**, also run `make upload-local-wheel-emr` so bootstrap installs the latest wheels from `artifacts.../bi-etl-ejuice/`.
 
 ### Individual targets (faster for targeted changes)
 
 ```bash
-make upload-local-package        # Wheel + spark_jobs
+make upload-local-package        # Wheel + spark_jobs (Databricks)
+make upload-local-wheel-emr      # EMR bootstrap wheels (*-latest on artifacts bucket)
 make upload-local-queries        # SQL queries only
 make upload-local-data-quality   # Data quality YAML only
 make upload-local-schemas        # JSON schemas only
 make upload-local-qube-jobs      # Qube Python modules only
-make upload-local-init-scripts   # Init scripts (rarely needed)
+make upload-local-init-scripts   # EMR/Databricks init scripts
 ```
 
 **Wheel upload**: `local/upload_local_whl_to_s3.py` auto-discovers `bietlejuice_core-*.whl` and `bietlejuice_runtime-*.whl` in `dist/` and uploads them. Run `make build` first to produce the wheels.
@@ -158,8 +162,13 @@ server:
 # List available roles
 /usr/local/bin/weep list
 
-# Export credentials for Forno Stag Data (account 713278628093) — EMR DAGs require EMR role
-eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_DataAndAnalyticsEMRUser_staff)
+# Export credentials for uploads (S3 artifacts / Databricks repo paths)
+eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_EngineerFornoStagData_squad)
+
+# For EMR DAG runs, refresh Airflow aws_default separately (DataAndAnalyticsEMRUser_staff)
+# docker exec bietlejuice_<hash>-scheduler-1 airflow connections delete aws_default
+# docker exec bietlejuice_<hash>-scheduler-1 airflow connections add aws_default \
+#   --conn-type aws --conn-extra '{"region_name":"us-east-1","aws_access_key_id":"...","aws_secret_access_key":"...","aws_session_token":"..."}'
 
 # Verify
 aws sts get-caller-identity
@@ -295,78 +304,4 @@ Stop polling when `state` is `success` or `failed`.
 
 ## Step 8 — Inspect failures
 
-If any task fails, check its logs:
-
-```bash
-curl -s -u admin:admin \
-  "http://localhost:8080/api/v1/dags/bietlejuice.{dag_name}/dagRuns/{dag_run_id}/taskInstances/{task_id}/logs/{try_number}" \
-  | tail -40
-```
-
-Use `try_number=1` for the first attempt, `2` for the first retry, etc.
-
-### Inspect Databricks run output for detailed errors
-
-When Airflow logs only show `RunState failed with terminal state: FAILED. Message: Workload failed`, extract the Databricks run ID from the Airflow log and query the Databricks API for the full stack trace:
-
-```bash
-RUN_ID=<run_id_from_logs>
-
-curl -s -H "Authorization: Bearer $DATABRICKS_TOKEN" \
-  "https://dbc-324f044d-4b9d.cloud.databricks.com/api/2.1/jobs/runs/get-output?run_id=$RUN_ID" \
-  | uv run python -c "import json,sys; d=json.load(sys.stdin); print(d.get('error','')); print('---'); print(d.get('error_trace','')[:3000])"
-```
-
----
-
-## Core model DAGs: upload spark jobs to shared forno path
-
-The `make upload-local-spark-jobs` target uploads to a **personal** S3 path under `bi-etl-ejuice-local/{username}/`. Core model DAGs resolve spark job paths from the **shared** forno location. When `FileNotFoundException` occurs on Databricks, upload directly to the shared path:
-
-```bash
-aws s3 cp dags/{domain}/{dag_name}/spark_jobs/{job_file}.py \
-  s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice/spark_jobs/{dag_name}/{job_file}.py \
-  --acl bucket-owner-full-control
-
-aws s3 cp dags/{domain}/{dag_name}/spark_jobs/forno_conf.yml \
-  s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice/spark_jobs/{dag_name}/forno_conf.yml \
-  --acl bucket-owner-full-control
-```
-
----
-
-## Common issues
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Docker mount permission error on `astro/include` | macOS permission issue | `sudo chmod 755 ./astro/include` |
-| TTY error adding variables on restart | Non-interactive terminal | Non-critical; containers still work |
-| `has_import_errors: true` | Python import or YAML syntax error | Check `importErrors` API endpoint for the traceback |
-| `last_parsed_time` not updating | Scheduler has not processed the DAG yet | Wait 15–30s and retry |
-| `optimize-*` task fails | Databricks cluster terminated before optimize finished | Non-critical on Forno; does not affect data correctness |
-| Port 8080 already in use | Another service on port 8080 | Stop the other service or edit `astro/docker-compose.override.yml` |
-| DAG shows 0 tasks | Stale parse from before restart | Wait for `last_parsed_time` to update past the restart time |
-| `execute-job-cluster` fails | Databricks connection issue or cluster config | Check Databricks workspace; verify `databricks_conn_id` in declaration |
-| `FileNotFoundException: spark_jobs/{dag_name}/*.py` | `make upload-local-spark-jobs` uploads to a **personal** S3 path, but core model DAGs use the **shared** forno path | Upload to the shared path (see Core model DAGs section above) |
-| `DELTA_CREATE_TABLE_SCHEME_MISMATCH` | Schema change conflicts with existing Delta table on forno | Delete the old table: `aws s3 rm s3://5a-datalake-forno/{layer}/{schema}/{table}/ --recursive`, then re-trigger |
-| `DELTA_PATH_DOES_NOT_EXIST` after deleting a table | Metastore still references the old table but the S3 path was removed | Drop the metastore entry via Databricks: `spark.sql("DROP TABLE IF EXISTS {schema}.{table}")` before re-triggering |
-| Task succeeds but target table is empty | Date range does not match data available in forno | Check source table dates first, then trigger with matching dates |
-| AWS credentials expire mid-session | Weep credentials last ~1 hour | Re-run `eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_DataAndAnalyticsEMRUser_staff)` or `make import-local-aws-connection` |
-| `unknown flag: --secret` during image build | `DOCKER_BUILDKIT` not set | `export DOCKER_BUILDKIT=1`; install buildx if missing (see setup-local-environment skill) |
-
----
-
-## Checklist
-
-- [ ] Unit tests pass for the changed modules
-- [ ] Docker running and Astro containers up
-- [ ] AWS session valid (`aws sts get-caller-identity`) — re-check before each upload step
-- [ ] DAG file regenerated (`make create-dag-files dag_name=...`)
-- [ ] Forno S3 artifacts uploaded — use the decision matrix to pick the right target(s), or run `make upload-forno-release` for a full sync
-- [ ] For core model DAGs: spark jobs also uploaded to the **shared** forno path
-- [ ] DAG has no import errors (`has_import_errors: false`)
-- [ ] All expected tasks visible via API
-- [ ] Trigger date range matches available data in forno source tables
-- [ ] DAG triggered with `test_run` mode
-- [ ] All critical tasks (load, data-quality) completed successfully
-- [ ] If task fails: checked Databricks run output for full stack trace
+[Showing lines 1-300 of 303. Use :301 to continue]

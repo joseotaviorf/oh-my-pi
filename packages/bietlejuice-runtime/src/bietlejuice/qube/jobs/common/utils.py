@@ -70,8 +70,8 @@ def load_table(spark: SparkSession, table_name: str, env: str = "dev"):
     loads from CSV. Otherwise uses spark.table(). If table doesn't exist in
     metastore but exists as Delta on disk, registers it first.
 
-    For Databricks environments (forno/prod), automatically prepends the Unity
-    Catalog namespace (e.g., quintoandar_forno) to table names.
+    On forno/prod, table names are resolved as Glue/Hive two-part identifiers
+    (e.g. ``core_visit.visit``). No Databricks Unity Catalog prefix is applied.
 
     Note: env="unittest" skips CSV loading to use test fixtures.
     """
@@ -89,14 +89,7 @@ def load_table(spark: SparkSession, table_name: str, env: str = "dev"):
                 .csv(csv_path)
             )
 
-    # Prepend Unity Catalog namespace for Databricks environments
     qualified_table_name = table_name
-    if env in ["forno", "prod"]:
-        # Check if table name already has catalog prefix to avoid double-prefixing
-        if not table_name.startswith("quintoandar_"):
-            catalog = f"quintoandar_{env}"
-            qualified_table_name = f"{catalog}.{table_name}"
-            print(f"Qualified table name for Unity Catalog: {qualified_table_name}")
 
     # Try to load from metastore
     try:

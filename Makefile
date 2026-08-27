@@ -409,8 +409,23 @@ upload-local-package:
 
 .PHONY: upload-local-qube-jobs
 upload-local-qube-jobs:
-	@aws s3 sync packages/bietlejuice-runtime/src/bietlejuice/qube \
-		s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice/bietlejuice/qube \
+	@aws s3 sync packages/bietlejuice-runtime/src/bietlejuice/qube/jobs \
+		s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice/qube/jobs \
+		--acl bucket-owner-full-control
+
+.PHONY: upload-local-wheel-emr
+## Overwrites Forno EMR bootstrap *-latest* wheels on the artifacts bucket (new clusters only).
+## Requires EngineerFornoStagData_squad (not DataAndAnalyticsEMRUser_staff). See emr_init_script.sh.
+upload-local-wheel-emr:
+	@make build
+	@RUNTIME=$$(ls -t dist/bietlejuice_runtime-*.whl 2>/dev/null | head -1); \
+	CORE=$$(ls -t dist/bietlejuice_core-*.whl 2>/dev/null | head -1); \
+	test -n "$$RUNTIME" && test -n "$$CORE" || { echo "ERROR: wheels missing under dist/; make build failed?" >&2; exit 1; }; \
+	echo "Uploading $$CORE -> bi-etl-ejuice/bietlejuice_core-latest-py3-none-any.whl"; \
+	aws s3 cp "$$CORE" s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/bietlejuice_core-latest-py3-none-any.whl \
+		--acl bucket-owner-full-control; \
+	echo "Uploading $$RUNTIME -> bi-etl-ejuice/bietlejuice_runtime-latest-py3-none-any.whl"; \
+	aws s3 cp "$$RUNTIME" s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/bietlejuice_runtime-latest-py3-none-any.whl \
 		--acl bucket-owner-full-control
 
 .PHONY: upload-local-queries
@@ -465,6 +480,7 @@ upload-local-init-scripts:
 ## Full local Forno release: builds wheel and uploads all artifacts to Forno S3 (mirrors release.yml forno steps).
 upload-forno-release:
 	@make upload-local-package
+	@make upload-local-wheel-emr
 	@make upload-local-queries
 	@make upload-local-metadata
 	@make upload-local-data-quality

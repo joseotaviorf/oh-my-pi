@@ -52,6 +52,13 @@ PHASE2_WORKFLOWS = frozenset(
         "wonka",
     }
 )
+# qube_dimension/measure/metric always run a hand-written Spark job
+# (build_dimension.py / build_measure.py / build_metric.py) with no
+# `load_spark_job` key in the declaration — allow_custom_spark_job is
+# therefore always expected in their validation block.
+QUBE_CUSTOM_SPARK_JOB_WORKFLOWS = frozenset(
+    {"qube_dimension", "qube_measure", "qube_metric"}
+)
 SKIP_CLUSTER_PREFIXES = ("emr_",)
 
 INSTANCE_SUFFIX_TO_TIER = {
@@ -191,6 +198,8 @@ class ValidationClusterSpec:
 
 def _has_load_spark_job(declaration: dict) -> bool:
     workflow = declaration.get("workflow", {})
+    if workflow.get("type") in QUBE_CUSTOM_SPARK_JOB_WORKFLOWS:
+        return True
     if workflow.get("load_spark_job"):
         return True
     tables_customization = workflow.get("tables_customization")

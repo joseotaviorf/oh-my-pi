@@ -134,6 +134,29 @@ class TestExtractClusterValidationFiles:
         assert err is not None
         assert "unexpected allow_custom_spark_job" in err
 
+    def test_validate_allow_custom_contract_accepts_qube_dimension_without_load_spark_job(
+        self,
+    ):
+        """qube_dimension/measure/metric always run a hand-written Spark job with
+        no `load_spark_job` key — allow_custom_spark_job: true is expected."""
+        declaration = {
+            "dag": {"name": "dimensions_chatbot_session_channel"},
+            "workflow": {"type": "qube_dimension"},
+        }
+        content = (
+            "cluster:\n  type: x\n\nvalidation:\n  cluster:\n"
+            "    type: consolidation_s_general_cluster\n"
+            "  allow_custom_spark_job: true\n"
+        )
+        err = _validate_allow_custom_spark_job_contract(
+            content,
+            declaration,
+            context_path=Path(
+                "dags/qube/dimensions_chatbot_session_channel/x_cluster.yml"
+            ),
+        )
+        assert err is None
+
     def test_validate_cluster_file_yaml_format_rejects_folded_jinja(self):
         folded = """cluster:
   custom_configurations:

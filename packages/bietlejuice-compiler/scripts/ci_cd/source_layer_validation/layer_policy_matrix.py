@@ -15,7 +15,8 @@ ALLOWED_SOURCE_LAYERS_BY_OUTPUT: Dict[str, FrozenSet[str]] = {
     "enrich": frozenset({"transactional", "clean", "enrich", "core"}),
     "dw": frozenset({"clean", "enrich", "core", "dw"}),
     "metric": frozenset({"enrich", "core", "dw", "metric"}),
-    "qube": frozenset({"enrich", "dw", "metric", "qube"}),
+    # Dimensions/measures may read clean+ layers; metrics also read qube_dimensions/measures.
+    "qube": frozenset({"clean", "enrich", "dw", "metric", "core", "qube"}),
     "core": frozenset({"transactional", "clean", "core"}),
     "reverse": frozenset({"clean", "enrich", "dw", "metric"}),
     # Consumption = final materialized output (Luigi-style scheduled query

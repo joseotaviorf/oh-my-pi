@@ -64,6 +64,15 @@ def test_consumption_allows_transformation_and_modeling_layers_not_raw():
     assert "transactional" not in allowed
 
 
+def test_qube_allows_clean_plus_layers_and_intra_qube_reads():
+    """Qube specs may source from any governed layer (clean+); metrics read qube tables."""
+    allowed = allowed_layers_for_output("qube")
+    assert allowed is not None
+    assert allowed == frozenset({"clean", "enrich", "dw", "metric", "core", "qube"})
+    assert "raw" not in allowed
+    assert "transactional" not in allowed
+
+
 def test_matrix_covers_expected_outputs():
     assert "dw" in ALLOWED_SOURCE_LAYERS_BY_OUTPUT
     assert "metric" in ALLOWED_SOURCE_LAYERS_BY_OUTPUT

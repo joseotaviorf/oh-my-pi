@@ -102,3 +102,38 @@ def test_extract_all_tables_for_core_dag(minimal_profile):
         (sj / "load_x.py").write_text('spark.table("dw_rent.fact")\n', encoding="utf-8")
         all_t = extract_all_tables_for_core_dag(minimal_profile, root)
         assert all_t == {"datalake_ebdb_clean.t", "dw_rent.fact"}
+
+
+def test_extract_tables_by_source_file_qube_declaration(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    root = Path(tmp_path) / "dags/qube/dimensions_visit_status"
+    root.mkdir(parents=True)
+    declaration = {
+        "dag": {"name": "qube_dimension_visit_status"},
+        "workflow": {
+            "type": "qube_dimension",
+            "layer": "qube",
+            "qube_specs": {
+                "entity": "visit",
+                "name": "visit_status",
+                "source": {
+                    "table": "enrich_visit.visit_events",
+                    "date_expr": "unix_timestamp(dt_visit)",
+                },
+            },
+        },
+    }
+    decl_path = root / "dimensions_visit_status_declaration.yml"
+    with open(decl_path, "w") as f:
+        yaml.dump(declaration, f)
+
+    profile = {
+        "spark_jobs_subdir": "spark_jobs",
+        "yaml_conf_files": [],
+        "skip_yaml_keys": [],
+        "scan_python_spark_table_literals": False,
+        "python_globs": ["load_*.py"],
+    }
+    by_file = extract_tables_by_source_file(profile, root, "qube_dimension")
+    rel = "dags/qube/dimensions_visit_status/dimensions_visit_status_declaration.yml"
+    assert by_file[rel] == {"enrich_visit.visit_events"}

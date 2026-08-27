@@ -1,0 +1,32 @@
+dag:
+  name: qube_measure_chatbot_session_walle_session_escalated
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0 6 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Wall-E chatbot sessions escalated to human support (numerator for escalation rate)
+  folder_name: measures_chatbot_session_walle_session_escalated
+workflow:
+  type: qube_measure
+  layer: qube
+  has_hive_sync: true
+  custom_schema: measures
+  qube_specs:
+    entity: chatbot_session
+    name: walle_session_escalated
+    source:
+      table: datalake_chatbot.sessions
+      layer: enrich
+      entity_id_col: id_sauron_session
+      date_expr: unix_timestamp(ts_created)
+      select:
+      - id_sauron_session
+      - ts_created
+      - bot
+      - is_escalated
+    logic:
+      filter_sql: bot = 'wall-e' AND is_escalated = true
+    windows:
+    - 1
+    - 7
+    - 28

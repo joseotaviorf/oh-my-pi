@@ -13,11 +13,23 @@ dags/qube/
 ```
 Each folder contains only a `{dag_name}_declaration.yml` (and the auto-generated `_dag.py`).
 
-## Cluster — always use this block
+## Cluster
+
+**Databricks (default):**
 ```yaml
 cluster:
   type: databricks_16_4_rfleet_instance_cluster
   databricks_conn_id: databricks_new
+```
+
+**EMR pilot** (match `tars_vector_logs` — prod multi-node, validation single-node + custom Spark job):
+```yaml
+cluster:
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_single_node_fleet_cluster
+  allow_custom_spark_job: true
 ```
 
 ## Dimension Declaration (`qube_dimension`)
@@ -37,6 +49,15 @@ workflow:
     name: contract_status         # dimension name
     source:
       date_expr: "unix_timestamp(ts_updated, \"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\")"
+      # Optional: read from a governed non-Core table instead of core_{entity}.{entity}
+      # table: enrich_visit.visit_events
+      # Or structured reference (preferred for new specs):
+      # layer: enrich
+      # source_schema: enrich_visit
+      # table_name: visit_events
+      # Closed-world join (include_all_entities: true in logic):
+      # universe_table: core_visit.visit
+      # universe_entity_id_col: id_visit
       select:                     # columns to pull from source
         - id_contract
         - status
@@ -102,6 +123,9 @@ workflow:
 
 ## Key Rules
 - `entity` must match the corresponding core model entity (e.g. `contract`, `visit`, `listing`).
+- **Source layers**: dimensions/measures may read from `clean`, `enrich`, `dw`, `metric`, `core`, or `qube` tables. `raw` is rejected. Omit `source.table` to default to `core_{entity}.{entity}`.
+- Use `source.table` (fully qualified) or `source.layer` + `source.source_schema` + `source.table_name` for non-Core sources.
+- When `logic.include_all_entities: true`, set `source.universe_table` if the closed-world entity list is not `core_{entity}.{entity}`.
 - A metric must reference **existing** dimensions and measures — create them first.
 - `source.date_expr` is always a SQL expression returning a Unix timestamp (seconds).
 - `logic.filter_sql` is **required** for measures; must be a valid SQL boolean expression.

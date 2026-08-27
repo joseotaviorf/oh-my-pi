@@ -64,6 +64,69 @@ class TestSourceSpec:
         with pytest.raises(ValidationError):
             SourceSpec(table="core.visit")
 
+    def test_source_spec_with_structured_reference(self):
+        """Test structured layer + source_schema + table_name reference."""
+        spec = SourceSpec(
+            layer="dw",
+            source_schema="dw_rent",
+            table_name="dim_contract",
+            date_expr="unix_timestamp(ts_updated)",
+        )
+        assert spec.layer == "dw"
+        assert spec.source_schema == "dw_rent"
+        assert spec.table_name == "dim_contract"
+
+    def test_source_spec_rejects_raw_layer(self):
+        """Test raw layer is rejected at spec validation time."""
+        with pytest.raises(ValidationError):
+            SourceSpec(
+                layer="raw",
+                table="raw_ebdb.visit",
+                date_expr="unix_timestamp(ts_created)",
+            )
+
+    def test_source_spec_layer_normalized_to_lowercase(self):
+        """Test layer value is normalized to lowercase."""
+        spec = SourceSpec(
+            layer="DW",
+            table="dw_rent.dim_contract",
+            date_expr="unix_timestamp(ts_updated)",
+        )
+        assert spec.layer == "dw"
+
+    def test_source_spec_with_universe_fields(self):
+        """Test optional universe_table/universe_entity_id_col/universe_layer."""
+        spec = SourceSpec(
+            table="enrich_visit.visit_events",
+            date_expr="unix_timestamp(ts_created)",
+            universe_table="core_visit.visit",
+            universe_entity_id_col="id_visit",
+            universe_layer="core",
+        )
+        assert spec.universe_table == "core_visit.visit"
+        assert spec.universe_entity_id_col == "id_visit"
+        assert spec.universe_layer == "core"
+
+    def test_source_spec_universe_layer_rejects_raw(self):
+        """Test universe_layer also rejects raw."""
+        with pytest.raises(ValidationError):
+            SourceSpec(
+                table="enrich_visit.visit_events",
+                date_expr="unix_timestamp(ts_created)",
+                universe_table="raw_ebdb.visit",
+                universe_layer="raw",
+            )
+
+    def test_source_spec_universe_fields_optional(self):
+        """Test universe fields default to None when not specified."""
+        spec = SourceSpec(
+            table="core.visit",
+            date_expr="unix_timestamp(dt_visit)",
+        )
+        assert spec.universe_table is None
+        assert spec.universe_entity_id_col is None
+        assert spec.universe_layer is None
+
 
 class TestDimensionSpec:
     """Tests for DimensionSpec validation."""

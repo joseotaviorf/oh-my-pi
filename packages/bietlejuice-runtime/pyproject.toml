@@ -24,6 +24,8 @@ dependencies = [
     "opentelemetry-exporter-otlp-proto-http>=1.22.0",
     "paramiko",
     "pendulum",
+    "pydantic>=2.0,<3",
+    "PyYAML>=6.0",
     "pymongo>=4.0.0",
     # pyspark is intentionally absent from Requires-Dist: DBR 16.4 bundles PySpark 3.5.2
     # directly; installing from PyPI would download a 317 MB sdist and shadow the

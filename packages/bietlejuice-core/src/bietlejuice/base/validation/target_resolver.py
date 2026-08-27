@@ -3,6 +3,7 @@ from typing import Optional
 from bietlejuice.base.db.datalake_metastore_mapping import DatalakeMetastoreMapping
 from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.db.metric_metastore_mapping import MetricMetastoreMapping
+from bietlejuice.base.db.qube_metastore_mapping import QubeMetastoreMapping
 from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
@@ -24,6 +25,10 @@ def get_prod_database_name(layer: LayerEnum, schema: str, bucket: str = "") -> s
         return ReverseMetastoreMapping(
             bucket=bucket, source=schema
         ).get_full_database_name()
+    if layer == LayerEnum.QUBE:
+        return QubeMetastoreMapping(
+            source=schema, bucket=bucket
+        ).get_full_database_name(layer)
     return DatalakeMetastoreMapping(
         bucket=bucket, source=schema
     ).get_full_database_name(layer)

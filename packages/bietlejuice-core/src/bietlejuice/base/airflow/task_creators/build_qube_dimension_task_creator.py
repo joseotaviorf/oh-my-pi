@@ -10,6 +10,8 @@ from airflow.models.baseoperator import BaseOperator
 
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.airflow.validation_aware import validation_spark_extra_args
+from bietlejuice.base.qube.qube_table_naming import qube_output_base_table_name
 
 
 class BuildQubeDimensionTaskCreator(BaseTaskCreator):
@@ -59,6 +61,20 @@ class BuildQubeDimensionTaskCreator(BaseTaskCreator):
             parameters.extend(
                 ["--warehouse", table_attributes.table_customization["warehouse"]]
             )
+
+        qube_specs = table_attributes.table_customization
+        base_table_name = qube_output_base_table_name(
+            qube_specs.get("entity", ""),
+            qube_specs.get("name", table_attributes.table_name),
+        )
+        parameters.extend(
+            validation_spark_extra_args(
+                getattr(self.dag_execution_context, "is_validation", False),
+                table_attributes.layer,
+                table_attributes.schema,
+                base_table_name,
+            )
+        )
 
         return self._create_spark_job_task(
             self.SPARK_JOB_NAME, task_id, parameters, spark_job_prefix=""

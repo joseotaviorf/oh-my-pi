@@ -10,15 +10,33 @@ from pydantic import BaseModel, Field, field_validator
 
 class SourceSpec(BaseModel):
     """
-    Source table configuration for dimensions and measures.
+      Source table configuration for dimensions and measures.
 
-    If table and entity_id_col are not specified, they are automatically derived:
-    - table: core_{entity}.{entity} (e.g., core.contract, core.visit)
-    - entity_id_col: id_{entity} (e.g., id_contract, id_visit)
+      If table and entity_id_col are not specified, they are automatically derived:
+      - table: core_{entity}.{entity} (e.g., core.contract, core.visit)
+      - entity_id_col: id_{entity} (e.g., id_contract, id_visit)
+
+    Structured references (preferred for non-Core sources):
+      layer + source_schema + table_name
+
+    Universe table (closed-world join when include_all_entities is true):
+      universe_table, universe_entity_id_col, universe_layer
     """
 
     table: Optional[str] = Field(
-        None, description="Source table name (auto-derived from entity if not provided)"
+        None,
+        description="Source table as schema.table (auto-derived from entity if not provided)",
+    )
+    layer: Optional[str] = Field(
+        None,
+        description="Metastore layer (clean, enrich, dw, metric, core, qube). Inferred from schema when omitted.",
+    )
+    source_schema: Optional[str] = Field(
+        None, description="Source schema/database name when using structured reference"
+    )
+    table_name: Optional[str] = Field(
+        None,
+        description="Source table name within schema when using structured reference",
     )
     entity_id_col: Optional[str] = Field(
         None,
@@ -28,6 +46,28 @@ class SourceSpec(BaseModel):
     select: Optional[List[str]] = Field(
         None, description="Columns to select (optimization)"
     )
+    universe_table: Optional[str] = Field(
+        None,
+        description="Entity universe table for include_all_entities (default: core_{entity}.{entity})",
+    )
+    universe_entity_id_col: Optional[str] = Field(
+        None,
+        description="Entity ID column in universe table (default: entity_id_col)",
+    )
+    universe_layer: Optional[str] = Field(
+        None,
+        description="Metastore layer for universe_table (inferred from schema when omitted)",
+    )
+
+    @field_validator("layer", "universe_layer")
+    @classmethod
+    def validate_layer(cls, v):
+        if v is None:
+            return v
+        normalized = v.strip().lower()
+        if normalized == "raw":
+            raise ValueError("raw layer is not allowed for Qube sources")
+        return normalized
 
 
 class LogicSpec(BaseModel):

@@ -22,24 +22,13 @@ class Config:
         self.config_root = config_root
         self.db_prefix = db_prefix
 
-        # Database / Namespace configuration (configurable via env vars)
-        core_db_base = os.getenv("QUBE_CORE_DB", "core")
-        dim_db_base = os.getenv("QUBE_DIM_DB", "qube_dimensions")
-        meas_db_base = os.getenv("QUBE_MEAS_DB", "qube_measures")
-        met_db_base = os.getenv("QUBE_MET_DB", "qube_metrics")
-
-        # Apply Unity Catalog prefix for Databricks environments
-        if env in ["forno", "prod"]:
-            catalog = f"quintoandar_{env}"
-            self.core_db = f"{catalog}.{core_db_base}"
-            self.dim_db = f"{catalog}.{dim_db_base}"
-            self.meas_db = f"{catalog}.{meas_db_base}"
-            self.met_db = f"{catalog}.{met_db_base}"
-        else:
-            self.core_db = core_db_base
-            self.dim_db = dim_db_base
-            self.meas_db = meas_db_base
-            self.met_db = met_db_base
+        # Database / Namespace configuration (configurable via env vars).
+        # EMR and Trino use the Glue Hive metastore: two-part schema.table names only
+        # (e.g. core_visit.visit). Do not prepend a Databricks Unity Catalog namespace.
+        self.core_db = os.getenv("QUBE_CORE_DB", "core")
+        self.dim_db = os.getenv("QUBE_DIM_DB", "qube_dimensions")
+        self.meas_db = os.getenv("QUBE_MEAS_DB", "qube_measures")
+        self.met_db = os.getenv("QUBE_MET_DB", "qube_metrics")
 
         # Apply additional prefix if provided (for test environments)
         if db_prefix:
@@ -93,7 +82,7 @@ class Config:
             layer: Layer type ('core', 'dim', 'meas', 'met')
 
         Returns:
-            Schema name without catalog prefix (e.g., "qube_dimensions" from "quintoandar_forno.qube_dimensions")
+            Glue/Hive schema name (e.g. ``qube_dimensions``).
         """
         db_map = {
             "core": self.core_db,
@@ -103,9 +92,8 @@ class Config:
         }
         full_db_name = db_map.get(layer, "default")
 
-        # If database name has catalog prefix (e.g., "quintoandar_forno.qube_dimensions"),
-        # extract just the schema name
-        if "." in full_db_name and full_db_name.startswith("quintoandar_"):
+        # Legacy configs may still carry a catalog prefix; keep only the schema segment.
+        if "." in full_db_name:
             return full_db_name.split(".", 1)[1]
 
         return full_db_name
