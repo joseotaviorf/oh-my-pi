@@ -1,42 +1,61 @@
----
-table_name: datalake_agent_performance.agent_demand_referral
+table_name: datalake_agent_performance.fact_agent_demand_acquisition
 alert_channel: "#agents-data-alarms"
+
 table_level_validations:
   has_size:
     greater_than: 0
     severity_level: Error
+
 column_level_validations:
-  id_demand_referral:
+  id_referral:
     is_complete:
       severity_level: Error
-    is_unique:
+  rev:
+    is_complete:
       severity_level: Error
-  id_user_referrer:
+      
+  id_lead:
+    is_complete:
+      severity_level: Error
+  id_user_referring_agent:
     is_complete:
       severity_level: Warning
-  sourcing_channel:
+  id_agent_data_referring:
     is_complete:
-      severity_level: Error
-    is_contained_in:
-      values: ['TQC', 'TQA']
-      severity_level: Error
-  attribution_source:
-    is_complete:
-      severity_level: Error
-    is_contained_in:
-      values: ['INVITE_AND_OFFER', 'INVITE_ONLY', 'OFFER_ONLY']
-      severity_level: Error
+      severity_level: Warning
+
   referral_status:
     is_complete:
       severity_level: Error
     is_contained_in:
-      values: ['CONFIRMED', 'PENDING', 'EXPIRED', 'INACTIVE', 'NOT_ELIGIBLE', 'NO_INVITE']
+      values: ['CONFIRMED', 'PENDING', 'EXPIRED', 'INACTIVE']
       severity_level: Error
+
+  business_context:
+    is_contained_in:
+      values: ['SALE', 'RENT']
+      severity_level: Warning
+
   origin:
     is_contained_in:
       values: ['REFERRAL', 'SERVICE_LINK', 'SCHEDULING_LINK']
       severity_level: Warning
-  referral_type:
+
+  valid_from:
+    is_complete:
+      severity_level: Error
+
+  is_visit_same_agent:
     is_contained_in:
-      values: ['AGENT', 'NEGOTIATION_EXECUTIVE', 'ASSOCIATED_EXECUTIVE', 'AGENT_NEGOTIATION_EXECUTIVE', 'AGENT_ASSOCIATED_EXECUTIVE', 'NEGOTIATION_EXECUTIVE_ASSOCIATED_EXECUTIVE', 'AGENT_NEGOTIATION_EXECUTIVE_ASSOCIATED_EXECUTIVE', 'OTHER']
+      values: [true, false]
+      severity_level: Warning
+
+  is_offer_same_agent:
+    is_contained_in:
+      values: [true, false]
+      severity_level: Warning
+
+  "offer_specialist.has_mismatch":
+    is_contained_in:
+      values: [true, false]
       severity_level: Warning
