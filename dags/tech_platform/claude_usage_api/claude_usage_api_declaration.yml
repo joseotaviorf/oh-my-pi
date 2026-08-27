@@ -103,6 +103,11 @@ workflow:
     user_cost:
       endpoint_path: v1/organizations/analytics/user_cost_report
       extraction_type: incremental
+      merge_on:
+        - dt_starting
+        - dt_ending
+        - id_user
+        - currency
       date_filter_column: starting_at
       params:
         bucket_width: 1d

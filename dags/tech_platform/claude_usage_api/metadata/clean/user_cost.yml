@@ -1,0 +1,83 @@
+database_name: datalake_claude_usage_clean
+table_name: user_cost
+owner: gabriel.berger@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Claude Enterprise daily user cost for QuintoAndar workforce seats.
+  One row per id_user, currency, dt_starting, and dt_ending after deduplication from overlapping raw loads.
+  Flattens vendor JSON from the Analytics user cost report endpoint into typed columns.
+columns:
+  id_user:
+    description: Claude Enterprise user identifier (user_...) the cost row is attributed to (e.g. 'user_011CReAqK5DGX6fqXqoBSpFn').
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  email_user:
+    description: Work email address of the user the cost row is attributed to (e.g. 'jane.doe@quintoandar.com').
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  name_user:
+    description: Display name of the user the cost row is attributed to. Reads "Deleted User" if the account has since been deleted (e.g. 'Jane Doe').
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  type_actor:
+    description: Vendor actor type discriminator for the cost attribution; always user_actor, since this per-user report only attributes cost to named users (e.g. 'user_actor').
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  currency:
+    description: Currency code for the cost amounts; currently always USD (e.g. 'USD').
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  count_requests:
+    description: Number of API requests included in this row's cost attribution for the period.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  sum_discounted_cost_amount:
+    description: Post-discount, pre-credit cost for the period, in the currency's decimal unit.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  sum_list_price_amount:
+    description: Pre-discount list-price cost for the period, in the currency's decimal unit.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  is_actor_deleted:
+    description: Whether the vendor marks the user as no longer a member of the organization (membership removed or the account itself deleted).
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  dt_starting:
+    description: Start date (UTC) of the cost aggregation period this row covers.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  dt_ending:
+    description: End date (UTC, exclusive) of the cost aggregation period this row covers.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.payload
+
+  ts_load:
+    description: Timestamp when the Spark api_ingestion job wrote the source raw row.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.ts_load
+
+  year:
+    description: Ingestion partition year, derived from the vendor's starting_at date in the API payload (date_filter_column), not the load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.year
+
+  month:
+    description: Ingestion partition month, derived from the vendor's starting_at date in the API payload (date_filter_column), not the load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.month
+
+  day:
+    description: Ingestion partition day, derived from the vendor's starting_at date in the API payload (date_filter_column), not the load timestamp.
+    lineage:
+      - datalake_claude_usage_raw.user_cost.day
