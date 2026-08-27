@@ -1,3 +1,5 @@
+import base64
+import binascii
 import json
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
@@ -164,11 +166,19 @@ def get_conn_config(dbutils_secret_key: str, dbutils_secret_scope: str) -> dict:
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
-    conn_config_json = dbutils.secrets.get(
+    conn_config_raw = dbutils.secrets.get(
         scope=dbutils_secret_scope, key=dbutils_secret_key
     )
 
-    return json.loads(conn_config_json)
+    try:
+        return json.loads(conn_config_raw)
+    except json.JSONDecodeError:
+        # some secrets are re-synced as base64-encoded JSON; fall back to decoding
+        try:
+            decoded = base64.b64decode(conn_config_raw).decode("utf-8")
+        except (binascii.Error, UnicodeDecodeError):
+            raise
+        return json.loads(decoded)
 
 
 if __name__ == "__main__":
