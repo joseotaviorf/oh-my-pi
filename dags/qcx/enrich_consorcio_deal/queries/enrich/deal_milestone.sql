@@ -370,7 +370,7 @@ deal_funnel_scorecard AS (
 -- ----------------------------------------------------------------
 deal_calendar_lookups AS (
   SELECT
-    base.id_deal,
+    deal_funnel_scorecard.id_deal,
     TRY_ELEMENT_AT(business_day_maps.incl, DATE_SUB(CURRENT_DATE(), 1)) AS incl_yesterday,
     TRY_ELEMENT_AT(business_day_maps.excl, CAST(deal_funnel_scorecard.ts_deal_created             AS DATE)) AS excl_deal_created,
     TRY_ELEMENT_AT(business_day_maps.excl, CAST(deal_funnel_scorecard._ts_current_stage_started AS DATE)) AS excl_current_stage_started,
