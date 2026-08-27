@@ -2,15 +2,22 @@
 database_name: datalake_crawled_idactum_houses_clean
 table_name: rj_dados_cadastrais_main_predio
 description: |
-  Clean passthrough of rj_dados_cadastrais_main_predio Scrapy crawler output with crawl metadata flattened.
+  Flattened Rio de Janeiro building-level cadastral records with municipal inscription
+  mapped toward the idactum_houses legacy contract.
 domain: Growth
 owner: gabriel.mota@quintoandar.com.br
 columns:
-  response:
+  id_municipal_house:
     lineage:
-      - datalake_crawled_idactum_houses_raw.rj_dados_cadastrais_main_predio.response
+      - datalake_crawled_idactum_houses_raw.rj_dados_cadastrais_main_predio.response.inscription_sem_dv
     description: |
-      Nested scraped payload returned by the spider (schema-on-read JSONL).
+      Municipal property inscription without check digit from the building cadastral payload.
+  state:
+    description: |
+      Brazilian state abbreviation for Rio de Janeiro properties (constant RJ).
+  city:
+    description: |
+      Municipality name for Rio de Janeiro properties (constant Rio de Janeiro).
   feed_source:
     lineage:
       - datalake_crawled_idactum_houses_raw.rj_dados_cadastrais_main_predio.metadata.source

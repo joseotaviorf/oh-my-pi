@@ -2039,12 +2039,33 @@ bietlejuice.enrich_content_funnel:
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
 bietlejuice.enrich_crawled_idactum_houses:
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-am-manaus-bci:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-ba-salvador-certidao-cadastral:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-bh-cnd-main:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-bsb-main-cadastro-territorial:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-bsb-main-certidao-geometria:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-bsb-main-fichas:first-run-of-day
   - bietlejuice.idactum_scrapy_cadastral:load-clean-go-goiania-cadastro-imobiliario:first-run-of-day
   - bietlejuice.idactum_scrapy_cadastral:load-clean-go-goiania-comprovacao-pagamento:first-run-of-day
   - bietlejuice.idactum_scrapy_cadastral:load-clean-go-goiania-informacoes-cadastrais:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-pe-recife-certidao-narrativa-imob:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-rj-dados-cadastrais-main-busca:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-rj-dados-cadastrais-main-nirf:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-rj-dados-cadastrais-main-predio:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-rj-niteroi-e-cidade:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-sp-dados-cadastrais-recadastramento-main:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-sp-osasco-compromissarios:first-run-of-day
   - bietlejuice.idactum_scrapy_cadastral:load-clean-sp-osasco-pesquisa-cdc:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-sp-osasco-pesquisa-cep:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-sp-osasco-proprietarios:first-run-of-day
+  - bietlejuice.idactum_scrapy_iptu:load-clean-bsb-main-debitos:first-run-of-day
+  - bietlejuice.idactum_scrapy_iptu:load-clean-bsb-main-pauta:first-run-of-day
+  - bietlejuice.idactum_scrapy_iptu:load-clean-sp-osasco-extrato-iptu:first-run-of-day
+  - bietlejuice.idactum_scrapy_itbi:load-clean-go-goiania-itbi-certidao:first-run-of-day
+  - bietlejuice.idactum_scrapy_itbi:load-clean-go-goiania-itbi:first-run-of-day
   - bietlejuice.idactum_scrapy_itbi:load-clean-rj-itbi-main:first-run-of-day
   - bietlejuice.idactum_scrapy_itbi:load-clean-sp-osasco-itbi:first-run-of-day
+  - bietlejuice.idactum_scrapy_itbi:load-clean-sp-santo-andre-itbi:first-run-of-day
 bietlejuice.enrich_crawler_chaves_na_mao:
   - bietlejuice.crawler_chaves_na_mao:load-clean-chaves-na-mao:first-run-of-day
 bietlejuice.enrich_crawler_df_imoveis:

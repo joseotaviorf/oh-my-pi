@@ -1,5 +1,14 @@
 SELECT
-  response,
+  NULLIF(
+    REGEXP_REPLACE(
+      CAST(COALESCE(response.registration_number, response.inscricao) AS STRING),
+      '[^0-9]',
+      ''
+    ),
+    ''
+  ) AS id_municipal_house,
+  'GO' AS state,
+  'Goiânia' AS city,
   metadata.source AS feed_source,
   metadata.url AS feed_url,
   metadata.accessed_at AS ts_accessed,

@@ -1,17 +1,22 @@
 database_name: datalake_crawled_idactum_houses_clean
 table_name: sp_osasco_extrato_iptu
 description: |
-  Clean passthrough of Osasco Scrapy crawler sp_osasco_extrato_iptu (IPTU statement extracts (including PDF payload) from the municipal tax portal).
-  Built from the shared crawled_idactum_houses raw table with crawl metadata
-  flattened and load provenance columns retained for analysis.
+  Flattened Osasco IPTU statement records with municipal CDC mapped toward the
+  idactum_houses legacy contract.
 domain: Growth
 owner: gabriel.mota@quintoandar.com.br
 columns:
-  response:
+  id_municipal_house:
     lineage:
-      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.response
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.response.cdc
     description: |
-      Nested scraped payload fields returned by the spider (schema-on-read from JSONL).
+      Municipal CDC identifier from the IPTU statement payload.
+  state:
+    description: |
+      Brazilian state abbreviation for Osasco properties (constant SP).
+  city:
+    description: |
+      Municipality name for Osasco properties (constant Osasco).
   feed_source:
     lineage:
       - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.metadata.source

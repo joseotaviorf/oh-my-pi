@@ -1,17 +1,23 @@
 database_name: datalake_crawled_idactum_houses_clean
 table_name: go_goiania_itbi_certidao
 description: |
-  Clean passthrough of Goiânia Scrapy crawler go_goiania_itbi_certidao (municipal ITBI certificates associated with property registrations).
-  Built from the shared crawled_idactum_houses raw table with crawl metadata
-  flattened and load provenance columns retained for analysis.
+  Flattened Goiânia ITBI certificate records with municipal registration mapped toward
+  the idactum_houses legacy contract.
 domain: Growth
 owner: gabriel.mota@quintoandar.com.br
 columns:
-  response:
+  id_municipal_house:
     lineage:
-      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.response
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.response.registration_number
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.response.inscricao
     description: |
-      Nested scraped payload fields returned by the spider (schema-on-read from JSONL).
+      Municipal property registration number from the ITBI certificate payload.
+  state:
+    description: |
+      Brazilian state abbreviation for Goiânia properties (constant GO).
+  city:
+    description: |
+      Municipality name for Goiânia properties (constant Goiânia).
   feed_source:
     lineage:
       - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.metadata.source

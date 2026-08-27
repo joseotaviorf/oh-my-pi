@@ -4,10 +4,10 @@ dag:
   schedule_start_date: 2026, 05, 14
   documentation:
     dag_purpose: |
-      Aggregates six Idactum Scrapy clean tables (from idactum_scrapy_cadastral and
-      idactum_scrapy_itbi) with municipal house attributes into a unified houses-like
-      enrich table aligned with the legacy idactum_houses column contract, enriched with
-      crawl provenance.
+      Aggregates twenty-seven Idactum Scrapy clean sources from three upstream DAGs
+      (idactum_scrapy_cadastral, idactum_scrapy_itbi, idactum_scrapy_iptu) into a
+      unified houses-like enrich table aligned with the legacy idactum_houses column
+      contract, enriched with crawl provenance via source_spider.
 workflow:
   type: query_delta
   layer: enrich

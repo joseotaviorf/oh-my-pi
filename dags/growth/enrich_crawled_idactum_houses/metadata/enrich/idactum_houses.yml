@@ -1,10 +1,6 @@
 database_name: datalake_crawled_idactum_houses
 table_name: idactum_houses
-description: |
-  Unified municipal property records aggregated from six Idactum Scrapy crawlers
-  with house attributes (RJ ITBI, Goiânia cadastral/ITBI payment proof, Osasco
-  CDC/ITBI). Each row follows the legacy idactum_houses column contract with crawl
-  provenance. People-only and PDF-only spiders are excluded from this aggregation.
+description: Unified municipal property records aggregated from twenty-seven Idactum Scrapy clean sources across three upstream DAGs (idactum_scrapy_cadastral, idactum_scrapy_itbi, idactum_scrapy_iptu). Each row follows the legacy idactum_houses column contract with crawl provenance via source_spider. People-only and PDF-only spiders remain excluded.
 domain: Growth
 owner: gabriel.mota@quintoandar.com.br
 columns:
@@ -14,15 +10,31 @@ columns:
       crawlers do not emit Idactum snapshot identifiers.
   id_municipal_house:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.id_municipal_house
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.id_municipal_house
-      - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.id_municipal_house
-      - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.id_municipal_house
-      - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.id_municipal_house
-      - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.id_municipal_house
-    description: |
-      Municipal cadastral identifier when the source spider exposes a registration
-      number (e.g. inscrição imobiliária or CDC); null for spiders not yet flattened.
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.id_municipal_house
+    description: Municipal cadastral identifier when the source spider exposes a registration number (e.g. inscrição imobiliária or CDC); null when the spider does not emit one.
   id_idactum:
     description: |
       Idactum proprietary identifier; not available from municipal Scrapy crawlers and
@@ -32,38 +44,92 @@ columns:
       Idactum iPatri asset key; not populated by municipal Scrapy crawlers in this release.
   state:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.state
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.state
-      - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.state
-    description: |
-      Brazilian state abbreviation inferred from the source spider geography (RJ, GO, SP).
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.state
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.state
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.state
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.state
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.state
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.state
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.state
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.state
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.state
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.state
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.state
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.state
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.state
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.state
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.state
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.state
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.state
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.state
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.state
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.state
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.state
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.state
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.state
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.state
+    description: Brazilian state abbreviation inferred from the source spider geography across cadastral, ITBI, and IPTU municipal feeds (e.g. RJ, GO, SP, AM, BA, PE, DF).
   city:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.city
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.city
-      - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.city
-    description: |
-      Municipality name inferred from the source spider geography (e.g. Rio de Janeiro,
-      Goiânia, Osasco).
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.city
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.city
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.city
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.city
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.city
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.city
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.city
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.city
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.city
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.city
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.city
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.city
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.city
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.city
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.city
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.city
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.city
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.city
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.city
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.city
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.city
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.city
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.city
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.city
+    description: Municipality name inferred from the source spider geography (e.g. Rio de Janeiro, Goiânia, Osasco, Manaus, Salvador, Brasília).
   neighborhood:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.neighborhood
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.neighborhood
-      - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.neighborhood_id
-      - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.neighborhood
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.neighborhood
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.neighborhood
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.neighborhood
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.neighborhood
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.neighborhood
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.neighborhood_id
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.neighborhood
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.neighborhood
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.neighborhood
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.neighborhood
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.neighborhood
     description: |
       Neighborhood name or identifier when exposed by the flattened source spider; otherwise null.
   street:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.street
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.street
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.street
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.street
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.street
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.street
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.street
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.street
     description: |
       Street name when parsed from the municipal payload; null when only a full address
       blob is available in address_details.
   address_number:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.address_number
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.address_number
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.address_number
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.address_number
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.address_number
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.address_number
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.address_number
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.address_number
     description: |
       Street number when parsed from the municipal payload; null when not provided by the spider.
   zipcode:
@@ -71,13 +137,24 @@ columns:
       Brazilian postal code (CEP) when present in the scraped payload; null otherwise.
   address_details:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.address_details
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.address_details
-      - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.address_details
-      - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.address_details
-    description: |
-      Address complement or full address string from flattened spiders; JSON-serialized
-      nested payload (TO_JSON) only for spiders not yet flattened in Phase B.
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.address_details
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.address_details
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.address_details
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.address_details
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.address_details
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.address_details
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.address_details
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.address_details
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.address_details
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.address_details
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.property_address
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.address_details
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.property_address
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.address_details
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.address_details
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.address_details
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.address_details
+    description: Address complement or full address string from flattened spiders; COALESCE of address_details and property_address where both exist in the upstream clean table.
   address_details_unit:
     description: |
       Apartment or unit number when parsed from the municipal payload; null otherwise.
@@ -86,12 +163,17 @@ columns:
       Building block identifier when parsed from the municipal payload; null otherwise.
   real_estate_register:
     lineage:
-      - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.real_estate_register
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.real_estate_register
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.real_estate_register
     description: |
       Notary office (cartório) name when present in the scraped payload; null otherwise.
   real_estate_registry:
     lineage:
-      - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.real_estate_registry
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.real_estate_registry
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.real_estate_registry
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.real_estate_registry
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.real_estate_registry
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.real_estate_registry
     description: |
       Property registry number (matrícula) when present in the scraped payload; null otherwise.
   building_year:
@@ -99,17 +181,31 @@ columns:
       Construction year when present in the scraped payload; null otherwise.
   lot_area:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.lot_area
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.lot_area
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.lot_area
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.lot_area
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.lot_area
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.lot_area
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.lot_area
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.lot_area
     description: |
       Land area in square meters when present in the scraped payload; null otherwise.
   building_area:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.building_area
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.building_area
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.building_area
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.building_area
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.building_area
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.building_area
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.building_area
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.building_area
     description: |
       Built area in square meters when present in the scraped payload; null otherwise.
   private_area:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.private_area
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.private_area
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.private_area
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.private_area
     description: |
       Private area in square meters when present in the scraped payload; null otherwise.
   idactum_price_estimation:
@@ -129,40 +225,45 @@ columns:
       Estimated monthly condominium fee; not populated by municipal Scrapy crawlers.
   assessed_iptu_value:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.assessed_iptu_value
-      - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.assessed_iptu_value
-    description: |
-      Government-assessed IPTU fiscal value when present in the scraped payload; null otherwise.
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.assessed_iptu_value
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.assessed_iptu_value
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.assessed_iptu_value
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.assessed_iptu_value
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.assessed_iptu_value
+    description: Government-assessed IPTU fiscal value when present in the scraped payload (go_goiania_informacoes_cadastrais, sp_osasco_itbi, sp_santo_andre_itbi, bsb_main_debitos, bsb_main_pauta); null otherwise.
   assessed_itbi_value:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.assessed_itbi_value
-      - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.assessed_itbi_value
-    description: |
-      Declared or assessed ITBI transaction value when the source spider exposes it;
-      null for spiders without ITBI fiscal data.
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.assessed_itbi_value
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.assessed_itbi_value
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.assessed_itbi_value
+    description: Declared or assessed ITBI transaction value when the source spider exposes it (rj_itbi_main, sp_osasco_itbi, sp_santo_andre_itbi); null for other spiders.
   latitude:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.latitude
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.latitude
     description: |
       SIRGAS easting coordinate (x_coord) from Goiânia cadastral records; not WGS84 latitude.
   longitude:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.longitude
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.longitude
     description: |
       SIRGAS northing coordinate (y_coord) from Goiânia cadastral records; not WGS84 longitude.
   kind:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.kind
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.kind
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.kind
     description: |
       Physical property type when present in the scraped payload; null otherwise.
   usage_purpose:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.usage_purpose
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.usage_purpose
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.usage_purpose
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.usage_purpose
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.usage_purpose
     description: |
       Intended use category when present in the scraped payload; null otherwise.
   usage_type:
     lineage:
-      - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.usage_type
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.usage_type
     description: |
       Occupancy classification when present in the scraped payload; null otherwise.
   is_iptu_exempt:
@@ -170,55 +271,288 @@ columns:
       IPTU exemption flag when present in the scraped payload; null otherwise.
   is_active:
     lineage:
-      - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.is_active
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.is_active
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.is_active
     description: |
       Active flag (1.0/0.0) from Osasco CDC situacao; null for other spiders.
   dt_load:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.dt_load
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.dt_load
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.dt_load
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.dt_load
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.dt_load
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.dt_load
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.dt_load
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.dt_load
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.dt_load
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.dt_load
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.dt_load
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.dt_load
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.dt_load
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.dt_load
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.dt_load
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.dt_load
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.dt_load
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.dt_load
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.dt_load
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.dt_load
     description: |
       Date when the upstream per-spider clean row was loaded into the datalake.
   source_spider:
-    description: |
-      Scrapy spider slug identifying which per-spider clean table produced the row
-      (e.g. rj_itbi_main, sp_osasco_pesquisa_cdc).
+    description: Scrapy spider slug identifying which per-spider clean table produced the row; one of twenty-seven municipal sources (nineteen cadastral, five ITBI, three IPTU).
   feed_source:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.feed_source
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.feed_source
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.feed_source
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.feed_source
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.feed_source
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.feed_source
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.feed_source
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.feed_source
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.feed_source
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.feed_source
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.feed_source
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.feed_source
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.feed_source
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.feed_source
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.feed_source
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.feed_source
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.feed_source
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.feed_source
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.feed_source
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.feed_source
     description: |
       Spider source tag embedded in the crawl metadata payload.
   feed_url:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.feed_url
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.feed_url
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.feed_url
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.feed_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.feed_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.feed_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.feed_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.feed_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.feed_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.feed_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.feed_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.feed_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.feed_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.feed_url
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.feed_url
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.feed_url
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.feed_url
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.feed_url
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.feed_url
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.feed_url
     description: |
       Source URL consulted by the crawler when producing the upstream record.
   ts_accessed:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.ts_accessed
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.ts_accessed
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.ts_accessed
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.ts_accessed
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.ts_accessed
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.ts_accessed
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.ts_accessed
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.ts_accessed
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.ts_accessed
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.ts_accessed
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.ts_accessed
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.ts_accessed
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.ts_accessed
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.ts_accessed
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.ts_accessed
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.ts_accessed
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.ts_accessed
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.ts_accessed
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.ts_accessed
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.ts_accessed
     description: |
       Timestamp when the crawler accessed the municipal portal page or API.
   referer_url:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.referer_url
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.referer_url
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.referer_url
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.referer_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.referer_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.referer_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.referer_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.referer_url
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.referer_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.referer_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.referer_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.referer_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.referer_url
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.referer_url
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.referer_url
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.referer_url
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.referer_url
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.referer_url
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.referer_url
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.referer_url
     description: |
       HTTP referer URL captured during the crawl session, when available.
   crawler_name:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.crawler_name
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.crawler_name
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.crawler_name
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.crawler_name
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.crawler_name
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.crawler_name
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.crawler_name
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.crawler_name
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.crawler_name
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.crawler_name
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.crawler_name
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.crawler_name
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.crawler_name
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.crawler_name
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.crawler_name
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.crawler_name
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.crawler_name
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.crawler_name
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.crawler_name
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.crawler_name
     description: |
       Scrapy spider name stamped on the upstream clean record by the raw ingestion job.
   year:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.year
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.year
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.year
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.year
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.year
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.year
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.year
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.year
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.year
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.year
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.year
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.year
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.year
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.year
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.year
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.year
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.year
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.year
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.year
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.year
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.year
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.year
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.year
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.year
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.year
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.year
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.year
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.year
     description: |
       Partition year derived from the DAG execution date of the Scrapy feed load.
   month:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.month
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.month
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.month
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.month
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.month
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.month
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.month
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.month
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.month
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.month
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.month
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.month
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.month
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.month
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.month
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.month
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.month
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.month
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.month
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.month
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.month
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.month
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.month
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.month
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.month
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.month
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.month
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.month
     description: |
       Partition month derived from the DAG execution date of the Scrapy feed load.
   day:
     lineage:
-      - datalake_crawled_idactum_houses_clean.rj_itbi_main.day
+    - datalake_crawled_idactum_houses_clean.am_manaus_bci.day
+    - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.day
+    - datalake_crawled_idactum_houses_clean.bh_cnd_main.day
+    - datalake_crawled_idactum_houses_clean.bsb_main_cadastro_territorial.day
+    - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.day
+    - datalake_crawled_idactum_houses_clean.bsb_main_debitos.day
+    - datalake_crawled_idactum_houses_clean.bsb_main_fichas.day
+    - datalake_crawled_idactum_houses_clean.bsb_main_pauta.day
+    - datalake_crawled_idactum_houses_clean.go_goiania_cadastro_imobiliario.day
+    - datalake_crawled_idactum_houses_clean.go_goiania_comprovacao_pagamento.day
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.day
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi.day
+    - datalake_crawled_idactum_houses_clean.go_goiania_itbi_certidao.day
+    - datalake_crawled_idactum_houses_clean.pe_recife_certidao_narrativa_imob.day
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_busca.day
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_nirf.day
+    - datalake_crawled_idactum_houses_clean.rj_dados_cadastrais_main_predio.day
+    - datalake_crawled_idactum_houses_clean.rj_itbi_main.day
+    - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.day
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.day
+    - datalake_crawled_idactum_houses_clean.sp_osasco_compromissarios.day
+    - datalake_crawled_idactum_houses_clean.sp_osasco_extrato_iptu.day
+    - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.day
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.day
+    - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.day
+    - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.day
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.day
     description: |
       Partition day derived from the DAG execution date of the Scrapy feed load.

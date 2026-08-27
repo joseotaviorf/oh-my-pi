@@ -45,6 +45,7 @@ _RESPONSE_STRUCT = StructType(
             "_inscricao",
             "inscricao",
             "inscricao_cadastral",
+            "registration_number",
             "cdc",
             "endereco",
             "setor",
@@ -75,6 +76,10 @@ _RESPONSE_STRUCT = StructType(
             "transmitente",
             "folha_suplementar",
             "observacao",
+            "valor_pago",
+            "data_criacao",
+            "numero",
+            "ano",
         )
     ]
 )
@@ -141,6 +146,18 @@ _OSASCO_PROPRIETARIOS_ITEM_STRUCT = StructType(
         StructField("cpf_cnpj", StringType(), True),
         StructField("nome", StringType(), True),
         StructField("percentual_posse", StringType(), True),
+    ]
+)
+
+_SANTO_ANDRE_ITBI_ITEM_STRUCT = StructType(
+    [
+        StructField("matricula", StringType(), True),
+        StructField("endereco", StringType(), True),
+        StructField("cartorio", StringType(), True),
+        StructField("valor_pago", StringType(), True),
+        StructField("valor_venal", StringType(), True),
+        StructField("area_terreno", StringType(), True),
+        StructField("area_construcao", StringType(), True),
     ]
 )
 
@@ -342,6 +359,16 @@ _EMPTY_RAW_SCHEMAS = {
             StructField(
                 "response",
                 ArrayType(_OSASCO_PROPRIETARIOS_ITEM_STRUCT),
+                True,
+            ),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+    "sp_santo_andre_itbi": StructType(
+        [
+            StructField(
+                "response",
+                ArrayType(_SANTO_ANDRE_ITBI_ITEM_STRUCT),
                 True,
             ),
             StructField("metadata", METADATA_STRUCT, True),

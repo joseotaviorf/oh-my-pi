@@ -4,39 +4,12 @@ SELECT
   response.cdc AS cdc,
   'SP' AS state,
   'Osasco' AS city,
-  response.cartorio_de_registro AS real_estate_register,
-  CASE
-    WHEN response.valor_da_transacao IS NULL OR TRIM(response.valor_da_transacao) = '' THEN NULL
-    ELSE CAST(
-      REPLACE(
-        REPLACE(TRIM(response.valor_da_transacao), '.', ''),
-        ',',
-        '.'
-      ) AS DOUBLE
-    )
-  END AS assessed_itbi_value,
-  CASE
-    WHEN response.valor_venal_do_imovel IS NULL OR TRIM(response.valor_venal_do_imovel) = '' THEN NULL
-    ELSE CAST(
-      REPLACE(
-        REPLACE(TRIM(response.valor_venal_do_imovel), '.', ''),
-        ',',
-        '.'
-      ) AS DOUBLE
-    )
-  END AS assessed_iptu_value,
-  CASE
-    WHEN response.valor_venal_da_edificacao IS NULL OR TRIM(response.valor_venal_da_edificacao) = '' THEN NULL
-    ELSE CAST(
-      REPLACE(
-        REPLACE(TRIM(response.valor_venal_da_edificacao), '.', ''),
-        ',',
-        '.'
-      ) AS DOUBLE
-    )
-  END AS building_assessed_value,
-  response.natureza_da_operacao AS transaction_nature,
-  response.proprietario AS owner_name,
+  CAST(NULL AS STRING) AS real_estate_register,
+  CAST(response.valor_pago AS DOUBLE) AS assessed_itbi_value,
+  CAST(NULL AS DOUBLE) AS assessed_iptu_value,
+  CAST(NULL AS DOUBLE) AS building_assessed_value,
+  CAST(NULL AS STRING) AS transaction_nature,
+  CAST(NULL AS STRING) AS owner_name,
   response.adquirente AS buyer_name,
   response.situacao AS payment_status,
   metadata.source AS feed_source,

@@ -193,6 +193,24 @@ def test_empty_raw_schema_osasco_proprietarios_uses_array_response(job):
     assert item_field_names == {"cpf_cnpj", "nome", "percentual_posse"}
 
 
+def test_empty_raw_schema_sp_santo_andre_itbi_uses_array_response(job):
+    schema = job._empty_raw_schema("sp_santo_andre_itbi")
+    response_field = next(field for field in schema.fields if field.name == "response")
+    assert isinstance(response_field.dataType, _ArrayType)
+    item_field_names = {
+        field.name for field in response_field.dataType.elementType.fields
+    }
+    assert item_field_names == {
+        "matricula",
+        "endereco",
+        "cartorio",
+        "valor_pago",
+        "valor_venal",
+        "area_terreno",
+        "area_construcao",
+    }
+
+
 def test_response_schema_type_mismatch_detects_generic_vs_nested(job):
     metastore_service = MagicMock()
     metastore_service.get_table_names.return_value = ["rj_niteroi_e_cidade"]

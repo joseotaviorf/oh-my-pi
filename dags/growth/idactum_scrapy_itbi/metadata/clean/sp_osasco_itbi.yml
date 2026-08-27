@@ -34,35 +34,25 @@ columns:
     description: |
       Municipality name for Osasco properties (constant Osasco).
   real_estate_register:
-    lineage:
-      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.cartorio_de_registro
     description: |
-      Name of the notary office (cartório) where the property title is registered.
+      Notary office name; not present in the current Osasco ITBI portal payload.
   assessed_itbi_value:
     lineage:
-      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.valor_da_transacao
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.valor_pago
     description: |
-      Declared transaction value (valor da transação) parsed from Brazilian currency format.
+      ITBI amount paid (valor pago) from the municipal ITBI guide.
   assessed_iptu_value:
-    lineage:
-      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.valor_venal_do_imovel
     description: |
-      Municipal assessed property value (valor venal do imóvel) parsed from Brazilian currency format.
+      Municipal assessed property value; not mapped from the current Osasco ITBI payload.
   building_assessed_value:
-    lineage:
-      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.valor_venal_da_edificacao
     description: |
-      Assessed building value (valor venal da edificação) parsed from Brazilian currency format.
+      Assessed building value; not mapped from the current Osasco ITBI payload.
   transaction_nature:
-    lineage:
-      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.natureza_da_operacao
     description: |
-      Nature of the real estate transaction (e.g., Compra e Venda).
+      Nature of the transaction; not present in the current Osasco ITBI portal payload.
   owner_name:
-    lineage:
-      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.proprietario
     description: |
-      Property owner name as recorded in the ITBI declaration.
+      Property owner name; transmitentes array not flattened in this clean table.
   buyer_name:
     lineage:
       - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.adquirente

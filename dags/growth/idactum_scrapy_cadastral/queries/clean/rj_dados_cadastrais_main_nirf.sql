@@ -1,5 +1,7 @@
 SELECT
-  response,
+  NULLIF(REGEXP_REPLACE(CAST(response.inscription_sem_dv AS STRING), '[^0-9]', ''), '') AS id_municipal_house,
+  'RJ' AS state,
+  'Rio de Janeiro' AS city,
   metadata.source AS feed_source,
   metadata.url AS feed_url,
   metadata.accessed_at AS ts_accessed,
