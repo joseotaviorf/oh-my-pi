@@ -11,20 +11,20 @@ That makes this table a junk dimension.
 */
 WITH contract_with_default AS (
     SELECT
-        id,
-        contract_name,
-        COALESCE(NULLIF(3p_partner, ''), 'N/A') AS rede_partner,
-        is_3p_contract AS is_rede_contract,
-        ts_created,
-        ts_updated
+        wc.id,
+        wc.contract_name,
+        COALESCE(NULLIF(wc.3p_partner, ''), 'N/A') AS 3p_partner,
+        wc.is_3p_contract,
+        wc.ts_created,
+        wc.ts_updated
     FROM
-        datalake_ebdb_work_contract.work_contract
+        datalake_ebdb_work_contract.work_contract AS wc
     UNION ALL
     SELECT
         NULL AS id,
         'N/A' AS contract_name,
-        'N/A' AS rede_partner,
-        FALSE AS is_rede_contract,
+        'N/A' AS 3p_partner,
+        FALSE AS is_3p_contract,
         NULL AS ts_created,
         NULL AS ts_updated
 ),
@@ -50,9 +50,9 @@ SELECT
     BIGINT(COALESCE(id, -1) || INT(is_active) || INT(is_for_sale_contract) || INT(is_for_rent_contract)) AS sk_work_contract,
     id AS id_work_contract,
     contract_name,
-    rede_partner,
+    3p_partner,
     is_active,
-    is_rede_contract,
+    is_3p_contract,
     is_for_sale_contract,
     is_for_rent_contract,
     ts_created,

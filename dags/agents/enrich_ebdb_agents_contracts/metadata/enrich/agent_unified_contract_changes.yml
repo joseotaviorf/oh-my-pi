@@ -15,10 +15,6 @@ columns:
     description: Foreign key of the work contract.
     lineage:
       - datalake_ebdb_work_contract.work_contract.id
-  id_company_hubspot:
-    description: ID of the Rede company in Hubspot.
-    lineage:
-      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
   3p_partner:
     description: Short name of the Rede company.
     lineage:

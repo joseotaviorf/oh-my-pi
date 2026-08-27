@@ -23,18 +23,18 @@ columns:
     lineage:
       - datalake_ebdb_work_contract.work_contract.contract_name
     description: Display name of the work contract template in EBDB (brackets removed for reporting consistency).
-  rede_partner:
+  3p_partner:
     lineage:
       - datalake_ebdb_work_contract.work_contract.3p_partner
-    description: Name of the partner if this is a Rede contract. Otherwise, N/A.
+    description: Name of the third-party partner parsed from the EBDB contract [3P-*] tag. N/A when the contract is not 3P.
   is_active:
     lineage:
       - datalake_ebdb_clean.agent_data.is_active
     description: Tells if the agent is active or not, as specified by Main's agent data.
-  is_rede_contract:
+  is_3p_contract:
     lineage:
       - datalake_ebdb_work_contract.work_contract.is_3p_contract
-    description: Tells if the contract is a Rede contract.
+    description: True when the work contract is a third-party partner contract, based on a [3P-*] tag in the EBDB contract name.
   is_for_sale_contract:
     description: Tells if the contract is a Sale contract. This will come from the agent's business context.
   is_for_rent_contract:

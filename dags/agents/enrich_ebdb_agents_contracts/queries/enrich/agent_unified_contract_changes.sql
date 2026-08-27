@@ -161,7 +161,6 @@ having_last_changes AS (
 SELECT
     hlc.id_agent,
     wc.id AS id_work_contract,
-    wc.id_company_hubspot,
     wc.3p_partner,
     hlc.action,
     hlc.days_in_status,

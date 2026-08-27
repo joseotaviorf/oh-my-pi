@@ -114,7 +114,6 @@ bietlejuice.dw_agent_accreditation:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
 bietlejuice.dw_agent_contract:
   - bietlejuice.enrich_agenda_allocation:load-enrich-agents-slots-hourly:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_agents_contracts:load-enrich-agent-coincident-business-contexts:first-run-of-day
   - bietlejuice.enrich_ebdb_agents_contracts:load-enrich-agents-activations-suspensions-contracts-changes:first-run-of-day
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract:first-run-of-day
@@ -2614,9 +2613,6 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.enrich_ebdb_country:load-enrich-user:first-run-of-day
 bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
-  - bietlejuice.enrich_hubspot_crm:load-enrich-company-history:first-run-of-day
-  - bietlejuice.hubspot:load-clean-company:first-run-of-day
 bietlejuice.enrich_edwiges:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
 bietlejuice.enrich_emlio:
