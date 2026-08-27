@@ -5,41 +5,11 @@
 
 DAG:
   equals:
-    bietlejuice.blip_messages:
-      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
-      deadline: Never
-      created_by: edgar.fernandes@quintoandar.com.br
-      approved_by: edgar.fernandes@quintoandar.com.br
-    bietlejuice.consorcio_chatbot_offline_eval:
-      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
-      deadline: Never
-      created_by: edgar.fernandes@quintoandar.com.br
-      approved_by: edgar.fernandes@quintoandar.com.br
     bietlejuice.demand_balancer_service:
       reason: "Pipeline owned by Data Science/MLOps teams."
       deadline: Never
       created_by: isadora.gallerani@quintoandar.com.br
       approved_by: william.angelo@quintoandar.com.br
-    bietlejuice.enrich_chat_messages:
-      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
-      deadline: Never
-      created_by: edgar.fernandes@quintoandar.com.br
-      approved_by: edgar.fernandes@quintoandar.com.br
-    bietlejuice.enrich_chat_tool_calls:
-      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
-      deadline: Never
-      created_by: edgar.fernandes@quintoandar.com.br
-      approved_by: edgar.fernandes@quintoandar.com.br
-    bietlejuice.enrich_concierge_privacy_facts:
-      reason: "Concierge targeting support without an overnight SLA. It is upstream of the placas LPV-reprocess POC, which runs four hours later and re-checks Privacy Hub live at dispatch, so a late run does not page the DE on-call."
-      deadline: Never
-      created_by: akira@quintoandar.com.br
-      approved_by: akira@quintoandar.com.br
-    bietlejuice.enrich_lead_scoring:
-      reason: "QCX ATM pipeline without an overnight SLA. Failures still open a Jira Ops alert; DE on-call paging is reserved for bietlejuice.consorcio and bietlejuice.enrich_consorcio_deal."
-      deadline: Never
-      created_by: edgar.fernandes@quintoandar.com.br
-      approved_by: edgar.fernandes@quintoandar.com.br
     bietlejuice.reverse_demand_classifieds_ranking:
       reason: "Reverse pipeline owned by Data Science/MLOps teams."
       deadline: Never
@@ -99,6 +69,11 @@ DAGOwner:
       deadline: Never
       created_by: carolina.cavalcante@quintoandar.com.br
       approved_by: jeniffer.freitas@quintoandar.com.br
+    QCX:
+      reason: "QCX pipelines live under dags/qcx/ and are owned by the QCX squad. Failures still open a Jira Ops alert; DE on-call engineers have no context, access, or accountability over this domain."
+      deadline: Never
+      created_by: isadora.gallerani@quintoandar.com.br
+      approved_by: isadora.gallerani@quintoandar.com.br
     Tech Platform Cyber Security:
       reason: "Security and identity management pipelines are fully owned by the Tech Platform Cyber Security squad; DE on-call engineers have no context, access, or accountability over this domain."
       deadline: Never

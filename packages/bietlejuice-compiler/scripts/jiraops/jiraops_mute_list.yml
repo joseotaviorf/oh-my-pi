@@ -1,10 +1,8 @@
 DAG:
   equals:
-    - bietlejuice.blip_messages
     - bietlejuice.cdp_clickhouse
     - bietlejuice.check_dags_dataset_queue
     - bietlejuice.clustering_image_model
-    - bietlejuice.consorcio_chatbot_offline_eval
     - bietlejuice.conversation_explorer
     - bietlejuice.cyber_bureau
     - bietlejuice.demand_balancer_service
@@ -12,11 +10,7 @@ DAG:
     - bietlejuice.dw_collections_landlord
     - bietlejuice.dw_recon_quintocred_snapshot
     - bietlejuice.enrich_atlas_db_quality_metrics
-    - bietlejuice.enrich_chat_messages
-    - bietlejuice.enrich_chat_tool_calls
-    - bietlejuice.enrich_concierge_placas_lpv_reproc
-    - bietlejuice.enrich_concierge_privacy_facts
-    - bietlejuice.enrich_concierge_tof_events
+    - bietlejuice.enrich_agents_matias
     - bietlejuice.enrich_crawler_chaves_na_mao
     - bietlejuice.enrich_crawler_df_imoveis
     - bietlejuice.enrich_crawler_loft
@@ -27,7 +21,6 @@ DAG:
     - bietlejuice.enrich_google_search_console_classified
     - bietlejuice.enrich_growth_automatic_daily_costs
     - bietlejuice.enrich_growth_commission_costs
-    - bietlejuice.enrich_lead_scoring
     - bietlejuice.enrich_lost_listings
     - bietlejuice.enrich_sonia_journeys
     - bietlejuice.grb
@@ -86,6 +79,7 @@ DAGOwner:
     - Data Planning and Performance
     - MLOps
     - Ops POC
+    - QCX
     - Tech Platform Cyber Security
     - Tech Platform Dev Foundation
     - Tech Platform Engineering Productivity
