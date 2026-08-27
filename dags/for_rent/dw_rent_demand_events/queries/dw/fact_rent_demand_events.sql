@@ -27,8 +27,28 @@ WITH rent_flow_type AS (
   ) AS _t
   WHERE
     _w = 1
+),
+broker_ranked AS (
+  SELECT
+    uuid_company,
+    sk_broker,
+    ROW_NUMBER() OVER (
+      PARTITION BY uuid_company
+      ORDER BY ts_broker_updated DESC, sk_broker DESC
+    ) AS row_number
+  FROM core_brokers.brokers
+  WHERE
+    uuid_company IS NOT NULL
+),
+brokers AS (
+  SELECT
+    uuid_company,
+    sk_broker
+  FROM broker_ranked
+  WHERE
+    row_number = 1
 )
-SELECT
+SELECT /*+ BROADCAST(brokers) */
   rde.id_event || '.' || rde.id_event_type || '.' || rde.id_tenant_prospect AS pk_rent_demand_event,
   rde.id_event AS sk_event,
   COALESCE(rde.id_booking, -1) AS sk_booking,
@@ -48,7 +68,7 @@ SELECT
   COALESCE(rde.id_owner, -1) AS sk_owner,
   COALESCE(rde.id_owner_category, -1) AS sk_owner_category,
   COALESCE(supply_company.sk_company, -1) AS sk_company_supply,
-  COALESCE(IF(rde.uuid_company IS NOT NULL, cb.sk_broker, NULL), '-1') AS sk_broker_supply,
+  COALESCE(brokers.sk_broker, '-1') AS sk_broker_supply,
   COALESCE(CAST(DATE_FORMAT(rde.ts_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_event_date,
   rde.country_code,
   rde.is_during_termination,
@@ -63,5 +83,5 @@ LEFT JOIN rent_flow_type AS rt
 LEFT JOIN datalake_company.company_sks AS supply_company
   ON rde.uuid_company IS NOT NULL
   AND rde.uuid_company = supply_company.uuid_company
-LEFT JOIN core_brokers.brokers AS cb
-  ON rde.uuid_company = cb.uuid_company
+LEFT JOIN brokers
+  ON rde.uuid_company = brokers.uuid_company
