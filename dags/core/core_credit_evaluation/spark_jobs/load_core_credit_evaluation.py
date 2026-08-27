@@ -107,10 +107,44 @@ class CoreCreditEvaluationSparkJob(BaseCoreModelSparkJob):
         """Load user data."""
         return spark.read.table(config["EBDB_USER_TABLE"])
 
+    def _resolve_property_owners(self, house_listing_relation_df, user_df):
+        """Resolve PROPERTY_OWNER relations to user.id via two equi-joins.
+
+        `id_related` holds either a numeric `user.id` or `user.uuid_person`. A single
+        OR join across those columns forces BroadcastNestedLoopJoin on EMR.
+        """
+        hl = house_listing_relation_df.filter(col("related_as") == "PROPERTY_OWNER")
+
+        owners_by_id = (
+            hl.alias("hl")
+            .join(
+                user_df.alias("u"),
+                col("u.id").cast("string") == col("hl.id_related"),
+                "inner",
+            )
+            .select(col("hl.id").alias("id_house"), col("u.id").alias("id_owner"))
+        )
+
+        owners_by_uuid = (
+            hl.alias("hl")
+            .join(
+                user_df.alias("u"),
+                col("u.uuid_person") == col("hl.id_related"),
+                "inner",
+            )
+            .select(col("hl.id").alias("id_house"), col("u.id").alias("id_owner"))
+        )
+
+        return owners_by_id.union(owners_by_uuid)
+
     def _join_all_data(
         self, credit_evaluation_df, house_df, house_listing_relation_df, user_df
     ):
         """Join all data sources to create the final result."""
+
+        owner_resolved_df = self._resolve_property_owners(
+            house_listing_relation_df, user_df
+        )
 
         # Start with credit evaluation data
         result_df = credit_evaluation_df.alias("ce")
@@ -120,20 +154,9 @@ class CoreCreditEvaluationSparkJob(BaseCoreModelSparkJob):
             house_df.alias("h"), col("ce.id_house") == col("h.id"), "left"
         )
 
-        # Join with house listing relation
         result_df = result_df.join(
-            house_listing_relation_df.alias("hl"),
-            (col("ce.id_house") == col("hl.id"))
-            & (col("hl.related_as") == "PROPERTY_OWNER"),
-            "left",
-        )
-
-        # Join with user (with complex OR condition)
-        # id_related can be either a numeric ID (as string) or a UUID string
-        result_df = result_df.join(
-            user_df.alias("u"),
-            (col("u.id").cast("string") == col("hl.id_related"))
-            | (col("u.uuid_person") == col("hl.id_related")),
+            owner_resolved_df.alias("owner"),
+            col("ce.id_house") == col("owner.id_house"),
             "left",
         )
 
@@ -143,7 +166,7 @@ class CoreCreditEvaluationSparkJob(BaseCoreModelSparkJob):
             col("ce.id_house"),
             col("ce.id_proposal"),
             col("ce.id_user"),
-            coalesce(col("u.id"), col("h.id_user")).alias("id_owner"),
+            coalesce(col("owner.id_owner"), col("h.id_user")).alias("id_owner"),
             col("ce.id_city"),
             col("ce.id_group"),
             col("ce.reason"),

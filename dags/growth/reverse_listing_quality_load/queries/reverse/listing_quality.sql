@@ -64,7 +64,7 @@ GROUP BY a.id_house, a.id_job, a.ts_photos_uploaded, e.bathrooms, e.bedrooms, e.
         SELECT
             im.id AS sk_image_inspection,
             im.id_group,
-            h.id AS id_house,
+            COALESCE(h_lead.id, h_other.id) AS id_house,
             im.house_place,
             im.room_type,
             ig.property_condition,
@@ -75,9 +75,13 @@ GROUP BY a.id_house, a.id_job, a.ts_photos_uploaded, e.bathrooms, e.bedrooms, e.
             datalake_kodak_clean.image_inspection_group AS ig
                 ON ig.id = im.id_group
         LEFT JOIN
-            kodak_inspection_houses AS h
-            ON (ig.external_domain = 'LEAD3P' AND ig.id_external_domain = h.id_external
-                OR ig.external_domain != 'LEAD3P' AND ig.id_external_domain = h.id)
+            kodak_inspection_houses AS h_lead
+            ON ig.external_domain = 'LEAD3P'
+            AND ig.id_external_domain = h_lead.id_external
+        LEFT JOIN
+            kodak_inspection_houses AS h_other
+            ON ig.external_domain != 'LEAD3P'
+            AND ig.id_external_domain = CAST(h_other.id AS STRING)
     ),
 
     last_inspection AS (

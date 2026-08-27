@@ -891,3 +891,123 @@ class TestCoreCreditEvaluationSparkJob:
             assert rejected_eval["reason"] == "INSUFFICIENT_INCOME", (
                 "Should have INSUFFICIENT_INCOME reason for rejection"
             )
+
+    def test_join_all_data_complex_owner_logic(
+        self,
+        spark_session,
+        credit_evaluation_df,
+        house_df,
+        house_listing_relation_df,
+        user_df,
+        mock_configuration_service,
+    ):
+        """Test owner resolution via numeric id, uuid_person, and house fallback."""
+        job = CoreCreditEvaluationSparkJob()
+
+        result_df = job._join_all_data(
+            credit_evaluation_df,
+            house_df,
+            house_listing_relation_df,
+            user_df,
+        )
+
+        result_data = result_df.collect()
+        assert len(result_data) == credit_evaluation_df.count()
+
+        eval_1 = [row for row in result_data if row["id_credit_evaluation"] == 1][0]
+        assert eval_1["id_owner"] == 8001, (
+            "Eval 1 should get owner via numeric id_related match"
+        )
+
+        eval_2 = [row for row in result_data if row["id_credit_evaluation"] == 2][0]
+        assert eval_2["id_owner"] == 8002, (
+            "Eval 2 should get owner via uuid_person match"
+        )
+
+        eval_4 = [row for row in result_data if row["id_credit_evaluation"] == 4][0]
+        assert eval_4["id_owner"] == 8004, (
+            "Eval 4 should get owner via uuid_person match"
+        )
+
+        from datetime import datetime
+        from decimal import Decimal
+
+        from pyspark.sql.types import (
+            DecimalType,
+            DoubleType,
+            LongType,
+            StringType,
+            StructField,
+            StructType,
+            TimestampType,
+        )
+
+        fallback_schema = StructType(
+            [
+                StructField("id", LongType(), True),
+                StructField("id_house", LongType(), True),
+                StructField("id_proposal", LongType(), True),
+                StructField("id_user", LongType(), True),
+                StructField("id_city", LongType(), True),
+                StructField("id_group", LongType(), True),
+                StructField("reason", StringType(), True),
+                StructField("result", StringType(), True),
+                StructField("early_result", StringType(), True),
+                StructField("limit_value", DoubleType(), True),
+                StructField("pre_approved_limit", DecimalType(10, 2), True),
+                StructField("status", StringType(), True),
+                StructField("type", StringType(), True),
+                StructField("scope", StringType(), True),
+                StructField("ts_created", TimestampType(), True),
+                StructField("ts_updated", TimestampType(), True),
+                StructField("ts_expires", TimestampType(), True),
+            ]
+        )
+        fallback_credit_df = spark_session.createDataFrame(
+            [
+                (
+                    99,
+                    1099,
+                    2099,
+                    3099,
+                    4099,
+                    5099,
+                    None,
+                    "REGULAR",
+                    None,
+                    1000.0,
+                    Decimal("1000.00"),
+                    "FINISHED",
+                    "REGULAR",
+                    "HOUSE",
+                    datetime(2025, 1, 1),
+                    datetime(2025, 1, 1),
+                    datetime(2025, 2, 1),
+                )
+            ],
+            fallback_schema,
+        )
+        fallback_house_df = spark_session.createDataFrame(
+            [(1099, 7099)],
+            StructType(
+                [
+                    StructField("id", LongType(), True),
+                    StructField("id_user", LongType(), True),
+                ]
+            ),
+        )
+        empty_hl_df = spark_session.createDataFrame(
+            [],
+            house_listing_relation_df.schema,
+        )
+
+        fallback_result = job._join_all_data(
+            fallback_credit_df,
+            fallback_house_df,
+            empty_hl_df,
+            user_df,
+        ).collect()
+
+        assert fallback_result[0]["id_owner"] == 7099, (
+            "Should fall back to house.id_user when no PROPERTY_OWNER relation"
+        )

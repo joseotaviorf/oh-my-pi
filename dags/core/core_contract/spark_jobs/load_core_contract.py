@@ -109,8 +109,42 @@ class CoreContractSparkJob(BaseCoreModelSparkJob):
 
         return spark.table(config["EBDB_USER_TABLE"])
 
+    def _resolve_property_owners(self, house_listing_relation_df, user_df):
+        """Resolve PROPERTY_OWNER relations to user.id via two equi-joins.
+
+        `id_related` holds either a numeric `user.id` or `user.uuid_person`. A single
+        OR join across those columns forces BroadcastNestedLoopJoin on EMR.
+        """
+        hl = house_listing_relation_df.filter(col("related_as") == "PROPERTY_OWNER")
+
+        owners_by_id = (
+            hl.alias("hl")
+            .join(
+                user_df.alias("u"),
+                col("u.id").cast("string") == col("hl.id_related"),
+                "inner",
+            )
+            .select(col("hl.id").alias("id_house"), col("u.id").alias("id_owner"))
+        )
+
+        owners_by_uuid = (
+            hl.alias("hl")
+            .join(
+                user_df.alias("u"),
+                col("u.uuid_person") == col("hl.id_related"),
+                "inner",
+            )
+            .select(col("hl.id").alias("id_house"), col("u.id").alias("id_owner"))
+        )
+
+        return owners_by_id.union(owners_by_uuid)
+
     def _join_all_data(self, contract_df, house_df, house_listing_relation_df, user_df):
         """Join all data sources to create the final result."""
+
+        owner_resolved_df = self._resolve_property_owners(
+            house_listing_relation_df, user_df
+        )
 
         result_df = contract_df.alias("ct")
 
@@ -119,16 +153,8 @@ class CoreContractSparkJob(BaseCoreModelSparkJob):
         )
 
         result_df = result_df.join(
-            house_listing_relation_df.alias("hl"),
-            (col("ct.id_house") == col("hl.id"))
-            & (col("hl.related_as") == "PROPERTY_OWNER"),
-            "left",
-        )
-
-        result_df = result_df.join(
-            user_df.alias("u"),
-            (col("u.id").cast("string") == col("hl.id_related"))
-            | (col("u.uuid_person") == col("hl.id_related")),
+            owner_resolved_df.alias("owner"),
+            col("ct.id_house") == col("owner.id_house"),
             "left",
         )
 
@@ -136,7 +162,7 @@ class CoreContractSparkJob(BaseCoreModelSparkJob):
             col("ct.id").alias("id_contract"),
             col("ct.id_house"),
             col("ct.id_user").alias("id_tenant"),
-            coalesce(col("u.id"), col("h.id_user")).alias("id_owner"),
+            coalesce(col("owner.id_owner"), col("h.id_user")).alias("id_owner"),
             col("ct.id_proposal"),
             col("ct.status"),
             coalesce(

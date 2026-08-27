@@ -127,6 +127,36 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         """Load user data."""
         return spark.read.table(config["EBDB_USER_TABLE"])
 
+    def _resolve_property_owners(self, house_listing_relation_df, user_df):
+        """Resolve PROPERTY_OWNER relations to user.id via two equi-joins.
+
+        `id_related` holds either a numeric `user.id` or `user.uuid_person`. A single
+        OR join across those columns forces BroadcastNestedLoopJoin on EMR.
+        """
+        hl = house_listing_relation_df.filter(col("related_as") == "PROPERTY_OWNER")
+
+        owners_by_id = (
+            hl.alias("hl")
+            .join(
+                user_df.alias("u"),
+                col("u.id").cast("string") == col("hl.id_related"),
+                "inner",
+            )
+            .select(col("hl.id").alias("id_house"), col("u.id").alias("id_owner"))
+        )
+
+        owners_by_uuid = (
+            hl.alias("hl")
+            .join(
+                user_df.alias("u"),
+                col("u.uuid_person") == col("hl.id_related"),
+                "inner",
+            )
+            .select(col("hl.id").alias("id_house"), col("u.id").alias("id_owner"))
+        )
+
+        return owners_by_id.union(owners_by_uuid)
+
     def _process_last_event(self, visit_status_log_df):
         """Process visit status log to get the last event per visit."""
         window_spec = Window.partitionBy("id_visit").orderBy(col("ts_created").desc())
@@ -177,6 +207,10 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
     ):
         """Join all data sources to create the final result."""
 
+        owner_resolved_df = self._resolve_property_owners(
+            house_listing_relation_df, user_df
+        )
+
         # Start with visit data
         result_df = visit_df
 
@@ -195,20 +229,9 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
             house_df.alias("h"), col("v.id_house") == col("h.id"), "left"
         )
 
-        # Join with house listing relation
         result_df = result_df.join(
-            house_listing_relation_df.alias("hl"),
-            (col("v.id_house") == col("hl.id"))
-            & (col("hl.related_as") == "PROPERTY_OWNER"),
-            "left",
-        )
-
-        # Join with user (with complex OR condition)
-        # id_related can be either a numeric ID (as string) or a UUID string
-        result_df = result_df.join(
-            user_df.alias("u"),
-            (col("u.id").cast("string") == col("hl.id_related"))
-            | (col("u.uuid_person") == col("hl.id_related")),
+            owner_resolved_df.alias("owner"),
+            col("v.id_house") == col("owner.id_house"),
             "left",
         )
 
@@ -217,7 +240,7 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
             col("v.id").alias("id_visit"),
             col("v.id_house"),
             col("v.id_visitor"),
-            coalesce(col("u.id"), col("h.id_user")).alias("id_owner"),
+            coalesce(col("owner.id_owner"), col("h.id_user")).alias("id_owner"),
             col("v.id_agent"),
             col("v.code"),
             col("v.status"),
