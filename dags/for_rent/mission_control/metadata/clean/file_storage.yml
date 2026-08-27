@@ -1,0 +1,82 @@
+---
+database_name: datalake_mission_control_clean
+table_name: file_storage
+owner: gustavo.silva@quintoandar.com.br
+domain: For Rent
+description: >
+  One row per file metadata record in Mission Control. It identifies the storage
+  backend and external file reference, with optional ownership information used to
+  connect files to rental contracts and their related documents.
+columns:
+  id:
+    description: Unique identifier of the file metadata record in Mission Control.
+    lineage:
+      - datalake_mission_control_raw.filestorage.id
+  status:
+    description: Current visibility state of the stored file in Mission Control.
+    categories:
+      Visible: File is available for use in Mission Control.
+      Deleted: File is soft-deleted and is no longer available for normal use.
+    lineage:
+      - datalake_mission_control_raw.filestorage.status
+  file_storage_type:
+    description: Storage backend that holds the external file reference.
+    categories:
+      GDrive: File is stored in Google Drive.
+      S3: File is stored in Amazon S3.
+    lineage:
+      - datalake_mission_control_raw.filestorage.file_storage_type
+  file_storage_identifier:
+    description: External identifier of the file in its configured storage backend.
+    lineage:
+      - datalake_mission_control_raw.filestorage.file_storage_identifier
+  display_title:
+    description: Optional display name used to identify the file to application users.
+    lineage:
+      - datalake_mission_control_raw.filestorage.display_title
+  owner_resource:
+    description: Optional resource type that owns the file metadata record.
+    categories:
+      CONTRACT: File ownership is assigned directly to a rental contract.
+    lineage:
+      - datalake_mission_control_raw.filestorage.owner_resource
+  owner_resource_id:
+    description: Optional identifier of the resource named by owner_resource.
+    lineage:
+      - datalake_mission_control_raw.filestorage.owner_resource_id
+  is_deleted:
+    description: Indicates whether the file metadata record was soft-deleted.
+    lineage:
+      - datalake_mission_control_raw.filestorage.deleted
+  ts_created:
+    description: Timestamp when the file metadata record was created in Mission Control.
+    lineage:
+      - datalake_mission_control_raw.filestorage.created_on
+  ts_updated:
+    description: Timestamp when the file metadata record was last updated in Mission Control.
+    lineage:
+      - datalake_mission_control_raw.filestorage.updated_on
+  op_cdc:
+    description: CDC operation type that produced the file metadata change event.
+    lineage:
+      - datalake_mission_control_raw.filestorage.op_cdc
+  ts_cdc_transaction:
+    description: Timestamp when CDC captured the file metadata change transaction.
+    lineage:
+      - datalake_mission_control_raw.filestorage.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the source database transaction for the file metadata change.
+    lineage:
+      - datalake_mission_control_raw.filestorage.ts_database_transaction
+  year:
+    description: Calendar year of the CDC record update, used for table partitioning.
+    lineage:
+      - datalake_mission_control_raw.filestorage.year
+  month:
+    description: Calendar month of the CDC record update, used for table partitioning.
+    lineage:
+      - datalake_mission_control_raw.filestorage.month
+  day:
+    description: Calendar day of the CDC record update, used for table partitioning.
+    lineage:
+      - datalake_mission_control_raw.filestorage.day

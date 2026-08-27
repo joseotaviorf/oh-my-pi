@@ -31,3 +31,7 @@ workflow:
       clean_table_name: onboarding_task_types
     User:
       clean_table_name: user
+    FileStorage:
+      clean_table_name: file_storage
+    Invoice:
+      clean_table_name: invoice

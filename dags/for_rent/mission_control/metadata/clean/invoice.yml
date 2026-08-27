@@ -1,0 +1,83 @@
+---
+database_name: datalake_mission_control_clean
+table_name: invoice
+owner: gustavo.silva@quintoandar.com.br
+domain: For Rent
+description: >
+  One row per invoice managed by Mission Control. It links a rental contract to the
+  file metadata for the invoice document and payment receipt, enabling file-to-contract
+  analysis for billing, refund, and ownership-transfer processes.
+columns:
+  id:
+    description: Unique identifier of the invoice record in Mission Control.
+    lineage:
+      - datalake_mission_control_raw.invoice.id
+  id_contract:
+    description: Rental contract associated with this invoice record.
+    lineage:
+      - datalake_mission_control_raw.invoice.contract_id
+  id_invoice_file_storage:
+    description: File metadata identifier for the invoice document.
+    lineage:
+      - datalake_mission_control_raw.invoice.invoice_file_storage_id
+  id_received_file_storage:
+    description: File metadata identifier for the receipt of invoice payment.
+    lineage:
+      - datalake_mission_control_raw.invoice.received_file_storage_id
+  type:
+    description: Business category of the invoice or document associated with the contract.
+    categories:
+      CONDOMINIUM: Condominium charge invoice.
+      PENDING_WATER_BILL: Pending water utility bill.
+      PENDING_ELETRIC_BILL: Pending electricity utility bill.
+      PENDING_GAS_BILL: Pending gas utility bill.
+      OWNERSHIP_TRANSFER_WATER_BILL: Water account ownership-transfer proof.
+      OWNERSHIP_TRANSFER_GAS_BILL: Gas account ownership-transfer proof.
+      OWNERSHIP_TRANSFER_ELETRIC_BILL: Electricity account ownership-transfer proof.
+      REFUND: Tenant refund document.
+    lineage:
+      - datalake_mission_control_raw.invoice.type
+  invoice_amount:
+    description: Monetary value recorded for the invoice in the Mission Control source.
+    lineage:
+      - datalake_mission_control_raw.invoice.value
+  ts_due:
+    description: Timestamp when the invoice payment is due.
+    lineage:
+      - datalake_mission_control_raw.invoice.due_date
+  is_deleted:
+    description: Indicates whether the invoice record was soft-deleted.
+    lineage:
+      - datalake_mission_control_raw.invoice.deleted
+  ts_created:
+    description: Timestamp when the invoice record was created in Mission Control.
+    lineage:
+      - datalake_mission_control_raw.invoice.created_on
+  ts_updated:
+    description: Timestamp when the invoice record was last updated in Mission Control.
+    lineage:
+      - datalake_mission_control_raw.invoice.updated_on
+  op_cdc:
+    description: CDC operation type that produced the invoice change event.
+    lineage:
+      - datalake_mission_control_raw.invoice.op_cdc
+  ts_cdc_transaction:
+    description: Timestamp when CDC captured the invoice change transaction.
+    lineage:
+      - datalake_mission_control_raw.invoice.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the source database transaction for the invoice change.
+    lineage:
+      - datalake_mission_control_raw.invoice.ts_database_transaction
+  year:
+    description: Calendar year of the CDC record update, used for table partitioning.
+    lineage:
+      - datalake_mission_control_raw.invoice.year
+  month:
+    description: Calendar month of the CDC record update, used for table partitioning.
+    lineage:
+      - datalake_mission_control_raw.invoice.month
+  day:
+    description: Calendar day of the CDC record update, used for table partitioning.
+    lineage:
+      - datalake_mission_control_raw.invoice.day
