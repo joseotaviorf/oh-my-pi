@@ -33,10 +33,6 @@ workflow:
     - year
     - month
     - day
-  default_clean_partitions:
-    - year
-    - month
-    - day
   default_table_privileges:
     people-team:
       - ALL PRIVILEGES
