@@ -149,6 +149,9 @@ workflow:
     summaries:
       endpoint_path: v1/organizations/analytics/summaries
       extraction_type: incremental
+      merge_on:
+        - dt_starting
+        - dt_ending
       results_response_path: summaries
       date_filter_column: starting_at
       date_format: "%Y-%m-%d"
