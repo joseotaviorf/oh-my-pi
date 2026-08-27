@@ -56,11 +56,11 @@ columns:
   dismissal_type:
     description: Type of dismissal when applicable (e.g., resignation, termination).
     lineage:
-      - datalake_employment.employee_details.dismissal_type
+      - datalake_people.assignment_termination.dismissal_type
   dismissal_reason:
     description: Reason for dismissal when applicable. Just cause dismissals are not PLR eligible.
     lineage:
-      - datalake_employment.employee_details.dismissal_reason
+      - datalake_people.assignment_termination.dismissal_reason
   performa_score:
     description: Individual performance assessment score from Performa calibration (Outstanding, Above expectations, etc.).
     lineage:
@@ -172,7 +172,7 @@ columns:
   is_eligible_by_dismissal_reason:
     description: TRUE if not dismissed for just cause.
     lineage:
-      - datalake_employment.employee_details.dismissal_reason
+      - datalake_people.assignment_termination.reason_code
   is_eligible_by_country_and_band:
     description: "TRUE if eligible by country and band rules (core: non-intern; LATAM: Band 9+)."
     lineage:

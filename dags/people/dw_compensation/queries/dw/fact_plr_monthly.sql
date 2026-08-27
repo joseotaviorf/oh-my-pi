@@ -30,8 +30,8 @@ assignments_plr_eligibility_ranked AS (
         im.id_assignment AS sk_contract,
         im.assignment_number,
         im.person_number,
-        ed.dismissal_type,
-        ed.dismissal_reason,
+        at.dismissal_type,
+        at.dismissal_reason,
         fpc.performa_score,
         CASE
             WHEN fpc.performa_score = 'Outstanding' THEN 1.50
@@ -62,7 +62,7 @@ assignments_plr_eligibility_ranked AS (
         plr_params.min_days_worked_in_month_to_count,
         plr_params.pct_min_corporate_goals,
         COALESCE(im.dt_started < plr_params.dt_admission_cutoff, FALSE) AS is_eligible_by_hired_date,
-        COALESCE(ed.dismissal_reason <> 'Dispensa por Justa Causa', TRUE) AS is_eligible_by_dismissal_reason,
+        COALESCE(at.reason_code <> 'D12', TRUE) AS is_eligible_by_dismissal_reason,
         COALESCE(
             im.dt_actual_termination < plr_params.dt_evaluation_cycle_started,
             FALSE
@@ -76,8 +76,8 @@ assignments_plr_eligibility_ranked AS (
     FROM
         datalake_people.identifier_mapping AS im
     LEFT JOIN
-        datalake_employment.employee_details AS ed
-            ON ed.id_assignment = im.id_assignment
+        datalake_people.assignment_termination AS at
+            ON at.id_assignment = im.id_assignment
     CROSS JOIN
         params AS plr_params
     LEFT JOIN
@@ -138,21 +138,47 @@ plr_reference_months AS (
     GROUP BY 
         dd.month_start, dd.month_end
 ),
+absence_requests_exploded_months AS (
+    SELECT
+        far.sk_assignment,
+        far.dt_absence_started,
+        far.dt_absence_ended,
+        far.sk_absence_type,
+        dt_month_key
+    FROM
+        dw_time.fact_absence_requests AS far
+    CROSS JOIN
+        params AS plr_params
+    LATERAL VIEW OUTER EXPLODE(
+        CASE
+            WHEN GREATEST(DATE_TRUNC('month', far.dt_absence_started), DATE_TRUNC('month', plr_params.dt_year_started))
+                <= LEAST(DATE_TRUNC('month', COALESCE(far.dt_absence_ended, plr_params.dt_year_ended)), DATE_TRUNC('month', plr_params.dt_year_ended))
+            THEN SEQUENCE(
+                CAST(GREATEST(DATE_TRUNC('month', far.dt_absence_started), DATE_TRUNC('month', plr_params.dt_year_started)) AS DATE),
+                CAST(LEAST(DATE_TRUNC('month', COALESCE(far.dt_absence_ended, plr_params.dt_year_ended)), DATE_TRUNC('month', plr_params.dt_year_ended)) AS DATE),
+                INTERVAL 1 MONTH
+            )
+            ELSE ARRAY()
+        END
+    ) exploded_far_months AS dt_month_key
+    WHERE
+        far.is_approved = TRUE
+),
 absence_days_by_assignment_month AS (
     /* Monthly absence days: unpaid leave reduces worked days, protected leave (maternity/parental/health)
        ensures minimum 100% IPA when >= 15 days in the month. */
     SELECT
-        far.sk_assignment,
+        e.sk_assignment,
         mc.dt_month_started,
         SUM(
             CASE
                 WHEN NOT dat.is_paid_leave
                 THEN DATEDIFF(
                     LEAST(
-                        COALESCE(far.dt_absence_ended, mc.dt_month_ended),
+                        COALESCE(e.dt_absence_ended, mc.dt_month_ended),
                         mc.dt_month_ended
                     ),
-                    GREATEST(far.dt_absence_started, mc.dt_month_started)
+                    GREATEST(e.dt_absence_started, mc.dt_month_started)
                 ) + 1
                 ELSE 0
             END
@@ -162,26 +188,24 @@ absence_days_by_assignment_month AS (
                 WHEN dat.is_performa_protected
                 THEN DATEDIFF(
                     LEAST(
-                        COALESCE(far.dt_absence_ended, mc.dt_month_ended),
+                        COALESCE(e.dt_absence_ended, mc.dt_month_ended),
                         mc.dt_month_ended
                     ),
-                    GREATEST(far.dt_absence_started, mc.dt_month_started)
+                    GREATEST(e.dt_absence_started, mc.dt_month_started)
                 ) + 1
                 ELSE 0
             END
         ) AS days_protected_leave
     FROM
-        plr_reference_months AS mc
+        absence_requests_exploded_months AS e
     INNER JOIN
-        dw_time.fact_absence_requests AS far
-            ON far.dt_absence_started <= mc.dt_month_ended
-            AND COALESCE(far.dt_absence_ended, mc.dt_month_ended) >= mc.dt_month_started
-            AND far.is_approved = TRUE
+        plr_reference_months AS mc
+            ON mc.dt_month_started = e.dt_month_key
     INNER JOIN
         dw_time.dim_absence_type AS dat
-            ON far.sk_absence_type = dat.sk_absence_type
+            ON e.sk_absence_type = dat.sk_absence_type
     GROUP BY
-        far.sk_assignment,
+        e.sk_assignment,
         mc.dt_month_started
     HAVING
         days_unpaid_leave + days_protected_leave > 0
@@ -197,6 +221,37 @@ absence_days_by_assignment_year AS (
         absence_days_by_assignment_month
     GROUP BY
         sk_assignment
+),
+fc_exploded_months AS (
+    /* Explodes each salary record's validity window into the reference-year months it
+       covers, replacing a `dt_valid_from <= ... AND dt_valid_to >= ...` range join */
+    SELECT
+        fc.sk_contract,
+        fc.sk_job_version,
+        fc.currency_code,
+        fc.amount_salary,
+        fc.dt_valid_from,
+        fc.dt_valid_to,
+        dt_month_key
+    FROM
+        dw_compensation.fact_compensations AS fc
+    CROSS JOIN
+        params AS plr_params
+    LATERAL VIEW OUTER EXPLODE(
+        CASE
+            WHEN GREATEST(DATE_TRUNC('month', fc.dt_valid_from), DATE_TRUNC('month', plr_params.dt_year_started))
+                <= LEAST(DATE_TRUNC('month', fc.dt_valid_to), DATE_TRUNC('month', plr_params.dt_year_ended))
+            THEN SEQUENCE(
+                CAST(GREATEST(DATE_TRUNC('month', fc.dt_valid_from), DATE_TRUNC('month', plr_params.dt_year_started)) AS DATE),
+                CAST(LEAST(DATE_TRUNC('month', fc.dt_valid_to), DATE_TRUNC('month', plr_params.dt_year_ended)) AS DATE),
+                INTERVAL 1 MONTH
+            )
+            ELSE ARRAY()
+        END
+    ) exploded_fc_months AS dt_month_key
+    WHERE
+        plr_params.reference_year BETWEEN YEAR(fc.dt_valid_from)
+            AND YEAR(fc.dt_valid_to)
 ),
 compensation_by_contract_month_ranked AS (
     /* Monthly compensation and job info: eligibility by country/band (BR/PT/US exclude interns, LATAM requires Band 9+).
@@ -230,19 +285,13 @@ compensation_by_contract_month_ranked AS (
         END AS is_core_country,
         ROW_NUMBER() OVER (PARTITION BY fc.sk_contract, mc.dt_month_started ORDER BY fc.dt_valid_from DESC) AS rn
     FROM
-        dw_compensation.fact_compensations AS fc
+        fc_exploded_months AS fc
     LEFT JOIN
         dw_compensation.dim_job AS dj
             ON fc.sk_job_version = dj.sk_job_version
-    CROSS JOIN
-        params AS plr_params
     LEFT JOIN
         plr_reference_months AS mc
-            ON fc.dt_valid_from <= mc.dt_month_ended
-            AND fc.dt_valid_to >= mc.dt_month_started
-    WHERE
-        plr_params.reference_year BETWEEN YEAR(fc.dt_valid_from)
-            AND YEAR(fc.dt_valid_to)
+            ON mc.dt_month_started = fc.dt_month_key
 ),
 compensation_by_contract_month AS (
     SELECT
