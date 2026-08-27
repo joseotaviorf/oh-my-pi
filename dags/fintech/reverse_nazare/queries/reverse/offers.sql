@@ -32,7 +32,6 @@ WITH cte_demand AS (
     FROM
         dw_sale.fact_offers AS fo
         LEFT JOIN demand_3p AS dp ON fo.sk_booking = dp.sk_booking
-        LEFT JOIN datalake_gsheets_clean.forbrokers_3p_partner_conditions pc ON UPPER(dp.demand_3p_partner) = UPPER(pc.partner_short_name)
     WHERE
         TRIM(COALESCE(dp.is_3p_demand, False)) = 'true'
 ),

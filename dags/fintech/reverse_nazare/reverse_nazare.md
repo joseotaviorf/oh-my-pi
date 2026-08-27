@@ -24,9 +24,7 @@ We incrementally load the following table into the Datalake Reverse bucket, for 
 - `campaign`
 - `hub_bonus`
 - `offer_agent`
-- `offer_partner`
 - `offer`
-- `partner`
 - `tier_bonus`
 
 This pipeline also exports results do Nazaré bucket (`s3://nazare-revenue-share-{ENV}`).
