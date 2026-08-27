@@ -1,0 +1,274 @@
+---
+database_name: datalake_agent_performance
+table_name: agent_demand_referral
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  One row per demand-referral event. Invite rows come from agent_lead_referral
+  (TQC Sale including null business_context, and TQA Rent). Extra rows come from
+  TQC-credited sale offers with no matching invite pair (offer is also SSOT).
+  TQA conversion is a signed For Rent contract from rent_demand_events
+  (id_event_type 9), same origin as enrich_tiers.agent_offers, joined on tenant
+  prospect and agent user id. attribution_source is INVITE_AND_OFFER, INVITE_ONLY,
+  or OFFER_ONLY. OFFER_ONLY uses referral_status NO_INVITE. No names, emails,
+  phones, or CRECI.
+columns:
+  id_demand_referral:
+    description: Primary key. invite_{id_lead_referral} for invite spines, sale_offer_{id_sale_offer} for TQC offers with no matching invite.
+  id_lead_referral:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.id
+    description: EBDB invite id. Null on OFFER_ONLY rows where TQC exists on the offer but no invite pair.
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.id_agent
+      - datalake_ebdb_user.user.id_agent
+    description: DadosAgente id of the referrer. Invite column id_agent is this key. Null when the TQC user has no id_agent.
+  id_user_referrer:
+    lineage:
+      - datalake_agent_accreditation.agent.id_user
+      - datalake_ebdb_user.user.id
+      - datalake_sale_offer_flows.offer_specialists.id_user_agent_lead_referral
+      - datalake_rent_demand_events.rent_demand_events.id_agent
+    description: EBDB user id of the referrer. Invite spine uses accreditation then ebdb user. OFFER_ONLY uses the TQC specialist user. TQA contract join uses this id against rent_demand_events.id_agent (user id, same as agent_offers).
+  id_agent:
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+    description: Accreditation agent id of the inviter. Null when the DadosAgente id is not in the agent accreditation table.
+  id_partner:
+    lineage:
+      - datalake_agent_accreditation.agent.id_partner
+    description: Partner id of the inviter when accreditation has a PARTNER_ID external reference.
+  id_lead:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.id_lead
+      - datalake_sale_offer.sale_offer.id_buyer
+    description: Invited user id, or the sale-offer buyer on OFFER_ONLY rows. Identifier only; no contact attributes.
+  id_sale_offer:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_offer
+    description: First sale offer that credits this invite pair as TQC (lead equals buyer, invite agent equals TQC specialist DadosAgente). Null when no such offer.
+  id_rent_offer:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_offer
+    description: Rent offer context on the signed TQA contract (agent_offers rent spine). Null when TQA did not convert or on TQC rows.
+  id_rent_contract:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_contract
+    description: First signed For Rent contract for this TQA invite lead and referrer user. Signal is rent_demand_events id_event_type 9, same as enrich_tiers.agent_offers.
+  id_house:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_house
+      - datalake_rent_demand_events.rent_demand_events.id_house
+    description: House id from the converted sale offer, else from the TQA signed rent contract.
+  id_user_agent:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_user_agent
+    description: EBDB user id of the AGENT specialist on the converted sale offer. Null when the invite has no TQC sale offer.
+  id_user_negotiation_executive:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_user_consultant
+    description: EBDB user id of the offer consultant (EN) on the converted sale offer.
+  id_user_associated_executive:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_user_team_lead
+    description: EBDB user id of the offer team lead (EA) on the converted sale offer.
+  id_negotiation_executive_user:
+    lineage:
+      - datalake_agent_accreditation.agent.id_negotiation_executive_user
+    description: Hub parent EN of the inviter from accreditation. Different from id_user_negotiation_executive on the sale offer.
+  id_specialist_referrer:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_agent_lead_referral
+    description: SalesFlow specialist id of AGENT_LEAD_REFERRAL on the converted sale offer.
+  uuid_agent:
+    lineage:
+      - datalake_agent_accreditation.agent.uuid_agent
+    description: Business UUID of the inviter agent when present in accreditation.
+  uuid_person:
+    lineage:
+      - datalake_agent_accreditation.agent.uuid_person
+      - datalake_ebdb_user.user.uuid_person
+    description: Person UUID of the inviter. Accreditation first, else ebdb user. Join dim_person at query time; this table does not store PII.
+  sourcing_channel:
+    description: Demand-sourcing program. TQA when invite business_context is RENT; TQC for SALE, null context, or OFFER_ONLY TQC offers.
+    categories:
+      TQC: Agent-sourced Sale demand (invite or TQC-credited offer).
+      TQA: Agent-sourced Rent demand invite (business_context RENT).
+  attribution_source:
+    description: Which SSOT produced this row. Invite and sale-offer TQC are both sources of truth.
+    categories:
+      INVITE_AND_OFFER: Invite matches a TQC sale offer or a TQA signed rent contract.
+      INVITE_ONLY: Invite with no TQC sale offer and no TQA signed contract on that pair.
+      OFFER_ONLY: Sale offer has AGENT_LEAD_REFERRAL but no invite on that buyer and agent pair.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.business_context
+    description: Source business_context on the invite. Null is treated as Sale / TQC.
+    categories:
+      SALE: For Sale invite (TQC), or inferred Sale on OFFER_ONLY TQC offers.
+      RENT: For Rent invite (TQA).
+  origin:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.origin
+    description: Product channel that created the invite (referral flow, service link, or scheduling link).
+    categories:
+      REFERRAL: Classic invite / referral code flow.
+      SERVICE_LINK: Invite originated from a service link.
+      SCHEDULING_LINK: Invite originated from a scheduling link.
+  referral_status:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.status
+    description: Lifecycle status of the invite in EBDB, same field dim_agent folds into has_*_lead_referral flags.
+    categories:
+      CONFIRMED: Lead accepted the invite.
+      PENDING: Invite still open.
+      EXPIRED: Invite expired without confirm.
+      INACTIVE: Invite inactivated.
+      NOT_ELIGIBLE: Invite marked not eligible (excluded from dim_agent has_* flags).
+      NO_INVITE: Synthetic status on OFFER_ONLY rows. TQC exists on the offer and no matching invite was sent.
+  referral_type:
+    description: Roster roles of the TQC specialist on the converted sale offer, underscore-joined. Null when there is no converted sale offer.
+    categories:
+      AGENT: TQC user equals the offer AGENT specialist.
+      NEGOTIATION_EXECUTIVE: TQC user equals the offer consultant (EN).
+      ASSOCIATED_EXECUTIVE: TQC user equals the offer team lead (EA).
+      AGENT_NEGOTIATION_EXECUTIVE: TQC user is both broker and EN.
+      AGENT_ASSOCIATED_EXECUTIVE: TQC user is both broker and EA.
+      NEGOTIATION_EXECUTIVE_ASSOCIATED_EXECUTIVE: TQC user is both EN and EA.
+      AGENT_NEGOTIATION_EXECUTIVE_ASSOCIATED_EXECUTIVE: TQC user holds all three roster seats.
+      OTHER: TQC user matches none of the three roster ids.
+  affiliation_type:
+    lineage:
+      - datalake_agent_accreditation.agent.affiliation_type
+    description: Affiliation model of the inviter (1P/3P style) from accreditation.
+  agent_status:
+    lineage:
+      - datalake_agent_accreditation.agent.status
+    description: Current accreditation lifecycle status of the inviter (for example ACTIVE or INACTIVE).
+  agent_profile:
+    lineage:
+      - datalake_agent_accreditation.agent.profile
+    description: Current agent profile label from accreditation. Not the same as referral_type.
+  is_allow_demand_acquisition:
+    lineage:
+      - datalake_agent_accreditation.agent.is_allow_demand_acquisition
+    description: True when the inviter currently has demand-acquisition capability enabled in accreditation.
+  is_allow_demand_sale:
+    lineage:
+      - datalake_agent_accreditation.agent.is_allow_demand_sale
+    description: True when the inviter currently has demand-sale capability enabled in accreditation.
+  is_allow_demand_rent:
+    lineage:
+      - datalake_agent_accreditation.agent.is_allow_demand_rent
+    description: True when the inviter currently has demand-rent capability enabled in accreditation.
+  is_referrer_active:
+    lineage:
+      - datalake_ebdb_user.user.is_active
+    description: Whether the chosen BR ebdb user account for the inviter DadosAgente is active.
+  has_invite:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.id
+    description: True on invite spines. False on OFFER_ONLY rows.
+  has_tqc_offer_for_lead_other_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.id_lead
+      - datalake_sale_offer.sale_offer.id_buyer
+    description: True when this invite lead has a TQC-credited sale offer whose agent is not this invite agent. The 20-case buyer-other-agent pattern from the invite side.
+  has_other_agent_invite_for_lead:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.id_lead
+      - datalake_sale_offer.sale_offer.id_buyer
+    description: True on OFFER_ONLY when the buyer has some sale invite, but not for this TQC agent. Distinguishes other-agent invite from no invite at all.
+  has_unattributed_same_context_offer:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_buyer
+      - datalake_sale_offer_flows.offer_specialists.id_user_agent_lead_referral
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+      - datalake_rent_demand_events.rent_demand_events.id_agent
+      - datalake_ebdb_clean.agent_lead_referral.business_context
+    description: |
+      True when the invited lead has an offer in the same business context as the
+      invite, but that offer is not attributed as TQC or TQA. Sale or null context
+      means a sale offer with no AGENT_LEAD_REFERRAL. Rent means an offer submitted
+      (rent_demand_events id_event_type 3, same as agent_offers) that is not attributed
+      to this TQA referrer user. False on OFFER_ONLY rows.
+  is_confirmed:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.status
+    description: True when invite status is CONFIRMED. Same test as dim_agent has_sale_lead_referral_confirmed / has_rent_lead_referral_confirmed at invite grain.
+  is_not_eligible:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.status
+    description: True when invite status is NOT_ELIGIBLE. dim_agent ignores these rows in the has_*_lead_referral flags.
+  is_converted_to_sale_offer:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_offer
+    description: True when a TQC-credited sale offer exists for this invite lead and agent. Only evaluated for TQC invites.
+  is_converted_to_rent_contract:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_contract
+    description: True when this TQA invite lead and referrer user have a signed rent contract (rent_demand_events id_event_type 9), same conversion as enrich_tiers.agent_offers.
+  is_agent_referral:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_agent_lead_referral
+      - datalake_sale_offer.sale_offer.id_user_agent
+    description: True when the converted sale offer TQC user is the offer AGENT specialist.
+  is_negotiation_executive_referral:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_agent_lead_referral
+      - datalake_sale_offer.sale_offer.id_user_consultant
+    description: True when the converted sale offer TQC user is the offer consultant (EN).
+  is_associated_executive_referral:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_agent_lead_referral
+      - datalake_sale_offer.sale_offer.id_user_team_lead
+    description: True when the converted sale offer TQC user is the offer TEAM_LEAD (EA).
+  dt_invite:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.ts_created
+      - datalake_ebdb_clean.agent_lead_referral.ts_updated
+    description: Calendar date of the invite. Uses ts_created, else ts_updated. Partition date and default day for daily invite counts.
+  dt_sale_offer:
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Calendar date of the first converted sale offer submit. Null when not converted.
+  dt_rent_contract_signed:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: UTC calendar date of the first TQA signed contract. Do not convert to BRT; that belongs only in enrich_tiers metric windows.
+  ts_invite_created:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.ts_created
+    description: Timestamp when the invite row was created in EBDB.
+  ts_invite_updated:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.ts_updated
+    description: Timestamp when the invite row was last updated in EBDB.
+  ts_sale_offer_submitted:
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Timestamp when the buyer submitted the converted sale offer.
+  ts_agent_lead_referral_updated:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
+    description: Last update of the AGENT_LEAD_REFERRAL specialist row on the converted sale offer.
+  ts_rent_contract_signed:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Timestamp of the first TQA signed-contract event (id_event_type 9).
+  year:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.ts_created
+      - datalake_ebdb_clean.agent_lead_referral.ts_updated
+    description: Partition year derived from dt_invite.
+  month:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.ts_created
+      - datalake_ebdb_clean.agent_lead_referral.ts_updated
+    description: Partition month derived from dt_invite.
+  day:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral.ts_created
+      - datalake_ebdb_clean.agent_lead_referral.ts_updated
+    description: Partition day derived from dt_invite.

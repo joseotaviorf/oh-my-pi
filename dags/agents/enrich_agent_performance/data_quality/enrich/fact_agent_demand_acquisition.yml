@@ -1,0 +1,42 @@
+---
+table_name: datalake_agent_performance.agent_demand_referral
+alert_channel: "#agents-data-alarms"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_demand_referral:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_user_referrer:
+    is_complete:
+      severity_level: Warning
+  sourcing_channel:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: ['TQC', 'TQA']
+      severity_level: Error
+  attribution_source:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: ['INVITE_AND_OFFER', 'INVITE_ONLY', 'OFFER_ONLY']
+      severity_level: Error
+  referral_status:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: ['CONFIRMED', 'PENDING', 'EXPIRED', 'INACTIVE', 'NOT_ELIGIBLE', 'NO_INVITE']
+      severity_level: Error
+  origin:
+    is_contained_in:
+      values: ['REFERRAL', 'SERVICE_LINK', 'SCHEDULING_LINK']
+      severity_level: Warning
+  referral_type:
+    is_contained_in:
+      values: ['AGENT', 'NEGOTIATION_EXECUTIVE', 'ASSOCIATED_EXECUTIVE', 'AGENT_NEGOTIATION_EXECUTIVE', 'AGENT_ASSOCIATED_EXECUTIVE', 'NEGOTIATION_EXECUTIVE_ASSOCIATED_EXECUTIVE', 'AGENT_NEGOTIATION_EXECUTIVE_ASSOCIATED_EXECUTIVE', 'OTHER']
+      severity_level: Warning
