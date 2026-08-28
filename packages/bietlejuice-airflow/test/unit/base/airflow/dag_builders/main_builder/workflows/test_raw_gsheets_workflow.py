@@ -337,3 +337,43 @@ class TestRawGsheetsWorkflowEngineWiring:
             cluster_completion_sink=terminate_sink,
         )
         mock_engine.create_databricks_terminate_cluster_task.assert_not_called()
+
+
+class TestRawGsheetsWorkflowDecideBranch:
+    @patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_gsheets_workflow.DatasetService"
+    )
+    @patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_gsheets_workflow.pull_gsheets_ingest_output_json"
+    )
+    def test_sidecar_read_uses_dataset_events_assume_role_session(
+        self, mock_pull, mock_dataset_service
+    ):
+        workflow = _build_workflow()
+        dummy = MagicMock(task_id="dummy-sheet")
+        raw_task = MagicMock(task_id="load-raw_sheet")
+        mock_s3 = MagicMock()
+        mock_dataset_service._get_boto3_session_for_dataset_events.return_value.client.return_value = mock_s3
+        mock_pull.return_value = None
+
+        with patch(
+            "bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_gsheets_workflow.DatalakeTaskGroup.first_tasks",
+            return_value=[raw_task],
+        ):
+            result = workflow.decide_branch(
+                table_name="sheet_clean",
+                gsheet_raw_task_group=(raw_task,),
+                dummy_task=dummy,
+                artifacts_bucket="s3://artifacts.s3.data.quintoandar.com.br",
+                ti=MagicMock(run_id="val__1"),
+                dag_run=MagicMock(run_id="val__1"),
+                dag=MagicMock(dag_id="bietlejuice.gsheets_people__validation"),
+            )
+
+        assert result == "load-raw_sheet"
+        factory = mock_pull.call_args.kwargs["s3_client_factory"]
+        assert factory() is mock_s3
+        mock_dataset_service._get_boto3_session_for_dataset_events.assert_called_once_with()
+        mock_dataset_service._get_boto3_session_for_dataset_events.return_value.client.assert_called_once_with(
+            "s3"
+        )

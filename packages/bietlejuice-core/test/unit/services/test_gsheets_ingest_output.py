@@ -14,6 +14,7 @@ PROD_ARTIFACTS_BUCKET = "artifacts.s3.data.quintoandar.com.br"
 SIDECAR_KEY = (
     "emr-migration/_gsheets_ingest/bietlejuice.gsheets_agents/manual__2026.json"
 )
+SIDECAR_BODY = '{"success_run": true, "sheets_to_be_ingested": ["t1"]}'
 
 
 @contextmanager
@@ -69,6 +70,7 @@ class TestPullGsheetsIngestOutputJson:
     def test_returns_xcom_when_present(self):
         ti = MagicMock()
         ti.xcom_pull.return_value = '{"success_run": true, "sheets_to_be_ingested": []}'
+        factory = MagicMock()
 
         result = pull_gsheets_ingest_output_json(
             task_instance=ti,
@@ -76,21 +78,22 @@ class TestPullGsheetsIngestOutputJson:
             artifacts_bucket=PROD_ARTIFACTS_URI,
             dag_id="bietlejuice.gsheets_agents",
             run_id="manual__2026",
+            s3_client_factory=factory,
         )
 
         assert result == '{"success_run": true, "sheets_to_be_ingested": []}'
         ti.xcom_pull.assert_called_once_with(
             task_ids="ingested-gsheets-id-info", key="output"
         )
+        factory.assert_not_called()
 
     def test_reads_s3_sidecar_when_xcom_missing(self):
         ti = MagicMock()
         ti.xcom_pull.return_value = None
-        sidecar_body = '{"success_run": true, "sheets_to_be_ingested": ["t1"]}'
 
         with patch("boto3.client") as mock_boto_client:
             mock_boto_client.return_value.get_object.return_value = {
-                "Body": MagicMock(read=MagicMock(return_value=sidecar_body.encode()))
+                "Body": MagicMock(read=MagicMock(return_value=SIDECAR_BODY.encode()))
             }
             result = pull_gsheets_ingest_output_json(
                 task_instance=ti,
@@ -100,8 +103,35 @@ class TestPullGsheetsIngestOutputJson:
                 run_id="manual__2026",
             )
 
-        assert result == sidecar_body
+        assert result == SIDECAR_BODY
         mock_boto_client.return_value.get_object.assert_called_once_with(
+            Bucket=PROD_ARTIFACTS_BUCKET,
+            Key=SIDECAR_KEY,
+        )
+
+    def test_uses_injected_s3_client_factory_when_xcom_missing(self):
+        ti = MagicMock()
+        ti.xcom_pull.return_value = None
+        mock_s3 = MagicMock()
+        mock_s3.get_object.return_value = {
+            "Body": MagicMock(read=MagicMock(return_value=SIDECAR_BODY.encode()))
+        }
+        factory = MagicMock(return_value=mock_s3)
+
+        with patch("boto3.client") as mock_boto_client:
+            result = pull_gsheets_ingest_output_json(
+                task_instance=ti,
+                ingest_task_id="ingested-gsheets-id-info",
+                artifacts_bucket=PROD_ARTIFACTS_URI,
+                dag_id="bietlejuice.gsheets_agents",
+                run_id="manual__2026",
+                s3_client_factory=factory,
+            )
+
+        assert result == SIDECAR_BODY
+        factory.assert_called_once_with()
+        mock_boto_client.assert_not_called()
+        mock_s3.get_object.assert_called_once_with(
             Bucket=PROD_ARTIFACTS_BUCKET,
             Key=SIDECAR_KEY,
         )

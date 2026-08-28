@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -68,8 +68,14 @@ def pull_gsheets_ingest_output_json(
     artifacts_bucket: str,
     dag_id: str,
     run_id: str,
+    s3_client_factory: Optional[Callable[[], Any]] = None,
 ) -> Optional[str]:
-    """Return ingest-id JSON from XCom or, on EMR, from the S3 sidecar."""
+    """Return ingest-id JSON from XCom or, on EMR, from the S3 sidecar.
+
+    ``s3_client_factory`` is invoked only when XCom is empty. Airflow passes
+    ``DatasetService._get_boto3_session_for_dataset_events`` (same assume-role
+    as the dataset-events post action).
+    """
     output = task_instance.xcom_pull(task_ids=ingest_task_id, key="output")
     if output:
         return output
@@ -79,9 +85,11 @@ def pull_gsheets_ingest_output_json(
         import boto3
 
         parsed = urlparse(sidecar_uri)
+        client = (
+            s3_client_factory() if s3_client_factory is not None else boto3.client("s3")
+        )
         body = (
-            boto3.client("s3")
-            .get_object(Bucket=parsed.netloc, Key=parsed.path.lstrip("/"))
+            client.get_object(Bucket=parsed.netloc, Key=parsed.path.lstrip("/"))
             .get("Body")
             .read()
             .decode("utf-8")

@@ -21,6 +21,7 @@ from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTas
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.formatters import StringFormatter
+from bietlejuice.services.dataset_service import DatasetService
 from bietlejuice.services.gsheets_ingest_output import pull_gsheets_ingest_output_json
 from bietlejuice.services.gsheets_ingestion_alert import get_metadata_owner
 
@@ -321,6 +322,9 @@ class RawGsheetsWorkflow(BaseWorkflow):
             artifacts_bucket=artifacts_bucket,
             dag_id=dag_id,
             run_id=run_id,
+            s3_client_factory=lambda: (
+                DatasetService._get_boto3_session_for_dataset_events().client("s3")
+            ),
         )
         if not to_ingest_output_json:
             return DatalakeTaskGroup.first_tasks(gsheet_raw_task_group)[0].task_id
