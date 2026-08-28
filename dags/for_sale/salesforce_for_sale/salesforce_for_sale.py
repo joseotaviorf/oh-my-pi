@@ -6,6 +6,7 @@ Note: this line above forces Airflow to parse this file for implemented DAGs
 
 import math
 import os
+from copy import deepcopy
 from datetime import datetime, timedelta
 from os.path import basename, dirname
 from typing import Dict
@@ -17,6 +18,7 @@ from databricks_plugin import (
 )
 
 from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.notification.gchat_callback import GchatCallback
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -64,12 +66,35 @@ BASE_PARAMETERS = {
 }
 
 
+def lineage_pool_name(cluster_id: str) -> str:
+    return f"salesforce_for_sale_cluster_{cluster_id}"
+
+
+def ensure_lineage_pool(cluster_id: str) -> str:
+    """One Airflow pool slot = at most one hour executing this lineage."""
+    from airflow.models.pool import Pool
+
+    pool_name = lineage_pool_name(cluster_id)
+    try:
+        Pool.create_or_update_pool(
+            name=pool_name,
+            slots=1,
+            description=(f"Serialize {DAG_ID} cluster {cluster_id} to one active hour"),
+            include_deferred=False,
+        )
+    except Exception:
+        # Dag-file parse in tests / without a metadata DB still assigns pool=.
+        pass
+    return pool_name
+
+
 def create_sst_task(
     target_schema: str,
     target_table: str,
     entry_point: str,
     parameters: Dict[str, str],
     task_id: str = None,
+    pool: str = None,
 ):
     task_id = f"load_{target_schema}_{target_table}" if not task_id else task_id
     base_parameters = {
@@ -93,24 +118,151 @@ def create_sst_task(
             }
         },
         execution_timeout=timedelta(minutes=30),
+        depends_on_past=False,
+        pool=pool,
     )
 
 
-def create_execute_job_cluster_task(dag: DAG, task_id: str):
+def create_execute_job_cluster_task(dag: DAG, cluster_id: str, task_id: str, pool: str):
+    cluster_configuration = deepcopy(CLUSTER_CONFIGURATION)
+    cluster_configuration["cluster_name"] = f"{DAG_ID}_{{{{ run_id }}}}_{cluster_id}"
     return QuintoAndarDatabricksExecuteJobClusterOperator(
         databricks_conn_id=DATABRICKS_CONN_ID,
         dag=dag,
         task_id=task_id,
-        cluster_configuration=CLUSTER_CONFIGURATION,
+        cluster_configuration=cluster_configuration,
         access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         libraries=get_libs(ENV),
+        pool=pool,
+        # Do not start hour N+1's cluster until hour N's execute succeeded and
+        # end_cdc_cluster_* (full lineage) succeeded. See execute >> end.
+        depends_on_past=True,
+        wait_for_downstream=True,
     )
 
 
-def create_start_end_operator(task_id: str):
-    start = SStPlaceholderOperator(task_id=f"start_{task_id}")
-    end = SStPlaceholderOperator(task_id=f"end_{task_id}")
-    return start, end
+def create_previous_lineage_gate(cluster_id: str, pool: str):
+    return SStPlaceholderOperator(
+        task_id=f"wait_previous_lineage_{cluster_id}",
+        depends_on_past=True,
+        wait_for_downstream=True,
+        pool=pool,
+    )
+
+
+def build_metrics_tasks(event_table, pool: str):
+    return [
+        create_sst_task(
+            target_schema="",
+            target_table=event_table,
+            entry_point="quality/metrics/stability",
+            parameters={},
+            task_id=f"metrics_pipeline_stability_{event_table}",
+            pool=pool,
+        ),
+        create_sst_task(
+            target_schema="",
+            target_table=event_table,
+            entry_point="quality/metrics/latency",
+            parameters={},
+            task_id=f"metrics_pipeline_latency_{event_table}",
+            pool=pool,
+        ),
+        create_sst_task(
+            target_schema="",
+            target_table=event_table,
+            entry_point="salesforce/metrics/missing_events",
+            parameters={},
+            task_id=f"metrics_pipeline_missing_events_{event_table}",
+            pool=pool,
+        ),
+    ]
+
+
+def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
+    parameters = EVENTS_CONFIG[event]
+    event_table = f"events_{event.lower()}"
+    threshold_time_hours = parameters.get("threshold_time_hours", 24)
+
+    raw_task = create_sst_task(
+        target_schema=RAW_SCHEMA,
+        target_table=event_table,
+        entry_point="salesforce/cdc_raw",
+        parameters=parameters,
+        pool=pool,
+    )
+
+    clean_task = create_sst_task(
+        target_schema=CLEAN_SCHEMA,
+        target_table=event_table,
+        entry_point="salesforce/cdc_clean",
+        parameters={
+            "source_schema": RAW_SCHEMA,
+            "sync_hive": "True",
+        },
+        pool=pool,
+    )
+    DatasetAdder.attach_dataset_to_task(clean_task)
+
+    metrics_tasks = build_metrics_tasks(event_table, pool)
+    if parameters.get("skip_quality_contracts", False):
+        (execute_job_cluster >> raw_task >> clean_task >> metrics_tasks >> end_cluster)
+        return
+
+    quality_contract_raw = create_sst_task(
+        target_schema=RAW_SCHEMA,
+        target_table=event_table,
+        entry_point="quality/contracts/generic",
+        parameters={
+            "threshold_time_hours": threshold_time_hours,
+        },
+        task_id=f"quality_contract_checks_raw_{event_table}",
+        pool=pool,
+    )
+    quality_contract_clean = create_sst_task(
+        target_schema=CLEAN_SCHEMA,
+        target_table=event_table,
+        entry_point="quality/contracts/generic",
+        parameters={
+            "threshold_time_hours": threshold_time_hours,
+        },
+        task_id=f"quality_contract_checks_clean_{event_table}",
+        pool=pool,
+    )
+    (
+        execute_job_cluster
+        >> raw_task
+        >> quality_contract_raw
+        >> clean_task
+        >> quality_contract_clean
+        >> metrics_tasks
+        >> end_cluster
+    )
+
+
+def build_cluster_lineage(cluster_id: str, events):
+    if not events:
+        return
+    pool = ensure_lineage_pool(cluster_id)
+    wait_previous_lineage = create_previous_lineage_gate(cluster_id, pool)
+    execute_job_cluster = create_execute_job_cluster_task(
+        dag=dag,
+        cluster_id=cluster_id,
+        task_id=f"execute_cdc_cluster_{cluster_id}",
+        pool=pool,
+    )
+    end_cluster = SStPlaceholderOperator(
+        task_id=f"end_cdc_cluster_{cluster_id}",
+        depends_on_past=False,
+        pool=pool,
+    )
+    wait_previous_lineage >> execute_job_cluster
+    for event in events:
+        wire_event_lineage(execute_job_cluster, event, end_cluster, pool)
+    # Immediate downstream of the gate and execute includes the lineage leaf
+    # so wait_for_downstream waits for the full hour, not only cluster start.
+    wait_previous_lineage >> end_cluster
+    execute_job_cluster >> end_cluster
 
 
 jiraops_callback = JiraOpsCallback()
@@ -137,10 +289,11 @@ with DAG(
     on_failure_callback=gchat_callback.dag_failure_alert,
     # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # on_failure_callback=jiraops_callback.dag_failure_alert,
+    # Single cluster lineage: keep one active hour. Sequencing across hours is
+    # the pool (1 slot) plus wait_previous_lineage / execute wait_for_downstream,
+    # not depends_on_past on the load tasks.
     max_active_runs=1,
 ) as dag:
-    start, end = create_start_end_operator("salesforce")
-
     NUMBER_OF_CLUSTERS = 1
     events_lst = list(EVENTS_CONFIG.keys())
     pool_max_size = math.ceil(len(events_lst) / NUMBER_OF_CLUSTERS) or 1
@@ -148,66 +301,5 @@ with DAG(
         events_lst[i : i + pool_max_size]
         for i in range(0, len(events_lst), pool_max_size)
     ]
-
-    execute_job_clusters = []
     for i, pool_events in enumerate(job_pool):
-        execute_job_cluster = create_execute_job_cluster_task(
-            dag=dag, task_id=f"execute_cdc_cluster_{i}"
-        )
-        execute_job_clusters.append(execute_job_cluster)
-        end_pool = SStPlaceholderOperator(task_id=f"end_pool_{i}")
-
-        for event in pool_events:
-            parameters = EVENTS_CONFIG[event]
-            event_table = f"events_{event.lower()}"
-            threshold_time_hours = parameters.get("threshold_time_hours", 24)
-
-            raw_task = create_sst_task(
-                target_schema=RAW_SCHEMA,
-                target_table=event_table,
-                entry_point="salesforce/cdc_raw",
-                parameters=parameters,
-            )
-
-            clean_task = create_sst_task(
-                target_schema=CLEAN_SCHEMA,
-                target_table=event_table,
-                entry_point="salesforce/cdc_clean",
-                parameters={
-                    "source_schema": RAW_SCHEMA,
-                    "sync_hive": "True",
-                },
-            )
-
-            if parameters.get("skip_quality_contracts", False):
-                (execute_job_cluster >> raw_task >> clean_task >> end_pool >> end)
-            else:
-                quality_contract_raw = create_sst_task(
-                    target_schema=RAW_SCHEMA,
-                    target_table=event_table,
-                    entry_point="quality/contracts/generic",
-                    parameters={
-                        "threshold_time_hours": threshold_time_hours,
-                    },
-                    task_id=f"quality_contract_checks_raw_{event_table}",
-                )
-                quality_contract_clean = create_sst_task(
-                    target_schema=CLEAN_SCHEMA,
-                    target_table=event_table,
-                    entry_point="quality/contracts/generic",
-                    parameters={
-                        "threshold_time_hours": threshold_time_hours,
-                    },
-                    task_id=f"quality_contract_checks_clean_{event_table}",
-                )
-                (
-                    execute_job_cluster
-                    >> raw_task
-                    >> quality_contract_raw
-                    >> clean_task
-                    >> quality_contract_clean
-                    >> end_pool
-                    >> end
-                )
-
-    start >> execute_job_clusters
+        build_cluster_lineage(str(i), pool_events)

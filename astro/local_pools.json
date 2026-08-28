@@ -35,6 +35,11 @@
       "pool_name": "salesforce_cdc_cluster_1",
       "slots": 1,
       "description": "One active hour at a time for salesforce_cdc pooled cluster 1."
+    },
+    {
+      "pool_name": "salesforce_for_sale_cluster_0",
+      "slots": 1,
+      "description": "One active hour at a time for salesforce_for_sale pooled cluster 0."
     }
   ]
 }
