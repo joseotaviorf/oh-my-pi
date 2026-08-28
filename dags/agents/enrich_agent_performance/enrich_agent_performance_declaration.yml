@@ -1,29 +1,25 @@
----
 dag:
   name: enrich_agent_performance
   owner: Data Agents
-  schedule_start_date: 2026, 8, 21
-  schedule_interval: "0 7 * * *"
+  schedule_start_date: 2026, 8, 28
   catchup: false
   documentation:
     dag_purpose: |
-      Agents Performance enrich for agent-sourced demand (TQC Sale and TQA Rent).
-      Spine is invites plus TQC sale offers that have no matching invite pair.
-      TQA conversion is rent_demand_events contract signed (id_event_type 9),
-      same origin as enrich_tiers.agent_offers.
-      Daily counts compose downstream (AAREDE-509); no daily family table.
+      Agents Performance enrich tables for demand acquisition, supply acquisition, 
+      demand conversion and other metrics and concepts related to the quality and overall 
+      activities of an agent.
 workflow:
   type: query_delta
   layer: enrich
   custom_schema: agent_performance
   default_extraction_type: full
-  default_partitions: [year, month, day]
   tables_customization:
-    agent_demand_referral:
+    fact_agent_demand_acquisition:
       extraction_type: full
       merge_on:
-        - id_demand_referral
+        - id_referral
+        - rev
       z_order_by:
-        - id_user_referrer
-        - attribution_source
-      partitions: [year, month, day]
+        - valid_from
+        - id_user_referring_agent
+        - id_lead
