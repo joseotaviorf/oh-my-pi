@@ -84,6 +84,8 @@ company:
       - hs_lead_status
       - hubspot_owner_assigneddate
       - hubspot_owner_id
+      - account_manager__for_sale
+      - account_manager__for_rent
       - hubspot_team_id
       - quantidade_de_imoveis_a_venda
       - hs_parent_company_id
