@@ -1,3 +1,4 @@
+-- redeploy trigger
 WITH time_solved AS (
   SELECT
     sk_ticket,
