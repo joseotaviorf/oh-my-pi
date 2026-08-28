@@ -39,7 +39,7 @@ workflow:
       raw_primary_keys: [calendar_id]
       clean_primary_keys: [id_calendar]
       get_table_metrics:
-        count: "id_calendar"
+        count: "calendar_id"
     week_calendar:
       clean_table_name: week_calendar
       raw_primary_keys: [id]
