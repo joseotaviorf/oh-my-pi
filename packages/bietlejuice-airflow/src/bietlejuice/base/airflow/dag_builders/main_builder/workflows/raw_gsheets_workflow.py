@@ -75,6 +75,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
         self.env = os.environ.get("ENVIRONMENT")
         bucket_config = workflow_args.get("bucket_config_name", "datalake_bucket")
         self.datalake_bucket = self.config_service.get_config(bucket_config)
+        self.artifacts_bucket = self.config_service.get_config("artifacts_bucket")
         self.task_pool = "gsheets_pool"
         self.databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
@@ -235,7 +236,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
                     "gsheet_raw_task_group": raw_task_groups[gsheet],
                     "dummy_task": dummy_tasks[gsheet],
                     "bypass_update_check_list": "{{ get_run_param(dag_run, 'bypass_update_check_list') }}",
-                    "datalake_bucket": self.datalake_bucket,
+                    "artifacts_bucket": self.artifacts_bucket,
                 },
                 provide_context=True,
             )
@@ -291,7 +292,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
         table_name: str,
         gsheet_raw_task_group,
         dummy_task: DummyOperator,
-        datalake_bucket: str,
+        artifacts_bucket: str,
         bypass_update_check_list=[],
         **kwargs,
     ) -> AnyStr:
@@ -317,7 +318,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
         to_ingest_output_json = pull_gsheets_ingest_output_json(
             task_instance=ti,
             ingest_task_id=self.IDS_TO_BE_INGESTED_TASK_ID,
-            datalake_bucket=datalake_bucket,
+            artifacts_bucket=artifacts_bucket,
             dag_id=dag_id,
             run_id=run_id,
         )

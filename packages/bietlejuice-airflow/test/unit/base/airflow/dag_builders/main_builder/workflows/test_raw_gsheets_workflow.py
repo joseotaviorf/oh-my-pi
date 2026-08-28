@@ -15,6 +15,7 @@ def _build_workflow(workflow_args=None):
         ) as mock_config_service:
             mock_config_service.return_value.get_config.side_effect = lambda key: {
                 "datalake_bucket": "test-bucket",
+                "artifacts_bucket": "s3://artifacts.s3.data.quintoandar.com.br",
                 "databricks_bietlejuice_repo_path": "/repo",
             }[key]
             return RawGsheetsWorkflow(
@@ -34,6 +35,7 @@ class TestRawGsheetsWorkflowDocumentation:
     ):
         mock_config_service.return_value.get_config.side_effect = lambda key: {
             "datalake_bucket": "test-bucket",
+            "artifacts_bucket": "s3://artifacts.s3.data.quintoandar.com.br",
             "databricks_bietlejuice_repo_path": "/repo",
         }[key]
         original_purpose = RawGsheetsWorkflow.DEFAULT_DAG_DOCUMENTATION["dag_purpose"]
@@ -158,6 +160,7 @@ class TestRawGsheetsWorkflowEngineWiring:
     ):
         mock_config_service.return_value.get_config.side_effect = lambda key: {
             "datalake_bucket": "test-bucket",
+            "artifacts_bucket": "s3://artifacts.s3.data.quintoandar.com.br",
             "databricks_bietlejuice_repo_path": "/repo",
             "doc_md_chart_url": "https://charts.example.com",
             "sheets_info": {
@@ -261,6 +264,7 @@ class TestRawGsheetsWorkflowEngineWiring:
     ):
         mock_config_service.return_value.get_config.side_effect = lambda key: {
             "datalake_bucket": "test-bucket",
+            "artifacts_bucket": "s3://artifacts.s3.data.quintoandar.com.br",
             "databricks_bietlejuice_repo_path": "/repo",
             "doc_md_chart_url": "https://charts.example.com",
             "sheets_info": {

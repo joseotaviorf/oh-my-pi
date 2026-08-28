@@ -79,13 +79,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     environment = args.environment
-    datalake_bucket = args.datalake_bucket
     dag_name = args.dag_name
     credentials_key = args.credentials_key
     credentials_scope = args.credentials_scope
 
     config_service = ConfigurationService(dag_name)
     sheet_details = config_service.get_config("sheets_info")
+    artifacts_bucket = config_service.get_config("artifacts_bucket")
 
     base_dbutils = BaseDBUtils()
     dbutils = base_dbutils.get_dbutils()
@@ -144,7 +144,7 @@ if __name__ == "__main__":
         emit_gsheets_ingest_output(
             dbutils,
             output_json,
-            datalake_bucket,
+            artifacts_bucket,
             args.airflow_dag_id,
             args.airflow_run_id,
         )
