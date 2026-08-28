@@ -269,11 +269,9 @@ def main() -> None:
                     "pathGlobFilter": FINALIZED_PARQUET_GLOB,
                 },
             )
-
-            # Instrumentation (debug session 7256d1): surface the inferred
-            # Spark types of the timestamp columns so the post-fix task log
-            # confirms which columns arrived as LongType (nanos) and that the
-            # cast produced sane TimestampType values.
+            # Schema-only: never collect() or rdd.isEmpty() per day. Those
+            # PythonRDD actions hang this EMR xs job when OpenLineage NPEs
+            # on Dataset.getFacets() (load-raw try 1, 2026-08-27).
             ts_types = {
                 c: str(raw_df.schema[c].dataType)
                 for c in NANOS_TIMESTAMP_COLUMNS
@@ -283,14 +281,6 @@ def main() -> None:
                 f"m=load_day, date={date_str}, uri={day_uri}, "
                 f"msg=inferred timestamp types after read, ts_types={ts_types}"
             )
-            probe_cols = [c for c in NANOS_TIMESTAMP_COLUMNS if c in raw_df.columns]
-            if probe_cols:
-                probe = raw_df.select(*probe_cols).limit(3).collect()
-                logger.info(
-                    f"m=load_day, date={date_str}, "
-                    f"msg=sample values after read (pre-cast), "
-                    f"samples={[r.asDict() for r in probe]}"
-                )
         except Exception as exc:
             msg = str(exc)
             # vocs-machina finalizes a (day, prompt) partition (part-0000.parquet +
@@ -312,14 +302,9 @@ def main() -> None:
             # swallow it as "no data" — that would silently write nothing.
             raise
 
-        day_df = _prepare_day_df(raw_df, date_str)
-
-        if day_df.rdd.isEmpty():
-            logger.warning(
-                f"m=main, msg=Parquet for {date_str} is empty; skipping that day."
-            )
-            continue
-        dfs.append(day_df)
+        # Empty frames with a schema union cheaply; skip via the path/schema
+        # exceptions above. Never rdd.isEmpty() here (see load_day comment).
+        dfs.append(_prepare_day_df(raw_df, date_str))
 
     if not dfs:
         table_exists = spark_client.conn.catalog.tableExists(

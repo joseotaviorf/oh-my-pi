@@ -152,7 +152,6 @@ def test_main_uses_validation_target_for_all_writes():
     spark_metastore_service = MagicMock()
     spark_metastore_loader = MagicMock()
     day_df = MagicMock()
-    day_df.rdd.isEmpty.return_value = False
 
     argv = [
         "load_vocs_machina_raw",
@@ -445,7 +444,6 @@ def test_main_reads_only_finalized_part_files():
     spark_metastore_service = MagicMock()
     spark_metastore_loader = MagicMock()
     day_df = MagicMock()
-    day_df.rdd.isEmpty.return_value = False
 
     source_root = (
         "s3://data-science.s3.data.quintoandar.com.br/post-contract/vocs-machina"
@@ -512,5 +510,8 @@ def test_main_reads_only_finalized_part_files():
             "pathGlobFilter": _job.FINALIZED_PARQUET_GLOB,
         },
     )
+    raw_df = s3_consumer.get_data_from_file.return_value
+    raw_df.select.assert_not_called()
+    day_df.rdd.isEmpty.assert_not_called()
     # Guard against a regression that would ingest partial checkpoints.
     assert _job.FINALIZED_PARQUET_GLOB == "part-*.parquet"
