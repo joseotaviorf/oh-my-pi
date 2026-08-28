@@ -1,0 +1,25 @@
+---
+# See prod_conf.yml for the meaning of each key.
+#
+# Forno does not read `5a-base44-office`: it is tagged sensitive-data and its bucket
+# policy denies every principal outside an allow-list that excludes emr-people-forno.
+# These entries point at a mirror prefix in the People forno bucket instead, so the
+# forno run is a smoke test on an empty prefix. To make it end-to-end, seed a sample:
+#   aws s3 cp allocation_sample.json \
+#     s3://people-s3-forno-data-quintoandar-com-br/s3_ingestion_test/allocationtool/export/allocation/
+s3_ingestion_sources:
+  allocation_tool_allocation:
+    bucket: people-s3-forno-data-quintoandar-com-br
+    prefix: s3_ingestion_test/allocationtool/export/allocation
+    file_suffix: .json
+    read_mode: whole_file
+  allocation_tool_tags:
+    bucket: people-s3-forno-data-quintoandar-com-br
+    prefix: s3_ingestion_test/allocationtool/export/tags
+    file_suffix: .json
+    read_mode: whole_file
+  allocation_tool_groups:
+    bucket: people-s3-forno-data-quintoandar-com-br
+    prefix: s3_ingestion_test/allocationtool/export/groups
+    file_suffix: .json
+    read_mode: whole_file

@@ -1,0 +1,9 @@
+cluster:
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  custom_configurations:
+    aws_attributes:
+      # The role that external source buckets grant read access to.
+      instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE

@@ -1,0 +1,83 @@
+dag:
+  name: s3_ingestion
+  owner: Data People
+  schedule_start_date: 2026, 8, 27
+  schedule_interval: "0 9 * * *"
+  callback_by_task: False
+  documentation:
+    dag_purpose: |
+      Generic S3 file ingestion for the People domain. Each table in
+      tables_customization independently lands the objects of one S3 bucket/prefix
+      into a raw table — bucket, prefix, file filter and read mode are configuration,
+      not code.
+
+      Source config lives in `spark_jobs/{environment}_conf.yml` under
+      `s3_ingestion_sources.<source_key>`; this declaration owns only the destination
+      side. To add a source: add the conf entry to prod_conf.yml and forno_conf.yml,
+      add the table below with its `custom_schema` and `extra_spark_job_arguments:
+      [<source_key>]`, and make sure the People EMR instance profile has
+      s3:ListBucket + s3:GetObject on the source prefix (identity policy AND, for a
+      cross-account bucket, the bucket policy).
+
+      Raw keeps the payload verbatim in `raw_content` — one row per object
+      (`read_mode: whole_file`) or per line (`read_mode: lines`) — so an external
+      app can change its export contract without breaking ingestion; parsing belongs
+      to the clean layer.
+
+      The tables are incremental: partitions come from each object's S3 LastModified
+      in UTC and load_start_date/load_end_date select which objects are ingested, so a
+      run replaces only the day partitions it covers and leaves history untouched.
+      That makes reruns and backfills idempotent, and the job fails rather than write
+      if the session is not in dynamic partition-overwrite mode. The window is
+      inclusive on both ends: the one-day overlap between runs is intentional and
+      self-heals objects that land late.
+
+workflow:
+  type: custom_ingestion
+  layer: raw
+  # Fallback only: every table overrides it so each ingested system gets its own
+  # raw schema instead of a shared "s3" one.
+  custom_schema: s3
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  load_spark_job: load_s3_ingestion_raw
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+
+  tables_customization:
+    # extra_spark_job_arguments[0] is the source_key in {environment}_conf.yml.
+    allocation:
+      custom_schema: allocation_tool
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [file_name, line_number]
+      extra_spark_job_arguments:
+        - "allocation_tool_allocation"
+    tags:
+      custom_schema: allocation_tool
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [file_name, line_number]
+      extra_spark_job_arguments:
+        - "allocation_tool_tags"
+    groups:
+      custom_schema: allocation_tool
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [file_name, line_number]
+      extra_spark_job_arguments:
+        - "allocation_tool_groups"

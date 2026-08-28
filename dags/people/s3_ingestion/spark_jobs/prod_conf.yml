@@ -1,0 +1,25 @@
+---
+# One entry per source_key referenced in tables_customization.
+#
+#   bucket           Source S3 bucket (no s3:// prefix).
+#   prefix           Key prefix to list, recursively.
+#   file_suffix      Case-insensitive suffix filter ("" = every object).
+#   read_mode        whole_file (one row per object, default) | lines (one per line).
+#   ingest_all_files Optional. true re-reads the whole prefix every run, ignoring the
+#                    load window. Default false.
+s3_ingestion_sources:
+  allocation_tool_allocation:
+    bucket: 5a-base44-office
+    prefix: allocationtool/export/allocation
+    file_suffix: .json
+    read_mode: whole_file
+  allocation_tool_tags:
+    bucket: 5a-base44-office
+    prefix: allocationtool/export/tags
+    file_suffix: .json
+    read_mode: whole_file
+  allocation_tool_groups:
+    bucket: 5a-base44-office
+    prefix: allocationtool/export/groups
+    file_suffix: .json
+    read_mode: whole_file
