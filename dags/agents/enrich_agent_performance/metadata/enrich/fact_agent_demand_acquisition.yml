@@ -1,3 +1,4 @@
+---
 database_name: datalake_agent_performance
 table_name: fact_agent_demand_acquisition
 domain: Agents
@@ -91,144 +92,132 @@ columns:
     description: |
       Attribution metric for offers. True when the agent handling the first offer equals the referring agent (id_user_referring_agent).
       False when handled by a different agent. Null when no offer occurred.
-      
-  # ---------------------------------------------------------
+
   # STRUCT 1: invitation_agent_interactions
-  # ---------------------------------------------------------
   invitation_agent_interactions:
     description: Struct containing interaction flags and timestamps strictly for events where the referring agent handled the interaction.
-    fields:
-      has_handled_visit:
-        description: True when the referring agent personally conducted/handled at least one visit for this lead.
-      has_handled_offer:
-        description: True when the referring agent personally submitted/handled at least one offer for this lead.
-      ts_sale_visit:
-        description: Timestamp of the first Sale visit handled by the referring agent. Null if handled by another agent or no visit occurred.
-      ts_sale_offer:
-        description: Timestamp of the first Sale offer handled by the referring agent. Null if handled by another agent or no offer occurred.
-      ts_rent_visit:
-        description: Timestamp of the first Rent visit handled by the referring agent. Null if handled by another agent or no visit occurred.
-      ts_rent_offer:
-        description: Timestamp of the first Rent offer handled by the referring agent. Null if handled by another agent or no offer occurred.
+  "invitation_agent_interactions.has_handled_visit":
+    description: True when the referring agent personally conducted/handled at least one visit for this lead.
+  "invitation_agent_interactions.has_handled_offer":
+    description: True when the referring agent personally submitted/handled at least one offer for this lead.
+  "invitation_agent_interactions.ts_sale_visit":
+    description: Timestamp of the first Sale visit handled by the referring agent. Null if handled by another agent or no visit occurred.
+  "invitation_agent_interactions.ts_sale_offer":
+    description: Timestamp of the first Sale offer handled by the referring agent. Null if handled by another agent or no offer occurred.
+  "invitation_agent_interactions.ts_rent_visit":
+    description: Timestamp of the first Rent visit handled by the referring agent. Null if handled by another agent or no visit occurred.
+  "invitation_agent_interactions.ts_rent_offer":
+    description: Timestamp of the first Rent offer handled by the referring agent. Null if handled by another agent or no offer occurred.
 
-  # ---------------------------------------------------------
   # STRUCT 2: sale_first_events
-  # ---------------------------------------------------------
   sale_first_events:
     description: Struct capturing milestone facts, timestamps, and agent attributions for the first Sale lifecycle events on this referral.
-    fields:
-      id_booking:
-        lineage:
-          - datalake_sale_demand_events.sale_demand_events.id_booking
-        description: ID of the booking associated with the first Sale visit.
-      ts_visit_booked:
-        lineage:
-          - datalake_sale_demand_events.sale_demand_events.ts_event
-        description: Timestamp when the first Sale visit was booked (sk_event_type = 1).
-      ts_visit_completed:
-        lineage:
-          - datalake_sale_demand_events.sale_demand_events.ts_event
-        description: Timestamp when the first Sale visit was marked completed (sk_event_type = 2).
-      visit_id_agent:
-        lineage:
-          - datalake_sale_demand_events.sale_demand_events.id_agent
-        description: Legacy DadosAgente ID of the agent who handled the first Sale visit.
-      visit_id_user:
-        lineage:
-          - datalake_ebdb_agent_events.agent_unified_identity.id_user
-        description: Unified EBDB user ID of the agent who handled the first Sale visit.
-      visit_uuid_person:
-        lineage:
-          - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
-        description: Person UUID of the agent who handled the first Sale visit.
-      id_offer:
-        lineage:
-          - datalake_sale_demand_events.sale_demand_events.id_offer
-        description: ID of the first Sale offer submitted.
-      ts_offer_submitted:
-        lineage:
-          - datalake_sale_demand_events.sale_demand_events.ts_event
-        description: Timestamp when the first Sale offer was submitted (sk_event_type = 3).
-      ts_offer_accepted:
-        lineage:
-          - datalake_sale_demand_events.sale_demand_events.ts_event
-        description: Timestamp when the Sale offer was accepted (sk_event_type = 4).
-      offer_id_agent:
-        lineage:
-          - datalake_sale_demand_events.sale_demand_events.id_agent
-        description: Legacy DadosAgente ID of the agent who handled the first Sale offer.
-      offer_id_user:
-        lineage:
-          - datalake_ebdb_agent_events.agent_unified_identity.id_user
-        description: Unified EBDB user ID of the agent who handled the first Sale offer.
-      offer_uuid_person:
-        lineage:
-          - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
-        description: Person UUID of the agent who handled the first Sale offer.
+  "sale_first_events.id_booking":
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+    description: ID of the booking associated with the first Sale visit.
+  "sale_first_events.ts_visit_booked":
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+    description: Timestamp when the first Sale visit was booked (sk_event_type = 1).
+  "sale_first_events.ts_visit_completed":
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+    description: Timestamp when the first Sale visit was marked completed (sk_event_type = 2).
+  "sale_first_events.visit_id_agent":
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.id_agent
+    description: Legacy DadosAgente ID of the agent who handled the first Sale visit.
+  "sale_first_events.visit_id_user":
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_user
+    description: Unified EBDB user ID of the agent who handled the first Sale visit.
+  "sale_first_events.visit_uuid_person":
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+    description: Person UUID of the agent who handled the first Sale visit.
+  "sale_first_events.id_offer":
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.id_offer
+    description: ID of the first Sale offer submitted.
+  "sale_first_events.ts_offer_submitted":
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+    description: Timestamp when the first Sale offer was submitted (sk_event_type = 3).
+  "sale_first_events.ts_offer_accepted":
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+    description: Timestamp when the Sale offer was accepted (sk_event_type = 4).
+  "sale_first_events.offer_id_agent":
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.id_agent
+    description: Legacy DadosAgente ID of the agent who handled the first Sale offer.
+  "sale_first_events.offer_id_user":
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_user
+    description: Unified EBDB user ID of the agent who handled the first Sale offer.
+  "sale_first_events.offer_uuid_person":
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+    description: Person UUID of the agent who handled the first Sale offer.
 
-  # ---------------------------------------------------------
   # STRUCT 3: rent_first_events
-  # ---------------------------------------------------------
   rent_first_events:
     description: Struct capturing milestone facts, timestamps, and agent attributions for the first Rent lifecycle events on this referral.
-    fields:
-      id_booking:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.id_booking
-        description: ID of the booking associated with the first Rent visit.
-      ts_visit_booked:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.ts_event
-        description: Timestamp when the first Rent visit was booked (id_event_type = 1).
-      ts_visit_completed:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.ts_event
-        description: Timestamp when the first Rent visit was marked completed (id_event_type = 2).
-      visit_id_agent:
-        description: Always null for Rent demand events (Rent uses user IDs directly).
-      visit_id_user:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.id_agent
-        description: Unified EBDB user ID of the agent who handled the first Rent visit (rent_demand_events.id_agent is id_user directly).
-      visit_uuid_person:
-        description: Person UUID of the agent who handled the Rent visit. Null for legacy rental events.
-      id_offer:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.id_offer
-        description: ID of the first Rent offer submitted.
-      ts_offer_submitted:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.ts_event
-        description: Timestamp when the first Rent offer was submitted (id_event_type = 3).
-      id_contract:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.id_contract
-        description: ID of the signed Rent contract.
-      ts_contract_signed:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.ts_event
-        description: Timestamp when the Rent contract was signed (id_event_type = 9).
-      offer_id_agent:
-        description: Always null for Rent demand events (Rent uses user IDs directly).
-      offer_id_user:
-        lineage:
-          - datalake_rent_demand_events.rent_demand_events.id_agent
-        description: Unified EBDB user ID of the agent who handled the first Rent offer (rent_demand_events.id_agent is id_user directly).
-      offer_uuid_person:
-        description: Person UUID of the agent who handled the Rent offer. Null for legacy rental events.
+  "rent_first_events.id_booking":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_booking
+    description: ID of the booking associated with the first Rent visit.
+  "rent_first_events.ts_visit_booked":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Timestamp when the first Rent visit was booked (id_event_type = 1).
+  "rent_first_events.ts_visit_completed":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Timestamp when the first Rent visit was marked completed (id_event_type = 2).
+  "rent_first_events.visit_id_agent":
+    description: Always null for Rent demand events (Rent uses user IDs directly).
+  "rent_first_events.visit_id_user":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_agent
+    description: Unified EBDB user ID of the agent who handled the first Rent visit (rent_demand_events.id_agent is id_user directly).
+  "rent_first_events.visit_uuid_person":
+    description: Person UUID of the agent who handled the Rent visit. Null for legacy rental events.
+  "rent_first_events.id_offer":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_offer
+    description: ID of the first Rent offer submitted.
+  "rent_first_events.ts_offer_submitted":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Timestamp when the first Rent offer was submitted (id_event_type = 3).
+  "rent_first_events.id_contract":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_contract
+    description: ID of the signed Rent contract.
+  "rent_first_events.ts_contract_signed":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Timestamp when the Rent contract was signed (id_event_type = 9).
+  "rent_first_events.offer_id_agent":
+    description: Always null for Rent demand events (Rent uses user IDs directly).
+  "rent_first_events.offer_id_user":
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_agent
+    description: Unified EBDB user ID of the agent who handled the first Rent offer (rent_demand_events.id_agent is id_user directly).
+  "rent_first_events.offer_uuid_person":
+    description: Person UUID of the agent who handled the Rent offer. Null for legacy rental events.
 
-  # ---------------------------------------------------------
   # STRUCT 4: offer_specialist
-  # ---------------------------------------------------------
   offer_specialist:
     description: Struct capturing the Offer Specialist assignment from offer_specialists and alignment with the referring agent.
-    fields:
-      id_user:
-        lineage:
-          - datalake_sale_offer_flows.offer_specialists.id_user_agent_lead_referral
-        description: EBDB user ID of the Offer Specialist assigned to the lead's sale offer flow.
-      has_mismatch:
-        description: |
-          Boolean flag indicating alignment. True when an Offer Specialist exists (id_user IS NOT NULL)
-          and differs from the referring agent (id_user_referring_agent != offer_specialist.id_user).
-          False when the referring agent is the assigned specialist. Null when no specialist is assigned.
+  "offer_specialist.id_user":
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_agent_lead_referral
+    description: EBDB user ID of the Offer Specialist assigned to the lead's sale offer flow.
+  "offer_specialist.has_mismatch":
+    description: |
+      Boolean flag indicating alignment. True when an Offer Specialist exists (id_user IS NOT NULL)
+      and differs from the referring agent (id_user_referring_agent != offer_specialist.id_user).
+      False when the referring agent is the assigned specialist. Null when no specialist is assigned.
