@@ -9,18 +9,22 @@ columns:
     lineage:
       - datalake_ebdb_raw.development.id
     description: Primary key identifier for the development record.
+  id_development_contact:
+    lineage:
+      - datalake_ebdb_raw.development.development_contact_id
+    description: Foreign key to the contact person responsible for commercial communication about this development.
   development_uuid:
     lineage:
       - datalake_ebdb_raw.development.development_uuid
     description: UUID for the development, used as external stable identifier.
-  external_id:
-    lineage:
-      - datalake_ebdb_raw.development.external_id
-    description: External identifier for the development from the originating system.
   company_uuid:
     lineage:
       - datalake_ebdb_raw.development.company_uuid
     description: UUID of the company (developer/builder) responsible for the development.
+  external_id:
+    lineage:
+      - datalake_ebdb_raw.development.external_id
+    description: External identifier for the development from the originating system.
   name:
     lineage:
       - datalake_ebdb_raw.development.name
@@ -33,30 +37,14 @@ columns:
     lineage:
       - datalake_ebdb_raw.development.construction_status
     description: Current construction status of the development (e.g. UNDER_CONSTRUCTION, COMPLETED).
-  launch_date:
-    lineage:
-      - datalake_ebdb_raw.development.launch_date
-    description: Date when the development was officially launched for sale.
-  forecast_delivery_date:
-    lineage:
-      - datalake_ebdb_raw.development.forecast_delivery_date
-    description: Forecasted date for delivery/completion of the development.
-  towers:
-    lineage:
-      - datalake_ebdb_raw.development.towers
-    description: Number of towers in the development.
-  floors:
-    lineage:
-      - datalake_ebdb_raw.development.floors
-    description: Number of floors per tower.
-  apartments_per_floor:
-    lineage:
-      - datalake_ebdb_raw.development.apartments_per_floor
-    description: Number of apartments per floor.
   legal_permit:
     lineage:
       - datalake_ebdb_raw.development.legal_permit
     description: Legal permit identifier for the development.
+  provider:
+    lineage:
+      - datalake_ebdb_raw.development.provider
+    description: Source system or partner that supplied this development listing to EBDB (primary market feed).
   postal_code:
     lineage:
       - datalake_ebdb_raw.development.postal_code
@@ -77,10 +65,10 @@ columns:
     lineage:
       - datalake_ebdb_raw.development.city
     description: City of the development location.
-  id_state:
+  state:
     lineage:
-      - datalake_ebdb_raw.development.state_id
-    description: Foreign key referencing the Estado (state) table.
+      - datalake_ebdb_raw.development.state
+    description: Brazilian state (UF name or code) of the development location, stored as text in the source table.
   latitude:
     lineage:
       - datalake_ebdb_raw.development.latitude
@@ -89,6 +77,18 @@ columns:
     lineage:
       - datalake_ebdb_raw.development.longitude
     description: Longitude coordinate of the development location.
+  towers:
+    lineage:
+      - datalake_ebdb_raw.development.towers
+    description: Number of towers in the development.
+  floors:
+    lineage:
+      - datalake_ebdb_raw.development.floors
+    description: Number of floors per tower.
+  apartments_per_floor:
+    lineage:
+      - datalake_ebdb_raw.development.apartments_per_floor
+    description: Number of apartments per floor.
   min_condominium_fee:
     lineage:
       - datalake_ebdb_raw.development.min_condominium_fee
@@ -97,6 +97,14 @@ columns:
     lineage:
       - datalake_ebdb_raw.development.min_iptu
     description: Minimum IPTU (property tax) across typologies in BRL.
+  launch_date:
+    lineage:
+      - datalake_ebdb_raw.development.launch_date
+    description: Date when the development was officially launched for sale.
+  forecast_delivery_date:
+    lineage:
+      - datalake_ebdb_raw.development.forecast_delivery_date
+    description: Forecasted date for delivery/completion of the development.
   ts_created:
     lineage:
       - datalake_ebdb_raw.development.created_at
@@ -105,6 +113,14 @@ columns:
     lineage:
       - datalake_ebdb_raw.development.updated_at
     description: Timestamp when the development record was last updated.
+  ts_last_validated:
+    lineage:
+      - datalake_ebdb_raw.development.last_validated_at
+    description: Timestamp of the last validation of this development's data against the source/partner feed.
+  ts_withdrawn:
+    lineage:
+      - datalake_ebdb_raw.development.withdrawn_at
+    description: Timestamp when the development was withdrawn from the primary market catalog. Null while the development is still listed.
   op_cdc:
     description: CDC operation type captured by Debezium.
     categories:

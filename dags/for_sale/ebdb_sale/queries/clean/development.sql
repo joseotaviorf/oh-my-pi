@@ -1,18 +1,20 @@
 SELECT
     id,
-    state_id AS id_state,
+    development_contact_id AS id_development_contact,
     development_uuid,
-    external_id,
     company_uuid,
+    external_id,
     name,
     description,
     construction_status,
     legal_permit,
+    provider,
     postal_code,
     street,
     street_number,
     neighborhood,
     city,
+    state,
     latitude,
     longitude,
     towers,
@@ -23,6 +25,8 @@ SELECT
     launch_date,
     forecast_delivery_date,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    last_validated_at AS ts_last_validated,
+    withdrawn_at AS ts_withdrawn
 FROM
     datalake_ebdb_raw.Development
