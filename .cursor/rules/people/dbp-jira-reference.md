@@ -2,7 +2,7 @@
 
 **Purpose:** Stable, reusable facts about Jira for the **Enterprise Engineering** squad (project key **DBP**): IDs, URLs, API quirks, kickoff policies, branch/slug/Jira summary norms, and workflow — usually learned once via Jira/API or squad norms. **Read this file before** opening a Jira/MCP call for the same fact. After you discover something durable (field name, issue type string, cloud id), **add it here** in the same delivery so the next run skips the lookup. If Atlassian configuration changes, update this file when you adjust the process.
 
-**Location:** `.cursor/rules/people/dbp-jira-reference.md` — People rules companion; **delivery procedures** live under **`.cursor/skills/people/*/`** (see **Related delivery skills** below).
+**Location:** `.cursor/rules/people/dbp-jira-reference.md` — People rules companion; **delivery procedures** live under **`.cursor/skills/people-*/`** (see **Related delivery skills** below).
 
 ---
 
@@ -97,7 +97,7 @@ Add subsections or tables for **custom field IDs**, **components**, **labels**, 
 
 ### Codifying delivery learnings
 
-When a DBP delivery surfaces a **reusable** pattern, capture it in the rule that owns the concern: pipeline design, SCD behavior, and EMR SQL idioms in **`.cursor/rules/people/people_domain.mdc`**; metadata style in **`.cursor/rules/people/people_metadata.mdc`**. If agents need a playbook entry point, update **`.cursor/skills/people/people-dw-patterns/SKILL.md`** too. Keep ticket-specific repro data out of rules (no person numbers, addresses, or PII). Prefer a focused docs-only PR or a final commit on the same epic — not blocking the functional merge unless the team asks.
+When a DBP delivery surfaces a **reusable** pattern, capture it in the rule that owns the concern: pipeline design, SCD behavior, and EMR SQL idioms in **`.cursor/rules/people/people_domain.mdc`**; metadata style in **`.cursor/rules/people/people_metadata.mdc`**. If agents need a playbook entry point, update **`.cursor/skills/people-dw-patterns/SKILL.md`** too. Keep ticket-specific repro data out of rules (no person numbers, addresses, or PII). Prefer a focused docs-only PR or a final commit on the same epic — not blocking the functional merge unless the team asks.
 
 ---
 
@@ -109,11 +109,11 @@ Authoritative **current** assignee, description, comments, **today’s** status,
 
 ## Related delivery skills
 
-Read **this reference** before Jira/MCP steps in any of these (each skill lives under **`.cursor/skills/people/<folder>/SKILL.md`** with YAML **`name`**):
+Read **this reference** before Jira/MCP steps in any of these (each skill lives under **`.cursor/skills/people-<folder>/SKILL.md`** with YAML **`name`**):
 
 | Skill `name` | Role |
 |----------------|------|
 | **`people-jira-branch-setup`** | Jira + Git: branch from `origin/master` / `origin/HEAD` — **procedural** steps in the skill; **`.cursor/temp/`** layout → **`people/people_domain.mdc`** (**Delivery artifact folder**); policies and naming → **this file**. |
 | **`people-dw-patterns`** | Playbook for People DW SQL/metadata patterns; canonical pipeline/SQL text in **`people_domain.mdc`**, metadata text in **`people_metadata.mdc`**. |
 
-Other People skills added later under **`.cursor/skills/people/*/`** should still read **this reference** before Jira/MCP steps.
+Other People skills added later under **`.cursor/skills/people-*/`** should still read **this reference** before Jira/MCP steps.

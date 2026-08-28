@@ -1,5 +1,5 @@
 ---
-name: sync-dw-documentation
+name: people-sync-dw-documentation
 description: >
   Create or update business facing Markdown documentation for Data Warehouse datasets.
   Uses a mandatory template as the absolute reference for format and section content.
@@ -15,8 +15,8 @@ Use this skill for creating **new** DW dataset documentation or **updating** exi
 
 **Source of truth for format:** all documentation must strictly follow the structure in:
 
-* **Repo relative (official for tooling):** `.cursor/skills/people/sync-dw-documentation/REFERENCE_TEMPLATE.md`
-* **Example with clone folder name:** `bi-etl-ejuice/.cursor/skills/people/sync-dw-documentation/REFERENCE_TEMPLATE.md`
+* **Repo relative (official for tooling):** `.cursor/skills/people-sync-dw-documentation/REFERENCE_TEMPLATE.md`
+* **Example with clone folder name:** `bi-etl-ejuice/.cursor/skills/people-sync-dw-documentation/REFERENCE_TEMPLATE.md`
 
 ## General Guidelines
 
@@ -34,7 +34,7 @@ Identify how the tables store data over time to fill the Data Model and Tables s
 | No history columns | **Current state** : Latest version of the data only, without history (SCD Type 1 equivalent). |
 
 ### 3. Reading metadata files (YAML)
-* **Automatic descriptions:** scan `metadata/dw/{table}.yml`. Use `description` fields there to pre fill table and logic descriptions in the Markdown. **Official schema for metadata files:** [`.cursor/rules/governance_metadata.mdc`](../../../rules/governance_metadata.mdc); **authoring skill:** [`.cursor/skills/create-metadata-files/SKILL.md`](../../create-metadata-files/SKILL.md).
+* **Automatic descriptions:** scan `metadata/dw/{table}.yml`. Use `description` fields there to pre fill table and logic descriptions in the Markdown. **Official schema for metadata files:** [`.cursor/rules/governance_metadata.mdc`](../../rules/governance_metadata.mdc); **authoring skill:** [`.cursor/skills/create-metadata-files/SKILL.md`](../create-metadata-files/SKILL.md).
 * **SLA defaults:** if domain is **`people`**, default SLA is **D-1 available by 08:00 BRT**.
 
 ### 4. URL & asset construction
@@ -82,7 +82,7 @@ To keep documentation simple and business useful, **ask the user** during author
    * Ensure all DataHub notes explicitly mention that a **VPN connection is required** for access.
    * Eliminate repetitive information across sections and simplify prose.
    * Ensure the language is completely and cleanly in English.
-7. **SQL Updates:** replace SQL placeholders with **exact**, verified `schema.table` and column names from `queries/dw/`. Example SQL in the published doc must follow [`.cursor/rules/sql_conventions.mdc`](../../../rules/sql_conventions.mdc) and [`.cursor/rules/naming_conventions.mdc`](../../../rules/naming_conventions.mdc).
+7. **SQL Updates:** replace SQL placeholders with **exact**, verified `schema.table` and column names from `queries/dw/`. Example SQL in the published doc must follow [`.cursor/rules/sql_conventions.mdc`](../../rules/sql_conventions.mdc) and [`.cursor/rules/naming_conventions.mdc`](../../rules/naming_conventions.mdc).
 8. **Polishing and cleanup:** remove all `*{...}*` author comments and ensure no `{placeholder}` tokens remain.
 
 ## Quality checks
@@ -98,6 +98,6 @@ To keep documentation simple and business useful, **ask the user** during author
 * **VPN Requirement Note:** Confirm DataHub indicators explicitly state the VPN requirement.
 * **Final Section Check:** Verify that **Related Scopes *(Optional)*** is the last section in the document (if included), and that no "Sensitivity and Access" sections exist.
 * **No Column Glossaries:** Confirm no column by column glossaries exist in the Markdown; pointers must redirect users entirely to DataHub.
-* **Metadata alignment:** descriptions match `metadata/dw/*.yml` and **[`governance_metadata.mdc`](../../../rules/governance_metadata.mdc)**.
+* **Metadata alignment:** descriptions match `metadata/dw/*.yml` and **[`governance_metadata.mdc`](../../rules/governance_metadata.mdc)**.
 * **H1 cleanliness:** **H1** is plain text only (no backticks on the `#` line).
 * **SQL Accuracy:** SQL examples use exact, verified schema and column names; layout matches **`sql_conventions.mdc`** (all keywords in UPPERCASE, strict alignment, clear table aliases, and explicit column selections instead of `SELECT *` in key snapshot queries) and identifiers match **`naming_conventions.mdc`**.

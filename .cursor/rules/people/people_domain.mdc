@@ -17,11 +17,11 @@ Optional agent skills that complement this rule file (invoke by each skill’s Y
 
 | Skill `name` | Path | Suggest when |
 |--------------|------|----------------|
-| **`people-jira-branch-setup`** | `.cursor/skills/people/jira-branch-setup/SKILL.md` | Starting **non–local-only** ticketed work: Jira + Git branch from `origin/master` / `origin/HEAD` — **before** heavy edits to People SQL/metadata. **Policies, naming, English on Jira** → **`dbp-jira-reference.md`**; **`.cursor/temp/`** mirror → **Delivery artifact folder** above. |
+| **`people-jira-branch-setup`** | `.cursor/skills/people-jira-branch-setup/SKILL.md` | Starting **non–local-only** ticketed work: Jira + Git branch from `origin/master` / `origin/HEAD` — **before** heavy edits to People SQL/metadata. **Policies, naming, English on Jira** → **`dbp-jira-reference.md`**; **`.cursor/temp/`** mirror → **Delivery artifact folder** above. |
 | **`review-pr`** | `.cursor/skills/review-pr/SKILL.md` | Full local CI-style checks before merge (style, declarations, metadata pairs, etc.). |
-| **`sync-dw-documentation`** | `.cursor/skills/people/sync-dw-documentation/SKILL.md` | Authoring or refreshing **People DW** business Markdown under `dags/people/dw_*/docs/` from **`REFERENCE_TEMPLATE.md`** (SQL + `metadata/dw` synergy). |
-| **`publish-confluence-markdown`** | `.cursor/skills/people/publish-confluence-markdown/SKILL.md` | Syncing `dags/people/**/docs/dw_*.md` to Confluence via Atlassian MCP (**draft-first**, title hygiene, **`people_domain.mdc`** IDs). |
-| **`people-dw-patterns`** | `.cursor/skills/people/people-dw-patterns/SKILL.md` | Editing **People DW / metric** SQL and metadata: independent source SCDs, EMR-safe dedup (no `QUALIFY`), business-first metadata (PIN, no Oracle names in descriptions). |
+| **`people-sync-dw-documentation`** | `.cursor/skills/people-sync-dw-documentation/SKILL.md` | Authoring or refreshing **People DW** business Markdown under `dags/people/dw_*/docs/` from **`REFERENCE_TEMPLATE.md`** (SQL + `metadata/dw` synergy). |
+| **`people-publish-confluence-markdown`** | `.cursor/skills/people-publish-confluence-markdown/SKILL.md` | Syncing `dags/people/**/docs/dw_*.md` to Confluence via Atlassian MCP (**draft-first**, title hygiene, **`people_domain.mdc`** IDs). |
+| **`people-dw-patterns`** | `.cursor/skills/people-dw-patterns/SKILL.md` | Editing **People DW / metric** SQL and metadata: independent source SCDs, EMR-safe dedup (no `QUALIFY`), business-first metadata (PIN, no Oracle names in descriptions). |
 
 For **`workflow.type: api_ingestion`** under **`dags/people/`**, follow **`docs/api_ingestion/user_guide.md`** (and **`contributing.md`** for code changes) plus the **New DAGs in People** / **Mandatory Declaration** sections in this file (bucket, `*_people_cluster`, ACL, `credentials_scope`, etc.).
 
@@ -39,7 +39,7 @@ Per-ticket delivery artifacts (PR drafts, planning, SQL tests, Databricks output
 - Resolve from **`git rev-parse --abbrev-ref HEAD`** after the branch exists; e.g. **`PEOPLE/foo-bar`** → **`.cursor/temp/PEOPLE/foo-bar/`**.
 - **`.cursor/temp/`** is **gitignored** (not committed).
 
-The **`people-jira-branch-setup`** skill uses this layout; additional People delivery skills under **`.cursor/skills/people/`** should reuse the same rule when they land in the repo.
+The **`people-jira-branch-setup`** skill uses this layout; additional People delivery skills under **`.cursor/skills/people-*/`** should reuse the same rule when they land in the repo.
 
 ---
 
@@ -93,7 +93,7 @@ Employee PII in reverse exports is governed by People access controls (`people-t
 
 ## Confluence — People Data space (Atlassian MCP)
 
-Use this when syncing Markdown from `dags/people/**/docs/dw_*.md` via **`publish-confluence-markdown`** (`updateConfluencePage` / `createConfluencePage` on `plugin-atlassian-atlassian`).
+Use this when syncing Markdown from `dags/people/**/docs/dw_*.md` via **`people-publish-confluence-markdown`** (`updateConfluencePage` / `createConfluencePage` on `plugin-atlassian-atlassian`).
 
 | Identifier | Value | Notes |
 |------------|-------|-------|

@@ -11,6 +11,7 @@
 3. [Skills in this repo](#3-skills-in-this-repo)
 4. [Subagents in this repo](#4-subagents-in-this-repo)
 5. [End-to-end DAG creation walkthrough](#5-end-to-end-dag-creation-walkthrough)
+6. [Cursor and Claude Code (dual client)](#6-cursor-and-claude-code-dual-client)
 
 Skills: [create-dag](#create-dag--scaffold-a-complete-new-dag) · [create-qube-spec](#create-qube-spec--scaffold-a-qube-semantic-layer-spec) · [run-dag-locally](#run-dag-locally--run-and-test-a-dag-on-local-airflow-and-forno) · [impact-analysis](#impact-analysis--trace-downstream-impact-of-a-rename-or-removal) · [map-table-usage](#map-table-usage--map-production-usage-for-deprecation) · [review-pr](#review-pr--full-pre-push-code-review) · [generate-unit-test](#generate-unit-test--write-correctly-patterned-unit-tests) · [fix-ci-failure](#fix-ci-failure--diagnose-and-fix-a-woodpecker-ci-failure) · [setup-local-environment](#setup-local-environment--set-up-or-restore-the-local-dev-environment)
 
@@ -82,7 +83,7 @@ Rules encode *what the project expects* — naming conventions, cluster presets,
 
 ### Skills
 
-**Location**: `.cursor/skills/*/SKILL.md`
+**Location**: `.cursor/skills/*/SKILL.md` (source of truth; Claude Code reads the same files via `.claude/skills` → `.cursor/skills`)
 
 Skills are step-by-step playbooks that the AI reads and executes when a matching task is requested. They describe a concrete sequence of actions: which files to create, which commands to run, which subagents to spawn. When you trigger a skill, the AI reads the `SKILL.md` file first, then follows its instructions exactly.
 
@@ -832,4 +833,46 @@ make create-dag-files
 
 # Transcribe a specific DAG
 make create-dag-files dag_name=<dag_name>
+```
+
+---
+
+## 6. Cursor and Claude Code (dual client)
+
+Skills in this repo are maintained once under `.cursor/skills/`. Claude Code reads the same files through a symlink:
+
+```text
+.claude/skills  →  .cursor/skills
+```
+
+| Component | Cursor | Claude Code |
+| --- | --- | --- |
+| Skills | `.cursor/skills/` (native) | `.claude/skills/` (symlink to the same tree) |
+| Always-on context | `.cursor/rules/*.mdc` (auto-loaded) | `AGENTS.md` via `CLAUDE.md` import |
+| Path-scoped rules | `.cursor/rules/*.mdc` (glob / on demand) | Read `.cursor/rules/*.mdc` on demand — not auto-loaded |
+| Invocation | Agent auto-selects or `/skill-name` | `/skill-name` or agent reads `SKILL.md` when relevant |
+
+### Constraints for a skill to work in both clients
+
+Cursor is tolerant here; Claude Code is not. A skill that violates any of these is silently
+skipped in Claude Code while still working in Cursor — so keep all three true:
+
+1. **One level deep.** `.cursor/skills/<skill-name>/SKILL.md`. Do **not** group skills in a
+   parent folder (`.cursor/skills/<group>/<skill-name>/SKILL.md` is not discovered). Use a
+   name prefix instead — the People skills are `people-*`.
+2. **`name` matches the folder.** The YAML `name:` in `SKILL.md` must equal its directory name.
+3. **`description` under 1024 characters.** Move long detail into the body of `SKILL.md`.
+
+**After cloning**, verify the symlink exists:
+
+```bash
+ls -la .claude/skills
+# skills -> ../.cursor/skills
+```
+
+If missing, recreate it from the repo root:
+
+```bash
+mkdir -p .claude
+ln -sfn ../.cursor/skills .claude/skills
 ```

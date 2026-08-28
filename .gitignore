@@ -78,6 +78,9 @@ astro/generated-dag-excludes.txt
 
 # Cursor local scratch: drafts, test SQL, logs
 .cursor/temp/
+
+# Claude Code local settings (per-machine permissions; never committed)
+.claude/settings.local.json
 .uv-cache
 
 # Legacy contracts directory

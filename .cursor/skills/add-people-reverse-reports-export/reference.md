@@ -310,7 +310,7 @@ Waivers must be explicit and documented in the PR body.
 | **DBP** | Jira project do squad **Enterprise Engineering** — kickoff: *"Já existe um card no board do Jira de Enterprise Engineering (DBP) para esse trabalho?"* (ver [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) para nome legado do board) |
 | **Interaction** | First turn → **AskQuestion** tool ([Flow selection](SKILL.md#flow-selection)); intake only after flows 1–2; bullets in chat ≠ AskQuestion |
 | **Language** | Perguntas ao usuário → **PT-BR**; summary/description/comments no Jira → **English** |
-| Jira branch | [`people-jira-branch-setup`](../people/jira-branch-setup/SKILL.md) |
+| Jira branch | [`people-jira-branch-setup`](../people-jira-branch-setup/SKILL.md) |
 
 ---
 

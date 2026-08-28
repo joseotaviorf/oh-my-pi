@@ -1,13 +1,13 @@
 # Reverse export governance (blank template)
 
-**Purpose:** Copy this file (or the section below) when documenting a new People `reverse_reports` Google Sheet export. **Filled** governance lives under **`dags/people/reverse_reports/docs/`** (for example [`codex_pin_gsheet_exports.md`](../../../../dags/people/reverse_reports/docs/codex_pin_gsheet_exports.md)), not in `metadata/reverse/*.yml`, because repository CI rejects reverse-layer governance YAML.
+**Purpose:** Copy this file (or the section below) when documenting a new People `reverse_reports` Google Sheet export. **Filled** governance lives under **`dags/people/reverse_reports/docs/`** (for example [`codex_pin_gsheet_exports.md`](../../../dags/people/reverse_reports/docs/codex_pin_gsheet_exports.md)), not in `metadata/reverse/*.yml`, because repository CI rejects reverse-layer governance YAML.
 
-**Reader-friendly index:** Keep [`codex_pin_gsheet_exports.md`](../../../../dags/people/reverse_reports/docs/codex_pin_gsheet_exports.md) short—links and per-export sections only. Put “how to add an export”, template copy-paste, and CI rationale in this file (and in the skill `SKILL.md`).
+**Reader-friendly index:** Keep [`codex_pin_gsheet_exports.md`](../../../dags/people/reverse_reports/docs/codex_pin_gsheet_exports.md) short—links and per-export sections only. Put “how to add an export”, template copy-paste, and CI rationale in this file (and in the skill `SKILL.md`).
 
 **Where to paste the filled copy**
 
-- **CODEX → PIN–style exports** (same programme as organization / org unit classification): append a new `## \`your_table_name\`` section to [`codex_pin_gsheet_exports.md`](../../../../dags/people/reverse_reports/docs/codex_pin_gsheet_exports.md).
-- **Other People reverse tabs:** add a new Markdown file under [`dags/people/reverse_reports/docs/`](../../../../dags/people/reverse_reports/docs/) (for example `other_topic_gsheet_exports.md`) and link it from a short comment on the `tables_customization` entry in `reverse_reports_declaration.yml` if helpful.
+- **CODEX → PIN–style exports** (same programme as organization / org unit classification): append a new `## \`your_table_name\`` section to [`codex_pin_gsheet_exports.md`](../../../dags/people/reverse_reports/docs/codex_pin_gsheet_exports.md).
+- **Other People reverse tabs:** add a new Markdown file under [`dags/people/reverse_reports/docs/`](../../../dags/people/reverse_reports/docs/) (for example `other_topic_gsheet_exports.md`) and link it from a short comment on the `tables_customization` entry in `reverse_reports_declaration.yml` if helpful.
 
 Keep prose in **English**. Align the **column inventory** row order with the outer `SELECT` list in `queries/reverse/<table_name>.sql` (see `sql_conventions.mdc`).
 

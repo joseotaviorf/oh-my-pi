@@ -85,7 +85,8 @@ make dependencies-file && git add dags/dependencies.yaml
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-dependency-file-correctness
 ```
 
-Metadata authoring guide: `.cursor/skills/create-metadata-files/SKILL.md`.
+Metadata authoring guide: the **`create-metadata-files`** skill
+(`.cursor/skills/create-metadata-files/SKILL.md`).
 
 ## Where detailed rules live (load on demand)
 
@@ -102,8 +103,14 @@ Cursor auto-loads `.cursor/rules/*.mdc` by path/glob and applies always-on ones 
   `sql_conventions.mdc`, `databricks_conventions.mdc`, `emr_compatibility.mdc`,
   `data_quality_tests.mdc`, `governance_metadata.mdc`, `python_conventions.mdc`,
   `testing_conventions.mdc`, `people/people_domain.mdc`, …
-- **`.cursor/skills/<name>/SKILL.md`** — task playbooks: `setup-local-environment`,
-  `create-dag`, `run-dag-locally`, `create-metadata-files`, `fix-ci-failure`,
-  `generate-unit-test`, `create-or-update-pr`, `review-pr`, `trino`, `find-stale-dags`, `map-table-usage`, …
+- **`.cursor/skills/<name>/SKILL.md`** — task playbooks, shared by both clients: Cursor reads
+  `.cursor/skills/` natively, Claude Code reads the same files through the `.claude/skills`
+  symlink. **Invoke by name (`/create-dag`) in either client**, or read the `SKILL.md` directly.
+  Examples: `setup-local-environment`, `create-dag`, `run-dag-locally`, `create-metadata-files`,
+  `fix-ci-failure`, `generate-unit-test`, `create-or-update-pr`, `review-pr`, `trino`,
+  `find-stale-dags`, `map-table-usage`, `people-*`, …
+  A skill folder must sit **one level** under `.cursor/skills/`, its YAML `name` must match the
+  folder, and `description` must stay under 1024 characters — otherwise Claude Code skips it
+  silently. See `docs/cursor_ai_guide.md` §6.
 - **`README.md`** — install, dev container, local Airflow, useful `make` targets.
 - **`docs/cursor_ai_guide.md`** and **`docs/business_contribution_guide.md`** — contribution workflows.

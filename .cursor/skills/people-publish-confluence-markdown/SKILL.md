@@ -1,5 +1,5 @@
 ---
-name: publish-confluence-markdown
+name: people-publish-confluence-markdown
 description: >-
   Uploads a local Markdown file to Confluence via Atlassian MCP.
   Focuses on API interaction and compatibility (Draft status, Page Hierarchy, Title stripping).
@@ -19,7 +19,7 @@ Replace the body of a Confluence page with Markdown content, ensuring **draft-fi
 
 ## Confluence identifiers (People Data — single source of truth)
 
-Do **not** copy long ID tables into this skill. For **`cloudId`**, numeric **`spaceId`**, **`parentId`** (**People Data Catalog**), hub URLs, and MCP notes, use **[`.cursor/rules/people/people_domain.mdc`](../../../rules/people/people_domain.mdc)** — section **Confluence — People Data space (Atlassian MCP)**.
+Do **not** copy long ID tables into this skill. For **`cloudId`**, numeric **`spaceId`**, **`parentId`** (**People Data Catalog**), hub URLs, and MCP notes, use **[`.cursor/rules/people/people_domain.mdc`](../../rules/people/people_domain.mdc)** — section **Confluence — People Data space (Atlassian MCP)**.
 
 ## API compatibility & title hygiene
 
@@ -40,7 +40,7 @@ If editors may have changed Confluence **without** git, optionally call **`getCo
 ## Images and diagrams
 
 - Prefer **PNG** under `docs/assets/` with **`https://raw.githubusercontent.com/quintoandar/bi-etl-ejuice/master/...`** URLs so Confluence loads the asset (after it exists on `master`).
-- **`docs/data_model.md`** may stay **GitHub-only**; the wiki page can link with an absolute **github.com** URL. See **`sync-dw-documentation`** / **`REFERENCE_TEMPLATE.md`**.
+- **`docs/data_model.md`** may stay **GitHub-only**; the wiki page can link with an absolute **github.com** URL. See **`people-sync-dw-documentation`** / **`REFERENCE_TEMPLATE.md`**.
 
 ## Steps (agent)
 
@@ -54,7 +54,7 @@ If editors may have changed Confluence **without** git, optionally call **`getCo
 
 - For very long bodies, prefer the **build script** + JSON payload to avoid truncation.
 - **Promotion to `current`** is **manual** in Confluence after human review unless the user explicitly requests **`--status current`**.
-- **Catalog Database rows** are **not** created or edited by MCP—maintain them in Confluence; see **`sync-dw-documentation`** for git vs Database boundaries.
+- **Catalog Database rows** are **not** created or edited by MCP—maintain them in Confluence; see **`people-sync-dw-documentation`** for git vs Database boundaries.
 
 ## No MCP (CI or headless)
 

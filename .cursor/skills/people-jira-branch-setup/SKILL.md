@@ -8,7 +8,7 @@ description: >-
 
 # Enterprise Engineering — Jira issue and branch setup
 
-**Before Jira/MCP or Git branch steps:** Read **[`dbp-jira-reference.md`](../../../rules/people/dbp-jira-reference.md)** (kickoff policies, **Sprints and buffer (DBP)**, language, branch/slug/Jira summary, API quirks, workflow). **Buffer vs planned** sprint work is defined there — **confirm with the user**; do not guess. **Artifact paths:** **[`people_domain.mdc`](../../../rules/people/people_domain.mdc)** — **Delivery artifact folder (`.cursor/temp/`)**. Extend the reference when you learn new durable Jira facts.
+**Before Jira/MCP or Git branch steps:** Read **[`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md)** (kickoff policies, **Sprints and buffer (DBP)**, language, branch/slug/Jira summary, API quirks, workflow). **Buffer vs planned** sprint work is defined there — **confirm with the user**; do not guess. **Artifact paths:** **[`people_domain.mdc`](../../rules/people/people_domain.mdc)** — **Delivery artifact folder (`.cursor/temp/`)**. Extend the reference when you learn new durable Jira facts.
 
 Use this skill when starting **non–local-only** work on `bi-etl-ejuice`. If **local-only**, see **Kickoff policies** in the reference (skip this workflow unless asked).
 

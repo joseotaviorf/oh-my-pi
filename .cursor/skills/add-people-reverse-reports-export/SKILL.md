@@ -337,7 +337,7 @@ Comment notebook write cells; remove Daily Pipeline task if full migration. [`ex
 
 - [reference.md](reference.md)
 - [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) — project **DBP**, squad **Enterprise Engineering**
-- [`people-jira-branch-setup`](../people/jira-branch-setup/SKILL.md)
+- [`people-jira-branch-setup`](../people-jira-branch-setup/SKILL.md)
 - [DBP-1310](https://quintoandar.atlassian.net/browse/DBP-1310)
 
 ## Out of scope
