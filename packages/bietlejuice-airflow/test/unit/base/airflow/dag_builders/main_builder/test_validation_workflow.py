@@ -100,6 +100,33 @@ class TestValidationWorkflow:
         assert len(tables) == 1
         assert tables[0].layer == LayerEnum.CONSUMPTION
 
+    def test_no_tables_found_raises_instead_of_dividing_by_zero(self):
+        with mock.patch.dict("os.environ", {"ENVIRONMENT": EnvironmentEnum.PROD}):
+            workflow = EnrichQueryDeltaWorkflow(
+                dag_args={"name": "pilot", "owner": "Data Engineering"},
+                workflow_args={
+                    "type": "query_delta",
+                    "layer": "consumption",
+                    "custom_schema": "bi_metrics",
+                },
+                cluster_args={"type": "consolidation_s_general_single_node_cluster"},
+                dataset_dependencies=mock.MagicMock(),
+            )
+
+        workflow.config_service = mock.MagicMock()
+        with mock.patch.multiple(
+            workflow,
+            dag_instance=mock.DEFAULT,
+            _get_dag_execution_context=mock.DEFAULT,
+            _initialize_task_creators=mock.DEFAULT,
+            _get_tables=mock.DEFAULT,
+        ) as patched:
+            patched["_get_tables"].return_value = []
+            with pytest.raises(
+                ValueError, match="No tables found for layer consumption"
+            ):
+                workflow.build_dag()
+
     def test_base_workflow_dag_id_suffix_only_when_validation(self):
         with mock.patch.dict("os.environ", {"ENVIRONMENT": EnvironmentEnum.PROD}):
             prod = BaseWorkflow(
