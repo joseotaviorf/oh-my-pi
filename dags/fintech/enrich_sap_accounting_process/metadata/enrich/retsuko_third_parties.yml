@@ -102,6 +102,6 @@ columns:
     lineage:
       - datalake_pas.ledger.dt_created
   dt_filter_end:
-    description: Same value as dt_sap_reference, which already reflects the most recent SAP ledger movement for this id_finance_entity_entry and account_number (it already falls back to a direct entry+account match when the hash-based SAP Gateway match is unavailable).
+    description: Date on which the position was settled or cancelled - the reference date of the SAP ledger movement that closed the accumulated balance of this id_finance_entity_entry and account_number. NULL while the position is still open (non-zero accumulated balance) or absent from the ledger, so a filled value always means the position closed. Computed independently of the hash-based SAP Gateway match used for dt_sap_reference, which only reflects the posting matched to this row's version.
     lineage:
       - datalake_pas.ledger.dt_reference

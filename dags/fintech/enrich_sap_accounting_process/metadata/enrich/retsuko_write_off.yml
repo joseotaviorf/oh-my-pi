@@ -108,6 +108,6 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger.dt_created
   dt_filter_end:
-    description: Same value as dt_sap_reference, which already reflects the most recent SAP ledger movement for this id_finance_entity and account_number (it already falls back to a direct id_finance_entity match when the hash-based SAP Gateway match is unavailable).
+    description: Always NULL for this source. dt_filter_end means the date on which the position was settled or cancelled, and this source carries no settlement signal - its dt_sap_reference only reflects the original posting, so filling it would read as a settlement that never happened. Use dt_sap_reference when the posting date is what you need.
     lineage:
-      - datalake_accounting_funnel.ledger.dt_reference 
+      - datalake_sap_accounting_process.retsuko_write_off.dt_filter_end 

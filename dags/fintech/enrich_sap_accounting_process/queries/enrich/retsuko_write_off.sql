@@ -122,6 +122,49 @@ retsuko AS (
         rn = 1
 ),
 
+write_off_match_keys AS (
+    SELECT DISTINCT
+        sg.hash AS gateway_hash,
+        CAST(r.id_finance_entity AS STRING) AS retsuko_id_finance_entity
+    FROM
+        retsuko AS r
+    LEFT JOIN
+        sap_gateway AS sg
+            ON sg.id_feature = r.id_sap_gateway_feature
+),
+
+sap_resolved AS (
+    SELECT
+        COALESCE(k.gateway_hash, '__NO_GATEWAY_HASH__') AS gateway_hash,
+        COALESCE(k.retsuko_id_finance_entity, '__NO_FINANCE_ENTITY__') AS retsuko_id_finance_entity,
+        s.hash,
+        s.account_number,
+        s.sap_amount,
+        s.dt_sap_reference,
+        s.dt_sap_created
+    FROM
+        write_off_match_keys AS k
+    INNER JOIN
+        sap AS s
+            ON s.hash = k.gateway_hash
+
+    UNION
+
+    SELECT
+        COALESCE(k.gateway_hash, '__NO_GATEWAY_HASH__') AS gateway_hash,
+        COALESCE(k.retsuko_id_finance_entity, '__NO_FINANCE_ENTITY__') AS retsuko_id_finance_entity,
+        s.hash,
+        s.account_number,
+        s.sap_amount,
+        s.dt_sap_reference,
+        s.dt_sap_created
+    FROM
+        write_off_match_keys AS k
+    INNER JOIN
+        sap AS s
+            ON s.id_finance_entity = k.retsuko_id_finance_entity
+),
+
 df AS (
     SELECT 
         'RTSK-WO'||'-'||r.id_finance_entity||'-'||COALESCE(account_number, '') AS id_accounting_process,
@@ -157,9 +200,9 @@ df AS (
         sap_gateway AS sg 
             ON sg.id_feature = r.id_sap_gateway_feature
     LEFT JOIN 
-        sap AS s
-            ON s.hash = sg.hash
-            OR s.id_finance_entity = CAST(r.id_finance_entity AS STRING)
+        sap_resolved AS s
+            ON s.gateway_hash = COALESCE(sg.hash, '__NO_GATEWAY_HASH__')
+            AND s.retsuko_id_finance_entity = COALESCE(CAST(r.id_finance_entity AS STRING), '__NO_FINANCE_ENTITY__')
     WHERE
         TRUE
     GROUP BY
@@ -214,6 +257,6 @@ SELECT
     dt_source_trigger,
     dt_sap_reference,
     dt_sap_created,
-    dt_sap_reference AS dt_filter_end
+    CAST(NULL AS DATE) AS dt_filter_end
 FROM
     assertions_base

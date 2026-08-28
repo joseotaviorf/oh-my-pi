@@ -146,6 +146,7 @@ last_movement AS (
       MAX(dt_sap_reference) AS dt_filter_end
   FROM sap
   GROUP BY 1, 2
+  HAVING ABS(SUM(debit_credit)) < 0.05
 ),
 
 errors_base AS (

@@ -208,7 +208,7 @@ SELECT
     CAST(NULL AS DATE) AS dt_source_trigger,
     sl.dt_sap_created AS dt_sap_created,
     sl.dt_sap_reference AS dt_sap_reference,
-    sl.dt_sap_reference AS dt_filter_end
+    CAST(NULL AS DATE) AS dt_filter_end
   FROM
     sap_ledger sl
  LEFT JOIN
