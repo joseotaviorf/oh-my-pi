@@ -1,0 +1,102 @@
+database_name: datalake_sap_accounting_process
+table_name: retsuko_postponement
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description:
+  Table to track the accounting route of account 211407 (postponed invoice - PP), fed exclusively by Seu Barriga. It anchors on the Retsuko entry and follows it through the SAP gateway into the ledger, so it reports whether every postponement the source created reached accounting.
+  Postponement is recognised at bill item creation only, like the revenue accounts, and does nothing on payment, so the funnel starts at entry.ts_created and the sap_entity leg is restricted to the 'new-accounting-entries' event.
+  The same bill item splits between two accounts in SAP according to the invoice kind - 211407 for PP and 113403 for IQ - and the authoritative rule lives in the ledger accounting_rule prefix, 'invoice-transfer-entry-' against 'invoice-bill-entry-'. That prefix is not reproducible from Retsuko data, so this table uses the ownership of the invoice account as a proxy, which agrees with the ledger on about 95% of the entries.
+  The remaining entries are not treated as failures. When an entry selected by the proxy is found in 113403 instead, it is reported with the 'account divergence' status and an error_description naming the sibling account, which keeps proxy noise separate from genuine dispatch problems.
+columns:
+  id_accounting_process:
+    description: Unique key for each record on this table, formatted as 'RTSK-PSTP-{id_finance_entity_entry}-{account_number}-{row_number}'.
+    lineage:
+      - datalake_retsuko.entry.id_external
+  id_business_entity:
+    description: Business key for the contract, taken from the Retsuko contract external id.
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  id_finance_entity:
+    description: Business key for the invoice that owns the postponement entry.
+    lineage:
+      - datalake_retsuko.invoice.id_external
+  id_finance_entity_entry:
+    description: Business key for the Retsuko entry. This is the grain of the table and the key the SAP ledger carries back in id_finance_entity_entry.
+    lineage:
+      - datalake_retsuko.entry.id_external
+  version:
+    description: Version of the accounting contract used by the source when dispatching the entry to the gateway.
+    lineage:
+      - datalake_retsuko_clean.sap_entity.version
+  business_unit:
+    description: Identifier created in this table to segment the business unit, fixed as for rent.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.business_unit
+  source_name:
+    description: Product responsible for sending the accounting information, fixed as seu barriga.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.source_name
+  accounting_type:
+    description: Type indicator used to segregate accounts, fixed as postponement.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.accounting_type
+  account_number:
+    description: Identifier of accounts used by controllership accounting process in SAP, fixed as 211407.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.account_number
+  accounting_name:
+    description: Human readable name for the SAP account, fixed as postponed invoice PP.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.accounting_name
+  source_amount:
+    description: Value of the postponement entry as recorded by Retsuko.
+    lineage:
+      - datalake_retsuko.entry.amount
+  sap_amount:
+    description: Value recorded in SAP, summed over the 211407 ledger lines that share the same finance entity entry. Postponement posts two legs per entry, one reversing the original invoice and one creating the postponed invoice, and the sum of both is what is compared against the source.
+    lineage:
+      - datalake_pas.ledger.debit_credit
+  is_completeness:
+    description: Indicates whether the entry was found in the 211407 ledger. FALSE for dispatch failures and also for the account divergence records, since the amount did not reach this account.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.is_completeness
+  is_correctness:
+    description: TRUE if the deviation between source and SAP amounts is under R$0.05.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.is_correctness
+  is_temporality:
+    description: TRUE if the SAP reference date falls in the same month as the source trigger, or in the following month within three business days.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.is_temporality
+  is_compliance:
+    description: TRUE if completeness, correctness and temporality are all TRUE.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.is_compliance
+  accounting_process_status:
+    description: "Classification of accounting status. 'success' when the entry reached account 211407; 'account divergence' when it reached 113403 instead, which is a limitation of the PP proxy rather than a source problem; 'source failure', 'gateway failure' and 'unknown failure' follow the same meaning as the other Retsuko straws."
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.accounting_process_status
+  error_description:
+    description: "Textual reason for the outcome. 'accounted in 113403 - IQ postponed invoice' marks the account divergence records; the remaining values follow the standard funnel vocabulary of source not found, gateway not found, sap not found and the failure reason reported by the source or by the gateway webhook."
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponement.error_description
+  accrual_year_month:
+    description: Account reference in the format YYYYMM taken from the invoice.
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+  dt_source_trigger:
+    description: Creation date of the Retsuko entry, which is the event that starts this funnel.
+    lineage:
+      - datalake_retsuko.entry.ts_created
+  dt_sap_reference:
+    description: Reference date of the 211407 SAP posting.
+    lineage:
+      - datalake_pas.ledger.dt_reference
+  dt_sap_created:
+    description: Creation date of the 211407 SAP posting.
+    lineage:
+      - datalake_pas.ledger.dt_created
+  dt_filter_end:
+    description: Date of the most recent SAP ledger movement for this entry and account, equal to dt_sap_reference in this table.
+    lineage:
+      - datalake_pas.ledger.dt_reference
