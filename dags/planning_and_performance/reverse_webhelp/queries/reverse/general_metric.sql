@@ -1,3 +1,20 @@
+WITH analyst_resolved AS (
+  SELECT
+    da.sk_analyst AS sk_lookup,
+    da.full_name,
+    da.email,
+    da.agent_organization
+  FROM dw_customer_support.dim_analyst AS da
+  UNION
+  SELECT
+    da.sk_agent_twilio AS sk_lookup,
+    da.full_name,
+    da.email,
+    da.agent_organization
+  FROM dw_customer_support.dim_analyst AS da
+  WHERE
+    da.sk_agent_twilio IS NOT NULL
+)
 SELECT DISTINCT
   ft.sk_ticket,
   ft.sk_user,
@@ -69,9 +86,8 @@ LEFT JOIN
   dw_customer_support.dim_taxonomy AS dt
     ON ft.sk_taxonomy = dt.sk_taxonomy
 LEFT JOIN
-  dw_customer_support.dim_analyst AS da
-    ON ft.sk_last_analyst = da.sk_analyst
-    OR ft.sk_last_analyst = da.sk_agent_twilio
+  analyst_resolved AS da
+    ON ft.sk_last_analyst = da.sk_lookup
 WHERE
   DATE(ft.ts_created) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND da.agent_organization IN ('webhelp', 'webhelpbr')
