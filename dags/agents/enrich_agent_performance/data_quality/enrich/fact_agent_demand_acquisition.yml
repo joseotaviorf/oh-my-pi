@@ -54,8 +54,3 @@ column_level_validations:
     is_contained_in:
       values: [true, false]
       severity_level: Warning
-
-  "offer_specialist.has_mismatch":
-    is_contained_in:
-      values: [true, false]
-      severity_level: Warning
