@@ -12,7 +12,7 @@ WITH rental_guarantee AS (
       'PIX_REVENUE_RECOGNITION',
       'CREDIT_CARD_REVENUE_RECOGNITION',
       'STANDALONE_REVENUE_RECOGNITION')
-    AND DATE(dt_event_date) >= DATE('2024-01-01')
+    AND DATE(dt_event_date) >= DATE('2025-01-01')
     AND id_feature IS NOT NULL
 ),
 
@@ -47,7 +47,7 @@ sap_gateway AS (
       s.erp_solution IN ('S4')
       AND s.type = 'NF'
       AND s.status NOT IN ('ignore', 'ignored')
-      AND DATE(s.ts_created) >= DATE('2024-01-01')
+      AND DATE(s.ts_created) >= DATE('2025-01-01')
   )
   WHERE
     rn = 1
@@ -83,10 +83,35 @@ sap_ledger AS (
   FROM
     datalake_pas.ledger
   WHERE
-    dt_reference >= DATE('2024-01-01')
+    dt_reference >= DATE('2025-01-01')
     AND account_number = '420010'
     AND accounting_rule IN ('pro-guarantor-nf', 'standalone-nf')
     AND hash IS NOT NULL
+  GROUP BY 1
+),
+
+-- Account 420010 also carries postings that belong to neither source: no accounting_rule, no
+-- gateway hash and no business entity. They are adjustments posted straight into SAP by people or
+-- by batch workflows. Because both forward straws split the account by accounting_rule and join
+-- the ledger by hash, this population was invisible in both directions, which is exactly what a
+-- reverse straw exists to prevent. They are grouped by transaction, since there is no other key,
+-- and carry a NULL accounting_name because they cannot be attributed to rental guarantee or to
+-- Seu Barriga.
+sap_ledger_unkeyed AS (
+  SELECT
+    CAST(id_transaction AS STRING) AS id_transaction,
+    MAX(created_by) AS created_by,
+    MAX(accrual_year_month) AS accrual_year_month,
+    SUM(debit_credit) AS debit_credit,
+    MAX(DATE(dt_created)) AS dt_sap_created,
+    MAX(DATE(dt_reference)) AS dt_sap_reference
+  FROM
+    datalake_pas.ledger
+  WHERE
+    dt_reference >= DATE('2025-01-01')
+    AND account_number = '420010'
+    AND accounting_rule IS NULL
+    AND hash IS NULL
   GROUP BY 1
 )
 
@@ -131,3 +156,31 @@ LEFT JOIN
 WHERE
   r.id_feature IS NULL
   AND b1.hash IS NULL
+
+UNION ALL
+
+SELECT
+  ('RE-RGRT-I-NOHASH'||'-'||m.id_transaction) AS id_accounting_process,
+  CAST(NULL AS STRING) AS id_business_entity,
+  CAST(NULL AS STRING) AS id_finance_entity,
+  CAST(NULL AS STRING) AS id_finance_entity_entry,
+  CAST(NULL AS STRING) AS version,
+  'for rent' AS business_unit,
+  'S4' AS source_name,
+  'invoice' AS accounting_type,
+  '420010' AS account_number,
+  CAST(NULL AS STRING) AS accounting_name,
+  CAST(NULL AS DECIMAL(12,2)) AS source_amount,
+  CAST(m.debit_credit AS DECIMAL(12,2)) AS sap_amount,
+  FALSE AS is_completeness,
+  FALSE AS is_correctness,
+  FALSE AS is_temporality,
+  FALSE AS is_compliance,
+  'reverse straw failure' AS accounting_process_status,
+  CONCAT('posting without gateway hash - ', COALESCE(m.created_by, 'unknown')) AS error_description,
+  m.accrual_year_month,
+  CAST(NULL AS DATE) AS dt_source_trigger,
+  m.dt_sap_reference,
+  m.dt_sap_created
+FROM
+  sap_ledger_unkeyed m

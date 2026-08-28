@@ -5,6 +5,7 @@ domain: Fintech
 description:
   Table to track the Rental Guarantee share of revenue account 420010, following the route between source (rental-guarantee) and SAP through the SAP Gateway payload system.
   Account 420010 is fed by two independent producers - Seu Barriga (Retsuko), reconciled by retsuko_invoice, and Rental Guarantee, reconciled here. The two are separated by the SAP accounting_rule - pro-guarantor-nf and standalone-nf belong to Rental Guarantee, while the invoice-*-pro-guarantor-5A-installment rules belong to Seu Barriga - and by source_name and accounting_name in the output.
+  The table reads the source, the gateway and the ledger from 2025-01-01 onwards, matching rental_guarantee_invoice_reverse, so the two tables partition the same ledger population. The 2024 records, which are dominated by the ERP migration loads, are outside this scope.
   It applies business rules for IPO to assess completeness, correctness (up to R$0.05 deviation), and temporality (same calendar month as the source trigger, or the next month with at most three Brazilian business days between trigger and SAP reference dates).
   The final output includes a status classification and failure reason to support monitoring and root-cause analysis.
 columns:

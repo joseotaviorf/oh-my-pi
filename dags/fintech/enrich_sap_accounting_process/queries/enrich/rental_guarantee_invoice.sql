@@ -31,7 +31,7 @@ rental_guarantee AS (
       'PIX_REVENUE_RECOGNITION',
       'CREDIT_CARD_REVENUE_RECOGNITION',
       'STANDALONE_REVENUE_RECOGNITION')
-    AND DATE(dt_event_date) >= DATE('2024-01-01')
+    AND DATE(dt_event_date) >= DATE('2025-01-01')
 ),
 
 -- The nota fiscal job is the only leg that carries the hash used by the SAP ledger.
@@ -71,7 +71,7 @@ sap_gateway AS (
       s.erp_solution IN ('S4')
       AND s.type = 'NF'
       AND s.status NOT IN ('ignore', 'ignored')
-      AND DATE(s.ts_created) >= DATE('2024-01-01')
+      AND DATE(s.ts_created) >= DATE('2025-01-01')
   )
   WHERE
     rn = 1
@@ -92,7 +92,7 @@ sap_ledger AS (
   FROM
     datalake_pas.ledger
   WHERE
-    dt_reference >= DATE('2024-01-01')
+    dt_reference >= DATE('2025-01-01')
     AND account_number = '420010'
     AND accounting_rule IN ('pro-guarantor-nf', 'standalone-nf')
     AND hash IS NOT NULL
