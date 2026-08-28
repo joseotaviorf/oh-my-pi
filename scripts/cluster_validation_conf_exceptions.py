@@ -134,7 +134,7 @@ def resolve_greenhouse_v3_conf(
 def resolve_maestro_next_day_ingest_conf(
     run: dict[str, Any],
 ) -> tuple[dict[str, str], LoadWindowSource] | None:
-    """S3 partition is data_interval_start + 1 day (maestro / search_monitoring layout)."""
+    """S3 partition is data_interval_start + 1 day (maestro layout)."""
     ingest_day = _conf_load_start_from_run(run)
     if ingest_day is None:
         interval_start = _interval_start(run)

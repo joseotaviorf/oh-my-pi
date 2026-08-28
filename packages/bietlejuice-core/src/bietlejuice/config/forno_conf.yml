@@ -46,7 +46,6 @@ dags_out_of_pattern:
         "quintoml.post_contract.wall_e_offboarding_categoriser.inference",
         "quintoml.recs.house_user_embeddings.inference",
         "quintoml.search.maestro.inference",
-        "quintoml.search.search_monitoring.inference",
         "reverse_anonymization",
         "reverse_atento",
         "reverse_atento_test",

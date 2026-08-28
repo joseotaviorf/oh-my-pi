@@ -52,8 +52,6 @@ LIST OF DEFAULT METRICS:
 Nondefault metrics:
 - search_ctr
 
-For full list of metrics, see the file: models/search/search-monitoring/search_monitoring/batch/metrics/metrics_dict.py
-
 */
 
 SELECT experiment_name, config
