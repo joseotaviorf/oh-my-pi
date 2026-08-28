@@ -27,8 +27,12 @@ workflow:
       clean_table_name: shop_window_listing_business_context_aud
     Development:
       clean_table_name: development
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     DevelopmentTypology:
       clean_table_name: development_typology
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     DevelopmentAmenity:
       clean_table_name: development_amenity
       raw_primary_keys: [development_id, amenity]
