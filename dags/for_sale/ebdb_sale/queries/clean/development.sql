@@ -1,0 +1,28 @@
+SELECT
+    id,
+    state_id AS id_state,
+    development_uuid,
+    external_id,
+    company_uuid,
+    name,
+    description,
+    construction_status,
+    legal_permit,
+    postal_code,
+    street,
+    street_number,
+    neighborhood,
+    city,
+    latitude,
+    longitude,
+    towers,
+    floors,
+    apartments_per_floor,
+    min_condominium_fee,
+    min_iptu,
+    launch_date,
+    forecast_delivery_date,
+    created_at AS ts_created,
+    updated_at AS ts_updated
+FROM
+    datalake_ebdb_raw.Development

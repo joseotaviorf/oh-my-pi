@@ -1,0 +1,70 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_typology
+domain: For Sale
+description: Typologies (unit types) available within a primary market development. Each row represents one typology configuration (e.g. 2-bedroom apartments) within a development.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.id
+    description: Primary key identifier for the development typology record.
+  development_typology_uuid:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.development_typology_uuid
+    description: UUID for the typology, used as external stable identifier.
+  id_development:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.development_id
+    description: Foreign key referencing the Development table.
+  type:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.type
+    description: Type/category of the typology unit.
+  total_units:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.total_units
+    description: Total number of units of this typology in the development.
+  available_units:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.available_units
+    description: Number of units of this typology currently available for sale.
+  total_area:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.total_area
+    description: Total area of the unit in square meters.
+  bedrooms:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.bedrooms
+    description: Number of bedrooms in the unit.
+  bathrooms:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.bathrooms
+    description: Number of bathrooms in the unit.
+  suites:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.suites
+    description: Number of suites in the unit.
+  parking_spaces:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.parking_spaces
+    description: Number of parking spaces for the unit.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.created_at
+    description: Timestamp when the typology record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.updated_at
+    description: Timestamp when the typology record was last updated.
+  op_cdc:
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in the source system.

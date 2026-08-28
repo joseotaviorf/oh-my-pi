@@ -1,0 +1,34 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_amenity
+domain: For Sale
+description: "Amenities associated with a primary market development. Each row represents one amenity for a development (composite PK: development_id + amenity)."
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_development:
+    lineage:
+      - datalake_ebdb_raw.developmentamenity.development_id
+    description: Foreign key referencing the Development table. Part of the composite primary key.
+  amenity:
+    lineage:
+      - datalake_ebdb_raw.developmentamenity.amenity
+    description: Amenity identifier (e.g. POOL, GYM, PLAYGROUND). Part of the composite primary key.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmentamenity.created_at
+    description: Timestamp when the amenity record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmentamenity.updated_at
+    description: Timestamp when the amenity record was last updated.
+  op_cdc:
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in the source system.
