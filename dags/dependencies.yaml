@@ -1423,6 +1423,7 @@ bietlejuice.enrich_agent_payments:
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
 bietlejuice.enrich_agent_performance:
   - bietlejuice.ebdb_agent:load-clean-agent-lead-referral-aud:first-run-of-day
+  - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-unified-identity:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day
