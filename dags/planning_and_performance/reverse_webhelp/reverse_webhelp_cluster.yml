@@ -7,20 +7,35 @@ cluster:
     driver_node_type_id: r7g.4xlarge
 validation:
   cluster:
+    # 21 load tasks, step_concurrency=4. L-tier preset (24g/4-core executors, unbounded
+    # maxExecutors) caused 5–7 min YARN executor waits with 4 concurrent YARN apps on
+    # 5 workers (j-094113781DFGQMJZDJF). Pack executors + cap maxExecutors; add 4th
+    # spot task to match DBR 5-worker parity (same pattern as metric_growth__demand).
     type: emr_7_12_consolidation_l_general_fleet_cluster
     custom_configurations:
+      step_concurrency_level: 4
       master_node_type_id: r6g.4xlarge
-      task_nodes:
-        instance_types:
-        - m6g.4xlarge
-        - m7g.4xlarge
-        target_on_demand: 0
-        target_spot: 3
-        allocation_strategy: price-capacity-optimized
-        bid_price_percentage: 100
       core_nodes:
         target_on_demand: 2
         target_spot: 0
         instance_types:
         - m6g.4xlarge
         - m7g.4xlarge
+      task_nodes:
+        instance_types:
+        - m6g.4xlarge
+        - m7g.4xlarge
+        target_on_demand: 0
+        target_spot: 4
+        allocation_strategy: price-capacity-optimized
+        bid_price_percentage: 100
+      spark_conf:
+        spark.yarn.am.memory: 2g
+        spark.yarn.am.cores: "1"
+        spark.driver.memory: 8g
+        spark.driver.memoryOverhead: 2g
+        spark.executor.cores: "2"
+        spark.executor.memory: 12g
+        spark.executor.memoryOverhead: 2g
+        spark.dynamicAllocation.minExecutors: "1"
+        spark.dynamicAllocation.maxExecutors: "3"
