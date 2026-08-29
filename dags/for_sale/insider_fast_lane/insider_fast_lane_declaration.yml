@@ -26,12 +26,12 @@ workflow:
       raw_primary_keys: ["id"]
     resource:
       raw_primary_keys: ["id"]
-    review_aud:
-      raw_primary_keys: ["id", "rev"]
+    # review_aud:
+    #   raw_primary_keys: ["id", "rev"]
     review_feature:
       raw_primary_keys: ["id"]
-    review:
-      raw_primary_keys: ["id"]
+    # review:
+    #   raw_primary_keys: ["id"]
     template_feature:
       raw_primary_keys: ["id"]
     template:
