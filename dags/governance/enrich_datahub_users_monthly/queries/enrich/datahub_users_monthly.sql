@@ -26,7 +26,20 @@ WITH bounds AS (
     NOT work_email IS NULL AND TRIM(work_email) <> ''
 ), eligible_employees AS (
   SELECT
-    e.*
+    e.work_email,
+    e.job_class,
+    e.business,
+    e.product,
+    e.vertical,
+    e.line,
+    e.chapter,
+    e.directorate,
+    e.assignment_status_type,
+    e.dt_hired,
+    e.dt_terminated,
+    e.area_class,
+    b.month_start,
+    b.month_end
   FROM all_employees AS e
   CROSS JOIN bounds AS b
   WHERE
@@ -78,20 +91,18 @@ SELECT
   CASE WHEN NOT dh.user_email IS NULL THEN TRUE ELSE FALSE END AS is_datahub_user,
   CASE WHEN NOT db.email IS NULL THEN TRUE ELSE FALSE END AS is_databricks_user,
   CASE WHEN NOT tr.session_user IS NULL THEN TRUE ELSE FALSE END AS is_trino_user,
-  CAST(b.month_start AS DATE) AS dt_reference_month_start,
-  CAST(b.month_end AS DATE) AS dt_reference_month_end,
+  CAST(e.month_start AS DATE) AS dt_reference_month_start,
+  CAST(e.month_end AS DATE) AS dt_reference_month_end,
   CASE
     WHEN LOWER('{is_backfilled_dimension_proxy}') = 'true'
     THEN TRUE
     ELSE FALSE
   END AS is_backfilled_dimension_proxy,
   CURRENT_TIMESTAMP() AS ts_load,
-  YEAR(TO_DATE(b.month_start)) AS year,
-  MONTH(TO_DATE(b.month_start)) AS month,
+  YEAR(TO_DATE(e.month_start)) AS year,
+  MONTH(TO_DATE(e.month_start)) AS month,
   1 AS day
-FROM bounds AS b
-INNER JOIN eligible_employees AS e
-  ON TRUE
+FROM eligible_employees AS e
 LEFT JOIN datahub_users_month AS dh
   ON LOWER(TRIM(e.work_email)) = LOWER(TRIM(dh.user_email))
 LEFT JOIN databricks_users_month AS db

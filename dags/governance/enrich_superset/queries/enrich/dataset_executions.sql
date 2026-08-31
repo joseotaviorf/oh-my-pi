@@ -18,7 +18,9 @@ dataset_executions AS (
         COUNT(id) AS dataset_executions
     FROM
         dataset_logs
-    GROUP BY ALL
+        GROUP BY
+            id_dataset,
+            dt_event
 )
 SELECT
     hash(CONCAT(id_dataset, dt_event)) AS id_snapshot,
