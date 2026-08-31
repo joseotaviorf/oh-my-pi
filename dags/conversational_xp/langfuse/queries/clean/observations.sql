@@ -1,4 +1,5 @@
 -- Native year/month/day/hour predicates so EMR Spark 3.5 can prune partitions.
+-- First/last hour-start match MAKE_TIMESTAMP(y,m,d,h,0,0) >= load_start-3h AND < load_end.
 WITH deduped AS (
     SELECT
         id AS id_observation,
@@ -37,41 +38,41 @@ WITH deduped AS (
     WHERE
         (
             (
-                YEAR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                    = YEAR(TIMESTAMP('{load_end_date}'))
-                AND MONTH(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                    = MONTH(TIMESTAMP('{load_end_date}'))
-                AND DAY(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                    = DAY(TIMESTAMP('{load_end_date}'))
-                AND year = YEAR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                AND month = MONTH(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                AND day = DAY(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                AND hour >= HOUR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                AND hour <= HOUR(TIMESTAMP('{load_end_date}'))
+                YEAR(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                    = YEAR(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
+                AND MONTH(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                    = MONTH(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
+                AND DAY(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                    = DAY(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
+                AND year = YEAR(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                AND month = MONTH(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                AND day = DAY(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                AND hour >= HOUR(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                AND hour <= HOUR(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
             )
             OR
             (
                 (
-                    YEAR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                        <> YEAR(TIMESTAMP('{load_end_date}'))
-                    OR MONTH(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                        <> MONTH(TIMESTAMP('{load_end_date}'))
-                    OR DAY(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                        <> DAY(TIMESTAMP('{load_end_date}'))
+                    YEAR(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                        <> YEAR(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
+                    OR MONTH(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                        <> MONTH(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
+                    OR DAY(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                        <> DAY(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
                 )
                 AND (
                     (
-                        year = YEAR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                        AND month = MONTH(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                        AND day = DAY(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
-                        AND hour >= HOUR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                        year = YEAR(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                        AND month = MONTH(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                        AND day = DAY(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
+                        AND hour >= HOUR(DATE_TRUNC('HOUR', TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR + INTERVAL 1 HOUR - INTERVAL 1 SECOND))
                     )
                     OR
                     (
-                        year = YEAR(TIMESTAMP('{load_end_date}'))
-                        AND month = MONTH(TIMESTAMP('{load_end_date}'))
-                        AND day = DAY(TIMESTAMP('{load_end_date}'))
-                        AND hour <= HOUR(TIMESTAMP('{load_end_date}'))
+                        year = YEAR(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
+                        AND month = MONTH(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
+                        AND day = DAY(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
+                        AND hour <= HOUR(DATE_TRUNC('HOUR', TIMESTAMP('{load_end_date}') - INTERVAL 1 SECOND))
                     )
                 )
             )
