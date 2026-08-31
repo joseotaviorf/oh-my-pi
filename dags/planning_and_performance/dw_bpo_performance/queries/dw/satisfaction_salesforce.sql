@@ -11,6 +11,20 @@ WHERE event_type IN ('DELETE')
 
 ),
 
+mkt_cloud AS (
+  SELECT
+    case__c AS sk_case,
+    parse_url(survey_url__c, 'QUERY', 'mkt_cloud_trigger__c_id') AS trigger_id,
+    account__c,
+    email__c,
+    COALESCE(
+      NULLIF(parse_url(survey_url__c, 'QUERY', 'mkt_cloud_trigger__c_id'), '-1'),
+      NULLIF(account__c, '-1'),
+      NULLIF(case__c, '-1')
+    ) AS key_trigger
+  FROM datalake_salesforce_clean.events_mkt_cloud_trigger
+),
+
 ----- Regra incremental 
 ----- Retorna ID que teve atualização de resposta 
 answers as ( 
@@ -41,7 +55,8 @@ WHERE
             WHEN member_csat.type__c = 'Tenant' THEN 'Inquilino' 
             WHEN member_csat.type__c IN ('Owner','Landlord') THEN 'Proprietário' 
             ELSE 'Sem Definição de Partes' 
-        END AS client_type_csat
+        END AS client_type_csat,
+                mc.email__c AS email_cliente
     FROM dw_satisfaction_rating.fact_answer AS fa
     LEFT JOIN dw_satisfaction_rating.dim_answer AS da 
         ON da.sk_answer = fa.sk_answer
@@ -49,6 +64,12 @@ WHERE
         ON member_csat.account__c = fa.sk_account 
        AND fa.sk_case = member_csat.case__c
        AND member_csat.type__c IN ('Owner','Tenant','Landlord')
+        LEFT JOIN mkt_cloud AS mc 
+        ON COALESCE(
+             NULLIF(fa.sk_trigger, '-1'), 
+             NULLIF(fa.sk_account, '-1'), 
+             NULLIF(fa.sk_case, '-1')
+           ) = mc.key_trigger
     WHERE fa.sk_case IS NOT NULL
        AND        COALESCE(NULLIF(fa.sk_trigger, '-1'), NULLIF(fa.sk_account, '-1'), NULLIF(fa.sk_case, '-1')) IN (SELECT key_csat FROM answers )
 ),
@@ -63,6 +84,7 @@ CSAT AS (
         type__c,
         sk_account,
         client_type_csat,
+        email_cliente,
         
         -- Busca o satisfaction_score preenchido mais recente no Spark SQL
         FIRST_VALUE(satisfaction_score) OVER (
@@ -270,7 +292,8 @@ csat_final as (
                 THEN date_add(CAST(c.created_date AS TIMESTAMP), 19)
             WHEN c.type = 'Emergency'
                 THEN date_add(CAST(c.created_date AS TIMESTAMP), 3)
-        END AS dt_max_end
+        END AS dt_max_end,
+        email_cliente
 
     FROM csat as csat 
     LEFT JOIN events_case as c on c.id_record = csat.sk_case and rn_case = 1 
@@ -286,7 +309,7 @@ csat_final as (
     WHERE  c.id_record NOT IN (SELECT id_record FROM deletados)
 AND (CSAT.rn = 1)
 
-    GROUP BY 1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
+    GROUP BY 1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
 ),
 
 csat_final_ajustado AS (
@@ -334,9 +357,9 @@ SELECT
     dt_max_fr,
     dt_max_end,
     dt_max_end_ajustado,
+    email_cliente,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
     DAY(CURRENT_DATE) AS day,
     NOW() AS ts_load
 FROM csat_final_ajustado
-

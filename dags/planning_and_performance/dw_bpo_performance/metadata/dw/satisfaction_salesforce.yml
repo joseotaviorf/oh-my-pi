@@ -130,6 +130,10 @@ columns:
       - dw_public.dim_date.is_brz_holiday
       - datalake_salesforce_clean.events_case.created_date
     description: Final adjusted SLA end date, shifting target by 1 day if it lands on a Saturday or holiday.
+  email_cliente:
+    lineage:
+      - datalake_salesforce_clean.events_mkt_cloud_trigger.email
+    description: Email of the person who received the survey
   year:
     description: Current year.
   month:
