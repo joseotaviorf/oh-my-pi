@@ -27,13 +27,15 @@ photo_jobs AS (
   LEFT JOIN
     house_listing AS hl_photo
       ON hl_photo.id_house = fpj.id_house
-      AND fpj.ts_created BETWEEN hl_photo.ts_listing_version_start AND hl_photo.ts_listing_version_end
       AND hl_photo.id_house_listing IS NOT NULL
+      AND fpj.ts_created >= hl_photo.ts_listing_version_start
+      AND fpj.ts_created <= hl_photo.ts_listing_version_end
   LEFT JOIN
     house_listing AS dhl
       ON turf.origin = 'Imovel'
       AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(dhl.id_house AS BIGINT)
-      AND turf.ts_start BETWEEN COALESCE(NULLIF(dhl.ts_listing_version_start,''), turf.ts_start, NOW()) AND dhl.ts_listing_version_end
+      AND turf.ts_start >= COALESCE(dhl.ts_listing_version_start, turf.ts_start)
+      AND turf.ts_start <= dhl.ts_listing_version_end
   WHERE
     turf.year = {year}
     AND turf.month = {month}

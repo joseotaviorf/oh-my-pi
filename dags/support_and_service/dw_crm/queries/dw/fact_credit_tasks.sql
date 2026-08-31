@@ -59,20 +59,38 @@ house_listing AS (
     FROM
         datalake_listing_contracts.listing_contracts AS lc
 ),
-proposal_house_listing AS (
-    SELECT DISTINCT
-        COALESCE(hl.id_house_listing, -1) AS sk_house_listing,
-        COALESCE(rf.id_proposal, -1) AS sk_proposal,
-        COALESCE(rf.id_client, -1) AS sk_proponent
+rent_flow_house_listing_matches AS (
+    SELECT
+        hl.id_house_listing,
+        rf.id_proposal,
+        rf.id_client
     FROM
         house_listing AS hl
-    LEFT JOIN
+    INNER JOIN
         datalake_ebdb_rent_flow.rent_flow AS rf
             ON rf.id_contract = hl.id_contract
-            OR (
-                rf.id_house = hl.id_house
-                AND rf.dt_rent_flow_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
-            )
+
+    UNION
+
+    SELECT
+        hl.id_house_listing,
+        rf.id_proposal,
+        rf.id_client
+    FROM
+        house_listing AS hl
+    INNER JOIN
+        datalake_ebdb_rent_flow.rent_flow AS rf
+            ON rf.id_house = hl.id_house
+    WHERE
+        rf.dt_rent_flow_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
+),
+proposal_house_listing AS (
+    SELECT DISTINCT
+        COALESCE(matched.id_house_listing, -1) AS sk_house_listing,
+        COALESCE(matched.id_proposal, -1) AS sk_proposal,
+        COALESCE(matched.id_client, -1) AS sk_proponent
+    FROM
+        rent_flow_house_listing_matches AS matched
 )
 SELECT DISTINCT
     p.sk_task,

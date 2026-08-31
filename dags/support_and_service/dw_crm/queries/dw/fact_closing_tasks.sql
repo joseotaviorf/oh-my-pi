@@ -93,34 +93,58 @@ house_listing AS (
   FROM
     datalake_listing_contracts.listing_contracts AS lc
 ),
+rent_flow_house_listing_matches AS (
+  SELECT
+    hl.id_house_listing,
+    rf.id_offer_context,
+    rf.id_proposal,
+    rf.id_owner,
+    rf.id_client,
+    rf.id_contract
+  FROM
+    house_listing AS hl
+  INNER JOIN
+    datalake_ebdb_rent_flow.rent_flow AS rf
+      ON rf.id_contract = hl.id_contract
+
+  UNION
+
+  SELECT
+    hl.id_house_listing,
+    rf.id_offer_context,
+    rf.id_proposal,
+    rf.id_owner,
+    rf.id_client,
+    rf.id_contract
+  FROM
+    house_listing AS hl
+  INNER JOIN
+    datalake_ebdb_rent_flow.rent_flow AS rf
+      ON rf.id_house = hl.id_house
+  WHERE
+    rf.dt_rent_flow_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
+),
 contract_proposal_house_listing AS (
   SELECT DISTINCT
-    COALESCE(hl.id_house_listing, -1) AS sk_house_listing,
-    COALESCE(rf.id_offer_context, -1) AS sk_offer,
-    COALESCE(rf.id_proposal, -1) AS sk_proposal,
-    COALESCE(rf.id_owner, -1) AS sk_house_owner,
+    COALESCE(matched.id_house_listing, -1) AS sk_house_listing,
+    COALESCE(matched.id_offer_context, -1) AS sk_offer,
+    COALESCE(matched.id_proposal, -1) AS sk_proposal,
+    COALESCE(matched.id_owner, -1) AS sk_house_owner,
     CASE
-      WHEN rf.id_contract IS NOT NULL THEN rf.id_client
+      WHEN matched.id_contract IS NOT NULL THEN matched.id_client
       ELSE -1
     END AS sk_tenant,
     CASE
-      WHEN rf.id_proposal IS NOT NULL THEN rf.id_client
+      WHEN matched.id_proposal IS NOT NULL THEN matched.id_client
       ELSE -1
     END AS sk_proponent,
-    COALESCE(rf.id_contract, -1) AS sk_contract
+    COALESCE(matched.id_contract, -1) AS sk_contract
   FROM
-    house_listing AS hl
-  LEFT JOIN
-    datalake_ebdb_rent_flow.rent_flow AS rf
-      ON rf.id_contract = hl.id_contract
-      OR (
-        rf.id_house = hl.id_house
-        AND rf.dt_rent_flow_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
-      )
+    rent_flow_house_listing_matches AS matched
   WHERE
-    rf.id_contract IS NOT NULL
-    OR rf.id_offer_context IS NOT NULL
-    OR rf.id_proposal IS NOT NULL
+    matched.id_contract IS NOT NULL
+    OR matched.id_offer_context IS NOT NULL
+    OR matched.id_proposal IS NOT NULL
 )
 SELECT DISTINCT
   pc.id_task AS sk_task,
