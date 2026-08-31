@@ -29,4 +29,9 @@ workflow:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - endpoint_enum: ISSUE_JQL_SEARCH
-          # jql_query_filter: 'project IN ("DEI")'
+          # PROVISIONAL: scope daily incremental extraction down to the PAY
+          # project only, to control ingestion volume while the historical
+          # reprocessing of other projects is planned/validated.
+          # TODO: remove this line (restoring full ingestion) once that work
+          # is done. Tracking: <link to ticket/PR here>.
+          jql_query_filter: 'project IN ("PAY")'

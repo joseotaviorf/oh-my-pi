@@ -83,7 +83,16 @@ if __name__ == "__main__":
     )
     credentials = json.loads(json_credentials)
 
-    jql_query_filter = f'updated >= "{dt_start_execution} 00:00" and updated <= "{dt_end_execution} 23:59"'
+    date_range_jql_filter = f'updated >= "{dt_start_execution} 00:00" and updated <= "{dt_end_execution} 23:59"'
+    # Optional extra JQL constraint declared via `jql_query_filter` in the DAG's
+    # `extra_spark_job_arguments` (see jira_declaration.yml). Used, e.g., to
+    # provisionally scope ingestion down to a single project.
+    custom_jql_filter = endpoint_params.get("jql_query_filter")
+    jql_query_filter = (
+        f"({custom_jql_filter}) AND {date_range_jql_filter}"
+        if custom_jql_filter
+        else date_range_jql_filter
+    )
 
     params = {
         "jql": jql_query_filter,
