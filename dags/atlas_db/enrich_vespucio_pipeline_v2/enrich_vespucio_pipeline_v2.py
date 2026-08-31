@@ -462,6 +462,27 @@ groups_step_task = create_task(
     ],
 )
 
+resolve_pin_step_task = create_task(
+    entry_point="core_v2_resolve_pin_step",
+    parameters=[
+        f"--input_artifacts={Tables.artifacts_v2}",
+        f"--input_match_anchors={Tables.match_anchors_v2}",
+        f"--output_pins={Tables.pins_step_v2}",
+    ],
+)
+
+condominium_step_task = create_task(
+    entry_point="core_v2_condominium_step",
+    parameters=[
+        f"--input_pins={Tables.pins_step_v2}",
+        f"--input_match_anchors={Tables.match_anchors_v2}",
+        f"--input_general_normalized={Tables.general_normalization_step_v2}",
+        f"--input_claims={Tables.claims_step_v2}",
+        f"--output_condominium_pins={Tables.condominium_pins_step_v2}",
+        f"--output_condominiums={Tables.condominium_step_v2}",
+    ],
+)
+
 publish_artifacts_step_task = create_task(
     entry_point="core_v2_publish_artifacts_step",
     parameters=[
@@ -532,6 +553,17 @@ address_normalization_step_task >> address_enrich_step_task
 groups_step_task >> vespucio_v2_pipeline_complete_task
 artifacts_step_task >> vespucio_v2_pipeline_complete_task
 artifacts_step_task >> publish_artifacts_step_task
+[
+    artifacts_step_task,
+    address_grouping_step_task,
+] >> resolve_pin_step_task
+[
+    resolve_pin_step_task,
+    address_grouping_step_task,
+    general_normalization_step_task,
+    claims_step_task,
+] >> condominium_step_task
+condominium_step_task >> vespucio_v2_pipeline_complete_task
 [
     resolve_groups_step_task,
     publish_artifacts_step_task,

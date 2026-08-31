@@ -111,6 +111,9 @@ class Tables:
     artifact_groups = "vespucio_pipeline_delta.artifact_groups"
     group_merges = "vespucio_pipeline_delta.group_merges"
     groups_step_v2 = "vespucio_pipeline_delta.groups_step"
+    pins_step_v2 = "vespucio_pipeline_delta.pins_step"
+    condominium_pins_step_v2 = "vespucio_pipeline_delta.condominium_pins_step"
+    condominium_step_v2 = "vespucio_pipeline_delta.condominium_step"
     resolved_identities_publish_checkpoint = (
         "vespucio_pipeline_delta.resolved_identities_publish_checkpoint"
     )

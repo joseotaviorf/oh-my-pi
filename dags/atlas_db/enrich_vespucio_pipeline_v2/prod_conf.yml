@@ -8,7 +8,8 @@ dag_documentation:
     core_v2_image_normalization_step, core_v2_address_enrich_step, sources_kodak_atlas_images_job,
     core_v2_image_enrich_step, core_v2_photo_duplication_step, core_v2_artifacts_step,
     core_v2_publish_artifacts_step, core_v2_address_grouping_step, core_v2_image_grouping_step,
-    core_v2_resolve_groups_step, core_v2_groups_step and core_v2_publish_resolved_identities_step.
+    core_v2_resolve_groups_step, core_v2_groups_step, core_v2_resolve_pin_step,
+    core_v2_condominium_step and core_v2_publish_resolved_identities_step.
     For more information, see the GitHub [Vespucio Repository](https://github.com/quintoandar/vespucio)"
 kafka_bootstrap_servers: lkc-256gpm-jv0e34.us-east-1.aws.glb.confluent.cloud:9092
 callback_by_task_failure: True
