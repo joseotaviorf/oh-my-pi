@@ -13,9 +13,10 @@ Thin ``RequirementResult`` wrappers for row fields live in
 from __future__ import annotations
 
 import json
-from typing import Mapping, Optional
+from typing import Mapping, Optional, Set
 
 from bietlejuice.governance.fairness_assessment.constants import (
+    CDC_PLUMBING_COLUMN_NAMES_LOWERCASE,
     DOCUMENTED_NOT_IN_PHYSICAL_REASON,
     PARTITION_COLUMN_NAMES_LOWERCASE,
     SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON,
@@ -26,6 +27,20 @@ from bietlejuice.governance.fairness_assessment.description_quality import (
 from bietlejuice.governance.fairness_assessment.models import RequirementResult
 
 _DETAIL_LIST_CAP = 200
+
+
+def _is_f2_02_excluded_column(column_name: str) -> bool:
+    """Partitions and Debezium CDC plumbing are out of F2-02 substance scoring."""
+    lower = column_name.lower()
+    return (
+        lower in PARTITION_COLUMN_NAMES_LOWERCASE
+        or lower in CDC_PLUMBING_COLUMN_NAMES_LOWERCASE
+    )
+
+
+def _i1_01_comparable_names(names_lower: Set[str]) -> Set[str]:
+    """Drop CDC plumbing names from I1-01 docs ↔ physical comparison."""
+    return {n for n in names_lower if n not in CDC_PLUMBING_COLUMN_NAMES_LOWERCASE}
 
 
 def _i1_01_schema_detail_json(
@@ -100,7 +115,7 @@ def compute_f2_02_and_i1_01_for_fqn(
         columns_description_is_substantive = False
     else:
         for cname, desc in col_map.items():
-            if cname.lower() in PARTITION_COLUMN_NAMES_LOWERCASE:
+            if _is_f2_02_excluded_column(cname):
                 continue
             assessed_non_partition = True
             q = assess_column_description_quality(
@@ -124,15 +139,16 @@ def compute_f2_02_and_i1_01_for_fqn(
         else:
             columns_description_is_substantive = False
 
-    doc_lower = {c.lower() for c in col_map if c}
+    doc_lower = _i1_01_comparable_names({c.lower() for c in col_map if c})
+    physical_comparable = _i1_01_comparable_names(set(physical_field_names_lower))
     undocumented_columns: list[str] = []
     documented_not_in_physical: list[str] = []
     if has_physical:
         undocumented_columns = sorted(
-            phy for phy in physical_field_names_lower if phy not in doc_lower
+            phy for phy in physical_comparable if phy not in doc_lower
         )[:_DETAIL_LIST_CAP]
         documented_not_in_physical = sorted(
-            c for c in doc_lower if c not in physical_field_names_lower
+            c for c in doc_lower if c not in physical_comparable
         )[:_DETAIL_LIST_CAP]
 
     i1_ok = (not undocumented_columns) and (not documented_not_in_physical)

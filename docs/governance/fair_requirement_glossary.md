@@ -37,7 +37,7 @@ A table can have perfect metadata and still show tier &lt; 2 if **platform-owned
 |----|---------------|-------------|
 | **F2-01** | Table-level catalog basics | `owner`, `domain`, table `description` in metadata YAML |
 | **F2-02** | Column descriptions are useful | `columns.*.description` in metadata YAML |
-| **I1-01** | Documentation matches physical table | `columns:` vs SQL / metastore; `validate-lineage-consistency` |
+| **I1-01** | Documentation matches physical table | `columns:` vs SQL / metastore; `validate-lineage-consistency`. Debezium CDC plumbing (`op_cdc`, `ts_cdc_transaction`, `ts_database_transaction`) is excluded from this check. |
 | **F1-01** | Table has a stable identity | `database_name`, `table_name` in metadata |
 
 Often domain + platform together:

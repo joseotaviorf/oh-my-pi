@@ -8,10 +8,9 @@ This script ensures that:
 
 The physical schema is approximated as the SQL query result plus any
 framework-injected columns (e.g. the CDC ``op_cdc`` / ``ts_*`` columns appended
-at write time by ``load_cdc_clean``) that never appear in the ``.sql``. Those
-injected columns are treated as required documentation so this PR-time check
-stays aligned with the FAIRness I1-01 assessment (documentation ↔ physical
-schema), which runs post-deploy against the ``columns_metastore`` snapshot.
+at write time by ``load_cdc_clean``) that never appear in the ``.sql``.
+Debezium plumbing columns are tolerated in metadata but not required, matching
+FAIRness I1-01. Other injected columns (DMS CDC) remain required documentation.
 
 Usage:
     python validate_lineage_consistency.py -a              # Validate all files
@@ -60,6 +59,10 @@ CDC_INJECTED_COLUMNS_BY_WORKFLOW_TYPE: Dict[str, frozenset[str]] = {
     "cdc": CDC_CLEAN_INJECTED_COLUMNS,
     "dms_cdc": DMS_CDC_CLEAN_INJECTED_COLUMNS,
 }
+# Keep in sync with ``CDC_PLUMBING_COLUMN_NAMES_LOWERCASE`` in fairness_assessment
+# constants. Debezium plumbing is optional in YAML: I1-01 no longer scores it, so
+# CI must not require it either. DMS ``op`` / ``event_timestamp`` stay required.
+CDC_PLUMBING_OPTIONAL_IN_METADATA = CDC_CLEAN_INJECTED_COLUMNS
 
 metadata_file_service = MetadataFileService()
 
@@ -331,20 +334,24 @@ def compare_columns(
 
     The physical schema is the SQL ``SELECT`` output plus any framework-injected
     columns (e.g. the CDC ``op_cdc`` / ``ts_*`` columns appended at write time by
-    ``load_cdc_clean``) that never appear in the ``.sql``. The FAIRness I1-01
-    assessment compares documentation against that physical schema, so this
-    PR-time check treats injected columns as **required** documentation — not
-    merely tolerated — to stay aligned with I1-01 and stop CDC tables from
-    passing CI only to fail the assessment after deploy.
+    ``load_cdc_clean``) that never appear in the ``.sql``.
+
+    Debezium plumbing (``CDC_PLUMBING_OPTIONAL_IN_METADATA``) is **tolerated** in
+    metadata but **not required**, matching FAIRness I1-01 which excludes those
+    names from the docs ↔ physical comparison. Other injected columns (DMS CDC)
+    remain required documentation.
 
     Returns:
         (missing_in_metadata, extra_in_metadata)
-        - ``missing_in_metadata``: physical columns (SQL output ∪ injected) not documented.
-        - ``extra_in_metadata``: documented columns that are neither in the SQL output nor injected.
+        - ``missing_in_metadata``: required physical columns not documented.
+        - ``extra_in_metadata``: documented columns that are neither in the SQL
+          output nor injected (optional plumbing still allowed).
     """
-    expected_columns = sql_columns | injected_columns
-    missing_in_metadata = expected_columns - metadata_columns
-    extra_in_metadata = metadata_columns - expected_columns
+    optional_injected = injected_columns & CDC_PLUMBING_OPTIONAL_IN_METADATA
+    required_physical = (sql_columns | injected_columns) - optional_injected
+    allowed_in_metadata = sql_columns | injected_columns
+    missing_in_metadata = required_physical - metadata_columns
+    extra_in_metadata = metadata_columns - allowed_in_metadata
     return missing_in_metadata, extra_in_metadata
 
 
@@ -396,9 +403,8 @@ def validate_lineage_consistency(sql_path: str, metadata_path: str) -> Dict:
             return result
 
         # Compare documentation against the physical schema (SQL output + any
-        # framework-injected columns, e.g. CDC op/timestamp columns). Injected
-        # columns are required documentation so this check stays aligned with the
-        # FAIRness I1-01 assessment (documentation ↔ physical schema).
+        # framework-injected columns). Debezium plumbing is optional in metadata
+        # (aligned with I1-01); other injected columns remain required.
         injected_columns = cdc_injected_columns_for_sql(sql_path)
         missing_in_metadata, extra_in_metadata = compare_columns(
             sql_columns, metadata_columns, injected_columns

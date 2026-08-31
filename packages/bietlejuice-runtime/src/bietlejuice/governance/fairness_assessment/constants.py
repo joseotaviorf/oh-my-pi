@@ -312,8 +312,17 @@ MVP_IMPLEMENTED_REQUIREMENT_IDS: FrozenSet[str] = frozenset(
 # F2-02: partition column names excluded from substantive description checks (lowercase)
 PARTITION_COLUMN_NAMES_LOWERCASE: FrozenSet[str] = frozenset({"year", "month", "day"})
 
+# Debezium CDC plumbing appended by ``load_cdc_clean.insert_columns_into_query``.
+# Excluded from F2-02 (description substance) and I1-01 (docs ↔ physical names) so
+# framework-injected columns cannot cap an otherwise-FAIR table at Tier 1.
+# Names are unique; do **not** add DMS ``op`` / ``event_timestamp`` here (collisions).
+# Keep in sync with ``CDC_CLEAN_INJECTED_COLUMNS`` in validate_lineage_consistency.py.
+CDC_PLUMBING_COLUMN_NAMES_LOWERCASE: FrozenSet[str] = frozenset(
+    {"op_cdc", "ts_cdc_transaction", "ts_database_transaction"}
+)
+
 # Bump when FAIR tiering requirement ID sets from governance change
-TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v14"
+TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v15"
 
 # ---------------------------------------------------------------------------
 # DataHub GraphQL: default endpoints by environment

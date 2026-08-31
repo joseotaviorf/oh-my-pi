@@ -13,6 +13,8 @@ Lake-side detail for **metadata agents** and engineers. Domains and product line
 
 Always parse **`checks_result_json`** from the latest `ts_assessed` per FQN. Do not fix from `classification` alone.
 
+Debezium CDC plumbing (`op_cdc`, `ts_cdc_transaction`, `ts_database_transaction`) is **excluded** from F2-02 and I1-01. Do not remediate those names to clear a tier; if I1-01 still fails, another physical column is undocumented.
+
 ## When to use lake vs offline CLI
 
 | Situation | Source |

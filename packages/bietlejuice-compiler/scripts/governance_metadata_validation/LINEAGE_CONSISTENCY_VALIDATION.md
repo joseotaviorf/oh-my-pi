@@ -34,20 +34,24 @@ the `.sql`. The CDC clean spark jobs append them to the SELECT at write time
 | `cdc` | `load_cdc_clean` | `op_cdc`, `ts_cdc_transaction`, `ts_database_transaction` |
 | `dms_cdc` | `load_dms_cdc_clean` | `op`, `event_timestamp` |
 
-These injected columns are **required documentation**: they must be listed under
-`columns:` in the clean metadata, exactly as the post-deploy FAIRness **I1-01**
-assessment (documentation ↔ `columns_metastore` snapshot) requires. Omitting
-them fails this check with:
+These injected columns are part of the **physical** table even though they
+never appear in the `.sql`.
+
+| Treatment | Columns | Lineage CI | FAIRness I1-01 / F2-02 |
+|---|---|---|---|
+| **Optional plumbing** | `cdc`: `op_cdc`, `ts_cdc_transaction`, `ts_database_transaction` | May be omitted or documented; documenting them is not “extra vs SQL” | Excluded from scoring so missing/weak docs cannot cap an otherwise-FAIR table |
+| **Required** | `dms_cdc`: `op`, `event_timestamp` | Must be listed under `columns:` | Still scored like any other column |
+
+Omitting required DMS columns fails this check with:
 
 ```
-Columns in SQL query but missing in metadata: ['op_cdc', 'ts_cdc_transaction', 'ts_database_transaction'] (includes framework-injected columns that are physically present but undocumented: [...])
+Columns in SQL query but missing in metadata: ['op', 'event_timestamp'] (includes framework-injected columns that are physically present but undocumented: [...])
 ```
 
-This keeps the PR-time check aligned with I1-01 and stops CDC tables from
-passing CI only to fail the FAIRness assessment after deploy. The injected sets
-live in `CDC_INJECTED_COLUMNS_BY_WORKFLOW_TYPE` in `validate_lineage_consistency.py`
+The injected sets live in `CDC_INJECTED_COLUMNS_BY_WORKFLOW_TYPE` in `validate_lineage_consistency.py`
 (kept in sync with the CDC spark jobs). If a new CDC spark job is added, wire its
-injected columns into that mapping.
+injected columns into that mapping. Debezium plumbing names must stay in sync with
+`CDC_PLUMBING_COLUMN_NAMES_LOWERCASE` in fairness assessment constants.
 
 ## Parsing Skip List
 

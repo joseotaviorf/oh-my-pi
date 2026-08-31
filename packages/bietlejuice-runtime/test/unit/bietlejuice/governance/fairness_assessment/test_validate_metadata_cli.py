@@ -133,6 +133,18 @@ def test_validate_metadata_file_skips_partition_columns_case_insensitive(
     assert ok, blocking
 
 
+def test_validate_metadata_file_skips_cdc_plumbing_columns(
+    good_metadata: Path,
+) -> None:
+    data = yaml.safe_load(good_metadata.read_text(encoding="utf-8"))
+    data["columns"]["op_cdc"] = {"description": "op cdc"}
+    data["columns"]["ts_cdc_transaction"] = {"description": "ts"}
+    data["columns"]["ts_database_transaction"] = {"description": "ts"}
+    good_metadata.write_text(yaml.dump(data), encoding="utf-8")
+    ok, blocking = validate_metadata_file(good_metadata)
+    assert ok, blocking
+
+
 def test_validate_metadata_file_fails_on_unreadable_yaml(tmp_path: Path) -> None:
     bad = tmp_path / "dags" / "g" / "metadata" / "clean" / "bad.yml"
     bad.parent.mkdir(parents=True)

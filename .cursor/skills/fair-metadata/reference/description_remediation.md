@@ -76,6 +76,7 @@ The bad version would read identically if you swapped in any other table name. T
 | Substantive words | ≥ 2 words not in table/column/database name vocabulary |
 | Name echo | Avoid descriptions that only repeat identifier tokens |
 | Partitions | `year`, `month`, `day` excluded from F2-02 column checks |
+| CDC plumbing | `op_cdc`, `ts_cdc_transaction`, `ts_database_transaction` excluded from F2-02 and I1-01 |
 
 ## Research before writing (in order)
 

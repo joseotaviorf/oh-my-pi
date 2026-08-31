@@ -55,7 +55,7 @@ Woodpecker **`validate-fair-metadata`** runs **F2-02** on **clean / core / enric
 
 **Authoring intent:** Descriptions must explain **business meaning** (what the value is, grain, units, caveats). Passing the heuristic alone is insufficient. Agents must not pad with platform boilerplate (e.g. “Persisted in the governance lake for lineage, documentation metrics, and FAIR assessments”). Research `docs/llm_context/domain_entities/` when relevant, then SQL/spark jobs and Trino samples; if still unclear, **ask the user** — see `fair-metadata/reference/description_remediation.md`.
 
-Every **non-partition** column in `columns:` needs a `description` that passes TDQ heuristics (stricter than Yamale min 10 chars). Partition columns `year`, `month`, `day` and skeleton `_placeholder` are excluded.
+Every **non-partition** column in `columns:` needs a `description` that passes TDQ heuristics (stricter than Yamale min 10 chars). Excluded from F2-02: partition columns `year`, `month`, `day`; skeleton `_placeholder`; Debezium CDC plumbing `op_cdc`, `ts_cdc_transaction`, `ts_database_transaction`.
 
 ### Raw layer
 
@@ -81,6 +81,7 @@ For enrich/dw, lineage keys must also match real sources (same script).
 
 - New tables: pass F2-01/F2-02 + lineage-consistency in the PR; confirm I1-01 after deploy and the next fairness assessment run (~1 day after `documentation_metrics`).
 - Failure reasons: `undocumented_columns`, `documented_not_in_physical`, `spark_schema_not_in_columns_metastore_snapshot`, `i1_01_not_assessed`.
+- **CDC plumbing excluded:** `op_cdc`, `ts_cdc_transaction`, `ts_database_transaction` are ignored in the docs ↔ physical comparison (same names as F2-02). Missing or weak docs on those columns must not fail I1-01. Other undocumented physical columns still fail.
 
 ## Commands (typical PR)
 

@@ -13,6 +13,7 @@ from bietlejuice.governance.fairness_assessment.checks.interoperable.i1_01_docum
     check_i1_01_documented_physical_fields,
 )
 from bietlejuice.governance.fairness_assessment.constants import (
+    CDC_PLUMBING_COLUMN_NAMES_LOWERCASE,
     DOCUMENTED_NOT_IN_PHYSICAL_REASON,
     SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON,
 )
@@ -213,6 +214,111 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
         self.assertTrue(f2.passed)
         self.assertEqual(f2_json, "{}")
         self.assertTrue(cols_sub)
+
+    def test_i1_passes_when_only_cdc_plumbing_is_undocumented(self):
+        long = "Identifier column used in joins; stable surrogate key for the business entity in this table."
+        f2, i1, _f2_json, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+            "a",
+            "b",
+            {"id": long},
+            spark_table_exists=True,
+            physical_field_names_lower=frozenset(
+                {
+                    "id",
+                    "op_cdc",
+                    "ts_cdc_transaction",
+                    "ts_database_transaction",
+                }
+            ),
+        )
+        self.assertTrue(cols_sub)
+        self.assertTrue(f2.passed)
+        self.assertTrue(i1.passed)
+        d = json.loads(i1_json)
+        self.assertEqual(d["undocumented_columns"], [])
+        self.assertEqual(d["documented_not_in_physical"], [])
+
+    def test_f2_ignores_weak_cdc_plumbing_descriptions(self):
+        long = "Identifier column used in joins; stable surrogate key for the business entity in this table."
+        f2, i1, f2_json, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+            "a",
+            "b",
+            {
+                "id": long,
+                "op_cdc": "op cdc",
+                "ts_cdc_transaction": "ts",
+                "ts_database_transaction": "ts database transaction",
+            },
+            spark_table_exists=True,
+            physical_field_names_lower=frozenset(
+                {
+                    "id",
+                    "op_cdc",
+                    "ts_cdc_transaction",
+                    "ts_database_transaction",
+                }
+            ),
+        )
+        self.assertTrue(cols_sub)
+        self.assertTrue(f2.passed)
+        self.assertEqual(f2_json, "{}")
+        self.assertTrue(i1.passed)
+        d = json.loads(i1_json)
+        self.assertEqual(d["undocumented_columns"], [])
+
+    def test_i1_still_fails_when_business_columns_undocumented_alongside_cdc(self):
+        long = "Identifier column used in joins; stable surrogate key for the business entity in this table."
+        f2, i1, _f2_json, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+            "a",
+            "b",
+            {"id": long},
+            spark_table_exists=True,
+            physical_field_names_lower=frozenset(
+                {"id", "status", "op_cdc", "ts_cdc_transaction"}
+            ),
+        )
+        self.assertTrue(cols_sub)
+        self.assertTrue(f2.passed)
+        self.assertFalse(i1.passed)
+        self.assertEqual(i1.reason, "undocumented_columns")
+        d = json.loads(i1_json)
+        self.assertEqual(d["undocumented_columns"], ["status"])
+        self.assertNotIn("op_cdc", d["undocumented_columns"])
+        self.assertNotIn("ts_cdc_transaction", d["undocumented_columns"])
+
+    def test_dashboard_cdc_only_i1_failures_pass_after_plumbing_skip(self):
+        """Growth CDC clean tables stuck at Tier 1 solely by undocumented plumbing."""
+        long = (
+            "Business column documented for catalog consumers; used in joins and "
+            "downstream identity or demand workflows."
+        )
+        cases = (
+            (
+                "datalake_demand_contact_submission_clean",
+                "contact_submissions",
+                ("id_contact_submission", "id_user", "year", "month", "day"),
+            ),
+            (
+                "datalake_person_clean",
+                "person",
+                ("id", "uuid_person", "year", "month", "day"),
+            ),
+        )
+        for database_name, table_name, documented in cases:
+            with self.subTest(fqn=f"{database_name}.{table_name}"):
+                docs = {col: long for col in documented}
+                physical = frozenset(documented) | CDC_PLUMBING_COLUMN_NAMES_LOWERCASE
+                f2, i1, _f2_json, i1_json, _cols_sub = compute_f2_02_and_i1_01_for_fqn(
+                    database_name,
+                    table_name,
+                    docs,
+                    spark_table_exists=True,
+                    physical_field_names_lower=physical,
+                )
+                self.assertTrue(f2.passed)
+                self.assertTrue(i1.passed)
+                d = json.loads(i1_json)
+                self.assertEqual(d["undocumented_columns"], [])
 
     def test_f2_lists_all_insufficient_business_columns(self):
         long = "Identifier column used in joins; stable surrogate key for the business entity in this table."

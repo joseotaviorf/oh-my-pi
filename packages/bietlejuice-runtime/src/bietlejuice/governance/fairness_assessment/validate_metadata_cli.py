@@ -36,6 +36,7 @@ import yaml
 
 from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from bietlejuice.governance.fairness_assessment.constants import (
+    CDC_PLUMBING_COLUMN_NAMES_LOWERCASE,
     PARTITION_COLUMN_NAMES_LOWERCASE,
 )
 from bietlejuice.governance.fairness_assessment.description_quality import (
@@ -44,6 +45,7 @@ from bietlejuice.governance.fairness_assessment.description_quality import (
 )
 
 PARTITION_COLUMNS = PARTITION_COLUMN_NAMES_LOWERCASE
+CDC_PLUMBING_COLUMNS = CDC_PLUMBING_COLUMN_NAMES_LOWERCASE
 PLACEHOLDER_COLUMNS = frozenset({"_placeholder"})
 UPSERT_STATUS = frozenset({"M", "A"})
 METADATA_PATH_RE = re.compile(r"dags/.+/metadata/[^/]+/[^/]+\.yml$")
@@ -292,7 +294,11 @@ def validate_metadata_file(path: Path) -> Tuple[bool, List[str]]:
 
     insufficient: List[str] = []
     for col_name, col_meta in columns.items():
-        if col_name.lower() in PARTITION_COLUMNS or col_name in PLACEHOLDER_COLUMNS:
+        if (
+            col_name.lower() in PARTITION_COLUMNS
+            or col_name.lower() in CDC_PLUMBING_COLUMNS
+            or col_name in PLACEHOLDER_COLUMNS
+        ):
             continue
         if not isinstance(col_meta, dict):
             blocking.append(f"{path}: column {col_name!r} must be a mapping (dict)")

@@ -47,8 +47,7 @@ def test_documented_column_not_in_physical_schema_is_extra():
 
 
 def test_cdc_injected_columns_documented_passes():
-    # Injected columns are part of the physical schema; documenting them must
-    # not be flagged as "missing in SQL" (they legitimately are not in the .sql).
+    # Injected Debezium columns may be documented; that must not be flagged as extra.
     missing, extra = compare_columns(
         sql_columns={"id", "name"},
         metadata_columns={"id", "name"} | CDC,
@@ -58,27 +57,25 @@ def test_cdc_injected_columns_documented_passes():
     assert extra == set()
 
 
-def test_cdc_injected_columns_undocumented_is_now_required():
-    # The core alignment fix: CDC columns are physically present, so leaving them
-    # out of the metadata must fail (previously they were only tolerated, never
-    # required — which let tables pass CI and then fail FAIRness I1-01).
+def test_cdc_plumbing_columns_undocumented_are_optional():
+    # I1-01 no longer scores Debezium plumbing, so lineage must not require them.
     missing, extra = compare_columns(
         sql_columns={"id", "name"},
         metadata_columns={"id", "name"},
         injected_columns=CDC,
     )
-    assert missing == CDC
+    assert missing == set()
     assert extra == set()
 
 
-def test_cdc_injected_columns_partially_documented_flags_only_the_gap():
+def test_cdc_injected_columns_partially_documented_does_not_require_the_rest():
     documented_subset = {"op_cdc"}
     missing, extra = compare_columns(
         sql_columns={"id"},
         metadata_columns={"id"} | documented_subset,
         injected_columns=CDC,
     )
-    assert missing == CDC - documented_subset
+    assert missing == set()
     assert extra == set()
 
 
@@ -88,7 +85,7 @@ def test_extra_and_missing_reported_together():
         metadata_columns={"id", "removed_col"},
         injected_columns=CDC,
     )
-    assert missing == {"email"} | CDC
+    assert missing == {"email"}
     assert extra == {"removed_col"}
 
 
