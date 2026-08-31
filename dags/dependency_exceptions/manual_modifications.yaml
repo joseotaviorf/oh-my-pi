@@ -1098,6 +1098,13 @@ bietlejuice.reverse_reports:
     - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
   remove:
     - bietlejuice.gsheets_people_static:load-clean-mapping-wb-to-gh:first-run-of-day
+    # dw_time sensors block the whole export DAG when dw_time is late; absence/hours-bank
+    # tabs tolerate previous-day data, so run without waiting for dw_time.
+    - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
+    - bietlejuice.dw_time:load-dw-time-dim-hours-bank-rule:first-run-of-day
+    - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
+    - bietlejuice.dw_time:load-dw-time-fact-hours-bank-rule-totals:first-run-of-day
+    - bietlejuice.dw_time:load-dw-time-fact-vacation-balances:first-run-of-day
 bietlejuice.reverse_anonymization:
   remove:
     - bietlejuice.astro:load-clean-dag:first-run-of-day
