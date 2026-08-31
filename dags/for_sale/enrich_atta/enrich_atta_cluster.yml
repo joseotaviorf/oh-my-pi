@@ -1,5 +1,11 @@
 cluster:
-  type: consolidation_s_general_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
   custom_configurations:
-    driver_node_type_id: r7g.large
+    aws_attributes:
+      ebs_volume_size: 32
+    spark_conf:
+      spark.driver.memory: 10g
+      spark.driver.memoryOverhead: 2g
+      spark.executor.memory: 12g
+      spark.executor.memoryOverhead: 2g
+      spark.executor.cores: "2"

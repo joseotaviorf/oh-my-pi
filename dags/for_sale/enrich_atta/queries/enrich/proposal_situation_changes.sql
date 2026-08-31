@@ -18,16 +18,16 @@ WITH log_union AS (
             't2' as origin_table,
             id,
             CAST(id_proposal AS INTEGER) AS id_proposal,
-            CAST(GET_JSON_OBJECT(to, '$.Status') AS INTEGER) AS id_current_status,
-            CAST(GET_JSON_OBJECT(from, '$.Situacao') AS INTEGER) AS id_previous_proposal_situation,
-            CAST(GET_JSON_OBJECT(to, '$.Situacao') AS INTEGER) AS id_current_proposal_situation,
+            CAST(GET_JSON_OBJECT(`to`, '$.Status') AS INTEGER) AS id_current_status,
+            CAST(GET_JSON_OBJECT(`from`, '$.Situacao') AS INTEGER) AS id_previous_proposal_situation,
+            CAST(GET_JSON_OBJECT(`to`, '$.Situacao') AS INTEGER) AS id_current_proposal_situation,
             LAG(ts_created) over(partition by id_proposal order by ts_created) AS ts_previous_log,
             ts_created AS ts_current_log
         FROM
             datalake_atta_clean.log_isolve_v2
         WHERE
-            GET_JSON_OBJECT(to, '$.Status') IS NOT NULL
-            AND CAST(GET_JSON_OBJECT(from, '$.Situacao') AS INTEGER) IS NOT NULL
+            GET_JSON_OBJECT(`to`, '$.Status') IS NOT NULL
+            AND CAST(GET_JSON_OBJECT(`from`, '$.Situacao') AS INTEGER) IS NOT NULL
             AND type_operation = 'Proposta'
     )
     ),
@@ -137,10 +137,10 @@ SELECT
   proposal_status,
   situation_history,
   next_situation,
-  DATEDIFF(MINUTE,ts_start_situation,ts_end_situation) AS lead_time_situation_in_minutes,
-  DATEDIFF(HOUR,ts_start_situation,ts_end_situation) AS lead_time_situation_in_hour,
-  DATEDIFF(DAY,ts_start_situation,ts_end_situation) AS lead_time_situation_in_day,
-  DATEDIFF(DAY, date_trunc('day', min_ts_step),COALESCE(date_trunc('day',  max_ts_step),current_date)) AS lead_time_status_in_day,
+  TIMESTAMPDIFF(MINUTE, ts_start_situation, ts_end_situation) AS lead_time_situation_in_minutes,
+  TIMESTAMPDIFF(HOUR, ts_start_situation, ts_end_situation) AS lead_time_situation_in_hour,
+  DATEDIFF(ts_end_situation, ts_start_situation) AS lead_time_situation_in_day,
+  DATEDIFF(COALESCE(date_trunc('day', max_ts_step), current_date), date_trunc('day', min_ts_step)) AS lead_time_status_in_day,
   ts_proposal_registration,
   ts_start_situation,
   ts_end_situation
@@ -154,21 +154,61 @@ SELECT
   proposal_status,
   last_situation as situation_history,
   NULL AS next_situation,
-  DATEDIFF(MINUTE,ts_end_situation,current_date) AS lead_time_situation_in_minutes,
-  DATEDIFF(HOUR,ts_end_situation,current_date) AS lead_time_situation_in_hour,
-  DATEDIFF(DAY,ts_end_situation,current_date) AS lead_time_situation_in_day,
-  DATEDIFF(DAY, date_trunc('day', min_ts_step),COALESCE(date_trunc('day',  max_ts_step),current_date)) AS lead_time_status_in_day,
+  TIMESTAMPDIFF(MINUTE, ts_end_situation, current_date) AS lead_time_situation_in_minutes,
+  TIMESTAMPDIFF(HOUR, ts_end_situation, current_date) AS lead_time_situation_in_hour,
+  DATEDIFF(current_date, ts_end_situation) AS lead_time_situation_in_day,
+  DATEDIFF(COALESCE(date_trunc('day', max_ts_step), current_date), date_trunc('day', min_ts_step)) AS lead_time_status_in_day,
   ts_proposal_registration,
   ts_end_situation AS ts_start_situation,
   NULL AS ts_end_situation
 FROM aux
 WHERE is_last_situation = TRUE
 ),
-union_all (
-SELECT * FROM not_last_situation
+union_all AS (
+SELECT
+  id_proposal,
+  id_partner,
+  proposal_order,
+  proposal_status,
+  situation_history,
+  next_situation,
+  lead_time_situation_in_minutes,
+  lead_time_situation_in_hour,
+  lead_time_situation_in_day,
+  lead_time_status_in_day,
+  ts_proposal_registration,
+  ts_start_situation,
+  ts_end_situation
+FROM not_last_situation
 UNION ALL
-SELECT * FROM adj_last_situation
+SELECT
+  id_proposal,
+  id_partner,
+  proposal_order,
+  proposal_status,
+  situation_history,
+  next_situation,
+  lead_time_situation_in_minutes,
+  lead_time_situation_in_hour,
+  lead_time_situation_in_day,
+  lead_time_status_in_day,
+  ts_proposal_registration,
+  ts_start_situation,
+  ts_end_situation
+FROM adj_last_situation
 )
 SELECT
-*
+  id_proposal,
+  id_partner,
+  proposal_order,
+  proposal_status,
+  situation_history,
+  next_situation,
+  lead_time_situation_in_minutes,
+  lead_time_situation_in_hour,
+  lead_time_situation_in_day,
+  lead_time_status_in_day,
+  ts_proposal_registration,
+  ts_start_situation,
+  ts_end_situation
 FROM union_all

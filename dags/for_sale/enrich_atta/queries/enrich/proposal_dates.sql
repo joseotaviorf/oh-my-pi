@@ -52,12 +52,6 @@ log_classified AS (
         datalake_atta_clean.track_step_detail AS pre
             ON pre.decision_number = log.id_current_status
             AND pre.id_product = pp.id_product
-
-
-    ORDER BY
-        log.id_proposal DESC,
-        log.ts_current_log,
-        log.id
 )
 SELECT
     id_proposal,
