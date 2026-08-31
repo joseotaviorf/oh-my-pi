@@ -158,29 +158,59 @@ ajusted_house AS (
 ),
 sale_listing_status AS (
     SELECT
-        *
+        id_house,
+        id_region,
+        ts_first_publication,
+        ts_status_started
     FROM
         datalake_sale_listings.sale_listing_status
     WHERE
-        status_history = "PUBLISHED"
+        status_history = 'PUBLISHED'
+),
+-- Equi-join only: a BETWEEN in ON is planned as BroadcastNestedLoopJoin on EMR
+-- Spark 3.5 (the Databricks RANGE_JOIN hint is ignored). In-range listing is
+-- selected with a window; out-of-range rows sort last so a house with no
+-- published status in the seller tenure still emits one row with NULL listing.
+house_listing_candidates AS (
+    SELECT
+        h.id_house,
+        h.id_user AS id_seller,
+        h.id_region,
+        h.ts_first_day_as_seller,
+        h.ts_last_day_as_seller,
+        sls.ts_first_publication,
+        sls.ts_status_started
+    FROM
+        ajusted_house AS h
+    LEFT JOIN
+        sale_listing_status AS sls
+            ON sls.id_house = h.id_house
+            AND sls.id_region = h.id_region
 ),
 house_info AS (
     WITH house_info_ranked AS (
         SELECT
-            h.id_house AS id_house,
-            h.id_user AS id_seller,
-            h.id_region,
+            id_house,
+            id_seller,
+            id_region,
             ts_first_day_as_seller,
             ts_last_day_as_seller,
-            sls.ts_first_publication AS ts_first_listing,
-            ROW_NUMBER() OVER (PARTITION BY h.id_house, h.id_user ORDER BY sls.ts_status_started ASC) AS rn
+            CASE
+                WHEN ts_status_started >= ts_first_day_as_seller
+                    AND ts_status_started <= ts_last_day_as_seller
+                    THEN ts_first_publication
+            END AS ts_first_listing,
+            ROW_NUMBER() OVER (
+                PARTITION BY id_house, id_seller
+                ORDER BY
+                    CASE
+                        WHEN ts_status_started >= ts_first_day_as_seller
+                            AND ts_status_started <= ts_last_day_as_seller
+                            THEN ts_status_started
+                    END ASC NULLS LAST
+            ) AS rn
         FROM
-            ajusted_house AS h
-        LEFT JOIN
-            sale_listing_status AS sls
-                ON sls.id_house = h.id_house
-                AND sls.id_region = h.id_region
-                AND sls.ts_status_started BETWEEN ts_first_day_as_seller AND ts_last_day_as_seller
+            house_listing_candidates
     )
     SELECT
         id_house,
@@ -194,38 +224,90 @@ house_info AS (
     WHERE
         rn = 1
 ),
+-- UNION of keys + LEFT JOIN is the OSS equivalent of the 3-way FULL OUTER JOIN
+-- on COALESCE(...), which Spark cannot hash-join (no single-table equi key).
+sale_flow_keys AS (
+    SELECT
+        id_sale_flow
+    FROM
+        sale_booking
+    UNION
+    SELECT
+        id_sale_flow
+    FROM
+        sale_offer
+    UNION
+    SELECT
+        id_sale_flow
+    FROM
+        sale_talk_to_agent
+),
 sale_flows AS (
-SELECT
-    COALESCE(b.id_sale_flow, o.id_sale_flow, tta.id_sale_flow) AS id_sale_flow,
-    CAST(COALESCE(b.id_buyer, o.id_buyer, tta.id_buyer) AS BIGINT) AS id_buyer,
-    CAST(COALESCE(b.id_house, o.id_house, tta.id_house) AS BIGINT)  AS id_house,
-    CASE
-        WHEN LEAST(b.ts_first_booking_created,o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) = b.ts_first_booking_created
-            THEN 'booking'
-        WHEN LEAST(b.ts_first_booking_created,o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) = o.ts_first_offer_submitted
-            THEN 'offer'
-        WHEN LEAST(b.ts_first_booking_created,o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) = tta.ts_first_tta_message_sent
-            THEN 'talk_to_agent'
-        ELSE null
-    END AS first_event,
-    LEAST(b.ts_first_booking_created,o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) AS ts_first_event,
-    ROW_NUMBER() OVER (PARTITION BY COALESCE(b.id_buyer, o.id_buyer, tta.id_buyer) ORDER BY LEAST(b.ts_first_booking_created,o.ts_first_offer_submitted, tta.ts_first_tta_message_sent)) AS rank_buyer_sale_flow,
-    ROW_NUMBER() OVER (PARTITION BY COALESCE(b.id_house, o.id_house, tta.id_house) ORDER BY LEAST(b.ts_first_booking_created,o.ts_first_offer_submitted, tta.ts_first_tta_message_sent)) AS rank_house_sale_flow
-FROM
-    sale_booking AS b
-FULL OUTER JOIN
-    sale_offer AS o
-    ON b.id_sale_flow = o.id_sale_flow
-FULL OUTER JOIN
-    sale_talk_to_agent AS tta
-    ON COALESCE(b.id_sale_flow, o.id_sale_flow) = tta.id_sale_flow
+    SELECT
+        keys.id_sale_flow,
+        CAST(COALESCE(b.id_buyer, o.id_buyer, tta.id_buyer) AS BIGINT) AS id_buyer,
+        CAST(COALESCE(b.id_house, o.id_house, tta.id_house) AS BIGINT) AS id_house,
+        CASE
+            WHEN LEAST(b.ts_first_booking_created, o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) = b.ts_first_booking_created
+                THEN 'booking'
+            WHEN LEAST(b.ts_first_booking_created, o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) = o.ts_first_offer_submitted
+                THEN 'offer'
+            WHEN LEAST(b.ts_first_booking_created, o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) = tta.ts_first_tta_message_sent
+                THEN 'talk_to_agent'
+            ELSE NULL
+        END AS first_event,
+        LEAST(b.ts_first_booking_created, o.ts_first_offer_submitted, tta.ts_first_tta_message_sent) AS ts_first_event,
+        ROW_NUMBER() OVER (
+            PARTITION BY COALESCE(b.id_buyer, o.id_buyer, tta.id_buyer)
+            ORDER BY LEAST(b.ts_first_booking_created, o.ts_first_offer_submitted, tta.ts_first_tta_message_sent)
+        ) AS rank_buyer_sale_flow,
+        ROW_NUMBER() OVER (
+            PARTITION BY COALESCE(b.id_house, o.id_house, tta.id_house)
+            ORDER BY LEAST(b.ts_first_booking_created, o.ts_first_offer_submitted, tta.ts_first_tta_message_sent)
+        ) AS rank_house_sale_flow
+    FROM
+        sale_flow_keys AS keys
+    LEFT JOIN
+        sale_booking AS b
+            ON keys.id_sale_flow = b.id_sale_flow
+    LEFT JOIN
+        sale_offer AS o
+            ON keys.id_sale_flow = o.id_sale_flow
+    LEFT JOIN
+        sale_talk_to_agent AS tta
+            ON keys.id_sale_flow = tta.id_sale_flow
+),
+-- Hash-join on id_house, then residual tenure filter. Equivalent to the old
+-- LEFT JOIN ... BETWEEN because WHERE id_buyer != id_seller already dropped
+-- unmatched house_info rows (NULL inequality is unknown).
+sale_flow_with_house AS (
+    SELECT
+        sf.id_sale_flow,
+        sf.id_buyer,
+        sf.id_house,
+        hi.id_seller,
+        hi.id_region,
+        sf.first_event,
+        sf.ts_first_event,
+        sf.rank_buyer_sale_flow,
+        sf.rank_house_sale_flow,
+        hi.ts_first_listing
+    FROM
+        sale_flows AS sf
+    INNER JOIN
+        house_info AS hi
+            ON hi.id_house = sf.id_house
+    WHERE
+        sf.ts_first_event >= hi.ts_first_day_as_seller
+        AND sf.ts_first_event <= hi.ts_last_day_as_seller
+        AND sf.id_buyer != hi.id_seller
 )
-SELECT/*RANGE_JOIN(hi, 1000)*/
+SELECT
     sf.id_sale_flow,
     sf.id_buyer,
     sf.id_house,
-    hi.id_seller,
-    hi.id_region,
+    sf.id_seller,
+    sf.id_region,
     sf.first_event,
     -- gets the higher intent before the offer submission (VC > VB > TTA > DO)
     CASE
@@ -286,13 +368,13 @@ SELECT/*RANGE_JOIN(hi, 1000)*/
     COALESCE(b.nbr_visits_completed,0) AS visits_completed,
     COALESCE(o.nbr_offers_submitted,0) AS offers_submitted,
     COALESCE(tta.nbr_tta_messages,0) AS tta_messages_sent,
-    DATEDIFF(sf.ts_first_event, hi.ts_first_listing) AS days_first_publication_to_first_event,
-    DATEDIFF(b.ts_first_booking_created, hi.ts_first_listing) AS days_first_publication_to_first_booking_created,
-    DATEDIFF(b.ts_first_visit_completed, hi.ts_first_listing) AS days_first_publication_to_first_visit_completed,
-    DATEDIFF(o.ts_first_offer_submitted, hi.ts_first_listing) AS days_first_publication_to_first_offer_submitted,
-    DATEDIFF(o.dt_first_offer_accepted, hi.ts_first_listing) AS days_first_publication_to_first_offer_accepted,
-    DATEDIFF(o.dt_sale_agreement_signed, hi.ts_first_listing) AS days_first_publication_to_sale_agreement_signed,
-    DATEDIFF(o.dt_house_registry_ended, hi.ts_first_listing) AS days_first_publication_to_house_registry_ended,
+    DATEDIFF(sf.ts_first_event, sf.ts_first_listing) AS days_first_publication_to_first_event,
+    DATEDIFF(b.ts_first_booking_created, sf.ts_first_listing) AS days_first_publication_to_first_booking_created,
+    DATEDIFF(b.ts_first_visit_completed, sf.ts_first_listing) AS days_first_publication_to_first_visit_completed,
+    DATEDIFF(o.ts_first_offer_submitted, sf.ts_first_listing) AS days_first_publication_to_first_offer_submitted,
+    DATEDIFF(o.dt_first_offer_accepted, sf.ts_first_listing) AS days_first_publication_to_first_offer_accepted,
+    DATEDIFF(o.dt_sale_agreement_signed, sf.ts_first_listing) AS days_first_publication_to_sale_agreement_signed,
+    DATEDIFF(o.dt_house_registry_ended, sf.ts_first_listing) AS days_first_publication_to_house_registry_ended,
     DATEDIFF(b.ts_first_visit_completed, sf.ts_first_event) AS days_first_event_to_first_visit_completed,
     DATEDIFF(o.ts_first_offer_submitted, sf.ts_first_event) AS days_first_event_to_first_offer_submitted,
     DATEDIFF(o.dt_first_offer_accepted, sf.ts_first_event) AS days_first_event_to_first_offer_accepted,
@@ -311,7 +393,7 @@ SELECT/*RANGE_JOIN(hi, 1000)*/
     DATEDIFF(o.dt_sale_agreement_signed, o.ts_first_offer_submitted) AS days_first_offer_submitted_to_sale_agreement_signed,
     DATEDIFF(o.dt_sale_agreement_signed, o.dt_first_offer_accepted) AS days_first_offer_accepted_to_sale_agreement_signed,
     DATEDIFF(o.dt_house_registry_ended, o.ts_first_offer_submitted) AS days_first_offer_submitted_to_house_registry_ended,
-    hi.ts_first_listing,
+    sf.ts_first_listing,
     sf.ts_first_event,
     tta.ts_first_tta_message_sent,
     b.ts_first_booking_created,
@@ -324,11 +406,7 @@ SELECT/*RANGE_JOIN(hi, 1000)*/
     o.dt_sale_agreement_cancelled,
     o.dt_house_registry_ended
 FROM
-    sale_flows AS sf
-LEFT JOIN
-    house_info AS hi
-        ON hi.id_house = sf.id_house
-        AND sf.ts_first_event BETWEEN hi.ts_first_day_as_seller AND hi.ts_last_day_as_seller
+    sale_flow_with_house AS sf
 LEFT JOIN
     sale_booking AS b
         ON b.id_sale_flow = sf.id_sale_flow
@@ -338,5 +416,3 @@ LEFT JOIN
 LEFT JOIN
     sale_talk_to_agent AS tta
         ON tta.id_sale_flow = sf.id_sale_flow
-WHERE
-    sf.id_buyer != hi.id_seller

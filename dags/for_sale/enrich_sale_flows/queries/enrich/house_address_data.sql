@@ -1,20 +1,33 @@
-WITH house AS (
-    SELECT DISTINCT
+WITH house_ranked AS (
+    SELECT
         h.id,
         h.id_address_data,
         h.has_seller_debt_payments,
         h.house_registration_status,
         h.land_tenure,
         h.ts_created AS ts_house_created,
-        h.ts_updated AS ts_last_house_updated
+        h.ts_updated AS ts_last_house_updated,
+        h.ts_updated = MAX(h.ts_updated) OVER(PARTITION BY h.id) AS is_last_house_update
     FROM
         datalake_sales_flow_clean.house AS h
     WHERE
         h.year <= {year}
         AND h.month <= {month}
         AND h.day <= {day}
-    QUALIFY
-        h.ts_updated = MAX(h.ts_updated) OVER(PARTITION BY h.id)
+),
+house AS (
+    SELECT DISTINCT
+        id,
+        id_address_data,
+        has_seller_debt_payments,
+        house_registration_status,
+        land_tenure,
+        ts_house_created,
+        ts_last_house_updated
+    FROM
+        house_ranked
+    WHERE
+        is_last_house_update
 )
 SELECT DISTINCT
     h.id AS id_house,
