@@ -23,27 +23,43 @@ sap_entity AS (
 ),
 sap_gateway AS (
     SELECT
-        f.id_finance_entity,
-        s.id_feature,
-        s.hash,
-        s.type,
-        s.status as sync_sap_job_status,
-        w.status as sap_send_status,
-        w.webhook_status as sap_processed_status,
-        w.errors AS webhook_error
-    FROM
-        datalake_sap_gateway_clean.feature f
-    LEFT JOIN
-        datalake_sap_gateway_clean.sync_sap_job s
-          ON f.id_feature = s.id_feature
-    LEFT JOIN
-        datalake_sap_gateway_clean.webhook_log w
-          ON s.idoc = w.idoc
-    WHERE
-        s.erp_solution IN ('S4')
-        AND s.type IN ('LCM')
-        AND s.status NOT IN ('ignore', 'ignored')
-        AND DATE(f.ts_created) >= DATE('2025-01-01')
+        id_finance_entity,
+        id_feature,
+        hash,
+        type,
+        sync_sap_job_status,
+        sap_send_status,
+        sap_processed_status,
+        webhook_error
+    FROM (
+        SELECT
+            f.id_finance_entity,
+            s.id_feature,
+            s.hash,
+            s.type,
+            s.status AS sync_sap_job_status,
+            w.status AS sap_send_status,
+            w.webhook_status AS sap_processed_status,
+            w.errors AS webhook_error,
+            ROW_NUMBER() OVER (
+                PARTITION BY s.id_feature
+                ORDER BY s.ts_created DESC
+            ) AS rn
+        FROM
+            datalake_sap_gateway_clean.feature f
+        LEFT JOIN
+            datalake_sap_gateway_clean.sync_sap_job s
+                ON f.id_feature = s.id_feature
+        LEFT JOIN
+            datalake_sap_gateway_clean.webhook_log w
+                ON s.idoc = w.idoc
+        WHERE
+            s.erp_solution IN ('S4')
+            AND s.type IN ('LCM')
+            AND s.status NOT IN ('ignore', 'ignored')
+            AND DATE(f.ts_created) >= DATE('2025-01-01')
+    )
+    WHERE rn = 1
 ),
 pre_francesinha AS (
     SELECT
@@ -441,21 +457,27 @@ df AS (
     LEFT JOIN
         trato_feito tf
             ON tf.our_number = cs.our_number
-    LEFT JOIN
-        seu_barriga_sap sbs_num
-            ON sbs_num.company_use = cs.our_number
-           AND sbs_num.month_paid = cs.month_paid
-    LEFT JOIN
-        seu_barriga_sap sbs_inv
-            ON sbs_inv.id_invoice = tf.id_invoice
-           AND sbs_num.id_invoice IS NULL
+            AND DATE_TRUNC('month', tf.dt_paid) = cs.month_paid
     LEFT JOIN
         sap s_num
             ON cs.our_number = s_num.our_number
     LEFT JOIN
         sap s_inv
             ON tf.id_invoice = s_inv.id_finance_entity
-           AND s_num.id_finance_entity IS NULL
+            AND s_num.id_finance_entity IS NULL
+    LEFT JOIN
+        seu_barriga_sap sbs_num
+            ON sbs_num.company_use = cs.our_number
+           AND sbs_num.month_paid = cs.month_paid
+    LEFT JOIN
+        seu_barriga_sap sbs_inv
+            ON sbs_inv.id_invoice = COALESCE(
+                tf.id_invoice,
+                s_num.id_finance_entity,
+                s_inv.id_finance_entity
+            )
+            AND sbs_inv.month_paid = cs.month_paid
+            AND sbs_num.id_invoice IS NULL
     WHERE
         cs.our_number IS NOT NULL
     AND
