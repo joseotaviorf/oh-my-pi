@@ -281,6 +281,12 @@ workflow:
         - "1rGC0c4Y_pbvq_M2OL0-78KgkMCkFAEhg8ul11b4gNDM"
         - "import_completa"
 
+    # Former notebook: ai_teva_update (Daily Pipeline).
+    teva_employee_roster:
+      extra_spark_job_arguments:
+        - "1zIF0bBTNYdW3ryUiySqZ6lNp4z7MTo_Nv8w_4IP0nWQ"
+        - "lista de funcionários"
+
     # --- reports_dw.py notebook migration (DBP-1333) ---
     # Former notebook view: base_de_para
     cost_center_mapping_pin:
