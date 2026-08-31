@@ -17,7 +17,7 @@ agent_lead_history AS (
         aud.rev,
         aud.status,
         LAG(aud.status) OVER (PARTITION BY aud.id ORDER BY aud.rev ASC) AS previous_status,
-        aud.business_context,
+        CASE WHEN DATE(ts_created) <= "2026-06-17" THEN "SALE" ELSE aud.business_context END as business_context, -- Only SALE existed before that date and the backfill was never made
         aud.origin,
         aud.ts_created AS valid_from,
         LEAD(aud.ts_created) OVER (PARTITION BY aud.id ORDER BY aud.rev ASC) AS valid_to
