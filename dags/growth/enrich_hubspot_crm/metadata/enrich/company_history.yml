@@ -27,6 +27,18 @@ columns:
     lineage:
       - datalake_hubspot_clean.company.properties
     description: ID of the HubSpot owner associated with the company.
+  id_account_manager_for_sale:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: >
+      HubSpot owner id of the For Sale Account Manager on this company revision, extracted from
+      company property account_manager__for_sale. Null when the property is empty on that snapshot.
+  id_account_manager_for_rent:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: >
+      HubSpot owner id of the For Rent Account Manager on this company revision, extracted from
+      company property account_manager__for_rent. Null when the property is empty on that snapshot.
   id_hubspot_team:
     lineage:
       - datalake_hubspot_clean.company.properties

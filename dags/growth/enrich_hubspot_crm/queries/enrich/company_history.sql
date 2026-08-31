@@ -1,6 +1,8 @@
 SELECT
     CAST(id_company AS BIGINT) AS id_company,
     CAST(GET_JSON_OBJECT(properties, '$.hubspot_owner_id') AS BIGINT) AS id_hubspot_owner,
+    CAST(GET_JSON_OBJECT(properties, '$.account_manager__for_sale') AS BIGINT) AS id_account_manager_for_sale,
+    CAST(GET_JSON_OBJECT(properties, '$.account_manager__for_rent') AS BIGINT) AS id_account_manager_for_rent,
     CAST(GET_JSON_OBJECT(properties, '$.hubspot_team_id') AS BIGINT) AS id_hubspot_team,
     CAST(GET_JSON_OBJECT(properties, '$.hs_parent_company_id') AS BIGINT) AS id_parent_company,
     TRANSFORM(

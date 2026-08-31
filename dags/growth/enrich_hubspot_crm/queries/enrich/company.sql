@@ -130,39 +130,86 @@ company_document AS (
     WHERE
         rn = 1
 ),
+-- Match HubSpot companies on document, CNPJ, or RFC as UNION of equi-joins
+-- (not OR in ON) so Spark can hash-join on EMR.
+company_hubspot_key_matches AS (
+    SELECT
+        cd.uuid_company,
+        cd.company_status,
+        ch.id_company,
+        ch.current_tag,
+        ch.is_currently_archived,
+        ch.current_sale_status,
+        ch.current_rent_status,
+        ch.ts_updated
+    FROM
+        company_document AS cd
+    INNER JOIN
+        hubspot_companies AS ch
+            ON cd.document = ch.document
+
+    UNION
+
+    SELECT
+        cd.uuid_company,
+        cd.company_status,
+        ch.id_company,
+        ch.current_tag,
+        ch.is_currently_archived,
+        ch.current_sale_status,
+        ch.current_rent_status,
+        ch.ts_updated
+    FROM
+        company_document AS cd
+    INNER JOIN
+        hubspot_companies AS ch
+            ON cd.cnpj = ch.cnpj
+
+    UNION
+
+    SELECT
+        cd.uuid_company,
+        cd.company_status,
+        ch.id_company,
+        ch.current_tag,
+        ch.is_currently_archived,
+        ch.current_sale_status,
+        ch.current_rent_status,
+        ch.ts_updated
+    FROM
+        company_document AS cd
+    INNER JOIN
+        hubspot_companies AS ch
+            ON cd.rfc = ch.rfc
+),
 -- Select the best match for each hubspot company.
 company_matches_candidates AS (
     SELECT
-        cd.uuid_company,
-        ch.id_company AS id_company_hubspot,
+        km.uuid_company,
+        km.id_company AS id_company_hubspot,
         mc.id_merged_company,
-        ch.current_tag,
-        ch.is_currently_archived,
+        km.current_tag,
+        km.is_currently_archived,
         (
-            ch.current_sale_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
-            OR ch.current_rent_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
+            km.current_sale_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
+            OR km.current_rent_status IN ('Membro', 'Parceiro', 'Em processo tombamento')
         ) AS is_current_hubspot_member,
-        ch.ts_updated AS ts_hubspot_updated,
+        km.ts_updated AS ts_hubspot_updated,
         ROW_NUMBER() OVER (
         PARTITION BY
-            ch.id_company
+            km.id_company
         ORDER BY
             lo.houses_currently_owned DESC, -- First, companies with houses
-            cd.company_status IS NOT DISTINCT FROM 'ACTIVE' DESC -- Then, active companies
+            km.company_status IS NOT DISTINCT FROM 'ACTIVE' DESC -- Then, active companies
         ) AS rn
     FROM
-        company_document AS cd
+        company_hubspot_key_matches AS km
     LEFT JOIN
         listing_ownership AS lo
-            ON lo.uuid_company = cd.uuid_company
-    JOIN
-        hubspot_companies AS ch
-            ON cd.document = ch.document
-            OR cd.cnpj = ch.cnpj
-            OR cd.rfc = ch.rfc
+            ON lo.uuid_company = km.uuid_company
     LEFT JOIN
         merged_companies AS mc
-            ON ch.id_company = mc.id_merged_company
+            ON km.id_company = mc.id_merged_company
 ),
 company_matches_aux AS (
     SELECT
@@ -210,6 +257,8 @@ deduped_companies AS (
         cm.uuid_company,
         cc.id_contact AS id_deciding_contact,
         ch.id_hubspot_owner,
+        ch.id_account_manager_for_sale,
+        ch.id_account_manager_for_rent,
         ch.id_hubspot_team,
         ch.id_parent_company,
         ch.ids_merged_companies,
@@ -371,6 +420,8 @@ SELECT
     uuid_company,
     id_deciding_contact,
     id_hubspot_owner,
+    id_account_manager_for_sale,
+    id_account_manager_for_rent,
     id_hubspot_team,
     id_parent_company,
     ids_merged_companies,

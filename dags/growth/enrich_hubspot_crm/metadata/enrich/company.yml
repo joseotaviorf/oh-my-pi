@@ -33,6 +33,18 @@ columns:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_owner
     description: ID of the HubSpot owner associated with the company.
+  id_account_manager_for_sale:
+    lineage:
+      - datalake_hubspot.company_history.id_account_manager_for_sale
+    description: >
+      HubSpot owner id of the For Sale Account Manager on the current company snapshot, passed
+      through from company_history. Null when HubSpot has not set account_manager__for_sale.
+  id_account_manager_for_rent:
+    lineage:
+      - datalake_hubspot.company_history.id_account_manager_for_rent
+    description: >
+      HubSpot owner id of the For Rent Account Manager on the current company snapshot, passed
+      through from company_history. Null when HubSpot has not set account_manager__for_rent.
   id_hubspot_team:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_team
