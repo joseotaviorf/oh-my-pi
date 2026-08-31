@@ -42,7 +42,7 @@ purchase_pricing AS (
                 AND lpe.similar_house_listing_status = "UNPUBLISHED"
                 AND lpe.is_same_owner IS TRUE
                 THEN 'not-eligible: Similar house was terminated, is unpublished and has not generated a relisting, but the owner is the same'
-            WHEN LOWER(clp.city_group) IN ('brasília', 'goiânia') AND clp.ts_first_listing >= '2026-09-01' and clp.ts_first_listing < '2026-10-01'
+            WHEN LOWER(clp.city_group) IN ('brasília', 'goiânia') AND clp.ts_first_listing >= '2026-09-01' and clp.ts_first_listing < '2026-11-01'
                 AND lpe.dt_similiar_house_contract_termination IS NOT NULL 
                 AND lpe.has_similiar_house_republication IS FALSE
                 AND lpe.similar_house_listing_status = "UNPUBLISHED"
