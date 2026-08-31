@@ -1,5 +1,5 @@
 WITH
-dw_last_proposal AS (
+dw_last_proposal_ranked AS (
     SELECT
         fpp.sk_pre_analysis,
         fpp.sk_offer,
@@ -8,18 +8,35 @@ dw_last_proposal AS (
         dp.credit_application_status AS credit_analysis_status,
         fpp.ts_max_credit_application_approval,
         fpp.is_most_advanced,
-        fpp.ts_last_updated
+        fpp.ts_last_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY fpp.sk_pre_analysis
+            ORDER BY fpp.sk_proposal_status DESC, fpp.ts_last_updated DESC
+        ) AS rn
     FROM
         dw_atta.fact_pre_analysis_proposal_flow AS fpp
     LEFT JOIN
         dw_atta.dim_proposal_atta AS dp
             ON fpp.sk_proposal = dp.sk_proposal
     WHERE
-      dp.sk_proposal > 0
-      AND fpp.is_most_advanced = 1
-      AND fpp.sk_offer != '-1'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY fpp.sk_pre_analysis ORDER BY fpp.sk_proposal_status DESC, fpp.ts_last_updated DESC) = 1
+        dp.sk_proposal > 0
+        AND fpp.is_most_advanced = 1
+        AND fpp.sk_offer != '-1'
+),
+dw_last_proposal AS (
+    SELECT
+        sk_pre_analysis,
+        sk_offer,
+        sk_proposal,
+        financing_value,
+        credit_analysis_status,
+        ts_max_credit_application_approval,
+        is_most_advanced,
+        ts_last_updated
+    FROM
+        dw_last_proposal_ranked
+    WHERE
+        rn = 1
 ),
 dim_financed_proposal AS (
     SELECT
@@ -88,14 +105,14 @@ SELECT
  fo.days_offer_accepted_to_sale_agreement_signed,
  fo.days_offer_submitted_to_offer_accepted,
  fo.days_offer_submitted_to_sale_agreement_signed,
- DATEDIFF(day, fo.ts_offer_submitted, ca.last_credit_approved_date) AS days_offer_submitted_to_credit_approved,
- DATEDIFF(day, fo.ts_offer_submitted, ca.last_credit_ended) AS days_offer_submitted_to_credit_ended,
- DATEDIFF(day, fo.ts_offer_submitted, ca.last_financing_ended) AS days_offer_submitted_to_financing_ended,
- DATEDIFF(day, ca.last_credit_ended, ca.last_financing_ended) AS days_credit_ended_to_financing_ended,
- DATEDIFF(day, ca.last_credit_approved_date, ca.last_financing_ended) AS days_credit_approved_to_financing_ended,
- DATEDIFF(day, fo.ts_sale_agreement_signed, ca.last_credit_approved_date) AS days_CCV_to_credit_approved,
- DATEDIFF(day, fo.ts_sale_agreement_signed, ca.last_credit_ended) AS days_CCV_to_credit_ended,
- DATEDIFF(day, fo.ts_sale_agreement_signed, ca.last_financing_ended) AS days_CCV_to_financing_ended,
+ DATEDIFF(ca.last_credit_approved_date, fo.ts_offer_submitted) AS days_offer_submitted_to_credit_approved,
+ DATEDIFF(ca.last_credit_ended, fo.ts_offer_submitted) AS days_offer_submitted_to_credit_ended,
+ DATEDIFF(ca.last_financing_ended, fo.ts_offer_submitted) AS days_offer_submitted_to_financing_ended,
+ DATEDIFF(ca.last_financing_ended, ca.last_credit_ended) AS days_credit_ended_to_financing_ended,
+ DATEDIFF(ca.last_financing_ended, ca.last_credit_approved_date) AS days_credit_approved_to_financing_ended,
+ DATEDIFF(ca.last_credit_approved_date, fo.ts_sale_agreement_signed) AS days_CCV_to_credit_approved,
+ DATEDIFF(ca.last_credit_ended, fo.ts_sale_agreement_signed) AS days_CCV_to_credit_ended,
+ DATEDIFF(ca.last_financing_ended, fo.ts_sale_agreement_signed) AS days_CCV_to_financing_ended,
  fo.ts_offer_submitted AS ts_offer_sumitted,
  fo.ts_offer_accepted AS ts_offer_accepted,
  fo.ts_sale_agreement_signed AS ts_ccv_signed,

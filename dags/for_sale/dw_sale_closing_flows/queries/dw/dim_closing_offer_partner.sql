@@ -1,4 +1,4 @@
-WITH dw_last_proposal AS (
+WITH dw_last_proposal_ranked AS (
     SELECT
         fpp.sk_pre_analysis,
         fpp.sk_offer,
@@ -13,7 +13,11 @@ WITH dw_last_proposal AS (
         dp.financing_value,
         dp.credit_application_status AS credit_analysis_status,
         fpp.ts_max_credit_application_approval,
-        fpp.ts_last_updated
+        fpp.ts_last_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY fpp.sk_pre_analysis
+            ORDER BY fpp.sk_proposal_status DESC, fpp.ts_last_updated DESC
+        ) AS rn
     FROM
         dw_atta.fact_pre_analysis_proposal_flow AS fpp
     LEFT JOIN
@@ -29,11 +33,30 @@ WITH dw_last_proposal AS (
         dw_atta.dim_consultant_atta AS ca
             ON fpp.sk_consultant = ca.sk_consultant
     WHERE
-      dp.sk_proposal > 0
-      AND fpp.is_most_advanced = 1
-      AND fpp.sk_offer != '-1'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY fpp.sk_pre_analysis ORDER BY fpp.sk_proposal_status DESC, fpp.ts_last_updated DESC) = 1
+        dp.sk_proposal > 0
+        AND fpp.is_most_advanced = 1
+        AND fpp.sk_offer != '-1'
+),
+dw_last_proposal AS (
+    SELECT
+        sk_pre_analysis,
+        sk_offer,
+        franchise_name,
+        partner_name,
+        consultant_name,
+        partner_type,
+        proposal_status,
+        proposal_situation,
+        sk_proposal,
+        financing_bank,
+        financing_value,
+        credit_analysis_status,
+        ts_max_credit_application_approval,
+        ts_last_updated
+    FROM
+        dw_last_proposal_ranked
+    WHERE
+        rn = 1
 ),
 dim_financed_proposal AS (
     SELECT
@@ -75,7 +98,21 @@ dim_financed_proposal AS (
     WHERE
         fpp.sk_proposal > 0
         AND fpp.sk_offer != '-1'
-    GROUP BY ALL
+    GROUP BY
+        fpp.sk_offer,
+        cd.sk_pre_analysis,
+        cd.franchise_name,
+        cd.partner_name,
+        cd.consultant_name,
+        cd.partner_type,
+        cd.credit_analysis_status,
+        cd.sk_proposal,
+        cd.proposal_status,
+        cd.proposal_situation,
+        cd.financing_bank,
+        cd.financing_value,
+        cd.ts_last_updated,
+        cd.ts_max_credit_application_approval
 )
 SELECT DISTINCT
     fo.sk_offer,
