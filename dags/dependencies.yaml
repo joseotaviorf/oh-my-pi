@@ -1662,7 +1662,6 @@ bietlejuice.enrich_big_agent_incentives:
   - bietlejuice.big_agent_fast_lane:load-clean-score-rule:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-tier:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-unresolved-earnings:first-run-of-day
-  - bietlejuice.ebdb_contract:load-clean-contract-partnership-data:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day

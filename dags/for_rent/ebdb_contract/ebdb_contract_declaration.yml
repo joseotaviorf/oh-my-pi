@@ -17,8 +17,6 @@ workflow:
       clean_table_name: contract_aud
     ContractNegotiation:
       clean_table_name: contract_negotiation
-    ContractPartnershipData:
-      clean_table_name: contract_partnership_data
     ContratoPessoa_AUD:
       clean_table_name: contract_person_aud
     ContratoPessoa:
