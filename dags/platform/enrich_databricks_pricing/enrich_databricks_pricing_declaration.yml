@@ -11,9 +11,10 @@ dag:
         - dim_dbu_price: USD/DBU by compute_type and validity window.
           Replaces the stale gsheet `databricks_contract_details` and the
           inline Superset CASE rates. Current rates encode the AWS Premium
-          pay-as-you-go list from 2026-07-01 (JOBS 0.15 / ALL_PURPOSE 0.55 /
-          SQL 0.17). Prior windows keep the Oct-2024 committed-use contract
-          (closed 2026-07-01) and the expired 2024-09-01 gsheet rates.
+          pay-as-you-go list from 2027-10-01 (JOBS 0.15 / ALL_PURPOSE 0.55 /
+          SQL 0.17). Prior windows keep the Oct-2026 $250k/12mo committed-use
+          contract (closed 2027-10-01), the Oct-2024 $1M/24mo committed-use
+          contract (closed 2026-10-01), and the expired 2024-09-01 gsheet rates.
 
       This table is a full-refresh static seed (no date partitions); the data
       lives in the query, so there is no upstream lake dependency. The price

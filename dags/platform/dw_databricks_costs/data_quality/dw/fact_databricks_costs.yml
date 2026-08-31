@@ -135,14 +135,14 @@ column_level_validations:
         ) = 0
       severity_level: Warning
   negotiated_usd_per_dbu:
-    # Soft reminder to re-verify PAYG list rates annually (seeded 2026-07-01).
+    # Soft reminder to re-verify PAYG list rates annually (seeded 2027-10-01).
     custom:
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_databricks_pricing.dim_dbu_price
          WHERE is_current = TRUE
            AND dt_valid_to IS NULL
-           AND CURRENT_DATE() > DATE('2027-07-01')
+           AND CURRENT_DATE() > DATE('2027-10-01')
         ) = 0
       severity_level: Warning
   total_cost_usd:

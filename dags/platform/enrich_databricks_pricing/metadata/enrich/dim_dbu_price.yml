@@ -8,8 +8,9 @@ description: |
   by compute type and validity window. Single source of truth that replaces
   the stale gsheet `databricks_contract_details` and the inline Superset CASE
   rates. Current rates encode the AWS Premium pay-as-you-go list from
-  2026-07-01 (JOBS 0.15 / ALL_PURPOSE 0.55 / SQL 0.17). Prior ranges keep the
-  Oct-2024 $1M/24-month committed-use contract (closed 2026-07-01) and the
+  2027-10-01 (JOBS 0.15 / ALL_PURPOSE 0.55 / SQL 0.17). Prior ranges keep the
+  Oct-2026 $250k/12-month committed-use contract (closed 2027-10-01), the
+  Oct-2024 $1M/24-month committed-use contract (closed 2026-10-01), and the
   expired (2024-09-01) gsheet rates. Static full-refresh seed (no upstream
   lake table). Only JOBS, ALL_PURPOSE and SQL rates are represented here;
   products outside those compute classes intentionally use list-price
