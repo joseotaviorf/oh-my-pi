@@ -4616,6 +4616,7 @@ bietlejuice.reverse_minority_report_ss:
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics:first-run-of-day
   - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step:first-run-of-day
 bietlejuice.reverse_nazare:
+  - bietlejuice.dw_brokers:load-dw-public-dim-company-3p-partners:first-run-of-day
   - bietlejuice.dw_house:load-dw-house-dim-house:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows:first-run-of-day
@@ -4626,6 +4627,7 @@ bietlejuice.reverse_nazare:
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_agents_contracts:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
+  - bietlejuice.gsheets_3p:done-clean-forbrokers-3p-partner-conditions:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-advance-base:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-associate-executive-bonus:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-business-rules-bonus:first-run-of-day

@@ -76,7 +76,7 @@ if __name__ == "__main__":
     tables_to_send_warning = []
 
     for table in tables:
-        if table not in ["business_unit", "offer_agent", "partner", "offers_partners"]:
+        if table not in ["business_unit", "offer_agent"]:
             datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
             try:
                 df = s3_consumer.get_data_from_file(
