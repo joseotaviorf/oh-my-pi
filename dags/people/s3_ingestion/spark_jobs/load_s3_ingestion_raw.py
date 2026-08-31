@@ -202,10 +202,10 @@ def read_source_files(
     spark_session = spark if spark_session is None else spark_session
     paths = [f"s3://{bucket}/{obj['key']}" for obj in objects]
 
-    reader = spark_session.read
-    if read_mode == READ_MODE_WHOLE_FILE:
-        reader = reader.option("wholetext", "true")
-    raw = reader.text(paths)
+    # wholetext must be passed to text() itself: PySpark's text() writes its
+    # wholetext kwarg (default False) over any previously set reader option,
+    # silently degrading whole_file mode to one row per line.
+    raw = spark_session.read.text(paths, wholetext=read_mode == READ_MODE_WHOLE_FILE)
 
     with_key = raw.select(
         F.regexp_replace(F.input_file_name(), S3_URI_SCHEME_AND_BUCKET, "").alias(
