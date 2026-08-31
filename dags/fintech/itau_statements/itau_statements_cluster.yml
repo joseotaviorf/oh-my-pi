@@ -1,5 +1,7 @@
 cluster:
   type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  emr_task_retries: 4
+  emr_retry_delay_seconds: 1200
   custom_libraries:
   - pypi:
       package: numpy==1.26.4
