@@ -134,6 +134,17 @@ workflow:
       extraction_type: incremental
       date_format: "%Y-%m-%d"
       date_filter_column: date
+      # Punch adjustments (is_manual_adjustment) are edits on past punch dates;
+      # with the default daily window the from/to range never re-fetches them and
+      # whole adjusted days go missing (validated against UI exports 2026-08-30).
+      # Shifting load_start_date 45 days back (mirroring hoursbank_totals) widens
+      # both the API fetch and the clean query window. Incremental raw APPENDS the
+      # overlapping copies (same trade-off hoursbank_totals already runs with);
+      # clean dedups per id_punch by latest ts_load before merging, so downstream
+      # stays idempotent and the newest adjustment wins.
+      # get_date_param keeps manual-run conf overrides working.
+      extra_query_template_params:
+        load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -45), 'load_start_date') }}"
       params:
         from: load_start_date
         to: load_end_date
