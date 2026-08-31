@@ -1,4 +1,12 @@
-WITH intraday_dags_ranked AS (
+WITH load_dates AS (
+    SELECT
+        date
+    FROM
+        datalake_quintoandar.aux_date
+    WHERE
+        date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+intraday_dags_ranked AS (
     SELECT
         id_dag,
         schedule_interval,
@@ -130,9 +138,8 @@ dag_base AS (
     JOIN
         datalake_airflow.dag AS dd
             ON dd.id_dag = d.id_dag
-    JOIN
-        datalake_quintoandar.aux_date AS ad
-            ON ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    CROSS JOIN
+        load_dates AS ad
     LEFT JOIN
         astro_dag_pause_status AS ads
             ON ads.id_dag = d.id_dag
@@ -150,9 +157,8 @@ sla_exclusion_list AS (
         ad.date AS dt_event
     FROM
         datalake_gsheets_clean.dags_sla_exclusion_list AS g
-    JOIN
-        datalake_quintoandar.aux_date AS ad
-            ON ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    CROSS JOIN
+        load_dates AS ad
     WHERE
         ad.date BETWEEN dt_dag_added AND COALESCE(dt_dag_removed, CURRENT_DATE)
     UNION
@@ -172,9 +178,8 @@ special_scheduler AS (
         ad.date AS dt_event
     FROM
         datalake_gsheets_clean.dags_special_scheduler AS ds
-    JOIN
-        datalake_quintoandar.aux_date AS ad
-            ON ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    CROSS JOIN
+        load_dates AS ad
     JOIN
         dag_base AS db
             ON db.id_dag = ds.id_dag    -- Only active DAGs
@@ -245,8 +250,12 @@ base AS (
             ELSE NULL
         END AS is_special_scheduler,
         CASE
-            WHEN ss.id_dag IS NOT NULL AND ss.dt_run IS NOT NULL THEN TRUE
-            WHEN ss.id_dag IS NOT NULL AND ss.dt_run IS NULL THEN FALSE
+            WHEN ss.id_dag IS NOT NULL
+                AND db.id_dag IS NOT NULL
+                AND COALESCE(db.is_manual_run, FALSE) = FALSE
+                AND COALESCE(db.is_first_run_ever, FALSE) = FALSE
+                THEN TRUE
+            WHEN ss.id_dag IS NOT NULL THEN FALSE
             ELSE NULL
         END AS is_special_scheduler_executed,
         CASE

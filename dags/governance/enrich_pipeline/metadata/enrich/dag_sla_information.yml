@@ -39,7 +39,12 @@ columns:
     lineage:
       - datalake_gsheets_clean.dags_special_scheduler.id_dag
       - datalake_pipeline.dag_run.ts_data_interval_started
-    description: Boolean flag indicating whether a special-scheduler DAG actually ran on the snapshot date.
+      - datalake_pipeline.dag_run.is_manual_run
+      - datalake_pipeline.dag_run.is_first_run_ever
+    description: >
+      Boolean flag indicating whether a special-scheduler DAG had a non-manual,
+      non-first-ever run on the snapshot date (manual and first-ever runs do not
+      re-enter the SLA denominator via special_exec).
   is_in_sla_exclusion_list:
     lineage:
       - datalake_gsheets_clean.dags_sla_exclusion_list.dag
