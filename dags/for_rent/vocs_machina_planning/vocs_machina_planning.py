@@ -27,11 +27,12 @@ What this DAG does:
      unchanged since the last published run, the task raises
      AirflowSkipException, which cascades to skip every downstream task
      (cluster creation, raw load, enrich execution) so we don't wake
-     Databricks/quintoml for nothing every 6 hours.
-  2. create-cluster -> load-vocs-machina-inference-status-raw -> <enrich task
-     group> -> terminate-cluster: a single Databricks cluster independently
-     re-reads the same manifest (its own instance profile reaches quintoml's
-     bucket directly, separately from Task A's) and loads the result into
+     EMR/quintoml for nothing every 6 hours.
+  2. execute-job-cluster -> load-vocs-machina-inference-status-raw -> <enrich
+     task group> -> terminate-emr-cluster: a single EMR job cluster
+     independently re-reads the same manifest (its own instance profile
+     reaches quintoml's bucket directly, separately from Task A's) and loads
+     the result into
      datalake_vocs_machina_planning_raw.vocs_machina_inference_status, then
      materializes both queries/enrich/*.sql files (Slice 2) as real Delta
      tables via DatalakeTaskGroup.build_task_group_from_sql_files --
@@ -44,14 +45,27 @@ What this DAG does:
      with a 6-hour CronTriggerTimetable safety net, so the DAG also runs even
      if none of the 14 sources fire in a given window.
 
-Style model: dags/fintech/enrich_dai_report/enrich_dai_report.py (manual
-DAG()/create-cluster/submit-run/terminate-cluster wiring, plus
-DatalakeTaskGroup for the enrich layer). Diverges from
-dags/platform/dag_inventory/dag_inventory.py's PythonOperator + S3Hook
-staging-to-S3 pattern for the Task-A-to-Spark-job hand-off -- see
+Compute (VOCS-45): every Spark task runs as a step on one EMR job cluster,
+built by the shared job-cluster engine rather than by hand-instantiated
+operators. Structural model:
+dags/support_and_service/salesforce_api_v2/salesforce_api_v2.py -- build a
+DagExecutionContext carrying the cluster_args read from
+vocs_machina_planning_cluster.yml, call attach_job_cluster_engine_to_context
+to pick the engine, then create every task through
+dag_execution_context.job_cluster_engine (including DatalakeTaskGroup's,
+which takes the engine as a constructor argument). Diverges from
+salesforce_api_v2 in the teardown: this DAG is a single linear chain with no
+job-cluster-finished task, so it calls create_emr_terminate_cluster_task
+directly instead of going through get_job_cluster_completion_sink /
+attach_emr_terminate_cluster_work_prerequisites, which exist for branching
+and multi-cluster topologies.
+
+Diverges from dags/platform/dag_inventory/dag_inventory.py's PythonOperator
++ S3Hook staging-to-S3 pattern for the Task-A-to-Spark-job hand-off -- see
 spark_jobs/load_vocs_machina_inference_status_raw.py's module docstring for
-why (an Airflow-side S3 write grant, then a Databricks job-parameter size
-cap, were both tried and ruled out).
+why (an Airflow-side S3 write grant, then a job-parameter size cap on the
+Databricks submit API this DAG used at the time, were both tried and ruled
+out).
 """
 
 import hashlib
@@ -72,24 +86,23 @@ from airflow.timetables.datasets import DatasetOrTimeSchedule
 from airflow.timetables.trigger import CronTriggerTimetable
 from airflow.utils.helpers import chain
 from airflow.utils.trigger_rule import TriggerRule
-from databricks_plugin import (
-    QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
-)
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
-from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import (
-    DatabricksGroupNameEnum,
+from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_job_cluster_engine_to_context,
 )
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
+)
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.file_service import FileService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2026, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -376,20 +389,21 @@ def stage_inference_status_to_s3(load_start_date: str, **kwargs) -> None:
     4. Selective propagation (Slice 3): decide via should_skip_stage_task()
        whether this run has anything new to publish; if not, raise
        AirflowSkipException so this task and everything downstream
-       (create-cluster, the raw load, and the enrich task group) is skipped
-       instead of waking Databricks for an unchanged cron tick. Otherwise,
+       (execute-job-cluster, the raw load, and the enrich task group) is
+       skipped instead of waking EMR for an unchanged cron tick. Otherwise,
        remember the new hash in LAST_SNAPSHOT_HASH_VARIABLE_KEY for the next
        run's comparison.
 
     Despite the task's name, this no longer writes anything to S3:
     airflow-prod-role has no write grant on this repo's own datalake bucket,
-    and handing these rows to Databricks via XCom/job-parameters instead hit
-    Databricks' jobs/runs/submit 10,000-byte parameter cap in production
-    (see bi-etl-ejuice#27353, reverted). The actual read + transform + load
-    now happens independently in load_vocs_machina_inference_status_raw.py,
-    on the Databricks cluster this DAG creates next -- its own instance
-    profile reaches quintoml's manifest bucket directly, so it re-derives
-    the same rows rather than receiving them from this task. This task's
+    and handing these rows over via XCom/job-parameters instead hit the
+    10,000-byte parameter cap on Databricks' jobs/runs/submit, the API this
+    DAG submitted Spark work through at the time (see bi-etl-ejuice#27353,
+    reverted). The actual read + transform + load now happens independently
+    in load_vocs_machina_inference_status_raw.py, on the EMR job cluster
+    this DAG creates next -- its own instance profile reaches quintoml's
+    manifest bucket directly, so it re-derives the same rows rather than
+    receiving them from this task. This task's
     only remaining job is computing the same hash that job's output would
     produce, purely to decide skip vs proceed without paying for a cluster
     + Spark job on every unchanged cron tick.
@@ -430,9 +444,7 @@ jiraops_callback = JiraOpsCallback()
 
 config_service = ConfigurationService(SOURCE)
 datalake_bucket = config_service.get_config("datalake_bucket")
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-default_libraries = config_service.get_config("default_libraries")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
@@ -443,21 +455,6 @@ SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 # dags/fintech/enrich_dai_report/enrich_dai_report.py uses for the same
 # purpose.
 ENRICH_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-
-CLUSTER_DESCRIPTION = config_service.get_config(
-    "consolidation_xs_memory_single_node_cluster"
-)
-CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
-CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
-    "quintoandar_{{ var.value.environment }}"
-)
-DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
-    {
-        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
-        "permission_level": ClusterPermissionEnum.MANAGE,
-    }
-]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -483,6 +480,26 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
+# Cluster shape lives in vocs_machina_planning_cluster.yml rather than inline
+# here, the same convention the DAG Builder uses for a declaration's
+# `cluster:` block -- attach_job_cluster_engine_to_context reads its `type`
+# to pick the EMR engine and resolve the cluster template.
+_cluster_file_path = DAGPackagesPathService.resolve_artifact_file_path(
+    artifact_type="dag_cluster", dag_name=SOURCE
+)
+CLUSTER_ARGS = FileService.get_dict_from_yaml_file(_cluster_file_path)["cluster"]
+
+dag_execution_context = DagExecutionContext(
+    dag=dag,
+    environment=ENV,
+    bucket=datalake_bucket,
+    base_spark_jobs_path=databricks_bietlejuice_repo_path,
+    dag_args={},
+    workflow_args={},
+    cluster_args=CLUSTER_ARGS,
+)
+attach_job_cluster_engine_to_context(dag_execution_context, config_service)
+
 stage_inference_status_task = PythonOperator(
     dag=dag,
     task_id="stage-inference-status-to-s3",
@@ -493,56 +510,66 @@ stage_inference_status_task = PythonOperator(
     provide_context=True,
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    databricks_conn_id="databricks_new",
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=default_libraries,
+# Must be built before any Spark task: creating it is what records the
+# cluster's task id on dag_execution_context, which every later
+# create_spark_python_task call reads to point its step at this cluster.
+execute_job_cluster_task = (
+    dag_execution_context.job_cluster_engine.create_execute_cluster_task(
+        config_service=config_service,
+        minimum_cluster_runtime_version=None,
+        execute_job_cluster_local_id=None,
+    )
 )
 
-load_inference_status_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    databricks_conn_id="databricks_new",
+load_inference_status_raw_task = dag_execution_context.job_cluster_engine.create_spark_python_task(
+    spark_job_path=f"{SPARK_JOBS_PATH}load_vocs_machina_inference_status_raw.py",
     task_id="load-vocs-machina-inference-status-raw",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": f"{SPARK_JOBS_PATH}load_vocs_machina_inference_status_raw.py",
-            "parameters": [
-                ENV,
-                datalake_bucket,
-                SOURCE,
-                RAW_TABLE_NAME,
-                "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}",
-                RAW_PARTITION_COLS,
-            ],
-        }
-    },
+    job_parameters=[
+        ENV,
+        datalake_bucket,
+        SOURCE,
+        RAW_TABLE_NAME,
+        "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}",
+        RAW_PARTITION_COLS,
+    ],
+    execution_timeout_hours=2,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    databricks_conn_id="databricks_new",
-    dag=dag,
-    task_id="terminate-cluster",
-    # NONE_SKIPPED (not the default ALL_SUCCESS): if load-vocs-machina-
-    # inference-status-raw fails after create-cluster succeeded, the cluster
-    # must still be torn down instead of leaking until its idle timeout.
-    # NONE_SKIPPED still leaves the cluster alone when stage-inference-
-    # status-to-s3 itself is skipped (Slice 3's selective-propagation path,
-    # see should_skip_stage_task) -- create-cluster is skipped too in that
-    # case, so there is no cluster to terminate.
-    trigger_rule=TriggerRule.NONE_SKIPPED,
+terminate_task = (
+    dag_execution_context.job_cluster_engine.create_emr_terminate_cluster_task(
+        execute_cluster_task_id=execute_job_cluster_task.task_id,
+        terminate_task_local_suffix=None,
+    )
 )
+# NONE_SKIPPED, overriding the all_done create_emr_terminate_cluster_task
+# hardcodes: if load-vocs-machina-inference-status-raw fails after
+# execute-job-cluster succeeded, the cluster must still be torn down instead
+# of leaking until its idle timeout (a failure leaves downstream tasks
+# upstream_failed, not skipped, so NONE_SKIPPED still fires). But all_done
+# also treats "skipped" as "done", which would run this task on Slice 3's
+# selective-propagation path (see should_skip_stage_task) -- there the skip
+# of stage-inference-status-to-s3 cascades through execute-job-cluster, so
+# there is no cluster to terminate and no job_flow_id in XCom to pull.
+#
+# Dropping this line does NOT page anyone: every unchanged 6-hourly cron
+# tick would just fail silently. This DAG is muted twice over in
+# packages/bietlejuice-compiler/scripts/jiraops/jiraops_mute_list.yml --
+# once by DAG (`bietlejuice.vocs_machina_planning`, line 45) and again by
+# task (`bietlejuice.*:terminate-emr-cluster`, line 55) -- so
+# jiraops_callback.task_failure_alert opens no incident. That makes the
+# failure mode worse than a noisy one, not better: red task instances would
+# accumulate four times a day on the DAG's happiest path with nobody
+# finding out, and the first person to notice would be whoever eventually
+# wonders why the run history is red. Keep this override.
+terminate_task.trigger_rule = TriggerRule.NONE_SKIPPED
 
 datalake_task_group = DatalakeTaskGroup(
-    databricks_conn_id="databricks_new",
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
     spark_jobs_path=ENRICH_SPARK_JOBS_PATH,
-    athena_query_result_location=athena_query_results_bucket,
+    job_cluster_engine=dag_execution_context.job_cluster_engine,
 )
 
 # Materializes both queries/enrich/*.sql files (Slice 2) as real Delta
@@ -578,7 +605,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
 
 chain(
     stage_inference_status_task,
-    create_cluster_task,
+    execute_job_cluster_task,
     load_inference_status_raw_task,
 )
 
@@ -591,5 +618,5 @@ chain(
 chain(
     datalake_task_group.all_last_tasks(enrich_task_groups_without_inner_dependencies)
     + datalake_task_group.last_tasks(enrich_inner_dependencies_boundaries),
-    terminate_cluster_task,
+    terminate_task,
 )

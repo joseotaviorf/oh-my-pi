@@ -4,19 +4,19 @@ Task A in ../vocs_machina_planning.py reads, to decide skip vs proceed) and
 registers the resulting inference-status rows as
 datalake_vocs_machina_planning_raw.vocs_machina_inference_status.
 
-Runs on the Databricks cluster this DAG creates right before this job
-(create-cluster task): that cluster's own instance profile reaches both
+Runs as a step on the EMR job cluster this DAG creates right before this job
+(execute-job-cluster task): that cluster's own instance profile reaches both
 quintoml's manifest bucket and this repo's own datalake bucket directly, so
 this job does its own read + transform + load in one shot instead of
 receiving pre-built rows from Task A. Two earlier hand-off designs were
 tried and abandoned:
   - Airflow (airflow-prod-role) staging the rows as a JSON blob to this
     repo's own datalake bucket: needs a PutObject grant Airflow doesn't have.
-  - Task A pushing the rows to XCom and this job pulling them into a
-    spark_python_task CLI parameter: works mechanically, but Databricks'
-    jobs/runs/submit caps the total parameters payload at 10,000 bytes, and
-    a real production backfill window serializes to ~76KB -- see
-    bi-etl-ejuice#27353 (reverted).
+  - Task A pushing the rows to XCom and this job pulling them into a CLI
+    parameter: worked mechanically, but the DAG submitted Spark work through
+    Databricks' jobs/runs/submit back then, which caps the total parameters
+    payload at 10,000 bytes, and a real production backfill window
+    serializes to ~76KB -- see bi-etl-ejuice#27353 (reverted).
 So this job re-derives the same rows Task A computes, via the
 manifest-reading/row-building functions mirrored 1:1 from
 ../vocs_machina_planning.py (no cross-import between dags/ and spark_jobs/
@@ -222,17 +222,13 @@ def read_active_prompts_manifest(s3_client) -> dict:
     return json.loads(body)
 
 
-def build_inference_status_dataframe(rows: list):
+def build_inference_status_dataframe(rows: list, spark_client):
     """Transform the computed inference-status rows into a Spark DataFrame.
 
-    Uses the bare global `spark` SparkSession, matching
-    load_dag_inventory_raw.py's create_dag_dataframe -- Databricks injects
-    `spark` into the execution namespace of spark_python_task jobs.
-
-    Passes an explicit schema (same pattern as create_dag_dataframe), since
-    spark.createDataFrame(records) with no schema raises "can not infer
-    schema from empty dataset" when rows is empty -- which happens whenever
-    quintoml's active-prompt manifest has zero active prompts for a run.
+    Passes an explicit schema, since create_dataframe(records) with no schema
+    raises "can not infer schema from empty dataset" when rows is empty --
+    which happens whenever quintoml's active-prompt manifest has zero active
+    prompts for a run.
     """
     records = []
     for row in rows:
@@ -247,9 +243,7 @@ def build_inference_status_dataframe(rows: list):
                 day=dt.day,
             )
         )
-    return spark.createDataFrame(  # noqa: F821 -- injected by Databricks
-        records, schema=INFERENCE_STATUS_SCHEMA
-    )
+    return spark_client.create_dataframe(records, schema=INFERENCE_STATUS_SCHEMA)
 
 
 def main() -> None:
@@ -306,7 +300,7 @@ def main() -> None:
     existing_marker_keys = existing_marker_keys_for_days(s3_client, unique_days)
     rows = build_snapshot_rows(partition_days, existing_marker_keys)
 
-    df = build_inference_status_dataframe(rows)
+    df = build_inference_status_dataframe(rows, spark_client)
 
     s3_loader.load_df(
         df=df,

@@ -6,46 +6,37 @@ import the DAG module via its dotted path (dags.<domain>.<name>.<name>),
 relying on ../../conftest.py to put the repo root on sys.path. Run as part of
 `make unit-tests` (uv run --directory packages/bietlejuice-airflow pytest).
 
-conftest.py stubs the whole databricks_plugin module as a bare MagicMock
-(real Databricks deps only exist at runtime in Databricks/Composer) --
-QuintoAndarDatabricksCreateClusterOperator/SubmitRunOperator/
-TerminateClusterOperator therefore construct mock objects instead of real
-operators when this module is imported plainly. Slice 1's create-cluster ->
-submit-run -> terminate-cluster wiring is plain, un-templated ``>>``
-chaining, so that never mattered. Slice 3 added
-DatalakeTaskGroup.build_task_group_from_sql_files, whose internal
-_build_task_group calls chain(load_table_task, metadata_sync_task) (see
-datalake_task_group.py) -- and a bare MagicMock instance is not a
-DependencyMixin, so that chain() call raises TypeError at DAG-parse/import
-time. _import_dag_module_with_fake_databricks_operators() below swaps in a
-real (if inert) BaseOperator subclass for those three names just long enough
-to import the module once (imports are cached), then restores the original
-MagicMock attributes so no other test file in the suite is affected
-regardless of collection order.
+Since VOCS-45 every Spark task is an EMR step built by the shared
+job-cluster engine, so the plugin that has to be faked here is emr_plugin,
+not databricks_plugin. emr_plugin is a private Nexus package that only
+exists at runtime in Composer, and it is not in conftest.py's stub list
+because job_cluster_engine.py imports it lazily, inside the methods that
+build EMR tasks -- so nothing needs it until a DAG actually constructs one.
+A bare MagicMock would not do: DatalakeTaskGroup.build_task_group_from_sql_
+files' internal _build_task_group calls chain(load_table_task,
+metadata_sync_task) (see datalake_task_group.py) at DAG-parse/import time,
+and a MagicMock instance is not a DependencyMixin, so that chain() call
+would raise TypeError. _import_dag_module_with_fake_emr_plugin() below
+installs an emr_plugin whose operators return real (if inert)
+EmptyOperators, exactly like
+test/unit/base/airflow/emr_terminate_workflow_smoke.py::_install_emr_plugin,
+just long enough to import the module once (imports are cached).
 
-Wrinkle discovered while wiring this up: bietlejuice.base.airflow.task_groups.
-datalake_task_group does its OWN `from databricks_plugin import
-QuintoAndarDatabricksSubmitRunOperator` at that module's import time. When
-this test file is run in isolation, that import happens for the first time
-*after* our patch is applied, so it naturally picks up the fake class. But in
-a full-suite run, test_datalake_task_group.py / test_datalake_task_group_
-validation.py (collected earlier, under test/unit/base/...) already import
-and cache that module *before* our patch runs -- so its
-QuintoAndarDatabricksSubmitRunOperator name stays bound to the original
-MagicMock no matter what we set on the databricks_plugin module afterwards
-(Python caches the imported module and `from X import Y` copies the
-reference once, it does not re-read X.Y later). So we also
-importlib.reload() that already-imported module around the patch window,
-forcing it to re-bind against our fake class, then reload it again on the
-way out to restore it to the original MagicMock-bound state.
+conftest.py's databricks_plugin MagicMock stub is still required even though
+this DAG no longer submits anything to Databricks: both
+job_cluster_engine.py and datalake_task_group.py do a module-level
+`from databricks_plugin import QuintoAndarDatabricks*Operator`, so importing
+either one fails outright without the stub. Those names stay MagicMocks here
+and that is fine -- the EMR branch of DatalakeTaskGroup._build_load_task
+never instantiates them (it delegates to job_cluster_engine instead), so no
+MagicMock ever reaches chain().
 
 Only the pure S3-key -> status mapping and skip/proceed logic is exercised
-otherwise (no real or mocked S3/Databricks/Spark needed). Building `dag` at
-import time also doubles as an import-cleanliness check: ConfigurationService
-reads local YAML only, no network calls happen at parse time.
+otherwise (no real or mocked S3/EMR/Spark needed). Building `dag` at import
+time also doubles as an import-cleanliness check: ConfigurationService reads
+local YAML only, no network calls happen at parse time.
 """
 
-import importlib
 import inspect
 import json
 import sys
@@ -54,77 +45,91 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from airflow.models import BaseOperator
+from airflow.operators.empty import EmptyOperator
 from airflow.timetables.datasets import DatasetOrTimeSchedule
 from airflow.timetables.trigger import CronTriggerTimetable
+from airflow.utils.trigger_rule import TriggerRule
 
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 _BASE_OPERATOR_PARAMS = set(inspect.signature(BaseOperator.__init__).parameters)
-_DATALAKE_TASK_GROUP_MODULE_NAME = (
-    "bietlejuice.base.airflow.task_groups.datalake_task_group"
-)
 
 
-class _FakeDatabricksOperator(BaseOperator):
-    """Real BaseOperator stand-in for the mocked Databricks operators.
+def _fake_emr_operator(*args, **kwargs):
+    """Real BaseOperator stand-in for one emr_plugin operator.
 
-    Accepts (and silently drops) whatever Databricks-specific kwargs the
-    real QuintoAndarDatabricks*Operator classes take (json,
-    cluster_configuration, access_control_list, libraries,
-    polling_period_seconds, databricks_conn_id, do_output_xcom_push, ...) --
-    only params BaseOperator itself understands (task_id, dag, pool,
-    execution_timeout, ...) are forwarded. Never actually executed.
+    Accepts (and silently drops) whatever EMR-specific kwargs the real
+    QuintoAndarEmr*Operator classes take (cluster_configuration, job_flow_id,
+    steps, wait_for_completion, aws_conn_id, deferrable, ...) -- only params
+    BaseOperator itself understands (task_id, dag, trigger_rule,
+    execution_timeout, retries, ...) are forwarded. Never actually executed.
     """
+    known_kwargs = {
+        key: value for key, value in kwargs.items() if key in _BASE_OPERATOR_PARAMS
+    }
+    return EmptyOperator(*args, **known_kwargs)
 
-    def __init__(self, *args, **kwargs):
-        known_kwargs = {
-            key: value for key, value in kwargs.items() if key in _BASE_OPERATOR_PARAMS
+
+def _build_fake_emr_plugin():
+    """An emr_plugin stand-in whose operator factories return real operators.
+
+    Same shape as
+    test/unit/base/airflow/emr_terminate_workflow_smoke.py::_install_emr_plugin.
+    build_spark_submit_step is a factory on the submit operator class, called
+    by EmrJobClusterEngine.create_spark_python_task before the operator
+    itself is constructed, so it needs its own stub returning a step-shaped
+    dict.
+    """
+    fake = MagicMock()
+    fake.QuintoAndarEmrCreateClusterOperator = MagicMock(side_effect=_fake_emr_operator)
+    fake.QuintoAndarEmrSubmitStepsOperator = MagicMock(side_effect=_fake_emr_operator)
+    fake.QuintoAndarEmrTerminateClusterOperator = MagicMock(
+        side_effect=_fake_emr_operator
+    )
+    fake.QuintoAndarEmrSubmitStepsOperator.build_spark_submit_step = MagicMock(
+        return_value={
+            "Name": "step",
+            "ActionOnFailure": "CONTINUE",
+            "HadoopJarStep": {},
         }
-        super().__init__(*args, **known_kwargs)
-
-    def execute(self, context):
-        raise NotImplementedError("stub operator: not meant to run in unit tests")
+    )
+    return fake
 
 
-def _import_dag_module_with_fake_databricks_operators():
-    """Import vocs_machina_planning.py with real-but-inert Databricks operators.
+def _import_dag_module_with_fake_emr_plugin():
+    """Import vocs_machina_planning.py with real-but-inert EMR operators.
 
-    See module docstring for why this is needed (Slice 3's DatalakeTaskGroup
-    enrich task group calls chain() on the built load/metadata-sync tasks at
-    import time, which requires DependencyMixin instances, not bare
-    MagicMocks). Restores conftest.py's original MagicMock stub afterwards.
+    See module docstring for why this is needed (DatalakeTaskGroup's enrich
+    task group calls chain() on the built load/metadata-sync tasks at import
+    time, which requires DependencyMixin instances, not bare MagicMocks).
+    The stub only has to be in place for the import itself: job_cluster_
+    engine.py imports emr_plugin lazily, per call, and every one of this
+    DAG's calls happens at module import time. It is removed again on the
+    way out so no other test file in the suite is affected regardless of
+    collection order.
+
+    Deliberately NOT patch.dict(sys.modules, ...) despite that being the
+    idiom in emr_terminate_workflow_smoke.py: patch.dict restores the WHOLE
+    mapping on exit, which would drop every module imported inside the
+    block -- including the DAG module itself. Later @patch("dags...
+    vocs_machina_planning.S3Hook") decorators would then re-execute it from
+    scratch (pkgutil.resolve_name re-imports on a sys.modules miss) outside
+    this stub, and fail. Only the one key we added is undone here.
     """
-    databricks_plugin_stub = sys.modules.get("databricks_plugin")
-    operator_names = [
-        "QuintoAndarDatabricksCreateClusterOperator",
-        "QuintoAndarDatabricksSubmitRunOperator",
-        "QuintoAndarDatabricksTerminateClusterOperator",
-    ]
-    is_mocked = isinstance(databricks_plugin_stub, MagicMock)
-    originals = {}
-    datalake_task_group_module = sys.modules.get(_DATALAKE_TASK_GROUP_MODULE_NAME)
-    if is_mocked:
-        for name in operator_names:
-            originals[name] = getattr(databricks_plugin_stub, name)
-            setattr(databricks_plugin_stub, name, _FakeDatabricksOperator)
-        if datalake_task_group_module is not None:
-            # Already imported by an earlier-collected test (see module
-            # docstring) -- its QuintoAndarDatabricksSubmitRunOperator name
-            # is stale until reloaded against the patch above.
-            importlib.reload(datalake_task_group_module)
+    original_emr_plugin = sys.modules.get("emr_plugin")
+    sys.modules["emr_plugin"] = _build_fake_emr_plugin()
     try:
         import dags.for_rent.vocs_machina_planning.vocs_machina_planning as module
     finally:
-        if is_mocked:
-            for name, original in originals.items():
-                setattr(databricks_plugin_stub, name, original)
-            if datalake_task_group_module is not None:
-                importlib.reload(datalake_task_group_module)
+        if original_emr_plugin is None:
+            del sys.modules["emr_plugin"]
+        else:
+            sys.modules["emr_plugin"] = original_emr_plugin
     return module
 
 
-_vocs_machina_planning = _import_dag_module_with_fake_databricks_operators()
+_vocs_machina_planning = _import_dag_module_with_fake_emr_plugin()
 
 BACKFILL_STATUS_SUMMARY_TABLE = _vocs_machina_planning.BACKFILL_STATUS_SUMMARY_TABLE
 BACKFILL_STATUS_TABLE = _vocs_machina_planning.BACKFILL_STATUS_TABLE
@@ -473,7 +478,7 @@ def test_backfill_status_summary_load_task_id_and_dataset_uri():
     # Proves build_task_group_from_sql_files actually discovered and built
     # this table's load task on the real `dag` (not just that
     # generate_default_task_id() can format a plausible-looking string) --
-    # possible now thanks to _import_dag_module_with_fake_databricks_operators,
+    # possible now thanks to _import_dag_module_with_fake_emr_plugin,
     # which swaps in a real BaseOperator stand-in so DatalakeTaskGroup's
     # tasks self-register instead of being unregistered MagicMocks.
     detail_task_id = BaseTaskGroup.generate_default_task_id(
@@ -597,16 +602,6 @@ class TestShouldSkipStageTask:
 
 
 def test_dag_has_stage_inference_status_task():
-    # packages/bietlejuice-airflow/test/unit/conftest.py stubs the whole
-    # databricks_plugin module with a MagicMock (real Databricks deps are only
-    # available at runtime in Databricks/Composer, not in this unit test env).
-    # QuintoAndarDatabricksCreateClusterOperator/SubmitRunOperator/
-    # TerminateClusterOperator therefore construct mock objects here instead of
-    # real operators, so they never self-register on `dag` the way a real
-    # BaseOperator would -- only the plain PythonOperator task is verifiable
-    # from this suite. The create-cluster -> load -> terminate wiring itself
-    # is plain, un-templated `>>` chaining (see vocs_machina_planning.py) and
-    # is not re-asserted here.
     assert "stage-inference-status-to-s3" in dag.task_ids
     stage_task = dag.get_task("stage-inference-status-to-s3")
     assert stage_task.op_kwargs["load_start_date"] == (
@@ -614,32 +609,64 @@ def test_dag_has_stage_inference_status_task():
     )
 
 
-def test_terminate_cluster_task_uses_none_skipped_trigger_rule():
-    # Regression: the default ALL_SUCCESS trigger_rule left the Databricks
-    # cluster running whenever an upstream task failed. Asserted on source
-    # rather than the mocked `terminate_cluster_task` object itself: per
-    # test_dag_has_stage_inference_status_task's note above,
-    # QuintoAndarDatabricksTerminateClusterOperator is a MagicMock in this
-    # unit test env (conftest.py stubs the whole databricks_plugin module
-    # with ONE shared MagicMock for the whole test session), so its
-    # `.call_args` reflects whichever DAG test module happened to construct
-    # a terminate-cluster operator last -- not reliably this DAG's call.
-    source = inspect.getsource(_vocs_machina_planning)
-    terminate_call = source[source.index("terminate_cluster_task = ") :]
-    terminate_call = terminate_call[: terminate_call.index(")\n") + 1]
-    assert "trigger_rule=TriggerRule.NONE_SKIPPED" in terminate_call
+@pytest.mark.parametrize(
+    "task_id",
+    [
+        "stage-inference-status-to-s3",
+        "execute-job-cluster",
+        "load-vocs-machina-inference-status-raw",
+        "terminate-emr-cluster",
+    ],
+)
+def test_dag_builds_the_full_emr_cluster_lifecycle(task_id):
+    # VOCS-45: every one of these is now a real, self-registering operator
+    # (see _import_dag_module_with_fake_emr_plugin), so the whole
+    # stage -> cluster -> raw load -> terminate spine is assertable from
+    # this suite rather than only the plain PythonOperator task.
+    assert task_id in dag.task_ids
+
+
+def test_terminate_task_uses_none_skipped_trigger_rule():
+    # The single riskiest line in the Databricks -> EMR migration.
+    # create_emr_terminate_cluster_task hardcodes trigger_rule="all_done",
+    # which treats a skip as a completion: on a quiet cron tick
+    # stage-inference-status-to-s3 raises AirflowSkipException, the skip
+    # cascades through execute-job-cluster, and an all_done terminate task
+    # would still fire and xcom_pull a job_flow_id that was never pushed.
+    # Nothing would page: this DAG is muted twice in packages/bietlejuice-
+    # compiler/scripts/jiraops/jiraops_mute_list.yml, by DAG
+    # (bietlejuice.vocs_machina_planning, line 45) and by task
+    # (bietlejuice.*:terminate-emr-cluster, line 55), so JiraOps opens no
+    # incident. Every unchanged 6-hourly tick would fail silently instead --
+    # worse than paging, because nobody finds out. Hence this assertion.
+    # NONE_SKIPPED still tears the cluster down when an upstream task FAILS,
+    # because a failure leaves downstream tasks upstream_failed, not skipped.
+    assert dag.get_task("terminate-emr-cluster").trigger_rule == (
+        TriggerRule.NONE_SKIPPED
+    )
+
+
+def test_summary_load_task_emits_a_dataset_outlet():
+    # The cross-repo contract quintoml's Slice 4 subscribes to. DatalakeTask
+    # Group._build_load_task attaches it via DatasetAdder.attach_dataset_to_
+    # task unconditionally (is_validation is not set here), and that has to
+    # keep happening now that the load task is an EMR step operator rather
+    # than a Databricks submit-run operator.
+    summary_load_task = dag.get_task("load-enrich-vocs-machina-backfill-status-summary")
+    assert summary_load_task.outlets
 
 
 class TestStageInferenceStatusToS3:
     """Regression coverage for the post-XCom-revert design: this task only
     computes the skip-vs-proceed hash and never writes to S3. The actual
     read + transform + load happens independently in
-    load_vocs_machina_inference_status_raw.py, on the Databricks cluster
-    this DAG creates next -- see that file's module docstring for why
+    load_vocs_machina_inference_status_raw.py, on the EMR job cluster this
+    DAG creates next -- see that file's module docstring for why
     (airflow-prod-role has no S3 write grant on this repo's own datalake
-    bucket, and handing the rows to Databricks via XCom/job-parameters
-    instead hit Databricks' jobs/runs/submit 10,000-byte parameter cap in
-    production; see the reverted bi-etl-ejuice#27353).
+    bucket, and handing the rows over via XCom/job-parameters instead hit
+    the 10,000-byte parameter cap on Databricks' jobs/runs/submit, the API
+    this DAG submitted Spark work through at the time; see the reverted
+    bi-etl-ejuice#27353).
     """
 
     _MANIFEST = {

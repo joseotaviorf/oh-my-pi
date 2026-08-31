@@ -203,16 +203,16 @@ class TestReadActivePromptsManifest:
 
 class TestBuildInferenceStatusDataframe:
     def test_empty_rows_passes_an_explicit_schema(self):
-        job.spark = MagicMock()
+        spark_client = MagicMock()
 
-        job.build_inference_status_dataframe([])
+        job.build_inference_status_dataframe([], spark_client)
 
-        job.spark.createDataFrame.assert_called_once_with(
+        spark_client.create_dataframe.assert_called_once_with(
             [], schema=job.INFERENCE_STATUS_SCHEMA
         )
 
     def test_nonempty_rows_still_passes_the_same_schema(self):
-        job.spark = MagicMock()
+        spark_client = MagicMock()
 
         job.build_inference_status_dataframe(
             [
@@ -222,9 +222,10 @@ class TestBuildInferenceStatusDataframe:
                     "prompt_hash": "abc123",
                     "inference_status": "done",
                 }
-            ]
+            ],
+            spark_client,
         )
 
-        args, kwargs = job.spark.createDataFrame.call_args
+        args, kwargs = spark_client.create_dataframe.call_args
         assert len(args[0]) == 1
         assert kwargs["schema"] == job.INFERENCE_STATUS_SCHEMA
