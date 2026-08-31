@@ -60,6 +60,9 @@ events_config:
   opportunity:
     event_path: "raw/salesforce/OpportunityEvent"
     api_entity: "Opportunity"
+  support_case_relation:
+    event_path: "raw/salesforce/SupportCaseRelationEvent"
+    api_entity: "SupportCaseRelation__c"
   user:
     event_path: "raw/salesforce/UserEvent"
     api_entity: "User"
