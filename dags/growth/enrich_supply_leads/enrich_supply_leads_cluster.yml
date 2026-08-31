@@ -1,5 +1,5 @@
 cluster:
-  type: emr_7_12_consolidation_s_memory_fleet_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_libraries:
   # DAG-scoped Sedona with H3 (ST_H3CellIDs); does not bump the house default 1.2.1.
   # JARs only: ST_* SQL is registered via spark.sql.extensions. Do not add
