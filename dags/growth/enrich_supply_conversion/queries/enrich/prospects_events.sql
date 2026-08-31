@@ -51,7 +51,7 @@ extract_wololo AS (
   FROM
     datalake_wololo_clean.prospect AS p
   LEFT JOIN prospect_business_context AS bc
-    ON (p.id = bc.id_prospect)
+    ON p.id = bc.id_prospect
 )
 
 SELECT

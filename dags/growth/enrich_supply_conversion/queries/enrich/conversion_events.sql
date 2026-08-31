@@ -20,9 +20,9 @@ WITH events_3p AS (
       datalake_supply_flows.conversion_events_3p AS c3p
     LEFT ANTI JOIN 
       datalake_supply_flows.conversion_attributed_events AS t2
-        ON (c3p.id_house = t2.id_entity)
-        AND (c3p.business_context = t2.business_context)
-        AND (t2.aux_group LIKE 'T2%')
+        ON c3p.id_house = t2.id_entity
+        AND c3p.business_context = t2.business_context
+        AND t2.aux_group LIKE 'T2%'
 ),
 original_events AS (
     SELECT 
@@ -138,9 +138,9 @@ fill_events (
     last_extract AS le
   LEFT ANTI JOIN 
     datalake_supply_flows.conversion_events_3p AS ce3
-      ON (le.id_entity = ce3.id_house)
-        AND (le.business_context = ce3.business_context)
-        AND (le.step = ce3.funnel_step)
+      ON le.id_entity = ce3.id_house
+        AND le.business_context = ce3.business_context
+        AND le.step = ce3.funnel_step
 )
 
 SELECT

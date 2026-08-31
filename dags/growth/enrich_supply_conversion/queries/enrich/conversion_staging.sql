@@ -30,7 +30,7 @@ WITH listing_events AS (
   FROM
     datalake_ebdb_clean.house_aud AS had
   JOIN datalake_ebdb_clean.user_revision_entity AS ure 
-    ON (had.rev = ure.id)
+    ON had.rev = ure.id
   WHERE status = 'publicado'
     AND had.is_for_rent IS TRUE
     AND FROM_UNIXTIME(ure.ts_revision / 1000) <= '2020-01-07'
@@ -121,7 +121,7 @@ conversion_lookup AS (
     supply_source, 
     business_context
   FROM datalake_supply_flows.conversion_lookup
-  GROUP BY ALL
+  GROUP BY id_lead, id_house, supply_source, business_context
 ),
 events_and_discards AS (
   SELECT 
@@ -141,8 +141,8 @@ events_and_discards AS (
     al.ts_event
   FROM all_events AS al
   LEFT JOIN conversion_lookup AS cl
-    ON (al.id_entity = cl.id_house)
-      AND (al.business_context = cl.business_context)
+    ON al.id_entity = cl.id_house
+      AND al.business_context = cl.business_context
   UNION ALL
   SELECT 
     id_entity,
