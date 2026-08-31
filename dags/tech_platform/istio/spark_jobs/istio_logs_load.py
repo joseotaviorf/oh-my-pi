@@ -36,6 +36,7 @@ from bietlejuice.base.validation.spark_args import (
     resolve_datalake_write_target,
 )
 from bietlejuice.jobs.common.corrupt_record_monitor import alert_on_corrupt_records
+from bietlejuice.jobs.common.volume_drop_monitor import alert_on_volume_drop
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -267,6 +268,18 @@ def main():
     )
 
     raw_df.unpersist()
+
+    # Volume-deviation alarm. Reads the written table (not raw_df): the reference
+    # hours come from previous weeks, and the current hour must reflect what the
+    # MERGE actually landed. Reads the resolved write target so an EMR validation
+    # run measures its own output rather than prod.
+    alert_on_volume_drop(
+        spark,
+        table_name=f"{write_database_name}.{write_table_name}",
+        loaded_hour=args.execution_date,
+        env=args.env,
+        channel="AUTHX_ALERTS",
+    )
 
 
 def get_claims_schema():
