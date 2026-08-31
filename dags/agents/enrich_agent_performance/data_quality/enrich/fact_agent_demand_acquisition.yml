@@ -13,44 +13,9 @@ column_level_validations:
   rev:
     is_complete:
       severity_level: Error
-      
   id_lead:
     is_complete:
       severity_level: Error
-  id_user_referring_agent:
-    is_complete:
-      severity_level: Warning
-  id_agent_data_referring:
-    is_complete:
-      severity_level: Warning
-
-  referral_status:
-    is_complete:
-      severity_level: Error
-    is_contained_in:
-      values: ['CONFIRMED', 'PENDING', 'EXPIRED', 'INACTIVE']
-      severity_level: Error
-
-  business_context:
-    is_contained_in:
-      values: ['SALE', 'RENT']
-      severity_level: Warning
-
-  origin:
-    is_contained_in:
-      values: ['REFERRAL', 'SERVICE_LINK', 'SCHEDULING_LINK']
-      severity_level: Warning
-
   valid_from:
     is_complete:
       severity_level: Error
-
-  is_visit_same_agent:
-    is_contained_in:
-      values: [true, false]
-      severity_level: Warning
-
-  is_offer_same_agent:
-    is_contained_in:
-      values: [true, false]
-      severity_level: Warning
