@@ -1,3 +1,4 @@
+-- Native year/month/day/hour predicates so EMR Spark 3.5 can prune partitions.
 WITH deduped AS (
     SELECT
         id AS id_observation,
@@ -25,18 +26,59 @@ WITH deduped AS (
         ROW_NUMBER() OVER (
             PARTITION BY id
             ORDER BY
-                MAKE_TIMESTAMP(year, month, day, hour, 0, 0) DESC,
+                year DESC,
+                month DESC,
+                day DESC,
+                hour DESC,
                 CAST(end_time AS TIMESTAMP) DESC NULLS LAST
         ) AS rn
     FROM
         datalake_langfuse_raw.observations
     WHERE
-        MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR
-        AND MAKE_TIMESTAMP(year, month, day, hour, 0, 0) < TIMESTAMP('{load_end_date}')
+        (
+            (
+                YEAR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                    = YEAR(TIMESTAMP('{load_end_date}'))
+                AND MONTH(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                    = MONTH(TIMESTAMP('{load_end_date}'))
+                AND DAY(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                    = DAY(TIMESTAMP('{load_end_date}'))
+                AND year = YEAR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                AND month = MONTH(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                AND day = DAY(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                AND hour >= HOUR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                AND hour <= HOUR(TIMESTAMP('{load_end_date}'))
+            )
+            OR
+            (
+                (
+                    YEAR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                        <> YEAR(TIMESTAMP('{load_end_date}'))
+                    OR MONTH(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                        <> MONTH(TIMESTAMP('{load_end_date}'))
+                    OR DAY(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                        <> DAY(TIMESTAMP('{load_end_date}'))
+                )
+                AND (
+                    (
+                        year = YEAR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                        AND month = MONTH(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                        AND day = DAY(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                        AND hour >= HOUR(TIMESTAMP('{load_start_date}') - INTERVAL 3 HOUR)
+                    )
+                    OR
+                    (
+                        year = YEAR(TIMESTAMP('{load_end_date}'))
+                        AND month = MONTH(TIMESTAMP('{load_end_date}'))
+                        AND day = DAY(TIMESTAMP('{load_end_date}'))
+                        AND hour <= HOUR(TIMESTAMP('{load_end_date}'))
+                    )
+                )
+            )
+        )
         AND CAST(start_time AS TIMESTAMP) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
         AND CAST(start_time AS TIMESTAMP) < TIMESTAMP('{load_end_date}')
 )
-
 SELECT
     id_observation,
     id_parent_observation,

@@ -1,3 +1,4 @@
+-- Native year/month/day predicates so EMR Spark 3.5 can prune partitions.
 WITH deduped AS (
     SELECT
         id AS id_trace,
@@ -23,7 +24,25 @@ WITH deduped AS (
     FROM
         datalake_langfuse_raw.traces
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 1 DAY AND DATE('{load_end_date}')
+        (
+            (
+                year = YEAR(DATE('{load_start_date}') - INTERVAL 1 DAY)
+                AND month = MONTH(DATE('{load_start_date}') - INTERVAL 1 DAY)
+                AND day = DAY(DATE('{load_start_date}') - INTERVAL 1 DAY)
+            )
+            OR
+            (
+                year = YEAR(DATE('{load_start_date}'))
+                AND month = MONTH(DATE('{load_start_date}'))
+                AND day = DAY(DATE('{load_start_date}'))
+            )
+            OR
+            (
+                year = YEAR(DATE('{load_end_date}'))
+                AND month = MONTH(DATE('{load_end_date}'))
+                AND day = DAY(DATE('{load_end_date}'))
+            )
+        )
         AND CAST(timestamp AS TIMESTAMP) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
         AND CAST(timestamp AS TIMESTAMP) < TIMESTAMP('{load_end_date}')
 )
