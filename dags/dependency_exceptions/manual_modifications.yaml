@@ -287,8 +287,6 @@ bietlejuice.enrich_app_installed:
 bietlejuice.enrich_booking:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
-    # insider_fast_lane review CDC bypass (DEI-26838 / DEI-26839)
-    - bietlejuice.insider_fast_lane:load-clean-review:first-run-of-day
 bietlejuice.enrich_braze_events:
   remove:
     - bietlejuice.braze_events:load-clean-events-indica-ai:first-run-of-day
@@ -631,10 +629,6 @@ bietlejuice.enrich_pipeline:
     - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
     - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list:first-run-of-day
     - bietlejuice.gsheets_cross:done-clean-dags-special-scheduler:first-run-of-day
-bietlejuice.enrich_post_visit_conversion:
-  # insider_fast_lane review CDC bypass (DEI-26838 / DEI-26839)
-  remove:
-    - bietlejuice.insider_fast_lane:load-clean-review:first-run-of-day
 bietlejuice.enrich_rental_historical_follow_up:
   add:
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-status:first-run-of-day
@@ -781,10 +775,6 @@ bietlejuice.enrich_sale_stranded_listings_status:
 bietlejuice.enrich_sale_stranded_listings_thresholds:
   remove:
     - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
-bietlejuice.enrich_sale_visit:
-  # insider_fast_lane review CDC bypass (DEI-26838 / DEI-26839)
-  remove:
-    - bietlejuice.insider_fast_lane:load-clean-review:first-run-of-day
 bietlejuice.enrich_sale_visit_hubs:
   add:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
@@ -942,10 +932,6 @@ bietlejuice.enrich_transactional_entities:
     - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
     - bietlejuice.enrich_entities_views:load-enrich-house-draft:first-run-of-day
     - bietlejuice.enrich_entities_views:load-enrich-collections-segment:first-run-of-day
-bietlejuice.enrich_visit:
-  # insider_fast_lane review CDC bypass (DEI-26838 / DEI-26839)
-  remove:
-    - bietlejuice.insider_fast_lane:load-clean-review:first-run-of-day
 bietlejuice.enrich_visit_entities_views:
   override: []
 bietlejuice.enrich_listing_entities_views:
@@ -1013,8 +999,6 @@ bietlejuice.reverse_birdie:
   remove:
     - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users:first-run-of-day
     - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
-    # insider_fast_lane review CDC bypass (DEI-26838 / DEI-26839)
-    - bietlejuice.insider_fast_lane:load-clean-review:first-run-of-day
 bietlejuice.reverse_birdie_access:
   add:
     - bietlejuice.reverse_birdie:load-reverse-dsat-bot:first-run-of-day
