@@ -186,6 +186,53 @@ def test_save_volume_metric_uses_fallback_grain_values_for_empty_df():
     mock_lit.assert_any_call("2026-08-05")
 
 
+def test_save_volume_metric_records_zero_row_when_df_is_none():
+    # A caller that bailed out before building a frame at all still has to
+    # record row_count = 0, so an absent row unambiguously means the job never
+    # ran. There is no dataframe to read grain types from, so the grain comes
+    # entirely from fallback_grain_values and is left untyped.
+    spark = MagicMock()
+
+    fallback_df = MagicMock()
+    fallback_df.withColumn.return_value = fallback_df
+    fallback_df.select.return_value = fallback_df
+    spark.range.return_value = fallback_df
+
+    with (
+        patch(
+            "bietlejuice.base.sst.core.observability.metrics.validate_and_write"
+        ) as mock_write,
+        patch("bietlejuice.base.sst.core.observability.metrics.F.lit") as mock_lit,
+    ):
+        mock_lit.return_value = DummyExpr()
+
+        save_volume_metric(
+            spark=spark,
+            df=None,
+            grain=["partition_date", "partition_hour", "event_type"],
+            metric_name="events_type_volume",
+            table_name="events_case",
+            env="prod",
+            layer="raw",
+            partition_cols=["partition_date", "partition_hour"],
+            table_location="s3a://bucket/sst_metrics/events_type_volume",
+            fallback_grain_values={
+                "partition_date": "2026-08-21",
+                "partition_hour": "10",
+                "event_type": "DLQ_RECOVERY",
+            },
+        )
+
+    # Synthetic single row, not an aggregation over a frame.
+    spark.range.assert_called_once_with(1)
+    for value in ("2026-08-21", "10", "DLQ_RECOVERY"):
+        mock_lit.assert_any_call(value)
+    assert mock_write.call_count == 1
+    write_kwargs = mock_write.call_args.kwargs
+    assert write_kwargs["target_table"] == "datalake_sst_metrics.events_type_volume"
+    assert write_kwargs["append"] is True
+
+
 def test_save_scd_change_metric_writes_to_metric_name_table():
     """save_scd_change_metric writes one aggregated row to
     datalake_sst_metrics.<metric_name>, partitioned by source_table +

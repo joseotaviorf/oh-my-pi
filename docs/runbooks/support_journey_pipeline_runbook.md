@@ -188,7 +188,7 @@ principais tabelas (catalog `delta`, schema `datalake_sst_metrics`):
 | Tabela                                 | Para responder…                                                                                         |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `pipeline_stability`                   | Anomalias de volume (z-score, média móvel). Filtrar `environment = 'prod'` e um `window_size` (ex.: 24) |
-| `events_volume` / `events_type_volume` | Contagem de linhas por tabela/hora (por `event_type`)                                                   |
+| `events_volume` / `events_type_volume` | Contagem de linhas por tabela/hora (por `event_type`). DLQ: `event_type = 'DLQ_RECOVERY'` (`layer` raw vs clean) |
 | `pipeline_events_latency`              | Latência source→target (`average_delay`, `p90`/`p95`/`p99`, `unit`) — grão por `target_table`           |
 | `cdc_pipeline_missing_events`          | Gaps de CDC (`total_events_missing > 0`) — usa coluna `env` (não `environment`)                         |
 | `table_metadata`                       | Schema drift (`new_cols`, `new_cols_count`)                                                             |
@@ -199,6 +199,11 @@ principais tabelas (catalog `delta`, schema `datalake_sst_metrics`):
 > partition_date, partition_hour)` significa que o pipeline **não rodou** naquela
 > hora — isso já é sinal de falha, não é NULL. Antes de tratar como incidente,
 > confirme em `events_type_volume` se não é um fluxo diário/`RECOVERY`.
+
+> **Volume da DLQ:** o volume recuperado pela DLQ entra em `events_type_volume`
+> com `event_type = 'DLQ_RECOVERY'` (`layer` raw = API; clean = replay), uma
+> linha por layer em **toda** execução — `row_count = 0` quando não havia nada
+> a recuperar. Linha **ausente** significa que a task `dlq_events_*` não rodou.
 
 ### 5.2 Como o TARS ajuda a investigar
 
@@ -212,6 +217,8 @@ Exemplos de perguntas úteis:
 - "Quais `target_table` estão com latência acima da média na partição mais
   recente?"
 - "Houve gaps de CDC (`total_events_missing > 0`) nos últimos 7 dias?"
+- "Quantas linhas a DLQ recuperou em raw e reprocessou em clean nos últimos 7
+  dias?"
 
 Para consultas analíticas sobre essas métricas, instale o plugin **TARS** do marketplace ai-tools (`/tars`). A documentação de
 referência das métricas (schemas, regras e *golden queries*) está em
@@ -677,6 +684,8 @@ SERVICES_CONFIG = {
 | Jobs Spark core (classes de backfill: `SupportJourneyCoreModelPipeline` / `SupportJourneyServicesCoreModelPipeline`) | `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/core_model/support_journey/{cases,services}.py` |
 | Loader da config (dict/`table_config_relative_path`)                                                                 | `packages/bietlejuice-runtime/src/bietlejuice/base/sst/domains/salesforce/core_models/config_loader.py`          |
 | Jobs Spark CDC                                                                                                       | `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/salesforce/{cdc_raw,cdc_clean}.py`              |
+| DLQ Salesforce                                                                                                       | `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/salesforce/dlq.py`                               |
+| Recovery AppFlow                                                                                                     | `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/salesforce/recovery_flow.py`                     |
 | Guarda de partição (`partition_has_data`)                                                                            | `packages/bietlejuice-runtime/src/bietlejuice/base/sst/core/observability/sensors.py`                            |
 | Deps do DW (Datasets)                                                                                                | `dags/dependencies.yaml` (+ `dags/dependency_exceptions/manual_modifications.yaml`)                              |
 | Doc de métricas SST (TARS)                                                                                           | `docs/llm_context/domain_entities/salesforce_sst_pipeline.md`                                                  |

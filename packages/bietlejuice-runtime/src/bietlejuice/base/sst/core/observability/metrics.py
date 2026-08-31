@@ -421,7 +421,7 @@ def save_volume_metric(
     table_location: str,
     fallback_grain_values: Optional[dict] = None,
 ):
-    """Record a per-grain row count, even when ``df`` has zero rows.
+    """Record a per-grain row count, even when there is no data to count.
 
     ``df`` being empty means the ``groupby`` below produces no groups at all —
     there is no row for any grain value to attach a ``row_count`` of 0 to — so
@@ -432,8 +432,40 @@ def save_volume_metric(
     which grain value it was processing (typically the partition it just
     wrote, or tried to) should pass it here so the zero-row metric still lands
     under the right partition instead of a NULL one.
+
+    ``df`` may also be ``None``, for a caller that bailed out before building a
+    frame at all — a pipeline that returned early because there was nothing to
+    process. That still has to be recorded as ``row_count = 0``, otherwise a
+    missing row is ambiguous between "no data this partition" and "the job
+    never ran". Pass ``fallback_grain_values`` alongside it, or the grain lands
+    NULL.
     """
     write_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if df is None:
+        logger.info(
+            f"m=save_volume_metric, msg=No dataframe for metric {metric_name}, "
+            "recording a zero-row metric"
+        )
+        _metric = _zero_row_volume_metric(
+            spark=spark,
+            grain=grain,
+            grain_types={},
+            metric_name=metric_name,
+            table_name=table_name,
+            env=env,
+            layer=layer,
+            write_timestamp=write_timestamp,
+            fallback_grain_values=fallback_grain_values,
+        )
+        _write_volume_metric(
+            spark=spark,
+            df=_metric,
+            metric_name=metric_name,
+            partition_cols=partition_cols,
+            table_location=table_location,
+        )
+        return
+
     _metric = (
         df.groupby(grain)
         .agg(F.coalesce(F.count("*").cast("bigint"), F.lit(0)).alias("row_count"))
@@ -459,48 +491,86 @@ def save_volume_metric(
         logger.warning(
             f"m=save_volume_metric, msg=No rows found for metric {metric_name}, "
         )
-        grain_types = {field.name: field.dataType for field in df.schema.fields}
-        _metric = spark.range(1)
-
-        for grain_col in grain:
-            col_type = grain_types.get(grain_col)
-            if fallback_grain_values and grain_col in fallback_grain_values:
-                fallback_value = fallback_grain_values[grain_col]
-                grain_col_expr = (
-                    F.lit(fallback_value).cast(col_type)
-                    if col_type
-                    else F.lit(fallback_value)
-                )
-            else:
-                grain_col_expr = F.lit(None).cast(col_type) if col_type else F.lit(None)
-            _metric = _metric.withColumn(grain_col, grain_col_expr)
-
-        _metric = (
-            _metric.withColumn("metric_category", F.lit("volume"))
-            .withColumn("metric_name", F.lit(metric_name))
-            .withColumn("source_table", F.lit(table_name))
-            .withColumn("environment", F.lit(env))
-            .withColumn("layer", F.lit(layer))
-            .withColumn("row_count", F.lit(0).cast("bigint"))
-            .withColumn("_write_timestamp", F.lit(write_timestamp))
-            .select(
-                "metric_category",
-                "metric_name",
-                "source_table",
-                "environment",
-                "layer",
-                *grain,
-                "row_count",
-                "_write_timestamp",
-            )
+        _metric = _zero_row_volume_metric(
+            spark=spark,
+            grain=grain,
+            grain_types={field.name: field.dataType for field in df.schema.fields},
+            metric_name=metric_name,
+            table_name=table_name,
+            env=env,
+            layer=layer,
+            write_timestamp=write_timestamp,
+            fallback_grain_values=fallback_grain_values,
         )
 
-    logger.info(f"m=save_volume_metric, msg=Partition columns: {partition_cols}")
-    metric_table = f"datalake_sst_metrics.{metric_name}"
-    validate_and_write(
+    _write_volume_metric(
         spark=spark,
         df=_metric,
-        target_table=metric_table,
+        metric_name=metric_name,
+        partition_cols=partition_cols,
+        table_location=table_location,
+    )
+
+
+def _zero_row_volume_metric(
+    spark,
+    grain,
+    grain_types,
+    metric_name,
+    table_name,
+    env,
+    layer,
+    write_timestamp,
+    fallback_grain_values: Optional[dict] = None,
+):
+    """Build the single synthetic ``row_count = 0`` row for an empty grain.
+
+    ``grain_types`` maps grain column name to Spark type, so the synthetic row
+    matches the schema of the table being appended to. It is empty when there
+    was no dataframe to read types from, in which case the columns are left
+    untyped and Spark infers them from the literals.
+    """
+    _metric = spark.range(1)
+    for grain_col in grain:
+        col_type = grain_types.get(grain_col)
+        if fallback_grain_values and grain_col in fallback_grain_values:
+            fallback_value = fallback_grain_values[grain_col]
+            grain_col_expr = (
+                F.lit(fallback_value).cast(col_type)
+                if col_type
+                else F.lit(fallback_value)
+            )
+        else:
+            grain_col_expr = F.lit(None).cast(col_type) if col_type else F.lit(None)
+        _metric = _metric.withColumn(grain_col, grain_col_expr)
+
+    return (
+        _metric.withColumn("metric_category", F.lit("volume"))
+        .withColumn("metric_name", F.lit(metric_name))
+        .withColumn("source_table", F.lit(table_name))
+        .withColumn("environment", F.lit(env))
+        .withColumn("layer", F.lit(layer))
+        .withColumn("row_count", F.lit(0).cast("bigint"))
+        .withColumn("_write_timestamp", F.lit(write_timestamp))
+        .select(
+            "metric_category",
+            "metric_name",
+            "source_table",
+            "environment",
+            "layer",
+            *grain,
+            "row_count",
+            "_write_timestamp",
+        )
+    )
+
+
+def _write_volume_metric(spark, df, metric_name, partition_cols, table_location):
+    logger.info(f"m=save_volume_metric, msg=Partition columns: {partition_cols}")
+    validate_and_write(
+        spark=spark,
+        df=df,
+        target_table=f"datalake_sst_metrics.{metric_name}",
         table_location=table_location,
         partition_cols=partition_cols,
         overwrite_schema=False,

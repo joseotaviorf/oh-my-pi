@@ -33,6 +33,9 @@ from bietlejuice.base.sst.domains.salesforce.api.headers import (
 from bietlejuice.base.sst.domains.salesforce.clean.transform import (
     in_memory_cdc_udpate,
 )
+from bietlejuice.base.sst.domains.salesforce.recovery.volume import (
+    save_dlq_volume_metrics,
+)
 
 logger = QuintoAndarLogger("sst.pipelines.salesforce.dlq")
 
@@ -88,6 +91,13 @@ RAW_DROP_COLS = {"source_file", "ts_load", "ChangeEventHeader"}
             required=True,
             help="Salesforce API base endpoint URL.",
         ),
+        dict(
+            name="bucket",
+            flags=["--bucket"],
+            type=str,
+            required=True,
+            help="Datalake bucket used to persist DLQ volume metrics.",
+        ),
     ]
 )
 @logger(exclude_return=True)
@@ -118,6 +128,7 @@ def dlq_pipeline(cfg):
     logger.info(f"m=events_dlq, msg=Number of events found: {len(updated_lst)}")
     if not updated_lst:
         logger.info("m=events_dlq, msg=No records to be fetched from API")
+        _save_dlq_volume(spark, cfg)
         return
 
     raw_columns = spark.read.table(raw_target_table).columns + ["Id"]
@@ -135,6 +146,7 @@ def dlq_pipeline(cfg):
     )
     if not updated_queries:
         logger.info("m=events_dlq, msg=No recovery queries to send to API")
+        _save_dlq_volume(spark, cfg)
         return
 
     dlq_df = retrieve_salesforce_event(
@@ -170,8 +182,27 @@ def dlq_pipeline(cfg):
         source_df=remapped_df,
         match_fields=UNIQUE_GRAIN,
     )
-    reprocess_cdc_events(spark=spark, table=cfg.target_table, id_list=updated_lst)
+    reprocessed_df = reprocess_cdc_events(
+        spark=spark,
+        table=cfg.target_table,
+        id_list=updated_lst,
+    )
+    _save_dlq_volume(spark, cfg, raw_df=remapped_df, clean_df=reprocessed_df)
     logger.info("m=events_dlq, msg=Pipeline completed")
+
+
+def _save_dlq_volume(spark, cfg, raw_df=None, clean_df=None):
+    """Unpack ``cfg`` for the domain-level metric writer."""
+    save_dlq_volume_metrics(
+        spark=spark,
+        bucket=cfg.bucket,
+        target_table=cfg.target_table,
+        env=cfg.env,
+        partition_date=cfg.partition_date,
+        partition_hour=cfg.partition_hour,
+        raw_df=raw_df,
+        clean_df=clean_df,
+    )
 
 
 def reprocess_cdc_events(spark, table, id_list):
@@ -213,6 +244,7 @@ def reprocess_cdc_events(spark, table, id_list):
         source_df=update_df,
         match_fields=UNIQUE_GRAIN,
     )
+    return update_df
 
 
 if __name__ == "__main__":

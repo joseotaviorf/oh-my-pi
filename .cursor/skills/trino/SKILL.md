@@ -14,6 +14,8 @@ Pure execution layer for running SQL against the Trino cluster. This skill does 
 Invoke when:
 
 - **`fair-metadata`** needs owner ACTIVE checks or bounded description samples.
+- **`debug-salesforce-sst-pipeline`** delegates bounded SST metric queries (including
+  `events_type_volume` with `event_type = 'DLQ_RECOVERY'`).
 - Another skill explicitly delegates Trino execution.
 - The user explicitly asks to run a query against Trino.
 

@@ -1,5 +1,15 @@
 # Salesforce Single Station Pipeline
 
+## Ownership
+
+**Data Owner:**
+- lucas.bguerra@quintoandar.com
+
+**Data Steward:**
+- lucas.bguerra@quintoandar.com
+
+---
+
 ## Overview
 
 The Salesforce Single Station Pipeline entity tracks the data quality and operational health of the Salesforce pipeline in the Single Station domain. It provides hourly metrics on data volume,
@@ -29,6 +39,8 @@ All tables live in the `datalake_sst_metrics` schema (catalog `delta`).
 - **Recovery flow** → when an Appflow flow status ≠ `'Active'`, a batch process takes over
   and fetches the missing data directly via the Salesforce API, ensuring no data loss
 - **CDC** → Change Data Capture; gaps tracked in `cdc_pipeline_missing_events`
+- **DLQ / dead-letter replay** → recovery that fetches raw∖clean gaps from Salesforce
+  and replays each recovered ID's complete CDC history into clean
 - **Latency / delay** → time (hours or minutes, per `unit` column) between source and
   target layer; measured in `pipeline_events_latency`
 - **window_size** → rolling window (in hours) used to compute moving averages and z-scores
@@ -43,7 +55,7 @@ All tables live in the `datalake_sst_metrics` schema (catalog `delta`).
 |-------------|----------------|
 | Volume anomaly detection (z-score, stddev, moving avg) per table per hour | `datalake_sst_metrics.pipeline_stability` — grain: 1 row per `source_table` + `partition_date` + `partition_hour` + `window_size`; use `environment = 'prod'` |
 | Raw hourly row count per table | `datalake_sst_metrics.events_volume` — grain: 1 row per `source_table` + `partition_date` + `partition_hour`; simpler than `pipeline_stability` when you only need `row_count` |
-| Row count broken down by event type | `datalake_sst_metrics.events_type_volume` — same as `events_volume` plus `event_type` column |
+| Row count broken down by event type | `datalake_sst_metrics.events_type_volume` — same as `events_volume` plus `event_type`. DLQ volume is a separate `event_type = 'DLQ_RECOVERY'` row per `layer` (raw vs clean), written every run — `row_count = 0` when there was nothing to recover |
 | Latency / delay from source to target layer | `datalake_sst_metrics.pipeline_events_latency` — grain: 1 row per `target_table` + `partition_date` + `partition_hour`; includes `average_delay`, `p50`/`p90`/`p95`/`p99`, `unit`, `source_layer`, `target_layer` |
 | CDC gaps — missing events in Change Data Capture | `datalake_sst_metrics.cdc_pipeline_missing_events` — grain: 1 row per `target_table` + `partition_date` + `partition_hour`; check `total_events_missing > 0` |
 | Schema drift — new columns added to a source table | `datalake_sst_metrics.table_metadata` — grain: 1 row per `source_table` + `partition_date` + `partition_hour`; `new_cols` (array as VARCHAR) + `new_cols_count` |
@@ -83,6 +95,11 @@ All tables live in the `datalake_sst_metrics` schema (catalog `delta`).
   events not captured; `> 0` is an alert
 - **Unique records missing** (`cdc_pipeline_missing_events.unique_id_record_missing`) —
   distinct records with missing CDC events
+- **DLQ recovered rows** (`events_type_volume` where `event_type = 'DLQ_RECOVERY'`) —
+  metric-only type. Use `layer = 'raw'` for API rows written to raw and `layer = 'clean'`
+  for CDC history replayed into clean. Lake rows keep `event_type = 'RECOVERY'`.
+  Every DLQ run writes both layers, so `row_count = 0` means nothing needed recovering
+  and a *missing* row means the `dlq_events_*` task did not run.
 - **New columns count** (`table_metadata.new_cols_count`) — number of unexpected new
   columns detected in a source table that hour
 - **Contract status** (`contract_quality_checks.status`) — pass/fail string for each
@@ -149,6 +166,9 @@ LEFT JOIN datalake_sst_metrics.cdc_pipeline_missing_events m
 - Pick a consistent `window_size` when querying `pipeline_stability` across multiple rows.
 - Use `table_metadata` to answer "what new columns appeared in table X" — check
   `new_cols_count > 0` and read the `new_cols` array.
+- Filter `events_type_volume.event_type = 'DLQ_RECOVERY'` for DLQ volume (`layer` for
+  raw vs clean). Treat an absent row — not `row_count = 0` — as the signal that the
+  `dlq_events_*` Airflow task did not run.
 
 **Don't:**
 - Don't query `stability` for new analyses — it is the legacy version of
@@ -166,6 +186,8 @@ LEFT JOIN datalake_sst_metrics.cdc_pipeline_missing_events m
   column — latency may be in hours or minutes depending on the pipeline.
 - Don't treat `z_score = 0` as healthy without also checking `has_historical_data =
   true`; a table with no history will show `z_score = 0` trivially.
+- Don't use `event_type = 'RECOVERY'` as the DLQ volume signal — that is the lake CDC
+  payload type (also used by AppFlow API fallback). DLQ metrics use `DLQ_RECOVERY`.
 
 ## Golden Queries
 
@@ -252,6 +274,27 @@ ORDER BY partition_date DESC, total_events_missing DESC
 LIMIT 100
 ```
 
+### Query 5 — Salesforce rows recovered by DLQ in the last 7 days
+
+```sql
+SELECT
+  source_table,
+  partition_date,
+  partition_hour,
+  layer,
+  row_count,
+  _write_timestamp
+FROM datalake_sst_metrics.events_type_volume
+WHERE CAST(partition_date AS DATE) >= CURRENT_DATE - INTERVAL '7' DAY
+  AND environment = 'prod'
+  AND event_type = 'DLQ_RECOVERY'
+ORDER BY partition_date DESC, CAST(partition_hour AS INTEGER) DESC
+LIMIT 100
+```
+
+`layer = 'raw'` is API rows upserted into raw; `layer = 'clean'` is CDC history replayed
+into clean. The two counts need not match, and both are `0` on an hour with no gap.
+
 ## Salesforce Appflow Pipeline
 
 ### Architecture
@@ -300,6 +343,18 @@ in `pipeline_stability` during recovery are expected and do not indicate data lo
 **How to check if recovery is active:** query `appflow_status` for `status != 'Active'`.
 If multiple tables show non-Active simultaneously, a broader Appflow connectivity issue is
 likely (e.g., Salesforce credential expiry, AWS connector issue).
+
+### DLQ replay
+
+Each event lineage ends with `dlq_events_*`, after the regular metrics tasks. The DLQ
+compares raw with clean for the hour, fetches missing IDs from the Salesforce API as
+`RECOVERY`, upserts those records into raw, and replays each ID's complete raw CDC history
+into clean.
+
+DLQ appends `event_type = 'DLQ_RECOVERY'` to the same `events_type_volume` table (`layer`
+distinguishes raw vs clean), one row per layer on **every** run — `row_count = 0` when
+there was nothing to recover. An absent row therefore means the task did not run. Lake
+rows still use `event_type = 'RECOVERY'`.
 
 ### Golden query — Appflow flows with non-Active status
 

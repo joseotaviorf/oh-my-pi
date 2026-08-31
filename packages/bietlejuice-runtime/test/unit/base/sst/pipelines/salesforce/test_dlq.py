@@ -12,6 +12,7 @@ API_ENTITY = "Case"
 PARTITION_DATE = "2026-08-21"
 PARTITION_HOUR = "10"
 ENDPOINT = "https://example.my.salesforce.com"
+BUCKET = "test-datalake-bucket"
 UPDATED_IDS = ["001AAA", "001BBB"]
 UNIQUE_GRAIN = [
     "id_record",
@@ -47,6 +48,8 @@ def _args():
         API_ENTITY,
         "--salesforce_endpoint",
         ENDPOINT,
+        "--bucket",
+        BUCKET,
     ]
 
 
@@ -86,13 +89,16 @@ def patched():
         mock.patch.object(pipeline, "apply_schema_remaps") as remap,
         mock.patch.object(pipeline, "validate_and_upsert") as upsert,
         mock.patch.object(pipeline, "reprocess_cdc_events") as reprocess,
+        mock.patch.object(pipeline, "save_dlq_volume_metrics") as save_metric,
     ):
         spark = mock.MagicMock(name="spark")
         spark.read.table.return_value = _chained_df("raw_table")
         retrieve.return_value = spark
         remapped = _chained_df("remapped")
+        reprocessed = _chained_df("reprocessed")
         remap.return_value = remapped
         retrieve_event.return_value = _chained_df("recovered")
+        reprocess.return_value = reprocessed
         yield SimpleNamespace(
             spark=spark,
             missing=missing,
@@ -101,7 +107,22 @@ def patched():
             upsert=upsert,
             reprocess=reprocess,
             remapped=remapped,
+            reprocessed=reprocessed,
+            save_metric=save_metric,
         )
+
+
+def _assert_metric_recorded(save_metric, raw_df=None, clean_df=None):
+    """The metric is always recorded once, with the partition it processed."""
+    save_metric.assert_called_once()
+    kwargs = save_metric.call_args.kwargs
+    assert kwargs["bucket"] == BUCKET
+    assert kwargs["target_table"] == TARGET_TABLE
+    assert kwargs["env"] == "forno"
+    assert kwargs["partition_date"] == PARTITION_DATE
+    assert kwargs["partition_hour"] == PARTITION_HOUR
+    assert kwargs["raw_df"] is raw_df
+    assert kwargs["clean_df"] is clean_df
 
 
 class TestDlqPipeline:
@@ -121,6 +142,7 @@ class TestDlqPipeline:
         patched.retrieve_event.assert_not_called()
         patched.upsert.assert_not_called()
         patched.reprocess.assert_not_called()
+        _assert_metric_recorded(patched.save_metric)
 
     def test_upserts_raw_and_reprocesses_clean(self, patched):
         pipeline.dlq_pipeline(args=_args())
@@ -147,6 +169,11 @@ class TestDlqPipeline:
             table=TARGET_TABLE,
             id_list=UPDATED_IDS,
         )
+        _assert_metric_recorded(
+            patched.save_metric,
+            raw_df=patched.remapped,
+            clean_df=patched.reprocessed,
+        )
 
     def test_exits_when_query_chunks_are_empty(self, patched):
         patched.chunks.return_value = ([], [])
@@ -156,6 +183,7 @@ class TestDlqPipeline:
         patched.retrieve_event.assert_not_called()
         patched.upsert.assert_not_called()
         patched.reprocess.assert_not_called()
+        _assert_metric_recorded(patched.save_metric)
 
     def test_main_entrypoint_parses_cli_argv(self, patched):
         with mock.patch("sys.argv", ["dlq.py", *_args()]):
@@ -172,8 +200,9 @@ class TestReprocessCdcEvents:
     def test_returns_early_when_id_list_is_empty(self):
         spark = mock.MagicMock()
 
-        pipeline.reprocess_cdc_events(spark, TARGET_TABLE, [])
+        result = pipeline.reprocess_cdc_events(spark, TARGET_TABLE, [])
 
+        assert result is None
         spark.read.table.assert_not_called()
 
     def test_upserts_clean_for_ids_with_create_or_recovery(self):
@@ -198,11 +227,12 @@ class TestReprocessCdcEvents:
             mock.patch.object(pipeline, "in_memory_cdc_udpate", return_value=cdc),
             mock.patch.object(pipeline, "validate_and_upsert") as upsert,
         ):
-            pipeline.reprocess_cdc_events(spark, TARGET_TABLE, UPDATED_IDS)
+            result = pipeline.reprocess_cdc_events(spark, TARGET_TABLE, UPDATED_IDS)
 
         spark.read.table.assert_called_once_with(
             f"datalake_salesforce_raw.{TARGET_TABLE}"
         )
+        assert result is updated
         upsert.assert_called_once()
         _, kwargs = upsert.call_args
         assert kwargs["target_table"] == f"datalake_salesforce_clean.{TARGET_TABLE}"
