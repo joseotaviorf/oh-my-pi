@@ -4,7 +4,9 @@ dag:
   owner: Data Broker XP
   documentation:
     dag_purpose: |
-      Creates enriched tables for broker status history tracking. Combines Hubspot and Company data sources to build a unified view of broker status changes over time, partitioned by broker and product.
+      Creates enriched tables for broker status history tracking and product-scoped HubSpot Account
+      Manager periods. Combines Hubspot and Company data sources to build a unified view of broker
+      status changes over time, partitioned by broker and product, plus Sale/Rent AM SCD2.
 workflow:
   type: query_delta
   layer: enrich
@@ -12,6 +14,8 @@ workflow:
   tables_customization:
     broker_status_history:
       z_order_by: [sk_broker, product_name]
+    broker_account_manager_history:
+      z_order_by: [sk_broker, business_context]
   inner_dependencies:
     broker_status_history:
     - hubspot_brokers_history

@@ -1,0 +1,74 @@
+database_name: datalake_brokers
+table_name: broker_account_manager_history
+description: >
+  Enriched SCD2 periods of HubSpot Account Manager assignment per broker and product lane (SALE / RENT).
+  One canonical HubSpot company is chosen per effective CNPJ among companies that have been Rede Sale or
+  Rede Rent members (same ranking as hubspot_brokers_history, with eligibility widened to sale or rent).
+  Grain is one row per (sk_broker, business_context, assignment period) with ts_start / ts_end / is_current.
+  Effective owner id uses id_hubspot_owner until the first lake observation of the dedicated HubSpot field
+  (ts_switch), then account_manager__for_sale or account_manager__for_rent even if the product is inactive.
+  Rent periods are clipped so ts_start is never before 2026-02-01. Membership INACTIVE does not close a
+  period; a new row is emitted only when the effective HubSpot owner id changes. Consumed by
+  dw_brokers.dim_broker (current Sale/Rent emails) and dw_brokers.dim_broker_account_manager_history.
+domain: Broker XP
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_broker:
+    lineage:
+      - core_brokers.brokers.sk_broker
+    description: >
+      Surrogate key of the broker in core_brokers.brokers, resolved by matching the effective CNPJ
+      (COALESCE(cnpj_unique, cnpj) from datalake_hubspot.company) to core_brokers.brokers.cnpj.
+  id_hubspot_company:
+    lineage:
+      - datalake_hubspot.company_history.id_company
+    description: >
+      HubSpot company object id of the canonical company whose history produced this Account Manager
+      period. One company is kept per effective CNPJ after ranking.
+  id_account_manager:
+    lineage:
+      - datalake_hubspot.company_history.id_account_manager_for_sale
+      - datalake_hubspot.company_history.id_account_manager_for_rent
+      - datalake_hubspot.company_history.id_hubspot_owner
+    description: >
+      Effective HubSpot owner id for this period and business_context. Before ts_switch (or when the
+      dedicated field was never populated) this is id_hubspot_owner; from ts_switch onward it is
+      id_account_manager_for_sale or id_account_manager_for_rent. Null is allowed after switch when the
+      dedicated HubSpot property is cleared.
+  business_context:
+    description: Product lane of the Account Manager assignment.
+    categories:
+      SALE: For Sale Account Manager timeline.
+      RENT: For Rent Account Manager timeline (no period starts before 2026-02-01).
+  account_manager_source:
+    description: >
+      Which HubSpot property supplied the effective owner id on this period. HUBSPOT_OWNER before
+      ts_switch; the dedicated For Sale or For Rent property from the first lake observation onward.
+    categories:
+      HUBSPOT_OWNER: Effective id taken from generic hubspot_owner_id.
+      ACCOUNT_MANAGER_FOR_SALE: Effective id taken from account_manager__for_sale after ts_switch.
+      ACCOUNT_MANAGER_FOR_RENT: Effective id taken from account_manager__for_rent after ts_switch.
+  version:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: >
+      Sequential version of Account Manager periods per (sk_broker, business_context), ordered by
+      ts_start ascending. Version 1 is the earliest period in that lane.
+  is_current:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: >
+      True for the latest period per (sk_broker, business_context). A broker can have two current rows,
+      one for SALE and one for RENT.
+  ts_start:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: >
+      Start timestamp of the assignment period. For RENT, clipped to 2026-02-01 when the underlying
+      owner assignment began earlier.
+  ts_end:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: End timestamp of the period (start of the next owner-id change); null while current.
+  ts_load:
+    description: Timestamp of when the record was loaded or last updated by the ETL process.
