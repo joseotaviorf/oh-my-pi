@@ -113,34 +113,24 @@ house_city_clean AS (
         id_house,
         TRIM(
             REGEXP_REPLACE(
-                REGEXP_EXTRACT(
-                    TRIM(LOWER(h.city)),
-                    '^([^,/-]+)',
-                    1
+                TRANSLATE(
+                    REGEXP_EXTRACT(TRIM(LOWER(h.city)), '^([^,/-]+)', 1),
+                    'áàâãäéèêëíìîïóòôõöúùûüç',
+                    'aaaaaeeeeiiiiooooouuuuc'
                 ),
                 '[^a-z ]',
                 ''
             )
         ) AS city_name,
-        TRANSLATE(
-            REGEXP_REPLACE(
-                TRIM(
-                    REGEXP_REPLACE(
-                        REGEXP_EXTRACT(
-                            TRIM(LOWER(h.city)),
-                            '^([^,/-]+)',
-                            1
-                        ),
-                        '[^a-z ]',
-                        ''
-                    )
-                ),
-                '\\s+',
-                ''
+        REGEXP_REPLACE(
+            TRANSLATE(
+                REGEXP_EXTRACT(TRIM(LOWER(h.city)), '^([^,/-]+)', 1),
+                'áàâãäéèêëíìîïóòôõöúùûüç',
+                'aaaaaeeeeiiiiooooouuuuc'
             ),
-            'áàâãäéèêëíìîïóòôõöúùûüç',
-            'aaaaaeeeeiiiiooooouuuuc'
-        )  AS city_name_clean
+            '[^a-z]',
+            ''
+        ) AS city_name_clean
     FROM
         core_house.house AS h
 ),

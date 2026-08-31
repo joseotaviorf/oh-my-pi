@@ -42,6 +42,12 @@ purchase_pricing AS (
                 AND lpe.similar_house_listing_status = "UNPUBLISHED"
                 AND lpe.is_same_owner IS TRUE
                 THEN 'not-eligible: Similar house was terminated, is unpublished and has not generated a relisting, but the owner is the same'
+            WHEN LOWER(clp.city_group) IN ('brasília', 'goiânia') AND clp.ts_first_listing >= '2026-09-01' and clp.ts_first_listing < '2026-10-01'
+                AND lpe.dt_similiar_house_contract_termination IS NOT NULL 
+                AND lpe.has_similiar_house_republication IS FALSE
+                AND lpe.similar_house_listing_status = "UNPUBLISHED"
+                AND lpe.is_same_owner IS FALSE
+                THEN 'full-price-promotional-2026-09: Similar house was terminated, is unpublished, has not generated a relisting and the owner is different. Promotional price for 2026-09 and 2026-10 on Brasilia & Goiania.'
             WHEN lpe.dt_similiar_house_contract_termination IS NOT NULL 
                 AND lpe.has_similiar_house_republication IS FALSE
                 AND lpe.similar_house_listing_status = "UNPUBLISHED"
@@ -65,6 +71,7 @@ purchase_pricing AS (
             WHEN acquisition_type = 'not-eligible' THEN 0
             WHEN acquisition_type = 'reduced-price' THEN 150
             WHEN acquisition_type = 'full-price' THEN 1000
+            WHEN acquisition_type = 'full-price-promotional-2026-09' THEN 1500
         END AS purchase_value,
         CASE
             WHEN acquisition_type = 'not-eligible' THEN 'not-eligible'
