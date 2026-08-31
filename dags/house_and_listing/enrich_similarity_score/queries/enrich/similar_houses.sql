@@ -16,7 +16,10 @@ WITH get_sale_visits AS (
     WHERE
         MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
-        ALL
+        oldi_1.id_house,
+        oldi_1.year,
+        oldi_1.month,
+        oldi_1.day
 ),
 sale_with_visits AS (
     SELECT
@@ -155,7 +158,12 @@ get_similar_rules AS (
         has_price_and_area_match
         AND distance <= 2
     GROUP BY
-        ALL
+        base_id_house,
+        days_published,
+        business_context,
+        year,
+        month,
+        day
     HAVING
         SIZE(ids_similar) >= 3
 
@@ -176,7 +184,12 @@ get_similar_rules AS (
         has_price_and_area_match
         AND distance <= 5
     GROUP BY
-        ALL
+        base_id_house,
+        days_published,
+        business_context,
+        year,
+        month,
+        day
     HAVING
         SIZE(ids_similar) >= 3
 
@@ -194,7 +207,12 @@ get_similar_rules AS (
     FROM
         get_similar
     GROUP BY
-        ALL
+        base_id_house,
+        days_published,
+        business_context,
+        year,
+        month,
+        day
     HAVING
         SIZE(ids_similar) >= 3
 ),

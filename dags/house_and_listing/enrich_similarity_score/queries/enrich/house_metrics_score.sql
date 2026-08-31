@@ -25,7 +25,16 @@ WITH get_metrics_base_rent AS (
         MAKE_DATE(hldi_1.year, hldi_1.month, hldi_1.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND hldi_1.status_history = 'PUBLISHED'
     GROUP BY
-        ALL
+        MD5(CONCAT(hldi_1.id_house, 'RENT', hldi_1.year, hldi_1.month, hldi_1.day)),
+        hldi_1.id_house,
+        DATE_SUB(
+            MAKE_DATE(hldi_1.year, hldi_1.month, hldi_1.day),
+            CAST(IF(hldi_1.days_published < 15, hldi_1.days_published, 15) AS INT) - 1
+        ),
+        MAKE_DATE(hldi_1.year, hldi_1.month, hldi_1.day),
+        hldi_1.year,
+        hldi_1.month,
+        hldi_1.day
 ),
 get_metrics_base_sale AS (
     SELECT
@@ -53,7 +62,16 @@ get_metrics_base_sale AS (
     WHERE
         MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
-        ALL
+        MD5(CONCAT(oldi_1.id_house, 'SALE', oldi_1.year, oldi_1.month, oldi_1.day)),
+        oldi_1.id_house,
+        DATE_SUB(
+            MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day),
+            CAST(IF(oldi_1.days_published < 30, oldi_1.days_published, 30) AS INT) - 1
+        ),
+        MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day),
+        oldi_1.year,
+        oldi_1.month,
+        oldi_1.day
 ),
 get_metrics_base AS (
     SELECT
@@ -138,7 +156,15 @@ get_metrics_similar_1 AS (
             AND es.business_context = 'SALE'
             AND MAKE_DATE(oldi.year, oldi.month,oldi.day) BETWEEN es.dt_agg_started AND es.dt_agg_ended
     GROUP BY
-        ALL
+        es.id,
+        es.id_house,
+        es.id_similar,
+        es.business_context,
+        es.dt_agg_started,
+        es.dt_agg_ended,
+        es.year,
+        es.month,
+        es.day
 ),
 get_metrics_similar_2 AS (
     SELECT
@@ -159,7 +185,14 @@ get_metrics_similar_2 AS (
     FROM
         get_metrics_similar_1
     GROUP BY
-        ALL
+        id,
+        id_house,
+        business_context,
+        dt_agg_started,
+        dt_agg_ended,
+        year,
+        month,
+        day
 )
 SELECT
     COALESCE(s.id, b.id) AS id,
