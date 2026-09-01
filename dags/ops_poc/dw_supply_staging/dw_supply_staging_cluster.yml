@@ -1,2 +1,11 @@
 cluster:
   type: emr_7_12_consolidation_m_memory_fleet_cluster
+  custom_configurations:
+    # Match pre-migration Databricks override (consolidation_m + num_workers: 4).
+    # EMR M fleet preset defaults to 2 CORE nodes — too small for supply_tof_aggregated.
+    # Fleet clusters must use core_nodes.target_* (not legacy num_workers).
+    core_nodes:
+      target_on_demand: 4
+      target_spot: 0
+    spark_conf:
+      spark.sql.broadcastTimeout: '600'
