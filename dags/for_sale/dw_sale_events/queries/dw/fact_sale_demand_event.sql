@@ -415,4 +415,35 @@ SELECT
     ts_load
 FROM
     final_results
-GROUP BY ALL
+GROUP BY
+    sk_sale_demand_event,
+    sk_event_date,
+    sk_event_type,
+    sk_booking,
+    sk_visit,
+    sk_offer,
+    sk_house,
+    sk_region,
+    sk_buyer,
+    sk_seller,
+    sk_agent,
+    sk_agent_work_contract,
+    sk_business_unit,
+    sk_company_supply,
+    sk_company_demand,
+    sk_broker_supply,
+    sk_broker_demand,
+    sk_secretariat_booking_creator,
+    sk_secretariat_on_event,
+    sk_last_secretariat,
+    sk_buyer_prospect_type,
+    sk_listing_price_segment,
+    is_3p_supply,
+    is_3p_demand,
+    is_3p_lead_gen,
+    has_3p_access_control,
+    year,
+    month,
+    day,
+    ts_event,
+    ts_load
