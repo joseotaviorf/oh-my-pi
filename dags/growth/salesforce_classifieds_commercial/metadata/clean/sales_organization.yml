@@ -1,0 +1,157 @@
+---
+database_name: datalake_salesforce_classifieds_clean
+table_name: sales_organization
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Organizacion_de_venta__c objects from the Navent Classifieds Salesforce org. Grain is one row
+  per sales organization (id) per incremental load window, keyed by Salesforce Id. Contains configuration parameters,
+  accepted currencies, payment methods, and Pardot integration settings for sales organizations. Source:
+  datalake_salesforce_classifieds_raw.organizacion_de_venta__c. Physically partitioned by year, month, and day from dt_updated
+  (derived from LastModifiedDate). Always filter year, month, and day together — or use dt_updated with
+  load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Organizacion_de_venta__c object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Id
+  id_owner:
+    description: Foreign Key to the Salesforce User who owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.OwnerId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.LastModifiedById
+  id_country:
+    description: Foreign Key to the associated Country custom object (Pais__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Pais__c
+  id_portal:
+    description: Custom external or reference portal identifier (Id_de_portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Id_de_portal__c
+  external_sap_id:
+    description: External SAP identifier for the sales organization (Id_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Id_SAP__c
+  external_pardot_business_unit_id:
+    description: External Pardot business unit identifier (Id_unidad_de_negocio_Pardot__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Id_unidad_de_negocio_Pardot__c
+  sales_organization_name:
+    description: Name of the sales organization record (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Name
+  custom_sales_organization_name:
+    description: Custom text representation or alias for the sales organization (Organizacion_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Organizacion_de_venta__c
+  crm_navent_name:
+    description: Navent CRM integration reference name (CRM_Navent__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.CRM_Navent__c
+  vertical_name:
+    description: Business vertical classification (Vertical__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Vertical__c
+  portal_name:
+    description: Name of the associated portal (Portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Portal__c
+  credit_profile_name:
+    description: Default credit risk profile evaluation (Perfil_crediticio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Perfil_crediticio__c
+  base_currency:
+    description: Primary operating base currency (Moneda_base__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Moneda_base__c
+  accepted_currencies:
+    description: List of accepted transaction currencies (Monedas_aceptadas__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Monedas_aceptadas__c
+  accepted_payment_methods:
+    description: List of allowed payment methods (Vias_de_pago_aceptadas__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Vias_de_pago_aceptadas__c
+  allowed_discounts:
+    description: Description or configuration of permitted discounts (Descuentos_permitidos__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Descuentos_permitidos__c
+  discount_duration:
+    description: Allowed duration for applied discounts (Duracion_descuentos__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Duracion_descuentos__c
+  service_order_notification_emails:
+    description: Email addresses configured for service order dispatch (Emails_envio_OS__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Emails_envio_OS__c
+  currency_iso_code:
+    description: ISO code for record currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.CurrencyIsoCode
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.IsDeleted
+  is_campaign_mandatory_in_opportunity:
+    description: Flag indicating if campaign selection is mandatory in opportunities (Campana_oblig_en_Oport__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Campana_oblig_en_Oport__c
+  is_manual_company_id_upload_enabled:
+    description: Flag allowing manual upload of company ID (Carga_Id_empresa_manual__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Carga_Id_empresa_manual__c
+  is_opportunity_auto_renewal_enabled:
+    description: Flag enabling automatic renewal of opportunities (Renovacion_automatica_de_oportunidades__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Renovacion_automatica_de_oportunidades__c
+  is_pardot_sync_enabled:
+    description: Flag indicating synchronization status with Pardot (Sincroniza_con_pardot__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.Sincroniza_con_pardot__c
+  dt_last_activity:
+    description: Date of the last activity related to the record (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.LastActivityDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.LastReferencedDate
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.organizacion_de_venta__c.day

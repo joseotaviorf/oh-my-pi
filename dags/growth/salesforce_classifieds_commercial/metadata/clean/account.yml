@@ -1,0 +1,591 @@
+---
+database_name: datalake_salesforce_classifieds_clean
+table_name: account
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Account objects from the Navent Classifieds Salesforce org. Grain is one row
+  per account (id) per incremental load window, keyed by Salesforce Id. Includes standard Account fields,
+  Person Account attributes, tax/billing custom fields, and Whatslly integration timestamps. Source:
+  datalake_salesforce_classifieds_raw.account. Physically partitioned by year, month, and day from dt_updated
+  (derived from LastModifiedDate). Always filter year, month, and day together — or use dt_updated with
+  load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Account object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Id
+  id_parent:
+    description: Foreign Key to the parent Account record (ParentId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ParentId
+  id_master_record:
+    description: Foreign Key to the master Account record in case of merge (MasterRecordId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.MasterRecordId
+  id_owner:
+    description: Foreign Key to the Salesforce User who owns the Account (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.OwnerId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the Account (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the Account (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.LastModifiedById
+  id_record_type:
+    description: Foreign Key to the Salesforce RecordType assigned to the Account (RecordTypeId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.RecordTypeId
+  id_primary_contact:
+    description: Foreign Key to the primary contact record (Contacto_principal__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Contacto_principal__pc
+  id_person_contact:
+    description: Foreign Key to the underlying Contact record for Person Accounts (PersonContactId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonContactId
+  id_sap_contact:
+    description: Foreign Key to the SAP contact identifier (ID_Contacto_SAP__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ID_Contacto_SAP__pc
+  id_jigsaw_company:
+    description: Data.com Jigsaw company identifier (JigsawCompanyId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.JigsawCompanyId
+
+  # --- Priority 1: Natural Keys / External IDs ---
+  external_sap_customer_id:
+    description: External SAP customer identifier (ID_Cliente_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ID_Cliente_SAP__c
+  external_salesforce_account_id:
+    description: Alternative custom Salesforce account ID (ID_Cuenta_SF__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ID_Cuenta_SF__c
+  external_auto_number_id:
+    description: Autonumeric external ID for person contact (Id_externo_autonumerico__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Id_externo_autonumerico__pc
+  external_unique_id:
+    description: Custom exclusive external identifier (id_externo_exclusivo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.id_externo_exclusivo__c
+  external_jigsaw_id:
+    description: External Data.com Jigsaw record identifier (Jigsaw).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Jigsaw
+  external_whatslly_person_id:
+    description: External Whatslly integration person ID (whatslly__Whatslly_Person_Id__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.whatslly__Whatslly_Person_Id__c
+  external_whatslly_person_contact_id:
+    description: External Whatslly integration person contact ID (whatslly__Whatslly_Person_Id__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.whatslly__Whatslly_Person_Id__pc
+  external_whatslly_thread_id:
+    description: External Whatslly WhatsApp conversation thread ID (whatslly__Whatslly_Threads_ID__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.whatslly__Whatslly_Threads_ID__pc
+  account_name:
+    description: Full name or business name of the Account (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Name
+  first_name:
+    description: First name for Person Accounts (FirstName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.FirstName
+  last_name:
+    description: Last name for Person Accounts (LastName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.LastName
+  salutation:
+    description: Title or salutation of the individual (Salutation).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Salutation
+  person_title:
+    description: Title associated with the person contact (PersonTitle).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonTitle
+  job_title:
+    description: Job position/title of the contact (Puesto__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Puesto__pc
+  role_name:
+    description: Custom role or function within the company (Funcion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Funcion__c
+  department_name:
+    description: Department name for person contact (PersonDepartment).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonDepartment
+  company_department_name:
+    description: Functional area or department within the company (Area_en_la_empresa__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Area_en_la_empresa__pc
+  trade_name:
+    description: Trade name or fantasy name of the company (Nombre_de_Fantasia__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Nombre_de_Fantasia__c
+  account_owner_name:
+    description: Text name of the account owner (Nombre_del_propietario_de_la_cuenta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Nombre_del_propietario_de_la_cuenta__c
+  account_source:
+    description: Source channel from which the account originated (AccountSource).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.AccountSource
+  person_lead_source:
+    description: Lead source attributed to the person contact (PersonLeadSource).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonLeadSource
+  account_type:
+    description: Categorization type of the Account (Type).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Type
+  industry_name:
+    description: Industry classification translated via tolabel(Industry).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Industry
+  corporate_regime_name:
+    description: Legal corporate regime translated via tolabel(Regimen_societario__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Regimen_societario__c
+  line_of_business_name:
+    description: Line of business classification (Giro_comercial__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Giro_comercial__c
+  business_activity_name:
+    description: Secondary business activity description (Giro_de_Negocio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Giro_de_Negocio__c
+  tax_condition_name:
+    description: Fiscal/tax condition status for billing (Condicion_fiscal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Condicion_fiscal__c
+  document_type:
+    description: Official tax identification document type (Tipo_de_documento__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Tipo_de_documento__c
+  tax_id_number:
+    description: Fiscal identification document number (Numero_de_documento_fiscal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Numero_de_documento_fiscal__c
+  document_type_to_validate:
+    description: Document type pending validation (Tipo_de_documento_necesita_validar__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Tipo_de_documento_necesita_validar__c
+  credit_profile_name:
+    description: Credit risk profile evaluation (Perfil_crediticio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Perfil_crediticio__c
+  economic_group_name:
+    description: Associated corporate economic group (grupo_economico__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.grupo_economico__c
+  primary_sales_organization_name:
+    description: Main sales organization assignment (Organizacion_de_venta_principal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Organizacion_de_venta_principal__c
+  sales_organizations_name:
+    description: List or secondary sales organizations (Organizaciones_de_venta__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Organizaciones_de_venta__pc
+  checking_account_alias:
+    description: Alias for checking account / corriente (Alias_Cta_Cte__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Alias_Cta_Cte__c
+  system_checking_account_name:
+    description: System checking account reference (System_Cta_Cte__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.System_Cta_Cte__c
+  cbu_number:
+    description: Bank account unique code (CBU__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.CBU__c
+  license_number:
+    description: Professional or commercial license number (Matricula_Licencia__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Matricula_Licencia__c
+  hr_domain_name:
+    description: HR domain name classification (Dominio_HR__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Dominio_HR__c
+  phone_number:
+    description: Main phone number (Phone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Phone
+  home_phone_number:
+    description: Home phone number for Person Accounts (PersonHomePhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonHomePhone
+  mobile_phone_number:
+    description: Mobile phone number for Person Accounts (PersonMobilePhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMobilePhone
+  assistant_name:
+    description: Assistant name for Person Accounts (PersonAssistantName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonAssistantName
+  assistant_phone_number:
+    description: Assistant phone number for Person Accounts (PersonAssistantPhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonAssistantPhone
+  primary_contact_email:
+    description: Email address of the primary contact (Correo_electronico_de_contacto_principal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Correo_electronico_de_contacto_principal__c
+  person_email:
+    description: Email address for Person Accounts (PersonEmail).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonEmail
+  additional_email:
+    description: Secondary or additional email address (Email_adicional__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Email_adicional__pc
+  website_url:
+    description: Primary corporate website URL (Website).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Website
+  photo_url:
+    description: URL pointing to profile picture (PhotoUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PhotoUrl
+  last_service_order_url:
+    description: URL to the latest service order (URL_ultima_orden_de_servicio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.URL_ultima_orden_de_servicio__c
+  person_last_service_order_url:
+    description: URL to the latest person service order (URL_ultima_orden_de_servicio__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.URL_ultima_orden_de_servicio__pc
+  description:
+    description: General text description of the Account (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Description
+  sic_description:
+    description: Standard Industrial Classification text description (SicDesc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.SicDesc
+  sap_error_message:
+    description: Error message returned by SAP integration (Error_de_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Error_de_SAP__c
+  person_sap_error_message:
+    description: Error message returned by SAP for person account (Error_de_SAP__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Error_de_SAP__pc
+  email_bounced_reason:
+    description: Reason why email to person bounced (PersonEmailBouncedReason).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonEmailBouncedReason
+  mobile_country_code:
+    description: Country code for mobile phone marketing (et4ae5__Mobile_Country_Code__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.et4ae5__Mobile_Country_Code__pc
+  currency_iso_code:
+    description: ISO code for account currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.CurrencyIsoCode
+  billing_street:
+    description: Billing address street (BillingStreet).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.BillingStreet
+  billing_city:
+    description: Billing address city (BillingCity).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.BillingCity
+  billing_city_v2:
+    description: Custom secondary billing city (Ciudad_de_facturacion2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Ciudad_de_facturacion2__c
+  billing_state:
+    description: Billing address state/province (BillingState).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.BillingState
+  billing_state_custom:
+    description: Custom billing province/state (Provincia_Estado_de_facturacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Provincia_Estado_de_facturacion__c
+  billing_postal_code:
+    description: Billing address postal code (BillingPostalCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.BillingPostalCode
+  billing_postal_code_custom:
+    description: Custom billing postal code (Codigo_postal_de_facturacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Codigo_postal_de_facturacion__c
+  billing_country:
+    description: Billing address country (BillingCountry).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.BillingCountry
+  billing_country_custom:
+    description: Custom billing country (Pais_de_facturacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Pais_de_facturacion__c
+  billing_address:
+    description: Custom full billing address string (Direccion_de_facturacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Direccion_de_facturacion__c
+  billing_neighborhood:
+    description: Custom billing neighborhood/suburb (Zona_Barrio_Colonia_Comuna_facturacion2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Zona_Barrio_Colonia_Comuna_facturacion2__c
+  billing_geocode_accuracy:
+    description: Billing geocode accuracy level (BillingGeocodeAccuracy).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.BillingGeocodeAccuracy
+  shipping_street:
+    description: Shipping address street (ShippingStreet).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ShippingStreet
+  shipping_city:
+    description: Shipping address city (ShippingCity).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ShippingCity
+  shipping_state:
+    description: Shipping address state/province (ShippingState).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ShippingState
+  shipping_postal_code:
+    description: Shipping address postal code (ShippingPostalCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ShippingPostalCode
+  shipping_country:
+    description: Shipping address country (ShippingCountry).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ShippingCountry
+  shipping_geocode_accuracy:
+    description: Shipping geocode accuracy level (ShippingGeocodeAccuracy).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ShippingGeocodeAccuracy
+  mailing_street:
+    description: Person contact mailing street (PersonMailingStreet).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMailingStreet
+  mailing_city:
+    description: Person contact mailing city (PersonMailingCity).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMailingCity
+  mailing_state:
+    description: Person contact mailing state (PersonMailingState).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMailingState
+  mailing_postal_code:
+    description: Person contact mailing postal code (PersonMailingPostalCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMailingPostalCode
+  mailing_country:
+    description: Person contact mailing country (PersonMailingCountry).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMailingCountry
+  mailing_geocode_accuracy:
+    description: Person mailing geocode accuracy level (PersonMailingGeocodeAccuracy).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMailingGeocodeAccuracy
+  operation_address:
+    description: Operational activity street address (Direccion_de_operacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Direccion_de_operacion__c
+  operation_city:
+    description: Operational activity city (Ciudad_de_operacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Ciudad_de_operacion__c
+  operation_state:
+    description: Operational activity state (Provincia_Estado_de_operacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Provincia_Estado_de_operacion__c
+  operation_postal_code:
+    description: Operational activity postal code (Codigo_postal_de_operacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Codigo_postal_de_operacion__c
+  operation_country:
+    description: Operational activity country (Pais_de_operacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Pais_de_operacion__c
+  operation_neighborhood:
+    description: Operational activity neighborhood (Zona_Barrio_Colonia_Comuna_operacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Zona_Barrio_Colonia_Comuna_operacion__c
+  atta_management_status:
+    description: Management status flag for Atta system (Gestion_Atta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Gestion_Atta__c
+  casa_mineira_management_status:
+    description: Management status flag for Casa Mineira system (Gestion_CasaMineira__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Gestion_CasaMineira__c
+  iwb_wim_management_status:
+    description: Management status flag for IWB/WIM (Gestion_IWB_WIM__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Gestion_IWB_WIM__c
+  noknox_management_status:
+    description: Management status flag for NokNox system (Gestion_NokNox__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Gestion_NokNox__c
+  sindiconet_management_status:
+    description: Management status flag for SindicoNet system (Gestion_SindicoNet__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Gestion_SindicoNet__c
+  union_management_status:
+    description: Management status flag for Union system (Gestion_Union__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Gestion_Union__c
+  velo_management_status:
+    description: Management status flag for Velo system (Gestion_Velo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Gestion_Velo__c
+  created_by_whatslly_status:
+    description: Flag indicating creation through Whatslly integration (whatslly__Created_by_Whatslly__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.whatslly__Created_by_Whatslly__c
+  person_created_by_whatslly_status:
+    description: Person Account flag indicating creation through Whatslly (whatslly__Created_by_Whatslly__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.whatslly__Created_by_Whatslly__pc
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.IsDeleted
+  is_person_account:
+    description: True if the record is a Person Account, false for Business Account (IsPersonAccount).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.IsPersonAccount
+  is_blocked:
+    description: Boolean flag indicating if account is locked/blocked (Bloqueado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Bloqueado__c
+  is_customer_validated:
+    description: Boolean flag indicating if customer details have been verified (Cliente_validado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Cliente_validado__c
+  is_converted_to_business:
+    description: Flag indicating conversion from individual to business (Convertido_a_empresarial__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Convertido_a_empresarial__c
+  is_created_from_lead:
+    description: Flag indicating if person contact originated from lead conversion (Creado_de_prospecto__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Creado_de_prospecto__pc
+  has_sap_invoice_query_enabled:
+    description: Flag enabling invoice lookup in SAP (Consulta_de_facturas_en_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Consulta_de_facturas_en_SAP__c
+  requires_purchase_order:
+    description: Flag indicating requirement for purchase order (Requiere_orden_de_compra__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Requiere_orden_de_compra__c
+  is_last_owner_not_updated:
+    description: Flag indicating owner update anomaly (Ultimo_propietario_no_actualizado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Ultimo_propietario_no_actualizado__c
+  has_opted_out_of_email:
+    description: Person opt-out flag for marketing email communications (PersonHasOptedOutOfEmail).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonHasOptedOutOfEmail
+  has_opted_out_of_mobile:
+    description: Person opt-out flag for mobile/SMS communications (et4ae5__HasOptedOutOfMobile__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.et4ae5__HasOptedOutOfMobile__pc
+  employees_count:
+    description: Total employee headcount attributed to account (NumberOfEmployees).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.NumberOfEmployees
+  billing_latitude_coord:
+    description: Geolocation latitude for billing address (BillingLatitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.BillingLatitude
+  billing_longitude_coord:
+    description: Geolocation longitude for billing address (BillingLongitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.BillingLongitude
+  shipping_latitude_coord:
+    description: Geolocation latitude for shipping address (ShippingLatitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ShippingLatitude
+  shipping_longitude_coord:
+    description: Geolocation longitude for shipping address (ShippingLongitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.ShippingLongitude
+  mailing_latitude_coord:
+    description: Geolocation latitude for mailing address (PersonMailingLatitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMailingLatitude
+  mailing_longitude_coord:
+    description: Geolocation longitude for mailing address (PersonMailingLongitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonMailingLongitude
+  dt_born:
+    description: Date of birth for Person Accounts (PersonBirthdate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonBirthdate
+  dt_last_activity:
+    description: Date of the last activity related to the record (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.LastActivityDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.LastReferencedDate
+  ts_email_bounced:
+    description: Timestamp when email bounced for person account (PersonEmailBouncedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonEmailBouncedDate
+  ts_last_sap_error:
+    description: Timestamp of the last error reported by SAP (Fecha_de_ultimo_error_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Fecha_de_ultimo_error_SAP__c
+  ts_person_last_sap_error:
+    description: Timestamp of the last SAP error on person account (Fecha_de_ultimo_error_SAP__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.Fecha_de_ultimo_error_SAP__pc
+  ts_last_cu_requested:
+    description: Timestamp of last Contact Update request (PersonLastCURequestDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonLastCURequestDate
+  ts_last_cu_updated:
+    description: Timestamp of last Contact Update completion (PersonLastCUUpdateDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.PersonLastCUUpdateDate
+  ts_last_whatsapp_message:
+    description: Timestamp of last WhatsApp message recorded (whatslly__Last_WhatsApp_Message_Time__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.whatslly__Last_WhatsApp_Message_Time__c
+  ts_person_last_whatsapp_message:
+    description: Timestamp of last person WhatsApp message (whatslly__Last_WhatsApp_Message_Time__pc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.whatslly__Last_WhatsApp_Message_Time__pc
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.account.day

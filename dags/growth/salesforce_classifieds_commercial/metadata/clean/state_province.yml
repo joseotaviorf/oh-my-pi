@@ -1,0 +1,91 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: state_province
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Provincia_Estado__c objects from the Navent Classifieds Salesforce org. Grain is one row
+  per state/province record (id) per incremental load window, keyed by Salesforce Id. Contains state metadata and country links.
+  Source: datalake_salesforce_classifieds_raw.provincia_estado__c. Physically partitioned by year, month, and day from dt_updated
+  (derived from LastModifiedDate). Always filter year, month, and day together — or use dt_updated with
+  load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Provincia_Estado__c object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.Id
+  id_country:
+    description: Foreign Key to associated Country custom object (Pais__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.Pais__c
+  id_owner:
+    description: Foreign Key to the Salesforce User who owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.OwnerId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.LastModifiedById
+  external_state_id:
+    description: Custom external state/province identifier (Id_de_Provincia_Estado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.Id_de_Provincia_Estado__c
+  external_salesforce_id:
+    description: External Salesforce migration reference ID (Id_Salesforce__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.Id_Salesforce__c
+  state_name:
+    description: Full display label of the first-level administrative division shown on classifieds billing and operation addresses (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.Name
+  currency_iso_code:
+    description: ISO code for record currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.CurrencyIsoCode
+  is_deleted:
+    description: Flag indicating if record was soft-deleted (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.IsDeleted
+  dt_last_activity:
+    description: Date of last activity (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.LastActivityDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.LastReferencedDate
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.provincia_estado__c.day

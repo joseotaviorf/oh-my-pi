@@ -1,0 +1,103 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: pricebook2
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Pricebook2 objects from the Navent Classifieds Salesforce org. Grain is one row
+  per pricebook (id) per incremental load window, keyed by Salesforce Id. Contains pricing catalogs and regional flags.
+  Source: datalake_salesforce_classifieds_raw.pricebook2. Physically partitioned by year, month, and day from dt_updated
+  (derived from LastModifiedDate). Always filter year, month, and day together — or use dt_updated with
+  load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Pricebook2 object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.Id
+  id_country:
+    description: Foreign Key to associated Country custom object (Pais__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.Pais__c
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.LastModifiedById
+  external_sap_price_list_id:
+    description: External SAP price list identifier (ID_Lista_de_Precios_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.ID_Lista_de_Precios_SAP__c
+  pricebook_name:
+    description: Full display name of the pricebook (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.Name
+  description:
+    description: Description of the pricebook catalog (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.Description
+  currency_iso_code:
+    description: ISO code for currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.CurrencyIsoCode
+  sales_organization_name:
+    description: Sales organization assigned to pricebook (Organizacion_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.Organizacion_de_venta__c
+  is_active:
+    description: Flag indicating if the pricebook is active (IsActive).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.IsActive
+  is_deleted:
+    description: Flag indicating if record was soft-deleted (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.IsDeleted
+  is_standard:
+    description: True if this is the system standard pricebook (IsStandard).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.IsStandard
+  is_archived:
+    description: Flag indicating if pricebook is archived (IsArchived).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.IsArchived
+  is_regional:
+    description: Flag indicating if pricebook applies regionally (Es_regional__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.Es_regional__c
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.LastReferencedDate
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.pricebook2.day

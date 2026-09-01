@@ -1,0 +1,87 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: city
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Ciudad__c objects from the Navent Classifieds Salesforce org. Grain is one row
+  per city record (id) per incremental load window, keyed by Salesforce Id. Includes city names, reference IDs,
+  and state/province links. Source: datalake_salesforce_classifieds_raw.ciudad__c. Physically partitioned by year, month, and day
+  from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use dt_updated with
+  load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Ciudad__c object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.Id
+  id_owner:
+    description: Foreign Key to the Salesforce User who owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.OwnerId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.LastModifiedById
+  id_city:
+    description: Custom external or reference city identifier (Id_de_Ciudad__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.Id_de_Ciudad__c
+  id_state:
+    description: Foreign Key to the associated State/Province custom object (Provincia_Estado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.Provincia_Estado__c
+  city_name:
+    description: Full display name of the city (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.Name
+  currency_iso_code:
+    description: ISO code for record currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.CurrencyIsoCode
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.IsDeleted
+  dt_last_activity:
+    description: Date of the last activity related to the record (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.LastActivityDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.LastReferencedDate
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.ciudad__c.day

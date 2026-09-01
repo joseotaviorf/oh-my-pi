@@ -1,0 +1,291 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: contact
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Contact objects from the Navent Classifieds Salesforce org. Grain is one row
+  per contact (id) per incremental load window, keyed by Salesforce Id. Includes contact personal details,
+  job positions, mailing addresses, SAP references, and Whatslly metadata. Source: datalake_salesforce_classifieds_raw.contact.
+  Physically partitioned by year, month, and day from dt_updated (derived from LastModifiedDate). Always filter year,
+  month, and day together — or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Contact object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Id
+  id_account:
+    description: Foreign Key to the associated Account record (AccountId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.AccountId
+  id_owner:
+    description: Foreign Key to the Salesforce User who owns the Contact (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.OwnerId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the Contact (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the Contact (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LastModifiedById
+  id_reports_to:
+    description: Foreign Key to the manager Contact record (ReportsToId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.ReportsToId
+  id_master_record:
+    description: Foreign Key to the master Contact record in case of merge (MasterRecordId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MasterRecordId
+  external_sap_contact_id:
+    description: External SAP contact identifier (ID_Contacto_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.ID_Contacto_SAP__c
+  external_auto_number_id:
+    description: Autonumeric external ID for contact (Id_externo_autonumerico__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Id_externo_autonumerico__c
+  external_jigsaw_contact_id:
+    description: Data.com Jigsaw contact identifier (JigsawContactId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.JigsawContactId
+  external_whatslly_person_id:
+    description: External Whatslly integration person ID (whatslly__Whatslly_Person_Id__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.whatslly__Whatslly_Person_Id__c
+  external_whatslly_thread_id:
+    description: External Whatslly WhatsApp conversation thread ID (whatslly__Whatslly_Threads_ID__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.whatslly__Whatslly_Threads_ID__c
+  external_jigsaw_id:
+    description: External Data.com Jigsaw record identifier (Jigsaw).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Jigsaw
+  contact_name:
+    description: Full name of the contact (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Name
+  first_name:
+    description: Contact first name (FirstName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.FirstName
+  last_name:
+    description: Contact last name (LastName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LastName
+  salutation:
+    description: Title or salutation of the contact (Salutation).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Salutation
+  title:
+    description: Professional title of the contact (Title).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Title
+  job_title:
+    description: Job position/title of the contact (Puesto__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Puesto__c
+  department_name:
+    description: Department or functional area of the contact (Department).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Department
+  company_department_name:
+    description: Functional area within the company (Area_en_la_empresa__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Area_en_la_empresa__c
+  lead_source:
+    description: Source channel from which the contact originated (LeadSource).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LeadSource
+  phone_number:
+    description: Primary phone number (Phone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Phone
+  home_phone_number:
+    description: Home phone number (HomePhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.HomePhone
+  mobile_phone_number:
+    description: Mobile phone number (MobilePhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MobilePhone
+  fax_number:
+    description: Fax phone number for reaching the contact (Fax).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Fax
+  assistant_name:
+    description: Assistant name (AssistantName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.AssistantName
+  assistant_phone_number:
+    description: Assistant phone number (AssistantPhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.AssistantPhone
+  email:
+    description: Primary email address (Email).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Email
+  additional_email:
+    description: Secondary or additional email address (Email_adicional__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Email_adicional__c
+  photo_url:
+    description: URL pointing to profile picture (PhotoUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.PhotoUrl
+  last_service_order_url:
+    description: URL to the latest service order (URL_ultima_orden_de_servicio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.URL_ultima_orden_de_servicio__c
+  description:
+    description: General text description of the contact (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Description
+  sap_error_message:
+    description: Error message returned by SAP integration (Error_de_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Error_de_SAP__c
+  email_bounced_reason:
+    description: Reason why email bounced (EmailBouncedReason).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.EmailBouncedReason
+  mobile_country_code:
+    description: Country code for mobile phone marketing (et4ae5__Mobile_Country_Code__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.et4ae5__Mobile_Country_Code__c
+  currency_iso_code:
+    description: ISO code for record currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.CurrencyIsoCode
+  mailing_street:
+    description: Mailing address street (MailingStreet).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MailingStreet
+  mailing_city:
+    description: Mailing address city (MailingCity).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MailingCity
+  mailing_state:
+    description: Mailing address state/province (MailingState).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MailingState
+  mailing_postal_code:
+    description: Mailing address postal code (MailingPostalCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MailingPostalCode
+  mailing_country:
+    description: Mailing address country (MailingCountry).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MailingCountry
+  mailing_geocode_accuracy:
+    description: Mailing geocode accuracy level (MailingGeocodeAccuracy).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MailingGeocodeAccuracy
+  sales_organizations_name:
+    description: Assigned sales organizations (Organizaciones_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Organizaciones_de_venta__c
+  created_by_whatslly_status:
+    description: Flag indicating creation through Whatslly integration (whatslly__Created_by_Whatslly__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.whatslly__Created_by_Whatslly__c
+  is_primary_contact:
+    description: Flag indicating if this is the main contact (Contacto_principal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Contacto_principal__c
+  is_created_from_lead:
+    description: Flag indicating if contact originated from lead conversion (Creado_de_prospecto__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Creado_de_prospecto__c
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.IsDeleted
+  is_email_bounced:
+    description: True if email sent to contact bounced (IsEmailBounced).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.IsEmailBounced
+  is_person_account:
+    description: True if record belongs to a Person Account (IsPersonAccount).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.IsPersonAccount
+  has_opted_out_of_email:
+    description: Opt-out flag for marketing email communications (HasOptedOutOfEmail).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.HasOptedOutOfEmail
+  has_opted_out_of_mobile:
+    description: Opt-out flag for mobile/SMS communications (et4ae5__HasOptedOutOfMobile__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.et4ae5__HasOptedOutOfMobile__c
+  mailing_latitude_coord:
+    description: Geolocation latitude for mailing address (MailingLatitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MailingLatitude
+  mailing_longitude_coord:
+    description: Geolocation longitude for mailing address (MailingLongitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.MailingLongitude
+  dt_born:
+    description: Date of birth (Birthdate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Birthdate
+  dt_last_activity:
+    description: Date of the last activity related to the record (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LastActivityDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LastReferencedDate
+  ts_email_bounced:
+    description: Timestamp when email bounced (EmailBouncedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.EmailBouncedDate
+  ts_last_sap_error:
+    description: Timestamp of the last error reported by SAP (Fecha_de_ultimo_error_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.Fecha_de_ultimo_error_SAP__c
+  ts_last_cu_requested:
+    description: Timestamp of last Contact Update request (LastCURequestDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LastCURequestDate
+  ts_last_cu_updated:
+    description: Timestamp of last Contact Update completion (LastCUUpdateDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.LastCUUpdateDate
+  ts_last_whatsapp_message:
+    description: Timestamp of last WhatsApp message recorded (whatslly__Last_WhatsApp_Message_Time__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.whatslly__Last_WhatsApp_Message_Time__c
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.contact.day

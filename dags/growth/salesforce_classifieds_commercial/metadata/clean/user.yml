@@ -1,0 +1,435 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: user
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce User objects from the Navent Classifieds Salesforce org. Grain is one row
+  per user (id) per incremental load window, keyed by Salesforce Id. Contains employee profiles, roles,
+  and ExactTarget/Marketing Cloud metadata. Source: datalake_salesforce_classifieds_raw.user. Physically partitioned by year,
+  month, and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use dt_updated
+  with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the User object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Id
+  id_account:
+    description: Foreign Key to associated Account record (AccountId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.AccountId
+  id_contact:
+    description: Foreign Key to associated Contact record (ContactId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.ContactId
+  id_manager:
+    description: Foreign Key to user's manager User record (ManagerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.ManagerId
+  id_user_role:
+    description: Foreign Key to associated UserRole record (UserRoleId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.UserRoleId
+  id_delegated_approver:
+    description: Foreign Key to delegated approver User (DelegatedApproverId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.DelegatedApproverId
+  id_call_center:
+    description: Foreign Key to CallCenter record (CallCenterId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.CallCenterId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created this record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified this record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.LastModifiedById
+  id_parent_manager:
+    description: Foreign Key to parent manager User record (Gerente_padre__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Gerente_padre__c
+  external_sap_user_id:
+    description: External SAP user identifier (Id_usuario_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Id_usuario_SAP__c
+  external_salesforce_user_id:
+    description: Alternative Salesforce user reference ID (ID_Usuario_SF__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.ID_Usuario_SF__c
+  external_federation_id:
+    description: External Single Sign-On federation identifier (FederationIdentifier).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.FederationIdentifier
+  username:
+    description: Salesforce login username (Username).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Username
+  user_name:
+    description: Full name of user (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Name
+  first_name:
+    description: User first name (FirstName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.FirstName
+  last_name:
+    description: User last name (LastName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.LastName
+  alias:
+    description: Short user alias (Alias).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Alias
+  community_nickname:
+    description: Community/Portal display nickname (CommunityNickname).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.CommunityNickname
+  job_title:
+    description: Job title or professional position of the user (Title).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Title
+  department_name:
+    description: Department or functional area of the user (Department).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Department
+  division_name:
+    description: Division or business area of the user (Division).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Division
+  company_name:
+    description: Company name (CompanyName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.CompanyName
+  user_type:
+    description: License user type category (UserType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.UserType
+  portal_role:
+    description: Community portal role assignment (PortalRole).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.PortalRole
+  sales_channel_name:
+    description: Assigned sales channel (Canal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Canal__c
+  cost_center_name:
+    description: Assigned cost center (Centro_de_costos__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Centro_de_costos__c
+  sales_organization_name:
+    description: Assigned sales organization (Organizacion_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Organizacion_de_venta__c
+  parent_role_name:
+    description: Parent role label (Rol_padre__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Rol_padre__c
+  country_custom_name:
+    description: Custom country assignment (Pais__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Pais__c
+  phone_number:
+    description: Primary phone number (Phone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Phone
+  mobile_phone_number:
+    description: Mobile phone number (MobilePhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.MobilePhone
+  fax_number:
+    description: Fax phone number for reaching the user (Fax).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Fax
+  phone_extension:
+    description: Phone extension number (Extension).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Extension
+  email:
+    description: Primary email address (Email).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Email
+  email_custom:
+    description: Custom email address (Email__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Email__c
+  sender_email:
+    description: Default outbound sender email address (SenderEmail).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.SenderEmail
+  sender_name:
+    description: Default outbound sender name (SenderName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.SenderName
+  out_of_office_message:
+    description: Out of office auto-reply message text (OutOfOfficeMessage).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.OutOfOfficeMessage
+  badge_text:
+    description: Custom user badge text (BadgeText).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.BadgeText
+  calendly_url:
+    description: Calendly booking URL (Link_Calendly__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Link_Calendly__c
+  full_photo_url:
+    description: URL pointing to full size profile picture (FullPhotoUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.FullPhotoUrl
+  medium_photo_url:
+    description: URL pointing to medium profile picture (MediumPhotoUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.MediumPhotoUrl
+  small_photo_url:
+    description: URL pointing to small profile picture (SmallPhotoUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.SmallPhotoUrl
+  banner_photo_url:
+    description: URL pointing to banner image (BannerPhotoUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.BannerPhotoUrl
+  medium_banner_photo_url:
+    description: URL pointing to medium banner image (MediumBannerPhotoUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.MediumBannerPhotoUrl
+  small_banner_photo_url:
+    description: URL pointing to small banner image (SmallBannerPhotoUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.SmallBannerPhotoUrl
+  email_signature:
+    description: Email signature text block (Signature).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Signature
+  stay_in_touch_signature:
+    description: Stay in touch email signature block (StayInTouchSignature).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.StayInTouchSignature
+  stay_in_touch_note:
+    description: Stay in touch personal note (StayInTouchNote).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.StayInTouchNote
+  stay_in_touch_subject:
+    description: Stay in touch email subject (StayInTouchSubject).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.StayInTouchSubject
+  sap_error_message:
+    description: Error message returned by SAP integration (Error_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Error_SAP__c
+  digest_frequency:
+    description: Chatter digest email frequency (DigestFrequency).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.DigestFrequency
+  default_group_notification_frequency:
+    description: Default chatter group notification frequency (DefaultGroupNotificationFrequency).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.DefaultGroupNotificationFrequency
+  email_encoding_key:
+    description: Character encoding for outbound emails (EmailEncodingKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.EmailEncodingKey
+  language_locale_key:
+    description: Primary language locale code (LanguageLocaleKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.LanguageLocaleKey
+  locale_sid_key:
+    description: Regional locale code for formatting (LocaleSidKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.LocaleSidKey
+  time_zone_sid_key:
+    description: Assigned timezone identifier (TimeZoneSidKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.TimeZoneSidKey
+  currency_iso_code:
+    description: ISO code for user default currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.CurrencyIsoCode
+  default_currency_iso_code:
+    description: Default ISO currency code (DefaultCurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.DefaultCurrencyIsoCode
+  street:
+    description: User address street (Street).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Street
+  city:
+    description: User address city (City).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.City
+  state:
+    description: User address state/province (State).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.State
+  postal_code:
+    description: User address postal code (PostalCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.PostalCode
+  country:
+    description: User address country (Country).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Country
+  geocode_accuracy:
+    description: Geocode accuracy level (GeocodeAccuracy).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.GeocodeAccuracy
+  et4ae5_default_et_page:
+    description: Marketing Cloud default page parameter (et4ae5__Default_ET_Page__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.et4ae5__Default_ET_Page__c
+  et4ae5_default_mid:
+    description: Marketing Cloud default Business Unit ID (et4ae5__Default_MID__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.et4ae5__Default_MID__c
+  et4ae5_exacttarget_oauth_token:
+    description: Marketing Cloud OAuth authentication token (et4ae5__ExactTarget_OAuth_Token__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.et4ae5__ExactTarget_OAuth_Token__c
+  et4ae5_exacttarget_username:
+    description: Marketing Cloud integration username (et4ae5__ExactTargetUsername__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.et4ae5__ExactTargetUsername__c
+  is_active:
+    description: Flag indicating if the user account is active (IsActive).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.IsActive
+  is_forecast_enabled:
+    description: Flag indicating if user is included in forecasts (ForecastEnabled).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.ForecastEnabled
+  is_portal_enabled:
+    description: Flag indicating if portal access is enabled (IsPortalEnabled).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.IsPortalEnabled
+  is_partner:
+    description: Flag indicating if user is a partner user (IsPartner).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.IsPartner
+  is_profile_photo_active:
+    description: Flag indicating if profile photo is active (IsProfilePhotoActive).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.IsProfilePhotoActive
+  is_ext_indicator_visible:
+    description: Flag indicating if external user indicator is visible (IsExtIndicatorVisible).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.IsExtIndicatorVisible
+  is_data_visible:
+    description: Custom flag controlling data visibility (Mostrar_datos__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Mostrar_datos__c
+  receives_info_emails:
+    description: Flag indicating preference for system info emails (ReceivesInfoEmails).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.ReceivesInfoEmails
+  receives_admin_info_emails:
+    description: Flag indicating preference for administrative emails (ReceivesAdminInfoEmails).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.ReceivesAdminInfoEmails
+  has_email_preferences_auto_bcc:
+    description: Preference flag for auto BCC on outgoing emails (EmailPreferencesAutoBcc).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.EmailPreferencesAutoBcc
+  has_email_preferences_auto_bcc_stay_in_touch:
+    description: Preference flag for auto BCC on stay-in-touch emails (EmailPreferencesAutoBccStayInTouch).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.EmailPreferencesAutoBccStayInTouch
+  has_email_preferences_stay_in_touch_reminder:
+    description: Preference flag for stay-in-touch email reminders (EmailPreferencesStayInTouchReminder).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.EmailPreferencesStayInTouchReminder
+  is_exacttarget_appexchange_admin:
+    description: Marketing Cloud AppExchange Admin flag (et4ae5__ExactTargetForAppExchangeAdmin__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.et4ae5__ExactTargetForAppExchangeAdmin__c
+  is_exacttarget_appexchange_user:
+    description: Marketing Cloud AppExchange User flag (et4ae5__ExactTargetForAppExchangeUser__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.et4ae5__ExactTargetForAppExchangeUser__c
+  is_valid_exacttarget_admin:
+    description: Marketing Cloud valid Admin credentials flag (et4ae5__ValidExactTargetAdmin__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.et4ae5__ValidExactTargetAdmin__c
+  is_valid_exacttarget_user:
+    description: Marketing Cloud valid User credentials flag (et4ae5__ValidExactTargetUser__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.et4ae5__ValidExactTargetUser__c
+  start_day_number:
+    description: Working week start day number (StartDay).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.StartDay
+  end_day_number:
+    description: Working week end day number (EndDay).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.EndDay
+  employee_number:
+    description: Corporate employee identification number (EmployeeNumber).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.EmployeeNumber
+  latitude_coord:
+    description: Geolocation latitude (Latitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Latitude
+  longitude_coord:
+    description: Geolocation longitude (Longitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Longitude
+  dt_offline_trial_expired:
+    description: Expiration date for offline trial (OfflineTrialExpirationDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.OfflineTrialExpirationDate
+  dt_offline_pda_trial_expired:
+    description: Expiration date for offline PDA trial (OfflinePdaTrialExpirationDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.OfflinePdaTrialExpirationDate
+  dt_password_expired:
+    description: Date when user password expires (PasswordExpirationDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.PasswordExpirationDate
+  dt_su_access_expired:
+    description: Date when superuser access expires (SuAccessExpirationDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.SuAccessExpirationDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.LastReferencedDate
+  ts_last_logged_in:
+    description: Timestamp of user's last login (LastLoginDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.LastLoginDate
+  ts_last_sap_error:
+    description: Timestamp of last SAP error for user (Fecha_de_ultimo_error_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.Fecha_de_ultimo_error_SAP__c
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.user.day

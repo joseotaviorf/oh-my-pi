@@ -1,0 +1,383 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: contract
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Contract objects from the Navent Classifieds Salesforce org. Grain is one row
+  per contract (id) per incremental load window, keyed by Salesforce Id. Includes terms, pricing, approval statuses,
+  billing addresses, and SAP integration details. Source: datalake_salesforce_classifieds_raw.contract. Physically partitioned
+  by year, month, and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together —
+  or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Contract object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Id
+  id_account:
+    description: Foreign Key to the associated Account record (AccountId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.AccountId
+  id_owner:
+    description: Foreign Key to the Salesforce User who owns the Contract (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.OwnerId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the Contract (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the Contract (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.LastModifiedById
+  id_activated_by:
+    description: Foreign Key to the Salesforce User who activated the contract (ActivatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ActivatedById
+  id_company_signed_by:
+    description: Foreign Key to the internal Contact/User who signed for the company (CompanySignedId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.CompanySignedId
+  id_customer_signed_by:
+    description: Foreign Key to the customer Contact who signed the contract (CustomerSignedId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.CustomerSignedId
+  id_pricebook2:
+    description: Foreign Key to the associated Pricebook2 record (Pricebook2Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Pricebook2Id
+  id_billing_approval_contact:
+    description: Foreign Key to contact responsible for billing approval (Contacto_de_facturacion_aprobacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Contacto_de_facturacion_aprobacion__c
+  id_portal_company:
+    description: Foreign Key to the related Empresa_portal__c record (Empresa_portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Empresa_portal__c
+  id_related_service_order:
+    description: Foreign Key to related service order contract (Orden_de_servicio_relacionada__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Orden_de_servicio_relacionada__c
+  external_unique_id:
+    description: Custom exclusive external identifier (Id_exclusivo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Id_exclusivo__c
+  external_sap_order_id:
+    description: External SAP sales order ID (ID_pedido_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ID_pedido_SAP__c
+  contract_number:
+    description: System-generated contract number (ContractNumber).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ContractNumber
+  status:
+    description: Contract lifecycle status (Status).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Status
+  status_code:
+    description: Internal status code designation (StatusCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.StatusCode
+  contract_type:
+    description: Custom contract type classification (Tipo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Tipo__c
+  opportunity_record_type:
+    description: Record type designation of originating opportunity (RT_Oportunidad__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.RT_Oportunidad__c
+  signature_status:
+    description: Status of the signature process (Estado_de_la_firma__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Estado_de_la_firma__c
+  customer_signed_title:
+    description: Professional title of customer signer (CustomerSignedTitle).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.CustomerSignedTitle
+  owner_role:
+    description: Function/role of owner when creating contract (Funcion_del_propietario__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Funcion_del_propietario__c
+  assigned_to:
+    description: User or entity assigned to the contract (Asignado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Asignado__c
+  payment_terms:
+    description: Agreement payment terms (Condiciones_de_pago__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Condiciones_de_pago__c
+  payment_method:
+    description: Payment method specified (Via_de_pago__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Via_de_pago__c
+  payment_identification_number:
+    description: External payment transaction ID (Numero_de_identificacion_de_pago__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Numero_de_identificacion_de_pago__c
+  mercadopago_token:
+    description: MercadoPago integration token (MP_token__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.MP_token__c
+  purchase_order_number:
+    description: Customer purchase order reference number (Numero_de_orden_de_compra__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Numero_de_orden_de_compra__c
+  service_order_sent_email:
+    description: Destination email address where service order was dispatched (Correo_al_que_se_envi_la_OS__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Correo_al_que_se_envi_la_OS__c
+  service_order_signature_ip:
+    description: IP address captured during digital signature (IP_en_la_que_se_firmo_la_OS__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.IP_en_la_que_se_firmo_la_OS__c
+  invoice_layout:
+    description: Template layout format for generated invoice (Layout_de_factura__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Layout_de_factura__c
+  invoice_additional_text:
+    description: Free text comments printed on invoice (Texto_adicional_de_factura__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Texto_adicional_de_factura__c
+  currency_iso_code:
+    description: ISO code for contract currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.CurrencyIsoCode
+  sales_organization_name:
+    description: Sales organization assigned to contract (Organizacion_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Organizacion_de_venta__c
+  billing_street:
+    description: Contract billing address street (BillingStreet).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.BillingStreet
+  billing_city:
+    description: Contract billing address city (BillingCity).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.BillingCity
+  billing_state:
+    description: Contract billing address state/province (BillingState).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.BillingState
+  billing_postal_code:
+    description: Contract billing address postal code (BillingPostalCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.BillingPostalCode
+  billing_country:
+    description: Contract billing address country (BillingCountry).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.BillingCountry
+  billing_geocode_accuracy:
+    description: Billing geocode accuracy level (BillingGeocodeAccuracy).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.BillingGeocodeAccuracy
+  shipping_street:
+    description: Contract shipping address street (ShippingStreet).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ShippingStreet
+  shipping_city:
+    description: Contract shipping address city (ShippingCity).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ShippingCity
+  shipping_state:
+    description: Contract shipping address state/province (ShippingState).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ShippingState
+  shipping_postal_code:
+    description: Contract shipping address postal code (ShippingPostalCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ShippingPostalCode
+  shipping_country:
+    description: Contract shipping address country (ShippingCountry).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ShippingCountry
+  shipping_geocode_accuracy:
+    description: Shipping geocode accuracy level (ShippingGeocodeAccuracy).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ShippingGeocodeAccuracy
+  description:
+    description: General text description of the contract (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Description
+  special_terms:
+    description: Custom or non-standard contractual terms (SpecialTerms).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.SpecialTerms
+  sap_error_message:
+    description: Error message returned by SAP integration (Error_de_Sap__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Error_de_Sap__c
+  canceled_by_user:
+    description: User or entity who initiated contract cancellation (Cancelado_por__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Cancelado_por__c
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.IsDeleted
+  is_created_by_ecommerce:
+    description: Flag indicating creation via e-commerce channel (Creada_por_ecommerce__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Creada_por_ecommerce__c
+  is_prepayment_finished:
+    description: Flag indicating if advance payment has been completed (Prepago_Finalizado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Prepago_Finalizado__c
+  required_customer_approval:
+    description: Flag indicating if client approval was mandatory (Requirio_aprobacion_del_cliente__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Requirio_aprobacion_del_cliente__c
+  has_mercadopago_access:
+    description: Access permission flag for MercadoPago processing (Acceso_a_mercadopago__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Acceso_a_mercadopago__c
+  owner_expiration_notice_days:
+    description: Days notice required prior to contract expiration (OwnerExpirationNotice).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.OwnerExpirationNotice
+  contract_term_months:
+    description: Total duration of contract in months (ContractTerm).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ContractTerm
+  discount_amount:
+    description: Discount amount or percentage applied (Descuento__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Descuento__c
+  amount_v2:
+    description: Secondary custom contract total amount (Importe2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Importe2__c
+  original_amount_v2:
+    description: Secondary original unadjusted contract amount (Importe_original2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Importe_original2__c
+  monthly_amount:
+    description: Calculated monthly recurring charge (Importe_mensualizado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Importe_mensualizado__c
+  monthly_amount_v2:
+    description: Secondary monthly recurring charge value (Importe_mensualizado2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Importe_mensualizado2__c
+  annualized_amount:
+    description: Calculated annual recurring charge (Importe_anualizado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Importe_anualizado__c
+  inflation_percentage:
+    description: Rate applied for inflation adjustment (Valor_de_porcentaje_por_inflacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Valor_de_porcentaje_por_inflacion__c
+  billing_latitude_coord:
+    description: Geolocation latitude for billing address (BillingLatitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.BillingLatitude
+  billing_longitude_coord:
+    description: Geolocation longitude for billing address (BillingLongitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.BillingLongitude
+  shipping_latitude_coord:
+    description: Geolocation latitude for shipping address (ShippingLatitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ShippingLatitude
+  shipping_longitude_coord:
+    description: Geolocation longitude for shipping address (ShippingLongitude).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ShippingLongitude
+  dt_started:
+    description: Official contract start date (StartDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.StartDate
+  dt_ended:
+    description: Official contract end date (EndDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.EndDate
+  dt_to_bill:
+    description: Target scheduled billing date (fecha_a_facturar__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.fecha_a_facturar__c
+  dt_canceled:
+    description: Date when contract was canceled (Fecha_de_cancelacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Fecha_de_cancelacion__c
+  dt_validity_started:
+    description: Start date of contract validity period (Fecha_de_inicio_de_vigencia__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Fecha_de_inicio_de_vigencia__c
+  dt_validity_ended:
+    description: End date of contract validity period (Fecha_de_fin_de_vigencia__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Fecha_de_fin_de_vigencia__c
+  dt_max_products:
+    description: Maximum date limit for product usage (Fecha_maxima_de_productos__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Fecha_maxima_de_productos__c
+  dt_prepaid:
+    description: Date when prepayment was received (Fecha_prepago__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Fecha_prepago__c
+  dt_last_activity:
+    description: Date of the last activity related to the record (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.LastActivityDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.LastReferencedDate
+  ts_activated:
+    description: Timestamp when contract was activated (ActivatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.ActivatedDate
+  ts_company_signed:
+    description: Timestamp when internal signature occurred (CompanySignedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.CompanySignedDate
+  ts_customer_signed:
+    description: Timestamp when customer signature occurred (CustomerSignedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.CustomerSignedDate
+  ts_service_order_signed:
+    description: Timestamp when service order was signed (Fecha_en_la_que_se_firmo_la_OS__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Fecha_en_la_que_se_firmo_la_OS__c
+  ts_last_approved:
+    description: Timestamp of last contract approval (LastApprovedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.LastApprovedDate
+  ts_last_indexed:
+    description: Timestamp of last search indexing (Ultima_fecha_de_indexacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Ultima_fecha_de_indexacion__c
+  ts_last_sent_to_sap:
+    description: Timestamp of last export to SAP (Ultimo_envio_a_sap__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.Ultimo_envio_a_sap__c
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.contract.day

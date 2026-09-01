@@ -1,0 +1,91 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: userrole
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce UserRole objects from the Navent Classifieds Salesforce org. Grain is one row
+  per role (id) per incremental load window, keyed by Salesforce Id. Maps organizational role hierarchies and access settings.
+  Source: datalake_salesforce_classifieds_raw.userrole. Physically partitioned by year, month, and day from dt_updated
+  (derived from LastModifiedDate). Always filter year, month, and day together — or use dt_updated with
+  load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the UserRole object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.Id
+  id_parent_role:
+    description: Foreign Key to parent UserRole record (ParentRoleId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.ParentRoleId
+  id_forecast_user:
+    description: Foreign Key to forecast User record (ForecastUserId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.ForecastUserId
+  id_portal_account:
+    description: Foreign Key to associated portal Account (PortalAccountId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.PortalAccountId
+  id_portal_account_owner:
+    description: Foreign Key to portal Account owner User (PortalAccountOwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.PortalAccountOwnerId
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified this record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.LastModifiedById
+  role_name:
+    description: Full display name of the role (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.Name
+  developer_name:
+    description: Unique API developer name of the role (DeveloperName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.DeveloperName
+  rollup_description:
+    description: Description used for reporting rollups (RollupDescription).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.RollupDescription
+  portal_type:
+    description: Type of portal associated with the role (PortalType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.PortalType
+  case_access_for_account_owner:
+    description: Access level to cases for account owner (CaseAccessForAccountOwner).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.CaseAccessForAccountOwner
+  contact_access_for_account_owner:
+    description: Access level to contacts for account owner (ContactAccessForAccountOwner).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.ContactAccessForAccountOwner
+  opportunity_access_for_account_owner:
+    description: Access level to opportunities for account owner (OpportunityAccessForAccountOwner).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.OpportunityAccessForAccountOwner
+  may_forecast_manager_share:
+    description: Flag indicating if manager can share forecast data (MayForecastManagerShare).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.MayForecastManagerShare
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.userrole.day

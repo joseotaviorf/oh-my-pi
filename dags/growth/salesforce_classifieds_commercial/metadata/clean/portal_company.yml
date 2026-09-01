@@ -1,0 +1,371 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: portal_company
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Empresa_portal__c objects from the Navent Classifieds Salesforce org. Grain is one row
+  per portal company (id) per incremental load window, keyed by Salesforce Id. Tracks ad balances, portal metrics,
+  debt balances, and integration statuses. Source: datalake_salesforce_classifieds_raw.empresa_portal__c. Physically partitioned
+  by year, month, and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together —
+  or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Empresa_portal__c object.
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Id
+  id_account:
+    description: Foreign Key to the associated Account record (Cuenta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Cuenta__c
+  id_owner:
+    description: Foreign Key to the Salesforce User who owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.OwnerId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.LastModifiedById
+  id_pricebook:
+    description: Foreign Key to the associated Pricebook2 record (Lista_de_precios__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Lista_de_precios__c
+  external_crm_customer_id:
+    description: External CRM customer identifier (ID_cliente_CRM__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.ID_cliente_CRM__c
+  external_portal_company_id:
+    description: External portal company identifier (ID_Empresa_portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.ID_Empresa_portal__c
+  external_sap_portal_company_id:
+    description: External SAP portal company identifier (ID_Empresa_Portal_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.ID_Empresa_Portal_SAP__c
+  external_exclusive_site_company_id:
+    description: External exclusive site identifier (ID_Empresa_Site_exclusivo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.ID_Empresa_Site_exclusivo__c
+  external_salesforce_user_id:
+    description: External Salesforce user ID mapped to portal (ID_Usuario_SF__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.ID_Usuario_SF__c
+  company_portal_name:
+    description: Full display name of the portal company (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Name
+  portal_company_owner_name:
+    description: Name of the portal company owner (Propietario_de_Empresa_Portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Propietario_de_Empresa_Portal__c
+  crm_navent_name:
+    description: Navent CRM integration reference (CRM_Navent__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.CRM_Navent__c
+  re_integrator_name:
+    description: Real estate software integrator name (Integrador_RE__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Integrador_RE__c
+  local_classification:
+    description: Local agency or client classification (Clasificacion_local__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Clasificacion_local__c
+  industry_name:
+    description: Industry sector (Industria__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Industria__c
+  site_name:
+    description: Associated portal site name (Sitio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Sitio__c
+  sizing_type:
+    description: Sizing tier for company operations (Sizing__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Sizing__c
+  risk_status:
+    description: Risk status classification (Status_riesgo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Status_riesgo__c
+  stock_period:
+    description: Stock period reference (Periodo_Stock__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Periodo_Stock__c
+  portfolio_resolution:
+    description: Standard portfolio resolution status (Cartera_Resolucion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Cartera_Resolucion__c
+  portfolio_plan_status:
+    description: Standard portfolio plan status (Cartera_Status_Plan__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Cartera_Status_Plan__c
+  ecom_portfolio_resolution:
+    description: E-commerce portfolio resolution status (Cartera_Ecom_Resolucion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Cartera_Ecom_Resolucion__c
+  ecom_portfolio_plan_status:
+    description: E-commerce portfolio plan status (Cartera_Ecom_Status_Plan__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Cartera_Ecom_Status_Plan__c
+  panoramix_access_type:
+    description: Panoramix portal access status (Acceso_Panoramix__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Acceso_Panoramix__c
+  blocked_icon_type:
+    description: Icon type displayed for blocked accounts (Bloqueado_icono__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Bloqueado_icono__c
+  currency_iso_code:
+    description: ISO code for currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.CurrencyIsoCode
+  sales_organization_name:
+    description: Assigned sales organization (Organizacion_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Organizacion_de_venta__c
+  sales_organization_picklist:
+    description: Sales organization picklist value (Organizacion_de_venta_picklist__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Organizacion_de_venta_picklist__c
+  sap_error_message:
+    description: Error message returned by SAP (Error_de_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Error_de_SAP__c
+  portal_error_message:
+    description: Error message returned by portal (Error_Portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Error_Portal__c
+  is_deleted:
+    description: Flag indicating if record was soft-deleted (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.IsDeleted
+  is_blocked:
+    description: Flag indicating if account is blocked (Bloqueado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Bloqueado__c
+  has_development_flag:
+    description: Flag for real estate development accounts (Flag_Desarrollo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Flag_Desarrollo__c
+  has_ec_flag:
+    description: Flag for e-commerce status (Flag_EC__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Flag_EC__c
+  has_premier_flag:
+    description: Flag for premier tier clients (Flag_Premier__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Flag_Premier__c
+  has_recurrence_flag:
+    description: Flag for recurring contract billing (Flag_Recurrencia__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Flag_Recurrencia__c
+  properties_count:
+    description: Count of active properties managed (Cantidad_de_Propiedades__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Cantidad_de_Propiedades__c
+  total_ads_count:
+    description: Total total ad slots (Total_Avisos__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos__c
+  simple_ads_count:
+    description: Total simple ad slots (Total_Avisos_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Simple__c
+  subsimple_ads_count:
+    description: Total subsimple ad slots (Total_Avisos_Subsimple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Subsimple__c
+  featured_ads_count:
+    description: Total featured ad slots (Total_Avisos_Destacado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Destacado__c
+  super_featured_ads_count:
+    description: Total super featured ad slots (Total_Avisos_SuperDest__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_SuperDest__c
+  dev_simple_ads_count:
+    description: Total development simple ad slots (Total_Avisos_Desa_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Desa_Simple__c
+  dev_featured_ads_count:
+    description: Total development featured ad slots (Total_Avisos_Des_Destacado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Des_Destacado__c
+  dev_super_featured_ads_count:
+    description: Total development super featured ad slots (Total_Avisos_Des_SuperDest__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Des_SuperDest__c
+  total_online_ads_count:
+    description: Total ads currently active online (Total_Online__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Online__c
+  online_simple_ads_count:
+    description: Simple ads active online (Total_Avisos_Online_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Online_Simple__c
+  online_subsimple_ads_count:
+    description: Subsimple ads active online (Total_Avisos_Online_Sub_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Online_Sub_Simple__c
+  online_featured_ads_count:
+    description: Featured ads active online (Total_Avisos_Online_Destacado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Online_Destacado__c
+  online_super_featured_ads_count:
+    description: Super featured ads active online (Total_Avisos_Online_SuperDest__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Online_SuperDest__c
+  online_dev_simple_ads_count:
+    description: Development simple ads active online (Total_Avisos_Online_Desa_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Online_Desa_Simple__c
+  online_dev_featured_ads_count:
+    description: Development featured ads active online (Total_Avisos_Online_Des_Destacado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Online_Des_Destacado__c
+  online_dev_super_featured_ads_count:
+    description: Development super featured ads active online (Total_Avisos_Online_Des_SuperDest__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Avisos_Online_Des_SuperDest__c
+  total_available_ads_count:
+    description: Total ad slots available (Total_Disponibles__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Disponibles__c
+  available_simple_ads_count:
+    description: Available simple ad slots (Total_Disponible_Avisos_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Disponible_Avisos_Simple__c
+  available_subsimple_ads_count:
+    description: Available subsimple ad slots (Total_Disponible_Avisos_Subsimple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Disponible_Avisos_Subsimple__c
+  available_featured_ads_count:
+    description: Available featured ad slots (Total_Disponible_Avisos_Destacado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Disponible_Avisos_Destacado__c
+  available_super_featured_ads_count:
+    description: Available super featured ad slots (Total_Disponible_Avisos_SuperDest__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Disponible_Avisos_SuperDest__c
+  available_dev_simple_ads_count:
+    description: Available development simple ad slots (Total_Disponible_Avisos_Desa_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Disponible_Avisos_Desa_Simple__c
+  available_dev_featured_ads_count:
+    description: Available development featured ad slots (Total_Disponible_Avisos_Des_Destacado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Disponible_Avisos_Des_Destacado__c
+  available_dev_super_featured_ads_count:
+    description: Available development super featured ad slots (Total_Disponible_Avisos_Des_Superdest__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Disponible_Avisos_Des_Superdest__c
+  total_used_ads_count:
+    description: Total ad slots used (Total_Usado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Usado__c
+  used_simple_ads_count:
+    description: Used simple ad slots (Total_Usado_Avisos_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Usado_Avisos_Simple__c
+  used_subsimple_ads_count:
+    description: Used subsimple ad slots (Total_Usado_Avisos_Subsimple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Usado_Avisos_Subsimple__c
+  used_featured_ads_count:
+    description: Used featured ad slots (Total_Usado_Avisos_Destacado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Usado_Avisos_Destacado__c
+  used_super_featured_ads_count:
+    description: Used super featured ad slots (Total_Usado_Avisos_SuperDest__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Usado_Avisos_SuperDest__c
+  used_dev_simple_ads_count:
+    description: Used development simple ad slots (Total_Usado_Avisos_Desa_Simple__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Usado_Avisos_Desa_Simple__c
+  used_dev_featured_ads_count:
+    description: Used development featured ad slots (Total_Usado_Avisos_Des_Destacado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Usado_Avisos_Des_Destacado__c
+  used_dev_super_featured_ads_count:
+    description: Used development super featured ad slots (Total_Usado_Avisos_Des_SuperDest__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_Usado_Avisos_Des_SuperDest__c
+  service_orders_count:
+    description: Count of total service orders (Total_ordenes_de_servicio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Total_ordenes_de_servicio__c
+  sap_total_debt_due_amount:
+    description: Total pending debt amount due in SAP (SAP_total_deuda_a_vencer__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.SAP_total_deuda_a_vencer__c
+  sap_total_overdue_debt_amount:
+    description: Total unpaid overdue debt amount in SAP (SAP_total_deuda_vencida__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.SAP_total_deuda_vencida__c
+  dt_portfolio:
+    description: Portfolio calculation snapshot date (Cartera_fecha__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Cartera_fecha__c
+  dt_ecom_portfolio:
+    description: E-commerce portfolio snapshot date (Cartera_Ecom_fecha__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Cartera_Ecom_fecha__c
+  dt_sap_next_expiration:
+    description: Next SAP debt expiration date (SAP_prox_vencimiento__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.SAP_prox_vencimiento__c
+  dt_sap_next_block:
+    description: Scheduled next account blocking date in SAP (SAP_prox_bloqueo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.SAP_prox_bloqueo__c
+  dt_last_activity:
+    description: Date of last activity (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.LastActivityDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.LastReferencedDate
+  ts_last_sap_error:
+    description: Timestamp of last SAP integration error (Fecha_de_ultimo_error_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Fecha_de_ultimo_error_SAP__c
+  ts_first_portal_error:
+    description: Timestamp of first portal error recorded (Primer_error_portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.Primer_error_portal__c
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__c.day

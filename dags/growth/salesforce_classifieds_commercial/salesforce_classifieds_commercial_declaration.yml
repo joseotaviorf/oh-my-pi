@@ -1,0 +1,82 @@
+dag:
+  name: salesforce_classifieds_commercial
+  owner: Data Growth
+  schedule_start_date: 2025, 05, 15
+  schedule_interval: 0 3 * * *
+  documentation:
+    dag_purpose: |
+      Ingests Salesforce Account data for the Classifieds (Navent) business context via the Salesforce
+      REST API. Raw snapshots land in datalake_salesforce_classifieds_raw; clean models in datalake_salesforce_classifieds_clean
+      support Growth analytics on advertiser accounts, tax/billing attributes, and Person Account contacts.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  custom_schema: salesforce_classifieds
+  load_spark_job: load_salesforce_classifieds_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{schema}"
+    - "https://navent--uat.sandbox.my.salesforce.com"
+    - "https://navent.my.salesforce.com"
+
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    Account:
+      extra_spark_job_arguments:
+        - "SELECT AccountSource, Alias_Cta_Cte__c, Area_en_la_empresa__pc, BillingCity, BillingCountry, BillingGeocodeAccuracy, BillingLatitude, BillingLongitude, BillingPostalCode, BillingState, BillingStreet, Bloqueado__c, CBU__c, Ciudad_de_facturacion2__c, Ciudad_de_operacion__c, Cliente_validado__c, Codigo_postal_de_facturacion__c, Codigo_postal_de_operacion__c, Condicion_fiscal__c, Consulta_de_facturas_en_SAP__c, Contacto_principal__pc, Convertido_a_empresarial__c, Correo_electronico_de_contacto_principal__c, Creado_de_prospecto__pc, CreatedById, CreatedDate, CurrencyIsoCode, Description, Direccion_de_facturacion__c, Direccion_de_operacion__c, Dominio_HR__c, Email_adicional__pc, Error_de_SAP__c, Error_de_SAP__pc, et4ae5__HasOptedOutOfMobile__pc, et4ae5__Mobile_Country_Code__pc, Fecha_de_ultimo_error_SAP__c, Fecha_de_ultimo_error_SAP__pc, FirstName, Funcion__c, Gestion_Atta__c, Gestion_CasaMineira__c, Gestion_IWB_WIM__c, Gestion_NokNox__c, Gestion_SindicoNet__c, Gestion_Union__c, Gestion_Velo__c, Giro_comercial__c, Giro_de_Negocio__c, Grupo_economico__c, Id, ID_Cliente_SAP__c, ID_Contacto_SAP__pc, ID_Cuenta_SF__c, Id_externo_autonumerico__pc, id_externo_exclusivo__c, tolabel(Industry) Industry, IsDeleted, IsPersonAccount, Jigsaw, JigsawCompanyId, LastActivityDate, LastModifiedById, LastModifiedDate, LastName, LastReferencedDate, LastViewedDate, MasterRecordId, Matricula_Licencia__c, Name, Nombre_de_Fantasia__c, Nombre_del_propietario_de_la_cuenta__c, NumberOfEmployees, Numero_de_documento_fiscal__c, Organizacion_de_venta_principal__c, Organizaciones_de_venta__pc, OwnerId, Pais_de_facturacion__c, Pais_de_operacion__c, ParentId, Perfil_crediticio__c, PersonAssistantName, PersonAssistantPhone, PersonBirthdate, PersonContactId, PersonDepartment, PersonEmail, PersonEmailBouncedDate, PersonEmailBouncedReason, PersonHasOptedOutOfEmail, PersonHomePhone, PersonLastCURequestDate, PersonLastCUUpdateDate, PersonLeadSource, PersonMailingCity, PersonMailingCountry, PersonMailingGeocodeAccuracy, PersonMailingLatitude, PersonMailingLongitude, PersonMailingPostalCode, PersonMailingState, PersonMailingStreet, PersonMobilePhone, PersonTitle, Phone, PhotoUrl, Provincia_Estado_de_facturacion__c, Provincia_Estado_de_operacion__c, Puesto__pc, RecordTypeId, tolabel(Regimen_societario__c) Regimen_societario__c, Requiere_orden_de_compra__c, Salutation, ShippingCity, ShippingCountry, ShippingGeocodeAccuracy, ShippingLatitude, ShippingLongitude, ShippingPostalCode, ShippingState, ShippingStreet, SicDesc, System_Cta_Cte__c, SystemModstamp, Tipo_de_documento__c, Tipo_de_documento_necesita_validar__c, Type, Ultimo_propietario_no_actualizado__c, URL_ultima_orden_de_servicio__c, URL_ultima_orden_de_servicio__pc, Website, whatslly__Created_by_Whatslly__c, whatslly__Created_by_Whatslly__pc, whatslly__Last_WhatsApp_Message_Time__c, whatslly__Last_WhatsApp_Message_Time__pc, whatslly__Whatslly_Person_Id__c, whatslly__Whatslly_Person_Id__pc, whatslly__Whatslly_Threads_ID__pc, Zona_Barrio_Colonia_Comuna_facturacion2__c, Zona_Barrio_Colonia_Comuna_operacion__c FROM Account"
+    Ciudad__c:
+      clean_table_name: city
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, CurrencyIsoCode, Id, Id_de_Ciudad__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, OwnerId, Provincia_Estado__c, SystemModstamp FROM Ciudad__c"
+    Condicion_fiscal__c:
+      clean_table_name: tax_condition
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, CurrencyIsoCode, Id, Id_Clase__c, IsDeleted, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, OwnerId, Pais__c, SystemModstamp, Tipo_de_documento__c FROM Condicion_fiscal__c"
+    Contact:
+      extra_spark_job_arguments:
+        - "SELECT AccountId, Area_en_la_empresa__c, AssistantName, AssistantPhone, Birthdate, Contacto_principal__c, Creado_de_prospecto__c, CreatedById, CreatedDate, CurrencyIsoCode, Department, Description, Email, Email_adicional__c, EmailBouncedDate, EmailBouncedReason, Error_de_SAP__c, et4ae5__HasOptedOutOfMobile__c, et4ae5__Mobile_Country_Code__c, Fax, Fecha_de_ultimo_error_SAP__c, FirstName, HasOptedOutOfEmail, HomePhone, Id, ID_Contacto_SAP__c, Id_externo_autonumerico__c, IsDeleted, IsEmailBounced, IsPersonAccount, Jigsaw, JigsawContactId, LastActivityDate, LastCURequestDate, LastCUUpdateDate, LastModifiedById, LastModifiedDate, LastName, LastReferencedDate, LastViewedDate, LeadSource, MailingCity, MailingCountry, MailingGeocodeAccuracy, MailingLatitude, MailingLongitude, MailingPostalCode, MailingState, MailingStreet, MasterRecordId, MobilePhone, Name, Organizaciones_de_venta__c, OwnerId, Phone, PhotoUrl, Puesto__c, ReportsToId, Salutation, SystemModstamp, Title, URL_ultima_orden_de_servicio__c, whatslly__Created_by_Whatslly__c, whatslly__Last_WhatsApp_Message_Time__c, whatslly__Whatslly_Person_Id__c, whatslly__Whatslly_Threads_ID__c FROM Contact"
+    Contract:
+      extra_spark_job_arguments:
+        - "SELECT AccountId, ActivatedById, ActivatedDate, Asignado__c, BillingCity, BillingCountry, BillingGeocodeAccuracy, BillingLatitude, BillingLongitude, BillingPostalCode, BillingState, BillingStreet, CompanySignedDate, CompanySignedId, Condiciones_de_pago__c, Contacto_de_facturacion_aprobacion__c, ContractNumber, ContractTerm, Correo_al_que_se_envi_la_OS__c, Creada_por_ecommerce__c, CreatedById, CreatedDate, CurrencyIsoCode, CustomerSignedDate, CustomerSignedId, CustomerSignedTitle, Description, Descuento__c, Empresa_portal__c, EndDate, Error_de_Sap__c, Estado_de_la_firma__c, fecha_a_facturar__c, Fecha_de_cancelacion__c, Fecha_de_fin_de_vigencia__c, Fecha_de_inicio_de_vigencia__c, Fecha_en_la_que_se_firmo_la_OS__c, Fecha_maxima_de_productos__c, Fecha_prepago__c, Funcion_del_propietario__c, Id, Id_exclusivo__c, ID_pedido_SAP__c, Importe_anualizado__c, Importe_mensualizado__c, Importe_mensualizado2__c, Importe_original2__c, Importe2__c, IP_en_la_que_se_firmo_la_OS__c, IsDeleted, LastActivityDate, LastApprovedDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Layout_de_factura__c, MP_token__c, Numero_de_identificacion_de_pago__c, Numero_de_orden_de_compra__c, Orden_de_servicio_relacionada__c, Organizacion_de_venta__c, OwnerExpirationNotice, OwnerId, Prepago_Finalizado__c, Pricebook2Id, Requirio_aprobacion_del_cliente__c, RT_Oportunidad__c, ShippingCity, ShippingCountry, ShippingGeocodeAccuracy, ShippingLatitude, ShippingLongitude, ShippingPostalCode, ShippingState, ShippingStreet, SpecialTerms, StartDate, Status, StatusCode, SystemModstamp, Texto_adicional_de_factura__c, Tipo__c, Ultima_fecha_de_indexacion__c, Ultimo_envio_a_sap__c, Valor_de_porcentaje_por_inflacion__c, Via_de_pago__c, Acceso_a_mercadopago__c, Cancelado_por__c FROM Contract"
+    Empresa_portal__c:
+      clean_table_name: portal_company
+      extra_spark_job_arguments:
+        - "SELECT Acceso_Panoramix__c, Bloqueado__c, Bloqueado_icono__c, Cantidad_de_Propiedades__c, Cartera_Ecom_fecha__c, Cartera_Ecom_Resolucion__c, Cartera_Ecom_Status_Plan__c, Cartera_fecha__c, Cartera_Resolucion__c, Cartera_Status_Plan__c, Clasificacion_local__c, CreatedById, CreatedDate, CRM_Navent__c, Cuenta__c, CurrencyIsoCode, Error_de_SAP__c, Error_Portal__c, Fecha_de_ultimo_error_SAP__c, Flag_Desarrollo__c, Flag_EC__c, Flag_Premier__c, Flag_Recurrencia__c, Id, ID_cliente_CRM__c, ID_Empresa_portal__c, ID_Empresa_Portal_SAP__c, ID_Empresa_Site_exclusivo__c, ID_Usuario_SF__c, Industria__c, Integrador_RE__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Lista_de_precios__c, Name, Organizacion_de_venta__c, Organizacion_de_venta_picklist__c, OwnerId, Periodo_Stock__c, Primer_error_portal__c, Propietario_de_Empresa_Portal__c, SAP_prox_bloqueo__c, SAP_prox_vencimiento__c, SAP_total_deuda_a_vencer__c, SAP_total_deuda_vencida__c, Sitio__c, Sizing__c, Status_riesgo__c, SystemModstamp, Total_Avisos__c, Total_Avisos_Des_Destacado__c, Total_Avisos_Des_SuperDest__c, Total_Avisos_Desa_Simple__c, Total_Avisos_Destacado__c, Total_Avisos_Online_Des_Destacado__c, Total_Avisos_Online_Des_SuperDest__c, Total_Avisos_Online_Desa_Simple__c, Total_Avisos_Online_Destacado__c, Total_Avisos_Online_Simple__c, Total_Avisos_Online_Sub_Simple__c, Total_Avisos_Online_SuperDest__c, Total_Avisos_Simple__c, Total_Avisos_Subsimple__c, Total_Avisos_SuperDest__c, Total_Disponible_Avisos_Des_Destacado__c, Total_Disponible_Avisos_Des_Superdest__c, Total_Disponible_Avisos_Desa_Simple__c, Total_Disponible_Avisos_Destacado__c, Total_Disponible_Avisos_Simple__c, Total_Disponible_Avisos_Subsimple__c, Total_Disponible_Avisos_SuperDest__c, Total_Disponibles__c, Total_Online__c, Total_ordenes_de_servicio__c, Total_Usado__c, Total_Usado_Avisos_Des_Destacado__c, Total_Usado_Avisos_Des_SuperDest__c, Total_Usado_Avisos_Desa_Simple__c, Total_Usado_Avisos_Destacado__c, Total_Usado_Avisos_Simple__c, Total_Usado_Avisos_Subsimple__c, Total_Usado_Avisos_SuperDest__c FROM Empresa_portal__c"
+    Grupo_economico__c:
+      clean_table_name: economic_group
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, Cuenta__c, CurrencyIsoCode, Envio_email_OS__c, Id, Id_grupo_economico__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, OwnerId, SystemModstamp FROM Grupo_economico__c"
+    Pais__c:
+      clean_table_name: country
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, CurrencyIsoCode, Id, Id_de_Pais__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, OwnerId, SystemModstamp FROM Pais__c"
+    Pricebook2:
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, CurrencyIsoCode, Description, Es_regional__c, Id, ID_Lista_de_Precios_SAP__c, IsActive, IsArchived, IsDeleted, IsStandard, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, Organizacion_de_venta__c, Pais__c, SystemModstamp FROM Pricebook2"
+    Provincia_Estado__c:
+      clean_table_name: state_province
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, CurrencyIsoCode, Id, Id_de_Provincia_Estado__c, Id_Salesforce__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, OwnerId, Pais__c, SystemModstamp FROM Provincia_Estado__c"
+    User:
+      extra_spark_job_arguments:
+        - "SELECT AccountId, Alias, BadgeText, BannerPhotoUrl, CallCenterId, Canal__c, Centro_de_costos__c, City, CommunityNickname, CompanyName, ContactId, Country, CreatedById, CreatedDate, CurrencyIsoCode, DefaultCurrencyIsoCode, DefaultGroupNotificationFrequency, DelegatedApproverId, Department, DigestFrequency, Division, Email, Email__c, EmailEncodingKey, EmailPreferencesAutoBcc, EmailPreferencesAutoBccStayInTouch, EmailPreferencesStayInTouchReminder, EmployeeNumber, EndDay, Error_SAP__c, et4ae5__Default_ET_Page__c, et4ae5__Default_MID__c, et4ae5__ExactTarget_OAuth_Token__c, et4ae5__ExactTargetForAppExchangeAdmin__c, et4ae5__ExactTargetForAppExchangeUser__c, et4ae5__ExactTargetUsername__c, et4ae5__ValidExactTargetAdmin__c, et4ae5__ValidExactTargetUser__c, Extension, Fax, Fecha_de_ultimo_error_SAP__c, FederationIdentifier, FirstName, ForecastEnabled, FullPhotoUrl, GeocodeAccuracy, Gerente_padre__c, Id, Id_usuario_SAP__c, ID_Usuario_SF__c, IsActive, IsExtIndicatorVisible, IsPartner, IsPortalEnabled, IsProfilePhotoActive, LanguageLocaleKey, LastLoginDate, LastModifiedById, LastModifiedDate, LastName, LastReferencedDate, LastViewedDate, Latitude, Link_Calendly__c, LocaleSidKey, Longitude, ManagerId, MediumBannerPhotoUrl, MediumPhotoUrl, MobilePhone, Mostrar_datos__c, Name, OfflinePdaTrialExpirationDate, OfflineTrialExpirationDate, Organizacion_de_venta__c, OutOfOfficeMessage, Pais__c, PasswordExpirationDate, Phone, PortalRole, PostalCode, ReceivesAdminInfoEmails, ReceivesInfoEmails, Rol_padre__c, SenderEmail, SenderName, Signature, SmallBannerPhotoUrl, SmallPhotoUrl, StartDay, State, StayInTouchNote, StayInTouchSignature, StayInTouchSubject, Street, SuAccessExpirationDate, SystemModstamp, TimeZoneSidKey, Title, Username, UserRoleId, UserType FROM User"
+    UserRole:
+      extra_spark_job_arguments:
+        - "SELECT CaseAccessForAccountOwner, ContactAccessForAccountOwner, DeveloperName, ForecastUserId, Id, LastModifiedById, LastModifiedDate, MayForecastManagerShare, Name, OpportunityAccessForAccountOwner, ParentRoleId, PortalAccountId, PortalAccountOwnerId, PortalType, RollupDescription, SystemModstamp FROM UserRole"
+    Zona_Barrio_Colonia_Comuna__c:
+      clean_table_name: neighborhood
+      extra_spark_job_arguments:
+        - "SELECT Ciudad__c, CreatedById, CreatedDate, CurrencyIsoCode, Id, Id_de_Zona_Barrio_Colonia_Comuna__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, OwnerId, SystemModstamp FROM Zona_Barrio_Colonia_Comuna__c"
+    Organizacion_de_venta__c:
+      clean_table_name: sales_organization
+      extra_spark_job_arguments:
+        - "select Campana_oblig_en_Oport__c,Carga_Id_empresa_manual__c,CreatedById,CreatedDate,CRM_Navent__c,CurrencyIsoCode,Descuentos_permitidos__c,Duracion_descuentos__c,Emails_envio_OS__c,Id,Id_de_portal__c,Id_SAP__c,Id_unidad_de_negocio_Pardot__c,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,Moneda_base__c,Monedas_aceptadas__c,Name,Organizacion_de_venta__c,OwnerId,Pais__c,Perfil_crediticio__c,Portal__c,Renovacion_automatica_de_oportunidades__c,Sincroniza_con_pardot__c,SystemModstamp,Vertical__c,Vias_de_pago_aceptadas__c from Organizacion_de_venta__c"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
