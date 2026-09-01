@@ -8,8 +8,8 @@ WITH em_casa_listings_raw AS (
         CAST(address.state AS STRING) AS state,
         CAST(address.street AS STRING) AS address,
         REGEXP_REPLACE(LOWER(CAST(address.street AS STRING)), "avenida|rua|av.|#|&|1|2|3|4|5|6|7|8|9| da | de | do | das | dos ", "") AS address_for_join,
-        NULL::INT AS st_number,
-        NULL::STRING AS zip_code,
+        CAST(NULL AS INT) AS st_number,
+        CAST(NULL AS STRING) AS zip_code,
         CAST(geolocation.latitude AS STRING) AS lat,
         CAST(geolocation.longitude AS STRING) AS lng,
         CAST(house_info.floor AS STRING) AS floors,
@@ -20,9 +20,9 @@ WITH em_casa_listings_raw AS (
         CAST(house_info.suites AS INT) AS suites,
         CAST(house_info.parking_spaces AS INT) AS parking_spaces,
         CAST(house_info.bathrooms AS INT) AS bathrooms,
-        NULL::STRING AS year_built,
+        CAST(NULL AS STRING) AS year_built,
         CONCAT(UPPER(SUBSTR(CAST(house_info.unit_type AS STRING), 1, 1)), LOWER(SUBSTR(CAST(house_info.unit_type AS STRING), 2, 15))) AS unit_type,
-        NULL::STRING AS usage_type,
+        CAST(NULL AS STRING) AS usage_type,
         CAST(price.sale.price AS DOUBLE) AS price,
         (CAST(price.sale.price AS DOUBLE)/CAST(house_info.area AS INT)) AS price_m2,
         CAST(price.sale.condo_fee AS DOUBLE) AS condo_fee,
@@ -36,7 +36,7 @@ WITH em_casa_listings_raw AS (
     FROM
         datalake_crawlers_listings_clean.em_casa
 ),
-em_casa_listings AS (
+em_casa_listings_ranked AS (
     SELECT
         id_house,
         id_house_platform,
@@ -74,23 +74,71 @@ em_casa_listings AS (
         ts_last_extraction
     FROM
         em_casa_listings_raw
-    QUALIFY
+),
+em_casa_listings AS (
+    SELECT
+        id_house,
+        id_house_platform,
+        platform,
+        neighborhood,
+        city,
+        state,
+        address,
+        address_for_join,
+        st_number,
+        zip_code,
+        lat,
+        lng,
+        floors,
+        num_floors,
+        unit_per_floor,
+        total_area,
+        bedrooms,
+        suites,
+        parking_spaces,
+        bathrooms,
+        year_built,
+        unit_type,
+        usage_type,
+        price,
+        price_m2,
+        condo_fee,
+        iptu,
+        for_sale,
+        for_rent,
+        is_platform_property,
+        ts_updated,
+        ts_last_publication,
+        ts_last_extraction
+    FROM
+        em_casa_listings_ranked
+    WHERE
         is_last_status
 ),
-regions AS (
+regions_ranked AS (
     SELECT
         rm.id_house_platform,
         rm.id_neighborhood,
         rm.neighborhood,
-        r.city_group
+        r.city_group,
+        ROW_NUMBER() OVER (PARTITION BY rm.id_house_platform ORDER BY rm.ts_updated DESC) AS rn
     FROM
-        datalake_crawlers_listings.em_casa_region_mapping AS rm
+        datalake_sale_crawlers_listings.em_casa_region_mapping AS rm
     LEFT JOIN
         datalake_region.region AS r
             ON rm.id_neighborhood = r.id
             AND r.level IN ('SubRegiao', 'Cidade')
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_house_platform ORDER BY rm.ts_updated DESC) = 1
+),
+regions AS (
+    SELECT
+        id_house_platform,
+        id_neighborhood,
+        neighborhood,
+        city_group
+    FROM
+        regions_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     el.id_house,
@@ -124,11 +172,11 @@ SELECT
     el.iptu,
     for_sale AS is_for_sale,
     for_rent AS is_for_rent,
-    NULL::INTEGER AS nearby_other_platform_houses,
-    NULL::DOUBLE AS avg_nearby_price_m2,
-    NULL::DOUBLE AS avg_distance,
+    CAST(NULL AS INTEGER) AS nearby_other_platform_houses,
+    CAST(NULL AS DOUBLE) AS avg_nearby_price_m2,
+    CAST(NULL AS DOUBLE) AS avg_distance,
     el.is_platform_property,
-    NULL::STRING AS is_exclusive,
+    CAST(NULL AS STRING) AS is_exclusive,
     el.ts_updated
 FROM
     em_casa_listings AS el

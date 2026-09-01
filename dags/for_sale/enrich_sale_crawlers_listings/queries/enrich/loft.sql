@@ -5,7 +5,7 @@ WITH loft_listings_raw AS (
     FROM 
         datalake_crawlers_listings_clean.loft
 ),
-loft_listings AS (
+loft_listings_ranked AS (
     SELECT
         CONCAT(id, 'Loft') AS id_house,
         id AS id_house_platform,
@@ -46,23 +46,75 @@ loft_listings AS (
         FIRST_VALUE(ts_updated) OVER (PARTITION BY 1 ORDER BY ts_updated DESC) AS ts_last_extraction
     FROM
         loft_listings_raw
-    QUALIFY
+),
+loft_listings AS (
+    SELECT
+        id_house,
+        id_house_platform,
+        platform,
+        3p_name,
+        unit_type,
+        usage_type,
+        property_type,
+        contract_type,
+        business_type,
+        neighborhood,
+        city,
+        state,
+        address,
+        zip_code,
+        st_number,
+        lat,
+        lng,
+        floors,
+        num_floors,
+        total_area,
+        bedrooms,
+        suites,
+        parking_spaces,
+        bathrooms,
+        year_built,
+        price,
+        price_m2,
+        installments_price,
+        condo_fee,
+        iptu,
+        is_3p,
+        is_marketplace,
+        is_platform_property,
+        is_last_status,
+        ts_created,
+        ts_updated,
+        ts_last_extraction
+    FROM
+        loft_listings_ranked
+    WHERE
         is_last_status
 ),
-regions AS (
-    SELECT 
+regions_ranked AS (
+    SELECT
         rm.id_house_platform,
         rm.id_neighborhood,
         rm.neighborhood,
-        r.city_group
+        r.city_group,
+        ROW_NUMBER() OVER (PARTITION BY rm.id_house_platform ORDER BY rm.dt_updated DESC) AS rn
     FROM
         datalake_crawlers_listings.loft_region_mapping AS rm
-    LEFT JOIN 
-        datalake_region.region AS r 
+    LEFT JOIN
+        datalake_region.region AS r
             ON rm.id_neighborhood = r.id
             AND r.level IN ('SubRegiao', 'Cidade')
-    QUALIFY 
-        ROW_NUMBER() OVER (PARTITION BY id_house_platform ORDER BY dt_updated DESC) = 1 
+),
+regions AS (
+    SELECT
+        id_house_platform,
+        id_neighborhood,
+        neighborhood,
+        city_group
+    FROM
+        regions_ranked
+    WHERE
+        rn = 1
 )
 SELECT 
     l.id_house,
@@ -87,7 +139,7 @@ SELECT
     l.lng,
     l.floors,
     l.num_floors,
-    NULL::INTEGER AS unit_per_floor, /* We don't have this column in Loft, but we put this column in to standardize with Emcasa (it may be unnecessary)*/
+    CAST(NULL AS INTEGER) AS unit_per_floor, /* We don't have this column in Loft, but we put this column in to standardize with Emcasa (it may be unnecessary)*/
     l.total_area,
     l.bedrooms,
     l.suites,
@@ -100,10 +152,10 @@ SELECT
     l.condo_fee,
     l.iptu,
     /* Columns referring to the distance CTE present in the old datamart. A solution to check the uniqueness of Loft listings will be developed in another table.*/
-    NULL::INTEGER AS nearby_other_platform_houses,
-    NULL::DOUBLE AS avg_nearby_price_m2,
-    NULL::DOUBLE AS avg_distance, 
-    NULL::BOOLEAN AS is_exclusive, 
+    CAST(NULL AS INTEGER) AS nearby_other_platform_houses,
+    CAST(NULL AS DOUBLE) AS avg_nearby_price_m2,
+    CAST(NULL AS DOUBLE) AS avg_distance,
+    CAST(NULL AS BOOLEAN) AS is_exclusive,
     /* */
     /* Standardization columns for other competitors. However, Loft only works with sale.*/
     TRUE AS is_for_sale,
