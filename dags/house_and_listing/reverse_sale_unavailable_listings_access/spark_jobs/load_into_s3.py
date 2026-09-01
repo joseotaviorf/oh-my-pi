@@ -21,7 +21,8 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 s3_service = S3Service(boto3.resource("s3"))
-spark_client = SparkClient()
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 buckets = {
     "prod": "sale-unavailable-listings-s3-data-quintoandar-com-br",

@@ -15,12 +15,15 @@ from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     is_validation_run,
 )
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_into_sqs"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 T = TypeVar("T")
 

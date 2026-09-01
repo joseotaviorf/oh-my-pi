@@ -7,6 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.configuration_service import ConfigurationService
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -14,6 +15,9 @@ JOB_NAME = "load_into_robbyson_api"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
+dbutils = BaseDBUtils().get_dbutils()
 
 
 def create_results_payload(
@@ -137,11 +141,6 @@ def send_payload_in_batches(
 
 def main():
     job_arguments_dict = parse_arguments()
-
-    base_dbutils = BaseDBUtils()
-    global dbutils
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
 
     token = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.ROBBYSON)
 

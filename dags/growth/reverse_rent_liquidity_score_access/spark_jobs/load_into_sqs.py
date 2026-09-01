@@ -11,6 +11,7 @@ from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     is_validation_run,
 )
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.configuration_service import ConfigurationService
 
 # Masterfeed SQS export for reverse_rent_liquidity_score.rent_liquidity_score (rent liquidity score to Masterfeed).
@@ -22,6 +23,8 @@ JOB_NAME = "load_into_sqs"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def parse_arguments() -> Tuple[str, str, str, Optional[str], Optional[str]]:

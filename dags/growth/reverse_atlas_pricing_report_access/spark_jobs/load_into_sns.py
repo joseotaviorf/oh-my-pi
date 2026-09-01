@@ -18,6 +18,8 @@ JOB_NAME = "load_into_sns"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def parse_arguments() -> dict:
@@ -99,7 +101,6 @@ def load_table_into_sns(
     """
 
     region = sns_topic_arn.split(":")[3]
-    spark_client = SparkClient()
 
     df = spark.table(f"{database_name}.{table_name}")
 
