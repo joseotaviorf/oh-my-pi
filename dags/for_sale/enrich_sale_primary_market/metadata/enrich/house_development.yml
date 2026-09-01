@@ -1,0 +1,89 @@
+---
+database_name: datalake_sale_primary_market
+table_name: house_development
+domain: For Sale
+description: One row per house that belongs to a development, denormalizing Development and DevelopmentTypology attributes onto the house grain. Single source of truth for primary-market house-level profile, so consumers don't need to know the two link paths (offer-created unit vs typology shell listing).
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+      - datalake_ebdb_clean.development_typology_unit.id_house
+    description: Unique identifier of the house (Imovel) linked to a development.
+  id_development:
+    lineage:
+      - datalake_ebdb_clean.development_typology.id_development
+    description: Development the house belongs to.
+  id_development_typology:
+    lineage:
+      - datalake_ebdb_clean.development_typology_unit.id_development_typology
+      - datalake_ebdb_clean.house.id_development_typology
+    description: Typology (floor plan) the house belongs to. Resolved from the offer-created unit when present, otherwise from the typology shell listing.
+  development_name:
+    lineage:
+      - datalake_ebdb_clean.development.name
+    description: Name of the development/empreendimento.
+  construction_status:
+    lineage:
+      - datalake_ebdb_clean.development.construction_status
+    description: Construction stage of the development (e.g. launch, under construction, ready).
+  provider:
+    lineage:
+      - datalake_ebdb_clean.development.provider
+    description: External inventory provider the development's data was sourced from (e.g. Orulo).
+  postal_code:
+    lineage:
+      - datalake_ebdb_clean.development.postal_code
+    description: Postal code of the development's address.
+  street:
+    lineage:
+      - datalake_ebdb_clean.development.street
+    description: Street name of the development's address.
+  street_number:
+    lineage:
+      - datalake_ebdb_clean.development.street_number
+    description: Street number of the development's address.
+  neighborhood:
+    lineage:
+      - datalake_ebdb_clean.development.neighborhood
+    description: Neighborhood of the development's address.
+  city:
+    lineage:
+      - datalake_ebdb_clean.development.city
+    description: City of the development's address.
+  state:
+    lineage:
+      - datalake_ebdb_clean.development.state
+    description: State of the development's address.
+  latitude:
+    lineage:
+      - datalake_ebdb_clean.development.latitude
+    description: Latitude of the development's location.
+  longitude:
+    lineage:
+      - datalake_ebdb_clean.development.longitude
+    description: Longitude of the development's location.
+  typology_type:
+    lineage:
+      - datalake_ebdb_clean.development_typology.type
+    description: Typology's property type (e.g. apartment, house, studio, loft).
+  bedrooms:
+    lineage:
+      - datalake_ebdb_clean.development_typology.bedrooms
+    description: Number of bedrooms in the typology.
+  bathrooms:
+    lineage:
+      - datalake_ebdb_clean.development_typology.bathrooms
+    description: Number of bathrooms in the typology.
+  suites:
+    lineage:
+      - datalake_ebdb_clean.development_typology.suites
+    description: Number of suites in the typology.
+  parking_spaces:
+    lineage:
+      - datalake_ebdb_clean.development_typology.parking_spaces
+    description: Number of parking spaces in the typology.
+  total_area:
+    lineage:
+      - datalake_ebdb_clean.development_typology.total_area
+    description: Total area (m²) of the typology.
