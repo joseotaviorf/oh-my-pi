@@ -1,6 +1,5 @@
 cluster:
-  type: consolidation_l_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_libraries:
   - pypi:
       package: kafka-python==2.0.3
@@ -9,13 +8,3 @@ cluster:
       ebs_volume_size: 200
     spark_conf:
       spark.driver.maxResultSize: '0'
-    spark_version: 13.3.x-scala2.12
-validation:
-  cluster:
-    type: emr_7_12_consolidation_l_memory_fleet_cluster
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_conf:
-        spark.driver.maxResultSize: '0'
-  allow_custom_spark_job: true
