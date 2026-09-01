@@ -42,6 +42,9 @@ source AS (
         c.invoice_filename,
         c.invoice_accrual_year_month,
         c.country,
+        c.last_modified_by_name,
+        c.last_modified_by_email,
+        c.ts_created,
         c.year,
         c.month,
         c.day
@@ -82,6 +85,9 @@ SELECT
     s.invoice_filename,
     s.invoice_accrual_year_month,
     s.country,
+    s.last_modified_by_name,
+    s.last_modified_by_email,
+    s.ts_created,
     TRY_CAST(
         REVERSE(
             CASE

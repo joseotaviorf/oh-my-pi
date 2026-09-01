@@ -61,6 +61,14 @@ columns:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.country
     description: Financial attribute representing country on the invoice_preview dataset.
+  last_modified_by_name:
+    description: Display name of the SeuBarriga user who last changed this preview billing line in the export snapshot.
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.last-modified-by-name
+  last_modified_by_email:
+    description: Email of the SeuBarriga user who last changed this preview billing line in the export snapshot.
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.last-modified-by-email
   paid_amount:
     description: Monetary amount of the preview billing line in the currency exported by SeuBarriga.
     lineage:
@@ -127,6 +135,10 @@ columns:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.landlord-invoice-created-at
     description: Calendar date associated with landlord invoice created at in the financial workflow.
+  ts_created:
+    description: Timestamp when this preview billing line was created in SeuBarriga, as exported in the CSV created-at column.
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.created-at
   year:
     description: Partition year of the calendar date when the preview snapshot was loaded into the datalake.
     lineage:

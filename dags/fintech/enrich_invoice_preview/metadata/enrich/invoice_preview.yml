@@ -104,6 +104,18 @@ columns:
     description: Country code associated with the contract; only Brazil rows are materialized in this table.
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.country
+  last_modified_by_name:
+    description: Display name of the SeuBarriga user who last changed this preview billing line in the selected morning snapshot.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.last_modified_by_name
+  last_modified_by_email:
+    description: Email of the SeuBarriga user who last changed this preview billing line in the selected morning snapshot.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.last_modified_by_email
+  ts_created:
+    description: Timestamp when this preview billing line was created in SeuBarriga, as recorded in the clean snapshot.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.ts_created
   payment_installment:
     description: Installment number parsed from payment_description when it contains parcela; defaults to 1 otherwise.
     lineage:

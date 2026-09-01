@@ -43,6 +43,13 @@ EXPORT_SLOT_MORNING = "morning"
 EXPORT_SLOT_AFTERNOON = "afternoon"
 EXPORT_SLOT_AUTO = "auto"
 BRT = timezone(timedelta(hours=-3))
+# SeuBarriga preview audit columns (CSV kebab-case). Older files may omit them;
+# fill nulls so unionAll across mixed schemas does not fail.
+PREVIEW_AUDIT_CSV_COLUMNS = (
+    "last-modified-by-name",
+    "last-modified-by-email",
+    "created-at",
+)
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -143,6 +150,13 @@ def _select_files_for_export_slot(file_paths, export_slot):
 
 def _write_mode_for_export_slot(export_slot):
     return "append" if export_slot == EXPORT_SLOT_AFTERNOON else "overwrite"
+
+
+def _ensure_string_columns(df, column_names):
+    for column_name in column_names:
+        if column_name not in df.columns:
+            df = df.withColumn(column_name, functions.lit(None).cast("string"))
+    return df
 
 
 def _generate_date_range(load_start_date, load_end_date):
@@ -274,6 +288,7 @@ if __name__ == "__main__":
                 df = s3_consumer.get_data_from_file(
                     path=csv, format=format, options=options
                 )
+                df = _ensure_string_columns(df, PREVIEW_AUDIT_CSV_COLUMNS)
                 df = df.withColumn("invoice_filename", functions.lit(csv))
                 dfs.append(df)
 
