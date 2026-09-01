@@ -13,8 +13,9 @@ with `sale_type IS NULL` and `98` rows with `sale_type = 'SECONDARY'`.
 
 The enriched house table currently derives `is_sale_primary_market` from the
 legacy `is_primary_market` boolean. That preserves historical classifications
-but does not follow the new source-of-truth enum. The existing house query also
-uses `QUALIFY`, which is not compatible with EMR Spark 3.5.
+but does not follow the new source-of-truth enum. The merged EMR migration
+already replaced the former `QUALIFY` with an EMR-compatible `_t` subquery
+filtered by `WHERE _w = 1`.
 
 ## Goal
 
@@ -33,9 +34,8 @@ The SQL change will:
 
 1. Replace `BOOL_OR(lsm.is_primary_market)` with
    `BOOL_OR(lsm.sale_type = 'PRIMARY')` in `listing_info`
-2. Add a `listing_business_context_ranked` CTE that ranks rental context
-   before sale context per house
-3. Join only the ranked context row and remove the final `QUALIFY`
+2. Preserve the existing `_t` subquery and `WHERE _w = 1` one-row-per-house
+   selection, which is already compatible with EMR Spark 3.5
 
 The metadata change will replace lineage from
 `listing_sale_model.is_primary_market` with lineage from
@@ -69,7 +69,7 @@ be used in production derivation.
 Run, in order:
 
 1. Databricks/EMR SQL compatibility lint immediately after editing
-   `house.sql`
+   `house.sql`; it should confirm the existing EMR-safe query baseline
 2. Metadata content validation
 3. SQL-to-metadata lineage validation
 4. FAIR metadata validation
