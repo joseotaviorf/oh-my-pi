@@ -189,6 +189,11 @@ workflow:
       extra_spark_job_arguments:
         - "1SNPW37g1l96rSgAJeQ9iAM0NJlDHxfJlGZ3iJZ4ico4"
         - "base_hiring_gh"
+    # Former notebook: LEGADO_export (Daily Pipeline) — DBP-1835.
+    people_insights_full_roster:
+      extra_spark_job_arguments:
+        - "1OI1OoQCZWP37HrPQsFGn2VmpQkgbE5-apJIa4qJnGMo"
+        - "base_completa_grupo"
 
     # --- people_reports notebook migration (Tier-1 validated) ---
     # Former notebook view: base_wfa
