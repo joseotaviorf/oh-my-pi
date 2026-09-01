@@ -70,13 +70,13 @@ class TestUnityCatalogRestMetastoreService(unittest.TestCase):
         mock_client.delete_table.assert_not_called()
         mock_client.create_table.assert_not_called()
 
-    def test_drop_table_calls_delete(self):
+    def test_drop_table_skips_uc_delete(self):
         mock_client = MagicMock()
         svc = self._make_service(mock_client)
 
         svc.drop_table("db", "tbl")
 
-        mock_client.delete_table.assert_called_once_with("quintoandar_forno.db.tbl")
+        mock_client.delete_table.assert_not_called()
 
     def test_get_table_names_delegates_to_client(self):
         mock_client = MagicMock()

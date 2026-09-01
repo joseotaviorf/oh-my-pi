@@ -108,8 +108,17 @@ class UnityCatalogRestMetastoreService(MetastoreService):
         )
 
     def drop_table(self, database_name: str, table_name: str) -> None:
+        """Do not delete UC secondary tables.
+
+        Primary catalogs still drop+recreate. UC REST create is skip-if-exists and
+        cannot reliably recreate JSON/Parquet external tables after delete, so
+        dropping here orphans the secondary entry. Keep the UC registration.
+        """
         full_name = f"{self._catalog}.{database_name}.{table_name}"
-        self._client.delete_table(full_name)
+        logger.info(
+            f"m=drop_table, table={full_name}, "
+            "msg=skipping UC secondary drop to avoid orphaning non-recreatable formats"
+        )
 
     def get_table_names(self, database_name: str, regex: str = "*") -> List[str]:
         return self._client.list_tables(self._catalog, database_name)
