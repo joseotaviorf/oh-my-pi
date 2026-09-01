@@ -10,5 +10,7 @@ cluster:
       spark.driver.memoryOverhead: 2g
       spark.driver.cores: "1"
       spark.executor.memory: 8g
-      spark.executor.memoryOverhead: 3g
+      spark.executor.memoryOverhead: 2g
       spark.executor.cores: "2"
+      spark.databricks.delta.optimizeWrite.enabled: "true"
+      spark.databricks.delta.autoCompact.enabled: "false"
