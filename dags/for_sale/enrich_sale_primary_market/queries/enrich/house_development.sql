@@ -31,6 +31,27 @@ house_typology AS (
     WHERE
         dtu.id_development_typology IS NOT NULL
         OR h.id_development_typology IS NOT NULL
+),
+-- Amenities are multi-valued per development — pre-aggregate to one row per
+-- id_development so the join below can't fan out the house grain.
+development_amenities AS (
+    SELECT
+        id_development,
+        COLLECT_SET(amenity) AS amenities
+    FROM
+        datalake_ebdb_clean.development_amenity
+    GROUP BY
+        id_development
+),
+-- Typology attributes are multi-valued per typology — same pre-aggregation.
+development_typology_attributes AS (
+    SELECT
+        id_development_typology,
+        COLLECT_SET(attribute) AS typology_attributes
+    FROM
+        datalake_ebdb_clean.development_typology_attribute
+    GROUP BY
+        id_development_typology
 )
 SELECT
     ht.id_house,
@@ -52,7 +73,13 @@ SELECT
     dt.bathrooms,
     dt.suites,
     dt.parking_spaces,
-    dt.total_area
+    dt.total_area,
+    da.amenities,
+    dta.typology_attributes,
+    -- development.id_development_contact is already a single FK to the current
+    -- active contact, so this join is 1:1 by construction — no aggregation needed.
+    dc.uuid_person AS active_contact_uuid_person,
+    dc.status AS active_contact_status
 FROM
     house_typology AS ht
 INNER JOIN
@@ -61,3 +88,12 @@ INNER JOIN
 INNER JOIN
     datalake_ebdb_clean.development AS d
         ON d.id = dt.id_development
+LEFT JOIN
+    development_amenities AS da
+        ON da.id_development = dt.id_development
+LEFT JOIN
+    development_typology_attributes AS dta
+        ON dta.id_development_typology = ht.id_development_typology
+LEFT JOIN
+    datalake_ebdb_clean.development_contact AS dc
+        ON dc.id = d.id_development_contact

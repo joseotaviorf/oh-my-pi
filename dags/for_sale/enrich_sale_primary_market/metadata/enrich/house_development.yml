@@ -87,3 +87,20 @@ columns:
     lineage:
       - datalake_ebdb_clean.development_typology.total_area
     description: Total area (m²) of the typology.
+  amenities:
+    lineage:
+      - datalake_ebdb_clean.development_amenity.amenity
+    description: Distinct set of amenity types available in the development (e.g. pool, gym, sauna). Aggregated to one array per development before joining, since amenities are multi-valued.
+  typology_attributes:
+    lineage:
+      - datalake_ebdb_clean.development_typology_attribute.attribute
+    description: Distinct set of special attributes of the typology (e.g. cobertura, duplex, triplex, jardim). Aggregated to one array per typology before joining, since attributes are multi-valued.
+  active_contact_uuid_person:
+    lineage:
+      - datalake_ebdb_clean.development.id_development_contact
+      - datalake_ebdb_clean.development_contact.uuid_person
+    description: Person UUID of the development's current active contact (gestor ativo), resolved via development.id_development_contact.
+  active_contact_status:
+    lineage:
+      - datalake_ebdb_clean.development_contact.status
+    description: Lifecycle status of the active contact assignment (ACTIVE/INACTIVE).
