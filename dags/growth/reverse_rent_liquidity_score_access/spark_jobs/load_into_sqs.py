@@ -67,6 +67,8 @@ def transform_payload(database_name: str, table_name: str) -> List[Dict[str, Any
         (df["dt_snapshot"].cast("timestamp").cast("long") * 1000),
     )
     rows = df.collect()
+    row_count = len(rows)
+    logger.info("Transformed %s rows for %s.%s", row_count, database_name, table_name)
     return [
         {
             "eventDate": int(row["eventDate"]),
@@ -83,7 +85,8 @@ def transform_payload(database_name: str, table_name: str) -> List[Dict[str, Any
 def send_messages(
     sqs_client: Any, queue_url: str, messages: List[Dict[str, Any]]
 ) -> None:
-    logger.info("Sending messages to SQS queue %s", queue_url)
+    message_count = len(messages)
+    logger.info("Sending %s messages to SQS queue %s", message_count, queue_url)
     message_attributes = {
         "contentType": {"DataType": "String", "StringValue": "application/json"},
     }
@@ -91,13 +94,16 @@ def send_messages(
     try:
         for last_message in messages:
             message_body = json.dumps(last_message)
-            logger.info("Sending message to SQS: %s", message_body)
             sqs_client.send_message(
                 QueueUrl=queue_url,
                 MessageBody=message_body,
                 MessageAttributes=message_attributes,
             )
-        logger.info("Messages sent successfully")
+        logger.info(
+            "Successfully sent %s messages to SQS queue %s",
+            message_count,
+            queue_url,
+        )
     except Exception as e:
         logger.error("Error sending message to SQS: %s", e)
         logger.error("The last message attempted was %s", last_message)
