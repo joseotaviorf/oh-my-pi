@@ -1439,9 +1439,6 @@ bietlejuice.enrich_agent_reports:
   - bietlejuice.enrich_tiers:load-enrich-ciq-first-listing:first-run-of-day
 bietlejuice.enrich_agents_matias:
   - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
-  - bietlejuice.langfuse:load-clean-observations:first-run-of-day
-  - bietlejuice.langfuse:load-clean-scores:first-run-of-day
-  - bietlejuice.langfuse:load-clean-traces:first-run-of-day
 bietlejuice.enrich_agents_validation:
   - bietlejuice.big_agent_fast_lane:load-clean-incentive-engine:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-metric-period:first-run-of-day
