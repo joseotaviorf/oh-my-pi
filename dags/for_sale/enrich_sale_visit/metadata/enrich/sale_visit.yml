@@ -134,10 +134,8 @@ columns:
     description: True if the house booked had an active rental contract at 5A at the booking date
   sale_type:
     lineage:
-    - datalake_ebdb_clean.listing_sale_model.sale_type
-    - datalake_ebdb_clean.listing_sale_model.is_primary_market
-    - datalake_ebdb_clean.listing_business_context.ts_updated
-    description: Market type of the house on this sale visit. Taken from the latest SALE listing_business_context by ts_updated that has a listing_sale_model. Uses sale_type when set; otherwise PRIMARY if is_primary_market is true and SECONDARY if false. NULL if the house has no SALE listing sale model.
+    - datalake_sale_primary_market.listing_sale_type.sale_type
+    description: Market type of the house on this sale visit, sourced from the primary-market SSOT enrich_sale_primary_market.listing_sale_type. PRIMARY, SECONDARY, or NULL if the house has no SALE listing sale model.
     categories:
       PRIMARY: New-build / primary market.
       SECONDARY: Resale / secondary market.
