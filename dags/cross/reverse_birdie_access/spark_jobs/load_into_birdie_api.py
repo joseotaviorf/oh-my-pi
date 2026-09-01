@@ -47,7 +47,7 @@ def get_df(database_name, table_name, execution_date):
 
     for col in df.columns:
         if dict(df.dtypes)[col] == "int":
-            df = df.fillna({col: np.NaN})
+            df = df.fillna({col: np.nan})
         else:
             df = df.fillna({col: ""})
 
