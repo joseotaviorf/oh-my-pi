@@ -1,41 +1,28 @@
 cluster:
-  type: consolidation_s_general_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_s_general_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    step_concurrency_level: 4
+    task_nodes:
+      instance_types:
+      - m6g.xlarge
+      - m7g.xlarge
+      target_on_demand: 1
+      target_spot: 1
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - m6g.xlarge
+      - m7g.xlarge
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    num_workers: 3
-validation:
-  cluster:
-    # 4 parallel loads on 2 effective xlarge workers (task spot never provisioned on
-    # j-09366642SWV8LMPTFMKH) → 15–16 min executor queue times. Guarantee 3rd worker
-    # (DBR parity) and cap per-app executors to stop dynamic-allocation thrashing.
-    type: emr_7_12_consolidation_s_general_fleet_cluster
-    custom_configurations:
-      step_concurrency_level: 4
-      task_nodes:
-        instance_types:
-        - m6g.xlarge
-        - m7g.xlarge
-        target_on_demand: 1
-        target_spot: 1
-        allocation_strategy: price-capacity-optimized
-        bid_price_percentage: 100
-      core_nodes:
-        target_on_demand: 2
-        target_spot: 0
-        instance_types:
-        - m6g.xlarge
-        - m7g.xlarge
-      spark_conf:
-        spark.yarn.am.memory: 1536m
-        spark.yarn.am.cores: "1"
-        spark.driver.memory: 4g
-        spark.driver.memoryOverhead: 1536m
-        spark.executor.cores: "2"
-        spark.executor.memory: 6g
-        spark.executor.memoryOverhead: 1536m
-        spark.dynamicAllocation.minExecutors: "1"
-        spark.dynamicAllocation.maxExecutors: "2"
+      spark.yarn.am.memory: 1536m
+      spark.yarn.am.cores: '1'
+      spark.driver.memory: 4g
+      spark.driver.memoryOverhead: 1536m
+      spark.executor.cores: '2'
+      spark.executor.memory: 6g
+      spark.executor.memoryOverhead: 1536m
+      spark.dynamicAllocation.minExecutors: '1'
+      spark.dynamicAllocation.maxExecutors: '2'
