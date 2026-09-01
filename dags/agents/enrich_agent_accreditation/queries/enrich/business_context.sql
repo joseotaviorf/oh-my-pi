@@ -48,11 +48,12 @@ legacy_agent_data_business_contexts AS (
         aer.uuid_person,
         aud.business_context,
         aud.rev_type,
-        -- rev_type ASC breaks ties between a transition's DEL (2) and ADD (0) row,
-        -- which share the same instant (AAREDE-526).
+        aud.rev,
+        -- Keep each context at an instant. For the same context, an ADD wins over
+        -- a same-instant DEL so the transition remains observable (AAREDE-526).
         ROW_NUMBER() OVER (
-            PARTITION BY aud.id_agent_data, u.ts_revision
-            ORDER BY aud.rev_type ASC
+            PARTITION BY aud.id_agent_data, aud.business_context, u.ts_revision
+            ORDER BY aud.rev_type ASC, aud.rev DESC
         ) = 1 AS is_last_update_by_instant,
         u.ts_revision AS ts_revision_started
     FROM
@@ -64,37 +65,188 @@ legacy_agent_data_business_contexts AS (
         datalake_ebdb_user.user_revision_entity AS u
             ON u.id = aud.rev
 ),
--- one row per context run: drop DEL-only, then keep the ADD that starts a new
--- business_context. Same-day N switches become N sequential boxes (AAREDE-526).
-legacy_context_changes AS (
+-- Calculate context-specific intervals before removing DEL events. Otherwise a
+-- deleted context remains open until the next unrelated context event.
+legacy_context_events AS (
     SELECT
         id_agent_data,
         id_user,
         uuid_person,
         business_context,
-        ts_revision_started
-    FROM (
-        SELECT
-            id_agent_data,
-            id_user,
-            uuid_person,
-            business_context,
-            ts_revision_started,
-            LAG(business_context) OVER (
-                PARTITION BY id_agent_data
-                ORDER BY ts_revision_started
-            ) AS previous_business_context
-        FROM
-            legacy_agent_data_business_contexts
-        WHERE
-            rev_type <> 2
-            AND is_last_update_by_instant IS TRUE
-    )
+        rev_type,
+        rev,
+        ts_revision_started,
+        LEAD(ts_revision_started) OVER (
+            PARTITION BY id_agent_data, business_context
+            ORDER BY ts_revision_started, rev_type ASC, rev DESC
+        ) AS ts_context_ended
+    FROM
+        legacy_agent_data_business_contexts
     WHERE
-        previous_business_context IS NULL
-        OR previous_business_context <> business_context
+        is_last_update_by_instant IS TRUE
 ),
-new_business_contexts AS (
+legacy_context_event_intervals AS (
+    SELECT
+        id_agent_data,
+        id_user,
+        uuid_person,
+        business_context,
+        ts_revision_started,
+        ts_context_ended
+    FROM
+        legacy_context_events
+    WHERE
+        rev_type <> 2
+),
+legacy_agent_identity AS (
+    SELECT
+        id_agent_data,
+        MAX(id_user) AS id_user,
+        MAX(uuid_person) AS uuid_person
+    FROM
+        legacy_context_events
+    GROUP BY
+        id_agent_data
+),
+legacy_context_boundaries AS (
+    SELECT
+        id_agent_data,
+        ts_revision_started AS ts_boundary
+    FROM
+        legacy_context_events
+    UNION
+    SELECT
+        id_agent_data,
+        ts_context_ended AS ts_boundary
+    FROM
+        legacy_context_events
+    WHERE
+        ts_context_ended IS NOT NULL
+),
+legacy_context_segments AS (
+    SELECT
+        id_agent_data,
+        ts_boundary AS ts_revision_started,
+        LEAD(ts_boundary) OVER (
+            PARTITION BY id_agent_data
+            ORDER BY ts_boundary
+        ) AS ts_context_ended
+    FROM
+        legacy_context_boundaries
+),
+legacy_context_candidates AS (
+    SELECT
+        segments.id_agent_data,
+        segments.ts_revision_started,
+        intervals.business_context,
+        ROW_NUMBER() OVER (
+            PARTITION BY segments.id_agent_data, segments.ts_revision_started
+            ORDER BY
+                CASE
+                    WHEN intervals.business_context = "SALE" THEN 1
+                    WHEN intervals.business_context = "SALE_PRIMARY_MARKET" THEN 2
+                    ELSE 3
+                END,
+                intervals.ts_revision_started DESC,
+                intervals.business_context DESC
+        ) AS rn
+    FROM
+        legacy_context_segments AS segments
+    INNER JOIN legacy_context_event_intervals AS intervals
+        ON intervals.id_agent_data = segments.id_agent_data
+        AND intervals.ts_revision_started <= segments.ts_revision_started
+        AND (
+            intervals.ts_context_ended IS NULL
+            OR segments.ts_revision_started < intervals.ts_context_ended
+        )
+),
+legacy_context_timeline AS (
+    SELECT
+        segments.id_agent_data,
+        segments.ts_revision_started,
+        segments.ts_context_ended,
+        candidates.business_context
+    FROM
+        legacy_context_segments AS segments
+    LEFT JOIN legacy_context_candidates AS candidates
+        ON candidates.id_agent_data = segments.id_agent_data
+        AND candidates.ts_revision_started = segments.ts_revision_started
+        AND candidates.rn = 1
+),
+legacy_context_timeline_marked AS (
+    SELECT
+        id_agent_data,
+        ts_revision_started,
+        ts_context_ended,
+        business_context,
+        LAG(business_context) OVER (
+            PARTITION BY id_agent_data
+            ORDER BY ts_revision_started
+        ) AS previous_business_context
+    FROM
+        legacy_context_timeline
+),
+legacy_context_timeline_grouped AS (
+    SELECT
+        id_agent_data,
+        ts_revision_started,
+        ts_context_ended,
+        business_context,
+        SUM(
+            CASE
+                WHEN previous_business_context IS NULL
+                    AND business_context IS NULL
+                    THEN 0
+                WHEN previous_business_context = business_context
+                    THEN 0
+                ELSE 1
+            END
+        ) OVER (
+            PARTITION BY id_agent_data
+            ORDER BY ts_revision_started
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS context_group
+    FROM
+        legacy_context_timeline_marked
+),
+legacy_context_intervals_raw AS (
+    SELECT
+        id_agent_data,
+        business_context,
+        MIN(ts_revision_started) AS ts_revision_started,
+        CASE
+            WHEN MAX(
+                CASE
+                    WHEN ts_context_ended IS NULL THEN 1
+                    ELSE 0
+                END
+            ) = 1
+                THEN CAST(NULL AS TIMESTAMP)
+            ELSE MAX(ts_context_ended)
+        END AS ts_context_ended
+    FROM
+        legacy_context_timeline_grouped
+    WHERE
+        business_context IS NOT NULL
+    GROUP BY
+        id_agent_data,
+        business_context,
+        context_group
+),
+legacy_context_intervals AS (
+    SELECT
+        intervals.id_agent_data,
+        identity.id_user,
+        identity.uuid_person,
+        intervals.business_context,
+        intervals.ts_revision_started,
+        intervals.ts_context_ended
+    FROM
+        legacy_context_intervals_raw AS intervals
+    INNER JOIN legacy_agent_identity AS identity
+        ON identity.id_agent_data = intervals.id_agent_data
+),
+new_business_context_events AS (
     SELECT
         -- id_agent_data is in the key too: one Agent Domain identity can map to more than
         -- one legacy id_agent_data, and omitting it let two such rows collide on the same
@@ -106,8 +258,28 @@ new_business_contexts AS (
         aer.uuid_person,
         settings.business_context,
         "AGENT_DOMAIN" AS system_name,
-        ROW_NUMBER() OVER (PARTITION BY settings.id_agent ORDER BY settings.ts_started) = 1 AS is_first_event,
-        settings.ts_started AS ts_revision_started
+        settings.ts_started AS ts_revision_started,
+        CASE
+            WHEN settings.business_context = "SALE" THEN 1
+            WHEN settings.business_context = "SALE_PRIMARY_MARKET" THEN 2
+            ELSE 3
+        END AS context_priority,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                COALESCE(
+                    CAST(aer.id_agent_data AS STRING),
+                    CAST(aer.id_user AS STRING),
+                    CAST(settings.id_agent AS STRING)
+                ),
+                settings.ts_started
+            ORDER BY
+                CASE
+                    WHEN settings.business_context = "SALE" THEN 1
+                    WHEN settings.business_context = "SALE_PRIMARY_MARKET" THEN 2
+                    ELSE 3
+                END,
+                settings.business_context DESC
+        ) AS rn_same_instant
     FROM
         agent_external_reference AS aer
     JOIN
@@ -115,6 +287,30 @@ new_business_contexts AS (
             ON settings.id_agent = aer.id_agent
     WHERE
         settings.is_last_update_by_date IS TRUE
+),
+new_business_contexts AS (
+    SELECT
+        id_agent_business_context,
+        id_agent,
+        id_agent_data,
+        id_user,
+        uuid_person,
+        business_context,
+        system_name,
+        ROW_NUMBER() OVER (
+            PARTITION BY COALESCE(
+                CAST(id_agent_data AS STRING),
+                CAST(id_user AS STRING),
+                CAST(id_agent AS STRING)
+            )
+            ORDER BY ts_revision_started, context_priority, business_context DESC
+        ) = 1 AS is_first_event,
+        ts_revision_started,
+        CAST(NULL AS TIMESTAMP) AS ts_context_ended
+    FROM
+        new_business_context_events
+    WHERE
+        rn_same_instant = 1
 ),
 legacy_business_contexts AS (
     SELECT
@@ -129,9 +325,18 @@ legacy_business_contexts AS (
         bc.uuid_person,
         bc.business_context,
         "LEGACY_SYSTEM" AS system_name,
-        bc.ts_revision_started
+        bc.ts_revision_started,
+        CASE
+            WHEN new.ts_revision_started IS NOT NULL
+                AND (
+                    bc.ts_context_ended IS NULL
+                    OR new.ts_revision_started < bc.ts_context_ended
+                )
+                THEN new.ts_revision_started
+            ELSE bc.ts_context_ended
+        END AS ts_context_ended
     FROM
-        legacy_context_changes AS bc
+        legacy_context_intervals AS bc
     LEFT JOIN
         new_business_contexts AS new
             ON new.id_agent_data = bc.id_agent_data
@@ -151,7 +356,8 @@ business_contexts AS (
         uuid_person,
         business_context,
         system_name,
-        ts_revision_started
+        ts_revision_started,
+        ts_context_ended
     FROM (
         SELECT
             id_agent_business_context,
@@ -162,14 +368,36 @@ business_contexts AS (
             business_context,
             system_name,
             ts_revision_started,
+            ts_context_ended,
             ROW_NUMBER() OVER (PARTITION BY id_agent_business_context ORDER BY system_name DESC) AS rn
         FROM (
-            SELECT id_agent_business_context, id_agent, id_agent_data, id_user, uuid_person, business_context, system_name, ts_revision_started FROM new_business_contexts
+            SELECT id_agent_business_context, id_agent, id_agent_data, id_user, uuid_person, business_context, system_name, ts_revision_started, ts_context_ended FROM new_business_contexts
             UNION
-            SELECT id_agent_business_context, id_agent, id_agent_data, id_user, uuid_person, business_context, system_name, ts_revision_started FROM legacy_business_contexts
+            SELECT id_agent_business_context, id_agent, id_agent_data, id_user, uuid_person, business_context, system_name, ts_revision_started, ts_context_ended FROM legacy_business_contexts
         )
     )
     WHERE rn = 1
+),
+business_contexts_with_next AS (
+    SELECT
+        id_agent_business_context,
+        id_agent,
+        id_agent_data,
+        id_user,
+        uuid_person,
+        business_context,
+        system_name,
+        ts_revision_started,
+        ts_context_ended,
+        LEAD(ts_revision_started) OVER (
+            PARTITION BY COALESCE(
+                CAST(id_agent_data AS STRING),
+                CAST(id_user AS STRING)
+            )
+            ORDER BY ts_revision_started
+        ) AS next_context_started
+    FROM
+        business_contexts
 )
 SELECT
     id_agent_business_context,
@@ -180,13 +408,10 @@ SELECT
     business_context,
     system_name,
     ts_revision_started,
-    -- partitioned by id_agent_data (stable), not id_agent (null until Agent Domain resolves
-    -- it). COALESCE to id_user so Agent Domain rows with null user.id_agent do not share
-    -- one Spark NULL partition. -1 SECOND not -1 DAY so the end never lands before this
-    -- row's own start when the next revision's time-of-day is earlier (AAREDE-526).
-    LEAD(ts_revision_started) OVER (
-        PARTITION BY COALESCE(CAST(id_agent_data AS STRING), CAST(id_user AS STRING))
-        ORDER BY ts_revision_started
-    ) - INTERVAL 1 SECOND AS ts_revision_ended
+    CASE
+        WHEN system_name = "LEGACY_SYSTEM"
+            THEN ts_context_ended - INTERVAL 1 SECOND
+        ELSE next_context_started - INTERVAL 1 SECOND
+    END AS ts_revision_ended
 FROM
-    business_contexts
+    business_contexts_with_next

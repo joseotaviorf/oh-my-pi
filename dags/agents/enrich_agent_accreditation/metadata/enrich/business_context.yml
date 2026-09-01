@@ -4,8 +4,9 @@ table_name: business_context
 description: |
   Historical record of business contexts assigned to visit agents over time.
   Combines legacy agent-data audit intervals with Agent Domain capability settings,
-  then builds contiguous validity windows per user and agent across both sources so
-  open-ended or fragmented revision ends do not leave null gaps for consumers.
+  reconstructing non-overlapping single-context validity windows from ADD/DELETE
+  events. Agent Domain takes precedence over legacy rows, and SALE wins same-source
+  timestamp conflicts.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -19,7 +20,7 @@ columns:
       - datalake_ebdb_agent_events.capability_settings.ts_started
     description: |
       Unique identifier for the business context revision interval, generated with XXHASH64
-      from person UUID, agent id, business context, and interval start date.
+      from person UUID, agent identity, business context, and interval start value.
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent.id
@@ -47,6 +48,7 @@ columns:
     description: Business context of the agent's activity (for example Sale or Rent).
     categories:
       SALE: Agent serves For Sale visits.
+      SALE_PRIMARY_MARKET: Agent serves primary-market Sale visits.
       RENT: Agent serves For Rent visits.
   system_name:
     description: Origin of the interval row — Agent Domain capability settings or the legacy agent-data audit system.
@@ -63,6 +65,6 @@ columns:
       - datalake_ebdb_user.user_revision_entity.ts_revision
       - datalake_ebdb_agent_events.capability_settings.ts_started
     description: |
-      End of the business context validity window: day before the next revision start
-      for the same user and agent across Agent Domain and legacy rows; null for the
-      latest open-ended interval.
+      End of the selected business context validity window. Legacy rows close immediately
+      before the next selected state, context deletion, or Agent Domain cutover; Agent
+      Domain rows close immediately before the next context event. Null when open-ended.
