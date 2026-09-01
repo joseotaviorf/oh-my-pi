@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from typing import Dict
 
 from airflow import DAG
+from airflow.models.baseoperator import cross_downstream
 from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
@@ -145,34 +146,79 @@ DEDICATED_CLUSTER_EVENTS = ("case", "email_message")
 NUMBER_OF_POOLED_CLUSTERS = 2
 
 
-def build_metrics_tasks(event_table, pool: str):
-
-    return [
-        create_sst_task(
-            target_schema="",
-            target_table=event_table,
+# The lineage after the clean gate, declared as ordered stages: tasks inside a
+# stage run in parallel, stages run in sequence. Adding a metric or moving the
+# DLQ is a change here, not new wiring code.
+#
+# Every metric sits after the DLQ on purpose. ``quality/metrics/stability`` and
+# ``quality/metrics/latency`` both iterate LAYERS = ["raw", "clean"], and the DLQ
+# writes to both — it upserts recovered API records into raw and replays their
+# CDC history into clean. Running the metrics alongside the DLQ would let them
+# read a half-recovered partition, so their values would depend on task timing.
+# Downstream of it, they consistently describe the post-recovery state.
+POST_CLEAN_STAGES = (
+    (
+        dict(
+            task_id="dlq_{table}",
+            entry_point="salesforce/dlq",
+            target_schema="datalake_salesforce_raw",
+            event_parameters=("api_entity", "salesforce_endpoint"),
+        ),
+    ),
+    (
+        dict(
+            task_id="metrics_pipeline_stability_{table}",
             entry_point="quality/metrics/stability",
-            parameters={},
-            task_id=f"metrics_pipeline_stability_{event_table}",
-            pool=pool,
         ),
-        create_sst_task(
-            target_schema="",
-            target_table=event_table,
+        dict(
+            task_id="metrics_pipeline_latency_{table}",
             entry_point="quality/metrics/latency",
-            parameters={},
-            task_id=f"metrics_pipeline_latency_{event_table}",
-            pool=pool,
         ),
-        create_sst_task(
-            target_schema="",
-            target_table=event_table,
+        dict(
+            task_id="metrics_pipeline_missing_events_{table}",
             entry_point="salesforce/metrics/missing_events",
-            parameters={},
-            task_id=f"metrics_pipeline_missing_events_{event_table}",
-            pool=pool,
         ),
-    ]
+    ),
+)
+
+
+def build_stage_task(spec: Dict, event_table: str, event_parameters: Dict, pool: str):
+    """Turn one POST_CLEAN_STAGES entry into a task via ``create_sst_task``."""
+    return create_sst_task(
+        target_schema=spec.get("target_schema", ""),
+        target_table=event_table,
+        entry_point=spec["entry_point"],
+        parameters={
+            key: event_parameters[key] for key in spec.get("event_parameters", ())
+        },
+        task_id=spec["task_id"].format(table=event_table),
+        pool=pool,
+    )
+
+
+def wire_task_stages(
+    stages, upstream, event_table: str, event_parameters: Dict, pool: str, end_cluster
+):
+    """Chain declarative stages between ``upstream`` and ``end_cluster``.
+
+    Returns the tasks keyed by ``task_id`` so a caller can reach a specific one
+    (e.g. to attach a dataset) without knowing the stage layout.
+    """
+    tasks_by_id = {}
+    previous_stage = [upstream]
+    for stage in stages:
+        stage_tasks = [
+            build_stage_task(spec, event_table, event_parameters, pool)
+            for spec in stage
+        ]
+        # cross_downstream, not ``>>``: Airflow defines no ``>>`` between two
+        # lists, so chaining a multi-task stage onto another would raise
+        # TypeError at parse time.
+        cross_downstream(previous_stage, stage_tasks)
+        previous_stage = stage_tasks
+        tasks_by_id.update({task.task_id: task for task in stage_tasks})
+    previous_stage >> end_cluster
+    return tasks_by_id
 
 
 def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
@@ -206,26 +252,15 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
     # DAGs can trigger on this DAG via dependencies.yaml.
     DatasetAdder.attach_dataset_to_task(clean_task)
 
-    metrics_tasks = build_metrics_tasks(event_table, pool)
-    dlq_task = create_sst_task(
-        target_schema="datalake_salesforce_raw",
-        target_table=event_table,
-        entry_point="salesforce/dlq",
-        parameters={
-            "api_entity": parameters["api_entity"],
-            "salesforce_endpoint": SALESFORCE_ENDPOINT,
-        },
-        task_id=f"dlq_{event_table}",
-        pool=pool,
-    )
     if parameters.get("skip_quality_contracts", False):
-        (
-            execute_job_cluster
-            >> raw_task
-            >> clean_task
-            >> metrics_tasks
-            >> dlq_task
-            >> end_cluster
+        execute_job_cluster >> raw_task >> clean_task
+        wire_task_stages(
+            POST_CLEAN_STAGES,
+            clean_task,
+            event_table,
+            parameters,
+            pool,
+            end_cluster,
         )
         return
 
@@ -257,9 +292,14 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
         >> quality_contract_raw
         >> clean_task
         >> quality_contract_clean
-        >> metrics_tasks
-        >> dlq_task
-        >> end_cluster
+    )
+    wire_task_stages(
+        POST_CLEAN_STAGES,
+        quality_contract_clean,
+        event_table,
+        parameters,
+        pool,
+        end_cluster,
     )
 
 

@@ -19,10 +19,10 @@ query.
 
 1. **AppFlow fallback** — `salesforce/recovery_flow.py` fetches an hour through the
    Salesforce API when AppFlow is not `Active`. Lake rows use `event_type = 'RECOVERY'`.
-2. **DLQ replay** — `salesforce/dlq.py` runs at the end of each event lineage, after the
-   metrics tasks. It finds IDs present in raw but missing from clean, fetches current
-   records as lake `event_type = 'RECOVERY'`, upserts raw, and replays their complete raw
-   CDC history into clean.
+2. **DLQ replay** — `salesforce/dlq.py` runs after clean (and the quality contracts) and
+   **before** `metrics_pipeline_missing_events_*`. It finds IDs present in raw but missing
+   from clean, fetches current records as lake `event_type = 'RECOVERY'`, upserts raw, and
+   replays their complete raw CDC history into clean.
 
 ## DLQ volume
 
@@ -34,7 +34,7 @@ DLQ appends to `datalake_sst_metrics.events_type_volume` with a **metric-only**
 - `layer = 'raw'`: API rows upserted into raw.
 - `layer = 'clean'`: CDC history rows replayed into clean (can exceed raw).
 
-The pre-DLQ CDC types (`CREATE`/`UPDATE`/`DELETE`/`RECOVERY`) in the same table do **not**
+The ingest CDC types (`CREATE`/`UPDATE`/`DELETE`/`RECOVERY`) in the same table do **not**
 include that hour's DLQ work. Do not use `event_type = 'RECOVERY'` as the DLQ volume
 signal. Both layers are written on **every** run, so `row_count = 0` means there was no gap
 that hour; an **absent** row means the `dlq_events_*` Airflow task did not run.
@@ -55,26 +55,26 @@ ORDER BY partition_date DESC, CAST(partition_hour AS INTEGER) DESC
 LIMIT 100
 ```
 
-## Interpret alongside the pre-DLQ gap
+## Interpret alongside the residual gap
 
-`datalake_sst_metrics.cdc_pipeline_missing_events` is a snapshot taken **before** the DLQ
-for that hour, so `total_events_missing > 0` there is the gap the DLQ was then asked to
-fix — not necessarily lost data. Compare it with the `DLQ_RECOVERY` counts for the same
-hour, but do not expect the numbers to line up:
+`datalake_sst_metrics.cdc_pipeline_missing_events` is measured **after** the DLQ, so
+`total_events_missing > 0` is the gap that survived recovery — that is an alert, not an
+expected pre-DLQ snapshot. Compare it with the `DLQ_RECOVERY` counts for the same hour,
+but do not expect the numbers to line up:
 
-- missing-event rows count raw events absent from clean at snapshot time;
+- missing-event rows count raw events still absent from clean after replay;
 - raw `DLQ_RECOVERY` counts Salesforce API records returned;
 - clean `DLQ_RECOVERY` counts replayed CDC history rows.
 
-If the gap is positive, read the matching `dlq_events_*` task logs for an early exit, API
-response, or write failure. `DLQ_RECOVERY` rows with `row_count = 0` alongside a positive
-gap mean the DLQ found no IDs to fetch — suspect `retrieve_missing_events` scoping or a
-raw-side partition problem rather than the API.
+If the residual gap is positive, read the matching `dlq_events_*` task logs for an early
+exit, API response, or write failure. `DLQ_RECOVERY` rows with `row_count = 0` alongside a
+positive residual gap mean the DLQ found no IDs to fetch — suspect
+`retrieve_missing_events` scoping or a raw-side partition problem rather than the API.
 
 ## Code map
 
 - DAG order: `dags/support_and_service/salesforce_cdc/salesforce_cdc.py`
 - DLQ replay: `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/salesforce/dlq.py`
 - AppFlow fallback: `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/salesforce/recovery_flow.py`
-- pre-DLQ gap metric: `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/salesforce/metrics/missing_events.py`
+- residual gap metric (post-DLQ): `packages/bietlejuice-runtime/src/bietlejuice/base/sst/pipelines/salesforce/metrics/missing_events.py`
 - shared volume writer: `packages/bietlejuice-runtime/src/bietlejuice/base/sst/core/observability/metrics.py`

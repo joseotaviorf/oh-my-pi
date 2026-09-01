@@ -40,7 +40,8 @@ All tables live in the `datalake_sst_metrics` schema (catalog `delta`).
   and fetches the missing data directly via the Salesforce API, ensuring no data loss
 - **CDC** → Change Data Capture; gaps tracked in `cdc_pipeline_missing_events`
 - **DLQ / dead-letter replay** → recovery that fetches raw∖clean gaps from Salesforce
-  and replays each recovered ID's complete CDC history into clean
+  and replays each recovered ID's complete CDC history into clean. Runs after clean,
+  **before** the missing-events metric
 - **Latency / delay** → time (hours or minutes, per `unit` column) between source and
   target layer; measured in `pipeline_events_latency`
 - **window_size** → rolling window (in hours) used to compute moving averages and z-scores
@@ -57,7 +58,7 @@ All tables live in the `datalake_sst_metrics` schema (catalog `delta`).
 | Raw hourly row count per table | `datalake_sst_metrics.events_volume` — grain: 1 row per `source_table` + `partition_date` + `partition_hour`; simpler than `pipeline_stability` when you only need `row_count` |
 | Row count broken down by event type | `datalake_sst_metrics.events_type_volume` — same as `events_volume` plus `event_type`. DLQ volume is a separate `event_type = 'DLQ_RECOVERY'` row per `layer` (raw vs clean), written every run — `row_count = 0` when there was nothing to recover |
 | Latency / delay from source to target layer | `datalake_sst_metrics.pipeline_events_latency` — grain: 1 row per `target_table` + `partition_date` + `partition_hour`; includes `average_delay`, `p50`/`p90`/`p95`/`p99`, `unit`, `source_layer`, `target_layer` |
-| CDC gaps — missing events in Change Data Capture | `datalake_sst_metrics.cdc_pipeline_missing_events` — grain: 1 row per `target_table` + `partition_date` + `partition_hour`; check `total_events_missing > 0` |
+| CDC gaps — missing events in Change Data Capture | `datalake_sst_metrics.cdc_pipeline_missing_events` — grain: 1 row per `target_table` + `partition_date` + `partition_hour`; check `total_events_missing > 0`. Measured **after** DLQ recovery, so it is the residual gap |
 | Schema drift — new columns added to a source table | `datalake_sst_metrics.table_metadata` — grain: 1 row per `source_table` + `partition_date` + `partition_hour`; `new_cols` (array as VARCHAR) + `new_cols_count` |
 | Contract-level pipeline freshness checks | `datalake_sst_metrics.contract_quality_checks` — grain: 1 row per `table_name` + `metric_name`; `status` column + `last_row_timestamp` + `threshold_time_hours` |
 | Salesforce Appflow connector health | `datalake_sst_metrics.appflow_status` — one row per Appflow flow (= one per `events_*` table); filter `status != 'Active'` to find broken flows. ⚠️ Table exists in DataHub metadata but was not found in Trino at time of writing — confirm current catalog location with the team. |
@@ -188,6 +189,9 @@ LEFT JOIN datalake_sst_metrics.cdc_pipeline_missing_events m
   true`; a table with no history will show `z_score = 0` trivially.
 - Don't use `event_type = 'RECOVERY'` as the DLQ volume signal — that is the lake CDC
   payload type (also used by AppFlow API fallback). DLQ metrics use `DLQ_RECOVERY`.
+- Don't read `cdc_pipeline_missing_events` as the gap the DLQ was asked to fix: it runs
+  **after** the DLQ, so `total_events_missing > 0` there is the gap that survived
+  recovery. Compare it against the `DLQ_RECOVERY` counts for the same hour.
 
 ## Golden Queries
 
@@ -346,10 +350,16 @@ likely (e.g., Salesforce credential expiry, AWS connector issue).
 
 ### DLQ replay
 
-Each event lineage ends with `dlq_events_*`, after the regular metrics tasks. The DLQ
-compares raw with clean for the hour, fetches missing IDs from the Salesforce API as
-`RECOVERY`, upserts those records into raw, and replays each ID's complete raw CDC history
-into clean.
+After raw, clean, and the quality contracts, each event lineage runs `dlq_events_*`.
+The DLQ compares raw with clean for the hour, fetches missing IDs from the Salesforce API
+as `RECOVERY`, upserts those records into raw, and replays each ID's complete raw CDC
+history into clean.
+
+Every metric task runs **after** the DLQ, so `cdc_pipeline_missing_events`
+reports the gap that survived recovery. `quality/metrics/stability` and
+`quality/metrics/latency` read both the raw and the clean layer, and the DLQ writes
+to both, so running them alongside it would let them read a half-recovered
+partition. Downstream of it they consistently describe the post-recovery state.
 
 DLQ appends `event_type = 'DLQ_RECOVERY'` to the same `events_type_volume` table (`layer`
 distinguishes raw vs clean), one row per layer on **every** run — `row_count = 0` when

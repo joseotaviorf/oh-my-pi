@@ -68,7 +68,9 @@ flowchart TD
   S3 --> CDC["bietlejuice.salesforce_cdc<br/>hourly (0 * * * *)"]
   CDC --> RAW["datalake_salesforce_raw.events_*"]
   CDC --> CLEAN["datalake_salesforce_clean.events_*"]
-  CDC --> MET["datalake_sst_metrics.*<br/>(volume, latência, missing_events, appflow_status)"]
+  CLEAN --> DLQ["dlq_events_*<br/>recovery do gap raw∖clean<br/>(faz upsert em raw + replay na clean)"]
+  CDC --> MET["datalake_sst_metrics.*<br/>(appflow_status, volume do raw)"]
+  DLQ --> MISS["métricas pós-DLQ<br/>stability, latency, missing_events"]
 
   SF["bietlejuice.salesforce (0 21 * * *)"] --> SFCLN["record_types, case_milestones"]
   CH["bigfone / quinto_messenger / sauron /<br/>support_session_service (0 21 * * *)"] --> CHCLN["clean de canais"]
@@ -89,7 +91,8 @@ flowchart TD
 
 **Ordem efetiva:**
 1. AppFlow grava a partição horária do CDC no S3.
-2. `salesforce_cdc` transforma raw → clean e gera métricas SST.
+2. `salesforce_cdc` transforma raw → clean, roda o **DLQ** (recovery +
+   reprocess da clean) e só então gera a métrica de missing events.
 3. `core_support_journey` espera os **sensores** (CDC clean hourly + fontes
    diárias) e carrega `cases` (por hora) e `services` (efetivamente 1×/dia).
 4. `dw_support_journey` sobe via **Datasets** quando `cases` **e** `services`
@@ -126,8 +129,9 @@ pelo **AWS AppFlow** (serviço gerenciado, **fora do repositório**).
   O `<FlowName>` é o último segmento de `event_path` no
   `dags/support_and_service/salesforce_cdc/prod_conf.yml` (ex.: `CaseEvent`).
 - A DAG `salesforce_cdc` então lê esse S3 e faz `raw` → `quality_contract_raw`
-  → `clean` → `quality_contract_clean` → `métricas`, por evento, em 2 pools de
-  cluster.
+  → `clean` → `quality_contract_clean` → **DLQ** → `missing_events`, por
+  evento. Todas as métricas (stability, latency, missing_events) rodam
+  **depois** do DLQ, para não lerem uma partição meio recuperada.
 
 ### AppFlow status e recovery automático
 
@@ -190,7 +194,7 @@ principais tabelas (catalog `delta`, schema `datalake_sst_metrics`):
 | `pipeline_stability`                   | Anomalias de volume (z-score, média móvel). Filtrar `environment = 'prod'` e um `window_size` (ex.: 24) |
 | `events_volume` / `events_type_volume` | Contagem de linhas por tabela/hora (por `event_type`). DLQ: `event_type = 'DLQ_RECOVERY'` (`layer` raw vs clean) |
 | `pipeline_events_latency`              | Latência source→target (`average_delay`, `p90`/`p95`/`p99`, `unit`) — grão por `target_table`           |
-| `cdc_pipeline_missing_events`          | Gaps de CDC (`total_events_missing > 0`) — usa coluna `env` (não `environment`)                         |
+| `cdc_pipeline_missing_events`          | Gaps de CDC **residuais, depois do DLQ** (`total_events_missing > 0`) — usa coluna `env` (não `environment`) |
 | `table_metadata`                       | Schema drift (`new_cols`, `new_cols_count`)                                                             |
 | `contract_quality_checks`              | Freshness dos contratos de qualidade (`status`, `last_row_timestamp`)                                   |
 | `appflow_status`                       | Saúde do connector AppFlow (`status != 'Active'`)                                                       |
@@ -199,6 +203,9 @@ principais tabelas (catalog `delta`, schema `datalake_sst_metrics`):
 > partition_date, partition_hour)` significa que o pipeline **não rodou** naquela
 > hora — isso já é sinal de falha, não é NULL. Antes de tratar como incidente,
 > confirme em `events_type_volume` se não é um fluxo diário/`RECOVERY`.
+
+> **Timing da DLQ:** o DLQ roda **antes** de `missing_events`, então
+> `cdc_pipeline_missing_events` mostra o gap que **sobrou** depois do recovery.
 
 > **Volume da DLQ:** o volume recuperado pela DLQ entra em `events_type_volume`
 > com `event_type = 'DLQ_RECOVERY'` (`layer` raw = API; clean = replay), uma
@@ -664,6 +671,7 @@ SERVICES_CONFIG = {
 | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `salesforce_cdc` / `core_support_journey` parou e horas seguintes não rodam | Airflow (grid)                                                                     | Efeito de `depends_on_past=True`: resolver a run mais antiga em falha; só então as seguintes destravam                                                     |
 | Ingestão sem dados numa hora                                                | `datalake_sst_metrics.appflow_status` (`status != 'Active'`), `events_type_volume` | Se AppFlow ≠ `Active`, recovery via API já atua; validar se é gap real ou fluxo diário/RECOVERY                                                            |
+| `missing_events` positivo mesmo após DLQ verde                              | `events_type_volume` com `event_type = 'DLQ_RECOVERY'`                             | Gap real: `missing_events` roda **depois** do DLQ, logo é o que o recovery não cobriu. Compare com `DLQ_RECOVERY` (`layer` raw vs clean) na mesma hora        |
 | Reexecutei a partição e "não fez nada"                                      | Comportamento de skip (§4)                                                         | Limpar a partição no Delta destino antes de reexecutar (raw/clean/`cases`: `(date, hour)`; `services`: `d-1`)                                              |
 | Preciso reprocessar um período grande (backfill)                            | Backfill via configuração (§8)                                                     | `cases`: `is_backfill_run=True` + partição de início; `services`: `is_backfill_run=True` + `delta_hours` por source. Ignora o skip e recompõe o SCD Type 2 |
 | Run de meia-noite lenta                                                     | `services` processa d-1 (§6)                                                       | Esperado até 4h; investigar só se estourar timeout recorrentemente                                                                                         |

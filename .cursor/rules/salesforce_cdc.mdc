@@ -1,0 +1,21 @@
+---
+description: >-
+  Salesforce CDC DAG cluster lineages must use a 1-slot Airflow pool. Load when
+  editing salesforce_cdc.py, events_config, or astro/local_pools.json for
+  bietlejuice.salesforce_cdc. Follow skill salesforce-cdc-cluster-pool.
+globs:
+  - dags/support_and_service/salesforce_cdc/**
+  - astro/local_pools.json
+alwaysApply: false
+---
+
+# Salesforce CDC — cluster pools
+
+When adding or changing a **cluster lineage** on `bietlejuice.salesforce_cdc`
+(dedicated event cluster or pooled index `0`/`1`/…):
+
+1. Read and follow **`.cursor/skills/salesforce-cdc-cluster-pool/SKILL.md`**.
+2. **Always add the new cluster to the Airflow pool** (`ensure_lineage_pool` +
+   `astro/local_pools.json`, `slots: 1`). A cluster without a pool is a bug.
+3. Every task on that lineage must pass `pool=`. Do not share one pool across
+   two `cluster_id`s.
