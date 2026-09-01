@@ -1,25 +1,4 @@
-WITH listing_sale_type AS (
-  SELECT
-    id_house,
-    sale_type
-  FROM (
-    SELECT
-      lbc.id_house,
-      CASE
-        WHEN lsm.sale_type IS NOT NULL THEN lsm.sale_type
-        WHEN lsm.is_primary_market = TRUE THEN 'PRIMARY'
-        ELSE 'SECONDARY'
-      END AS sale_type,
-      ROW_NUMBER() OVER (PARTITION BY lbc.id_house ORDER BY lbc.ts_updated DESC) AS _w
-    FROM datalake_ebdb_clean.listing_business_context AS lbc
-    INNER JOIN datalake_ebdb_clean.listing_sale_model AS lsm
-      ON lbc.id = lsm.id_listing_business_context
-    WHERE
-      lbc.business_context = 'SALE'
-  ) AS _lst
-  WHERE
-    _w = 1
-), amplitude_data AS (
+WITH amplitude_data AS (
   SELECT
     sse.id_house,
     sse.year,
@@ -238,7 +217,7 @@ FROM (
     AND dol.dt_snapshot < COALESCE(CAST(hsc.ts_suggestion_ended AS DATE), '2100-01-01')
     AND hsc.is_last_suggestion_of_day
     AND hsc.business_context = 'SALE'
-  LEFT JOIN listing_sale_type AS lst
+  LEFT JOIN datalake_sale_primary_market.listing_sale_type AS lst
     ON dol.sk_house = lst.id_house
   LEFT JOIN datalake_ebdb_listing.house AS h
     ON dol.sk_house = h.id
