@@ -49,6 +49,18 @@ columns:
     description: The Id of the suggestion change record from the pricing model.
     lineage:
       - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
+  sale_type:
+    lineage:
+    - datalake_ebdb_clean.listing_sale_model.sale_type
+    - datalake_ebdb_clean.listing_sale_model.is_primary_market
+    description: >
+      Listing market type for the SALE listing business context of this house.
+      ListingSaleModel.saleType wins when populated; when it is null, follow legacy
+      is_primary_market (true = PRIMARY, else SECONDARY). Filter PRIMARY for Mercado
+      Primário stock. Null when the listing has no sale model. Grain is sk_house.
+    categories:
+      PRIMARY: New-build / primary market listing (empreendimento).
+      SECONDARY: Resale / secondary market listing.
   sale_price:
     description: Price of the sale listing at the end of that day.
     lineage:
