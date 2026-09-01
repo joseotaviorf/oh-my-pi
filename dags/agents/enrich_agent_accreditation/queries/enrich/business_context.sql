@@ -142,12 +142,12 @@ legacy_context_candidates AS (
         ROW_NUMBER() OVER (
             PARTITION BY segments.id_agent_data, segments.ts_revision_started
             ORDER BY
+                intervals.ts_revision_started DESC,
                 CASE
                     WHEN intervals.business_context = "SALE" THEN 1
                     WHEN intervals.business_context = "SALE_PRIMARY_MARKET" THEN 2
                     ELSE 3
                 END,
-                intervals.ts_revision_started DESC,
                 intervals.business_context DESC
         ) AS rn
     FROM
