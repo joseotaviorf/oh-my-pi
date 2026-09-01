@@ -16,6 +16,31 @@ column_level_validations:
   id_lead_3p:
     is_complete:
       severity_level: Error
+    custom:
+      # Every business context present in the source must produce a current row here.
+      # A non-zero count means revisions are being dropped upstream — either no
+      # business_context_detail_aud row, or a rev missing from rev_info, which the
+      # INNER JOINs in lead_3p_status_changes.sql discard. Those leads then have no
+      # flow and are excluded from dw_3p_supply.fact_lead_3p_flows.
+      # Measured baseline on 2026-08-31: 0. Kept at Warning rather than Error because
+      # a CDC lag on rev_info can make it transiently non-zero mid-run.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_brokers_supply_processor_clean.business_context_detail AS bcd
+         LEFT JOIN datalake_3p_supply.lead_3p_status_changes AS lsc
+           ON lsc.id_lead_3p = bcd.id_lead
+           AND lsc.business_context = bcd.business_context
+           AND lsc.is_current = TRUE
+         WHERE lsc.id_lead_3p IS NULL
+        ) = 0
+      severity_level: Warning
+  sk_lead_3p_flow:
+    is_complete:
+      # NULL means business_context has no branch in the sk_lead_3p_flow CASE.
+      # SALE_PRIMARY_MARKET is defined in the source enum but reserved (not in
+      # acceptedContexts), so it produces no rows today; if it is ever enabled it must
+      # fail loudly here rather than silently drop the lead from the fact.
+      severity_level: Error
   business_context:
     is_complete:
       severity_level: Error

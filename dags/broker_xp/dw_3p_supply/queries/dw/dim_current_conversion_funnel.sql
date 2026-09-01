@@ -30,10 +30,15 @@ WITH max_ts_value AS (
     ) AS ts_max_value
   FROM
     datalake_3p_supply.lead_3p AS l
-  LEFT JOIN
+  -- sk_lead_3p_flow is the merge key, and a NULL never matches in a Delta MERGE, so a
+  -- lead with no current status for a mapped business context would be re-inserted on
+  -- every run instead of updated. Require the key here; those leads have no flow and
+  -- remain available in dim_lead_3p, at lead grain.
+  INNER JOIN
     datalake_3p_supply.lead_3p_status_changes AS lsc
     ON l.id_lead_3p = lsc.id_lead_3p
     AND lsc.is_current = TRUE
+    AND NOT lsc.sk_lead_3p_flow IS NULL
   LEFT JOIN
     datalake_3p_supply.listing_draft_status AS lds
     ON l.id_house = lds.id_house

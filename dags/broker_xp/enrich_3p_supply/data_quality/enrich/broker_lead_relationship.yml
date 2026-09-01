@@ -24,6 +24,16 @@ column_level_validations:
     is_contained_in:
       values: ["SALE", "RENT", "SALE_PRIMARY_MARKET"]
       severity_level: Error
+  is_current_valid_first_lead:
+    is_complete:
+      severity_level: Error
+  ts_partner_contract_start:
+    # Nulls are legitimate for leads sent before the partner's first activation,
+    # but a collapse here means the contract match broke again (BUGS-147388).
+    # Threshold is a tripwire, not a target — calibrate from the first post-fix run.
+    has_completeness:
+      greater_than: 0.9
+      severity_level: Warning
   recurrency_type:
     is_complete:
       severity_level: Error

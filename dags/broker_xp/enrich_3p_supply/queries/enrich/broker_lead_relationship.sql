@@ -5,7 +5,9 @@ WITH partner AS (
       WHEN bsh.product_name = 'Rede Sale' THEN 'SALE'
       ELSE 'RENT'
     END AS business_context,
-    bsh.ts_start AS ts_partner_contract_start
+    -- ts_start comes straight from CDC (UTC), while ts_business_context_created is
+    -- already converted to America/Sao_Paulo. Align both before any comparison.
+    FROM_UTC_TIMESTAMP(bsh.ts_start, 'America/Sao_Paulo') AS ts_partner_contract_start
   FROM
     datalake_brokers.broker_status_history AS bsh
   WHERE
@@ -38,7 +40,9 @@ leads_matched_to_latest_contract AS (
     partner
       ON partner.sk_broker = cb.sk_broker
       AND partner.business_context = lsc.business_context
-      AND partner.ts_partner_contract_start <= lsc.ts_business_context_created
+      -- Day granularity: a partner's onboarding batch arrives hours before the
+      -- ACTIVE record is written, so an instant-level comparison drops it entirely.
+      AND DATE(partner.ts_partner_contract_start) <= DATE(lsc.ts_business_context_created)
 ),
 latest_contract_per_lead AS (
   SELECT

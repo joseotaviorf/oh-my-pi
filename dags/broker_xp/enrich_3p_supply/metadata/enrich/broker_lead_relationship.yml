@@ -19,8 +19,9 @@ description: |
   - sk_broker and ts_partner_contract_start from broker_status_history
   - is_valid_first_lead: TRUE when this lead is the first
     for (lead_hash, uuid_company, business_context)
-  - is_current_valid_first_lead: TRUE when this lead is the first post-contract
-    for (lead_hash, uuid_company, business_context, ts_partner_contract_start)
+  - is_current_valid_first_lead: TRUE when this lead is the first sent on or after
+    the contract activation day, for (lead_hash, uuid_company, business_context,
+    ts_partner_contract_start)
   - recurrency_type: bucket the lead into FIRST_BATCH / FIRST_MONTH_BATCH /
     COMPLEMENTARY / RECURRENT relative to the first lead sent after the partner's
     latest contract activation (per uuid_company, business_context,
@@ -46,7 +47,7 @@ columns:
     lineage:
       - core_brokers.brokers.sk_broker
   ts_partner_contract_start:
-    description: "Start timestamp of the active broker status period (contract start)"
+    description: "Start timestamp of the active broker status period (contract start), converted to America/Sao_Paulo to match ts_business_context_created"
     lineage:
       - datalake_brokers.broker_status_history.ts_start
   ts_business_context_created:
@@ -60,7 +61,7 @@ columns:
   is_valid_first_lead:
     description: "TRUE when this lead is the first occurrence for (lead_hash, uuid_company, business_context) (boolean)"
   is_current_valid_first_lead:
-    description: "TRUE when this lead is the first post-contract occurrence for (lead_hash, uuid_company, business_context, ts_partner_contract_start) (boolean)"
+    description: "TRUE when this lead is the first occurrence for (lead_hash, uuid_company, business_context, ts_partner_contract_start), counting leads sent on or after the contract activation day (boolean)"
   recurrency_type:
     description: "Classifies the lead relative to the first lead sent after the partner's latest active contract start, per (uuid_company, business_context, ts_partner_contract_start)."
     lineage:

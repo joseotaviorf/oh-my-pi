@@ -36,23 +36,21 @@ workflow:
       - lead_3p_status_changes
     lead_3p_reason_changes:
       - lead_3p_status_changes
+  # No merge_on anywhere: every query here is a full recompute with no date window, so
+  # an overwrite reproduces the whole table and keeps it idempotent. A merge on a
+  # nullable surrogate key silently re-inserts instead of updating, since NULL never
+  # matches in a Delta MERGE.
   tables_customization:
     lead_3p:
-      merge_on: ["id_lead_3p"]
-      when_matched_update_condition: "source.ts_lead_updated > target.ts_lead_updated"
       partitions: ["year", "month", "day"]
       z_order_by: ["id_lead_3p"]
     lead_3p_status_changes:
-      merge_on: ["id_lead_3p", "business_context", "ts_start"]
       partitions: ["year", "month", "day"]
       z_order_by: ["id_lead_3p"]
     lead_3p_reason_changes:
-      merge_on: ["id_lead_3p", "business_context", "reason", "ts_reason_started"]
       partitions: ["year", "month", "day"]
       z_order_by: ["id_lead_3p"]
     listing_draft_status:
-      merge_on: ["id_house", "business_context"]
       z_order_by: ["id_house"]
     broker_lead_relationship:
-      merge_on: ["sk_lead_3p_flow"]
       z_order_by: ["sk_lead_3p_flow"]

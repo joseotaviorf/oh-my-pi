@@ -1,7 +1,7 @@
 ---
 database_name: dw_3p_supply
 table_name: dim_current_conversion_funnel
-description: Dimension of current conversion funnel stage per 3P lead and business context. One row per lead flow with funnel stage, BSP/main status, and last change timestamp.
+description: Dimension of current conversion funnel stage per 3P lead and business context. One row per lead flow with funnel stage, BSP/main status, and last change timestamp. A lead only enters this dimension once it has a current status for a mapped business context; leads without one carry no flow and are available in dim_lead_3p, at lead grain.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:

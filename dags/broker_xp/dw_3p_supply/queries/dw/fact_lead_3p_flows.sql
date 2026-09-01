@@ -42,10 +42,15 @@ SELECT
   DAY(lsc.ts_start) AS day
 FROM
   datalake_3p_supply.lead_3p AS l
-LEFT JOIN
+-- The grain is the lead flow, so a fact row requires a current status carrying a
+-- surrogate key. A lead with no business context, or one whose context has no branch
+-- in the sk_lead_3p_flow mapping, would land here with a NULL primary key and NULL
+-- partitions. Those leads remain available in dim_lead_3p, which is at lead grain.
+INNER JOIN
   datalake_3p_supply.lead_3p_status_changes AS lsc
   ON l.id_lead_3p = lsc.id_lead_3p
   AND lsc.is_current = TRUE
+  AND NOT lsc.sk_lead_3p_flow IS NULL
 LEFT JOIN
   datalake_3p_supply.listing_draft_status AS lds
   ON l.id_house = lds.id_house

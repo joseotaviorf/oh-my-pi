@@ -1,7 +1,7 @@
 ---
 database_name: dw_3p_supply
 table_name: fact_lead_3p_flows
-description: Fact table for 3P Supply lead flows. One row per lead and business context (SALE/RENT) with surrogate keys, flags, and BSP/main timestamps for funnel analysis.
+description: Fact table for 3P Supply lead flows. One row per lead and business context (SALE/RENT) with surrogate keys, flags, and BSP/main timestamps for funnel analysis. A lead only enters this fact once it has a current status for a mapped business context; leads without one carry no flow and are available in dim_lead_3p, at lead grain.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
