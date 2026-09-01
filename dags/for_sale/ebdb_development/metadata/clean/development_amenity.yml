@@ -1,0 +1,91 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_amenity
+domain: For Sale
+description: Clean CDC mirror of amenities assigned to primary market developments from EBDB. One row per development and amenity (composite PK id_development, amenity). Relates to development via id_development. Used for supply feature coverage and amenity mix analytics in the primary market catalog.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_development:
+    lineage:
+      - datalake_ebdb_raw.developmentamenity.development_id
+    description: Foreign key to development. Part of the composite primary key with amenity.
+  amenity:
+    lineage:
+      - datalake_ebdb_raw.developmentamenity.amenity
+    description: Amenity type assigned to the development from the DevelopmentAmenityType catalog. Part of the composite primary key.
+    categories:
+      POOL: Swimming pool available in the development.
+      SAUNA: Sauna facility available in the development.
+      HOT_TUB: Hot tub or spa bath facility available in the development.
+      SPA: Spa area available in the development.
+      PARTY_ROOM: Party or event room available in the development.
+      GOURMET_SPACE: Gourmet or dining preparation space available in the development.
+      BARBECUE_AREA: Barbecue area available in the development.
+      GAME_ROOM: Game or recreation room available in the development.
+      MOVIE_THEATER: Movie theater or cinema room available in the development.
+      BAR: Bar area available in the development.
+      LOUNGE: Lounge or social seating area available in the development.
+      WINE_CELLAR: Wine cellar available in the development.
+      COWORKING_SPACE: Coworking space available in the development.
+      FIREPLACE: Fireplace available in shared or common areas of the development.
+      PLAYGROUND: Children's playground available in the development.
+      CHILDRENS_PLAYROOM: Indoor children's playroom available in the development.
+      GYM: Gym or fitness room available in the development.
+      SPORTS_COURT: Sports court available in the development.
+      BEACH_TENNIS: Beach tennis court available in the development.
+      TENNIS_COURT: Tennis court available in the development.
+      WALKING_TRACK: Walking or running track available in the development.
+      BICYCLE_STORAGE: Bicycle storage area available in the development.
+      CHANGING_ROOMS: Changing rooms available in the development.
+      GARDEN: Garden area available in the development.
+      TERRACE: Terrace area available in the development.
+      SOLARIUM: Solarium available in the development.
+      PLAZA: Plaza or open courtyard available in the development.
+      TRAILS_AND_WOODS: Trails or wooded leisure area available in the development.
+      HAMMOCK_AREA: Hammock area available in the development.
+      PERGOLA: Pergola structure available in the development.
+      CONCIERGE: Concierge service available in the development.
+      CONCIERGE_24H: Twenty-four-hour concierge service available in the development.
+      ARMORED_CONCIERGE: Armored or secured concierge post available in the development.
+      INTERCOM: Intercom access system available in the development.
+      CARETAKER: Caretaker service available in the development.
+      SECURITY: Security service available in the development.
+      GATED_COMMUNITY: Gated community access control applies to the development.
+      ELEVATOR: Elevator available in the development.
+      PORTE_COCHERE: Porte-cochere or covered vehicle entrance available in the development.
+      LAUNDRY_ROOM: Shared laundry room available in the development.
+      CAR_WASH: Car wash area available in the development.
+      MARKET: Market or convenience shop available in the development.
+      DELIVERY_ROOM: Package delivery room available in the development.
+      STORAGE_ROOM: Storage room available in the development.
+      PET_AREA: Pet area available in the development.
+      PET_PLACE: Dedicated pet place or pet care area available in the development.
+      VISITOR_PARKING: Visitor parking available in the development.
+      EV_CHARGING: Electric vehicle charging available in the development.
+      ACCESSIBILITY: Accessibility features available in the development.
+      RESTAURANT: Restaurant available in the development.
+      MEETING_ROOM: Meeting room available in the development.
+      RECORDING_STUDIO: Recording studio available in the development.
+      HELIPAD: Helipad available in the development.
+      GRAND_LOBBY: Grand lobby available in the development.
+      SOLAR_ENERGY: Solar energy infrastructure available in the development.
+      GENERATOR: Backup generator available in the development.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmentamenity.created_at
+    description: Timestamp when the amenity row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmentamenity.updated_at
+    description: Timestamp when the amenity row was last updated in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

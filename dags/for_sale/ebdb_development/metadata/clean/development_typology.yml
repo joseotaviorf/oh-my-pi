@@ -1,0 +1,79 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_typology
+domain: For Sale
+description: Clean CDC mirror of unit typologies within a primary market development from EBDB. One row per typology (PK id). Relates to development via id_development and to units, attributes, and images in child tables. Used for inventory and pricing analytics by bedroom and area configuration.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.id
+    description: Surrogate primary key of the development typology in EBDB.
+  id_development:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.development_id
+    description: Foreign key to development identifying the parent project.
+  development_typology_uuid:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.development_typology_uuid
+    description: Stable UUID identifier for the typology across integrations.
+  external_id:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.external_id
+    description: Provider typology identifier used for reconciliation within a development.
+  type:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.type
+    description: Closed unit-type classification from the DevelopmentTypologyType catalog in EBDB.
+    categories:
+      APARTMENT: Apartment unit typology (display label Apartamento).
+      HOUSE: House unit typology (display label Casa).
+      STUDIO: Studio unit typology.
+      LOFT: Loft unit typology.
+  total_units:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.total_units
+    description: Total number of units of this typology in the development.
+  available_units:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.available_units
+    description: Number of units of this typology currently available for sale.
+  total_area:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.total_area
+    description: Total private area of the unit typology in square meters.
+  bedrooms:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.bedrooms
+    description: Number of bedrooms in the typology configuration.
+  bathrooms:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.bathrooms
+    description: Number of bathrooms in the typology configuration.
+  suites:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.suites
+    description: Number of suites in the typology configuration.
+  parking_spaces:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.parking_spaces
+    description: Number of parking spaces included in the typology.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.created_at
+    description: Timestamp when the typology row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmenttypology.updated_at
+    description: Timestamp when the typology row was last updated in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

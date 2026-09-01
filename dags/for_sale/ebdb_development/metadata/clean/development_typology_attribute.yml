@@ -1,0 +1,39 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_typology_attribute
+domain: For Sale
+description: Clean CDC mirror of structural attributes assigned to development typologies from EBDB. One row per typology and attribute (composite PK id_development_typology, attribute). Relates to development_typology via id_development_typology. Used to segment inventory by penthouse, garden, duplex, or triplex features.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_development_typology:
+    lineage:
+      - datalake_ebdb_raw.developmenttypologyattribute.development_typology_id
+    description: Foreign key to development_typology. Part of the composite primary key with attribute.
+  attribute:
+    lineage:
+      - datalake_ebdb_raw.developmenttypologyattribute.attribute
+    description: Structural attribute label assigned to the typology. Part of the composite primary key.
+    categories:
+      PENTHOUSE: Typology is classified as a penthouse unit.
+      GARDEN: Typology includes a private garden area.
+      DUPLEX: Typology spans two floors in a duplex layout.
+      TRIPLEX: Typology spans three floors in a triplex layout.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmenttypologyattribute.created_at
+    description: Timestamp when the typology attribute row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmenttypologyattribute.updated_at
+    description: Timestamp when the typology attribute row was last updated in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

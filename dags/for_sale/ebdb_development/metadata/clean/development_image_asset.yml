@@ -1,0 +1,61 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_image_asset
+domain: For Sale
+description: Clean CDC mirror of image assets for primary market developments from EBDB. One row per image asset (PK id). Relates to development via id_development and to typologies through development_typology_image. Used for media coverage and listing presentation analytics.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.id
+    description: Surrogate primary key of the development image asset in EBDB.
+  id_development:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.development_id
+    description: Foreign key to development that owns this image asset.
+  external_id:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.external_id
+    description: Provider image identifier unique within development and type.
+  type:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.type
+    description: Image category indicating how the asset is displayed in the catalog.
+    categories:
+      PICTURE: Standard photograph of the development or unit.
+      FLOOR_PLAN: Floor plan diagram for a typology or unit layout.
+  storage_key:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.storage_key
+    description: Object storage key where the image binary is persisted.
+  caption:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.caption
+    description: Optional caption text displayed with the image.
+  display_order:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.display_order
+    description: Sort order for displaying images within the development gallery.
+  is_cover:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.is_cover
+    description: Flag indicating whether this image is the cover image for the development.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.created_at
+    description: Timestamp when the image asset row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmentimageasset.updated_at
+    description: Timestamp when the image asset row was last updated in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

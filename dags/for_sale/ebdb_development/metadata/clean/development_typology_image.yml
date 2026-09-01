@@ -1,0 +1,30 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_typology_image
+domain: For Sale
+description: Clean CDC mirror of image-to-typology associations for primary market developments from EBDB. One row per image asset and typology pair (composite PK id_development_image_asset, id_development_typology). Links development_image_asset to development_typology. Used for typology-specific media analytics.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_development_image_asset:
+    lineage:
+      - datalake_ebdb_raw.developmenttypologyimage.development_image_asset_id
+    description: Foreign key to development_image_asset. Part of the composite primary key with id_development_typology.
+  id_development_typology:
+    lineage:
+      - datalake_ebdb_raw.developmenttypologyimage.development_typology_id
+    description: Foreign key to development_typology. Part of the composite primary key with id_development_image_asset.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmenttypologyimage.created_at
+    description: Timestamp when the typology image association row was created in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

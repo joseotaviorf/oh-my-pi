@@ -25,17 +25,5 @@ workflow:
       clean_table_name: shop_window_listing_business_context
     ShopWindow_ListingBusinessContext_AUD:
       clean_table_name: shop_window_listing_business_context_aud
-    Development:
-      clean_table_name: development
-      raw_primary_keys: [id]
-      clean_primary_keys: [id]
-    DevelopmentTypology:
-      clean_table_name: development_typology
-      raw_primary_keys: [id]
-      clean_primary_keys: [id]
-    DevelopmentAmenity:
-      clean_table_name: development_amenity
-      raw_primary_keys: [development_id, amenity]
-      clean_primary_keys: [id_development, amenity]
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"

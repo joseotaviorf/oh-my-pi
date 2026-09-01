@@ -1,0 +1,42 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_listing_unit
+domain: For Sale
+description: Clean CDC mirror of published listing links for primary market typology units from EBDB. One row per listing unit bridge (PK id). Relates typology units to listing business contexts and typologies. Used to connect development inventory to active sale listings.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.developmentlistingunit.id
+    description: Surrogate primary key of the development listing unit bridge in EBDB.
+  id_development_typology_unit:
+    lineage:
+      - datalake_ebdb_raw.developmentlistingunit.development_typology_unit_id
+    description: Foreign key to development_typology_unit for the physical unit being listed.
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.developmentlistingunit.listing_business_context_id
+    description: Foreign key to the sale listing business context published for this unit.
+  id_development_typology:
+    lineage:
+      - datalake_ebdb_raw.developmentlistingunit.development_typology_id
+    description: Foreign key to development_typology associated with this listing bridge.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmentlistingunit.created_at
+    description: Timestamp when the listing unit row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmentlistingunit.updated_at
+    description: Timestamp when the listing unit row was last updated in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

@@ -2,13 +2,13 @@ SELECT
     id,
     development_contact_id AS id_development_contact,
     development_uuid,
-    company_uuid,
     external_id,
+    company_uuid,
+    provider,
     name,
     description,
     construction_status,
     legal_permit,
-    provider,
     postal_code,
     street,
     street_number,
@@ -24,9 +24,9 @@ SELECT
     min_iptu,
     launch_date,
     forecast_delivery_date,
-    created_at AS ts_created,
-    updated_at AS ts_updated,
     last_validated_at AS ts_last_validated,
-    withdrawn_at AS ts_withdrawn
+    withdrawn_at AS ts_withdrawn,
+    created_at AS ts_created,
+    updated_at AS ts_updated
 FROM
     datalake_ebdb_raw.Development

@@ -1,0 +1,38 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_negotiation_unit
+domain: For Sale
+description: Clean CDC mirror of typology units included in a development negotiation from EBDB. One row per negotiation-unit link (PK id). Relates development_typology_unit to development_negotiation. Used to analyze which inventory units are under negotiation.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiationunit.id
+    description: Surrogate primary key of the negotiation unit link in EBDB.
+  id_development_typology_unit:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiationunit.development_typology_unit_id
+    description: Foreign key to development_typology_unit included in the negotiation.
+  id_development_negotiation:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiationunit.development_negotiation_id
+    description: Foreign key to development_negotiation that references this unit.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiationunit.created_at
+    description: Timestamp when the negotiation unit row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiationunit.updated_at
+    description: Timestamp when the negotiation unit row was last updated in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

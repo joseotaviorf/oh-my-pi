@@ -1,0 +1,140 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development
+domain: For Sale
+description: Clean CDC mirror of primary market development projects from EBDB. One row per development (PK id). Relates to development_contact via id_development_contact, to typologies via development_typology, and to registration and commission child tables. Used for For Sale primary-market supply analytics and development lifecycle reporting.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.development.id
+    description: Surrogate primary key of the development in EBDB.
+  id_development_contact:
+    lineage:
+      - datalake_ebdb_raw.development.development_contact_id
+    description: Foreign key to development_contact identifying the active contact person linked to this development.
+  development_uuid:
+    lineage:
+      - datalake_ebdb_raw.development.development_uuid
+    description: Stable UUID identifier for the development across integrations.
+  external_id:
+    lineage:
+      - datalake_ebdb_raw.development.external_id
+    description: External identifier from the originating provider system, part of the natural key with provider and company_uuid.
+  company_uuid:
+    lineage:
+      - datalake_ebdb_raw.development.company_uuid
+    description: UUID of the developer or builder company responsible for the project.
+  provider:
+    lineage:
+      - datalake_ebdb_raw.development.provider
+    description: Source provider code that ingested the development, used with external_id for reconciliation.
+    categories:
+      ORULO: Development ingested from Órulo, a real-estate platform aggregating new-construction launches from developers.
+  name:
+    lineage:
+      - datalake_ebdb_raw.development.name
+    description: Commercial name of the development project.
+  description:
+    lineage:
+      - datalake_ebdb_raw.development.description
+    description: Free-text marketing or technical description of the development.
+  construction_status:
+    lineage:
+      - datalake_ebdb_raw.development.construction_status
+    description: Construction lifecycle status of the development in the primary market domain.
+    categories:
+      PRE_CONSTRUCTION: Development is in pre-construction planning before active building work.
+      UNDER_CONSTRUCTION: Development is actively under construction.
+      READY: Development construction is complete and units are ready for occupancy.
+  legal_permit:
+    lineage:
+      - datalake_ebdb_raw.development.legal_permit
+    description: Legal permit or registration number associated with the development.
+  postal_code:
+    lineage:
+      - datalake_ebdb_raw.development.postal_code
+    description: Postal code (CEP) of the development address.
+  street:
+    lineage:
+      - datalake_ebdb_raw.development.street
+    description: Street name of the development address.
+  street_number:
+    lineage:
+      - datalake_ebdb_raw.development.street_number
+    description: Street number of the development address.
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.development.neighborhood
+    description: Neighborhood where the development is located.
+  city:
+    lineage:
+      - datalake_ebdb_raw.development.city
+    description: City where the development is located.
+  state:
+    lineage:
+      - datalake_ebdb_raw.development.state
+    description: Brazilian state abbreviation (UF) for the development location.
+  latitude:
+    lineage:
+      - datalake_ebdb_raw.development.latitude
+    description: Latitude coordinate of the development geolocation.
+  longitude:
+    lineage:
+      - datalake_ebdb_raw.development.longitude
+    description: Longitude coordinate of the development geolocation.
+  towers:
+    lineage:
+      - datalake_ebdb_raw.development.towers
+    description: Number of towers in the development complex.
+  floors:
+    lineage:
+      - datalake_ebdb_raw.development.floors
+    description: Number of floors per tower in the development.
+  apartments_per_floor:
+    lineage:
+      - datalake_ebdb_raw.development.apartments_per_floor
+    description: Number of apartments available on each floor.
+  min_condominium_fee:
+    lineage:
+      - datalake_ebdb_raw.development.min_condominium_fee
+    description: Minimum condominium fee in BRL across typologies in the development.
+  min_iptu:
+    lineage:
+      - datalake_ebdb_raw.development.min_iptu
+    description: Minimum annual IPTU property tax in BRL across typologies in the development.
+  launch_date:
+    lineage:
+      - datalake_ebdb_raw.development.launch_date
+    description: Calendar date when the development was launched for sale.
+  forecast_delivery_date:
+    lineage:
+      - datalake_ebdb_raw.development.forecast_delivery_date
+    description: Forecasted calendar date for delivery or completion of the development.
+  ts_last_validated:
+    lineage:
+      - datalake_ebdb_raw.development.last_validated_at
+    description: Timestamp when the development record was last validated against the provider source.
+  ts_withdrawn:
+    lineage:
+      - datalake_ebdb_raw.development.withdrawn_at
+    description: Timestamp when the development was withdrawn from publication; null while active.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.development.created_at
+    description: Timestamp when the development row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.development.updated_at
+    description: Timestamp when the development row was last updated in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

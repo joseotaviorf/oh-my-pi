@@ -1,0 +1,57 @@
+---
+database_name: datalake_ebdb_clean
+table_name: development_negotiation
+domain: For Sale
+description: Clean CDC mirror of negotiation events for primary market developments from EBDB. One row per negotiation event (PK id). Relates to development via id_development, to visits via id_visit, and to units through development_negotiation_unit. Used for demand and agent negotiation funnel analytics.
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.id
+    description: Surrogate primary key of the development negotiation event in EBDB.
+  id_development:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.development_id
+    description: Foreign key to development where the negotiation occurred.
+  id_visit:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.visit_id
+    description: Foreign key to the visit that originated or is linked to this negotiation.
+  id_demand:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.demand_id
+    description: Foreign key to the demand user when actor is DEMAND; null for agent-led events.
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.agent_id
+    description: Foreign key to the agent when actor is AGENT; null for demand-led events.
+  uuid_event:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.event_id
+    description: Unique event UUID for idempotent negotiation event tracking.
+  actor:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.actor
+    description: Party that initiated or owns the negotiation event in the primary market flow.
+    categories:
+      AGENT: Negotiation event was recorded by or on behalf of a broker agent.
+      DEMAND: Negotiation event was recorded by or on behalf of the buyer demand side.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.created_at
+    description: Timestamp when the negotiation row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.developmentnegotiation.updated_at
+    description: Timestamp when the negotiation row was last updated in EBDB.
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row change event.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC pipeline captured this change event with millisecond precision.
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the EBDB source system.

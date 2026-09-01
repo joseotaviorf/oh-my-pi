@@ -2,6 +2,7 @@ SELECT
     id,
     development_id AS id_development,
     development_typology_uuid,
+    external_id,
     type,
     total_units,
     available_units,

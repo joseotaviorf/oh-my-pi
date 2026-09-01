@@ -1,0 +1,57 @@
+dag:
+  name: ebdb_development
+  schedule_start_date: 2024,01,01
+  schedule_interval: 10 21,8,12 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Extraction of EBDB tables related to Developments (Primary Market / Empreendimentos) into the data lake. EBDB is QuintoAndar's main production database (https://github.com/quintoandar/main).
+      DevelopmentStatusLog is deliberately excluded because it has no application references or current domain use.
+      DevelopmentCommission and DevelopmentRegistration are excluded because they have no rows in production.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  custom_schema: ebdb
+  dbutils_secret_key: EBDB_DB
+  tables_customization:
+    Development:
+      raw_primary_keys: [id]
+      clean_table_name: development
+    DevelopmentAmenity:
+      raw_primary_keys: [development_id, amenity]
+      clean_table_name: development_amenity
+      clean_primary_keys: [id_development, amenity]
+    DevelopmentContact:
+      raw_primary_keys: [id]
+      clean_table_name: development_contact
+    DevelopmentImageAsset:
+      raw_primary_keys: [id]
+      clean_table_name: development_image_asset
+    DevelopmentListingUnit:
+      raw_primary_keys: [id]
+      clean_table_name: development_listing_unit
+    DevelopmentNegotiation:
+      raw_primary_keys: [id]
+      clean_table_name: development_negotiation
+    DevelopmentNegotiationUnit:
+      raw_primary_keys: [id]
+      clean_table_name: development_negotiation_unit
+    DevelopmentTypology:
+      raw_primary_keys: [id]
+      clean_table_name: development_typology
+    DevelopmentTypologyAttribute:
+      raw_primary_keys: [development_typology_id, attribute]
+      clean_table_name: development_typology_attribute
+      clean_primary_keys: [id_development_typology, attribute]
+    DevelopmentTypologyImage:
+      raw_primary_keys: [development_image_asset_id, development_typology_id]
+      clean_table_name: development_typology_image
+      clean_primary_keys: [id_development_image_asset, id_development_typology]
+    DevelopmentTypologyUnit:
+      raw_primary_keys: [id]
+      clean_table_name: development_typology_unit
+  extra_query_template_params:
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
