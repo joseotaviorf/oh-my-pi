@@ -67,7 +67,11 @@ visit_intent_events AS (
         visit_fitting AS vf2
             ON vf2.id_visitor = vf.id_visitor
             AND vf2.status = "FITTED"
-    GROUP BY ALL
+    GROUP BY
+        vf.id,
+        vf.id_visitor,
+        vf.id_house,
+        vf.status
 )
 SELECT
     vf.id,

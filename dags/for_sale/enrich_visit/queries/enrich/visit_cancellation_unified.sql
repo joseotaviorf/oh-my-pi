@@ -1,4 +1,4 @@
-WITH new_model AS (
+WITH new_model_ranked AS (
   SELECT
     vse.id_visit,
     vse.id_schedule,
@@ -10,7 +10,8 @@ WITH new_model AS (
     vse.event_type AS type,
     IF(vse.reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
     vse.ts_created,
-    vse.ts_updated
+    vse.ts_updated,
+    ROW_NUMBER() OVER(PARTITION BY vse.id_visit ORDER BY vse.ts_created, vse.id_visit_status_log DESC) AS rn
   FROM
     datalake_visit.visit_status_events AS vse
   JOIN
@@ -19,8 +20,24 @@ WITH new_model AS (
   WHERE
     vse.event_type IN ("VISIT_REQUEST_CANCELED", "VISIT_CANCELED")
     AND DATE(v.ts_created) >= '2024-11-01'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY vse.id_visit ORDER BY vse.ts_created, vse.id_visit_status_log DESC) = 1
+),
+new_model AS (
+  SELECT
+    id_visit,
+    id_schedule,
+    id_user,
+    channel,
+    on_behalf_of,
+    reason,
+    author_user_role,
+    type,
+    is_cancelled_by_expiration,
+    ts_created,
+    ts_updated
+  FROM
+    new_model_ranked
+  WHERE
+    rn = 1
 ),
 old_model AS (
   WITH last_booking_status AS (
