@@ -41,7 +41,7 @@ member_profile AS (
             ON mp_p.id = mp.id_parent_member_profile
             AND mp_p.r = 1
 ),
-business_units AS (
+business_units_ranked AS (
     SELECT
         id AS id_business_unit,
         hub_name,
@@ -50,11 +50,25 @@ business_units AS (
         sdr_type,
         lead_types,
         ts_updated,
-        ts_created
+        ts_created,
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY version DESC) AS rn
     FROM
         datalake_hub_services_clean.business_unit AS bu
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_business_unit ORDER BY version DESC) = 1
+),
+business_units AS (
+    SELECT
+        id_business_unit,
+        hub_name,
+        business_context,
+        negotiation_type,
+        sdr_type,
+        lead_types,
+        ts_updated,
+        ts_created
+    FROM
+        business_units_ranked
+    WHERE
+        rn = 1
 ),
 users_order AS (
     SELECT
@@ -134,14 +148,15 @@ business_unit_region_relations AS (
         NOT (bur.hub_name LIKE '%[For rent]%' OR bur.hub_name LIKE '%HUB FR%')
 ),
 
-visit_relation AS (
+visit_relation_ranked AS (
     SELECT
         b.id AS id_booking,
         COALESCE(tr.id_business_unit, whp.id_hub, bur.id_hub) AS id_business_unit,
         COALESCE(tr.hub_name, whp.hub_name, bur.hub_name) AS business_unit,
         ua.id AS id_user_agent,
         tr.id_user_en,
-        b.ts_created AS ts_visit_intent
+        b.ts_created AS ts_visit_intent,
+        ROW_NUMBER() OVER (PARTITION BY b.id ORDER BY tr.ts_started ASC) AS rn
     FROM
         datalake_ebdb_clean.booking AS b
     LEFT JOIN
@@ -167,8 +182,19 @@ visit_relation AS (
     WHERE
         b.business_context = 'SALE'
         AND ua.id IS NOT NULL
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_booking ORDER BY tr.ts_started ASC) = 1
+),
+visit_relation AS (
+    SELECT
+        id_booking,
+        id_business_unit,
+        business_unit,
+        id_user_agent,
+        id_user_en,
+        ts_visit_intent
+    FROM
+        visit_relation_ranked
+    WHERE
+        rn = 1
 )
 
 SELECT
