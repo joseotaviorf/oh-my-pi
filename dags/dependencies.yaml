@@ -3815,6 +3815,9 @@ bietlejuice.enrich_sale_potential_listing:
 bietlejuice.enrich_sale_primary_market:
   - bietlejuice.ebdb_development:load-clean-development-amenity:first-run-of-day
   - bietlejuice.ebdb_development:load-clean-development-contact:first-run-of-day
+  - bietlejuice.ebdb_development:load-clean-development-listing-unit:first-run-of-day
+  - bietlejuice.ebdb_development:load-clean-development-negotiation-unit:first-run-of-day
+  - bietlejuice.ebdb_development:load-clean-development-negotiation:first-run-of-day
   - bietlejuice.ebdb_development:load-clean-development-typology-attribute:first-run-of-day
   - bietlejuice.ebdb_development:load-clean-development-typology-unit:first-run-of-day
   - bietlejuice.ebdb_development:load-clean-development-typology:first-run-of-day
@@ -3822,6 +3825,7 @@ bietlejuice.enrich_sale_primary_market:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-listing-sale-model:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
 bietlejuice.enrich_sale_salesforce:
   - bietlejuice.salesforce:load-clean-purchase-sale-contract:first-run-of-day
 bietlejuice.enrich_sale_stranded_listings_status:

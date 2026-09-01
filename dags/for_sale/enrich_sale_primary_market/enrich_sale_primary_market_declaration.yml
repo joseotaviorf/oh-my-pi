@@ -4,7 +4,12 @@ dag:
   schedule_start_date: 2026, 9, 1
   owner: Data ForSale
   documentation:
-    dag_purpose: This DAG creates the enriched table classifying each house as primary or secondary market and attaching its development lineage, so other enrich/DW tables can join a single source of truth instead of re-deriving sale_type per consumer.
+    dag_purpose: >
+      Primary-market enrich hub. listing_sale_type classifies SALE listings as
+      PRIMARY or SECONDARY from ListingSaleModel. house_development attaches
+      empreendimento and typology attrs to shell and unit houses.
+      development_negotiation is pré-OS at negotiation grain (visit shell house,
+      unit house, listing published flag) so visit-to-proposal does not use Sales Flow.
 workflow:
   type: query_delta
   layer: enrich

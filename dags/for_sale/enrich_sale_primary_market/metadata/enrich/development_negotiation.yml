@@ -1,0 +1,98 @@
+---
+database_name: datalake_sale_primary_market
+table_name: development_negotiation
+domain: For Sale
+description: >
+  One row per primary-market pré-OS negotiation (DevelopmentNegotiation).
+  Grain is id_development_negotiation, not visit: one visit can spawn several
+  negotiations when the buyer wants more than one apt. id_house_shell is the
+  typology vitrine the visit was booked on (Approach A). id_house is the
+  typology-unit Imovel used for the proposal or offer. is_published_unit is
+  true when that unit has a DevelopmentListingUnit row. Used to count
+  visit-to-proposal without going through Sales Flow. Actor must be filtered
+  (AGENT vs DEMAND) to avoid broker inflation of pré-OS.
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_development_negotiation:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.id
+    description: Primary key of the pré-OS negotiation event in EBDB DevelopmentNegotiation.
+  id_development:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.id_development
+    description: Empreendimento this negotiation belongs to. Native on the negotiation, not inferred from the visit house.
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.id_visit
+    description: Visit that originated this negotiation. Several negotiations may share the same visit when two apts are proposed after one visit. Null if the negotiation has no visit yet.
+  id_house_shell:
+    lineage:
+      - datalake_ebdb_clean.visit.id_house
+    description: House id of the visit (typology vitrine listing). This is the catalog shell, not the offer unit. Null when id_visit is null or the visit row is missing.
+  id_visitor:
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+    description: Platform user who is the visitor on the linked visit. Null when there is no visit row.
+  id_demand:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.id_demand
+    description: Demand-side user on the negotiation when actor is DEMAND. Null for agent-led events.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.id_agent
+    description: Agent on the negotiation when actor is AGENT. Null for demand-led events. Not the visit agent unless they coincide.
+  id_development_negotiation_unit:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation_unit.id
+    description: Chosen DevelopmentNegotiationUnit link for this negotiation. Product allows one unit per negotiation; if CDC has several, the latest ts_updated row is kept. Null when no unit is attached yet.
+  id_development_typology_unit:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation_unit.id_development_typology_unit
+    description: Concrete typology unit (apto) under this negotiation. Same entity Sales Flow will hang the offer house on.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.development_typology_unit.id_house
+    description: House id of the typology unit (offer or published apt), distinct from id_house_shell. Null when no unit is linked.
+  id_offer:
+    description: Reserved for the Sales Flow sale offer that closed this negotiation. Always null in this version; filled later by joining sale_offer on id_visit and id_house.
+  id_sales_flow:
+    description: Reserved for the Sales Flow entity wrapping that offer. Always null in this version; filled with id_offer.
+  id_development_typology:
+    lineage:
+      - datalake_ebdb_clean.development_typology_unit.id_development_typology
+    description: Floor-plan typology of the unit house. Join key to development_typology and to the shell listing of the same mold.
+  id_development_listing_unit:
+    lineage:
+      - datalake_ebdb_clean.development_listing_unit.id
+    description: ListingUnit row when this unit is published on the catalog. Null means offer-only unit (not a vitrine listing).
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_clean.development_listing_unit.id_listing_business_context
+    description: SALE listing business context of the published unit, when ListingUnit exists. Not the shell listing LBC.
+  id_development_contact:
+    lineage:
+      - datalake_ebdb_clean.development.id_development_contact
+    description: Current development contact FK from the empreendimento (gestor). Not a history of contacts.
+  uuid_event:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.uuid_event
+    description: Idempotency UUID of the event that created this negotiation in the Development domain.
+  actor:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.actor
+    description: Who opened the pré-OS. AGENT is broker-created; DEMAND is buyer-created. Filter this before counting propostas so broker volume does not inflate the funnel.
+    categories:
+      AGENT: Negotiation recorded by or for a broker.
+      DEMAND: Negotiation recorded by or for the buyer.
+  is_published_unit:
+    lineage:
+      - datalake_ebdb_clean.development_listing_unit.id
+    description: True when the typology unit has a DevelopmentListingUnit row (apt is a published listing). False when the unit exists only for the offer. Null when there is no unit.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.ts_created
+    description: Timestamp when the negotiation row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.development_negotiation.ts_updated
+    description: Timestamp when the negotiation row was last updated in EBDB.
