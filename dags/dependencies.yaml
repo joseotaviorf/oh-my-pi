@@ -3787,6 +3787,12 @@ bietlejuice.enrich_sale_potential_listing:
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead:first-run-of-day
   - bietlejuice.enrich_listing_flow:load-enrich-sales-listing-flows-with-reprocessed-leads:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks:first-run-of-day
+bietlejuice.enrich_sale_primary_market:
+  - bietlejuice.ebdb_development:load-clean-development-typology-unit:first-run-of-day
+  - bietlejuice.ebdb_development:load-clean-development-typology:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+  - bietlejuice.ebdb_listing:load-clean-listing-sale-model:first-run-of-day
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
 bietlejuice.enrich_sale_salesforce:
   - bietlejuice.salesforce:load-clean-purchase-sale-contract:first-run-of-day
 bietlejuice.enrich_sale_stranded_listings_status:

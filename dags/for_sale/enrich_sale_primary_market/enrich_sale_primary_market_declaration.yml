@@ -1,0 +1,10 @@
+---
+dag:
+  name: enrich_sale_primary_market
+  schedule_start_date: 2026, 9, 1
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates the enriched table classifying each house as primary or secondary market and attaching its development lineage, so other enrich/DW tables can join a single source of truth instead of re-deriving sale_type per consumer.
+workflow:
+  type: query_delta
+  layer: enrich
