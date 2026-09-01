@@ -12,3 +12,4 @@ workflow:
   tables_customization:
     search_session_event:
       z_order_by: [id_house, event_type]
+      incremental_optimize: true

@@ -18,3 +18,4 @@ workflow:
     fact_search_session_event:
       partitions: [year, month, day]
       z_order_by: [sk_house, sk_event_type]
+      incremental_optimize: true
