@@ -258,6 +258,16 @@ columns:
     lineage:
     - datalake_visit.visits.has_3p_access_control
     description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
+  sale_type:
+    lineage:
+    - datalake_ebdb_clean.listing_sale_model.sale_type
+    - datalake_ebdb_clean.listing_sale_model.is_primary_market
+    - datalake_ebdb_clean.listing_business_context.ts_updated
+    - datalake_visit.visits.business_context
+    description: Market type of the house when the visit is SALE. Taken from the latest SALE listing_business_context by ts_updated that has a listing_sale_model. Uses sale_type when set; otherwise PRIMARY if is_primary_market is true and SECONDARY if false. NULL for RENT visits and when the house has no SALE listing sale model.
+    categories:
+      PRIMARY: New-build / primary market.
+      SECONDARY: Resale / secondary market.
   journey_days:
     description: Journey days since the first created event. Will be deprecated.
     lineage:

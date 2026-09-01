@@ -153,6 +153,13 @@ columns:
     lineage:
     - datalake_sale_visit.sale_visit.is_house_rented
     description: True if the house booked had an active rental contract at 5A at the booking date
+  sale_type:
+    lineage:
+    - datalake_sale_visit.sale_visit.sale_type
+    description: Market type of the house on this sale visit. Passthrough from enrich sale_visit. PRIMARY, SECONDARY, or NULL when the house has no SALE listing sale model.
+    categories:
+      PRIMARY: New-build / primary market.
+      SECONDARY: Resale / secondary market.
   is_3p_supply:
     lineage:
     - datalake_sale_visit.sale_visit.is_3p_supply

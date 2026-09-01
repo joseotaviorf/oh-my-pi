@@ -25,6 +25,30 @@ WITH visit_tenant_living AS (
     visit_tenant_living_ranked
   WHERE
     rn = 1
+),
+listing_sale_type AS (
+    SELECT
+        id_house,
+        sale_type
+    FROM (
+        SELECT
+            lbc.id_house,
+            CASE
+                WHEN lsm.sale_type IS NOT NULL THEN lsm.sale_type
+                WHEN lsm.is_primary_market = TRUE THEN 'PRIMARY'
+                ELSE 'SECONDARY'
+            END AS sale_type,
+            ROW_NUMBER() OVER (PARTITION BY lbc.id_house ORDER BY lbc.ts_updated DESC) AS _w
+        FROM
+            datalake_ebdb_clean.listing_business_context AS lbc
+        INNER JOIN
+            datalake_ebdb_clean.listing_sale_model AS lsm
+                ON lbc.id = lsm.id_listing_business_context
+        WHERE
+            lbc.business_context = 'SALE'
+    ) AS _t
+    WHERE
+        _w = 1
 )
 SELECT
   v.id_visit AS sk_visit,
@@ -91,6 +115,9 @@ SELECT
   v.is_3p_demand,
   v.is_3p_lead_gen,
   v.has_3p_access_control,
+  CASE
+    WHEN v.business_context = 'SALE' THEN lst.sale_type
+  END AS sale_type,
   v.journey_days,
   TIMESTAMPDIFF(HOUR, v.ts_created, (v.ts_visit_local_tz + INTERVAL 3 HOUR)) AS hours_between_created_and_visit_day,
   TIMESTAMPDIFF(HOUR, v.ts_created, v.ts_visit_canceled) AS hours_between_request_and_cancellation,
@@ -160,3 +187,6 @@ LEFT JOIN
 LEFT JOIN
   visit_tenant_living AS vtl
     ON v.id_visit = vtl.id_visit
+LEFT JOIN
+  listing_sale_type AS lst
+    ON lst.id_house = v.id_house

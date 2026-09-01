@@ -38,6 +38,30 @@ status_log AS (
     status_log_ranked
   WHERE
     rn = 1
+),
+listing_sale_type AS (
+    SELECT
+        id_house,
+        sale_type
+    FROM (
+        SELECT
+            lbc.id_house,
+            CASE
+                WHEN lsm.sale_type IS NOT NULL THEN lsm.sale_type
+                WHEN lsm.is_primary_market = TRUE THEN 'PRIMARY'
+                ELSE 'SECONDARY'
+            END AS sale_type,
+            ROW_NUMBER() OVER (PARTITION BY lbc.id_house ORDER BY lbc.ts_updated DESC) AS _w
+        FROM
+            datalake_ebdb_clean.listing_business_context AS lbc
+        INNER JOIN
+            datalake_ebdb_clean.listing_sale_model AS lsm
+                ON lbc.id = lsm.id_listing_business_context
+        WHERE
+            lbc.business_context = 'SALE'
+    ) AS _t
+    WHERE
+        _w = 1
 )
 SELECT DISTINCT
     b.id AS id_booking,
@@ -72,6 +96,7 @@ SELECT DISTINCT
     b.hub_agent_region AS hub_agent_region,
     COALESCE(b.is_hub_flow,FALSE) AS is_hub_flow,
     COALESCE(b.is_house_rented,FALSE) AS is_house_rented,
+    lst.sale_type,
     b.days_visit_cancelled_to_visit,
     b.days_visit_booked_to_visit,
     b.days_visit_booked_to_visit_cancelled,
@@ -88,6 +113,9 @@ FROM
 JOIN
     datalake_ebdb_clean.house AS h
         ON h.id = b.id_house
+LEFT JOIN
+    listing_sale_type AS lst
+        ON lst.id_house = b.id_house
 LEFT JOIN
     datalake_sale_visit_hubs.sale_visit_hubs AS svh
         ON svh.id_booking = b.id
