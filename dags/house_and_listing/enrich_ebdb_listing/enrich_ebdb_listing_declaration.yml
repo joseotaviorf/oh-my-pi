@@ -43,6 +43,14 @@ workflow:
     lbc_status_version_order:
     - business_context_history
     - house_status_version_order
+    # Keep heavy side jobs off the critical path until house_listing is published.
+    # They compete with house_entrance_history / house_status_version_order for cluster slots.
+    listing_business_context_suspension_history:
+    - house_listing
+    portability:
+    - house_listing
+    rent_listing:
+    - house_listing
   tables_customization:
     agents_with_keys:
       partitions:

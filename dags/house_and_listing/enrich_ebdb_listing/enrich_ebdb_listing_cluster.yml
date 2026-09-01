@@ -3,7 +3,7 @@ cluster:
   custom_configurations:
     master_node_type_id: r6g.xlarge
     core_nodes:
-      target_on_demand: 3
+      target_on_demand: 4
       target_spot: 0
       instance_types:
       - m6g.4xlarge
