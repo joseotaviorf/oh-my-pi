@@ -1,0 +1,36 @@
+---
+table_name: datalake_allocation_tool_clean.tags
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    # Small table (~54 rows): a leader creating a batch of tags for a new group
+    # is a legitimate single-day jump, so the default +25 (14 rows) would fire on
+    # normal app usage. Drops stay at the default guard: rows are soft-deleted,
+    # never removed, so any real shrink means the MERGE misbehaved.
+    less_than_or_equal_to: 100
+    severity_level: Error
+
+column_level_validations:
+  id_tag:
+    is_unique:
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  id_group:
+    is_complete:
+      severity_level: Warning
+  tag_name:
+    is_complete:
+      severity_level: Warning
+  is_active:
+    is_complete:
+      severity_level: Warning
+  ts_export_generated:
+    is_complete:
+      severity_level: Warning

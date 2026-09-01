@@ -1,0 +1,33 @@
+---
+table_name: datalake_allocation_tool_clean.groups
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    # Tiny table (~11 rows): the default +25 fires on +3 rows, and an admin
+    # creating a handful of groups at once is normal app usage. Drops stay at
+    # the default guard: rows are soft-deleted, never removed, so any real
+    # shrink means the MERGE misbehaved.
+    less_than_or_equal_to: 100
+    severity_level: Error
+
+column_level_validations:
+  id_group:
+    is_unique:
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  group_name:
+    is_complete:
+      severity_level: Warning
+  is_active:
+    is_complete:
+      severity_level: Warning
+  ts_export_generated:
+    is_complete:
+      severity_level: Warning

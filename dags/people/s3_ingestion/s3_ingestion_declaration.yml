@@ -32,6 +32,22 @@ dag:
       inclusive on both ends: the one-day overlap between runs is intentional and
       self-heals objects that land late.
 
+      Clean tables (queries/clean) hold the current state of each Allocation Tool
+      entity, built incrementally: the app exports one initial per-entity snapshot
+      (envelope `{entity, type, count, records, generated_at}` in the entity's own
+      prefix) and afterwards only modifications, as unified delta files in the
+      `delta` prefix (`{allocations, tags, groups, counts, generated_at, watermark}`,
+      full records of every entity changed since `watermark`). Each run explodes the
+      records that landed in its load window — snapshot and delta alike — keeps the
+      latest version per entity id and MERGEs it into the clean table on that id.
+      The `when_matched_update_condition` guard only lets an export generated at the
+      same time or later overwrite a row, so reruns and out-of-order backfills never
+      regress state. Older export formats in the entity prefixes (bare JSON arrays
+      and unified envelopes without `records`) are ignored by the content filter;
+      deletions are soft (`status` / `is_active` flags), so snapshot + deltas are
+      the whole truth. `raw_inner_dependencies` runs the delta raw load before the
+      entity raw loads so every clean task sees the window's delta files.
+
 workflow:
   type: custom_ingestion
   layer: raw
@@ -58,26 +74,60 @@ workflow:
     - "{load_start_date}"
     - "{load_end_date}"
 
+  # Delta raw must land before each entity raw so the clean MERGE that follows the
+  # entity raw sees every delta file of the load window (clean X runs after raw X).
+  raw_inner_dependencies:
+    allocation:
+      - delta
+    tags:
+      - delta
+    groups:
+      - delta
+
   tables_customization:
     # extra_spark_job_arguments[0] is the source_key in {environment}_conf.yml.
+    # merge_on / when_matched_update_condition configure the CLEAN MERGE (the raw
+    # custom job doesn't consume them): upsert by entity id, and only an export
+    # generated at the same time or later may overwrite a row, so reruns and
+    # out-of-order backfills never regress current state.
     allocation:
       custom_schema: allocation_tool
       extraction_type: incremental
       partitions: [year, month, day]
-      merge_on: [file_name, line_number]
+      merge_on: [id_allocation]
+      when_matched_update_condition: source.ts_export_generated >= target.ts_export_generated
+      clean_table_name: allocations
+      clean_extraction_type: incremental
+      clean_partitions: []
       extra_spark_job_arguments:
         - "allocation_tool_allocation"
     tags:
       custom_schema: allocation_tool
       extraction_type: incremental
       partitions: [year, month, day]
-      merge_on: [file_name, line_number]
+      merge_on: [id_tag]
+      when_matched_update_condition: source.ts_export_generated >= target.ts_export_generated
+      clean_table_name: tags
+      clean_extraction_type: incremental
+      clean_partitions: []
       extra_spark_job_arguments:
         - "allocation_tool_tags"
     groups:
       custom_schema: allocation_tool
       extraction_type: incremental
       partitions: [year, month, day]
-      merge_on: [file_name, line_number]
+      merge_on: [id_group]
+      when_matched_update_condition: source.ts_export_generated >= target.ts_export_generated
+      clean_table_name: groups
+      clean_extraction_type: incremental
+      clean_partitions: []
       extra_spark_job_arguments:
         - "allocation_tool_groups"
+    # Unified modification exports ({allocations, tags, groups, ...}); no clean
+    # table of its own — the three entity clean queries read it.
+    delta:
+      custom_schema: allocation_tool
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "allocation_tool_delta"

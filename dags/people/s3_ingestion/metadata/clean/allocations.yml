@@ -1,0 +1,128 @@
+database_name: datalake_allocation_tool_clean
+table_name: allocations
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Current state of employee allocations in the Allocation Tool, the internal app
+  where leaders distribute people across groups and tags for resource planning.
+  One row per allocation id.
+  Covers all allocation records exported by the app, including soft-deleted rows
+  whose status was updated instead of being removed.
+  Built incrementally: an initial snapshot export seeds the table and daily delta
+  exports (full records of whatever changed) are merged in by allocation id.
+columns:
+  id_allocation:
+    description: Unique identifier of the allocation record in the Allocation Tool.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].id
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].id
+  id_employee:
+    description: Allocation Tool internal user id of the allocated employee (source field employee_id); not PIN person_number or assignment_number.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].employee_id
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].employee_id
+  id_group:
+    description: Identifier of the group the employee is allocated to.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].group_id
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].group_id
+  id_tag:
+    description: Identifier of the tag applied to this allocation.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].tag_id
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].tag_id
+  id_allocated_by:
+    description: Identifier of the user who made the allocation, when recorded.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].allocated_by
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].allocated_by
+  id_created_by:
+    description: Identifier of the user who created the allocation record.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].created_by_id
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].created_by_id
+  employee_name:
+    description: Full name of the allocated employee.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].employee_name
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].employee_name
+  manager_name:
+    description: Full name of the employee's manager at allocation time.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].gestor_name
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].gestor_name
+  group_name:
+    description: Display name of the group the employee is allocated to.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].group_name
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].group_name
+  tag_name:
+    description: Display name of the tag applied to this allocation.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].tag_name
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].tag_name
+  chapter:
+    description: Chapter (discipline community, e.g. engineering) of the employee.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].chapter
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].chapter
+  vertical:
+    description: Business vertical the employee belongs to (e.g. tech).
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].vertical
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].vertical
+  team:
+    description: Team the employee belongs to in the organizational structure.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].team
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].team
+  status:
+    description: Allocation lifecycle status in the Allocation Tool (e.g. active); soft deletes are expressed here instead of removing the row.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].status
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].status
+  file_name:
+    description: Full S3 URI of the export file (snapshot or delta) this row version was parsed from.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.file_name
+    - datalake_allocation_tool_raw.delta.file_name
+  is_leader:
+    description: True when the allocated employee is the leader in this allocation (source flag fl_lider = "1").
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].fl_lider
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].fl_lider
+  is_sample:
+    description: True when the record is app-generated sample data rather than a real allocation.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].is_sample
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].is_sample
+  ts_allocated:
+    description: Timestamp (UTC) when the allocation was made in the Allocation Tool.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].allocated_at
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].allocated_at
+  ts_created:
+    description: Timestamp (UTC) when the allocation record was created in the Allocation Tool.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].created_date
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].created_date
+  ts_updated:
+    description: Timestamp (UTC) of the last update to the allocation record in the Allocation Tool.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.records[*].updated_date
+    - datalake_allocation_tool_raw.delta.raw_content.allocations[*].updated_date
+  ts_export_generated:
+    description: Timestamp (UTC) when the source export (snapshot or delta) that produced this row version was generated by the app.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.raw_content.generated_at
+    - datalake_allocation_tool_raw.delta.raw_content.generated_at
+  ts_file_modified:
+    description: Timestamp (UTC) when the export file landed in S3 (object LastModified).
+    lineage:
+    - datalake_allocation_tool_raw.allocation.ts_file_modified
+    - datalake_allocation_tool_raw.delta.ts_file_modified
+  ts_load:
+    description: Timestamp indicating when the record was ingested into the raw layer.
+    lineage:
+    - datalake_allocation_tool_raw.allocation.ts_load
+    - datalake_allocation_tool_raw.delta.ts_load
