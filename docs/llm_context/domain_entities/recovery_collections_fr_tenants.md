@@ -1,5 +1,13 @@
 # Recovery — Collections (For-Rent Tenants)
 
+## Ownership
+
+**Data Owner:**
+- thiago.villani@quintoandar.com.br
+
+**Data Steward:**
+- thiago.villani@quintoandar.com.br
+
 ## Overview
 
 This document covers **recovery analytics for tenants on the For-Rent (FR) product**. Recovery measures how much overdue debt is collected from defaulting customers, and how that collection performance evolves over time.
@@ -96,6 +104,18 @@ The **official segmentation** layer that drives operational strategy and communi
 | `prob_payment` | Frozen Probability of Payment |
 | `t1_delay_bucket`, `t2_delay_bucket` | Delay buckets aligned with T1 / T2 methodologies |
 
+For active stock contracts, `active-stock-pre-evictions` is determined by wallet conditions: more than one overdue
+monthly invoice or a broken ongoing deal. A delay above 30 days is not sufficient by itself; contracts with at most
+one overdue monthly invoice and no broken deal can therefore reach `active-stock-hold`.
+
+AT-RISK segments use two distinct approaches:
+
+- With an ongoing deal, the reason is deterministic. `active-stock-risk-deal-new-monthly` means new original debt is
+  unpaid and takes precedence when both debt types are overdue. `active-stock-risk-deal-unpaid` means only a deal
+  installment is unpaid.
+- Without an ongoing deal, `active-stock-risk-nodeal-high` and `active-stock-risk-nodeal-low` keep their names but are
+  assigned from Collections Score v3 rather than the legacy static decision tree.
+
 > **Always include the partition guard** when joining these tables to avoid full scans:
 > `MAKE_DATE(year, month, day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS`.
 
@@ -122,6 +142,17 @@ Four-tier hierarchy from most granular to highest-level summary:
 
 Each level has its own materialized recovery table under `metric_fintech.daily_recovery_*`.
 
+## Key Metrics
+
+All of these are already materialized per `segment` × `dt_reference` in the `metric_fintech.daily_recovery_*` tables — prefer reading them there over recomputing from the wallet.
+
+- **Recovery rate (amount, DT2):** share of accumulated overdue debt that was collected — `recovered_amount_DT2_acc / due_amount_DT2_acc`, exposed as `recovery_rate_amount_t2`. The canonical recovery KPI for FR tenants.
+- **Accumulated due amount (DT2):** cohort denominator — every overdue amount that came to be within the period, in `due_amount_DT2_acc`. Accumulated (not end-of-period) so paid invoices stay in the denominator.
+- **Accumulated recovered amount (DT2):** cohort numerator — cash actually collected within the period, in `recovered_amount_DT2_acc`.
+- **Wallet at reference:** the open overdue position on a given day, in `due_amount_DT2_at_reference` — a snapshot measure, never a cohort denominator.
+- **Defaulting volume:** distinct contracts and invoices in the recovery universe, via `n_contracts_acc` / `n_invoices_DT2_acc` (accumulated) and their `_at_reference` snapshot counterparts.
+- **Recovered invoice count (DT2):** number of overdue invoices that got paid, in `recovered_invoices_DT2_acc` — pairs with the amount rate to separate ticket size from hit rate.
+
 ## Relationships with other entities
 
 - **Tenants on FR** is the universe — joins to `dw_rent.dim_contract` for contract attributes.
@@ -141,7 +172,7 @@ Each level has its own materialized recovery table under `metric_fintech.daily_r
 - Always include the 6-month partition guard `MAKE_DATE(year, month, day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS` to avoid full-table scans.
 - For MTD comparisons across months, align by **`n_business_days_since_pipe`** (preferred), or by running days, depending on the operational question — see `get_parity_table` below.
 - Exclude `segmentation IN ('active-current', 'ended-current')` and require `wallet > 0` when measuring recovery — these contracts are not in the recovery universe.
-- Use `LAST_VALUE(... TRUE) OVER (...)` to **propagate / back-fill** segment and amount features forward in time once an invoice leaves the daily timeline (it disappears the day it is paid). The "any range" golden query shows the pattern.
+- Use `LAST_VALUE(...) IGNORE NULLS OVER (...)` to **propagate / back-fill** segment and amount features forward in time once an invoice leaves the daily timeline (it disappears the day it is paid). The "any range" golden query shows the pattern. In Spark the equivalent is `LAST_VALUE(..., TRUE)`.
 
 **Don't:**
 
@@ -270,7 +301,7 @@ daily_accumulation AS (
 business_day_context AS (
     SELECT
         da.segment,
-        DATE_DIFF(da.dt_reference, da.dt_pipe) AS days_to_pipe,
+        DATE_DIFF('day', da.dt_pipe, da.dt_reference) AS days_to_pipe,
         COUNT(
             CASE WHEN da.dt_reference >= da.dt_pipe AND dd.is_brz_fintech_business_day
                  THEN da.dt_reference END
@@ -324,24 +355,33 @@ WHERE segment IS NOT NULL;
 For the **operational live view**, replace the `fact_contract_features_timeline` segmentation with the Chargehub audience allocation. Used to materialize `metric_fintech.daily_recovery_chargehub_audiences`.
 
 ```sql
-WITH segment_allocation AS (
-    SELECT DISTINCT
+WITH ranked_allocation AS (
+    SELECT
         dt_last_appearance,
         segment_name,
         audience_name,
-        id_contract
+        id_contract,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_contract, dt_last_appearance
+            ORDER BY ts_entered_segment DESC, ts_entered_audience DESC
+        ) AS rn_allocation
     FROM datalake_debt_recovery.segmentation_distribution
     WHERE is_active = TRUE
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY id_contract, dt_last_appearance
-        ORDER BY ts_entered_segment DESC, ts_entered_audience DESC
-    ) = 1
 )
--- Then use COALESCE(sda.audience_name, 'Unsegmented') wherever
--- Query 2 uses cft.segmentation, joining segment_allocation on
--- (sda.dt_last_appearance = iwt.dt_reference AND sda.id_contract = iwt.sk_contract)
--- and filter `sda.dt_last_appearance IS NOT NULL` in invoice_month_boundaries.
+SELECT
+    dt_last_appearance,
+    segment_name,
+    audience_name,
+    id_contract
+FROM ranked_allocation
+WHERE rn_allocation = 1
 ```
+
+Then plug this CTE into Query 2:
+
+- Use `COALESCE(sda.audience_name, 'Unsegmented')` everywhere Query 2 uses `cft.segmentation`.
+- Join the allocation on `sda.dt_last_appearance = iwt.dt_reference AND sda.id_contract = iwt.sk_contract`.
+- Filter `sda.dt_last_appearance IS NOT NULL` inside `invoice_month_boundaries`.
 
 ### 4. Recovery for an arbitrary date range (ad-hoc filter on any segment)
 
@@ -349,21 +389,19 @@ When you need a **custom slice** that the materialized tables don't cover (e.g. 
 
 ```sql
 WITH chargehub_allocation AS (
-    SELECT DISTINCT
-        dt_last_appearance,
-        segment_name,
-        audience_name,
-        id_contract
+    SELECT
+        m.dt_last_appearance,
+        m.segment_name,
+        m.audience_name,
+        m.id_contract,
+        ROW_NUMBER() OVER (
+            PARTITION BY m.id_contract, m.dt_last_appearance
+            ORDER BY m.ts_entered_segment DESC, m.ts_entered_audience DESC
+        ) AS rn_allocation
     FROM datalake_debt_recovery.segmentation_distribution AS m
-    LEFT JOIN dw_collections_segmentation.fact_contract_wallet_timeline AS f
-        ON f.sk_contract = m.id_contract AND f.dt_reference = m.dt_last_appearance
     WHERE m.is_active
     -- Optional early filter on audience to reduce volume:
     -- AND m.audience_name IN ('ACTIVE_STOCK_PRE_EVICTIONS_AQA', 'ACTIVE_STOCK_PRE_EVICTIONS_WQA')
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY id_contract, dt_last_appearance
-        ORDER BY ts_entered_segment DESC, ts_entered_audience DESC
-    ) = 1
 ),
 minimal_invoice_select AS (
     SELECT
@@ -386,7 +424,9 @@ minimal_invoice_select AS (
     LEFT JOIN dw_collections_segmentation.fact_contract_features_timeline AS f
         ON f.dt_reference = m.dt_reference AND f.sk_contract = m.sk_contract
     LEFT JOIN chargehub_allocation AS ch
-        ON ch.dt_last_appearance = m.dt_reference AND ch.id_contract = m.sk_contract
+        ON ch.dt_last_appearance = m.dt_reference
+        AND ch.id_contract = m.sk_contract
+        AND ch.rn_allocation = 1
     WHERE DATE_TRUNC('month', m.dt_reference) >= DATE('2025-10-01')   -- start of window
         AND m.dt_reference < DATE(CURRENT_DATE)
         -- Slice the universe here. Examples:
@@ -395,7 +435,7 @@ minimal_invoice_select AS (
 ),
 answer_sheet AS (
     -- Cross-join the requested date window with every (sk_contract, sk_invoice)
-    -- present in the slice, starting from each invoice's earliest appearance.
+    -- present in the slice, starting from the earliest appearance of each invoice.
     SELECT
         d.date,
         m.sk_contract,
@@ -424,13 +464,13 @@ propagated_timeline AS (
     -- features after they disappear from the daily wallet.
     SELECT
         m.*,
-        LAST_VALUE(chargehub_segment,    TRUE) OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_chargehub_segment,
-        LAST_VALUE(dl_segment,           TRUE) OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_dl_segment,
-        LAST_VALUE(macro_segmentation,   TRUE) OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_macro_segmentation,
-        LAST_VALUE(recovered_amount,     TRUE) OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_recovered_amount,
-        LAST_VALUE(invoice_delay_t2,     TRUE) OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_invoice_delay_t2,
-        LAST_VALUE(payment_status,       TRUE) OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_payment_status,
-        LAST_VALUE(due_amount,           TRUE) OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_due_amount
+        LAST_VALUE(chargehub_segment)  IGNORE NULLS OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_chargehub_segment,
+        LAST_VALUE(dl_segment)         IGNORE NULLS OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_dl_segment,
+        LAST_VALUE(macro_segmentation) IGNORE NULLS OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_macro_segmentation,
+        LAST_VALUE(recovered_amount)   IGNORE NULLS OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_recovered_amount,
+        LAST_VALUE(invoice_delay_t2)   IGNORE NULLS OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_invoice_delay_t2,
+        LAST_VALUE(payment_status)     IGNORE NULLS OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_payment_status,
+        LAST_VALUE(due_amount)         IGNORE NULLS OVER (PARTITION BY sk_invoice ORDER BY date) AS bb_fill_due_amount
     FROM know_timeline AS m
 ),
 database_cleaned_timeline AS (

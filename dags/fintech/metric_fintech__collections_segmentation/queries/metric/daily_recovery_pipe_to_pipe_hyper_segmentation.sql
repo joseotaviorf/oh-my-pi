@@ -79,7 +79,7 @@ contract_features_normalized AS (
                 'active-new-defaulter-under-mob3-early', 'active-new-defaulter-under-mob3-late',
                 'active-new-defaulter-high', 'active-new-defaulter-medium',
                 'active-new-defaulter-early-low', 'active-new-defaulter-late-low',
-                'active-stock-hold', 'active-stock-risk-deal-high', 'active-stock-risk-deal-low',
+                'active-stock-hold', 'active-stock-risk-deal-unpaid', 'active-stock-risk-deal-new-monthly',
                 'active-stock-risk-nodeal-high', 'active-stock-risk-nodeal-low',
                 'active-ongoing-deal'
             ) THEN 'active-segments'

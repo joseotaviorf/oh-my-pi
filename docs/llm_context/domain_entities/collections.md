@@ -180,7 +180,7 @@ Daily **contract** grain: aggregates from invoice wallet — max delays (`max_de
 
 ### `fact_contract_features_timeline`
 
-Subset of wallet timeline plus **accumulated** features (`acc_*`), **rolling** windows (e.g. L12M, L90, L180), **`tree_class`** and **frozen** **`prob_payment`** (vs volatile `prob_payment_at_dt_reference`), **`segmentation`** vs **`segmentation_with_prob_payment_at_dt_reference`**, **`macro_segmentation`** / **`next_macro_segmentation`** / transition flags, **`segment_comms`**, delay buckets **`t1_delay_bucket`** / **`t2_delay_bucket`**, broken-deal flags (`flag_broken_installment_deal`, …). Designed for **stable monthly segmentation** once a contract enters a decision-tree class.
+Subset of wallet timeline plus **accumulated** features (`acc_*`), **rolling** windows (e.g. L12M, L90, L180), **`tree_class`** and **frozen** **`prob_payment`** (vs volatile `prob_payment_at_dt_reference`), **`segmentation`** vs **`segmentation_with_prob_payment_at_dt_reference`**, **`macro_segmentation`** / **`next_macro_segmentation`** / transition flags, **`segment_comms`**, delay buckets **`t1_delay_bucket`** / **`t2_delay_bucket`**, broken-deal flags (`flag_broken_installment_deal`, …). Active stock pre-evictions is triggered by wallet conditions, not delay alone. Its AT-RISK deal branches identify the unpaid debt type deterministically, while no-deal high/low branches use Collections Score v3. Designed for **stable monthly segmentation** once a contract enters a macro-segmentation island.
 
 ---
 

@@ -12,7 +12,9 @@ description: |
   flag_source. It implements frozen payment probability bands (prob_payment): within each macro_segmentation island,
   the first prob_payment_at_dt_reference value is held until the contract leaves that macro segment. A parallel
   legacy rule-based band (legacy_prob_payment_at_dt_reference) is kept for comparison. Segmentation uses both daily
-  (segmentation_with_prob_payment_at_dt_reference) and frozen   (segmentation) probability logic for operational use.
+  (segmentation_with_prob_payment_at_dt_reference) and frozen (segmentation) probability logic for operational use.
+  Active stock contracts enter pre-evictions based on wallet conditions rather than delay alone. Contracts with an
+  ongoing deal are split by the unpaid debt type, while contracts without a deal use the collections score.
 
   Includes lead_23_n_quitacao_t1, the collections score model training target: count of T1 quitacao days
   in the 23-day forward window on each reference date.
@@ -361,7 +363,8 @@ columns:
     description: |
       Payment probability band calculated at each reference date before macro-segment freezing. Combines rule-based
       branches with collections score v3 thresholds on payment_probability_propagated (per contract status and delay
-      bucket). Values: VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW, or NULL-prefixed states depending on phase.
+      bucket). Active stock contracts use a 0.38 score threshold for HIGH versus LOW. Values: VERY_HIGH, HIGH, MEDIUM,
+      LOW, VERY_LOW, or NULL-prefixed states depending on phase.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -409,10 +412,10 @@ columns:
   segmentation_with_prob_payment_at_dt_reference:
     description: |
       Detailed contract segmentation using the daily calculated payment probability (prob_payment_at_dt_reference).
-      This segmentation changes daily as contract conditions evolve. Includes categories like active-new-defaulter-early-high,
-      ended-stock-roll1-low, and evictions sub-segments (evictions-late, evictions-early-low,
-      evictions-early-reincident-high, evictions-early-first-high), differentiated by status, delay range, and daily
-      probability assessment.
+      This segmentation changes daily as contract conditions evolve. Active stock contracts with an ongoing deal are
+      classified deterministically as active-stock-risk-deal-new-monthly when new original debt is unpaid, including
+      when both debt types are unpaid, or active-stock-risk-deal-unpaid when only the deal installment is unpaid.
+      Active stock contracts without a deal retain the high/low labels driven by the daily collections score band.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -429,9 +432,10 @@ columns:
   segmentation:
     description: |
       Detailed contract segmentation using the frozen payment probability band (prob_payment), constant within each
-      macro_segmentation island. Same label set as segmentation_with_prob_payment_at_dt_reference but driven by
-      prob_payment instead of daily prob_payment_at_dt_reference. Evictions contracts split into evictions-late,
-      evictions-early-low, evictions-early-reincident-high, evictions-early-first-high, or evictions-undefined.
+      macro_segmentation island. Deal-risk branches are deterministic: active-stock-risk-deal-new-monthly identifies
+      unpaid new original debt and takes precedence when both debt types are unpaid; active-stock-risk-deal-unpaid
+      identifies an unpaid deal installment only. No-deal active stock branches retain high/low labels based on the
+      frozen collections score band. Evictions contracts retain their timing and probability sub-segments.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -518,9 +522,10 @@ columns:
   macro_segmentation:
     description: |
       High-level classification of the contract state (e.g., active-current, active-stock-pre-evictions,
-      evictions, ended-stock-361over) based on status, delay ranges, and deal flags, evaluated before
-      payment probabilities are applied. Evictions contracts always map to the single macro label evictions;
-      tactical evictions sub-segments are derived downstream in segmentation.
+      evictions, ended-stock-361over) evaluated before payment probabilities are applied. Active contracts enter
+      active-stock-pre-evictions when the wallet has more than one overdue monthly invoice or a broken ongoing deal;
+      delay above 30 days alone instead maps eligible contracts to active-stock-hold. Evictions contracts always map
+      to the single macro label evictions; tactical evictions sub-segments are derived downstream in segmentation.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -596,8 +601,9 @@ columns:
       - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
   clustered_segmentation:
     description: |
-      Clustered tactical rollup for dashboard building. Rolls mob3, low, and good-payer segments; maps forgiveness
-      rows by prob_payment; groups evictions-early-* sub-segments into evictions-early and keeps evictions-late unchanged.
+      Clustered tactical rollup for dashboard building. Groups both deterministic deal-risk reasons into
+      active-stock-risk-deal and both score-based no-deal risk bands into active-stock-risk-nodeal. It also rolls up
+      MOB3 and low new-defaulter timing, good-payer, forgiveness, and early-evictions sub-segments.
     lineage:
       - dw_collections_segmentation.fact_contract_features_timeline.segmentation
       - dw_collections_segmentation.fact_contract_features_timeline.prob_payment
