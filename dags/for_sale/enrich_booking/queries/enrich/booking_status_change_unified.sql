@@ -9,10 +9,10 @@ WITH old_filtered_schedule AS (
             ON b.id = bsc.id_booking
     WHERE
         (b.type != 'Visita')
-        OR (b.type = 'Visita' AND bsc.ts_created::DATE < '2025-09-01')
+        OR (b.type = 'Visita' AND CAST(bsc.ts_created AS DATE) < '2025-09-01')
     GROUP BY 1
 ),
-old_status AS (
+old_status_ranked AS (
     SELECT
         bsc.id_booking,
         bsc.id_user,
@@ -22,7 +22,8 @@ old_status AS (
         acrc.name AS reason_category,
         b.type,
         bsc.ts_created,
-        f.ts_first_event
+        f.ts_first_event,
+        ROW_NUMBER() OVER (PARTITION BY bsc.id_booking, bsc.status ORDER BY bsc.id DESC) AS rn
     FROM
         old_filtered_schedule AS f
     LEFT JOIN
@@ -34,8 +35,22 @@ old_status AS (
     LEFT JOIN
         datalake_ebdb_clean.appointment_change_reason_category AS acrc
             ON acrc.id = bsc.id_reason_category
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY bsc.id_booking, bsc.status ORDER BY bsc.id DESC) = 1
+),
+old_status AS (
+    SELECT
+        id_booking,
+        id_user,
+        status,
+        reason,
+        reason_enum,
+        reason_category,
+        type,
+        ts_created,
+        ts_first_event
+    FROM
+        old_status_ranked
+    WHERE
+        rn = 1
 ),
 new_filtered_schedule AS (
     SELECT
@@ -49,10 +64,10 @@ new_filtered_schedule AS (
     FROM
         datalake_ebdb_clean.visit_status_log
     WHERE
-        ts_created::DATE >= '2024-11-01'
+        CAST(ts_created AS DATE) >= '2024-11-01'
     GROUP BY 1,2
 ),
-new_requested_status AS (
+new_requested_status_ranked AS (
     SELECT
         vsl.id_schedule AS id_booking,
         vsl.id_author_user AS id_user,
@@ -62,11 +77,12 @@ new_requested_status AS (
             WHEN vsl.channel = 'AGENT_PWA' THEN 'Visita marcada pelo app de corretores'
             ELSE 'Agendamento via site'
         END AS reason,
-        reason AS reason_enum,
+        vsl.reason AS reason_enum,
         NULL AS reason_category,
         'Visita' AS type,
         vsl.ts_created,
-        f.ts_first_event
+        f.ts_first_event,
+        ROW_NUMBER() OVER(PARTITION BY f.id_schedule ORDER BY vsl.id_visit_status_log DESC) AS rn
     FROM
         new_filtered_schedule AS f
     LEFT JOIN
@@ -74,33 +90,62 @@ new_requested_status AS (
             ON f.id_schedule = vsl.id_schedule
     WHERE
         vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
-        AND f.ts_first_event::DATE >= '2025-09-01'
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY f.id_schedule ORDER BY id_visit_status_log DESC) = 1
+        AND CAST(f.ts_first_event AS DATE) >= '2025-09-01'
 ),
-new_confirmed_status AS (
+new_requested_status AS (
+    SELECT
+        id_booking,
+        id_user,
+        status,
+        reason,
+        reason_enum,
+        reason_category,
+        type,
+        ts_created,
+        ts_first_event
+    FROM
+        new_requested_status_ranked
+    WHERE
+        rn = 1
+),
+new_confirmed_status_ranked AS (
     SELECT
         vsl.id_schedule AS id_booking,
         vsl.id_author_user AS id_user,
         'Marcado' AS status,
-        IF(ts_visit_registered IS NOT NULL, 'AGENT_SCHEDULE_REALIZED', NULL) AS reason,
-        IF(ts_visit_registered IS NOT NULL, 'AGENT_SCHEDULE_REALIZED', NULL) AS reason_enum,
-        IF(ts_visit_registered IS NOT NULL, 'Other', NULL) AS reason_category,
+        IF(f.ts_visit_registered IS NOT NULL, 'AGENT_SCHEDULE_REALIZED', NULL) AS reason,
+        IF(f.ts_visit_registered IS NOT NULL, 'AGENT_SCHEDULE_REALIZED', NULL) AS reason_enum,
+        IF(f.ts_visit_registered IS NOT NULL, 'Other', NULL) AS reason_category,
         'Visita' AS type,
-        ts_created,
-        f.ts_first_event
+        vsl.ts_created,
+        f.ts_first_event,
+        ROW_NUMBER() OVER(PARTITION BY f.id_schedule ORDER BY vsl.id_visit_status_log DESC) AS rn
     FROM
         new_filtered_schedule AS f
     LEFT JOIN
         datalake_ebdb_clean.visit_status_log vsl
             ON f.id_schedule = vsl.id_schedule
     WHERE
-        event_type = 'VISIT_CONFIRMED'
-        AND f.ts_first_event::date >= '2025-09-01'
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY f.id_schedule ORDER BY id_visit_status_log DESC) = 1
+        vsl.event_type = 'VISIT_CONFIRMED'
+        AND CAST(f.ts_first_event AS DATE) >= '2025-09-01'
 ),
-new_canceled_status AS (
+new_confirmed_status AS (
+    SELECT
+        id_booking,
+        id_user,
+        status,
+        reason,
+        reason_enum,
+        reason_category,
+        type,
+        ts_created,
+        ts_first_event
+    FROM
+        new_confirmed_status_ranked
+    WHERE
+        rn = 1
+),
+new_canceled_status_ranked AS (
     SELECT
         vsl.id_schedule AS id_booking,
         IF(f.id_succeed_schedule IS NOT NULL, f.id_succeed_user, vsl.id_author_user) AS id_user,
@@ -168,8 +213,9 @@ new_canceled_status AS (
             ELSE 'Other'
         END AS reason_category,
         'Visita' AS type,
-        ts_created,
-        f.ts_first_event
+        vsl.ts_created,
+        f.ts_first_event,
+        ROW_NUMBER() OVER(PARTITION BY f.id_schedule ORDER BY vsl.id_visit_status_log DESC) AS rn
     FROM
         new_filtered_schedule AS f
     LEFT JOIN
@@ -177,9 +223,23 @@ new_canceled_status AS (
             ON f.id_schedule = vsl.id_schedule
     WHERE
         (vsl.event_type IN ('VISIT_CANCELED', 'VISIT_REQUEST_CANCELED') OR f.id_succeed_schedule IS NOT NULL)
-        AND f.ts_first_event::date >= '2025-09-01'
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY f.id_schedule ORDER BY id_visit_status_log DESC) = 1
+        AND CAST(f.ts_first_event AS DATE) >= '2025-09-01'
+),
+new_canceled_status AS (
+    SELECT
+        id_booking,
+        id_user,
+        status,
+        reason,
+        reason_enum,
+        reason_category,
+        type,
+        ts_created,
+        ts_first_event
+    FROM
+        new_canceled_status_ranked
+    WHERE
+        rn = 1
 ),
 all_events AS (
     SELECT
@@ -237,9 +297,26 @@ all_events AS (
         ts_first_event
     FROM
         new_canceled_status
+),
+all_events_ranked AS (
+    SELECT
+        CONCAT(CAST(id_booking AS STRING), '-', status) AS id_booking_status,
+        id_booking,
+        id_user,
+        status,
+        reason,
+        reason_enum,
+        reason_category,
+        source,
+        type,
+        ts_created,
+        ts_first_event,
+        ROW_NUMBER() OVER(PARTITION BY id_booking, status ORDER BY IF(source = 'OLD', 1, 0) DESC) AS rn
+    FROM
+        all_events
 )
 SELECT
-    CONCAT(CAST(id_booking AS STRING), '-', status) AS id_booking_status,
+    id_booking_status,
     id_booking,
     id_user,
     status,
@@ -251,6 +328,6 @@ SELECT
     ts_created,
     ts_first_event
 FROM
-    all_events
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_booking, status ORDER BY IF(source = 'OLD', 1, 0) DESC) = 1
+    all_events_ranked
+WHERE
+    rn = 1
