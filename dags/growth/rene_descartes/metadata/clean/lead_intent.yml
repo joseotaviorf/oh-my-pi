@@ -21,6 +21,10 @@ columns:
     description: Foreign key linking back to the House Lead record.
     lineage:
       - datalake_rene_descartes_raw.lead_intent.house_lead_id
+  id_device:
+    description: Device ID associated with the customer at the moment of this intent (e.g., smartphone, tablet, computer). Same identifier type as the values stored in lead_contact_info.linked_devices.
+    lineage:
+      - datalake_rene_descartes_raw.lead_intent.device_id
   origin:
     description: The specific product through which the customer demonstrated intent.
     lineage:
