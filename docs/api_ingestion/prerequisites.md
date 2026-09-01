@@ -3,42 +3,55 @@
 **Audience:** Pipeline authors about to build a new `api_ingestion` DAG.
 
 All new `api_ingestion` DAGs run on **EMR** (see [user_guide.md](user_guide.md) for the runtime
-itself). Before writing a single line of DAG code, SQL, or target schemas, three approval-gated
-prerequisites need to be requested. None of them requires the DAG, the SQL, or even the target
-schema to exist yet — they only need a handful of static facts you already know. Request all
-three as early as possible: every one of them goes through an external team's approval queue,
-and that queue time is almost always the actual bottleneck, not the implementation.
+itself). Before you're done, three approval-gated prerequisites need to be requested. All three
+can — and should — be **started** right away with static facts you already know, but the Data
+Contract has a catch: it can only be **implemented/activated** once the target raw and clean
+schemas already exist in Databricks/Glue/Trino — request/build both together, not one at a time.
+Start the paperwork immediately, just don't merge/activate until both are real.
 
 ## The Three Prerequisites
 
 | # | What | Why It Is Gated | Static Input Needed | Approval Owner |
 | --- | --- | --- | --- | --- |
-| 1 | **Data Contract** (raw + clean) | Access to a new schema is disabled by default | Domain/subdomain + schema names | Data Governance, authX |
+| 1 | **Data Contract** (raw + clean) | Access to a new schema is disabled by default | Domain/subdomain + schema names to start; **both the raw and clean schemas must exist before it can be activated** | Data Governance, authX |
 | 2 | **Cybersec: Application Internet Access** | All new outbound access from EMR is disabled by default | Destination API URL (+ protocol/port/env) | SecurityHub |
 | 3 | **Vault → EMR Secrets Manager Mirror** | EMR reads credentials strictly from AWS Secrets Manager | Target Vault path | Data Platform |
 
 ## Recommended Order
 
-1. **Data Contract — start this first.** It has the longest and least predictable lead time (up
-   to 3 PRs across 2 approving teams), so don't let it be an afterthought. Its only inputs are
-   the domain/subdomain and the raw + clean schema names.
-2. **Cybersec ticket and Vault mirror PR — fire the same day, in either order.** Both need only
-   one static fact (the API URL, and the Vault path, respectively), go through a single approval
-   chain, and have no soft blockers. There's no benefit to sequencing them relative to each other
-   or to waiting on the Data Contract.
+1. **Start all three processes right away, in parallel.** Open the Data Contract PRs (using just
+   the domain/subdomain and the raw + clean schema names), file the Cybersec ticket, and open the
+   Vault mirror PR. None of them blocks another at this stage — **do not merge/apply any of the
+   three yet.**
+2. **Once Cybersec access and the Vault credential mirror are approved/in place, merge the PR
+   that adds the new DAG and run it.** This is what actually materializes the raw and clean
+   schemas — see [user_guide.md](user_guide.md) and [contributing.md](contributing.md). Include
+   the raw tables you actually want, plus **at least one clean table** (a plain `SELECT *` off
+   raw is enough at this stage) so the clean schema is created too — this also makes the raw data
+   queryable/explorable sooner, ahead of building out the real clean-layer transformations.
+3. **Last, merge the Data Contract PRs.** Provisioning applies **incrementally**: if the target
+   raw and clean schemas aren't there yet when the contract is applied, it simply doesn't attach,
+   and it does **not** retry later once they show up — so this step has to come after step 2, not
+   in parallel with it. Follow the specifics in the `provision-data-contract` skill (see "How to
+   provision" below), including requesting/verifying your own access to the contract afterward.
 
 ## 1. Data Contract
 
-Access to a new schema is disabled by default; a Data Contract is what turns it on. The contract
-**does not require the schema to exist** in Databricks/Glue/Trino yet, so it can be created
-before (or in parallel with) building the ingestion DAG.
+Access to a new schema is disabled by default; a Data Contract is what turns it on. You can (and
+should) start the contract PRs early using just the domain/subdomain and schema names, but the
+contract **requires the target raw and clean schemas to already exist together** in
+Databricks/Glue/Trino to actually take effect — provisioning is incremental and one-shot: if
+either schema is missing when the contract is applied/activated, it does not attach, and it will
+**not** automatically pick them up later. Merge/activate the contract only after both schemas
+exist, and re-apply if you activated it too early.
 
-Create one for **both `raw` and `clean`**.
+Create and activate one contract covering **both `raw` and `clean` together** — don't split
+activation across the two.
 
 > In most cases the schema lands in an existing, already-owned domain, so the domain/subdomain
 > input is just as static and self-known as the other two prerequisites. The one exception is a
 > **new** domain/subdomain, where that ownership decision needs to be resolved with your
-> team/Leadership before the contract can be requested, adding delay ahead of the step that
+> team/Leadership before the contract can be requested, adding delay on top of the step that
 > already has the longest tail.
 
 **How to provision:**
@@ -122,5 +135,9 @@ the AWS Secrets Manager `name` to the EMR key). Host: `https://vault.sre.quintoa
 
 ---
 
-Once these three are in flight, proceed to building the DAG — see [user_guide.md](user_guide.md)
-for declaration parameters and [contributing.md](contributing.md) for the implementation map.
+With all three processes started, merge the DAG PR and run it once Cybersec + the Vault mirror
+are approved — see [user_guide.md](user_guide.md) for declaration parameters and
+[contributing.md](contributing.md) for the implementation map. Include at least one clean table
+(a `SELECT *` placeholder is fine to start) alongside the raw tables so both schemas are created
+in the same run. Only merge the Data Contract PRs last, once both the raw and clean schemas
+exist.
