@@ -596,9 +596,10 @@ columns:
       QuintoAndar.
   is_sale_primary_market:
     lineage:
-      - datalake_ebdb_clean.listing_sale_model.is_primary_market
-    description: Whether the sale listing is primary market (new development sold by the
-      builder).
+      - datalake_ebdb_clean.listing_sale_model.sale_type
+    description: Whether any sale listing for the house has sale_type PRIMARY, identifying a
+      new development sold by the builder. NULL and non-PRIMARY values are false; the legacy
+      is_primary_market flag is not used as a fallback.
   is_for_sale:
     lineage:
       - datalake_ebdb_clean.house.is_for_sale

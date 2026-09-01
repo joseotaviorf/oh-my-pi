@@ -47,7 +47,7 @@ WITH special_condition AS (
       AND cb.uuid_company IS NOT NULL
     ) AS is_sale_3p_supply,
     BOOL_OR(lrm.rental_administrator = 'THIRD_PARTY' AND cb.uuid_company IS NOT NULL) AS is_rent_3p_supply,
-    BOOL_OR(lsm.is_primary_market) AS is_sale_primary_market,
+    BOOL_OR(lsm.sale_type = 'PRIMARY') AS is_sale_primary_market,
     BOOL_OR(lsm.has_great_sale_price_tag) AS has_sale_great_price_tag
   FROM datalake_ebdb_clean.listing_business_context AS lbc
   LEFT JOIN datalake_ebdb_clean.listing_sale_model AS lsm
