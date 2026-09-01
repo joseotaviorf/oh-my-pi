@@ -16,12 +16,16 @@ from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     is_validation_run,
 )
+from bietlejuice.clients.db_clients import SparkClient
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_into_birdie_api"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
+dbutils = BaseDBUtils().get_dbutils()
 
 
 def get_df(database_name, table_name, execution_date):
@@ -306,11 +310,6 @@ def main():
             f"m={JOB_NAME}, msg=Skipping Birdie API export in cluster validation mode"
         )
         return
-
-    base_dbutils = BaseDBUtils()
-    global dbutils
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
 
     api_key = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.BIRDIE)
     headers = {"Content-type": "application/json", "Authorization": api_key}
