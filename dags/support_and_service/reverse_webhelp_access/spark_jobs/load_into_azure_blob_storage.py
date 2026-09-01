@@ -41,9 +41,8 @@ def main():
     )
 
     storage_account_name, storage_account_access_key = get_azure_credentials()
-    spark.conf.set(
-        f"fs.azure.account.key.{storage_account_name}.blob.core.windows.net",
-        f"{storage_account_access_key}",
+    _configure_azure_storage_credentials(
+        storage_account_name, storage_account_access_key
     )
     blob_storage_path = f"wasbs://{job_args['azure_container_name']}@{storage_account_name}.blob.core.windows.net/"
 
@@ -101,6 +100,25 @@ def get_azure_credentials():
     return credentials["storage_account_name"], credentials[
         "storage_account_access_key"
     ]
+
+
+def _configure_azure_storage_credentials(
+    storage_account_name: str, storage_account_access_key: str
+) -> None:
+    """Set WASBS account key on Spark and Hadoop configs.
+
+    ``spark.conf`` alone is not always visible to Hadoop FS / the parquet
+    committer on EMR; both layers need the key or writes fall back to
+    anonymous access and fail on non-public accounts.
+    """
+    account_key_conf = (
+        f"fs.azure.account.key.{storage_account_name}.blob.core.windows.net"
+    )
+    spark.conf.set(account_key_conf, storage_account_access_key)
+    spark.conf.set(f"spark.hadoop.{account_key_conf}", storage_account_access_key)
+    spark.sparkContext._jsc.hadoopConfiguration().set(
+        account_key_conf, storage_account_access_key
+    )
 
 
 PARTITION_COLUMNS = ("year", "month", "day")
