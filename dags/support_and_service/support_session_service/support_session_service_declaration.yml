@@ -1,7 +1,7 @@
 dag:
   name: support_session_service
   schedule_start_date: 2025, 7, 29
-  schedule_interval: 0 21 * * *
+  schedule_interval: 0 * * * *
   owner: Data SS
   documentation:
     dag_purpose: |
@@ -22,3 +22,6 @@ workflow:
     support_session:
       raw_z_order_by: [updated_at]
       clean_z_order_by: [ts_updated]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
