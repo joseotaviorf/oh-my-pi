@@ -9,9 +9,8 @@ WITH fact_service AS (
         SUBSTR(theme_detail, 3, LENGTH(theme_detail) - 4) AS theme_detail,
         ROW_NUMBER() OVER(PARTITION BY sk_support_session ORDER BY ts_task_created DESC, sk_task_event DESC) AS rn_task
     FROM dw_support_journey.fact_services
-      WHERE dt_task_created >= DATE_SUB(DATE('{load_start_date}'), 4) 
-          AND dt_task_created <= DATE_ADD(DATE('{load_end_date}' ), 5) 
-          AND is_current = true
+      WHERE dt_task_created >= DATE_SUB(DATE('{load_start_date}'), 20) 
+          AND dt_task_created <= DATE_ADD(DATE('{load_end_date}'), 20) 
           AND sk_support_session IS NOT NULL
           AND sk_support_session != '-1'
           AND queue_name not in ('IVR Events (no workers)')
@@ -23,8 +22,8 @@ contacts_modified as (
 SELECT 
 fcc.sk_support_session
 FROM dw_customer_support.fact_customer_contacts AS fcc
-   WHERE fcc.ts_task_created >= DATE_SUB(DATE('{load_start_date}'), 4) 
-        AND fcc.ts_task_created < DATE_ADD(DATE('{load_end_date}'), 5) 
+   WHERE fcc.ts_task_created >= DATE_SUB(DATE('{load_start_date}'), 20) 
+        AND fcc.ts_task_created < DATE_ADD(DATE('{load_end_date}'), 20) 
         AND fcc.channel IN ('chat', 'call')
         AND fcc.is_interaction_answered = TRUE
 UNION 
@@ -34,8 +33,8 @@ FROM dw_satisfaction_rating.fact_answer AS fa
 LEFT JOIN datalake_satisfaction_rating.satisfaction_answers sa 
         ON sa.id_answer = fa.sk_answer
     WHERE 1=1
-    AND    fa.ts_submitted >= DATE_SUB(DATE('{load_start_date}'), 4) 
-    AND fa.ts_submitted < DATE_ADD(DATE('{load_end_date}'), 5) 
+    AND    fa.ts_submitted >= DATE_SUB(DATE('{load_start_date}'), 20) 
+    AND fa.ts_submitted < DATE_ADD(DATE('{load_end_date}'), 20) 
       AND (
         (sa.service_context IN ('call','call inapp') AND sa.score_description = 'satisfaction evaluation') OR 
         (sa.service_context NOT IN ('call','call inapp')
@@ -119,6 +118,8 @@ customer_contacts AS (
     LEFT JOIN fact_service AS fs
            ON fcc.sk_support_session = fs.sk_support_session_varchar AND fs.rn_task = 1
  WHERE fcc.sk_support_session IN (SELECT sk_support_session FROM contacts_modified)
+        AND   fcc.channel IN ('chat', 'call')
+        AND fcc.is_interaction_answered = TRUE
 ),
 
 
@@ -247,9 +248,7 @@ LEFT JOIN (
           SELECT *,
                  ROW_NUMBER() OVER (PARTITION BY sk_ticket ORDER BY ts_first_response DESC) as rnk
           FROM dw_satisfaction_rating.fact_ticket_csat
-          WHERE ts_first_response >= '{load_start_date}' 
-            AND ts_first_response < DATE_ADD(DATE('{load_end_date}'), 1)
-            AND sk_ticket IS NOT NULL
+            WHERE sk_ticket IS NOT NULL
       ) ftc
       WHERE rnk = 1
   ) AS ftc ON ftc.sk_ticket = cc.sk_ticket AND cc.sk_ticket > 0
@@ -279,8 +278,6 @@ LEFT JOIN dw_customer_support.dim_department AS dd_last
       ON dd_last.sk_department = ft.sk_main_department
 WHERE
     ft.sk_ticket IS NOT NULL
-    AND ft.ts_created >= DATE_SUB(DATE('{load_start_date}'), 4) 
-    AND ft.ts_created < DATE_ADD(DATE('{load_start_date}'), 5) 
 ) as tp ON tp.sk_ticket = cc.sk_ticket AND cc.sk_ticket > 0
 LEFT JOIN satisfaction_ratings AS sa
     ON sa.sk_support_session_fallback_ticket = COALESCE(NULLIF(cc.sk_support_session, '-1'), CAST(tp.sk_ticket AS STRING), CAST(cc.sk_ticket AS STRING))
@@ -289,124 +286,119 @@ LEFT JOIN satisfaction_ratings AS sa
 WHERE cc.is_last_interaction = TRUE
 ),
 recontact_drilldown_d4 AS (
-  SELECT
+SELECT
     tp.sk_support_session_fallback_ticket,
-    
-    -- Substituído DATE_ADD('day', -3, ...) por DATE_SUB(...)
-    DATE_SUB(CAST(tp.dt_created AS DATE), 3) AS recontact_search_window_from,
-    tp.dt_created AS recontact_search_window_until,
+    date_sub(DATE(tp.dt_created), 3) AS recontact_search_window_from,
+    DATE(tp.dt_created) AS recontact_search_window_until,
     
     LEAD(tp.sk_support_session_fallback_ticket) OVER (
-      PARTITION BY tp.sk_user, tp.last_team, tp.theme
-      ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+        PARTITION BY tp.sk_user, tp.last_team, tp.theme
+        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
     ) AS recontact_sk_support_session_fallback_ticket,
     
     LEAD(tp.sk_task) OVER (
-      PARTITION BY tp.sk_user, tp.last_team, tp.theme
-      ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+        PARTITION BY tp.sk_user, tp.last_team, tp.theme
+        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
     ) AS recontact_sk_task,
     
     LEAD(tp.dt_created) OVER (
-      PARTITION BY tp.sk_user, tp.last_team, tp.theme
-      ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+        PARTITION BY tp.sk_user, tp.last_team, tp.theme
+        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
     ) AS recontact_ts_started,
     
     LEAD(tp.agent_email) OVER (
-      PARTITION BY tp.sk_user, tp.last_team, tp.theme
-      ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+        PARTITION BY tp.sk_user, tp.last_team, tp.theme
+        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
     ) AS recontact_agent_email,
     
     LEAD(tp.agent_organization) OVER (
-      PARTITION BY tp.sk_user, tp.last_team, tp.theme
-      ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+        PARTITION BY tp.sk_user, tp.last_team, tp.theme
+        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
     ) AS recontact_agent_organization,
     
-    -- Ajustado DATEDIFF(fim, inicio)
-    DATEDIFF(
-      LEAD(CAST(tp.dt_created AS DATE)) OVER (
-        PARTITION BY tp.sk_user, tp.last_team, tp.theme
-        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
-      ),
-      CAST(tp.dt_created AS DATE)
+    datediff(
+        LEAD(DATE(tp.dt_created)) OVER (
+            PARTITION BY tp.sk_user, tp.last_team, tp.theme
+            ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+        ),
+        DATE(tp.dt_created)
     ) AS recontact_interval_days,
     
-    -- Substituído DATE_DIFF por TIMESTAMPDIFF(unit, start, end)
-    TIMESTAMPDIFF(
-      HOUR,
-      tp.dt_created,
-      LEAD(tp.dt_created) OVER (
-        PARTITION BY tp.sk_user, tp.last_team, tp.theme
-        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
-      )
-    ) AS recontact_interval_hours,
+    CAST((
+        unix_timestamp(LEAD(tp.dt_created) OVER (
+            PARTITION BY tp.sk_user, tp.last_team, tp.theme
+            ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+        )) - unix_timestamp(tp.dt_created )
+    ) / 3600 AS INT) AS recontact_interval_hours,
     
     CASE
-      WHEN DATEDIFF(
-             LEAD(CAST(tp.dt_created AS DATE)) OVER (
-               PARTITION BY tp.sk_user, tp.last_team
-               ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
-             ),
-             CAST(tp.dt_created AS DATE)
-           ) <= 4
-      THEN
-        CASE
-          WHEN tp.sk_support_session_fallback_ticket <> LEAD(tp.sk_support_session_fallback_ticket) OVER (
-                 PARTITION BY tp.sk_user, tp.last_team
-                 ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
-               )
-          THEN 1 ELSE 0
-        END
-      ELSE 0
+        WHEN datediff(
+                LEAD(DATE(tp.dt_created)) OVER (
+                    PARTITION BY tp.sk_user, tp.last_team
+                    ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+                ),
+                DATE(tp.dt_created)
+             ) <= 4
+        THEN
+            CASE
+                WHEN tp.sk_support_session_fallback_ticket <> LEAD(tp.sk_support_session_fallback_ticket) OVER (
+                        PARTITION BY tp.sk_user, tp.last_team
+                        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+                     )
+                THEN 1 ELSE 0
+            END
+        ELSE 0
     END AS recontact_flag,
     
     CASE
-      WHEN tp.theme IS NULL THEN 0
-      WHEN DATEDIFF(
-             LEAD(CAST(tp.dt_created AS DATE)) OVER (
-               PARTITION BY tp.sk_user, tp.last_team, tp.theme
-               ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
-             ),
-             CAST(tp.dt_created AS DATE)
-           ) <= 4
-      THEN
-        CASE
-          WHEN tp.sk_support_session_fallback_ticket <> LEAD(tp.sk_support_session_fallback_ticket) OVER (
-                 PARTITION BY tp.sk_user, tp.last_team, tp.theme
-                 ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
-               )
-          THEN 1 ELSE 0
-        END
-      ELSE 0
+        WHEN tp.theme IS NULL THEN 0
+        WHEN datediff(
+                LEAD(DATE(tp.dt_created)) OVER (
+                    PARTITION BY tp.sk_user, tp.last_team, tp.theme
+                    ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+                ),
+                DATE(tp.dt_created)
+             ) <= 4
+        THEN
+            CASE
+                WHEN tp.sk_support_session_fallback_ticket <> LEAD(tp.sk_support_session_fallback_ticket) OVER (
+                        PARTITION BY tp.sk_user, tp.last_team, tp.theme
+                        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+                     )
+                THEN 1 ELSE 0
+            END
+        ELSE 0
     END AS theme_recontact_flag,
     
     CASE
-      WHEN tp.theme IS NULL THEN 0
-      WHEN DATEDIFF(
-             LEAD(CAST(tp.dt_created AS DATE)) OVER (
-               PARTITION BY tp.sk_user, tp.last_team, tp.theme
-               ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
-             ),
-             CAST(tp.dt_created AS DATE)
-           ) = 0
-      THEN
-        CASE
-          WHEN tp.sk_support_session_fallback_ticket <> LEAD(tp.sk_support_session_fallback_ticket) OVER (
-                 PARTITION BY tp.sk_user, tp.last_team, tp.theme
-                 ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
-               )
-          THEN 1 ELSE 0
-        END
-      ELSE 0
+        WHEN tp.theme IS NULL THEN 0
+        WHEN datediff(
+                LEAD(DATE(tp.dt_created)) OVER (
+                    PARTITION BY tp.sk_user, tp.last_team, tp.theme
+                    ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+                ),
+                DATE(tp.dt_created)
+             ) = 0
+        THEN
+            CASE
+                WHEN tp.sk_support_session_fallback_ticket <> LEAD(tp.sk_support_session_fallback_ticket) OVER (
+                        PARTITION BY tp.sk_user, tp.last_team, tp.theme
+                        ORDER BY tp.dt_created, tp.sk_support_session_fallback_ticket
+                     )
+                THEN 1 ELSE 0
+            END
+        ELSE 0
     END AS theme_recontact_flag_D0
-
-  FROM last_contacts AS tp
-  WHERE 1 = 1
-    AND tp.direction = 'inbound'
-    AND tp.last_department NOT IN ('Welcome Onboarding [BACK] [POS]', 'CX Welcome Onboarding [FRONT][POS]')
-    AND tp.channel IN ('call', 'chat', 'email')
-    AND tp.sk_user IS NOT NULL
-    AND tp.sk_user > 0
+    
+FROM last_contacts AS tp
+WHERE 1 = 1
+  AND tp.direction = 'inbound'
+  AND tp.last_department NOT IN ('Welcome Onboarding [BACK] [POS]', 'CX Welcome Onboarding [FRONT][POS]')
+  AND tp.channel IN ('call', 'chat', 'email')
+  AND tp.sk_user IS NOT NULL
+  AND tp.sk_user > 0
 ),
+
 
 final_output AS (
     SELECT
@@ -458,8 +450,6 @@ final_output AS (
         ON rd4.sk_support_session_fallback_ticket = lc.sk_support_session_fallback_ticket
         AND lc.sk_support_session_fallback_ticket IS NOT NULL
         AND lc.sk_support_session_fallback_ticket != '-1'
-    WHERE lc.contact_dt_created >= DATE('{load_start_date}') 
-        AND lc.contact_dt_created <= DATE('{load_end_date}') 
 )
 SELECT
     sk_support_session,
