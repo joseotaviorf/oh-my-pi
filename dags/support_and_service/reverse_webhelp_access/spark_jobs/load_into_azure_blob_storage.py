@@ -122,13 +122,21 @@ def _configure_azure_storage_credentials(
 
 
 PARTITION_COLUMNS = ("year", "month", "day")
+TEMPORARY_DIR_NAME = "_temporary"
+
+
+def _set_hadoop_conf(key: str, value: str) -> None:
+    spark.conf.set(key, value)
+    spark.conf.set(f"spark.hadoop.{key}", value)
+    spark.sparkContext._jsc.hadoopConfiguration().set(key, value)
 
 
 def _configure_azure_parquet_write() -> None:
-    """Use the standard Hadoop committer for WASBS writes.
+    """Configure parquet writes for WASBS on EMR.
 
-    EMR's ``EmrOptimizedSparkSqlParquetOutputCommitter`` cleanup fails on Azure
-    Blob Storage with ``StorageException: non-empty directory``.
+    EMR's optimized committer and Hadoop's default ``cleanupJob`` both try to
+    recursively delete ``_temporary`` on Azure Blob, which fails with
+    ``StorageException: non-empty directory``.
     """
     spark.conf.set(
         "spark.sql.sources.commitProtocolClass",
@@ -138,6 +146,9 @@ def _configure_azure_parquet_write() -> None:
         "spark.sql.parquet.output.committer.class",
         "org.apache.parquet.hadoop.ParquetOutputCommitter",
     )
+    _set_hadoop_conf("mapreduce.fileoutputcommitter.algorithm.version", "2")
+    _set_hadoop_conf("mapreduce.fileoutputcommitter.cleanup.skipped", "true")
+    _set_hadoop_conf("mapreduce.fileoutputcommitter.cleanup-failures.ignored", "true")
 
 
 def _partition_output_path(base_path: str, execution_date: datetime) -> str:
@@ -158,7 +169,31 @@ def _delete_wasbs_tree(fs, hadoop_path) -> None:
     if status.isDirectory():
         for child in fs.listStatus(hadoop_path):
             _delete_wasbs_tree(fs, child.getPath())
-    fs.delete(hadoop_path, False)
+    if not fs.delete(hadoop_path, False):
+        raise RuntimeError(f"Failed to delete WASBS path: {hadoop_path}")
+
+
+def _delete_partition_temporary_dirs(fs, hadoop_path) -> None:
+    """Delete leftover ``_temporary`` dirs from a failed prior commit/cleanup."""
+    if not fs.exists(hadoop_path):
+        return
+    if not fs.getFileStatus(hadoop_path).isDirectory():
+        return
+    for child in fs.listStatus(hadoop_path):
+        child_path = child.getPath()
+        if child.isDirectory() and child_path.getName() == TEMPORARY_DIR_NAME:
+            logger.info(
+                f"m=_delete_partition_temporary_dirs, path={child_path}, "
+                "msg=Deleting leftover _temporary folder"
+            )
+            _delete_wasbs_tree(fs, child_path)
+
+
+def _assert_partition_path_clean(fs, hadoop_path, path: str) -> None:
+    if fs.exists(hadoop_path):
+        raise RuntimeError(
+            f"Day partition could not be fully cleared before write: path={path}"
+        )
 
 
 def _replace_execution_date_partition(path: str) -> None:
@@ -175,7 +210,9 @@ def _replace_execution_date_partition(path: str) -> None:
     logger.info(
         f"m=_replace_execution_date_partition, path={path}, msg=Deleting day partition"
     )
+    _delete_partition_temporary_dirs(fs, hadoop_path)
     _delete_wasbs_tree(fs, hadoop_path)
+    _assert_partition_path_clean(fs, hadoop_path, path)
 
 
 def load_table_in_azure_blob_storage(
