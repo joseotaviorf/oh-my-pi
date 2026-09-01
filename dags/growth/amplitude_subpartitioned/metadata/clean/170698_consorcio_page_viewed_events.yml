@@ -53,6 +53,26 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Event property that indicates in which platform the event was triggered
+  ep_promo_origin:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Identifies users who reached the landing page via internal locations on the app. Equals to utm_source on the qcx lead table and hubspot
+  ep_promo_channel:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Identifies if the internal user reached the landing page via an in product promo or a banner. Equals to utm_medium on the qcx lead table and hubspot
+  ep_promo_keyword:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Identifies the keyword that was placed on the internal banner. Equals to utm_term on the qcx lead table and hubspot
+  ep_promo_offer:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Identifies the position and page of the internal product promo or banner that redirected the user to the landing page. Equals to utm_campaign on the qcx lead table and hubspot
+  ep_promo_creative:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Details the type of campaign. Equals to utm_content on the qcx lead table and hubspot
   ep_utm_source:
     lineage:
     - datalake_amplitude_clean.events.event_properties
