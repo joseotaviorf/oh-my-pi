@@ -3,10 +3,9 @@ database_name: datalake_agent_accreditation
 table_name: business_context
 description: |
   Historical record of business contexts assigned to visit agents over time.
-  Combines legacy agent-data audit intervals with Agent Domain capability settings,
-  reconstructing non-overlapping single-context validity windows from ADD/DELETE
-  events. Agent Domain takes precedence over legacy rows, and SALE wins same-source
-  timestamp conflicts.
+  Combines legacy agent-data audit intervals with Agent Domain capability settings.
+  When multiple contexts share the same revision instant, ADD wins over DEL and SALE
+  wins over other contexts so a single non-overlapping validity window remains.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -65,6 +64,5 @@ columns:
       - datalake_ebdb_user.user_revision_entity.ts_revision
       - datalake_ebdb_agent_events.capability_settings.ts_started
     description: |
-      End of the selected business context validity window. Legacy rows close immediately
-      before the next selected state, context deletion, or Agent Domain cutover; Agent
-      Domain rows close immediately before the next context event. Null when open-ended.
+      End of the business context validity window: immediately before the next context
+      revision for the same agent identity, or null when still open.
