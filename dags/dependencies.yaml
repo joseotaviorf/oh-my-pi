@@ -1130,6 +1130,7 @@ bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
+  - bietlejuice.enrich_sale_primary_market:load-enrich-listing-sale-type:first-run-of-day
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event:first-run-of-day
 bietlejuice.dw_sale_visits:
   - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment:first-run-of-day
@@ -3778,6 +3779,7 @@ bietlejuice.enrich_sale_ongoing_listings:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
+  - bietlejuice.enrich_sale_primary_market:load-enrich-listing-sale-type:first-run-of-day
 bietlejuice.enrich_sale_potential_listing:
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
