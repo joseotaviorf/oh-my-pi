@@ -255,7 +255,15 @@ columns:
   is_primary_market:
     lineage:
     - datalake_ebdb_listing.house.is_sale_primary_market
-    description: Boolean column describing whether the listing is of the primary market type. The primary market is the market of new properties, that is, properties that have never been inhabited.
+    description: >-
+      Whether the sale listing is Primary Market (new development sold by the
+      builder). Passthrough of house.is_sale_primary_market, which is true only
+      when listing_sale_model.sale_type is PRIMARY; NULL and non-PRIMARY values
+      are false, with no legacy is_primary_market fallback (AAREDE-481).
+      Facts that do not yet denormalize this flag should join
+      dw_sale.dim_listing on sk_house (established pattern) or sk_sale_listing
+      when the fact has that key, then filter is_primary_market. Wave 2
+      (AAREDE-484+) copies the flag onto facts so the join is no longer required.
   is_offer_and_visit_stranded:
     description: Boolean column that indicates if the listing is also Visit Stranded if it has the Offer Stranded status. According to the table construction, for the `stranded_status` column, when a listing is Offer Stranded, we will mark it as Offer Stranded regardless of whether it is also Visit Stranded. This flag is to provide this visibility.
     lineage:
