@@ -2,50 +2,80 @@ WITH
 users_last_register AS (
   SELECT
     *
-  FROM
-    datalake_olos_dialer_clean.users
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_agent ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY id_agent ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+    FROM
+      datalake_olos_dialer_clean.users
+  ) AS ranked_users
+  WHERE
+    rn = 1
 ),
 campaign_last_register AS (
   SELECT
     *
-  FROM
-    datalake_olos_dialer_clean.campaign
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_campaign ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY id_campaign ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+    FROM
+      datalake_olos_dialer_clean.campaign
+  ) AS ranked_campaign
+  WHERE
+    rn = 1
 ),
 disposition_last_register AS (
   SELECT
     *
-  FROM
-    datalake_olos_dialer_clean.disposition
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_disposition ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY id_disposition ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+    FROM
+      datalake_olos_dialer_clean.disposition
+  ) AS ranked_disposition
+  WHERE
+    rn = 1
 ),
 info_campaign_type_last_register AS (
   SELECT
     *
-  FROM
-    datalake_olos_dialer_clean.info_campaign_type
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_campaign_type ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY id_campaign_type ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+    FROM
+      datalake_olos_dialer_clean.info_campaign_type
+  ) AS ranked_info_campaign_type
+  WHERE
+    rn = 1
 ),
 campaign_customer_last_register AS (
   SELECT
     *
-  FROM
-    datalake_olos_dialer_clean.campaign_customer
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_campaign, id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY id_campaign, id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+    FROM
+      datalake_olos_dialer_clean.campaign_customer
+  ) AS ranked_campaign_customer
+  WHERE
+    rn = 1
 ),
 customer_last_register AS (
   SELECT
     *
-  FROM
-    datalake_olos_dialer_clean.customer
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+    FROM
+      datalake_olos_dialer_clean.customer
+  ) AS ranked_customer
+  WHERE
+    rn = 1
 )
 SELECT
   outbound.id_call AS id_call,
@@ -69,7 +99,7 @@ SELECT
     WHEN outbound.id_phone_type = 65536 THEN 'MsBot'
   END AS phone_type,
   customer.name AS organization,
-  DATEDIFF(SECOND, outbound.ts_started, outbound.ts_call_ended) AS duration_in_seconds,
+  TIMESTAMPDIFF(SECOND, outbound.ts_started, outbound.ts_call_ended) AS duration_in_seconds,
   outbound.ts_started AS ts_call_started,
   outbound.ts_call_ended AS ts_call_ended,
   outbound.year AS year,

@@ -2,26 +2,41 @@ WITH
 campaign_last_register AS (
     SELECT
         *
-    FROM
-        datalake_olos_dialer_clean.campaign
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_campaign ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+    FROM (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (PARTITION BY id_campaign ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+        FROM
+            datalake_olos_dialer_clean.campaign
+    ) AS ranked_campaign
+    WHERE
+        rn = 1
 ),
 campaign_customer_last_register AS (
     SELECT
         *
-    FROM
-        datalake_olos_dialer_clean.campaign_customer
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_campaign, id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+    FROM (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (PARTITION BY id_campaign, id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+        FROM
+            datalake_olos_dialer_clean.campaign_customer
+    ) AS ranked_campaign_customer
+    WHERE
+        rn = 1
 ),
 customer_last_register AS (
     SELECT
         *
-    FROM
-        datalake_olos_dialer_clean.customer
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) = 1
+    FROM (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (PARTITION BY id_customer ORDER BY DATE(year||'-'||month||'-'||day) DESC) AS rn
+        FROM
+            datalake_olos_dialer_clean.customer
+    ) AS ranked_customer
+    WHERE
+        rn = 1
 )
 SELECT
     mailing.id_lead,

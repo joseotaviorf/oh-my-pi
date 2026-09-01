@@ -72,7 +72,15 @@ leads_share AS (
             'Owner PWA - Paid',
             'Inbound'
         )
-    GROUP BY ALL
+    GROUP BY
+        DATE_TRUNC('month', obt.date),
+        obt.city_group,
+        obt.campaign_landing_page,
+        obt.campaign_business_context,
+        obt.source,
+        obt.medium,
+        obt.company_report_origin,
+        obt.planning_cluster
 ),
 -- -----------------------------------------------------------------------------
 -- PASSO 4: Share de prospects por BU dentro da origem
@@ -116,7 +124,16 @@ prospects_share AS (
             'Owner PWA - Paid',
             'Inbound'
         )
-    GROUP BY ALL
+    GROUP BY
+        DATE_TRUNC('month', obt.date),
+        obt.city_group,
+        obt.campaign_landing_page,
+        obt.campaign_business_context,
+        obt.source,
+        obt.medium,
+        obt.company_report_origin,
+        obt.planning_cluster,
+        obt.nm_business_context
 ),
 -- -----------------------------------------------------------------------------
 -- PASSO 1: Custo total da campanha
@@ -158,7 +175,19 @@ costs AS (
     WHERE
         ms.funnel_side = 'Supply'
         AND mc.year >= 2023
-    GROUP BY ALL
+    GROUP BY
+        dd.date,
+        dr.city_group,
+        mc.utm_campaign,
+        mc.sk_campaign,
+        ms.naming_convention_sufix,
+        ms.campaign_strategy_intent,
+        ms.campaign_landing_page,
+        ms.campaign_business_context,
+        ms.source,
+        ms.medium,
+        ms.funnel_side,
+        ms.behavior_type
 ),
 -- -----------------------------------------------------------------------------
 -- VERIFICAÇÃO DE DADOS (FALLBACK)
