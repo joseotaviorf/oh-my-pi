@@ -325,12 +325,12 @@ uv run --directory packages/bietlejuice-airflow pytest test/unit/airflow/dag_bui
 
 - **`payload_filters`** (optional) — filter source raw `payload` JSON before collecting IDs.
 - **`max_workers`** (optional) — parallel HTTP fan-out on the Spark **driver** (`ThreadPoolExecutor`); see user guide (not Spark executor parallelism).
-- **`date_expansion`** (optional, table-level) — repeat each entity call for multiple date param values (`last_n_days` / calendar-month strategies).
+- **`date_expansion`** (optional, table-level) — repeat each entity call for multiple date param values (`last_n_days` / calendar-month strategies). Also works on plain tables **without** `id_expansion` (one paginated fetch per date), and `param_names` (list) sets several params to the same expanded date (e.g. `[from, to]` for one-day-capped range endpoints).
 - **`api_policies.pagination`** on the same table (e.g. **`page_per_page`**) — used inside the fan-out for **GET** so each per-entity call can walk all pages.
 
 | Concern | Primary file |
 |---------|----------------|
-| Fan-out loop, path substitution, row stamping, paginator wiring | [`dags/cross/base/spark_jobs/load_api_ingestion_raw.py`](../../dags/cross/base/spark_jobs/load_api_ingestion_raw.py) — `_fetch_with_id_expansion()` |
+| Fan-out loop, path substitution, row stamping, paginator wiring | [`dags/cross/base/spark_jobs/load_api_ingestion_raw.py`](../../dags/cross/base/spark_jobs/load_api_ingestion_raw.py) — `_fetch_with_id_expansion()`; plain per-date fetches: `_fetch_plain_once()` + `_date_expansion_param_names()` |
 | Loader helpers (`get_id_expansion_config`, paginator factory) | [`bietlejuice/base/api/configuration/loader.py`](../../bietlejuice/base/api/configuration/loader.py) |
 | Declaration validation (`source_table`, `id_field`, exactly one of `param_name` / `path_param` / `json_body_field`, `correlation_field`) | [`bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py`](../../bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py) |
 | Regression tests | [`packages/bietlejuice-runtime/test/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py`](../../packages/bietlejuice-runtime/test/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py) |

@@ -134,9 +134,18 @@ workflow:
       extraction_type: incremental
       date_format: "%Y-%m-%d"
       date_filter_column: date
-      params:
-        from: load_start_date
-        to: load_end_date
+      # The punches API caps from/to at one day ("Date range from-to cannot be
+      # bigger than 1 day"), so the 45-day lookback for retroactive punch
+      # adjustments (is_manual_adjustment) is one paginated call per day:
+      # date_expansion sets from and to to each expanded date (mirrors the
+      # hoursbank_totals lookback). Incremental raw APPENDS the overlapping
+      # copies; clean dedups per id_punch by latest ts_load before merging.
+      date_expansion:
+        param_names: [from, to]
+        strategy: last_n_days
+        days: 45
+        anchor: load_end_date
+      params: {}
       api_policies:
         pagination:
           strategy: page_per_page

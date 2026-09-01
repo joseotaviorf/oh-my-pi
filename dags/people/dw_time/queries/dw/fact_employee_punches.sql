@@ -36,7 +36,10 @@ WITH deduped_punches AS (
     FROM
         datalake_oitchau_clean.punches
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
+        -- Match the punches ingestion lookback_days: 45 — retroactive punch
+        -- adjustments land in old punch-date partitions; the merge on id_punch
+        -- keeps the wider window idempotent.
+        MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{load_start_date}'), 45)
             AND DATE('{load_end_date}')
 ),
 latest_punches AS (

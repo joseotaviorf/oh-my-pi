@@ -348,18 +348,24 @@ id_expansion:
 
 ### `date_expansion` (per-table, optional)
 
-When an endpoint accepts a **single date param per call** (e.g. Oitchau `employees/hoursbank/totals?date=`), use table-level **`date_expansion`** to repeat each entity fan-out for multiple dates. Tasks become **entity × date**.
+When an endpoint bounds how much time one call may cover, use table-level **`date_expansion`** to repeat the fetch for multiple dates. It works in two shapes:
+
+- **With `id_expansion`** (e.g. Oitchau `employees/hoursbank/totals?date=`): tasks become **entity × date**.
+- **Without `id_expansion`** (plain table, e.g. Oitchau `punches?from=&to=`): the job performs **one fetch per expanded date** (each with the table's pagination, when configured) and concatenates the results.
 
 | Key | Required | Description |
 |-----|----------|-------------|
-| `param_name` | yes | Query param to override per iteration (e.g. `date`) |
+| `param_name` | one of `param_name` / `param_names` | Query param to override per iteration (e.g. `date`) |
+| `param_names` | one of `param_name` / `param_names` | List of query params **all set to the same expanded date** — for range endpoints that cap the window at one day (e.g. `[from, to]` when the API answers `400 "Date range from-to cannot be bigger than 1 day"`) |
 | `strategy` | yes | `last_n_days` — inclusive rolling window of `days` ending on the anchor; or `previous_and_current_calendar_month` — from the 1st of the previous calendar month through the anchor |
 | `days` | when `strategy: last_n_days` | Positive integer (e.g. `45` for ~six weeks of retroactive hours-bank adjustments) |
 | `anchor` | no | `load_end_date` (default) or `load_start_date` — last day of the window for `last_n_days` |
 
 Keep the **clean SQL** date filter aligned with the chosen window (e.g. for `last_n_days: 45` and `anchor: load_end_date`, filter `dt_balanced` between `DATE_ADD(load_end_date, -44)` and `load_end_date` inclusive).
 
-Combine with `id_expansion.max_workers` and `payload_filters` to control volume and concurrency. Without parallel workers, a large lookback window will usually exceed Airflow task timeouts.
+Under `id_expansion`, combine with `max_workers` and `payload_filters` to control volume and concurrency — without parallel workers, a large lookback window will usually exceed Airflow task timeouts. Plain (non-`id_expansion`) tables fetch the expanded dates sequentially, one paginated fetch per date.
+
+Raw incremental loads **append**: every run re-appends the overlapping window, so pair the lookback with a `merge_on` key and a latest-`ts_load` dedup in the clean query (see the punches example).
 
 ### Runtime behaviour
 
@@ -403,6 +409,41 @@ tables_customization:
 ```
 
 This fetches hours-bank balances for each **active** employee UUID for each of the last **45 days** through `load_end_date` (one API call per employee per day), with up to 32 parallel HTTP workers on the Spark driver.
+
+### Example — daily range endpoint without id_expansion (OiTchau `punches`)
+
+The punches API takes `from`/`to` but rejects ranges wider than one day, and
+retroactive punch adjustments (`is_manual_adjustment`) land on past dates —
+so the lookback is one paginated call per day with both params pinned to the
+expanded date:
+
+```yaml
+tables_customization:
+  punches:
+    endpoint_path: punches
+    extraction_type: incremental
+    date_format: "%Y-%m-%d"
+    date_filter_column: date
+    date_expansion:
+      param_names: [from, to]
+      strategy: last_n_days
+      days: 45
+      anchor: load_end_date
+    params: {}
+    api_policies:
+      pagination:
+        strategy: page_per_page
+        page_param: page
+        per_page_param: per_page
+        page_size: 100
+    merge_on:
+      - id_punch
+```
+
+Keep the **clean SQL** read window aligned (e.g. `MAKE_DATE(year, month, day)
+BETWEEN DATE_ADD(load_end_date, -44) AND load_end_date` when `anchor:
+load_end_date` and `days: 45`) so re-fetched old punch-date partitions flow
+through, and dedup per `id_punch` by latest `ts_load` before the merge.
 
 ### Example — POST JSON body fan-out (OiTchau `costs/list`)
 

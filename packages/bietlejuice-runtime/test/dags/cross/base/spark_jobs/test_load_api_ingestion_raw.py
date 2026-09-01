@@ -29,8 +29,10 @@ sys.modules["bietlejuice.base.api.configuration.declaration_loader"] = MagicMock
 sys.modules["bietlejuice.base.api.configuration.loader"] = MagicMock()
 
 from dags.cross.base.spark_jobs.load_api_ingestion_raw import (  # noqa: E402
+    _date_expansion_param_names,
     _dates_last_n_days,
     _dates_previous_and_current_calendar_month,
+    _fetch_plain_once,
     _fetch_with_id_expansion,
     _format_date_expansion_value,
     _resolve_date_expansion_values,
@@ -621,3 +623,98 @@ class TestFetchWithIdExpansion:
                 load_start_date="2026-04-12",
                 load_end_date="2026-04-12",
             )
+
+
+class TestDateExpansionParamNames:
+    """Tests for _date_expansion_param_names."""
+
+    def test_single_param_name(self):
+        assert _date_expansion_param_names({"param_name": "date"}) == ["date"]
+
+    def test_param_names_list(self):
+        assert _date_expansion_param_names({"param_names": ["from", "to"]}) == [
+            "from",
+            "to",
+        ]
+
+    def test_param_names_wins_over_param_name(self):
+        config = {"param_name": "date", "param_names": ["from", "to"]}
+        assert _date_expansion_param_names(config) == ["from", "to"]
+
+    def test_missing_both_raises(self):
+        with pytest.raises(ValueError, match="date_expansion.param_name"):
+            _date_expansion_param_names({"strategy": "last_n_days"})
+
+    def test_empty_param_names_raises(self):
+        with pytest.raises(ValueError, match="param_names"):
+            _date_expansion_param_names({"param_names": []})
+
+    def test_non_string_param_names_raises(self):
+        with pytest.raises(ValueError, match="param_names"):
+            _date_expansion_param_names({"param_names": ["from", 2]})
+
+
+class TestFetchPlainOnce:
+    """Tests for the plain (non-id_expansion) fetch helper."""
+
+    @staticmethod
+    def _loader_with_pages(pages):
+        loader = MagicMock()
+        paginator = MagicMock()
+        paginator.fetch_all.return_value = iter(pages)
+        loader.create_paginator.return_value = paginator
+        return loader
+
+    def test_paginated_fetch_concatenates_pages(self):
+        loader = self._loader_with_pages([[{"id": 1}], [{"id": 2}, {"id": 3}]])
+        client = MagicMock()
+
+        rows = _fetch_plain_once(
+            client=client,
+            loader=loader,
+            table_config={},
+            table_name="punches",
+            endpoint="punches",
+            params={"from": "2026-08-07", "to": "2026-08-07"},
+        )
+
+        assert [row["id"] for row in rows] == [1, 2, 3]
+        loader.create_paginator.assert_called_once_with(
+            client, "punches", {"from": "2026-08-07", "to": "2026-08-07"}
+        )
+        client.get.assert_not_called()
+
+    def test_single_page_uses_results_response_path(self):
+        loader = MagicMock()
+        loader.create_paginator.return_value = None
+        client = MagicMock()
+        client.get.return_value.json.return_value = {"items": [{"id": 9}]}
+
+        rows = _fetch_plain_once(
+            client=client,
+            loader=loader,
+            table_config={"results_response_path": "items"},
+            table_name="events",
+            endpoint="events",
+            params={},
+        )
+
+        assert rows == [{"id": 9}]
+        client.get.assert_called_once_with("events", params={})
+
+    def test_single_page_list_response(self):
+        loader = MagicMock()
+        loader.create_paginator.return_value = None
+        client = MagicMock()
+        client.get.return_value.json.return_value = [{"id": 1}]
+
+        rows = _fetch_plain_once(
+            client=client,
+            loader=loader,
+            table_config={},
+            table_name="events",
+            endpoint="events",
+            params={},
+        )
+
+        assert rows == [{"id": 1}]

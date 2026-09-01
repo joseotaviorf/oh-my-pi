@@ -199,6 +199,37 @@ def _resolve_date_expansion_values(
     )
 
 
+def _date_expansion_param_names(
+    date_expansion_config: Dict[str, Any],
+) -> List[str]:
+    """
+    Resolves the query param name(s) that receive each expanded date value.
+
+    ``param_names`` (non-empty list) sets every listed param to the same expanded
+    date — for range APIs that cap from/to at one day (e.g. OiTchau punches,
+    ``param_names: [from, to]``). The legacy single ``param_name`` still works.
+    """
+    param_names = date_expansion_config.get("param_names")
+    if param_names is not None:
+        if (
+            not isinstance(param_names, list)
+            or not param_names
+            or not all(isinstance(name, str) and name for name in param_names)
+        ):
+            raise ValueError(
+                "m=_date_expansion_param_names, msg=date_expansion.param_names "
+                "must be a non-empty list of strings"
+            )
+        return list(param_names)
+    param_name = date_expansion_config.get("param_name")
+    if not param_name:
+        raise ValueError(
+            "m=_date_expansion_param_names, msg=date_expansion.param_name (or "
+            "param_names) is required when date_expansion is configured"
+        )
+    return [param_name]
+
+
 def _warn_if_unpaginated_multi_page(
     data: Any,
     *,
@@ -232,7 +263,7 @@ def _fetch_one_entity(
     endpoint: str,
     initial_params: Dict[str, Any],
     entity_id: str,
-    date_param_name: Optional[str],
+    date_param_names: Optional[List[str]],
     date_param_value: Optional[str],
 ) -> Tuple[List[Dict[str, Any]], bool]:
     """
@@ -249,8 +280,9 @@ def _fetch_one_entity(
     json_body_field = id_expansion_config.get("json_body_field")
 
     params = dict(initial_params)
-    if date_param_name and date_param_value is not None:
-        params[date_param_name] = date_param_value
+    if date_param_names and date_param_value is not None:
+        for date_param_name in date_param_names:
+            params[date_param_name] = date_param_value
 
     resolved_endpoint = endpoint
     if path_param:
@@ -401,14 +433,9 @@ def _fetch_with_id_expansion(
     date_values = _resolve_date_expansion_values(
         date_expansion_config, load_start_date, load_end_date
     )
-    date_param_name = None
+    date_param_names = None
     if date_expansion_config:
-        date_param_name = date_expansion_config.get("param_name")
-        if not date_param_name:
-            raise ValueError(
-                "m=_fetch_with_id_expansion, msg=date_expansion.param_name is required "
-                "when date_expansion is configured"
-            )
+        date_param_names = _date_expansion_param_names(date_expansion_config)
         date_values = [
             None if value is None else _format_date_expansion_value(value, date_format)
             for value in date_values
@@ -505,7 +532,7 @@ def _fetch_with_id_expansion(
                 endpoint=endpoint,
                 initial_params=initial_params,
                 entity_id=entity_id,
-                date_param_name=date_param_name,
+                date_param_names=date_param_names,
                 date_param_value=date_value,
             )
         except Exception as exc:
@@ -561,6 +588,62 @@ def _fetch_with_id_expansion(
         failed,
     )
     return all_results
+
+
+def _fetch_plain_once(
+    client: Any,
+    loader: APIConfigurationLoader,
+    table_config: Dict[str, Any],
+    table_name: str,
+    endpoint: str,
+    params: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    """One plain (non-id_expansion) fetch: paginated when configured, else single page."""
+    paginator = loader.create_paginator(client, endpoint, params)
+
+    results: List[Dict[str, Any]] = []
+    if paginator:
+        LOGGER.info(
+            "m=_fetch_plain_once, table_name=%s msg=Fetching data with pagination",
+            table_name,
+        )
+        page_num = 0
+        for page_results in paginator.fetch_all():
+            page_num += 1
+            results.extend(page_results)
+            LOGGER.info(
+                "m=_fetch_plain_once, table_name=%s, page=%d, page_records=%d, "
+                "total_records=%d msg=Page fetched",
+                table_name,
+                page_num,
+                len(page_results),
+                len(results),
+            )
+        return results
+
+    LOGGER.info(
+        "m=_fetch_plain_once, table_name=%s msg=Fetching single page (no pagination)",
+        table_name,
+    )
+    response = client.get(endpoint, params=params)
+    data = response.json() if hasattr(response, "json") else response
+    if isinstance(data, dict):
+        results_path = table_config.get("results_response_path", "results")
+        results = data.get(results_path, [])
+        if not results and "data" in data:
+            results = data.get("data", [])
+        if not results and "content" in data:
+            content = data.get("content")
+            if isinstance(content, list):
+                results = content
+    elif isinstance(data, list):
+        results = data
+    LOGGER.info(
+        "m=_fetch_plain_once, table_name=%s, records=%d msg=Single page response received",
+        table_name,
+        len(results),
+    )
+    return results
 
 
 def main() -> None:
@@ -682,49 +765,38 @@ def main() -> None:
             date_format=date_format,
         )
     else:
-        paginator = loader.create_paginator(client, endpoint, initial_params)
+        date_values = _resolve_date_expansion_values(
+            date_expansion_config, args.load_start_date, args.load_end_date
+        )
+        date_param_names: List[str] = []
+        if date_expansion_config:
+            date_param_names = _date_expansion_param_names(date_expansion_config)
 
         all_results = []
-        if paginator:
-            LOGGER.info(
-                "m=main, table_name=%s msg=Fetching data with pagination",
-                args.table_name,
+        for date_value in date_values:
+            call_params = dict(initial_params)
+            if date_value is not None:
+                formatted_date = _format_date_expansion_value(date_value, date_format)
+                for date_param_name in date_param_names:
+                    call_params[date_param_name] = formatted_date
+            date_results = _fetch_plain_once(
+                client=client,
+                loader=loader,
+                table_config=table_config,
+                table_name=args.table_name,
+                endpoint=endpoint,
+                params=call_params,
             )
-            page_num = 0
-            for page_results in paginator.fetch_all():
-                page_num += 1
-                all_results.extend(page_results)
+            all_results.extend(date_results)
+            if date_value is not None:
                 LOGGER.info(
-                    "m=main, table_name=%s, page=%d, page_records=%d, total_records=%d "
-                    "msg=Page fetched",
+                    "m=main, table_name=%s, date=%s, date_records=%d, total_records=%d "
+                    "msg=Date expansion fetch complete",
                     args.table_name,
-                    page_num,
-                    len(page_results),
+                    date_value,
+                    len(date_results),
                     len(all_results),
                 )
-        else:
-            LOGGER.info(
-                "m=main, table_name=%s msg=Fetching single page (no pagination)",
-                args.table_name,
-            )
-            response = client.get(endpoint, params=initial_params)
-            data = response.json() if hasattr(response, "json") else response
-            if isinstance(data, dict):
-                results_path = table_config.get("results_response_path", "results")
-                all_results = data.get(results_path, [])
-                if not all_results and "data" in data:
-                    all_results = data.get("data", [])
-                if not all_results and "content" in data:
-                    content = data.get("content")
-                    if isinstance(content, list):
-                        all_results = content
-            elif isinstance(data, list):
-                all_results = data
-            LOGGER.info(
-                "m=main, table_name=%s, records=%d msg=Single page response received",
-                args.table_name,
-                len(all_results),
-            )
 
         spark = _initialize_spark()
 

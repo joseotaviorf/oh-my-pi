@@ -47,7 +47,9 @@ WITH deduped AS (
     FROM
         datalake_oitchau_raw.punches
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
+        -- Match the raw date_expansion 45-day lookback (anchor: load_end_date):
+        -- retroactive punch adjustments land in old punch-date partitions.
+        MAKE_DATE(year, month, day) BETWEEN DATE_ADD(DATE('{load_end_date}'), -44)
             AND DATE('{load_end_date}')
 )
 SELECT
