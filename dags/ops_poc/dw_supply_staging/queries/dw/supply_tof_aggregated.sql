@@ -22,7 +22,7 @@ sf_dedup AS (
       id_lead
 ),
 
-sf AS ( -- fl_carteirizado
+sf AS ( -- fl_carteirizado — keep only latest lead row (filter non-latest before DISTINCT)
     SELECT DISTINCT
         sf.id_lead AS lead_id,
         DATE(sf.creation_date) AS dt_creation_sf,
@@ -31,7 +31,7 @@ sf AS ( -- fl_carteirizado
         'carteirizado' AS outbound_operation
     FROM
         datalake_salesforce_growth_clean.lead sf
-    LEFT JOIN
+    INNER JOIN
         sf_dedup sfd
             ON sf.id_lead = sfd.id_lead
             AND sf.dt_updated = sfd.dt_updated_latest
@@ -42,6 +42,42 @@ sf AS ( -- fl_carteirizado
         DATE(sf.creation_date) BETWEEN DATE'2025-01-01' AND CURRENT_DATE
 ),
 
+-- Push the 3-year window before joins (same predicate as actual_vol WHERE).
+obt_base AS (
+    SELECT
+        date,
+        acquisition_origin,
+        nm_business_context,
+        nm_supply_source,
+        company_report_origin,
+        planning_operation,
+        planning_conversion,
+        planning_cluster,
+        behavior_type,
+        source,
+        medium,
+        nm_campaign,
+        country_code,
+        city_group,
+        ds_discard_reason,
+        campaign_strategy_intent,
+        campaign_business_context,
+        funnel_side,
+        campaign_landing_page,
+        sk_supply,
+        sk_lead,
+        sk_user_conversion,
+        sk_user_affiliate,
+        nm_agent,
+        cd_funnel_step,
+        quinto_andar_phone_number,
+        CAST(PMOD(HASH(sk_user_conversion), 16) AS INT) AS join_salt
+    FROM
+        dw_growth.obt_supply
+    WHERE
+        YEAR(date) >= YEAR(CURRENT_DATE) - 3
+),
+
 cohort_events AS (
     SELECT
         date,
@@ -49,7 +85,7 @@ cohort_events AS (
         nm_business_context,
         cd_funnel_step
     FROM
-        dw_growth.obt_supply
+        obt_base
     WHERE
         cd_funnel_step IN ('qualified', 'av_qualified', 'opportunity', 'first_listing')
 ),
@@ -82,18 +118,36 @@ latest_campaign_name AS (
 
 aux_planning_operation AS (
     SELECT
-        cp.*,
         CAST(CAST(cp.skuser AS DOUBLE) AS BIGINT) AS sk_user_id,
-        DATE(cp.Data_Mudanca_Area) as periodo_inicio,
+        cp.area,
+        DATE(cp.Data_Mudanca_Area) AS periodo_inicio,
         COALESCE(
-            LEAD(DATE(cp.Data_Mudanca_Area)) OVER (PARTITION BY CAST(CAST(cp.skuser AS DOUBLE) AS BIGINT) ORDER BY DATE(cp.Data_Mudanca_Area)) 
-            , current_date
+            LEAD(DATE(cp.Data_Mudanca_Area)) OVER (
+                PARTITION BY CAST(CAST(cp.skuser AS DOUBLE) AS BIGINT)
+                ORDER BY DATE(cp.Data_Mudanca_Area)
+            ),
+            CURRENT_DATE
         ) AS periodo_fim
-    FROM 
+    FROM
         datalake_gsheets_clean.supply_user_match_is cp
-    WHERE 
-        cp.skuser IS NOT NULL 
-        AND trim(cp.skuser) NOT IN ('', '-')    
+    WHERE
+        cp.skuser IS NOT NULL
+        AND TRIM(cp.skuser) NOT IN ('', '-')
+),
+
+-- Salt build side so hot sk_user_id keys spread across 16 partitions on the equi+range join.
+aux_planning_operation_salted AS (
+    SELECT
+        apo.sk_user_id,
+        apo.area,
+        apo.periodo_inicio,
+        apo.periodo_fim,
+        salt.salt AS join_salt
+    FROM
+        aux_planning_operation AS apo
+    CROSS JOIN (
+        SELECT EXPLODE(SEQUENCE(0, 15)) AS salt
+    ) AS salt
 ),
 
 actual_vol AS (
@@ -284,7 +338,7 @@ actual_vol AS (
         ,NULL AS tgt_cost
         ,NULL AS mkt_cost
     FROM
-      dw_growth.obt_supply obt
+      obt_base obt
     LEFT JOIN
       cohort_events qualifieds
         ON obt.sk_supply = qualifieds.sk_supply
@@ -334,13 +388,12 @@ actual_vol AS (
     LEFT JOIN
       datalake_supply_flows.inbound_attribution AS ia
         ON ia.id_lead_ebdb = obt.sk_lead
-    LEFT JOIN 
-      aux_planning_operation apo
+    LEFT JOIN
+      aux_planning_operation_salted apo
         ON obt.sk_user_conversion = apo.sk_user_id
+        AND obt.join_salt = apo.join_salt
         AND obt.date >= apo.periodo_inicio
         AND obt.date < apo.periodo_fim
-    WHERE
-      YEAR(obt.date) >= YEAR(current_date) - 3
 
     GROUP BY
         'actual_vol',
