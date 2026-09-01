@@ -47,9 +47,30 @@ column_level_validations:
            AND LOWER(account_manager) NOT LIKE '%@quintoandar.%'
         ) = 0
       severity_level: Warning
+  business_context:
+    is_complete:
+      severity_level: Error
   version:
     is_complete:
       severity_level: Error
   is_current:
     is_complete:
+      severity_level: Error
+    custom:
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            sk_broker,
+            business_context,
+            COUNT(*) AS cnt
+          FROM
+            dw_brokers.dim_broker_account_manager_history
+          WHERE
+            is_current
+          GROUP BY
+            sk_broker,
+            business_context
+          HAVING
+            COUNT(*) > 1
+        ) AS dup_current) = 0
       severity_level: Error

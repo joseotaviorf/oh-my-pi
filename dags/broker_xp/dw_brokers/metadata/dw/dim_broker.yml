@@ -40,6 +40,23 @@ columns:
       sourced from the current row of datalake_brokers.hubspot_brokers_history joined to
       datalake_hubspot.owner. Null when there is no current owner mapping. Expected domain is
       quintoandar.com.br (validated via the table's data quality check).
+  account_manager_for_sale:
+    lineage:
+      - datalake_hubspot.owner.email
+    description: >
+      Email of the For Sale Account Manager currently assigned to this broker. Resolved from the
+      current SALE row of datalake_brokers.broker_account_manager_history joined to
+      datalake_hubspot.owner, falling back to the generic account_manager (HubSpot owner) when the
+      dedicated field is empty. Null when neither mapping exists. Expected domain is quintoandar.com.br.
+  account_manager_for_rent:
+    lineage:
+      - datalake_hubspot.owner.email
+    description: >
+      Email of the For Rent Account Manager currently assigned to this broker, populated only when
+      is_3p_rent_broker is true. Resolved from the current RENT row of
+      datalake_brokers.broker_account_manager_history joined to datalake_hubspot.owner, falling back
+      to the generic account_manager. Null for brokers that never had the Rent product, or when
+      neither mapping exists. Expected domain is quintoandar.com.br.
   broker_address:
     lineage:
       - core_brokers.brokers.broker_address

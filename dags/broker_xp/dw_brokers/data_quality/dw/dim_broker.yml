@@ -23,6 +23,24 @@ column_level_validations:
            AND LOWER(account_manager) NOT LIKE '%@quintoandar.%'
         ) = 0
       severity_level: Warning
+  account_manager_for_sale:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_brokers.dim_broker
+         WHERE account_manager_for_sale IS NOT NULL
+           AND LOWER(account_manager_for_sale) NOT LIKE '%@quintoandar.%'
+        ) = 0
+      severity_level: Warning
+  account_manager_for_rent:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_brokers.dim_broker
+         WHERE account_manager_for_rent IS NOT NULL
+           AND LOWER(account_manager_for_rent) NOT LIKE '%@quintoandar.%'
+        ) = 0
+      severity_level: Warning
   account_manager_consistent_across_duplicate_cnpj:
     custom:
       # Among brokers sharing the same CNPJ, those linked to hubspot_brokers_history with a declared

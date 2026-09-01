@@ -1,5 +1,13 @@
 # Broker XP (Marketplace QuintoAndar)
 
+## Ownership
+
+**Data Owner:**
+- vitor.musachio@quintoandar.com.br
+
+**Data Steward:**
+- vitor.musachio@quintoandar.com.br
+
 ## Overview
 
 Broker XP is QuintoAndar's **Marketplace** operation — a B2B2C model where partner real-estate companies (imobiliárias) and autonomous agents transact through QuintoAndar's platform. The team is known internally as **3P Partners** / **Broker XP**; externally and to business stakeholders as **Marketplace**; legacy names still in use: **Rede** and **For Brokers**.
@@ -23,7 +31,7 @@ Three business models coexist under Marketplace:
 - **3P Demand**, **TSC**, **Traga Seus Clientes** → partner-brought buyer/tenant. Flag: `is_3p_demand = TRUE`.
 - **3P Lead Gen**, **CQA**, **Clientes QuintoAndar** → lead handoff model. Flag: `is_3p_lead_gen = TRUE`.
 - **Magic Link**, **Company** → the partner registration tool (Magic Link) backed by the internal Company service. Source of truth for `core_brokers.brokers` and `dw_brokers.dim_broker`.
-- **Account Manager**, **AM**, **dono da conta** → HubSpot owner currently assigned to the broker → `dim_broker.sk_person_account_manager`; history in `dim_broker_account_manager_history`. **Only HubSpot field still in use** — all other HubSpot-derived attributes are deprecated.
+- **Account Manager**, **AM**, **dono da conta** → HubSpot owner assigned to the broker. Snapshot: `dim_broker.account_manager` (generic owner email), plus `account_manager_for_sale` / `account_manager_for_rent` for the product lanes. History in `dim_broker_account_manager_history` (SCD2 per `(sk_broker, business_context)`). **Only HubSpot field still in use** — all other HubSpot-derived attributes are deprecated.
 - **BSP** (Broker Supply Platform), **portal do parceiro** → partner portal where leads are submitted. Detailed in [`3p_supply.md`](./3p_supply.md).
 - **3P agent**, **agente 3P**, **corretor da Rede**, **corretor parceiro** → autonomous broker working at an imobiliária → `dim_agent.agent_type = 'CORRETOR_REDE'` / `is_3p_agent = TRUE`.
 - **Broker admin** → person who administers the broker registry in Magic Link → `dim_broker_profile_history.profile = 'company_admin'`.
@@ -46,7 +54,7 @@ The authoritative model is `dw_brokers` (DAG `dags/broker_xp/dw_brokers`). All e
 | Products the partner is enrolled in (Rede Sale / Rede Rent), with fees, banking, tier, integrator at the current state | `dw_brokers.dim_broker_products` — PK `sk_broker_product`. One row per broker × product. Carries `business_context`, `commission`, `demand_fee`, `supply_fee`, `platform_fee`, `tier_name`, `integrator_partner`, `has_opt_in_navent`. |
 | Operating regions declared by each broker product, enriched with city / state / country names | `dw_brokers.dim_broker_regions` — PK `sk_broker_region`. Bridge `broker_product × region`. |
 | Time-line of partner activation / deactivation in the Rede (per business context when applicable) | `dw_brokers.dim_broker_status_history` — PK `sk_broker_status_history`. SCD2 with `version`, `is_current`, `ts_start`, `ts_end`. Includes `status_origin` (Hubspot or Company). |
-| Time-line of Account Manager (HubSpot owner) assignment per broker | `dw_brokers.dim_broker_account_manager_history` — PK `sk_broker_account_manager_history`. SCD2 per `(sk_broker, sk_person_account_manager)`. |
+| Time-line of Account Manager (HubSpot owner) assignment per broker and product | `dw_brokers.dim_broker_account_manager_history` — PK `sk_broker_account_manager_history`. SCD2 per `(sk_broker, business_context)`. Filter `business_context` when using `is_current = TRUE` (up to two current rows). |
 | Time-line of people linked to the broker (3P agents and broker admins), with role and active period | `dw_brokers.dim_broker_profile_history` — PK `sk_broker_profile_history`. SCD2 per `(sk_person, profile)`. Flags `is_agent`, `is_broker_admin`, `is_active_profile`. |
 | Time-line of commercial tier (program) per broker product | `dw_brokers.dim_broker_tier_history` — PK `sk_broker_tier_history`. SCD2 per `sk_broker_product`. |
 | Time-line of integrator partner per broker product | `dw_brokers.dim_broker_integrator_partner_history` — PK `sk_broker_integrator_partner_history`. SCD2 per `sk_broker_product`. |
@@ -57,10 +65,10 @@ The authoritative model is `dw_brokers` (DAG `dags/broker_xp/dw_brokers`). All e
 | Buyer prospect (For Sale 3P demand) NBP/RBP windows | `dw_sale.dim_buyer_prospect_3p_history`. Full demand-side coverage in [`3p_demand.md`](./3p_demand.md). |
 
 **Critical rules:**
-- **Sentinel `-1` for missing surrogate keys** in this domain (`sk_broker`, `sk_broker_product`, `sk_person_account_manager`, `sk_person`, etc.). Filter `<> -1` when you need real matches; never `COUNT` them as entities.
+- **Sentinel `-1` for missing surrogate keys** in this domain (`sk_broker`, `sk_broker_product`, `sk_user_account_manager`, `sk_person`, etc.). Filter `<> -1` when you need real matches; never `COUNT` them as entities.
 - **"Active now" — prefer the flags on `dim_broker` / `dim_broker_products`** (`is_3p_active_broker`, `is_3p_active_sale_broker`, `is_3p_active_rent_broker`) over reconstructing from `dim_broker_status_history`. These flags reflect product-level credentialing, not the generic registry status.
 - **For status time-line** (when did broker X become active/inactive), use `dim_broker_status_history` with `is_current = TRUE` for the current row or `ts_start`/`ts_end` for arbitrary points. The same pattern applies to `account_manager`, `profile`, `tier`, and `integrator_partner` history tables.
-- **Isolate Sale vs Rent** with `business_context = 'SALE'` / `'RENT'` on `dim_broker_products`, `dim_broker_regions`, `dim_broker_status_history`. The other history tables (account_manager, profile, tier, integrator_partner) are not scoped by business context — drop the filter when joining them.
+- **Isolate Sale vs Rent** with `business_context = 'SALE'` / `'RENT'` on `dim_broker_products`, `dim_broker_regions`, `dim_broker_status_history`, and `dim_broker_account_manager_history`. The other history tables (profile, tier, integrator_partner) are not scoped by business context — drop the filter when joining them. `is_current = TRUE` on AM history can return up to two rows per broker.
 - **`broker_status` on `dim_broker` / `dim_broker_status_history`** reflects the partner's status in the **Rede** (per product enrollment), not the generic Company registry status. The legacy `company_status` (deprecated) does not match this semantics.
 - **`dim_broker` has no `company_name` column.** Use `broker_name` (legal name) or `broker_trade_name` (trade name). The legacy `dim_company_3p_partners.company_name` maps to `broker_name`.
 
@@ -75,7 +83,7 @@ Current snapshot of the partner imobiliária (PK `sk_broker`). Sourced from `cor
   - Rows = modality scope: overall (`*_broker`), Sale (`*_sale_broker`), Rent (`*_rent_broker`).
   - Columns = lifecycle stage: `is_3p_{rent|sale}_broker` ("ever registered for this modality") vs `is_3p_active_{rent|sale}_broker` ("currently credentialed for this modality"). The overall pair is `is_3p_rent_broker` / `is_3p_sale_broker` (any registration) vs `is_3p_active_broker` (at least one active product). A partner can be **registered but not active** (registered the product, never completed the activation flow), so always pick the **active** flags when you want operational filtering.
 - **Aggregate people counts (snapshot)** — `qt_active_agents` (active `third_party_agent` profiles), `qt_active_agents_in_lead_gen` (active 3P agents flagged `is_passive_lead_receiver` in `agent_data` — i.e. Lead Gen-eligible), `qt_active_broker_admins` (active `company_admin` profiles). `has_active_agents_in_lead_gen` is the boolean derivation (`qt_active_agents_in_lead_gen > 0`). These are **not** split by `business_context` — use `dim_broker_profile_history` if you need that split.
-- **Account Manager (snapshot)** — `sk_person_account_manager` is the current HubSpot owner mapped to `sk_person`; `-1` when there is no owner or the mapping fails. Full timeline in `dim_broker_account_manager_history`.
+- **Account Manager (snapshot)** — `account_manager` is the generic HubSpot owner email; `account_manager_for_sale` / `account_manager_for_rent` are the product-lane emails (Rent is null unless `is_3p_rent_broker`). Full timeline in `dim_broker_account_manager_history` (`sk_user_account_manager`, `account_manager`, `account_manager_source`).
 - **Lifecycle timestamps** — `ts_broker_created` / `ts_broker_updated` (registry create/update in Magic Link → core brokers), `ts_last_membership_start` / `ts_last_membership_end` (latest `ACTIVE` / latest current-`INACTIVE` in the status history, any product lane), plus per-product variants `ts_last_{rent|sale}_membership_start/end` (filtered to Rede Rent / Rede Sale).
 
 ### `dim_broker_products` — product, fees, banking
@@ -107,14 +115,14 @@ The five history dims share an **identical mechanical pattern** — only the dim
 | Dim | Tracks changes in | Grain (versioned by) | Origin column |
 |---|---|---|---|
 | `dim_broker_status_history` | `broker_status` (`ACTIVE` / `INACTIVE`) per `(broker, business_context)` | `(sk_broker, business_context)` | `status_origin` (`Hubspot` or `Company`) |
-| `dim_broker_account_manager_history` | `sk_person_account_manager` (HubSpot owner) per broker | `(sk_broker)` — not split by `business_context` | — |
+| `dim_broker_account_manager_history` | `sk_user_account_manager` + `account_manager` (HubSpot owner email) per broker and product | `(sk_broker, business_context)` | `account_manager_source` |
 | `dim_broker_profile_history` | `profile_status` of each `(person, profile)` link to the broker | `(uuid_person, profile)` — not split by `business_context` | — |
 | `dim_broker_tier_history` | `id_tier` / `tier_name` per broker product | `(sk_broker_product)` | — |
 | `dim_broker_integrator_partner_history` | `uuid_integrator_partner` / `integrator_partner` per broker product | `(sk_broker_product)` | — |
 
 All five carry the same columns for the SCD2 mechanics: `sk_*_history` (PK), `version` (sequential within the grain, ordered by transaction timestamp), `is_current` (TRUE for the latest revision), `ts_start` (when the revision became effective), `ts_end` (start of the next revision; `NULL` for the current row), `has_3p_access_control = TRUE`, `ts_load`. When querying:
 
-- For **"what is true today"** → filter `is_current = TRUE` (or equivalently `ts_end IS NULL`).
+- For **"what is true today"** → filter `is_current = TRUE` (or equivalently `ts_end IS NULL`). On `dim_broker_account_manager_history` also filter `business_context`, otherwise you may get two current rows.
 - For **"what was true at moment T"** → filter `ts_start <= T AND (ts_end IS NULL OR ts_end > T)`.
 - For **"how many transitions in period P"** → count rows where `ts_start` falls inside P (excluding the synthetic initial row when applicable).
 
@@ -429,7 +437,7 @@ Mixing the two without splitting hides which effect (server default vs ranking) 
 
 ### Person — Account Manager (N:1)
 
-- `dim_broker.sk_person_account_manager` → Person dimension. Full history on `dim_broker_account_manager_history` (filter `is_current = TRUE` for the active assignment).
+- `dim_broker.account_manager` / `account_manager_for_sale` / `account_manager_for_rent` → HubSpot owner emails. Full history on `dim_broker_account_manager_history` (filter `is_current = TRUE` **and** `business_context` for the active assignment in one lane).
 
 ### Region (N:N per product)
 
@@ -447,11 +455,11 @@ Mixing the two without splitting hides which effect (server default vs ranking) 
 - Always filter `sk_broker <> -1` when listing or counting real partner imobiliárias.
 - For "active now" questions, prefer `dim_broker.is_3p_active_broker` (or `is_3p_active_sale_broker` / `is_3p_active_rent_broker`) over reconstructing from history tables — these flags reflect product-level credentialing.
 - Use `dim_broker_status_history` (with `is_current = TRUE` or explicit `ts_start`/`ts_end`) for time-line questions — when did broker X become active, how long has it been active, etc. Same SCD2 pattern for `account_manager`, `profile`, `tier`, `integrator_partner` history tables.
-- Filter `business_context = 'SALE'` / `'RENT'` on `dim_broker_products`, `dim_broker_regions`, `dim_broker_status_history` for modality-specific analyses.
+- Filter `business_context = 'SALE'` / `'RENT'` on `dim_broker_products`, `dim_broker_regions`, `dim_broker_status_history`, and `dim_broker_account_manager_history` for modality-specific analyses.
 - On Visit/Offer tables, **always** filter on `business_model` or the `is_3p_*` flags to scope to Marketplace transactions. A transaction can carry two different brokers (`sk_broker_supply` vs `sk_broker_demand`) — decide upfront which side answers the business question.
 - To identify 3P agents, JOIN `dim_agent` to `dim_broker` on `sk_broker` and validate `is_3p_agent = TRUE` (or `agent_type = 'CORRETOR_REDE'`).
 - For the supply funnel (lead → first listing), route directly to [`3p_supply.md`](./3p_supply.md) — the metrics, recipes (L2FL, valid-lead), and pitfalls are documented there.
-- For HubSpot Account Manager information, use `dim_broker.sk_person_account_manager` (current) or `dim_broker_account_manager_history` (history). This is the **only** HubSpot-derived attribute still in scope.
+- For HubSpot Account Manager information, use `dim_broker.account_manager` (generic), `account_manager_for_sale` / `account_manager_for_rent` (current by product), or `dim_broker_account_manager_history` (history, scoped by `business_context`). This is the **only** HubSpot-derived attribute still in scope.
 - For visibility and Listing-Page-Viewed analytics of 3P listings, start on `dw_public.fact_search_session_event` and bridge `sk_house` to `dw_sale_listings.dim_listing.is_3p_supply` (fast 3P filter) or `dw_sale_listings.fact_listings.sk_broker` (broker-level). Always split by `dim_search_session_event_type.search_rendering_type` — the pclick / ranking ML model acts on Client Search only.
 - For pre-aggregated daily demand metrics on published 3P listings (search results, LPV, bookings, visits, offers, CCVs per day), prefer `dw_sale.fact_daily_ongoing_listing` and bridge via `sk_house` to identify 3P. It saves the manual aggregation per stage; just remember the truncation caveat (next bullet).
 - For publication / unpublication / suspension / closing timelines per 3P listing, use `dw_sale_listings.fact_listing_status` — `sk_broker` is on the table, `is_last_status = TRUE` snapshots the current state, and `status_history` + `status_closing_history` give the categorical journey.
@@ -459,7 +467,7 @@ Mixing the two without splitting hides which effect (server default vs ranking) 
 **Don't:**
 - Don't use any legacy table or DAG (see de/para below). The DW migration is in progress — TARS must never suggest them.
 - Don't use `sk_company` to identify imobiliárias in the Marketplace context — use `sk_broker`. `sk_company` is the legacy join key on the deprecated `dw_company` schema.
-- Don't read `company_status` or any HubSpot-derived attribute (cluster, tag, member status, tier) — only `sk_person_account_manager` is still valid from HubSpot.
+- Don't read `company_status` or any HubSpot-derived attribute (cluster, tag, member status, tier) — only Account Manager emails (`account_manager`, `account_manager_for_sale`, `account_manager_for_rent`) are still valid from HubSpot.
 - Don't use `dim_broker_products.tier_name` as a historical timeline — that column reflects the **current** state. For history, use `dim_broker_tier_history`.
 - Don't assume `broker_status` on `dim_broker_status_history` is the same as the legacy `company_status`. The new model reflects credentialing **per product** in the Rede, not the generic Company registry.
 - Don't anchor new analyses on the `is_3p_*` flags of `dw_visit.fact_visits` — they will be moved to `dw_visit.dim_visit` (where the equivalents `is_visit_3p_supply` / `is_visit_3p_demand` / `is_visit_3p_lead_gen` already exist). The columns are not being deprecated; both locations work today, but new code should target the dim. For For Sale, `dw_sale_visits.fact_visits` is unaffected — prefer it.
@@ -554,28 +562,32 @@ ORDER BY s.sk_broker, s.business_context, s.ts_start
 
 ### Query 3 — Current Account Manager + number of past handovers
 
-Joins the current snapshot (`dim_broker.sk_person_account_manager`) with the count of historical assignments to surface the handover frequency. Filter `<> -1` to exclude unmapped brokers.
+Joins the current snapshot (`dim_broker.account_manager`) with the count of historical assignments to surface the handover frequency. Filter history with `sk_user_account_manager <> -1` and split by `business_context` when comparing Sale vs Rent.
 
 ```sql
 WITH am_counts AS (
     SELECT
         sk_broker,
+        business_context,
         COUNT(*) AS total_assignments,
         MIN(ts_start) AS ts_first_assignment
     FROM dw_brokers.dim_broker_account_manager_history
-    WHERE sk_person_account_manager <> -1
-    GROUP BY sk_broker
+    WHERE sk_user_account_manager <> -1
+    GROUP BY sk_broker, business_context
 )
 SELECT
     b.sk_broker,
     b.broker_name,
-    b.sk_person_account_manager,
+    b.account_manager,
+    b.account_manager_for_sale,
+    b.account_manager_for_rent,
+    am.business_context,
     am.total_assignments,
     am.ts_first_assignment
 FROM dw_brokers.dim_broker AS b
 LEFT JOIN am_counts AS am ON b.sk_broker = am.sk_broker
 WHERE b.is_3p_active_broker = TRUE
-  AND b.sk_person_account_manager <> -1
+  AND b.account_manager IS NOT NULL
 ORDER BY am.total_assignments DESC NULLS LAST
 ```
 
@@ -670,7 +682,7 @@ WITH visits_supply AS (
            'visit'   AS event_type,
            'supply'  AS broker_side,
            COUNT(*)  AS event_count
-    FROM dw_sale_visits.fact_visits
+    FROM dw_sale.fact_visits
     WHERE is_3p_supply = TRUE
       AND sk_broker_supply <> -1
     GROUP BY sk_broker_supply
@@ -680,7 +692,7 @@ visits_demand AS (
            'visit'   AS event_type,
            'demand'  AS broker_side,
            COUNT(*)  AS event_count
-    FROM dw_sale_visits.fact_visits
+    FROM dw_sale.fact_visits
     WHERE (is_3p_demand = TRUE OR is_3p_lead_gen = TRUE)
       AND sk_broker_demand <> -1
     GROUP BY sk_broker_demand
@@ -690,7 +702,7 @@ offers_supply AS (
            'offer'   AS event_type,
            'supply'  AS broker_side,
            COUNT(*)  AS event_count
-    FROM dw_sale_offers.fact_offers
+    FROM dw_sale.fact_offers
     WHERE is_3p_supply = TRUE
       AND sk_broker_supply <> -1
     GROUP BY sk_broker_supply
@@ -700,7 +712,7 @@ offers_demand AS (
            'offer'   AS event_type,
            'demand'  AS broker_side,
            COUNT(*)  AS event_count
-    FROM dw_sale_offers.fact_offers
+    FROM dw_sale.fact_offers
     WHERE (is_3p_demand = TRUE OR is_3p_lead_gen = TRUE)
       AND sk_broker_demand <> -1
     GROUP BY sk_broker_demand
@@ -732,7 +744,7 @@ WITH listings_3p AS (
     SELECT
         fl.sk_house,
         fl.sk_broker
-    FROM dw_sale_listings.fact_listings AS fl
+    FROM dw_sale.fact_listings AS fl
     WHERE fl.sk_broker <> -1
 ),
 daily_3p AS (
@@ -783,8 +795,8 @@ WITH listings_3p AS (
     SELECT
         fl.sk_house,
         fl.sk_broker
-    FROM dw_sale_listings.fact_listings AS fl
-    INNER JOIN dw_sale_listings.dim_listing AS dl ON fl.sk_house = dl.sk_house
+    FROM dw_sale.fact_listings AS fl
+    INNER JOIN dw_sale.dim_listing AS dl ON fl.sk_house = dl.sk_house
     WHERE fl.sk_broker <> -1
       AND dl.is_3p_supply = TRUE
 ),
@@ -829,16 +841,16 @@ Counts distinct 3P agents active in each calendar month using the SCD2 history. 
 
 ```sql
 WITH monthly_spine AS (
-    SELECT month_start
+    SELECT t.month_start
     FROM UNNEST(
         SEQUENCE(date '2023-01-01', current_date, interval '1' month)
     ) AS t (month_start)
 ),
 spine_bounds AS (
     SELECT
-        month_start,
-        date_add('day', -1, date_add('month', 1, month_start)) AS month_end
-    FROM monthly_spine
+        ms.month_start,
+        date_add('day', -1, date_add('month', 1, ms.month_start)) AS month_end
+    FROM monthly_spine AS ms
 ),
 active_revisions AS (
     SELECT
@@ -854,14 +866,14 @@ active_revisions AS (
        AND (h.ts_ended IS NULL OR CAST(h.ts_ended AS DATE) > s.month_start)
 )
 SELECT
-    month_start,
-    COUNT(DISTINCT sk_agent)                                                            AS active_3p_agents,
-    COUNT(DISTINCT sk_agent) FILTER (WHERE is_passive_lead_receiver = TRUE)             AS active_lead_gen_agents,
-    COUNT(DISTINCT sk_agent) FILTER (WHERE is_passive_lead_receiver = FALSE OR is_passive_lead_receiver IS NULL) AS active_non_lead_gen_agents,
-    COUNT(DISTINCT sk_broker) FILTER (WHERE sk_broker <> -1)                            AS active_brokers_with_agents
-FROM active_revisions
-GROUP BY month_start
-ORDER BY month_start
+    ar.month_start,
+    COUNT(DISTINCT ar.sk_agent)                                                            AS active_3p_agents,
+    COUNT(DISTINCT ar.sk_agent) FILTER (WHERE ar.is_passive_lead_receiver = TRUE)             AS active_lead_gen_agents,
+    COUNT(DISTINCT ar.sk_agent) FILTER (WHERE ar.is_passive_lead_receiver = FALSE OR ar.is_passive_lead_receiver IS NULL) AS active_non_lead_gen_agents,
+    COUNT(DISTINCT ar.sk_broker) FILTER (WHERE ar.sk_broker <> -1)                            AS active_brokers_with_agents
+FROM active_revisions AS ar
+GROUP BY ar.month_start
+ORDER BY ar.month_start
 ```
 
 ### Query 12 — Active brokers distribution by state × business_context (regions)
@@ -1066,15 +1078,15 @@ WITH params AS (
         date_trunc('month', current_date)       AS current_month
 ),
 monthly_spine AS (
-    SELECT month_start
+    SELECT t.month_start
     FROM params,
          UNNEST(SEQUENCE(start_month, current_month, interval '1' month)) AS t (month_start)
 ),
 spine_bounds AS (
     SELECT
-        month_start,
-        date_add('day', -1, date_add('month', 1, month_start)) AS month_end
-    FROM monthly_spine
+        ms.month_start,
+        date_add('day', -1, date_add('month', 1, ms.month_start)) AS month_end
+    FROM monthly_spine AS ms
 ),
 active_3p_per_month AS (
     SELECT DISTINCT
@@ -1113,13 +1125,13 @@ agent_activity_per_month AS (
     GROUP BY ap.month_start, ap.sk_agent
 )
 SELECT
-    month_start,
-    COUNT(DISTINCT sk_agent)                                                              AS total_active_3p_agents,
-    SUM(active_in_month)                                                                  AS active_in_app_in_month,
-    SUM(engaged_last_3m)                                                                  AS engaged_last_3m,
-    ROUND(CAST(SUM(active_in_month) AS DOUBLE) / NULLIF(COUNT(DISTINCT sk_agent), 0), 4)  AS pct_active_in_app_in_month,
-    ROUND(CAST(SUM(engaged_last_3m) AS DOUBLE) / NULLIF(COUNT(DISTINCT sk_agent), 0), 4)  AS pct_engaged_last_3m
-FROM agent_activity_per_month
-GROUP BY month_start
-ORDER BY month_start
+    aap.month_start,
+    COUNT(DISTINCT aap.sk_agent)                                                              AS total_active_3p_agents,
+    SUM(aap.active_in_month)                                                                  AS active_in_app_in_month,
+    SUM(aap.engaged_last_3m)                                                                  AS engaged_last_3m,
+    ROUND(CAST(SUM(aap.active_in_month) AS DOUBLE) / NULLIF(COUNT(DISTINCT aap.sk_agent), 0), 4)  AS pct_active_in_app_in_month,
+    ROUND(CAST(SUM(aap.engaged_last_3m) AS DOUBLE) / NULLIF(COUNT(DISTINCT aap.sk_agent), 0), 4)  AS pct_engaged_last_3m
+FROM agent_activity_per_month AS aap
+GROUP BY aap.month_start
+ORDER BY aap.month_start
 ```

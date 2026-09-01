@@ -58,6 +58,10 @@ SELECT
   cb.broker_name_tag,
   cb.broker_trade_name_tag,
   ho.email AS account_manager,
+  COALESCE(ho_sale.email, ho.email) AS account_manager_for_sale,
+  CASE
+    WHEN cb.is_3p_rent_broker THEN COALESCE(ho_rent.email, ho.email)
+  END AS account_manager_for_rent,
   cb.broker_address,
   cb.broker_number,
   cb.broker_complement,
@@ -105,6 +109,22 @@ LEFT JOIN
 LEFT JOIN
   datalake_hubspot.owner AS ho
   ON hb.id_hubspot_owner = ho.id_owner
+LEFT JOIN
+  datalake_brokers.broker_account_manager_history AS bam_sale
+  ON cb.sk_broker = bam_sale.sk_broker
+  AND bam_sale.business_context = 'SALE'
+  AND bam_sale.is_current
+LEFT JOIN
+  datalake_hubspot.owner AS ho_sale
+  ON bam_sale.id_account_manager = ho_sale.id_owner
+LEFT JOIN
+  datalake_brokers.broker_account_manager_history AS bam_rent
+  ON cb.sk_broker = bam_rent.sk_broker
+  AND bam_rent.business_context = 'RENT'
+  AND bam_rent.is_current
+LEFT JOIN
+  datalake_hubspot.owner AS ho_rent
+  ON bam_rent.id_account_manager = ho_rent.id_owner
 LEFT JOIN
   broker_profiles AS bp
   ON cb.sk_broker = bp.sk_broker

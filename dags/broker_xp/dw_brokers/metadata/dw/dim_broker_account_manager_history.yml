@@ -1,24 +1,26 @@
 database_name: dw_brokers
 table_name: dim_broker_account_manager_history
 description: |
-  Data warehouse dimension of HubSpot account manager (owner) assignment periods per broker. Rows are
-  derived from distinct id_hubspot_owner changes in datalake_brokers.hubspot_brokers_history, versioned
-  per broker and resolved to the enrich user via datalake_hubspot.owner.uuid_person ↔
-  datalake_ebdb_user.user.uuid_person; the account manager email is exposed directly from the HubSpot
-  owner.
+  Data warehouse dimension of HubSpot Account Manager assignment periods per broker and product lane
+  (SALE / RENT). Rows come from datalake_brokers.broker_account_manager_history, versioned per
+  (sk_broker, business_context) and resolved to the enrich user via datalake_hubspot.owner.uuid_person ↔
+  datalake_ebdb_user.user.uuid_person; the account manager email is exposed from the HubSpot owner.
+  Consumers that filter only is_current = TRUE can see up to two rows per broker (one per lane).
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_broker_account_manager_history:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.sk_broker
+      - datalake_brokers.broker_account_manager_history.sk_broker
+      - datalake_brokers.broker_account_manager_history.business_context
       - datalake_ebdb_user.user.id
+      - datalake_brokers.broker_account_manager_history.version
     description: |
-      Surrogate string key for the broker-owner assignment period, built from sk_broker,
-      COALESCE(id_user, -1), and sequential version within the broker.
+      Surrogate string key for the broker-lane-owner assignment period, built from sk_broker,
+      business_context, COALESCE(id_user, -1), and sequential version within that grain.
   sk_broker:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.sk_broker
+      - datalake_brokers.broker_account_manager_history.sk_broker
     description: Surrogate key of the broker for this account manager period.
   sk_user_account_manager:
     lineage:
@@ -33,42 +35,59 @@ columns:
       Email of the QuintoAndar internal account manager assigned to this broker during the period,
       sourced from datalake_hubspot.owner. Null when there is no owner mapping. Expected domain is
       quintoandar.com.br (validated via the table's data quality check).
+  business_context:
+    lineage:
+      - datalake_brokers.broker_account_manager_history.business_context
+    description: Product lane of this assignment period (SALE or RENT).
+    categories:
+      SALE: For Sale Account Manager timeline.
+      RENT: For Rent Account Manager timeline.
+  account_manager_source:
+    lineage:
+      - datalake_brokers.broker_account_manager_history.account_manager_source
+    description: |
+      Which HubSpot property supplied the effective owner id: HUBSPOT_OWNER before ts_switch, or the
+      dedicated For Sale / For Rent property afterward.
+    categories:
+      HUBSPOT_OWNER: Effective id taken from generic hubspot_owner_id.
+      ACCOUNT_MANAGER_FOR_SALE: Effective id taken from account_manager__for_sale after ts_switch.
+      ACCOUNT_MANAGER_FOR_RENT: Effective id taken from account_manager__for_rent after ts_switch.
   version:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.ts_updated
+      - datalake_brokers.broker_account_manager_history.version
     description: |
-      Sequential version of the account manager assignment for the broker, ordered by ts_updated at the
-      time of each distinct owner change.
+      Sequential version of the account manager assignment for the broker and business_context, ordered
+      by ts_start at the time of each distinct owner-id change.
   is_current:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.ts_updated
+      - datalake_brokers.broker_account_manager_history.is_current
     description: |
-      True when this row is the latest assignment period for the broker (no later ts_updated in the
-      filtered change stream).
+      True when this row is the latest assignment period for the broker in this business_context.
+      Filter business_context as well when a single current assignment is required.
   has_3p_access_control:
     description: |
       Boolean flag indicating that this row is subject to 3P Partners access control policies; always true
       in this table.
   ts_start:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.ts_updated
-    description: Start timestamp of the account manager period (first observation of this owner for the broker).
+      - datalake_brokers.broker_account_manager_history.ts_start
+    description: Start timestamp of the account manager period for this broker and business_context.
   ts_end:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.ts_updated
+      - datalake_brokers.broker_account_manager_history.ts_end
     description: |
       End timestamp of the period (start of the next owner change); null while the assignment is current.
   ts_load:
     description: Timestamp when this DW row was loaded by the ETL process.
   year:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.ts_updated
+      - datalake_brokers.broker_account_manager_history.ts_start
     description: Partition year from period start (ts_start).
   month:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.ts_updated
+      - datalake_brokers.broker_account_manager_history.ts_start
     description: Partition month from period start (ts_start).
   day:
     lineage:
-      - datalake_brokers.hubspot_brokers_history.ts_updated
+      - datalake_brokers.broker_account_manager_history.ts_start
     description: Partition day from period start (ts_start).
