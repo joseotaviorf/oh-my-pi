@@ -26,3 +26,59 @@ workflow:
       raw_primary_keys: ["pkimovel2"]
       clean_table_name: "house_2"
       clean_primary_keys: ["id_house_2"]
+    portal:
+      raw_primary_keys: ["pkportal"]
+      clean_table_name: "portal"
+      clean_primary_keys: ["id_portal"]
+    clientes:
+      raw_primary_keys: ["codcli"]
+      clean_table_name: "client"
+      clean_primary_keys: ["id_client"]
+    leads_site:
+      raw_primary_keys: ["codigo"]
+      clean_table_name: "site_leads"
+      clean_primary_keys: ["id_site_lead"]
+    leads_vivareal_zap:
+      raw_primary_keys: ["pklead"]
+      clean_table_name: "vivareal_zap_leads"
+      clean_primary_keys: ["id_vivareal_zap_lead"]
+    leads_imovelweb:
+      raw_primary_keys: ["codigo"]
+      clean_table_name: "imovelweb_leads"
+      clean_primary_keys: ["id_imovelweb_lead"]
+    leads_casamineira:
+      raw_primary_keys: ["codigo"]
+      clean_table_name: "casamineira_leads"
+      clean_primary_keys: ["id_casamineira_lead"]
+    leads_portais:
+      raw_primary_keys: ["codigo"]
+      clean_table_name: "portal_leads"
+      clean_primary_keys: ["id_portal_lead"]
+    pool_flex:
+      raw_primary_keys: ["codigo"]
+      clean_table_name: "pool_flex"
+      clean_primary_keys: ["id_pool_flex"]
+    qa_imoveis:
+      raw_primary_keys: ["codigo"]
+      clean_table_name: "qa_house"
+      clean_primary_keys: ["id_qa_house"]
+    qa_listing:
+      raw_primary_keys: ["id"]
+      clean_table_name: "qa_listing"
+      clean_primary_keys: ["id_qa_listing"]
+    qa_listing_images:
+      raw_primary_keys: ["id"]
+      clean_table_name: "qa_listing_images"
+      clean_primary_keys: ["id_qa_listing_image"]
+    qa_listing_client:
+      raw_primary_keys: ["id"]
+      clean_table_name: "qa_listing_clients"
+      clean_primary_keys: ["id_qa_listing_client"]
+    sites_mensagem:
+      raw_primary_keys: ["pkmensagem"]
+      clean_table_name: "site_messages"
+      clean_primary_keys: ["id_site_message"]
+    portal_mensagem:
+      raw_primary_keys: ["pkmensagem"]
+      clean_table_name: "portal_messages"
+      clean_primary_keys: ["id_portal_message"]

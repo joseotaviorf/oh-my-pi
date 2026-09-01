@@ -1,0 +1,54 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: qa_listing_clients
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table tracks, per client company (real-estate agency), which property listings are enrolled in
+  the QA subsystem in UnionDB and whether each enrollment is currently active. Grain is one row per
+  company/property QA enrollment.
+columns:
+  id_qa_listing_client:
+    description: QA listing client enrollment primary key.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.id
+  id_company:
+    description: Foreign key referencing the client real-estate company enrolled in the QA subsystem.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.fkempresa
+  id_house:
+    description: Foreign key referencing the property enrolled in the QA subsystem, via the legacy UnionDB identifier.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.fkimovel
+  id_house_api:
+    description: House identifier as exposed by the UnionDB API, kept alongside id_house (the legacy UnionDB house key) because this source table carries the property in both key spaces. WARNING - this is not QuintoAndar's house id and must never be joined against house.id_house. Carrying both spaces makes this table one of the two bridges (together with qa_house) used to reach qa_listing and qa_listing_images, which expose only the API key.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.houseId
+  detail_view_url:
+    description: URL of the public listing detail page tracked for this QA enrollment.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.detailViewUrl
+  is_active_db:
+    description: Flag indicating whether this QA enrollment is currently active.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.activeDb
+  dt_updated:
+    description: Business date this QA enrollment record was last updated.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.updateDate
+  ts_created_db:
+    description: Timestamp when this QA enrollment record was created in the QA database.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.createDateDb
+  ts_updated_db:
+    description: Timestamp when this QA enrollment record was last updated in the QA database.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.updateDateDb
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_client.event_timestamp

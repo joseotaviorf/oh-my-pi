@@ -1,0 +1,148 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: portal_messages
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains contact messages received through classified-ad portal integrations about a
+  specific property in UnionDB, together with the handling workflow (assigned user and broker,
+  distribution/read status, related lead, and optional Tokko CRM export). Grain is one row per message
+  (pkmensagem); duplicate pkmensagem values in a CDC sample reflect insert+update event versions of the
+  same message, which is expected and handled by the raw dedup step.
+columns:
+  id_portal_message:
+    description: Portal message primary key.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.pkmensagem
+  id_house:
+    description: Foreign key referencing the property the message is about.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fkimovel
+  id_company:
+    description: Foreign key referencing the real-estate company that received the message.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fkempresa
+  id_portal:
+    description: Foreign key referencing the portal that originated the message.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fkportal
+  id_user:
+    description: Foreign key referencing the internal user assigned to handle this message.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fkusuario
+  id_broker:
+    description: Foreign key referencing the broker/agent assigned to handle this message.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fkcorretor
+  id_client:
+    description: Foreign key referencing the matched internal client/customer record for this message's sender.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fkcliente
+  id_consumer:
+    description: Foreign key referencing the raw consumer/contact record as received from the portal, prior to client matching.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fkconsumidor
+  id_lead:
+    description: Foreign key referencing the lead record associated with this message.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fklead
+  id_attendance:
+    description: Foreign key referencing the attendance/service record opened to handle this message.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.fkatendimento
+  property_reference:
+    description: Human-readable reference code of the property, as displayed on the portal listing.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.imovel_referencia
+  name:
+    description: Name provided by the message sender.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.nome
+  email:
+    description: Email address provided by the message sender.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.email
+  phone_area_code:
+    description: Area code (DDD) of the phone number provided by the message sender.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.dddtelefone
+  phone:
+    description: Phone number provided by the message sender.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.telefone
+  reply:
+    description: Text of the response sent back to the message sender, when applicable.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.resposta
+  message:
+    description: Free-text message/question submitted by the sender through the portal.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.msg
+  import_code:
+    description: Import code used for data migration or integration tracking of this message record.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.codigo_importacao
+  is_seasonal_rental:
+    description: Flag indicating whether the message is about a seasonal/vacation rental (temporada) property.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.temporada
+  guest_count:
+    description: Number of guests/occupants requested for a seasonal rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.acomodacoes
+  enrichment_notes:
+    description: Free-text field with additional data enrichment applied to the message/sender.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.enriquecimento
+  is_read:
+    description: Flag indicating whether the message has been read by the assigned user/broker.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.lido
+  is_distributed:
+    description: Flag indicating whether the message has been distributed to a user/broker for handling.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.distribuir
+  is_auto_distributed:
+    description: Flag indicating whether the message was automatically distributed to a user/broker instead of manually assigned.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.dist_auto
+  is_sent_tokko:
+    description: Flag indicating whether this message was exported to the Tokko CRM integration.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.enviado_tokko
+  dt_message:
+    description: Date the message was received from the portal.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.data
+  dt_user_action:
+    description: Date the assigned internal user acted on this message.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.datausuario
+  dt_broker_action:
+    description: Date the assigned broker acted on this message.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.datacorretor
+  dt_check_in:
+    description: Requested check-in date for a seasonal/vacation rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.data_entrada
+  dt_check_out:
+    description: Requested check-out date for a seasonal/vacation rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.data_saida
+  dt_sent_tokko:
+    description: Date the message was exported to the Tokko CRM integration.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.data_envio_tokko
+  dt_paratime:
+    description: Timestamp parameter used internally by the source system for CDC/data-processing control.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.paratime
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.portal_mensagem.event_timestamp

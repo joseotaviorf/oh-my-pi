@@ -1,0 +1,78 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: portal_leads
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains leads received through generic/aggregated classified-ad portal integrations
+  (excluding VivaReal/ZAP, ImovelWeb, and Casa Mineira, which have their own dedicated tables) in
+  UnionDB. Each row represents one inquiry submitted by a prospective client.
+columns:
+  id_portal_lead:
+    description: Portal lead primary key.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.codigo
+  id_company:
+    description: Foreign key referencing the real-estate company that received the lead.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.fkempresa
+  id_portal:
+    description: Foreign key referencing the portal that originated the lead.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.fkportal
+  portal_message_template_id:
+    description: Message identifier column from the source schema template; observed as constant/unpopulated on this table's sampled partition.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.pk_portal_mensagem
+  portal_leads_email_template_id:
+    description: Secondary message/email identifier column from the source schema template; observed as constant/unpopulated on this table's sampled partition.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.pk_emails_leads_portais2
+  name:
+    description: Name provided by the prospective client in the portal's contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.nome
+  email:
+    description: Email address provided by the prospective client in the portal's contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.email
+  phone_area_code:
+    description: Area code (DDD) of the phone number provided by the prospective client.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.dddtelefone
+  phone:
+    description: Phone number provided by the prospective client in the portal's contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.telefone
+  message:
+    description: Free-text message/question submitted by the prospective client.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.msg
+  import_code:
+    description: Import code used for data migration or integration tracking of this lead record.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.codigo_importacao
+  reference_info:
+    description: Free-text reference information supplied with the lead (e.g. listing reference code).
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.inf_referencia
+  status:
+    description: Processing status of the lead (e.g. pending, forwarded, discarded) in the source system.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.status
+  dt_lead:
+    description: Date the lead was received from the portal.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.data_lead
+  dt_registered:
+    description: Date the lead record was registered in the source system.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.datacad
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.leads_portais.event_timestamp

@@ -1,0 +1,96 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: site_leads
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains lead/contact-form submissions captured directly on the real-estate company's own
+  website (not from an external classified-ad portal) in UnionDB. Each row represents one inquiry from a
+  prospective client about a specific property. Grain is one row per inquiry, keyed on codigo — confirmed
+  with the product owners as the primary key of the source table, since the pkmensagem column is unpopulated
+  on this table and does not identify the row.
+columns:
+  id_site_lead:
+    description: Site lead primary key, confirmed with the product owners as the identifying column of the source table.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.codigo
+  id_company:
+    description: Foreign key referencing the real-estate company that owns the website and received the lead.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.fkempresa
+  id_house:
+    description: Foreign key referencing the property the lead is inquiring about.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.fkimovel
+  id_client:
+    description: Foreign key referencing the client record created or matched for this lead.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.fkcliente
+  message_template_id:
+    description: Message identifier column inherited from the shared source schema template; unpopulated on this table, so it does not identify the lead and should not be used as a key.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.pkmensagem
+  property_reference:
+    description: Human-readable reference code of the property, as displayed on the website listing.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.imovel_referencia
+  name:
+    description: Name provided by the prospective client in the contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.nome
+  email:
+    description: Email address provided by the prospective client in the contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.email
+  phone_area_code:
+    description: Area code (DDD) for the phone number provided by the prospective client.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.dddtelefone
+  phone:
+    description: Phone number provided by the prospective client in the contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.telefone
+  reply:
+    description: Text of the response sent back to the client by the company/broker, when applicable.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.resposta
+  message:
+    description: Free-text message/question submitted by the prospective client.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.msg
+  ip_address:
+    description: IP address from which the contact form was submitted.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.ip
+  is_seasonal_rental:
+    description: Flag indicating whether the lead is about a seasonal/vacation rental (temporada) property.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.temporada
+  guest_count:
+    description: Number of guests/occupants requested for a seasonal rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.acomodacoes
+  status:
+    description: Processing status of the lead (e.g. pending, answered, discarded) in the source system.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.status
+  dt_check_in:
+    description: Requested check-in date for a seasonal/vacation rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.data_entrada
+  dt_check_out:
+    description: Requested check-out date for a seasonal/vacation rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.data_saida
+  dt_registered:
+    description: Date when the lead was captured/registered in the source system.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.datacad
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.leads_site.event_timestamp

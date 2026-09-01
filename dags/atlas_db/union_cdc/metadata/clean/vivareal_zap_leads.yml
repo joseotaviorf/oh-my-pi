@@ -1,0 +1,83 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: vivareal_zap_leads
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains leads received through the VivaReal/ZAP Imóveis classified-ad portal integration
+  API in UnionDB. Each row represents one inquiry submitted by a prospective client on a VivaReal or ZAP
+  listing page, which is then routed back into the company's CRM. Grain is one row per lead event
+  (pklead), which was verified unique in the sampled partition.
+columns:
+  id_vivareal_zap_lead:
+    description: VivaReal/ZAP lead primary key.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.pklead
+  id_portal:
+    description: Foreign key referencing the portal (VivaReal or ZAP) that originated the lead.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.fkportal
+  id_portal_client:
+    description: Client identifier as registered on the portal side (VivaReal/ZAP account code), used to reconcile leads across systems.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.codigo_cliente_portal
+  client_listing_id:
+    description: Listing identifier as known to the client/company on the portal integration, distinct from the internal property id.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.clientListingId
+  origin_listing_id:
+    description: Original listing identifier assigned by the portal (VivaReal/ZAP) to the property.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.originListingId
+  origin_lead_id:
+    description: Original lead identifier assigned by the portal (VivaReal/ZAP) to this inquiry.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.originLeadId
+  lead_origin:
+    description: Sub-channel or campaign origin of the lead as reported by the portal (e.g. VivaReal vs ZAP, organic vs paid).
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.leadOrigin
+  name:
+    description: Name of the prospective client as submitted through the portal's lead form.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.name
+  email:
+    description: Email address of the prospective client as submitted through the portal's lead form.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.email
+  phone_area_code:
+    description: Area code (DDD) of the prospective client's phone number.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.ddd
+  phone:
+    description: Prospective client's phone number as submitted through the portal's lead form.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.phone
+  phone_number:
+    description: Normalized/alternate representation of the prospective client's phone number provided by the portal API.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.phoneNumber
+  message:
+    description: Free-text message/question submitted by the prospective client through the portal.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.message
+  status:
+    description: Processing status of the lead (e.g. pending, forwarded, discarded) in the source system.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.status
+  ts_lead_received:
+    description: Timestamp reported by the portal API for when the lead was submitted.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.timestamp
+  dt_paratime:
+    description: Timestamp parameter used internally by the source system for CDC/data-processing control.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.paratime
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.leads_vivareal_zap.event_timestamp

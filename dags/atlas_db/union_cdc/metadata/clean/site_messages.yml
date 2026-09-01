@@ -1,0 +1,136 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: site_messages
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains contact-form messages submitted directly on the real-estate company's own
+  website about a specific property in UnionDB, together with the handling workflow (assigned user
+  and broker, read/distribution status, and optional Tokko CRM export). Grain is one row per message
+  (pkmensagem); duplicate pkmensagem values in a CDC sample reflect insert+update event versions of
+  the same message, which is expected and handled by the raw dedup step.
+columns:
+  id_site_message:
+    description: Site message primary key.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.pkmensagem
+  id_house:
+    description: Foreign key referencing the property the message is about.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.fkimovel
+  id_company:
+    description: Foreign key referencing the real-estate company that owns the website and received the message.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.fkempresa
+  id_user:
+    description: Foreign key referencing the internal user assigned to handle this message.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.fkusuario
+  id_broker:
+    description: Foreign key referencing the broker/agent assigned to handle this message.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.fkcorretor
+  id_client:
+    description: Foreign key referencing the client record created or matched for this message's sender.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.fkcliente
+  id_attendance:
+    description: Foreign key referencing the attendance/service record opened to handle this message.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.fkatendimento
+  property_reference:
+    description: Human-readable reference code of the property, as displayed on the website listing.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.imovel_referencia
+  name:
+    description: Name provided by the message sender.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.nome
+  email:
+    description: Email address provided by the message sender.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.email
+  phone_area_code:
+    description: Area code (DDD) of the phone number provided by the message sender.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.dddtelefone
+  phone:
+    description: Phone number provided by the message sender.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.telefone
+  reply:
+    description: Text of the response sent back to the message sender, when applicable.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.resposta
+  message:
+    description: Free-text message/question submitted by the sender.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.msg
+  ip_address:
+    description: IP address from which the message was submitted.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.ip
+  import_code:
+    description: Import code used for data migration or integration tracking of this message record.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.codigo_importacao
+  is_seasonal_rental:
+    description: Flag indicating whether the message is about a seasonal/vacation rental (temporada) property.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.temporada
+  guest_count:
+    description: Number of guests/occupants requested for a seasonal rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.acomodacoes
+  enrichment_notes:
+    description: Free-text field with additional data enrichment applied to the message/sender.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.enriquecimento
+  is_read:
+    description: Flag indicating whether the message has been read by the assigned user/broker.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.lido
+  is_auto_distributed:
+    description: Flag indicating whether the message was automatically distributed to a user/broker instead of manually assigned.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.dist_auto
+  is_sent_tokko:
+    description: Flag indicating whether this message was exported to the Tokko CRM integration.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.enviado_tokko
+  dt_message:
+    description: Date the message was submitted through the website.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.data
+  dt_user_action:
+    description: Date the assigned internal user acted on this message.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.datausuario
+  dt_broker_action:
+    description: Date the assigned broker acted on this message.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.datacorretor
+  dt_check_in:
+    description: Requested check-in date for a seasonal/vacation rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.data_entrada
+  dt_check_out:
+    description: Requested check-out date for a seasonal/vacation rental inquiry.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.data_saida
+  dt_sent_tokko:
+    description: Date the message was exported to the Tokko CRM integration.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.data_envio_tokko
+  dt_paratime:
+    description: Timestamp parameter used internally by the source system for CDC/data-processing control.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.paratime
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.sites_mensagem.event_timestamp

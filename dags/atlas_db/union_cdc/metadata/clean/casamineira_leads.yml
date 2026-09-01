@@ -1,0 +1,78 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: casamineira_leads
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains leads received through the Casa Mineira classified-ad portal integration in
+  UnionDB. Each row represents one inquiry or contact event submitted by a prospective client on a
+  Casa Mineira listing page.
+columns:
+  id_casamineira_lead:
+    description: Casa Mineira lead primary key.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.codigo
+  id_company:
+    description: Foreign key referencing the real-estate company that received the lead.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.fkempresa
+  id_house:
+    description: Foreign key referencing the property the lead is inquiring about.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.fkimovel
+  id_portal_client:
+    description: Client identifier as registered on the Casa Mineira portal side, used to reconcile leads across systems.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.codigo_cliente_portal
+  id_portal_lead:
+    description: Original lead identifier assigned by the Casa Mineira portal to this inquiry.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.idlead
+  property_description:
+    description: Free-text property reference/description as displayed on the Casa Mineira listing.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.imovel
+  name:
+    description: Name provided by the prospective client in the Casa Mineira contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.nombre
+  email:
+    description: Email address provided by the prospective client in the Casa Mineira contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.email
+  phone_area_code:
+    description: Area code (DDD) of the phone number provided by the prospective client.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.ddd_telefono
+  phone:
+    description: Phone number provided by the prospective client in the Casa Mineira contact form.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.telefono
+  message:
+    description: Free-text message submitted by the prospective client through Casa Mineira.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.mensaje
+  event_type:
+    description: Type of contact event reported by the portal (e.g. message, phone-reveal, visit request).
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.tipo_evento
+  json_payload:
+    description: Raw JSON payload received from the Casa Mineira lead API, kept for traceability/debugging.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.json
+  dt_lead:
+    description: Date the lead was received from the portal.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.data
+  dt_paratime:
+    description: Timestamp parameter used internally by the source system for CDC/data-processing control.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.paratime
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.leads_casamineira.event_timestamp

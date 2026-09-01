@@ -1,0 +1,463 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: client
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains the customer/contact registry from UnionDB: individuals and legal entities that
+  act as landlords, tenants, guarantors, buyers, sellers, or suppliers for a real-estate company using
+  the platform. It stores identification, address, contact, banking, and role-flag information, and is
+  the main dimension referenced by houses, leads, and message tables in the Union CDC pipeline.
+columns:
+  id_client:
+    description: Client primary key (customer code).
+    lineage:
+      - datalake_union_cdc_raw.clientes.codcli
+  id_company:
+    description: Foreign key referencing the real-estate company/brokerage this client is registered under.
+    lineage:
+      - datalake_union_cdc_raw.clientes.fkEmpresa
+  id_broker:
+    description: Foreign key referencing the broker/agent assigned to this client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.fkcorretor
+  name:
+    description: Client full name (individual) or company legal name (legal entity).
+    lineage:
+      - datalake_union_cdc_raw.clientes.nome
+  normalized_name:
+    description: Normalized/indexed version of the client name used for search and deduplication.
+    lineage:
+      - datalake_union_cdc_raw.clientes.idxnome
+  address:
+    description: Client residential or business street address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.endereco
+  address_complement:
+    description: Address complement (apartment number, suite, block, etc.) for the client's address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.complemento
+  neighborhood:
+    description: Client's neighborhood/district.
+    lineage:
+      - datalake_union_cdc_raw.clientes.bairro
+  city:
+    description: Name of the client's city, part of the client's residential address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.cidade
+  state:
+    description: Client's state abbreviation (UF).
+    lineage:
+      - datalake_union_cdc_raw.clientes.uf
+  zip_code:
+    description: Client's postal code (CEP).
+    lineage:
+      - datalake_union_cdc_raw.clientes.cep
+  mailing_address:
+    description: Client's correspondence (mailing) address, when different from the residential address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.endcor
+  mailing_address_complement:
+    description: Address complement for the client's correspondence address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.compcor
+  mailing_neighborhood:
+    description: Neighborhood/district of the client's correspondence address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.baicor
+  mailing_city:
+    description: City of the client's correspondence address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.cidcor
+  mailing_state:
+    description: State abbreviation of the client's correspondence address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.ufcor
+  mailing_zip_code:
+    description: Postal code of the client's correspondence address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.cepcor
+  created_by_user:
+    description: Identifier of the operator/user who registered this client record.
+    lineage:
+      - datalake_union_cdc_raw.clientes.usercad
+  updated_by_user:
+    description: Identifier of the operator/user who last updated this client record.
+    lineage:
+      - datalake_union_cdc_raw.clientes.useratua
+  phone_1:
+    description: Primary telephone number for the client, including area code.
+    lineage:
+      - datalake_union_cdc_raw.clientes.telefone1
+  phone_2:
+    description: Secondary telephone number for the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.telefone2
+  mobile_phone:
+    description: Client's mobile phone number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.celular
+  fax_number:
+    description: Client's fax number, without the area code prefix.
+    lineage:
+      - datalake_union_cdc_raw.clientes.fax
+  email:
+    description: Client's primary contact email address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.email
+  website:
+    description: Client's personal or company website URL.
+    lineage:
+      - datalake_union_cdc_raw.clientes.site
+  person_type:
+    description: Person type indicator distinguishing individual (pessoa física) from legal entity (pessoa jurídica).
+    lineage:
+      - datalake_union_cdc_raw.clientes.pessoa
+  tax_id:
+    description: Brazilian federal tax ID — CPF for individuals or CNPJ for legal entities.
+    lineage:
+      - datalake_union_cdc_raw.clientes.cnpj_cpf
+  state_registration_or_id_document:
+    description: State tax registration number (Inscrição Estadual) for legal entities or identity document number (RG) for individuals.
+    lineage:
+      - datalake_union_cdc_raw.clientes.ie_rg
+  municipal_registration:
+    description: Municipal tax registration number (Inscrição Municipal) for legal entities.
+    lineage:
+      - datalake_union_cdc_raw.clientes.im
+  gender:
+    description: Client's gender, for individual clients.
+    lineage:
+      - datalake_union_cdc_raw.clientes.sexo
+  marital_status:
+    description: Client's marital status.
+    lineage:
+      - datalake_union_cdc_raw.clientes.civil
+  property_regime:
+    description: Marital property regime (regime de bens) applicable to the client's marriage, when relevant to guarantees.
+    lineage:
+      - datalake_union_cdc_raw.clientes.regime
+  dependents_count:
+    description: Number of dependents declared by the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.dependentes
+  nationality:
+    description: Client's declared nationality, for individual clients.
+    lineage:
+      - datalake_union_cdc_raw.clientes.nacionalidade
+  birthplace:
+    description: Client's place of birth (city/state of birth).
+    lineage:
+      - datalake_union_cdc_raw.clientes.naturalidade
+  profession:
+    description: Client's declared profession or occupation.
+    lineage:
+      - datalake_union_cdc_raw.clientes.profissao
+  education_level:
+    description: Client's declared education level.
+    lineage:
+      - datalake_union_cdc_raw.clientes.escolaridade
+  job_title:
+    description: Client's job title/position, typically used for corporate clients or their legal representative.
+    lineage:
+      - datalake_union_cdc_raw.clientes.cargo
+  business_line:
+    description: Client's line of business (ramo de atividade), for legal-entity clients.
+    lineage:
+      - datalake_union_cdc_raw.clientes.ramo
+  salutation:
+    description: Preferred form of address/salutation for the client (e.g. Sr., Sra., Dr.).
+    lineage:
+      - datalake_union_cdc_raw.clientes.tratamento
+  is_active:
+    description: Client status flag indicating whether the client record is currently active.
+    lineage:
+      - datalake_union_cdc_raw.clientes.ativo
+  notes:
+    description: Free-text internal notes about the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.notas
+  last_search:
+    description: Description of the client's last property search criteria/interest.
+    lineage:
+      - datalake_union_cdc_raw.clientes.ultima_busca
+  nickname:
+    description: Client's nickname or preferred short name.
+    lineage:
+      - datalake_union_cdc_raw.clientes.apelido
+  phone_1_area_code:
+    description: Area code (DDD) for the client's primary telephone number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.prefix_tel1
+  phone_2_area_code:
+    description: Area code (DDD) for the client's secondary telephone number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.prefix_tel2
+  mobile_phone_area_code:
+    description: Area code (DDD) for the client's mobile phone number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.prefix_cel
+  fax_area_code:
+    description: Area code (DDD) for the client's fax number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.prefix_fax
+  is_landlord:
+    description: Role flag indicating whether the client acts as a landlord (locador) in rental transactions.
+    lineage:
+      - datalake_union_cdc_raw.clientes.locador
+  is_beneficiary:
+    description: Role flag indicating whether the client is registered as a payment beneficiary (favorecido).
+    lineage:
+      - datalake_union_cdc_raw.clientes.favorecido
+  is_tenant:
+    description: Role flag indicating whether the client acts as a tenant (inquilino) in rental transactions.
+    lineage:
+      - datalake_union_cdc_raw.clientes.inquilino
+  is_guarantor:
+    description: Role flag indicating whether the client acts as a guarantor (fiador) on a rental contract.
+    lineage:
+      - datalake_union_cdc_raw.clientes.fiador
+  is_supplier:
+    description: Role flag indicating whether the client is registered as a supplier/vendor (fornecedor) to the company.
+    lineage:
+      - datalake_union_cdc_raw.clientes.fornece
+  is_seller:
+    description: Role flag indicating whether the client acts as a seller (vendedor) in sale transactions.
+    lineage:
+      - datalake_union_cdc_raw.clientes.vendedor
+  address_type:
+    description: Type/classification of the client's residential address (e.g. own, rented).
+    lineage:
+      - datalake_union_cdc_raw.clientes.tipoende
+  mailing_address_type:
+    description: Type/classification of the client's correspondence address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.tipoendeco
+  street_number:
+    description: Street number of the client's residential address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.numero
+  mailing_street_number:
+    description: Street number of the client's correspondence address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.numerocor
+  acquisition_channel:
+    description: Client acquisition/origination channel indicator.
+    lineage:
+      - datalake_union_cdc_raw.clientes.acend
+  marketing_source:
+    description: Marketing channel or media source through which the client was acquired.
+    lineage:
+      - datalake_union_cdc_raw.clientes.midia
+  income_1:
+    description: Client's primary declared monthly income, in BRL.
+    lineage:
+      - datalake_union_cdc_raw.clientes.renda1
+  income_2:
+    description: Client's secondary declared monthly income (e.g. spouse's income), in BRL.
+    lineage:
+      - datalake_union_cdc_raw.clientes.renda2
+  workplace:
+    description: Client's workplace name/address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.local_traba
+  payment_location:
+    description: Preferred payment location or method for the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.local_pagamento
+  bank_name:
+    description: Name of the client's bank.
+    lineage:
+      - datalake_union_cdc_raw.clientes.nbanco
+  bank_check_digit:
+    description: Digit/check digit associated with the client's bank code.
+    lineage:
+      - datalake_union_cdc_raw.clientes.dbanco
+  bank_code:
+    description: Client's bank code (FEBRABAN code).
+    lineage:
+      - datalake_union_cdc_raw.clientes.banco
+  branch_name:
+    description: Name/location of the client's bank branch (agência).
+    lineage:
+      - datalake_union_cdc_raw.clientes.nagencia
+  branch_check_digit:
+    description: Check digit of the client's bank branch number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.dagencia
+  branch_number:
+    description: Client's bank branch (agência) number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.agencia
+  account_number:
+    description: Client's bank account number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.conta
+  account_check_digit:
+    description: Check digit of the client's bank account number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.dconta
+  banking_agreement_code:
+    description: Banking agreement/covenant code (convênio) used for the client's payments/receipts.
+    lineage:
+      - datalake_union_cdc_raw.clientes.convenio
+  collection_portfolio_code:
+    description: Bank collection portfolio code (carteira) associated with the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.carteira
+  banking_instruction_code:
+    description: Banking instruction code applied to slips/collections issued for the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.instrucao
+  creci_number:
+    description: CRECI registration number (Regional Real Estate Council), when the client is itself a broker/agent.
+    lineage:
+      - datalake_union_cdc_raw.clientes.creci
+  identification_code:
+    description: Additional identification code or document used to identify the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.identifica
+  broker_name:
+    description: Free-text name of the broker/agent associated with the client, when not linked via id_broker.
+    lineage:
+      - datalake_union_cdc_raw.clientes.corretor
+  has_legal_process:
+    description: Flag indicating whether the client record has a pending legal/collections process.
+    lineage:
+      - datalake_union_cdc_raw.clientes.juridico
+  legacy_client_code:
+    description: Legacy client code carried over from a prior system migration.
+    lineage:
+      - datalake_union_cdc_raw.clientes.codcliold
+  alternate_client_code:
+    description: Secondary/alternate client code used for cross-referencing duplicate or merged records.
+    lineage:
+      - datalake_union_cdc_raw.clientes.codcli2
+  process_reason:
+    description: Reason code for a pending process or restriction associated with the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.motivopro
+  use_mailing_address:
+    description: Flag indicating whether correspondence should be sent to the client's correspondence address instead of the residential address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.corresp
+  phone_3_area_code:
+    description: Area code (DDD) for the client's third telephone number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.prefix_tel3
+  phone_3:
+    description: Client's third telephone number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.telefone3
+  preferred_phone:
+    description: Maximum/preferred telephone number to use when contacting the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.telmax
+  search_follow_up_phone:
+    description: Telephone number used specifically for property-search follow-up contact.
+    lineage:
+      - datalake_union_cdc_raw.clientes.telpsq
+  is_desktop:
+    description: Flag indicating the client record originated from or is flagged for desktop system display.
+    lineage:
+      - datalake_union_cdc_raw.clientes.flagdesk
+  residential_fax_area_code:
+    description: Area code (DDD) for the client's residential fax number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.prefix_faxres
+  residential_fax:
+    description: Client's residential fax number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.faxres
+  import_code:
+    description: Import code used for data migration or integration tracking of this client record.
+    lineage:
+      - datalake_union_cdc_raw.clientes.codigo_importacao
+  has_active_proposals:
+    description: Flag indicating whether the client has active purchase/rental proposals.
+    lineage:
+      - datalake_union_cdc_raw.clientes.flag_propostas
+  issuing_authority:
+    description: Issuing authority of the client's identity document (RG).
+    lineage:
+      - datalake_union_cdc_raw.clientes.orgao_expeditor
+  secondary_email:
+    description: Client's secondary contact email address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.email_sec
+  mobile_carrier:
+    description: Mobile carrier (operadora) associated with the client's mobile phone number.
+    lineage:
+      - datalake_union_cdc_raw.clientes.cel_operadora
+  duplicate_reference_code:
+    description: Reference code linking this client record to a detected duplicate record.
+    lineage:
+      - datalake_union_cdc_raw.clientes.codigo_duplica
+  negotiation_temperature:
+    description: Negotiation "temperature" score indicating how close the client is to closing a deal.
+    lineage:
+      - datalake_union_cdc_raw.clientes.termometro_neg
+  has_whatsapp:
+    description: Flag indicating whether the client's mobile number is registered/reachable on WhatsApp.
+    lineage:
+      - datalake_union_cdc_raw.clientes.possui_whatsapp
+  uniloc_is_landlord:
+    description: Flag indicating whether the client is registered as a landlord in the Uniloc rental management module.
+    lineage:
+      - datalake_union_cdc_raw.clientes.uniloc_locador
+  uniloc_is_tenant:
+    description: Flag indicating whether the client is registered as a tenant in the Uniloc rental management module.
+    lineage:
+      - datalake_union_cdc_raw.clientes.uniloc_locatario
+  uniloc_is_beneficiary:
+    description: Flag indicating whether the client is registered as a payment beneficiary in the Uniloc rental management module.
+    lineage:
+      - datalake_union_cdc_raw.clientes.uniloc_favorecido
+  uniloc_is_guarantor:
+    description: Flag indicating whether the client is registered as a guarantor in the Uniloc rental management module.
+    lineage:
+      - datalake_union_cdc_raw.clientes.uniloc_fiador
+  country:
+    description: Country of the client's residential address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.pais
+  mailing_country:
+    description: Country of the client's correspondence address.
+    lineage:
+      - datalake_union_cdc_raw.clientes.paiscor
+  uses_simplified_discount:
+    description: Flag indicating whether a simplified discount rule should be applied to this client's transactions.
+    lineage:
+      - datalake_union_cdc_raw.clientes.usar_desconto_simplificado
+  dt_registered:
+    description: Date when the client record was first registered in the source system.
+    lineage:
+      - datalake_union_cdc_raw.clientes.datacad
+  dt_updated:
+    description: Date when the client record was last updated in the source system.
+    lineage:
+      - datalake_union_cdc_raw.clientes.dataatua
+  dt_birth:
+    description: Client's date of birth, for individual clients.
+    lineage:
+      - datalake_union_cdc_raw.clientes.nascimento
+  dt_document_issued:
+    description: Issuance date of the client's identity document (RG).
+    lineage:
+      - datalake_union_cdc_raw.clientes.data_expedicao
+  dt_last_contact:
+    description: Date of the last recorded contact/interaction with the client.
+    lineage:
+      - datalake_union_cdc_raw.clientes.ultimo_contato
+  dt_paratime:
+    description: Timestamp parameter used internally by the source system for CDC/data-processing control.
+    lineage:
+      - datalake_union_cdc_raw.clientes.paratime
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.clientes.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.clientes.event_timestamp

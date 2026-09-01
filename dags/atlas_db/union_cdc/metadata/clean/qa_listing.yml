@@ -1,0 +1,195 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: qa_listing
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains a denormalized, English-language snapshot of property listing data used by the
+  QA (quality-assurance) subsystem in UnionDB — one row per property listing, with location, pricing,
+  and physical-characteristics attributes as published to portals. It complements qa_house (the QA
+  review workflow status) with the actual listing content being reviewed.
+columns:
+  id_qa_listing:
+    description: QA listing primary key.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.id
+  id_house_api:
+    description: House identifier as exposed by the UnionDB API, referencing the property this QA listing snapshot describes, and the only house key present on this table. WARNING - this is not QuintoAndar's house id and not the legacy UnionDB house key (house.id_house); joining it against either one produces wrong matches. Translate between the two key spaces via qa_house or qa_listing_clients, which carry both.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.houseId
+  detail_view_url:
+    description: URL of the public listing detail page as published.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.detailViewUrl
+  house_type:
+    description: Property type (e.g. apartment, house) as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.houseType
+  house_finality:
+    description: Listing purpose (sale or rent) as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.houseFinality
+  condominium_name:
+    description: Name of the condominium/building the property belongs to, when applicable.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.condominiumName
+  location_address:
+    description: Street address of the property as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationAddress
+  location_number:
+    description: Street number of the property as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationNumber
+  location_complement:
+    description: Address complement (apartment/unit number, block, etc.) as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationComplement
+  location_neighborhood:
+    description: Neighborhood of the property as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationNeighborhood
+  location_city:
+    description: City of the property as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationCity
+  location_state_name:
+    description: Full state name of the property's location as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationStateName
+  location_state_acronym:
+    description: State abbreviation (UF) of the property's location as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationStateAcronym
+  location_zip_code:
+    description: Postal code (CEP) of the property as published in the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationZipCode
+  location_lat:
+    description: Latitude coordinate of the property's location.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationLat
+  location_lng:
+    description: Longitude coordinate of the property's location.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationLng
+  location_country_name:
+    description: Full country name of the property's location.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationCountryName
+  location_country_code:
+    description: Country code of the property's location.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationCountryCode
+  location_floor_min:
+    description: Minimum floor number of the property, for multi-floor units.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationFloorMin
+  location_floor_max:
+    description: Maximum floor number of the property, for multi-floor units.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.locationFloorMax
+  title:
+    description: Listing title/headline as published.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.title
+  description:
+    description: Full listing description text as published.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.description
+  features:
+    description: Delimited list of amenities/features tagged on the listing (e.g. pool, gym, parking).
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.features
+  video_url:
+    description: URL of a video tour associated with the listing, when available.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.videourl
+  sale_price:
+    description: Published sale price of the property, in BRL.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.salePrice
+  rent_price:
+    description: Published monthly rent price of the property, in BRL.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.rentPrice
+  bedrooms:
+    description: Number of bedrooms in the property.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.bedrooms
+  suites:
+    description: Number of en-suite bedrooms in the property.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.suites
+  bathrooms:
+    description: Number of bathrooms in the property.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.bathrooms
+  garages:
+    description: Number of parking spaces in the property.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.garages
+  util_area:
+    description: Usable/private area of the property, in square meters.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.utilArea
+  total_area:
+    description: Total (gross) area of the property, in square meters.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.totalArea
+  condominium_price:
+    description: Monthly condominium fee for the property, in BRL.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.condominiumPrice
+  iptu_price:
+    description: Annual/monthly IPTU property-tax amount for the property, in BRL.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.iptuPrice
+  zone:
+    description: Zoning classification code of the property as published.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.zone
+  is_business_context_sale:
+    description: Flag indicating whether the sale business context is active for this listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.businessContextSale
+  is_business_context_rent:
+    description: Flag indicating whether the rental business context is active for this listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.businessContextRent
+  is_condominium:
+    description: Flag indicating whether the property belongs to a condominium/building complex.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.isCondominium
+  is_active_db:
+    description: Flag indicating whether this listing snapshot is currently active in the QA database.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.activeDb
+  dt_created:
+    description: Business date the listing was originally created/published.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.createDate
+  dt_updated:
+    description: Business date the listing content was last updated.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.updateDate
+  ts_created_db:
+    description: Timestamp when this listing snapshot record was created in the QA database.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.createDateDb
+  ts_updated_db:
+    description: Timestamp when this listing snapshot record was last updated in the QA database.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.updateDateDb
+  ts_active_db:
+    description: Timestamp when the is_active_db flag was last changed for this listing snapshot.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.activeDbDate
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing.event_timestamp

@@ -1,0 +1,68 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: qa_house
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains quality-assurance (QA) validation results for property listings (sale and rent)
+  in UnionDB — tracking the automated/manual review status of each property's ad content before or
+  after publishing. Grain is one row per property QA record. The table carries the property in both
+  key spaces: id_house (legacy UnionDB house key) and id_house_api (house key as exposed by the
+  UnionDB API). The two are not interchangeable.
+columns:
+  id_qa_house:
+    description: House QA record primary key.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.codigo
+  id_company:
+    description: Foreign key referencing the real-estate company that owns the property under QA review.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.fkempresa
+  id_house:
+    description: Foreign key referencing the property under QA review, via the legacy UnionDB identifier (house.id_house).
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.fkimovel
+  id_house_api:
+    description: House identifier as exposed by the UnionDB API, kept alongside id_house (the legacy UnionDB house key) because this source table carries the property in both key spaces. WARNING - this is not QuintoAndar's house id and must never be joined against house.id_house. Same key space as qa_listing.id_house_api.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.id_imovel_qa
+  uuid_qa_house:
+    description: UUID-style unique identifier assigned to the QA record by the source system.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.uid_imovel_qa
+  status:
+    description: Overall QA review status of the property listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.status
+  qa_status_sale:
+    description: QA review status specific to the property's sale listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.qa_status_sale
+  qa_status_rent:
+    description: QA review status specific to the property's rental listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.qa_status_rent
+  json_payload:
+    description: Raw JSON payload with the detailed QA review result/checklist for the property.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.json
+  feedback_message:
+    description: Free-text return/feedback message from the QA review process.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.retorno
+  dt_registered:
+    description: Date this QA record was registered in the source system.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.datacad
+  dt_updated:
+    description: Date this QA record was last updated in the source system.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.dataatua
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.qa_imoveis.event_timestamp

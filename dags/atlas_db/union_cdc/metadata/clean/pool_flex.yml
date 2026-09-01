@@ -1,0 +1,271 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: pool_flex
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains the per-company, per-portal publishing/integration configuration ("pool flex")
+  used to syndicate property listings from UnionDB to classified-ad portals — including FTP/API
+  credentials, portal-side client codes, feature flags (e.g. lead blocking, SEO fields), and inventory
+  counters. Grain is one row per company/portal integration setup.
+columns:
+  id_pool_flex:
+    description: Pool flex configuration primary key.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.codigo
+  id_company:
+    description: Foreign key referencing the real-estate company that owns this portal publishing configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.fkempresa
+  id_user:
+    description: Portal-side user/account identifier associated with this integration (not an internal QuintoAndar user).
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.iduser
+  is_desktop:
+    description: Flag indicating the configuration record originated from or is flagged for desktop system display.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.flagdesk
+  pool_code:
+    description: Internal code identifying which publishing pool/integration profile this configuration uses.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.codpool
+  ftp_host:
+    description: FTP server host used to transfer listing feed files to the portal.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.ftp
+  ftp_username:
+    description: FTP username used to authenticate with the portal's feed server.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.usuario
+  union_api_username:
+    description: Username used by the portal to authenticate back into UnionDB's integration endpoint.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.unionuser
+  ftp_group_directory:
+    description: FTP directory/group path where the listing feed files are placed for this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.grupodir
+  ftp_user_directory:
+    description: FTP user-specific directory path used for this configuration's feed files.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.userdir
+  is_asp_integration_ok:
+    description: Flag/code indicating whether the ASP-side integration step completed successfully.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.okasp
+  default_ftp_user:
+    description: Default FTP user profile applied to this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.dfuser
+  property_group_code:
+    description: Group/segment code used to classify which properties are included in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.grupoimo
+  property_group_name:
+    description: Display name used for the property group associated with this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.nomeimo
+  nickname:
+    description: Nickname/alias given to this publishing configuration for internal identification.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.apelido
+  creci_number:
+    description: CRECI registration number (Regional Real Estate Council) of the company as displayed on the portal.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.creci
+  personal_notes:
+    description: Free-text field for personal/internal notes about this publishing configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.pessoal
+  state:
+    description: State abbreviation (UF) used to scope which properties are eligible for this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.uf
+  website:
+    description: Web address associated with this publishing configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.web
+  configuration_type:
+    description: Type/category of this publishing configuration (e.g. which portal integration protocol it uses).
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.tipo
+  group_name:
+    description: Display name of the broader group this configuration belongs to.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.nomegrupo
+  server_code:
+    description: Flag/code identifying which feed server this configuration publishes through.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.servidor
+  is_confidential:
+    description: Flag indicating whether the address of properties in this feed should be published confidentially (hidden street/number).
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.confidencial
+  selection_rule:
+    description: Flag/rule controlling which properties are selected for inclusion in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.selecao
+  photo_selection_rule:
+    description: Flag/rule controlling which photos are selected for inclusion in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.selfoto
+  max_photos:
+    description: Maximum number of photos sent per property in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.numfotos
+  is_confidential_secondary:
+    description: Secondary confidentiality flag/rule applied to this feed (legacy duplicate of is_confidential).
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.confidenci
+  send_address:
+    description: Flag indicating whether the full property address should be sent in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.enviar_endereco
+  is_active:
+    description: Flag indicating whether this publishing configuration is currently active.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.ativo
+  is_suspended:
+    description: Flag indicating whether this publishing configuration is currently suspended.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.suspenso
+  id_portal_client:
+    description: Primary client identifier as registered on the target portal side for this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.codigo_cliente_portal
+  updated_by_user:
+    description: Identifier of the operator/user who last modified this configuration record.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.user_altera
+  is_promotion_enabled:
+    description: Flag indicating whether promotional/featured placement is enabled for this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.promocao
+  network_load_weight:
+    description: Load/weight setting used to distribute properties across the network for this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.carga_rede
+  lead_forwarding_email:
+    description: Email address to which leads generated through this portal integration are forwarded.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.email_lead
+  is_lead_email_confirmed:
+    description: Flag indicating whether the lead-forwarding email address has been confirmed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.email_confirmado
+  id_portal_client_2:
+    description: Secondary client identifier as registered on the target portal side, used for multi-account configurations.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.codigo_cliente_portal2
+  id_portal_client_3:
+    description: Tertiary client identifier as registered on the target portal side, used for multi-account configurations.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.codigo_cliente_portal3
+  inventory_count:
+    description: Total number of properties currently available in this feed's inventory.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.qtd_estoque
+  featured_count:
+    description: Number of properties in this feed marked as featured/highlighted listings.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.qtd_destaques
+  featured_count_secondary:
+    description: Number of properties in this feed marked under a secondary featured/highlighted tier.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.qtd_destaques2
+  published_count:
+    description: Number of properties from this feed currently published/online on the portal.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.qtd_imoveis_online
+  address_type_rule:
+    description: Address-type rule applied when publishing properties through this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.tipo_endereco
+  property_type_filter:
+    description: Property-type filter applied to select which properties are eligible for this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.tipo_imovel
+  listing_purpose_filter:
+    description: Listing purpose filter (sale/rent) applied to select which properties are eligible for this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.finalidade
+  import_code:
+    description: Import code used for data migration or integration tracking of this configuration record.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.codigo_importacao
+  show_updated_date:
+    description: Flag controlling whether the property's last-updated date is displayed on the portal.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.exibe_data_atua
+  generates_seasonal_listings:
+    description: Flag indicating whether seasonal/vacation-rental listings are generated for this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.gera_temporada
+  blocks_lead_capture:
+    description: Flag indicating whether lead capture is blocked for properties published through this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.bloqueia_lead
+  sends_detailed_info:
+    description: Flag indicating whether detailed property information is sent in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.flag_envia_detalhes
+  includes_promo_sale_price:
+    description: Flag indicating whether promotional sale price fields are included in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.flag_valvendapromo
+  includes_seo_fields:
+    description: Flag indicating whether SEO metadata fields are included in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.flag_campos_seo
+  blocks_smart_lead_routing:
+    description: Flag indicating whether smart/automated lead routing is blocked for this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.bloqueia_smart_lead
+  status_updated_by_user:
+    description: Identifier of the operator/user who last changed this configuration's status.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.user_altera_situacao
+  auto_activation_enabled:
+    description: Flag indicating whether newly published properties are automatically activated in this feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.auto_ativacao
+  imovelweb_includes_agent_email:
+    description: Flag specific to the ImovelWeb integration indicating whether the listing agent's email is included in the feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.iw_email_captador
+  ad_type_sent:
+    description: Ad-type code sent to the portal for properties published through this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.tipo_anuncio_enviado
+  imovelweb_includes_agent_data:
+    description: Flag specific to the ImovelWeb integration indicating whether the listing agent's contact data is included in the feed.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.iw_dados_captador
+  dt_status:
+    description: Date when this configuration's current status (situação) was last set.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.data_situacao
+  dt_suspended:
+    description: Date when this configuration was suspended, if applicable.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.data_suspensao
+  dt_promoted:
+    description: Date when promotional/featured placement was last enabled for this configuration.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.data_promocao
+  dt_updated:
+    description: Date this configuration record was last updated in the source system.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.data_altera
+  dt_paratime:
+    description: Timestamp parameter used internally by the source system for CDC/data-processing control.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.paratime
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.pool_flex.event_timestamp

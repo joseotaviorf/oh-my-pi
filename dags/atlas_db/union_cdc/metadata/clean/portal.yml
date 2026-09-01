@@ -1,0 +1,52 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: portal
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains the catalog of real-estate classified-ad portals (e.g. VivaReal, ZAP, ImovelWeb)
+  integrated with UnionDB, including each portal's contact details and its network/pool-flex publishing
+  configuration. It is a small dimension table used to resolve portal foreign keys on the lead and
+  listing-distribution tables (site_leads, portal_leads, portal_messages, imovelweb_leads, etc.) in the
+  Union CDC pipeline.
+columns:
+  id_portal:
+    description: Portal primary key.
+    lineage:
+      - datalake_union_cdc_raw.portal.pkportal
+  id_network:
+    description: Foreign key referencing the real-estate network (rede) this portal is grouped under.
+    lineage:
+      - datalake_union_cdc_raw.portal.fkrede
+  id_pool_flex:
+    description: Foreign key referencing the pool_flex publishing configuration used to syndicate listings to this portal.
+    lineage:
+      - datalake_union_cdc_raw.portal.fkportal_poolflex
+  name:
+    description: Portal display name (e.g. VivaReal, ZAP, ImovelWeb).
+    lineage:
+      - datalake_union_cdc_raw.portal.nome
+  website:
+    description: Portal's website URL, as registered in UnionDB.
+    lineage:
+      - datalake_union_cdc_raw.portal.site
+  email:
+    description: Contact email address used for communication with the portal.
+    lineage:
+      - datalake_union_cdc_raw.portal.email
+  account_owner:
+    description: Name of the person or team responsible for the relationship with this portal.
+    lineage:
+      - datalake_union_cdc_raw.portal.responsavel
+  dt_paratime:
+    description: Timestamp parameter used internally by the source system for CDC/data-processing control.
+    lineage:
+      - datalake_union_cdc_raw.portal.paratime
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.portal.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.portal.event_timestamp

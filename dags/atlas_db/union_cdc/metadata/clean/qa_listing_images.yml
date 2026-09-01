@@ -1,0 +1,54 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: qa_listing_images
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains the photos associated with each property listing snapshot tracked by the QA
+  subsystem in UnionDB (see qa_listing), including image URLs, thumbnail URLs, display order, and the
+  main-photo flag. Grain is one row per photo per listing.
+columns:
+  id_qa_listing_image:
+    description: QA listing image primary key.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.id
+  id_house_api:
+    description: House identifier as exposed by the UnionDB API, referencing the listing this photo belongs to, and the only house key present on this table. WARNING - this is not QuintoAndar's house id and not the legacy UnionDB house key (house.id_house); joining it against either one produces wrong matches. Translate between the two key spaces via qa_house or qa_listing_clients, which carry both.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.houseId
+  description:
+    description: Caption/description text associated with the photo.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.description
+  url:
+    description: Full-resolution URL of the photo.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.url
+  url_thumb:
+    description: Thumbnail URL of the photo.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.urlThumb
+  display_order:
+    description: Position in which the photo is displayed within the listing's photo gallery.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.order
+  is_main:
+    description: Flag indicating whether this photo is the main/cover photo for the listing.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.main
+  ts_created_db:
+    description: Timestamp when this photo record was created in the QA database.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.createDateDb
+  ts_updated_db:
+    description: Timestamp when this photo record was last updated in the QA database.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.updateDateDb
+  op:
+    description: DMS change-data-capture operation code for this row version (e.g. insert/update/delete), injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.Op
+  event_timestamp:
+    description: Timestamp at which the DMS change-data-capture event was captured at the source, injected by the raw-to-clean CDC load process.
+    lineage:
+      - datalake_union_cdc_raw.qa_listing_images.event_timestamp
