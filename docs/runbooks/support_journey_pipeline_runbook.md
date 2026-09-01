@@ -75,7 +75,7 @@ flowchart TD
   SF["bietlejuice.salesforce (0 21 * * *)"] --> SFCLN["record_types, case_milestones"]
   CH["bigfone / quinto_messenger / sauron /<br/>support_session_service (0 21 * * *)"] --> CHCLN["clean de canais"]
 
-  CLEAN -->|sensor hourly| CORE["bietlejuice.core_support_journey<br/>hourly (0 * * * *)"]
+  DLQ -->|sensor hourly| CORE["bietlejuice.core_support_journey<br/>hourly (0 * * * *)"]
   SFCLN -->|sensor daily| CORE
   CHCLN -->|sensor daily| CORE
 
@@ -93,8 +93,9 @@ flowchart TD
 1. AppFlow grava a partição horária do CDC no S3.
 2. `salesforce_cdc` transforma raw → clean, roda o **DLQ** (recovery +
    reprocess da clean) e só então gera a métrica de missing events.
-3. `core_support_journey` espera os **sensores** (CDC clean hourly + fontes
-   diárias) e carrega `cases` (por hora) e `services` (efetivamente 1×/dia).
+3. `core_support_journey` espera os **sensores** (CDC **DLQ** hourly de Case +
+   clean hourly de User + fontes diárias) e carrega `cases` (por hora) e
+   `services` (efetivamente 1×/dia).
 4. `dw_support_journey` sobe via **Datasets** quando `cases` **e** `services`
    emitem seus datasets.
 5. Datamarts a jusante (ex.: `dw_bpo_performance`).
@@ -672,6 +673,7 @@ SERVICES_CONFIG = {
 | `salesforce_cdc` / `core_support_journey` parou e horas seguintes não rodam | Airflow (grid)                                                                     | Efeito de `depends_on_past=True`: resolver a run mais antiga em falha; só então as seguintes destravam                                                     |
 | Ingestão sem dados numa hora                                                | `datalake_sst_metrics.appflow_status` (`status != 'Active'`), `events_type_volume` | Se AppFlow ≠ `Active`, recovery via API já atua; validar se é gap real ou fluxo diário/RECOVERY                                                            |
 | `missing_events` positivo mesmo após DLQ verde                              | `events_type_volume` com `event_type = 'DLQ_RECOVERY'`                             | Gap real: `missing_events` roda **depois** do DLQ, logo é o que o recovery não cobriu. Compare com `DLQ_RECOVERY` (`layer` raw vs clean) na mesma hora        |
+| `core_support_journey` travado esperando o CDC de Case                      | Airflow (grid) — task `dlq_events_case`                                            | O sensor aguarda `dlq_events_case` (não mais `load_datalake_salesforce_clean_events_case`), para que o recovery já esteja na clean. Marque a task DLQ da hora presa como success para destravar |
 | Reexecutei a partição e "não fez nada"                                      | Comportamento de skip (§4)                                                         | Limpar a partição no Delta destino antes de reexecutar (raw/clean/`cases`: `(date, hour)`; `services`: `d-1`)                                              |
 | Preciso reprocessar um período grande (backfill)                            | Backfill via configuração (§8)                                                     | `cases`: `is_backfill_run=True` + partição de início; `services`: `is_backfill_run=True` + `delta_hours` por source. Ignora o skip e recompõe o SCD Type 2 |
 | Run de meia-noite lenta                                                     | `services` processa d-1 (§6)                                                       | Esperado até 4h; investigar só se estourar timeout recorrentemente                                                                                         |

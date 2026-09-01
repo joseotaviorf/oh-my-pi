@@ -163,6 +163,7 @@ POST_CLEAN_STAGES = (
             entry_point="salesforce/dlq",
             target_schema="datalake_salesforce_raw",
             event_parameters=("api_entity", "salesforce_endpoint"),
+            emits_dataset=True,
         ),
     ),
     (
@@ -184,7 +185,7 @@ POST_CLEAN_STAGES = (
 
 def build_stage_task(spec: Dict, event_table: str, event_parameters: Dict, pool: str):
     """Turn one POST_CLEAN_STAGES entry into a task via ``create_sst_task``."""
-    return create_sst_task(
+    task = create_sst_task(
         target_schema=spec.get("target_schema", ""),
         target_table=event_table,
         entry_point=spec["entry_point"],
@@ -194,6 +195,12 @@ def build_stage_task(spec: Dict, event_table: str, event_parameters: Dict, pool:
         task_id=spec["task_id"].format(table=event_table),
         pool=pool,
     )
+    if spec.get("emits_dataset", False):
+        # For downstream dataset-triggered DAGs. core_support_journey does NOT
+        # use this: it gates on the task name via SStExternalTaskSensor, driven
+        # by the ``tasks:`` list in its *_conf.yml.
+        DatasetAdder.attach_dataset_to_task(task)
+    return task
 
 
 def wire_task_stages(
@@ -248,8 +255,9 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
         },
         pool=pool,
     )
-    # Emit a per-table dataset event for the clean layer so downstream
-    # DAGs can trigger on this DAG via dependencies.yaml.
+    # Clean still emits its own dataset for downstream consumers. Core Support
+    # Journey's Case sensor now waits on ``dlq_events_case`` instead, so recovery
+    # is already in clean before the core model reads it.
     DatasetAdder.attach_dataset_to_task(clean_task)
 
     if parameters.get("skip_quality_contracts", False):

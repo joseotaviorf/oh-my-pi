@@ -34,7 +34,7 @@ _CONFIG_VALUES = {
         },
         "bietlejuice.salesforce_cdc": {
             "is_daily": False,
-            "tasks": ["load_datalake_salesforce_clean_events_case"],
+            "tasks": ["dlq_events_case"],
         },
     },
     "webhook_salesforce_cdc": "WEBHOOK_TEST",

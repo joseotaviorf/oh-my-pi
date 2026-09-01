@@ -17,7 +17,7 @@ dependencies:
   bietlejuice.salesforce_cdc:
     is_daily: false
     tasks:
-      - load_datalake_salesforce_clean_events_case
+      - dlq_events_case
       - load_datalake_salesforce_clean_events_user
   bietlejuice.bigfone:
     is_daily: true
