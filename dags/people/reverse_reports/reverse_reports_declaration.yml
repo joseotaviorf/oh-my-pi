@@ -194,6 +194,12 @@ workflow:
       extra_spark_job_arguments:
         - "1OI1OoQCZWP37HrPQsFGn2VmpQkgbE5-apJIa4qJnGMo"
         - "base_completa_grupo"
+    # Former notebook: gh_funnel (Daily Pipeline) — DBP-1902.
+    # Governance: docs/ta_applications_funnel.md
+    ta_applications_funnel:
+      extra_spark_job_arguments:
+        - "1Q5fzX2njlEZBUwrEfyCouuD07RsoMY1glKCVBm_UNCo"
+        - "ta_funnel_full"
 
     # --- people_reports notebook migration (Tier-1 validated) ---
     # Former notebook view: base_wfa

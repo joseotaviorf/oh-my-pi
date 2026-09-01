@@ -4705,6 +4705,7 @@ bietlejuice.reverse_reports:
   - bietlejuice.greenhouse_v3:load-clean-offices:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-rejection-details:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-rejection-reasons:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-sources:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-turnover-user-roles:first-run-of-day
   - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
