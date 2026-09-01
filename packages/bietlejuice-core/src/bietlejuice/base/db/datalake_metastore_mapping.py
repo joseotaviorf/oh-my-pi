@@ -20,6 +20,7 @@ SCHEMAS_WITHOUT_DATALAKE_PREFIX = frozenset(
         "ops_public",
         "bi_metrics",
         "forrent_postcontract",
+        "forsale_postcontract",
     }
 )
 
@@ -44,6 +45,7 @@ CONSUMPTION_SCHEMAS = frozenset(
         "ops_public",
         "bi_metrics",
         "forrent_postcontract",
+        "forsale_postcontract",
     }
 )
 
