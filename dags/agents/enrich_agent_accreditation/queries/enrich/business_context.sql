@@ -163,28 +163,77 @@ legacy_context_candidates AS (
             OR segments.ts_revision_started < intervals.ts_context_ended
         )
 ),
-legacy_context_intervals AS (
+legacy_context_marked AS (
     SELECT
         candidates.id_agent_data,
+        candidates.business_context,
+        candidates.ts_revision_started,
+        candidates.ts_context_ended,
+        LAG(business_context) OVER (
+            PARTITION BY id_agent_data
+            ORDER BY ts_revision_started
+        ) AS previous_business_context,
+        LAG(ts_context_ended) OVER (
+            PARTITION BY id_agent_data
+            ORDER BY ts_revision_started
+        ) AS previous_segment_ended
+    FROM
+        legacy_context_candidates AS candidates
+    WHERE
+        candidates.rn = 1
+),
+legacy_context_grouped AS (
+    SELECT
+        id_agent_data,
+        business_context,
+        ts_revision_started,
+        ts_context_ended,
+        SUM(
+            CASE
+                WHEN previous_business_context = business_context
+                    AND previous_segment_ended = ts_revision_started
+                    THEN 0
+                ELSE 1
+            END
+        ) OVER (
+            PARTITION BY id_agent_data
+            ORDER BY ts_revision_started
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS context_group
+    FROM
+        legacy_context_marked
+),
+legacy_context_intervals AS (
+    SELECT
+        grouped.id_agent_data,
         identity.id_agent,
         identity.id_user,
         identity.uuid_person,
-        candidates.business_context,
-        candidates.ts_revision_started,
-        candidates.ts_context_ended
+        grouped.business_context,
+        MIN(grouped.ts_revision_started) AS ts_revision_started,
+        CASE
+            WHEN COUNT(grouped.ts_context_ended) < COUNT(*)
+                THEN CAST(NULL AS TIMESTAMP)
+            ELSE MAX(grouped.ts_context_ended)
+        END AS ts_context_ended
     FROM
-        legacy_context_candidates AS candidates
+        legacy_context_grouped AS grouped
     INNER JOIN legacy_agent_identity AS identity
-        ON identity.id_agent_data = candidates.id_agent_data
-    WHERE
-        candidates.rn = 1
+        ON identity.id_agent_data = grouped.id_agent_data
+    GROUP BY
+        grouped.id_agent_data,
+        identity.id_agent,
+        identity.id_user,
+        identity.uuid_person,
+        grouped.business_context,
+        grouped.context_group
 ),
 new_business_context_events AS (
     SELECT
         -- id_agent_data is in the key too: one Agent Domain identity can map to more than
         -- one legacy id_agent_data, and omitting it let two such rows collide on the same
         -- key, silently dropping one id_agent_data's row in the dedup below (AAREDE-526).
-        XXHASH64(aer.uuid_person, settings.id_agent, aer.id_agent_data, settings.business_context, settings.ts_started) AS id_agent_business_context,
+        XXHASH64(aer.uuid_person, settings.id_agent, aer.id_agent_data, settings.business_context, DATE(settings.ts_started)) AS id_agent_business_context,
         settings.id_agent,
         aer.id_agent_data,
         aer.id_user,
