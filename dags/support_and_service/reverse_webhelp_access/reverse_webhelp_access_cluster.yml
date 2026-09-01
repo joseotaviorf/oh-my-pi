@@ -2,11 +2,16 @@ cluster:
   type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_libraries:
   # WASBS export (wasbs://) — not bundled on EMR; Databricks includes hadoop-azure.
-  # EMR bootstrap resolves direct Maven artifacts only (no transitive deps).
+  # EMR bootstrap resolves direct Maven artifacts only (no Ivy transitive resolve).
+  # Closure for hadoop-azure 3.4.1 + azure-storage 7.0.1 (all non-EMR compile deps):
   - maven:
       coordinates: org.apache.hadoop:hadoop-azure:3.4.1
   - maven:
       coordinates: com.microsoft.azure:azure-storage:7.0.1
+  - maven:
+      coordinates: com.microsoft.azure:azure-keyvault-core:1.0.0
+  - maven:
+      coordinates: org.eclipse.jetty:jetty-util:9.4.53.v20231009
   - maven:
       coordinates: org.eclipse.jetty:jetty-util-ajax:9.4.53.v20231009
   - maven:
