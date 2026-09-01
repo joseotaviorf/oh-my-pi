@@ -1,5 +1,11 @@
 cluster:
   type: emr_7_12_consolidation_s_memory_fleet_cluster
+  custom_libraries:
+  # WASBS export (wasbs://) — not bundled on EMR; Databricks includes hadoop-azure.
+  - maven:
+      coordinates: org.apache.hadoop:hadoop-azure:3.4.1
+  - maven:
+      coordinates: com.microsoft.azure:azure-storage:7.0.1
   custom_configurations:
     task_nodes:
       instance_types:
