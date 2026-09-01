@@ -1,9 +1,7 @@
 cluster:
   type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.executor.memory: 96g
       spark.executor.memoryOverhead: 8g
       spark.driver.memory: 20g
