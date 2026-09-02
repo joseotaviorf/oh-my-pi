@@ -28,6 +28,7 @@ It focuses only on what exists in code today, plus known limitations.
 - [Authentication](#authentication-workflowauthentication)
   - [Parameter reference (authentication)](#parameter-reference-authentication)
 - [Request params and date placeholders](#request-params-and-date-placeholders)
+- [Bounded validation on EMR](#bounded-validation-on-emr)
 - [Pagination](#pagination-api_policiespagination) (`none`, `offset_limit`, `page_per_page`, `cursor`)
 - [Rate limiting](#rate-limiting-api_policiesrate_limiting)
 - [Error handling](#error-handling-api_policieserror_handling)
@@ -357,15 +358,60 @@ When an endpoint bounds how much time one call may cover, use table-level **`dat
 |-----|----------|-------------|
 | `param_name` | one of `param_name` / `param_names` | Query param to override per iteration (e.g. `date`) |
 | `param_names` | one of `param_name` / `param_names` | List of query params **all set to the same expanded date** — for range endpoints that cap the window at one day (e.g. `[from, to]` when the API answers `400 "Date range from-to cannot be bigger than 1 day"`) |
-| `strategy` | yes | `last_n_days` — inclusive rolling window of `days` ending on the anchor; or `previous_and_current_calendar_month` — from the 1st of the previous calendar month through the anchor |
+| `strategy` | yes | `load_window` — every date from `load_start_date` through `load_end_date` inclusive; `last_n_days` — inclusive rolling window of `days` ending on the anchor; or `previous_and_current_calendar_month` — from the 1st of the previous calendar month through the anchor |
 | `days` | when `strategy: last_n_days` | Positive integer (e.g. `45` for ~six weeks of retroactive hours-bank adjustments) |
 | `anchor` | no | `load_end_date` (default) or `load_start_date` — last day of the window for `last_n_days` |
+
+For `strategy: load_window`, the Spark job uses the dates already resolved from
+the task arguments (including `dag_run.conf`). The range is inclusive: equal
+start and end dates make one request, while a start date after the end date
+fails validation with a clear error. The existing strategies are unchanged.
 
 Keep the **clean SQL** date filter aligned with the chosen window (e.g. for `last_n_days: 45` and `anchor: load_end_date`, filter `dt_balanced` between `DATE_ADD(load_end_date, -44)` and `load_end_date` inclusive).
 
 Under `id_expansion`, combine with `max_workers` and `payload_filters` to control volume and concurrency — without parallel workers, a large lookback window will usually exceed Airflow task timeouts. Plain (non-`id_expansion`) tables fetch the expanded dates sequentially, one paginated fetch per date.
 
 Raw incremental loads **append**: every run re-appends the overlapping window, so pair the lookback with a `merge_on` key and a latest-`ts_load` dedup in the clean query (see the punches example).
+
+### Explicit load windows, date offsets, and availability tolerance
+
+Date placeholders in `tables_customization.<table>.params` may include a
+signed integer day offset:
+
+```yaml
+tables_customization:
+  summaries:
+    endpoint_path: summaries
+    params:
+      starting_date: load_start_date
+      ending_date: load_end_date+1
+    availability_tolerance:
+      message_patterns:
+        - "latest available data"
+```
+
+Offsets are applied by the Spark job **after** the `load_start_date` and
+`load_end_date` arguments have been resolved. Therefore, a run supplied with
+`dag_run.conf` uses the conf dates and then applies `+N` or `-N`; Jinja-only
+offsets are not required for this behavior. Exact placeholders and literal
+parameter values remain unchanged. Supported forms are
+`load_start_date`, `load_start_date±N`, `load_end_date`, and
+`load_end_date±N`, where `N` is an integer number of calendar days. Malformed
+forms fail with an actionable configuration error.
+
+`availability_tolerance` is opt-in and accepts a non-empty list of
+case-insensitive regular-expression `message_patterns`. A matching response
+is tolerated only when its status is **400**; the affected request/date is
+logged as a warning and skipped. If the request used an offset placeholder,
+the job retries once with the equivalent unshifted date before warning and
+skipping. A second matching unavailable-date response is skipped; a
+non-matching response still fails after the client's existing retries.
+Without `availability_tolerance`, `id_expansion` retains its existing
+per-entity error handling.
+
+Do not use availability tolerance to hide usage/cost range-limit errors:
+those vendor endpoints remain capped at **31 days**, and this framework does
+not chunk or tolerate that limit.
 
 ### Runtime behaviour
 
@@ -497,20 +543,27 @@ tables_customization:
 
 ## Authentication (`workflow.authentication`)
 
-> **Databricks → EMR migration:** Databricks is being phased out; all new `api_ingestion` DAGs
-> run on EMR, where credentials are resolved from **AWS Secrets Manager** (mirrored from Vault),
-> not Databricks Secrets. Before implementing a new ingestion, see
-> [prerequisites.md](prerequisites.md) for the Vault → EMR Secrets Manager mirror request. The
-> secret-scope mechanics below describe the legacy Databricks Secrets path and are being updated
-> for the EMR equivalent.
+> **Runtime:** New `api_ingestion` DAGs run on EMR. When `SPARK_RUNTIME=emr`, the shared
+> runtime resolves credentials from **AWS Secrets Manager** using the EMR instance role. Secrets
+> are mirrored from Vault; EMR does not read Vault directly. Before implementing a new
+> ingestion, see [prerequisites.md](prerequisites.md) for the mirror request. Databricks
+> Secrets remains a legacy path for existing Databricks runs.
 
-The secret scope is read from:
+On EMR:
 
-- `workflow.credentials_scope` (preferred, per-DAG), otherwise
-- `DATABRICKS_SECRET_SCOPE` (fallback, default: `quintoandar`).
+- `authentication.secret_key` is the AWS Secrets Manager secret ID by default.
+- `workflow.credentials_scope` remains available as a compatibility input when an
+  `BIETL_SECRETS_MANAGER_SECRET_ID_TEMPLATE` uses `{scope}`.
 
-Whenever the API requires a credential (API key, token, client secret, etc.), it **must be stored in Databricks Secrets** and referenced from the YAML (e.g., via `authentication.secret_key` in the currently supported strategies).
-If you need help creating/updating a secret, see [Save a credential in Databricks Secrets](https://docs.google.com/document/d/1ZqeBdDOoij00-0lYF1QbWkmQdKFBVg494wlQTTHuLFY/edit?tab=t.0#heading=h.yvxztbuje7xm).
+Whenever the API requires a credential (API key, token, client secret, etc.), it **must be
+stored in Vault and mirrored to AWS Secrets Manager** using the process in
+[prerequisites.md](prerequisites.md). Never create or rotate the EMR secret directly in the
+AWS or Databricks UI.
+
+For legacy Databricks runs, the key is read from the scope configured by
+`workflow.credentials_scope`, or `DATABRICKS_SECRET_SCOPE` (default: `quintoandar`). See
+[Save a credential in Databricks Secrets](https://docs.google.com/document/d/1ZqeBdDOoij00-0lYF1QbWkmQdKFBVg494wlQTTHuLFY/edit?tab=t.0#heading=h.yvxztbuje7xm)
+only for that legacy path.
 
 ### `strategy: none`
 
@@ -542,8 +595,11 @@ Config:
 ### Parameter reference (authentication)
 
 - **`authentication.strategy`** string (required): one of `none`, `basic`, `oauth2_client_credentials`, `api_key`.
-- **`authentication.secret_key`** string (required for `basic` and `oauth2_client_credentials`): Databricks secret key.
-  - Secret scope is read from `workflow.credentials_scope` (preferred) or `DATABRICKS_SECRET_SCOPE` (fallback, default: `quintoandar`).
+- **`authentication.secret_key`** string (required for `basic`, `oauth2_client_credentials`, and `api_key`): secret ID/key.
+  - On EMR, this is the AWS Secrets Manager secret ID unless the configured
+    `BIETL_SECRETS_MANAGER_SECRET_ID_TEMPLATE` changes the mapping.
+  - On legacy Databricks runs, it is the key inside the scope from
+    `workflow.credentials_scope` or `DATABRICKS_SECRET_SCOPE` (default: `quintoandar`).
 
 For **`strategy: basic`**:
 
@@ -566,11 +622,35 @@ For **`strategy: oauth2_client_credentials`**:
 
 For **`strategy: api_key`**:
 
-- **`authentication.secret_key`** string (required): Databricks secret key containing the API key.
+- **`authentication.secret_key`** string (required): secret ID/key containing
+  the API key; lookup uses the active runtime's secret backend described above.
 - **`authentication.api_key_field`** string (optional, default: `api_key`): field in secret JSON holding the API key value.
 - **`authentication.location`** string (optional, default: `header`): one of `header`, `query_param`.
 - **`authentication.header_name`** string (optional, default: `x-api-key`): header name when using `location: header`.
 - **`authentication.query_param_name`** string (optional, default: `token`): query param name when using `location: query_param`.
+
+---
+
+## Bounded validation on EMR
+
+Framework changes can be validated before a downstream DAG adopts them by
+running the branch Spark job in an ephemeral EMR step.
+
+- Stage the branch job and a temporary validation driver through the approved
+  EMR artifact path; confirm the artifact source SHA before execution.
+- Run with `SPARK_RUNTIME=emr` and the existing Vault → AWS Secrets Manager
+  mirror. Do not place credentials in the runner, command arguments, or logs.
+- Use a bounded three-day `dag_run.conf` window and an in-memory configuration
+  overlay to exercise date expansion, post-conf offsets, and availability
+  fallback without changing the production declaration.
+- Replace the raw writer with an aggregate-only collector. Evidence may include
+  request dates, counts, statuses, fallback counts, runtime, and source SHA,
+  but must not include API payloads or write production raw tables.
+- Terminate the ephemeral EMR cluster through the approved lifecycle after the
+  result is collected.
+
+This bounded run validates the shared framework only. End-to-end behavior after
+`claude_usage_api` adopts the options is a separate follow-up validation.
 
 ---
 

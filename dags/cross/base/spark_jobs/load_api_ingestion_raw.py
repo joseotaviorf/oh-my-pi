@@ -12,6 +12,7 @@ Uses the standard library :mod:`logging` for this workflow (aligned with
 import itertools
 import json
 import logging
+import re
 import time
 from argparse import ArgumentParser, Namespace
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
@@ -33,6 +34,8 @@ from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 
 JOB_NAME = "load_api_ingestion_raw"
 LOGGER = logging.getLogger(__name__)
+DATE_PLACEHOLDERS = ("load_start_date", "load_end_date")
+DATE_OFFSET_PATTERN = re.compile(r"^(load_(?:start|end)_date)([+-]\d+)$")
 
 
 def parse_arguments() -> Namespace:
@@ -117,6 +120,25 @@ def _dates_previous_and_current_calendar_month(anchor_iso: str) -> List[str]:
     return dates_out
 
 
+def _dates_load_window(load_start_iso: str, load_end_iso: str) -> List[str]:
+    """Returns every inclusive calendar date in the resolved load window."""
+    load_start = date.fromisoformat(load_start_iso)
+    load_end = date.fromisoformat(load_end_iso)
+    if load_start > load_end:
+        raise ValueError(
+            "m=_dates_load_window, "
+            f"load_start_date={load_start_iso}, load_end_date={load_end_iso} "
+            "msg=load_start_date must be on or before load_end_date"
+        )
+
+    dates_out: List[str] = []
+    cursor = load_start
+    while cursor <= load_end:
+        dates_out.append(cursor.isoformat())
+        cursor += timedelta(days=1)
+    return dates_out
+
+
 def _dates_last_n_days(anchor_iso: str, days: int) -> List[str]:
     """
     Returns inclusive ISO dates for the last ``days`` calendar days ending on the anchor.
@@ -155,6 +177,97 @@ def _format_date_expansion_value(iso_date: str, date_format: Optional[str]) -> s
     return f"{iso_date}T00:00:00.000Z"
 
 
+def _format_date_parameter_value(
+    parameter_date: date,
+    placeholder: str,
+    date_format: Optional[str],
+) -> str:
+    """Formats an offset date using the same boundaries as the API loader."""
+    if date_format:
+        return parameter_date.strftime(date_format)
+    time_suffix = (
+        "T00:00:00.000Z" if placeholder == "load_start_date" else "T23:59:59.999Z"
+    )
+    return f"{parameter_date.isoformat()}{time_suffix}"
+
+
+def _resolve_initial_params(
+    loader: APIConfigurationLoader,
+    table_config: Dict[str, Any],
+    load_start_date: str,
+    load_end_date: str,
+    date_format: Optional[str],
+    apply_offsets: bool = True,
+) -> Dict[str, Any]:
+    """
+    Applies per-table date offsets after the DAG has resolved its load dates.
+
+    Offset syntax is an existing date placeholder followed by a signed integer
+    number of calendar days, for example ``load_end_date+1``.
+    """
+    params = loader.get_initial_params(load_start_date, load_end_date)
+    table_params = table_config.get("params")
+    if not isinstance(table_params, dict):
+        return params
+
+    base_dates = {
+        "load_start_date": date.fromisoformat(load_start_date),
+        "load_end_date": date.fromisoformat(load_end_date),
+    }
+
+    for param_name, param_value in table_params.items():
+        if not isinstance(param_value, str):
+            continue
+        if param_value in DATE_PLACEHOLDERS:
+            continue
+
+        match = DATE_OFFSET_PATTERN.fullmatch(param_value)
+        if not match:
+            if param_value.startswith(DATE_PLACEHOLDERS):
+                raise ValueError(
+                    "m=_resolve_initial_params, "
+                    f"param={param_name}, value={param_value!r} "
+                    "msg=Invalid date offset; expected "
+                    "load_start_date or load_end_date followed by +/-integer days"
+                )
+            continue
+
+        placeholder, offset_text = match.groups()
+        offset_days = int(offset_text) if apply_offsets else 0
+        shifted_date = base_dates[placeholder] + timedelta(days=offset_days)
+        params[param_name] = _format_date_parameter_value(
+            shifted_date, placeholder, date_format
+        )
+
+    return params
+
+
+def _resolve_date_parameter_offsets(
+    table_config: Dict[str, Any],
+) -> Dict[str, Tuple[str, int]]:
+    """Returns validated per-table date offsets keyed by query parameter."""
+    table_params = table_config.get("params")
+    if not isinstance(table_params, dict):
+        return {}
+
+    offsets: Dict[str, Tuple[str, int]] = {}
+    for param_name, param_value in table_params.items():
+        if not isinstance(param_value, str) or param_value in DATE_PLACEHOLDERS:
+            continue
+        match = DATE_OFFSET_PATTERN.fullmatch(param_value)
+        if match:
+            placeholder, offset_text = match.groups()
+            offsets[param_name] = (placeholder, int(offset_text))
+        elif param_value.startswith(DATE_PLACEHOLDERS):
+            raise ValueError(
+                "m=_resolve_date_parameter_offsets, "
+                f"param={param_name}, value={param_value!r} "
+                "msg=Invalid date offset; expected "
+                "load_start_date or load_end_date followed by +/-integer days"
+            )
+    return offsets
+
+
 def _resolve_date_expansion_values(
     date_expansion_config: Optional[Dict[str, Any]],
     load_start_date: str,
@@ -172,6 +285,9 @@ def _resolve_date_expansion_values(
         return [None]
 
     strategy = date_expansion_config.get("strategy")
+    if strategy == "load_window":
+        return _dates_load_window(load_start_date, load_end_date)
+
     anchor_key = date_expansion_config.get("anchor", "load_end_date")
     if anchor_key not in ("load_end_date", "load_start_date"):
         raise ValueError(
@@ -256,7 +372,83 @@ def _warn_if_unpaginated_multi_page(
         )
 
 
-def _fetch_one_entity(
+def _resolve_availability_patterns(
+    table_config: Dict[str, Any],
+) -> List[str]:
+    """Returns validated case-insensitive response patterns for date tolerance."""
+    tolerance_config = table_config.get("availability_tolerance")
+    if tolerance_config is None:
+        return []
+    if not isinstance(tolerance_config, dict):
+        raise ValueError(
+            "m=_resolve_availability_patterns, "
+            "msg=availability_tolerance must be a mapping"
+        )
+
+    patterns = tolerance_config.get("message_patterns")
+    if (
+        not isinstance(patterns, list)
+        or not patterns
+        or not all(isinstance(pattern, str) and pattern for pattern in patterns)
+    ):
+        raise ValueError(
+            "m=_resolve_availability_patterns, "
+            "msg=availability_tolerance.message_patterns must be a non-empty "
+            "list of strings"
+        )
+    for pattern in patterns:
+        try:
+            re.compile(pattern, re.IGNORECASE)
+        except re.error as exc:
+            raise ValueError(
+                "m=_resolve_availability_patterns, "
+                f"pattern={pattern!r} msg=Invalid availability message pattern"
+            ) from exc
+    return patterns
+
+
+def _availability_error_matches(
+    exc: Exception,
+    message_patterns: Optional[List[str]],
+) -> bool:
+    """Returns whether an exception is a configured unavailable-date 400."""
+    if not message_patterns:
+        return False
+
+    status_code = getattr(exc, "status_code", None)
+    if status_code is None:
+        response = getattr(exc, "response", None)
+        status_code = getattr(response, "status_code", None)
+    if status_code != 400:
+        return False
+
+    response_text = getattr(exc, "response_text", None)
+    if not response_text:
+        response = getattr(exc, "response", None)
+        response_text = getattr(response, "text", None)
+    response_text = response_text or str(exc)
+    return any(
+        re.search(pattern, str(response_text), flags=re.IGNORECASE)
+        for pattern in message_patterns
+    )
+
+
+def _warn_unavailable_date(
+    endpoint: str,
+    date_value: Optional[str],
+    exc: Exception,
+) -> None:
+    """Logs a skipped unavailable-date API request."""
+    LOGGER.warning(
+        "m=_warn_unavailable_date, endpoint=%s, date=%s, error=%s "
+        "msg=Skipping unavailable API date",
+        endpoint,
+        date_value or "not specified",
+        exc,
+    )
+
+
+def _fetch_one_entity_once(
     client: Any,
     loader: APIConfigurationLoader,
     id_expansion_config: Dict[str, Any],
@@ -351,6 +543,62 @@ def _fetch_one_entity(
     return rows, True
 
 
+def _fetch_one_entity(
+    client: Any,
+    loader: APIConfigurationLoader,
+    id_expansion_config: Dict[str, Any],
+    endpoint: str,
+    initial_params: Dict[str, Any],
+    entity_id: str,
+    date_param_names: Optional[List[str]],
+    date_param_value: Optional[str],
+    fallback_params: Optional[Dict[str, Any]] = None,
+    availability_patterns: Optional[List[str]] = None,
+) -> Tuple[List[Dict[str, Any]], bool]:
+    """Fetches one entity, optionally retrying an unavailable shifted date."""
+    try:
+        return _fetch_one_entity_once(
+            client=client,
+            loader=loader,
+            id_expansion_config=id_expansion_config,
+            endpoint=endpoint,
+            initial_params=initial_params,
+            entity_id=entity_id,
+            date_param_names=date_param_names,
+            date_param_value=date_param_value,
+        )
+    except Exception as exc:
+        if not _availability_error_matches(exc, availability_patterns):
+            raise
+
+        if fallback_params is not None:
+            LOGGER.info(
+                "m=_fetch_one_entity, endpoint=%s, date=%s "
+                "msg=Retrying unavailable shifted date with unshifted params",
+                endpoint,
+                date_param_value or "not specified",
+            )
+            try:
+                return _fetch_one_entity_once(
+                    client=client,
+                    loader=loader,
+                    id_expansion_config=id_expansion_config,
+                    endpoint=endpoint,
+                    initial_params=fallback_params,
+                    entity_id=entity_id,
+                    date_param_names=date_param_names,
+                    date_param_value=date_param_value,
+                )
+            except Exception as fallback_exc:
+                if not _availability_error_matches(fallback_exc, availability_patterns):
+                    raise
+                _warn_unavailable_date(endpoint, date_param_value, fallback_exc)
+                return [], True
+
+        _warn_unavailable_date(endpoint, date_param_value, exc)
+        return [], True
+
+
 def _fetch_with_id_expansion(
     spark: SparkSession,
     client: Any,
@@ -363,6 +611,8 @@ def _fetch_with_id_expansion(
     load_end_date: str,
     date_expansion_config: Optional[Dict[str, Any]] = None,
     date_format: Optional[str] = None,
+    fallback_params: Optional[Dict[str, Any]] = None,
+    availability_patterns: Optional[List[str]] = None,
 ) -> List[Dict[str, Any]]:
     """
     Fetches data from a per-entity endpoint by fanning out over IDs from a source table.
@@ -534,6 +784,8 @@ def _fetch_with_id_expansion(
                 entity_id=entity_id,
                 date_param_names=date_param_names,
                 date_param_value=date_value,
+                fallback_params=fallback_params,
+                availability_patterns=availability_patterns,
             )
         except Exception as exc:
             LOGGER.warning(
@@ -544,6 +796,8 @@ def _fetch_with_id_expansion(
                 date_value,
                 exc,
             )
+            if availability_patterns:
+                raise
             return [], False
 
     tasks: List[Tuple[str, Optional[str]]] = [
@@ -646,6 +900,57 @@ def _fetch_plain_once(
     return results
 
 
+def _fetch_plain_with_availability_tolerance(
+    client: Any,
+    loader: APIConfigurationLoader,
+    table_config: Dict[str, Any],
+    table_name: str,
+    endpoint: str,
+    params: Dict[str, Any],
+    fallback_params: Optional[Dict[str, Any]] = None,
+    availability_patterns: Optional[List[str]] = None,
+    date_value: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Fetches a plain endpoint with optional unavailable-date handling."""
+    try:
+        return _fetch_plain_once(
+            client=client,
+            loader=loader,
+            table_config=table_config,
+            table_name=table_name,
+            endpoint=endpoint,
+            params=params,
+        )
+    except Exception as exc:
+        if not _availability_error_matches(exc, availability_patterns):
+            raise
+
+        if fallback_params is not None:
+            LOGGER.info(
+                "m=_fetch_plain_with_availability_tolerance, endpoint=%s, date=%s "
+                "msg=Retrying unavailable shifted date with unshifted params",
+                endpoint,
+                date_value or "not specified",
+            )
+            try:
+                return _fetch_plain_once(
+                    client=client,
+                    loader=loader,
+                    table_config=table_config,
+                    table_name=table_name,
+                    endpoint=endpoint,
+                    params=fallback_params,
+                )
+            except Exception as fallback_exc:
+                if not _availability_error_matches(fallback_exc, availability_patterns):
+                    raise
+                _warn_unavailable_date(endpoint, date_value, fallback_exc)
+                return []
+
+        _warn_unavailable_date(endpoint, date_value, exc)
+        return []
+
+
 def main() -> None:
     """
     Main entry point for the API ingestion raw layer job.
@@ -719,19 +1024,6 @@ def main() -> None:
     client = loader.create_api_client()
 
     endpoint = loader.get_endpoint_path()
-    initial_params = loader.get_initial_params(args.load_start_date, args.load_end_date)
-    LOGGER.info(
-        "m=main, endpoint=%s, params=%s msg=API request configuration",
-        endpoint,
-        initial_params,
-    )
-
-    source_schema = workflow.get("custom_schema", dag_name)
-    if source_schema and source_schema.startswith("dw_"):
-        source_schema = source_schema.replace("dw_", "", 1)
-
-    id_expansion_config = loader.get_id_expansion_config()
-    date_expansion_config = table_config.get("date_expansion")
     table_date_format = table_config.get("date_format")
     if table_date_format == "":
         raise ValueError(
@@ -744,6 +1036,37 @@ def main() -> None:
         else workflow_config.get("date_format")
         or workflow_config.get("date_format_mask")
     )
+    date_parameter_offsets = _resolve_date_parameter_offsets(table_config)
+    availability_patterns = _resolve_availability_patterns(table_config)
+    initial_params = _resolve_initial_params(
+        loader=loader,
+        table_config=table_config,
+        load_start_date=args.load_start_date,
+        load_end_date=args.load_end_date,
+        date_format=date_format,
+    )
+    fallback_params = None
+    if date_parameter_offsets:
+        fallback_params = _resolve_initial_params(
+            loader=loader,
+            table_config=table_config,
+            load_start_date=args.load_start_date,
+            load_end_date=args.load_end_date,
+            date_format=date_format,
+            apply_offsets=False,
+        )
+    LOGGER.info(
+        "m=main, endpoint=%s, params=%s msg=API request configuration",
+        endpoint,
+        initial_params,
+    )
+
+    source_schema = workflow.get("custom_schema", dag_name)
+    if source_schema and source_schema.startswith("dw_"):
+        source_schema = source_schema.replace("dw_", "", 1)
+
+    id_expansion_config = loader.get_id_expansion_config()
+    date_expansion_config = table_config.get("date_expansion")
 
     if id_expansion_config:
         LOGGER.info(
@@ -763,6 +1086,8 @@ def main() -> None:
             load_end_date=args.load_end_date,
             date_expansion_config=date_expansion_config,
             date_format=date_format,
+            fallback_params=fallback_params,
+            availability_patterns=availability_patterns,
         )
     else:
         date_values = _resolve_date_expansion_values(
@@ -775,17 +1100,25 @@ def main() -> None:
         all_results = []
         for date_value in date_values:
             call_params = dict(initial_params)
+            fallback_call_params = (
+                dict(fallback_params) if fallback_params is not None else None
+            )
             if date_value is not None:
                 formatted_date = _format_date_expansion_value(date_value, date_format)
                 for date_param_name in date_param_names:
                     call_params[date_param_name] = formatted_date
-            date_results = _fetch_plain_once(
+                    if fallback_call_params is not None:
+                        fallback_call_params[date_param_name] = formatted_date
+            date_results = _fetch_plain_with_availability_tolerance(
                 client=client,
                 loader=loader,
                 table_config=table_config,
                 table_name=args.table_name,
                 endpoint=endpoint,
                 params=call_params,
+                fallback_params=fallback_call_params,
+                availability_patterns=availability_patterns,
+                date_value=date_value,
             )
             all_results.extend(date_results)
             if date_value is not None:
@@ -843,19 +1176,9 @@ def main() -> None:
         table_name=args.table_name.lower(),
         partition_cols=partition_cols,
         extraction_type=args.extraction_type,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )
-    if args.target_database_name and args.target_table_name:
-        from bietlejuice.base.validation.target_resolver import (
-            validation_database_location,
-        )
-
-        prod_database_name = raw_loader.database_name
-        write_table_name = args.target_table_name
-        raw_loader.database_name = args.target_database_name
-        raw_loader.table_name = write_table_name
-        raw_loader.database_location = validation_database_location(
-            args.datalake_bucket, prod_database_name
-        ).replace("s3a://", "s3://")
 
     LOGGER.info(
         "m=main, table_name=%s, source=%s, bucket=%s, extraction_type=%s "
