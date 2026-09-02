@@ -42,6 +42,13 @@ columns:
     lineage:
     - datalake_sales_flow_clean.offer.id_hub
     description: Hub identification key responsible for the offer. Only available for SalesFlow originated offers.
+  sale_type:
+    lineage:
+    - datalake_sales_flow_clean.offer.sale_type
+    description: Market type of the offer as persisted by Sales Flow. PRIMARY is a new-build (Mercado Primário) unit offer; SECONDARY is resale. Null on Sales Flow rows created before the source column existed, on Firestore-only offers (no native field), and when OLTP never set it. Offer-grain discriminator, not listing ListingSaleModel.saleType.
+    categories:
+      PRIMARY: Offer for a Primary Market (new-build) unit.
+      SECONDARY: Offer for a Secondary Market (resale) listing.
   status:
     lineage:
     - datalake_sales_flow_clean.sales_flow.status
