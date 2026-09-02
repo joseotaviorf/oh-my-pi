@@ -18,6 +18,7 @@ class DAGOwnerEnum:
     DATA_FINTECH = "Data Fintech"
     DATA_FOR_RENT = "Data ForRent"
     FOR_RENT_POST_CONTRACT = "ForRent PostContract"
+    FOR_SALE_POST_CONTRACT = "ForSale PostContract"
     DATA_FOR_SALE = "Data ForSale"
     DATA_JOURNEY_OPTIMIZER = "Data Journey Optimizer"
     DATA_HOUSE_AND_LISTING = "Data House and Listing"
