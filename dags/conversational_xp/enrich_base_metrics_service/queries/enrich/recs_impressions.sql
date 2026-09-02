@@ -9,6 +9,7 @@ WITH recs_impressions_info AS (
         -- This is happening because sometimes we have two user ids or more for the same recset_id. And recset_id can repeat within the same session and betweendifferent sessions
         concat(get_json_object(event_properties, '$.recset_id'), '-', id_user, '-', id_session) AS recset_id_fix,
         get_json_object(event_properties, '$.showcase') AS showcase,
+        get_json_object(event_properties, '$.origin') AS origin,
         id_user,
         id_amplitude,
         id_session,
@@ -79,6 +80,7 @@ UNION ALL
             ELSE "None"
         END AS platform,
         recs_impressions_info.showcase,
+        recs_impressions_info.origin,
         recs_impressions_info.user_properties,
         recs_impressions.ts_event as ts_recommendation,
         recs_impressions_info.year,
@@ -107,10 +109,11 @@ SELECT
     business_context,
     platform,
     showcase,
+    origin,
     user_properties,
     MIN(ts_recommendation) AS ts_recommendation,
     year,
     month,
     day
 FROM recs_impressions_final
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17

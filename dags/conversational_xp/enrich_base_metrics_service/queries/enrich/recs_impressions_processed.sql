@@ -97,6 +97,7 @@ SELECT DISTINCT
             'platform', recs_impressions.platform,
             'position', recs_impressions.position,
             'showcase', recs_impressions.showcase,
+            'origin', recs_impressions.origin,
             'listing_age', CAST(DATEDIFF(recs_impressions.ts_recommendation, recs_house_published.ts_house_published) AS INT),
             'is_classified', recs_house_published.is_classified,
             'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END,
