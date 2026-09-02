@@ -5,8 +5,8 @@ cluster:
       # supply_tof_aggregated: wide joins + COUNT DISTINCT spill on default EBS.
       ebs_volume_size: 200
     core_nodes:
-      # 4× r6g.4xlarge ≈ same $/h as 8× r6g.2xlarge, but 2× executor RAM (48g) per node.
-      target_on_demand: 4
+      # 1 executor per node (48g heap). 4 nodes × 2 executors OOM'd (exit 137).
+      target_on_demand: 6
       target_spot: 0
       instance_types:
       - r6g.4xlarge
@@ -14,12 +14,15 @@ cluster:
       - r6i.4xlarge
     spark_conf:
       spark.sql.broadcastTimeout: '600'
-      spark.sql.shuffle.partitions: '400'
+      # Smaller shuffle blocks → less heap per task for ~50 COUNT DISTINCT aggs.
+      spark.sql.shuffle.partitions: '600'
       spark.sql.adaptive.coalescePartitions.enabled: 'false'
       # Avoid AQE coalescing skewed joins/aggs into a handful of 256MiB partitions.
       spark.sql.adaptive.advisoryPartitionSizeInBytes: '64m'
       spark.sql.adaptive.coalescePartitions.minPartitionSize: '16m'
-      spark.dynamicAllocation.maxExecutors: '8'
+      spark.dynamicAllocation.maxExecutors: '6'
+      # 4 cores × 48g caused 11min GC/task (4 tasks sharing heap). 2 cores ≈ 24g/task.
+      spark.executor.cores: '2'
       spark.memory.fraction: '0.8'
-      spark.memory.storageFraction: '0.3'
-      spark.executor.memoryOverhead: '6g'
+      spark.memory.storageFraction: '0.2'
+      spark.executor.memoryOverhead: '8g'

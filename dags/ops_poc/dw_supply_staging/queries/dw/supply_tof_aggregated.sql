@@ -110,7 +110,7 @@ aux_planning_operation_salted AS (
 ),
 
 actual_vol_joined AS (
-    SELECT /*+ REPARTITION(200, obt.date, obt.sk_supply, join_salt) */
+    SELECT /*+ REPARTITION(400, obt.date, obt.sk_supply, join_salt) */
         obt.date,
         obt.sk_supply,
         CAST(PMOD(XXHASH64(obt.sk_supply, obt.date), 64) AS INT) AS join_salt,
