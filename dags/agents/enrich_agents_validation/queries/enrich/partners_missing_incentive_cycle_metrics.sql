@@ -44,7 +44,7 @@ partner_metrics AS (
     WHERE
         pm.status = 'ACTIVE'
         AND ADD_MONTHS(CURRENT_DATE(), -2) BETWEEN mp.dt_initiated AND mp.dt_ended
-        AND mp.id IN (72, 73, 74, 75, 76)
+        AND mp.id IN (297, 298, 299, 300, 301, 302)
     GROUP BY
         pm.id_partner_external
 ),
