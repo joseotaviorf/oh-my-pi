@@ -1,0 +1,59 @@
+---
+database_name: datalake_vocs_machina_meta_clean
+table_name: throughput_observations
+owner: data-ae-for-rent@quintoandar.com.br
+domain: For Rent
+description: >
+  Clean Delta table of vocs-machina throughput observations, promoted from raw for
+  Trino/Superset access. One row per (uuid_run, ts_observed): a run emits many throughput
+  samples over its lifetime to track LLM call throughput. Already flat in raw; this layer
+  only types/casts columns.
+columns:
+  uuid_run:
+    description: UUID of the vocs-machina run this observation belongs to.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.run_id
+  model:
+    description: LLM model identifier in use at the time of this observation.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.model
+  mode:
+    description: Run mode in effect at the time of this observation.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.mode
+  completed_calls:
+    description: Cumulative LLM calls completed at the time of this observation.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.completed_calls
+  duration_seconds:
+    description: Elapsed run duration in seconds at the time of this observation.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.duration_seconds
+  calls_per_second:
+    description: Observed LLM calls-per-second throughput at the time of this observation.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.calls_per_second
+  ts_observed:
+    description: Timestamp when this throughput sample was taken.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.observed_at
+  s3_key:
+    description: Source S3 object key this row was read from.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.s3_key
+  ts_load:
+    description: UTC timestamp when this row was written to the raw datalake by the ingestion Spark job.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.ts_load
+  year:
+    description: Hive partition year from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.year
+  month:
+    description: Hive partition month from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.month
+  day:
+    description: Hive partition day from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.throughput_observations.day

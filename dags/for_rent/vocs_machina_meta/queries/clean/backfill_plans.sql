@@ -1,0 +1,26 @@
+SELECT
+    run_id AS uuid_run,
+    caution,
+    partitions,
+    estimated_calls,
+    estimated_llm_seconds,
+    estimated_wall_clock_seconds,
+    estimated_runs_needed,
+    estimate_basis_counts.measured_from_last_success AS estimate_basis_measured_from_last_success,
+    estimate_basis_counts.config_default AS estimate_basis_config_default,
+    backfill_breaker.n_prompts AS breaker_n_prompts,
+    backfill_breaker.n_partitions AS breaker_n_partitions,
+    backfill_breaker.estimated_calls AS breaker_estimated_calls,
+    backfill_breaker.tripped AS is_breaker_tripped,
+    backfill_breaker.approved AS is_breaker_approved,
+    backfill_breaker.refused AS is_breaker_refused,
+    s3_key,
+    ts_load,
+    estimate_basis_counts,
+    throughput_calibration,
+    backfill_breaker,
+    year,
+    month,
+    day
+FROM
+    datalake_vocs_machina_meta_raw.backfill_plans

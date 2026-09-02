@@ -1,0 +1,81 @@
+---
+database_name: datalake_vocs_machina_meta_clean
+table_name: prompt_catalog_snapshots
+owner: data-ae-for-rent@quintoandar.com.br
+domain: For Rent
+description: >
+  Clean Delta table of vocs-machina prompt catalog snapshots, promoted from raw for
+  Trino/Superset access. One row per (uuid_run, id_prompt): each vocs-machina run that
+  writes a `latest_active_prompts.json` snapshot produces one row per prompt captured
+  in that snapshot. To find the currently active prompt catalog, filter
+  `WHERE is_active = true` on the latest `uuid_run` (or `ts_generated`). To trace a given
+  prompt's hash-change history over time, self-join or window this table over `uuid_run`
+  ordered by `ts_generated`, partitioned by `id_prompt`, comparing consecutive
+  `prompt_hash` values. `effective_applicability` is kept as a raw JSON string (not
+  parsed into a struct) since its shape varies per prompt.
+columns:
+  id_prompt:
+    description: Identifier of the prompt captured by this snapshot row.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.prompt_id
+  uuid_run:
+    description: UUID of the vocs-machina run that generated this snapshot.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.run_id
+  prompt_hash:
+    description: >
+      Hash of the compiled prompt content at snapshot time. Changes when the prompt
+      template or taxonomy changes.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.prompt_hash
+  classifier_contract_fingerprint:
+    description: Fingerprint of the classifier contract this prompt was compiled against.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.classifier_contract_fingerprint
+  effective_applicability:
+    description: >
+      Raw JSON string of the prompt's effective applicability clause tree at snapshot
+      time. Deliberately kept as a string (not parsed into a struct) since the shape
+      varies per prompt.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.effective_applicability
+  collection:
+    description: Logical group the prompt belongs to (from prompts.yml collection field).
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.collection
+  opportunity:
+    description: Business opportunity label associated with this prompt.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.opportunity
+  backfill_days:
+    description: Number of days of history this prompt is configured to backfill.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.backfill_days
+  is_active:
+    description: Whether this prompt was active at snapshot time.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.active
+  ts_generated:
+    description: Timestamp when this prompt catalog snapshot was generated.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.generated_at
+  s3_key:
+    description: Source S3 object key this row was read from.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.s3_key
+  ts_load:
+    description: UTC timestamp when this row was written to the raw datalake by the ingestion Spark job.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.ts_load
+  year:
+    description: Hive partition year from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.year
+  month:
+    description: Hive partition month from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.month
+  day:
+    description: Hive partition day from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.prompt_catalog_snapshots.day

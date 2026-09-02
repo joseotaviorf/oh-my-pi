@@ -1,0 +1,81 @@
+dag:
+  name: vocs_machina_meta
+  schedule_start_date: 2026, 8, 23
+  catchup: false
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Ingests vocs-machina's `_meta/` JSON artifacts (run summaries, throughput
+      observations, a prompt catalog snapshot, and backfill plans) from Data
+      Science S3 into raw and clean Delta tables for Trino/Superset access.
+
+      Unlike the sibling `vocs_machina` DAG, these artifacts are NOT
+      day-partitioned in their S3 key layout (no year=/month=/day= prefix):
+      run summaries and backfill plans are one file per run, throughput
+      observations are many files per run under a flat prefix (one per
+      calibration sample), and the prompt catalog snapshot is a single
+      fixed-key JSON file (latest_active_prompts.json) with one row per
+      currently-active prompt. So this DAG does a full-prefix rescan of each
+      `_meta/` sub-prefix on every run instead of looping over a
+      load_start_date/load_end_date day range. Idempotency comes from a Delta
+      MERGE keyed to each artifact's grain (uuid_run for run_summaries and
+      backfill_plans, [uuid_run, ts_observed] for throughput observations,
+      [uuid_run, id_prompt] for the prompt catalog snapshot), so re-running the
+      same rescan never duplicates rows.
+
+      Scheduling: dataset-driven, off the same trigger as `vocs_machina` itself
+      (quintoml.post_contract.vocs_machina.inference:first-run-of-day, wired in
+      dags/dependencies.yaml) — the schedule follows the vocs-machina writer,
+      not the downstream planning DAG, since these are artifacts the writer
+      itself produces once per run.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: vocs_machina_meta
+  load_spark_job: load_vocs_machina_meta_raw
+  default_partitions: [year, month, day]
+  # No source-emitted date field is guaranteed across all 4 artifact types
+  # (backfill_plans in particular has no timestamp field at all), and the
+  # source is not day-partitioned on S3, so there is nothing to loop a
+  # load_start_date/load_end_date range over. "full" is this framework's
+  # extraction_type for a non-incremental, always-rescan-everything load
+  # (see TableAttributes._get_extraction_type default and the `grb` DAG's
+  # same usage) — every run rescans the whole prefix and relies on the
+  # Delta MERGE in the custom Spark job for idempotency.
+  default_extraction_type: full
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - s3://data-science.s3.data.quintoandar.com.br/post-contract/vocs-machina
+    - "{table_name}"
+    - "{partitions}"
+    - json
+
+  tables_customization:
+    # Raw is insert-only (when_matched_update_condition=FALSE), so ts_load is
+    # first-seen, not restamped on every rescan. This guard then skips the
+    # clean rewrite of unchanged history -- the opposite of using ts_load
+    # against a raw job that always stamps current_timestamp().
+    run_summaries:
+      clean_table_name: run_summaries
+      partitions: [year, month, day]
+      merge_on: [uuid_run]
+      when_matched_update_condition: source.ts_load > target.ts_load
+    throughput_observations:
+      clean_table_name: throughput_observations
+      partitions: [year, month, day]
+      merge_on: [uuid_run, ts_observed]
+      when_matched_update_condition: source.ts_load > target.ts_load
+    prompt_catalog_snapshots:
+      clean_table_name: prompt_catalog_snapshots
+      partitions: [year, month, day]
+      merge_on: [uuid_run, id_prompt]
+      when_matched_update_condition: source.ts_load > target.ts_load
+    backfill_plans:
+      clean_table_name: backfill_plans
+      partitions: [year, month, day]
+      merge_on: [uuid_run]
+      when_matched_update_condition: source.ts_load > target.ts_load

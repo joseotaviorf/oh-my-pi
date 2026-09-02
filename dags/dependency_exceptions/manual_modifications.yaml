@@ -1286,6 +1286,9 @@ bietlejuice.offboarding_categorization:
 bietlejuice.vocs_machina:
   add:
     - quintoml.post_contract.vocs_machina.inference:first-run-of-day
+bietlejuice.vocs_machina_meta:
+  add:
+    - quintoml.post_contract.vocs_machina.inference:first-run-of-day
 bietlejuice.enrich_fairness_assessment:
   override:
     - bietlejuice.documentation_metrics:load-clean-tables-documentation:first-run-of-day

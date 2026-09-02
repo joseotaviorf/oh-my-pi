@@ -1,0 +1,224 @@
+---
+database_name: datalake_vocs_machina_meta_clean
+table_name: run_summaries
+owner: data-ae-for-rent@quintoandar.com.br
+domain: For Rent
+description: >
+  Clean Delta table of vocs-machina inference run summaries, promoted from raw for
+  Trino/Superset access. One row per uuid_run. Struct columns (metrics, throughput_calibration,
+  backfill_breaker, backfill_escalation_attribution) are kept as pass-through for full-fidelity
+  drill-down, alongside flattened scalar headline columns for easy filtering/aggregation
+  without needing dot-notation. Used to monitor vocs-machina run cost, throughput, and
+  backfill-breaker behavior.
+columns:
+  uuid_run:
+    description: UUID of the vocs-machina run that produced this summary.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.run_id
+  environment:
+    description: Environment the run executed in (e.g. forno, staging, prod).
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.environment
+  mode:
+    description: Run mode — e.g. forward-only or forward-plus-backfill.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.mode
+  execution_backend:
+    description: Execution backend used for the run's LLM calls.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.execution_backend
+  model:
+    description: LLM model identifier used for this run's classifications.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.model
+  forward_tasks:
+    description: Number of forward (current-window) classification tasks in this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.forward_tasks
+  backfill_tasks:
+    description: Number of backfill classification tasks in this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_tasks
+  s3_key:
+    description: Source S3 object key this row was read from.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.s3_key
+  planned_calls:
+    description: Number of LLM calls planned for this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.planned_calls
+  completed_calls:
+    description: Number of LLM calls completed successfully in this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.completed_calls
+  failed_calls:
+    description: Number of LLM calls that failed in this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.failed_calls
+  calls_per_second:
+    description: Observed LLM calls-per-second throughput for this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.calls_per_second
+  duration_seconds:
+    description: Total wall-clock duration of this run in seconds.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.duration_seconds
+  classification_duration_seconds:
+    description: Wall-clock duration spent on classification calls specifically, in seconds.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.classification_duration_seconds
+  prompt_tokens:
+    description: Total prompt tokens consumed by this run's LLM calls.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.prompt_tokens
+  completion_tokens:
+    description: Total completion tokens produced by this run's LLM calls.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.completion_tokens
+  cached_tokens:
+    description: Total tokens served from cache in this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.cached_tokens
+  cache_hit_rate:
+    description: Fraction of LLM calls in this run served from cache.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.cache_hit_rate
+  cost_usd:
+    description: Total estimated LLM response cost in USD for this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.response_cost_usd
+  partitions_complete:
+    description: Number of source partitions fully classified in this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.partitions_complete
+  partitions_incomplete:
+    description: Number of source partitions left incomplete after this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.partitions_incomplete
+  backfill_deferred_partitions:
+    description: Number of partitions whose backfill was deferred to a later run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics.backfill_deferred_partitions
+  breaker_n_prompts:
+    description: Number of prompts evaluated by the backfill breaker for this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_breaker.n_prompts
+  breaker_n_partitions:
+    description: Number of partitions evaluated by the backfill breaker for this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_breaker.n_partitions
+  breaker_estimated_calls:
+    description: Estimated LLM call count the backfill breaker used to decide on this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_breaker.estimated_calls
+  escalation_forward_tasks:
+    description: Number of forward classification tasks attributed to this run's backfill escalation. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.forward_tasks
+  escalation_backfill_tasks:
+    description: Number of backfill classification tasks attributed to this run's backfill escalation. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.backfill_tasks
+  escalation_forward_plan_and_fetch_seconds:
+    description: Seconds spent on forward plan-and-fetch attributed to this run's backfill escalation. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.forward_plan_and_fetch_seconds
+  escalation_backfill_plan_and_fetch_seconds:
+    description: Seconds spent on backfill plan-and-fetch attributed to this run's backfill escalation. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.backfill_plan_and_fetch_seconds
+  escalation_forward_classification_seconds_estimated:
+    description: Estimated seconds of forward classification attributed to this run's backfill escalation. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.forward_classification_seconds_estimated
+  escalation_backfill_classification_seconds_estimated:
+    description: Estimated seconds of backfill classification attributed to this run's backfill escalation. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.backfill_classification_seconds_estimated
+  escalation_forward_cost_usd_estimated:
+    description: Estimated USD cost of forward classification attributed to this run's backfill escalation. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.forward_cost_usd_estimated
+  escalation_backfill_cost_usd_estimated:
+    description: Estimated USD cost of backfill classification attributed to this run's backfill escalation. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.backfill_cost_usd_estimated
+  is_breaker_tripped:
+    description: Whether the backfill breaker tripped (blocked backfill) during this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_breaker.tripped
+  is_breaker_approved:
+    description: Whether a tripped backfill breaker was subsequently approved to proceed.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_breaker.approved
+  is_breaker_refused:
+    description: Whether a tripped backfill breaker was refused (backfill blocked).
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_breaker.refused
+  is_escalated_to_backfill:
+    description: >
+      Whether this run's forward classification escalated into a backfill run. Null when
+      no escalation-attribution data was recorded for this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.escalated_to_backfill
+  is_escalation_backfill_share_estimated:
+    description: Whether the backfill share of this run's work is estimated rather than measured. Null when no escalation-attribution data was recorded.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution.backfill_share_estimated
+  ts_window_start:
+    description: Start timestamp of the time window this run classified.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.window.start
+  ts_window_end:
+    description: End timestamp of the time window this run classified.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.window.end
+  ts_load:
+    description: UTC timestamp when this row was written to the raw datalake by the ingestion Spark job.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.ts_load
+  failed_sources:
+    description: Array of source names that failed to fetch during this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.failed_sources
+  prompts_backfilling:
+    description: Array of prompt_ids that were being backfilled during this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.prompts_backfilling
+  metrics:
+    description: >
+      Full pass-through struct of this run's metrics (calls, tokens, cost, duration,
+      partitions) — see the flattened columns above for the individual fields.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.metrics
+  throughput_calibration:
+    description: >
+      Pass-through struct of the throughput calibration (calls_per_second, basis,
+      config_default) used to plan this run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.throughput_calibration
+  backfill_breaker:
+    description: >
+      Full pass-through struct of the backfill breaker's decision for this run (tripped,
+      fingerprint, reasons, counts, approval, approved_pairs) — see the flattened breaker_*
+      columns above for the individual scalar fields.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_breaker
+  backfill_escalation_attribution:
+    description: >
+      Full pass-through struct attributing forward-vs-backfill task/cost/duration shares
+      when this run escalated to backfill.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.backfill_escalation_attribution
+  year:
+    description: Hive partition year from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.year
+  month:
+    description: Hive partition month from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.month
+  day:
+    description: Hive partition day from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.run_summaries.day

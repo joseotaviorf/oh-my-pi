@@ -1,0 +1,115 @@
+---
+database_name: datalake_vocs_machina_meta_clean
+table_name: backfill_plans
+owner: data-ae-for-rent@quintoandar.com.br
+domain: For Rent
+description: >
+  Clean Delta table of vocs-machina backfill plans, promoted from raw for Trino/Superset
+  access. One row per uuid_run that produced a backfill plan. Struct columns
+  (estimate_basis_counts, throughput_calibration, backfill_breaker) are kept as
+  pass-through, alongside flattened scalar headline columns for easy filtering/aggregation.
+columns:
+  uuid_run:
+    description: >
+      UUID of the vocs-machina run this backfill plan belongs to. Derived from the
+      source object's filename, not its JSON body.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.run_id
+  caution:
+    description: Free-text caution/warning message attached to this backfill plan, if any.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.caution
+  partitions:
+    description: Number of source partitions covered by this backfill plan.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.partitions
+  estimated_calls:
+    description: Estimated total LLM calls required to execute this backfill plan.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.estimated_calls
+  estimated_llm_seconds:
+    description: Estimated LLM-call time in seconds required to execute this backfill plan.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.estimated_llm_seconds
+  estimated_wall_clock_seconds:
+    description: Estimated total wall-clock time in seconds required to execute this backfill plan.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.estimated_wall_clock_seconds
+  estimated_runs_needed:
+    description: Estimated number of vocs-machina runs needed to complete this backfill plan.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.estimated_runs_needed
+  estimate_basis_measured_from_last_success:
+    description: >
+      Count basis for this plan's estimate that came from measurements of the last
+      successful run.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.estimate_basis_counts.measured_from_last_success
+  estimate_basis_config_default:
+    description: Count basis for this plan's estimate that fell back to a config default.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.estimate_basis_counts.config_default
+  breaker_n_prompts:
+    description: Number of prompts evaluated by the backfill breaker for this plan.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.backfill_breaker.n_prompts
+  breaker_n_partitions:
+    description: Number of partitions evaluated by the backfill breaker for this plan.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.backfill_breaker.n_partitions
+  breaker_estimated_calls:
+    description: Estimated LLM call count the backfill breaker used to decide on this plan.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.backfill_breaker.estimated_calls
+  is_breaker_tripped:
+    description: Whether the backfill breaker tripped (blocked backfill) when this plan was produced.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.backfill_breaker.tripped
+  is_breaker_approved:
+    description: Whether a tripped backfill breaker was subsequently approved to proceed.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.backfill_breaker.approved
+  is_breaker_refused:
+    description: Whether a tripped backfill breaker was refused (backfill blocked).
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.backfill_breaker.refused
+  s3_key:
+    description: Source S3 object key this row was read from.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.s3_key
+  ts_load:
+    description: UTC timestamp when this row was written to the raw datalake by the ingestion Spark job.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.ts_load
+  estimate_basis_counts:
+    description: >
+      Pass-through struct of the count basis (measured_from_last_success, config_default)
+      used to derive this plan's estimates — see the flattened estimate_basis_* columns
+      above for the individual fields.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.estimate_basis_counts
+  throughput_calibration:
+    description: >
+      Pass-through struct of the throughput calibration (calls_per_second, basis,
+      config_default) used to derive this plan's estimates.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.throughput_calibration
+  backfill_breaker:
+    description: >
+      Full pass-through struct of the backfill breaker's decision for this plan (tripped,
+      fingerprint, reasons, counts, approval, approved_pairs) — see the flattened breaker_*
+      columns above for the individual scalar fields.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.backfill_breaker
+  year:
+    description: Hive partition year from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.year
+  month:
+    description: Hive partition month from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.month
+  day:
+    description: Hive partition day from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_meta_raw.backfill_plans.day
