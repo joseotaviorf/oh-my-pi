@@ -9,6 +9,10 @@ columns:
     lineage:
       - datalake_consorcio_raw.lead.id
     description: Primary key of table.
+  id_contact:
+    lineage:
+      - datalake_consorcio_raw.lead.contact_id
+    description: Foreign key to the Consórcio contact that owns this lead's WhatsApp identity. Nullable for leads created before the contact entity existed.
   uuid:
     lineage:
       - datalake_consorcio_raw.lead.uuid

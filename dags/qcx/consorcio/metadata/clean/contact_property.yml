@@ -1,0 +1,53 @@
+---
+database_name: datalake_consorcio_clean
+table_name: contact_property
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  Append-only history of Consórcio contact identifiers, one row per source
+  contact_property event (same grain as the source PK) so CDC MERGE stays 1:1.
+  The EAV key stays in property_key. The value is split: non-PHONE keys go to
+  property_value; PHONE goes to masked_property_value so Trino can mask that
+  column without hiding BSP identifiers. A new non-PHONE key needs no DAG
+  change; a new phone-like key is added to the IN list in the clean SQL.
+columns:
+  id:
+    lineage:
+      - datalake_consorcio_raw.contact_property.id
+    description: Primary key of the contact_property event in consorcio-api. One row per identifier write.
+  id_contact:
+    lineage:
+      - datalake_consorcio_raw.contact_property.contact_id
+    description: Foreign key to datalake_consorcio_clean.contact. Identifies the WhatsApp identity that owns this identifier event.
+  property_key:
+    lineage:
+      - datalake_consorcio_raw.contact_property.property_key
+    description: Source EAV key for this event. Current value per (id_contact, property_key) is the latest ts_created.
+    categories:
+      PHONE: Personal phone number of the contact. Populates masked_property_value.
+      BSP_CONTACT_ID: Blip/WhatsApp BSP contact id. Populates property_value.
+      BSP_CONVERSATION_ID: Blip conversation / tunnel id. Populates property_value.
+      BSUID: Blip session unique identifier. Populates property_value.
+  property_value:
+    lineage:
+      - datalake_consorcio_raw.contact_property.property_value
+    description: Source property_value when property_key is not PHONE. NULL on PHONE rows so the number is not stored in this column.
+  masked_property_value:
+    lineage:
+      - datalake_consorcio_raw.contact_property.property_value
+    description: Source property_value when property_key is PHONE. NULL on every other key. Masked in Trino.
+  ts_created:
+    lineage:
+      - datalake_consorcio_raw.contact_property.created_at
+    description: Timestamp when this identifier event was appended in consorcio-api. History is reconstructed by ordering this column per (id_contact, property_key).
+  op_cdc:
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

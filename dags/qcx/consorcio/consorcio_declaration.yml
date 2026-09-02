@@ -17,6 +17,10 @@ workflow:
     #   clean_table_name: consorciado
     # consorciado_quota:
     #   clean_table_name: consorciado_quota
+    contact:
+      clean_table_name: contact
+    contact_property:
+      clean_table_name: contact_property
     lead:
       clean_table_name: lead
     lead_external_data:

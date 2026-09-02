@@ -1,0 +1,38 @@
+---
+database_name: datalake_consorcio_clean
+table_name: contact
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  Stable Consórcio WhatsApp identity, one row per contact, independent of lead
+  or HubSpot deal. Downstream analytics and CDP (Mora, M03) join this table to
+  resolve the same person across lead recreations. Grain matches the source
+  contact PK ingested via CDC from consorcio-api.
+columns:
+  id:
+    lineage:
+      - datalake_consorcio_raw.contact.id
+    description: Primary key of the contact in consorcio-api. Unique identifier of the WhatsApp identity entity.
+  uuid:
+    lineage:
+      - datalake_consorcio_raw.contact.uuid
+    description: Stable UUID of the contact, generated at insert in consorcio-api and used as the public identity key.
+  ts_created:
+    lineage:
+      - datalake_consorcio_raw.contact.created_at
+    description: Timestamp when the contact row was first created in consorcio-api. NOT NULL at source.
+  ts_updated:
+    lineage:
+      - datalake_consorcio_raw.contact.updated_at
+    description: Timestamp when the contact row was last updated in consorcio-api. NOT NULL at source.
+  op_cdc:
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

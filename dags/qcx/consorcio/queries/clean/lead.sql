@@ -1,6 +1,7 @@
 SELECT
     id,
     session_id AS id_session,
+    contact_id AS id_contact,
     uuid,
     person_uuid AS uuid_person,
     name,
