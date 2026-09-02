@@ -1,21 +1,21 @@
+import os
 from datetime import datetime
 
 import pendulum
 from airflow.models import DAG
-from databricks_plugin import (
-    QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
-)
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import (
-    DatabricksGroupNameEnum,
+from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_job_cluster_engine_to_context,
+)
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
 )
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.file_service import FileService
 
 DAG_NAME = "services_integration_validations"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -24,49 +24,15 @@ MAIN_START_DATE = datetime(
 )
 MAIN_SCHEDULE_INTERVAL = "0 13,16,18,20 * * *"
 
-config_service = ConfigurationService()
-CLUSTER_DESCRIPTION = config_service.get_config(
-    "consolidation_s_general_single_node_cluster"
-)
+ENV = os.environ.get("ENVIRONMENT")
 
-CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
-CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
-    "quintoandar_{{ var.value.environment }}"
-)
-
-DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
-    {
-        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
-        "permission_level": ClusterPermissionEnum.MANAGE,
-    }
-]
+config_service = ConfigurationService(DAG_NAME)
+datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}"
 
-artifacts_bucket = config_service.get_config("artifacts_bucket")
-default_libraries = config_service.get_config("default_libraries")
-custom_libraries = [
-    {"maven": {"coordinates": "mysql:mysql-connector-java:8.0.33"}},
-    {"pypi": {"package": "hubspot-api-client==5.0.0"}},
-    {"pypi": {"package": "google-api-python-client==2.55.0"}},
-    {"pypi": {"package": "validations-engine==2.0.0"}},
-    {
-        "whl": f"{artifacts_bucket}/facebook-api-client-python/"
-        f"quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl"
-    },
-    {
-        "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
-        f"quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
-    },
-    {
-        "whl": f"{artifacts_bucket}/survicate-api-client-python/"
-        f"quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
-    },
-    {"jar": f"{artifacts_bucket}/jars/ojdbc8.jar"},
-]
 jiraops_callback = JiraOpsCallback()
 dag = DAG(
     dag_id=DAG_ID,
@@ -81,29 +47,46 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    databricks_conn_id="databricks_new",
+# Cluster shape lives in services_integration_validations_cluster.yml.
+_cluster_file_path = DAGPackagesPathService.resolve_artifact_file_path(
+    artifact_type="dag_cluster", dag_name=DAG_NAME
+)
+CLUSTER_ARGS = FileService.get_dict_from_yaml_file(_cluster_file_path)["cluster"]
+
+dag_execution_context = DagExecutionContext(
     dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=default_libraries + custom_libraries,
+    environment=ENV,
+    bucket=datalake_bucket,
+    base_spark_jobs_path=databricks_bietlejuice_repo_path,
+    dag_args={},
+    workflow_args={},
+    cluster_args=CLUSTER_ARGS,
+)
+attach_job_cluster_engine_to_context(dag_execution_context, config_service)
+
+execute_job_cluster_task = (
+    dag_execution_context.job_cluster_engine.create_execute_cluster_task(
+        config_service=config_service,
+        minimum_cluster_runtime_version=None,
+        execute_job_cluster_local_id=None,
+    )
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+run_validations_suites = (
+    dag_execution_context.job_cluster_engine.create_spark_python_task(
+        spark_job_path=f"{base_spark_jobs_path}/run_validation_suites.py",
+        task_id="run-validations-suites",
+        job_parameters=[],
+        execution_timeout_hours=1,
+    )
+)
+run_validations_suites.retries = 0
+
+terminate_cluster_task = (
+    dag_execution_context.job_cluster_engine.create_emr_terminate_cluster_task(
+        execute_cluster_task_id=execute_job_cluster_task.task_id,
+        terminate_task_local_suffix=None,
+    )
 )
 
-run_validations_suites = QuintoAndarDatabricksSubmitRunOperator(
-    databricks_conn_id="databricks_new",
-    task_id="run-validations-suites",
-    dag=dag,
-    retries=0,
-    json={
-        "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/run_validation_suites.py"
-        }
-    },
-)
-
-create_cluster_task >> run_validations_suites >> terminate_cluster_task
+execute_job_cluster_task >> run_validations_suites >> terminate_cluster_task

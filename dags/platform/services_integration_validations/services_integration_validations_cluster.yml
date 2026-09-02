@@ -1,0 +1,8 @@
+cluster:
+  type: emr_7_12_consolidation_s_general_single_node_fleet_cluster
+  custom_libraries:
+  - pypi:
+      package: hubspot-api-client==5.0.0
+  - whl: '{artifacts_bucket}/survicate-api-client-python/quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl'
+  - whl: '{artifacts_bucket}/facebook-api-client-python/quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl'
+  - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
