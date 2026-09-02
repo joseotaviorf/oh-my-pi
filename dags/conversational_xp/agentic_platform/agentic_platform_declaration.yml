@@ -10,7 +10,8 @@ dag:
       - `traces` — full versioned `TraceEvent` (conversation content + agent-execution tree) → datalake_agentic_platform_{raw,clean}.traces (CNVPL-2085)
       - `agentic_sessions` — session lifecycle (stream/session identity + open/closed timestamps) → datalake_agentic_platform_raw.agentic_sessions / _clean.sessions
       - `nudges` — per-user mission/nudge coordination state (lifecycle, CDP payload, snooze) → datalake_agentic_platform_{raw,clean}.nudges
-      - `nudge_openers` — pre-generated conversational opener per user, linked to the source nudge → datalake_agentic_platform_{raw,clean}.nudge_openers
+      # - `nudge_openers` — pre-generated conversational opener per user, linked to the source nudge → datalake_agentic_platform_{raw,clean}.nudge_openers
+      #   Disabled until the operational table has data in prod; clean SQL/metadata remain for a future enablement PR.
 workflow:
   type: cdc
   layer: raw
@@ -45,12 +46,13 @@ workflow:
       clean_primary_keys: ["id_nudge"]
       # Rows are upserted in place (status transitions, snooze, payload refresh). Deactivated
       # history is retained; default merge (has_soft_delete: false) is correct.
-    nudge_openers:
-      raw_primary_keys: ["user_id"]
-      primary_keys: ["user_id"]
-      clean_primary_keys: ["id_user"]
-      # One row per user; regeneration overwrites via upsert. CASCADE delete when the linked
-      # nudge is removed. Default merge (has_soft_delete: false) is correct.
+    # nudge_openers has no prod data yet; keep queries/metadata for a future enablement PR.
+    # nudge_openers:
+    #   raw_primary_keys: ["user_id"]
+    #   primary_keys: ["user_id"]
+    #   clean_primary_keys: ["id_user"]
+    #   # One row per user; regeneration overwrites via upsert. CASCADE delete when the linked
+    #   # nudge is removed. Default merge (has_soft_delete: false) is correct.
 
 cluster:
   type: consolidation_s_memory_cluster
