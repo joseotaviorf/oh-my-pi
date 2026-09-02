@@ -30,6 +30,8 @@ WITH last_status_updated AS (
     id_sales_flow,
     id_firestore
   FROM datalake_sales_flow_clean.offer
+  WHERE
+    ts_created < CURRENT_DATE()
 ), micro_status_keys AS (
   SELECT
     id,
@@ -77,6 +79,8 @@ WITH last_status_updated AS (
     ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS rw,
     ts_updated
   FROM datalake_sales_flow_clean.sales_flow
+  WHERE
+    ts_created < CURRENT_DATE()
 ), closing_type AS (
   /* Returns the micro and macro status id for each offer for its last id_closing_type on table sales_flow. */ /* On table sales_flow the id_closing_type can be the micro status id, so in order to return both ids the */ /* CASE WHEN was used. */
   SELECT
@@ -92,6 +96,8 @@ WITH last_status_updated AS (
   FROM datalake_sales_flow_clean.sales_flow AS sf
   LEFT JOIN datalake_sales_flow_clean.closing_type AS ct
     ON ct.id = sf.id_closing_type
+  WHERE
+    sf.ts_created < CURRENT_DATE()
 ), last_row_number_closing_type AS (
   SELECT
     *,

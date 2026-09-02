@@ -109,6 +109,8 @@ WITH sales_flow_users AS (
       ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS _w,
       id
     FROM datalake_sales_flow_clean.users
+    WHERE
+      ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1
@@ -123,6 +125,8 @@ WITH sales_flow_users AS (
       ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS _w,
       ts_updated
     FROM datalake_sales_flow_clean.sales_flow
+    WHERE
+      ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1
@@ -151,6 +155,8 @@ WITH sales_flow_users AS (
       ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) AS _w,
       ts_updated
     FROM datalake_sales_flow_clean.offer
+    WHERE
+      ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1
@@ -215,6 +221,8 @@ WITH sales_flow_users AS (
       day,
       ROW_NUMBER() OVER (PARTITION BY email, id_sales_flow ORDER BY ts_updated DESC) AS _w
     FROM datalake_sales_flow_clean.buyer_data
+    WHERE
+      ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1
@@ -252,6 +260,8 @@ WITH sales_flow_users AS (
       ts_updated,
       ROW_NUMBER() OVER (PARTITION BY email, id_sales_flow ORDER BY ts_updated DESC) AS _w
     FROM datalake_sales_flow_clean.seller_data
+    WHERE
+      ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1

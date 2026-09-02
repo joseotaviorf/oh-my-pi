@@ -22,6 +22,8 @@ WITH last_specialist AS (
     LEFT JOIN
         datalake_ebdb_clean.user AS us
             ON sfu.id_external = us.id
+    WHERE
+        sp.ts_created < CURRENT_DATE()
 ),
 offers_specialists AS (
     SELECT

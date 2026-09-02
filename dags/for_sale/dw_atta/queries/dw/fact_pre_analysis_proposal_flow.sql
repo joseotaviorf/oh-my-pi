@@ -19,6 +19,7 @@ doc_submission AS (
                         datalake_sales_flow_clean.negotiation AS neg
                     LEFT JOIN
                         datalake_sales_flow_clean.offer ON neg.id_sales_flow = offer.id_sales_flow
+                        AND offer.ts_created < CURRENT_DATE()
                     WHERE neg.ts_buyer_credit_submitted >= date '2022-11-23'
                     GROUP BY 1,2
                 ),

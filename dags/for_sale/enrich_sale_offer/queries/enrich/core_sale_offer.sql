@@ -127,6 +127,8 @@ WITH firestore_sale_offer_clean AS (
       ON sf.id_seller = seller.id
     LEFT JOIN datalake_sales_flow_clean.users AS buyer
       ON sf.id_buyer = buyer.id
+    WHERE
+      sf.ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1
@@ -138,6 +140,8 @@ WITH firestore_sale_offer_clean AS (
       *,
       ROW_NUMBER() OVER (PARTITION BY id_firestore ORDER BY ts_updated DESC) AS _w
     FROM datalake_sales_flow_clean.offer
+    WHERE
+      ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1
@@ -345,6 +349,9 @@ WITH firestore_sale_offer_clean AS (
   FROM datalake_sales_flow_clean.sales_flow AS SF
   LEFT JOIN datalake_sales_flow_clean.offer AS O
     ON SF.id = O.id_sales_flow
+  WHERE
+    SF.ts_created < CURRENT_DATE()
+    AND (O.id IS NULL OR O.ts_created < CURRENT_DATE())
 ), offers_date_rescue AS (
   SELECT
     id_sales_flow,
@@ -483,6 +490,7 @@ WITH firestore_sale_offer_clean AS (
       ON sfu.id_external = us.id
     WHERE
       sp.kind = 'AGENT'
+      AND sp.ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1

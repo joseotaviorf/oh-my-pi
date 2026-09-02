@@ -5,6 +5,8 @@ WITH last_sf_entry AS (
     id,
     flow_type
   FROM datalake_sales_flow_clean.sales_flow
+  WHERE
+    ts_created < CURRENT_DATE()
 ), flow_type AS (
   SELECT
     o.id_firestore AS id_offer,
@@ -36,6 +38,8 @@ WITH last_sf_entry AS (
       *,
       ROW_NUMBER() OVER (PARTITION BY id_firestore ORDER BY ts_updated DESC) AS _w
     FROM datalake_sales_flow_clean.offer
+    WHERE
+      ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1
@@ -84,6 +88,8 @@ WITH last_sf_entry AS (
     ON sf.id_seller = seller.id
   LEFT JOIN datalake_sales_flow_clean.users AS buyer
     ON sf.id_buyer = buyer.id
+  WHERE
+    sf.ts_created < CURRENT_DATE()
 ), sales_flow AS (
   SELECT
     sf.id,
@@ -120,6 +126,8 @@ WITH last_sf_entry AS (
     ROW_NUMBER() OVER (PARTITION BY id_sales_flow, kind ORDER BY ts_updated DESC) AS ROW,
     *
   FROM datalake_sales_flow_clean.specialist
+  WHERE
+    ts_created < CURRENT_DATE()
 ), offers_specialists AS (
   SELECT
     id_firestore AS id_offer,
@@ -454,6 +462,9 @@ WITH last_sf_entry AS (
   FROM datalake_sales_flow_clean.sales_flow AS SF
   LEFT JOIN datalake_sales_flow_clean.offer AS O
     ON SF.id = O.id_sales_flow
+  WHERE
+    SF.ts_created < CURRENT_DATE()
+    AND (O.id IS NULL OR O.ts_created < CURRENT_DATE())
 ), offers_history AS (
   SELECT
     id_sales_flow,

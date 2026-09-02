@@ -58,6 +58,7 @@ WITH business_unit_by_hub_id AS (
     ON vs.id_visit = sf.id_visit_external
   WHERE
     vs.id_succeed_schedule IS NULL /* PEGA O AGENDAMENTO ATIVO DA VISITA */
+    AND sf.ts_created < CURRENT_DATE()
 ), last_visit AS (
   SELECT
     id_sales_flow,
@@ -223,6 +224,8 @@ WITH business_unit_by_hub_id AS (
       sf.id,
       sf.ts_updated
     FROM datalake_sales_flow_clean.sales_flow AS sf
+    WHERE
+      sf.ts_created < CURRENT_DATE()
   ) AS _t
   WHERE
     _w = 1
