@@ -4,10 +4,10 @@ owner: gabriel.berger@quintoandar.com.br
 domain: Enterprise Efficiency
 description: |
   Claude Enterprise RBAC group memberships linking QuintoAndar workforce seats to their RBAC groups.
-  One row per id_group and id_user, fully overwritten each run from the latest daily extraction only:
-  the Admin API returns current memberships only (no removal signal), so a user removed from a group
-  simply stops appearing in the next load rather than being flagged as deleted.
-  Flattens vendor JSON from the Admin RBAC Group Members endpoint into typed columns.
+  Current-state snapshot: one row per id_group and id_user from the latest raw ts_load only;
+  removed memberships disappear on the next full overwrite because the Admin API returns
+  current memberships only. Flattens vendor JSON from the Admin RBAC Group Members endpoint
+  into typed columns.
 columns:
   id_group:
     description: Vendor RBAC group identifier (rbac_group_...) the membership belongs to (e.g. 'rbac_group_011CReAqK5DGX6fqXqoBSpFn').

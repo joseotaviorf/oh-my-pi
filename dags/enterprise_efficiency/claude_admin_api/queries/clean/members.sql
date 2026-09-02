@@ -1,4 +1,11 @@
-WITH flattened AS (
+WITH latest_load AS (
+    SELECT
+        MAX(ts_load) AS max_ts_load
+    FROM
+        datalake_claude_usage_raw.members
+),
+
+flattened AS (
     SELECT
         GET_JSON_OBJECT(payload, '$.id') AS id,
         GET_JSON_OBJECT(payload, '$.email') AS email,
@@ -6,13 +13,14 @@ WITH flattened AS (
         GET_JSON_OBJECT(payload, '$.role') AS role,
         GET_JSON_OBJECT(payload, '$.type') AS type_member,
         CAST(GET_JSON_OBJECT(payload, '$.added_at') AS TIMESTAMP) AS ts_added,
-        ts_load,
-        year,
-        month,
-        day
+        ts_load
     FROM
-        datalake_claude_usage_raw.members
+        datalake_claude_usage_raw.members,
+        latest_load
+    WHERE
+        ts_load = latest_load.max_ts_load
 ),
+
 ranked AS (
     SELECT
         id,
@@ -22,9 +30,6 @@ ranked AS (
         type_member,
         ts_added,
         ts_load,
-        year,
-        month,
-        day,
         ROW_NUMBER() OVER (
             PARTITION BY
                 id
@@ -34,6 +39,7 @@ ranked AS (
     FROM
         flattened
 )
+
 SELECT
     id,
     email,
@@ -41,10 +47,7 @@ SELECT
     role,
     type_member,
     ts_added,
-    ts_load,
-    year,
-    month,
-    day
+    ts_load
 FROM
     ranked
 WHERE

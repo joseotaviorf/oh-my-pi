@@ -4,8 +4,9 @@ owner: gabriel.berger@quintoandar.com.br
 domain: Enterprise Efficiency
 description: |
   Claude Enterprise RBAC groups used to manage role-based access for QuintoAndar workforce seats.
-  One row per id after deduplication from overlapping admin snapshot loads.
-  Flattens vendor JSON from the Admin RBAC Groups endpoint into typed columns.
+  Current-state snapshot: one row per id from the latest raw ts_load only; deleted groups
+  are removed on the next full overwrite. Flattens vendor JSON from the Admin RBAC Groups
+  endpoint into typed columns.
 columns:
   id:
     description: Vendor RBAC group identifier (rbac_group_...) (e.g. 'rbac_group_011CReAqK5DGX6fqXqoBSpFn').
@@ -49,18 +50,3 @@ columns:
     description: Timestamp when the Spark api_ingestion job wrote the source raw row.
     lineage:
       - datalake_claude_usage_raw.groups.ts_load
-
-  year:
-    description: Ingestion partition year, derived from ts_load (job run time); this endpoint has no date_filter_column, so it is not derived from the API payload.
-    lineage:
-      - datalake_claude_usage_raw.groups.year
-
-  month:
-    description: Ingestion partition month, derived from ts_load (job run time); this endpoint has no date_filter_column, so it is not derived from the API payload.
-    lineage:
-      - datalake_claude_usage_raw.groups.month
-
-  day:
-    description: Ingestion partition day, derived from ts_load (job run time); this endpoint has no date_filter_column, so it is not derived from the API payload.
-    lineage:
-      - datalake_claude_usage_raw.groups.day

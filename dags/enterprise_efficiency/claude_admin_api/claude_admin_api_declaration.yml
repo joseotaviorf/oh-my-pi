@@ -9,16 +9,19 @@ dag:
     dag_purpose: |
       Claude Enterprise Admin effective spend limits and seat roster for
       QuintoAndar workforce seats.
-      One raw JSON payload per API record per daily load, partitioned by year,
-      month, and day; group_members is membership grain after fan-out from groups.
-      Covers current members, RBAC groups, memberships, and effective spend
-      limits from the Admin API.
+      Raw layer: one JSON payload per API record per daily load, incremental
+      append partitioned by year, month, and day; group_members is membership
+      grain after fan-out from groups. Raw retains full ingestion history.
+      Clean layer: current-state snapshots only — each table filters to the
+      latest ts_load, full-overwrites unpartitioned Delta tables, and drops
+      departed users, groups, and memberships. Natural grains: id (members,
+      groups), id_group + id_user (group_members), id_user + period
+      (spend_limits).
       Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo. Auth is
       CLAUDE_ADMIN_API_KEY in the quintoandar secret scope (x-api-key) plus
       anthropic-version 2023-06-01; group and group_members add anthropic-beta
       ce-user-management-2026-07-13. group_members expands from raw groups via
       group_id.
-      Bootstraps datalake_claude_usage_clean via spend_limits (payload pass-through).
 
 workflow:
   layer: raw
@@ -33,6 +36,7 @@ workflow:
     - year
     - month
     - day
+  default_clean_partitions: []
   default_table_privileges:
     people-team:
       - ALL PRIVILEGES
@@ -66,6 +70,7 @@ workflow:
     spend_limits:
       endpoint_path: v1/organizations/spend_limits/effective
       extraction_type: incremental
+      clean_extraction_type: full
       params: {}
       api_policies:
         pagination:
@@ -86,8 +91,7 @@ workflow:
     members:
       endpoint_path: v1/organizations/users
       extraction_type: incremental
-      merge_on:
-        - id
+      clean_extraction_type: full
       params: {}
       api_policies:
         pagination:
@@ -108,8 +112,7 @@ workflow:
     groups:
       endpoint_path: v1/organizations/rbac_groups
       extraction_type: incremental
-      merge_on:
-        - id
+      clean_extraction_type: full
       params: {}
       http_headers:
         anthropic-beta: "ce-user-management-2026-07-13"
@@ -132,6 +135,7 @@ workflow:
     group_members:
       endpoint_path: v1/organizations/rbac_groups/{group_id}/members
       extraction_type: incremental
+      clean_extraction_type: full
       execution_timeout_hours: 3
       http_headers:
         anthropic-beta: "ce-user-management-2026-07-13"
