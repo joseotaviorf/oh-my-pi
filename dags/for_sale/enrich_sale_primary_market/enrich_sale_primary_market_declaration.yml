@@ -8,9 +8,8 @@ dag:
       Primary-market enrich hub. listing_sale_type classifies SALE listings as
       PRIMARY or SECONDARY from ListingSaleModel. house_development attaches
       empreendimento and typology attrs to shell and unit houses.
-      development_negotiation is pré-OS at negotiation grain (visit shell house,
-      unit house, listing published flag) and bridges to Sales Flow offer on
-      visit + unit house.
+      development_negotiation is pré-OS at negotiation grain. Offer/flow join
+      is the unit Imovel (house.id_external); id_visit is origin context only.
 workflow:
   type: query_delta
   layer: enrich

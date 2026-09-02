@@ -1,15 +1,14 @@
 -- Grain: one row per DevelopmentNegotiation.
--- Visit house (id_house_shell) is the listing the visit was booked on.
--- Unit house (id_house) is DevelopmentTypologyUnit.imovel_id (EBDB Imovel).
+-- Strong key to Sales Flow is unit house (id_house = DTU.imovel_id = house.id_external).
+-- id_visit is payload on the negotiation, not a join predicate to offer/flow.
+-- id_house_shell is the listing Imovel the visit was booked on; offer house is minted.
 -- sales_flow.house_id is the Sales Flow house PK; Imovel is house.id_external.
--- Match offer/flow on visit_external_id + that Imovel.
--- id_sales_flow / offer attrs are the non-canceled latest flow (then latest
--- offer) on that pair. ids_sales_flow is every flow id for the pair.
+-- Latest flow prefers not canceled, then latest ts_created.
+-- ids_sales_flow is every flow id for that Imovel.
 WITH sales_flow_offer_candidates AS (
     SELECT
         sf.id AS id_sales_flow,
         o.id AS id_offer,
-        sf.id_visit_external,
         h.id_external AS id_house,
         sf.flow_step,
         o.status AS offer_status,
@@ -18,7 +17,7 @@ WITH sales_flow_offer_candidates AS (
         o.final_price,
         sf.ts_created AS ts_sales_flow_created,
         ROW_NUMBER() OVER (
-            PARTITION BY sf.id_visit_external, h.id_external
+            PARTITION BY h.id_external
             ORDER BY
                 CASE
                     WHEN COALESCE(sf.is_canceled, FALSE) = FALSE THEN 0
@@ -36,14 +35,12 @@ WITH sales_flow_offer_candidates AS (
         datalake_sales_flow_clean.house AS h
             ON h.id = sf.id_house
     WHERE
-        sf.id_visit_external IS NOT NULL
-        AND h.id_external IS NOT NULL
+        h.id_external IS NOT NULL
 ),
 sales_flow_offer AS (
     SELECT
         c.id_sales_flow,
         c.id_offer,
-        c.id_visit_external,
         c.id_house,
         h.ids_sales_flow,
         c.flow_step,
@@ -56,17 +53,14 @@ sales_flow_offer AS (
         sales_flow_offer_candidates AS c
     INNER JOIN (
         SELECT
-            id_visit_external,
             id_house,
             SORT_ARRAY(COLLECT_SET(id_sales_flow)) AS ids_sales_flow
         FROM
             sales_flow_offer_candidates
         GROUP BY
-            id_visit_external,
             id_house
     ) AS h
-        ON h.id_visit_external = c.id_visit_external
-        AND h.id_house = c.id_house
+        ON h.id_house = c.id_house
     WHERE
         c._w = 1
 )
@@ -121,5 +115,4 @@ LEFT JOIN
         ON d.id = n.id_development
 LEFT JOIN
     sales_flow_offer AS sfo
-        ON sfo.id_visit_external = n.id_visit
-        AND sfo.id_house = dtu.id_house
+        ON sfo.id_house = dtu.id_house

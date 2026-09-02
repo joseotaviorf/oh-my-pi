@@ -4,13 +4,14 @@ table_name: development_negotiation
 domain: For Sale
 description: >
   One row per primary-market pré-OS negotiation (DevelopmentNegotiation).
-  Grain is id_development_negotiation, not visit: one visit can spawn several
-  negotiations when the buyer wants more than one apt. id_house_shell is the
-  listing the visit was booked on. id_house is the typology-unit Imovel used
-  for the proposal or offer. id_offer, id_sales_flow, flow_step, offer prices
-  and offer_status are the latest Sales Flow on visit + unit house (prefer
-  not canceled, then latest ts_created). ids_sales_flow lists every flow id
-  on that pair so earlier offers remain reachable. is_published_unit is true
+  Grain is id_development_negotiation. Strong key to Sales Flow is the unit
+  Imovel (id_house = house.id_external). id_visit is an attribute on the
+  negotiation, not a matching requirement for offer or flow. One visit can
+  spawn several negotiations when the buyer wants more than one apt.
+  id_house_shell is the listing the visit was booked on. id_house is the
+  typology-unit Imovel minted for the proposal or offer. Offer attrs come from
+  Sales Flow on that Imovel (prefer not canceled, then latest ts_created).
+  ids_sales_flow lists every flow id on that Imovel. is_published_unit is true
   when that unit has a DevelopmentListingUnit row. Actor must be filtered
   (AGENT vs DEMAND) to avoid broker inflation of pré-OS.
 owner: gustavo.rompe@quintoandar.com.br
@@ -26,11 +27,11 @@ columns:
   id_visit:
     lineage:
       - datalake_ebdb_clean.development_negotiation.id_visit
-    description: Visit that originated this negotiation. Several negotiations may share the same visit when two apts are proposed after one visit. Null if the negotiation has no visit yet.
+    description: Visit stored on the negotiation as origin context, not used to match Sales Flow. Several negotiations may share the same visit when two apts are proposed after one visit. Null if the negotiation has no visit yet.
   id_house_shell:
     lineage:
       - datalake_ebdb_clean.visit.id_house
-    description: House id of the listing the visit was booked on. Distinct from id_house (typology unit / offer house). Null when id_visit is null or the visit row is missing.
+    description: House id of the listing the visit was booked on. Visits stay on this listing Imovel; they are not booked on the minted offer house. Distinct from id_house. Null when id_visit is null or the visit row is missing.
   id_visitor:
     lineage:
       - datalake_ebdb_clean.visit.id_visitor
@@ -50,15 +51,15 @@ columns:
   id_development_typology_unit:
     lineage:
       - datalake_ebdb_clean.development_negotiation_unit.id_development_typology_unit
-    description: Concrete typology unit (apto) under this negotiation. Same entity Sales Flow will hang the offer house on.
+    description: Concrete typology unit (apto) under this negotiation. Imovel on this row is the house Sales Flow uses for the offer.
   id_house:
     lineage:
       - datalake_ebdb_clean.development_typology_unit.id_house
-    description: House id of the typology unit (EBDB Imovel.id / DevelopmentTypologyUnit.imovel_id), distinct from id_house_shell. Same identifier as datalake_sales_flow_clean.house.id_external, not sales_flow.house_id. Null when no unit is linked.
+    description: House id of the typology unit (EBDB Imovel.id / DevelopmentTypologyUnit.imovel_id), distinct from id_house_shell. Same identifier as datalake_sales_flow_clean.house.id_external, not sales_flow.house_id. One negotiation has one unit Imovel; a later offer on the same physical apt mints a new Imovel and a new negotiation. Null when no unit is linked.
   id_offer:
     lineage:
       - datalake_sales_flow_clean.offer.id
-    description: Sales Flow offer.id linked when visit_external_id and house.id_external (Imovel) match this negotiation. Null when visit or unit house is missing, or no matching flow exists. If several flows share the pair, the non-canceled latest flow (then latest offer) is kept. Numeric offer id, not Firestore.
+    description: Sales Flow offer.id linked only when house.id_external equals this negotiation unit Imovel. Visit is not part of that join. Null when the unit house is missing or no matching flow exists. If several flows share the Imovel, the non-canceled latest flow (then latest offer) is kept. Numeric offer id, not Firestore.
   id_sales_flow:
     lineage:
       - datalake_sales_flow_clean.sales_flow.id
@@ -66,7 +67,7 @@ columns:
   ids_sales_flow:
     lineage:
       - datalake_sales_flow_clean.sales_flow.id
-    description: Sorted array of every sales_flow.id that shares this negotiation visit and unit Imovel (house.id_external), including canceled or older flows. Use to retrieve prior offers. Null when no flow matches. Distinct from id_sales_flow, which is only the latest.
+    description: Sorted array of every sales_flow.id for this unit Imovel (house.id_external), including canceled or older flows. Null when no flow matches. Distinct from id_sales_flow, which is only the latest.
   id_development_typology:
     lineage:
       - datalake_ebdb_clean.development_typology_unit.id_development_typology
