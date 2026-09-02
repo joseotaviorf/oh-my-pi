@@ -13,7 +13,7 @@ SELECT
     idfa,
     STRING(GET_JSON_OBJECT(event_properties, '$.house_id')) AS id_house,
     GET_JSON_OBJECT(event_properties, '$.search_id') AS id_search,
-    TRANSFORM(FROM_JSON(GET_JSON_OBJECT(event_properties, '$.search_results_list'), 'array<string>'), x -> X::BIGINT) AS ids_search_results_list,
+    TRANSFORM(FROM_JSON(GET_JSON_OBJECT(event_properties, '$.search_results_list'), 'array<string>'), x -> CAST(X AS BIGINT)) AS ids_search_results_list,
     event_type,
     amplitude_event_type,
     city,

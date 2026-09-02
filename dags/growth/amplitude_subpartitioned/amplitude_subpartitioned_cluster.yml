@@ -1,15 +1,17 @@
 cluster:
-  type: consolidation_l_general_cluster
-  databricks_conn_id: databricks_new
+  # Memory-optimized r6g.8xlarge (256 GB). The Delta file-index build for the very wide
+  # `datalake_amplitude_clean.events` table OOMs the driver/executors at planning time on
+  # smaller presets, so we give each task a large heap: executor.memory 200g / 2 cores
+  # gives ~100g per task, and a 96g driver absorbs the metadata footprint. This is the
+  # EMR equivalent of the former Databricks consolidation_l_general_cluster, sized up to
+  # survive the wide-table snapshot without needing spark.databricks.delta.snapshotPartitions.
+  type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
-    driver_node_type_id: c7g.4xlarge
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment}}
-      spark.driver.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
-      spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
     aws_attributes:
       ebs_volume_size: 500
+    spark_conf:
+      spark.executor.memory: 200g
+      spark.executor.cores: "2"
+      spark.executor.memoryOverhead: 24g
+      spark.driver.memory: 96g
+      spark.driver.memoryOverhead: 16g

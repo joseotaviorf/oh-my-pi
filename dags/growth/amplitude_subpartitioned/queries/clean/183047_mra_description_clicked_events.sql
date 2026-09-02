@@ -23,7 +23,7 @@ SELECT
   event_type,
   event_properties,
   REGEXP_EXTRACT(
-    event_properties:uri,
+    GET_JSON_OBJECT(event_properties, '$.uri'),
     '/contrato/([0-9]+)',
     1
   ) AS id_contract,

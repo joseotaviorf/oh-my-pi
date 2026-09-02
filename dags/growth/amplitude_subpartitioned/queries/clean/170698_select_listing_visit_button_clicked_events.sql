@@ -11,7 +11,7 @@ SELECT
     idfa,
     adid,
     uuid,
-    GET_JSON_OBJECT(event_properties, '$.agentId')::BIGINT AS id_user_agent,
+    CAST(GET_JSON_OBJECT(event_properties, '$.agentId') AS BIGINT) AS id_user_agent,
     GET_JSON_OBJECT(event_properties, '$.houseId') AS id_house,
     GET_JSON_OBJECT(event_properties, '$.listId') AS id_list,
     GET_JSON_OBJECT(event_properties, '$.listName') AS list_name,

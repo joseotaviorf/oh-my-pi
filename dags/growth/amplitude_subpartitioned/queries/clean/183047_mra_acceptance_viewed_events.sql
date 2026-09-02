@@ -8,7 +8,7 @@ SELECT
   id_user,
   id_schema,
   id_inserted,
-  REGEXP_EXTRACT(event_properties:uri, '/contrato/([0-9]+)', 1) AS id_contract,
+  REGEXP_EXTRACT(GET_JSON_OBJECT(event_properties, '$.uri'), '/contrato/([0-9]+)', 1) AS id_contract,
   adid,
   idfa,
   amplitude_event_type,
