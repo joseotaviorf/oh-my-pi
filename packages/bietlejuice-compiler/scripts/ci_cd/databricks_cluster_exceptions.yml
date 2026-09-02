@@ -91,3 +91,18 @@ exceptions:
       2026-08-18 prod run, no terminal state). Returns to EMR once the raw
       ingestion is optimized.
     approved_by: eduardo.soares@quintoandar.com.br
+  - dag: amplitude_subpartitioned
+    path: dags/growth/amplitude_subpartitioned
+    reason: >-
+      Temporary EMR→Databricks revert for performance: the DAG fans out one EMR
+      step per subpartition table (~366 tables), and each step independently
+      rebuilds the Delta file-index and re-scans the wide
+      datalake_amplitude_clean.events source (partitioned only by
+      year/month/day; id_app/event_type are not partition columns). On the
+      2026-09-02 prod run each step took ~30-46 min even for near-empty tables,
+      so the whole DAG runs far too long/costly under EMR step concurrency.
+      Same class of issue as its sibling amplitude_new. SQL stays on the
+      dual-runtime-safe rewrites (CAST / GET_JSON_OBJECT); only the runtime
+      returns to Databricks. Returns to EMR once the per-table re-scan is
+      optimized (e.g. read the source once and derive the tables).
+    approved_by: henrique.paulo@quintoandar.com.br
