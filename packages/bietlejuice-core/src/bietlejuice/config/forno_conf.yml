@@ -185,7 +185,7 @@ cluster_template:
             # DDL, so a low value corrupts wide struct columns in the catalog.
             spark.sql.debug.maxToStringFields: "4096"
             spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
-            spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.forno.quintoandar.com.br"
+            spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.apps.core-frn.habitat.zone"
             spark.metrics.conf.*.sink.graphite.period: "15"
             spark.metrics.conf.*.sink.graphite.port: "9109"
             spark.metrics.conf.*.sink.graphite.unit: "seconds"
@@ -280,7 +280,7 @@ cluster_template:
             # DDL, so a low value corrupts wide struct columns in the catalog.
             spark.sql.debug.maxToStringFields: "4096"
             spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
-            spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.forno.quintoandar.com.br"
+            spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.apps.core-frn.habitat.zone"
             spark.metrics.conf.*.sink.graphite.period: "15"
             spark.metrics.conf.*.sink.graphite.port: "9109"
             spark.metrics.conf.*.sink.graphite.unit: "seconds"
