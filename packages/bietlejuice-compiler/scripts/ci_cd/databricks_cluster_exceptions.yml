@@ -61,13 +61,6 @@ exceptions:
       adapted for EMR. Once that migration lands, this DAG will move to EMR
       (consolidation_s_memory_cluster).
     approved_by: anne.macedo@quintoandar.com.br
-  - dag: gsheets_agents_fast_lane
-    path: dags/agents/gsheets_agents_fast_lane
-    reason: >-
-      Temporary Databricks exception: the gsheets_ingestion workflow is not yet
-      adapted for EMR. Once that migration lands, this DAG will move to EMR
-      (consolidation_s_memory_cluster).
-    approved_by: anne.macedo@quintoandar.com.br
   - dag: salesforce_cdc
     path: dags/support_and_service/salesforce_cdc
     reason: >-
