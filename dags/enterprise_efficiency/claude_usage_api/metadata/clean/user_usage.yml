@@ -1,7 +1,7 @@
 database_name: datalake_claude_usage_clean
 table_name: user_usage
 owner: gabriel.berger@quintoandar.com.br
-domain: Tech Platform
+domain: Enterprise Efficiency
 description: |
   Claude Enterprise daily token usage by user, model, and product for QuintoAndar workforce seats.
   One row per id_user, model, product, dt_starting, and dt_ending after deduplication from overlapping raw loads.

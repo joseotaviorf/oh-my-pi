@@ -1,7 +1,7 @@
 database_name: datalake_claude_usage_clean
 table_name: summaries
 owner: gabriel.berger@quintoandar.com.br
-domain: Tech Platform
+domain: Enterprise Efficiency
 description: |
   Claude Enterprise organization-level activity summaries for QuintoAndar's workforce.
   One row per dt_starting and dt_ending after deduplication from overlapping raw loads.

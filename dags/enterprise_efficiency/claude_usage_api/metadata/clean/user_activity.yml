@@ -1,7 +1,7 @@
 database_name: datalake_claude_usage_clean
 table_name: user_activity
 owner: gabriel.berger@quintoandar.com.br
-domain: Tech Platform
+domain: Enterprise Efficiency
 description: |
   Claude Enterprise Analytics daily user activity for QuintoAndar workforce seats.
   One row per user and activity date after deduplication from overlapping raw loads.

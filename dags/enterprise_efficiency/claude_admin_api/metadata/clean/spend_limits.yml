@@ -1,7 +1,7 @@
 database_name: datalake_claude_usage_clean
 table_name: spend_limits
 owner: gabriel.berger@quintoandar.com.br
-domain: Tech Platform
+domain: Enterprise Efficiency
 description: |
   Claude Enterprise effective spend limits for QuintoAndar workforce seats.
   One row per member (id_user) and period, from the latest daily snapshot.

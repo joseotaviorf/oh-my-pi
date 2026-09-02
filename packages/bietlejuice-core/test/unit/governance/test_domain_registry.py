@@ -21,7 +21,7 @@ GOLDEN_PATTERN = (
     "Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|"
     "Growth|International|Journey Optimizer|MLOps|People|QCX|Rede|"
     "Support and Services|Tech Platform|Data Platform|Conversational XP|"
-    "DS Pricing|Atlas DB|Broker XP|House and Listing"
+    "DS Pricing|Atlas DB|Broker XP|House and Listing|Enterprise Efficiency"
 )
 
 _REPO_ROOT = Path(__file__).resolve().parents[5]
@@ -42,7 +42,7 @@ def test_pattern_is_byte_identical_to_golden():
 
 
 def test_order_is_preserved():
-    # 22 domains, order matters for the regex alternation.
+    # 23 domains, order matters for the regex alternation.
     assert domain_registry.active_domains() == tuple(GOLDEN_PATTERN.split("|"))
 
 

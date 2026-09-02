@@ -1,7 +1,7 @@
 database_name: datalake_claude_usage_clean
 table_name: groups
 owner: gabriel.berger@quintoandar.com.br
-domain: Tech Platform
+domain: Enterprise Efficiency
 description: |
   Claude Enterprise RBAC groups used to manage role-based access for QuintoAndar workforce seats.
   One row per id after deduplication from overlapping admin snapshot loads.

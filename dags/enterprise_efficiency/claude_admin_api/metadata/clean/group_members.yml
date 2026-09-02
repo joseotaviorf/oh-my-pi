@@ -1,7 +1,7 @@
 database_name: datalake_claude_usage_clean
 table_name: group_members
 owner: gabriel.berger@quintoandar.com.br
-domain: Tech Platform
+domain: Enterprise Efficiency
 description: |
   Claude Enterprise RBAC group memberships linking QuintoAndar workforce seats to their RBAC groups.
   One row per id_group and id_user, fully overwritten each run from the latest daily extraction only:
