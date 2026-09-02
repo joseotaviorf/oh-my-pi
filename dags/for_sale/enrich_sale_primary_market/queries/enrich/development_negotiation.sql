@@ -1,56 +1,10 @@
--- One row per primary-market pré-OS negotiation. Visit is the shell listing
--- (Approach A). Unit house is the typology unit linked to the negotiation
--- (offer / published apt). Product is 1 negotiation → 1 unit; if CDC attaches
--- more than one unit, keep the latest link only. Sales Flow offer is attached
--- on visit + unit house (not the shell). Several flows on the same pair keep
--- the non-canceled row with latest ts_created, then latest offer ts_created.
-WITH latest_negotiation_unit AS (
-    SELECT
-        id,
-        id_development_negotiation,
-        id_development_typology_unit,
-        ts_created,
-        ts_updated
-    FROM (
-        SELECT
-            id,
-            id_development_negotiation,
-            id_development_typology_unit,
-            ts_created,
-            ts_updated,
-            ROW_NUMBER() OVER (
-                PARTITION BY id_development_negotiation
-                ORDER BY ts_updated DESC
-            ) AS _w
-        FROM
-            datalake_ebdb_clean.development_negotiation_unit
-    ) AS _negotiation_unit
-    WHERE
-        _w = 1
-),
-latest_listing_unit AS (
-    SELECT
-        id,
-        id_development_typology_unit,
-        id_listing_business_context,
-        id_development_typology
-    FROM (
-        SELECT
-            id,
-            id_development_typology_unit,
-            id_listing_business_context,
-            id_development_typology,
-            ROW_NUMBER() OVER (
-                PARTITION BY id_development_typology_unit
-                ORDER BY ts_updated DESC
-            ) AS _w
-        FROM
-            datalake_ebdb_clean.development_listing_unit
-    ) AS _listing_unit
-    WHERE
-        _w = 1
-),
-sales_flow_offer AS (
+-- Grain: one row per DevelopmentNegotiation.
+-- Visit house (id_house_shell) is the listing the visit was booked on.
+-- Unit house (id_house) is DevelopmentTypologyUnit.imovel_id and is the house
+-- on the Sales Flow offer. Match offer/flow on visit_external_id + unit house.
+-- Several sales_flow rows can share that pair: keep non-canceled, then latest
+-- ts_created on the flow, then latest ts_created on the offer.
+WITH sales_flow_offer AS (
     SELECT
         id_sales_flow,
         id_offer,
@@ -115,13 +69,13 @@ LEFT JOIN
     datalake_ebdb_clean.visit AS v
         ON v.id = n.id_visit
 LEFT JOIN
-    latest_negotiation_unit AS nu
+    datalake_ebdb_clean.development_negotiation_unit AS nu
         ON nu.id_development_negotiation = n.id
 LEFT JOIN
     datalake_ebdb_clean.development_typology_unit AS dtu
         ON dtu.id = nu.id_development_typology_unit
 LEFT JOIN
-    latest_listing_unit AS dlu
+    datalake_ebdb_clean.development_listing_unit AS dlu
         ON dlu.id_development_typology_unit = dtu.id
 LEFT JOIN
     datalake_ebdb_clean.development AS d
