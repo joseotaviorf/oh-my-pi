@@ -28,6 +28,13 @@ columns:
     lineage:
     - datalake_sale_offer.core_sale_offer.id_region
     description: Region identification key where the property is located.
+  sale_type:
+    lineage:
+    - datalake_sale_offer.core_sale_offer.sale_type
+    description: Market type of the offer persisted by Sales Flow. PRIMARY identifies a new-build unit offer and SECONDARY identifies a resale offer. NULL is preserved when the upstream offer has no classification.
+    categories:
+      PRIMARY: Offer for a Primary Market (new-build) unit.
+      SECONDARY: Offer for a Secondary Market (resale) listing.
   city_group:
     lineage:
     - datalake_region.region.city_group

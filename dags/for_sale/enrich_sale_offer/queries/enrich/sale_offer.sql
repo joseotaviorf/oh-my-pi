@@ -332,6 +332,7 @@ SELECT
   o.id_house,
   o.id_owner,
   o.id_region,
+  o.sale_type,
   r.city_group,
   o.id_agent,
   vo.id_booking,
