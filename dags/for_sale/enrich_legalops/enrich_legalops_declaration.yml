@@ -26,6 +26,7 @@ workflow:
   type: query_delta
   layer: enrich
   custom_schema: legalops
+  has_hive_sync: false
   default_extraction_type: full
   default_partitions: []
   inner_dependencies:
