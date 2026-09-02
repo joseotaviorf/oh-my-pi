@@ -95,31 +95,45 @@ aux_planning_operation AS (
         cp.skuser IS NOT NULL 
         AND trim(cp.skuser) NOT IN ('', '-')    
 ),
-
-actual_vol AS (
+aux_planning_operation_salted AS (
     SELECT
-      'actual_vol' as aux_reference,
-        obt.date
-        ,obt.acquisition_origin
-        ,obt.nm_business_context AS business_context
-        ,obt.nm_supply_source AS supply_source
-        ,obt.company_report_origin
-        ,obt.planning_operation
-        ,COALESCE(TRIM(SPLIT_PART(apo.area, '-',1)), obt.planning_operation) AS planning_operation_adj
-        ,obt.planning_conversion
-        ,obt.planning_cluster
-        ,obt.behavior_type
-        ,obt.source
-        ,obt.medium
-        ,obt.nm_campaign
-        ,cnh.id_campaign
-        ,obt.country_code
-        ,obt.city_group
-        ,obt.ds_discard_reason
-        ,scc.campaign_cluster
-        ,sf.dt_creation_sf
-        ,sf.channel_sf
-        ,CASE
+        apo.sk_user_id,
+        apo.area,
+        apo.periodo_inicio,
+        apo.periodo_fim,
+        salt.salt AS join_salt
+    FROM
+        aux_planning_operation AS apo
+    CROSS JOIN (
+        SELECT EXPLODE(SEQUENCE(0, 63)) AS salt
+    ) AS salt
+),
+
+actual_vol_joined AS (
+    SELECT /*+ REPARTITION(200, obt.date, obt.sk_supply, join_salt) */
+        obt.date,
+        obt.sk_supply,
+        CAST(PMOD(XXHASH64(obt.sk_supply, obt.date), 64) AS INT) AS join_salt,
+        obt.acquisition_origin,
+        obt.nm_business_context,
+        obt.nm_supply_source,
+        obt.company_report_origin,
+        obt.planning_operation,
+        COALESCE(TRIM(SPLIT_PART(apo.area, '-', 1)), obt.planning_operation) AS planning_operation_adj,
+        obt.planning_conversion,
+        obt.planning_cluster,
+        obt.behavior_type,
+        obt.source,
+        obt.medium,
+        obt.nm_campaign,
+        cnh.id_campaign,
+        obt.country_code,
+        obt.city_group,
+        obt.ds_discard_reason,
+        scc.campaign_cluster,
+        sf.dt_creation_sf,
+        sf.channel_sf,
+        CASE
             WHEN ac.id IS NOT NULL
                 AND obt.country_code = 'BR'
                 AND obt.planning_operation = 'Outbound'
@@ -134,8 +148,8 @@ actual_vol AS (
                     )
                 THEN TRUE
             ELSE FALSE
-        END AS is_carteirizacao
-        ,CASE
+        END AS is_carteirizacao,
+        CASE
             WHEN obt.sk_user_conversion IS NULL
                 THEN NULL
             WHEN obt.sk_user_conversion IN (
@@ -157,8 +171,8 @@ actual_vol AS (
                   AND obt.planning_operation = 'Outbound'
                   THEN TRUE
               ELSE FALSE
-        END AS is_exec_carteirizacao
-        ,CASE
+        END AS is_exec_carteirizacao,
+        CASE
             WHEN obt.date >= DATE '2025-09-01'
               AND obt.date <= DATE '2025-11-18'
               AND obt.nm_business_context = 'RENT'
@@ -174,8 +188,8 @@ actual_vol AS (
               AND lower(obt.nm_agent) IN ('ciq_pj', '3p_fr')
               THEN TRUE
             ELSE FALSE
-        END AS is_3p_fr_test
-        ,CASE
+        END AS is_3p_fr_test,
+        CASE
           WHEN obt.nm_campaign = '-1' AND ia.source_environment IN (
             SELECT DISTINCT
                 source_environment
@@ -202,87 +216,18 @@ actual_vol AS (
                 phone_number IS NOT NULL
             ) THEN TRUE
           ELSE FALSE
-        END AS is_click_to_wpp
-        ,COALESCE(sf.outbound_operation, 'não-carteirizado') as outbound_operation
-        ,COALESCE(fl_unique.fl_unique, 'Cross-listing') as fl_unique
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'lead', obt.sk_supply, NULL))) as act_leads
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect', obt.sk_supply, NULL))) as act_prospects
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified', obt.sk_supply, NULL))) as act_qualifieds
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified', obt.sk_supply, NULL))) as act_av_qualifieds
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity', obt.sk_supply, NULL))) as act_opportunities
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'first_listing', obt.sk_supply, NULL))) as act_first_listings
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect', qualifieds.sk_supply, NULL))) as qty_p2q_cohort
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=7, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_d7
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=14, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_d14
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=28, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_d28
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', qualifieds.date) = date_trunc('WEEK', obt.date), qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w0
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) = 1, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w1
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) = 2, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w2
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) = 3, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w3
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) = 4, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w4
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) >= 5, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w5plus
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect', opportunities.sk_supply, NULL))) as qty_p2o_cohort
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=7, opportunities.sk_supply, NULL))) as qty_p2o_cohort_d7
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=14, opportunities.sk_supply, NULL))) as qty_p2o_cohort_d14
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=28, opportunities.sk_supply, NULL))) as qty_p2o_cohort_d28
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', opportunities.date) = date_trunc('WEEK', obt.date), opportunities.sk_supply, NULL))) as qty_p2o_cohort_w0
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 1, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w1
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 2, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w2
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 3, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w3
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 4, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w4
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) >= 5, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w5plus
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect', first_listings.sk_supply, NULL))) as qty_p2l_cohort
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=7, first_listings.sk_supply, NULL))) as qty_p2l_cohort_d7
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=14, first_listings.sk_supply, NULL))) as qty_p2l_cohort_d14
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=28, first_listings.sk_supply, NULL))) as qty_p2l_cohort_d28
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', first_listings.date) = date_trunc('WEEK', obt.date), first_listings.sk_supply, NULL))) as qty_p2l_cohort_w0
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 1, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w1
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 2, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w2
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 3, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w3
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 4, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w4
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) >= 5, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w5plus
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified', av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and date_trunc('WEEK', av_qualifieds.date) = date_trunc('WEEK', obt.date), av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w0
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) = 1, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w1
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) = 2, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w2
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) = 3, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w3
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) = 4, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w4
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) >= 5, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w5plus
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified', opportunities.sk_supply, NULL))) as qty_avq2o_cohort
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and date_trunc('WEEK', opportunities.date) = date_trunc('WEEK', obt.date), opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w0
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 1, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w1
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 2, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w2
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 3, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w3
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 4, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w4
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) >= 5, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w5plus
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity', first_listings.sk_supply, NULL))) as qty_o2l_cohort
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and datediff(first_listings.date, obt.date)<=7, first_listings.sk_supply, NULL)))  as   qty_o2l_cohort_d7
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and datediff(first_listings.date, obt.date)<=14, first_listings.sk_supply,   NULL)))   as qty_o2l_cohort_d14
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and datediff(first_listings.date, obt.date)<=28, first_listings.sk_supply,   NULL)))   as qty_o2l_cohort_d28
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and date_trunc('WEEK', first_listings.date) = date_trunc('WEEK', obt.date),    first_listings.sk_supply, NULL))) as qty_o2l_cohort_w0
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 1, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w1
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 2, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w2
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 3, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w3
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 4, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w4
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) >= 5, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w5plus
-        ,NULL AS lastyear_leads
-        ,NULL AS lastyear_prospects
-        ,NULL AS lastyear_opportunities
-        ,NULL AS lastyear_first_listings
-        ,NULL AS bup_prospects
-        ,NULL AS bup_qualifieds
-        ,NULL AS bup_opportunities
-        ,NULL AS bup_first_listings
-        ,NULL AS okr_prospects
-        ,NULL AS okr_qualifieds
-        ,NULL AS okr_opportunities
-        ,NULL AS okr_first_listings
-        ,NULL AS qts_prospects_unique
-        ,NULL AS qts_qualifieds_unique
-        ,NULL AS qts_opportunities_unique
-        ,NULL AS qts_first_listings_unique
-        ,NULL AS tgt_cost
-        ,NULL AS mkt_cost
+        END AS is_click_to_wpp,
+        COALESCE(sf.outbound_operation, 'não-carteirizado') AS outbound_operation,
+        COALESCE(fl_unique.fl_unique, 'Cross-listing') AS fl_unique,
+        obt.cd_funnel_step,
+        qualifieds.sk_supply AS qualifieds_sk_supply,
+        qualifieds.date AS qualifieds_date,
+        opportunities.sk_supply AS opportunities_sk_supply,
+        opportunities.date AS opportunities_date,
+        av_qualifieds.sk_supply AS av_qualifieds_sk_supply,
+        av_qualifieds.date AS av_qualifieds_date,
+        first_listings.sk_supply AS first_listings_sk_supply,
+        first_listings.date AS first_listings_date
     FROM
       dw_growth.obt_supply obt
     LEFT JOIN
@@ -334,14 +279,125 @@ actual_vol AS (
     LEFT JOIN
       datalake_supply_flows.inbound_attribution AS ia
         ON ia.id_lead_ebdb = obt.sk_lead
-    LEFT JOIN 
-      aux_planning_operation apo
+    LEFT JOIN
+      aux_planning_operation_salted apo
         ON obt.sk_user_conversion = apo.sk_user_id
+        AND CAST(PMOD(XXHASH64(obt.sk_supply, obt.date), 64) AS INT) = apo.join_salt
         AND obt.date >= apo.periodo_inicio
         AND obt.date < apo.periodo_fim
     WHERE
       YEAR(obt.date) >= YEAR(current_date) - 3
+),
 
+actual_vol AS (
+    SELECT
+      'actual_vol' as aux_reference,
+        j.date
+        ,j.acquisition_origin
+        ,j.nm_business_context AS business_context
+        ,j.nm_supply_source AS supply_source
+        ,j.company_report_origin
+        ,j.planning_operation
+        ,j.planning_operation_adj
+        ,j.planning_conversion
+        ,j.planning_cluster
+        ,j.behavior_type
+        ,j.source
+        ,j.medium
+        ,j.nm_campaign
+        ,j.id_campaign
+        ,j.country_code
+        ,j.city_group
+        ,j.ds_discard_reason
+        ,j.campaign_cluster
+        ,j.dt_creation_sf
+        ,j.channel_sf
+        ,j.is_carteirizacao
+        ,j.is_exec_carteirizacao
+        ,j.is_3p_fr_test
+        ,j.is_click_to_wpp
+        ,j.outbound_operation
+        ,j.fl_unique
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'lead', j.sk_supply, NULL))) as act_leads
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect', j.sk_supply, NULL))) as act_prospects
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'qualified', j.sk_supply, NULL))) as act_qualifieds
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'av_qualified', j.sk_supply, NULL))) as act_av_qualifieds
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity', j.sk_supply, NULL))) as act_opportunities
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'first_listing', j.sk_supply, NULL))) as act_first_listings
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect', j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.qualifieds_date, j.date)<=7, j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_d7
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.qualifieds_date, j.date)<=14, j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_d14
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.qualifieds_date, j.date)<=28, j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_d28
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and date_trunc('WEEK', j.qualifieds_date) = date_trunc('WEEK', j.date), j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_w0
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.qualifieds_date)) = 1, j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_w1
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.qualifieds_date)) = 2, j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_w2
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.qualifieds_date)) = 3, j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_w3
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.qualifieds_date)) = 4, j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_w4
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.qualifieds_date)) >= 5, j.qualifieds_sk_supply, NULL))) as qty_p2q_cohort_w5plus
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect', j.opportunities_sk_supply, NULL))) as qty_p2o_cohort
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.opportunities_date, j.date)<=7, j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_d7
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.opportunities_date, j.date)<=14, j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_d14
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.opportunities_date, j.date)<=28, j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_d28
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and date_trunc('WEEK', j.opportunities_date) = date_trunc('WEEK', j.date), j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_w0
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) = 1, j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_w1
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) = 2, j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_w2
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) = 3, j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_w3
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) = 4, j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_w4
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) >= 5, j.opportunities_sk_supply, NULL))) as qty_p2o_cohort_w5plus
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect', j.first_listings_sk_supply, NULL))) as qty_p2l_cohort
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.first_listings_date, j.date)<=7, j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_d7
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.first_listings_date, j.date)<=14, j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_d14
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and datediff(j.first_listings_date, j.date)<=28, j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_d28
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and date_trunc('WEEK', j.first_listings_date) = date_trunc('WEEK', j.date), j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_w0
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) = 1, j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_w1
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) = 2, j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_w2
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) = 3, j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_w3
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) = 4, j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_w4
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) >= 5, j.first_listings_sk_supply, NULL))) as qty_p2l_cohort_w5plus
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'qualified', j.av_qualifieds_sk_supply, NULL))) as qty_q2avq_cohort
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'qualified' and date_trunc('WEEK', j.av_qualifieds_date) = date_trunc('WEEK', j.date), j.av_qualifieds_sk_supply, NULL))) as qty_q2avq_cohort_w0
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.av_qualifieds_date)) = 1, j.av_qualifieds_sk_supply, NULL))) as qty_q2avq_cohort_w1
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.av_qualifieds_date)) = 2, j.av_qualifieds_sk_supply, NULL))) as qty_q2avq_cohort_w2
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.av_qualifieds_date)) = 3, j.av_qualifieds_sk_supply, NULL))) as qty_q2avq_cohort_w3
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.av_qualifieds_date)) = 4, j.av_qualifieds_sk_supply, NULL))) as qty_q2avq_cohort_w4
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.av_qualifieds_date)) >= 5, j.av_qualifieds_sk_supply, NULL))) as qty_q2avq_cohort_w5plus
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'av_qualified', j.opportunities_sk_supply, NULL))) as qty_avq2o_cohort
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'av_qualified' and date_trunc('WEEK', j.opportunities_date) = date_trunc('WEEK', j.date), j.opportunities_sk_supply, NULL))) as qty_avq2o_cohort_w0
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) = 1, j.opportunities_sk_supply, NULL))) as qty_avq2o_cohort_w1
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) = 2, j.opportunities_sk_supply, NULL))) as qty_avq2o_cohort_w2
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) = 3, j.opportunities_sk_supply, NULL))) as qty_avq2o_cohort_w3
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) = 4, j.opportunities_sk_supply, NULL))) as qty_avq2o_cohort_w4
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.opportunities_date)) >= 5, j.opportunities_sk_supply, NULL))) as qty_avq2o_cohort_w5plus
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity', j.first_listings_sk_supply, NULL))) as qty_o2l_cohort
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and datediff(j.first_listings_date, j.date)<=7, j.first_listings_sk_supply, NULL)))  as   qty_o2l_cohort_d7
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and datediff(j.first_listings_date, j.date)<=14, j.first_listings_sk_supply,   NULL)))   as qty_o2l_cohort_d14
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and datediff(j.first_listings_date, j.date)<=28, j.first_listings_sk_supply,   NULL)))   as qty_o2l_cohort_d28
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and date_trunc('WEEK', j.first_listings_date) = date_trunc('WEEK', j.date),    j.first_listings_sk_supply, NULL))) as qty_o2l_cohort_w0
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) = 1, j.first_listings_sk_supply, NULL))) as qty_o2l_cohort_w1
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) = 2, j.first_listings_sk_supply, NULL))) as qty_o2l_cohort_w2
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) = 3, j.first_listings_sk_supply, NULL))) as qty_o2l_cohort_w3
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) = 4, j.first_listings_sk_supply, NULL))) as qty_o2l_cohort_w4
+        ,COUNT(DISTINCT (IF(j.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', j.date), date_trunc('WEEK', j.first_listings_date)) >= 5, j.first_listings_sk_supply, NULL))) as qty_o2l_cohort_w5plus
+        ,NULL AS lastyear_leads
+        ,NULL AS lastyear_prospects
+        ,NULL AS lastyear_opportunities
+        ,NULL AS lastyear_first_listings
+        ,NULL AS bup_prospects
+        ,NULL AS bup_qualifieds
+        ,NULL AS bup_opportunities
+        ,NULL AS bup_first_listings
+        ,NULL AS okr_prospects
+        ,NULL AS okr_qualifieds
+        ,NULL AS okr_opportunities
+        ,NULL AS okr_first_listings
+        ,NULL AS qts_prospects_unique
+        ,NULL AS qts_qualifieds_unique
+        ,NULL AS qts_opportunities_unique
+        ,NULL AS qts_first_listings_unique
+        ,NULL AS tgt_cost
+        ,NULL AS mkt_cost
+    FROM
+        actual_vol_joined j
     GROUP BY ALL
 ),
 
