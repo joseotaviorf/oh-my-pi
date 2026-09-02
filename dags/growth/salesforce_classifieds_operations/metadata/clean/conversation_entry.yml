@@ -1,0 +1,140 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: conversation_entry
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce ConversationEntry messages from the Navent Classifieds Salesforce org.
+  Grain is one row per conversation entry (id) per incremental load window, keyed by Salesforce Id.
+  Stores message payload, actor, sequence, and delivery/read timestamps inside a conversation.
+  Source: datalake_salesforce_classifieds_raw.conversationentry. Physically partitioned by year, month,
+  and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together
+  — or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the ConversationEntry object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.Id
+  id_actor:
+    description: Foreign Key to the related actor on this ConversationEntry (ActorId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.ActorId
+  id_conversation:
+    description: Foreign Key to the parent Conversation (ConversationId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.ConversationId
+  id_conversation_entity:
+    description: Foreign Key to the related related conversation entity on this ConversationEntry (ConversationEntityId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.ConversationEntityId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.LastModifiedById
+  actor_name:
+    description: Actor name stored on this ConversationEntry (ActorName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.ActorName
+  actor_type:
+    description: Actor type stored on this ConversationEntry (ActorType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.ActorType
+  entry_type:
+    description: Entry type stored on this ConversationEntry (EntryType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.EntryType
+  message_body:
+    description: Message body stored on this ConversationEntry (Message).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.Message
+  message_identifier:
+    description: Message identifier stored on this ConversationEntry (MessageIdentifier).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.MessageIdentifier
+  message_status:
+    description: Message status stored on this ConversationEntry (MessageStatus).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.MessageStatus
+  message_status_code:
+    description: Message status code stored on this ConversationEntry (MessageStatusCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.MessageStatusCode
+  client_duration:
+    description: Client duration stored on this ConversationEntry (ClientDuration).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.ClientDuration
+  entry_time_milli_secs:
+    description: Entry time milli secs stored on this ConversationEntry (EntryTimeMilliSecs).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.EntryTimeMilliSecs
+  seq:
+    description: Seq stored on this ConversationEntry (Seq).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.Seq
+  has_attachments:
+    description: Flag indicating attachments on this ConversationEntry (HasAttachments).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.HasAttachments
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.IsDeleted
+  ts_client_timestamp:
+    description: Salesforce timestamp for client timestamp on this ConversationEntry (ClientTimestamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.ClientTimestamp
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.CreatedDate
+  ts_entry_end_time:
+    description: Salesforce timestamp for entry end time on this ConversationEntry (EntryEndTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.EntryEndTime
+  ts_entry_time:
+    description: Salesforce timestamp for entry time on this ConversationEntry (EntryTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.EntryTime
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.LastModifiedDate
+  ts_message_deliver_time:
+    description: Salesforce timestamp for message deliver time on this ConversationEntry (MessageDeliverTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.MessageDeliverTime
+  ts_message_read_time:
+    description: Salesforce timestamp for message read time on this ConversationEntry (MessageReadTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.MessageReadTime
+  ts_message_send_time:
+    description: Salesforce timestamp for message send time on this ConversationEntry (MessageSendTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.MessageSendTime
+  ts_server_received_timestamp:
+    description: Salesforce timestamp for server received timestamp on this ConversationEntry (ServerReceivedTimestamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.ServerReceivedTimestamp
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationentry.day

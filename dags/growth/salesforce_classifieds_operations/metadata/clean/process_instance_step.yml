@@ -1,0 +1,81 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: process_instance_step
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce ProcessInstanceStep approval steps from the Navent Classifieds Salesforce
+  org. Grain is one row per step (id) per incremental load window, keyed by Salesforce Id. Records the
+  actor, original actor, comments, and step status. Incremental partition uses CreatedDate (no
+  LastModifiedDate). Source: datalake_salesforce_classifieds_raw.processinstancestep. Physically
+  partitioned by year, month, and day from dt_updated (derived from CreatedDate). Always filter year,
+  month, and day together — or use dt_updated with load_start_date/load_end_date — for partition pruning
+  on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the ProcessInstanceStep object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.Id
+  id_actor:
+    description: Foreign Key to the related actor on this ProcessInstanceStep (ActorId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.ActorId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.CreatedById
+  id_original_actor:
+    description: Foreign Key to the related original approval actor on this ProcessInstanceStep (OriginalActorId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.OriginalActorId
+  id_process_instance:
+    description: Foreign Key to the parent ProcessInstance (ProcessInstanceId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.ProcessInstanceId
+  id_step_node:
+    description: Foreign Key to the related approval step node on this ProcessInstanceStep (StepNodeId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.StepNodeId
+  comments:
+    description: Comments stored on this ProcessInstanceStep (Comments).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.Comments
+  step_status_name:
+    description: Step status name stored on this ProcessInstanceStep (StepStatus).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.StepStatus
+  elapsed_time_days:
+    description: Elapsed time days stored on this ProcessInstanceStep (ElapsedTimeInDays).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.ElapsedTimeInDays
+  elapsed_time_hours:
+    description: Elapsed time hours stored on this ProcessInstanceStep (ElapsedTimeInHours).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.ElapsedTimeInHours
+  elapsed_time_minutes:
+    description: Elapsed time minutes stored on this ProcessInstanceStep (ElapsedTimeInMinutes).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.ElapsedTimeInMinutes
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.CreatedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (CreatedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.processinstancestep.day

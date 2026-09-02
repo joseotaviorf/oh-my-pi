@@ -1,0 +1,37 @@
+SELECT
+    Id AS id,
+    ActorId AS id_actor,
+    ConversationId AS id_conversation,
+    ConversationEntityId AS id_conversation_entity,
+    CreatedById AS id_created_by,
+    LastModifiedById AS id_last_modified_by,
+    ActorName AS actor_name,
+    ActorType AS actor_type,
+    EntryType AS entry_type,
+    Message AS message_body,
+    MessageIdentifier AS message_identifier,
+    MessageStatus AS message_status,
+    MessageStatusCode AS message_status_code,
+    ClientDuration AS client_duration,
+    EntryTimeMilliSecs AS entry_time_milli_secs,
+    Seq AS seq,
+    HasAttachments AS has_attachments,
+    IsDeleted AS is_deleted,
+    ClientTimestamp AS ts_client_timestamp,
+    CreatedDate AS ts_created,
+    EntryEndTime AS ts_entry_end_time,
+    EntryTime AS ts_entry_time,
+    LastModifiedDate AS ts_last_modified,
+    MessageDeliverTime AS ts_message_deliver_time,
+    MessageReadTime AS ts_message_read_time,
+    MessageSendTime AS ts_message_send_time,
+    ServerReceivedTimestamp AS ts_server_received_timestamp,
+    SystemModstamp AS ts_system_mod,
+    CAST(LastModifiedDate AS DATE) AS dt_updated,
+    YEAR(LastModifiedDate) AS year,
+    MONTH(LastModifiedDate) AS month,
+    DAY(LastModifiedDate) AS day
+FROM
+    datalake_salesforce_classifieds_raw.conversationentry
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

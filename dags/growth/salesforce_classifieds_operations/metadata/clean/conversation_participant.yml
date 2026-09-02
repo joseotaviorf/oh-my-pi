@@ -1,0 +1,96 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: conversation_participant
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce ConversationParticipant records from the Navent Classifieds Salesforce org.
+  Grain is one row per conversation participant (id) per incremental load window, keyed by Salesforce
+  Id. Tracks join/leave and last-active times for people in a conversation. Source:
+  datalake_salesforce_classifieds_raw.conversationparticipant. Physically partitioned by year, month,
+  and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together
+  — or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the ConversationParticipant object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.Id
+  id_conversation:
+    description: Foreign Key to the parent Conversation (ConversationId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.ConversationId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.LastModifiedById
+  id_participant_entity:
+    description: Foreign Key to the related participant entity on this ConversationParticipant (ParticipantEntityId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.ParticipantEntityId
+  app_type:
+    description: App type stored on this ConversationParticipant (AppType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.AppType
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.Name
+  participant_context:
+    description: Participant context stored on this ConversationParticipant (ParticipantContext).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.ParticipantContext
+  participant_display_name:
+    description: Participant display name stored on this ConversationParticipant (ParticipantDisplayName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.ParticipantDisplayName
+  participant_key:
+    description: Participant key stored on this ConversationParticipant (ParticipantKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.ParticipantKey
+  participant_role:
+    description: Participant role stored on this ConversationParticipant (ParticipantRole).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.ParticipantRole
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.IsDeleted
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.CreatedDate
+  ts_joined:
+    description: Salesforce timestamp for joined on this ConversationParticipant (JoinedTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.JoinedTime
+  ts_last_active:
+    description: Salesforce timestamp for last active on this ConversationParticipant (LastActiveTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.LastActiveTime
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.LastModifiedDate
+  ts_left:
+    description: Salesforce timestamp for left on this ConversationParticipant (LeftTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.LeftTime
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversationparticipant.day

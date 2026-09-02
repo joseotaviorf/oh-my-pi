@@ -1,0 +1,108 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: messaging_end_user
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce MessagingEndUser identities from the Navent Classifieds Salesforce org.
+  Grain is one row per messaging end user (id) per incremental load window, keyed by Salesforce Id.
+  Links a person on a messaging platform (consent, locale, channel key) to Salesforce. Source:
+  datalake_salesforce_classifieds_raw.messagingenduser. Physically partitioned by year, month, and day
+  from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use
+  dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the MessagingEndUser object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.Id
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.LastModifiedById
+  id_messaging_channel:
+    description: Foreign Key to the MessagingChannel used by this record (MessagingChannelId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.MessagingChannelId
+  id_owner:
+    description: Foreign Key to the Salesforce User or Queue that owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.OwnerId
+  currency_iso_code:
+    description: ISO currency code stored on the Salesforce record (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.CurrencyIsoCode
+  iso_country_code:
+    description: Iso country code stored on this MessagingEndUser (IsoCountryCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.IsoCountryCode
+  locale:
+    description: Locale stored on this MessagingEndUser (Locale).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.Locale
+  message_type:
+    description: Message type stored on this MessagingEndUser (MessageType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.MessageType
+  messaging_consent_status:
+    description: Messaging consent status stored on this MessagingEndUser (MessagingConsentStatus).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.MessagingConsentStatus
+  messaging_platform_key:
+    description: Messaging platform key stored on this MessagingEndUser (MessagingPlatformKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.MessagingPlatformKey
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.Name
+  profile_picture_url:
+    description: Profile picture url stored on this MessagingEndUser (ProfilePictureUrl).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.ProfilePictureUrl
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.IsDeleted
+  is_fully_opted_in:
+    description: Flag indicating fully opted in on this MessagingEndUser (IsFullyOptedIn).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.IsFullyOptedIn
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.LastModifiedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.LastReferencedDate
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.LastViewedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingenduser.day

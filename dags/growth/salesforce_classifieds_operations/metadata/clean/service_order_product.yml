@@ -1,0 +1,206 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: service_order_product
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce service-order product lines (Producto_de_orden_de_servicio__c) from the
+  Navent Classifieds Salesforce org. Grain is one row per order product (id) per incremental load
+  window, keyed by Salesforce Id. Holds list/sale prices, discounts, quantities, and validity dates
+  used in classifieds billing operations. Source:
+  datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c. Physically partitioned by year,
+  month, and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day
+  together — or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental
+  reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the service-order product object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Id
+  id_country_activation:
+    description: Foreign Key to the related activation country on this service-order product (Pais_de_activacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Pais_de_activacion__c
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.CreatedById
+  id_external:
+    description: Foreign Key to the related external order-item identifier on this service-order product (Id_externo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Id_externo__c
+  id_external_temporary:
+    description: Foreign Key to the related temporary external identifier on this service-order product (Id_externo_temporal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Id_externo_temporal__c
+  id_invoice:
+    description: Foreign Key to the related bill-to party on this service-order product (Facturar_a__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Facturar_a__c
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.LastModifiedById
+  id_name_quote:
+    description: Foreign Key to the related related quote on this service-order product (Nombre_de_presupuesto__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Nombre_de_presupuesto__c
+  id_order_service:
+    description: Foreign Key to the related service order on this service-order product (Orden_de_servicio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Orden_de_servicio__c
+  id_product:
+    description: Foreign Key to the related Product (Producto__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Producto__c
+  branch_id:
+    description: Branch stored on this service-order product (Branch_ID__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Branch_ID__c
+  code_product:
+    description: Code product stored on this service-order product (Codigo_de_producto__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Codigo_de_producto__c
+  currency_iso_code:
+    description: ISO currency code stored on the Salesforce record (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.CurrencyIsoCode
+  description_line_item:
+    description: Description line item stored on this service-order product (Descripcion_de_partida__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Descripcion_de_partida__c
+  frequency_billing:
+    description: Frequency billing stored on this service-order product (Frecuencia_de_Facturacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Frecuencia_de_Facturacion__c
+  billing_frequency_2:
+    description: Alternate billing cadence on this service-order product line (Frecuencia_de_facturacion2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Frecuencia_de_facturacion2__c
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Name
+  status_validity:
+    description: Status validity stored on this service-order product (Estado_de_vigencia__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Estado_de_vigencia__c
+  billing:
+    description: Billing stored on this service-order product (facturacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.facturacion__c
+  difference_months:
+    description: Number of months between start and end of validity on this service-order product (diferencia_meses__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.diferencia_meses__c
+  discount:
+    description: Discount stored on this service-order product (Descuento__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Descuento__c
+  discount_original:
+    description: Monetary or numeric measure of discount original on this service-order product (Descuento_original__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Descuento_original__c
+  duration:
+    description: Duration stored on this service-order product (Duracion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Duracion__c
+  price_annual:
+    description: Monetary or numeric measure of price annual on this service-order product (Precio_anual__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Precio_anual__c
+  price_list:
+    description: Monetary or numeric measure of price list on this service-order product (Precio_de_lista__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Precio_de_lista__c
+  price_monthly_2:
+    description: Alternate monthly list or sale price on this service-order product (Precio_mensual2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Precio_mensual2__c
+  price_monthly:
+    description: Monetary or numeric measure of price monthly on this service-order product (Precio_mensual__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Precio_mensual__c
+  price_sales:
+    description: Monetary or numeric measure of price sales on this service-order product (Precio_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Precio_de_venta__c
+  price_sales_original:
+    description: Monetary or numeric measure of price sales original on this service-order product (Precio_de_venta_original__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Precio_de_venta_original__c
+  price_total2:
+    description: Monetary or numeric measure of price total2 on this service-order product (Precio_total2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Precio_total2__c
+  price_total_original2:
+    description: Monetary or numeric measure of price total original2 on this service-order product (Precio_total_original2__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Precio_total_original2__c
+  quantity:
+    description: Quantity stored on this service-order product (Cantidad__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Cantidad__c
+  quantity_original:
+    description: Quantity original stored on this service-order product (Cantidad_original__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Cantidad_original__c
+  is_current:
+    description: Flag indicating current on this service-order product (Vigente__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Vigente__c
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.IsDeleted
+  is_renewable:
+    description: Flag indicating renewable on this service-order product (Renovable__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Renovable__c
+  dt_end_validity:
+    description: Calendar date of end validity on this service-order product (Fecha_de_fin_de_vigencia__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Fecha_de_fin_de_vigencia__c
+  dt_last_activity:
+    description: Date of the last activity related to the record (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.LastActivityDate
+  dt_start_validity:
+    description: Calendar date of start validity on this service-order product (Fecha_de_inicio_de_vigencia__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.Fecha_de_inicio_de_vigencia__c
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.LastModifiedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.LastReferencedDate
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.LastViewedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.producto_de_orden_de_servicio__c.day

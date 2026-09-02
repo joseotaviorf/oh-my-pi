@@ -1,0 +1,177 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: messaging_session
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce MessagingSession records from the Navent Classifieds Salesforce org.
+  Grain is one row per messaging session (id) per incremental load window, keyed by Salesforce Id.
+  Connects a chat session to Case, Account, Contact, Lead, or Opportunity and counts agent vs end-user
+  messages. Source: datalake_salesforce_classifieds_raw.messagingsession. Physically partitioned by year,
+  month, and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day
+  together — or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental
+  reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the MessagingSession object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.Id
+  id_case:
+    description: Foreign Key to the related Case record (CaseId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.CaseId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.CreatedById
+  id_end_user_account:
+    description: Foreign Key to the related end-user Account on this MessagingSession (EndUserAccountId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.EndUserAccountId
+  id_end_user_contact:
+    description: Foreign Key to the related end-user Contact on this MessagingSession (EndUserContactId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.EndUserContactId
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.LastModifiedById
+  id_lead:
+    description: Foreign Key to the related Lead record (LeadId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.LeadId
+  id_messaging_channel:
+    description: Foreign Key to the MessagingChannel used by this record (MessagingChannelId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.MessagingChannelId
+  id_messaging_end_user:
+    description: Foreign Key to the MessagingEndUser on this session (MessagingEndUserId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.MessagingEndUserId
+  id_opportunity:
+    description: Foreign Key to the related Opportunity record (OpportunityId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.OpportunityId
+  id_owner:
+    description: Foreign Key to the Salesforce User or Queue that owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.OwnerId
+  id_target_user:
+    description: Foreign Key to the related target User on this MessagingSession (TargetUserId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.TargetUserId
+  agent_type:
+    description: Agent type stored on this MessagingSession (AgentType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.AgentType
+  channel_end_user_formula:
+    description: Channel end user formula stored on this MessagingSession (ChannelEndUserFormula).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.ChannelEndUserFormula
+  channel_group:
+    description: Channel group stored on this MessagingSession (ChannelGroup).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.ChannelGroup
+  channel_intent:
+    description: Channel intent stored on this MessagingSession (ChannelIntent).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.ChannelIntent
+  channel_key:
+    description: Channel key stored on this MessagingSession (ChannelKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.ChannelKey
+  channel_locale:
+    description: Channel locale stored on this MessagingSession (ChannelLocale).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.ChannelLocale
+  channel_name:
+    description: Channel name stored on this MessagingSession (ChannelName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.ChannelName
+  channel_type:
+    description: Channel type stored on this MessagingSession (ChannelType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.ChannelType
+  currency_iso_code:
+    description: ISO currency code stored on the Salesforce record (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.CurrencyIsoCode
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.Name
+  origin_channel_name:
+    description: Origin channel name stored on this MessagingSession (Origin).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.Origin
+  preview_details:
+    description: Preview details stored on this MessagingSession (PreviewDetails).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.PreviewDetails
+  session_key:
+    description: Session key stored on this MessagingSession (SessionKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.SessionKey
+  status_name:
+    description: Lifecycle status of the Salesforce record (Status).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.Status
+  agent_message_count:
+    description: Numeric count of agent message count on this MessagingSession (AgentMessageCount).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.AgentMessageCount
+  end_user_message_count:
+    description: Numeric count of end user message count on this MessagingSession (EndUserMessageCount).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.EndUserMessageCount
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.IsDeleted
+  ts_accepted:
+    description: Salesforce timestamp for accepted on this MessagingSession (AcceptTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.AcceptTime
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.CreatedDate
+  ts_end:
+    description: Salesforce timestamp for end on this MessagingSession (EndTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.EndTime
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.LastModifiedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.LastReferencedDate
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.LastViewedDate
+  ts_start:
+    description: Salesforce timestamp for start on this MessagingSession (StartTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.StartTime
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingsession.day

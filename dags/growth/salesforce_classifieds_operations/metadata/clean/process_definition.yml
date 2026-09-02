@@ -1,0 +1,80 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: process_definition
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce approval ProcessDefinition metadata from the Navent Classifieds Salesforce
+  org. Grain is one row per process definition (id) per incremental load window, keyed by Salesforce Id.
+  Names the approval process type, lock behavior, and target object. Source:
+  datalake_salesforce_classifieds_raw.processdefinition. Physically partitioned by year, month, and day
+  from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use
+  dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the ProcessDefinition object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.Id
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.LastModifiedById
+  description:
+    description: Free-text description stored on the Salesforce record (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.Description
+  developer_name:
+    description: Developer name stored on this ProcessDefinition (DeveloperName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.DeveloperName
+  lock_type_name:
+    description: Lock type name stored on this ProcessDefinition (LockType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.LockType
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.Name
+  state_name:
+    description: State name stored on this ProcessDefinition (State).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.State
+  target_object_name:
+    description: Target object name stored on this ProcessDefinition (TableEnumOrId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.TableEnumOrId
+  type_name:
+    description: Type classification stored on the Salesforce record (Type).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.Type
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.processdefinition.day

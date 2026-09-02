@@ -1,0 +1,173 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: individual_email_result
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Marketing Cloud Individual Email Result records (et4ae5) from the Navent Classifieds
+  Salesforce org. Grain is one row per send result (id) per incremental load window, keyed by Salesforce
+  Id. Tracks whether a contact or lead opened, clicked, or bounced an email. Source:
+  datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c. Physically partitioned by year,
+  month, and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day
+  together — or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental
+  reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Individual Email Result object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.Id
+  id_contact:
+    description: Foreign Key to the Contact who received the email (et4ae5__Contact__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Contact__c
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.LastModifiedById
+  id_lead:
+    description: Foreign Key to the Lead who received the email (et4ae5__Lead__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Lead__c
+  id_owner:
+    description: Foreign Key to the Salesforce User or Queue that owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.OwnerId
+  id_send_definition:
+    description: Foreign Key to the related Marketing Cloud send definition on this Individual Email Result (et4ae5__SendDefinition__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__SendDefinition__c
+  id_triggered_send_definition:
+    description: Foreign Key to the related Marketing Cloud triggered send on this Individual Email Result (et4ae5__TriggeredSendDefinition__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__TriggeredSendDefinition__c
+  campaign_member_id:
+    description: Campaign member stored on this Individual Email Result (et4ae5__CampaignMemberId__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__CampaignMemberId__c
+  contact_id:
+    description: Contact stored on this Individual Email Result (et4ae5__Contact_ID__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Contact_ID__c
+  currency_iso_code:
+    description: ISO currency code stored on the Salesforce record (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.CurrencyIsoCode
+  email:
+    description: Email stored on this Individual Email Result (et4ae5__Email__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Email__c
+  email_asset_id:
+    description: Email asset stored on this Individual Email Result (et4ae5__Email_Asset_ID__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Email_Asset_ID__c
+  email_id:
+    description: Email stored on this Individual Email Result (et4ae5__Email_ID__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Email_ID__c
+  from_address:
+    description: From address stored on this Individual Email Result (et4ae5__FromAddress__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__FromAddress__c
+  from_name:
+    description: From name stored on this Individual Email Result (et4ae5__FromName__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__FromName__c
+  lead_id:
+    description: Lead stored on this Individual Email Result (et4ae5__Lead_ID__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Lead_ID__c
+  merge_id:
+    description: Merge stored on this Individual Email Result (et4ae5__MergeId__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__MergeId__c
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.Name
+  subject_line:
+    description: Subject line stored on this Individual Email Result (et4ae5__SubjectLine__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__SubjectLine__c
+  triggered_send_definition_name:
+    description: Triggered send definition name stored on this Individual Email Result (et4ae5__TriggeredSendDefinitionName__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__TriggeredSendDefinitionName__c
+  number_total_clicks:
+    description: Number total clicks stored on this Individual Email Result (et4ae5__NumberOfTotalClicks__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__NumberOfTotalClicks__c
+  number_unique_clicks:
+    description: Number unique clicks stored on this Individual Email Result (et4ae5__NumberOfUniqueClicks__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__NumberOfUniqueClicks__c
+  is_clicked:
+    description: Flag indicating clicked on this Individual Email Result (et4ae5__Clicked__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Clicked__c
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.IsDeleted
+  is_hard_bounce:
+    description: Flag indicating hard bounce on this Individual Email Result (et4ae5__HardBounce__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__HardBounce__c
+  is_opened:
+    description: Flag indicating opened on this Individual Email Result (et4ae5__Opened__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Opened__c
+  is_soft_bounce:
+    description: Flag indicating soft bounce on this Individual Email Result (et4ae5__SoftBounce__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__SoftBounce__c
+  ts_bounced:
+    description: Salesforce timestamp for bounced on this Individual Email Result (et4ae5__DateBounced__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__DateBounced__c
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.LastModifiedDate
+  ts_opened:
+    description: Salesforce timestamp for opened on this Individual Email Result (et4ae5__DateOpened__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__DateOpened__c
+  ts_sent:
+    description: Salesforce timestamp for sent on this Individual Email Result (et4ae5__DateSent__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__DateSent__c
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.SystemModstamp
+  ts_tracking_as:
+    description: Salesforce timestamp for tracking as on this Individual Email Result (et4ae5__Tracking_As_Of__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__Tracking_As_Of__c
+  ts_unsubscribed:
+    description: Salesforce timestamp for unsubscribed on this Individual Email Result (et4ae5__DateUnsubscribed__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.et4ae5__DateUnsubscribed__c
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.et4ae5__individualemailresult__c.day

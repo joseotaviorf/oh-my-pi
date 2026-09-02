@@ -1,0 +1,68 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: participant
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Participant records from the Navent Classifieds Salesforce org.
+  Grain is one row per participant (id) per incremental load window, keyed by Salesforce Id.
+  Identifies who joined a conversation or messaging context (role and subject). Source:
+  datalake_salesforce_classifieds_raw.participant. Physically partitioned by year, month, and day from
+  dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use
+  dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Participant object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.Id
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.LastModifiedById
+  participant_app_type:
+    description: Participant app type stored on this Participant (ParticipantAppType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.ParticipantAppType
+  participant_role:
+    description: Participant role stored on this Participant (ParticipantRole).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.ParticipantRole
+  participant_subject:
+    description: Participant subject stored on this Participant (ParticipantSubject).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.ParticipantSubject
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.IsDeleted
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.participant.day

@@ -1,0 +1,288 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: calendar_event
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Event calendar records from the Navent Classifieds Salesforce org.
+  Grain is one row per event (id) per incremental load window, keyed by Salesforce Id. Captures
+  scheduled meetings and related recurrence metadata for classifieds operations. Source:
+  datalake_salesforce_classifieds_raw.event. Physically partitioned by year, month, and day from
+  dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use
+  dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Event object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Id
+  id_account:
+    description: Foreign Key to the related Account record (AccountId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.AccountId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.LastModifiedById
+  id_organization_sales:
+    description: Foreign Key to the sales organization associated with this record (Organizacion_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Organizacion_de_venta__c
+  id_owner:
+    description: Foreign Key to the Salesforce User or Queue that owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.OwnerId
+  id_recurrence_activity:
+    description: Foreign Key to the recurring activity series this row belongs to (RecurrenceActivityId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceActivityId
+  id_what:
+    description: Polymorphic foreign key to the related record this activity is about (WhatId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.WhatId
+  id_who:
+    description: Polymorphic foreign key to the related person (Contact or Lead) on this activity (WhoId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.WhoId
+  call_ani:
+    description: Call ani stored on this Event (Call_Ani__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Call_Ani__c
+  called_number:
+    description: Called number stored on this Event (Called_Number__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Called_Number__c
+  conversation_id:
+    description: Conversation stored on this Event (Conversation_Id__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Conversation_Id__c
+  currency_iso_code:
+    description: ISO currency code stored on the Salesforce record (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.CurrencyIsoCode
+  description:
+    description: Free-text description stored on the Salesforce record (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Description
+  event_subtype:
+    description: Event subtype stored on this Event (EventSubtype).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.EventSubtype
+  interaction_url:
+    description: Interaction url stored on this Event (Interaction_Url__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Interaction_Url__c
+  location_name:
+    description: Location name stored on this Event (Location).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Location
+  management_cross_selling:
+    description: Management cross selling stored on this Event (Gestion_Cross_selling__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Gestion_Cross_selling__c
+  queue_name:
+    description: Queue name stored on this Event (Queue_Name__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Queue_Name__c
+  recurrence2_pattern_text:
+    description: Recurrence2 pattern text stored on this Event (Recurrence2PatternText).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Recurrence2PatternText
+  recurrence2_pattern_time_zone:
+    description: Recurrence2 pattern time zone stored on this Event (Recurrence2PatternTimeZone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Recurrence2PatternTimeZone
+  recurrence_instance:
+    description: Recurrence instance stored on this Event (RecurrenceInstance).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceInstance
+  recurrence_month_year:
+    description: Recurrence month year stored on this Event (RecurrenceMonthOfYear).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceMonthOfYear
+  recurrence_time_zone_sid_key:
+    description: Recurrence time zone sid key stored on this Event (RecurrenceTimeZoneSidKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceTimeZoneSidKey
+  recurrence_type:
+    description: Recurrence type stored on this Event (RecurrenceType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceType
+  result_lead:
+    description: Result lead stored on this Event (Resultado_Lead__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Resultado_Lead__c
+  show_as:
+    description: Show as stored on this Event (ShowAs).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.ShowAs
+  status_lead:
+    description: Status lead stored on this Event (Status_Lead__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Status_Lead__c
+  subject:
+    description: Subject line shown on the Salesforce record (Subject).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Subject
+  type_name:
+    description: Type classification stored on the Salesforce record (Type).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Type
+  whatslly_number:
+    description: Whatslly number stored on this Event (whatslly__Whatslly_Number__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.whatslly__Whatslly_Number__c
+  duration_minutes:
+    description: Monetary or numeric measure of duration minutes on this Event (DurationInMinutes).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.DurationInMinutes
+  recurrence_day_month:
+    description: Recurrence day month stored on this Event (RecurrenceDayOfMonth).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceDayOfMonth
+  recurrence_day_week_mask:
+    description: Recurrence day week mask stored on this Event (RecurrenceDayOfWeekMask).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceDayOfWeekMask
+  recurrence_interval:
+    description: Recurrence interval stored on this Event (RecurrenceInterval).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceInterval
+  total_acd_time:
+    description: Monetary or numeric measure of total acd time on this Event (Total_Acd_Time__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Total_Acd_Time__c
+  total_ivr_time:
+    description: Monetary or numeric measure of total ivr time on this Event (Total_Ivr_Time__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Total_Ivr_Time__c
+  what_count:
+    description: Numeric count of what count on this Event (WhatCount).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.WhatCount
+  who_count:
+    description: Numeric count of who count on this Event (WhoCount).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.WhoCount
+  is_all_day_event:
+    description: Flag indicating all day event on this Event (IsAllDayEvent).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsAllDayEvent
+  is_archived:
+    description: Flag indicating archived on this Event (IsArchived).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsArchived
+  is_child:
+    description: Flag indicating child on this Event (IsChild).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsChild
+  is_created_whatslly:
+    description: Flag indicating created whatslly on this Event (whatslly__Created_by_Whatslly__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.whatslly__Created_by_Whatslly__c
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsDeleted
+  is_group_event:
+    description: Flag indicating group event on this Event (IsGroupEvent).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsGroupEvent
+  is_private:
+    description: Flag indicating private on this Event (IsPrivate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsPrivate
+  is_recurrence:
+    description: Flag indicating recurrence on this Event (IsRecurrence).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsRecurrence
+  is_recurrence2:
+    description: Flag indicating recurrence2 on this Event (IsRecurrence2).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsRecurrence2
+  is_recurrence2_exception:
+    description: Flag indicating recurrence2 exception on this Event (IsRecurrence2Exception).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsRecurrence2Exception
+  is_recurrence2_exclusion:
+    description: Flag indicating recurrence2 exclusion on this Event (IsRecurrence2Exclusion).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsRecurrence2Exclusion
+  is_reminder_set:
+    description: Flag indicating reminder set on this Event (IsReminderSet).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.IsReminderSet
+  is_whats_app_task:
+    description: Flag indicating whats app task on this Event (whatslly__Is_WhatsApp_Task__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.whatslly__Is_WhatsApp_Task__c
+  dt_activity:
+    description: Calendar date of activity on this Event (ActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.ActivityDate
+  dt_completion:
+    description: Calendar date of completion on this Event (Fecha_de_finalizacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Fecha_de_finalizacion__c
+  dt_end:
+    description: Calendar date of end on this Event (EndDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.EndDate
+  dt_recurrence_end_date_only:
+    description: Last calendar day this recurring Event series is allowed to generate occurrences (RecurrenceEndDateOnly).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceEndDateOnly
+  ts_activity:
+    description: Salesforce timestamp for activity on this Event (ActivityDateTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.ActivityDateTime
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.CreatedDate
+  ts_end:
+    description: Salesforce timestamp for end on this Event (EndDateTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.EndDateTime
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.LastModifiedDate
+  ts_recurrence2_pattern_start_date:
+    description: Salesforce timestamp for recurrence2 pattern start date on this Event (Recurrence2PatternStartDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.Recurrence2PatternStartDate
+  ts_recurrence_start_date_time:
+    description: Salesforce timestamp for recurrence start date time on this Event (RecurrenceStartDateTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.RecurrenceStartDateTime
+  ts_reminder:
+    description: Salesforce timestamp for reminder on this Event (ReminderDateTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.ReminderDateTime
+  ts_start:
+    description: Salesforce timestamp for start on this Event (StartDateTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.StartDateTime
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.event.day

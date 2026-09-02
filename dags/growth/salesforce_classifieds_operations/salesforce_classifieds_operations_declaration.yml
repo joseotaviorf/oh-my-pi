@@ -1,0 +1,132 @@
+dag:
+  name: salesforce_classifieds_operations
+  owner: Data Growth
+  schedule_start_date: 2026, 9, 1
+  schedule_interval: 0 0 * * *
+  documentation:
+    dag_purpose: |
+      Ingests Salesforce Operations data for the Classifieds (Navent) business context via the Salesforce
+      REST API. Raw snapshots land in datalake_salesforce_classifieds_raw; clean models in datalake_salesforce_classifieds_clean
+      support Growth analytics on support cases, messaging, portal billing, and approval processes for the Navent Operations org.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  custom_schema: salesforce_classifieds
+  load_spark_job: load_salesforce_classifieds_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{schema}"
+    - "https://navent--uat.sandbox.my.salesforce.com"
+    - "https://navent.my.salesforce.com"
+
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    cases:
+      clean_table_name: support_case
+      extra_spark_job_arguments:
+        - "SELECT AccountId, botmakerglobal__BotmakerId__c, CaseNumber, ClosedDate, Codigo_Postal__c, Comments, Condicion_fiscal__c, ContactEmail, ContactFax, ContactId, ContactMobile, ContactPhone, CreatedById, CreatedDate, CurrencyIsoCode, Datos_bancarios__c, Description, Dias_Transcurridos__c, Direccion_del_cliente__c, Email_envio_comprobante_de_devolucion__c, Email_para_validacion__c, Fecha_de_entrega__c, Fecha_de_pago__c, Id, ID_Genesys__c, ID_pedido_SAP__c, Importe__c, IsClosed, IsDeleted, IsEscalated, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, MasterRecordId, Monto_sin_impuestos__c, Nombre_de_Integrador__c, Nombre_del_cliente_Razon_social__c, Nuevo_email__c, Nuevo_numero_OS__c, Numero_de_factura__c, Numero_de_la_oportunidad__c, Oportunidad__c, Orden_de_servicio__c, Organizacion_de_venta_picklist__c, Origin, OwnerId, Pais__c, ParentId, Priority, Reason, RecordTypeId, Se_requiere_reenviar_la_factura__c, SourceId, Status, Subject, Subtipo__c, SuppliedCompany, SuppliedEmail, SuppliedName, SuppliedPhone, SystemModstamp, Ticket_JIRA__c, Tipo_de_pago__c, Total_de_expectativas_de_PI_Leads__c, Type, Valor_total_del_PI__c, whatslly__Created_by_Whatslly__c FROM Case"
+        - "LastModifiedDate"
+    Task:
+      clean_table_name: task
+      extra_spark_job_arguments:
+        - "SELECT AccountId, ActivityDate, Call_Ani__c, CallDisposition, CallDurationInSeconds, Called_Number__c, CallObject, CallType, CompletedDateTime, Conversation_Id__c, CreatedById, CreatedDate, CurrencyIsoCode, Description, Fecha_de_finalizacion__c, Gestion_Cross_selling__c, Id, Interaction_Url__c, IsArchived, IsClosed, IsDeleted, IsHighPriority, IsRecurrence, IsReminderSet, LastModifiedById, LastModifiedDate, Organizacion_de_venta__c, OwnerId, Priority, Queue_Name__c, RecurrenceActivityId, RecurrenceDayOfMonth, RecurrenceDayOfWeekMask, RecurrenceEndDateOnly, RecurrenceInstance, RecurrenceInterval, RecurrenceMonthOfYear, RecurrenceRegeneratedType, RecurrenceStartDateOnly, RecurrenceTimeZoneSidKey, RecurrenceType, ReminderDateTime, Resultado_Lead__c, Status, Status_Lead__c, Subject, SystemModstamp, TaskSubtype, Total_Acd_Time__c, Total_Ivr_Time__c, Type, WhatCount, WhatId, whatslly__Created_by_Whatslly__c, whatslly__Is_WhatsApp_Task__c, whatslly__Whatslly_Number__c, WhoCount, WhoId FROM Task"
+        - "LastModifiedDate"
+    Event:
+      clean_table_name: calendar_event
+      extra_spark_job_arguments:
+        - "SELECT AccountId, ActivityDate, ActivityDateTime, Call_Ani__c, Called_Number__c, Conversation_Id__c, CreatedById, CreatedDate, CurrencyIsoCode, Description, DurationInMinutes, EndDate, EndDateTime, EventSubtype, Fecha_de_finalizacion__c, Gestion_Cross_selling__c, Id, Interaction_Url__c, IsAllDayEvent, IsArchived, IsChild, IsDeleted, IsGroupEvent, IsPrivate, IsRecurrence, IsRecurrence2, IsRecurrence2Exception, IsRecurrence2Exclusion, IsReminderSet, LastModifiedById, LastModifiedDate, Location, Organizacion_de_venta__c, OwnerId, Queue_Name__c, Recurrence2PatternStartDate, Recurrence2PatternText, Recurrence2PatternTimeZone, RecurrenceActivityId, RecurrenceDayOfMonth, RecurrenceDayOfWeekMask, RecurrenceEndDateOnly, RecurrenceInstance, RecurrenceInterval, RecurrenceMonthOfYear, RecurrenceStartDateTime, RecurrenceTimeZoneSidKey, RecurrenceType, ReminderDateTime, Resultado_Lead__c, ShowAs, StartDateTime, Status_Lead__c, Subject, SystemModstamp, Total_Acd_Time__c, Total_Ivr_Time__c, Type, WhatCount, WhatId, whatslly__Created_by_Whatslly__c, whatslly__Is_WhatsApp_Task__c, whatslly__Whatslly_Number__c, WhoCount, WhoId FROM Event"
+        - "LastModifiedDate"
+    Participant:
+      clean_table_name: participant
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, Id, IsDeleted, LastModifiedById, LastModifiedDate, ParticipantAppType, ParticipantRole, ParticipantSubject, SystemModstamp FROM Participant"
+        - "LastModifiedDate"
+    Conversation:
+      clean_table_name: conversation
+      extra_spark_job_arguments:
+        - "SELECT ConversationChannelId, ConversationIdentifier, CreatedById, CreatedDate, EndTime, Id, IsDeleted, LastModifiedById, LastModifiedDate, Name, StartTime FROM Conversation"
+        - "LastModifiedDate"
+    ConversationEntry:
+      clean_table_name: conversation_entry
+      extra_spark_job_arguments:
+        - "SELECT ActorId, ActorName, ActorType, ClientDuration, ClientTimestamp, ConversationEntityId, ConversationId, CreatedById, CreatedDate, EntryEndTime, EntryTime, EntryTimeMilliSecs, EntryType, HasAttachments, Id, IsDeleted, LastModifiedById, LastModifiedDate, Message, MessageDeliverTime, MessageIdentifier, MessageReadTime, MessageSendTime, MessageStatus, MessageStatusCode, Seq, ServerReceivedTimestamp, SystemModstamp FROM ConversationEntry"
+        - "LastModifiedDate"
+    ConversationParticipant:
+      clean_table_name: conversation_participant
+      extra_spark_job_arguments:
+        - "SELECT AppType, ConversationId, CreatedById, CreatedDate, Id, IsDeleted, JoinedTime, LastActiveTime, LastModifiedById, LastModifiedDate, LeftTime, Name, ParticipantContext, ParticipantDisplayName, ParticipantEntityId, ParticipantKey, ParticipantRole FROM ConversationParticipant"
+        - "LastModifiedDate"
+    MessagingChannel:
+      clean_table_name: messaging_channel
+      extra_spark_job_arguments:
+        - "SELECT BusinessHoursId, ChannelAddressIdentifier, ChannelDefinitionId, ConsentType, ConversationEndResponse, CreatedById, CreatedDate, Description, DeveloperName, DoubleOptInPrompt, EngagedResponse, Id, InitialResponse, IsActive, IsDeleted, IsoCountryCode, IsRequireDoubleOptIn, IsRestrictedToBusinessHours, Language, LastModifiedById, LastModifiedDate, MasterLabel, MessageType, MessagingPlatformKey, OfflineAgentsResponse, OptInPrompt, OutsideBusinessHoursResponse, PlatformType, RoutingConfigurationId, RoutingType, SystemModstamp, TargetQueueId FROM MessagingChannel"
+        - "LastModifiedDate"
+    MessagingEndUser:
+      clean_table_name: messaging_end_user
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, CurrencyIsoCode, Id, IsDeleted, IsFullyOptedIn, IsoCountryCode, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Locale, MessageType, MessagingChannelId, MessagingConsentStatus, MessagingPlatformKey, Name, OwnerId, ProfilePictureUrl, SystemModstamp FROM MessagingEndUser"
+        - "LastModifiedDate"
+    MessagingSession:
+      clean_table_name: messaging_session
+      extra_spark_job_arguments:
+        - "SELECT AcceptTime, AgentMessageCount, AgentType, CaseId, ChannelEndUserFormula, ChannelGroup, ChannelIntent, ChannelKey, ChannelLocale, ChannelName, ChannelType, CreatedById, CreatedDate, CurrencyIsoCode, EndTime, EndUserAccountId, EndUserContactId, EndUserMessageCount, Id, IsDeleted, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, LeadId, MessagingChannelId, MessagingEndUserId, Name, OpportunityId, Origin, OwnerId, PreviewDetails, SessionKey, StartTime, Status, SystemModstamp, TargetUserId FROM MessagingSession"
+        - "LastModifiedDate"
+    et4ae5__IndividualEmailResult__c:
+      clean_table_name: individual_email_result
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, CurrencyIsoCode, et4ae5__CampaignMemberId__c, et4ae5__Clicked__c, et4ae5__Contact__c, et4ae5__Contact_ID__c, et4ae5__DateBounced__c, et4ae5__DateOpened__c, et4ae5__DateSent__c, et4ae5__DateUnsubscribed__c, et4ae5__Email__c, et4ae5__Email_Asset_ID__c, et4ae5__Email_ID__c, et4ae5__FromAddress__c, et4ae5__FromName__c, et4ae5__HardBounce__c, et4ae5__Lead__c, et4ae5__Lead_ID__c, et4ae5__MergeId__c, et4ae5__NumberOfTotalClicks__c, et4ae5__NumberOfUniqueClicks__c, et4ae5__Opened__c, et4ae5__SendDefinition__c, et4ae5__SoftBounce__c, et4ae5__SubjectLine__c, et4ae5__Tracking_As_Of__c, et4ae5__TriggeredSendDefinition__c, et4ae5__TriggeredSendDefinitionName__c, Id, IsDeleted, LastModifiedById, LastModifiedDate, Name, OwnerId, SystemModstamp FROM et4ae5__IndividualEmailResult__c"
+        - "LastModifiedDate"
+    Portal__c:
+      clean_table_name: portal
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, CurrencyIsoCode, Id, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, Organizaciones_con_ID_Empresa_compartido__c, OwnerId, Permite_compartir_id_site__c, Portal__c, Sitio__c, SystemModstamp, Vertical__c FROM Portal__c"
+        - "LastModifiedDate"
+    Empresa_portal__History:
+      clean_table_name: portal_company_history
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, DataType, Field, Id, IsDeleted, NewValue, OldValue, ParentId FROM Empresa_portal__History"
+        - "CreatedDate"
+    Producto_de_orden_de_servicio__c:
+      clean_table_name: service_order_product
+      extra_spark_job_arguments:
+        - "SELECT Branch_ID__c, Cantidad__c, Cantidad_original__c, Codigo_de_producto__c, CreatedById, CreatedDate, CurrencyIsoCode, Descripcion_de_partida__c, Descuento__c, Descuento_original__c, diferencia_meses__c, Duracion__c, Estado_de_vigencia__c, facturacion__c, Facturar_a__c, Fecha_de_fin_de_vigencia__c, Fecha_de_inicio_de_vigencia__c, Frecuencia_de_Facturacion__c, Frecuencia_de_facturacion2__c, Id, Id_externo__c, Id_externo_temporal__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, Nombre_de_presupuesto__c, Orden_de_servicio__c, Pais_de_activacion__c, Precio_anual__c, Precio_de_lista__c, Precio_de_venta__c, Precio_de_venta_original__c, Precio_mensual__c, Precio_mensual2__c, Precio_total_original2__c, Precio_total2__c, Producto__c, Renovable__c, SystemModstamp, Vigente__c FROM Producto_de_orden_de_servicio__c"
+        - "LastModifiedDate"
+    Facturacion__c:
+      clean_table_name: billing
+      extra_spark_job_arguments:
+        - "SELECT CEBE__c, Clase_de_documento__c, Creada_por_ecommerce__c, CreatedById, CreatedDate, CurrencyIsoCode, Divisa_OV__c, Documento_Posicion__c, Duracion_en_meses__c, Empresa_portal__c, Fecha_de_fin_de_vigencia__c, Fecha_de_inicio_de_vigencia__c, Fecha_documento__c, Frecuencia_de_Facturacion__c, Id, Id_pedido_portal__c, Id_pedido_SAP__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Linea_de_producto__c, Monto_en_Divisa_OV__c, Monto_en_Divisa_Transaccion__c, Monto_en_USD__c, Monto_mensualizado_moneda_OV__c, Motivo__c, Name, Oportunidad__c, Organizacion_de_venta__c, OwnerId, Producto__c, Propietario_de_empresa_portal__c, Referencia__c, Responsable_pago__c, Solicitante__c, SystemModstamp, Tipificacion__c, Tipo__c, Via_de_pago__c FROM Facturacion__c"
+        - "LastModifiedDate"
+    Cartera_mensual__c:
+      clean_table_name: monthly_portfolio
+      extra_spark_job_arguments:
+        - "SELECT A_cobrar_MP__c, A_facturar__c, Alias_Cta_Cte__c, Baja_Inicial__c, Cancelado__c, Cant_oport_canceladas__c, Cartera_inicial__c, Comentario_Gestion__c, Con_bloqueo_cliente__c, Con_bloqueo_pedido__c, CreatedById, CreatedDate, CRM_Navent__c, Cuenta__c, CurrencyIsoCode, Descuento_temporal__c, Ecommerce__c, Empresa_portal__c, En_curso__c, En_revision__c, Facturado__c, Facturado_con_NC__c, Fecha__c, Fecha_primer_factura_mes__c, Id, Id_exclusivo__c, Importe_mensual_real__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Monto_cartera_mensual_final__c, Monto_cartera_mensual_inicial__c, Monto_factura__c, Motivo_Churn__c, Name, NC_y_otros__c, OwnerId, Primer_proximo_vencimiento__c, Resolucion__c, Semana_Gestion__c, Sizing__c, Status_Gestion__c, Status_plan__c, Subtotal_plan_renovacion__c, System_Cta_Cte__c, SystemModstamp, Target_a_facturar__c, Target_comentario__c, Tipo_de_cartera__c, Total_facturacion__c, Total_plan__c, Ultimo_dia_de_vigencia_anterior__c, Venta_a_renovar_mensualizada__c, Venta_mensualizada__c, Ventas_a_renovar__c, Ventas_por_unica_vez__c, Ventas_recurrentes__c FROM Cartera_mensual__c"
+        - "LastModifiedDate"
+    Plan_de_facturacion__c:
+      clean_table_name: billing_plan
+      extra_spark_job_arguments:
+        - "SELECT Bloqueo_posicion__c, Creada_por_ecommerce__c, CreatedById, CreatedDate, CurrencyIsoCode, Empresa_portal__c, Fecha_de_cancelacion__c, Fecha_factura__c, Fecha_fin_liquidacion__c, Fecha_inicio_liquidacion__c, Id, Id_pedido_posicion_SAP__c, Id_pedido_SAP__c, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Monto__c, Name, Numero_de_oportunidad__c, Numero_de_pedido_portal__c, Oportunidad__c, Organizacion_de_venta__c, OwnerId, Producto__c, Reasigna_propietario__c, Responsable_pago__c, Solicitante__c, Status_factura__c, SystemModstamp, Via_de_pago__c FROM Plan_de_facturacion__c"
+        - "LastModifiedDate"
+    ProcessDefinition:
+      clean_table_name: process_definition
+      extra_spark_job_arguments:
+        - "SELECT CreatedById, CreatedDate, Description, DeveloperName, Id, LastModifiedById, LastModifiedDate, LockType, Name, State, SystemModstamp, TableEnumOrId, Type FROM ProcessDefinition"
+        - "LastModifiedDate"
+    ProcessInstance:
+      clean_table_name: process_instance
+      extra_spark_job_arguments:
+        - "SELECT CompletedDate, CreatedById, CreatedDate, ElapsedTimeInDays, ElapsedTimeInHours, ElapsedTimeInMinutes, Id, IsDeleted, LastActorId, LastModifiedById, LastModifiedDate, ProcessDefinitionId, Status, SubmittedById, SystemModstamp, TargetObjectId FROM ProcessInstance"
+        - "LastModifiedDate"
+    ProcessInstanceStep:
+      clean_table_name: process_instance_step
+      extra_spark_job_arguments:
+        - "SELECT ActorId, Comments, CreatedById, CreatedDate, ElapsedTimeInDays, ElapsedTimeInHours, ElapsedTimeInMinutes, Id, OriginalActorId, ProcessInstanceId, StepNodeId, StepStatus, SystemModstamp FROM ProcessInstanceStep"
+        - "CreatedDate"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

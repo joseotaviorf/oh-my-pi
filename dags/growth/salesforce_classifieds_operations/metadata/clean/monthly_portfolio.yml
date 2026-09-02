@@ -1,0 +1,269 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: monthly_portfolio
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce monthly portfolio snapshots (Cartera_mensual__c) from the Navent
+  Classifieds Salesforce org. Grain is one row per portfolio snapshot (id) per incremental load window,
+  keyed by Salesforce Id. Tracks billed vs to-bill amounts, churn reasons, and collections status for
+  a portal company in a given month. Source: datalake_salesforce_classifieds_raw.cartera_mensual__c.
+  Physically partitioned by year, month, and day from dt_updated (derived from LastModifiedDate). Always
+  filter year, month, and day together — or use dt_updated with load_start_date/load_end_date — for
+  partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the monthly portfolio object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Id
+  id_account:
+    description: Foreign Key to the related account on this monthly portfolio (Cuenta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Cuenta__c
+  id_company_portal:
+    description: Foreign Key to the related portal company (Empresa_portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Empresa_portal__c
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.CreatedById
+  id_exclusive:
+    description: Foreign Key to the related exclusive portfolio key on this monthly portfolio (Id_exclusivo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Id_exclusivo__c
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.LastModifiedById
+  id_owner:
+    description: Foreign Key to the Salesforce User or Queue that owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.OwnerId
+  alias_account_current:
+    description: Alias account current stored on this monthly portfolio (Alias_Cta_Cte__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Alias_Cta_Cte__c
+  comment_management:
+    description: Comment management stored on this monthly portfolio (Comentario_Gestion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Comentario_Gestion__c
+  crm_navent:
+    description: Crm navent stored on this monthly portfolio (CRM_Navent__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.CRM_Navent__c
+  currency_iso_code:
+    description: ISO currency code stored on the Salesforce record (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.CurrencyIsoCode
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Name
+  reason_churn:
+    description: Reason churn stored on this monthly portfolio (Motivo_Churn__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Motivo_Churn__c
+  resolution:
+    description: Resolution stored on this monthly portfolio (Resolucion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Resolucion__c
+  sizing:
+    description: Sizing stored on this monthly portfolio (Sizing__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Sizing__c
+  status_management:
+    description: Status management stored on this monthly portfolio (Status_Gestion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Status_Gestion__c
+  status_plan:
+    description: Status plan stored on this monthly portfolio (Status_plan__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Status_plan__c
+  system_account_current:
+    description: System account current stored on this monthly portfolio (System_Cta_Cte__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.System_Cta_Cte__c
+  target_comment:
+    description: Target comment stored on this monthly portfolio (Target_comentario__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Target_comentario__c
+  type_portfolio:
+    description: Type portfolio stored on this monthly portfolio (Tipo_de_cartera__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Tipo_de_cartera__c
+  week_management:
+    description: Week management stored on this monthly portfolio (Semana_Gestion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Semana_Gestion__c
+  amount_invoice:
+    description: Monetary or numeric measure of amount invoice on this monthly portfolio (Monto_factura__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Monto_factura__c
+  amount_monthly_real:
+    description: Monetary or numeric measure of amount monthly real on this monthly portfolio (Importe_mensual_real__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Importe_mensual_real__c
+  amount_portfolio_monthly_final:
+    description: Monetary or numeric measure of amount portfolio monthly final on this monthly portfolio (Monto_cartera_mensual_final__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Monto_cartera_mensual_final__c
+  amount_portfolio_monthly_initial:
+    description: Monetary or numeric measure of amount portfolio monthly initial on this monthly portfolio (Monto_cartera_mensual_inicial__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Monto_cartera_mensual_inicial__c
+  block_customer:
+    description: Block customer stored on this monthly portfolio (Con_bloqueo_cliente__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Con_bloqueo_cliente__c
+  block_order:
+    description: Block order stored on this monthly portfolio (Con_bloqueo_pedido__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Con_bloqueo_pedido__c
+  cancelled:
+    description: Cancelled stored on this monthly portfolio (Cancelado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Cancelado__c
+  churn_amount_initial:
+    description: Churn amount initial stored on this monthly portfolio (Baja_Inicial__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Baja_Inicial__c
+  collect_mercadopago:
+    description: Collect mercadopago stored on this monthly portfolio (A_cobrar_MP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.A_cobrar_MP__c
+  count_opportunities_cancelled:
+    description: Count opportunities cancelled stored on this monthly portfolio (Cant_oport_canceladas__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Cant_oport_canceladas__c
+  credit_note_other:
+    description: Credit note other stored on this monthly portfolio (NC_y_otros__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.NC_y_otros__c
+  discount_temporary:
+    description: Monetary or numeric measure of discount temporary on this monthly portfolio (Descuento_temporal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Descuento_temporal__c
+  invoice:
+    description: Bill-to party stored on this monthly portfolio (A_facturar__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.A_facturar__c
+  invoiced:
+    description: Invoiced stored on this monthly portfolio (Facturado__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Facturado__c
+  invoiced_credit_note:
+    description: Invoiced credit note stored on this monthly portfolio (Facturado_con_NC__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Facturado_con_NC__c
+  progress:
+    description: Progress stored on this monthly portfolio (En_curso__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.En_curso__c
+  review:
+    description: Review stored on this monthly portfolio (En_revision__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.En_revision__c
+  sales_monthly:
+    description: Monthlyized sales amount on this portfolio snapshot (Venta_mensualizada__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Venta_mensualizada__c
+  sales_one_time:
+    description: One-time sales amount on this portfolio snapshot (Ventas_por_unica_vez__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Ventas_por_unica_vez__c
+  sales_recurring:
+    description: Sales recurring stored on this monthly portfolio (Ventas_recurrentes__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Ventas_recurrentes__c
+  sales_renew:
+    description: Sales renew stored on this monthly portfolio (Ventas_a_renovar__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Ventas_a_renovar__c
+  sales_renew_monthly:
+    description: Monthlyized amount of sales due for renewal on this portfolio snapshot (Venta_a_renovar_mensualizada__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Venta_a_renovar_mensualizada__c
+  subtotal_plan_renewal:
+    description: Monetary or numeric measure of subtotal plan renewal on this monthly portfolio (Subtotal_plan_renovacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Subtotal_plan_renovacion__c
+  target_invoice:
+    description: Target invoice stored on this monthly portfolio (Target_a_facturar__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Target_a_facturar__c
+  total_billing:
+    description: Monetary or numeric measure of total billing on this monthly portfolio (Total_facturacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Total_facturacion__c
+  total_plan:
+    description: Monetary or numeric measure of total plan on this monthly portfolio (Total_plan__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Total_plan__c
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.IsDeleted
+  is_ecommerce:
+    description: Flag indicating ecommerce on this monthly portfolio (Ecommerce__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Ecommerce__c
+  is_portfolio_initial:
+    description: Flag indicating portfolio initial on this monthly portfolio (Cartera_inicial__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Cartera_inicial__c
+  dt_date:
+    description: Calendar date of date on this monthly portfolio (Fecha__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Fecha__c
+  dt_first_invoice_month:
+    description: Date of the first invoice issued in the portfolio month (Fecha_primer_factura_mes__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Fecha_primer_factura_mes__c
+  dt_first_next_due:
+    description: Calendar date of first next due on this monthly portfolio (Primer_proximo_vencimiento__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Primer_proximo_vencimiento__c
+  dt_last_activity:
+    description: Date of the last activity related to the record (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.LastActivityDate
+  dt_last_day_validity_previous:
+    description: Calendar date of last day validity previous on this monthly portfolio (Ultimo_dia_de_vigencia_anterior__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.Ultimo_dia_de_vigencia_anterior__c
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.LastModifiedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.LastReferencedDate
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.LastViewedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.cartera_mensual__c.day

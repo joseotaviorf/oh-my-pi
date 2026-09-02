@@ -1,0 +1,72 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: conversation
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Conversation records from the Navent Classifieds Salesforce org.
+  Grain is one row per conversation (id) per incremental load window, keyed by Salesforce Id.
+  Holds channel identifier and start/end times for omnichannel threads. Source:
+  datalake_salesforce_classifieds_raw.conversation. Physically partitioned by year, month, and day from
+  dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use
+  dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Conversation object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.Id
+  id_conversation_channel:
+    description: Foreign Key to the related conversation channel on this Conversation (ConversationChannelId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.ConversationChannelId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.LastModifiedById
+  conversation_identifier:
+    description: Conversation identifier stored on this Conversation (ConversationIdentifier).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.ConversationIdentifier
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.Name
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.IsDeleted
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.CreatedDate
+  ts_end:
+    description: Salesforce timestamp for end on this Conversation (EndTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.EndTime
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.LastModifiedDate
+  ts_start:
+    description: Salesforce timestamp for start on this Conversation (StartTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.StartTime
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.conversation.day

@@ -1,0 +1,156 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: messaging_channel
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce MessagingChannel configuration from the Navent Classifieds Salesforce org.
+  Grain is one row per messaging channel (id) per incremental load window, keyed by Salesforce Id.
+  Defines WhatsApp/SMS routing, opt-in copy, and business-hours restrictions used by support.
+  Source: datalake_salesforce_classifieds_raw.messagingchannel. Physically partitioned by year, month,
+  and day from dt_updated (derived from LastModifiedDate). Always filter year, month, and day together
+  — or use dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the MessagingChannel object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.Id
+  id_business_hours:
+    description: Foreign Key to the related Business Hours on this MessagingChannel (BusinessHoursId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.BusinessHoursId
+  id_channel_definition:
+    description: Foreign Key to the related channel definition on this MessagingChannel (ChannelDefinitionId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.ChannelDefinitionId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.LastModifiedById
+  id_routing_configuration:
+    description: Foreign Key to the related routing configuration on this MessagingChannel (RoutingConfigurationId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.RoutingConfigurationId
+  id_target_queue:
+    description: Foreign Key to the related target Queue on this MessagingChannel (TargetQueueId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.TargetQueueId
+  channel_address_identifier:
+    description: Channel address identifier stored on this MessagingChannel (ChannelAddressIdentifier).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.ChannelAddressIdentifier
+  consent_type:
+    description: Consent type stored on this MessagingChannel (ConsentType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.ConsentType
+  conversation_end_response:
+    description: Conversation end response stored on this MessagingChannel (ConversationEndResponse).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.ConversationEndResponse
+  description:
+    description: Free-text description stored on the Salesforce record (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.Description
+  developer_name:
+    description: Developer name stored on this MessagingChannel (DeveloperName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.DeveloperName
+  double_opt_prompt:
+    description: Double opt prompt stored on this MessagingChannel (DoubleOptInPrompt).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.DoubleOptInPrompt
+  engaged_response:
+    description: Engaged response stored on this MessagingChannel (EngagedResponse).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.EngagedResponse
+  initial_response:
+    description: Initial response stored on this MessagingChannel (InitialResponse).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.InitialResponse
+  iso_country_code:
+    description: Iso country code stored on this MessagingChannel (IsoCountryCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.IsoCountryCode
+  language_name:
+    description: Language name stored on this MessagingChannel (Language).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.Language
+  master_label:
+    description: Master label stored on this MessagingChannel (MasterLabel).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.MasterLabel
+  message_type:
+    description: Message type stored on this MessagingChannel (MessageType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.MessageType
+  messaging_platform_key:
+    description: Messaging platform key stored on this MessagingChannel (MessagingPlatformKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.MessagingPlatformKey
+  offline_agents_response:
+    description: Offline agents response stored on this MessagingChannel (OfflineAgentsResponse).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.OfflineAgentsResponse
+  opt_prompt:
+    description: Opt prompt stored on this MessagingChannel (OptInPrompt).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.OptInPrompt
+  outside_business_hours_response:
+    description: Outside business hours response stored on this MessagingChannel (OutsideBusinessHoursResponse).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.OutsideBusinessHoursResponse
+  platform_type:
+    description: Platform type stored on this MessagingChannel (PlatformType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.PlatformType
+  routing_type:
+    description: Routing type stored on this MessagingChannel (RoutingType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.RoutingType
+  is_active:
+    description: Flag indicating active on this MessagingChannel (IsActive).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.IsActive
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.IsDeleted
+  is_require_double_opt:
+    description: Flag indicating require double opt on this MessagingChannel (IsRequireDoubleOptIn).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.IsRequireDoubleOptIn
+  is_restricted_business_hours:
+    description: Flag indicating restricted business hours on this MessagingChannel (IsRestrictedToBusinessHours).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.IsRestrictedToBusinessHours
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.messagingchannel.day

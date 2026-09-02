@@ -1,0 +1,302 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: support_case
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Case objects (customer support cases) from the Navent Classifieds Salesforce org.
+  Grain is one row per case (id) per incremental load window, keyed by Salesforce Id. Named support_case because
+  "case" is a reserved word; the raw table is datalake_salesforce_classifieds_raw.cases for the same reason. Includes
+  case status/type/priority, customer contact details, and billing/refund attributes. Contains PII (contact email/phone,
+  customer address, bank account details) — permitted in clean; not propagated to enrich/DW in this story. Source:
+  datalake_salesforce_classifieds_raw.cases. Physically partitioned by year, month, and day from dt_updated (derived from
+  LastModifiedDate). Always filter year, month, and day together — or use dt_updated with load_start_date/load_end_date —
+  for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Case object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Id
+  id_account:
+    description: Foreign Key to the related Account record (AccountId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.AccountId
+  id_contact:
+    description: Foreign Key to the related Contact record (ContactId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ContactId
+  id_owner:
+    description: Foreign Key to the Salesforce User or Queue that owns the case (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.OwnerId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.LastModifiedById
+  id_parent_case:
+    description: Foreign Key to the parent Case record, for case hierarchies (ParentId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ParentId
+  id_master_record:
+    description: Foreign Key to the master Case record in case of merge (MasterRecordId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.MasterRecordId
+  id_source:
+    description: Foreign Key to the originating EmailMessage, MessagingSession, or SocialPost record (SourceId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.SourceId
+  id_record_type:
+    description: Foreign Key to the Salesforce RecordType assigned to the case (RecordTypeId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.RecordTypeId
+  id_tax_condition:
+    description: Foreign Key to the associated tax condition custom object (Condicion_fiscal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Condicion_fiscal__c
+  id_country:
+    description: Foreign Key to the associated country custom object (Pais__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Pais__c
+  id_opportunity:
+    description: Foreign Key to the related Opportunity record (Oportunidad__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Oportunidad__c
+  id_service_order:
+    description: Foreign Key to the related Contract record used as service order (Orden_de_servicio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Orden_de_servicio__c
+  external_botmaker_id:
+    description: External identifier from the Botmaker chatbot integration (botmakerglobal__BotmakerId__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.botmakerglobal__BotmakerId__c
+  external_genesys_id:
+    description: External identifier from the Genesys contact center integration (ID_Genesys__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ID_Genesys__c
+  external_sap_order_id:
+    description: External SAP order identifier, calculated from the related service order (ID_pedido_SAP__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ID_pedido_SAP__c
+  case_number:
+    description: Auto-generated, human-readable case number (CaseNumber).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.CaseNumber
+  subject:
+    description: Short subject line describing the case (Subject).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Subject
+  description:
+    description: Free-text description of the case (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Description
+  internal_comments:
+    description: Internal comments not visible to the customer (Comments).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Comments
+  customer_address:
+    description: Free-text customer address associated with the case (Direccion_del_cliente__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Direccion_del_cliente__c
+  postal_code:
+    description: Postal code associated with the case (Codigo_Postal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Codigo_Postal__c
+  bank_account_details:
+    description: Customer bank account details provided for a refund; excludes virtual accounts by convention (Datos_bancarios__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Datos_bancarios__c
+  contact_email:
+    description: Email address of the related contact (ContactEmail).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ContactEmail
+  contact_fax_number:
+    description: Fax number of the related contact (ContactFax).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ContactFax
+  contact_mobile_number:
+    description: Mobile phone number of the related contact (ContactMobile).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ContactMobile
+  contact_phone_number:
+    description: Phone number of the related contact (ContactPhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ContactPhone
+  supplied_company_name:
+    description: Company name supplied by the requester when no Contact match exists (SuppliedCompany).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.SuppliedCompany
+  supplied_email:
+    description: Email address supplied by the requester when no Contact match exists (SuppliedEmail).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.SuppliedEmail
+  supplied_name:
+    description: Name supplied by the requester when no Contact match exists (SuppliedName).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.SuppliedName
+  supplied_phone_number:
+    description: Phone number supplied by the requester when no Contact match exists (SuppliedPhone).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.SuppliedPhone
+  new_email:
+    description: New email address requested by the customer (Nuevo_email__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Nuevo_email__c
+  refund_receipt_email:
+    description: Email address for sending the refund receipt (Email_envio_comprobante_de_devolucion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Email_envio_comprobante_de_devolucion__c
+  validation_email:
+    description: Email address used for validating the request (Email_para_validacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Email_para_validacion__c
+  integrator_name:
+    description: Name of the real estate integrator associated with the case (Nombre_de_Integrador__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Nombre_de_Integrador__c
+  customer_legal_name:
+    description: Customer legal/business name, razon social (Nombre_del_cliente_Razon_social__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Nombre_del_cliente_Razon_social__c
+  new_service_order_number:
+    description: New service order number in case of substitution or rebilling (Nuevo_numero_OS__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Nuevo_numero_OS__c
+  invoice_number:
+    description: Invoice number referenced by the case (Numero_de_factura__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Numero_de_factura__c
+  opportunity_number:
+    description: Opportunity number, calculated from the related Opportunity (Numero_de_la_oportunidad__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Numero_de_la_oportunidad__c
+  sales_organization_name:
+    description: Sales organization associated with the case (Organizacion_de_venta_picklist__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Organizacion_de_venta_picklist__c
+  origin_channel_name:
+    description: Channel through which the case was created, e.g. Email, Phone, Web (Origin).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Origin
+  priority_name:
+    description: Priority level assigned to the case (Priority).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Priority
+  reason_name:
+    description: Business reason selected for opening the case (Reason).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Reason
+  status_name:
+    description: Current status of the case (Status).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Status
+  subtype_name:
+    description: Detailed subtype classification of the case (Subtipo__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Subtipo__c
+  case_type_name:
+    description: Type classification of the case (Type).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Type
+  payment_type_name:
+    description: Payment method type associated with the case (Tipo_de_pago__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Tipo_de_pago__c
+  response_time_status_name:
+    description: Calculated response-time status, comparing today against the creation date (Dias_Transcurridos__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Dias_Transcurridos__c
+  jira_ticket_key:
+    description: Related Jira ticket key, if any (Ticket_JIRA__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Ticket_JIRA__c
+  total_pi_leads_expectations:
+    description: Total expectations for PI Leads associated with the case (Total_de_expectativas_de_PI_Leads__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Total_de_expectativas_de_PI_Leads__c
+  total_pi_value:
+    description: Total value of the PI (Programa de Incentivo) associated with the case (Valor_total_del_PI__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Valor_total_del_PI__c
+  currency_iso_code:
+    description: ISO code for the case currency (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.CurrencyIsoCode
+  amount:
+    description: Monetary amount associated with the case, e.g. for a partial refund (Importe__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Importe__c
+  amount_without_taxes:
+    description: Monetary amount excluding taxes (Monto_sin_impuestos__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Monto_sin_impuestos__c
+  is_closed:
+    description: Flag indicating whether the case is closed (IsClosed).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.IsClosed
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.IsDeleted
+  is_escalated:
+    description: Flag indicating whether the case has been escalated (IsEscalated).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.IsEscalated
+  requires_invoice_resend:
+    description: Flag indicating whether the invoice needs to be resent (Se_requiere_reenviar_la_factura__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Se_requiere_reenviar_la_factura__c
+  created_by_whatslly_status:
+    description: Flag indicating creation through the Whatslly WhatsApp integration (whatslly__Created_by_Whatslly__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.whatslly__Created_by_Whatslly__c
+  dt_delivery:
+    description: Delivery date associated with the case (Fecha_de_entrega__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Fecha_de_entrega__c
+  dt_payment:
+    description: Payment date associated with the case (Fecha_de_pago__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.Fecha_de_pago__c
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.LastModifiedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.SystemModstamp
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.LastViewedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.LastReferencedDate
+  ts_closed:
+    description: Timestamp when the case was closed (ClosedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.ClosedDate
+  dt_updated:
+    description: Date of the last Salesforce modification (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.cases.day

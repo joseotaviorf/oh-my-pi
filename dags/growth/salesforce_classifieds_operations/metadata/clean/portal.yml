@@ -1,0 +1,100 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: portal
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Portal__c classifieds-site records from the Navent Classifieds Salesforce
+  org. Grain is one row per portal (id) per incremental load window, keyed by Salesforce Id. Describes
+  listing sites (vertical, shared company IDs, site-id sharing). Source:
+  datalake_salesforce_classifieds_raw.portal__c. Physically partitioned by year, month, and day from
+  dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use
+  dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Portal object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.Id
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.LastModifiedById
+  id_owner:
+    description: Foreign Key to the Salesforce User or Queue that owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.OwnerId
+  currency_iso_code:
+    description: ISO currency code stored on the Salesforce record (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.CurrencyIsoCode
+  name:
+    description: Salesforce record name / auto-number displayed in the UI (Name).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.Name
+  organizations_id_company_shared:
+    description: Organizations company shared stored on this Portal (Organizaciones_con_ID_Empresa_compartido__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.Organizaciones_con_ID_Empresa_compartido__c
+  portal:
+    description: Portal stored on this Portal (Portal__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.Portal__c
+  site:
+    description: Site stored on this Portal (Sitio__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.Sitio__c
+  vertical:
+    description: Vertical stored on this Portal (Vertical__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.Vertical__c
+  allows_share_id_site:
+    description: Allows share site stored on this Portal (Permite_compartir_id_site__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.Permite_compartir_id_site__c
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.IsDeleted
+  dt_last_activity:
+    description: Date of the last activity related to the record (LastActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.LastActivityDate
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.LastModifiedDate
+  ts_last_referenced:
+    description: Timestamp when the user last referenced the record (LastReferencedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.LastReferencedDate
+  ts_last_viewed:
+    description: Timestamp when the user last viewed the record (LastViewedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.LastViewedDate
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.portal__c.day

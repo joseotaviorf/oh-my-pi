@@ -1,0 +1,261 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: task
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce Task activities from the Navent Classifieds Salesforce org.
+  Grain is one row per task (id) per incremental load window, keyed by Salesforce Id. Captures agent
+  follow-up work (calls, WhatsApp, reminders) tied to accounts, leads, and related records. Used by
+  Growth classifieds operations to reconstruct workload and channel mix. Source:
+  datalake_salesforce_classifieds_raw.task. Physically partitioned by year, month, and day from
+  dt_updated (derived from LastModifiedDate). Always filter year, month, and day together — or use
+  dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the Task object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Id
+  id_account:
+    description: Foreign Key to the related Account record (AccountId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.AccountId
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.CreatedById
+  id_last_modified_by:
+    description: Foreign Key to the Salesforce User who last modified the record (LastModifiedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.LastModifiedById
+  id_organization_sales:
+    description: Foreign Key to the sales organization associated with this record (Organizacion_de_venta__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Organizacion_de_venta__c
+  id_owner:
+    description: Foreign Key to the Salesforce User or Queue that owns the record (OwnerId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.OwnerId
+  id_recurrence_activity:
+    description: Foreign Key to the recurring activity series this row belongs to (RecurrenceActivityId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceActivityId
+  id_what:
+    description: Polymorphic foreign key to the related record this activity is about (WhatId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.WhatId
+  id_who:
+    description: Polymorphic foreign key to the related person (Contact or Lead) on this activity (WhoId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.WhoId
+  call_ani:
+    description: Call ani stored on this Task (Call_Ani__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Call_Ani__c
+  call_disposition:
+    description: Call disposition stored on this Task (CallDisposition).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.CallDisposition
+  call_object:
+    description: Call object stored on this Task (CallObject).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.CallObject
+  call_type:
+    description: Call type stored on this Task (CallType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.CallType
+  called_number:
+    description: Called number stored on this Task (Called_Number__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Called_Number__c
+  conversation_id:
+    description: Conversation stored on this Task (Conversation_Id__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Conversation_Id__c
+  currency_iso_code:
+    description: ISO currency code stored on the Salesforce record (CurrencyIsoCode).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.CurrencyIsoCode
+  description:
+    description: Free-text description stored on the Salesforce record (Description).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Description
+  interaction_url:
+    description: Interaction url stored on this Task (Interaction_Url__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Interaction_Url__c
+  management_cross_selling:
+    description: Management cross selling stored on this Task (Gestion_Cross_selling__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Gestion_Cross_selling__c
+  priority_name:
+    description: Priority classification stored on the Salesforce record (Priority).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Priority
+  queue_name:
+    description: Queue name stored on this Task (Queue_Name__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Queue_Name__c
+  recurrence_instance:
+    description: Recurrence instance stored on this Task (RecurrenceInstance).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceInstance
+  recurrence_month_year:
+    description: Recurrence month year stored on this Task (RecurrenceMonthOfYear).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceMonthOfYear
+  recurrence_regenerated_type:
+    description: Recurrence regenerated type stored on this Task (RecurrenceRegeneratedType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceRegeneratedType
+  recurrence_time_zone_sid_key:
+    description: Recurrence time zone sid key stored on this Task (RecurrenceTimeZoneSidKey).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceTimeZoneSidKey
+  recurrence_type:
+    description: Recurrence type stored on this Task (RecurrenceType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceType
+  result_lead:
+    description: Result lead stored on this Task (Resultado_Lead__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Resultado_Lead__c
+  status_lead:
+    description: Status lead stored on this Task (Status_Lead__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Status_Lead__c
+  status_name:
+    description: Lifecycle status of the Salesforce record (Status).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Status
+  subject:
+    description: Subject line shown on the Salesforce record (Subject).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Subject
+  task_subtype:
+    description: Task subtype stored on this Task (TaskSubtype).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.TaskSubtype
+  type_name:
+    description: Type classification stored on the Salesforce record (Type).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Type
+  whatslly_number:
+    description: Whatslly number stored on this Task (whatslly__Whatslly_Number__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.whatslly__Whatslly_Number__c
+  call_duration_seconds:
+    description: Numeric count of call duration seconds on this Task (CallDurationInSeconds).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.CallDurationInSeconds
+  recurrence_day_month:
+    description: Recurrence day month stored on this Task (RecurrenceDayOfMonth).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceDayOfMonth
+  recurrence_day_week_mask:
+    description: Recurrence day week mask stored on this Task (RecurrenceDayOfWeekMask).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceDayOfWeekMask
+  recurrence_interval:
+    description: Recurrence interval stored on this Task (RecurrenceInterval).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceInterval
+  total_acd_time:
+    description: Monetary or numeric measure of total acd time on this Task (Total_Acd_Time__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Total_Acd_Time__c
+  total_ivr_time:
+    description: Monetary or numeric measure of total ivr time on this Task (Total_Ivr_Time__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Total_Ivr_Time__c
+  what_count:
+    description: Numeric count of what count on this Task (WhatCount).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.WhatCount
+  who_count:
+    description: Numeric count of who count on this Task (WhoCount).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.WhoCount
+  is_archived:
+    description: Flag indicating archived on this Task (IsArchived).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.IsArchived
+  is_closed:
+    description: Flag indicating closed on this Task (IsClosed).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.IsClosed
+  is_created_whatslly:
+    description: Flag indicating created whatslly on this Task (whatslly__Created_by_Whatslly__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.whatslly__Created_by_Whatslly__c
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.IsDeleted
+  is_high_priority:
+    description: Flag indicating high priority on this Task (IsHighPriority).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.IsHighPriority
+  is_recurrence:
+    description: Flag indicating recurrence on this Task (IsRecurrence).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.IsRecurrence
+  is_reminder_set:
+    description: Flag indicating reminder set on this Task (IsReminderSet).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.IsReminderSet
+  is_whats_app_task:
+    description: Flag indicating whats app task on this Task (whatslly__Is_WhatsApp_Task__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.whatslly__Is_WhatsApp_Task__c
+  dt_activity:
+    description: Calendar date of activity on this Task (ActivityDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.ActivityDate
+  dt_completion:
+    description: Calendar date of completion on this Task (Fecha_de_finalizacion__c).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.Fecha_de_finalizacion__c
+  dt_recurrence_end_date_only:
+    description: Last calendar day this recurring Task series is allowed to generate occurrences (RecurrenceEndDateOnly).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceEndDateOnly
+  dt_recurrence_start_date_only:
+    description: Calendar date of recurrence start date only on this Task (RecurrenceStartDateOnly).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.RecurrenceStartDateOnly
+  ts_completed:
+    description: Salesforce timestamp for completed on this Task (CompletedDateTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.CompletedDateTime
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.CreatedDate
+  ts_last_modified:
+    description: Last modified timestamp in Salesforce (LastModifiedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.LastModifiedDate
+  ts_reminder:
+    description: Salesforce timestamp for reminder on this Task (ReminderDateTime).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.ReminderDateTime
+  ts_system_mod:
+    description: System modification timestamp tracking internal updates (SystemModstamp).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.SystemModstamp
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (LastModifiedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.task.day

@@ -1,0 +1,65 @@
+database_name: datalake_salesforce_classifieds_clean
+table_name: portal_company_history
+owner: fabian.flores@quintoandar.com
+domain: Growth
+description: |
+  Clean layer for Salesforce field-history rows on Empresa_portal__c from the Navent Classifieds
+  Salesforce org. Grain is one history row (id) per incremental load window, keyed by Salesforce Id.
+  Stores old/new values when a portal-company field changes. Incremental partition uses CreatedDate
+  (history objects have no LastModifiedDate). Source:
+  datalake_salesforce_classifieds_raw.empresa_portal__history. Physically partitioned by year, month, and
+  day from dt_updated (derived from CreatedDate). Always filter year, month, and day together — or use
+  dt_updated with load_start_date/load_end_date — for partition pruning on incremental reads.
+columns:
+  id:
+    description: Primary Key. Salesforce native record Id for the portal-company history object (Id).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.Id
+  id_created_by:
+    description: Foreign Key to the Salesforce User who created the record (CreatedById).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.CreatedById
+  id_parent:
+    description: Foreign Key to the parent Salesforce record this row belongs to (ParentId).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.ParentId
+  changed_field_name:
+    description: API name of the Empresa_portal__c field that changed on this history row (Field).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.Field
+  data_type_name:
+    description: Data type name stored on this portal-company history (DataType).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.DataType
+  new_value:
+    description: New value stored on this portal-company history (NewValue).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.NewValue
+  old_value:
+    description: Old value stored on this portal-company history (OldValue).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.OldValue
+  is_deleted:
+    description: Flag indicating if the record was soft-deleted in Salesforce (IsDeleted).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.IsDeleted
+  ts_created:
+    description: Creation timestamp in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.CreatedDate
+  dt_updated:
+    description: Date of the last Salesforce change used for incremental loads (CreatedDate cast to date).
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.dt_updated
+  year:
+    description: Hive partition year (1–9999). Filter with month and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.year
+  month:
+    description: Hive partition month (1–12). Filter with year and day together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.month
+  day:
+    description: Hive partition day (1–31). Filter with year and month together to enable partition pruning on incremental reads.
+    lineage:
+      - datalake_salesforce_classifieds_raw.empresa_portal__history.day
