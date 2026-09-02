@@ -1,0 +1,115 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: sp_santo_andre_iptu
+description: |
+  Flattened Santo André IPTU bill rows from the sp_santo_andre_iptu Scrapy spider. Each row
+  is one fiscal year exploded from the IPTU history array, with venal values and areas.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.classificacao_fiscal
+    description: |
+      Municipal fiscal classification code used as the property join key.
+  municipal_inscription:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.classificacao_fiscal
+    description: |
+      Formatted fiscal classification from the IPTU portal.
+  fiscal_classification_query:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.sql
+    description: |
+      Query key used to fetch IPTU records from the municipal portal.
+  iptu_bill_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.lancamento
+    description: |
+      IPTU bill launch number for the fiscal year row.
+  state:
+    description: |
+      Brazilian state abbreviation for Santo André properties (constant SP).
+  city:
+    description: |
+      Municipality name for Santo André properties (constant Santo Andre).
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.endereco
+    description: |
+      Full property address from the IPTU bill row.
+  block_lot:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.loteamento_quadra_lote
+    description: |
+      Block, lot and subdivision text from the IPTU bill row.
+  tax_year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.exercicio
+    description: |
+      IPTU fiscal year for the bill row.
+  usage_purpose:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.grupo_lancamento
+    description: |
+      Launch group from the IPTU portal (for example APARTAMENTO).
+  lot_area:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.area_terreno
+    description: |
+      Lot area in square meters parsed from Brazilian decimal format.
+  building_area:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.area_predio
+    description: |
+      Built area in square meters parsed from Brazilian decimal format.
+  assessed_iptu_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.valor_venal_predio
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.response.valor_venal_terreno
+    description: |
+      Sum of building and land venal values parsed from the IPTU bill row.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_santo_andre_iptu.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

@@ -36,3 +36,5 @@ workflow:
       partitions: [year, month, day]
     sp_santo_andre_itbi:
       partitions: [year, month, day]
+    sp_sao_paulo_itbi:
+      partitions: [year, month, day]

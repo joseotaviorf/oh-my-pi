@@ -1,0 +1,27 @@
+SELECT
+  response.inscricao AS id_municipal_house,
+  response.inscricao AS municipal_inscription,
+  'PA' AS state,
+  'Belem' AS city,
+  response.bairro AS neighborhood,
+  response.logradouro AS street,
+  response.numero AS address_number,
+  response.complemento AS address_details,
+  response.cep AS zipcode,
+  CAST(response.area_terreno AS DOUBLE) AS lot_area,
+  CAST(response.area_construida AS DOUBLE) AS building_area,
+  response.uso AS usage_purpose,
+  response.tipo AS property_type,
+  CAST(response.valor_venal AS DOUBLE) AS assessed_iptu_value,
+  response.status_imposto AS tax_status,
+  metadata.source AS feed_source,
+  metadata.url AS feed_url,
+  metadata.accessed_at AS ts_accessed,
+  metadata.referer_url AS referer_url,
+  crawler_name,
+  dt_load,
+  year,
+  month,
+  day
+FROM
+  datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro

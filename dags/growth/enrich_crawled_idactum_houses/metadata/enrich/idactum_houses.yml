@@ -1,6 +1,6 @@
 database_name: datalake_crawled_idactum_houses
 table_name: idactum_houses
-description: Unified municipal property records aggregated from twenty-seven Idactum Scrapy clean sources across three upstream DAGs (idactum_scrapy_cadastral, idactum_scrapy_itbi, idactum_scrapy_iptu). Each row follows the legacy idactum_houses column contract with crawl provenance via source_spider. People-only and PDF-only spiders remain excluded.
+description: Unified municipal property records aggregated from thirty-one Idactum Scrapy clean sources across three upstream DAGs (idactum_scrapy_cadastral, idactum_scrapy_itbi, idactum_scrapy_iptu). Each row follows the legacy idactum_houses column contract with crawl provenance via source_spider. People-only and PDF-only spiders remain excluded.
 domain: Growth
 owner: gabriel.mota@quintoandar.com.br
 columns:
@@ -33,7 +33,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.id_municipal_house
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.id_municipal_house
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.id_municipal_house
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.id_municipal_house    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.id_municipal_house
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.id_municipal_house
     description: Municipal cadastral identifier when the source spider exposes a registration number (e.g. inscrição imobiliária or CDC); null when the spider does not emit one.
   id_idactum:
     description: |
@@ -67,7 +70,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.state
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.state
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.state
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.state
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.state    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.state
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.state
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.state
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.state
     description: Brazilian state abbreviation inferred from the source spider geography across cadastral, ITBI, and IPTU municipal feeds (e.g. RJ, GO, SP, AM, BA, PE, DF).
   city:
     lineage:
@@ -94,7 +100,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.city
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.city
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.city
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.city
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.city    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.city
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.city
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.city
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.city
     description: Municipality name inferred from the source spider geography (e.g. Rio de Janeiro, Goiânia, Osasco, Manaus, Salvador, Brasília).
   neighborhood:
     lineage:
@@ -108,7 +117,9 @@ columns:
     - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.neighborhood
     - datalake_crawled_idactum_houses_clean.rj_itbi_main.neighborhood
     - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.neighborhood
-    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.neighborhood
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.neighborhood    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.neighborhood
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.neighborhood
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.neighborhood
     description: |
       Neighborhood name or identifier when exposed by the flattened source spider; otherwise null.
   street:
@@ -118,7 +129,8 @@ columns:
     - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.street
     - datalake_crawled_idactum_houses_clean.rj_itbi_main.street
     - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.street
-    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.street
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.street    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.street
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.street
     description: |
       Street name when parsed from the municipal payload; null when only a full address
       blob is available in address_details.
@@ -129,7 +141,8 @@ columns:
     - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.address_number
     - datalake_crawled_idactum_houses_clean.rj_itbi_main.address_number
     - datalake_crawled_idactum_houses_clean.rj_niteroi_e_cidade.address_number
-    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.address_number
+    - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.address_number    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.address_number
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.address_number
     description: |
       Street number when parsed from the municipal payload; null when not provided by the spider.
   zipcode:
@@ -153,7 +166,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_dados_cadastrais_recadastramento_main.address_details
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.address_details
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.address_details
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.address_details
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.address_details    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.address_details
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.address_details
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.address_details
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.address_details
     description: Address complement or full address string from flattened spiders; COALESCE of address_details and property_address where both exist in the upstream clean table.
   address_details_unit:
     description: |
@@ -187,7 +203,8 @@ columns:
     - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.lot_area
     - datalake_crawled_idactum_houses_clean.bsb_main_fichas.lot_area
     - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.lot_area
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.lot_area
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.lot_area    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.lot_area
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.lot_area
     description: |
       Land area in square meters when present in the scraped payload; null otherwise.
   building_area:
@@ -198,7 +215,8 @@ columns:
     - datalake_crawled_idactum_houses_clean.bsb_main_certidao_geometria.building_area
     - datalake_crawled_idactum_houses_clean.bsb_main_fichas.building_area
     - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.building_area
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.building_area
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.building_area    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.building_area
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.building_area
     description: |
       Built area in square meters when present in the scraped payload; null otherwise.
   private_area:
@@ -229,13 +247,14 @@ columns:
     - datalake_crawled_idactum_houses_clean.bsb_main_pauta.assessed_iptu_value
     - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.assessed_iptu_value
     - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.assessed_iptu_value
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.assessed_iptu_value
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.assessed_iptu_value    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.assessed_iptu_value
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.assessed_iptu_value
     description: Government-assessed IPTU fiscal value when present in the scraped payload (go_goiania_informacoes_cadastrais, sp_osasco_itbi, sp_santo_andre_itbi, bsb_main_debitos, bsb_main_pauta); null otherwise.
   assessed_itbi_value:
     lineage:
     - datalake_crawled_idactum_houses_clean.rj_itbi_main.assessed_itbi_value
     - datalake_crawled_idactum_houses_clean.sp_osasco_itbi.assessed_itbi_value
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.assessed_itbi_value
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.assessed_itbi_value    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.assessed_itbi_value
     description: Declared or assessed ITBI transaction value when the source spider exposes it (rj_itbi_main, sp_osasco_itbi, sp_santo_andre_itbi); null for other spiders.
   latitude:
     lineage:
@@ -258,7 +277,8 @@ columns:
     - datalake_crawled_idactum_houses_clean.ba_salvador_certidao_cadastral.usage_purpose
     - datalake_crawled_idactum_houses_clean.bsb_main_debitos.usage_purpose
     - datalake_crawled_idactum_houses_clean.bsb_main_fichas.usage_purpose
-    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.usage_purpose
+    - datalake_crawled_idactum_houses_clean.go_goiania_informacoes_cadastrais.usage_purpose    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.usage_purpose
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.usage_purpose
     description: |
       Intended use category when present in the scraped payload; null otherwise.
   usage_type:
@@ -303,7 +323,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.dt_load
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.dt_load
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.dt_load
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.dt_load    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.dt_load
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.dt_load
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.dt_load
     description: |
       Date when the upstream per-spider clean row was loaded into the datalake.
   source_spider:
@@ -336,7 +359,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.feed_source
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.feed_source
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.feed_source
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.feed_source    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.feed_source
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.feed_source
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.feed_source
     description: |
       Spider source tag embedded in the crawl metadata payload.
   feed_url:
@@ -367,7 +393,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.feed_url
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.feed_url
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.feed_url
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.feed_url    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.feed_url
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.feed_url
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.feed_url
     description: |
       Source URL consulted by the crawler when producing the upstream record.
   ts_accessed:
@@ -398,7 +427,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.ts_accessed
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.ts_accessed
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.ts_accessed
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.ts_accessed    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.ts_accessed
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.ts_accessed
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.ts_accessed
     description: |
       Timestamp when the crawler accessed the municipal portal page or API.
   referer_url:
@@ -429,7 +461,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.referer_url
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.referer_url
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.referer_url
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.referer_url    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.referer_url
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.referer_url
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.referer_url
     description: |
       HTTP referer URL captured during the crawl session, when available.
   crawler_name:
@@ -460,7 +495,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.crawler_name
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.crawler_name
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.crawler_name
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.crawler_name    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.crawler_name
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.crawler_name
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.crawler_name
     description: |
       Scrapy spider name stamped on the upstream clean record by the raw ingestion job.
   year:
@@ -491,7 +529,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.year
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.year
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.year
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.year
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.year    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.year
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.year
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.year
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.year
     description: |
       Partition year derived from the DAG execution date of the Scrapy feed load.
   month:
@@ -522,7 +563,10 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.month
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.month
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.month
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.month
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.month    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.month
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.month
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.month
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.month
     description: |
       Partition month derived from the DAG execution date of the Scrapy feed load.
   day:
@@ -553,6 +597,9 @@ columns:
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cdc.day
     - datalake_crawled_idactum_houses_clean.sp_osasco_pesquisa_cep.day
     - datalake_crawled_idactum_houses_clean.sp_osasco_proprietarios.day
-    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.day
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_itbi.day    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro_bairros.day
+    - datalake_crawled_idactum_houses_clean.pa_belem_certidao_cadastro.day
+    - datalake_crawled_idactum_houses_clean.sp_santo_andre_iptu.day
+    - datalake_crawled_idactum_houses_clean.sp_sao_paulo_itbi.day
     description: |
       Partition day derived from the DAG execution date of the Scrapy feed load.

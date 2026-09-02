@@ -65,3 +65,7 @@ workflow:
       partitions: [year, month, day]
     sp_osasco_proprietarios:
       partitions: [year, month, day]
+    pa_belem_certidao_cadastro_bairros:
+      partitions: [year, month, day]
+    pa_belem_certidao_cadastro:
+      partitions: [year, month, day]

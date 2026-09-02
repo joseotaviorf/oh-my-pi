@@ -1,0 +1,32 @@
+---
+database_name: datalake_crawled_idactum_houses_raw
+table_name: pa_belem_certidao_cadastro
+description: |
+  Raw Crawl JSONL feed from the Scrapy crawler pa_belem_certidao_cadastro (Belém PA
+  cadastral certificate per municipal inscription). One table per spider under the shared
+  crawled_idactum_houses raw database. Schema-on-read from batch_*.jsonl under
+  crawler-scrapy feeds.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  response:
+    description: |
+      Cadastral certificate payload with inscription, address, areas and tax status fields.
+  metadata:
+    description: |
+      Crawl metadata including source spider, URL, access timestamp and referer.
+  crawler_name:
+    description: |
+      Scrapy spider name that produced the record (always pa_belem_certidao_cadastro).
+  dt_load:
+    description: |
+      Date when the JSONL batch was loaded into the raw datalake table.
+  year:
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

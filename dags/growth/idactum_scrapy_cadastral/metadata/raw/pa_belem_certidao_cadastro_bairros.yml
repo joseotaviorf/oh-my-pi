@@ -1,0 +1,41 @@
+---
+database_name: datalake_crawled_idactum_houses_raw
+table_name: pa_belem_certidao_cadastro_bairros
+description: |
+  Raw Crawl JSONL feed from the Scrapy crawler pa_belem_certidao_cadastro_bairros (Belém
+  PA neighborhood listing with municipal registration inscriptions). One table per spider
+  under the shared crawled_idactum_houses raw database. Schema-on-read from batch_*.jsonl
+  under crawler-scrapy feeds.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  neighborhood_code:
+    description: |
+      Municipal neighborhood code used in the Belém cadastre portal query.
+  neighborhood_name:
+    description: |
+      Neighborhood name returned by the Belém cadastre portal listing.
+  registrations:
+    description: |
+      Array of municipal registration inscriptions returned for the neighborhood.
+  total_registrations:
+    description: |
+      Count of registrations returned for the neighborhood in this crawl item.
+  metadata:
+    description: |
+      Crawl metadata including source spider, URL, access timestamp and referer.
+  crawler_name:
+    description: |
+      Scrapy spider name that produced the record (always pa_belem_certidao_cadastro_bairros).
+  dt_load:
+    description: |
+      Date when the JSONL batch was loaded into the raw datalake table.
+  year:
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

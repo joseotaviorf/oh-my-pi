@@ -1,0 +1,125 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: sp_sao_paulo_itbi
+description: |
+  Flattened São Paulo ITBI complementary guide fields from the sp_sao_paulo_itbi Scrapy
+  spider. Built from the shared crawled_idactum_houses raw table with load provenance
+  columns and parsed address components.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.cadastro_imovel
+    description: |
+      Municipal property registration (cadastro imóvel) used as the idactum_houses join key.
+  municipal_registration:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.cadastro_imovel
+    description: |
+      Formatted municipal property registration from the ITBI guide.
+  state:
+    description: |
+      Brazilian state abbreviation for São Paulo properties (constant SP).
+  city:
+    description: |
+      Municipality name for São Paulo properties (constant Sao Paulo).
+  transaction_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.numero_transacao
+    description: |
+      ITBI transaction number from the complementary guide.
+  transaction_date:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.data_transacao
+    description: |
+      Date of the real estate transaction from the ITBI guide.
+  property_address:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.endereco_imovel
+    description: |
+      Full property address as printed on the ITBI complementary guide.
+  street:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.endereco_imovel
+    description: |
+      Street name parsed from the ITBI guide address (before the first comma).
+  address_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.endereco_imovel
+    description: |
+      Street number parsed from the ITBI guide address (after the comma).
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.endereco_imovel
+    description: |
+      Address complement parsed from the ITBI guide (between slash and hyphen).
+  neighborhood:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.endereco_imovel
+    description: |
+      Neighborhood name parsed from the ITBI guide address (after the last hyphen).
+  declared_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.valor_informado_complemento
+    description: |
+      Declared transaction value from the ITBI complementary guide.
+  assessed_itbi_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.valor_informado_complemento
+    description: |
+      ITBI assessed value mapped from the declared complement amount.
+  due_date:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.vencimento_tributo
+    description: |
+      Tax due date from the ITBI complementary guide.
+  total_amount_due:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.response.total_a_pagar
+    description: |
+      Total amount due including fines and interest from the ITBI guide.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

@@ -4,7 +4,7 @@ dag:
   schedule_start_date: 2026, 05, 14
   documentation:
     dag_purpose: |
-      Aggregates twenty-seven Idactum Scrapy clean sources from three upstream DAGs
+      Aggregates thirty-one Idactum Scrapy clean sources from three upstream DAGs
       (idactum_scrapy_cadastral, idactum_scrapy_itbi, idactum_scrapy_iptu) into a
       unified houses-like enrich table aligned with the legacy idactum_houses column
       contract, enriched with crawl provenance via source_spider.

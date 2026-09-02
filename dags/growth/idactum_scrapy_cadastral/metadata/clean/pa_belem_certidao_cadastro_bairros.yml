@@ -1,0 +1,100 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: pa_belem_certidao_cadastro_bairros
+description: |
+  Flattened Belém property registrations from the pa_belem_certidao_cadastro_bairros Scrapy
+  spider. Each row is one registration exploded from the neighborhood listing, with
+  municipal inscription and address for the idactum_houses contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.registrations.inscricao
+    description: |
+      Municipal property registration number for one unit in the neighborhood listing.
+  municipal_inscription:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.registrations.inscricao
+    description: |
+      Formatted municipal cadastral inscription from the neighborhood listing.
+  state:
+    description: |
+      Brazilian state abbreviation for Belém properties (constant PA).
+  city:
+    description: |
+      Municipality name for Belém properties (constant Belem).
+  neighborhood_code:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.neighborhood_code
+    description: |
+      Municipal neighborhood code from the Belém cadastre portal.
+  neighborhood_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.neighborhood_name
+    description: |
+      Neighborhood name from the Belém cadastre portal listing.
+  registration_sequential:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.registrations.sequencial
+    description: |
+      Sequential identifier assigned by the municipal portal for the registration row.
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.registrations.endereco
+    description: |
+      Street address text returned for the registration in the neighborhood listing.
+  registration_status:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.registrations.situacao
+    description: |
+      Registration status on the municipal portal (for example ATIVA).
+  total_registrations:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.total_registrations
+    description: |
+      Total count of registrations returned for the neighborhood in this crawl item.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.pa_belem_certidao_cadastro_bairros.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

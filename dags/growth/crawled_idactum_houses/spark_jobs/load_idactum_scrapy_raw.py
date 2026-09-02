@@ -161,6 +161,100 @@ _SANTO_ANDRE_ITBI_ITEM_STRUCT = StructType(
     ]
 )
 
+_PA_BELEM_BAIRROS_REGISTRATION_STRUCT = StructType(
+    [
+        StructField("sequencial", StringType(), True),
+        StructField("inscricao", StringType(), True),
+        StructField("endereco", StringType(), True),
+        StructField("situacao", StringType(), True),
+    ]
+)
+
+_PA_BELEM_CERTIDAO_CADASTRO_RESPONSE_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "inscricao",
+            "sequencial",
+            "status_imposto",
+            "valor_venal",
+            "proprietario",
+            "documento",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cep",
+            "bairro",
+            "zona",
+            "area_terreno",
+            "profundidade",
+            "cond_terreno",
+            "sit_patrimonial",
+            "confinantes_le",
+            "confinantes_ld",
+            "confinantes_fu",
+            "testeda_1",
+            "testeda_2",
+            "testeda_3",
+            "testeda_4",
+            "area_construida",
+            "pavimentos",
+            "uso",
+            "regime_util",
+            "tipo",
+        )
+    ]
+)
+
+_SP_SANTO_ANDRE_IPTU_ITEM_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "lancamento",
+            "classificacao_fiscal",
+            "proprietario",
+            "endereco",
+            "endereco_notificacao",
+            "loteamento_quadra_lote",
+            "exercicio",
+            "area_terreno",
+            "valor_venal_terreno",
+            "area_predio",
+            "valor_venal_predio",
+            "area_terreno_excedente",
+            "valor_venal_terreno_excedente",
+            "grupo_lancamento",
+            "imposto_predial_fmp",
+            "imposto_predial_valor",
+            "imposto_territorial_fmp",
+            "imposto_territorial_valor",
+            "imposto_total_fmp",
+            "imposto_total_valor",
+        )
+    ]
+)
+
+_SP_SAO_PAULO_ITBI_RESPONSE_STRUCT = StructType(
+    [
+        StructField(field_name, StringType(), True)
+        for field_name in (
+            "multa",
+            "atualizacao_monetaria",
+            "juros",
+            "total_a_pagar",
+            "atencao",
+            "nome_contribuinte",
+            "cpf_cnpj_contribuinte",
+            "cadastro_imovel",
+            "endereco_imovel",
+            "numero_transacao",
+            "data_transacao",
+            "vencimento_tributo",
+            "valor_informado_complemento",
+        )
+    ]
+)
+
 _AM_MANAUS_BCI_RESPONSE_STRUCT = StructType(
     [
         StructField(field_name, StringType(), True)
@@ -424,6 +518,34 @@ _EMPTY_RAW_SCHEMAS = {
     "bsb_main_certidao_geometria": _response_metadata_schema(
         _BSB_GEOMETRIA_RESPONSE_STRUCT
     ),
+    "pa_belem_certidao_cadastro_bairros": StructType(
+        [
+            StructField("neighborhood_code", StringType(), True),
+            StructField("neighborhood_name", StringType(), True),
+            StructField(
+                "registrations",
+                ArrayType(_PA_BELEM_BAIRROS_REGISTRATION_STRUCT),
+                True,
+            ),
+            StructField("total_registrations", LongType(), True),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+    "pa_belem_certidao_cadastro": _response_metadata_schema(
+        _PA_BELEM_CERTIDAO_CADASTRO_RESPONSE_STRUCT
+    ),
+    "sp_santo_andre_iptu": StructType(
+        [
+            StructField("sql", StringType(), True),
+            StructField(
+                "response",
+                ArrayType(_SP_SANTO_ANDRE_IPTU_ITEM_STRUCT),
+                True,
+            ),
+            StructField("metadata", METADATA_STRUCT, True),
+        ]
+    ),
+    "sp_sao_paulo_itbi": _response_metadata_schema(_SP_SAO_PAULO_ITBI_RESPONSE_STRUCT),
 }
 
 

@@ -211,6 +211,46 @@ def test_empty_raw_schema_sp_santo_andre_itbi_uses_array_response(job):
     }
 
 
+def test_empty_raw_schema_pa_belem_certidao_cadastro_bairros_has_top_level_fields(job):
+    schema = job._empty_raw_schema("pa_belem_certidao_cadastro_bairros")
+    field_names = {field.name for field in schema.fields}
+    assert field_names == {
+        "neighborhood_code",
+        "neighborhood_name",
+        "registrations",
+        "total_registrations",
+        "metadata",
+    }
+
+
+def test_empty_raw_schema_pa_belem_certidao_cadastro_has_inscricao(job):
+    schema = job._empty_raw_schema("pa_belem_certidao_cadastro")
+    response_field = next(field for field in schema.fields if field.name == "response")
+    response_field_names = {field.name for field in response_field.dataType.fields}
+    assert "inscricao" in response_field_names
+
+
+def test_empty_raw_schema_sp_santo_andre_iptu_uses_array_response(job):
+    schema = job._empty_raw_schema("sp_santo_andre_iptu")
+    field_names = {field.name for field in schema.fields}
+    assert field_names == {"sql", "response", "metadata"}
+    response_field = next(field for field in schema.fields if field.name == "response")
+    assert isinstance(response_field.dataType, _ArrayType)
+    item_field_names = {
+        field.name for field in response_field.dataType.elementType.fields
+    }
+    assert "classificacao_fiscal" in item_field_names
+    assert "lancamento" in item_field_names
+
+
+def test_empty_raw_schema_sp_sao_paulo_itbi_has_cadastro_imovel(job):
+    schema = job._empty_raw_schema("sp_sao_paulo_itbi")
+    response_field = next(field for field in schema.fields if field.name == "response")
+    response_field_names = {field.name for field in response_field.dataType.fields}
+    assert "cadastro_imovel" in response_field_names
+    assert "numero_transacao" in response_field_names
+
+
 def test_response_schema_type_mismatch_detects_generic_vs_nested(job):
     metastore_service = MagicMock()
     metastore_service.get_table_names.return_value = ["rj_niteroi_e_cidade"]

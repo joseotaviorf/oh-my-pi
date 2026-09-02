@@ -1,0 +1,35 @@
+---
+database_name: datalake_crawled_idactum_houses_raw
+table_name: sp_santo_andre_iptu
+description: |
+  Raw Crawl JSONL feed from the Scrapy crawler sp_santo_andre_iptu (Santo André SP IPTU
+  bill history by fiscal classification). One table per spider under the shared
+  crawled_idactum_houses raw database. Schema-on-read from batch_*.jsonl under
+  crawler-scrapy feeds.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  sql:
+    description: |
+      Fiscal classification query key used to fetch IPTU records from the municipal portal.
+  response:
+    description: |
+      Array of IPTU bill rows with fiscal classification, areas and venal values.
+  metadata:
+    description: |
+      Crawl metadata including source spider, URL, access timestamp and referer.
+  crawler_name:
+    description: |
+      Scrapy spider name that produced the record (always sp_santo_andre_iptu).
+  dt_load:
+    description: |
+      Date when the JSONL batch was loaded into the raw datalake table.
+  year:
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

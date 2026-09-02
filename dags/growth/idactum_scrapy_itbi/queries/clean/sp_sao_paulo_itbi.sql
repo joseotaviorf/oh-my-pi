@@ -1,0 +1,27 @@
+SELECT
+  response.cadastro_imovel AS id_municipal_house,
+  response.cadastro_imovel AS municipal_registration,
+  'SP' AS state,
+  'Sao Paulo' AS city,
+  response.numero_transacao AS transaction_number,
+  response.data_transacao AS transaction_date,
+  response.endereco_imovel AS property_address,
+  TRIM(REGEXP_EXTRACT(response.endereco_imovel, '^([^,]+)', 1)) AS street,
+  TRIM(REGEXP_EXTRACT(response.endereco_imovel, ',\\s*([^/\\-]+)', 1)) AS address_number,
+  TRIM(REGEXP_EXTRACT(response.endereco_imovel, '/\\s*([^\\-]+)', 1)) AS address_details,
+  TRIM(REGEXP_EXTRACT(response.endereco_imovel, '-\\s*(.+)$', 1)) AS neighborhood,
+  CAST(response.valor_informado_complemento AS DOUBLE) AS declared_value,
+  CAST(response.valor_informado_complemento AS DOUBLE) AS assessed_itbi_value,
+  response.vencimento_tributo AS due_date,
+  response.total_a_pagar AS total_amount_due,
+  metadata.source AS feed_source,
+  metadata.url AS feed_url,
+  metadata.accessed_at AS ts_accessed,
+  metadata.referer_url AS referer_url,
+  crawler_name,
+  dt_load,
+  year,
+  month,
+  day
+FROM
+  datalake_crawled_idactum_houses_raw.sp_sao_paulo_itbi

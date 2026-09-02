@@ -31,3 +31,5 @@ workflow:
       partitions: [year, month, day]
     bsb_main_pauta:
       partitions: [year, month, day]
+    sp_santo_andre_iptu:
+      partitions: [year, month, day]
