@@ -1,0 +1,73 @@
+---
+database_name: datalake_docpilot_clean
+table_name: income_extraction_document
+owner: marcus.silva@quintoandar.com.br
+domain: Fintech
+description: Per-file rows for DocPilot income v2 extraction batches, capturing classification, platform extraction status, Apurador inclusion decisions, and per-document errors.
+columns:
+  id:
+    description: Unique identifier of the income v2 document row.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.id
+  id_batch:
+    description: Identifier of the parent income v2 extraction batch.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.batch_id
+  id_platform_document:
+    description: Identifier of the platform extraction record for the file in docpilot-platform.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.platform_document_id
+  file_path:
+    description: Path of the file processed within the submitted income documentation package.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.file_path
+  classified_document_type:
+    description: Document type assigned by DocPilot platform interpretation (e.g. PAYSLIP, BANK_STATEMENT).
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.classified_document_type
+  extraction_result:
+    description: Platform extraction outcome for the file.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.extraction_result
+    categories:
+      COMPLETED: Platform extraction finished successfully for the file.
+      ERROR: Platform extraction failed for the file.
+      NOT_REQUESTED: The file was not selected for extraction in the batch.
+  inclusion_result:
+    description: Business-handler inclusion decision for the file after Apurador rules were applied.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.inclusion_result
+    categories:
+      USED: The file contributed to the batch business output.
+      EXCLUDED_NAME_MISMATCH: Excluded because the document owner name did not match.
+      EXCLUDED_INSUFFICIENT_MONTHS: Excluded because the file did not cover enough months.
+      EXCLUDED_NOT_IN_SELECTED_MONTHS: Excluded because its months were outside the selected window.
+      EXCLUDED_NO_FIXED_INCOME_SINGLE_MONTH: Excluded because no fixed income was found in a single-month case.
+      EXCLUDED_NOT_IN_SELECTED_PERIODS: Excluded because its periods were outside the selected window.
+      EXCLUDED_INSUFFICIENT_PERIODS: Excluded because the file did not cover enough periods.
+      NOT_APPLICABLE: Inclusion rules did not apply to the file.
+  error:
+    description: Error message recorded for the file when extraction failed.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.error
+  ts_created:
+    description: When the income v2 document row was created in DocPilot.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.ts_created
+  op_cdc:
+    description: CDC operation type for this row (insert, update, or delete).
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp of the CDC capture transaction for this change event.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the source database transaction that produced this row version.
+    lineage:
+      - datalake_docpilot_raw.incomeextractiondocument.ts_database_transaction

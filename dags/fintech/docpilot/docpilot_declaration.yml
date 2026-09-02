@@ -22,3 +22,7 @@ workflow:
       clean_table_name: processed_message
     transaction:
       clean_table_name: transaction
+    IncomeExtractionBatch:
+      clean_table_name: income_extraction_batch
+    IncomeExtractionDocument:
+      clean_table_name: income_extraction_document

@@ -1,0 +1,13 @@
+SELECT
+    id,
+    id_external,
+    external_source,
+    status,
+    error_type,
+    error,
+    output_schema_version,
+    business_output,
+    pipeline_metadata,
+    ts_created
+FROM
+    datalake_docpilot_raw.incomeextractionbatch

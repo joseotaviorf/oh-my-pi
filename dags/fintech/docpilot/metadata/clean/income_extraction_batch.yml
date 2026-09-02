@@ -1,0 +1,69 @@
+---
+database_name: datalake_docpilot_clean
+table_name: income_extraction_batch
+owner: marcus.silva@quintoandar.com.br
+domain: Fintech
+description: Append-only batch results from DocPilot income v2 (Apurador), including business handler output, batch status, pipeline provenance, and errors for each extraction run.
+columns:
+  id:
+    description: Unique identifier of the income v2 extraction batch.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.id
+  id_external:
+    description: Unique identifier of the income document in the upstream documentation system.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.id_external
+  external_source:
+    description: System that submitted the document for income reading (e.g. rental documentation).
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.external_source
+  status:
+    description: Overall outcome of the income v2 extraction run.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.status
+    categories:
+      SUCCESS: All selected documents were extracted and used by the business handler.
+      PARTIAL_SUCCESS: The batch completed with some documents excluded or failed.
+      FAILURE: The batch failed with no documents used in the final outcome.
+      SKIPPED: Income v2 was not executed for the selected document type.
+  error_type:
+    description: Machine-readable error category when the batch ended in a controlled failure or degraded state.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.error_type
+  error:
+    description: Structured error details associated with the batch outcome.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.error
+  output_schema_version:
+    description: Version of the business_output JSON schema persisted for the batch.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.output_schema_version
+  business_output:
+    description: Structured Apurador output with per-period income maps (extracted, gross, committed), reference date, and optional analysis text.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.business_output
+  pipeline_metadata:
+    description: Deploy and business-handler provenance, including commit hash and handler prompt/version metadata.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.pipeline_metadata
+  ts_created:
+    description: When the income v2 batch record was created in DocPilot.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.ts_created
+  op_cdc:
+    description: CDC operation type for this row (insert, update, or delete).
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp of the CDC capture transaction for this change event.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the source database transaction that produced this row version.
+    lineage:
+      - datalake_docpilot_raw.incomeextractionbatch.ts_database_transaction
