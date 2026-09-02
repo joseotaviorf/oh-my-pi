@@ -593,7 +593,7 @@ base AS (
         CAST(NULL AS DATE) AS dt_source_trigger,
         sl_hash.dt_sap_created AS dt_sap_created,
         sl_hash.dt_sap_reference AS dt_sap_reference,
-        CASE WHEN m.is_matched THEN sl_hash.id_finance_entity_entry ELSE NULL END AS id_finance_entity_entry_r
+        m.is_matched AS is_matched
     FROM
         sap AS sl_hash
     LEFT JOIN 
@@ -639,4 +639,4 @@ SELECT
     dt_sap_created,
     CAST(NULL AS DATE) AS dt_filter_end
 FROM base
-WHERE id_finance_entity_entry_r IS NULL
+WHERE is_matched IS NULL

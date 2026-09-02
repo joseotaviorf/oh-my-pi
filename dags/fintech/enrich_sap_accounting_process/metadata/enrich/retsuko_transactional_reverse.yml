@@ -8,6 +8,8 @@ description:
   These are classified as 'reverse straw failure' transactions, indicating potential data
   inconsistencies or manual entries in SAP that were not originated from the Seu Barriga/Retsuko
   system. The table supports monitoring and root-cause analysis for these reverse transactional entries.
+  A posting counts as matched when it reaches a Retsuko entry by any of three routes - the gateway hash of the dispatch, the finance entity entry carried on the ledger line, or the finance entity on the account - and matched postings are excluded here on purpose, since reporting them would blame the source for an event the forward straw already reconciles.
+  The match is read from the flag itself rather than from the entry id it resolves to. Part of the account is posted by batch loads that reach SAP without carrying an entry id, so reading the match through that id let every one of those postings escape the filter and be reported as a failure even when the hash tied it to a dispatch the forward straw already covers.
 columns:
   id_accounting_process:
     description: Unique key for each record on this table, formatted as 'RE-RTSK-T-{id_finance_entity}-{account_number}-{row_number}' for deduplication
