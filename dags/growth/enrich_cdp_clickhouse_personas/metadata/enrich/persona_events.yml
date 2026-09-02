@@ -1,0 +1,102 @@
+---
+database_name: datalake_cdp
+table_name: persona_events
+description: |
+  Current active CDP persona state with one row per QuintoAndar user and persona.
+  Each incremental run merges event-derived journey signals from the current
+  ClickHouse ingest window with the matching historical persona model, retaining
+  the most recent update and publishing only active roles. Analytics,
+  segmentation, and customer activation consumers use this table to identify a
+  user's current platform role and journey position.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_persona_event:
+    description: |
+      Deterministic SHA-512 key for the user and persona pair and the primary key
+      of the current persona table.
+    lineage:
+      - datalake_cdp_personas.persona.id_user
+      - datalake_cdp_personas.persona.persona
+      - datalake_cdp.stream_persona_events.id_persona_event
+  id_user:
+    description: |
+      QuintoAndar user identifier whose current business role is represented by
+      this persona row.
+    lineage:
+      - datalake_cdp_personas.persona.id_user
+      - datalake_cdp.stream_persona_events.id_user
+  uuid_person:
+    description: |
+      Governed person UUID selected from the latest event signal when available,
+      otherwise from the historical persona model.
+    lineage:
+      - datalake_cdp_personas.persona.uuid_person
+      - datalake_cdp.stream_persona_events.uuid_person
+  persona:
+    description: |
+      Current business role of the user, including owner, tenant, prospect,
+      partner, and operational agent classifications.
+    lineage:
+      - datalake_cdp_personas.persona.persona
+      - datalake_cdp.stream_persona_events.persona
+  last_journey_step:
+    description: |
+      Most recent known journey position for this persona, selected from the
+      batch or event source according to their update timestamps.
+    lineage:
+      - datalake_cdp_personas.persona.journey_step
+      - datalake_cdp.stream_persona_events.last_journey_step
+  is_active:
+    description: |
+      Whether the user and persona pair is active, taken from the same
+      timestamp winner used for last_journey_step. A newer historical batch
+      row can remain inactive even when the event signal is hardcoded true.
+      Inactive rows are excluded from this published table.
+    lineage:
+      - datalake_cdp_personas.persona.is_active
+      - datalake_cdp.stream_persona_events.is_active
+  ts_started:
+    description: |
+      UTC timestamp when the historical persona period began, when supplied by
+      the batch persona model.
+    lineage:
+      - datalake_cdp_personas.persona.ts_first_event
+  ts_updated:
+    description: |
+      Latest logical UTC update timestamp after reconciling the historical
+      persona period and the event-derived signal, falling back to the
+      historical start timestamp when neither source has an update timestamp.
+    lineage:
+      - datalake_cdp_personas.persona.ts_first_event
+      - datalake_cdp_personas.persona.ts_last_event
+      - datalake_cdp.stream_persona_events.ts_updated
+  ts_ended:
+    description: |
+      Reserved timestamp for an explicit persona end. Current active persona
+      rows do not populate this value.
+  ts_load:
+    description: |
+      Timestamp when the Airflow batch merged this persona state for the current
+      ingest window.
+  year:
+    description: |
+      Calendar year used as the first Delta partition component, preferring the
+      event signal date and otherwise the historical update date.
+    lineage:
+      - datalake_cdp_personas.persona.ts_last_event
+      - datalake_cdp.stream_persona_events.year
+  month:
+    description: |
+      Calendar month used as the second Delta partition component, preferring the
+      event signal date and otherwise the historical update date.
+    lineage:
+      - datalake_cdp_personas.persona.ts_last_event
+      - datalake_cdp.stream_persona_events.month
+  day:
+    description: |
+      Calendar day used as the final Delta partition component, preferring the
+      event signal date and otherwise the historical update date.
+    lineage:
+      - datalake_cdp_personas.persona.ts_last_event
+      - datalake_cdp.stream_persona_events.day

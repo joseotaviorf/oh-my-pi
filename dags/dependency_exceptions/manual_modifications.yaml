@@ -1332,3 +1332,6 @@ bietlejuice.enrich_crawled_idactum_houses:
     - bietlejuice.idactum_scrapy_cadastral:load-clean-sp-osasco-pesquisa-cdc:first-run-of-day
     - bietlejuice.idactum_scrapy_itbi:load-clean-rj-itbi-main:first-run-of-day
     - bietlejuice.idactum_scrapy_itbi:load-clean-sp-osasco-itbi:first-run-of-day
+bietlejuice.enrich_cdp_clickhouse_personas:
+  # No dataset deps: cdp_clickhouse is JiraOps-muted and cannot appear in dependencies.yaml.
+  override: []

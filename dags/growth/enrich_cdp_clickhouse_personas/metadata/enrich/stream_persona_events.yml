@@ -1,0 +1,101 @@
+---
+database_name: datalake_cdp
+table_name: stream_persona_events
+description: |
+  Intraday incremental snapshot of the latest Event Gateway persona signal for
+  each QuintoAndar user and persona in the legacy stream-source window. It derives
+  owner, tenant-prospect, buyer-prospect, and owner-prospect roles from CDP
+  transactional events, visit participants, and governed identity matches. Rows
+  are merged by id_persona_event using ts_updated so overlapping 30-minute runs
+  keep the newest journey signal. The table is consumed by
+  datalake_cdp.persona_events.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_persona_event:
+    description: |
+      Deterministic SHA-512 key for the user and persona pair, used as the
+      primary key for incremental batch updates.
+    lineage:
+      - datalake_cdp_clean.transactional.id_user
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.application
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_ebdb_clean.user.id
+      - datalake_cdp.person.id_user
+  id_user:
+    description: |
+      QuintoAndar user identifier assigned to the persona signal. Visit events
+      may resolve it from the visitor payload, while owner-prospect events may
+      resolve it through the CDP person identity table.
+    lineage:
+      - datalake_cdp_clean.transactional.id_user
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_ebdb_clean.user.id
+      - datalake_cdp.person.id_user
+  uuid_person:
+    description: |
+      Governed person UUID associated with the user when available from the
+      event, EBDB user mapping, or CDP person identity match.
+    lineage:
+      - datalake_cdp_clean.transactional.id_person
+      - datalake_ebdb_clean.user.uuid_person
+      - datalake_cdp.person.uuid_person
+  persona:
+    description: |
+      Business role inferred from the event and journey context, such as OWNER,
+      OWNER_PROSPECT, TENANT_PROSPECT, or BUYER_PROSPECT.
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.application
+      - datalake_cdp_clean.transactional.event_properties
+  last_journey_step:
+    description: |
+      Journey step carried by the most recent transactional event selected for
+      the user and persona pair.
+    lineage:
+      - datalake_cdp_clean.transactional.journey_step
+  is_active:
+    description: |
+      Indicates that the event-derived persona signal is active. Persona events
+      currently create active signals only.
+  ts_started:
+    description: |
+      Reserved persona start timestamp. Event-derived signals do not populate
+      this value because historical starts come from the batch persona model.
+  ts_updated:
+    description: |
+      UTC event timestamp of the latest signal for the user and persona pair,
+      used to reject older incremental updates.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+  ts_ended:
+    description: |
+      Reserved persona end timestamp. Event-derived signals do not currently
+      provide an explicit end time.
+  ts_load:
+    description: |
+      Timestamp when the Airflow batch calculated and merged this persona signal
+      for the current ingest window.
+  ts_ingested_at:
+    description: |
+      UTC Event Gateway ingest timestamp of the winning transactional event.
+      During stream-source validation this compatibility field is populated from
+      ts_egw and selects rows between load_start_date and load_end_date.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_egw
+  year:
+    description: |
+      Calendar year of ts_updated, used as the first Delta partition component.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+  month:
+    description: |
+      Calendar month of ts_updated, used as the second Delta partition component.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+  day:
+    description: |
+      Calendar day of ts_updated, used as the final Delta partition component.
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event

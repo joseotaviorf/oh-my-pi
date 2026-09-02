@@ -1,0 +1,45 @@
+dag:
+  name: enrich_cdp_clickhouse_personas
+  owner: Data Growth
+  catchup: false
+  schedule_start_date: 2026, 8, 28
+  schedule_interval: "*/30 * * * *"
+  max_active_runs: 1
+  documentation:
+    dag_purpose: |
+      Incrementally materializes CDP Persona datasets every 30 minutes. During
+      batch-pipeline validation, each run reads the legacy stream-owned
+      datalake_cdp_clean.transactional table using ts_egw from load_start_date
+      through load_end_date, without Change Data Feed or streaming checkpoints.
+      It merges the latest event per user and persona, then reconciles those
+      signals with the matching historical persona snapshot. Overlapping runs
+      are safe because merges only apply when the source update timestamp is at
+      least as recent as the target.
+
+workflow:
+  layer: enrich
+  type: query_delta
+  custom_schema: cdp
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  execution_timeout_hours: 2
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=2)).strftime('%Y-%m-%d %H:00:00'), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, (data_interval_end + macros.timedelta(hours=1)).strftime('%Y-%m-%d %H:00:00'), 'load_end_date') }}"
+  inner_dependencies:
+    persona_events:
+      - stream_persona_events
+  tables_customization:
+    stream_persona_events:
+      extraction_type: incremental
+      merge_on: [id_persona_event]
+      when_matched_update_condition: source.ts_updated >= target.ts_updated
+      z_order_by: [persona, id_user, uuid_person, ts_updated]
+    persona_events:
+      extraction_type: incremental
+      merge_on: [id_persona_event]
+      when_matched_update_condition: source.ts_updated >= target.ts_updated
+      z_order_by: [persona, id_user, uuid_person, ts_updated]
+
+cluster:
+  type: emr_7_12_consolidation_s_memory_cluster
