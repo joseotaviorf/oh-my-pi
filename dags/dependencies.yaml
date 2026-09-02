@@ -1151,6 +1151,8 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-monopoly-revenue-share:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-rental-guarantee-invoice-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-rental-guarantee-invoice:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-broker-commission-reverse:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-broker-commission:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice-unified-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice-unified:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice:first-run-of-day
