@@ -15,7 +15,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 DATABRICKS_SCOPE = "quintoandar"
-JOB_NAME = "load_jira_ops_data_into_datalake_raw"
+JOB_NAME = "load_responders_account_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -119,7 +119,7 @@ if __name__ == "__main__":
         )
     )
 
-    loader = DeltaLoader()
+    loader = DeltaLoader(spark=spark)
     loader.load_table(
         table_name=f"{write_database_name}.{write_table_name}",
         path=f"{write_location}{write_table_name}",

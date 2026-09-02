@@ -181,7 +181,7 @@ if __name__ == "__main__":
             )
         )
 
-        loader = DeltaLoader()
+        loader = DeltaLoader(spark=spark)
         loader.load_table(
             table_name=f"{write_database_name}.{write_table_name}",
             path=f"{write_location}{write_table_name}",
