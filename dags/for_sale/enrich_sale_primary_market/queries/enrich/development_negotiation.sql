@@ -1,7 +1,8 @@
 -- Grain: one row per DevelopmentNegotiation.
 -- Visit house (id_house_shell) is the listing the visit was booked on.
--- Unit house (id_house) is DevelopmentTypologyUnit.imovel_id and is the house
--- on the Sales Flow offer. Match offer/flow on visit_external_id + unit house.
+-- Unit house (id_house) is DevelopmentTypologyUnit.imovel_id (EBDB Imovel).
+-- sales_flow.house_id is the Sales Flow house PK; Imovel is house.id_external.
+-- Match offer/flow on visit_external_id + that Imovel.
 -- id_sales_flow / offer attrs are the non-canceled latest flow (then latest
 -- offer) on that pair. ids_sales_flow is every flow id for the pair.
 WITH sales_flow_offer_candidates AS (
@@ -9,7 +10,7 @@ WITH sales_flow_offer_candidates AS (
         sf.id AS id_sales_flow,
         o.id AS id_offer,
         sf.id_visit_external,
-        sf.id_house,
+        h.id_external AS id_house,
         sf.flow_step,
         o.status AS offer_status,
         o.offer_price,
@@ -17,7 +18,7 @@ WITH sales_flow_offer_candidates AS (
         o.final_price,
         sf.ts_created AS ts_sales_flow_created,
         ROW_NUMBER() OVER (
-            PARTITION BY sf.id_visit_external, sf.id_house
+            PARTITION BY sf.id_visit_external, h.id_external
             ORDER BY
                 CASE
                     WHEN COALESCE(sf.is_canceled, FALSE) = FALSE THEN 0
@@ -31,9 +32,12 @@ WITH sales_flow_offer_candidates AS (
     INNER JOIN
         datalake_sales_flow_clean.offer AS o
             ON o.id_sales_flow = sf.id
+    INNER JOIN
+        datalake_sales_flow_clean.house AS h
+            ON h.id = sf.id_house
     WHERE
         sf.id_visit_external IS NOT NULL
-        AND sf.id_house IS NOT NULL
+        AND h.id_external IS NOT NULL
 ),
 sales_flow_offer AS (
     SELECT

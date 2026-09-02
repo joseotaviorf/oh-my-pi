@@ -54,11 +54,11 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.development_typology_unit.id_house
-    description: House id of the typology unit (offer or published apt), distinct from id_house_shell. Null when no unit is linked.
+    description: House id of the typology unit (EBDB Imovel.id / DevelopmentTypologyUnit.imovel_id), distinct from id_house_shell. Same identifier as datalake_sales_flow_clean.house.id_external, not sales_flow.house_id. Null when no unit is linked.
   id_offer:
     lineage:
       - datalake_sales_flow_clean.offer.id
-    description: Sales Flow offer.id linked when the flow visit and unit house match this negotiation. Null when visit or unit house is missing, or no matching flow exists. If several flows share the pair, the non-canceled latest flow (then latest offer) is kept. Numeric offer id, not Firestore.
+    description: Sales Flow offer.id linked when visit_external_id and house.id_external (Imovel) match this negotiation. Null when visit or unit house is missing, or no matching flow exists. If several flows share the pair, the non-canceled latest flow (then latest offer) is kept. Numeric offer id, not Firestore.
   id_sales_flow:
     lineage:
       - datalake_sales_flow_clean.sales_flow.id
@@ -66,7 +66,7 @@ columns:
   ids_sales_flow:
     lineage:
       - datalake_sales_flow_clean.sales_flow.id
-    description: Sorted array of every sales_flow.id that shares this negotiation visit and unit house, including canceled or older flows. Use to retrieve prior offers. Null when no flow matches. Distinct from id_sales_flow, which is only the latest.
+    description: Sorted array of every sales_flow.id that shares this negotiation visit and unit Imovel (house.id_external), including canceled or older flows. Use to retrieve prior offers. Null when no flow matches. Distinct from id_sales_flow, which is only the latest.
   id_development_typology:
     lineage:
       - datalake_ebdb_clean.development_typology_unit.id_development_typology
