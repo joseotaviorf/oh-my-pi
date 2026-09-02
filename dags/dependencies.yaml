@@ -1473,6 +1473,8 @@ bietlejuice.enrich_ai_collections_quintoandar:
   - bietlejuice.langfuse:load-clean-scores:first-run-of-day
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day
   - bietlejuice.request_logging:load-clean-collections:first-run-of-day
+bietlejuice.enrich_ai_usage:
+  - bietlejuice.claude_admin_api:load-clean-spend-limits:first-run-of-day
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated:first-run-of-day
 bietlejuice.enrich_alias:

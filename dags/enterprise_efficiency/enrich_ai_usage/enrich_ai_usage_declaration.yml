@@ -1,0 +1,15 @@
+dag:
+  name: enrich_ai_usage
+  owner: Tech Platform Enterprise Engineering
+  catchup: false
+  schedule_start_date: "2026, 9, 3"
+  documentation:
+    dag_purpose: |
+      Conforms AI-tool usage into a vendor-agnostic contract with no vendor-named
+      columns. Reads Claude usage from datalake_claude_usage_clean.
+
+workflow:
+  layer: enrich
+  type: query_delta
+  custom_schema: ai_usage
+  default_extraction_type: full
