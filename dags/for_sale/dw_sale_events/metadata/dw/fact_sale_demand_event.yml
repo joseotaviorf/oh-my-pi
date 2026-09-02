@@ -116,6 +116,14 @@ columns:
     - dw_sale.fact_visits.sk_listing_price_segment
     - dw_sale.fact_offers.sk_listing_price_segment
     description: Surrogate key of the listing price segment. Can be joined with dw_sale.dim_sale_price_segment.
+  sale_type:
+    lineage:
+    - dw_sale.fact_visits.sale_type
+    - dw_sale.fact_offers.sale_type
+    description: Market type associated with the demand-funnel event. Visit-derived events use the visit classification and offer-derived events use the offer classification. PRIMARY identifies a new-build unit and SECONDARY identifies a resale offer; NULL is preserved for unclassified source rows.
+    categories:
+      PRIMARY: Event associated with a Primary Market offer or visit.
+      SECONDARY: Event associated with a Secondary Market offer or visit.
   is_3p_supply:
     lineage:
     - dw_sale.fact_visits.is_3p_supply
