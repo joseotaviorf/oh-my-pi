@@ -7,11 +7,12 @@ description: >
   Grain is id_development_negotiation, not visit: one visit can spawn several
   negotiations when the buyer wants more than one apt. id_house_shell is the
   listing the visit was booked on. id_house is the typology-unit Imovel used
-  for the proposal or offer. id_offer and id_sales_flow come from Sales Flow
-  when visit + unit house match (one flow per pair: prefer not canceled, then
-  latest ts_created). is_published_unit is true when that unit has a
-  DevelopmentListingUnit row. Actor must be filtered (AGENT vs DEMAND) to
-  avoid broker inflation of pré-OS.
+  for the proposal or offer. id_offer, id_sales_flow, flow_step, offer prices
+  and offer_status are the latest Sales Flow on visit + unit house (prefer
+  not canceled, then latest ts_created). ids_sales_flow lists every flow id
+  on that pair so earlier offers remain reachable. is_published_unit is true
+  when that unit has a DevelopmentListingUnit row. Actor must be filtered
+  (AGENT vs DEMAND) to avoid broker inflation of pré-OS.
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_development_negotiation:
@@ -61,7 +62,11 @@ columns:
   id_sales_flow:
     lineage:
       - datalake_sales_flow_clean.sales_flow.id
-    description: Sales Flow wrapping that offer. Same pick rule as id_offer. Null when id_offer is null.
+    description: Sales Flow wrapping the latest matching offer. Null when id_offer is null.
+  ids_sales_flow:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id
+    description: Sorted array of every sales_flow.id that shares this negotiation visit and unit house, including canceled or older flows. Use to retrieve prior offers. Null when no flow matches. Distinct from id_sales_flow, which is only the latest.
   id_development_typology:
     lineage:
       - datalake_ebdb_clean.development_typology_unit.id_development_typology
@@ -89,6 +94,26 @@ columns:
     categories:
       AGENT: Negotiation recorded by or for a broker.
       DEMAND: Negotiation recorded by or for the buyer.
+  flow_step:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_step
+    description: High-level Sales Flow lifecycle of the latest matching flow (proposal, post-CCV, canceled, completed). Null when no flow matches. Same values as datalake_sales_flow_clean.sales_flow.flow_step.
+  offer_status:
+    lineage:
+      - datalake_sales_flow_clean.offer.status
+    description: Negotiation status of the latest matching offer (ongoing, accepted, rejected, validated, and related states). Null when no offer matches. Same values as datalake_sales_flow_clean.offer.status.
+  offer_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.offer_price
+    description: Price initially proposed by the buyer on the latest matching offer, in BRL. Null when no offer matches.
+  sale_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.sale_price
+    description: Listing price of the property at the time of the latest matching offer, in BRL. Null when no offer matches.
+  final_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.final_price
+    description: Final price agreed between buyer and seller on the latest matching offer, in BRL. Null when no offer matches or the deal has no agreed price yet.
   is_published_unit:
     lineage:
       - datalake_ebdb_clean.development_listing_unit.id
@@ -101,3 +126,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.development_negotiation.ts_updated
     description: Timestamp when the negotiation row was last updated in EBDB.
+  ts_sales_flow_created:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.ts_created
+    description: Timestamp when the latest matching sales flow was created. Null when no flow matches.
