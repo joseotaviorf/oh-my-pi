@@ -4,7 +4,6 @@
 -- id_house_shell is the listing Imovel the visit was booked on; offer house is minted.
 -- sales_flow.house_id is the Sales Flow house PK; Imovel is house.id_external.
 -- Latest flow prefers not canceled, then latest ts_created.
--- ids_sales_flow is every flow id for that Imovel.
 WITH sales_flow_offer_candidates AS (
     SELECT
         sf.id AS id_sales_flow,
@@ -42,7 +41,6 @@ sales_flow_offer AS (
         c.id_sales_flow,
         c.id_offer,
         c.id_house,
-        h.ids_sales_flow,
         c.flow_step,
         c.offer_status,
         c.offer_price,
@@ -51,16 +49,6 @@ sales_flow_offer AS (
         c.ts_sales_flow_created
     FROM
         sales_flow_offer_candidates AS c
-    INNER JOIN (
-        SELECT
-            id_house,
-            SORT_ARRAY(COLLECT_SET(id_sales_flow)) AS ids_sales_flow
-        FROM
-            sales_flow_offer_candidates
-        GROUP BY
-            id_house
-    ) AS h
-        ON h.id_house = c.id_house
     WHERE
         c._w = 1
 )
@@ -77,7 +65,6 @@ SELECT
     dtu.id_house,
     sfo.id_offer,
     sfo.id_sales_flow,
-    sfo.ids_sales_flow,
     dtu.id_development_typology,
     dlu.id AS id_development_listing_unit,
     dlu.id_listing_business_context,

@@ -11,8 +11,8 @@ description: >
   id_house_shell is the listing the visit was booked on. id_house is the
   typology-unit Imovel minted for the proposal or offer. Offer attrs come from
   Sales Flow on that Imovel (prefer not canceled, then latest ts_created).
-  ids_sales_flow lists every flow id on that Imovel. is_published_unit is true
-  when that unit has a DevelopmentListingUnit row. Actor must be filtered
+  is_published_unit is true when that unit has a DevelopmentListingUnit row.
+  Actor must be filtered
   (AGENT vs DEMAND) to avoid broker inflation of pré-OS.
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -64,10 +64,6 @@ columns:
     lineage:
       - datalake_sales_flow_clean.sales_flow.id
     description: Sales Flow wrapping the latest matching offer. Null when id_offer is null.
-  ids_sales_flow:
-    lineage:
-      - datalake_sales_flow_clean.sales_flow.id
-    description: Sorted array of every sales_flow.id for this unit Imovel (house.id_external), including canceled or older flows. Null when no flow matches. Distinct from id_sales_flow, which is only the latest.
   id_development_typology:
     lineage:
       - datalake_ebdb_clean.development_typology_unit.id_development_typology
