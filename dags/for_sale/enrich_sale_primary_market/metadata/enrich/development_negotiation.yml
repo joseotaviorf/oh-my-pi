@@ -8,7 +8,7 @@ description: >
   Imovel (id_house = house.id_external). id_visit is an attribute on the
   negotiation, not a matching requirement for offer or flow. One visit can
   spawn several negotiations when the buyer wants more than one apt.
-  id_house_shell is the listing the visit was booked on. id_house is the
+  id_house_development is the listing the visit was booked on. id_house is the
   typology-unit Imovel minted for the proposal or offer. Offer attrs come from
   Sales Flow on that Imovel (prefer not canceled, then latest ts_created).
   is_published_unit is true when that unit has a DevelopmentListingUnit row.
@@ -28,7 +28,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.development_negotiation.id_visit
     description: Visit stored on the negotiation as origin context, not used to match Sales Flow. Several negotiations may share the same visit when two apts are proposed after one visit. Null if the negotiation has no visit yet.
-  id_house_shell:
+  id_house_development:
     lineage:
       - datalake_ebdb_clean.visit.id_house
     description: House id of the listing the visit was booked on. Visits stay on this listing Imovel; they are not booked on the minted offer house. Distinct from id_house. Null when id_visit is null or the visit row is missing.
@@ -55,7 +55,7 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.development_typology_unit.id_house
-    description: House id of the typology unit (EBDB Imovel.id / DevelopmentTypologyUnit.imovel_id), distinct from id_house_shell. Same identifier as datalake_sales_flow_clean.house.id_external, not sales_flow.house_id. One negotiation has one unit Imovel; a later offer on the same physical apt mints a new Imovel and a new negotiation. Null when no unit is linked.
+    description: House id of the typology unit (EBDB Imovel.id / DevelopmentTypologyUnit.imovel_id), distinct from id_house_development. Same identifier as datalake_sales_flow_clean.house.id_external, not sales_flow.house_id. One negotiation has one unit Imovel; a later offer on the same physical apt mints a new Imovel and a new negotiation. Null when no unit is linked.
   id_offer:
     lineage:
       - datalake_sales_flow_clean.offer.id

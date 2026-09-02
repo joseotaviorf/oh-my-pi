@@ -1,7 +1,7 @@
 -- Grain: one row per DevelopmentNegotiation.
 -- Strong key to Sales Flow is unit house (id_house = DTU.imovel_id = house.id_external).
 -- id_visit is payload on the negotiation, not a join predicate to offer/flow.
--- id_house_shell is the listing Imovel the visit was booked on; offer house is minted.
+-- id_house_development is the listing Imovel the visit was booked on; offer house is minted.
 -- sales_flow.house_id is the Sales Flow house PK; Imovel is house.id_external.
 -- Latest flow prefers not canceled, then latest ts_created.
 WITH sales_flow_offer_candidates AS (
@@ -56,7 +56,7 @@ SELECT
     n.id AS id_development_negotiation,
     n.id_development,
     n.id_visit,
-    v.id_house AS id_house_shell,
+    v.id_house AS id_house_development,
     v.id_visitor,
     n.id_demand,
     n.id_agent,
