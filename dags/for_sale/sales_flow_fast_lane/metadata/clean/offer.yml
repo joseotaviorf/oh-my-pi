@@ -66,6 +66,13 @@ columns:
       OFFER_ONGOING: The negotiation started and is ongoing.
       NEGOTIATION_OUT_OF_5A: The negotiation is not being handled by 5A.
       DEFAULT: The offer was not seen yet. Usually the first time it was created or recovered.
+  sale_type:
+    description: Market type of the offer as persisted by Sales Flow. PRIMARY is a new-build (Mercado Primário) unit offer; SECONDARY is resale. Null on rows created before the source column existed. This is the offer-grain discriminator, not listing ListingSaleModel.saleType.
+    lineage:
+      - datalake_sales_flow_raw.offer.sale_type
+    categories:
+      PRIMARY: Offer for a Primary Market (new-build) unit.
+      SECONDARY: Offer for a Secondary Market (resale) listing.
   actor_type:
     description: Type of actor who submitted the offer. Null when the buyer submitted directly; AGENT when a corretor submitted on behalf of the buyer via the "offer submission by agent" feature. Use together with uuid_actor to identify agent-submitted offers.
     lineage:
