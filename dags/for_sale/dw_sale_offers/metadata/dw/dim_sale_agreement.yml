@@ -10,6 +10,13 @@ columns:
     lineage:
     - datalake_sale_offer.sale_offer.id_offer
     description: Offer unique identifier.
+  sale_type:
+    lineage:
+    - datalake_sale_offer.sale_offer.sale_type
+    description: Market type of the offer associated with the sale agreement. PRIMARY identifies a new-build unit offer and SECONDARY identifies a resale offer. NULL is preserved when the upstream offer has no classification.
+    categories:
+      PRIMARY: Sale agreement for a Primary Market (new-build) unit.
+      SECONDARY: Sale agreement for a Secondary Market (resale) listing.
   ccv_type:
     lineage:
       - datalake_sale_offer.sale_offer.ccv_type

@@ -109,6 +109,7 @@ WITH taxonomy_min_ids AS (
 )
 SELECT
   eso.id_offer AS sk_offer,
+  eso.sale_type,
   eso.offer_status,
   eso.drop_reason,
   eso.drop_reason_responsible,

@@ -15,6 +15,13 @@ columns:
     lineage:
     - datalake_sale_offer.sale_offer.id_offer
     description: Surrogate key of the offer (hash ID from Firestore for legacy offers). Primary key and join key to dw_sale.fact_offers, dw_sale.dim_sale_agreement, and dw_sale.fact_closing_flows.
+  sale_type:
+    lineage:
+    - datalake_sale_offer.sale_offer.sale_type
+    description: Market type of the offer. PRIMARY identifies a new-build unit offer and SECONDARY identifies a resale offer. NULL is preserved when the upstream offer has no classification.
+    categories:
+      PRIMARY: Offer for a Primary Market (new-build) unit.
+      SECONDARY: Offer for a Secondary Market (resale) listing.
   offer_status:
     lineage:
     - datalake_sale_offer.sale_offer.offer_status

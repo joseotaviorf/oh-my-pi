@@ -1,5 +1,6 @@
 SELECT
     eso.id_offer AS sk_offer,
+    eso.sale_type,
     eso.ccv_type,
     eso.sale_agreement_status,
     eso.offer_flow,
