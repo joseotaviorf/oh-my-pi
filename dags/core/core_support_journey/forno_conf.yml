@@ -20,25 +20,22 @@ dependencies:
       - dlq_events_case
       - load_datalake_salesforce_clean_events_user
   bietlejuice.bigfone:
-    is_daily: true
-    execution_hour: 0
+    is_daily: false
     tasks:
       - load-clean-event
   bietlejuice.quinto_messenger:
-    is_daily: true
-    execution_hour: 0
+    is_daily: false
     tasks:
       - load-clean-channel
       - load-clean-chat
       - load-clean-task
+      - load-clean-task-event
   bietlejuice.sauron:
-    is_daily: true
-    execution_hour: 0
+    is_daily: false
     tasks:
       - load-clean-session
   bietlejuice.support_session_service:
-    is_daily: true
-    execution_hour: 0
+    is_daily: false
     tasks:
       - load-clean-support-session
 

@@ -14,7 +14,7 @@ sources:
     delta_hours: 72
   bigfone_event:
     table_name: "datalake_bigfone_clean.event"
-    delta_hours: 24
+    delta_hours: 1
   qm_channel:
     table_name: "datalake_quinto_messenger_clean.channel"
     delta_hours: 72
@@ -23,7 +23,7 @@ sources:
     delta_hours: 72
   qm_task:
     table_name: "datalake_quinto_messenger_clean.task"
-    delta_hours: 24
+    delta_hours: 1
   qm_task_event:
     table_name: "datalake_quinto_messenger_clean.task_event"
     delta_hours: 72

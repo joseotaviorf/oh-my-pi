@@ -103,41 +103,68 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
     def build_ts_filter(
         self,
         partition_date: str,
-        delta_hours: int = -80,
+        delta_hours: int = 1,
         col: Optional[str] = None,
+        partition_hour: Optional[str] = None,
     ):
         """
-        Build a half-open timestamp filter on ``col`` anchored at
-        ``partition_date`` 00:00 UTC and extended by signed ``delta_hours``.
+        Build a half-open timestamp filter on ``col`` covering
+        ``abs(delta_hours)`` ending at the DAG partition hour.
 
-        The window is bounded by the anchor (``partition_date`` 00:00 UTC) and
-        the anchor shifted by ``delta_hours``. A negative ``delta_hours`` places
-        the window before the anchor; a positive one places it after. The lower
-        bound is inclusive and the upper bound is exclusive
-        (``min_ts <= col < max_ts``).
+        The anchor is ``partition_date`` + ``partition_hour`` (``00`` when the
+        hour is omitted). The exclusive upper bound is the anchor; the
+        inclusive lower bound is the anchor minus ``abs(delta_hours)``.
+        The predicate is ``min_ts <= col < max_ts``.
 
         Examples
         --------
-        delta_hours = 80:
-            min_ts = partition_date 00:00
-            max_ts = partition_date 00:00 + 80h
+        partition_hour = 14, delta_hours = 1:
+            min_ts = partition_date 13:00
+            max_ts = partition_date 14:00
 
-        delta_hours = -80:
-            min_ts = partition_date 00:00 - 80h
-            max_ts = partition_date 00:00
+        partition_hour = 14, delta_hours = 72:
+            min_ts = (partition_date 14:00) - 72h
+            max_ts = partition_date 14:00
         """
-        partition = datetime.strptime(partition_date, "%Y-%m-%d").replace(
-            tzinfo=timezone.utc
+        hour = int(partition_hour) if partition_hour is not None else 0
+        anchor = datetime.strptime(partition_date, "%Y-%m-%d").replace(
+            hour=hour, tzinfo=timezone.utc
         )
-        delta_partition = partition + timedelta(hours=delta_hours)
-
-        min_dt = min(partition, delta_partition)
-        max_dt = max(partition, delta_partition)
+        max_dt = anchor
+        min_dt = max_dt - timedelta(hours=abs(delta_hours))
 
         min_ts = min_dt.isoformat(timespec="milliseconds")
         max_ts = max_dt.isoformat(timespec="milliseconds")
 
         return (F.col(col) >= F.lit(min_ts)) & (F.col(col) < F.lit(max_ts))
+
+    def _written_partition(
+        self,
+        partition_date: str,
+        partition_hour: Optional[str] = None,
+    ):
+        """
+        Return the ``(partition_date, partition_hour)`` this run writes.
+
+        Event rows are filtered to ``[anchor - lookback, anchor)`` and
+        partitioned from ``ts_task_updated``, so they land in the hour
+        before the DAG partition hour. The skip must check this output
+        partition — not the DAG hour — otherwise a later hour's write
+        (which lands *in* the DAG hour) would make a re-run skip.
+        """
+        hour = int(partition_hour) if partition_hour is not None else 0
+        written = datetime.strptime(partition_date, "%Y-%m-%d").replace(
+            hour=hour, tzinfo=timezone.utc
+        ) - timedelta(hours=1)
+        return written.strftime("%Y-%m-%d"), written.strftime("%H")
+
+    def _source_ts_filter(self, source: Dict[str, Any], col: str):
+        return self.build_ts_filter(
+            self.cfg.partition_date,
+            delta_hours=source["delta_hours"],
+            col=col,
+            partition_hour=self.cfg.partition_hour,
+        )
 
     def _build_call_events_df(
         self,
@@ -156,9 +183,8 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         call_event_df = (
             spark.table(bigfone_table)
             .where(
-                self.build_ts_filter(
-                    self.cfg.partition_date,
-                    delta_hours=-sources["bigfone_event"]["delta_hours"],
+                self._source_ts_filter(
+                    sources["bigfone_event"],
                     col="ts_cdc_transaction",
                 )
             )
@@ -251,9 +277,8 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         qm_task_event_table: str,
     ) -> DataFrame:
 
-        chat_filter = self.build_ts_filter(
-            self.cfg.partition_date,
-            delta_hours=-sources["qm_task_event"]["delta_hours"],
+        chat_filter = self._source_ts_filter(
+            sources["qm_task_event"],
             col="ts_updated",
         )
 
@@ -327,9 +352,8 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         task_df = (
             spark.table(qm_task_table)
             .where(
-                self.build_ts_filter(
-                    self.cfg.partition_date,
-                    delta_hours=-sources["qm_task"]["delta_hours"],
+                self._source_ts_filter(
+                    sources["qm_task"],
                     col="ts_updated",
                 )
             )
@@ -508,9 +532,8 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             .when(F.col("source").isin(CHAT_SOURCES), F.lit("chat"))
             .otherwise(F.lit(None))
         )
-        ts_filter = self.build_ts_filter(
-            self.cfg.partition_date,
-            delta_hours=-sources["support_session"]["delta_hours"],
+        ts_filter = self._source_ts_filter(
+            sources["support_session"],
             col="ts_updated",
         )
 
@@ -632,32 +655,30 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         schema_column_names = list(expected_schema.keys())
 
         if not self.table_spec.get("is_backfill_run", False):
-            previous_partition_date = (
-                datetime.strptime(self.cfg.partition_date, "%Y-%m-%d")
-                - timedelta(hours=24)
-            ).strftime("%Y-%m-%d")
-
+            written_date, written_hour = self._written_partition(
+                self.cfg.partition_date,
+                self.cfg.partition_hour,
+            )
             if partition_has_data(
                 spark,
                 target_full_table_name,
-                previous_partition_date,
-                None,
+                written_date,
+                written_hour,
             ):
                 self.logger.info(
                     "m=create_core_model, "
-                    f"msg=Partition {self.cfg.partition_date} already exists in "
+                    f"msg=Partition {written_date} "
+                    f"{written_hour} already exists in "
                     f"{target_full_table_name}"
                 )
                 return
 
-        bigfone_events_ts_filter = self.build_ts_filter(
-            self.cfg.partition_date,
-            delta_hours=-sources["bigfone_event"]["delta_hours"],
+        bigfone_events_ts_filter = self._source_ts_filter(
+            sources["bigfone_event"],
             col="ts_cdc_transaction",
         )
-        qm_tasks_ts_filter = self.build_ts_filter(
-            self.cfg.partition_date,
-            delta_hours=-sources["qm_task"]["delta_hours"],
+        qm_tasks_ts_filter = self._source_ts_filter(
+            sources["qm_task"],
             col="ts_updated",
         )
 
@@ -669,12 +690,15 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         )
 
         if bigfone_events_df.isEmpty() and qm_tasks_df.isEmpty():
-            raise ValueError(
-                "No service event rows found in "
-                f"{sources['bigfone_event']['table_name']} ON filter {bigfone_events_ts_filter} "
-                f"{sources['qm_task']['table_name']} ON filter {qm_tasks_ts_filter} "
-                f"partition_date={self.cfg.partition_date}"
+            self.logger.warning(
+                "m=create_core_model, "
+                "msg=No service event rows found in "
+                f"{sources['bigfone_event']['table_name']} or "
+                f"{sources['qm_task']['table_name']} for partition "
+                f"(partition_date={self.cfg.partition_date}, "
+                f"partition_hour={self.cfg.partition_hour}); skipping"
             )
+            return
 
         target_df = self._build_target_df(spark, sources)
         if _table_exists(spark, target_full_table_name):

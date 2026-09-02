@@ -1,7 +1,7 @@
 """Unit tests for SupportJourneyServicesCoreModelPipeline (services table)."""
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -99,29 +99,36 @@ class TestSupportJourneyServicesCoreModelPipelineInit:
 
 class TestSupportJourneyServicesBuildTsFilter:
     @pytest.mark.parametrize(
-        "partition_date, delta_hours, expected_min, expected_max",
+        "partition_date, partition_hour, delta_hours, expected_min, expected_max",
         [
-            # build_ts_filter anchors the window at partition_date 00:00 UTC and
-            # shifts it by signed delta_hours. A negative delta places the
-            # half-open window before the anchor (processing whole prior days);
-            # a positive delta places it after.
+            # Window is [hour - lookback, hour). Bounds are UTC.
             (
                 "2026-05-27",
-                -24,
-                "2026-05-26T00:00:00.000+00:00",
+                "14",
+                1,
+                "2026-05-27T13:00:00.000+00:00",
+                "2026-05-27T14:00:00.000+00:00",
+            ),
+            (
+                "2026-05-27",
+                "14",
+                72,
+                "2026-05-24T14:00:00.000+00:00",
+                "2026-05-27T14:00:00.000+00:00",
+            ),
+            (
+                "2026-05-27",
+                "00",
+                1,
+                "2026-05-26T23:00:00.000+00:00",
                 "2026-05-27T00:00:00.000+00:00",
             ),
             (
                 "2026-05-27",
-                -72,
-                "2026-05-24T00:00:00.000+00:00",
-                "2026-05-27T00:00:00.000+00:00",
-            ),
-            (
-                "2026-05-27",
-                80,
-                "2026-05-27T00:00:00.000+00:00",
-                "2026-05-30T08:00:00.000+00:00",
+                "23",
+                1,
+                "2026-05-27T22:00:00.000+00:00",
+                "2026-05-27T23:00:00.000+00:00",
             ),
         ],
     )
@@ -129,13 +136,17 @@ class TestSupportJourneyServicesBuildTsFilter:
         self,
         pipeline_with_spec,
         partition_date,
+        partition_hour,
         delta_hours,
         expected_min,
         expected_max,
     ):
         # act
         ts_filter = pipeline_with_spec.build_ts_filter(
-            partition_date, delta_hours=delta_hours, col="ts_event"
+            partition_date,
+            delta_hours=delta_hours,
+            col="ts_event",
+            partition_hour=partition_hour,
         )
 
         # assert: build_ts_filter returns a half-open Spark filter
@@ -145,17 +156,77 @@ class TestSupportJourneyServicesBuildTsFilter:
         assert expected_min in filter_str
         assert expected_max in filter_str
 
-    def test_negative_delta_processes_previous_day(self, pipeline_with_spec):
+    def test_one_hour_delta_covers_previous_hour(self, pipeline_with_spec):
         # act
         ts_filter = pipeline_with_spec.build_ts_filter(
-            "2026-05-27", delta_hours=-24, col="ts_event"
+            "2026-05-27",
+            delta_hours=1,
+            col="ts_event",
+            partition_hour="14",
         )
 
-        # assert: a -24h delta yields the full previous day window,
-        # [previous_day 00:00, partition_date 00:00).
+        # assert: a 1h lookback from hour 14 yields [13:00, 14:00).
         filter_str = str(ts_filter)
-        assert "2026-05-26T00:00:00.000+00:00" in filter_str
+        assert "2026-05-27T13:00:00.000+00:00" in filter_str
+        assert "2026-05-27T14:00:00.000+00:00" in filter_str
+
+    def test_omitted_partition_hour_defaults_to_midnight(self, pipeline_with_spec):
+        # act
+        ts_filter = pipeline_with_spec.build_ts_filter(
+            "2026-05-27", delta_hours=1, col="ts_event"
+        )
+
+        # assert: hour defaults to 00, so a 1h lookback is the last hour of
+        # the previous calendar day.
+        filter_str = str(ts_filter)
+        assert "2026-05-26T23:00:00.000+00:00" in filter_str
         assert "2026-05-27T00:00:00.000+00:00" in filter_str
+
+    def test_source_ts_filter_uses_cfg_hour_and_yaml_delta(
+        self, pipeline_with_spec, cfg
+    ):
+        # act
+        ts_filter = pipeline_with_spec._source_ts_filter(
+            pipeline_with_spec.table_spec["sources"]["bigfone_event"],
+            col="ts_cdc_transaction",
+        )
+
+        # assert: cfg hour is 14 and yaml delta_hours is 1 → [13:00, 14:00)
+        filter_str = str(ts_filter)
+        assert "2026-05-27T13:00:00.000+00:00" in filter_str
+        assert "2026-05-27T14:00:00.000+00:00" in filter_str
+        assert cfg.partition_hour == "14"
+
+
+class TestSupportJourneyServicesWrittenPartition:
+    @pytest.mark.parametrize(
+        "partition_date, partition_hour, expected_date, expected_hour",
+        [
+            # Event window is [hour - 1, hour); rows land in the previous hour.
+            ("2026-05-27", "14", "2026-05-27", "13"),
+            ("2026-05-27", "01", "2026-05-27", "00"),
+            ("2026-05-27", "10", "2026-05-27", "09"),
+            # Midnight rolls back to 23:00 of the previous calendar day.
+            ("2026-05-27", "00", "2026-05-26", "23"),
+            ("2026-05-27", None, "2026-05-26", "23"),
+        ],
+    )
+    def test_written_partition_is_the_hour_rows_land_in(
+        self,
+        pipeline_with_spec,
+        partition_date,
+        partition_hour,
+        expected_date,
+        expected_hour,
+    ):
+        # act
+        written_date, written_hour = pipeline_with_spec._written_partition(
+            partition_date, partition_hour
+        )
+
+        # assert
+        assert written_date == expected_date
+        assert written_hour == expected_hour
 
 
 class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
@@ -171,24 +242,50 @@ class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
         # act
         pipeline.create_core_model(spark)
 
-        # assert: the existence check is anchored on the previous partition
-        # day (partition_date - 24h), not on partition_date itself.
-        previous_partition_date = (
-            datetime.strptime(cfg.partition_date, "%Y-%m-%d") - timedelta(hours=24)
-        ).strftime("%Y-%m-%d")
+        # assert: skip the hour this run actually writes (hour 14 reads
+        # [13:00, 14:00) partitioned by ts_task_updated → partition 13).
+        # Checking the DAG hour would miss this run's output and would skip
+        # a rebuild after a later hour (15) writes into partition 14.
         mock_partition_has_data.assert_called_once_with(
             spark,
             "core_support_journey.services",
-            previous_partition_date,
-            None,
+            "2026-05-27",
+            "13",
         )
         spark.table.assert_not_called()
 
     @mock.patch.object(services_module, "partition_has_data")
-    def test_raises_when_event_sources_are_empty(
+    def test_skip_checks_previous_day_when_dag_hour_is_midnight(
         self, mock_partition_has_data, cfg, pipeline_with_spec
     ):
-        # arrange
+        # arrange: hour 00 writes [previous day 23:00, 00:00).
+        cfg.partition_hour = "00"
+        spark = mock.MagicMock()
+        mock_partition_has_data.return_value = True
+
+        # act
+        pipeline_with_spec.create_core_model(spark)
+
+        # assert
+        mock_partition_has_data.assert_called_once_with(
+            spark,
+            "core_support_journey.services",
+            "2026-05-26",
+            "23",
+        )
+        spark.table.assert_not_called()
+
+    @mock.patch.object(
+        services_module.SupportJourneyServicesCoreModelPipeline, "_build_target_df"
+    )
+    @mock.patch.object(services_module, "partition_has_data")
+    def test_returns_when_event_sources_are_empty(
+        self, mock_partition_has_data, mock_build_target_df, cfg, pipeline_with_spec
+    ):
+        # arrange: a quiet hour (overnight / holiday) has no Bigfone calls
+        # and no QM task updates. Raising here would fail the Airflow task
+        # and, with depends_on_past, block every later hour — same skip
+        # cases already uses for an empty partition.
         spark = mock.MagicMock()
         empty_df = mock.MagicMock()
         empty_df.isEmpty.return_value = True
@@ -198,12 +295,13 @@ class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
         mock_partition_has_data.return_value = False
         pipeline = pipeline_with_spec
 
-        # act / assert
-        with pytest.raises(ValueError, match="No service event rows found"):
-            pipeline.create_core_model(spark)
+        # act
+        pipeline.create_core_model(spark)
 
+        # assert
         assert spark.table.call_count == 2
         empty_df.isEmpty.assert_called()
+        mock_build_target_df.assert_not_called()
 
     @mock.patch.object(services_module, "DataFrameDeltaTableLoaderPipeline")
     @mock.patch.object(services_module, "SchemaValidator")
@@ -472,7 +570,7 @@ class TestSupportJourneyServicesQueueAttribution:
                     "C1",  # id_chat
                     "SS1",  # id_session (matches session join_key)
                     '{"channel_type": "web"}',  # attributes
-                    datetime(2026, 5, 26, 9, 0, 0),  # ts_updated
+                    datetime(2026, 5, 27, 13, 10, 0, tzinfo=timezone.utc),  # ts_updated
                 ),
             ],
             _CHAT_SCHEMA,
@@ -503,15 +601,17 @@ class TestSupportJourneyServicesQueueAttribution:
                     False,  # is_forwarded
                     False,  # is_per_team_task
                     False,  # is_spoc_task
-                    datetime(2026, 5, 26, 12, 0, 0),  # ts_cdc_transaction
+                    datetime(
+                        2026, 5, 27, 13, 20, 0, tzinfo=timezone.utc
+                    ),  # ts_cdc_transaction
                     None,  # task_attributes
                     None,  # id_source_ctwa
                     None,  # url_source_ctwa
                     None,  # type_source_ctwa
                     0,  # total_inactivity_time
                     0,  # last_inactivity_time
-                    datetime(2026, 5, 26, 8, 0, 0),  # ts_created
-                    datetime(2026, 5, 26, 12, 0, 0),  # ts_updated
+                    datetime(2026, 5, 27, 13, 0, 0, tzinfo=timezone.utc),  # ts_created
+                    datetime(2026, 5, 27, 13, 20, 0, tzinfo=timezone.utc),  # ts_updated
                 ),
             ],
             _TASK_SCHEMA,
@@ -543,8 +643,8 @@ class TestSupportJourneyServicesQueueAttribution:
         # arrange: the alphabetically greatest queue ("zeta_queue") is the
         # OLDER event; the most recent event routes to "alpha_queue".
         task_event_rows = [
-            ("T1", "zeta_queue", datetime(2026, 5, 25, 10, 0, 0)),
-            ("T1", "alpha_queue", datetime(2026, 5, 26, 10, 0, 0)),
+            ("T1", "zeta_queue", datetime(2026, 5, 25, 10, 0, 0, tzinfo=timezone.utc)),
+            ("T1", "alpha_queue", datetime(2026, 5, 26, 10, 0, 0, tzinfo=timezone.utc)),
         ]
 
         # act
@@ -562,9 +662,9 @@ class TestSupportJourneyServicesQueueAttribution:
         # the latest NON-null queue wins. The skipped older event also carries
         # the alphabetically greatest name, so F.max would mis-attribute it.
         task_event_rows = [
-            ("T1", "zeta_queue", datetime(2026, 5, 25, 10, 0, 0)),
-            ("T1", "alpha_queue", datetime(2026, 5, 26, 10, 0, 0)),
-            ("T1", None, datetime(2026, 5, 26, 23, 0, 0)),
+            ("T1", "zeta_queue", datetime(2026, 5, 25, 10, 0, 0, tzinfo=timezone.utc)),
+            ("T1", "alpha_queue", datetime(2026, 5, 26, 10, 0, 0, tzinfo=timezone.utc)),
+            ("T1", None, datetime(2026, 5, 26, 23, 0, 0, tzinfo=timezone.utc)),
         ]
 
         # act

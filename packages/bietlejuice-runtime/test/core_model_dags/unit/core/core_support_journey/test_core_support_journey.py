@@ -97,6 +97,7 @@ class TestCreateLoadTableTask:
         mock_engine.create_spark_python_task.assert_called_once()
         call_kwargs = mock_engine.create_spark_python_task.call_args.kwargs
         assert call_kwargs["task_id"] == "load_core_support_journey_cases"
+        assert call_kwargs["execution_timeout_hours"] == 2
         assert "core_model/support_journey/cases.py" in call_kwargs["spark_job_path"]
 
         job_parameters = call_kwargs["job_parameters"]
