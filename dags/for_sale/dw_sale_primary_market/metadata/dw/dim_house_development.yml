@@ -1,0 +1,111 @@
+---
+database_name: dw_sale_primary_market
+table_name: dim_house_development
+domain: For Sale
+description: DW-layer evolution of enrich house_development. One row per house that belongs to a development, denormalizing Development/DevelopmentTypology attributes plus the house's region and city_group onto the house grain, so consumers don't need to join house/region themselves.
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_sale_primary_market.house_development.id_house
+    description: Unique identifier of the house (Imovel) linked to a development.
+  id_development:
+    lineage:
+      - datalake_sale_primary_market.house_development.id_development
+    description: Development the house belongs to.
+  id_development_typology:
+    lineage:
+      - datalake_sale_primary_market.house_development.id_development_typology
+    description: Typology (floor plan) the house belongs to. Resolved from the offer-created unit when present, otherwise from the typology shell listing.
+  development_name:
+    lineage:
+      - datalake_sale_primary_market.house_development.development_name
+    description: Name of the development/empreendimento.
+  construction_status:
+    lineage:
+      - datalake_sale_primary_market.house_development.construction_status
+    description: Construction stage of the development (e.g. launch, under construction, ready).
+  provider:
+    lineage:
+      - datalake_sale_primary_market.house_development.provider
+    description: External inventory provider the development's data was sourced from (e.g. Orulo).
+  postal_code:
+    lineage:
+      - datalake_sale_primary_market.house_development.postal_code
+    description: Postal code of the development's address.
+  street:
+    lineage:
+      - datalake_sale_primary_market.house_development.street
+    description: Street name of the development's address.
+  street_number:
+    lineage:
+      - datalake_sale_primary_market.house_development.street_number
+    description: Street number of the development's address.
+  neighborhood:
+    lineage:
+      - datalake_sale_primary_market.house_development.neighborhood
+    description: Neighborhood of the development's address.
+  city:
+    lineage:
+      - datalake_sale_primary_market.house_development.city
+    description: City of the development's address.
+  state:
+    lineage:
+      - datalake_sale_primary_market.house_development.state
+    description: State of the development's address.
+  latitude:
+    lineage:
+      - datalake_sale_primary_market.house_development.latitude
+    description: Latitude of the development's location.
+  longitude:
+    lineage:
+      - datalake_sale_primary_market.house_development.longitude
+    description: Longitude of the development's location.
+  typology_type:
+    lineage:
+      - datalake_sale_primary_market.house_development.typology_type
+    description: Typology's property type (e.g. apartment, house, studio, loft).
+  bedrooms:
+    lineage:
+      - datalake_sale_primary_market.house_development.bedrooms
+    description: Number of bedrooms in the typology.
+  bathrooms:
+    lineage:
+      - datalake_sale_primary_market.house_development.bathrooms
+    description: Number of bathrooms in the typology.
+  suites:
+    lineage:
+      - datalake_sale_primary_market.house_development.suites
+    description: Number of suites in the typology.
+  parking_spaces:
+    lineage:
+      - datalake_sale_primary_market.house_development.parking_spaces
+    description: Number of parking spaces in the typology.
+  total_area:
+    lineage:
+      - datalake_sale_primary_market.house_development.total_area
+    description: Total area (m²) of the typology.
+  amenities:
+    lineage:
+      - datalake_sale_primary_market.house_development.amenities
+    description: Distinct set of amenity types available in the development (e.g. pool, gym, sauna).
+  typology_attributes:
+    lineage:
+      - datalake_sale_primary_market.house_development.typology_attributes
+    description: Distinct set of special attributes of the typology (e.g. cobertura, duplex, triplex, jardim).
+  active_contact_uuid_person:
+    lineage:
+      - datalake_sale_primary_market.house_development.active_contact_uuid_person
+    description: Person UUID of the development's current active contact (gestor ativo).
+  active_contact_status:
+    lineage:
+      - datalake_sale_primary_market.house_development.active_contact_status
+    description: Lifecycle status of the active contact assignment (ACTIVE/INACTIVE).
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: Region id of the house's own EBDB record. Native house attribute, independent of any offer. Null when the house has no region assigned.
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+    description: City group of the house's region, resolved via id_region. Null when id_region is null or has no matching region row.

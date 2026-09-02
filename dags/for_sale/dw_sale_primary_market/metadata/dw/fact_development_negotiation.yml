@@ -1,0 +1,144 @@
+---
+database_name: dw_sale_primary_market
+table_name: fact_development_negotiation
+domain: For Sale
+description: >
+  DW-layer evolution of enrich development_negotiation. One row per primary-market
+  pré-OS negotiation, with city_group, hub, and EN (negotiation executive / Deal
+  Maker) added so consumers don't join house/region/offer/offer_specialists
+  themselves. EN and hub are LEFT JOINs on the offer: pré-OS negotiations that
+  have not reached an offer yet have no id_offer, so these three stay null, same
+  as the enrich table's own offer attributes (id_sales_flow, flow_step, etc.).
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_development_negotiation:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_development_negotiation
+    description: Primary key of the pré-OS negotiation event in EBDB DevelopmentNegotiation.
+  id_development:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_development
+    description: Empreendimento this negotiation belongs to. Native on the negotiation, not inferred from the visit house.
+  id_visit:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_visit
+    description: Visit stored on the negotiation as origin context, not used to match Sales Flow. Null if the negotiation has no visit yet.
+  id_house_development:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_house_development
+    description: House id of the listing the visit was booked on. Visits stay on this listing Imovel; they are not booked on the minted offer house. Distinct from id_house. Null when id_visit is null or the visit row is missing.
+  id_visitor:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_visitor
+    description: Platform user who is the visitor on the linked visit. Null when there is no visit row.
+  id_demand:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_demand
+    description: Demand-side user on the negotiation when actor is DEMAND. Null for agent-led events.
+  id_agent:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_agent
+    description: Agent on the negotiation when actor is AGENT. Null for demand-led events. Not the visit agent unless they coincide.
+  id_development_negotiation_unit:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_development_negotiation_unit
+    description: DevelopmentNegotiationUnit link for this negotiation. Null when no unit is attached yet.
+  id_development_typology_unit:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_development_typology_unit
+    description: Concrete typology unit (apto) under this negotiation. Imovel on this row is the house Sales Flow uses for the offer.
+  id_house:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_house
+    description: House id of the typology unit (EBDB Imovel.id / DevelopmentTypologyUnit.imovel_id), distinct from id_house_development. One negotiation has one unit Imovel. Null when no unit is linked.
+  id_offer:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_offer
+    description: Sales Flow offer.id linked only when house.id_external equals this negotiation unit Imovel. Null when the unit house is missing or no matching flow exists.
+  id_sales_flow:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_sales_flow
+    description: Sales Flow wrapping the latest matching offer. Null when id_offer is null.
+  id_development_typology:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_development_typology
+    description: Floor-plan typology of the unit house. Join key to development_typology and to the shell listing of the same mold.
+  id_development_listing_unit:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_development_listing_unit
+    description: ListingUnit row when this unit is published on the catalog. Null means offer-only unit (not a vitrine listing).
+  id_listing_business_context:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_listing_business_context
+    description: SALE listing business context of the published unit, when ListingUnit exists. Not the shell listing LBC.
+  id_development_contact:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.id_development_contact
+    description: Current development contact FK from the empreendimento (gestor). Not a history of contacts.
+  uuid_event:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.uuid_event
+    description: Idempotency UUID of the event that created this negotiation in the Development domain.
+  actor:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.actor
+    description: Who opened the pré-OS. AGENT is broker-created; DEMAND is buyer-created.
+    categories:
+      AGENT: Negotiation recorded by or for a broker.
+      DEMAND: Negotiation recorded by or for the buyer.
+  flow_step:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.flow_step
+    description: High-level Sales Flow lifecycle of the latest matching flow (proposal, post-CCV, canceled, completed). Null when no flow matches.
+  offer_status:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.offer_status
+    description: Negotiation status of the latest matching offer (ongoing, accepted, rejected, validated, and related states). Null when no offer matches.
+  offer_price:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.offer_price
+    description: Price initially proposed by the buyer on the latest matching offer, in BRL. Null when no offer matches.
+  sale_price:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.sale_price
+    description: Listing price of the property at the time of the latest matching offer, in BRL. Null when no offer matches.
+  final_price:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.final_price
+    description: Final price agreed between buyer and seller on the latest matching offer, in BRL. Null when no offer matches or the deal has no agreed price yet.
+  is_published_unit:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.is_published_unit
+    description: True when the typology unit has a DevelopmentListingUnit row (apt is a published listing). False when the unit exists only for the offer. Null when there is no unit.
+  ts_created:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.ts_created
+    description: Timestamp when the negotiation row was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.ts_updated
+    description: Timestamp when the negotiation row was last updated in EBDB.
+  ts_sales_flow_created:
+    lineage:
+      - datalake_sale_primary_market.development_negotiation.ts_sales_flow_created
+    description: Timestamp when the latest matching sales flow was created. Null when no flow matches.
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: Region id of the negotiation's unit house (id_house), joined directly on the house's own EBDB record. Null when id_house is null or has no region assigned.
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+    description: City group of the unit house's region, resolved via id_region. Null when id_region is null or has no matching region row.
+  id_hub:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_hub
+    description: Closing hub responsible for negotiating the latest matching offer, native on the Sales Flow offer. Null when id_offer is null.
+  hub_name:
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
+    description: Name of the closing hub, resolved via id_hub (latest business_unit row per hub id, SALE context). Null when id_hub is null or has no matching business_unit row.
+  id_user_negotiation_executive:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_consultant
+    description: EBDB user id of the Negotiation Executive (EN / Deal Maker) assigned to the latest matching offer's sales flow, joined via the offer's Firestore id. Null when id_offer is null or no specialist is assigned yet.
