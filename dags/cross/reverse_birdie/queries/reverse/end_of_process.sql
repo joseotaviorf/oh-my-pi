@@ -196,11 +196,11 @@ SELECT DISTINCT
        ELSE NULL 
     END AS adjusted_franchise_name,
     offer.SELLER_DILLIGENCE_STATUS as share_risco,
-    --date_diff('day', ts_sale_agreement_signed, ts_house_registry_ended) AS LTCCV2CRI,
-    Case when date_diff(DAY, ts_sale_agreement_signed, ts_house_registry_ended) >141 then '141d+' 
-    when date_diff(DAY, ts_sale_agreement_signed, ts_house_registry_ended) >100 then '101d - 140d' 
-    when date_diff(DAY, ts_sale_agreement_signed, ts_house_registry_ended) >60 then '61d - 100d' 
-    when date_diff(DAY, ts_sale_agreement_signed, ts_house_registry_ended) >0 then '0d - 60d'
+    -- LTCCV2CRI buckets: see range_lt_ccv2cri below
+    Case when DATEDIFF(ts_house_registry_ended, ts_sale_agreement_signed) >141 then '141d+' 
+    when DATEDIFF(ts_house_registry_ended, ts_sale_agreement_signed) >100 then '101d - 140d' 
+    when DATEDIFF(ts_house_registry_ended, ts_sale_agreement_signed) >60 then '61d - 100d' 
+    when DATEDIFF(ts_house_registry_ended, ts_sale_agreement_signed) >0 then '0d - 60d'
     else null end as range_lt_ccv2cri,
     offer.HAS_USED_FGTS_IN_PAYMENT as has_used_fgts_in_payment,
     --nps.comment,

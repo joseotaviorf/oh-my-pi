@@ -149,9 +149,9 @@ contracts AS (
     li.dt_entrance,
     li.house_contract_rank,
     li.rent_value,
-    date_diff(DAY, li.dt_prev_annulment, li.ts_signature) ndays_to_rerental,
+    DATEDIFF(li.ts_signature, li.dt_prev_annulment) ndays_to_rerental,
     CASE
-      WHEN date_diff(DAY, li.dt_prev_annulment, li.ts_signature) <= 84 THEN 1
+      WHEN DATEDIFF(li.ts_signature, li.dt_prev_annulment) <= 84 THEN 1
       ELSE 0
     END flg_rerental_12w
   FROM
@@ -586,7 +586,7 @@ offboarding AS (
     CASE
       WHEN t.ts_termination_finished IS NULL THEN NULL
       WHEN t.ts_termination_finished < t.dt_termination THEN 0
-      WHEN t.ts_termination_finished >= t.dt_termination THEN date_diff(DAY, t.dt_termination, t.ts_termination_finished)
+      WHEN t.ts_termination_finished >= t.dt_termination THEN DATEDIFF(t.ts_termination_finished, t.dt_termination)
       ELSE NULL
     END AS lt_off,
     t.is_exit_inspection_opted_out,
@@ -699,12 +699,11 @@ contrato_anterior AS (
     DATE_FORMAT(
       COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment), 'yyyy-mm-dd'
     ) AS date_erc,
-    date_diff(
-      DAY,
+    DATEDIFF(
+      dhl.ts_listing_version_start,
       date(
         COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment)
-      ),
-      dhl.ts_listing_version_start
+      )
     ) AS er2rl,
     DATE_FORMAT(dhl.ts_early_demand_started, 'yyyy-mm-dd') AS early_demand_started -- relisting
 ,
@@ -760,12 +759,11 @@ contrato_anterior_new_relisting AS (
     date(
       COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment)
     ) AS date_erc,
-    date_diff(
-      DAY,
+    DATEDIFF(
+      dhl.ts_listing_version_start,
       date(
         COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment)
-      ),
-      dhl.ts_listing_version_start
+      )
     ) AS er2rl,
     DATE_FORMAT(dhl.ts_early_demand_started, 'yyyy-mm-dd') AS early_demand_started,
     DATE_FORMAT(dhl.ts_last_de_publication, 'yyyy-mm-dd') AS dt_despublicado,
@@ -836,14 +834,13 @@ inquilinos_em_contrato AS (
         ORDER BY
           COALESCE(dc.dt_start, dc.dt_entrance)
       )
-      AND DATE_DIFF(
-        DAY,
-        dc.dt_annulment,
+      AND DATEDIFF(
         LEAD(COALESCE(dc.dt_start, dc.dt_entrance)) OVER(
           PARTITION BY fcp.sk_personal_document
           ORDER BY
             COALESCE(dc.dt_start, dc.dt_entrance)
-        )
+        ),
+        dc.dt_annulment
       ) <= 84 THEN 1
       ELSE NULL
     END AS is_retenant_12W

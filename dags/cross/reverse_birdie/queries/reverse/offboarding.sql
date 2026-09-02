@@ -241,7 +241,7 @@ base_off AS (
     DATE(t.ts_termination_finished) AS dt_tf,
     CASE
       WHEN DATE(t.ts_termination_finished) < t.dt_termination THEN 0
-      ELSE DATE_DIFF(DAY, t.dt_termination, DATE(t.ts_termination_finished))
+      ELSE DATEDIFF(DATE(t.ts_termination_finished), t.dt_termination)
     END AS lt_off,
     t.repair_resolution,
     t.city_group
@@ -856,18 +856,18 @@ SELECT DISTINCT
       FALSE
   END AS com_ou_sem_reparos,
   CASE
-    WHEN DATE_DIFF(DAY, nps.data_inicio_contrato, b.dt_termination) <= 182 THEN '0 - 6m'
+    WHEN DATEDIFF(b.dt_termination, nps.data_inicio_contrato) <= 182 THEN '0 - 6m'
     WHEN
-      DATE_DIFF(DAY, nps.data_inicio_contrato, b.dt_termination) > 180
-      AND DATE_DIFF(DAY, nps.data_inicio_contrato, b.dt_termination) <= 365
+      DATEDIFF(b.dt_termination, nps.data_inicio_contrato) > 180
+      AND DATEDIFF(b.dt_termination, nps.data_inicio_contrato) <= 365
     THEN
       '6m - 1a'
     WHEN
-      DATE_DIFF(DAY, nps.data_inicio_contrato, b.dt_termination) > 365
-      AND DATE_DIFF(DAY, nps.data_inicio_contrato, b.dt_termination) <= 730
+      DATEDIFF(b.dt_termination, nps.data_inicio_contrato) > 365
+      AND DATEDIFF(b.dt_termination, nps.data_inicio_contrato) <= 730
     THEN
       '1a - 2a'
-    WHEN DATE_DIFF(DAY, nps.data_inicio_contrato, b.dt_termination) > 730 THEN '+2a'
+    WHEN DATEDIFF(b.dt_termination, nps.data_inicio_contrato) > 730 THEN '+2a'
     ELSE NULL
   END AS range_contract_lifetime,
   CASE
