@@ -30,6 +30,7 @@ SELECT
     COALESCE(CAST(REPLACE(SUBSTRING(eso.ts_buyer_fup,1, 10),'-','') AS BIGINT), -1) AS sk_buyer_fup_date,
     eso.brokerage_fee,
     eso.sale_price_agreed,
+    eso.sale_type,
     eso.has_used_fgts_in_payment,
     eso.is_buyer_first_offer,
     eso.is_house_first_offer,

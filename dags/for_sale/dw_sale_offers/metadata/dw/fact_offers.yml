@@ -143,6 +143,13 @@ columns:
       (listing price at the time of the offer): discount = (sale_price - sale_price_agreed) / sale_price.
       Do not use dw_sale.dim_listing.price for this calculation — it reflects the current
       listing price and is not updated when an offer is accepted.
+  sale_type:
+    lineage:
+    - datalake_sale_offer.sale_offer.sale_type
+    description: Market type of each offer. Propagated from the Sales Flow offer classification through the enriched sale-offer table; PRIMARY identifies a new-build unit and SECONDARY identifies a resale offer. NULL is preserved when the source is unclassified.
+    categories:
+      PRIMARY: Offer for a Primary Market (new-build) unit.
+      SECONDARY: Offer for a Secondary Market (resale) listing.
   has_used_fgts_in_payment:
     lineage:
       - datalake_sale_offer.sale_offer.has_used_fgts_in_payment
