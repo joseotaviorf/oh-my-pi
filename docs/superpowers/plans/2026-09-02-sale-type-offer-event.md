@@ -309,12 +309,15 @@ Run:
 
 ```bash
 make check-style-dags
-make validate-join-shapes paths=dags/for_sale/enrich_sale_offer
-make validate-join-shapes paths=dags/for_sale/dw_sale_offers
-make validate-join-shapes paths=dags/for_sale/dw_sale_events
+make validate-join-shapes \
+  paths=dags/for_sale/enrich_sale_offer/queries/enrich/sale_offer.sql
+make validate-join-shapes \
+  paths=dags/for_sale/dw_sale_offers/queries/dw/fact_offers.sql
+make validate-join-shapes \
+  paths=dags/for_sale/dw_sale_events/queries/dw/fact_sale_demand_event.sql
 ```
 
-Expected: style passes and all join-shape reports contain no violations.
+Expected: style passes and each changed-file join-shape report contains no violations. Directory-level scans are intentionally excluded because they include unchanged SQL files outside this propagation slice.
 
 - [ ] **Step 4: Confirm generated dependencies are unchanged**
 
