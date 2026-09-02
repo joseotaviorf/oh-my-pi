@@ -39,8 +39,11 @@ dependencies:
     tasks:
       - load-clean-support-session
 
+# TEMP: bumped one rung (from emr_7_12_min_memory_2_workers_cluster) because the
+# hourly run was overshooting its 1h SLA at ~1:10. Reduce back to the smaller
+# preset as soon as the upstream DAGs set partition_hour.
 cluster:
-  type: emr_7_12_min_memory_2_workers_cluster
+  type: emr_7_12_consolidation_l_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
