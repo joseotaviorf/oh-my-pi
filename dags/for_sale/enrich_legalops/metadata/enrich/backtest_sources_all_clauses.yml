@@ -1,0 +1,48 @@
+database_name: datalake_legalops
+table_name: backtest_sources_all_clauses
+description: |
+  CCV clause rows used as Lego backtest inputs. Grain is one row per clause
+  attached to a sales flow that sits in datalake_legalops.backtest_sources_sales_flows_screenings.
+  Joins screening flows to datalake_sales_flow_clean.ccv_clause, clause_message,
+  and clause_subject. Lego reads clause title, payment method, negotiation flag,
+  and identifier to score contract-analysis rules. Primary key: ccv_clause_id.
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+columns:
+  ccv_clause_id:
+    description: Unique identifier of the CCV clause instance on the sales flow. Primary key of this table.
+    lineage:
+      - datalake_sales_flow_clean.ccv_clause.id
+  id_sales_flow:
+    description: Foreign key to the For Sale sales flow whose CCV contains this clause. Joins the LegalOps screening cohort and the other backtest_sources_* tables.
+    lineage:
+      - datalake_sales_flow_clean.ccv_clause.id_sales_flow
+      - datalake_legalops.backtest_sources_sales_flows_screenings.id_sales_flow
+  clause_description:
+    description: Business-facing description of the clause subject (the topic the clause covers in the CCV).
+    lineage:
+      - datalake_sales_flow_clean.clause_subject.description
+  clause_variables:
+    description: JSON payload of variable values filled into this clause instance when the CCV was generated.
+    lineage:
+      - datalake_sales_flow_clean.ccv_clause.variables
+  clause_payment_method:
+    description: Payment method associated with the clause template (for example cash, financed, or FGTS), used by Lego payment-clause rules.
+    lineage:
+      - datalake_sales_flow_clean.clause_message.payment_method
+  clause_title:
+    description: Display title of the clause template in the CCV confection UI. Rows with a null title are dropped because they cannot be scored.
+    lineage:
+      - datalake_sales_flow_clean.clause_message.title
+  is_negotiation_clause:
+    description: Boolean flag that marks clauses created during commercial negotiation rather than standard CCV templates.
+    lineage:
+      - datalake_sales_flow_clean.clause_message.is_negotiation_clause
+  clause_identifier:
+    description: Stable template identifier of the clause message, used to map Lego validation rules to a specific CCV clause type.
+    lineage:
+      - datalake_sales_flow_clean.clause_message.clause_identifier
+  clause_message_id:
+    description: Foreign key to the clause message template that this CCV clause instance was generated from.
+    lineage:
+      - datalake_sales_flow_clean.clause_message.id

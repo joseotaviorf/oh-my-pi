@@ -1,0 +1,53 @@
+database_name: datalake_legalops
+table_name: backtest_sources_docx_document_attributes
+description: |
+  Subset of exploded Docx attributes that Lego contract-analysis rules consume
+  during backtests. Grain is one row per (sales flow, document, attribute key)
+  after filtering HOUSE_REGISTRATION, HOUSE_OWNERSHIP_PROOF, BANK_DATA, and
+  PERSONAL_DATA keys (registry number, FGTS/family transaction flags, seller on
+  registry, PJ/receipt flags, attorney and house-holder flags). Same document
+  union as backtest_eda_all_documents_attributes, restricted to the Lego input
+  catalog. Cohort is datalake_legalops.backtest_sources_sales_flows_screenings.
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+columns:
+  document_source:
+    description: Which Docx folder produced the document. SALES_FLOW is the property folder; SELLER_DATA and BUYER_DATA are party folders.
+  id_sales_flow:
+    description: Foreign key to the sales flow in the LegalOps screening backtest cohort.
+    lineage:
+      - datalake_legalops.backtest_sources_sales_flows_screenings.id_sales_flow
+      - datalake_sales_flow_clean.seller_data.id_sales_flow
+      - datalake_sales_flow_clean.buyer_data.id_sales_flow
+  id_seller:
+    description: Seller identifier when the attribute comes from a seller Docx folder. Null for property-level and buyer documents.
+    lineage:
+      - datalake_sales_flow_clean.seller_data.id_seller
+  id_buyer:
+    description: Buyer identifier when the attribute comes from a buyer Docx folder. Null for property-level and seller documents.
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.id_buyer
+  id_document:
+    description: Docx document identifier that holds the filtered attribute used by a Lego rule.
+    lineage:
+      - datalake_docx_clean.document.id
+  document_type_name:
+    description: Docx document type after the Lego allow-list (HOUSE_REGISTRATION, HOUSE_OWNERSHIP_PROOF, BANK_DATA, or PERSONAL_DATA).
+    lineage:
+      - datalake_docx_clean.document_type.name
+  document_context_name:
+    description: Docx context of the document (BUYER, SELLER, or property-level) so Lego can bind the attribute to the right party or house.
+    lineage:
+      - datalake_docx_clean.document_context.name
+  document_ts_created:
+    description: Timestamp when the Docx document was created. Helps pick the latest registration document when several exist.
+    lineage:
+      - datalake_docx_clean.document.ts_created
+  attribute_key:
+    description: JSON key from document.attributes that Lego rules read (for example registryNumber, isSellerOnRegistry, willReceiveSaleValue, isHouseHolder).
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attribute_value:
+    description: String value of that Lego-consumed JSON key, exploded from document.attributes for the filtered document type.
+    lineage:
+      - datalake_docx_clean.document.attributes

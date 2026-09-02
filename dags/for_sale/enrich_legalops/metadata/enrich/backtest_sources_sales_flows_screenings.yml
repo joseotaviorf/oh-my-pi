@@ -1,0 +1,109 @@
+database_name: datalake_legalops
+table_name: backtest_sources_sales_flows_screenings
+description: |
+  Sales-flow grain table that defines the LegalOps Lego backtest cohort and
+  supporting LegalOps analyses. One row per sales flow with a CCV created on
+  or after 2025-11-11 (Sao Paulo date), non-null CCV status, CCV_ASSISTANCE
+  payment model, and a backtest subgroup (CCV signed, CCV generated but not
+  signed, or the manual inclusion of flow 315014). Projects the house, address,
+  parking, payment, and property-check fields Lego reads, plus buyer and seller
+  counts for analyses outside the backtest runtime. Downstream backtest_sources_*
+  tables attach parties, clauses, and Docx documents to this id_sales_flow.
+  Primary key: id_sales_flow.
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+columns:
+  id_sales_flow:
+    description: Unique identifier of the For Sale sales flow. Primary key and join key to every other backtest_sources_* table.
+    lineage:
+      - datalake_sales_flow_clean.offer.id_sales_flow
+  ScreeningCCV__property_id:
+    description: External house identifier used as Docx folder id_external for property-level documents and attachments.
+    lineage:
+      - datalake_sales_flow_clean.house.id_external
+  ScreeningCCV__total_buyers:
+    description: Count of buyer_data rows on this sales flow. Used in LegalOps analyses outside the Lego backtest runtime.
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.id_buyer
+  ScreeningCCV__confirmed_buyers:
+    description: Count of buyers whose screening_buyer status is COMPLETED. Used in LegalOps analyses outside the Lego backtest runtime.
+    lineage:
+      - datalake_sales_flow_clean.screening_buyer.status
+      - datalake_sales_flow_clean.buyer_data.id_buyer
+  ScreeningCCV__total_sellers:
+    description: Count of seller_data rows on this sales flow. Used in LegalOps analyses outside the Lego backtest runtime.
+    lineage:
+      - datalake_sales_flow_clean.seller_data.id_seller
+  ScreeningCCV__confirmed_sellers:
+    description: Count of sellers whose screening_seller status is COMPLETED. Used in LegalOps analyses outside the Lego backtest runtime.
+    lineage:
+      - datalake_sales_flow_clean.screening_seller.status
+      - datalake_sales_flow_clean.seller_data.id_seller
+  ScreeningCCV__ccv_flow_ts_created:
+    description: Timestamp when the CCV flow (contract request) was created. Lego named sets filter the backtest corpus on this column.
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_created
+  Negotiation__payment_method:
+    description: Payment method agreed on the sales flow (cash, financing, FGTS mix, and so on).
+    lineage:
+      - datalake_sales_flow_clean.payment.payment_method
+  Conditions__is_seller_pj:
+    description: Whether the seller side is a legal entity (PJ). Copied onto the sellers table so Lego can branch PJ vs PF seller rules.
+    lineage:
+      - datalake_sales_flow_clean.negotiation.is_seller_pj
+  Conditions__is_buyer_pj:
+    description: Whether the buyer side is a legal entity (PJ). Copied onto the buyers table so Lego can branch PJ vs PF buyer rules.
+    lineage:
+      - datalake_sales_flow_clean.negotiation.is_buyer_pj
+  Conditions__is_consorcio_payment:
+    description: Whether the deal uses a consórcio as payment, from negotiation.
+    lineage:
+      - datalake_sales_flow_clean.negotiation.is_consorcio_payment
+  PropertyAddress__street:
+    description: Street name of the property address attached to the house on the sales flow.
+    lineage:
+      - datalake_sales_flow_clean.address_data.street
+  PropertyAddress__number:
+    description: Street number of the property address.
+    lineage:
+      - datalake_sales_flow_clean.address_data.number
+  PropertyAddress__complement:
+    description: Address complement (apartment, block) of the property.
+    lineage:
+      - datalake_sales_flow_clean.address_data.complement
+  PropertyAddress__neighborhood:
+    description: Neighborhood of the property address.
+    lineage:
+      - datalake_sales_flow_clean.address_data.neighborhood
+  PropertyAddress__city:
+    description: City of the property address.
+    lineage:
+      - datalake_sales_flow_clean.address_data.city
+  PropertyAddress__zip_code:
+    description: Postal code (CEP) of the property address.
+    lineage:
+      - datalake_sales_flow_clean.address_data.zip_code
+  PropertyAddress__state:
+    description: State (UF) of the property address.
+    lineage:
+      - datalake_sales_flow_clean.address_data.state
+  EBDB__ParkingSlots:
+    description: Number of parking slots on the EBDB house, joined through the sales-flow house id_external.
+    lineage:
+      - datalake_ebdb_clean.house.parking_slots
+  PropertyChecks__needs_update:
+    description: Whether the house still has a pending registry update (has_pending_registry_update).
+    lineage:
+      - datalake_sales_flow_clean.house.has_pending_registry_update
+  PropertyChecks__land_tenure:
+    description: Land-tenure type of the house (for example freehold vs occupancy), used by Lego property-rights rules.
+    lineage:
+      - datalake_sales_flow_clean.house.land_tenure
+  PropertyChecks__has_fiduciary_alienation:
+    description: Whether the house has a chattel mortgage / alienação fiduciária (has_chattel_mortgage).
+    lineage:
+      - datalake_sales_flow_clean.house.has_chattel_mortgage
+  PropertyChecks__has_usufruct:
+    description: Whether a usufruct is instituted on the house (has_instituted_usufruct).
+    lineage:
+      - datalake_sales_flow_clean.house.has_instituted_usufruct

@@ -1,0 +1,77 @@
+database_name: datalake_legalops
+table_name: backtest_sources_all_sellers
+description: |
+  Seller-level Lego backtest input. Grain is one row per seller on a sales flow
+  in datalake_legalops.backtest_sources_sales_flows_screenings. Combines
+  datalake_sales_flow_clean.seller_data with Docx PERSONAL_DATA (marital status,
+  attorney, house-holder) and BANK_DATA (willReceiveSaleValue). When the seller
+  folder has several PERSONAL_DATA documents, those attributes come from the
+  latest one (ts_updated, then ts_created). is_seller_pj comes from the
+  screening snapshot. Natural key: (id_sales_flow, id_seller).
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+columns:
+  id_sales_flow:
+    description: Foreign key to the sales flow in the LegalOps screening backtest cohort.
+    lineage:
+      - datalake_legalops.backtest_sources_sales_flows_screenings.id_sales_flow
+  id_seller:
+    description: Unique identifier of the seller on the sales flow. Joins the seller Docx folder.
+    lineage:
+      - datalake_sales_flow_clean.seller_data.id_seller
+  seller__name:
+    description: Seller full name as registered on the sales flow.
+    lineage:
+      - datalake_sales_flow_clean.seller_data.name
+  seller__email:
+    description: Seller contact email stored on seller_data, used to match the party in Docx and CCV signers.
+    lineage:
+      - datalake_sales_flow_clean.seller_data.email
+  sellerCPF:
+    description: Seller CPF extracted from Docx PERSONAL_DATA attributes.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  is_seller_pj:
+    description: Whether the seller side of the CCV is a legal entity (PJ). Copied from the screening snapshot so Lego can branch PJ vs PF rules.
+    lineage:
+      - datalake_legalops.backtest_sources_sales_flows_screenings.Conditions__is_seller_pj
+  is_represented_by_attorney:
+    description: Whether the seller is represented by an attorney, extracted from Docx PERSONAL_DATA attributes. Lego requires attorney documents when true.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  maritalStatus:
+    description: Seller marital status extracted from Docx PERSONAL_DATA attributes. Drives Lego marital-regime and spouse-consent rules.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  regimeOfAssets:
+    description: Matrimonial property regime extracted from Docx PERSONAL_DATA attributes for this seller.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  spouseName:
+    description: Spouse name extracted from Docx PERSONAL_DATA attributes for this seller.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  stable_union:
+    description: Boolean from Docx PERSONAL_DATA indicating whether a stable union is registered for this seller.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  sellerdata__holding_value:
+    description: Holding value attributed to this seller on the sales flow (share of the sale proceeds).
+    lineage:
+      - datalake_sales_flow_clean.seller_data.holding_value
+  sellerdata__is_ccv_signer:
+    description: Boolean indicating whether this seller is a required CCV signer.
+    lineage:
+      - datalake_sales_flow_clean.seller_data.is_ccv_signer
+  seller_is_property_owner:
+    description: Whether Docx PERSONAL_DATA marks this seller as the house holder / owner on the registry.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  sellerdata__share_percentage:
+    description: Percentage of the property this seller owns, used by Lego to check that transfer shares add to 100%.
+    lineage:
+      - datalake_sales_flow_clean.seller_data.share_percentage
+  seller_will_receive_sale_value:
+    description: True if any BANK_DATA document for this seller has willReceiveSaleValue=true. Lego uses it to check that proceeds recipients match CCV parties.
+    lineage:
+      - datalake_docx_clean.document.attributes

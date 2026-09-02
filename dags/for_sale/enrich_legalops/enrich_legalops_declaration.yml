@@ -1,0 +1,43 @@
+---
+dag:
+  name: enrich_legalops
+  schedule_interval: null
+  schedule_start_date: 2026, 9, 1
+  owner: Data ForSale
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Builds exclusive LegalOps Lego backtest tables in datalake_legalops.
+      The cohort is datalake_legalops.backtest_sources_sales_flows_screenings (CCV
+      assistance screenings in LegalOps scope), joined to Sales Flow clean
+      (offer, payment, brokerage, negotiation, ccv_flow, payment_rules,
+      sales_flow, house, address_data, mortgage, house_registration_order,
+      buyer_data, seller_data, screening_buyer, screening_seller, ccv_clause,
+      clause_message, clause_subject, sales_flow_tag, tag) and Docx clean
+      (folder, folder_type, document, document_type, document_context).
+      LegalOps case classification buckets offer create date (since yesterday,
+      last 7 days, or older); macrogroup is always Recent Cases. Scope is CCV
+      flows created on or after 2025-11-11 with a non-null CCV status. Listing
+      parking slots come from datalake_ebdb_clean.house.
+
+      Triggered manually (no schedule) so the backtest corpus can be rebuilt
+      on demand.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: legalops
+  default_extraction_type: full
+  default_partitions: []
+  inner_dependencies:
+    backtest_sources_all_buyers:
+      - backtest_sources_sales_flows_screenings
+    backtest_sources_all_sellers:
+      - backtest_sources_sales_flows_screenings
+    backtest_sources_all_clauses:
+      - backtest_sources_sales_flows_screenings
+    backtest_sources_all_document_attachments:
+      - backtest_sources_sales_flows_screenings
+    backtest_sources_docx_document_attributes:
+      - backtest_sources_sales_flows_screenings
+    backtest_eda_all_documents_attributes:
+      - backtest_sources_sales_flows_screenings

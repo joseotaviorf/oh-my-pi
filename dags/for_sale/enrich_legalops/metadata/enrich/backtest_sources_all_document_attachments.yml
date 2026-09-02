@@ -1,0 +1,51 @@
+database_name: datalake_legalops
+table_name: backtest_sources_all_document_attachments
+description: |
+  Exploded Docx file attachments for LegalOps Lego backtests, classified into
+  doc_kind (house registry, OCR extract, extra registry pages, marital or
+  stable-union certificate sides, personal ID front/back/selfie). Grain is one
+  row per attachment page on a document of a sales flow in
+  datalake_legalops.backtest_sources_sales_flows_screenings. Unions property,
+  seller, and buyer Docx folders. Lego uses doc_kind plus the intra Docx URL to
+  fetch files during contract-analysis backtests. Rows without a filename are
+  dropped.
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+columns:
+  id_sales_flow:
+    description: Foreign key to the sales flow in the LegalOps screening backtest cohort.
+    lineage:
+      - datalake_legalops.backtest_sources_sales_flows_screenings.id_sales_flow
+      - datalake_sales_flow_clean.seller_data.id_sales_flow
+      - datalake_sales_flow_clean.buyer_data.id_sales_flow
+  id_seller:
+    description: Seller identifier when the attachment comes from a seller Docx folder. Null for property-level and buyer attachments.
+    lineage:
+      - datalake_sales_flow_clean.seller_data.id_seller
+  id_buyer:
+    description: Buyer identifier when the attachment comes from a buyer Docx folder. Null for property-level and seller attachments.
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.id_buyer
+  id_document:
+    description: Docx document identifier that owns this attachment page.
+    lineage:
+      - datalake_docx_clean.document.id
+  doc_kind:
+    description: Lego classification of the attachment, derived from document type, pageNumber, and source (HOUSE_REGISTRATION, HOUSE_REGISTRATION_OCR_EXTRACT, marital/stable-union certificate sides, personal ID sides, or UNCLASSIFIED).
+    lineage:
+      - datalake_docx_clean.document_type.name
+      - datalake_docx_clean.document.attachments
+      - datalake_docx_clean.document.attributes
+  docx_attachment_prod_url:
+    description: Production intra Docx API URL used to download the attachment binary during a Lego backtest run.
+    lineage:
+      - datalake_docx_clean.document.attachments
+      - datalake_docx_clean.document.id
+  attachment_filename:
+    description: Original filename stored in the Docx attachments JSON. Rows with a null filename are excluded because they cannot be fetched.
+    lineage:
+      - datalake_docx_clean.document.attachments
+  attachment_guid:
+    description: UUID extracted from the attachment filename, used to correlate the file across Docx storage and Lego job logs.
+    lineage:
+      - datalake_docx_clean.document.attachments

@@ -1,0 +1,75 @@
+database_name: datalake_legalops
+table_name: backtest_sources_all_buyers
+description: |
+  Buyer-level Lego backtest input. Grain is one row per buyer on a sales flow
+  in datalake_legalops.backtest_sources_sales_flows_screenings. Combines
+  datalake_sales_flow_clean.buyer_data and screening_buyer with Docx
+  PERSONAL_DATA in BUYER context (marital status, asset regime, spouse, CPF).
+  When the buyer folder has several PERSONAL_DATA documents, marital fields come
+  from the latest one (ts_updated, then ts_created). is_spouse_buyer flags pairs
+  of buyers who are each other's spouse, which Lego uses to skip duplicate
+  marital validations. Natural key: (id_sales_flow, id_buyer).
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+columns:
+  id_sales_flow:
+    description: Foreign key to the sales flow in the LegalOps screening backtest cohort.
+    lineage:
+      - datalake_legalops.backtest_sources_sales_flows_screenings.id_sales_flow
+  id_buyer:
+    description: Unique identifier of the buyer on the sales flow. Joins screening_buyer and the buyer Docx folder.
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.id_buyer
+  Conditions__is_buyer_pj:
+    description: Whether the buyer side of the CCV is a legal entity (PJ). Copied from the screening snapshot so Lego can branch PJ vs PF rules.
+    lineage:
+      - datalake_legalops.backtest_sources_sales_flows_screenings.Conditions__is_buyer_pj
+  buyer__name:
+    description: Buyer full name as registered on the sales flow. Compared to spouseName to compute is_spouse_buyer.
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.name
+  buyer__email:
+    description: Buyer contact email stored on buyer_data, used to match the party in Docx and CCV signers.
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.email
+  buyerCPF:
+    description: Buyer CPF extracted from Docx PERSONAL_DATA attributes.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  maritalStatus:
+    description: Buyer marital status extracted from Docx PERSONAL_DATA attributes. Drives Lego marital-regime and spouse-consent rules.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  regimeOfAssets:
+    description: Matrimonial property regime extracted from Docx PERSONAL_DATA attributes (for example community or separation of assets).
+    lineage:
+      - datalake_docx_clean.document.attributes
+  spouseName:
+    description: Spouse name extracted from Docx PERSONAL_DATA attributes. Compared to other buyers on the same flow to set is_spouse_buyer.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  stable_union:
+    description: Boolean from Docx PERSONAL_DATA indicating whether a stable union is registered for this buyer.
+    lineage:
+      - datalake_docx_clean.document.attributes
+  buyerdata__holding_value:
+    description: Share of the acquisition this buyer holds, in the unit stored on buyer_data (used for multi-buyer CCV allocation).
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.holding_value
+  buyerdata__signer_status:
+    description: CCV signer status of this buyer (whether they have already signed or are still pending).
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.signer_status
+  buyer_screening__proposal_validation_status:
+    description: Proposal-validation status from screening_buyer, used to see if LegalOps already flagged this buyer on the offer.
+    lineage:
+      - datalake_sales_flow_clean.screening_buyer.proposal_validation_status
+  buyer_screening__legal_pendency_note:
+    description: Free-text LegalOps pendency note recorded against this buyer during screening.
+    lineage:
+      - datalake_sales_flow_clean.screening_buyer.legal_pendency_note
+  is_spouse_buyer:
+    description: True when another buyer on the same sales flow has this buyer's name as spouseName and vice versa. Lego uses the flag to treat the pair as spouses instead of independent acquirers.
+    lineage:
+      - datalake_sales_flow_clean.buyer_data.name
+      - datalake_docx_clean.document.attributes
