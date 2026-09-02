@@ -1,7 +1,10 @@
 -- Latest SALE listing per house. sale_type from LSM, else boolean is_primary_market.
+-- min_price/max_price are the same latest row's price range -- no extra join.
 SELECT
     id_house,
-    sale_type
+    sale_type,
+    min_price,
+    max_price
 FROM (
     SELECT
         lbc.id_house,
@@ -10,6 +13,8 @@ FROM (
             WHEN lsm.is_primary_market = TRUE THEN 'PRIMARY'
             ELSE 'SECONDARY'
         END AS sale_type,
+        lsm.min_price,
+        lsm.max_price,
         ROW_NUMBER() OVER (PARTITION BY lbc.id_house ORDER BY lbc.ts_updated DESC) AS _w
     FROM
         datalake_ebdb_clean.listing_business_context AS lbc

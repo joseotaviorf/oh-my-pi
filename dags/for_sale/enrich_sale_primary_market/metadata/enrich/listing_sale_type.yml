@@ -2,7 +2,7 @@
 database_name: datalake_sale_primary_market
 table_name: listing_sale_type
 domain: For Sale
-description: One row per house classifying it as PRIMARY or SECONDARY market. Single source of truth so other enrich/DW tables can join sale_type instead of re-deriving it.
+description: One row per house classifying it as PRIMARY or SECONDARY market, with the price range of that same listing. Single source of truth so other enrich/DW tables can join sale_type or price instead of re-deriving the latest-SALE-listing_sale_model lookup.
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house:
@@ -14,3 +14,11 @@ columns:
       - datalake_ebdb_clean.listing_sale_model.sale_type
       - datalake_ebdb_clean.listing_sale_model.is_primary_market
     description: PRIMARY or SECONDARY market classification of the house's most recently updated SALE listing. Prefers the sale_type enum; falls back to the legacy is_primary_market boolean when sale_type is not yet populated.
+  min_price:
+    lineage:
+      - datalake_ebdb_clean.listing_sale_model.min_price
+    description: Minimum price of the house's most recently updated SALE listing_sale_model row (same row sale_type is derived from). Null when the house has no SALE listing_sale_model row.
+  max_price:
+    lineage:
+      - datalake_ebdb_clean.listing_sale_model.max_price
+    description: Maximum price of the house's most recently updated SALE listing_sale_model row (same row sale_type is derived from). Null when the house has no SALE listing_sale_model row.

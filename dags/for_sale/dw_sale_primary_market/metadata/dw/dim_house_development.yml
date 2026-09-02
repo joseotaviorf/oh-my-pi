@@ -111,9 +111,9 @@ columns:
     description: City group of the house's region, resolved via id_region. Null when id_region is null or has no matching region row.
   min_price:
     lineage:
-      - datalake_ebdb_clean.listing_sale_model.min_price
-    description: Minimum price of the house's most recently updated SALE listing_sale_model row. Null when the house has no SALE listing_sale_model row.
+      - datalake_sale_primary_market.listing_sale_type.min_price
+    description: Minimum price of the house's most recently updated SALE listing_sale_model row, passed through from enrich listing_sale_type. Null when the house has no SALE listing_sale_model row.
   max_price:
     lineage:
-      - datalake_ebdb_clean.listing_sale_model.max_price
-    description: Maximum price of the house's most recently updated SALE listing_sale_model row. Null when the house has no SALE listing_sale_model row.
+      - datalake_sale_primary_market.listing_sale_type.max_price
+    description: Maximum price of the house's most recently updated SALE listing_sale_model row, passed through from enrich listing_sale_type. Null when the house has no SALE listing_sale_model row.
