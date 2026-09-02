@@ -585,6 +585,10 @@ Same event definition; bucket on **interval start**.
 
 - `dim_house.sk_region = dw_public.dim_region.sk_region`
 
+### Primary Market (shell house ≠ physical unit)
+
+- On Primary Market listings, `sk_house` is a **typology shell**, not one physical apartment — see `domain_entities/primary_market.md` for `sale_type` classification, the development/typology model, and which facts already carry a Primary flag.
+
 ## Dos and Don'ts
 
 **Do:**
