@@ -15,6 +15,7 @@ alerts:
       WHERE csd.uuid_person IS NOT NULL
         AND csd.agent_type = 'CORRETOR_5A'
         AND GREATEST(
+              COALESCE(csd.ts_database_transaction_agent, TIMESTAMP '1970-01-01'),
               COALESCE(csd.ts_database_transaction_agent_data, TIMESTAMP '1970-01-01'),
               COALESCE(csd.ts_database_transaction_partner, TIMESTAMP '1970-01-01'),
               COALESCE(csd.ts_database_transaction_identity_document, TIMESTAMP '1970-01-01')

@@ -8,7 +8,9 @@ WITH agent_external_reference AS (
     SELECT
         aer.id_agent,
         FIRST(aer.value) FILTER(WHERE aer.type = 'DADOS_AGENTE_ID') AS id_agent_data,
-        FIRST(aer.value) FILTER(WHERE aer.type = 'PARTNER_ID') AS id_partner
+        FIRST(aer.value) FILTER(WHERE aer.type = 'PARTNER_ID') AS id_partner,
+        FIRST(aer.ts_database_transaction) FILTER(WHERE aer.type = 'DADOS_AGENTE_ID') AS ts_database_transaction_ref_agent_data,
+        FIRST(aer.ts_database_transaction) FILTER(WHERE aer.type = 'PARTNER_ID') AS ts_database_transaction_ref_partner
     FROM
         datalake_ebdb_clean.agent_external_reference AS aer
     GROUP BY 1
@@ -18,7 +20,10 @@ agent AS (
         a.id AS id_agent,
         a.uuid_person,
         aer.id_agent_data,
-        aer.id_partner
+        aer.id_partner,
+        aer.ts_database_transaction_ref_agent_data,
+        aer.ts_database_transaction_ref_partner,
+        a.ts_database_transaction AS ts_database_transaction_agent
     FROM
         datalake_ebdb_clean.agent AS a
     LEFT JOIN
@@ -52,10 +57,11 @@ person_creci AS (
     SELECT
         p.uuid_person,
         idoc.identification_number,
-        idoc.ts_database_transaction AS ts_database_transaction_identity_document
+        idoc.ts_database_transaction AS ts_database_transaction_identity_document,
+        p.ts_database_transaction AS ts_database_transaction_ref_person
     FROM
         datalake_person_clean.person AS p
-    JOIN
+    LEFT JOIN
         datalake_person_clean.identity_document AS idoc
             ON idoc.id_person = p.id
             AND idoc.document_type = 'CRECI'
@@ -82,9 +88,10 @@ creci_divergence AS (
             AND a.id_partner IS NOT NULL
             AND COALESCE(UPPER(TRIM(adc.creci_number)), '') <> COALESCE(UPPER(TRIM(pc.creci)), '')
             AS is_agent_data_vs_partner_divergent,
-        adc.ts_database_transaction_agent_data,
-        pc.ts_database_transaction_partner,
-        pec.ts_database_transaction_identity_document
+        a.ts_database_transaction_agent,
+        COALESCE(adc.ts_database_transaction_agent_data, a.ts_database_transaction_ref_agent_data) AS ts_database_transaction_agent_data,
+        COALESCE(pc.ts_database_transaction_partner, a.ts_database_transaction_ref_partner) AS ts_database_transaction_partner,
+        COALESCE(pec.ts_database_transaction_identity_document, pec.ts_database_transaction_ref_person) AS ts_database_transaction_identity_document
     FROM
         agent AS a
     LEFT JOIN
@@ -109,6 +116,7 @@ SELECT
     is_agent_data_vs_person_divergent,
     is_partner_vs_person_divergent,
     is_agent_data_vs_partner_divergent,
+    ts_database_transaction_agent,
     ts_database_transaction_agent_data,
     ts_database_transaction_partner,
     ts_database_transaction_identity_document,
@@ -132,6 +140,7 @@ SELECT
     FALSE AS is_agent_data_vs_person_divergent,
     FALSE AS is_partner_vs_person_divergent,
     FALSE AS is_agent_data_vs_partner_divergent,
+    NULL AS ts_database_transaction_agent,
     NULL AS ts_database_transaction_agent_data,
     NULL AS ts_database_transaction_partner,
     NULL AS ts_database_transaction_identity_document,

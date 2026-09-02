@@ -66,23 +66,41 @@ columns:
       - datalake_ebdb_clean.agent_external_reference.value
       - datalake_ebdb_clean.agent_data.creci_number
       - datalake_ebdb_clean.partner.creci
+  ts_database_transaction_agent:
+    description: |
+      Timestamp of the originating database transaction for the agent record
+      itself.
+    lineage:
+      - datalake_ebdb_clean.agent.ts_database_transaction
   ts_database_transaction_agent_data:
     description: |
-      Timestamp of the last source-database transaction captured by CDC for the
-      linked DadosAgente row. Null when the agent has no DadosAgente link.
+      Timestamp of the originating database transaction for the linked
+      DadosAgente row. The agent_external_reference link can exist before
+      the DadosAgente row itself finishes syncing; in that case this column
+      uses the link's own transaction timestamp instead, so the not-yet-synced
+      row isn't mistaken for an old divergence. Null only when the agent has
+      no DadosAgente link at all.
     lineage:
       - datalake_ebdb_clean.agent_data.ts_database_transaction
+      - datalake_ebdb_clean.agent_external_reference.ts_database_transaction
   ts_database_transaction_partner:
     description: |
-      Timestamp of the last source-database transaction captured by CDC for the
-      linked Partner row. Null when the agent has no Partner link.
+      Timestamp of the originating database transaction for the linked
+      Partner row. The agent_external_reference link can exist before the
+      Partner row itself finishes syncing; in that case this column uses the
+      link's own transaction timestamp instead, so the not-yet-synced row
+      isn't mistaken for an old divergence. Null only when the agent has no
+      Partner link at all.
     lineage:
       - datalake_ebdb_clean.partner.ts_database_transaction
+      - datalake_ebdb_clean.agent_external_reference.ts_database_transaction
   ts_database_transaction_identity_document:
     description: |
-      Timestamp of the last source-database transaction captured by CDC for the
-      Person CRECI identity document. Null when the person has no CRECI document.
+      Timestamp of the originating database transaction for the Person CRECI
+      identity document. Falls back to the person record's own transaction
+      when the person has no CRECI document.
     lineage:
       - datalake_person_clean.identity_document.ts_database_transaction
+      - datalake_person_clean.person.ts_database_transaction
   ts_validated:
     description: Timestamp when this validation run produced the row.
