@@ -16,3 +16,5 @@ workflow:
   tables_customization:
     activity:
       clean_table_name: activity
+    file:
+      clean_table_name: file

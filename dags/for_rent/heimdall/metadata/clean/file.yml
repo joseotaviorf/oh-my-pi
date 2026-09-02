@@ -1,0 +1,58 @@
+database_name: datalake_heimdall_clean
+table_name: file
+description: Clean layer table for file from the heimdall pipeline. Stores documents (e.g. condominium invoices) extracted for a rental contract and their DocPilot inference metadata.
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_heimdall_raw.file._id
+    description: Unique identifier of the file document in heimdall.
+  mime_type:
+    lineage:
+      - datalake_heimdall_raw.file.mimeType
+    description: MIME type of the stored file, e.g. application/pdf.
+  type:
+    lineage:
+      - datalake_heimdall_raw.file.type
+    description: Classification of the file.
+    categories:
+      CONDO_BILL_INVOICE: File contains a condominium invoice submitted for DocPilot extraction.
+  uuid_inference:
+    lineage:
+      - datalake_heimdall_raw.file.inferenceUuid
+    description: Identifier correlating this file with its DocPilot extraction inference.
+  id_contract:
+    lineage:
+      - datalake_heimdall_raw.file.contractId
+    description: Foreign key referencing the related external contract entity.
+  id_activity:
+    lineage:
+      - datalake_heimdall_raw.file.activityId
+    description: Foreign key referencing the related activity entity, when applicable.
+  class:
+    lineage:
+      - datalake_heimdall_raw.file._class
+    description: Fully-qualified Java class name of the document, as stored by Spring Data.
+  id_external_storage:
+    lineage:
+      - datalake_heimdall_raw.file.externalStorageId
+    description: Identifier of the file in the external storage provider.
+  external_storage_provider:
+    lineage:
+      - datalake_heimdall_raw.file.externalStorageProvider
+    description: External system that stores the underlying file.
+    categories:
+      RENTAL_API: File is stored by Rental API and referenced through id_external_storage.
+  inference:
+    lineage:
+      - datalake_heimdall_raw.file.inference
+    description: Raw DocPilot inference payload, including extraction errors and extracted expense data.
+  ts_created:
+    lineage:
+      - datalake_heimdall_raw.file.createdAt
+    description: Timestamp marking the created event for this record.
+  ts_updated:
+    lineage:
+      - datalake_heimdall_raw.file.updatedAt
+    description: Timestamp marking the updated event for this record.
