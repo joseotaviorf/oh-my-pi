@@ -1,0 +1,17 @@
+dag:
+  name: dw_ai_usage
+  owner: Tech Platform Enterprise Engineering
+  catchup: false
+  schedule_start_date: "2026, 9, 3"
+  documentation:
+    dag_purpose: |
+      DW layer for the conformed AI-usage model. Projects enrich_ai_usage tables into
+      dimensions and facts for analytics consumption, resolving identity via
+      datalake_people.identifier_mapping and dw_people.
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: ai_usage
+  default_extraction_type: full
+  serialize_dq_after_default_row: true

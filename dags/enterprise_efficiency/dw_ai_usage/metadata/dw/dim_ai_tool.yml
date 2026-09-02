@@ -1,0 +1,20 @@
+database_name: dw_ai_usage
+table_name: dim_ai_tool
+owner: gabriel.berger@quintoandar.com.br
+domain: Enterprise Efficiency
+description: |
+  Seed dimension of AI tools: Claude, Cursor, and Gemini. Grain: one row per tool.
+  Scope: covers the conformed AI-usage model's vendor set. A literal, hand-maintained
+  lookup.
+columns:
+  sk_ai_tool:
+    description: Stable surrogate key for the AI tool, a hand-assigned literal integer that never changes once a tool is added.
+    # No lineage — hardcoded literal value in the SQL.
+
+  tool:
+    description: AI tool identifier matching the literal used in enrich_ai_usage tables (e.g. 'claude').
+    # No lineage — hardcoded literal value in the SQL.
+
+  tool_name:
+    description: Human-readable display name of the AI tool (e.g. 'Claude').
+    # No lineage — hardcoded literal value in the SQL.
