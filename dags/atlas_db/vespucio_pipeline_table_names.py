@@ -105,6 +105,7 @@ class Tables:
     address_enrich_step_v2 = "vespucio_pipeline_delta.address_enrich_step"
     source_kodak_atlas_images_v2 = "vespucio_sources_delta.source_kodak_atlas_images"
     image_enrich_step_v2 = "vespucio_pipeline_delta.image_enrich_step"
+    images_upsert_step_v2 = "vespucio_pipeline_delta.images_upsert_step"
     artifacts_v2 = "vespucio_pipeline_delta.artifacts_step"
     match_anchors_v2 = "vespucio_pipeline_delta.match_anchors_v2"
     match_pairs_v2 = "vespucio_pipeline_delta.match_pairs_v2"

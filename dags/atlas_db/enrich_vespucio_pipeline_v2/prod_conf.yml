@@ -5,16 +5,18 @@ dag_documentation:
     replaces the legacy staged/extract/cluster steps with a single incremental registry of
     external listings/houses. This DAG orchestrates core_v2_registry_step,
     core_v2_address_normalization_step, core_v2_general_normalization_step,
-    core_v2_image_normalization_step, core_v2_address_enrich_step, sources_kodak_atlas_images_job,
-    core_v2_image_enrich_step, core_v2_photo_duplication_step, core_v2_artifacts_step,
-    core_v2_publish_artifacts_step, core_v2_address_grouping_step, core_v2_image_grouping_step,
-    core_v2_resolve_groups_step, core_v2_groups_step, core_v2_resolve_pin_step,
-    core_v2_condominium_step and core_v2_publish_resolved_identities_step.
+    core_v2_image_normalization_step, core_v2_images_upsert_step, core_v2_address_enrich_step,
+    sources_kodak_atlas_images_job, core_v2_image_enrich_step, core_v2_photo_duplication_step,
+    core_v2_artifacts_step, core_v2_publish_artifacts_step, core_v2_address_grouping_step,
+    core_v2_image_grouping_step, core_v2_resolve_groups_step, core_v2_groups_step,
+    core_v2_resolve_pin_step, core_v2_condominium_step and
+    core_v2_publish_resolved_identities_step.
     For more information, see the GitHub [Vespucio Repository](https://github.com/quintoandar/vespucio)"
 kafka_bootstrap_servers: lkc-256gpm-jv0e34.us-east-1.aws.glb.confluent.cloud:9092
 callback_by_task_failure: True
 callback_by_task_success: False
 webhook_vespucio_pipeline_v2: WEBHOOK_VESPUCIO_PIPELINE_PROD
+kodak_photo_sns_arn: "arn:aws:sns:us-east-1:632540934959:ProdKodakPhoto"
 kodak_photo_duplication_sqs_queue_url: "https://sqs.us-east-1.amazonaws.com/632540934959/ProdKodakPhotoDuplicationQueue"
 
 custom_cluster:

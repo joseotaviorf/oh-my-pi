@@ -50,6 +50,7 @@ kafka_bootstrap_servers = config_service.get_config("kafka_bootstrap_servers")
 kodak_photo_duplication_sqs_queue_url = config_service.get_config(
     "kodak_photo_duplication_sqs_queue_url"
 )
+kodak_photo_sns_arn = config_service.get_config("kodak_photo_sns_arn")
 
 VESPUCIO_PACKAGE_VERSION = config_service.get_config("vespucio_pipeline_version")
 VESPUCIO_WHEEL_FILE = (
@@ -350,6 +351,19 @@ image_normalization_step_task = create_task(
     ],
 )
 
+images_upsert_step_task = create_task(
+    entry_point="core_v2_images_upsert_step",
+    parameters=[
+        f"--input_image_normalized={Tables.image_normalization_step_v2}",
+        f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
+        f"--output_images_upsert={Tables.images_upsert_step_v2}",
+        f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
+        f"--kodak_photo_sns_arn={kodak_photo_sns_arn}",
+        "--kodak_photo_sns_region=us-east-1",
+    ],
+    task_id="images_upsert",
+)
+
 address_enrich_step_task = create_task(
     entry_point="core_v2_address_enrich_step",
     parameters=[
@@ -376,7 +390,6 @@ kodak_atlas_images_task = create_task(
 image_enrich_step_task = create_task(
     entry_point="core_v2_image_enrich_step",
     parameters=[
-        f"--input_image_normalized={Tables.image_normalization_step_v2}",
         f"--input_source_kodak_atlas_images={Tables.source_kodak_atlas_images_v2}",
         "--overwrite_schema",
         f"--output_image_enrich={Tables.image_enrich_step_v2}",
@@ -532,7 +545,8 @@ registry_step_task >> address_normalization_step_task
 registry_step_task >> general_normalization_step_task
 registry_step_task >> image_normalization_step_task
 address_normalization_step_task >> address_enrich_step_task
-[image_normalization_step_task, kodak_atlas_images_task] >> image_enrich_step_task
+image_normalization_step_task >> images_upsert_step_task
+kodak_atlas_images_task >> image_enrich_step_task
 [
     address_enrich_step_task,
     general_normalization_step_task,
