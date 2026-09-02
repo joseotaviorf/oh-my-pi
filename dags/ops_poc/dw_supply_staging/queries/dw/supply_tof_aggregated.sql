@@ -22,7 +22,7 @@ sf_dedup AS (
       id_lead
 ),
 
-sf AS ( -- fl_carteirizado — keep only latest lead row (filter non-latest before DISTINCT)
+sf AS ( -- fl_carteirizado
     SELECT DISTINCT
         sf.id_lead AS lead_id,
         DATE(sf.creation_date) AS dt_creation_sf,
@@ -31,7 +31,7 @@ sf AS ( -- fl_carteirizado — keep only latest lead row (filter non-latest befo
         'carteirizado' AS outbound_operation
     FROM
         datalake_salesforce_growth_clean.lead sf
-    INNER JOIN
+    LEFT JOIN
         sf_dedup sfd
             ON sf.id_lead = sfd.id_lead
             AND sf.dt_updated = sfd.dt_updated_latest
@@ -42,42 +42,6 @@ sf AS ( -- fl_carteirizado — keep only latest lead row (filter non-latest befo
         DATE(sf.creation_date) BETWEEN DATE'2025-01-01' AND CURRENT_DATE
 ),
 
--- Push the 3-year window before joins (same predicate as actual_vol WHERE).
-obt_base AS (
-    SELECT
-        date,
-        acquisition_origin,
-        nm_business_context,
-        nm_supply_source,
-        company_report_origin,
-        planning_operation,
-        planning_conversion,
-        planning_cluster,
-        behavior_type,
-        source,
-        medium,
-        nm_campaign,
-        country_code,
-        city_group,
-        ds_discard_reason,
-        campaign_strategy_intent,
-        campaign_business_context,
-        funnel_side,
-        campaign_landing_page,
-        sk_supply,
-        sk_lead,
-        sk_user_conversion,
-        sk_user_affiliate,
-        nm_agent,
-        cd_funnel_step,
-        quinto_andar_phone_number,
-        CAST(PMOD(HASH(sk_user_conversion), 16) AS INT) AS join_salt
-    FROM
-        dw_growth.obt_supply
-    WHERE
-        YEAR(date) >= YEAR(CURRENT_DATE) - 3
-),
-
 cohort_events AS (
     SELECT
         date,
@@ -85,7 +49,7 @@ cohort_events AS (
         nm_business_context,
         cd_funnel_step
     FROM
-        obt_base
+        dw_growth.obt_supply
     WHERE
         cd_funnel_step IN ('qualified', 'av_qualified', 'opportunity', 'first_listing')
 ),
@@ -118,36 +82,18 @@ latest_campaign_name AS (
 
 aux_planning_operation AS (
     SELECT
+        cp.*,
         CAST(CAST(cp.skuser AS DOUBLE) AS BIGINT) AS sk_user_id,
-        cp.area,
-        DATE(cp.Data_Mudanca_Area) AS periodo_inicio,
+        DATE(cp.Data_Mudanca_Area) as periodo_inicio,
         COALESCE(
-            LEAD(DATE(cp.Data_Mudanca_Area)) OVER (
-                PARTITION BY CAST(CAST(cp.skuser AS DOUBLE) AS BIGINT)
-                ORDER BY DATE(cp.Data_Mudanca_Area)
-            ),
-            CURRENT_DATE
+            LEAD(DATE(cp.Data_Mudanca_Area)) OVER (PARTITION BY CAST(CAST(cp.skuser AS DOUBLE) AS BIGINT) ORDER BY DATE(cp.Data_Mudanca_Area)) 
+            , current_date
         ) AS periodo_fim
-    FROM
+    FROM 
         datalake_gsheets_clean.supply_user_match_is cp
-    WHERE
-        cp.skuser IS NOT NULL
-        AND TRIM(cp.skuser) NOT IN ('', '-')
-),
-
--- Salt build side so hot sk_user_id keys spread across 16 partitions on the equi+range join.
-aux_planning_operation_salted AS (
-    SELECT
-        apo.sk_user_id,
-        apo.area,
-        apo.periodo_inicio,
-        apo.periodo_fim,
-        salt.salt AS join_salt
-    FROM
-        aux_planning_operation AS apo
-    CROSS JOIN (
-        SELECT EXPLODE(SEQUENCE(0, 15)) AS salt
-    ) AS salt
+    WHERE 
+        cp.skuser IS NOT NULL 
+        AND trim(cp.skuser) NOT IN ('', '-')    
 ),
 
 actual_vol AS (
@@ -338,7 +284,7 @@ actual_vol AS (
         ,NULL AS tgt_cost
         ,NULL AS mkt_cost
     FROM
-      obt_base obt
+      dw_growth.obt_supply obt
     LEFT JOIN
       cohort_events qualifieds
         ON obt.sk_supply = qualifieds.sk_supply
@@ -388,139 +334,15 @@ actual_vol AS (
     LEFT JOIN
       datalake_supply_flows.inbound_attribution AS ia
         ON ia.id_lead_ebdb = obt.sk_lead
-    LEFT JOIN
-      aux_planning_operation_salted apo
+    LEFT JOIN 
+      aux_planning_operation apo
         ON obt.sk_user_conversion = apo.sk_user_id
-        AND obt.join_salt = apo.join_salt
         AND obt.date >= apo.periodo_inicio
         AND obt.date < apo.periodo_fim
+    WHERE
+      YEAR(obt.date) >= YEAR(current_date) - 3
 
-    GROUP BY
-        'actual_vol',
-        obt.date,
-        obt.acquisition_origin,
-        obt.nm_business_context,
-        obt.nm_supply_source,
-        obt.company_report_origin,
-        obt.planning_operation,
-        COALESCE(TRIM(SPLIT_PART(apo.area, '-',1)), obt.planning_operation),
-        obt.planning_conversion,
-        obt.planning_cluster,
-        obt.behavior_type,
-        obt.source,
-        obt.medium,
-        obt.nm_campaign,
-        cnh.id_campaign,
-        obt.country_code,
-        obt.city_group,
-        obt.ds_discard_reason,
-        scc.campaign_cluster,
-        sf.dt_creation_sf,
-        sf.channel_sf,
-        CASE
-            WHEN ac.id IS NOT NULL
-                AND obt.country_code = 'BR'
-                AND obt.planning_operation = 'Outbound'
-                AND NOT (
-                    obt.date >= DATE '2025-09-01'
-                        AND obt.nm_business_context = 'RENT'
-                        AND (
-                        obt.sk_user_conversion IN (8919771, 11299701, 6001450) OR
-                        obt.sk_user_conversion IN (8919771, 11299701, 6001450) OR
-                        obt.sk_user_affiliate IN (12306405, 14046860, 14053116,14046994, 14217303, 14294994)
-                        )
-                    )
-                THEN TRUE
-            ELSE FALSE
-        END,
-        CASE
-            WHEN obt.sk_user_conversion IS NULL
-                THEN NULL
-            WHEN obt.sk_user_conversion IN (
-              12524938,13946547,8213735,13345718,12547541,13686088,13096943,12514676,14248042,13650603,14077391,13089199,
-              13686095,12525058,13345712,12547601,13180531,13044261,13686090,8629756,10461327,8629755,12839526,13201490,
-              13892168,13817190,13180530,13473187,13946548,13473192,12080523,12422745,12525005,13395938,13276220,14473223,
-              8793348,13501526,13158267,12013178,12839533,9840974,13390240,12458723,13390237,1479808,13460993,14473225,13658514,
-              13096941,12547669
-              )
-              AND NOT (
-                  obt.date >= DATE '2025-09-01' AND obt.nm_business_context = 'RENT'
-                  AND (
-                      obt.sk_user_conversion IN (8919771, 11299701, 6001450) OR
-                      obt.sk_user_conversion IN (8919771, 11299701, 6001450) OR
-                      obt.sk_user_affiliate IN (12306405, 14046860, 14053116,14046994, 14217303, 14294994)
-                      )
-                  )
-                  AND obt.country_code = 'BR'
-                  AND obt.planning_operation = 'Outbound'
-                  THEN TRUE
-              ELSE FALSE
-        END,
-        CASE
-            WHEN obt.date >= DATE '2025-09-01'
-              AND obt.date <= DATE '2025-11-18'
-              AND obt.nm_business_context = 'RENT'
-              AND obt.sk_user_conversion IN (8919771, 11299701, 6001450)
-              THEN TRUE
-            WHEN obt.date >= DATE '2025-09-01'
-              AND obt.date <= DATE '2025-11-18'
-              AND obt.nm_business_context = 'RENT'
-              AND obt.sk_user_affiliate IN (12306405, 14046860,14053116, 14046994, 14217303, 14294994)
-              THEN TRUE
-            WHEN obt.date >= DATE '2025-09-01'
-              AND obt.nm_business_context = 'RENT'
-              AND lower(obt.nm_agent) IN ('ciq_pj', '3p_fr')
-              THEN TRUE
-            ELSE FALSE
-        END,
-        CASE
-          WHEN obt.nm_campaign = '-1' AND ia.source_environment IN (
-            SELECT DISTINCT
-                source_environment
-            FROM
-                datalake_gsheets_clean.supply_inputs_click_to_whatsapp
-            WHERE
-                source_environment IS NOT NULL
-                AND source_environment <> 'default'
-            ) THEN TRUE
-          WHEN obt.nm_campaign IN (
-            SELECT DISTINCT
-                nm_campaign
-            FROM
-                datalake_gsheets_clean.supply_inputs_click_to_whatsapp
-            WHERE
-                nm_campaign <> '-1'
-            ) THEN TRUE
-          WHEN obt.quinto_andar_phone_number IN (
-            SELECT DISTINCT
-                phone_number
-            FROM
-                datalake_gsheets_clean.supply_inputs_click_to_whatsapp
-            WHERE
-                phone_number IS NOT NULL
-            ) THEN TRUE
-          ELSE FALSE
-        END,
-        COALESCE(sf.outbound_operation, 'não-carteirizado'),
-        COALESCE(fl_unique.fl_unique, 'Cross-listing'),
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+    GROUP BY ALL
 ),
 
 bup AS (
@@ -639,112 +461,7 @@ bup AS (
     WHERE
         source = 'qts' -- BUP  | budget para OKR
         AND YEAR(date) = YEAR(current_date)
-    GROUP BY
-        'bup',
-        date,
-        NULL,
-        business_context,
-        CASE
-            WHEN planning_operation = 'Rede' THEN '3P'
-            WHEN planning_operation = 'CIQ' THEN 'CIQ'
-            ELSE '1P'
-        END,
-        company_report_origin,
-        planning_operation,
-        NULL,
-        planning_conversion,
-        planning_cluster,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        'BR',
-        city_group,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+    GROUP BY ALL
 ),
 okr AS (
     SELECT
@@ -868,118 +585,7 @@ okr AS (
     WHERE
         source = 'okr' -- BUP  | budget para OKR
         AND YEAR(date) = YEAR(current_date)
-    GROUP BY
-        'okr',
-        date,
-        NULL,
-        business_context,
-        CASE
-          WHEN planning_operation = 'Rede' THEN '3P'
-          WHEN planning_operation = 'CIQ' THEN 'CIQ'
-          ELSE '1P'
-        END,
-        CASE
-            WHEN planning_cluster LIKE 'Indica Aí - General%' THEN 'Indica Aí - General'
-            WHEN planning_cluster LIKE 'Owner PWA - Paid%' THEN 'Owner PWA - Paid'
-            WHEN planning_cluster LIKE 'Price Calculator - Sale%' THEN 'Price Calculator - Sale'
-            WHEN planning_cluster LIKE 'Price Calculator%' THEN 'Price Calculator'
-            ELSE planning_cluster
-        END,
-        planning_operation,
-        NULL,
-        planning_conversion,
-        planning_cluster,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        'BR',
-        city_group,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+    GROUP BY ALL
 ),
 tgt_unique as (
     SELECT
@@ -1094,112 +700,7 @@ tgt_unique as (
         ,NULL AS mkt_cost
     FROM
         datalake_supply_staging.supply_unique_targets
-    GROUP BY
-        'target_unique',
-        date,
-        NULL,
-        NULL,
-        CASE
-            WHEN planning_operation = 'Rede' THEN '3P'
-            WHEN planning_operation = 'CIQ' THEN 'CIQ'
-            ELSE '1P'
-        END,
-        company_report_origin,
-        planning_operation,
-        NULL,
-        planning_conversion,
-        planning_cluster,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        'BR',
-        city_group,
-        NULL,
-        campaign_cluster,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        'Unique',
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+    GROUP BY ALL
 ),
 tgt_mkt_costs AS (
     SELECT
@@ -1316,114 +817,7 @@ tgt_mkt_costs AS (
     WHERE
         cost_per_source > 0
         AND YEAR(dt_target) = YEAR(CURRENT_DATE)
-    GROUP BY
-        'tgt_mkt_costs',
-        dt_target,
-        NULL,
-        'SALE',
-        '1P',
-        CASE
-            WHEN supply_origin LIKE 'Owner PWA' THEN 'Owner PWA - Paid'
-            ELSE supply_origin
-        END,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        supply_medium,
-        NULL,
-        NULL,
-        NULL,
-        city_group,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        'Unique',
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+    GROUP BY ALL
 UNION ALL
     SELECT
         'tgt_mkt_costs' AS aux_reference,
@@ -1539,114 +933,7 @@ UNION ALL
      WHERE
         cost_per_source > 0
         AND YEAR(dt_target) = YEAR(CURRENT_DATE)
-     GROUP BY
-         'tgt_mkt_costs',
-         dt_target,
-         NULL,
-         'RENT',
-         '1P',
-         CASE
-            WHEN supply_origin like 'Owner PWA' THEN 'Owner PWA - Paid'
-            ELSE supply_origin
-        END,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         supply_medium,
-         NULL,
-         NULL,
-         NULL,
-         city_group,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         'Unique',
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL,
-         NULL
+     GROUP BY ALL
 ),
 act_costs AS (
     SELECT
