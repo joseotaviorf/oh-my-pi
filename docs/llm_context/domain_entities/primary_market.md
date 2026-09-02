@@ -28,6 +28,23 @@ The **Development** domain is a separate service/bounded-context from **Sales Fl
 - **Offer acceptance is also a service-side event**, not just a data write: on accept, the service atomically decrements `unitCount`, suspends the typology listing when sold out (and the whole development if all typologies are sold out), and only then mints the **real** unit Imovel used for the closing path. This is why the unit house_id is created at **offer accept**, not at offer send — a deliberate anti-ghost-inventory design, not a data gap.
 - **`DevelopmentContact`** (active manager per empreendimento) is fully owned and queryable inside the Development domain — no external service call needed, which is why that FAQ answer below is native.
 
+## ⚠️ Two different "Primary Market" populations — do not conflate
+
+**Verified 2026-09-02 against production data.** Any table sourced from `listing_sale_type` (which includes the legacy `is_primary_market` boolean as a fallback — see Tables below) mixes **two populations** that most business questions do NOT mean to combine:
+
+1. **The new Órulo pilot** (this doc's actual subject) — houses that exist in `datalake_ebdb_clean.development_typology_unit` (**537** houses), almost all of which also have `sale_type = 'PRIMARY'` on the strict raw enum (**536** — 1 house not yet classified).
+2. **Legacy pre-pilot `is_primary_market = TRUE` houses** — builder-sold listings flagged under the old system, unrelated to this pilot's Development/Órulo model. There are roughly **4,767** of these (5,303 fallback-classified minus 536 strict).
+
+**This is not a rounding difference — it changes results by two orders of magnitude.** On `dw_visit.fact_visits`, `sale_type = 'PRIMARY'` returns **37,407 visits booked** (90% VB2VC) across the fallback-inclusive population, versus **23 visits booked** (5 completed, 17 distinct houses) when scoped to the actual 536/537-house pilot. **If a question is about the pilot, filter by `development_typology_unit.id_house`, not by `sale_type = 'PRIMARY'` alone.**
+
+```sql
+-- Correct pilot-scoped filter (any fact with a house-grain join key)
+INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
+    ON dtu.id_house = fact_table.sk_house  -- or id_house, per the fact's own column name
+```
+
+`sale_type = 'PRIMARY'` alone is only safe to use for tables that are natively scoped to the pilot already (e.g. `house_development`, `development_negotiation` — both only exist for Development-domain houses in the first place).
+
 ## Glossary and Synonyms
 
 | Term | Meaning | Notes |
@@ -76,9 +93,10 @@ WHERE dl.is_primary_market
 
 - **Primary listings:** `COUNT(DISTINCT sk_sale_listing)` where `dw_sale.dim_listing.is_primary_market = TRUE`.
 - **Primary houses:** `COUNT(DISTINCT sk_house)` with the same filter.
-- **Primary visit volume:** `SUM(num_visit_booked)` on `dw_visit.fact_visits` where `sale_type = 'PRIMARY'` — see [`visits.md`](visits.md) for booked vs completed metric conventions.
+- **Primary visit volume (pilot-scoped):** `SUM(num_visit_booked)` on `dw_visit.fact_visits`, joined to `development_typology_unit` on `id_house` (do **not** filter by `sale_type = 'PRIMARY'` alone — see the population warning above). As of 2026-09-02: 23 booked, 5 completed, 17 distinct houses. See [`visits.md`](visits.md) for booked vs completed metric conventions.
 - **Primary ongoing supply (daily stock):** `COUNT(DISTINCT sk_snapshot)` (or house count) on `dw_sale.fact_daily_ongoing_listing` where `sale_type = 'PRIMARY'`.
 - **Pré-OS volume (buyer-initiated only):** `COUNT(*)` on `datalake_sale_primary_market.development_negotiation` where `actor = 'DEMAND'` — filter `actor` to avoid broker-inflation from agent-created negotiations.
+- **Visit → pré-OS conversion:** join `dw_visit.fact_visits.sk_visit` to `development_negotiation.id_visit` (same ID space — see Golden Query 4). As of 2026-09-02: 1 of 23 pilot visits (1 of 5 completed) led to a negotiation — directional only at this volume.
 
 No official metric-entity file exists for Primary Market yet — all metrics above are component-level, not corporate/OKR definitions.
 
@@ -149,6 +167,7 @@ This question never leaves the Development domain: `DevelopmentContact` (exposed
 - Treat the shell house_id as a **typology**, not a physical unit, when reasoning about Primary inventory counts.
 - Join `dim_listing` on `sk_house` for any Primary/Secondary question on a fact that doesn't carry its own flag yet (e.g. `fact_offers`).
 - Filter `development_negotiation.actor = 'DEMAND'` when counting buyer-initiated pré-OS to avoid broker inflation.
+- Scope any Primary Market question to the pilot via `development_typology_unit.id_house`, not `sale_type = 'PRIMARY'` alone — see the population warning above.
 - Check the live SQL/metadata before assuming a table has `sale_type` — this domain is mid-rollout and columns are landing incrementally.
 
 **Do not:**
@@ -175,19 +194,98 @@ FROM dw_sale.dim_listing AS dl
 WHERE dl.is_primary_market
 ```
 
-### Query 2 — Primary visit volume by month
+### Query 2 — Primary visit volume by month (pilot-scoped)
 
-Counts Primary Market visits booked and completed, monthly, using the visit-grain `sale_type` column (not a `dim_listing` join). Follows the same `SUM(num_visit_*)` convention as [`visits.md`](visits.md) — do not `COUNT(*)` rows for booked/completed totals.
+Counts Primary Market **pilot** visits booked and completed, monthly. **Deliberately does NOT filter `sale_type = 'PRIMARY'` alone** — see the population warning above; that filter would pull in ~4,767 legacy pre-pilot houses unrelated to this rollout. Scopes via `development_typology_unit` instead, which is inherently pilot-only. Follows the same `SUM(num_visit_*)` convention as [`visits.md`](visits.md) — do not `COUNT(*)` rows for booked/completed totals.
 
 ```sql
 SELECT
-    DATE_TRUNC('month', CAST(ts_visit_local_tz AS DATE)) AS visit_month,
-    SUM(num_visit_booked) AS primary_visits_booked,
-    SUM(num_visit_completed) AS primary_visits_completed
-FROM dw_visit.fact_visits
-WHERE sale_type = 'PRIMARY'
+    DATE_TRUNC('month', CAST(fv.ts_visit_local_tz AS DATE)) AS visit_month,
+    SUM(fv.num_visit_booked) AS primary_visits_booked,
+    SUM(fv.num_visit_completed) AS primary_visits_completed
+FROM dw_visit.fact_visits AS fv
+INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
+    ON dtu.id_house = fv.sk_house
 GROUP BY 1
 ORDER BY 1 DESC
 ```
 
 > See [`visits.md`](visits.md) for the full visit-fact column reference, VB2VC conventions, and the `fact_visits` ↔ `fact_visit_schedules` join.
+
+### Query 3 — Pilot VB2VC rate vs. Secondary (comparison)
+
+Compares visit-completion efficiency between the pilot and Secondary. Demonstrates why scoping matters: the fallback-inclusive `sale_type = 'PRIMARY'` filter alone would show a misleading ~90% VB2VC (driven by the legacy population, not this pilot).
+
+```sql
+SELECT
+    CASE WHEN dtu.id_house IS NOT NULL THEN 'PRIMARY_PILOT' ELSE fv.sale_type END AS segment,
+    SUM(fv.num_visit_booked) AS booked,
+    SUM(fv.num_visit_completed) AS completed,
+    CAST(SUM(fv.num_visit_completed) AS DOUBLE) / NULLIF(SUM(fv.num_visit_booked), 0) AS vb2vc_rate
+FROM dw_visit.fact_visits AS fv
+LEFT JOIN datalake_ebdb_clean.development_typology_unit AS dtu
+    ON dtu.id_house = fv.sk_house
+WHERE fv.sale_type IN ('PRIMARY', 'SECONDARY')
+GROUP BY 1
+ORDER BY 1
+```
+
+### Query 4 — Visit → pré-OS conversion (pilot)
+
+How many pilot visits led to a negotiation (pré-OS)? `development_negotiation.id_visit` and `fact_visits.sk_visit` share the same ID space (both ultimately trace to `datalake_visit.visits.id_visit` / `datalake_ebdb_clean.visit.id`, which are kept in sync) — confirmed against the one known negotiation in production before relying on this join.
+
+```sql
+WITH pilot_visits AS (
+    SELECT
+        fv.sk_visit,
+        fv.sk_house,
+        fv.is_completed
+    FROM dw_visit.fact_visits AS fv
+    INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
+        ON dtu.id_house = fv.sk_house
+)
+SELECT
+    COUNT(*) AS total_pilot_visits,
+    SUM(CASE WHEN pv.is_completed THEN 1 ELSE 0 END) AS completed_pilot_visits,
+    COUNT(DISTINCT dn.id_visit) AS visits_with_negotiation
+FROM pilot_visits AS pv
+LEFT JOIN datalake_sale_primary_market.development_negotiation AS dn
+    ON dn.id_visit = pv.sk_visit
+```
+
+### Query 5 — Visits by development (top N)
+
+Which developments are getting visit traffic. Useful for spotting cold-start developments the pilot hasn't yet demonstrated demand for.
+
+```sql
+SELECT
+    hd.development_name,
+    hd.id_development,
+    SUM(fv.num_visit_booked) AS booked,
+    SUM(fv.num_visit_completed) AS completed
+FROM dw_visit.fact_visits AS fv
+INNER JOIN datalake_sale_primary_market.house_development AS hd
+    ON hd.id_house = fv.sk_house
+GROUP BY 1, 2
+ORDER BY booked DESC
+LIMIT 10
+```
+
+### Query 6 — Pilot houses never visited (supply not yet demonstrated)
+
+Supply-side gap check: how much of the pilot's published inventory has zero visit activity. Ops-relevant for identifying developments that may need marketing push or aren't ranking in search.
+
+```sql
+WITH visited_houses AS (
+    SELECT DISTINCT sk_house
+    FROM dw_visit.fact_visits
+    WHERE num_visit_booked > 0
+)
+SELECT
+    COUNT(*) AS n_pilot_houses,
+    COUNT(vh.sk_house) AS n_visited,
+    COUNT(*) - COUNT(vh.sk_house) AS n_never_visited
+FROM datalake_sale_primary_market.house_development AS hd
+LEFT JOIN visited_houses AS vh
+    ON vh.sk_house = hd.id_house
+```
