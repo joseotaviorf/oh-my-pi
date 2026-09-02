@@ -53,6 +53,38 @@ WITH base_search_events AS (
         AND month = {month}
         AND day = {day}
 ),
+-- A neighborhood slug embeds its city slug (`vila-mariana-sao-paulo-sp-brasil`), so matching one against
+-- the other is a containment test. Expressed as a join it has no hash key, and Spark can only plan it as a
+-- BroadcastNestedLoopJoin over every event row. There are only ~130 cities, so the whole set fits in one
+-- array: FILTER applies the containment test map-side against the day's distinct slugs, and EXPLODE turns
+-- each match back into a row, so a slug matching two cities still yields two rows exactly as the join did.
+city_slugs AS (
+    SELECT
+        COLLECT_SET(slug) AS slugs
+    FROM
+        datalake_ebdb_clean.region
+    WHERE
+        level = 'Cidade'
+),
+searched_location_slugs AS (
+    SELECT DISTINCT
+        search_location_slug
+    FROM
+        base_search_events
+    WHERE
+        search_location_slug IS NOT NULL
+),
+searched_location_city_matches AS (
+    SELECT
+        sls.search_location_slug,
+        EXPLODE(
+            FILTER(cs.slugs, city -> sls.search_location_slug LIKE ('%' || city || '%'))
+        ) AS city_slug
+    FROM
+        searched_location_slugs AS sls
+    CROSS JOIN
+        city_slugs AS cs
+),
 all_events AS (
     SELECT
         bse.id_amplitude,
@@ -72,7 +104,7 @@ all_events AS (
             WHEN RLIKE(bse.uri, 'imovel\/[-+]?[0-9]*\.?[0-9]+,[-+]?[0-9]*\.?[0-9]+') THEN 'coordinates'
             WHEN RLIKE(bse.search_location_slug, 'rua|praça|avenida|av\.\-|\-r\-|\-av\-|\-praca\-|alameda|estrada|r\.\-|al\.\-|av\-|av\.') THEN 'street'
             WHEN NULLIF(bse.search_query_context, 'unknown') IS NOT NULL THEN search_query_context
-            WHEN r_like_city.slug IS NOT NULL THEN 'neighborhood'
+            WHEN r_like_city.city_slug IS NOT NULL THEN 'neighborhood'
             ELSE 'unknown'
         END AS search_location_type,
         COALESCE(view_mode, 'N/A') AS search_view_mode,
@@ -87,9 +119,8 @@ all_events AS (
         datalake_ebdb_clean.region AS r_equal
             ON bse.search_location_slug = r_equal.slug
     LEFT JOIN
-        datalake_ebdb_clean.region AS r_like_city
-            ON bse.search_location_slug like ('%' || r_like_city.slug || '%')
-            AND r_like_city.level = 'Cidade'
+        searched_location_city_matches AS r_like_city
+            ON r_like_city.search_location_slug = bse.search_location_slug
     UNION ALL
     SELECT
         id_amplitude,

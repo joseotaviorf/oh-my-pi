@@ -1,57 +1,57 @@
 ---
 table_name: datalake_search_session_event.search_session_event
 alert_channel: "#alerts-de-airflow-dags"
+# The per-column `is_complete` / `is_contained_in` checks this replaces were evaluated by
+# Deequ over the whole table, so the validation step re-scanned all of history on every run
+# and grew with it. Folding them into one partition-filtered constraint keeps the same
+# assertions but reads only the partition the run just wrote.
+#
+# Wall-clock caveat (same as `enrich_access_logs`): the framework does not template the run's
+# data interval into a constraint, so this is anchored on CURRENT_DATE() rather than on the
+# interval being processed. A backfill or a run that slips past midnight UTC therefore
+# validates the current calendar day, not the interval that triggered it.
 column_level_validations:
-  id_amplitude:
-    is_complete:
-      severity_level: Error
-  event_type:
-    is_complete:
-      severity_level: Error
-    is_contained_in:
-      values:
-        - Search
-        - Listing Page Viewed
-  search_rendering_type:
-    is_complete:
-      severity_level: Error
-    is_contained_in:
-      values:
-        - Client Search
-        - Server-Side Rendering (SSR)
-        - N/A
-  business_context:
-    is_complete:
-      severity_level: Error
-    is_contained_in:
-      values:
-        - sale
-        - rent
-        - n/a
-  utm_source:
-    is_complete:
-      severity_level: Error
-  utm_medium:
-    is_complete:
-      severity_level: Error
-  platform:
-    is_complete:
-      severity_level: Error
-  base_referrer_url:
-    is_complete:
-      severity_level: Error
-  search_location_type:
-    is_complete:
-      severity_level: Error
-  search_view_mode:
-    is_complete:
-      severity_level: Error
-  search_sort_order:
-    is_complete:
-      severity_level: Error
-  nr_session_for_user_on_day:
-    is_complete:
-      severity_level: Error
-  ts_event:
-    is_complete:
+  loaded_partition_has_valid_required_search_event_values:
+    custom:
+      # Completeness and accepted categorical values for the D-1 partition. COUNT(*) > 0
+      # also guards against the run writing an empty partition.
+      constraint: |-
+        (
+          SELECT
+            CASE
+              WHEN COUNT(*) > 0
+                AND SUM(
+                  CASE
+                    WHEN id_amplitude IS NULL
+                      OR event_type IS NULL
+                      OR event_type NOT IN ('Search', 'Listing Page Viewed')
+                      OR search_rendering_type IS NULL
+                      OR search_rendering_type NOT IN (
+                        'Client Search',
+                        'Server-Side Rendering (SSR)',
+                        'N/A'
+                      )
+                      OR business_context IS NULL
+                      OR business_context NOT IN ('sale', 'rent', 'n/a')
+                      OR utm_source IS NULL
+                      OR utm_medium IS NULL
+                      OR platform IS NULL
+                      OR base_referrer_url IS NULL
+                      OR search_location_type IS NULL
+                      OR search_view_mode IS NULL
+                      OR search_sort_order IS NULL
+                      OR nr_session_for_user_on_day IS NULL
+                      OR ts_event IS NULL
+                    THEN 1
+                    ELSE 0
+                  END
+                ) = 0
+              THEN 1
+              ELSE 0
+            END
+          FROM
+            datalake_search_session_event.search_session_event
+          WHERE
+            MAKE_DATE(year, month, day) = CURRENT_DATE() - INTERVAL 1 DAY
+        ) = 1
       severity_level: Error

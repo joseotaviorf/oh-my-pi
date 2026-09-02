@@ -1,12 +1,34 @@
 ---
 table_name: dw_public.fact_search_session_event
 alert_channel: "#alerts-de-airflow-dags"
+# `is_unique` on `sk_event` was the expensive check here: Deequ evaluates it over the whole
+# table, so every run shuffled the full fact history to prove uniqueness. Scoping it to the
+# partition the run just wrote keeps the assertion that matters (the new keys are unique and
+# complete) at a cost proportional to one day of data.
+#
+# Wall-clock caveat (same as `enrich_access_logs`): the framework does not template the run's
+# data interval into a constraint, so this is anchored on CURRENT_DATE() rather than on the
+# interval being processed. A backfill or a run that slips past midnight UTC therefore
+# validates the current calendar day, not the interval that triggered it.
 column_level_validations:
-  sk_event:
-    is_complete:
-      severity_level: Error
-    is_unique:
-      severity_level: Error
-  sk_event_type:
-    is_complete:
+  loaded_partition_has_complete_unique_event_keys:
+    custom:
+      # Key completeness and uniqueness for the D-1 partition. COUNT(*) > 0 also guards
+      # against the run writing an empty partition.
+      constraint: |-
+        (
+          SELECT
+            CASE
+              WHEN COUNT(*) > 0
+                AND COUNT(sk_event) = COUNT(*)
+                AND COUNT(DISTINCT sk_event) = COUNT(*)
+                AND COUNT(sk_event_type) = COUNT(*)
+              THEN 1
+              ELSE 0
+            END
+          FROM
+            dw_public.fact_search_session_event
+          WHERE
+            MAKE_DATE(year, month, day) = CURRENT_DATE() - INTERVAL 1 DAY
+        ) = 1
       severity_level: Error
