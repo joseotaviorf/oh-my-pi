@@ -141,7 +141,14 @@ segments_perspective AS (
       fcc.is_last_interaction,
       fcc.is_first_department_interaction,
       fcc.is_per_team_task AS per_team_flag,
-      UPPER(fcc.status) AS status,
+      UPPER(CASE
+        WHEN fcc.outcome = 'task idled' THEN 'idled'
+        WHEN fcc.outcome = 'session expired' THEN 'expired'
+        WHEN fcc.outcome = 'task completed' THEN 'completed'
+        WHEN fcc.outcome = 'task transferred' THEN 'transferred'
+        WHEN fcc.outcome IS NULL THEN fcc.status
+        ELSE fcc.status 
+      END) AS status,
       COALESCE(fcc.ts_reservation_created, fcc.ts_task_created) - INTERVAL '3' HOUR AS ts_reservation_created,
       CAST(NULL AS DOUBLE) AS average_reply_time,
       CASE
