@@ -1,0 +1,147 @@
+---
+database_name: datalake_mortgage_management_service_clean
+table_name: credit_proposal_crawler_job_aud
+owner: helder.rodrigues@quintoandar.com.br
+domain: For Sale
+description: "Historical audit trail of credit_proposal_crawler_job: one row per revision of a crawler job that automates filling a mortgage credit proposal on an external bank portal (currently Caixa Aqui), enabling point-in-time reconstruction of state transitions (RUNNING / RETRYING / COMPLETED / FAILED), retries, and failure diagnostics. Technical: Hibernate Envers audit table using the ValidityAuditStrategy, so each revision also records when it stopped being valid (rev_end); joins to revinfo via rev for who/what made the change. CDC-replicated clean copy of credit_proposal_crawler_job_aud from the Mortgage Management Service (MMS) operational database."
+columns:
+  id:
+    description: "Identifier of the crawler job that was revised, matching credit_proposal_crawler_job.id."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.id
+  rev:
+    description: "Envers revision identifier linking this audit row to the revinfo metadata table in the source database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.rev
+  rev_type:
+    description: "Envers revision type code for the row change (0=insert, 1=update, 2=delete)."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.revtype
+  rev_end:
+    description: "Revision at which this audit snapshot was superseded by a later change, marking the end of its validity period (Envers ValidityAuditStrategy)."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.revend
+  id_credit_proposal_reference:
+    description: "External identifier of the mortgage credit proposal this crawler job was filling, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.credit_proposal_reference_id
+  id_analyst_reference:
+    description: "External identifier of the analyst who triggered the crawler run, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.analyst_reference_id
+  uuid_credit_proposal_crawler_job:
+    description: "Public UUID of the crawler job, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.uuid
+  crawler_type_name:
+    description: "Crawler implementation assigned to this job (e.g. Caixa Aqui risk assessment), as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.crawler_type
+  state_name:
+    description: "Lifecycle state of the crawler job (RUNNING, RETRYING, COMPLETED, or FAILED), as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.state
+  failure_reason:
+    description: "Why the crawler stopped, as observed at this audit revision. Null while the job had not failed."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.failure_reason
+  failure_category:
+    description: "Retry-handling class of the failure (TRANSIENT, STRUCTURAL, or BUSINESS), as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.failure_category
+  step_failure:
+    description: "High-level crawler step where the failure occurred, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.step_failure
+  step_section_failure:
+    description: "Form section inside the failed step where the crawler stopped, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.step_section_failure
+  retry_count:
+    description: "Number of automatic retries already attempted, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.retry_count
+  fields_filled:
+    description: "Count of form fields filled by the crawler before this revision's state, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.fields_filled
+  version:
+    description: "Row optimistic-locking version number, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.version
+  mod_id_credit_proposal_reference:
+    description: "Envers flag indicating whether credit_proposal_reference_id changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.credit_proposal_reference_id_mod
+  mod_id_analyst_reference:
+    description: "Envers flag indicating whether analyst_reference_id changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.analyst_reference_id_mod
+  mod_uuid_credit_proposal_crawler_job:
+    description: "Envers flag indicating whether uuid changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.uuid_mod
+  mod_crawler_type_name:
+    description: "Envers flag indicating whether crawler_type changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.crawler_type_mod
+  mod_state_name:
+    description: "Envers flag indicating whether state changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.state_mod
+  mod_failure_reason:
+    description: "Envers flag indicating whether failure_reason changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.failure_reason_mod
+  mod_failure_category:
+    description: "Envers flag indicating whether failure_category changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.failure_category_mod
+  mod_step_failure:
+    description: "Envers flag indicating whether step_failure changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.step_failure_mod
+  mod_step_section_failure:
+    description: "Envers flag indicating whether step_section_failure changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.step_section_failure_mod
+  mod_retry_count:
+    description: "Envers flag indicating whether retry_count changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.retry_count_mod
+  mod_fields_filled:
+    description: "Envers flag indicating whether fields_filled changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.fields_filled_mod
+  mod_version:
+    description: "Envers flag indicating whether version changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.version_mod
+  mod_ts_created:
+    description: "Envers flag indicating whether created_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.created_at_mod
+  mod_ts_updated:
+    description: "Envers flag indicating whether updated_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.updated_at_mod
+  ts_created:
+    description: "Row creation timestamp, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.created_at
+  ts_updated:
+    description: "Row last-update timestamp, as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.updated_at
+  year:
+    description: "Partition year of the CDC audit row ingested into the data lake raw layer."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.year
+  month:
+    description: "Partition month of the CDC audit row ingested into the data lake raw layer."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.month
+  day:
+    description: "Partition day of the CDC audit row ingested into the data lake raw layer."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job_aud.day

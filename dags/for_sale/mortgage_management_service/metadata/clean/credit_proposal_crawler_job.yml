@@ -1,0 +1,116 @@
+---
+database_name: datalake_mortgage_management_service_clean
+table_name: credit_proposal_crawler_job
+owner: helder.rodrigues@quintoandar.com.br
+domain: For Sale
+description: "Execution log of automated crawler jobs that fill and submit parts of a mortgage credit proposal on an external bank portal (currently Caixa Aqui risk assessment) on behalf of an analyst. One row per crawler job (grain = one job execution); a credit proposal can have several jobs over time, but the source enforces at most one active job (state RUNNING or RETRYING) per (crawler_type_name, id_credit_proposal_reference) pair. Tracks the job lifecycle, retry count, how many form fields were filled, and — when the run fails — the failure reason/category plus the step and section where it stopped. Used to monitor crawler reliability, analyst workload, and where the Caixa Aqui flow breaks. Relates to the credit proposal via id_credit_proposal_reference (external reference, not a local foreign key; typically the Atta proposal identifier) and to the triggering analyst via id_analyst_reference. Technical: CDC-replicated clean copy of the credit_proposal_crawler_job table from the Mortgage Management Service (MMS) operational database."
+columns:
+  id:
+    description: "Primary key that uniquely identifies the crawler job execution. Technical: primary key of the row in the source service database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.id
+  id_credit_proposal_reference:
+    description: "External identifier of the mortgage credit proposal this crawler job is filling (typically the Atta 'proposta' id). Together with crawler_type_name, it is the business key used to prevent concurrent active runs for the same proposal. Technical: not a local foreign key; unique among active jobs only."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.credit_proposal_reference_id
+  id_analyst_reference:
+    description: "External identifier of the analyst who triggered this crawler run (the operator whose session is used to log into the bank portal). Technical: not a local foreign key."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.analyst_reference_id
+  uuid_credit_proposal_crawler_job:
+    description: "Public identifier of the crawler job, used to correlate this execution across APIs and domain events. Technical: unique UUID of the job in the source service."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.uuid
+  crawler_type_name:
+    description: "Which crawler implementation should execute this job, i.e. which bank portal and mortgage step to automate. Technical: stored as an enum string in the source database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.crawler_type
+    categories:
+      CAIXA_AQUI_RISK_ASSESSMENT: "Fills and submits the Caixa Aqui credit risk-assessment flow for the proposal (CPF lookup, client registration, and risk evaluation)."
+  state_name:
+    description: "Current lifecycle state of the crawler job. RUNNING and RETRYING are active states (at most one active job per proposal and crawler type). COMPLETED and FAILED are terminal; a failed job can be followed by a new run triggered by the analyst. Technical: stored as an enum string in the source database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.state
+    categories:
+      RUNNING: "Analyst triggered a run and the crawler is currently executing."
+      RETRYING: "A transient or structural failure occurred and the crawler will retry automatically (up to 3 times)."
+      COMPLETED: "All crawler steps succeeded; failure fields are cleared."
+      FAILED: "The job stopped after a business-rule failure or after exhausting automatic retries."
+  failure_reason:
+    description: "Why the crawler stopped, populated only when the job is not successfully completed. Drives retry policy via failure_category (transient/structural auto-retry up to 3 times; business reasons are terminal). Null on successful completion. Technical: stored as an enum string in the source database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.failure_reason
+    categories:
+      SESSION_EXPIRED: "Bank-portal session expired. Transient: crawler restarts and asks the analyst to log in again."
+      AUTHENTICATION_FAILURE: "Login to the bank portal failed. Transient: crawler restarts and asks the analyst to log in again."
+      CAIXA_UNAVAILABLE: "Caixa Aqui was unavailable. Transient: crawler restarts automatically."
+      SELECTOR_BROKEN: "A UI selector on the bank portal could not be resolved. Structural: auto-retries up to 3 times, then alerts engineering."
+      CPF_RESTRICTION: "The proponent's CPF has a restriction that blocks the flow. Business: non-retriable; needs analyst intervention."
+      ACTIVE_PROPOSAL: "The client already has an active credit proposal on the bank portal. Business: non-retriable; needs analyst intervention."
+      DATA_MISSING: "Required input data is missing. Business: non-retriable; analyst must adjust inputs before the next run."
+      REGISTRATION_REJECTED: "The client registration submitted to the bank was rejected. Business: non-retriable; needs analyst intervention."
+  failure_category:
+    description: "How the failure should be handled regarding retries and analyst involvement. Derived from failure_reason in the source service (not independently set). Null on successful completion. Technical: stored as an enum string in the source database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.failure_category
+    categories:
+      TRANSIENT: "Temporary failure (session, auth, portal outage). Crawler restarts automatically up to 3 times and may request analyst login."
+      STRUCTURAL: "Infrastructure or UI-integration failure. Auto-retries up to 3 times; may require an engineering alert when retries are exhausted."
+      BUSINESS: "Domain-rule violation. Non-retriable; requires analyst intervention before the next run."
+  step_failure:
+    description: "High-level crawler step where the failure occurred (CPF lookup, client registration, or risk assessment). Null when the job completed successfully or when the source did not record a step. Technical: stored as an enum string in the source database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.step_failure
+    categories:
+      CPF_QUERY: "Searching for the proponent by CPF to locate their record in Caixa Aqui."
+      CLIENT_REGISTRATION: "Filling client registration screens: personal data, address, income, dependents, expenses, and home branch."
+      RISK_ASSESSMENT: "Submitting the completed registration for credit risk evaluation."
+  step_section_failure:
+    description: "Finer-grained screen or form section, inside step_failure, where the crawler stopped (e.g. CPF search, personal data, loan details). Null when the job completed successfully or when the source did not record a section. Technical: stored as an enum string in the source database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.step_section_failure
+    categories:
+      CPF_SEARCH: "Entering the proponent's CPF in the Caixa Aqui search form."
+      CPF_SEARCH_RESULTS: "Reading and validating the CPF search result page."
+      PERSONAL_DATA: "Filling personal details such as education, PIS/NIS, father's name, occupation, marital status, and document."
+      ADDRESS: "Filling residential address and proof-of-residence date."
+      FORMAL_INCOME: "Filling formal employment income: employer, occupation, gross/net income, proof type, and date."
+      INFORMAL_INCOME: "Filling informal or self-employed income: source, net income, and start date."
+      NUMBER_OF_DEPENDENTS: "Entering the number of financial dependents."
+      MONTHLY_HOUSEHOLD_EXPENSES: "Entering monthly household expense amounts."
+      HOME_BRANCH: "Selecting the Caixa relationship branch (agência de relacionamento)."
+      BORROWER_DETAILS: "Reviewing and confirming the main borrower's data summary."
+      PARTICIPANT_DETAILS: "Reviewing and confirming a co-borrower or guarantor's data summary."
+      LOAN_DETAILS: "Filling loan specifics: property value, financing amount, and term."
+  retry_count:
+    description: "Number of automatic retries already attempted for this job, as reported by the crawler agent. Defaults to 0. Transient and structural failures retry while this count is below 3; at or above that limit the job moves to FAILED."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.retry_count
+  fields_filled:
+    description: "Count of form fields the crawler successfully filled before completing or failing, used to measure how far the automation progressed. Null when the source did not record a count."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.fields_filled
+  version:
+    description: "Optimistic locking version counter maintained by the application for this job row."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.version
+  ts_created:
+    description: "Timestamp when the crawler job row was first created in the operational database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.created_at
+  ts_updated:
+    description: "Timestamp of the last update applied to this crawler job in the operational database."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.updated_at
+  year:
+    description: "Partition year of the CDC snapshot row ingested into the data lake raw layer."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.year
+  month:
+    description: "Partition month of the CDC snapshot row ingested into the data lake raw layer."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.month
+  day:
+    description: "Partition day of the CDC snapshot row ingested into the data lake raw layer."
+    lineage:
+      - datalake_mortgage_management_service_raw.credit_proposal_crawler_job.day

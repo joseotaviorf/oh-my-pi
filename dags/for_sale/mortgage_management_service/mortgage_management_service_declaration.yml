@@ -5,8 +5,9 @@ dag:
   owner: Data ForSale
   documentation:
     dag_purpose: |
-      This DAG imports the tables from Mortgage Management Service, a service responsible for managing 
-      mortgage intentions, proposals, and related financial information for the ForSale business.
+      This DAG imports the tables from Mortgage Management Service, a service responsible for managing
+      mortgage intentions, proposals, credit-proposal crawler executions, and related financial
+      information for the ForSale business.
 workflow:
   type: cdc
   layer: raw
@@ -47,5 +48,13 @@ workflow:
       clean_primary_keys: ["id"]
     mortgage_proposal_aux_aud:
       clean_table_name: mortgage_proposal_aux_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+    credit_proposal_crawler_job:
+      clean_table_name: credit_proposal_crawler_job
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    credit_proposal_crawler_job_aud:
+      clean_table_name: credit_proposal_crawler_job_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
