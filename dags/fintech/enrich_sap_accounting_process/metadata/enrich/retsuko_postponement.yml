@@ -7,6 +7,7 @@ description:
   Postponement is recognised at bill item creation only, like the revenue accounts, and does nothing on payment, so the funnel starts at entry.ts_created and the sap_entity leg is restricted to the 'new-accounting-entries' event.
   The same bill item splits between two accounts in SAP according to the invoice kind - 211407 for PP and 113403 for IQ - and the authoritative rule lives in the ledger accounting_rule prefix, 'invoice-transfer-entry-' against 'invoice-bill-entry-'. That prefix is not reproducible from Retsuko data, so this table uses the ownership of the invoice account as a proxy, which agrees with the ledger on about 95% of the entries.
   The remaining entries are not treated as failures. When an entry selected by the proxy is found in 113403 instead, it is reported with the 'account divergence' status and an error_description naming the sibling account, which keeps proxy noise separate from genuine dispatch problems.
+  The ledger is read on two keys. The entry id is the primary one, but part of the account is posted by batch loads that reach SAP without carrying the entry id, so those postings are matched by the gateway hash of the dispatch instead. Without the hash leg they would look like postings that never happened and the entry would be reported as 'sap not found' while the money was already booked.
 columns:
   id_accounting_process:
     description: Unique key for each record on this table, formatted as 'RTSK-PSTP-{id_finance_entity_entry}-{account_number}-{row_number}'.

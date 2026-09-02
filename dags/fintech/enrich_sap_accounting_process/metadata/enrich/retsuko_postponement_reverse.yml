@@ -6,7 +6,8 @@ description:
   Table to track the reverse route of account 211407 (postponed invoice - PP), identifying postings that exist in the SAP ledger but that the forward straw cannot see, since retsuko_postponement starts from the Retsuko entry.
   The anchor is the whole account rather than a list of accounting rules, on purpose - any rule that starts posting to 211407 surfaces here instead of disappearing from the reconciliation.
   Three populations end up in this table. Postings whose entry exists but sits on a tenant owned invoice are the mirror of the account divergence bucket in the forward straw and carry that same status, since SAP booked them as PP while the ownership proxy reads them as IQ. Postings whose entry has no postponement record at all are genuine reverse straw failures. Postings with no finance entity entry are grouped by transaction and split between batch postings that reached the gateway without an entry id and adjustments typed straight into SAP by a user.
-  Together with retsuko_postponement this table partitions account 211407 with no overlap and no gap, which was verified entry by entry against the ledger.
+  Postings with no entry id whose gateway hash belongs to a dispatch of an entry already covered by retsuko_postponement are excluded on purpose. They are not unexplained postings - they are the same accounting event the forward straw already reconciles, and reporting them here would count the amount twice and turn a reconciled entry into a false failure.
+  Together with retsuko_postponement this table partitions account 211407 with no overlap and no gap - the two tables sum to the ledger total for the account to the cent.
   All four assertion flags are FALSE by construction, so the table is read through accounting_process_status and error_description for root-cause analysis.
 columns:
   id_accounting_process:

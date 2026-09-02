@@ -58,6 +58,23 @@ sap_gateway AS (
     rn = 1
 ),
 
+source_dispatch_hash AS (
+  SELECT DISTINCT
+    sg.hash
+  FROM
+    source_postponement sp
+  INNER JOIN
+    datalake_retsuko_clean.sap_entity se
+      ON CAST(se.id_finance_entity AS STRING) = sp.id_finance_entity_entry
+      AND se.event = 'new-accounting-entries'
+  INNER JOIN
+    sap_gateway sg
+      ON sg.id_feature = CAST(se.id_sap_gateway_feature AS STRING)
+  WHERE
+    sp.invoice_owner_type = 'landlord'
+    AND sg.hash IS NOT NULL
+),
+
 -- Anchor of the reverse straw. No accounting_rule filter on purpose: the whole account is in
 -- scope so that any rule that starts posting to 211407 shows up here instead of disappearing.
 sap_ledger AS (
@@ -86,20 +103,24 @@ sap_ledger AS (
 -- which have neither hash nor finance entity.
 sap_ledger_manual AS (
   SELECT
-    CAST(id_transaction AS STRING) AS id_transaction,
-    MAX(id_business_entity) AS id_business_entity,
-    MAX(id_finance_entity) AS id_finance_entity,
-    MAX(accrual_year_month) AS accrual_year_month,
-    MAX(hash) AS hash,
-    SUM(debit_credit) AS debit_credit,
-    MAX(DATE(dt_created)) AS dt_sap_created,
-    MAX(DATE(dt_reference)) AS dt_sap_reference
+    CAST(l.id_transaction AS STRING) AS id_transaction,
+    MAX(l.id_business_entity) AS id_business_entity,
+    MAX(l.id_finance_entity) AS id_finance_entity,
+    MAX(l.accrual_year_month) AS accrual_year_month,
+    MAX(l.hash) AS hash,
+    SUM(l.debit_credit) AS debit_credit,
+    MAX(DATE(l.dt_created)) AS dt_sap_created,
+    MAX(DATE(l.dt_reference)) AS dt_sap_reference
   FROM
-    datalake_pas.ledger
+    datalake_pas.ledger l
+  LEFT JOIN
+    source_dispatch_hash sdh
+      ON sdh.hash = l.hash
   WHERE
-    account_number = '211407'
-    AND dt_reference >= DATE('2025-01-01')
-    AND id_finance_entity_entry IS NULL
+    l.account_number = '211407'
+    AND l.dt_reference >= DATE('2025-01-01')
+    AND l.id_finance_entity_entry IS NULL
+    AND sdh.hash IS NULL
   GROUP BY 1
 )
 
