@@ -12,6 +12,10 @@ columns:
     lineage:
     - datalake_checkout_raw.order.id
     description: Financial attribute representing id on the order dataset.
+  uuid:
+    lineage:
+    - datalake_checkout_raw.order.uuid
+    description: Non-enumerable internal identifier for the order. Null for rows created before the 2026-08-24 Postgres migration; new inserts are populated by uuid_generate_v4().
   id_external:
     lineage:
     - datalake_checkout_raw.order.external_id

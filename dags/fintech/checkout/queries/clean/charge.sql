@@ -1,5 +1,6 @@
 SELECT
     id,
+    uuid,
     order_id AS id_order,
     user_external_id AS id_user_external,
     due_amount,

@@ -12,6 +12,10 @@ columns:
     lineage:
     - datalake_checkout_raw.charge.id
     description: Financial attribute representing id on the charge dataset.
+  uuid:
+    lineage:
+    - datalake_checkout_raw.charge.uuid
+    description: Non-enumerable internal identifier for the charge. Null for rows created before the 2026-08-24 Postgres migration; new inserts are populated by uuid_generate_v4().
   id_order:
     lineage:
     - datalake_checkout_raw.charge.order_id

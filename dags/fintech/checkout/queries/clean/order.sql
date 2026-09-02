@@ -1,5 +1,6 @@
 SELECT
     id,
+    uuid,
     external_id AS id_external,
     business_entity_id AS id_business_entity,
     finance_entity_id AS id_finance_entity,
