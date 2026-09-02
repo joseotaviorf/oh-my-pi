@@ -83,6 +83,8 @@ dags_out_of_pattern:
         "reverse_reports",
         "reverse_listing_quality_load",
         "reverse_listing_quality_access",
+        "reverse_gsc_metrics_load",
+        "reverse_gsc_metrics_access",
         "migration_twin_fintech__enrich_velo",
         "migration_emr_fintech__enrich_velo",
         "migration_compare_fintech__enrich_velo",

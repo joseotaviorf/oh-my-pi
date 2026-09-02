@@ -1,0 +1,23 @@
+dag:
+  name: reverse_gsc_metrics_load
+  owner: Data Growth
+  schedule_start_date: 2026, 8, 26
+  documentation:
+    dag_purpose: |
+      Aggregates Google Search Console performance by canonical search page.
+      It produces 7, 30, and 90 day snapshots consumed by the Internal Linking
+      access DAG for selective SQS publication.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: gsc_metrics
+  default_extraction_type: incremental
+  default_partitions:
+    - ref_date
+  extra_query_template_params:
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_end_date') }}"
+  tables_customization:
+    gsc_page_metrics:
+      merge_on:
+        - page_id
+        - ref_date

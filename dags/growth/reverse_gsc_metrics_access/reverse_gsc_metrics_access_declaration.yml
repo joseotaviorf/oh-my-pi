@@ -1,0 +1,21 @@
+dag:
+  name: reverse_gsc_metrics_access
+  owner: Data Growth
+  schedule_start_date: 2026, 8, 26
+  documentation:
+    dag_purpose: |
+      Publishes changed Google Search Console page metrics to Internal Linking.
+      It compares the latest 7, 30, and 90 day snapshots with the last
+      successfully published state and sends only changed pages to SQS.
+workflow:
+  type: access
+  layer: reverse
+  custom_schema: gsc_metrics
+  load_spark_job: load_into_sqs
+  spark_job_arguments:
+    - "{dag_name}"
+    - "{bucket}"
+    - "reverse_gsc_metrics"
+    - "{table_name}"
+  tables_customization:
+    gsc_page_metrics: {}

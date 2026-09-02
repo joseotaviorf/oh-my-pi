@@ -1062,6 +1062,9 @@ bietlejuice.reverse_demand_classifieds_ranking_access:
 bietlejuice.reverse_listing_quality_access:
   add:
     - bietlejuice.reverse_listing_quality_load:load-reverse-listing-quality:first-run-of-day
+bietlejuice.reverse_gsc_metrics_access:
+  add:
+    - bietlejuice.reverse_gsc_metrics_load:load-reverse-gsc-page-metrics:first-run-of-day
 bietlejuice.reverse_listings_locations_access:
   add:
     - bietlejuice.reverse_listings_locations_load:load-reverse-listings-locations:first-run-of-day

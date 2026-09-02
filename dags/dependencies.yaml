@@ -4592,6 +4592,10 @@ bietlejuice.reverse_demand_score:
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info:first-run-of-day
 bietlejuice.reverse_demand_score_access:
   - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score:first-run-of-day
+bietlejuice.reverse_gsc_metrics_access:
+  - bietlejuice.reverse_gsc_metrics_load:load-reverse-gsc-page-metrics:first-run-of-day
+bietlejuice.reverse_gsc_metrics_load:
+  - bietlejuice.google_search_console:load-clean-report-by-page:first-run-of-day
 bietlejuice.reverse_integration_cloudzero:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
 bietlejuice.reverse_listing_quality_access:
