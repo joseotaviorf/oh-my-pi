@@ -14,7 +14,6 @@ _JOB_PATHS = [
     "dags/growth/enrich_ebdb_user/spark_jobs/user_merge.py",
     "dags/growth/enrich_house_feature_inference/spark_jobs/load_description_features.py",
     "dags/growth/enrich_lost_listings/spark_jobs/load_lost_listings_enrich.py",
-    "dags/growth/enrich_pricing_agent/spark_jobs/load_interaction_state_tracker.py",
     "dags/growth/google_ads/spark_jobs/load_google_ads_raw.py",
     "dags/growth/google_analytics_classified/spark_jobs/load_google_analytics_classified_raw.py",
     "dags/growth/google_search_console/spark_jobs/load_google_search_console_raw.py",

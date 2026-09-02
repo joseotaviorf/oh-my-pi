@@ -612,7 +612,6 @@ DEFAULT_DAG_NAMES = [
     "enrich_open_external_data_addresses",
     "enrich_pixar",
     "enrich_planner_emlio_logs",
-    "enrich_pricing_agent",
     "enrich_proposal",
     "enrich_region",
     "enrich_rent_flows",
