@@ -3826,6 +3826,8 @@ bietlejuice.enrich_sale_primary_market:
   - bietlejuice.ebdb_listing:load-clean-listing-sale-model:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-offer:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-sales-flow:first-run-of-day
 bietlejuice.enrich_sale_salesforce:
   - bietlejuice.salesforce:load-clean-purchase-sale-contract:first-run-of-day
 bietlejuice.enrich_sale_stranded_listings_status:

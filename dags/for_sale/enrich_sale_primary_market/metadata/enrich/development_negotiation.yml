@@ -7,10 +7,12 @@ description: >
   Grain is id_development_negotiation, not visit: one visit can spawn several
   negotiations when the buyer wants more than one apt. id_house_shell is the
   typology vitrine the visit was booked on (Approach A). id_house is the
-  typology-unit Imovel used for the proposal or offer. is_published_unit is
-  true when that unit has a DevelopmentListingUnit row. Used to count
-  visit-to-proposal without going through Sales Flow. Actor must be filtered
-  (AGENT vs DEMAND) to avoid broker inflation of pré-OS.
+  typology-unit Imovel used for the proposal or offer. id_offer and
+  id_sales_flow come from Sales Flow when visit + unit house match (one
+  flow per pair: prefer not canceled, then latest ts_created).
+  is_published_unit is true when that unit has a DevelopmentListingUnit
+  row. Actor must be filtered (AGENT vs DEMAND) to avoid broker inflation
+  of pré-OS.
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_development_negotiation:
@@ -54,9 +56,13 @@ columns:
       - datalake_ebdb_clean.development_typology_unit.id_house
     description: House id of the typology unit (offer or published apt), distinct from id_house_shell. Null when no unit is linked.
   id_offer:
-    description: Reserved for the Sales Flow sale offer that closed this negotiation. Always null in this version; filled later by joining sale_offer on id_visit and id_house.
+    lineage:
+      - datalake_sales_flow_clean.offer.id
+    description: Sales Flow offer.id linked when the flow visit and unit house match this negotiation. Null when visit or unit house is missing, or no matching flow exists. If several flows share the pair, the non-canceled latest flow (then latest offer) is kept. Numeric offer id, not Firestore.
   id_sales_flow:
-    description: Reserved for the Sales Flow entity wrapping that offer. Always null in this version; filled with id_offer.
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id
+    description: Sales Flow wrapping that offer. Same pick rule as id_offer. Null when id_offer is null.
   id_development_typology:
     lineage:
       - datalake_ebdb_clean.development_typology_unit.id_development_typology

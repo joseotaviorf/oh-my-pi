@@ -9,7 +9,8 @@ dag:
       PRIMARY or SECONDARY from ListingSaleModel. house_development attaches
       empreendimento and typology attrs to shell and unit houses.
       development_negotiation is pré-OS at negotiation grain (visit shell house,
-      unit house, listing published flag) so visit-to-proposal does not use Sales Flow.
+      unit house, listing published flag) and bridges to Sales Flow offer on
+      visit + unit house.
 workflow:
   type: query_delta
   layer: enrich
