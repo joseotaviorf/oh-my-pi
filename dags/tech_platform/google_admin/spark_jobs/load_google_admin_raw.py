@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 from datetime import datetime
 from typing import Any
 from urllib.parse import urlparse
@@ -50,6 +51,12 @@ GOOGLE_ADMIN_MOBILE_PATH_PREFIX = "/admin/directory/v1/customer/"
 CLOUD_IDENTITY_API_BASE = "https://cloudidentity.googleapis.com/v1"
 CLOUD_IDENTITY_ALLOWED_HOST = "cloudidentity.googleapis.com"
 CLOUD_IDENTITY_DEVICES_PATH = "/v1/devices"
+
+# Google recommends exponential backoff on these for Workspace / Cloud Identity APIs.
+RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
+MAX_RETRIES = 5
+INITIAL_BACKOFF_SECONDS = 2.0
+MAX_BACKOFF_SECONDS = 60.0
 
 
 def _validate_google_admin_url(url: str) -> str:
@@ -150,6 +157,57 @@ def _get_access_token(service_account_key: dict[str, Any], admin_subject: str) -
     )
     creds.refresh(GoogleAuthRequest())
     return creds.token
+
+
+def _retry_delay_seconds(response: requests.Response | None, attempt: int) -> float:
+    if response is not None:
+        retry_after = response.headers.get("Retry-After")
+        if retry_after and retry_after.isdigit():
+            return min(float(retry_after), MAX_BACKOFF_SECONDS)
+    return min(INITIAL_BACKOFF_SECONDS * (2**attempt), MAX_BACKOFF_SECONDS)
+
+
+def _get_with_retry(
+    url: str,
+    headers: dict[str, str],
+    params: dict[str, Any],
+    timeout_seconds: int,
+    method_name: str,
+) -> requests.Response:
+    """GET with exponential backoff on transient errors (5xx, 429, network).
+
+    Returns the response as-is for non-retryable status codes (e.g. 401) so the
+    caller keeps control over auth refresh and ``raise_for_status``.
+    """
+    last_error: Exception | None = None
+    for attempt in range(MAX_RETRIES + 1):
+        response: requests.Response | None = None
+        try:
+            response = requests.get(
+                url, headers=headers, params=params, timeout=timeout_seconds
+            )
+            if response.status_code not in RETRYABLE_STATUS_CODES:
+                return response
+            last_error = requests.HTTPError(
+                f"{response.status_code} {response.reason}", response=response
+            )
+        except (requests.ConnectionError, requests.Timeout) as e:
+            last_error = e
+
+        if attempt == MAX_RETRIES:
+            break
+        delay = _retry_delay_seconds(response, attempt)
+        LOGGER.warning(
+            f"m={method_name}, msg=Transient error, retrying, "
+            f"attempt={attempt + 1}/{MAX_RETRIES}, delay_seconds={delay:.1f}, "
+            f"error={last_error}"
+        )
+        time.sleep(delay)
+
+    LOGGER.error(
+        f"m={method_name}, msg=Giving up after {MAX_RETRIES} retries, error={last_error}"
+    )
+    raise last_error  # type: ignore[misc]
 
 
 def _parse_query_params(
@@ -311,11 +369,8 @@ def fetch_all_cloud_identity_devices(
         if page_token:
             params["pageToken"] = page_token
 
-        response = requests.get(
-            url,
-            headers=headers,
-            params=params,
-            timeout=timeout_seconds,
+        response = _get_with_retry(
+            url, headers, params, timeout_seconds, "fetch_all_cloud_identity_devices"
         )
 
         if response.status_code == 401:
@@ -324,8 +379,12 @@ def fetch_all_cloud_identity_devices(
             )
             token = _get_access_token(service_account_key, admin_subject)
             headers = {"Authorization": f"Bearer {token}"}
-            response = requests.get(
-                url, headers=headers, params=params, timeout=timeout_seconds
+            response = _get_with_retry(
+                url,
+                headers,
+                params,
+                timeout_seconds,
+                "fetch_all_cloud_identity_devices",
             )
 
         response.raise_for_status()
@@ -382,11 +441,12 @@ def fetch_all_cloud_identity_device_users(
         if page_token:
             params["pageToken"] = page_token
 
-        response = requests.get(
+        response = _get_with_retry(
             url,
-            headers=headers,
-            params=params,
-            timeout=timeout_seconds,
+            headers,
+            params,
+            timeout_seconds,
+            "fetch_all_cloud_identity_device_users",
         )
 
         if response.status_code == 401:
@@ -395,8 +455,12 @@ def fetch_all_cloud_identity_device_users(
             )
             token = _get_access_token(service_account_key, admin_subject)
             headers = {"Authorization": f"Bearer {token}"}
-            response = requests.get(
-                url, headers=headers, params=params, timeout=timeout_seconds
+            response = _get_with_retry(
+                url,
+                headers,
+                params,
+                timeout_seconds,
+                "fetch_all_cloud_identity_device_users",
             )
 
         response.raise_for_status()
@@ -440,11 +504,8 @@ def fetch_all_mobile_devices(
         if page_token:
             params["pageToken"] = page_token
 
-        response = requests.get(
-            url,
-            headers=headers,
-            params=params,
-            timeout=timeout_seconds,
+        response = _get_with_retry(
+            url, headers, params, timeout_seconds, "fetch_all_mobile_devices"
         )
 
         if response.status_code == 401:
@@ -453,8 +514,8 @@ def fetch_all_mobile_devices(
             )
             token = _get_access_token(service_account_key, admin_subject)
             headers = {"Authorization": f"Bearer {token}"}
-            response = requests.get(
-                url, headers=headers, params=params, timeout=timeout_seconds
+            response = _get_with_retry(
+                url, headers, params, timeout_seconds, "fetch_all_mobile_devices"
             )
 
         response.raise_for_status()
