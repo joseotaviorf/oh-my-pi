@@ -5,20 +5,12 @@
 -- so they stay NULL, same as the enrich table's own offer attributes.
 WITH business_unit_by_hub_id AS (
     SELECT
-        id_hub,
-        hub_name
-    FROM (
-        SELECT
-            bu.id AS id_hub,
-            bu.hub_name,
-            ROW_NUMBER() OVER (PARTITION BY bu.id ORDER BY bu.ts_updated DESC) AS _w
-        FROM
-            datalake_hub_services_clean.business_unit AS bu
-        WHERE
-            bu.business_context = 'SALE'
-    ) AS _t
+        bu.id AS id_hub,
+        bu.hub_name
+    FROM
+        datalake_hub_services_clean.business_unit AS bu
     WHERE
-        _w = 1
+        bu.business_context = 'SALE'
 )
 SELECT
     dn.id_development_negotiation,
