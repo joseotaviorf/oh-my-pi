@@ -70,6 +70,9 @@ dags_not_using_builder:
   # Wonka Option-A parse-time registry factory — intentional non-Builder DAG.
   - quintoml/wonka_registry_factory.py
   - governance/notify_dag_rotation/notify_dag_rotation.py
+  # Glue catalog maintenance — PythonOperator only (no EMR / DAG Builder).
+  - governance/glue_table_version_cleanup/glue_table_version_cleanup.py
+  - governance/glue_table_version_cleanup/cleanup_glue_table_versions.py
   # Standalone governance scripts — not Airflow DAG files; no DAG object to validate.
   - governance/datahub_business_context/datahub_curated_urns.py
   - governance/datahub_business_context/datahub_domain_catalog.py

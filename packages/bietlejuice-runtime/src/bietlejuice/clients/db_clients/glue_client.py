@@ -181,6 +181,65 @@ class GlueClient(DBClient):
                 names.append(table["Name"])
         return names
 
+    def list_table_version_ids(self, database_name: str, table_name: str) -> List[str]:
+        """Return all Glue table version IDs for a table (oldest to newest)."""
+        version_ids: List[str] = []
+        paginator = self.conn.get_paginator("get_table_versions")
+        for page in paginator.paginate(
+            DatabaseName=database_name, TableName=table_name
+        ):
+            for version in page.get("TableVersions", []):
+                version_ids.append(version["VersionId"])
+        return sorted(version_ids, key=lambda version_id: int(version_id))
+
+    def batch_delete_table_versions(
+        self,
+        database_name: str,
+        table_name: str,
+        version_ids: List[str],
+    ) -> int:
+        """Delete Glue table versions in batches of 100.
+
+        Returns the number of versions successfully deleted.
+        """
+        if not version_ids:
+            return 0
+
+        batch_size = 100
+        deleted_count = 0
+        failures: List[Dict] = []
+        for i in range(0, len(version_ids), batch_size):
+            batch = version_ids[i : i + batch_size]
+            response = self.conn.batch_delete_table_version(
+                DatabaseName=database_name,
+                TableName=table_name,
+                VersionIds=batch,
+            )
+            errors = response.get("Errors", [])
+            for err in errors:
+                error_detail = err.get("ErrorDetail", {})
+                logger.error(
+                    f"m=batch_delete_table_versions, "
+                    f"table={database_name}.{table_name}, "
+                    f"version_id={err.get('VersionId')}, "
+                    f"error_code={error_detail.get('ErrorCode')}, "
+                    f"error_message={error_detail.get('ErrorMessage')}, "
+                    "msg=table version deletion failed in Glue"
+                )
+            failures.extend(errors)
+            deleted_count += len(batch) - len(errors)
+
+        if failures:
+            raise RuntimeError(
+                f"Glue batch_delete_table_version failed for "
+                f"{len(failures)} version(s) in "
+                f"{database_name}.{table_name} "
+                f"({deleted_count} deleted): "
+                f"{[e.get('ErrorDetail', {}).get('ErrorCode') for e in failures]}"
+            )
+
+        return deleted_count
+
     def get_partition(
         self, database_name: str, table_name: str, values: List[str]
     ) -> Optional[Dict]:
