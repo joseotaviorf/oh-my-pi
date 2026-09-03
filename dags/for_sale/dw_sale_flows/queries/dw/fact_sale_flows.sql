@@ -164,6 +164,7 @@ SELECT
   sf.id_sale_flow AS sk_sale_flow,
   sf.id_buyer AS sk_buyer,
   sf.id_house AS sk_house,
+  sf.sale_type,
   sf.id_seller AS sk_seller,
   COALESCE(sf.id_region,-1) AS sk_region,
   COALESCE(CAST(REPLACE(SUBSTRING(sf.ts_first_listing,1, 10),'-','') AS BIGINT), -1) AS sk_first_listing_date,

@@ -31,6 +31,13 @@ columns:
     lineage:
     - datalake_sale_flows.sale_flow.id_house
     description: ID of the house (listing). Can be joined with dw_house.dim_house and dw_sale.dim_listing.
+  sale_type:
+    lineage:
+    - datalake_sale_flows.sale_flow.sale_type
+    description: Market type derived from classified offers in the buyer-house sale flow. PRIMARY identifies a new-build unit offer and SECONDARY identifies a resale offer. NULL is preserved for flows without a classified offer or when offer values conflict.
+    categories:
+      PRIMARY: Sale flow containing a Primary Market (new-build) offer.
+      SECONDARY: Sale flow containing a Secondary Market (resale) offer.
   sk_seller:
     lineage:
     - datalake_sale_flows.sale_flow.id_seller
