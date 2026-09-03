@@ -1,0 +1,59 @@
+database_name: dw_ai_usage
+table_name: fact_ai_spend_daily
+owner: gabriel.berger@quintoandar.com.br
+domain: Enterprise Efficiency
+description: |
+  Conformed AI-tool spend fact. Grain: one row per day, tool, id_user, and currency —
+  a separate population axis from fact_ai_usage_daily's day x tool x id_user x model x
+  product grain. Scope: covers every spend row conformed by enrich_ai_usage. Join the
+  two facts on sk_ai_user and tool only when combining them; each fact's own measures
+  stay un-summed against the other's grain, so no cost allocation across product or
+  model is fabricated. Amounts are expressed in USD. sk_ai_user is -1 when the source
+  row's (tool, id_user) has no matching dimension row (unknown-member routing).
+columns:
+  sk_ai_spend_daily:
+    description: Unique key for the fact grain (day, tool, id_user, currency), a deterministic hash so it never changes across reruns (e.g. 'e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0'). Hashed from the raw natural key including dt_ended, not the resolved sk_ai_user, so unmatched rows (which all share the same -1 unknown-member FK) never collapse onto a single grain key.
+    lineage:
+      - datalake_ai_usage.spend_daily.tool
+      - datalake_ai_usage.spend_daily.dt_started
+      - datalake_ai_usage.spend_daily.dt_ended
+      - datalake_ai_usage.spend_daily.id_user
+      - datalake_ai_usage.spend_daily.currency
+
+  sk_ai_user:
+    description: Key of the employee attributed to this spend row (e.g. 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8'). References dw_ai_usage.dim_ai_user. -1 when no matching dimension row exists for this tool and id_user.
+    lineage:
+      - dw_ai_usage.dim_ai_user.sk_ai_user
+
+  currency:
+    description: ISO currency code the spend amounts are denominated in (e.g. 'USD').
+    lineage:
+      - datalake_ai_usage.spend_daily.currency
+
+  sum_discounted_cost_amount:
+    description: Discounted spend amount for the day, in USD (e.g. 12.50).
+    lineage:
+      - datalake_ai_usage.spend_daily.sum_discounted_cost_amount
+
+  sum_list_price_amount:
+    description: List-price (undiscounted) spend amount for the day, in USD (e.g. 15.00).
+    lineage:
+      - datalake_ai_usage.spend_daily.sum_list_price_amount
+
+  is_actor_deleted:
+    description: True when the vendor marks the user as no longer a member of the organization (membership removed or the account itself deleted). Terminated or deleted users are retained here, not dropped.
+    lineage:
+      - datalake_ai_usage.spend_daily.is_actor_deleted
+
+  dt_started:
+    description: Date the spend aggregation period this row covers began (e.g. 2026-09-01).
+    lineage:
+      - datalake_ai_usage.spend_daily.dt_started
+
+  dt_ended:
+    description: Date the spend aggregation period this row covers ended, exclusive (e.g. 2026-09-02).
+    lineage:
+      - datalake_ai_usage.spend_daily.dt_ended
+
+  ts_load:
+    description: Timestamp this row was loaded into the fact (e.g. 2026-09-01 03:00:00).
