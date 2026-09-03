@@ -83,9 +83,10 @@ columns:
     lineage:
     - datalake_sale_primary_market.house_development.id_house
   bp_market_type:
-    description: Primary Market-specific market-exclusivity classification of this buyer prospect, orthogonal to bp_type (new/recurrent). Computed by looking across the buyer's other rows within this query's bp_window_days lookback constant (NULL = infinite). NULL for buyers who have never touched a Primary Market pilot house.
+    description: Mutually exclusive market-exclusivity classification of this buyer prospect, orthogonal to bp_type (new/recurrent). Computed by looking across the buyer's other rows within this query's bp_window_days lookback constant (NULL = infinite).
     categories:
       PRIMARY_EXCLUSIVE: Buyer has only ever activated on Primary Market pilot houses within the window.
+      SECONDARY_EXCLUSIVE: Buyer has only ever activated on Secondary market houses within the window (has never touched Primary Market).
       NON_EXCLUSIVE: Buyer has activated on both Primary Market pilot houses and Secondary market houses within the window.
     lineage:
     - datalake_sale_primary_market.house_development.id_house

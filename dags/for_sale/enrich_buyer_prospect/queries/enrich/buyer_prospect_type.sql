@@ -137,12 +137,11 @@ SELECT
   ts_activation_end,
   ts_load,
   sale_type,
-  -- Primary Market-specific, orthogonal to bp_type (new/recurrent):
+  -- Market-exclusivity classification, orthogonal to bp_type (new/recurrent):
   -- whether this buyer, across their other rows within the window above,
-  -- has also touched Secondary. NULL for buyers who have never touched a
-  -- Primary Market pilot house -- this segmentation doesn't apply to them.
+  -- has touched Primary, Secondary, or both.
   CASE
-    WHEN NOT touched_primary THEN NULL
+    WHEN NOT touched_primary THEN 'SECONDARY_EXCLUSIVE'
     WHEN touched_secondary THEN 'NON_EXCLUSIVE'
     ELSE 'PRIMARY_EXCLUSIVE'
   END AS bp_market_type
