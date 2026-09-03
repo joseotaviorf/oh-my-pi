@@ -1,67 +1,15 @@
 cluster:
-  # NOTE: this block applies to EACH of the DAG's 15 clusters. base_query_delta_workflow
-  # slices tables into MAX_TABLES_PER_CLUSTER=25 chunks, so 366 tables => 15 clusters of
-  # 25 tables (x3 steps: load-clean, register-table, sync-metadata). Every node added here
-  # is multiplied by 15.
-  #
-  # Measured cost per load step on j-04200052D9QJPLL47ICY: ~58 CPU-min, almost all of it
-  # rebuilding the Delta snapshot of `datalake_amplitude_clean.events` — a 54.6 GB checkpoint
-  # across 1,525 files (~15M file entries; the upstream amplitude_new runs with run_optimize
-  # and run_vacuum off). On Databricks the tables were tasks on one shared job cluster and
-  # the snapshot was rebuilt once; on EMR every step is a fresh spark-submit with a cold
-  # DeltaLog. That is ~24 CPU-h per cluster, and it is the floor until the checkpoint shrinks.
-  #
-  # The two bottlenecks that turned this into ~33 min/step:
-  #   1. executor 200g/2c: only 1 executor fit per node => 4 containers on the whole cluster,
-  #      64 vCPUs provisioned and 4 in use (ContainerAllocated pinned at 4 in CloudWatch).
-  #   2. snapshotPartitions default 50: a 50-core ceiling per step, 50 reducers of 857 MB
-  #      taking 52 s each, no matter how big the cluster is.
-  # Same 3-node footprint as today; the gain comes from using cores that were already paid for.
-  type: emr_7_12_consolidation_xl_memory_fleet_cluster
+  type: consolidation_l_general_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
-    # r6gd (local NVMe) rather than r6g: the snapshot rebuild shuffles the entire checkpoint,
-    # ~54 GB of shuffle per app. On EBS gp3 (125 MB/s per volume) that shuffle would become
-    # the new bottleneck. Same choice as amplitude_new, which reads the same table.
-    core_nodes:
-      target_on_demand: 2
-      target_spot: 0
-      instance_types:
-        - r6gd.8xlarge
-        - r7gd.8xlarge
+    driver_node_type_id: c7g.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment}}
+      spark.driver.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
+      spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
     aws_attributes:
       ebs_volume_size: 500
-    spark_conf:
-      # Lifts the 50-core-per-step ceiling: 200 reducers of ~13 s instead of 50 of 52 s.
-      spark.databricks.delta.snapshotPartitions: "200"
-      # Mandatory counterweight to the core increase: the query is a pure projection with no
-      # shuffle, so every read split becomes one file in the SAME year/month/day partition.
-      # Split size is min(256MB, max(openCost 4MB, totalBytes/defaultParallelism)), so going
-      # from 2 to 56 cores drives splits down to the 4 MB floor and multiplies file count.
-      # optimizeWrite shuffles before the write, targeting ~1 right-sized file per partition,
-      # which decouples file count from read parallelism. It is not in the base EMR anchor;
-      # amplitude_new enables it explicitly for the same reason. It matters more here because
-      # these tables run with run_optimize and run_vacuum off — nothing compacts them later.
-      spark.databricks.delta.optimizeWrite.enabled: "true"
-      # autoCompact is on in the anchor, but on Delta OSS it is a liability, not a safeguard:
-      # enrich_collections_quintoandar and cyber_complement document serial "Optimizing N
-      # files in partition" stages in the SHS, each a single (1/1) task, dominating wall time.
-      # Its cost also grows with exactly the small files that more cores produce. With
-      # optimizeWrite it finds nothing to do; turning it off removes the serial pass for good.
-      # Same pairing those two DAGs settled on.
-      spark.databricks.delta.autoCompact.enabled: "false"
-      # 26g + 4g = 30g per executor => 7 executors per node (YARN offers ~236 GiB), 28 of the
-      # 32 vCPUs. 2 nodes = 14 executors / 56 cores.
-      # maxExecutors 14 = the whole cluster for one step. That is right today because the DAG
-      # sits at Airflow's default max_active_tasks (16) spread over 15 clusters, i.e. ~1 active
-      # step per cluster — a lower cap would only idle cores. If the DAG's max_active_tasks is
-      # raised, lower this cap to ~56/(steps per cluster), otherwise the first app takes
-      # everything and the rest get no executors.
-      spark.executor.memory: 26g
-      spark.executor.memoryOverhead: 4g
-      spark.executor.cores: "4"
-      spark.dynamicAllocation.maxExecutors: "14"
-      # 96g of driver was unnecessary: the logs show 66 GiB free on the executor throughout
-      # the rebuild, and the snapshot state lives on the executors, not the driver. 4
-      # client-mode drivers x 16g fit comfortably on the preset's master.
-      spark.driver.memory: 16g
-      spark.driver.memoryOverhead: 4g
