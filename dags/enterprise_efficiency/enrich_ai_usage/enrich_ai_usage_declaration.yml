@@ -13,3 +13,6 @@ workflow:
   type: query_delta
   custom_schema: ai_usage
   default_extraction_type: full
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
