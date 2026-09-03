@@ -80,10 +80,7 @@ sale_offer AS (
         MIN(so.ts_sale_agreement_canceled) AS dt_sale_agreement_cancelled,
         MIN(n.dt_house_registry_ended) AS dt_house_registry_ended,
         MAX(so.first_discount_proposed) AS max_discount_proposed,
-        CASE
-            WHEN COUNT(DISTINCT so.sale_type) <= 1 THEN MAX(so.sale_type)
-            ELSE CAST(NULL AS STRING)
-        END AS sale_type,
+        MAX(so.sale_type) AS sale_type,
         COUNT(DISTINCT so.id_offer) AS nbr_offers_submitted
     FROM
         datalake_sale_offer.sale_offer AS so
