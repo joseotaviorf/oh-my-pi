@@ -526,6 +526,21 @@ publish_resolved_identities_step_task = create_task(
     task_id="publish_resolved_identities",
 )
 
+# Assigns classifieds house ids to the Mexico Navent (navent_24mx_houses) artifacts, writing
+# them back into the shared vespucio_classifieds.classifieds_house_id table under
+# source = "24mx" (ID band 400,000,001-799,999,998). The iwbr band is owned by the
+# plugins_classifieds_house_id task in the vespucio_pipeline_plugins DAG; both plugins rewrite
+# the whole table, so they must not run concurrently.
+classifieds_house_id_24mx_task = create_task(
+    entry_point="plugins_classifieds_house_id_24mx",
+    parameters=[
+        f"--input_artifacts={Tables.artifacts_v2}",
+        f"--input_classifieds_house_id={Tables.classifieds_house_id}",
+        f"--output_classifieds_house_id={Tables.classifieds_house_id}",
+    ],
+    task_id="classifieds_house_id_24mx",
+)
+
 vespucio_v2_pipeline_complete_task = DummyOperator(
     task_id="vespucio-v2-pipeline-complete",
     dag=dag,
@@ -582,3 +597,5 @@ condominium_step_task >> vespucio_v2_pipeline_complete_task
     resolve_groups_step_task,
     publish_artifacts_step_task,
 ] >> publish_resolved_identities_step_task
+artifacts_step_task >> classifieds_house_id_24mx_task
+classifieds_house_id_24mx_task >> vespucio_v2_pipeline_complete_task
