@@ -1,0 +1,148 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: geolocations
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Geolocation coordinate record from Imovelweb Navent MySQL `geolocalizaciones`. Grain: one row per geolocation (PK `id_geolocation`). Downstream: map rendering and distance-based search. No table partitions. Z-ORDER (`id_geolocation`) on clean layer for selective lookups.
+columns:
+  id_geolocation:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.idgeolocalizacion
+    description: |
+      Surrogate key for a resolved geographic coordinate record used by Imovelweb map rendering and proximity search. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_geolocation_locality:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.idgeolocalizacionlocalidad
+    description: |
+      Child locality geo record linked to this coordinate for hierarchical Imovelweb address component resolution.
+  id_geolocation_state:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.idgeolocalizacionprovincia
+    description: |
+      State-level geo record linked to this coordinate for regional bounding in Imovelweb map views.
+  id_geolocation_country:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.idgeolocalizacionpais
+    description: |
+      Country-level geo record linked to this coordinate for market-scoped Imovelweb geo queries.
+  geolocation_type:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.type
+    description: |
+      Google-places-style type token (street_address, route) classifying the precision of this Imovelweb geo point.
+  location_type:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.location_type
+    description: |
+      Secondary location classification refining how Imovelweb renders this point on listing detail map widgets.
+  street_address:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.streetaddress
+    description: |
+      Full street-level address string from geocoding used to pre-populate Imovelweb listing address fields.
+  street_number:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.street_number
+    description: |
+      Building number component extracted from geocoding for precise pin placement on Imovelweb listing maps.
+  route_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.route
+    description: |
+      Street or route name from geocoding displayed in Imovelweb listing location breadcrumbs.
+  country_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.country
+    description: |
+      Country component from geocoding result, denormalized for Imovelweb geo display without hierarchy joins.
+  admin_area_level_1_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.administrative_area_level_1
+    description: |
+      First-level administrative area (state/province) from geocoding for Imovelweb regional map overlays.
+  admin_area_level_2_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.administrative_area_level_2
+    description: |
+      Second-level administrative area (county/department) from geocoding for Imovelweb mid-grain geo analytics.
+  admin_area_level_3_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.administrative_area_level_3
+    description: |
+      Third-level administrative area from geocoding providing finer regional context on Imovelweb listing maps.
+  locality_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.locality
+    description: |
+      City or town name from geocoding used to validate listing city assignment on Imovelweb.
+  sublocality_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.sublocality
+    description: |
+      Sub-municipal area name from geocoding for neighborhood context on Imovelweb listing detail maps.
+  neighborhood_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.neighborhood
+    description: |
+      Neighborhood label from geocoding shown on Imovelweb search result location chips.
+  premise_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.premise
+    description: |
+      Named building or complex from geocoding (condo, tower) displayed on Imovelweb luxury listing cards.
+  subpremise_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.subpremise
+    description: |
+      Unit or apartment identifier within a premise from geocoding for precise Imovelweb multi-unit developments.
+  point_of_interest_name:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.point_of_interest
+    description: |
+      Nearby landmark name from geocoding used in Imovelweb listing location descriptions for orientation.
+  postal_code:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.postal_code
+    description: |
+      Postal code from geocoding result validating listing address coverage on Imovelweb.
+  bounds_southwest:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.southwest
+    description: |
+      Southwest corner coordinate of the geo bounding box for Imovelweb map zoom-to-fit on area searches.
+  bounds_northeast:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.northEast
+    description: |
+      Northeast corner coordinate of the geo bounding box for Imovelweb map zoom-to-fit on area searches.
+  latitude:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.lat
+    description: |
+      WGS-84 latitude of the geocoded point for pin placement on Imovelweb interactive listing maps.
+  longitude:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.lng
+    description: |
+      WGS-84 longitude of the geocoded point for pin placement on Imovelweb interactive listing maps.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.geolocalizaciones.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

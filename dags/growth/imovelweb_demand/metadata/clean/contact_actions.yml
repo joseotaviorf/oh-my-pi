@@ -1,0 +1,53 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: contact_actions
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Prospect contact action (lead event) from Imovelweb Navent MySQL `contactosacciones`. Grain: one row per contact action (PK `id_contact_action`). Downstream: demand funnel and lead attribution analytics. No table partitions. Z-ORDER (`id_contact`) on clean layer for selective lookups.
+columns:
+  id_contact_action:
+    lineage:
+      - datalake_imovelweb_raw.contactosacciones.idcontactoaccion
+    description: |
+      Surrogate key for a single prospect interaction event in the Imovelweb demand funnel (view, call, email, WhatsApp).
+  id_contact:
+    lineage:
+      - datalake_imovelweb_raw.contactosacciones.idcontacto
+    description: |
+      Prospect lead record that performed this action, linking the event to buyer identity in Imovelweb CRM workflows. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_action_type:
+    lineage:
+      - datalake_imovelweb_raw.contactosacciones.idtipoaccion
+    description: |
+      Action category code (phone click, form submit, chat open) classifying the demand signal for Imovelweb attribution.
+  id_source:
+    lineage:
+      - datalake_imovelweb_raw.contactosacciones.idorigen
+    description: |
+      Traffic origin channel (organic, paid, direct) that brought the prospect to Imovelweb before this interaction.
+  ts_occurred:
+    lineage:
+      - datalake_imovelweb_raw.contactosacciones.fecha
+    description: |
+      Exact moment the prospect performed this interaction on Imovelweb, anchoring demand funnel time-series analysis.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.contactosacciones.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.contactosacciones.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.contactosacciones.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

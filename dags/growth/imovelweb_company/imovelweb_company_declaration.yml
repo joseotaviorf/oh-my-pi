@@ -1,0 +1,67 @@
+dag:
+  name: imovelweb_company
+  owner: Data Growth
+  schedule_interval: 0 8,12,21 * * *
+  schedule_start_date: 2026, 9, 1
+  documentation:
+    dag_purpose: 'CDC pipeline for Imovelweb (Navent) MySQL — real-estate agencies
+      (companies), agency users, agency types, and third-party interface bindings.
+      Part of the Navent → QuintoAndar migration POC (RD-3333, parent RD-3332). See
+      dags/growth/imovelweb_company/imovelweb_company.md for table inventory and mapping
+      notes.
+
+
+      DATA LINEAGE: MySQL (OLTP) → Raw Layer (`datalake_imovelweb_raw`) → Clean Layer
+      (`datalake_imovelweb_clean`)
+
+      SCHEDULE: 0 8,12,21 * * * UTC'
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: imovelweb
+  custom_schema: imovelweb
+  source_schema: imovelweb
+  dbutils_secret_key: IMOVELWEB_DB
+  tables_customization:
+    empresas:
+      clean_table_name: companies
+      clean_primary_keys:
+      - id_company
+      clean_z_order_by:
+      - id_company
+    usuariosempresas:
+      clean_table_name: company_users
+      clean_primary_keys:
+      - id_company_user
+      clean_z_order_by:
+      - id_company
+    tiposdeinmobiliaria:
+      clean_table_name: agency_types
+      clean_primary_keys:
+      - id_agency_type
+      clean_z_order_by:
+      - id_agency_type
+    interfaceempresas:
+      clean_table_name: interface_companies
+      clean_primary_keys:
+      - id_interface_company
+      clean_z_order_by:
+      - id_company
+    interfaceconfigurations:
+      clean_table_name: interface_configurations
+      clean_primary_keys:
+      - id_interface
+      clean_z_order_by:
+      - id_interface
+    interfaceconfigurationparameters:
+      clean_table_name: interface_configuration_parameters
+      clean_primary_keys:
+      - id_parameter
+      clean_z_order_by:
+      - id_interface
+  extra_query_template_params:
+    load_start_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_start_date'')
+      }}'
+    load_end_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_end_date'')
+      }}'

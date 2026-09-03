@@ -1,0 +1,63 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: states
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  State/province reference from Imovelweb Navent MySQL `provincias`. Grain: one row per state (PK `id_state`). Downstream: geo hierarchy and listing address normalization. No table partitions. Z-ORDER (`id_state`) on clean layer for selective lookups.
+columns:
+  id_state:
+    lineage:
+      - datalake_imovelweb_raw.provincias.idprovincia
+    description: |
+      Surrogate key for a state or province in the Imovelweb geo hierarchy between country and city. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.provincias.idpais
+    description: |
+      Country market that contains this state/province in the Imovelweb geo catalog.
+  id_sap_state:
+    lineage:
+      - datalake_imovelweb_raw.provincias.idprovinciasap
+    description: |
+      SAP region code mapping this state for Navent enterprise billing address validation.
+  state_name:
+    lineage:
+      - datalake_imovelweb_raw.provincias.nombre
+    description: |
+      Official state or province name displayed in Imovelweb location selectors and listing addresses.
+  state_abbreviation:
+    lineage:
+      - datalake_imovelweb_raw.provincias.sigla
+    description: |
+      Short code (SP, RJ) for the state shown on Imovelweb listing cards and compact address displays.
+  state_preposition:
+    lineage:
+      - datalake_imovelweb_raw.provincias.preposicion
+    description: |
+      Grammatical preposition paired with the state name in Imovelweb localized listing titles.
+  display_order:
+    lineage:
+      - datalake_imovelweb_raw.provincias.orden
+    description: |
+      Sort sequence for state options in Imovelweb geo dropdowns and regional navigation menus.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.provincias.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.provincias.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.provincias.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

@@ -1,0 +1,43 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: plans_by_product_by_country
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Publication-plan availability by product and country from Imovelweb Navent MySQL `planesporproductoporpais`. Grain: one row per publication plan, product, and country (PK `id_publication_plan`, `id_product`, `id_country`). Downstream: market-specific product-plan eligibility. No table partitions. Z-ORDER (`id_publication_plan`, `id_product`, `id_country`) on clean layer for selective lookups.
+columns:
+  id_publication_plan:
+    lineage:
+      - datalake_imovelweb_raw.planesporproductoporpais.idplandepublicacion
+    description: |
+      Publication plan tier eligible for the linked product in this country market on Imovelweb. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_product:
+    lineage:
+      - datalake_imovelweb_raw.planesporproductoporpais.idproducto
+    description: |
+      Commercial product SKU that can be purchased under the linked publication plan on Imovelweb. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.planesporproductoporpais.idpais
+    description: |
+      Country market where this product-plan combination is available for purchase on Imovelweb. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.planesporproductoporpais.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.planesporproductoporpais.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.planesporproductoporpais.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

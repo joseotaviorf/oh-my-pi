@@ -1,0 +1,48 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: currencies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Currency reference from Imovelweb Navent MySQL `monedas`. Grain: one row per currency (PK `id_currency`). Downstream: price normalization across markets. No table partitions. Z-ORDER (`id_currency`) on clean layer for selective lookups.
+columns:
+  id_currency:
+    lineage:
+      - datalake_imovelweb_raw.monedas.idmoneda
+    description: |
+      Surrogate key for a currency used in Imovelweb listing prices, commissions, and commercial order line items. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  currency_code:
+    lineage:
+      - datalake_imovelweb_raw.monedas.codigomoneda
+    description: |
+      ISO 4217 currency code (BRL, USD) for price display and SAP billing reconciliation on Imovelweb.
+  currency_symbol:
+    lineage:
+      - datalake_imovelweb_raw.monedas.simbolo
+    description: |
+      Symbol shown before amounts on Imovelweb listing cards and checkout screens (R$, US$).
+  currency_name:
+    lineage:
+      - datalake_imovelweb_raw.monedas.nombre
+    description: |
+      Full currency name for Imovelweb back-office dropdowns and publisher-facing price configuration forms.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.monedas.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.monedas.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.monedas.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

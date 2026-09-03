@@ -1,0 +1,24 @@
+---
+table_name: datalake_imovelweb_clean.cities
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+column_level_validations:
+  id_city:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  city_name:
+    is_complete:
+      severity_level: Error
+  id_state:
+    is_complete:
+      severity_level: Error
+  id_country:
+    is_complete:
+      severity_level: Error

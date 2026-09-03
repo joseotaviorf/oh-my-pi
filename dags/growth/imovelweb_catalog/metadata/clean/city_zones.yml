@@ -1,0 +1,78 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: city_zones
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  City zone (neighborhood group) from Imovelweb Navent MySQL `zonasciudad`. Grain: one row per city zone (PK `id_city_zone`). Downstream: neighborhood-level listing geo analytics. No table partitions. Z-ORDER (`id_city`) on clean layer for selective lookups.
+columns:
+  id_city_zone:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.idzonaciudad
+    description: |
+      Surrogate key for a neighborhood group within an Imovelweb city, used to cluster listings for area-level analytics.
+  id_city:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.idciudad
+    description: |
+      Municipality that contains this zone, anchoring neighborhood browsing and listing location assignment in Imovelweb. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_state:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.idprovincia
+    description: |
+      State/province denormalized from the parent city for regional supply dashboards without extra geo hierarchy joins.
+  id_city_zone_type:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.idtipodezonaciudad
+    description: |
+      Classification of the zone (residential, commercial, coastal) that drives Imovelweb search facet grouping and map styling.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.idpais
+    description: |
+      Country market denormalized from the parent city to partition zone-level metrics by Imovelweb operating territory.
+  city_zone_name:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.nombre
+    description: |
+      Neighborhood group label displayed on Imovelweb search results and agency minisite location breadcrumbs.
+  postal_code:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.codigoPostal
+    description: |
+      Primary postal code associated with the zone, used by Imovelweb to pre-fill listing address forms and validate coverage areas.
+  city_zone_aliases:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.aliases
+    description: |
+      Alternate neighborhood names indexed by Imovelweb search to match colloquial area references entered by publishers.
+  latitude:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.latitud
+    description: |
+      Centroid latitude of the zone boundary for Imovelweb map centering when users browse listings by neighborhood.
+  longitude:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.longitud
+    description: |
+      Centroid longitude of the zone boundary for Imovelweb map centering when users browse listings by neighborhood.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.zonasciudad.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

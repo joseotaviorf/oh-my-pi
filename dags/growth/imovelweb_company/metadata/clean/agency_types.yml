@@ -1,0 +1,38 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: agency_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Agency type reference from Imovelweb Navent MySQL `tiposdeinmobiliaria`. Grain: one row per agency type (PK `id_agency_type`). Downstream: agency segmentation. No table partitions. Z-ORDER (`id_agency_type`) on clean layer for selective lookups.
+columns:
+  id_agency_type:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeinmobiliaria.idtipodeinmobiliaria
+    description: |
+      Surrogate key for an agency classification tier in Imovelweb (e.g. developer, broker, franchise) used to segment publisher accounts. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  agency_type_name:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeinmobiliaria.nombre
+    description: |
+      Human-readable label for the agency classification shown in Imovelweb back-office filters and publisher onboarding workflows.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeinmobiliaria.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeinmobiliaria.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeinmobiliaria.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

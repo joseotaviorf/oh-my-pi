@@ -1,0 +1,228 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: orders
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Commercial sales order from Imovelweb Navent MySQL `pedidos`. Grain: one row per order (PK `id_order`). Downstream: revenue, billing, and SAP order reconciliation. No table partitions. Z-ORDER (`id_order`) on clean layer for selective lookups.
+columns:
+  id_order:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idpedido
+    description: |
+      Surrogate key for a commercial sales order on Imovelweb purchasing publication credits or services. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_company:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idempresa
+    description: |
+      Agency account that placed this commercial order on Imovelweb.
+  id_bumeran_user:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idusuariobumeran
+    description: |
+      Navent internal sales representative who created this order in the Imovelweb commercial system.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idpais
+    description: |
+      Country market where this order applies, determining product catalog and tax treatment on Imovelweb.
+  id_point_of_sale:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idpuntodeventa
+    description: |
+      Sales channel or branch that originated this order in the Imovelweb commercial pipeline.
+  id_portal:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idportal
+    description: |
+      Navent portal brand under which this order was placed for Imovelweb publication services.
+  id_payment_method:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idmediopago
+    description: |
+      Payment instrument type (credit card, bank transfer, invoice) for this Imovelweb order settlement.
+  id_invoicing_frequency:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idfrecuenciadefacturacion
+    description: |
+      Billing cadence (monthly, quarterly) for recurring charges on this Imovelweb commercial order.
+  id_sap_sales_order:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idpedidodeventasap
+    description: |
+      SAP sales order number linking this Imovelweb order to Navent enterprise accounts receivable.
+  id_billing_company:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idempresafacturacion
+    description: |
+      Legal entity billed for this order, which may differ from the publishing agency on Imovelweb.
+  id_payment_term:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idplazodepago
+    description: |
+      Payment terms code (net-30, prepaid) governing invoice due dates for this Imovelweb order.
+  id_activating_bumeran_user:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idusuariobumeranactivador
+    description: |
+      Navent user who activated the order and released publication credits on Imovelweb.
+  id_price_list:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.idlistadeprecio
+    description: |
+      Price list catalog applied to determine unit prices on this Imovelweb commercial order.
+  order_detail:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.detalle
+    description: |
+      Free-text notes or description of the commercial agreement attached to this Imovelweb order.
+  invoicing_username:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.usernameFacturador
+    description: |
+      Username of the billing contact responsible for invoice approval on this Imovelweb order.
+  authorization_code:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.codigoautorizacion
+    description: |
+      Payment gateway authorization code confirming successful charge for this Imovelweb order.
+  contact_email_1:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.mailcontacto1
+    description: |
+      Primary billing contact email for invoices and payment reminders on this Imovelweb order.
+  contact_email_2:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.mailcontacto2
+    description: |
+      Secondary billing contact email for invoice copies on this Imovelweb order.
+  affiliation_number:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.numerodeafiliacion
+    description: |
+      Partner or affiliate tracking number associated with this Imovelweb commercial order for commission.
+  payment_receipt_number:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.numerodecomprobantedepago
+    description: |
+      Receipt or voucher number for the payment settling this Imovelweb order.
+  purchase_order_number:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.ordendecompra
+    description: |
+      Agency purchase order reference for procurement tracking of this Imovelweb commercial order.
+  bank_account_number:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.numerocuentabancaria
+    description: |
+      Bank account used for wire transfer payment of this Imovelweb order.
+  amount:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.monto
+    description: |
+      Total order value including all line items before discounts on Imovelweb commercial billing.
+  discount_amount:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.descuento
+    description: |
+      Total discount applied across all line items on this Imovelweb order.
+  invoice_count:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.cantidaddefacturas
+    description: |
+      Number of invoices to be generated for this order under the configured billing cadence on Imovelweb.
+  days_between_invoices:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.diasentrefacturas
+    description: |
+      Interval in days between consecutive invoice issuances for this Imovelweb order.
+  payment_count:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.cantidaddepagos
+    description: |
+      Number of installment payments scheduled for this Imovelweb order settlement.
+  days_between_payments:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.diasentrepagos
+    description: |
+      Interval in days between consecutive installment payments for this Imovelweb order.
+  order_status:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.estado
+    description: |
+      Lifecycle status code (pending, active, cancelled) of this commercial order on Imovelweb.
+  usd_exchange_rate:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.cotizaciondolar
+    description: |
+      USD exchange rate applied when converting local currency amounts on this Imovelweb order.
+  is_enabled:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.habilitado
+    description: |
+      When true, the order is active and its credits can be consumed for listing publication on Imovelweb.
+  is_invoiced_in_usd:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.facturaendolar
+    description: |
+      When true, invoices for this order are issued in US dollars instead of local currency on Imovelweb.
+  dt_created:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.fechaalta
+    description: |
+      Date when the commercial order was created in the Imovelweb billing system.
+  dt_invoicing_started:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.fechainiciofacturas
+    description: |
+      Date when recurring invoice generation began for this Imovelweb order.
+  dt_payments_started:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.fechainiciopagos
+    description: |
+      Date when installment payment collection started for this Imovelweb order.
+  dt_deactivated:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.fechabaja
+    description: |
+      Date when the order was cancelled and remaining credits were frozen on Imovelweb.
+  dt_invoiced:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.fechafacturado
+    description: |
+      Date when the order was fully invoiced in the Imovelweb billing system.
+  dt_paid:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.fechapago
+    description: |
+      Date when the order was fully paid and credits released for Imovelweb listing publication.
+  dt_started:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.fechaInicio
+    description: |
+      Date when the order became effective and credits became available for consumption on Imovelweb.
+  dt_deactivation_requested:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.fechasolicitudbaja
+    description: |
+      Date when the agency requested cancellation of this order on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.pedidos.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

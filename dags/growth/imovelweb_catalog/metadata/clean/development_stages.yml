@@ -1,0 +1,48 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: development_stages
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Property development stage reference from Imovelweb Navent MySQL `etapasdedesarrollo`. Grain: one row per development stage (PK `id_development_stage`). Downstream: new-development listing classification. No table partitions. Z-ORDER (`id_development_stage`) on clean layer for selective lookups.
+columns:
+  id_development_stage:
+    lineage:
+      - datalake_imovelweb_raw.etapasdedesarrollo.idetapadedesarrollo
+    description: |
+      Surrogate key for a construction phase label (pre-launch, under construction, delivered) on Imovelweb new developments. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.etapasdedesarrollo.idpais
+    description: |
+      Country market where this development stage label applies, as naming conventions vary across Imovelweb territories.
+  development_stage_name:
+    lineage:
+      - datalake_imovelweb_raw.etapasdedesarrollo.nombre
+    description: |
+      Display label for the construction phase shown on Imovelweb new-development listing cards and search filters.
+  display_order:
+    lineage:
+      - datalake_imovelweb_raw.etapasdedesarrollo.orden
+    description: |
+      Sort sequence for development stage options in Imovelweb listing creation forms and search facet ordering.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.etapasdedesarrollo.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.etapasdedesarrollo.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.etapasdedesarrollo.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

@@ -1,0 +1,98 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: products
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Commercial product (publication package sku) from Imovelweb Navent MySQL `productos`. Grain: one row per product (PK `id_product`). Downstream: product catalog and order line attribution. No table partitions. Z-ORDER (`id_product`) on clean layer for selective lookups.
+columns:
+  id_product:
+    lineage:
+      - datalake_imovelweb_raw.productos.idproducto
+    description: |
+      Surrogate key for a commercial product SKU (publication package) sold on Imovelweb. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_product_line:
+    lineage:
+      - datalake_imovelweb_raw.productos.idlineadeproducto
+    description: |
+      Product family grouping this SKU belongs to in Imovelweb commercial catalog hierarchies.
+  id_sap_material:
+    lineage:
+      - datalake_imovelweb_raw.productos.idmaterialsap
+    description: |
+      SAP material master code linking this product to Navent enterprise inventory and revenue systems.
+  id_zone:
+    lineage:
+      - datalake_imovelweb_raw.productos.idzona
+    description: |
+      Geographic zone limiting where publication credits from this product can be used on Imovelweb.
+  id_product_subline:
+    lineage:
+      - datalake_imovelweb_raw.productos.idsublineadeproducto
+    description: |
+      Sub-family classification refining product grouping within the parent line on Imovelweb.
+  product_name:
+    lineage:
+      - datalake_imovelweb_raw.productos.nombre
+    description: |
+      Commercial product label shown in Imovelweb publisher checkout and order confirmation screens.
+  initial_quantity:
+    lineage:
+      - datalake_imovelweb_raw.productos.cantidadinicial
+    description: |
+      Default number of publication credits included when this product is purchased on Imovelweb.
+  concurrent_delivery_limit:
+    lineage:
+      - datalake_imovelweb_raw.productos.limiteentregaensimultaneo
+    description: |
+      Maximum listings that can be live simultaneously from one purchase of this product on Imovelweb.
+  daily_delivery_limit:
+    lineage:
+      - datalake_imovelweb_raw.productos.limiteentregapordia
+    description: |
+      Maximum new listing publications per day allowed by this product on Imovelweb.
+  monthly_delivery_limit:
+    lineage:
+      - datalake_imovelweb_raw.productos.limiteentregapormes
+    description: |
+      Maximum new listing publications per month allowed by this product on Imovelweb.
+  validity_days:
+    lineage:
+      - datalake_imovelweb_raw.productos.diasvigencia
+    description: |
+      Number of days after purchase before unconsumed credits from this product expire on Imovelweb.
+  is_unlimited_delivery:
+    lineage:
+      - datalake_imovelweb_raw.productos.entregailimitada
+    description: |
+      When true, this product has no cap on concurrent or periodic listing publications on Imovelweb.
+  is_enabled:
+    lineage:
+      - datalake_imovelweb_raw.productos.habilitado
+    description: |
+      When true, this product SKU is available for purchase in the Imovelweb commercial catalog.
+  is_cloneable:
+    lineage:
+      - datalake_imovelweb_raw.productos.esclonable
+    description: |
+      When true, existing orders of this product can be duplicated for renewal on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.productos.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.productos.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.productos.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

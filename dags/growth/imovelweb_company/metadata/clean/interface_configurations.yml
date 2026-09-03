@@ -1,0 +1,108 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: interface_configurations
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Third-party interface configuration from Imovelweb Navent MySQL `interfaceconfigurations`. Grain: one row per interface integration (PK `id_interface`). Downstream: integration setup and parameter resolution. No table partitions. Z-ORDER (`id_interface`) on clean layer for selective lookups.
+columns:
+  id_interface:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.idinterface
+    description: |
+      Surrogate key for a third-party integration connector definition managed in Imovelweb publisher platform. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.idpais
+    description: |
+      Country market where this integration connector operates, as Imovelweb API endpoints differ by territory.
+  id_integrator:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.idintegrador
+    description: |
+      External integrator vendor identifier for the CRM/ERP platform connected to Imovelweb listing sync.
+  default_id_company:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.defaultidempresa
+    description: |
+      Fallback agency account used when inbound sync messages lack an explicit company mapping on Imovelweb.
+  default_id_user:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.defaultidusuario
+    description: |
+      Fallback user account assigned to auto-created listings from external feeds on Imovelweb.
+  class_name:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.classname
+    description: |
+      Java adapter class implementing the sync protocol for this Imovelweb integration connector.
+  interface_name:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.nombre
+    description: |
+      Human-readable connector label shown in Imovelweb publisher back-office integration settings.
+  parameters:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.parametros
+    description: |
+      Serialized default parameter bundle for the connector before per-agency overrides on Imovelweb.
+  processor_code:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.procesador
+    description: |
+      Short code selecting the message processor pipeline for this Imovelweb integration connector.
+  execution_hour_range_start:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.rangohorasejecucioninicio
+    description: |
+      Earliest hour of day (0-23) when Imovelweb may trigger scheduled sync runs for this connector.
+  execution_hour_range_end:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.rangohorasejecucionfin
+    description: |
+      Latest hour of day (0-23) when Imovelweb may trigger scheduled sync runs for this connector.
+  minutes_between_executions:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.minutosentreejecuciones
+    description: |
+      Minimum interval in minutes between consecutive Imovelweb sync job executions for this connector.
+  is_image_download_enabled:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.descargarimagenes
+    description: |
+      When true, Imovelweb sync jobs fetch and store listing photos from the external feed during import.
+  is_enabled:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.habilitado
+    description: |
+      When true, the integration connector is active and Imovelweb schedules sync jobs against it.
+  is_check_only:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.justcheck
+    description: |
+      When true, Imovelweb runs validation-only sync passes without writing listing changes to production.
+  is_online:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.isonline
+    description: |
+      When true, the connector uses real-time push mode instead of batch polling on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurations.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

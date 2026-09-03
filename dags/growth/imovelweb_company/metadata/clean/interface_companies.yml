@@ -1,0 +1,83 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: interface_companies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Third-party interface company binding from Imovelweb Navent MySQL `interfaceempresas`. Grain: one row per interface-company link (PK `id_interface_company`). Downstream: external CRM/ERP company sync. No table partitions. Z-ORDER (`id_company`) on clean layer for selective lookups.
+columns:
+  id_interface_company:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.idinterfaceempresa
+    description: |
+      Surrogate key for a binding between an Imovelweb agency and an external CRM/ERP integration connector.
+  id_interface:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.idinterface
+    description: |
+      Integration configuration that defines how this agency syncs data with external systems via Imovelweb.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.idpais
+    description: |
+      Country market scope for this integration binding, as Imovelweb connector endpoints vary by territory.
+  id_company:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.idempresa
+    description: |
+      Agency account whose listings and leads flow through this Imovelweb third-party integration channel. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_external_company:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.idempresaexterna
+    description: |
+      Company identifier in the external CRM/ERP system mapped to the Imovelweb agency for bidirectional sync.
+  id_company_user:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.idusuarioempresa
+    description: |
+      Agency user designated as the integration owner responsible for sync errors and credential rotation on Imovelweb.
+  processor_code:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.procesador
+    description: |
+      Integration processor module name selecting the adapter logic for this agency sync pipeline on Imovelweb.
+  pause_status:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.pausestatus
+    description: |
+      Sync pause state code indicating whether Imovelweb has temporarily halted data exchange for this agency.
+  is_enabled:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.habilitado
+    description: |
+      When true, the agency integration is active and Imovelweb pushes/pulls listing and lead data on schedule.
+  ts_created:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.fechaalta
+    description: |
+      Timestamp when the integration binding was first activated for this agency on Imovelweb.
+  ts_deactivated:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.fechabaja
+    description: |
+      Timestamp when the integration binding was disabled and Imovelweb stopped syncing data for this agency.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.interfaceempresas.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

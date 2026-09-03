@@ -1,0 +1,58 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: listing_operation_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Listing operation type (sale/rent) from Imovelweb Navent MySQL `avisostiposdeoperaciones`. Grain: one row per listing-operation assignment (PK `id_listing_operation_type`). Downstream: multi-operation listing analytics. No table partitions. Z-ORDER (`id_listing`) on clean layer for selective lookups.
+columns:
+  id_listing_operation_type:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.idavisostiposdeoperaciones
+    description: |
+      Surrogate key for a price offering on a listing (sale, rent, vacation) in the Imovelweb multi-operation model.
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.idaviso
+    description: |
+      Property listing that offers this transaction type and price on the Imovelweb marketplace. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_operation_type:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.idtipodeoperacion
+    description: |
+      Transaction type (sale, rent, temporary rent) governing how the price is displayed and searched on Imovelweb.
+  id_currency:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.idmoneda
+    description: |
+      Currency for this operation price, allowing multi-currency offerings on a single Imovelweb listing.
+  price_amount:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.precio
+    description: |
+      Primary asking price for this operation type shown on Imovelweb search cards and detail pages.
+  extra_price_amount:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.precioextra
+    description: |
+      Secondary price component (expenses, admin fees) added to the base price on Imovelweb rental listings.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisostiposdeoperaciones.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

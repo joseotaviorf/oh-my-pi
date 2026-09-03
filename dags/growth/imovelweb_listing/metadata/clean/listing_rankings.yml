@@ -1,0 +1,128 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: listing_rankings
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Listing search-ranking snapshot from Imovelweb Navent MySQL `avisosrealestateranking`. Grain: one row per listing within country, publication plan, publication area, and ranking type (logical composite key; declaration PK is `id_listing` pending source validation). Downstream: search ranking, impressions, leads, and conversion analytics. No table partitions. Z-ORDER (`id_listing`) on clean layer for selective lookups.
+columns:
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.idaviso
+    description: |
+      Property listing whose search ranking performance metrics are captured in this Imovelweb analytics snapshot. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.idpais
+    description: |
+      Country market where ranking metrics were collected for this listing on the Imovelweb portal.
+  id_publication_plan:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.idplandepublicacion
+    description: |
+      Publication plan tier (standard, featured, super) under which this listing ranking was computed on Imovelweb.
+  id_publication_area:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.idareadepublicacion
+    description: |
+      Geographic publication area scope that bounds where this listing competes in Imovelweb search ranking.
+  ranking_type:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.tipo
+    description: |
+      Ranking algorithm variant or segment code used to compute this listing position on Imovelweb search results.
+  impression_count:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.impresiones
+    description: |
+      Listing card views in the current ranking measurement window on Imovelweb search and browse pages.
+  total_impression_count:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.impresionestotales
+    description: |
+      Cumulative listing card views since publication on Imovelweb, spanning all measurement windows.
+  lead_count:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.leads
+    description: |
+      Prospect contact actions generated in the current ranking measurement window for this Imovelweb listing.
+  total_lead_count:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.leadstotales
+    description: |
+      Cumulative prospect contacts since publication for this listing across all Imovelweb measurement windows.
+  record_count:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.ctdadregistros
+    description: |
+      Number of ranking score observations in the current measurement window for this Imovelweb listing.
+  total_record_count:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.ctdadregistrostotales
+    description: |
+      Cumulative ranking score observations since publication for this listing on Imovelweb.
+  ranking_weight:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.peso
+    description: |
+      Publication plan weight factor boosting this listing in Imovelweb search result ordering.
+  lead_score:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.scoreleads
+    description: |
+      Lead-generation performance sub-score contributing to overall search position on Imovelweb.
+  ranking_score:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.score
+    description: |
+      Composite search relevance score determining this listing position in Imovelweb result pages.
+  conversion_rate:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.convertionrate
+    description: |
+      Ratio of leads to impressions for this listing in the current Imovelweb ranking measurement window.
+  ranking_position:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.ranking
+    description: |
+      Current search result position of this listing within its publication area on Imovelweb.
+  new_ranking_position:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.rankingnew
+    description: |
+      Recalculated search position after the latest ranking algorithm update on Imovelweb.
+  ts_created:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.fechacreacion
+    description: |
+      Timestamp when this ranking metrics snapshot was first created for the listing on Imovelweb.
+  ts_published:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.fechapublicacion
+    description: |
+      Timestamp when the listing went live under the publication plan tracked by this Imovelweb ranking record.
+  ts_updated:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.fechamodificado
+    description: |
+      Timestamp when ranking metrics were last recalculated for this listing on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisosrealestateranking.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

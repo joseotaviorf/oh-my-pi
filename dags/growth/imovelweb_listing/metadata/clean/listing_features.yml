@@ -1,0 +1,53 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: listing_features
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Listing amenity/feature flag from Imovelweb Navent MySQL `avisoscaracteristicas`. Grain: one row per listing feature assignment (PK `id_listing_feature`). Downstream: property attribute enrichment and search filters. No table partitions. Z-ORDER (`id_listing`) on clean layer for selective lookups.
+columns:
+  id_listing_feature:
+    lineage:
+      - datalake_imovelweb_raw.avisoscaracteristicas.idavisocaracteristica
+    description: |
+      Surrogate key for a single amenity or characteristic value attached to an Imovelweb property listing.
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.avisoscaracteristicas.idaviso
+    description: |
+      Property listing that carries this amenity or characteristic on its Imovelweb detail page. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_feature:
+    lineage:
+      - datalake_imovelweb_raw.avisoscaracteristicas.idcaracteristica
+    description: |
+      Amenity catalog entry (pool, gym, balcony) defining the characteristic type on Imovelweb search filters.
+  id_feature_option:
+    lineage:
+      - datalake_imovelweb_raw.avisoscaracteristicas.idopcion
+    description: |
+      Predefined option for the amenity when it is a pick-list rather than free text on Imovelweb listing forms.
+  feature_value:
+    lineage:
+      - datalake_imovelweb_raw.avisoscaracteristicas.valor
+    description: |
+      Free-text or numeric value for the amenity (e.g. '2' parking spots) displayed on the Imovelweb listing detail page.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.avisoscaracteristicas.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisoscaracteristicas.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisoscaracteristicas.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

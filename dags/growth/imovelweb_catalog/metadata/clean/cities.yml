@@ -1,0 +1,73 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: cities
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  City reference from Imovelweb Navent MySQL `ciudades`. Grain: one row per city (PK `id_city`). Downstream: geo hierarchy, zones, and listing location joins. No table partitions. Z-ORDER (`id_city`) on clean layer for selective lookups.
+columns:
+  id_city:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.idciudad
+    description: |
+      Surrogate key for a municipality within Imovelweb geo hierarchy; joins listings and agencies to their canonical city record. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_state:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.idprovincia
+    description: |
+      Links the city to its parent state/province in the Imovelweb geo catalog for regional search and address normalization.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.idpais
+    description: |
+      Links the city to the Imovelweb country market that governs currency, portal branding, and listing publication rules.
+  id_original:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.idoriginal
+    description: |
+      Legacy or external-system city identifier retained for migration reconciliation when Imovelweb absorbed older geo master data.
+  id_region:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.idregion
+    description: |
+      Optional regional grouping above state level used in Imovelweb market reports and multi-state publisher coverage analytics.
+  city_name:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.nombre
+    description: |
+      Official municipality name displayed on Imovelweb listing cards and used in location autocomplete for property search.
+  city_aliases:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.aliases
+    description: |
+      Alternate spellings or nicknames for the city accepted by Imovelweb search indexing to improve location match recall.
+  city_preposition:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.preposicion
+    description: |
+      Grammatical preposition paired with the city name in Imovelweb localized listing titles (e.g. 'em São Paulo' in Brazil).
+  is_capital:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.escapital
+    description: |
+      When true, marks the city as a state/province capital so Imovelweb can prioritize it in geo pickers and market dashboards.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.ciudades.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

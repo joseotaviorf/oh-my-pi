@@ -1,0 +1,27 @@
+SELECT
+    idgeolocalizacion AS id_geolocation,
+    idgeolocalizacionlocalidad AS id_geolocation_locality,
+    idgeolocalizacionprovincia AS id_geolocation_state,
+    idgeolocalizacionpais AS id_geolocation_country,
+    type AS geolocation_type,
+    location_type AS location_type,
+    streetaddress AS street_address,
+    street_number AS street_number,
+    route AS route_name,
+    country AS country_name,
+    administrative_area_level_1 AS admin_area_level_1_name,
+    administrative_area_level_2 AS admin_area_level_2_name,
+    administrative_area_level_3 AS admin_area_level_3_name,
+    locality AS locality_name,
+    sublocality AS sublocality_name,
+    neighborhood AS neighborhood_name,
+    premise AS premise_name,
+    subpremise AS subpremise_name,
+    point_of_interest AS point_of_interest_name,
+    postal_code AS postal_code,
+    southwest AS bounds_southwest,
+    northEast AS bounds_northeast,
+    lat AS latitude,
+    lng AS longitude
+FROM
+    datalake_imovelweb_raw.geolocalizaciones

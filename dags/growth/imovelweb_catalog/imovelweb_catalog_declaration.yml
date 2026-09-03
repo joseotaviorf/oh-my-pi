@@ -1,0 +1,97 @@
+dag:
+  name: imovelweb_catalog
+  owner: Data Growth
+  schedule_interval: 0 8,12,21 * * *
+  schedule_start_date: 2026, 9, 1
+  documentation:
+    dag_purpose: 'CDC pipeline for Imovelweb (Navent) MySQL — geo and property reference
+      catalogs (countries through currencies) shared across listings and companies.
+      Part of the Navent → QuintoAndar migration POC (RD-3333, parent RD-3332). See
+      dags/growth/imovelweb_catalog/imovelweb_catalog.md for table inventory and mapping
+      notes.
+
+
+      DATA LINEAGE: MySQL (OLTP) → Raw Layer (`datalake_imovelweb_raw`) → Clean Layer
+      (`datalake_imovelweb_clean`)
+
+      SCHEDULE: 0 8,12,21 * * * UTC'
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: imovelweb
+  custom_schema: imovelweb
+  source_schema: imovelweb
+  dbutils_secret_key: IMOVELWEB_DB
+  tables_customization:
+    paises:
+      clean_table_name: countries
+      clean_primary_keys:
+      - id_country
+      clean_z_order_by:
+      - id_country
+    provincias:
+      clean_table_name: states
+      clean_primary_keys:
+      - id_state
+      clean_z_order_by:
+      - id_state
+    ciudades:
+      clean_table_name: cities
+      clean_primary_keys:
+      - id_city
+      clean_z_order_by:
+      - id_city
+    zonasciudad:
+      clean_table_name: city_zones
+      clean_primary_keys:
+      - id_city_zone
+      clean_z_order_by:
+      - id_city
+    subzonasciudad:
+      clean_table_name: city_subzones
+      clean_primary_keys:
+      - id_city_subzone
+      clean_z_order_by:
+      - id_city
+    geolocalizaciones:
+      clean_table_name: geolocations
+      clean_primary_keys:
+      - id_geolocation
+      clean_z_order_by:
+      - id_geolocation
+    tiposdepropiedad:
+      clean_table_name: property_types
+      clean_primary_keys:
+      - id_property_type
+      clean_z_order_by:
+      - id_property_type
+    subtiposdepropiedad:
+      clean_table_name: property_subtypes
+      clean_primary_keys:
+      - id_property_subtype
+      clean_z_order_by:
+      - id_property_type
+    tiposdeoperacion:
+      clean_table_name: operation_types
+      clean_primary_keys:
+      - id_operation_type
+      clean_z_order_by:
+      - id_operation_type
+    etapasdedesarrollo:
+      clean_table_name: development_stages
+      clean_primary_keys:
+      - id_development_stage
+      clean_z_order_by:
+      - id_development_stage
+    monedas:
+      clean_table_name: currencies
+      clean_primary_keys:
+      - id_currency
+      clean_z_order_by:
+      - id_currency
+  extra_query_template_params:
+    load_start_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_start_date'')
+      }}'
+    load_end_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_end_date'')
+      }}'

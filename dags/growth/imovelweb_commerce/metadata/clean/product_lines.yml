@@ -1,0 +1,48 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: product_lines
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Product line reference from Imovelweb Navent MySQL `lineasdeproducto`. Grain: one row per product line (PK `id_product_line`). Downstream: product hierarchy and reporting rollups. No table partitions. Z-ORDER (`id_product_line`) on clean layer for selective lookups.
+columns:
+  id_product_line:
+    lineage:
+      - datalake_imovelweb_raw.lineasdeproducto.idlineadeproducto
+    description: |
+      Surrogate key for a product family grouping Imovelweb commercial SKUs in reporting hierarchies. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_translation:
+    lineage:
+      - datalake_imovelweb_raw.lineasdeproducto.idtraduccion
+    description: |
+      Translation bundle for localized product line names in Imovelweb publisher checkout flows.
+  product_line_name:
+    lineage:
+      - datalake_imovelweb_raw.lineasdeproducto.nombre
+    description: |
+      Display name of the product family shown in Imovelweb commercial catalog and sales reports.
+  is_enabled:
+    lineage:
+      - datalake_imovelweb_raw.lineasdeproducto.habilitada
+    description: |
+      When true, products under this line are available for purchase on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.lineasdeproducto.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.lineasdeproducto.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.lineasdeproducto.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

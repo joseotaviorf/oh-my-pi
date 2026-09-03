@@ -1,0 +1,74 @@
+dag:
+  name: imovelweb_commerce
+  owner: Data Growth
+  schedule_interval: 0 8,12,21 * * *
+  schedule_start_date: 2026, 9, 1
+  documentation:
+    dag_purpose: 'CDC pipeline for Imovelweb (Navent) MySQL — commercial orders, order
+      line items, products, product lines, and publication-plan pricing. Part of the
+      Navent → QuintoAndar migration POC (RD-3333, parent RD-3332). See dags/growth/imovelweb_commerce/imovelweb_commerce.md
+      for table inventory and mapping notes.
+
+
+      DATA LINEAGE: MySQL (OLTP) → Raw Layer (`datalake_imovelweb_raw`) → Clean Layer
+      (`datalake_imovelweb_clean`)
+
+      SCHEDULE: 0 8,12,21 * * * UTC'
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: imovelweb
+  custom_schema: imovelweb
+  source_schema: imovelweb
+  dbutils_secret_key: IMOVELWEB_DB
+  tables_customization:
+    pedidos:
+      clean_table_name: orders
+      clean_primary_keys:
+      - id_order
+      clean_z_order_by:
+      - id_order
+    itemspedido:
+      clean_table_name: order_items
+      clean_primary_keys:
+      - id_order_item
+      clean_z_order_by:
+      - id_order
+    productos:
+      clean_table_name: products
+      clean_primary_keys:
+      - id_product
+      clean_z_order_by:
+      - id_product
+    lineasdeproducto:
+      clean_table_name: product_lines
+      clean_primary_keys:
+      - id_product_line
+      clean_z_order_by:
+      - id_product_line
+    planesdepublicacion:
+      clean_table_name: publication_plans
+      clean_primary_keys:
+      - id_publication_plan
+      clean_z_order_by:
+      - id_publication_plan
+    planesporproductoporpais:
+      clean_table_name: plans_by_product_by_country
+      raw_primary_keys:
+      - idplandepublicacion
+      - idproducto
+      - idpais
+      clean_primary_keys:
+      - id_publication_plan
+      - id_product
+      - id_country
+      clean_z_order_by:
+      - id_publication_plan
+      - id_product
+      - id_country
+  extra_query_template_params:
+    load_start_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_start_date'')
+      }}'
+    load_end_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_end_date'')
+      }}'

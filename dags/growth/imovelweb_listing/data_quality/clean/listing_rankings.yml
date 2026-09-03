@@ -1,0 +1,30 @@
+---
+table_name: datalake_imovelweb_clean.listing_rankings
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+column_level_validations:
+  id_listing:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_published:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  ranking_type:
+    is_complete:
+      severity_level: Error
+  ranking_position:
+    is_complete:
+      severity_level: Error

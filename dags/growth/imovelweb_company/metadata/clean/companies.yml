@@ -1,0 +1,248 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: companies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Real-estate agency (company) from Imovelweb Navent MySQL `empresas`. Grain: one row per agency (PK `id_company`). Downstream: agency master data, billing, and listing ownership joins (contains PII). No table partitions. Z-ORDER (`id_company`) on clean layer for selective lookups.
+columns:
+  id_company:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idempresa
+    description: |
+      Surrogate key for a real-estate agency account on Imovelweb; primary anchor for listings, orders, and billing relationships. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_portal:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idportal
+    description: |
+      Navent portal brand (Imovelweb, Zonaprop, etc.) under which this agency publishes and is billed for classified inventory.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idpais
+    description: |
+      Country market where the agency operates, determining currency, tax rules, and product catalog availability on Imovelweb.
+  id_vat_condition:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idcondicioniva
+    description: |
+      Tax/VAT status code for the agency used by Imovelweb billing to determine invoice treatment and SAP tax classification.
+  id_financial_status:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idestadofinanciero
+    description: |
+      Credit and collections standing of the agency that gates Imovelweb publication rights and order fulfillment.
+  id_sap_client:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idclientesap
+    description: |
+      SAP customer master identifier linking the agency to Navent enterprise billing and accounts-receivable processes.
+  id_state:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idprovincia
+    description: |
+      Registered state/province of the agency headquarters for Imovelweb geo reporting and regional account management.
+  id_city:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idciudad
+    description: |
+      Registered city of the agency headquarters used in Imovelweb publisher directory and local market segmentation.
+  id_zone:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idzona
+    description: |
+      Neighborhood zone of the agency office location for hyper-local Imovelweb directory placement and territory assignment.
+  id_agency_type:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idtipodeinmobiliaria
+    description: |
+      Agency classification tier (developer, broker, franchise) that controls Imovelweb onboarding workflows and product eligibility.
+  id_group:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idgrupo
+    description: |
+      Corporate group identifier linking multiple agency accounts under a single Imovelweb publisher network umbrella.
+  id_parent_company:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idempresapadre
+    description: |
+      Parent agency account when this company is a branch or subsidiary within an Imovelweb multi-office publisher hierarchy.
+  id_iw_branch:
+    lineage:
+      - datalake_imovelweb_raw.empresas.idSucursalIW
+    description: |
+      Imovelweb-specific branch office identifier for agencies operating multiple physical locations under one account.
+  id_tax:
+    lineage:
+      - datalake_imovelweb_raw.empresas.cuit
+    description: |
+      National tax identification number (CUIT/CNPJ) of the agency required for Imovelweb invoicing and regulatory compliance.
+  id_video:
+    lineage:
+      - datalake_imovelweb_raw.empresas.videoid
+    description: |
+      External video platform identifier for the agency promotional clip embedded on its Imovelweb minisite profile page.
+  company_name:
+    lineage:
+      - datalake_imovelweb_raw.empresas.denominacion
+    description: |
+      Trade name of the agency displayed on Imovelweb listing cards, search results, and the public agency profile page.
+  legal_name:
+    lineage:
+      - datalake_imovelweb_raw.empresas.razonsocial
+    description: |
+      Registered legal entity name of the agency printed on Imovelweb commercial invoices and contractual documents.
+  company_description:
+    lineage:
+      - datalake_imovelweb_raw.empresas.descripcion
+    description: |
+      Marketing blurb about the agency shown on its Imovelweb minisite profile to attract property seekers.
+  contact_email:
+    lineage:
+      - datalake_imovelweb_raw.empresas.email
+    description: |
+      Primary business email for the agency used in Imovelweb lead notifications and account administration messages.
+  website_url:
+    lineage:
+      - datalake_imovelweb_raw.empresas.url
+    description: |
+      Agency corporate website link displayed on the Imovelweb minisite profile for cross-traffic to the publisher site.
+  video_provider:
+    lineage:
+      - datalake_imovelweb_raw.empresas.videoprovider
+    description: |
+      Video hosting platform name (YouTube, Vimeo) for the agency promotional clip rendered on the Imovelweb profile page.
+  logo_url:
+    lineage:
+      - datalake_imovelweb_raw.empresas.urlLogo
+    description: |
+      CDN URL of the agency logo image shown on Imovelweb listing cards and the publisher minisite header.
+  company_segment:
+    lineage:
+      - datalake_imovelweb_raw.empresas.segmento
+    description: |
+      Commercial segment tag (premium, standard, SMB) assigned to the agency for Imovelweb sales targeting and plan upsell.
+  address:
+    lineage:
+      - datalake_imovelweb_raw.empresas.direccion
+    description: |
+      Street address of the agency office displayed on the Imovelweb publisher directory and minisite contact section.
+  phone_number:
+    lineage:
+      - datalake_imovelweb_raw.empresas.telefono
+    description: |
+      Main office phone number shown on the Imovelweb agency profile and included in lead-delivery contact options.
+  postal_code:
+    lineage:
+      - datalake_imovelweb_raw.empresas.codigopostal
+    description: |
+      Postal code of the agency office used for Imovelweb directory geo filtering and invoice address validation.
+  license_number:
+    lineage:
+      - datalake_imovelweb_raw.empresas.licencia
+    description: |
+      Real-estate brokerage license number displayed on the Imovelweb agency profile for regulatory transparency.
+  company_slug:
+    lineage:
+      - datalake_imovelweb_raw.empresas.slug
+    description: |
+      URL-friendly identifier for the agency minisite path on Imovelweb (e.g. /inmobiliaria/agency-slug).
+  rental_email:
+    lineage:
+      - datalake_imovelweb_raw.empresas.emailalquiler
+    description: |
+      Dedicated email for rental inquiries routed separately from sales leads on the Imovelweb agency profile.
+  sales_chat_url:
+    lineage:
+      - datalake_imovelweb_raw.empresas.urlchatventa
+    description: |
+      Live-chat widget URL for purchase inquiries embedded on the Imovelweb agency minisite sales contact section.
+  rental_chat_url:
+    lineage:
+      - datalake_imovelweb_raw.empresas.urlchatalquiler
+    description: |
+      Live-chat widget URL for rental inquiries embedded on the Imovelweb agency minisite rental contact section.
+  about_us_text:
+    lineage:
+      - datalake_imovelweb_raw.empresas.quienesSomos
+    description: |
+      Extended 'about us' narrative on the Imovelweb agency minisite describing team, history, and service areas.
+  cover_photo_url:
+    lineage:
+      - datalake_imovelweb_raw.empresas.fotoPortadaUrl
+    description: |
+      Banner image URL for the agency minisite header on Imovelweb, giving visual branding to the publisher profile page.
+  video_url:
+    lineage:
+      - datalake_imovelweb_raw.empresas.videoUrl
+    description: |
+      Direct URL to the agency promotional video played on the Imovelweb minisite profile media section.
+  employee_count:
+    lineage:
+      - datalake_imovelweb_raw.empresas.cantidadEmpleados
+    description: |
+      Self-reported total staff size shown on the Imovelweb agency profile to signal scale to property seekers.
+  broker_count:
+    lineage:
+      - datalake_imovelweb_raw.empresas.cantidadCorredores
+    description: |
+      Number of licensed brokers in the agency displayed on the Imovelweb profile as a trust and capacity indicator.
+  is_approved:
+    lineage:
+      - datalake_imovelweb_raw.empresas.aprobada
+    description: |
+      When true, the agency passed Imovelweb compliance review and may publish listings on the classifieds marketplace.
+  is_visible:
+    lineage:
+      - datalake_imovelweb_raw.empresas.visible
+    description: |
+      When true, the agency profile and its listings appear in Imovelweb public search and directory pages.
+  is_top_500:
+    lineage:
+      - datalake_imovelweb_raw.empresas.top500
+    description: |
+      When true, flags the agency as a top-500 publisher for Imovelweb premium support and strategic account programs.
+  is_manually_blocked:
+    lineage:
+      - datalake_imovelweb_raw.empresas.bloqueadomanual
+    description: |
+      When true, an Imovelweb operator manually suspended the agency account, preventing new publications and logins.
+  is_enabled:
+    lineage:
+      - datalake_imovelweb_raw.empresas.habilitada
+    description: |
+      When true, the agency account is active and its users can access the Imovelweb publisher back-office portal.
+  dt_missing:
+    lineage:
+      - datalake_imovelweb_raw.empresas.falta
+    description: |
+      Date when the agency record was flagged as incomplete or missing required data in Imovelweb onboarding validation.
+  ts_updated:
+    lineage:
+      - datalake_imovelweb_raw.empresas.fechamodificado
+    description: |
+      Last modification timestamp of the agency profile on the Imovelweb publisher master data.
+  ts_deactivated:
+    lineage:
+      - datalake_imovelweb_raw.empresas.fbaja
+    description: |
+      Timestamp when the agency account was deactivated and removed from active Imovelweb publication workflows.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.empresas.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.empresas.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.empresas.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

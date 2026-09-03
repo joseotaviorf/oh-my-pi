@@ -1,0 +1,68 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: listing_deliveries
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Listing delivery/package assignment from Imovelweb Navent MySQL `entregasavisos`. Grain: one row per listing delivery record (PK `id_listing_delivery`). Downstream: publication package and delivery tracking. No table partitions. Z-ORDER (`id_listing`) on clean layer for selective lookups.
+columns:
+  id_listing_delivery:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.identregaaviso
+    description: |
+      Surrogate key for a publication-credit consumption event when an Imovelweb listing goes live on the marketplace.
+  id_original_listing_delivery:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.identregaavisoriginal
+    description: |
+      Legacy listing-delivery identifier from the pre-migration Navent schema when this delivery row was backfilled or reconciled across systems.
+  id_account:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.idcuenta
+    description: |
+      Billing account whose publication credits were debited for this listing delivery on Imovelweb.
+  id_order:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.idpedido
+    description: |
+      Commercial order that funded the publication credits used to deliver this listing on Imovelweb.
+  id_order_item:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.iditempedido
+    description: |
+      Order line item specifying the product SKU whose credits were consumed for this Imovelweb listing delivery.
+  id_company_user:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.idusuarioempresa
+    description: |
+      Agency user who triggered the listing publication that consumed credits on Imovelweb.
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.idaviso
+    description: |
+      Property listing that was published to the Imovelweb marketplace through this credit consumption event. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  dt_delivered:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.fecha
+    description: |
+      Date when the listing publication credit was consumed and the property went live on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.entregasavisos.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

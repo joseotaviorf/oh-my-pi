@@ -1,0 +1,103 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: order_items
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Sales order line item from Imovelweb Navent MySQL `itemspedido`. Grain: one row per order line (PK `id_order_item`). Downstream: product-level revenue and fulfillment analytics. No table partitions. Z-ORDER (`id_order`) on clean layer for selective lookups.
+columns:
+  id_order_item:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.iditempedido
+    description: |
+      Surrogate key for a line item within an Imovelweb commercial order specifying a product SKU and quantity.
+  id_order:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.idpedido
+    description: |
+      Parent commercial order that contains this product line for Imovelweb billing and fulfillment. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_product:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.idproducto
+    description: |
+      Product SKU (publication package) purchased in this order line on Imovelweb.
+  id_zone:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.idzona
+    description: |
+      Geographic zone scope limiting where credits from this order item can publish listings on Imovelweb.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.idpais
+    description: |
+      Country market where this order item product is valid for listing publication on Imovelweb.
+  id_account:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.idcuenta
+    description: |
+      Billing account receiving the publication credits from this order item on Imovelweb.
+  id_sap_sales_order_position:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.idposicionpedidodeventasap
+    description: |
+      SAP sales order line position linking this item to Navent enterprise revenue recognition.
+  item_position:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.posicion
+    description: |
+      Sequential line number of this item within the parent order for Imovelweb invoice rendering.
+  quantity:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.cantidad
+    description: |
+      Number of publication credits or units purchased in this order line on Imovelweb.
+  consumed_quantity:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.consumidos
+    description: |
+      Publication credits already used from this order line to deliver listings on Imovelweb.
+  amount:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.monto
+    description: |
+      Total monetary value of this order line before discounts on Imovelweb commercial billing.
+  unit_price:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.preciounitario
+    description: |
+      Negotiated per-unit price for this order line after any Imovelweb sales discounts.
+  list_unit_price:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.preciounitariodelista
+    description: |
+      Catalog list price per unit before negotiation on this Imovelweb order line.
+  is_non_deliverable:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.noentregable
+    description: |
+      When true, credits from this line cannot be consumed for listing publication on Imovelweb (e.g. setup fees).
+  dt_expired:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.fechadevencimiento
+    description: |
+      Date when unconsumed credits from this order line expire and become unusable on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.itemspedido.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

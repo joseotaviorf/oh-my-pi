@@ -1,0 +1,443 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: listings
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Classified property listing from Imovelweb Navent MySQL `avisos`. Grain: one row per listing (PK `id_listing`). Downstream: listing analytics, migration reconciliation, and joins to features, phones, rankings, and interface sync tables. No table partitions. Z-ORDER (`id_listing`) on clean layer for selective lookups.
+columns:
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idaviso
+    description: |
+      Surrogate key for a classified property listing on Imovelweb; primary identifier across supply and demand analytics. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idpais
+    description: |
+      Country market where this listing is published, governing currency, tax display, and Imovelweb portal branding.
+  id_zone:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idzona
+    description: |
+      Neighborhood zone assigning this listing to an Imovelweb geo area for search filters and map browsing.
+  id_posting_type:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idtipodeposting
+    description: |
+      Publication format code (standard, development, unit) controlling listing template layout on Imovelweb.
+  id_company:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idempresa
+    description: |
+      Agency account that owns and manages this listing on the Imovelweb publisher platform.
+  id_account:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idcuenta
+    description: |
+      Commercial billing account whose credits fund this listing publication on Imovelweb.
+  id_company_user:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idusuarioempresa
+    description: |
+      Agency user who created or last managed this listing in the Imovelweb publisher back-office.
+  id_portal:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idportal
+    description: |
+      Navent portal brand (Imovelweb, Zonaprop) where this listing is visible to property seekers.
+  id_delivery:
+    lineage:
+      - datalake_imovelweb_raw.avisos.identrega
+    description: |
+      Publication credit delivery event that brought this listing live on the Imovelweb marketplace.
+  id_property_type:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idtipodepropiedad
+    description: |
+      High-level property category (apartment, house, land) driving Imovelweb search filters and card layout.
+  id_parent_listing:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idavisopadre
+    description: |
+      Parent development listing when this row represents a single unit within an Imovelweb multi-unit project.
+  id_state:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idprovincia
+    description: |
+      State/province of the property location for regional search and address display on Imovelweb.
+  id_city:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idciudad
+    description: |
+      Canonical city of the property linked to the Imovelweb geo hierarchy for location autocomplete.
+  id_currency:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idmoneda
+    description: |
+      Currency for the primary listing price shown on Imovelweb search cards and detail pages.
+  id_photo:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idfoto
+    description: |
+      Cover photo record identifier for the hero image on this listing Imovelweb search result card.
+  id_operation_type:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idtipodeoperacion
+    description: |
+      Primary transaction type (sale, rent) for this listing on Imovelweb when only one operation is offered.
+  id_development_stage:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idetapadedesarrollo
+    description: |
+      Construction phase label for new-development listings displayed on Imovelweb project pages.
+  id_source:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idorigen
+    description: |
+      Inbound channel code (manual, XML feed, API) that created this listing in Imovelweb.
+  id_beach:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idplaya
+    description: |
+      Beach or coastal area tag for seaside properties shown in Imovelweb vacation and coastal search filters.
+  id_property_subtype:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idsubtipodepropiedad
+    description: |
+      Fine-grained property classification (penthouse, loft) refining Imovelweb search facet options.
+  id_measurement_unit:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idunidaddemedida
+    description: |
+      Area measurement unit (m², hectares) for dimension fields displayed on this Imovelweb listing.
+  id_value_zone:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idzonadevalor
+    description: |
+      Market-value zone for automated price-per-m² benchmarks on Imovelweb listing analytics.
+  id_city_subzone:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idsubzonaciudad
+    description: |
+      Micro-neighborhood assigning hyper-local geo context to this listing on Imovelweb map search.
+  id_agreed_commission_currency:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idmonedaconvenida
+    description: |
+      Currency for the agreed broker commission amount on this Imovelweb listing co-brokerage terms.
+  id_shared_commission_currency:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idmonedacompartir
+    description: |
+      Currency for the shared commission offered to cooperating brokers on this Imovelweb listing.
+  id_external_original:
+    lineage:
+      - datalake_imovelweb_raw.avisos.idoriginalexterna
+    description: |
+      Listing identifier in the publisher external CRM/ERP system used for Imovelweb integration sync reconciliation.
+  listing_title:
+    lineage:
+      - datalake_imovelweb_raw.avisos.titulo
+    description: |
+      Headline text on the Imovelweb search card and detail page summarizing the property offering.
+  listing_description:
+    lineage:
+      - datalake_imovelweb_raw.avisos.descripcion
+    description: |
+      Full property narrative on the Imovelweb detail page describing features, location, and conditions.
+  listing_reference:
+    lineage:
+      - datalake_imovelweb_raw.avisos.referencia
+    description: |
+      Publisher internal reference code shown on the Imovelweb listing for agency inventory tracking.
+  city_name:
+    lineage:
+      - datalake_imovelweb_raw.avisos.ciudad
+    description: |
+      Free-text city label on the listing, which may differ from the canonical id_city on Imovelweb.
+  alternative_company_name:
+    lineage:
+      - datalake_imovelweb_raw.avisos.nombreempresaalternativo
+    description: |
+      Override agency display name on this listing when the publisher wants different branding on Imovelweb.
+  map_latitude:
+    lineage:
+      - datalake_imovelweb_raw.avisos.mapalatitud
+    description: |
+      Latitude coordinate for the property pin on the Imovelweb listing detail interactive map.
+  map_longitude:
+    lineage:
+      - datalake_imovelweb_raw.avisos.mapalongitud
+    description: |
+      Longitude coordinate for the property pin on the Imovelweb listing detail interactive map.
+  map_street:
+    lineage:
+      - datalake_imovelweb_raw.avisos.mapacalle
+    description: |
+      Street name shown on the Imovelweb listing map popup for location context without full address.
+  thank_you_email_subject:
+    lineage:
+      - datalake_imovelweb_raw.avisos.subjectagradecimiento
+    description: |
+      Subject line of the auto-reply email sent to prospects after they contact this listing on Imovelweb.
+  thank_you_email_text:
+    lineage:
+      - datalake_imovelweb_raw.avisos.textoagradecimiento
+    description: |
+      Body text of the auto-reply email sent to prospects after they submit a lead on this Imovelweb listing.
+  listing_image_url:
+    lineage:
+      - datalake_imovelweb_raw.avisos.imagenaviso
+    description: |
+      URL of the cover image thumbnail rendered on Imovelweb search result cards for this listing.
+  contact_email:
+    lineage:
+      - datalake_imovelweb_raw.avisos.email
+    description: |
+      Email address receiving lead notifications for this specific listing on Imovelweb.
+  redirect_url:
+    lineage:
+      - datalake_imovelweb_raw.avisos.urlredireccion
+    description: |
+      External URL where Imovelweb redirects seekers who click through from this listing to the publisher site.
+  floor_number:
+    lineage:
+      - datalake_imovelweb_raw.avisos.piso
+    description: |
+      Floor level of the property unit displayed on the Imovelweb listing detail specifications section.
+  address:
+    lineage:
+      - datalake_imovelweb_raw.avisos.direccion
+    description: |
+      Street address text on the Imovelweb listing detail page; may be partially hidden for privacy on certain plans.
+  postal_code:
+    lineage:
+      - datalake_imovelweb_raw.avisos.codigopostal
+    description: |
+      Postal code of the property location shown on the Imovelweb listing and used for area-based search.
+  internal_key:
+    lineage:
+      - datalake_imovelweb_raw.avisos.claveinterna
+    description: |
+      Publisher-private inventory key not shown publicly, used for Imovelweb integration sync deduplication.
+  commission_comments:
+    lineage:
+      - datalake_imovelweb_raw.avisos.comisioncomentarios
+    description: |
+      Free-text notes about broker commission terms visible to cooperating agents on Imovelweb.
+  listing_title_en:
+    lineage:
+      - datalake_imovelweb_raw.avisos.titulo_en
+    description: |
+      English translation of the listing headline for Imovelweb international seeker audiences.
+  listing_description_en:
+    lineage:
+      - datalake_imovelweb_raw.avisos.descripcion_en
+    description: |
+      English translation of the property description for Imovelweb international seeker audiences.
+  address_complement:
+    lineage:
+      - datalake_imovelweb_raw.avisos.direccion_complemento
+    description: |
+      Additional address detail (apartment, block, tower) shown on the Imovelweb listing location section.
+  contact_data:
+    lineage:
+      - datalake_imovelweb_raw.avisos.datoscontacto
+    description: |
+      Serialized contact details blob for alternative lead delivery channels configured on Imovelweb.
+  bedroom_count:
+    lineage:
+      - datalake_imovelweb_raw.avisos.habitaciones
+    description: |
+      Number of bedrooms advertised on the Imovelweb listing card and detail specifications.
+  total_room_count:
+    lineage:
+      - datalake_imovelweb_raw.avisos.ambientes
+    description: |
+      Total room count including living areas, shown on Imovelweb listing specs distinct from bedroom count.
+  garage_count:
+    lineage:
+      - datalake_imovelweb_raw.avisos.garages
+    description: |
+      Number of parking spaces advertised on the Imovelweb listing detail specifications.
+  bathroom_count:
+    lineage:
+      - datalake_imovelweb_raw.avisos.banos
+    description: |
+      Number of full bathrooms shown on the Imovelweb listing detail specifications section.
+  half_bathroom_count:
+    lineage:
+      - datalake_imovelweb_raw.avisos.mediosbanos
+    description: |
+      Number of half bathrooms (toilet only) on the Imovelweb listing detail specifications.
+  covered_area_m2:
+    lineage:
+      - datalake_imovelweb_raw.avisos.metroscubiertos
+    description: |
+      Indoor built area in square meters displayed on Imovelweb listing cards and price-per-m² calculation.
+  total_area_m2:
+    lineage:
+      - datalake_imovelweb_raw.avisos.metrostotales
+    description: |
+      Total lot or built area in square meters including outdoor space on the Imovelweb listing detail page.
+  property_age_years:
+    lineage:
+      - datalake_imovelweb_raw.avisos.antiguedad
+    description: |
+      Age of the property in years shown on Imovelweb listing specs; zero typically means new construction.
+  total_unit_count:
+    lineage:
+      - datalake_imovelweb_raw.avisos.totalunidades
+    description: |
+      Total units in a development project listed on Imovelweb for multi-unit new-construction listings.
+  available_unit_count:
+    lineage:
+      - datalake_imovelweb_raw.avisos.disponibles
+    description: |
+      Remaining unsold or unrented units in a development project on Imovelweb.
+  occupant_count:
+    lineage:
+      - datalake_imovelweb_raw.avisos.numeropersonas
+    description: |
+      Maximum occupant capacity for vacation or temporary-rent listings on Imovelweb.
+  agreed_commission_amount:
+    lineage:
+      - datalake_imovelweb_raw.avisos.comisionconvenida
+    description: |
+      Broker commission amount agreed between parties for this listing on Imovelweb co-brokerage network.
+  shared_commission_amount:
+    lineage:
+      - datalake_imovelweb_raw.avisos.comisioncompartir
+    description: |
+      Commission percentage or amount offered to cooperating brokers who bring a buyer via Imovelweb.
+  price_per_m2:
+    lineage:
+      - datalake_imovelweb_raw.avisos.preciopormetro2
+    description: |
+      Computed or entered price per square meter shown on Imovelweb listing cards for value comparison.
+  price_amount:
+    lineage:
+      - datalake_imovelweb_raw.avisos.precio
+    description: |
+      Primary asking price for the listing displayed prominently on Imovelweb search and detail pages.
+  extra_price_amount:
+    lineage:
+      - datalake_imovelweb_raw.avisos.precioextra
+    description: |
+      Additional recurring cost (HOA, utilities) listed below the base price on Imovelweb rental listings.
+  condo_fee_amount:
+    lineage:
+      - datalake_imovelweb_raw.avisos.valorcondominio
+    description: |
+      Monthly condominium maintenance fee shown on the Imovelweb listing detail cost breakdown.
+  property_tax_amount:
+    lineage:
+      - datalake_imovelweb_raw.avisos.valoriptu
+    description: |
+      Annual property tax (IPTU) amount disclosed on the Imovelweb listing detail cost section.
+  listing_status:
+    lineage:
+      - datalake_imovelweb_raw.avisos.estado
+    description: |
+      Lifecycle status code (active, paused, sold) controlling visibility and editability on Imovelweb.
+  is_company_shown:
+    lineage:
+      - datalake_imovelweb_raw.avisos.muestraempresa
+    description: |
+      When true, the agency name and logo appear on the Imovelweb listing card; false shows anonymous listing.
+  is_map_shown:
+    lineage:
+      - datalake_imovelweb_raw.avisos.muestramapa
+    description: |
+      When true, the interactive map with property pin is visible on the Imovelweb listing detail page.
+  has_comments_enabled:
+    lineage:
+      - datalake_imovelweb_raw.avisos.recibecomentarios
+    description: |
+      When true, seekers can leave public comments on the Imovelweb listing detail page.
+  is_featured_minisite:
+    lineage:
+      - datalake_imovelweb_raw.avisos.destacadominisitio
+    description: |
+      When true, this listing is highlighted on the agency Imovelweb minisite homepage carousel.
+  is_enabled:
+    lineage:
+      - datalake_imovelweb_raw.avisos.habilitado
+    description: |
+      When true, the listing is eligible for publication and visible in Imovelweb publisher workflows.
+  is_validated:
+    lineage:
+      - datalake_imovelweb_raw.avisos.validado
+    description: |
+      When true, the listing passed Imovelweb quality review and meets minimum content standards for going live.
+  is_quarterly_delivery:
+    lineage:
+      - datalake_imovelweb_raw.avisos.entregatrimestral
+    description: |
+      When true, the listing follows a quarterly publication credit billing cycle on Imovelweb.
+  is_agency_network:
+    lineage:
+      - datalake_imovelweb_raw.avisos.redinmobiliaria
+    description: |
+      When true, the listing is shared across the publisher network for co-brokerage on Imovelweb.
+  dt_delivered:
+    lineage:
+      - datalake_imovelweb_raw.avisos.fechaentrega
+    description: |
+      Expected or actual property handover date for new-development listings on Imovelweb.
+  ts_created:
+    lineage:
+      - datalake_imovelweb_raw.avisos.fechaalta
+    description: |
+      Timestamp when the listing record was first created in the Imovelweb publisher platform.
+  ts_deactivated:
+    lineage:
+      - datalake_imovelweb_raw.avisos.fechabaja
+    description: |
+      Timestamp when the listing was taken offline and removed from active Imovelweb search results.
+  ts_published:
+    lineage:
+      - datalake_imovelweb_raw.avisos.fechaonline
+    description: |
+      Timestamp when the listing first appeared live on the Imovelweb marketplace for seekers.
+  ts_unpublished:
+    lineage:
+      - datalake_imovelweb_raw.avisos.fechaoffline
+    description: |
+      Timestamp when the listing was temporarily hidden from Imovelweb search without full deactivation.
+  ts_admin_ended:
+    lineage:
+      - datalake_imovelweb_raw.avisos.fechafinadmin
+    description: |
+      Timestamp when Imovelweb operations staff closed the listing after policy or billing intervention.
+  ts_updated:
+    lineage:
+      - datalake_imovelweb_raw.avisos.fechamodificado
+    description: |
+      Timestamp of the most recent content or metadata edit to this listing on Imovelweb.
+  ts_last_reviewed:
+    lineage:
+      - datalake_imovelweb_raw.avisos.ultimavezquesereviso
+    description: |
+      Timestamp when Imovelweb quality team last audited this listing for compliance and content standards.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.avisos.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisos.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisos.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

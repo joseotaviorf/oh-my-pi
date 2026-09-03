@@ -1,0 +1,45 @@
+---
+table_name: datalake_imovelweb_clean.listings
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+column_level_validations:
+  id_listing:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_country:
+    is_complete:
+      severity_level: Error
+  listing_description:
+    is_complete:
+      severity_level: Error
+  is_company_shown:
+    is_complete:
+      severity_level: Error
+  is_map_shown:
+    is_complete:
+      severity_level: Error
+  has_comments_enabled:
+    is_complete:
+      severity_level: Error
+  id_posting_type:
+    is_complete:
+      severity_level: Error
+  id_company:
+    is_complete:
+      severity_level: Error
+  id_account:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  id_portal:
+    is_complete:
+      severity_level: Error

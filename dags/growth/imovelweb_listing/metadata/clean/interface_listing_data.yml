@@ -1,0 +1,108 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: interface_listing_data
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Third-party interface listing sync row from Imovelweb Navent MySQL `interfaceavisodata`. Grain: one row per listing and interface integration (PK `id_listing`, `id_interface`). Downstream: CRM/portal integration reconciliation. No table partitions. Z-ORDER (`id_listing`, `id_interface`) on clean layer for selective lookups.
+columns:
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.idaviso
+    description: |
+      Imovelweb listing whose sync state with an external CRM/ERP is tracked in this integration staging record. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_interface:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.idinterface
+    description: |
+      Integration connector responsible for syncing this listing between Imovelweb and the external publisher system. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_company:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.idempresa
+    description: |
+      Agency that owns this listing and initiated the external sync channel on Imovelweb.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.idpais
+    description: |
+      Country market context for this listing sync, determining which Imovelweb connector endpoint processes it.
+  id_interface_run:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.idinterfacerun
+    description: |
+      Specific sync execution batch that last touched this listing record on Imovelweb.
+  interface_key:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.claveInterface
+    description: |
+      External-system listing identifier used as the sync key between Imovelweb and the publisher CRM/ERP.
+  content_hash:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.contenthash
+    description: |
+      Checksum of listing text fields detecting content changes that trigger Imovelweb re-sync to external systems.
+  images_hash:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.imageshash
+    description: |
+      Checksum of listing photo set detecting media changes that trigger Imovelweb image re-download jobs.
+  action_code:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.accion
+    description: |
+      Pending sync action (create, update, delete) queued for the next Imovelweb integration processor run.
+  is_manual_override:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.overridemanualchanges
+    description: |
+      When true, publisher edits on Imovelweb take precedence over inbound changes from the external feed.
+  is_enabled:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.habilitado
+    description: |
+      When true, this listing participates in active bidirectional sync between Imovelweb and the external system.
+  ts_last_synced:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.fechaultimasincronizacion
+    description: |
+      Timestamp of the most recent successful sync completion for this listing on Imovelweb.
+  ts_manually_updated:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.fechamodificacionmanual
+    description: |
+      Timestamp when a publisher last edited this listing directly in Imovelweb, bypassing the external feed.
+  ts_update_pending:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.fechaactualizacionpendiente
+    description: |
+      Timestamp when outbound changes were queued but not yet delivered to the external system by Imovelweb.
+  ts_media_processed:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.fechaprocesamientomultimedia
+    description: |
+      Timestamp when listing photos were last downloaded and processed by the Imovelweb integration image pipeline.
+  ts_deactivated:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.fechabaja
+    description: |
+      Timestamp when this listing was removed from active sync and delisted on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.interfaceavisodata.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

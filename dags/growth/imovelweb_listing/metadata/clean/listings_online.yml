@@ -1,0 +1,73 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: listings_online
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Listing online-publication state from Imovelweb Navent MySQL `avisosonline`. Grain: one row per listing (PK `id_listing`). Downstream: publication status monitoring and supply metrics. No table partitions. Z-ORDER (`id_listing`) on clean layer for selective lookups.
+columns:
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.idaviso
+    description: |
+      Property listing currently in an online publication state on the Imovelweb marketplace. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_publication_plan:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.idplandepublicacion
+    description: |
+      Active publication plan tier (standard, featured, super) governing this listing visibility on Imovelweb.
+  id_company:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.idempresa
+    description: |
+      Agency account that owns this online listing on Imovelweb.
+  id_order:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.idpedido
+    description: |
+      Commercial order funding the publication credits keeping this listing live on Imovelweb.
+  id_order_item:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.iditempedido
+    description: |
+      Order line item whose product SKU credits sustain this listing online status on Imovelweb.
+  id_listing_delivery:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.identregaaviso
+    description: |
+      Publication credit delivery event that placed this listing in its current online state on Imovelweb.
+  listing_level:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.nivelaviso
+    description: |
+      Visibility tier level within the publication plan affecting search prominence on Imovelweb.
+  dt_published:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.fechapublicacion
+    description: |
+      Date when this listing entered its current online publication state on Imovelweb.
+  ts_updated:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.fechamodificado
+    description: |
+      Timestamp of the last change to this listing online publication state on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisosonline.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

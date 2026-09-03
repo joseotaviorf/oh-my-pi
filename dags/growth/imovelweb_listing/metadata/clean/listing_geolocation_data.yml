@@ -1,0 +1,48 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: listing_geolocation_data
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Listing geolocation enrichment from Imovelweb Navent MySQL `avisosgeolocationdata`. Grain: one row per listing (PK `id_listing`). Downstream: map placement and geo analytics for listings. No table partitions. Z-ORDER (`id_listing`) on clean layer for selective lookups.
+columns:
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.avisosgeolocationdata.idaviso
+    description: |
+      Property listing whose map coordinates and display settings are defined in this Imovelweb geo overlay record. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_geolocation:
+    lineage:
+      - datalake_imovelweb_raw.avisosgeolocationdata.idgeolocalizacion
+    description: |
+      Exact geocoded coordinate record for pin placement on the Imovelweb listing detail interactive map.
+  id_geolocation_to_display:
+    lineage:
+      - datalake_imovelweb_raw.avisosgeolocationdata.idgeolocalizacionamostrar
+    description: |
+      Approximate geo record shown to seekers when the exact address is hidden on Imovelweb for privacy.
+  map_zoom_level:
+    lineage:
+      - datalake_imovelweb_raw.avisosgeolocationdata.zoom
+    description: |
+      Default map zoom level when rendering this listing location on the Imovelweb detail page map widget.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.avisosgeolocationdata.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisosgeolocationdata.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.avisosgeolocationdata.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

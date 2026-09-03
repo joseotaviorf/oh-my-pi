@@ -1,0 +1,58 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: publication_plans
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Publication plan (pricing tier) from Imovelweb Navent MySQL `planesdepublicacion`. Grain: one row per publication plan (PK `id_publication_plan`). Downstream: plan pricing, listing rankings, and order attribution. No table partitions. Z-ORDER (`id_publication_plan`) on clean layer for selective lookups.
+columns:
+  id_publication_plan:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.idplandepublicacion
+    description: |
+      Surrogate key for a publication pricing tier (standard, featured, super) on Imovelweb. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_translation:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.idTraduccion
+    description: |
+      Translation bundle for localized publication plan names in Imovelweb publisher checkout flows.
+  id_sap_publication_plan:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.idplandepublicacionsap
+    description: |
+      SAP plan code linking this tier to Navent enterprise billing and revenue recognition.
+  publication_plan_name:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.nombre
+    description: |
+      Display name of the publication tier shown on Imovelweb listing upgrade screens and invoices.
+  plan_weight:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.peso
+    description: |
+      Search ranking boost factor associated with this publication tier on Imovelweb result pages.
+  is_cloneable:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.esclonable
+    description: |
+      When true, orders under this plan can be duplicated for renewal without renegotiation on Imovelweb.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.planesdepublicacion.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

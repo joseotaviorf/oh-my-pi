@@ -1,0 +1,188 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: company_users
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Agency portal user account from Imovelweb Navent MySQL `usuariosempresas`. Grain: one row per company user (PK `id_company_user`; `password` excluded from clean). Downstream: user-to-agency mapping and access analytics (contains PII). No table partitions. Z-ORDER (`id_company`) on clean layer for selective lookups.
+columns:
+  id_company_user:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idusuarioempresa
+    description: |
+      Surrogate key for an individual user account tied to an Imovelweb agency, used for login and listing ownership.
+  id_portal:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idportal
+    description: |
+      Navent portal brand context for this user login, determining which Imovelweb skin and product catalog they access.
+  id_company:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idempresa
+    description: |
+      Agency account that employs this user and owns the listings they create or manage on Imovelweb. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_account:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idcuenta
+    description: |
+      Commercial billing account linked to the user for tracking publication credits and order consumption on Imovelweb.
+  id_user_type:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idtipodeusuario
+    description: |
+      Role classification (admin, agent, assistant) that controls permission scopes in the Imovelweb publisher back-office.
+  id_marital_status:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idEstadoCivil
+    description: |
+      Marital status code stored on the user profile for Imovelweb HR-style publisher directory display, when provided.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idPais
+    description: |
+      Country of residence for the user, used in Imovelweb regional user management and compliance reporting.
+  id_state:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idProvincia
+    description: |
+      State/province of residence for the user profile on Imovelweb publisher directory and territory assignment.
+  id_city:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idCiudad
+    description: |
+      City of residence for the user shown on the Imovelweb agency team page and local lead routing.
+  id_facebook:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idFacebook
+    description: |
+      Facebook social-login identifier linked to the user account for OAuth authentication on Imovelweb publisher portal.
+  id_language:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idIdioma
+    description: |
+      Preferred UI language for the user session in the Imovelweb publisher back-office and notification templates.
+  id_geolocation:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idGeolocalizacion
+    description: |
+      Resolved geo record for the user office location, powering map widgets and proximity features on Imovelweb.
+  id_zone:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.idZona
+    description: |
+      Neighborhood zone of the user office for hyper-local lead assignment within the Imovelweb publisher workspace.
+  first_name:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.nombre
+    description: |
+      Given name of the agency user displayed on Imovelweb listing contact cards and the agency team directory.
+  last_name:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.apellido
+    description: |
+      Family name of the agency user displayed alongside listings and on the Imovelweb publisher team roster.
+  username:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.username
+    description: |
+      Login handle for the user to authenticate into the Imovelweb publisher back-office portal.
+  email:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.email
+    description: |
+      Primary email address for the user receiving Imovelweb lead alerts and account security notifications.
+  phone_prefix:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.prefijo
+    description: |
+      International dialing prefix for the user desk phone shown on Imovelweb listing contact sections.
+  phone_number:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.telefono
+    description: |
+      Desk phone number of the user displayed on Imovelweb listing detail pages as a direct contact option.
+  job_title:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.cargo
+    description: |
+      Professional title of the user (e.g. Senior Broker) shown on the Imovelweb agency team page.
+  department:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.area
+    description: |
+      Internal department or business unit of the user within the agency, used for Imovelweb lead routing rules.
+  mobile_prefix:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.celPrefijo
+    description: |
+      International dialing prefix for the user mobile phone used in Imovelweb SMS lead notifications.
+  mobile_number:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.celNumero
+    description: |
+      Mobile phone number of the user for WhatsApp and SMS lead delivery from Imovelweb contact forms.
+  email_username:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.mailusername
+    description: |
+      Local-part alias for internal Imovelweb mail routing when the agency uses Navent-hosted email forwarding.
+  gender_code:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.sexo
+    description: |
+      Gender code on the user profile used for Imovelweb directory personalization and demographic analytics.
+  is_blocked:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.bloqueado
+    description: |
+      When true, the user login is suspended and cannot access the Imovelweb publisher back-office portal.
+  has_internal_email_permission:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.permisoenviomailinterno
+    description: |
+      When true, the user may send emails through Imovelweb internal mail relay for lead follow-up campaigns.
+  is_email_valid:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.emailusuariovalido
+    description: |
+      When true, the user email passed Imovelweb verification and can receive lead notifications and system alerts.
+  dt_deactivated:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.fbaja
+    description: |
+      Date when the user account was deactivated and removed from active Imovelweb publisher access.
+  ts_missing:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.falta
+    description: |
+      Timestamp when the user profile was flagged as incomplete during Imovelweb onboarding data-quality checks.
+  ts_last_logged_in:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.ultimavezqueselogueo
+    description: |
+      Most recent successful login timestamp for the user on the Imovelweb publisher back-office portal.
+  ts_created:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.fechaalta
+    description: |
+      Timestamp when the user account was provisioned in Imovelweb for the parent agency.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.usuariosempresas.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

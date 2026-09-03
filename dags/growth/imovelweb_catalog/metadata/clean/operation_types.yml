@@ -1,0 +1,38 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: operation_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Transaction operation type (sale/rent) from Imovelweb Navent MySQL `tiposdeoperacion`. Grain: one row per operation type (PK `id_operation_type`). Downstream: listing and order operation classification. No table partitions. Z-ORDER (`id_operation_type`) on clean layer for selective lookups.
+columns:
+  id_operation_type:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeoperacion.idtipodeoperacion
+    description: |
+      Surrogate key for a transaction type (sale, rent, vacation) in the Imovelweb listing operation catalog. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  operation_type_name:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeoperacion.nombre
+    description: |
+      Display label for the transaction type shown on Imovelweb listing cards and search operation filters.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeoperacion.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeoperacion.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.tiposdeoperacion.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

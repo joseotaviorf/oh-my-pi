@@ -1,0 +1,24 @@
+---
+table_name: datalake_imovelweb_clean.order_items
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+column_level_validations:
+  id_order_item:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_order:
+    is_complete:
+      severity_level: Error
+  list_unit_price:
+    is_complete:
+      severity_level: Error
+  id_account:
+    is_complete:
+      severity_level: Error

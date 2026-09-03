@@ -1,0 +1,53 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: listing_phones
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Listing contact phone from Imovelweb Navent MySQL `telefonosaviso`. Grain: one row per listing phone (PK `id_listing_phone`). Downstream: contact-channel analytics (contains PII). No table partitions. Z-ORDER (`id_listing`) on clean layer for selective lookups.
+columns:
+  id_listing_phone:
+    lineage:
+      - datalake_imovelweb_raw.telefonosaviso.idtelefonoaviso
+    description: |
+      Surrogate key for a contact phone number attached to an Imovelweb property listing.
+  id_listing:
+    lineage:
+      - datalake_imovelweb_raw.telefonosaviso.idaviso
+    description: |
+      Property listing that displays this phone number on its Imovelweb contact section. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  phone_prefix:
+    lineage:
+      - datalake_imovelweb_raw.telefonosaviso.prefijo
+    description: |
+      International or area dialing prefix for the listing contact phone on Imovelweb.
+  phone_number:
+    lineage:
+      - datalake_imovelweb_raw.telefonosaviso.numero
+    description: |
+      Local phone number shown to seekers who click 'call' on the Imovelweb listing detail page.
+  phone_type:
+    lineage:
+      - datalake_imovelweb_raw.telefonosaviso.tipodetelefono
+    description: |
+      Phone category (mobile, landline, WhatsApp) controlling which contact icon Imovelweb renders for this number.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.telefonosaviso.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.telefonosaviso.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.telefonosaviso.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

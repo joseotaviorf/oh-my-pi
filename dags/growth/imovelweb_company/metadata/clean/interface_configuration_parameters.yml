@@ -1,0 +1,48 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: interface_configuration_parameters
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Interface configuration parameter from Imovelweb Navent MySQL `interfaceconfigurationparameters`. Grain: one row per configuration parameter (PK `id_parameter`). Downstream: integration credential and endpoint configuration. No table partitions. Z-ORDER (`id_interface`) on clean layer for selective lookups.
+columns:
+  id_parameter:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurationparameters.idparameter
+    description: |
+      Surrogate key for a single key-value configuration entry within an Imovelweb integration connector setup.
+  id_interface:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurationparameters.idinterface
+    description: |
+      Parent integration configuration that owns this parameter for Imovelweb external system connectivity. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  parameter_name:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurationparameters.name
+    description: |
+      Configuration key name (API URL, token, webhook path) for the Imovelweb integration adapter runtime.
+  parameter_value:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurationparameters.value
+    description: |
+      Configuration value for the named parameter, typically holding credentials or endpoints for Imovelweb sync jobs.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurationparameters.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurationparameters.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.interfaceconfigurationparameters.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

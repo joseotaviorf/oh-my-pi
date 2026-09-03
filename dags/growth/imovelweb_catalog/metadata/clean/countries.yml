@@ -1,0 +1,68 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: countries
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Country market reference from Imovelweb Navent MySQL `paises`. Grain: one row per country (PK `id_country`). Downstream: geo hierarchy root and market activation filters. No table partitions. Z-ORDER (`id_country`) on clean layer for selective lookups.
+columns:
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.paises.idpais
+    description: |
+      Surrogate key for an Imovelweb country market (Brazil, Argentina, etc.) governing portal config and billing. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_translation:
+    lineage:
+      - datalake_imovelweb_raw.paises.idtraduccion
+    description: |
+      Translation bundle identifier for localized Imovelweb UI strings and email templates in this country market.
+  id_local_currency:
+    lineage:
+      - datalake_imovelweb_raw.paises.idmonedalocal
+    description: |
+      Default currency for listing prices and commercial orders published on Imovelweb in this country market.
+  country_name:
+    lineage:
+      - datalake_imovelweb_raw.paises.nombre
+    description: |
+      Display name of the country market shown in Imovelweb geo selectors and cross-market analytics dashboards.
+  country_code:
+    lineage:
+      - datalake_imovelweb_raw.paises.codigo
+    description: |
+      ISO-style country code used by Imovelweb APIs and CDN routing to scope content to the correct market.
+  currency_code:
+    lineage:
+      - datalake_imovelweb_raw.paises.moneda
+    description: |
+      ISO currency code (BRL, ARS) displayed alongside prices on Imovelweb listing cards in this market.
+  application_medium:
+    lineage:
+      - datalake_imovelweb_raw.paises.mediadepostulacion
+    description: |
+      Default application channel code for lead submission forms configured on Imovelweb portals in this country.
+  is_active_market:
+    lineage:
+      - datalake_imovelweb_raw.paises.estamos
+    description: |
+      When true, Imovelweb actively publishes listings and sells products in this country; false means dormant market.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.paises.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.paises.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.paises.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

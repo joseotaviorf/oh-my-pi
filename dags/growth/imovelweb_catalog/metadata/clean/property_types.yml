@@ -1,0 +1,43 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: property_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Property type reference from Imovelweb Navent MySQL `tiposdepropiedad`. Operational grain for CDC merge is `id_property_type` (same as Zonaprop/RealEstate). Production MySQL currently has no PRIMARY KEY — only a non-unique KEY on `idtipodepropiedad`; a source PK will be requested. Uniqueness is assumed for now (17/17 distinct ids as of the 2026-09-02 SageMaker probe). Downstream: listing classification and search filters. No table partitions. Z-ORDER (`id_property_type`) on clean layer for selective lookups.
+columns:
+  id_property_type:
+    lineage:
+      - datalake_imovelweb_raw.tiposdepropiedad.idtipodepropiedad
+    description: |
+      Operational CDC merge key for a top-level property category (apartment, house, land) on Imovelweb. Source column `idtipodepropiedad` is NOT NULL with a non-unique index (no MySQL PRIMARY KEY yet). Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_property_type_category:
+    lineage:
+      - datalake_imovelweb_raw.tiposdepropiedad.idcategoriatipodepropiedad
+    description: |
+      Higher-level grouping (residential, commercial) organizing property types in Imovelweb navigation.
+  property_type_name:
+    lineage:
+      - datalake_imovelweb_raw.tiposdepropiedad.nombre
+    description: |
+      Display label for the property type shown on Imovelweb search filters and listing creation forms.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.tiposdepropiedad.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.tiposdepropiedad.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.tiposdepropiedad.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.

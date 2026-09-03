@@ -1,0 +1,58 @@
+---
+database_name: datalake_imovelweb_clean
+table_name: city_subzones
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  City sub-zone (micro-neighborhood) from Imovelweb Navent MySQL `subzonasciudad`. Grain: one row per city sub-zone (PK `id_city_subzone`). Downstream: fine-grained listing geo analytics. No table partitions. Z-ORDER (`id_city`) on clean layer for selective lookups.
+columns:
+  id_city_subzone:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.idsubzonaciudad
+    description: |
+      Surrogate key for a micro-neighborhood within an Imovelweb city zone, enabling fine-grained listing geo targeting.
+  id_city_zone:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.idzonaciudad
+    description: |
+      Parent neighborhood group that contains this sub-zone in the Imovelweb geo tree for hierarchical location browsing.
+  id_city:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.idciudad
+    description: |
+      Municipality that owns this sub-zone, linking micro-areas to city-level search filters on the Imovelweb portal. Delta Z-ORDER column — filter on this field for efficient data skipping (table has no partitions).
+  id_state:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.idprovincia
+    description: |
+      State/province denormalized from the parent city for efficient regional rollups without traversing the full geo hierarchy.
+  id_country:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.idpais
+    description: |
+      Country market denormalized from the parent city to scope sub-zone analytics to a single Imovelweb operating country.
+  city_subzone_name:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.nombre
+    description: |
+      Display name of the micro-neighborhood shown on Imovelweb listing detail pages and map-based search filters.
+  op_cdc:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.op_cdc
+    description: |
+      Debezium change-capture operation for this row: r snapshot read, c insert, u update, d delete.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.ts_cdc_transaction
+    description: |
+      Wall-clock time when Debezium captured this change (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_imovelweb_raw.subzonasciudad.ts_database_transaction
+    description: |
+      MySQL transaction commit time in Imovelweb before CDC propagation.
