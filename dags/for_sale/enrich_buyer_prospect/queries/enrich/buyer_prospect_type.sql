@@ -112,12 +112,6 @@ deduped AS (
     sale_type
   FROM enriched
   WHERE change_number = _w
-),
-params AS (
-  -- bp_window_days: NULL = infinite lookback (all-time). Set an integer
-  -- (e.g. 90) to only count Primary/Secondary touches within that many
-  -- days of today when classifying bp_market_type below.
-  SELECT CAST(NULL AS INT) AS bp_window_days
 )
 SELECT
   id_buyer_prospect_type,
@@ -164,16 +158,19 @@ FROM (
     d.ts_activation_end,
     d.ts_load,
     d.sale_type,
+    -- bp_window_days comes from extra_query_template_params in the DAG
+    -- declaration (NULL by default = infinite lookback). Measured from
+    -- load_start_date, not CURRENT_DATE(), so a backfill run classifies
+    -- bp_market_type as of the date being processed, not the run's wall clock.
     MAX(CASE
       WHEN d.sale_type = 'PRIMARY'
-        AND (p.bp_window_days IS NULL OR d.ts_activation >= DATE_SUB(CURRENT_DATE(), p.bp_window_days))
+        AND ({bp_window_days} IS NULL OR d.ts_activation >= DATE_SUB(DATE('{load_start_date}'), {bp_window_days}))
       THEN 1 ELSE 0
     END) OVER (PARTITION BY d.id_prospect) = 1 AS touched_primary,
     MAX(CASE
       WHEN d.sale_type = 'SECONDARY'
-        AND (p.bp_window_days IS NULL OR d.ts_activation >= DATE_SUB(CURRENT_DATE(), p.bp_window_days))
+        AND ({bp_window_days} IS NULL OR d.ts_activation >= DATE_SUB(DATE('{load_start_date}'), {bp_window_days}))
       THEN 1 ELSE 0
     END) OVER (PARTITION BY d.id_prospect) = 1 AS touched_secondary
   FROM deduped AS d
-  CROSS JOIN params AS p
 ) AS _t2

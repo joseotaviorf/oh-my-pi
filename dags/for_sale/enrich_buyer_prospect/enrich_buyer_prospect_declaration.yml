@@ -8,3 +8,8 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  extra_query_template_params:
+    # bp_window_days: NULL = infinite lookback (all-time). Set an integer
+    # (e.g. 90) to only count Primary/Secondary touches within that many
+    # days of load_start_date when classifying buyer_prospect_type.bp_market_type.
+    bp_window_days: "NULL"
