@@ -289,3 +289,107 @@ FROM datalake_sale_primary_market.house_development AS hd
 LEFT JOIN visited_houses AS vh
     ON vh.sk_house = hd.id_house
 ```
+
+## Ops Daily Tracking Pack (visits)
+
+A stakeholder tracking Primary Market visit operations day-to-day typically wants these five cuts. All verified against production data (2026-09-02) — pilot volume is small enough that absolute numbers move fast, but the query shapes are stable.
+
+### Query 7 — Visits per house (ranked)
+
+Which pilot houses are getting visited, at all. First thing an Ops stakeholder checks: is visit activity concentrated on a few houses, or spread out.
+
+```sql
+SELECT
+    fv.sk_house,
+    hd.development_name,
+    SUM(fv.num_visit_booked) AS booked,
+    SUM(fv.num_visit_completed) AS completed
+FROM dw_visit.fact_visits AS fv
+INNER JOIN datalake_sale_primary_market.house_development AS hd
+    ON hd.id_house = fv.sk_house
+GROUP BY 1, 2
+ORDER BY booked DESC
+```
+
+### Query 8 — Visits per development, daily trend
+
+Day-over-day visit activity per development — the core daily-tracking view. `ts_visit_local_tz` can include future-dated rows for visits already scheduled but not yet occurred (`num_visit_booked` counts the booking, not the calendar day it happens).
+
+```sql
+SELECT
+    CAST(fv.ts_visit_local_tz AS DATE) AS visit_date,
+    hd.id_development,
+    hd.development_name,
+    SUM(fv.num_visit_booked) AS booked,
+    SUM(fv.num_visit_completed) AS completed
+FROM dw_visit.fact_visits AS fv
+INNER JOIN datalake_sale_primary_market.house_development AS hd
+    ON hd.id_house = fv.sk_house
+GROUP BY 1, 2, 3
+ORDER BY visit_date DESC
+```
+
+### Query 9 — Visits booked-to-completed by region
+
+Regional VB2VC comparison. Joins the house's own `id_region` directly (native EBDB house attribute, same as `city_group`'s source) rather than going through `dim_house_development`/`fact_development_negotiation`, since those carry `city_group` only once [PR #28316](https://github.com/quintoandar/bi-etl-ejuice/pull/28316) merges. Swap in `r.city_group` (join `datalake_region.region AS r ON r.id = h.id_region`) for a human-readable name once that table is confirmed reachable from your query environment — it wasn't independently verifiable from this session's Trino access, but it's the identical join already running in production `enrich_sale_offer/sale_offer.sql`.
+
+```sql
+SELECT
+    h.id_region,
+    SUM(fv.num_visit_booked) AS booked,
+    SUM(fv.num_visit_completed) AS completed,
+    CAST(SUM(fv.num_visit_completed) AS DOUBLE) / NULLIF(SUM(fv.num_visit_booked), 0) AS vb2vc_rate
+FROM dw_visit.fact_visits AS fv
+INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
+    ON dtu.id_house = fv.sk_house
+INNER JOIN datalake_ebdb_clean.house AS h
+    ON h.id = fv.sk_house
+GROUP BY 1
+ORDER BY booked DESC
+```
+
+### Query 10 — Visit outcome breakdown (booked / completed / cancelled / unsuccessful)
+
+Where visits are dropping off in the funnel, not just the top-line VB2VC rate. `booked` won't always equal `completed + canceled + unsuccessful` — the remainder is visits still pending (future-dated or not yet resolved).
+
+```sql
+SELECT
+    SUM(fv.num_visit_booked) AS booked,
+    SUM(fv.num_visit_completed) AS completed,
+    SUM(fv.num_visit_canceled) AS canceled,
+    SUM(fv.num_visit_unsuccessful) AS unsuccessful
+FROM dw_visit.fact_visits AS fv
+INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
+    ON dtu.id_house = fv.sk_house
+```
+
+### Query 11 — Early warning: developments with visits but no pré-OS yet
+
+Developments that completed at least one visit but have generated zero negotiations — a lead-quality or sales-process signal, not a data problem.
+
+```sql
+WITH dev_visits AS (
+    SELECT
+        hd.id_development,
+        hd.development_name,
+        SUM(fv.num_visit_completed) AS completed_visits
+    FROM dw_visit.fact_visits AS fv
+    INNER JOIN datalake_sale_primary_market.house_development AS hd
+        ON hd.id_house = fv.sk_house
+    GROUP BY 1, 2
+),
+dev_negotiations AS (
+    SELECT DISTINCT id_development
+    FROM datalake_sale_primary_market.development_negotiation
+)
+SELECT
+    dv.id_development,
+    dv.development_name,
+    dv.completed_visits
+FROM dev_visits AS dv
+LEFT JOIN dev_negotiations AS dn
+    ON dn.id_development = dv.id_development
+WHERE dv.completed_visits > 0
+  AND dn.id_development IS NULL
+ORDER BY dv.completed_visits DESC
+```
