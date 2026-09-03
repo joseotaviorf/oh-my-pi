@@ -33,6 +33,7 @@ COPY astro/requirements.txt requirements.txt
 RUN /usr/local/bin/install-python-dependencies
 
 # Monorepo Python packages (bietlejuice-specific; not part of Astro ONBUILD).
+# Rebuild note: glue_table_version_cleanup ships in bietlejuice-core (see #28356).
 # GITHUB_TOKEN via BuildKit secret (/run/secrets/) — same as local docker build --secret.
 # --no-sources: package pyprojects use workspace/git sources that don't apply here.
 COPY astro/runtime-constraints.txt /tmp/runtime-constraints.txt

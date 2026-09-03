@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from bietlejuice.clients.db_clients.glue_client import GlueClient
+from bietlejuice.services.glue.glue_client import GlueClient
 from bietlejuice.services.glue.glue_table_version_cleanup import (
     GLUE_TABLE_VERSION_CLEANUP_DRY_RUN_ENV,
     GlueTableVersionCleanupService,

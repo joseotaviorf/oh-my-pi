@@ -1,4 +1,9 @@
-"""Sweep the Glue Data Catalog and prune archived TABLE_VERSION resources."""
+"""Sweep the Glue Data Catalog and prune archived TABLE_VERSION resources.
+
+Lives in bietlejuice-core (not runtime) because Airflow PythonOperator DAGs parse
+this module at scheduler startup; the Astro image installs core/airflow/operators/
+plugins only.
+"""
 
 from __future__ import annotations
 
@@ -9,7 +14,7 @@ from typing import Any, List, Optional, Sequence, Tuple, Union
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.clients.db_clients.glue_client import GlueClient
+from bietlejuice.services.glue.glue_client import GlueClient
 
 logger = QuintoAndarLogger("GlueTableVersionCleanup")
 
