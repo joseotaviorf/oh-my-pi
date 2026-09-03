@@ -45,6 +45,8 @@ workflow:
       - codex_log
     cost_center_history:
       - codex_log
+    allocation_history:
+      - identifier_mapping
   tables_customization:
     codex_history_base:
       extraction_type: incremental
@@ -84,5 +86,8 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     cost_center_history:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    allocation_history:
       vacuum_retention_hours: 168
       vacuum_lite: true

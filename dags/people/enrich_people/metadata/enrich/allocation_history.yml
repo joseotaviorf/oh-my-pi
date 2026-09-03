@@ -1,0 +1,120 @@
+database_name: datalake_people
+table_name: allocation_history
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Versioned history of the allocations that link employees to Allocation Tool groups and tags.
+  One row per allocation and validity interval: a new interval opens only when a tracked attribute changes, consecutive identical states stay merged, intervals never overlap, and the interval in force carries dt_valid_to 9999-12-31 and is_current.
+  Covers active and inactive allocations, and keeps allocations whose employee could not be resolved so they remain available for reconciliation.
+  Point-in-time state is read by filtering a reference date between dt_valid_from and dt_valid_to. An allocation that stops appearing in the source snapshots has its last interval closed and is flagged by is_removed_at_source.
+columns:
+  id_allocation:
+    description: Allocation Tool identifier of the allocation record.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.id_allocation
+  id_employee:
+    description: Allocation Tool employee identifier. New allocations send the PIN person_number in this field.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.id_employee
+  id_person:
+    description: Canonical People person identifier of the allocated employee, resolved by matching the Allocation Tool employee name to identifier_mapping.name on the current valid assignment. NULL when the name is missing, maps to more than one person, or has no match.
+    lineage:
+      - datalake_people.identifier_mapping.id_person
+      - datalake_people.identifier_mapping.name
+      - datalake_allocation_tool_clean.allocations.employee_name
+  person_number:
+    description: People business identifier of the allocated employee, resolved by matching the Allocation Tool employee name to identifier_mapping.name on the current valid assignment. NULL when the employee is unresolved.
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+      - datalake_people.identifier_mapping.name
+      - datalake_allocation_tool_clean.allocations.employee_name
+  id_group:
+    description: Identifier of the group associated with the allocation.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.id_group
+  id_tag:
+    description: Identifier of the tag assigned through the allocation.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.id_tag
+  group_name:
+    description: Display name of the group associated with the allocation.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.group_name
+  tag_name:
+    description: Display name of the tag assigned through the allocation.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.tag_name
+  chapter:
+    description: Organizational chapter captured with the allocation record.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.chapter
+  vertical:
+    description: Organizational vertical captured with the allocation record.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.vertical
+  team:
+    description: Organizational team captured with the allocation record.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.team
+  status:
+    description: Allocation lifecycle status exactly as labelled by the source application during the interval.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.status
+  allocation_status:
+    description: Normalized allocation lifecycle status, with active source labels represented as active.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.status
+  is_leader:
+    description: Boolean indicating whether the allocation employee is marked as a leader.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.is_leader
+  is_sample:
+    description: Boolean indicating whether the record is application-generated sample data.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.is_sample
+  dt_valid_from:
+    description: First date on which this allocation state was observed in the source exports (e.g. 2026-08-28).
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_version
+  dt_valid_to:
+    description: Last date on which this allocation state was in force, set to 9999-12-31 while the state is current (e.g. 2026-08-31).
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_version
+  is_current:
+    description: True for the state still in force, which has no successor version and whose allocation still appears in the latest full snapshot.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_version
+      - datalake_allocation_tool_clean.allocations.export_type
+  is_removed_at_source:
+    description: True for the last state of an allocation that stopped appearing in the source full snapshots, meaning it was removed at the source rather than merely deactivated.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_version
+      - datalake_allocation_tool_clean.allocations.export_type
+  ts_allocated:
+    description: Timestamp when the allocation was created in the Allocation Tool.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_allocated
+  ts_created:
+    description: Timestamp when the allocation record was created.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_created
+  ts_updated:
+    description: Timestamp when the allocation record was last updated.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_updated
+  ts_version:
+    description: Ordering key of the source export version that produced this state.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_version
+  ts_export_generated:
+    description: Timestamp when the source export containing this state was generated.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_export_generated
+  ts_file_modified:
+    description: Timestamp when the source export file was modified in S3.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_file_modified
+  ts_load:
+    description: Timestamp when the source record was ingested into the raw layer.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_load

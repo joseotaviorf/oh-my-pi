@@ -1,0 +1,67 @@
+---
+table_name: datalake_people.allocation_history
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  id_allocation:
+    is_complete:
+      severity_level: Warning
+  dt_valid_from:
+    is_complete:
+      severity_level: Warning
+  dt_valid_to:
+    is_complete:
+      severity_level: Warning
+  is_current:
+    is_complete:
+      severity_level: Warning
+  # SCD2 contract: exactly one open interval per allocation.
+  one_current_row_per_allocation:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_allocation
+           FROM datalake_people.allocation_history
+           WHERE is_current
+           GROUP BY id_allocation
+           HAVING COUNT(*) > 1
+         ) duplicate_rows) = 0
+      severity_level: Warning
+  # SCD2 contract: validity intervals of an allocation must not overlap.
+  no_overlapping_validity_intervals:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.allocation_history AS earlier
+         JOIN datalake_people.allocation_history AS later
+           ON later.id_allocation = earlier.id_allocation
+          AND later.dt_valid_from > earlier.dt_valid_from
+          AND later.dt_valid_from <= earlier.dt_valid_to) = 0
+      severity_level: Error
+  # Person keys are resolved by matching employee_name to identifier_mapping.name.
+  # Ambiguous or missing names stay unresolved; alert before the rate becomes noise.
+  employee_resolution_rate:
+    custom:
+      constraint: |-
+        (SELECT 100.0 * SUM(CASE WHEN id_person IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*)
+           FROM datalake_people.allocation_history) > 90
+      severity_level: Warning
+  # SCD2 contract: an interval must end on or after it starts.
+  no_inverted_validity_intervals:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.allocation_history
+         WHERE dt_valid_to < dt_valid_from) = 0
+      severity_level: Warning
