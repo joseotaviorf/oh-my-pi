@@ -1,0 +1,55 @@
+database_name: datalake_amplitude_clean
+table_name: 233592_new_visit_date_time_type_selected_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Tracks when a user selects a date/time type while scheduling a new property visit.
+columns:
+  id_user:
+    description: Unique identifier of the user who selected the visit date/time type.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_house:
+    description: Identifier of the house being visited, extracted from the visit entrance URI in
+      user_properties.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.uri
+      - datalake_amplitude_clean.events.user_properties.entrance_uri
+      - datalake_amplitude_clean.events.user_properties.initial_entrance_uri
+  visit_type:
+    description: Type of visit selected by the user, as reported by the event_properties visitType
+      field.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.visitType
+  flow:
+    description: Flow of the visit, as reported by the event_properties flow field.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.flow
+  is_sale_agent:
+    description: Whether the user is a sale agent, as reported by the user_properties isSaleAgent
+      field.
+    lineage:
+      - datalake_amplitude_clean.events.user_properties.isSaleAgent
+  is_rent_agent:
+    description: Whether the user is a rent agent, as reported by the user_properties isRentAgent
+      field.
+    lineage:
+      - datalake_amplitude_clean.events.user_properties.isRentAgent
+  ts_event:
+    description: Timestamp when the date/time type selection event occurred.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event timestamp, used for efficient data partitioning and
+      time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event timestamp, used for efficient data partitioning and
+      time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event timestamp, used for efficient data partitioning and
+      time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.day

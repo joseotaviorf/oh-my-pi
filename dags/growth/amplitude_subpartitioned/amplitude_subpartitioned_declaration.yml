@@ -924,3 +924,6 @@ workflow:
     233592_home_page_viewed_events:
       run_optimize: false
       run_vacuum: false
+    233592_new_visit_date_time_type_selected_events:
+      run_optimize: false
+      run_vacuum: false
