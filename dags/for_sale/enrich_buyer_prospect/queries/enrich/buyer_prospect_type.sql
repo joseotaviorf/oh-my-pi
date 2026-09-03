@@ -49,26 +49,8 @@ WITH bp_status AS (
   ) AS _t
   WHERE
     ts_status_started = _w
-)
-SELECT
-  id_buyer_prospect_type,
-  id_prospect,
-  id_offer,
-  id_house,
-  id_booking,
-  id_region,
-  id_demand_prospect_conversion_event,
-  prospect_event_name,
-  status_trigger_event_name,
-  bp_type,
-  city_group,
-  price_segment,
-  price_change_number,
-  ts_activation,
-  ts_activation_end,
-  ts_load,
-  sale_type
-FROM (
+),
+enriched AS (
   SELECT
     MD5(
       CONCAT(
@@ -98,8 +80,7 @@ FROM (
     -- pre-pilot houses and would mislabel historic secondary activations.
     CASE WHEN hd.id_house IS NOT NULL THEN 'PRIMARY' ELSE 'SECONDARY' END AS sale_type,
     slpc.change_number,
-    MAX(slpc.change_number) OVER (PARTITION BY bp_status.id_buyer_prospect, bp_status.ts_activation, bp_status.id_house) AS _w,
-    bp_status.id_buyer_prospect
+    MAX(slpc.change_number) OVER (PARTITION BY bp_status.id_buyer_prospect, bp_status.ts_activation, bp_status.id_house) AS _w
   FROM bp_status
   LEFT JOIN datalake_sale_listings.sale_listing_price_changes AS slpc
     ON bp_status.id_house = slpc.id_house
@@ -109,6 +90,91 @@ FROM (
   WHERE
     bp_status.prospect_event_name IN ('USER FIRST ACTIVATION', 'USER FIRST ACTIVATION IN CITY GROUP', 'USER RECOVERY')
     AND bp_status.status = 'ACTIVE'
-) AS _t
-WHERE
-  change_number = _w
+),
+deduped AS (
+  SELECT
+    id_buyer_prospect_type,
+    id_prospect,
+    id_offer,
+    id_house,
+    id_booking,
+    id_region,
+    id_demand_prospect_conversion_event,
+    prospect_event_name,
+    status_trigger_event_name,
+    bp_type,
+    city_group,
+    price_segment,
+    price_change_number,
+    ts_activation,
+    ts_activation_end,
+    ts_load,
+    sale_type
+  FROM enriched
+  WHERE change_number = _w
+),
+params AS (
+  -- bp_window_days: NULL = infinite lookback (all-time). Set an integer
+  -- (e.g. 90) to only count Primary/Secondary touches within that many
+  -- days of today when classifying bp_market_type below.
+  SELECT CAST(NULL AS INT) AS bp_window_days
+)
+SELECT
+  id_buyer_prospect_type,
+  id_prospect,
+  id_offer,
+  id_house,
+  id_booking,
+  id_region,
+  id_demand_prospect_conversion_event,
+  prospect_event_name,
+  status_trigger_event_name,
+  bp_type,
+  city_group,
+  price_segment,
+  price_change_number,
+  ts_activation,
+  ts_activation_end,
+  ts_load,
+  sale_type,
+  -- Primary Market-specific, orthogonal to bp_type (new/recurrent):
+  -- whether this buyer, across their other rows within the window above,
+  -- has also touched Secondary. NULL for buyers who have never touched a
+  -- Primary Market pilot house -- this segmentation doesn't apply to them.
+  CASE
+    WHEN NOT touched_primary THEN NULL
+    WHEN touched_secondary THEN 'NON_EXCLUSIVE'
+    ELSE 'PRIMARY_EXCLUSIVE'
+  END AS bp_market_type
+FROM (
+  SELECT
+    d.id_buyer_prospect_type,
+    d.id_prospect,
+    d.id_offer,
+    d.id_house,
+    d.id_booking,
+    d.id_region,
+    d.id_demand_prospect_conversion_event,
+    d.prospect_event_name,
+    d.status_trigger_event_name,
+    d.bp_type,
+    d.city_group,
+    d.price_segment,
+    d.price_change_number,
+    d.ts_activation,
+    d.ts_activation_end,
+    d.ts_load,
+    d.sale_type,
+    MAX(CASE
+      WHEN d.sale_type = 'PRIMARY'
+        AND (p.bp_window_days IS NULL OR d.ts_activation >= DATE_SUB(CURRENT_DATE(), p.bp_window_days))
+      THEN 1 ELSE 0
+    END) OVER (PARTITION BY d.id_prospect) = 1 AS touched_primary,
+    MAX(CASE
+      WHEN d.sale_type = 'SECONDARY'
+        AND (p.bp_window_days IS NULL OR d.ts_activation >= DATE_SUB(CURRENT_DATE(), p.bp_window_days))
+      THEN 1 ELSE 0
+    END) OVER (PARTITION BY d.id_prospect) = 1 AS touched_secondary
+  FROM deduped AS d
+  CROSS JOIN params AS p
+) AS _t2

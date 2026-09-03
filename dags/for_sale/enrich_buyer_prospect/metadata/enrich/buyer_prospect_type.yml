@@ -82,3 +82,11 @@ columns:
       SECONDARY: Activation event driven by any other house, or an event with no house (id_house is null).
     lineage:
     - datalake_sale_primary_market.house_development.id_house
+  bp_market_type:
+    description: Primary Market-specific market-exclusivity classification of this buyer prospect, orthogonal to bp_type (new/recurrent). Computed by looking across the buyer's other rows within this query's bp_window_days lookback constant (NULL = infinite). NULL for buyers who have never touched a Primary Market pilot house.
+    categories:
+      PRIMARY_EXCLUSIVE: Buyer has only ever activated on Primary Market pilot houses within the window.
+      NON_EXCLUSIVE: Buyer has activated on both Primary Market pilot houses and Secondary market houses within the window.
+    lineage:
+    - datalake_sale_primary_market.house_development.id_house
+    - datalake_demand_flows.buyer_prospect_status.ts_status_started
