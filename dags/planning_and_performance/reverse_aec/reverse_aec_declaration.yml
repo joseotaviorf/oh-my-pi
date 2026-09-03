@@ -5,6 +5,28 @@ dag:
   documentation:
     dag_purpose: |
       This dag has the purpose of sending operation follow-up data, related to AeC services.
+    additional_information: |
+      ### Sending only some datasets (Trigger DAG w/ config)
+
+      By default every table listed in `tables_customization` is exported. To send a
+      subset, set `tables` in the run conf:
+
+      ```json
+      {
+        "load_start_date": "2026-09-01",
+        "load_end_date": "2026-09-01",
+        "tables": ["segments_perspective", "fcr_metric"]
+      }
+      ```
+
+      - Omit `tables` (or leave it empty) to export every configured table — this is
+        what scheduled runs do.
+      - A comma-separated string (`"segments_perspective,fcr_metric"`) also works.
+      - The selection is applied by `load_reverse_aec`, so every export task still
+        runs: the unselected ones exit right away without writing to S3.
+      - A name absent from `tables_customization` below matches no table, so the run
+        succeeds having exported nothing for it. Check the spelling against that list
+        when a run exports fewer files than expected.
 workflow:
   layer: reverse
   type: access
@@ -22,6 +44,7 @@ workflow:
     - "aec"
     - "('aec', 'AeC')"
     - "{{ dag_run.run_id }}"
+    - "{{ (dag_run.conf.get('tables') if dag_run.conf else none) | tojson }}"
     
   tables_customization:
     backlog_metric: {}

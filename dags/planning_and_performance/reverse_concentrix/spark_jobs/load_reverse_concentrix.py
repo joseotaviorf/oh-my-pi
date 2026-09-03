@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
@@ -15,6 +16,9 @@ from bietlejuice.base.validation.target_resolver import get_prod_database_name
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.jobs.planning_and_performance.reverse_bpo_file_notifier import (
     notify_reverse_bpo_file_saved,
+)
+from bietlejuice.jobs.planning_and_performance.reverse_bpo_table_selection import (
+    is_table_selected,
 )
 
 JOB_NAME = "load_reverse_concentrix"
@@ -66,6 +70,7 @@ if __name__ == "__main__":
     parser.add_argument("partner_name")
     parser.add_argument("organization_filters")
     parser.add_argument("dag_run_id")
+    parser.add_argument("requested_tables")
 
     add_validation_target_args(parser)
     args = parser.parse_args()
@@ -80,6 +85,7 @@ if __name__ == "__main__":
     partner_name = args.partner_name
     organization_filters = args.organization_filters
     dag_run_id = args.dag_run_id
+    requested_tables = args.requested_tables
 
     prod_database = get_prod_database_name(LayerEnum.REVERSE, partner_name, bucket)
     prod_s3_prefix = f"s3a://{bucket}/{partner_name.lower()}/{table_name}/"
@@ -93,6 +99,13 @@ if __name__ == "__main__":
     )
 
     logger = QuintoAndarLogger(f"{dag_name}")
+
+    if not is_table_selected(table_name, requested_tables):
+        logger.info(
+            f"m={JOB_NAME}, table_name={table_name}, requested_tables={requested_tables}, "
+            f"msg=Table not requested for this run, nothing to export"
+        )
+        sys.exit(0)
 
     # Parse ISO format datetime (supports both date-only and full datetime formats) removing the timezone information
     if "T" in load_start_date:
