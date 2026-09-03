@@ -2387,6 +2387,10 @@ bietlejuice.enrich_demand_score_report:
   - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score:first-run-of-day
 bietlejuice.enrich_docpilot:
   - bietlejuice.docpilot:load-clean-income-extraction:first-run-of-day
+  - bietlejuice.docpilot:load-clean-income-extraction-batch:first-run-of-day
+  - bietlejuice.docpilot:load-clean-income-extraction-document:first-run-of-day
+  - bietlejuice.docpilot_platform:load-clean-document:first-run-of-day
+  - bietlejuice.docpilot_platform:load-clean-extraction:first-run-of-day
   - bietlejuice.docx:load-clean-document:first-run-of-day
   - bietlejuice.enrich_docx:load-enrich-personal-documentation:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day

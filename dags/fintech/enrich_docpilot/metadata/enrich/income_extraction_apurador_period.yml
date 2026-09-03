@@ -1,0 +1,82 @@
+database_name: datalake_docpilot
+table_name: income_extraction_apurador_period
+owner: thalbert.miranda@quintoandar.com.br
+domain: Fintech
+description: "Enriched per-period income view exploding Apurador business_output income maps and the latest legacy extracted_data maps side by side for comparison. One row per batch and reference period (plus legacy-only rows via full outer join); filter is_latest_batch_for_external = TRUE to avoid double-counting legacy income when multiple Apurador reruns exist for the same proposal."
+columns:
+  id_batch:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.id
+    description: "Identifier of the Apurador batch; synthetic legacy-only prefix when only legacy periods exist."
+  id_external:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.id_external
+    description: "Proposal or document package identifier shared between legacy and Apurador income extraction."
+  external_source:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.external_source
+    description: "Upstream source namespace for the external identifier; paired with id_external when joining legacy income extraction."
+  reference_period:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.business_output
+    description: "Reference month or period key from the exploded income map (e.g. YYYY-MM)."
+  apurador_status:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.status
+    description: "Overall Apurador batch status for this period row when an Apurador batch exists."
+  apurador_handler_type:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.pipeline_metadata
+    description: "Business handler type from Apurador pipeline metadata for this batch."
+  legacy_processing_result:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.processing_result
+    description: "Latest legacy processing outcome for the same proposal when legacy periods exist."
+  apurador_extracted_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.business_output
+    description: "Net extracted income in BRL for the reference period from Apurador business_output."
+  apurador_gross_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.business_output
+    description: "Gross income in BRL for the reference period from Apurador business_output."
+  apurador_committed_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.business_output
+    description: "Committed income in BRL for the reference period from Apurador business_output."
+  legacy_extracted_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "Net extracted income in BRL for the reference period from latest legacy extracted_data."
+  legacy_gross_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "Gross income in BRL for the reference period from latest legacy extracted_data."
+  legacy_committed_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "Committed income in BRL for the reference period from latest legacy extracted_data."
+  delta_extracted_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.business_output
+    description: "Absolute difference Apurador minus legacy net extracted income when both sides exist for the period."
+  delta_extracted_income_pct:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.business_output
+    description: "Percentage change of Apurador vs legacy net extracted income when both sides exist for the period."
+  has_apurador_period:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.id
+    description: "True when this row carries an Apurador exploded income period."
+  has_legacy_period:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "True when this row carries a legacy exploded income period."
+  is_latest_batch_for_external:
+    description: "True when this row belongs to the most recent Apurador batch for the given id_external and external_source; filter on this column to dedupe legacy comparisons across reruns."
+  ts_batch_created:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.ts_created
+    description: "Creation timestamp of the Apurador batch when an Apurador period row exists."
+  ts_load:
+    description: "Timestamp when this enrich table row was loaded by the DAG."

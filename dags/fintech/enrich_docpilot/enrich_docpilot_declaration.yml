@@ -5,7 +5,8 @@ dag:
   owner: Data Fintech
   documentation:
     dag_purpose: |
-      This DAG creates the full table for DocPilot data enrichment, with information about income extraction processing.
+      This DAG creates enriched DocPilot tables for income extraction analysis: legacy document-period processing,
+      Apurador batch/document/period views with platform joins, and Quinturk auditing annotations.
 workflow:
   type: query_delta
   layer: enrich

@@ -1,0 +1,164 @@
+database_name: datalake_docpilot
+table_name: income_extraction_apurador_document
+owner: thalbert.miranda@quintoandar.com.br
+domain: Fintech
+description: "Enriched per-file view of DocPilot Apurador income extraction documents, joining batch context with DocPilot Platform document and extraction records and the latest legacy outcome per proposal. One row per file within a batch; used to trace platform extraction lifecycle, inclusion decisions, and document-level errors."
+columns:
+  id_income_extraction_document:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.id
+    description: "Unique identifier of the Apurador income extraction document row in DocPilot."
+  id_batch:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.id_batch
+    description: "Identifier of the parent Apurador income extraction batch."
+  id_external:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.id_external
+    description: "Proposal or document package identifier from the upstream system."
+  id_platform_document:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.id_platform_document
+    description: "External UUID of the DocPilot Platform document (maps to id_document_external, not internal id)."
+  id_platform_internal:
+    lineage:
+      - datalake_docpilot_platform_clean.document.id
+    description: "Internal numeric identifier of the matched DocPilot Platform document."
+  external_source:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.external_source
+    description: "Upstream system that submitted the income documentation for processing."
+  apurador_batch_status:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.status
+    description: "Overall outcome of the parent Apurador batch for this document."
+  apurador_batch_error_type:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_batch.error_type
+    description: "Machine-readable error category of the parent Apurador batch, if any."
+  file_path:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.file_path
+    description: "Path of the file within the submitted income documentation package."
+  classified_document_type:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.classified_document_type
+    description: "Document type assigned by DocPilot platform interpretation."
+  extraction_result:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.extraction_result
+    description: "Platform extraction outcome for the file within the Apurador batch."
+    categories:
+      COMPLETED: Platform extraction finished successfully for the file.
+      ERROR: Platform extraction failed for the file.
+      NOT_REQUESTED: The file was not selected for extraction in the batch.
+  inclusion_result:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.inclusion_result
+    description: "Apurador business-handler inclusion decision for the file after rules were applied."
+  apurador_document_error:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.error
+    description: "Plain-text error message recorded for the file when platform extraction or polling failed (not JSON)."
+  platform_application_name:
+    lineage:
+      - datalake_docpilot_platform_clean.document.application_name
+    description: "Application name on the matched DocPilot Platform document record."
+  platform_context:
+    lineage:
+      - datalake_docpilot_platform_clean.document.context
+    description: "Business context stored on the matched DocPilot Platform document."
+  platform_original_uri:
+    lineage:
+      - datalake_docpilot_platform_clean.document.original_document_uri
+    description: "URI of the original file on the matched DocPilot Platform document."
+  platform_internal_uri:
+    lineage:
+      - datalake_docpilot_platform_clean.document.internal_document_uri
+    description: "Internal storage URI of the processed file on DocPilot Platform."
+  platform_document_metadata_json:
+    lineage:
+      - datalake_docpilot_platform_clean.document.document_metadata
+    description: "Raw document metadata JSON from the matched DocPilot Platform document."
+  platform_checksum:
+    lineage:
+      - datalake_docpilot_platform_clean.document.checksum
+    description: "Checksum of the matched DocPilot Platform document for integrity checks."
+  platform_extractor_name:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.extractor_name
+    description: "Name of the extractor used on the latest platform extraction for this document."
+  platform_extractor_type:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.document_extractor_type
+    description: "Type of document extractor used on the latest platform extraction."
+  platform_extraction_status:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.status
+    description: "Processing status of the latest DocPilot Platform extraction for this document."
+  platform_extraction_error:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.error
+    description: "Error details from the latest DocPilot Platform extraction, if any."
+  platform_extracted_data_json:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.extracted_data
+    description: "Raw extracted_data JSON from the latest DocPilot Platform extraction."
+  platform_extractor_metadata_json:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.extractor_metadata
+    description: "Configuration and runtime metadata from the platform extractor, such as model version and parsing options."
+  legacy_processing_result:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.processing_result
+    description: "Latest legacy income extraction processing outcome for the same proposal."
+  legacy_documents_type:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.documents_type
+    description: "Document type from the latest matching legacy income extraction record."
+  platform_holder_name:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.extracted_data
+    description: "Holder or employee name from platform extracted_data; uses account_holder, taxpayer_name, employee_name, or payslips[0].employee_name depending on extractor type."
+  platform_balance:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.extracted_data
+    description: "Primary income amount in BRL from platform extracted_data; net_pay, gross_salary, taxable_income, or first-month investment metrics depending on extractor type."
+  platform_retry_count:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.retry_count
+    description: "Number of retry attempts on the latest DocPilot Platform extraction."
+  has_platform_document:
+    lineage:
+      - datalake_docpilot_platform_clean.document.id
+    description: "True when id_platform_document matched a DocPilot Platform document row."
+  has_platform_extraction:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.id_document
+    description: "True when the matched platform document has a latest extraction record."
+  dt_platform_start:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.extracted_data
+    description: "Period start from platform extracted_data: statement_start_date, contract_start_date, calendar_year, or payslip reference_period depending on extractor type."
+  dt_platform_end:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.extracted_data
+    description: "Period end from platform extracted_data: statement_end_date, term_end_date, or calendar_year depending on extractor type."
+  ts_document_created:
+    lineage:
+      - datalake_docpilot_clean.income_extraction_document.ts_created
+    description: "Timestamp when the Apurador document row was created in DocPilot."
+  ts_platform_doc_created:
+    lineage:
+      - datalake_docpilot_platform_clean.document.ts_created
+    description: "Creation timestamp of the matched DocPilot Platform document record."
+  ts_platform_ext_created:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.ts_created
+    description: "Creation timestamp of the latest DocPilot Platform extraction record."
+  ts_platform_ext_processed:
+    lineage:
+      - datalake_docpilot_platform_clean.extraction.ts_processed
+    description: "Processing timestamp of the latest DocPilot Platform extraction record."
+  ts_load:
+    description: "Timestamp when this enrich table row was loaded by the DAG."
