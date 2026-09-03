@@ -387,6 +387,10 @@ kodak_atlas_images_task = create_task(
     task_id="kodak_atlas_images",
 )
 
+# Perceptual hashing is gated by the image_enrich_compute_phash ConfigCat flag
+# (fails closed: with the flag off or ConfigCat unreachable, phash/phash_64 stay
+# null and no S3 image bytes are fetched; hashes already in the output table are
+# still carried forward).
 image_enrich_step_task = create_task(
     entry_point="core_v2_image_enrich_step",
     parameters=[
@@ -394,6 +398,7 @@ image_enrich_step_task = create_task(
         "--overwrite_schema",
         f"--output_image_enrich={Tables.image_enrich_step_v2}",
         "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
+        f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
     ],
 )
 
@@ -451,6 +456,27 @@ image_grouping_step_task = create_task(
         "--overwrite_schema",
         f"--output_match_pairs={Tables.match_pairs_v2}",
     ],
+)
+
+# Merges listing-level phash pairs (match_method=phash) into the same match_pairs
+# table image_grouping writes to, reading phashes from image_enrich's
+# images[].phash_64. Incremental runs are driven by the phash_last_run_at table
+# property: until the backfill arms that watermark this task is a hard no-op, so
+# it is safe to deploy ahead of the backfill. Runs strictly after
+# image_grouping_step_task because both MERGE into match_pairs and concurrent
+# Delta writers on the same table would conflict.
+# hamming_threshold=0 restricts matching to identical hashes (exact equality
+# join); the near-duplicate LSH probe is skipped entirely. Raise the threshold
+# later to enable near-duplicate matching once exact matching is validated in
+# production.
+image_phash_grouping_step_task = create_task(
+    entry_point="core_v2_image_phash_grouping_step",
+    parameters=[
+        f"--input_image_enrich={Tables.image_enrich_step_v2}",
+        f"--output_match_pairs={Tables.match_pairs_v2}",
+        "--hamming_threshold=0",
+    ],
+    task_id="image_phash_grouping_step",
 )
 
 resolve_groups_step_task = create_task(
@@ -572,8 +598,12 @@ kodak_atlas_images_task >> image_enrich_step_task
     image_enrich_step_task,
 ] >> artifacts_step_task
 [
-    address_grouping_step_task,
+    image_enrich_step_task,
     image_grouping_step_task,
+] >> image_phash_grouping_step_task
+[
+    address_grouping_step_task,
+    image_phash_grouping_step_task,
 ] >> resolve_groups_step_task
 [
     resolve_groups_step_task,
