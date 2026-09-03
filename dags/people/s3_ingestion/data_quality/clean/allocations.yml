@@ -9,21 +9,34 @@ table_level_validations:
   has_size_variation:
     variation_type: percentage
     greater_than_or_equal_to: -10
-    less_than_or_equal_to: 25
+    less_than_or_equal_to: 100
     severity_level: Error
 
 column_level_validations:
   id_allocation:
-    is_unique:
-      severity_level: Warning
+    is_complete:
+      severity_level: Error
+  ts_version:
     is_complete:
       severity_level: Warning
   id_employee:
     is_complete:
       severity_level: Warning
-  status:
+  id_group:
     is_complete:
       severity_level: Warning
-  ts_export_generated:
+  id_tag:
     is_complete:
       severity_level: Warning
+  # The log is append-only: an allocation must have exactly one row per version.
+  one_row_per_allocation_and_version:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_allocation, ts_version
+           FROM datalake_allocation_tool_clean.allocations
+           GROUP BY id_allocation, ts_version
+           HAVING COUNT(*) > 1
+         ) duplicate_rows) = 0
+      severity_level: Error

@@ -1,14 +1,23 @@
--- Current state of Allocation Tool allocations, built incrementally: the app
--- exports one initial per-entity snapshot (*-snapshot-*, envelope with `records`)
--- and afterwards only modifications, as unified delta files (full records of every
--- allocation changed since the watermark). Each run parses the files of its load
--- window, keeps the latest version per allocation id and MERGEs into the clean
--- table on id_allocation (merge_on in the declaration). Records are parsed as
--- MAP<STRING,STRING> so new upstream fields never break the load; deletions are
--- soft (status), so snapshot + deltas are the whole truth.
+-- Append-only log of every allocation version the Allocation Tool has exported.
+-- NOTE the grain: one row per allocation AND version, not one row per allocation.
+-- This is the ONLY place the raw envelopes are parsed. The app currently exports a
+-- full snapshot on every run (*-snapshot-*, envelope with `records`); it previously
+-- exported unified delta files (`allocations`, everything changed since a watermark)
+-- and those are still read so the historical exports stay available. Both
+-- `allocations` (current state) and the People allocation history derive from this
+-- table, so a new upstream field is added here once.
+-- Records are parsed as MAP<STRING,STRING> so new fields never break the load.
+-- One row per allocation id and version timestamp; the MERGE in the declaration
+-- makes reruns and out-of-order backfills idempotent.
+-- Partitioned by the raw INGESTION date, not by ts_version: the Airflow load
+-- window is expressed in ingestion dates, so a late or retried export whose
+-- generated_at is older than the window must still fall inside it -- otherwise
+-- downstream consumers filtering on the window would silently skip the file.
 WITH snapshot_records AS (
     SELECT
         record,
+        'snapshot' AS export_type,
+        MAKE_DATE(year, month, day) AS dt_ingestion,
         CAST(
             GET_JSON_OBJECT(raw_content, '$.generated_at') AS TIMESTAMP
         ) AS ts_export_generated,
@@ -33,6 +42,8 @@ WITH snapshot_records AS (
 delta_records AS (
     SELECT
         record,
+        'delta' AS export_type,
+        MAKE_DATE(year, month, day) AS dt_ingestion,
         CAST(
             GET_JSON_OBJECT(raw_content, '$.generated_at') AS TIMESTAMP
         ) AS ts_export_generated,
@@ -54,6 +65,8 @@ delta_records AS (
 unioned_records AS (
     SELECT
         record,
+        export_type,
+        dt_ingestion,
         ts_export_generated,
         file_name,
         ts_file_modified,
@@ -63,6 +76,8 @@ unioned_records AS (
     UNION ALL
     SELECT
         record,
+        export_type,
+        dt_ingestion,
         ts_export_generated,
         file_name,
         ts_file_modified,
@@ -70,22 +85,41 @@ unioned_records AS (
     FROM
         delta_records
 ),
-latest_record AS (
+versioned_records AS (
     SELECT
         record,
+        export_type,
+        dt_ingestion,
         ts_export_generated,
         file_name,
         ts_file_modified,
         ts_load,
-        ROW_NUMBER() OVER (
-            PARTITION BY record['id']
-            ORDER BY
-                ts_export_generated DESC,
-                ts_file_modified DESC,
-                file_name DESC
-        ) AS rn_record
+        -- Exports carrying no `generated_at` fall back to the S3 modification
+        -- time so every version has a single, non-null ordering key.
+        COALESCE(ts_export_generated, ts_file_modified) AS ts_version
     FROM
         unioned_records
+),
+deduplicated_versions AS (
+    SELECT
+        record,
+        export_type,
+        dt_ingestion,
+        ts_export_generated,
+        file_name,
+        ts_file_modified,
+        ts_load,
+        ts_version,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                record['id'],
+                ts_version
+            ORDER BY
+                ts_file_modified DESC,
+                file_name DESC
+        ) AS rn_version
+    FROM
+        versioned_records
 )
 SELECT
     record['id'] AS id_allocation,
@@ -102,16 +136,22 @@ SELECT
     record['vertical'] AS vertical,
     record['team'] AS team,
     record['status'] AS status,
+    export_type,
     file_name,
     record['fl_lider'] = '1' AS is_leader,
     CAST(record['is_sample'] AS BOOLEAN) AS is_sample,
     CAST(record['allocated_at'] AS TIMESTAMP) AS ts_allocated,
     CAST(record['created_date'] AS TIMESTAMP) AS ts_created,
     CAST(record['updated_date'] AS TIMESTAMP) AS ts_updated,
+    ts_version,
     ts_export_generated,
     ts_file_modified,
-    ts_load
+    ts_load,
+    dt_ingestion,
+    YEAR(dt_ingestion) AS year,
+    MONTH(dt_ingestion) AS month,
+    DAY(dt_ingestion) AS day
 FROM
-    latest_record
+    deduplicated_versions
 WHERE
-    rn_record = 1
+    rn_version = 1

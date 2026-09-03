@@ -86,19 +86,18 @@ workflow:
 
   tables_customization:
     # extra_spark_job_arguments[0] is the source_key in {environment}_conf.yml.
-    # merge_on / when_matched_update_condition configure the CLEAN MERGE (the raw
-    # custom job doesn't consume them): upsert by entity id, and only an export
-    # generated at the same time or later may overwrite a row, so reruns and
-    # out-of-order backfills never regress current state.
+    # merge_on configures the CLEAN MERGE (the raw custom job doesn't consume it).
+    # allocations is an append-only version log keyed on (id_allocation,
+    # ts_version), so a rerun or an out-of-order backfill re-lands the same
+    # version instead of duplicating or regressing it.
     allocation:
       custom_schema: allocation_tool
       extraction_type: incremental
       partitions: [year, month, day]
-      merge_on: [id_allocation]
-      when_matched_update_condition: source.ts_export_generated >= target.ts_export_generated
+      merge_on: [id_allocation, ts_version]
       clean_table_name: allocations
       clean_extraction_type: incremental
-      clean_partitions: []
+      clean_partitions: [year, month, day]
       extra_spark_job_arguments:
         - "allocation_tool_allocation"
     tags:
