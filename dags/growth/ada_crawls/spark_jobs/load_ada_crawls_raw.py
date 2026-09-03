@@ -6,13 +6,17 @@ from functools import reduce
 from typing import Optional
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import col, lit, to_date
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
@@ -32,10 +36,10 @@ JOB_NAME = "load_ada_crawls_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-
-
-def get_dbutils():
-    return BaseDBUtils().get_dbutils()
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
+dbutils = BaseDBUtils().get_dbutils()
+RAW_PARTITION_COLS = ["year", "month", "day", "device"]
 
 
 def get_most_recent_crawl(
@@ -52,7 +56,7 @@ def get_most_recent_crawl(
       Returns:
         most_recent_crawl (str): The most recent crawl folder within the date range, or None if not found.
     """
-    folder_items = get_dbutils().fs.ls(crawl_bucket_path)
+    folder_items = dbutils.fs.ls(crawl_bucket_path)
     date_pattern = r"^\d{4}-\d{2}-\d{2}$"
 
     load_start_date = datetime.strptime(load_start_date, "%Y-%m-%d")
@@ -119,7 +123,7 @@ def get_issues_dataframe(
       Returns:
         df (DataFrame): The DataFrame with the data from the CSV files inside the issues_reports/ folder.
     """
-    report_file_list = get_dbutils().fs.ls(most_recent_crawl_issues_path)
+    report_file_list = dbutils.fs.ls(most_recent_crawl_issues_path)
 
     if not report_file_list:
         raise FileNotFoundError(
@@ -215,7 +219,7 @@ def has_required_items(path: str) -> bool:
         bool: True if the path has the required items, False otherwise.
     """
     try:
-        contents = [content.name for content in get_dbutils().fs.ls(path)]
+        contents = [content.name for content in dbutils.fs.ls(path)]
         return "issues_reports/" in contents and "internal_all.csv" in contents
     except:
         return False
@@ -247,7 +251,7 @@ def get_dataframe_for_most_recent_crawl(
 
     device_folders = [
         item
-        for item in get_dbutils().fs.ls(most_recent_crawl.path)
+        for item in dbutils.fs.ls(most_recent_crawl.path)
         if item.isDir()
         and not item.name.startswith(".")
         and has_required_items(item.path)
@@ -347,8 +351,6 @@ def load_dataframe_into_datalake(
       Returns:
         None
     """
-    spark_client = SparkClient()
-
     db_info = DatalakeMetastoreService.get_db_info(
         env=environment,
         source=source,  # dag_name
@@ -376,7 +378,6 @@ def load_dataframe_into_datalake(
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     spark_metastore_service.create_database(write_database_name)
-    partition_cols = ["date", "device"]
     updated_df = update_df_with_missing_columns(
         df,
         write_database_name,
@@ -385,12 +386,18 @@ def load_dataframe_into_datalake(
         fallback_database_name=database_name,
         fallback_table_name=table_name,
     )
+    updated_df = (
+        SparkDataFrameService()
+        .input(updated_df.withColumn("date", to_date(col("date"))))
+        .create_year_month_day_columns_from_dataframe_column("date")
+        .output()
+    )
 
     s3_loader.load_df(
         df=updated_df,
         s3_path=f"{write_location}{write_table_name}",
         format_options=format_options,
-        partitions=partition_cols,
+        partitions=RAW_PARTITION_COLS,
         compression="gzip",
     )
 
@@ -400,14 +407,14 @@ def load_dataframe_into_datalake(
         table_name=write_table_name,
         format_options=format_options,
         database_location=write_location,
-        partitions=partition_cols,
+        partitions=RAW_PARTITION_COLS,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
         df=updated_df,
         database_name=write_database_name,
         table_name=write_table_name,
-        partition_cols=partition_cols,
+        partition_cols=RAW_PARTITION_COLS,
     )
 
     full_write_table_name = f"{write_database_name}.{write_table_name}"
@@ -450,8 +457,7 @@ def main():
             msg=Starting Spark Job...
             """)
 
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is None:
+    if dbutils is None:
         raise RuntimeError("""
             m=main, msg=Failed to initialize dbutils or find its object.
             """)
@@ -463,7 +469,7 @@ def main():
     )
     gchat_webhook = None
     try:
-        gchat_webhook = get_dbutils().secrets.get(scope="quintoandar", key=webhook_key)
+        gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
     except Exception as e:
         logger.warning(
             f"m=main, msg=Could not get GChat webhook for no-crawl notification; notifications will be skipped. error={e}"
