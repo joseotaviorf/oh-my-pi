@@ -124,6 +124,11 @@ class BaseWorkflow(BuilderInterface):
         if self.is_validation:
             default_args["retries"] = 0
 
+        optional_dag_kwargs = {}
+        max_active_tasks = self.dag_args.get("max_active_tasks")
+        if max_active_tasks is not None:
+            optional_dag_kwargs["max_active_tasks"] = max_active_tasks
+
         dag = DAG(
             dag_id=self.dag_id,
             catchup=self.dag_args.get("catchup", False),
@@ -137,6 +142,7 @@ class BaseWorkflow(BuilderInterface):
                 jiraops_callback.dag_failure_alert if not callback_by_task else None
             ),
             tags=dag_tags or None,
+            **optional_dag_kwargs,
             **kwargs,
         )
 

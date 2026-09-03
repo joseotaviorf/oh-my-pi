@@ -234,6 +234,34 @@ class TestValidationWorkflow:
         workflow.dag_instance()
         assert "retries" not in mock_dag_cls.call_args.kwargs["default_args"]
 
+    def test_dag_with_max_active_tasks_passes_it_to_dag(self, _dag_instance_mocks):
+        mock_dag_cls = _dag_instance_mocks
+        with mock.patch.dict("os.environ", {"ENVIRONMENT": EnvironmentEnum.PROD}):
+            workflow = BaseWorkflow(
+                dag_args={
+                    "name": "pilot",
+                    "owner": "Data Engineering",
+                    "max_active_tasks": 5,
+                },
+                workflow_args={},
+                cluster_args={},
+                is_validation=False,
+            )
+        workflow.dag_instance()
+        assert mock_dag_cls.call_args.kwargs["max_active_tasks"] == 5
+
+    def test_dag_without_max_active_tasks_omits_it(self, _dag_instance_mocks):
+        mock_dag_cls = _dag_instance_mocks
+        with mock.patch.dict("os.environ", {"ENVIRONMENT": EnvironmentEnum.PROD}):
+            workflow = BaseWorkflow(
+                dag_args={"name": "pilot", "owner": "Data Engineering"},
+                workflow_args={},
+                cluster_args={},
+                is_validation=False,
+            )
+        workflow.dag_instance()
+        assert "max_active_tasks" not in mock_dag_cls.call_args.kwargs
+
     def test_validation_check_include_sync_hive_tasks_returns_false(self):
         table_attributes = mock.MagicMock()
         table_attributes.table_customization = {"has_hive_sync": True}

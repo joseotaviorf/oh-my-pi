@@ -92,6 +92,52 @@ class TestDAGDeclarationValidator:
                 is None
             )
 
+    def test_validate_max_active_tasks_valid_int_passes(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "max_active_tasks": 5,
+            },
+        }
+
+        with does_not_raise():
+            assert (
+                dag_declaration_validator.validate(dag_declaration=dag_declaration)
+                is None
+            )
+
+    def test_validate_max_active_tasks_zero_raises(self, dag_declaration_validator):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "max_active_tasks": 0,
+            },
+        }
+
+        with pytest.raises(AssertionError):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_max_active_tasks_non_integer_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "max_active_tasks": "5",
+            },
+        }
+
+        with pytest.raises(AssertionError):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
     def test_validate_reverse_access_workflow_allows_gchat_export_summary(
         self, dag_declaration_validator
     ):

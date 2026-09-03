@@ -52,6 +52,7 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "allowed": DAGOwnerEnum.get_available_enum_values(),
                 },
+                "max_active_tasks": {"type": "integer", "min": 1, "required": False},
             },
         },
         "workflow": {
