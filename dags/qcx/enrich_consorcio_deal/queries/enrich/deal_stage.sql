@@ -14,7 +14,7 @@ WITH stage_visits AS (
     CAST(hubspot_deal_stage.id_user_updated_by AS STRING) AS id_actor,
     consorcio_deal.uuid_lead,
     hubspot_pipeline.label AS pipeline_name,
-    hubspot_stage.label AS stage_name,
+    LOWER(hubspot_stage.label) AS stage_name,
     hubspot_deal_stage.source_type AS change_source,
     FROM_UTC_TIMESTAMP(hubspot_deal_stage.ts_stage_started, 'America/Sao_Paulo') AS ts_entered,
     FROM_UTC_TIMESTAMP(hubspot_deal_stage.ts_stage_ended, 'America/Sao_Paulo') AS ts_exited
