@@ -107,6 +107,8 @@ SELECT
     END AS dt_desligamento,
     CAST(FROM_UTC_TIMESTAMP(f.ts_load, 'America/Sao_Paulo') AS DATE) AS dt_last_update,
     dip.dt_inicio_person AS dt_inicio_person,
+    j.band AS band,
+    c.github_username AS github_user,
     YEAR(DATE('{load_start_date}')) AS year,
     MONTH(DATE('{load_start_date}')) AS month,
     DAY(DATE('{load_start_date}')) AS day

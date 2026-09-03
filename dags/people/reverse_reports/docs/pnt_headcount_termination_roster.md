@@ -56,6 +56,8 @@
 | dt_desligamento | Termination date when it is on or before today; NULL (empty) for active employees and not-yet-effective future terminations. | `dw_employee_details.fact_assignment_snapshots.dt_terminated` |
 | dt_last_update | Date when the snapshot was last loaded, in Brazil/São Paulo timezone. | `dw_employee_details.fact_assignment_snapshots.ts_load` |
 | dt_inicio_person | Earliest hire date across all assignments for this person (first day at the company). | `dw_employee_details.fact_assignment_snapshots.dt_employee_hired` (MIN per person_number) |
+| band | Employee job band. | `dw_compensation.dim_job.band` |
+| github_user | Employee GitHub username or profile link. | `dw_employee_details.dim_contact.github_username` |
 | year | Partition year (from `{load_start_date}`). Not exported to the sheet. | — |
 | month | Partition month (from `{load_start_date}`). Not exported to the sheet. | — |
 | day | Partition day (from `{load_start_date}`). Not exported to the sheet. | — |
