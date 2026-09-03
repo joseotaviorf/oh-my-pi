@@ -17,17 +17,16 @@ column_level_validations:
     is_complete:
       severity_level: Warning
 
-  one_row_per_member_and_period:
+  one_row_per_member_and_spend_limit:
     custom:
-      # Grain uniqueness: exactly one row per id_user/period. id_spend_limit is not
-      # unique on its own — inherited org/group/seat limits reuse the same value
-      # across members, and it can be null when amount is null.
+      # Grain uniqueness: exactly one row per id_user/id_spend_limit — the same
+      # merge_on key used to append cap-change history.
       constraint: |-
         (SELECT COUNT(*)
          FROM (
-           SELECT id_user, period
+           SELECT id_user, id_spend_limit
            FROM datalake_claude_usage_clean.spend_limits
-           GROUP BY id_user, period
+           GROUP BY id_user, id_spend_limit
            HAVING COUNT(*) > 1
          )
         ) = 0

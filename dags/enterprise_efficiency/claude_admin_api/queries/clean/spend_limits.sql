@@ -16,11 +16,9 @@ flattened AS (
         GET_JSON_OBJECT(payload, '$.source.user_id') AS id_source_user,
         GET_JSON_OBJECT(payload, '$.source.rbac_group_id') AS id_source_rbac_group,
         GET_JSON_OBJECT(payload, '$.source.seat_tier') AS seat_tier,
-        GET_JSON_OBJECT(payload, '$.period') AS period,
+        GET_JSON_OBJECT(payload, '$.period') AS period_type,
         GET_JSON_OBJECT(payload, '$.currency') AS currency,
         CAST(GET_JSON_OBJECT(payload, '$.amount') AS DECIMAL(18, 6)) / 100 AS sum_spend_limit_amount,
-        CAST(GET_JSON_OBJECT(payload, '$.period_to_date_spend') AS DECIMAL(18, 6)) / 100
-            AS sum_period_to_date_spend,
         ts_load
     FROM
         datalake_claude_usage_raw.spend_limits, latest_load
@@ -41,15 +39,14 @@ ranked AS (
         id_source_user,
         id_source_rbac_group,
         seat_tier,
-        period,
+        period_type,
         currency,
         sum_spend_limit_amount,
-        sum_period_to_date_spend,
         ts_load,
         ROW_NUMBER() OVER (
             PARTITION BY
                 id_user,
-                period
+                id_spend_limit
             ORDER BY
                 ts_load DESC
         ) AS rn
@@ -68,11 +65,11 @@ SELECT
     type_scope,
     type_source,
     seat_tier,
-    period,
+    period_type,
     currency,
     sum_spend_limit_amount,
-    sum_period_to_date_spend,
     is_actor_deleted,
+    DATE(ts_load) AS dt_started,
     ts_load
 FROM
     ranked

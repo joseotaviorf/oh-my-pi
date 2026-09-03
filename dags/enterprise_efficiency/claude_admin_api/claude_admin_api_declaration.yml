@@ -12,11 +12,20 @@ dag:
       Raw layer: one JSON payload per API record per daily load, incremental
       append partitioned by year, month, and day; group_members is membership
       grain after fan-out from groups. Raw retains full ingestion history.
-      Clean layer: current-state snapshots only — each table filters to the
-      latest ts_load, full-overwrites unpartitioned Delta tables, and drops
-      departed users, groups, and memberships. Natural grains: id (members,
-      groups), id_group + id_user (group_members), id_user + period
-      (spend_limits).
+      Clean layer: current-state snapshots only for members, groups, and
+      group_members — each filters to the latest ts_load, full-overwrites its
+      unpartitioned Delta table, and drops departed users, groups, and
+      memberships. Natural grains: id (members, groups), id_group + id_user
+      (group_members). spend_limits is the exception: it is a cap-change
+      history, incrementally merged on (id_user, id_spend_limit) — the
+      vendor mints a new id_spend_limit only when a member's cap is actually
+      reconfigured, never for routine period-to-date spend accumulation or
+      period rollover, so this key alone separates real cap changes from
+      day-to-day spend, with no comparison logic needed in the query.
+      dt_started stamps the date an id_spend_limit was first observed and is
+      excluded from the match-update, so re-observing an unchanged cap
+      refreshes its other attributes without resetting when it started.
+      Grain: id_user + id_spend_limit.
       Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo. Auth is
       CLAUDE_ADMIN_API_KEY in the quintoandar secret scope (x-api-key) plus
       anthropic-version 2023-06-01; group and group_members add anthropic-beta
@@ -70,7 +79,29 @@ workflow:
     spend_limits:
       endpoint_path: v1/organizations/spend_limits/effective
       extraction_type: incremental
-      clean_extraction_type: full
+      clean_extraction_type: incremental
+      merge_on:
+        - id_user
+        - id_spend_limit
+      when_matched_operation:
+        update:
+          - id_actor_user
+          - id_source_user
+          - id_source_rbac_group
+          - email_actor
+          - name_actor
+          - type_actor
+          - type_scope
+          - type_source
+          - seat_tier
+          - period_type
+          - currency
+          - sum_spend_limit_amount
+          - is_actor_deleted
+          - ts_load
+          # dt_started intentionally excluded: preserves the date this
+          # id_spend_limit was first observed, instead of resetting it to
+          # today on every re-observation of an unchanged cap.
       params: {}
       api_policies:
         pagination:

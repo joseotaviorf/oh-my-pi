@@ -3,11 +3,16 @@ table_name: spend_limits
 owner: gabriel.berger@quintoandar.com.br
 domain: Enterprise Efficiency
 description: |
-  Claude Enterprise effective spend limits for QuintoAndar workforce seats.
-  One row per member (id_user) and period, from the latest daily snapshot.
-  id_spend_limit is not the grain: inherited org/group/seat limits reuse the
-  same value across members. Flattens vendor JSON from the Admin spend limits
-  endpoint into typed columns.
+  Claude Enterprise effective spend limits for QuintoAndar workforce seats. One row
+  per member (id_user) and id_spend_limit: the vendor mints a new id_spend_limit only
+  when a member's cap is actually reconfigured, never for routine period-to-date spend
+  accumulation or period rollover, so this table accumulates the full cap-change
+  history rather than holding one row per daily pull. Re-observing an unchanged
+  id_spend_limit refreshes its other attributes in place without resetting dt_started.
+  Flattens vendor JSON from the Admin spend limits endpoint into typed columns. Does not
+  carry period-to-date spend: that figure reconciles closely with the sum of this
+  member's own cost rows in datalake_claude_usage_clean.user_cost for the current
+  period, so it is derived downstream instead of duplicated here.
 columns:
   id_spend_limit:
     description: Vendor identifier for the effective spend limit record (e.g. 'spl_011CReAqK5DGX6fqXqoBSpFn').
@@ -64,7 +69,7 @@ columns:
     lineage:
       - datalake_claude_usage_raw.spend_limits.payload
 
-  period:
+  period_type:
     description: Spend limit period cadence reported by the vendor (for example monthly).
     lineage:
       - datalake_claude_usage_raw.spend_limits.payload
@@ -79,17 +84,16 @@ columns:
     lineage:
       - datalake_claude_usage_raw.spend_limits.payload
 
-  sum_period_to_date_spend:
-    description: Spend accumulated in the current period to date.
-    lineage:
-      - datalake_claude_usage_raw.spend_limits.payload
-
   is_actor_deleted:
     description: Whether the vendor marks the associated actor as deleted.
     lineage:
       - datalake_claude_usage_raw.spend_limits.payload
 
+  dt_started:
+    description: Date this id_spend_limit was first observed for this member. Not updated when the row's other attributes are later refreshed. The vendor API exposes no timestamp of its own for when a value was computed, so this and ts_load reflect only when QuintoAndar last observed it, not when the vendor last updated it.
+    # No lineage — derived from ts_load on first insert, not a source column.
+
   ts_load:
-    description: Timestamp when the Spark api_ingestion job wrote the source raw row.
+    description: Timestamp when the Spark api_ingestion job wrote the raw row this version was most recently refreshed from.
     lineage:
       - datalake_claude_usage_raw.spend_limits.ts_load

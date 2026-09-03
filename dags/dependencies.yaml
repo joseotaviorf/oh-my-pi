@@ -1320,6 +1320,8 @@ bietlejuice.dw_voc_classifications:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-survey-responses:first-run-of-day
   - bietlejuice.vocs_machina:load-clean-vocs-machina:first-run-of-day
+bietlejuice.dw_workforce_allocation:
+  - bietlejuice.enrich_people:load-enrich-allocation-history:first-run-of-day
 bietlejuice.ebdb_house_historical:
   - bietlejuice.ebdb_house:load-transactional-housepricesuggestion:first-run-of-day
 bietlejuice.enrich_3p_supply:
