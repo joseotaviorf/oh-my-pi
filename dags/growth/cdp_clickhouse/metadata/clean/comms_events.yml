@@ -113,6 +113,12 @@ columns:
       Raw JSON string of user-scoped properties from the governed EGW hub record.
     lineage:
       - datalake_cdp_raw.comms_events.user_properties
+  enrichments:
+    description: |
+      Raw JSON string of enrichment payloads from the ClickHouse comms_events view,
+      populated when governed enrichment is registered for the event.
+    lineage:
+      - datalake_cdp_raw.comms_events.enrichments
   event_name:
     description: |
       Event name from the communication hub stream.

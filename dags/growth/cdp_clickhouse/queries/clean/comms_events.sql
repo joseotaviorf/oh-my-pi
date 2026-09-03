@@ -19,6 +19,7 @@ SELECT
     raw.application,
     raw.event_properties,
     raw.user_properties,
+    raw.enrichments,
     raw.event_name,
     raw.ts_event,
     raw.ts_egw,

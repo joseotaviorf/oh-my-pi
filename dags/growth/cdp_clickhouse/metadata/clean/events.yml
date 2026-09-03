@@ -84,6 +84,14 @@ columns:
       - datalake_cdp_raw.user_tracking_events.user_properties
       - datalake_cdp_raw.transactional_events.user_properties
       - datalake_cdp_raw.comms_events.user_properties
+  enrichments:
+    description: |
+      Raw JSON string of enrichment payloads from the source context stream,
+      populated when governed enrichment is registered for the event.
+    lineage:
+      - datalake_cdp_raw.user_tracking_events.enrichments
+      - datalake_cdp_raw.transactional_events.enrichments
+      - datalake_cdp_raw.comms_events.enrichments
   ts_event:
     description: |
       Client-reported event time in UTC from the source context stream.

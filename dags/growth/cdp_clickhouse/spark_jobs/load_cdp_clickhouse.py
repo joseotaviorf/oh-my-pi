@@ -283,6 +283,7 @@ if __name__ == "__main__":
         format_options=format_options,
         partitions=partition_columns,
         optimize_dataframe=False,
+        mergeSchema="true",
     )
 
     """

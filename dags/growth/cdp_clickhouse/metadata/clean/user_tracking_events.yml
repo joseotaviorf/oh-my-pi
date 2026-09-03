@@ -245,6 +245,12 @@ columns:
       attribution and UTM fields surfaced as dedicated columns where mapped.
     lineage:
       - datalake_cdp_raw.user_tracking_events.user_properties
+  enrichments:
+    description: |
+      Raw JSON string of enrichment payloads from the ClickHouse user_tracking_events
+      view, populated when governed enrichment is registered for the event.
+    lineage:
+      - datalake_cdp_raw.user_tracking_events.enrichments
   ts_event:
     description: |
       Client-reported event time in UTC from raw timestamp epoch milliseconds or

@@ -74,6 +74,12 @@ columns:
       hub record.
     lineage:
       - datalake_cdp_raw.transactional_events.user_properties
+  enrichments:
+    description: |
+      Raw JSON string of enrichment payloads from the ClickHouse transactional_events
+      view, populated when governed enrichment is registered for the event.
+    lineage:
+      - datalake_cdp_raw.transactional_events.enrichments
   ts_event:
     description: |
       Client-reported event time in UTC from timestamp_dt in the ClickHouse view.

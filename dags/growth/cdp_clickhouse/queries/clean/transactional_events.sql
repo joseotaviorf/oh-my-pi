@@ -11,6 +11,7 @@ SELECT
     raw.event_name,
     raw.event_properties,
     raw.user_properties,
+    raw.enrichments,
     raw.ts_event,
     raw.ts_egw,
     raw.ts_egw_updated_at,

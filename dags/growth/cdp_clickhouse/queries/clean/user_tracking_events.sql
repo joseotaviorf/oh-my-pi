@@ -43,6 +43,7 @@ SELECT
     raw.egw_linked_devices,
     raw.event_properties,
     raw.user_properties,
+    raw.enrichments,
     raw.ts_event,
     raw.ts_egw,
     raw.ts_egw_updated_at,
