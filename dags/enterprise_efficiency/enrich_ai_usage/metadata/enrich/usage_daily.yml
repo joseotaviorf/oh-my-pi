@@ -1,0 +1,91 @@
+database_name: datalake_ai_usage
+table_name: usage_daily
+owner: gabriel.berger@quintoandar.com.br
+domain: Enterprise Efficiency
+description: |
+  Vendor-agnostic daily AI-tool usage, conformed to a contract with no vendor-named
+  columns. Grain: one row per tool, id_user, model, product, dt_started, and
+  dt_ended. Scope: covers Claude.
+columns:
+  tool:
+    description: AI tool the usage row belongs to, a literal constant per source (e.g. 'claude').
+    # No lineage — hardcoded literal value ('claude') in the SQL.
+
+  id_user:
+    description: Identifier of the user the usage row is attributed to, as assigned by the vendor and stable across runs.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.id_user
+
+  email_user:
+    description: Work email address of the user the usage row is attributed to.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.email_user
+
+  model:
+    description: AI model that produced the usage (for example claude-opus-4-6). NULL for vendors that don't expose a model.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.model
+
+  product:
+    description: Product surface that produced the usage (for example chat, claude_code). NULL for vendors that don't expose a product.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.product
+
+  count_requests:
+    description: Number of API requests included in this row's usage aggregation for the period.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.count_requests
+
+  count_output_tokens:
+    description: Number of output tokens generated in the period. NULL for vendors that don't expose tokens.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.count_output_tokens
+
+  count_total_tokens:
+    description: Total token count across all token types for the period (input, output, and cache). NULL for vendors that don't expose tokens.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.count_total_tokens
+
+  count_uncached_input_tokens:
+    description: Number of uncached input tokens processed in the period. NULL for vendors that don't expose tokens.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.count_uncached_input_tokens
+
+  count_cache_read_input_tokens:
+    description: Number of input tokens read from the prompt cache in the period. NULL for vendors that don't expose tokens.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.count_cache_read_input_tokens
+
+  count_cache_creation_1h_tokens:
+    description: Number of input tokens used to create 1-hour ephemeral cache entries in the period. NULL for vendors that don't expose tokens.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.count_cache_creation_1h_tokens
+
+  count_cache_creation_5m_tokens:
+    description: Number of input tokens used to create 5-minute ephemeral cache entries in the period. NULL for vendors that don't expose tokens.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.count_cache_creation_5m_tokens
+
+  count_web_search_requests:
+    description: Number of server-side web search tool requests made in the period. NULL for vendors that don't expose this measure.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.count_web_search_requests
+
+  is_actor_deleted:
+    description: True when the vendor marks the user as no longer a member of the organization (membership removed or the account itself deleted).
+    lineage:
+      - datalake_claude_usage_clean.user_usage.is_actor_deleted
+
+  dt_started:
+    description: Start date (UTC) of the usage aggregation period this row covers.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.dt_starting
+
+  dt_ended:
+    description: End date (UTC) of the usage aggregation period this row covers, exclusive of that date.
+    lineage:
+      - datalake_claude_usage_clean.user_usage.dt_ending
+
+  ts_load:
+    description: Timestamp when this row was loaded into the enrich layer.
+    # No lineage — derived from CURRENT_TIMESTAMP() at load time, not a source column.

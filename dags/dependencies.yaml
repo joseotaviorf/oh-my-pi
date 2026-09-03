@@ -1476,6 +1476,7 @@ bietlejuice.enrich_ai_collections_quintoandar:
 bietlejuice.enrich_ai_usage:
   - bietlejuice.claude_admin_api:load-clean-spend-limits:first-run-of-day
   - bietlejuice.claude_usage_api:load-clean-user-cost:first-run-of-day
+  - bietlejuice.claude_usage_api:load-clean-user-usage:first-run-of-day
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated:first-run-of-day
 bietlejuice.enrich_alias:

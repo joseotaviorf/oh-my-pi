@@ -1,0 +1,51 @@
+---
+table_name: datalake_ai_usage.usage_daily
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
+
+column_level_validations:
+  tool:
+    is_complete:
+      severity_level: Warning
+  id_user:
+    is_complete:
+      severity_level: Warning
+  dt_started:
+    is_complete:
+      severity_level: Warning
+  dt_ended:
+    is_complete:
+      severity_level: Warning
+  one_row_per_tool_id_user_model_product_dt_started_dt_ended:
+    custom:
+      # Grain guard: at most one row per (tool, id_user, model, product, dt_started,
+      # dt_ended), matching this table's intended key.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            tool,
+            id_user,
+            model,
+            product,
+            dt_started,
+            dt_ended
+          FROM datalake_ai_usage.usage_daily
+          GROUP BY
+            tool,
+            id_user,
+            model,
+            product,
+            dt_started,
+            dt_ended
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
