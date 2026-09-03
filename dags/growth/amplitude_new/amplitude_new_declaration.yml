@@ -31,4 +31,8 @@ workflow:
       has_hive_sync: false
       # Applied on clean load via ALTER TABLE; default commit interval is 10.
       table_properties:
+        # Preserve transaction-log history on EMR (Glue does not mirror UC TBLPROPERTIES).
+        delta.enableExpiredLogCleanup: "false"
+        # OSS Delta has no literal "infinite"; use a very large days interval (~2740 years).
+        delta.logRetentionDuration: "interval 999999 days"
         delta.checkpointInterval: "50"
