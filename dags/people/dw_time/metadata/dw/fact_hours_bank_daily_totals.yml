@@ -1,0 +1,51 @@
+---
+database_name: dw_time
+table_name: fact_hours_bank_daily_totals
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Daily hours-bank balance aligned to the OiTchau UI Banco Acumulado for each employee.
+  Grain: one row per employee (PIN person number) × calendar balance date.
+  Carries the last matured workforce time API daily total forward (the API already
+  embeds jornada debits once a day matures; the trailing snapshot day arrives zeroed
+  and is excluded until the ingestion lookback rewrites it) and derives the day-over-day
+  delta (OiTchau UI label Banco Dia). Use this table for UI-parity bank totals; use
+  fact_hours_bank_rule_totals for API rule/segment breakdown and overtime cost
+  estimates.
+columns:
+  sk_hours_bank_daily_total:
+    description: Unique key for one employee balance date (e.g. 'a1b2c3d4…'). Used to deduplicate grain rows in this fact.
+  sk_employee:
+    description: Key of the employee (e.g. 'a1b2c3d4…'). Join dw_employee_details.dim_employee for name and hierarchy.
+    lineage:
+      - datalake_people.identifier_mapping.id_person
+  sk_balance_date:
+    description: Key of the hours-bank balance date in YYYYMMDD format (e.g. '20260823'). References dim_date.
+    lineage:
+      - dw_public.dim_date.sk_date
+  person_number:
+    description: Main business identifier of the employee in PIN, stable across assignments (e.g. '134296'). Links People DW tables and OiTchau externalId.
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  subsidiary_name:
+    description: OiTchau subsidiary label of the employee (e.g. 'Quinto Andar Sp'). Audit field for schedule and payroll context.
+    lineage:
+      - datalake_oitchau_clean.employees.subsidiary_name
+  sum_minutes_balance_api:
+    description: Sum of all hours-bank rule buckets from the OiTchau API snapshot on that calendar day in minutes (e.g. -379). Null when the API has no row for that date and the balance is carried from the previous day.
+    lineage:
+      - datalake_oitchau_clean.hoursbank_totals.hours_bank_totals
+  amount_minutes_delta_day_over_day:
+    description: Day-over-day delta of the carried balance in minutes (e.g. -540). OiTchau UI label Banco Dia. Null on the opening row of the month, whose value is prior stock rather than a daily movement.
+  sum_minutes_running_balance:
+    description: Running balance in minutes through that calendar day (e.g. -1459). OiTchau UI label Banco Acumulado — last matured API balance carried forward; canonical total for dashboards and exports that must match the OiTchau bank screen.
+  is_closed:
+    description: True only for the last calendar day of a month that is strictly before the previous month relative to the load date (month-end closed snapshot). Current and previous month stay open for retroactive updates.
+  dt_reference_month:
+    description: First calendar day of the work month for the balance date (e.g. 2026-08-01). Use when grouping balances by month of work.
+  dt_hours_bank_balanced:
+    description: Calendar date of the hours-bank balance row (e.g. 2026-08-23).
+    lineage:
+      - datalake_oitchau_clean.hoursbank_totals.dt_balanced
+  ts_load:
+    description: Warehouse load timestamp for this row (e.g. 2026-08-24 08:00:00). Use for operational freshness, not for balance business dates.

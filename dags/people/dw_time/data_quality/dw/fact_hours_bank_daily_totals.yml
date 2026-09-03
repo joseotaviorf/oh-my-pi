@@ -1,0 +1,49 @@
+---
+table_name: dw_time.fact_hours_bank_daily_totals
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
+
+column_level_validations:
+  sk_hours_bank_daily_total:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_employee:
+    is_complete:
+      severity_level: Error
+  sk_balance_date:
+    is_complete:
+      severity_level: Error
+  # Ensure the fact has exactly one row per employee and balance date.
+  one_row_per_person_and_balance_date:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT person_number, dt_hours_bank_balanced
+           FROM dw_time.fact_hours_bank_daily_totals
+           GROUP BY person_number, dt_hours_bank_balanced
+           HAVING COUNT(*) > 1
+         )
+        ) = 0
+      severity_level: Error
+  # Ensure carried totals equal the API balance whenever a snapshot exists.
+  balance_total_is_carried_api:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_time.fact_hours_bank_daily_totals
+         WHERE sum_minutes_balance_api IS NOT NULL
+           AND sum_minutes_running_balance <> sum_minutes_balance_api
+        ) = 0
+      severity_level: Warning

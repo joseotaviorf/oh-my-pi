@@ -4,10 +4,11 @@ table_name: fact_hours_bank_rule_totals
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
-  Hours-bank balances from the workforce time integration, split by rule or bucket that
+  Hours-bank balances from the workforce time API, split by rule or bucket that
   holds minutes for each employee on a calendar day. Grain: one row per employee (PIN person number) × balance date ×
-  rule key. Summing minutes_balance_rule for the same person and date gives total minutes across buckets shown in that
-  balance snapshot; slice by rule for workforce or payroll support analytics.
+  rule key. This is the API rule/segment breakdown (including overtime cost estimates); for the UI-aligned Banco
+  Acumulado total use dw_time.fact_hours_bank_daily_totals. Summing minutes_balance_rule for the same person and date
+  gives the raw API snapshot total, which can lag the UI on workdays without punches.
 
   Overtime realized cost (DBP-1515): for closed rows on segments 50% or 60%, amount_overtime_realized_total is an
   **estimate** of premium plus DSR reflection for analytics. Attribute to dt_reference_month (work month). Oracle HCM
