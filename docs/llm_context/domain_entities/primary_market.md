@@ -8,13 +8,37 @@
 **Data Steward:**
 - gustavo.rompe@quintoandar.com.br
 
+## Primary Market enrich schema access fallback
+
+If TARS cannot access the `datalake_sale_primary_market` enrich schema because
+the user lacks data-contract access, treat it as an access limitation. The team
+is working on the data-contract permissions.
+
+Until access is available, use the equivalent Primary Market enrich table in
+the `sandbox` schema with the naming convention:
+
+```text
+sandbox.{schema}_{table_name}
+```
+
+Examples:
+
+```text
+sandbox.datalake_sale_primary_market_listing_sale_type
+sandbox.datalake_sale_primary_market_house_development
+sandbox.datalake_sale_primary_market_development_negotiation
+```
+
+Keep the same column names and filters, identify the sandbox source in the
+answer, and do not apply this fallback to DW or other schemas.
+
 ## Overview
 
 - **Objective:** classify sale listings, visits, and ongoing-supply snapshots as **Primary** (new-build inventory sold by an incorporadora) or **Secondary** (resale between individuals), and route Ops/TARS questions to the current source of truth during the pilot rollout.
 - **Asset status / lifecycle:** August 2026 São Paulo pilot, inventory supplied through Órulo. The engineering RFC introduced a **1:N** development model (one empreendimento → N typologies → N shell houses) that coexists with the legacy **1:1** secondary model (one listing ≈ one house ≈ one unit).
-- **Source of truth:** `ListingSaleModel.saleType`, exposed in the lake as `datalake_ebdb_clean.listing_sale_model.sale_type` (`PRIMARY` / `SECONDARY`, nullable). This supersedes the legacy `is_primary_market` boolean on the same source table — do not use the legacy boolean as a fallback once `sale_type` classification is live on a table (see per-table notes below).
+- **Source of truth:** use the source according to the grain. Listing/house classification is `datalake_sale_primary_market.listing_sale_type.sale_type` (enum with legacy-boolean fallback). Offer classification is `datalake_sales_flow_clean.offer.sale_type`, propagated through `datalake_sale_offer.core_sale_offer`, `datalake_sale_offer.sale_offer`, and the offer DW tables. Buyer activation classification is `datalake_buyer_prospect.buyer_prospect_type.sale_type`, with `bp_market_type` for market exclusivity.
 - **Typical actions / events:** a typology is published as a shell listing → buyer visits the shell house → buyer offers on a **minted unit** Imovel (a new house_id, not the shell) → CCV is the de-facto closing signal for Primary (no post-CCV diligência step like Secondary).
-- **Common metrics:** Primary listing count, Primary visit volume, Primary ongoing-supply stock, Primary offer volume (in progress — see Tables).
+- **Common metrics:** Primary listing count, Primary visit volume, Primary ongoing-supply stock, Primary offer volume, sale-flow volume, and buyer market exclusivity.
 - **Related entities:** for house/listing grain fundamentals shared with Secondary, see [`house_and_listing.md`](house_and_listing.md). For offer/CCV mechanics, see [`fs-transact.md`](fs-transact.md).
 
 ## Service Architecture (why some cross-references don't exist yet)
@@ -49,7 +73,7 @@ INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
 
 | Term | Meaning | Notes |
 |------|---------|-------|
-| **Primary Market / Mercado Primário / MP** | New-build inventory sold by an incorporadora | `sale_type = 'PRIMARY'` is the strict SoT filter |
+| **Primary Market / Mercado Primário / MP** | New-build inventory sold by an incorporadora | `sale_type = 'PRIMARY'` is the market-classification filter; use `development_typology_unit.id_house` for strict Órulo-pilot scope |
 | **Secondary Market / Mercado Secundário** | Resale inventory between individuals (CPF sellers) | `sale_type = 'SECONDARY'`, or `NULL` when no listing_sale_model row exists |
 | **Development / Empreendimento** | The real-estate project aggregate, containing multiple typologies | `datalake_ebdb_clean.development` |
 | **Typology / Tipologia** | A floor-plan / SKU within a development; exposed as one **shell house** for search, visit, and offer | `datalake_ebdb_clean.development_typology` |
@@ -59,6 +83,8 @@ INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
 | **EN, Executivo de Negociação, Deal Maker** | Negotiation Executive assigned to an offer's sales flow — in Primary, a conversion accelerator / developer liaison, not a price closer like Secondary | `datalake_sale_offer_flows.offer_specialists.id_user_consultant` |
 | **hub_bp** | The closing hub servicing an offer | `datalake_sales_flow_clean.offer.id_hub` — native Sales Flow field, same mechanism as Secondary |
 | **city_group** | Region grouping of a house | Resolved from `datalake_ebdb_clean.house.id_region` → `datalake_region.region.city_group` |
+| **Buyer activation `sale_type`** | Market classification of the house that triggered the buyer-prospect activation | `datalake_buyer_prospect.buyer_prospect_type.sale_type`; strict Primary pilot membership through `house_development` |
+| **`bp_market_type`** | Buyer market-exclusivity segment, independent of NBP/RBP | `PRIMARY_EXCLUSIVE`, `NON_EXCLUSIVE`, or `SECONDARY_EXCLUSIVE` in `buyer_prospect_type` |
 | **DSP (`developers-supply-processor`)** | Product-side supply ledger for Primary inventory (Órulo sync) — **not** a DW/analytics source | See `datalake_ebdb_clean.development*` for the lake-side result of DSP → Main |
 | **BSP (`brokers-supply-processor`)** | Unrelated 3P broker-lead pipeline — orthogonal axis (who supplies), not Primary/Secondary market type | Do not conflate with Primary Market classification |
 
@@ -66,37 +92,42 @@ INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
 
 | You need... | Use this table |
 |-------------|-----------------|
-| Primary/Secondary classification at listing grain | `dw_sale.dim_listing` (`dl`) — `is_primary_market`, strict from `sale_type = 'PRIMARY'`; `NULL` and all other values are `FALSE`. Join `sk_house` for facts without their own flag. |
-| Raw enum + unit-level attributes | `datalake_ebdb_clean.listing_sale_model` (`lsm`) — `sale_type`, `unit_count`, `min_price`, `max_price`. Prefer `dim_listing` for analyst queries; do not join this table directly from ad-hoc SQL. |
+| Primary/Secondary classification at listing grain | `dw_sale.dim_listing` (`dl`) — prefer `sale_type`; retain `is_primary_market` for backward compatibility. |
+| Raw enum + unit-level attributes | `datalake_ebdb_clean.listing_sale_model` (`lsm`) — `sale_type`, `unit_count`, `min_price`, `max_price`. Prefer the `listing_sale_type` SSOT for analyst queries; do not join this table directly from ad-hoc SQL. |
 | House-grain Primary flag (pre-listing join) | `datalake_ebdb_listing.house` (enrich) — `is_sale_primary_market` = `BOOL_OR(sale_type = 'PRIMARY')` across that house's `listing_sale_model` rows. No legacy-boolean fallback. |
-| House-grain canonical `sale_type` fill (preferred join target) | `datalake_sale_primary_market.listing_sale_type` (enrich) — one row per house, `sale_type` from the **most recently updated SALE** `listing_sale_model` row; prefers the enum, **falls back to the legacy boolean** when `sale_type` is null. Built so other enrich/DW tables join this instead of re-deriving the fallback logic themselves. **Different semantics from `house.is_sale_primary_market` above** — that one is strict (no fallback); this one has a fallback. Do not treat them as interchangeable. |
+| House-grain canonical `sale_type` fill (preferred join target) | `datalake_sale_primary_market.listing_sale_type` (enrich) — one row per house, `sale_type` from the **most recently updated SALE** `listing_sale_model` row; prefers the enum and falls back to the legacy boolean when the enum is NULL. It also carries `min_price` and `max_price`. **Different semantics from `house.is_sale_primary_market` above** — that one is strict; this one has a fallback. |
 | Primary flag on visits — **just sale** | `dw_visit.fact_visits` and `dw_visit.fact_visit_schedules` (canonical — see [`visits.md`](visits.md)) — `sale_type` (STRING: `PRIMARY`/`SECONDARY`/`NULL`) at visit grain, derived from the latest SALE listing business context; RENT rows are `NULL`. `dw_sale.fact_visits` also got the column (same enrich source), but it is a **separate, legacy table not covered by `visits.md`** — prefer `dw_visit.fact_visits` unless you have a specific reason to use the older one. |
 | Primary flag on daily supply snapshot | `dw_sale.fact_daily_ongoing_listing` — `sale_type` per snapshot day. |
-| Development / typology context for a house | `datalake_sale_primary_market.house_development` (enrich; **no DW equivalent yet**) — denormalizes development name, construction status, address, and typology attributes onto the house grain. |
-| Pré-OS negotiation events | `datalake_sale_primary_market.development_negotiation` (enrich; **no DW equivalent yet**) — one row per `DevelopmentNegotiation`; carries `id_offer`/`id_sales_flow` when the negotiation reached an offer. |
-| Offer volume, EN, hub, city_group at negotiation grain | **In review** — `dw_sale_primary_market.fact_development_negotiation` (PR pending merge). Do not reference until merged; treat as not yet available. |
+| Listing publication facts | `dw_sale.fact_listings` — `sale_type` per listing. |
+| Listing price-change facts | `dw_sale.fact_listing_price_changes` — latest available house-level `sale_type`; not a historical as-of classification. |
+| Offer volume and offer attributes | `dw_sale.fact_offers` and `dw_sale.dim_offer` — offer-side `sale_type` propagated from Sales Flow. |
+| Sale agreement attributes | `dw_sale.dim_sale_agreement` — offer-side `sale_type` alongside CCV attributes. |
+| Demand-funnel events | `dw_sale.fact_sale_demand_event` — visit events use `dw_sale.fact_visits.sale_type`; offer events use `dw_sale.fact_offers.sale_type`. |
+| Buyer-house sale flows | `dw_sale.fact_sale_flows` — offer-side `sale_type`; booking/TTA-only flows remain NULL. |
+| Buyer activation and market exclusivity | `datalake_buyer_prospect.buyer_prospect_type` — `sale_type` for the activation house and `bp_market_type` (`PRIMARY_EXCLUSIVE`, `NON_EXCLUSIVE`, `SECONDARY_EXCLUSIVE`). This is distinct from `bp_type` (`NBP`/`RBP`). |
+| Development / typology context for a house | `datalake_sale_primary_market.house_development` (enrich) or `dw_sale_primary_market.dim_house_development` (DW) — house-grain development and typology attributes. |
+| Pré-OS negotiation events | `datalake_sale_primary_market.development_negotiation` (enrich) or `dw_sale_primary_market.fact_development_negotiation` (DW) — visit house, unit house, offer, flow, and development keys. |
+| Primary-market pilot scope | `datalake_ebdb_clean.development_typology_unit.id_house` or the development house tables — stricter than `sale_type = 'PRIMARY'`, which includes legacy fallback-classified houses. |
 
-**`dw_sale.fact_offers` does not carry `sale_type` or `is_primary_market` today.** To identify Primary offers, join `dw_sale.dim_listing` on `sk_house` (interim pattern below). This is in-progress work — do not assume the column exists without checking the live schema first.
-
-**`dw_sale.fact_sale_flows` does not carry `sale_type` yet.** Propagation hasn't reached this table — it may get the column in a future wave, same as `fact_offers` above. Until then, filter Primary at query time via the same `dim_listing` / `house` join. Check the live schema before assuming either way.
+`datalake_visit.visit_schedules` does not have a native `sale_type`. Visit
+facts derive it from the house-level listing SSOT.
 
 ```sql
--- Interim Primary filter for facts without their own flag (e.g. fact_offers)
-LEFT JOIN dw_sale.dim_listing AS dl
-    ON fact_table.sk_house = dl.sk_house
-WHERE dl.is_primary_market
+-- Use the native field when the target table exposes it
+WHERE sale_type = 'PRIMARY'
 ```
 
 ## Key Metrics
 
 ### Component / exploratory metrics
 
-- **Primary listings:** `COUNT(DISTINCT sk_sale_listing)` where `dw_sale.dim_listing.is_primary_market = TRUE`.
+- **Primary listings:** `COUNT(DISTINCT sk_sale_listing)` where `dw_sale.dim_listing.sale_type = 'PRIMARY'`.
 - **Primary houses:** `COUNT(DISTINCT sk_house)` with the same filter.
 - **Primary visit volume (pilot-scoped):** `SUM(num_visit_booked)` on `dw_visit.fact_visits`, joined to `development_typology_unit` on `id_house` (do **not** filter by `sale_type = 'PRIMARY'` alone — see the population warning above). As of 2026-09-02: 23 booked, 5 completed, 17 distinct houses. See [`visits.md`](visits.md) for booked vs completed metric conventions.
 - **Primary ongoing supply (daily stock):** `COUNT(DISTINCT sk_snapshot)` (or house count) on `dw_sale.fact_daily_ongoing_listing` where `sale_type = 'PRIMARY'`.
 - **Pré-OS volume (buyer-initiated only):** `COUNT(*)` on `datalake_sale_primary_market.development_negotiation` where `actor = 'DEMAND'` — filter `actor` to avoid broker-inflation from agent-created negotiations.
 - **Visit → pré-OS conversion:** join `dw_visit.fact_visits.sk_visit` to `development_negotiation.id_visit` (same ID space — see Golden Query 4). As of 2026-09-02: 1 of 23 pilot visits (1 of 5 completed) led to a negotiation — directional only at this volume.
+- **Buyer market exclusivity:** `COUNT(DISTINCT id_prospect)` on `datalake_buyer_prospect.buyer_prospect_type`, grouped by `bp_market_type` and filtered by `sale_type = 'PRIMARY'` for buyers activated by a Primary house.
 
 No official metric-entity file exists for Primary Market yet — all metrics above are component-level, not corporate/OKR definitions.
 
@@ -113,7 +144,7 @@ No official metric-entity file exists for Primary Market yet — all metrics abo
 
 ### Offer / CCV (`fs-transact.md`)
 
-- `SalesFlow.sale_type` is the offer-side discriminator, distinct from the listing-side `ListingSaleModel.saleType` — live on `datalake_sales_flow_clean.offer.sale_type`. As of this writing, only `SECONDARY` values have appeared in production (~1,161 rows); `PRIMARY` has 0 observed rows so far, and most rows are still `NULL` (pre-existing offers created before the column landed). Prefer the `dim_listing` join above for offers today since `fact_offers` doesn't yet expose this column — but the raw/clean data itself is available for anyone querying `datalake_sales_flow_clean.offer` directly.
+- `SalesFlow.sale_type` is the offer-side discriminator, distinct from the listing-side `ListingSaleModel.saleType`. It is available on `datalake_sales_flow_clean.offer`, then propagated to `datalake_sale_offer.core_sale_offer`, `datalake_sale_offer.sale_offer`, `dw_sale.fact_offers`, `dw_sale.dim_offer`, `dw_sale.dim_sale_agreement`, `dw_sale.fact_sale_demand_event`, and `dw_sale.fact_sale_flows`. NULL remains valid for historical or unclassified offers.
 - EN (Deal Maker) and hub assignment on an offer follow the **same raw sources** as Secondary (`offer_specialists`, `sales_flow.offer.id_hub`) — no separate Primary-specific mechanism.
 
 ### Visits (typology-shell caveat)
@@ -137,12 +168,12 @@ Confirmation/completion is already flagged on `dw_visit.fact_visits` (`visit_sta
 ### Q: How many visits generated a proposal request?
 **Stage:** pré-OS · **Status:** ✓ native
 
-Immediate answer: `datalake_ebdb_clean.development_negotiation` (exposed via `datalake_sale_primary_market.development_negotiation` in the lake) is born with `id_development` and `id_visit` on the same row. Unlike the questions above, no cross-reference is needed — that's the entire reason this table exists (see Service Architecture above).
+Immediate answer: `datalake_sale_primary_market.development_negotiation` is born with `id_development` and `id_visit` on the same row. Its DW evolution is `dw_sale_primary_market.fact_development_negotiation`. Unlike the questions above, no cross-reference is needed — that's the entire reason this table exists (see Service Architecture above).
 
 ### Q: How many proposals became a submitted offer (OS)?
 **Stage:** OS · **Status:** ⚠ outside the domain
 
-The offer itself is not stored in the Development domain. `DevelopmentNegotiationUnit` triggers `OfferPort`, which calls the external **sales-flow** system (see Service Architecture above). Counting "submitted offers" requires querying that system's own tables (`datalake_sales_flow_clean.offer` / `sales_flow`) or `dw_sale.fact_offers` once the Primary Market flag exists there.
+The offer itself is not stored in the Development domain. `DevelopmentNegotiationUnit` triggers `OfferPort`, which calls the external **sales-flow** system (see Service Architecture above). Count submitted offers with `dw_sale.fact_offers.sale_type = 'PRIMARY'`; use `dw_sale_primary_market.fact_development_negotiation` when the question also requires a development or negotiation key.
 
 ### Q: What's the offer-to-signed-contract conversion (OS2CCV) for a development's units?
 **Stage:** OS2CCV · **Status:** ⚠ manual filter
@@ -152,32 +183,32 @@ The offer itself is not stored in the Development domain. `DevelopmentNegotiatio
 ### Q: What's BP→CCV (Buyer Prospect → Contract) restricted to Primary Market?
 **Stage:** BP2CCV · **Status:** ⚠ biggest gap
 
-BP comes from `dw_buyer_prospect`, which today carries **no** reference to the development — not direct, not even via house_id. Unlike the questions above, not even the manual cross-reference is possible yet: this is the most serious gap for segmenting this funnel stage by Primary Market. (Also documented in the wiki's `metrics.md` as the "confirmed biggest gap.")
+`datalake_buyer_prospect.buyer_prospect_type` now carries activation-level `sale_type` and buyer-level `bp_market_type`. The aggregated `dw_sale.fact_buyer_prospects` table still has no market classification or development key, so BP2CCV at the aggregate buyer-prospect grain remains a gap.
 
 ### Q: Who is the active manager (gestor) responsible for a development?
 **Category:** operational · **Status:** ✓ native
 
-This question never leaves the Development domain: `DevelopmentContact` (exposed via `datalake_sale_primary_market.house_development.active_contact_uuid_person` / `active_contact_status`) already stores the active manager (`status = 'ACTIVE'`) per development, with no external table or data-warehouse join needed.
+This question never leaves the Development domain: `DevelopmentContact` (exposed via `datalake_sale_primary_market.house_development` and `dw_sale_primary_market.dim_house_development`) stores the development contact fields, with no external table or data-warehouse join needed.
 
 ## Dos and Don'ts
 
 **Do:**
-- Use `dw_sale.dim_listing.is_primary_market` for current, strict Primary/Secondary classification.
-- Prefer `sale_type` (the enum) over the legacy `is_primary_market` boolean on `listing_sale_model` wherever both exist — the enum wins, the legacy value is only used as history for pre-existing rows on `house.sql`'s own rollup, not queried directly by analysts.
+- Prefer `sale_type` on the target table. Keep `dw_sale.dim_listing.is_primary_market` only for backward-compatible listing filters.
+- Prefer `sale_type` on the target table. At house/listing grain, use `listing_sale_type`, whose documented fallback maps legacy `is_primary_market = TRUE` to `PRIMARY`. Do not substitute the strict `house.is_sale_primary_market` flag without checking the semantic difference.
 - Treat the shell house_id as a **typology**, not a physical unit, when reasoning about Primary inventory counts.
-- Join `dim_listing` on `sk_house` for any Primary/Secondary question on a fact that doesn't carry its own flag yet (e.g. `fact_offers`).
+- Use the native `sale_type` on facts and dimensions. If a table has no native field, join `datalake_sale_primary_market.listing_sale_type` at house grain.
 - Filter `development_negotiation.actor = 'DEMAND'` when counting buyer-initiated pré-OS to avoid broker inflation.
 - Scope any Primary Market question to the pilot via `development_typology_unit.id_house`, not `sale_type = 'PRIMARY'` alone — see the population warning above.
-- Check the live SQL/metadata before assuming a table has `sale_type` — this domain is mid-rollout and columns are landing incrementally.
+- Check the live physical schema after each DAG rollout; merged SQL and deployed columns can temporarily differ until the affected DAG runs. If access fails because of missing Primary Market data-contract permissions, use the sandbox fallback documented above.
 
 **Do not:**
 - Do not use `is_3p_supply`, developer/company ownership, or price alone to infer Primary Market — these are orthogonal axes.
 - Do not treat the shell house as one physical apartment; use `unit_count` on `listing_sale_model` or the unit Imovel (`development_typology_unit.id_house`) for inventory-level questions.
 - Do not rewrite historical visit `house_id`s after an offer lands on a different typology, and do not expect synthetic "corrective" visits — neither exists by design.
 - Do not denormalize `id_development` onto funnel facts — join it at consume time via `house → development_typology_unit → development_typology`.
-- Do not assume `fact_offers` has a Primary flag — verify against the live schema; as of this doc, it does not.
-- Do not treat `house.is_sale_primary_market` (strict, no fallback) and `listing_sale_type.sale_type` (has a legacy-boolean fallback) as interchangeable — they can disagree on rows where `sale_type` is still null.
-- Do not assume `dw_sale.fact_sale_flows` will never get `sale_type` — propagation just hasn't reached it yet. Join `dim_listing` / `house` as the interim alternative, but re-check the live schema; it may land there in a future wave.
+- Do not treat `fact_offers.sale_type` as a listing classification; it is offer-side Sales Flow data.
+- Do not treat `house.is_sale_primary_market` (strict, no fallback) and `listing_sale_type.sale_type` (has a legacy-boolean fallback) as interchangeable — they can disagree on rows where `sale_type` is still NULL.
+- Do not use `dw_sale.fact_buyer_prospects` as if it had `sale_type`; use `datalake_buyer_prospect.buyer_prospect_type` for activation-level market segmentation and `bp_market_type` for buyer exclusivity.
 - Do not confuse `SalesFlow.sale_type` (offer-side, `datalake_sales_flow_clean.offer.sale_type`) with `ListingSaleModel.saleType` (listing-side, `datalake_ebdb_clean.listing_sale_model.sale_type`) — they are separate columns on separate tables, populated independently.
 
 ## Golden Queries
@@ -191,7 +222,8 @@ SELECT
     COUNT(DISTINCT dl.sk_sale_listing) AS primary_listing_count,
     COUNT(DISTINCT dl.sk_house) AS primary_house_count
 FROM dw_sale.dim_listing AS dl
-WHERE dl.is_primary_market
+WHERE dl.sale_type = 'PRIMARY'
+  AND dl.status = 'PUBLISHED'
 ```
 
 ### Query 2 — Primary visit volume by month (pilot-scoped)
