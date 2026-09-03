@@ -1,24 +1,15 @@
 cluster:
-  type: emr_7_12_consolidation_xl_general_cluster
+  type: consolidation_l_general_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
-    # ~25 small Amplitude event loads per cluster (367 tables -> 15 clusters). Run 16
-    # at a time so the cluster is never idle. No CLUSTER autoscale (fixed instance
-    # groups), but Spark dynamicAllocation ON so each app provisions executors on
-    # demand: small tables sit at 1 executor, heavy tables (session_start,
-    # listing_page_viewed) ramp up to 8 when capacity is free. minExecutors 1 x 16 apps
-    # = 16 always fit in the ~46 executor slots of the 4 m6g.8xlarge core nodes (512g /
-    # 10g). max_active_tasks: 240 (15 x 16) keeps every cluster fed. Validate spill in Forno.
-    step_concurrency_level: 16
-    core_nodes:
-      instance_count: 4
+    driver_node_type_id: c7g.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment}}
+      spark.driver.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
+      spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
     aws_attributes:
       ebs_volume_size: 500
-    spark_conf:
-      spark.executor.memory: 8g
-      spark.executor.memoryOverhead: 2g
-      spark.executor.cores: "2"
-      spark.driver.memory: 4g
-      spark.driver.memoryOverhead: 2g
-      spark.dynamicAllocation.enabled: "true"
-      spark.dynamicAllocation.minExecutors: "1"
-      spark.dynamicAllocation.maxExecutors: "8"
