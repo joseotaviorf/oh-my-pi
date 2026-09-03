@@ -1096,6 +1096,9 @@ bietlejuice.reverse_reports:
     - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
   remove:
     - bietlejuice.gsheets_people_static:load-clean-mapping-wb-to-gh:first-run-of-day
+    # This reverse export may use the latest available Plugify snapshot without
+    # blocking the complete report DAG on the source DAG.
+    - bietlejuice.plugify_api:load-clean-device-inventory:first-run-of-day
     # dw_time sensors block the whole export DAG when dw_time is late; absence/hours-bank
     # tabs tolerate previous-day data, so run without waiting for dw_time.
     - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day

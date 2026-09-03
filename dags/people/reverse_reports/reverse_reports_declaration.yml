@@ -471,3 +471,9 @@ workflow:
       extra_spark_job_arguments:
         - "1NXWclDZfgZ61-UGANp7gDT1X_kEnjV-dIwS2f4lkQso"
         - "base_turnover_v2"
+
+    # --- Enterprise Efficiency ---
+    employee_equipment_roster:
+      extra_spark_job_arguments:
+        - "1LeEvPtDFySpqhsMnzz8PwlQtJJ3r3cEAo618TwDszfw"
+        - "base"
