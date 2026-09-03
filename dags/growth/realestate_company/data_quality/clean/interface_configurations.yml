@@ -1,0 +1,42 @@
+---
+table_name: datalake_realestate_clean.interface_configurations
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  class_name:
+    is_complete:
+      severity_level: Error
+  execution_hour_range_end:
+    is_complete:
+      severity_level: Error
+  execution_hour_range_start:
+    is_complete:
+      severity_level: Error
+  id_country:
+    is_complete:
+      severity_level: Error
+  id_interface:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  interface_name:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  is_check_only:
+    is_complete:
+      severity_level: Error
+  is_enabled:
+    is_complete:
+      severity_level: Error
+  is_image_download_enabled:
+    is_complete:
+      severity_level: Error
+  minutes_between_executions:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,59 @@
+---
+database_name: datalake_realestate_clean
+table_name: countries
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.countries). Grain: one row per country (id_country). No date partitions; Delta Z-order on (id_country) — filter/join on Z-order columns for data skipping. Downstream: Geographic scoping for listings, agencies and commercial plans.
+columns:
+  id_country:
+    lineage:
+    - datalake_realestate_raw.paises.idpais
+    description: |-
+      Surrogate key for a country market in the Navent portal network. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_local_currency:
+    lineage:
+    - datalake_realestate_raw.paises.idmonedalocal
+    description: Default currency used for domestic price display in this country.
+  id_translation:
+    lineage:
+    - datalake_realestate_raw.paises.idtraduccion
+    description: Localization catalog key for the country display name.
+  application_medium:
+    lineage:
+    - datalake_realestate_raw.paises.mediadepostulacion
+    description: Default marketing medium code for campaigns in this country.
+  country_code:
+    lineage:
+    - datalake_realestate_raw.paises.codigo
+    description: ISO-style short code for the country (e.g., AR, BR, MX).
+  country_name:
+    lineage:
+    - datalake_realestate_raw.paises.nombre
+    description: Localized country name shown in portal selectors.
+  currency_code:
+    lineage:
+    - datalake_realestate_raw.paises.moneda
+    description: ISO currency code used for domestic transactions.
+  is_active_market:
+    lineage:
+    - datalake_realestate_raw.paises.estamos
+    description: Country is open for new agency onboarding and listing publication.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.paises.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.paises.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.paises.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

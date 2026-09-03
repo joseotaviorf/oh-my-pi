@@ -1,0 +1,68 @@
+---
+dag:
+  name: realestate_commerce
+  owner: Data Growth
+  schedule_interval: 0 8,12,21 * * *
+  schedule_start_date: 2026, 9, 1
+  documentation:
+    dag_purpose: |-
+      CDC pipeline for RealEstate (Navent) MySQL — commerce context. Part of the Navent → QuintoAndar migration POC (RD-3335, parent RD-3332). CDC ingestion of RealEstate commercial catalog and billing: sales orders, order line items, products, publication plans and country-specific plan pricing.
+
+      DATA LINEAGE: MySQL (OLTP) → datalake_realestate_raw → datalake_realestate_clean
+      SCHEDULE: 3× daily at minute 0 UTC (08:00, 12:00, 21:00).
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: realestate
+  custom_schema: realestate
+  source_schema: realestate
+  dbutils_secret_key: REALESTATE_DB
+  tables_customization:
+    itemspedido:
+      clean_table_name: order_items
+      clean_primary_keys:
+      - id_order_item
+      clean_z_order_by:
+      - id_order
+    lineasdeproducto:
+      clean_table_name: product_lines
+      clean_primary_keys:
+      - id_product_line
+      clean_z_order_by:
+      - id_product_line
+    pedidos:
+      clean_table_name: orders
+      clean_primary_keys:
+      - id_order
+      clean_z_order_by:
+      - id_order
+    planesdepublicacion:
+      clean_table_name: publication_plans
+      clean_primary_keys:
+      - id_publication_plan
+      clean_z_order_by:
+      - id_publication_plan
+    planesporproductoporpais:
+      clean_table_name: plans_by_product_by_country
+      raw_primary_keys:
+      - idplandepublicacion
+      - idproducto
+      - idpais
+      clean_primary_keys:
+      - id_publication_plan
+      - id_product
+      - id_country
+      clean_z_order_by:
+      - id_publication_plan
+      - id_product
+      - id_country
+    productos:
+      clean_table_name: products
+      clean_primary_keys:
+      - id_product
+      clean_z_order_by:
+      - id_product
+  extra_query_template_params:
+    load_start_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_start_date'') }}'
+    load_end_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_end_date'') }}'

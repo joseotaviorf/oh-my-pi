@@ -1,0 +1,16 @@
+---
+table_name: datalake_realestate_clean.property_types
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  id_property_type:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_property_type_category:
+    is_complete:
+      severity_level: Error

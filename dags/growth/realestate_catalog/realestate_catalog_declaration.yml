@@ -1,0 +1,90 @@
+---
+dag:
+  name: realestate_catalog
+  owner: Data Growth
+  schedule_interval: 0 8,12,21 * * *
+  schedule_start_date: 2026, 9, 1
+  documentation:
+    dag_purpose: |-
+      CDC pipeline for RealEstate (Navent) MySQL — catalog context. Part of the Navent → QuintoAndar migration POC (RD-3335, parent RD-3332). CDC ingestion of RealEstate reference catalogs: geography hierarchy, property/operation taxonomies, development stages and currencies.
+
+      DATA LINEAGE: MySQL (OLTP) → datalake_realestate_raw → datalake_realestate_clean
+      SCHEDULE: 3× daily at minute 0 UTC (08:00, 12:00, 21:00).
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: realestate
+  custom_schema: realestate
+  source_schema: realestate
+  dbutils_secret_key: REALESTATE_DB
+  tables_customization:
+    ciudades:
+      clean_table_name: cities
+      clean_primary_keys:
+      - id_city
+      clean_z_order_by:
+      - id_city
+    etapasdedesarrollo:
+      clean_table_name: development_stages
+      clean_primary_keys:
+      - id_development_stage
+      clean_z_order_by:
+      - id_development_stage
+    geolocalizaciones:
+      clean_table_name: geolocations
+      clean_primary_keys:
+      - id_geolocation
+      clean_z_order_by:
+      - id_geolocation
+    monedas:
+      clean_table_name: currencies
+      clean_primary_keys:
+      - id_currency
+      clean_z_order_by:
+      - id_currency
+    paises:
+      clean_table_name: countries
+      clean_primary_keys:
+      - id_country
+      clean_z_order_by:
+      - id_country
+    provincias:
+      clean_table_name: states
+      clean_primary_keys:
+      - id_state
+      clean_z_order_by:
+      - id_state
+    subtiposdepropiedad:
+      clean_table_name: property_subtypes
+      clean_primary_keys:
+      - id_property_subtype
+      clean_z_order_by:
+      - id_property_type
+    subzonasciudad:
+      clean_table_name: city_subzones
+      clean_primary_keys:
+      - id_city_subzone
+      clean_z_order_by:
+      - id_city
+    tiposdeoperacion:
+      clean_table_name: operation_types
+      clean_primary_keys:
+      - id_operation_type
+      clean_z_order_by:
+      - id_operation_type
+    tiposdepropiedad:
+      clean_table_name: property_types
+      clean_primary_keys:
+      - id_property_type
+      clean_z_order_by:
+      - id_property_type
+    zonasciudad:
+      clean_table_name: city_zones
+      clean_primary_keys:
+      - id_city_zone
+      clean_z_order_by:
+      - id_city
+  extra_query_template_params:
+    load_start_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_start_date'') }}'
+    load_end_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_end_date'') }}'

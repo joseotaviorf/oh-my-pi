@@ -1,0 +1,71 @@
+---
+database_name: datalake_realestate_clean
+table_name: interface_companies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.interface_companies). Grain: one row per agency linked to an external integration (id_interface_company). No date partitions; Delta Z-order on (id_company) — filter/join on Z-order columns for data skipping. Downstream: Mapping Navent agencies to external CRM company identifiers.
+columns:
+  id_interface_company:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.idinterfaceempresa
+    description: Surrogate key linking an agency to an external integration.
+  id_company:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.idempresa
+    description: |-
+      Navent agency synchronized through the connector. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_company_user:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.idusuarioempresa
+    description: Portal user that owns or authorized the integration mapping.
+  id_country:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.idpais
+    description: Country scope of the external company mapping.
+  id_external_company:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.idempresaexterna
+    description: Company identifier on the remote CRM or MLS system.
+  id_interface:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.idinterface
+    description: Integration definition governing this agency mapping.
+  pause_status:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.pausestatus
+    description: Connector pause state controlling whether sync jobs run for this agency.
+  processor_code:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.procesador
+    description: Implementation class or adapter code executing the integration.
+  is_enabled:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.habilitado
+    description: Agency mapping is active and eligible for connector runs.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_created:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.fechaalta
+    description: Moment when the agency-to-external mapping was first created.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  ts_deactivated:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.fechabaja
+    description: Moment when the mapping was deactivated on the connector.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.interfaceempresas.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

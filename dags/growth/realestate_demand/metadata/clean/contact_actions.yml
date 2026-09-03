@@ -1,0 +1,47 @@
+---
+database_name: datalake_realestate_clean
+table_name: contact_actions
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Event table from the RealEstate Navent MySQL portal (datalake_realestate_clean.contact_actions). Grain: one row per buyer or renter contact action on a listing (id_contact_action). No date partitions; Delta Z-order on (id_contact) — filter/join on Z-order columns for data skipping. Downstream: Lead funnel analytics and demand-generation reporting.
+columns:
+  id_contact_action:
+    lineage:
+    - datalake_realestate_raw.contactosacciones.idcontactoaccion
+    description: Surrogate key for a buyer or renter contact event on a listing.
+  id_action_type:
+    lineage:
+    - datalake_realestate_raw.contactosacciones.idtipoaccion
+    description: Type of contact action (call, email, chat, schedule visit, etc.).
+  id_contact:
+    lineage:
+    - datalake_realestate_raw.contactosacciones.idcontacto
+    description: |-
+      Demand-side contact profile that performed the action. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_source:
+    lineage:
+    - datalake_realestate_raw.contactosacciones.idorigen
+    description: Marketing or product surface that originated the contact (search, alert, etc.).
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.contactosacciones.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.contactosacciones.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  ts_occurred:
+    lineage:
+    - datalake_realestate_raw.contactosacciones.fecha
+    description: Moment when the buyer performed the contact action on the listing.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.contactosacciones.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

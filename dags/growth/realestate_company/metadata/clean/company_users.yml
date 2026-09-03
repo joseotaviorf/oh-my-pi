@@ -1,0 +1,155 @@
+---
+database_name: datalake_realestate_clean
+table_name: company_users
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.company_users). Grain: one row per portal user belonging to an agency (id_company_user). No date partitions; Delta Z-order on (id_company) — filter/join on Z-order columns for data skipping. Downstream: Agency staffing and access audits (password excluded from clean).
+columns:
+  id_company_user:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idusuarioempresa
+    description: Navent internal identifier for an agency staff portal user.
+  id_account:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idcuenta
+    description: Billing account linked to this user's publication activity.
+  id_city:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idCiudad
+    description: City associated with the user's office location.
+  id_company:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idempresa
+    description: |-
+      Agency employer for this portal user. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_country:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idPais
+    description: Country market where the user operates.
+  id_facebook:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idFacebook
+    description: Facebook profile identifier linked for social login or sharing.
+  id_geolocation:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idGeolocalizacion
+    description: Resolved geolocation for the user's office or service area.
+  id_language:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idIdioma
+    description: Preferred UI language for the portal session.
+  id_marital_status:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idEstadoCivil
+    description: Demographic label collected during user registration when applicable.
+  id_portal:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idportal
+    description: Portal brand where the user account was created.
+  id_state:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idProvincia
+    description: State or province of the user's office location.
+  id_user_type:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idtipodeusuario
+    description: Role category controlling permissions (admin, agent, back-office, etc.).
+  id_zone:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.idZona
+    description: Publication zone assigned to the user for plan and delivery rules.
+  department:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.area
+    description: Organizational department within the agency (sales, rentals, marketing).
+  email:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.email
+    description: Login email and primary notification address for the user.
+  email_username:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.mailusername
+    description: Local part of the email when stored separately from the domain.
+  first_name:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.nombre
+    description: Given name shown in the portal UI and on listing contact cards.
+  gender_code:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.sexo
+    description: Gender code collected during registration when applicable.
+  job_title:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.cargo
+    description: Job title displayed on listing contact cards.
+  last_name:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.apellido
+    description: Family name shown in the portal UI and on listing contact cards.
+  mobile_number:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.celNumero
+    description: Mobile phone digits without country prefix.
+  mobile_prefix:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.celPrefijo
+    description: Country or area prefix for the mobile phone.
+  phone_number:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.telefono
+    description: Office landline digits without prefix.
+  phone_prefix:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.prefijo
+    description: Country or area prefix for the office phone.
+  username:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.username
+    description: Unique login handle for the portal authentication system.
+  has_internal_email_permission:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.permisoenviomailinterno
+    description: User may send leads through Navent internal email relay.
+  is_blocked:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.bloqueado
+    description: User login is blocked and cannot access the portal.
+  is_email_valid:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.emailusuariovalido
+    description: Email address passed deliverability validation.
+  dt_deactivated:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.fbaja
+    description: Calendar date when the user account was deactivated.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_created:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.fechaalta
+    description: Moment when the user account was first registered.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  ts_last_logged_in:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.ultimavezqueselogueo
+    description: Moment of the user's most recent successful portal login.
+  ts_missing:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.falta
+    description: Moment when the user was flagged as missing required profile data.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.usuariosempresas.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

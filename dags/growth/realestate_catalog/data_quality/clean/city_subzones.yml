@@ -1,0 +1,28 @@
+---
+table_name: datalake_realestate_clean.city_subzones
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  city_subzone_name:
+    is_complete:
+      severity_level: Error
+  id_city:
+    is_complete:
+      severity_level: Error
+  id_city_subzone:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_city_zone:
+    is_complete:
+      severity_level: Error
+  id_country:
+    is_complete:
+      severity_level: Error
+  id_state:
+    is_complete:
+      severity_level: Error

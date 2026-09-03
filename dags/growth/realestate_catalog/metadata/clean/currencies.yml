@@ -1,0 +1,43 @@
+---
+database_name: datalake_realestate_clean
+table_name: currencies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.currencies). Grain: one row per currency (id_currency). No date partitions; Delta Z-order on (id_currency) — filter/join on Z-order columns for data skipping. Downstream: Multi-currency price display and billing conversion.
+columns:
+  id_currency:
+    lineage:
+    - datalake_realestate_raw.monedas.idmoneda
+    description: |-
+      Surrogate key for a currency in the Navent catalog. Delta Z-order column — include in filters for data skipping (no date partitions).
+  currency_code:
+    lineage:
+    - datalake_realestate_raw.monedas.codigomoneda
+    description: ISO currency code (ARS, BRL, USD, etc.).
+  currency_name:
+    lineage:
+    - datalake_realestate_raw.monedas.nombre
+    description: Full currency name for display in selectors.
+  currency_symbol:
+    lineage:
+    - datalake_realestate_raw.monedas.simbolo
+    description: Symbol shown alongside prices ($, R$, etc.).
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.monedas.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.monedas.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.monedas.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

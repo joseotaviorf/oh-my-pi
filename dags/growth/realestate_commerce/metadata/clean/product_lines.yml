@@ -1,0 +1,43 @@
+---
+database_name: datalake_realestate_clean
+table_name: product_lines
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.product_lines). Grain: one row per product-line grouping (id_product_line). No date partitions; Delta Z-order on (id_product_line) — filter/join on Z-order columns for data skipping. Downstream: Commercial reporting rollups above individual SKUs.
+columns:
+  id_product_line:
+    lineage:
+    - datalake_realestate_raw.lineasdeproducto.idlineadeproducto
+    description: |-
+      Surrogate key for a commercial product-line grouping. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_translation:
+    lineage:
+    - datalake_realestate_raw.lineasdeproducto.idtraduccion
+    description: Localization catalog key for the product-line display name.
+  product_line_name:
+    lineage:
+    - datalake_realestate_raw.lineasdeproducto.nombre
+    description: Commercial family name grouping related SKUs (publication, ads, data).
+  is_enabled:
+    lineage:
+    - datalake_realestate_raw.lineasdeproducto.habilitada
+    description: Product line is available for quoting on new orders.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.lineasdeproducto.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.lineasdeproducto.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.lineasdeproducto.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

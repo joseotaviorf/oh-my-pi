@@ -1,0 +1,22 @@
+---
+table_name: datalake_realestate_clean.company_users
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  email_username:
+    is_unique:
+      severity_level: Error
+  id_company_user:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_portal:
+    is_complete:
+      severity_level: Error
+  ts_missing:
+    is_complete:
+      severity_level: Error

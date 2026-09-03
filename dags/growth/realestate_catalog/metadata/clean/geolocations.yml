@@ -1,0 +1,123 @@
+---
+database_name: datalake_realestate_clean
+table_name: geolocations
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.geolocations). Grain: one row per canonical geolocation point (id_geolocation). No date partitions; Delta Z-order on (id_geolocation) — filter/join on Z-order columns for data skipping. Downstream: Address normalization and map pin placement.
+columns:
+  id_geolocation:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.idgeolocalizacion
+    description: |-
+      Surrogate key for a canonical geolocation point from the geocoder. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_geolocation_country:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.idgeolocalizacionpais
+    description: Country component identifier within the geolocation hierarchy.
+  id_geolocation_locality:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.idgeolocalizacionlocalidad
+    description: Locality component identifier within the geolocation hierarchy.
+  id_geolocation_state:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.idgeolocalizacionprovincia
+    description: State component identifier within the geolocation hierarchy.
+  admin_area_level_1_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.administrative_area_level_1
+    description: First-level administrative area label (state/province) from the geocoder.
+  admin_area_level_2_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.administrative_area_level_2
+    description: Second-level administrative area label (county/department) from the geocoder.
+  admin_area_level_3_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.administrative_area_level_3
+    description: Third-level administrative area label (district) from the geocoder.
+  bounds_northeast:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.northEast
+    description: Northeast corner of the bounding box enclosing the resolved place.
+  bounds_southwest:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.southwest
+    description: Southwest corner of the bounding box enclosing the resolved place.
+  country_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.country
+    description: Country name returned by the geocoder for this point.
+  geolocation_type:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.type
+    description: Geocoder classification of the place (street, neighborhood, city, etc.).
+  latitude:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.lat
+    description: Latitude coordinate of the resolved geolocation point.
+  locality_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.locality
+    description: City or locality name returned by the geocoder.
+  location_type:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.location_type
+    description: Precision indicator for the coordinate (rooftop, range, approximate).
+  longitude:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.lng
+    description: Longitude coordinate of the resolved geolocation point.
+  neighborhood_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.neighborhood
+    description: Neighborhood label when resolved below city level.
+  point_of_interest_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.point_of_interest
+    description: Named point of interest when the address references a landmark.
+  postal_code:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.postal_code
+    description: Postal code returned by the geocoder for this address.
+  premise_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.premise
+    description: Building or premise name when resolved by the geocoder.
+  route_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.route
+    description: Street name component of the resolved address.
+  street_address:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.streetaddress
+    description: Full street-line address returned by the geocoder.
+  street_number:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.street_number
+    description: Street number component of the resolved address.
+  sublocality_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.sublocality
+    description: Sub-locality or district label within the city.
+  subpremise_name:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.subpremise
+    description: Unit, apartment or sub-premise label within the building.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.geolocalizaciones.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

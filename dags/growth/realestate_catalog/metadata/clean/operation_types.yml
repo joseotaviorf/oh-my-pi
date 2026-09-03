@@ -1,0 +1,35 @@
+---
+database_name: datalake_realestate_clean
+table_name: operation_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.operation_types). Grain: one row per operation-type taxonomy entry (id_operation_type). No date partitions; Delta Z-order on (id_operation_type) — filter/join on Z-order columns for data skipping. Downstream: Sale vs rent and related operation classification.
+columns:
+  id_operation_type:
+    lineage:
+    - datalake_realestate_raw.tiposdeoperacion.idtipodeoperacion
+    description: |-
+      Surrogate key for a transaction-type taxonomy entry. Delta Z-order column — include in filters for data skipping (no date partitions).
+  operation_type_name:
+    lineage:
+    - datalake_realestate_raw.tiposdeoperacion.nombre
+    description: Display label for the operation (sale, rent, temporary rent, etc.).
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.tiposdeoperacion.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.tiposdeoperacion.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.tiposdeoperacion.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

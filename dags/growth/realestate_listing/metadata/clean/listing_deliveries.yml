@@ -1,0 +1,55 @@
+---
+database_name: datalake_realestate_clean
+table_name: listing_deliveries
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.listing_deliveries). Grain: one row per listing syndication delivery (id_listing_delivery). No date partitions; Delta Z-order on (id_listing) — filter/join on Z-order columns for data skipping. Downstream: Quarterly delivery compliance and partner syndication tracking.
+columns:
+  id_listing_delivery:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.identregaaviso
+    description: Surrogate key for a syndication or delivery fulfillment event.
+  id_account:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.idcuenta
+    description: Billing account that owns the delivery quota consumed.
+  id_company_user:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.idusuarioempresa
+    description: Agency user who triggered or authorized the delivery.
+  id_listing:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.idaviso
+    description: |-
+      Listing that was syndicated or delivered in this event. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_order:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.idpedido
+    description: Commercial order that funded the delivery.
+  id_order_item:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.iditempedido
+    description: Order line whose credits were debited for this delivery.
+  dt_delivered:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.fecha
+    description: Calendar date when the delivery obligation was fulfilled.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.entregasavisos.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

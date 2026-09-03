@@ -1,0 +1,64 @@
+---
+database_name: datalake_realestate_clean
+table_name: listings_online
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.listings_online). Grain: one row per listing online-publication snapshot (id_listing). No date partitions; Delta Z-order on (id_listing) — filter/join on Z-order columns for data skipping. Downstream: Portal visibility monitoring and publication SLA dashboards.
+columns:
+  id_listing:
+    lineage:
+    - datalake_realestate_raw.avisosonline.idaviso
+    description: |-
+      Listing whose online publication state is tracked in this snapshot. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_company:
+    lineage:
+    - datalake_realestate_raw.avisosonline.idempresa
+    description: Publishing agency responsible for the active online publication.
+  id_listing_delivery:
+    lineage:
+    - datalake_realestate_raw.avisosonline.identregaaviso
+    description: Delivery batch that authorized the current online publication period.
+  id_order:
+    lineage:
+    - datalake_realestate_raw.avisosonline.idpedido
+    description: Commercial order that paid for the active publication plan.
+  id_order_item:
+    lineage:
+    - datalake_realestate_raw.avisosonline.iditempedido
+    description: Order line item that consumed credits for the current online period.
+  id_publication_plan:
+    lineage:
+    - datalake_realestate_raw.avisosonline.idplandepublicacion
+    description: Active publication plan tier governing exposure and ranking boosts.
+  listing_level:
+    lineage:
+    - datalake_realestate_raw.avisosonline.nivelaviso
+    description: |-
+      Exposure level or highlight tier within the plan (e.g., standard, premium, super).
+  dt_published:
+    lineage:
+    - datalake_realestate_raw.avisosonline.fechapublicacion
+    description: Calendar date when the listing entered the current online publication period.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.avisosonline.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.avisosonline.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  ts_updated:
+    lineage:
+    - datalake_realestate_raw.avisosonline.fechamodificado
+    description: Moment when online publication attributes were last changed.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.avisosonline.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

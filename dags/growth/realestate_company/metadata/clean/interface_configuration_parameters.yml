@@ -1,0 +1,43 @@
+---
+database_name: datalake_realestate_clean
+table_name: interface_configuration_parameters
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.interface_configuration_parameters). Grain: one row per key/value parameter of an interface configuration (id_parameter). No date partitions; Delta Z-order on (id_interface) — filter/join on Z-order columns for data skipping. Downstream: Fine-grained connector settings consumed by syndication jobs.
+columns:
+  id_parameter:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurationparameters.idparameter
+    description: Surrogate key for a connector configuration key/value pair.
+  id_interface:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurationparameters.idinterface
+    description: |-
+      Integration definition that owns this configuration entry. Delta Z-order column — include in filters for data skipping (no date partitions).
+  parameter_name:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurationparameters.name
+    description: Configuration key consumed by the connector runtime (endpoint, queue, flag).
+  parameter_value:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurationparameters.value
+    description: Configuration value supplied to the connector for this key.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurationparameters.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurationparameters.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurationparameters.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

@@ -1,0 +1,51 @@
+---
+database_name: datalake_realestate_clean
+table_name: publication_plans
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.publication_plans). Grain: one row per publication-plan definition (id_publication_plan). No date partitions; Delta Z-order on (id_publication_plan) — filter/join on Z-order columns for data skipping. Downstream: Listing exposure tiers and plan-based ranking configuration.
+columns:
+  id_publication_plan:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.idplandepublicacion
+    description: |-
+      Surrogate key for a publication plan tier definition. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_sap_publication_plan:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.idplandepublicacionsap
+    description: SAP plan code used for billing and fulfillment reconciliation.
+  id_translation:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.idTraduccion
+    description: Localization catalog key for the plan display name.
+  plan_weight:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.peso
+    description: Relative weight used by the ranking engine to boost listings on this plan.
+  publication_plan_name:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.nombre
+    description: Commercial plan label shown to agencies (standard, featured, premium).
+  is_cloneable:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.esclonable
+    description: Plan configuration may be duplicated when provisioning trial accounts.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.planesdepublicacion.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

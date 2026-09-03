@@ -1,0 +1,91 @@
+---
+database_name: datalake_realestate_clean
+table_name: interface_configurations
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.interface_configurations). Grain: one row per third-party integration definition (id_interface). No date partitions; Delta Z-order on (id_interface) — filter/join on Z-order columns for data skipping. Downstream: Integration enablement and credential routing for syndication connectors.
+columns:
+  id_interface:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.idinterface
+    description: |-
+      Surrogate key for a third-party integration definition. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_country:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.idpais
+    description: Country market where this connector is deployed.
+  id_integrator:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.idintegrador
+    description: Vendor or technology partner that built the connector.
+  class_name:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.classname
+    description: Java or service class implementing the connector runtime.
+  default_id_company:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.defaultidempresa
+    description: Fallback agency used when the connector cannot resolve the owner.
+  default_id_user:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.defaultidusuario
+    description: Fallback portal user used for automated connector actions.
+  execution_hour_range_end:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.rangohorasejecucionfin
+    description: Latest hour of day (local) when scheduled connector runs may execute.
+  execution_hour_range_start:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.rangohorasejecucioninicio
+    description: Earliest hour of day (local) when scheduled connector runs may execute.
+  interface_name:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.nombre
+    description: Display name of the integration in the Navent admin console.
+  minutes_between_executions:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.minutosentreejecuciones
+    description: Minimum interval between automatic connector poll cycles.
+  parameters:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.parametros
+    description: Serialized connector configuration payload (endpoints, credentials references).
+  processor_code:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.procesador
+    description: Adapter code selecting the syndication protocol implementation.
+  is_check_only:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.justcheck
+    description: Connector runs in validation mode without writing to external systems.
+  is_enabled:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.habilitado
+    description: Integration is active and scheduled for execution.
+  is_image_download_enabled:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.descargarimagenes
+    description: Connector downloads and uploads listing images to the remote system.
+  is_online:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.isonline
+    description: Connector is currently running or reachable in the operations dashboard.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.interfaceconfigurations.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

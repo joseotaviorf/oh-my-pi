@@ -1,0 +1,81 @@
+---
+dag:
+  name: realestate_listing
+  owner: Data Growth
+  schedule_interval: 0 8,12,21 * * *
+  schedule_start_date: 2026, 9, 1
+  documentation:
+    dag_purpose: |-
+      CDC pipeline for RealEstate (Navent) MySQL — listing context. Part of the Navent → QuintoAndar migration POC (RD-3335, parent RD-3332). CDC ingestion of RealEstate listing entities (classified ads, features, geolocation, online state, rankings, phones and third-party interface sync). Highest-volume slice of the Navent RealEstate MySQL database.
+
+      DATA LINEAGE: MySQL (OLTP) → datalake_realestate_raw → datalake_realestate_clean
+      SCHEDULE: 3× daily at minute 0 UTC (08:00, 12:00, 21:00 slots).
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: realestate
+  custom_schema: realestate
+  source_schema: realestate
+  dbutils_secret_key: REALESTATE_DB
+  tables_customization:
+    avisos:
+      clean_table_name: listings
+      clean_primary_keys:
+      - id_listing
+      clean_z_order_by:
+      - id_listing
+    avisoscaracteristicas:
+      clean_table_name: listing_features
+      clean_primary_keys:
+      - id_listing_feature
+      clean_z_order_by:
+      - id_listing
+    avisosgeolocationdata:
+      clean_table_name: listing_geolocation_data
+      clean_primary_keys:
+      - id_listing
+      clean_z_order_by:
+      - id_listing
+    avisosonline:
+      clean_table_name: listings_online
+      clean_primary_keys:
+      - id_listing
+      clean_z_order_by:
+      - id_listing
+    avisosrealestateranking:
+      clean_table_name: listing_rankings
+      clean_primary_keys: [id_listing]
+      clean_z_order_by: [id_listing]
+    avisostiposdeoperaciones:
+      clean_table_name: listing_operation_types
+      clean_primary_keys:
+      - id_listing_operation_type
+      clean_z_order_by:
+      - id_listing
+    entregasavisos:
+      clean_table_name: listing_deliveries
+      clean_primary_keys:
+      - id_listing_delivery
+      clean_z_order_by:
+      - id_listing
+    interfaceavisodata:
+      clean_table_name: interface_listing_data
+      raw_primary_keys:
+      - idaviso
+      - idinterface
+      clean_primary_keys:
+      - id_listing
+      - id_interface
+      clean_z_order_by:
+      - id_listing
+      - id_interface
+    telefonosaviso:
+      clean_table_name: listing_phones
+      clean_primary_keys:
+      - id_listing_phone
+      clean_z_order_by:
+      - id_listing
+  extra_query_template_params:
+    load_start_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_start_date'') }}'
+    load_end_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_end_date'') }}'

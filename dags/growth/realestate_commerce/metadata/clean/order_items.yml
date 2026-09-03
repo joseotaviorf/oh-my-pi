@@ -1,0 +1,87 @@
+---
+database_name: datalake_realestate_clean
+table_name: order_items
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.order_items). Grain: one row per sales-order line item (id_order_item). No date partitions; Delta Z-order on (id_order) — filter/join on Z-order columns for data skipping. Downstream: SKU-level revenue breakdown and fulfillment tracking.
+columns:
+  id_order_item:
+    lineage:
+    - datalake_realestate_raw.itemspedido.iditempedido
+    description: Surrogate key for a line item on a commercial sales order.
+  id_account:
+    lineage:
+    - datalake_realestate_raw.itemspedido.idcuenta
+    description: Billing account that owns credits consumed by this line.
+  id_country:
+    lineage:
+    - datalake_realestate_raw.itemspedido.idpais
+    description: Country market where this product line is fulfilled.
+  id_order:
+    lineage:
+    - datalake_realestate_raw.itemspedido.idpedido
+    description: |-
+      Parent sales order that groups this line item. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_product:
+    lineage:
+    - datalake_realestate_raw.itemspedido.idproducto
+    description: Sellable SKU purchased on this line.
+  id_sap_sales_order_position:
+    lineage:
+    - datalake_realestate_raw.itemspedido.idposicionpedidodeventasap
+    description: SAP line-position number within the parent sales order.
+  id_zone:
+    lineage:
+    - datalake_realestate_raw.itemspedido.idzona
+    description: Publication zone where the purchased credits may be consumed.
+  amount:
+    lineage:
+    - datalake_realestate_raw.itemspedido.monto
+    description: Extended line total (unit price × quantity minus line discounts).
+  consumed_quantity:
+    lineage:
+    - datalake_realestate_raw.itemspedido.consumidos
+    description: Credits or units already used from this purchase.
+  item_position:
+    lineage:
+    - datalake_realestate_raw.itemspedido.posicion
+    description: Sequence number of the line within the parent order.
+  list_unit_price:
+    lineage:
+    - datalake_realestate_raw.itemspedido.preciounitariodelista
+    description: Catalog list price per unit before negotiated discounts.
+  quantity:
+    lineage:
+    - datalake_realestate_raw.itemspedido.cantidad
+    description: Number of units or credits purchased on this line.
+  unit_price:
+    lineage:
+    - datalake_realestate_raw.itemspedido.preciounitario
+    description: Negotiated price per unit charged on the order.
+  is_non_deliverable:
+    lineage:
+    - datalake_realestate_raw.itemspedido.noentregable
+    description: Product on this line does not generate syndication deliveries.
+  dt_expired:
+    lineage:
+    - datalake_realestate_raw.itemspedido.fechadevencimiento
+    description: Calendar date when unused credits on this line expire.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.itemspedido.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.itemspedido.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.itemspedido.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

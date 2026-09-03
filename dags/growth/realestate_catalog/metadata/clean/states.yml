@@ -1,0 +1,55 @@
+---
+database_name: datalake_realestate_clean
+table_name: states
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.states). Grain: one row per state or province (id_state). No date partitions; Delta Z-order on (id_state) — filter/join on Z-order columns for data skipping. Downstream: Regional reporting and SAP province crosswalk.
+columns:
+  id_state:
+    lineage:
+    - datalake_realestate_raw.provincias.idprovincia
+    description: |-
+      Surrogate key for a state or province within a country. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_country:
+    lineage:
+    - datalake_realestate_raw.provincias.idpais
+    description: Country that contains this state in the geographic hierarchy.
+  id_sap_state:
+    lineage:
+    - datalake_realestate_raw.provincias.idprovinciasap
+    description: SAP province code used for ERP geography reconciliation.
+  display_order:
+    lineage:
+    - datalake_realestate_raw.provincias.orden
+    description: Sort order for state names in portal dropdowns.
+  state_abbreviation:
+    lineage:
+    - datalake_realestate_raw.provincias.sigla
+    description: Short code printed on addresses and filters (e.g., BA, SP).
+  state_name:
+    lineage:
+    - datalake_realestate_raw.provincias.nombre
+    description: Full state or province name shown in geo selectors.
+  state_preposition:
+    lineage:
+    - datalake_realestate_raw.provincias.preposicion
+    description: Grammatical preposition used before the state name in localized UI copy.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.provincias.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.provincias.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.provincias.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

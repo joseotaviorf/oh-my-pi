@@ -1,0 +1,83 @@
+---
+database_name: datalake_realestate_clean
+table_name: products
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.products). Grain: one row per sellable product or SKU (id_product). No date partitions; Delta Z-order on (id_product) — filter/join on Z-order columns for data skipping. Downstream: Publication-plan catalog and SAP material crosswalk.
+columns:
+  id_product:
+    lineage:
+    - datalake_realestate_raw.productos.idproducto
+    description: |-
+      Navent internal identifier for a sellable product or SKU. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_product_line:
+    lineage:
+    - datalake_realestate_raw.productos.idlineadeproducto
+    description: Commercial product line grouping this SKU for reporting rollups.
+  id_product_subline:
+    lineage:
+    - datalake_realestate_raw.productos.idsublineadeproducto
+    description: Finer sub-line classification within the product line.
+  id_sap_material:
+    lineage:
+    - datalake_realestate_raw.productos.idmaterialsap
+    description: SAP material number cross-referenced for fulfillment and revenue.
+  id_zone:
+    lineage:
+    - datalake_realestate_raw.productos.idzona
+    description: Publication zone where credits from this SKU may be consumed.
+  concurrent_delivery_limit:
+    lineage:
+    - datalake_realestate_raw.productos.limiteentregaensimultaneo
+    description: Maximum simultaneous syndication deliveries allowed per listing.
+  daily_delivery_limit:
+    lineage:
+    - datalake_realestate_raw.productos.limiteentregapordia
+    description: Maximum syndication deliveries allowed per listing per day.
+  initial_quantity:
+    lineage:
+    - datalake_realestate_raw.productos.cantidadinicial
+    description: Default credit bundle size when the product is first purchased.
+  monthly_delivery_limit:
+    lineage:
+    - datalake_realestate_raw.productos.limiteentregapormes
+    description: Maximum syndication deliveries allowed per listing per month.
+  product_name:
+    lineage:
+    - datalake_realestate_raw.productos.nombre
+    description: Commercial name shown in the order catalog and invoices.
+  validity_days:
+    lineage:
+    - datalake_realestate_raw.productos.diasvigencia
+    description: Number of days purchased credits remain valid after activation.
+  is_cloneable:
+    lineage:
+    - datalake_realestate_raw.productos.esclonable
+    description: Product credits may be duplicated when cloning a publication package.
+  is_enabled:
+    lineage:
+    - datalake_realestate_raw.productos.habilitado
+    description: SKU is available for new orders in the catalog.
+  is_unlimited_delivery:
+    lineage:
+    - datalake_realestate_raw.productos.entregailimitada
+    description: Product removes delivery caps for syndication consumption.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.productos.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.productos.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.productos.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

@@ -1,0 +1,43 @@
+---
+database_name: datalake_realestate_clean
+table_name: development_stages
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.development_stages). Grain: one row per development-stage label (id_development_stage). No date partitions; Delta Z-order on (id_development_stage) — filter/join on Z-order columns for data skipping. Downstream: New-development inventory segmentation.
+columns:
+  id_development_stage:
+    lineage:
+    - datalake_realestate_raw.etapasdedesarrollo.idetapadedesarrollo
+    description: |-
+      Surrogate key for a new-development stage label. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_country:
+    lineage:
+    - datalake_realestate_raw.etapasdedesarrollo.idpais
+    description: Country where this development-stage label is valid.
+  development_stage_name:
+    lineage:
+    - datalake_realestate_raw.etapasdedesarrollo.nombre
+    description: Display label for the construction stage on new-development listings.
+  display_order:
+    lineage:
+    - datalake_realestate_raw.etapasdedesarrollo.orden
+    description: Sort order for stage names in portal dropdowns.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.etapasdedesarrollo.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.etapasdedesarrollo.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.etapasdedesarrollo.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

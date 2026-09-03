@@ -1,0 +1,39 @@
+---
+database_name: datalake_realestate_clean
+table_name: property_subtypes
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.property_subtypes). Grain: one row per property-subtype taxonomy entry (id_property_subtype). No date partitions; Delta Z-order on (id_property_type) — filter/join on Z-order columns for data skipping. Downstream: Finer listing classification under each property type.
+columns:
+  id_property_subtype:
+    lineage:
+    - datalake_realestate_raw.subtiposdepropiedad.idsubtipodepropiedad
+    description: Surrogate key for a property-subtype taxonomy entry.
+  id_property_type:
+    lineage:
+    - datalake_realestate_raw.subtiposdepropiedad.idtipodepropiedad
+    description: |-
+      Parent property type that owns this subtype. Delta Z-order column — include in filters for data skipping (no date partitions).
+  property_subtype_name:
+    lineage:
+    - datalake_realestate_raw.subtiposdepropiedad.nombre
+    description: Display label for the finer classification (duplex, penthouse, etc.).
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.subtiposdepropiedad.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.subtiposdepropiedad.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.subtiposdepropiedad.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

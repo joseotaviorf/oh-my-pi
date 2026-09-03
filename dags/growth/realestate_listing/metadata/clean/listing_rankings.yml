@@ -1,0 +1,110 @@
+---
+database_name: datalake_realestate_clean
+table_name: listing_rankings
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Event table from the RealEstate Navent MySQL portal (datalake_realestate_clean.listing_rankings). Grain: one row per listing search-performance snapshot (id_listing). No date partitions; Delta Z-order on (id_listing) — filter/join on Z-order columns for data skipping. Downstream: Search-position analytics, impression/lead funnels and conversion-rate reporting.
+columns:
+  id_listing:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.idaviso
+    description: |-
+      Listing whose search-traffic and conversion metrics are captured in this snapshot row. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_country:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.idpais
+    description: |-
+      Country market context for the ranking metrics (plan pricing and search inventory vary by country).
+  id_publication_area:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.idareadepublicacion
+    description: |-
+      Publication area dimension within the plan/country used to segment ranking results.
+  id_publication_plan:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.idplandepublicacion
+    description: |-
+      Publication plan tier whose exposure rules apply when interpreting ranking position.
+  conversion_rate:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.convertionrate
+    description: Ratio of leads to impressions for this listing in the ranking context.
+  impression_count:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.impresiones
+    description: Search-result impressions accumulated for this listing in the ranking window.
+  lead_count:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.leads
+    description: Buyer inquiries generated from impressions in the ranking window.
+  lead_score:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.scoreleads
+    description: Weighted lead-quality score used to rank listings against peers.
+  new_ranking_position:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.rankingnew
+    description: Latest computed search position after the most recent ranking refresh.
+  ranking_position:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.ranking
+    description: Current search results position for the listing in the ranking context.
+  ranking_score:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.score
+    description: Composite score combining impressions, leads and weights that drives sort order.
+  ranking_type:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.tipo
+    description: Ranking algorithm or metric family label (e.g., organic vs sponsored placement).
+  ranking_weight:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.peso
+    description: Boost multiplier applied by the ranking engine for plan or quality signals.
+  record_count:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.ctdadregistros
+    description: Rows contributing to the aggregated metrics for this ranking snapshot.
+  total_impression_count:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.impresionestotales
+    description: Cumulative impressions across all contributing records in the window.
+  total_lead_count:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.leadstotales
+    description: Cumulative leads across all contributing records in the window.
+  total_record_count:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.ctdadregistrostotales
+    description: Total underlying records rolled into the aggregated ranking metrics.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_created:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.fechacreacion
+    description: Moment when this ranking snapshot row was first inserted in Navent.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  ts_published:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.fechapublicacion
+    description: Moment when the ranking metrics became visible to internal reporting consumers.
+  ts_updated:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.fechamodificado
+    description: Moment when ranking metrics or positions were last recalculated.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.avisosrealestateranking.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

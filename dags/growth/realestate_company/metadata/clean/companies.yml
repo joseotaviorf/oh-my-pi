@@ -1,0 +1,203 @@
+---
+database_name: datalake_realestate_clean
+table_name: companies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.companies). Grain: one row per real-estate agency or brokerage (id_company). No date partitions; Delta Z-order on (id_company) — filter/join on Z-order columns for data skipping. Downstream: Agency onboarding, billing-account matching and portal administration.
+columns:
+  id_company:
+    lineage:
+    - datalake_realestate_raw.empresas.idempresa
+    description: |-
+      Navent internal identifier for the real-estate agency or brokerage profile. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_agency_type:
+    lineage:
+    - datalake_realestate_raw.empresas.idtipodeinmobiliaria
+    description: Commercial agency category controlling plan eligibility and onboarding rules.
+  id_city:
+    lineage:
+    - datalake_realestate_raw.empresas.idciudad
+    description: City where the agency headquarters or primary office is registered.
+  id_country:
+    lineage:
+    - datalake_realestate_raw.empresas.idpais
+    description: Country market where the agency operates and is billed.
+  id_financial_status:
+    lineage:
+    - datalake_realestate_raw.empresas.idestadofinanciero
+    description: Account receivable standing used to gate publication and ordering.
+  id_group:
+    lineage:
+    - datalake_realestate_raw.empresas.idgrupo
+    description: Commercial group or franchise network the agency belongs to.
+  id_iw_branch:
+    lineage:
+    - datalake_realestate_raw.empresas.idSucursalIW
+    description: ImovelWeb branch identifier for cross-portal agency mapping.
+  id_parent_company:
+    lineage:
+    - datalake_realestate_raw.empresas.idempresapadre
+    description: Parent agency in a corporate hierarchy when this office is a branch.
+  id_portal:
+    lineage:
+    - datalake_realestate_raw.empresas.idportal
+    description: Primary Navent portal brand where the agency profile is published.
+  id_sap_client:
+    lineage:
+    - datalake_realestate_raw.empresas.idclientesap
+    description: SAP customer number used for invoicing and revenue recognition.
+  id_state:
+    lineage:
+    - datalake_realestate_raw.empresas.idprovincia
+    description: State or province where the agency is legally registered.
+  id_tax:
+    lineage:
+    - datalake_realestate_raw.empresas.cuit
+    description: Government tax identifier (CUIT/CNPJ-style) on the agency legal entity.
+  id_vat_condition:
+    lineage:
+    - datalake_realestate_raw.empresas.idcondicioniva
+    description: VAT or tax regime category applied to agency invoices.
+  id_video:
+    lineage:
+    - datalake_realestate_raw.empresas.videoid
+    description: External video-hosting asset identifier embedded on the agency profile.
+  id_zone:
+    lineage:
+    - datalake_realestate_raw.empresas.idzona
+    description: Publication geography zone assigned to the agency for plan pricing.
+  about_us_text:
+    lineage:
+    - datalake_realestate_raw.empresas.quienesSomos
+    description: Marketing blurb displayed on the agency public profile page.
+  address:
+    lineage:
+    - datalake_realestate_raw.empresas.direccion
+    description: Street address of the agency primary office.
+  broker_count:
+    lineage:
+    - datalake_realestate_raw.empresas.cantidadCorredores
+    description: Number of licensed brokers associated with the agency profile.
+  company_description:
+    lineage:
+    - datalake_realestate_raw.empresas.descripcion
+    description: Long-form description shown on the agency landing page.
+  company_name:
+    lineage:
+    - datalake_realestate_raw.empresas.denominacion
+    description: Trade name displayed to buyers on listings and the agency page.
+  company_segment:
+    lineage:
+    - datalake_realestate_raw.empresas.segmento
+    description: Commercial segment label used for sales targeting and reporting.
+  company_slug:
+    lineage:
+    - datalake_realestate_raw.empresas.slug
+    description: URL-friendly slug for the agency branded minisite path.
+  contact_email:
+    lineage:
+    - datalake_realestate_raw.empresas.email
+    description: Primary contact email for agency administration and billing.
+  cover_photo_url:
+    lineage:
+    - datalake_realestate_raw.empresas.fotoPortadaUrl
+    description: Banner image URL on the agency public profile.
+  employee_count:
+    lineage:
+    - datalake_realestate_raw.empresas.cantidadEmpleados
+    description: Reported staff size used for commercial segmentation.
+  legal_name:
+    lineage:
+    - datalake_realestate_raw.empresas.razonsocial
+    description: Registered legal entity name on contracts and tax documents.
+  license_number:
+    lineage:
+    - datalake_realestate_raw.empresas.licencia
+    description: Real-estate brokerage license number when required by local regulation.
+  logo_url:
+    lineage:
+    - datalake_realestate_raw.empresas.urlLogo
+    description: Agency logo image served on listings and profile pages.
+  phone_number:
+    lineage:
+    - datalake_realestate_raw.empresas.telefono
+    description: Main published phone number for the agency office.
+  postal_code:
+    lineage:
+    - datalake_realestate_raw.empresas.codigopostal
+    description: Postal code of the agency primary office address.
+  rental_chat_url:
+    lineage:
+    - datalake_realestate_raw.empresas.urlchatalquiler
+    description: Chat widget URL dedicated to rental inquiries for the agency.
+  rental_email:
+    lineage:
+    - datalake_realestate_raw.empresas.emailalquiler
+    description: Email inbox monitored for rental lead notifications.
+  sales_chat_url:
+    lineage:
+    - datalake_realestate_raw.empresas.urlchatventa
+    description: Chat widget URL dedicated to sales inquiries for the agency.
+  video_provider:
+    lineage:
+    - datalake_realestate_raw.empresas.videoprovider
+    description: Hosting platform for the agency profile video (YouTube, Vimeo, etc.).
+  video_url:
+    lineage:
+    - datalake_realestate_raw.empresas.videoUrl
+    description: Public URL of the agency promotional video on the profile page.
+  website_url:
+    lineage:
+    - datalake_realestate_raw.empresas.url
+    description: Agency corporate website linked from the Navent profile.
+  is_approved:
+    lineage:
+    - datalake_realestate_raw.empresas.aprobada
+    description: Agency passed Navent onboarding and compliance approval.
+  is_enabled:
+    lineage:
+    - datalake_realestate_raw.empresas.habilitada
+    description: Agency account is active and may publish listings.
+  is_manually_blocked:
+    lineage:
+    - datalake_realestate_raw.empresas.bloqueadomanual
+    description: Operations team manually blocked the agency from publishing.
+  is_top_500:
+    lineage:
+    - datalake_realestate_raw.empresas.top500
+    description: Agency is flagged as a top commercial account for prioritization.
+  is_visible:
+    lineage:
+    - datalake_realestate_raw.empresas.visible
+    description: Agency profile is shown publicly on the portal directory.
+  dt_missing:
+    lineage:
+    - datalake_realestate_raw.empresas.falta
+    description: Calendar date when the agency was flagged as missing required profile data.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.empresas.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.empresas.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  ts_deactivated:
+    lineage:
+    - datalake_realestate_raw.empresas.fbaja
+    description: Moment when the agency account was deactivated.
+  ts_updated:
+    lineage:
+    - datalake_realestate_raw.empresas.fechamodificado
+    description: Moment when agency profile or settings were last modified.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.empresas.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

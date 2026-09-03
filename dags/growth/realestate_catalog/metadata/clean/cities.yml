@@ -1,0 +1,63 @@
+---
+database_name: datalake_realestate_clean
+table_name: cities
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.cities). Grain: one row per city (id_city). No date partitions; Delta Z-order on (id_city) — filter/join on Z-order columns for data skipping. Downstream: City-level listing distribution and geo analytics.
+columns:
+  id_city:
+    lineage:
+    - datalake_realestate_raw.ciudades.idciudad
+    description: |-
+      Surrogate key for a city in the Navent geographic catalog. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_country:
+    lineage:
+    - datalake_realestate_raw.ciudades.idpais
+    description: Country that contains this city.
+  id_original:
+    lineage:
+    - datalake_realestate_raw.ciudades.idoriginal
+    description: Legacy city identifier preserved from a prior system migration.
+  id_region:
+    lineage:
+    - datalake_realestate_raw.ciudades.idregion
+    description: Macro-region grouping used for commercial reporting above state level.
+  id_state:
+    lineage:
+    - datalake_realestate_raw.ciudades.idprovincia
+    description: State or province that contains this city.
+  city_aliases:
+    lineage:
+    - datalake_realestate_raw.ciudades.aliases
+    description: Alternate spellings or names used for search matching.
+  city_name:
+    lineage:
+    - datalake_realestate_raw.ciudades.nombre
+    description: Canonical city name displayed in filters and listing addresses.
+  city_preposition:
+    lineage:
+    - datalake_realestate_raw.ciudades.preposicion
+    description: Grammatical preposition used before the city name in localized UI copy.
+  is_capital:
+    lineage:
+    - datalake_realestate_raw.ciudades.escapital
+    description: City is the national or state capital for geo hierarchy rules.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.ciudades.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.ciudades.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.ciudades.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

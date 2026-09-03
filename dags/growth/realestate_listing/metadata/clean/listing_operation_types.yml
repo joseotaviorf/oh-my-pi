@@ -1,0 +1,51 @@
+---
+database_name: datalake_realestate_clean
+table_name: listing_operation_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.listing_operation_types). Grain: one row per listing-to-operation-type price row (id_listing_operation_type). No date partitions; Delta Z-order on (id_listing) — filter/join on Z-order columns for data skipping. Downstream: Sale vs rent availability and multi-operation pricing on classified inventory.
+columns:
+  id_listing_operation_type:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.idavisostiposdeoperaciones
+    description: Surrogate key for a price row linking a listing to an operation type.
+  id_currency:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.idmoneda
+    description: Currency in which the operation price is expressed.
+  id_listing:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.idaviso
+    description: |-
+      Listing offering this operation (sale, rent, temporary rent, etc.). Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_operation_type:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.idtipodeoperacion
+    description: Transaction type being priced on this row.
+  extra_price_amount:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.precioextra
+    description: Additional charge on top of the base price for this operation.
+  price_amount:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.precio
+    description: Advertised price for this operation type on the listing.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.avisostiposdeoperaciones.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

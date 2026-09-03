@@ -1,0 +1,383 @@
+---
+database_name: datalake_realestate_clean
+table_name: listings
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.listings). Grain: one row per classified property listing (id_listing). No date partitions; Delta Z-order on (id_listing) — filter/join on Z-order columns for data skipping. Downstream: Navent migration inventory, listing reconciliation and search-ranking analytics.
+columns:
+  id_listing:
+    lineage:
+    - datalake_realestate_raw.avisos.idaviso
+    description: |-
+      Navent internal identifier for this property listing advertisement; anchors child features, phones, rankings and syndication rows. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_account:
+    lineage:
+    - datalake_realestate_raw.avisos.idcuenta
+    description: |-
+      Billing account charged for publication fees and plan consumption tied to this listing.
+  id_agreed_commission_currency:
+    lineage:
+    - datalake_realestate_raw.avisos.idmonedaconvenida
+    description: |-
+      Currency code used to express the commission amount agreed with co-brokers on this listing.
+  id_beach:
+    lineage:
+    - datalake_realestate_raw.avisos.idplaya
+    description: |-
+      Coastal or beach-zone taxonomy identifier applied to waterfront listings in supported markets.
+  id_city:
+    lineage:
+    - datalake_realestate_raw.avisos.idciudad
+    description: |-
+      Normalized city catalog identifier for the property address used in search filters and regional reporting.
+  id_city_subzone:
+    lineage:
+    - datalake_realestate_raw.avisos.idsubzonaciudad
+    description: Finer neighborhood or sub-zone within the city for hyper-local search targeting.
+  id_company:
+    lineage:
+    - datalake_realestate_raw.avisos.idempresa
+    description: Publishing agency that owns and manages this classified advertisement.
+  id_company_user:
+    lineage:
+    - datalake_realestate_raw.avisos.idusuarioempresa
+    description: Agency staff member assigned as the listing contact and editor in the portal.
+  id_country:
+    lineage:
+    - datalake_realestate_raw.avisos.idpais
+    description: |-
+      Country market where the property is published; scopes currency, tax display and regional rules.
+  id_currency:
+    lineage:
+    - datalake_realestate_raw.avisos.idmoneda
+    description: Currency used to display the advertised price on the listing detail page.
+  id_delivery:
+    lineage:
+    - datalake_realestate_raw.avisos.identrega
+    description: |-
+      Syndication delivery batch that fulfilled quarterly or plan-based publication quotas for this listing.
+  id_development_stage:
+    lineage:
+    - datalake_realestate_raw.avisos.idetapadedesarrollo
+    description: |-
+      Construction or project stage label for new-development inventory (e.g., under construction, ready).
+  id_external_original:
+    lineage:
+    - datalake_realestate_raw.avisos.idoriginalexterna
+    description: Identifier of this listing in the upstream CRM or MLS before Navent ingestion.
+  id_measurement_unit:
+    lineage:
+    - datalake_realestate_raw.avisos.idunidaddemedida
+    description: |-
+      Unit of measure for area fields (square meters, hectares, etc.) shown on the listing.
+  id_operation_type:
+    lineage:
+    - datalake_realestate_raw.avisos.idtipodeoperacion
+    description: |-
+      Primary transaction type advertised (sale, rent, etc.) when a single operation is highlighted.
+  id_parent_listing:
+    lineage:
+    - datalake_realestate_raw.avisos.idavisopadre
+    description: |-
+      Parent listing identifier when this row represents a unit or child of a multi-unit development.
+  id_photo:
+    lineage:
+    - datalake_realestate_raw.avisos.idfoto
+    description: Primary cover image asset displayed on search results and the listing gallery.
+  id_portal:
+    lineage:
+    - datalake_realestate_raw.avisos.idportal
+    description: |-
+      Navent portal brand or site where this listing is published (e.g., ZonaProp, ImovelWeb).
+  id_posting_type:
+    lineage:
+    - datalake_realestate_raw.avisos.idtipodeposting
+    description: |-
+      Publication channel or posting modality that controls how the listing is exposed.
+  id_property_subtype:
+    lineage:
+    - datalake_realestate_raw.avisos.idsubtipodepropiedad
+    description: |-
+      Finer property classification under the main property type (e.g., duplex under apartment).
+  id_property_type:
+    lineage:
+    - datalake_realestate_raw.avisos.idtipodepropiedad
+    description: |-
+      High-level property category used for search facets (house, apartment, land, commercial).
+  id_shared_commission_currency:
+    lineage:
+    - datalake_realestate_raw.avisos.idmonedacompartir
+    description: Currency code for the commission amount offered to sharing brokers.
+  id_source:
+    lineage:
+    - datalake_realestate_raw.avisos.idorigen
+    description: |-
+      Lead or ingestion channel that created the listing (manual entry, feed, API, etc.).
+  id_state:
+    lineage:
+    - datalake_realestate_raw.avisos.idprovincia
+    description: State or province catalog identifier for the property location.
+  id_value_zone:
+    lineage:
+    - datalake_realestate_raw.avisos.idzonadevalor
+    description: |-
+      Valuation zone used by pricing models and market analytics for the property area.
+  id_zone:
+    lineage:
+    - datalake_realestate_raw.avisos.idzona
+    description: |-
+      Publication geography zone that drives plan pricing, delivery limits and regional exposure.
+  address:
+    lineage:
+    - datalake_realestate_raw.avisos.direccion
+    description: Street address text shown to buyers for the property location.
+  address_complement:
+    lineage:
+    - datalake_realestate_raw.avisos.direccion_complemento
+    description: Additional address detail such as floor, apartment number or building wing.
+  agreed_commission_amount:
+    lineage:
+    - datalake_realestate_raw.avisos.comisionconvenida
+    description: Commission value agreed with cooperating brokers when the listing is shared.
+  alternative_company_name:
+    lineage:
+    - datalake_realestate_raw.avisos.nombreempresaalternativo
+    description: Alternate trade name displayed instead of the registered agency name.
+  available_unit_count:
+    lineage:
+    - datalake_realestate_raw.avisos.disponibles
+    description: |-
+      Number of units still available when the listing advertises a multi-unit development.
+  bathroom_count:
+    lineage:
+    - datalake_realestate_raw.avisos.banos
+    description: Number of full bathrooms advertised on the listing detail page.
+  bedroom_count:
+    lineage:
+    - datalake_realestate_raw.avisos.habitaciones
+    description: Number of bedrooms advertised on the listing detail page.
+  city_name:
+    lineage:
+    - datalake_realestate_raw.avisos.ciudad
+    description: |-
+      Free-text city label entered by the publisher; prefer id_city for normalized geo joins.
+  commission_comments:
+    lineage:
+    - datalake_realestate_raw.avisos.comisioncomentarios
+    description: Free-text notes about commission splits or sharing arrangements.
+  condo_fee_amount:
+    lineage:
+    - datalake_realestate_raw.avisos.valorcondominio
+    description: |-
+      Monthly condominium or HOA fee amount communicated to prospective tenants or buyers.
+  contact_data:
+    lineage:
+    - datalake_realestate_raw.avisos.datoscontacto
+    description: Serialized contact payload (phones, emails) exposed on the listing lead form.
+  contact_email:
+    lineage:
+    - datalake_realestate_raw.avisos.email
+    description: Primary email address buyers use to inquire about this property.
+  covered_area_m2:
+    lineage:
+    - datalake_realestate_raw.avisos.metroscubiertos
+    description: Enclosed living area in square meters used for price-per-area calculations.
+  extra_price_amount:
+    lineage:
+    - datalake_realestate_raw.avisos.precioextra
+    description: Supplemental price component on top of the base advertised amount.
+  floor_number:
+    lineage:
+    - datalake_realestate_raw.avisos.piso
+    description: Floor level of the unit within the building.
+  garage_count:
+    lineage:
+    - datalake_realestate_raw.avisos.garages
+    description: Number of parking spaces or garages included with the property.
+  half_bathroom_count:
+    lineage:
+    - datalake_realestate_raw.avisos.mediosbanos
+    description: Number of half bathrooms (toilet only) advertised on the listing.
+  internal_key:
+    lineage:
+    - datalake_realestate_raw.avisos.claveinterna
+    description: |-
+      Agency-internal reference code used by the publisher to track the listing offline.
+  listing_description:
+    lineage:
+    - datalake_realestate_raw.avisos.descripcion
+    description: |-
+      Long-form property description shown on the listing detail page (local language).
+  listing_description_en:
+    lineage:
+    - datalake_realestate_raw.avisos.descripcion_en
+    description: English translation of the property description for bilingual portals.
+  listing_image_url:
+    lineage:
+    - datalake_realestate_raw.avisos.imagenaviso
+    description: URL of the main listing image served on search and detail pages.
+  listing_reference:
+    lineage:
+    - datalake_realestate_raw.avisos.referencia
+    description: Publisher reference code shown to buyers alongside the internal key.
+  listing_status:
+    lineage:
+    - datalake_realestate_raw.avisos.estado
+    description: |-
+      Lifecycle status code controlling visibility and editability (active, paused, sold, etc.).
+  listing_title:
+    lineage:
+    - datalake_realestate_raw.avisos.titulo
+    description: |-
+      Headline title displayed on search cards and the listing detail page (local language).
+  listing_title_en:
+    lineage:
+    - datalake_realestate_raw.avisos.titulo_en
+    description: English headline for bilingual portal presentation.
+  map_latitude:
+    lineage:
+    - datalake_realestate_raw.avisos.mapalatitud
+    description: Latitude coordinate for the map pin on the listing detail page.
+  map_longitude:
+    lineage:
+    - datalake_realestate_raw.avisos.mapalongitud
+    description: Longitude coordinate for the map pin on the listing detail page.
+  map_street:
+    lineage:
+    - datalake_realestate_raw.avisos.mapacalle
+    description: Street label used on the embedded map widget.
+  occupant_count:
+    lineage:
+    - datalake_realestate_raw.avisos.numeropersonas
+    description: Maximum number of occupants the property is advertised to accommodate.
+  postal_code:
+    lineage:
+    - datalake_realestate_raw.avisos.codigopostal
+    description: Postal or ZIP code for the property address.
+  price_amount:
+    lineage:
+    - datalake_realestate_raw.avisos.precio
+    description: Main advertised price for the primary operation on the listing.
+  price_per_m2:
+    lineage:
+    - datalake_realestate_raw.avisos.preciopormetro2
+    description: Advertised price divided by covered area for comparison shopping.
+  property_age_years:
+    lineage:
+    - datalake_realestate_raw.avisos.antiguedad
+    description: Age of the property in years when relevant to valuation filters.
+  property_tax_amount:
+    lineage:
+    - datalake_realestate_raw.avisos.valoriptu
+    description: Annual property tax amount disclosed on the listing when applicable.
+  redirect_url:
+    lineage:
+    - datalake_realestate_raw.avisos.urlredireccion
+    description: External URL buyers are redirected to instead of the native lead form.
+  shared_commission_amount:
+    lineage:
+    - datalake_realestate_raw.avisos.comisioncompartir
+    description: Commission amount offered to external brokers who bring a buyer.
+  thank_you_email_subject:
+    lineage:
+    - datalake_realestate_raw.avisos.subjectagradecimiento
+    description: Subject line of the auto-reply email sent after a buyer submits a lead.
+  thank_you_email_text:
+    lineage:
+    - datalake_realestate_raw.avisos.textoagradecimiento
+    description: Body text of the auto-reply email sent after a buyer submits a lead.
+  total_area_m2:
+    lineage:
+    - datalake_realestate_raw.avisos.metrostotales
+    description: Total lot or built area in square meters including non-covered spaces.
+  total_room_count:
+    lineage:
+    - datalake_realestate_raw.avisos.ambientes
+    description: Total number of rooms including bedrooms, living and dining areas.
+  total_unit_count:
+    lineage:
+    - datalake_realestate_raw.avisos.totalunidades
+    description: Total units in the building or development when advertising a project.
+  has_comments_enabled:
+    lineage:
+    - datalake_realestate_raw.avisos.recibecomentarios
+    description: Buyer comments or Q&A thread is enabled on the listing detail page.
+  is_agency_network:
+    lineage:
+    - datalake_realestate_raw.avisos.redinmobiliaria
+    description: Listing is published under an agency network or franchise program.
+  is_company_shown:
+    lineage:
+    - datalake_realestate_raw.avisos.muestraempresa
+    description: Agency branding and logo are displayed publicly on the listing.
+  is_enabled:
+    lineage:
+    - datalake_realestate_raw.avisos.habilitado
+    description: Listing is active and eligible for publication workflows.
+  is_featured_minisite:
+    lineage:
+    - datalake_realestate_raw.avisos.destacadominisitio
+    description: Listing is promoted on the agency branded minisite landing page.
+  is_map_shown:
+    lineage:
+    - datalake_realestate_raw.avisos.muestramapa
+    description: Map widget with coordinates is visible on the listing detail page.
+  is_quarterly_delivery:
+    lineage:
+    - datalake_realestate_raw.avisos.entregatrimestral
+    description: Listing consumes a quarterly syndication delivery quota instead of daily limits.
+  is_validated:
+    lineage:
+    - datalake_realestate_raw.avisos.validado
+    description: Listing content passed Navent quality or compliance validation checks.
+  dt_delivered:
+    lineage:
+    - datalake_realestate_raw.avisos.fechaentrega
+    description: Calendar date when the listing satisfied its delivery or syndication obligation.
+  ts_admin_ended:
+    lineage:
+    - datalake_realestate_raw.avisos.fechafinadmin
+    description: Moment when an administrator forcibly ended publication of the listing.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.avisos.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_created:
+    lineage:
+    - datalake_realestate_raw.avisos.fechaalta
+    description: Moment when the agency first created the listing record in Navent.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.avisos.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  ts_deactivated:
+    lineage:
+    - datalake_realestate_raw.avisos.fechabaja
+    description: Moment when the listing was deactivated and hidden from buyers.
+  ts_last_reviewed:
+    lineage:
+    - datalake_realestate_raw.avisos.ultimavezquesereviso
+    description: Moment when the listing content was last reviewed by moderation.
+  ts_published:
+    lineage:
+    - datalake_realestate_raw.avisos.fechaonline
+    description: Moment when the listing became visible to buyers on the portal.
+  ts_unpublished:
+    lineage:
+    - datalake_realestate_raw.avisos.fechaoffline
+    description: Moment when the listing was taken offline while retaining the record.
+  ts_updated:
+    lineage:
+    - datalake_realestate_raw.avisos.fechamodificado
+    description: Moment when any listing attribute was last modified by the publisher.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.avisos.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

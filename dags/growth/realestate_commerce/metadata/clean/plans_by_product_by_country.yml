@@ -1,0 +1,41 @@
+---
+database_name: datalake_realestate_clean
+table_name: plans_by_product_by_country
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.plans_by_product_by_country). Grain: one row per publication-plan × product × country price mapping. No date partitions; Delta Z-order on (id_publication_plan, id_product, id_country) — filter/join on Z-order columns for data skipping. Downstream: Country-specific plan pricing for billing and checkout.
+columns:
+  id_publication_plan:
+    lineage:
+    - datalake_realestate_raw.planesporproductoporpais.idplandepublicacion
+    description: |-
+      Publication plan tier included in this country price mapping. Part of the Delta Z-order key — include in filters for data skipping (no date partitions).
+  id_product:
+    lineage:
+    - datalake_realestate_raw.planesporproductoporpais.idproducto
+    description: |-
+      Sellable SKU priced for the plan in the given country. Part of the Delta Z-order key — include in filters for data skipping (no date partitions).
+  id_country:
+    lineage:
+    - datalake_realestate_raw.planesporproductoporpais.idpais
+    description: |-
+      Country market where this plan–product price applies. Part of the Delta Z-order key — include in filters for data skipping (no date partitions).
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.planesporproductoporpais.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.planesporproductoporpais.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.planesporproductoporpais.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

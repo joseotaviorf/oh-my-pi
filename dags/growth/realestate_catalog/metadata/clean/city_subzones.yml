@@ -1,0 +1,51 @@
+---
+database_name: datalake_realestate_clean
+table_name: city_subzones
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.city_subzones). Grain: one row per city sub-zone (id_city_subzone). No date partitions; Delta Z-order on (id_city) — filter/join on Z-order columns for data skipping. Downstream: Finer geo targeting within city zones.
+columns:
+  id_city_subzone:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.idsubzonaciudad
+    description: Surrogate key for a sub-zone within a city zone.
+  id_city:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.idciudad
+    description: |-
+      City that contains this sub-zone. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_city_zone:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.idzonaciudad
+    description: Parent zone that contains this sub-zone.
+  id_country:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.idpais
+    description: Country scope for the sub-zone definition.
+  id_state:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.idprovincia
+    description: State or province scope for the sub-zone definition.
+  city_subzone_name:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.nombre
+    description: Canonical sub-zone name for finer geo targeting.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.subzonasciudad.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

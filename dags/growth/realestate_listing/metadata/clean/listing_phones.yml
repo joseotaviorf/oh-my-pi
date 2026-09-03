@@ -1,0 +1,47 @@
+---
+database_name: datalake_realestate_clean
+table_name: listing_phones
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.listing_phones). Grain: one row per phone number published on a listing (id_listing_phone). No date partitions; Delta Z-order on (id_listing) — filter/join on Z-order columns for data skipping. Downstream: Lead-routing analytics (PII — handle per LGPD policy).
+columns:
+  id_listing_phone:
+    lineage:
+    - datalake_realestate_raw.telefonosaviso.idtelefonoaviso
+    description: Surrogate key for a phone number published on a listing.
+  id_listing:
+    lineage:
+    - datalake_realestate_raw.telefonosaviso.idaviso
+    description: |-
+      Listing that displays this phone on the lead contact options. Delta Z-order column — include in filters for data skipping (no date partitions).
+  phone_number:
+    lineage:
+    - datalake_realestate_raw.telefonosaviso.numero
+    description: Local phone number digits without country prefix.
+  phone_prefix:
+    lineage:
+    - datalake_realestate_raw.telefonosaviso.prefijo
+    description: Country or area prefix prepended when dialing the published number.
+  phone_type:
+    lineage:
+    - datalake_realestate_raw.telefonosaviso.tipodetelefono
+    description: Phone category (mobile, landline, WhatsApp) controlling display and routing.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.telefonosaviso.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.telefonosaviso.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.telefonosaviso.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

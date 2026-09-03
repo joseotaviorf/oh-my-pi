@@ -1,0 +1,24 @@
+---
+table_name: datalake_realestate_clean.currencies
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  currency_code:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  currency_name:
+    is_complete:
+      severity_level: Error
+  currency_symbol:
+    is_complete:
+      severity_level: Error
+  id_currency:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error

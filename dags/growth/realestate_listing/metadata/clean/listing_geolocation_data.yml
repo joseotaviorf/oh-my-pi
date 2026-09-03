@@ -1,0 +1,44 @@
+---
+database_name: datalake_realestate_clean
+table_name: listing_geolocation_data
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.listing_geolocation_data). Grain: one row per listing geolocation enrichment (id_listing). No date partitions; Delta Z-order on (id_listing) — filter/join on Z-order columns for data skipping. Downstream: Map display and geo-targeted publication eligibility.
+columns:
+  id_listing:
+    lineage:
+    - datalake_realestate_raw.avisosgeolocationdata.idaviso
+    description: |-
+      Listing whose map presentation and geo enrichment are defined by this row. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_geolocation:
+    lineage:
+    - datalake_realestate_raw.avisosgeolocationdata.idgeolocalizacion
+    description: Canonical geolocation point resolved from the listing address for map display.
+  id_geolocation_to_display:
+    lineage:
+    - datalake_realestate_raw.avisosgeolocationdata.idgeolocalizacionamostrar
+    description: |-
+      Geolocation point actually shown to buyers when it differs from the resolved address.
+  map_zoom_level:
+    lineage:
+    - datalake_realestate_raw.avisosgeolocationdata.zoom
+    description: Default zoom level for the embedded map widget on the listing detail page.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.avisosgeolocationdata.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.avisosgeolocationdata.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.avisosgeolocationdata.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

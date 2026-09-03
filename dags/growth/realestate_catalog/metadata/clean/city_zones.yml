@@ -1,0 +1,67 @@
+---
+database_name: datalake_realestate_clean
+table_name: city_zones
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.city_zones). Grain: one row per city zone or neighborhood (id_city_zone). No date partitions; Delta Z-order on (id_city) — filter/join on Z-order columns for data skipping. Downstream: Hyper-local search filters and zone-based pricing.
+columns:
+  id_city_zone:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.idzonaciudad
+    description: Surrogate key for a neighborhood or zone within a city.
+  id_city:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.idciudad
+    description: |-
+      City that contains this zone in the geographic hierarchy. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_city_zone_type:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.idtipodezonaciudad
+    description: Zone category controlling search behavior (neighborhood, district, etc.).
+  id_country:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.idpais
+    description: Country scope for the zone definition.
+  id_state:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.idprovincia
+    description: State or province scope for the zone definition.
+  city_zone_aliases:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.aliases
+    description: Alternate names or spellings for search matching within the city.
+  city_zone_name:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.nombre
+    description: Canonical zone name shown in hyper-local search filters.
+  latitude:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.latitud
+    description: Representative latitude for the zone centroid on map views.
+  longitude:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.longitud
+    description: Representative longitude for the zone centroid on map views.
+  postal_code:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.codigoPostal
+    description: Typical postal code associated with the zone for address autofill.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.zonasciudad.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

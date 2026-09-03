@@ -1,0 +1,93 @@
+---
+database_name: datalake_realestate_clean
+table_name: interface_listing_data
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.interface_listing_data). Grain: one row per listing synchronized via a third-party interface (id_listing, id_interface). No date partitions; Delta Z-order on (id_listing, id_interface) — filter/join on Z-order columns for data skipping. Downstream: CRM/ERP syndication reconciliation for externally published listings.
+columns:
+  id_listing:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.idaviso
+    description: |-
+      Listing synchronized to or from an external CRM or MLS connector. Part of the Delta Z-order key — include in filters for data skipping (no date partitions).
+  id_interface:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.idinterface
+    description: |-
+      Integration definition that produced or consumed this syndication row. Part of the Delta Z-order key — include in filters for data skipping (no date partitions).
+  id_company:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.idempresa
+    description: Publishing agency on whose behalf the connector acts.
+  id_country:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.idpais
+    description: Country scope of the integration run and listing market.
+  id_interface_run:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.idinterfacerun
+    description: Batch run identifier for the connector execution that touched this row.
+  action_code:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.accion
+    description: |-
+      Connector action performed (create, update, pause, delete) on the external system.
+  content_hash:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.contenthash
+    description: Hash of textual listing fields used to detect changes since the last sync.
+  images_hash:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.imageshash
+    description: Hash of media assets used to skip unchanged image uploads.
+  interface_key:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.claveInterface
+    description: External-system key used to match this listing on the remote side.
+  is_enabled:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.habilitado
+    description: Connector syndication is active for this listing on the external channel.
+  is_manual_override:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.overridemanualchanges
+    description: Publisher forced a manual sync bypassing automatic change detection.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  ts_deactivated:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.fechabaja
+    description: Moment when syndication to the external system was turned off.
+  ts_last_synced:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.fechaultimasincronizacion
+    description: Moment when the connector last successfully exchanged data for this listing.
+  ts_manually_updated:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.fechamodificacionmanual
+    description: Moment when a user manually pushed an update through the connector UI.
+  ts_media_processed:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.fechaprocesamientomultimedia
+    description: Moment when image or media assets finished processing on the remote side.
+  ts_update_pending:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.fechaactualizacionpendiente
+    description: Moment when a change was queued and awaiting the next connector run.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.interfaceavisodata.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

@@ -1,0 +1,3 @@
+---
+cluster:
+  type: emr_7_12_consolidation_m_memory_fleet_cluster

@@ -1,0 +1,187 @@
+---
+database_name: datalake_realestate_clean
+table_name: orders
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.orders). Grain: one row per commercial sales order (id_order). No date partitions; Delta Z-order on (id_order) — filter/join on Z-order columns for data skipping. Downstream: Revenue recognition and SAP sales-order reconciliation.
+columns:
+  id_order:
+    lineage:
+    - datalake_realestate_raw.pedidos.idpedido
+    description: |-
+      Navent internal identifier for a commercial sales order. Delta Z-order column — include in filters for data skipping (no date partitions).
+  id_activating_bumeran_user:
+    lineage:
+    - datalake_realestate_raw.pedidos.idusuariobumeranactivador
+    description: Bumeran portal user who activated the order when cross-brand.
+  id_billing_company:
+    lineage:
+    - datalake_realestate_raw.pedidos.idempresafacturacion
+    description: Agency entity invoiced for this order when different from the buyer.
+  id_bumeran_user:
+    lineage:
+    - datalake_realestate_raw.pedidos.idusuariobumeran
+    description: Bumeran user associated with the purchase on the cross-brand flow.
+  id_company:
+    lineage:
+    - datalake_realestate_raw.pedidos.idempresa
+    description: Agency that placed and owns this commercial order.
+  id_country:
+    lineage:
+    - datalake_realestate_raw.pedidos.idpais
+    description: Country market where the order was sold and fulfilled.
+  id_invoicing_frequency:
+    lineage:
+    - datalake_realestate_raw.pedidos.idfrecuenciadefacturacion
+    description: Billing cadence schedule applied to recurring charges on the order.
+  id_payment_method:
+    lineage:
+    - datalake_realestate_raw.pedidos.idmediopago
+    description: Payment instrument type used to settle the order (card, transfer, etc.).
+  id_payment_term:
+    lineage:
+    - datalake_realestate_raw.pedidos.idplazodepago
+    description: Contractual payment-term code governing due dates and installments.
+  id_point_of_sale:
+    lineage:
+    - datalake_realestate_raw.pedidos.idpuntodeventa
+    description: Sales channel or POS identifier where the order originated.
+  id_portal:
+    lineage:
+    - datalake_realestate_raw.pedidos.idportal
+    description: Portal brand through which the order was purchased.
+  id_price_list:
+    lineage:
+    - datalake_realestate_raw.pedidos.idlistadeprecio
+    description: Price list version used to quote line-item unit prices.
+  id_sap_sales_order:
+    lineage:
+    - datalake_realestate_raw.pedidos.idpedidodeventasap
+    description: SAP sales-order document number for ERP reconciliation.
+  affiliation_number:
+    lineage:
+    - datalake_realestate_raw.pedidos.numerodeafiliacion
+    description: Partner or affiliate tracking number attached to the sale.
+  amount:
+    lineage:
+    - datalake_realestate_raw.pedidos.monto
+    description: Total order amount after discounts before tax adjustments.
+  authorization_code:
+    lineage:
+    - datalake_realestate_raw.pedidos.codigoautorizacion
+    description: Payment gateway authorization reference for the initial charge.
+  bank_account_number:
+    lineage:
+    - datalake_realestate_raw.pedidos.numerocuentabancaria
+    description: Bank account supplied for wire or debit settlement.
+  contact_email_1:
+    lineage:
+    - datalake_realestate_raw.pedidos.mailcontacto1
+    description: Primary billing contact email for order notifications.
+  contact_email_2:
+    lineage:
+    - datalake_realestate_raw.pedidos.mailcontacto2
+    description: Secondary billing contact email for order notifications.
+  days_between_invoices:
+    lineage:
+    - datalake_realestate_raw.pedidos.diasentrefacturas
+    description: Interval in days between recurring invoice generations.
+  days_between_payments:
+    lineage:
+    - datalake_realestate_raw.pedidos.diasentrepagos
+    description: Interval in days between installment payments.
+  discount_amount:
+    lineage:
+    - datalake_realestate_raw.pedidos.descuento
+    description: Monetary discount applied at the order header level.
+  invoice_count:
+    lineage:
+    - datalake_realestate_raw.pedidos.cantidaddefacturas
+    description: Number of invoices already issued against this order.
+  invoicing_username:
+    lineage:
+    - datalake_realestate_raw.pedidos.usernameFacturador
+    description: Portal username allowed to download invoices for this order.
+  order_detail:
+    lineage:
+    - datalake_realestate_raw.pedidos.detalle
+    description: Free-text notes or internal comments about the commercial terms.
+  order_status:
+    lineage:
+    - datalake_realestate_raw.pedidos.estado
+    description: Lifecycle status of the order (draft, active, paid, cancelled, etc.).
+  payment_count:
+    lineage:
+    - datalake_realestate_raw.pedidos.cantidaddepagos
+    description: Number of installment payments scheduled or completed.
+  payment_receipt_number:
+    lineage:
+    - datalake_realestate_raw.pedidos.numerodecomprobantedepago
+    description: Receipt or voucher number from the payment provider.
+  purchase_order_number:
+    lineage:
+    - datalake_realestate_raw.pedidos.ordendecompra
+    description: Customer purchase-order reference for corporate billing.
+  usd_exchange_rate:
+    lineage:
+    - datalake_realestate_raw.pedidos.cotizaciondolar
+    description: USD conversion rate applied when invoicing in local currency.
+  is_enabled:
+    lineage:
+    - datalake_realestate_raw.pedidos.habilitado
+    description: Order is active and its products may be consumed.
+  is_invoiced_in_usd:
+    lineage:
+    - datalake_realestate_raw.pedidos.facturaendolar
+    description: Invoices are issued in US dollars instead of local currency.
+  dt_created:
+    lineage:
+    - datalake_realestate_raw.pedidos.fechaalta
+    description: Calendar date when the order was created in Navent.
+  dt_deactivated:
+    lineage:
+    - datalake_realestate_raw.pedidos.fechabaja
+    description: Calendar date when the order was permanently closed.
+  dt_deactivation_requested:
+    lineage:
+    - datalake_realestate_raw.pedidos.fechasolicitudbaja
+    description: Calendar date when cancellation was requested by the customer.
+  dt_invoiced:
+    lineage:
+    - datalake_realestate_raw.pedidos.fechafacturado
+    description: Calendar date when the first invoice was issued.
+  dt_invoicing_started:
+    lineage:
+    - datalake_realestate_raw.pedidos.fechainiciofacturas
+    description: Calendar date when recurring invoicing began.
+  dt_paid:
+    lineage:
+    - datalake_realestate_raw.pedidos.fechapago
+    description: Calendar date when the order was fully paid.
+  dt_payments_started:
+    lineage:
+    - datalake_realestate_raw.pedidos.fechainiciopagos
+    description: Calendar date when installment collection started.
+  dt_started:
+    lineage:
+    - datalake_realestate_raw.pedidos.fechaInicio
+    description: Calendar date when product consumption became allowed.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.pedidos.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.pedidos.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.pedidos.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

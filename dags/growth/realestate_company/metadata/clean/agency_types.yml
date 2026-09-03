@@ -1,0 +1,35 @@
+---
+database_name: datalake_realestate_clean
+table_name: agency_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |-
+  Entity table from the RealEstate Navent MySQL portal (datalake_realestate_clean.agency_types). Grain: one row per agency-type taxonomy value (id_agency_type). No date partitions; Delta Z-order on (id_agency_type) — filter/join on Z-order columns for data skipping. Downstream: Agency segmentation and commercial-plan eligibility rules.
+columns:
+  id_agency_type:
+    lineage:
+    - datalake_realestate_raw.tiposdeinmobiliaria.idtipodeinmobiliaria
+    description: |-
+      Surrogate key for an agency-type taxonomy value. Delta Z-order column — include in filters for data skipping (no date partitions).
+  agency_type_name:
+    lineage:
+    - datalake_realestate_raw.tiposdeinmobiliaria.nombre
+    description: Human-readable agency category label (independent, franchise, developer, etc.).
+  ts_cdc_transaction:
+    lineage:
+    - datalake_realestate_raw.tiposdeinmobiliaria.ts_cdc_transaction
+    description: Wall-clock time when the Debezium connector captured this row change.
+  ts_database_transaction:
+    lineage:
+    - datalake_realestate_raw.tiposdeinmobiliaria.ts_database_transaction
+    description: Commit time of the originating MySQL transaction before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_realestate_raw.tiposdeinmobiliaria.op_cdc
+    description: |-
+      CDC operation type captured by Debezium (r=read/snapshot, c=create, u=update, d=delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
