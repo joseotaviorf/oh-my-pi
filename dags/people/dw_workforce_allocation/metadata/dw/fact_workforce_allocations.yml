@@ -1,0 +1,127 @@
+database_name: dw_workforce_allocation
+table_name: fact_workforce_allocations
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Slowly Changing Dimension Type 2 fact of workforce allocations across organizational groups and tags, with the equal-share FTE measure used for People planning analysis.
+  One row per allocation and validity interval over which its FTE share is constant, with non-overlapping intervals closed by dt_valid_from and dt_valid_to.
+  Point-in-time analysis filters a reference date between dt_valid_from and dt_valid_to; current state filters is_current.
+  Inactive allocation states remain available for historical analysis, while application-generated sample records are excluded.
+  Stores identifiers and organizational allocation attributes only, never employee names or contact data.
+columns:
+  sk_employee:
+    description: Surrogate key of the employee, resolved from the canonical People person identifier; -1 when the Allocation Tool employee identifier has no People match.
+    lineage:
+      - datalake_people.allocation_history.id_person
+  sk_valid_from_date:
+    description: Date surrogate key of the first day of the validity interval, in yyyyMMdd format (e.g. 20260828).
+    lineage:
+      - datalake_people.allocation_history.dt_valid_from
+  person_number:
+    description: People business identifier of the employee matched to the Allocation Tool employee identifier.
+    lineage:
+      - datalake_people.allocation_history.person_number
+  id_employee:
+    description: Allocation Tool employee identifier carried from the source application.
+    lineage:
+      - datalake_people.allocation_history.id_employee
+  id_allocation:
+    description: Allocation Tool identifier of the allocation record.
+    lineage:
+      - datalake_people.allocation_history.id_allocation
+  id_group:
+    description: Identifier of the group associated with the allocation.
+    lineage:
+      - datalake_people.allocation_history.id_group
+  id_tag:
+    description: Identifier of the tag assigned through the allocation.
+    lineage:
+      - datalake_people.allocation_history.id_tag
+  group_name:
+    description: Display name of the group the employee is allocated to.
+    lineage:
+      - datalake_people.allocation_history.group_name
+  tag_name:
+    description: Display name of the tag assigned through the allocation.
+    lineage:
+      - datalake_people.allocation_history.tag_name
+  chapter:
+    description: Organizational chapter captured with the allocation record.
+    lineage:
+      - datalake_people.allocation_history.chapter
+  vertical:
+    description: Organizational vertical captured with the allocation record.
+    lineage:
+      - datalake_people.allocation_history.vertical
+  team:
+    description: Organizational team captured with the allocation record.
+    lineage:
+      - datalake_people.allocation_history.team
+  status:
+    description: Allocation lifecycle status exactly as labelled by the source application during the interval.
+    lineage:
+      - datalake_people.allocation_history.status
+  allocation_status:
+    description: Normalized lifecycle status of the allocation during the validity interval.
+    categories:
+      active: Allocation is active and contributes to FTE totals.
+      inactive: Allocation is inactive and remains available for historical analysis.
+    lineage:
+      - datalake_people.allocation_history.allocation_status
+  allocation_fte:
+    description: FTE share assigned to the tag during the validity interval, equal to one divided by the number of active tags the employee holds in the same group (e.g. 0.5). Scoped to the group and therefore not additive across groups, since an employee allocated to two groups contributes 1.0 in each.
+    lineage:
+      - datalake_people.allocation_history.id_employee
+      - datalake_people.allocation_history.id_group
+      - datalake_people.allocation_history.id_tag
+      - datalake_people.allocation_history.allocation_status
+      - datalake_people.allocation_history.dt_valid_from
+      - datalake_people.allocation_history.dt_valid_to
+  is_active:
+    description: True when the allocation is active during the validity interval and contributes to FTE totals.
+    lineage:
+      - datalake_people.allocation_history.allocation_status
+  is_leader:
+    description: True when the source marks the employee as a leader for the allocation.
+    lineage:
+      - datalake_people.allocation_history.is_leader
+  dt_valid_from:
+    description: First date on which this allocation state and FTE share were in force (e.g. 2026-08-28).
+    lineage:
+      - datalake_people.allocation_history.dt_valid_from
+  dt_valid_to:
+    description: Last date on which this allocation state and FTE share were in force, set to 9999-12-31 while current (e.g. 2026-08-31).
+    lineage:
+      - datalake_people.allocation_history.dt_valid_to
+  is_current:
+    description: True for the interval still in force, which has no successor.
+    lineage:
+      - datalake_people.allocation_history.dt_valid_to
+  ts_allocated:
+    description: Timestamp when the allocation was created in the Allocation Tool.
+    lineage:
+      - datalake_people.allocation_history.ts_allocated
+  ts_created:
+    description: Timestamp when the allocation record was created.
+    lineage:
+      - datalake_people.allocation_history.ts_created
+  ts_updated:
+    description: Timestamp when the allocation record was last updated.
+    lineage:
+      - datalake_people.allocation_history.ts_updated
+  ts_version:
+    description: Ordering key of the source export version that produced this state.
+    lineage:
+      - datalake_people.allocation_history.ts_version
+  ts_export_generated:
+    description: Timestamp when the source export containing this state was generated.
+    lineage:
+      - datalake_people.allocation_history.ts_export_generated
+  ts_file_modified:
+    description: Timestamp when the source export file was modified in S3.
+    lineage:
+      - datalake_people.allocation_history.ts_file_modified
+  ts_load:
+    description: Timestamp when the source record was ingested into the raw layer.
+    lineage:
+      - datalake_people.allocation_history.ts_load

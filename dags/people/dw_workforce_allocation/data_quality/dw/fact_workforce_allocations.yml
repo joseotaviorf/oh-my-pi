@@ -1,0 +1,75 @@
+---
+table_name: dw_workforce_allocation.fact_workforce_allocations
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_employee:
+    is_complete:
+      severity_level: Error
+  sk_valid_from_date:
+    is_complete:
+      severity_level: Error
+  id_allocation:
+    is_complete:
+      severity_level: Warning
+  dt_valid_from:
+    is_complete:
+      severity_level: Warning
+  dt_valid_to:
+    is_complete:
+      severity_level: Warning
+  allocation_fte:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+    has_max_value:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  # SCD2 contract: validity intervals of an allocation must not overlap.
+  no_overlapping_validity_intervals:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_workforce_allocation.fact_workforce_allocations AS earlier
+         JOIN dw_workforce_allocation.fact_workforce_allocations AS later
+           ON later.id_allocation = earlier.id_allocation
+          AND later.dt_valid_from > earlier.dt_valid_from
+          AND later.dt_valid_from <= earlier.dt_valid_to) = 0
+      severity_level: Warning
+  # SCD2 contract: exactly one open interval per allocation.
+  one_current_row_per_allocation:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_allocation
+           FROM dw_workforce_allocation.fact_workforce_allocations
+           WHERE is_current
+           GROUP BY id_allocation
+           HAVING COUNT(*) > 1
+         ) duplicate_rows) = 0
+      severity_level: Error
+  # Equal-share contract: within a group, an employee's active FTE must total 1
+  # at every point in time. Checked on the current state.
+  active_fte_totals_one_per_employee_and_group:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_employee, id_group, SUM(allocation_fte) AS total_fte
+           FROM dw_workforce_allocation.fact_workforce_allocations
+           WHERE is_current AND is_active
+           GROUP BY id_employee, id_group
+           HAVING ABS(SUM(allocation_fte) - 1) > 0.000001
+         ) unbalanced_rows) = 0
+      severity_level: Warning

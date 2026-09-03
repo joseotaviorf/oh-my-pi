@@ -1,0 +1,29 @@
+dag:
+  name: dw_workforce_allocation
+  owner: Tech Platform Enterprise Engineering
+  callback_by_task: False
+  schedule_start_date: 2026, 9, 2
+  documentation:
+    dag_purpose: |
+      Dedicated People Data Warehouse contract for workforce allocation history.
+      The table preserves allocation states by reference date and exposes equal-share FTE values
+      for authorized planning and TARS consumers without storing employee names or contact data.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: workforce_allocation
+  bucket_config_name: people_bucket
+  has_hive_sync: true
+  serialize_dq_after_default_row: true
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  tables_customization:
+    fact_workforce_allocations:
+      extraction_type: full
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
