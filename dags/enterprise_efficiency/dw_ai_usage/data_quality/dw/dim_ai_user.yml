@@ -1,0 +1,43 @@
+---
+table_name: dw_ai_usage.dim_ai_user
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_ai_user:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  tool:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  id_user:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  unexplained_unmatched_email_rate_within_baseline:
+    custom:
+      # Unmatched-email rate excluding known @ext.quintoandar.com.br contractors.
+      # Known exception: pending-hire employees (assignment type P/PT, not yet E/C)
+      # are absent from identifier_mapping until they become effective; their usage
+      # resolves once hired. Live-prod check on 2026-09-03: 4/1397 (0.29%) residual.
+      constraint: |-
+        (SELECT
+           COUNT(*) FILTER (
+             WHERE sk_employee IS NULL
+               AND LOWER(email_user) NOT LIKE '%@ext.quintoandar.com.br'
+           ) * 100.0 / COUNT(*)
+         FROM dw_ai_usage.dim_ai_user
+        ) <= 1.0
+      severity_level: Warning
