@@ -1,0 +1,59 @@
+database_name: datalake_zonaprop_clean
+table_name: cities
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'City reference for Zonaprop markets (`ciudades`). One row per city (PK id_city). Anchors listing addresses and geographic filters across the portal. Physical layout: Z-ordered by id_city (no partitions); filter on id_city for efficient data skipping.'
+columns:
+  id_city:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.idciudad
+    description: City where listings and agencies are located within the Zonaprop market hierarchy.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.idpais
+    description: Country market that scopes this city for multi-country portal operations.
+  id_original:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.idoriginal
+    description: Legacy upstream city identifier retained when merging or migrating geographic catalogs.
+  id_region:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.idregion
+    description: Broader regional grouping above city level used in market analytics.
+  id_state:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.idprovincia
+    description: State or province that contains this city in the administrative hierarchy.
+  city_aliases:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.aliases
+    description: Alternative spellings or names for the same city to improve search matching.
+  city_name:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.nombre
+    description: Official city name displayed in search filters and listing addresses.
+  city_preposition:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.preposicion
+    description: Grammatical preposition paired with the city name in Spanish-language portal copy.
+  is_capital:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.escapital
+    description: When true, the city is the capital of its state and receives default search prominence.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.ciudades.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

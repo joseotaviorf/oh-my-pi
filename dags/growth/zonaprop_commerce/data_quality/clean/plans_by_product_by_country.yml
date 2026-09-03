@@ -1,0 +1,21 @@
+---
+table_name: datalake_zonaprop_clean.plans_by_product_by_country
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  id_publication_plan:
+    is_complete:
+      severity_level: Error
+  id_product:
+    is_complete:
+      severity_level: Error
+  id_country:
+    is_complete:
+      severity_level: Error
+  unique_composite_primary_key:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (\n  SELECT id_publication_plan, id_product, id_country, COUNT(*) AS cnt\n  FROM datalake_zonaprop_clean.plans_by_product_by_country\n  GROUP BY id_publication_plan, id_product, id_country\n  HAVING COUNT(*) > 1\n) dupes) = 0"
+      severity_level: Error

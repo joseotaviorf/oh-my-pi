@@ -1,0 +1,43 @@
+database_name: datalake_zonaprop_clean
+table_name: listing_features
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Amenity and characteristic values attached to a Zonaprop listing (`avisoscaracteristicas`). One row per listing-feature assignment (PK id_listing_feature). Enriches search filters and listing quality scoring. Physical layout: Z-ordered by id_listing (no partitions); filter on id_listing for efficient data skipping.'
+columns:
+  id_feature:
+    lineage:
+    - datalake_zonaprop_raw.avisoscaracteristicas.idcaracteristica
+    description: Amenity or characteristic definition such as pool, balcony or air conditioning.
+  id_feature_option:
+    lineage:
+    - datalake_zonaprop_raw.avisoscaracteristicas.idopcion
+    description: Selected option value when the feature is a multi-choice attribute.
+  id_listing:
+    lineage:
+    - datalake_zonaprop_raw.avisoscaracteristicas.idaviso
+    description: Listing to which this amenity or characteristic is attached.
+  id_listing_feature:
+    lineage:
+    - datalake_zonaprop_raw.avisoscaracteristicas.idavisocaracteristica
+    description: Unique identifier for a listing-to-feature assignment.
+  feature_value:
+    lineage:
+    - datalake_zonaprop_raw.avisoscaracteristicas.valor
+    description: Free-text or numeric value for the feature when not covered by a predefined option.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisoscaracteristicas.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisoscaracteristicas.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.avisoscaracteristicas.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

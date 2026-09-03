@@ -1,0 +1,42 @@
+---
+table_name: datalake_zonaprop_clean.interface_listing_data
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  id_listing:
+    is_complete:
+      severity_level: Error
+  id_interface:
+    is_complete:
+      severity_level: Error
+  action_code:
+    is_complete:
+      severity_level: Error
+  content_hash:
+    is_complete:
+      severity_level: Error
+  id_company:
+    is_complete:
+      severity_level: Error
+  id_country:
+    is_complete:
+      severity_level: Error
+  images_hash:
+    is_complete:
+      severity_level: Error
+  interface_key:
+    is_complete:
+      severity_level: Error
+  is_enabled:
+    is_complete:
+      severity_level: Error
+  ts_last_synced:
+    is_complete:
+      severity_level: Error
+  unique_composite_primary_key:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (\n  SELECT id_listing, id_interface, COUNT(*) AS cnt\n  FROM datalake_zonaprop_clean.interface_listing_data\n  GROUP BY id_listing, id_interface\n  HAVING COUNT(*) > 1\n) dupes) = 0"
+      severity_level: Warning

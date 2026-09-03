@@ -1,0 +1,151 @@
+database_name: datalake_zonaprop_clean
+table_name: company_users
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Portal user accounts belonging to a Zonaprop agency (`usuariosempresas`). One row per user (PK id_company_user). Represents agents and staff who manage listings and orders. Physical layout: Z-ordered by id_company_user (no partitions); filter on id_company_user for efficient data skipping.'
+columns:
+  id_account:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idcuenta
+    description: Billing or subscription account linked to this portal user.
+  id_city:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idCiudad
+    description: City associated with the user profile or office location.
+  id_company:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idempresa
+    description: Agency that employs or manages this portal user.
+  id_company_user:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idusuarioempresa
+    description: Unique identifier for an agency staff user on the Zonaprop portal.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idPais
+    description: Country market where this user operates.
+  id_facebook:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idFacebook
+    description: Facebook account identifier linked to the user profile for social login.
+  id_geolocation:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idGeolocalizacion
+    description: Resolved geographic location associated with the user profile.
+  id_language:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idIdioma
+    description: Preferred language for portal UI and communications.
+  id_marital_status:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idEstadoCivil
+    description: Marital status code stored in the user HR profile.
+  id_portal:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idportal
+    description: Portal brand under which this user account was created.
+  id_state:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idProvincia
+    description: State or province associated with the user profile.
+  id_user_type:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idtipodeusuario
+    description: Role classification such as administrator, agent or back-office staff.
+  id_zone:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.idZona
+    description: City zone associated with the user office or service area.
+  department:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.area
+    description: Department or team within the agency.
+  email:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.email
+    description: Primary email address for portal login and notifications.
+  email_username:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.mailusername
+    description: Local part of the email used as an alternative login identifier.
+  first_name:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.nombre
+    description: Given name of the agency user.
+  gender_code:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.sexo
+    description: Gender code stored in the user profile.
+  job_title:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.cargo
+    description: Job title displayed on the user profile.
+  last_name:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.apellido
+    description: Family name of the agency user.
+  mobile_number:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.celNumero
+    description: Mobile phone number for the agency user.
+  mobile_prefix:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.celPrefijo
+    description: Country or area code prefix for the mobile phone number.
+  phone_number:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.telefono
+    description: Office phone number for the agency user.
+  phone_prefix:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.prefijo
+    description: Country or area code prefix for the office phone number.
+  username:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.username
+    description: Login username for the portal account.
+  has_internal_email_permission:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.permisoenviomailinterno
+    description: When true, the user may send emails through the internal Zonaprop mail system.
+  is_blocked:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.bloqueado
+    description: When true, the user is blocked from logging in or performing portal actions.
+  is_email_valid:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.emailusuariovalido
+    description: When true, the user email address has been verified.
+  dt_deactivated:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.fbaja
+    description: Date when the user account was deactivated.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_created:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.fechaalta
+    description: Moment when the user account was created on the portal.
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  ts_last_logged_in:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.ultimavezqueselogueo
+    description: Last time the user successfully logged into the portal.
+  ts_missing:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.falta
+    description: Moment when the user was flagged as missing required profile data.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.usuariosempresas.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

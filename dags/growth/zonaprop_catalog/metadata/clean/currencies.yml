@@ -1,0 +1,39 @@
+database_name: datalake_zonaprop_clean
+table_name: currencies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Currency reference for Zonaprop pricing (`monedas`). One row per currency (PK id_currency). Standardizes monetary values across listings, orders and commissions. Physical layout: Z-ordered by id_currency (no partitions); filter on id_currency for efficient data skipping.'
+columns:
+  id_currency:
+    lineage:
+    - datalake_zonaprop_raw.monedas.idmoneda
+    description: Unique identifier for a currency in the Zonaprop pricing catalog.
+  currency_code:
+    lineage:
+    - datalake_zonaprop_raw.monedas.codigomoneda
+    description: ISO currency code such as ARS or USD.
+  currency_name:
+    lineage:
+    - datalake_zonaprop_raw.monedas.nombre
+    description: Full currency name used in back-office and invoicing screens.
+  currency_symbol:
+    lineage:
+    - datalake_zonaprop_raw.monedas.simbolo
+    description: Symbol displayed alongside monetary amounts in the portal UI.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.monedas.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.monedas.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.monedas.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

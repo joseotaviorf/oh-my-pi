@@ -1,0 +1,87 @@
+database_name: datalake_zonaprop_clean
+table_name: interface_listing_data
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Third-party interface sync state for a Zonaprop listing (`interfaceavisodata`). One row per listing and interface combination. Tracks external identifiers, content hashes and sync lifecycle for feed integrations. Physical layout: Z-ordered by id_listing (no partitions); filter on id_listing for efficient data skipping.'
+columns:
+  id_company:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.idempresa
+    description: Agency that owns the listing being synchronized through the integration.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.idpais
+    description: Country market context for the integration sync.
+  id_interface:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.idinterface
+    description: Integration configuration processing this listing feed record.
+  id_interface_run:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.idinterfacerun
+    description: Specific sync job execution that last touched this listing.
+  id_listing:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.idaviso
+    description: Zonaprop listing whose external feed sync state is tracked in this row.
+  action_code:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.accion
+    description: Pending sync action such as create, update or deactivate for the external listing.
+  content_hash:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.contenthash
+    description: Hash of listing text content used to detect changes since the last sync.
+  images_hash:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.imageshash
+    description: Hash of listing image set used to detect media changes since the last sync.
+  interface_key:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.claveInterface
+    description: External-system key identifying the listing within the feed connector.
+  is_enabled:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.habilitado
+    description: When true, the listing is eligible for synchronization through this integration.
+  is_manual_override:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.overridemanualchanges
+    description: When true, manual edits on the portal take precedence over incoming feed updates.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  ts_deactivated:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.fechabaja
+    description: Moment when the listing was deactivated through the integration feed.
+  ts_last_synced:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.fechaultimasincronizacion
+    description: Last time the listing was successfully synchronized from the external feed.
+  ts_manually_updated:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.fechamodificacionmanual
+    description: Last time a portal user manually edited listing data protected from feed overwrite.
+  ts_media_processed:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.fechaprocesamientomultimedia
+    description: Last time listing images from the feed were downloaded and processed.
+  ts_update_pending:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.fechaactualizacionpendiente
+    description: Moment when a feed update was queued but not yet applied to the listing.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.interfaceavisodata.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

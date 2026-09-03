@@ -1,0 +1,35 @@
+database_name: datalake_zonaprop_clean
+table_name: plans_by_product_by_country
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Availability of a publication plan for a product in a given country (`planesporproductoporpais`). One row per plan, product and country combination. Defines which listing packages can be sold in each market. Physical layout: Z-ordered by id_publication_plan (no partitions); filter on id_publication_plan for efficient data skipping.'
+columns:
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.planesporproductoporpais.idpais
+    description: Country market where this plan-product combination is sold.
+  id_product:
+    lineage:
+    - datalake_zonaprop_raw.planesporproductoporpais.idproducto
+    description: Commercial product that bundles this publication plan.
+  id_publication_plan:
+    lineage:
+    - datalake_zonaprop_raw.planesporproductoporpais.idplandepublicacion
+    description: Publication plan included in the product for this country.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.planesporproductoporpais.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.planesporproductoporpais.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.planesporproductoporpais.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

@@ -1,0 +1,55 @@
+database_name: datalake_zonaprop_clean
+table_name: countries
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Country reference for Zonaprop markets (`paises`). One row per country (PK id_country). Defines market boundaries, currencies and localization settings. Physical layout: Z-ordered by id_country (no partitions); filter on id_country for efficient data skipping.'
+columns:
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.paises.idpais
+    description: Unique identifier for a country market on the Zonaprop portal.
+  id_local_currency:
+    lineage:
+    - datalake_zonaprop_raw.paises.idmonedalocal
+    description: Default currency used for pricing and billing in this country market.
+  id_translation:
+    lineage:
+    - datalake_zonaprop_raw.paises.idtraduccion
+    description: Translation bundle identifier for localized portal content in this country.
+  application_medium:
+    lineage:
+    - datalake_zonaprop_raw.paises.mediadepostulacion
+    description: Default marketing or application medium assigned to this country market.
+  country_code:
+    lineage:
+    - datalake_zonaprop_raw.paises.codigo
+    description: Short country code used in URLs, APIs and cross-system integrations.
+  country_name:
+    lineage:
+    - datalake_zonaprop_raw.paises.nombre
+    description: Full country name displayed in market selectors and reporting.
+  currency_code:
+    lineage:
+    - datalake_zonaprop_raw.paises.moneda
+    description: ISO currency code for the primary monetary unit in this market.
+  is_active_market:
+    lineage:
+    - datalake_zonaprop_raw.paises.estamos
+    description: When true, the country is an active Zonaprop market accepting listings and orders.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.paises.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.paises.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.paises.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

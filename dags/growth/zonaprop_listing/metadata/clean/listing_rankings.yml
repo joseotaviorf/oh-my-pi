@@ -1,0 +1,103 @@
+database_name: datalake_zonaprop_clean
+table_name: listing_rankings
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Search-ranking performance snapshot for a Zonaprop listing (`avisosrealestateranking`). One row per listing (PK id_listing). Country, publication plan, publication area and ranking type provide dimensional context for impressions, leads and position metrics. Physical layout: Z-ordered by id_listing (no partitions); filter on id_listing for efficient data skipping.'
+columns:
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.idpais
+    description: Country market context for the ranking metrics snapshot.
+  id_listing:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.idaviso
+    description: Listing whose search-ranking performance is captured in this row.
+  id_publication_area:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.idareadepublicacion
+    description: Publication area dimension such as a city or zone scope for the ranking snapshot.
+  id_publication_plan:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.idplandepublicacion
+    description: Publication plan tier dimension that scopes ranking weight and visibility.
+  conversion_rate:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.convertionrate
+    description: Ratio of leads to impressions measuring listing engagement efficiency.
+  impression_count:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.impresiones
+    description: Number of search result impressions for the listing in the current ranking window.
+  lead_count:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.leads
+    description: Number of buyer leads generated from the listing in the current ranking window.
+  lead_score:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.scoreleads
+    description: Computed lead-generation score contributing to overall ranking position.
+  new_ranking_position:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.rankingnew
+    description: Recalculated position after the latest ranking algorithm update.
+  ranking_position:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.ranking
+    description: Current search result position of the listing within its scope.
+  ranking_score:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.score
+    description: Composite search-ranking score determining listing sort order.
+  ranking_type:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.tipo
+    description: Ranking algorithm or metric family such as standard, featured or experimental.
+  ranking_weight:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.peso
+    description: Weight multiplier applied by the publication plan to the listing search position.
+  record_count:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.ctdadregistros
+    description: Number of ranking evaluation records in the current window.
+  total_impression_count:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.impresionestotales
+    description: Cumulative impressions across all ranking windows for the listing.
+  total_lead_count:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.leadstotales
+    description: Cumulative leads across all ranking windows for the listing.
+  total_record_count:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.ctdadregistrostotales
+    description: Cumulative ranking evaluation records across all windows.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_created:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.fechacreacion
+    description: Moment when this ranking snapshot was first created.
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  ts_published:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.fechapublicacion
+    description: Moment when the listing was published under the ranking scope being measured.
+  ts_updated:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.fechamodificado
+    description: Last time the ranking metrics were recalculated.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.avisosrealestateranking.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

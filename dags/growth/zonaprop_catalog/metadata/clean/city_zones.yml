@@ -1,0 +1,63 @@
+database_name: datalake_zonaprop_clean
+table_name: city_zones
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Neighborhood or district within a Zonaprop city (`zonasciudad`). One row per zone (PK id_city_zone). Defines neighborhood-level geography for listings and search filters. Physical layout: Z-ordered by id_city_zone (no partitions); filter on id_city_zone for efficient data skipping.'
+columns:
+  id_city:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.idciudad
+    description: City that contains this zone in the Zonaprop geographic hierarchy.
+  id_city_zone:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.idzonaciudad
+    description: Unique identifier for a neighborhood or district within a city.
+  id_city_zone_type:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.idtipodezonaciudad
+    description: Category of zone such as neighborhood, district or administrative division.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.idpais
+    description: Country market that scopes this city zone.
+  id_state:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.idprovincia
+    description: State or province that contains this city zone.
+  city_zone_aliases:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.aliases
+    description: Alternative names for the zone to improve search matching.
+  city_zone_name:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.nombre
+    description: Display name of the zone shown in listing location selectors and search filters.
+  latitude:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.latitud
+    description: Centroid latitude of the zone for map display and proximity search.
+  longitude:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.longitud
+    description: Centroid longitude of the zone for map display and proximity search.
+  postal_code:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.codigoPostal
+    description: Postal code associated with the zone for address validation.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.zonasciudad.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

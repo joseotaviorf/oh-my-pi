@@ -1,0 +1,35 @@
+database_name: datalake_zonaprop_clean
+table_name: property_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Top-level property type taxonomy on Zonaprop (`tiposdepropiedad`). One row per type (PK id_property_type). Primary property classification used in listing creation and search. Physical layout: Z-ordered by id_property_type (no partitions); filter on id_property_type for efficient data skipping.'
+columns:
+  id_property_type:
+    lineage:
+    - datalake_zonaprop_raw.tiposdepropiedad.idtipodepropiedad
+    description: Unique identifier for a top-level property category such as apartment or house.
+  id_property_type_category:
+    lineage:
+    - datalake_zonaprop_raw.tiposdepropiedad.idcategoriatipodepropiedad
+    description: Higher-level grouping that clusters related property types for navigation.
+  property_type_name:
+    lineage:
+    - datalake_zonaprop_raw.tiposdepropiedad.nombre
+    description: Display label of the property type shown in listing creation and search.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.tiposdepropiedad.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.tiposdepropiedad.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.tiposdepropiedad.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

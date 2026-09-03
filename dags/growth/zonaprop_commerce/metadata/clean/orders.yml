@@ -1,0 +1,183 @@
+database_name: datalake_zonaprop_clean
+table_name: orders
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Commercial sales orders placed by Zonaprop agencies (`pedidos`). One row per order (PK id_order). Links agencies to SAP billing, payment terms and publication products. Physical layout: Z-ordered by id_order (no partitions); filter on id_order for efficient data skipping.'
+columns:
+  id_activating_bumeran_user:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idusuariobumeranactivador
+    description: Bumeran back-office user who activated the order for processing.
+  id_billing_company:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idempresafacturacion
+    description: Legal entity used for invoicing, which may differ from the ordering agency.
+  id_bumeran_user:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idusuariobumeran
+    description: Bumeran sales representative who created or manages the order.
+  id_company:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idempresa
+    description: Agency that placed the commercial order.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idpais
+    description: Country market where the order applies.
+  id_invoicing_frequency:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idfrecuenciadefacturacion
+    description: Billing cadence such as monthly or quarterly for recurring charges.
+  id_order:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idpedido
+    description: Unique identifier for a commercial sales order on the Zonaprop portal.
+  id_payment_method:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idmediopago
+    description: Payment method such as bank transfer, credit card or check.
+  id_payment_term:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idplazodepago
+    description: Payment term defining due dates and installment schedule.
+  id_point_of_sale:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idpuntodeventa
+    description: Sales channel or point of sale where the order was created.
+  id_portal:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idportal
+    description: Portal brand under which the order was placed.
+  id_price_list:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idlistadeprecio
+    description: Price list version applied to calculate product unit prices.
+  id_sap_sales_order:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.idpedidodeventasap
+    description: SAP sales order number for ERP billing integration.
+  affiliation_number:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.numerodeafiliacion
+    description: Payment gateway affiliation or merchant identifier.
+  amount:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.monto
+    description: Total order amount in the order currency before discounts.
+  authorization_code:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.codigoautorizacion
+    description: Payment authorization code from the payment processor.
+  bank_account_number:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.numerocuentabancaria
+    description: Bank account number used for wire transfer payments.
+  contact_email_1:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.mailcontacto1
+    description: Primary contact email for order-related communications.
+  contact_email_2:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.mailcontacto2
+    description: Secondary contact email for order-related communications.
+  days_between_invoices:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.diasentrefacturas
+    description: Interval in days between consecutive invoice issuances.
+  days_between_payments:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.diasentrepagos
+    description: Interval in days between consecutive payment due dates.
+  discount_amount:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.descuento
+    description: Total discount applied to the order.
+  invoice_count:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.cantidaddefacturas
+    description: Number of invoices planned for this order under the billing schedule.
+  invoicing_username:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.usernameFacturador
+    description: Portal username of the staff member responsible for invoicing.
+  order_detail:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.detalle
+    description: Free-text description or notes about the order.
+  order_status:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.estado
+    description: Current lifecycle status such as draft, active, invoiced or cancelled.
+  payment_count:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.cantidaddepagos
+    description: Number of installment payments planned for this order.
+  payment_receipt_number:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.numerodecomprobantedepago
+    description: Receipt number from the payment transaction.
+  purchase_order_number:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.ordendecompra
+    description: Customer purchase order reference for corporate billing.
+  usd_exchange_rate:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.cotizaciondolar
+    description: USD exchange rate applied when the order is invoiced in dollars.
+  is_enabled:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.habilitado
+    description: When true, the order is active and publication credits can be consumed.
+  is_invoiced_in_usd:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.facturaendolar
+    description: When true, the order is billed in US dollars rather than local currency.
+  dt_created:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.fechaalta
+    description: Date when the order was created.
+  dt_deactivated:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.fechabaja
+    description: Date when the order was cancelled or deactivated.
+  dt_deactivation_requested:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.fechasolicitudbaja
+    description: Date when the agency requested order cancellation.
+  dt_invoiced:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.fechafacturado
+    description: Date when the order was fully invoiced.
+  dt_invoicing_started:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.fechainiciofacturas
+    description: Date when the first invoice was issued for this order.
+  dt_paid:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.fechapago
+    description: Date when the order was fully paid.
+  dt_payments_started:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.fechainiciopagos
+    description: Date when the first payment was due or received.
+  dt_started:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.fechaInicio
+    description: Date when the order became effective and credits became available.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.pedidos.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

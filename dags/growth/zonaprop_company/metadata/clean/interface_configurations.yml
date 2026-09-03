@@ -1,0 +1,87 @@
+database_name: datalake_zonaprop_clean
+table_name: interface_configurations
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Integration endpoint configuration for a Zonaprop external interface (`interfaceconfigurations`). One row per interface (PK id_interface). Defines how third-party listing feeds connect to the portal. Physical layout: Z-ordered by id_interface (no partitions); filter on id_interface for efficient data skipping.'
+columns:
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.idpais
+    description: Country market where this integration configuration applies.
+  id_integrator:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.idintegrador
+    description: Third-party integrator or software vendor providing the feed connector.
+  id_interface:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.idinterface
+    description: Unique identifier for an integration endpoint configuration.
+  class_name:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.classname
+    description: Java class name implementing the integration connector logic.
+  default_id_company:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.defaultidempresa
+    description: Fallback agency used when incoming feed records lack a company mapping.
+  default_id_user:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.defaultidusuario
+    description: Fallback portal user assigned to listings imported without an explicit owner.
+  execution_hour_range_end:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.rangohorasejecucionfin
+    description: Latest hour of day when scheduled sync jobs may run.
+  execution_hour_range_start:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.rangohorasejecucioninicio
+    description: Earliest hour of day when scheduled sync jobs may run.
+  interface_name:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.nombre
+    description: Human-readable name of the integration shown in back-office screens.
+  minutes_between_executions:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.minutosentreejecuciones
+    description: Minimum interval in minutes between consecutive sync job runs.
+  parameters:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.parametros
+    description: Serialized default parameter set for the integration connector.
+  processor_code:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.procesador
+    description: Code selecting the processor implementation that handles feed parsing.
+  is_check_only:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.justcheck
+    description: When true, sync jobs validate feed data without writing changes to listings.
+  is_enabled:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.habilitado
+    description: When true, the integration configuration is active and eligible to run sync jobs.
+  is_image_download_enabled:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.descargarimagenes
+    description: When true, the integration downloads and stores listing images locally.
+  is_online:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.isonline
+    description: When true, the integration is currently connected and processing in real time.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurations.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

@@ -1,0 +1,119 @@
+database_name: datalake_zonaprop_clean
+table_name: geolocations
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Geographic point or area definitions used by Zonaprop search (`geolocalizaciones`). One row per geolocation (PK id_geolocation). Powers map-based search, autocomplete and location resolution. Physical layout: Z-ordered by id_geolocation (no partitions); filter on id_geolocation for efficient data skipping.'
+columns:
+  id_geolocation:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.idgeolocalizacion
+    description: Unique identifier for a resolved geographic location in Zonaprop search.
+  id_geolocation_country:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.idgeolocalizacionpais
+    description: Linked country-level geolocation node in the hierarchy.
+  id_geolocation_locality:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.idgeolocalizacionlocalidad
+    description: Linked locality-level geolocation node such as a city or town.
+  id_geolocation_state:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.idgeolocalizacionprovincia
+    description: Linked state or province geolocation node in the hierarchy.
+  admin_area_level_1_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.administrative_area_level_1
+    description: First-level administrative area name, typically state or province.
+  admin_area_level_2_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.administrative_area_level_2
+    description: Second-level administrative area name, typically department or county.
+  admin_area_level_3_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.administrative_area_level_3
+    description: Third-level administrative area name for finer administrative divisions.
+  bounds_northeast:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.northEast
+    description: Northeast corner coordinates defining the geographic bounding box.
+  bounds_southwest:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.southwest
+    description: Southwest corner coordinates defining the geographic bounding box.
+  country_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.country
+    description: Country name returned by the geocoding service.
+  geolocation_type:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.type
+    description: Resolution type of the geolocation such as address, neighborhood or point of interest.
+  latitude:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.lat
+    description: Latitude coordinate of the geocoded point.
+  locality_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.locality
+    description: City or town name from the geocoding result.
+  location_type:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.location_type
+    description: Granularity level of the location used by the search engine.
+  longitude:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.lng
+    description: Longitude coordinate of the geocoded point.
+  neighborhood_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.neighborhood
+    description: Neighborhood name from the geocoding result.
+  point_of_interest_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.point_of_interest
+    description: Named point of interest when the location is not a street address.
+  postal_code:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.postal_code
+    description: Postal code associated with the geocoded location.
+  premise_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.premise
+    description: Named building or premise when the location resolves to a specific property.
+  route_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.route
+    description: Route or street name component of the resolved address.
+  street_address:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.streetaddress
+    description: Street-level address text when the geolocation resolves to a specific location.
+  street_number:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.street_number
+    description: Street number component of the resolved address.
+  sublocality_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.sublocality
+    description: Sub-locality name within a city such as a district.
+  subpremise_name:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.subpremise
+    description: Unit or apartment identifier within a premise.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.geolocalizaciones.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

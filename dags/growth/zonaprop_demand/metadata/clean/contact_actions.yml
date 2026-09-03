@@ -1,0 +1,43 @@
+database_name: datalake_zonaprop_clean
+table_name: contact_actions
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Buyer contact and lead actions on Zonaprop listings (`contactosacciones`). One row per contact action (PK id_contact_action). Feeds demand-funnel analytics linking buyer intent to listings. Physical layout: Z-ordered by id_contact_action (no partitions); filter on id_contact_action for efficient data skipping.'
+columns:
+  id_action_type:
+    lineage:
+    - datalake_zonaprop_raw.contactosacciones.idtipoaccion
+    description: Type of buyer interaction such as phone call, email inquiry or WhatsApp message.
+  id_contact:
+    lineage:
+    - datalake_zonaprop_raw.contactosacciones.idcontacto
+    description: Buyer contact record associated with this interaction event.
+  id_contact_action:
+    lineage:
+    - datalake_zonaprop_raw.contactosacciones.idcontactoaccion
+    description: Unique identifier for a single buyer action on a Zonaprop listing.
+  id_source:
+    lineage:
+    - datalake_zonaprop_raw.contactosacciones.idorigen
+    description: Portal page or channel where the buyer initiated the contact action.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.contactosacciones.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.contactosacciones.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  ts_occurred:
+    lineage:
+    - datalake_zonaprop_raw.contactosacciones.fecha
+    description: Moment when the buyer performed the contact action on the portal.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.contactosacciones.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

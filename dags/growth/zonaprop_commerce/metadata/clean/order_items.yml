@@ -1,0 +1,83 @@
+database_name: datalake_zonaprop_clean
+table_name: order_items
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Line items within a Zonaprop commercial order (`itemspedido`). One row per order item (PK id_order_item). Details products purchased, quantities and amounts that fund listing publications. Physical layout: Z-ordered by id_order_item (no partitions); filter on id_order_item for efficient data skipping.'
+columns:
+  id_account:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.idcuenta
+    description: Billing account charged for this order line item.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.idpais
+    description: Country market where this product line item applies.
+  id_order:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.idpedido
+    description: Parent commercial order containing this line item.
+  id_order_item:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.iditempedido
+    description: Unique identifier for a line item within a commercial order.
+  id_product:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.idproducto
+    description: Sellable product such as a publication credit package.
+  id_sap_sales_order_position:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.idposicionpedidodeventasap
+    description: SAP line position number for ERP billing integration.
+  id_zone:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.idzona
+    description: Geographic zone that scopes product availability for this line item.
+  amount:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.monto
+    description: Total line amount in the order currency.
+  consumed_quantity:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.consumidos
+    description: Number of product units already used for listing publications.
+  item_position:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.posicion
+    description: Sequential position of the line item within the order.
+  list_unit_price:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.preciounitariodelista
+    description: Catalog list price per unit before discounts.
+  quantity:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.cantidad
+    description: Number of product units purchased in this line item.
+  unit_price:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.preciounitario
+    description: Negotiated unit price after discounts for this line item.
+  is_non_deliverable:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.noentregable
+    description: When true, the product is a service charge not tied to listing delivery.
+  dt_expired:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.fechadevencimiento
+    description: Date when unconsumed publication credits from this line item expire.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.itemspedido.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

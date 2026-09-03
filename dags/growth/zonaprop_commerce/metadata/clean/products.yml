@@ -1,0 +1,79 @@
+database_name: datalake_zonaprop_clean
+table_name: products
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Sellable products in the Zonaprop commercial catalog (`productos`). One row per product (PK id_product). Defines publication credits, delivery limits and SAP material linkage. Physical layout: Z-ordered by id_product (no partitions); filter on id_product for efficient data skipping.'
+columns:
+  id_product:
+    lineage:
+    - datalake_zonaprop_raw.productos.idproducto
+    description: Unique identifier for a sellable product in the Zonaprop commercial catalog.
+  id_product_line:
+    lineage:
+    - datalake_zonaprop_raw.productos.idlineadeproducto
+    description: Product line that groups this product in the catalog hierarchy.
+  id_product_subline:
+    lineage:
+    - datalake_zonaprop_raw.productos.idsublineadeproducto
+    description: Finer sub-line classification within the product line.
+  id_sap_material:
+    lineage:
+    - datalake_zonaprop_raw.productos.idmaterialsap
+    description: SAP material number for ERP inventory and billing integration.
+  id_zone:
+    lineage:
+    - datalake_zonaprop_raw.productos.idzona
+    description: Geographic zone that scopes product availability.
+  concurrent_delivery_limit:
+    lineage:
+    - datalake_zonaprop_raw.productos.limiteentregaensimultaneo
+    description: Maximum number of simultaneous listing deliveries allowed.
+  daily_delivery_limit:
+    lineage:
+    - datalake_zonaprop_raw.productos.limiteentregapordia
+    description: Maximum listing deliveries permitted per day.
+  initial_quantity:
+    lineage:
+    - datalake_zonaprop_raw.productos.cantidadinicial
+    description: Default quantity bundled when the product is first purchased.
+  monthly_delivery_limit:
+    lineage:
+    - datalake_zonaprop_raw.productos.limiteentregapormes
+    description: Maximum listing deliveries permitted per month.
+  product_name:
+    lineage:
+    - datalake_zonaprop_raw.productos.nombre
+    description: Display name of the product shown in order creation screens.
+  validity_days:
+    lineage:
+    - datalake_zonaprop_raw.productos.diasvigencia
+    description: Number of days publication credits remain valid after purchase.
+  is_cloneable:
+    lineage:
+    - datalake_zonaprop_raw.productos.esclonable
+    description: When true, the product configuration can be duplicated for new orders.
+  is_enabled:
+    lineage:
+    - datalake_zonaprop_raw.productos.habilitado
+    description: When true, the product is available for purchase in the catalog.
+  is_unlimited_delivery:
+    lineage:
+    - datalake_zonaprop_raw.productos.entregailimitada
+    description: When true, the product allows unlimited listing deliveries within its term.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.productos.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.productos.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.productos.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

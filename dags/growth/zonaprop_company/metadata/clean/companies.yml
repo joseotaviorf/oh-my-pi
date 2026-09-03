@@ -1,0 +1,199 @@
+database_name: datalake_zonaprop_clean
+table_name: companies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Real-estate agency accounts on the Zonaprop portal (`empresas`). One row per company (PK id_company). Includes billing, contact and SAP linkage for B2B and supply analytics. Physical layout: Z-ordered by id_company (no partitions); filter on id_company for efficient data skipping.'
+columns:
+  id_agency_type:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idtipodeinmobiliaria
+    description: Agency category that classifies the company for commercial rules and segmentation.
+  id_city:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idciudad
+    description: City where the agency is headquartered or primarily operates.
+  id_company:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idempresa
+    description: Unique identifier for a real-estate agency account on the Zonaprop portal.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idpais
+    description: Country market where the agency operates and is billed.
+  id_financial_status:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idestadofinanciero
+    description: Financial standing of the agency affecting credit and billing eligibility.
+  id_group:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idgrupo
+    description: Corporate group that owns or manages multiple agency accounts.
+  id_iw_branch:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idSucursalIW
+    description: ImovelWeb branch identifier when the agency is linked to the IW network.
+  id_parent_company:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idempresapadre
+    description: Parent agency account when this company is a subsidiary or franchise.
+  id_portal:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idportal
+    description: Portal brand under which the agency account is registered.
+  id_sap_client:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idclientesap
+    description: SAP customer number used for invoicing and accounts receivable.
+  id_state:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idprovincia
+    description: State or province where the agency is located.
+  id_tax:
+    lineage:
+    - datalake_zonaprop_raw.empresas.cuit
+    description: Tax identification number (CUIT) for the agency in Argentina.
+  id_vat_condition:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idcondicioniva
+    description: VAT tax condition code applied to the agency for invoicing.
+  id_video:
+    lineage:
+    - datalake_zonaprop_raw.empresas.videoid
+    description: External video platform identifier for the agency promotional video.
+  id_zone:
+    lineage:
+    - datalake_zonaprop_raw.empresas.idzona
+    description: City zone or neighborhood associated with the agency address.
+  about_us_text:
+    lineage:
+    - datalake_zonaprop_raw.empresas.quienesSomos
+    description: Long-form about-us content displayed on the agency public profile.
+  address:
+    lineage:
+    - datalake_zonaprop_raw.empresas.direccion
+    description: Street address of the agency office.
+  broker_count:
+    lineage:
+    - datalake_zonaprop_raw.empresas.cantidadCorredores
+    description: Number of licensed brokers associated with the agency.
+  company_description:
+    lineage:
+    - datalake_zonaprop_raw.empresas.descripcion
+    description: Marketing description of the agency shown on its public profile page.
+  company_name:
+    lineage:
+    - datalake_zonaprop_raw.empresas.denominacion
+    description: Trade name of the agency displayed on listings and the portal.
+  company_segment:
+    lineage:
+    - datalake_zonaprop_raw.empresas.segmento
+    description: Commercial segment classification for sales and marketing analytics.
+  company_slug:
+    lineage:
+    - datalake_zonaprop_raw.empresas.slug
+    description: URL-friendly identifier for the agency public profile page.
+  contact_email:
+    lineage:
+    - datalake_zonaprop_raw.empresas.email
+    description: Primary contact email for the agency account.
+  cover_photo_url:
+    lineage:
+    - datalake_zonaprop_raw.empresas.fotoPortadaUrl
+    description: URL of the cover image on the agency public profile page.
+  employee_count:
+    lineage:
+    - datalake_zonaprop_raw.empresas.cantidadEmpleados
+    description: Total number of employees reported by the agency.
+  legal_name:
+    lineage:
+    - datalake_zonaprop_raw.empresas.razonsocial
+    description: Registered legal name of the agency for contracts and invoicing.
+  license_number:
+    lineage:
+    - datalake_zonaprop_raw.empresas.licencia
+    description: Real-estate brokerage license number for regulatory compliance.
+  logo_url:
+    lineage:
+    - datalake_zonaprop_raw.empresas.urlLogo
+    description: URL of the agency logo image displayed on listings and profile pages.
+  phone_number:
+    lineage:
+    - datalake_zonaprop_raw.empresas.telefono
+    description: Main office phone number for the agency.
+  postal_code:
+    lineage:
+    - datalake_zonaprop_raw.empresas.codigopostal
+    description: Postal code of the agency office address.
+  rental_chat_url:
+    lineage:
+    - datalake_zonaprop_raw.empresas.urlchatalquiler
+    description: Live chat URL for rental inquiries on the agency profile.
+  rental_email:
+    lineage:
+    - datalake_zonaprop_raw.empresas.emailalquiler
+    description: Dedicated email address for rental inquiries routed to the agency.
+  sales_chat_url:
+    lineage:
+    - datalake_zonaprop_raw.empresas.urlchatventa
+    description: Live chat URL for sales inquiries on the agency profile.
+  video_provider:
+    lineage:
+    - datalake_zonaprop_raw.empresas.videoprovider
+    description: Video hosting platform used for the agency promotional video.
+  video_url:
+    lineage:
+    - datalake_zonaprop_raw.empresas.videoUrl
+    description: URL of the agency promotional video.
+  website_url:
+    lineage:
+    - datalake_zonaprop_raw.empresas.url
+    description: Agency website URL linked from the public profile.
+  is_approved:
+    lineage:
+    - datalake_zonaprop_raw.empresas.aprobada
+    description: When true, the agency account has been approved by Zonaprop operations and can publish listings.
+  is_enabled:
+    lineage:
+    - datalake_zonaprop_raw.empresas.habilitada
+    description: When true, the agency account is active and can log in to the portal.
+  is_manually_blocked:
+    lineage:
+    - datalake_zonaprop_raw.empresas.bloqueadomanual
+    description: When true, operations has manually blocked the agency from publishing or transacting.
+  is_top_500:
+    lineage:
+    - datalake_zonaprop_raw.empresas.top500
+    description: When true, the agency is ranked among the top 500 agencies on the portal.
+  is_visible:
+    lineage:
+    - datalake_zonaprop_raw.empresas.visible
+    description: When true, the agency public profile is visible to portal visitors.
+  dt_missing:
+    lineage:
+    - datalake_zonaprop_raw.empresas.falta
+    description: Date when the agency was flagged as missing required documentation or data.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.empresas.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.empresas.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  ts_deactivated:
+    lineage:
+    - datalake_zonaprop_raw.empresas.fbaja
+    description: Moment when the agency account was deactivated on the portal.
+  ts_updated:
+    lineage:
+    - datalake_zonaprop_raw.empresas.fechamodificado
+    description: Last time any agency profile or settings were modified.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.empresas.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

@@ -1,0 +1,39 @@
+database_name: datalake_zonaprop_clean
+table_name: interface_configuration_parameters
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Key-value parameters for a Zonaprop interface configuration (`interfaceconfigurationparameters`). One row per parameter (PK id_parameter). Stores connector credentials and runtime settings. Physical layout: Z-ordered by id_parameter (no partitions); filter on id_parameter for efficient data skipping.'
+columns:
+  id_interface:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurationparameters.idinterface
+    description: Integration configuration that owns this parameter.
+  id_parameter:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurationparameters.idparameter
+    description: Unique identifier for a configuration parameter row.
+  parameter_name:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurationparameters.name
+    description: Name of the configuration key such as API endpoint or credential identifier.
+  parameter_value:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurationparameters.value
+    description: Value assigned to the configuration parameter for the integration runtime.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurationparameters.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurationparameters.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.interfaceconfigurationparameters.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

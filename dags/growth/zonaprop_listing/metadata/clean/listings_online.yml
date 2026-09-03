@@ -1,0 +1,59 @@
+database_name: datalake_zonaprop_clean
+table_name: listings_online
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Active online publication record for a Zonaprop listing (`avisosonline`). One row per listing (PK id_listing). Tracks the publication plan, commercial order and visibility level while the listing is live on the portal. Physical layout: Z-ordered by id_listing (no partitions); filter on id_listing for efficient data skipping.'
+columns:
+  id_company:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.idempresa
+    description: Agency that owns the currently online listing.
+  id_listing:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.idaviso
+    description: Listing that is actively published on the portal.
+  id_listing_delivery:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.identregaaviso
+    description: Publication delivery that placed this listing online.
+  id_order:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.idpedido
+    description: Commercial order funding the current online publication.
+  id_order_item:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.iditempedido
+    description: Order line item specifying the publication product consumed.
+  id_publication_plan:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.idplandepublicacion
+    description: Publication plan tier determining listing visibility and ranking weight.
+  listing_level:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.nivelaviso
+    description: Visibility level or prominence tier of the online listing.
+  dt_published:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.fechapublicacion
+    description: Date when the listing went online under the current publication.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  ts_updated:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.fechamodificado
+    description: Last time the online publication record was modified.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.avisosonline.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

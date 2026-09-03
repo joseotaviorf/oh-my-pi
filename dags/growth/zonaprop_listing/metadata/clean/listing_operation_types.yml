@@ -1,0 +1,47 @@
+database_name: datalake_zonaprop_clean
+table_name: listing_operation_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Sale, rent or other operation types enabled on a Zonaprop listing (`avisostiposdeoperaciones`). One row per listing-operation assignment (PK id_listing_operation_type). Supports multi-operation listings with distinct pricing. Physical layout: Z-ordered by id_listing (no partitions); filter on id_listing for efficient data skipping.'
+columns:
+  id_currency:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.idmoneda
+    description: Currency in which the operation price is denominated.
+  id_listing:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.idaviso
+    description: Listing that offers this transaction mode.
+  id_listing_operation_type:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.idavisostiposdeoperaciones
+    description: Unique identifier for a listing-to-operation-type assignment.
+  id_operation_type:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.idtipodeoperacion
+    description: Transaction mode such as sale or rent enabled on the listing.
+  extra_price_amount:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.precioextra
+    description: Secondary price component such as expenses or common charges for this operation.
+  price_amount:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.precio
+    description: Primary asking price for this operation in the specified currency.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.avisostiposdeoperaciones.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

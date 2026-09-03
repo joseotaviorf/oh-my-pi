@@ -1,0 +1,31 @@
+database_name: datalake_zonaprop_clean
+table_name: operation_types
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Listing operation type lookup on Zonaprop (`tiposdeoperacion`). One row per type (PK id_operation_type). Distinguishes sale, rent and other transaction modes for search and pricing. Physical layout: Z-ordered by id_operation_type (no partitions); filter on id_operation_type for efficient data skipping.'
+columns:
+  id_operation_type:
+    lineage:
+    - datalake_zonaprop_raw.tiposdeoperacion.idtipodeoperacion
+    description: Unique identifier for a listing transaction mode such as sale or rent.
+  operation_type_name:
+    lineage:
+    - datalake_zonaprop_raw.tiposdeoperacion.nombre
+    description: Display label of the operation type shown in search filters and listing forms.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.tiposdeoperacion.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.tiposdeoperacion.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.tiposdeoperacion.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

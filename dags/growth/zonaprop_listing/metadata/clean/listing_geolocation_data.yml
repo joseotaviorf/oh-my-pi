@@ -1,0 +1,39 @@
+database_name: datalake_zonaprop_clean
+table_name: listing_geolocation_data
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Map display settings and geocoded location for a Zonaprop listing (`avisosgeolocationdata`). One row per listing (PK id_listing). Feeds map rendering and geo-based search. Physical layout: Z-ordered by id_listing (no partitions); filter on id_listing for efficient data skipping.'
+columns:
+  id_geolocation:
+    lineage:
+    - datalake_zonaprop_raw.avisosgeolocationdata.idgeolocalizacion
+    description: Resolved geographic location used for map display and proximity search.
+  id_geolocation_to_display:
+    lineage:
+    - datalake_zonaprop_raw.avisosgeolocationdata.idgeolocalizacionamostrar
+    description: Geolocation shown on the public listing map, which may differ from the exact address for privacy.
+  id_listing:
+    lineage:
+    - datalake_zonaprop_raw.avisosgeolocationdata.idaviso
+    description: Listing whose map coordinates and display settings are defined in this row.
+  map_zoom_level:
+    lineage:
+    - datalake_zonaprop_raw.avisosgeolocationdata.zoom
+    description: Default map zoom level when displaying the listing location to visitors.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisosgeolocationdata.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisosgeolocationdata.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.avisosgeolocationdata.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

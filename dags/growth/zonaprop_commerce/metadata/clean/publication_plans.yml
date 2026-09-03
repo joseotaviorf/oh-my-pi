@@ -1,0 +1,47 @@
+database_name: datalake_zonaprop_clean
+table_name: publication_plans
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Publication plan definitions (listing visibility packages) on Zonaprop (`planesdepublicacion`). One row per plan (PK id_publication_plan). Determines listing prominence, ranking weight and commercial tier. Physical layout: Z-ordered by id_publication_plan (no partitions); filter on id_publication_plan for efficient data skipping.'
+columns:
+  id_publication_plan:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.idplandepublicacion
+    description: Unique identifier for a listing visibility package on the portal.
+  id_sap_publication_plan:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.idplandepublicacionsap
+    description: SAP plan code for billing integration.
+  id_translation:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.idTraduccion
+    description: Translation bundle for localized plan names.
+  plan_weight:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.peso
+    description: Numeric weight multiplier applied to search ranking for listings on this plan.
+  publication_plan_name:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.nombre
+    description: Display name of the plan such as Simple, Destacado or Superdestacado.
+  is_cloneable:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.esclonable
+    description: When true, the plan configuration can be duplicated for new products.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.planesdepublicacion.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

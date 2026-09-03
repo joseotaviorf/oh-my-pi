@@ -1,0 +1,51 @@
+database_name: datalake_zonaprop_clean
+table_name: listing_deliveries
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Publication credit consumption when a listing is delivered to the portal (`entregasavisos`). One row per delivery record (PK id_listing_delivery). Links listings to commercial orders that funded the publication. Physical layout: Z-ordered by id_listing (no partitions); filter on id_listing for efficient data skipping.'
+columns:
+  id_account:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.idcuenta
+    description: Billing account charged for the publication credit consumed by this delivery.
+  id_company_user:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.idusuarioempresa
+    description: Agency user who triggered the listing delivery.
+  id_listing:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.idaviso
+    description: Listing that was published to the portal through this delivery.
+  id_listing_delivery:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.identregaaviso
+    description: Unique identifier for a publication credit consumption event.
+  id_order:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.idpedido
+    description: Commercial order that funded the publication credit for this delivery.
+  id_order_item:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.iditempedido
+    description: Order line item specifying the product and quantity consumed.
+  dt_delivered:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.fecha
+    description: Date when the listing was delivered and became eligible for online publication.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.entregasavisos.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

@@ -1,0 +1,67 @@
+database_name: datalake_zonaprop_clean
+table_name: interface_companies
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Mapping between a Zonaprop agency and an external integration partner (`interfaceempresas`). One row per interface-company link (PK id_interface_company). Controls which CRM or feed systems sync with each agency. Physical layout: Z-ordered by id_interface_company (no partitions); filter on id_interface_company for efficient data skipping.'
+columns:
+  id_company:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.idempresa
+    description: Agency whose listings are synchronized through this integration.
+  id_company_user:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.idusuarioempresa
+    description: Portal user responsible for managing this integration on behalf of the agency.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.idpais
+    description: Country market where this integration operates.
+  id_external_company:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.idempresaexterna
+    description: Company identifier in the external CRM or feed system.
+  id_interface:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.idinterface
+    description: Integration configuration that defines how data flows between systems.
+  id_interface_company:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.idinterfaceempresa
+    description: Unique identifier for an agency-to-integration link.
+  pause_status:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.pausestatus
+    description: Pause state code indicating if the integration sync is active, paused or suspended.
+  processor_code:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.procesador
+    description: Code selecting the integration processor implementation for this agency.
+  is_enabled:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.habilitado
+    description: When true, the integration link is active and eligible to sync listings.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_created:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.fechaalta
+    description: Moment when the integration link was first established.
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  ts_deactivated:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.fechabaja
+    description: Moment when the integration link was deactivated.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.interfaceempresas.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

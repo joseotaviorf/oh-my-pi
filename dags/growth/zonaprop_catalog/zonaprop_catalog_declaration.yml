@@ -1,0 +1,100 @@
+dag:
+  name: zonaprop_catalog
+  owner: Data Growth
+  schedule_interval: 0 8,12,21 * * *
+  schedule_start_date: 2026, 9, 1
+  documentation:
+    dag_purpose: 'CDC pipeline for Zonaprop (Navent) — Catalog domain tables (RD-3334,
+      parent RD-3332).
+
+
+      CDC ingestion of Zonaprop geographic, property-type and currency reference catalogs
+      from the Navent MySQL portal. Shared dimension tables for listings, companies
+      and commerce facts in the migration POC.
+
+
+      DATA LINEAGE: MySQL (OLTP) -> datalake_zonaprop_raw -> datalake_zonaprop_clean
+
+      SCHEDULE: 3x daily at minute 0 UTC (08:00, 12:00, 21:00).
+
+      See dags/growth/zonaprop_catalog/zonaprop_catalog.md for table inventory.'
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: zonaprop
+  custom_schema: zonaprop
+  source_schema: zonaprop
+  dbutils_secret_key: ZONAPROP_DB
+  tables_customization:
+    paises:
+      clean_table_name: countries
+      clean_primary_keys:
+      - id_country
+      clean_z_order_by:
+      - id_country
+    provincias:
+      clean_table_name: states
+      clean_primary_keys:
+      - id_state
+      clean_z_order_by:
+      - id_state
+    ciudades:
+      clean_table_name: cities
+      clean_primary_keys:
+      - id_city
+      clean_z_order_by:
+      - id_city
+    zonasciudad:
+      clean_table_name: city_zones
+      clean_primary_keys:
+      - id_city_zone
+      clean_z_order_by:
+      - id_city
+    subzonasciudad:
+      clean_table_name: city_subzones
+      clean_primary_keys:
+      - id_city_subzone
+      clean_z_order_by:
+      - id_city
+    geolocalizaciones:
+      clean_table_name: geolocations
+      clean_primary_keys:
+      - id_geolocation
+      clean_z_order_by:
+      - id_geolocation
+    tiposdepropiedad:
+      clean_table_name: property_types
+      clean_primary_keys:
+      - id_property_type
+      clean_z_order_by:
+      - id_property_type
+    subtiposdepropiedad:
+      clean_table_name: property_subtypes
+      clean_primary_keys:
+      - id_property_subtype
+      clean_z_order_by:
+      - id_property_type
+    tiposdeoperacion:
+      clean_table_name: operation_types
+      clean_primary_keys:
+      - id_operation_type
+      clean_z_order_by:
+      - id_operation_type
+    etapasdedesarrollo:
+      clean_table_name: development_stages
+      clean_primary_keys:
+      - id_development_stage
+      clean_z_order_by:
+      - id_development_stage
+    monedas:
+      clean_table_name: currencies
+      clean_primary_keys:
+      - id_currency
+      clean_z_order_by:
+      - id_currency
+  extra_query_template_params:
+    load_start_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_start_date'')
+      }}'
+    load_end_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_end_date'')
+      }}'

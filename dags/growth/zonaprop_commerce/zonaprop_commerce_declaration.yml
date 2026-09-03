@@ -1,0 +1,78 @@
+dag:
+  name: zonaprop_commerce
+  owner: Data Growth
+  schedule_interval: 0 8,12,21 * * *
+  schedule_start_date: 2026, 9, 1
+  documentation:
+    dag_purpose: 'CDC pipeline for Zonaprop (Navent) — Commerce domain tables (RD-3334,
+      parent RD-3332).
+
+
+      CDC ingestion of Zonaprop commercial orders, order line items, sellable products,
+      product lines and publication-plan catalog from the Navent MySQL portal. Feeds
+      revenue and subscription analytics for the migration POC.
+
+
+      DATA LINEAGE: MySQL (OLTP) -> datalake_zonaprop_raw -> datalake_zonaprop_clean
+
+      SCHEDULE: 3x daily at minute 0 UTC (08:00, 12:00, 21:00).
+
+      See dags/growth/zonaprop_commerce/zonaprop_commerce.md for table inventory.'
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: zonaprop
+  custom_schema: zonaprop
+  source_schema: zonaprop
+  dbutils_secret_key: ZONAPROP_DB
+  tables_customization:
+    pedidos:
+      clean_table_name: orders
+      clean_primary_keys:
+      - id_order
+      clean_z_order_by:
+      - id_order
+    itemspedido:
+      clean_table_name: order_items
+      clean_primary_keys:
+      - id_order_item
+      clean_z_order_by:
+      - id_order
+    productos:
+      clean_table_name: products
+      clean_primary_keys:
+      - id_product
+      clean_z_order_by:
+      - id_product
+    lineasdeproducto:
+      clean_table_name: product_lines
+      clean_primary_keys:
+      - id_product_line
+      clean_z_order_by:
+      - id_product_line
+    planesdepublicacion:
+      clean_table_name: publication_plans
+      clean_primary_keys:
+      - id_publication_plan
+      clean_z_order_by:
+      - id_publication_plan
+    planesporproductoporpais:
+      clean_table_name: plans_by_product_by_country
+      raw_primary_keys:
+      - idplandepublicacion
+      - idproducto
+      - idpais
+      clean_primary_keys:
+      - id_publication_plan
+      - id_product
+      - id_country
+      clean_z_order_by:
+      - id_publication_plan
+      - id_product
+      - id_country
+  extra_query_template_params:
+    load_start_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_start_date'')
+      }}'
+    load_end_date: '{{ get_date_param(dag_run, data_interval_start | ds, ''load_end_date'')
+      }}'

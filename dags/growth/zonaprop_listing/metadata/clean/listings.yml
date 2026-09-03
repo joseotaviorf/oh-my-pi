@@ -1,0 +1,355 @@
+database_name: datalake_zonaprop_clean
+table_name: listings
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'Real-estate classified listings published on the Zonaprop portal (Navent MySQL `avisos`). One row per listing (PK id_listing). Covers property attributes, address, pricing, publication window and lifecycle status as the root supply entity. Physical layout: Z-ordered by id_listing (no partitions); filter on id_listing for efficient data skipping.'
+columns:
+  id_account:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idcuenta
+    description: Billing account associated with the listing publication charges.
+  id_agreed_commission_currency:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idmonedaconvenida
+    description: Currency for the commission amount agreed with the property owner.
+  id_beach:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idplaya
+    description: Beach or coastal area associated with the property location.
+  id_city:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idciudad
+    description: City where the property is located.
+  id_city_subzone:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idsubzonaciudad
+    description: Sub-zone within a city zone for finer neighborhood classification.
+  id_company:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idempresa
+    description: Agency that publishes and manages this listing on the portal.
+  id_company_user:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idusuarioempresa
+    description: Agency agent who created or owns this listing.
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idpais
+    description: Country market where the listing is published.
+  id_currency:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idmoneda
+    description: Currency in which the primary listing price is denominated.
+  id_delivery:
+    lineage:
+    - datalake_zonaprop_raw.avisos.identrega
+    description: Latest publication delivery that placed this listing online.
+  id_development_stage:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idetapadedesarrollo
+    description: Construction or delivery stage for development property listings.
+  id_external_original:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idoriginalexterna
+    description: Identifier of the listing in the originating external system before import.
+  id_listing:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idaviso
+    description: Unique identifier for a classified property listing on the Zonaprop portal.
+  id_measurement_unit:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idunidaddemedida
+    description: Unit of measure for area fields such as square meters.
+  id_operation_type:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idtipodeoperacion
+    description: Primary transaction mode such as sale or rent for the listing.
+  id_parent_listing:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idavisopadre
+    description: Parent listing when this record is a unit or sub-listing within a development.
+  id_photo:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idfoto
+    description: Primary cover photo identifier for the listing gallery.
+  id_portal:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idportal
+    description: Portal brand under which the listing is published.
+  id_posting_type:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idtipodeposting
+    description: Posting category distinguishing standard, development or other listing formats.
+  id_property_subtype:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idsubtipodepropiedad
+    description: Property subtype refining the top-level property type.
+  id_property_type:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idtipodepropiedad
+    description: Top-level property category such as apartment, house or land.
+  id_shared_commission_currency:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idmonedacompartir
+    description: Currency for the co-brokerage commission shared with collaborating agents.
+  id_source:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idorigen
+    description: Origin channel of the listing such as manual entry, CRM feed or bulk import.
+  id_state:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idprovincia
+    description: State or province where the property is located.
+  id_value_zone:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idzonadevalor
+    description: Valuation zone used for price-per-square-meter benchmarks.
+  id_zone:
+    lineage:
+    - datalake_zonaprop_raw.avisos.idzona
+    description: City zone or neighborhood where the property is located.
+  address:
+    lineage:
+    - datalake_zonaprop_raw.avisos.direccion
+    description: Street address of the property.
+  address_complement:
+    lineage:
+    - datalake_zonaprop_raw.avisos.direccion_complemento
+    description: Additional address details such as apartment number or building name.
+  agreed_commission_amount:
+    lineage:
+    - datalake_zonaprop_raw.avisos.comisionconvenida
+    description: Commission percentage or amount agreed with the property owner.
+  alternative_company_name:
+    lineage:
+    - datalake_zonaprop_raw.avisos.nombreempresaalternativo
+    description: Alternate agency name displayed on the listing instead of the default company name.
+  available_unit_count:
+    lineage:
+    - datalake_zonaprop_raw.avisos.disponibles
+    description: Number of units still available for sale or rent in a development.
+  bathroom_count:
+    lineage:
+    - datalake_zonaprop_raw.avisos.banos
+    description: Number of full bathrooms in the property.
+  bedroom_count:
+    lineage:
+    - datalake_zonaprop_raw.avisos.habitaciones
+    description: Number of bedrooms in the property.
+  city_name:
+    lineage:
+    - datalake_zonaprop_raw.avisos.ciudad
+    description: Free-text city name as entered by the agent, which may supplement the catalog city.
+  commission_comments:
+    lineage:
+    - datalake_zonaprop_raw.avisos.comisioncomentarios
+    description: Free-text notes about commission arrangements for the property.
+  condo_fee_amount:
+    lineage:
+    - datalake_zonaprop_raw.avisos.valorcondominio
+    description: Monthly condominium or building maintenance fee in the listing currency.
+  contact_data:
+    lineage:
+    - datalake_zonaprop_raw.avisos.datoscontacto
+    description: Serialized contact information block for buyer inquiries.
+  contact_email:
+    lineage:
+    - datalake_zonaprop_raw.avisos.email
+    description: Email address displayed for buyer inquiries on the listing.
+  covered_area_m2:
+    lineage:
+    - datalake_zonaprop_raw.avisos.metroscubiertos
+    description: Indoor covered area in square meters.
+  extra_price_amount:
+    lineage:
+    - datalake_zonaprop_raw.avisos.precioextra
+    description: Secondary price component such as expenses or common charges.
+  floor_number:
+    lineage:
+    - datalake_zonaprop_raw.avisos.piso
+    description: Floor level of the property within the building.
+  garage_count:
+    lineage:
+    - datalake_zonaprop_raw.avisos.garages
+    description: Number of parking spaces or garages included with the property.
+  half_bathroom_count:
+    lineage:
+    - datalake_zonaprop_raw.avisos.mediosbanos
+    description: Number of half bathrooms without a shower or bathtub.
+  internal_key:
+    lineage:
+    - datalake_zonaprop_raw.avisos.claveinterna
+    description: Internal tracking key used by agency systems to correlate the listing.
+  listing_description:
+    lineage:
+    - datalake_zonaprop_raw.avisos.descripcion
+    description: Full property description shown on the listing detail page.
+  listing_description_en:
+    lineage:
+    - datalake_zonaprop_raw.avisos.descripcion_en
+    description: English translation of the listing description for bilingual markets.
+  listing_image_url:
+    lineage:
+    - datalake_zonaprop_raw.avisos.imagenaviso
+    description: URL of the primary listing image shown in search results.
+  listing_reference:
+    lineage:
+    - datalake_zonaprop_raw.avisos.referencia
+    description: Agency internal reference code for the property.
+  listing_status:
+    lineage:
+    - datalake_zonaprop_raw.avisos.estado
+    description: Lifecycle status such as draft, published, paused or archived.
+  listing_title:
+    lineage:
+    - datalake_zonaprop_raw.avisos.titulo
+    description: Headline title displayed on the listing card and detail page.
+  listing_title_en:
+    lineage:
+    - datalake_zonaprop_raw.avisos.titulo_en
+    description: English translation of the listing title for bilingual markets.
+  map_latitude:
+    lineage:
+    - datalake_zonaprop_raw.avisos.mapalatitud
+    description: Latitude coordinate for map display of the property.
+  map_longitude:
+    lineage:
+    - datalake_zonaprop_raw.avisos.mapalongitud
+    description: Longitude coordinate for map display of the property.
+  map_street:
+    lineage:
+    - datalake_zonaprop_raw.avisos.mapacalle
+    description: Street name used for map pin placement.
+  occupant_count:
+    lineage:
+    - datalake_zonaprop_raw.avisos.numeropersonas
+    description: Maximum number of occupants the property accommodates.
+  postal_code:
+    lineage:
+    - datalake_zonaprop_raw.avisos.codigopostal
+    description: Postal code of the property address.
+  price_amount:
+    lineage:
+    - datalake_zonaprop_raw.avisos.precio
+    description: Primary asking price for the listing in the specified currency.
+  price_per_m2:
+    lineage:
+    - datalake_zonaprop_raw.avisos.preciopormetro2
+    description: Asking price divided by covered area in the listing currency.
+  property_age_years:
+    lineage:
+    - datalake_zonaprop_raw.avisos.antiguedad
+    description: Age of the property in years since construction.
+  property_tax_amount:
+    lineage:
+    - datalake_zonaprop_raw.avisos.valoriptu
+    description: Annual property tax (ABL or equivalent) in the listing currency.
+  redirect_url:
+    lineage:
+    - datalake_zonaprop_raw.avisos.urlredireccion
+    description: External URL to which listing traffic is redirected when applicable.
+  shared_commission_amount:
+    lineage:
+    - datalake_zonaprop_raw.avisos.comisioncompartir
+    description: Co-brokerage commission amount offered to collaborating agents.
+  thank_you_email_subject:
+    lineage:
+    - datalake_zonaprop_raw.avisos.subjectagradecimiento
+    description: Subject line of the automatic thank-you email sent to inquiry contacts.
+  thank_you_email_text:
+    lineage:
+    - datalake_zonaprop_raw.avisos.textoagradecimiento
+    description: Body text of the automatic thank-you email sent to inquiry contacts.
+  total_area_m2:
+    lineage:
+    - datalake_zonaprop_raw.avisos.metrostotales
+    description: Total land or built area in square meters including uncovered spaces.
+  total_room_count:
+    lineage:
+    - datalake_zonaprop_raw.avisos.ambientes
+    description: Total number of rooms including bedrooms and living areas.
+  total_unit_count:
+    lineage:
+    - datalake_zonaprop_raw.avisos.totalunidades
+    description: Total number of units in a development project.
+  has_comments_enabled:
+    lineage:
+    - datalake_zonaprop_raw.avisos.recibecomentarios
+    description: When true, visitors can leave comments on the listing page.
+  is_agency_network:
+    lineage:
+    - datalake_zonaprop_raw.avisos.redinmobiliaria
+    description: When true, the listing is shared across the agency network for co-brokerage.
+  is_company_shown:
+    lineage:
+    - datalake_zonaprop_raw.avisos.muestraempresa
+    description: When true, the agency name and logo are visible on the public listing.
+  is_enabled:
+    lineage:
+    - datalake_zonaprop_raw.avisos.habilitado
+    description: When true, the listing is active and eligible for publication.
+  is_featured_minisite:
+    lineage:
+    - datalake_zonaprop_raw.avisos.destacadominisitio
+    description: When true, the listing is highlighted on the agency minisite homepage.
+  is_map_shown:
+    lineage:
+    - datalake_zonaprop_raw.avisos.muestramapa
+    description: When true, the property location is displayed on the map to visitors.
+  is_quarterly_delivery:
+    lineage:
+    - datalake_zonaprop_raw.avisos.entregatrimestral
+    description: When true, the listing follows a quarterly publication delivery schedule.
+  is_validated:
+    lineage:
+    - datalake_zonaprop_raw.avisos.validado
+    description: When true, the listing content has passed quality or moderation review.
+  dt_delivered:
+    lineage:
+    - datalake_zonaprop_raw.avisos.fechaentrega
+    description: Date when the listing was last delivered to the portal through a publication credit.
+  ts_admin_ended:
+    lineage:
+    - datalake_zonaprop_raw.avisos.fechafinadmin
+    description: Moment when operations administratively ended the listing publication.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisos.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_created:
+    lineage:
+    - datalake_zonaprop_raw.avisos.fechaalta
+    description: Moment when the listing was first created on the portal.
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.avisos.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  ts_deactivated:
+    lineage:
+    - datalake_zonaprop_raw.avisos.fechabaja
+    description: Moment when the listing was taken offline or deactivated.
+  ts_last_reviewed:
+    lineage:
+    - datalake_zonaprop_raw.avisos.ultimavezquesereviso
+    description: Last time the listing underwent quality or moderation review.
+  ts_published:
+    lineage:
+    - datalake_zonaprop_raw.avisos.fechaonline
+    description: Moment when the listing first went live on the portal.
+  ts_unpublished:
+    lineage:
+    - datalake_zonaprop_raw.avisos.fechaoffline
+    description: Moment when the listing was temporarily removed from public view.
+  ts_updated:
+    lineage:
+    - datalake_zonaprop_raw.avisos.fechamodificado
+    description: Last time any listing content or settings were modified.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.avisos.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

@@ -1,0 +1,25 @@
+---
+table_name: datalake_zonaprop_clean.listing_deliveries
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  id_listing_delivery:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  dt_delivered:
+    is_complete:
+      severity_level: Error
+  id_account:
+    is_complete:
+      severity_level: Error
+  id_order:
+    is_complete:
+      severity_level: Error
+  id_order_item:
+    is_complete:
+      severity_level: Error

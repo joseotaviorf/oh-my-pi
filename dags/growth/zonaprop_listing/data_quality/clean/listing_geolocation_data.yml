@@ -1,0 +1,16 @@
+---
+table_name: datalake_zonaprop_clean.listing_geolocation_data
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  id_listing:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_geolocation:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,22 @@
+---
+table_name: datalake_zonaprop_clean.contact_actions
+alert_channel: '#alerts-de-airflow-dags'
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+column_level_validations:
+  id_contact_action:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_action_type:
+    is_complete:
+      severity_level: Error
+  id_contact:
+    is_complete:
+      severity_level: Error
+  ts_occurred:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,51 @@
+database_name: datalake_zonaprop_clean
+table_name: states
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: 'State or province reference for Zonaprop markets (`provincias`). One row per state (PK id_state), scoped by country. Second level in the geographic hierarchy below country. Physical layout: Z-ordered by id_state (no partitions); filter on id_state for efficient data skipping.'
+columns:
+  id_country:
+    lineage:
+    - datalake_zonaprop_raw.provincias.idpais
+    description: Country market that scopes this state or province.
+  id_sap_state:
+    lineage:
+    - datalake_zonaprop_raw.provincias.idprovinciasap
+    description: SAP state code used when billing and invoicing agency orders.
+  id_state:
+    lineage:
+    - datalake_zonaprop_raw.provincias.idprovincia
+    description: Unique identifier for a state or province in the Zonaprop geographic hierarchy.
+  display_order:
+    lineage:
+    - datalake_zonaprop_raw.provincias.orden
+    description: Sort position of the state in dropdown lists within its country.
+  state_abbreviation:
+    lineage:
+    - datalake_zonaprop_raw.provincias.sigla
+    description: Short abbreviation of the state used in addresses and filters.
+  state_name:
+    lineage:
+    - datalake_zonaprop_raw.provincias.nombre
+    description: Full state or province name displayed in location selectors.
+  state_preposition:
+    lineage:
+    - datalake_zonaprop_raw.provincias.preposicion
+    description: Grammatical preposition paired with the state name in Spanish-language portal copy.
+  ts_cdc_transaction:
+    lineage:
+    - datalake_zonaprop_raw.provincias.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+    - datalake_zonaprop_raw.provincias.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
+  op_cdc:
+    lineage:
+    - datalake_zonaprop_raw.provincias.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
