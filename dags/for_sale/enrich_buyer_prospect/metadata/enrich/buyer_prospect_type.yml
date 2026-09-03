@@ -75,3 +75,10 @@ columns:
     - datalake_demand_flows.buyer_prospect_status.ts_activation_end
   ts_load:
     description: Timestamp of the load of the data.
+  sale_type:
+    description: PRIMARY or SECONDARY market classification of the house that drove this activation event, based on strict Primary Market pilot membership (house_development). PRIMARY here means the house is one of the Orulo pilot's typology units, not the broader legacy is_primary_market flag.
+    categories:
+      PRIMARY: Activation event driven by a Primary Market pilot house.
+      SECONDARY: Activation event driven by any other house, or an event with no house (id_house is null).
+    lineage:
+    - datalake_sale_primary_market.house_development.id_house

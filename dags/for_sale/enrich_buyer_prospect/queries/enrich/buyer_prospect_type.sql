@@ -66,7 +66,8 @@ SELECT
   price_change_number,
   ts_activation,
   ts_activation_end,
-  ts_load
+  ts_load,
+  sale_type
 FROM (
   SELECT
     MD5(
@@ -92,6 +93,10 @@ FROM (
     bp_status.ts_activation,
     bp_status.ts_activation_end,
     NOW() AS ts_load,
+    -- Strictly the Orulo pilot (house_development), not listing_sale_type's
+    -- legacy is_primary_market fallback, which also covers ~4.7k unrelated
+    -- pre-pilot houses and would mislabel historic secondary activations.
+    CASE WHEN hd.id_house IS NOT NULL THEN 'PRIMARY' ELSE 'SECONDARY' END AS sale_type,
     slpc.change_number,
     MAX(slpc.change_number) OVER (PARTITION BY bp_status.id_buyer_prospect, bp_status.ts_activation, bp_status.id_house) AS _w,
     bp_status.id_buyer_prospect
@@ -99,6 +104,8 @@ FROM (
   LEFT JOIN datalake_sale_listings.sale_listing_price_changes AS slpc
     ON bp_status.id_house = slpc.id_house
     AND bp_status.ts_activation BETWEEN slpc.ts_price_started AND COALESCE(slpc.ts_price_ended, NOW())
+  LEFT JOIN datalake_sale_primary_market.house_development AS hd
+    ON bp_status.id_house = hd.id_house
   WHERE
     bp_status.prospect_event_name IN ('USER FIRST ACTIVATION', 'USER FIRST ACTIVATION IN CITY GROUP', 'USER RECOVERY')
     AND bp_status.status = 'ACTIVE'
