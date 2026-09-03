@@ -6,7 +6,7 @@ from functools import reduce
 from typing import Optional
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, lit, to_date
+from pyspark.sql.functions import lit
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
@@ -14,7 +14,6 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    SparkDataFrameService,
     SparkTableStorageFormat,
 )
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
@@ -39,7 +38,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient(app_name=JOB_NAME)
 spark = spark_client.conn
 dbutils = BaseDBUtils().get_dbutils()
-RAW_PARTITION_COLS = ["year", "month", "day", "device"]
+RAW_PARTITION_COLS = ["date", "device"]
 
 
 def get_most_recent_crawl(
@@ -385,12 +384,6 @@ def load_dataframe_into_datalake(
         spark_metastore_service,
         fallback_database_name=database_name,
         fallback_table_name=table_name,
-    )
-    updated_df = (
-        SparkDataFrameService()
-        .input(updated_df.withColumn("date", to_date(col("date"))))
-        .create_year_month_day_columns_from_dataframe_column("date")
-        .output()
     )
 
     s3_loader.load_df(
