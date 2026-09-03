@@ -162,14 +162,17 @@ FROM (
     -- declaration (NULL by default = infinite lookback). Measured from
     -- load_start_date, not CURRENT_DATE(), so a backfill run classifies
     -- bp_market_type as of the date being processed, not the run's wall clock.
+    -- COALESCE'd to a ~2739-year sentinel instead of comparing against
+    -- DATE_SUB(..., NULL) directly, so NULL never has to flow into the
+    -- comparison operator itself.
     MAX(CASE
       WHEN d.sale_type = 'PRIMARY'
-        AND ({bp_window_days} IS NULL OR d.ts_activation >= DATE_SUB(DATE('{load_start_date}'), {bp_window_days}))
+        AND d.ts_activation >= DATE_SUB(DATE('{load_start_date}'), COALESCE({bp_window_days}, 999999))
       THEN 1 ELSE 0
     END) OVER (PARTITION BY d.id_prospect) = 1 AS touched_primary,
     MAX(CASE
       WHEN d.sale_type = 'SECONDARY'
-        AND ({bp_window_days} IS NULL OR d.ts_activation >= DATE_SUB(DATE('{load_start_date}'), {bp_window_days}))
+        AND d.ts_activation >= DATE_SUB(DATE('{load_start_date}'), COALESCE({bp_window_days}, 999999))
       THEN 1 ELSE 0
     END) OVER (PARTITION BY d.id_prospect) = 1 AS touched_secondary
   FROM deduped AS d
