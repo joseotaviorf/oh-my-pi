@@ -146,6 +146,10 @@ columns:
     description: Identifier of the campaign responsible for the survey dispatch. Only populated for Survicate-originated responses; for all other sources, the value is NULL.
     lineage:
       - datalake_satisfaction_rating.survicate_surveys.utm_campaign
+  response_url:
+    description: Full URL of the survey response sent to the respondent. Only populated for Survicate-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.response_url
   improvement_tags:
     description: Process improvement tags, which are indicated by the respondent.
     lineage:

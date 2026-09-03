@@ -382,6 +382,7 @@ SELECT
     TRIM(LOWER(PARSE_URL(sr.response_url, 'QUERY', 'utm_source'))) AS utm_source,
     TRIM(LOWER(PARSE_URL(sr.response_url, 'QUERY', 'utm_medium'))) AS utm_medium,
     TRIM(LOWER(PARSE_URL(sr.response_url, 'QUERY', 'utm_campaign'))) AS utm_campaign,
+    sr.response_url,
     ss.improvement_tags,
     ss.respondent_comments,
     ss.satisfaction_score,

@@ -12,6 +12,7 @@ SELECT
     sa.utm_source,
     sa.utm_medium,
     sa.utm_campaign,
+    sa.response_url,
     sa.satisfaction_score,
     sa.secondary_satisfaction_score,
     sa.is_solved,

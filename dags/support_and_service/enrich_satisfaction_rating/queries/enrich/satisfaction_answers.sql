@@ -19,6 +19,7 @@ WITH union_surveys_answers AS (
         NULL AS utm_source,
         NULL AS utm_medium,
         NULL AS utm_campaign,
+        NULL AS response_url,
         ssg.improvement_tags,
         ssg.respondent_comments,
         ssg.satisfaction_score,
@@ -58,6 +59,7 @@ WITH union_surveys_answers AS (
         NULL AS utm_source,
         NULL AS utm_medium,
         NULL AS utm_campaign,
+        NULL AS response_url,
         ssz.improvement_tags,
         NULL AS respondent_comments,
         ssz.satisfaction_score,
@@ -97,6 +99,7 @@ WITH union_surveys_answers AS (
         NULL AS utm_source,
         NULL AS utm_medium,
         NULL AS utm_campaign,
+        NULL AS response_url,
         NULL AS improvement_tags,
         NULL AS respondent_comments,
         ssb.satisfaction_score,
@@ -136,6 +139,7 @@ WITH union_surveys_answers AS (
         NULL AS utm_source,
         NULL AS utm_medium,
         NULL AS utm_campaign,
+        NULL AS response_url,
         sscf.improvement_tags,
         sscf.respondent_comments,
         sscf.satisfaction_score,
@@ -175,6 +179,7 @@ WITH union_surveys_answers AS (
         sss.utm_source,
         sss.utm_medium,
         sss.utm_campaign,
+        sss.response_url,
         sss.improvement_tags,
         sss.respondent_comments,
         sss.satisfaction_score,
@@ -211,6 +216,35 @@ users AS (
         users_ranked AS ur
     WHERE
         ur.ts_updated = ur.ts_last_updated
+),
+matched_users AS (
+    SELECT
+        usa.id_answer,
+        usa.year,
+        usa.month,
+        usa.day,
+        ue.id_user,
+        ue.email
+    FROM
+        union_surveys_answers AS usa
+    INNER JOIN
+        users AS ue
+            ON ue.email = LOWER(usa.respondent_email)
+
+    UNION
+
+    SELECT
+        usa.id_answer,
+        usa.year,
+        usa.month,
+        usa.day,
+        ue.id_user,
+        ue.email
+    FROM
+        union_surveys_answers AS usa
+    INNER JOIN
+        users AS ue
+            ON ue.id_user = usa.id_respondent
 )
 SELECT DISTINCT
     usa.id_answer,
@@ -232,6 +266,7 @@ SELECT DISTINCT
     usa.utm_source,
     usa.utm_medium,
     usa.utm_campaign,
+    usa.response_url,
     usa.improvement_tags,
     usa.respondent_comments,
     usa.satisfaction_score,
@@ -247,6 +282,8 @@ SELECT DISTINCT
 FROM
     union_surveys_answers AS usa
 LEFT JOIN
-    users AS ue
-        ON ue.email = LOWER(usa.respondent_email)
-        OR ue.id_user = usa.id_respondent
+    matched_users AS ue
+        ON ue.id_answer = usa.id_answer
+        AND ue.year = usa.year
+        AND ue.month = usa.month
+        AND ue.day = usa.day

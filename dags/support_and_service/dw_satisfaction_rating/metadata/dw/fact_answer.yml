@@ -58,6 +58,10 @@ columns:
     description: Identifier of the campaign responsible for the survey dispatch. Only populated for Survicate-originated responses; for all other sources, the value is NULL.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.utm_campaign
+  response_url:
+    description: Full URL of the survey response sent to the respondent. Only populated for Survicate-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.response_url
   satisfaction_score:
     description: Main satisfaction form responses.
     lineage:
