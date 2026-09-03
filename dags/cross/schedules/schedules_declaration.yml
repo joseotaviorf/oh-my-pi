@@ -64,4 +64,16 @@ workflow:
       clean_primary_keys: [id]
       get_table_metrics:
         count: "id"
+    appointment_participant:
+      clean_table_name: appointment_participant
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      get_table_metrics:
+        count: "id"
+    external_reference:
+      clean_table_name: external_reference
+      raw_primary_keys: [external_id]
+      clean_primary_keys: [id_external]
+      get_table_metrics:
+        count: "external_id"
 
