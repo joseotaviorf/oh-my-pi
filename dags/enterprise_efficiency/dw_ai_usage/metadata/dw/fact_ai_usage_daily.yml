@@ -1,0 +1,98 @@
+database_name: dw_ai_usage
+table_name: fact_ai_usage_daily
+owner: gabriel.berger@quintoandar.com.br
+domain: Enterprise Efficiency
+description: |
+  Conformed AI-tool usage fact. Grain: one row per day, tool, id_user, model, and
+  product. Scope: covers every usage row conformed by enrich_ai_usage. Measures are
+  atomic (requests, token components); heavy-user, model-cost, and temporal analyses
+  are consumer-side aggregations over these atoms, with no derived intensity tiers or
+  burn-pace columns precomputed here. Spend is a separate fact
+  (fact_ai_spend_daily); join on sk_ai_user and tool to combine the two at the
+  employee/tool level, keeping each fact's own measures un-summed against the other's
+  grain. Vendor-absent measures (for tools without token or request exposure) are
+  NULL, not zero. sk_ai_user, sk_ai_model, and sk_ai_product are -1 when the source
+  row's natural key has no matching dimension row (unknown-member routing).
+columns:
+  sk_ai_usage_daily:
+    description: Unique key for the fact grain (day, tool, id_user, model, product), a deterministic hash so it never changes across reruns (e.g. 'd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9'). Hashed from the raw natural key including dt_ended, not the resolved sk_ai_user/sk_ai_model/sk_ai_product, so unmatched rows (which all share the same -1 unknown-member FK) never collapse onto a single grain key.
+    lineage:
+      - datalake_ai_usage.usage_daily.tool
+      - datalake_ai_usage.usage_daily.dt_started
+      - datalake_ai_usage.usage_daily.dt_ended
+      - datalake_ai_usage.usage_daily.id_user
+      - datalake_ai_usage.usage_daily.model
+      - datalake_ai_usage.usage_daily.product
+
+  sk_ai_user:
+    description: Key of the employee attributed to this usage row (e.g. 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8'). References dw_ai_usage.dim_ai_user. -1 when no matching dimension row exists for this tool and id_user.
+    lineage:
+      - dw_ai_usage.dim_ai_user.sk_ai_user
+
+  sk_ai_model:
+    description: Key of the AI model that produced this usage row (e.g. 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6'). References dw_ai_usage.dim_ai_model. -1 when no matching dimension row exists for this tool and model, including when the source model is NULL.
+    lineage:
+      - dw_ai_usage.dim_ai_model.sk_ai_model
+
+  sk_ai_product:
+    description: Key of the product surface that produced this usage row (e.g. 'b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7'). References dw_ai_usage.dim_ai_product. -1 when no matching dimension row exists for this tool and product, including when the source product is NULL.
+    lineage:
+      - dw_ai_usage.dim_ai_product.sk_ai_product
+
+  count_requests:
+    description: Number of API requests included in this row's usage aggregation for the day (e.g. 42). The sole authoritative source for request counts (fact_ai_spend_daily carries no request count, to prevent double-counting on SUM).
+    lineage:
+      - datalake_ai_usage.usage_daily.count_requests
+
+  count_output_tokens:
+    description: Number of output tokens generated in the day (e.g. 15000). NULL for tools that don't expose token counts.
+    lineage:
+      - datalake_ai_usage.usage_daily.count_output_tokens
+
+  count_total_tokens:
+    description: Total token count across all token types for the day, input, output, and cache (e.g. 82000). NULL for tools that don't expose token counts.
+    lineage:
+      - datalake_ai_usage.usage_daily.count_total_tokens
+
+  count_uncached_input_tokens:
+    description: Number of uncached input tokens processed in the day (e.g. 40000). NULL for tools that don't expose token counts.
+    lineage:
+      - datalake_ai_usage.usage_daily.count_uncached_input_tokens
+
+  count_cache_read_input_tokens:
+    description: Number of input tokens read from the prompt cache in the day (e.g. 25000). NULL for tools that don't expose token counts.
+    lineage:
+      - datalake_ai_usage.usage_daily.count_cache_read_input_tokens
+
+  count_cache_creation_1h_tokens:
+    description: Number of input tokens used to create 1-hour ephemeral cache entries in the day (e.g. 1200). NULL for tools that don't expose token counts.
+    lineage:
+      - datalake_ai_usage.usage_daily.count_cache_creation_1h_tokens
+
+  count_cache_creation_5m_tokens:
+    description: Number of input tokens used to create 5-minute ephemeral cache entries in the day (e.g. 800). NULL for tools that don't expose token counts.
+    lineage:
+      - datalake_ai_usage.usage_daily.count_cache_creation_5m_tokens
+
+  count_web_search_requests:
+    description: Number of server-side web search tool requests made in the day (e.g. 5). NULL for tools that don't expose this measure.
+    lineage:
+      - datalake_ai_usage.usage_daily.count_web_search_requests
+
+  is_actor_deleted:
+    description: True when the vendor marks the user as no longer a member of the organization (membership removed or the account itself deleted). Terminated or deleted users are retained here, not dropped.
+    lineage:
+      - datalake_ai_usage.usage_daily.is_actor_deleted
+
+  dt_started:
+    description: Date the usage aggregation period this row covers began (e.g. 2026-09-01).
+    lineage:
+      - datalake_ai_usage.usage_daily.dt_started
+
+  dt_ended:
+    description: Date the usage aggregation period this row covers ended, exclusive (e.g. 2026-09-02).
+    lineage:
+      - datalake_ai_usage.usage_daily.dt_ended
+
+  ts_load:
+    description: Timestamp this row was loaded into the fact (e.g. 2026-09-01 03:00:00).
