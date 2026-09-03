@@ -202,81 +202,6 @@ current_hrbp_by_code AS (
     WHERE
         rn = 1
 ),
-band_start_dates AS (
-    SELECT
-        es.person_number,
-        LOWER(es.band) AS banda,
-        MIN(es.dt_month_reference) AS inicio_banda
-    FROM
-        metric_people.employee_snapshots AS es
-    WHERE
-        es.is_primary_assignment_for_snapshot = TRUE
-        AND (
-            COALESCE(es.consolidated_business_unit_name, '') != 'Classifieds'
-            OR (
-                es.consolidated_business_unit_name = 'Classifieds'
-                AND es.dt_month_reference > DATE('2024-10-01')
-            )
-        )
-    GROUP BY
-        es.person_number,
-        LOWER(es.band)
-),
-band_photos AS (
-    SELECT
-        es.dt_month_reference AS fechamento,
-        es.person_number,
-        LOWER(es.band) AS banda,
-        LOWER(es.country) AS pais,
-        bs.inicio_banda,
-        CASE
-            WHEN LOWER(es.country) IN ('argentina', 'mexico', 'méxico')
-                AND bs.inicio_banda <= DATE('2024-10-01')
-            THEN CAST(
-                MONTHS_BETWEEN(
-                    DATE_TRUNC('MONTH', es.dt_month_reference),
-                    DATE_TRUNC('MONTH', DATE('2024-10-01'))
-                ) AS INT
-            )
-            ELSE CAST(
-                MONTHS_BETWEEN(
-                    DATE_TRUNC('MONTH', es.dt_month_reference),
-                    DATE_TRUNC('MONTH', bs.inicio_banda)
-                ) AS INT
-            )
-        END AS tempo_na_banda_em_meses
-    FROM
-        metric_people.employee_snapshots AS es
-    INNER JOIN
-        band_start_dates AS bs
-            ON es.person_number = bs.person_number
-            AND LOWER(es.band) = bs.banda
-    WHERE
-        es.is_primary_assignment_for_snapshot = TRUE
-        AND YEAR(es.dt_month_reference) >= 2025
-        AND LOWER(es.email_l1) IN (
-            'paulo.golgher@quintoandar.com.br',
-            'rafael.castro@quintoandar.com.br'
-        )
-        AND LOWER(es.status) = 'active'
-),
-latest_band_fechamento AS (
-    SELECT
-        MAX(bp.fechamento) AS max_fechamento
-    FROM
-        band_photos AS bp
-),
-final_tech_recency AS (
-    SELECT
-        bp.person_number,
-        bp.tempo_na_banda_em_meses
-    FROM
-        band_photos AS bp
-    CROSS JOIN
-        latest_band_fechamento AS lbf
-    WHERE
-        bp.fechamento = lbf.max_fechamento
-),
 primary_disability_ranked AS (
     SELECT
         dis.person_number,
@@ -412,7 +337,7 @@ employee_base AS (
                     'paulo.golgher@quintoandar.com.br',
                     'rafael.castro@quintoandar.com.br'
                 )
-            THEN ftr.tempo_na_banda_em_meses
+            THEN es.months_tenure_in_band
             ELSE NULL
         END AS tempo_na_banda_em_meses,
         INITCAP(NULLIF(es.name_l1, '')) AS L1,
@@ -575,9 +500,6 @@ employee_base AS (
     LEFT JOIN
         tech_team AS tt
             ON LOWER(es.assignment_number) = tt.assignment_number
-    LEFT JOIN
-        final_tech_recency AS ftr
-            ON es.person_number = ftr.person_number
     LEFT JOIN
         dw_employee_details.fact_assignment_snapshots AS mgr_fas
             ON mgr_fas.assignment_number = es.manager_assignment_number
