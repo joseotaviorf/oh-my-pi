@@ -84,24 +84,23 @@ workflow:
         - id_user
         - id_spend_limit
       when_matched_operation:
-        update:
-          - id_actor_user
-          - id_source_user
-          - id_source_rbac_group
-          - email_actor
-          - name_actor
-          - type_actor
-          - type_scope
-          - type_source
-          - seat_tier
-          - period_type
-          - currency
-          - sum_spend_limit_amount
-          - is_actor_deleted
-          - ts_load
-          # dt_started intentionally excluded: preserves the date this
-          # id_spend_limit was first observed, instead of resetting it to
-          # today on every re-observation of an unchanged cap.
+        id_actor_user: "source.id_actor_user"
+        id_source_user: "source.id_source_user"
+        id_source_rbac_group: "source.id_source_rbac_group"
+        email_actor: "source.email_actor"
+        name_actor: "source.name_actor"
+        type_actor: "source.type_actor"
+        type_scope: "source.type_scope"
+        type_source: "source.type_source"
+        seat_tier: "source.seat_tier"
+        period_type: "source.period_type"
+        currency: "source.currency"
+        sum_spend_limit_amount: "source.sum_spend_limit_amount"
+        is_actor_deleted: "source.is_actor_deleted"
+        ts_load: "source.ts_load"
+        # dt_started intentionally excluded: preserves the date this
+        # id_spend_limit was first observed, instead of resetting it to
+        # today on every re-observation of an unchanged cap.
       params: {}
       api_policies:
         pagination:
