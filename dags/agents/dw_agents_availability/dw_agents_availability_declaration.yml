@@ -9,7 +9,9 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   extra_query_template_params:
-    "DATE(ts_load)": "DATE_ADD(DATE('{year}-{month}-{day}'), 1)"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    "DATE(ts_load)": "DATE_ADD(DATE('{load_end_date}'), 1)"
   inner_dependencies:
     fact_inspector_daily_allocations:
       - fact_inspector_hourly_allocations

@@ -17,7 +17,7 @@ WITH agents_slots_daily AS ( -- TODO [ODS] we are following ODS current structur
     FROM
         dw_agent.fact_agent_hourly_allocations
     WHERE
-        DATE(ts_slot_hour) BETWEEN DATE('{year}-{month}-{day}') AND (DATE('{year}-{month}-{day}') + INTERVAL 21 DAYS)
+        DATE(ts_slot_hour) BETWEEN DATE('{load_start_date}') AND (DATE('{load_end_date}') + INTERVAL 21 DAYS)
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14
 )
 SELECT
