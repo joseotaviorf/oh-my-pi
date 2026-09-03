@@ -1,0 +1,25 @@
+database_name: dw_ai_usage
+table_name: dim_ai_product
+owner: gabriel.berger@quintoandar.com.br
+domain: Enterprise Efficiency
+description: |
+  Dimension of distinct AI product surfaces observed across tools. Grain: one row
+  per tool and product surface. Scope: covers every product surface that has ever
+  appeared in usage. A new product surface appears automatically on the next full
+  recompute.
+columns:
+  sk_ai_product:
+    description: Unique key for the (tool, product) combination, a deterministic hash so it never changes across reruns (e.g. 'b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7'). Referenced by fact_ai_usage_daily.sk_ai_product.
+    lineage:
+      - datalake_ai_usage.usage_daily.tool
+      - datalake_ai_usage.usage_daily.product
+
+  tool:
+    description: AI tool this product surface belongs to, matching dim_ai_tool.tool (e.g. 'claude').
+    lineage:
+      - datalake_ai_usage.usage_daily.tool
+
+  product:
+    description: Product surface as reported by the vendor (for example chat, claude_code, cowork, office_agent).
+    lineage:
+      - datalake_ai_usage.usage_daily.product
