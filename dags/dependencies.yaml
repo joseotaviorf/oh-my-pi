@@ -1090,6 +1090,7 @@ bietlejuice.dw_sale_listing_flow:
   - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
 bietlejuice.dw_sale_listing_price_changes:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
+  - bietlejuice.enrich_sale_primary_market:load-enrich-listing-sale-type:first-run-of-day
 bietlejuice.dw_sale_listings:
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-predicted-price:first-run-of-day
@@ -1106,6 +1107,7 @@ bietlejuice.dw_sale_listings:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
   - bietlejuice.enrich_sale_listings_lenses:load-enrich-listing-lenses:first-run-of-day
+  - bietlejuice.enrich_sale_primary_market:load-enrich-listing-sale-type:first-run-of-day
 bietlejuice.dw_sale_offer_users:
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users-info:first-run-of-day

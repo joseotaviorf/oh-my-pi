@@ -4,6 +4,7 @@ SELECT
   h.id_user AS sk_owner,
   CAST(hlco.id_user AS BIGINT) AS sk_user_consultant,
   h.id_region AS sk_region, 
+  lst.sale_type,
   COALESCE(
     CASE
       WHEN h.is_sale_3p_supply THEN cs_supply.sk_company
@@ -48,6 +49,9 @@ JOIN
 JOIN 
   datalake_ebdb_listing.house AS h
     ON sl.id_house = h.id
+LEFT JOIN
+  datalake_sale_primary_market.listing_sale_type AS lst
+    ON lst.id_house = sl.id_house
 LEFT JOIN
   datalake_big_agent.house_listing_consultant AS hlco
     ON hlco.id_listing = sl.id_sale_listing

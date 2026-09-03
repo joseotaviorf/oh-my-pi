@@ -43,6 +43,7 @@ SELECT
   ll.availability_drill_down AS availability_lens_drill_down,
   ll.listing_quality_disclaimer AS listing_quality_lens_disclaimer,
   ll.listing_quality_drill_down AS listing_quality_lens_drill_down,
+  lst.sale_type,
   CASE
     WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
   END AS partner_3p_supply,
@@ -76,6 +77,9 @@ FROM
 JOIN
   datalake_ebdb_listing.house AS h
     ON h.id = lbc.id_house
+LEFT JOIN
+  datalake_sale_primary_market.listing_sale_type AS lst
+    ON lst.id_house = lbc.id_house
 JOIN
   datalake_sale_listings.sale_listing AS sl
     ON lbc.id_house = sl.id_house

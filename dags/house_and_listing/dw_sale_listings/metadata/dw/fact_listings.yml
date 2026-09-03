@@ -29,6 +29,13 @@ columns:
       - datalake_ebdb_clean.house.id_region
     description: Foreign key of region where house listing is located in. Can be joined
       with dw_public.dim_region.
+  sale_type:
+    lineage:
+      - datalake_sale_primary_market.listing_sale_type.sale_type
+    description: Market type of the SALE listing, sourced from the house-level primary-market SSOT. PRIMARY identifies a new-build unit listing and SECONDARY identifies a resale listing. NULL is preserved when no SALE classification is available.
+    categories:
+      PRIMARY: Listing for a Primary Market (new-build) unit.
+      SECONDARY: Listing for a Secondary Market (resale) property.
   sk_company:
     lineage:
       - datalake_company.company_sks.sk_company

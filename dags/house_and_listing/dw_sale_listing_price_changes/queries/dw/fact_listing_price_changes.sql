@@ -4,6 +4,7 @@ SELECT
     slpc.id_user_revision AS sk_user_revision,
     slpc.id_owner AS sk_owner,
     slpc.id_region AS sk_region,
+    lst.sale_type,
     dps.sk_sale_price_segment,
     BIGINT(DATE_FORMAT(slpc.ts_price_started, 'yyyyMMdd')) AS sk_price_started_date,
     COALESCE(BIGINT(DATE_FORMAT(slpc.ts_price_ended, 'yyyyMMdd')), -1) AS sk_price_ended_date,
@@ -27,6 +28,9 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_sale_listings.sale_listing_price_changes AS slpc
+LEFT JOIN
+    datalake_sale_primary_market.listing_sale_type AS lst
+        ON lst.id_house = slpc.id_house
 LEFT JOIN
     dw_sale.dim_sale_price_segment AS dps
         ON slpc.price_segment = dps.price_segment

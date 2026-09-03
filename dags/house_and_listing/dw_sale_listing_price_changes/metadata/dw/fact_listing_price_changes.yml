@@ -30,6 +30,13 @@ columns:
     - datalake_sale_listings.sale_listing_price_changes.id_region
     description: Foreign key of region where house listing is located in. Can be joined
       with dw_public.dim_region.
+  sale_type:
+    lineage:
+    - datalake_sale_primary_market.listing_sale_type.sale_type
+    description: Latest available market type of the SALE house associated with the price change, sourced from the house-level primary-market SSOT. PRIMARY identifies a new-build unit listing and SECONDARY identifies a resale listing. This is not a historical as-of classification for the price-change timestamp. NULL is preserved when no SALE classification is available.
+    categories:
+      PRIMARY: Price change for a Primary Market (new-build) listing.
+      SECONDARY: Price change for a Secondary Market (resale) listing.
   sk_sale_price_segment:
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.sk_sale_price_segment
