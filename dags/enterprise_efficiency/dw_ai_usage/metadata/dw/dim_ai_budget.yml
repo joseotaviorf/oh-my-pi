@@ -1,0 +1,62 @@
+database_name: dw_ai_usage
+table_name: dim_ai_budget
+owner: gabriel.berger@quintoandar.com.br
+domain: Enterprise Efficiency
+description: |
+  AI-tool budget and spend-limit cap history, versioned as a Type 2 slowly changing
+  dimension. Grain: one row per tool, id_user, period_type, and version (dt_valid_from)
+  — a new version whenever a member's spend-limit attributes change. Scope: covers
+  every version datalake_claude_usage_clean.spend_limits has ever observed for Claude.
+  Filter is_current = TRUE for each member's present budget state; join a fact's event
+  date between dt_valid_from and dt_valid_to for the budget state that was in effect
+  at that time. Does not carry period-to-date spend: sum this member's own measures in
+  fact_ai_spend_daily over the current period instead.
+columns:
+  sk_ai_budget_version:
+    description: Unique key for this (tool, id_user, period_type) version, a deterministic hash so it never changes across reruns (e.g. 'a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2'). Hashed from the raw natural key, not the resolved sk_ai_user, so unmatched rows (which all share the same -1 unknown-member FK) never collapse onto a single grain key.
+    lineage:
+      - datalake_claude_usage_clean.spend_limits.id_user
+      - datalake_claude_usage_clean.spend_limits.period_type
+      - datalake_claude_usage_clean.spend_limits.dt_started
+
+  sk_ai_user:
+    description: Key of the employee this budget belongs to (e.g. 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8'). References dw_ai_usage.dim_ai_user. -1 when no matching dimension row exists for this tool and id_user.
+    lineage:
+      - dw_ai_usage.dim_ai_user.sk_ai_user
+
+  tool:
+    description: AI tool this budget version belongs to, matching dim_ai_tool.tool (e.g. 'claude'). A literal constant in this query since it currently has a single vendor source.
+    # No lineage — hardcoded literal value ('claude') in the SQL.
+
+  period_type:
+    description: Vendor-defined budget period this version's limit applies to (e.g. 'monthly').
+    lineage:
+      - datalake_claude_usage_clean.spend_limits.period_type
+
+  currency:
+    description: ISO currency code the budget amounts are denominated in (e.g. 'USD').
+    lineage:
+      - datalake_claude_usage_clean.spend_limits.currency
+
+  sum_spend_limit_amount:
+    description: Spend cap for the period, in effect for this version (e.g. 100.00).
+    lineage:
+      - datalake_claude_usage_clean.spend_limits.sum_spend_limit_amount
+
+  is_actor_deleted:
+    description: True when the vendor marks the actor who set this limit as no longer a member of the organization (membership removed or the account itself deleted), as of this version.
+    lineage:
+      - datalake_claude_usage_clean.spend_limits.is_actor_deleted
+
+  dt_valid_from:
+    description: Date from which this version becomes effective (e.g. 2026-09-01).
+    lineage:
+      - datalake_claude_usage_clean.spend_limits.dt_started
+
+  dt_valid_to:
+    description: Date until which this version is valid (e.g. 2026-09-14). 9999-12-31 for the current version.
+    # No lineage — derived from the next version's dt_started (LEAD), not a source column.
+
+  is_current:
+    description: True on exactly one row per (tool, id_user, period_type) — the version whose validity extends to 9999-12-31. Filter for each member's present budget state.
+    # No lineage — derived from dt_valid_to, not a source column.
