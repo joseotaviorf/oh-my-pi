@@ -357,6 +357,123 @@ class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
         mock_pipeline_cls.assert_called_once()
         mock_pipeline.run.assert_called_once()
 
+        # The batch is persisted and materialized once (its lineage is a full
+        # read of clean bigfone/event), then released after the load.
+        persisted_df = target_df.persist.return_value
+        persisted_df.count.assert_called_once()
+        mock_complete_schema.assert_called_once()
+        assert mock_complete_schema.call_args.args[0] is persisted_df
+        persisted_df.unpersist.assert_called_once()
+
+        # SchemaAlignment's null audit would re-evaluate the whole source.
+        spark.conf.set.assert_any_call(services_module.AUDIT_NULLS_CONF, "false")
+
+    @mock.patch.object(services_module, "DataFrameDeltaTableLoaderPipeline")
+    @mock.patch.object(services_module, "SchemaValidator")
+    @mock.patch.object(services_module, "get_versioning_df")
+    @mock.patch.object(services_module, "safe_union_with_target_schema")
+    @mock.patch.object(services_module, "get_rows_to_update")
+    @mock.patch.object(services_module, "_table_exists")
+    @mock.patch.object(
+        services_module.SupportJourneyServicesCoreModelPipeline, "_build_target_df"
+    )
+    @mock.patch.object(services_module, "partition_has_data")
+    def test_incremental_run_feeds_persisted_batch_to_rows_to_update(
+        self,
+        mock_partition_has_data,
+        mock_build_target_df,
+        mock_table_exists,
+        mock_get_rows_to_update,
+        mock_safe_union,
+        mock_get_versioning_df,
+        mock_schema_validator_cls,
+        mock_pipeline_cls,
+        cfg,
+        pipeline_with_spec,
+    ):
+        # arrange: target exists, so the current versions to expire are read.
+        mock_partition_has_data.return_value = False
+        mock_table_exists.return_value = True
+
+        non_empty_df = mock.MagicMock()
+        non_empty_df.isEmpty.return_value = False
+        table_df = mock.MagicMock()
+        table_df.where.return_value = non_empty_df
+        spark = mock.MagicMock()
+        spark.table.return_value = table_df
+
+        target_df = mock.MagicMock()
+        mock_build_target_df.return_value = target_df
+        persisted_df = target_df.persist.return_value
+
+        versioned_df = mock.MagicMock()
+        versioned_df.select.return_value = versioned_df
+        mock_get_versioning_df.return_value = versioned_df
+        mock_schema_validator_cls.return_value.validate_schema.return_value = True
+
+        # act
+        pipeline_with_spec.create_core_model(spark)
+
+        # assert: the persisted batch (not the raw lineage) feeds the distinct
+        # keys used to fetch the current versions to expire.
+        mock_get_rows_to_update.assert_called_once_with(
+            spark,
+            "core_support_journey.services",
+            persisted_df,
+            ["id_session", "id_task"],
+        )
+
+        mock_safe_union.assert_called_once()
+        assert mock_safe_union.call_args.args[0] is persisted_df
+        assert mock_safe_union.call_args.args[1] is mock_get_rows_to_update.return_value
+        mock_pipeline_cls.return_value.run.assert_called_once()
+        persisted_df.unpersist.assert_called_once()
+
+    @mock.patch.object(services_module, "DataFrameDeltaTableLoaderPipeline")
+    @mock.patch.object(services_module, "SchemaValidator")
+    @mock.patch.object(services_module, "get_versioning_df")
+    @mock.patch.object(services_module, "_complete_dataframe_schema")
+    @mock.patch.object(services_module, "_table_exists")
+    @mock.patch.object(
+        services_module.SupportJourneyServicesCoreModelPipeline, "_build_target_df"
+    )
+    @mock.patch.object(services_module, "partition_has_data")
+    def test_unpersists_batch_when_load_fails(
+        self,
+        mock_partition_has_data,
+        mock_build_target_df,
+        mock_table_exists,
+        mock_complete_schema,
+        mock_get_versioning_df,
+        mock_schema_validator_cls,
+        mock_pipeline_cls,
+        cfg,
+        pipeline_with_spec,
+    ):
+        # arrange
+        mock_partition_has_data.return_value = False
+        mock_table_exists.return_value = False
+
+        non_empty_df = mock.MagicMock()
+        non_empty_df.isEmpty.return_value = False
+        table_df = mock.MagicMock()
+        table_df.where.return_value = non_empty_df
+        spark = mock.MagicMock()
+        spark.table.return_value = table_df
+
+        target_df = mock.MagicMock()
+        mock_build_target_df.return_value = target_df
+        versioned_df = mock.MagicMock()
+        versioned_df.select.return_value = versioned_df
+        mock_get_versioning_df.return_value = versioned_df
+        mock_schema_validator_cls.return_value.validate_schema.return_value = True
+        mock_pipeline_cls.return_value.run.side_effect = RuntimeError("merge failed")
+
+        # act / assert
+        with pytest.raises(RuntimeError, match="merge failed"):
+            pipeline_with_spec.create_core_model(spark)
+        target_df.persist.return_value.unpersist.assert_called_once()
+
     @mock.patch.object(services_module, "SchemaValidator")
     @mock.patch.object(services_module, "get_versioning_df")
     @mock.patch.object(services_module, "_complete_dataframe_schema")

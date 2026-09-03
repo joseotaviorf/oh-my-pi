@@ -10,6 +10,7 @@ from bietlejuice.base.core_models.helpers.schema_validator import (
 )
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
+from bietlejuice.base.spark.schema_alignment import AUDIT_NULLS_CONF
 from bietlejuice.base.sst.core.observability.sensors import partition_has_data
 from bietlejuice.base.sst.core.utils.common import (
     _complete_dataframe_schema,
@@ -700,7 +701,37 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             )
             return
 
-        target_df = self._build_target_df(spark, sources)
+        # The one-hour batch is small, but its lineage reads the unpartitioned
+        # clean bigfone/event table end to end (no stats on ts_cdc_transaction).
+        # It is referenced twice below (batch rows + distinct keys for
+        # get_rows_to_update) and evaluated again when Delta MERGE materializes
+        # the source, so persist it and materialize once here.
+        target_df = self._build_target_df(spark, sources).persist()
+        try:
+            batch_rows = target_df.count()
+            self.logger.info(
+                f"m=create_core_model, msg=Persisted service event batch, rows={batch_rows}"
+            )
+            self._version_and_load(
+                spark,
+                target_df,
+                target_full_table_name,
+                target_table_location,
+                expected_schema,
+                schema_column_names,
+            )
+        finally:
+            target_df.unpersist()
+
+    def _version_and_load(
+        self,
+        spark: SparkSession,
+        target_df: DataFrame,
+        target_full_table_name: str,
+        target_table_location: str,
+        expected_schema: Dict[str, Any],
+        schema_column_names: List[str],
+    ) -> None:
         if _table_exists(spark, target_full_table_name):
             self.logger.info(
                 "m=get_rows_to_update, "
@@ -754,6 +785,13 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             )
         else:
             raise SchemaValidationError("Schema validation failed")
+
+        # _effective_timestamp/_expired_timestamp leave standardize_timestamps as
+        # "yyyy-MM-dd HH:mm:ss" strings while the Delta target holds timestamps,
+        # so the loader casts them (SchemaAlignment). Its null audit is a second
+        # full evaluation of versioned_df on top of the MERGE; the cast cannot
+        # produce NULLs from that fixed format, so skip it for this job.
+        spark.conf.set(AUDIT_NULLS_CONF, "false")
 
         self.logger.info(
             "m=create_core_model, "
