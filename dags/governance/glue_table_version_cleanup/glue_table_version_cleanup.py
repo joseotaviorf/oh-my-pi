@@ -7,15 +7,19 @@ Note: this line above forces Airflow to parse this file for implemented DAGs
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime, timedelta
 
 import pendulum
 from airflow import DAG
+from airflow.models import Variable
 from airflow.models.param import Param
 from airflow.operators.python import PythonOperator
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services.glue.glue_table_version_cleanup import (
+    AIRFLOW_GLUE_WORKER_ROLE_ENV,
+    AIRFLOW_GLUE_WORKER_ROLE_VARIABLE,
     GLUE_TABLE_VERSION_CLEANUP_DRY_RUN_ENV,
     GlueTableVersionCleanupService,
     create_glue_boto_client,
@@ -56,11 +60,24 @@ def cleanup_glue_table_versions(**context):
     max_tables = _conf_int(conf.get("max_tables"))
     fail_on_error = parse_bool_flag(conf.get("fail_on_error"), default=True)
     region = conf.get("region") or DEFAULT_REGION
+    worker_role_arn = (
+        conf.get("airflow_glue_worker_role")
+        or os.environ.get(AIRFLOW_GLUE_WORKER_ROLE_ENV)
+        or Variable.get(AIRFLOW_GLUE_WORKER_ROLE_VARIABLE, default_var=None)
+    )
+    if not worker_role_arn:
+        raise ValueError(
+            "Missing Airflow worker role ARN. Set dag_run.conf "
+            f"airflow_glue_worker_role, env {AIRFLOW_GLUE_WORKER_ROLE_ENV}, or "
+            f"Variable {AIRFLOW_GLUE_WORKER_ROLE_VARIABLE} "
+            "(prod: arn:aws:iam::206390561754:role/airflow-prod-role; "
+            "forno: arn:aws:iam::713278628093:role/airflow-forno-role)."
+        )
 
     logger.info(
         "Starting Glue table version cleanup: dry_run=%s keep_count=%s "
         "database_prefix=%s database_name=%s table_name=%s max_tables=%s "
-        "region=%s",
+        "region=%s airflow_glue_worker_role=%s",
         dry_run,
         keep_count,
         database_prefix,
@@ -68,9 +85,13 @@ def cleanup_glue_table_versions(**context):
         table_name,
         max_tables,
         region,
+        worker_role_arn,
     )
 
-    glue_client = create_glue_boto_client(region=region)
+    glue_client = create_glue_boto_client(
+        worker_role_arn=worker_role_arn,
+        region=region,
+    )
     service = GlueTableVersionCleanupService()
     summary = service.sweep(
         glue_client,
@@ -95,8 +116,9 @@ with DAG(
     description=(
         "Weekly sweep of the Glue Data Catalog that deletes archived TABLE_VERSION "
         "resources, keeping only the latest version per table. Trigger from the "
-        "Airflow UI params form or dag_run.conf. It uses the Airflow worker's "
-        "existing AWS credentials to call Glue directly. "
+        "Airflow UI params form or dag_run.conf. The Astronomer pod assumes "
+        f"{AIRFLOW_GLUE_WORKER_ROLE_VARIABLE} (airflow-prod-role / "
+        "airflow-forno-role) before calling Glue in the lake account. "
         f"Env {GLUE_TABLE_VERSION_CLEANUP_DRY_RUN_ENV} sets dry_run when not overridden."
     ),
     schedule="0 3 * * 0",

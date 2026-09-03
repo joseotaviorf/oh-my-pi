@@ -1,10 +1,9 @@
 """
 Notebook- and CLI-friendly Glue TABLE_VERSION cleanup.
 
-Uses the default credential chain, an optional ``--worker-role-arn`` (Airflow
-worker), and/or an explicit ``--assume-role-arn`` / ``GLUE_ASSUME_ROLE_ARN`` for
-notebook or ad-hoc runs. The scheduled Airflow DAG does not set a Glue assume
-role by default.
+The scheduled Airflow DAG STS-assumes ``airflow_glue_worker_role``
+(``airflow-prod-role`` / ``airflow-forno-role``) from the Astronomer pod.
+CLI/notebook can pass ``--worker-role-arn`` and/or ``--assume-role-arn``.
 
 Examples::
 
@@ -19,7 +18,7 @@ Examples::
     )
 
     glue_client = create_glue_client(
-        role_arn="arn:aws:iam::206390561754:role/databricks-prod-glue-access",
+        role_arn="arn:aws:iam::206390561754:role/airflow-prod-role",
     )
     print(sweep_glue_table_versions(glue_client, dry_run=True).as_dict())
 """
@@ -86,7 +85,7 @@ def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--worker-role-arn",
         default=os.environ.get("AIRFLOW_GLUE_WORKER_ROLE_ARN"),
-        help="Optional first-hop Airflow worker role (Astro → airflow-prod-role).",
+        help="Airflow lake worker role to assume (Astro → airflow-prod-role).",
     )
     parser.add_argument(
         "--assume-role-arn",

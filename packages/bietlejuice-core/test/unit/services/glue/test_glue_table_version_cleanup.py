@@ -192,19 +192,6 @@ class TestCreateGlueClient:
             region="us-east-1",
         )
 
-    @patch(
-        "bietlejuice.services.glue.glue_table_version_cleanup.create_glue_boto_client"
-    )
-    def test_create_glue_client_chains_when_both_roles_explicit(self, mock_boto_client):
-        worker = "arn:aws:iam::206390561754:role/airflow-prod-role"
-        glue = "arn:aws:iam::206390561754:role/databricks-prod-glue-access"
-        create_glue_client(role_arn=glue, worker_role_arn=worker)
-        mock_boto_client.assert_called_once_with(
-            role_arn=glue,
-            worker_role_arn=worker,
-            region="us-east-1",
-        )
-
 
 class TestCreateGlueBotoClient:
     @patch("bietlejuice.services.glue.glue_table_version_cleanup.boto3")

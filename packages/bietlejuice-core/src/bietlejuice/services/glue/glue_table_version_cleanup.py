@@ -90,10 +90,10 @@ def create_glue_boto_client(
 ) -> Any:
     """Build a boto3 Glue client for the Airflow-worker cleanup DAG.
 
-    On Astronomer, the pod identity assumes ``worker_role_arn`` (e.g.
-    ``airflow-prod-role``) and calls Glue in the same account. An optional
-    second ``role_arn`` hop is supported only when passed explicitly (CLI /
-    notebook overrides), not via ``GLUE_ASSUME_ROLE_ARN`` env.
+    Astronomer pods run as ``astro-*`` in account ``216989142634``. Glue lives
+    in the data/forno account, so the DAG must STS-assume ``worker_role_arn``
+    (``airflow-prod-role`` / ``airflow-forno-role``) before Glue APIs. An
+    optional second ``role_arn`` hop is CLI/notebook only.
     """
     session = boto3.Session(region_name=region)
 
@@ -122,9 +122,8 @@ def create_glue_client(
 ) -> Union[GlueClient, Any]:
     """Return a Glue client for catalog sweeps.
 
-    Airflow DAG path: set ``worker_role_arn`` only; Glue runs in the worker
-    account after the Astro → worker assume. CLI/notebook path: omit
-    ``worker_role_arn`` and pass ``role_arn`` or rely on
+    Airflow DAG path: require ``worker_role_arn`` (Astro → lake worker).
+    CLI/notebook: omit ``worker_role_arn`` and pass ``role_arn`` or
     ``GLUE_ASSUME_ROLE_ARN`` for a single-hop ``GlueClient``.
     """
     if worker_role_arn:
