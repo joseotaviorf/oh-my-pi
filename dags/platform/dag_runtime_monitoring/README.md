@@ -149,7 +149,8 @@ Real alerts are only delivered when `environment == prod`. Config lives in
 `factor`, `min_alert_duration_minutes`, `critical_dags`). SLA keys
 (`sla_enabled`, `sla_lookback_days`, `sla_min_history_cycles`, `sla_percentile`,
 `sla_grace_minutes`, `sla_cycle_anchor_local_time`, `sla_exclude_dag_prefixes`,
-`sla_exclude_dag_suffixes`, `sla_max_missing_run_alerts`) fall back to module defaults
+`sla_exclude_dag_suffixes`, `sla_max_missing_run_alerts`, `alert_exclude_dag_prefixes`)
+fall back to module defaults
 when omitted.
 
 `sla_max_missing_run_alerts` (default 25) caps how many roots one tick may report,

@@ -145,6 +145,8 @@ _DEFAULT_CONFIG = {
     "sla_cycle_anchor_local_time": "20:55",
     "sla_exclude_dag_prefixes": ["migration_"],
     "sla_exclude_dag_suffixes": ["__validation"],
+    # No Chat/Jira alerts for these DAG namespaces (e.g. quintoml.* floods the channel).
+    "alert_exclude_dag_prefixes": ["quintoml"],
     # Blast-radius cap on missing-run roots reported in one tick. The readiness gate
     # already keeps a recovering cascade quiet, but it can only do so while the dataset
     # trigger state is readable — when that read fails the fallback deliberately opens
@@ -537,6 +539,8 @@ def _evaluate_all(
     min_elapsed_s = config["min_alert_duration_minutes"] * 60
     findings = []
     for row in running_rows:
+        if _is_alert_excluded_dag(row.dag_id, config):
+            continue
         history = durations_by_dag.get(row.dag_id, [])
         work_start = _effective_work_start(row)
         if work_start is None:
@@ -645,8 +649,25 @@ def _matches_exclude_prefix(dag_id: str, prefix: str) -> bool:
     return any(part.startswith(prefix) for part in dag_id.split("."))
 
 
+def _alert_exclude_prefixes(config: dict | None) -> list[str]:
+    prefixes = (config or {}).get("alert_exclude_dag_prefixes")
+    if prefixes is None:
+        prefixes = _DEFAULT_CONFIG.get("alert_exclude_dag_prefixes") or []
+    return list(prefixes)
+
+
+def _is_alert_excluded_dag(dag_id: str, config: dict | None = None) -> bool:
+    """True when this DAG must not open or update a Chat/Jira alert thread."""
+    for prefix in _alert_exclude_prefixes(config):
+        if _matches_exclude_prefix(dag_id, prefix):
+            return True
+    return False
+
+
 def _is_sla_candidate(dag_id: str, schedule_interval, config: dict) -> bool:
     """True when a DAG row is eligible for the missing-run guard."""
+    if _is_alert_excluded_dag(dag_id, config):
+        return False
     if dag_id == DAG_ID:
         return False
     if schedule_interval is None or str(schedule_interval).strip().lower() == "null":
@@ -2278,7 +2299,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
                 return
             if not state:
                 for finding in findings:
-                    _deliver_initial(finding, gchat_dest, jira_team, is_test)
+                    _deliver_initial(finding, gchat_dest, jira_team, is_test, config)
                 return
             ledger = {}
             for finding in findings:
@@ -2311,7 +2332,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
             return
         if not state:
             for finding in findings:
-                _deliver_initial(finding, gchat_dest, jira_team, is_test)
+                _deliver_initial(finding, gchat_dest, jira_team, is_test, config)
             return
         # Follow-up phase: build a throwaway ledger + fabricated run states and run the
         # real follow-up logic (Chat lifecycle for every tier).
@@ -2425,6 +2446,8 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
 
     # 2) Open new incidents for anomalies not yet tracked (and not just closed above).
     for finding in all_findings:
+        if _is_alert_excluded_dag(finding["dag_id"], config):
+            continue
         key = _run_key(finding["dag_id"], finding["run_id"])
         if key in ledger or key in already_tracked:
             continue
@@ -2520,11 +2543,16 @@ def _collect_sla_findings(
     )
 
 
-def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
+def _deliver_initial(
+    finding, gchat_dest, jira_team, is_test, config: dict | None = None
+) -> None:
     """Send the initial alert for one finding (used by simulate mode).
 
     Chat always; JiraOps additionally for the critical tier (slow or missing-run).
     """
+    if _is_alert_excluded_dag(finding["dag_id"], config):
+        print(f"ℹ️  Skipping alert delivery for excluded DAG {finding['dag_id']}.")
+        return
     if finding["tier"] == "critical":
         if is_test and not jira_team:
             print(
@@ -2542,6 +2570,15 @@ def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
     )
 
 
+def _drop_alert_excluded_entries(ledger: dict, config: dict) -> None:
+    """Stop tracking excluded DAGs without posting close messages."""
+    for key, entry in list(ledger.items()):
+        if not _is_alert_excluded_dag(entry["dag_id"], config):
+            continue
+        print(f"ℹ️  Dropping tracking for excluded DAG {entry['dag_id']}.")
+        del ledger[key]
+
+
 def _follow_up_tracked_runs(
     session,
     ledger: dict,
@@ -2554,6 +2591,9 @@ def _follow_up_tracked_runs(
     sla_emitted: dict | None = None,
 ) -> None:
     """Fetch the current state of tracked runs and apply follow-up messaging."""
+    if not ledger:
+        return
+    _drop_alert_excluded_entries(ledger, config)
     if not ledger:
         return
     slow_entries = [e for e in ledger.values() if not _is_sla_entry(e)]

@@ -37,6 +37,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _collect_sla_findings,
     _cycle_anchor,
     _dataset_blocked,
+    _drop_alert_excluded_entries,
     _effective_work_start,
     _enrich_findings_with_dataset_state,
     _enrich_findings_with_dw_impact,
@@ -56,6 +57,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _format_impacted_dw_line,
     _impacts_critical,
     _initial_text,
+    _is_alert_excluded_dag,
     _is_sla_candidate,
     _live_impacted_dw_count,
     _load_dedup_state,
@@ -91,6 +93,7 @@ _WEBHOOK_KEY = "GCHAT_DAG_RUNTIME_MONITORING_WEBHOOK"
 _WEBHOOK_URL = "https://chat.example.com/hook?key=k&token=t"
 _CRITICAL_DAG = "bietlejuice.ebdb_location"
 _STANDARD_DAG = "bietlejuice.some_small_dag"
+_QUINTOML_DAG = "quintoml.wonka.segmentation"
 
 _CONFIG = {
     "critical_dags": [_CRITICAL_DAG],
@@ -296,6 +299,20 @@ class TestEvaluateAll:
             )
         ]
         durations = {_STANDARD_DAG: [600.0] * 10}
+        assert _evaluate_all(running, durations, now, _CONFIG) == []
+
+    def test_skips_alert_excluded_quintoml_dags(self):
+        now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
+        running = [
+            SimpleNamespace(
+                dag_id=_QUINTOML_DAG,
+                run_id="r1",
+                start_date=now - timedelta(hours=5),
+                work_start=None,
+                has_execute_job_cluster=False,
+            )
+        ]
+        durations = {_QUINTOML_DAG: [600.0] * 10}
         assert _evaluate_all(running, durations, now, _CONFIG) == []
 
     def test_uses_execute_job_cluster_work_start_for_elapsed(self):
@@ -1031,6 +1048,41 @@ def test_new_standard_anomaly_posts_initial_and_tracks(
         "bietlejuice.dw_impacted"
     ]
     assert saved[f"{_STANDARD_DAG}|r2"]["impacted_dw_count"] == 1
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}._fetch_run_states", return_value={})
+@mock.patch(f"{_MODULE}._fetch_recent_durations")
+@mock.patch(f"{_MODULE}._fetch_running_runs")
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
+def test_quintoml_anomaly_is_not_posted(
+    mock_deps,
+    mock_cfg,
+    mock_var,
+    mock_running,
+    mock_durations,
+    mock_states,
+    mock_jira,
+    mock_post,
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
+    now = datetime.now(timezone.utc)
+    mock_running.return_value = [_running_row(_QUINTOML_DAG, "r1", 90, now)]
+    mock_durations.return_value = {_QUINTOML_DAG: [600.0] * 10}
+
+    monitor_dag_runtimes(session=_db_session())
+
+    mock_jira.assert_not_called()
+    mock_post.assert_not_called()
+    saved = _saved_ledger(mock_var)
+    assert not any(_QUINTOML_DAG in key for key in saved)
 
 
 @mock.patch(f"{_MODULE}._post_gchat", return_value=True)
@@ -1910,6 +1962,24 @@ class TestExpectedOffsetMinutes:
         assert expected == pytest.approx(200.0)
 
 
+class TestIsAlertExcludedDag:
+    def test_matches_quintoml_namespace(self):
+        assert _is_alert_excluded_dag(_QUINTOML_DAG, _CONFIG) is True
+
+    def test_keeps_regular_bietlejuice_dag(self):
+        assert _is_alert_excluded_dag(_STANDARD_DAG, _CONFIG) is False
+
+
+class TestDropAlertExcludedEntries:
+    def test_drops_quintoml_ledger_entries(self):
+        ledger = {
+            f"{_QUINTOML_DAG}|r1": {"dag_id": _QUINTOML_DAG, "run_id": "r1"},
+            f"{_STANDARD_DAG}|r2": {"dag_id": _STANDARD_DAG, "run_id": "r2"},
+        }
+        _drop_alert_excluded_entries(ledger, _CONFIG)
+        assert list(ledger) == [f"{_STANDARD_DAG}|r2"]
+
+
 class TestIsSlaCandidate:
     def test_excludes_self(self):
         assert _is_sla_candidate(DAG_ID, "Dataset", _SLA_CONFIG) is False
@@ -1937,6 +2007,9 @@ class TestIsSlaCandidate:
             )
             is False
         )
+
+    def test_excludes_quintoml_namespace(self):
+        assert _is_sla_candidate(_QUINTOML_DAG, "Dataset", _SLA_CONFIG) is False
 
     def test_keeps_regular_dataset_dag(self):
         assert (
