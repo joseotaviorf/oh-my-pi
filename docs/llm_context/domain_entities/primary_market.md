@@ -8,7 +8,7 @@
 **Data Steward:**
 - gustavo.rompe@quintoandar.com.br
 
-## Primary Market enrich schema access fallback
+## Overview
 
 If TARS cannot access the `datalake_sale_primary_market` enrich schema because
 the user lacks data-contract access, treat it as an access limitation. The team
@@ -32,7 +32,7 @@ sandbox.datalake_sale_primary_market_development_negotiation
 Keep the same column names and filters, identify the sandbox source in the
 answer, and do not apply this fallback to DW or other schemas.
 
-## Overview
+### Overview context
 
 - **Objective:** classify sale listings, visits, and ongoing-supply snapshots as **Primary** (new-build inventory sold by an incorporadora) or **Secondary** (resale between individuals), and route Ops/TARS questions to the current source of truth during the pilot rollout.
 - **Asset status / lifecycle:** August 2026 São Paulo pilot, inventory supplied through Órulo. The engineering RFC introduced a **1:N** development model (one empreendimento → N typologies → N shell houses) that coexists with the legacy **1:1** secondary model (one listing ≈ one house ≈ one unit).
@@ -41,7 +41,7 @@ answer, and do not apply this fallback to DW or other schemas.
 - **Common metrics:** Primary listing count, Primary visit volume, Primary ongoing-supply stock, Primary offer volume, sale-flow volume, and buyer market exclusivity.
 - **Related entities:** for house/listing grain fundamentals shared with Secondary, see [`house_and_listing.md`](house_and_listing.md). For offer/CCV mechanics, see [`fs-transact.md`](fs-transact.md).
 
-## Service Architecture (why some cross-references don't exist yet)
+### Service Architecture (why some cross-references don't exist yet)
 
 The **Development** domain is a separate service/bounded-context from **Sales Flow** (the offer/CCV system) — this is a service boundary, not just a data-modeling choice, and it explains most of the "manual cross-reference" answers in the FAQ below.
 
@@ -52,7 +52,7 @@ The **Development** domain is a separate service/bounded-context from **Sales Fl
 - **Offer acceptance is also a service-side event**, not just a data write: on accept, the service atomically decrements `unitCount`, suspends the typology listing when sold out (and the whole development if all typologies are sold out), and only then mints the **real** unit Imovel used for the closing path. This is why the unit house_id is created at **offer accept**, not at offer send — a deliberate anti-ghost-inventory design, not a data gap.
 - **`DevelopmentContact`** (active manager per empreendimento) is fully owned and queryable inside the Development domain — no external service call needed, which is why that FAQ answer below is native.
 
-## ⚠️ Two different "Primary Market" populations — do not conflate
+### ⚠️ Two different "Primary Market" populations — do not conflate
 
 **Verified 2026-09-02 against production data.** Any table sourced from `listing_sale_type` (which includes the legacy `is_primary_market` boolean as a fallback — see Tables below) mixes **two populations** that most business questions do NOT mean to combine:
 
@@ -68,6 +68,10 @@ INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
 ```
 
 `sale_type = 'PRIMARY'` alone is only safe to use for tables that are natively scoped to the pilot already (e.g. `house_development`, `development_negotiation` — both only exist for Development-domain houses in the first place).
+
+## Related Metric Entities
+
+- None — no metric entity doc owns Primary Market metrics yet.
 
 ## Glossary and Synonyms
 
@@ -88,7 +92,7 @@ INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
 | **DSP (`developers-supply-processor`)** | Product-side supply ledger for Primary inventory (Órulo sync) — **not** a DW/analytics source | See `datalake_ebdb_clean.development*` for the lake-side result of DSP → Main |
 | **BSP (`brokers-supply-processor`)** | Unrelated 3P broker-lead pipeline — orthogonal axis (who supplies), not Primary/Secondary market type | Do not conflate with Primary Market classification |
 
-## Where to query what
+## Tables
 
 | You need... | Use this table |
 |-------------|-----------------|
@@ -131,7 +135,7 @@ WHERE sale_type = 'PRIMARY'
 
 No official metric-entity file exists for Primary Market yet — all metrics above are component-level, not corporate/OKR definitions.
 
-## Relationships with Other Entities
+## Relationships with other entities
 
 ### House / Listing (shared grain, different meaning for the shell)
 
@@ -151,7 +155,7 @@ No official metric-entity file exists for Primary Market yet — all metrics abo
 
 - Visits book on the **shell** house, same as the intent house_id above. A buyer can visit typology A and offer on typology C of the same development — this is expected, not a data error. Typology-level visit-completion rates across shells of the same development are **not meaningful**; aggregate at development grain instead.
 
-## Frequently Asked Questions (example question → table, and why)
+### Frequently Asked Questions (example question → table, and why)
 
 Source: SWE domain walkthrough. For each business question: how to answer it **today**, and why — ✓ native (no cross-reference needed) or ⚠ requires a manual cross-reference / has a gap.
 
@@ -322,106 +326,8 @@ LEFT JOIN visited_houses AS vh
     ON vh.sk_house = hd.id_house
 ```
 
-## Ops Daily Tracking Pack (visits)
+## DataHub catalog
 
-A stakeholder tracking Primary Market visit operations day-to-day typically wants these five cuts. All verified against production data (2026-09-02) — pilot volume is small enough that absolute numbers move fast, but the query shapes are stable.
-
-### Query 7 — Visits per house (ranked)
-
-Which pilot houses are getting visited, at all. First thing an Ops stakeholder checks: is visit activity concentrated on a few houses, or spread out.
-
-```sql
-SELECT
-    fv.sk_house,
-    hd.development_name,
-    SUM(fv.num_visit_booked) AS booked,
-    SUM(fv.num_visit_completed) AS completed
-FROM dw_visit.fact_visits AS fv
-INNER JOIN datalake_sale_primary_market.house_development AS hd
-    ON hd.id_house = fv.sk_house
-GROUP BY 1, 2
-ORDER BY booked DESC
-```
-
-### Query 8 — Visits per development, daily trend
-
-Day-over-day visit activity per development — the core daily-tracking view. `ts_visit_local_tz` can include future-dated rows for visits already scheduled but not yet occurred (`num_visit_booked` counts the booking, not the calendar day it happens).
-
-```sql
-SELECT
-    CAST(fv.ts_visit_local_tz AS DATE) AS visit_date,
-    hd.id_development,
-    hd.development_name,
-    SUM(fv.num_visit_booked) AS booked,
-    SUM(fv.num_visit_completed) AS completed
-FROM dw_visit.fact_visits AS fv
-INNER JOIN datalake_sale_primary_market.house_development AS hd
-    ON hd.id_house = fv.sk_house
-GROUP BY 1, 2, 3
-ORDER BY visit_date DESC
-```
-
-### Query 9 — Visits booked-to-completed by region
-
-Regional VB2VC comparison. Joins the house's own `id_region` directly (native EBDB house attribute, same as `city_group`'s source) rather than going through `dim_house_development`/`fact_development_negotiation`, since those carry `city_group` only once [PR #28316](https://github.com/quintoandar/bi-etl-ejuice/pull/28316) merges. Swap in `r.city_group` (join `datalake_region.region AS r ON r.id = h.id_region`) for a human-readable name once that table is confirmed reachable from your query environment — it wasn't independently verifiable from this session's Trino access, but it's the identical join already running in production `enrich_sale_offer/sale_offer.sql`.
-
-```sql
-SELECT
-    h.id_region,
-    SUM(fv.num_visit_booked) AS booked,
-    SUM(fv.num_visit_completed) AS completed,
-    CAST(SUM(fv.num_visit_completed) AS DOUBLE) / NULLIF(SUM(fv.num_visit_booked), 0) AS vb2vc_rate
-FROM dw_visit.fact_visits AS fv
-INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
-    ON dtu.id_house = fv.sk_house
-INNER JOIN datalake_ebdb_clean.house AS h
-    ON h.id = fv.sk_house
-GROUP BY 1
-ORDER BY booked DESC
-```
-
-### Query 10 — Visit outcome breakdown (booked / completed / cancelled / unsuccessful)
-
-Where visits are dropping off in the funnel, not just the top-line VB2VC rate. `booked` won't always equal `completed + canceled + unsuccessful` — the remainder is visits still pending (future-dated or not yet resolved).
-
-```sql
-SELECT
-    SUM(fv.num_visit_booked) AS booked,
-    SUM(fv.num_visit_completed) AS completed,
-    SUM(fv.num_visit_canceled) AS canceled,
-    SUM(fv.num_visit_unsuccessful) AS unsuccessful
-FROM dw_visit.fact_visits AS fv
-INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
-    ON dtu.id_house = fv.sk_house
-```
-
-### Query 11 — Early warning: developments with visits but no pré-OS yet
-
-Developments that completed at least one visit but have generated zero negotiations — a lead-quality or sales-process signal, not a data problem.
-
-```sql
-WITH dev_visits AS (
-    SELECT
-        hd.id_development,
-        hd.development_name,
-        SUM(fv.num_visit_completed) AS completed_visits
-    FROM dw_visit.fact_visits AS fv
-    INNER JOIN datalake_sale_primary_market.house_development AS hd
-        ON hd.id_house = fv.sk_house
-    GROUP BY 1, 2
-),
-dev_negotiations AS (
-    SELECT DISTINCT id_development
-    FROM datalake_sale_primary_market.development_negotiation
-)
-SELECT
-    dv.id_development,
-    dv.development_name,
-    dv.completed_visits
-FROM dev_visits AS dv
-LEFT JOIN dev_negotiations AS dn
-    ON dn.id_development = dv.id_development
-WHERE dv.completed_visits > 0
-  AND dn.id_development IS NULL
-ORDER BY dv.completed_visits DESC
-```
+- **Data Product:** Published from this Markdown by the repository DataHub metadata workflow.
+- **Datasets:** Primary Market tables are listed in the Tables section; only tables owned by this domain should be linked as DataHub assets.
+- **Golden queries:** The six canonical queries above are published as DataHub Query entities.
