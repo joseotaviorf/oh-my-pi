@@ -20,60 +20,39 @@ workflow:
       clean_table_name: appointment_history
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-      get_table_metrics:
-        count: "id"
     appointment:
       clean_table_name: appointment
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-      get_table_metrics:
-        count: "id"
     attendee:
       clean_table_name: attendee
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-      get_table_metrics:
-        count: "id"
     calendar:
       clean_table_name: calendar
       raw_primary_keys: [calendar_id]
       clean_primary_keys: [id_calendar]
-      get_table_metrics:
-        count: "calendar_id"
     week_calendar:
       clean_table_name: week_calendar
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-      get_table_metrics:
-        count: "id"
     specific_calendar:
       clean_table_name: specific_calendar
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-      get_table_metrics:
-        count: "id"
     agent_data:
       clean_table_name: agent_data
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-      get_table_metrics:
-        count: "id"
     location_data:
       clean_table_name: location_data
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-      get_table_metrics:
-        count: "id"
     appointment_participant:
       clean_table_name: appointment_participant
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-      get_table_metrics:
-        count: "id"
     external_reference:
       clean_table_name: external_reference
       raw_primary_keys: [external_id]
       clean_primary_keys: [id_external]
-      get_table_metrics:
-        count: "external_id"
-

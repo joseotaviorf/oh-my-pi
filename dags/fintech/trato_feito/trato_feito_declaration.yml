@@ -17,56 +17,26 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 0), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   tables_customization:
-    accounting_installment:
-      get_table_metrics:
-        count: "id"
+    accounting_installment: {}
     audience:
       raw_primary_keys: [id]
       clean_primary_keys: [id_communication_audience]
-    bill:
-      get_table_metrics:
-        count: "id"
-    billing:
-      get_table_metrics:
-        count: "id"
-    client:
-      get_table_metrics:
-        count: "id"
-    contract:
-      get_table_metrics:
-        count: "id"
-    debt:
-      get_table_metrics:
-        count: "id"
-    debtor:
-      get_table_metrics:
-        count: "id"
-    eviction_data:
-      get_table_metrics:
-        count: "id"
-    eviction:
-      get_table_metrics:
-        count: "id"
-    evictions_report:
-      get_table_metrics:
-        count: "id"
+    bill: {}
+    billing: {}
+    client: {}
+    contract: {}
+    debt: {}
+    debtor: {}
+    eviction_data: {}
+    eviction: {}
+    evictions_report: {}
     eviction_aud: {}
-    installment:
-      get_table_metrics:
-        count: "id"
-    installment_charges:
-      get_table_metrics:
-        count: "id"
-    negotiation:
-      get_table_metrics:
-        count: "id"
-    payment:
-      get_table_metrics:
-        count: "id"
+    installment: {}
+    installment_charges: {}
+    negotiation: {}
+    payment: {}
     collector_load: {}
-    collector:
-      get_table_metrics:
-        count: "id"
+    collector: {}
     events_batch: {}
     status_sync: {}
     rollout_cyber_contract: {}

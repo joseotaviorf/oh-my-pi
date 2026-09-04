@@ -73,11 +73,6 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.OPTIMIZE_DELTA_TABLE
         )
-        self.generate_database_table_metrics_task_creator = (
-            task_creator_factory.get_task_creator(
-                TaskEnum.GENERATE_DATABASE_TABLE_METRICS
-            )
-        )
 
     def _get_raw_tables(self) -> List[TableAttributes]:
         """Returns the table attributes for all the tables in the raw layer from tables_customization."""
@@ -166,9 +161,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             dummy_terminate_job_cluster_task,
             execute_job_cluster_local_id,
         )
-        dag_final_tasks = self._set_dag_final_tasks(
-            execute_job_cluster_local_id, cluster_completion_sink
-        )
+        dag_final_tasks = cluster_completion_sink
 
         for raw_table, clean_table in zip(cluster_raw_tables, cluster_clean_tables):
             raw_initial_task, raw_final_task = self._create_raw_tasks(
@@ -267,31 +260,3 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             (load_clean_task >> data_quality_tests_clean_task >> dag_final_tasks)
 
         return load_clean_task, last_clean_task
-
-    def _set_dag_final_tasks(
-        self, execute_job_cluster_local_id, cluster_completion_sink
-    ):
-        """
-        The final task of the DAG will either be the cluster completion sink (terminate or
-        job-cluster-finished), or the get_table_metrics_task entry.
-        This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
-        it simply returns the cluster_completion_sink.
-        """
-
-        # This guarantees that the task will be added only at the first local job cluster subdag.
-        if (
-            self._check_include_get_table_metrics_task(
-                self.workflow_args["tables_customization"]
-            )
-            and execute_job_cluster_local_id == 1
-        ):
-            first_metrics_task, last_metrics_task = (
-                self._create_generate_metrics_task_group(
-                    self.generate_database_table_metrics_task_creator,
-                    self.register_delta_table_task_creator,
-                )
-            )
-            last_metrics_task >> cluster_completion_sink
-            return first_metrics_task
-        else:
-            return cluster_completion_sink

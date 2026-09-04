@@ -118,11 +118,6 @@ class RawCDCWorkflow(BaseWorkflow):
         self.profiling_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.PROFILING
         )
-        self.generate_database_table_metrics_task_creator = (
-            task_creator_factory.get_task_creator(
-                TaskEnum.GENERATE_DATABASE_TABLE_METRICS
-            )
-        )
 
     def _get_transactional_tables(self) -> List[TableAttributes]:
         """Returns the table attributes for all the tables in the transactional layer."""
@@ -227,9 +222,7 @@ class RawCDCWorkflow(BaseWorkflow):
             dummy_terminate_job_cluster_task,
             execute_job_cluster_local_id,
         )
-        dag_final_tasks = self._set_dag_final_tasks(
-            execute_job_cluster_local_id, cluster_completion_sink
-        )
+        dag_final_tasks = cluster_completion_sink
         if not self.is_validation:
             optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
                 transactional_tables,
@@ -386,32 +379,3 @@ class RawCDCWorkflow(BaseWorkflow):
             (load_clean_task >> profiling_clean_task >> dag_final_tasks)
 
         return load_clean_task, last_clean_task
-
-    def _set_dag_final_tasks(
-        self, execute_job_cluster_local_id: int, cluster_completion_sink
-    ):
-        """
-        The final task of the DAG will either be the cluster completion sink (terminate or
-        job-cluster-finished), or the get_table_metrics_task entry.
-        This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
-        it simply returns the cluster_completion_sink.
-        """
-        # Since we use a single task for get_metrics task extract metrics
-        # from all tables, this validates if this is the first time the
-        # task is being added.
-        if (
-            self._check_include_get_table_metrics_task(
-                self.workflow_args["tables_customization"]
-            )
-            and execute_job_cluster_local_id == 1
-        ):
-            first_metrics_task, last_metrics_task = (
-                self._create_generate_metrics_task_group(
-                    self.generate_database_table_metrics_task_creator,
-                    self.sync_metadata_task_creator,
-                )
-            )
-            last_metrics_task >> cluster_completion_sink
-            return first_metrics_task
-        else:
-            return cluster_completion_sink

@@ -725,18 +725,6 @@ make clean
 
 ## Advanced Parameters Reference
 
-### `get_table_metrics` (per-table)
-
-Runs JDBC count/max queries against the source to collect metadata. Different from `collect_metrics` (which is per-table). Defined inside `tables_customization`:
-
-```yaml
-tables_customization:
-  my_table:
-    get_table_metrics:
-      count_query: "SELECT COUNT(*) FROM my_table"
-      max_query: "SELECT MAX(updated_at) FROM my_table"
-```
-
 ### `short_circuit_customization`
 
 Gates the entire DAG run on a Python callable result. When the function returns `False`, all downstream tasks are skipped. The `function` must be a valid `ShortCircuitFunctionEnum` value:

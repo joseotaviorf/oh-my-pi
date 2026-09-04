@@ -23,44 +23,24 @@ workflow:
   tables_customization:
     agreement: {}
     agreement_entry: {}
-    audit:
-      get_table_metrics:
-        count: id
-    boleto:
-      get_table_metrics:
-        count: external_id
-        max: retsuko_updated_at
-    credit_card_payment:
-      get_table_metrics:
-        count: external_id
+    audit: {}
+    boleto: {}
+    credit_card_payment: {}
     discount: {}
     discount_entry: {}
     early_termination: {}
     early_termination_fee: {}
     early_termination_version: {}
-    entry:
-      get_table_metrics:
-        count: external_id
-        max: retsuko_updated_at
+    entry: {}
     file: {}
-    invoice_partitioned:
-      get_table_metrics:
-        count: external_id
-        max: retsuko_updated_at
+    invoice_partitioned: {}
     invoice_entry:
       raw_primary_keys: [invoice_id, entry_id]
-      get_table_metrics:
-        count: entry_id
-        max: created_at
     manual_entry: {}
-    monthly_closing_checks:
-      get_table_metrics:
-        count: id
+    monthly_closing_checks: {}
     overlimit_check: {}
     payment_block: {}
     recurrent_credit_card: {}
     recurring_expense: {}
     recurring_expense_entry: {}
-    sap_entity:
-      get_table_metrics:
-        count: id
+    sap_entity: {}

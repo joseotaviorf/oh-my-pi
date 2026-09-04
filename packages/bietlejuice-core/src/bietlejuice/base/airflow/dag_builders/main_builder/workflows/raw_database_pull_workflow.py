@@ -42,9 +42,7 @@ class RawDatabasePullWorkflow(BaseWorkflow):
                         execute_job_cluster_local_id=execute_job_cluster_local_id
                     )
                 )
-                dag_final_tasks = self._set_dag_final_tasks(
-                    execute_job_cluster_local_id
-                )
+                dag_final_tasks = self._set_dag_final_tasks()
                 execute_job_cluster_local_id += 1
 
             raw_initial_task, raw_final_task = self._create_raw_tasks(
@@ -87,11 +85,6 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         )
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
-        )
-        self.generate_database_table_metrics_task_creator = (
-            task_creator_factory.get_task_creator(
-                TaskEnum.GENERATE_DATABASE_TABLE_METRICS
-            )
         )
 
     def _create_raw_tasks(
@@ -173,29 +166,5 @@ class RawDatabasePullWorkflow(BaseWorkflow):
 
         return load_clean_task, last_clean_task
 
-    def _set_dag_final_tasks(self, execute_job_cluster_local_id: int):
-        """
-        The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
-        This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
-        it simply returns the dummy_terminate_job_cluster_task.
-        """
-        dummy_terminate_job_cluster_task = (
-            self.dummy_job_cluster_finished_task_creator.create_task()
-        )
-
-        if (
-            self._check_include_get_table_metrics_task(
-                self.workflow_args["tables_customization"]
-            )
-            and execute_job_cluster_local_id == 1
-        ):
-            first_metrics_task, last_metrics_task = (
-                self._create_generate_metrics_task_group(
-                    self.generate_database_table_metrics_task_creator,
-                    self.sync_metadata_task_creator,
-                )
-            )
-            last_metrics_task >> dummy_terminate_job_cluster_task
-            return first_metrics_task
-        else:
-            return dummy_terminate_job_cluster_task
+    def _set_dag_final_tasks(self):
+        return self.dummy_job_cluster_finished_task_creator.create_task()
