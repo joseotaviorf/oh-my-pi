@@ -38,5 +38,8 @@ packages/bietlejuice-runtime/src/bietlejuice/base/sst/**                @quintoa
 packages/bietlejuice-runtime/test/unit/base/sst/**                      @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners
 packages/bietlejuice-airflow/src/bietlejuice/base/sst/**                @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners
 
-
-
+# BPO pipelines — data-sst sole owner (overrides packages/**).
+packages/**/reverse_bpo_*                                               @quintoandar/data-sst
+packages/**/test_reverse_bpo_*                                          @quintoandar/data-sst
+packages/**/dw_bpo_performance/**                                       @quintoandar/data-sst
+packages/bietlejuice-runtime/test/dags/planning_and_performance/**      @quintoandar/data-sst
