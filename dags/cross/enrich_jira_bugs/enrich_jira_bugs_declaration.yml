@@ -1,7 +1,7 @@
 dag:
   name: enrich_jira_bugs
   schedule_start_date: 2025, 11, 17
-  owner: Data Engineering
+  owner: Data Governance
   documentation:
     dag_purpose: |
       This DAG creates the full table for Jira Bugs workflow.
