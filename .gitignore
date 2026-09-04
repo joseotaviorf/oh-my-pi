@@ -60,7 +60,7 @@ logs/
 # macOS
 .DS_Store
 
-# Local helpers (emr_monitor, S3 upload scripts) — Astro lives under astro/
+# Local helpers (emr_monitor, etl_gantt, S3 upload scripts) — Astro lives under astro/
 
 # Airflow DAG Builder generated files
 dags/**/*_dag.py

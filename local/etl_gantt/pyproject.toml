@@ -1,0 +1,43 @@
+[project]
+name = "etl_gantt"
+version = "0.1.0"
+description = "Local Streamlit UI for Airflow task-instance timelines via Trino"
+requires-python = ">=3.10"
+dependencies = [
+    "keyring>=25.0",
+    "pandas>=2.0",
+    "plotly>=5.20",
+    "pyyaml>=6.0",
+    "streamlit>=1.32",
+    "trino>=0.329",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "chart",
+    "identity",
+    "lineage",
+    "query",
+    "trino_client",
+    "tests",
+]

@@ -6,6 +6,7 @@
 This folder holds standalone developer tooling:
 
 - **`emr_monitor/`** — EMR cluster monitoring app (own [`README`](emr_monitor/README.md)).
+- **`etl_gantt/`** — upstream ETL timelines (median time-of-day) via Trino (own [`README`](etl_gantt/README.md)).
 - **`upload_local_spark_jobs_to_s3.py`** / **`upload_local_whl_to_s3.py`** — push local
   artifacts to the Forno S3 buckets, used by the `make upload-local-*` targets below.
 
