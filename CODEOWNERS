@@ -3,6 +3,7 @@
 CODEOWNERS                                                              @quintoandar/data-ingestion-code-owners
 Makefile                                                                @quintoandar/data-ingestion-code-owners
 dags/*/metric_*                                                         @quintoandar/bi-etl-ejuice-metric-layer-code-owners @quintoandar/data-ingestion-code-owners
+dags/agents/**                                                          @quintoandar/data-agents @quintoandar/data-ingestion-code-owners
 dags/atlas_db/**                                                        @quintoandar/atlas-db-code-owners @quintoandar/data-ingestion-code-owners
 dags/conversational_xp/**                                               @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/bi-etl-ejuice-code-owners @quintoandar/data-ingestion-code-owners
 dags/publisher_xp/**                                                    @quintoandar/publisher-xp @quintoandar/data-ingestion-code-owners
