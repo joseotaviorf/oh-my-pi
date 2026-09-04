@@ -292,7 +292,7 @@ window_visits AS (
         IF(computed_status_unified IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
         IF(visit_log.ts_visit_tenant_answer IS NOT NULL OR visit_log.ts_visit_pending_tenant_answer IS NOT NULL, TRUE, NULL) AS has_tenant_living,
         visit_log.last_event = 'ANSWER_PENDING' AS is_waiting_for_response,
-        IF(v_origin.visit_request_channel IN ('AGENT_PWA', 'AGENT_NATIVE') OR v_origin.visit_request_application_source = 'AGENT_SCHEDULING_LINK' OR visit_log.ts_visit_registered IS NOT NULL, 1, 0) AS is_vbba,
+        IF(v_origin.visit_request_channel IN ('AGENT_PWA', 'AGENT_NATIVE') OR v_origin.visit_request_application_source = 'AGENT_SCHEDULING_LINK' OR visit_log.ts_visit_registered IS NOT NULL, TRUE, FALSE) AS is_vbba,
         FALSE AS has_entrance_problem,
         IF(visit_log.ts_visit_supply_answer IS NOT NULL, TRUE, NULL) AS has_supply_answered,
         IF(visit_log.ts_visit_supply_confirmed IS NOT NULL, TRUE, NULL) AS has_supply_confirmed,

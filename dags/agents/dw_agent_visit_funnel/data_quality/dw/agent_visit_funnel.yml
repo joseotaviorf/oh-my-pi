@@ -1,0 +1,15 @@
+---
+table_name: dw_agent_performance.agent_visit_funnel
+alert_channel: "#agents-data-alarms"
+column_level_validations:
+  sk_agent_visit_funnel:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  uuid_person:
+    is_complete:
+      severity_level: Error
+  date_ref:
+    is_complete:
+      severity_level: Error

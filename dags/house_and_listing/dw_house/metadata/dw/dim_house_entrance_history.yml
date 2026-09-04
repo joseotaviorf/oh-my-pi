@@ -18,6 +18,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.id_actor_user
     description: ID of actor user who initiated the entry.
+  sk_user_key_holder:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.key_holder_identifier
+    description: ID of user key holder who initiated the entry.
   sk_trace:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.id_trace

@@ -1,0 +1,23 @@
+dag:
+  name: dw_agent_visit_funnel
+  owner: Data Agents
+  schedule_start_date: 2026, 9, 4
+  schedule_interval: "0 6 * * *"
+  documentation:
+    dag_purpose: |
+      Agent visit funnel DW DAG. Tracks the visit funnel stages for agents
+      (e.g. scheduled, confirmed, completed) based on the agent_visit_funnel
+      query. Based on dw_agent_milestone configuration (owner, cluster).
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: agent_performance
+  default_extraction_type: incremental
+  tables_customization:
+    agent_visit_funnel:
+      merge_on: [sk_agent_visit_funnel]
+      partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
