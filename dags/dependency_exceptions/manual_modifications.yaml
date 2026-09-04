@@ -728,7 +728,15 @@ bietlejuice.enrich_sale_lead_flows:
     - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
     - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   remove:
+    - bietlejuice.casa_mineira_crm:load-clean-city:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-client:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-contact:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-house:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-media-contact:first-run-of-day
     - bietlejuice.casa_mineira_crm:load-clean-neighborhood:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-origin-contact:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-sale:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-visit:first-run-of-day
     - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
 bietlejuice.enrich_sale_listings:
@@ -880,6 +888,11 @@ bietlejuice.enrich_top_of_funnel_demand:
 bietlejuice.enrich_top_of_funnel_supply:
   remove:
     - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
+bietlejuice.enrich_tracked_events:
+  remove:
+    - bietlejuice.casa_mineira_crm:load-clean-contact:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-media-contact:first-run-of-day
+    - bietlejuice.casa_mineira_crm:load-clean-origin-contact:first-run-of-day
 bietlejuice.enrich_tracksale:
   remove:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day

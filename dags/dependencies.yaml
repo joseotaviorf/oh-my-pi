@@ -3698,14 +3698,6 @@ bietlejuice.enrich_sale_flows:
   - bietlejuice.sales_flow_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-offer:first-run-of-day
 bietlejuice.enrich_sale_lead_flows:
-  - bietlejuice.casa_mineira_crm:load-clean-city:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-client:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-contact:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-house:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-media-contact:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-origin-contact:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-sale:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-visit:first-run-of-day
   - bietlejuice.classified_leads:load-clean-lead-contact:first-run-of-day
   - bietlejuice.classified_leads:load-clean-lead-reply-email:first-run-of-day
   - bietlejuice.classified_leads:load-clean-lead-reply-whatsapp:first-run-of-day
@@ -4290,9 +4282,6 @@ bietlejuice.enrich_tqc_referral:
   - bietlejuice.gsheets_for_sale:done-clean-tqc-leads:first-run-of-day
 bietlejuice.enrich_tracked_events:
   - bietlejuice.bigfone:load-clean-event:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-contact:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-media-contact:first-run-of-day
-  - bietlejuice.casa_mineira_crm:load-clean-origin-contact:first-run-of-day
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions:first-run-of-day
