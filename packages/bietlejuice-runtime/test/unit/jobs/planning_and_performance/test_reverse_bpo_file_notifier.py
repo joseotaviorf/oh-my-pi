@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
@@ -10,6 +11,7 @@ from bietlejuice.jobs.planning_and_performance.reverse_bpo_file_notifier import 
     format_file_size,
     format_gchat_message,
     get_file_size_bytes,
+    normalize_gchat_webhook_url,
     notify_reverse_bpo_file_saved,
 )
 
@@ -150,6 +152,17 @@ class TestFormatGchatMessage:
         assert "maior que ontem" in message
 
 
+class TestNormalizeGchatWebhookUrl:
+    def test_leaves_plain_url_unchanged(self):
+        url = "https://chat.googleapis.com/v1/spaces/TEST/messages?key=TEST"
+        assert normalize_gchat_webhook_url(url) == url
+
+    def test_decodes_base64_webhook_url(self):
+        url = "https://chat.googleapis.com/v1/spaces/TEST/messages?key=TEST"
+        encoded = base64.b64encode(url.encode("utf-8")).decode("ascii")
+        assert normalize_gchat_webhook_url(encoded) == url
+
+
 class TestNotifyReverseBpoFileSaved:
     @patch(f"{MODULE}.record_saved_file_marker")
     @patch(f"{MODULE}.GChatService.send_message", return_value=True)
@@ -198,6 +211,49 @@ class TestNotifyReverseBpoFileSaved:
             default_keyword="AE_ALERTS_PROD",
         )
         mock_send_message.assert_called_once()
+
+    @patch(f"{MODULE}.record_saved_file_marker")
+    @patch(f"{MODULE}.GChatService.send_message", return_value=True)
+    @patch(f"{MODULE}.AlertChannelService")
+    @patch(f"{MODULE}.get_file_size_bytes")
+    @patch(f"{MODULE}.compare_with_previous_day")
+    def test_decodes_base64_webhook_before_sending(
+        self,
+        mock_compare,
+        mock_get_file_size,
+        mock_alert_channel_service,
+        mock_send_message,
+        _mock_record_marker,
+    ):
+        mock_get_file_size.return_value = 2500
+        mock_compare.return_value = FileSizeComparison(
+            current_size_bytes=2500,
+            previous_size_bytes=2000,
+            is_greater_than_previous=True,
+            size_change_pct=25.0,
+            previous_file_path="s3a://bucket/table_2026_08_25.parquet",
+        )
+        plain_url = "https://chat.googleapis.com/v1/spaces/TEST/messages?key=TEST"
+        encoded_url = base64.b64encode(plain_url.encode("utf-8")).decode("ascii")
+        alert_service = MagicMock()
+        alert_service.get_gchat_webhook_url.return_value = encoded_url
+        mock_alert_channel_service.return_value = alert_service
+
+        sent = notify_reverse_bpo_file_saved(
+            dbutils=MagicMock(),
+            environment="prod",
+            dag_name="reverse_aec",
+            file_name="table_2026_08_26.parquet",
+            destination_path="s3a://bucket/table_2026_08_26.parquet",
+            s3_path="s3a://bucket/aec/table/year=2026/month=08/day=26/",
+            execution_date=datetime(2026, 8, 26),
+            row_count=100,
+            dag_run_id="manual__2026-08-26",
+            bucket="5a-dataops-prod",
+        )
+
+        assert sent is True
+        assert mock_send_message.call_args[0][0].destination == plain_url
 
     @patch(f"{MODULE}.get_file_size_bytes", return_value=None)
     def test_does_not_raise_when_file_size_is_unavailable(self, _mock_get_file_size):

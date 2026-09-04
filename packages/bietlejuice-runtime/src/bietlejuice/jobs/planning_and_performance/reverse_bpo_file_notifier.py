@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional
@@ -186,6 +187,25 @@ def format_gchat_message(
     )
 
 
+def normalize_gchat_webhook_url(webhook_url: str) -> str:
+    """
+    EMR Secrets Manager may store Databricks-style base64 webhook values.
+    Decode when needed; leave plain https:// URLs unchanged.
+    """
+    webhook_url = webhook_url.strip()
+    if webhook_url.startswith(("http://", "https://")):
+        return webhook_url
+
+    try:
+        decoded = base64.b64decode(webhook_url, validate=True).decode("utf-8").strip()
+    except (ValueError, UnicodeDecodeError):
+        return webhook_url
+
+    if decoded.startswith(("http://", "https://")):
+        return decoded
+    return webhook_url
+
+
 def notify_reverse_bpo_file_saved(
     *,
     dbutils,
@@ -233,9 +253,11 @@ def notify_reverse_bpo_file_saved(
         fallback_keyword = (
             "AE_ALERTS_PROD" if environment == "prod" else "AE_ALERTS_FORNO"
         )
-        webhook_url = AlertChannelService(dbutils=dbutils).get_gchat_webhook_url(
-            channel_keyword=alert_channel,
-            default_keyword=fallback_keyword,
+        webhook_url = normalize_gchat_webhook_url(
+            AlertChannelService(dbutils=dbutils).get_gchat_webhook_url(
+                channel_keyword=alert_channel,
+                default_keyword=fallback_keyword,
+            )
         )
         message = Message(content=message_content, destination=webhook_url)
         sent = GChatService.send_message(message)
