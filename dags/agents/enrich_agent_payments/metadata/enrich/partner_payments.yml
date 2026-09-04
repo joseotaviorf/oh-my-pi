@@ -37,6 +37,10 @@ columns:
     lineage:
       - datalake_big_agent.earnings.id_contract
     description: Rent contract identifier when the payment is tied to a rent earning source.
+  id_sales_flow:
+    lineage:
+      - datalake_big_agent.earnings.id_sales_flow
+    description: Sales flow identifier associated with the payment context.
   id_offer:
     lineage:
       - datalake_big_agent.earnings.id_offer

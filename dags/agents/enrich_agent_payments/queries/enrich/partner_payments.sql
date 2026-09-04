@@ -35,10 +35,12 @@ WITH nazare_revenue_share AS (
 nazare_offer_agent AS (
     SELECT
         oa.id_offer_agent,
+        sfo.id_sales_flow,
         a.id_external AS id_user,
         o.id_external AS id_offer,
         o.id_business_unit,
-        a.uuid_external_person AS uuid_person
+        a.uuid_external_person AS uuid_person,
+        fee.brokerage_fee
     FROM
         datalake_nazare_clean.offer_agent AS oa
     LEFT JOIN
@@ -47,6 +49,12 @@ nazare_offer_agent AS (
     LEFT JOIN
         datalake_nazare_clean.offer AS o
             ON o.id_offer = oa.id_offer
+    LEFT JOIN
+        datalake_sales_flow_clean.offer AS sfo
+            ON sfo.id_firestore = o.id_external
+    LEFT JOIN
+        datalake_sales_flow_clean.brokerage AS fee
+            ON fee.id_sales_flow = sfo.id_sales_flow
 ),
 nazare_offer_partner AS (
     SELECT
@@ -68,7 +76,7 @@ union_nazare_incentives AS (
         "SUPPLY_ACQUISITION_FS" AS incentive_system,
         IF(rs.is_3p_partnership IS TRUE, "COMPANY", "AGENT") AS revenue_receiver_type,
         COALESCE(
-            rs.supply_acquisition_share, 
+            rs.supply_acquisition_share,
             rs.final_revenue_share_percentage
         ) AS revenue_percentage,
         rs.ts_created
@@ -132,6 +140,7 @@ nazare_earnings AS (
         ui.id_revenue_share,
         rs.id_house,
         NULL AS id_contract,
+        oa.id_sales_flow,
         COALESCE(oa.id_offer, op.id_offer) AS id_offer,
         oa.id_business_unit,
         COALESCE(pt_person.id_tier, pt_company.id_tier) AS id_tier,
@@ -157,8 +166,8 @@ nazare_earnings AS (
         IF(rs.participant_role IN ('CIQ', 'SUPPLY'), 'SUPPLY', 'DEMAND') AS revenue_role,
         NULL AS revenue_share_type,
         NULL AS revenue_share_value,
-        rs.brokerage AS brokerage_fee,
-        rs.brokerage * rs.sale_price AS brokerage_amount,
+        COALESCE(oa.brokerage_fee, rs.brokerage) AS brokerage_fee,
+        COALESCE(oa.brokerage_fee, rs.brokerage) * rs.sale_price AS brokerage_amount,
         rs.sale_price AS ticket_base_amount,
         ui.revenue_percentage,
         IF(
@@ -215,6 +224,7 @@ SELECT
     e.id_revenue_share,
     e.id_house,
     e.id_contract,
+    e.id_sales_flow,
     e.id_offer,
     e.id_offer_business_unit AS id_business_unit,
     e.id_tier,
@@ -225,7 +235,7 @@ SELECT
     e.calculated_from,
     e.business_context,
     CASE
-        WHEN pr.profile = "REDE" 
+        WHEN pr.profile = "REDE"
             OR e.uuid_company IS NOT NULL
             THEN "THIRD_PARTY_AGENT"
         ELSE pr.profile
@@ -272,6 +282,7 @@ SELECT
     e.id_revenue_share,
     e.id_house,
     e.id_contract,
+    e.id_sales_flow,
     e.id_offer,
     e.id_business_unit,
     e.id_tier,

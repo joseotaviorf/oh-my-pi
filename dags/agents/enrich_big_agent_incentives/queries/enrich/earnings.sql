@@ -49,7 +49,8 @@ earning_sources AS (
         FROM_JSON(
             incentive_systems_calculation_status,
             'MAP<STRING,STRING>'
-        ) AS calculation_status
+        ) AS calculation_status,
+        es.ts_sent_to_finance
     FROM
         datalake_big_agent_clean.earning_sources AS es
 ),
@@ -109,6 +110,8 @@ SELECT DISTINCT
     ei.reason AS invalidation_reason,
     ei.invalidation_description,
     ue.reason AS unresolved_earning_reason,
+    rs.performance_evaluation_period,
+    rs.tier_validity_period,
     rs.revenue_share_type,
     rs.revenue_share_value,
     person_tier.tier_name,
@@ -141,6 +144,7 @@ SELECT DISTINCT
     ue.ts_solved AS ts_unresolved_earning_solved,
     ne.ts_created,
     ei.ts_invalidated,
+    es.ts_sent_to_finance,
     ne.ts_updated,
     YEAR(ne.ts_created) AS year,
     MONTH(ne.ts_created) AS month,

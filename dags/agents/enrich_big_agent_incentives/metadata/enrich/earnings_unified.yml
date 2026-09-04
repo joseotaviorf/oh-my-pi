@@ -30,6 +30,11 @@ columns:
       - datalake_ebdb_clean.contract_partnership_data.id_contract
       - datalake_big_agent.earnings.id_contract
     description: EBDB contract identifier the earning is attached to.
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id
+      - datalake_big_agent.earnings.id_sales_flow
+    description: Sales flow identifier the earning is attached to.
   uuid_person:
     lineage:
       - datalake_ebdb_clean.user.uuid_person
@@ -83,6 +88,16 @@ columns:
       High-level role of the earning within the incentive funnel (DEMAND or SUPPLY). Hardcoded
       per branch for legacy earnings; derived from the first segment of the Big Agent earning's
       incentive_system (split on underscore) for the migrated flow.
+  performance_evaluation_period:
+    lineage:
+      - datalake_big_agent.earnings.performance_evaluation_period
+    description: |
+      Performance evaluation period of the incentive system configuration. For example, P2M (last 2 months).
+  tier_validity_period:
+    lineage:
+      - datalake_big_agent.earnings.tier_validity_period
+    description: |
+      Tier validity period of the incentive system configuration. For example, P2M (next 2 months).
   revenue_share_type:
     lineage:
       - datalake_ebdb_clean.agent_rent_flow.id_agent
@@ -191,6 +206,12 @@ columns:
       Boolean flag indicating whether the earning was calculated by the Big Agent Incentives Engine.
       Always false for legacy For-Rent earnings, which predate this classification; populated from the Big
       Agent earning for the migrated flow.
+  ts_sent_to_finance:
+    lineage:
+      - datalake_big_agent.earnings.ts_sent_to_finance
+    description: |
+      Timestamp when the earning sourced from the Big Agent Incentives Engine was sent to finance. Always null for legacy For-Rent earnings,
+      which predate this classification.
   ts_created:
     lineage:
       - datalake_ebdb_clean.contract.ts_signed

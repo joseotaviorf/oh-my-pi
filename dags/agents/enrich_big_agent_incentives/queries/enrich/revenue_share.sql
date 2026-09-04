@@ -1,16 +1,16 @@
 WITH revenue_share_updated AS (
-    SELECT 
-        id_revenue_share 
-    FROM 
-        datalake_big_agent_clean.revenue_share_invalidations 
-    WHERE 
+    SELECT
+        id_revenue_share
+    FROM
+        datalake_big_agent_clean.revenue_share_invalidations
+    WHERE
         DATE(ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
-    SELECT 
-        id AS id_revenue_share 
-    FROM 
+    SELECT
+        id AS id_revenue_share
+    FROM
         datalake_big_agent_clean.revenue_share
-    WHERE 
+    WHERE
         DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 revenue_share_condition AS (
@@ -46,19 +46,21 @@ SELECT
     rs.relation_type,
     CASE
         WHEN rs.relation_type = "TIER" THEN rs.relation_type
-        WHEN rs.relation_type IN ("INCENTIVE_ENGINE", "INCENTIVE_SYSTEM_CONFIGURATION") 
+        WHEN rs.relation_type IN ("INCENTIVE_ENGINE", "INCENTIVE_SYSTEM_CONFIGURATION")
             AND rs.type IS NOT NULL
             THEN rs.type
-        WHEN rs.relation_type IN ("INCENTIVE_ENGINE", "INCENTIVE_SYSTEM_CONFIGURATION") 
+        WHEN rs.relation_type IN ("INCENTIVE_ENGINE", "INCENTIVE_SYSTEM_CONFIGURATION")
             AND rs.type IS NULL
             AND condition.is_crcc IS TRUE
             THEN "CRCC"
-        WHEN rs.relation_type IN ("INCENTIVE_ENGINE", "INCENTIVE_SYSTEM_CONFIGURATION") 
+        WHEN rs.relation_type IN ("INCENTIVE_ENGINE", "INCENTIVE_SYSTEM_CONFIGURATION")
             AND rs.type IS NULL
             AND condition.is_fifty IS TRUE
             THEN "FIFTY"
         ELSE rs.type
     END AS revenue_share_type,
+    COALESCE(conf.performance_evaluation_period, conf_tier.performance_evaluation_period) AS performance_evaluation_period,
+    COALESCE(conf.tier_validity_period, conf_tier.tier_validity_period) AS tier_validity_period,
     rs.value AS revenue_share_value,
     rs.status,
     COALESCE(rs.invalidation_reason, invalid.reason) AS invalidation_reason,
@@ -92,3 +94,13 @@ LEFT JOIN
     datalake_big_agent_clean.tier AS tier
         ON tier.id = rs.id_relation
         AND rs.relation_type = 'TIER'
+LEFT JOIN
+    datalake_big_agent_clean.incentive_engine AS ie
+        ON ie.id = tier.id_incentive_engine
+LEFT JOIN
+    datalake_big_agent_clean.incentive_system_configuration AS conf_tier
+        ON ie.incentive_system_configuration_key = conf_tier.configuration_key
+LEFT JOIN
+    datalake_big_agent_clean.incentive_system_configuration AS conf
+        ON conf.id = rs.id_relation
+        AND rs.relation_type = 'INCENTIVE_SYSTEM_CONFIGURATION'

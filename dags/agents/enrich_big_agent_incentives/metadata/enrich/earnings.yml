@@ -149,6 +149,14 @@ columns:
     lineage:
       - datalake_big_agent.unresolved_earnings.reason
     description: Business reason from the linked unresolved earning queue item that preceded this earning's calculation.
+  performance_evaluation_period:
+    lineage:
+      - datalake_big_agent.revenue_share.performance_evaluation_period
+    description: Performance evaluation period of the incentive system configuration. For example, P2M (last 2 months).
+  tier_validity_period:
+    lineage:
+      - datalake_big_agent.revenue_share.tier_validity_period
+    description: Tier validity period of the incentive system configuration. For example, P2M (next 2 months).
   revenue_share_type:
     lineage:
       - datalake_big_agent.revenue_share.revenue_share_type
@@ -257,6 +265,10 @@ columns:
     lineage:
       - datalake_big_agent_clean.earning_invalidations.ts_invalidated
     description: Timestamp when the earning was invalidated in Big Agent.
+  ts_sent_to_finance:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_sent_to_finance
+    description: Timestamp when the earning was sent to finance in Big Agent.
   ts_updated:
     lineage:
       - datalake_big_agent_clean.new_earnings.ts_updated
