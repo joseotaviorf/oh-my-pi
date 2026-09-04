@@ -234,6 +234,10 @@ columns:
     lineage:
       - datalake_visit.visits.is_visit_contested_by_demand
     description: True if the visit was contested by demand. Data since 2024-11.
+  is_vbba:
+    lineage:
+    - datalake_visit.visits.is_vbba
+    description: True if the visit is a VBBA schedule. Data since 2015.
   is_house_revisit:
     lineage:
     - datalake_visit.visits.ts_visit_last_visit_done_of_house

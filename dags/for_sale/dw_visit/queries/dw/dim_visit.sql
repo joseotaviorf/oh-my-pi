@@ -55,6 +55,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.is_completed_visit_contested_by_demand,
   v.is_canceled_visit_contested_by_demand,
   v.is_visit_contested_by_demand,
+  v.is_vbba,
   v.has_3p_access_control,
   v.has_tenant_living AS has_visit_tenant_living,
   v.has_fup_collected AS has_visit_fup_collected,

@@ -24,6 +24,7 @@ SELECT
     es.id_user_cancelation AS sk_author_cancelation,
     es.visit_code,
     dim_heh.sk_house_entrance,
+    dim_heh_entrance.sk_house_entrance AS sk_house_entrance_visit,
     es.id_succeed_schedule AS sk_succeed_schedule,
     es.days_visit_cancelled_to_visit,
     es.days_visit_booked_to_visit,
@@ -43,6 +44,7 @@ SELECT
     CASE WHEN es.ts_schedule_completed IS NOT NULL THEN 1 ELSE 0 END AS is_completed,
     CASE WHEN es.ts_schedule_canceled IS NOT NULL THEN 1 ELSE 0 END AS is_canceled,
     CASE WHEN es.ts_schedule_unsuccessful IS NOT NULL THEN 1 ELSE 0 END AS is_unsuccessful,
+    IF(es.channel_creation IN ('AGENT_PWA', 'AGENT_NATIVE') OR es.application_source_creation = 'AGENT_SCHEDULING_LINK' OR v.is_registered, 1, 0) AS is_schedule_vbba,
     COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_created, 1, 10), '-', '') AS BIGINT), -1) AS sk_schedule_created,
     COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_confirmed, 1, 10), '-', '') AS BIGINT), -1) AS sk_schedule_confirmed,
     COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_completed, 1, 10), '-', '') AS BIGINT), -1) AS sk_schedule_completed,
@@ -58,6 +60,9 @@ SELECT
 FROM
     datalake_visit.visit_schedules AS es
 LEFT JOIN
+    datalake_visit.visits AS v
+        ON v.id_visit = es.id_visit
+LEFT JOIN
     dw_visit.dim_business_context AS bc
         ON es.business_context = bc.business_context
 LEFT JOIN
@@ -68,6 +73,11 @@ LEFT JOIN
         ON es.id_house = dim_heh.sk_house
         AND es.ts_schedule_created >= dim_heh.ts_entrance_started
         AND es.ts_schedule_created < COALESCE(dim_heh.ts_entrance_ended, CURRENT_TIMESTAMP())
+LEFT JOIN
+    dw_house.dim_house_entrance_history AS dim_heh_entrance
+        ON es.id_house = dim_heh_entrance.sk_house
+        AND es.ts_schedule_visit >= dim_heh_entrance.ts_entrance_started
+        AND es.ts_schedule_visit < COALESCE(dim_heh_entrance.ts_entrance_ended, CURRENT_TIMESTAMP())
 LEFT JOIN
     datalake_ebdb_agents.preferred_property_agent_relation_history AS ppa
         ON ppa.id_house = es.id_house

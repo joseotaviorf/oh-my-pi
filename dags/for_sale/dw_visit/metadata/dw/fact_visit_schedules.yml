@@ -104,6 +104,10 @@ columns:
     lineage:
     - dw_house.dim_house_entrance_history.sk_house_entrance
     description: Foreign key from dw_house.dim_house_entrance_history. Last event before the schedule creation.
+  sk_house_entrance_visit:
+    lineage:
+    - dw_house.dim_house_entrance_history.sk_house_entrance
+    description: Foreign key from dw_house.dim_house_entrance_history. Last event before the schedule visit.
   sk_succeed_schedule:
     description: The next schedule case when this schedule have a reschedule.
   days_visit_cancelled_to_visit:
@@ -162,6 +166,8 @@ columns:
     description: If the schedule was canceled.
   is_unsuccessful:
     description: If the schedule was unsuccessful.
+  is_schedule_vbba:
+    description: If the schedule is a VBBA schedule. Visit booked by agent when the visit is registered or when the visit is created by an agent or agent scheduling link.
   sk_schedule_created:
     lineage:
     - datalake_visit.visit_schedules.ts_schedule_created

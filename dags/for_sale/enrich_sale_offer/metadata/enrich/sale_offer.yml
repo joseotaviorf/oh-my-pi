@@ -44,6 +44,14 @@ columns:
     - datalake_sale_offer.core_sale_offer.id_agent
     - datalake_visit.visits.id_agent
     description: Agent identification key linked to the offer or visit.
+  id_visit_external:
+    lineage:
+    - datalake_sale_offer.core_sale_offer.id_visit_external
+    description: Identification key of the visit associated with the offer. Only available for SalesFlow originated offers.
+  id_visit_fifty_external:
+    lineage:
+    - datalake_sale_offer.core_sale_offer.id_fifty_agent_visit_external
+    description: Identification key of the visit associated with the offer. Only available for SalesFlow originated offers.
   id_booking:
     lineage:
     - datalake_visit.visits.id_visit

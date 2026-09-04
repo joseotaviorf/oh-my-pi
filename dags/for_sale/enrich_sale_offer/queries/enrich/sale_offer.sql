@@ -324,6 +324,77 @@ WITH business_unit_by_hub_id AS (
     is_a_rescued_ccv,
     ts_sale_agreement_canceled
   FROM rescue_and_cancelation_status
+),
+visit_from_offer AS (
+  WITH agent_related_to_offer AS (
+    SELECT
+      os.id_offer,
+      so.id_sales_flow,
+      so.id_house,
+      so.id_visit_external,
+      so.id_fifty_agent_visit_external,
+      os.id_user_agent,
+      os.id_user_fifty_agent,
+      so.ts_offer_created AS ts_offer_submitted
+    FROM
+      datalake_sale_offer_flows.offer_specialists as os
+    LEFT JOIN
+      datalake_sale_offer.core_sale_offer as so
+        ON os.id_offer = so.id_offer
+  ),
+  visit_external AS (
+    WITH visit_external_ranked AS (
+      SELECT
+        arto.id_offer,
+        COALESCE(arto.id_visit_external, v.id_visit) AS id_visit_external,
+        ROW_NUMBER() OVER (PARTITION BY arto.id_offer ORDER BY v.ts_created DESC) AS _w
+      FROM
+        agent_related_to_offer AS arto
+      JOIN
+        datalake_visit.visits AS v
+          ON arto.id_house = v.id_house
+          AND arto.id_user_agent = v.id_last_associated_agent
+          AND arto.ts_offer_submitted >= v.ts_created
+          AND v.is_completed
+    )
+    SELECT
+      id_offer,
+      id_visit_external
+    FROM visit_external_ranked
+    WHERE
+      _w = 1
+  ),
+  fifty_visit_external AS (
+    WITH fifty_visit_external_ranked AS (
+      SELECT
+        arto.id_offer,
+        COALESCE(arto.id_fifty_agent_visit_external, v.id_visit) AS id_visit_fifty_external,
+        ROW_NUMBER() OVER (PARTITION BY arto.id_offer ORDER BY v.ts_created DESC) AS _w
+      FROM
+        agent_related_to_offer AS arto
+      JOIN
+        datalake_visit.visits AS v
+          ON arto.id_house = v.id_house
+          AND arto.id_user_fifty_agent = v.id_last_associated_agent
+          AND arto.ts_offer_submitted >= v.ts_created
+          AND v.is_completed
+    )
+    SELECT
+      id_offer,
+      id_visit_fifty_external
+    FROM fifty_visit_external_ranked
+    WHERE
+      _w = 1
+  )
+  SELECT
+    p.id_offer,
+    p.id_visit_external,
+    f.id_visit_fifty_external
+  FROM
+    visit_external AS p
+  LEFT JOIN
+    fifty_visit_external AS f
+      ON p.id_offer = f.id_offer
 )
 SELECT
   o.id_offer,
@@ -335,6 +406,8 @@ SELECT
   o.sale_type,
   r.city_group,
   o.id_agent,
+  vfo.id_visit_external,
+  vfo.id_visit_fifty_external,
   vo.id_booking,
   o.id_hub AS id_business_unit,
   vo.id_company_supply,
@@ -517,3 +590,5 @@ LEFT JOIN latest_diligence AS d
   ON d.id_sales_flow = o.id_sales_flow
 LEFT JOIN latest_diligence_appointment AS da
   ON da.id_diligence = d.id_diligence
+LEFT JOIN visit_from_offer AS vfo
+  ON vfo.id_offer = o.id_offer

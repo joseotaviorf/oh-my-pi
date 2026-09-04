@@ -34,6 +34,14 @@ columns:
     - datalake_sales_flow_clean.users.id_external
     - datalake_firestore_clean.sale_offer.text1.value
     description: Agent identification key linked to the offer. For SalesFlow offers, obtained from specialist table where kind='AGENT'. For Firestore offers, extracted from JSON text1.value field.
+  id_visit_external:
+    lineage:
+    - datalake_sales_flow_clean.sales_flow.id_visit_external
+    description: Identification key of the visit associated with the offer. Only available for SalesFlow originated offers.
+  id_fifty_agent_visit_external:
+    lineage:
+    - datalake_sales_flow_clean.sales_flow.id_fifty_agent_visit_external
+    description: Identification key of the visit associated with the offer. Only available for SalesFlow originated offers.
   id_region:
     lineage:
     - datalake_ebdb_clean.house.id_region

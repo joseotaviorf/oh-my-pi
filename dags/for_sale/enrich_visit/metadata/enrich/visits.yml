@@ -346,6 +346,12 @@ columns:
     lineage:
     - datalake_visit.visit_status_events.event_type
     description: If this visit is waiting for some response. Data since 2024-11
+  is_vbba:
+    lineage:
+    - datalake_visit.visit_status_events.channel
+    - datalake_visit.visit_status_events.application_source
+    - datalake_visit.visit_status_events.event_type
+    description: If this visit is a VBBA schedule. Data since 2015.
   has_entrance_problem:
     description: If this visit has entrance problem.
   has_supply_answered:
