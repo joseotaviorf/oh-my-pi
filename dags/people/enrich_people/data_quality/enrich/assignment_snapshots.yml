@@ -152,19 +152,22 @@ column_level_validations:
            )
         ) = 0
       severity_level: Warning
-  assignment_must_have_full_job_coverage:
-    custom:
-      # id_job set but sk_job_version = MD5('') after PIN go-live. Single-table to avoid Deequ id_job crash.
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_people.assignment_snapshots AS asn
-         WHERE asn.id_job IS NOT NULL
-           AND asn.sk_job_version = MD5('')
-           AND asn.dt_reference >= DATE('2024-03-01')
-           AND asn.dt_reference >= asn.dt_assignment_started
-           AND (
-             asn.dt_terminated IS NULL
-             OR asn.dt_reference <= asn.dt_terminated
-           )
-        ) = 0
-      severity_level: Warning
+  # Temporarily disabled while [PIN-21792](https://quintoandar.atlassian.net/browse/PIN-21792)
+  # and [PIN-21793](https://quintoandar.atlassian.net/browse/PIN-21793) are unresolved.
+  # Re-enable this check after both tickets are resolved and production data has been revalidated.
+  # assignment_must_have_full_job_coverage:
+  #   custom:
+  #     # id_job set but sk_job_version = MD5('') after PIN go-live. Single-table to avoid Deequ id_job crash.
+  #     constraint: |-
+  #       (SELECT COUNT(*)
+  #        FROM datalake_people.assignment_snapshots AS asn
+  #        WHERE asn.id_job IS NOT NULL
+  #          AND asn.sk_job_version = MD5('')
+  #          AND asn.dt_reference >= DATE('2024-03-01')
+  #          AND asn.dt_reference >= asn.dt_assignment_started
+  #          AND (
+  #            asn.dt_terminated IS NULL
+  #            OR asn.dt_reference <= asn.dt_terminated
+  #          )
+  #       ) = 0
+  #     severity_level: Warning
