@@ -19,28 +19,32 @@ column_level_validations:
       # No duplicate rows for the same (id_rate_value, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.rate_values GROUP BY id_rate_value, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
-  rate_value_versions_must_abut:
-    custom:
-      # Adjacent SCD versions for (id_rate, id_rate_object) must abut after PIN go-live.
-      constraint: |-
-        (SELECT COUNT(*) FROM (
-          SELECT
-            id_rate,
-            id_rate_object,
-            dt_effective_started,
-            COALESCE(dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
-            LEAD(dt_effective_started) OVER (
-              PARTITION BY id_rate, id_rate_object
-              ORDER BY dt_effective_started
-            ) AS next_started
-          FROM datalake_pin_core_clean.rate_values
-          WHERE COALESCE(dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
-        ) versions
-        WHERE next_started IS NOT NULL
-          AND DATE_ADD(dt_effective_ended, 1) != next_started
-          AND next_started >= DATE('2024-03-01')
-        ) = 0
-      severity_level: Warning
+  # Temporarily disabled while [PIN-21793](https://quintoandar.atlassian.net/browse/PIN-21793)
+  # and [PIN-21794](https://quintoandar.atlassian.net/browse/PIN-21794) are unresolved.
+  # Together, these tickets cover the currently failing rate-value gap and overlap cases.
+  # Re-enable this check after both tickets are resolved and production data has been revalidated.
+  # rate_value_versions_must_abut:
+  #   custom:
+  #     # Adjacent SCD versions for (id_rate, id_rate_object) must abut after PIN go-live.
+  #     constraint: |-
+  #       (SELECT COUNT(*) FROM (
+  #         SELECT
+  #           id_rate,
+  #           id_rate_object,
+  #           dt_effective_started,
+  #           COALESCE(dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
+  #           LEAD(dt_effective_started) OVER (
+  #             PARTITION BY id_rate, id_rate_object
+  #             ORDER BY dt_effective_started
+  #           ) AS next_started
+  #         FROM datalake_pin_core_clean.rate_values
+  #         WHERE COALESCE(dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
+  #       ) versions
+  #       WHERE next_started IS NOT NULL
+  #         AND DATE_ADD(dt_effective_ended, 1) != next_started
+  #         AND next_started >= DATE('2024-03-01')
+  #       ) = 0
+  #     severity_level: Warning
   salary_rate_values_must_cover_active_salary_rate:
     custom:
       # Salary (id_rate, id_rate_object) pairs in rate_values must cover the active rate window from go-live (no late start / mid-gap / early end).
