@@ -10,7 +10,10 @@ description: >
   demand taxonomy) resolved from Amplitude, talk-to-agent and cross-channel
   attribution events for the flow's first touchpoint. Rows with a null
   sk_sale_flow are excluded, due to a known limitation where the
-  datalake_gsheets.sale_hub_offer source has no id_sale_flow information.
+  datalake_gsheets.sale_hub_offer source has no id_sale_flow information. This is the DW
+  counterpart of the enrich-layer datalake_sale_flows.sale_flow table (enrich_sale_flows DAG),
+  reshaped into surrogate keys (sk_*) and enriched with marketing attribution; sk_sale_flow
+  carries the same id_sale_flow value produced there.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:

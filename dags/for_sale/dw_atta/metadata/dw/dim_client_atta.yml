@@ -1,32 +1,38 @@
 database_name: dw_atta
 table_name: dim_client_atta
-description: dimension with the details from atta clients
+description: >-
+  Client contact-details dimension for the Atta financing workflow. A "client" here is the
+  financing applicant as registered directly on Atta (distinct from dw_atta.dim_buyer_atta,
+  which resolves the buyer via the For Sale offer/dim_user). One row per client (sk_client,
+  surrogate key = datalake_atta_clean.client_info.id_client). Referenced by
+  dw_atta.fact_pre_analysis_proposal_flow via sk_client, identifying the financing applicant
+  tied to a given pre-analysis/proposal.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_client:
     lineage:
-    - datalake_atta_clean.client.id_client
-    description: Client's identification number
+    - datalake_atta_clean.client_info.id_client
+    description: Surrogate key identifying the financing client/applicant. Primary key of this dimension; referenced by dw_atta.fact_pre_analysis_proposal_flow.sk_client.
   client_cpf:
     lineage:
-    - datalake_atta_clean.client.client_cpf
-    description: Client's name
+    - datalake_atta_clean.client_info.client_cpf
+    description: Client's CPF (Brazilian individual taxpayer identification number) used to identify the financing applicant.
   client_financing_name:
     lineage:
-    - datalake_atta_clean.client.client_name
-    description: Client's full name
+    - datalake_atta_clean.client_info.client_name
+    description: Client's full name as registered on the financing proposal.
   client_email:
     lineage:
-    - datalake_atta_clean.client.client_email
+    - datalake_atta_clean.client_info.client_email
     description: Email address used to contact the client about financing status updates.
   client_cellphone:
     lineage:
-    - datalake_atta_clean.client.client_cellphone
-    description: Client's cellphone number
+    - datalake_atta_clean.client_info.client_cellphone
+    description: Client's cellphone number used to contact them about their financing proposal.
   client_phone:
     lineage:
-    - datalake_atta_clean.client.client_phone
-    description: Client's telephone number
+    - datalake_atta_clean.client_info.client_phone
+    description: Client's landline telephone number used to contact them about their financing proposal.
   ts_load:
     description: ETL ingestion timestamp when this snapshot was written to the lake layer.

@@ -1,17 +1,22 @@
 database_name: dw_atta
 table_name: dim_buyer_atta
-description: dimension with the details from atta buyers
+description: >-
+  Buyer identity dimension for the Atta mortgage-financing workflow. One row per buyer
+  (sk_buyer, surrogate key shared with dw_sale.fact_offers.sk_buyer), built by joining
+  dw_sale.fact_offers to dw_public.dim_user to bring in the buyer's CPF and name for financing
+  reporting. Referenced by dw_atta.fact_pre_analysis_proposal_flow via sk_buyer, identifying
+  the buyer associated with a given pre-analysis/proposal financing flow.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_buyer:
     lineage:
     - dw_sale.fact_offers.sk_buyer
-    description: Buyer's identification number
+    description: Surrogate key identifying the buyer, shared with dw_sale.fact_offers.sk_buyer. Primary key of this dimension; referenced by dw_atta.fact_pre_analysis_proposal_flow.sk_buyer.
   buyer_cpf:
     lineage:
     - dw_public.dim_user.cpf
-    description: Buyer's CPF number
+    description: Buyer's CPF (Brazilian individual taxpayer identification number) used to identify the person applying for financing.
   buyer_name:
     lineage:
     - dw_public.dim_user.nome

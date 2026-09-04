@@ -2,14 +2,22 @@ database_name: dw_sale
 table_name: dim_sale_offer_user
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: This is a Junk dimension table. It contains all the possible combinations for some low cardinality characteristics of an user.
+description: >-
+  Junk dimension holding profile/contact attributes (name, contact info, address, property and
+  contract-status flags) for the distinct SalesFlow users who appear as buyers, sellers, or owners
+  on For Sale offers. Grain: one row per distinct (sk_user_sales_flow, sk_user_external) pair —
+  deduplicated from datalake_sale_offer_flows.sale_offer_users and enriched with dw_public.dim_user
+  attributes. There is no single surrogate key; dw_sale_offer_users.fact_sale_offer_users joins
+  back to this dimension on that same (sk_user_sales_flow, sk_user_external) key pair. A user row
+  here is tied to a specific offer only through fact_sale_offer_users.sk_offer, which in turn
+  relates to dw_sale_offers.dim_offer, dim_sale_agreement, and fact_offers.
 columns:
   sk_user_sales_flow:
-    description: Id used on sales flow databases.
+    description: Id used on sales flow databases. Half of the composite key (together with sk_user_external) used by fact_sale_offer_users to join this dimension.
     lineage:
     - datalake_sale_offer_flows.sale_offer_users.id_user
   sk_user_external:
-    description: User id on dw_public.dim_user.
+    description: User id on dw_public.dim_user. Half of the composite key (together with sk_user_sales_flow) used by fact_sale_offer_users to join this dimension.
     lineage:
     - datalake_sale_offer_flows.sale_offer_users.id_external
   name:
@@ -17,7 +25,7 @@ columns:
     lineage:
     - dw_public.dim_user.nome
   gender:
-    description: Gender of the offer user, sourced from the user master record.
+    description: Gender of the offer user, sourced from the user master record; defaults to 'Unknown' when not populated in the source.
     lineage:
     - dw_public.dim_user.sexo
   email:
@@ -29,19 +37,19 @@ columns:
     lineage:
     - dw_public.dim_user.telefone_principal
   address:
-    description: Street address registered for the offer user.
+    description: Street address registered for the offer user; defaults to 'Unknown' when not populated in the source.
     lineage:
     - dw_public.dim_user.endereco
   postal_code:
-    description: Postal code (CEP) of the offer user's registered address.
+    description: Postal code (CEP) of the offer user's registered address; defaults to 'Unknown' when not populated in the source.
     lineage:
     - dw_public.dim_user.cep
   city:
-    description: City of the offer user's registered address.
+    description: City of the offer user's registered address; defaults to 'Unknown' when not populated in the source.
     lineage:
     - dw_public.dim_user.cidade
   state:
-    description: State (federative unit) of the offer user's registered address.
+    description: State (federative unit) of the offer user's registered address; defaults to 'Unknown' when not populated in the source.
     lineage:
     - dw_public.dim_user.estado_nome
   houses_owned:
@@ -69,4 +77,6 @@ columns:
     lineage:
     - dw_public.dim_user.bloqueado
   alternative_email:
-    description: Secondary email address registered for the offer user, when provided.
+    description: Secondary email address registered for the offer user, when provided; defaults to 'Unknown' when not populated in the source.
+    lineage:
+    - dw_public.dim_user.email_alternativo

@@ -1,13 +1,23 @@
 database_name: dw_atta
 table_name: dim_proposal_atta
-description: dimension with the details from atta proposals
+description: >-
+  Financing proposal dimension for the Atta mortgage workflow. One row per proposal (sk_proposal,
+  surrogate key = datalake_atta_clean.proposal.id_proposal), enriched with product, bank,
+  credit-analyst/juridical-analyst assignment, current status/situation labels, declared and
+  bank-evaluated house value, financing/down-payment amounts, commercial channel, and a
+  cancellation flag. Aggregates timing signals from enrich_atta.proposal_dates (via
+  datalake_atta.proposal_dates) to derive credit_application_status. Referenced by
+  dw_atta.fact_pre_analysis_proposal_flow via sk_proposal, which carries the same proposal
+  grain alongside its pre-analysis, offer, client, and franchise/partner context. Also links
+  to dw_atta.dim_proposal_situation_changes via sk_proposal for the full transition-by-transition
+  history of the same proposals (this table only exposes the current/latest status and situation).
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_proposal:
     lineage:
     - datalake_atta_clean.proposal.id_proposal
-    description: Proposal identification number
+    description: Surrogate key identifying the financing proposal. Primary key of this dimension; referenced by dw_atta.fact_pre_analysis_proposal_flow.sk_proposal and dw_atta.dim_proposal_situation_changes.sk_proposal.
   sk_product:
     lineage:
     - datalake_atta_clean.product_info.id_product
@@ -23,7 +33,7 @@ columns:
   sk_proprosal_bank:
     lineage:
     - datalake_atta_clean.financing_proposal.id_itau
-    description: Proposal ID in related bank
+    description: Identifier of this proposal in the partner bank's own system (source column named for the original Itaú integration but reused for other banks). Column name keeps the upstream 'sk_proprosal' typo.
   sk_credit_analyst:
     lineage:
     - datalake_atta_clean.proposal.id_credit_analyst
@@ -41,15 +51,64 @@ columns:
     - datalake_atta_clean.providers_info.provider_name
     description: Name of the bank providing the financing for the proposal.
   credit_application_status:
-    description: Status of the credit application tied to the financing proposal.
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_credit_application_approval
+    - datalake_atta.proposal_dates.ts_min_credit_application_reproval
+    - datalake_atta.proposal_dates.ts_max_credit_application_approval
+    - datalake_atta.proposal_dates.ts_max_credit_application_reproval
+    description: >-
+      Outcome of the credit-letter (Carta de Crédito) evaluation for this proposal. Built by
+      comparing the first/last approval and rejection timestamps from enrich_atta.proposal_dates:
+      no approval or rejection yet is Incomplete; only a rejection is Reproved; only an approval
+      is Approved; if both exist, the most recent event (approval vs rejection) wins.
+    categories:
+      "Incomplete": "Neither an approval nor a rejection has been logged yet for the credit application."
+      "Approved": "The credit application's most recent (or only) outcome is an approval."
+      "Reproved": "The credit application's most recent (or only) outcome is a rejection."
   proposal_status:
     lineage:
     - datalake_atta_clean.track_step_detail.proposal_status
-    description: Description of proposal status
+    description: Track/step name of the financing proposal workflow the proposal currently sits in (e.g. credit letter, inspection, contracting), joined from track_step_detail by decision number and product. Same category values as enrich_atta.proposal_situation_changes.proposal_status.
   proposal_situation:
-    description: Description of proposal situation
+    lineage:
+    - datalake_atta_clean.proposal.id_proposal_situation
+    description: >-
+      Current situation label of the proposal. Built by mapping the raw id_proposal_situation
+      code (Atta's SITUACAO_ISOLVE enum) into its Portuguese label; only codes 1-13 are mapped
+      by this proposal's CASE expression, higher codes (14-17, e.g. Divergência de Cadastro,
+      Notas de Exigência, Cartório Externo, Aprovado Condicionado) yield no label here even
+      though they are valid situations elsewhere in Atta (see enrich_atta.proposal_situation_changes
+      for the full category list).
+    categories:
+      "Andamento": "In progress: proposal actively moving through the workflow."
+      "Aprovado": "Approved: proposal was approved at this stage."
+      "Pendente": "Pending: proposal is awaiting additional information or action."
+      "Reprovado": "Rejected: proposal was denied at this stage."
+      "Cancelada": "Canceled: proposal was canceled."
+      "Finalizada": "Finalized: proposal process completed."
+      "Em Análise": "Under analysis: proposal is being reviewed."
+      "Análise Atta": "Under Atta analysis: reviewed internally by Atta."
+      "Análise Banco": "Under bank analysis: reviewed by the financing bank."
+      "Análise Banco Duvida": "Bank analysis query: the bank raised a question needing clarification."
+      "Não Passível Defesa": "Not eligible for appeal/defense."
+      "Revisão": "Under revision."
+      "Não Processado Banco": "Not processed by the bank."
   channel:
-    description: Proposal channel grouping
+    lineage:
+    - datalake_atta.partner_info.wallet
+    - datalake_atta.partner_info.partner_name
+    - datalake_atta_clean.proposal.id_franchise
+    - datalake_atta_clean.franchise_info.franchise_name
+    description: >-
+      Commercial channel grouping used for partner/franchise reporting. Built from the
+      proposal's partner wallet/name and franchise: partners in a QuintoAndar wallet, Casa
+      Mineira, or named 'Franquia%' fall into Canal 5A; other-partnership proposals routed to
+      a franchise outside ids 1/182 and not named with '5A' fall into Canal Franquia; other-
+      partnership proposals on franchise ids 1 or 182 fall into Canal Jardins.
+    categories:
+      "Canal 5A": "Partner is a QuintoAndar wallet, Casa Mineira, or a 'Franquia%'-named partner."
+      "Canal Franquia": "Other-partnership proposal routed to a franchise (excluding ids 1 and 182) whose name does not contain '5A'."
+      "Canal Jardins": "Other-partnership proposal routed to franchise id 1 or 182 (the Jardins franchise)."
   house_value:
     lineage:
     - datalake_atta_clean.financing_proposal_check.house_sale_value
@@ -59,18 +118,39 @@ columns:
     lineage:
     - datalake_atta_clean.financing_proposal_check.bank_valuation_value
     - datalake_atta_clean.financing_proposal.estimated_house_value
-    description: House value according to bank evaluation
+    description: Property value as evaluated by the financing bank, used to determine the actual loan-to-value ratio (may differ from the declared house_value).
   down_payment_amount:
-    description: Down payment amount in BRL
+    lineage:
+    - datalake_atta_clean.financing_proposal_check.down_payment_own_resources_value
+    - datalake_atta_clean.financing_proposal.down_payment_value
+    - datalake_atta_clean.pre_analysis.house_value
+    - datalake_atta_clean.proposal.financing_value
+    - datalake_atta_clean.pre_analysis.down_payment_amount
+    description: >-
+      Down payment amount in BRL paid with the buyer's own resources. Built from the first
+      available source, in order: the confirmed down payment from financing_proposal_check,
+      the bank's recorded down payment from financing_proposal, the pre-analysis house value
+      minus the proposal's financing value, or the pre-analysis' own down payment amount.
   financing_value:
     lineage:
     - datalake_atta_clean.financing_proposal_check.financing_value
     - datalake_atta_clean.financing_proposal.finance_value
     - datalake_atta_clean.proposal.financing_value
     - datalake_atta_clean.pre_analysis.financing_value
-    description: Financing amouint in BRL
+    description: >-
+      Financing amount in BRL requested/granted for this proposal. Built from the first
+      available source, in order: the confirmed financing value from financing_proposal_check,
+      the bank's recorded finance value from financing_proposal, the proposal's own
+      financing_value, or the pre-analysis' financing_value.
   total_financing_value:
-    description: Total financing amount in BRL (Sum of financing value, itbi and bank evaluation fee)
+    lineage:
+    - datalake_atta_clean.financing_proposal_check.financing_value
+    - datalake_atta_clean.financing_proposal.finance_value
+    - datalake_atta_clean.proposal.financing_value
+    - datalake_atta_clean.pre_analysis.financing_value
+    - datalake_atta_clean.financing_proposal_check.itbi_value
+    - datalake_atta_clean.financing_proposal_check.bank_valuation_fee_value
+    description: Total financing amount in BRL, built as financing_value plus itbi_value plus bank_valuation_fee_value (defaulting the fees to zero when absent).
   itbi_value:
     lineage:
     - datalake_atta_clean.financing_proposal_check.itbi_value
@@ -80,8 +160,18 @@ columns:
     - datalake_atta_clean.financing_proposal_check.bank_valuation_fee_value
     description: Bank evaluation fee in BRL
   is_automatic_proposal:
-    description: Flag to identify automatic or manual proposals
+    lineage:
+    - datalake_atta_clean.proposal.created_by
+    description: Boolean flag indicating whether the proposal was created automatically by Atta's system user (created_by = 30001) rather than manually by a human operator.
   is_offer_canceled:
-    description: Flag to identify canceled offers
+    lineage:
+    - dw_sale.dim_sale_agreement.is_ccv_canceled
+    - dw_sale.fact_offers.sk_offer_rescued_date
+    - dw_sale.fact_offers.sk_offer_dismissed_date
+    description: >-
+      Boolean flag indicating whether the underlying For Sale offer tied to this proposal was
+      canceled. Built as true when the sale agreement was canceled (is_ccv_canceled), or when
+      the offer was dismissed and not later rescued; false when the offer was rescued after
+      being dismissed, or was never dismissed.
   ts_load:
     description: ETL ingestion timestamp when this snapshot was written to the lake layer.

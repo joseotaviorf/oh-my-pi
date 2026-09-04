@@ -1,6 +1,17 @@
 database_name: dw_sale
 table_name: fact_closing_offer_partners
-description: This table contains information about financed proposals, including their statuses, dates, and various metrics related to the financing process.
+description: >-
+  SLA/lead-time and status detail for the ATTA financing/credit proposal linked to an offer.
+  Grain: one row per sk_offer with at least one proposal in
+  dw_atta.fact_pre_analysis_proposal_flow, keeping only the most advanced proposal per
+  sk_pre_analysis (same selection logic as dim_closing_offer_partner, its companion dimension
+  table — both share the sk_offer/sk_pre_analysis keys). sk_offer is shared with
+  dw_sale.fact_offers and, transitively, with dw_sale.fact_closing_flows (also keyed by
+  sk_offer) for the same CCV. Brings offer-level milestones (submitted, accepted, CCV signed)
+  from dw_sale.fact_offers alongside the proposal's inspection, checklist, bank legal
+  analysis, financing contract and financing-ended milestones from
+  dw_atta.fact_pre_analysis_proposal_flow, plus precomputed day-count SLA metrics between
+  those milestones.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -33,10 +44,9 @@ columns:
     lineage:
     - dw_atta.dim_proposal_atta.financing_value
   internal_vendors_flag:
-    description: Flag indicating internal vendors.
+    description: Legacy flag set to '1' when the ATTA credit process for the offer's most advanced proposal has ended (ts_credit_ended populated), NULL otherwise. Historically used to mark completed proposals for internal vendor/accounting reconciliation; the name does not necessarily imply an internal-only partner (see partner_type_group in dim_closing_offer_partner for the partner classification).
     lineage:
-    - dw_atta.fact_pre_analysis_proposal_flow.last_credit_ended
-    - dw_atta.fact_pre_analysis_proposal_flow.credit_ended_isolve
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   days_offer_accepted_to_sale_agreement_signed:
     description: SLA metric for days from offer accepted to sale agreement signed.
     lineage:
@@ -63,17 +73,17 @@ columns:
     description: SLA metric for days from offer submitted to financing ended.
     lineage:
     - dw_sale.fact_offers.ts_offer_submitted
-    - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
   days_credit_ended_to_financing_ended:
     description: SLA metric for days from credit ended to financing ended.
     lineage:
-    - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
     - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   days_credit_approved_to_financing_ended:
     description: SLA metric for days from credit approved to financing ended.
     lineage:
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
     - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
-    - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   days_CCV_to_credit_approved:
     description: SLA metric for days from CCV signed to credit approved.
     lineage:
@@ -88,7 +98,7 @@ columns:
     description: SLA metric for days from CCV signed to financing ended.
     lineage:
     - dw_sale.fact_offers.ts_sale_agreement_signed
-    - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
   ts_offer_sumitted:
     description: Timestamp when the offer was submitted.
     lineage:
@@ -182,4 +192,4 @@ columns:
     lineage:
     - dw_sale.fact_offers.ts_sale_agreement_signed
   ts_load:
-    description: Date of ingestion.
+    description: Pipeline load/audit timestamp (NOW() at query time), indicating when this table was last refreshed. Hardcoded at write time — no upstream source column, so no lineage applies.

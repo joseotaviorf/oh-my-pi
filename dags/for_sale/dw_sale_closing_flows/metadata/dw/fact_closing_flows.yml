@@ -1,6 +1,16 @@
 database_name: dw_sale
 table_name: fact_closing_flows
-description: Each row of this table is a CCV, with a distinct sk_offer and key milestones in the funnel.
+description: >-
+  One row per CCV (signed sale agreement) / offer, at the grain of sk_offer — the same
+  surrogate key used by dw_sale.fact_offers and dw_sale.dim_offer, to which this table joins
+  1:1 for the same deal. Built from datalake_sale_closing_flows.closing_flow (enrich layer),
+  it captures the post-CCV "End of Process" (EoP) closing funnel: due diligence, legal and
+  credit analysis, financing, notary/registry milestones, key delivery and their precomputed
+  day-to-day lead times. sk_legal_analysis_ended_date marks the Closed Deal (CD) — the
+  Financeiro team's official sale-recognition event, the CD/EoP counterpart to the EoF (End of
+  Funnel) milestones tracked up through CCV signature in fact_offers. sk_company_supply and
+  sk_company_demand identify 3P Rede partner companies on the supply/demand side when
+  applicable.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -15,11 +25,11 @@ columns:
   sk_owner:
     lineage:
     - datalake_sale_closing_flows.closing_flow.id_owner
-    description: Surrogate key for the supply-side owner associated with the visited listing.
+    description: Surrogate key of the house owner (seller) party to the CCV. Joins to dw_public.dim_user.
   sk_house:
     lineage:
     - datalake_sale_closing_flows.closing_flow.id_house
-    description: Surrogate key for the property listing visited during the schedule.
+    description: Surrogate key of the house (property) under the closing flow. Joins to dw_house.dim_house.
   sk_company_supply:
     lineage:
     - datalake_company.company_sks.sk_company
@@ -115,7 +125,7 @@ columns:
   sk_payment_allowed_date:
     lineage:
     - datalake_sale_closing_flows.closing_flow.dt_payment_allowed
-    description: Date when the CCV was rescued
+    description: Date key to be joined with dim_date. Date from which payment to the seller is allowed to proceed, computed by business rules that depend on the payment method (cash vs. financed vs. brokerage-term) and on the completion of legal and/or credit analysis.
   sk_down_payment_date:
     lineage:
     - datalake_sale_closing_flows.closing_flow.dt_down_payment
@@ -341,4 +351,4 @@ columns:
     - datalake_sale_closing_flows.closing_flow.ts_load
     description: Timestamp indicating when enrich_sale_closing_flows DAG was last updated.
   ts_load:
-    description: Timestamp indicating when this table was last updated.
+    description: Pipeline load/audit timestamp (NOW() at query time), indicating when this table was last refreshed. Hardcoded at write time — no upstream source column, so no lineage applies.

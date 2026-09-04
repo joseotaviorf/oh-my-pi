@@ -9,6 +9,7 @@ description: >
   For Closed Deals (CD), join with dw_sale.fact_closing_flows via sk_offer.
   For offer attributes (status, drop reason, tags), join with dw_sale.dim_offer.
   For CCV details (payment method, credit model, cancellation reason), join with dw_sale.dim_sale_agreement.
+  For the buyer/seller/co-signer users involved in the offer, join with dw_sale_offer_users.fact_sale_offer_users via sk_offer.
   Note: date surrogate keys use -1 as sentinel when the event has not occurred yet.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br

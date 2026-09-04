@@ -2,12 +2,22 @@ database_name: dw_sale
 table_name: fact_sale_offer_users
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: Fact table relating each user involved with an offer. In the case of users invited to participate in an offer it will only show them after the user accepts the invite.
+description: >-
+  Fact table relating each user (buyer, seller, or invited co-signer/joint-buyer) involved with a
+  For Sale offer. Grain: one row per (sk_offer, sk_user_sales_flow) pair. For users invited to join
+  the offer (e.g. a co-buyer or co-seller), the row only appears after the invite is accepted.
+  Joins to dw_sale_offer_users.dim_sale_offer_user via the composite key (sk_user_sales_flow,
+  sk_user_external), and to dw_sale_offer_users.dim_sale_offer_user_info via sk_user_info to look
+  up the user's characteristic flags. Joins to dw_sale_offers.fact_offers, dim_offer, and
+  dim_sale_agreement via sk_offer, since every user row is tied to a specific offer.
 columns:
   sk_sale_offer_user:
     description: Unique id built with the offer (sk_offer) and user id (sk_user_sales_flow) concatenation.
+    lineage:
+    - datalake_sale_offer_flows.sale_offer_users.id_firestore
+    - datalake_sale_offer_flows.sale_offer_users.id_user
   sk_offer:
-    description: Offer id. Can relate with dim_offer and dim_sale_agreement, for example.
+    description: Offer id. FK to dw_sale_offers.fact_offers, dim_offer, and dim_sale_agreement.
     lineage:
     - datalake_sale_offer_flows.sale_offer_users.id_firestore
   sk_user_external:
@@ -45,7 +55,7 @@ columns:
   sk_date_user_invite_accepted:
     description: Invite accepted date on ID format compatible with dw_public.dim_date.
     lineage:
-    - datalake_sale_offer_flows.sale_offer_users_info.ts_user_invite_accepted
+    - datalake_sale_offer_flows.sale_offer_users.ts_user_invite_accepted
   ts_user_invited:
     description: Invite timestamp.
     lineage:
@@ -53,4 +63,4 @@ columns:
   ts_user_invite_accepted:
     description: Timestamp related to the time when the invitation to join the offer was accepted.
     lineage:
-    - datalake_sale_offer_flows.sale_offer_users_info.ts_user_invite_accepted
+    - datalake_sale_offer_flows.sale_offer_users.ts_user_invite_accepted

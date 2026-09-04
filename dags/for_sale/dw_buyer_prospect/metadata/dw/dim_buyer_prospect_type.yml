@@ -3,7 +3,15 @@ database_name: dw_sale
 table_name: dim_buyer_prospect_type
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: Dimension table for buyer prospect type
+description: >-
+  Dimension classifying the Buyer Prospect (BP) segmentation used across the For Sale demand
+  funnel. A Buyer Prospect is a buyer with a booked visit (VISIT_BOOKED) — see
+  dw_sale.fact_sale_demand_event. Grain: one row per buyer_prospect_type / city_group /
+  price_segment combination, with surrogate key sk_buyer_prospect_type. Time-windowed via
+  ts_activation/ts_activation_end, so a given event is matched to the row whose activation
+  window covers the event's date. Referenced by dw_sale.fact_sale_demand_event (and its 1P
+  sources dw_sale.fact_visits / dw_sale.fact_offers) via sk_buyer_prospect_type — it is NOT
+  referenced by dw_sale.fact_buyer_prospects, which has no such foreign key in its own SQL.
 columns:
   sk_buyer_prospect_type:
     description: 'Surrogate key for buyer prospect type'
@@ -17,10 +25,10 @@ columns:
     lineage:
     - datalake_buyer_prospect.buyer_prospect_type.bp_type
   buyer_prospect_type_long:
-    description: 'Buyer prospect type long description'
+    description: 'Human-readable long-form label of buyer_prospect_type. Built by a CASE mapping of bp_type (NBP -> New Buyer Prospect, RBP -> Recovery Buyer Prospect).'
     categories:
-      'New Buyer Prospect': '#N/A'
-      'Recovery Buyer Prospect': '#N/A'
+      'New Buyer Prospect': 'Long-form label used when buyer_prospect_type = NBP.'
+      'Recovery Buyer Prospect': 'Long-form label used when buyer_prospect_type = RBP.'
     lineage:
     - datalake_buyer_prospect.buyer_prospect_type.bp_type
   city_group:
@@ -32,7 +40,10 @@ columns:
     lineage:
     - datalake_buyer_prospect.buyer_prospect_type.price_segment
   price_segment_short:
-    description: 'Short description of the price segment'
+    description: 'Short code for price_segment. Built by a CASE mapping (High Ticket -> HT, Low Ticket -> LT); other price_segment values map to null.'
+    categories:
+      'HT': 'Short code for price_segment = High Ticket.'
+      'LT': 'Short code for price_segment = Low Ticket.'
     lineage:
     - datalake_buyer_prospect.buyer_prospect_type.price_segment
   ts_activation:

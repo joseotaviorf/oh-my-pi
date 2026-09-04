@@ -1,21 +1,29 @@
 database_name: dw_atta
 table_name: dim_franchise_atta
-description: dimension with the details from atta franchises
+description: >-
+  Franchise dimension for the Atta/Casa Mineira financing correspondent network. One row per
+  franchise unit (sk_franchise, surrogate key = datalake_atta_clean.franchise_info.id_franchise),
+  with the franchise's contract terms (royalties, marketing fund, grace periods, contract
+  deadline/signature). Referenced by dw_atta.fact_pre_analysis_proposal_flow via sk_franchise,
+  identifying which franchise a given pre-analysis/proposal was routed through; also joined
+  from dw_atta.dim_partner_atta via sk_franchise for partners affiliated with a franchise.
+  franchise_name matching '%Quinto Andar%' identifies the "Internal Corban" channel (QuintoAndar-
+  operated correspondent) used across For Sale financing-attach and lead-time metrics.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_franchise:
     lineage:
     - datalake_atta_clean.franchise_info.id_franchise
-    description: Franchise's identification number
+    description: Surrogate key identifying the franchise unit. Primary key of this dimension; referenced by dw_atta.fact_pre_analysis_proposal_flow.sk_franchise and dw_atta.dim_partner_atta.sk_franchise.
   sk_registration_user:
     lineage:
     - datalake_atta_clean.franchise_info.id_registration_user
-    description: User's identification number
+    description: Identifier of the Atta user who registered/created this franchise record.
   sk_franchise_status:
     lineage:
     - datalake_atta_clean.franchise_info.id_franchise_status
-    description: Identification number for franchise status
+    description: Identifier for the franchise's lifecycle status (e.g. active, blocked, without franchisee) in Atta. Raw status ids only; no verified label mapping available in this repo's SQL.
   franchise_name:
     lineage:
     - datalake_atta_clean.franchise_info.franchise_name
@@ -23,13 +31,20 @@ columns:
   sk_franchise_category:
     lineage:
     - datalake_atta_clean.franchise_info.franchise_category
-    description: Franchise's category identification number
+    description: Raw numeric code for the franchise's contractual category (0/1). Same source value as franchise_category below, which maps it into the START/EXPERT labels.
   sk_franchise_type:
     lineage:
     - datalake_atta_clean.franchise_info.franchise_type
-    description: Identification number for franchise type
+    description: Identifier for the franchise's business-line type in Atta. Raw type id only; no verified label mapping available in this repo's SQL.
   franchise_category:
-    description: Franchise's category description
+    lineage:
+    - datalake_atta_clean.franchise_info.franchise_category
+    description: >-
+      Franchise contract tier. Built by mapping the raw franchise_category code into START or
+      EXPERT labels (1=EXPERT, 0=START; any other value yields no label).
+    categories:
+      "EXPERT": "Franchise contract tier 1 — Expert tier."
+      "START": "Franchise contract tier 0 — Start tier (entry level)."
   royalties_percentage_value:
     lineage:
     - datalake_atta_clean.franchise_info.royalties_percentage_value
@@ -37,7 +52,7 @@ columns:
   martketing_fund_percentage:
     lineage:
     - datalake_atta_clean.franchise_info.martketing_fund_percentage
-    description: Percentagem value for marketing fund
+    description: Percentage of revenue the franchise contributes to the shared marketing fund under contract (source column name keeps the upstream 'martketing' typo).
   grace_period_royalties:
     lineage:
     - datalake_atta_clean.franchise_info.grace_period_royalties
@@ -49,7 +64,7 @@ columns:
   ts_contract_deadline:
     lineage:
     - datalake_atta_clean.franchise_info.ts_contract_deadline
-    description: Contract deadline timestamp
+    description: Timestamp when the franchise's contract with QuintoAndar is due to expire.
   ts_registration:
     lineage:
     - datalake_atta_clean.franchise_info.ts_registration
@@ -57,6 +72,6 @@ columns:
   ts_franchise_signature:
     lineage:
     - datalake_atta_clean.franchise_info.ts_franchise_signature
-    description: Franchise signature timestamp
+    description: Timestamp when the franchise agreement was signed.
   ts_load:
     description: ETL ingestion timestamp when this snapshot was written to the lake layer.

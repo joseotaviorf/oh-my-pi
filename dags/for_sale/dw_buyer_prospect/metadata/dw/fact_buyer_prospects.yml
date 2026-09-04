@@ -1,6 +1,19 @@
 database_name: dw_sale
 table_name: fact_buyer_prospects
-description: Fact table that describes the events of buyer prospects in the demand sale funnel. Each line is a user that at least made a booking or an offer
+description: >-
+  One-row-per-buyer lifetime summary (OBT) of the For Sale demand funnel: first/last dates and
+  elapsed-day metrics across booking, visit, offer, and sale-agreement (CCV) milestones for each
+  buyer who made at least one booking or offer. Grain and primary key: sk_buyer (one row per
+  buyer). Sourced directly from datalake_buyer_prospect.buyer_prospect, a pre-aggregated
+  lifetime table maintained upstream of this DAG — this query only reshapes its date strings
+  into dw_public.dim_date surrogate keys and passes through the pre-computed lifetime
+  counters/day-deltas. This table is NOT joined to dw_sale.fact_sale_demand_event or
+  dw_sale.dim_buyer_prospect_3p_history in its own SQL. Per the FS Transact business glossary,
+  it captures only each buyer's first-ever booking/offer history (roughly half of monthly Buyer
+  Prospect volume) and must NOT be used to compute the "# Buyer Prospect" metric — use
+  dw_sale.fact_sale_demand_event filtered to event_name = VISIT_BOOKED (via
+  dw_sale.dim_sale_event_type) for that. Use this table only for buyer-level lifetime journey
+  analysis (lifetime funnel step counts, conversion day-deltas).
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:

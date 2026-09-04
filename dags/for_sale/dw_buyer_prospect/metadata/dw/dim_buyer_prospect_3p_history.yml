@@ -1,6 +1,21 @@
 database_name: dw_sale
 table_name: dim_buyer_prospect_3p_history
-description: SCD2-style dimension that tracks the buyer prospect classification (NBP / RBP) timeline for the 3P funnel. Each row is one prospect window per (sk_buyer, demand_type) with version, is_current, ts_started and ts_ended. NBP marks the first episode for that buyer x demand_type pair; RBP marks the next episode after a >=90-day idle period. Events whose computed classification is null (continuations within an open window) are filtered out and do not open or close a window.
+description: >-
+  SCD2-style dimension that tracks the buyer prospect classification (NBP / RBP) timeline for
+  the 3P funnel. Each row is one prospect window per (sk_buyer, demand_type) with version,
+  is_current, ts_started and ts_ended. NBP marks the first episode for that buyer x demand_type
+  pair; RBP marks the next episode after a >=90-day idle period. Events whose computed
+  classification is null (continuations within an open window) are filtered out and do not open
+  or close a window. Grain and surrogate key: sk_buyer_prospect (uniqueness grain is the tuple
+  sk_buyer, demand_type, version — see the sk_buyer_prospect column note). Built from two
+  independent 3P sources — datalake_visit.visits (visit branch) and
+  datalake_rede_platform_clean.buyer_company/buyer_company_event (buyer_company_relation
+  branch); it is NOT joined to, and has no shared key materialized with, dw_sale.fact_buyer_prospects
+  in either table's SQL — those are separate pipelines (fact_buyer_prospects is sourced from
+  datalake_buyer_prospect.buyer_prospect, a pre-aggregated lifetime OBT). Both tables key on the
+  same buyer-identity space (sk_buyer / id_buyer), so they can be joined downstream on sk_buyer
+  for cross-referencing 3P episode history against lifetime buyer metrics, but no such join
+  exists in this DAG.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:
@@ -62,9 +77,15 @@ columns:
     - datalake_rede_platform_clean.buyer_company_event.trigger_actor
     description: Actor that triggered the event. Hardcoded as 'AGENT' on the visit branch and sourced from buyer_company_event.trigger_actor on the buyer_company_relation branch.
   version:
-    description: Sequential revision number per (sk_buyer, demand_type), ordered by ts_started (1 = oldest window). Derived from a ROW_NUMBER window function over the classified base.
+    lineage:
+    - datalake_visit.visits.ts_created
+    - datalake_rede_platform_clean.buyer_company.ts_started
+    description: Sequential revision number per (sk_buyer, demand_type), ordered by ts_started (1 = oldest window). Derived from a ROW_NUMBER window function ordered by ts_started over the classified base.
   is_current:
-    description: Flag identifying the most recent window per (sk_buyer, demand_type). True when ts_ended is null.
+    lineage:
+    - datalake_visit.visits.ts_created
+    - datalake_rede_platform_clean.buyer_company.ts_started
+    description: Flag identifying the most recent window per (sk_buyer, demand_type). True when ts_ended is null (ts_ended is derived from a LEAD window function over ts_started).
   ts_started:
     lineage:
     - datalake_visit.visits.ts_created

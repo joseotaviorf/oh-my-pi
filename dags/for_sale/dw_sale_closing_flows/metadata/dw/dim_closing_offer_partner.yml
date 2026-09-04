@@ -1,6 +1,20 @@
 database_name: dw_sale
 table_name: dim_closing_offer_partner
-description: This table contains information about financed proposals, including their BU`s, Buyer`s name and etc.
+description: >-
+  Snapshot of the most-advanced ATTA financing/credit proposal and its financing partner
+  ("Corban", per the FS Transact glossary — Internal Corban when operated by QuintoAndar,
+  Partner Corban when external) for a given offer. Grain: one row per sk_offer with at least
+  one proposal in dw_atta.fact_pre_analysis_proposal_flow, keeping only the most advanced
+  proposal per sk_pre_analysis (ROW_NUMBER over sk_proposal_status/ts_last_updated). sk_offer
+  is shared with dw_sale.fact_offers and, transitively, with dw_sale.fact_closing_flows (also
+  keyed by sk_offer) for the same CCV. Resolves the partner identity from
+  dw_atta.dim_partner_atta, its franchise from dw_atta.dim_franchise_atta, the assigned
+  consultant from dw_atta.dim_consultant_atta, and the proposal's financing/credit attributes
+  from dw_atta.dim_proposal_atta, plus a set of boolean status flags (credit approved/ended,
+  CCV signed/canceled, financing ended) computed from dw_sale.fact_offers,
+  dw_sale.dim_sale_agreement and dw_sale.dim_offer. fact_closing_offer_partners is the
+  companion fact table, sharing the same sk_offer/sk_pre_analysis keys, with SLA/lead-time
+  metrics for the same proposal.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -25,17 +39,26 @@ columns:
     lineage:
     - dw_atta.dim_consultant_atta.consultant_name
   partner_type:
-    description: Classification of the financing or brokerage partner type for the proposal.
+    description: Classification of the financing/brokerage partner entity behind the proposal's most advanced pre-analysis, resolved from dim_partner_atta (derived there from the partner's commercial name).
+    lineage:
+    - dw_atta.dim_partner_atta.partner_type
+    categories:
+      EXTERNAL: Partner is an external financing/brokerage entity (not a QuintoAndar-operated wallet or franchise).
+      FRANCHISE: Partner name identifies a franchise ("Franquia") partner.
+      INTERNAL: Partner is QuintoAndar-operated (5A Hub/Carteira wallets) or has no partner name.
   partner_type_group:
-    description: The grouped type of the partner.
+    description: Simplified partner grouping for the proposal — PARTNER when the offer already has a pre-analysis and its partner_type is EXTERNAL or FRANCHISE, INTERNAL otherwise (including cases with no partner_type resolved).
     lineage:
-    - dw_atta.dim_proposal_atta.partner_type
-    - dw_atta.dim_proposal_atta.first_pre_analysis
+    - dw_atta.dim_partner_atta.partner_type
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_registration
+    categories:
+      PARTNER: Financing/brokerage handled by an external or franchise partner.
+      INTERNAL: Financing/brokerage handled internally by QuintoAndar (or no pre-analysis partner resolved).
   last_credit_analysis_status:
-    description: Status of the most recent credit analysis for the proposal.
+    description: Status of the most recent credit analysis for the proposal. Forced to 'Approved' once any credit application for the offer has an approval date recorded, otherwise falls back to the most advanced proposal's raw credit application status.
     lineage:
-    - dw_atta.dim_proposal_atta.last_credit_analysis_status
-    - dw_atta.dim_proposal_atta.first_credit_approved_date
+    - dw_atta.dim_proposal_atta.credit_application_status
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_min_credit_application_approval
   financing_bank:
     description: The bank providing the financing.
     lineage:
@@ -53,22 +76,43 @@ columns:
     lineage:
     - dw_atta.dim_proposal_atta.proposal_situation
   is_ccv_canceled:
-    description: Indicates if the CCV was canceled.
+    description: Boolean flag indicating the CCV was canceled — true when the offer was dismissed without a later rescue, or when the linked sale agreement has a cancellation date.
+    lineage:
+    - dw_sale.fact_offers.ts_offer_dismissed
+    - dw_sale.fact_offers.ts_offer_rescued
+    - dw_sale.dim_sale_agreement.ts_sale_agreement_cancelled
   is_offer_financed:
-    description: Indicates if the offer is financed.
+    description: Boolean flag indicating the offer's payment method is a financed/mortgage track (FINANCED or FINANCED_USING_FGTS).
+    lineage:
+    - dw_sale.dim_offer.payment_method
   is_offer_canceled:
-    description: Indicates if the offer was canceled.
+    description: Boolean flag indicating the offer was dismissed and not later rescued.
+    lineage:
+    - dw_sale.fact_offers.ts_offer_dismissed
+    - dw_sale.fact_offers.ts_offer_rescued
   is_offer_accepted:
-    description: Indicates if the offer was accepted.
+    description: Boolean flag indicating the offer was accepted by the seller (Offer Accepted / OA milestone).
+    lineage:
+    - dw_sale.fact_offers.ts_offer_accepted
   is_credit_approved:
-    description: Indicates if the credit was approved.
+    description: Boolean flag indicating at least one proposal for the offer has an 'Approved' credit application status.
+    lineage:
+    - dw_atta.dim_proposal_atta.credit_application_status
   is_credit_ended:
-    description: Indicates if the credit process ended.
+    description: Boolean flag indicating the ATTA credit process for the offer's most advanced proposal has ended (ts_credit_ended populated).
+    lineage:
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   is_credit_ended_general:
-    description: General indicator if the credit process ended.
+    description: Boolean flag indicating the credit process ended, same underlying source as is_credit_ended kept as a general/legacy indicator for compatibility.
+    lineage:
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   is_ccv_signed:
-    description: Indicates if the CCV was signed.
+    description: Boolean flag indicating the CCV was signed, i.e. the offer has a valid sale-agreement-signed date key (sk_sale_agreement_signed_date > 0).
+    lineage:
+    - dw_sale.fact_offers.sk_sale_agreement_signed_date
   is_financing_ended:
-    description: Indicates if the financing process ended.
+    description: Boolean flag indicating the mortgage/financing process with the bank ended for the offer's most advanced proposal.
+    lineage:
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
   ts_load:
-    description: Date of ingestion.
+    description: Pipeline load/audit timestamp (NOW() at query time), indicating when this table was last refreshed. Hardcoded at write time — no upstream source column, so no lineage applies.

@@ -2,16 +2,29 @@ database_name: dw_sale
 table_name: dim_sale_offer_user_info
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: This is a Junk dimension table. It contains all the possible combinations for some low cardinality characteristics of an user.
+description: >-
+  Junk dimension holding every unique combination of a sale-offer user's low-cardinality
+  characteristics (role, CCV buyer/signer flags, legal type, original-user, income-partner and
+  joint-buyer status). One row per distinct combination, keyed by the sk_user_info surrogate key.
+  Joined from dw_sale_offer_users.fact_sale_offer_users via sk_user_info (many users can share the
+  same characteristic combination and therefore the same sk_user_info). A user row here is tied to
+  a specific offer only through fact_sale_offer_users.sk_offer, which in turn relates to
+  dw_sale_offers.dim_offer, dim_sale_agreement, and fact_offers. Most columns already hold a
+  human-readable label (e.g. "CCV Buyer" / "Not a CCV Buyer") rather than a coded value, so they do
+  not need a categories mapping; user_type is the exception, since it carries the raw role code.
 columns:
   sk_user_info:
     description: Unique id for each combination of user characteristics.
     lineage:
     - datalake_sale_offer_flows.sale_offer_users_info.sk_user_info
   user_type:
-    description: User type, it can be BUYER or SELLER.
+    description: Role this user plays on the offer's sales flow (buyer, seller, or property owner).
     lineage:
     - datalake_sale_offer_flows.sale_offer_users_info.user_type
+    categories:
+      BUYER: User is a buyer on this offer.
+      SELLER: User is a seller (co-owner) on this offer.
+      OWNER: User is the property owner on this offer, distinct from a generic seller.
   ccv_buyer_status:
     description: Flag from docx databases that indicates if this user will be on the sale agreement document.
     lineage:

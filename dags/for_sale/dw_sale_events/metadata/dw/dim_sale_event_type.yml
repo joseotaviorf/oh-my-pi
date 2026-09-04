@@ -1,6 +1,52 @@
 database_name: dw_sale
 table_name: dim_sale_event_type
 domain: For Sale
-columns: {}
+columns:
+  sk_event_type:
+    description: Surrogate key uniquely identifying the demand-funnel event type. Values 1-8, hardcoded literals (one UNION ALL branch per event type in this table's SQL, no upstream source column). Foreign key from dw_sale.fact_sale_demand_event.sk_event_type; self-joined (dset_1 x dset_2) to build every ordered event-type pair in dw_sale.dim_sale_cohort_type.
+    categories:
+      '1': 'VISIT_BOOKED — buyer booked a visit to the house.'
+      '2': 'VISIT_COMPLETED — buyer completed the booked visit.'
+      '3': 'OFFER_SUBMITTED — buyer submitted a purchase offer.'
+      '4': 'OFFER_ACCEPTED — seller accepted the buyer''s offer.'
+      '5': 'SALE_AGREEMENT_CREATED — sale agreement (CCV) draft was created.'
+      '6': 'SALE_AGREEMENT_SIGNED — sale agreement (CCV) was signed by both parties.'
+      '7': 'VISIT_CANCELLED — the previously booked visit was cancelled.'
+      '8': 'OFFER_REJECTED — the offer was rejected or dismissed before acceptance.'
+  event_name:
+    description: Textual name of the demand-funnel event type (UPPER_SNAKE_CASE), the label counterpart of sk_event_type. Hardcoded literal per event type. event_name = VISIT_BOOKED identifies a Buyer Prospect (BP) in For Sale demand-funnel metrics (see dw_sale.fact_sale_demand_event).
+    categories:
+      VISIT_BOOKED: Buyer booked a visit to the house.
+      VISIT_COMPLETED: Buyer completed the booked visit.
+      OFFER_SUBMITTED: Buyer submitted a purchase offer.
+      OFFER_ACCEPTED: Seller accepted the buyer's offer.
+      SALE_AGREEMENT_CREATED: Sale agreement (CCV) draft was created.
+      SALE_AGREEMENT_SIGNED: Sale agreement (CCV) was signed by both parties.
+      VISIT_CANCELLED: The previously booked visit was cancelled.
+      OFFER_REJECTED: The offer was rejected or dismissed before acceptance.
+  abbreviation:
+    description: Short code for the event type, used to build human-readable conversion abbreviations in dw_sale.dim_sale_cohort_type (e.g. VB for VISIT_BOOKED, CCV for SALE_AGREEMENT_SIGNED). Hardcoded literal per event type.
+    categories:
+      VB: VISIT_BOOKED
+      VC: VISIT_COMPLETED
+      OS: OFFER_SUBMITTED
+      OA: OFFER_ACCEPTED
+      SAC: SALE_AGREEMENT_CREATED
+      CCV: SALE_AGREEMENT_SIGNED
+      BC: VISIT_CANCELLED
+      OR: OFFER_REJECTED
+  stage:
+    description: Broad funnel stage grouping for the event type (booking-related, offer-related, or closing-related). Hardcoded literal per event type.
+    categories:
+      BOOKING: Groups VISIT_BOOKED, VISIT_COMPLETED, and VISIT_CANCELLED events.
+      OFFER: Groups OFFER_SUBMITTED, OFFER_ACCEPTED, and OFFER_REJECTED events.
+      CLOSING: Groups SALE_AGREEMENT_CREATED and SALE_AGREEMENT_SIGNED events.
 owner: guilherme.rocha@quintoandar.com.br
-description: Dimension holding the distinct For Sale demand event types (for example VISIT_BOOKED, VISIT_COMPLETED, OFFER_SUBMITTED) with their names and abbreviations. One row per event type; referenced by dw_sale.fact_sale_demand_event and combined into dw_sale.dim_sale_cohort_type to define conversions.
+description: >-
+  Dimension holding the 8 distinct For Sale demand-funnel event types (VISIT_BOOKED,
+  VISIT_COMPLETED, OFFER_SUBMITTED, OFFER_ACCEPTED, SALE_AGREEMENT_CREATED,
+  SALE_AGREEMENT_SIGNED, VISIT_CANCELLED, OFFER_REJECTED) with their names, abbreviations, and
+  funnel stage. Every column is a hardcoded literal (one UNION ALL branch per event type) — not
+  sourced from any upstream table. Grain: one row per event type; surrogate key sk_event_type
+  (1-8). Referenced by dw_sale.fact_sale_demand_event via sk_event_type, and self-joined
+  (dset_1 x dset_2) to build every ordered event-type pair in dw_sale.dim_sale_cohort_type.

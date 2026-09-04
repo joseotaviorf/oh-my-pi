@@ -1,35 +1,61 @@
 database_name: dw_atta
 table_name: dim_partner_atta
-description: dimension with the details from atta partners
+description: >-
+  Financing/brokerage partner dimension for the Atta mortgage-financing workflow. One row per
+  partner entity (sk_partner, surrogate key = datalake_atta.partner_info.id_partner, itself
+  built from enrich_atta.partner_info — the partner master already documented there). Adds a
+  local business classification (partner_type, wallet) on top of the enrich partner record.
+  sk_franchise links each partner to dim_franchise_atta.sk_franchise when the partner belongs
+  to a franchise network. Referenced by dw_atta.fact_pre_analysis_proposal_flow via sk_partner,
+  identifying which partner is handling a given pre-analysis/proposal; also joined from
+  dw_atta.dim_proposal_atta (via the underlying partner_info) to derive the channel column.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_partner:
     lineage:
     - datalake_atta.partner_info.id_partner
-    description: Partner's identification number
+    description: Surrogate key identifying the financing/brokerage partner entity. Primary key of this dimension; referenced by dw_atta.fact_pre_analysis_proposal_flow.sk_partner.
   sk_admin_user:
     lineage:
     - datalake_atta.partner_info.id_admin_user
-    description: Admin user's identification number
+    description: Identifier of the Atta staff/admin user responsible for managing this partner account.
   sk_franchise:
     lineage:
     - datalake_atta.partner_info.id_franchise
-    description: Franchise's identification number
+    description: Foreign key to dw_atta.dim_franchise_atta.sk_franchise. Identifies which commercial franchise unit the partner is affiliated with.
   sk_registration_user:
     lineage:
     - datalake_atta.partner_info.id_registration_user
-    description: User's identification number
+    description: Identifier of the Atta user who registered/created this partner record.
   partner_name:
     lineage:
     - datalake_atta.partner_info.partner_name
     description: Legal or commercial name of the financing or brokerage partner entity.
   partner_type:
-    description: Category of the financing or brokerage partner entity.
+    lineage:
+    - datalake_atta.partner_info.partner_name
+    description: >-
+      Coarse structural classification of the partner entity, derived by pattern-matching on
+      partner_name. Built by mapping names starting with 'Franquia' to FRANCHISE; names
+      containing 'Hub', starting with 'Carteira' or '5A HUB', matching '5a >>' (case-insensitive),
+      or null names, to INTERNAL; everything else to EXTERNAL.
+    categories:
+      "FRANCHISE": "Partner name starts with 'Franquia' — partner operates under the Atta franchise network."
+      "INTERNAL": "Partner name matches internal QuintoAndar wallet patterns ('Hub', 'Carteira*', '5A HUB*', '5a >>*') or is null — internal correspondent/hub."
+      "EXTERNAL": "Partner name does not match any franchise or internal pattern — external correspondent partnership."
   wallet:
     lineage:
     - datalake_atta.partner_info.wallet
-    description: Partnerships description
+    description: >-
+      Business segmentation bucket for the partner, carried through unchanged from
+      enrich_atta.partner_info.wallet. Used to separate QuintoAndar-operated partner wallets
+      from external correspondent partnerships in commercial and portfolio reporting.
+    categories:
+      "QuintoAndar Full Atta": "Partner name matches the '5a>>atta' pattern or starts with 'carteira h' — fully QuintoAndar-operated Atta wallet."
+      "QuintoAndar Backlog": "Partner name matches the '5a' pattern (excluding Full Atta cases) — QuintoAndar backlog partner wallet."
+      "Casa Mineira": "Partner name contains 'casa mineira' — Casa Mineira correspondent partnership."
+      "Other partnerships": "Partner name does not match any of the above patterns — other/external correspondent partnership."
   ts_registration:
     lineage:
     - datalake_atta.partner_info.ts_registration

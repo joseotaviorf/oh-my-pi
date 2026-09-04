@@ -8,6 +8,7 @@ description: >
   Always LEFT JOIN from fact_offers via sk_offer — this table has one row per offer regardless of funnel stage.
   Critical: tags_from_salesflow is the mandatory filter column for excluding legacy Casa Mineira flows
   (tags #fluxo-cm, #casa-mineira, #fluxo_cm) from 1P analyses. This column lives HERE, not in dim_sale_agreement.
+  For the individual buyer/seller/co-signer users tied to the offer, join dw_sale_offer_users.fact_sale_offer_users via sk_offer.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
