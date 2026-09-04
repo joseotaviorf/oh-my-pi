@@ -62,7 +62,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '170135' AND event_type = 'in_app_survey_answered'
     AND (

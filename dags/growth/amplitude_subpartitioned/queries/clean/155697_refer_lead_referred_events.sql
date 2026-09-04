@@ -65,7 +65,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '155697' AND event_type = 'refer_lead_referred'
     AND (

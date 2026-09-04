@@ -64,7 +64,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '183047' AND event_type = 'chatcrpp_blocked_message_alert_shown'
     AND (

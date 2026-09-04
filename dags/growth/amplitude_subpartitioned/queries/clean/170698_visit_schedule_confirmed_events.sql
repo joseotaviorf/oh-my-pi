@@ -72,7 +72,7 @@ SELECT
     COALESCE(GET_JSON_OBJECT(event_properties, '$.scheduled_hour_from'), GET_JSON_OBJECT(event_properties, '$.scheduled_hours_from')) AS hour_schedule_started,
     GET_JSON_OBJECT(event_properties, '$.scheduled_hour_to') AS hour_schedule_ended
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '170698' AND event_type = 'visit_schedule_confirmed'
     AND (

@@ -2,6 +2,13 @@ bietlejuice.jira_open_incidents_report:
   # Spark job SQL is not scanned by the query-file dependency generator.
   add:
     - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
+bietlejuice.amplitude_subpartitioned:
+  # Queries read the base Delta table datalake_amplitude_events_clean.events directly (to
+  # restore partition pruning) instead of the datalake_amplitude_clean.events SELECT * view
+  # that amplitude_new declares as its output, so the generator can no longer infer this edge.
+  # The data dependency on amplitude_new's clean-events load is real; keep it.
+  add:
+    - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
 bietlejuice.enrich_consolidated_growth_metrics:
   remove:
     - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day

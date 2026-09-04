@@ -52,7 +52,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '170698' AND event_type = 'user_tried_to_call_again_after_blocked'
     AND (

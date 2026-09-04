@@ -48,7 +48,7 @@ SELECT
     year,
     month,
     day
-FROM datalake_amplitude_clean.events
+FROM datalake_amplitude_events_clean.events
 WHERE
     id_app = '170698' AND event_type = 'pi_negotiation_started_page_viewed'
     AND (

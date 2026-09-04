@@ -65,7 +65,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE  id_app = 155696 and event_type = 'refer_lead_referred' AND
     (
         (year > YEAR('{load_start_date}') OR (year = YEAR('{load_start_date}') AND (month > MONTH('{load_start_date}') OR (month = MONTH('{load_start_date}') AND day >= DAY('{load_start_date}')))))

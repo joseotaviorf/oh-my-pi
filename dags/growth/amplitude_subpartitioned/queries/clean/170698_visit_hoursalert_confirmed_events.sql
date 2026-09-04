@@ -54,7 +54,7 @@ SELECT
         CAST(COALESCE(GET_JSON_OBJECT(event_properties, '$.alert_slot_from'), '') AS BIGINT) AS ep_alert_slot_from,
         CAST(COALESCE(GET_JSON_OBJECT(event_properties, '$.alert_slot_to'), '') AS BIGINT) AS ep_alert_slot_to
 FROM
-        datalake_amplitude_clean.events
+        datalake_amplitude_events_clean.events
     WHERE
     id_app = '170698' AND event_type = 'visit_hoursalert_confirmed'
     AND (

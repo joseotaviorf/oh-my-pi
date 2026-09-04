@@ -58,7 +58,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '203461' AND event_type = 'inspector_app_add_photo_clicked'
     AND (

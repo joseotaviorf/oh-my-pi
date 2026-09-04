@@ -50,7 +50,7 @@ SELECT
   year,
   month,
   day
-FROM datalake_amplitude_clean.events
+FROM datalake_amplitude_events_clean.events
 WHERE
     id_app = '183047' AND event_type = 'mra_acceptance_viewed'
     AND (

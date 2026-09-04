@@ -50,7 +50,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '170698' AND event_type = 'offboarding_repairs_task_success_page_viewed'
     AND (

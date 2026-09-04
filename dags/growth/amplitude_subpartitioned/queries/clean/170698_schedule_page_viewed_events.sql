@@ -76,7 +76,7 @@ SELECT
     CAST(GET_JSON_OBJECT(event_properties, '$.valor_total') AS BIGINT) AS total_value,
     CAST(GET_JSON_OBJECT(event_properties, '$.valor_venda') AS BIGINT) AS sale_value
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '170698' AND event_type = 'schedule_page_viewed'
     AND (

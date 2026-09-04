@@ -10,7 +10,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     event_type = 'properties_entry_model_drawer_update_error'
     AND id_app = 370096

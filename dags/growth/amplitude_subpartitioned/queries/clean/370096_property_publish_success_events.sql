@@ -8,7 +8,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     event_type = 'property_publish_success'
     AND id_app = 370096

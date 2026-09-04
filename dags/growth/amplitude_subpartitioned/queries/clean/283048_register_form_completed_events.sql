@@ -13,7 +13,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = 283048
     AND event_type = 'register_form_completed'

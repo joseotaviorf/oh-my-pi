@@ -57,7 +57,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = '170698' AND event_type = 'price_suggestion_address_submitted'
     AND (

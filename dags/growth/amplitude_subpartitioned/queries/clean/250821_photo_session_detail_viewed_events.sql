@@ -9,7 +9,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = 250821
     AND event_type = 'photo_session_detail_viewed'

@@ -7,7 +7,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean.events
+    datalake_amplitude_events_clean.events
 WHERE
     id_app = 233592
     AND event_type = 'agent_with_keys_property_indication_search_feedback'
