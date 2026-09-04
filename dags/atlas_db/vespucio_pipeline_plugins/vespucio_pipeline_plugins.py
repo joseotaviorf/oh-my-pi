@@ -32,6 +32,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 ENV = os.environ.get("ENVIRONMENT")
 EXECUTION_HOURS_TIMEOUT = 3.0
+PROPERTY_SEARCH_INDEXER_TIMEOUT_HOURS = 4.0
 
 config_service = ConfigurationService(DAG_NAME)
 artifacts_bucket = config_service.get_config("artifacts_bucket")
@@ -120,7 +121,12 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
 DatasetAdder.attach_reprocessing_guard(execute_job_cluster_task)
 
 
-def create_task(entry_point: str, parameters: List[str], task_id: str = None):
+def create_task(
+    entry_point: str,
+    parameters: List[str],
+    task_id: str = None,
+    execution_timeout_hours: float = EXECUTION_HOURS_TIMEOUT,
+):
     return QuintoAndarDatabricksCheckJobTaskOperator(
         databricks_conn_id="databricks_new",
         dag=dag,
@@ -132,7 +138,7 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
                 "parameters": parameters,
             }
         },
-        execution_timeout=timedelta(hours=EXECUTION_HOURS_TIMEOUT),
+        execution_timeout=timedelta(hours=execution_timeout_hours),
     )
 
 
@@ -147,6 +153,7 @@ property_search_indexer_task = create_task(
         "--number_of_shards=3",
         "--number_of_replicas=2",
     ],
+    execution_timeout_hours=PROPERTY_SEARCH_INDEXER_TIMEOUT_HOURS,
 )
 
 compound_indexer_task = create_task(
