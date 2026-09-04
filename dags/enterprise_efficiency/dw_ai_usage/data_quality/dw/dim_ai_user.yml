@@ -26,18 +26,3 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  unexplained_unmatched_email_rate_within_baseline:
-    custom:
-      # Unmatched-email rate excluding known @ext.quintoandar.com.br contractors.
-      # Known exception: pending-hire employees (assignment type P/PT, not yet E/C)
-      # are absent from identifier_mapping until they become effective; their usage
-      # resolves once hired. Live-prod check on 2026-09-03: 4/1397 (0.29%) residual.
-      constraint: |-
-        (SELECT
-           COUNT(*) FILTER (
-             WHERE sk_employee IS NULL
-               AND LOWER(email_user) NOT LIKE '%@ext.quintoandar.com.br'
-           ) * 100.0 / COUNT(*)
-         FROM dw_ai_usage.dim_ai_user
-        ) <= 1.0
-      severity_level: Warning

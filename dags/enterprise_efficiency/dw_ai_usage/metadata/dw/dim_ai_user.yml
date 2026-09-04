@@ -3,17 +3,12 @@ table_name: dim_ai_user
 owner: gabriel.berger@quintoandar.com.br
 domain: Enterprise Efficiency
 description: |
-  Conformed AI-tool user dimension, resolving each vendor's raw identity (id_user and
-  email) to a QuintoAndar person identity through People's email-based identifier
-  matching. Grain: one row per tool and id_user. Scope: covers every tool/id_user
-  combination ever seen in usage or spend, including rows that never matched a known
-  email (contractors, service accounts, or unresolved emails); these are retained with
-  NULL sk_employee rather than dropped, so usage and spend are never silently lost.
-  sk_employee is set whenever the email resolves to a person, regardless
-  of employment status; it shares dw_people.dim_employee's key space, so consumers join
-  there directly for employee attributes (name, manager, etc.) instead of this DW
-  duplicating them — a since-terminated employee's sk_employee simply won't find a
-  match in dw_people, which is active-employee-only.
+  Conformed AI-tool user dimension preserving each vendor's raw identity (id_user and
+  email). Grain: one row per tool and id_user. Scope: covers every tool/id_user
+  combination ever seen in usage or spend, including contractors, service accounts,
+  former employees, and unresolved identities, so usage and spend are never silently
+  lost. email_user is retained as the employee joining key for downstream attribution;
+  this dimension does not depend on or duplicate a People employee dimension.
 columns:
   sk_ai_user:
     description: Unique key for the (tool, id_user) combination, a deterministic hash so it never changes across reruns (e.g. 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8'). Referenced by fact_ai_usage_daily.sk_ai_user, fact_ai_spend_daily.sk_ai_user, and fact_ai_budget_snapshot_daily.sk_ai_user.
@@ -32,11 +27,12 @@ columns:
       - datalake_ai_usage.usage_daily.id_user
 
   email_user:
-    description: Work email address reported by the vendor for this user, used to resolve employee identity (e.g. 'name.last_name@quintoandar.com.br').
+    description: |
+      Work email address reported by the vendor for this user and the joining key for
+      downstream employee attribution (e.g. 'name.last_name@quintoandar.com.br'). The
+      value is preserved from usage and spend and may be NULL or unmatched. Downstream
+      consumers can enrich current employee attributes by joining email_user to
+      dw_people.dim_employee.work_email; the public table is active-only, so historical
+      or former employees may remain unmatched.
     lineage:
       - datalake_ai_usage.usage_daily.email_user
-
-  sk_employee:
-    description: Person key resolved via identifier_mapping (e.g. '300000123456789'), in dw_people.dim_employee's key space — join there for employee attributes. NULL when email_user matches no known assignment. Not guaranteed to resolve in dw_people, since dim_employee is active-employee-only.
-    lineage:
-      - datalake_people.identifier_mapping.id_person
