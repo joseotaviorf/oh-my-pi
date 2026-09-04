@@ -82,7 +82,7 @@ columns:
     lineage:
       - datalake_cyber_legal_clean.case_expense.expense_description
   is_authorized:
-    description: "Expense authorization status. TRUE means authorized and eligible to charge the client; FALSE means rejected after analysis; NULL means pending analysis and must not be treated as rejected."
+    description: "Expense authorization status from Cyber EXAUTFLG. TRUE (Y) means authorized, either auto-approved within the configured type and amount limit or approved by the manager. FALSE (R) means rejected by the manager. NULL (N) means pending manager approval, so pending expenses are not treated as rejected."
     lineage:
       - datalake_cyber_legal_clean.case_expense.is_authorized
   is_payment_made:
@@ -102,7 +102,7 @@ columns:
     lineage:
       - datalake_cyber_legal_clean.case_expense.dt_invoice
   dt_authorized:
-    description: "Date of expense authorization or rejection."
+    description: "Date from Cyber EXAUTDT. Filled when the manager approves (Y) or rejects (R) a pending expense; may also be set on auto-authorization (Y). Empty while pending (N)."
     lineage:
       - datalake_cyber_legal_clean.case_expense.dt_authorized
   dt_reimbursed:

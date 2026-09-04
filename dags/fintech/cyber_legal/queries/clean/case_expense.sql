@@ -16,8 +16,8 @@ WITH ranked_expenses AS (
         EXIDESC AS invoice_description,
         EXSUPPLIER AS supplier_name,
         CASE
-            WHEN EXAUTFLG = 'Y' THEN TRUE
-            WHEN EXAUTFLG = 'N' THEN FALSE
+            WHEN UPPER(TRIM(EXAUTFLG)) = 'Y' THEN TRUE
+            WHEN UPPER(TRIM(EXAUTFLG)) = 'R' THEN FALSE
             ELSE NULL
         END AS is_authorized,
         CASE

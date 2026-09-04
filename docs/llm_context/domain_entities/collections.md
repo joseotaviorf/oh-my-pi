@@ -204,7 +204,7 @@ Cyber alerts: `sk_alert`, `sk_case`, contract ids, alert type/review/task/aging,
 
 ### `fact_expenses`
 
-Custas / expenses by case and stage: amounts, authorization/reimbursement flags, attorney ids, dates.
+Custas / expenses by case and stage: amounts, `is_authorized` (from Cyber EXAUTFLG — TRUE only when authorized, FALSE only when rejected by the manager, NULL while pending approval), reimbursement flags, attorney ids, dates (`dt_authorized` from EXAUTDT on manager approve/reject).
 
 ---
 
