@@ -1,29 +1,37 @@
 database_name: datalake_sale_closing_flows
 table_name: closing_flow
 description: >-
-  Enriched table for sale closing flows, used to monitor and analyze the closing funnel in For Sale.
-  Specialist assignments and closing milestone dates are sourced from datalake_firestore.monday, a
-  static table from the deprecated enrich_sale_firestore pipeline (legacy Firestore/Monday system
-  inactive since 2024); those fields reflect historical records only.
+  Enriched table for the post-CCV "End of Process" (EoP) closing funnel in For Sale — due
+  diligence, financing, notary/registry and key delivery — with one row per offer (id_offer).
+  id_offer is the same key used by enrich_sale_offer_flows.sale_offer_flows and
+  enrich_sale_salesforce.purchase_sale_contract, letting closing milestones be joined back to
+  the pre-CCV negotiation funnel and to the Salesforce contract record for the same deal.
+  id_buyer and id_owner (seller) can be joined with dw_public.dim_user; id_house can be joined
+  with dw_house.dim_house and with enrich_sale_flows.house_address_data/house_offers.
+  id_company_supply/id_company_demand identify the 3P partner real-estate agencies (Rede
+  network) involved on the supply/demand side, when applicable. Specialist assignments and
+  closing milestone dates are sourced from datalake_firestore.monday, a static table from the
+  deprecated enrich_sale_firestore pipeline (legacy Firestore/Monday system inactive since
+  2024); those fields reflect historical records only.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_offer:
     lineage:
     - datalake_sale_offer.sale_offer.id_offer
-    description: Identification key of the offer.
+    description: Identification key of the offer that reached a signed sale agreement (CCV) and entered the closing/post-CCV process tracked by this table.
   id_buyer:
     lineage:
     - datalake_sale_offer.sale_offer.id_buyer
-    description: Identification key of the user who sent the offer.
+    description: Identification key of the buyer who sent the offer. Foreign key to dw_public.dim_user.
   id_owner:
     lineage:
     - datalake_sale_offer.sale_offer.id_owner
-    description: House owner to whom an offer has been sent.
+    description: House owner (seller) to whom the offer was sent. Foreign key to dw_public.dim_user.
   id_house:
     lineage:
     - datalake_sale_offer.sale_offer.id_house
-    description: Identification key of the house linked to the offer.
+    description: Identification key of the house linked to the offer. Foreign key to dw_house.dim_house and to id_house in the house_offers and sale_flow enrich tables.
   id_company_supply:
     lineage:
     - datalake_sale_offer.sale_offer.id_company_supply
@@ -40,60 +48,60 @@ columns:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_consultant
     - datalake_firestore.monday.id_closing_specialist
-    description: Identification key of the closing specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee (closing specialist) responsible for the closing process. Composite text value, prefixed 'ID_VENDAS_' when sourced from the current sales-flow system (id_consultant) or 'ID_MONDAY_' when backfilled from the legacy Firestore/Monday system (inactive since 2024) — not a plain foreign-key integer; strip the prefix before joining to a user dimension.
   id_legal_risk_analyst:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_legal_risk_analyst
     - datalake_firestore.monday.id_legal_risk_analyst
-    description: Identification key of the legal risk analyst. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee (legal risk analyst) who evaluated legal risk for this closing. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   id_pre_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_pre_specialist
     - datalake_firestore.monday.id_pre_specialist
-    description: Identification key of the pre credit specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee (pre credit specialist) who ran the initial credit pre-analysis for this closing. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   id_post_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_post_specialist
     - datalake_firestore.monday.id_post_specialist
-    description: Identification key of the post credit specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee (post credit specialist) who handled credit follow-up after the pre-analysis. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   id_start_financing_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_start_financing_specialist
     - datalake_firestore.monday.id_start_financing_specialist
-    description: Identification key of the start financing specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee who started the financing process for this closing. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   id_follow_up_financing_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_follow_up_financing_specialist
     - datalake_firestore.monday.id_follow_up_financing_specialist
-    description: Identification key of the follow up financing specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee who followed up on the financing process for this closing. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   id_end_financing_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_end_financing_specialist
     - datalake_firestore.monday.id_end_financing_specialist
-    description: Identification key of the end financing specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee who closed out the financing process for this closing. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   id_credit_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_credit_specialist
     - datalake_firestore.monday.id_credit_specialist
-    description: Identification key of the credit specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee (credit specialist) responsible for the buyer's credit analysis. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   id_notes_registry_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_notes_registry_specialist
     - datalake_firestore.monday.id_notes_registry_specialist
-    description: Identification key of the notes registry specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee (notes registry specialist) who handled the notary notes registry (registro de notas) step. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   id_real_estate_register_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_real_estate_register_specialist
     - datalake_firestore.monday.id_real_estate_register_specialist
-    description: Identification key of the real estate register specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Identification key of the QuintoAndar employee (real estate register specialist) who handled the property registry (cartório) step. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   partner_3p_supply:
     lineage:
     - datalake_company.company_sks.company_name
-    description: Name of the Rede partner that supplied the property.
+    description: Name of the third-party (3P) partner company, from QuintoAndar's real-estate partner network ("Rede"), that supplied (listed) this property, when the sale involves a 3P supply partner.
   partner_3p_demand:
     lineage:
     - datalake_company.company_sks.company_name
-    description: Name of the Rede partner that demanded the property.
+    description: Name of the third-party (3P) partner company, from QuintoAndar's real-estate partner network ("Rede"), that brought the buyer's demand for this property, when the sale involves a 3P demand partner.
   is_3p_supply:
     lineage:
     - datalake_sale_offer.sale_offer.is_3p_supply
@@ -204,95 +212,95 @@ columns:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_onboarding_ended
     - datalake_firestore.monday.dt_onboarding_ended
-    description: Date when the onboarding was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the post-CCV closing onboarding step was completed, marking the buyer/seller as ready to move into legal and financial analysis. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legal_analysis_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
     - datalake_firestore.monday.dt_legal_analysis_ended
-    description: Date when the legal analysis was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the legal analysis of the deal (buyer/seller documentation and diligence) was completed, unblocking the deal to move forward to financing and registry. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legaut_analysis_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_started
     - datalake_firestore.monday.dt_legaut_analysis_started
-    description: Date when the legaut analysis was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the legal-utility (legaut) analysis of the property — checking utility bills/debts and property legal standing — started. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legaut_analysis_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_ended
     - datalake_firestore.monday.dt_legaut_analysis_ended
-    description: Date when the legaut analysis was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the legal-utility (legaut) analysis of the property was completed. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legal_risk_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_started
     - datalake_firestore.monday.dt_legal_risk_started
-    description: Date when the legal risk analysis was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the legal risk analysis of the deal started, assessing legal blockers before the deal can proceed to financing and registry. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legal_risk_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_ended
     - datalake_firestore.monday.dt_legal_risk_ended
-    description: Date when the legal risk analysis was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the legal risk analysis of the deal was completed. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_bank_legal_analysis_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
     - datalake_firestore.monday.dt_bank_legal_analysis_started
-    description: Date when the bank legal analysis was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the financing bank's own legal analysis of the deal started, a prerequisite for the bank to release the mortgage funds. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_credit_analysis_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_started
     - datalake_firestore.monday.dt_credit_analysis_started
-    description: Date when the credit analysis was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the buyer's credit analysis (creditworthiness/financing eligibility check) started. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_credit_analysis_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
     - datalake_firestore.monday.dt_credit_analysis_ended
-    description: Date when the credit analysis was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the buyer's credit analysis was completed. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_financing_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_financing_started
     - datalake_firestore.monday.dt_financing_started
-    description: Date when the financing was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the mortgage/financing process with the bank started. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_financing_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
     - datalake_firestore.monday.dt_financing_ended
-    description: Date when the financing was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the mortgage/financing process with the bank was completed (loan disbursement finalized). Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_notes_registry_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_started
     - datalake_firestore.monday.dt_notes_registry_started
-    description: Date when the notes registry was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the notary notes registry step (registro de notas, formalizing the deed at the notary office) started. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_notes_registry_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
     - datalake_firestore.monday.dt_notes_registry_ended
-    description: Date when the notes registry was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the notary notes registry step was completed. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_house_registry_started:
     lineage:
     - datalake_sales_flow_clean.notary.ts_started
     - datalake_firestore.monday.dt_house_registry_started
-    description: Date when the house registry started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the property registry process at the real-estate registry office (cartório de registro de imóveis) started — the final legal step transferring ownership to the buyer. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_house_registry_ended:
     lineage:
     - datalake_sales_flow_clean.notary.ts_ended
     - datalake_firestore.monday.dt_house_registry_ended
-    description: Date when the house registry ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the property registry process ended, meaning ownership of the house has legally transferred to the buyer. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_sale_key_delivered:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_sale_key_delivered
     - datalake_firestore.monday.dt_sale_key_delivered
-    description: Date when the sale key was delivered Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the property keys were delivered to the buyer, marking the physical handover of the house. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_sale_transacton_paid:
     lineage:
     - datalake_sales_flow_clean.mortgage_aud.ts_seller_paid
     - datalake_firestore.monday.dt_sale_transacton_paid
-    description: Date when the seller received the payment from the financing company. In Closing Assistance model, the full closing process is not monitored. After July 2022 there is no date. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date when the seller received the sale payment from the financing company. In the Closing Assistance model the full closing process is not monitored, so there is no date recorded after July 2022. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_diligence_buyer_sent_at:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_diligence_buyer_sent_at
-    description: Date when the diligence was sent by the buyer
+    description: Date when the due-diligence report was sent to the buyer for review/acceptance.
   dt_diligence_seller_sent_at:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_diligence_seller_sent_at
-    description: Date when the diligence was sent by the seller
+    description: Date when the due-diligence report was sent to the seller for review/acceptance.
   dt_payment_allowed:
     lineage:
     - datalake_monopoly.sale.dt_occurence
@@ -300,14 +308,14 @@ columns:
     - datalake_sales_flow_clean.mortgage_aud.dt_credit_ended
     - datalake_firestore.monday.dt_legal_analysis_ended
     - datalake_firestore.monday.dt_credit_analysis_ended
-    description: Date when payment was allowed based on payment method rules Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
+    description: Date from which payment to the seller is allowed to proceed, computed by business rules that depend on the payment method (cash vs. financed vs. brokerage-term) and on the completion of legal and/or credit analysis. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_down_payment:
     lineage:
     - datalake_monopoly.sale.dt_occurence
-    description: Date when the down payment was made
+    description: Date when the buyer's down payment (sinal) was made.
   ts_updated:
     lineage:
     - datalake_sale_offer.sale_offer.ts_updated
-    description: Timestamp when the offer was updated
+    description: Timestamp when the underlying offer record was last updated in the source system.
   ts_load:
-    description: Timestamp indicating when this table was last updated.
+    description: Timestamp indicating when this table was last refreshed by the pipeline.

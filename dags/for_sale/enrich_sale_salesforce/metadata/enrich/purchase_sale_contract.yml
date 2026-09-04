@@ -2,30 +2,39 @@ database_name: datalake_sale_salesforce
 table_name: purchase_sale_contract
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Table with enriched data about purchase sale contracts from Salesforce, consolidated for the For Sale domain. This table contains comprehensive information about contract stages, payments, dates, and process status throughout the sales transaction lifecycle.
+description: >-
+  Table with enriched data about purchase sale contracts (opportunities) from Salesforce,
+  consolidated for the For Sale domain. One row per contract, keeping only the most recently
+  modified version per id. This table contains comprehensive information about contract stages,
+  payments, dates, and process status throughout the sales transaction lifecycle (CCV signature
+  through key delivery and registry). id_offer is a foreign key to
+  enrich_sale_offer_flows.sale_offer_flows.id_offer and to dw_sale.fact_offers/dw_sale.dim_offer,
+  linking each Salesforce contract to the underlying For Sale offer; the same deal's post-CCV
+  closing milestones are also tracked in enrich_sale_closing_flows.closing_flow (joined via
+  id_offer), with this table serving as the Salesforce-CRM view of the same lifecycle.
 columns:
   id:
-    description: Identifier of the purchase sale contract
+    description: Unique identifier of the purchase and sale contract opportunity in Salesforce; primary key of this table, one row per contract keeping only the latest modified version.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.id
   id_owner:
-    description: Identifier of the seller of the house
+    description: Identifier of the seller of the house associated with the contract (sourced from the Salesforce record-owner field).
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.id_owner
   id_created_by:
-    description: Identifier of the user who created the purchase sale contract
+    description: Identifier of the Salesforce user who created this contract record.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.id_created_by
   id_last_modified_by:
-    description: Identifier of the user who last modified the purchase sale contract
+    description: Identifier of the Salesforce user who last modified this contract record.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.id_last_modified_by
   id_external:
-    description: External identifier of the purchase sale contract
+    description: External system identifier used to reconcile this Salesforce contract record with its counterpart in the upstream sales/offer system.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.id_external
   id_offer:
-    description: Identifier of the offer associated with the purchase sale contract
+    description: Identifier of the sales offer this contract originated from. Foreign key to the For Sale offer/funnel tables (e.g. dw_sale.fact_offers, dw_sale.dim_offer), used to relate the contract back to the earlier funnel stages.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.id_offer
   name:
@@ -33,11 +42,11 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.name
   diligence_classification:
-    description: Diligence classification assigned to the contract in Salesforce.
+    description: Risk classification assigned to the contract during the due-diligence (DD) legal review of seller and house documentation, used to prioritize and route the review.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.diligence_classification
   diligence_status:
-    description: Current status of the diligence process for the contract.
+    description: Current status of the due-diligence (DD) legal review of seller and house documentation for the contract, reflecting progress toward Closed Deal (CD).
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.diligence_status
   payment_method:
@@ -45,7 +54,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.payment_method
   stage:
-    description: Current pipeline stage of the purchase sale contract in Salesforce.
+    description: Current pipeline stage of the purchase and sale contract opportunity in Salesforce, reflecting where the deal is in the CCV/closing workflow (e.g. drafting, signature, registry, key delivery).
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.stage
   buyer:
@@ -53,7 +62,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.buyer
   clause_identifiers:
-    description: Specifies the clauses that are part of the purchase sale contract
+    description: List of contract clause codes applicable to this purchase and sale agreement, identifying which standard or optional clauses were included.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.clause_identifiers
   sales_flow_url:
@@ -73,7 +82,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.agent_email
   crn_status:
-    description: Notary office (CRN) status
+    description: Status of the notary-office (CRN) step of the closing process, tracking progress of the deed (escritura) execution.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.crn_status
   ccv_status:
@@ -117,19 +126,19 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.alienation_status
   bypass_rescission_validation:
-    description: Indicates if rescission validation was bypassed
+    description: Whether the standard rescission (cancellation) validation checks were manually bypassed for this contract, typically used for exception handling by ops/legal.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.bypass_rescission_validation
   cri_have_demand_note:
-    description: Indicates if CRI has a demand note
+    description: Whether a demand note (nota de exigencia) was issued by the real estate registry (CRI) during registration of this contract, requiring additional documentation before registry completion.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.cri_have_demand_note
   crn_partner:
-    description: Notary office (CRN) partner
+    description: Name of the partner notary office (CRN parceiro) handling the deed execution for this contract, when closing uses QuintoAndar's notary partner network.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.crn_partner
   crn_complexity:
-    description: Complexity of the notary office (CRN)
+    description: Complexity classification assigned to the notary-office (CRN) step for this contract, used to route or prioritize cases with more demanding registry requirements.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.crn_complexity
   escrivao:
@@ -137,7 +146,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.escrivao
   have_unpaid_alienation:
-    description: Indicates if there is an unpaid alienation
+    description: Whether the property has an outstanding (unpaid) chattel mortgage (alienacao fiduciaria) that must be settled before registry/closing can proceed.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.have_unpaid_alienation
   house_occupant:
@@ -149,7 +158,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.preemptive_right
   proof_payment_received:
-    description: Indicates if proof of payment was received
+    description: Whether documented proof of payment (comprovante) for the transaction has been received and validated by QuintoAndar.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.proof_payment_received
   request_type:
@@ -157,7 +166,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.request_type
   requested_by:
-    description: Who requested the action
+    description: Person or role who requested the action recorded in request_type for this contract case.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.requested_by
   rescission_status:
@@ -189,7 +198,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.fs_reason_non_conversion_ccv
   address:
-    description: Address associated with the contract
+    description: Address of the house under this purchase and sale contract.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.address
   addendum_status:
@@ -201,7 +210,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.fs_responsible_assistant_ccv
   lt_bookkeeping_done_form:
-    description: LT bookkeeping done form status
+    description: Status of the lead-time (LT) bookkeeping-done form, indicating whether bookkeeping for the CCV registry step was completed on schedule.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.lt_bookkeeping_done_form
   fs_reasons_lt_overrun_register_ccv:
@@ -221,11 +230,11 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.hub_name
   long_term_payment:
-    description: Indicates if it is a long-term payment
+    description: Whether the buyer is settling the purchase through a long-term installment payment plan rather than a lump-sum payment.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.long_term_payment
   range_of_days_since_ccv:
-    description: Range of days since CCV signing
+    description: Bucketed range of days elapsed since the CCV (sale agreement) was signed, used to group contracts by aging in operational reporting.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.range_of_days_since_ccv
   thread_id:
@@ -233,63 +242,63 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.thread_id
   have_demand_note_reason:
-    description: Reason for having a demand note
+    description: Reason recorded for why a registry demand note (nota de exigencia) was issued on this contract (see cri_have_demand_note).
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.have_demand_note_reason
   is_deleted:
-    description: Flag indicating if the purchase sale contract is deleted
+    description: Whether this contract record has been soft-deleted in Salesforce and should be excluded from active reporting.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_deleted
   is_down_payment_paid:
-    description: Flag indicating if the down payment is paid
+    description: Whether the buyer's down payment (entrada) for this contract has been paid.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_down_payment_paid
   is_buyer_pays_entire_deposit:
-    description: Flag indicating if the buyer pays the entire deposit
+    description: Whether the buyer is responsible for paying the entire deposit (sinal) amount, rather than splitting it with the seller.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_buyer_pays_entire_deposit
   is_diligence_accepted:
-    description: Flag indicating if the diligence is accepted
+    description: Whether the outcome of the due-diligence (DD) review was accepted, allowing the deal to proceed toward Closed Deal (CD).
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_diligence_accepted
   has_down_payment_extension:
-    description: Flag indicating if there is a down payment extension
+    description: Whether an extension was granted on the down payment (entrada) deadline for this contract.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.has_down_payment_extension
   is_paid_via_ted:
-    description: Flag indicating if the payment is made via TED
+    description: Whether the payment for this contract was made via TED bank transfer, rather than another payment channel.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_paid_via_ted
   is_seller_pays_part_deposit:
-    description: Flag indicating if the seller pays part of the deposit
+    description: Whether the seller contributes part of the deposit (sinal) amount on this contract.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_seller_pays_part_deposit
   is_key_received:
-    description: Flag indicating if the key is received
+    description: Whether the property keys have been received as part of closing this contract.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_key_received
   is_continue_with_partner_registry:
-    description: Flag indicating if the process should continue with the partner registry
+    description: Whether the contract's registry process continues with QuintoAndar's partner notary/registry office (CRN/CRI parceiro), rather than a non-partner office.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_continue_with_partner_registry
   is_house_registry_must_be_updated:
-    description: Flag indicating if the house registry must be updated
+    description: Whether the house's property registry (matricula) requires an update as part of closing this contract.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_house_registry_must_be_updated
   is_suspended:
-    description: Flag indicating if the contract is suspended
+    description: Whether processing of this contract is currently suspended (paused) in the closing workflow.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_suspended
   is_assigned:
-    description: Flag indicating if the contract is assigned
+    description: Whether this contract case has been assigned to a responsible agent or analyst.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_assigned
   is_balance_payment_made:
-    description: Flag indicating if the balance payment was made
+    description: Whether the remaining balance payment (saldo) for the purchase has been made.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_balance_payment_made
   is_share_community_portal:
-    description: Flag indicating if it is shared on the community portal
+    description: Whether this contract's information is shared on the community/condominium portal.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_share_community_portal
   is_list_view_user:
@@ -297,19 +306,19 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_list_view_user
   is_house_registry_must_be_updated_form:
-    description: Flag from form indicating if the house registry must be updated
+    description: Whether the intake form flagged that the house's property registry (matricula) must be updated, ahead of the operational confirmation in is_house_registry_must_be_updated.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_house_registry_must_be_updated_form
   is_concomitant_registration:
-    description: Flag indicating if the registration is concomitant
+    description: Whether this contract's property registration is being processed concomitantly (jointly) with another related registration.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_concomitant_registration
   is_lease_complaint_sent:
-    description: Flag indicating if a lease complaint was sent
+    description: Whether a lease-related complaint notice was sent regarding the occupant of the house under this contract.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.is_lease_complaint_sent
   dt_down_payment_deadline:
-    description: Date of the down payment deadline
+    description: Deadline date by which the buyer's down payment (entrada) must be made for this contract.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.dt_down_payment_deadline
   dt_key_delivery_buyer:
@@ -329,7 +338,7 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.dt_updated
   dt_subscription_scheduling:
-    description: Date of the subscription scheduling
+    description: Scheduled date for the contract signing (subscription) appointment.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.dt_subscription_scheduling
   dt_bookkeeping_done_ccv:
@@ -377,15 +386,15 @@ columns:
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.ts_last_referenced
   ts_ccv_signed:
-    description: Timestamp of when the CCV was signed
+    description: Timestamp of when the CCV (sale agreement) was signed for this contract — the commercial closing milestone in the For Sale funnel, distinct from Closed Deal (CD).
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.ts_ccv_signed
   ts_ccv_termination:
-    description: Timestamp of when the CCV termination was created
+    description: Timestamp of when the CCV termination (distrato) record was created for this contract, if the sale agreement was cancelled.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.ts_ccv_termination
   ts_dd_accepted:
-    description: Timestamp of when the DD was accepted
+    description: Timestamp of when the due-diligence (DD) review outcome was accepted for this contract.
     lineage:
     - datalake_salesforce_clean.purchase_sale_contract.ts_dd_accepted
   year:

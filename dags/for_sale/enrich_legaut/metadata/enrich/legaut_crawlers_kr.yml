@@ -1,6 +1,19 @@
 database_name: datalake_legaut
 table_name: legaut_crawlers_kr
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: >-
+  Enriched Legaut crawler run/key-result table for Due Diligence document automation,
+  combining upstream clean and warehouse sources. One row per crawler run (id_crawler), joined
+  to the crawled unit/operation (meusite_unit), its project, location (meusite_city/meusite_state)
+  and delivered document (meusite_document), and labeled through the crawler-type reference
+  catalog (crawlers_crawlertype). Legaut has no column shared with the other For Sale enrich
+  tables in this repo — the property/offer a crawler run relates to is only identifiable
+  through the ids embedded in link_imovel_analise/link_imovel_imoveis, not a joinable key. The
+  Due Diligence milestones Legaut produces surface conceptually (without a shared join key) in
+  enrich_sale_offer_flows.sale_offer_flows and enrich_sale_closing_flows.closing_flow as
+  dt_legaut_analysis_started/dt_legaut_analysis_ended, both sourced from
+  datalake_sales_flow_clean.diligence.ts_partner_started/ts_partner_ended.
 columns:
   id_crawler:
     lineage:
@@ -17,7 +30,7 @@ columns:
   crawler_type:
     lineage:
     - datalake_legaut_clean.crawlers_crawler.type
-    description: Type code of the crawler, identifying which document or pendency it collects.
+    description: Foreign key to crawlers_crawlertype.value. Identifies which document or legal pendency type the crawler collects (e.g. property registration certificate, debt clearance certificate). The catalog of type codes and their metadata is maintained in the crawlers_crawlertype table; see crawler_type_label for the human-readable name.
   crawler_state:
     lineage:
     - datalake_legaut_clean.meusite_state.name
@@ -37,7 +50,15 @@ columns:
   crawler_status:
     lineage:
     - datalake_legaut_clean.crawlers_crawler.status
-    description: Current execution status of the crawler run.
+    description: Current execution status of the crawler run, stored as an integer code defined in the Legaut Crawler model.
+    categories:
+      "0": "Failed: the crawler failed to execute."
+      "1": "Running: the crawler is currently executing."
+      "2": "Completed: the crawler finished execution successfully."
+      "3": "Manual: the result was submitted manually instead of by an automated run."
+      "4": "Manual (via other crawler): the result was submitted manually through another crawler."
+      "5": "Waiting for info: the crawler is waiting for additional information to proceed."
+      "6": "Killed: the crawler process was terminated."
   document:
     lineage:
     - datalake_legaut_clean.meusite_document.file_name
@@ -66,5 +87,3 @@ columns:
     lineage:
     - datalake_legaut_clean.crawlers_crawler.ts_run_end
     description: Timestamp when the crawler run finished.
-owner: helder.rodrigues@quintoandar.com.br
-description: Enriched legaut crawlers kr table combining upstream clean and warehouse sources for Enriched Legaut legal automation tables for contract analysis and pendencies. Rows are shaped for analytics with derived attributes and business keys.

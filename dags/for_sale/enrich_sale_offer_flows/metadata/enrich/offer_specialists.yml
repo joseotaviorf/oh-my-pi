@@ -1,6 +1,18 @@
 database_name: datalake_sale_offer_flows
 table_name: offer_specialists
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: >-
+  Enriched table mapping the human specialists currently assigned to each For Sale offer at every
+  stage of the negotiation/closing funnel (Deal Maker, team lead, PRE, POST, CREDIT,
+  MORTGAGE_START/FUP/END, CRN, CRI, LEGAL_RISK, AGENT, FIFTY_AGENT, POST_DD and AGENT_LEAD_REFERRAL
+  specialist kinds from SalesFlow's specialist table), joined to EBDB user identities. One row per
+  offer (id_offer), with one id_user_X/id_X/X_name/X_email column group per specialist kind, always
+  keeping the most recently updated specialist per kind. Serves as the specialist-assignment source
+  for sale_offer_flows and for team performance/attribution analytics. id_offer is the same key
+  used across enrich_sale_offer_flows.sale_offer_flows/sale_offer_status and
+  enrich_sale_closing_flows.closing_flow, letting specialist assignments be joined to the full
+  offer negotiation and closing timeline.
 columns:
   id_offer:
     lineage:
@@ -242,5 +254,4 @@ columns:
     lineage:
     - datalake_sales_flow_clean.specialist.ts_updated
     description: Timestamp when the agent lead referral specialist record was last updated.
-owner: helder.rodrigues@quintoandar.com.br
-description: Enriched offer specialists table combining upstream clean and warehouse sources for Enriched offer-flow event tables tracking negotiation milestones. Rows are shaped for analytics with derived attributes and business keys.
+

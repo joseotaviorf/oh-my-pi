@@ -1,20 +1,34 @@
 database_name: datalake_sale_demand_events
 table_name: sale_demand_events
-description: 'Transactional table that registers a row for each key event in the funnel of ForSale demand. '
+description: >-
+  Fact table for the For Sale (real-estate purchase) demand funnel, with one row per key
+  buyer/house event: visit booked, visit completed, offer submitted, offer accepted, sale
+  agreement created, sale agreement signed, visit cancelled, or offer rejected. Built by
+  unioning event timestamps from the sale visit and sale offer clean tables
+  (datalake_sale_visit.sale_visit, datalake_sale_offer.sale_offer). Backs the For Sale
+  demand-funnel and Buyer Prospect (BP) metrics (e.g. event_name = VISIT_BOOKED identifies a
+  Buyer Prospect). id_sale_flow is the same buyer/house key used by enrich_sale_flows.sale_flow
+  (both built from the sale_visit/sale_offer/talk-to-agent event sources) — join the two to
+  connect a demand event to its full discovery-journey record. id_buyer/id_seller can be joined
+  with dw_public.dim_user, id_house with dw_house.dim_house, and sk_company_supply/sk_company_demand
+  with dw_rede.dim_company. Caution: id_offer here is sourced from datalake_sale_offer.sale_offer
+  (this DAG's own schema) and is NOT the same key space as id_offer in
+  enrich_sale_offer_flows.sale_offer_flows, which is sourced from the separate
+  datalake_sales_flow_clean.offer schema — do not join the two id_offer columns directly.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_event_type:
-    description: Key of the type of event (number from 1 to 8). Can be joined with dw_sale.dim_sale_event_type.
+    description: Identifies which stage of the demand funnel this row represents (e.g. visit booked, offer submitted, sale agreement signed). Surrogate key from 1 to 8; foreign key to dw_sale.dim_sale_event_type for the full event catalog.
     categories:
-      '1': The key has a value of 1, indicating that it's a booked visit event.
-      '2': The key has a value of 2, indicating that it's a completed visit event.
-      '3': The key has a value of 3, indicating that it's an offer submitted event.
-      '4': The key has a value of 4, indicating that it's an offer accepted event.
-      '5': The key has a value of 5, indicating that it's a sale agreement created event.
-      '6': The key has a value of 6, indicating that it's a sale agreement signed event.
-      '7': The key has a value of 7, indicating that it's a visit cancelled event.
-      '8': The key has a value of 8, indicating that it's an offer rejected event.
+      '1': Buyer booked a visit to the house (VISIT_BOOKED).
+      '2': Buyer completed the booked visit (VISIT_COMPLETED).
+      '3': Buyer submitted a purchase offer (OFFER_SUBMITTED).
+      '4': Seller accepted the buyer's offer (OFFER_ACCEPTED).
+      '5': Sale agreement (CCV) draft was created (SALE_AGREEMENT_CREATED).
+      '6': Sale agreement (CCV) was signed by both parties (SALE_AGREEMENT_SIGNED).
+      '7': The previously booked visit was cancelled (VISIT_CANCELLED).
+      '8': The offer was rejected or dismissed before acceptance (OFFER_REJECTED).
   sk_company_supply:
     lineage:
     - datalake_sale_visit.sale_visit.sk_company_supply
@@ -71,16 +85,16 @@ columns:
     - datalake_sale_offer.sale_offer.id_owner
     description: Key of the seller's user. Can be joined with dw_public.dim_user.
   event_name:
-    description: Name of the demand funnel event (e.g. VISIT_BOOKED, OFFER_SUBMITTED, SALE_AGREEMENT_SIGNED), the textual label corresponding to sk_event_type.
+    description: Textual name of the demand funnel event this row represents (the label counterpart of sk_event_type). event_name = VISIT_BOOKED identifies a Buyer Prospect (BP) in For Sale demand-funnel metrics; SALE_AGREEMENT_SIGNED is the CCV milestone.
     categories:
-      VISIT_BOOKED: The event is a booked visit.
-      VISIT_COMPLETED: The event is a completed visit.
-      OFFER_SUBMITTED: The event is an offer submitted.
-      OFFER_ACCEPTED: The event is an offer accepted.
-      SALE_AGREEMENT_CREATED: The event is a sale agreement created.
-      SALE_AGREEMENT_SIGNED: The event is a sale agreement signed.
-      VISIT_CANCELLED: The event is a visit cancelled.
-      OFFER_REJECTED: The event is an offer rejected.
+      VISIT_BOOKED: Buyer booked a visit to the house.
+      VISIT_COMPLETED: Buyer completed the booked visit.
+      OFFER_SUBMITTED: Buyer submitted a purchase offer.
+      OFFER_ACCEPTED: Seller accepted the buyer's offer.
+      SALE_AGREEMENT_CREATED: Sale agreement (CCV) draft was created.
+      SALE_AGREEMENT_SIGNED: Sale agreement (CCV) was signed by both parties.
+      VISIT_CANCELLED: The previously booked visit was cancelled.
+      OFFER_REJECTED: The offer was rejected or dismissed before acceptance.
   dt_event:
     lineage:
     - datalake_sale_visit.sale_visit.ts_booking_created
@@ -91,7 +105,7 @@ columns:
     - datalake_sale_offer.sale_offer.ts_sale_agreement_created
     - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     - datalake_sale_offer.sale_offer.ts_offer_dismissed
-    description: Date of when the event happened.
+    description: Calendar date (no time component) on which the funnel event occurred, used to bucket events by day for funnel and cohort analysis. Derived from the event-specific timestamp column for each event type (e.g. ts_booking_created for VISIT_BOOKED, ts_offer_submitted for OFFER_SUBMITTED).
   ts_event:
     lineage:
     - datalake_sale_visit.sale_visit.ts_booking_created
@@ -102,4 +116,4 @@ columns:
     - datalake_sale_offer.sale_offer.ts_sale_agreement_created
     - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     - datalake_sale_offer.sale_offer.ts_offer_dismissed
-    description: Timestamp of when the event happened, in UTC.
+    description: Full timestamp (UTC) at which the funnel event occurred, sourced from the corresponding event-specific timestamp column depending on event_name (visit booking/completion/cancellation from sale_visit; offer and sale-agreement milestones from sale_offer).

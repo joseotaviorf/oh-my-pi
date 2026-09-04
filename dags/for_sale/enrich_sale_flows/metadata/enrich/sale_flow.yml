@@ -1,6 +1,14 @@
 database_name: datalake_sale_flows
 table_name: sale_flow
-description: The sale flow is defined by the tuple buyer / house. It can be started when the buyer makes a booking, offer ou talk to agent event in some house. The table brings information about events (Dates, counts, flags, categories) that happened in each sale flow.
+description: >-
+  One row per (buyer, house) sale flow (id_sale_flow = buyer + house), started when the buyer
+  books a visit, makes an offer, or talks to an agent about that house. Aggregates
+  engagement/discovery-funnel events, counts, flags and days-between metrics for the flow.
+  id_buyer/id_seller can be joined with dw_public.dim_user, id_region with dw_public.dim_region,
+  and id_house with dw_house.dim_house and enrich_sale_flows.house_address_data/house_offers.
+  id_sale_flow is the same buyer/house key used by enrich_sale_demand_events.sale_demand_events
+  (event-level grain for the same journeys); enrich_sale_offer_flows.sale_offer_flows carries the
+  post-offer negotiation and closing details for offers made within this flow.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -72,9 +80,23 @@ columns:
       TTA_after_OS: Talked to the agent after the offer.
       'null': If the buyer didn't perform any event after the offer or not even made an offer.
   rank_buyer_sale_flow:
-    description: This number indicates the sequence of sale flows the buyer has made on the platform. For example, if the number is '2', it means that this is the second sale flow the buyer has made on the platform, not necessarily for the same house.
+    lineage:
+    - datalake_talk_to_agent.talk_to_agent_events.id_user
+    - datalake_talk_to_agent.talk_to_agent_events.ts_event
+    - datalake_visit.visit_schedules.id_visitor
+    - datalake_visit.visit_schedules.ts_schedule_created
+    - datalake_sale_offer.sale_offer.id_buyer
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: This number indicates the sequence of sale flows the buyer has made on the platform. For example, if the number is '2', it means that this is the second sale flow the buyer has made on the platform, not necessarily for the same house. Built by ranking each buyer's sale flows by their first event timestamp (booking, offer, or talk to agent).
   rank_house_sale_flow:
-    description: This number indicates the sequence of sale flows the house has had on the platform. For example, if the number is '2', it means that this is the second sale flow the house has had on the platform, not necessarily with the same buyer.
+    lineage:
+    - datalake_talk_to_agent.talk_to_agent_events.id_house
+    - datalake_talk_to_agent.talk_to_agent_events.ts_event
+    - datalake_visit.visit_schedules.id_house
+    - datalake_visit.visit_schedules.ts_schedule_created
+    - datalake_sale_offer.sale_offer.id_house
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: This number indicates the sequence of sale flows the house has had on the platform. For example, if the number is '2', it means that this is the second sale flow the house has had on the platform, not necessarily with the same buyer. Built by ranking each house's sale flows by their first event timestamp (booking, offer, or talk to agent).
   is_buyer_first_sale_flow:
     lineage:
     - datalake_talk_to_agent.talk_to_agent_events.id_user

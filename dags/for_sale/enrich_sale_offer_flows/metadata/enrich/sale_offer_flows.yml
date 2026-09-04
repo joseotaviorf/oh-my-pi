@@ -4,9 +4,17 @@ owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: >-
   Enriched table consolidating For Sale offer information from Sales Flow and related services.
-  id_sale_flow lineage includes datalake_firestore.sale_offer, a static table from the deprecated
-  enrich_sale_firestore pipeline (legacy Firestore/Monday system inactive since 2024); Firestore-sourced
-  identifiers reflect historical records only.
+  One row per offer (id_offer), the primary key shared with enrich_sale_offer_flows.offer_specialists
+  (specialist assignments) and, downstream of CCV signing, with enrich_sale_closing_flows.closing_flow
+  and enrich_sale_salesforce.purchase_sale_contract (the Salesforce mirror of the same deal).
+  id_sales_flow is the join key to enrich_sale_offer_flows.sale_offer_status (funnel step/status),
+  sale_offer_users and sale_offer_users_info (parties involved in the offer). id_sale_flow links
+  back to enrich_sale_flows.sale_flow, the pre-offer discovery journey for the same buyer/house.
+  id_house can be joined with dw_house.dim_house and enrich_sale_flows.house_address_data/house_offers;
+  id_buyer/id_seller can be joined with dw_public.dim_user. id_sale_flow lineage includes
+  datalake_firestore.sale_offer, a static table from the deprecated enrich_sale_firestore pipeline
+  (legacy Firestore/Monday system inactive since 2024); Firestore-sourced identifiers reflect
+  historical records only.
 columns:
   id_offer:
     lineage:
@@ -171,21 +179,72 @@ columns:
   vendas_offer_status:
     lineage:
     - datalake_sales_flow_clean.offer.status
-    description: Offer status as recorded in the Vendas (SalesFlow) offer table.
+    description: Offer status as recorded in the Vendas (SalesFlow) offer table, tracking the buyer/seller negotiation lifecycle before a sale agreement (CCV) exists.
+    categories:
+      DEFAULT: Offer created and not yet processed/triaged.
+      OFFER_ONGOING: Offer is in active negotiation between buyer and seller.
+      CONTRA_SELLER: Seller has made a counter-offer.
+      CONTRA_BUYER: Buyer has made a counter-offer.
+      OFFER_ACCEPTED: Offer was accepted by the seller.
+      OFFER_REJECTED: Offer was rejected/discarded.
+      STAND_BY_BUYER: Negotiation is paused waiting on the buyer.
+      STAND_BY_SELLER: Negotiation is paused waiting on the seller.
+      NO_CONTACT_BUYER: Buyer could not be reached.
+      NO_CONTACT_SELLER: Seller could not be reached.
+      OFFER_VALIDATED: Offer passed validation checks.
+      INVALID_OFFER: Offer failed validation and was invalidated.
+      BROKER_TEST: Test offer created by/for a broker, not a real transaction.
+      POST_ACCEPTED_DISPOSAL: Offer was discarded/disposed after having been accepted.
+      BROKER_SELLER: Offer flow involving a broker representing the seller.
+      NEGOTIATION_OUT_OF_5A: Negotiation is proceeding outside QuintoAndar's standard (5A) model.
+      BLANK_CHAT: Negotiation chat was opened but no messages were exchanged.
+      OA_VALIDATION: Offer is under validation by the offer-acceptance (OA) process.
   sale_agreement_status:
     lineage:
     - datalake_sales_flow_clean.ccv_flow.status
-    description: Current status of the sale agreement (CCV) flow.
+    description: Current status of the sale agreement (CCV - Contrato de Compra e Venda) flow, tracking drafting and signature after an offer is accepted.
+    categories:
+      PENDING_DOCUMENTATION: Waiting on buyer/seller documentation before drafting the CCV.
+      SEND_TO_CCV_QUEUE: Queued to have the CCV document drafted.
+      SEND_TO_BE_SIGNED: CCV draft is ready and sent out for signature.
+      SIGNED: CCV has been signed by all required parties.
+      LEGAL_PENDING_ISSUES: Blocked on a legal/compliance issue.
+      VISIT_REVISIT: Blocked pending a property (re)visit.
+      NO_RETURN_FROM_BUYER_OR_SELLER: Blocked because buyer or seller has not responded.
+      FINANCIAL_ISSUE: Blocked on a financial issue (e.g. payment/financing problem).
+      RIGHT_OF_FIRST_REFUSAL: Blocked pending right-of-first-refusal (direito de preferência) resolution.
+      OFFER_UNDER_ANALYSIS: The underlying offer is still under analysis.
+      ANOTHER_OFFER_ONGOING: Blocked because another competing offer is in progress for the same house.
+      SEND_TO_QUICK_QUEUE: Routed to an expedited processing queue.
+      SEND_TO_OPERATIONS_SUPPORT: Routed to operations support for manual handling.
   negotiation_model:
-    description: Where this offer started.
+    description: Which SalesFlow negotiation model/channel originated this offer's sales flow (standard Deal Maker-led flow, HUB, or Closing Central). Same raw value as flow_type.
     lineage:
     - datalake_sales_flow_clean.sales_flow.flow_type
+    categories:
+      DEFAULT: Standard negotiation model, led by a Deal Maker/specialist team.
+      HUB: Offer originated through the HUB negotiation channel.
+      CLOSING_CENTRAL: Offer originated through the Closing Central channel.
   flow_type:
-    description: Where this offer started.
+    description: Raw SalesFlow negotiation model/channel value for this offer's sales flow. Identical source value as negotiation_model, kept for backward compatibility with existing consumers.
     lineage:
     - datalake_sales_flow_clean.sales_flow.flow_type
+    categories:
+      DEFAULT: Standard negotiation model, led by a Deal Maker/specialist team.
+      HUB: Offer originated through the HUB negotiation channel.
+      CLOSING_CENTRAL: Offer originated through the Closing Central channel.
   vendas_offer_flow:
-    description: Information about which flow this offer is following
+    description: >-
+      Grouped/simplified version of the negotiation channel for reporting. Built by pattern-matching
+      sales_flow.flow_type: any value containing 'HUB' maps to HUB, any value containing 'CENTRAL'
+      maps to CENTRAL, and the exact value 'DEFAULT' maps to DEAL_MAKING (any other value yields
+      NULL).
+    lineage:
+    - datalake_sales_flow_clean.sales_flow.flow_type
+    categories:
+      HUB: Offer is following the HUB negotiation channel.
+      CENTRAL: Offer is following the Closing Central negotiation channel.
+      DEAL_MAKING: Offer is following the standard, Deal Maker-led negotiation channel.
   has_used_negotiation_chat:
     lineage:
     - datalake_sales_flow_clean.sales_flow.flow_type
@@ -198,25 +257,73 @@ columns:
     lineage:
     - datalake_sales_flow_clean.offer.discard_reason
     - datalake_sales_flow_clean.reject_reason.reason
-    description: Reason why an offer was discarded.
+    description: >-
+      Detailed reason why an offer was discarded/rejected. Built as reject_reason.reason when a
+      structured rejection reason exists, falling back to offer.discard_reason otherwise. Both
+      source columns are large, evolving enums in SalesFlow (offer.discard_reason has ~60+ values,
+      many prefixed OBSOLETE_ and no longer used; reject_reason.reason has ~65 values, about 25
+      currently active and the rest marked inactive) — see SalesFlow's DiscardReason and Reason enum
+      classes for the authoritative, current value list rather than a static mapping here.
   drop_reason_responsible:
-    description: Information about which type of user rejected the offer.
+    lineage:
+    - datalake_sales_flow_clean.reject_reason.source
+    - datalake_sales_flow_clean.offer.discard_reason
+    description: >-
+      Which party is considered responsible for dropping/rejecting the offer. Built by taking
+      reject_reason.source when present (mapped to Buyer/Seller, with LISTING and BROKERS_3P source
+      values also falling into Other), otherwise falling back to keyword-matching 'buyer'/'seller' in
+      offer.discard_reason; anything else is classified as Other.
+    categories:
+      Buyer: The buyer is responsible for the offer being dropped.
+      Seller: The seller is responsible for the offer being dropped.
+      Other: Responsibility could not be attributed to buyer or seller (e.g. listing- or partner-broker-related reasons, or an unclassified reason).
   credit_model:
     lineage:
     - datalake_sales_flow_clean.mortgage.credit_model
-    description: Credit model used for the mortgage financing on this offer.
+    description: Credit/mortgage origination model used for the mortgage financing on this offer (who originates and manages the credit).
+    categories:
+      ATTA: Mortgage originated internally through QuintoAndar's own credit product (ATTA).
+      EXTERNAL: Mortgage originated with an external bank/credit provider, outside ATTA.
+      UNDEFINED: Credit model has not yet been defined for this offer.
+      INTERNAL: Legacy/deprecated internal credit model, predating ATTA; no longer used for new offers.
   payment_model:
-    description: Payment model used in the purchase of the property (CCV_ASSISTANCE, INSTANT_MORTGAGE, etc)
+    description: Payment model / operational track used to close the purchase of the property (e.g. cash-only transfer, standard advance payment, instant mortgage, closing assistance).
     lineage:
     - datalake_sales_flow_clean.payment.payment_model
+    categories:
+      NA: Not applicable / not defined for this offer.
+      TRANSFER_BETWEEN_PARTS: Payment happens directly between buyer and seller, without QuintoAndar's standard flow.
+      MODEL_5A: Legacy "5A" model (Repasses), where QuintoAndar holds and passes through payments.
+      ADVANCED_PAYMENT: Standard payment model with an advance/down payment.
+      INSTANT_MORTGAGE: Fast-track mortgage model ("Chave Antecipada") allowing early key delivery.
+      CCV_ASSISTANCE: QuintoAndar only assists with the sale agreement (CCV), without managing the full closing.
+      BROKERAGE_TERM: Payment is governed by a brokerage term (Termo de Corretagem) rather than the standard flow.
+      CLOSING_3P: Closing handled by a partner real-estate agency (Rede) rather than directly by QuintoAndar.
+      CLOSING_PRIMARY_MARKET: Closing for a primary-market (new/developer) property purchase.
   payment_method:
-    description: Current payment method chosen for the offer (e.g. cash, financed).
+    description: Current payment method chosen for the offer, indicating whether the buyer pays cash or uses financing, and whether FGTS funds are used.
     lineage:
     - datalake_sales_flow_clean.payment.payment_method
+    categories:
+      CASH: Cash purchase, not using FGTS funds.
+      CASH_USING_FGTS: Cash purchase using FGTS (severance fund) funds.
+      FINANCED: Financed (mortgage) purchase, not using FGTS funds.
+      FINANCED_USING_FGTS: Financed (mortgage) purchase using FGTS funds.
+      FINANCED_USING_THIRD_COMPANY: Financed through a third-party/outside institution rather than QuintoAndar's standard flow (legacy alias 'FINANCED_OUTSIDE_5A').
+      NOT_DEFINED: Payment method not yet decided (legacy alias 'UNDECIDED').
   planned_payment_method:
     lineage:
     - datalake_sales_flow_clean.payment.payment_method
-    description: Payment method the buyer initially planned at offer creation.
+    description: >-
+      Payment method the buyer initially planned at offer creation (first recorded value from the
+      payment audit history), before any later changes. Same category values as payment_method.
+    categories:
+      CASH: Cash purchase, not using FGTS funds.
+      CASH_USING_FGTS: Cash purchase using FGTS (severance fund) funds.
+      FINANCED: Financed (mortgage) purchase, not using FGTS funds.
+      FINANCED_USING_FGTS: Financed (mortgage) purchase using FGTS funds.
+      FINANCED_USING_THIRD_COMPANY: Financed through a third-party/outside institution rather than QuintoAndar's standard flow (legacy alias 'FINANCED_OUTSIDE_5A').
+      NOT_DEFINED: Payment method not yet decided (legacy alias 'UNDECIDED').
   financing_value:
     lineage:
     - datalake_monopoly_clean.sale_revision.financed_amount
@@ -326,13 +433,42 @@ columns:
     lineage:
     - datalake_sales_flow.offer_specialists.post_dd_specialist_email
   closing_status:
-    description: Offer status, like canceled or credit_analysis.
+    description: Current step of the sales flow's overall closing process, spanning onboarding through post-closing seller payment/cancellation.
     lineage:
     - datalake_sales_flow_clean.sales_flow.status_closing
+    categories:
+      ONBOARDING: Sales flow just started, initial onboarding of the transaction.
+      EARNEST_PAYMENT: Waiting on the earnest/sinal payment.
+      DILIGENCE: House/seller due diligence is in progress.
+      CREDIT_ANALYSIS: Buyer's mortgage credit is under analysis.
+      DOWN_OR_CASH_PAYMENT: Waiting on the down payment or full cash payment.
+      DOCS_DELIVERY: Waiting on document delivery.
+      FINANCING_ANALYSIS: Financing/mortgage is under bank analysis.
+      FINANCING_CONFIRM: Financing terms are being confirmed.
+      FINANCING_SIGNATURE: Waiting on financing contract signature.
+      CASH_SIGNATURE: Waiting on cash-purchase contract signature.
+      EXPENSES_PAYMENT: Waiting on payment of closing expenses (fees/taxes).
+      VALUES_TRANSFER_5A: Values are being transferred through QuintoAndar's 5A flow.
+      CRI: In the real-estate registry (Cartório de Registro de Imóveis) step.
+      SELLER_PAYMENT: Seller has been paid; transaction effectively concluded.
+      WAITING_FINANCING_RESOURCES: Waiting for the financing institution to release funds.
+      END: Closing process finished.
+      DILIGENCE_CANCELED: Transaction was canceled during the diligence step.
+      CANCELED: Transaction was canceled.
   house_dilligence_status:
     lineage:
     - datalake_sales_flow_clean.house.house_registration_status
-    description: Status of the house registration diligence process.
+    description: Status of the house's registration/documentation diligence process (Matrícula analysis).
+    categories:
+      NOT_STARTED: House registration diligence has not started.
+      SIMPLE_APPOINTMENT: Simple appointment/note found on the registration (Apontamento Simples).
+      NO_APPOINTMENT: No appointment/restriction found on the registration.
+      NO_GO_APPOINTMENT: A blocking appointment/restriction was found; diligence fails the house.
+      PROCESSING: Registration document is being processed/analyzed.
+      DIVERGENT_SELLER: Seller on the registration diverges from the seller in the offer (PP divergente).
+      FIDUCIARY_SALE: Property is under a fiduciary sale/alienation (Alienação Fiduciária).
+      FIDUCIARY_SALE_DEBTS: Property is under fiduciary sale/alienation and also has associated debts.
+      SHARING_ASSETS: Property is under an asset-sharing process (partilha de bens), e.g. divorce/inheritance.
   diligence_appointment_reason:
     description: Concatenated list of diligence appointment reasons for the offer.
     lineage:
@@ -340,15 +476,55 @@ columns:
   seller_dilligence_status:
     lineage:
     - datalake_sales_flow_clean.diligence.classification
-    description: Classification status of the seller diligence process.
+    description: Risk classification of the seller/property diligence analysis for this offer.
+    categories:
+      NOT_STARTED: Diligence classification has not started.
+      NO_APPOINTMENT: No appointment/issue found during diligence.
+      LIGHT_APPOINTMENT: A light-severity appointment/issue was found.
+      MODERATE_APPOINTMENT: A moderate-severity appointment/issue was found.
+      CRITICAL_APPOINTMENT: A critical-severity appointment/issue was found.
+      NO_GO_APPOINTMENT: A blocking appointment/issue was found; diligence fails the offer.
+      LOW_RISK: Diligence classified the offer as low risk.
+      MODERATE_RISK: Diligence classified the offer as moderate risk.
+      HIGH_RISK: Diligence classified the offer as high risk.
+      NO_GO_HIGH_RISK: Diligence classified the offer as high risk and blocking (no-go).
   report_dilligence_status:
-    description: Current step of the diligence report process.
+    description: Current step of the diligence report's preparation and delivery workflow.
     lineage:
     - datalake_sales_flow_clean.diligence.step
+    categories:
+      NOT_STARTED: Diligence report workflow has not started.
+      LONG_TERM_PAYMENT: Deprecated legacy step, no longer used.
+      REQUEST_DD_LEGAL_RISK: Due-diligence legal risk analysis was requested.
+      PROCESSING: Report is being processed.
+      PENDING: Deprecated legacy step, no longer used.
+      DOC_AVAILABLE: Underlying documentation is available.
+      REPORT_UNDER_PREPARATION: Diligence report is being prepared.
+      REPORT_AVAILABLE: Diligence report is ready.
+      REPORT_SENT_SELLER: Diligence report was sent to the seller.
+      REPORT_SENT_BUYER: Diligence report was sent to the buyer.
+      CANCELLED: Diligence report workflow was cancelled.
   bank_analysis_status:
-    description: Status of the bank's mortgage analysis for the offer.
+    description: Status of the bank's mortgage financing analysis/process for the offer.
     lineage:
     - datalake_sales_flow_clean.mortgage.status
+    categories:
+      NOT_STARTED: Mortgage process has not started.
+      NEW: Mortgage process just created.
+      DOCS_PENDING: Waiting on documents from the buyer.
+      READY_TO_REVISION: Documents ready for revision.
+      STARTED: Mortgage process has started.
+      INSPECTION: Property inspection step for the mortgage.
+      IQ_INFORMATION: Waiting on information from the tenant (IQ - inquilino).
+      FGTS_WITHDRAW: FGTS withdrawal step in progress.
+      VALUES_CONFIRMED: Financing values have been confirmed.
+      CONTRACT_ISSUANCE: Financing contract is being issued.
+      SIGNING: Financing contract is being signed.
+      CONTRACT_CORRECTION: Financing contract needs correction.
+      SIGNED: Financing contract has been signed.
+      CREDIT_ANALYSIS: Credit is under bank analysis.
+      BACK_REANALYZING: Bank is re-analyzing the credit (back office reanalysis).
+      FRONT_PENDING: Pending action from the front-office/customer-facing step.
   payment_status:
     lineage:
     - datalake_sales_flow_clean.payment.status
@@ -370,18 +546,59 @@ columns:
     - datalake_sales_flow_clean.payment.entry_amount
     description: Value paid by the buyer on the beginning of the contract.
   credit_status:
-    description: Status of the buyer's credit analysis for the mortgage.
+    description: >-
+      Status of the buyer's credit analysis for the mortgage. Built by preferring the offer's most
+      recent CREDIT_ANALYSIS micro-status name from sale_offer_status (a business-configured status
+      value, not a fixed code enum) when available, and falling back to mortgage.credit_status
+      otherwise. The categories below only cover the mortgage.credit_status fallback values.
     lineage:
     - datalake_sales_flow_clean.mortgage.credit_status
     - datalake_sale_offer_flows.sale_offer_status.credit_analysis_status_name
+    categories:
+      NA: Not applicable / no credit process for this offer.
+      OPEN_TICKET: A credit-analysis ticket has been opened.
+      SIMU_SENT: Financing simulation was sent to the buyer.
+      WAITING_DOCUMENTATION: Waiting on buyer documentation for credit analysis.
+      BANK_ANALYSIS: Credit is under the bank's analysis.
+      APPROVED_CORRESP: Credit approved through a correspondent bank.
+      EXTERNAL_CREDIT: Buyer is using an external credit letter (carta de crédito) not managed by QuintoAndar.
+      APPROVED_DIFF_COND: Credit approved with different conditions than requested.
+      APPROVED_OUTSIDE_5A: Credit approved outside QuintoAndar's standard (5A) flow.
+      REJECTED: Credit was rejected (legacy/inactive value).
+      CLIENT_ANALYSIS: Credit under the client's own analysis (legacy/inactive value).
   real_estate_register_office_status:
-    description: Status at the real estate registry office (cartorio de registro de imoveis).
+    description: Status at the real estate registry office (cartório de registro de imóveis) for recording the deed/title transfer.
     lineage:
     - datalake_sales_flow_clean.notary.status
+    categories:
+      NOT_STARTED: Registry process has not started.
+      PROTOCOLED: Documents were protocoled (filed) at the registry office.
+      REQUIREMENT_NOTE: Registry office issued a requirement note/exigência (legacy/inactive value).
+      REGISTERED: Deed/title transfer has been registered.
+      WITHDRAWN: Process was withdrawn from the registry office.
+      FINISHED: Registry process is finished.
+      PENDING: Registry process pending (legacy/inactive value).
+      WAITING_SIGNATURE: Waiting on a signature required for registration.
+      REQUIREMENT_NOTE_ANSWERED: Requirement note was answered (legacy/inactive value).
+      REQUIREMENT_NOTE_PHYSICAL_SEND: Requirement note was physically sent (legacy/inactive value).
+      REQUIREMENT_NOTE_PHYSICAL_SEND_ANSWERED: Physically-sent requirement note was answered (legacy/inactive value).
   notary_office_status:
-    description: Status at the notary office (cartorio de notas) for the offer's deed.
+    description: Status at the notary office (cartório de notas) for drafting and signing the offer's public deed (escritura).
     lineage:
     - datalake_sales_flow_clean.cash_payment.status_notary_notes
+    categories:
+      NOT_STARTED: Notary office process has not started.
+      DRAFT_ORDER: Deed draft (minuta) has been ordered.
+      DRAFT_AVAILABLE: Deed draft is available.
+      DRAFT_IN_REVISION: Deed draft is under revision.
+      PAUSED: Process paused at the notary office (legacy/inactive value).
+      WAITING_PAYMENT: Waiting on payment of notary fees.
+      WAITING_SCHEDULE: Waiting to schedule the signature appointment.
+      SCHEDULED_SIGNATURE: Signature appointment has been scheduled.
+      SIGNED: Deed has been signed at the notary office.
+      OUTSIDE: Handled outside QuintoAndar's standard flow (Por Fora).
+      DISTRACT: Process was called off/distracted (legacy/inactive value).
+      LONG_TERM_PAYMENT: Legacy long-term payment step (legacy/inactive value).
   notary_office_details:
     description: Notary office status details
     lineage:
@@ -462,9 +679,26 @@ columns:
     - datalake_sales_flow_clean.sales_flow.is_canceled
     description: Boolean to identify if the cvv is cancelled.
   is_a_rescued_ccv:
-    description: Boolean to identify if this offer has an rescued ccv (A ccv that was cancelled and opened again)
+    description: >-
+      Boolean flag indicating this sales flow's sale agreement (CCV) was cancelled and then
+      reopened/rescued. Built by detecting a transition on sales_flow_aud where is_canceled flips
+      from TRUE back to FALSE after a prior cancellation with a closing_canceled_reason set.
+    lineage:
+    - datalake_sales_flow_clean.sales_flow_aud.is_canceled
+    - datalake_sales_flow_clean.sales_flow_aud.closing_canceled_reason
+    - datalake_sales_flow_clean.sales_flow_aud.ts_updated
   is_a_rescued_offer:
-    description: Boolean to identify if this offer is a rescued one (An offer that was cancelled and opened again)
+    description: >-
+      Boolean flag indicating this offer was discarded/rejected and later re-accepted (rescued),
+      rather than being accepted for the first time. Built by comparing offer acceptance and
+      discard timestamps in offer_aud history (accepted after a later discard) and, for offers
+      without that audit trail, by checking whether the parent sales flow is not canceled but still
+      carries a prior cancellation timestamp.
+    lineage:
+    - datalake_sales_flow_clean.offer_aud.ts_accepted
+    - datalake_sales_flow_clean.offer_aud.ts_discarded
+    - datalake_sales_flow_clean.sales_flow.is_canceled
+    - datalake_sales_flow_clean.sales_flow.ts_canceled
   is_ccv_5a_model:
     lineage:
     - datalake_sales_flow_clean.ccv_flow.is_5a_model

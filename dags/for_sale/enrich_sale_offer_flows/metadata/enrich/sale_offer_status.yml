@@ -1,6 +1,18 @@
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_status
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: >-
+  Enriched table tracking the current macro/micro status and closing-type funnel position of each
+  For Sale offer's sales flow, built from SalesFlow's status, status_record, status_order and
+  closing_type tables. One row per (id_sales_flow, id_status) combination, keeping the most recent
+  status_record per status. macro_status_name, last_micro_status_name and the closing-type labels
+  come from SalesFlow's business-configured status/closing_type reference tables rather than a
+  fixed application enum, so their full value set lives in that reference data, not in application
+  source code. Used by sale_offer_flows (e.g. credit_analysis_status_name, dt_onboarding_ended) and
+  by closing-funnel monitoring to measure how long an offer has spent in its current step.
+  id_sales_flow is the same join key used by enrich_sale_offer_flows.sale_offer_flows.id_sales_flow
+  and sale_offer_users.id_sales_flow (and, for Firestore-era records, id_firestore).
 columns:
   id_sales_flow:
     lineage:
@@ -42,5 +54,4 @@ columns:
     lineage:
     - datalake_sales_flow_clean.status_record.ts_updated
     description: Timestamp of the last micro status update for the offer status record.
-owner: helder.rodrigues@quintoandar.com.br
-description: Enriched sale offer status table combining upstream clean and warehouse sources for Enriched offer-flow event tables tracking negotiation milestones. Rows are shaped for analytics with derived attributes and business keys.
+

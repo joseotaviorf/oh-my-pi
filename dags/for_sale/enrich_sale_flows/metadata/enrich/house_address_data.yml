@@ -1,25 +1,49 @@
 database_name: datalake_sale_flows
 table_name: house_address_data
-description: Historical data about the property address
+description: >-
+  Enrich table combining house registration/land-tenure verification data with the property's
+  physical address, for houses tracked in the For Sale funnel. One row per house (id_house) per
+  daily load partition (year/month/day); reflects the latest known house record and the address
+  record valid on that reference day. Used to assess legal/registry risk and to display the
+  property location for a sale flow. id_house is the same key used across the rest of the
+  enrich_sale_flows DAG (house_offers, sale_flow) and can be joined with dw_house.dim_house;
+  id_address_data identifies the specific address record valid for that house on the reference
+  day.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_house:
     lineage:
     - datalake_sales_flow_clean.house.id
-    description: Unique identifier of the house
+    description: Unique identifier of the house/listing being sold. Primary key of this table (one row per house per daily load partition); can be joined to dw_house.dim_house and to the id_house column of the sale_flow and house_offers enrich tables.
   id_address_data:
     lineage:
     - datalake_sales_flow_clean.house.id_address_data
-    description: Unique identifier of the house address
+    description: Foreign key to the address record in datalake_sales_flow_clean.address_data that is linked to this house; identifies which physical address (street, city, etc.) is associated with it.
   house_registration_status:
     lineage:
     - datalake_sales_flow_clean.house.house_registration_status
-    description: Registration status of the house in the property registry (e.g. whether the deed is registered).
+    description: Status of the property's title/registration check at the notary registry office (cartório), used by the legal/closing team to assess registration risk before and during the sale. Built from the house registration verification workflow in the sales-flow source system.
+    categories:
+      NOT_STARTED: Registration check has not started yet.
+      PROCESSING: Registration check is in progress at the registry office.
+      NO_APPOINTMENT: No annotations or liens found on the registry — clean title.
+      SIMPLE_APPOINTMENT: A minor annotation (simple lien) was found on the registry.
+      NO_GO_APPOINTMENT: A blocking annotation was found that prevents the deal from proceeding.
+      DIVERGENT_SELLER: The registered owner of record does not match the declared seller.
+      FIDUCIARY_SALE: Property is under a fiduciary/collateral sale (bank-held lien).
+      FIDUCIARY_SALE_DEBTS: Property is under a fiduciary sale and also has outstanding debts.
+      SHARING_ASSETS: Property is under asset-division/inheritance proceedings.
   land_tenure:
     lineage:
     - datalake_sales_flow_clean.house.land_tenure
-    description: Type of land tenure or ownership regime of the property.
+    description: Land tenure/ownership regime of the property, used to flag houses under a special (non-freehold) tenure regime that requires extra legal handling before closing.
+    categories:
+      NOT_VERIFIED: Land tenure regime has not been checked yet.
+      NOT_IN_LAND_TENURE: Property is not under any special land-tenure (aforamento) regime — regular freehold.
+      UNION: Property is under federal-government land tenure (aforamento da União).
+      COUNTY: Property is under municipal land tenure.
+      RELIGIOUS: Property is under land tenure held by a religious institution.
   street:
     lineage:
     - datalake_sales_flow_clean.address_data.street
@@ -61,23 +85,23 @@ columns:
   has_seller_debt_payments:
     lineage:
     - datalake_sales_flow_clean.house.has_seller_debt_payments
-    description: Boolean flag indicating whether seller debt payments applies to this record.
+    description: Boolean flag indicating whether the seller has outstanding debts (e.g. condo fees, property tax) tied to the house that need to be settled as part of the closing process.
   ts_house_created:
     lineage:
     - datalake_sales_flow_clean.house.ts_house_created
-    description: House creation date
+    description: Timestamp when the house record was first created in the sales-flow source system.
   ts_last_house_updated:
     lineage:
     - datalake_sales_flow_clean.house.ts_last_house_updated
-    description: Date of last house update
+    description: Timestamp of the most recent update to the house record as of the load date. The pipeline keeps only the latest house version per id_house for each daily partition.
   ts_created:
     lineage:
     - datalake_sales_flow_clean.address_data.ts_created
-    description: Address creation date
+    description: Timestamp when the address record was first created in the sales-flow source system.
   ts_updated:
     lineage:
     - datalake_sales_flow_clean.address_data.ts_updated
-    description: Address update date
+    description: Timestamp when the address record was last updated. The pipeline loads the address version valid for the given year/month/day partition.
   year:
     lineage:
     - datalake_sales_flow_clean.address_data.year

@@ -1,6 +1,13 @@
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_users
-description: Enriched table for sales flow users. This table contains info for each users involved in the offer flow after it gets accepted and before the sale agreement flow get started.
+description: >-
+  One row per (id_sales_flow, id_user) — every user (buyer, seller, or invited co-signer/joint-buyer)
+  involved in a sales flow's offer negotiation, from offer acceptance through the CCV signing
+  process. id_sales_flow is the same join key used by enrich_sale_offer_flows.sale_offer_flows
+  and sale_offer_status. id_house can be joined with dw_house.dim_house. This table's
+  boolean/status flag columns (role, CCV buyer/signer, legal type, original-user, income-partner,
+  joint-buyer) are deduplicated into enrich_sale_offer_flows.sale_offer_users_info — matched by
+  those same flag values (not a shared id column) to obtain the sk_user_info surrogate key.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -45,11 +52,19 @@ columns:
   type:
     lineage:
     - datalake_sales_flow_clean.sales_flow_users.type
-    description: User type, it can be BUYER or SELLER.
+    description: Role this user plays on the offer's sales flow (buyer, seller, or property owner).
+    categories:
+      BUYER: User is a buyer on this offer.
+      SELLER: User is a seller (co-owner) on this offer.
+      OWNER: User is the property owner on this offer, distinct from a generic seller.
   invite_status:
     lineage:
     - datalake_sales_flow_clean.sales_flow_invite_aud.status
-    description: In case of an invited user this column indicates it's invite status.
+    description: For a user who was invited to join the offer (e.g. a co-buyer or co-seller), the current status of that invite.
+    categories:
+      PENDING: Invite was created and is awaiting the invitee's response.
+      ACCEPTED: Invitee accepted the invite and joined the offer.
+      CANCELLED: Invite was cancelled before being accepted.
   name:
     lineage:
     - datalake_sales_flow_clean.users.name
@@ -69,7 +84,10 @@ columns:
   buyer_signer_status:
     lineage:
     - datalake_sales_flow_clean.buyer_data.signer_status
-    description: For buyers this column indicates if this user is a ccv signer or not.
+    description: For buyers, indicates whether this user is a required signer of the sale agreement (CCV).
+    categories:
+      SIGNER: Buyer is a required signer of the sale agreement.
+      NOT_SIGNER: Buyer is not required to sign the sale agreement.
   buyer_holding_value:
     lineage:
     - datalake_sales_flow_clean.buyer_data.holding_value

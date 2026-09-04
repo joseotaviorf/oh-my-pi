@@ -1,42 +1,50 @@
 database_name: datalake_sale_flows
 table_name: house_offers
-description: This table lists houses with offers, sellers, buyers and sale flow
+description: >-
+  Daily incremental snapshot linking houses to their offers, buyers and sellers in the For Sale
+  funnel. One row per (house, sales flow, offer) combination that was created or changed on the
+  load date — detected via the sales flow, the offer, or the house's own change timestamps/flags.
+  Used to trace which offers and parties (buyer/seller) are associated with a given house.
+  id_house is shared with enrich_sale_flows.house_address_data (property registry/address data)
+  and enrich_sale_flows.sale_flow (same buyer/house grain); id_sales_flow/id_offer can be joined
+  with enrich_sale_offer_flows.sale_offer_flows for the full offer negotiation and closing
+  details; id_buyer/id_seller can be joined with dw_public.dim_user.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_house:
     lineage:
     - datalake_sales_flow_clean.house_aud.id
-    description: Unique identifier of the house
+    description: Foreign key identifying the house/listing the offer was made on; can be joined to dw_house.dim_house and to id_house in the house_address_data and sale_flow enrich tables.
   id_address_data:
     lineage:
     - datalake_sales_flow_clean.house_aud.id_address_data
-    description: Unique identifier of the house address
+    description: Foreign key to the address record linked to this house; identifies which physical address (street, city, etc.) is associated with it. Can be joined to house_address_data.id_address_data.
   id_offer:
     lineage:
     - datalake_sales_flow_clean.offer.id
-    description: Unique identifier of the offer
+    description: Unique identifier of the purchase offer submitted for this house in the sales-flow source system.
   id_firestore:
     lineage:
     - datalake_sales_flow_clean.offer.id_firestore
-    description: Unique identifier of the firestore
+    description: External identifier of the offer (the "firestoreId" in the sales-flow API), inherited from the legacy Firestore-based offer front end. Used to correlate offers across the current sales-flow system and legacy/front-end systems that still reference this ID.
   id_sales_flow:
     lineage:
     - datalake_sales_flow_clean.offer.id_sales_flow
-    description: Unique identifier of the sales flow
+    description: Foreign key to the sales-flow record (post-offer buyer/house journey — CCV, diligence, financing, closing) that this offer belongs to in the sales-flow source system. Distinct from id_sale_flow in the sale_flow enrich table, which is a separate buyer-house key covering the pre-offer visit/talk-to-agent journey.
   id_buyer:
     lineage:
     - datalake_sales_flow_clean.sales_flow_aud.id_buyer
-    description: Unique identifier of the buyer
+    description: Foreign key identifying the buyer who made the offer; can be joined to dw_public.dim_user.
   id_seller:
     lineage:
     - datalake_sales_flow_clean.sales_flow_aud.id_seller
-    description: Unique identifier of the seller
+    description: Foreign key identifying the seller (house owner) who received the offer; can be joined to dw_public.dim_user.
   dt_load:
-    description: Data loading date
+    description: Calendar date this snapshot represents, built from the {year}-{month}-{day} pipeline partition parameters used to select which offers/houses/sales flows changed on that day.
   year:
-    description: Year of data loading date
+    description: Year of the pipeline load partition (dt_load).
   month:
-    description: Month of data loading date
+    description: Month of the pipeline load partition (dt_load).
   day:
-    description: Day of data loading date
+    description: Day of the pipeline load partition (dt_load).

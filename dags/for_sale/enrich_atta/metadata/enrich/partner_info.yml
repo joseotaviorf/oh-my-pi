@@ -1,33 +1,45 @@
 database_name: datalake_atta
 table_name: partner_info
-description: Table containing the details from atta partners
+description: >-
+  Registry of financing and brokerage partner entities (banks, correspondents, franchises)
+  operating on the Atta platform, used across the For Sale mortgage-financing funnel. One row
+  per partner (id_partner). id_franchise is a foreign key to Atta's franchise table, grouping
+  partners under the same franchise/network; id_admin_user and id_registration_user reference
+  the Atta staff who administer or registered the partner. This is the partner master
+  referenced by enrich_atta.proposal_situation_changes via id_partner, which links each
+  financing proposal to the partner handling it.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_partner:
     lineage:
     - datalake_atta_clean.partner_info.id_partner
-    description: Partner's identification number
+    description: Unique identifier of the financing/brokerage partner entity in the Atta platform. Primary key of this table.
   id_admin_user:
     lineage:
     - datalake_atta_clean.partner_info.id_admin_user
-    description: Admin user's identification number
+    description: Identifier of the Atta staff/admin user responsible for managing this partner account (source column IDUsuResp on the partner table).
   id_franchise:
     lineage:
     - datalake_atta_clean.partner_info.id_franchise
-    description: Franchise's identification number
+    description: Foreign key to the Atta franchise (franquia) entity. Identifies which commercial franchise unit the partner is affiliated with.
   id_registration_user:
     lineage:
     - datalake_atta_clean.partner_info.id_registration_user
-    description: User's identification number
+    description: Identifier of the Atta user who registered/created this partner record (source column idUsuCad on the partner table).
   partner_name:
     lineage:
     - datalake_atta_clean.partner_info.partner_name
     description: Legal or commercial name of the financing or brokerage partner entity.
   wallet:
-    description: Partnerships description
+    description: Business segmentation bucket for the partner, derived by pattern-matching on partner_name. Used to separate QuintoAndar-operated partner wallets from external correspondent partnerships (e.g. Casa Mineira) in commercial and portfolio reporting.
     lineage:
     - datalake_atta_clean.partner_info.partner_name
+    categories:
+      "QuintoAndar Full Atta": "Partner name matches the '5a>>atta' pattern or starts with 'carteira h' — fully QuintoAndar-operated Atta wallet."
+      "QuintoAndar Backlog": "Partner name matches the '5a' pattern (excluding Full Atta cases) — QuintoAndar backlog partner wallet."
+      "Casa Mineira": "Partner name contains 'casa mineira' — Casa Mineira correspondent partnership."
+      "Other partnerships": "Partner name does not match any of the above patterns — other/external correspondent partnership."
   ts_registration:
     lineage:
     - datalake_atta_clean.partner_info.ts_registration
@@ -35,4 +47,4 @@ columns:
   ts_inactive_user:
     lineage:
     - datalake_atta_clean.partner_info.ts_inactive_user
-    description: Timestamp when user became inactive
+    description: Timestamp when the partner was marked inactive in Atta (source column DtInativo on the partner table). Null while the partner remains active.

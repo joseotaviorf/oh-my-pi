@@ -2,7 +2,14 @@ database_name: datalake_atta
 table_name: proposal_situation_changes
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table containing the leadtime for each proposal situation
+description: >-
+  History table with one row per status/situation transition of an Atta financing proposal
+  (id_proposal, proposal_order), used to measure how long each proposal stayed in each
+  situation (lead_time_* columns). id_partner is a foreign key to enrich_atta.partner_info,
+  identifying the partner handling the proposal. Shares its grain key (id_proposal) with
+  enrich_atta.proposal_dates, which aggregates the same underlying proposal history into one
+  row per proposal with named milestone timestamps instead of a full transition-by-transition
+  history.
 columns:
   id_proposal:
     description: Foreign key to the financing or sale proposal in the Atta platform.
@@ -10,31 +17,105 @@ columns:
     - datalake_atta_clean.log_isolve_v1.id_proposal
     - datalake_atta_clean.log_isolve_v2.id_proposal
   id_partner:
-    description: ID to identify the partner
+    description: Foreign key to partner_info.id_partner. Identifies the financing/brokerage partner (Atta correspondent) handling this proposal.
     lineage:
-    - datalake_atta_clean.log_isolve_v1.id_current_status
-    - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.partner_info.id_partner
   proposal_order:
-    description: Number to identify the order of situation
+    description: Sequential order of this situation/status change within the proposal's history, starting at 1 for the earliest logged transition and ordered by log timestamp.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.ts_created
   proposal_status:
-    description: Current status of the financing or sale proposal in the partner workflow.
+    description: Track/step name of the financing proposal workflow that this situation change belongs to (e.g. credit letter, inspection, contracting), joined from track_step_detail by decision number and product.
     lineage:
     - datalake_atta_clean.track_step_detail.proposal_status
+    categories:
+      "Carta de Crédito": "Credit letter stage: evaluation and issuance of the buyer's pre-approved credit letter."
+      "Vistoria": "Inspection stage: property inspection step of the financing process."
+      "Checklist": "Checklist stage: document checklist validation step."
+      "Contratação": "Contracting stage: bank/legal contracting and legal analysis step."
+      "Conf / Emissão": "Confirmation/issuance stage: final confirmation and issuance of the financing contract."
+      "Pré - Análise": "Pre-analysis stage: initial eligibility/credit pre-analysis before the formal application."
+      "Contratado": "Contracted stage: financing has been contracted; final closed stage of the workflow."
+    # Other track/step names may exist in track_step_detail beyond the ones verified above.
   situation_history:
-    description: Previous proposal situation label preceding this transition (for example Andamento, Aprovado, Pendente).
+    description: Proposal situation label immediately before this transition (for example Andamento, Aprovado, Pendente); the situation the proposal was leaving at ts_start_situation.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.id_previous_proposal_situation
+    - datalake_atta_clean.log_isolve_v2.from
+    categories:
+      "Andamento": "In progress: proposal actively moving through the workflow."
+      "Aprovado": "Approved: proposal was approved at this stage."
+      "Pendente": "Pending: proposal is awaiting additional information or action."
+      "Reprovado": "Rejected: proposal was denied at this stage."
+      "Cancelada": "Canceled: proposal was canceled."
+      "Finalizada": "Finalized: proposal process completed."
+      "Em Análise": "Under analysis: proposal is being reviewed."
+      "Análise Atta": "Under Atta analysis: reviewed internally by Atta."
+      "Análise Banco": "Under bank analysis: reviewed by the financing bank."
+      "Análise Banco Duvida": "Bank analysis query: the bank raised a question needing clarification."
+      "Não Passível de Defesa": "Not eligible for appeal/defense."
+      "Revisão": "Under revision."
+      "Não Processado Banco": "Not processed by the bank."
+      "Divergência de Cadastro": "Registration data discrepancy found."
+      "Notas de Exigência": "Requirement notes issued: bank requested additional documents/conditions."
+      "Cartório Externo": "External notary office step."
+      "Aprovado Condicionado": "Conditionally approved."
   next_situation:
-    description: Next situation description
+    description: Proposal situation label the proposal moved into at this transition (for example Andamento, Aprovado, Pendente); the situation reached at ts_end_situation. Null for the synthetic row representing the proposal's current (still open) situation.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.id_current_proposal_situation
+    - datalake_atta_clean.log_isolve_v2.to
+    categories:
+      "Andamento": "In progress: proposal actively moving through the workflow."
+      "Aprovado": "Approved: proposal was approved at this stage."
+      "Pendente": "Pending: proposal is awaiting additional information or action."
+      "Reprovado": "Rejected: proposal was denied at this stage."
+      "Cancelada": "Canceled: proposal was canceled."
+      "Finalizada": "Finalized: proposal process completed."
+      "Em Análise": "Under analysis: proposal is being reviewed."
+      "Análise Atta": "Under Atta analysis: reviewed internally by Atta."
+      "Análise Banco": "Under bank analysis: reviewed by the financing bank."
+      "Análise Banco Duvida": "Bank analysis query: the bank raised a question needing clarification."
+      "Não Passível de Defesa": "Not eligible for appeal/defense."
+      "Revisão": "Under revision."
+      "Não Processado Banco": "Not processed by the bank."
+      "Divergência de Cadastro": "Registration data discrepancy found."
+      "Notas de Exigência": "Requirement notes issued: bank requested additional documents/conditions."
+      "Cartório Externo": "External notary office step."
+      "Aprovado Condicionado": "Conditionally approved."
   ts_proposal_registration:
-    description: Proposal registration timestamp
+    description: Timestamp when the underlying financing proposal was registered in Atta. Used as the starting reference for the first logged situation's lead time.
+    lineage:
+    - datalake_atta_clean.proposal.ts_registration
   ts_start_situation:
-    description: Start current situation timestamp
+    description: Timestamp when the proposal entered this situation. For the first logged situation this is the proposal registration timestamp; for later situations it is the end timestamp of the immediately preceding situation.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.ts_created
+    - datalake_atta_clean.proposal.ts_registration
   ts_end_situation:
-    description: End current situation timestamp
+    description: Timestamp when the proposal exited this situation, i.e. when the log entry that closed it was recorded. Null for the synthetic row representing the proposal's current (still open) situation.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.ts_created
   lead_time_situation_in_minutes:
-    description: Situation leadtime in minutes
+    description: Duration the proposal spent in this situation, in minutes, computed as the difference between ts_end_situation and ts_start_situation.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.ts_created
   lead_time_situation_in_hour:
-    description: Situation leadtime in hours
+    description: Duration the proposal spent in this situation, in hours, computed as the difference between ts_end_situation and ts_start_situation.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.ts_created
   lead_time_situation_in_day:
-    description: Situation leadtime in days
+    description: Duration the proposal spent in this situation, in days, computed as the calendar-day difference between ts_end_situation and ts_start_situation.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.ts_created
   lead_time_status_in_day:
-    description: Status leadtime in days
+    description: Total duration in days the proposal spent across all transitions within the same workflow step (proposal_status), computed as the day difference between the earliest and latest log timestamp recorded for that step; counts up to the current date if the step has not closed yet.
+    lineage:
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.ts_created
