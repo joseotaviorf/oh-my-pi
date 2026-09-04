@@ -125,7 +125,7 @@ INNER JOIN
         AND cs.bot IN ('matthew', 'wall-e')
 WHERE
     MAKE_DATE(obs.year, obs.month, obs.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-    AND obs.ts_started >= TIMESTAMP('{load_start_date}')
+    AND obs.ts_started >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
     AND trc.environment = 'prod'
     AND trc.id_session IS NOT NULL
     AND (

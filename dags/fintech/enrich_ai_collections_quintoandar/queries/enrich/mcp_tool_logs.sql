@@ -24,7 +24,7 @@ WITH collections AS (
         datalake_request_logging_clean.collections AS c
     WHERE
         MAKE_DATE(c.year, c.month, c.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND c.ts_request >= TIMESTAMP('{load_start_date}')
+        AND c.ts_request >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
         AND c.tool_name IS NOT NULL
         AND c.id_event = CONCAT('MCP_TOOL_', c.tool_name)
 ),
@@ -42,7 +42,7 @@ tool_observations AS (
         datalake_langfuse_clean.observations AS obs
     WHERE
         MAKE_DATE(obs.year, obs.month, obs.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND obs.ts_started >= TIMESTAMP('{load_start_date}')
+        AND obs.ts_started >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
         AND obs.type = 'TOOL'
         AND NOT (obs.level = 'ERROR' AND obs.output IS NULL)
         AND LOWER(obs.name) IN (

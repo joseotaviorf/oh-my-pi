@@ -22,7 +22,7 @@ WITH trace_first_ranked AS (
             AND cs.bot IN ('matthew', 'wall-e')
     WHERE
         MAKE_DATE(t.year, t.month, t.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND t.ts_created >= TIMESTAMP('{load_start_date}')
+        AND t.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
         AND t.environment = 'prod'
         AND t.id_session IS NOT NULL
 ),
