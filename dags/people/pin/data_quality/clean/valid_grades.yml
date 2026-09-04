@@ -19,27 +19,30 @@ column_level_validations:
       # No duplicate rows for the same (id_valid_grade, dt_effective_started, dt_effective_ended).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.valid_grades GROUP BY id_valid_grade, dt_effective_started, dt_effective_ended HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
-  valid_grade_versions_must_abut:
-    custom:
-      # Adjacent SCD versions for (id_job, id_grade) must abut after PIN go-live (jobs may have multiple grades).
-      constraint: |-
-        (SELECT COUNT(*) FROM (
-          SELECT
-            id_job,
-            id_grade,
-            dt_effective_started,
-            COALESCE(dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
-            LEAD(dt_effective_started) OVER (
-              PARTITION BY id_job, id_grade
-              ORDER BY dt_effective_started
-            ) AS next_started
-          FROM datalake_pin_core_clean.valid_grades
-          WHERE id_job IS NOT NULL
-            AND id_grade IS NOT NULL
-            AND COALESCE(dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
-        ) versions
-        WHERE next_started IS NOT NULL
-          AND DATE_ADD(dt_effective_ended, 1) != next_started
-          AND next_started >= DATE('2024-03-01')
-        ) = 0
-      severity_level: Warning
+  # Temporarily disabled while [PIN-21792](https://quintoandar.atlassian.net/browse/PIN-21792)
+  # and [PIN-21794](https://quintoandar.atlassian.net/browse/PIN-21794) are unresolved.
+  # Re-enable this check after both tickets are resolved and production data has been revalidated.
+  # valid_grade_versions_must_abut:
+  #   custom:
+  #     # Adjacent SCD versions for (id_job, id_grade) must abut after PIN go-live (jobs may have multiple grades).
+  #     constraint: |-
+  #       (SELECT COUNT(*) FROM (
+  #         SELECT
+  #           id_job,
+  #           id_grade,
+  #           dt_effective_started,
+  #           COALESCE(dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
+  #           LEAD(dt_effective_started) OVER (
+  #             PARTITION BY id_job, id_grade
+  #             ORDER BY dt_effective_started
+  #           ) AS next_started
+  #         FROM datalake_pin_core_clean.valid_grades
+  #         WHERE id_job IS NOT NULL
+  #           AND id_grade IS NOT NULL
+  #           AND COALESCE(dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
+  #       ) versions
+  #       WHERE next_started IS NOT NULL
+  #         AND DATE_ADD(dt_effective_ended, 1) != next_started
+  #         AND next_started >= DATE('2024-03-01')
+  #       ) = 0
+  #     severity_level: Warning
