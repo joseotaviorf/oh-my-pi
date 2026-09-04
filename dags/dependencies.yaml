@@ -1492,7 +1492,6 @@ bietlejuice.enrich_ai_collections_quintoandar:
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day
   - bietlejuice.request_logging:load-clean-collections:first-run-of-day
 bietlejuice.enrich_ai_usage:
-  - bietlejuice.claude_admin_api:load-clean-spend-limits:first-run-of-day
   - bietlejuice.claude_usage_api:load-clean-user-cost:first-run-of-day
   - bietlejuice.claude_usage_api:load-clean-user-usage:first-run-of-day
 bietlejuice.enrich_airtable:
@@ -2386,9 +2385,9 @@ bietlejuice.enrich_demand_conversion_events:
 bietlejuice.enrich_demand_score_report:
   - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score:first-run-of-day
 bietlejuice.enrich_docpilot:
-  - bietlejuice.docpilot:load-clean-income-extraction:first-run-of-day
   - bietlejuice.docpilot:load-clean-income-extraction-batch:first-run-of-day
   - bietlejuice.docpilot:load-clean-income-extraction-document:first-run-of-day
+  - bietlejuice.docpilot:load-clean-income-extraction:first-run-of-day
   - bietlejuice.docpilot_platform:load-clean-document:first-run-of-day
   - bietlejuice.docpilot_platform:load-clean-extraction:first-run-of-day
   - bietlejuice.docx:load-clean-document:first-run-of-day
