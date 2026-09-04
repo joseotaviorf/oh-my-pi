@@ -1,13 +1,22 @@
 cluster:
   type: emr_7_12_consolidation_l_general_cluster
   custom_configurations:
-    # 25 Amplitude event loads per cluster (367 tables -> 15 clusters). With the
-    # queries now pruning on the year/month/day partition columns, each load reads a
-    # single day (~tens of MB) instead of full-scanning the 54GB events table, so the
-    # cluster can be small. Small 8g executors keep GC pauses short — the 24g heaps
-    # tried earlier caused multi-minute GC and executor heartbeat timeouts. Run 8 at a
-    # time on 3 m6g.4xlarge core nodes. No cluster autoscale; Spark dynamicAllocation on
-    # (min 1 / max 3) since the pruned data is light. max_active_tasks: 120 (15 x 8).
+    # 25 Amplitude event loads per cluster (367 tables -> 15 clusters).
+    #
+    # The 54GB every load was reading is NOT the events data — it is the source table's
+    # Delta checkpoint. datalake_amplitude_events_clean.events has 76.2M live log
+    # actions, so _last_checkpoint is 1526 parts / 50.9 GiB, and every load replays it
+    # to rebuild the snapshot before partition pruning can even apply. Confirmed: the
+    # three Spark UI scan metrics (1526 files / 50.9 GiB / 76,256,366 rows) match
+    # _last_checkpoint's parts / sizeInBytes / size exactly, and prod steps died inside
+    # PrepareDeltaScan -> convertDataFrameToAddFiles -> collect(). No query change can
+    # reduce this cost; see the two Delta confs below.
+    #
+    # Small 8g executors keep GC pauses short — the 24g heaps tried earlier caused
+    # multi-minute GC and executor heartbeat timeouts. That was the wrong lever: the
+    # problem is task SIZE during log replay, not heap size. Run 8 at a time on 3
+    # m6g.4xlarge core nodes. No cluster autoscale; Spark dynamicAllocation on
+    # (min 1 / max 3). max_active_tasks: 120 (15 x 8).
     step_concurrency_level: 8
     core_nodes:
       instance_count: 3
@@ -22,3 +31,17 @@ cluster:
       spark.dynamicAllocation.enabled: "true"
       spark.dynamicAllocation.minExecutors: "1"
       spark.dynamicAllocation.maxExecutors: "3"
+      # Delta snapshot reconstruction parallelism. Default is 50, which is why prod
+      # showed exactly 50 tasks failing: 76.2M actions / 50 = 1.5M actions per task at
+      # ~2KB each (~3 GiB raw, more as JVM objects) against 4 GiB per task slot
+      # (8g / 2 cores) -> exit 137. 1200 partitions gives ~64k actions (~130 MiB) per
+      # task. OSS Delta keeps the spark.databricks.delta.* prefix; verified present in
+      # DeltaSQLConf of io.delta:delta-spark_2.12:3.3.1 (EMR 7.12 ships delta-spark 3.3.2).
+      spark.databricks.delta.snapshotPartitions: "1200"
+      # All 367 queries filter only on partition columns (id_app, event_type, year,
+      # month, day), so file-level min/max data skipping contributes nothing here.
+      # Turning it off lets Parquet column pruning drop add.stats and add.stats_parsed
+      # from the checkpoint read — measured at 76.8% of checkpoint bytes, stored twice
+      # (JSON string + parsed struct). Verify on the first run: `size of files read`
+      # should drop from 50.9 GiB to roughly 12 GiB.
+      spark.databricks.delta.stats.skipping: "false"
