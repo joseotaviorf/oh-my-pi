@@ -88,7 +88,7 @@ INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
 | **DSP (`developers-supply-processor`)** | Product-side supply ledger for Primary inventory (Órulo sync) — **not** a DW/analytics source | See `datalake_ebdb_clean.development*` for the lake-side result of DSP → Main |
 | **BSP (`brokers-supply-processor`)** | Unrelated 3P broker-lead pipeline — orthogonal axis (who supplies), not Primary/Secondary market type | Do not conflate with Primary Market classification |
 
-## Tables
+## Where to query what
 
 | You need... | Use this table |
 |-------------|-----------------|
