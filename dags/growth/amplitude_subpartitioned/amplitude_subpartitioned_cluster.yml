@@ -1,26 +1,24 @@
 cluster:
-  type: emr_7_12_consolidation_xl_general_cluster
+  type: emr_7_12_consolidation_l_general_cluster
   custom_configurations:
-    # 25 Amplitude event loads per cluster (367 tables -> 15 clusters). Each load is a
-    # wide scan (Delta file-skipping on id_app/event_type) + GET_JSON_OBJECT parse +
-    # Delta write, so it needs real heap: 8g OOMed. Run 8 at a time, not 16 — on a fixed
-    # cluster 16 concurrent apps starve each other (pinned near minExecutors 1) and the
-    # 5-min tasks crawl. At concurrency 8 on 6 m6g.8xlarge core nodes (~23 executor slots
-    # of 24g) each heavy table (session_start, listing_page_viewed) can grab up to 8
-    # executors and finish fast. No CLUSTER autoscale (fixed instance groups); Spark
-    # dynamicAllocation on so small tables stay at 1 executor. max_active_tasks: 120
-    # (15 x 8) keeps every cluster fed without oversubscription. Validate in Forno.
+    # 25 Amplitude event loads per cluster (367 tables -> 15 clusters). With the
+    # queries now pruning on the year/month/day partition columns, each load reads a
+    # single day (~tens of MB) instead of full-scanning the 54GB events table, so the
+    # cluster can be small. Small 8g executors keep GC pauses short — the 24g heaps
+    # tried earlier caused multi-minute GC and executor heartbeat timeouts. Run 8 at a
+    # time on 3 m6g.4xlarge core nodes. No cluster autoscale; Spark dynamicAllocation on
+    # (min 1 / max 3) since the pruned data is light. max_active_tasks: 120 (15 x 8).
     step_concurrency_level: 8
     core_nodes:
-      instance_count: 6
+      instance_count: 3
     aws_attributes:
-      ebs_volume_size: 500
+      ebs_volume_size: 200
     spark_conf:
-      spark.executor.memory: 24g
-      spark.executor.memoryOverhead: 6g
-      spark.executor.cores: "4"
-      spark.driver.memory: 8g
+      spark.executor.memory: 8g
+      spark.executor.memoryOverhead: 2g
+      spark.executor.cores: "2"
+      spark.driver.memory: 4g
       spark.driver.memoryOverhead: 2g
       spark.dynamicAllocation.enabled: "true"
       spark.dynamicAllocation.minExecutors: "1"
-      spark.dynamicAllocation.maxExecutors: "8"
+      spark.dynamicAllocation.maxExecutors: "3"
