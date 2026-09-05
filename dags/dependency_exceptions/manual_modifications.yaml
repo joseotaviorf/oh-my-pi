@@ -291,6 +291,17 @@ bietlejuice.enrich_airflow:
 bietlejuice.enrich_app_installed:
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+bietlejuice.enrich_big_agent_incentives:
+  # nazare is scheduled for 12h BRT; waiting on its first-run-of-day datasets blocks
+  # enrich_ebdb_contract → enrich_repairs → dw_bpo_performance morning delivery without
+  # a hard same-day requirement on nazare for earnings_unified.
+  remove:
+    - bietlejuice.nazare:load-clean-agent:first-run-of-day
+    - bietlejuice.nazare:load-clean-offer-agent:first-run-of-day
+    - bietlejuice.nazare:load-clean-offer:first-run-of-day
+    - bietlejuice.nazare:load-clean-revenue-share-by-participant:first-run-of-day
+    - bietlejuice.nazare:load-clean-tier-bonus-revision:first-run-of-day
+    - bietlejuice.nazare:load-clean-tier-bonus:first-run-of-day
 bietlejuice.enrich_booking:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
