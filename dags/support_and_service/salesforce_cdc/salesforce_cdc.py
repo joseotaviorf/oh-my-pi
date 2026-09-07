@@ -38,6 +38,12 @@ EVENTS_CONFIG = CONFIG_SERVICE.get_config("events_config")
 SALESFORCE_ENDPOINT = CONFIG_SERVICE.get_config("salesforce_endpoint")
 THRESHOLD_PARTITION_HOURS = CONFIG_SERVICE.get_config("threshold_partition_hours")
 THRESHOLD_TIME_HOURS = CONFIG_SERVICE.get_config("threshold_time_hours")
+# Observe-only by default: the contract writes to
+# datalake_sst_metrics.contract_quality_checks but a violation must not fail the
+# task, because the whole lineage (clean, DLQ, metrics) hangs off it and a stale
+# hour would otherwise block every downstream hour via wait_for_downstream.
+# Flip per event in *_conf.yml (``fail_on_quality_contract: true``) to enforce.
+FAIL_ON_QUALITY_CONTRACT = CONFIG_SERVICE.get_config("fail_on_quality_contract")
 
 # Use config and DAG constants so the DAG works without requiring Airflow Variables
 # (bucket/dag_name/environment). Config is loaded per environment (forno_conf vs prod_conf).
@@ -236,6 +242,9 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
     threshold_partition_hours = parameters.get(
         "threshold_partition_hours", THRESHOLD_PARTITION_HOURS
     )
+    fail_on_violation = parameters.get(
+        "fail_on_quality_contract", FAIL_ON_QUALITY_CONTRACT
+    )
 
     raw_task = create_sst_task(
         target_schema="datalake_salesforce_raw",
@@ -279,6 +288,7 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
         parameters={
             "threshold_time_hours": threshold_time_hours,
             "threshold_partition_hours": threshold_partition_hours,
+            "fail_on_violation": fail_on_violation,
         },
         task_id=f"quality_contract_checks_raw_{event_table}",
         pool=pool,
@@ -290,6 +300,7 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
         parameters={
             "threshold_time_hours": threshold_time_hours,
             "threshold_partition_hours": threshold_partition_hours,
+            "fail_on_violation": fail_on_violation,
         },
         task_id=f"quality_contract_checks_clean_{event_table}",
         pool=pool,

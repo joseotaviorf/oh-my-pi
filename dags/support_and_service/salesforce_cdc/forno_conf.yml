@@ -15,6 +15,11 @@ dag_documentation:
 datalake_bucket: "5a-datalake-forno"
 threshold_partition_hours: 24
 threshold_time_hours: 48
+# Contract checks run in observe-only mode: they still write to
+# datalake_sst_metrics.contract_quality_checks, but a violation logs a warning
+# instead of failing the task and stalling the lineage. Override per event under
+# events_config with `fail_on_quality_contract: true` to enforce.
+fail_on_quality_contract: false
 events_config:
   case:
     event_path: "raw/salesforce/CaseEvent"

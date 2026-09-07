@@ -28,6 +28,7 @@ class GenericContractQualityChecks:
         threshold_partition_hours: int = 24,
         partition_date: str = None,
         partition_hour: str = None,
+        fail_on_violation: bool = True,
     ):
         self.spark = spark
         self.table_name = table_name
@@ -36,6 +37,10 @@ class GenericContractQualityChecks:
         self.partition_date = partition_date
         self.partition_hour = partition_hour
         self.bucket = bucket
+        # Observe-only mode: metrics are still written to
+        # ``contract_quality_checks``, but a violation logs a warning instead of
+        # failing the task (and therefore the rest of the lineage).
+        self.fail_on_violation = fail_on_violation
         self.logger = (
             logger
             if logger
@@ -93,6 +98,14 @@ class GenericContractQualityChecks:
                 failed_metric.append(metric["metric_name"])
 
         if len(failed_metric) > 0:
+            if not self.fail_on_violation:
+                self.logger.warning(
+                    f"m=run, msg=Failed contract checks for {self.table_name}, "
+                    f"running in observe-only mode (fail_on_violation=False): "
+                    f"metrics were persisted and the task will not fail. "
+                    f"failed metrics: {failed_metric}"
+                )
+                return
             is_weekend = self.partition_date is not None and is_weekend_window(
                 self.partition_date, self.partition_hour
             )
@@ -264,6 +277,18 @@ class GenericContractQualityChecks:
             default=48,
             help="Window in hours for ts_load freshness check.",
         ),
+        dict(
+            name="fail_on_violation",
+            flags=["--fail_on_violation", "--fail-on-violation"],
+            type=lambda x: x.lower() == "true",
+            required=False,
+            default=True,
+            help=(
+                "When false, a failed check is logged as a warning instead of "
+                "raising, so the contract only collects metrics and never breaks "
+                "the downstream lineage. Defaults to true (enforcing)."
+            ),
+        ),
     ]
 )
 def run(cfg):
@@ -284,6 +309,7 @@ def run(cfg):
         logger=logger,
         threshold_partition_hours=cfg.threshold_partition_hours,
         threshold_time_hours=cfg.threshold_time_hours,
+        fail_on_violation=cfg.fail_on_violation,
     )
     checks.run()
     logger.info("m=run, msg=Generic contract quality checks completed")

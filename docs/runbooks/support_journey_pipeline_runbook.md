@@ -133,6 +133,14 @@ pelo **AWS AppFlow** (serviço gerenciado, **fora do repositório**).
   → `clean` → `quality_contract_clean` → **DLQ** → `missing_events`, por
   evento. Todas as métricas (stability, latency, missing_events) rodam
   **depois** do DLQ, para não lerem uma partição meio recuperada.
+- Os dois `quality_contract_*` rodam em **modo observe-only**
+  (`fail_on_quality_contract: false` no `prod_conf.yml`/`forno_conf.yml`): eles
+  continuam gravando em `datalake_sst_metrics.contract_quality_checks`, mas uma
+  violação vira **warning no log** em vez de falhar a task. Ou seja, **a task
+  verde não significa contrato aprovado** — para saber se houve violação,
+  consulte a tabela de métricas (`status = 'failed'`), não o estado da task no
+  Airflow. Para voltar a enforcar em um evento específico, adicione
+  `fail_on_quality_contract: true` sob aquele evento em `events_config`.
 
 ### AppFlow status e recovery automático
 
