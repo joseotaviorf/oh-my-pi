@@ -183,10 +183,7 @@ EOF
             pip_flags+=(--ignore-installed)
         fi
         echo "  Installing ${pkg}..."
-        if ! $PIP_EXEC install "${pip_flags[@]}" "${pkg}"; then
-            echo "Error: pip install of custom_libraries package '${pkg}' failed."
-            exit 1
-        fi
+        _emr_pip_install install "${pip_flags[@]}" "${pkg}"
     done <<EOF
 ${packages}
 EOF
@@ -251,6 +248,42 @@ _emr_install_system_gnupg() {
     echo "  gpg: $(command -v gpg)"
     echo "  gpg-agent: $(command -v gpg-agent)"
     echo "END: Install gnupg2 / gpg-agent"
+}
+
+# Retry pip (PyPI ConnectionResetError / OSError) then abort bootstrap.
+# Uses $PIP_EXEC at call time (sudo pip3 on EMR, Databricks pip on DBR).
+_emr_pip_install() {
+    local max_attempts="${EMR_PIP_MAX_ATTEMPTS:-5}"
+    local sleep_secs="${EMR_PIP_RETRY_SLEEP_SECS:-15}"
+    local attempt
+    local -a pip_args=("$@")
+
+    if [ -z "${PIP_EXEC:-}" ]; then
+        echo "Error: PIP_EXEC is unset; cannot run pip."
+        exit 1
+    fi
+    if [ "${#pip_args[@]}" -eq 0 ]; then
+        echo "Error: _emr_pip_install requires pip arguments (e.g. install ...)."
+        exit 1
+    fi
+
+    if [ "${pip_args[0]}" = "install" ]; then
+        pip_args=(install --retries 5 --timeout 30 "${pip_args[@]:1}")
+    fi
+
+    for attempt in $(seq 1 "${max_attempts}"); do
+        echo "  pip attempt ${attempt}/${max_attempts}: ${PIP_EXEC} ${pip_args[*]}"
+        if $PIP_EXEC "${pip_args[@]}"; then
+            return 0
+        fi
+        if [ "${attempt}" -eq "${max_attempts}" ]; then
+            break
+        fi
+        echo "  WARN: pip failed (attempt ${attempt}/${max_attempts}). Retrying in ${sleep_secs}s..."
+        sleep "${sleep_secs}"
+    done
+    echo "Error: pip failed after ${max_attempts} attempts: ${PIP_EXEC} ${pip_args[*]}"
+    exit 1
 }
 
 # Parse custom_libraries whl entries from a cluster/declaration YAML.
@@ -521,10 +554,7 @@ EOF
     for req in "${uniq_reqs[@]}"; do
         echo "      ${req}"
     done
-    if ! $PIP_EXEC install --no-cache-dir --ignore-requires-python -c "${EMR_CONSTRAINTS}" "${uniq_reqs[@]}"; then
-        echo "Error: pip install of Requires-Dist for '${local_whl}' failed."
-        return 1
-    fi
+    _emr_pip_install install --no-cache-dir --ignore-requires-python -c "${EMR_CONSTRAINTS}" "${uniq_reqs[@]}"
 }
 
 # Install DAG-level custom_libraries wheels previously downloaded to CUSTOM_WHL_MANIFEST.
@@ -555,10 +585,7 @@ _emr_install_custom_whl_libraries() {
             exit 1
         fi
         echo "  Installing ${local_whl} (--no-deps)..."
-        if ! $PIP_EXEC install --no-cache-dir --no-deps --ignore-requires-python "${local_whl}"; then
-            echo "Error: pip install of custom_libraries whl '${local_whl}' failed."
-            exit 1
-        fi
+        _emr_pip_install install --no-cache-dir --no-deps --ignore-requires-python "${local_whl}"
     done <"${CUSTOM_WHL_MANIFEST}"
 
     echo "END: Install custom_libraries whl"
@@ -639,7 +666,7 @@ if [ "${PROVIDER:-}" = "databricks" ]; then
     echo "PROVIDER=databricks. Using Databricks environment."
     PIP_EXEC="/databricks/python/bin/pip"
     echo "Installing awscli..."
-    $PIP_EXEC install -q awscli
+    _emr_pip_install install -q awscli
 else
     echo "Using EMR environment."
 
@@ -722,14 +749,11 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
     fi
 
     # Pin urllib3 / requests for awscli before resolving the big stack.
-    $PIP_EXEC install --upgrade --ignore-installed \
+    _emr_pip_install install --upgrade --ignore-installed \
         "requests==${REQUESTS_VERSION}" 'urllib3>=1.25.4,<1.27'
 
     echo "Installing quintoandar-logger wheel (with deps)..."
-    if ! $PIP_EXEC install --no-cache-dir "${TMP_DIR}/wheels/${QUINTOANDAR_LOGGER_WHEEL}"; then
-        echo "Error: pip install quintoandar-logger failed."
-        exit 1
-    fi
+    _emr_pip_install install --no-cache-dir "${TMP_DIR}/wheels/${QUINTOANDAR_LOGGER_WHEEL}"
 
     # Mirrors packages/bietlejuice-runtime [tool.uv].override-dependencies for pip (constraints
     # only narrow the solver; they cannot relax validations-engine's requests==2.28.1 pin).
@@ -745,15 +769,12 @@ EOF
     # validations-engine 2.0.0 declares requests==2.28.1; bietlejuice-core needs >=2.32.3.
     # Install it without deps after pinning requests (same effect as uv override-dependencies).
     echo "Installing validations-engine (no-deps; requests already pinned)..."
-    if ! $PIP_EXEC install --no-cache-dir --no-deps 'validations-engine==2.0.0'; then
-        echo "Error: pip install validations-engine failed."
-        exit 1
-    fi
+    _emr_pip_install install --no-cache-dir --no-deps 'validations-engine==2.0.0'
 
     # PyPI deps from bietlejuice-runtime + bietlejuice-core wheels (excluding validations-engine,
     # which is already installed). Keeps one resolver pass under constraints.
     echo "Installing bietlejuice transitive PyPI dependencies (constraints)..."
-    if ! $PIP_EXEC install --no-cache-dir -c "${EMR_CONSTRAINTS}" \
+    _emr_pip_install install --no-cache-dir -c "${EMR_CONSTRAINTS}" \
         'bs4>=0.0.1' \
         'boto3>=1.37.3' \
         'businesstimedelta' \
@@ -774,36 +795,27 @@ EOF
         'sqlglot>=26.9.0' \
         'tenacity>=8.0.1' \
         'trino>=0.305.0' \
-        'Unidecode==1.1.1'; then
-        echo "Error: pip install of bietlejuice PyPI dependencies failed."
-        exit 1
-    fi
+        'Unidecode==1.1.1'
 
     # delta-spark declares pyspark; EMR already ships PySpark — install the wheel only (same as runtime pyproject note).
     echo "Installing delta-spark 3.3.1 (no-deps; cluster PySpark)..."
-    if ! $PIP_EXEC install --no-cache-dir --no-deps 'delta-spark==3.3.1'; then
-        echo "Error: pip install delta-spark failed."
-        exit 1
-    fi
+    _emr_pip_install install --no-cache-dir --no-deps 'delta-spark==3.3.1'
 
     echo "Installing bietlejuice core + runtime wheels (no-deps; logger already installed)..."
-    if ! $PIP_EXEC install --no-cache-dir --no-deps \
+    _emr_pip_install install --no-cache-dir --no-deps \
         "${TMP_DIR}/wheels/bietlejuice_core-latest-py3-none-any.whl" \
-        "${TMP_DIR}/wheels/bietlejuice_runtime-latest-py3-none-any.whl"; then
-        echo "Error: pip install of bietlejuice wheels failed."
-        exit 1
-    fi
+        "${TMP_DIR}/wheels/bietlejuice_runtime-latest-py3-none-any.whl"
 
     # Runtime wheel omits psycopg2 (DBR bundles it); EMR does not.
     echo "Installing psycopg2-binary (EMR)..."
-    $PIP_EXEC install --no-cache-dir 'psycopg2-binary==2.9.9'
+    _emr_pip_install install --no-cache-dir 'psycopg2-binary==2.9.9'
 fi
 
 if [ "${PROVIDER:-}" = "databricks" ]; then
     echo "Pinning requests..."
-    $PIP_EXEC install --no-cache-dir --ignore-installed "requests==${REQUESTS_VERSION}"
+    _emr_pip_install install --no-cache-dir --ignore-installed "requests==${REQUESTS_VERSION}"
     echo "Installing databricks-sdk for UC REST API sync..."
-    $PIP_EXEC install --no-cache-dir "databricks-sdk==${DATABRICKS_SDK_VERSION}"
+    _emr_pip_install install --no-cache-dir "databricks-sdk==${DATABRICKS_SDK_VERSION}"
 fi
 
 if [ "${PROVIDER:-}" != "databricks" ]; then
@@ -825,23 +837,23 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
     done
 
     echo "Installing delta-spark 3.3.2 to match EMR 7.12 native Delta (no-deps; cluster PySpark)..."
-    $PIP_EXEC install --no-cache-dir --no-deps 'delta-spark==3.3.2'
+    _emr_pip_install install --no-cache-dir --no-deps 'delta-spark==3.3.2'
     echo "Installing databricks-sdk for UC REST API sync..."
-    $PIP_EXEC install --no-cache-dir "databricks-sdk==${DATABRICKS_SDK_VERSION}"
+    _emr_pip_install install --no-cache-dir "databricks-sdk==${DATABRICKS_SDK_VERSION}"
     echo "Pinning urllib3 for EMR awscli/botocore compatibility..."
-    $PIP_EXEC install 'urllib3>=1.25.4,<1.27'
+    _emr_pip_install install 'urllib3>=1.25.4,<1.27'
 
     echo "Installing inmetro ${INMETRO_VERSION} on EMR Python 3.9 (pydeequ, yamale, typing-extensions)..."
-    $PIP_EXEC install --no-cache-dir --no-deps --ignore-requires-python \
+    _emr_pip_install install --no-cache-dir --no-deps --ignore-requires-python \
         "${TMP_DIR}/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl"
-    $PIP_EXEC install --no-cache-dir \
+    _emr_pip_install install --no-cache-dir \
         'pydeequ==1.4.0' \
         'yamale==5.2.1' \
         'typing-extensions==4.12.2'
 
     if ! python3 -c 'import pandas; major, minor, *_ = (int(x) for x in pandas.__version__.split(".")[:2]); raise SystemExit(0 if (major, minor) >= (2, 0) else 1)' 2>/dev/null; then
         echo "Installing pandas>=2.0.0,<3 for inmetro ${INMETRO_VERSION}..."
-        $PIP_EXEC install --no-cache-dir 'pandas>=2.0.0,<3'
+        _emr_pip_install install --no-cache-dir 'pandas>=2.0.0,<3'
     fi
 
     # Databricks custom_libraries (pypi + whl + jar + maven) parity — after all
@@ -862,7 +874,7 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
     fi
 
     echo "Restoring python-dateutil and urllib3 for awscli compatibility..."
-    $PIP_EXEC install 'python-dateutil>=2.1,<=2.9.0' 'urllib3>=1.25.4,<1.27'
+    _emr_pip_install install 'python-dateutil>=2.1,<=2.9.0' 'urllib3>=1.25.4,<1.27'
 
     SPARK_JARS_DIRS="/usr/lib/spark/jars"
     PYSPARK_JARS=$(python3 -c "import pyspark; print(pyspark.__path__[0] + '/jars')" 2>/dev/null) \
@@ -906,17 +918,38 @@ fi
 
 echo "Validating installation..."
 
-$PIP_EXEC show databricks-sdk
+if ! $PIP_EXEC show databricks-sdk; then
+    echo "Error: databricks-sdk is not installed."
+    exit 1
+fi
 if [ "${PROVIDER:-}" = "databricks" ]; then
     :
 else
-    $PIP_EXEC show bietlejuice-core
-    $PIP_EXEC show bietlejuice-runtime
-    $PIP_EXEC show quintoandar-logger
-    $PIP_EXEC show inmetro
-    python3 -c 'import psycopg2; print("psycopg2", psycopg2.__version__)'
+    if ! $PIP_EXEC show bietlejuice-core; then
+        echo "Error: bietlejuice-core is not installed."
+        exit 1
+    fi
+    if ! $PIP_EXEC show bietlejuice-runtime; then
+        echo "Error: bietlejuice-runtime is not installed."
+        exit 1
+    fi
+    if ! $PIP_EXEC show quintoandar-logger; then
+        echo "Error: quintoandar-logger is not installed."
+        exit 1
+    fi
+    if ! $PIP_EXEC show inmetro; then
+        echo "Error: inmetro is not installed."
+        exit 1
+    fi
+    if ! python3 -c 'import psycopg2; print("psycopg2", psycopg2.__version__)'; then
+        echo "Error: psycopg2 import failed after bootstrap."
+        exit 1
+    fi
     echo "Smoke-testing inmetro ${INMETRO_VERSION} on python3..."
-    python3 -c "import inmetro; from inmetro.config_reader import ConfigReader; import inspect; assert 'content' in inspect.signature(ConfigReader.__init__).parameters; print('inmetro', inmetro.__version__)"
+    if ! python3 -c "import inmetro; from inmetro.config_reader import ConfigReader; import inspect; assert 'content' in inspect.signature(ConfigReader.__init__).parameters; print('inmetro', inmetro.__version__)"; then
+        echo "Error: inmetro smoke test failed after bootstrap."
+        exit 1
+    fi
 fi
 
 echo "DONE: bootstrap finished."

@@ -469,6 +469,60 @@ def test_emr_init_script_supports_ignore_installed_pypi_flag():
     assert "pip_flags+=(--ignore-installed)" in fn_body
 
 
+def test_emr_pip_install_helper_retries_then_exits():
+    """Bootstrap ignored pip ConnectionResetError; cluster reached WAITING missing deps."""
+    # arrange
+    script = (_SCRIPTS_DIR / "emr_init_script.sh").read_text(encoding="utf-8")
+
+    # act
+    fn_start = script.index("_emr_pip_install()")
+    fn_end = script.index("\n_emr_extract_whl_uris()", fn_start)
+    fn_body = script[fn_start:fn_end]
+
+    # assert
+    assert "_emr_pip_install()" in script
+    assert "EMR_PIP_MAX_ATTEMPTS" in fn_body
+    assert 'pip_args=(install --retries 5 --timeout 30 "${pip_args[@]:1}")' in fn_body
+    assert '$PIP_EXEC "${pip_args[@]}"' in fn_body
+    assert "exit 1" in fn_body
+
+
+def test_emr_init_script_has_no_bare_pip_exec_install():
+    """Bootstrap ignored pip ConnectionResetError; cluster reached WAITING missing deps."""
+    # arrange
+    script = (_SCRIPTS_DIR / "emr_init_script.sh").read_text(encoding="utf-8")
+
+    # act
+    fn_start = script.index("_emr_pip_install()")
+    fn_end = script.index("\n_emr_extract_whl_uris()", fn_start)
+    remainder = script[:fn_start] + script[fn_end:]
+
+    # assert
+    assert "$PIP_EXEC install" not in script
+    assert "$PIP_EXEC install" not in remainder
+    assert "_emr_pip_install install" in remainder
+
+
+def test_emr_init_script_psycopg2_validation_exits():
+    """Bootstrap ignored pip failures and a broken import psycopg2; EMR stayed WAITING."""
+    # arrange
+    script = (_SCRIPTS_DIR / "emr_init_script.sh").read_text(encoding="utf-8")
+    val_start = script.index("Validating installation...")
+    val_end = script.index("DONE: bootstrap finished.", val_start)
+
+    # act
+    validation_block = script[val_start:val_end]
+
+    # assert
+    assert "import psycopg2" in validation_block
+    assert "if ! python3 -c 'import psycopg2;" in validation_block
+    assert "exit 1" in validation_block
+    inmetro_smoke = 'if ! python3 -c "import inmetro;'
+    assert inmetro_smoke in validation_block
+    smoke_start = validation_block.index(inmetro_smoke)
+    assert "exit 1" in validation_block[smoke_start:]
+
+
 def test_langfuse_cluster_pins_packaging_before_client():
     cluster_yaml = (
         _SCRIPTS_DIR.parents[2] / "dags/conversational_xp/langfuse/langfuse_cluster.yml"
