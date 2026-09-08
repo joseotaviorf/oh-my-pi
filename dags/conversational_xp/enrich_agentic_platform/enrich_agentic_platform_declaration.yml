@@ -14,7 +14,7 @@ dag:
       inner_dependencies.
 workflow:
   type: query_delta
-  layer: consumption
+  layer: enrich
   custom_schema: agentic_platform
   default_extraction_type: incremental
   tables_customization:
