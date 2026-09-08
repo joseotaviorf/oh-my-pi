@@ -48,7 +48,7 @@ columns:
       - datalake_jaiminho_clean.user_notifications.template
       - datalake_copilot_service_clean.message.content
       - datalake_house_listing_search_clean.concierge_trigger.intent
-    description: The type of the inbound/outbound message. Outbound examples include 'Medium intent', 'High intent', 'TTC Outbound', and follow-up campaigns (FUP = follow-up) such as 'Medium FUP', 'Visit cancellation FUP'. Inbound examples include 'Placas', 'TTC', and 'Click2WPP'. In one session a user can have more than one type of inbound flow (e.g. placas and chaves na mão, id_session = 27884962).
+    description: The type of the inbound/outbound message. Outbound examples include 'Medium intent', 'High intent', 'TTC Outbound', 'Favorites', and follow-up campaigns (FUP = follow-up) such as 'Medium FUP', 'Visit cancellation FUP'. Inbound examples include 'Placas', 'TTC', and 'Click2WPP'. In one session a user can have more than one type of inbound flow (e.g. placas and chaves na mão, id_session = 27884962).
   has_human_reply:  
     lineage:
       - datalake_copilot_service_clean.message.role
