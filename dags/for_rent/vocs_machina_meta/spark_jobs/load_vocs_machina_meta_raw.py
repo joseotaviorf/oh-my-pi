@@ -366,9 +366,24 @@ def _read_json_or_none(
     Returns None (never raises) when no files match `path` -- a legitimate
     "nothing to ingest this run" state for these sparse `_meta/` artifacts.
     Any other failure (auth, corruption) is a real error and is re-raised.
+
+    `multiLine=true` is required here: these `_meta/` artifacts are written
+    pretty-printed (one JSON object spanning many physical lines), not JSONL.
+    Without it Spark's default line-delimited JSON reader treats every
+    physical line as its own record; since the schema has no
+    `_corrupt_record` column, each unparseable line still emits an output row
+    with every field NULL instead of raising -- silently exploding one real
+    record into N garbage rows (all sharing one key). This is the actual
+    root cause of the `backfill_plans` MERGE abort (and of `run_summaries`
+    and `throughput_observations` silently losing real data with no error at
+    all) -- see VOCS-61 / DEI-27181. The `dropDuplicates` below is real
+    defense-in-depth for genuine duplicate-content cases, but on its own,
+    without this option, it cannot fix the underlying parse bug -- it only
+    hides the symptom by collapsing the garbage rows instead of preventing
+    them.
     """
     try:
-        return spark.read.schema(schema).json(path)
+        return spark.read.schema(schema).option("multiLine", "true").json(path)
     except Exception as exc:
         msg = str(exc)
         if any(marker in msg for marker in MISSING_DATA_MARKERS):
@@ -391,10 +406,27 @@ def _add_ts_load_partition_cols(df: DataFrame) -> DataFrame:
     )
 
 
-def _add_source_and_load_columns(df: DataFrame) -> DataFrame:
-    """Add s3_key, ts_load, and ts_load-derived year/month/day columns."""
+def _non_empty_merge_key_filter(merge_keys: List[str]) -> F.Column:
+    """Require every MERGE key column to be non-null and non-empty."""
+    condition = F.lit(True)
+    for key in merge_keys:
+        condition = condition & F.col(key).isNotNull() & (F.col(key) != "")
+    return condition
+
+
+def _stamp_s3_key_and_dedupe_for_merge(
+    df: DataFrame, merge_keys: List[str]
+) -> DataFrame:
+    """Stamp s3_key before shuffle and collapse duplicate MERGE keys in one batch.
+
+    ``input_file_name()`` is empty after shuffle/aggregation, so lineage must be
+    captured first. Duplicate keys in the source batch abort the Delta MERGE with
+    ``DELTA_MULTIPLE_SOURCE_ROW_MATCHING_TARGET_ROW_IN_MERGE``.
+    """
     with_key = df.withColumn("s3_key", F.input_file_name())
-    return _add_ts_load_partition_cols(with_key)
+    return with_key.filter(_non_empty_merge_key_filter(merge_keys)).dropDuplicates(
+        merge_keys
+    )
 
 
 def build_run_summaries_df(
@@ -404,7 +436,8 @@ def build_run_summaries_df(
     df = _read_json_or_none(spark, path, RUN_SUMMARIES_SCHEMA)
     if df is None:
         return None
-    return _add_source_and_load_columns(df)
+    deduped = _stamp_s3_key_and_dedupe_for_merge(df, MERGE_KEYS["run_summaries"])
+    return _add_ts_load_partition_cols(deduped)
 
 
 def build_throughput_observations_df(
@@ -414,16 +447,10 @@ def build_throughput_observations_df(
     df = _read_json_or_none(spark, path, THROUGHPUT_OBSERVATIONS_SCHEMA)
     if df is None:
         return None
-    # Capture s3_key before dropDuplicates. input_file_name() is empty after
-    # a shuffle/aggregation, so stamping it afterwards would blank lineage
-    # on every throughput row (the catalog path already materializes s3_key
-    # before explode + dropDuplicates for the same reason).
-    df = df.withColumn("s3_key", F.input_file_name())
-    # The MERGE keys this table on [run_id, observed_at]. A run's samples each
-    # carry a distinct observed_at, but collapse any exact duplicate defensively
-    # so two identical source rows can't abort the MERGE on one target key.
-    df = df.dropDuplicates(["run_id", "observed_at"])
-    return _add_ts_load_partition_cols(df)
+    deduped = _stamp_s3_key_and_dedupe_for_merge(
+        df, MERGE_KEYS["throughput_observations"]
+    )
+    return _add_ts_load_partition_cols(deduped)
 
 
 def build_prompt_catalog_snapshots_df(
@@ -477,7 +504,10 @@ def build_backfill_plans_df(
         "run_id",
         F.regexp_extract(F.input_file_name(), BACKFILL_PLAN_RUN_ID_RE, 1),
     )
-    return _add_source_and_load_columns(with_run_id)
+    deduped = _stamp_s3_key_and_dedupe_for_merge(
+        with_run_id, MERGE_KEYS["backfill_plans"]
+    )
+    return _add_ts_load_partition_cols(deduped)
 
 
 TABLE_BUILDERS: Dict[str, Callable[[SparkSession, str], Optional[DataFrame]]] = {

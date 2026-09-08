@@ -27,8 +27,16 @@ RUN_ID = "run-2026-08-23T00-00-00"
 
 
 def _write_json(path, payload):
+    # Pretty-printed (indent=2), matching the real multi-line `_meta/`
+    # artifacts on S3 -- a bare json.dumps() (single physical line) does not
+    # exercise the multiLine read path and previously masked VOCS-61.
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload))
+    path.write_text(json.dumps(payload, indent=2))
+
+
+def _write_jsonl(path, payloads):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(json.dumps(payload) for payload in payloads))
 
 
 def _run_summary_payload(run_id=RUN_ID):
@@ -71,6 +79,39 @@ def _run_summary_payload(run_id=RUN_ID):
         # No backfill_breaker / backfill_escalation_attribution -- both are
         # optional and this run didn't trigger either.
     }
+
+
+def _backfill_plan_payload(**overrides):
+    payload = {
+        "partitions": 4,
+        "estimated_calls": 200,
+        "estimated_llm_seconds": 120.5,
+        "estimated_wall_clock_seconds": 300,
+        "estimated_runs_needed": 2,
+        "estimate_basis_counts": {
+            "measured_from_last_success": 3,
+            "config_default": 1,
+        },
+        "caution": "high_volume",
+        "throughput_calibration": {
+            "calls_per_second": 1.5,
+            "basis": "measured",
+            "config_default": 1.0,
+        },
+        "backfill_breaker": {
+            "tripped": False,
+            "fingerprint": "xyz",
+            "reasons": [],
+            "n_prompts": 0,
+            "n_partitions": 0,
+            "estimated_calls": 0,
+            "approved": None,
+            "refused": False,
+            "approved_pairs": [],
+        },
+    }
+    payload.update(overrides)
+    return payload
 
 
 @pytest.fixture
@@ -123,6 +164,18 @@ class TestBuildRunSummariesDf:
         assert row["backfill_breaker"]["tripped"] is True
         assert row["backfill_breaker"]["approved"] is None
         assert row["backfill_breaker"]["approved_pairs"][0]["prompt_id"] == "p1"
+
+    def test_duplicate_run_id_in_one_file_is_collapsed(self, spark, source_root):
+        _write_jsonl(
+            source_root / "_meta" / "runs" / RUN_ID / "summary.json",
+            [_run_summary_payload(), _run_summary_payload()],
+        )
+
+        df = job.build_run_summaries_df(spark, str(source_root))
+
+        assert df is not None
+        assert df.count() == 1
+        assert df.collect()[0]["run_id"] == RUN_ID
 
 
 class TestBuildThroughputObservationsDf:
@@ -225,34 +278,7 @@ class TestBuildBackfillPlansDf:
         # does (_meta/backfill_plans/<run_id>.json).
         _write_json(
             source_root / "_meta" / "backfill_plans" / f"{RUN_ID}.json",
-            {
-                "partitions": 4,
-                "estimated_calls": 200,
-                "estimated_llm_seconds": 120.5,
-                "estimated_wall_clock_seconds": 300,
-                "estimated_runs_needed": 2,
-                "estimate_basis_counts": {
-                    "measured_from_last_success": 3,
-                    "config_default": 1,
-                },
-                "caution": "high_volume",
-                "throughput_calibration": {
-                    "calls_per_second": 1.5,
-                    "basis": "measured",
-                    "config_default": 1.0,
-                },
-                "backfill_breaker": {
-                    "tripped": False,
-                    "fingerprint": "xyz",
-                    "reasons": [],
-                    "n_prompts": 0,
-                    "n_partitions": 0,
-                    "estimated_calls": 0,
-                    "approved": None,
-                    "refused": False,
-                    "approved_pairs": [],
-                },
-            },
+            _backfill_plan_payload(),
         )
 
         df = job.build_backfill_plans_df(spark, str(source_root))
@@ -263,6 +289,47 @@ class TestBuildBackfillPlansDf:
         assert row["estimate_basis_counts"]["measured_from_last_success"] == 3
         for col in ("s3_key", "ts_load", "year", "month", "day"):
             assert col in df.columns
+
+    def test_duplicate_run_id_in_one_file_is_collapsed(self, spark, source_root):
+        payload = _backfill_plan_payload()
+        _write_jsonl(
+            source_root / "_meta" / "backfill_plans" / f"{RUN_ID}.json",
+            [payload, payload],
+        )
+
+        df = job.build_backfill_plans_df(spark, str(source_root))
+
+        assert df is not None
+        assert df.count() == 1
+        assert df.collect()[0]["run_id"] == RUN_ID
+
+    def test_empty_run_id_rows_are_dropped(self, spark, source_root):
+        _write_json(
+            source_root / "_meta" / "backfill_plans" / ".json",
+            _backfill_plan_payload(
+                partitions=1,
+                estimated_calls=1,
+                estimated_llm_seconds=1.0,
+                estimated_wall_clock_seconds=1,
+                estimated_runs_needed=1,
+                estimate_basis_counts={
+                    "measured_from_last_success": 0,
+                    "config_default": 1,
+                },
+                caution=None,
+                throughput_calibration={
+                    "calls_per_second": 1.0,
+                    "basis": "config_default",
+                    "config_default": 1.0,
+                },
+                backfill_breaker=None,
+            ),
+        )
+
+        df = job.build_backfill_plans_df(spark, str(source_root))
+
+        assert df is not None
+        assert df.count() == 0
 
 
 class TestBuildPromptCatalogSnapshotsDf:
