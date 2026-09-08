@@ -134,10 +134,15 @@ columns:
     lineage:
       - datalake_retsuko.invoice.ts_due
   net_rate_recovery:
-    description: Net recovery rate applied to written-down invoices when computing recovered_amount.
+    description:
+      Canonical net recovery rate applied to written-down invoices when computing
+      recovered_amount. For Trato Feito negotiations it is the discount-ordering-hierarchy rate from
+      negotiation.net_recovery_rate; Recupera-only negotiations fall back to down_payment / original
+      because the Recupera wallet snapshot lacks the fine/interest breakdown.
     lineage:
-      - datalake_debt_recovery.negotiation.down_payment_amount
-      - datalake_debt_recovery.negotiation.negotiation_original_amount
+      - datalake_debt_recovery.negotiation.net_recovery_rate
+      - datalake_recupera.negotiation_wallet.down_payment_amount
+      - datalake_recupera.negotiation_wallet.original_debt_amount
   negotiation_installment_number:
     description:
       Installment sequence number within the parent negotiation; used to filter credit-card

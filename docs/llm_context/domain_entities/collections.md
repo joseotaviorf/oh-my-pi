@@ -41,8 +41,8 @@ Use [Related Metric Entities](#related-metric-entities) for **official** Condo G
 
 ### Official metrics (metric entities)
 
-| When you need… | Metric entity |
-|----------------|---------------|
+| When you need…                                     | Metric entity                                            |
+| -------------------------------------------------- | -------------------------------------------------------- |
 | Condo Garantido adoption, automatic identification | [Condo Garantido](../metric_entities/condo_garantido.md) |
 
 ### Component / exploratory metrics
@@ -54,27 +54,27 @@ Use [Related Metric Entities](#related-metric-entities) for **official** Condo G
 
 ## Tables
 
-| You need... | Use this table |
-|-------------|----------------|
+| You need...                                                                                                                                                                                                                                         | Use this table                                                                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Daily overdue invoice timeline, recovery amounts, queues, Flow/Stock, **`has_matthew_interaction`** (interaction flag from collections QuintoAndar datalake inputs — Matthew itself is not defined in these DAGs; see `domain_entities/matthew.md`) | `dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline` (+ incremental variant if using partitions) |
-| Collection touches (Cyber + Recupera) | `dw_collection_recovery_quintoandar.fact_collection` + `dim_operator` |
-| Debt at invoice grain (negotiated deals, sources) | `dw_collection_recovery_quintoandar.fact_debt` |
-| Negotiations (status, amounts, classification) | `dw_collection_recovery_quintoandar.fact_negotiation` |
-| Negotiation installments (boletos/extra invoices) | `dw_collection_recovery_quintoandar.fact_negotiation_installment` |
-| Link invoice-debt ↔ negotiation | `dw_collection_recovery_quintoandar.bridge_map_debt_negotiation` |
-| Renegotiation chain / anchor invoice | `dw_collection_recovery_quintoandar.fact_renegotiations` |
-| Agencies (Cyber) | `dw_collection_recovery_quintoandar.dim_agency` |
-| **Landlord** portfolio: Retsuko invoices, bill-item balances, deals | `dw_collections_landlord.fact_invoice_landlord_portfolio` |
-| Original invoice ↔ deal installment match | `dw_collections_landlord.fact_landlord_deal_installment_match` |
-| Landlord overdue **daily** timeline (delay T2, contract delay range) | `dw_collections_landlord.fact_overdue_portfolio_timeline` |
-| **Tenant / QA** wallet: invoice-day features, T1/T2/T3 delays, bill clusters | `dw_collections_segmentation.fact_invoice_wallet_timeline` |
-| Contract-day wallet rollups, income, eviction flag, comms rollups | `dw_collections_segmentation.fact_contract_wallet_timeline` |
-| ML-oriented features: frozen **`prob_payment`**, **`segmentation`**, **`tree_class`**, accumulators | `dw_collections_segmentation.fact_contract_features_timeline` |
-| **Cyber Legal** eviction case fact (stages, costs, lead times) | `dw_evictions.fact_evictions` |
-| Juridical log actions | `dw_evictions.fact_action` |
-| Legal alerts | `dw_evictions.fact_alerts` |
-| Legal custas / expenses | `dw_evictions.fact_expenses` |
-| Formal AR + recovery (PDD universe) | `dw_losses.fact_accounts_receivable` (separate `dw_accounts_receivable` DAG) |
+| Collection touches (Cyber + Recupera)                                                                                                                                                                                                               | `dw_collection_recovery_quintoandar.fact_collection` + `dim_operator`                                            |
+| Debt at invoice grain (negotiated deals, sources)                                                                                                                                                                                                   | `dw_collection_recovery_quintoandar.fact_debt`                                                                   |
+| Negotiations (status, amounts, classification)                                                                                                                                                                                                      | `dw_collection_recovery_quintoandar.fact_negotiation`                                                            |
+| Negotiation installments (boletos/extra invoices)                                                                                                                                                                                                   | `dw_collection_recovery_quintoandar.fact_negotiation_installment`                                                |
+| Link invoice-debt ↔ negotiation                                                                                                                                                                                                                     | `dw_collection_recovery_quintoandar.bridge_map_debt_negotiation`                                                 |
+| Renegotiation chain / anchor invoice                                                                                                                                                                                                                | `dw_collection_recovery_quintoandar.fact_renegotiations`                                                         |
+| Agencies (Cyber)                                                                                                                                                                                                                                    | `dw_collection_recovery_quintoandar.dim_agency`                                                                  |
+| **Landlord** portfolio: Retsuko invoices, bill-item balances, deals                                                                                                                                                                                 | `dw_collections_landlord.fact_invoice_landlord_portfolio`                                                        |
+| Original invoice ↔ deal installment match                                                                                                                                                                                                           | `dw_collections_landlord.fact_landlord_deal_installment_match`                                                   |
+| Landlord overdue **daily** timeline (delay T2, contract delay range)                                                                                                                                                                                | `dw_collections_landlord.fact_overdue_portfolio_timeline`                                                        |
+| **Tenant / QA** wallet: invoice-day features, T1/T2/T3 delays, bill clusters                                                                                                                                                                        | `dw_collections_segmentation.fact_invoice_wallet_timeline`                                                       |
+| Contract-day wallet rollups, income, eviction flag, comms rollups                                                                                                                                                                                   | `dw_collections_segmentation.fact_contract_wallet_timeline`                                                      |
+| ML-oriented features: frozen **`prob_payment`**, **`segmentation`**, **`tree_class`**, accumulators                                                                                                                                                 | `dw_collections_segmentation.fact_contract_features_timeline`                                                    |
+| **Cyber Legal** eviction case fact (stages, costs, lead times)                                                                                                                                                                                      | `dw_evictions.fact_evictions`                                                                                    |
+| Juridical log actions                                                                                                                                                                                                                               | `dw_evictions.fact_action`                                                                                       |
+| Legal alerts                                                                                                                                                                                                                                        | `dw_evictions.fact_alerts`                                                                                       |
+| Legal custas / expenses                                                                                                                                                                                                                             | `dw_evictions.fact_expenses`                                                                                     |
+| Formal AR + recovery (PDD universe)                                                                                                                                                                                                                 | `dw_losses.fact_accounts_receivable` (separate `dw_accounts_receivable` DAG)                                     |
 
 ---
 
@@ -88,12 +88,12 @@ Use [Related Metric Entities](#related-metric-entities) for **official** Condo G
 
 Grain: **one row per collection occurrence** (action on a contract/customer). **`sk_collection`** hashes customer, contract, creditor, operator, action, occurrence time.
 
-| Topic | Fields |
-|-------|--------|
-| Keys / links | `sk_debtor` (CPF), `sk_contract`, `sk_operator`, `operator_agency` |
-| Source | **`source`**: `Cyber` vs `Recupera` |
-| Action | `action`, `action_code_type`, `action_description`, `result*`, `complement*`, `total_esforco`, `total_alo`, `total_cpc`, `total_promisse`, `total_agreement`, `total_failure` |
-| Time | `dt_occurrence`, `year`, `month`, `day` |
+| Topic        | Fields                                                                                                                                                                        |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keys / links | `sk_debtor` (CPF), `sk_contract`, `sk_operator`, `operator_agency`                                                                                                            |
+| Source       | **`source`**: `Cyber` vs `Recupera`                                                                                                                                           |
+| Action       | `action`, `action_code_type`, `action_description`, `result*`, `complement*`, `total_esforco`, `total_alo`, `total_cpc`, `total_promisse`, `total_agreement`, `total_failure` |
+| Time         | `dt_occurrence`, `year`, `month`, `day`                                                                                                                                       |
 
 ### `fact_debt`
 
@@ -103,7 +103,7 @@ Important fields: `sk_debt`, `id_contract`, `id_invoice` (Seu Barriga external i
 
 ### `fact_negotiation`
 
-Negotiation header from Trato Feito / collections stack: `sk_negotiation`, `sk_contract`, `sk_debtor`, `creditor`, **`negotiation_status`** (started, offset, broken, finished, canceled, …), **`negotiation_classification`** (ACORDO, QUITAÇÃO, SUBSTITUIÇÃO, PROMESSA, PROMESSA QUEBRADA), agreement metadata (`agreement_type`, `advisory`, `origin_agreement`), money fields (discounts, `negotiated_amount`, down payment columns), **`delay_contamined_range`**, installment counts, dates (`dt_promisse`, `dt_due_promisse`, `dt_down_payment`, …), flags `is_renegotiation`, `has_been_renegotiated`.
+Negotiation header from Trato Feito / collections stack: `sk_negotiation`, `sk_contract`, `sk_debtor`, `creditor`, **`negotiation_status`** (started, offset, broken, finished, canceled, …), **`negotiation_classification`** (ACORDO, QUITAÇÃO, SUBSTITUIÇÃO, PROMESSA, PROMESSA QUEBRADA), agreement metadata (`agreement_type`, `advisory`, `origin_agreement`), money fields (discounts, `negotiated_amount`, down payment columns), **`net_recovery_rate`** (canonical principal recovery, clamped to [0, 1]; entry-based for multi-installment non-card deals, so only the down payment is recognized up front; the principal share of the discount is read from the source-declared `discount_to_original_amount` and recomputed as discount minus fine minus interest only where the source does not declare the split), **`delay_contamined_range`**, installment counts, dates (`dt_promisse`, `dt_due_promisse`, `dt_down_payment`, …), flags `is_renegotiation`, `has_been_renegotiated`.
 
 ### `fact_negotiation_installment`
 
@@ -117,13 +117,13 @@ Maps **`sk_debt`** ↔ **`sk_negotiation`** when a negotiation exists; **`source
 
 Grain: **invoice × contract × `dt_reference`** (daily while invoice is overdue until paid or written down). Invoice enters **one day after due** and is replicated daily.
 
-| Topic | Examples |
-|-------|----------|
-| Keys | `sk_overdue_portfolio_timeline`, `id_invoice`, `sk_contract`, `sk_negotiation`, `sk_origin_negotiation` (extra invoices), `sk_agency`, `sk_region` |
-| Delays | `delay_invoice_at_reference`, `delay_contamined_range`, **`delay_contract_range`** (contract-level, PDD-related), `delay_first_payment_default`, `delay_contamined_at_closure` |
-| Amounts | `due_amount`, `paid_amount`, `recovered_amount`, **`net_recovered_amount`** (adjusts for negotiation net rate on written-down), `contract_debt` |
+| Topic         | Examples                                                                                                                                                                                                                                                                                                  |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keys          | `sk_overdue_portfolio_timeline`, `id_invoice`, `sk_contract`, `sk_negotiation`, `sk_origin_negotiation` (extra invoices), `sk_agency`, `sk_region`                                                                                                                                                        |
+| Delays        | `delay_invoice_at_reference`, `delay_contamined_range`, **`delay_contract_range`** (contract-level, PDD-related), `delay_first_payment_default`, `delay_contamined_at_closure`                                                                                                                            |
+| Amounts       | `due_amount`, `paid_amount`, `recovered_amount`, **`net_recovered_amount`** (written-down × `fact_negotiation.net_recovery_rate`; same rate as wallet `recovered_amount`), `contract_debt`                                                                                                                |
 | Ops / routing | `recovery_channel`, **`debtor_type`** (**Flow** = new in month vs **Stock**), `advisory`, **`segmentation_queue`**, **`agreement_queue`**, **`eviction_queue`** (+ descriptions), `has_matthew_interaction`, `has_app_action_event`, **`is_ssn`**, `is_most_recent_record_month`, `is_last_business_days` |
-| Dates | `dt_reference`, `dt_month_start`, `dt_month_end`, `dt_invoice_due`, `dt_invoice_paid`, `dt_write_off` |
+| Dates         | `dt_reference`, `dt_month_start`, `dt_month_end`, `dt_invoice_due`, `dt_invoice_paid`, `dt_write_off`                                                                                                                                                                                                     |
 
 Use **`is_most_recent_record_month = true`** for **one row per invoice per month** when deduplicating to the latest day in the month.
 

@@ -71,6 +71,7 @@ trato_feito_negotiation AS (
     n.status AS negotiation_status,
     n.down_payment_amount,
     n.negotiation_original_amount AS original_debt_amount,
+    n.net_recovery_rate,
     DATE(n.ts_created_at) AS dt_promisse,
     DATE(n.ts_first_payment) AS dt_down_payment
   FROM datalake_debt_recovery.negotiation AS n
@@ -84,6 +85,10 @@ negotiation_no_cyber AS (
     COALESCE(rn.origin_agreement, tf.origin_agreement) AS origin_agreement,
     COALESCE(tf.down_payment_amount, rn.down_payment_amount) AS down_payment_amount,
     COALESCE(tf.original_debt_amount, rn.original_debt_amount) AS original_debt_amount,
+    COALESCE(
+      tf.net_recovery_rate,
+      CAST(rn.down_payment_amount / NULLIF(rn.original_debt_amount, 0) AS DECIMAL(14,2))
+    ) AS net_recovery_rate,
     COALESCE(tf.dt_promisse, rn.dt_promisse) AS dt_promisse,
     COALESCE(tf.dt_down_payment, rn.dt_down_payment) AS dt_down_payment,
     COALESCE(tf.negotiation_status, rn.negotiation_status) AS negotiation_status,
@@ -133,6 +138,7 @@ negotiation_child_ranked AS (
     n.origin_agreement,
     n.down_payment_amount,
     n.original_debt_amount,
+    n.net_recovery_rate,
     n.dt_promisse,
     ROW_NUMBER() OVER (
       PARTITION BY dn.id_invoice
@@ -154,6 +160,7 @@ negotiation_child AS (
     origin_agreement,
     down_payment_amount,
     original_debt_amount,
+    net_recovery_rate,
     dt_promisse
   FROM negotiation_child_ranked
   WHERE rn = 1
@@ -206,7 +213,7 @@ base_negotiation AS (
     child.id_negotiation_child,
     child.agency AS child_negotiation_agency,
     child.origin_agreement,
-    CAST(child.down_payment_amount / child.original_debt_amount AS DECIMAL(14, 2)) AS net_rate_recovery,
+    child.net_recovery_rate AS net_rate_recovery,
     parent.installment_number AS negotiation_installment_number,
     DATE(i.ts_due) AS dt_due,
     parent.dt_due_parent,

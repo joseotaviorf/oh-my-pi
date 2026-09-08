@@ -74,8 +74,8 @@ cte_debts AS (
     FROM
         datalake_trato_feito_clean.debt AS d
     GROUP BY 1
-)
-
+),
+negotiation_base AS (
 SELECT
     n.`id` AS id_negotiation,
     n.id_collector_external AS id_negotiation_external,
@@ -181,3 +181,57 @@ LEFT JOIN extract_credit_card_data AS cc
     ON cc.`id` = n.`id`
 LEFT JOIN datalake_trato_feito_clean.collector AS c
     ON n.id_collector = c.id
+)
+SELECT
+    id_negotiation,
+    id_negotiation_external,
+    id_contract,
+    debtor,
+    collector,
+    consultancy,
+    consultancy_name,
+    contact_type,
+    status,
+    promisse_payment_method,
+    qt_installments,
+    qt_installments_paid,
+    total_expected_amount,
+    down_payment_amount,
+    paid_amount,
+    negotiation_original_amount,
+    negotiation_discount_amount,
+    interest_fee_amount,
+    fine_fee_amount,
+    negotiation_fees_amount,
+    credit_card_fee_amount,
+    installment_costs,
+    installment_lawyers_fee,
+    breached_installment,
+    total_breached_installments,
+    is_contract_recurrent_debtor,
+    has_renegotiated,
+    dt_expected_end,
+    ts_first_payment,
+    ts_paid_all,
+    ts_breach,
+    ts_created_at,
+    CAST(
+      CASE
+        WHEN COALESCE(negotiation_original_amount, 0) <= 0 THEN NULL
+        WHEN qt_installments = 1
+          OR UPPER(promisse_payment_method) IN ('CREDIT-CARD', 'CARTÃO', 'CARTÃO DE CRÉDITO')
+        THEN GREATEST(0, LEAST(1,
+            (
+              negotiation_original_amount
+              - GREATEST(0,
+                  COALESCE(negotiation_discount_amount, 0)
+                  - COALESCE(fine_fee_amount, 0)
+                  - COALESCE(interest_fee_amount, 0)
+                )
+            ) / negotiation_original_amount
+          ))
+        WHEN down_payment_amount IS NULL THEN NULL
+        ELSE GREATEST(0, LEAST(1, down_payment_amount / negotiation_original_amount))
+      END AS DECIMAL(14,2)
+    ) AS net_recovery_rate
+FROM negotiation_base

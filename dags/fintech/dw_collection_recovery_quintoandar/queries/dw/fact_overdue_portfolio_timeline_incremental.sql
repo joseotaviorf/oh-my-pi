@@ -11,7 +11,7 @@ negotiation_data AS (
       ip.id_invoice,
       ip.id_contract,
       n.sk_negotiation,
-      CAST(n.net_paid_amount / n.original_debt_amount AS DECIMAL(14,2)) AS net_rate,
+      n.net_recovery_rate AS net_rate,
       IF(n.origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao,
       ROW_NUMBER() OVER(
         PARTITION BY ip.id_invoice, ip.id_contract
@@ -55,7 +55,7 @@ SELECT
     ROUND(CASE
       WHEN o.payment_status = "paid" THEN ABS(o.recovered_amount)
       WHEN o.payment_status = "written-down" AND n.sk_negotiation IS NULL THEN ABS(o.recovered_amount)
-      WHEN o.payment_status = "written-down" THEN n.net_rate * ABS(o.recovered_amount)
+      WHEN o.payment_status = "written-down" THEN COALESCE(n.net_rate, 1) * ABS(o.recovered_amount)
       ELSE 0
     END, 2) AS net_recovered_amount,
     o.contract_debt,

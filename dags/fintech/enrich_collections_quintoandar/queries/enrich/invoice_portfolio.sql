@@ -29,6 +29,7 @@ negotiation_child AS (
         origin_agreement,
         down_payment_amount,
         original_debt_amount,
+        net_recovery_rate,
         dt_promisse
     FROM (
         SELECT
@@ -38,6 +39,7 @@ negotiation_child AS (
             n.origin_agreement,
             n.down_payment_amount,
             n.original_debt_amount,
+            n.net_recovery_rate,
             n.dt_promisse,
             ROW_NUMBER() OVER(
                 PARTITION BY dn.id_invoice
@@ -106,7 +108,7 @@ base_negotiation AS (
         child.id_negotiation_child,
         child.agency AS child_negotiation_agency,
         child.origin_agreement,
-        CAST(child.down_payment_amount / child.original_debt_amount AS DECIMAL(14,2)) AS net_rate_recovery,
+        child.net_recovery_rate AS net_rate_recovery,
         parent.installment_number AS negotiation_installment_number,
         DATE(i.ts_due) AS dt_due,
         parent.dt_due_parent,

@@ -314,3 +314,7 @@ columns:
     description: "The actual end date of the negotiation, which is either when all installments are paid or when the negotiation is canceled."
   ts_load:
     description: "Timestamp indicating when this record was loaded or last updated in the table."
+  net_recovery_rate:
+    lineage:
+      - datalake_collections_quintoandar.negotiation.net_recovery_rate
+    description: "Canonical net recovery rate (fraction of the original principal recovered net of the discount, applying the discount-ordering hierarchy of fine and interest before the original debt), clamped to [0, 1]. Consumed by fact_overdue_portfolio_timeline.net_recovered_amount so it converges with fact_invoice_wallet_timeline.recovered_amount."

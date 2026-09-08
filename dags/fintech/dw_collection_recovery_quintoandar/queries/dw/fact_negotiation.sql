@@ -138,6 +138,7 @@ calculations AS (
     i.down_payment_net_amount,
     IF(COALESCE(i.dt_down_payment,u.dt_down_payment) IS NOT NULL, i.down_payment_net_amount, 0) AS down_payment_net_amount_paid,
     u.paid_amount,
+    u.net_recovery_rate,
     oi.dt_due_invoice_anchor,
     u.dt_promisse,
     u.dt_due_promisse,
@@ -225,6 +226,7 @@ calculate_discounts AS (
     down_payment_net_amount,
     down_payment_net_amount_paid,
     paid_amount,
+    net_recovery_rate,
     dt_due_invoice_anchor,
     dt_promisse,
     dt_due_promisse,
@@ -303,6 +305,7 @@ SELECT
     ELSE 0
   END AS DECIMAL(14,2)) AS net_paid_amount,
   CAST(paid_amount AS DECIMAL(14,2)) AS paid_amount,
+  CAST(net_recovery_rate AS DECIMAL(14,2)) AS net_recovery_rate,
   dt_due_invoice_anchor,
   dt_promisse,
   dt_due_promisse,

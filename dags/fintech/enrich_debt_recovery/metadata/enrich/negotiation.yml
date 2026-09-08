@@ -174,3 +174,24 @@ columns:
     lineage:
       - datalake_trato_feito_clean.installment.total_amount
       - datalake_trato_feito_clean.installment.installment_number
+  net_recovery_rate:
+    description: "Canonical entry-based net recovery rate. Same definition as\
+      \ enrich_collections_quintoandar.negotiation.net_recovery_rate, for platform consistency.\
+      \ Clamped to [0, 1]. Single-installment and credit-card: principal recovered net of the\
+      \ discount (discount-ordering hierarchy: discount absorbs fine and interest before the original debt).\
+      \ Multi-installment non-card: only the entry (down payment) is recognized here; the remaining\
+      \ installments are recognized as paid over time, so full principal is not used to avoid\
+      \ double-counting. NULL when the rate cannot be computed (no original debt, or a\
+      \ multi-installment agreement with no down payment recorded); consumers recognize those\
+      \ invoices in full."
+    lineage:
+      - datalake_trato_feito_clean.debt.original_amount
+      - datalake_trato_feito_clean.debt.discount_amount
+      - datalake_trato_feito_clean.installment.discount_amount
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+      - datalake_trato_feito_clean.debt.fine_fee_amount
+      - datalake_trato_feito_clean.negotiation.payload
+      - datalake_trato_feito_clean.installment.id
+      - datalake_trato_feito_clean.payment.type
+      - datalake_trato_feito_clean.installment.installment_number
+      - datalake_trato_feito_clean.installment.total_amount

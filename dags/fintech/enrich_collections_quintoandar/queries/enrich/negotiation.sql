@@ -303,6 +303,34 @@ SELECT DISTINCT
     COALESCE(tfn.negotiated_amount, cn.negotiated_amount, rn.negotiated_amount) AS negotiated_amount,
     COALESCE(tfn.down_payment_amount, cn.down_payment_amount, rn.down_payment_amount) AS down_payment_amount,
     COALESCE(tfn.paid_amount, cn.total_paid_amount, rn.total_paid_amount, 0) AS paid_amount,
+    CAST(
+      CASE
+        WHEN COALESCE(tfn.original_debt_amount, cn.original_debt_amount, rn.original_debt_amount, 0) <= 0
+          THEN NULL
+        WHEN COALESCE(tfn.number_of_installments, cn.number_of_installments, rn.number_of_installments) = 1
+          OR UPPER(COALESCE(tfn.promisse_payment_method, cn.promisse_payment_method, rn.promisse_payment_method))
+             IN ('CREDIT-CARD', 'CARTÃO', 'CARTÃO DE CRÉDITO')
+        THEN GREATEST(0, LEAST(1,
+            (
+              COALESCE(tfn.original_debt_amount, cn.original_debt_amount, rn.original_debt_amount)
+              - COALESCE(
+                  cn.discount_to_original_amount,
+                  GREATEST(0,
+                    COALESCE(tfn.discount_amount, cn.discount_amount, rn.discount_amount, 0)
+                    - COALESCE(tfn.fine_amount, cn.fine_amount, rn.fine_amount, 0)
+                    - COALESCE(tfn.interest_fee_amount, cn.interest_fee_amount, rn.interest_fee_amount, 0)
+                  )
+                )
+            ) / COALESCE(tfn.original_debt_amount, cn.original_debt_amount, rn.original_debt_amount)
+          ))
+        WHEN COALESCE(tfn.down_payment_amount, cn.down_payment_amount, rn.down_payment_amount) IS NULL
+          THEN NULL
+        ELSE GREATEST(0, LEAST(1,
+            COALESCE(tfn.down_payment_amount, cn.down_payment_amount, rn.down_payment_amount)
+            / COALESCE(tfn.original_debt_amount, cn.original_debt_amount, rn.original_debt_amount)
+          ))
+      END AS DECIMAL(14,2)
+    ) AS net_recovery_rate,
     COALESCE(tfn.dt_promisse, cn.dt_promisse, rn.dt_promisse) AS dt_promisse,
     COALESCE(cn.dt_due_promisse, rn.dt_due_promisse) AS dt_due_promisse,
     COALESCE(tfn.dt_cancellation, cn.dt_cancellation, rn.dt_cancellation) AS dt_cancellation,
