@@ -56,6 +56,12 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         )
         self.layer = layer
 
+    def _max_tables_per_cluster(self) -> int:
+        value = self.workflow_args.get("max_tables_per_cluster")
+        if value is None:
+            return self.MAX_TABLES_PER_CLUSTER
+        return int(value)
+
     def build_dag(self):
         dag = self.dag_instance()
         if self.layer == LayerEnum.METRIC:
@@ -82,7 +88,7 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         if "inner_dependencies" in self.workflow_args:
             n_clusters = 1
         else:
-            n_clusters = math.ceil(n_tables / self.MAX_TABLES_PER_CLUSTER)
+            n_clusters = math.ceil(n_tables / self._max_tables_per_cluster())
         tables_per_cluster = math.ceil(n_tables / n_clusters)
 
         cluster_tables = []
