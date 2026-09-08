@@ -106,11 +106,3 @@ exceptions:
       returns to Databricks. Returns to EMR once the per-table re-scan is
       optimized (e.g. read the source once and derive the tables).
     approved_by: henrique.paulo@quintoandar.com.br
-  - dag: reverse_birdie_access
-    path: dags/cross/reverse_birdie_access
-    reason: >-
-      Temporary EMR→Databricks revert: prod export fails on TLS handshake to
-      api.br.birdie.ai from EMR (cluster j-10143811IXX9BI1ANNDU). Secret fetch
-      and Spark reads succeed; zero-row partitions pass without calling Birdie.
-      Returns to EMR after Birdie allowlists data-account NAT egress IPs.
-    approved_by: eduardo.soares@quintoandar.com.br
