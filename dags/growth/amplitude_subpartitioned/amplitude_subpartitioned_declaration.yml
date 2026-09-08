@@ -1,7 +1,7 @@
 dag:
   name: amplitude_subpartitioned
   owner: Data Growth
-  max_active_tasks: 40
+  max_active_tasks: 16
   documentation:
     dag_purpose:
       "This DAG ingests data from Amplitude and materializes it in a subpartitioned
