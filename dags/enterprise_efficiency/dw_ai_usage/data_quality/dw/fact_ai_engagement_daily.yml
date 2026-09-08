@@ -1,0 +1,43 @@
+---
+table_name: dw_ai_usage.fact_ai_engagement_daily
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_ai_engagement_daily:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  dt_last_activity:
+    is_complete:
+      severity_level: Warning
+  sk_ai_user:
+    is_complete:
+      severity_level: Warning
+  matching_sk_ai_user_dim_ai_user:
+    custom:
+      # Every sk_ai_user > -1 must exist in dw_ai_usage.dim_ai_user (no orphan FK).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT DISTINCT sk_ai_user
+           FROM dw_ai_usage.fact_ai_engagement_daily
+           WHERE sk_ai_user > -1
+         ) AS fact_user
+         WHERE NOT EXISTS (
+           SELECT 1
+           FROM dw_ai_usage.dim_ai_user AS user_dim
+           WHERE user_dim.sk_ai_user = fact_user.sk_ai_user
+         )
+        ) = 0
+      severity_level: Warning

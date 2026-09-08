@@ -5,13 +5,14 @@ domain: Enterprise Efficiency
 description: |
   Conformed AI-tool user dimension preserving each vendor's raw identity (id_user and
   email). Grain: one row per tool and id_user. Scope: covers every tool/id_user
-  combination ever seen in usage or spend, including contractors, service accounts,
-  former employees, and unresolved identities, so usage and spend are never silently
-  lost. email_user is retained as the employee joining key for downstream attribution;
-  this dimension does not depend on or duplicate a People employee dimension.
+  combination ever seen in usage, spend, or Claude product engagement (user_activity),
+  including contractors, service accounts, former employees, and unresolved identities,
+  so usage, spend, and engagement are never silently lost. email_user is retained as
+  the employee joining key for downstream attribution; this dimension does not depend
+  on or duplicate a People employee dimension.
 columns:
   sk_ai_user:
-    description: Unique key for the (tool, id_user) combination, a deterministic hash so it never changes across reruns (e.g. 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8'). Referenced by fact_ai_usage_daily.sk_ai_user, fact_ai_spend_daily.sk_ai_user, and fact_ai_budget_snapshot_daily.sk_ai_user.
+    description: Unique key for the (tool, id_user) combination, a deterministic hash so it never changes across reruns (e.g. 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8'). Referenced by fact_ai_usage_daily.sk_ai_user, fact_ai_spend_daily.sk_ai_user, fact_ai_engagement_daily.sk_ai_user, and fact_ai_budget_snapshot_daily.sk_ai_user.
     lineage:
       - datalake_ai_usage.usage_daily.tool
       - datalake_ai_usage.usage_daily.id_user
@@ -22,17 +23,22 @@ columns:
       - datalake_ai_usage.usage_daily.tool
 
   id_user:
-    description: Vendor-stable user identifier as reported in usage and spend (e.g. 'user_01H8XGJ4K2M3N4P5Q6R7S8T9U0').
+    description: Vendor-stable user identifier as reported in usage, spend, and engagement (e.g. 'user_01H8XGJ4K2M3N4P5Q6R7S8T9U0').
     lineage:
       - datalake_ai_usage.usage_daily.id_user
+      - datalake_ai_usage.spend_daily.id_user
+      - datalake_claude_usage_clean.user_activity.id_user
 
   email_user:
     description: |
       Work email address reported by the vendor for this user and the joining key for
-      downstream employee attribution (e.g. 'name.last_name@quintoandar.com.br'). The
-      value is preserved from usage and spend and may be NULL or unmatched. Downstream
-      consumers can enrich current employee attributes by joining email_user to
-      dw_people.dim_employee.work_email; the public table is active-only, so historical
-      or former employees may remain unmatched.
+      downstream employee attribution (e.g. 'name.last_name@quintoandar.com.br'). When
+      multiple emails appear for the same tool and id_user, the dimension keeps one row
+      by preferring rows where both id_user and email_user are non-null. The value may be
+      NULL or unmatched. Downstream consumers can enrich current employee attributes by
+      joining email_user to dw_people.dim_employee.work_email; the public table is
+      active-only, so historical or former employees may remain unmatched.
     lineage:
       - datalake_ai_usage.usage_daily.email_user
+      - datalake_ai_usage.spend_daily.email_user
+      - datalake_claude_usage_clean.user_activity.email_user

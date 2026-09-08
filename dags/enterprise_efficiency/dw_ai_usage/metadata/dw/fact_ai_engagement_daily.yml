@@ -1,0 +1,82 @@
+database_name: dw_ai_usage
+table_name: fact_ai_engagement_daily
+owner: gabriel.berger@quintoandar.com.br
+domain: Enterprise Efficiency
+description: |
+  Claude product-engagement fact. Grain: one row per tool, id_user, and activity day
+  (dt_last_activity). Scope: covers every user_activity row from the Claude Analytics
+  /users endpoint. Measures are engagement counts only (chat, Claude Code, Cowork);
+  token usage and spend live in fact_ai_usage_daily and fact_ai_spend_daily. Vendor-absent
+  measures are NULL, not zero. sk_ai_user is -1 when the source row's (tool, id_user)
+  has no matching dimension row (unknown-member routing).
+columns:
+  sk_ai_engagement_daily:
+    description: Unique key for the fact grain (tool, id_user, activity day), a deterministic hash so it never changes across reruns (e.g. 'f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1'). Hashed from the raw natural key, not the resolved sk_ai_user, so unmatched rows (which all share the same -1 unknown-member FK) never collapse onto a single grain key.
+    lineage:
+      - datalake_claude_usage_clean.user_activity.id_user
+      - datalake_claude_usage_clean.user_activity.dt_last_activity
+
+  sk_ai_user:
+    description: Key of the employee attributed to this engagement row (e.g. 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8'). References dw_ai_usage.dim_ai_user. -1 when no matching dimension row exists for this tool and id_user.
+    lineage:
+      - dw_ai_usage.dim_ai_user.sk_ai_user
+
+  count_chat_distinct_conversations:
+    description: Number of distinct chat conversations the user had on the activity day (e.g. 3).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_chat_distinct_conversations
+
+  count_chat_messages:
+    description: Number of chat messages the user sent on the activity day (e.g. 42).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_chat_messages
+
+  count_claude_code_commits:
+    description: Number of Claude Code commits the user made on the activity day (e.g. 5).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_claude_code_commits
+
+  count_claude_code_pull_requests:
+    description: Number of Claude Code pull requests the user opened on the activity day (e.g. 2).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_claude_code_pull_requests
+
+  count_claude_code_lines_added:
+    description: Number of lines of code added via Claude Code on the activity day (e.g. 150).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_claude_code_lines_added
+
+  count_claude_code_lines_removed:
+    description: Number of lines of code removed via Claude Code on the activity day (e.g. 80).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_claude_code_lines_removed
+
+  count_cowork_messages:
+    description: Number of Cowork messages the user sent on the activity day (e.g. 10).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_cowork_messages
+
+  count_cowork_actions:
+    description: Number of Cowork actions the user performed on the activity day (e.g. 7).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_cowork_actions
+
+  count_cowork_dispatch_turns:
+    description: Number of Cowork dispatch turns the user triggered on the activity day (e.g. 4).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_cowork_dispatch_turns
+
+  is_active_day:
+    description: True when the user had at least one chat message, Claude Code commit, or Cowork message on the activity day.
+    lineage:
+      - datalake_claude_usage_clean.user_activity.count_chat_messages
+      - datalake_claude_usage_clean.user_activity.count_claude_code_commits
+      - datalake_claude_usage_clean.user_activity.count_cowork_messages
+
+  dt_last_activity:
+    description: Activity date reported by Claude Analytics for this engagement row (e.g. 2026-09-01).
+    lineage:
+      - datalake_claude_usage_clean.user_activity.dt_last_activity
+
+  ts_load:
+    description: Timestamp this row was loaded into the fact (e.g. 2026-09-01 03:00:00).
