@@ -8,6 +8,7 @@ dag:
       It produces 7, 30, and 90 day snapshots consumed by the Internal Linking
       access DAG for selective SQS publication. Snapshots close at D-7 because
       GSC rewrites the last seven days and recent calendar days are often empty.
+      The DAG is dataset-triggered after GSC clean and executes on Mondays only.
 workflow:
   type: load
   layer: reverse
@@ -17,6 +18,10 @@ workflow:
     - ref_date
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -7), 'load_end_date') }}"
+  short_circuit_customization:
+    function: CHECK_IS_SPECIFIC_WEEKDAY
+    function_params:
+      weekday: 0
   tables_customization:
     gsc_page_metrics:
       merge_on:
