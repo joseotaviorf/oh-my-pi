@@ -131,7 +131,9 @@ provision_table AS (
         AND NOT is_international
         AND NOT is_before_started
         AND payment_status NOT IN ('written down', 'written-down', 'canceled')
-    GROUP BY ALL
+    GROUP BY
+        id_contract,
+        DATE_FORMAT(dt_closing, "yyyy-MM-01")
 ),
 
 losses_table AS (
@@ -157,9 +159,23 @@ losses_table AS (
 
 final_table AS (
     SELECT
-        * EXCEPT (tax_rate, losses),
-        coalesce(tax_rate, -8.0) AS tax_rate,
-        coalesce(losses, 0.) AS losses
+        id_rent_flow,
+        id_house,
+        id_tenant_prospect,
+        id_contract,
+        contract_start_month,
+        dt_termination,
+        contract_lifetime,
+        dt_month_start,
+        accrual_year_month,
+        net_revenue_pre_taxes,
+        gross_revenue,
+        pre_rental_costs,
+        onboarding_costs,
+        ongoing_costs,
+        offboarding_costs,
+        COALESCE(tax_rate, -8.0) AS tax_rate,
+        COALESCE(losses, 0.) AS losses
     FROM
         revenue_table
     LEFT JOIN

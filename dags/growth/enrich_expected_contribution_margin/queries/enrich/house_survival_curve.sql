@@ -1,14 +1,25 @@
-WITH house_table AS (
+WITH house_ranked AS (
     SELECT
         h.id AS id_house,
-        COALESCE(IF(lbc.business_context = 'RENT', lbc.ts_first_publication, NULL), h.dt_first_publication) AS dt_first_publication
+        COALESCE(IF(lbc.business_context = 'RENT', lbc.ts_first_publication, NULL), h.dt_first_publication) AS dt_first_publication,
+        ROW_NUMBER() OVER (
+            PARTITION BY h.id
+            ORDER BY IF(lbc.business_context = 'RENT', 1, 2)
+        ) AS rn
     FROM
         datalake_ebdb_clean.house AS h
     LEFT JOIN
         datalake_ebdb_clean.listing_business_context AS lbc
             ON lbc.id_house = h.id
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY IF(lbc.business_context = 'RENT', 1, 2)) = 1
+),
+house_table AS (
+    SELECT
+        id_house,
+        dt_first_publication
+    FROM
+        house_ranked
+    WHERE
+        rn = 1
 ),
 
 durations_table AS (
