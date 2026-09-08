@@ -112,8 +112,8 @@ columns:
   min_price:
     lineage:
       - datalake_sale_primary_market.listing_sale_type.min_price
-    description: Minimum price of the house's most recently updated SALE listing_sale_model row, passed through from enrich listing_sale_type. Null when the house has no SALE listing_sale_model row.
+    description: Minimum price of the house's SALE listing_sale_model row, passed through from enrich listing_sale_type. Null when the house has no SALE listing_sale_model row.
   max_price:
     lineage:
       - datalake_sale_primary_market.listing_sale_type.max_price
-    description: Maximum price of the house's most recently updated SALE listing_sale_model row, passed through from enrich listing_sale_type. Null when the house has no SALE listing_sale_model row.
+    description: Maximum price of the house's SALE listing_sale_model row, passed through from enrich listing_sale_type. Null when the house has no SALE listing_sale_model row.

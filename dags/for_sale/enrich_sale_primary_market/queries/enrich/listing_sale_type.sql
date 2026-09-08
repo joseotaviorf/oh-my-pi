@@ -1,28 +1,20 @@
--- Latest SALE listing per house. sale_type from LSM, else boolean is_primary_market.
--- min_price/max_price are the same latest row's price range -- no extra join.
+-- One SALE listing per house (id_house is unique after business_context = SALE).
+-- sale_type from LSM enum (NULL -> SECONDARY).
+-- Excludes old primary-market tests (is_primary_market = TRUE).
+-- min_price/max_price come from the same listing_sale_model row.
 SELECT
-    id_house,
-    sale_type,
-    min_price,
-    max_price
-FROM (
-    SELECT
-        lbc.id_house,
-        CASE
-            WHEN lsm.sale_type IS NOT NULL THEN lsm.sale_type
-            WHEN lsm.is_primary_market = TRUE THEN 'PRIMARY'
-            ELSE 'SECONDARY'
-        END AS sale_type,
-        lsm.min_price,
-        lsm.max_price,
-        ROW_NUMBER() OVER (PARTITION BY lbc.id_house ORDER BY lbc.ts_updated DESC) AS _w
-    FROM
-        datalake_ebdb_clean.listing_business_context AS lbc
-    INNER JOIN
-        datalake_ebdb_clean.listing_sale_model AS lsm
-            ON lbc.id = lsm.id_listing_business_context
-    WHERE
-        lbc.business_context = 'SALE'
-) AS _t
+    lbc.id_house,
+    CASE
+        WHEN lsm.sale_type IS NULL THEN 'SECONDARY'
+        ELSE lsm.sale_type
+    END AS sale_type,
+    lsm.min_price,
+    lsm.max_price
+FROM
+    datalake_ebdb_clean.listing_business_context AS lbc
+INNER JOIN
+    datalake_ebdb_clean.listing_sale_model AS lsm
+        ON lbc.id = lsm.id_listing_business_context
 WHERE
-    _w = 1
+    lbc.business_context = 'SALE'
+    AND lsm.is_primary_market != TRUE -- Filter out old primary market tests

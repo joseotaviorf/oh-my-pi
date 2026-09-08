@@ -2,7 +2,15 @@
 database_name: datalake_sale_primary_market
 table_name: listing_sale_type
 domain: For Sale
-description: One row per house classifying it as PRIMARY or SECONDARY market, with the price range of that same listing. Single source of truth so other enrich/DW tables can join sale_type or price instead of re-deriving the latest-SALE-listing_sale_model lookup.
+description: >
+  One row per house classifying its SALE listing as PRIMARY or SECONDARY from
+  ListingSaleModel.sale_type. Grain is one SALE listing_business_context per
+  house. NULL enum values are filled as SECONDARY. Old primary-market test
+  listings (is_primary_market = TRUE) are excluded, so this table is no longer
+  a mix of the Órulo pilot and legacy boolean-flagged houses. Also carries that
+  same listing's min_price and max_price. Single source of truth so other
+  enrich/DW tables can join sale_type or price instead of re-deriving the SALE
+  listing_sale_model lookup.
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house:
@@ -12,13 +20,28 @@ columns:
   sale_type:
     lineage:
       - datalake_ebdb_clean.listing_sale_model.sale_type
-      - datalake_ebdb_clean.listing_sale_model.is_primary_market
-    description: PRIMARY or SECONDARY market classification of the house's most recently updated SALE listing. Prefers the sale_type enum; falls back to the legacy is_primary_market boolean when sale_type is not yet populated.
+    description: >
+      PRIMARY or SECONDARY market classification of the house's SALE listing.
+      Taken from listing_sale_model.sale_type; when the enum is NULL, filled as
+      SECONDARY. Listing_sale_model rows with is_primary_market = TRUE (old
+      primary-market tests) are excluded, so this column does not fall back to
+      the legacy boolean.
+    categories:
+      PRIMARY: New-build inventory sold by an incorporadora, from the ListingSaleModel.sale_type enum.
+      SECONDARY: Resale inventory, including listings whose sale_type enum is still NULL.
   min_price:
     lineage:
       - datalake_ebdb_clean.listing_sale_model.min_price
-    description: Minimum price of the house's most recently updated SALE listing_sale_model row (same row sale_type is derived from). Null when the house has no SALE listing_sale_model row.
+    description: >
+      Minimum price of the house's SALE listing_sale_model row (same row
+      sale_type is derived from). Null when that row has no min_price. Houses
+      with no SALE listing_sale_model row after the test-listing filter are
+      absent from this table.
   max_price:
     lineage:
       - datalake_ebdb_clean.listing_sale_model.max_price
-    description: Maximum price of the house's most recently updated SALE listing_sale_model row (same row sale_type is derived from). Null when the house has no SALE listing_sale_model row.
+    description: >
+      Maximum price of the house's SALE listing_sale_model row (same row
+      sale_type is derived from). Null when that row has no max_price. Houses
+      with no SALE listing_sale_model row after the test-listing filter are
+      absent from this table.

@@ -1,7 +1,7 @@
 -- Grain: one row per house (same as enrich house_development). Adds id_region
 -- (raw FK), city_group (resolved), and min/max price (from enrich
--- listing_sale_type, which already does the latest-SALE-listing_sale_model
--- lookup) so consumers don't repeat either join.
+-- listing_sale_type, which already joins the SALE listing_sale_model)
+-- so consumers don't repeat either join.
 SELECT
     hd.id_house,
     hd.id_development,
