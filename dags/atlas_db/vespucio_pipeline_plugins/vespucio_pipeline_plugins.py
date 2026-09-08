@@ -14,6 +14,7 @@ from databricks_plugin import (
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
@@ -152,6 +153,7 @@ property_search_indexer_task = create_task(
         "--output_index_prefix=vespucio_prod",
         "--number_of_shards=3",
         "--number_of_replicas=2",
+        f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
     ],
     execution_timeout_hours=PROPERTY_SEARCH_INDEXER_TIMEOUT_HOURS,
 )
