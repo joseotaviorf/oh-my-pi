@@ -1,7 +1,7 @@
 dag:
   name: amplitude_subpartitioned
   owner: Data Growth
-  max_active_tasks: 40
+  max_active_tasks: 80
   documentation:
     dag_purpose:
       "This DAG ingests data from Amplitude and materializes it in a subpartitioned
@@ -12,7 +12,7 @@ workflow:
   custom_schema: amplitude
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
-  max_tables_per_cluster: 400
+  max_tables_per_cluster: 25
   tables_customization:
     170135_piloto_cw_message_sent_events:
       run_optimize: false
