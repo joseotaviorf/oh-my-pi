@@ -20,6 +20,7 @@ from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_scan_results_into_gsheet"
 TIMEOUT_LIMIT = 5 * 60
+VALIDATION_TABLE_NAME = "pii_scan_results_validation"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -94,6 +95,44 @@ def _get_payloads_from_datalake(
     return rows
 
 
+def _get_pending_validation_rows(
+    gsheets_consumer: GsheetsConsumer,
+    sheet_name: str,
+    sheet_id: str,
+) -> list:
+    """
+    This function gets the rows still awaiting evaluation from the validation gsheet.
+
+    The tab keeps only entities pending evaluation, so once owners evaluate every
+    entity the job rewrites it with the header alone. A header-only tab reads back
+    as zero rows, which is a valid steady state and must not fail the export.
+
+    :param gsheets_consumer: GsheetsConsumer to read the validation gsheet
+    :param sheet_name: Sheet name for data
+    :param sheet_id: Sheet ID for data
+
+    :return: list of lists
+    """
+    sheet_data = gsheets_consumer.read(sheet_name, sheet_id)
+
+    logger.info(
+        f"m=_get_pending_validation_rows, message=Found {len(sheet_data)} rows on gsheets."
+    )
+
+    if not sheet_data:
+        return []
+
+    df = gsheets_consumer.parse_data_on_dataframe(
+        sheet_data, VALIDATION_TABLE_NAME, is_partitioned=False
+    )
+
+    return (
+        df.filter("manual_eval == ''")
+        .rdd.map(lambda row: [str(x) for x in row])
+        .collect()
+    )
+
+
 def __get_auth(dbutils, credentials_scope, credentials_key):
     """
     This method gets credentials from the Gsheets API.
@@ -166,17 +205,8 @@ def main():
     logger.info(
         f"m=main, message=Fetching data from gsheets. sheet_name={sheet_name}, sheet_id={sheet_id}"
     )
-    gsheet_current_data = gsheets_consumer.get_sheet_df(
-        sheet_name, sheet_id, "pii_scan_results_validation"
-    )
-    logger.info(
-        f"m=main, message=Found {len(gsheet_current_data.collect())} rows on gsheets."
-    )
-
-    gsheet_current_data_list = (
-        gsheet_current_data.filter("manual_eval == ''")
-        .rdd.map(lambda row: [str(x) for x in row])
-        .collect()
+    gsheet_current_data_list = _get_pending_validation_rows(
+        gsheets_consumer, sheet_name, sheet_id
     )
 
     logger.info(
