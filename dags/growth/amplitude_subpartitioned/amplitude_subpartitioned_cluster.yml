@@ -3,10 +3,12 @@ cluster:
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     autotermination_minutes: 30
+    step_concurrency_level: 12
+    master_node_type_id: r6g.8xlarge
     core_nodes:
-      target_on_demand: 12
+      target_on_demand: 20
       target_spot: 0
-      instance_types: [r6g.4xlarge, r7g.4xlarge]
+      instance_types: [r8g.8xlarge, r7g.8xlarge]
     spark_conf:
       spark.executor.cores: "4"
       spark.executor.memory: "24g"
