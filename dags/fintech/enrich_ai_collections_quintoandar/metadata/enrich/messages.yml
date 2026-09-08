@@ -7,7 +7,7 @@ columns:
   id_sauron_session:
     lineage:
       - datalake_chatbot.messages.id_sauron_session
-    description: "Numeric Sauron session identifier from the source message. NULL when the session is tracked only by a hash id (see id_session_key)."
+    description: "Numeric Sauron session identifier of the session. Taken from the source messages that carry it, since a session may have it filled on part of its messages only. NULL when the session is tracked exclusively by a hash id (see id_session_key)."
   id_session_key:
     lineage:
       - datalake_chatbot.messages.id_sauron_session

@@ -48,7 +48,7 @@ messages_as_struct AS (
         m.message IS NOT NULL
 )
 SELECT
-    id_sauron_session,
+    MAX(id_sauron_session) AS id_sauron_session,
     id_session_key,
     id_external,
     MIN(ts_created) AS ts_session_start,
@@ -66,4 +66,4 @@ SELECT
 FROM
     messages_as_struct
 GROUP BY
-    id_sauron_session, id_session_key, id_external
+    id_session_key, id_external

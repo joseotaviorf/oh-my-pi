@@ -251,7 +251,7 @@ negotiations AS (
 ),
 contract_static_info_ranked AS (
   SELECT
-    id_contract,
+    id AS id_contract,
     CASE
       WHEN UPPER(guarantee_type) = 'SEGUROFAIRFAX' THEN 'FAIRFAX'
       WHEN UPPER(guarantee_type) = 'PRO_GUARANTOR' THEN 'PRO_GUARANTOR'
@@ -260,7 +260,7 @@ contract_static_info_ranked AS (
       WHEN UPPER(guarantee_type) IN ('STANDALONE', 'THIRDPARTYGUARANTEE') THEN 'BROKERAGE_ONLY'
       ELSE 'OTHERS'
     END AS contract_guarantee,
-    ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_updated DESC) AS rn
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS rn
   FROM datalake_ebdb_contract.contract
 ),
 contract_static_info AS (
