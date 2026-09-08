@@ -203,34 +203,6 @@ To run a single package or DAG test folder:
 
 ---
 
-## Configuring a Google Chat webhook for alerts
-
-Spark jobs and data-quality checks send alerts through `GChatService`, resolved from a human-readable channel keyword (e.g. `AUTHX_ALERTS`) to a webhook URL fetched from Databricks Secrets. Adding a new channel touches three places: Google Chat, Vault, and one enum in this repo.
-
-1. **Create the webhook in Google Chat.** In the target space, open **Apps & integrations** → **Add webhooks**, name it, and copy the generated URL. Each channel that should receive alerts needs its own webhook.
-
-2. **Store the URL in Vault, one secret per environment.** Add it at:
-
-   ```
-   apps/<env>/bi-etl-ejuice/WEBHOOK_NAME
-   ```
-
-where `<env>` is `prod` or `forno`, and `WEBHOOK_NAME` is the secret name. This must be requested via a PR in the [`infrastructure`](https://github.com/quintoandar/infrastructure) repo — see [#41477](https://github.com/quintoandar/infrastructure/pull/41477) for an example. Vault secrets under `apps/<env>/bi-etl-ejuice/*` are synced into the `quintoandar` scope in Databricks Secrets, which is what `dbutils.secrets.get(scope="quintoandar", key=...)` reads at runtime (see [`AlertChannelService`](packages/bietlejuice-runtime/src/bietlejuice/services/messaging_services/alert_channel_service.py)).
-
-3. **Register the channel keyword** in [`GchatWebhooksEnum`](packages/bietlejuice-runtime/src/bietlejuice/base/notification/gchat_webhooks_enum.py):
-
-   ```python
-   class GchatWebhooksEnum:
-       ...
-       MY_TEAM_ALERTS = "GCHAT_MY_TEAM_ALERTS_WEBHOOK"  # must match the Vault secret name
-   ```
-
-The class attribute value must be the exact Vault/Databricks-Secrets key from step 2. The attribute *name* (`MY_TEAM_ALERTS`) is the keyword used elsewhere — e.g. as `alert_channel:` in a `data_quality/*.yml` file, or as the `channel` argument to a monitor.
-
-Once all three are in place, `AlertChannelService(dbutils=...).get_gchat_webhook_url(channel_keyword="MY_TEAM_ALERTS", ...)` resolves the keyword to the secret key, fetches it from Databricks Secrets, and `GChatService.send_message` posts to it.
-
----
-
 ## Hotfixes
 
 Urgent production path: [Hotfix flow (Google Doc)](https://docs.google.com/document/d/13_0MoPv_R5eYk647v7BRQSp4O6P-mcr3AdouC8gwXVk/edit#heading=h.otmv9f3bbomh).
