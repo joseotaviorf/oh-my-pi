@@ -7,14 +7,17 @@ dag:
   max_active_runs: 1
   documentation:
     dag_purpose: |
-      Incrementally materializes CDP Persona datasets every 30 minutes. During
-      batch-pipeline validation, each run reads the legacy stream-owned
-      datalake_cdp_clean.transactional table using ts_egw from load_start_date
-      through load_end_date, without Change Data Feed or streaming checkpoints.
-      It merges the latest event per user and persona, then reconciles those
-      signals with the matching historical persona snapshot. Overlapping runs
-      are safe because merges only apply when the source update timestamp is at
-      least as recent as the target.
+      Incrementally materializes CDP Persona datasets every 30 minutes as a
+      batch replacement for stream_persona_clean and stream_persona_enrich.
+      stream_persona_events rebuilds the latest EGW persona signal per user and
+      persona from datalake_cdp_clean.transactional filtered by year, month, and
+      day partitions in the load window. persona_events full-outer-joins
+      datalake_cdp.stream_persona_events with the historical snapshot in
+      datalake_cdp_personas.persona using the same is_active COALESCE and
+      last_journey_step CASE as stream_persona_enrich. Waits on
+      enrich_cdp_personas (load-enrich-persona) before reading the historical
+      snapshot. Merge inserts only active rows and deletes when the source is
+      inactive and at least as recent as the target.
 
 workflow:
   layer: enrich
@@ -38,7 +41,9 @@ workflow:
     persona_events:
       extraction_type: incremental
       merge_on: [id_persona_event]
-      when_matched_update_condition: source.ts_updated >= target.ts_updated
+      when_matched_update_condition: source.is_active = true AND source.ts_updated >= target.ts_updated
+      when_matched_delete_condition: source.is_active = false AND source.ts_updated >= target.ts_updated
+      when_not_matched_insert_condition: source.is_active = true
       z_order_by: [persona, id_user, uuid_person, ts_updated]
 
 cluster:

@@ -1,4 +1,52 @@
-WITH events_incremental AS (
+WITH persona_ranked AS (
+    SELECT
+        SHA2(
+            CONCAT(
+                CAST(id_user AS STRING),
+                persona
+            ),
+            512
+        ) AS id_persona_event,
+        id_user,
+        uuid_person,
+        persona,
+        journey_step AS last_journey_step,
+        is_active,
+        CAST(ts_first_event AS TIMESTAMP) AS ts_started,
+        CAST(ts_last_event AS TIMESTAMP) AS ts_updated,
+        CAST(NULL AS TIMESTAMP) AS ts_ended,
+        YEAR(
+            COALESCE(
+                CAST(ts_last_event AS TIMESTAMP),
+                CAST(ts_first_event AS TIMESTAMP)
+            )
+        ) AS year,
+        MONTH(
+            COALESCE(
+                CAST(ts_last_event AS TIMESTAMP),
+                CAST(ts_first_event AS TIMESTAMP)
+            )
+        ) AS month,
+        DAY(
+            COALESCE(
+                CAST(ts_last_event AS TIMESTAMP),
+                CAST(ts_first_event AS TIMESTAMP)
+            )
+        ) AS day,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                id_user,
+                persona
+            ORDER BY
+                COALESCE(
+                    CAST(ts_last_event AS TIMESTAMP),
+                    CURRENT_TIMESTAMP()
+                ) DESC
+        ) AS row_number
+    FROM
+        datalake_cdp_personas.persona
+),
+persona_filtered AS (
     SELECT
         id_persona_event,
         id_user,
@@ -6,6 +54,25 @@ WITH events_incremental AS (
         persona,
         last_journey_step,
         is_active,
+        ts_started,
+        ts_updated,
+        ts_ended,
+        year,
+        month,
+        day
+    FROM
+        persona_ranked
+    WHERE
+        row_number = 1
+),
+persona_events_filtered AS (
+    SELECT
+        id_persona_event,
+        id_user,
+        uuid_person,
+        persona,
+        is_active,
+        UPPER(last_journey_step) AS last_journey_step,
         ts_updated,
         year,
         month,
@@ -13,101 +80,108 @@ WITH events_incremental AS (
     FROM
         datalake_cdp.stream_persona_events
     WHERE
-        ts_ingested_at >= TIMESTAMP('{load_start_date}')
-        AND ts_ingested_at <= TIMESTAMP('{load_end_date}')
+        TO_DATE(ts_load)
+        BETWEEN TO_DATE('{load_start_date}')
+        AND TO_DATE('{load_end_date}')
 ),
-batch_ranked AS (
-    SELECT
-        events.id_persona_event,
-        events.id_user,
-        COALESCE(events.uuid_person, batch.uuid_person) AS uuid_person,
-        events.persona,
-        events.last_journey_step AS event_last_journey_step,
-        events.is_active AS event_is_active,
-        events.ts_updated AS event_ts_updated,
-        events.year,
-        events.month,
-        events.day,
-        batch.journey_step AS batch_last_journey_step,
-        batch.is_active AS batch_is_active,
-        CAST(batch.ts_first_event AS TIMESTAMP) AS batch_ts_started,
-        CAST(batch.ts_last_event AS TIMESTAMP) AS batch_ts_updated,
-        ROW_NUMBER() OVER (
-            PARTITION BY events.id_persona_event
-            ORDER BY
-                COALESCE(
-                    CAST(batch.ts_last_event AS TIMESTAMP),
-                    CURRENT_TIMESTAMP()
-                ) DESC,
-                CAST(batch.ts_first_event AS TIMESTAMP) DESC
-        ) AS row_number
-    FROM
-        events_incremental AS events
-    LEFT JOIN
-        datalake_cdp_personas.persona AS batch
-            ON batch.id_user = events.id_user
-            AND batch.persona = events.persona
-),
-reconciled AS (
+persona_events_distinct AS (
     SELECT
         id_persona_event,
         id_user,
         uuid_person,
         persona,
+        is_active,
+        last_journey_step,
+        MAX(ts_updated) AS ts_updated,
+        year,
+        month,
+        day
+    FROM
+        persona_events_filtered
+    GROUP BY
+        id_persona_event,
+        id_user,
+        uuid_person,
+        persona,
+        is_active,
+        last_journey_step,
+        year,
+        month,
+        day
+),
+unified AS (
+    SELECT
+        COALESCE(
+            persona_evt.id_persona_event,
+            persona_hist.id_persona_event
+        ) AS id_persona_event,
+        COALESCE(
+            persona_evt.id_user,
+            persona_hist.id_user
+        ) AS id_user,
+        COALESCE(
+            persona_evt.uuid_person,
+            persona_hist.uuid_person
+        ) AS uuid_person,
+        COALESCE(
+            persona_evt.persona,
+            persona_hist.persona
+        ) AS persona,
         CASE
             WHEN
-                event_ts_updated IS NOT NULL
-                AND (
-                    batch_ts_updated IS NULL
-                    OR event_ts_updated > batch_ts_updated
-                )
-                THEN UPPER(event_last_journey_step)
-            ELSE UPPER(batch_last_journey_step)
+                persona_hist.ts_updated IS NOT NULL
+                AND persona_evt.ts_updated IS NOT NULL
+                AND persona_hist.ts_updated >= persona_evt.ts_updated
+                THEN persona_hist.last_journey_step
+            WHEN
+                persona_hist.ts_updated IS NOT NULL
+                AND persona_evt.ts_updated IS NOT NULL
+                AND persona_evt.ts_updated > persona_hist.ts_updated
+                THEN persona_evt.last_journey_step
+            WHEN
+                persona_hist.ts_updated IS NULL
+                AND persona_evt.ts_updated IS NOT NULL
+                THEN persona_evt.last_journey_step
+            WHEN
+                persona_hist.ts_updated IS NOT NULL
+                AND persona_evt.ts_updated IS NULL
+                THEN persona_hist.last_journey_step
         END AS last_journey_step,
-        CASE
-            WHEN
-                event_ts_updated IS NOT NULL
-                AND (
-                    batch_ts_updated IS NULL
-                    OR event_ts_updated > batch_ts_updated
-                )
-                THEN event_is_active
-            ELSE batch_is_active
-        END AS is_active,
-        batch_ts_started AS ts_started,
+        COALESCE(
+            persona_evt.is_active,
+            persona_hist.is_active
+        ) AS is_active,
+        persona_hist.ts_started,
         COALESCE(
             CASE
                 WHEN
-                    batch_ts_updated IS NOT NULL
-                    AND event_ts_updated IS NOT NULL
-                    AND batch_ts_updated >= event_ts_updated
-                    THEN batch_ts_updated
+                    persona_hist.ts_updated IS NOT NULL
+                    AND persona_evt.ts_updated IS NOT NULL
+                    AND persona_hist.ts_updated >= persona_evt.ts_updated
+                    THEN persona_hist.ts_updated
                 WHEN
-                    batch_ts_updated IS NOT NULL
-                    AND event_ts_updated IS NOT NULL
-                    AND event_ts_updated > batch_ts_updated
-                    THEN event_ts_updated
+                    persona_hist.ts_updated IS NOT NULL
+                    AND persona_evt.ts_updated IS NOT NULL
+                    AND persona_evt.ts_updated > persona_hist.ts_updated
+                    THEN persona_evt.ts_updated
                 WHEN
-                    batch_ts_updated IS NOT NULL
-                    AND event_ts_updated IS NULL
-                    THEN batch_ts_updated
+                    persona_hist.ts_updated IS NOT NULL
+                    AND persona_evt.ts_updated IS NULL
+                    THEN persona_hist.ts_updated
                 WHEN
-                    event_ts_updated IS NOT NULL
-                    AND batch_ts_updated IS NULL
-                    THEN event_ts_updated
+                    persona_evt.ts_updated IS NOT NULL
+                    AND persona_hist.ts_updated IS NULL
+                    THEN persona_evt.ts_updated
             END,
-            batch_ts_started
+            persona_hist.ts_started
         ) AS ts_updated,
-        CAST(NULL AS TIMESTAMP) AS ts_ended,
-        CURRENT_TIMESTAMP() AS ts_load,
-        COALESCE(year, YEAR(batch_ts_updated), YEAR(CURRENT_DATE())) AS year,
-        COALESCE(month, MONTH(batch_ts_updated), MONTH(CURRENT_DATE())) AS month,
-        COALESCE(day, DAY(batch_ts_updated), DAY(CURRENT_DATE())) AS day
+        persona_hist.ts_ended,
+        CURRENT_TIMESTAMP() AS ts_load
     FROM
-        batch_ranked
-    WHERE
-        row_number = 1
-        AND id_persona_event IS NOT NULL
+        persona_filtered AS persona_hist
+    FULL OUTER JOIN
+        persona_events_distinct AS persona_evt
+            ON persona_hist.id_persona_event = persona_evt.id_persona_event
 )
 SELECT
     id_persona_event,
@@ -120,10 +194,10 @@ SELECT
     ts_updated,
     ts_ended,
     ts_load,
-    year,
-    month,
-    day
+    YEAR(COALESCE(ts_updated, ts_started)) AS year,
+    MONTH(COALESCE(ts_updated, ts_started)) AS month,
+    DAY(COALESCE(ts_updated, ts_started)) AS day
 FROM
-    reconciled
+    unified
 WHERE
-    is_active = true
+    id_persona_event IS NOT NULL

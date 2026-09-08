@@ -2,12 +2,13 @@
 database_name: datalake_cdp
 table_name: persona_events
 description: |
-  Current active CDP persona state with one row per QuintoAndar user and persona.
-  Each incremental run merges event-derived journey signals from the current
-  ClickHouse ingest window with the matching historical persona model, retaining
-  the most recent update and publishing only active roles. Analytics,
-  segmentation, and customer activation consumers use this table to identify a
-  user's current platform role and journey position.
+  Current CDP persona state with one row per QuintoAndar user and persona, built
+  as a batch replacement for stream_persona_enrich. Each run full-outer-joins the
+  historical snapshot in datalake_cdp_personas.persona with stream persona signals
+  from datalake_cdp.stream_persona_events in the load window, applies the
+  streaming is_active COALESCE and last_journey_step CASE, and merges active rows
+  only. Analytics, segmentation, and customer activation consumers use this table
+  as the governed persona state model.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -29,44 +30,48 @@ columns:
   uuid_person:
     description: |
       Governed person UUID selected from the latest event signal when available,
-      otherwise from the historical persona model.
+      otherwise from the historical batch persona model.
     lineage:
       - datalake_cdp_personas.persona.uuid_person
       - datalake_cdp.stream_persona_events.uuid_person
   persona:
     description: |
       Current business role of the user, including owner, tenant, prospect,
-      partner, and operational agent classifications.
+      buyer, and owner-prospect classifications.
     lineage:
       - datalake_cdp_personas.persona.persona
       - datalake_cdp.stream_persona_events.persona
   last_journey_step:
     description: |
-      Most recent known journey position for this persona, selected from the
-      batch or event source according to their update timestamps.
+      Journey position reconciled between the batch persona snapshot and the
+      stream_persona_events signal: batch journey_step when batch ts_updated is
+      at least as recent as the event signal, otherwise the event
+      last_journey_step. Batch-only rows with no matching stream event in the
+      current microbatch keep batch.last_journey_step.
     lineage:
       - datalake_cdp_personas.persona.journey_step
       - datalake_cdp.stream_persona_events.last_journey_step
   is_active:
     description: |
-      Whether the user and persona pair is active, taken from the same
-      timestamp winner used for last_journey_step. A newer historical batch
-      row can remain inactive even when the event signal is hardcoded true.
-      Inactive rows are excluded from this published table.
+      Whether the user and persona pair is active, COALESCE of the stream event
+      signal then the batch persona model. Event signals are hardcoded active,
+      so any overlapping event keeps the row active. Inactive source rows are not
+      inserted and delete a matching target row when their ts_updated is at least
+      as recent as the target.
     lineage:
       - datalake_cdp_personas.persona.is_active
       - datalake_cdp.stream_persona_events.is_active
   ts_started:
     description: |
-      UTC timestamp when the historical persona period began, when supplied by
-      the batch persona model.
+      UTC timestamp when the batch persona period began, when supplied by
+      datalake_cdp_personas.persona.
     lineage:
       - datalake_cdp_personas.persona.ts_first_event
   ts_updated:
     description: |
-      Latest logical UTC update timestamp after reconciling the historical
-      persona period and the event-derived signal, falling back to the
-      historical start timestamp when neither source has an update timestamp.
+      Latest logical UTC update timestamp after reconciling the batch persona
+      period and the stream_persona_events signal, falling back to the batch
+      start timestamp when neither source has an update timestamp.
     lineage:
       - datalake_cdp_personas.persona.ts_first_event
       - datalake_cdp_personas.persona.ts_last_event
@@ -81,22 +86,25 @@ columns:
       ingest window.
   year:
     description: |
-      Calendar year used as the first Delta partition component, preferring the
-      event signal date and otherwise the historical update date.
+      Calendar year used as the first Delta partition component, derived from the
+      reconciled ts_updated timestamp, falling back to ts_started when absent.
     lineage:
       - datalake_cdp_personas.persona.ts_last_event
-      - datalake_cdp.stream_persona_events.year
+      - datalake_cdp_personas.persona.ts_first_event
+      - datalake_cdp.stream_persona_events.ts_updated
   month:
     description: |
-      Calendar month used as the second Delta partition component, preferring the
-      event signal date and otherwise the historical update date.
+      Calendar month used as the second Delta partition component, derived from the
+      reconciled ts_updated timestamp, falling back to ts_started when absent.
     lineage:
       - datalake_cdp_personas.persona.ts_last_event
-      - datalake_cdp.stream_persona_events.month
+      - datalake_cdp_personas.persona.ts_first_event
+      - datalake_cdp.stream_persona_events.ts_updated
   day:
     description: |
-      Calendar day used as the final Delta partition component, preferring the
-      event signal date and otherwise the historical update date.
+      Calendar day used as the final Delta partition component, derived from the
+      reconciled ts_updated timestamp, falling back to ts_started when absent.
     lineage:
       - datalake_cdp_personas.persona.ts_last_event
-      - datalake_cdp.stream_persona_events.day
+      - datalake_cdp_personas.persona.ts_first_event
+      - datalake_cdp.stream_persona_events.ts_updated

@@ -1,39 +1,45 @@
 WITH transactional_base AS (
     SELECT
-        transactional.id_event,
-        transactional.id_user,
-        transactional.id_person AS uuid_person,
+        txn.id_user,
+        txn.id_person AS uuid_person,
         COALESCE(
-            GET_JSON_OBJECT(transactional.event_properties, '$.owner_email'),
-            GET_JSON_OBJECT(transactional.user_properties, '$.email')
+            GET_JSON_OBJECT(txn.event_properties, '$.owner_email'),
+            GET_JSON_OBJECT(txn.user_properties, '$.email')
         ) AS email,
         COALESCE(
-            GET_JSON_OBJECT(transactional.event_properties, '$.owner_phone'),
-            GET_JSON_OBJECT(transactional.user_properties, '$.phone')
+            GET_JSON_OBJECT(txn.event_properties, '$.owner_phone'),
+            GET_JSON_OBJECT(txn.user_properties, '$.phone')
         ) AS phone,
-        transactional.application,
-        transactional.event_name,
-        transactional.journey_step,
+        txn.event_name,
+        txn.journey_step,
         CASE
-            WHEN transactional.event_name IN (
+            WHEN txn.event_name IN (
                 'rene_lead_processed',
                 'rene_lead_converted'
             ) THEN 'OWNER_PROSPECT'
-            WHEN transactional.application = 'tenant-app' THEN 'TENANT_PROSPECT'
-            WHEN transactional.application = 'owner-app' THEN 'OWNER'
+            WHEN txn.application = 'tenant-app' THEN 'TENANT_PROSPECT'
+            WHEN txn.application = 'owner-app' THEN 'OWNER'
         END AS persona,
-        transactional.event_properties,
-        true AS is_active,
-        transactional.ts_event,
-        transactional.ts_egw AS ts_egw_updated_at,
-        transactional.ts_egw AS ts_ingested_at
+        txn.event_properties,
+        TRUE AS is_active,
+        txn.ts_event,
+        txn.year,
+        txn.month,
+        txn.day
     FROM
-        datalake_cdp_clean.transactional AS transactional
+        datalake_cdp_clean.transactional AS txn
     WHERE
-        transactional.ts_egw >= TIMESTAMP('{load_start_date}')
-        AND transactional.ts_egw <= TIMESTAMP('{load_end_date}')
+        TO_DATE(
+            CONCAT_WS(
+                '-',
+                CAST(txn.year AS STRING),
+                LPAD(CAST(txn.month AS STRING), 2, '0'),
+                LPAD(CAST(txn.day AS STRING), 2, '0')
+            )
+        ) BETWEEN TO_DATE('{load_start_date}')
+        AND TO_DATE('{load_end_date}')
         AND (
-            transactional.event_name IN (
+            txn.event_name IN (
                 'answer_confirmed',
                 'answer_pending',
                 'answer_rejected',
@@ -49,38 +55,41 @@ WITH transactional_base AS (
                 'rene_lead_processed',
                 'rene_lead_converted'
             )
-            OR transactional.application IN ('tenant-app', 'owner-app')
+            OR txn.application IN (
+                'tenant-app',
+                'owner-app'
+            )
         )
 ),
 visit_events AS (
     SELECT
-        transactional.id_event,
-        transactional.id_user,
+        id_user,
         GET_JSON_OBJECT(
-            transactional.event_properties,
+            event_properties,
             '$.visit.visitorId'
         ) AS id_prospect,
         GET_JSON_OBJECT(
-            transactional.event_properties,
+            event_properties,
             '$.authorUserRole'
         ) AS author_user_role,
         GET_JSON_OBJECT(
-            transactional.event_properties,
+            event_properties,
             '$.schedule.businessContext'
         ) AS business_context,
         FROM_JSON(
-            transactional.event_properties,
-            'STRUCT<visitors:ARRAY<STRUCT<type:STRING, userId:BIGINT>>>'
+            event_properties,
+            'STRUCT<visitors:ARRAY<STRUCT<type:STRING,userId:BIGINT>>>'
         ) AS visitors,
-        transactional.journey_step,
-        transactional.is_active,
-        transactional.ts_event,
-        transactional.ts_egw_updated_at,
-        transactional.ts_ingested_at
+        journey_step,
+        is_active,
+        ts_event,
+        year,
+        month,
+        day
     FROM
-        transactional_base AS transactional
+        transactional_base
     WHERE
-        transactional.event_name IN (
+        event_name IN (
             'answer_confirmed',
             'answer_pending',
             'answer_rejected',
@@ -97,150 +106,154 @@ visit_events AS (
 ),
 visit_exploded AS (
     SELECT
-        visit.id_event,
         CASE
-            WHEN visit.author_user_role = 'DEMAND' THEN
-                COALESCE(CAST(visit.id_prospect AS BIGINT), visit.id_user)
-            WHEN
-                visit.author_user_role = 'SUPPLY'
-                AND visitor.type = 'Landlord'
-                THEN visitor.userId
+            WHEN visit_evt.author_user_role = 'DEMAND' THEN COALESCE(
+                CAST(visit_evt.id_prospect AS BIGINT),
+                CAST(visit_evt.id_user AS BIGINT)
+            )
+            WHEN visit_evt.author_user_role = 'SUPPLY'
+                AND visitor.type = 'Landlord' THEN visitor.userId
         END AS id_user,
         CASE
-            WHEN
-                visit.author_user_role = 'DEMAND'
-                AND visit.business_context = 'RENT'
-                THEN 'TENANT_PROSPECT'
-            WHEN
-                visit.author_user_role = 'DEMAND'
-                AND visit.business_context = 'SALE'
-                THEN 'BUYER_PROSPECT'
-            WHEN visit.author_user_role = 'SUPPLY' THEN 'OWNER'
+            WHEN visit_evt.author_user_role = 'DEMAND'
+                AND visit_evt.business_context = 'RENT' THEN 'TENANT_PROSPECT'
+            WHEN visit_evt.author_user_role = 'DEMAND'
+                AND visit_evt.business_context = 'SALE' THEN 'BUYER_PROSPECT'
+            WHEN visit_evt.author_user_role = 'SUPPLY' THEN 'OWNER'
         END AS persona,
-        visit.journey_step,
-        visit.is_active,
-        visit.ts_event,
-        visit.ts_egw_updated_at,
-        visit.ts_ingested_at
+        visit_evt.journey_step,
+        visit_evt.is_active,
+        visit_evt.ts_event,
+        visit_evt.year,
+        visit_evt.month,
+        visit_evt.day
     FROM
-        visit_events AS visit
+        visit_events AS visit_evt
     LATERAL VIEW OUTER
-        EXPLODE(visit.visitors.visitors) AS visitor
+        EXPLODE(visit_evt.visitors.visitors) exploded AS visitor
 ),
 visit_person AS (
     SELECT
-        visit.id_event,
         visit.id_user,
-        person.uuid_person,
+        ebdb_user.uuid_person,
         visit.persona,
         visit.journey_step,
         visit.is_active,
         visit.ts_event,
-        visit.ts_egw_updated_at,
-        visit.ts_ingested_at
+        visit.year,
+        visit.month,
+        visit.day
     FROM
         visit_exploded AS visit
     LEFT JOIN
-        datalake_ebdb_clean.user AS person
-            ON person.id = visit.id_user
+        datalake_ebdb_clean.user AS ebdb_user
+            ON ebdb_user.id = visit.id_user
 ),
-identity_resolved AS (
+idr_by_person AS (
     SELECT
-        transactional.id_event,
-        CAST(person.id_user AS BIGINT) AS id_user,
-        person.uuid_person,
-        transactional.persona,
-        transactional.journey_step,
-        transactional.is_active,
-        transactional.ts_event,
-        transactional.ts_egw_updated_at,
-        transactional.ts_ingested_at
+        cdp_person.id_user,
+        cdp_person.uuid_person,
+        txn.persona,
+        txn.journey_step,
+        txn.is_active,
+        txn.ts_event,
+        txn.year,
+        txn.month,
+        txn.day
     FROM
-        transactional_base AS transactional
+        transactional_base AS txn
     INNER JOIN
-        datalake_cdp.person AS person
-            ON transactional.persona = 'OWNER_PROSPECT'
-            AND person.phone_number = transactional.phone
+        datalake_cdp.person AS cdp_person
+            ON txn.persona = 'OWNER_PROSPECT'
+            AND cdp_person.phone_number = txn.phone
     UNION
     SELECT
-        transactional.id_event,
-        CAST(person.id_user AS BIGINT) AS id_user,
-        person.uuid_person,
-        transactional.persona,
-        transactional.journey_step,
-        transactional.is_active,
-        transactional.ts_event,
-        transactional.ts_egw_updated_at,
-        transactional.ts_ingested_at
+        cdp_person.id_user,
+        cdp_person.uuid_person,
+        txn.persona,
+        txn.journey_step,
+        txn.is_active,
+        txn.ts_event,
+        txn.year,
+        txn.month,
+        txn.day
     FROM
-        transactional_base AS transactional
+        transactional_base AS txn
     INNER JOIN
-        datalake_cdp.person AS person
-            ON transactional.persona = 'OWNER_PROSPECT'
-            AND person.email = transactional.email
+        datalake_cdp.person AS cdp_person
+            ON txn.persona = 'OWNER_PROSPECT'
+            AND cdp_person.email = txn.email
 ),
-unified AS (
+unifying AS (
     SELECT
-        transactional.id_event,
-        transactional.id_user,
-        transactional.uuid_person,
-        transactional.persona,
-        transactional.journey_step,
-        transactional.is_active,
-        transactional.ts_event,
-        transactional.ts_egw_updated_at,
-        transactional.ts_ingested_at
+        id_user,
+        uuid_person,
+        persona,
+        journey_step,
+        is_active,
+        ts_event,
+        year,
+        month,
+        day
     FROM
-        transactional_base AS transactional
+        transactional_base
     UNION ALL
     SELECT
-        visit.id_event,
-        visit.id_user,
-        visit.uuid_person,
-        visit.persona,
-        visit.journey_step,
-        visit.is_active,
-        visit.ts_event,
-        visit.ts_egw_updated_at,
-        visit.ts_ingested_at
+        id_user,
+        uuid_person,
+        persona,
+        journey_step,
+        is_active,
+        ts_event,
+        year,
+        month,
+        day
     FROM
-        visit_person AS visit
+        visit_person
     UNION ALL
     SELECT
-        resolved.id_event,
-        resolved.id_user,
-        resolved.uuid_person,
-        resolved.persona,
-        resolved.journey_step,
-        resolved.is_active,
-        resolved.ts_event,
-        resolved.ts_egw_updated_at,
-        resolved.ts_ingested_at
+        id_user,
+        uuid_person,
+        persona,
+        journey_step,
+        is_active,
+        ts_event,
+        year,
+        month,
+        day
     FROM
-        identity_resolved AS resolved
+        idr_by_person
 ),
 ranked AS (
     SELECT
-        SHA2(CONCAT(id_user, persona), 512) AS id_persona_event,
+        SHA2(
+            CONCAT(
+                CAST(id_user AS STRING),
+                persona
+            ),
+            512
+        ) AS id_persona_event,
         id_user,
         uuid_person,
         persona,
         journey_step AS last_journey_step,
         is_active,
         ts_event AS ts_updated,
-        ts_egw_updated_at,
-        ts_ingested_at,
-        id_event,
+        year,
+        month,
+        day,
         ROW_NUMBER() OVER (
-            PARTITION BY id_user, persona
+            PARTITION BY
+                id_user,
+                persona
             ORDER BY
                 ts_event DESC,
-                ts_egw_updated_at DESC,
-                ts_ingested_at DESC,
-                id_event DESC
+                year DESC,
+                month DESC,
+                day DESC
         ) AS row_number
     FROM
-        unified
+        unifying
     WHERE
         id_user IS NOT NULL
         AND persona IS NOT NULL
@@ -256,10 +269,9 @@ SELECT
     ts_updated,
     CAST(NULL AS TIMESTAMP) AS ts_ended,
     CURRENT_TIMESTAMP() AS ts_load,
-    ts_ingested_at,
-    YEAR(ts_updated) AS year,
-    MONTH(ts_updated) AS month,
-    DAY(ts_updated) AS day
+    year,
+    month,
+    day
 FROM
     ranked
 WHERE
