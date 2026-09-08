@@ -6,7 +6,8 @@ dag:
     dag_purpose: |
       Aggregates Google Search Console performance by canonical search page.
       It produces 7, 30, and 90 day snapshots consumed by the Internal Linking
-      access DAG for selective SQS publication.
+      access DAG for selective SQS publication. Snapshots close at D-7 because
+      GSC rewrites the last seven days and recent calendar days are often empty.
 workflow:
   type: load
   layer: reverse
@@ -15,7 +16,7 @@ workflow:
   default_partitions:
     - ref_date
   extra_query_template_params:
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_end_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -7), 'load_end_date') }}"
   tables_customization:
     gsc_page_metrics:
       merge_on:

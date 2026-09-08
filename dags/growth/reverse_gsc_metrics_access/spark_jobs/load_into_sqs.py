@@ -35,12 +35,16 @@ spark_client = SparkClient(app_name=JOB_NAME)
 spark = spark_client.conn
 
 
-def parse_arguments() -> Tuple[str, str, str, str, Optional[str], Optional[str]]:
+def parse_arguments() -> Tuple[str, str, str, str, str, Optional[str], Optional[str]]:
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("dag_name", help="Name of the access DAG")
     parser.add_argument("datalake_bucket", help="Environment datalake bucket")
     parser.add_argument("database_name", help="Reverse database containing metrics")
     parser.add_argument("table_name", help="Current GSC metrics table")
+    parser.add_argument(
+        "load_end_date",
+        help="Snapshot close date (D-7) matching reverse_gsc_metrics_load",
+    )
     add_validation_target_args(parser)
     args = parser.parse_args()
     return (
@@ -48,6 +52,7 @@ def parse_arguments() -> Tuple[str, str, str, str, Optional[str], Optional[str]]
         args.datalake_bucket,
         args.database_name,
         args.table_name,
+        args.load_end_date,
         args.target_database_name,
         args.target_table_name,
     )
@@ -149,12 +154,17 @@ def _with_metrics_hash(dataframe: DataFrame) -> DataFrame:
     )
 
 
-def _current_snapshot(database_name: str, table_name: str) -> DataFrame:
+def _current_snapshot(
+    database_name: str, table_name: str, load_end_date: str
+) -> DataFrame:
     current = spark.table(f"{database_name}.{table_name}")
-    ref_date = current.agg(F.max("ref_date").alias("ref_date")).collect()[0]["ref_date"]
-    if ref_date is None:
-        raise ValueError(f"{database_name}.{table_name} has no GSC metrics rows")
-    return _with_metrics_hash(current.filter(F.col("ref_date") == F.lit(ref_date)))
+    snapshot = current.filter(F.col("ref_date") == F.to_date(F.lit(load_end_date)))
+    if snapshot.limit(1).count() == 0:
+        raise ValueError(
+            f"{database_name}.{table_name} has no GSC metrics rows for "
+            f"ref_date={load_end_date}"
+        )
+    return _with_metrics_hash(snapshot)
 
 
 def _changed_rows(current: DataFrame, state_table: str) -> DataFrame:
@@ -205,10 +215,11 @@ def publish_changed_metrics(
     database_name: str,
     table_name: str,
     queue_url: str,
+    load_end_date: str,
 ) -> None:
     state_table = f"{database_name}.{STATE_TABLE_NAME}"
     changed = _changed_rows(
-        _current_snapshot(database_name, table_name),
+        _current_snapshot(database_name, table_name, load_end_date),
         state_table,
     ).cache()
     changed_count = changed.count()
@@ -236,6 +247,7 @@ def main() -> None:
         datalake_bucket,
         database_name,
         table_name,
+        load_end_date,
         target_database_name,
         target_table_name,
     ) = parse_arguments()
@@ -248,6 +260,7 @@ def main() -> None:
         database_name,
         table_name,
         queue_url,
+        load_end_date,
     )
 
 
