@@ -162,6 +162,7 @@ columns:
   overdue_days_at_registration:
     description: "Days overdue at registration — delay from overdue portfolio on registration date for Cyber, or eLaw overdue_days_at_registration."
     lineage:
+      - datalake_cyber_legal.evictions_base.dt_registered
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_due_adjust
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_reference
   succumbency_fee:

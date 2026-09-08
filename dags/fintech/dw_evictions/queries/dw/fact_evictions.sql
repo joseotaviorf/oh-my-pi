@@ -481,9 +481,9 @@ LEFT JOIN
     overdue_final AS ovf
     ON ovf.sk_process = e.id_process
 LEFT JOIN
-    overdue o1
-    ON e.contract = o1.sk_contract
-    AND e.dt_registered = o1.dt_reference
+    overdue AS o1
+        ON e.contract = o1.sk_contract
+        AND DATE_ADD(DATE(e.dt_registered), -1) = o1.dt_reference
 LEFT JOIN
     dw_rent.dim_contract c
     ON e.contract = c.id_contract
