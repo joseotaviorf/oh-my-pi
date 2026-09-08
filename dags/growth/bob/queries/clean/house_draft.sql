@@ -10,6 +10,7 @@ SELECT
     blueprint,
     status,
     business_context,
+    social_housing_program,
     type,
     administrators,
     attendance_info,

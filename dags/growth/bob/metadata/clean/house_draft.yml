@@ -53,6 +53,10 @@ columns:
     lineage:
       - datalake_bob_raw.house_draft.business_context
     description: JSON struct with businessContextType array listing intents (RENT, SALE, both, or empty). ~14% have empty array; ~0.3% null. Parsed downstream in enrich_bob as is_for_rent/is_for_sale.
+  social_housing_program:
+    lineage:
+      - datalake_bob_raw.house_draft.social_housing_program
+    description: Optional JSON object containing the validated social housing program classification. Status is one of DECLARED, NOT_APPLICABLE, OWNER_DOES_NOT_KNOW, or REGULATED_TYPE_UNKNOWN; type is present only for DECLARED and is one of HIS_1, HIS_2, or HMP. Existing drafts without the field remain null.
   type:
     lineage:
       - datalake_bob_raw.house_draft.type
