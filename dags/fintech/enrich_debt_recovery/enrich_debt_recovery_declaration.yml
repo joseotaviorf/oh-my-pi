@@ -10,25 +10,6 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
   inner_dependencies:
     negotiation:
       - installment
-    invoice_wallet_timeline_trato_feito:
-      - negotiation
-      - installment
-  tables_customization:
-    invoice_wallet_timeline_trato_feito:
-      extraction_type: incremental
-      partitions: [year, month, day]
-      z_order_by: [dt_reference, id_contract, id_invoice]
-      # Without this, OPTIMIZE Z-ORDERs the FULL history every run (~20min in the
-      # SHS optimize_delta_table app — the real cost here, untouched by the s->m
-      # tier bump which only sped the loads). Z-ORDER is a full shuffle, far more
-      # expensive on EMR/Delta-OSS than on Databricks. incremental_optimize scopes
-      # OPTIMIZE's WHERE to the run's date range (the -30d load window) instead of
-      # all history; older partitions keep the z-order from prior runs, so data and
-      # skipping layout are unchanged. Validate wall time + z-order coverage in Forno.
-      incremental_optimize: true

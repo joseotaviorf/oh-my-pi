@@ -1,0 +1,39 @@
+---
+dag:
+  name: enrich_collections_fast_lane
+  schedule_start_date: 2022, 3, 1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Enrich pipeline that materializes collections wallet timelines earlier in the
+      daily run than enrich_debt_recovery. Builds the Trato Feito invoice-day wallet,
+      the contract-day rollup, and pocket segmentation features so downstream
+      collections consumers can start before the rest of debt-recovery transforms.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: collections_fast_lane
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  inner_dependencies:
+    contract_wallet_timeline:
+      - invoice_wallet_timeline
+    contract_features_timeline:
+      - contract_wallet_timeline
+  tables_customization:
+    invoice_wallet_timeline:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      z_order_by: [dt_reference, id_contract, id_invoice]
+      incremental_optimize: true
+    contract_wallet_timeline:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      z_order_by: [dt_reference, id_contract]
+      incremental_optimize: true
+    contract_features_timeline:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      z_order_by: [dt_reference, id_contract]
+      incremental_optimize: true

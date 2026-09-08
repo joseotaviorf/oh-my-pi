@@ -1,9 +1,9 @@
-database_name: datalake_debt_recovery
-table_name: invoice_wallet_timeline_trato_feito
+database_name: datalake_collections_fast_lane
+table_name: invoice_wallet_timeline
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |-
-  Daily timeline of tenant BR invoices for debt recovery wallet segmentation, built from Trato Feito (datalake_debt_recovery / datalake_trato_feito_clean) and frozen Recupera legacy snapshots (datalake_recupera.invoice_debt_negotiation, datalake_recupera.negotiation_wallet) without Cyber sources. Grain is one row per invoice, contract, and reference date. Each invoice is exploded into a daily timeline from begin date through payment (or load end if open).
+  Daily timeline of tenant BR invoices for collections wallet segmentation, produced in enrich_collections_fast_lane so it can run earlier in the daily lineage than enrich_debt_recovery. Built from Trato Feito (datalake_debt_recovery / datalake_trato_feito_clean) and frozen Recupera legacy snapshots (datalake_recupera.invoice_debt_negotiation, datalake_recupera.negotiation_wallet) without Cyber sources. Grain is one row per invoice, contract, and reference date. Each invoice is exploded into a daily timeline from begin date through payment (or load end if open).
   Delay methodologies: T1 is delay from the nominal due date (ts_due). T2 applies deal delay contamination via dt_invoice_anchor and dt_created_negotiation_parent. T3 is the contract-level maximum of T2 on the reference date.
 columns:
   id_invoice_wallet_timeline:

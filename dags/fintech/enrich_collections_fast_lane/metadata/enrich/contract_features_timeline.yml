@@ -1,0 +1,136 @@
+database_name: datalake_collections_fast_lane
+table_name: contract_features_timeline
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Daily pocket segmentation features at contract grain. Grain is one row per contract and reference
+  date. Builds macro and micro segments, frozen payment-probability class, and rolling delay/deal/eviction
+  accumulators from contract_wallet_timeline and the collections score v3 output.
+columns:
+  id_contract:
+    description: Rental contract identifier for the pocket segmentation row.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.id_contract
+  segmentation:
+    description: Micro pocket segment assigned on the reference date from delay, deal, eviction and score
+      rules.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
+  macro_segmentation:
+    description: Coarser pocket segment used as the parent of the micro segmentation island.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
+  days_in_segmentation:
+    description: Consecutive days the contract has stayed in the current micro segmentation island.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.dt_reference
+  days_in_macro_segmentation:
+    description: Consecutive days the contract has stayed in the current macro segmentation island.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.dt_reference
+  payment_probability:
+    description: Raw collections score payment probability on the reference date, when a score exists.
+    lineage:
+    - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
+  reference_contract_status:
+    description: Contract status on the reference date copied from the contract wallet timeline.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
+  max_delay_contaminated_contract_t2:
+    description: Maximum T2 delay on the contract for the reference date.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.max_delay_contaminated_contract_t2
+  prob_payment:
+    description: Payment-probability class frozen at macro-island entrance (HIGH, MEDIUM, LOW, VERY_HIGH,
+      VERY_LOW).
+    lineage:
+    - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
+  payment_probability_at_entrance:
+    description: Propagated score value frozen at the start of the current macro island.
+    lineage:
+    - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
+  payment_probability_propagated:
+    description: Last non-null collections score carried forward along the contract timeline.
+    lineage:
+    - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
+  n_evictions_processes_lifetime:
+    description: Count of distinct eviction processes seen on the contract up to the reference date.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.id_process_evictions
+  acc_deals_principal_discount_lifetime:
+    description: Lifetime count of high-discount deals accumulated up to the reference date.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.qt_aco_desconto
+  n_days_over1_t2_l180:
+    description: Days in the last 180 with T2 delay greater than zero.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.max_delay_contaminated_contract_t2
+  avg_days_overdue_invoices_paid_t1:
+    description: Average T1 overdue days among monthly invoices recovered while overdue, lifetime to date.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.sum_monthly_overdue_days_paid_t1
+  has_overdue_balance_over5_t1_at_ending_ffill:
+    description: Forward-filled flag that the contract ended a month with open T1 overdue balance above
+      five days.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.has_overdue_balance_over5_t1_at_ending
+  acc_count_monthly_overdue_invoices_paid_t1:
+    description: Lifetime count of monthly invoices recovered while overdue on T1.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.count_monthly_overdue_invoices_paid_t1
+  pct_monthly_paid_ontime_t1_l12m:
+    description: Share of monthly invoices paid on time on T1 over the last 365 days.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.n_monthly_invoices_paid_ontime_t1
+  share_monthly_paid_ontime_t1:
+    description: Share of created monthly invoices that were paid on time on T1, lifetime to date.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.n_monthly_invoices_created
+  flag_full_repair:
+    description: True when every invoice in the wallet is a repairs invoice.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.n_reparos_invoices
+  flag_broken_global_deal:
+    description: True when the contract has a negotiation and any original or deal invoice is overdue
+      on T1.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.has_negotiation_in_contract
+  flag_broken_deal_by_new_original_debt:
+    description: True when a negotiation exists and an original invoice is overdue on T1.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.max_delay_original_invoices_t1
+  flag_broken_installment_deal:
+    description: True when a negotiation exists and a deal installment invoice is overdue on T1.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.max_delay_deal_invoices_t1
+  major_segmentation:
+    description: Macro segment remapped so special new-defaulter and forgiveness cases follow delay buckets.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
+  hyper_segmentation:
+    description: 'Highest grouping of pocket segments: active-segments, ended-segments, evictions, or
+      the raw micro label.'
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
+  clustered_segmentation:
+    description: Micro segment collapsed into operational clusters (for example under-mob3 and ended-forgiveness
+      buckets).
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
+  dt_reference:
+    description: Calendar day of the pocket segmentation snapshot.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.dt_reference
+  year:
+    description: Partition year of dt_reference.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.year
+  month:
+    description: Partition month of dt_reference.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.month
+  day:
+    description: Partition day of dt_reference.
+    lineage:
+    - datalake_collections_fast_lane.contract_wallet_timeline.day
+  ts_load:
+    description: Timestamp when enrich_collections_fast_lane wrote this pocket-segmentation feature row into the lake.

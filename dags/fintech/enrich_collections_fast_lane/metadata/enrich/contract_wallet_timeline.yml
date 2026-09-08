@@ -1,0 +1,116 @@
+database_name: datalake_collections_fast_lane
+table_name: contract_wallet_timeline
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Daily contract-level rollup of the Trato Feito invoice wallet for pocket collections segmentation.
+  Grain is one row per contract and reference date. Delay, deal, eviction and first-payment flags are
+  aggregated from datalake_collections_fast_lane.invoice_wallet_timeline plus Cyber Legal evictions and
+  collections negotiations so the features timeline can start earlier in the day.
+columns:
+  id_contract:
+    description: Rental contract identifier rolled up from the invoice wallet timeline.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.id_contract
+  dt_reference:
+    description: Calendar day of the contract wallet snapshot, one row per contract and date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.dt_reference
+  reference_contract_status:
+    description: 'Contract status on the reference date: Ativo when the contract has not ended yet, otherwise
+      Finalizado.'
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.dt_contract_annulled
+  max_delay_contaminated_contract_t1:
+    description: Maximum T1 invoice delay on the contract for the reference date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.invoice_delay_t1
+  max_delay_contaminated_contract_t2:
+    description: Maximum T2 contaminated invoice delay on the contract for the reference date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.invoice_delay_t2
+  max_delay_original_invoices_t1:
+    description: Maximum T1 delay among original (non-child-deal) invoices on the reference date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.invoice_delay_t1
+  max_delay_deal_invoices_t1:
+    description: Maximum T1 delay among child-deal invoices on the reference date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.invoice_delay_t1
+  n_overdue_monthlys_t1:
+    description: Count of monthly or onboarding invoices with T1 delay greater than zero.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.invoice_delay_t1
+  has_negotiation_in_contract:
+    description: True when any invoice on the contract belongs to a negotiation on the reference date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.has_negotiation_in_contract
+  sum_monthly_overdue_days_paid_t1:
+    description: Sum of T1 delay days for monthly invoices recovered while overdue.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.invoice_delay_t1
+  count_monthly_overdue_invoices_paid_t1:
+    description: Count of distinct monthly invoices recovered while overdue on T1.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.id_invoice
+  id_process_evictions:
+    description: Cyber Legal eviction process identifier active on the reference date, when any.
+    lineage:
+    - datalake_cyber_legal.evictions_base.id_process
+  is_evictions:
+    description: True when the contract is in an open eviction stage (EVEX or EVPD) on the reference date.
+    lineage:
+    - datalake_cyber_legal.evictions_base.dt_registered
+  n_reparos_invoices:
+    description: Count of distinct invoices in the wallet that carry a REPAROS bill-item cluster.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+  n_invoices_in_wallet:
+    description: Count of distinct invoices present in the contract wallet on the reference date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.id_invoice
+  dt_contract_start:
+    description: Contract start date taken from the invoice wallet timeline.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.dt_contract_start
+  has_fpd_in_wallet_general:
+    description: True when the wallet still has a first-invoice flag and the guarantee is not brokerage-only.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.is_first_invoice_contract
+    - datalake_ebdb_contract.contract.guarantee_type
+  qt_aco_desconto:
+    description: Count of distinct negotiations promised that day with principal discount above 50 and
+      a down payment.
+    lineage:
+    - datalake_collections_quintoandar.negotiation.discount_to_original_amount
+  n_monthly_invoices:
+    description: Count of monthly invoices in the wallet on the reference date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.invoice_type
+  n_monthly_invoices_paid_ontime_t1:
+    description: Count of monthly invoices paid or written down with T1 delay not positive.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.invoice_delay_t1
+  n_monthly_invoices_created:
+    description: Count of monthly invoices whose begin date equals the reference date.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.dt_begin
+  has_overdue_balance_over5_t1_at_ending:
+    description: True when the contract ends in the reference month with open overdue T1 balance and open
+      delay above five days.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.due_amount
+  year:
+    description: Partition year of dt_reference.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.year
+  month:
+    description: Partition month of dt_reference.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.month
+  day:
+    description: Partition day of dt_reference.
+    lineage:
+    - datalake_collections_fast_lane.invoice_wallet_timeline.day
+  ts_load:
+    description: Timestamp when enrich_collections_fast_lane wrote this contract-day wallet row into the lake.
