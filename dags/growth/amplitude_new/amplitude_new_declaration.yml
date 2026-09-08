@@ -30,9 +30,28 @@ workflow:
       run_vacuum: false
       has_hive_sync: false
       # Applied on clean load via ALTER TABLE; default commit interval is 10.
+      # These must stay in sync with what was applied by hand on the table, or each load
+      # reverts them. Consumers (dags/growth/amplitude_subpartitioned, 367 loads) replay
+      # this table's Delta checkpoint on every run, so checkpoint size and log growth are
+      # the dominant cost — not the data.
       table_properties:
-        # Preserve transaction-log history on EMR (Glue does not mirror UC TBLPROPERTIES).
-        delta.enableExpiredLogCleanup: "false"
-        # OSS Delta has no literal "infinite"; use a very large days interval (~2740 years).
-        delta.logRetentionDuration: "interval 999999 days"
+        # Log cleanup ON with short retention. The earlier "false + 999999 days" let the
+        # _delta_log grow to 6.1 TiB / 195k objects across 125 checkpoint generations; the
+        # default in-band cleanup then could not delete that backlog inside the 2h EMR
+        # timeout (serial driver deletes) and hung the DAG. Backlog was purged out of band
+        # (201k -> 17k objects) via a forced checkpoint; with the log small, incremental
+        # cleanup on each checkpoint is cheap. 2 days trades time travel beyond 2 days for a
+        # bounded log — acceptable: consumers read the current snapshot, not history.
+        delta.enableExpiredLogCleanup: "true"
+        delta.logRetentionDuration: "interval 2 days"
+        delta.deletedFileRetentionDuration: "interval 2 days"
+        # Drop the redundant JSON stats copy from checkpoints. Measured at ~47.5% of
+        # checkpoint bytes; the parsed struct is kept, so EMR Spark 3.5, Databricks 16.4
+        # and Trino 457 (all read the struct) lose nothing. Cut checkpoint 54.6 -> 8.5 GB.
+        delta.checkpoint.writeStatsAsJson: "false"
+        # Index stats only for columns skipping can use. The default indexes the first 32
+        # columns, including the huge data / event_properties JSON blobs. Combined with the
+        # line above this shrank the checkpoint ~6.4x. Consumers filter only on partition
+        # columns, so file min/max stats are dead weight for them.
+        delta.dataSkippingStatsColumns: "id_event,ts_event"
         delta.checkpointInterval: "50"
