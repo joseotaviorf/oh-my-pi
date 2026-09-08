@@ -10,49 +10,22 @@ dag:
       - `traces` — full versioned `TraceEvent` (conversation content + agent-execution tree) → datalake_agentic_platform_{raw,clean}.traces (CNVPL-2085)
       - `agentic_sessions` — session lifecycle (stream/session identity + open/closed timestamps) → datalake_agentic_platform_raw.agentic_sessions / _clean.sessions
       - `nudges` — per-user mission/nudge coordination state (lifecycle, CDP payload, snooze) → datalake_agentic_platform_{raw,clean}.nudges
-      # - `nudge_openers` — pre-generated conversational opener per user, linked to the source nudge → datalake_agentic_platform_{raw,clean}.nudge_openers
-      #   Disabled until the operational table has data in prod; clean SQL/metadata remain for a future enablement PR.
+
 workflow:
   type: cdc
   layer: raw
   database_type: postgres
   source_schema: public
-  # The S3 incoming path is built from `source_database` (NOT from the target schema below).
-  # This MUST match the Backstage `kafka-connect-s3-sink` `topics.dir` and the Debezium topic
-  # prefix `<env>_agentic_chatbot_service.data`. Confirm/align when the Backstage templates are run.
   source_database: agentic_chatbot_service
-  # Databricks secret with the source DB connection, created by infra PR (scope `quintoandar`,
-  # key `AGENTIC_CHATBOT_SERVICE_DB`). Set explicitly because it does NOT follow the default
-  # `{custom_schema}_DB` (which would resolve to the wrong `AGENTIC_PLATFORM_DB`).
   dbutils_secret_key: AGENTIC_CHATBOT_SERVICE_DB
-  # Target lake DB prefix -> datalake_agentic_platform_{raw,clean}, decoupled from the source service name.
-  custom_schema: agentic_platform
   tables_customization:
     traces:
-      raw_primary_keys: ["event_id"]
-      primary_keys: ["event_id"]
-      clean_primary_keys: ["event_id"]
-      # Append-only history: ignore the operational table's purge DELETEs so they never erase lake history.
+      # append-only history: ignore the operational table's purge DELETEs so they never erase lake history.
       has_soft_delete: true
     agentic_sessions:
       clean_table_name: sessions
-      raw_primary_keys: ["stream_id", "session_id"]
-      clean_primary_keys: ["id_stream", "id_session"]
-      # Application never hard-deletes rows; close is an UPDATE setting closed_at. Default
-      # merge (has_soft_delete: false) is correct — CDC UPDATEs land as latest-row merge.
-    nudges:
-      raw_primary_keys: ["nudge_id"]
-      primary_keys: ["nudge_id"]
-      clean_primary_keys: ["id_nudge"]
-      # Rows are upserted in place (status transitions, snooze, payload refresh). Deactivated
-      # history is retained; default merge (has_soft_delete: false) is correct.
+    nudges: {}
     # nudge_openers has no prod data yet; keep queries/metadata for a future enablement PR.
-    # nudge_openers:
-    #   raw_primary_keys: ["user_id"]
-    #   primary_keys: ["user_id"]
-    #   clean_primary_keys: ["id_user"]
-    #   # One row per user; regeneration overwrites via upsert. CASCADE delete when the linked
-    #   # nudge is removed. Default merge (has_soft_delete: false) is correct.
 
 cluster:
   type: consolidation_s_memory_cluster
