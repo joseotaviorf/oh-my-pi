@@ -143,20 +143,38 @@ columns:
     description: Customer email associated with the contact.
   total_talk_time:
     lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
-    description: Total talk time during the contact.
+    description: >
+      Seconds the agent stayed engaged in the contact. For chat it is measured from the task event
+      trail, as the elapsed time between the reservation being accepted and completed; Twilio Flex
+      Insights is used only when that trail is incomplete. For calls it always comes from Twilio.
   total_queue_time:
     lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
-    description: Total queue time during the contact.
+    description: >
+      Seconds the contact waited in queue before an agent accepted it. For chat it is measured from
+      the task event trail, as the elapsed time between the task being created and the reservation
+      being accepted; Twilio Flex Insights is used only when that trail is incomplete. For calls it
+      always comes from Twilio.
   total_wrap_up_time:
     lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_wrap_up_time
-    description: Total wrap-up time during the contact.
+    description: >
+      Seconds the agent spent on post-contact work. For chat it is the elapsed time between the
+      task wrap-up event and the reservation being completed, and zero when the task emitted no
+      wrap-up event, which is the case for the vast majority of chats. For calls it comes from
+      Twilio Flex Insights.
   total_waiting_time:
     lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_waiting_time
-    description: Total waiting time during the contact.
+    description: >
+      Seconds the customer waited across all phases of the contact. For chat it matches
+      total_queue_time, which is how Twilio Flex Insights itself reports it for this channel. For
+      calls it comes from Twilio.
   first_reply_time:
     lineage:
       - datalake_customer_support.chats.seconds_to_first_response
@@ -164,8 +182,12 @@ columns:
     description: First reply time during the contact.
   total_handling_time:
     lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
-    description: Total handling time during the contact.
+    description: >
+      Total agent effort on the contact, in seconds, as talk time plus wrap-up time. For chat it is
+      computed from the task event trail; Twilio Flex Insights is used only when that trail is
+      incomplete. For calls it always comes from Twilio.
   total_inactivity_time:
     lineage:
       - datalake_customer_support.chats.total_inactivity_time
@@ -206,7 +228,10 @@ columns:
   ts_reservation_created:
     lineage:
       - datalake_customer_support.calls.ts_reservation_created
-    description: Timestamp when the reservation was created.
+      - datalake_quinto_messenger_clean.task_event.ts_created
+    description: >
+      Timestamp when the reservation was created. For chat it is the first reservation acceptance
+      recorded in the task event trail, converted to local time.
   ts_reservation_ended:
     lineage:
       - datalake_customer_support.calls.ts_reservation_ended

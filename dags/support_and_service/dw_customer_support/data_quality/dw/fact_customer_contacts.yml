@@ -1,0 +1,52 @@
+table_name: dw_customer_support.fact_customer_contacts
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_contact:
+    is_complete:
+      severity_level: Error
+  sk_interaction:
+    is_complete:
+      severity_level: Error
+  channel:
+    is_complete:
+      severity_level: Error
+  ts_task_created:
+    is_complete:
+      severity_level: Error
+  chat_time_metrics_coverage:
+    custom:
+      # Share of answered chat interactions that carry a time metric, over the last 7 days.
+      # The denominator is restricted to interactions that actually reached an agent
+      # (ts_reservation_created present), because a chat that was never answered legitimately has
+      # no handling time -- is_complete on the metric itself would fail on those and be silenced.
+      # BUGS-145614: this ran at 81% for months without anyone noticing, because the source of the
+      # metric silently dropped long-lived conversations. Expected >= 99% once the metric is
+      # derived from the task event trail; 0.97 leaves headroom while still catching a regression
+      # of the size that caused the incident.
+      constraint: |-
+        (SELECT COUNT(CASE WHEN total_handling_time IS NOT NULL THEN 1 END) * 1.0
+                / NULLIF(COUNT(*), 0)
+         FROM dw_customer_support.fact_customer_contacts
+         WHERE channel = 'chat'
+           AND ts_reservation_created IS NOT NULL
+           AND ts_task_created >= CURRENT_DATE - INTERVAL 7 DAY) >= 0.97
+      severity_level: Error
+  chat_handling_time_identity:
+    custom:
+      # total_handling_time must equal total_talk_time + total_wrap_up_time for chat. This is the
+      # identity Twilio itself holds (99.99% of rows), and it is what guards against a future edit
+      # mixing the derived source and the Twilio source within the same row.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_customer_support.fact_customer_contacts
+         WHERE channel = 'chat'
+           AND total_handling_time IS NOT NULL
+           AND total_talk_time IS NOT NULL
+           AND total_wrap_up_time IS NOT NULL
+           AND ABS(total_handling_time - (total_talk_time + total_wrap_up_time)) > 2
+           AND ts_task_created >= CURRENT_DATE - INTERVAL 7 DAY) = 0
+      severity_level: Error

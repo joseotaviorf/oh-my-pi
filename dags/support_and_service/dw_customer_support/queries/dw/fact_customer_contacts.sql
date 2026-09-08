@@ -25,25 +25,44 @@ time_metrics AS (
   WHERE
     rn = 1
 ),
-chat_reservation_timestamp_raw AS (
+-- Chat time metrics come from the task event trail, not from Twilio Flex Insights. The Flex report
+-- only materialises a segment once the conversation closes and the daily ingestion never re-reads a
+-- past day, so long-lived chats (mostly WhatsApp outbound) are lost for good. task_event is CDC, so
+-- a task re-appears in the partition of the day it is updated and late closures are captured.
+-- Validated on 412,700 chats of 2026-07: median absolute error 0s vs Twilio. See BUGS-145614.
+chat_task_events AS (
   SELECT
     id_task,
-    ts_created - INTERVAL 3 HOUR AS ts_reservation_created,
-    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created) AS rn
+    MIN(CASE WHEN event_type = 'reservation.accepted' THEN ts_created END) AS ts_first_reservation_accepted,
+    MAX(CASE WHEN event_type = 'reservation.accepted' THEN ts_created END) AS ts_reservation_accepted,
+    MAX(CASE WHEN event_type = 'reservation.completed' THEN ts_created END) AS ts_reservation_completed,
+    MIN(CASE WHEN event_type = 'task.created' THEN ts_created END) AS ts_task_created_event,
+    MAX(CASE WHEN event_type = 'task.wrapup' THEN ts_created END) AS ts_task_wrapup
   FROM
     datalake_quinto_messenger_clean.task_event
   WHERE
-    event_type = 'reservation.accepted'
+    event_type IN ('reservation.accepted', 'reservation.completed', 'task.created', 'task.wrapup')
     AND MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL 3 YEAR
+  GROUP BY
+    id_task
 ),
-chat_reservation_timestamp AS (
+chat_time_metrics AS (
   SELECT
     id_task,
-    ts_reservation_created
+    ts_first_reservation_accepted - INTERVAL 3 HOUR AS ts_reservation_created,
+    CAST(
+      UNIX_TIMESTAMP(ts_reservation_completed) - UNIX_TIMESTAMP(ts_reservation_accepted) AS FLOAT
+    ) AS total_talk_time,
+    CAST(
+      UNIX_TIMESTAMP(ts_reservation_accepted) - UNIX_TIMESTAMP(ts_task_created_event) AS FLOAT
+    ) AS total_queue_time,
+    -- Twilio reports wrap-up as 0 for 99.90% of chats; a positive value only exists when the task
+    -- emitted a task.wrapup event, so the absence of that event is a real zero, not a gap.
+    CAST(
+      COALESCE(UNIX_TIMESTAMP(ts_reservation_completed) - UNIX_TIMESTAMP(ts_task_wrapup), 0) AS FLOAT
+    ) AS total_wrap_up_time
   FROM
-    chat_reservation_timestamp_raw
-  WHERE
-    rn = 1
+    chat_task_events
 ),
 customer_email_raw AS (
   SELECT DISTINCT
@@ -233,24 +252,44 @@ twilio_contacts AS (
     d.quinto_andar_phone_number,
     d.customer_phone_number,
     d.customer_email,
-    tm.total_talk_time,
-    tm.total_queue_time,
-    tm.total_wrap_up_time,
-    tm.total_waiting_time,
+    -- All five time metrics switch source under the same condition, so a row is either fully
+    -- derived or fully from Twilio. Mixing the two within a row would break the
+    -- total_handling_time = total_talk_time + total_wrap_up_time identity that Twilio itself holds.
+    CASE
+      WHEN ctm.total_talk_time IS NOT NULL THEN ctm.total_talk_time
+      ELSE tm.total_talk_time
+    END AS total_talk_time,
+    CASE
+      WHEN ctm.total_talk_time IS NOT NULL THEN ctm.total_queue_time
+      ELSE tm.total_queue_time
+    END AS total_queue_time,
+    CASE
+      WHEN ctm.total_talk_time IS NOT NULL THEN ctm.total_wrap_up_time
+      ELSE tm.total_wrap_up_time
+    END AS total_wrap_up_time,
+    -- Twilio fills total_waiting_time with the same value as total_queue_time for chat (99.85%
+    -- agreement with the derived queue time), so the derivation is shared.
+    CASE
+      WHEN ctm.total_talk_time IS NOT NULL THEN ctm.total_queue_time
+      ELSE tm.total_waiting_time
+    END AS total_waiting_time,
     d.total_inactivity_time,
     d.last_inactivity_time,
     CASE
       WHEN d.channel = 'chat' THEN d.seconds_to_first_response
       WHEN d.channel = 'call' THEN d.waiting_time_sec
     END AS first_reply_time,
-    tm.total_handling_time,
+    CASE
+      WHEN ctm.total_talk_time IS NOT NULL THEN ctm.total_talk_time + ctm.total_wrap_up_time
+      ELSE tm.total_handling_time
+    END AS total_handling_time,
     d.is_per_team_task,
     d.is_contact_answered,
     d.is_interaction_answered,
     d.is_spoc_task,
     d.is_isaias_session,
     d.ts_task_created,
-    COALESCE(d.ts_reservation_created, crt.ts_reservation_created) AS ts_reservation_created,
+    COALESCE(d.ts_reservation_created, ctm.ts_reservation_created) AS ts_reservation_created,
     d.ts_reservation_ended,
     NOW() AS ts_load
   FROM
@@ -285,8 +324,8 @@ twilio_contacts AS (
       AND t_sss.id_user_main = d.id_user
       AND d.channel = 'chat'
   LEFT JOIN
-    chat_reservation_timestamp AS crt
-      ON crt.id_task = d.id_task
+    chat_time_metrics AS ctm
+      ON ctm.id_task = d.id_task
       AND d.channel = 'chat'
 ),
 front_contacts AS (
