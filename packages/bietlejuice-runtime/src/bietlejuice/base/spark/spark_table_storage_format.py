@@ -10,6 +10,13 @@ class SparkTableStorageFormat:
     DEFAULT_DW_STAGING = PARQUET
     DEFAULT_METRIC = PARQUET
     DEFAULT_REVERSE = PARQUET
+    # Consumption is a query_delta output layer, same as enrich/dw/metric (see
+    # LayerEnum.CONSUMPTION, layer_policy_matrix.py). format_options here is
+    # informational only for the Delta write path (DeltaTableLoaderPipeline always
+    # writes Delta regardless of this value; see its load_and_register log line),
+    # but TableLoaderPipeline.run() calls get_storage(self.layer) unconditionally
+    # before dispatching, so every valid workflow layer needs an entry here.
+    DEFAULT_CONSUMPTION = PARQUET
 
     @classmethod
     def is_valid_storage(cls, storage):
@@ -27,6 +34,7 @@ class SparkTableStorageFormat:
             "dw",
             "metric",
             "reverse",
+            "consumption",
         ]
 
     @classmethod
@@ -45,4 +53,5 @@ class SparkTableStorageFormat:
             "dw": cls.DEFAULT_DW,
             "metric": cls.DEFAULT_METRIC,
             "reverse": cls.DEFAULT_REVERSE,
+            "consumption": cls.DEFAULT_CONSUMPTION,
         }.get(storage)
