@@ -121,9 +121,6 @@ class Tables:
     artifacts_publish_checkpoint = (
         "vespucio_pipeline_delta.artifacts_publish_checkpoint"
     )
-    kodak_photo_duplication_sent = (
-        "vespucio_pipeline_delta.kodak_photo_duplication_sent"
-    )
 
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
 
