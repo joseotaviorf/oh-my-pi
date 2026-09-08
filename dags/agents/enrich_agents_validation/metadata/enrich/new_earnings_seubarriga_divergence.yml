@@ -1,0 +1,52 @@
+---
+database_name: datalake_agents_validation
+table_name: new_earnings_seubarriga_divergence
+description: |
+  Validation table that identifies active RENT_CONTRACT earning sources in the current
+  competence month whose Big Agent new_earnings DEMAND_CONVERSION_FR revenue percentage
+  is out of sync with the agent brokerage share configured for the contract in Seu Barriga
+  (Retsuko), split evenly across the agents linked to the contract's rent flow. Only earning
+  sources that finished their first day of eventual consistency (ts_occurred before the
+  current day) are considered. The table is expected to be empty; any row it produces is a
+  divergence.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_contract:
+    description: Identifier of the rent contract, shared by the earning source, the Seu Barriga contract, and the rent flow.
+    lineage:
+      - datalake_big_agent_clean.earning_sources.id_external_domain
+      - datalake_retsuko_clean.contract.id_external
+      - datalake_ebdb_clean.rent_flow.id_current_contract
+  status:
+    description: Status of the Big Agent earning source for this contract.
+    lineage:
+      - datalake_big_agent_clean.earning_sources.status
+  incentive_system_earning_percentage:
+    description: |
+      Sum of DEMAND_CONVERSION_FR revenue percentages from Big Agent new_earnings for this
+      earning source, formatted as a percentage string. Null when there is no matching
+      new_earnings row.
+    lineage:
+      - datalake_big_agent_clean.new_earnings.revenue_percentage
+      - datalake_big_agent_clean.new_earnings.incentive_system
+      - datalake_big_agent_clean.new_earnings.status
+  seubarriga_percentage:
+    description: |
+      Seu Barriga (Retsuko) contract brokerage estate agent share, divided evenly across the
+      agents linked to the contract's rent flow, formatted as a percentage string. Null when
+      there is no matching Seu Barriga contract.
+    lineage:
+      - datalake_retsuko_clean.contract.brokerage_estate_agent_share
+      - datalake_ebdb_clean.rent_flow.id_current_contract
+      - datalake_ebdb_clean.agent_rent_flow.id_agent
+  dt_competence:
+    description: Business competence date of the earning source.
+    lineage:
+      - datalake_big_agent_clean.earning_sources.dt_competence
+  ts_signed:
+    description: Timestamp when the underlying earning source event occurred.
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_occurred
+  ts_validated:
+    description: Timestamp when this validation run produced the row.
