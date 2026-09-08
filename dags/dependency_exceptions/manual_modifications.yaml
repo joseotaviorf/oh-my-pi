@@ -353,11 +353,6 @@ bietlejuice.enrich_collections_quintoandar:
     - bietlejuice.grb:load-clean-operators:first-run-of-day
     - bietlejuice.meetcall:load-clean-operators:first-run-of-day
     - bietlejuice.langfuse:load-clean-scores:first-run-of-day
-bietlejuice.enrich_concierge_tof_events:
-  # CDP ClickHouse is muted for DE on-call. Hourly TOF snapshots read the
-  # latest available user_tracking_events partition without waiting on that DAG.
-  remove:
-    - bietlejuice.cdp_clickhouse:load-clean-user-tracking-events:first-run-of-day
 bietlejuice.enrich_consolidated_marketing_metrics:
   remove:
     - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes:first-run-of-day

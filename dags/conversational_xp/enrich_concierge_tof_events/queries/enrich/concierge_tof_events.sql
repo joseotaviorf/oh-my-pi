@@ -14,13 +14,13 @@ WITH tof_events AS (
         ts_event,
         DATE(ts_event) AS dt_event
     FROM
-        datalake_cdp_clean.user_tracking_events
+        datalake_cdp_clean.user_tracking
     WHERE
-        event_date >= DATE_FORMAT(
-            DATE_SUB(CURRENT_DATE(), {days_lookback_60} - 1),
-            'yyyy-MM-dd'
+        MAKE_DATE(year, month, day) >= DATE_SUB(
+            CURRENT_DATE(),
+            {days_lookback_60} - 1
         )
-        AND event_date <= DATE_FORMAT(CURRENT_DATE(), 'yyyy-MM-dd')
+        AND MAKE_DATE(year, month, day) <= CURRENT_DATE()
         AND event_name IN (
             'search_page_viewed',
             'search_results_page_viewed',
