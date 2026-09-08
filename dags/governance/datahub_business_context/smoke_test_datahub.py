@@ -88,8 +88,14 @@ query SmokeTestDataProduct($urn: String!) {
 
 _LIST_ASSETS = """
 query SmokeTestDataProductAssets($urn: String!) {
-  listDataProductAssets(urn: $urn, input: { query: "*", start: 0, count: 0 }) {
-    total
+  dataProduct(urn: $urn) {
+    entities(input: { query: "*", start: 0, count: 1000 }) {
+      searchResults {
+        entity {
+          urn
+        }
+      }
+    }
   }
 }
 """
@@ -278,9 +284,10 @@ def _fetch_asset_count(urn: str) -> Optional[int]:
     root, _diag = _datahub_graphql_post(GRAPHQL_URL, TOKEN, _LIST_ASSETS, {"urn": urn})
     if root is None or root.get("errors"):
         return None
-    block = (root.get("data") or {}).get("listDataProductAssets") or {}
-    total = block.get("total")
-    return int(total) if isinstance(total, int) else None
+    data_product = (root.get("data") or {}).get("dataProduct") or {}
+    entities = data_product.get("entities") or {}
+    results = entities.get("searchResults") or []
+    return len(results) if isinstance(results, list) else None
 
 
 def main() -> None:
