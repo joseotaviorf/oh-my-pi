@@ -1,0 +1,34 @@
+dag:
+  name: enrich_agentic_platform
+  schedule_start_date: 2026, 06, 01
+  schedule_interval: 0 6 * * *
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Consolidate agentic platform evaluation and tool-call events from CDP
+      into typed, deduplicated consumer tables at
+      agentic_platform.evaluations and agentic_platform.tool_calls.
+      A shared agentic_platform.platform_events table reads and deduplicates
+      the upstream source once; downstream projections fan out via
+      inner_dependencies.
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: agentic_platform
+  default_extraction_type: incremental
+  tables_customization:
+    platform_events:
+      merge_on: [id_event]
+      z_order_by: [ts_event, event_name]
+    evaluations:
+      merge_on: [id_event]
+      z_order_by: [ts_event, id_session, id_trace, id_chatbot]
+    tool_calls:
+      merge_on: [id_event]
+      z_order_by: [ts_event, id_session, id_otel_trace, id_chatbot]
+  inner_dependencies:
+    evaluations:
+      - platform_events
+    tool_calls:
+      - platform_events

@@ -1,0 +1,35 @@
+---
+database_name: agentic_platform
+table_name: platform_events
+owner: lucas.cardozo@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Deduplicated agentic platform events sourced from CDP user tracking. The
+  table consolidates evaluation and tool-call event names in a single scan of
+  the upstream source so downstream projections can fan out without repeating
+  read and deduplication logic.
+columns:
+  id_event:
+    description: "Unique CDP event identifier and merge key."
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_event
+  id_person:
+    description: "Person UUID carried by the governed event, when identity is available."
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_person
+  id_user:
+    description: "Application user identifier carried by the CDP event, when available."
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_user
+  event_name:
+    description: "CDP event name used to route rows into downstream projections."
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_name
+  event_properties:
+    description: "Raw JSON payload retained for downstream typed projections."
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+  ts_event:
+    description: "Timestamp when the source event occurred."
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event

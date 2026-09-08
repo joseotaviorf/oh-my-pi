@@ -1,0 +1,79 @@
+---
+database_name: agentic_platform
+table_name: tool_calls
+owner: lucas.cardozo@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Completed agentic-chatbot-service tool invocations emitted through Event
+  Gateway and landed in CDP user tracking. The table has one row per event
+  identifier after keeping the latest CDP delivery. Tool arguments and outputs
+  remain JSON strings while execution and correlation fields are typed.
+columns:
+  id_event:
+    description: "Unique CDP event identifier and merge key."
+    lineage:
+      - agentic_platform.platform_events.id_event
+  id_person:
+    description: "Person UUID carried by the governed event, when identity is available."
+    lineage:
+      - agentic_platform.platform_events.id_person
+  id_user:
+    description: "Application user identifier carried by the CDP event, when available."
+    lineage:
+      - agentic_platform.platform_events.id_user
+  tool_name:
+    description: "Name of the tool that was invoked."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  tool_args_json:
+    description: "Arguments supplied to the tool, retained as JSON."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  tool_output_json:
+    description: "Tool return value retained as JSON; null when absent or on an error."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  duration_ms:
+    description: "Tool execution duration in milliseconds."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  is_error:
+    description: "Whether the tool invocation raised an error."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  error_type:
+    description: "Exception class name when the invocation failed."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  id_chatbot:
+    description: "Catalog identifier of the top-level chatbot."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  id_session:
+    description: "Agentic chatbot session identifier carried by the tool-call event."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  id_span:
+    description: "OTEL span identifier for the tool invocation."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  id_otel_trace:
+    description: "OTEL trace identifier used to correlate the call with its invocation trace."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  channel:
+    description: "Conversation channel observed when the tool was invoked, when available."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  caller_agent:
+    description: "Agent that initiated the tool call, when available."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  destination_agent:
+    description: "Destination agent for handoff-like tool calls, when available."
+    lineage:
+      - agentic_platform.platform_events.event_properties
+  ts_event:
+    description: "Timestamp when the tool-call completion event occurred."
+    lineage:
+      - agentic_platform.platform_events.ts_event
