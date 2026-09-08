@@ -1,7 +1,7 @@
 ---
 database_name: datalake_tiers
 table_name: agent_offers
-description: Aggregated view of RENT and SALE offer events with agent attribution (broker and negotiation executive), including prospect, CIQ attribution, TQC presence, contract status, key timestamps, and partition fields.
+description: Aggregated view of RENT and SALE offer events with agent attribution (broker, negotiation executive, and associated executive / team lead), including prospect, CIQ attribution, TQC presence, contract status, key timestamps, and partition fields.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -29,13 +29,14 @@ columns:
       - datalake_rent_demand_events.rent_demand_events.id_agent
       - datalake_sale_offer.sale_offer.id_user_agent
       - datalake_sale_offer.sale_offer.id_user_consultant
-    description: User identifier linked to the agent responsible for the offer event.
+      - datalake_sale_offer.sale_offer.id_user_team_lead
+    description: Platform user identifier for the attributed person on this offer row — conversion broker (SALE id_user_agent or RENT id_agent), negotiation executive (SALE dealmaker / id_user_consultant), or associated executive (SALE team lead / id_user_team_lead). Each UNION branch emits one role per row.
   id_agent:
     lineage:
       - datalake_sale_offer_flows.offer_specialists.id_agent
       - datalake_ebdb_user.user.id_agent
       - datalake_sale_offer.sale_offer.id_agent
-    description: Agent identifier associated to the user (broker or negotiation executive).
+    description: Accreditation agent identifier resolved by the final ebdb user join when available. Broker rows may also resolve it through offer_specialists; EN and EA UNION branches start with a null value before the user lookup.
   uuid_person:
     lineage:
       - datalake_ebdb_user.user.uuid_person
@@ -45,7 +46,14 @@ columns:
       - datalake_tiers.ciq_first_listing.id_user
     description: Unique identifier of the CIQ user who captured/recommended the house through the CIQ program.
   agent_profile:
-    description: Agent role for the attribution (Negotiation Executive or Broker).
+    description: |
+      Attribution role on the offer. SALE broker = AGENT; dealmaker (DEAL_MAKER /
+      id_user_consultant) = NEGOTIATION_EXECUTIVE; associated executive (TEAM_LEAD /
+      id_user_team_lead) = ASSOCIATED_EXECUTIVE; RENT broker = AGENT.
+    categories:
+      AGENT: Conversion broker on the offer (SALE id_user_agent or RENT id_agent).
+      NEGOTIATION_EXECUTIVE: Dealmaker on the SALE offer (id_user_consultant).
+      ASSOCIATED_EXECUTIVE: Team lead on the SALE offer (id_user_team_lead). EA VGV is VGV_EA_TOTAL.
   business_context:
     description: Business context of the offer (RENT or SALE).
   agreement_value:

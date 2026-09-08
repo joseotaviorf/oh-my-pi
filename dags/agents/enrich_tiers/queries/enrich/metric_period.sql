@@ -16,19 +16,14 @@ metrics AS (
                 "CCV",
                 "CCV_TQC",
                 "CCV_CIQ",
-                "BP",
-                "GMV",
-                "OS_BY",
-                "OS2CCV_BY",
-                "BP2CCV",
                 "CS",
-                "TP",
                 "FL_FR",
                 "FL_FS",
-                "TP2CS",
                 "VGV_ACQ",
                 "VGV_CONV",
-                "VGV_TOTAL"
+                "VGV_TOTAL",
+                "VGV_EN_TOTAL",
+                "VGV_EA_TOTAL"
             )
         ) AS metric
 )

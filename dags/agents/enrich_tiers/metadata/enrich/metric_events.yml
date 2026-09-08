@@ -2,12 +2,17 @@
 database_name: datalake_tiers
 table_name: metric_events
 description: |
-  Consolidated metric events for agent performance. It unifies OFFER and PROSPECT
-  domain events with metric period mapping (simple and compound), including validity,
-  invalidation (when applicable), and supporting identifiers. For Sale VGV metrics,
+  Consolidated metric events for agent performance. It unifies OFFER, CONTRACT, and HOUSE
+  domain events with metric period mapping, including validity, invalidation (when
+  applicable), and supporting identifiers. For Sale VGV metrics,
   VGV_CONV and VGV_ACQ sum agreement_value on signed CCVs (conversion broker vs CIQ
-  acquisition); VGV_TOTAL attributes each offer once per id_user when the agent is
-  broker and/or CIQ on the same deal.   First Listing metrics
+  acquisition). VGV_CONV and VGV_TOTAL are AGENT (conversion broker) only. VGV_ACQ is
+  CIQ only. VGV_EN_TOTAL is dealmaker (NEGOTIATION_EXECUTIVE / id_user_consultant) only.
+  VGV_EA_TOTAL is team lead (ASSOCIATED_EXECUTIVE / id_user_team_lead) only. VGV persona
+  is exclusive per offer (agent_profile on each event), not per user-month; a user may
+  have both VGV_CONV and VGV_EN_TOTAL in the same period on different offers. VGV_TOTAL
+  attributes each offer once per id_user when the agent is broker and/or CIQ on the same deal. Every VGV event
+  is invalid when its contract is canceled within 90 days of signing. First Listing metrics
   (FL_FS, FL_FR) map houses using ciq_first_listing.dt_compliance_general_rule between
   DATE(ts_interval_started) and DATE(ts_interval_ended), and require
   DATE_TRUNC('MONTH', ts_original_first_listing) to match the metric period month.
@@ -61,21 +66,21 @@ columns:
   agent_profile:
     lineage:
       - datalake_tiers.agent_offers.agent_profile
-    description: Agent role for the event attribution (AGENT, NEGOTIATION_EXECUTIVE or CIQ).
+    description: Agent role for the event attribution (AGENT, NEGOTIATION_EXECUTIVE, ASSOCIATED_EXECUTIVE, or CIQ).
   partial_metric:
     description: |
-      Partial/primary metric component used for compound metrics (e.g., "CCV", "OS_BY", "BP").
-      Null for simple metrics.
+      Partial/primary metric component used for compound metrics. Null for all current metrics.
   final_metric:
     lineage:
       - datalake_tiers.metric_period.metric
     description: |
-      Final metric label from the metric period mapping (e.g., "CCV", "GMV",
-      "CCV_TQC", "CCV_CIQ", "VGV_ACQ", "VGV_CONV", "VGV_TOTAL", "OS_BY", "OS2CCV_BY", "BP2CCV", "BP", "TP", "FL_FS", "FL_FR").
+      Final metric label from the metric period mapping (e.g., "CCV", "CCV_TQC",
+      "CCV_CIQ", "VGV_ACQ", "VGV_CONV", "VGV_TOTAL", "VGV_EN_TOTAL", "VGV_EA_TOTAL",
+      "CS", "FL_FS", "FL_FR").
   cumulative_value_type:
-    description: Label describing the cumulative value meaning when applicable (e.g., "Sale price agreed" for GMV and VGV_*). Null for non-cumulative metrics.
+    description: Label describing the cumulative value meaning when applicable (e.g., "Sale price agreed" for VGV_*). Null for non-cumulative metrics.
   cumulative_value:
-    description: Numeric cumulative value when applicable (e.g., GMV, VGV_ACQ, VGV_CONV, VGV_TOTAL). Null for non-cumulative metrics.
+    description: Numeric cumulative value when applicable (e.g., VGV_ACQ, VGV_CONV, VGV_TOTAL, VGV_EN_TOTAL, VGV_EA_TOTAL). Null for non-cumulative metrics.
   reason:
     description: |
       Human-readable reason that validates the event. Possible values include:
@@ -84,7 +89,7 @@ columns:
   is_valid:
     lineage:
       - datalake_tiers.ciq_first_listing.is_first_listing_valid
-    description: Indicates whether the event is valid for the target metric/period.
+    description: Indicates whether the event is valid for the target metric/period; VGV events are invalid when the contract is canceled within 90 days of signing.
   is_compound_metric_part:
     description: Flags whether the record composes a compound metric mapping.
   is_cumulative_metric:
@@ -104,7 +109,7 @@ columns:
     lineage:
       - datalake_tiers.metric_period.dt_end
       - datalake_tiers.agent_offers.dt_contract_cancelled
-    description: Timestamp when the event became invalid (e.g., contract cancelled), when applicable.
+    description: Timestamp when the event became invalid, including the cancellation timestamp for VGV contracts canceled within 90 days of signing.
   ts_updated:
     lineage:
       - datalake_tiers.agent_offers.ts_updated

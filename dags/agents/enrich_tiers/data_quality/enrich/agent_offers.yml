@@ -27,3 +27,9 @@ column_level_validations:
   day:
     is_complete:
       severity_level: Error
+  agent_profile:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: [AGENT, NEGOTIATION_EXECUTIVE, ASSOCIATED_EXECUTIVE]
+      severity_level: Warning

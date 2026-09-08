@@ -3,8 +3,13 @@ database_name: datalake_tiers
 table_name: agent_performance
 description: |
   Aggregated performance metrics per agent and metric period, derived from metric_events
-  (simple, invalid and compound metrics). Each row represents a metric value for an
-  agent in a given metric period.
+  (simple and cumulative metrics), including VGV_EN_TOTAL and VGV_EA_TOTAL.
+  Each row represents a metric value for an agent in a given metric period. VGV persona
+  routing is per offer in metric_events (agent_profile on each event); the same user may
+  have VGV_CONV on broker-attributed offers and VGV_EN_TOTAL or VGV_EA_TOTAL on EN/EA
+  offers in the same period. VGV contracts canceled within 90 days
+  of signing remain as invalid rows for audit and are excluded from valid totals through
+  the is_valid flag.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -27,7 +32,7 @@ columns:
       - datalake_tiers.metric_period.id
     description: Identifier of the metric period.
   metric_name:
-    description: Metric name aggregated (e.g., CCV, GMV, VGV_ACQ, VGV_CONV, VGV_TOTAL, CCV_TQC, CCV_CIQ, OS_BY, OS2CCV_BY, BP2CCV, BP, TP, and INVALID variants).
+    description: Metric name aggregated (e.g., CCV, VGV_ACQ, VGV_CONV, VGV_TOTAL, VGV_EN_TOTAL, VGV_EA_TOTAL, CCV_TQC, CCV_CIQ, CS, FL_FS, FL_FR, and INVALID variants).
   metric_value:
     description: Aggregated metric value for the period (count or ratio depending on the metric definition).
   is_valid:

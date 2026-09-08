@@ -1,17 +1,22 @@
--- Contract-signed period keys use America/Sao_Paulo calendar date, not DATE(utc_ts).
--- DATE(ts) on UTC timestamps moves late-evening BRT signatures into the next month.
 WITH metric_period_process AS (
     SELECT DISTINCT
         mp.id,
         mp.metric,
         mp.dt_init,
         mp.dt_end,
-        mp. ts_interval_started,
-        mp. ts_interval_ended,
+        mp.ts_interval_started,
+        mp.ts_interval_ended,
         -- keeping partitions immutable for the merge on function
         YEAR(mp.dt_init) AS year,
         MONTH(mp.dt_init) AS month,
-        DAY(mp.dt_init) AS day
+        DAY(mp.dt_init) AS day,
+        mp.metric IN (
+            "VGV_ACQ",
+            "VGV_CONV",
+            "VGV_TOTAL",
+            "VGV_EN_TOTAL",
+            "VGV_EA_TOTAL"
+        ) AS is_vgv_metric
     FROM
         datalake_tiers.metric_period AS mp
     JOIN
@@ -19,8 +24,9 @@ WITH metric_period_process AS (
             ON YEAR(ad.date) = mp.year
             AND MONTH(ad.date) = mp.month
     WHERE
-        ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND mp.status = "VALID"
+        mp.status = "VALID"
+        AND ad.date BETWEEN DATE_SUB(DATE('{load_start_date}'), 90)
+            AND DATE('{load_end_date}')
 ),
 sale_contract_signed_simple_metrics AS (
     SELECT
@@ -33,22 +39,60 @@ sale_contract_signed_simple_metrics AS (
         ao.agent_profile,
         NULL AS partial_metric,
         mp.metric AS final_metric,
-        IF(mp_invalid.id IS NOT NULL, "CONTRACT CANCELLED AFTER SIGNED", "CONTRACT SIGNED") AS reason,
         IF(
-            mp.metric IN ("GMV", "VGV_CONV"),
+            mp.is_vgv_metric
+            AND ao.dt_contract_cancelled IS NOT NULL
+            AND DATEDIFF(
+                DATE(ao.dt_contract_cancelled),
+                DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo'))
+            ) <= 90,
+            "CONTRACT CANCELLED AFTER SIGNED",
+            IF(
+                mp_invalid.id IS NOT NULL,
+                "CONTRACT CANCELLED AFTER SIGNED",
+                "CONTRACT SIGNED"
+            )
+        ) AS reason,
+        IF(
+            mp.is_vgv_metric,
             "Sale price agreed",
             NULL
         ) AS cumulative_value_type,
         IF(
-            mp.metric IN ("GMV", "VGV_CONV"),
+            mp.is_vgv_metric,
             ao.agreement_value,
             NULL
         ) AS cumulative_value,
-        mp_invalid.id IS NULL AS is_valid,
+        IF(
+            mp.is_vgv_metric,
+            ao.dt_contract_cancelled IS NULL
+            OR DATEDIFF(
+                DATE(ao.dt_contract_cancelled),
+                DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo'))
+            ) > 90,
+            mp_invalid.id IS NULL
+        ) AS is_valid,
         FALSE AS is_compound_metric_part,
-        IF(mp.metric IN ("GMV", "VGV_CONV"), TRUE, FALSE) AS is_cumulative_metric,
+        IF(
+            mp.is_vgv_metric,
+            TRUE,
+            FALSE
+        ) AS is_cumulative_metric,
         DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
-        IF(mp_invalid.id IS NOT NULL, ao.dt_contract_cancelled, NULL) AS ts_invalidation,
+        IF(
+            mp.is_vgv_metric
+            AND ao.dt_contract_cancelled IS NOT NULL
+            AND DATEDIFF(
+                DATE(ao.dt_contract_cancelled),
+                DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo'))
+            ) <= 90,
+            ao.dt_contract_cancelled,
+            IF(
+                mp_invalid.id IS NOT NULL,
+                ao.dt_contract_cancelled,
+                NULL
+            )
+        ) AS ts_invalidation,
         ao.ts_updated,
         mp.year,
         mp.month,
@@ -59,7 +103,13 @@ sale_contract_signed_simple_metrics AS (
         metric_period_process AS mp
             ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.year
             AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.month
-            AND mp.metric IN ("CCV", "CCV_TQC", "GMV", "VGV_CONV")
+            AND mp.metric IN (
+                "CCV",
+                "CCV_TQC",
+                "VGV_CONV",
+                "VGV_EN_TOTAL",
+                "VGV_EA_TOTAL"
+            )
     LEFT JOIN
         metric_period_process AS mp_invalid
             ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
@@ -69,9 +119,18 @@ sale_contract_signed_simple_metrics AS (
             AND mp_invalid.metric = mp.metric
     WHERE
         ao.business_context = "SALE"
-        AND (            
+        AND (
             (mp.metric = "CCV_TQC" AND ao.has_tqc IS TRUE)
-            OR mp.metric IN ("CCV", "GMV", "VGV_CONV")
+            OR mp.metric = "CCV"
+            OR (mp.metric = "VGV_CONV" AND ao.agent_profile = "AGENT")
+            OR (
+                mp.metric = "VGV_EN_TOTAL"
+                AND ao.agent_profile = "NEGOTIATION_EXECUTIVE"
+            )
+            OR (
+                mp.metric = "VGV_EA_TOTAL"
+                AND ao.agent_profile = "ASSOCIATED_EXECUTIVE"
+            )
         )
 ),
 sale_contract_signed_with_ciq_simple_metrics AS (
@@ -86,23 +145,50 @@ sale_contract_signed_with_ciq_simple_metrics AS (
         NULL AS partial_metric,
         mp.metric AS final_metric,
         IF(
-            mp_invalid.id IS NOT NULL, 
-            "CONTRACT CANCELLED AFTER SIGNED", 
+            mp.is_vgv_metric
+            AND ao.dt_contract_cancelled IS NOT NULL
+            AND DATEDIFF(
+                DATE(ao.dt_contract_cancelled),
+                DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo'))
+            ) <= 90,
+            "CONTRACT CANCELLED AFTER SIGNED",
             IF(
-                cfl.is_first_listing_valid IS FALSE, 
-                ARRAY_JOIN(cfl.invalidation_reasons, ' | '),
-                "FIRST LISTING VALID | CONTRACT SIGNED"
+                mp_invalid.id IS NOT NULL,
+                "CONTRACT CANCELLED AFTER SIGNED",
+                IF(
+                    cfl.is_first_listing_valid IS FALSE,
+                    ARRAY_JOIN(cfl.invalidation_reasons, ' | '),
+                    "FIRST LISTING VALID | CONTRACT SIGNED"
+                )
             )
         ) AS reason,
         IF(mp.metric = "VGV_ACQ", "Sale price agreed", NULL) AS cumulative_value_type,
         IF(mp.metric = "VGV_ACQ", ao.agreement_value, NULL) AS cumulative_value,
-        mp_invalid.id IS NULL AND cfl.is_first_listing_valid IS TRUE AS is_valid,
+        IF(
+            mp.is_vgv_metric,
+            ao.dt_contract_cancelled IS NULL
+            OR DATEDIFF(
+                DATE(ao.dt_contract_cancelled),
+                DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo'))
+            ) > 90,
+            mp_invalid.id IS NULL
+        )
+        AND cfl.is_first_listing_valid IS TRUE AS is_valid,
         FALSE AS is_compound_metric_part,
-        IF(mp.metric = "VGV_ACQ", TRUE, FALSE) AS is_cumulative_metric,
+        IF(mp.is_vgv_metric, TRUE, FALSE) AS is_cumulative_metric,
         DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
         IF(
-            mp_invalid.id IS NOT NULL OR cfl.is_first_listing_valid IS FALSE, 
-            COALESCE(ao.dt_contract_cancelled, mp.dt_end), 
+            (
+                mp.is_vgv_metric
+                AND ao.dt_contract_cancelled IS NOT NULL
+                AND DATEDIFF(
+                    DATE(ao.dt_contract_cancelled),
+                    DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo'))
+                ) <= 90
+            )
+            OR mp_invalid.id IS NOT NULL
+            OR cfl.is_first_listing_valid IS FALSE,
+            COALESCE(ao.dt_contract_cancelled, mp.dt_end),
             NULL
         ) AS ts_invalidation,
         ao.ts_updated,
@@ -144,16 +230,13 @@ sale_vgv_total_attribution AS (
         DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_contract_signed,
         ao.dt_contract_cancelled,
         ao.ts_updated,
-        mp_invalid.id IS NOT NULL AS is_invalid_by_cancellation
+        ao.dt_contract_cancelled IS NOT NULL
+        AND DATEDIFF(
+            DATE(ao.dt_contract_cancelled),
+            DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo'))
+        ) <= 90 AS is_invalid_by_cancellation
     FROM
         datalake_tiers.agent_offers AS ao
-    LEFT JOIN
-        metric_period_process AS mp_invalid
-            ON mp_invalid.metric = "VGV_TOTAL"
-            AND YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
-            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.month
-            AND YEAR(ao.dt_contract_cancelled) = mp_invalid.year
-            AND MONTH(ao.dt_contract_cancelled) = mp_invalid.month
     WHERE
         ao.business_context = "SALE"
         AND ao.agent_profile = "AGENT"
@@ -179,7 +262,11 @@ sale_vgv_total_attribution AS (
             DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_contract_signed,
             ao.dt_contract_cancelled,
             ao.ts_updated,
-            mp_invalid.id IS NOT NULL AS is_invalid_by_cancellation,
+            ao.dt_contract_cancelled IS NOT NULL
+        AND DATEDIFF(
+            DATE(ao.dt_contract_cancelled),
+            DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo'))
+        ) <= 90 AS is_invalid_by_cancellation,
             -- agent_offers is an audit table: the same id_offer can carry multiple
             -- agent_profile rows (AGENT, NEGOTIATION_EXECUTIVE, ...) and multiple
             -- revisions per profile as the offer is updated. This branch has no
@@ -193,13 +280,6 @@ sale_vgv_total_attribution AS (
                 ON cfl.id_house = ao.id_house
                 AND cfl.id_user = ao.id_user_ciq
                 AND cfl.business_context = ao.business_context
-        LEFT JOIN
-            metric_period_process AS mp_invalid
-                ON mp_invalid.metric = "VGV_TOTAL"
-                AND YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
-            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.month
-                AND YEAR(ao.dt_contract_cancelled) = mp_invalid.year
-            AND MONTH(ao.dt_contract_cancelled) = mp_invalid.month
         WHERE
             ao.business_context = "SALE"
             AND ao.is_ciq_first_listing IS TRUE
@@ -241,18 +321,18 @@ sale_vgv_total_cumulative_metrics AS (
         NULL AS partial_metric,
         mp.metric AS final_metric,
         IF(
-            mp_invalid.id IS NOT NULL OR vtd.is_invalid_by_cancellation,
+            vtd.is_invalid_by_cancellation,
             "CONTRACT CANCELLED AFTER SIGNED",
             "CONTRACT SIGNED"
         ) AS reason,
         "Sale price agreed" AS cumulative_value_type,
         vtd.agreement_value AS cumulative_value,
-        mp_invalid.id IS NULL AND NOT vtd.is_invalid_by_cancellation AS is_valid,
+        NOT vtd.is_invalid_by_cancellation AS is_valid,
         FALSE AS is_compound_metric_part,
         TRUE AS is_cumulative_metric,
         vtd.dt_contract_signed AS dt_become_valid,
         IF(
-            mp_invalid.id IS NOT NULL OR vtd.is_invalid_by_cancellation,
+            vtd.is_invalid_by_cancellation,
             vtd.dt_contract_cancelled,
             NULL
         ) AS ts_invalidation,
@@ -267,53 +347,6 @@ sale_vgv_total_cumulative_metrics AS (
             ON YEAR(vtd.dt_contract_signed) = mp.year
             AND MONTH(vtd.dt_contract_signed) = mp.month
             AND mp.metric = "VGV_TOTAL"
-    LEFT JOIN
-        metric_period_process AS mp_invalid
-            ON YEAR(vtd.dt_contract_signed) = mp_invalid.year
-            AND MONTH(vtd.dt_contract_signed) = mp_invalid.month
-            AND YEAR(vtd.dt_contract_cancelled) = mp_invalid.year
-            AND MONTH(vtd.dt_contract_cancelled) = mp_invalid.month
-            AND mp_invalid.metric = "VGV_TOTAL"
-),
-sale_contract_signed_compound_metrics AS (
-    SELECT
-        ao.id_user,
-        ao.id_agent,
-        ao.uuid_person,
-        ao.id_offer AS id_external_domain,
-        mp.id AS id_metric_period,
-        "OFFER" AS external_domain,
-        ao.agent_profile,
-        "CCV" AS partial_metric,
-        mp.metric AS final_metric,
-        IF(mp_invalid.id IS NOT NULL, "CONTRACT CANCELLED AFTER SIGNED", "CONTRACT SIGNED") AS reason,
-        NULL AS cumulative_value_type,
-        NULL AS cumulative_value,
-        mp_invalid.id IS NULL AS is_valid,
-        TRUE AS is_compound_metric_part,
-        FALSE AS is_cumulative_metric,
-        DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
-        IF(mp_invalid.id IS NOT NULL, ao.dt_contract_cancelled, NULL) AS ts_invalidation,
-        ao.ts_updated,
-        mp.year,
-        mp.month,
-        mp.day
-    FROM
-        datalake_tiers.agent_offers AS ao
-    JOIN
-        metric_period_process AS mp
-            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.year
-            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.month
-            AND mp.metric IN ("OS2CCV_BY", "BP2CCV")
-    LEFT JOIN
-        metric_period_process AS mp_invalid
-            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.year
-            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp_invalid.month
-            AND YEAR(ao.dt_contract_cancelled) = mp_invalid.year
-            AND MONTH(ao.dt_contract_cancelled) = mp_invalid.month
-            AND mp_invalid.metric = mp.metric
-    WHERE
-        ao.business_context = "SALE"
 ),
 rent_contract_signed_simple_metrics AS (
     SELECT
@@ -347,253 +380,6 @@ rent_contract_signed_simple_metrics AS (
             AND mp.metric IN ("CS")
     WHERE
         ao.business_context = "RENT"
-),
-rent_contract_signed_compound_metrics AS (
-    SELECT
-        ao.id_user,
-        ao.id_agent,
-        ao.uuid_person,
-        ao.id_contract AS id_external_domain,
-        mp.id AS id_metric_period,
-        "CONTRACT" AS external_domain,
-        ao.agent_profile,
-        "CS" AS partial_metric,
-        mp.metric AS final_metric,
-        "CONTRACT SIGNED" AS reason,
-        NULL AS cumulative_value_type,
-        NULL AS cumulative_value,
-        TRUE AS is_valid,
-        TRUE AS is_compound_metric_part,
-        FALSE AS is_cumulative_metric,
-        DATE(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) AS dt_become_valid,
-        NULL AS ts_invalidation,
-        ao.ts_updated,
-        mp.year,
-        mp.month,
-        mp.day
-    FROM
-        datalake_tiers.agent_offers AS ao
-    JOIN
-        metric_period_process AS mp
-            ON YEAR(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.year
-            AND MONTH(FROM_UTC_TIMESTAMP(ao.ts_contract_signed, 'America/Sao_Paulo')) = mp.month
-            AND mp.metric IN ("TP2CS")
-    WHERE
-        ao.business_context = "RENT"
-),
-buyer_with_offer_submited_simple_metrics AS (
-    SELECT
-        ao.id_user,
-        ao.id_agent,
-        ao.uuid_person,
-        ao.id_offer AS id_external_domain,
-        mp.id AS id_metric_period,
-        "OFFER" AS external_domain,
-        ao.agent_profile,
-        NULL AS partial_metric,
-        mp.metric AS final_metric,
-        "OFFER SUBMITED" AS reason,
-        NULL AS cumulative_value_type,
-        NULL AS cumulative_value,
-        TRUE AS is_valid,
-        FALSE AS is_compound_metric_part,
-        FALSE AS is_cumulative_metric,
-        DATE(ao.ts_offer_submitted) AS dt_become_valid,
-        NULL AS ts_invalidation,
-        ao.ts_updated,
-        mp.year,
-        mp.month,
-        mp.day
-    FROM
-        datalake_tiers.agent_offers AS ao
-    JOIN
-        metric_period_process AS mp
-            ON YEAR(ao.ts_offer_submitted) = mp.year
-            AND MONTH(ao.ts_offer_submitted) = mp.month
-            AND mp.metric = "OS_BY"
-    WHERE
-        ao.business_context = "SALE"
-),
-buyer_with_offer_submited_compound_metrics AS (
-    SELECT
-        ao.id_user,
-        ao.id_agent,
-        ao.uuid_person,
-        ao.id_offer AS id_external_domain,
-        mp.id AS id_metric_period,
-        "OFFER" AS external_domain,
-        ao.agent_profile,
-        "OS_BY" AS partial_metric,
-        mp.metric AS final_metric,
-        "OFFER SUBMITED" AS reason,
-        NULL AS cumulative_value_type,
-        NULL AS cumulative_value,
-        TRUE AS is_valid,
-        TRUE AS is_compound_metric_part,
-        FALSE AS is_cumulative_metric,
-        DATE(ao.ts_offer_submitted) AS dt_become_valid,
-        NULL AS ts_invalidation,
-        ao.ts_updated,
-        mp.year,
-        mp.month,
-        mp.day
-    FROM
-        datalake_tiers.agent_offers AS ao
-    JOIN
-        metric_period_process AS mp
-            ON YEAR(ao.ts_offer_submitted) = mp.year
-            AND MONTH(ao.ts_offer_submitted) = mp.month
-            AND mp.metric IN ("OS2CCV_BY")
-    WHERE
-        ao.business_context = "SALE"
-),
-broker_prospects_simple_metrics AS (
-    SELECT
-        ap.id_user,
-        ap.id_agent,
-        ap.uuid_person,
-        ap.id_prospect AS id_external_domain,
-        mp.id AS id_metric_period,
-        "PROSPECT" AS external_domain,
-        "AGENT" AS agent_profile,
-        NULL AS partial_metric,
-        mp.metric AS final_metric,
-        "NEW OR RECOVERED PROSPECT" AS reason,
-        NULL AS cumulative_value_type,
-        NULL AS cumulative_value,
-        TRUE AS is_valid,
-        FALSE AS is_compound_metric_part,
-        FALSE AS is_cumulative_metric,
-        DATE(MIN(ap.ts_event)) AS dt_become_valid,
-        NULL AS ts_invalidation,
-        MAX(ap.ts_event) AS ts_updated,
-        mp.year,
-        mp.month,
-        mp.day
-    FROM
-        datalake_tiers.agent_prospects AS ap
-    JOIN
-        metric_period_process AS mp
-            ON YEAR(ap.ts_event) = mp.year
-            AND MONTH(ap.ts_event) = mp.month
-            AND mp.metric IN ("BP", "TP")
-    WHERE
-        (ap.business_context = "SALE" AND mp.metric = "BP")
-        OR (ap.business_context = "RENT" AND mp.metric = "TP")
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
-),
-broker_prospects_compound_metrics AS (
-    SELECT
-        ap.id_user,
-        ap.id_agent,
-        ap.uuid_person,
-        ap.id_prospect AS id_external_domain,
-        mp.id AS id_metric_period,
-        "PROSPECT" AS external_domain,
-        "AGENT" AS agent_profile,
-        IF(mp.metric = "BP2CCV", "BP", "TP") AS partial_metric,
-        mp.metric AS final_metric,
-        "NEW OR RECOVERED PROSPECT" AS reason,
-        NULL AS cumulative_value_type,
-        NULL AS cumulative_value,
-        TRUE AS is_valid,
-        TRUE AS is_compound_metric_part,
-        FALSE AS is_cumulative_metric,
-        DATE(MIN(ap.ts_event)) AS dt_become_valid,
-        NULL AS ts_invalidation,
-        MAX(ap.ts_event) AS ts_updated,
-        mp.year,
-        mp.month,
-        mp.day
-    FROM
-        datalake_tiers.agent_prospects AS ap
-    JOIN
-        metric_period_process AS mp
-            ON YEAR(ap.ts_event) = mp.year
-            AND MONTH(ap.ts_event) = mp.month
-            AND mp.metric IN ("BP2CCV", "TP2CS")
-    WHERE
-        (ap.business_context = "SALE" AND mp.metric = "BP2CCV")
-        OR (ap.business_context = "RENT" AND mp.metric = "TP2CS")
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
-),
-negotiation_executive_prospects_simple_metrics AS (
-    SELECT
-        aa.id_parent_user AS id_user,
-        aa.id_parent_agent AS id_agent,
-        aa.uuid_parent_person AS uuid_person,
-        ap.id_prospect AS id_external_domain,
-        mp.id AS id_metric_period,
-        "PROSPECT" AS external_domain,
-        "NEGOTIATION_EXECUTIVE" AS agent_profile,
-        NULL AS partial_metric,
-        mp.metric AS final_metric,
-        "NEW OR RECOVERED PROSPECT" AS reason,
-        NULL AS cumulative_value_type,
-        NULL AS cumulative_value,
-        TRUE AS is_valid,
-        FALSE AS is_compound_metric_part,
-        FALSE AS is_cumulative_metric,
-        DATE(MIN(ap.ts_event)) AS dt_become_valid,
-        NULL AS ts_invalidation,
-        MAX(ap.ts_event) AS ts_updated,
-        mp.year,
-        mp.month,
-        mp.day
-    FROM
-        datalake_tiers.agent_prospects AS ap
-    JOIN
-        metric_period_process AS mp
-            ON YEAR(ap.ts_event) = mp.year
-            AND MONTH(ap.ts_event) = mp.month
-            AND mp.metric IN ("BP")
-    JOIN
-        datalake_tiers.agent_allocation AS aa
-            ON aa.id_agent = ap.id_agent
-            AND aa.id_metric_period = mp.id
-    WHERE
-        ap.business_context = "SALE"
-        AND aa.id_parent_user IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
-),
-negotiation_executive_prospects_compound_metrics AS (
-    SELECT
-        aa.id_parent_user AS id_user,
-        aa.id_parent_agent AS id_agent,
-        aa.uuid_parent_person AS uuid_person,
-        ap.id_prospect AS id_external_domain,
-        mp.id AS id_metric_period,
-        "PROSPECT" AS external_domain,
-        "NEGOTIATION_EXECUTIVE" AS agent_profile,
-        "BP" AS partial_metric,
-        mp.metric AS final_metric,
-        "NEW OR RECOVERED PROSPECT" AS reason,
-        NULL AS cumulative_value_type,
-        NULL AS cumulative_value,
-        TRUE AS is_valid,
-        TRUE AS is_compound_metric_part,
-        FALSE AS is_cumulative_metric,
-        DATE(MIN(ap.ts_event)) AS dt_become_valid,
-        NULL AS ts_invalidation,
-        MAX(ap.ts_event) AS ts_updated,
-        mp.year,
-        mp.month,
-        mp.day
-    FROM
-        datalake_tiers.agent_prospects AS ap
-    JOIN
-        metric_period_process AS mp
-            ON YEAR(ap.ts_event) = mp.year
-            AND MONTH(ap.ts_event) = mp.month
-            AND mp.metric IN ("BP2CCV")
-    JOIN
-        datalake_tiers.agent_allocation AS aa
-            ON aa.id_agent = ap.id_agent
-            AND aa.id_metric_period = mp.id
-    WHERE
-        ap.business_context = "SALE"
-        AND aa.id_parent_user IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
 ),
 fl_fs_first_listing_candidates AS (
     SELECT
@@ -790,23 +576,7 @@ union_metrics AS (
     UNION ALL
     SELECT * FROM sale_vgv_total_cumulative_metrics
     UNION ALL
-    SELECT * FROM sale_contract_signed_compound_metrics
-    UNION ALL
     SELECT * FROM rent_contract_signed_simple_metrics
-    UNION ALL
-    SELECT * FROM rent_contract_signed_compound_metrics
-    UNION ALL
-    SELECT * FROM buyer_with_offer_submited_simple_metrics
-    UNION ALL
-    SELECT * FROM buyer_with_offer_submited_compound_metrics
-    UNION ALL
-    SELECT * FROM broker_prospects_simple_metrics
-    UNION ALL
-    SELECT * FROM broker_prospects_compound_metrics
-    UNION ALL
-    SELECT * FROM negotiation_executive_prospects_simple_metrics
-    UNION ALL
-    SELECT * FROM negotiation_executive_prospects_compound_metrics
     UNION ALL
     SELECT * FROM sale_first_listing_simple_metrics
     UNION ALL
