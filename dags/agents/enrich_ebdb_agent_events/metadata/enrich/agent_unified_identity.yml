@@ -6,7 +6,8 @@ owner: anne.macedo@quintoandar.com.br
 description: |
   Unified agent identity across Agent Domain agent, legacy EBDB agent_data (dadosAgente), and
   partner records. One row per person-agent-partner bridge with at least one agent identifier
-  (id_agent, id_agent_data, or id_partner), updated within the load window.
+  (id_agent, id_agent_data, or id_partner). Full reload each run from upstream agent, agent_data,
+  and partner sources so downstream supply joins resolve identities outside the incremental window.
   Consolidates natural and surrogate keys (id_unified_agent, sk_person, sk_broker, sk_company),
   prospect/affiliate context, 1P/3P partnership flags, and 3P broker profile flags. Built from
   a UNION of Agent Domain rows linked to legacy/partner references and standalone legacy/partner

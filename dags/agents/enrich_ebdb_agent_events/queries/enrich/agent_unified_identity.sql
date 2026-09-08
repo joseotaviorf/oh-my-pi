@@ -18,8 +18,6 @@ WITH agent AS (
     LEFT JOIN
         datalake_ebdb_clean.agent_external_reference AS reference
             ON reference.id_agent = agent.id
-    WHERE
-        DATE(agent.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY 1, 6, 7, 8, 9, 10, 11, 12, 13
 ),
 agent_data AS (
@@ -34,8 +32,6 @@ agent_data AS (
         agent_data.ts_created
     FROM
         datalake_ebdb_clean.agent_data AS agent_data
-    WHERE
-        DATE(agent_data.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 partner AS (
     SELECT
@@ -52,9 +48,6 @@ partner AS (
     JOIN
         datalake_ebdb_clean.partner_agent AS partner_agent
             ON partner_agent.id_partner = partner.id
-    WHERE
-        DATE(partner.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        OR DATE(partner_agent.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 person_creci_number AS (
     SELECT
