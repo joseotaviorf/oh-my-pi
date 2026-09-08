@@ -35,6 +35,7 @@ packages/bietlejuice-core/src/bietlejuice/governance/domain_registry.py @quintoa
 packages/bietlejuice-compiler/scripts/governance_metadata_validation/sync_domain_allowlist.py @quintoandar/data-ops-governance
 # Databricks prod-runtime CI bypass — data-ingestion must approve exceptions.
 packages/bietlejuice-compiler/scripts/ci_cd/databricks_cluster_exceptions.yml @quintoandar/data-ingestion-code-owners
+packages/bietlejuice-compiler/scripts/jiraops/** @quintoandar/bi-etl-ejuice-code-owners
 packages/bietlejuice-runtime/src/bietlejuice/base/sst/**                @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners
 packages/bietlejuice-runtime/test/unit/base/sst/**                      @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners
 packages/bietlejuice-airflow/src/bietlejuice/base/sst/**                @quintoandar/data-sst @luisarodriguees @quintoandar/data-ingestion-code-owners

@@ -64,6 +64,12 @@ Task:
     - bietlejuice.retsuko_fast_lane:load-transactional-entry-partitioned
     - bietlejuice.trato_feito:register-table-clean-audience
     - bietlejuice.cyber_complement:sync-metadata-raw-delqmst
+    - bietlejuice.langfuse:sync-metadata-raw-scores
+    - bietlejuice.langfuse:sync-metadata-raw-traces
+    - bietlejuice.langfuse:sync-metadata-raw-observations
+    - bietlejuice.langfuse:sync-metadata-clean-scores
+    - bietlejuice.langfuse:sync-metadata-clean-traces
+    - bietlejuice.langfuse:sync-metadata-clean-observations
   contains:
     - bietlejuice.*:optimize-
     - bietlejuice.*:register-
