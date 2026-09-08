@@ -1,9 +1,10 @@
 WITH concierge_trigger AS (
   SELECT DISTINCT
-    CASE 
+    CASE
       WHEN intent LIKE 'medium_reprocess%' THEN 'Medium FUP'
       WHEN intent LIKE 'medium_fup%' THEN 'Medium FUP'
       WHEN intent LIKE 'visit_cancellation_fup%' THEN 'Visit cancellation FUP'
+      WHEN intent LIKE 'favorites%' THEN 'Favorites'
       ELSE intent
     END AS trigger_intent,
     uuid_trigger_id
@@ -34,7 +35,6 @@ WITH concierge_trigger AS (
       WHEN un.action LIKE 'ConciergeContactSubmissionClassifieds%' THEN 'Classifieds'
       WHEN un.action LIKE 'ConciergeContactSubmissionTtcQac%' THEN 'TTC QAC Outbound'
       WHEN un.action LIKE 'ConciergeContactSubmissionTtc%' THEN 'TTC Outbound'
-      WHEN un.action = 'ConciergeOutboundNotification_whatsapp' AND un.template LIKE 'concierge_favorites%' THEN 'Favorites'
       WHEN un.action = 'ConciergeOutboundNotification_whatsapp' AND un.template = 'concierge_placas_agents_reproc_trigger' THEN 'Placas agent FUP'
       WHEN un.action = 'ConciergeOutboundNotification_whatsapp' THEN COALESCE(t.trigger_intent, 'Undefined')
     ELSE 'Undefined'
