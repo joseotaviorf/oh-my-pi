@@ -38,6 +38,8 @@ workflow:
       merge_on: [id_persona_event]
       when_matched_update_condition: source.ts_updated >= target.ts_updated
       z_order_by: [persona, id_user, uuid_person, ts_updated]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
     persona_events:
       extraction_type: incremental
       merge_on: [id_persona_event]
@@ -45,6 +47,8 @@ workflow:
       when_matched_delete_condition: source.is_active = false AND source.ts_updated >= target.ts_updated
       when_not_matched_insert_condition: source.is_active = true
       z_order_by: [persona, id_user, uuid_person, ts_updated]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
 
 cluster:
   type: emr_7_12_consolidation_s_memory_cluster
