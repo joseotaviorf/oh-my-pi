@@ -479,6 +479,9 @@ def validate_and_write(
             # catalog.database.table -> use catalog.database for CREATE DATABASE
             database_name = ".".join(parts[:-1])
         spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
+        from bietlejuice.base.spark.lake_formation_tagger import LakeFormationTagger
+
+        LakeFormationTagger.ensure_database_data_contract_tag(database_name)
         writer = df.write.format("delta").mode("overwrite")
         if partition_cols:
             writer = writer.partitionBy(*partition_cols)

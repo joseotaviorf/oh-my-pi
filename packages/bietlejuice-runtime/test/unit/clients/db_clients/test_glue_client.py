@@ -120,6 +120,87 @@ class TestGlueClient:
                 )
 
 
+class TestGlueClientLakeFormationApis:
+    def _client_with_mock_lf(self, mock_lf):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("GLUE_ASSUME_ROLE_ARN", None)
+            with patch(
+                "bietlejuice.clients.db_clients.glue_client.boto3.client",
+                return_value=MagicMock(),
+            ):
+                client = GlueClient(role_arn=None)
+                client._lf = mock_lf
+                return client
+
+    def test_lakeformation_property_builds_client(self):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("GLUE_ASSUME_ROLE_ARN", None)
+            with patch(
+                "bietlejuice.clients.db_clients.glue_client.boto3.client"
+            ) as mock_boto_client:
+                mock_lf = MagicMock()
+                mock_boto_client.return_value = mock_lf
+
+                client = GlueClient(role_arn=None)
+                assert client.lakeformation is mock_lf
+                mock_boto_client.assert_called_once_with(
+                    "lakeformation", region_name="us-east-1"
+                )
+
+    def test_database_has_data_contract_tag_true(self):
+        mock_lf = MagicMock()
+        mock_lf.get_resource_lf_tags.return_value = {
+            "LFTagOnDatabase": [
+                {"TagKey": "data_contract_managed", "TagValues": ["true"]}
+            ]
+        }
+        client = self._client_with_mock_lf(mock_lf)
+        assert client.database_has_data_contract_tag("bi_metrics") is True
+        mock_lf.get_resource_lf_tags.assert_called_once_with(
+            Resource={"Database": {"Name": "bi_metrics"}},
+            ShowAssignedLFTags=True,
+        )
+
+    def test_database_has_data_contract_tag_false(self):
+        mock_lf = MagicMock()
+        mock_lf.get_resource_lf_tags.return_value = {
+            "LFTagOnDatabase": [{"TagKey": "other", "TagValues": ["x"]}]
+        }
+        client = self._client_with_mock_lf(mock_lf)
+        assert client.database_has_data_contract_tag("agentic_platform") is False
+
+    def test_add_database_data_contract_tag_payload(self):
+        mock_lf = MagicMock()
+        mock_lf.add_lf_tags_to_resource.return_value = {"Failures": []}
+        client = self._client_with_mock_lf(mock_lf)
+        client.add_database_data_contract_tag("agentic_platform")
+        mock_lf.add_lf_tags_to_resource.assert_called_once_with(
+            Resource={"Database": {"Name": "agentic_platform"}},
+            LFTags=[{"TagKey": "data_contract_managed", "TagValues": ["unknown"]}],
+        )
+
+    def test_add_database_data_contract_tag_raises_on_failures(self):
+        mock_lf = MagicMock()
+        mock_lf.add_lf_tags_to_resource.return_value = {
+            "Failures": [
+                {
+                    "LFTag": {
+                        "TagKey": "data_contract_managed",
+                        "TagValues": ["unknown"],
+                    },
+                    "Error": {
+                        "ErrorCode": "AccessDeniedException",
+                        "ErrorMessage": "not authorized",
+                    },
+                }
+            ]
+        }
+        client = self._client_with_mock_lf(mock_lf)
+
+        with pytest.raises(RuntimeError, match="add_lf_tags_to_resource failed"):
+            client.add_database_data_contract_tag("agentic_platform")
+
+
 class TestGlueClientPartitionApis:
     def _client_with_mock_glue(self, mock_glue):
         with patch.dict(os.environ, {}, clear=False):

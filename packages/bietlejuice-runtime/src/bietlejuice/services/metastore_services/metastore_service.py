@@ -33,6 +33,9 @@ class MetastoreService(ABC):
         """
         command = f"CREATE DATABASE IF NOT EXISTS `{database_name}`"
         self.client.run(command)
+        from bietlejuice.base.spark.lake_formation_tagger import LakeFormationTagger
+
+        LakeFormationTagger.ensure_database_data_contract_tag(database_name)
         logger.info(
             f"m=create_database, database_name={database_name}, msg=the "
             f"database was created successfully in the metastore."

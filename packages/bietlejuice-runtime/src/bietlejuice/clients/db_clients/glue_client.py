@@ -37,21 +37,29 @@ class GlueClient(DBClient):
         self._region = region
         self._glue = None
         self._s3 = None
+        self._lf = None
         self._assumed_creds = None
 
     @property
     def conn(self):
         """Return a ready-to-use ``boto3`` Glue client."""
         if self._glue is None:
-            self._glue = self._build_glue_client()
+            self._glue = self._build_client("glue")
         return self._glue
 
     @property
     def s3_client(self):
         """Return a ``boto3`` S3 client using the same credentials as Glue."""
         if self._s3 is None:
-            self._s3 = self._build_s3_client()
+            self._s3 = self._build_client("s3")
         return self._s3
+
+    @property
+    def lakeformation(self):
+        """Return a ``boto3`` Lake Formation client using the same credentials."""
+        if self._lf is None:
+            self._lf = self._build_client("lakeformation")
+        return self._lf
 
     def _get_assumed_credentials(self) -> Optional[Dict]:
         """Return assumed-role credentials, caching across Glue/S3 clients."""
@@ -68,29 +76,17 @@ class GlueClient(DBClient):
             )["Credentials"]
         return self._assumed_creds
 
-    def _build_glue_client(self):
+    def _build_client(self, service_name: str):
         creds = self._get_assumed_credentials()
         if creds:
             return boto3.client(
-                "glue",
+                service_name,
                 region_name=self._region,
                 aws_access_key_id=creds["AccessKeyId"],
                 aws_secret_access_key=creds["SecretAccessKey"],
                 aws_session_token=creds["SessionToken"],
             )
-        return boto3.client("glue", region_name=self._region)
-
-    def _build_s3_client(self):
-        creds = self._get_assumed_credentials()
-        if creds:
-            return boto3.client(
-                "s3",
-                region_name=self._region,
-                aws_access_key_id=creds["AccessKeyId"],
-                aws_secret_access_key=creds["SecretAccessKey"],
-                aws_session_token=creds["SessionToken"],
-            )
-        return boto3.client("s3", region_name=self._region)
+        return boto3.client(service_name, region_name=self._region)
 
     # -- DBClient interface --------------------------------------------------
 
@@ -105,6 +101,39 @@ class GlueClient(DBClient):
             "GlueClient does not support raw SQL commands. "
             "Use the dedicated methods instead."
         )
+
+    # -- Lake Formation tag operations ---------------------------------------
+
+    def database_has_data_contract_tag(self, database_name: str) -> bool:
+        """Return True if the database has a ``data_contract_managed`` LF-tag."""
+        response = self.lakeformation.get_resource_lf_tags(
+            Resource={"Database": {"Name": database_name}},
+            ShowAssignedLFTags=True,
+        )
+        for tag in response.get("LFTagOnDatabase", []):
+            if tag.get("TagKey") == "data_contract_managed":
+                return True
+        return False
+
+    def add_database_data_contract_tag(
+        self, database_name: str, value: str = "unknown"
+    ) -> None:
+        """Apply ``data_contract_managed`` LF-tag to a Glue database.
+
+        Raises ``RuntimeError`` when the Lake Formation response includes
+        ``Failures`` so callers do not treat a rejected stamp as success.
+        """
+        response = self.lakeformation.add_lf_tags_to_resource(
+            Resource={"Database": {"Name": database_name}},
+            LFTags=[{"TagKey": "data_contract_managed", "TagValues": [value]}],
+        )
+        failures = (response or {}).get("Failures") or []
+        if failures:
+            raise RuntimeError(
+                f"Lake Formation add_lf_tags_to_resource failed for "
+                f"database={database_name}, tag=data_contract_managed, "
+                f"value={value}, failures={failures}"
+            )
 
     # -- Glue-specific operations --------------------------------------------
 

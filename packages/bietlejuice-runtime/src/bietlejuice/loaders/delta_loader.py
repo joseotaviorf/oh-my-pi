@@ -126,6 +126,9 @@ class DeltaLoader:
         table_name = _check_identifier_safety(table_name)
         database_name = _check_identifier_safety(table_name.split(".")[0])
         self.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
+        from bietlejuice.base.spark.lake_formation_tagger import LakeFormationTagger
+
+        LakeFormationTagger.ensure_database_data_contract_tag(database_name)
 
         exists = self.spark.catalog.tableExists(table_name)
         try:
