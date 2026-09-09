@@ -5,18 +5,6 @@ sheets_info:
     clean_table_name: add_invoice_entry
     sheet_context: fintech
   
-  advance_base:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: advance_base
-    clean_table_name: advance_base
-    sheet_context: fintech
-
-  associate_executive_bonus:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: associate_executive_bonus
-    clean_table_name: associate_executive_bonus
-    sheet_context: fintech
-
   payfaturas_bandaid:
     sheet_id: 1-HKD9rv6Ov6_WLRDct56f3Gnur45-w004l_Q_ct8jX4
     sheet_name: Respostas
@@ -27,18 +15,6 @@ sheets_info:
     sheet_id: 13IuO9GIFHVulqLlRD6ceUaEiBUGGjkOkjTMxsazSUMg
     sheet_name: "Pagamentos Band-Aid"
     clean_table_name: bandaid_payment
-    sheet_context: fintech
-
-  business_rules_bonus:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: business_rules_bonus
-    clean_table_name: business_rules_bonus
-    sheet_context: fintech
-
-  campaign_bonus:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: campaign_bonus
-    clean_table_name: campaign_bonus
     sheet_context: fintech
 
   feature_matrix:
@@ -187,22 +163,10 @@ sheets_info:
     clean_table_name: for_sale_casa_mineira_invoice_control
     sheet_context: fintech
 
-  hub_bonus:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: hub_bonus
-    clean_table_name: hub_bonus
-    sheet_context: fintech
-
   manual_payment:
     sheet_id: 13IuO9GIFHVulqLlRD6ceUaEiBUGGjkOkjTMxsazSUMg
     sheet_name: "Pagamentos Manuais"
     clean_table_name: manual_payment
-    sheet_context: fintech
-
-  negotiation_executive_bonus:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: negotiation_executive_bonus
-    clean_table_name: negotiation_executive_bonus
     sheet_context: fintech
 
   process_eviction:

@@ -59,7 +59,6 @@ dags_out_of_pattern:
         "reverse_rent_liquidity_score_access",
         "reverse_rent_listings_report_load",
         "reverse_minority_report_ss",
-        "reverse_nazare",
         "reverse_nexxera",
         "reverse_regions_polygon",
         "reverse_sale_unavailable_listings_load",
