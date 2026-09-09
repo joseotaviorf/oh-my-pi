@@ -1,0 +1,32 @@
+dag:
+  name: enrich_concierge_lpv_ads
+  schedule_start_date: 2026, 9, 8
+  # No schedule_interval: the DAG is triggered by its dataset dependencies (see
+  # dependencies.yaml), so it runs once its upstreams (enrich_concierge_privacy_facts,
+  # copilot_service, ebdb_listing) finish. This also lets enrich_concierge_placas_lpv_reproc
+  # gate on this DAG's dataset instead of relying on clock timing. Matches PR #28536, which
+  # makes the sibling concierge DAGs dataset-triggered.
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Daily eligibility snapshot for the concierge Shared/Retargeting LPV-ads use
+      case: users who viewed a listing (CDP listing_page_viewed) from a shared link
+      or facebook/criteo retargeting on the previous day and are not already engaged
+      or suppressed. It consumes the shared concierge privacy snapshot rather than
+      parsing Privacy Hub directly. Not part of enrich_concierge_audience.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: search
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  tables_customization:
+    concierge_lpv_ads_daily:
+      merge_on: [id_user, id_house, dt_lpv, year, month, day]
+      when_not_matched_by_source_delete_condition: |
+        target.year = YEAR(CURRENT_DATE())
+        AND target.month = MONTH(CURRENT_DATE())
+        AND target.day = DAY(CURRENT_DATE())
+      partitions: [year, month, day]
+      z_order_by: [id_user, id_house]

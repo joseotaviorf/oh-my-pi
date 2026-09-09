@@ -1,0 +1,69 @@
+---
+database_name: datalake_search
+table_name: concierge_lpv_ads_daily
+owner: thiago.nakamura@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Daily eligibility list for the concierge Shared/Retargeting LPV-ads use case.
+  Grain is lead user, prioritized listing, and LPV date (the previous day), excluding
+  users who exchanged concierge messages in the last 28 days, users suppressed in the
+  shared concierge privacy snapshot, a 28-day LPV cooldown, and self-views (the user
+  owns or registered the listing). Pageview signal comes from the CDP user_tracking
+  hub (listing_page_viewed) filtered to shared and facebook/criteo retargeting UTM.
+columns:
+  id_user:
+    description: "User who viewed the listing, from the CDP user_tracking event."
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_user
+  id_person:
+    description: |
+      CDP person identifier for the user, used to join the eligibility row with SFMC
+      and with the shared concierge privacy snapshot.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_person
+  id_house:
+    description: "Prioritized listing viewed by the user (sale over rent, most LPVs)."
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+  business_context:
+    description: "Intent for the prioritized listing: alugar (rent) or comprar (sale)."
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+  city:
+    description: "City of the prioritized listing."
+    lineage:
+      - datalake_ebdb_listing.house.city
+  region_name:
+    description: "Neighborhood/region of the prioritized listing."
+    lineage:
+      - datalake_ebdb_listing.house.region_name
+  price:
+    description: "Total price of the prioritized listing (rent+condo+iptu for rent, sale_price for sale)."
+    lineage:
+      - datalake_ebdb_listing.house.rent
+      - datalake_ebdb_listing.house.condo
+      - datalake_ebdb_listing.house.iptu
+      - datalake_ebdb_listing.house.sale_price
+  price_arred:
+    description: "Rounded price bucket used in the concierge message template."
+    lineage:
+      - datalake_ebdb_listing.house.rent
+      - datalake_ebdb_listing.house.sale_price
+  count_lpv:
+    description: "Number of qualifying listing_page_viewed events for the user/listing on dt_lpv."
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_event
+  dt_lpv:
+    description: "Calendar date of the qualifying LPV (the previous day relative to the run date)."
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  group_ab:
+    description: "Experiment cell from the last three digits of the user phone: treatment (0-499), control (500-999), else out_of_test."
+    lineage:
+      - datalake_cdp.users.phone_number
+  year:
+    description: "Snapshot year partition (run date)."
+  month:
+    description: "Snapshot month partition (run date)."
+  day:
+    description: "Snapshot day partition (run date)."
