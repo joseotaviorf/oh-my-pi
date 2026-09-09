@@ -28,7 +28,7 @@ columns:
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.id_booking
   id_visit:
-    description: "Id of the visit."
+    description: "Identifier of the executed visit tied to this prospect event, filled after a booking is confirmed and the visit takes place."
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.id_visit
   id_offer:
@@ -44,7 +44,7 @@ columns:
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.id_house
   id_region:
-    description: "Id of the house region."
+    description: "Identifier of the geographic region of the listing involved in this prospect conversion or flow event."
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.id_region
   id_prospect:
@@ -164,9 +164,14 @@ columns:
       - datalake_demand_flows.demand_prospect_conversion_events.is_3p_demand
       - datalake_demand_flows.demand_prospect_conversion_events.utm_medium
       - datalake_demand_flows.demand_prospect_conversion_events.id_agent
+      - datalake_demand_flows.demand_prospect_conversion_events.business_context
     categories:
-      TQC: "Conversions from TQC (Terceiro Quintoandar) referral program or when utm_medium is TQC."
-      Agent: "Conversions recorded by agents who are not part of TQC or Rede programs."
+      TQC: "Conversions from TQC (Traz Quem Compra) referral program in sale, or when utm_medium is TQC without a rent context."
+      TQC 1P: "QuintoAndar first-party Traz Quem Compra prospecting in sale."
+      TQC 3P: "Third-party Traz Quem Compra prospecting in sale."
+      TQA 1P: "QuintoAndar first-party Traz Quem Aluga prospecting in rent (same detection as TQC 1P, remapped by business_context)."
+      TQA 3P: "Third-party Traz Quem Aluga prospecting in rent (same detection as TQC 3P, remapped by business_context)."
+      Agent: "Conversions recorded by agents who are not part of TQC, TQA or Rede programs."
       Rede: "Real estate partners that prospect tenants and such prospecting is encouraged by Fifth Floor."
       NA: "This level of characterization is not applicable to the event/context."
   origin:

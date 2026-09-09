@@ -116,11 +116,19 @@ adhoc_rules AS (
           AND dpce.id_agent = sef.id_agent
           AND (bcr.buyer_company_relation_type IS NULL OR bcr.buyer_company_relation_type != '3P'))
         OR dpce.utm_medium = 'TQC 1P'
-      THEN 'TQC 1P'
+      THEN
+        CASE
+          WHEN LOWER(dpce.business_context) = 'rent' THEN 'TQA 1P'
+          ELSE 'TQC 1P'
+        END
       WHEN dpce.utm_medium = 'TQC 3P'
         OR (dpce.product_origin = 'AGENT_PWA'
           AND bm.is_3p_demand = TRUE)
-      THEN 'TQC 3P'
+      THEN
+        CASE
+          WHEN LOWER(dpce.business_context) = 'rent' THEN 'TQA 3P'
+          ELSE 'TQC 3P'
+        END
       WHEN dpce.product_origin = 'AGENT_PWA'
         OR dpce.booking_creator = 'Agent'
       THEN 'Agent'

@@ -140,16 +140,19 @@ columns:
       Other: Conversions recorded by other operational channels.
       Lost Tracking: Conversions with lost marketing attribution tracking.
   referral_type:
-    description: Grouping of results by type of user prospecting program or initiative (e.g. Agents, Rede, TQC).
+    description: Grouping of results by type of user prospecting program or initiative (e.g. Agents, Rede, TQC, TQA).
     lineage:
       - datalake_demand_flows.prospect_daily_results.booking_creator
       - datalake_demand_flows.prospect_daily_results.is_3p_demand
+      - datalake_demand_flows.prospect_daily_results.business_context
     categories:
       Agents: Third-party brokers who make visits and can prospect tenants.
       Rede: Real estate partners that prospect tenants encouraged by Fifth Floor.
-      TQC: QuintoCred tenant prospecting program.
-      TQC 1P: QuintoCred first-party tenant prospecting.
-      TQC 3P: QuintoCred third-party tenant prospecting.
+      TQC: Traz Quem Compra (sale) prospecting program.
+      TQC 1P: Traz Quem Compra first-party prospecting in sale.
+      TQC 3P: Traz Quem Compra third-party prospecting in sale.
+      TQA 1P: Traz Quem Aluga first-party prospecting in rent (same detection as TQC 1P, remapped by business_context).
+      TQA 3P: Traz Quem Aluga third-party prospecting in rent (same detection as TQC 3P, remapped by business_context).
       NA: Characterization not applicable to the event or context.
   origin:
     description: QuintoAndar application where the conversion was carried out in the funnel stage under analysis.
