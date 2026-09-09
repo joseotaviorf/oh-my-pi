@@ -340,6 +340,8 @@ bietlejuice.dw_collection_ai_agents:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-llm-metrics:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-mcp-observations:first-run-of-day
+  - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-voice-events:first-run-of-day
+  - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-voice-sessions:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-messages:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-observation:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-sessions:first-run-of-day
@@ -1500,6 +1502,8 @@ bietlejuice.enrich_agents_validation:
   - bietlejuice.person:load-clean-person:first-run-of-day
   - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
 bietlejuice.enrich_ai_collections_quintoandar:
+  - bietlejuice.copilot_service:load-clean-voice-call-attempt:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-voice-session:first-run-of-day
   - bietlejuice.enrich_chatbot:load-enrich-messages:first-run-of-day
   - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
   - bietlejuice.langfuse:load-clean-observations:first-run-of-day

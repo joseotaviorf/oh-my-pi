@@ -12,10 +12,11 @@
 
 Matthew is the **AI agent dedicated to tenants with open balances** — overdue invoices or invoices not yet due — helping them regularize their debts via direct payment, payment-method support, or full-debt negotiation (installments / discounts). It is the collections counterpart to QuintoAndar's general-purpose support bot Wall-E.
 
-Matthew operates in **two environments**:
+Matthew operates in **three environments**:
 
 1. **WhatsApp** — Matthew runs as a standalone host (`bot = 'matthew'`).
 2. **In-app chat** — Matthew runs as a sub-agent inside the Wall-E host (`bot = 'wall-e'` plus a Matthew-specific signal).
+3. **Voice** — Matthew collections outbound calls via Copilot + Twilio (production Langfuse traces tagged with both `matthew` and `online_call`; the endpoint name is not part of the analytical contract). Voice sessions do **not** flow through `datalake_chatbot.sessions`; use the voice tables below instead of `fact_ai_agents_interaction`.
 
 Conversations come from two flows:
 - **Inbound** (in-app and WhatsApp) — the user organically reaches out to regularize a debt.
@@ -74,6 +75,13 @@ Not all sessions reach negotiation. Many resolve via debt visualization, payment
 - **Agent message** → a message/turn (Langfuse trace) in which the collections agent called the LLM at least once. Counted per session by `n_agent_messages`. This is the denominator for "per message" metrics.
 - **Collections-agent cost** → USD cost of the collections-agent LLM calls only (`total_collections_agent_cost`), excluding host-side moderator + answer-processor LLM cost. `total_llm_cost` is the all-in session LLM cost (agent + host-side).
 - **Timeout** → a message whose collections-agent-input observation was recorded with `level = 'ERROR'` (the agent exceeded its time budget, ~90s). Session flag: `flag_session_had_timeout = 1`.
+- **Voice call / id_langfuse_session** → one outbound Matthew collections dial. Primary key across voice tables (`id_langfuse_session` = Langfuse `traces.id_session` = Copilot `voice_call_attempt.id_voice_call_external`). Twilio SID is `id_twilio_call` (`call_sid` on the Langfuse `traces.output`, session grain only — Copilot `voice_call_provider_id` is not a Twilio SID). It lives on `fact_ai_agents_voice_sessions`; join it in when you need the SID next to an event.
+- **Call duration** → `call_duration` on the session table is the wrapping Langfuse span `latency` in seconds (the earliest observation on the trace, today named `/v1/voice`). It approximates Twilio talk time. Do not derive duration from Copilot `voice_session` timestamps — those are campaign-grain.
+- **VAD (voice activity detection)** → after each `user_speech` group, a single `vad` timeline row records the honor/suppress gate: `vad_first_decision` (`honor` / `suppress`) and `vad_final_outcome` (`honor_immediate` / `barge_in_honored` / `backchannel_discarded`). **Failed VAD** = `flag_failed_vad = 1` (discarded with a non-empty user transcript).
+- **Agent interrupt** → not a separate event type; `flag_agent_interrupted = 1` on `agent_speech` rows when playback was cancelled mid-turn. In a reconstructed transcript, keep the turn and append ` (interrupted)` to the line.
+- **Voice transcript** → there is no stored `full_conversation` for voice. Rebuild from `user_speech` + `agent_speech` in `event_index` order, dropping user turns whose following VAD is `backchannel_discarded`. See **Reconstructing a voice transcript** and Golden Query 9.
+- **Voice error / n_error_observations** → count of Langfuse observations named `error` on the call. Do not read it as a dial failure: observed rows are `invalid_request_error` protocol races from barge-in handling (`conversation_already_has_active_response`, `response_cancel_not_active`). The producer currently emits each error twice, so the count is the raw span total until that logging is fixed. Langfuse `observations.level` is always `DEFAULT` on voice traces and carries no error signal.
+- **LLM voice judge** → sparse sample (~8% of calls) tagged with `MatthewVoiceTag*` scores pivoted to `eval_*` on the session table. `has_llm_voice_tags = 0` means `eval_*` is NULL (not judged), not a negative. Deterministic twins: `flag_call_answered`, `flag_user_spoke`, `flag_answered_by_machine`, identity trio (`flag_identity_check_triggered`, `n_identity_check_calls`, `flag_identity_check_result`).
 
 ## Tables
 
@@ -87,8 +95,18 @@ Not all sessions reach negotiation. Many resolve via debt visualization, payment
 | Individual V3+ MCP tool requests and their downstream service calls (debugging grain) | `datalake_ai_collections_quintoandar.mcp_tool_logs` — one row per downstream service call inside an MCP tool request. Engineering-oriented; prefer the session-grain tables for analytics. |
 | Full agglutinated conversation text per session for LLM analysis or regex theme filtering (e.g. `boleto`, `IR`) | `datalake_ai_collections_quintoandar.messages` (`m`) — one row per Matthew session. JOIN via `m.id_sauron_session = s.id_sauron_session`. Includes both `'Matthew in Whatsapp'` and `'Matthew in Chat'` only. |
 | User wallet snapshot at any reference date (delay, overdue amount, active/ended contract counts) | `dw_collection_ai_agents.fact_user_wallet_timeline` (`fuwt`) — daily user-grain snapshot. Used to enrich Matthew sessions with delinquency context. |
+| **Voice** — reconstructable call timeline (user/agent speech, VAD, tools) | `datalake_ai_collections_quintoandar.matthew_voice_events` (enrich) / `dw_collection_ai_agents.fact_ai_agents_voice_events` (DW wrap). JOIN to sessions on `id_langfuse_session`. Order by `event_index`. |
+| **Voice** — one row per call with dial state, debt context, metrics, LLM tags, deterministic flags | `datalake_ai_collections_quintoandar.matthew_voice_sessions` (enrich) / `dw_collection_ai_agents.fact_ai_agents_voice_sessions` (DW wrap). Grain = one production Langfuse session tagged with both `matthew` and `online_call`. |
 
-**Critical rules:**
+**Voice pipeline pattern:** heavy parsing lives in **enrich** (`matthew_voice_events`, `matthew_voice_sessions`); **DW** facts are thin `SELECT` projections for analyst access — same split as text Matthew (`observation` / `messages` → `fact_ai_agents_interaction`).
+
+**Critical rules (voice):**
+- Default quality filter: `flag_call_answered = 1 AND flag_user_spoke = 1`.
+- Reconstruct a voice transcript from events (see **Reconstructing a voice transcript**); the sessions table does not store `full_conversation`, and chat `messages.full_conversation` does not cover voice.
+- `eval_*` is NULL when `has_llm_voice_tags = 0`; never treat missing judge tags as negatives.
+- Failed identity check is inferred: `flag_identity_check_triggered = 1 AND flag_identity_check_result = 0` (no `eval_user_failed_identity_check` column).
+
+**Critical rules (chat):**
 - **Mandatory filter**: `flag_session_with_trace = TRUE`. Sessions without trace are kept in `sessions` only to record outbound send-offs (no user reply yet) and contain no analysable interaction. Skip them in every analysis except outbound funnel volume.
 - **Unified vs V3+-only vs granular columns in the fact table**:
   - **Unified columns** work for every session regardless of version (V3+ MCP value when the session has MCP activity, V2 observation value otherwise): `send_proposal_count`, `confirm_negotiation_count`, `flag_create_negotiation`, `handle_negotiation_cancelled_count`, `flag_handle_segments_without_proposals`, `flag_fetch_financial_data`, `flag_fetch_financial_data_error`, `flag_has_fetch_contracts`, `flag_handle_no_contracts`, `flag_get_yearly_paid_invoices_report_tool`, `flag_negotiation_proposer_tool`, `flag_ongoing_deal_renegotiation_request_helper`, `flag_handle_non_tenant`, `flag_has_prorated_rent`. Use these by default.
@@ -184,6 +202,7 @@ When investigating escalations, decompose hierarchically:
 - For thematic conversation breakdowns (e.g. boleto, IR, alegação), apply `LOWER(full_conversation) LIKE '%term%'` regex on `datalake_ai_collections_quintoandar.messages` or on the OBT.
 - For Pillar A escalation analysis, combine the three data-failure flags with OR (`flag_fetch_financial_data_error = 1 OR flag_empty_invoices_mismatch = 1 OR flag_no_contracts_mismatch = 1`).
 - For LLM cost/latency/efficiency comparisons, group by `matthew_model` (the LLM) and compute every average as `SUM(numerator)/SUM(denominator)` from the additive counters (see Golden Query 6).
+- For a readable voice call transcript, follow **Reconstructing a voice transcript**: keep `user_speech` and `agent_speech` in `event_index` order, drop user turns the VAD discarded (`backchannel_discarded`), and append ` (interrupted)` to agent turns with `flag_agent_interrupted = 1`.
 
 **Don't:**
 - Don't analyse Matthew sessions on `bot = 'matthew'` alone — that excludes Matthew running inside Wall-E (`'Matthew in Chat'`). Use `ai_agent_source <> 'Wall-e'` instead.
@@ -198,6 +217,27 @@ When investigating escalations, decompose hierarchically:
 - Don't try to explain Pillars B and C from observations alone — they require LLM analysis on `full_conversation` against the out-of-scope category list.
 - Don't average the LLM cost/latency metrics as `AVG(per_session_value)` — the tables store additive counters exactly so you compute `SUM(numerator)/SUM(denominator)`; averaging pre-averaged per-session values biases the result. (The only plain average is `timeout_rate = AVG(flag_session_had_timeout)`, a per-session 0/1 flag.)
 - Don't use `matthew_version` as the model-comparison dimension for cost/latency — that is the architecture generation. Use `matthew_model` (the LLM). A single version can run different models (e.g. V4 model tests).
+- Don't dump every voice event into a transcript. Tool calls and VAD rows are not spoken turns. User speech that VAD discarded (`vad_final_outcome = 'backchannel_discarded'`) was never heard by the agent — leave it out. Do not use chat `messages.full_conversation` for voice calls.
+
+## Reconstructing a voice transcript
+
+Voice sessions have no stored `full_conversation`. Build the transcript from `dw_collection_ai_agents.fact_ai_agents_voice_events` (or the enrich twin `matthew_voice_events`).
+
+**Keep only spoken turns.** `event_type IN ('user_speech', 'agent_speech')`. Drop `vad` and `tool_call` rows from the text; they are control events, not utterances.
+
+**Drop ignored user speech.** After each user turn the VAD gate either honors the utterance or discards it as backchannel. A `vad` row with `vad_final_outcome = 'backchannel_discarded'` belongs to the latest `user_speech` that opened before it (`event_index` running max). That user turn never reached the agent — omit it. Keep `honor_immediate` and `barge_in_honored`: the user was heard (including barge-in). `flag_failed_vad = 1` is the QA subset of those discards (non-empty transcript); for transcripts, filter on the outcome, not only the QA flag.
+
+**Mark interrupted agent speech.** When `flag_agent_interrupted = 1`, the agent was cut off mid-playback. Keep the row and append ` (interrupted)` to the end of that line. Do not drop the turn.
+
+**Line format** (one line per kept turn, chronological by `event_index`):
+
+```
+user: <transcript>
+agent: <transcript>
+agent: <transcript> (interrupted)
+```
+
+Use Golden Query 9. Join `fact_ai_agents_voice_sessions` when you also need `id_twilio_call` or dial flags.
 
 ## Golden Queries
 
@@ -216,7 +256,7 @@ SELECT
 FROM datalake_ai_collections_quintoandar.sessions
 WHERE flag_session_with_trace
   AND dt_session_created >= DATE '{start_date}'
-  AND dt_session_created < DATE '{end_date}'
+  AND dt_session_created < DATE {end_date}
 GROUP BY 1, 2
 ORDER BY 1 DESC, 2
 ```
@@ -247,7 +287,7 @@ SELECT
     END) AS n_escalated_pillar_b_or_c
 FROM dw_collection_ai_agents.fact_ai_agents_interaction
 WHERE dt_session_created >= DATE '{start_date}'
-  AND dt_session_created < DATE '{end_date}'
+  AND dt_session_created < DATE {end_date}
 GROUP BY 1, 2
 ORDER BY 1 DESC, 2
 ```
@@ -267,7 +307,7 @@ FROM dw_collection_ai_agents.fact_ai_agents_interaction
 WHERE ai_agent_source = 'Matthew in Whatsapp'
   AND is_notification_reply = 1
   AND dt_session_created >= DATE '{start_date}'
-  AND dt_session_created < DATE '{end_date}'
+  AND dt_session_created < DATE {end_date}
 GROUP BY 1, 2
 ORDER BY 1 DESC, n_sessions DESC
 ```
@@ -294,7 +334,7 @@ WHERE f.is_escalation
   AND f.flag_empty_invoices_mismatch = 0
   AND f.flag_no_contracts_mismatch = 0
   AND f.dt_session_created >= DATE '{start_date}'
-  AND f.dt_session_created < DATE '{end_date}'
+  AND f.dt_session_created < DATE {end_date}
 ORDER BY f.dt_session_created DESC
 LIMIT 200
 ```
@@ -324,7 +364,7 @@ SELECT
 FROM dw_collection_ai_agents.fact_ai_agents_interaction
 WHERE matthew_version IN ('V2', 'V3', 'V4')
   AND dt_session_created >= DATE '{start_date}'
-  AND dt_session_created < DATE '{end_date}'
+  AND dt_session_created < DATE {end_date}
 GROUP BY 1
 ORDER BY 1
 ```
@@ -355,9 +395,135 @@ SELECT
 FROM dw_collection_ai_agents.fact_ai_agents_interaction
 WHERE matthew_model IS NOT NULL
   AND dt_session_created >= DATE '{start_date}'
-  AND dt_session_created < DATE '{end_date}'
+  AND dt_session_created < DATE {end_date}
 GROUP BY 1
 ORDER BY n_sessions DESC
+```
+
+### Query 7 — Reconstruct a voice call timeline
+
+```sql
+SELECT
+    e.event_index,
+    e.event_type,
+    e.transcript,
+    e.vad_first_decision,
+    e.vad_final_outcome,
+    e.tool_name,
+    e.flag_failed_vad,
+    e.flag_agent_interrupted,
+    e.ts_started
+FROM dw_collection_ai_agents.fact_ai_agents_voice_events AS e
+WHERE e.id_langfuse_session = '{id_langfuse_session}'
+ORDER BY e.event_index
+```
+
+### Query 8 — VAD QA and identity funnel
+
+```sql
+-- Failed VAD: discarded user speech that had a transcript
+SELECT
+    s.id_langfuse_session,
+    s.id_twilio_call,
+    e.event_index,
+    e.transcript,
+    e.vad_first_decision,
+    e.vad_final_outcome
+FROM dw_collection_ai_agents.fact_ai_agents_voice_events AS e
+INNER JOIN dw_collection_ai_agents.fact_ai_agents_voice_sessions AS s
+    ON s.id_langfuse_session = e.id_langfuse_session
+WHERE e.event_type = 'vad'
+  AND e.flag_failed_vad = 1
+  AND s.year = {year}
+  AND s.month = {month}
+LIMIT 100
+;
+
+-- Identity funnel (deterministic flags on every call)
+SELECT
+    id_langfuse_session,
+    flag_identity_check_triggered,
+    n_identity_check_calls,
+    flag_identity_check_result
+FROM dw_collection_ai_agents.fact_ai_agents_voice_sessions
+WHERE flag_identity_check_triggered = 1
+  AND year = {year}
+  AND month = {month}
+LIMIT 100
+```
+
+### Query 9 — Reconstruct a voice call transcript
+
+Spoken turns only: drop user utterances the VAD discarded, keep barge-in, mark interrupted agent playback with ` (interrupted)`.
+
+```sql
+WITH timeline AS (
+    SELECT
+        e.id_langfuse_session,
+        e.event_index,
+        e.event_type,
+        e.transcript,
+        e.flag_agent_interrupted,
+        e.vad_final_outcome,
+        MAX(
+            CASE
+                WHEN e.event_type = 'user_speech' THEN e.event_index
+            END
+        ) OVER (
+            PARTITION BY e.id_langfuse_session
+            ORDER BY e.event_index ASC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS last_user_event_index
+    FROM
+        dw_collection_ai_agents.fact_ai_agents_voice_events AS e
+    WHERE
+        e.id_langfuse_session = '{id_langfuse_session}'
+),
+ignored_user_turns AS (
+    SELECT DISTINCT
+        id_langfuse_session,
+        last_user_event_index AS event_index
+    FROM
+        timeline
+    WHERE
+        event_type = 'vad'
+        AND vad_final_outcome = 'backchannel_discarded'
+        AND last_user_event_index IS NOT NULL
+),
+spoken_turns AS (
+    SELECT
+        t.id_langfuse_session,
+        t.event_index,
+        CASE
+            WHEN t.event_type = 'user_speech'
+            THEN CONCAT('user: ', COALESCE(t.transcript, ''))
+            WHEN t.flag_agent_interrupted = 1
+            THEN CONCAT('agent: ', COALESCE(t.transcript, ''), ' (interrupted)')
+            ELSE CONCAT('agent: ', COALESCE(t.transcript, ''))
+        END AS line
+    FROM
+        timeline AS t
+    LEFT JOIN
+        ignored_user_turns AS ign
+            ON ign.id_langfuse_session = t.id_langfuse_session
+            AND ign.event_index = t.event_index
+    WHERE
+        t.event_type IN ('user_speech', 'agent_speech')
+        AND ign.event_index IS NULL
+)
+SELECT
+    id_langfuse_session,
+    ARRAY_JOIN(
+        TRANSFORM(
+            ARRAY_SORT(ARRAY_AGG(STRUCT(event_index, line))),
+            element -> element.col2
+        ),
+        '\n'
+    ) AS voice_transcript
+FROM
+    spoken_turns
+GROUP BY
+    id_langfuse_session
 ```
 
 ## DataHub catalog

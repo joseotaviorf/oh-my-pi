@@ -1,0 +1,226 @@
+database_name: dw_collection_ai_agents
+table_name: fact_ai_agents_voice_sessions
+description: DW projection of Matthew voice call sessions — one row per production Langfuse session tagged with both matthew and online_call, with dial state, debt context, event metrics, LLM judge tags, and deterministic flags. Thin wrap of datalake_ai_collections_quintoandar.matthew_voice_sessions.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_langfuse_session:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.id_langfuse_session
+    description: "Langfuse session identifier for the voice call; primary join key to fact_ai_agents_voice_events."
+  id_twilio_call:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.id_twilio_call
+    description: "Twilio CallSid of the dial, read from call_sid on the Langfuse trace output."
+  call_attempt_state:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.call_attempt_state
+    description: "Copilot outcome for this dial (ANSWERED, ANSWERED_BY_MACHINE, etc.)."
+  open_debts_amount:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.open_debts_amount
+    description: "Total open debt value at dial time from Copilot call context."
+  n_open_debts:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_open_debts
+    description: "Count of open debts at dial time from Copilot call context."
+  call_duration:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.call_duration
+    description: "Dial duration in seconds from the latency of the earliest observation on the trace (the wrapping span)."
+  n_identity_check_calls:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_identity_check_calls
+    description: "Number of confirm_user_identity_tool calls in the call."
+  n_user_speech_events:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_user_speech_events
+    description: "Count of user_speech timeline events."
+  n_agent_speech_events:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_agent_speech_events
+    description: "Count of agent_speech timeline events."
+  n_empty_user_transcripts:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_empty_user_transcripts
+    description: "Count of user_speech events with empty transcripts."
+  n_vad_starts:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_vad_starts
+    description: "Count of vad timeline events."
+  n_vad_first_honor:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_vad_first_honor
+    description: "Count of vad events with first decision honor."
+  n_vad_first_suppress:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_vad_first_suppress
+    description: "Count of vad events with first decision suppress."
+  n_vad_discarded:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_vad_discarded
+    description: "Count of vad events ending in backchannel_discarded."
+  n_failed_vad:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_failed_vad
+    description: "Count of failed VAD events (discarded with non-empty user transcript)."
+  n_agent_interrupts:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_agent_interrupts
+    description: "Count of interrupted agent_speech events."
+  n_tool_calls:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_tool_calls
+    description: "Count of tool_call timeline events."
+  n_consecutive_user_turns:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_consecutive_user_turns
+    description: "Maximum consecutive user_speech streak in event order."
+  n_consecutive_agent_turns:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_consecutive_agent_turns
+    description: "Maximum consecutive agent_speech streak in event order."
+  n_error_observations:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.n_error_observations
+    description: "Count of Langfuse observations named error on the trace. The producer currently emits each error twice; this column counts the raw spans until that logging is fixed."
+  eval_call_answered:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_call_answered
+    description: "LLM judge call-answered tag (0/1). NULL when not judged."
+  eval_call_ended_by_voice_mail:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_call_ended_by_voice_mail
+    description: "LLM judge voicemail tag (0/1). NULL when not judged."
+  eval_user_person_name_checked:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_person_name_checked
+    description: "LLM judge name-check tag (0/1). NULL when not judged."
+  eval_user_identity_checked:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_identity_checked
+    description: "LLM judge identity-check tag (0/1). NULL when not judged."
+  eval_user_refused_to_check_identity:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_refused_to_check_identity
+    description: "LLM judge identity-refusal tag (0/1). NULL when not judged."
+  eval_user_acknowledged_debt:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_acknowledged_debt
+    description: "LLM judge debt-acknowledgment tag (0/1). NULL when not judged."
+  eval_user_already_paid:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_already_paid
+    description: "LLM judge already-paid tag (0/1). NULL when not judged."
+  eval_user_committed_to_payment:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_committed_to_payment
+    description: "LLM judge payment-commitment tag (0/1). NULL when not judged."
+  eval_negotiation_invoice:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_negotiation_invoice
+    description: "LLM judge invoice-negotiation tag (0/1). NULL when not judged."
+  eval_negotiation_credit_card:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_negotiation_credit_card
+    description: "LLM judge credit-card-negotiation tag (0/1). NULL when not judged."
+  eval_user_requested_pix:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_requested_pix
+    description: "LLM judge PIX-request tag (0/1). NULL when not judged."
+  eval_user_refused_negotiation:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_refused_negotiation
+    description: "LLM judge negotiation-refusal tag (0/1). NULL when not judged."
+  eval_user_requested_human_support:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_requested_human_support
+    description: "LLM judge human-support-request tag (0/1). NULL when not judged."
+  eval_requested_help_to_navigate_app:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_requested_help_to_navigate_app
+    description: "LLM judge app-navigation-help tag (0/1). NULL when not judged."
+  eval_user_requested_opt_out:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.eval_user_requested_opt_out
+    description: "LLM judge opt-out-request tag (0/1). NULL when not judged."
+  has_discount_fines_fees:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.has_discount_fines_fees
+    description: "1 when discount on fines/fees was available at dial time."
+  has_negotiation_available:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.has_negotiation_available
+    description: "1 when negotiation was available at dial time."
+  has_pix_boleto_installments:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.has_pix_boleto_installments
+    description: "1 when PIX/boleto installments were available at dial time."
+  has_credit_card_installments:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.has_credit_card_installments
+    description: "1 when credit-card installments were available at dial time."
+  has_llm_voice_tags:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.has_llm_voice_tags
+    description: "1 when the session was sampled by the LLM judge."
+  flag_call_answered:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.flag_call_answered
+    description: "1 when Copilot reports this dial as ANSWERED."
+  flag_user_spoke:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.flag_user_spoke
+    description: "1 when at least one non-empty user_speech transcript exists."
+  flag_answered_by_machine:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.flag_answered_by_machine
+    description: "1 when Copilot reports this dial as ANSWERED_BY_MACHINE."
+  flag_identity_check_triggered:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.flag_identity_check_triggered
+    description: "1 when confirm_user_identity_tool was called."
+  flag_identity_check_result:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.flag_identity_check_result
+    description: "Last identity tool result: 1 correct, 0 incorrect, NULL if never called."
+  flag_payment_allegation:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.flag_payment_allegation
+    description: "1 when analyze_payment_allegation_date was called."
+  dt_oldest_debt_due:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.dt_oldest_debt_due
+    description: "Oldest open debt due date from Copilot call context."
+  ts_trace_created:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.ts_trace_created
+    description: "Langfuse trace creation timestamp."
+  ts_call_started:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.ts_call_started
+    description: "Copilot voice_session start timestamp."
+  ts_call_ended:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.ts_call_ended
+    description: "Copilot voice_session end timestamp."
+  ts_first_event:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.ts_first_event
+    description: "Earliest timeline event timestamp."
+  ts_last_event:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.ts_last_event
+    description: "Latest timeline event timestamp."
+  year:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.year
+    description: "Partition year."
+  month:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.month
+    description: "Partition month."
+  day:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_sessions.day
+    description: "Partition day."

@@ -17,3 +17,9 @@ workflow:
     fact_user_wallet_timeline:
       extraction_type: incremental
       partitions: [year, month, day]
+    fact_ai_agents_voice_events:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_ai_agents_voice_sessions:
+      extraction_type: incremental
+      partitions: [year, month, day]

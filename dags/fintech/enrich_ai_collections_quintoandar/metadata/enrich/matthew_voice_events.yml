@@ -1,0 +1,91 @@
+database_name: datalake_ai_collections_quintoandar
+table_name: matthew_voice_events
+description: Reconstructable Matthew voice call timeline — one row per spoken utterance, VAD decision, agent turn, or tool call inside a production Langfuse session tagged with both matthew and online_call. VAD honor/suppress outcomes and QA flags live on event_type = vad rows; agent interruption is flag_agent_interrupted on agent_speech rows.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_langfuse_session:
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+      - datalake_langfuse_clean.traces.tags
+    description: "Langfuse session identifier for the voice call; primary join key to matthew_voice_sessions."
+  id_observation:
+    lineage:
+      - datalake_langfuse_clean.observations.id_observation
+    description: "Langfuse observation identifier for the timeline event row."
+  event_type:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "Timeline event category: user_speech, vad, agent_speech, or tool_call."
+  event_index:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: "1-based chronological order of the event inside the call (by ts_started)."
+  vad_first_decision:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "On vad rows only: honor when no suppress follow-up exists before the next vad_speech_started, suppress otherwise. NULL on other event types."
+  vad_final_outcome:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "On vad rows only: honor_immediate, barge_in_honored, or backchannel_discarded. NULL on other event types or when the decision cannot be inferred."
+  tool_name:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: "On tool_call rows only: function name from the Langfuse tool_call observation. NULL on other event types."
+  tool_result:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: "On tool_call rows only: tool output string. Identity document arguments are not persisted. NULL on other event types."
+  transcript:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: "Spoken text for user_speech and agent_speech rows; preceding user transcript copied onto vad rows for QA. NULL on tool_call rows."
+  is_empty_transcript:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: "1 when transcript is NULL or blank on user_speech, agent_speech, or vad rows; NULL on tool_call rows."
+  flag_failed_vad:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "On vad rows only: 1 when vad_final_outcome is backchannel_discarded and the copied user transcript is non-empty (missed user input). NULL on other event types."
+  flag_agent_interrupted:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: "On agent_speech rows only: 1 when the generation was cancelled or an agent_interrupt span occurred in the same turn window. NULL on other event types."
+  ts_started:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Timestamp when the observation span started."
+  ts_ended:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+    description: "Timestamp when the observation span ended."
+  ts_speech_started:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: "On user_speech rows: matched input_speech_started timestamp. NULL on other event types."
+  ts_speech_ended:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: "On user_speech rows: matched input_speech_stopped timestamp. NULL on other event types."
+  ts_transcript:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: "On user_speech rows: matched input_audio_transcript timestamp. NULL on other event types."
+  ts_final_decision:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: "On vad rows with suppress outcome: timestamp of vad_barge_in_honored or vad_backchannel_discarded. NULL otherwise."
+  year:
+    lineage:
+      - datalake_langfuse_clean.traces.year
+    description: "Partition year from the parent online-call trace."
+  month:
+    lineage:
+      - datalake_langfuse_clean.traces.month
+    description: "Partition month from the parent online-call trace."
+  day:
+    lineage:
+      - datalake_langfuse_clean.traces.day
+    description: "Partition day from the parent online-call trace."

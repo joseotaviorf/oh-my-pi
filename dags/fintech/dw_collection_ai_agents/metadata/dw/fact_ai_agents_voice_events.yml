@@ -1,0 +1,90 @@
+database_name: dw_collection_ai_agents
+table_name: fact_ai_agents_voice_events
+description: DW projection of Matthew voice call timeline events — one row per spoken utterance, VAD decision, agent turn, or tool call inside a production Langfuse session tagged with both matthew and online_call. Thin wrap of datalake_ai_collections_quintoandar.matthew_voice_events for analyst access.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_langfuse_session:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.id_langfuse_session
+    description: "Langfuse session identifier for the voice call; primary join key to fact_ai_agents_voice_sessions."
+  id_observation:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.id_observation
+    description: "Langfuse observation identifier for the timeline event row."
+  event_type:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.event_type
+    description: "Timeline event category: user_speech, vad, agent_speech, or tool_call."
+  event_index:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.event_index
+    description: "1-based chronological order of the event inside the call."
+  vad_first_decision:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.vad_first_decision
+    description: "On vad rows: honor or suppress first decision. NULL on other event types."
+  vad_final_outcome:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.vad_final_outcome
+    description: "On vad rows: honor_immediate, barge_in_honored, or backchannel_discarded. NULL on other event types."
+  tool_name:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.tool_name
+    description: "On tool_call rows: function name. NULL on other event types."
+  tool_result:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.tool_result
+    description: "On tool_call rows: tool output string. NULL on other event types."
+  transcript:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.transcript
+    description: "Spoken text for user_speech and agent_speech; preceding user text on vad rows."
+  is_empty_transcript:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.is_empty_transcript
+    description: "1 when transcript is NULL or blank on speech or vad rows."
+  flag_failed_vad:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.flag_failed_vad
+    description: "On vad rows: 1 when user speech was discarded but a transcript exists."
+  flag_agent_interrupted:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.flag_agent_interrupted
+    description: "On agent_speech rows: 1 when the turn was interrupted."
+  ts_started:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.ts_started
+    description: "Observation span start timestamp."
+  ts_ended:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.ts_ended
+    description: "Observation span end timestamp."
+  ts_speech_started:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.ts_speech_started
+    description: "On user_speech rows: matched speech start timestamp."
+  ts_speech_ended:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.ts_speech_ended
+    description: "On user_speech rows: matched speech end timestamp."
+  ts_transcript:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.ts_transcript
+    description: "On user_speech rows: matched transcript timestamp."
+  ts_final_decision:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.ts_final_decision
+    description: "On suppress vad rows: final VAD outcome timestamp."
+  year:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.year
+    description: "Partition year."
+  month:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.month
+    description: "Partition month."
+  day:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_voice_events.day
+    description: "Partition day."

@@ -1,0 +1,26 @@
+SELECT
+    id_langfuse_session,
+    id_observation,
+    event_type,
+    event_index,
+    vad_first_decision,
+    vad_final_outcome,
+    tool_name,
+    tool_result,
+    transcript,
+    is_empty_transcript,
+    flag_failed_vad,
+    flag_agent_interrupted,
+    ts_started,
+    ts_ended,
+    ts_speech_started,
+    ts_speech_ended,
+    ts_transcript,
+    ts_final_decision,
+    year,
+    month,
+    day
+FROM
+    datalake_ai_collections_quintoandar.matthew_voice_events
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(DATE('{load_start_date}'), -1) AND DATE_ADD(DATE('{load_end_date}'), 1)
