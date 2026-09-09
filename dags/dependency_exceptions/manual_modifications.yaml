@@ -450,7 +450,6 @@ bietlejuice.enrich_crawlers_listings:
   override: []
 bietlejuice.enrich_crawlers_listings_deduplicated:
   remove:
-    - bietlejuice.enrich_sale_crawlers_listings:load-enrich-em-casa:first-run-of-day
     - bietlejuice.enrich_sale_crawlers_listings:load-enrich-loft:first-run-of-day
 bietlejuice.enrich_credit_analysis:
   remove:

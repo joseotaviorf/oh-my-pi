@@ -4,26 +4,18 @@ dag:
   schedule_start_date: 2021, 7, 20
   schedule_interval: 0 6 * * 1
   documentation:
-    dag_purpose: Creates enriched tables for the context Crawlers Listings from Em Casa and Loft. This schema has tables that extract data from both websites. The ingestion is incremental and full. The partitions for incremental tables are described below in Outputs section.
+    dag_purpose: Creates enriched tables for the context Crawlers Listings from Loft. This schema has tables that extract data from the Loft website. The ingestion is incremental and full. The partitions for incremental tables are described below in Outputs section.
 workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: full
   inner_dependencies:
-    em_casa:
-      - em_casa_region_mapping
     loft:
       - loft_region_mapping
     loft_status_listing_flows:
       - loft_region_mapping
-    em_casa_status_listing_flows:
-      - em_casa_region_mapping
   tables_customization:
     loft_region_mapping:
       extraction_type: incremental
       partitions:
         - dt_updated
-    em_casa_region_mapping:
-      extraction_type: incremental
-      partitions:
-        - ts_updated

@@ -321,9 +321,9 @@ def python_dag_scope(repo_relative: str) -> Tuple[str, str]:
     """Return (dag_root, dag_name) used for exceptions matching.
 
     ``dag_root`` is the module's parent directory and ``dag_name`` its file stem,
-    so ``dags/cross/crawlers/listings/em_casa.py`` is matched by
-    ``dag: em_casa``, ``path: dags/cross/crawlers/listings`` or
-    ``path_prefix: dags/cross``.
+    so ``dags/governance/datahub_business_context/sync/github_api.py`` is matched by
+    ``dag: github_api``, ``path: dags/governance/datahub_business_context/sync`` or
+    ``path_prefix: dags/governance``.
     """
     path = Path(repo_relative)
     return str(path.parent), path.stem

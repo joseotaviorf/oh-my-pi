@@ -1,6 +1,0 @@
----
-root_path: "s3://5a-datalake-forno/validacao-crawlers/full/"
-job_extra_args:
-  consumer:
-    format: json
-partition_cols: ["city", "year", "month", "day"]

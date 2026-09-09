@@ -1,8 +1,4 @@
 dags_not_using_builder:
-  - cross/crawlers/listings/em_casa.py
-  - cross/crawlers/listings/loft.py
-  - cross/crawlers/listings/viva_real.py
-  - cross/crawlers/listings/zap_imoveis.py
   - cross/reverse_tracksale/reverse_tracksale.py
   - fintech/enrich_credit_evers/enrich_credit_evers.py
   - fintech/enrich_dai_report/enrich_dai_report.py

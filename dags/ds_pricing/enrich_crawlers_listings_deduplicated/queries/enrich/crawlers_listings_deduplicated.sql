@@ -46,75 +46,56 @@ zap_listings AS (
     AND neighborhood IS NOT NULL
     AND usage_type = 'RESIDENTIAL'
 ),
-vivareal_listings AS (
-  SELECT DISTINCT
+crawlers_listings AS (
+  SELECT
     id_house,
-    LOWER(platform) AS platform,
-    state,
-    address_city AS city,
-    street,
-    street_number,
-    CAST(latitude AS FLOAT) AS latitude,
-    CAST(longitude AS FLOAT) AS longitude,
-    total_area,
-    price_sale AS price,
-    price_m2_sale AS price_m2,
-    ts_created,
-    ts_updated
-  FROM
-    datalake_crawlers_listings.viva_real
-  WHERE
-    price_m2_sale IS NOT NULL
-    AND (price_m2_sale BETWEEN 1000 AND 100000)
-    AND latitude IS NOT NULL
-    AND street_number IS NOT NULL
-),
-emcasa_listings AS (
-  SELECT DISTINCT
-    id_house,
-    LOWER(platform) AS platform,
+    platform,
     state,
     city,
-    address AS street,
-    st_number AS street_number,
-    CAST(lat AS FLOAT) AS latitude,
-    CAST(lng AS FLOAT) AS longitude,
+    street,
+    street_number,
+    latitude,
+    longitude,
     total_area,
     price,
     price_m2,
-    ts_updated AS ts_created,
+    ts_created,
     ts_updated
-  FROM
-    datalake_crawlers_listings.em_casa
-  WHERE
-    price_m2 IS NOT NULL
-    AND (price_m2 BETWEEN 1000 AND 100000)
-    AND lat IS NOT NULL
-),
-crawlers_listings AS (
-  SELECT
-    *
   FROM
     loft_listings
   UNION ALL
   SELECT
-    *
+    id_house,
+    platform,
+    state,
+    city,
+    street,
+    street_number,
+    latitude,
+    longitude,
+    total_area,
+    price,
+    price_m2,
+    ts_created,
+    ts_updated
   FROM
     zap_listings
-  UNION ALL
-  SELECT
-    *
-  FROM
-    vivareal_listings
-  UNION ALL
-  SELECT
-    *
-  FROM
-    emcasa_listings
 ),
 listings_deduplicated AS (
   SELECT
-    *,
+    id_house,
+    platform,
+    state,
+    city,
+    street,
+    street_number,
+    latitude,
+    longitude,
+    total_area,
+    price,
+    price_m2,
+    ts_created,
+    ts_updated,
     ROW_NUMBER() OVER (PARTITION BY latitude, longitude, price_m2 ORDER BY ts_created ASC) AS row_number,
     MAX(ts_updated) OVER (PARTITION BY latitude, longitude, price_m2) AS max_ts_updated,
     MIN(ts_created) OVER (PARTITION BY latitude, longitude, price_m2) AS min_ts_created,
@@ -123,7 +104,23 @@ listings_deduplicated AS (
     crawlers_listings
 )
 SELECT
-  *
+  id_house,
+  platform,
+  state,
+  city,
+  street,
+  street_number,
+  latitude,
+  longitude,
+  total_area,
+  price,
+  price_m2,
+  ts_created,
+  ts_updated,
+  row_number,
+  max_ts_updated,
+  min_ts_created,
+  clean_city
 FROM
   listings_deduplicated
 WHERE

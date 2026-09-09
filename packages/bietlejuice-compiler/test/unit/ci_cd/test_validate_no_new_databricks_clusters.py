@@ -363,7 +363,12 @@ class TestIsScannedPythonPath:
         assert is_scanned_python_path("dags/growth/semrush/semrush.py") is True
 
     def test_nested_handwritten(self):
-        assert is_scanned_python_path("dags/cross/crawlers/listings/em_casa.py") is True
+        assert (
+            is_scanned_python_path(
+                "dags/governance/datahub_business_context/sync/github_api.py"
+            )
+            is True
+        )
 
     def test_spark_jobs_excluded(self):
         assert (
@@ -388,9 +393,11 @@ class TestIsScannedPythonPath:
 
 class TestPythonDagScope:
     def test_nested_module(self):
-        assert python_dag_scope("dags/cross/crawlers/listings/em_casa.py") == (
-            "dags/cross/crawlers/listings",
-            "em_casa",
+        assert python_dag_scope(
+            "dags/governance/datahub_business_context/sync/github_api.py"
+        ) == (
+            "dags/governance/datahub_business_context/sync",
+            "github_api",
         )
 
 
