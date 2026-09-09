@@ -4,16 +4,14 @@ dag:
   owner: Data Agents
   documentation:
     dag_purpose: |
-      Enrich layer for agent partner payments: unified revenue-share and earning payment lines
-      from Big Agent incentives and Nazaré offer participants for brokerage analytics.
+      Enrich layer for agent partner payments: payment lines from Big Agent incentives and
+      Nazaré offer participants for brokerage analytics (`partner_payments`).
 
 workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
   tables_customization:
-    agent_revenue_share:
-      partitions: [dt_updated]
     partner_payments:
       merge_on: [id_partner_payment]
       partitions: [revenue_source]

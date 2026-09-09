@@ -1453,7 +1453,6 @@ bietlejuice.enrich_agent_payments:
   - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day
   - bietlejuice.enrich_big_agent_incentives:load-enrich-earnings:first-run-of-day
   - bietlejuice.enrich_big_agent_incentives:load-enrich-partner-tier:first-run-of-day
-  - bietlejuice.enrich_hub_services:load-enrich-member-profile:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-brokerage:first-run-of-day
 bietlejuice.enrich_agent_performance:
