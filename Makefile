@@ -840,6 +840,18 @@ validate-no-new-cyclic-dependencies:
 	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/validate_no_new_cyclic_dependencies.py
 
+.PHONY: validate-no-new-late-schedule-dependencies
+## fails when a change adds a dataset wait on a DAG whose first daily run is later than
+## any pre-existing upstream (e.g. noon CDC like nazare delaying morning DW DAGs).
+## Woodpecker runs this on PRs with failure: ignore so release is not blocked.
+validate-no-new-late-schedule-dependencies:
+	@echo ""
+	@echo "Validating that no new late-schedule DAG dependencies were introduced"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/validate_no_new_late_schedule_dependencies.py
+
 level ?= warning
 domain ?=
 paths ?=

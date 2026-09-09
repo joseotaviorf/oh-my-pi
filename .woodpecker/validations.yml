@@ -334,6 +334,20 @@ steps:
         path: *dependency_file_correctness_path
     depends_on: [setup]
 
+  # Advisory: script exits 1 on a new later-than-existing dataset wait (e.g. nazare at 12h).
+  # failure: ignore keeps the validations workflow green so release.yml depends_on: validations
+  # is never gated. PR-only so merge/push to master/forno does not run it.
+  validate-no-new-late-schedule-dependencies:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    failure: ignore
+    commands:
+      - make validate-no-new-late-schedule-dependencies
+    when:
+      - event: pull_request
+        path: *dependency_file_correctness_path
+    depends_on: [setup]
+
   validate-core-model-schemas:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true

@@ -1,0 +1,8 @@
+# Allowlist for validate_no_new_late_schedule_dependencies.py
+#
+# Suppresses a (consumer, producer) finding only when the pair is listed here.
+# Format:
+#
+# bietlejuice.consumer_dag:
+#   - producer: bietlejuice.producer_dag
+#     reason: "Why this late upstream is acceptable"

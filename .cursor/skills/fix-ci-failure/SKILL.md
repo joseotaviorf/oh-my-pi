@@ -24,6 +24,7 @@ Ask the user (or infer from context) which Woodpecker step failed. The full list
 | `validate-dags-dependencies-forno` | `ENVIRONMENT=forno make validate-dags-dependencies` | Dependencies |
 | `validate-dags-dependencies-prod` | `ENVIRONMENT=prod make validate-dags-dependencies` | Dependencies |
 | `validate-dependency-file-correctness` | `make validate-dependency-file-correctness` | Dependencies |
+| `validate-no-new-late-schedule-dependencies` | `make validate-no-new-late-schedule-dependencies` | Dependencies (advisory) |
 | `validate-metadata-files-content` | `make validate-metadata-files-content` | Metadata |
 | `validate-metadata-files-exist` | `make validate-metadata-files-exist` | Metadata |
 | `validate-lineage-consistency` | `make validate-lineage-consistency` | Metadata |
@@ -88,13 +89,16 @@ git fetch --no-tags origin +refs/heads/master
 | `lineage source not referenced in SQL` | Metadata `lineage:` points to a source table not in the SQL | Fix the lineage to match the actual SQL `FROM`/`JOIN` sources |
 | `table in SQL not in lineage` | SQL references a table not listed in any lineage entry | Add the correct `lineage:` entries for all source columns |
 
-### Dependency failures (`validate-dags-dependencies`, `validate-dependency-file-correctness`)
+### Dependency failures (`validate-dags-dependencies`, `validate-dependency-file-correctness`, `validate-no-new-late-schedule-dependencies`)
 
 | Error message pattern | Root cause | Fix |
 |----------------------|-----------|-----|
 | `DAG not found in dependencies.yaml` | A new DAG was added but `dependencies.yaml` was not regenerated | Run `make dependencies-file` and commit the updated file |
 | `dependency cycle detected` | A circular dependency was introduced | Review the dependency chain and break the cycle |
 | `dependency file out of sync` | `dependencies.yaml` does not match what the generator would produce | Run `make dependencies-file` to regenerate and commit |
+| late-schedule upstream / later cron tick | A new dataset wait points at an upstream whose first daily run is later than existing upstreams | Remove the late lineage edge, or ack the consumer → producer pair in `dags/dependency_exceptions/late_schedule_acks.yaml` with a `reason` |
+
+**Note:** `validate-no-new-late-schedule-dependencies` uses `failure: ignore` in Woodpecker — a red step does **not** fail the validations workflow or block merge. Treat it as a signal to review scheduling impact, not a hard gate.
 
 ### Standard failures (`validate-dags-up-to-standard`)
 

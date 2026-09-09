@@ -144,3 +144,13 @@
 
   It cannot be run outside of an Airflow container, because it collects the parsed DAGs from the database. Therefore, you need
   the local environment to do so.
+
+## validate_no_new_late_schedule_dependencies.py
+
+  Compares `dags/dependencies.yaml` at the merge base vs `HEAD` and flags when a change adds a new upstream whose first daily cron tick is **later** than any pre-existing upstream of a dataset-triggered consumer. Cron- or manual-scheduled consumers are skipped.
+
+  Allowlist: `dags/dependency_exceptions/late_schedule_acks.yaml` — each entry is a consumer → producer pair with a `reason`.
+
+  Local check: `make validate-no-new-late-schedule-dependencies` (fetches `origin/master` first).
+
+  CI: Woodpecker step `validate-no-new-late-schedule-dependencies` is **advisory** (`failure: ignore`, PR-only) — a red step does not fail the validations workflow or block release.

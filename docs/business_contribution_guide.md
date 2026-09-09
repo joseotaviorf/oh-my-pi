@@ -604,6 +604,7 @@ Same as [§5.7 Code owners](#a7-who-reviews-your-pr-codeowners).
 |---------|---------|
 | `make validate-dags-dependencies` | Cross-DAG consistency |
 | `make validate-dependency-file-correctness` | File shape |
+| `make validate-no-new-late-schedule-dependencies` | Advisory: flags new upstream waits later than existing ones (PR-only in CI; does not block merge) |
 
 **Cursor:** [`create-dag` skill](../.cursor/skills/create-dag/SKILL.md) + [`business-contribution` skill](../.cursor/skills/business-contribution/SKILL.md)
 
