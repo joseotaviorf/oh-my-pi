@@ -340,11 +340,13 @@ class DWTaskGroup(BaseTaskGroup):
         final_tasks = default_dim_row_tasks or (
             [sync_metadata_task] if sync_metadata_task else [load_table_task]
         )
+        load_chain_tasks = default_dim_row_tasks or [load_table_task]
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
             final_tasks=final_tasks,
             independent_tasks=data_quality_tasks,
+            load_chain_tasks=load_chain_tasks,
         )
 
     def build_dw_task_group(

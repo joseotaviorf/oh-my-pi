@@ -154,8 +154,11 @@ class DWQueryWorkflow(BaseWorkflow):
         for table in dw_task_groups:
             initial_tasks = DWTaskGroup.first_tasks(dw_staging_task_groups[table])
             final_tasks = DWTaskGroup.last_tasks(dw_task_groups[table])
+            load_chain_tasks = DWTaskGroup.load_chain_tasks(dw_task_groups[table])
             dw_task_groups_boundaries[table] = DWTaskGroup.format_tasks_boundaries(
-                initial_tasks=initial_tasks, final_tasks=final_tasks
+                initial_tasks=initial_tasks,
+                final_tasks=final_tasks,
+                load_chain_tasks=load_chain_tasks,
             )
         return dw_task_groups_boundaries
 

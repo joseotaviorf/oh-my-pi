@@ -23,6 +23,7 @@ class BaseTaskGroup:
     TASK_GROUP_INITIAL_TASKS_DICT_KEY = "initial_tasks"
     TASK_GROUP_FINAL_TASKS_DICT_KEY = "final_tasks"
     TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY = "independent_tasks"
+    TASK_GROUP_LOAD_CHAIN_TASKS_DICT_KEY = "load_chain_tasks"
 
     ADD_DEFAULT_ROW_TASK_PREFIX = "add-default-row-to"
     DATA_QUALITY_TESTS_TASK_PREFIX = "data-quality-tests"
@@ -117,7 +118,12 @@ class BaseTaskGroup:
         )
 
     @staticmethod
-    def format_tasks_boundaries(initial_tasks, final_tasks, independent_tasks=None):
+    def format_tasks_boundaries(
+        initial_tasks,
+        final_tasks,
+        independent_tasks=None,
+        load_chain_tasks=None,
+    ):
         """
         Format the tasks to a dict considering the supplied hierarchy:
             initial bound and final bound of the task group, so we can apply
@@ -130,6 +136,9 @@ class BaseTaskGroup:
         :param independent_tasks: the independent tasks in the task group, i.e., the tasks that are
         not dependencies for any other tasks or task groups
         :type independent_tasks: list[airflow.models.BaseOperator]
+        :param load_chain_tasks: predecessors for the next table's load. Falls back to
+            final_tasks when omitted. Must never include sync-metadata.
+        :type load_chain_tasks: list[airflow.models.BaseOperator]
         :return: formatted dict with initial tasks and final tasks keys
         :rtype: dict
         """
@@ -141,6 +150,10 @@ class BaseTaskGroup:
         if independent_tasks:
             tasks_boundaries[BaseTaskGroup.TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY] = (
                 independent_tasks
+            )
+        if load_chain_tasks:
+            tasks_boundaries[BaseTaskGroup.TASK_GROUP_LOAD_CHAIN_TASKS_DICT_KEY] = (
+                load_chain_tasks
             )
         return tasks_boundaries
 
@@ -169,6 +182,16 @@ class BaseTaskGroup:
         :rtype: list[airflow.models.BaseOperator]
         """
         return task_group_boundaries.get(BaseTaskGroup.TASK_GROUP_FINAL_TASKS_DICT_KEY)
+
+    @staticmethod
+    def load_chain_tasks(task_group_boundaries):
+        """
+        Gets the load-chain predecessors from a task group (the tasks a downstream
+        load may wait on). Falls back to final_tasks when unset.
+        """
+        return task_group_boundaries.get(
+            BaseTaskGroup.TASK_GROUP_LOAD_CHAIN_TASKS_DICT_KEY
+        ) or BaseTaskGroup.last_tasks(task_group_boundaries)
 
     @staticmethod
     def independent_tasks(task_group_boundaries):
@@ -274,9 +297,16 @@ class BaseTaskGroup:
                     dependency_task_group_boundaries, dependent_task_group_boundaries
                 )
 
+                inner_last_tasks = list(
+                    self.last_tasks(dependent_task_group_boundaries) or []
+                )
+                source_last_tasks = self.last_tasks(dependency_task_group_boundaries)
+                if source_last_tasks:
+                    inner_last_tasks.extend(source_last_tasks)
+
                 inner_dependencies_task_group_boundaries = self.format_tasks_boundaries(
                     initial_tasks=self.first_tasks(dependency_task_group_boundaries),
-                    final_tasks=self.last_tasks(dependent_task_group_boundaries),
+                    final_tasks=inner_last_tasks,
                 )
 
                 all_inner_dependencies_first_tasks.extend(

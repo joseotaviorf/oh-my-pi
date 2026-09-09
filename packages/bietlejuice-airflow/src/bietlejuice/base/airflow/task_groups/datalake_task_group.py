@@ -402,6 +402,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             initial_tasks=[load_table_task],
             final_tasks=raw_final_tasks,
             independent_tasks=quality_tasks,
+            load_chain_tasks=[load_table_task],
         )
 
     def _build_task_group(
@@ -549,6 +550,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             initial_tasks=[load_table_task],
             final_tasks=sql_final_tasks,
             independent_tasks=quality_tasks,
+            load_chain_tasks=[load_table_task],
         )
 
     def build_raw_task_group_for_single_table(

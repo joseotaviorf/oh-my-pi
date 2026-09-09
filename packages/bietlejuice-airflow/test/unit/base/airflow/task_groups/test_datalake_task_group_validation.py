@@ -261,3 +261,28 @@ class TestDatalakeTaskGroupValidation:
 
         # Assert
         build_sync.assert_called_once()
+
+    def test_prod_sql_path_load_chain_excludes_sync(self):
+        group = self._task_group(is_validation=False)
+        load_task = mock.MagicMock(name="load")
+        sync_task = mock.MagicMock(name="sync")
+        with (
+            mock.patch(
+                "bietlejuice.base.airflow.task_groups.datalake_task_group.chain"
+            ),
+            mock.patch.object(group, "_build_load_task", return_value=load_task),
+            mock.patch.object(
+                group, "_build_metadata_sync_task", return_value=sync_task
+            ),
+            mock.patch.object(group, "_get_data_quality_tables", return_value=set()),
+        ):
+            boundaries = group._build_task_group(
+                layer=LayerEnum.ENRICH,
+                source_database_base_name="enrich",
+                target_database_base_name="enrich",
+                table_name="my_table",
+                partitions=["year"],
+            )
+
+        assert boundaries["load_chain_tasks"] == [load_task]
+        assert boundaries["final_tasks"] == [load_task, sync_task]

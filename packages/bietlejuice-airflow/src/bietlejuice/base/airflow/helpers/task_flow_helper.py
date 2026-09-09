@@ -31,7 +31,7 @@ class TaskFlowHelper:
                 )
 
             airflow_helpers.cross_downstream(
-                BaseTaskGroup.last_tasks(from_task_groups[table_name]),
+                BaseTaskGroup.load_chain_tasks(from_task_groups[table_name]),
                 BaseTaskGroup.first_tasks(to_task_groups[table_name]),
             )
 
@@ -41,8 +41,8 @@ class TaskFlowHelper:
         self, from_task_group_boundaries: dict, to_task_group_boundaries: dict
     ) -> bool:
         """
-        Identify all the final-tasks of the initial task-group and set a downstream to
-            all the beginning-tasks of the final task-group
+        Identify the load-chain predecessors of the initial task-group and set a
+            downstream to all the beginning-tasks of the final task-group
 
         :param from_task_group_boundaries: task group boundaries to be set as beginning of chain
         :type from_task_group_boundaries: dict[str:dict[str:list[airflow.models.BaseOperator]]]
@@ -50,7 +50,7 @@ class TaskFlowHelper:
         :type to_task_group_boundaries: dict[str:dict[str:list[airflow.models.BaseOperator]]]
         :rtype: bool
         """
-        from_tasks = BaseTaskGroup.last_tasks(from_task_group_boundaries)
+        from_tasks = BaseTaskGroup.load_chain_tasks(from_task_group_boundaries)
         to_tasks = BaseTaskGroup.first_tasks(to_task_group_boundaries)
         airflow_helpers.cross_downstream(from_tasks, to_tasks)
 

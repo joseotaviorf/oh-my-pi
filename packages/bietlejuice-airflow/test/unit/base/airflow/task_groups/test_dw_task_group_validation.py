@@ -83,3 +83,49 @@ class TestDWTaskGroupValidation:
             )
 
         attach_dataset.assert_not_called()
+
+    def test_dw_layer_load_chain_is_load_not_sync(self):
+        group = self._task_group(is_validation=False)
+        load_task = mock.MagicMock(name="load")
+        sync_task = mock.MagicMock(name="sync")
+        with (
+            mock.patch("bietlejuice.base.airflow.task_groups.dw_task_group.chain"),
+            mock.patch.object(
+                group, "_build_metadata_sync_task", return_value=sync_task
+            ),
+            mock.patch.object(group, "_set_data_quality_tasks", return_value=[]),
+            mock.patch.object(group, "_set_default_dim_row_task", return_value=[]),
+            mock.patch.object(group, "_set_load_task", return_value=load_task),
+        ):
+            boundaries = group._build_task_group(
+                layer=LayerEnum.DW.value,
+                table_name="fact_bar",
+                is_incremental=True,
+                partitions=["year"],
+            )
+
+        assert boundaries["load_chain_tasks"] == [load_task]
+        assert boundaries["final_tasks"] == [sync_task]
+
+    def test_staging_dim_load_chain_is_default_row(self):
+        group = self._task_group(is_validation=False)
+        load_task = mock.MagicMock(name="load")
+        default_row = mock.MagicMock(name="default_row")
+        with (
+            mock.patch("bietlejuice.base.airflow.task_groups.dw_task_group.chain"),
+            mock.patch.object(group, "_build_metadata_sync_task", return_value=None),
+            mock.patch.object(group, "_set_data_quality_tasks", return_value=[]),
+            mock.patch.object(
+                group, "_set_default_dim_row_task", return_value=[default_row]
+            ),
+            mock.patch.object(group, "_set_load_task", return_value=load_task),
+        ):
+            boundaries = group._build_task_group(
+                layer=LayerEnum.DW_STAGING.value,
+                table_name="dim_bar",
+                is_incremental=False,
+                partitions=["year"],
+            )
+
+        assert boundaries["load_chain_tasks"] == [default_row]
+        assert boundaries["final_tasks"] == [default_row]

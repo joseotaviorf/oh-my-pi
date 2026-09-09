@@ -278,6 +278,8 @@ class RawGsheetsWorkflow(BaseWorkflow):
 
         terminate_cluster_task.set_upstream(
             DatalakeTaskGroup.all_last_tasks(done_task_groups)
+            + DatalakeTaskGroup.all_last_tasks(raw_task_groups)
+            + DatalakeTaskGroup.all_last_tasks(clean_task_groups)
         )
 
         # Set data quality tasks if exists

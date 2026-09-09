@@ -239,7 +239,6 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             clean_table_attributes
         )
         load_clean_task >> optimize_clean_task
-        last_clean_task = load_clean_task
 
         if self._check_include_sync_hive_tasks(clean_table_attributes):
             register_table = self.register_delta_table_task_creator.create_task(
@@ -249,9 +248,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
                 clean_table_attributes, "--bypass-hive"
             )
 
-            last_clean_task = sync_metadata
-
-            (load_clean_task >> register_table >> sync_metadata)
+            (load_clean_task >> register_table >> sync_metadata >> dag_final_tasks)
 
         if self._check_include_data_quality_task(clean_table_attributes):
             data_quality_tests_clean_task = self.data_quality_task_creator.create_task(
@@ -259,4 +256,4 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             )
             (load_clean_task >> data_quality_tests_clean_task >> dag_final_tasks)
 
-        return load_clean_task, last_clean_task
+        return load_clean_task, load_clean_task

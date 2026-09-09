@@ -348,15 +348,13 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
             dag_final_tasks: The final task(s) of the DAG to chain dependencies
 
         Returns:
-            Tuple: A tuple containing (first_task, last_task) where first_task is the
-                   load_clean_task and last_task may be sync_metadata_clean_task if
-                   hive sync is enabled, otherwise load_clean_task
+            Tuple: A tuple containing (first_task, last_task) for the load chain.
+                   last_task is always the load so inner deps never wait on sync-metadata.
         """
         load_clean_task = self.load_clean_task_creator.create_task(
             clean_table_attributes
         )
         load_clean_task >> optimize_clean_task
-        last_clean_task = load_clean_task
 
         if self._check_include_sync_hive_tasks(clean_table_attributes):
             register_delta_table_clean_task = (
@@ -368,12 +366,11 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
             sync_metadata_clean_task = self.sync_metadata_task_creator.create_task(
                 clean_table_attributes, "--bypass-hive"
             )
-            last_clean_task = sync_metadata_clean_task
-
             (
                 load_clean_task
                 >> register_delta_table_clean_task
                 >> sync_metadata_clean_task
+                >> dag_final_tasks
             )
 
         if self._check_include_data_quality_task(clean_table_attributes):
@@ -382,4 +379,4 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
             )
             (load_clean_task >> data_quality_tests_clean_task >> dag_final_tasks)
 
-        return load_clean_task, last_clean_task
+        return load_clean_task, load_clean_task
