@@ -13,6 +13,9 @@ WITH base AS (
         mtl.call_function_name,
         mtl.call_invoice_preview_dispatch,
         mtl.call_invoice_preview_entries,
+        mtl.call_has_rental_guarantee,
+        mtl.call_dt_occupancy_started,
+        mtl.call_condominium_payer,
         mtl.call_outcome,
         mtl.call_response,
         mtl.call_http_status,
@@ -234,6 +237,32 @@ SELECT
             THEN TO_JSON(b.call_invoice_preview_entries)
         END
     ) AS next_invoice_preview_entries_list,
+    MAX(
+        CASE
+            WHEN b.call_function_name = 'GetContractBillingFacts'
+                AND b.is_call_success = true
+            THEN b.call_condominium_payer
+        END
+    ) AS condominium_payer,
+    MAX(
+        CASE
+            WHEN b.call_function_name = 'GetContractBillingFacts'
+                AND b.is_call_success = true
+                AND b.call_has_rental_guarantee = true
+            THEN 1
+            WHEN b.call_function_name = 'GetContractBillingFacts'
+                AND b.is_call_success = true
+                AND b.call_has_rental_guarantee = false
+            THEN 0
+        END
+    ) AS flag_has_rental_guarantee,
+    MAX(
+        CASE
+            WHEN b.call_function_name = 'GetContractBillingFacts'
+                AND b.is_call_success = true
+            THEN b.call_dt_occupancy_started
+        END
+    ) AS dt_occupancy_started,
     MIN(b.ts_request) AS ts_first_mcp_call,
     MAX(b.ts_request) AS ts_last_mcp_call,
     YEAR(MAX(b.ts_request)) AS year,

@@ -131,6 +131,31 @@ SELECT
             'ARRAY<STRING>'
         )
     END AS call_invoice_preview_entries,
+    CASE
+        WHEN call.function = 'GetContractBillingFacts'
+        THEN TRY_CAST(
+            GET_JSON_OBJECT(
+                GET_JSON_OBJECT(p.calls_json_str, CONCAT('$[', pos, '].response')),
+                '$.hasRentalGuarantee'
+            ) AS BOOLEAN
+        )
+    END AS call_has_rental_guarantee,
+    CASE
+        WHEN call.function = 'GetContractBillingFacts'
+        THEN TRY_CAST(
+            GET_JSON_OBJECT(
+                GET_JSON_OBJECT(p.calls_json_str, CONCAT('$[', pos, '].response')),
+                '$.occupancyStartDate'
+            ) AS DATE
+        )
+    END AS call_dt_occupancy_started,
+    CASE
+        WHEN call.function = 'GetContractBillingFacts'
+        THEN GET_JSON_OBJECT(
+            GET_JSON_OBJECT(p.calls_json_str, CONCAT('$[', pos, '].response')),
+            '$.condominiumPayer'
+        )
+    END AS call_condominium_payer,
     TO_JSON(call) AS call_payload_json,
     YEAR(p.ts_request) AS year,
     MONTH(p.ts_request) AS month,

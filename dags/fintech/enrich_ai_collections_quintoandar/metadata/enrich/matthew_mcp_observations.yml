@@ -415,6 +415,47 @@ columns:
       when no preview was composed in the session. Amounts are not logged upstream, so this
       says which charges were shown, never how much was charged; a session that previews more
       than one contract reports only one of the previews.
+  condominium_payer:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_condominium_payer
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
+    description:
+      Who pays the condominium fee on the contract the agent is collecting in this
+      session (TENANT for tenant or QuintoAndar as payer, LANDLORD including self-condo, or
+      NONE when there is no condominium charge). Technically, from a successful
+      SeuBarriga.GetContractBillingFacts call logged inside get_financial_context_v1; NULL
+      when the lookup did not succeed in the session. A session that snapshots more than one
+      contract reports only one of the values.
+    categories:
+      TENANT: Tenant or QuintoAndar pays the condominium.
+      LANDLORD: Landlord pays the condominium, including self-condo.
+      NONE: No condominium charge on the contract.
+  flag_has_rental_guarantee:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_has_rental_guarantee
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
+    description:
+      Whether the contract has Garantia Locatícia — the tenant occupies first and
+      pays rent after (mora e paga) — rather than paying rent in advance (paga e mora).
+      Technically, 1 when at least one successful SeuBarriga.GetContractBillingFacts call in
+      the session logged hasRentalGuarantee=true; 0 when every successful lookup that parsed
+      the boolean logged false; NULL when the lookup did not succeed or the boolean could not
+      be parsed. Sourced from the inverted rental-paid-in-advance? flag on the SeuBarriga
+      contract.
+  dt_occupancy_started:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_dt_occupancy_started
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
+    description:
+      Calendar date the tenant's occupancy started on the contract (the
+      start-period date as stored, without timezone conversion). Used to tell first-month
+      billing cases apart (boletinho vs boletão). Technically, from a successful
+      SeuBarriga.GetContractBillingFacts occupancyStartDate in the session; NULL when the
+      lookup did not succeed. A session that snapshots more than one contract reports only
+      one of the dates.
   ts_first_mcp_call:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.ts_request
