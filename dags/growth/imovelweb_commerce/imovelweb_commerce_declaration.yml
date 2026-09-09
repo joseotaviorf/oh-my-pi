@@ -25,30 +25,40 @@ workflow:
   tables_customization:
     pedidos:
       clean_table_name: orders
+      raw_primary_keys:
+      - idpedido
       clean_primary_keys:
       - id_order
       clean_z_order_by:
       - id_order
     itemspedido:
       clean_table_name: order_items
+      raw_primary_keys:
+      - iditempedido
       clean_primary_keys:
       - id_order_item
       clean_z_order_by:
       - id_order
     productos:
       clean_table_name: products
+      raw_primary_keys:
+      - idproducto
       clean_primary_keys:
       - id_product
       clean_z_order_by:
       - id_product
     lineasdeproducto:
       clean_table_name: product_lines
+      raw_primary_keys:
+      - idlineadeproducto
       clean_primary_keys:
       - id_product_line
       clean_z_order_by:
       - id_product_line
     planesdepublicacion:
       clean_table_name: publication_plans
+      raw_primary_keys:
+      - idplandepublicacion
       clean_primary_keys:
       - id_publication_plan
       clean_z_order_by:

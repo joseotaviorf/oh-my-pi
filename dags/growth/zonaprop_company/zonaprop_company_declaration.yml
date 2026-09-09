@@ -29,36 +29,48 @@ workflow:
   tables_customization:
     empresas:
       clean_table_name: companies
+      raw_primary_keys:
+      - idempresa
       clean_primary_keys:
       - id_company
       clean_z_order_by:
       - id_company
     usuariosempresas:
       clean_table_name: company_users
+      raw_primary_keys:
+      - idusuarioempresa
       clean_primary_keys:
       - id_company_user
       clean_z_order_by:
       - id_company
     tiposdeinmobiliaria:
       clean_table_name: agency_types
+      raw_primary_keys:
+      - idtipodeinmobiliaria
       clean_primary_keys:
       - id_agency_type
       clean_z_order_by:
       - id_agency_type
     interfaceempresas:
       clean_table_name: interface_companies
+      raw_primary_keys:
+      - idinterfaceempresa
       clean_primary_keys:
       - id_interface_company
       clean_z_order_by:
       - id_company
     interfaceconfigurations:
       clean_table_name: interface_configurations
+      raw_primary_keys:
+      - idinterface
       clean_primary_keys:
       - id_interface
       clean_z_order_by:
       - id_interface
     interfaceconfigurationparameters:
       clean_table_name: interface_configuration_parameters
+      raw_primary_keys:
+      - idparameter
       clean_primary_keys:
       - id_parameter
       clean_z_order_by:

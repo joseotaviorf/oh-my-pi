@@ -13,6 +13,8 @@ from bietlejuice.clients.db_clients.spark_client import SparkClient
 from bietlejuice.consumers.db_consumers.mysql_consumer import MySqlConsumer
 from bietlejuice.consumers.db_consumers.postgres_consumer import PostgresConsumer
 
+NAVENT_MYSQL_SECRET_KEYS = frozenset({"ZONAPROP_DB", "IMOVELWEB_DB", "REALESTATE_DB"})
+
 
 class CdcSchemaFinderFactory:
     def __init__(self, dbutils_secret_key: str, schema: str = None) -> None:
@@ -36,7 +38,10 @@ class CdcSchemaFinderFactory:
         conn_config = self._get_conn_config()
         spark_client = SparkClient()
         mysql_consumer = MySqlConsumer(conn_config, spark_client)
-        return MySqlCdcSchemaFinder(mysql_consumer)
+        return MySqlCdcSchemaFinder(
+            mysql_consumer,
+            use_driver_jdbc=self.dbutils_secret_key in NAVENT_MYSQL_SECRET_KEYS,
+        )
 
     def _get_conn_config(self):
         base_dbutils = BaseDBUtils()

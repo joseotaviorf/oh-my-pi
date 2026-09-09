@@ -67,3 +67,25 @@ class TestCdcSchemaFinderFactory:
 
         assert isinstance(cdc_schema_finder, MySqlCdcSchemaFinder)
         assert cdc_schema_finder.mysql_consumer == mysql_consumer.return_value
+        assert cdc_schema_finder.use_driver_jdbc is False
+
+    @pytest.mark.parametrize(
+        "secret_key", ["ZONAPROP_DB", "IMOVELWEB_DB", "REALESTATE_DB"]
+    )
+    def test_mysql_schema_finder_uses_driver_jdbc_for_navent_secrets(
+        self, mysql_consumer, secret_key
+    ):
+        factory = CdcSchemaFinderFactory(secret_key)
+
+        cdc_schema_finder = factory.get_cdc_schema_finder(DatabaseTypeEnum.MYSQL)
+
+        assert cdc_schema_finder.use_driver_jdbc is True
+
+    def test_mysql_schema_finder_keeps_spark_jdbc_for_other_secrets(
+        self, mysql_consumer
+    ):
+        factory = CdcSchemaFinderFactory("EBDB_DB")
+
+        cdc_schema_finder = factory.get_cdc_schema_finder(DatabaseTypeEnum.MYSQL)
+
+        assert cdc_schema_finder.use_driver_jdbc is False

@@ -194,6 +194,76 @@ class MySqlConsumer(DBConsumer):
 
         return df
 
+    def get_driver_query_rows(self, query: str, parameters: tuple) -> list:
+        """Run a small metadata query from the Spark driver JVM."""
+        connection = None
+        statement = None
+        result_set = None
+        try:
+            jvm = self.spark_client.conn._jvm
+            properties = jvm.java.util.Properties()
+            properties.setProperty("user", self.spark_common_options["user"])
+            properties.setProperty("password", self.spark_common_options["password"])
+            connection = jvm.com.mysql.cj.jdbc.Driver().connect(
+                self.spark_common_options["url"], properties
+            )
+            statement = connection.prepareStatement(query)
+            for position, parameter in enumerate(parameters, start=1):
+                statement.setString(position, parameter)
+
+            result_set = statement.executeQuery()
+            metadata = result_set.getMetaData()
+            column_count = metadata.getColumnCount()
+            rows = []
+            while result_set.next():
+                rows.append(
+                    {
+                        metadata.getColumnLabel(index): result_set.getString(index)
+                        for index in range(1, column_count + 1)
+                    }
+                )
+            return rows
+        finally:
+            if result_set is not None:
+                result_set.close()
+            if statement is not None:
+                statement.close()
+            if connection is not None:
+                connection.close()
+
+    def get_table_schema_on_driver(self, table_name: str) -> list:
+        """Get a MySQL table schema without scheduling JDBC work on executors."""
+        query = """
+            SELECT
+                COLUMN_NAME AS col_name,
+                COLUMN_TYPE AS col_type
+            FROM
+                INFORMATION_SCHEMA.COLUMNS
+            WHERE
+                TABLE_SCHEMA = ?
+                AND TABLE_NAME = ?
+            ORDER BY
+                ORDINAL_POSITION
+        """
+        return self.get_driver_query_rows(query, (self.conn_config["db"], table_name))
+
+    def get_table_primary_keys_on_driver(self, table_name: str) -> list:
+        """Get MySQL primary keys without scheduling JDBC work on executors."""
+        query = """
+            SELECT
+                COLUMN_NAME AS col_name
+            FROM
+                INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+            WHERE
+                TABLE_SCHEMA = ?
+                AND TABLE_NAME = ?
+                AND CONSTRAINT_NAME = 'PRIMARY'
+            ORDER BY
+                ORDINAL_POSITION
+        """
+        rows = self.get_driver_query_rows(query, (self.conn_config["db"], table_name))
+        return [row["col_name"] for row in rows]
+
     @logger
     def get_table_schema(self, table_name):
         """

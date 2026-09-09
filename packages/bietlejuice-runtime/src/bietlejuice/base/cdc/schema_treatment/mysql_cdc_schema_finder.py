@@ -5,12 +5,15 @@ from bietlejuice.consumers.db_consumers.mysql_consumer import MySqlConsumer
 
 
 class MySqlCdcSchemaFinder(CdcSchemaFinder):
-    def __init__(self, mysql_consumer: MySqlConsumer) -> None:
+    def __init__(
+        self, mysql_consumer: MySqlConsumer, use_driver_jdbc: bool = False
+    ) -> None:
         """
         This class identifies the schema of the table based by querying the database.
         """
 
         self.mysql_consumer = mysql_consumer
+        self.use_driver_jdbc = use_driver_jdbc
 
     def _get_column_type_length(self, typeName):
         """
@@ -99,15 +102,27 @@ class MySqlCdcSchemaFinder(CdcSchemaFinder):
         }
         """
 
-        primary_keys = self.mysql_consumer.get_table_primary_keys(table_name)
-        columns = self.mysql_consumer.get_table_schema(table_name)
-        columns_rows = (
-            columns.withColumnRenamed("col_name", "name")
-            .withColumnRenamed("col_type", "typeName")
-            .collect()
-        )
-        columns_metadata_list = self.format_columns_dict(
-            [row.asDict() for row in columns_rows]
-        )
+        if self.use_driver_jdbc:
+            primary_keys = self.mysql_consumer.get_table_primary_keys_on_driver(
+                table_name
+            )
+            columns_rows = self.mysql_consumer.get_table_schema_on_driver(table_name)
+            columns_metadata_list = self.format_columns_dict(
+                [
+                    {"name": row["col_name"], "typeName": row["col_type"]}
+                    for row in columns_rows
+                ]
+            )
+        else:
+            primary_keys = self.mysql_consumer.get_table_primary_keys(table_name)
+            columns = self.mysql_consumer.get_table_schema(table_name)
+            columns_rows = (
+                columns.withColumnRenamed("col_name", "name")
+                .withColumnRenamed("col_type", "typeName")
+                .collect()
+            )
+            columns_metadata_list = self.format_columns_dict(
+                [row.asDict() for row in columns_rows]
+            )
 
         return {"primaryKeyColumnNames": primary_keys, "columns": columns_metadata_list}

@@ -29,66 +29,88 @@ workflow:
   tables_customization:
     paises:
       clean_table_name: countries
+      raw_primary_keys:
+      - idpais
       clean_primary_keys:
       - id_country
       clean_z_order_by:
       - id_country
     provincias:
       clean_table_name: states
+      raw_primary_keys:
+      - idprovincia
       clean_primary_keys:
       - id_state
       clean_z_order_by:
       - id_state
     ciudades:
       clean_table_name: cities
+      raw_primary_keys:
+      - idciudad
       clean_primary_keys:
       - id_city
       clean_z_order_by:
       - id_city
     zonasciudad:
       clean_table_name: city_zones
+      raw_primary_keys:
+      - idzonaciudad
       clean_primary_keys:
       - id_city_zone
       clean_z_order_by:
       - id_city
     subzonasciudad:
       clean_table_name: city_subzones
+      raw_primary_keys:
+      - idsubzonaciudad
       clean_primary_keys:
       - id_city_subzone
       clean_z_order_by:
       - id_city
     geolocalizaciones:
       clean_table_name: geolocations
+      raw_primary_keys:
+      - idgeolocalizacion
       clean_primary_keys:
       - id_geolocation
       clean_z_order_by:
       - id_geolocation
     tiposdepropiedad:
       clean_table_name: property_types
+      raw_primary_keys:
+      - idtipodepropiedad
       clean_primary_keys:
       - id_property_type
       clean_z_order_by:
       - id_property_type
     subtiposdepropiedad:
       clean_table_name: property_subtypes
+      raw_primary_keys:
+      - idsubtipodepropiedad
       clean_primary_keys:
       - id_property_subtype
       clean_z_order_by:
       - id_property_type
     tiposdeoperacion:
       clean_table_name: operation_types
+      raw_primary_keys:
+      - idtipodeoperacion
       clean_primary_keys:
       - id_operation_type
       clean_z_order_by:
       - id_operation_type
     etapasdedesarrollo:
       clean_table_name: development_stages
+      raw_primary_keys:
+      - idetapadedesarrollo
       clean_primary_keys:
       - id_development_stage
       clean_z_order_by:
       - id_development_stage
     monedas:
       clean_table_name: currencies
+      raw_primary_keys:
+      - idmoneda
       clean_primary_keys:
       - id_currency
       clean_z_order_by:

@@ -21,40 +21,54 @@ workflow:
   tables_customization:
     avisos:
       clean_table_name: listings
+      raw_primary_keys:
+      - idaviso
       clean_primary_keys:
       - id_listing
       clean_z_order_by:
       - id_listing
     avisoscaracteristicas:
       clean_table_name: listing_features
+      raw_primary_keys:
+      - idavisocaracteristica
       clean_primary_keys:
       - id_listing_feature
       clean_z_order_by:
       - id_listing
     avisosgeolocationdata:
       clean_table_name: listing_geolocation_data
+      raw_primary_keys:
+      - idaviso
       clean_primary_keys:
       - id_listing
       clean_z_order_by:
       - id_listing
     avisosonline:
       clean_table_name: listings_online
+      raw_primary_keys:
+      - idaviso
       clean_primary_keys:
       - id_listing
       clean_z_order_by:
       - id_listing
     avisosrealestateranking:
       clean_table_name: listing_rankings
+      raw_primary_keys:
+      - idaviso
       clean_primary_keys: [id_listing]
       clean_z_order_by: [id_listing]
     avisostiposdeoperaciones:
       clean_table_name: listing_operation_types
+      raw_primary_keys:
+      - idavisostiposdeoperaciones
       clean_primary_keys:
       - id_listing_operation_type
       clean_z_order_by:
       - id_listing
     entregasavisos:
       clean_table_name: listing_deliveries
+      raw_primary_keys:
+      - identregaaviso
       clean_primary_keys:
       - id_listing_delivery
       clean_z_order_by:
@@ -72,6 +86,8 @@ workflow:
       - id_interface
     telefonosaviso:
       clean_table_name: listing_phones
+      raw_primary_keys:
+      - idtelefonoaviso
       clean_primary_keys:
       - id_listing_phone
       clean_z_order_by:
