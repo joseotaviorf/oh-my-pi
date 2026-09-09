@@ -21,20 +21,20 @@ column_level_validations:
   sk_ai_user:
     is_complete:
       severity_level: Warning
-  one_current_row_per_tool_id_user_period_type:
+  one_current_row_per_tool_sk_ai_user_period_type:
     custom:
-      # SCD2 integrity: at most one is_current row per (tool, id_user, period_type).
+      # SCD2 integrity: at most one is_current row per (tool, sk_ai_user, period_type).
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT
             tool,
-            id_user,
+            sk_ai_user,
             period_type
           FROM dw_ai_usage.dim_ai_budget
           WHERE is_current
           GROUP BY
             tool,
-            id_user,
+            sk_ai_user,
             period_type
           HAVING COUNT(*) > 1
         )) = 0
