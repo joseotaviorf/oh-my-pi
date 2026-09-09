@@ -1,5 +1,5 @@
 ---
-database_name: agentic_platform
+database_name: datalake_agentic_platform
 table_name: platform_events
 owner: lucas.cardozo@quintoandar.com.br
 domain: Conversational XP

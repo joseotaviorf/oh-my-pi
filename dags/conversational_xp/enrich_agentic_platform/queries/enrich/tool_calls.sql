@@ -21,6 +21,6 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.caller_agent') AS caller_agent,
     GET_JSON_OBJECT(event_properties, '$.destination_agent') AS destination_agent
 FROM
-    agentic_platform.platform_events
+    datalake_agentic_platform.platform_events
 WHERE
     event_name = 'agentic_tool_call_completed'

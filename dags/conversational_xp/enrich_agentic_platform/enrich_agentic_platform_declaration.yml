@@ -8,8 +8,8 @@ dag:
     dag_purpose: |
       Consolidate agentic platform evaluation and tool-call events from CDP
       into typed, deduplicated consumer tables at
-      agentic_platform.evaluations and agentic_platform.tool_calls.
-      A shared agentic_platform.platform_events table reads and deduplicates
+      datalake_agentic_platform.evaluations and datalake_agentic_platform.tool_calls.
+      A shared datalake_agentic_platform.platform_events table reads and deduplicates
       the upstream source once; downstream projections fan out via
       inner_dependencies.
 workflow:

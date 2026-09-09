@@ -25,6 +25,6 @@ SELECT
         'map<string,double>'
     ) AS metrics
 FROM
-    agentic_platform.platform_events
+    datalake_agentic_platform.platform_events
 WHERE
     event_name RLIKE '^agentic_platform_'

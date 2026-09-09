@@ -21,7 +21,6 @@ SCHEMAS_WITHOUT_DATALAKE_PREFIX = frozenset(
         "bi_metrics",
         "forrent_postcontract",
         "forsale_postcontract",
-        "agentic_platform",
     }
 )
 
@@ -47,8 +46,6 @@ CONSUMPTION_SCHEMAS = frozenset(
         "bi_metrics",
         "forrent_postcontract",
         "forsale_postcontract",
-        # agentic_platform is prefix-free enrich (enrich_agentic_platform DAG), not
-        # consumption — see conversational_xp/enrich_agentic_platform.
     }
 )
 

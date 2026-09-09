@@ -1,5 +1,5 @@
 ---
-database_name: agentic_platform
+database_name: datalake_agentic_platform
 table_name: evaluations
 owner: lucas.cardozo@quintoandar.com.br
 domain: Conversational XP
@@ -15,37 +15,37 @@ columns:
   id_event:
     description: "Unique CDP event identifier and merge key."
     lineage:
-      - agentic_platform.platform_events.id_event
+      - datalake_agentic_platform.platform_events.id_event
   id_person:
     description: "Person UUID carried by the governed event, when identity is available."
     lineage:
-      - agentic_platform.platform_events.id_person
+      - datalake_agentic_platform.platform_events.id_person
   id_user:
     description: |
       Numeric application user identifier carried by CDP, when available.
       Current evaluation events identify users through id_person instead.
     lineage:
-      - agentic_platform.platform_events.id_user
+      - datalake_agentic_platform.platform_events.id_user
   eval_level:
     description: "Evaluation grain derived from the source event name: session or trace."
     lineage:
-      - agentic_platform.platform_events.event_name
+      - datalake_agentic_platform.platform_events.event_name
   id_session:
     description: "Identifier of the evaluation session/window judged by the online evaluator."
     lineage:
-      - agentic_platform.platform_events.event_properties
+      - datalake_agentic_platform.platform_events.event_properties
   id_trace:
     description: "OTEL trace identifier for trace evaluations; null for session evaluations."
     lineage:
-      - agentic_platform.platform_events.event_properties
+      - datalake_agentic_platform.platform_events.event_properties
   id_chatbot:
     description: "Catalog identifier of the top-level chatbot conversation product."
     lineage:
-      - agentic_platform.platform_events.event_properties
+      - datalake_agentic_platform.platform_events.event_properties
   channel:
     description: "Conversation channel emitted with the evaluation, when available."
     lineage:
-      - agentic_platform.platform_events.event_properties
+      - datalake_agentic_platform.platform_events.event_properties
   agent_declared:
     description: |
       Agent under whose configuration the evaluator was declared. For trace
@@ -53,14 +53,14 @@ columns:
       it is lineage metadata, not attribution for the whole conversation, and
       must not be used to split session-level rates.
     lineage:
-      - agentic_platform.platform_events.event_properties
+      - datalake_agentic_platform.platform_events.event_properties
   metrics:
     description: |
       Dynamic map from metric name to numeric score. Binary scores are encoded
       as 1.0 or 0.0; continuous trace metrics retain their numeric values.
     lineage:
-      - agentic_platform.platform_events.event_properties
+      - datalake_agentic_platform.platform_events.event_properties
   ts_event:
     description: "Timestamp when the evaluation event occurred."
     lineage:
-      - agentic_platform.platform_events.ts_event
+      - datalake_agentic_platform.platform_events.ts_event
