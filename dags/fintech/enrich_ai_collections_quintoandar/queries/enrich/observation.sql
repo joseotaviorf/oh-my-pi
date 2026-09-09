@@ -71,33 +71,6 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'handle_non_tenant' THEN 1 ELSE 0 END) AS flag_handle_non_tenant,
     MAX(
         CASE
-            WHEN GET_JSON_OBJECT(trc.output, '$.responses[0].response_type') = 'human_escalation'
-            THEN 1
-            ELSE 0
-        END
-    ) AS flag_escalation_attempted,
-    MAX(
-        CASE
-            WHEN GET_JSON_OBJECT(trc.output, '$.responses[0].response_type') = 'human_escalation'
-            THEN GET_JSON_OBJECT(
-                trc.output,
-                '$.responses[0].content.hybrid_content.metadata[0].escalation_reason'
-            )
-            ELSE NULL
-        END
-    ) AS matthew_declared_escalation_reason,
-    MAX(
-        CASE
-            WHEN GET_JSON_OBJECT(trc.output, '$.responses[0].response_type') = 'human_escalation'
-            THEN GET_JSON_OBJECT(
-                trc.output,
-                '$.responses[0].content.hybrid_content.metadata[0].queue_name'
-            )
-            ELSE NULL
-        END
-    ) AS matthew_declared_escalation_queue,
-    MAX(
-        CASE
             WHEN UPPER(obs.type) = 'TOOL'
                 AND LOWER(obs.name) IN ('get_annual_tax_report_v1', 'get_paid_invoices_annual_report_v1', 'get_yearly_paid_invoices_report_tool')
                 AND (
@@ -119,7 +92,7 @@ FROM
 INNER JOIN
     datalake_langfuse_clean.traces AS trc
         ON trc.id_trace = obs.id_trace
-INNER JOIN
+LEFT SEMI JOIN
     datalake_chatbot.sessions AS cs
         ON cs.id_langfuse_session = trc.id_session
         AND cs.bot IN ('matthew', 'wall-e')

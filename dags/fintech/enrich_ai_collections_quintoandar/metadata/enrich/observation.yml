@@ -1,6 +1,6 @@
 database_name: datalake_ai_collections_quintoandar
 table_name: observation
-description: Per-session summary of Langfuse observations for Matthew (collections AI agent) sessions, with flags grouping negotiation flow signals, technical-state signals, and trace volume aggregates.
+description: Per-session summary of Langfuse observations for Matthew (collections AI agent) sessions, with flags grouping negotiation flow signals, technical-state signals, and trace volume aggregates. Observation-grain only — trace-grain signals such as the human-escalation attempt live on enrich_ai_collections_quintoandar.sessions, whose row universe is not restricted by the observation-name filter applied here.
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
@@ -126,18 +126,6 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: "1 if the session reached the handle_non_tenant state, signalling that the user is not a tenant."
-  flag_escalation_attempted:
-    lineage:
-      - datalake_langfuse_clean.traces.output
-    description: "1 if the agent ATTEMPTED to escalate the user to human support in the session, i.e. any of its traces emitted a human_escalation response (detected via GET_JSON_OBJECT(traces.output, '$.responses[0].response_type') = 'human_escalation'); else 0. This is the agent's attempt, not the outcome: an attempt only becomes an actual escalation when it happens within human-support working hours, which is why this can be 1 while the session's is_escalation is false. Derived name-agnostically from the trace output, so it is independent of which agent/tool produced the escalation (escalate_tool, HumanEscalationAgentV7Input, and future renames)."
-  matthew_declared_escalation_reason:
-    lineage:
-      - datalake_langfuse_clean.traces.output
-    description: "Free-text reason the agent gave for attempting to escalate the user to human support, extracted from the escalating trace output at $.responses[0].content.hybrid_content.metadata[0].escalation_reason. Populated whenever flag_escalation_attempted = 1 (the escalation attempt), regardless of whether it resulted in an actual escalation. NULL when no trace in the session emitted a human_escalation response. When more than one trace escalates in the same session, MAX() picks one reason lexicographically — rare, but not deterministic."
-  matthew_declared_escalation_queue:
-    lineage:
-      - datalake_langfuse_clean.traces.output
-    description: "Queue the agent attempted to route the escalation to, extracted from the escalating trace output at $.responses[0].content.hybrid_content.metadata[0].queue_name (e.g. 'OPS COBRANÇA ATIVO [POS]'). Populated whenever flag_escalation_attempted = 1 (the escalation attempt); it reflects the agent's intended target, not necessarily where the session was actually routed. Distinct from first_queue / last_queue, which are the queues that actually handled the session on the chatbot platform. NULL when no trace in the session emitted a human_escalation response. When more than one trace escalates in the same session, MAX() picks one queue lexicographically — rare, but not deterministic."
   confirm_negotiation_count_v3:
     lineage:
       - datalake_langfuse_clean.observations.name

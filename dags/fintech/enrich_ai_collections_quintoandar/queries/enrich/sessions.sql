@@ -1,4 +1,22 @@
-WITH trace_first_ranked AS (
+WITH matthew_prod_traces AS (
+    SELECT
+        t.id_session,
+        t.input,
+        t.output,
+        t.ts_created
+    FROM
+        datalake_langfuse_clean.traces AS t
+    LEFT SEMI JOIN
+        datalake_chatbot.sessions AS cs
+            ON cs.id_langfuse_session = t.id_session
+            AND cs.bot IN ('matthew', 'wall-e')
+    WHERE
+        MAKE_DATE(t.year, t.month, t.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
+        AND t.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
+        AND t.environment = 'prod'
+        AND t.id_session IS NOT NULL
+),
+trace_first_ranked AS (
     SELECT
         t.id_session AS id_langfuse_session,
         GET_JSON_OBJECT(t.input, '$.user_context.user_last_notifications[0].sent_at') AS notif_ts_extracted,
@@ -15,16 +33,7 @@ WITH trace_first_ranked AS (
         END AS is_owner_only,
         ROW_NUMBER() OVER (PARTITION BY t.id_session ORDER BY t.ts_created ASC) AS rn
     FROM
-        datalake_langfuse_clean.traces AS t
-    INNER JOIN
-        datalake_chatbot.sessions AS cs
-            ON cs.id_langfuse_session = t.id_session
-            AND cs.bot IN ('matthew', 'wall-e')
-    WHERE
-        MAKE_DATE(t.year, t.month, t.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND t.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
-        AND t.environment = 'prod'
-        AND t.id_session IS NOT NULL
+        matthew_prod_traces AS t
 ),
 trace_first AS (
     SELECT
@@ -40,6 +49,41 @@ trace_first AS (
         trace_first_ranked
     WHERE
         rn = 1
+),
+trace_escalation AS (
+    SELECT
+        id_session AS id_langfuse_session,
+        MAX(
+            CASE
+                WHEN GET_JSON_OBJECT(output, '$.responses[0].response_type') = 'human_escalation'
+                THEN 1
+                ELSE 0
+            END
+        ) AS flag_escalation_attempted,
+        MAX(
+            CASE
+                WHEN GET_JSON_OBJECT(output, '$.responses[0].response_type') = 'human_escalation'
+                THEN GET_JSON_OBJECT(
+                    output,
+                    '$.responses[0].content.hybrid_content.metadata[0].escalation_reason'
+                )
+                ELSE NULL
+            END
+        ) AS matthew_declared_escalation_reason,
+        MAX(
+            CASE
+                WHEN GET_JSON_OBJECT(output, '$.responses[0].response_type') = 'human_escalation'
+                THEN GET_JSON_OBJECT(
+                    output,
+                    '$.responses[0].content.hybrid_content.metadata[0].queue_name'
+                )
+                ELSE NULL
+            END
+        ) AS matthew_declared_escalation_queue
+    FROM
+        matthew_prod_traces
+    GROUP BY
+        id_session
 ),
 score_matthew AS (
     SELECT
@@ -120,6 +164,9 @@ sessions_enriched AS (
             ELSE FALSE
         END AS flag_eval_matthew_in_chat,
         m.is_escalated AS is_escalation,
+        COALESCE(te.flag_escalation_attempted, 0) AS flag_escalation_attempted,
+        te.matthew_declared_escalation_reason,
+        te.matthew_declared_escalation_queue,
         tf.id_langfuse_session IS NOT NULL AS flag_session_with_trace,
         tf.notif_ts_extracted,
         tf.notif_text_extracted,
@@ -142,6 +189,9 @@ sessions_enriched AS (
     LEFT JOIN
         trace_first AS tf
             ON tf.id_langfuse_session = m.id_langfuse_session
+    LEFT JOIN
+        trace_escalation AS te
+            ON te.id_langfuse_session = m.id_langfuse_session
     LEFT JOIN
         score_matthew AS sm
             ON sm.id_langfuse_session = m.id_langfuse_session
@@ -167,6 +217,9 @@ sessions_deduped AS (
         matthew_version,
         flag_eval_matthew_in_chat,
         is_escalation,
+        flag_escalation_attempted,
+        matthew_declared_escalation_reason,
+        matthew_declared_escalation_queue,
         flag_session_with_trace,
         notif_ts_extracted,
         notif_text_extracted,
@@ -205,6 +258,9 @@ SELECT
     matthew_version,
     flag_eval_matthew_in_chat,
     is_escalation,
+    flag_escalation_attempted,
+    matthew_declared_escalation_reason,
+    matthew_declared_escalation_queue,
     flag_session_with_trace,
     notif_ts_extracted,
     notif_text_extracted,

@@ -88,6 +88,18 @@ columns:
     lineage:
       - datalake_chatbot.sessions.is_escalated
     description: "Boolean flag indicating that the session was escalated to a human agent."
+  flag_escalation_attempted:
+    lineage:
+      - datalake_langfuse_clean.traces.output
+    description: "1 if the agent ATTEMPTED to escalate the session to human support, i.e. any of its prod traces emitted a human_escalation response (detected via GET_JSON_OBJECT(traces.output, '$.responses[0].response_type') = 'human_escalation'); else 0. Aggregated over every trace of the session and derived name-agnostically from the trace output, so it is independent of which agent/tool produced the escalation (escalate_tool, HumanEscalationAgentV7Input, future renames). This is the agent's attempt, not the outcome: an attempt only becomes an actual escalation when it happens within human-support working hours, which is why this can be 1 while is_escalation is false."
+  matthew_declared_escalation_reason:
+    lineage:
+      - datalake_langfuse_clean.traces.output
+    description: "Free-text reason the agent gave for attempting to escalate the session to human support, extracted from the escalating trace output at $.responses[0].content.hybrid_content.metadata[0].escalation_reason. Populated whenever flag_escalation_attempted = 1 (the attempt), regardless of whether it resulted in an actual escalation. NULL when no trace in the session emitted a human_escalation response. When more than one trace escalates in the same session, MAX() picks one reason lexicographically — rare, but not deterministic."
+  matthew_declared_escalation_queue:
+    lineage:
+      - datalake_langfuse_clean.traces.output
+    description: "Queue the agent attempted to route the escalation to, extracted from the escalating trace output at $.responses[0].content.hybrid_content.metadata[0].queue_name (e.g. 'OPS COBRANCA ATIVO [POS]'). Populated whenever flag_escalation_attempted = 1; it reflects the agent's intended target, not necessarily where the session was actually routed. Distinct from first_queue / last_queue, which are the queues that actually handled the session on the chatbot platform. NULL when no trace in the session emitted a human_escalation response. When more than one trace escalates in the same session, MAX() picks one queue lexicographically — rare, but not deterministic."
   flag_session_with_trace:
     lineage:
       - datalake_langfuse_clean.traces.id_session
