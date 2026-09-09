@@ -261,8 +261,8 @@ columns:
       SECONDARY: Listing for a Secondary Market (resale) property.
   is_primary_market:
     lineage:
-    - datalake_ebdb_listing.house.is_sale_primary_market
-    description: Whether the listing is of the primary market type. Passthrough of house.is_sale_primary_market.
+    - datalake_sale_primary_market.listing_sale_type.sale_type
+    description: Backward-compatible boolean derived from sale_type. TRUE only when sale_type = PRIMARY; FALSE for SECONDARY or NULL. Prefer sale_type for new analyses.
   is_offer_and_visit_stranded:
     description: Boolean column that indicates if the listing is also Visit Stranded if it has the Offer Stranded status. According to the table construction, for the `stranded_status` column, when a listing is Offer Stranded, we will mark it as Offer Stranded regardless of whether it is also Visit Stranded. This flag is to provide this visibility.
     lineage:

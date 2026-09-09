@@ -5,9 +5,8 @@ domain: For Sale
 description: >
   One row per house classifying its SALE listing as PRIMARY or SECONDARY from
   ListingSaleModel.sale_type. Grain is one SALE listing_business_context per
-  house. NULL enum values are filled as SECONDARY. Old primary-market test
-  listings (is_primary_market = TRUE) are excluded, so this table is no longer
-  a mix of the Órulo pilot and legacy boolean-flagged houses. Also carries that
+  house. NULL enum values are filled as SECONDARY. The legacy
+  is_primary_market flag is not used for classification. Also carries that
   same listing's min_price and max_price. Single source of truth so other
   enrich/DW tables can join sale_type or price instead of re-deriving the SALE
   listing_sale_model lookup.
@@ -23,9 +22,8 @@ columns:
     description: >
       PRIMARY or SECONDARY market classification of the house's SALE listing.
       Taken from listing_sale_model.sale_type; when the enum is NULL, filled as
-      SECONDARY. Listing_sale_model rows with is_primary_market = TRUE (old
-      primary-market tests) are excluded, so this column does not fall back to
-      the legacy boolean.
+      SECONDARY. The legacy is_primary_market flag is retained only as an
+      upstream source field and is not used to derive this classification.
     categories:
       PRIMARY: New-build inventory sold by an incorporadora, from the ListingSaleModel.sale_type enum.
       SECONDARY: Resale inventory, including listings whose sale_type enum is still NULL.

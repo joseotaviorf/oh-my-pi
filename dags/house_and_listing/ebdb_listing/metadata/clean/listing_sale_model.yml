@@ -17,7 +17,7 @@ columns:
   is_primary_market:
     lineage:
       - datalake_ebdb_raw.listingsalemodel.isprimarymarket
-    description: Boolean flag indicating if this is a primary market listing.
+    description: Legacy upstream boolean from ListingSaleModel. Not authoritative and not used for current market classification; use sale_type instead.
   has_great_sale_price_tag:
     lineage:
       - datalake_ebdb_raw.listingsalemodel.hasGreatSalePriceTag

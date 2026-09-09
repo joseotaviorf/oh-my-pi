@@ -76,8 +76,8 @@ enriched AS (
     bp_status.ts_activation_end,
     NOW() AS ts_load,
     -- Strictly the Orulo pilot (house_development), not listing_sale_type's
-    -- legacy is_primary_market fallback, which also covers ~4.7k unrelated
-    -- pre-pilot houses and would mislabel historic secondary activations.
+    -- Do not use the legacy is_primary_market flag: it is stale and broader
+    -- than strict Primary pilot membership.
     CASE WHEN hd.id_house IS NOT NULL THEN 'PRIMARY' ELSE 'SECONDARY' END AS sale_type,
     slpc.change_number,
     MAX(slpc.change_number) OVER (PARTITION BY bp_status.id_buyer_prospect, bp_status.ts_activation, bp_status.id_house) AS _w

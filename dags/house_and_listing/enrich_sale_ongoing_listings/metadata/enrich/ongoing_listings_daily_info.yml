@@ -46,7 +46,8 @@ columns:
     description: >
       Listing market type for the SALE listing business context of this house, sourced
       from the primary-market SSOT enrich_sale_primary_market.listing_sale_type (PRIMARY
-      or SECONDARY, ListingSaleModel.saleType with legacy is_primary_market fallback).
+      or SECONDARY, ListingSaleModel.saleType; the legacy is_primary_market flag is
+      not used).
       Null when the house has no SALE listing sale model. Grain is id_house. Cut stock
       metrics with sale_type = 'PRIMARY'.
     categories:

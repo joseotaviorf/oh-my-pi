@@ -61,7 +61,7 @@ columns:
     lineage:
       - datalake_sales_flow_raw.house.image_url
   is_primary_market:
-    description: Flag indicating whether the property was acquired in the real estate primary market (new development) rather than the resale/secondary market.
+    description: Legacy Sales Flow source flag retained for lineage. Not authoritative for current market classification; use sale_type from the Primary Market or Sales Flow source of truth.
     lineage:
       - datalake_sales_flow_raw.house.is_primary_market
   ts_notified_on_negotiation:

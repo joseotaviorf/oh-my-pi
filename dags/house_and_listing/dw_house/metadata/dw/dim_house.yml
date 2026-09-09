@@ -167,7 +167,7 @@ columns:
   is_sale_primary_market:
     lineage:
       - datalake_ebdb_listing.house.is_sale_primary_market
-    description: If the house is in the primary market.
+    description: Boolean derived from listing_sale_model.sale_type. TRUE when any SALE listing has sale_type PRIMARY; the legacy is_primary_market flag is not used.
   ts_created:
     lineage:
       - datalake_ebdb_listing.house.dt_creation

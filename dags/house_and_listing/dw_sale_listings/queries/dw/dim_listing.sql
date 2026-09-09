@@ -50,7 +50,10 @@ SELECT
   h.is_sale_3p_supply AS is_3p_supply,
   h.is_casa_mineira_migration,
   h.sale_price > 1000000 AS is_high_ticket,
-  h.is_sale_primary_market AS is_primary_market,
+  CASE
+    WHEN lst.sale_type = 'PRIMARY' THEN TRUE
+    ELSE FALSE
+  END AS is_primary_market,
   ssl.is_offer_and_visit_stranded,
   sl.is_for_rent,
   sl.has_active_rental_contract,
