@@ -12,6 +12,7 @@ dag:
 workflow:
   type: query_delta
   layer: dw
+  bucket_config_name: people_bucket
   custom_schema: ai_usage
   default_extraction_type: full
   serialize_dq_after_default_row: true

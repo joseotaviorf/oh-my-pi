@@ -11,6 +11,7 @@ dag:
 workflow:
   layer: enrich
   type: query_delta
+  bucket_config_name: people_bucket
   custom_schema: ai_usage
   default_extraction_type: full
   default_table_privileges:
