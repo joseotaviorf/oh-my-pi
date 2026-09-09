@@ -13,6 +13,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+from gspread.exceptions import WorksheetNotFound
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 from quintoandar_gsheets_api_client.producer import GoogleSheetsWriter
 
@@ -166,10 +167,23 @@ def _iter_payload_write_chunks(payload: list, chunk_size: int) -> list[list]:
 
 
 def _get_worksheet(writer: GoogleSheetsWriter, sheet_id: str, sheet_tab: str):
-    """Return the gspread worksheet handle for one tab."""
-    return writer.google_sheets_client.gsheets.open_by_key(sheet_id).worksheet(
-        sheet_tab
-    )
+    """
+    Return the gspread worksheet handle for one tab.
+
+    When the tab is missing, create it so reverse exports recover from
+    accidental deletion without manual spreadsheet edits. Grid size is
+    grown later by ``_grow_worksheet_grid`` before writing payload data.
+    """
+    workbook = writer.google_sheets_client.gsheets.open_by_key(sheet_id)
+    try:
+        return workbook.worksheet(sheet_tab)
+    except WorksheetNotFound:
+        logger.warning(
+            "Sheet tab '%s' not found in spreadsheet %s; creating it",
+            sheet_tab,
+            sheet_id,
+        )
+        return workbook.add_worksheet(title=sheet_tab, rows=1, cols=1)
 
 
 def _grow_worksheet_grid(worksheet, n_rows: int, n_cols: int) -> None:

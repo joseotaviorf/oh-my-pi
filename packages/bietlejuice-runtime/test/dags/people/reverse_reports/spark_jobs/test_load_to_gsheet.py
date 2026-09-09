@@ -105,13 +105,55 @@ class TestIterPayloadWriteChunks(unittest.TestCase):
         self.assertEqual(chunks, [[["h"], ["1"], ["2"]], [["3"], ["4"]], [["5"]]])
 
 
+class TestGetWorksheet(unittest.TestCase):
+    """Tests for _get_worksheet helper."""
+
+    def test_returns_existing_worksheet(self):
+        mock_writer = MagicMock()
+        mock_workbook = MagicMock()
+        mock_worksheet = MagicMock()
+        mock_writer.google_sheets_client.gsheets.open_by_key.return_value = (
+            mock_workbook
+        )
+        mock_workbook.worksheet.return_value = mock_worksheet
+
+        result = job._get_worksheet(mock_writer, "sheet-id", "Tab")
+
+        self.assertEqual(result, mock_worksheet)
+        mock_workbook.worksheet.assert_called_once_with("Tab")
+        mock_workbook.add_worksheet.assert_not_called()
+
+    def test_creates_worksheet_when_tab_missing(self):
+        mock_writer = MagicMock()
+        mock_workbook = MagicMock()
+        mock_worksheet = MagicMock()
+        mock_writer.google_sheets_client.gsheets.open_by_key.return_value = (
+            mock_workbook
+        )
+        mock_workbook.worksheet.side_effect = job.WorksheetNotFound("ALL5A1")
+        mock_workbook.add_worksheet.return_value = mock_worksheet
+
+        result = job._get_worksheet(mock_writer, "sheet-id", "ALL5A1")
+
+        self.assertEqual(result, mock_worksheet)
+        mock_workbook.add_worksheet.assert_called_once_with(
+            title="ALL5A1",
+            rows=1,
+            cols=1,
+        )
+
+
 class TestWritePayloadInChunks(unittest.TestCase):
     """Tests for _write_payload_in_chunks helper."""
 
     def _build_writer_with_worksheet(self):
         mock_writer = MagicMock()
+        mock_workbook = MagicMock()
         mock_worksheet = MagicMock()
-        mock_writer.google_sheets_client.gsheets.open_by_key.return_value.worksheet.return_value = mock_worksheet
+        mock_writer.google_sheets_client.gsheets.open_by_key.return_value = (
+            mock_workbook
+        )
+        mock_workbook.worksheet.return_value = mock_worksheet
         return mock_writer, mock_worksheet
 
     def test_small_payload_grows_grid_and_updates_from_a1(self):
