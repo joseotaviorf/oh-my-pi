@@ -1,0 +1,35 @@
+---
+database_name: datalake_house_listing_search_clean
+table_name: user_collection
+owner: tomas.nunes@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores user-owned listing collections in the House Listing Search service, including the default interest list and custom favorite lists"
+columns:
+  id:
+    description: "Surrogate primary key for the user collection row in the transactional database"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection.id
+  uuid_external_id:
+    description: "Stable external identifier for the collection (UUID for custom lists; fixed value for built-in lists such as the interest list)"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection.external_id
+  id_user:
+    description: "Identifier of the user who owns the collection in the source system"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection.user_id
+  list_type:
+    description: "Type of collection in the House Listing Search domain (for example INTEREST_LIST, CUSTOM_LIST, or CONDO_INTEREST_LIST)"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection.list_type
+  name_custom:
+    description: "Display name for a custom collection; null for built-in collection types"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection.custom_name
+  ts_created:
+    description: "Timestamp when the user collection row was first created in the source database"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection.created_at
+  ts_updated:
+    description: "Timestamp when the user collection row was last updated in the source database"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection.updated_at

@@ -23,4 +23,6 @@ workflow:
     search_profile_filters: {}
     search_profile_description: {}
     concierge_trigger: {}
+    user_collection: {}
+    user_collection_listing: {}
 

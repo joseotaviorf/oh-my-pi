@@ -1,0 +1,31 @@
+---
+database_name: datalake_house_listing_search_clean
+table_name: user_collection_listing
+owner: tomas.nunes@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores listings saved inside a user collection in the House Listing Search service, including favorites in the interest list and items in custom lists"
+columns:
+  id:
+    description: "Surrogate primary key for the user collection listing row in the transactional database"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection_listing.id
+  id_user_collection:
+    description: "Foreign key to the parent user collection (matches user_collection.id in the source database)"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection_listing.user_collection_id
+  id_listing:
+    description: "Identifier of the listing saved in the collection"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection_listing.listing_id
+  business_context:
+    description: "Business context of the saved listing (for example RENT or SALE)"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection_listing.business_context
+  listing_origin:
+    description: "Origin of the listing in the collection (for example TRANSACTIONAL, CLASSIFIED, or DEVELOPMENT)"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection_listing.listing_origin
+  ts_updated:
+    description: "Timestamp when the listing was last added or updated in the collection in the source database"
+    lineage:
+    - datalake_house_listing_search_raw.user_collection_listing.updated_at
