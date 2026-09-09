@@ -20,6 +20,7 @@ SELECT
         WHEN business_unit_name IN ('Benvi PT', 'Remote') THEN 'QuintoAndar Portugal'
         ELSE business_unit_name
     END AS consolidated_business_unit_name,
+    legal_employer_name,
     country,
     CASE
         WHEN business_unit_name = 'QuintoAndar MG' THEN '16.788.643/0021-25'

@@ -39,6 +39,47 @@ bu_legislation AS (
     WHERE
         rn = 1
 ),
+bu_legal_employer_counts AS (
+    SELECT
+        a.id_business_unit,
+        le.name AS legal_employer_name,
+        COUNT(*) AS assignment_count
+    FROM
+        datalake_pin_core_clean.all_assignments AS a
+    INNER JOIN
+        datalake_pin_core_clean.hr_organization AS le
+            ON le.id_organization = a.id_legal_entity
+            AND le.classification_code = 'HCM_LEMP'
+            AND le.dt_effective_ended = DATE('9999-12-31')
+    WHERE
+        a.is_primary = TRUE
+        AND a.is_active = TRUE
+        AND a.dt_effective_started <= DATE('{load_start_date}')
+        AND a.dt_effective_ended >= DATE('{load_start_date}')
+    GROUP BY
+        a.id_business_unit,
+        le.name
+),
+bu_legal_employer_ranked AS (
+    SELECT
+        id_business_unit,
+        legal_employer_name,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_business_unit
+            ORDER BY assignment_count DESC, legal_employer_name ASC
+        ) AS rn
+    FROM
+        bu_legal_employer_counts
+),
+bu_legal_employer AS (
+    SELECT
+        id_business_unit,
+        legal_employer_name
+    FROM
+        bu_legal_employer_ranked
+    WHERE
+        rn = 1
+),
 base AS (
     SELECT
         id_organization,
@@ -191,6 +232,7 @@ SELECT
     cwr.id_legal_entity,
     cwr.organization_code,
     cwr.business_unit_name,
+    ble.legal_employer_name,
     /* Temporary workaround: PIN has country names in legislative_data_group, but we have
     not modeled that lookup yet. Map legislation_code to English country names in a CASE.
     Named branches override BUs whose PIN legislation (or missing assignment fallback)
@@ -241,3 +283,6 @@ FROM
 LEFT JOIN
     bu_legislation AS bl
         ON bl.id_business_unit = cwr.id_organization
+LEFT JOIN
+    bu_legal_employer AS ble
+        ON ble.id_business_unit = cwr.id_organization

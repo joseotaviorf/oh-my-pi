@@ -26,6 +26,15 @@ columns:
     description: Display name of the QuintoAndar business unit in the enriched org structure.
     lineage:
       - datalake_pin_core_clean.hr_organization.name
+  legal_employer_name:
+    description: |
+      Legal employer label from PIN (Empregador Legal) for the business unit, one row per
+      business unit on the load date (e.g. 'BENVI PT' for Remote, 'DRIDCO S.A.U.' for
+      Classifieds Latam). Resolved from the majority legal entity among active primary
+      assignments; NULL when the unit has no active primary assignments.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.id_legal_entity
+      - datalake_pin_core_clean.hr_organization.name
   country:
     description: Operating country of the business unit in English (e.g. 'Peru', 'Brazil'), derived from the majority legal-employer legislation_code on active primary assignments and overridden for Deel - QuintoAndar (United States), Benvi MX (Mexico), and QuintoAndar SC (Brazil) where legislation_code does not match allocation country.
     lineage:

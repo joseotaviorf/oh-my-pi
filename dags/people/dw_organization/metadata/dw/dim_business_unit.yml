@@ -37,6 +37,14 @@ columns:
         Portugal operating label. Source business_unit_name Benvi PT and Remote (international contractors under Benvi PT, replacing Deel).
     lineage:
       - datalake_people.business_unit.business_unit_name
+  legal_employer_name:
+    description: |
+      Legal employer label from PIN (Empregador Legal) for headcount allocated to this business
+      unit (e.g. 'BENVI PT' for Remote, 'DRIDCO S.A.U.' for Classifieds Latam). One row per
+      business unit; NULL when the unit has no active primary assignments. Use with
+      business_unit_name when the assignment unit is an umbrella label.
+    lineage:
+      - datalake_people.business_unit.legal_employer_name
   country:
     description: Operating country of the business unit in English (e.g. 'Peru', 'Brazil').
     lineage:

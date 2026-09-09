@@ -109,7 +109,7 @@ SELECT
     dip.dt_inicio_person AS dt_inicio_person,
     j.band AS band,
     c.github_username AS github_user,
-    bu.business_unit_name AS unidade_negocio,
+    bu.legal_employer_name AS empregador_legal,
     YEAR(DATE('{load_start_date}')) AS year,
     MONTH(DATE('{load_start_date}')) AS month,
     DAY(DATE('{load_start_date}')) AS day
