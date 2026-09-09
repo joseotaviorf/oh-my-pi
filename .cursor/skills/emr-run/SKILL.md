@@ -64,17 +64,90 @@ cluster creation.
 Ask the user which role fits when the data domain is ambiguous. A cluster's
 role is fixed at creation — to switch roles, create another cluster.
 
+## Bootstrap profiles (pick at cluster creation)
+
+The bootstrap script is **fixed at cluster creation**. Wrong bootstrap → missing
+Python deps or failed `dbutils` — terminate and recreate; `submit-step` cannot
+fix it.
+
+| Profile | Bootstrap script | When to use |
+| ------- | ---------------- | ----------- |
+| **Minimal** | `migration-emr-cli/samples/init/emr_init_minimal.sh` | SQL via `run_sql_job.py`; self-contained PySpark with no `bietlejuice` secrets or DAG `custom_libraries` |
+| **Production DAG** | `packages/bietlejuice-compiler/scripts/emr_init_script.sh` | DAG spark jobs (`load_to_gsheet`, anything using `BaseDBUtils`, `gspread`, `quintoandar_gsheets_api_client`, or `*_cluster.yml` `custom_libraries`) |
+
+**Minimal installs only** `bi-etl-ejuice` + `delta-spark` + logger. It does
+**not** install `gspread`, `quintoandar_gsheets_api_client`, or other
+`custom_libraries` from a DAG's `*_cluster.yml`.
+
+**Production DAG bootstrap** needs three args (artifacts bucket, optional
+Databricks bucket for event logs, Airflow `dag_id`). Repeat the artifacts
+bucket as arg 2 when you only need custom libraries:
+
+```bash
+INIT_SCRIPT="$PWD/packages/bietlejuice-compiler/scripts/emr_init_script.sh"
+ARTIFACTS_BUCKET='s3://artifacts.s3.data.quintoandar.com.br'   # prod
+# forno: s3://artifacts.s3.forno.data.quintoandar.com.br
+AIRFLOW_DAG_ID='bietlejuice.reverse_reports'   # match the DAG under test
+
+cd $CLI_DIR && uv run migration-emr-cli create-cluster \
+  --name "emr-run-${ROLE}-$(date +%s)" \
+  --job-flow-role "$ROLE" \
+  --no-use-spot \
+  --tag Purpose=emr-run \
+  --tag "JobFlowRole=${ROLE}" \
+  --tag "Owner=$(whoami)" \
+  --tag "AirflowDagId=${AIRFLOW_DAG_ID}" \
+  --bootstrap-script-uri "$INIT_SCRIPT" \
+  --bootstrap-arg "$ARTIFACTS_BUCKET" \
+  --bootstrap-arg "$ARTIFACTS_BUCKET" \
+  --bootstrap-arg "$AIRFLOW_DAG_ID"
+```
+
+On forno, swap `ARTIFACTS_BUCKET` and `EMR_SETTINGS_FILE` (see **Forno** below).
+
+**Reuse rule:** when reusing a cluster, its bootstrap must match the next job.
+Do not run `load_to_gsheet` on a cluster created with minimal bootstrap.
+
+## Deploy mode (`client` vs `cluster`)
+
+`migration-validate.yml` defaults to **`deploy_mode: client`** (good for SQL).
+Production Airflow EMR steps use **cluster** mode.
+
+| Job type | Deploy mode | Why |
+| -------- | ----------- | --- |
+| `run_sql_job.py` (ad-hoc SQL) | `client` (default) | Self-contained; no `bietlejuice` dbutils |
+| DAG spark jobs using `BaseDBUtils` / Secrets Manager | **`cluster`** | `SPARK_RUNTIME=emr` must reach the Python driver; in `client` mode the driver often misses it and `get_dbutils()` falls through to `IPython` → `ModuleNotFoundError: No module named 'IPython'` |
+
+Pass `--deploy-mode cluster` on `submit-step` for any job that reads Databricks
+secrets via `BaseDBUtils` (e.g. `load_to_gsheet`, API ingestion jobs):
+
+```bash
+cd $CLI_DIR && uv run migration-emr-cli submit-step \
+  --cluster-id j-XXXX \
+  --deploy-mode cluster \
+  --step-name my-job \
+  --uri /absolute/path/to/job.py \
+  --job-args 'arg1 arg2' \
+  --wait --follow-logs
+```
+
+Cluster-mode steps may upload step stdout/stderr to S3 **later** or not at all;
+use `aws emr describe-step` for terminal state and **`emr-dump-logs`** after
+~30–60 s if logs are missing.
+
 ## 1. Reuse or create the cluster
 
 Reuse only clusters **this skill created** (tag `Purpose=emr-run`) whose
-`JobFlowRole` tag matches the role you need. Never submit ad-hoc steps to
-fleet DAG clusters or `migration-validation` clusters.
+`JobFlowRole` tag matches the role you need **and** whose bootstrap matches the
+job (check `AirflowDagId` tag or recreate). Never submit ad-hoc steps to fleet
+DAG clusters or `migration-validation` clusters.
 
 ```bash
 cd $CLI_DIR && uv run migration-emr-cli list-clusters --tag Purpose=emr-run --output json
 ```
 
-If a matching cluster is `WAITING`/`RUNNING`, use its `j-…` id. Otherwise create:
+If a matching cluster is `WAITING`/`RUNNING`, use its `j-…` id. Otherwise create
+with the bootstrap profile from the table above. Minimal-only example:
 
 ```bash
 ROLE=emr-people-prod   # or emr-prod, etc.
@@ -84,7 +157,9 @@ cd $CLI_DIR && uv run migration-emr-cli create-cluster \
   --no-use-spot \
   --tag Purpose=emr-run \
   --tag "JobFlowRole=${ROLE}" \
-  --tag "Owner=$(whoami)"
+  --tag "Owner=$(whoami)" \
+  --bootstrap-script-uri "$PWD/$CLI_DIR/samples/init/emr_init_minimal.sh" \
+  --bootstrap-arg 's3://artifacts.s3.data.quintoandar.com.br'
 ```
 
 Then poll until `WAITING` (~8–12 min; check every ~60 s):
@@ -148,8 +223,9 @@ Notes:
   For large results, download `$RESULT_URI` with `aws s3 cp` and
   inspect with **Read**/**Grep** instead of dumping it all to the terminal.
 * Long queries: drop `--follow-logs` to reduce noise; keep `--wait`.
+* SQL-only clusters can use **minimal** bootstrap; deploy mode **client** is fine.
 
-## 3. Run PySpark code
+## 3. Run PySpark / DAG spark jobs
 
 Any self-contained PySpark driver works the same way — build the session like
 `run_sql_job.py` does (Glue + Delta + `enableHiveSupport`) so lake tables
@@ -165,15 +241,41 @@ cd $CLI_DIR && uv run migration-emr-cli submit-step \
 ```
 
 `--job-args` become the driver's `sys.argv` (not `spark-submit --conf`). The
-CLI already injects Delta/Glue/`SPARK_RUNTIME=emr` confs before the script.
+CLI injects Delta/Glue/`SPARK_RUNTIME=emr` confs before the script.
 `--uri` must point to a **`.py`** file — JARs are not supported by this CLI.
 Don't set `spark.databricks.*` confs: EMR silently drops them by design.
 
-If the code imports **bietlejuice** (e.g. `DeltaLoader`), the cluster needs the
-wheels bootstrap at creation time:
+### Pre-flight checklist (DAG spark jobs)
+
+Before `submit-step`, confirm:
+
+1. **Role** — `emr-people-prod` for `dags/people/*` (secrets in `people` scope).
+2. **Bootstrap** — production `emr_init_script.sh` + `bietlejuice.<dag_name>` when
+   the job imports `gspread`, `quintoandar_gsheets_api_client`, or
+   `BaseDBUtils.get_dbutils()`.
+3. **Deploy mode** — `--deploy-mode cluster` when the job uses `BaseDBUtils` /
+   Secrets Manager (see **Deploy mode** above).
+4. **Partition / args** — match production `spark_job_arguments` from the DAG
+   declaration (e.g. `load_to_gsheet`: `table_name`, `load_start_date`,
+   `environment`, `sheet_id`, `sheet_tab`).
+
+Example — validate `reverse_reports` / `load_to_gsheet` on prod:
 
 ```bash
-  --bootstrap-script-uri "$PWD/../../../../packages/emr-cli/samples/init/emr_init_minimal.sh" \
+cd $CLI_DIR && uv run migration-emr-cli submit-step \
+  --cluster-id j-XXXX \
+  --deploy-mode cluster \
+  --step-name emr-run-all5a-export \
+  --uri "$PWD/dags/people/reverse_reports/spark_jobs/load_to_gsheet.py" \
+  --job-args "all_5a_demographics 2026-09-08 prod <sheet_id> ALL5A1" \
+  --wait --follow-logs
+```
+
+If the code imports **bietlejuice** without DAG `custom_libraries` (e.g.
+`DeltaLoader` only), minimal bootstrap is enough:
+
+```bash
+  --bootstrap-script-uri "$PWD/$CLI_DIR/samples/init/emr_init_minimal.sh" \
   --bootstrap-arg 's3://artifacts.s3.data.quintoandar.com.br'   # prod
 ```
 
@@ -199,6 +301,20 @@ cd $CLI_DIR && uv run migration-emr-cli terminate --cluster-id j-XXXX
 Step failed / no output: use the **`emr-dump-logs`** skill
 (`.cursor/skills/emr-dump-logs/SKILL.md`). Ad-hoc CLI steps log under
 `cli/<cluster_id>/steps/<step_id>/` in the artifacts bucket.
+
+If `follow-logs` prints *"No step logs appeared"* but the step already finished,
+wait 30–60 s and pull logs manually, or run `aws emr describe-step` for state.
+
+### Known failure patterns
+
+| Symptom | Likely cause | Fix |
+| ------- | ------------ | --- |
+| Step fails in &lt;5 s, no S3 logs | Missing Python dep (`gspread`, `quintoandar_gsheets_api_client`, …) | Recreate cluster with **production DAG** bootstrap + correct `AIRFLOW_DAG_ID` |
+| `ModuleNotFoundError: No module named 'IPython'` in stdout | `client` deploy mode; `SPARK_RUNTIME` not on driver; `BaseDBUtils` used Databricks path | Retry with `--deploy-mode cluster` |
+| `ModuleNotFoundError: gspread` / `quintoandar_gsheets_api_client` | Minimal bootstrap on a gsheets job | Recreate with production DAG bootstrap |
+| `RuntimeError: DBUtils not available` | Same as IPython row | `--deploy-mode cluster` + production bootstrap |
+| `gspread.exceptions.WorksheetNotFound` | Missing Google Sheet **tab** (job ran correctly) | Application/data issue — not a cluster bootstrap issue |
+| `AccessDenied` on S3 or secrets | Wrong `JobFlowRole` | New cluster with correct role (`emr-people-prod` for People) |
 
 Other diagnostics:
 
