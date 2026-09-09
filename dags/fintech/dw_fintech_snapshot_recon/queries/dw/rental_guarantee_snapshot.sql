@@ -4,6 +4,8 @@ SELECT
     g.guarantee_type,
     gc.payment_recurrence,
     g.guarantee_status,
+    g.final_value,
+    g.base_value,
     g.ts_started,
     g.ts_cancellation_requested,
     g.ts_paid,

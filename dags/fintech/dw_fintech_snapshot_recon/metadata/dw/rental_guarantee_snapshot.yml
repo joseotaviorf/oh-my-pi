@@ -25,6 +25,14 @@ columns:
     lineage:
       - datalake_rental_guarantee_clean.guarantee.guarantee_status
     description: "Current status of the guarantee in the rental guarantee platform."
+  final_value:
+    lineage:
+      - datalake_rental_guarantee.guarantee.final_value
+    description: "Final billed guarantee amount (DECIMAL 12,2) from the enrich guarantee table at snapshot time."
+  base_value:
+    lineage:
+      - datalake_rental_guarantee.guarantee.base_value
+    description: "Base guarantee amount (DECIMAL 12,2) from the enrich guarantee table at snapshot time, before score adjustments."
   ts_started:
     lineage:
       - datalake_rental_guarantee_clean.guarantee.ts_started
