@@ -1,6 +1,6 @@
 # Supply Revamp
 
-> **Status: WIP (work in progress).** This document covers only the first slice of the Rene Descartes Supply Revamp data model — `contact_info`, `intent`, and the application entities `contact_identifier` / `contact_info_identifier`. It does **not** replace the production funnel model in [`supply.md`](supply.md) (`dw_growth.obt_supply`, `dw_growth.fact_supply_events`). Do not mix revamp clean tables with legacy funnel metrics until downstream DW/enrich layers exist.
+> **Status: WIP (work in progress).** This document covers only the first slice of the Rene Descartes Supply Revamp data model — `contact_info`, `intent`, and the application entities `contact_identifier` / `contact_info_identifier`. In the lake today, **only `lead_intent` is ingested**. `contact_info` lives in Rene Descartes PostgreSQL and is **not** loaded to `datalake_rene_descartes_clean`. This doc does **not** replace the production funnel model in [`supply.md`](supply.md) (`dw_growth.obt_supply`, `dw_growth.fact_supply_events`). Do not mix revamp clean tables with legacy funnel metrics until downstream DW/enrich layers exist.
 
 ## Ownership
 
@@ -26,24 +26,24 @@ Supply Revamp is the new Rene Descartes entity model for first-party Supply acqu
 
 | Canonical | Lake table (`datalake_rene_descartes_clean`) |
 |-----------|-----------------------------------------------|
-| `contact_info` | `lead_contact_info` |
+| `contact_info` | not ingested (CDC load of `lead_contact_info` removed) |
 | `intent` | `lead_intent` |
 | `contact_identifier` | not ingested yet |
 | `contact_info_identifier` | not ingested yet |
 
 **What is in production in the lake today (this doc only):**
 
-1. **Contact info** — one row per Supply customer (`lead_contact_info` in the lake).
-2. **Intent** — one row per capture-form submission (`lead_intent` in the lake); append-only; links to contact via `id_contact`.
+1. **Intent** — one row per capture-form submission (`lead_intent` in the lake); append-only; carries `id_contact` as a foreign key to the application `contact_info` row (not joinable in Trino).
+2. **Contact info** — one row per Supply customer in Rene Descartes PostgreSQL (`contact_info`); **not ingested to the lake**. Do not query `datalake_rene_descartes_clean.lead_contact_info`.
 3. **Contact identifier** — internal IDR match index in Rene Descartes PostgreSQL (`contact_identifier`); **not yet ingested to the lake**. Since SAL-549, contacts attach via `contact_info_identifier` (N:M) — identifiers can be shared across contacts.
 
 **Not documented here (planned revamp entities, not in prod lake):** `lead_attribution`, `opportunity`, `supply_activities`, `supply_rejection`, and any DW/obt built on the full revamp model. For end-to-end funnel, channel attribution, and conversions, continue using [`supply.md`](supply.md).
 
 ## Glossary and Synonyms
 
-- **Supply Revamp**, **novo modelo de captação**, **modelo Rene revamp** → Rene Descartes entity model (contact-centric); canonical tables `contact_info`, `intent` (lake: `lead_*` prefix today)
+- **Supply Revamp**, **novo modelo de captação**, **modelo Rene revamp** → Rene Descartes entity model (contact-centric); canonical tables `contact_info`, `intent` (lake today: `lead_intent` only)
 - **Intent**, **intenção**, **demonstração de intenção** → owner submitted a capture form; row in `intent` (`id_intent`; lake: `lead_intent`)
-- **Contact**, **cliente Supply**, **contato** → unified Supply customer in `contact_info` (`id_contact`; lake: `lead_contact_info`)
+- **Contact**, **cliente Supply**, **contato** → unified Supply customer in application `contact_info` (`id_contact`). Referenced from the lake only as `lead_intent.id_contact` — no contact profile table in the lake.
 - **Identity Resolution**, **IDR**, **resolução de identidade** → deterministic merge of incoming leads onto one `id_contact` via strong keys (`person_id`, phone, email, `meta_username`); match index is `contact_identifier` + `contact_info_identifier` in the app (not in lake)
 - **Strong key** → `mobile_phone_number`, `email`, or `meta_username` — used for deduplication; normalized forms live in `contact_identifier.normalized_value` (app only)
 - **Shared identifier (SAL-549)** → strong key already linked to another contact is **merged** into `contact_info` and linked via `contact_info_identifier` (not dropped); IDR resolves to the contact with the **strongest bond**
@@ -76,9 +76,8 @@ Supply Revamp is the new Rene Descartes entity model for first-party Supply acqu
 
 | You need... | Use this table |
 |-------------|----------------|
-| Supply customer identity, contact channels, Person link | `datalake_rene_descartes_clean.lead_contact_info` (`lci`) — canonical `contact_info`; one row per customer (`id_contact`); partition on `year`/`month`/`day` from `ts_updated`; z-ordered by `id_contact` |
 | Intent volume, product origin, supply source, A/B tags | `datalake_rene_descartes_clean.lead_intent` (`li`) — canonical `intent`; one row per intent (`id_intent`); append-only (`ts_created` only); partition on `year`/`month`/`day` from `ts_created`; z-ordered by `id_contact` |
-| Join intents to their owning contact | `li.id_contact = lci.id_contact` |
+| Contact grain in the lake | `li.id_contact` on `lead_intent` — group intents by this key. Full contact profile (`name`, channels, `id_person`) is **not** in the lake |
 | Bridge a revamp intent to legacy funnel (when populated) | `li.id_house_lead` ↔ legacy `id_lead_ebdb` / `obt_supply.sk_lead` — only when `id_house_lead IS NOT NULL` |
 | Internal IDR match index (application only — **not in lake**) | `contact_identifier` in Rene Descartes PostgreSQL — one row per normalized strong key; contacts link via `contact_info_identifier` (N:M, SAL-549) |
 | Internal contact ↔ identifier links (application only — **not in lake**) | `contact_info_identifier` — `UNIQUE (contact_id, identifier_id)` |
@@ -86,15 +85,23 @@ Supply Revamp is the new Rene Descartes entity model for first-party Supply acqu
 **Critical rules:**
 
 - **Scope gate:** For funnel steps (lead → prospect → qualified → opportunity → first listing), channel reporting (`company_report_origin`), and Isaias metrics, use [`supply.md`](supply.md) and `dw_growth.obt_supply` — not this document.
-- **Canonical vs lake names:** Application specs and business rules use `contact_info`, `intent`, `contact_identifier`. The lake still exposes `lead_contact_info` and `lead_intent` — always use lake names in Trino SQL until a rename migration is reflected in CDC.
-- **Lake availability:** Only `lead_contact_info` and `lead_intent` exist in `datalake_rene_descartes_clean` today. `contact_identifier` and `contact_info_identifier` are application-internal.
-- **Partition filters:** `lead_contact_info` — filter `year`, `month`, `day` on `ts_updated`. `lead_intent` — filter on `ts_created`.
-- **PII:** `lci.name`, `lci.contact_info`, and JSON channel `value` fields contain personal data. Follow org PII policy.
+- **Canonical vs lake names:** Application specs and business rules use `contact_info`, `intent`, `contact_identifier`. In Trino, the only ingested revamp table is `lead_intent`.
+- **Lake availability:** Only `lead_intent` exists in `datalake_rene_descartes_clean` for this slice. `contact_info`, `contact_identifier`, and `contact_info_identifier` are application-internal (not ingested).
+- **Partition filters:** `lead_intent` — filter `year`, `month`, `day` on `ts_created`.
 - **`id_house_lead` semantics:** Non-null only for legacy `HouseLead` projection rows. New-flow intents have `id_house_lead IS NULL`.
 - **Intent without contact:** If contact creation was skipped (no valid channels after phone validation, BR-LCI-013 / BR-LI-011), the app writes **no** `contact_info` and **no** `intent` for that event.
 - **`person_id` / `id_person`:** Set when Person service resolves the contact; unique per contact when present; not cleared once set. `person_id` is matched on the `contact_info` row directly — not stored in `contact_identifier`.
 - **SAL-549 IDR:** `contact_identifier` has no `contact_id` column; links live in `contact_info_identifier`. Shared identifiers resolve to the strongest bond (mobile > email; more links; latest link `ts_created`).
 - **DataHub CI:** concrete `schema.table` names only in this section — no wildcards.
+
+## Key Metrics
+
+No official metric entity exists yet for this WIP slice. Use [`supply.md`](supply.md) for funnel, conversion, and Isaias numbers. Exploratory measures from the lake:
+
+- **Intent volume:** `COUNT(*)` (or `COUNT(li.id_intent)`) on `datalake_rene_descartes_clean.lead_intent`, partitioned on `ts_created`.
+- **Intent volume by origin and supply source:** same count grouped by `li.origin` and `li.supply_source` (allowed pairs in the glossary).
+- **Intents per contact:** `COUNT(li.id_intent)` grouped by `li.id_contact` — contact profile is not in the lake.
+- **Legacy-bridged intents:** count or list rows where `li.id_house_lead IS NOT NULL`.
 
 ## Relationships with Other Entities
 
@@ -105,7 +112,7 @@ Supply Revamp is the new Rene Descartes entity model for first-party Supply acqu
 
 ### Person (N:1 when resolved)
 
-- `lci.id_person` → Person service UUID. Join Person clean/DW tables — do not rely on duplicated PII in `contact_info` JSON when `id_person` is set.
+- Person UUID (`id_person` / `person_id`) lives on application `contact_info`, which is **not** in the lake. Do not join Person from `lead_intent`; there is no ingested contact profile table.
 
 ## Related Metric Entities
 
@@ -116,9 +123,9 @@ Supply Revamp is the new Rene Descartes entity model for first-party Supply acqu
 **Do:**
 
 - Use this document only for **contact** and **intent** questions on the revamp model (volume by `origin`/`supply_source`, contact enrichment, IDR-related contact grain).
-- Refer to canonical names (`contact_info`, `intent`) in business language; use lake table names (`lead_contact_info`, `lead_intent`) in SQL.
-- Filter `lead_contact_info` partitions on `ts_updated` and `lead_intent` partitions on `ts_created`.
-- Filter `id_contact` when querying a known customer — both lake tables are z-ordered on that key.
+- Refer to canonical names (`contact_info`, `intent`) in business language; in Trino use `datalake_rene_descartes_clean.lead_intent` only.
+- Filter `lead_intent` partitions on `ts_created`.
+- Filter `id_contact` when querying a known customer — `lead_intent` is z-ordered on that key.
 - Use `intent.origin` and `intent.supply_source` together — each origin constrains allowed `supply_source` values.
 - For funnel, conversion, and channel dashboards, use [`supply.md`](supply.md) and `dw_growth.obt_supply`.
 
@@ -127,7 +134,7 @@ Supply Revamp is the new Rene Descartes entity model for first-party Supply acqu
 - Don't use revamp clean tables as a substitute for `obt_supply` or `fact_supply_events` — the revamp DW layer is not in production.
 - Don't assume every legacy lead has an `intent` row — only leads projected through the new flow (or legacy bridge with `id_house_lead`) appear here.
 - Don't scan `contact_info` JSON for IDR deduplication — matching uses `contact_identifier` + `contact_info_identifier` in the app.
-- Don't query `contact_identifier` or `contact_info_identifier` in Trino — not in the lake yet.
+- Don't query `lead_contact_info`, `contact_identifier`, or `contact_info_identifier` in Trino — they are not ingested to the lake.
 - Don't count `id_house_lead IS NULL` intents as join failures to legacy supply — expected for new-flow intents.
 - Don't assume `contact_identifier.contact_id` exists — removed in SAL-549; use the link table instead.
 
@@ -155,31 +162,25 @@ ORDER BY
     3, 4 DESC
 ```
 
-### Query 2 — Contacts with intent count and latest intent metadata
+### Query 2 — Intent counts and latest origin/source per contact id
 
-Contact grain (`lead_contact_info` = canonical `contact_info`) with intent counts and latest origin/source.
+Contact grain from `lead_intent` only (`id_contact` FK). Contact profile columns (`name`, channels, `id_person`) are not in the lake.
 
 ```sql
 SELECT
-    lci.id_contact,
-    lci.id_person,
-    lci.ts_created,
-    lci.ts_updated,
+    li.id_contact,
     COUNT(li.id_intent) AS intent_count,
     MAX(li.ts_created) AS ts_last_intent,
     MAX_BY(li.origin, li.ts_created) AS last_origin,
     MAX_BY(li.supply_source, li.ts_created) AS last_supply_source
 FROM
-    datalake_rene_descartes_clean.lead_contact_info AS lci
-LEFT JOIN
     datalake_rene_descartes_clean.lead_intent AS li
-        ON li.id_contact = lci.id_contact
 WHERE
-    lci.year = 2026
-    AND lci.month >= 1
-    AND lci.ts_updated >= DATE '2026-01-01'
+    li.year = 2026
+    AND li.month >= 1
+    AND li.ts_created >= DATE '2026-01-01'
 GROUP BY
-    1, 2, 3, 4
+    1
 ```
 
 ### Query 3 — Legacy bridge: intents linked to legacy lead id
