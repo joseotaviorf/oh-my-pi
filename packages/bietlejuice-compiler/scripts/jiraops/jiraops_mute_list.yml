@@ -10,7 +10,6 @@ DAG:
     - bietlejuice.dw_collections_landlord
     - bietlejuice.dw_recon_quintocred_snapshot
     - bietlejuice.enrich_atlas_db_quality_metrics
-    - bietlejuice.enrich_agents_matias
     - bietlejuice.enrich_crawler_chaves_na_mao
     - bietlejuice.enrich_crawler_df_imoveis
     - bietlejuice.enrich_crawler_loft
