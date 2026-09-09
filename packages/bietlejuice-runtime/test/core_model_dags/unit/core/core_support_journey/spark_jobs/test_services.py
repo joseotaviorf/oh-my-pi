@@ -101,34 +101,36 @@ class TestSupportJourneyServicesBuildTsFilter:
     @pytest.mark.parametrize(
         "partition_date, partition_hour, delta_hours, expected_min, expected_max",
         [
-            # Window is [hour - lookback, hour). Bounds are UTC.
+            # Window is [hour + 1h - lookback, hour + 1h), i.e. it closes at
+            # the run's data_interval_end. Bounds are UTC.
             (
                 "2026-05-27",
                 "14",
                 1,
-                "2026-05-27T13:00:00.000+00:00",
                 "2026-05-27T14:00:00.000+00:00",
+                "2026-05-27T15:00:00.000+00:00",
             ),
             (
                 "2026-05-27",
                 "14",
                 72,
-                "2026-05-24T14:00:00.000+00:00",
-                "2026-05-27T14:00:00.000+00:00",
+                "2026-05-24T15:00:00.000+00:00",
+                "2026-05-27T15:00:00.000+00:00",
             ),
             (
                 "2026-05-27",
                 "00",
                 1,
-                "2026-05-26T23:00:00.000+00:00",
                 "2026-05-27T00:00:00.000+00:00",
+                "2026-05-27T01:00:00.000+00:00",
             ),
+            # Hour 23 closes at midnight of the next calendar day.
             (
                 "2026-05-27",
                 "23",
                 1,
-                "2026-05-27T22:00:00.000+00:00",
                 "2026-05-27T23:00:00.000+00:00",
+                "2026-05-28T00:00:00.000+00:00",
             ),
         ],
     )
@@ -156,7 +158,7 @@ class TestSupportJourneyServicesBuildTsFilter:
         assert expected_min in filter_str
         assert expected_max in filter_str
 
-    def test_one_hour_delta_covers_previous_hour(self, pipeline_with_spec):
+    def test_one_hour_delta_covers_the_dag_hour(self, pipeline_with_spec):
         # act
         ts_filter = pipeline_with_spec.build_ts_filter(
             "2026-05-27",
@@ -165,10 +167,11 @@ class TestSupportJourneyServicesBuildTsFilter:
             partition_hour="14",
         )
 
-        # assert: a 1h lookback from hour 14 yields [13:00, 14:00).
+        # assert: a 1h window for DAG hour 14 is [14:00, 15:00) — the run's
+        # own data_interval, matching what cases/analyst process.
         filter_str = str(ts_filter)
-        assert "2026-05-27T13:00:00.000+00:00" in filter_str
         assert "2026-05-27T14:00:00.000+00:00" in filter_str
+        assert "2026-05-27T15:00:00.000+00:00" in filter_str
 
     def test_omitted_partition_hour_defaults_to_midnight(self, pipeline_with_spec):
         # act
@@ -176,11 +179,11 @@ class TestSupportJourneyServicesBuildTsFilter:
             "2026-05-27", delta_hours=1, col="ts_event"
         )
 
-        # assert: hour defaults to 00, so a 1h lookback is the last hour of
-        # the previous calendar day.
+        # assert: hour defaults to 00, so a 1h window is the first hour of
+        # partition_date.
         filter_str = str(ts_filter)
-        assert "2026-05-26T23:00:00.000+00:00" in filter_str
         assert "2026-05-27T00:00:00.000+00:00" in filter_str
+        assert "2026-05-27T01:00:00.000+00:00" in filter_str
 
     def test_source_ts_filter_uses_cfg_hour_and_yaml_delta(
         self, pipeline_with_spec, cfg
@@ -191,10 +194,10 @@ class TestSupportJourneyServicesBuildTsFilter:
             col="ts_cdc_transaction",
         )
 
-        # assert: cfg hour is 14 and yaml delta_hours is 1 → [13:00, 14:00)
+        # assert: cfg hour is 14 and yaml delta_hours is 1 → [14:00, 15:00)
         filter_str = str(ts_filter)
-        assert "2026-05-27T13:00:00.000+00:00" in filter_str
         assert "2026-05-27T14:00:00.000+00:00" in filter_str
+        assert "2026-05-27T15:00:00.000+00:00" in filter_str
         assert cfg.partition_hour == "14"
 
 
@@ -202,13 +205,13 @@ class TestSupportJourneyServicesWrittenPartition:
     @pytest.mark.parametrize(
         "partition_date, partition_hour, expected_date, expected_hour",
         [
-            # Event window is [hour - 1, hour); rows land in the previous hour.
-            ("2026-05-27", "14", "2026-05-27", "13"),
-            ("2026-05-27", "01", "2026-05-27", "00"),
-            ("2026-05-27", "10", "2026-05-27", "09"),
-            # Midnight rolls back to 23:00 of the previous calendar day.
-            ("2026-05-27", "00", "2026-05-26", "23"),
-            ("2026-05-27", None, "2026-05-26", "23"),
+            # Event window is [hour, hour + 1); rows land in the DAG hour itself.
+            ("2026-05-27", "14", "2026-05-27", "14"),
+            ("2026-05-27", "01", "2026-05-27", "01"),
+            ("2026-05-27", "10", "2026-05-27", "10"),
+            ("2026-05-27", "00", "2026-05-27", "00"),
+            # Omitted hour is normalised to "00".
+            ("2026-05-27", None, "2026-05-27", "00"),
         ],
     )
     def test_written_partition_is_the_hour_rows_land_in(
@@ -243,22 +246,21 @@ class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
         pipeline.create_core_model(spark)
 
         # assert: skip the hour this run actually writes (hour 14 reads
-        # [13:00, 14:00) partitioned by ts_task_updated → partition 13).
-        # Checking the DAG hour would miss this run's output and would skip
-        # a rebuild after a later hour (15) writes into partition 14.
+        # [14:00, 15:00) partitioned by ts_task_updated → partition 14),
+        # which is also the DAG hour, as in cases/analyst.
         mock_partition_has_data.assert_called_once_with(
             spark,
             "core_support_journey.services",
             "2026-05-27",
-            "13",
+            "14",
         )
         spark.table.assert_not_called()
 
     @mock.patch.object(services_module, "partition_has_data")
-    def test_skip_checks_previous_day_when_dag_hour_is_midnight(
+    def test_skip_checks_same_day_when_dag_hour_is_midnight(
         self, mock_partition_has_data, cfg, pipeline_with_spec
     ):
-        # arrange: hour 00 writes [previous day 23:00, 00:00).
+        # arrange: hour 00 writes [00:00, 01:00) of partition_date.
         cfg.partition_hour = "00"
         spark = mock.MagicMock()
         mock_partition_has_data.return_value = True
@@ -270,8 +272,8 @@ class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
         mock_partition_has_data.assert_called_once_with(
             spark,
             "core_support_journey.services",
-            "2026-05-26",
-            "23",
+            "2026-05-27",
+            "00",
         )
         spark.table.assert_not_called()
 
@@ -687,7 +689,8 @@ class TestSupportJourneyServicesQueueAttribution:
                     "C1",  # id_chat
                     "SS1",  # id_session (matches session join_key)
                     '{"channel_type": "web"}',  # attributes
-                    datetime(2026, 5, 27, 13, 10, 0, tzinfo=timezone.utc),  # ts_updated
+                    # Inside the DAG hour (cfg hour 14 → window [14:00, 15:00)).
+                    datetime(2026, 5, 27, 14, 10, 0, tzinfo=timezone.utc),  # ts_updated
                 ),
             ],
             _CHAT_SCHEMA,
@@ -719,7 +722,7 @@ class TestSupportJourneyServicesQueueAttribution:
                     False,  # is_per_team_task
                     False,  # is_spoc_task
                     datetime(
-                        2026, 5, 27, 13, 20, 0, tzinfo=timezone.utc
+                        2026, 5, 27, 14, 20, 0, tzinfo=timezone.utc
                     ),  # ts_cdc_transaction
                     None,  # task_attributes
                     None,  # id_source_ctwa
@@ -727,8 +730,8 @@ class TestSupportJourneyServicesQueueAttribution:
                     None,  # type_source_ctwa
                     0,  # total_inactivity_time
                     0,  # last_inactivity_time
-                    datetime(2026, 5, 27, 13, 0, 0, tzinfo=timezone.utc),  # ts_created
-                    datetime(2026, 5, 27, 13, 20, 0, tzinfo=timezone.utc),  # ts_updated
+                    datetime(2026, 5, 27, 14, 0, 0, tzinfo=timezone.utc),  # ts_created
+                    datetime(2026, 5, 27, 14, 20, 0, tzinfo=timezone.utc),  # ts_updated
                 ),
             ],
             _TASK_SCHEMA,

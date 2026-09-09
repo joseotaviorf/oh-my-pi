@@ -110,28 +110,32 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
     ):
         """
         Build a half-open timestamp filter on ``col`` covering
-        ``abs(delta_hours)`` ending at the DAG partition hour.
+        ``abs(delta_hours)`` ending at the close of the DAG partition hour.
 
         The anchor is ``partition_date`` + ``partition_hour`` (``00`` when the
-        hour is omitted). The exclusive upper bound is the anchor; the
-        inclusive lower bound is the anchor minus ``abs(delta_hours)``.
+        hour is omitted), i.e. the run's ``data_interval_start``. The exclusive
+        upper bound is the anchor plus one hour (``data_interval_end``); the
+        inclusive lower bound is that bound minus ``abs(delta_hours)``.
         The predicate is ``min_ts <= col < max_ts``.
+
+        With ``delta_hours = 1`` the window is exactly the DAG hour, which is
+        the same hour ``cases`` and ``analyst`` process for the same run.
 
         Examples
         --------
         partition_hour = 14, delta_hours = 1:
-            min_ts = partition_date 13:00
-            max_ts = partition_date 14:00
+            min_ts = partition_date 14:00
+            max_ts = partition_date 15:00
 
         partition_hour = 14, delta_hours = 72:
-            min_ts = (partition_date 14:00) - 72h
-            max_ts = partition_date 14:00
+            min_ts = (partition_date 15:00) - 72h
+            max_ts = partition_date 15:00
         """
         hour = int(partition_hour) if partition_hour is not None else 0
         anchor = datetime.strptime(partition_date, "%Y-%m-%d").replace(
             hour=hour, tzinfo=timezone.utc
         )
-        max_dt = anchor
+        max_dt = anchor + timedelta(hours=1)
         min_dt = max_dt - timedelta(hours=abs(delta_hours))
 
         min_ts = min_dt.isoformat(timespec="milliseconds")
@@ -147,16 +151,15 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         """
         Return the ``(partition_date, partition_hour)`` this run writes.
 
-        Event rows are filtered to ``[anchor - lookback, anchor)`` and
-        partitioned from ``ts_task_updated``, so they land in the hour
-        before the DAG partition hour. The skip must check this output
-        partition — not the DAG hour — otherwise a later hour's write
-        (which lands *in* the DAG hour) would make a re-run skip.
+        Event rows are filtered to ``[anchor, anchor + 1h)`` and partitioned
+        from ``ts_task_updated``, so they land in the DAG partition hour
+        itself — the same partition ``cases`` and ``analyst`` write for the
+        same run. The hour is normalised to two digits (``00`` when omitted).
         """
         hour = int(partition_hour) if partition_hour is not None else 0
         written = datetime.strptime(partition_date, "%Y-%m-%d").replace(
             hour=hour, tzinfo=timezone.utc
-        ) - timedelta(hours=1)
+        )
         return written.strftime("%Y-%m-%d"), written.strftime("%H")
 
     def _source_ts_filter(self, source: Dict[str, Any], col: str):
