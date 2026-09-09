@@ -1,10 +1,11 @@
 """
-Databricks spark job — daily update of on-call hours spreadsheets.
+Spark job — daily update of on-call hours spreadsheets (Databricks + EMR).
 
 Appends the previous shift's on-call record to the monthly Google Sheet tab
 for the AE or DPE squad, depending on the `team` argument ("ae" or "dpe").
 
-Credentials are read from Databricks secrets (scope ``quintoandar``):
+Credentials are read via BaseDBUtils (Databricks secrets on DBR; AWS Secrets
+Manager on EMR, keyed by the same names as the former ``quintoandar`` scope):
   - JIRA_OPS_API: JSON with ``username``, ``token``, ``cloud_id``.
   - GOOGLE_SERVICE_ACCOUNT_CREDENTIALS: GSheets service account JSON key.
 

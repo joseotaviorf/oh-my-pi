@@ -13,13 +13,14 @@ dag:
       Two tasks run in parallel: one for the AE squad (task=ae) and one
       for the DPE squad (task=dpe).
 
-      Credentials required in Databricks secrets (scope `quintoandar`):
+      Credentials required in AWS Secrets Manager (same key names as the former
+      Databricks `quintoandar` scope; on EMR, BaseDBUtils reads SM by key name):
         - JIRA_OPS_API: JSON with `username`, `token`, `cloud_id` for Jira Ops API.
         - GOOGLE_SERVICE_ACCOUNT_CREDENTIALS: JSON key of the GSheets service account.
 
       Google Sheets access: share each target sheet (Editor permission) with
         gsheets-access@quintoandardata.iam.gserviceaccount.com
-        (from GOOGLE_SERVICE_ACCOUNT_CREDENTIALS, scope `quintoandar`).
+        (from GOOGLE_SERVICE_ACCOUNT_CREDENTIALS).
 
 workflow:
   layer: raw
