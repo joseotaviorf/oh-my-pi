@@ -1,23 +1,29 @@
 ---
 database_name: datalake_agents_validation
-table_name: new_earnings_seubarriga_partner_divergence
+table_name: new_earnings_seubarriga_supply_acquisition_fr_divergence
 description: |
   Validation table that identifies active RENT_CONTRACT earning sources in the current
   competence month whose Big Agent new_earnings SUPPLY_ACQUISITION_FR revenue percentage
   is out of sync with the partner brokerage fee configured for the contract in Seu Barriga
   (Retsuko). Only earning sources with a non-zero revenue share that finished their first
-  day of eventual consistency (ts_occurred before the current day) are considered. The
-  table is expected to be empty; any row it produces is a divergence.
+  day of eventual consistency (ts_occurred before the current day) are considered. A
+  sentinel row (id_contract = '-1', status = 'NO_DIVERGENCE') is included when no
+  divergences are found, so the data quality alert can still evaluate the table instead
+  of hitting an empty dataframe.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_contract:
-    description: Identifier of the rent contract, shared by the earning source and the Seu Barriga contract.
+    description: |
+      Identifier of the rent contract, shared by the earning source and the Seu Barriga
+      contract. Value '-1' marks the sentinel row.
     lineage:
       - datalake_big_agent_clean.earning_sources.id_external_domain
       - datalake_retsuko_clean.contract.id_external
   status:
-    description: Status of the Big Agent earning source for this contract.
+    description: |
+      Status of the Big Agent earning source for this contract. Value 'NO_DIVERGENCE'
+      marks the sentinel row.
     lineage:
       - datalake_big_agent_clean.earning_sources.status
   incentive_system_earning_percentage:

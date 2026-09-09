@@ -1,0 +1,7 @@
+---
+table_name: datalake_agents_validation.new_earnings_seubarriga_supply_acquisition_fr_divergence
+alert_channel: "#alerts_big_agent"
+table_level_validations:
+  has_size:
+    equal_to: 1
+    severity_level: Error
