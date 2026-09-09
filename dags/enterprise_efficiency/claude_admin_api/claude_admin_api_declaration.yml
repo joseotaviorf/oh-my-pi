@@ -37,7 +37,7 @@ workflow:
   type: api_ingestion
   custom_schema: claude_usage
   api_base_url: https://api.anthropic.com
-  bucket_config_name: datalake_bucket
+  bucket_config_name: people_bucket
   credentials_scope: quintoandar
   has_hive_sync: false
   default_extraction_type: incremental
