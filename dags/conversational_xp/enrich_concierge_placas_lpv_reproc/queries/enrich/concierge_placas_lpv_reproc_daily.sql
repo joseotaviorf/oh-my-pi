@@ -153,6 +153,19 @@ house_on_sale AS (
         datalake_ebdb_clean.house
     WHERE
         sale_price > 0
+),
+lpv_ads_eligible_today AS (
+    -- Cross-exclusion: users already eligible today for the Shared/Retargeting
+    -- LPV-ads concierge use case, to avoid double-messaging the same user across
+    -- both concierge programs on the same day (see enrich_concierge_lpv_ads).
+    SELECT DISTINCT
+        id_user
+    FROM
+        datalake_search.concierge_lpv_ads_daily
+    WHERE
+        year = YEAR(CURRENT_DATE())
+        AND month = MONTH(CURRENT_DATE())
+        AND day = DAY(CURRENT_DATE())
 )
 SELECT DISTINCT
     filtered_agents.id_user,
@@ -196,6 +209,9 @@ LEFT JOIN
 LEFT JOIN
     recent_lpv_trigger
     ON filtered_agents.id_user = recent_lpv_trigger.id_user
+LEFT JOIN
+    lpv_ads_eligible_today
+    ON filtered_agents.id_user = lpv_ads_eligible_today.id_user
 WHERE
     tqc_after.id_user IS NULL
     AND sale_vb_after.id_user IS NULL
@@ -204,3 +220,4 @@ WHERE
         FALSE
     ) = FALSE
     AND recent_lpv_trigger.id_user IS NULL
+    AND lpv_ads_eligible_today.id_user IS NULL
