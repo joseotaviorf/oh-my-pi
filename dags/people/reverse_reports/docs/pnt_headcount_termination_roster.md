@@ -58,6 +58,7 @@
 | dt_inicio_person | Earliest hire date across all assignments for this person (first day at the company). | `dw_employee_details.fact_assignment_snapshots.dt_employee_hired` (MIN per person_number) |
 | band | Employee job band. | `dw_compensation.dim_job.band` |
 | github_user | Employee GitHub username or profile link. | `dw_employee_details.dim_contact.github_username` |
+| unidade_negocio | Raw business-unit / legal-entity name from PIN (e.g. `OneLoop S.R.L.`, `Dridco S.A.U.`). Use this column — not `empresa` — when Argentina (or other Classifieds) entity split is required. | `dw_organization.dim_business_unit.business_unit_name` |
 | year | Partition year (from `{load_start_date}`). Not exported to the sheet. | — |
 | month | Partition month (from `{load_start_date}`). Not exported to the sheet. | — |
 | day | Partition day (from `{load_start_date}`). Not exported to the sheet. | — |
