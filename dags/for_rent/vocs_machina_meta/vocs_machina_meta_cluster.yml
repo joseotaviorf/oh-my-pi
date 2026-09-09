@@ -1,2 +1,10 @@
 cluster:
   type: emr_7_12_consolidation_xs_memory_single_node_cluster
+  # VOCS-61 recovery: raw/clean backfill_plans use full overwrite (no merge_on).
+  # EMR defaults to dynamic partitionOverwriteMode, which would only replace
+  # today's year/month/day partition and leave older polluted rows. The raw job
+  # verifies this setting at runtime before any destructive write.
+  # Remove this override in the cleanup PR once MERGE is restored.
+  custom_configurations:
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static

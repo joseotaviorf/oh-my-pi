@@ -74,8 +74,10 @@ workflow:
       partitions: [year, month, day]
       merge_on: [uuid_run, id_prompt]
       when_matched_update_condition: source.ts_load > target.ts_load
+    # VOCS-61 recovery: no merge_on -> full overwrite each run (requires static
+    # partitionOverwriteMode on the cluster -- see vocs_machina_meta_cluster.yml).
+    # Raw job aborts on zero source rows and verifies static mode before write.
+    # Clean SQL dedupes uuid_run until MERGE is restored in the cleanup PR.
     backfill_plans:
       clean_table_name: backfill_plans
       partitions: [year, month, day]
-      merge_on: [uuid_run]
-      when_matched_update_condition: source.ts_load > target.ts_load

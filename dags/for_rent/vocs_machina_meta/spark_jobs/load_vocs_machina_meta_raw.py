@@ -30,7 +30,7 @@ shapes (backfill_plans in particular has none at all).
 import json
 import logging
 from argparse import ArgumentParser
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
@@ -264,6 +264,16 @@ MERGE_KEYS: Dict[str, List[str]] = {
     "backfill_plans": ["run_id"],
 }
 
+# VOCS-61 recovery: raw backfill_plans was polluted with duplicate NULL rows from
+# pre-multiLine JSON reads. Insert-only MERGE cannot replace them; full overwrite
+# (merge_on=None) each run until the cleanup PR restores MERGE_KEYS for this table.
+# Requires spark.sql.sources.partitionOverwriteMode=static (see cluster yml): with
+# EMR's default dynamic mode, overwrite only replaces today's ts_load-derived
+# partition and leaves older polluted partitions behind.
+RAW_OVERWRITE_TABLES = frozenset({"backfill_plans"})
+
+PARTITION_OVERWRITE_MODE_KEY = "spark.sql.sources.partitionOverwriteMode"
+
 # `_meta/` artifacts are immutable. Updating matched keys would only restamp
 # ts_load and hop year/month/day into today's partition.
 WHEN_MATCHED_UPDATE_CONDITION = "FALSE"
@@ -403,6 +413,123 @@ def _add_ts_load_partition_cols(df: DataFrame) -> DataFrame:
         out.withColumn("year", F.year("ts_load"))
         .withColumn("month", F.month("ts_load"))
         .withColumn("day", F.dayofmonth("ts_load"))
+    )
+
+
+def _get_configured_partition_overwrite_mode(spark: SparkSession) -> Optional[str]:
+    """Read the effective overwrite mode without assuming Spark runtime defaults.
+
+    Session RuntimeConfig wins over bootstrap SparkConf. Use get(key, None) so an
+    absent cluster overlay does not inherit Spark's built-in STATIC default from
+    the one-arg RuntimeConfig.get.
+    """
+    session_mode = spark.conf.get(PARTITION_OVERWRITE_MODE_KEY, None)
+    if session_mode is not None:
+        return session_mode
+    return spark.sparkContext.getConf().get(PARTITION_OVERWRITE_MODE_KEY, None)
+
+
+def _backfill_plans_valid_payload_filter() -> F.Column:
+    """Rows with a real run_id and the core plan metrics populated."""
+    return (
+        F.col("run_id").isNotNull()
+        & (F.col("run_id") != "")
+        & F.col("partitions").isNotNull()
+        & F.col("estimated_calls").isNotNull()
+    )
+
+
+def _require_static_partition_overwrite_mode(spark: SparkSession) -> None:
+    """Guard VOCS-61 recovery overwrites: static mode replaces the whole table."""
+    mode = _get_configured_partition_overwrite_mode(spark)
+    if mode is None:
+        raise RuntimeError(
+            f"m=_require_static_partition_overwrite_mode, "
+            f"{PARTITION_OVERWRITE_MODE_KEY} is unset, "
+            f"msg=Recovery overwrite for {sorted(RAW_OVERWRITE_TABLES)} requires "
+            f"an explicit 'static' partitionOverwriteMode on the cluster "
+            f"(see vocs_machina_meta_cluster.yml); refusing to assume a default."
+        )
+    mode_text = str(mode).strip()
+    if not mode_text:
+        raise RuntimeError(
+            f"m=_require_static_partition_overwrite_mode, "
+            f"{PARTITION_OVERWRITE_MODE_KEY} is empty, "
+            f"msg=Recovery overwrite for {sorted(RAW_OVERWRITE_TABLES)} requires "
+            f"an explicit 'static' partitionOverwriteMode on the cluster "
+            f"(see vocs_machina_meta_cluster.yml); refusing to assume a default."
+        )
+    if mode_text.lower() != "static":
+        raise RuntimeError(
+            f"m=_require_static_partition_overwrite_mode, "
+            f"{PARTITION_OVERWRITE_MODE_KEY}={mode!r}, "
+            f"msg=Recovery overwrite for {sorted(RAW_OVERWRITE_TABLES)} requires "
+            f"'static' partitionOverwriteMode so saveAsTable(overwrite) replaces "
+            f"all year/month/day partitions; refusing to run with {mode_text!r}."
+        )
+
+
+def _validate_recovery_source(table_name: str, df: Optional[DataFrame]) -> None:
+    """Fail fast when a recovery table has no rebuildable source rows."""
+    if table_name not in RAW_OVERWRITE_TABLES:
+        return
+    if df is None:
+        raise RuntimeError(
+            f"m=_validate_recovery_source, table_name={table_name}, row_count=0, "
+            f"msg=Recovery overwrite would destroy existing data with an empty "
+            f"source batch; aborting before any write."
+        )
+    if table_name == "backfill_plans":
+        has_valid_payload = (
+            df.filter(_backfill_plans_valid_payload_filter()).limit(1).count() > 0
+        )
+        if not has_valid_payload:
+            raise RuntimeError(
+                f"m=_validate_recovery_source, table_name={table_name}, "
+                f"valid_payload_row_count=0, "
+                f"msg=Recovery overwrite would destroy existing data with no valid "
+                f"backfill_plans payload (run_id, partitions, estimated_calls); "
+                f"aborting before any write."
+            )
+        return
+    if df.limit(1).count() == 0:
+        raise RuntimeError(
+            f"m=_validate_recovery_source, table_name={table_name}, row_count=0, "
+            f"msg=Recovery overwrite would destroy existing data with an empty "
+            f"source batch; aborting before any write."
+        )
+
+
+def resolve_raw_write_options(
+    table_name: str,
+) -> Tuple[Optional[List[str]], Optional[str]]:
+    """Return (merge_on, when_matched_update_condition) for DeltaLoader.load_table."""
+    if table_name in RAW_OVERWRITE_TABLES:
+        return None, None
+    return MERGE_KEYS[table_name], WHEN_MATCHED_UPDATE_CONDITION
+
+
+def write_raw_table(
+    spark: SparkSession,
+    loader: DeltaLoader,
+    table_name: str,
+    full_table_name: str,
+    table_path: str,
+    source_df: DataFrame,
+    partition_cols: List[str],
+) -> None:
+    """Write parsed source rows to the raw Delta table (merge or recovery overwrite)."""
+    if table_name in RAW_OVERWRITE_TABLES:
+        _require_static_partition_overwrite_mode(spark)
+
+    merge_on, when_matched_update_condition = resolve_raw_write_options(table_name)
+    loader.load_table(
+        table_name=full_table_name,
+        path=table_path,
+        source_df=source_df,
+        partition_by=partition_cols,
+        merge_on=merge_on,
+        when_matched_update_condition=when_matched_update_condition,
     )
 
 
@@ -569,9 +696,14 @@ def main() -> None:
 
     metastore_service.create_database(write_database_name)
 
-    df = ensure_output_df(
-        spark, table_name, TABLE_BUILDERS[table_name](spark, source_root_path)
-    )
+    parsed_df = TABLE_BUILDERS[table_name](spark, source_root_path)
+    _validate_recovery_source(table_name, parsed_df)
+
+    if table_name in RAW_OVERWRITE_TABLES:
+        df = parsed_df
+    else:
+        df = ensure_output_df(spark, table_name, parsed_df)
+
     row_count = df.count()
     if row_count == 0:
         logger.warning(
@@ -591,15 +723,17 @@ def main() -> None:
     # updating matched rows would only restamp ts_load and move history into
     # today's year/month/day partition -- the anti-pattern the sibling
     # vocs_machina DAG documents for ts_load-based merge conditions. Same
-    # FALSE-on-match pattern as load_blip_messages_raw.py.
+    # FALSE-on-match pattern as load_blip_messages_raw.py. VOCS-61 recovery
+    # tables use merge_on=None with static partitionOverwriteMode instead.
     loader = DeltaLoader(spark)
-    loader.load_table(
-        table_name=full_table_name,
-        path=table_path,
-        source_df=df,
-        partition_by=partition_cols,
-        merge_on=MERGE_KEYS[table_name],
-        when_matched_update_condition=WHEN_MATCHED_UPDATE_CONDITION,
+    write_raw_table(
+        spark,
+        loader,
+        table_name,
+        full_table_name,
+        table_path,
+        df,
+        partition_cols,
     )
 
     logger.info(
