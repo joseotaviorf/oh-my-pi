@@ -1,0 +1,84 @@
+---
+database_name: datalake_agent_supply
+table_name: house_listing_consultancy
+description: |
+  Rent and sale listing rows enriched with supply_conversion_consultancy intervals overlapping
+  each listing window. Rent expands consultancy intervals by day (SEQUENCE on ts_started/ts_ended)
+  to match listing version dates; sale joins consultancy rows on house id. Full reload each run
+  from upstream listing and consultancy tables.
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_sale_listings.sale_listing.id_sale_listing
+    description: Listing identifier from rent house_listing or sale sale_listing.
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house
+      - datalake_sale_listings.sale_listing.id_house
+      - datalake_agent_supply.supply_conversion_consultancy.id_house
+    description: EBDB house identifier for the property linked to the listing.
+  id_agent:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.id_agent
+    description: Agent Domain agent identifier from the overlapping consultancy interval.
+  id_user:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.id_user
+    description: Platform user identifier of the consultancy consultant on the listing window.
+  source:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.source
+    description: Origin label of the consultancy interval linked to the listing window.
+    categories:
+      SUPPLY_CONVERSION_CONSULTANCY: Modern EBDB supply conversion consultancy row.
+      LEGACY_AGENCY: Legacy Big Agent agency history row.
+  agent_profile:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.agent_profile
+    description: Consultant tier for the interval; CORE when agent_profile is null on the source row.
+    categories:
+      CORE: Default when no agent profile is assigned on the overlapping consultancy row.
+  business_context:
+    description: Operating context distinguishing rent listing versions from sale listings.
+    categories:
+      RENT: Row built from datalake_ebdb_listing.house_listing with daily-expanded consultancy overlap.
+      SALE: Row built from datalake_sale_listings.sale_listing joined on house id.
+  is_consultancy_active:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.is_active
+    description: True when the overlapping consultancy interval is active in the source.
+  is_lastest_on_listing:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.is_active
+      - datalake_agent_supply.supply_conversion_consultancy.ts_started
+    description: |
+      True when this row is the preferred consultancy attribution for the listing (active first,
+      then most recent ts_started).
+  is_first_on_listing:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.ts_started
+    description: True when this row is the earliest consultancy interval overlapping the listing.
+  ts_started:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.ts_started
+    description: Start timestamp of the consultancy interval overlapping the listing window.
+  ts_ended:
+    lineage:
+      - datalake_agent_supply.supply_conversion_consultancy.ts_ended
+    description: End timestamp of the consultancy interval, or current time when still open in the daily expansion.
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_first_publication
+      - datalake_sale_listings.sale_listing.ts_first_publication
+    description: First publication timestamp of the rent or sale listing.
+  ts_listing_version_start:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+    description: Rent listing version start used for temporal overlap; null for sale rows.
+  ts_listing_version_end:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_end
+    description: Rent listing version end used for temporal overlap; null for sale rows.

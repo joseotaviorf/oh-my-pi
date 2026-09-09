@@ -1,0 +1,122 @@
+---
+database_name: datalake_agent_supply
+table_name: supply_acquisition
+description: |
+  Supply acquisition attribution per house from EBDB supply_acquisition clean rows plus legacy
+  Big Agent agency rows when no modern acquisition exists for the same house and user in the
+  incremental window. Modern rows join agent_unified_identity on uuid_agent and resolve profile
+  from agent_product; legacy rows require is_last_status_of_day, first enrollment per house and
+  consultant type, enrollment before 2026-09-01, and types PRO_ACQUIRER or CIQ_FULL (CIQ_FULL
+  mapped to AUTONOMOUS_BROKERAGE_AGENT). acquisition_business_context and ts_first_publication
+  are derived from listing_business_context rows joined to attributed houses only.
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_acquisition:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.id
+      - datalake_big_agent.house_consultant_history.id_agency
+    description: |
+      Surrogate key for the acquisition interval (XXHASH64 from clean supply id or legacy agency id
+      plus source label).
+  id_supply_acquisition:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.id
+    description: EBDB supply_acquisition identifier for modern rows; -1 sentinel for legacy agency rows.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.id_property
+      - datalake_big_agent.house_consultant_history.id_house
+      - core_house.house.id_house
+    description: EBDB house identifier for the property under acquisition attribution.
+  id_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent
+      - datalake_ebdb_clean.supply_acquisition.uuid_agent
+    description: |
+      Agent Domain agent identifier from unified identity (uuid_agent join for modern rows;
+      partner replace key for legacy).
+  id_user:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_user
+      - datalake_big_agent.house_consultant_history.id_user
+    description: Platform user identifier of the acquisition consultant.
+  source:
+    description: Origin system label for the acquisition interval row.
+    categories:
+      SUPPLY_ACQUISITION: Row sourced from datalake_ebdb_clean.supply_acquisition.
+      LEGACY_AGENCY: Row from datalake_big_agent.house_consultant_history when no modern row exists for the house and user.
+  agent_profile:
+    lineage:
+      - datalake_ebdb_agent_events.agent_product.product_name
+      - datalake_big_agent.house_consultant_history.consultant_type
+    description: Consultant tier from agent product or mapped legacy consultant type.
+    categories:
+      AUTONOMOUS_BROKERAGE_AGENT: Mapped from legacy CIQ_FULL consultant type.
+      PRO_ACQUIRER: Legacy acquisition consultant type retained as-is.
+  acquisition_business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_clean.listing_business_context.ts_created
+    description: |
+      House-level business context inferred from minimum COALESCE(ts_first_publication, ts_created)
+      per RENT and SALE listing_business_context rows on attributed houses; null when contexts
+      differ or are absent.
+    categories:
+      HYBRID: Rent and sale first-publication timestamps are equal on the house.
+      RENT: Only rent first-publication is present on the house.
+      SALE: Only sale first-publication is present on the house.
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.status
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: True when EBDB status is ACTIVE or legacy enrollment is still open (ts_enrollment_ended is null).
+  ts_started:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.ts_start
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+    description: Timestamp when acquisition attribution started for the house.
+  ts_ended:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.ts_end
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: Timestamp when acquisition attribution ended; null when still open.
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_clean.listing_business_context.ts_created
+    description: Earliest rent or sale first-publication timestamp on the house (LEAST across contexts).
+  ts_house_created:
+    lineage:
+      - core_house.house.ts_created
+    description: Timestamp when the house was created in core_house.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.ts_created
+      - datalake_big_agent.house_consultant_history.ts_agency_created
+    description: Timestamp when the source acquisition or legacy agency record was first created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.ts_updated
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+    description: Latest update timestamp used for incremental extraction and legacy window filtering.
+  year:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.ts_updated
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: Calendar year partition derived from ts_updated.
+  month:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.ts_updated
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: Calendar month partition derived from ts_updated.
+  day:
+    lineage:
+      - datalake_ebdb_clean.supply_acquisition.ts_updated
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: Calendar day partition derived from ts_updated.

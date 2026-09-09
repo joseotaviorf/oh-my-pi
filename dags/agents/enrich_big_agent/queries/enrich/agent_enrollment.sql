@@ -15,11 +15,11 @@ WITH enrollment AS (
 agent AS (
     SELECT
         a.id,
-        COALESCE(
+        CAST(COALESCE(
             GET_JSON_OBJECT(a.details, '$.userExternalId'),
             pa.id_user
-        ) AS id_user,
-        GET_JSON_OBJECT(a.details, '$.partnerExternalId') AS id_partner,
+        ) AS BIGINT) AS id_user,
+        CAST(GET_JSON_OBJECT(a.details, '$.partnerExternalId') AS BIGINT) AS id_partner,
         e.id_enrollment,
         e.id_program,
         p.name AS consultant_type,

@@ -1471,6 +1471,16 @@ bietlejuice.enrich_agent_reports:
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_ciq_users:load-enrich-ciq-users:first-run-of-day
   - bietlejuice.enrich_tiers:load-enrich-ciq-first-listing:first-run-of-day
+bietlejuice.enrich_agent_supply:
+  - bietlejuice.core_house:load-core-house:first-run-of-day
+  - bietlejuice.ebdb_agent_fast_lane:load-clean-supply-acquisition:first-run-of-day
+  - bietlejuice.ebdb_agent_fast_lane:load-clean-supply-conversion-consultancy:first-run-of-day
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
+  - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history:first-run-of-day
+  - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-product:first-run-of-day
+  - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-unified-identity:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
 bietlejuice.enrich_agents_matias:
   - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
 bietlejuice.enrich_agents_validation:

@@ -52,17 +52,17 @@ SELECT
     aeh.id_agency,
     aeh.id_enrollment,
     ag.id_internal_agent,
-    GET_JSON_OBJECT(h.details, '$.houseExternalId') AS id_house,
+    CAST(GET_JSON_OBJECT(h.details, '$.houseExternalId') AS BIGINT) AS id_house,
     ag.id_partner,
     ag.id_user,
     aeh.rev,
     ag.consultant_type,
     aeh.is_last_status_of_day,
-    lsa.dt_consultant_started,
-    lsa.ts_consultant_deleted,
-    aeh.ts_agency_created,
-    aeh.ts_enrollment_started,
-    aeh.ts_enrollment_ended
+    CAST(lsa.dt_consultant_started AS DATE) AS dt_consultant_started,
+    CAST(lsa.ts_consultant_deleted AS TIMESTAMP) AS ts_consultant_deleted,
+    CAST(aeh.ts_agency_created AS TIMESTAMP) AS ts_agency_created,
+    CAST(aeh.ts_enrollment_started AS TIMESTAMP) AS ts_enrollment_started,
+    CAST(aeh.ts_enrollment_ended AS TIMESTAMP) AS ts_enrollment_ended
 FROM
     datalake_big_agent_clean.house AS h
 JOIN

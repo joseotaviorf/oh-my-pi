@@ -1,0 +1,96 @@
+---
+database_name: datalake_agent_supply
+table_name: supply_conversion_consultancy
+description: |
+  Supply conversion consultancy attribution per house from EBDB supply_conversion_consultancy
+  clean rows plus legacy Big Agent agency rows when no modern consultancy exists for the same
+  house and user in the incremental window. Modern rows join agent_unified_identity on uuid_agent;
+  legacy excludes PRO_ACQUIRER, requires is_last_status_of_day and enrollment before 2026-09-01.
+  Downstream house_listing_consultancy builds listing-level snapshots from this table.
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_consultancy:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.id
+      - datalake_big_agent.house_consultant_history.id_agency
+    description: |
+      Surrogate key for the consultancy interval (XXHASH64 from clean supply id or legacy agency id
+      plus source label).
+  id_supply_conversion_consultancy:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.id
+    description: EBDB supply_conversion_consultancy identifier for modern rows; -1 sentinel for legacy rows.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.id_property
+      - datalake_big_agent.house_consultant_history.id_house
+    description: EBDB house identifier for the property under consultancy attribution.
+  id_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent
+      - datalake_ebdb_clean.supply_conversion_consultancy.uuid_agent
+    description: |
+      Agent Domain agent identifier from unified identity (uuid_agent join for modern rows;
+      partner replace key for legacy).
+  id_user:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_user
+      - datalake_big_agent.house_consultant_history.id_user
+    description: Platform user identifier of the consultancy consultant.
+  source:
+    description: Origin system label for the consultancy interval row.
+    categories:
+      SUPPLY_CONVERSION_CONSULTANCY: Row sourced from datalake_ebdb_clean.supply_conversion_consultancy.
+      LEGACY_AGENCY: Row from datalake_big_agent.house_consultant_history when no modern row exists for the house and user.
+  agent_profile:
+    lineage:
+      - datalake_ebdb_agent_events.agent_product.product_name
+      - datalake_big_agent.house_consultant_history.consultant_type
+    description: Consultant tier from agent product or mapped legacy consultant type (UPPER for non-CIQ_FULL legacy).
+    categories:
+      AUTONOMOUS_BROKERAGE_AGENT: Mapped from legacy CIQ_FULL consultant type.
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.status
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: True when EBDB status is ACTIVE or legacy enrollment is still open (ts_enrollment_ended is null).
+  ts_started:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.ts_start
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+    description: Timestamp when consultancy attribution started for the house.
+  ts_ended:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.ts_end
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: Timestamp when consultancy attribution ended; null when still open.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.ts_created
+      - datalake_big_agent.house_consultant_history.ts_agency_created
+    description: Timestamp when the source consultancy or legacy agency record was first created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.ts_updated
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+    description: Latest update timestamp used for incremental extraction and legacy window filtering.
+  year:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.ts_updated
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: Calendar year partition derived from ts_updated.
+  month:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.ts_updated
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: Calendar month partition derived from ts_updated.
+  day:
+    lineage:
+      - datalake_ebdb_clean.supply_conversion_consultancy.ts_updated
+      - datalake_big_agent.house_consultant_history.ts_enrollment_started
+      - datalake_big_agent.house_consultant_history.ts_enrollment_ended
+    description: Calendar day partition derived from ts_updated.

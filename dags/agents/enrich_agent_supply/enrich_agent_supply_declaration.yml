@@ -1,0 +1,28 @@
+---
+dag:
+  name: enrich_agent_supply
+  schedule_start_date: 2026, 9, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enriched agent supply attribution from EBDB supply acquisition and conversion consultancy,
+      with legacy Big Agent agency fallback. Builds listing-level consultancy snapshots for rent
+      and sale from supply_conversion_consultancy intervals.
+workflow:
+  type: query_delta
+  layer: enrich
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    house_listing_consultancy:
+      - supply_conversion_consultancy
+  tables_customization:
+    supply_acquisition:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [id_acquisition]
+    supply_conversion_consultancy:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [id_consultancy]
