@@ -81,7 +81,7 @@ def validate_task_equals(
     if is_pipeline_task(parsed.task_id):
         if not parsed.dag_id or parsed.is_global:
             errors.append(
-                f"{label}: pipeline tasks (load-*, sync-*) "
+                f"{label}: pipeline tasks (load-*, execute-job-cluster) "
                 "must use bietlejuice.<dag>:<task>, "
                 "not bietlejuice.*."
             )
@@ -163,7 +163,7 @@ def validate_task_contains(
 
     if is_pipeline_task(parsed.task_id):
         errors.append(
-            f"{label}: pipeline task prefixes (load-*, sync-*, etc.) "
+            f"{label}: pipeline task prefixes (load-*, execute-job-cluster) "
             "cannot be muted via contains."
         )
 

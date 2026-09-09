@@ -45,7 +45,6 @@ class JiraOpsEnum(enum.Enum):
     GLOBAL_DAG_WILDCARD_SUFFIX = "*"
     FORBIDDEN_PIPELINE_TASK_PREFIXES = (
         "load-",
-        "sync-",
         "execute-job-cluster",
     )
     GENERAL_TASK_IDS = frozenset(
