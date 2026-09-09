@@ -26,15 +26,36 @@ _CONFIG_VALUES = {
     "databricks_bietlejuice_repo_path": "/test/bietlejuice",
     "datalake_bucket": "test-bucket",
     "cluster": {"type": "emr_7_12_small_general_2xlarge_single_node_cluster"},
-    "dependencies": {
-        "bietlejuice.salesforce": {
-            "is_daily": True,
-            "execution_hour": 6,
-            "tasks": ["load-clean-record-types"],
+    "lineages": {
+        "cases": {
+            "dependencies": {
+                "bietlejuice.salesforce": {
+                    "is_daily": True,
+                    "execution_hour": 6,
+                    "tasks": ["load-clean-record-types"],
+                },
+                "bietlejuice.salesforce_cdc": {
+                    "is_daily": False,
+                    "tasks": ["dlq_events_case"],
+                },
+            },
         },
-        "bietlejuice.salesforce_cdc": {
-            "is_daily": False,
-            "tasks": ["dlq_events_case"],
+        "services": {
+            "dependencies": {
+                "bietlejuice.sauron": {
+                    "is_daily": False,
+                    "tasks": ["load-clean-session"],
+                },
+            },
+        },
+        "general": {
+            "cluster": {"type": "emr_7_12_min_memory_2_workers_cluster"},
+            "dependencies": {
+                "bietlejuice.salesforce_cdc": {
+                    "is_daily": False,
+                    "tasks": ["load_datalake_salesforce_clean_events_user"],
+                },
+            },
         },
     },
     "webhook_salesforce_cdc": "WEBHOOK_TEST",
@@ -85,15 +106,34 @@ def _install_dag_dependency_stubs(
     models = MagicMock()
     models.baseoperator = baseoperator
 
+    class _TaskGroup:
+        def __init__(self, group_id=None, **kwargs):
+            self.group_id = group_id
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    task_group_mod = MagicMock()
+    task_group_mod.TaskGroup = _TaskGroup
+
+    utils_mod = MagicMock()
+    utils_mod.task_group = task_group_mod
+
     airflow_pkg = MagicMock()
     airflow_pkg.DAG = _DAG
     airflow_pkg.decorators = decorators
     airflow_pkg.models = models
+    airflow_pkg.utils = utils_mod
 
     sys.modules["airflow"] = airflow_pkg
     sys.modules["airflow.decorators"] = decorators
     sys.modules["airflow.models"] = models
     sys.modules["airflow.models.baseoperator"] = baseoperator
+    sys.modules["airflow.utils"] = utils_mod
+    sys.modules["airflow.utils.task_group"] = task_group_mod
 
     fake_jce = MagicMock()
     fake_jce.attach_job_cluster_engine_to_context = attach_engine_fn

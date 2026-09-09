@@ -3,45 +3,66 @@ webhook_salesforce_cdc: WEBHOOK_SALESFORCE_CDC_PROD
 dag_documentation:
   dag_purpose: |
     Builds Support Journey core model tables from Salesforce clean sources.
-    One Spark task per YAML spec under ``tables/`` (EMR job cluster when ``cluster.type`` uses ``emr-*`` spark_version).
+    One Spark task per YAML spec under ``tables/``, split into detached EMR
+    cluster lineages (cases / services dedicated, everything else on the shared
+    general cluster). Each lineage has its own sensors and its own
+    previous-run gate, so one lineage never blocks the others.
 
 datalake_bucket: "5a-datalake-prod"
 
-dependencies:
-  bietlejuice.salesforce:
-    is_daily: true
-    execution_hour: 0
-    tasks:
-      - load-clean-record-types
-      - load-clean-case-milestones
-  bietlejuice.salesforce_cdc:
-    is_daily: false
-    tasks:
-      - dlq_events_case
-      - load_datalake_salesforce_clean_events_user
-  bietlejuice.bigfone:
-    is_daily: false
-    tasks:
-      - load-clean-event
-  bietlejuice.quinto_messenger:
-    is_daily: false
-    tasks:
-      - load-clean-channel
-      - load-clean-chat
-      - load-clean-task
-      - load-clean-task-event
-  bietlejuice.sauron:
-    is_daily: false
-    tasks:
-      - load-clean-session
-  bietlejuice.support_session_service:
-    is_daily: false
-    tasks:
-      - load-clean-support-session
+# Per-lineage sensor specs. Each lineage waits only on the upstream tasks its
+# tables actually read (see tables/<table>.yml sources). A lineage may also
+# declare its own ``cluster:`` block to override the DAG-level default below.
+lineages:
+  cases:
+    dependencies:
+      bietlejuice.salesforce:
+        is_daily: true
+        execution_hour: 0
+        tasks:
+          - load-clean-record-types
+          - load-clean-case-milestones
+      bietlejuice.salesforce_cdc:
+        is_daily: false
+        tasks:
+          # DLQ, not the clean load: recovery is already replayed into clean
+          # before the core model reads events_case.
+          - dlq_events_case
+  services:
+    dependencies:
+      bietlejuice.bigfone:
+        is_daily: false
+        tasks:
+          - load-clean-event
+      bietlejuice.quinto_messenger:
+        is_daily: false
+        tasks:
+          - load-clean-channel
+          - load-clean-chat
+          - load-clean-task
+          - load-clean-task-event
+      bietlejuice.sauron:
+        is_daily: false
+        tasks:
+          - load-clean-session
+      bietlejuice.support_session_service:
+        is_daily: false
+        tasks:
+          - load-clean-support-session
+  general:
+    dependencies:
+      bietlejuice.salesforce_cdc:
+        is_daily: false
+        tasks:
+          # analyst reads datalake_salesforce_clean.events_user.
+          - load_datalake_salesforce_clean_events_user
 
+# Default cluster for every lineage (override per lineage under lineages.<name>.cluster).
 # TEMP: bumped one rung (from emr_7_12_min_memory_2_workers_cluster) because the
 # hourly run was overshooting its 1h SLA at ~1:10. Reduce back to the smaller
-# preset as soon as the upstream DAGs set partition_hour.
+# preset as soon as the upstream DAGs set partition_hour. With the lineage split
+# each cluster now runs a subset of the tables, so right-size per lineage once
+# post-split runtimes are measured.
 cluster:
   type: emr_7_12_consolidation_l_memory_cluster
   access_control_list:

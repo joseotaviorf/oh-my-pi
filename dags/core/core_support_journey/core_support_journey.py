@@ -9,9 +9,22 @@ follows the patterns defined by ``BaseCoreModelSparkJob``
 ``tables/<table>.yml``, SCD Type 2 versioning helpers, schema validation, and
 Delta merge via ``DataFrameDeltaTableLoaderPipeline``. New tables should extend
 that base class rather than introducing ad-hoc job structures.
+
+Topology (mirrors ``salesforce_cdc``'s detached cluster lineages, on EMR):
+each lineage — ``cases``, ``services`` and the shared ``general`` cluster for
+every other table — has its own sensors, its own EMR job cluster and its own
+previous-run gate, so one lineage lagging or failing never blocks the others.
+Hour N+1 of a lineage starts only after its own hour N fully succeeded
+(``wait_previous_lineage_*``: ``depends_on_past`` + ``wait_for_downstream``
+against the lineage leaf ``end_cluster_*``). Unlike ``salesforce_cdc`` there
+are NO per-lineage 1-slot Airflow pools: the ``emr_plugin`` operators default
+to the global ``emr_api`` pool (EMR control-plane rate limit) and passing a
+custom pool would silently replace it, so serialization here comes solely from
+the gate flags.
 """
 
 import os
+from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
@@ -19,8 +32,8 @@ from typing import Any, Dict, List, Tuple
 
 import yaml
 from airflow import DAG
-from airflow.decorators import task_group
 from airflow.models.baseoperator import BaseOperator
+from airflow.utils.task_group import TaskGroup
 
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.job_cluster_engine import (
@@ -47,9 +60,15 @@ BIETLEJUICE_REPO_PATH = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_p
 BASE_SPARK_JOB_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/sst_pipelines/"
 bucket = CONFIG_SERVICE.get_config("datalake_bucket")
 CORE_SCHEMA = "core_support_journey"
-CLUSTER_ARGS = CONFIG_SERVICE.get_config("cluster")
-EXTERNAL_SENSOR_SPECS: Dict[str, List[str]] = CONFIG_SERVICE.get_config("dependencies")
+DEFAULT_CLUSTER_ARGS = CONFIG_SERVICE.get_config("cluster")
+LINEAGES_CONFIG: Dict[str, Dict[str, Any]] = CONFIG_SERVICE.get_config("lineages")
 TABLES_DIR = Path(__file__).resolve().parent / "tables"
+
+# Tables that get a dedicated cluster lineage (lineage name == table stem),
+# mirroring salesforce_cdc's DEDICATED_CLUSTER_EVENTS. Every other table under
+# ``tables/`` lands on the shared GENERAL_LINEAGE cluster.
+DEDICATED_LINEAGE_TABLES = ("cases", "services")
+GENERAL_LINEAGE = "general"
 
 gchat_webhook_var = CONFIG_SERVICE.get_config("webhook_salesforce_cdc")
 gchat_callback = GchatCallback(webhook_url_variable=gchat_webhook_var)
@@ -67,6 +86,22 @@ def list_table_specs_from_dir(tables_dir: Path) -> List[Tuple[str, Dict[str, Any
             loaded = yaml.safe_load(handle) or {}
         out.append((path.stem, loaded))
     return out
+
+
+def assign_tables_to_lineages(table_stems: List[str]) -> Dict[str, List[str]]:
+    """
+    Map each table stem to its cluster lineage, in stable build order:
+    dedicated lineages first (declaration order), then the shared general
+    lineage. Lineages without tables are dropped (e.g. general on forno if only
+    dedicated tables exist), so ``execute-job-cluster[-N]`` local ids stay
+    aligned with the lineages actually built.
+    """
+    assignments: Dict[str, List[str]] = {name: [] for name in DEDICATED_LINEAGE_TABLES}
+    assignments[GENERAL_LINEAGE] = []
+    for stem in table_stems:
+        lineage = stem if stem in DEDICATED_LINEAGE_TABLES else GENERAL_LINEAGE
+        assignments[lineage].append(stem)
+    return {name: stems for name, stems in assignments.items() if stems}
 
 
 def get_daily_target_logical_date(
@@ -103,7 +138,30 @@ BASE_PARAMETERS = {
 _DEFAULT_EXECUTION_TIMEOUT_HOURS = 2
 
 
-def build_dag_execution_context(dag: DAG) -> DagExecutionContext:
+def lineage_cluster_args(lineage_name: str) -> Dict[str, Any]:
+    """
+    Cluster args for one lineage: the lineage's own ``cluster:`` conf block when
+    present, else the DAG-level ``cluster:`` default. Deep-copied because
+    ConfigurationService hands out shared dict references, and each lineage
+    injects its own ``cluster_name`` (the preset default ``dag_id_run_id`` would
+    otherwise name the concurrent lineage clusters identically).
+    """
+    lineage_conf = LINEAGES_CONFIG.get(lineage_name) or {}
+    cluster_args = deepcopy(lineage_conf.get("cluster") or DEFAULT_CLUSTER_ARGS)
+    custom = cluster_args.setdefault("custom_configurations", {})
+    custom.setdefault("cluster_name", f"{DAG_ID}_{{{{ run_id }}}}_{lineage_name}")
+    return cluster_args
+
+
+def build_dag_execution_context(
+    dag: DAG, cluster_args: Dict[str, Any]
+) -> DagExecutionContext:
+    """
+    One context (and therefore one EmrJobClusterEngine) per lineage: each engine
+    resolves its own cluster config and tracks its own
+    ``emr_active_create_cluster_task_id``, so a lineage's spark steps can never
+    point at another lineage's cluster XCom regardless of build order.
+    """
     context = DagExecutionContext(
         dag=dag,
         environment=ENV,
@@ -111,7 +169,7 @@ def build_dag_execution_context(dag: DAG) -> DagExecutionContext:
         base_spark_jobs_path=BASE_SPARK_JOB_PATH,
         dag_args={},
         workflow_args={},
-        cluster_args=CLUSTER_ARGS,
+        cluster_args=cluster_args,
         databricks_conn_id=DATABRICKS_CONN_ID,
     )
     attach_job_cluster_engine_to_context(context, CONFIG_SERVICE)
@@ -119,12 +177,15 @@ def build_dag_execution_context(dag: DAG) -> DagExecutionContext:
 
 
 def create_execute_job_cluster_task(
-    dag_execution_context: DagExecutionContext,
+    dag_execution_context: DagExecutionContext, local_id: int
 ) -> BaseOperator:
     return dag_execution_context.job_cluster_engine.create_execute_cluster_task(
         config_service=CONFIG_SERVICE,
         minimum_cluster_runtime_version=None,
-        execute_job_cluster_local_id=None,
+        # Repo convention (base_query_delta_workflow): cluster 1 keeps the
+        # unsuffixed ``execute-job-cluster`` id, so cases inherits the task
+        # history of the previous single-cluster layout.
+        execute_job_cluster_local_id=local_id if local_id > 1 else None,
     )
 
 
@@ -161,30 +222,115 @@ def create_load_table_task(
     )
 
 
-@task_group(group_id="start_sensors")
-def external_sensors():
-    for external_dag_id, config in EXTERNAL_SENSOR_SPECS.items():
-        for task_id in config["tasks"]:
-            execution_date_fn = (
-                partial(
-                    get_daily_target_logical_date,
-                    execution_hour=config["execution_hour"],
+def build_lineage_sensors(lineage_name: str, sensor_specs: Dict[str, Any]) -> TaskGroup:
+    """
+    One SStExternalTaskSensor per (upstream DAG, upstream task) pair, grouped
+    per lineage so a late upstream only holds back the lineage that reads it.
+    """
+    with TaskGroup(group_id=f"start_sensors_{lineage_name}") as sensors_group:
+        for external_dag_id, config in sensor_specs.items():
+            for task_id in config["tasks"]:
+                execution_date_fn = (
+                    partial(
+                        get_daily_target_logical_date,
+                        execution_hour=config["execution_hour"],
+                    )
+                    if config["is_daily"]
+                    else None
                 )
-                if config["is_daily"]
-                else None
-            )
-            SStExternalTaskSensor(
-                task_id=f"sensor_{external_dag_id.replace('.', '_')}_{task_id}",
-                external_dag_id=external_dag_id,
-                external_task_id=task_id,
-                execution_date_fn=execution_date_fn,
-            )
+                SStExternalTaskSensor(
+                    task_id=f"sensor_{external_dag_id.replace('.', '_')}_{task_id}",
+                    external_dag_id=external_dag_id,
+                    external_task_id=task_id,
+                    execution_date_fn=execution_date_fn,
+                )
+    return sensors_group
+
+
+def build_cluster_lineage(
+    dag: DAG, lineage_name: str, table_stems: List[str], local_id: int
+) -> None:
+    """
+    One detached lineage: gate >> sensors >> EMR cluster >> loads >> terminate,
+    with ``end_cluster_<lineage>`` as the leaf the next hour's gate waits on.
+    """
+    lineage_conf = LINEAGES_CONFIG.get(lineage_name)
+    if lineage_conf is None or "dependencies" not in lineage_conf:
+        raise ValueError(
+            f"Lineage '{lineage_name}' (tables: {table_stems}) has no "
+            f"'lineages.{lineage_name}.dependencies' entry in the environment "
+            "conf — every lineage must declare which upstream tasks it waits on"
+        )
+
+    dag_execution_context = build_dag_execution_context(
+        dag, lineage_cluster_args(lineage_name)
+    )
+
+    wait_previous_lineage = SStPlaceholderOperator(
+        task_id=f"wait_previous_lineage_{lineage_name}",
+        depends_on_past=True,
+        wait_for_downstream=True,
+    )
+    sensors_group = build_lineage_sensors(lineage_name, lineage_conf["dependencies"])
+    execute_job_cluster = create_execute_job_cluster_task(
+        dag_execution_context, local_id
+    )
+    # The engine does not expose wait_for_downstream; set it post-construction
+    # (depends_on_past=True already comes from default_args) so hour N+1's
+    # cluster refuses to provision until hour N's full lineage — including the
+    # end_cluster_* leaf wired below — succeeded, even if the gate is cleared.
+    execute_job_cluster.wait_for_downstream = True
+
+    load_tasks = []
+    for stem in table_stems:
+        load_task = create_load_table_task(dag_execution_context, stem)
+        # Emit a per-table dataset event so downstream DAGs (e.g. dw_support_journey)
+        # can trigger on this DAG via dependencies.yaml.
+        DatasetAdder.attach_dataset_to_task(load_task)
+        load_tasks.append(load_task)
+
+    end_cluster = SStPlaceholderOperator(
+        task_id=f"end_cluster_{lineage_name}",
+        # The gate serializes hours; depends_on_past on the leaf would only add
+        # a redundant cross-run chain that deadlocks the lineage after a clear.
+        depends_on_past=False,
+    )
+
+    cluster_completion_sink = get_job_cluster_completion_sink(
+        dag_execution_context, execute_job_cluster, end_cluster, local_id
+    )
+    attach_emr_job_cluster_finished_work_prerequisites(
+        dag_execution_context,
+        job_cluster_finished_task=end_cluster,
+        work_completion_tasks=load_tasks,
+    )
+
+    (
+        wait_previous_lineage
+        >> sensors_group
+        >> execute_job_cluster
+        >> load_tasks
+        >> cluster_completion_sink
+    )
+    attach_emr_terminate_cluster_work_prerequisites(
+        dag_execution_context,
+        cluster_completion_sink,
+        execute_job_cluster_task=execute_job_cluster,
+        job_cluster_finished_task=end_cluster,
+    )
+    # Immediate downstream of the gate and execute includes the lineage leaf so
+    # wait_for_downstream waits for the full hour, not only sensors/cluster start.
+    wait_previous_lineage >> end_cluster
+    execute_job_cluster >> end_cluster
 
 
 _DEFAULT_ARGS = {
     "owner": "Data SS",
     "email_on_retry": False,
     "retries": 3,
+    # Per-table SCD-2 ordering: a load task must not apply hour N+1 before its
+    # own hour N merged. The lineage-level gate additionally serializes the
+    # whole lineage across hours.
     "depends_on_past": True,
 }
 
@@ -195,44 +341,15 @@ with DAG(
     start_date=datetime(2026, 5, 1),
     catchup=True,
     tags=["core_model", "support_journey", "SST", "Salesforce", "SF"],
-    max_active_runs=1,
+    # Independent cluster lineages (cases, services, general) must not block
+    # each other across hours via a shared start/end. 24 open hours keeps the
+    # healthy lineages moving if one lags up to a day; within a lineage the
+    # wait_previous_lineage_* gate keeps hours strictly serial.
+    max_active_runs=24,
     on_failure_callback=gchat_callback.dag_failure_alert,
 ) as dag:
-    dag_execution_context = build_dag_execution_context(dag)
-
-    start = SStPlaceholderOperator(task_id="start")
-    end = SStPlaceholderOperator(task_id="end")
-    execute_job_cluster = create_execute_job_cluster_task(dag_execution_context)
-
-    external_sensors = external_sensors()
-
-    load_tasks = []
-    for stem, _spec in list_table_specs_from_dir(TABLES_DIR):
-        load_task = create_load_table_task(dag_execution_context, stem)
-        # Emit a per-table dataset event so downstream DAGs (e.g. dw_support_journey)
-        # can trigger on this DAG via dependencies.yaml.
-        DatasetAdder.attach_dataset_to_task(load_task)
-        load_tasks.append(load_task)
-
-    cluster_completion_sink = get_job_cluster_completion_sink(
-        dag_execution_context, execute_job_cluster, end
-    )
-    attach_emr_job_cluster_finished_work_prerequisites(
-        dag_execution_context,
-        job_cluster_finished_task=end,
-        work_completion_tasks=load_tasks,
-    )
-
-    (
-        start
-        >> external_sensors
-        >> execute_job_cluster
-        >> load_tasks
-        >> cluster_completion_sink
-    )
-    attach_emr_terminate_cluster_work_prerequisites(
-        dag_execution_context,
-        cluster_completion_sink,
-        execute_job_cluster_task=execute_job_cluster,
-        job_cluster_finished_task=end,
-    )
+    table_stems = [stem for stem, _spec in list_table_specs_from_dir(TABLES_DIR)]
+    for lineage_local_id, (lineage_name, lineage_tables) in enumerate(
+        assign_tables_to_lineages(table_stems).items(), start=1
+    ):
+        build_cluster_lineage(dag, lineage_name, lineage_tables, lineage_local_id)

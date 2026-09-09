@@ -62,14 +62,68 @@ class TestGetDailyTargetLogicalDate:
 class TestBuildDagExecutionContext:
     def test_attaches_job_cluster_engine(self, core_support_journey_module):
         dag = MagicMock()
+        cluster_args = {"type": "emr_test_cluster"}
         with patch.object(
             core_support_journey_module, "attach_job_cluster_engine_to_context"
         ) as mock_attach:
-            ctx = core_support_journey_module.build_dag_execution_context(dag)
+            ctx = core_support_journey_module.build_dag_execution_context(
+                dag, cluster_args
+            )
 
         assert ctx.dag is dag
+        assert ctx.cluster_args == cluster_args
         mock_attach.assert_called_once_with(
             ctx, core_support_journey_module.CONFIG_SERVICE
+        )
+
+
+class TestAssignTablesToLineages:
+    def test_dedicated_tables_get_own_lineage_and_rest_go_general(
+        self, core_support_journey_module
+    ):
+        assignments = core_support_journey_module.assign_tables_to_lineages(
+            ["analyst", "cases", "services", "zz_future_table"]
+        )
+
+        assert assignments == {
+            "cases": ["cases"],
+            "services": ["services"],
+            "general": ["analyst", "zz_future_table"],
+        }
+        # Build order (and therefore execute-job-cluster local ids) is stable:
+        # dedicated lineages first, general last.
+        assert list(assignments) == ["cases", "services", "general"]
+
+    def test_lineages_without_tables_are_dropped(self, core_support_journey_module):
+        assignments = core_support_journey_module.assign_tables_to_lineages(["cases"])
+
+        assert assignments == {"cases": ["cases"]}
+
+
+class TestLineageClusterArgs:
+    def test_falls_back_to_dag_level_cluster_and_injects_cluster_name(
+        self, core_support_journey_module
+    ):
+        args = core_support_journey_module.lineage_cluster_args("cases")
+
+        default = core_support_journey_module.DEFAULT_CLUSTER_ARGS
+        assert args["type"] == default["type"]
+        assert (
+            args["custom_configurations"]["cluster_name"]
+            == "bietlejuice.core_support_journey_{{ run_id }}_cases"
+        )
+        # Deep copy: the shared conf dict must not accumulate per-lineage keys.
+        assert "custom_configurations" not in default
+
+    def test_uses_lineage_cluster_override_when_present(
+        self, core_support_journey_module
+    ):
+        args = core_support_journey_module.lineage_cluster_args("general")
+
+        assert args["type"] == "emr_7_12_min_memory_2_workers_cluster"
+        assert (
+            args["custom_configurations"]["cluster_name"]
+            == "bietlejuice.core_support_journey_{{ run_id }}_general"
         )
 
 
@@ -113,15 +167,42 @@ class TestCreateLoadTableTask:
 
 
 class TestCreateExecuteJobClusterTask:
-    def test_delegates_to_job_cluster_engine(self, core_support_journey_module):
+    def test_first_cluster_keeps_unsuffixed_task_id(self, core_support_journey_module):
         mock_engine = core_support_journey_module._mock_engine
         mock_engine.create_execute_cluster_task.reset_mock()
         ctx = MagicMock()
         ctx.job_cluster_engine = mock_engine
 
-        core_support_journey_module.create_execute_job_cluster_task(ctx)
+        core_support_journey_module.create_execute_job_cluster_task(ctx, local_id=1)
 
-        mock_engine.create_execute_cluster_task.assert_called_once()
+        call_kwargs = mock_engine.create_execute_cluster_task.call_args.kwargs
+        assert call_kwargs["execute_job_cluster_local_id"] is None
+
+    def test_later_clusters_get_suffixed_local_ids(self, core_support_journey_module):
+        mock_engine = core_support_journey_module._mock_engine
+        mock_engine.create_execute_cluster_task.reset_mock()
+        ctx = MagicMock()
+        ctx.job_cluster_engine = mock_engine
+
+        core_support_journey_module.create_execute_job_cluster_task(ctx, local_id=3)
+
+        call_kwargs = mock_engine.create_execute_cluster_task.call_args.kwargs
+        assert call_kwargs["execute_job_cluster_local_id"] == 3
+
+
+class TestBuildClusterLineage:
+    def test_raises_when_lineage_has_no_dependencies_conf(
+        self, core_support_journey_module
+    ):
+        dag = MagicMock()
+
+        with (
+            patch.dict(core_support_journey_module.LINEAGES_CONFIG, {}, clear=True),
+            pytest.raises(ValueError, match="lineages.cases.dependencies"),
+        ):
+            core_support_journey_module.build_cluster_lineage(
+                dag, "cases", ["cases"], 1
+            )
 
 
 class TestDagModuleConstants:
