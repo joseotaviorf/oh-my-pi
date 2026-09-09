@@ -1120,6 +1120,17 @@ steps:
       path: *luigijr_dag_bundle_path
     depends_on: [setup]
 
+  upload-luigijr-spark-jobs-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs --include-dir luigijr
+    when:
+      event: push
+      branch: [master]
+      path: *luigijr_dag_bundle_path
+    depends_on: [setup]
+
   upload-luigijr-queries-s3-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
