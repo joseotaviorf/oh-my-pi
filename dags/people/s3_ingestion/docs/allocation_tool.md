@@ -72,10 +72,22 @@ employee changing allocation on the same day.
 
 ## Entity model
 
+### Resource Allocation 2.0 (current)
+
+| Level | Export entity | Clean column | Example |
+| --- | --- | --- | --- |
+| **Macro group (Line)** | `groups.line` | `groups.line_name` | For Rent |
+| **Team** | `groups.name` | `groups.group_name` | Billing & Payments |
+| **Project** | `tags.name` | `tags.tag_name` | IPO-readiness |
+
+Each team group carries a `line` field naming the Line it belongs to. Project tag names may repeat across teams (e.g. `Mora XP`); identify a tag by `(id_group, id_tag)` or `(group_name, tag_name)`, never by `tag_name` alone.
+
+### Legacy (pre-2.0)
+
 | Entity | Definition | Cardinality |
 | --- | --- | --- |
-| **Group** (tag class) | User-defined category — e.g. `BU`. Names are unique **globally**. | Holds 1-N tags |
-| **Tag** | Belongs to exactly one group — e.g. `ForSale` under group `BU`. Names are unique **only within their own group**, so a tag is identified by the pair (group, tag), never by name alone. | Belongs to 1 group |
+| **Group** (Line) | User-defined category — e.g. `For Rent`. Names are unique **globally**. `line` is absent. | Held 1-N tags that were effectively teams |
+| **Tag** (team) | Belongs to exactly one group. | Belongs to 1 group |
 | **Employee** | Read-only, seeded from PIN. | — |
 | **Allocation** | The link between an employee and a tag, from which FTE is derived. | An employee holds 0-N tags **per group** |
 

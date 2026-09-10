@@ -9,11 +9,10 @@ table_level_validations:
   has_size_variation:
     variation_type: percentage
     greater_than_or_equal_to: -10
-    # Tiny table (~11 rows): the default +25 fires on +3 rows, and an admin
-    # creating a handful of groups at once is normal app usage. Drops stay at
-    # the default guard: rows are soft-deleted, never removed, so any real
-    # shrink means the MERGE misbehaved.
-    less_than_or_equal_to: 100
+    # RA 2.0 added team-level groups under each Line (~48 teams + ~11 legacy
+    # line-as-group rows). One-time migration can spike well above +25%; cap
+    # high enough to catch runaway duplication without blocking the cutover.
+    less_than_or_equal_to: 500
     severity_level: Error
 
 column_level_validations:
@@ -22,6 +21,16 @@ column_level_validations:
       severity_level: Warning
     is_complete:
       severity_level: Warning
+  line_name:
+    active_teams_have_line_name:
+      custom:
+        constraint: |-
+          (SELECT COUNT(*)
+           FROM datalake_allocation_tool_clean.groups
+           WHERE is_active = TRUE
+             AND line_name IS NULL
+          ) = 0
+        severity_level: Warning
   group_name:
     is_complete:
       severity_level: Warning

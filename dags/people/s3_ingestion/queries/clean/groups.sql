@@ -91,6 +91,7 @@ SELECT
     record['id'] AS id_group,
     record['created_by_id'] AS id_created_by,
     record['deactivated_by'] AS id_deactivated_by,
+    record['line'] AS line_name,
     record['name'] AS group_name,
     file_name,
     CAST(record['is_locked'] AS BOOLEAN) AS is_locked,

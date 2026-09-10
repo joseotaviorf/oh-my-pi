@@ -4,8 +4,10 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
   Current state of groups in the Allocation Tool, the internal app where leaders
-  distribute people across groups and tags for resource planning.
+  distribute people across lines, teams and projects for resource planning.
   One row per group id.
+  Resource Allocation 2.0 models teams as groups: each team belongs to exactly
+  one Line via line_name (macro group) and is identified by group_name.
   Covers all groups exported by the app, including deactivated rows kept with
   is_active = false.
   Built incrementally: an initial snapshot export seeds the table and daily delta
@@ -26,8 +28,13 @@ columns:
     lineage:
     - datalake_allocation_tool_raw.groups.raw_content.records[*].deactivated_by
     - datalake_allocation_tool_raw.delta.raw_content.groups[*].deactivated_by
+  line_name:
+    description: Display name of the macro group (Line) that owns the team in Resource Allocation 2.0 (e.g. For Rent). NULL when the export carries no Line for the team group.
+    lineage:
+    - datalake_allocation_tool_raw.groups.raw_content.records[*].line
+    - datalake_allocation_tool_raw.delta.raw_content.groups[*].line
   group_name:
-    description: Display name of the group.
+    description: Display name of the team within its Line in Resource Allocation 2.0 (e.g. Billing & Payments).
     lineage:
     - datalake_allocation_tool_raw.groups.raw_content.records[*].name
     - datalake_allocation_tool_raw.delta.raw_content.groups[*].name
