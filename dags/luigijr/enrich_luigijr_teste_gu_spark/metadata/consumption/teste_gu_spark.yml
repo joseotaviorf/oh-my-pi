@@ -1,0 +1,12 @@
+database_name: ops_finance
+table_name: teste_gu_spark
+owner: gustavo.akashi@quintoandar.com.br
+domain: Data Ops & Governance
+description: Table `teste_gu_spark` materialized on a schedule by Luigi from a user-provided SQL query (Ops Finance domain).
+columns:
+  id:
+    description: Column `id` produced by the scheduled materialization query.
+  id_country:
+    description: Column `id_country` produced by the scheduled materialization query.
+  id_proposal:
+    description: Column `id_proposal` produced by the scheduled materialization query.

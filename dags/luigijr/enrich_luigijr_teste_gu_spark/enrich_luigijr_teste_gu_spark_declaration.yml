@@ -1,0 +1,13 @@
+dag:
+  name: enrich_luigijr_teste_gu_spark
+  owner: Ops Finance
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:gustavo.akashi
+  dataset_dependencies:
+  - datalake_ebdb_contract.contract
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: ops_finance
