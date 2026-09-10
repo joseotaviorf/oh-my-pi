@@ -9,15 +9,38 @@ bucket or to an external partner bucket.
 
 Supported file_format values: csv, json, parquet.
 
-Spark's DataFrameWriter always treats its target path as a directory of part
-files, even with `coalesce(1)`. Consumers of this DAG read a single object
-(e.g. `orghealth/base_app_org_health.csv`), so the job writes to a throwaway
-staging prefix under the destination key's parent directory (e.g.
-`orghealth/_staging/load_to_s3/...`), copies the single part file onto the
-exact destination key via boto3, and deletes the staging prefix. Scoping
-staging under the same IAM prefix as the consumer object avoids prod failures
-when partner buckets grant only `orghealth/*`. `coalesce(1)` is required for
-that promote step and is appropriate for roster-sized exports.
+Two write modes:
+
+1. **Single-object** (default) — Spark's DataFrameWriter always treats its
+   target path as a directory of part files, even with `coalesce(1)`. Consumers
+   read one object (e.g. `orghealth/base_app_org_health.csv`), so the job writes
+   to a throwaway staging prefix under the destination key's parent directory,
+   copies the single part file onto the exact destination key via boto3, and
+   deletes the staging prefix. `coalesce(1)` is required for that promote step.
+
+2. **Partitioned Parquet** — when the fifth argument lists partition columns
+   (comma-separated, e.g. `year,month,day`), the job writes a Hadoop-style
+   partitioned dataset directly under `s3a://{bucket}/{key_prefix}/` with ZSTD
+   compression and no staging promote.
+
+   `s3a://` is deliberate: `s3://` resolves to EMRFS on EMR, and the partner
+   integration (access point alias, `fs.s3a.bucket.probe=0`, no magic committer)
+   was specified against Hadoop 3.4.1 S3A. The scheme also decides whether the
+   cluster-wide `fs.s3a.*` settings apply at all.
+
+   Partition overwrite is forced to `dynamic` so a daily run replaces only its
+   own `year=/month=/day=` partition. Under Spark's default `static` mode,
+   `mode("overwrite")` + `partitionBy` deletes the whole destination prefix and
+   would leave the consumer with a single day instead of the agreed daily
+   snapshot history.
+
+   No canned ACL is set on this path, but note that EMR spark-submit injects
+   `spark.hadoop.fs.s3a.canned.acl=BucketOwnerFullControl` for every job in this
+   repo (`job_cluster_engine._build_emr_extra_spark_submit_args`), so S3A PUTs
+   still carry `x-amz-acl: bucket-owner-full-control`. Buckets with ACLs
+   disabled (`ObjectOwnership=BucketOwnerEnforced`) accept that specific value;
+   a bucket policy that denies `s3:x-amz-acl` outright would not, and the fix
+   belongs at submit time, not here.
 
 CSV options match the Daily Pipeline notebook Spark writer (`header=true`
 plus Spark CSV defaults: comma separator, UTF-8, backslash escape). Do not
@@ -33,13 +56,15 @@ an internal bucket that typically rejects canned ACLs.
 import os
 import uuid
 from argparse import ArgumentParser
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.validation.spark_args import (
+    CLI_NONE,
     add_validation_target_args,
+    decode_cli_arg,
     is_validation_run,
 )
 from bietlejuice.clients.db_clients import SparkClient
@@ -90,11 +115,36 @@ def _write_parquet(df, s3_uri: str) -> None:
     df.coalesce(1).write.mode("overwrite").parquet(s3_uri)
 
 
+def _write_partitioned_parquet(df, s3_uri: str, partition_columns: List[str]) -> None:
+    """
+    Write `df` as ZSTD-compressed Parquet partitioned by `partition_columns`.
+
+    Forces `partitionOverwriteMode=dynamic` so `mode("overwrite")` replaces only
+    the partitions present in `df`. Spark's default (`static`) deletes the entire
+    destination path first, which would drop every previously exported day.
+    """
+    df.sparkSession.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
+    (
+        df.write.mode("overwrite")
+        .option("compression", "zstd")
+        .partitionBy(*partition_columns)
+        .parquet(s3_uri)
+    )
+
+
 _WRITERS = {
     "csv": _write_csv,
     "json": _write_json,
     "parquet": _write_parquet,
 }
+
+
+def _parse_partition_columns(raw_value: Optional[str]) -> Optional[List[str]]:
+    """Return trimmed partition column names from a comma-separated CLI value."""
+    if raw_value is None or not raw_value.strip():
+        return None
+    columns = [column.strip() for column in raw_value.split(",") if column.strip()]
+    return columns or None
 
 
 def _as_prefix(prefix: str) -> str:
@@ -253,7 +303,7 @@ def _resolve_destination(bucket: str, key_prefix: str) -> Tuple[str, str, bool]:
     return test_bucket, test_key_prefix, False
 
 
-def parse_arguments() -> Dict[str, Optional[str]]:
+def parse_arguments() -> Dict[str, Any]:
     """Parse positional Spark-job arguments plus cluster-validation flags."""
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -270,10 +320,22 @@ def parse_arguments() -> Dict[str, Optional[str]]:
     parser.add_argument(
         "object_acl",
         nargs="?",
+        type=decode_cli_arg,
         default=None,
         help=(
-            "Optional canned ACL for the destination object "
-            f"(e.g. {CROSS_ACCOUNT_OBJECT_ACL}). Applied in prod only."
+            "Optional canned ACL for single-object exports "
+            f"(e.g. {CROSS_ACCOUNT_OBJECT_ACL}). Applied in prod only. "
+            f"Pass '{CLI_NONE}' to skip it when partition columns follow."
+        ),
+    )
+    parser.add_argument(
+        "partition_columns",
+        nargs="?",
+        type=decode_cli_arg,
+        default=None,
+        help=(
+            "Optional comma-separated partition columns for Parquet exports "
+            "(e.g. year,month,day). Writes a Hadoop-style dataset."
         ),
     )
 
@@ -287,6 +349,7 @@ def parse_arguments() -> Dict[str, Optional[str]]:
         "key_prefix": args.key_prefix,
         "file_format": args.file_format,
         "object_acl": args.object_acl,
+        "partition_columns": _parse_partition_columns(args.partition_columns),
         "target_database_name": args.target_database_name,
         "target_table_name": args.target_table_name,
     }
@@ -299,33 +362,56 @@ def load_table_into_s3(
     key_prefix: str,
     file_format: str,
     object_acl: Optional[str] = None,
+    partition_columns: Optional[List[str]] = None,
     spark_session=None,
     s3_client=None,
 ) -> None:
     """
-    Export `{schema}.{table_name}` to a single S3 object.
+    Export `{schema}.{table_name}` to S3.
+
+    Single-object mode promotes one Spark part file onto `key_prefix`. Partitioned
+    Parquet mode writes directly under `key_prefix/` with `partitionBy`.
 
     `spark_session` and `s3_client` default to the module Spark session and a
     new boto3 client so production stays dual-runtime; tests inject mocks.
     """
     file_format = file_format.lower()
-    writer = _WRITERS.get(file_format)
-    if writer is None:
+    if file_format not in _WRITERS:
         raise ValueError(
             f"m={JOB_NAME}, msg=Unsupported file_format '{file_format}'. "
             f"Supported: {', '.join(sorted(_WRITERS))}"
         )
+    if partition_columns and file_format != "parquet":
+        raise ValueError(
+            f"m={JOB_NAME}, msg=partition_columns requires file_format parquet, "
+            f"got={file_format}"
+        )
 
     spark_session = spark if spark_session is None else spark_session
-    s3_client = boto3.client("s3") if s3_client is None else s3_client
 
     bucket, key_prefix, apply_object_acl = _resolve_destination(bucket, key_prefix)
-    effective_acl = object_acl if apply_object_acl else None
-
     destination_key = key_prefix.strip("/")
+    df = spark_session.table(f"{schema}.{table_name}")
+
+    if partition_columns:
+        destination_uri = f"s3a://{bucket}/{destination_key}/"
+        logger.info(
+            f"m={JOB_NAME}, msg=exporting partitioned table, "
+            f"table={schema}.{table_name}, destination={destination_uri}, "
+            f"partition_columns={partition_columns}"
+        )
+        _write_partitioned_parquet(df, destination_uri, partition_columns)
+        logger.info(
+            f"m={JOB_NAME}, msg=partitioned export finished, "
+            f"destination={destination_uri}"
+        )
+        return
+
+    s3_client = boto3.client("s3") if s3_client is None else s3_client
+    writer = _WRITERS[file_format]
+    effective_acl = object_acl if apply_object_acl else None
     staging_prefix = _staging_prefix_for_destination(destination_key, table_name)
     staging_uri = f"s3://{bucket}/{staging_prefix}"
-    df = spark_session.table(f"{schema}.{table_name}")
 
     logger.info(
         f"m={JOB_NAME}, msg=exporting table, table={schema}.{table_name}, "
@@ -350,7 +436,7 @@ def load_table_into_s3(
     )
 
 
-def run(job_args: Optional[Dict[str, Optional[str]]] = None) -> None:
+def run(job_args: Optional[Dict[str, Any]] = None) -> None:
     """
     Entry point used by `__main__` and unit tests.
 
@@ -374,6 +460,7 @@ def run(job_args: Optional[Dict[str, Optional[str]]] = None) -> None:
         key_prefix=job_args["key_prefix"],
         file_format=job_args["file_format"],
         object_acl=job_args.get("object_acl"),
+        partition_columns=job_args.get("partition_columns"),
     )
 
 

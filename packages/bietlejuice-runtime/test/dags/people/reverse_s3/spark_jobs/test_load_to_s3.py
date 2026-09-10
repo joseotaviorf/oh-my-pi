@@ -392,6 +392,120 @@ class TestParseArguments(unittest.TestCase):
             args = job.parse_arguments()
         self.assertEqual(args["file_format"], "csv")
         self.assertIsNone(args["object_acl"])
+        self.assertIsNone(args["partition_columns"])
+
+    def test_parses_partition_columns_with_none_acl_sentinel(self):
+        """EMR spark-submit drops empty argv, so the ACL slot carries 'None'."""
+        argv = [
+            "load_to_s3.py",
+            "reverse_s3",
+            "comp_employee_roster",
+            "quintoandar-inbound-wikpng8fowgxahxxccrd8j6ogxydnuse2a-s3alias",
+            "quintoandar/comp_employee_roster",
+            "parquet",
+            job.CLI_NONE,
+            "year,month,day",
+        ]
+        with patch("sys.argv", argv):
+            args = job.parse_arguments()
+        self.assertEqual(args["file_format"], "parquet")
+        self.assertIsNone(args["object_acl"])
+        self.assertEqual(args["partition_columns"], ["year", "month", "day"])
+
+    def test_parses_single_partition_column(self):
+        """A lone column has no comma; it must still parse as a partition."""
+        argv = [
+            "load_to_s3.py",
+            "reverse_s3",
+            "comp_employee_roster",
+            "partner-bucket",
+            "quintoandar/comp_employee_roster",
+            "parquet",
+            job.CLI_NONE,
+            "day",
+        ]
+        with patch("sys.argv", argv):
+            args = job.parse_arguments()
+        self.assertIsNone(args["object_acl"])
+        self.assertEqual(args["partition_columns"], ["day"])
+
+
+class TestPartitionedParquetExport(unittest.TestCase):
+    """Partitioned exports write directly without staging promote."""
+
+    @patch(f"{MODULE_UNDER_TEST}._write_partitioned_parquet")
+    def test_writes_partitioned_dataset_without_promote(self, mock_write):
+        spark_session = MagicMock()
+        spark_session.table.return_value = MagicMock()
+        s3_client = MagicMock()
+
+        with patch.dict(os.environ, {"ENVIRONMENT": "prod"}):
+            job.load_table_into_s3(
+                schema="reverse_s3",
+                table_name="comp_employee_roster",
+                bucket="quintoandar-inbound-wikpng8fowgxahxxccrd8j6ogxydnuse2a-s3alias",
+                key_prefix="quintoandar/comp_employee_roster",
+                file_format="parquet",
+                partition_columns=["year", "month", "day"],
+                spark_session=spark_session,
+                s3_client=s3_client,
+            )
+
+        mock_write.assert_called_once()
+        destination_uri = mock_write.call_args.args[1]
+        self.assertEqual(
+            destination_uri,
+            "s3a://quintoandar-inbound-wikpng8fowgxahxxccrd8j6ogxydnuse2a-s3alias/"
+            "quintoandar/comp_employee_roster/",
+        )
+        s3_client.copy_object.assert_not_called()
+        s3_client.delete_objects.assert_not_called()
+
+    def test_rejects_partition_columns_for_non_parquet_format(self):
+        with patch.dict(os.environ, {"ENVIRONMENT": "prod"}):
+            with self.assertRaises(ValueError) as ctx:
+                job.load_table_into_s3(
+                    schema="reverse_s3",
+                    table_name="comp_employee_roster",
+                    bucket="partner-bucket",
+                    key_prefix="quintoandar/comp_employee_roster",
+                    file_format="csv",
+                    partition_columns=["year", "month", "day"],
+                    spark_session=MagicMock(),
+                    s3_client=MagicMock(),
+                )
+        self.assertIn("requires file_format parquet", str(ctx.exception))
+
+
+class TestWritePartitionedParquet(unittest.TestCase):
+    """The writer itself: dynamic overwrite, ZSTD, partitionBy."""
+
+    def test_forces_dynamic_partition_overwrite(self):
+        """Static mode would delete the whole prefix, dropping prior days."""
+        df = MagicMock()
+
+        job._write_partitioned_parquet(df, "s3a://bucket/prefix/", ["year", "month"])
+
+        df.sparkSession.conf.set.assert_called_once_with(
+            "spark.sql.sources.partitionOverwriteMode", "dynamic"
+        )
+
+    def test_writes_zstd_parquet_partitioned_by_columns(self):
+        df = MagicMock()
+
+        job._write_partitioned_parquet(
+            df, "s3a://bucket/prefix/", ["year", "month", "day"]
+        )
+
+        writer = df.write.mode.return_value
+        df.write.mode.assert_called_once_with("overwrite")
+        writer.option.assert_called_once_with("compression", "zstd")
+        writer.option.return_value.partitionBy.assert_called_once_with(
+            "year", "month", "day"
+        )
+        writer.option.return_value.partitionBy.return_value.parquet.assert_called_once_with(
+            "s3a://bucket/prefix/"
+        )
 
 
 class TestRun(unittest.TestCase):
@@ -436,6 +550,7 @@ class TestRun(unittest.TestCase):
             key_prefix="orghealth/base_app_org_health.csv",
             file_format="csv",
             object_acl=job.CROSS_ACCOUNT_OBJECT_ACL,
+            partition_columns=None,
         )
 
 
