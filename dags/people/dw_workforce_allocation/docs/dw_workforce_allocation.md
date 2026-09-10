@@ -20,12 +20,27 @@ The table is a Slowly Changing Dimension Type 2 fact: one row per allocation per
 
 The share is scoped to the group, so it is **not additive across groups**: an employee allocated to two groups contributes 1.0 FTE in each. Aggregate by group, tag, chapter or vertical; do not read a cross-group total as headcount.
 
+## Classification hierarchy
+
+Workforce allocations are organized in three levels:
+
+| Level | Column | Example |
+| --- | --- | --- |
+| Macro group (Line) | `line_name` | For Rent |
+| Team | `group_name` | Billing & Payments |
+| Project | `tag_name` | IPO-readiness |
+
+FTE is computed within the team (`id_group`): an employee with two project tags in the same team contributes `1/N` in that team.
+
+Project tag names may repeat across teams (for example, `Mora XP`). For a project view that rolls up every team carrying the same tag, aggregate `allocation_fte` by `tag_name` and filter or group by `line_name` when needed.
+
 ## Recommended usage
 
 - Point-in-time: `WHERE <reference date> BETWEEN dt_valid_from AND dt_valid_to`.
 - Current state: `WHERE is_current`.
 - Filter `is_active = TRUE` for active allocations.
-- Aggregate `allocation_fte` by `tag_name`, `group_name`, or organizational attributes.
+- Team view: aggregate `allocation_fte` by `line_name`, `group_name`, or organizational attributes.
+- Project view: aggregate `allocation_fte` by `tag_name` across teams.
 - Use `sk_employee` to join the People employee dimension; investigate rows with `sk_employee = -1`.
 - Do **not** count rows as allocations: one allocation spans several rows when its FTE share changed. Use `COUNT(DISTINCT id_allocation)`.
 

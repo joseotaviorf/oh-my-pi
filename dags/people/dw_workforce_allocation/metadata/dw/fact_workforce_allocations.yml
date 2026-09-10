@@ -3,7 +3,7 @@ table_name: fact_workforce_allocations
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Slowly Changing Dimension Type 2 fact of workforce allocations across organizational groups and tags, with the equal-share FTE measure used for People planning analysis.
+  Slowly Changing Dimension Type 2 fact of workforce allocations across Lines, teams and project tags in Resource Allocation 2.0, with the equal-share FTE measure used for People planning analysis.
   One row per allocation and validity interval over which its FTE share is constant, with non-overlapping intervals closed by dt_valid_from and dt_valid_to.
   Point-in-time analysis filters a reference date between dt_valid_from and dt_valid_to; current state filters is_current.
   Inactive allocation states remain available for historical analysis, while application-generated sample records are excluded.
@@ -37,12 +37,16 @@ columns:
     description: Identifier of the tag assigned through the allocation.
     lineage:
       - datalake_people.allocation_history.id_tag
+  line_name:
+    description: Display name of the macro group (Line) that owns the team in Resource Allocation 2.0 (e.g. For Rent). NULL when the team group has no Line in the export.
+    lineage:
+      - datalake_people.allocation_history.line_name
   group_name:
-    description: Display name of the group the employee is allocated to.
+    description: Display name of the team the employee is allocated to in Resource Allocation 2.0 (e.g. Billing & Payments).
     lineage:
       - datalake_people.allocation_history.group_name
   tag_name:
-    description: Display name of the tag assigned through the allocation.
+    description: Display name of the project tag assigned through the allocation in Resource Allocation 2.0 (e.g. IPO-readiness).
     lineage:
       - datalake_people.allocation_history.tag_name
   chapter:
