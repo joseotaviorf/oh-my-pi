@@ -45,6 +45,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -100,11 +101,35 @@ query SmokeTestDataProductAssets($urn: String!) {
 }
 """
 
+_LIST_ASSET_RELATIONSHIPS = """
+query SmokeTestDataProductAssetRels($urn: String!) {
+  dataProduct(urn: $urn) {
+    relationships(input: {
+      types: ["DataProductContains"]
+      direction: OUTGOING
+      start: 0
+      count: 1000
+    }) {
+      total
+      relationships {
+        entity {
+          urn
+        }
+      }
+    }
+  }
+}
+"""
+
 # Minimum bars enforced only under --strict. They catch complete misses
 # (empty description, zero golden queries, zero linked assets), not exact-match drift.
 _MIN_DESCRIPTION_CHARS = 100
 _MIN_GOLDEN_QUERIES = 1
 _MIN_ASSETS = 1
+# Must match load_collections_context._PENDING_TABLES_SENTINEL / _UNLINKED_TABLES_SENTINEL.
+_PENDING_TABLES_SENTINEL = "Tables not yet available in DataHub"
+_UNLINKED_TABLES_SENTINEL = "Tables not linked as Data Product assets"
+_ZERO_ASSET_RETRY_DELAYS_SEC = (2.0, 5.0, 10.0)
 
 
 def _is_metric_entity(md_path: Path) -> bool:
@@ -279,15 +304,61 @@ def _count_golden_queries(dp: dict[str, Any]) -> int:
     return 0
 
 
-def _fetch_asset_count(urn: str) -> Optional[int]:
-    """Linked-asset total for a Data Product (extra GraphQL call — only under --deep)."""
-    root, _diag = _datahub_graphql_post(GRAPHQL_URL, TOKEN, _LIST_ASSETS, {"urn": urn})
-    if root is None or root.get("errors"):
-        return None
+def _skips_zero_asset_check(description: str) -> bool:
+    """Publisher notes when 0 links is expected (pending ingest or lookup failure)."""
+    return (
+        _PENDING_TABLES_SENTINEL in description
+        or _UNLINKED_TABLES_SENTINEL in description
+    )
+
+
+def _count_from_entities_payload(root: dict[str, Any]) -> Optional[int]:
     data_product = (root.get("data") or {}).get("dataProduct") or {}
     entities = data_product.get("entities") or {}
     results = entities.get("searchResults") or []
     return len(results) if isinstance(results, list) else None
+
+
+def _count_from_relationships_payload(root: dict[str, Any]) -> Optional[int]:
+    data_product = (root.get("data") or {}).get("dataProduct") or {}
+    rels = data_product.get("relationships") or {}
+    total = rels.get("total")
+    if isinstance(total, int):
+        return total
+    rows = rels.get("relationships") or []
+    return len(rows) if isinstance(rows, list) else None
+
+
+def _fetch_asset_count_once(urn: str) -> Optional[int]:
+    """Prefer the relationship graph; fall back to the search index."""
+    rel_root, _diag = _datahub_graphql_post(
+        GRAPHQL_URL, TOKEN, _LIST_ASSET_RELATIONSHIPS, {"urn": urn}
+    )
+    if rel_root is not None and not rel_root.get("errors"):
+        rel_count = _count_from_relationships_payload(rel_root)
+        if rel_count:
+            return rel_count
+    root, _diag = _datahub_graphql_post(GRAPHQL_URL, TOKEN, _LIST_ASSETS, {"urn": urn})
+    if root is None or root.get("errors"):
+        return None
+    return _count_from_entities_payload(root)
+
+
+def _fetch_asset_count(urn: str) -> Optional[int]:
+    """Linked-asset total for a Data Product (extra GraphQL call — only under --deep).
+
+    Search-index lag after ``batchSetDataProduct`` can return 0 immediately; retry with
+    backoff, and prefer the ``DataProductContains`` relationship which is not indexed.
+    """
+    count = _fetch_asset_count_once(urn)
+    if count is None or count >= _MIN_ASSETS:
+        return count
+    for delay in _ZERO_ASSET_RETRY_DELAYS_SEC:
+        time.sleep(delay)
+        count = _fetch_asset_count_once(urn)
+        if count is None or count >= _MIN_ASSETS:
+            return count
+    return count
 
 
 def main() -> None:
@@ -401,7 +472,7 @@ def main() -> None:
             issues.append(f"{gq_count} golden queries < {_MIN_GOLDEN_QUERIES}")
         # Skip the zero-assets check when the loader noted that tables are pending
         # DataHub ingestion (the description contains the sentinel text).
-        has_pending_tables = "Tables not yet available in DataHub" in desc
+        has_pending_tables = _skips_zero_asset_check(desc)
         if (
             ns.deep
             and asset_count is not None

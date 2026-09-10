@@ -49,10 +49,12 @@ sync. A metric whose MD dropped a section has the matching property cleared, so
 DataHub stays in lockstep with the Markdown.
 
 Full-overwrite semantics: the Markdown/YAML is the single source of truth. A republish
-*reconciles* the product to the YAML — assets dropped from ``datasets`` are unlinked
-(``_prune_stale_assets``) and legacy structured properties named in
-``legacy_qualified_names_to_drop`` are deleted (``_drop_legacy_structured_properties``) —
-so editing the MD and re-pushing never leaves orphaned assets or stale sidebar properties.
+*reconciles* the product to the YAML — assets dropped from ``datasets`` are unlinked from
+*this* product only (``_prune_stale_assets`` / ``batchRemoveFromDataProducts``) and legacy
+structured properties named in ``legacy_qualified_names_to_drop`` are deleted
+(``_drop_legacy_structured_properties``) — so editing the MD and re-pushing never leaves
+orphaned assets or stale sidebar properties, and never strips a shared table from another
+product that still declares it.
 
 Usage:
     export DATAHUB_GRAPHQL_URL=https://<your-datahub-host>/api/graphql
@@ -958,6 +960,15 @@ mutation BatchSetDataProductAssets($input: BatchSetDataProductInput!) {
 }
 """
 
+# Scoped unlink: drop assets from *these* products only. Never substitute
+# ``batchSetDataProduct`` with a null ``dataProductUrn`` — that unsets the asset
+# from every Data Product (see BatchSetDataProductInput.dataProductUrn).
+_REMOVE_FROM_DATA_PRODUCTS = """
+mutation BatchRemoveFromDataProducts($input: BatchSetDataProductsInput!) {
+  batchRemoveFromDataProducts(input: $input)
+}
+"""
+
 _CHECK_DATA_PRODUCT = """
 query CheckDataProduct($urn: String!) {
   dataProduct(urn: $urn) { urn }
@@ -1674,6 +1685,71 @@ def _curated_pending_dataset_names(cfg: dict[str, Any]) -> list[str]:
     return pending
 
 
+def _curated_unlinked_dataset_names(
+    cfg: dict[str, Any], linked_urns: set[str]
+) -> list[str]:
+    """Declared datasets that exist in DataHub but were not assigned this run.
+
+    Typical cause: ownership lookup failed (fail-closed). Relies on ``_URN_CACHE``
+    from a prior ``_curated_data_product_asset_urns`` call. A table already linked to
+    another Data Product is still assignable — the same dataset may sit on several
+    products.
+    """
+    rows = cfg.get("datasets") or []
+    if not isinstance(rows, list):
+        return []
+    unlinked: list[str] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        if row.get("urn"):
+            urn = str(row["urn"])
+            label = urn
+        else:
+            schema = str(row.get("schema") or "").strip()
+            table = str(row.get("table") or "").strip()
+            if not schema or not table:
+                continue
+            urn = _resolve_urn(schema, table)
+            label = f"{schema}.{table}"
+        if urn and urn not in linked_urns:
+            unlinked.append(label)
+    return unlinked
+
+
+def _may_publish_without_linked_assets(
+    *, is_metric: bool, pending: list[str], unlinked: list[str]
+) -> bool:
+    """True when the Data Product should still be created with 0 dataset links."""
+    return is_metric or bool(pending) or bool(unlinked)
+
+
+_PENDING_TABLES_SENTINEL = "**Tables not yet available in DataHub**"
+_UNLINKED_TABLES_SENTINEL = "**Tables not linked as Data Product assets**"
+
+
+def _append_dataset_notes(
+    description: str, pending: list[str], unlinked: list[str]
+) -> str:
+    """Append pending/unlinked table notes used by the post-push smoke skip."""
+    parts = [description.rstrip()]
+    if pending:
+        parts.append(
+            "\n\n---\n\n"
+            f"{_PENDING_TABLES_SENTINEL} "
+            "(will be linked automatically once ingested):\n"
+            + "\n".join(f"- `{t}`" for t in sorted(pending))
+        )
+    if unlinked:
+        parts.append(
+            "\n\n---\n\n"
+            f"{_UNLINKED_TABLES_SENTINEL} "
+            "(ownership lookup failed this run; will retry on the next publish):\n"
+            + "\n".join(f"- `{t}`" for t in sorted(unlinked))
+        )
+    return "".join(parts)
+
+
 def _filter_registered_dataset_urns(urns: list[str]) -> list[str]:
     """Keep only dataset URNs that exist in DataHub (batchSet fails on unknown URNs)."""
     registered: list[str] = []
@@ -1691,8 +1767,8 @@ def _filter_registered_dataset_urns(urns: list[str]) -> list[str]:
     return registered
 
 
-# batchSetDataProduct is EXCLUSIVE (one asset → one product). This reverse-relationship
-# query lets us refuse to steal an asset already owned by a *different* product.
+# Reverse-relationship query: skip only when ownership cannot be determined (fail-closed).
+# A dataset may already sit on another Data Product; that is not a conflict.
 _GET_ASSET_OWNER_PRODUCT = """
 query GetAssetOwnerProduct($urn: String!) {
   entity(urn: $urn) {
@@ -1736,14 +1812,13 @@ def _get_asset_current_product_urn(asset_urn: str) -> Any:
 
 
 def _filter_assignable_urns(urns: list[str], this_product_urn: str) -> list[str]:
-    """Drop assets already owned by a *different* product (prevents ownership theft).
+    """Keep datasets that can be linked to this product, including shared tables.
 
-    Keep an asset when it is unowned or already owned by this product (idempotent).
-    Skip (fail-closed) when ownership cannot be determined — a transient API error must
-    not silently permit reassignment.
-    A conflict is logged loudly (naming both products) so it surfaces in CI and can be
-    resolved by editing the YAMLs — the authoring rule (SKILL step 4) is the real fix;
-    this is the defense-in-depth backstop.
+    The same dataset may belong to several Data Products (DataHub
+    ``DataProductContains`` is not exclusive). Keep the asset when it is unowned,
+    already on this product, or already on a *different* product.
+    Skip (fail-closed) only when ownership cannot be determined — a transient API
+    error must not drive assign/prune with incomplete information.
     """
     assignable: list[str] = []
     for urn in urns:
@@ -1758,16 +1833,14 @@ def _filter_assignable_urns(urns: list[str], this_product_urn: str) -> list[str]
             assignable.append(urn)
         else:
             print(
-                f"  ! ownership conflict: {urn}\n"
-                f"      already owned by {owner} — NOT reassigning to {this_product_urn}. "
-                f"Remove it from one of the two products' `datasets:` to resolve.",
-                file=sys.stderr,
+                f"  -> sharing {urn} with {owner} (also linking to {this_product_urn})"
             )
+            assignable.append(urn)
     skipped = len(urns) - len(assignable)
     if skipped:
         print(
             f"  -> assigning {len(assignable)}/{len(urns)} datasets "
-            f"({skipped} skipped — owned by another product or lookup failed)"
+            f"({skipped} skipped — ownership lookup failed)"
         )
     return assignable
 
@@ -1798,16 +1871,18 @@ def _fetch_linked_asset_urns(dp_urn: str) -> set[str] | None:
 
 
 def _prune_stale_assets(dp_urn: str, desired_urns: list[str]) -> None:
-    """Detach assets currently on the product that are no longer in the YAML (full overwrite).
+    """Detach assets currently on THIS product that are no longer in the YAML.
 
     The Markdown is the single source of truth: an asset dropped from ``datasets`` (or a
-    metric's ``## Superset Golden Assets``) is unlinked here so a republish converges to exactly
-    the YAML set instead of accumulating orphans (``batchSetDataProduct`` only *adds* links).
+    metric's ``## Superset Golden Assets``) is unlinked here so a republish converges to
+    exactly the YAML set instead of accumulating orphans (``batchSetDataProduct`` only
+    *adds* links).
 
-    Removal uses ``batchSetDataProduct`` with a null ``dataProductUrn`` — the GraphQL contract
-    for detaching the listed resources from any data product. Only assets currently linked to
-    THIS product are passed, so the call only ever detaches this product's own stale links.
-    Fail-open: a lookup failure logs and skips (never deletes on incomplete information).
+    Removal uses ``batchRemoveFromDataProducts`` with this product's URN so other products
+    that still list the same table keep their membership. Do **not** call
+    ``batchSetDataProduct`` with a null ``dataProductUrn`` — that unsets the asset from
+    every Data Product. Fail-open: a lookup or mutation failure logs and skips (never
+    globally unsets, never deletes on incomplete information).
     """
     current = _fetch_linked_asset_urns(dp_urn)
     if current is None:
@@ -1819,9 +1894,21 @@ def _prune_stale_assets(dp_urn: str, desired_urns: list[str]) -> None:
     stale = sorted(current - set(desired_urns))
     if not stale:
         return
-    data = _post(_SET_DATA_PRODUCT_ASSETS, {"input": {"resourceUrns": stale}})
+    data = _post(
+        _REMOVE_FROM_DATA_PRODUCTS,
+        {
+            "input": {
+                "dataProductUrns": [dp_urn],
+                "resourceUrns": stale,
+            }
+        },
+    )
     if data is None:
-        _fail("curated.pruneStaleAssets", "batchSetDataProduct(null) returned None")
+        print(
+            "  ! batchRemoveFromDataProducts failed — skipping stale-asset prune "
+            "(fail-open; will not globally unset shared tables)",
+            file=sys.stderr,
+        )
         return
     _ok(f"Unlinked {len(stale)} stale asset(s) no longer in YAML")
     for urn in stale:
@@ -1915,38 +2002,38 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     dp_u = _data_product_urn(pid)
     # Resolve datasets. _curated_data_product_asset_urns populates _URN_CACHE so
     # the subsequent _curated_pending_dataset_names call needs no extra API probes.
-    urns = _filter_assignable_urns(
-        _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
-    )
+    yaml_asset_urns = _curated_data_product_asset_urns(cfg)
+    registered = _filter_registered_dataset_urns(yaml_asset_urns)
+    urns = _filter_assignable_urns(registered, dp_u)
     pending = _curated_pending_dataset_names(cfg)
+    unlinked = _curated_unlinked_dataset_names(cfg, set(urns))
+    is_metric = _is_metric_product(cfg)
 
-    if not urns and not pending and not _is_metric_product(cfg):
+    if not urns and not _may_publish_without_linked_assets(
+        is_metric=is_metric, pending=pending, unlinked=unlinked
+    ):
         _fail(
             "curated.batchSetDataProduct",
             "no datasets from YAML are registered in DataHub",
         )
         return
 
-    # Tables that don't exist in DataHub yet can't be linked. When this caller owns the
-    # description, append their names to it so the product stays useful while ingestion
-    # catches up; otherwise just log it (the description isn't touched).
-    if pending:
+    # Tables that don't exist in DataHub yet, or that this run could not assign
+    # (ownership lookup failed), can't be linked. When this caller owns the description,
+    # append their names so the post-push smoke does not treat a valid 0-asset publish
+    # as a miss. Tables already on another product ARE linked (shared membership).
+    if pending or unlinked:
         if has_description:
-            note = (
-                "\n\n---\n\n**Tables not yet available in DataHub** "
-                "(will be linked automatically once ingested):\n"
-                + "\n".join(f"- `{t}`" for t in sorted(pending))
-            )
-            pdesc_raw = pdesc_raw.rstrip() + note
+            pdesc_raw = _append_dataset_notes(str(pdesc_raw), pending, unlinked)
             print(
-                f"  -> {len(pending)} dataset(s) not yet in DataHub — "
-                "noting them in the product description.",
+                f"  -> {len(pending)} pending / {len(unlinked)} unlinked dataset(s) "
+                "— noting them in the product description.",
                 file=sys.stderr,
             )
         else:
             print(
-                f"  -> {len(pending)} dataset(s) not yet in DataHub "
-                "(will be linked automatically once ingested).",
+                f"  -> {len(pending)} pending / {len(unlinked)} unlinked dataset(s) "
+                "(description not owned by this caller).",
                 file=sys.stderr,
             )
 
@@ -1955,12 +2042,16 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     ):
         return
 
-    # Full-overwrite: detach anything currently linked that the YAML no longer lists, so the
-    # product converges to exactly the MD-declared set (batchSetDataProduct only adds links).
-    _prune_stale_assets(dp_u, urns)
+    # Full-overwrite against the YAML-registered set (not just this run's assignable
+    # URNs): a transient ownership lookup must not treat a still-declared table as stale.
+    # Skip prune only when this run resolved zero registered URNs — wiping existing
+    # links would destroy a previous successful attach because tables are still pending
+    # DataHub ingestion. (batchSetDataProduct only adds links.)
+    if registered or (is_metric and not pending and not unlinked):
+        _prune_stale_assets(dp_u, registered)
 
     if not urns:
-        if _is_metric_product(cfg):
+        if is_metric:
             # Metric product — owns no base tables; sources surface via golden-query subjects.
             print(
                 "  -> metric product: no reference assets linked "
@@ -1968,8 +2059,9 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
             )
         else:
             print(
-                f"  -> 0 datasets linked; {len(pending)} pending DataHub ingestion "
-                "(will auto-link on next push once tables are registered)."
+                f"  -> 0 datasets linked; {len(pending)} pending DataHub ingestion, "
+                f"{len(unlinked)} not assigned this run "
+                "(product is still published)."
             )
         return
 

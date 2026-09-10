@@ -24,10 +24,10 @@
 #   validate-datahub-entities-post-push — strict smoke after publish (push only)
 #
 # Secrets required (configure in Woodpecker repo settings):
-#   datahub_graphql_url_prod — prod DataHub GraphQL endpoint (push step)
-#   datahub_api_key_prod     — prod DataHub PAT with editor role (push step)
-#   datahub_graphql_url      — DataHub GraphQL endpoint (validate step)
-#   datahub_token            — DataHub PAT (validate step)
+#   datahub_graphql_url_prod — prod DataHub GraphQL endpoint (push + post-push smoke)
+#   datahub_api_key_prod     — prod DataHub PAT with editor role (push + post-push smoke)
+#   datahub_graphql_url      — DataHub GraphQL endpoint (PR validate step)
+#   datahub_token            — DataHub PAT (PR validate step)
 #   Vault (prod)             — OPENAI_API_KEY for LiteLLM (push step only)
 #
 # This pipeline does NOT depend on lint / tests / validations so it can run
@@ -120,9 +120,9 @@ steps:
     pull: true
     environment:
       DATAHUB_GRAPHQL_URL:
-        from_secret: datahub_graphql_url
+        from_secret: datahub_graphql_url_prod
       DATAHUB_TOKEN:
-        from_secret: datahub_token
+        from_secret: datahub_api_key_prod
     commands:
       - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose --strict --deep --changed-only
     when:

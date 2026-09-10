@@ -90,6 +90,8 @@ dags_not_using_builder:
   - governance/datahub_business_context/golden_query_schema_validator.py
   - governance/datahub_business_context/datahub_table_fallback.py
   - governance/datahub_business_context/test_datahub_table_fallback.py
+  - governance/datahub_business_context/test_load_collections_context_assets.py
+  - governance/datahub_business_context/test_smoke_test_datahub.py
   - governance/datahub_business_context/validate_entity_golden_queries_metadata.py
   - governance/datahub_business_context/test_validate_entity_golden_queries_metadata.py
   - governance/datahub_business_context/llm_context_dag_impact_validator.py

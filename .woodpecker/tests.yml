@@ -129,6 +129,10 @@ steps:
             - "dags/governance/datahub_business_context/validate_llm_context_dag_impact.py"
             - "dags/governance/datahub_business_context/llm_context_dag_impact_validator.py"
             - "dags/governance/datahub_business_context/test_validate_llm_context_dag_impact.py"
+            - "dags/governance/datahub_business_context/smoke_test_datahub.py"
+            - "dags/governance/datahub_business_context/test_smoke_test_datahub.py"
+            - "dags/governance/datahub_business_context/load_collections_context.py"
+            - "dags/governance/datahub_business_context/test_load_collections_context_assets.py"
           on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]

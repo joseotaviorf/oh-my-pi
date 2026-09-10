@@ -781,9 +781,8 @@ def _as_yaml_datasets_block(rows: list[dict[str, str]]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def _inject_metric_datasets(yaml_content: str, md_path: Path) -> str:
-    """Replace ``datasets:`` with Trino + Superset reference assets extracted from the MD."""
-    rows = _extract_metric_dataset_rows(md_path)
+def _inject_datasets_block(yaml_content: str, rows: list[dict[str, str]]) -> str:
+    """Replace the LLM ``datasets:`` block with CI-extracted rows (or drop it)."""
     yaml_content = _DATASETS_BLOCK_RE.sub("", yaml_content)
     if not rows:
         return yaml_content
@@ -793,6 +792,31 @@ def _inject_metric_datasets(yaml_content: str, md_path: Path) -> str:
             lambda m: f"{m.group(0)}\n{block.rstrip()}", yaml_content, count=1
         )
     return yaml_content.rstrip() + f"\n{block}"
+
+
+def _inject_metric_datasets(yaml_content: str, md_path: Path) -> str:
+    """Replace ``datasets:`` with Trino + Superset reference assets extracted from the MD."""
+    return _inject_datasets_block(yaml_content, _extract_metric_dataset_rows(md_path))
+
+
+def _extract_domain_dataset_rows(md_path: Path) -> list[dict[str, str]]:
+    """Extract ``schema.table`` refs from ``## Tables`` / ``## Where to query what``."""
+    text = md_path.read_text()
+    body = _extract_section_body(text, "tables", "where to query")
+    source = body or text
+    rows: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for schema, table in _TRINO_TABLE_REF_RE.findall(source):
+        key = (schema.lower(), table.lower())
+        if key not in seen:
+            seen.add(key)
+            rows.append({"schema": schema, "table": table})
+    return rows
+
+
+def _inject_domain_datasets(yaml_content: str, md_path: Path) -> str:
+    """Replace ``datasets:`` with tables parsed from the domain entity Markdown."""
+    return _inject_datasets_block(yaml_content, _extract_domain_dataset_rows(md_path))
 
 
 def _inject_lifecycle_stage(yaml_content: str, default: str = "prod") -> str:
@@ -1498,6 +1522,8 @@ def main(argv: list[str] | None = None) -> int:
             yaml_content = _inject_related_data_products(
                 yaml_content, _extract_related_data_products(md_path)
             )
+        else:
+            yaml_content = _inject_domain_datasets(yaml_content, md_path)
 
         domain_err = _validate_domain_urn(
             _yaml_domain_urn(yaml_content),

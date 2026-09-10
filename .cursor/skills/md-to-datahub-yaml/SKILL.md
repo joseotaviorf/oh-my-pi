@@ -170,10 +170,10 @@ Scan `## Where to query what` and per-schema H2 sections for every `` `schema.ta
 
 - Keep only `schema.table` pairs where the schema looks like a real Databricks schema (e.g., `dw_rent`, `datalake_checkout_clean`, `enrich_visits`).
 - **Never emit wildcards or patterns in `datasets`.** DataHub links concrete dataset URNs only. Skip (do not copy to YAML) any reference containing `*`, `…`, or placeholder suffixes like `statement_*`, `reverse_accounts_*`, or `schema.*`. If the Markdown uses a pattern for narrative routing, expand to the real table names listed elsewhere in the same doc, or omit from `datasets` entirely.
-- **CRITICAL — list ONLY tables this product is the PRIMARY OWNER of.** `batchSetDataProduct` is *exclusive*: a dataset can belong to exactly one Data Product. Listing a table owned by another product would steal it and break that product. A table you only JOIN to (owned by another domain) belongs in the description prose / JOIN notes — **not** in `datasets:`.
-  - Primary owner = the product whose domain schema the table lives in. Use this schema-prefix → owner guide:
+- List every `` `schema.table` `` the product uses for routing or joins. The same table **may** appear on several Data Products; linking is additive (`DataProductContains` is not exclusive).
+  - Primary domain for a schema is still a useful narrative guide (which team owns the pipeline), but it does **not** reserve the table as a DataHub asset:
 
-    | Schema prefix | Primary owner |
+    | Schema prefix | Typical domain doc |
     |---|---|
     | `datalake_chatbot.*` | `chatbot-sessions` |
     | `datalake_langfuse_clean.*` | `evals` |
@@ -185,7 +185,7 @@ Scan `## Where to query what` and per-schema H2 sections for every `` `schema.ta
     | `dw_customer_support.fact_chat_messages` | `contact` |
     | `dw_customer_support.fact_tickets`, `datalake_customer_support.tickets` | `ticket` |
 
-  - When unsure who owns a shared table, leave it OUT of `datasets:` and mention it in the description instead. The loader has a backstop (`_filter_assignable_urns` in `load_collections_context.py`) that refuses to reassign a table already owned by a different product and logs the conflict — but authoring it correctly here is the real fix.
+  - The loader links every registered table in `datasets:`. It skips a URN only when DataHub ownership lookup fails (fail-closed), not because another product already lists it.
 - Deduplicate.
 - Output as:
 
@@ -216,7 +216,7 @@ datasets:
 - Superset rows use explicit `urn:` — no platform probing.
 - Omit `datasets:` when the Markdown declares no tables and no Superset URNs.
 - Include every `` `schema.table` `` and Superset URN in backticks so CI can extract them deterministically.
-- The loader refuses to steal a Trino table already owned by a **different** domain product (`_filter_assignable_urns`); sandbox tables materialized for the metric are typically safe to link.
+- The loader links registered Trino/Superset assets even when another domain product already lists them. Sandbox tables materialized for the metric are typically safe to link.
 
 ---
 

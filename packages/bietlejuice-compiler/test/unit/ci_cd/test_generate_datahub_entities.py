@@ -419,6 +419,78 @@ class MetricYamlPostProcessTest(unittest.TestCase):
         metric_dir.rmdir()
 
 
+class DomainYamlPostProcessTest(unittest.TestCase):
+    """Domain entity ``datasets:`` come from ``## Tables``, not the LLM block."""
+
+    _YAML_WITH_LLM_DATASETS = (
+        "spec_version: 1\n"
+        "data_product_type: domain\n"
+        "datasets:\n"
+        "  - schema: dw_llm\n"
+        "    table: hallucinated\n"
+        "golden_queries:\n"
+        '  - stable_urn: "TBD"\n'
+    )
+
+    def _domain_md(self, body: str) -> Path:
+        domain_dir = Path(tempfile.mkdtemp()) / "domain_entities"
+        domain_dir.mkdir()
+        md_path = domain_dir / "demo.md"
+        md_path.write_text(f"# Demo\n\n{body}\n", encoding="utf-8")
+        return md_path
+
+    def test_extract_domain_rows_from_tables_section(self) -> None:
+        md_path = self._domain_md(
+            "## Tables\n\n"
+            "| You need | Use |\n"
+            "|---|---|\n"
+            "| Canonical classification | `datalake_sale_primary_market.listing_sale_type` |\n"
+            "| Visit facts (owned elsewhere) | `dw_visit.fact_visits` |\n"
+            "\n"
+            "## Golden Queries\n\n"
+            "```sql\nSELECT 1 FROM dw_sale.dim_listing\n```\n"
+        )
+        rows = g._extract_domain_dataset_rows(md_path)
+        self.assertEqual(
+            rows,
+            [
+                {
+                    "schema": "datalake_sale_primary_market",
+                    "table": "listing_sale_type",
+                },
+                {"schema": "dw_visit", "table": "fact_visits"},
+            ],
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_inject_domain_datasets_replaces_llm_block(self) -> None:
+        md_path = self._domain_md(
+            "## Tables\n\n- `datalake_sale_primary_market.house_development`\n"
+        )
+        out = g._inject_domain_datasets(self._YAML_WITH_LLM_DATASETS, md_path)
+        parsed = yaml.safe_load(out)
+        self.assertEqual(
+            parsed["datasets"],
+            [
+                {
+                    "schema": "datalake_sale_primary_market",
+                    "table": "house_development",
+                }
+            ],
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_inject_domain_datasets_empty_when_no_tables(self) -> None:
+        md_path = self._domain_md("## Overview\n\nNo table refs.\n")
+        out = g._inject_domain_datasets(self._YAML_WITH_LLM_DATASETS, md_path)
+        parsed = yaml.safe_load(out)
+        self.assertNotIn("datasets", parsed)
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+
 class StableUrnTest(unittest.TestCase):
     def test_index_zero_matches_legacy(self) -> None:
         self.assertEqual(

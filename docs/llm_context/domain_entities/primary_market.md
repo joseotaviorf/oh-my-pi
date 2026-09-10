@@ -331,7 +331,7 @@ LEFT JOIN visited_houses AS vh
 ## DataHub catalog
 
 - **Data Product:** Published from this Markdown by the repository DataHub metadata workflow.
-- **Datasets:** Primary Market tables are listed in the Tables section; only tables owned by this domain should be linked as DataHub assets.
+- **Datasets:** Tables in the Tables section are linked as DataHub assets. The same table may also appear on other Data Products.
 - **Golden queries:** The six canonical queries above are published as DataHub Query entities.
 
-<!-- Trigger redeployment of the merged Primary Market context. -->
+<!-- Trigger republish: link Tables even when they already sit on another Data Product. -->
