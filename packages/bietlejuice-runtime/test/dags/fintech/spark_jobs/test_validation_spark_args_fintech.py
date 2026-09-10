@@ -41,3 +41,12 @@ def test_spark_job_registers_validation_write_flags(job_path: str):
         assert "is_validation_run" in text
     else:
         assert "resolve_datalake_write_target(" in text
+
+
+def test_nexxera_uses_dual_runtime_spark_client():
+    job_path = _REPO_ROOT / "dags/fintech/nexxera/spark_jobs/load_csv_into_datalake.py"
+    text = job_path.read_text(encoding="utf-8")
+
+    assert "SparkClient(app_name=JOB_NAME)" in text
+    assert "spark = spark_client.conn" in text
+    assert "from bietlejuice.base.spark import" not in text

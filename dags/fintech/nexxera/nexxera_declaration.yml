@@ -1,0 +1,141 @@
+dag:
+  name: nexxera
+  schedule_start_date: 2020, 11, 1
+  schedule_interval: 30 7 * * *
+  owner: Data Fintech
+  callback_by_task: false
+  documentation:
+    dag_purpose: |
+      Retrieves Nexxera CSV and CNAB return files from S3 and materializes
+      incremental raw and clean tables used by financial reconciliation flows.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  custom_schema: nexxera
+  load_spark_job: load_csv_into_datalake
+  max_tables_per_cluster: 40
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -7), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{table_name}"
+  clean_inner_dependencies:
+    acquirer_header:
+      - adjustments
+      - financial
+      - inadvance
+      - sales
+      - transaction
+    acquirer_trailer:
+      - adjustments
+      - financial
+      - inadvance
+      - sales
+      - transaction
+    cnab_charges_341:
+      - cnab_charges
+    cnab_payments_237_seg_a:
+      - cnab_payments
+    cnab_payments_341_seg_a:
+      - cnab_payments
+    cnab_payments_341_seg_j:
+      - cnab_payments
+    cnab_payments_341_seg_o:
+      - cnab_payments
+    establishment_header:
+      - adjustments
+      - financial
+      - inadvance
+      - sales
+      - transaction
+    establishment_trailer:
+      - adjustments
+      - financial
+      - inadvance
+      - sales
+      - transaction
+    group_header:
+      - adjustments
+      - financial
+      - inadvance
+      - sales
+      - transaction
+    group_trailer:
+      - adjustments
+      - financial
+      - inadvance
+      - sales
+      - transaction
+    financial_legacy:
+      - financial
+    batch_header:
+      - financial_extracts
+    batch_trailer_030:
+      - financial_extracts
+    batch_trailer_050:
+      - financial_extracts
+    file_header:
+      - financial_extracts
+    file_trailer:
+      - financial_extracts
+    financial_extracts_030e:
+      - financial_extracts
+    financial_extracts_050e:
+      - financial_extracts
+  tables_customization:
+    adjustments: {}
+    cnab_payments: {}
+    cnab_charges: {}
+    financial: {}
+    inadvance: {}
+    sales: {}
+    transaction: {}
+    financial_extracts: {}
+    cnab_charges_recupera_quintoandar: {}
+    cnab_charges_recupera_velo: {}
+    cnab_charges_recupera_velo_2: {}
+    acquirer_header:
+      raw_table_dependency: adjustments
+    acquirer_trailer:
+      raw_table_dependency: adjustments
+    establishment_header:
+      raw_table_dependency: adjustments
+    establishment_trailer:
+      raw_table_dependency: adjustments
+    group_header:
+      raw_table_dependency: adjustments
+    group_trailer:
+      raw_table_dependency: adjustments
+    financial_legacy:
+      raw_table_dependency: financial
+    batch_header:
+      raw_table_dependency: financial_extracts
+    batch_trailer_030:
+      raw_table_dependency: financial_extracts
+    batch_trailer_050:
+      raw_table_dependency: financial_extracts
+    file_header:
+      raw_table_dependency: financial_extracts
+    file_trailer:
+      raw_table_dependency: financial_extracts
+    financial_extracts_030e:
+      raw_table_dependency: financial_extracts
+    financial_extracts_050e:
+      raw_table_dependency: financial_extracts
+    cnab_charges_341:
+      raw_table_dependency: cnab_charges
+    cnab_payments_237_seg_a:
+      raw_table_dependency: cnab_payments
+    cnab_payments_341_seg_a:
+      raw_table_dependency: cnab_payments
+    cnab_payments_341_seg_j:
+      raw_table_dependency: cnab_payments
+    cnab_payments_341_seg_o:
+      raw_table_dependency: cnab_payments
