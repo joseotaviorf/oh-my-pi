@@ -5,8 +5,9 @@ domain: Enterprise Efficiency
 description: |
   Conformed AI-tool user dimension preserving each vendor's raw identity (id_user and
   email). Grain: one row per tool and id_user. Scope: covers every tool/id_user
-  combination ever seen in usage, spend, or Claude product engagement (user_activity),
-  including contractors, service accounts, former employees, and unresolved identities,
+  combination ever seen in usage, spend, Claude product engagement (user_activity),
+  organization membership (members), or budget caps (spend_limits), including
+  contractors, service accounts, former employees, and unresolved identities,
   so usage, spend, and engagement are never silently lost. email_user is retained as
   the employee joining key for downstream attribution; this dimension does not depend
   on or duplicate a People employee dimension.
@@ -28,6 +29,8 @@ columns:
       - datalake_ai_usage.usage_daily.id_user
       - datalake_ai_usage.spend_daily.id_user
       - datalake_claude_usage_clean.user_activity.id_user
+      - datalake_claude_usage_clean.members.id
+      - datalake_claude_usage_clean.spend_limits.id_user
 
   email_user:
     description: |
@@ -42,3 +45,5 @@ columns:
       - datalake_ai_usage.usage_daily.email_user
       - datalake_ai_usage.spend_daily.email_user
       - datalake_claude_usage_clean.user_activity.email_user
+      - datalake_claude_usage_clean.members.email
+      - datalake_claude_usage_clean.spend_limits.email_actor

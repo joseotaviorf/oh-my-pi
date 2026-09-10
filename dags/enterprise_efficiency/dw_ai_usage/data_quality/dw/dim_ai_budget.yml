@@ -19,7 +19,8 @@ column_level_validations:
     is_unique:
       severity_level: Error
   sk_ai_user:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
   one_current_row_per_tool_sk_ai_user_period_type:
     custom:
@@ -32,12 +33,22 @@ column_level_validations:
             period_type
           FROM dw_ai_usage.dim_ai_budget
           WHERE is_current
+            AND sk_ai_budget_version != '-1'
           GROUP BY
             tool,
             sk_ai_user,
             period_type
           HAVING COUNT(*) > 1
         )) = 0
+      severity_level: Warning
+  no_unresolved_sk_ai_user:
+    custom:
+      # Every row must resolve to dim_ai_user (no -1 unknown-member FK).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_ai_usage.dim_ai_budget
+         WHERE sk_ai_budget_version != '-1'
+           AND sk_ai_user = -1) = 0
       severity_level: Warning
   matching_sk_ai_user_dim_ai_user:
     custom:

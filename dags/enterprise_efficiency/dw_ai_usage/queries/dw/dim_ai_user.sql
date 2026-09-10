@@ -19,6 +19,22 @@ WITH sources AS (
         email_user
     FROM
         datalake_claude_usage_clean.user_activity
+    UNION ALL
+    SELECT
+        'claude' AS tool,
+        id AS id_user,
+        email AS email_user
+    FROM
+        datalake_claude_usage_clean.members
+    UNION ALL
+    SELECT
+        'claude' AS tool,
+        id_user,
+        email_actor AS email_user
+    FROM
+        datalake_claude_usage_clean.spend_limits
+    WHERE
+        id_user IS NOT NULL
 ),
 ai_users AS (
     SELECT

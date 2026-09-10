@@ -24,6 +24,14 @@ column_level_validations:
   sk_ai_user:
     is_complete:
       severity_level: Warning
+  no_unresolved_sk_ai_user:
+    custom:
+      # Every row must resolve to dim_ai_user (no -1 unknown-member FK).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_ai_usage.fact_ai_engagement_daily
+         WHERE sk_ai_user = -1) = 0
+      severity_level: Warning
   matching_sk_ai_user_dim_ai_user:
     custom:
       # Every sk_ai_user > -1 must exist in dw_ai_usage.dim_ai_user (no orphan FK).
