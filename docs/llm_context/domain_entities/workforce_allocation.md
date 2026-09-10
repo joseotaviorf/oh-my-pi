@@ -59,6 +59,13 @@ Resource Allocation 2.0 (Allocation Tool) classifies workforce planning in **thr
 | group / team / time | `group_name` or `id_group` |
 | tag / project / projeto | `tag_name` or `id_tag` (team-scoped: `(id_group, tag_name)`) |
 | which teams are on project X / distribuição por projeto | filter `tag_name` (e.g. `ILIKE '%IPO%'`), group by `line_name`, `group_name`, `tag_name` |
+| how many people on tag X / qtde alocada em tag | `COUNT(DISTINCT person_number)` filtering `tag_name`, `is_active = TRUE` |
+| people on tag X by chapter / por chapter | `GROUP BY chapter`, `COUNT(DISTINCT person_number)` |
+| names on tag X / nomes alocados | join `dw_people.dim_employee` on `person_number`; select `emp.name` |
+| teams on a Line / times de uma linha | `SELECT DISTINCT group_name WHERE line_name = '…'` |
+| how many Lines / quantas linhas | `COUNT(DISTINCT line_name)` where `line_name IS NOT NULL` |
+| people on a team / pessoas de um time | filter `group_name`; join `dim_employee` for `name` |
+| people on chapter within Line / chapter numa linha | filter `line_name` and `chapter`; join `dim_employee` for `name` |
 | which tags on date D / histórico de tag / tag history | `person_number` + `DATE '<D>' BETWEEN dt_valid_from AND dt_valid_to`; include `tag_name`, `group_name`, `dt_valid_from`, `dt_valid_to` |
 | tag change over time / tinha tag X agora tenho A e B | `person_number`, order by `dt_valid_from`; list all intervals with `tag_name`, `is_active`, `allocation_fte` |
 
@@ -83,6 +90,31 @@ Project tag names may repeat across teams — for project-scoped questions, list
 | `dw_workforce_allocation.fact_workforce_allocations` | SCD2 allocation history with precomputed `allocation_fte`, Line/team/project dimensions (`line_name`, `group_name`, `tag_name`), and read-only org attributes (`chapter`, `vertical`, `team`). No PII. **Only table in this domain for TARS and business consumers.** |
 
 `datalake_people.allocation_history` (Databricks enrich) is restricted to the **technical team** for pipeline debugging and modeling — do not query it from TARS or direct business users to it.
+
+### Do not confuse `dw_workforce_allocation` with `dw_people`
+
+Both schemas live under People and reuse words like **line**, **chapter**, **team**, and **person_number** — but they answer **different questions**. TARS must pick the schema from the **business intent**, not from shared column labels.
+
+| If the question is about… | Start here | Do **not** use |
+|---------------------------|------------|----------------|
+| Project tags, allocated FTE, allocation history, planning scenarios, “who is on IPO?” | `dw_workforce_allocation.fact_workforce_allocations` | `dw_people` tables as the primary source |
+| Official active org: manager chain, hire date, cost center, P&T Team Formation roster | `dw_people` — see [`people_public.md`](people_public.md) | `fact_workforce_allocations` |
+| Employee **name** or work email in an allocation answer | Join `dw_people.dim_employee` on `person_number` **after** filtering the fact | `dim_employee` alone (no allocation rows) or `employee_details` for names |
+| “Which team is person X on?” (org / squad, no project tag) | `dw_people.dim_product_tech_team` or cost center + manager | `group_name` on the allocation fact |
+| “Line” / “chapter” / “team” on the allocation export | `line_name`, `group_name`, `tag_name`, or PIN-seed `chapter` / `team` on the **fact** | `dim_product_tech_team.line` / `chapter` / `team_1`…`team_10` |
+| Company active headcount | `dw_people.fact_employees` or `dim_employee` | `COUNT(*)` on the allocation fact (subset of employees with tags) |
+| Headcount **allocated** to a project tag | `COUNT(DISTINCT person_number)` on the **fact** | `dim_product_tech_team` or `fact_employees` |
+
+**Same word, different meaning:**
+
+| Term | In `dw_workforce_allocation` | In `dw_people` |
+|------|-------------------------------|----------------|
+| **Line** | Macro group (`line_name`) from the Allocation Tool | P&T line (`dim_product_tech_team.line`) from Team Formation sheet |
+| **Team** | Allocation Tool group (`group_name`, `id_group`) | P&T squad slot (`team_1`…`team_10`) or cost-center placement |
+| **Chapter** | PIN seed on the export (`chapter` column on the fact) | P&T chapter (`dim_product_tech_team.chapter`) |
+| **Tag / project** | Project label (`tag_name`) — planning only | **Not** in `dw_people` |
+
+When a question mixes allocation and identity (e.g. “names on tag IPO”), **anchor on the fact**, then join `dim_employee` for display fields only — never reverse the flow (starting from `dw_people` and inferring allocations).
 
 ## Related Metric Entities
 
@@ -127,6 +159,11 @@ No official metric entity is currently defined for this domain.
 | Which teams (and Lines) are allocated to a project (e.g. IPO) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `tag_name` (exact or `ILIKE`), group by `line_name`, `group_name`, `tag_name` |
 | Which project tags an employee held on a reference date | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `person_number` and `DATE '<ref>' BETWEEN dt_valid_from AND dt_valid_to` |
 | How an employee's project tags changed over time (tag history / transitions) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `person_number`, order by `dt_valid_from`, show `tag_name`, `group_name`, validity columns |
+| Headcount allocated to a project tag (overall or by chapter) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; `COUNT(DISTINCT person_number)` by `tag_name` and optionally `chapter` |
+| Names of people allocated to a project tag | `fact_workforce_allocations` + `dw_people.dim_employee` — join on `person_number`; see [`people_public.md`](people_public.md) |
+| Teams belonging to a Line (Allocation Tool) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; `DISTINCT group_name` filtered by `line_name` |
+| How many Lines exist in the Allocation Tool model | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; `COUNT(DISTINCT line_name)` |
+| People on a team or on a chapter within a Line (with names) | `fact_workforce_allocations` + `dw_people.dim_employee` — filter `group_name` or `line_name` + `chapter`, join on `person_number` |
 | Project FTE rolled up across teams (same project tag name) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; aggregate `allocation_fte` by `tag_name` only when a single company-wide total is requested |
 | Current allocation state (no reference date) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `is_current = TRUE` |
 | PIN-seeded org attributes on the allocation export | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; columns `chapter`, `vertical`, `team` (not allocation teams or project tags) |
@@ -154,7 +191,7 @@ For active/inactive logic, prefer `is_active = TRUE` or `allocation_status = 'ac
 ## Relationships with Other Entities
 
 - **Workforce Allocation → Employee Details:** join on `person_number` (stable business key) or `sk_employee` when not `-1`.
-- **Workforce Allocation → People Public:** `person_number` links to `dw_people` for active-workforce context when the consumer has access.
+- **Workforce Allocation → People Public:** join `person_number` to `dw_people.dim_employee` for **active employee names** (`name`) and work email. The fact stores identifiers only — never join `employee_details` for names when `dw_people` suffices. See [`people_public.md`](people_public.md).
 - **Workforce Allocation ↔ Team Formation:** allocation tags are planning/simulation data; official P&T squad/line/chapter is in `dw_people.dim_product_tech_team` — do not substitute one for the other without stating the source.
 - **SCD2 model:** `dt_valid_from` and `dt_valid_to` bound each interval; `is_current = TRUE` marks the open interval (`dt_valid_to = DATE '9999-12-31'`).
 
@@ -170,10 +207,14 @@ For active/inactive logic, prefer `is_active = TRUE` or `allocation_status = 'ac
 - Use a `tag_name`-only rollup only when the user explicitly asks for a single company-wide project total.
 - Join project tags on `id_tag` or `(id_group, tag_name)` for team-level detail.
 - Treat `sk_employee = -1` as an unresolved Allocation Tool employee mapping.
+- Join `dw_people.dim_employee` on `person_number` when the question asks for **names** or a named roster (active employees only).
 - Use `dw_workforce_allocation.fact_workforce_allocations` for all allocation analysis in TARS.
+- When names are needed, join `dw_people.dim_employee` on `person_number` — keep allocation logic on the fact.
 
 **Don't:**
 
+- Answer allocation, project-tag, or FTE questions from `dw_people` alone — route to this entity first.
+- Use `dim_product_tech_team` line/chapter/team as a substitute for `line_name` / `group_name` / `tag_name` on the fact.
 - Query `datalake_people.allocation_history` — enrich-layer access is **technical team only**; use `fact_workforce_allocations` instead.
 
 - Count rows as FTE; use `allocation_fte`.
@@ -225,6 +266,140 @@ ORDER BY dt_valid_from, group_name, tag_name
 ```
 
 Show active tags only in the timeline by adding `AND is_active = TRUE`. Each closed interval keeps `tag_name` as it was during that period.
+
+### Planning questions — headcount and names on a project tag
+
+Headcount allocated to a project tag (overall):
+
+```sql
+SELECT
+    COUNT(DISTINCT person_number) AS allocated_employees
+FROM dw_workforce_allocation.fact_workforce_allocations
+WHERE DATE '2026-08-28' BETWEEN dt_valid_from AND dt_valid_to
+    AND is_active = TRUE
+    AND tag_name ILIKE '%IPO%'
+```
+
+Headcount allocated to a project tag by chapter:
+
+```sql
+SELECT
+    chapter,
+    COUNT(DISTINCT person_number) AS allocated_employees
+FROM dw_workforce_allocation.fact_workforce_allocations
+WHERE DATE '2026-08-28' BETWEEN dt_valid_from AND dt_valid_to
+    AND is_active = TRUE
+    AND tag_name ILIKE '%IPO%'
+GROUP BY chapter
+ORDER BY allocated_employees DESC, chapter
+```
+
+Names of people allocated to a project tag (join public `dw_people`):
+
+```sql
+SELECT
+    wa.line_name,
+    wa.group_name,
+    wa.tag_name,
+    wa.chapter,
+    emp.person_number,
+    emp.name
+FROM dw_workforce_allocation.fact_workforce_allocations AS wa
+INNER JOIN dw_people.dim_employee AS emp
+    ON wa.person_number = emp.person_number
+WHERE DATE '2026-08-28' BETWEEN wa.dt_valid_from AND wa.dt_valid_to
+    AND wa.is_active = TRUE
+    AND wa.tag_name ILIKE '%IPO%'
+ORDER BY wa.line_name, wa.group_name, emp.name
+```
+
+`dim_employee` lists **active** employees only. Use `person_number` when someone is not in the public roster.
+
+### Planning questions — Lines, teams, and org on the Allocation Tool model
+
+Teams and Lines with people allocated to a project tag:
+
+```sql
+SELECT
+    line_name,
+    group_name,
+    tag_name,
+    COUNT(DISTINCT person_number) AS allocated_employees
+FROM dw_workforce_allocation.fact_workforce_allocations
+WHERE DATE '2026-08-28' BETWEEN dt_valid_from AND dt_valid_to
+    AND is_active = TRUE
+    AND tag_name ILIKE '%IPO%'
+GROUP BY line_name, group_name, tag_name
+ORDER BY line_name, group_name, allocated_employees DESC
+```
+
+Teams (Allocation Tool groups) belonging to a Line:
+
+```sql
+SELECT DISTINCT
+    line_name,
+    group_name
+FROM dw_workforce_allocation.fact_workforce_allocations
+WHERE is_current = TRUE
+    AND is_active = TRUE
+    AND line_name = 'For Rent'
+    AND line_name IS NOT NULL
+ORDER BY group_name
+```
+
+Returns teams that appear in active allocations. Teams with no allocated people may be absent.
+
+How many Lines exist in the Allocation Tool model:
+
+```sql
+SELECT
+    COUNT(DISTINCT line_name) AS line_count
+FROM dw_workforce_allocation.fact_workforce_allocations
+WHERE is_current = TRUE
+    AND is_active = TRUE
+    AND line_name IS NOT NULL
+```
+
+People on a given team (with names):
+
+```sql
+SELECT
+    wa.line_name,
+    wa.group_name,
+    emp.person_number,
+    emp.name,
+    wa.tag_name,
+    wa.allocation_fte
+FROM dw_workforce_allocation.fact_workforce_allocations AS wa
+INNER JOIN dw_people.dim_employee AS emp
+    ON wa.person_number = emp.person_number
+WHERE wa.is_current = TRUE
+    AND wa.is_active = TRUE
+    AND wa.group_name = 'Billing & Payments'
+ORDER BY emp.name, wa.tag_name
+```
+
+People on a given chapter within a Line (with names):
+
+```sql
+SELECT
+    wa.line_name,
+    wa.chapter,
+    wa.group_name,
+    emp.person_number,
+    emp.name,
+    wa.tag_name
+FROM dw_workforce_allocation.fact_workforce_allocations AS wa
+INNER JOIN dw_people.dim_employee AS emp
+    ON wa.person_number = emp.person_number
+WHERE wa.is_current = TRUE
+    AND wa.is_active = TRUE
+    AND wa.line_name = 'For Rent'
+    AND wa.chapter = 'Engineering'
+ORDER BY wa.group_name, emp.name, wa.tag_name
+```
+
+`chapter` on the fact comes from the Allocation Tool export (PIN seed), not from Team Formation.
 
 Teams and people allocated to a project (e.g. IPO) — **primary project-distribution pattern**:
 

@@ -79,7 +79,18 @@ Do **not** invent team-formation attributes outside Product & Tech. Do **not** r
 
 - `organization.md` — cost center, business unit, and job labels via fact FKs.
 - `employee_details.md` — full internal People DW (history, terminations, restricted attributes). **`dw_employee_details` is exclusive to the People team** — access **only on IDN request** with data-owner approval. **Do not** route general consumers here; use `dw_people`.
+- `workforce_allocation.md` — **planning** allocations (project tags, FTE, Allocation Tool Lines/teams). Use `dw_workforce_allocation.fact_workforce_allocations`, **not** `dw_people`, for those questions. Join `dim_employee` here only when an allocation answer needs a **name**.
 - `org_chart.md` — legacy denormalized enrich table; keep for continuity until cutover completes.
+
+### Do not confuse `dw_people` with `dw_workforce_allocation`
+
+| If the question is about… | Use | Do **not** use |
+|---------------------------|-----|----------------|
+| Who is active, manager, cost center, tenure, official P&T squad | `dw_people` | `dw_workforce_allocation` |
+| Project tag, allocated FTE, “who is on IPO?”, allocation history | [`workforce_allocation.md`](workforce_allocation.md) → `fact_workforce_allocations` | `dim_product_tech_team` or `fact_employees` as primary source |
+| Name in an **allocation** answer | Join `dim_employee` to the allocation **fact** | Listing everyone in `dim_employee` and guessing tags |
+
+Shared labels (`line`, `chapter`, `team`) mean **different things** in each schema — see the homonym table in [`workforce_allocation.md`](workforce_allocation.md#do-not-confuse-dw_workforce_allocation-with-dw_people).
 
 ## Glossary and Synonyms
 
@@ -107,6 +118,7 @@ Do **not** invent team-formation attributes outside Product & Tech. Do **not** r
 | Job / cost center / BU labels (any area) | Join `organization.md` from `fact_employees` FKs |
 | Org / “time” outside P&T | Cost center + manager + direct reports — **not** the P&T dim |
 | Terminated or month-end history | `employee_details.md` — not this schema |
+| Project tags, allocation FTE, planning Lines/teams | [`workforce_allocation.md`](workforce_allocation.md) — not `dw_people` |
 | Legacy single-table org chart (during migration) | `datalake_people_public.org_chart` — see [`org_chart.md`](org_chart.md) |
 
 **Critical rules:**
@@ -152,6 +164,8 @@ Do **not** publish Product & Tech headcount-by-squad from this entity (wide slot
 - Route historical / termination questions to `employee_details.md` **only when the requester is on the People team** (IDN access to `dw_employee_details`).
 
 **Don't:**
+- Answer allocation, project-tag, or FTE planning questions from `dw_people` — route to [`workforce_allocation.md`](workforce_allocation.md).
+- Map `dim_product_tech_team.line` / `chapter` / `team_1` to Allocation Tool `line_name` / `group_name` / `tag_name` without stating both sources differ.
 - Tell consumers to request `dw_employee_details` access via **IDN** — that schema is **exclusive to the People team**.
 - Assume terminated or inactive people appear in `dw_people`.
 - Filter `is_active` on `dw_people` tables.
