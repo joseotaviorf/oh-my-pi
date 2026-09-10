@@ -58,7 +58,7 @@
 | dt_inicio_person | Earliest hire date across all assignments for this person (first day at the company). | `dw_employee_details.fact_assignment_snapshots.dt_employee_hired` (MIN per person_number) |
 | band | Employee job band. | `dw_compensation.dim_job.band` |
 | github_user | Employee GitHub username or profile link. | `dw_employee_details.dim_contact.github_username` |
-| empregador_legal | Legal employer from PIN (Empregador Legal), e.g. `BENVI PT` for Remote contractors, `DRIDCO S.A.U.` for Classifieds Latam umbrella rows. Replaces `unidade_negocio` for company-allocation reporting. | `dw_organization.dim_business_unit.legal_employer_name` |
+| unidade_negocio | Business unit label from PIN exposed under the `unidade_negocio` column name for workbook compatibility. | `dw_organization.dim_business_unit.business_unit_name` |
 | year | Partition year (from `{load_start_date}`). Not exported to the sheet. | — |
 | month | Partition month (from `{load_start_date}`). Not exported to the sheet. | — |
 | day | Partition day (from `{load_start_date}`). Not exported to the sheet. | — |
