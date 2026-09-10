@@ -13,17 +13,8 @@ objects_config:
     external_identifier: "A758F5EA-8201-483B-8F84-AFED55E5494B"
   sonia_ds2ca_reject:
     external_identifier: "5B45F178-957E-4DE6-BFA6-7075F1D5824A"
-custom_cluster:
-  driver_node_type_id: r5.large
-  node_type_id: r5.large
-  num_workers: 1
-  spark_version: 16.4.x-scala2.12
-  spark_conf:
-    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
-    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
-    spark.executor.heartbeatInterval: "100s"
-    spark.network.timeout: "600s"
-    spark.metrics.appStatusSource.enabled: "true"
+cluster:
+  type: emr_7_12_consolidation_xs_general_single_node_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
