@@ -13,6 +13,9 @@ dag_documentation:
 raw_schema: "datalake_salesforce_raw"
 clean_schema: "datalake_salesforce_clean"
 datalake_bucket: "5a-datalake-forno"
+# Base URL the cdc_raw recovery path calls when AppFlow has not delivered the
+# partition hour. Same org as salesforce_cdc, so the same endpoint per env.
+salesforce_endpoint: "https://quintoandar--fornov1.sandbox.my.salesforce.com"
 events_config:
   received_document:
     event_path: "raw/salesforce/ReceivedDocumentEvent"

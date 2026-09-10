@@ -1,14 +1,16 @@
 cluster:
-  type: consolidation_s_memory_single_node_cluster
-  databricks_conn_id: databricks_new
+  # emr_deploy_mode is client, so the driver runs on the master: the r6g.4xlarge
+  # master serves the driver while the core nodes carry the executors.
+  type: emr_7_12_consolidation_l_memory_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_env_vars:
-      GLUE_ASSUME_ROLE_ARN: '{{ var.value.get(''glue_assume_role_arn'', '''') }}'
-    spark_conf:
-      spark.driver.extraJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC
-      spark.executor.extraJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC
-      spark.executor.heartbeatInterval: 100s
-      spark.network.timeout: 600s
-      spark.metrics.appStatusSource.enabled: 'true'
+    # No preset ships 3 core nodes -- every multi-node one is 2 -- so override just
+    # the count and inherit node_type_id from the preset.
+    core_nodes:
+      instance_count: 3
+  # Top level on purpose: emr_task_retries is read from the raw cluster_args, not
+  # from the merged preset. Keeps the 1 retry the Databricks version had -- with a
+  # 1-slot lineage pool serializing every step, 3 retries can eat the hour.
+  emr_task_retries: 1
+  # Do NOT add airflow_emr_create_cluster_deferrable here: the lineage pool is
+  # created with include_deferred=False, so a deferred step would release its
+  # single slot while waiting on EMR and break the one-job-at-a-time guarantee.
