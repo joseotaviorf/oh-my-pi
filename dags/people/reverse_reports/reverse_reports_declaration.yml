@@ -51,6 +51,8 @@ workflow:
       - xray_general_info
     xray_salary_history_edc:
       - xray_general_info
+    xray_general_info_ext_recruiters:
+      - xray_general_info
 
   tables_customization:
     # --- Compensation ---
@@ -449,6 +451,10 @@ workflow:
       extra_spark_job_arguments:
         - "1PxwVEi5_S8YbyN8j4jMeHuKnk2wEQajPHcGmLqlvrSg"
         - "base_demographics"
+    xray_general_info_ext_recruiters:
+      extra_spark_job_arguments:
+        - "10FzAZ4lqQ2fA7yjXet7xoATBbohGN4jXzwl7itQmLEo"
+        - "Sheet1"
 
     blitz_regulatory_training_extended_deadlines:
       extra_spark_job_arguments:
