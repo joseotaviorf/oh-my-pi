@@ -13,8 +13,6 @@ dist/
 *.egg
 # CI staging directory (populated by .woodpecker/release.yml stage-bietlejuice-tree)
 staging/
-# EMR Serverless image build staging (populated by fetch-artifacts.sh)
-.container/emr-serverless/ci-staged/
 
 # Tests / coverage reports
 htmlcov/
