@@ -24,6 +24,7 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
 from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
     BietlejuiceRedundantDependencyFinder,
 )
+from bietlejuice.services.cid_fanout import AirflowDatasetFanout
 
 
 class DatasetService:
@@ -584,6 +585,14 @@ class DatasetService:
                 cls._write_dataset_events_to_s3(event_payloads)
             except Exception:
                 pass
+
+            try:
+                AirflowDatasetFanout.fanout(event_payloads)
+            except Exception as fanout_error:
+                print(
+                    "m=update_datasets, msg=CID fan-out failed unexpectedly. "
+                    f"error={fanout_error}"
+                )
         except Exception as e:
             webhook_url = Variable.get("DLC_GCHAT_DATASET_EVENTS", None)
             payload = DatasetService.format_alert_message(context)
