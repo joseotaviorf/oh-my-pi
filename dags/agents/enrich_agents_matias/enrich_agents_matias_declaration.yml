@@ -24,14 +24,21 @@ workflow:
     - "{load_end_date}"
     - "prod"
   inner_dependencies:
-    # matias_session_summary reads eval_session_bundle — must run after it finishes,
-    # not in parallel, or it would persist stale/partial rows for the same load window.
+    # matias_session_summary and matias_sessions_html_format read eval_session_bundle
+    # — must run after it finishes, not in parallel, or they would persist stale/partial
+    # rows for the same load window.
     matias_session_summary:
+      - eval_session_bundle
+    matias_sessions_html_format:
       - eval_session_bundle
   tables_customization:
     outbound_messages_sessions:
       merge_on: [id_notification]
       z_order_by: [ts_notification_sent, id_user]
+    matias_sessions_html_format:
+      merge_on: [id_session]
+      z_order_by: [year, month, day]
+      load_spark_job: load_matias_sessions_html_format
     eval_session_bundle:
       load_spark_job: load_eval_session_bundle
     matias_session_summary:

@@ -98,6 +98,7 @@ def _obs_name_in_whitelist(name_col):
 OBSERVATION_STRUCT = StructType(
     [
         StructField("started_at", TimestampType()),
+        StructField("ended_at", TimestampType()),
         StructField("id", StringType()),
         StructField("name", StringType()),
         StructField("type", StringType()),
@@ -447,6 +448,7 @@ def build_eval_session_bundle(
             col("type"),
             col("output"),
             col("ts_started").alias("ts_start"),
+            col("ts_ended").alias("ts_end"),
         )
     )
 
@@ -456,6 +458,7 @@ def build_eval_session_bundle(
                 col("ts_start"),
                 F.struct(
                     col("ts_start").alias("started_at"),
+                    col("ts_end").alias("ended_at"),
                     col("id_observation").alias("id"),
                     col("name"),
                     col("type"),

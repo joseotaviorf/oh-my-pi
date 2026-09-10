@@ -2,6 +2,11 @@ bietlejuice.jira_open_incidents_report:
   # Spark job SQL is not scanned by the query-file dependency generator.
   add:
     - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
+bietlejuice.enrich_agents_matias:
+  # HTML transcript LEFT JOINs knowledge_base.bot_content for article titles only.
+  # Drop the Airflow wait so the muted CDC DAG can stay on the Jira Ops mute list.
+  remove:
+    - bietlejuice.knowledge_base:load-clean-bot-content:first-run-of-day
 bietlejuice.amplitude_subpartitioned:
   # Queries read the base Delta table datalake_amplitude_events_clean.events directly (to
   # restore partition pruning) instead of the datalake_amplitude_clean.events SELECT * view

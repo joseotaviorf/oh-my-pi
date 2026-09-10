@@ -1,0 +1,101 @@
+---
+database_name: datalake_agents_matias
+table_name: matias_sessions_html_format
+description: |
+  One row per Matias broker chatbot session (grain: id_session = id_langfuse_session)
+  for product and QA review. Renders a self-contained HTML transcript from
+  datalake_agents_matias.eval_session_bundle (nested conversation traces and
+  observations), Langfuse scores and knowledge-base article titles, so consumers
+  can inspect the conversation, tool/agent path, knowledge-base hits and automatic
+  eval cards without exploding Langfuse traces. Conversation bubbles are labelled
+  "Matias" in the HTML even when host_name is dominic. Merge key: id_session.
+  Partitioned by year/month/day of session_started_at.
+domain: Agents
+owner: leticia.machado@quintoandar.com.br
+columns:
+  id_session:
+    description: >
+      Langfuse external session identifier (id_langfuse_session) used as the
+      table grain and join key back to eval_session_bundle and Langfuse scores.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.id_langfuse_session
+  session_started_at:
+    description: >
+      Session start timestamp converted from eval_session_bundle.session_start_ts
+      (UTC) to America/Sao_Paulo, used in the HTML summary and as the source of
+      the year/month/day partitions.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_start_ts
+  host_name:
+    description: >
+      Bot that handled the session. Copied from eval_session_bundle.bot
+      (always "dominic" in the current bundle cohort).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.bot
+    categories:
+      dominic: Matias host used on the dominic / broker chatbot environment.
+  is_escalated:
+    description: >
+      Whether the session was handed off to human support, taken from
+      eval_session_bundle.is_escalated.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.is_escalated
+  channel:
+    description: >
+      Communication channel of the session (e.g. whatsapp, web), propagated
+      from eval_session_bundle.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.channel
+  active_feature_flags:
+    description: >
+      Array of feature-flag names that were enabled on the session. Propagated
+      from eval_session_bundle. NULL when no payload exists; empty array when
+      every flag is false.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.active_feature_flags
+  conversation_with_traces_html:
+    description: >
+      Full HTML transcript of the session including nested Langfuse traces:
+      automatic eval cards, summary bar (date, message count, average latency,
+      trace count, session id), date pill, inbound notification cards when present,
+      and each turn (user bubble, Matias reply with latency, agents/tools) plus
+      per-observation blocks (tool calls and knowledge-base articles used).
+      Intended for detailed QA; heavier than conversation_html.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.id_langfuse_session
+      - datalake_agents_matias.eval_session_bundle.conversation
+      - datalake_agents_matias.eval_session_bundle.evals
+      - datalake_knowledge_base_clean.bot_content.id_content
+      - datalake_knowledge_base_clean.bot_content.title
+  conversation_html:
+    description: >
+      Lighter HTML transcript of the same session: summary bar, date pill,
+      inbound notification cards and user/Matias turns with agents and tools
+      — without eval cards and without per-observation LLM/KB detail. Use this
+      when the full observation dump is not needed.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.id_langfuse_session
+      - datalake_agents_matias.eval_session_bundle.conversation
+      - datalake_knowledge_base_clean.bot_content.id_content
+      - datalake_knowledge_base_clean.bot_content.title
+  evals:
+    description: >
+      HTML block of the latest Langfuse automatic-eval cards for the session
+      (frustration, naturalness, friction, resolution, labor litigation risk,
+      AI resistance, plus leftover score names). Empty string when the session
+      has no scores. This is rendered HTML, not the evals struct used in
+      eval_session_bundle / matias_session_summary.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.evals
+  year:
+    description: Partition year derived from session_started_at.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_start_ts
+  month:
+    description: Partition month derived from session_started_at.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_start_ts
+  day:
+    description: Partition day derived from session_started_at.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_start_ts

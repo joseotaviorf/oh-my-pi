@@ -16,6 +16,7 @@ _JOB_PATHS = [
     "dags/agents/enrich_planner_emlio_logs/spark_jobs/load_planner_emlio_logs.py",
     "dags/agents/enrich_agents_matias/spark_jobs/load_eval_session_bundle.py",
     "dags/agents/enrich_agents_matias/spark_jobs/load_matias_session_summary.py",
+    "dags/agents/enrich_agents_matias/spark_jobs/load_matias_sessions_html_format.py",
 ]
 
 _JOBS_WITH_RESOLVE = {
@@ -28,6 +29,7 @@ _JOBS_WITH_RESOLVE = {
     "dags/agents/enrich_planner_emlio_logs/spark_jobs/load_planner_emlio_logs.py",
     "dags/agents/enrich_agents_matias/spark_jobs/load_eval_session_bundle.py",
     "dags/agents/enrich_agents_matias/spark_jobs/load_matias_session_summary.py",
+    "dags/agents/enrich_agents_matias/spark_jobs/load_matias_sessions_html_format.py",
 }
 
 

@@ -59,7 +59,8 @@ columns:
       message_ts (timestamp), message_id (session-scoped sequential id),
       message_sender (user/bot/analyst/system), message (text content),
       and traces (array of Langfuse traces that fired during that user turn,
-      each with its observations filtered to the agent whitelist).
+      each with its observations filtered to the agent whitelist and including
+      started_at / ended_at timestamps).
     lineage:
       - datalake_chatbot.messages.ts_created
       - datalake_chatbot.messages.role
@@ -73,6 +74,8 @@ columns:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.type
       - datalake_langfuse_clean.observations.output
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
   evals:
     description: >
       Eval scores array from datalake_chatbot.evals for this session's id_langfuse_session.
