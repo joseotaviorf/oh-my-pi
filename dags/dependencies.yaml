@@ -4778,6 +4778,7 @@ bietlejuice.reverse_reports:
   - bietlejuice.dw_performance:load-dw-performance-dim-talent-rating:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-talent-reviews:first-run-of-day
+  - bietlejuice.dw_time:load-dw-time-fact-hours-bank-daily-totals:first-run-of-day
   - bietlejuice.enrich_hiring:load-enrich-job-openings:first-run-of-day
   - bietlejuice.enrich_learning:load-enrich-all-completions:first-run-of-day
   - bietlejuice.enrich_learning:load-enrich-lesson-contents:first-run-of-day

@@ -1,4 +1,5 @@
 -- Current-month hours-bank balances for the time-tracking control dashboard (current tab).
+-- Uses dw_time.fact_hours_bank_daily_totals (OiTchau UI Banco Acumulado parity).
 WITH
     exempt_managers AS (
         SELECT DISTINCT
@@ -26,13 +27,13 @@ WITH
     ),
     current_month_balances AS (
         SELECT
-            hbt.dt_hours_bank_balanced,
-            hbt.person_number,
+            hbd.dt_hours_bank_balanced,
+            hbd.person_number,
             de.work_email,
             de.name AS employee_name,
-            COALESCE(hbr.segment_label, 'negative') AS segment_label,
-            COALESCE(hbr.group_name, 'negative') AS group_name,
-            (hbt.minutes_balance_rule * 60) AS bank_hours,
+            'total' AS segment_label,
+            'total' AS group_name,
+            (hbd.sum_minutes_running_balance * 60) AS bank_hours,
             CONCAT(
                 LOWER(es.cost_center_code),
                 ' - ',
@@ -51,41 +52,41 @@ WITH
             bu.consolidated_business_unit_name AS empresa,
             CASE
                 WHEN bu.consolidated_business_unit_name IN ('QuintoAndar SP', 'Classifieds') THEN
-                    (hbt.minutes_balance_rule * 60.0)
+                    (hbd.sum_minutes_running_balance * 60.0)
                 WHEN bu.consolidated_business_unit_name = 'MLSP'
                     AND (
-                        MONTH(hbt.dt_hours_bank_balanced) IN (2, 4, 6, 8, 10, 12)
+                        MONTH(hbd.dt_hours_bank_balanced) IN (2, 4, 6, 8, 10, 12)
                         OR (
-                            MONTH(hbt.dt_hours_bank_balanced) = MONTH(CURRENT_DATE())
-                            AND YEAR(hbt.dt_hours_bank_balanced) = YEAR(CURRENT_DATE())
+                            MONTH(hbd.dt_hours_bank_balanced) = MONTH(DATE('{load_start_date}'))
+                            AND YEAR(hbd.dt_hours_bank_balanced) = YEAR(DATE('{load_start_date}'))
                         )
-                    ) THEN (hbt.minutes_balance_rule * 60.0)
+                    ) THEN (hbd.sum_minutes_running_balance * 60.0)
                 WHEN bu.consolidated_business_unit_name = 'QuintoAndar MG'
                     AND (
-                        MONTH(hbt.dt_hours_bank_balanced) IN (6, 12)
+                        MONTH(hbd.dt_hours_bank_balanced) IN (6, 12)
                         OR (
-                            MONTH(hbt.dt_hours_bank_balanced) = MONTH(CURRENT_DATE())
-                            AND YEAR(hbt.dt_hours_bank_balanced) = YEAR(CURRENT_DATE())
+                            MONTH(hbd.dt_hours_bank_balanced) = MONTH(DATE('{load_start_date}'))
+                            AND YEAR(hbd.dt_hours_bank_balanced) = YEAR(DATE('{load_start_date}'))
                         )
-                    ) THEN (hbt.minutes_balance_rule * 60.0)
+                    ) THEN (hbd.sum_minutes_running_balance * 60.0)
                 ELSE 0
             END AS bank_hours_padronizado,
             CASE
                 WHEN bu.consolidated_business_unit_name IN ('QuintoAndar SP', 'Classifieds') THEN 1
                 WHEN bu.consolidated_business_unit_name = 'MLSP'
                     AND (
-                        MONTH(hbt.dt_hours_bank_balanced) IN (2, 4, 6, 8, 10, 12)
+                        MONTH(hbd.dt_hours_bank_balanced) IN (2, 4, 6, 8, 10, 12)
                         OR (
-                            MONTH(hbt.dt_hours_bank_balanced) = MONTH(CURRENT_DATE())
-                            AND YEAR(hbt.dt_hours_bank_balanced) = YEAR(CURRENT_DATE())
+                            MONTH(hbd.dt_hours_bank_balanced) = MONTH(DATE('{load_start_date}'))
+                            AND YEAR(hbd.dt_hours_bank_balanced) = YEAR(DATE('{load_start_date}'))
                         )
                     ) THEN 1
                 WHEN bu.consolidated_business_unit_name = 'QuintoAndar MG'
                     AND (
-                        MONTH(hbt.dt_hours_bank_balanced) IN (6, 12)
+                        MONTH(hbd.dt_hours_bank_balanced) IN (6, 12)
                         OR (
-                            MONTH(hbt.dt_hours_bank_balanced) = MONTH(CURRENT_DATE())
-                            AND YEAR(hbt.dt_hours_bank_balanced) = YEAR(CURRENT_DATE())
+                            MONTH(hbd.dt_hours_bank_balanced) = MONTH(DATE('{load_start_date}'))
+                            AND YEAR(hbd.dt_hours_bank_balanced) = YEAR(DATE('{load_start_date}'))
                         )
                     ) THEN 1
                 ELSE 0
@@ -97,18 +98,15 @@ WITH
                 (SELECT sa.list_of_super_admins FROM super_admins AS sa),
                 '-'
             ) AS access_list_no_employee,
-            hbt.is_closed
+            hbd.is_closed
         FROM
-            dw_time.fact_hours_bank_rule_totals AS hbt
+            dw_time.fact_hours_bank_daily_totals AS hbd
         LEFT JOIN
             dw_employee_details.dim_employee AS de
-                ON hbt.sk_employee = de.sk_employee
-        LEFT JOIN
-            dw_time.dim_hours_bank_rule AS hbr
-                ON hbr.sk_hours_bank_rule = hbt.sk_hours_bank_rule
+                ON hbd.sk_employee = de.sk_employee
         LEFT JOIN
             exempt_managers AS em
-                ON hbt.person_number = em.person_number
+                ON hbd.person_number = em.person_number
         LEFT JOIN
             metric_people.employee_snapshots AS es
                 ON LOWER(de.person_number) = LOWER(es.person_number)
@@ -118,8 +116,8 @@ WITH
                 ON bu.sk_business_unit = es.sk_business_unit
         WHERE
             em.person_number IS NULL
-            AND MONTH(hbt.dt_hours_bank_balanced) = MONTH(CURRENT_DATE())
-            AND YEAR(hbt.dt_hours_bank_balanced) = YEAR(CURRENT_DATE())
+            AND MONTH(hbd.dt_hours_bank_balanced) = MONTH(DATE('{load_start_date}'))
+            AND YEAR(hbd.dt_hours_bank_balanced) = YEAR(DATE('{load_start_date}'))
     ),
     max_balance_date AS (
         SELECT
