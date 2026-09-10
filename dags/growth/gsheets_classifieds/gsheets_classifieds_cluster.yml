@@ -1,0 +1,10 @@
+cluster:
+  type: emr_7_12_consolidation_s_general_single_node_fleet_cluster
+  custom_libraries:
+  - whl: '{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl'
+  - pypi:
+      package: google-auth==2.23.0
+  - pypi:
+      package: google-api-python-client==2.55.0
+  custom_configurations:
+    spark_conf: {}

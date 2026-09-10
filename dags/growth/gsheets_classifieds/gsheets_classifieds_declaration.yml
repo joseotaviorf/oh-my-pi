@@ -1,0 +1,8 @@
+dag:
+  name: gsheets_classifieds
+  schedule_interval: 20 00 * * *
+  owner: Data Growth
+workflow:
+  type: gsheets
+  layer: raw
+  custom_schema: gsheets

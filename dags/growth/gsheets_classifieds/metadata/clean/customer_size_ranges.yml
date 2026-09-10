@@ -1,0 +1,47 @@
+# Metadata for clean customer_size_ranges
+database_name: datalake_gsheets_clean
+table_name: customer_size_ranges
+description: Cleaned table of customer size ranges by country and period, used by Growth analytics pipelines.
+domain: Growth
+columns:
+  id_country:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.idpais
+    description: Country identifier (e.g. BR, MX).
+  source:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.fuente
+    description: Data source from which size ranges were obtained.
+  currency:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.moneda
+    description: Currency used in the valuation/size range (e.g. BRL, MXN).
+  jumbo:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.jumbo
+    description: Lower limit or definition of Jumbo customer size range.
+  big:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.big
+    description: Definition/threshold of Big customer size range.
+  medium:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.medium
+    description: Definition/threshold of Medium customer size range.
+  small:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.small
+    description: Definition/threshold of Small customer size range.
+  dt_period_start:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.periodo_desde
+    description: Start date of the period for which these size ranges are valid.
+  dt_period_end:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.periodo_hasta
+    description: End date of the period for which these size ranges are valid.
+  ts_load:
+    lineage:
+    - datalake_gsheets_raw.customer_size_ranges.ts_load
+    description: Timestamp when the row was ingested into the datalake.
+owner: fabian.flores@quintoandar.com
