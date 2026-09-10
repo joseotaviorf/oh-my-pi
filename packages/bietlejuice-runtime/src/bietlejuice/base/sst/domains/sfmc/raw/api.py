@@ -1,3 +1,5 @@
+import base64
+import binascii
 import json
 from typing import Any, Dict, List
 
@@ -8,6 +10,28 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 
 logger = QuintoAndarLogger("sst.domains.sfmc.api")
+
+
+def _parse_secret_json(raw: str) -> Any:
+    payload = (raw or "").strip()
+    if not payload:
+        raise ValueError("SFMC credentials secret is empty")
+    try:
+        return json.loads(payload)
+    except json.JSONDecodeError:
+        pass
+    try:
+        decoded = base64.b64decode(payload, validate=True).decode("utf-8")
+        return json.loads(decoded)
+    except (
+        binascii.Error,
+        ValueError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+    ) as exc:
+        raise ValueError(
+            "Invalid SFMC credentials secret format. Expected JSON object."
+        ) from exc
 
 
 def derive_soap_url(rest_url: str, auth_url: str) -> str:
@@ -29,7 +53,7 @@ def get_api_credentials() -> Dict[str, str]:
             "Databricks dbutils is not available to retrieve SFMC secrets."
         )
 
-    api_credentials = json.loads(
+    api_credentials = _parse_secret_json(
         dbutils.secrets.get(scope="quintoandar", key=APIEnum.SFMC)
     )
     if not isinstance(api_credentials, dict):

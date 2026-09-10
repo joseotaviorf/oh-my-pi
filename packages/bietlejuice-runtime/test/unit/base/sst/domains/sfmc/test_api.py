@@ -1,3 +1,4 @@
+import base64
 from unittest import mock
 
 import pytest
@@ -73,6 +74,34 @@ class TestSfmcApiCredentials:
             "rest_url": "d",
             "soap_url": "e",
         }
+
+    @mock.patch.object(api, "BaseDBUtils")
+    def test_get_api_credentials_decodes_base64_json(self, mock_base_dbutils):
+        plaintext = (
+            '{"client_id":"a","client_secret":"b","auth_url":"c",'
+            '"rest_url":"d","soap_url":"e"}'
+        )
+        dbutils = mock.MagicMock()
+        dbutils.secrets.get.return_value = base64.b64encode(
+            plaintext.encode("utf-8")
+        ).decode("ascii")
+        mock_base_dbutils.return_value.get_dbutils.return_value = dbutils
+
+        credentials = api.get_api_credentials()
+
+        assert credentials["client_id"] == "a"
+        assert credentials["client_secret"] == "b"
+
+    @mock.patch.object(api, "BaseDBUtils")
+    def test_get_api_credentials_raises_when_secret_is_empty(self, mock_base_dbutils):
+        dbutils = mock.MagicMock()
+        dbutils.secrets.get.return_value = "   "
+        mock_base_dbutils.return_value.get_dbutils.return_value = dbutils
+
+        with pytest.raises(ValueError) as exc_info:
+            api.get_api_credentials()
+
+        assert "secret is empty" in str(exc_info.value)
 
     @mock.patch.object(api, "get_api_credentials")
     def test_resolve_api_credentials_uses_derived_soap_url(
