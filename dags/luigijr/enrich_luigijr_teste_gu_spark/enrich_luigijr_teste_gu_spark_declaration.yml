@@ -6,7 +6,7 @@ dag:
   - luigi-type:materialization
   - generated-by:gustavo.akashi
   dataset_dependencies:
-  - datalake_ebdb_contract.contract
+  - datalake_ebdb_clean.contract
 workflow:
   type: query_delta
   layer: consumption
