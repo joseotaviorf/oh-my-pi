@@ -44,6 +44,7 @@ SELECT DISTINCT
         WHEN UPPER(COALESCE(ag.agency_name, agg.agency_name, u.id_user)) LIKE "%MONES%" THEN "MONEST"
         WHEN UPPER(COALESCE(ag.agency_name, agg.agency_name, u.id_user)) LIKE "%PELLON%" THEN "PELLON"
         WHEN UPPER(COALESCE(ag.agency_name, agg.agency_name, u.id_user)) LIKE "%PLC%" THEN "PLC"
+        WHEN UPPER(COALESCE(ag.agency_name, agg.agency_name, u.id_user)) LIKE "%LLC%" THEN "PLC"
         WHEN UPPER(COALESCE(ag.agency_name, agg.agency_name, u.id_user)) LIKE "%GONDIM%" THEN "GONDIM"
         WHEN UPPER(COALESCE(ag.agency_name, agg.agency_name, u.id_user)) LIKE "%NOVAQ%" THEN "NOVAQUEST"
         WHEN UPPER(COALESCE(ag.agency_name, agg.agency_name, u.id_user)) LIKE "%PORTAL%" THEN "PORTAL_QUINTOANDAR"

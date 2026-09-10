@@ -215,6 +215,7 @@ SELECT /*+ BROADCAST(u, ag, agg, cda, cdaf, cdr, cdrf, cdc, cdcf, lvr, mto) */
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%PELLON%" THEN "PELLON"
     WHEN UPPER(l.id_user) LIKE "PLL%" THEN "PELLON"
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%PLC%" THEN "PLC"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%LLC%" THEN "PLC"
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%GONDIM%" THEN "GONDIM"
     WHEN UPPER(l.id_user) LIKE "GAN%" THEN "GONDIM"
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%NOVAQ%" THEN "NOVAQUEST"

@@ -223,6 +223,7 @@ SELECT
         WHEN e.office = 'GDM' THEN 'GONDIM'
         WHEN e.office = 'PLL' THEN 'PELLON'
         WHEN e.office = 'PLC' THEN 'PLC'
+        WHEN e.office = 'LLC' THEN 'PLC'
         WHEN e.office = 'PSC' THEN 'PASCHOALOTTO'
         ELSE e.office
     END AS collection_agency,
