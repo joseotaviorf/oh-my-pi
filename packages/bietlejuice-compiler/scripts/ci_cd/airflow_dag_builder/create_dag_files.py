@@ -59,22 +59,52 @@ def has_validation_cluster(dag_package_path: str, dag_name: str) -> bool:
     return isinstance(validation, dict) and bool(validation.get("cluster"))
 
 
+def _read_declaration_dataset_dependencies(declaration_path: str) -> list[str] | None:
+    """Return ``dag.dataset_dependencies`` from a declaration YAML, if present."""
+    declaration = FileService.get_dict_from_yaml_file(declaration_path)
+    dag_block = declaration.get("dag") or {}
+    dataset_dependencies = dag_block.get("dataset_dependencies")
+    if dataset_dependencies is None:
+        return None
+    if not isinstance(dataset_dependencies, list):
+        raise ValueError(
+            f"dataset_dependencies must be a list in {declaration_path}, "
+            f"got {type(dataset_dependencies).__name__}"
+        )
+    if not dataset_dependencies:
+        return None
+    return dataset_dependencies
+
+
 def _datasets_code(
     dag_name: str,
     dependencies: dict,
     redundant_dependency_finder: BietlejuiceRedundantDependencyFinder,
+    declaration_path: str | None = None,
 ) -> str:
     dag_id = f"bietlejuice.{dag_name}"
-    dag_dependencies = dependencies.get(dag_id)
-    redundant_dependencies = (
-        redundant_dependency_finder.find_redundant_dependencies(dag_id)
-        if dag_dependencies
-        else {}
+    if dag_id in dependencies:
+        dag_dependencies = dependencies[dag_id]
+        redundant_dependencies = (
+            redundant_dependency_finder.find_redundant_dependencies(dag_id)
+        )
+        datasets = DatasetService.get_dag_datasets_from_dependencies(
+            dag_dependencies, redundant_dependencies
+        )
+        return DatasetEncoder.encode_dataset_as_python_code(datasets)
+
+    declaration_dependencies = (
+        _read_declaration_dataset_dependencies(declaration_path)
+        if declaration_path
+        else None
     )
-    datasets = DatasetService.get_dag_datasets_from_dependencies(
-        dag_dependencies, redundant_dependencies
-    )
-    return DatasetEncoder.encode_dataset_as_python_code(datasets)
+    if declaration_dependencies:
+        datasets = DatasetService.get_dag_datasets_from_dependencies(
+            declaration_dependencies
+        )
+        return DatasetEncoder.encode_dataset_as_python_code(datasets)
+
+    return DatasetEncoder.encode_dataset_as_python_code(None)
 
 
 def create_dag_files(
@@ -113,7 +143,7 @@ def create_dag_files(
         )
 
         datasets_code = _datasets_code(
-            dag_name, dependencies, redundant_dependency_finder
+            dag_name, dependencies, redundant_dependency_finder, dag_file
         )
 
         with open(dag_python_file, "w") as f:
@@ -217,7 +247,7 @@ def create_domain_bundles(
         dag_name = basename(dag_package_path)
         domain = relpath(dag_package_path, DAG_PACKAGES_ROOT).split(path.sep, 1)[0]
         datasets_code = _datasets_code(
-            dag_name, dependencies, redundant_dependency_finder
+            dag_name, dependencies, redundant_dependency_finder, declaration_file
         )
         stub_path = join(dag_package_path, f"{dag_name}{DAG_PYTHON_FILE_SUFFIX}.py")
         excluded_stubs.append(relpath(stub_path, DAG_PACKAGES_ROOT))
