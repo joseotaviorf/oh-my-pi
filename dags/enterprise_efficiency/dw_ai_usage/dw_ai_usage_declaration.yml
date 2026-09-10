@@ -16,3 +16,14 @@ workflow:
   custom_schema: ai_usage
   default_extraction_type: full
   serialize_dq_after_default_row: true
+  inner_dependencies:
+    dim_ai_budget:
+      - dim_ai_user
+    fact_ai_usage_daily:
+      - dim_ai_user
+      - dim_ai_model
+      - dim_ai_product
+    fact_ai_spend_daily:
+      - dim_ai_user
+    fact_ai_engagement_daily:
+      - dim_ai_user
