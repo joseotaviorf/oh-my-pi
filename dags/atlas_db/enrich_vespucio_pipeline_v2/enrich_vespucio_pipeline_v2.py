@@ -33,6 +33,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 ENV = os.environ.get("ENVIRONMENT")
 EXECUTION_HOURS_TIMEOUT = 3.0
+PUBLISH_ARTIFACTS_TIMEOUT_HOURS = 5.0
 
 _GEOCODE_MAX_PARTITIONS = 5
 _GEOCODE_MAX_REQUESTS_PER_PARTITION = 1500
@@ -137,7 +138,12 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
 DatasetAdder.attach_reprocessing_guard(execute_job_cluster_task)
 
 
-def create_task(entry_point: str, parameters: List[str], task_id: str = None):
+def create_task(
+    entry_point: str,
+    parameters: List[str],
+    task_id: str = None,
+    execution_timeout_hours: float = EXECUTION_HOURS_TIMEOUT,
+):
     return QuintoAndarDatabricksCheckJobTaskOperator(
         databricks_conn_id="databricks_new",
         dag=dag,
@@ -149,7 +155,7 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
                 "parameters": parameters,
             }
         },
-        execution_timeout=timedelta(hours=EXECUTION_HOURS_TIMEOUT),
+        execution_timeout=timedelta(hours=execution_timeout_hours),
     )
 
 
@@ -535,6 +541,7 @@ publish_artifacts_step_task = create_task(
         "--running_mode=prod",
     ],
     task_id="publish_artifacts",
+    execution_timeout_hours=PUBLISH_ARTIFACTS_TIMEOUT_HOURS,
 )
 
 publish_resolved_identities_step_task = create_task(
