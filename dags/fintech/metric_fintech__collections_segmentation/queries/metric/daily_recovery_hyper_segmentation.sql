@@ -2,26 +2,7 @@ WITH contract_features_normalized AS (
     SELECT
         sk_contract,
         dt_reference,
-        CASE
-            WHEN segmentation IN (
-                'active-new-defaulter-first-payment-default', 'active-new-defaulter-good-payers',
-                'active-new-defaulter-under-mob3-early', 'active-new-defaulter-under-mob3-late',
-                'active-new-defaulter-high', 'active-new-defaulter-medium',
-                'active-new-defaulter-early-low', 'active-new-defaulter-late-low',
-                'active-stock-hold', 'active-stock-risk-deal-unpaid', 'active-stock-risk-deal-new-monthly',
-                'active-stock-risk-nodeal-high', 'active-stock-risk-nodeal-low',
-                'active-ongoing-deal'
-            ) THEN 'active-segments'
-            WHEN segmentation IN (
-                'ended-new-defaulter-high', 'ended-new-defaulter-low',
-                'ended-stock-31-90-high', 'ended-stock-31-90-low', 'ended-stock-31-90-repair',
-                'ended-stock-91-180-high', 'ended-stock-91-180-low', 'ended-stock-91-180-repair',
-                'ended-stock-181-360-high', 'ended-stock-181-360-low', 'ended-stock-181-360-repair',
-                'ended-stock-361-1440', 'ended-stock-over1440', 'ended-ongoing-deal', 'ended-had-forgiveness'
-            ) THEN 'ended-segments'
-            WHEN segmentation IN ('evictions') THEN 'evictions'
-            ELSE segmentation
-        END AS segmentation
+        hyper_segmentation AS segmentation
     FROM
         dw_collections_segmentation.fact_contract_features_timeline
     WHERE

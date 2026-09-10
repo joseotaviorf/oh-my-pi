@@ -2,7 +2,7 @@ database_name: metric_fintech
 table_name: daily_recovery_segmentation_clustered
 description: 'Daily recovery metrics by clustered theoretical segmentation on a calendar-month basis.
   Shows cumulative recovery from day 1 of the month through the end of the month (calendar-month window),
-  with daily points at each reference date. Grain is clustered theoretical segmentation: closely related
+  with daily points at each reference date. Grain is clustered_segmentation from fact_contract_features_timeline: closely related
   segments are collapsed (e.g. under-mob3 early + late → under-mob3; early-low + late-low → low), finer
   than macro/hyper. Main goal: show the T2 recovery rate (recovered_amount over due_amount) under the
   T2 delay contamination methodology. Restricted to the last 6 months to keep the pipeline lightweight.'
@@ -11,10 +11,10 @@ owner: juliana.hocihara@quintoandar.com.br
 columns:
   segment:
     lineage:
-    - dw_collections_segmentation.fact_contract_features_timeline.segmentation
-    description: Clustered theoretical segmentation — the raw segmentation with selected pairs collapsed
-      into shared buckets (active-new-defaulter-under-mob3 from under-mob3 early and late; active-new-defaulter-low
-      from early-low and late-low); all other segmentation values are preserved as-is.
+    - dw_collections_segmentation.fact_contract_features_timeline.clustered_segmentation
+    description: Clustered theoretical segmentation from fact_contract_features_timeline.clustered_segmentation
+      — early/late timing collapsed (under-mob3, new-defaulter-low), good-payers into new-defaulter-high,
+      deal-risk and no-deal risk pairs grouped, and early evictions rolled into evictions-early.
     dimension: true
   rn_business_day:
     description: Row number used to deduplicate rows by segment, reference month and business-day offset

@@ -428,7 +428,6 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
-      - dw_collections_segmentation.fact_contract_features_timeline.acc_deals_principal_discount_lifetime
   segmentation:
     description: |
       Detailed contract segmentation using the frozen payment probability band (prob_payment), constant within each
@@ -448,7 +447,6 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
-      - dw_collections_segmentation.fact_contract_features_timeline.acc_deals_principal_discount_lifetime
   t1_delay_bucket:
     description: Bucketed categorization of T1 delay into ranges (Current, 1-30, 31-60, 61-90, 91-180, >180 days)
     lineage:
@@ -524,8 +522,10 @@ columns:
       High-level classification of the contract state (e.g., active-current, active-stock-pre-evictions,
       evictions, ended-stock-361over) evaluated before payment probabilities are applied. Active contracts enter
       active-stock-pre-evictions when the wallet has more than one overdue monthly invoice or a broken ongoing deal;
-      delay above 30 days alone instead maps eligible contracts to active-stock-hold. Evictions contracts always map
-      to the single macro label evictions; tactical evictions sub-segments are derived downstream in segmentation.
+      delay above 30 days alone instead maps eligible contracts to active-stock-hold. First-payment-default remains
+      in active-new-defaulter-first-payment-default only while T2 delay is at most 30 days and those stock-at-risk
+      conditions are not met. Evictions contracts always map to the single macro label evictions; tactical evictions
+      sub-segments are derived downstream in segmentation.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -586,12 +586,10 @@ columns:
       - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
   major_segmentation:
     description: |
-      Macro-level rollup for dashboard grouping. Collapses active-new-defaulter-special into active-new-defaulter and
-      maps ended-had-forgiveness into delay-bucket macro labels; all other macro_segmentation values pass through unchanged.
+      Macro-level rollup for dashboard grouping. Collapses active-new-defaulter-special into active-new-defaulter;
+      all other macro_segmentation values pass through unchanged.
     lineage:
       - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
-      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
-      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
   hyper_segmentation:
     description: |
       Hyper-level rollup grouping active tactical segments into active-segments, ended tactical segments into
@@ -603,12 +601,9 @@ columns:
     description: |
       Clustered tactical rollup for dashboard building. Groups both deterministic deal-risk reasons into
       active-stock-risk-deal and both score-based no-deal risk bands into active-stock-risk-nodeal. It also rolls up
-      MOB3 and low new-defaulter timing, good-payer, forgiveness, and early-evictions sub-segments.
+      MOB3 and low new-defaulter timing, good-payer, and early-evictions sub-segments.
     lineage:
       - dw_collections_segmentation.fact_contract_features_timeline.segmentation
-      - dw_collections_segmentation.fact_contract_features_timeline.prob_payment
-      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
-      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
   payment_probability:
     description: |
       Raw payment probability from collections score v3 batch inference for this contract and dt_reference (latest

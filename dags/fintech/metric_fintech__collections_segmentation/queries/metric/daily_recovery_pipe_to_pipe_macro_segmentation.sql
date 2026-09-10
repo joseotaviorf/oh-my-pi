@@ -73,27 +73,7 @@ contract_features_normalized AS (
     SELECT
         sk_contract,
         dt_reference,
-        CASE
-            WHEN macro_segmentation IN ('active-new-defaulter-special') THEN 'active-new-defaulter'
-            WHEN macro_segmentation IN ('ended-had-forgiveness') THEN
-                CASE
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 <= 30 THEN 'ended-new-defaulter'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 30
-                     AND max_delay_contaminated_contract_t2 <= 90 THEN 'ended-stock-31to90'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 90
-                     AND max_delay_contaminated_contract_t2 <= 180 THEN 'ended-stock-91to180'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 180
-                     AND max_delay_contaminated_contract_t2 <= 360 THEN 'ended-stock-181to360'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 360 THEN 'ended-stock-361over'
-                    ELSE 'ended-had-forgiveness'
-                END
-            ELSE macro_segmentation
-        END AS segmentation
+        major_segmentation AS segmentation
     FROM
         dw_collections_segmentation.fact_contract_features_timeline
     WHERE

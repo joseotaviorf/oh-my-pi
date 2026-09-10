@@ -2,7 +2,7 @@ database_name: metric_fintech
 table_name: daily_recovery_macro_segmentation
 description: 'Daily recovery metrics by macro segmentation on a calendar-month basis. Shows cumulative
   recovery from day 1 of the month through the end of the month (calendar-month window), with daily points
-  at each reference date. Grain is macro_segmentation from fact_contract_features_timeline — an intermediate
+  at each reference date. Grain is major_segmentation from fact_contract_features_timeline — an intermediate
   level between raw theoretical segmentation and hyper buckets. Main goal: show the T2 recovery rate (recovered_amount
   over due_amount) under the T2 delay contamination methodology. Restricted to the last 6 months to keep
   the pipeline lightweight.'
@@ -11,9 +11,9 @@ owner: juliana.hocihara@quintoandar.com.br
 columns:
   segment:
     lineage:
-    - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
-    description: Macro segmentation name from contract features, an intermediate grouping level between
-      the raw theoretical segmentation and the hyper (top-level) buckets.
+    - dw_collections_segmentation.fact_contract_features_timeline.major_segmentation
+    description: Macro rollup from fact_contract_features_timeline.major_segmentation (special new-defaulter
+      collapsed into the parent new-defaulter label; other macro labels pass through).
     dimension: true
   rn_business_day:
     description: Row number used to deduplicate rows by segment, reference month and business-day offset

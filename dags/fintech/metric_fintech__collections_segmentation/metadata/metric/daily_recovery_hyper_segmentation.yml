@@ -11,9 +11,10 @@ owner: juliana.hocihara@quintoandar.com.br
 columns:
   segment:
     lineage:
-    - dw_collections_segmentation.fact_contract_features_timeline.segmentation
-    description: Hyper (top-level) segmentation bucket derived from the theoretical segmentation — active-segments,
-      ended-segments, evictions, or the raw segmentation when it does not fall into any of those buckets.
+    - dw_collections_segmentation.fact_contract_features_timeline.hyper_segmentation
+    description: Hyper (top-level) segmentation bucket from fact_contract_features_timeline.hyper_segmentation
+      — active-segments, ended-segments, evictions, or the raw segmentation when it does not fall into
+      any of those buckets.
     dimension: true
   rn_business_day:
     description: Row number used to deduplicate rows by segment, reference month and business-day offset

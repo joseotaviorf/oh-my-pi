@@ -73,70 +73,7 @@ contract_features_normalized AS (
     SELECT
         sk_contract,
         dt_reference,
-        CASE
-            WHEN segmentation IN (
-                'active-new-defaulter-under-mob3-early',
-                'active-new-defaulter-under-mob3-late'
-            ) THEN 'active-new-defaulter-under-mob3'
-            WHEN segmentation IN (
-                'active-new-defaulter-early-low',
-                'active-new-defaulter-late-low'
-            ) THEN 'active-new-defaulter-low'
-            WHEN segmentation IN ('active-new-defaulter-good-payers')
-                THEN 'active-new-defaulter-high'
-            WHEN segmentation IN ('ended-had-forgiveness') THEN
-                CASE
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 <= 30
-                     AND prob_payment = 'HIGH' THEN 'ended-new-defaulter-high'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 <= 30
-                     AND prob_payment = 'LOW' THEN 'ended-new-defaulter-low'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 30
-                     AND max_delay_contaminated_contract_t2 <= 90
-                     AND prob_payment = 'HIGH' THEN 'ended-stock-31-90-high'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 30
-                     AND max_delay_contaminated_contract_t2 <= 90
-                     AND prob_payment = 'LOW' THEN 'ended-stock-31-90-low'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 30
-                     AND max_delay_contaminated_contract_t2 <= 90
-                     AND prob_payment = 'VERY_LOW' THEN 'ended-stock-31-90-repair'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 90
-                     AND max_delay_contaminated_contract_t2 <= 180
-                     AND prob_payment = 'HIGH' THEN 'ended-stock-91-180-high'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 90
-                     AND max_delay_contaminated_contract_t2 <= 180
-                     AND prob_payment = 'LOW' THEN 'ended-stock-91-180-low'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 90
-                     AND max_delay_contaminated_contract_t2 <= 180
-                     AND prob_payment = 'VERY_LOW' THEN 'ended-stock-91-180-repair'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 180
-                     AND max_delay_contaminated_contract_t2 <= 360
-                     AND prob_payment = 'HIGH' THEN 'ended-stock-181-360-high'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 180
-                     AND max_delay_contaminated_contract_t2 <= 360
-                     AND prob_payment = 'LOW' THEN 'ended-stock-181-360-low'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 180
-                     AND max_delay_contaminated_contract_t2 <= 360
-                     AND prob_payment = 'VERY_LOW' THEN 'ended-stock-181-360-repair'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 360
-                     AND max_delay_contaminated_contract_t2 <= 1440 THEN 'ended-stock-361-1440'
-                    WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 > 1440 THEN 'ended-stock-over1440'
-                    ELSE segmentation
-                END
-            ELSE segmentation
-        END AS segmentation
+        clustered_segmentation AS segmentation
     FROM
         dw_collections_segmentation.fact_contract_features_timeline
     WHERE

@@ -103,7 +103,7 @@ columns:
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.max_delay_deal_invoices_t1
   major_segmentation:
-    description: Macro segment remapped so special new-defaulter and forgiveness cases follow delay buckets.
+    description: Macro segment remapped so special new-defaulter collapses into the parent new-defaulter label.
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
   hyper_segmentation:
@@ -112,8 +112,8 @@ columns:
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
   clustered_segmentation:
-    description: Micro segment collapsed into operational clusters (for example under-mob3 and ended-forgiveness
-      buckets).
+    description: Micro segment collapsed into operational clusters (for example under-mob3 and new-defaulter
+      timing buckets).
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
   dt_reference:
