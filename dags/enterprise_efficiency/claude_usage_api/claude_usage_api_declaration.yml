@@ -18,7 +18,10 @@ dag:
       load_end_date (interval day), so the latest included day is interval day
       minus one and stays within vendor publish lag;
       activity requests the interval day minus two because the vendor
-      publishes that endpoint a day behind and rejects unpublished dates.
+      publishes that endpoint a day behind and rejects unpublished dates,
+      then date_expansion.load_window calls that date once on the schedule.
+      A triggered conf window (load_start_date / load_end_date) iterates
+      every inclusive day so a backfill is not reduced to the end date.
       Auth is CLAUDE_ANALYTICS_API_KEY in the quintoandar secret scope (x-api-key)
       plus anthropic-version 2023-06-01. Usage, cost, and activity paginate
       next_page as query param page; summaries unpack summaries[] without a cursor.
@@ -136,9 +139,15 @@ workflow:
       # "date" is only the request param name; the response field is last_activity_date.
       date_filter_column: last_activity_date
       # Vendor publishes analytics/users a day behind and rejects unpublished
-      # dates with a 400; shift back two days for margin on the 09:00 UTC run.
+      # dates with a 400; shift both ends back two days on scheduled runs so
+      # date_expansion.load_window still makes one call. A triggered conf
+      # window (load_start_date / load_end_date) iterates every inclusive day.
       extra_query_template_params:
+        load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
         load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_end_date') }}"
+      date_expansion:
+        param_name: date
+        strategy: load_window
       params:
         date: load_end_date
       api_policies:
