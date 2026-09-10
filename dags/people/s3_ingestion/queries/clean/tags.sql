@@ -1,11 +1,9 @@
--- Current state of Allocation Tool tags, built incrementally: the app exports one
--- initial per-entity snapshot (*-snapshot-*, envelope with `records`) and
--- afterwards only modifications, as unified delta files (full records of every tag
--- changed since the watermark). Each run parses the files of its load window,
--- keeps the latest version per tag id and MERGEs into the clean table on id_tag
--- (merge_on in the declaration). Records are parsed as MAP<STRING,STRING> so new
--- upstream fields never break the load; deletions are soft (is_active), so
--- snapshot + deltas are the whole truth.
+-- Current state of Allocation Tool tags, built from per-entity snapshot exports
+-- (*-snapshot-*, envelope with `records`). Each run parses the files of its load
+-- window, keeps the latest version per tag id and MERGEs into the clean table
+-- on id_tag (merge_on in the declaration). Records are parsed as MAP<STRING,STRING>
+-- so new upstream fields never break the load; deletions are soft (is_active), so
+-- the latest snapshot is the whole truth.
 WITH snapshot_records AS (
     SELECT
         record,
@@ -30,46 +28,6 @@ WITH snapshot_records AS (
         -- unified envelopes sharing this prefix don't, and stay ignored.
         AND GET_JSON_OBJECT(raw_content, '$.records') IS NOT NULL
 ),
-delta_records AS (
-    SELECT
-        record,
-        CAST(
-            GET_JSON_OBJECT(raw_content, '$.generated_at') AS TIMESTAMP
-        ) AS ts_export_generated,
-        file_name,
-        ts_file_modified,
-        ts_load
-    FROM
-        datalake_allocation_tool_raw.delta
-        LATERAL VIEW EXPLODE(
-            FROM_JSON(
-                GET_JSON_OBJECT(raw_content, '$.tags'),
-                'ARRAY<MAP<STRING,STRING>>'
-            )
-        ) exploded AS record
-    WHERE
-        MAKE_DATE(year, month, day)
-            BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-),
-unioned_records AS (
-    SELECT
-        record,
-        ts_export_generated,
-        file_name,
-        ts_file_modified,
-        ts_load
-    FROM
-        snapshot_records
-    UNION ALL
-    SELECT
-        record,
-        ts_export_generated,
-        file_name,
-        ts_file_modified,
-        ts_load
-    FROM
-        delta_records
-),
 latest_record AS (
     SELECT
         record,
@@ -85,7 +43,7 @@ latest_record AS (
                 file_name DESC
         ) AS rn_record
     FROM
-        unioned_records
+        snapshot_records
 )
 SELECT
     record['id'] AS id_tag,

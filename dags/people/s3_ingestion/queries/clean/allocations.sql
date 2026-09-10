@@ -1,9 +1,7 @@
 -- Append-only log of every allocation version the Allocation Tool has exported.
 -- NOTE the grain: one row per allocation AND version, not one row per allocation.
--- This is the ONLY place the raw envelopes are parsed. The app currently exports a
--- full snapshot on every run (*-snapshot-*, envelope with `records`); it previously
--- exported unified delta files (`allocations`, everything changed since a watermark)
--- and those are still read so the historical exports stay available. Both
+-- This is the ONLY place the raw envelopes are parsed. The app exports a full
+-- snapshot on every run (*-snapshot-*, envelope with `records`); both
 -- `allocations` (current state) and the People allocation history derive from this
 -- table, so a new upstream field is added here once.
 -- Records are parsed as MAP<STRING,STRING> so new fields never break the load.
@@ -39,52 +37,6 @@ WITH snapshot_records AS (
         -- unified envelopes sharing this prefix don't, and stay ignored.
         AND GET_JSON_OBJECT(raw_content, '$.records') IS NOT NULL
 ),
-delta_records AS (
-    SELECT
-        record,
-        'delta' AS export_type,
-        MAKE_DATE(year, month, day) AS dt_ingestion,
-        CAST(
-            GET_JSON_OBJECT(raw_content, '$.generated_at') AS TIMESTAMP
-        ) AS ts_export_generated,
-        file_name,
-        ts_file_modified,
-        ts_load
-    FROM
-        datalake_allocation_tool_raw.delta
-        LATERAL VIEW EXPLODE(
-            FROM_JSON(
-                GET_JSON_OBJECT(raw_content, '$.allocations'),
-                'ARRAY<MAP<STRING,STRING>>'
-            )
-        ) exploded AS record
-    WHERE
-        MAKE_DATE(year, month, day)
-            BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-),
-unioned_records AS (
-    SELECT
-        record,
-        export_type,
-        dt_ingestion,
-        ts_export_generated,
-        file_name,
-        ts_file_modified,
-        ts_load
-    FROM
-        snapshot_records
-    UNION ALL
-    SELECT
-        record,
-        export_type,
-        dt_ingestion,
-        ts_export_generated,
-        file_name,
-        ts_file_modified,
-        ts_load
-    FROM
-        delta_records
-),
 versioned_records AS (
     SELECT
         record,
@@ -98,7 +50,7 @@ versioned_records AS (
         -- time so every version has a single, non-null ordering key.
         COALESCE(ts_export_generated, ts_file_modified) AS ts_version
     FROM
-        unioned_records
+        snapshot_records
 ),
 deduplicated_versions AS (
     SELECT

@@ -3,7 +3,7 @@ table_name: allocations
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Append-only log of every allocation version the Allocation Tool has exported, reconstructed from the full snapshot exports and the earlier delta exports.
+  Append-only log of every allocation version the Allocation Tool has exported, reconstructed from full snapshot exports.
   One row per allocation AND version timestamp, not one row per allocation: an allocation appears once for every export in which its state was observed, so COUNT(*) is larger than COUNT(DISTINCT id_allocation).
   Current state is the latest ts_version per id_allocation; the modeled point-in-time view lives in datalake_people.allocation_history.
   Covers active and inactive states, and is the single place where the source export envelopes are parsed.
@@ -12,141 +12,111 @@ columns:
     description: Allocation Tool identifier for the allocation record.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].id
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].id
   id_employee:
     description: Employee reference carried in the source field employee_id, reissued by the app on every employee re-seed from PIN and therefore not stable across exports. Since the 2026-08-27 re-seed it holds PIN person_number values.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].employee_id
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].employee_id
   id_group:
     description: Identifier of the group associated with the allocation.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].group_id
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].group_id
   id_tag:
     description: Identifier of the tag assigned through the allocation.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].tag_id
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].tag_id
   id_allocated_by:
     description: Allocation Tool identifier of the user who made the allocation.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].allocated_by
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].allocated_by
   id_created_by:
     description: Allocation Tool identifier of the user who created the allocation.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].created_by_id
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].created_by_id
   employee_name:
     description: Employee name captured by the Allocation Tool at the export point; not propagated beyond the clean layer.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].employee_name
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].employee_name
   manager_name:
     description: Manager name captured by the Allocation Tool at the export point; not propagated beyond the clean layer.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].gestor_name
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].gestor_name
   group_name:
     description: Display name of the group associated with the allocation.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].group_name
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].group_name
   tag_name:
     description: Display name of the tag assigned through the allocation.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].tag_name
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].tag_name
   chapter:
     description: Organizational chapter captured with the allocation record.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].chapter
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].chapter
   vertical:
     description: Organizational vertical captured with the allocation record.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].vertical
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].vertical
   team:
     description: Organizational team captured with the allocation record.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].team
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].team
   status:
     description: Allocation lifecycle status as labelled by the source application at this version.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].status
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].status
   export_type:
-    description: Kind of source export this version came from, which tells consumers whether an absent allocation means deleted or merely unchanged.
+    description: Kind of source export this version came from. Always snapshot; downstream uses it to detect removals when an allocation is absent from a later full export.
     categories:
       snapshot: Full export listing every allocation that exists at the generation time.
-      delta: Incremental export listing only the allocations changed since the previous watermark.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].id
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].id
   file_name:
     description: Name of the source export file that carried this version.
     lineage:
       - datalake_allocation_tool_raw.allocation.file_name
-      - datalake_allocation_tool_raw.delta.file_name
   is_leader:
     description: Boolean indicating whether the allocation employee is marked as a leader.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].fl_lider
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].fl_lider
   is_sample:
     description: Boolean indicating whether the record is application-generated sample data.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].is_sample
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].is_sample
   ts_allocated:
     description: Timestamp when the allocation was created in the Allocation Tool.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].allocated_at
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].allocated_at
   ts_created:
     description: Timestamp when the allocation record was created.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].created_date
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].created_date
   ts_updated:
     description: Timestamp when the allocation record was last updated.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].updated_date
-      - datalake_allocation_tool_raw.delta.raw_content.allocations[*].updated_date
   ts_version:
     description: Ordering key of the version, taken from the export generation timestamp and falling back to the file modification timestamp when the export carries none.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.generated_at
-      - datalake_allocation_tool_raw.delta.raw_content.generated_at
       - datalake_allocation_tool_raw.allocation.ts_file_modified
-      - datalake_allocation_tool_raw.delta.ts_file_modified
   ts_export_generated:
     description: Timestamp when the source export containing this allocation version was generated.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.generated_at
-      - datalake_allocation_tool_raw.delta.raw_content.generated_at
   ts_file_modified:
     description: Timestamp when the source export file was modified in S3.
     lineage:
       - datalake_allocation_tool_raw.allocation.ts_file_modified
-      - datalake_allocation_tool_raw.delta.ts_file_modified
   ts_load:
     description: Timestamp when the source record was ingested into the raw layer.
     lineage:
       - datalake_allocation_tool_raw.allocation.ts_load
-      - datalake_allocation_tool_raw.delta.ts_load
   dt_ingestion:
     description: Date on which the source export file was ingested into the raw layer, which is the grain the Airflow load window is expressed in.
     lineage:
       - datalake_allocation_tool_raw.allocation.year
       - datalake_allocation_tool_raw.allocation.month
       - datalake_allocation_tool_raw.allocation.day
-      - datalake_allocation_tool_raw.delta.year
-      - datalake_allocation_tool_raw.delta.month
-      - datalake_allocation_tool_raw.delta.day
   year:
     description: Calendar year of the raw ingestion date.
   month:

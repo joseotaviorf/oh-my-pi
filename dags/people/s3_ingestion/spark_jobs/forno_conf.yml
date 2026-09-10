@@ -23,8 +23,3 @@ s3_ingestion_sources:
     prefix: s3_ingestion_test/allocationtool/export/groups
     file_suffix: .json
     read_mode: whole_file
-  allocation_tool_delta:
-    bucket: people-s3-forno-data-quintoandar-com-br
-    prefix: s3_ingestion_test/allocationtool/export/delta
-    file_suffix: .json
-    read_mode: whole_file

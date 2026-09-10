@@ -23,8 +23,3 @@ s3_ingestion_sources:
     prefix: allocationtool/export/groups
     file_suffix: .json
     read_mode: whole_file
-  allocation_tool_delta:
-    bucket: 5a-base44-office
-    prefix: allocationtool/export/delta
-    file_suffix: .json
-    read_mode: whole_file
