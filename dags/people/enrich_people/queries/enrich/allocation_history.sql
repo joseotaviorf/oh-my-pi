@@ -15,7 +15,16 @@
 -- so absence from a delta means nothing and only snapshots close intervals.
 -- One row per person: identifier_mapping carries one row per assignment, and
 -- is_person_latest_assignment is the flag it publishes for person-level views.
-WITH current_assignments AS (
+-- Resource Allocation 2.0 attaches each team-level group to a Line via
+-- datalake_allocation_tool_clean.groups.line_name; NULL when the team has no Line in the export.
+WITH group_lines AS (
+    SELECT
+        id_group,
+        line_name
+    FROM
+        datalake_allocation_tool_clean.groups
+),
+current_assignments AS (
     SELECT
         person_number,
         id_person,
@@ -49,37 +58,41 @@ employee_name_mapping AS (
 -- state of a day is kept, so validity intervals never collapse to zero length.
 daily_versions AS (
     SELECT
-        id_allocation,
-        id_employee,
-        employee_name,
-        id_group,
-        id_tag,
-        group_name,
-        tag_name,
-        chapter,
-        vertical,
-        team,
-        status,
-        is_leader,
-        is_sample,
-        ts_allocated,
-        ts_created,
-        ts_updated,
-        ts_version,
-        ts_export_generated,
-        ts_file_modified,
-        ts_load,
-        TO_DATE(ts_version) AS dt_version,
+        allocations.id_allocation,
+        allocations.id_employee,
+        allocations.employee_name,
+        allocations.id_group,
+        allocations.id_tag,
+        groups.line_name,
+        allocations.group_name,
+        allocations.tag_name,
+        allocations.chapter,
+        allocations.vertical,
+        allocations.team,
+        allocations.status,
+        allocations.is_leader,
+        allocations.is_sample,
+        allocations.ts_allocated,
+        allocations.ts_created,
+        allocations.ts_updated,
+        allocations.ts_version,
+        allocations.ts_export_generated,
+        allocations.ts_file_modified,
+        allocations.ts_load,
+        TO_DATE(allocations.ts_version) AS dt_version,
         ROW_NUMBER() OVER (
             PARTITION BY
-                id_allocation,
-                TO_DATE(ts_version)
+                allocations.id_allocation,
+                TO_DATE(allocations.ts_version)
             ORDER BY
-                ts_version DESC,
-                ts_file_modified DESC
+                allocations.ts_version DESC,
+                allocations.ts_file_modified DESC
         ) AS rn_day
     FROM
-        datalake_allocation_tool_clean.allocations
+        datalake_allocation_tool_clean.allocations AS allocations
+    LEFT JOIN
+        group_lines AS groups
+            ON groups.id_group = allocations.id_group
 ),
 -- Fingerprint of the attributes whose change starts a new interval. Deliberately
 -- excluded: load provenance and ts_updated, which move on every export; and
@@ -94,6 +107,7 @@ fingerprinted_versions AS (
         employee_name,
         id_group,
         id_tag,
+        line_name,
         group_name,
         tag_name,
         chapter,
@@ -115,6 +129,7 @@ fingerprinted_versions AS (
                 '||',
                 COALESCE(id_group, ''),
                 COALESCE(id_tag, ''),
+                COALESCE(line_name, ''),
                 COALESCE(group_name, ''),
                 COALESCE(tag_name, ''),
                 COALESCE(chapter, ''),
@@ -137,6 +152,7 @@ state_changes AS (
         employee_name,
         id_group,
         id_tag,
+        line_name,
         group_name,
         tag_name,
         chapter,
@@ -235,6 +251,7 @@ validity_intervals AS (
         employee_name,
         id_group,
         id_tag,
+        line_name,
         group_name,
         tag_name,
         chapter,
@@ -268,6 +285,7 @@ SELECT
     name_mapping.person_number,
     intervals.id_group,
     intervals.id_tag,
+    intervals.line_name,
     intervals.group_name,
     intervals.tag_name,
     intervals.chapter,
