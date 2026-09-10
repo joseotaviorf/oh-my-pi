@@ -6,24 +6,25 @@ Note: this line above forces Airflow to parse this file for implemented DAGs
 
 import math
 import os
+from copy import deepcopy
 from datetime import datetime, timedelta
 from os.path import basename, dirname
-from typing import Dict, List
+from typing import Dict
 
 from airflow import DAG
-
-from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
-from bietlejuice.base.airflow.task_creators.dag_execution_context import (
-    DagExecutionContext,
+from databricks_plugin import (
+    QuintoAndarDatabricksCheckJobTaskOperator,
+    QuintoAndarDatabricksExecuteJobClusterOperator,
 )
+
+from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.notification.gchat_callback import GchatCallback
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.base.sst.airflow.common.common import parse_parameters
-from bietlejuice.base.sst.airflow.common.emr_dag_kit import (
-    build_dag_execution_context,
-    create_execute_cluster_task,
-    emr_execute_cluster_local_id,
-    finalize_emr_pipeline,
+from bietlejuice.base.sst.airflow.common.common import get_libs, parse_parameters
+from bietlejuice.base.sst.airflow.common.configs import (
+    DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 from bietlejuice.base.sst.airflow.operators.base import SStPlaceholderOperator
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -42,17 +43,19 @@ EVENTS_CONFIG = CONFIG_SERVICE.get_config("events_config")
 bucket = CONFIG_SERVICE.get_config("datalake_bucket")
 RAW_SCHEMA = CONFIG_SERVICE.get_config("raw_schema")
 CLEAN_SCHEMA = CONFIG_SERVICE.get_config("clean_schema")
-# cdc_raw falls back to a Salesforce REST recovery when AppFlow has not delivered
-# the partition hour, and that path needs the endpoint. Same wiring as salesforce_cdc.
-SALESFORCE_ENDPOINT = CONFIG_SERVICE.get_config("salesforce_endpoint")
 
-# Load cluster definition from salesforce_for_sale_cluster.yml. Its `type` is an
-# emr_* preset, which is what routes this DAG to the EMR job cluster engine; the
-# engine resolves the preset to full hardware specs and merges custom_configurations.
+# Load cluster definition from salesforce_for_sale_cluster.yml.
+# merge_cluster_configuration resolves the cluster type to its full hardware specs
+# (node_type_id, spark_version, etc.) stored in ConfigurationService, then deep-merges
+# the custom_configurations overrides on top.
+# ClusterEnvVarsHelper.input_spark_env_vars injects SPARK_VERSION, INMETRO_VERSION and
+# DEEQU_JAR_VERSION into spark_env_vars so Spark jobs load the correct library versions.
 _cluster_file_path = DAGPackagesPathService.resolve_artifact_file_path(
     artifact_type="dag_cluster", dag_name=DAG_NAME
 )
-CLUSTER_ARGS = FileService.get_dict_from_yaml_file(_cluster_file_path)["cluster"]
+_cluster_args = FileService.get_dict_from_yaml_file(_cluster_file_path)["cluster"]
+DATABRICKS_CONN_ID = _cluster_args["databricks_conn_id"]
+CLUSTER_CONFIGURATION = merge_cluster_configuration(_cluster_args, CONFIG_SERVICE)
 
 BASE_PARAMETERS = {
     "env": ENV,
@@ -68,7 +71,7 @@ def lineage_pool_name(cluster_id: str) -> str:
 
 
 def ensure_lineage_pool(cluster_id: str) -> str:
-    """One Airflow pool slot = at most one Spark step executing this lineage."""
+    """One Airflow pool slot = at most one hour executing this lineage."""
     from airflow.models.pool import Pool
 
     pool_name = lineage_pool_name(cluster_id)
@@ -86,7 +89,6 @@ def ensure_lineage_pool(cluster_id: str) -> str:
 
 
 def create_sst_task(
-    dag_execution_context: DagExecutionContext,
     target_schema: str,
     target_table: str,
     entry_point: str,
@@ -105,22 +107,41 @@ def create_sst_task(
     # override task_id if provided
     entry_point = entry_point if entry_point.endswith(".py") else f"{entry_point}.py"
     base_parameters = parse_parameters(base_parameters)
-    # execution_timeout_hours is an int contract, so the old 30-minute bound is not
-    # representable; dagrun_timeout (3h) remains the real backstop.
-    return dag_execution_context.job_cluster_engine.create_spark_python_task(
-        spark_job_path=f"{BASE_SPARK_JOB_PATH}{entry_point}",
+    return QuintoAndarDatabricksCheckJobTaskOperator(
+        databricks_conn_id=DATABRICKS_CONN_ID,
+        dag=dag,
         task_id=task_id,
-        job_parameters=base_parameters,
-        execution_timeout_hours=1,
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOB_PATH}{entry_point}",
+                "parameters": base_parameters,
+            }
+        },
+        execution_timeout=timedelta(minutes=30),
+        depends_on_past=False,
         pool=pool,
     )
 
 
+def create_execute_job_cluster_task(dag: DAG, cluster_id: str, task_id: str, pool: str):
+    cluster_configuration = deepcopy(CLUSTER_CONFIGURATION)
+    cluster_configuration["cluster_name"] = f"{DAG_ID}_{{{{ run_id }}}}_{cluster_id}"
+    return QuintoAndarDatabricksExecuteJobClusterOperator(
+        databricks_conn_id=DATABRICKS_CONN_ID,
+        dag=dag,
+        task_id=task_id,
+        cluster_configuration=cluster_configuration,
+        access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+        libraries=get_libs(ENV),
+        pool=pool,
+        # Do not start hour N+1's cluster until hour N's execute succeeded and
+        # end_cdc_cluster_* (full lineage) succeeded. See execute >> end.
+        depends_on_past=True,
+        wait_for_downstream=True,
+    )
+
+
 def create_previous_lineage_gate(cluster_id: str, pool: str):
-    # depends_on_past / wait_for_downstream are set here rather than in default_args:
-    # default_args would also land on the engine-created cluster, step and terminate
-    # tasks, and depends_on_past on terminate wedges the DAG permanently when one
-    # hour's teardown does not succeed.
     return SStPlaceholderOperator(
         task_id=f"wait_previous_lineage_{cluster_id}",
         depends_on_past=True,
@@ -129,12 +150,9 @@ def create_previous_lineage_gate(cluster_id: str, pool: str):
     )
 
 
-def build_metrics_tasks(
-    dag_execution_context: DagExecutionContext, event_table, pool: str
-):
+def build_metrics_tasks(event_table, pool: str):
     return [
         create_sst_task(
-            dag_execution_context=dag_execution_context,
             target_schema="",
             target_table=event_table,
             entry_point="quality/metrics/stability",
@@ -143,7 +161,6 @@ def build_metrics_tasks(
             pool=pool,
         ),
         create_sst_task(
-            dag_execution_context=dag_execution_context,
             target_schema="",
             target_table=event_table,
             entry_point="quality/metrics/latency",
@@ -152,7 +169,6 @@ def build_metrics_tasks(
             pool=pool,
         ),
         create_sst_task(
-            dag_execution_context=dag_execution_context,
             target_schema="",
             target_table=event_table,
             entry_point="salesforce/metrics/missing_events",
@@ -163,31 +179,20 @@ def build_metrics_tasks(
     ]
 
 
-def wire_event_lineage(
-    dag_execution_context: DagExecutionContext,
-    execute_job_cluster,
-    event: str,
-    end_cluster,
-    pool: str,
-) -> List:
-    """Wire one event's raw -> clean -> metrics chain. Returns the leaf tasks."""
+def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
     parameters = EVENTS_CONFIG[event]
     event_table = f"events_{event.lower()}"
     threshold_time_hours = parameters.get("threshold_time_hours", 24)
 
     raw_task = create_sst_task(
-        dag_execution_context=dag_execution_context,
         target_schema=RAW_SCHEMA,
         target_table=event_table,
         entry_point="salesforce/cdc_raw",
-        # Spread rather than mutate: EVENTS_CONFIG comes from the cached
-        # ConfigurationService instance and is shared across events.
-        parameters={**parameters, "salesforce_endpoint": SALESFORCE_ENDPOINT},
+        parameters=parameters,
         pool=pool,
     )
 
     clean_task = create_sst_task(
-        dag_execution_context=dag_execution_context,
         target_schema=CLEAN_SCHEMA,
         target_table=event_table,
         entry_point="salesforce/cdc_clean",
@@ -199,13 +204,12 @@ def wire_event_lineage(
     )
     DatasetAdder.attach_dataset_to_task(clean_task)
 
-    metrics_tasks = build_metrics_tasks(dag_execution_context, event_table, pool)
+    metrics_tasks = build_metrics_tasks(event_table, pool)
     if parameters.get("skip_quality_contracts", False):
         (execute_job_cluster >> raw_task >> clean_task >> metrics_tasks >> end_cluster)
-        return metrics_tasks
+        return
 
     quality_contract_raw = create_sst_task(
-        dag_execution_context=dag_execution_context,
         target_schema=RAW_SCHEMA,
         target_table=event_table,
         entry_point="quality/contracts/generic",
@@ -216,7 +220,6 @@ def wire_event_lineage(
         pool=pool,
     )
     quality_contract_clean = create_sst_task(
-        dag_execution_context=dag_execution_context,
         target_schema=CLEAN_SCHEMA,
         target_table=event_table,
         entry_point="quality/contracts/generic",
@@ -235,24 +238,18 @@ def wire_event_lineage(
         >> metrics_tasks
         >> end_cluster
     )
-    return metrics_tasks
 
 
-def build_cluster_lineage(
-    dag_execution_context: DagExecutionContext, shard_index: int, events
-):
+def build_cluster_lineage(cluster_id: str, events):
     if not events:
         return
-    # Pool and end-task names stay 0-based to preserve existing task history and the
-    # astro/local_pools.json entry; the engine-side task ids use the shifted local id.
-    cluster_id = str(shard_index)
     pool = ensure_lineage_pool(cluster_id)
     wait_previous_lineage = create_previous_lineage_gate(cluster_id, pool)
-    execute_job_cluster_local_id = emr_execute_cluster_local_id(shard_index)
-    execute_job_cluster = create_execute_cluster_task(
-        dag_execution_context,
-        CONFIG_SERVICE,
-        execute_job_cluster_local_id,
+    execute_job_cluster = create_execute_job_cluster_task(
+        dag=dag,
+        cluster_id=cluster_id,
+        task_id=f"execute_cdc_cluster_{cluster_id}",
+        pool=pool,
     )
     end_cluster = SStPlaceholderOperator(
         task_id=f"end_cdc_cluster_{cluster_id}",
@@ -260,38 +257,26 @@ def build_cluster_lineage(
         pool=pool,
     )
     wait_previous_lineage >> execute_job_cluster
-    leaf_tasks = [
-        task
-        for event in events
-        for task in wire_event_lineage(
-            dag_execution_context, execute_job_cluster, event, end_cluster, pool
-        )
-    ]
-    # SOLE cross-hour guarantee: the gate's wait_for_downstream inspects only its
-    # immediate downstreams, and end_cdc_cluster_* succeeds only once every step and
-    # terminate-emr-cluster have succeeded. Do not remove this edge -- nothing tests it.
-    # Nothing may be wired downstream of end_cdc_cluster_*: finalize_emr_pipeline walks
-    # the graph from the cluster task and would turn that into a cycle.
+    for event in events:
+        wire_event_lineage(execute_job_cluster, event, end_cluster, pool)
+    # Immediate downstream of the gate and execute includes the lineage leaf
+    # so wait_for_downstream waits for the full hour, not only cluster start.
     wait_previous_lineage >> end_cluster
-    finalize_emr_pipeline(
-        dag_execution_context,
-        execute_job_cluster,
-        leaf_tasks,
-        end_cluster,
-        execute_job_cluster_local_id,
-    )
+    execute_job_cluster >> end_cluster
 
 
+jiraops_callback = JiraOpsCallback()
 webhook_salesforce_cdc = CONFIG_SERVICE.get_config("webhook_salesforce_cdc")
 gchat_callback = GchatCallback(webhook_url_variable=webhook_salesforce_cdc)
 
-# depends_on_past is deliberately NOT here: it would propagate to the engine-created
-# cluster, step and terminate tasks. It lives on wait_previous_lineage_* instead.
 default_args = {
     "owner": CONFIG_SERVICE.get_config("owner"),
     "email_on_retry": False,
     "retries": 1,
+    "depends_on_past": True,
     "on_failure_callback": gchat_callback.task_failure_alert,
+    # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
+    # "on_failure_callback": jiraops_callback.task_failure_alert,
 }
 with DAG(
     dag_id=DAG_ID,
@@ -302,20 +287,13 @@ with DAG(
     catchup=True,
     tags=["ForSale", "SF", "salesforce"],
     on_failure_callback=gchat_callback.dag_failure_alert,
+    # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
+    # on_failure_callback=jiraops_callback.dag_failure_alert,
     # Single cluster lineage: keep one active hour. Sequencing across hours is
-    # the pool (1 slot) plus wait_previous_lineage / gate wait_for_downstream,
+    # the pool (1 slot) plus wait_previous_lineage / execute wait_for_downstream,
     # not depends_on_past on the load tasks.
     max_active_runs=1,
 ) as dag:
-    dag_execution_context = build_dag_execution_context(
-        dag,
-        ENV,
-        bucket,
-        BASE_SPARK_JOB_PATH,
-        CLUSTER_ARGS,
-        CONFIG_SERVICE,
-    )
-
     NUMBER_OF_CLUSTERS = 1
     events_lst = list(EVENTS_CONFIG.keys())
     pool_max_size = math.ceil(len(events_lst) / NUMBER_OF_CLUSTERS) or 1
@@ -323,7 +301,5 @@ with DAG(
         events_lst[i : i + pool_max_size]
         for i in range(0, len(events_lst), pool_max_size)
     ]
-    # One shard at a time: the engine tracks a single "active" cluster task id, so a
-    # shard's steps must all be created before the next shard's cluster.
     for i, pool_events in enumerate(job_pool):
-        build_cluster_lineage(dag_execution_context, i, pool_events)
+        build_cluster_lineage(str(i), pool_events)

@@ -106,6 +106,17 @@ exceptions:
       returns to Databricks. Returns to EMR once the per-table re-scan is
       optimized (e.g. read the source once and derive the tables).
     approved_by: henrique.paulo@quintoandar.com.br
+  - dag: salesforce_for_sale
+    path: dags/for_sale/salesforce_for_sale
+    reason: >-
+      Revert EMR migration from #28571: the cdc_raw recovery path cannot
+      authenticate on EMR because the SALESFORCE_FORNO_API credential is not
+      mirrored into AWS Secrets Manager, which is the only credential store the
+      EMR dbutils shim reads (GetSecretValue returns ResourceNotFoundException).
+      Same class of blocker as its sibling salesforce_cdc. Returns to EMR once
+      the Vault -> Secrets Manager mirror is provisioned (see
+      docs/api_ingestion/prerequisites.md).
+    approved_by: gabriel.firmino@quintoandar.com.br
   - dag: reverse_tracksale
     path: dags/support_and_service/reverse_tracksale
     reason: >-
