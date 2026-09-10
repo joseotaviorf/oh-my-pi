@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from argparse import ArgumentParser
 
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
@@ -91,6 +92,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     environment = args.environment
+    os.environ["ENVIRONMENT"] = environment
     datalake_bucket = args.datalake_bucket
     schema = args.schema
     table_name = args.table_name
@@ -124,7 +126,9 @@ if __name__ == "__main__":
         spark_client
     )
     database_name = datalake_info["db_raw_databricks"]
+    clean_database_name = datalake_info["db_clean_databricks"]
     spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(clean_database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     database_location = datalake_info["db_raw_path"]
@@ -153,6 +157,7 @@ if __name__ == "__main__":
             sheet_details["clean_table_name"],
             sheet_details.get("partitioned"),
             sheet_details.get("preload_time_in_seconds"),
+            header_row=sheet_details.get("header_row", 1),
         )
         service = GsheetsService(schema=schema)
         df = service.clean_unsupported_column_names(df)

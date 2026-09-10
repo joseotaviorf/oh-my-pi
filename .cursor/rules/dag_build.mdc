@@ -571,7 +571,20 @@ workflow:
 
 **Naming rule**: DAG name must follow `gsheets_{business_context}` (e.g., `gsheets_cross`, `gsheets_for_sale`, `gsheets_growth`).
 
-**Note**: Gsheets also requires `forno_conf.yml` and `prod_conf.yml` with sheet configurations.
+Gsheets also requires `forno_conf.yml` and `prod_conf.yml` with a `sheets_info` block. Each key is the raw table name; the DAG builder serializes the full entry and passes it to `load_gsheets_into_datalake.py` (no per-field wiring in the builder).
+
+```yaml
+# forno_conf.yml / prod_conf.yml
+sheets_info:
+  my_table:                              # raw table name (datalake_<custom_schema>_raw.my_table)
+    sheet_id: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789"  # Required
+    sheet_name: "Sheet1"                 # Required — tab name inside the spreadsheet
+    clean_table_name: my_table           # Required — clean query filename / datalake_<custom_schema>_clean target
+    sheet_context: my_domain             # Required — business context (alerts, static-sheet routing)
+    header_row: 5                        # Optional, default: 1 — 1-based row index used as column headers
+    partitioned: true                    # Optional, default: false — add year/month/day partitions on load
+    preload_time_in_seconds: 30          # Optional — sleep before fetching (rate-limited or slow sheets)
+```
 
 ### Raw API Ingestion
 

@@ -68,6 +68,49 @@ class GsheetsConsumer(GoogleSheetsReader):
         )
         time.sleep(preload_time_in_seconds)
 
+    @staticmethod
+    def _records_from_grid(all_values: List[List[str]], header_row: int) -> List[Dict]:
+        """
+        Build row dicts from a worksheet grid using a 1-based header row index.
+
+        :param all_values: Full worksheet grid from gspread ``get_all_values``.
+        :param header_row: 1-based row number that contains column headers.
+        """
+        if header_row < 1:
+            raise ValueError(
+                f"m=_records_from_grid, header_row={header_row}, "
+                "msg=header_row must be >= 1"
+            )
+        if len(all_values) < header_row:
+            raise ValueError(
+                f"m=_records_from_grid, header_row={header_row}, "
+                f"row_count={len(all_values)}, msg=Sheet has fewer rows than header_row"
+            )
+
+        headers = all_values[header_row - 1]
+        records = []
+        for row in all_values[header_row:]:
+            if not any(str(cell).strip() for cell in row):
+                continue
+            padded_row = list(row) + [""] * max(0, len(headers) - len(row))
+            records.append(
+                {headers[index]: padded_row[index] for index in range(len(headers))}
+            )
+        return records
+
+    def _read_sheet_records(
+        self, sheet_name: str, sheet_id: str, header_row: int = 1
+    ) -> List[Dict]:
+        """
+        Read worksheet rows as dict records, optionally using a non-first header row.
+        """
+        if header_row == 1:
+            return self.read(sheet_name, sheet_id)
+
+        working_sheet = self.google_sheets_client.gsheets.open_by_key(sheet_id)
+        sheet = working_sheet.worksheet(sheet_name)
+        return self._records_from_grid(sheet.get_all_values(), header_row)
+
     def __columns_to_alphanumeric_snake_case(self, df: DataFrame) -> DataFrame:
         """
         This method applies changes to dataframe column names.
@@ -115,6 +158,7 @@ class GsheetsConsumer(GoogleSheetsReader):
         table_name: str,
         is_partitioned: bool = False,
         preload_time_in_seconds: int = None,
+        header_row: int = 1,
     ) -> DataFrame:
         """
         :param sheet_name: Sheet name for data
@@ -122,6 +166,7 @@ class GsheetsConsumer(GoogleSheetsReader):
         :param table_name: Sheet clean table name
         :param is_partitioned: If data needs to be partitioned
         :param preload_time_in_seconds: If data needs to be preloaded before fetching
+        :param header_row: 1-based row number used as column headers (default: first row)
         """
         if preload_time_in_seconds:
             self.__preload_gsheet(
@@ -130,7 +175,7 @@ class GsheetsConsumer(GoogleSheetsReader):
                 preload_time_in_seconds=preload_time_in_seconds,
             )
 
-        sheet_data = self.read(sheet_name, sheet_id)
+        sheet_data = self._read_sheet_records(sheet_name, sheet_id, header_row)
         df = self.parse_data_on_dataframe(sheet_data, table_name, is_partitioned)
 
         return df
