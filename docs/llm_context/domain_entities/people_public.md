@@ -86,11 +86,19 @@ Do **not** invent team-formation attributes outside Product & Tech. Do **not** r
 
 | If the question is about… | Use | Do **not** use |
 |---------------------------|-----|----------------|
-| Who is active, manager, cost center, tenure, official P&T squad | `dw_people` | `dw_workforce_allocation` |
-| Project tag, allocated FTE, “who is on IPO?”, allocation history | [`workforce_allocation.md`](workforce_allocation.md) → `fact_workforce_allocations` | `dim_product_tech_team` or `fact_employees` as primary source |
-| Name in an **allocation** answer | Join `dim_employee` to the allocation **fact** | Listing everyone in `dim_employee` and guessing tags |
+| Which **team** person X is on (org / squad) | `dw_people` — `dim_product_tech_team` or cost center + manager | `group_name` on the allocation fact |
+| Which **projects** person X is on (planning tags) | [`workforce_allocation.md`](workforce_allocation.md) → `fact_workforce_allocations` | `dim_product_tech_team` or `fact_employees` |
+| P&T **chapter** / **line** of person X (Team Formation) | `dim_product_tech_team` | `chapter` / `line_name` on the allocation fact |
+| People on P&T **squad** / `team_1`…`team_10` | `dim_product_tech_team` | `fact_workforce_allocations` |
+| Who is active, manager, cost center, tenure | `dw_people` | `dw_workforce_allocation` |
+| Project tag, allocated FTE, “who is on IPO?”, allocation history | `fact_workforce_allocations` (requires Allocation data contract) | `dim_product_tech_team` as primary source |
+| Name in any people answer | `dim_employee` | `employee_details` for general consumers |
 
-Shared labels (`line`, `chapter`, `team`) mean **different things** in each schema — see the homonym table in [`workforce_allocation.md`](workforce_allocation.md#do-not-confuse-dw_workforce_allocation-with-dw_people).
+**Access signal:** if the requester **lacks** `dw_workforce_allocation` access, TARS answers only what `dw_people` (and linked org tables) can support — typically team/org placement, not project tags or allocation FTE. Do not proxy allocation answers from `dim_product_tech_team`.
+
+**Stay on `dw_people`** when keywords signal org placement without allocation intent: em qual time, squad, Team Formation, P&T roster, org chart, manager, reports to, hire date, tenure, cost center, active headcount, `team_1`…`team_10`, line leader, team leader, capítulo do colaborador (P&T). For allocation/project triggers and ambiguous `team`/`time`/`chapter`/`line` patterns, see [`workforce_allocation.md` — TARS routing triggers](workforce_allocation.md#tars-routing-triggers).
+
+Shared labels (`line`, `chapter`, `team`) mean **different things** in each schema — homonym table in [`workforce_allocation.md`](workforce_allocation.md#do-not-confuse-dw_workforce_allocation-with-dw_people).
 
 ## Glossary and Synonyms
 
@@ -164,7 +172,7 @@ Do **not** publish Product & Tech headcount-by-squad from this entity (wide slot
 - Route historical / termination questions to `employee_details.md` **only when the requester is on the People team** (IDN access to `dw_employee_details`).
 
 **Don't:**
-- Answer allocation, project-tag, or FTE planning questions from `dw_people` — route to [`workforce_allocation.md`](workforce_allocation.md).
+- **Allocation vs org (access-aware):** when the requester **has** the Allocation data contract and the question is about projects, tags, or FTE → route to [`workforce_allocation.md`](workforce_allocation.md); do not answer from `dw_people`. When the requester **lacks** that contract → answer team/org from `dw_people` only and state that project-allocation answers require **Data Contract - People - Allocation** on IDN; do not proxy tags or FTE from `dim_product_tech_team`.
 - Map `dim_product_tech_team.line` / `chapter` / `team_1` to Allocation Tool `line_name` / `group_name` / `tag_name` without stating both sources differ.
 - Tell consumers to request `dw_employee_details` access via **IDN** — that schema is **exclusive to the People team**.
 - Assume terminated or inactive people appear in `dw_people`.

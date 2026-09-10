@@ -19,7 +19,7 @@
 - **Source systems:** Allocation Tool (Base44) → S3 export → People pipeline → `dw_workforce_allocation.fact_workforce_allocations` (Trino/TARS). Upstream enrich (`datalake_people.allocation_history`) is **technical-team only** — not a TARS or business consumer entry point. Employee records in the tool are **read-only**, seeded from PIN (D-1); sync is one-directional (PIN → S3 → tool; the tool never writes back to PIN).
 - **Related entities:** For employee identity and assignment history, see [`employee_details.md`](employee_details.md). For public active-workforce org context, see [`people_public.md`](people_public.md). **Team Formation** (sheet-based Line/Team SoT) is **not** replaced during the PoC — do not treat allocation tags as authoritative for official P&T org structure; compare with `dw_people.dim_product_tech_team` when needed.
 
-**Access:** `dw_workforce_allocation` is a restricted People dataset. It stores employee and allocation identifiers plus organizational attributes from the tool export — never employee names, email addresses, or contact data. Use only with authorized People access.
+**Access:** `dw_workforce_allocation` is a restricted People dataset gated by the IDN domain **Data Contract - People - Allocation** (Allocation Tool app access does **not** grant TARS/Trino access). The fact stores identifiers and organizational attributes from the tool export — never employee names or contact data. Names require a separate join to `dw_people.dim_employee` when the requester also has People public access.
 
 **Grain:** One row per allocation, employee, team (`id_group`), and project tag **validity interval**. Intervals split when allocation status or equal-share FTE (1/N within the team) changes; active and inactive historical states are retained. Application-generated sample records (`is_sample`) are excluded.
 
@@ -115,6 +115,53 @@ Both schemas live under People and reuse words like **line**, **chapter**, **tea
 | **Tag / project** | Project label (`tag_name`) — planning only | **Not** in `dw_people` |
 
 When a question mixes allocation and identity (e.g. “names on tag IPO”), **anchor on the fact**, then join `dim_employee` for display fields only — never reverse the flow (starting from `dw_people` and inferring allocations).
+
+### TARS routing triggers
+
+Apply **in order** (see disambiguation tables above for column mapping):
+
+1. **Access** — missing **Data Contract - People - Allocation**? Answer only from [`people_public.md`](people_public.md) (`dw_people`). Do **not** infer project tags or allocation FTE from `dim_product_tech_team` or cost center.
+2. **Intent** — org/squad placement → `dw_people`; project planning / tags / FTE → this entity. Keywords below are tiebreakers when intent is unclear.
+3. **Homonyms** — when `team`, `time`, `line`, or `chapter` appear, classify intent before picking a table or column.
+
+**Canonical routing (same person, different intent):**
+
+| Question pattern | Route to | Notes |
+|------------------|----------|-------|
+| Which **team** is person X on? / em qual **time** a pessoa está? | `dw_people` — `dim_product_tech_team` (P&T) or cost center + manager (non–P&T) | Official org / squad — **not** Allocation Tool `group_name` |
+| Which **projects** is person X on? / em quais **projetos** a pessoa está? | `dw_workforce_allocation.fact_workforce_allocations` | Filter `person_number`, `is_active = TRUE`; list `tag_name`, `group_name`, `line_name` |
+| Names with either answer above | Join `dw_people.dim_employee` on `person_number` | Only when the requester has `dw_people` access |
+
+**Ambiguous patterns — resolve by intent, not by shared words:**
+
+| User says | Likely intent | Route |
+|-----------|---------------|-------|
+| em qual **time** a pessoa X está? / which **team** is person X on? | Org / squad placement for one person | `dw_people` |
+| em quais **projetos** a pessoa X está? / which **projects** is person X on? | Planning tags for one person | `fact_workforce_allocations` |
+| **people on team** [Allocation group] / pessoas do time [grupo da ferramenta] | Roster of an Allocation Tool **group** | `fact_workforce_allocations` — filter `group_name`; join `dim_employee` for names |
+| **people on squad** X / time P&T / Team Formation / `team_1`…`team_10` | Official P&T roster | `dw_people.dim_product_tech_team` |
+| **chapter** within Line + tags/FTE/allocation context | PIN seed on the export | `fact_workforce_allocations` — `chapter`, `line_name` |
+| **chapter** / capítulo **of person** X (P&T attribute, no tag/FTE) | Team Formation | `dw_people.dim_product_tech_team.chapter` |
+| **Line** / linha in allocation or IPO distribution context | Allocation Tool macro group | `fact_workforce_allocations` — `line_name` |
+| **Line** / linha as P&T person attribute | Team Formation | `dim_product_tech_team.line` |
+
+**Access-gated behavior:**
+
+- **Has** `dw_workforce_allocation` access → allocation, project-tag, and FTE questions use this entity.
+- **Lacks** `dw_workforce_allocation` access → do **not** query or proxy allocation data; answer team/org/placement from `dw_people` when possible and state that project-allocation answers require the Allocation data contract on IDN.
+- Allocation Tool UI access alone does **not** imply TARS can read `dw_workforce_allocation`.
+
+**Route here** when intent is **planning / allocation / project** — EN: allocation, allocated, allocate, workforce allocation, resource allocation, allocation tool, planning scenario, project tag, which projects, projects for person, tag allocation, allocation history, tag history, tag transition, allocated FTE, FTE on project, distribution by project, who is on [project], people on team [group] (with tags/FTE context), tag completeness, IPO (allocated / distribution).
+
+**Route here** — PT: alocação, alocado, alocada, ferramenta de alocação, tag de projeto, **em quais projetos**, projetos da pessoa, histórico de tag, FTE alocado, distribuição por projeto, quem está no [projeto], pessoas do time [grupo] (com contexto de tag/FTE), completude de tag, IPO (alocado / distribuição).
+
+**Do not route here** — use `dw_people` for **org / squad placement** without project-allocation intent:
+
+- which team is person X on, em qual time (placement), squad, Team Formation, P&T roster, org chart
+- manager, reports to, hire date, tenure, cost center, company active headcount
+- `team_1`…`team_10`, line leader, team leader, capítulo do colaborador (P&T sheet semantics)
+
+**Homonym quick reference:** `team`/`time` + **where person belongs (org)** → `dw_people`. `team`/`time` + **Allocation Tool group roster or tags/FTE** → this entity. `project`/`projeto` → this entity unless clearly cost center or job family. `chapter` → P&T person attribute in `dw_people`; PIN-seed `chapter` on the fact when the question is allocation-scoped.
 
 ## Related Metric Entities
 
