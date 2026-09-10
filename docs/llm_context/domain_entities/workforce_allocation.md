@@ -49,6 +49,8 @@ Resource Allocation 2.0 (Allocation Tool) classifies workforce planning in **thr
 
 **Primary analysis pattern — people distribution by project:** when the question is “how are people distributed on project X?” or “which teams are allocated to IPO?”, filter by `tag_name` (exact or partial match), then break down by `line_name` and `group_name`. The same project name may appear in multiple teams — always show team (and Line) in the answer, not only the project total.
 
+**Primary analysis pattern — tag allocation history:** project tags assigned to an employee are historized in `fact_workforce_allocations` as SCD2 intervals (`dt_valid_from`, `dt_valid_to`). Each row is one allocation (`id_allocation`) to one `tag_name` for one validity period. When the question is “which tags did person P have on date D?” or “I had tag X in period Y, now I have tags A and B”, filter by `person_number` (or `sk_employee`) and use a reference date or list intervals ordered by `dt_valid_from`. Tag **assignments** are point-in-time accurate; `line_name` on each row reflects the team's Line at processing time (see Known Limitations).
+
 **When the question says…**
 
 | User says | Query by |
@@ -57,6 +59,8 @@ Resource Allocation 2.0 (Allocation Tool) classifies workforce planning in **thr
 | group / team / time | `group_name` or `id_group` |
 | tag / project / projeto | `tag_name` or `id_tag` (team-scoped: `(id_group, tag_name)`) |
 | which teams are on project X / distribuição por projeto | filter `tag_name` (e.g. `ILIKE '%IPO%'`), group by `line_name`, `group_name`, `tag_name` |
+| which tags on date D / histórico de tag / tag history | `person_number` + `DATE '<D>' BETWEEN dt_valid_from AND dt_valid_to`; include `tag_name`, `group_name`, `dt_valid_from`, `dt_valid_to` |
+| tag change over time / tinha tag X agora tenho A e B | `person_number`, order by `dt_valid_from`; list all intervals with `tag_name`, `is_active`, `allocation_fte` |
 
 Project tag names may repeat across teams — for project-scoped questions, list **Line + team + project**; use a project-only total only when the user explicitly asks for a company-wide rollup.
 
@@ -68,6 +72,7 @@ Project tag names may repeat across teams — for project-scoped questions, list
 - **FTE is equal-split only:** within a team, each active project tag gets `1/N` of the employee's capacity; arbitrary percentages are out of scope.
 - **FTE is not additive across teams:** an employee in two teams contributes up to 1.0 FTE in each team separately — do not sum across teams as total headcount.
 - **Project tag names may repeat across teams:** aggregate by `tag_name` only when the question is project-scoped across teams; for team-level detail, use `id_tag` or `(id_group, tag_name)`.
+- **Tag assignment history vs Line history:** `tag_name` / `id_tag` per allocation interval are historized from daily snapshots (e.g. employee moved from tag X to tags A and B). `line_name` is resolved from current `groups` at enrich time — past Line membership of a team is not yet historized (see DBP-2106).
 
 ## TARS / Trino scope
 
@@ -93,6 +98,8 @@ No official metric entity is currently defined for this domain.
 | **Macro group / macro groups / grupo macro** | Top-level Line that groups related teams | `line_name`; export field `groups.line` (e.g. `For Rent`); exists only through its teams |
 | **Group / groups** (Allocation Tool) | **Team** in RA 2.0 — stored in export entity `groups`, not the macro group | `id_group`, `group_name` (e.g. `Billing & Payments`); **must** have a `line_name`; do not confuse with `groups` as a generic word or with PIN `team` |
 | **People distribution by project / distribuição por projeto** | How allocated people spread across Lines and teams for a given project tag | Filter `tag_name`, group by `line_name`, `group_name`; use `COUNT(DISTINCT person_number)` and `SUM(allocation_fte)` |
+| **Tag allocation history / histórico de tag / histórico de alocação** | Which project tags an employee held during a date or over time | SCD2 on `fact_workforce_allocations`: point-in-time with `BETWEEN dt_valid_from AND dt_valid_to`, or full timeline ordered by `dt_valid_from` |
+| **Tag transition / mudança de tag** | Employee moved from one project tag to others (e.g. had X, now has A and B) | List intervals per `person_number`; each `id_allocation` × `tag_name` has its own `dt_valid_from` / `dt_valid_to` |
 | **Tag / tags** (Allocation Tool) | **Project** label within exactly one team — stored in export entity `tags` | `id_tag`, `tag_name` (e.g. `IPO-readiness`); use `(id_group, tag_name)` for team-scoped joins |
 | **Line / linha** | Synonym for macro group | `line_name` |
 | **Team / time** | Synonym for Allocation Tool group | `id_group`, `group_name` |
@@ -118,6 +125,8 @@ No official metric entity is currently defined for this domain.
 | Active allocated FTE by team / Allocation Tool group (`group_name`) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; aggregate by `group_name` or `id_group`, filter `is_active = TRUE` |
 | Active allocated FTE by project tag (`tag_name`) within a team | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; aggregate by `line_name`, `group_name`, `tag_name`, filter `is_active = TRUE` |
 | Which teams (and Lines) are allocated to a project (e.g. IPO) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `tag_name` (exact or `ILIKE`), group by `line_name`, `group_name`, `tag_name` |
+| Which project tags an employee held on a reference date | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `person_number` and `DATE '<ref>' BETWEEN dt_valid_from AND dt_valid_to` |
+| How an employee's project tags changed over time (tag history / transitions) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `person_number`, order by `dt_valid_from`, show `tag_name`, `group_name`, validity columns |
 | Project FTE rolled up across teams (same project tag name) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; aggregate `allocation_fte` by `tag_name` only when a single company-wide total is requested |
 | Current allocation state (no reference date) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `is_current = TRUE` |
 | PIN-seeded org attributes on the allocation export | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; columns `chapter`, `vertical`, `team` (not allocation teams or project tags) |
@@ -138,6 +147,7 @@ Use this entity for exploratory allocation metrics. No official metric entity ov
 - **FTE per project across teams (rollup only):** `SUM(allocation_fte)` grouped by `tag_name` when the user wants one total, not a team breakdown.
 - **Tag completeness (exploratory):** ratio of distinct `person_number` with an active allocation in a project tag (or team) vs an expected roster from `fact_assignment_snapshots` or another approved denominator; define the denominator explicitly in the question.
 - **Historical allocation state:** filter `<date> BETWEEN dt_valid_from AND dt_valid_to`; do not use `ts_load` as the business reference date.
+- **Tag allocation history:** list `tag_name`, `group_name`, `allocation_fte`, `dt_valid_from`, `dt_valid_to` per `person_number` — answers “which tags on date D?” and “how did tags change over time?”.
 
 For active/inactive logic, prefer `is_active = TRUE` or `allocation_status = 'active'`; `status` is the raw source label.
 
@@ -156,6 +166,7 @@ For active/inactive logic, prefer `is_active = TRUE` or `allocation_status = 'ac
 - Filter `is_active = TRUE` when calculating current allocated FTE or active allocation counts.
 - Aggregate `allocation_fte` within a **single team** (`id_group`) when reporting team-level FTE; interpret cross-team sums as planning views, not headcount.
 - For project-scoped questions (“distribution by project”, “teams on IPO”), filter `tag_name` and group by `line_name`, `group_name`, `tag_name` — show Line and team, not only the project total.
+- For tag-history questions (“which tags on date D?”, “had tag X, now A and B”), filter `person_number` and use `BETWEEN dt_valid_from AND dt_valid_to` for a single date, or list all intervals ordered by `dt_valid_from` for a timeline.
 - Use a `tag_name`-only rollup only when the user explicitly asks for a single company-wide project total.
 - Join project tags on `id_tag` or `(id_group, tag_name)` for team-level detail.
 - Treat `sk_employee = -1` as an unresolved Allocation Tool employee mapping.
@@ -175,6 +186,45 @@ For active/inactive logic, prefer `is_active = TRUE` or `allocation_status = 'ac
 - Count rows as allocations: one allocation spans multiple rows when its FTE share changed; use `COUNT(DISTINCT id_allocation)`.
 
 ## Golden Queries
+
+Project tags held by one employee on a reference date (tag history — point in time):
+
+```sql
+SELECT
+    person_number,
+    line_name,
+    group_name,
+    tag_name,
+    allocation_fte,
+    dt_valid_from,
+    dt_valid_to,
+    is_active
+FROM dw_workforce_allocation.fact_workforce_allocations
+WHERE person_number = '123456'
+    AND DATE '2026-06-15' BETWEEN dt_valid_from AND dt_valid_to
+    AND is_active = TRUE
+ORDER BY group_name, tag_name
+```
+
+Project tag timeline for one employee (tag transitions — e.g. had tag X, now tags A and B):
+
+```sql
+SELECT
+    person_number,
+    line_name,
+    group_name,
+    tag_name,
+    allocation_fte,
+    dt_valid_from,
+    dt_valid_to,
+    is_current,
+    is_active
+FROM dw_workforce_allocation.fact_workforce_allocations
+WHERE person_number = '123456'
+ORDER BY dt_valid_from, group_name, tag_name
+```
+
+Show active tags only in the timeline by adding `AND is_active = TRUE`. Each closed interval keeps `tag_name` as it was during that period.
 
 Teams and people allocated to a project (e.g. IPO) — **primary project-distribution pattern**:
 
