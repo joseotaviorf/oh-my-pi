@@ -4820,9 +4820,15 @@ bietlejuice.reverse_reports:
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
 bietlejuice.reverse_s3:
+  - bietlejuice.dw_compensation:load-dw-compensation-dim-event-definition:first-run-of-day
+  - bietlejuice.dw_compensation:load-dw-compensation-fact-compensations:first-run-of-day
+  - bietlejuice.dw_employee_details:load-dw-employee-details-fact-assignment-snapshots:first-run-of-day
+  - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-cycle-period:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-dim-talent-rating:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-fact-talent-reviews:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-org-health-user-roles:first-run-of-day
