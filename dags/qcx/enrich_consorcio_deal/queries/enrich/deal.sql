@@ -528,6 +528,7 @@ LEFT JOIN
     ON lead_created.uuid_lead = base_deal.uuid_lead
 WHERE
   DATE(base_deal.ts_deal_created) >= DATE('2025-08-01')
-  AND LOWER(base_deal.deal_name) NOT LIKE '%test%'
+  AND LOWER(base_deal.deal_name) NOT LIKE '%teste%'
+  AND LOWER(base_deal.deal_name) NOT LIKE '%testando%'
   AND base_deal.rn = 1
   AND (COALESCE(base_deal.duplication_status, 'unique') = 'unique' OR base_deal.stage_name = 'venda fechada')
