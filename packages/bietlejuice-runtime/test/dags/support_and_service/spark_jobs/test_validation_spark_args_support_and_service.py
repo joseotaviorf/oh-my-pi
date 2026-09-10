@@ -14,6 +14,7 @@ _JOB_PATHS = [
     "dags/support_and_service/comms_manager_rules/spark_jobs/load_comms_manager_rules.py",
     "dags/support_and_service/internal_chat/spark_jobs/load_internal_chat_raw.py",
     "dags/support_and_service/reclameaqui/spark_jobs/load_reclameaqui_tickets.py",
+    "dags/support_and_service/reverse_tracksale_access/spark_jobs/load_targets_into_tracksale.py",
     "dags/support_and_service/reverse_webhelp_access/spark_jobs/load_into_azure_blob_storage.py",
     "dags/support_and_service/salesforce/spark_jobs/load_salesforce_raw.py",
     "dags/support_and_service/survicate_respondent_attributes/spark_jobs/load_survicate_respondent_attributes_raw.py",
@@ -28,6 +29,7 @@ _JOB_PATHS = [
 
 
 _REVERSE_EXPORT_JOBS = {
+    "dags/support_and_service/reverse_tracksale_access/spark_jobs/load_targets_into_tracksale.py",
     "dags/support_and_service/reverse_webhelp_access/spark_jobs/load_into_azure_blob_storage.py",
 }
 

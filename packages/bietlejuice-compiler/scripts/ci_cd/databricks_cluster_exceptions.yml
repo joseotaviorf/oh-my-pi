@@ -106,3 +106,13 @@ exceptions:
       returns to Databricks. Returns to EMR once the per-table re-scan is
       optimized (e.g. read the source once and derive the tables).
     approved_by: henrique.paulo@quintoandar.com.br
+  - dag: reverse_tracksale
+    path: dags/support_and_service/reverse_tracksale
+    reason: >-
+      Folder relocated from dags/cross/reverse_tracksale to
+      dags/support_and_service/reverse_tracksale (Support and Services domain).
+      The validator runs `git diff --no-renames`, so the moved
+      reverse_tracksale.py is seen as a brand-new hand-written DAG and flagged
+      as a new Databricks introduction; the legacy Python DAG has run on
+      Databricks since before the move, with no runtime change.
+    approved_by: luisa.frodrigues@quintoandar.com.br

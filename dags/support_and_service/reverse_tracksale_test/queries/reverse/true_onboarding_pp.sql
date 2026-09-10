@@ -75,7 +75,7 @@ onboarding_contracts AS (
         3,
         4
 ),
-owners AS (
+contract_owners AS (
     SELECT
         cp.cpf,
         cp.id_user,
@@ -91,25 +91,81 @@ owners AS (
         datalake_ebdb_clean.contract_person AS cp
             ON ac.sk_contract = cp.id_contract
             AND cp.type IN ('Proprietario')
-    LEFT JOIN
+),
+user_by_email AS (
+    SELECT
+        co.sk_contract,
+        u.id AS matched_user_id
+    FROM
+        contract_owners AS co
+    INNER JOIN
         datalake_ebdb_clean.user AS u
-            ON (
-                cp.email = u.email
-                OR cp.email = u.alternative_email
-            )
-    LEFT JOIN
+            ON co.email = u.email
+    UNION
+    SELECT
+        co.sk_contract,
+        u.id AS matched_user_id
+    FROM
+        contract_owners AS co
+    INNER JOIN
+        datalake_ebdb_clean.user AS u
+            ON co.email = u.alternative_email
+),
+owner_contact_identification AS (
+    SELECT
+        co.sk_contract,
+        cci.id_user AS cci_id_user
+    FROM
+        contract_owners AS co
+    INNER JOIN
         datalake_ebdb_customer_contact_identification.customer_contact_identification AS cci
-            ON cp.email = cci.customer_contact
-    LEFT JOIN
+            ON co.email = cci.customer_contact
+),
+active_pro_owner_contracts AS (
+    SELECT
+        co.sk_contract
+    FROM
+        contract_owners AS co
+    INNER JOIN
         datalake_ebdb_clean.user_pro_owner AS po
-            ON (
-                cp.id_user = po.id_user
-                OR u.id = po.id_user
-                OR cci.id_user = po.id_user
-            )
+            ON co.id_user = po.id_user
             AND po.is_active = TRUE
+    UNION
+    SELECT
+        ube.sk_contract
+    FROM
+        user_by_email AS ube
+    INNER JOIN
+        datalake_ebdb_clean.user_pro_owner AS po
+            ON ube.matched_user_id = po.id_user
+            AND po.is_active = TRUE
+    UNION
+    SELECT
+        oci.sk_contract
+    FROM
+        owner_contact_identification AS oci
+    INNER JOIN
+        datalake_ebdb_clean.user_pro_owner AS po
+            ON oci.cci_id_user = po.id_user
+            AND po.is_active = TRUE
+),
+owners AS (
+    SELECT
+        co.cpf,
+        co.id_user,
+        co.name,
+        co.email,
+        co.phone_number,
+        co.sk_contract,
+        co.step,
+        co.dt_cohort
+    FROM
+        contract_owners AS co
+    LEFT JOIN
+        active_pro_owner_contracts AS apoc
+            ON co.sk_contract = apoc.sk_contract
     WHERE
-        po.id_user IS NULL
+        apoc.sk_contract IS NULL
 ),
 customers AS (
     SELECT

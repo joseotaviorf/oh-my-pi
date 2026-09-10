@@ -8,7 +8,7 @@ POSTing again when Airflow retries the task.
 
 Run::
 
-    pytest packages/bietlejuice-runtime/test/dags/cross/reverse_tracksale_access/spark_jobs/ -q
+    pytest packages/bietlejuice-runtime/test/dags/support_and_service/reverse_tracksale_access/spark_jobs/ -q
 """
 
 import importlib
@@ -18,9 +18,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-_MODULE_PATH = (
-    "dags.cross.reverse_tracksale_access.spark_jobs.load_targets_into_tracksale"
-)
+_MODULE_PATH = "dags.support_and_service.reverse_tracksale_access.spark_jobs.load_targets_into_tracksale"
 
 # The job builds a SparkClient and reads Databricks secrets at import time.
 _IMPORT_TIME_MOCKS = {
