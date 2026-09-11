@@ -4,7 +4,7 @@ WITH concierge_trigger AS (
       WHEN intent LIKE 'medium_reprocess%' THEN 'Medium FUP'
       WHEN intent LIKE 'medium_fup%' THEN 'Medium FUP'
       WHEN intent LIKE 'visit_cancellation_fup%' THEN 'Visit cancellation FUP'
-      WHEN intent LIKE 'favorites%' THEN 'Favorites'
+      WHEN intent LIKE '%favorites%' THEN 'Favorites'
       ELSE intent
     END AS trigger_intent,
     uuid_trigger_id
