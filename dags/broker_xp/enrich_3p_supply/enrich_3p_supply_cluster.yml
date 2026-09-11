@@ -8,5 +8,3 @@ cluster:
       - r6g.xlarge
       - r7g.xlarge
       - r6i.xlarge
-    spark_env_vars:
-      UC_REST_DISABLED: "true"
