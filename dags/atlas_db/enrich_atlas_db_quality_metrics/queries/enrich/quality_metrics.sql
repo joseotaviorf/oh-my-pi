@@ -4,14 +4,14 @@ WITH amplitude_data AS (
     id_session,
     id_event,
     id_user,
-    event_properties:dejavuid,
-    event_properties:operation_type,
-    event_properties:product,
-    event_properties:form_step,
-    event_properties:match_type,
-    event_properties:match_response,
-    event_properties:user_response,
-    event_properties:operation_customer_edition,
+    dejavuid,
+    operation_type,
+    product,
+    form_step,
+    match_type,
+    match_response,
+    user_response,
+    operation_customer_edition,
     device_type,
     ts_event,
     year,
@@ -22,11 +22,11 @@ WITH amplitude_data AS (
   WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND (
-      event_properties:dejavuid IS NOT NULL
-      AND event_properties:dejavuid <> 'null'
+      dejavuid IS NOT NULL
+      AND dejavuid <> 'null'
     )
 ),
-auto_complete_events AS (
+auto_complete_events_ranked AS (
   SELECT
     amp.id_amplitude,
     amp.id_session,
@@ -53,15 +53,40 @@ auto_complete_events AS (
     amp.ts_event,
     amp.year,
     amp.month,
-    amp.day
+    amp.day,
+    ROW_NUMBER() OVER(
+      PARTITION BY amp.id_amplitude, amp.id_session, amp.dejavuid, filled.key
+      ORDER BY amp.ts_event
+    ) AS rn
   FROM
     amplitude_data AS amp
   LATERAL VIEW
     EXPLODE(MAP_ENTRIES(FROM_JSON(amp.match_response, 'MAP<STRING, STRING>'))) AS filled
   WHERE
     filled.key <> 'dejavuId'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY amp.id_amplitude, amp.id_session, amp.dejavuid, filled.key ORDER BY amp.ts_event) = 1
+),
+auto_complete_events AS (
+  SELECT
+    id_amplitude,
+    id_session,
+    id_event,
+    id_user,
+    dejavuid,
+    operation_type,
+    product,
+    form_step,
+    match_type,
+    device_type,
+    characteristic_name,
+    characteristic_value,
+    ts_event,
+    year,
+    month,
+    day
+  FROM
+    auto_complete_events_ranked
+  WHERE
+    rn = 1
 ),
 customer_edition_events AS (
   SELECT
