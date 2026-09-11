@@ -7,6 +7,7 @@
 
 **Data Steward:**
 - [victor.sakai@quintoandar.com.br](mailto:victor.sakai@quintoandar.com.br)
+- [pedro.feres@quintoandar.com.br](mailto:pedro.feres@quintoandar.com.br)
 
 ## Overview
 
