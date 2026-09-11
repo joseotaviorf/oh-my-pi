@@ -3,18 +3,36 @@ table_name: dw_people.dim_management_hierarchy
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Warning
 column_level_validations:
   sk_manager_hierarchy:
     is_complete:
-      severity_level: Warning
+      severity_level: Error
     is_unique:
-      severity_level: Warning
+      severity_level: Error
   person_number:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  one_row_per_person:
+    custom:
+      # The DW grain is one current hierarchy row per person_number, excluding the unknown row.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT person_number
+           FROM dw_people.dim_management_hierarchy
+           WHERE person_number IS NOT NULL
+           GROUP BY person_number
+           HAVING COUNT(*) > 1
+         )) = 0
+      severity_level: Error
   person_number_l0:
     has_null_count:
       less_than_or_equal_to: 1

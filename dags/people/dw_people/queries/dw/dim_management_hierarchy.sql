@@ -39,7 +39,7 @@ FROM
     datalake_people.management_hierarchy AS mh
 INNER JOIN
     datalake_people.identifier_mapping AS im
-        ON mh.person_number = im.person_number
+        ON mh.assignment_number = im.assignment_number
         AND im.is_person_latest_assignment
         AND im.is_active
         AND NOT im.is_user_test
