@@ -96,9 +96,9 @@ Do **not** invent team-formation attributes outside Product & Tech. Do **not** r
 
 **Access signal:** if the requester **lacks** `dw_workforce_allocation` access, TARS answers only what `dw_people` (and linked org tables) can support — typically team/org placement, not project tags or allocation FTE. Do not proxy allocation answers from `dim_product_tech_team`.
 
-**Stay on `dw_people`** when keywords signal org placement without allocation intent: em qual time, squad, Team Formation, P&T roster, org chart, manager, reports to, hire date, tenure, cost center, active headcount, `team_1`…`team_10`, line leader, team leader, capítulo do colaborador (P&T). For allocation/project triggers and ambiguous `team`/`time`/`chapter`/`line` patterns, see [`workforce_allocation.md` — TARS routing triggers](workforce_allocation.md#tars-routing-triggers).
+**Stay on `dw_people`** when keywords signal org placement without allocation intent: em qual time, squad, Team Formation, P&T roster, org chart, manager, reports to, hire date, tenure, cost center, active headcount, `team_1`…`team_10`, line leader, team leader, capítulo do colaborador (P&T). For allocation/project intent and ambiguous `team`/`time`/`chapter`/`line` patterns, see [`workforce_allocation.md` — Dos and Don'ts](workforce_allocation.md#dos-and-donts).
 
-Shared labels (`line`, `chapter`, `team`) mean **different things** in each schema — homonym table in [`workforce_allocation.md`](workforce_allocation.md#do-not-confuse-dw_workforce_allocation-with-dw_people).
+Shared labels (`line`, `chapter`, `team`) mean **different things** in each schema — near-miss notes in [`workforce_allocation.md` — Glossary and Synonyms](workforce_allocation.md#glossary-and-synonyms).
 
 ## Glossary and Synonyms
 
