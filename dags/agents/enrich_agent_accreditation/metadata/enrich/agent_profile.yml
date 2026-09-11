@@ -4,6 +4,7 @@ table_name: agent_profile
 description: |
   Historical intervals of legacy performance profile types (Visita, Vistoria, SessaoFotos, etc.)
   per dadosAgente record. Reconstructs add/delete audit pairs from agent_data_types_aud,
+  deduplicates rows that share the same start instant by keeping the latest end revision,
   reconciles against the current agent_data_types snapshot, and exposes ts_revision_started
   and ts_revision_ended validity windows for agent_history joins.
 domain: Agents

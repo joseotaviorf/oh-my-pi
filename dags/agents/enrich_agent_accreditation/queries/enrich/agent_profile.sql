@@ -1,4 +1,13 @@
-WITH agent_data_types AS (
+-- transactional scopes incremental reloads: CDC filters op_cdc = 'd', hiding hard deletes
+WITH updated_agent_data AS (
+    SELECT
+        DadosAgente_id AS id_agent_data
+    FROM
+        datalake_ebdb_transactional.dadosagente_tipos
+    WHERE
+        DATE(ts_database_transaction) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+agent_data_types AS (
     SELECT
         aud.id_agent_data,
         aud.rev,
@@ -6,7 +15,10 @@ WITH agent_data_types AS (
         aud.types,
         CAST(rev.ts_revision / 1000 AS TIMESTAMP) AS ts_revision
     FROM
+        updated_agent_data AS updated
+    JOIN
         datalake_ebdb_clean.agent_data_types_aud AS aud
+            ON updated.id_agent_data = aud.id_agent_data
     JOIN
         datalake_ebdb_clean.user_revision_entity AS rev
             ON rev.id = aud.rev 
@@ -34,6 +46,19 @@ types_history AS (
     WHERE
         types.rev_type <> 2
 ),
+dedup_start_exceptions AS (
+    SELECT
+        types.id_agent_data,
+        types.types,
+        types.is_active,
+        ROW_NUMBER() OVER(PARTITION BY types.id_agent_data, types.types, types.ts_started ORDER BY types.ts_ended DESC) = 1 AS is_dedup_start_exceptions,
+        types.ts_started,
+        types.ts_ended
+    FROM
+        types_history AS types
+    WHERE
+        types.is_dedup_row IS TRUE
+),
 dedup_deletion_history AS (
     SELECT
         types.id_agent_data,
@@ -43,9 +68,9 @@ dedup_deletion_history AS (
         types.ts_started,
         types.ts_ended
     FROM
-        types_history AS types
+        dedup_start_exceptions AS types
     WHERE
-        types.is_dedup_row IS TRUE
+        types.is_dedup_start_exceptions IS TRUE
 ),
 fix_audit_error AS (
     SELECT
@@ -70,7 +95,10 @@ fix_audit_error AS (
         current_.ts_database_transaction AS ts_started,
         NULL AS ts_ended
     FROM
+        updated_agent_data AS updated
+    JOIN
         datalake_ebdb_clean.agent_data_types AS current_
+            ON current_.id_agent_data = updated.id_agent_data
     LEFT JOIN
         dedup_deletion_history AS types
             ON current_.id_agent_data = types.id_agent_data

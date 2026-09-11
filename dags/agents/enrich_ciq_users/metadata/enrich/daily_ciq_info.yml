@@ -2,8 +2,10 @@
 database_name: datalake_ciq
 table_name: daily_ciq_info
 description: |
-  The table described provides daily information about the CIQ status and its information related to the demand context (Visit Broker), 
-  with 1 record per day for each CIQ.
+  Daily snapshot of CIQ partner status and related demand-side agent context (visit broker).
+  Expands each ciq_users status interval to calendar days, keeps the latest status version
+  per partner per reference date, and enriches with agent profile, business context,
+  accreditation, and Portfolio Manager login counts.
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -15,10 +17,11 @@ columns:
       - datalake_ebdb_agents.ciq_users.id_partner
   id_user:
     description: >
-      User id of the CIQ on the reference date, taken from the latest applicable
-      status version in ciq_users for that calendar day.
+      User id of the CIQ on the reference date, taken from the latest ciq_users status
+      revision whose interval covers dt_reference (is_last_status_by_date).
     lineage:
       - datalake_ebdb_agents.ciq_users.id_user
+      - datalake_ebdb_agents.ciq_users.ts_agent_status_start
   id_agent:
     description: >
       Visit-broker agent id when the CIQ is also registered as an agent in ebdb;
@@ -30,15 +33,22 @@ columns:
     lineage:
       - datalake_agent_accreditation.agent_registration_actions_log.id_work_contract
   ciq_status:
-    description: Status to identify wheter the CIQ is active or inactive.
+    description: >
+      CIQ active/inactive status on the reference date, from the latest ciq_users status
+      revision whose interval covers dt_reference.
     lineage:
       - datalake_ebdb_agents.ciq_users.status
+      - datalake_ebdb_agents.ciq_users.ts_agent_status_start
   qty_logins:
     description: Number of login performed by CIQ in Portfolio Manager.
   agent_profile:
-    description: "Agent's performance profile"
+    description: >
+      Agent performance profile on the reference date, matched over the agent_profile
+      ts_revision_started/ts_revision_ended validity window when the CIQ is also an agent.
     lineage:
       - datalake_agent_accreditation.agent_profile.profile
+      - datalake_agent_accreditation.agent_profile.ts_revision_started
+      - datalake_agent_accreditation.agent_profile.ts_revision_ended
     categories:
       "Visita": "Agents who are responsible for conducting property visits"
       "Inspection": "Agents responsible for conducting property inspections before the tenant moves into the property and after the end of the contract"
@@ -82,9 +92,12 @@ columns:
     lineage:
       - datalake_agent_accreditation.agent_registration_actions_log.visit_agent_type
   dt_reference:
-    description: Reference date for CIQ information.
+    description: >
+      Calendar date of the daily CIQ snapshot, one row per partner per day between
+      ts_agent_status_start and ts_agent_status_end (or load_end_date when still active).
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_ebdb_agents.ciq_users.ts_agent_status_start
+      - datalake_ebdb_agents.ciq_users.ts_agent_status_end
   year:
     description: When the record was created or updated. It's a partition.
     lineage:

@@ -180,7 +180,7 @@ SELECT
     uuid_person,
     business_context,
     system_name,
-    ROW_NUMBER() OVER(PARTITION BY uuid_person, CAST(ts_revision_started AS DATE) ORDER BY ts_revision_started DESC) = 1 AS is_latest_by_date,
+    ROW_NUMBER() OVER(PARTITION BY uuid_person, CAST(ts_revision_started AS DATE) ORDER BY ts_revision_started DESC) = 1 AS is_lastest_by_date,
     ts_revision_started,
     LEAD(ts_revision_started) OVER (PARTITION BY uuid_person ORDER BY ts_revision_started) AS ts_revision_ended
 FROM

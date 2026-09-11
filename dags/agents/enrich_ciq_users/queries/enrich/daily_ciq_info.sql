@@ -1,17 +1,29 @@
-WITH ciq_daily_history AS (
+WITH explode_ciq_users AS (
   SELECT
       cu.id_partner,
       cu.id_user,
       COALESCE(u.id_agent, -1) AS id_agent,
       cu.status,
       cu.email,
-      ROW_NUMBER() OVER (PARTITION BY cu.id_partner, dd.date ORDER BY cu.ts_agent_status_start DESC) = 1 AS is_last_status_by_date,
+      cu.ts_agent_status_start,
       EXPLODE(SEQUENCE(DATE(cu.ts_agent_status_start), DATE(COALESCE(cu.ts_agent_status_end, DATE('{load_end_date}'))))) AS dt_reference
   FROM
       datalake_ebdb_agents.ciq_users AS cu
   LEFT JOIN
       datalake_ebdb_user.user AS u
         ON cu.id_user = u.id
+),
+ciq_daily_history AS (
+  SELECT
+      id_partner,
+      id_user,
+      id_agent,
+      status,
+      email,
+      ROW_NUMBER() OVER (PARTITION BY id_partner, dt_reference ORDER BY ts_agent_status_start DESC) = 1 AS is_last_status_by_date,
+      dt_reference
+  FROM
+      explode_ciq_users
 ),
 logins_pm_per_day AS (
   SELECT
@@ -29,8 +41,8 @@ agent_profile_history AS (
     SELECT
         id_agent_data AS id_agent,
         profile,
-        dt_started,
-        dt_ended
+        DATE(ts_revision_started) AS dt_started,
+        DATE(ts_revision_ended) AS dt_ended
     FROM
         datalake_agent_accreditation.agent_profile AS ap
     WHERE

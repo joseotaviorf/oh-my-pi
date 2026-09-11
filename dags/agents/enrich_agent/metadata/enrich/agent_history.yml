@@ -91,20 +91,26 @@ columns:
       matching capability or profile row exists on the reference date.
   is_allow_demand_sale:
     lineage:
+      - datalake_ebdb_agent_events.capability_events.business_context
       - datalake_agent_accreditation.business_context.business_context
       - datalake_agent_accreditation.business_context.ts_revision_started
       - datalake_agent_accreditation.business_context.ts_revision_ended
     description: |
-      True when a SALE business_context revision interval from business_context covers the
-      reference date (is_latest_by_date row per day).
+      True when the agent is allowed to operate in the SALE business context on the reference
+      date. Prefers capability_events business_context when present, otherwise falls back to
+      business_context revision intervals (is_lastest_by_date row per day). Defaults to FALSE
+      when neither source matches on the reference date.
   is_allow_demand_rent:
     lineage:
+      - datalake_ebdb_agent_events.capability_events.business_context
       - datalake_agent_accreditation.business_context.business_context
       - datalake_agent_accreditation.business_context.ts_revision_started
       - datalake_agent_accreditation.business_context.ts_revision_ended
     description: |
-      True when a RENT business_context revision interval from business_context covers the
-      reference date (is_latest_by_date row per day).
+      True when the agent is allowed to operate in the RENT business context on the reference
+      date. Prefers capability_events business_context when present, otherwise falls back to
+      business_context revision intervals (is_lastest_by_date row per day). Defaults to FALSE
+      when neither source matches on the reference date.
   is_allow_demand_acquisition:
     lineage:
       - datalake_ebdb_agent_events.capability_events.is_capability_active

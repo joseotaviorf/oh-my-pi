@@ -1,45 +1,49 @@
-WITH agent_base AS (
+WITH agent_accreditation_events AS (
+    SELECT
+        events.id_unified_agent,
+        events.event,
+        ROW_NUMBER() OVER (PARTITION BY events.id_unified_agent, DATE(events.ts_created) ORDER BY events.ts_created DESC) = 1 AS is_lastest_by_date,
+        events.ts_created AS ts_started,
+        COALESCE(LEAD(events.ts_created) OVER (PARTITION BY events.id_unified_agent ORDER BY events.ts_created) - INTERVAL 1 DAY, '{load_end_date}') AS ts_ended
+    FROM
+        datalake_ebdb_agent_events.agent_accreditation_events AS events
+),
+agent_base AS (
     SELECT
         aui.sk_person,
-        aui.id_unified_agent,
+        events.id_unified_agent,
         aui.id_agent,
         aui.id_agent_data,
         aui.id_partner,
         aui.id_user,
         aui.sk_broker,
         aui.uuid_person,
-        MIN(events.ts_created) AS ts_accreditation,
-        MAX(events.ts_created) FILTER (
-            WHERE 
-                (aui.is_unified_agent_active IS FALSE AND events.event = "INACTIVATED") 
-                OR events.event_reason = "AGENT_DEACCREDITATION"
-        ) AS ts_deaccreditation
+        EXPLODE(SEQUENCE(
+            DATE(events.ts_started), 
+            DATE(
+                IF(
+                    events.event = "INACTIVATED",
+                    events.ts_started,
+                    events.ts_ended
+                )
+            )
+        )) AS dt_reference
     FROM
-        datalake_ebdb_agent_events.agent_unified_identity AS aui
+        agent_accreditation_events AS events
     JOIN
-        datalake_ebdb_agent_events.agent_accreditation_events AS events
+        datalake_ebdb_agent_events.agent_unified_identity AS aui
             ON aui.id_unified_agent = events.id_unified_agent
     WHERE
-        aui.is_unified_agent_active IS TRUE
-        OR (
-            DATE(aui.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-            OR DATE(events.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        events.is_lastest_by_date IS TRUE
+        AND (
+            (
+                events.event <> "INACTIVATED" 
+                AND DATE(events.ts_started) <= DATE('{load_end_date}')
+                AND DATE(events.ts_ended) >= DATE('{load_start_date}')
+            )
+            OR (events.event = "INACTIVATED" 
+            AND DATE(events.ts_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
         )
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
-),
-agent_daily AS (
-    SELECT
-        aui.sk_person,
-        aui.id_unified_agent,
-        aui.id_agent,
-        aui.id_agent_data,
-        aui.id_partner,
-        aui.id_user,
-        aui.sk_broker,
-        aui.uuid_person,
-        EXPLODE(SEQUENCE(DATE(aui.ts_accreditation), DATE(COALESCE(aui.ts_deaccreditation, '{load_end_date}')))) AS dt_reference
-    FROM
-        agent_base AS aui
 ),
 partner_type AS (
     SELECT
@@ -102,15 +106,17 @@ agent_capability AS (
         id_agent,
         dt_reference,
         MAX(business_context) AS business_context,
-        COALESCE(MAX(is_passive_lead_receiver), FALSE) AS is_passive_lead_receiver,
-        COALESCE(MAX(is_allow_supply_acquisition), FALSE) AS is_allow_supply_acquisition,
-        COALESCE(MAX(is_allow_demand_visit_management), FALSE) AS is_allow_demand_visit_management,
-        COALESCE(MAX(is_allow_demand_acquisition), FALSE) AS is_allow_demand_acquisition,
-        COALESCE(MAX(is_allow_supply_conversion_consultancy), FALSE) AS is_allow_supply_conversion_consultancy,
-        COALESCE(MAX(is_allow_supply_representative), FALSE) AS is_allow_supply_representative,
-        COALESCE(MAX(is_allow_supply_midia_management), FALSE) AS is_allow_supply_midia_management,
-        COALESCE(MAX(is_allow_supply_integrity_assurance), FALSE) AS is_allow_supply_integrity_assurance,
-        COALESCE(MAX(is_allow_negociation), FALSE) AS is_allow_negociation
+        MAX(NULLIF(business_context = "SALE", FALSE)) AS is_allow_demand_sale,
+        MAX(NULLIF(business_context = "RENT", FALSE)) AS is_allow_demand_rent,
+        MAX(is_passive_lead_receiver) AS is_passive_lead_receiver,
+        MAX(is_allow_supply_acquisition) AS is_allow_supply_acquisition,
+        MAX(is_allow_demand_visit_management) AS is_allow_demand_visit_management,
+        MAX(is_allow_demand_acquisition) AS is_allow_demand_acquisition,
+        MAX(is_allow_supply_conversion_consultancy) AS is_allow_supply_conversion_consultancy,
+        MAX(is_allow_supply_representative) AS is_allow_supply_representative,
+        MAX(is_allow_supply_midia_management) AS is_allow_supply_midia_management,
+        MAX(is_allow_supply_integrity_assurance) AS is_allow_supply_integrity_assurance,
+        MAX(is_allow_negociation) AS is_allow_negociation
     FROM 
         daily_capability
     PIVOT (
@@ -136,7 +142,7 @@ business_context_daily AS (
         EXPLODE(SEQUENCE(
             DATE(bc.ts_revision_started),
             DATE(COALESCE(
-                bc.ts_revision_started - INTERVAL 1 DAY,
+                bc.ts_revision_ended - INTERVAL 1 DAY,
                 '{load_end_date}'
             ))
         )) AS dt_reference
@@ -146,7 +152,7 @@ business_context_daily AS (
         datalake_agent_accreditation.business_context AS bc
             ON base.id_unified_agent = bc.id_unified_agent
     WHERE
-        bc.is_latest_by_date IS TRUE
+        bc.is_lastest_by_date IS TRUE
     GROUP BY 1, 4
 ),
 agent_data_lead_receiver AS (
@@ -184,10 +190,10 @@ legacy_passive_lead_receiver AS (
 agent_lead_referral AS (
     SELECT
         base.id_agent_data,
-        COALESCE(COALESCE(aud.business_context, 'SALE') = 'SALE' AND aud.status <> 'NOT_ELIGIBLE', FALSE) AS has_sale_lead_referral,
-        COALESCE(COALESCE(aud.business_context, 'SALE') = 'SALE' AND aud.status = 'CONFIRMED', FALSE) AS has_sale_lead_referral_confirmed,
-        COALESCE(aud.business_context = 'RENT' AND aud.status <> 'NOT_ELIGIBLE', FALSE) AS has_rent_lead_referral,
-        COALESCE(aud.business_context = 'RENT' AND aud.status = 'CONFIRMED', FALSE) AS has_rent_lead_referral_confirmed,
+        MAX(COALESCE(aud.business_context, 'SALE') = 'SALE' AND aud.status <> 'NOT_ELIGIBLE') AS has_sale_lead_referral,
+        MAX(COALESCE(aud.business_context, 'SALE') = 'SALE' AND aud.status = 'CONFIRMED') AS has_sale_lead_referral_confirmed,
+        MAX(aud.business_context = 'RENT' AND aud.status <> 'NOT_ELIGIBLE') AS has_rent_lead_referral,
+        MAX(aud.business_context = 'RENT' AND aud.status = 'CONFIRMED') AS has_rent_lead_referral_confirmed,
         CAST(CAST(ts_revision / 1000 AS TIMESTAMP) AS DATE) AS dt_reference
     FROM
         agent_base AS base
@@ -215,24 +221,24 @@ SELECT
         IF(agent_bc.is_allow_demand_rent IS TRUE, 'RENT', NULL)
     ) AS business_context,
     da.is_active,
-    MAX(COALESCE(receiver.is_passive_lead_receiver, agent_cap.is_passive_lead_receiver)) AS is_passive_lead_receiver,
-    MAX(COALESCE(agent_cap.is_allow_supply_acquisition, pt_type.is_allow_supply_acquisition)) AS is_allow_supply_acquisition,
-    MAX(COALESCE(agent_cap.is_allow_demand_visit_management, ag_type.types = 'Visita')) AS is_allow_demand_visit_management,
-    agent_bc.is_allow_demand_sale,
-    agent_bc.is_allow_demand_rent,
-    agent_cap.is_allow_demand_acquisition AS is_allow_demand_acquisition,
-    MAX(COALESCE(agent_cap.is_allow_supply_conversion_consultancy, pt_type.is_allow_supply_conversion_consultancy)) AS is_allow_supply_conversion_consultancy,
-    agent_cap.is_allow_supply_representative AS is_allow_supply_representative,
-    MAX(COALESCE(agent_cap.is_allow_supply_midia_management, ag_type.types = 'SessaoFotos')) AS is_allow_supply_midia_management,
-    MAX(COALESCE(agent_cap.is_allow_supply_integrity_assurance, ag_type.types IN ('Vistoria', 'VistoriaQuarteirizada'))) AS is_allow_supply_integrity_assurance,
-    agent_cap.is_allow_negociation AS is_allow_negociation,
-    MAX(lead_referral.has_sale_lead_referral) AS has_sale_lead_referral,
-    MAX(lead_referral.has_sale_lead_referral_confirmed) AS has_sale_lead_referral_confirmed,
-    MAX(lead_referral.has_rent_lead_referral) AS has_rent_lead_referral,
-    MAX(lead_referral.has_rent_lead_referral_confirmed) AS has_rent_lead_referral_confirmed,
+    MAX(COALESCE(receiver.is_passive_lead_receiver, agent_cap.is_passive_lead_receiver, FALSE)) AS is_passive_lead_receiver,
+    MAX(COALESCE(agent_cap.is_allow_supply_acquisition, pt_type.is_allow_supply_acquisition, FALSE)) AS is_allow_supply_acquisition,
+    MAX(COALESCE(agent_cap.is_allow_demand_visit_management, ag_type.profile = 'Visita', FALSE)) AS is_allow_demand_visit_management,
+    MAX(COALESCE(agent_cap.is_allow_demand_sale, agent_bc.is_allow_demand_sale, FALSE)) AS is_allow_demand_sale,
+    MAX(COALESCE(agent_cap.is_allow_demand_rent, agent_bc.is_allow_demand_rent, FALSE)) AS is_allow_demand_rent,
+    MAX(COALESCE(agent_cap.is_allow_demand_acquisition, FALSE)) AS is_allow_demand_acquisition,
+    MAX(COALESCE(agent_cap.is_allow_supply_conversion_consultancy, pt_type.is_allow_supply_conversion_consultancy, FALSE)) AS is_allow_supply_conversion_consultancy,
+    MAX(COALESCE(agent_cap.is_allow_supply_representative, FALSE)) AS is_allow_supply_representative,
+    MAX(COALESCE(agent_cap.is_allow_supply_midia_management, ag_type.profile = 'SessaoFotos', FALSE)) AS is_allow_supply_midia_management,
+    MAX(COALESCE(agent_cap.is_allow_supply_integrity_assurance, ag_type.profile IN ('Vistoria', 'VistoriaQuarteirizada'), FALSE)) AS is_allow_supply_integrity_assurance,
+    MAX(COALESCE(agent_cap.is_allow_negociation, FALSE)) AS is_allow_negociation,
+    MAX(COALESCE(lead_referral.has_sale_lead_referral, FALSE)) AS has_sale_lead_referral,
+    MAX(COALESCE(lead_referral.has_sale_lead_referral_confirmed, FALSE)) AS has_sale_lead_referral_confirmed,
+    MAX(COALESCE(lead_referral.has_rent_lead_referral, FALSE)) AS has_rent_lead_referral,
+    MAX(COALESCE(lead_referral.has_rent_lead_referral_confirmed, FALSE)) AS has_rent_lead_referral_confirmed,
     base.dt_reference
 FROM
-    agent_daily AS base
+    agent_base AS base
 LEFT JOIN
     agent_capability AS agent_cap
         ON base.id_agent = agent_cap.id_agent
@@ -263,4 +269,6 @@ LEFT JOIN
     agent_lead_referral AS lead_referral
         ON base.id_agent_data = lead_referral.id_agent_data
         AND base.dt_reference >= lead_referral.dt_reference
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16, 18, 21, 26
+WHERE
+    base.dt_reference BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 27

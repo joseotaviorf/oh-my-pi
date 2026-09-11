@@ -56,7 +56,7 @@ columns:
     categories:
       AGENT_DOMAIN: Interval derived from datalake_ebdb_agent_events.capability_settings.
       LEGACY_SYSTEM: Interval derived from agent_data_business_contexts_served audit history.
-  is_latest_by_date:
+  is_lastest_by_date:
     lineage:
       - datalake_ebdb_agent_events.capability_settings.ts_started
       - datalake_ebdb_clean.user_revision_entity.ts_revision
