@@ -6,6 +6,17 @@ WITH reason_categories AS (
   FROM
     datalake_gsheets_clean.supply_processor_status_reasons
 ),
+owner_changes AS (
+  SELECT
+    id,
+    owner,
+    ts_updated
+  FROM
+    datalake_brokers_supply_processor_clean.lead_3p_aud
+  WHERE
+    rev_type = 0
+    OR mod_owner
+),
 source_with_owner AS (
   SELECT
     bcda.rev,
@@ -30,7 +41,7 @@ source_with_owner AS (
     datalake_brokers_supply_processor_clean.rev_info AS ri
       ON bcda.rev = ri.rev
   LEFT JOIN
-    datalake_brokers_supply_processor_clean.lead_3p_aud AS la
+    owner_changes AS la
       ON la.id = bcd.id_lead
       AND la.ts_updated <= bcda.ts_updated
 ),
