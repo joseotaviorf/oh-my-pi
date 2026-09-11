@@ -50,7 +50,8 @@ columns:
   id_ciq_user:
     description: >
       Platform user of the last CIQ attributed to the listing version; null when the listing has no
-      last-CIQ row in house_listing_consultant.
+      last-CIQ row in house_listing_consultant or the last CIQ row has no id_user. Rows with null
+      id_ciq_user are not eligible for Compra de Carteira payment.
     lineage:
       - datalake_big_agent.house_listing_consultant.id_user
   id_internal_agent:
@@ -62,7 +63,9 @@ columns:
     lineage:
       - datalake_big_agent.house_listing_consultant.id_enrollment
   id_accounting_entry:
-    description: Robin Hood accounting entry id when matched on house, contract, and ciq-listing-purchase source.
+    description: >
+      Robin Hood accounting entry id when matched on rent id_contract and
+      1p-portfolio-purchase source (id_house is null on manual Compra de Carteira payouts).
     lineage:
       - datalake_robin_hood.accounting_entry.id
   id_address_parsed_duplicity:
@@ -127,7 +130,8 @@ columns:
     description: >
       Full human-readable initial pricing segment from the AAREDE-470 transition rules: not-eligible
       when business context is not RENT, consultant is not CIQ_FULL or PRO_ACQUIRER, there is no signed contract yet,
-      or the contract was signed before 2026-07-01; not-eligible when the house has a rent contract in house_listing
+      there is no active CIQ agent user on the last listing CIQ row (id_ciq_user is null), or the contract was signed
+      before 2026-07-01; not-eligible when the house has a rent contract in house_listing
       but no row in listing_business_context (legacy data gap, surfaced explicitly); hybrid when the house converted from sale to rent;
       new-listings when published and rented after the transition; ongoing-listings when published
       before the transition with no previous contract and first rented after it; ongoing-rentals when

@@ -81,6 +81,8 @@ SELECT
             WHEN 'House listing published after the transition' THEN 'Anúncio publicado após a transição de contrato (compra de carteira)'
             WHEN 'House is a hybrid house converted by a CIQ channel' THEN 'Híbrido convertido por canal CIQ'
             WHEN 'This house has already been purchased' THEN 'Este imóvel já foi adquirido (compra de carteira anterior)'
+            WHEN 'Another eligible contract on the same house was already selected for payment this month' THEN 'Outro contrato elegível no mesmo imóvel já foi selecionado para pagamento neste mês'
+            WHEN 'No active CIQ agent attributed to the house' THEN 'Não há agente CIQ ativo atribuído ao imóvel'
             WHEN 'Similar house was terminated, is unpublished and has not generated a relisting, but the owner is the same' THEN 'Imóvel similar rescindido, despublicado, sem republicação, mesmo proprietário'
             WHEN 'Similar house was terminated, is unpublished, has not generated a relisting and the owner is different' THEN 'Imóvel similar rescindido, despublicado, sem republicação, proprietário diferente'
             ELSE ''

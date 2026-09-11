@@ -297,6 +297,8 @@ listing_purchase_rent AS (
             WHEN hl.ts_contract_signed IS NULL THEN "not-eligible: Don't have a contract signed yet"
             WHEN ca.consultant_type NOT IN ('CIQ_FULL', 'PRO_ACQUIRER') OR ca.consultant_type IS NULL
                 THEN 'not-eligible: User consultant is not CIQ_FULL or PRO_ACQUIRER, or no last CIQ on listing'
+            WHEN ca.id_user IS NULL
+                THEN 'not-eligible: No active CIQ agent attributed to the house'
             WHEN CAST(FROM_UTC_TIMESTAMP(hl.ts_contract_signed, 'America/Sao_Paulo') AS DATE) < DATE('2026-07-01')
                 THEN 'not-eligible: Contract signed before the transition'
             WHEN CAST(FROM_UTC_TIMESTAMP(lbc.ts_first_publication, 'America/Sao_Paulo') AS DATE) >= DATE('2026-07-01')
@@ -382,9 +384,8 @@ listing_purchase_rent AS (
             ON vfl.id_house = hl.id_house
     LEFT JOIN
         datalake_robin_hood.accounting_entry AS ae
-            ON TRY_CAST(ae.id_house AS BIGINT) = hl.id_house
-            AND TRY_CAST(ae.id_contract AS BIGINT) = hl.id_contract
-            AND LOWER(TRIM(ae.source_code)) = 'ciq-listing-purchase'
+            ON TRY_CAST(ae.id_contract AS BIGINT) = hl.id_contract
+            AND LOWER(TRIM(ae.source_code)) = '1p-portfolio-purchase'
             AND ae.ts_blocked IS NULL
     LEFT JOIN
         supply_source_rent AS ssr

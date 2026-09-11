@@ -13,19 +13,55 @@ WITH listing_purchase_duplicity AS (
     WHERE
         lpe.is_similiar_house_paid IS TRUE
 ),
-previous_listing_paid AS (
+-- Rent payment grain for anti-repurchase windows (one pass per house, no self-joins).
+rent_house_contracts AS (
     SELECT
-        listing.id_house,
-        listing.id_house_listing,
-        listing_paid.id_listing_purchase AS id_previous_listing_paid,
-        ROW_NUMBER() OVER (PARTITION BY listing.id_house ORDER BY listing_paid.is_paid DESC) = 1 AS is_last_listing_paid
+        clp.id_listing_purchase,
+        clp.id_house,
+        clp.is_paid,
+        clp.ts_contract_signed,
+        COALESCE(clp.initial_pricing_type, 'not-eligible') <> 'not-eligible' AS is_initially_eligible
     FROM
-        datalake_ciq.ciq_listing_purchase AS listing
-    JOIN
-        datalake_ciq.ciq_listing_purchase AS listing_paid
-            ON listing_paid.id_house = listing.id_house
-            AND listing_paid.id_house_listing <> listing.id_house_listing
-            AND listing_paid.is_paid IS TRUE
+        datalake_ciq.ciq_listing_purchase AS clp
+    WHERE
+        clp.business_context = 'RENT'
+        AND clp.consultant_type IN ('CIQ_FULL', 'PRO_ACQUIRER')
+        AND clp.ts_contract_signed IS NOT NULL
+),
+house_payment_flags AS (
+    SELECT
+        rhc.id_listing_purchase,
+        SUM(CASE WHEN rhc.is_paid THEN 1 ELSE 0 END) OVER (
+            PARTITION BY rhc.id_house
+            ORDER BY rhc.ts_contract_signed ASC, rhc.id_listing_purchase ASC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) > 0 AS has_prior_paid_on_house,
+        FIRST_VALUE(
+            CASE WHEN rhc.is_paid THEN rhc.id_listing_purchase END
+        ) IGNORE NULLS OVER (
+            PARTITION BY rhc.id_house
+            ORDER BY rhc.ts_contract_signed ASC, rhc.id_listing_purchase ASC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS id_previous_listing_paid
+    FROM
+        rent_house_contracts AS rhc
+),
+eligible_month_rank AS (
+    SELECT
+        rhc.id_listing_purchase,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                rhc.id_house,
+                DATE_TRUNC(
+                    'month',
+                    DATE(FROM_UTC_TIMESTAMP(rhc.ts_contract_signed, 'America/Sao_Paulo'))
+                )
+            ORDER BY rhc.ts_contract_signed ASC, rhc.id_listing_purchase ASC
+        ) AS eligible_rank_in_house_month
+    FROM
+        rent_house_contracts AS rhc
+    WHERE
+        rhc.is_initially_eligible
 ),
 purchase_pricing AS (
     SELECT
@@ -34,9 +70,14 @@ purchase_pricing AS (
         clp.id_house,
         clp.id_house_listing,
         lpe.id_similar_house AS id_similar_house_paid,
-        plp.id_previous_listing_paid,
+        hpf.id_previous_listing_paid,
         CASE
-            WHEN plp.id_previous_listing_paid IS NOT NULL THEN 'not-eligible: This house has already been purchased'
+            WHEN hpf.has_prior_paid_on_house
+                THEN 'not-eligible: This house has already been purchased'
+            WHEN emr.eligible_rank_in_house_month > 1
+                THEN 'not-eligible: Another eligible contract on the same house was already selected for payment this month'
+            WHEN clp.id_ciq_user IS NULL
+                THEN 'not-eligible: No active CIQ agent attributed to the house'
             WHEN lpe.dt_similiar_house_contract_termination IS NOT NULL 
                 AND lpe.has_similiar_house_republication IS FALSE
                 AND lpe.similar_house_listing_status = "UNPUBLISHED"
@@ -94,10 +135,11 @@ purchase_pricing AS (
             ON lpe.id_listing_purchase = clp.id_listing_purchase
             AND lpe.is_last_similiar_house_paid IS TRUE
     LEFT JOIN
-        previous_listing_paid AS plp
-            ON plp.id_house = clp.id_house
-            AND plp.id_house_listing = clp.id_house_listing
-            AND plp.is_last_listing_paid IS TRUE
+        house_payment_flags AS hpf
+            ON hpf.id_listing_purchase = clp.id_listing_purchase
+    LEFT JOIN
+        eligible_month_rank AS emr
+            ON emr.id_listing_purchase = clp.id_listing_purchase
     WHERE
         clp.business_context = 'RENT'
         AND clp.consultant_type IN ('CIQ_FULL', 'PRO_ACQUIRER')

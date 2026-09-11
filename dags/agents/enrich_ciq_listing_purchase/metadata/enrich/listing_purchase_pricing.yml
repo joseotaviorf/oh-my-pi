@@ -35,13 +35,14 @@ columns:
       - datalake_ciq.listing_purchase_duplicity.id_similar_house
   id_previous_listing_paid:
     description: >
-      Earlier listing-purchase id on the same house with a smaller id_house_listing that is already
-      paid; null when no prior paid capture exists. Drives the not-eligible previous-paid rule.
+      Listing-purchase id of the most recent prior rent capture on the same house that is already
+      paid in Robin Hood (1p-portfolio-purchase on the prior contract). Null when no prior paid
+      capture exists. Drives the not-eligible already-purchased rule.
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_listing_purchase
       - datalake_ciq.ciq_listing_purchase.id_house
-      - datalake_ciq.ciq_listing_purchase.id_house_listing
       - datalake_ciq.ciq_listing_purchase.is_paid
+      - datalake_robin_hood.accounting_entry.id
   pricing_type:
     description: >
       Final commercial pricing segment prefix: falls back to acquisition_type when the initial
@@ -69,9 +70,11 @@ columns:
   acquisition_type_reason:
     description: >
       Human-readable acquisition outcome combining a previous-paid-listing check,
+      same-month duplicate contract cap, null id_ciq_user (no active CIQ agent on the house),
       similar-house duplicity signals from listing_purchase_duplicity, and the initial_pricing_type
       segment (city_group for ongoing-listings, supply_source for hybrid houses).
     lineage:
+      - datalake_ciq.ciq_listing_purchase.id_ciq_user
       - datalake_ciq.ciq_listing_purchase.id_house_listing
       - datalake_ciq.ciq_listing_purchase.initial_pricing_type
       - datalake_ciq.ciq_listing_purchase.initial_pricing_type_reason

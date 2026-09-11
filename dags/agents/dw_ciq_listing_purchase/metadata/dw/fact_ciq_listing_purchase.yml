@@ -32,9 +32,9 @@ columns:
       - datalake_ciq.ciq_listing_purchase.id_house_listing
   sk_previous_listing_paid:
     description: >
-      House listing surrogate key of another listing on the same house that was already purchased
-      earlier; used to avoid buying the same property again. 
-      Null when this house has no prior paid listing-purchase capture.
+      Listing-purchase surrogate key of the most recent prior rent capture on the same house that
+      is already paid in Robin Hood (1p-portfolio-purchase). Used to avoid paying Compra de
+      Carteira twice on the same property. Null when no prior paid capture exists.
     lineage:
       - datalake_ciq.listing_purchase_pricing.id_previous_listing_paid
   sk_similar_house_paid:
