@@ -277,3 +277,168 @@ def test_custom_emr_configurations_merge_with_spark_conf_delta_keys():
         props["spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled"]
         == "true"
     )
+
+
+SPOT_DECOMMISSION_KEYS = (
+    "spark.decommission.enabled",
+    "spark.storage.decommission.enabled",
+    "spark.storage.decommission.shuffleBlocks.enabled",
+    "spark.storage.decommission.rddBlocks.enabled",
+)
+
+
+def _instance_group_base(**overrides):
+    cfg = {
+        "cluster_name": "test",
+        "spark_version": "emr-7.12.0",
+        "master_node_type_id": "m5.xlarge",
+        "core_nodes": {"node_type_id": "m5.xlarge", "instance_count": 2},
+        "aws_attributes": {
+            "availability": "ON_DEMAND",
+            "instance_profile_arn": "arn:aws:iam::123:instance-profile/x",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "gp3",
+        },
+        "emr_subnet_id": "subnet-1",
+        "emr_service_role": "EMR_DefaultRole",
+    }
+    cfg.update(overrides)
+    return cfg
+
+
+def _has_decommission_defaults(out: dict) -> bool:
+    confs = out.get("Configurations") or []
+    spark_defaults = next(
+        (c for c in confs if c.get("Classification") == "spark-defaults"),
+        None,
+    )
+    if spark_defaults is None:
+        return False
+    props = spark_defaults.get("Properties") or {}
+    return all(props.get(key) == "true" for key in SPOT_DECOMMISSION_KEYS)
+
+
+def test_spot_task_fleet_injects_decommission_defaults():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 0,
+            },
+            task_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 0,
+                "target_spot": 2,
+            },
+        )
+    )
+
+    assert _has_decommission_defaults(out)
+
+
+def test_spot_core_fleet_injects_decommission_defaults():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 1,
+                "target_spot": 1,
+            }
+        )
+    )
+
+    assert _has_decommission_defaults(out)
+
+
+def test_on_demand_fleet_does_not_inject_decommission_defaults():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 0,
+            },
+            spark_conf={"spark.sql.shuffle.partitions": "200"},
+        )
+    )
+
+    props = _spark_defaults_props(out)
+    assert props["spark.sql.shuffle.partitions"] == "200"
+    for key in SPOT_DECOMMISSION_KEYS:
+        assert key not in props
+
+
+def test_spot_decommission_defaults_merge_with_existing_spark_conf():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 0,
+            },
+            task_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 0,
+                "target_spot": 1,
+            },
+            spark_conf={"spark.sql.shuffle.partitions": "800"},
+        )
+    )
+
+    props = _spark_defaults_props(out)
+    assert props["spark.sql.shuffle.partitions"] == "800"
+    assert _has_decommission_defaults(out)
+
+
+def test_explicit_spark_conf_wins_over_spot_decommission_defaults():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 0,
+            },
+            task_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 0,
+                "target_spot": 1,
+            },
+            spark_conf={"spark.decommission.enabled": "false"},
+        )
+    )
+
+    props = _spark_defaults_props(out)
+    assert props["spark.decommission.enabled"] == "false"
+    assert props["spark.storage.decommission.enabled"] == "true"
+
+
+def test_on_demand_instance_group_does_not_inject_decommission_defaults():
+    out = translate(_instance_group_base())
+
+    assert not _has_decommission_defaults(out)
+    assert "Configurations" not in out
+
+
+def test_spot_task_instance_group_injects_decommission_defaults():
+    out = translate(
+        _instance_group_base(
+            task_nodes={"node_type_id": "m5.xlarge", "instance_count": 1}
+        )
+    )
+
+    assert _has_decommission_defaults(out)
+
+
+def test_spot_with_fallback_core_instance_group_injects_decommission_defaults():
+    out = translate(
+        _instance_group_base(
+            aws_attributes={
+                "availability": "SPOT_WITH_FALLBACK",
+                "instance_profile_arn": "arn:aws:iam::123:instance-profile/x",
+            }
+        )
+    )
+
+    assert _has_decommission_defaults(out)

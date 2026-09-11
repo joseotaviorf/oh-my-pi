@@ -30,6 +30,7 @@ from emr_plugin.constants import (
     EMR_INSTANCE_GROUP_NAME_CORE,
     EMR_INSTANCE_GROUP_NAME_MASTER,
     EMR_INSTANCE_GROUP_NAME_TASK,
+    SPOT_DECOMMISSION_PROPERTIES,
 )
 from emr_plugin.x86_fallback import apply_x86_fallback
 
@@ -315,6 +316,43 @@ def _is_single_node(overrides: dict) -> bool:
     instances = overrides.get("Instances") or {}
     nodes = instances.get("InstanceFleets") or instances.get("InstanceGroups") or []
     return len(nodes) == 1
+
+
+def _uses_spot_capacity(overrides: dict) -> bool:
+    """True when any worker fleet/group in the translated request uses spot."""
+    instances = overrides.get("Instances") or {}
+    for fleet in instances.get("InstanceFleets") or []:
+        if int(fleet.get("TargetSpotCapacity") or 0) > 0:
+            return True
+    for group in instances.get("InstanceGroups") or []:
+        if group.get("Market") == "SPOT" and int(group.get("InstanceCount") or 0) > 0:
+            return True
+    return False
+
+
+def _spark_defaults_block(configurations: list) -> dict:
+    existing = next(
+        (c for c in configurations if c.get("Classification") == "spark-defaults"),
+        None,
+    )
+    if existing is not None:
+        existing.setdefault("Properties", {})
+        return existing
+    block = {"Classification": "spark-defaults", "Properties": {}}
+    configurations.append(block)
+    return block
+
+
+def _inject_spot_decommission(configurations: list, overrides: dict) -> None:
+    """Merge Spark decommission defaults when the cluster has spot workers.
+
+    Uses setdefault so an explicit spark-defaults / spark_conf value wins.
+    """
+    if not _uses_spot_capacity(overrides):
+        return
+    props = _spark_defaults_block(configurations)["Properties"]
+    for key, value in SPOT_DECOMMISSION_PROPERTIES.items():
+        props.setdefault(key, value)
 
 
 def _is_fleet_block(block) -> bool:
@@ -726,6 +764,8 @@ def _translate_configurations(cfg: dict, overrides: dict):
                 configurations.append(
                     {"Classification": "spark-defaults", "Properties": filtered}
                 )
+
+    _inject_spot_decommission(configurations, overrides)
 
     spark_env = cfg.pop("spark_env_vars", None)
     if spark_env:

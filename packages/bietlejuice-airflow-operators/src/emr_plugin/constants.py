@@ -23,3 +23,18 @@ DEFAULT_SPOT_TIMEOUT_MINUTES = 10
 # terminating the cluster when spot capacity can't be provisioned in time.
 # Intentionally NOT exposed as a YAML-configurable value.
 EMR_FLEET_SPOT_TIMEOUT_ACTION = "SWITCH_TO_ON_DEMAND"
+
+# Spark graceful decommission, injected into spark-defaults whenever a
+# translated cluster has spot capacity (fleet TargetSpotCapacity or an
+# instance-group Market=SPOT). When AWS reclaims a spot node, YARN opens a
+# ~2-min decommission window; these let Spark migrate shuffle/RDD blocks off
+# the dying executor so a running stage can finish. spark.decommission.enabled
+# is the master switch (Spark 3.1+; EMR 7.12 ships Spark 3.5) — without it the
+# spark.storage.decommission.* keys are no-ops. Harmless on on-demand-only
+# clusters, so we still skip those to keep RunJobFlow payloads unchanged.
+SPOT_DECOMMISSION_PROPERTIES = {
+    "spark.decommission.enabled": "true",
+    "spark.storage.decommission.enabled": "true",
+    "spark.storage.decommission.shuffleBlocks.enabled": "true",
+    "spark.storage.decommission.rddBlocks.enabled": "true",
+}
