@@ -1,0 +1,106 @@
+---
+database_name: datalake_search
+table_name: concierge_visit_user_daily
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Daily visit facts for concierge targeting from the CDP transactional VISIT
+  entity. Grain is one visitor row per snapshot day with the latest person
+  identifier, next-visit timing, the latest house and visit cancelled on the
+  previous day, an open-or-done house list, and recent cancellation and
+  rescheduling counts. The table is partitioned by snapshot
+  year, month, and day and Z-ordered by id_user; filter by the partition
+  columns for daily reads.
+columns:
+  id_user:
+    description: |
+      Visitor user join key from the CDP VISIT entity persona expansion and
+      Z-order key for user-level data skipping.
+    lineage:
+      - datalake_transactional_entities.entities.id_user
+  id_person:
+    description: |
+      Latest non-null Person UUID for the visitor, taken from the VISIT entity
+      uuid_person. Null when the user has no person mapping in the snapshot.
+      Used to join SFMC and other concierge person-grain tables.
+    lineage:
+      - datalake_transactional_entities.entities.uuid_person
+  qty_visits_tomorrow:
+    description: "Count of active visits scheduled for the next calendar day."
+    lineage:
+      - datalake_transactional_entities.entities.is_active
+      - datalake_transactional_entities.entities.properties
+  qty_visits_7d:
+    description: "Count of visits scheduled for the next seven calendar days."
+    lineage:
+      - datalake_transactional_entities.entities.properties
+  qty_visits_canceled_1d:
+    description: |
+      Count of visits whose latest CDP status is VISIT_CANCELED and whose source
+      record was updated on the previous calendar day.
+    lineage:
+      - datalake_transactional_entities.entities.properties
+      - datalake_transactional_entities.entities.ts_updated
+  qty_visits_canceled_7d:
+    description: |
+      Count of visits whose latest CDP status is VISIT_CANCELED and whose source
+      record was updated in the previous seven complete calendar days, excluding
+      the current day.
+    lineage:
+      - datalake_transactional_entities.entities.properties
+      - datalake_transactional_entities.entities.ts_updated
+  qty_visits_rescheduled_1d:
+    description: |
+      Count of visits whose latest CDP status is VISIT_RESCHEDULED and whose
+      source record was updated on the previous calendar day.
+    lineage:
+      - datalake_transactional_entities.entities.properties
+      - datalake_transactional_entities.entities.ts_updated
+  qty_visits_rescheduled_7d:
+    description: |
+      Count of visits whose latest CDP status is VISIT_RESCHEDULED and whose
+      source record was updated in the previous seven complete calendar days,
+      excluding the current day.
+    lineage:
+      - datalake_transactional_entities.entities.properties
+      - datalake_transactional_entities.entities.ts_updated
+  id_house_next_visit:
+    description: "House of the soonest future active visit."
+    lineage:
+      - datalake_transactional_entities.entities.id_house
+  visit_code_next:
+    description: "Visit code of the soonest future active visit."
+    lineage:
+      - datalake_transactional_entities.entities.id_entity
+  ts_next_visit:
+    description: "Scheduled timestamp of the soonest future active visit."
+    lineage:
+      - datalake_transactional_entities.entities.properties
+  id_house_last_canceled_1d:
+    description: |
+      House of the most recently updated visit whose latest CDP status is
+      VISIT_CANCELED and whose source record was updated on the previous
+      calendar day. Null when the visitor has no such cancellation.
+    lineage:
+      - datalake_transactional_entities.entities.id_house
+      - datalake_transactional_entities.entities.properties
+      - datalake_transactional_entities.entities.ts_updated
+  visit_code_last_canceled_1d:
+    description: |
+      Visit code of the most recently updated visit whose latest CDP status is
+      VISIT_CANCELED and whose source record was updated on the previous
+      calendar day. Null when the visitor has no such cancellation.
+    lineage:
+      - datalake_transactional_entities.entities.id_entity
+      - datalake_transactional_entities.entities.properties
+      - datalake_transactional_entities.entities.ts_updated
+  array_id_house_visit_open_or_done:
+    description: "Comma-separated houses with an active or done visit in the entity snapshot."
+    lineage:
+      - datalake_transactional_entities.entities.id_house
+  year:
+    description: "Snapshot year partition; filter with month and day for partition pruning."
+  month:
+    description: "Snapshot month partition; filter with year and day for partition pruning."
+  day:
+    description: "Snapshot day partition; filter with year and month for partition pruning."
