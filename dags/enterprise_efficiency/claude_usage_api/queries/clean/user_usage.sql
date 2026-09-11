@@ -1,7 +1,10 @@
 WITH flattened AS (
     SELECT
         GET_JSON_OBJECT(payload, '$.actor.user_id') AS id_user,
-        GET_JSON_OBJECT(payload, '$.actor.email') AS email_user,
+        NULLIF(
+            LOWER(TRIM(GET_JSON_OBJECT(payload, '$.actor.email'))),
+            ''
+        ) AS email_user,
         GET_JSON_OBJECT(payload, '$.actor.name') AS name_user,
         GET_JSON_OBJECT(payload, '$.actor.type') AS type_actor,
         GET_JSON_OBJECT(payload, '$.model') AS model,

@@ -13,7 +13,7 @@ columns:
       - datalake_claude_usage_raw.user_activity.payload
 
   email_user:
-    description: Work email address associated with the Claude user seat (e.g. 'jane.doe@quintoandar.com').
+    description: Lowercase, trimmed work email address associated with the Claude user seat; empty values are NULL (e.g. 'jane.doe@quintoandar.com').
     lineage:
       - datalake_claude_usage_raw.user_activity.payload
 

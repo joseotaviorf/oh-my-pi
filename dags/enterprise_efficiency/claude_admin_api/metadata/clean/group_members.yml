@@ -20,7 +20,7 @@ columns:
       - datalake_claude_usage_raw.group_members.payload
 
   email:
-    description: Work email address of the group member (e.g. 'jane.doe@quintoandar.com').
+    description: Lowercase, trimmed work email address of the group member; empty values are NULL (e.g. 'jane.doe@quintoandar.com').
     lineage:
       - datalake_claude_usage_raw.group_members.payload
 

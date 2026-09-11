@@ -1,7 +1,10 @@
 WITH flattened AS (
     SELECT
         GET_JSON_OBJECT(payload, '$.user.id') AS id_user,
-        GET_JSON_OBJECT(payload, '$.user.email_address') AS email_user,
+        NULLIF(
+            LOWER(TRIM(GET_JSON_OBJECT(payload, '$.user.email_address'))),
+            ''
+        ) AS email_user,
         GET_JSON_OBJECT(payload, '$.user.type') AS type_user,
         CAST(GET_JSON_OBJECT(payload, '$.chat_metrics.connectors_used_count') AS BIGINT)
             AS count_chat_connectors_used,

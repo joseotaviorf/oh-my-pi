@@ -42,7 +42,7 @@ ranked AS (
 SELECT
     id_group,
     id_user,
-    email,
+    NULLIF(LOWER(TRIM(email)), '') AS email,
     type_group_member,
     ts_created,
     ts_load

@@ -8,7 +8,10 @@ WITH latest_load AS (
 flattened AS (
     SELECT
         GET_JSON_OBJECT(payload, '$.id') AS id,
-        GET_JSON_OBJECT(payload, '$.email') AS email,
+    NULLIF(
+        LOWER(TRIM(GET_JSON_OBJECT(payload, '$.email'))),
+        ''
+    ) AS email,
         GET_JSON_OBJECT(payload, '$.name') AS name,
         GET_JSON_OBJECT(payload, '$.role') AS role,
         GET_JSON_OBJECT(payload, '$.type') AS type_member,

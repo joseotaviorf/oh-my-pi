@@ -10,7 +10,10 @@ flattened AS (
         GET_JSON_OBJECT(payload, '$.actor.type') AS type_actor,
         GET_JSON_OBJECT(payload, '$.actor.user_id') AS id_actor_user,
         GET_JSON_OBJECT(payload, '$.actor.name') AS name_actor,
-        GET_JSON_OBJECT(payload, '$.actor.email_address') AS email_actor,
+        NULLIF(
+            LOWER(TRIM(GET_JSON_OBJECT(payload, '$.actor.email_address'))),
+            ''
+        ) AS email_actor,
         CAST(GET_JSON_OBJECT(payload, '$.actor.deleted') AS BOOLEAN) AS is_actor_deleted,
         GET_JSON_OBJECT(payload, '$.source.type') AS type_source,
         GET_JSON_OBJECT(payload, '$.source.user_id') AS id_source_user,
