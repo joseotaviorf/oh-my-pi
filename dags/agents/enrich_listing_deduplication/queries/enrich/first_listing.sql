@@ -5,16 +5,18 @@ WITH house_listing_consultant AS (
         hlc.consultant_type,
         hlc.business_context,
         hlc.is_last_ciq_on_listing,
-        CASE
-            WHEN hlc.business_context = 'RENT' THEN COALESCE(
-                hlc.ts_enrollment_started,
-                FIRST(hlc.ts_listing_version_start) OVER (
-                    PARTITION BY hlc.id_house, hlc.business_context, COALESCE(hlc.id_user, -1), hlc.consultant_type
-                    ORDER BY hlc.ts_listing_version_start ASC
+        CAST(
+            CASE
+                WHEN hlc.business_context = 'RENT' THEN COALESCE(
+                    hlc.ts_enrollment_started,
+                    FIRST(hlc.ts_listing_version_start) OVER (
+                        PARTITION BY hlc.id_house, hlc.business_context, COALESCE(hlc.id_user, -1), hlc.consultant_type
+                        ORDER BY hlc.ts_listing_version_start ASC
+                    )
                 )
-            )
-            ELSE hlc.ts_enrollment_started
-        END AS ts_enrollment_started
+                ELSE hlc.ts_enrollment_started
+            END AS TIMESTAMP
+        ) AS ts_enrollment_started
     FROM
         datalake_big_agent.house_listing_consultant AS hlc
     WHERE
@@ -48,8 +50,8 @@ first_listing AS (
         lbc.ts_first_listing,
         u.ts_first_unpublished,
         GREATEST(
-            lbc.ts_first_listing, 
-            TIMESTAMP(hlc.ts_enrollment_started), 
+            lbc.ts_first_listing,
+            hlc.ts_enrollment_started,
             COALESCE(so.ts_sale_agreement_signed, rde.ts_event),
             u.ts_first_unpublished
         ) AS ts_updated
