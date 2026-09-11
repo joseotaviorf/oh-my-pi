@@ -28,8 +28,8 @@ dag:
       `datalake_gsheets_people_clean.org_health_user_roles`.
 
       Third export: base_app_ai_adoption — active-employee roster (work email,
-      assignment number, L1 leader's work email) for the AI Governance team
-      (`aiadoption/vertical_information.csv`).
+      assignment number, L1 leader's work email) for the AI Adoption Portal
+      (https://5a-ai-adoption-portal.base44.app/, `aiadoption/vertical_information.csv`).
 
       Fourth export: allocationtool_org_roster — active-employee org/gestor roster
       for the Allocation Tool app's import step, written to the same shared
@@ -92,7 +92,7 @@ workflow:
         - "orghealth/base_app_org_health_access.csv"
         - "csv"
         - "bucket-owner-full-control"
-    # Active-employee AI adoption roster — AI Governance team
+    # Active-employee AI adoption roster — AI Adoption Portal (Base44)
     base_app_ai_adoption:
       extra_spark_job_arguments:
         - "5a-base44-office"
