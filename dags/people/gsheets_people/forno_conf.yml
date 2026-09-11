@@ -64,3 +64,10 @@ sheets_info:
     sheet_context: people
     sheet_id: 1aplJFw2IT59IUjbAHU7o-9Eo0jOv65KWlPgG1z1NuJc
     sheet_name: roles
+
+  product_tech_neotribe:
+    clean_table_name: product_tech_neotribe
+    sheet_context: people
+    sheet_id: 1uyWQMdfjN1AiQ-h5xU6TWKPQO9eiVGPkFck3wHL17AI
+    sheet_name: "2. Teams, Mission & Goals"
+    header_row: 4

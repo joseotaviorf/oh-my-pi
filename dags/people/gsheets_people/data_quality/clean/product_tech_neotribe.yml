@@ -1,0 +1,39 @@
+---
+table_name: datalake_gsheets_people_clean.product_tech_neotribe
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
+column_level_validations:
+  id_line_neotribe:
+    is_complete:
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning
+  one_row_per_line_and_neotribe:
+    custom:
+      # Grain is one row per (line, neotribe).
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            line,
+            neotribe
+          FROM datalake_gsheets_people_clean.product_tech_neotribe
+          GROUP BY
+            line,
+            neotribe
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
+  line:
+    is_complete:
+      severity_level: Warning
+  neotribe:
+    is_complete:
+      severity_level: Warning

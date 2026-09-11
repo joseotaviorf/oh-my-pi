@@ -1,0 +1,46 @@
+database_name: datalake_gsheets_people_clean
+table_name: product_tech_neotribe
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Product and Technology neotribe catalog from the team-formation workbook, with planning
+  objective, mission, and scope for each squad.
+  One row per line × neotribe.
+  Covers Product and Technology neotribes maintained in the workbook by P&T leadership.
+  Full refresh each run; blank cells become NULL; rows without line or neotribe are dropped.
+columns:
+  id_line_neotribe:
+    description: Hash of the line and neotribe pair that uniquely identifies the catalog row (e.g. 'a1b2c3d4e5f6...').
+  line:
+    description: Product and Technology line that owns the neotribe. NULL when blank in the sheet.
+    categories:
+      Growth: Marketplace growth squads spanning demand, supply, classifieds, and user intelligence.
+      For Rent: Rental product squads covering transact, post-contract journeys, billing, and property integrity.
+      "For Sale & Agents": For Sale and agent marketplace squads covering activation, performance, visits, and closing.
+      Fintech: Payments, credit, payout, and financial-product squads.
+      Single Station: Shared service platform squads for Salesforce and Magic Link.
+      Conversational XP: Conversational AI, Domi, search, and app-experience squads.
+      Tech Platform: Infrastructure, SAP, cybersecurity, and engineering-productivity squads.
+      Consorcio: Consórcio new-venture squad.
+      "Data & AI - Core Teams": Data platform, MLOps, governance, serving, and data-lake squads.
+      "Design - Central Team": Central product design, content, research, and market-insights squads.
+    lineage:
+      - datalake_gsheets_people_raw.product_tech_neotribe.line
+  neotribe:
+    description: Neotribe name within the line (e.g. 'Broker XP', 'Domi Core'). NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_raw.product_tech_neotribe.neotribe
+  objective:
+    description: Planning-cycle outcome the neotribe is expected to drive. NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_raw.product_tech_neotribe.objective
+  mission:
+    description: How the neotribe delivers value to users and the business. NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_raw.product_tech_neotribe.mission
+  scope:
+    description: Products, journeys, and systems owned by the neotribe. NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_raw.product_tech_neotribe.scope
+  ts_load:
+    description: Timestamp when this neotribe catalog row was ingested from the Google Sheets source.
