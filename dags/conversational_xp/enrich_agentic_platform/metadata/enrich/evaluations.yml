@@ -46,6 +46,19 @@ columns:
     description: "Conversation channel emitted with the evaluation, when available."
     lineage:
       - datalake_agentic_platform.platform_events.event_properties
+  session_outcome:
+    description: |
+      Session-level labeler outcome for session evaluations (for example
+      resolved or redirected_to_dedicated_channel). Null for trace
+      evaluations and when the labeler did not run.
+    lineage:
+      - datalake_agentic_platform.platform_events.event_properties
+  topic:
+    description: |
+      Session-level topic label from the online labeler. Null for trace
+      evaluations and when the labeler did not run.
+    lineage:
+      - datalake_agentic_platform.platform_events.event_properties
   agent_declared:
     description: |
       Agent under whose configuration the evaluator was declared. For trace

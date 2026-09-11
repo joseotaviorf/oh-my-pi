@@ -1,0 +1,69 @@
+---
+database_name: datalake_agentic_platform
+table_name: eval_metric_observations
+owner: lucas.cardozo@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Collapsed, metric-grain observations derived from agentic platform
+  evaluation events. Each row represents one present metric key for a session
+  or trace after deduplication. Session rows collapse to one row per
+  (id_session, metric_key) using the latest ts_event. Trace rows collapse to
+  one row per (id_trace, agent_declared, metric_key). This table is the only
+  supported source for trace latency and cost percentiles.
+columns:
+  id_observation:
+    description: |
+      Stable merge key encoding eval level and collapse dimensions
+      (session or trace grain).
+  id_event:
+    description: "CDP event identifier from the winning evaluation emit."
+    lineage:
+      - datalake_agentic_platform.evaluations.id_event
+  eval_level:
+    description: "Evaluation grain: session or trace."
+    lineage:
+      - datalake_agentic_platform.evaluations.eval_level
+  id_session:
+    description: "Evaluation session identifier."
+    lineage:
+      - datalake_agentic_platform.evaluations.id_session
+  id_trace:
+    description: "OTEL trace identifier for trace evaluations; null for session."
+    lineage:
+      - datalake_agentic_platform.evaluations.id_trace
+  id_chatbot:
+    description: "Catalog identifier of the top-level chatbot conversation product."
+    lineage:
+      - datalake_agentic_platform.evaluations.id_chatbot
+  channel:
+    description: "Conversation channel, when available."
+    lineage:
+      - datalake_agentic_platform.evaluations.channel
+  session_outcome:
+    description: "Session labeler outcome; null for trace evaluations."
+    lineage:
+      - datalake_agentic_platform.evaluations.session_outcome
+  topic:
+    description: "Session topic label; null for trace evaluations."
+    lineage:
+      - datalake_agentic_platform.evaluations.topic
+  agent_declared:
+    description: |
+      Agent under whose configuration the evaluation was declared. Valid slice
+      for trace metrics; lineage only for session metrics.
+    lineage:
+      - datalake_agentic_platform.evaluations.agent_declared
+  metric_key:
+    description: "Metric name from the evaluation metrics map."
+    lineage:
+      - datalake_agentic_platform.evaluations.metrics
+  metric_value:
+    description: |
+      Numeric metric score. Binary session metrics are 0.0 or 1.0. Continuous
+      trace metrics retain their native units (seconds, USD, counts, ratios).
+    lineage:
+      - datalake_agentic_platform.evaluations.metrics
+  ts_event:
+    description: "Timestamp of the winning evaluation emit."
+    lineage:
+      - datalake_agentic_platform.evaluations.ts_event

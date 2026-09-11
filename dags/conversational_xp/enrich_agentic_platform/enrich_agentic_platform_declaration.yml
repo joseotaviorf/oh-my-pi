@@ -1,34 +1,41 @@
 dag:
   name: enrich_agentic_platform
   schedule_start_date: 2026, 06, 01
-  schedule_interval: 0 6 * * *
+  schedule_interval: 0 * * * *
   owner: Data Conversational XP
   catchup: false
   documentation:
     dag_purpose: |
       Consolidate agentic platform evaluation and tool-call events from CDP
-      into typed, deduplicated consumer tables at
+      into typed, deduplicated tables at
       datalake_agentic_platform.evaluations and datalake_agentic_platform.tool_calls.
       A shared datalake_agentic_platform.platform_events table reads and deduplicates
       the upstream source once; downstream projections fan out via
-      inner_dependencies.
+      inner_dependencies. Evaluation metrics are unpivoted into
+      eval_metric_observations (percentile source). Each run refreshes a
+      two-calendar-day CDP lookback so late events correct today's rows.
+      Additive daily serving lives in metric_agentic_platform.
 workflow:
   type: query_delta
   layer: enrich
   custom_schema: agentic_platform
   default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     platform_events:
       merge_on: [id_event]
-      z_order_by: [ts_event, event_name]
     evaluations:
       merge_on: [id_event]
-      z_order_by: [ts_event, id_session, id_trace, id_chatbot]
     tool_calls:
       merge_on: [id_event]
-      z_order_by: [ts_event, id_session, id_otel_trace, id_chatbot]
+    eval_metric_observations:
+      merge_on: [id_observation]
   inner_dependencies:
     evaluations:
       - platform_events
     tool_calls:
       - platform_events
+    eval_metric_observations:
+      - evaluations

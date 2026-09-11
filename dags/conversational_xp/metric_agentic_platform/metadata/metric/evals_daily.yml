@@ -1,0 +1,112 @@
+---
+database_name: metric_agentic_platform
+table_name: evals_daily
+owner: lucas.cardozo@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Additive daily snapshot of agentic-platform conversation metrics. Stores
+  observation counts and value sums at calendar-day grain so consumers can
+  re-aggregate rates, totals, and means across arbitrary windows and slices.
+  The first metric_key values come from online evaluations; the table is the
+  serving home for later conversation metrics that share this grain. Rates
+  and means are computed at query time. Percentiles are not stored and must
+  be read from datalake_agentic_platform.eval_metric_observations.
+columns:
+  dt:
+    description: "Calendar event date derived from the source observation timestamp."
+    dimension: true
+    lineage:
+      - datalake_agentic_platform.eval_metric_observations.ts_event
+  grain:
+    description: |
+      Entity grain of the metric_key, currently session or trace. Named
+      grain rather than eval_level so non-evaluation metrics can land here.
+    dimension: true
+    lineage:
+      - datalake_agentic_platform.eval_metric_observations.eval_level
+  id_chatbot:
+    description: |
+      Catalog identifier of the top-level chatbot conversation product.
+      Absent upstream values are stored as the merge sentinel __UNKNOWN__.
+    dimension: true
+    lineage:
+      - datalake_agentic_platform.eval_metric_observations.id_chatbot
+  channel:
+    description: |
+      Conversation channel when available on the source observation. Absent
+      values are stored as the merge sentinel __UNKNOWN__.
+    dimension: true
+    lineage:
+      - datalake_agentic_platform.eval_metric_observations.channel
+  session_outcome:
+    description: |
+      Session labeler outcome when the source observation carries one. Trace
+      rows and missing labeler output use the merge sentinel __UNKNOWN__.
+    dimension: true
+    lineage:
+      - datalake_agentic_platform.eval_metric_observations.session_outcome
+  topic:
+    description: |
+      Session topic label when the source observation carries one. Trace
+      rows and missing labeler output use the merge sentinel __UNKNOWN__.
+    dimension: true
+    lineage:
+      - datalake_agentic_platform.eval_metric_observations.topic
+  agent_declared:
+    description: |
+      Agent under whose configuration the source observation was declared.
+      Do not slice session-level rates by this column. Absent values use
+      the merge sentinel __UNKNOWN__.
+    dimension: true
+    lineage:
+      - datalake_agentic_platform.eval_metric_observations.agent_declared
+  metric_key:
+    description: |
+      Metric identifier in the additive snapshot (for example resolution,
+      human_escalation, trace_latency, trace_cost). Filter this column to
+      select a KPI; omitted source keys are not zeros.
+    dimension: true
+    lineage:
+      - datalake_agentic_platform.eval_metric_observations.metric_key
+  cnt_observations:
+    description: |
+      Count of collapsed observations in the slice-day. For binary session
+      metrics this is the denominator for rates; omitted keys are not counted.
+    metric:
+      name: Observation count
+      description: |
+        Count of collapsed observations in the slice-day. Denominator for
+        session rates and trace means; omitted source keys are not counted.
+      acronym: cnt_observations
+      is_additive: true
+      business_stage: Conversational XP
+      hierarchy: Agentic platform
+      approved_by: lucas.cardozo@quintoandar.com.br
+  cnt_positive:
+    description: |
+      Count of observations with metric_value >= 1. Used for binary
+      metrics; unused for continuous metrics such as latency and cost.
+    metric:
+      name: Positive observation count
+      description: |
+        Count of observations with metric_value >= 1. Numerator for binary
+        session rates; unused for continuous metrics such as latency and cost.
+      acronym: cnt_positive
+      is_additive: true
+      business_stage: Conversational XP
+      hierarchy: Agentic platform
+      approved_by: lucas.cardozo@quintoandar.com.br
+  sum_value:
+    description: |
+      Sum of metric_value in the slice-day. For trace_cost this is total USD;
+      for binaries it equals cnt_positive.
+    metric:
+      name: Metric value sum
+      description: |
+        Sum of metric_value in the slice-day. For trace_cost this is total USD;
+        for binaries it equals cnt_positive. Divide by cnt_observations for means.
+      acronym: sum_value
+      is_additive: true
+      business_stage: Conversational XP
+      hierarchy: Agentic platform
+      approved_by: lucas.cardozo@quintoandar.com.br

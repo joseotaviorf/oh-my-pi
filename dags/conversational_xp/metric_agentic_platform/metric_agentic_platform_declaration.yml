@@ -1,0 +1,37 @@
+dag:
+  name: metric_agentic_platform
+  schedule_start_date: 2026, 06, 01
+  schedule_interval: 0 * * * *
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Additive daily snapshot of agentic-platform conversation metrics for TARS
+      and dashboards. Stores observation counts and value sums at calendar-day
+      grain so consumers can re-aggregate rates, totals, and means across
+      windows and slices. Percentiles stay on
+      datalake_agentic_platform.eval_metric_observations. Each run rebuilds
+      the two-calendar-day lookback so late enrich rows correct today's partition.
+workflow:
+  type: query_delta
+  layer: metric
+  custom_schema: agentic_platform
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    evals_daily:
+      merge_on:
+        - dt
+        - grain
+        - id_chatbot
+        - channel
+        - session_outcome
+        - topic
+        - agent_declared
+        - metric_key
+      when_not_matched_by_source_delete_condition: |
+        target.dt >= DATE('{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}')
+        AND target.dt <= DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}')
+      partitions: [dt]

@@ -4441,6 +4441,8 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_taxonomy:load-dw-growth-dim-media-setup:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-quintoandar-classifieds-events:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
+bietlejuice.metric_agentic_platform:
+  - bietlejuice.enrich_agentic_platform:load-enrich-eval-metric-observations:first-run-of-day
 bietlejuice.metric_observability__dags:
   - bietlejuice.dw_databricks_health:load-dw-databricks-health-fact-databricks-dag-run
 bietlejuice.metric_people:

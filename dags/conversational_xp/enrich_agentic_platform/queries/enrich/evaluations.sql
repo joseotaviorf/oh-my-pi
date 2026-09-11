@@ -19,6 +19,8 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.trace_id') AS id_trace,
     GET_JSON_OBJECT(event_properties, '$.chatbot') AS id_chatbot,
     GET_JSON_OBJECT(event_properties, '$.channel') AS channel,
+    GET_JSON_OBJECT(event_properties, '$.session_outcome') AS session_outcome,
+    GET_JSON_OBJECT(event_properties, '$.topic') AS topic,
     GET_JSON_OBJECT(event_properties, '$.agent') AS agent_declared,
     FROM_JSON(
         GET_JSON_OBJECT(event_properties, '$.metrics'),
