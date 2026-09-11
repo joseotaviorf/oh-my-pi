@@ -2,7 +2,7 @@ database_name: datalake_bianca_follow_up
 table_name: bianca_users
 description: Bianca follow-up audiences for stalled conversations where the last message is a qualifying Bianca template
 domain: Growth
-owner: tomas.mena@quintoandar.com.br
+owner: tomas.mena@quintoandar.com
 columns:
   id:
     description: MD5 hash of phone_number, trigger_type, and signal_timestamp — stable unique key per signal event for HighTouch deduplication

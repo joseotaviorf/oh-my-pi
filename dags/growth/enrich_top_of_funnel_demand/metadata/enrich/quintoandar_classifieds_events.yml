@@ -1,7 +1,7 @@
 ---
 database_name: datalake_top_of_funnel_demand
 table_name: quintoandar_classifieds_events
-owner: growth@quintoandar.com.br
+owner: vinicius.araujo@quintoandar.com.br
 domain: Growth
 description: QuintoAndar Classifieds (QAC) funnel events consolidated from five Amplitude clean subpartitions and enriched with region resolution for top-of-funnel and growth metrics.
 

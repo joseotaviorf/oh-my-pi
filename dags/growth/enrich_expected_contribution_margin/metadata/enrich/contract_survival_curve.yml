@@ -2,6 +2,7 @@ database_name: datalake_expected_contribution_margin
 table_name: contract_survival_curve
 domain: Growth
 description: This table contains the contract survival curve of all contracts signed since Jan 2016.
+owner: vinicius.araujo@quintoandar.com.br
 columns:
   quarter:
     lineage:
@@ -15,4 +16,3 @@ columns:
     lineage:
     - datalake_ebdb_contract.contract
     description: The survival probability (survival curve) for a given _quarter_ and _days_since_start_.
-owner: vinicius.araujo@quintoandar.com

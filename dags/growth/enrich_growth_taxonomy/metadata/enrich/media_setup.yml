@@ -1,7 +1,7 @@
 ---
 database_name: datalake_growth_taxonomy
 table_name: media_setup
-owner: thiago.jesus@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Each row of this table is a combination of growth media setup taxonomy values (campaign_strategy_intent, funnel_side, campaign_business_context, campaign_landing_page, behavior_type, medium and source).
   This table's key should be used as input to identify campaign' results and costs according to the appropriate combination of media setup parameters.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_top_of_funnel_demand
 table_name: user_interactions
-owner: growth@quintoandar.com.br
+owner: vinicius.araujo@quintoandar.com.br
 domain: Growth
 description: 'Top of funnel user interactions enriched with marketing taxonomy and house region. One row per Amplitude page-viewed event consolidated from schedule, search and listing flows.'
 

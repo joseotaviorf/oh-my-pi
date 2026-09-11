@@ -6,6 +6,7 @@ description: |
   EMLIO for the eltv and for-sale-ecm services. One row per inference request
   (id_request), with flattened keys, margin estimates, and semi-structured request and
   features payloads for Growth analytics and model monitoring.
+owner: vinicius.araujo@quintoandar.com.br
 columns:
   id_request:
     lineage:
@@ -103,4 +104,3 @@ columns:
     lineage:
       - datalake_emlio_clean.emlio_logs.day
     description: Partition day of the source EMLIO log record.
-owner: vinicius.araujo@quintoandar.com
