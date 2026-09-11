@@ -1,0 +1,57 @@
+---
+database_name: datalake_developers_supply_processor_clean
+table_name: development_validation
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: >
+  Clean CDC copy of Developers Supply Processor (DSP) development validation outcomes.
+  One row per provider, developer company, and provider development id (composite PK).
+  Holds the latest VALID or INVALID result and withdrawal timestamp for each development.
+  Child rows live in development_validation_failure.
+  Source: developers_supply_processor.public.development_validation.
+columns:
+  id_external_development:
+    description: Provider-side development identifier. Part of the composite primary key.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.development_external_id
+  uuid_company:
+    description: UUID of the developer company that owns this development in DSP enrollment. Part of the composite primary key.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.company_uuid
+  provider:
+    description: Inventory provider of the development being validated. Part of the composite primary key.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.provider
+    categories:
+      ORULO: Real-estate inventory platform that aggregates new-construction launches from developers.
+  status:
+    description: Latest DSP validation outcome for this development. INVALID means at least one blocking rule failed; VALID means the development may proceed in the supply pipeline.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.status
+    categories:
+      VALID: Development passed DSP validation checks (no blocking failures).
+      INVALID: Development failed at least one blocking validation rule.
+  pipeline_version:
+    description: Integer version of the DSP validation pipeline that produced this outcome, used to tell which rule set evaluated the development.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.pipeline_version
+  ts_validated:
+    description: Timestamp when DSP last finished validating this development. NOT NULL in the source.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.validated_at
+  ts_withdrawn:
+    description: Timestamp when the development was withdrawn from DSP supply processing. Null while the development is still active in the pipeline.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.withdrawn_at
+  year:
+    description: Partition year of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.year
+  month:
+    description: Partition month of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.month
+  day:
+    description: Partition day of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation.day

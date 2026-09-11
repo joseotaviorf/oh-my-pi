@@ -1,0 +1,57 @@
+---
+database_name: datalake_developers_supply_processor_clean
+table_name: developer_sync_state
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: >
+  Clean CDC copy of Developers Supply Processor (DSP) developer sync watermarks.
+  One row per provider and developer company (composite PK provider, uuid_company).
+  Records the latest inventory sync attempt and outcome for each enrolled developer.
+  Source: developers_supply_processor.public.developer_sync_state.
+columns:
+  id_external_developer:
+    description: Provider-side developer identifier stored on the sync row. NOT NULL in the source.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.developer_external_id
+  uuid_company:
+    description: UUID of the developer company (QuintoAndar company/enrollment identity) whose inventory DSP is syncing. Part of the composite primary key with provider.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.company_uuid
+  provider:
+    description: Inventory provider that DSP syncs from. Part of the composite primary key with uuid_company.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.provider
+    categories:
+      ORULO: Real-estate inventory platform that aggregates new-construction launches from developers.
+  status:
+    description: Latest sync attempt outcome for this developer at this provider.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.status
+    categories:
+      PENDING: Developer is enrolled and waiting for the first sync attempt (last_attempt_at is null).
+      SUCCESS: Last sync completed without a recorded failure.
+      FAILED: Last sync failed; see last_failure_reason.
+  last_failure_reason:
+    description: Free-text error captured when the last sync failed. Null when status is not FAILED.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.last_failure_reason
+  ts_last_attempt:
+    description: Timestamp of the most recent sync attempt for this developer, successful or not. Null only while status is PENDING.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.last_attempt_at
+  ts_last_successful_sync:
+    description: Timestamp of the last sync that completed successfully. Null if the developer has never synced successfully.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.last_successful_sync_at
+  year:
+    description: Partition year of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.year
+  month:
+    description: Partition month of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.month
+  day:
+    description: Partition day of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.developer_sync_state.day

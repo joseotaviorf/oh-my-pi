@@ -1,0 +1,57 @@
+---
+database_name: datalake_developers_supply_processor_clean
+table_name: development_validation_failure
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: >
+  Clean CDC copy of Developers Supply Processor (DSP) validation failure rows.
+  One row per UUID id. Unique on (provider, company, development, typology, rule_code),
+  with id_external_typology null for development-level failures. Each row is one
+  failed rule (blocking or advisory) for a development in development_validation.
+  Source: developers_supply_processor.public.development_validation_failure.
+columns:
+  id:
+    description: UUID primary key of the validation failure row.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.id
+  id_external_development:
+    description: Provider-side development identifier. Foreign key component to development_validation.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.development_external_id
+  id_external_typology:
+    description: Provider-side typology identifier when the failed rule is typology-scoped. Null for development-level rules.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.typology_external_id
+  uuid_company:
+    description: UUID of the developer company. Foreign key component to development_validation together with provider and id_external_development.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.company_uuid
+  provider:
+    description: Inventory provider of the failed development. Foreign key component to development_validation.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.provider
+    categories:
+      ORULO: Real-estate inventory platform that aggregates new-construction launches from developers.
+  rule_code:
+    description: Machine code of the DSP validation rule that failed (for example MISSING_NAME). Together with provider, company, development, and typology it is unique in the source.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.rule_code
+  severity:
+    description: How hard the failed rule blocks indexing. BLOCKING marks the development INVALID; ADVISORY is a warning that does not fail the development by itself.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.severity
+    categories:
+      BLOCKING: Failure prevents the development from being treated as VALID.
+      ADVISORY: Warning only; does not by itself mark the development INVALID.
+  year:
+    description: Partition year of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.year
+  month:
+    description: Partition month of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.month
+  day:
+    description: Partition day of the CDC snapshot row ingested into the data lake raw layer.
+    lineage:
+      - datalake_developers_supply_processor_raw.development_validation_failure.day

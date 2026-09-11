@@ -1,0 +1,35 @@
+dag:
+  name: developers_supply_processor
+  schedule_start_date: 2026, 9, 9
+  schedule_interval: 0 21 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      CDC ingestion of Developers Supply Processor (DSP) PostgreSQL into the data lake.
+      DSP is the For Sale primary-market supply service that syncs developer inventory from
+      providers, validates developments, and records per-rule failures.
+      Source: backend-services/applications/developers-supply-processor
+      (developers_supply_processor.db.core-prd.habitat.zone / public).
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: developers_supply_processor
+  custom_schema: developers_supply_processor
+  lineage_product_database_name: developers_supply_processor
+  dbutils_secret_key: DEVELOPERS_SUPPLY_PROCESSOR_DB
+  has_hive_sync: true
+  tables_customization:
+    developer_sync_state:
+      clean_table_name: developer_sync_state
+      raw_primary_keys: [provider, company_uuid]
+      clean_primary_keys: [provider, uuid_company]
+    development_validation:
+      clean_table_name: development_validation
+      raw_primary_keys: [provider, company_uuid, development_external_id]
+      clean_primary_keys: [provider, uuid_company, id_external_development]
+    development_validation_failure:
+      clean_table_name: development_validation_failure
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
