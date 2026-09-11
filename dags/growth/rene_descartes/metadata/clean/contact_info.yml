@@ -1,0 +1,52 @@
+database_name: datalake_rene_descartes_clean
+table_name: contact_info
+description: |
+  Consolidated contact record for Supply customers after form submission or later interaction.
+  One row per unique customer (id_contact). Sourced from the Rene Descartes PostgreSQL table
+  contact_info via CDC. Holds display name, Person link when resolved, channel list (email,
+  phone, device_id), linked devices, and source version. Partitioned by year/month/day on
+  ts_updated; z-ordered by id_contact for point lookups. Used by lead_intent and
+  lead_attribution as the customer identity key.
+domain: Growth
+owner: gabriel.salla@quintoandar.com
+columns:
+  id_contact:
+    description: Unique incremental identifier of the Supply customer in Rene Descartes. Primary key. Z-ordered — filter on this column for efficient data skipping.
+    lineage:
+      - datalake_rene_descartes_raw.contact_info.id_contact
+  id_person:
+    description: Person-service UUID for this customer when an account exists or attribution resolved the person. Nullable until the person is linked.
+    lineage:
+      - datalake_rene_descartes_raw.contact_info.person_id
+  name:
+    description: Customer display name captured on the contact form or later profile update. Not unique; person_id may still be null.
+    lineage:
+      - datalake_rene_descartes_raw.contact_info.name
+  channels:
+    description: JSON array of contact channels, each object with type (email, mobile_phone_number, device_id) and value. Replaces the former contact_info payload.
+    lineage:
+      - datalake_rene_descartes_raw.contact_info.channels
+  linked_devices:
+    description: JSON array of Device IDs associated with the customer (smartphone, tablet, computer). Nullable when no device was captured.
+    lineage:
+      - datalake_rene_descartes_raw.contact_info.linked_devices
+  ts_created:
+    description: UTC timestamp when this Supply customer contact was first registered in Rene Descartes.
+    lineage:
+      - datalake_rene_descartes_raw.contact_info.ts_created
+  ts_updated:
+    description: UTC timestamp of the latest change to this contact (new channels, devices, person link, or name). Drives partition columns year, month, and day.
+    lineage:
+      - datalake_rene_descartes_raw.contact_info.ts_updated
+  op_cdc:
+    description: Change operation emitted by the PostgreSQL CDC framework for this contact record.
+  ts_cdc_transaction:
+    description: UTC timestamp when the CDC framework captured this contact change transaction.
+  ts_database_transaction:
+    description: UTC timestamp when the source PostgreSQL database committed this contact change.
+  year:
+    description: Calendar year extracted from `ts_updated`, used as a Hive partition for incremental reads of contact records.
+  month:
+    description: Calendar month extracted from `ts_updated`, used as a Hive partition alongside year and day.
+  day:
+    description: Calendar day extracted from `ts_updated`, used as a Hive partition alongside year and month.

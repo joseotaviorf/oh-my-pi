@@ -12,7 +12,7 @@
 
 Supply represents all channels and products QuintoAndar uses to acquire property owners and generate new listings on the platform, covering both for-rent and for-sale contexts. It tracks the owner journey from initial lead capture through a six-stage funnel to the creation of the first active listing.
 
-> **Supply Revamp (WIP):** Rene Descartes is rolling out a contact-centric model (`contact_info`, `intent`). In the lake today only `lead_intent` is ingested; `contact_info` is not. That slice is documented separately in [`supply_revamp.md`](supply_revamp.md). **This file remains the source of truth for production funnel analysis** (`obt_supply`, `fact_supply_events`) — do not mix revamp clean tables with legacy funnel metrics until the full revamp DW is in prod.
+> **Supply Revamp (WIP):** Rene Descartes is rolling out a contact-centric model (`contact_info`, `intent` — lake tables `contact_info`, `lead_intent` today). That slice is documented separately in [`supply_revamp.md`](supply_revamp.md). **This file remains the source of truth for production funnel analysis** (`obt_supply`, `fact_supply_events`) — do not mix revamp clean tables with legacy funnel metrics until the full revamp DW is in prod.
 
 The lifecycle has six stages:
 1. **Lead** — owner contact is registered (`cd_funnel_step = 'lead'`)

@@ -28,6 +28,8 @@ workflow:
     revinfo: {}
     portfolio: {}
     portfolio_enrichment: {}
+    contact_info:
+      z_order_by: [id_contact]
     lead_intent:
       clean_z_order_by: [id_contact]
     supply_rejection:
