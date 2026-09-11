@@ -7,7 +7,7 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  id_agent:
+  id_agent_data:
     is_complete:
       severity_level: Error
   profile:

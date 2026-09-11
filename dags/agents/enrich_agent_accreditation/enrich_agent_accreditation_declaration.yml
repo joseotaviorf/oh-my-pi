@@ -23,7 +23,7 @@ workflow:
   tables_customization:
     agent_profile:
       merge_on: [id_agent_profile]
-      z_order_by: [id_agent, ts_revision_started]
+      z_order_by: [id_agent_data, ts_revision_started]
     agent_registration_actions_log:
       merge_on: [id_action_log]
       z_order_by: [id_agent, dt_action]
