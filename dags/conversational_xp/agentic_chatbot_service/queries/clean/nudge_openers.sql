@@ -5,4 +5,4 @@ SELECT
   metadata AS opener_metadata,
   generated_at AS ts_generated
 FROM
-  datalake_agentic_platform_raw.nudge_openers
+  datalake_agentic_chatbot_service_raw.nudge_openers

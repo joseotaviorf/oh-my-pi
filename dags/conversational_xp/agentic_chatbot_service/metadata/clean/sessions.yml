@@ -1,5 +1,5 @@
 ---
-database_name: datalake_agentic_platform_clean
+database_name: datalake_agentic_chatbot_service_clean
 table_name: sessions
 owner: lucas.cardozo@quintoandar.com.br
 domain: Conversational XP
@@ -8,24 +8,24 @@ columns:
   id_stream:
     description: "Stream identifier. Part of the composite merge key with id_session. The same stream can have many historical sessions over time."
     lineage:
-    - datalake_agentic_platform_raw.agentic_sessions.stream_id
+    - datalake_agentic_chatbot_service_raw.agentic_sessions.stream_id
   id_session:
     description: "Session identifier. Part of the composite merge key with id_stream."
     lineage:
-    - datalake_agentic_platform_raw.agentic_sessions.session_id
+    - datalake_agentic_chatbot_service_raw.agentic_sessions.session_id
   ts_created:
     description: "When the session row was created (source created_at)."
     lineage:
-    - datalake_agentic_platform_raw.agentic_sessions.created_at
+    - datalake_agentic_chatbot_service_raw.agentic_sessions.created_at
   ts_updated:
     description: "Last activity timestamp (source updated_at). Bumped on TTL/activity; not updated on close."
     lineage:
-    - datalake_agentic_platform_raw.agentic_sessions.updated_at
+    - datalake_agentic_chatbot_service_raw.agentic_sessions.updated_at
   ts_closed:
     description: "When the session was closed (source closed_at). NULL while the session is open."
     lineage:
-    - datalake_agentic_platform_raw.agentic_sessions.closed_at
+    - datalake_agentic_chatbot_service_raw.agentic_sessions.closed_at
   is_open:
     description: "True when closed_at IS NULL (session still open)."
     lineage:
-    - datalake_agentic_platform_raw.agentic_sessions.closed_at
+    - datalake_agentic_chatbot_service_raw.agentic_sessions.closed_at

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_agentic_platform_clean
+database_name: datalake_agentic_chatbot_service_clean
 table_name: nudge_openers
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
@@ -8,20 +8,20 @@ columns:
   id_user:
     description: "User identifier. Primary key — one opener row per user, overwritten on regeneration."
     lineage:
-    - datalake_agentic_platform_raw.nudge_openers.user_id
+    - datalake_agentic_chatbot_service_raw.nudge_openers.user_id
   id_nudge:
     description: "Foreign key to the nudge row this opener was generated from. CASCADE-deleted when the nudge is removed."
     lineage:
-    - datalake_agentic_platform_raw.nudge_openers.nudge_id
+    - datalake_agentic_chatbot_service_raw.nudge_openers.nudge_id
   opener_text:
     description: "Plain-text opener shown to the user when the nudge is surfaced in conversation."
     lineage:
-    - datalake_agentic_platform_raw.nudge_openers.text
+    - datalake_agentic_chatbot_service_raw.nudge_openers.text
   opener_metadata:
     description: "Optional JSON metadata for rich-content rendering (e.g. template_component_name)."
     lineage:
-    - datalake_agentic_platform_raw.nudge_openers.metadata
+    - datalake_agentic_chatbot_service_raw.nudge_openers.metadata
   ts_generated:
     description: "When the opener was generated, stamped before the generation run (not after) for freshness checks."
     lineage:
-    - datalake_agentic_platform_raw.nudge_openers.generated_at
+    - datalake_agentic_chatbot_service_raw.nudge_openers.generated_at

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_agentic_platform_clean
+database_name: datalake_agentic_chatbot_service_clean
 table_name: traces
 owner: lucas.cardozo@quintoandar.com.br
 domain: Conversational XP
@@ -8,44 +8,44 @@ columns:
   event_id:
     description: "Unique trace/invocation event identifier. Merge key (append-only)."
     lineage:
-    - datalake_agentic_platform_raw.traces.event_id
+    - datalake_agentic_chatbot_service_raw.traces.event_id
   id_chatbot:
     description: "Chatbot identifier for the invocation."
     lineage:
-    - datalake_agentic_platform_raw.traces.payload
+    - datalake_agentic_chatbot_service_raw.traces.payload
   id_trace:
     description: "Trace identifier for the invocation (correlates with Langfuse)."
     lineage:
-    - datalake_agentic_platform_raw.traces.payload
+    - datalake_agentic_chatbot_service_raw.traces.payload
   id_session:
     description: "Session identifier for the invocation."
     lineage:
-    - datalake_agentic_platform_raw.traces.session_id
+    - datalake_agentic_chatbot_service_raw.traces.session_id
   id_user:
     description: "User identifier associated with the invocation (nullable)."
     lineage:
-    - datalake_agentic_platform_raw.traces.payload
+    - datalake_agentic_chatbot_service_raw.traces.payload
   version:
     description: "TraceEvent schema version. The DAG fails loud on any unsupported version."
     lineage:
-    - datalake_agentic_platform_raw.traces.payload
+    - datalake_agentic_chatbot_service_raw.traces.payload
   event_name:
     description: "Event name (always 'invocation')."
     lineage:
-    - datalake_agentic_platform_raw.traces.payload
+    - datalake_agentic_chatbot_service_raw.traces.payload
   ts_generated:
     description: "When the invocation trace was generated (source `generated_at`)."
     lineage:
-    - datalake_agentic_platform_raw.traces.generated_at
+    - datalake_agentic_chatbot_service_raw.traces.generated_at
   ts_received:
     description: "When the trace row was received/persisted by the agentic-chatbot-service."
     lineage:
-    - datalake_agentic_platform_raw.traces.received_at
+    - datalake_agentic_chatbot_service_raw.traces.received_at
   data_json:
     description: "Full invocation data as JSON: conversation input/output plus the nested agent-execution tree."
     lineage:
-    - datalake_agentic_platform_raw.traces.payload
+    - datalake_agentic_chatbot_service_raw.traces.payload
   agents_called:
     description: "Distinct agent names that participated in the invocation, derived from the agent-execution tree."
     lineage:
-    - datalake_agentic_platform_raw.traces.payload
+    - datalake_agentic_chatbot_service_raw.traces.payload

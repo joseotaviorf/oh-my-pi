@@ -1,5 +1,5 @@
--- Clean projection for datalake_agentic_platform_clean.traces.
--- Source: datalake_agentic_platform_raw.traces (Debezium CDC of agentic-chatbot-service.public.traces).
+-- Clean projection for datalake_agentic_chatbot_service_clean.traces.
+-- Source: datalake_agentic_chatbot_service_raw.traces (Debezium CDC of agentic-chatbot-service.public.traces).
 -- The `payload` column holds the full, versioned hades TraceEvent as JSON
 -- (envelope + conversation content + nested agent-execution tree).
 --
@@ -42,4 +42,4 @@ SELECT
     )
   ) AS agents_called
 FROM
-  datalake_agentic_platform_raw.traces
+  datalake_agentic_chatbot_service_raw.traces

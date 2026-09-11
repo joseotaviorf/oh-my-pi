@@ -16,4 +16,4 @@ SELECT
   created_at AS ts_created,
   updated_at AS ts_updated
 FROM
-  datalake_agentic_platform_raw.nudges
+  datalake_agentic_chatbot_service_raw.nudges

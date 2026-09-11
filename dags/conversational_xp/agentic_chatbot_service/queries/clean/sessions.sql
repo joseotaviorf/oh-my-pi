@@ -1,5 +1,5 @@
--- Clean projection for datalake_agentic_platform_clean.sessions.
--- Source: datalake_agentic_platform_raw.agentic_sessions (Debezium CDC of
+-- Clean projection for datalake_agentic_chatbot_service_clean.sessions.
+-- Source: datalake_agentic_chatbot_service_raw.agentic_sessions (Debezium CDC of
 -- agentic-chatbot-service.public.agentic_sessions).
 --
 -- Grain: one row per (stream_id, session_id). The same stream_id can have many
@@ -13,4 +13,4 @@ SELECT
   closed_at AS ts_closed,
   closed_at IS NULL AS is_open
 FROM
-  datalake_agentic_platform_raw.agentic_sessions
+  datalake_agentic_chatbot_service_raw.agentic_sessions

@@ -127,3 +127,14 @@ exceptions:
       as a new Databricks introduction; the legacy Python DAG has run on
       Databricks since before the move, with no runtime change.
     approved_by: luisa.frodrigues@quintoandar.com.br
+  - dag: agentic_chatbot_service
+    path: dags/conversational_xp/agentic_chatbot_service
+    reason: >-
+      Folder renamed from dags/conversational_xp/agentic_platform to
+      dags/conversational_xp/agentic_chatbot_service (CDC DAG name aligned with
+      the source service). The validator runs `git diff --no-renames`, so the
+      moved *_declaration.yml is seen as a brand-new file and flagged as a new
+      Databricks introduction; the DAG has run on Databricks
+      (consolidation_s_memory_cluster) since before the rename, with no
+      runtime change.
+    approved_by: william.angelo@quintoandar.com.br

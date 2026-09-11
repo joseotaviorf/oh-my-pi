@@ -1,16 +1,11 @@
 dag:
-  name: agentic_platform
+  name: agentic_chatbot_service
   schedule_start_date: 2026, 06, 01
   schedule_interval: 40 0,3-20 * * *
   owner: Data Conversational XP
   documentation:
     dag_purpose: |
       This DAG ingests CDC generated data from the [agentic-chatbot-service](https://github.com/quintoandar/quintoml) transactional database.
-      It captures:
-      - `traces` — full versioned `TraceEvent` (conversation content + agent-execution tree) → datalake_agentic_platform_{raw,clean}.traces (CNVPL-2085)
-      - `agentic_sessions` — session lifecycle (stream/session identity + open/closed timestamps) → datalake_agentic_platform_raw.agentic_sessions / _clean.sessions
-      - `nudges` — per-user mission/nudge coordination state (lifecycle, CDP payload, snooze) → datalake_agentic_platform_{raw,clean}.nudges
-
 workflow:
   type: cdc
   layer: raw
