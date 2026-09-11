@@ -100,7 +100,12 @@ bietlejuice.dw_agent:
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
 bietlejuice.dw_agent_accreditation:
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
+  - bietlejuice.enrich_agent:load-enrich-agent-daily:first-run-of-day
+  - bietlejuice.enrich_agent:load-enrich-agent-event-log:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-agent-history:first-run-of-day
+  - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-contract-process:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-prospect-agent:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-qualification-step:first-run-of-day
@@ -108,6 +113,7 @@ bietlejuice.dw_agent_accreditation:
   - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-accreditation-events:first-run-of-day
   - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-product:first-run-of-day
   - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-unified-identity:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
 bietlejuice.dw_agent_contract:
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
   - bietlejuice.enrich_agenda_allocation:load-enrich-agents-slots-hourly:first-run-of-day
