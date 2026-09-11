@@ -4438,6 +4438,8 @@ bietlejuice.enrich_zscaler:
   - bietlejuice.zscaler:load-clean-managed-devices:first-run-of-day
 bietlejuice.jira_open_incidents_report:
   - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
+bietlejuice.metric_agentic_platform:
+  - bietlejuice.enrich_agentic_platform:load-enrich-eval-metric-observations:first-run-of-day
 bietlejuice.metric_fintech__collections_segmentation:
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-features-timeline:first-run-of-day
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day
@@ -4450,8 +4452,6 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_taxonomy:load-dw-growth-dim-media-setup:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-quintoandar-classifieds-events:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
-bietlejuice.metric_agentic_platform:
-  - bietlejuice.enrich_agentic_platform:load-enrich-eval-metric-observations:first-run-of-day
 bietlejuice.metric_observability__dags:
   - bietlejuice.dw_databricks_health:load-dw-databricks-health-fact-databricks-dag-run
 bietlejuice.metric_people:
@@ -4831,15 +4831,9 @@ bietlejuice.reverse_reports:
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
 bietlejuice.reverse_s3:
-  - bietlejuice.dw_compensation:load-dw-compensation-dim-event-definition:first-run-of-day
-  - bietlejuice.dw_compensation:load-dw-compensation-fact-compensations:first-run-of-day
-  - bietlejuice.dw_employee_details:load-dw-employee-details-fact-assignment-snapshots:first-run-of-day
-  - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-cycle-period:first-run-of-day
-  - bietlejuice.dw_performance:load-dw-performance-dim-talent-rating:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
-  - bietlejuice.dw_performance:load-dw-performance-fact-talent-reviews:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-org-health-user-roles:first-run-of-day
