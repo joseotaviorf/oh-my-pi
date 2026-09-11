@@ -1,6 +1,21 @@
 WITH source_broker_commission AS (
   SELECT DISTINCT
-    CAST(e.id_external AS STRING) AS id_finance_entity_entry
+    CAST(e.id_external AS STRING) AS id_finance_entity_entry,
+    CASE
+      WHEN e.bill_item IN (
+        'entry.bill-item/brokerage-adm-partner',
+        'entry.bill-item/brokerage-adm-partner-postponed',
+        'entry.bill-item/brokerage-fee-tax-ir-adm-partner',
+        'entry.bill-item/brokerage-partner-select',
+        'entry.bill-item/brokerage-partner-select-postponed'
+      ) THEN '211408'
+      WHEN e.bill_item IN (
+        'entry.bill-item/brokerage-estate-agent',
+        'entry.bill-item/brokerage-estate-agent-postponed',
+        'entry.bill-item/estate-agent-adjustment',
+        'entry.bill-item/brokerage-compensation'
+      ) THEN '211409'
+    END AS account_number
   FROM
     datalake_retsuko.entry e
   INNER JOIN
@@ -13,16 +28,36 @@ WITH source_broker_commission AS (
     datalake_retsuko_clean.contract ct
       ON ct.id = e.id_contract
   WHERE
-    e.bill_item IN (
-      'entry.bill-item/brokerage-adm-partner',
-      'entry.bill-item/brokerage-adm-partner-postponed',
-      'entry.bill-item/brokerage-fee-tax-ir-adm-partner',
-      'entry.bill-item/brokerage-partner-select',
-      'entry.bill-item/brokerage-partner-select-postponed'
-    )
-    AND (
-      (af.type = 'landlord' AND atc.type = 'contract')
-      OR (af.type = 'contract' AND atc.type = 'landlord')
+    (
+      (
+        e.bill_item IN (
+          'entry.bill-item/brokerage-adm-partner',
+          'entry.bill-item/brokerage-adm-partner-postponed',
+          'entry.bill-item/brokerage-fee-tax-ir-adm-partner',
+          'entry.bill-item/brokerage-partner-select',
+          'entry.bill-item/brokerage-partner-select-postponed'
+        )
+        AND (
+          (af.type = 'landlord' AND atc.type = 'contract')
+          OR (af.type = 'contract' AND atc.type = 'landlord')
+        )
+      )
+      OR (
+        e.bill_item IN (
+          'entry.bill-item/brokerage-estate-agent',
+          'entry.bill-item/brokerage-estate-agent-postponed'
+        )
+        AND (
+          (af.type = 'landlord' AND atc.type = 'contract')
+          OR (af.type = 'contract' AND atc.type = 'landlord')
+          OR (af.type = 'personal-estate-agent' AND atc.type = 'contract')
+          OR (af.type = 'contract' AND atc.type = 'personal-estate-agent')
+        )
+      )
+      OR e.bill_item IN (
+        'entry.bill-item/estate-agent-adjustment',
+        'entry.bill-item/brokerage-compensation'
+      )
     )
     AND ct.country_code = 'BR'
     AND DATE(e.ts_created) >= '2025-01-01'
@@ -60,6 +95,7 @@ sap_gateway AS (
 sap_ledger AS (
   SELECT
     CAST(id_finance_entity_entry AS STRING) AS id_finance_entity_entry,
+    account_number,
     MAX(id_business_entity) AS id_business_entity,
     MAX(id_finance_entity) AS id_finance_entity,
     MAX(accrual_year_month) AS accrual_year_month,
@@ -70,15 +106,16 @@ sap_ledger AS (
   FROM
     datalake_pas.ledger
   WHERE
-    account_number = '211408'
+    account_number IN ('211408', '211409')
     AND dt_reference >= DATE('2025-01-01')
     AND id_finance_entity_entry IS NOT NULL
-  GROUP BY 1
+  GROUP BY 1, 2
 ),
 
 source_dispatch_hash AS (
   SELECT DISTINCT
-    sg.hash
+    sg.hash,
+    sb.account_number
   FROM
     source_broker_commission sb
   INNER JOIN
@@ -95,6 +132,7 @@ source_dispatch_hash AS (
 sap_ledger_unkeyed AS (
   SELECT
     CAST(l.id_transaction AS STRING) AS id_transaction,
+    l.account_number,
     MAX(l.created_by) AS created_by,
     MAX(l.id_business_entity) AS id_business_entity,
     MAX(l.id_finance_entity) AS id_finance_entity,
@@ -108,16 +146,17 @@ sap_ledger_unkeyed AS (
   LEFT JOIN
     source_dispatch_hash sdh
       ON sdh.hash = l.hash
+      AND sdh.account_number = l.account_number
   WHERE
-    l.account_number = '211408'
+    l.account_number IN ('211408', '211409')
     AND l.dt_reference >= DATE('2025-01-01')
     AND l.id_finance_entity_entry IS NULL
     AND sdh.hash IS NULL
-  GROUP BY 1
+  GROUP BY 1, 2
 )
 
 SELECT
-  ('RE-RTSK-BRKC'||'-'||sl.id_finance_entity_entry) AS id_accounting_process,
+  ('RE-RTSK-BRKC'||'-'||sl.id_finance_entity_entry||'-'||sl.account_number) AS id_accounting_process,
   sl.id_business_entity,
   sl.id_finance_entity,
   sl.id_finance_entity_entry,
@@ -125,8 +164,8 @@ SELECT
   'for rent' AS business_unit,
   'S4' AS source_name,
   'broker commission' AS accounting_type,
-  '211408' AS account_number,
-  'broker commission to transfer' AS accounting_name,
+  sl.account_number,
+  IF(sl.account_number = '211408', 'broker commission to transfer', 'visit broker commission to transfer') AS accounting_name,
   CAST(NULL AS DECIMAL(12,2)) AS source_amount,
   CAST(sl.debit_credit AS DECIMAL(12,2)) AS sap_amount,
   FALSE AS is_completeness,
@@ -151,13 +190,14 @@ LEFT JOIN
 LEFT JOIN
   source_broker_commission sb
     ON sb.id_finance_entity_entry = sl.id_finance_entity_entry
+    AND sb.account_number = sl.account_number
 WHERE
   sb.id_finance_entity_entry IS NULL
 
 UNION ALL
 
 SELECT
-  ('RE-RTSK-BRKC-MAN'||'-'||m.id_transaction) AS id_accounting_process,
+  ('RE-RTSK-BRKC-MAN'||'-'||m.id_transaction||'-'||m.account_number) AS id_accounting_process,
   m.id_business_entity,
   m.id_finance_entity,
   CAST(NULL AS STRING) AS id_finance_entity_entry,
@@ -165,8 +205,8 @@ SELECT
   'for rent' AS business_unit,
   'S4' AS source_name,
   'broker commission' AS accounting_type,
-  '211408' AS account_number,
-  'broker commission to transfer' AS accounting_name,
+  m.account_number,
+  IF(m.account_number = '211408', 'broker commission to transfer', 'visit broker commission to transfer') AS accounting_name,
   CAST(NULL AS DECIMAL(12,2)) AS source_amount,
   CAST(m.debit_credit AS DECIMAL(12,2)) AS sap_amount,
   FALSE AS is_completeness,

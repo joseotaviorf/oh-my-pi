@@ -3,15 +3,15 @@ table_name: retsuko_broker_commission_reverse
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
-  Table to track the reverse route of account 211408 (broker commission to transfer), identifying postings that exist in the SAP ledger but that the forward straw cannot see, since retsuko_broker_commission starts from the Retsuko entry.
-  The anchor is the whole account rather than a list of accounting rules, on purpose - any rule that starts posting to 211408 surfaces here instead of disappearing from the reconciliation.
-  Two populations end up in this table. Postings that carry a finance entity entry which is not a brokerage commission entry of the landlord leg are genuine reverse straw failures. Postings with no finance entity entry carry no key the entry level join could ever match, so they are grouped by transaction and split between loads that reached the gateway without an entry id and adjustments typed straight into SAP by a user, which have neither gateway hash nor entry - the second group is where the manual adjustments made while the automated posting was interrupted show up.
-  Postings with no entry id whose gateway hash belongs to a dispatch of an entry already covered by retsuko_broker_commission are excluded on purpose. They are not unexplained postings - they are the same accounting event the forward straw already reconciles, and reporting them here would count the amount twice and turn a reconciled entry into a false failure.
-  Together with retsuko_broker_commission this table partitions account 211408 with no overlap and no gap, which was verified line by line against the ledger.
+  Table to track the reverse route of the two broker commission payables - 211408 (broker commission to transfer) and 211409 (visit broker commission to transfer) - identifying postings that exist in the SAP ledger but that the forward straw cannot see, since retsuko_broker_commission starts from the Retsuko entry.
+  The anchor is the whole account rather than a list of accounting rules, on purpose - any rule that starts posting to either account surfaces here instead of disappearing from the reconciliation.
+  Two populations end up in this table. Postings that carry a finance entity entry which is not a brokerage commission entry in scope for that same account are genuine reverse straw failures. Postings with no finance entity entry carry no key the entry level join could ever match, so they are grouped by transaction and account and split between loads that reached the gateway without an entry id and adjustments typed straight into SAP by a user, which have neither gateway hash nor entry - the second group is where the manual adjustments made while the automated posting was interrupted show up.
+  Postings with no entry id whose gateway hash belongs to a dispatch of an entry already covered by retsuko_broker_commission on that account are excluded on purpose. They are not unexplained postings - they are the same accounting event the forward straw already reconciles, and reporting them here would count the amount twice and turn a reconciled entry into a false failure. Both the exclusion and the anti join against the forward scope carry the account number, so a posting is only ever discarded against the account it belongs to.
+  Together with retsuko_broker_commission this table partitions both accounts with no overlap and no gap, which was verified line by line against the ledger.
   All four assertion flags are FALSE by construction, so the table is read through accounting_process_status and error_description for root-cause analysis.
 columns:
   id_accounting_process:
-    description: Unique key for each record on this table, formatted as 'RE-RTSK-BRKC-{id_finance_entity_entry}' for entry level records and 'RE-RTSK-BRKC-MAN-{id_transaction}' for postings with no finance entity entry.
+    description: Unique key for each record on this table, formatted as 'RE-RTSK-BRKC-{id_finance_entity_entry}-{account_number}' for entry level records and 'RE-RTSK-BRKC-MAN-{id_transaction}-{account_number}' for postings with no finance entity entry. The account number is part of the key because the same entry or transaction can reach both accounts.
     lineage:
       - datalake_pas.ledger.id_finance_entity_entry
   id_business_entity:
@@ -43,19 +43,19 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission_reverse.accounting_type
   account_number:
-    description: Identifier of accounts used by controllership accounting process in SAP, fixed as 211408.
+    description: Identifier of accounts used by controllership accounting process in SAP, either 211408 or 211409, read from the ledger posting.
     lineage:
       - datalake_pas.ledger.account_number
   accounting_name:
-    description: Human readable name for the SAP account, fixed as broker commission to transfer.
+    description: Human readable name for the SAP account - broker commission to transfer for 211408 and visit broker commission to transfer for 211409.
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission_reverse.accounting_name
   source_amount:
-    description: Value from the source system. Always NULL here, since these postings have no brokerage commission dispatch that this table can attribute to account 211408.
+    description: Value from the source system. Always NULL here, since these postings have no brokerage commission dispatch that this table can attribute to the account.
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission_reverse.source_amount
   sap_amount:
-    description: Value recorded in SAP, summed over the 211408 ledger lines that share the same finance entity entry, or the same transaction for the records with no entry id.
+    description: Value recorded in SAP, summed over the ledger lines of the same account that share the same finance entity entry, or the same transaction for the records with no entry id.
     lineage:
       - datalake_pas.ledger.debit_credit
   is_completeness:
@@ -91,10 +91,10 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission_reverse.dt_source_trigger
   dt_sap_reference:
-    description: Reference date of the 211408 SAP posting.
+    description: Reference date of the SAP posting.
     lineage:
       - datalake_pas.ledger.dt_reference
   dt_sap_created:
-    description: Creation date of the 211408 SAP posting.
+    description: Creation date of the SAP posting.
     lineage:
       - datalake_pas.ledger.dt_created

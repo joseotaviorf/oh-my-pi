@@ -3,12 +3,15 @@ table_name: retsuko_broker_commission
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
-  Table to track the accounting route of account 211408 (broker commission to transfer), fed exclusively by Seu Barriga. It anchors on the Retsuko entry and follows it through the SAP gateway into the ledger, so it reports whether every brokerage commission the source created reached accounting.
-  The account is a payable to the broker and moves in two opposite legs, each one carried by its own Retsuko entry - the entry that runs from the landlord account to the contract account credits the account and recognises the commission, and the entry that runs from the contract account back to the landlord account debits it and settles the transfer. No entry ever carries both legs, so the direction of the entry is a deterministic discriminator and every entry in scope maps to exactly one posting on the account, with the amounts matching to the cent.
-  Five bill items feed the account - brokerage-adm-partner, brokerage-adm-partner-postponed, brokerage-fee-tax-ir-adm-partner, brokerage-partner-select and brokerage-partner-select-postponed - and only the landlord leg of each one reaches 211408. Entries of the same bill items running on any other direction, such as contract to adm-partner or quinto-andar to contract, belong to other accounts and are out of scope.
+  Table to track the accounting route of the two broker commission payables fed exclusively by Seu Barriga - 211408 (broker commission to transfer), owed to the partner real estate agency, and 211409 (visit broker commission to transfer), owed to the individual estate agent who runs the visits. They are the same accounting concept split by counterparty, so they share one table and are separated by a CASE on the bill item. No bill item feeds both accounts, which makes the bill item a deterministic discriminator.
+  It anchors on the Retsuko entry and follows it through the SAP gateway into the ledger, so it reports whether every brokerage commission the source created reached accounting. The ledger join carries the account number next to the entry id, so an entry only ever reads the postings of its own account.
+  Five bill items feed 211408 - brokerage-adm-partner, brokerage-adm-partner-postponed, brokerage-fee-tax-ir-adm-partner, brokerage-partner-select and brokerage-partner-select-postponed. Four feed 211409 - brokerage-estate-agent, brokerage-estate-agent-postponed, estate-agent-adjustment and brokerage-compensation.
+  The account type filter differs between the two. 211408 takes only the landlord and contract pair. 211409 takes that pair plus the pair that involves the individual estate agent, and deliberately leaves out the contract-estate-agent type, whose entries produce no posting on any account because they are internal movement that never reaches SAP. The compensation and adjustment bill items enter with no account type filter at all, since part of them travels on pairs that the filter above would discard, which would hide exactly what needs to be seen - that they do not reach the account.
+  Both accounts move in two opposite legs, each one carried by its own Retsuko entry, and no entry ever carries both legs. On 211409 the ledger also posts at payment time through the paid accounting rules, but those postings hang on their own payment entry rather than on the creation entry, so every entry in scope still maps to a single posting and the comparison against the source amount stays one to one.
   Recognition happens at bill item creation only, so the funnel starts at entry.ts_created and the sap_entity leg is restricted to the 'new-accounting-entries' event.
-  The ledger is matched on the finance entity entry and, when the posting carries no entry id, on the gateway hash of the dispatch. Part of the account was posted by batch loads that reached SAP through the gateway but lost the entry key on the way, and matching only by entry would report them as 'sap not found' while the money is in fact in the account. The hash leg reads only the postings with no entry id, so the two legs never read the same ledger line.
+  The ledger is matched on the finance entity entry and, when the posting carries no entry id, on the gateway hash of the dispatch. Part of both accounts was posted by batch loads that reached SAP through the gateway but lost the entry key on the way, and matching only by entry would report them as 'sap not found' while the money is in fact in the account. The hash leg reads only the postings with no entry id, so the two legs never read the same ledger line.
   A large share of the entries carries the 'skipped' status in the source, meaning the origin decided not to dispatch them, and none of them has ever been posted to the account. They are reported under the 'source skipped' status instead of being blamed on the source or on the gateway, which keeps a deliberate decision of the origin separate from a genuine dispatch problem.
+  The compensation and adjustment entries that were booked somewhere else are reported under the 'account divergence' status, naming the accounts that received them, which separates a classification difference from a posting that never happened.
 columns:
   id_accounting_process:
     description: Unique key for each record on this table, formatted as 'RTSK-BRKC-{id_finance_entity_entry}-{account_number}-{row_number}'.
@@ -43,23 +46,23 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission.accounting_type
   account_number:
-    description: Identifier of accounts used by controllership accounting process in SAP, fixed as 211408.
+    description: Identifier of accounts used by controllership accounting process in SAP, either 211408 or 211409 according to the bill item of the entry.
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission.account_number
   accounting_name:
-    description: Human readable name for the SAP account, fixed as broker commission to transfer.
+    description: Human readable name for the SAP account - broker commission to transfer for 211408 and visit broker commission to transfer for 211409.
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission.accounting_name
   source_amount:
-    description: Value of the commission entry as recorded by Retsuko. It carries the opposite sign of sap_amount, since the credit leg of the account is fed by an entry running towards the contract and the debit leg by an entry running back to the landlord.
+    description: Value of the commission entry as recorded by Retsuko. It carries the opposite sign of sap_amount, since the credit leg of the account is fed by an entry running towards the contract and the debit leg by an entry running back to the counterparty.
     lineage:
       - datalake_retsuko.entry.amount
   sap_amount:
-    description: Value recorded in SAP, summed over the 211408 ledger lines that share the same finance entity entry, or that carry the gateway hash of the dispatch when the posting has no entry id. Each entry in scope produces a single posting, so this is a one to one comparison against the source.
+    description: Value recorded in SAP, summed over the ledger lines of the account of the entry that share the same finance entity entry, or that carry the gateway hash of the dispatch when the posting has no entry id. Each entry in scope produces a single posting, so this is a one to one comparison against the source.
     lineage:
       - datalake_pas.ledger.debit_credit
   is_completeness:
-    description: Indicates whether the entry was found in the 211408 ledger. FALSE for dispatch failures and also for the entries the source skipped, since the amount did not reach this account.
+    description: Indicates whether the entry was found in the ledger of its own account. FALSE for dispatch failures, for the entries the source skipped and for the entries booked in another account, since in none of those cases the amount reached the account being reconciled.
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission.is_completeness
   is_correctness:
@@ -75,11 +78,11 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission.is_compliance
   accounting_process_status:
-    description: "Classification of accounting status. 'success' when the entry reached account 211408; 'source skipped' when the origin marked the entry as skipped and never dispatched it, which is a decision of the origin rather than a failure; 'source failure', 'gateway failure' and 'unknown failure' follow the same meaning as the other Retsuko straws."
+    description: "Classification of accounting status. 'success' when the entry reached the account named in account_number; 'account divergence' when a compensation or adjustment entry was booked in another account instead, which is a classification difference rather than a missing posting; 'source skipped' when the origin marked the entry as skipped and never dispatched it, which is a decision of the origin rather than a failure; 'source failure', 'gateway failure' and 'unknown failure' follow the same meaning as the other Retsuko straws."
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission.accounting_process_status
   error_description:
-    description: "Textual reason for the outcome. 'entry not dispatched by decision of the source' marks the skipped records; the remaining values follow the standard funnel vocabulary of source not found, gateway not found, sap not found and the failure reason reported by the source or by the gateway webhook."
+    description: "Textual reason for the outcome. 'entry not dispatched by decision of the source' marks the skipped records; 'accounted in {accounts} instead of {account_number}' names where a diverging entry was actually booked; the remaining values follow the standard funnel vocabulary of source not found, gateway not found, sap not found and the failure reason reported by the source or by the gateway webhook."
     lineage:
       - datalake_sap_accounting_process.retsuko_broker_commission.error_description
   accrual_year_month:
@@ -91,11 +94,11 @@ columns:
     lineage:
       - datalake_retsuko.entry.ts_created
   dt_sap_reference:
-    description: Reference date of the 211408 SAP posting.
+    description: Reference date of the SAP posting on the account of the entry.
     lineage:
       - datalake_pas.ledger.dt_reference
   dt_sap_created:
-    description: Creation date of the 211408 SAP posting.
+    description: Creation date of the SAP posting on the account of the entry.
     lineage:
       - datalake_pas.ledger.dt_created
   dt_filter_end:
