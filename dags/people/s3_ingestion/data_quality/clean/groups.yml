@@ -21,16 +21,17 @@ column_level_validations:
       severity_level: Warning
     is_complete:
       severity_level: Warning
-  line_name:
-    active_teams_have_line_name:
-      custom:
-        constraint: |-
-          (SELECT COUNT(*)
-           FROM datalake_allocation_tool_clean.groups
-           WHERE is_active = TRUE
-             AND line_name IS NULL
-          ) = 0
-        severity_level: Warning
+  active_teams_have_line_name:
+    custom:
+      # Every active group must belong to a Line; RA 2.0 team-level groups
+      # inherit line_name from the parent Line.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_allocation_tool_clean.groups
+         WHERE is_active = TRUE
+           AND line_name IS NULL
+        ) = 0
+      severity_level: Warning
   group_name:
     is_complete:
       severity_level: Warning
