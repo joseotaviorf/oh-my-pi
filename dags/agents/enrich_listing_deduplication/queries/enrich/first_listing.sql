@@ -15,7 +15,7 @@ WITH house_listing_consultant AS (
                     )
                 )
                 ELSE hlc.ts_enrollment_started
-            END AS TIMESTAMP
+            END AS STRING
         ) AS ts_enrollment_started
     FROM
         datalake_big_agent.house_listing_consultant AS hlc
