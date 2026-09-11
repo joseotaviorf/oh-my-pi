@@ -30,7 +30,7 @@ In datalake raw and clean, via incremental load:
 - `financial_legacy`
 - `group_header`
 - `group_trailer`
-- `inadvance`
+- `inadvance` (raw only; clean load disabled while the source has no `col_1 = 10` record)
 - `payments_cnab`
 - `sales`
 - `transaction`

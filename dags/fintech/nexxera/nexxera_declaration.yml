@@ -30,13 +30,13 @@ workflow:
     acquirer_header:
       - adjustments
       - financial
-      - inadvance
+      # - inadvance  # clean load disabled (see tables_customization below)
       - sales
       - transaction
     acquirer_trailer:
       - adjustments
       - financial
-      - inadvance
+      # - inadvance  # clean load disabled (see tables_customization below)
       - sales
       - transaction
     cnab_charges_341:
@@ -52,25 +52,25 @@ workflow:
     establishment_header:
       - adjustments
       - financial
-      - inadvance
+      # - inadvance  # clean load disabled (see tables_customization below)
       - sales
       - transaction
     establishment_trailer:
       - adjustments
       - financial
-      - inadvance
+      # - inadvance  # clean load disabled (see tables_customization below)
       - sales
       - transaction
     group_header:
       - adjustments
       - financial
-      - inadvance
+      # - inadvance  # clean load disabled (see tables_customization below)
       - sales
       - transaction
     group_trailer:
       - adjustments
       - financial
-      - inadvance
+      # - inadvance  # clean load disabled (see tables_customization below)
       - sales
       - transaction
     financial_legacy:
@@ -94,7 +94,13 @@ workflow:
     cnab_payments: {}
     cnab_charges: {}
     financial: {}
-    inadvance: {}
+    # Clean inadvance is disabled: the source files carry no col_1 = 10 record,
+    # so the clean load only produced an empty table. Pointing clean_table_name
+    # at a name with no queries/clean/*.sql skips the clean task while raw keeps
+    # feeding the header/trailer queries. Remove this key to re-enable the clean
+    # load from queries/clean/inadvance.sql (kept untouched).
+    inadvance:
+      clean_table_name: inadvance_clean_disabled
     sales: {}
     transaction: {}
     financial_extracts: {}
