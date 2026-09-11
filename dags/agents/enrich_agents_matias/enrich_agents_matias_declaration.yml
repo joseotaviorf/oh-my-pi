@@ -36,8 +36,7 @@ workflow:
       merge_on: [id_notification]
       z_order_by: [ts_notification_sent, id_user]
     matias_sessions_html_format:
-      merge_on: [id_session]
-      z_order_by: [year, month, day]
+      z_order_by: [id_session, is_escalated]
       load_spark_job: load_matias_sessions_html_format
     eval_session_bundle:
       load_spark_job: load_eval_session_bundle
