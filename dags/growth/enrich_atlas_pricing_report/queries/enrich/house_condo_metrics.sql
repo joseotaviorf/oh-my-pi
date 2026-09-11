@@ -27,9 +27,17 @@ WITH similar_houses AS (
           AND (sim.iptu IS NOT NULL OR sim.condo IS NOT NULL)
           AND sim.price BETWEEN ref.calculator_min_price AND ref.calculator_max_price
 ),
-nearest_houses_condo AS (
+nearest_houses_condo_ranked AS (
   SELECT
-    *,
+    id_house,
+    similar_id_house,
+    reference_condo,
+    similar_condo,
+    reference_iptu,
+    similar_iptu,
+    distance_km,
+    rn_iptu,
+    rn_condo,
     ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY distance_km) AS similar_order
   FROM
     similar_houses
@@ -37,20 +45,68 @@ nearest_houses_condo AS (
     distance_km <= 2
     AND rn_condo = 1
     AND similar_condo IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY distance_km) <= 30
+),
+nearest_houses_condo AS (
+  SELECT
+    id_house,
+    similar_id_house,
+    reference_condo,
+    similar_condo,
+    reference_iptu,
+    similar_iptu,
+    distance_km,
+    rn_iptu,
+    rn_condo,
+    similar_order
+  FROM
+    nearest_houses_condo_ranked
+  WHERE
+    similar_order <= 30
+),
+nearest_houses_condo_with_max AS (
+  SELECT
+    id_house,
+    similar_id_house,
+    reference_condo,
+    similar_condo,
+    reference_iptu,
+    similar_iptu,
+    distance_km,
+    rn_iptu,
+    rn_condo,
+    similar_order,
+    MAX(similar_order) OVER(PARTITION BY id_house) AS max_similar_order
+  FROM
+    nearest_houses_condo
 ),
 nearest_houses_condo_fix AS (
   SELECT
-    *
+    id_house,
+    similar_id_house,
+    reference_condo,
+    similar_condo,
+    reference_iptu,
+    similar_iptu,
+    distance_km,
+    rn_iptu,
+    rn_condo,
+    similar_order
   FROM
-    nearest_houses_condo
-  QUALIFY
-    MAX(similar_order) OVER(PARTITION BY id_house) >= 5
+    nearest_houses_condo_with_max
+  WHERE
+    max_similar_order >= 5
 ),
-nearest_houses_iptu AS (
+nearest_houses_iptu_ranked AS (
   SELECT
-    *,
+    id_house,
+    similar_id_house,
+    reference_condo,
+    similar_condo,
+    reference_iptu,
+    similar_iptu,
+    distance_km,
+    rn_iptu,
+    rn_condo,
     ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY distance_km) AS similar_order
   FROM
     similar_houses
@@ -58,16 +114,56 @@ nearest_houses_iptu AS (
     distance_km <= 2
     AND rn_iptu = 1
     AND similar_iptu IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY distance_km) <= 30
+),
+nearest_houses_iptu AS (
+  SELECT
+    id_house,
+    similar_id_house,
+    reference_condo,
+    similar_condo,
+    reference_iptu,
+    similar_iptu,
+    distance_km,
+    rn_iptu,
+    rn_condo,
+    similar_order
+  FROM
+    nearest_houses_iptu_ranked
+  WHERE
+    similar_order <= 30
+),
+nearest_houses_iptu_with_max AS (
+  SELECT
+    id_house,
+    similar_id_house,
+    reference_condo,
+    similar_condo,
+    reference_iptu,
+    similar_iptu,
+    distance_km,
+    rn_iptu,
+    rn_condo,
+    similar_order,
+    MAX(similar_order) OVER(PARTITION BY id_house) AS max_similar_order
+  FROM
+    nearest_houses_iptu
 ),
 nearest_houses_iptu_fix AS (
   SELECT
-    *
+    id_house,
+    similar_id_house,
+    reference_condo,
+    similar_condo,
+    reference_iptu,
+    similar_iptu,
+    distance_km,
+    rn_iptu,
+    rn_condo,
+    similar_order
   FROM
-    nearest_houses_iptu
-  QUALIFY
-    MAX(similar_order) OVER(PARTITION BY id_house) >= 5
+    nearest_houses_iptu_with_max
+  WHERE
+    max_similar_order >= 5
 ),
 all_similar_houses AS (
   SELECT

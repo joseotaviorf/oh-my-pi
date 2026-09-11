@@ -1,9 +1,10 @@
-WITH sale_contracts AS (
+WITH sale_contracts_ranked AS (
   SELECT
     offer.id_house,
     'SALE' AS business_context,
     h.city,
-    100*(ABS(offer.last_price_offered_by_buyer - hpp.p_50)/offer.last_price_offered_by_buyer) AS percentual_error
+    100*(ABS(offer.last_price_offered_by_buyer - hpp.p_50)/offer.last_price_offered_by_buyer) AS percentual_error,
+    ROW_NUMBER() OVER(PARTITION BY offer.id_house ORDER BY offer.ts_sale_agreement_signed DESC) AS rn
   FROM
     datalake_sale_offer.sale_offer AS offer
   INNER JOIN
@@ -19,15 +20,25 @@ WITH sale_contracts AS (
     AND offer.last_price_offered_by_buyer BETWEEN 100000 AND 20000000
     AND offer.id_house IS NOT NULL
     AND hpp.business_context = 'SALE'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY offer.id_house ORDER BY offer.ts_sale_agreement_signed DESC) = 1
 ),
-rent_contracts AS (
+sale_contracts AS (
+  SELECT
+    id_house,
+    business_context,
+    city,
+    percentual_error
+  FROM
+    sale_contracts_ranked
+  WHERE
+    rn = 1
+),
+rent_contracts_ranked AS (
   SELECT
     h.id AS id_house,
     'RENT' AS business_context,
     h.city,
-    100*(ABS(c.rent - hpp.p_50)/c.rent) AS percentual_error
+    100*(ABS(c.rent - hpp.p_50)/c.rent) AS percentual_error,
+    ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY c.ts_signed DESC) AS rn
   FROM
     datalake_ebdb_clean.contract AS c
   INNER JOIN
@@ -39,8 +50,17 @@ rent_contracts AS (
   WHERE
     DATE_DIFF(CURRENT_DATE, DATE(c.ts_signed)) BETWEEN 0 AND 60
     AND hpp.business_context = 'RENT'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY c.ts_signed DESC) = 1
+),
+rent_contracts AS (
+  SELECT
+    id_house,
+    business_context,
+    city,
+    percentual_error
+  FROM
+    rent_contracts_ranked
+  WHERE
+    rn = 1
 ),
 mdape_union AS (
   SELECT
@@ -49,7 +69,9 @@ mdape_union AS (
     MEDIAN(percentual_error) AS mdape
   FROM
     sale_contracts
-  GROUP BY ALL
+  GROUP BY
+    city,
+    business_context
   UNION ALL
   SELECT
     city,
@@ -57,7 +79,9 @@ mdape_union AS (
     MEDIAN(percentual_error) AS mdape
   FROM
     rent_contracts
-  GROUP BY ALL
+  GROUP BY
+    city,
+    business_context
 )
 SELECT
   dr.sk_region AS id_region,

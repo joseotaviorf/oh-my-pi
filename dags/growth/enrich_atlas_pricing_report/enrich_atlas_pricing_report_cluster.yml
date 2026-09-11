@@ -1,7 +1,5 @@
 cluster:
-  type: consolidation_l_general_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_l_general_fleet_cluster
   custom_configurations:
-    data_security_mode: USER_ISOLATION
-    runtime_engine: PHOTON
-    driver_node_type_id: r7g.2xlarge
+    aws_attributes:
+      ebs_volume_size: 200

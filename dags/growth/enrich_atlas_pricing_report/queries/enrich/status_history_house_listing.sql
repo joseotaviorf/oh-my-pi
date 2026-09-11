@@ -120,13 +120,14 @@ rent_price_fallback AS (
     sp.price IS NULL
     AND sp.business_context = 'RENT'
 ),
-sale_price_fallback AS (
+sale_price_fallback_ranked AS (
   SELECT
     sp.id_house,
     sp.business_context,
     sp.status,
     h_aud.sale_price AS price,
-    sp.ts_status_started
+    sp.ts_status_started,
+    ROW_NUMBER() OVER(PARTITION BY sp.id_house, sp.ts_status_started ORDER BY FROM_UNIXTIME(r.ts_revision/1000) DESC) AS rn
   FROM
     status_published AS sp
   INNER JOIN
@@ -139,8 +140,18 @@ sale_price_fallback AS (
   WHERE
     sp.price IS NULL
     AND sp.business_context = 'SALE'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY sp.id_house, sp.ts_status_started ORDER BY FROM_UNIXTIME(r.ts_revision/1000) DESC) = 1
+),
+sale_price_fallback AS (
+  SELECT
+    id_house,
+    business_context,
+    status,
+    price,
+    ts_status_started
+  FROM
+    sale_price_fallback_ranked
+  WHERE
+    rn = 1
 )
 SELECT
   sp.id_house,

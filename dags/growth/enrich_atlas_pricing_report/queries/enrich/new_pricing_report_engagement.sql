@@ -12,7 +12,9 @@ WITH house_metrics AS (
     MEDIAN(CASE WHEN similar_house_status = 'off-market' THEN similar_days_in_the_market END) AS off_market_days_to_contract_sign
   FROM
     datalake_atlas_pricing_report.similar_listings
-  GROUP BY ALL
+  GROUP BY
+    id_house,
+    business_context
 ),
 condo_metrics AS (
   SELECT
@@ -21,25 +23,26 @@ condo_metrics AS (
     MEDIAN(similar_iptu) AS urban_property_tax_median
   FROM
     datalake_atlas_pricing_report.house_condo_metrics
-  GROUP BY ALL
+  GROUP BY
+    id_house
 )
 SELECT
   DATE_FORMAT(NOW(), 'yyyy-MM-dd\'T\'HH:mm:ss') AS ts_event,
   MONOTONICALLY_INCREASING_ID() AS id,
-  house_metrics.id_house::BIGINT,
-  house_metrics.business_context::STRING,
-  hlvm.views_quantity::BIGINT,
-  COALESCE(hlvm.demand_level, 'NO_VIEWS')::STRING AS demand_level,
-  condo_metrics.condominium_price_median::BIGINT,
-  condo_metrics.urban_property_tax_median::BIGINT,
-  house_metrics.on_market_price_median::BIGINT,
-  house_metrics.on_market_price_by_square_meter::BIGINT,
-  house_metrics.off_market_price_median::BIGINT,
-  house_metrics.off_market_price_by_square_meter::BIGINT,
-  house_metrics.on_market_total_value_median::BIGINT,
-  house_metrics.off_market_total_value_median::BIGINT,
-  house_metrics.on_market_days_in_the_market::BIGINT,
-  house_metrics.off_market_days_to_contract_sign::BIGINT
+  CAST(house_metrics.id_house AS BIGINT),
+  CAST(house_metrics.business_context AS STRING),
+  CAST(hlvm.views_quantity AS BIGINT),
+  CAST(COALESCE(hlvm.demand_level, 'NO_VIEWS') AS STRING) AS demand_level,
+  CAST(condo_metrics.condominium_price_median AS BIGINT),
+  CAST(condo_metrics.urban_property_tax_median AS BIGINT),
+  CAST(house_metrics.on_market_price_median AS BIGINT),
+  CAST(house_metrics.on_market_price_by_square_meter AS BIGINT),
+  CAST(house_metrics.off_market_price_median AS BIGINT),
+  CAST(house_metrics.off_market_price_by_square_meter AS BIGINT),
+  CAST(house_metrics.on_market_total_value_median AS BIGINT),
+  CAST(house_metrics.off_market_total_value_median AS BIGINT),
+  CAST(house_metrics.on_market_days_in_the_market AS BIGINT),
+  CAST(house_metrics.off_market_days_to_contract_sign AS BIGINT)
 FROM
   house_metrics
 LEFT JOIN

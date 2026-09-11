@@ -45,7 +45,13 @@ negotiation_windows AS (
       ON neg.id_house = lb.id_house
         AND neg.business_context = lb.business_context
         AND neg.ts_status_started >= lb.ts_status_started
-  GROUP BY ALL
+  GROUP BY
+    lb.id_house,
+    lb.business_context,
+    lb.status,
+    lb.price,
+    lb.next_status,
+    lb.ts_status_started
 ),
 history_status AS (
   SELECT
@@ -98,10 +104,10 @@ avoiding_redundancy AS (
 SELECT
   DATE_FORMAT(NOW(), 'yyyy-MM-dd\'T\'HH:mm:ss') AS ts_event,
   MONOTONICALLY_INCREASING_ID() AS id,
-  id_house::BIGINT,
-  business_context::STRING,
-  ROUND(price::FLOAT, 2) AS price,
-  status::STRING,
+  CAST(id_house AS BIGINT),
+  CAST(business_context AS STRING),
+  ROUND(CAST(price AS FLOAT), 2) AS price,
+  CAST(status AS STRING),
   DATE_FORMAT(ts_status_started, 'yyyy-MM-dd\'T\'HH:mm:ss') AS ts_status_started
 FROM
   avoiding_redundancy

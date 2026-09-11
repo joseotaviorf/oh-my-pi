@@ -6,9 +6,11 @@ WITH amplitude_events AS (
   FROM
     datalake_amplitude_clean.170698_listing_page_viewed_events AS lpve
   WHERE
-    DATE(lpve.year::STRING || lpve.month::STRING || lpve.day::STRING) >= (CURRENT_DATE - INTERVAL '30' DAY)
+    DATE(CAST(lpve.year AS STRING) || CAST(lpve.month AS STRING) || CAST(lpve.day AS STRING)) >= (CURRENT_DATE - INTERVAL '30' DAY)
     AND lpve.ts_event >= (CURRENT_DATE - INTERVAL '7' DAY)
-  GROUP BY ALL
+  GROUP BY
+    lpve.ep_house_id,
+    UPPER(lpve.business_context)
 ),
 similar_views AS (
   SELECT
@@ -27,7 +29,10 @@ similar_views AS (
     amplitude_events AS e_similar
       ON sl.similar_id_house = e_similar.id_house
       AND sl.business_context = e_similar.business_context
-  GROUP BY ALL
+  GROUP BY
+    sl.id_house,
+    sl.business_context,
+    ae.views_quantity
 )
 SELECT
   id_house,

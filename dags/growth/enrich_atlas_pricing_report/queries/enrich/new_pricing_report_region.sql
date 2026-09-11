@@ -6,7 +6,7 @@ WITH amplitude_events AS (
   FROM
     datalake_amplitude_clean.170698_listing_page_viewed_events
   WHERE
-    DATE(year::STRING || month::STRING || day::STRING) >= (CURRENT_DATE - INTERVAL '30' DAY)
+    DATE(CAST(year AS STRING) || CAST(month AS STRING) || CAST(day AS STRING)) >= (CURRENT_DATE - INTERVAL '30' DAY)
     AND ts_event >= (CURRENT_DATE - INTERVAL '7' DAY)
 ),
 houses AS (
@@ -34,7 +34,7 @@ house_views AS (
     amplitude_events AS e
   INNER JOIN
     houses AS h
-      ON e.id_house::BIGINT = h.id_house
+      ON CAST(e.id_house AS BIGINT) = h.id_house
       AND e.business_context = h.business_context
   INNER JOIN
     dw_rent.dim_house_listing AS dhl
@@ -51,11 +51,11 @@ house_views AS (
 lpv_data AS (
   SELECT DISTINCT
     NOW() AS ts_event,
-    m.sk_region::BIGINT AS id_region,
-    m.neighborhood::STRING,
-    UPPER(m.business_context)::STRING AS business_context,
-    MEDIAN(m.views_quantity) OVER(PARTITION BY m.business_context, m.sk_region)::BIGINT AS lpv_p_50,
-    a.mdape_city::FLOAT
+    CAST(m.sk_region AS BIGINT) AS id_region,
+    CAST(m.neighborhood AS STRING) AS neighborhood,
+    CAST(UPPER(m.business_context) AS STRING) AS business_context,
+    CAST(MEDIAN(m.views_quantity) OVER(PARTITION BY m.business_context, m.sk_region) AS BIGINT) AS lpv_p_50,
+    CAST(a.mdape_city AS FLOAT) AS mdape_city
   FROM
     datalake_atlas_pricing_report.region_metrics AS a
   LEFT JOIN
