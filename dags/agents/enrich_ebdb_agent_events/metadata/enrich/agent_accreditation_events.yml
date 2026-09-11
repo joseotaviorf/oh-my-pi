@@ -88,7 +88,7 @@ columns:
   ts_created:
     lineage:
       - datalake_ebdb_clean.agent_event_log.ts_created
-      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: |
       Timestamp when the accreditation event occurred in the source system. For legacy
       sources, mapped from user_revision_entity.ts_revision.

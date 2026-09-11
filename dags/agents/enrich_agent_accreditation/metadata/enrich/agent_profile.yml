@@ -1,37 +1,62 @@
 ---
 database_name: datalake_agent_accreditation
 table_name: agent_profile
-description: "This table contains Agents' profile data and their revisions/updates."
+description: |
+  Historical intervals of legacy performance profile types (Visita, Vistoria, SessaoFotos, etc.)
+  per dadosAgente record. Reconstructs add/delete audit pairs from agent_data_types_aud,
+  reconciles against the current agent_data_types snapshot, and exposes ts_revision_started
+  and ts_revision_ended validity windows for agent_history joins.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_agent_profile:
     lineage:
       - datalake_ebdb_clean.agent_data_types_aud.id_agent_data
       - datalake_ebdb_clean.agent_data_types_aud.types
-      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: |
-      Unique identifier for the profile review, generated using an XXHASH64 function 
-      based on the agent ID, profile, and revision start date.
-  id_agent:
+      Unique identifier for the profile revision interval, generated with XXHASH64 from
+      id_agent_data, profile type, and ts_revision_started.
+  id_agent_data:
     lineage:
       - datalake_ebdb_clean.agent_data_types_aud.id_agent_data
-    description: Unique Agent Identifier
+    description: Dados Agente identifier for the agent profile revision interval.
   profile:
     lineage:
       - datalake_ebdb_clean.agent_data_types_aud.types
-    description: "Agent's performance profile"
+    description: Legacy performance profile type assigned to the agent for this interval.
     categories:
       Visit: Agents who are responsible for conducting property visits
       Inspection: Agents responsible for conducting property inspections before the tenant moves into the property and after the end of the contract
       Photo Session: Photographer agents responsible for taking photos of the properties that will be published
       Quarterly Inspection: Outsourced agents who are responsible for conducting property visits
       CheckUpLar: Agents responsible for performing/analyzing reported repairs to the properties
+  has_aud_divergence:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types_aud.rev_type
+      - datalake_ebdb_clean.agent_data_types.types
+    description: True when the audit history disagrees with the current agent_data_types snapshot for the profile type.
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types_aud.rev_type
+      - datalake_ebdb_clean.agent_data_types.types
+    description: True when the profile type is active for the agent data record in this interval.
+  is_lastest_by_date:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types_aud.id_agent_data
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: |
+      True when this row is the latest profile revision for the agent data id on the
+      calendar date of ts_revision_started.
   ts_revision_started:
     lineage:
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Date when the Agent started on the profile
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.agent_data_types.ts_database_transaction
+    description: Timestamp when this profile revision interval started.
   ts_revision_ended:
     lineage:
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Date when the Agent ended on the profile
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: |
+      Timestamp when the profile interval ended. For inactive rows without an explicit
+      deletion revision, uses the start instant of the next profile revision; null while
+      the profile remains active.

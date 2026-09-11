@@ -1,0 +1,73 @@
+---
+database_name: datalake_ebdb_agent_events
+table_name: capability_events
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+description: |
+  Historical event log of agent capability enablement and disablement across all capability
+  types in EBDB. One row per capability revision interval, combining agent_event_log status
+  changes with Demand Visit Management capability settings when applicable. Built incrementally
+  for capabilities updated within the load window. Feeds agent_history daily capability
+  reconstruction and downstream accreditation models.
+columns:
+  id_event_log:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.id_capability
+      - datalake_ebdb_clean.agent_event_log.ts_occurred
+    description: |
+      Unique identifier for the capability event row, generated with XXHASH64 from
+      id_capability and revision timestamp. Primary merge key.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.id_agent
+      - datalake_ebdb_agent_events.capability_settings.id_agent
+    description: Agent identifier linked to the capability through EBDB event log or settings.
+  id_capability:
+    lineage:
+      - datalake_ebdb_clean.capability.id
+    description: Capability identifier in the EBDB capability registry.
+  id_capability_settings:
+    lineage:
+      - datalake_ebdb_agent_events.capability_settings.id_capability_settings
+    description: |
+      Demand Visit Management capability settings record identifier when the capability
+      type has associated settings; null for capabilities without settings linkage.
+  type:
+    lineage:
+      - datalake_ebdb_clean.capability.type
+    description: Capability type enum from the EBDB capability registry.
+  business_context:
+    lineage:
+      - datalake_ebdb_agent_events.capability_settings.business_context
+    description: Business context configured for Demand Visit Management capabilities.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_ebdb_agent_events.capability_settings.is_passive_lead_receiver
+    description: Indicates whether the agent receives demand visit leads passively for this capability.
+  is_capability_active:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.event_type
+    description: |
+      True when the capability is enabled or re-enabled at this revision. Built from
+      AGENT_CAPABILITY_ENABLED and AGENT_CAPABILITY_REENABLED event types.
+  is_current_status:
+    description: True when the row represents the latest revision for the capability record.
+  is_last_event_by_date:
+    description: True when the row is the latest capability event on that calendar day.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.capability.ts_created
+    description: Timestamp when the capability record was created in EBDB.
+  ts_started:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_occurred
+      - datalake_ebdb_agent_events.capability_settings.ts_started
+    description: Timestamp when this capability revision became effective.
+  ts_ended:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_occurred
+      - datalake_ebdb_agent_events.capability_settings.ts_ended
+    description: |
+      End of this capability revision window: timestamp of the next event for the same
+      capability, or null when this is the latest revision. Daily expansion in capability_events
+      uses the day before ts_ended when building dt_reference intervals.

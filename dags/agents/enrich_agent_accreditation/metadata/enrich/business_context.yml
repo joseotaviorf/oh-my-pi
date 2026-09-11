@@ -7,19 +7,23 @@ description: |
   When multiple contexts share the same revision instant, ADD wins over DEL and SALE
   wins over other contexts so a single non-overlapping validity window remains.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_agent_business_context:
     lineage:
       - datalake_ebdb_clean.agent_data_business_contexts_served_aud.id_agent_data
       - datalake_ebdb_clean.agent_data_business_contexts_served_aud.business_context
-      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
       - datalake_ebdb_agent_events.capability_settings.id_agent
       - datalake_ebdb_agent_events.capability_settings.business_context
       - datalake_ebdb_agent_events.capability_settings.ts_started
     description: |
       Unique identifier for the business context revision interval, generated with XXHASH64
       from person UUID, agent identity, business context, and interval start value.
+  id_unified_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
+    description: Foreign key to the unified agent identity row in agent_unified_identity.
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent.id
@@ -27,18 +31,16 @@ columns:
     description: EBDB agent identifier when available from Agent Domain capability settings or mapped from legacy rows.
   id_agent_data:
     lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent_data
       - datalake_ebdb_clean.agent_data_business_contexts_served_aud.id_agent_data
-      - datalake_ebdb_clean.agent_external_reference.value
     description: Dados Agente identifier used historically to track business context assignments.
   id_user:
     lineage:
-      - datalake_ebdb_clean.user.id
-      - datalake_ebdb_clean.agent_external_reference.value
-    description: Application user identifier linked to the agent via the Dados Agente / user mapping.
+      - datalake_ebdb_agent_events.agent_unified_identity.id_user
+    description: Application user identifier linked to the unified agent identity.
   uuid_person:
     lineage:
-      - datalake_person.person_sks.uuid_person
-      - datalake_ebdb_clean.agent.uuid_person
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
     description: Person UUID linking the agent business context interval to the canonical person entity.
   business_context:
     lineage:
@@ -54,15 +56,24 @@ columns:
     categories:
       AGENT_DOMAIN: Interval derived from datalake_ebdb_agent_events.capability_settings.
       LEGACY_SYSTEM: Interval derived from agent_data_business_contexts_served audit history.
+  is_latest_by_date:
+    lineage:
+      - datalake_ebdb_agent_events.capability_settings.ts_started
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+    description: |
+      True when this row is the latest business-context change for the person on the calendar
+      date of ts_revision_started (partitioned by uuid_person).
   ts_revision_started:
     lineage:
-      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
       - datalake_ebdb_agent_events.capability_settings.ts_started
     description: Timestamp when the agent became assigned to the business context for this interval.
   ts_revision_ended:
     lineage:
-      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
       - datalake_ebdb_agent_events.capability_settings.ts_started
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
     description: |
       End of the business context validity window: immediately before the next context
       revision for the same agent identity, or null when still open.

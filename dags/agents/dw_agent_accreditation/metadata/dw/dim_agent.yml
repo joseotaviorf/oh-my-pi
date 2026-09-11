@@ -2,146 +2,180 @@
 database_name: dw_agent
 table_name: dim_agent
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 description: |
   Agent dimension from the agent accreditation enrich layer, one row per accredited agent.
-  Projects profile, partnership flags, Traz Quem Aluga (TQA) and Traz Quem Compra (TQC) referral
-  invite flags, and broker linkage for 3P agents. Consumed by Agents squad analytics; join
-  sk_broker to dw_brokers.dim_broker for imobiliária attributes.
+  Projects current profile, partnership flags, capability enablement, Traz Quem Aluga (TQA)
+  and Traz Quem Compra (TQC) referral invite flags, broker linkage for 3P agents, and
+  accreditation lifecycle timestamps. Consumed by Agents squad analytics; join sk_broker
+  to dw_brokers.dim_broker for imobiliária attributes.
 columns:
+  sk_person:
+    description: Person surrogate key from the unified agent identity registry.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.sk_person
   sk_agent:
     description: Unique identifier of the agent in EBDB.
     lineage:
-    - datalake_agent_accreditation.agent.id_agent
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent
+  sk_prospect_agent:
+    description: Prospect agent identifier when the agent row references a prospect UUID.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_prospect_agent
   sk_agent_data:
-    description: Dados Agente identifier resolved from agent external references when
-      type is DADOS_AGENTE_ID.
+    description: Dados Agente identifier from unified identity when type is DADOS_AGENTE_ID.
     lineage:
-    - datalake_agent_accreditation.agent.id_agent_data
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent_data
   sk_partner:
-    description: Partner identifier resolved from agent external references when type
-      is PARTNER_ID.
+    description: Partner identifier from unified identity when type is PARTNER_ID.
     lineage:
-    - datalake_agent_accreditation.agent.id_partner
+      - datalake_ebdb_agent_events.agent_unified_identity.id_partner
+  sk_partner_agent:
+    description: Partner-agent registry row identifier in EBDB.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_partner_agent
   sk_user:
-    description: Main application user id linked to the agent via person UUID and
-      main credential reference.
+    description: Main application user id linked to the agent via person UUID and main credential reference.
     lineage:
-    - datalake_agent_accreditation.agent.id_user
+      - datalake_ebdb_agent_events.agent_unified_identity.id_user
   sk_broker:
     description: |
       Surrogate key of the imobiliária (broker agency) in dw_brokers.dim_broker. Populated
       only when is_3p_partnership is TRUE, resolved by matching uuid_company to
       core_brokers.brokers. Returns -1 for non-3P agents with no broker linkage.
     lineage:
-    - core_brokers.brokers.sk_broker
-  uuid_company:
-    description: Company UUID when the agent partnership representative type is COMPANY_UUID.
+      - core_brokers.brokers.sk_broker
+  sk_affiliate:
+    description: Affiliate data identifier when the user has an affiliate profile.
     lineage:
-    - datalake_agent_accreditation.agent.uuid_company
+      - datalake_ebdb_agent_events.agent_unified_identity.id_affiliate
+  sk_photographer_data:
+    description: Photographer data identifier from the user record when applicable.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_photographer_data
+  sk_company:
+    description: Company surrogate key resolved from agent company UUID via company_sks.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.sk_company
   uuid_agent:
     description: Business UUID of the agent in the source system.
     lineage:
-    - datalake_agent_accreditation.agent.uuid_agent
-  uuid_person:
-    description: Person UUID associated with the agent in the person registry.
-    lineage:
-    - datalake_agent_accreditation.agent.uuid_person
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_agent
   creci:
     description: CRECI license number from the last prospect person converted.
     lineage:
-    - datalake_agent_accreditation.agent.creci
+      - datalake_ebdb_agent_events.agent_unified_identity.creci
   creci_uf:
     description: State (UF) of the CRECI license from the last prospect person converted.
     lineage:
-    - datalake_agent_accreditation.agent.creci_uf
-  affiliation_type:
-    description: Agent affiliation model (e.g., autonomous, company-managed).
-    lineage:
-    - datalake_agent_accreditation.agent.affiliation_type
-  status:
-    description: Current lifecycle status of the agent.
-    lineage:
-    - datalake_agent_accreditation.agent.status
+      - datalake_ebdb_agent_events.agent_unified_identity.creci_uf
   profile:
     description: |
       Agent company product profile name from the latest valid agent_product membership
       (is_valid_product and is_lastest_valid).
     lineage:
-    - datalake_ebdb_agent_events.agent_product.product_name
+      - datalake_ebdb_agent_events.agent_product.product_name
   deactivation_reason:
     description: |
       Product deactivation reason from the latest valid agent_product membership when
       the company-product link is inactive.
     lineage:
-    - datalake_ebdb_agent_events.agent_product.deactivation_reason
+      - datalake_ebdb_agent_events.agent_product.deactivation_reason
   deactivation_sub_reason:
     description: |
       Product deactivation sub-reason from the latest valid agent_product membership when
       the company-product link is inactive.
     lineage:
-    - datalake_ebdb_agent_events.agent_product.deactivation_sub_reason
+      - datalake_ebdb_agent_events.agent_product.deactivation_sub_reason
   is_reactivated:
-    description: True when the agent was reactivated.
+    description: True when the agent was reactivated after a prior inactivation event.
     lineage:
-    - datalake_agent_accreditation.agent.is_reactivated
-  is_allow_supply_acquisition:
-    description: True when the agent is allowed to perform supply acquisition.
+      - datalake_ebdb_agent_events.agent_accreditation_events.is_active
+  is_agent_active:
+    description: True when the unified agent identity is currently active in Agent Domain.
     lineage:
-    - datalake_agent_accreditation.agent.is_allow_supply_acquisition
-  is_allow_demand_acquisition:
-    description: True when the agent is allowed to perform demand acquisition.
+      - datalake_ebdb_agent_events.agent_unified_identity.is_agent_active
+  is_photographer_active:
+    description: True when the agent has an active photographer profile flag.
     lineage:
-    - datalake_agent_accreditation.agent.is_allow_demand_acquisition
-  is_allow_visit:
-    description: True when the agent is allowed to perform visit.
+      - datalake_ebdb_agent_events.agent_unified_identity.is_photographer_active
+  is_affiliate_active:
+    description: True when the agent has an active affiliate profile flag.
     lineage:
-    - datalake_agent_accreditation.agent.is_allow_visit
-  is_allow_demand_sale:
-    description: True when the agent is allowed to perform demand sale.
-    lineage:
-    - datalake_agent_accreditation.agent.is_allow_demand_sale
-  is_allow_demand_rent:
-    description: True when the agent is allowed to perform demand rent.
-    lineage:
-    - datalake_agent_accreditation.agent.is_allow_demand_rent
+      - datalake_ebdb_agent_events.agent_unified_identity.is_affiliate_active
   is_passive_lead_receiver:
-    description: True when the agent is configured to receive passive leads.
+    description: True when the agent is configured to receive passive leads on the latest snapshot date.
     lineage:
-    - datalake_agent_accreditation.agent.is_passive_lead_receiver
+      - datalake_agent_accreditation.agent_history.is_passive_lead_receiver
+  is_allow_supply_acquisition:
+    description: True when the agent is allowed to perform supply acquisition on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_acquisition
+  is_allow_demand_visit_management:
+    description: True when the agent is allowed to perform demand visit management on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_demand_visit_management
+  is_allow_demand_sale:
+    description: True when the agent is allowed to perform demand sale on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_demand_sale
+  is_allow_demand_rent:
+    description: True when the agent is allowed to perform demand rent on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_demand_rent
+  is_allow_demand_acquisition:
+    description: True when the agent is allowed to perform demand acquisition on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_demand_acquisition
+  is_allow_supply_conversion_consultancy:
+    description: True when the agent is allowed to perform supply conversion consultancy on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_conversion_consultancy
+  is_allow_supply_representative:
+    description: True when the agent is allowed to act as supply representative on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_representative
+  is_allow_supply_midia_management:
+    description: True when the agent is allowed to perform supply media management on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_midia_management
+  is_allow_supply_integrity_assurance:
+    description: True when the agent is allowed to perform supply integrity assurance on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_integrity_assurance
+  is_allow_negociation:
+    description: True when the agent is allowed to perform negotiation on the latest snapshot date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_negociation
   is_1p_partnership:
     description: True when affiliation type is autonomous (1P-style partnership flag).
     lineage:
-    - datalake_agent_accreditation.agent.is_1p_partnership
+      - datalake_ebdb_agent_events.agent_unified_identity.is_1p_partnership
   is_3p_partnership:
-    description: True when affiliation type is company-managed (3P-style partnership
-      flag).
+    description: True when affiliation type is company-managed (3P-style partnership flag).
     lineage:
-    - datalake_agent_accreditation.agent.is_3p_partnership
+      - datalake_ebdb_agent_events.agent_unified_identity.is_3p_partnership
   has_rent_lead_referral:
     description: |
       True when the agent has at least one tenant lead referral invite (business context
       RENT, status other than NOT_ELIGIBLE). Indicates participation in the Traz Quem
       Aluga (TQA) program via pending or active invites sent by the agent.
     lineage:
-    - datalake_ebdb_clean.agent_lead_referral.business_context
-    - datalake_ebdb_clean.agent_lead_referral.status
+      - datalake_agent_accreditation.agent_history.has_rent_lead_referral
   has_rent_lead_referral_confirmed:
     description: |
       True when the agent has at least one confirmed tenant lead referral invite (business
       context RENT, status CONFIRMED). Indicates a tenant accepted an invite sent by the
       agent, effectively confirming participation in the Traz Quem Aluga (TQA) program.
     lineage:
-    - datalake_ebdb_clean.agent_lead_referral.business_context
-    - datalake_ebdb_clean.agent_lead_referral.status
+      - datalake_agent_accreditation.agent_history.has_rent_lead_referral_confirmed
   has_sale_lead_referral:
     description: |
       True when the agent has at least one buyer lead referral invite (business context
       SALE or null, status other than NOT_ELIGIBLE). Indicates participation in the Traz
       Quem Compra (TQC) program via pending or active invites sent by the agent.
     lineage:
-    - datalake_ebdb_clean.agent_lead_referral.business_context
-    - datalake_ebdb_clean.agent_lead_referral.status
+      - datalake_agent_accreditation.agent_history.has_sale_lead_referral
   has_sale_lead_referral_confirmed:
     description: |
       True when the agent has at least one confirmed buyer lead referral invite
@@ -149,21 +183,42 @@ columns:
       invite sent by the agent, effectively confirming participation in the Traz Quem
       Compra (TQC) program.
     lineage:
-    - datalake_ebdb_clean.agent_lead_referral.business_context
-    - datalake_ebdb_clean.agent_lead_referral.status
+      - datalake_agent_accreditation.agent_history.has_sale_lead_referral_confirmed
   days_in_current_status:
-    description: Number of days in the current status.
+    description: Number of days the agent has remained in the current activation status.
     lineage:
-    - datalake_agent_accreditation.agent.days_in_current_status
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  ts_last_status_changed:
+    description: Timestamp when the last accreditation status change occurred for the agent.
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  ts_accreditation:
+    description: |
+      Timestamp of the earliest accreditation event for the agent across all event types
+      in agent_accreditation_events (migration, activation, or legacy audit events).
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  ts_first_activation:
+    description: Timestamp of the first ACTIVATED accreditation event for the agent.
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  ts_deaccreditation:
+    description: Timestamp of the deaccreditation or inactivation event for the agent.
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  ts_legacy_agent_migrated:
+    description: Timestamp of the first MIGRATED event when the legacy agent was moved to Agent Domain.
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  ts_agent_reenrollment:
+    description: Timestamp of the inactive agent reenrollment event for legacy agents.
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
   ts_created:
     description: Timestamp when the agent record was created in EBDB.
     lineage:
-    - datalake_agent_accreditation.agent.ts_created
-  ts_last_status_changed:
-    description: Timestamp when the last status change was logged for the agent.
-    lineage:
-    - datalake_agent_accreditation.agent.ts_last_status_changed
+      - datalake_ebdb_agent_events.agent_unified_identity.ts_created
   ts_updated:
     description: Timestamp when the agent record was last updated in EBDB.
     lineage:
-    - datalake_agent_accreditation.agent.ts_updated
+      - datalake_ebdb_agent_events.agent_unified_identity.ts_updated

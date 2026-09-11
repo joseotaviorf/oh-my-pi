@@ -1,4 +1,11 @@
-WITH last_agent_updated AS (
+WITH user_revision_entity AS (
+    SELECT
+        id,
+        CAST(ts_revision / 1000 AS TIMESTAMP) AS ts_revision
+    FROM
+        datalake_ebdb_clean.user_revision_entity
+),
+last_agent_updated AS (
     SELECT
         id_unified_agent,
         id_user,
@@ -69,7 +76,7 @@ agent_data_accreditation AS (
         datalake_ebdb_clean.agent_data_aud AS a
             ON a.id = updated.id_agent_data
     JOIN 
-        datalake_ebdb_user.user_revision_entity AS u 
+        user_revision_entity AS u 
             ON u.id = a.rev
     WHERE
         updated.is_agent_data_replace_key IS TRUE
@@ -175,7 +182,7 @@ partner_accreditation AS (
         datalake_ebdb_clean.partner AS p
             ON p.id = paa.id_partner
     LEFT JOIN
-        datalake_ebdb_user.user_revision_entity AS u
+        user_revision_entity AS u
             ON paa.rev = u.id
     WHERE
         p.type = 'AUTONOMOUS_AGENT'

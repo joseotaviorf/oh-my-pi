@@ -6,16 +6,9 @@ WITH ciq_daily_history AS (
       cu.status,
       cu.email,
       ROW_NUMBER() OVER (PARTITION BY cu.id_partner, dd.date ORDER BY cu.ts_agent_status_start DESC) = 1 AS is_last_status_by_date,
-      dd.date AS dt_reference,
-      dd.year AS year,
-      dd.month AS month,
-      dd.day AS day
+      EXPLODE(SEQUENCE(DATE(cu.ts_agent_status_start), DATE(COALESCE(cu.ts_agent_status_end, DATE('{load_end_date}'))))) AS dt_reference
   FROM
       datalake_ebdb_agents.ciq_users AS cu
-  LEFT JOIN
-      datalake_quintoandar.aux_date AS dd
-        ON dd.date BETWEEN DATE(cu.ts_agent_status_start)
-        AND COALESCE(DATE(cu.ts_agent_status_end), DATE('{load_end_date}'))
   LEFT JOIN
       datalake_ebdb_user.user AS u
         ON cu.id_user = u.id
@@ -33,13 +26,15 @@ logins_pm_per_day AS (
   GROUP BY 1,2
 ),
 agent_profile_history AS (
-  SELECT
-      id_agent,
-      profile,
-      ts_revision_started,
-      ts_revision_ended
-  FROM
-      datalake_agent_accreditation.agent_profile AS ap
+    SELECT
+        id_agent_data AS id_agent,
+        profile,
+        dt_started,
+        dt_ended
+    FROM
+        datalake_agent_accreditation.agent_profile AS ap
+    WHERE
+        is_lastest_by_date IS TRUE
 ),
 accreditation_history AS (
     SELECT
@@ -106,9 +101,9 @@ SELECT
     COALESCE(aha.action, 'N/A') AS accreditation_status,
     COALESCE(ash.visit_agent_type, 'N/A') AS visit_agent_type,
     cdh.dt_reference,
-    cdh.year,
-    cdh.month,
-    cdh.day
+    YEAR(cdh.dt_reference) AS year,
+    MONTH(cdh.dt_reference) AS month,
+    DAY(cdh.dt_reference) AS day
 FROM
     ciq_daily_history AS cdh
 LEFT JOIN
@@ -118,7 +113,7 @@ LEFT JOIN
 LEFT JOIN
     agent_profile_history AS aph
       ON cdh.id_agent = aph.id_agent
-      AND cdh.dt_reference BETWEEN DATE(aph.ts_revision_started) AND DATE(COALESCE(aph.ts_revision_ended, '{load_end_date}'))
+      AND cdh.dt_reference BETWEEN aph.dt_started AND COALESCE(aph.dt_ended, DATE('{load_end_date}'))
 LEFT JOIN
     business_context AS bca
       ON cdh.id_agent = bca.id_agent_data
@@ -135,4 +130,4 @@ LEFT JOIN
 WHERE
     cdh.id_partner NOT IN (691, 674) -- Inconsistent CIQs
     AND cdh.is_last_status_by_date IS TRUE
-    AND MAKE_DATE(cdh.year, cdh.month, cdh.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND cdh.dt_reference BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

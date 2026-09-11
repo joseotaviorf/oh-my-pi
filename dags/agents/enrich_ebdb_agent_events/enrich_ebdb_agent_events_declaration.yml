@@ -22,6 +22,8 @@ workflow:
       - agent_unified_identity
     agent_product:
       - agent_unified_identity
+    capability_events:
+      - capability_settings
   tables_customization:
     agent_accreditation_events:
       merge_on: [id_event]
@@ -35,6 +37,9 @@ workflow:
     capability_settings:
       merge_on: [id_event_log]
       partitions: [year, month, day]
+      z_order_by: [id_agent, ts_started]
+    capability_events:
+      merge_on: [id_event_log, id_agent]
       z_order_by: [id_agent, ts_started]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"

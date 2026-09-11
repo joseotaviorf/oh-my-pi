@@ -83,10 +83,36 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 | UUIDs | `uuid_company`, `uuid_agent`, `uuid_person` |
 | CRECI / classification | `creci`, `creci_uf`, `affiliation_type` (`1P`/`3P`), `profile` |
 | State flags (point-in-time) | `is_agent_active`, `is_passive_lead_receiver`, `is_1p_partnership`, `is_3p_partnership` |
-| Capability flags (business function) | `is_allow_supply_acquisition`, `is_allow_supply_conversion`, `is_allow_demand_visit`, `is_allow_demand_acquisition`, `is_allow_negotiation`, `is_allow_demand_sale`, `is_allow_demand_rent` |
+| Capability flags (business function) | `is_allow_supply_acquisition`, `is_allow_supply_conversion_consultancy`, `is_allow_demand_visit_management`, `is_allow_demand_acquisition`, `is_allow_negotiation`, `is_allow_demand_sale`, `is_allow_demand_rent` |
 | Timing | `dt_ref`, `days_in_current_status`, `ts_last_status_changed`, `ts_created` |
 
 > Siblings in `dw_agent`: `dim_agent`, `dim_prospect_agent`, and `fact_visit_agent_performance` (⚠ **STALE since 2025-09-21** — historical only, no confirmed replacement as of 2026-06).
+
+---
+
+## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) when the question asks for an **official**, **MBR**, or **OKR** number. None exist for this entity yet.
+
+### Component / exploratory metrics
+
+- **Active agents (daily / monthly):** `COUNT(DISTINCT sk_agent)` on `dw_agent.fact_agent_daily` where `is_agent_active = TRUE`; filter by integer `year`/`month`/`day` partitions for a reference date.
+- **Currently accredited agents:** `COUNT(DISTINCT sk_agent)` on `dw_agent.dim_agent` where `is_agent_active = TRUE`.
+- **Days in current status:** `days_in_current_status` on `dw_agent.dim_agent` (current state) or `dw_agent.fact_agent_daily` (historical daily snapshot).
+- **Prospect funnel blockers:** `COUNT(DISTINCT id_prospect_agent)` on `datalake_agent_accreditation.prospect_step_validation` grouped by `step_name` and `status_reason` — see [Golden Queries](#golden-queries).
+- **First activation / reactivation events:** `is_first_activation` and `is_reactivated` on `dw_agent.fact_agent_daily` reconstructed from accreditation events.
+
+---
+
+## Relationships with other entities
+
+- **Accreditation ↔ Profile (1:1 current state):** `dw_agent.dim_agent.sk_agent` projects the latest row from `datalake_agent_accreditation.agent_history`; join keys and business-profile rules live in [`agents_profile.md`](agents_profile.md).
+- **Accreditation ↔ Prospect (1:1 converted):** `dw_agent.dim_agent.sk_prospect_agent = dw_agent.dim_prospect_agent.sk_prospect_agent` for agents who completed onboarding; pre-conversion funnel in `prospect_step_validation`.
+- **Accreditation ↔ Parent entity:** identity-migration warning, business-function axes, and cross-domain routing in [`agents.md`](agents.md).
+- **Accreditation ↔ Hub allocation (1:N daily):** `dw_agent.dim_agent.sk_user = member_hub_allocation.id_main_user` for EN association and hub workload — see [`agents_profile.md`](agents_profile.md).
+- **Legacy ↔ new identity bridge:** `sk_agent_data` / `id_agent_data` (legacy `dadosAgent`) vs `sk_agent` / `id_agent` (Agent Domain) — never interchangeable; `dw_agent.fact_agent_daily` carries both keys for historical joins.
+
+---
 
 ## Dos and Don'ts
 

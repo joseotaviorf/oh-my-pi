@@ -23,10 +23,7 @@ SELECT
     ROW_NUMBER() OVER(PARTITION BY settings.id, DATE(settings.updated_at) ORDER BY settings.updated_at DESC) = 1 AS is_last_update_by_date,
     settings.created_at AS ts_created,
     settings.updated_at AS ts_started,
-    COALESCE(
-        LEAD(settings.updated_at) OVER(PARTITION BY settings.id ORDER BY settings.updated_at) - INTERVAL 1 DAY,
-        TIMESTAMP('{load_end_date}')
-    ) AS ts_ended,
+    LEAD(settings.updated_at) OVER (PARTITION BY settings.id ORDER BY settings.updated_at) AS ts_ended,
     settings.year,
     settings.month,
     settings.day

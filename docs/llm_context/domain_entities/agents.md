@@ -33,7 +33,7 @@
 |------|---------|-------|
 | **Agente / corretor** | Field agent | Multi-type — see [`agents_profile.md`](agents_profile.md) for classification rules. |
 | **Agente de visita / Visita** | Visit agent | `profile = 'Visita'`; default scope for most business questions. |
-| **Agente CIQ (program)** | Affiliation — enrolled in the CIQ (Corretor Integrado QuintoAndar) program | affiliation `1P`; nearest capability signal is `is_allow_supply_acquisition` / `is_allow_supply_conversion` on `dw_agent.dim_agent`. Overloaded with "CIQ (function)" below. |
+| **Agente CIQ (program)** | Affiliation — enrolled in the CIQ (Corretor Integrado QuintoAndar) program | affiliation `1P`; nearest capability signal is `is_allow_supply_acquisition` / `is_allow_supply_conversion_consultancy` on `dw_agent.dim_agent`. Overloaded with "CIQ (function)" below. |
 | **Agente 3P / parceiro** | Third-party / partner-firm agent | `affiliation_type = '3P'` in `agent`; `is_3p_agent = true` in `dw_public.dim_agent`. |
 | **Demand Agent / agente de demanda** | Conversion function — conducts visits and converts | `profile = 'Visita'` + capability `DEMAND_VISIT_MANAGEMENT ENABLED`; `revenue_role = DEMAND`. |
 | **TQC (Traz Quem Compra)** | Demand-acquisition function on Sale — brings/qualifies the buyer lead | See [`agents_programs.md`](agents_programs.md). |
@@ -80,7 +80,7 @@ No metric entity doc owns the Agents domain yet — use [Related Metric Entities
 ### Component / exploratory metrics
 
 - **Active agents (monthly):** `COUNT(DISTINCT id_agent)` on `dw_agent.fact_agent_daily` where `is_agent_active = true` — see [`agents_accreditation.md`](agents_accreditation.md).
-- **CIQ-active agents:** agents with supply-acquisition capability (`is_allow_supply_acquisition` / `is_allow_supply_conversion`) on `dw_agent.dim_agent` / `fact_agent_daily` — see [`agents_profile.md`](agents_profile.md).
+- **CIQ-active agents:** agents with supply-acquisition capability (`is_allow_supply_acquisition` / `is_allow_supply_conversion_consultancy`) on `dw_agent.dim_agent` / `fact_agent_daily` — see [`agents_profile.md`](agents_profile.md).
 - **Agents per hub:** `COUNT(DISTINCT id_user)` on `datalake_hub_services.member_hub_allocation` where `is_active = true` — see [`agents_profile.md`](agents_profile.md).
 - **Brokerage / revenue earned per agent:** `SUM` on `dw_agent_payments.fact_earnings` / `fact_partner_payments` — see [`agents_payments.md`](agents_payments.md).
 - **Active PFA relations:** current rows on `datalake_ebdb_agents.preferred_fixed_agent_history` — see [`agents_programs.md`](agents_programs.md).

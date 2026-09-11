@@ -71,16 +71,16 @@ business_context AS (
 ),
 other_actions AS (
     SELECT
-        ap.id_agent,
+        ap.id_agent_data AS id_agent,
         "Performance Profile Update" AS action,
         NULL AS business_context,
         ap.profile,
-        ap.ts_revision_started,
-        DATE(ap.ts_revision_started) AS dt_revision
+        ap.ts_revision AS ts_revision_started,
+        ap.dt_started AS dt_revision
     FROM
         datalake_agent_accreditation.agent_profile AS ap
     WHERE
-        DATE(ap.ts_revision_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        ap.dt_started BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         bc.id_agent,

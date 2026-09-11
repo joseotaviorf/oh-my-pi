@@ -38,3 +38,8 @@ workflow:
       extraction_type: incremental
       merge_on: [id_agent_daily]
       partitions: [year, month, day]
+    agent_history:
+      extraction_type: incremental
+      merge_on: [id_snapshot]
+      partitions: [dt_reference]
+      z_order_by: [id_unified_agent, dt_reference]

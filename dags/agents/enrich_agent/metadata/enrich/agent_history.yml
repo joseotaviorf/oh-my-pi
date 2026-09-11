@@ -1,0 +1,187 @@
+---
+database_name: datalake_agent_accreditation
+table_name: agent_history
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+description: |
+  Daily point-in-time snapshot of agent capabilities, business context, and lead referral
+  flags. One row per unified agent per reference date, expanding each accreditation window
+  from ts_accreditation through ts_deaccreditation via SEQUENCE. Reconstructs capability
+  enablement from capability_events, demand sale/rent flags from business_context revision
+  intervals, legacy profile types from agent_profile, partner autonomous-agent flags,
+  passive lead receiver history, and TQA/TQC referral invite status. Consumed by
+  dw_agent_accreditation dim_agent and fact_agent_daily.
+columns:
+  id_snapshot:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+    description: |
+      Primary key of the agent-day snapshot. Built with XXHASH64 from id_unified_agent
+      and dt_reference, uniquely identifying each row.
+  sk_person:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.sk_person
+    description: Person surrogate key from the unified agent identity registry.
+  id_unified_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
+    description: Foreign key to the unified agent identity row in agent_unified_identity.
+  id_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent
+    description: Agent Domain agent identifier when the identity has an accredited agent record.
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent_data
+    description: Legacy dadosAgente identifier from unified identity when present.
+  id_partner:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_partner
+    description: Partner identifier from unified identity when present.
+  id_user:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_user
+    description: Platform user identifier linked to the person behind the agent.
+  sk_broker:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.sk_broker
+    description: Broker surrogate key for 3P agents resolved from company UUID via core_brokers.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+    description: Person UUID anchor for joining person-level models and tier tables.
+  business_context:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.business_context
+      - datalake_agent_accreditation.business_context.business_context
+    description: |
+      Primary business context of the agent on the reference date, taken from the latest
+      active capability event or from business_context revision intervals when capability
+      data is absent.
+  is_active:
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.is_active
+    description: |
+      True when the agent is in an active accreditation status window on the reference date,
+      built from accreditation event segments expanded to daily grain.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_passive_lead_receiver
+      - datalake_ebdb_clean.agent_data_aud.is_passive_lead_receiver
+    description: |
+      True when the agent is configured to receive passive demand leads on the reference date.
+      Prefers legacy agent_data audit history when available, otherwise capability events.
+      Defaults to FALSE when no matching revision exists on the reference date.
+  is_allow_supply_acquisition:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_capability_active
+      - datalake_ebdb_clean.partner.type
+    description: |
+      True when supply acquisition capability is enabled on the reference date. Built from
+      capability_events pivot or autonomous partner type when partner-based. Defaults to FALSE
+      when no matching capability row exists on the reference date.
+  is_allow_demand_visit_management:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_capability_active
+      - datalake_agent_accreditation.agent_profile.profile
+    description: |
+      True when demand visit management capability is enabled on the reference date. Built
+      from capability_events pivot or legacy Visita profile type. Defaults to FALSE when no
+      matching capability or profile row exists on the reference date.
+  is_allow_demand_sale:
+    lineage:
+      - datalake_agent_accreditation.business_context.business_context
+      - datalake_agent_accreditation.business_context.ts_revision_started
+      - datalake_agent_accreditation.business_context.ts_revision_ended
+    description: |
+      True when a SALE business_context revision interval from business_context covers the
+      reference date (is_latest_by_date row per day).
+  is_allow_demand_rent:
+    lineage:
+      - datalake_agent_accreditation.business_context.business_context
+      - datalake_agent_accreditation.business_context.ts_revision_started
+      - datalake_agent_accreditation.business_context.ts_revision_ended
+    description: |
+      True when a RENT business_context revision interval from business_context covers the
+      reference date (is_latest_by_date row per day).
+  is_allow_demand_acquisition:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_capability_active
+    description: |
+      True when demand acquisition capability is enabled on the reference date. Defaults to
+      FALSE when no matching capability row exists on the reference date.
+  is_allow_supply_conversion_consultancy:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_capability_active
+      - datalake_ebdb_clean.partner.type
+    description: |
+      True when supply conversion consultancy capability is enabled on the reference date.
+      Built from capability_events pivot or autonomous partner type. Defaults to FALSE when no
+      matching capability or partner row exists on the reference date.
+  is_allow_supply_representative:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_capability_active
+    description: |
+      True when supply representative capability is enabled on the reference date. Defaults
+      to FALSE when no matching capability row exists on the reference date.
+  is_allow_supply_midia_management:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_capability_active
+      - datalake_agent_accreditation.agent_profile.profile
+    description: |
+      True when supply media management capability is enabled on the reference date. Built
+      from capability_events pivot or legacy SessaoFotos profile type. Defaults to FALSE when
+      no matching capability or profile row exists on the reference date.
+  is_allow_supply_integrity_assurance:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_capability_active
+      - datalake_agent_accreditation.agent_profile.profile
+    description: |
+      True when supply integrity assurance capability is enabled on the reference date. Built
+      from capability_events pivot or legacy Vistoria/VistoriaQuarteirizada profile types.
+      Defaults to FALSE when no matching capability or profile row exists on the reference date.
+  is_allow_negociation:
+    lineage:
+      - datalake_ebdb_agent_events.capability_events.is_capability_active
+    description: |
+      True when negotiation capability is enabled on the reference date. Defaults to FALSE
+      when no matching capability row exists on the reference date.
+  has_sale_lead_referral:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral_aud.business_context
+      - datalake_ebdb_clean.agent_lead_referral_aud.status
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: |
+      True on the reference date when a buyer lead referral audit row exists with business
+      context SALE (or null, treated as SALE) and status other than NOT_ELIGIBLE.
+  has_sale_lead_referral_confirmed:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral_aud.business_context
+      - datalake_ebdb_clean.agent_lead_referral_aud.status
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: |
+      True on the reference date when a buyer lead referral audit row exists with business
+      context SALE (or null, treated as SALE) and status CONFIRMED (Traz Quem Compra).
+  has_rent_lead_referral:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral_aud.business_context
+      - datalake_ebdb_clean.agent_lead_referral_aud.status
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: |
+      True on the reference date when a tenant lead referral audit row exists with business
+      context RENT and status other than NOT_ELIGIBLE.
+  has_rent_lead_referral_confirmed:
+    lineage:
+      - datalake_ebdb_clean.agent_lead_referral_aud.business_context
+      - datalake_ebdb_clean.agent_lead_referral_aud.status
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: |
+      True on the reference date when a tenant lead referral audit row exists with business
+      context RENT and status CONFIRMED (Traz Quem Aluga).
+  dt_reference:
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+    description: |
+      Reference calendar date of the daily snapshot, one day per row between ts_accreditation
+      and ts_deaccreditation (or load_end_date when still active). Joinable with dw_public.dim_date.

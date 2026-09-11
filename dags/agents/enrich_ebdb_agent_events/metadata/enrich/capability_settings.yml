@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_agent_events
 table_name: capability_settings
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 description: |
   Historical event log of Demand Visit Management capability settings changes per agent.
   Each row captures one CDC revision of a capability settings record, including business context,
@@ -60,8 +60,8 @@ columns:
     lineage:
       - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.updated_at
     description: |
-      End of this capability settings revision window: day before the next update for
-      the same settings id, or the load end date when this is the latest revision.
+      Timestamp when the next capability settings revision started for the same settings id;
+      null when this is the latest revision (open-ended interval).
   year:
     lineage:
       - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.year
