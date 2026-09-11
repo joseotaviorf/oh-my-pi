@@ -18,7 +18,7 @@
 - **Typical actions / events:** Who works where **today** (active people); tenure and hire date; manager chain L0+; Product & Tech line/chapter/teams (P&T only).
 - **Common metrics:** Active headcount; tenure; span of control via hierarchy; headcount by cost center. Prefer person-level P&T attributes over squad rollups.
 - **Source systems:** PIN (identity, placement, hierarchy) and the Product & Tech team-formation Google Sheet (line/chapter/`team_1`…`team_10` — P&T roster only).
-- **Related entities:** For internal People DW depth (history, terminations, PII docs), see [`employee_details.md`](employee_details.md) — **People-team exclusive** (`dw_employee_details` access **only via IDN request**; not for general consumers). For cost center / BU / job catalogs, see [`organization.md`](organization.md). Legacy denormalized chart: [`org_chart.md`](org_chart.md) (prefer this entity for new queries).
+- **Related entities:** For internal People DW depth (history, terminations, PII docs), see [`employee_details.md`](employee_details.md) — **People-team exclusive** (`dw_employee_details` access **only via IDN request**; not for general consumers). For cost center / BU / job catalogs, see [`organization.md`](organization.md). Legacy denormalized chart: [`org_chart.md`](org_chart.md) (prefer this entity for new queries). For project tags, allocated FTE, “pessoas alocadas”, or “tag de IPO”, see Workforce Allocation — not this schema.
 
 **Business-facing schema guide:** `dags/people/dw_people/docs/dw_people.md`.
 
@@ -114,6 +114,7 @@ Shared labels (`line`, `chapter`, `team`) mean **different things** in each sche
 | **Cost center / centro de custo** | Org classification for placement (all areas) | `dw_organization.dim_cost_center` |
 | **Manager chain / cadeia de gestão / hierarquia** | CEO → employee levels (company-wide) | `dim_management_hierarchy` |
 | **Active headcount / quadro ativo** | Count of active employees | `COUNT(*)` on `fact_employees` or `dim_employee` |
+| **Pessoas alocadas / tag de IPO / who is on IPO?** | Planning allocation to a project tag in the Allocation Tool | Not this schema — see [workforce_allocation.md](workforce_allocation.md) |
 
 ## Tables
 
@@ -125,9 +126,9 @@ Shared labels (`line`, `chapter`, `team`) mean **different things** in each sche
 | Product & Tech line / chapter / teams | `dw_people.dim_product_tech_team` |
 | Job / cost center / BU labels (any area) | Join `organization.md` from `fact_employees` FKs |
 | Org / “time” outside P&T | Cost center + manager + direct reports — **not** the P&T dim |
-| Terminated or month-end history | `employee_details.md` — not this schema |
-| Project tags, allocation FTE, planning Lines/teams | [`workforce_allocation.md`](workforce_allocation.md) — not `dw_people` |
-| Legacy single-table org chart (during migration) | `datalake_people_public.org_chart` — see [`org_chart.md`](org_chart.md) |
+| Terminated or month-end history | employee_details.md — not this schema |
+| Project tags, allocation FTE, planning Lines/teams | [workforce_allocation.md](workforce_allocation.md) — not `dw_people` |
+| Legacy single-table org chart (during migration) | `datalake_people_public.org_chart` — see [org_chart.md](org_chart.md) |
 
 **Critical rules:**
 - **Active-only:** all `dw_people` tables exclude terminated / inactive people. Do **not** add `is_active = TRUE`.
@@ -236,12 +237,11 @@ ORDER BY emp.name
 
 Use this to **list** people, not to answer “how many people on team X?” as a primary metric.
 
-### Query 3 — Team / org placement outside Product & Tech (cost center + leads + manager)
+### Query 3 — Team / org placement outside Product & Tech (cost center + manager)
 
-Use when the person has **no** row in `dim_product_tech_team` (or the question is about a non–P&T manager). Answer shape: cost center, who they lead, who leads them.
+Use when the person has **no** row in `dim_product_tech_team` (or the question is about a non–P&T manager). Answer shape: cost center and who leads them.
 
 ```sql
--- Placement + direct manager
 SELECT
     emp.person_number,
     emp.name,
@@ -261,8 +261,11 @@ WHERE emp.person_number = '<person_number>'
    OR LOWER(emp.work_email) = LOWER('<work_email>')
 ```
 
+### Query 4 — Direct reports (who this person leads)
+
+Use with Query 3 when the question is who reports to this person. One row per direct report.
+
 ```sql
--- Direct reports (who this person leads)
 SELECT
     report_emp.person_number,
     report_emp.name,
@@ -274,7 +277,7 @@ WHERE hier.person_number_manager = '<person_number>'
 ORDER BY report_emp.name
 ```
 
-### Query 4 — Management chain L0+ for an active employee
+### Query 5 — Management chain L0+ for an active employee
 
 ```sql
 SELECT

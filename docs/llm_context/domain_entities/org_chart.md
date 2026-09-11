@@ -21,7 +21,7 @@
 
 **SLA:** D-1 with the `enrich_people_public` DAG. Grain: **one row per active `assignment_number`**.
 
-**Out of scope:** employment history, terminated employees, compensation, performance, and SCD2 validity windows — use `employee_details.md` (`dw_employee_details`, **People-team exclusive — IDN request only**) or `datalake_people.identifier_mapping` instead.
+**Out of scope:** employment history, terminated employees, compensation, performance, and SCD2 validity windows — use `employee_details.md` (`dw_employee_details`, **People-team exclusive — IDN request only**) or `datalake_people.identifier_mapping` instead. **Project tags / tag de IPO / pessoas alocadas** are not on this table (`product_and_tech_team_*` is Team Formation, not Allocation Tool) — use Workforce Allocation.
 
 ## TARS pilot scope (restricted audience)
 
@@ -40,6 +40,7 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 - `people_public.md` — **preferred** public DW replacement (`dw_people`: hierarchy company-wide; wide `dim_product_tech_team`; cost center via `organization.md` for other areas).
 - `employee_details.md` — full employee identity, daily snapshots, management hierarchy (L0–L9), and terminated workforce.
 - `organization.md` — SCD2 cost centers, business units, and job catalog in `dw_organization`.
+- `workforce_allocation.md` — project tags, allocated FTE, “who is on IPO?” / “pessoas alocadas a uma tag”. Org Chart `product_and_tech_team_*` is **not** an allocation tag.
 
 ## Glossary and Synonyms
 
@@ -68,6 +69,7 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 | Codex / financial taxonomy per active employee (legacy) | `datalake_people_public.org_chart` — `business`, `product`, `vertical`, `directorate`, `subdirectorate` |
 | Product & Technology squad structure (**preferred**) | `dw_people.dim_product_tech_team` — see [`people_public.md`](people_public.md) |
 | Product & Technology squad structure (legacy) | `datalake_people_public.org_chart` — `line`, `chapter`, `product_and_tech_team_*` (NULL outside P&T) |
+| People allocated to a project tag / tag de IPO | [workforce_allocation.md](workforce_allocation.md) — not `product_and_tech_team_*` |
 | Historical headcount or terminated employees | `dw_employee_details.fact_assignment_snapshots` — see `employee_details.md` |
 | Full employment history (all statuses) | `datalake_people.identifier_mapping` |
 
@@ -114,6 +116,7 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 - Fall back to `employee_details.md` when the question mentions termination, historical dates, or monthly snapshots.
 
 **Don't:**
+- Treat `product_and_tech_team_*` as Allocation Tool project tags or answer “who is on IPO?” from this table — route to Workforce Allocation.
 - Start new P&T / org-chart analysis on this table once `dw_people` P&T tables are available — route to [`people_public.md`](people_public.md) (wide `team_1`…`team_10`).
 - Filter `is_active = TRUE` or `assignment_status_type = 'ACTIVE'` — the table is already scoped to active assignments.
 - Use this table for terminated-employee analysis or month-end headcount history — rows disappear after offboarding.

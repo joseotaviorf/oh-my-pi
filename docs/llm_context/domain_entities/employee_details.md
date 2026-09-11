@@ -23,7 +23,7 @@ Employee Details (`dw_employee_details`) is the primary internal People DW schem
 
 **Temporal model:** mixed. `dim_employee` is current state only. Contact, documentation, emergency contact, and hierarchy dimensions are SCD Type 2 validity windows (`dt_valid_from` / `dt_valid_to`). `fact_assignment_snapshots` is a daily snapshot — one row per `assignment_number` per calendar day.
 
-**Out of scope (sibling schemas):** compensation → `dw_compensation`; cost center / BU / job definitions → `dw_organization`; DE&I self-declared attributes → `dw_demographics` (stricter access).
+**Out of scope (sibling schemas):** compensation → `dw_compensation`; cost center / BU / job definitions → `dw_organization`; DE&I self-declared attributes → `dw_demographics` (stricter access). **Project tags, allocated FTE, “pessoas alocadas”, “tag de IPO”** → Workforce Allocation (`workforce_allocation.md`) — not assignment snapshots and not Team Formation.
 
 Sensitive personal data (CPF, address, legal name, marital status) lives here under restricted access. Prefer `dim_employee.name` (preferred name) for display; use `dim_documentation` only for compliance contexts.
 
@@ -59,6 +59,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - `organization.md` — cost center, business unit, and job reference dimensions joined via `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version` on the fact.
 - `people_public.md` — **preferred** public active-workforce DW (`dw_people`) replacing `org_chart` for new consumers; **Product & Tech team formation** lives there (`dim_product_tech_team`).
 - `org_chart.md` — legacy lightweight current org chart (`datalake_people_public.org_chart`) during migration.
+- `workforce_allocation.md` — **project tags**, allocated FTE, “pessoas alocadas”, “tag de IPO”, Allocation Tool Lines/teams. This schema has **no** project tags — do not answer IPO / allocation-roster questions from assignment snapshots or Team Formation.
 
 ## Teams / org placement
 
@@ -70,6 +71,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 | Manager chain / who reports to whom (history-capable) | `dw_employee_details.dim_management_hierarchy` (+ fact FKs) |
 | Cost center / BU / job labels | [`organization.md`](organization.md) via fact SKs |
 | Active-only public “which team?” without history | Prefer [`people_public.md`](people_public.md) end-to-end |
+| People allocated to a project tag / tag de IPO / pessoas alocadas | [workforce_allocation.md](workforce_allocation.md) — not this schema |
 
 **Product & Tech filter example** (join on `person_number`; dim is **active-only** and **wide** — one row per person):
 
@@ -155,6 +157,7 @@ If the person has **no** dim row, they are outside the Product & Tech roster —
 | Termination reasons (action + reason, EN/PT) | `dw_employee_details.dim_termination` — **TARS pilot**; current state; join via `sk_termination_event_definition` |
 | Management chain up to CEO | `dw_employee_details.dim_management_hierarchy` — **TARS pilot**; validity window; join via `sk_hierarchy_version` |
 | Wide employee picture across domains | `metric_people.employee_snapshots` — **not in TARS pilot**; official OBT joining compensation, demographics, org, and more |
+| People allocated to a project tag / tag de IPO / pessoas alocadas | Not this entity — see workforce_allocation.md |
 
 **Main join identifiers:** `sk_employee` (preferred FK), `person_number` (business key), `assignment_number` (assignment-level key).
 
@@ -219,6 +222,7 @@ Use [Related Metric Entities](#related-metric-entities) for **official** turnove
 - Treat a future `dt_terminated` (while still active) as a scheduled termination.
 
 **Don't:**
+- Answer “pessoas alocadas”, “tag de IPO”, project-tag, or allocated-FTE questions from this schema — route to Workforce Allocation (`workforce_allocation.md`).
 - Suggest or process **IDN access requests** for `dw_employee_details` for users **outside the People team** — route them to [`people_public.md`](people_public.md) (`dw_people`) instead.
 - Expect Product & Tech squad / line / chapter columns on `dw_employee_details` — those live only on `dw_people.dim_product_tech_team` ([`people_public.md`](people_public.md)).
 - Count `Global Transfer` termination events as dismissals or turnover — filter them out with `is_transfer_termination = FALSE`; the person remains employed under a new `assignment_number`.

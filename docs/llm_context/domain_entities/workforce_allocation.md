@@ -12,7 +12,7 @@
 
 ## Overview
 
-- **Objective:** Model how employees are allocated across Lines, teams, and project tags for quarterly planning, scenario simulation, and org-wide FTE views — replacing ad-hoc spreadsheet workflows that drift over time.
+- **Objective:** Model how employees are allocated across Lines, teams, and project tags (including **IPO** / **tag de IPO**) for quarterly planning, scenario simulation, and org-wide FTE views — replacing ad-hoc spreadsheet workflows that drift over time. **TARS:** questions like “quais pessoas estão alocadas a uma tag de IPO”, “who is on IPO?”, “pessoas alocadas”, or “project tag roster” belong **here**, not in Employee Details, Org Chart, or Team Formation.
 - **Asset status / lifecycle:** **Prototype** (Allocation Tool on Base44). Production rollout is a separate decision after validation; treat the export contract and schema as unstable. Base44 writes a **full daily snapshot** to S3; the People pipeline loads it into the lake and publishes `dw_workforce_allocation.fact_workforce_allocations` for Trino/TARS, Superset, and ad-hoc reports.
 - **Typical actions / events:** Admins and ET/LT create teams under Lines, define project tags within teams, link employees to project tags, or soft-deactivate them (`inactive` status). Allocations absent from a snapshot are treated as removed at source.
 - **Common metrics:** Allocated FTE by Line, team, or project tag; **people distribution by project** (which teams and Lines contribute to a project such as IPO); active allocation counts; project coverage across teams; historical allocation states.
@@ -74,7 +74,7 @@ Project tag names may repeat across teams — for project-scoped questions, list
 ## Known Limitations
 
 - **Prototype:** groups, tags, and export shapes may change before production rollout.
-- **Legacy `line_name`:** in RA 2.0 every team must have a Line; historical SCD2 intervals from pre-2.0 exports may still show `line_name IS NULL`. Filter `line_name IS NOT NULL` when the question assumes the current model.
+- **Legacy `line_name`:** in RA 2.0 every team must have a Line; historical SCD2 intervals from pre-2.0 exports may still show `line_name IS NULL`. Filter `line_name IS NOT NULL` when the question assumes the current model. DataHub and Databricks already expose `line_name`; the Hive-synced Trino table may lag — TARS golden queries for “who is allocated now” use `group_name` + `tag_name` and omit `line_name` until Hive catches up.
 - **No overlap guardrails with PIN:** `chapter`, `vertical`, and `team` on the fact come from the tool's PIN seed and may duplicate or contradict PIN-owned classifications — nothing validates consistency.
 - **FTE is equal-split only:** within a team, each active project tag gets `1/N` of the employee's capacity; arbitrary percentages are out of scope.
 - **FTE is not additive across teams:** an employee in two teams contributes up to 1.0 FTE in each team separately — do not sum across teams as total headcount.
@@ -83,11 +83,11 @@ Project tag names may repeat across teams — for project-scoped questions, list
 
 ## TARS / Trino scope
 
-**Catalog:** `delta`
+**Catalog:** `delta`. In Trino, qualify the fact as `hive.dw_workforce_allocation.fact_workforce_allocations` (DataHub URN path). A two-part name can resolve to a stale Hive schema.
 
 | Table | What it contains |
 |-------|------------------|
-| `dw_workforce_allocation.fact_workforce_allocations` | SCD2 allocation history with precomputed `allocation_fte`, Line/team/project dimensions (`line_name`, `group_name`, `tag_name`), and read-only org attributes (`chapter`, `vertical`, `team`). No PII. **Only table in this domain for TARS and business consumers.** |
+| `dw_workforce_allocation.fact_workforce_allocations` | SCD2 allocation history with precomputed `allocation_fte`, Line/team/project dimensions (`line_name`, `group_name`, `tag_name`), and read-only org attributes (`chapter`, `vertical`, `team`). No PII. **Only table in this domain for TARS and business consumers.** Link this table as the primary Data Product asset — do not attach Team Formation or assignment-snapshot tables to this product. |
 
 `datalake_people.allocation_history` (Databricks enrich) is restricted to the **technical team** for pipeline debugging and modeling — do not query it from TARS or direct business users to it.
 
@@ -130,6 +130,7 @@ Apply **in order** (see disambiguation tables above for column mapping):
 |------------------|----------|-------|
 | Which **team** is person X on? / em qual **time** a pessoa está? | `dw_people` — `dim_product_tech_team` (P&T) or cost center + manager (non–P&T) | Official org / squad — **not** Allocation Tool `group_name` |
 | Which **projects** is person X on? / em quais **projetos** a pessoa está? | `dw_workforce_allocation.fact_workforce_allocations` | Filter `person_number`, `is_active = TRUE`; list `tag_name`, `group_name`, `line_name` |
+| Who is allocated to an **IPO** tag / pessoas alocadas a uma tag de IPO | `dw_workforce_allocation.fact_workforce_allocations` | Filter `is_current = TRUE`, `is_active = TRUE`, `LOWER(tag_name) LIKE '%ipo%'`; join `dim_employee` for names — **not** Org Chart `product_and_tech_team_*` |
 | Names with either answer above | Join `dw_people.dim_employee` on `person_number` | Only when the requester has `dw_people` access |
 
 **Ambiguous patterns — resolve by intent, not by shared words:**
@@ -151,9 +152,9 @@ Apply **in order** (see disambiguation tables above for column mapping):
 - **Lacks** `dw_workforce_allocation` access → do **not** query or proxy allocation data; answer team/org/placement from `dw_people` when possible and state that project-allocation answers require the Allocation data contract on IDN.
 - Allocation Tool UI access alone does **not** imply TARS can read `dw_workforce_allocation`.
 
-**Route here** when intent is **planning / allocation / project** — EN: allocation, allocated, allocate, workforce allocation, resource allocation, allocation tool, planning scenario, project tag, which projects, projects for person, tag allocation, allocation history, tag history, tag transition, allocated FTE, FTE on project, distribution by project, who is on [project], people on team [group] (with tags/FTE context), tag completeness, IPO (allocated / distribution).
+**Route here** when intent is **planning / allocation / project** — EN: allocation, allocated, allocate, workforce allocation, resource allocation, allocation tool, planning scenario, project tag, which projects, projects for person, tag allocation, allocation history, tag history, tag transition, allocated FTE, FTE on project, distribution by project, who is on [project], people on team [group] (with tags/FTE context), tag completeness, IPO (allocated / distribution), who is on IPO, people allocated to a tag.
 
-**Route here** — PT: alocação, alocado, alocada, ferramenta de alocação, tag de projeto, **em quais projetos**, projetos da pessoa, histórico de tag, FTE alocado, distribuição por projeto, quem está no [projeto], pessoas do time [grupo] (com contexto de tag/FTE), completude de tag, IPO (alocado / distribuição).
+**Route here** — PT: alocação, alocado, alocada, pessoas alocadas, ferramenta de alocação, tag de projeto, tag de IPO, **em quais projetos**, projetos da pessoa, histórico de tag, FTE alocado, distribuição por projeto, quem está no [projeto], pessoas do time [grupo] (com contexto de tag/FTE), completude de tag, IPO (alocado / distribuição).
 
 **Do not route here** — use `dw_people` for **org / squad placement** without project-allocation intent:
 
@@ -163,16 +164,12 @@ Apply **in order** (see disambiguation tables above for column mapping):
 
 **Homonym quick reference:** `team`/`time` + **where person belongs (org)** → `dw_people`. `team`/`time` + **Allocation Tool group roster or tags/FTE** → this entity. `project`/`projeto` → this entity unless clearly cost center or job family. `chapter` → P&T person attribute in `dw_people`; PIN-seed `chapter` on the fact when the question is allocation-scoped.
 
-## Related Metric Entities
-
-No official metric entity is currently defined for this domain.
-
----
-
 ## Glossary and Synonyms
 
 | Term | Meaning | Notes |
 |------|---------|-------|
+| **Pessoas alocadas / people allocated / who is allocated** | Employees linked to a project tag in the Allocation Tool | Start at `fact_workforce_allocations`; join `dw_people.dim_employee` for `name` |
+| **Tag de IPO / IPO tag / IPO-readiness / who is on IPO?** | Project tag whose name contains IPO (canonical example: `IPO-readiness`) | `LOWER(tag_name) LIKE '%ipo%'` or `tag_name = 'IPO-readiness'`; **not** Team Formation `team_1`…`team_10` |
 | **Allocation Tool / ferramenta de alocação** | Base44 app where users manage macro groups, teams, project tags, and employee allocations | Source of truth for allocation planning — not for official Line/Team |
 | **Macro group / macro groups / grupo macro** | Top-level Line that groups related teams | `line_name`; export field `groups.line` (e.g. `For Rent`); exists only through its teams |
 | **Group / groups** (Allocation Tool) | **Team** in RA 2.0 — stored in export entity `groups`, not the macro group | `id_group`, `group_name` (e.g. `Billing & Payments`); **must** have a `line_name`; do not confuse with `groups` as a generic word or with PIN `team` |
@@ -199,6 +196,7 @@ No official metric entity is currently defined for this domain.
 
 | You need… | Schema / table |
 |-----------|----------------|
+| Which people are allocated to an IPO tag (pessoas alocadas a uma tag de IPO) | `dw_workforce_allocation.fact_workforce_allocations` + `dw_people.dim_employee` on `person_number`; filter `is_current = TRUE` and `is_active = TRUE`; `LOWER(tag_name) LIKE '%ipo%'` — **neither** |
 | Historical workforce allocation by employee, Line, team, project, and point in time | `dw_workforce_allocation.fact_workforce_allocations` — **neither** (workforce allocation) |
 | Active allocated FTE by macro group / Line (`line_name`) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; aggregate by `line_name`, filter `is_active = TRUE` |
 | Active allocated FTE by team / Allocation Tool group (`group_name`) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; aggregate by `group_name` or `id_group`, filter `is_active = TRUE` |
@@ -207,21 +205,23 @@ No official metric entity is currently defined for this domain.
 | Which project tags an employee held on a reference date | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `person_number` and `DATE '<ref>' BETWEEN dt_valid_from AND dt_valid_to` |
 | How an employee's project tags changed over time (tag history / transitions) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `person_number`, order by `dt_valid_from`, show `tag_name`, `group_name`, validity columns |
 | Headcount allocated to a project tag (overall or by chapter) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; `COUNT(DISTINCT person_number)` by `tag_name` and optionally `chapter` |
-| Names of people allocated to a project tag | `fact_workforce_allocations` + `dw_people.dim_employee` — join on `person_number`; see [`people_public.md`](people_public.md) |
+| Names of people allocated to a project tag | `dw_workforce_allocation.fact_workforce_allocations` + `dw_people.dim_employee` — join on `person_number`; see [people_public.md](people_public.md) |
 | Teams belonging to a Line (Allocation Tool) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; `DISTINCT group_name` filtered by `line_name` |
 | How many Lines exist in the Allocation Tool model | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; `COUNT(DISTINCT line_name)` |
 | People on a team or on a chapter within a Line (with names) | `fact_workforce_allocations` + `dw_people.dim_employee` — filter `group_name` or `line_name` + `chapter`, join on `person_number` |
 | Project FTE rolled up across teams (same project tag name) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; aggregate `allocation_fte` by `tag_name` only when a single company-wide total is requested |
 | Current allocation state (no reference date) | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; filter `is_current = TRUE` |
 | PIN-seeded org attributes on the allocation export | `dw_workforce_allocation.fact_workforce_allocations` — **neither**; columns `chapter`, `vertical`, `team` (not allocation teams or project tags) |
-| Official Product & Tech team / line / chapter (Team Formation) | `dw_people.dim_product_tech_team` — **neither**; see [`people_public.md`](people_public.md) |
-| Employee identity, headcount, or assignment history | `dw_employee_details.fact_assignment_snapshots` — **neither** (workforce history); see [`employee_details.md`](employee_details.md) |
+| Official Product & Tech team / line / chapter (Team Formation) | Not this entity — see [people_public.md](people_public.md) |
+| Employee identity, headcount, or assignment history | Not this entity — see [employee_details.md](employee_details.md) |
 
 ---
 
 ## Key Metrics
 
-Use this entity for exploratory allocation metrics. No official metric entity overrides these definitions.
+When the question asks for an official, MBR, or OKR number, use a linked metric-entity doc — do not compute it from this entity's tables.
+
+### Component / exploratory metrics
 
 - **Allocated FTE:** `SUM(allocation_fte)` grouped by `line_name`, `group_name`, `tag_name`, or org attributes; scope to one team at a time when interpreting team-level totals.
 - **Active allocation count:** `COUNT(DISTINCT id_allocation)` where `is_active = TRUE`.
@@ -235,14 +235,14 @@ Use this entity for exploratory allocation metrics. No official metric entity ov
 
 For active/inactive logic, prefer `is_active = TRUE` or `allocation_status = 'active'`; `status` is the raw source label.
 
-## Relationships with Other Entities
+## Relationships with other entities
 
 - **Workforce Allocation → Employee Details:** join on `person_number` (stable business key) or `sk_employee` when not `-1`.
 - **Workforce Allocation → People Public:** join `person_number` to `dw_people.dim_employee` for **active employee names** (`name`) and work email. The fact stores identifiers only — never join `employee_details` for names when `dw_people` suffices. See [`people_public.md`](people_public.md).
 - **Workforce Allocation ↔ Team Formation:** allocation tags are planning/simulation data; official P&T squad/line/chapter is in `dw_people.dim_product_tech_team` — do not substitute one for the other without stating the source.
 - **SCD2 model:** `dt_valid_from` and `dt_valid_to` bound each interval; `is_current = TRUE` marks the open interval (`dt_valid_to = DATE '9999-12-31'`).
 
-## Dos and Don'ts
+## Dos and don'ts
 
 **Do:**
 
@@ -260,7 +260,7 @@ For active/inactive logic, prefer `is_active = TRUE` or `allocation_status = 'ac
 
 **Don't:**
 
-- Answer allocation, project-tag, or FTE questions from `dw_people` alone — route to this entity first.
+- Answer allocation, project-tag, FTE, “pessoas alocadas”, or “tag de IPO” questions from Employee Details, Org Chart, or Team Formation — those schemas have no project tags.
 - Use `dim_product_tech_team` line/chapter/team as a substitute for `line_name` / `group_name` / `tag_name` on the fact.
 - Query `datalake_people.allocation_history` — enrich-layer access is **technical team only**; use `fact_workforce_allocations` instead.
 
@@ -274,6 +274,26 @@ For active/inactive logic, prefer `is_active = TRUE` or `allocation_status = 'ac
 - Count rows as allocations: one allocation spans multiple rows when its FTE share changed; use `COUNT(DISTINCT id_allocation)`.
 
 ## Golden Queries
+
+Names of people currently allocated to an IPO project tag (**canonical TARS pattern** — “quais pessoas estão alocadas a uma tag de IPO”). Validated on Hive Trino with `is_current = TRUE`, `is_active = TRUE`, and `LOWER(tag_name) LIKE '%ipo%'`. Omits `line_name` because that column may be missing on the Hive-synced Trino table.
+
+```sql
+SELECT
+    wa.group_name,
+    wa.tag_name,
+    emp.person_number,
+    emp.name,
+    wa.allocation_fte
+FROM dw_workforce_allocation.fact_workforce_allocations AS wa
+INNER JOIN dw_people.dim_employee AS emp
+    ON wa.person_number = emp.person_number
+WHERE wa.is_current = TRUE
+    AND wa.is_active = TRUE
+    AND LOWER(wa.tag_name) LIKE '%ipo%'
+ORDER BY wa.group_name, emp.name
+```
+
+In Trino (catalog `delta`), qualify as `hive.dw_workforce_allocation.fact_workforce_allocations` and `hive.dw_people.dim_employee`. Canonical tag example: `tag_name = 'IPO-readiness'`.
 
 Project tags held by one employee on a reference date (tag history — point in time):
 
@@ -512,7 +532,7 @@ GROUP BY tag_name
 ORDER BY allocated_fte DESC, tag_name
 ```
 
-> **Note:** Replace the literal reference date. In Trino, qualify with the `delta` catalog when needed (`delta.dw_workforce_allocation.fact_workforce_allocations`). Date literals use `DATE 'YYYY-MM-DD'`.
+> **Note:** Replace the literal reference date. In Trino, catalog is `delta`; qualify tables as `hive.dw_workforce_allocation.fact_workforce_allocations` and `hive.dw_people.dim_employee`. Date literals use `DATE 'YYYY-MM-DD'`. Prefer `LOWER(tag_name) LIKE '%ipo%'` over `ILIKE` in TARS SQL. When Hive still lacks `line_name`, keep that column out of the SELECT.
 
 ## DataHub catalog
 
