@@ -2,6 +2,7 @@ WITH agent_accreditation_events AS (
     SELECT
         events.id_unified_agent,
         events.event,
+        events.is_active,
         ROW_NUMBER() OVER (PARTITION BY events.id_unified_agent, DATE(events.ts_created) ORDER BY events.ts_created DESC) = 1 AS is_lastest_by_date,
         events.ts_created AS ts_started,
         COALESCE(LEAD(events.ts_created) OVER (PARTITION BY events.id_unified_agent ORDER BY events.ts_created) - INTERVAL 1 DAY, '{load_end_date}') AS ts_ended
@@ -18,6 +19,7 @@ agent_base AS (
         aui.id_user,
         aui.sk_broker,
         aui.uuid_person,
+        events.is_active,
         EXPLODE(SEQUENCE(
             DATE(events.ts_started), 
             DATE(
@@ -41,8 +43,10 @@ agent_base AS (
                 AND DATE(events.ts_started) <= DATE('{load_end_date}')
                 AND DATE(events.ts_ended) >= DATE('{load_start_date}')
             )
-            OR (events.event = "INACTIVATED" 
-            AND DATE(events.ts_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
+            OR (
+                events.event = "INACTIVATED" 
+                AND DATE(events.ts_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+            )
         )
 ),
 partner_type AS (
@@ -63,26 +67,6 @@ partner_type AS (
     WHERE
         events.source = 'PARTNER_DATA'
     GROUP BY 1, 2, 3
-),
-agent_activity AS (
-    SELECT
-        base.id_unified_agent,
-        events.is_active,
-        events.ts_created AS ts_started,
-        LEAD(events.ts_created) OVER(PARTITION BY base.id_unified_agent ORDER BY events.ts_created) AS ts_ended
-    FROM
-        agent_base AS base
-    JOIN
-        datalake_ebdb_agent_events.agent_accreditation_events AS events
-            ON base.id_unified_agent = events.id_unified_agent
-),
-daily_activity AS (
-    SELECT
-        aa.id_unified_agent,
-        aa.is_active,
-        EXPLODE(SEQUENCE(DATE(aa.ts_started), DATE(COALESCE(aa.ts_ended, '{load_end_date}')))) AS dt_reference
-    FROM
-        agent_activity AS aa
 ),
 daily_capability AS (
     SELECT
@@ -220,7 +204,7 @@ SELECT
         IF(agent_bc.is_allow_demand_sale IS TRUE, 'SALE', NULL),
         IF(agent_bc.is_allow_demand_rent IS TRUE, 'RENT', NULL)
     ) AS business_context,
-    da.is_active,
+    base.is_active,
     MAX(COALESCE(receiver.is_passive_lead_receiver, agent_cap.is_passive_lead_receiver, FALSE)) AS is_passive_lead_receiver,
     MAX(COALESCE(agent_cap.is_allow_supply_acquisition, pt_type.is_allow_supply_acquisition, FALSE)) AS is_allow_supply_acquisition,
     MAX(COALESCE(agent_cap.is_allow_demand_visit_management, ag_type.profile = 'Visita', FALSE)) AS is_allow_demand_visit_management,
@@ -243,10 +227,6 @@ LEFT JOIN
     agent_capability AS agent_cap
         ON base.id_agent = agent_cap.id_agent
         AND base.dt_reference = agent_cap.dt_reference
-LEFT JOIN
-    daily_activity AS da
-        ON base.id_unified_agent = da.id_unified_agent
-        AND base.dt_reference = da.dt_reference
 LEFT JOIN
     business_context_daily AS agent_bc
         ON base.id_unified_agent = agent_bc.id_unified_agent

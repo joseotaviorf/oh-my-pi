@@ -5,8 +5,9 @@ domain: Agents
 owner: anne.macedo@quintoandar.com.br
 description: |
   Daily point-in-time snapshot of agent capabilities, business context, and lead referral
-  flags. One row per unified agent per reference date, expanding each accreditation window
-  from ts_accreditation through ts_deaccreditation via SEQUENCE. Reconstructs capability
+  flags. One row per unified agent per reference date, built from accreditation event
+  segments (latest event per day) intersecting the load window, plus a single
+  INACTIVATED day when deaccreditation falls in the window. Reconstructs capability
   enablement from capability_events, demand sale/rent flags from business_context revision
   intervals, legacy profile types from agent_profile, partner autonomous-agent flags,
   passive lead receiver history, and TQA/TQC referral invite status. Consumed by
@@ -62,9 +63,11 @@ columns:
   is_active:
     lineage:
       - datalake_ebdb_agent_events.agent_accreditation_events.is_active
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
     description: |
-      True when the agent is in an active accreditation status window on the reference date,
-      built from accreditation event segments expanded to daily grain.
+      Accreditation active flag on the reference date, taken from the is_active value on the
+      segment-start accreditation event that generates dt_reference (constant within each
+      event segment).
   is_passive_lead_receiver:
     lineage:
       - datalake_ebdb_agent_events.capability_events.is_passive_lead_receiver
@@ -188,6 +191,9 @@ columns:
   dt_reference:
     lineage:
       - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+      - datalake_ebdb_agent_events.agent_accreditation_events.event
     description: |
-      Reference calendar date of the daily snapshot, one day per row between ts_accreditation
-      and ts_deaccreditation (or load_end_date when still active). Joinable with dw_public.dim_date.
+      Reference calendar date of the daily snapshot. Expanded from accreditation event segments
+      whose [ts_started, ts_ended] interval intersects the load window, plus the
+      INACTIVATED event day when deaccreditation occurs in the window. Joinable with
+      dw_public.dim_date.

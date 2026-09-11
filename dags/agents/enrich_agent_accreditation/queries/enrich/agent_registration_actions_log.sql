@@ -75,12 +75,12 @@ other_actions AS (
         "Performance Profile Update" AS action,
         NULL AS business_context,
         ap.profile,
-        ap.ts_revision AS ts_revision_started,
-        ap.dt_started AS dt_revision
+        ap.ts_revision_started,
+        DATE(ap.ts_revision_started) AS dt_revision
     FROM
         datalake_agent_accreditation.agent_profile AS ap
     WHERE
-        ap.dt_started BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        DATE(ap.ts_revision_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         bc.id_agent,
@@ -151,7 +151,7 @@ actions AS (
             AND bc.is_last_update_by_date IS TRUE
     LEFT JOIN
         datalake_agent_accreditation.agent_profile AS ap -- profile interval
-            ON ap.id_agent = ac.id_agent
+            ON ap.id_agent_data = ac.id_agent
             AND ac.dt_revision BETWEEN DATE(ap.ts_revision_started) 
             AND COALESCE(
                 DATE(ap.ts_revision_ended - INTERVAL 1 DAY), 

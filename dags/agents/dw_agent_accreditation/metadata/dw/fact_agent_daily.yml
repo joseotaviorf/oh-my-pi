@@ -63,7 +63,7 @@ columns:
   is_agent_active:
     description: |
       True when the agent is in an active accreditation status window on the reference date,
-      derived from agent_history daily activity segments.
+      propagated from agent_history.is_active (accreditation event-segment grain).
     lineage:
       - datalake_agent_accreditation.agent_history.is_active
   is_reactivated:

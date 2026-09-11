@@ -49,7 +49,12 @@ columns:
   agent_profile:
     lineage:
       - datalake_agent_accreditation.agent_profile.profile
-    description: "Agent's performance profile"
+      - datalake_agent_accreditation.agent_profile.id_agent_data
+      - datalake_agent_accreditation.agent_profile.ts_revision_started
+      - datalake_agent_accreditation.agent_profile.ts_revision_ended
+    description: |
+      Agent performance profile at the action date, joined from agent_profile intervals on
+      id_agent_data when the revision date falls within ts_revision_started/ts_revision_ended.
     categories:
       Visit: Agents who are responsible for conducting property visits
       Inspection: Agents responsible for conducting property inspections before the tenant moves into the property and after the end of the contract
@@ -76,6 +81,8 @@ columns:
       "De-accreditation": "The agent's accreditation has been revoked, making them ineligible to operate."
       "Re-accreditation": "The agent has been re-accredited after a previous de-accreditation, restoring their ability to operate."
       "Record Updated": "Changes have been made to the agent's registration details, such as profile information or credentials."
+      "Business Context Update": "The agent business context (SALE/RENT) was updated on the revision date."
+      "Performance Profile Update": "A legacy performance profile type (Visita, Vistoria, etc.) was added or changed on the revision date."
   is_active:
     lineage:
       - datalake_agent_accreditation.agent_accreditation.is_active
@@ -83,8 +90,16 @@ columns:
   ts_revision:
     lineage:
       - datalake_agent_accreditation.agent_accreditation.ts_revision_started
-    description: Timestamp when the registration action revision occurred.
+      - datalake_agent_accreditation.agent_profile.ts_revision_started
+      - datalake_agent_accreditation.business_context.ts_revision_started
+    description: |
+      Timestamp when the registration action revision occurred. For Performance Profile and
+      Business Context Update actions, uses the profile or business_context revision start.
   dt_action:
     lineage:
       - datalake_agent_accreditation.agent_accreditation.ts_revision_started
-    description: Date when the action was performed on the Agent's registry
+      - datalake_agent_accreditation.agent_profile.ts_revision_started
+      - datalake_agent_accreditation.business_context.ts_revision_started
+    description: |
+      Calendar date when the action was performed on the agent registry, derived from the
+      revision timestamp of the underlying accreditation, profile, or business_context event.
