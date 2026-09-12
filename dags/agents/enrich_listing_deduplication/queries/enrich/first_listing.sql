@@ -51,7 +51,7 @@ first_listing AS (
         u.ts_first_unpublished,
         GREATEST(
             lbc.ts_first_listing,
-            hlc.ts_enrollment_started,
+            TIMESTAMP(hlc.ts_enrollment_started),
             COALESCE(so.ts_sale_agreement_signed, rde.ts_event),
             u.ts_first_unpublished
         ) AS ts_updated
