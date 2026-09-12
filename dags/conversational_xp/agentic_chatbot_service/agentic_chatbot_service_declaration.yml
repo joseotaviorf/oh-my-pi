@@ -17,6 +17,8 @@ workflow:
     traces:
       # append-only history: ignore the operational table's purge DELETEs so they never erase lake history.
       has_soft_delete: true
+      # the operational PK (`id`) is not projected into clean; `event_id` is the invocation merge key.
+      clean_primary_keys: [event_id]
     agentic_sessions:
       clean_table_name: sessions
     nudges: {}
