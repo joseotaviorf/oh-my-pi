@@ -5,10 +5,25 @@
 
 DAG:
   equals:
+    bietlejuice.agentic_chatbot_service:
+      reason: "Temporary while we validate naming changes in the raw/clean DAG, metric structure, and adapt DAGs to the new datalake naming conventions in the near future."
+      deadline: Never
+      created_by: william.angelo@quintoandar.com.br
+      approved_by: william.angelo@quintoandar.com.br
     bietlejuice.demand_balancer_service:
       reason: "Pipeline owned by Data Science/MLOps teams."
       deadline: Never
       created_by: isadora.gallerani@quintoandar.com.br
+      approved_by: william.angelo@quintoandar.com.br
+    bietlejuice.enrich_agentic_platform:
+      reason: "Temporary while we validate naming changes in the raw/clean DAG, metric structure, and adapt DAGs to the new datalake naming conventions in the near future. Upstream of metric_agentic_platform."
+      deadline: Never
+      created_by: william.angelo@quintoandar.com.br
+      approved_by: william.angelo@quintoandar.com.br
+    bietlejuice.metric_agentic_platform:
+      reason: "Temporary while we validate naming changes in the raw/clean DAG, metric structure, and adapt DAGs to the new datalake naming conventions in the near future."
+      deadline: Never
+      created_by: william.angelo@quintoandar.com.br
       approved_by: william.angelo@quintoandar.com.br
     bietlejuice.reverse_demand_classifieds_ranking:
       reason: "Reverse pipeline owned by Data Science/MLOps teams."
