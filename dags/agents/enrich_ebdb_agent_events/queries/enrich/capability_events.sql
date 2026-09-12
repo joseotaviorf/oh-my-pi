@@ -58,6 +58,50 @@ capability_events AS (
             AND log.dt_reference BETWEEN DATE(settings.ts_started) AND DATE(COALESCE(settings.ts_ended, NOW()))
             AND settings.is_last_update_by_date IS TRUE
     GROUP BY 1, 2, 3, 4, 5, 6, 7
+),
+-- merge_on is (id_event_log, id_agent) with id_event_log = XXHASH64(id_capability, ts_updated).
+-- The LEFT JOIN to settings can emit a log-only row and a settings-enriched row at the same
+-- timestamp; keep the settings-enriched revision so Delta MERGE is unique.
+capability_events_ranked AS (
+    SELECT
+        id_agent,
+        id_capability,
+        id_capability_settings,
+        business_context,
+        is_passive_lead_receiver,
+        is_capability_active,
+        ts_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                id_agent,
+                id_capability,
+                ts_updated
+            ORDER BY
+                CASE
+                    WHEN id_capability_settings IS NOT NULL THEN 0
+                    ELSE 1
+                END,
+                CASE
+                    WHEN business_context IS NOT NULL THEN 0
+                    ELSE 1
+                END
+        ) AS event_rank
+    FROM
+        capability_events
+),
+capability_events_deduped AS (
+    SELECT
+        id_agent,
+        id_capability,
+        id_capability_settings,
+        business_context,
+        is_passive_lead_receiver,
+        is_capability_active,
+        ts_updated
+    FROM
+        capability_events_ranked
+    WHERE
+        event_rank = 1
 )
 SELECT
     XXHASH64(event.id_capability, event.ts_updated) AS id_event_log,
@@ -74,7 +118,7 @@ SELECT
     event.ts_updated AS ts_started,
     LEAD(event.ts_updated) OVER(PARTITION BY event.id_capability ORDER BY event.ts_updated) AS ts_ended
 FROM
-    capability_events AS event
+    capability_events_deduped AS event
 JOIN
     datalake_ebdb_clean.capability AS c
         ON c.id = event.id_capability

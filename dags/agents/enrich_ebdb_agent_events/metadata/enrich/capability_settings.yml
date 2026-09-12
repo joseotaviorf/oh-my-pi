@@ -7,6 +7,8 @@ description: |
   Historical event log of Demand Visit Management capability settings changes per agent.
   Each row captures one CDC revision of a capability settings record, including business context,
   passive lead receiver flag, and validity interval derived from consecutive updates.
+  CREATE and UPDATE CDC rows that share the same (id, updated_at) are collapsed to one revision
+  (UPDATE preferred) so Delta MERGE on id_event_log stays unique.
 columns:
   id_event_log:
     lineage:
@@ -14,7 +16,9 @@ columns:
       - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.updated_at
     description: |
       Unique identifier for the capability settings revision, generated with XXHASH64
-      from the settings record id and update timestamp.
+      from the settings record id and update timestamp. CDC CREATE/UPDATE rows that share
+      the same instant are reduced to one revision (UPDATE preferred) so the merge key
+      stays unique.
   id_agent:
     lineage:
       - datalake_ebdb_clean.capability.id_agent
