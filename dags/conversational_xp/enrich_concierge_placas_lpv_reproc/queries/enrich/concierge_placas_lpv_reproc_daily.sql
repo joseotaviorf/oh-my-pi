@@ -138,7 +138,10 @@ recent_lpv_trigger AS (
     WHERE
         (
             action = 'ConciergeSharedLpvAdsTrigger'
-            OR template = 'concierge_placas_agents_reproc_trigger'
+            OR template IN (
+                'concierge_placas_agents_reproc_trigger',
+                'concierge_placas_reply_sfmc'
+            )
         )
         AND DATE(ts_sent) >= DATE_SUB(CURRENT_DATE(), {days_trigger_cooldown})
         AND id_user IS NOT NULL
