@@ -1,0 +1,71 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: human_support_content
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores human support content information from the knowledge-base service"
+columns:
+  id:
+    description: "The human support content identifier"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.id
+  id_content:
+    description: "FK to the knowledge-base content item this content belongs to."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.content_id
+  id_quick_questions:
+    description: "The quick questions identifier (foreign key to quick_questions)"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.quick_questions_id
+  title:
+    description: "Human-readable title of the human support content item."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.title
+  country:
+    description: "JSON field containing country information"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.country
+  customer_type:
+    description: "JSON field containing customer type information"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.customer_type
+  taxonomy:
+    description: "Taxonomy associated with the human support content"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.taxonomy
+  link_to_training:
+    description: "Optional URL pointing to internal training material for this article."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.link_to_training
+  status:
+    description: "Publication status controlling visibility of this content."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.status
+  support_analyst_faq:
+    description: "JSON field containing the support analyst FAQ"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.support_analyst_faq
+  content_type:
+    description: "Content type of the human support article"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.type
+  resume:
+    description: "Short summary of the human support content"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.resume
+  slug:
+    description: "URL slug of the human support content"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.slug
+  needs_update_tsv_body:
+    description: "Boolean flag indicating the search index needs an update"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.needs_update_tsv_body
+  ts_updated:
+    description: "The timestamp when the content was last updated"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.updated_at
+  ts_created:
+    description: "The timestamp when the content was created"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content.created_at

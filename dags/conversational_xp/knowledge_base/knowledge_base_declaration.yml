@@ -18,8 +18,20 @@ workflow:
       clean_primary_keys: [id]
     bot_content_deep_link:
       clean_primary_keys: [id_bot_content, id_deep_link]
+    common_information:
+      clean_primary_keys: [id]
     deep_link:
       clean_primary_keys: [id]
+    human_support_category:
+      clean_primary_keys: [id]
+    human_support_category_children:
+      clean_primary_keys: [id_parent, id_child]
+    human_support_content:
+      clean_primary_keys: [id]
+    human_support_content_category:
+      clean_primary_keys: [id_human_support_content, id_human_support_category]
+    human_support_favorites:
+      clean_primary_keys: [id_user, id_article]
     meta_information:
       clean_primary_keys: [id]
     meta_information_bot_content:

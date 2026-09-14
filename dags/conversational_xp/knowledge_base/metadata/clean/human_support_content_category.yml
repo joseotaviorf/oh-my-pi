@@ -1,0 +1,19 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: human_support_content_category
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores the relationship between human support content and categories"
+columns:
+  id_human_support_content:
+    description: "The human support content identifier (foreign key to human_support_content)"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content_category.human_support_content_id
+  id_human_support_category:
+    description: "The human support category identifier (foreign key to human_support_category)"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content_category.human_support_category_id
+  category_order:
+    description: "Display position of this content within the category; lower values appear first."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_content_category.category_order

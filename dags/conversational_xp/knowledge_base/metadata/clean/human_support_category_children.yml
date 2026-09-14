@@ -1,0 +1,19 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: human_support_category_children
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores the parent-child relationship between human support categories"
+columns:
+  id_parent:
+    description: "The parent category identifier (foreign key to human_support_category)"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category_children.parent_id
+  id_child:
+    description: "The child category identifier (foreign key to human_support_category)"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category_children.child_id
+  child_order:
+    description: "Display position of this child within the parent category; lower values appear first."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category_children.child_order

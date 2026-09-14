@@ -1,0 +1,27 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: human_support_favorites
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores favorited human support articles from the knowledge-base service"
+columns:
+  id_user:
+    description: "The user identifier of the analyst who favorited the article"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_favorites.user_id
+  id_article:
+    description: "The article identifier (foreign key to human_support_content)"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_favorites.article_id
+  status:
+    description: "Publication status controlling visibility of this favorite."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_favorites.status
+  ts_updated:
+    description: "The timestamp when the favorite was last updated"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_favorites.updated_at
+  ts_created:
+    description: "The timestamp when the favorite was created"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_favorites.created_at

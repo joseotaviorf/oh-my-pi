@@ -1,0 +1,39 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: common_information
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores common information from the knowledge-base service"
+columns:
+  id:
+    description: "The common information identifier"
+    lineage:
+    - datalake_knowledge_base_raw.common_information.id
+  id_content:
+    description: "FK to the knowledge-base content item this record belongs to."
+    lineage:
+    - datalake_knowledge_base_raw.common_information.content_id
+  information_type:
+    description: "Type of the common information record"
+    lineage:
+    - datalake_knowledge_base_raw.common_information.type
+  title:
+    description: "Human-readable title of the common information item."
+    lineage:
+    - datalake_knowledge_base_raw.common_information.title
+  content:
+    description: "JSON field containing the common information content"
+    lineage:
+    - datalake_knowledge_base_raw.common_information.content
+  status:
+    description: "Publication status controlling visibility of this record."
+    lineage:
+    - datalake_knowledge_base_raw.common_information.status
+  ts_updated:
+    description: "The timestamp when the record was last updated"
+    lineage:
+    - datalake_knowledge_base_raw.common_information.updated_at
+  ts_created:
+    description: "The timestamp when the record was created"
+    lineage:
+    - datalake_knowledge_base_raw.common_information.created_at

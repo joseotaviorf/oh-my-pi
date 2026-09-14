@@ -1,0 +1,31 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: human_support_category
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores human support category information from the knowledge-base service"
+columns:
+  id:
+    description: "The human support category identifier"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category.id
+  id_content:
+    description: "FK to the knowledge-base content item this category belongs to."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category.content_id
+  title:
+    description: "Human-readable name displayed in the human support category tree."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category.title
+  status:
+    description: "Publication status controlling visibility of this category."
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category.status
+  ts_updated:
+    description: "The timestamp when the category was last updated"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category.updated_at
+  ts_created:
+    description: "The timestamp when the category was created"
+    lineage:
+    - datalake_knowledge_base_raw.human_support_category.created_at
