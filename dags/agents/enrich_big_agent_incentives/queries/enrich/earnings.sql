@@ -61,7 +61,7 @@ sales_flow_offer AS (
         h.id_external AS id_house,
         o.id_hub AS id_business_unit,
         fee.brokerage_fee,
-        ccv.ts_signed AS ts_contract_signed
+        MAX(ccv.ts_signed) AS ts_contract_signed
     FROM
         datalake_sales_flow_clean.sales_flow AS sf
     LEFT JOIN
@@ -76,6 +76,8 @@ sales_flow_offer AS (
     LEFT JOIN
         datalake_sales_flow_clean.ccv AS ccv
             ON ccv.id_sales_flow = sf.id
+            AND ccv.ts_signed IS NOT NULL
+    GROUP BY 1, 2, 3, 4, 5
 )
 SELECT DISTINCT
     ne.id AS id_earning,

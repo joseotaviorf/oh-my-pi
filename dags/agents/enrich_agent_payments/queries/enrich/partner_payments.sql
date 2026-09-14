@@ -37,7 +37,7 @@ sales_flow_offer AS (
         sfo.id_firestore AS id_offer,
         sfo.id_sales_flow,
         fee.brokerage_fee,
-        ccv.ts_signed AS ts_contract_signed
+        MAX(ccv.ts_signed) AS ts_contract_signed
     FROM
         datalake_sales_flow_clean.offer AS sfo
     LEFT JOIN
@@ -46,6 +46,8 @@ sales_flow_offer AS (
     LEFT JOIN
         datalake_sales_flow_clean.ccv AS ccv
             ON ccv.id_sales_flow = sfo.id_sales_flow
+            AND ccv.ts_signed IS NOT NULL
+    GROUP BY 1, 2, 3
 ),
 nazare_offer_agent AS (
     SELECT
