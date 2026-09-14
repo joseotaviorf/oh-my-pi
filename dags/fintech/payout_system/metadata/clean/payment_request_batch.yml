@@ -1,0 +1,58 @@
+database_name: datalake_payout_system_clean
+table_name: payment_request_batch
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: >
+  Async bulk ingestion root in payout-system. One row per request that creates
+  N payment_requests, split into chunks. Distinct from bank_submission.batch_id.
+  Grain is one ingestion batch (composite PK id + created_at).
+columns:
+  id:
+    description: Primary key of the ingestion batch (UUIDv7). Pair with ts_created for partition pruning.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.id
+  id_requester:
+    description: Foreign key to requester.id; the origin system that submitted this bulk ingestion.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.requester_id
+  id_idempotency_key:
+    description: Foreign key to the idempotency_keys row that backs this PAYMENT_REQUEST_BATCH operation; null when not keyed.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.idempotency_key_id
+  id_bank_submission:
+    description: Linked bank_submission.id in the VANS flow; null when the batch is not tied to a CNAB submission.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.bank_submission_id
+  status:
+    description: Ingestion lifecycle of the batch in payout-system (RECEIVED before chunks, PROCESSING while workers run, PROCESSED when all chunks finish, FAILED on unrecoverable sync-phase error).
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.status
+    categories:
+      RECEIVED: Batch created in the sync phase, before chunks are published to workers.
+      PROCESSING: Chunks published to SQS; workers are creating payment_requests.
+      PROCESSED: All chunks reached DONE or DONE_WITH_ERRORS; gate for send-file.
+      FAILED: Unrecoverable error in the sync phase (for example VANS failed).
+  total_payments:
+    description: Total number of payments requested in this ingestion (denominator for chunking).
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.total_payments
+  total_chunks:
+    description: Number of chunks, ceil(total_payments / chunk size). Starts at 0 until the batch is split.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.total_chunks
+  processed_chunks:
+    description: Count of chunks that reached a terminal state; equals total_chunks when status is PROCESSED.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.processed_chunks
+  ts_bank_submission_created:
+    description: Partition key of the linked bank_submission for the composite FK; null together with id_bank_submission when unused.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.bank_submission_created_at
+  ts_created:
+    description: Batch creation timestamp UTC and monthly partition key of payment_request_batch.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.created_at
+  ts_updated:
+    description: Last update timestamp UTC of the ingestion batch counters or status.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch.updated_at

@@ -1,0 +1,111 @@
+database_name: datalake_payout_system_clean
+table_name: payout_sync_job
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: >
+  Synchronization jobs from payout-system to Ledger and ERP (SAP). One row per
+  attempt to post a payment_request (or its chargeback) to an external accounting
+  system, including retry state and the original payload. Grain is one sync job
+  (composite PK id + created_at).
+columns:
+  id:
+    description: Primary key of the sync job (UUIDv7). Pair with ts_created for partition pruning.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.id
+  id_payment_request:
+    description: Foreign key to payment_request.id; the payment this sync job is accounting for.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.payment_request_id
+  id_charge_back_of:
+    description: Self-FK to the original PAID payout_sync_job.id this row reverses; null when the job is not a chargeback.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.charge_back_of
+  id_correlation:
+    description: Correlation identifier used to stitch this sync job across distributed traces.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.correlation_id
+  id_external:
+    description: Identifier returned or assigned by the external system (Ledger or SAP) for this operation; null before the first successful call.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.external_id
+  type:
+    description: Kind of sync operation issued by payout-system (ledger posting versus ERP payment sync).
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.type
+    categories:
+      LEDGER_TRANSACTION: Post the payment as a ledger transaction.
+      ERP_PAYMENT_SYNC: Sync the payment into SAP via ERP Gateway.
+  target_system:
+    description: External system this job talks to (LEDGER or ERP_SAP).
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.target_system
+    categories:
+      LEDGER: Internal ledger worker / accounting ledger.
+      ERP_SAP: SAP via ERP Gateway.
+  status:
+    description: Current sync job status in payout-system (queued, running, completed, failed, cancelled, or skipped).
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.status
+    categories:
+      PENDING: Job created and waiting to be picked up.
+      IN_PROGRESS: Call to the target system is in flight.
+      COMPLETED: Target system accepted the operation.
+      FAILED: Last attempt failed; may still be retryable.
+      CANCELLED: Job was cancelled and will not be retried.
+      SKIPPED: Job was intentionally not sent (for example disabled flow).
+  payload:
+    description: JSON body sent to the external system API for this job.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.payload
+  error_details:
+    description: JSON with error information after failed attempts; null when the job has not failed.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.error_details
+  retry_count:
+    description: Number of retry attempts already made against the target system.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.retry_count
+  max_retries:
+    description: Maximum retry attempts allowed for this job (default 5 in payout-system).
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.max_retries
+  hash:
+    description: Hash of the payload used to deduplicate equivalent sync operations.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.hash
+  trace_id:
+    description: OpenTelemetry (or equivalent) trace identifier for this sync request.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.trace_id
+  external_response:
+    description: JSON response received from the external system; empty object when none was stored.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.external_response
+  is_retryable:
+    description: Whether payout-system may retry this job after a failure.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.retryable
+  ts_payment_request_created:
+    description: Partition key (created_at) of the parent payment_request, required for the composite FK.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.payment_request_created_at
+  ts_charge_back_of_created:
+    description: Partition key (created_at) of the original PAID sync job for the composite self-FK; null when not a chargeback.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.charge_back_of_created_at
+  ts_created:
+    description: Job creation timestamp UTC and monthly partition key of payout_sync_job.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.created_at
+  ts_updated:
+    description: Last update timestamp UTC of status, retries, or response fields.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.updated_at
+  ts_synced:
+    description: Timestamp UTC of successful sync completion; null until the job completes.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.synced_at
+  ts_next_retry:
+    description: Scheduled timestamp UTC for the next retry; null when no retry is scheduled.
+    lineage:
+      - datalake_payout_system_raw.payout_sync_job.next_retry_at

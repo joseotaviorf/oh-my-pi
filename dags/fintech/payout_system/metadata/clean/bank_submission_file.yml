@@ -1,0 +1,37 @@
+database_name: datalake_payout_system_clean
+table_name: bank_submission_file
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: >
+  CNAB (or related bank) files attached to a payout-system bank_submission.
+  One row per file version linked to a submission batch; used to trace which
+  document was generated and when it was successfully sent to VANS.
+columns:
+  id:
+    description: Primary key of the bank submission file (UUIDv7 generated in payout-system).
+    lineage:
+      - datalake_payout_system_raw.bank_submission_file.id
+  id_bank_submission:
+    description: Foreign key to bank_submission.id; the batch this file belongs to.
+    lineage:
+      - datalake_payout_system_raw.bank_submission_file.bank_submission_id
+  id_file:
+    description: Identifier of the file object stored for this submission (upstream file_id).
+    lineage:
+      - datalake_payout_system_raw.bank_submission_file.file_id
+  file_name:
+    description: File name as registered on the bank submission (typically the CNAB name).
+    lineage:
+      - datalake_payout_system_raw.bank_submission_file.file_name
+  ts_bank_submission_created:
+    description: Partition key (created_at) of the parent bank_submission, required for the composite FK.
+    lineage:
+      - datalake_payout_system_raw.bank_submission_file.bank_submission_created_at
+  ts_changed:
+    description: Timestamp UTC of the last change to this file row in payout-system.
+    lineage:
+      - datalake_payout_system_raw.bank_submission_file.changed_at
+  ts_sent:
+    description: Timestamp UTC when the file was successfully sent to VANS; null means it has not been sent yet.
+    lineage:
+      - datalake_payout_system_raw.bank_submission_file.sent_at

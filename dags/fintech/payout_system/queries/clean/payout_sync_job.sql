@@ -1,0 +1,25 @@
+SELECT
+    id,
+    payment_request_id AS id_payment_request,
+    charge_back_of AS id_charge_back_of,
+    correlation_id AS id_correlation,
+    external_id AS id_external,
+    type,
+    target_system,
+    status,
+    payload,
+    error_details,
+    retry_count,
+    max_retries,
+    hash,
+    trace_id,
+    external_response,
+    retryable AS is_retryable,
+    TIMESTAMP(payment_request_created_at) AS ts_payment_request_created,
+    TIMESTAMP(charge_back_of_created_at) AS ts_charge_back_of_created,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    TIMESTAMP(synced_at) AS ts_synced,
+    TIMESTAMP(next_retry_at) AS ts_next_retry
+FROM
+    datalake_payout_system_raw.payout_sync_job

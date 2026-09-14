@@ -6,7 +6,8 @@ dag:
   documentation:
     dag_purpose: |
       Process data from the Payout System database (PostgreSQL), retrieved using the CDC process.
-      The Payout System manages payment requests, bank submissions, payees, flows, and related
+      The Payout System manages payment requests, bank submissions, payees, flows,
+      async payment-request batch ingestion, Ledger/ERP sync jobs, and related
       audit and status history for fintech payout operations.
 workflow:
   type: cdc
@@ -26,6 +27,7 @@ workflow:
       transactional_datatype_overrides:
         total_amount: decimal(38,20)
     bank_submission_item: {}
+    bank_submission_file: {}
     flow: {}
     payee: {}
     payment_audit_log: {}
@@ -36,6 +38,9 @@ workflow:
       transactional_datatype_overrides:
         due_amount: decimal(38,20)
         paid_amount: decimal(38,20)
+    payment_request_batch: {}
+    payment_request_batch_chunk: {}
     payment_status_history: {}
+    payout_sync_job: {}
     reason: {}
     requester_payment_method: {}

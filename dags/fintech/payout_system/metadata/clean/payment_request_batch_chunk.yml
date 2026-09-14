@@ -1,0 +1,63 @@
+database_name: datalake_payout_system_clean
+table_name: payment_request_batch_chunk
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: >
+  Unit of work for async payment_request ingestion in payout-system. One row
+  per chunk (~200 payments) of a payment_request_batch. Workers lock a chunk,
+  create payment_requests, then mark DONE or DONE_WITH_ERRORS. Grain is one
+  chunk (composite PK id + created_at).
+columns:
+  id:
+    description: Primary key of the chunk (UUIDv7). Pair with ts_created for partition pruning.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.id
+  id_batch:
+    description: Foreign key to payment_request_batch.id (composite with ts_batch_created).
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.batch_id
+  chunk_index:
+    description: Zero-based index of this chunk inside its parent batch (0 is the first slice).
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.chunk_index
+  status:
+    description: Worker lifecycle of the chunk (PENDING, IN_PROGRESS while locked, DONE if all payments created, DONE_WITH_ERRORS when some payments failed validation). SQS DLQ is the dead-letter; there is no FAILED status.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.status
+    categories:
+      PENDING: Chunk created and not yet picked up by a worker.
+      IN_PROGRESS: Locked by a worker that is creating payment_requests.
+      DONE: All payments in the chunk were created successfully.
+      DONE_WITH_ERRORS: Some payments in the chunk ended as VALIDATION_FAILED.
+  item_count:
+    description: Number of payments carried in this chunk at creation time.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.item_count
+  failed_item_count:
+    description: Count of payments in this chunk that landed in VALIDATION_FAILED.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.failed_item_count
+  last_error:
+    description: Last error message recorded for observability; null when the chunk has no error yet.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.last_error
+  ts_batch_created:
+    description: Partition key (created_at) of the owning payment_request_batch, required for the composite FK.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.batch_created_at
+  ts_locked_until:
+    description: Compare-and-swap lock expiry UTC; a new worker may re-lock after this instant. Null when unlocked.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.locked_until
+  ts_created:
+    description: Chunk creation timestamp UTC and monthly partition key of payment_request_batch_chunk.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.created_at
+  ts_updated:
+    description: Last update timestamp UTC of chunk status, lock, or error fields.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.updated_at
+  payments:
+    description: JSON payload with the payment slice used to dispatch or retry the chunk; set to null after the chunk reaches a terminal status.
+    lineage:
+      - datalake_payout_system_raw.payment_request_batch_chunk.payments
