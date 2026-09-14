@@ -36,6 +36,11 @@ dag:
       `5a-base44-office` bucket as the exports above, under `allocationtool/import/
       public_info.csv`. Same base query as reverse_reports.public_information.
 
+      Fifth export: all_5a_demographics — active All 5A employee demographics
+      for the Rituals app (`ritualsapp/list_of_employees.csv`). Same business
+      columns as reverse_reports.all_5a_demographics (ALL5A1), without lake
+      partition columns in the CSV.
+
       IAM prerequisite per new destination bucket: this DAG runs on EMR under the People
       EMR instance profile (emr_instance_profile_arn_people / emr-people-prod role). Any
       new external bucket added to tables_customization must first grant that role
@@ -105,5 +110,12 @@ workflow:
       extra_spark_job_arguments:
         - "5a-base44-office"
         - "allocationtool/import/public_info.csv"
+        - "csv"
+        - "bucket-owner-full-control"
+    # Active All 5A employee demographics — Rituals app
+    all_5a_demographics:
+      extra_spark_job_arguments:
+        - "5a-base44-office"
+        - "ritualsapp/list_of_employees.csv"
         - "csv"
         - "bucket-owner-full-control"

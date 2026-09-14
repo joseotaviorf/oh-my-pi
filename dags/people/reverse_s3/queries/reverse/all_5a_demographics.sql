@@ -1,4 +1,4 @@
--- Active All 5A employee demographics for the Rituals app (tab ALL5A1).
+-- Active All 5A employee demographics for the Rituals app, exported as S3 CSV.
 SELECT
     es.name AS nome,
     LOWER(es.work_email) AS email,
@@ -27,10 +27,7 @@ SELECT
         WHEN es.is_manager IS TRUE THEN 1
         ELSE 0
     END AS fl_lider,
-    es.access_list AS access_list,
-    YEAR(DATE('{load_start_date}')) AS year,
-    MONTH(DATE('{load_start_date}')) AS month,
-    DAY(DATE('{load_start_date}')) AS day
+    es.access_list AS access_list
 FROM
     metric_people.employee_snapshots AS es
 WHERE
