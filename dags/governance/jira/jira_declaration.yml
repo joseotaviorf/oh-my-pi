@@ -2,7 +2,11 @@ dag:
   name: jira
   owner: Data Governance
   schedule_start_date: 2020, 6, 1
-  schedule_interval: "0 0 * * *"
+  # Two runs/day: 00:00 keeps the original once-daily consumers (enrich_jira_bugs,
+  # enrich_jira_schedules, enrich_health_metrics) on their existing cadence; 08:00 is a
+  # same-day top-up so jira_open_incidents_report (cron 09:00) sees Jira issues created
+  # earlier that morning instead of only yesterday's state.
+  schedule_interval: "0 0,8 * * *"
   documentation:
     dag_purpose: This DAG imports, via API extraction, the tables for Jira, our platform for managing project lifecycles.
 workflow:
@@ -12,7 +16,10 @@ workflow:
   default_extraction_type: incremental
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    # data_interval_end (not data_interval_start): with the 08:00 run this resolves to
+    # "today", so the JQL window (updated BETWEEN load_start_date 00:00 AND load_end_date
+    # 23:59) actually covers same-day updates instead of always stopping at yesterday.
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}" # env
     - "{bucket}" # datalake_bucket

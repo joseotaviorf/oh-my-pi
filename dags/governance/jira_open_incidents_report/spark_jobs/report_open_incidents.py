@@ -1,10 +1,10 @@
 """Daily digest of open DEI incident cards — snapshot to Delta, then notify Google Chat.
 
 Query source: datalake_jira.issues (enrich layer). "Open" = current_status_category != 'Done'.
-Chat body is a Line (incident_owner) leaderboard plus hygiene: unassigned,
-not filled (empty or still the Jira pre-filled template), and
-on going vs backlog from the card workflow status (In Progress / On going vs
-To Do / Backlog). Concluded (Done) is excluded from this open digest.
+Chat card has two blocks: (1) a summary (date, total open, unassigned, not filled)
+and (2) a per-domain (incident_owner) breakdown with only newest/oldest age, each
+domain hyperlinked to its pre-filtered DEI board (all "Tech Platform" domains are
+merged into one unlinked line). Concluded (Done) is excluded from this open digest.
 Notification: Notification Hub generic route (cardsV2 so Chat renders line
 breaks; inmetro nl2br becomes literal ``<br>`` in GChat text).
 Space DAG_Rotation (base URL from spark_jobs/{environment}_conf.yml).
@@ -17,6 +17,7 @@ import re
 from argparse import ArgumentParser, Namespace
 from collections import defaultdict
 from datetime import datetime, timezone
+from urllib.parse import quote
 
 import requests
 import yaml
@@ -39,10 +40,13 @@ GENERIC_WEBHOOK_PATH = "/webhook/generic"
 GCHAT_SPACE = "DAG_Rotation"
 NO_LINE_LABEL = "no owner"
 INCIDENT_TEMPLATE_MARKER = "Incident format template"
-ON_GOING_STATUS_NAMES = frozenset(
-    {"on going", "ongoing", "em andamento", "in progress"}
+TECH_PLATFORM_LABEL = "Tech Platform"
+BOARD_URL_BASE = "https://quintoandar.atlassian.net/issues?filter=31118&jql="
+BOARD_JQL_TEMPLATE = (
+    'project = DEI AND status IN ("In Progress", "To Do") and '
+    '"Incident Owner [Data Engineer][Dropdown]" = "{domain}"\n'
+    "ORDER BY status ASC, created DESC"
 )
-ON_GOING_STATUS_CATEGORIES = frozenset({"in progress"})
 _URL_RE = re.compile(r"https?://\S+", re.I)
 _INSTRUCTIONAL_SNIPPETS = (
     "Here we describe what happened, bringing inputs like which DAG is broken, "
@@ -189,72 +193,122 @@ def _is_description_filled(issue_description) -> bool:
     return True
 
 
-def _is_on_going(current_status, current_status_category=None) -> bool:
-    """Card workflow is being worked (not backlog, not concluded)."""
-    name = str(current_status or "").strip().lower()
-    category = str(current_status_category or "").strip().lower()
-    return name in ON_GOING_STATUS_NAMES or category in ON_GOING_STATUS_CATEGORIES
+def _board_url(domain: str) -> str:
+    jql = BOARD_JQL_TEMPLATE.format(domain=domain)
+    return BOARD_URL_BASE + quote(jql, safe="()")
+
+
+def _domain_breakdown(rows, as_of: datetime) -> list[dict]:
+    """One row per incident_owner, merging every "Tech Platform" domain into one (unlinked)."""
+    ages_by_domain = defaultdict(list)
+    for row in rows:
+        domain = _line_label(row.get("incident_owner"))
+        is_tech_platform = TECH_PLATFORM_LABEL.lower() in domain.lower()
+        merged_key = TECH_PLATFORM_LABEL if is_tech_platform else domain
+        ages_by_domain[merged_key].append(_age_days(row.get("ts_created"), as_of))
+
+    breakdown = []
+    for domain, ages in sorted(
+        ages_by_domain.items(), key=lambda item: (-len(item[1]), item[0].lower())
+    ):
+        known_ages = [age for age in ages if age >= 0]
+        breakdown.append(
+            {
+                "domain": domain,
+                "count": len(ages),
+                "newest": min(known_ages) if known_ages else None,
+                "oldest": max(known_ages) if known_ages else None,
+                "linked": domain not in (TECH_PLATFORM_LABEL, NO_LINE_LABEL),
+            }
+        )
+    return breakdown
+
+
+def _age_text(entry: dict, separator: str) -> str:
+    if entry["newest"] is None:
+        return f"newest: unknown{separator}oldest: unknown"
+    return f"newest: {entry['newest']}d{separator}oldest: {entry['oldest']}d"
 
 
 def _format_message(rows, as_of: datetime) -> str:
+    """Plain-text digest for logs; the GChat card is built separately in `_build_card`."""
     if not rows:
         return f"No open DEI incidents as of {as_of.date().isoformat()}."
 
-    ages_by_line = defaultdict(list)
-    unassigned_by_line = defaultdict(int)
-    unfilled_by_line = defaultdict(int)
-    on_going_by_line = defaultdict(int)
-    for row in rows:
-        line_name = _line_label(row.get("incident_owner"))
-        ages_by_line[line_name].append(_age_days(row.get("ts_created"), as_of))
-        if _is_unassigned(row.get("assignee")):
-            unassigned_by_line[line_name] += 1
-        if not _is_description_filled(row.get("issue_description")):
-            unfilled_by_line[line_name] += 1
-        if _is_on_going(row.get("current_status"), row.get("current_status_category")):
-            on_going_by_line[line_name] += 1
-
-    ranked = sorted(
-        ages_by_line.items(), key=lambda item: (-len(item[1]), item[0].lower())
+    total_unassigned = sum(1 for row in rows if _is_unassigned(row.get("assignee")))
+    total_unfilled = sum(
+        1 for row in rows if not _is_description_filled(row.get("issue_description"))
     )
     lines = [
-        f"Open DEI incidents as of {as_of.date().isoformat()} — {len(rows)} total:"
+        f"Open DEI incidents as of {as_of.date().isoformat()} — {len(rows)} total, "
+        f"{total_unassigned} unassigned, {total_unfilled} not filled:"
     ]
-    for line_name, ages in ranked:
-        known_ages = [age for age in ages if age >= 0]
-        if known_ages:
-            age_part = f" (newest: {min(known_ages)}d, oldest: {max(known_ages)}d)"
-        else:
-            age_part = " (newest: unknown, oldest: unknown)"
-        # GChat wraps at `|`; keep hygiene on the next line, no pipes.
-        hygiene = (
-            f"on going {on_going_by_line[line_name]}"
-            f" · unassigned {unassigned_by_line[line_name]}"
-            f" · not filled {unfilled_by_line[line_name]}"
+    for entry in _domain_breakdown(rows, as_of):
+        lines.append(
+            f"• {entry['domain']}: {entry['count']} opened ({_age_text(entry, ', ')})"
         )
-        lines.append(f"• {line_name}: {len(ages)} opened{age_part}")
-        lines.append(hygiene)
     return "\n".join(lines)
 
 
-def _gchat_cards_v2(message: str) -> dict:
-    """GChat card: textParagraph renders ``<br>``; Hub inmetro text field does not."""
-    header, _, rest = message.partition("\n")
-    body = "<br>".join(
-        raw_line if raw_line.startswith("•") else f"&nbsp;&nbsp;{raw_line}"
-        for raw_line in rest.split("\n")
-        if raw_line
+def _build_card(rows, as_of: datetime) -> dict:
+    """Two-block GChat card: summary section, then per-domain section (linked to its board)."""
+    if not rows:
+        text = f"No open DEI incidents as of {as_of.date().isoformat()}."
+        return {
+            "cardsV2": [
+                {
+                    "cardId": JOB_NAME,
+                    "card": {
+                        "header": {"title": "Open DEI incidents"},
+                        "sections": [{"widgets": [{"textParagraph": {"text": text}}]}],
+                    },
+                }
+            ]
+        }
+
+    total_unassigned = sum(1 for row in rows if _is_unassigned(row.get("assignee")))
+    total_unfilled = sum(
+        1 for row in rows if not _is_description_filled(row.get("issue_description"))
     )
-    paragraph = f"<b>{header}</b>"
-    if body:
-        paragraph = f"{paragraph}<br>{body}"
+    summary_text = (
+        f"Date: {as_of.date().isoformat()}<br>"
+        f"Total open: {len(rows)}<br>"
+        f"Unassigned: {total_unassigned}<br>"
+        f"Not filled: {total_unfilled}"
+    )
+
+    # decoratedText + button (openLink) instead of a raw <a href> in textParagraph:
+    # this exact widget shape already round-trips through Google Chat incoming
+    # webhooks elsewhere in this repo (notify_stale_dags.py, notify_broken_dags.py),
+    # whereas an HTML anchor inside textParagraph text has no verified precedent here.
+    domain_widgets = []
+    for entry in _domain_breakdown(rows, as_of):
+        widget = {
+            "decoratedText": {
+                "text": f"<b>{entry['domain']}</b>: {entry['count']} opened",
+                "bottomLabel": _age_text(entry, " · "),
+            }
+        }
+        if entry["linked"]:
+            widget["decoratedText"]["button"] = {
+                "text": "Open board",
+                "onClick": {"openLink": {"url": _board_url(entry["domain"])}},
+            }
+        domain_widgets.append(widget)
+
     return {
         "cardsV2": [
             {
                 "cardId": JOB_NAME,
                 "card": {
                     "header": {"title": "Open DEI incidents"},
-                    "sections": [{"widgets": [{"textParagraph": {"text": paragraph}}]}],
+                    "sections": [
+                        {
+                            "header": "Summary",
+                            "widgets": [{"textParagraph": {"text": summary_text}}],
+                        },
+                        {"header": "By domain", "widgets": domain_widgets},
+                    ],
                 },
             }
         ]
@@ -293,7 +347,7 @@ def _notification_hub_inmetro_base(dag_name: str, environment: str) -> str | Non
         return None
 
 
-def _notify(dag_name: str, environment: str, message: str, row_count: int) -> None:
+def _notify(dag_name: str, environment: str, rows, as_of: datetime) -> None:
     base_url = _notification_hub_inmetro_base(dag_name, environment)
     if not base_url:
         logging_logger.warning(
@@ -305,9 +359,9 @@ def _notify(dag_name: str, environment: str, message: str, row_count: int) -> No
     generic_base = _generic_webhook_base(base_url)
     separator = "&" if "?" in generic_base else "?"
     webhook_url = f"{generic_base.rstrip('/')}{separator}space={GCHAT_SPACE}"
-    payload = {"space": GCHAT_SPACE, **_gchat_cards_v2(message)}
+    payload = {"space": GCHAT_SPACE, **_build_card(rows, as_of)}
     logging_logger.info(
-        f"m={JOB_NAME}, msg=Posting GChat card, open_incidents={row_count}"
+        f"m={JOB_NAME}, msg=Posting GChat card, open_incidents={len(rows)}"
     )
     try:
         response = requests.post(webhook_url, json=payload, timeout=30)
@@ -333,7 +387,7 @@ def main() -> None:
 
     rows = [row.asDict() for row in open_df.collect()]
     message = _format_message(rows, logical_ts)
-    logging_logger.info(f"m={JOB_NAME}, open_incidents={len(rows)}")
+    logging_logger.info(f"m={JOB_NAME}, open_incidents={len(rows)}, digest={message}")
 
     write_db = f"datalake_{args.schema}"
     table = f"{write_db}.{TABLE_NAME}"
@@ -349,7 +403,7 @@ def main() -> None:
     metastore.refresh_table(write_db, TABLE_NAME)
     logging_logger.info(f"m={JOB_NAME}, table={table}")
 
-    _notify(args.dag_name, args.environment, message, len(rows))
+    _notify(args.dag_name, args.environment, rows, logical_ts)
 
 
 if __name__ == "__main__":

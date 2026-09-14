@@ -3040,7 +3040,7 @@ bietlejuice.enrich_invoice_preview:
 bietlejuice.enrich_iru:
   - bietlejuice.iru:load-clean-managed-devices:first-run-of-day
 bietlejuice.enrich_jira:
-  - bietlejuice.jira:load-clean-issues:first-run-of-day
+  - bietlejuice.jira:load-clean-issues
 bietlejuice.enrich_jira_bugs:
   - bietlejuice.jira:load-clean-issues:first-run-of-day
 bietlejuice.enrich_jira_schedules:

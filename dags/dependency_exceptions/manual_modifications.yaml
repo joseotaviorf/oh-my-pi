@@ -7,6 +7,14 @@ bietlejuice.enrich_agents_matias:
   # Drop the Airflow wait so the muted CDC DAG can stay on the Jira Ops mute list.
   remove:
     - bietlejuice.knowledge_base:load-clean-bot-content:first-run-of-day
+bietlejuice.enrich_jira:
+  # jira now runs at 00:00 AND 08:00 (second run added for jira_open_incidents_report's
+  # 09:00 cron). Swap the default ":first-run-of-day" edge for the plain one so enrich_jira
+  # re-runs after the 08:00 pull too, instead of only reacting to the first run of the day.
+  add:
+    - bietlejuice.jira:load-clean-issues
+  remove:
+    - bietlejuice.jira:load-clean-issues:first-run-of-day
 bietlejuice.amplitude_subpartitioned:
   # Queries read the base Delta table datalake_amplitude_events_clean.events directly (to
   # restore partition pruning) instead of the datalake_amplitude_clean.events SELECT * view

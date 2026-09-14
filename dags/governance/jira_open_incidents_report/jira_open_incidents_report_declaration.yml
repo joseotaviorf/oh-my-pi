@@ -2,14 +2,21 @@ dag:
   name: jira_open_incidents_report
   owner: Data Governance
   schedule_start_date: 2026, 8, 13
+  # Cron, not dataset-triggered: fixed 09:00 delivery so the digest reflects same-day
+  # cards. Relies on jira's 08:00 run + enrich_jira (see dependency_exceptions/
+  # manual_modifications.yaml) finishing within the hour; it does not wait on that
+  # dataset event.
+  schedule_interval: "0 9 * * *"
   documentation:
     dag_purpose: |
       Digest of open DEI incident cards (current_status_category != 'Done').
-      Dataset-triggered after enrich_jira issues (datalake_jira.issues), not cron.
-      Snapshot grain is one row per open incident. Google Chat digest is a
-      Line (incident_owner) leaderboard: count, newest/oldest age, on going
-      (card workflow In Progress), unassigned, not filled. Open =
-      on going + backlog; concluded (Done) is excluded. Posts to space
+      Cron-scheduled at 09:00 America/Sao_Paulo (not dataset-triggered), so delivery
+      time is fixed and does not depend on enrich_jira's dataset chain finishing.
+      Snapshot grain is one row per open incident. Google Chat digest has two blocks:
+      a summary (date, total open, unassigned, not filled) and a per-domain
+      (incident_owner) breakdown with count + newest/oldest age, each domain linked to
+      its pre-filtered DEI board ("Tech Platform" domains merged into one unlinked
+      line). Open = on going + backlog; concluded (Done) is excluded. Posts to space
       "DAG_Rotation" via Notification Hub (generic cardsV2 route, webhook base co-located
       in spark_jobs/{environment}_conf.yml).
 workflow:
