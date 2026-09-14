@@ -4441,6 +4441,8 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-round:first-run-of-day
 bietlejuice.enrich_zscaler:
   - bietlejuice.zscaler:load-clean-managed-devices:first-run-of-day
+bietlejuice.ifrs:
+  - quintoml.fintech.provision_assets.inference:first-run-of-day
 bietlejuice.jira_open_incidents_report:
   - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
 bietlejuice.metric_agentic_platform:

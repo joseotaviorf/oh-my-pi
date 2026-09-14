@@ -1316,6 +1316,9 @@ bietlejuice.dw_rede_supply:
 bietlejuice.offboarding_categorization:
   add:
     - quintoml.post_contract.wall_e_offboarding_categoriser.inference:first-run-of-day
+bietlejuice.ifrs:
+  add:
+    - quintoml.fintech.provision_assets.inference:first-run-of-day
 bietlejuice.vocs_machina:
   add:
     - quintoml.post_contract.vocs_machina.inference:first-run-of-day

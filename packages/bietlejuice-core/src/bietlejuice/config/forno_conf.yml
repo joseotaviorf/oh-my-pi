@@ -42,6 +42,7 @@ dags_out_of_pattern:
         "quintoml.concierge.concierge_propensity_model_batch.inference",
         "quintoml.copilot.text2filter_evals.inference",
         "quintoml.concierge.text2rank_cross_encoder_dataset.inference",
+        "quintoml.fintech.provision_assets.inference",
         "quintoml.post_contract.vocs_machina.inference",
         "quintoml.post_contract.wall_e_offboarding_categoriser.inference",
         "quintoml.recs.house_user_embeddings.inference",

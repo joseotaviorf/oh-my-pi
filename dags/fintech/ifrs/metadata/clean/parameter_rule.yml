@@ -1,0 +1,35 @@
+---
+database_name: datalake_ifrs_clean
+table_name: parameter_rule
+description: |
+  Versioned provision rule definitions used by the IFRS ECL batch models. Each row describes
+  a rule set (PD or EAD/LGD lookup) with effective application dates. Finance and model
+  teams use this reference when reconciling id_pd_rule and id_ead_lgd_rule in ecl_asset and
+  ecl_liability outputs against the active rule catalog at each monthly closing.
+domain: Fintech
+owner: marcos.mota@quintoandar.com.br
+columns:
+  id_provision_rule:
+    description: Identifier of the provision rule set (matches id_pd_rule or id_ead_lgd_rule).
+    lineage:
+      - datalake_ifrs_raw.parameter_rule.sk_provision_rule
+  rule_name:
+    description: Human-readable name of the provision rule set for audit documentation.
+    lineage:
+      - datalake_ifrs_raw.parameter_rule.rules_name
+  rule_type:
+    description: Category of the rule (for example PD lookup, EAD, or LGD parameter table).
+    lineage:
+      - datalake_ifrs_raw.parameter_rule.rule_type
+  rules:
+    description: JSON or serialized rule definition payload exported from the rule catalog.
+    lineage:
+      - datalake_ifrs_raw.parameter_rule.rules
+  dt_begin_application:
+    description: First calendar date when this rule version is valid for ECL calculations.
+    lineage:
+      - datalake_ifrs_raw.parameter_rule.begin_date_application
+  dt_end_application:
+    description: Last calendar date when this rule version applies; null when still active.
+    lineage:
+      - datalake_ifrs_raw.parameter_rule.end_date_application

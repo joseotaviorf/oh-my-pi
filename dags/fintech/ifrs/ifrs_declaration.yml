@@ -1,0 +1,54 @@
+dag:
+  name: ifrs
+  schedule_start_date: 2020, 11, 1
+  catchup: false
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Ingests IFRS 9 expected credit loss (ECL) batch model outputs from QuintoML batch
+      prediction (data-science S3) into the datalake. Loads ecl_asset_runs (invoice-level asset
+      ECL, one row per model run), ecl_liability_runs (contract-level liability ECL, one row per
+      model run), and parameter_rule (provision rule definitions). Downstream DW and audit
+      pipelines (dw_audit_ifrs, dw_losses) consume the clean tables for monthly closing and
+      regulatory reporting; the latest run per closing date is exposed via the *_latest tables.
+
+      Scheduling: dataset-driven (no cron). Triggered after
+      quintoml.fintech.provision_assets.inference emits its :first-run-of-day dataset.
+      See dags/dependencies.yaml. Automated runs ingest the logical date from
+      data_interval_start; backfill via DagRun conf with load_start_date and load_end_date.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_ifrs_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{table_name}"
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    ecl_asset_runs:
+      partitions: [year, month, day]
+    ecl_liability_runs:
+      partitions: [year, month, day]
+    ecl_asset_latest:
+      # Derived clean view: latest run per (id_invoice, id_contract, dt_closing).
+      # No S3 source of its own — reads datalake_ifrs_raw.ecl_asset_runs, so it only
+      # gets a clean task, ordered after the ecl_asset_runs raw load.
+      raw_table_dependency: ecl_asset_runs
+      extraction_type: full
+      partitions: []
+    ecl_liability_latest:
+      # Derived clean view: latest run per (id_contract, dt_closing).
+      raw_table_dependency: ecl_liability_runs
+      extraction_type: full
+      partitions: []
+    parameter_rule:
+      extraction_type: full
+      partitions: []

@@ -1,0 +1,152 @@
+---
+database_name: datalake_ifrs_clean
+table_name: ecl_asset_latest
+description: |
+  Current invoice-level IFRS 9 expected credit loss (ECL) asset view: the latest model run
+  per (id_contract, id_invoice, dt_closing), picked by the most recent ts_loaded from
+  ecl_asset_runs. Grain is one row per contract, invoice, and monthly closing date. Finance
+  and audit teams use this table as the authoritative asset-side provision balance for each
+  closing, while ecl_asset_runs keeps the full run history for auditability.
+domain: Fintech
+owner: marcos.mota@quintoandar.com.br
+columns:
+  id_contract:
+    description: DW surrogate key of the rental contract scored by the ECL asset model.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.sk_contract
+  id_invoice:
+    description: DW surrogate key of the invoice included in the asset ECL calculation.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.sk_invoice
+  id_user:
+    description: EBDB user identifier of the tenant associated with the scored invoice.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.user_id
+  invoice_account_type:
+    description: Invoice account classification used by the ECL model (tenant or landlord side).
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.invoice_account_type
+  guarantee_group:
+    description: Guarantee product group applied when deriving asset ECL parameters.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.guarantee_group
+  initial_stage:
+    description: Initial IFRS stage assigned to the contract at the start of the closing month.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.estagio_inicial
+  closing_month_status:
+    description: Contract status label in the monthly closing snapshot used for ECL staging.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.closing_month_status
+  delay_contaminated_range:
+    description: Delay contamination bucket derived from payment delay days at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.delay_contamined_range
+  delay_contaminated_range_rule_e:
+    description: Delay contamination bucket under provision rule E for the asset ECL run.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.delay_contaminated_range_rule_e
+  pd_model_name:
+    description: Name of the probability-of-default model used in the asset ECL batch run.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.pd_model_name
+  pd_model_version:
+    description: Deployed version of the probability-of-default model for this batch run.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.pd_model_version
+  ead_lgd_model_version:
+    description: Version of the exposure-at-default and loss-given-default lookup applied.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.ead_lgd_model_version
+  id_pd_rule:
+    description: Identifier of the probability-of-default rule set applied to this row.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.sk_pd_rule
+  id_ead_lgd_rule:
+    description: Identifier of the EAD/LGD rule set matched for the asset ECL calculation.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.sk_ead_lgd_rule
+  raw_input:
+    description: JSON payload of raw model inputs before feature engineering for audit replay.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.raw_input
+  model_input:
+    description: JSON payload of engineered features fed to the asset ECL scoring model.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.model_input
+  metadata:
+    description: JSON metadata from the batch inference job (run context and diagnostics).
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.metadata
+  id_run:
+    description: Unique identifier of the batch inference run that produced this ECL row.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.run_id
+  commit_sha:
+    description: Git commit SHA of the ECL model code used in the batch inference run.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.commit_sha
+  boavista_score_p6__avg:
+    description: Average Boavista P6 bureau score used as a credit risk input when available.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.boavista_score_p6__avg
+  loss_given_default:
+    description: Loss given default percentage applied to the exposure for asset ECL.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.loss_given_default
+  probability_of_default:
+    description: Probability of default estimated by the PD model for this invoice at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.probability_of_default
+  raw_outputs:
+    description: Raw numeric output from the model before business rounding or capping rules.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.raw_outputs
+  sum_due_amount:
+    description: Total due amount in BRL on the invoice at the monthly closing reference date.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.sum_due_amount
+  provision_balance_ecl:
+    description: Expected credit loss provision balance in BRL for the asset-side invoice row.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.provision_balance_ecl
+  is_early_bird:
+    description: Whether the contract is in the early-bird portfolio segment for ECL staging.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.is_early_bird
+  is_guarantee_paid:
+    description: Whether the rental guarantee premium was paid for the contract at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.is_guarantee_paid
+  is_ongoing_contract:
+    description: Whether the contract was active and ongoing in the closing month snapshot.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.is_ongoing_contract
+  is_automated_run:
+    description: Whether the winning row was produced by an automated scheduled batch inference run.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.is_automated_run
+  dt_closing:
+    description: Monthly closing reference date (last calendar day of the accrual month).
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.dt_closing
+  ts_inference:
+    description: Event timestamp recorded by the batch inference pipeline for the winning run.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.timestamp
+  ts_loaded:
+    description: Load timestamp of the winning run; the max ts_loaded within each closing group.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.loaded_at
+  year:
+    description: Year partition of the winning run's ingestion date.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.year
+  month:
+    description: Month partition of the winning run's ingestion date.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.month
+  day:
+    description: Day partition of the winning run's ingestion date.
+    lineage:
+      - datalake_ifrs_raw.ecl_asset_runs.day

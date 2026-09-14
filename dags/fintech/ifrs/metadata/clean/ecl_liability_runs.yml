@@ -1,0 +1,169 @@
+---
+database_name: datalake_ifrs_clean
+table_name: ecl_liability_runs
+description: |
+  Contract-level IFRS 9 expected credit loss (ECL) liability outputs from the batch ECL model.
+  Holds every model execution: the same (id_contract, dt_closing) can appear multiple times
+  across runs, disambiguated by id_run / ts_loaded. Consumers that need the current view for a
+  closing date should use ecl_liability_latest (latest ts_loaded per id_contract, dt_closing).
+  Finance and audit teams use this table for liability-side exposure, PD, and active
+  probability alongside dw_audit_ifrs passivos exercises and regulatory reporting.
+domain: Fintech
+owner: marcos.mota@quintoandar.com.br
+columns:
+  id_contract:
+    description: DW surrogate key of the rental contract scored by the ECL liability model.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.sk_contract
+  id_user:
+    description: EBDB user identifier of the tenant associated with the scored contract.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.user_id
+  invoice_account_type:
+    description: Invoice account classification used by the ECL liability model.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.invoice_account_type
+  guarantee_group:
+    description: Guarantee product group applied when deriving liability ECL parameters.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.guarantee_group
+  initial_stage:
+    description: Initial IFRS stage assigned to the contract at the start of the closing month.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.estagio_inicial
+  closing_month_status:
+    description: Contract status label in the monthly closing snapshot used for ECL staging.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.closing_month_status
+  delay_contaminated_range:
+    description: Delay contamination bucket derived from payment delay days at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.delay_contamined_range
+  delay_contaminated_range_rule_e:
+    description: Delay contamination bucket under provision rule E for the liability ECL run.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.delay_contaminated_range_rule_e
+  pd_model_name:
+    description: Name of the probability-of-default model used in the liability ECL batch run.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.pd_model_name
+  pd_model_version:
+    description: Deployed version of the probability-of-default model for this batch run.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.pd_model_version
+  ead_lgd_model_version:
+    description: Version of the exposure-at-default and loss-given-default lookup applied.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.ead_lgd_model_version
+  id_pd_rule:
+    description: Identifier of the probability-of-default rule set applied to this row.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.sk_pd_rule
+  id_ead_lgd_rule:
+    description: Identifier of the EAD/LGD rule set matched for the liability ECL calculation.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.sk_ead_lgd_rule
+  raw_input:
+    description: JSON payload of raw model inputs before feature engineering for audit replay.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.raw_input
+  model_input:
+    description: JSON payload of engineered features fed to the liability ECL scoring model.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.model_input
+  metadata:
+    description: JSON metadata from the batch inference job (run context and diagnostics).
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.metadata
+  id_run:
+    description: Unique identifier of the batch inference run that produced this ECL row.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.run_id
+  commit_sha:
+    description: Git commit SHA of the ECL model code used in the batch inference run.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.commit_sha
+  first_rent_charged:
+    description: EBDB identifier of the first rent invoice charged on the contract.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.first_rent_charged
+  rent:
+    description: Monthly rent amount in BRL used as exposure input for the liability ECL model.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.rent
+  boavista_score_p6__avg:
+    description: Average Boavista P6 bureau score used as a credit risk input when available.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.boavista_score_p6__avg
+  loss_given_default:
+    description: Loss given default percentage applied to the exposure for liability ECL.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.loss_given_default
+  exposure_at_default:
+    description: Exposure at default amount in BRL estimated for the contract at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.exposure_at_default
+  probability_of_default:
+    description: Probability of default estimated by the PD model for this contract at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.probability_of_default
+  probability_active:
+    description: Probability that the contract remains active through the ECL horizon.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.probability_active
+  raw_outputs:
+    description: Raw numeric output from the model before business rounding or capping rules.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.raw_outputs
+  sum_due_amount:
+    description: Total due amount in BRL on open invoices for the contract at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.sum_due_amount
+  is_early_bird:
+    description: Whether the contract is in the early-bird portfolio segment for ECL staging.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.is_early_bird
+  is_guarantee_paid:
+    description: Whether the rental guarantee premium was paid for the contract at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.is_guarantee_paid
+  is_ongoing_contract:
+    description: Whether the contract was active and ongoing in the closing month snapshot.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.is_ongoing_contract
+  is_automated_run:
+    description: Whether this row was produced by an automated scheduled batch inference run.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.is_automated_run
+  dt_start:
+    description: Contract start timestamp used as a liability ECL model input at closing.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.dt_start
+  dt_annulment:
+    description: Contract annulment timestamp when the lease was voided before natural end.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.dt_annulment
+  dt_closing:
+    description: Monthly closing reference date (last calendar day of the accrual month).
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.dt_closing
+  ts_inference:
+    description: Event timestamp recorded by the batch inference pipeline for this prediction.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.timestamp
+  ts_loaded:
+    description: Timestamp when the row was written to the datalake by the IFRS ingestion job.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.loaded_at
+  year:
+    description: Year partition derived from the batch inference event timestamp.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.year
+  month:
+    description: Month partition derived from the batch inference event timestamp.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.month
+  day:
+    description: Day partition derived from the batch inference event timestamp.
+    lineage:
+      - datalake_ifrs_raw.ecl_liability_runs.day

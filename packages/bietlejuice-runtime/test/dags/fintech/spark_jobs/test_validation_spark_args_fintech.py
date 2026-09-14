@@ -18,6 +18,7 @@ _JOB_PATHS = [
     "dags/fintech/cyber_legal_historical/spark_jobs/load_cyber_raw.py",
     "dags/fintech/google_calendar/spark_jobs/load_google_calendar.py",
     "dags/fintech/grb/spark_jobs/load_grb_raw.py",
+    "dags/fintech/ifrs/spark_jobs/load_ifrs_raw.py",
     "dags/fintech/invoice_preview/spark_jobs/load_csv_into_datalake.py",
     "dags/fintech/itau_statements/spark_jobs/load_raw.py",
     "dags/fintech/meetcall/spark_jobs/load_meetcall_raw.py",
@@ -41,6 +42,16 @@ def test_spark_job_registers_validation_write_flags(job_path: str):
         assert "is_validation_run" in text
     else:
         assert "resolve_datalake_write_target(" in text
+
+
+def test_ifrs_uses_dual_runtime_spark_client():
+    job_path = _REPO_ROOT / "dags/fintech/ifrs/spark_jobs/load_ifrs_raw.py"
+    text = job_path.read_text(encoding="utf-8")
+
+    assert "SparkClient(app_name=JOB_NAME)" in text
+    assert "spark_client = SparkClient(app_name=JOB_NAME)" in text
+    assert "SparkClient()" not in text
+    assert "SparkSession.builder" not in text
 
 
 def test_nexxera_uses_dual_runtime_spark_client():
