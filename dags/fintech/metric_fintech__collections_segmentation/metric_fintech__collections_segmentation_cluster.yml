@@ -1,7 +1,7 @@
 cluster:
   type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
-    step_concurrency_level: 1
+    step_concurrency_level: 4
     core_nodes:
       target_on_demand: 2
       target_spot: 0
