@@ -42,6 +42,7 @@ Use a keyword that maps to a Google Chat webhook. Common values:
 | Domain / Context | `alert_channel` |
 |-----------------|-----------------|
 | People, HR, Compensation | `PEOPLE_ALERTS` |
+| Growth / Broker XP | `GROWTH_ALERTS` |
 | Core models | `GCHAT_CORE_MODEL_SCHEMA_VALIDATION` |
 | Default / generic | `#alerts-de-airflow-dags` |
 

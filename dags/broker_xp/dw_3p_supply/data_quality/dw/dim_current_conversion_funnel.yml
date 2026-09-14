@@ -1,6 +1,6 @@
 ---
 table_name: dw_3p_supply.dim_current_conversion_funnel
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: GROWTH_ALERTS
 table_level_validations:
   has_size:
     greater_than: 0

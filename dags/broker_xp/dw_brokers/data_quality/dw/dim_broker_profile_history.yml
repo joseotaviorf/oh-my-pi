@@ -1,7 +1,6 @@
 ---
 table_name: dw_brokers.dim_broker_profile_history
-alert_channel: "#alerts-de-airflow-dags"
-
+alert_channel: GROWTH_ALERTS
 table_level_validations:
   has_size:
     greater_than: 0

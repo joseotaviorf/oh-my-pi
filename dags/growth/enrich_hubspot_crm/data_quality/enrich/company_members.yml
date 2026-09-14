@@ -1,6 +1,6 @@
 ---
 table_name: datalake_hubspot.company_members
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: GROWTH_ALERTS
 column_level_validations:
   id_company:
     is_complete:

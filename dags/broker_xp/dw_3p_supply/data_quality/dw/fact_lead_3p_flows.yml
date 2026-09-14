@@ -1,6 +1,6 @@
 ---
 table_name: dw_3p_supply.fact_lead_3p_flows
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: GROWTH_ALERTS
 table_level_validations:
   has_size:
     greater_than: 0

@@ -1,6 +1,6 @@
 ---
 table_name: dw_public.fact_search_session_event
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: GROWTH_ALERTS
 # `is_unique` on `sk_event` was the expensive check here: Deequ evaluates it over the whole
 # table, so every run shuffled the full fact history to prove uniqueness. Scoping it to the
 # partition the run just wrote keeps the assertion that matters (the new keys are unique and

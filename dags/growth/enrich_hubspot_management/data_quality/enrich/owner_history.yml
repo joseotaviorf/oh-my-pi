@@ -1,6 +1,6 @@
 ---
 table_name: datalake_hubspot.owner_history
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: GROWTH_ALERTS
 table_level_validations:
   has_size:
     greater_than: 250

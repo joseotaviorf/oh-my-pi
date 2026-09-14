@@ -6,3 +6,4 @@ workflow:
   type: gsheets
   layer: raw
   custom_schema: gsheets
+  alert_channel: GROWTH_ALERTS

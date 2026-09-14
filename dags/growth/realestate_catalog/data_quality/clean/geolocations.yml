@@ -1,6 +1,6 @@
 ---
 table_name: datalake_realestate_clean.geolocations
-alert_channel: '#alerts-de-airflow-dags'
+alert_channel: GROWTH_ALERTS
 table_level_validations:
   has_size:
     greater_than: 0

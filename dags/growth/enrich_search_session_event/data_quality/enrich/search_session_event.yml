@@ -1,6 +1,6 @@
 ---
 table_name: datalake_search_session_event.search_session_event
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: GROWTH_ALERTS
 # The per-column `is_complete` / `is_contained_in` checks this replaces were evaluated by
 # Deequ over the whole table, so the validation step re-scanned all of history on every run
 # and grew with it. Folding them into one partition-filtered constraint keeps the same
