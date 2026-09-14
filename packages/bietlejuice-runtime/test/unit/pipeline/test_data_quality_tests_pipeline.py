@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.pipeline import data_quality_tests_pipeline
 from bietlejuice.pipeline.data_quality_tests_pipeline import DataQualityTestsPipeline
 
@@ -75,6 +76,49 @@ def test_execute_test_omits_table_identifier_when_unsupported(monkeypatch):
     # Assert
     assert result == {"status": "success"}
     assert captured["suite_name"] == "Pipeline Validations: database.table"
+
+
+def test_get_gchat_webhook_passes_default_keyword_as_enum_attribute_name(monkeypatch):
+    # Regression: AlertChannelService.get_gchat_webhook_url resolves the
+    # fallback via getattr(GchatWebhooksEnum, keyword.upper()), so the
+    # `default_keyword` argument must be the enum *attribute name*
+    # ("DATA_QUALITY_DEFAULT"), not its value/secret key
+    # ("GCHAT_DATA_QUALITY_WEBHOOK"). Passing the value made every fallback
+    # lookup fail with "not a valid channel" whenever the primary channel
+    # keyword's secret was missing.
+    captured = {}
+
+    class _Dbutils:
+        secrets = SimpleNamespace(get=lambda scope, key: "http://webhook")
+
+    class _BaseDBUtils:
+        def get_dbutils(self):
+            return _Dbutils()
+
+    class _AlertChannelService:
+        def __init__(self, dbutils):
+            captured["dbutils"] = dbutils
+
+        def get_gchat_webhook_url(self, channel_keyword, default_keyword=None):
+            captured["channel_keyword"] = channel_keyword
+            captured["default_keyword"] = default_keyword
+            return "http://webhook"
+
+    monkeypatch.setattr(data_quality_tests_pipeline, "BaseDBUtils", _BaseDBUtils)
+    monkeypatch.setattr(
+        data_quality_tests_pipeline, "AlertChannelService", _AlertChannelService
+    )
+
+    pipeline = _pipeline()
+
+    # Act
+    result = pipeline._get_gchat_webhook("GROWTH_ALERTS")
+
+    # Assert
+    assert result == "http://webhook"
+    assert captured["default_keyword"] == "DATA_QUALITY_DEFAULT"
+    assert captured["default_keyword"] != GchatWebhooksEnum.DATA_QUALITY_DEFAULT
+    assert hasattr(GchatWebhooksEnum, captured["default_keyword"])
 
 
 def test_publish_to_metadata_propagator_is_best_effort(monkeypatch):

@@ -206,7 +206,7 @@ class DataQualityTestsPipeline:
 
         dynamic_gchat_webhook = alert_channel_service.get_gchat_webhook_url(
             channel_keyword=channel_keyword_from_config,
-            default_keyword=GchatWebhooksEnum.DATA_QUALITY_DEFAULT,
+            default_keyword="DATA_QUALITY_DEFAULT",
         )
         logger.info(
             f"Alerts will be sent via webhook. Provided keyword: '{channel_keyword_from_config}'. "
