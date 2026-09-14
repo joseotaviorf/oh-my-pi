@@ -3,7 +3,6 @@ dags_not_using_builder:
   - fintech/enrich_credit_evers/enrich_credit_evers.py
   - fintech/enrich_dai_report/enrich_dai_report.py
   - fintech/reverse_nazare/reverse_nazare.py
-  - fintech/reverse_nexxera/reverse_nexxera.py
   - fintech/sap/sap.py
   - fintech/wall_street/wall_street.py
   - for_rent/ebdb/ebdb.py

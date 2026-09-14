@@ -1,0 +1,38 @@
+dag:
+  name: reverse_nexxera
+  schedule_start_date: 2022, 7, 12
+  owner: Data Fintech
+  callback_by_task: false
+  documentation:
+    dag_purpose: |
+      Builds reverse-layer Nexxera reconciliation tables from enrich_nexxera
+      (dtw_filter) and exports CSV files to recon-credit-card for SAP/Nexxera.
+      Daily tables go to YYYY/MM/DD/daily/; monthly_* tables only on day 1,
+      under YYYY/MM/DD/monthly/. Objects are written with
+      bucket-owner-full-control so the destination account can read them.
+workflow:
+  type: load_access
+  layer: reverse
+  custom_schema: nexxera
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  has_hive_sync: false
+  load_spark_job: load_s3_data_into_external_bucket
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "nexxera"
+    - "{table_name}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  tables_customization:
+    consolidated_entries: {}
+    consolidated_header: {}
+    divergence_entries: {}
+    divergence_header: {}
+    monthly_consolidated_entries: {}
+    monthly_consolidated_header: {}
+    monthly_divergence_entries: {}
+    monthly_divergence_header: {}
