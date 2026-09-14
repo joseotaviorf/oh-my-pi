@@ -91,14 +91,23 @@ columns:
     description: |
       Attribution metric for offers. True when the agent handling the first offer equals the referring agent (id_user_referring_agent).
       False when handled by a different agent. Null when no offer occurred.
+  is_agreement_same_agent:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.sk_event_type
+    description: |
+      Attribution metric for the Sale agreement signature (sk_event_type = 6, SALE_AGREEMENT_SIGNED). True when the signing agent
+      equals the referring agent (id_user_referring_agent). False when handled by a different agent. Null when no agreement was
+      signed yet. Sale only; Rent has no agreement-signed event on this fact (see rent_first_events.ts_contract_signed instead).
   invitation_agent_interactions:
     description: |
       Struct containing interaction flags and timestamps strictly for events where the referring agent handled the interaction.
       Contains fields:
       - has_handled_visit (BOOLEAN): True when referring agent handled a visit.
       - has_handled_offer (BOOLEAN): True when referring agent handled an offer.
+      - has_handled_agreement_signed (BOOLEAN): True when referring agent signed the Sale agreement.
       - ts_sale_visit (TIMESTAMP): First Sale visit handled timestamp.
       - ts_sale_offer (TIMESTAMP): First Sale offer handled timestamp.
+      - ts_sale_agreement_signed (TIMESTAMP): Sale agreement signed timestamp, when signed by the referring agent.
       - ts_rent_visit (TIMESTAMP): First Rent visit handled timestamp.
       - ts_rent_offer (TIMESTAMP): First Rent offer handled timestamp.
   sale_first_events:
@@ -124,6 +133,10 @@ columns:
       - offer_id_agent (LONG): Legacy DadosAgente ID of offer agent.
       - offer_id_user (LONG): Unified EBDB user ID of offer agent.
       - offer_uuid_person (STRING): Unique natural person identifier corresponding to the agent who submitted the first Sale offer. Join dim_person at query time for agent demographics.
+      - ts_agreement_signed (TIMESTAMP): Timestamp when the Sale agreement was signed (sk_event_type = 6, SALE_AGREEMENT_SIGNED).
+      - agreement_id_agent (LONG): Legacy DadosAgente ID of the agent who signed the agreement.
+      - agreement_id_user (LONG): Unified EBDB user ID of the agent who signed the agreement.
+      - agreement_uuid_person (STRING): Unique natural person identifier corresponding to the agent who signed the Sale agreement. Join dim_person at query time for agent demographics.
   rent_first_events:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_booking

@@ -78,7 +78,12 @@ flat_aggregations AS (
             NAMED_STRUCT('ts', ude.ts_event, 'id_agent', ude.id_event_agent, 'id_user', ude.id_user_event_agent, 'uuid_person', ude.uuid_person_event_agent, 'id_flow', ude.id_flow, 'id_offer', ude.id_offer),
             CASE WHEN ude.event_business_context = 'SALE' AND ude.id_event_type = 3 THEN ude.ts_event END
         ) AS sale_offer,
-        
+
+        MIN_BY(
+            NAMED_STRUCT('ts', ude.ts_event, 'id_agent', ude.id_event_agent, 'id_user', ude.id_user_event_agent, 'uuid_person', ude.uuid_person_event_agent, 'id_flow', ude.id_flow, 'id_offer', ude.id_offer),
+            CASE WHEN ude.event_business_context = 'SALE' AND ude.id_event_type = 6 THEN ude.ts_event END
+        ) AS sale_agreement_signed,
+
         MIN_BY(
             NAMED_STRUCT('ts', ude.ts_event, 'id_agent', ude.id_event_agent, 'id_user', ude.id_user_event_agent, 'uuid_person', ude.uuid_person_event_agent, 'id_flow', ude.id_flow, 'id_booking', ude.id_booking),
             CASE WHEN ude.event_business_context = 'RENT' AND ude.id_event_type = 1 THEN ude.ts_event END
@@ -98,6 +103,7 @@ flat_aggregations AS (
 
         MIN(CASE WHEN ude.event_business_context = 'SALE' AND ude.id_event_type = 1 AND alh.id_user_referring_agent = ude.id_user_event_agent THEN ude.ts_event END) AS ts_sale_ref_visit,
         MIN(CASE WHEN ude.event_business_context = 'SALE' AND ude.id_event_type = 3 AND alh.id_user_referring_agent = ude.id_user_event_agent THEN ude.ts_event END) AS ts_sale_ref_offer,
+        MIN(CASE WHEN ude.event_business_context = 'SALE' AND ude.id_event_type = 6 AND alh.id_user_referring_agent = ude.id_user_event_agent THEN ude.ts_event END) AS ts_sale_ref_agreement_signed,
         MIN(CASE WHEN ude.event_business_context = 'RENT' AND ude.id_event_type = 1 AND alh.id_user_referring_agent = ude.id_user_event_agent THEN ude.ts_event END) AS ts_rent_ref_visit,
         MIN(CASE WHEN ude.event_business_context = 'RENT' AND ude.id_event_type = 3 AND alh.id_user_referring_agent = ude.id_user_event_agent THEN ude.ts_event END) AS ts_rent_ref_offer,
 
@@ -139,18 +145,25 @@ SELECT
         WHEN sale_visit.id_user IS NOT NULL OR rent_visit.id_user IS NOT NULL THEN FALSE ELSE NULL 
     END AS is_visit_same_agent,
     
-    CASE 
-        WHEN (sale_offer.id_user IS NOT NULL AND sale_offer.id_user = id_user_referring_agent) 
-          OR (rent_offer.id_user IS NOT NULL AND rent_offer.id_user = id_user_referring_agent) THEN TRUE 
-        WHEN sale_offer.id_user IS NOT NULL OR rent_offer.id_user IS NOT NULL THEN FALSE ELSE NULL 
+    CASE
+        WHEN (sale_offer.id_user IS NOT NULL AND sale_offer.id_user = id_user_referring_agent)
+          OR (rent_offer.id_user IS NOT NULL AND rent_offer.id_user = id_user_referring_agent) THEN TRUE
+        WHEN sale_offer.id_user IS NOT NULL OR rent_offer.id_user IS NOT NULL THEN FALSE ELSE NULL
     END AS is_offer_same_agent,
+
+    CASE
+        WHEN sale_agreement_signed.id_user IS NOT NULL AND sale_agreement_signed.id_user = id_user_referring_agent THEN TRUE
+        WHEN sale_agreement_signed.id_user IS NOT NULL THEN FALSE ELSE NULL
+    END AS is_agreement_same_agent,
 
     NAMED_STRUCT(
         'has_handled_visit', CASE WHEN ts_sale_ref_visit IS NOT NULL OR ts_rent_ref_visit IS NOT NULL THEN TRUE ELSE FALSE END,
         'has_handled_offer', CASE WHEN ts_sale_ref_offer IS NOT NULL OR ts_rent_ref_offer IS NOT NULL THEN TRUE ELSE FALSE END,
-        'ts_sale_visit', ts_sale_ref_visit, 
+        'has_handled_agreement_signed', CASE WHEN ts_sale_ref_agreement_signed IS NOT NULL THEN TRUE ELSE FALSE END,
+        'ts_sale_visit', ts_sale_ref_visit,
         'ts_sale_offer', ts_sale_ref_offer,
-        'ts_rent_visit', ts_rent_ref_visit, 
+        'ts_sale_agreement_signed', ts_sale_ref_agreement_signed,
+        'ts_rent_visit', ts_rent_ref_visit,
         'ts_rent_offer', ts_rent_ref_offer
     ) AS invitation_agent_interactions,
     
@@ -166,7 +179,11 @@ SELECT
         'ts_offer_accepted', ts_sale_offer_accepted,
         'offer_id_agent', sale_offer.id_agent,
         'offer_id_user', sale_offer.id_user,
-        'offer_uuid_person', sale_offer.uuid_person
+        'offer_uuid_person', sale_offer.uuid_person,
+        'ts_agreement_signed', sale_agreement_signed.ts,
+        'agreement_id_agent', sale_agreement_signed.id_agent,
+        'agreement_id_user', sale_agreement_signed.id_user,
+        'agreement_uuid_person', sale_agreement_signed.uuid_person
     ) AS sale_first_events,
     
     NAMED_STRUCT(

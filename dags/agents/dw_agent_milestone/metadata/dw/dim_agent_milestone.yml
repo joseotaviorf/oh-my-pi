@@ -23,8 +23,9 @@ description: >
   datalake_visit.visit_schedules (VB / VC); datalake_tiers.ciq_first_listing
   temporary for FL / FL_VALID (swap planned with AAREDE-503);
   datalake_rent_demand_events (CS); datalake_sale_offer.sale_offer (CCV);
-  datalake_ebdb_clean.agent_lead_referral temporary for TQC (swap
-  planned with AAREDE-504). Identity joins cast both sides to STRING.
+  datalake_agent_performance.fact_agent_demand_acquisition for the TQC/TQA demand
+  acquisition funnel (referral, VB, VC, and Sale-only CCV, each with a same-agent
+  attribution variant per AAREDE-504). Identity joins cast both sides to STRING.
   business_context is not in the grain.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
@@ -109,16 +110,157 @@ milestones:
       scan:
         ts_column: so.ts_sale_agreement_signed
         lookback_days: 2
-    # Temporary upstream: agent_lead_referral — swap to AAREDE-504 later.
-    # TQA can reuse demand_referral_events.sql with business_context = 'RENT'.
+    # AAREDE-504: swapped off agent_lead_referral onto enrich_agent_performance's
+    # fact_agent_demand_acquisition, which already resolves referral status/business_context
+    # and same-agent attribution. TQA (rent) added alongside as a net-new milestone family.
     TQC:
       milestone_type: TQC
-      sql_file: demand_referral_events.sql
+      sql_file: demand_acquisition_funnel_events.sql
       scan:
-        ts_column: alr.ts_created
+        ts_column: fada.valid_from
         lookback_days: 2
       params:
         business_context: SALE
+        ts_expr: valid_from
+        entity_expr: id_referral
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.id_referral
+        same_agent_expr: "TRUE"
+    TQC_VB:
+      milestone_type: TQC_VB
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.sale_first_events.ts_visit_booked
+        lookback_days: 2
+      params:
+        business_context: SALE
+        ts_expr: sale_first_events.ts_visit_booked
+        entity_expr: sale_first_events.id_booking
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.sale_first_events.id_booking
+        same_agent_expr: "TRUE"
+    TQC_VB_SAME_AGENT:
+      milestone_type: TQC_VB_SAME_AGENT
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.sale_first_events.ts_visit_booked
+        lookback_days: 2
+      params:
+        business_context: SALE
+        ts_expr: sale_first_events.ts_visit_booked
+        entity_expr: sale_first_events.id_booking
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.sale_first_events.id_booking
+        same_agent_expr: "fada.is_visit_same_agent = TRUE"
+    TQC_VC:
+      milestone_type: TQC_VC
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.sale_first_events.ts_visit_completed
+        lookback_days: 2
+      params:
+        business_context: SALE
+        ts_expr: sale_first_events.ts_visit_completed
+        entity_expr: sale_first_events.id_booking
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.sale_first_events.id_booking
+        same_agent_expr: "TRUE"
+    # No separate "who completed the visit" field upstream — reuses is_visit_same_agent
+    # (the booking agent), same limitation as TQC_VB_SAME_AGENT.
+    TQC_VC_SAME_AGENT:
+      milestone_type: TQC_VC_SAME_AGENT
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.sale_first_events.ts_visit_completed
+        lookback_days: 2
+      params:
+        business_context: SALE
+        ts_expr: sale_first_events.ts_visit_completed
+        entity_expr: sale_first_events.id_booking
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.sale_first_events.id_booking
+        same_agent_expr: "fada.is_visit_same_agent = TRUE"
+    TQC_CCV:
+      milestone_type: TQC_CCV
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.sale_first_events.ts_agreement_signed
+        lookback_days: 2
+      params:
+        business_context: SALE
+        ts_expr: sale_first_events.ts_agreement_signed
+        entity_expr: sale_first_events.id_offer
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.sale_first_events.id_offer
+        same_agent_expr: "TRUE"
+    TQC_CCV_SAME_AGENT:
+      milestone_type: TQC_CCV_SAME_AGENT
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.sale_first_events.ts_agreement_signed
+        lookback_days: 2
+      params:
+        business_context: SALE
+        ts_expr: sale_first_events.ts_agreement_signed
+        entity_expr: sale_first_events.id_offer
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.sale_first_events.id_offer
+        same_agent_expr: "fada.is_agreement_same_agent = TRUE"
+    TQA:
+      milestone_type: TQA
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.valid_from
+        lookback_days: 2
+      params:
+        business_context: RENT
+        ts_expr: valid_from
+        entity_expr: id_referral
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.id_referral
+        same_agent_expr: "TRUE"
+    TQA_VB:
+      milestone_type: TQA_VB
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.rent_first_events.ts_visit_booked
+        lookback_days: 2
+      params:
+        business_context: RENT
+        ts_expr: rent_first_events.ts_visit_booked
+        entity_expr: rent_first_events.id_booking
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.rent_first_events.id_booking
+        same_agent_expr: "TRUE"
+    TQA_VB_SAME_AGENT:
+      milestone_type: TQA_VB_SAME_AGENT
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.rent_first_events.ts_visit_booked
+        lookback_days: 2
+      params:
+        business_context: RENT
+        ts_expr: rent_first_events.ts_visit_booked
+        entity_expr: rent_first_events.id_booking
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.rent_first_events.id_booking
+        same_agent_expr: "fada.is_visit_same_agent = TRUE"
+    TQA_VC:
+      milestone_type: TQA_VC
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.rent_first_events.ts_visit_completed
+        lookback_days: 2
+      params:
+        business_context: RENT
+        ts_expr: rent_first_events.ts_visit_completed
+        entity_expr: rent_first_events.id_booking
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.rent_first_events.id_booking
+        same_agent_expr: "TRUE"
+    # No separate "who completed the visit" field upstream — reuses is_visit_same_agent
+    # (the booking agent), same limitation as TQC_VC_SAME_AGENT.
+    TQA_VC_SAME_AGENT:
+      milestone_type: TQA_VC_SAME_AGENT
+      sql_file: demand_acquisition_funnel_events.sql
+      scan:
+        ts_column: fada.rent_first_events.ts_visit_completed
+        lookback_days: 2
+      params:
+        business_context: RENT
+        ts_expr: rent_first_events.ts_visit_completed
+        entity_expr: rent_first_events.id_booking
+        entity_type: datalake_agent_performance.fact_agent_demand_acquisition.rent_first_events.id_booking
+        same_agent_expr: "fada.is_visit_same_agent = TRUE"
 columns:
   sk_user:
     description: >
@@ -131,8 +273,8 @@ columns:
   id_agent:
     description: >
       Canonical accreditation agent id from datalake_agent_accreditation.agent,
-      joined on id_user (or id_agent_data for demand referral). Sticky on
-      incremental updates; rewritten on bootstrap. Not part of the MERGE grain.
+      joined on id_user. Sticky on incremental updates; rewritten on bootstrap.
+      Not part of the MERGE grain.
     lineage:
       - datalake_agent_accreditation.agent.id_agent
   milestone_type:
@@ -150,7 +292,18 @@ columns:
       FL_VALID: Valid listing (is_first_listing_valid)
       CS: Signed rent contract from rent_demand_events event type 9
       CCV: Signed sale agreement; entity pointer is sale_offer.id_house (id_offer is STRING)
-      TQC: TQC (sale) demand lead referral from agent_lead_referral until AAREDE-504
+      TQC: TQC (sale) demand lead referral, from fact_agent_demand_acquisition
+      TQC_VB: TQC referral's lead had a Sale visit booked (any agent)
+      TQC_VB_SAME_AGENT: TQC referral's lead had a Sale visit booked by the referring agent
+      TQC_VC: TQC referral's lead had a Sale visit completed (any agent)
+      TQC_VC_SAME_AGENT: TQC referral's lead had a Sale visit completed by the referring agent (reuses booking-agent attribution)
+      TQC_CCV: TQC referral's lead signed a Sale agreement (any agent)
+      TQC_CCV_SAME_AGENT: TQC referral's lead signed a Sale agreement, signed by the referring agent
+      TQA: TQA (rent) demand lead referral, from fact_agent_demand_acquisition
+      TQA_VB: TQA referral's lead had a Rent visit booked (any agent)
+      TQA_VB_SAME_AGENT: TQA referral's lead had a Rent visit booked by the referring agent
+      TQA_VC: TQA referral's lead had a Rent visit completed (any agent)
+      TQA_VC_SAME_AGENT: TQA referral's lead had a Rent visit completed by the referring agent (reuses booking-agent attribution)
   ts_first:
     description: >
       Timestamp of the first observed occurrence of this milestone for the user.

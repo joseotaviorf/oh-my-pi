@@ -120,9 +120,9 @@ bietlejuice.dw_agent_contract:
   - bietlejuice.enrich_ebdb_agents_contracts:load-enrich-agent-coincident-business-contexts:first-run-of-day
   - bietlejuice.enrich_ebdb_agents_contracts:load-enrich-agents-activations-suspensions-contracts-changes:first-run-of-day
 bietlejuice.dw_agent_milestone:
-  - bietlejuice.ebdb_agent:load-clean-agent-lead-referral:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-agent-registration-actions-log:first-run-of-day
+  - bietlejuice.enrich_agent_performance:load-enrich-fact-agent-demand-acquisition:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_tiers:load-enrich-ciq-first-listing:first-run-of-day
