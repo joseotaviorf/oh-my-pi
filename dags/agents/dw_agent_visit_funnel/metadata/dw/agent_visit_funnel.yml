@@ -85,7 +85,7 @@ columns:
       Count of visits marked as stalled among visits created on the reference
       date.
     lineage:
-      - dw_visit.fact_visits.num_visit_stalled
+      - dw_visit.dim_visit.is_visit_stalled
   total_visit_not_finished:
     description: >
       Count of visits created on the reference date that have not yet reached

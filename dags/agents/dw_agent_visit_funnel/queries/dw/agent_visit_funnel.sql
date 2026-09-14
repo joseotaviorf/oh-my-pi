@@ -60,7 +60,7 @@ visit_funnel_metrics AS ( -- Metrics for each agent + date (based on last associ
         SUM(fvs.num_visit_canceled) AS total_visit_canceled,
         SUM(fvs.num_visit_completed) AS total_visit_completed,
         SUM(fvs.num_visit_unsuccessful) AS total_visit_unsuccessful,
-        SUM(fvs.num_visit_stalled) AS total_visit_stalled,
+        SUM(IF(dv.is_visit_stalled, 1, 0)) AS total_visit_stalled,
         SUM(IF(dv.has_visit_finisher_status = False, 1, 0)) AS total_visit_not_finished,
         SUM(IF(COALESCE(o_visit.ts_offer_submitted, o_visit_fifty.ts_offer_submitted) IS NOT NULL, 1, 0)) AS total_offer_submitted,
         SUM(IF(COALESCE(o_visit.ts_offer_accepted, o_visit_fifty.ts_offer_accepted) IS NOT NULL, 1, 0)) AS total_offer_accepted,
