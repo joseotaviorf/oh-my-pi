@@ -18,7 +18,7 @@ It also owns **stage inventory (*estoque*)**, which has its own daily-snapshot b
 
 ## Related Domain Entities
 
-- Consórcio (Inside Sales Funnel)
+- Consórcio
 
 ## Catalog
 
@@ -27,7 +27,8 @@ It also owns **stage inventory (*estoque*)**, which has its own daily-snapshot b
 | Closed Deals (Production) | OKR |
 | GMV New | OKR |
 | Leads | Health Metric |
-| Handoff (Handoff/DU, Handoff/Analyst/Day) | Health Metric |
+| Handoff (Handoff/DU, Handoff/Analyst/Day, by track) | Health Metric |
+| Active analysts per day (denominator of per-analyst metrics) | Health Metric |
 | Avg Ticket | Health Metric |
 | R$/Handoff | Health Metric |
 | Leads/DU, CD/DU, R$/DU | Health Metric |
@@ -38,17 +39,18 @@ It also owns **stage inventory (*estoque*)**, which has its own daily-snapshot b
 
 ## Glossary and Synonyms
 
-- **Produção**, **Closed Deals**, **vendas no período**, **CDs coincident** → Production (Closed Deals)  
-- **GMV New**, **R$ vendido**, **produção em R$** → GMV New  
-- **Handoff/analista**, **Handoff/dia**, **Handoff/DU**, **Handoff/Analyst/Day** → Handoff throughput  
-- **Taxa de transbordo** → **Handoff ÷ Leads** (see Calculation below) — not to be confused with Handoff/Analyst/Day or Handoff→Closed Deal, which are different ratios  
-- **R$/Handoff**, **quanto fechou por handoff** → R$/Handoff  
-- **volume de leads na semana/dia**, **CDs na semana X** → coincident volumes  
-- **Estoque**, **estoque em negociação**, **deal parado**, **envelhecimento na etapa** → deals still sitting in a stage on a given snapshot date  
-- **Movimentação**, **entradas e saídas do dia** → stage flow: `is_entry` / `is_exit` on the inventory base  
-- **Tempo na etapa** → how long a deal that already left spent in a stage (entry → exit) — *not* estoque  
-- **Credit value** (`credit_value`) → the deal's potential credit amount, taken from the most advanced value the funnel has filled in (see [Credit value](#credit-value-and-value_source))  
-- **Spell**, **entry\_seq** → one continuous stay of a deal in a stage; `entry_seq` numbers re-entries into the same stage  
+- **Produção**, **Closed Deals**, **vendas no período**, **CDs coincident** → Production (Closed Deals)
+- **GMV New**, **R$ vendido**, **produção em R$** → GMV New
+- **Handoff/analista**, **Handoff/dia**, **Handoff/DU**, **Handoff/Analyst/Day** → Handoff throughput
+- **Analistas ativos**, **analistas escalados**, **headcount do dia** → `datalake_gsheets_clean.consorcio_daily_active_analysts`, the official denominator of every per-analyst metric
+- **Taxa de transbordo** → **Handoff ÷ Leads** (see Calculation below) — not to be confused with Handoff/Analyst/Day or Handoff→Closed Deal, which are different ratios
+- **R$/Handoff**, **quanto fechou por handoff** → R$/Handoff
+- **volume de leads na semana/dia**, **CDs na semana X** → coincident volumes
+- **Estoque**, **estoque em negociação**, **deal parado**, **envelhecimento na etapa** → deals still sitting in a stage on a given snapshot date
+- **Movimentação**, **entradas e saídas do dia** → stage flow: `is_entry` / `is_exit` on the inventory base
+- **Tempo na etapa** → how long a deal that already left spent in a stage (entry → exit) — *not* estoque
+- **Credit value** (`credit_value`) → the deal's potential credit amount, taken from the most advanced value the funnel has filled in (see [Credit value](#credit-value-and-value_source))
+- **Spell**, **entry\_seq** → one continuous stay of a deal in a stage; `entry_seq` numbers re-entries into the same stage
 - **por analista**, **por supervisor**, **painel gerencial**, **relatório de IS** → operational cuts
 
 ## Scope
@@ -61,75 +63,70 @@ It also owns **stage inventory (*estoque*)**, which has its own daily-snapshot b
 
 Every metric is counted by **the stage's own timestamp** (coincident) on the deal × stage base (`Funil Coincident - Não Agregado`):
 
-- **Leads** — count of `leads` stage entries in the period; **Leads/DU** \= ÷ business days.  
-- **Handoff** — count of handoff stage-entry events (track-aware): `Simulação` (`SDR IA`), `Simulação Aceita` (`SIMULATOR IA`), `Lead` (`SDR Humano`); **Handoff/DU**, **Handoff/Analyst/Day** (split SDR IA / Simulador / Repescagem). **Any handoff metric that involves a count/average of *analysts* (e.g. Handoff/Analyst/Day, "average handoff per analyst") must apply the Active Analyst Threshold and the Weekend Rule below — state both explicitly whenever a handoff-per-analyst question is answered.**  
-- **Production — Closed Deals** — **one row per `id_deal`** (its **first** stage-entry into `venda fechada`), **only counted if the deal's current stage is still `venda fechada`** (excludes reversed and duplicated close events — see Canonical Filter and Known Data-Quality Issues below); **CD/DU**.  
-- **Production — GMV New** — `SUM(deal_amount)` over the same deduplicated `venda fechada` set, by close date; **R$/DU**.  
-- **Avg Ticket** — `GMV New / #Closed Deals`, computed from the deduplicated Closed Deals base above (never from a raw `COUNT(*)` of `venda fechada` stage-entry rows).  
-- **R$/Handoff** — `GMV closed / Handoff volume` (revenue per unit of handoff), using the track-aware handoff.  
-- **Stage inventory** (*estoque*) — the deals **still sitting** in a stage on a given snapshot date, and how many business days they have been there. Available for **every** stage in scope, not only `proposta em negociação`. See the dedicated section.  
-- **Stage flow** (*movimentação*) — entries and exits of a stage on a given day, with the exit classified by where the deal went (`exit_type`). Same base as inventory.  
-- **Handoff Rate** (*taxa de transbordo*) — `Handoff volume / Leads volume`, both coincident (each counted by its own stage-entry date, not a shared cohort) over the same period. This is a **volume ratio, not a cohort conversion rate** — it does not track the same leads from entry to handoff; it compares "how much handoff happened this period" to "how many leads entered this period." Do not apply the Active Analyst Threshold or Weekend Rule here — those apply only to Handoff/Analyst/Day, not to this ratio. **Ambiguity note:** when someone asks for "taxa de transbordo" they may instead mean Handoff ÷ Simulação/SC per track, or Handoff → Closed Deal — confirm which one is meant if it is not already established in the conversation.
+- **Leads** — count of `leads` stage entries in the period; **Leads/DU** \= ÷ business days.
+- **Handoff** — count of deals that reached their track's handoff milestone, counted on that milestone's own date: **Lead** (`SDR Humano`), **Simulação** (`SDR IA`), **Simulação Aceita** (`SIMULATOR IA`); **Handoff/DU** and **Handoff/Analyst/Day**, normally split by track. Every per-analyst metric divides by the active-analyst headcount from `datalake_gsheets_clean.consorcio_daily_active_analysts` — see the two sections below.
+- **Production — Closed Deals** — **one row per `id_deal`** (its **first** stage-entry into `venda fechada`), **only counted if the deal's current stage is still `venda fechada`** (excludes reversed and duplicated close events — see Canonical Filter and Known Data-Quality Issues below); **CD/DU**.
+- **Production — GMV New** — `SUM(deal_amount)` over the same deduplicated `venda fechada` set, by close date; **R$/DU**.
+- **Avg Ticket** — `GMV New / #Closed Deals`, computed from the deduplicated Closed Deals base above (never from a raw `COUNT(*)` of `venda fechada` stage-entry rows).
+- **R$/Handoff** — `GMV closed / Handoff volume` (revenue per unit of handoff), using the track-aware handoff.
+- **Stage inventory** (*estoque*) — the deals **still sitting** in a stage on a given snapshot date, and how many business days they have been there. Available for **every** stage in scope, not only `proposta em negociação`. See the dedicated section.
+- **Stage flow** (*movimentação*) — entries and exits of a stage on a given day, with the exit classified by where the deal went (`exit_type`). Same base as inventory.
+- **Handoff Rate** (*taxa de transbordo*) — `Handoff volume / Leads volume`, both coincident (each counted by its own stage-entry date, not a shared cohort) over the same period. This is a **volume ratio, not a cohort conversion rate** — it does not track the same leads from entry to handoff; it compares "how much handoff happened this period" to "how many leads entered this period." Do not bring the active-analyst headcount into this ratio — it belongs only to per-analyst metrics. **Ambiguity note:** when someone asks for "taxa de transbordo" they may instead mean Handoff ÷ Simulação/SC per track, or Handoff → Closed Deal — confirm which one is meant if it is not already established in the conversation.
 
 `DU = dia útil` (business day) via `dw_public.dim_date.is_brz_business_day`. GMV field \= `deal_amount`.
 
 **Attribution is history-aware.** `analyst_name`, `analyst_role`, `supervisor_name` and `team` come from `datalake_consorcio.deal`, resolved **as of each deal's creation date** from the `[Consórcio] Operação IS` sheet — so an operational cut reflects the team as it was when the deal was created, not as it is today. A deal owned by an analyst who kept receiving leads after their end date carries supervisor `other`. `origin` and `segment` come from the `[Consorcio] Growth Attribution` sheets. All of this is applied upstream in the `deal` build; never rebuild it in a query. See the Consórcio business entity for the sheets and the rules.
 
-### Active Analyst Threshold
+### Active analysts — the official denominator
 
-For **any handoff metric expressed per analyst** (Handoff/Analyst/Day, average handoff per active analyst, analyst headcount used as a denominator, etc.), an analyst only counts as **"ativo" (active)** on a given day if they had **≥ 10 handoffs that day**. An analyst with 1–9 handoffs on a day is **not** counted in the active-analyst denominator for that day (their handoff volume still counts in the numerator/total, only the analyst headcount is affected).
+**The number of analysts working on a given day comes from a table, not from a heuristic.** `datalake_gsheets_clean.consorcio_daily_active_analysts` holds one row per calendar day, maintained by Inside Sales in the *\[Consórcio\] Analistas Ativos* sheet (tab **consolidado**):
 
-- Applies to: Handoff/Analyst/Day, any "average handoff per analyst" read, and any other handoff metric where the denominator is a count of analysts.  
-- Does **not** apply to: raw Handoff volume/count, Handoff/DU, R$/Handoff (none of these divide by a count of analysts).  
-- **State this rule explicitly** in the response whenever a handoff-per-analyst question is answered — do not let it stay an implicit assumption.
-
-### Weekend Rule
-
-Monday–Friday are always included in Handoff/Analyst/Day. Saturday and Sunday are **never included by default** — **always ask the requester whether the weekend should be considered** before computing a Handoff/Analyst/Day figure for a period that includes one. Do not assume either way.
-
-**If the requester says no** → exclude Saturday and Sunday entirely from the calculation (no contribution to numerator or denominator).
-
-**If the requester says yes**, Saturday and Sunday are handled differently, because they are operationally different days:
-
-- **Sunday** — Inside Sales **never** runs a shift on Sunday, so there is no need to check: **the denominator contribution from Sunday is always 0\.** However, leads and simulations still flow through the funnel on Sundays (bot-driven tracks keep operating), so Sunday's handoff volume is real and **is included in the numerator** whenever the requester opts to consider the weekend.  
-- **Saturday** — Inside Sales *sometimes* runs a **reduced** Saturday shift with fewer analysts, so this must be checked per Saturday, not assumed: does at least one analyst meet the Active Analyst Threshold (≥10 handoffs) that Saturday?  
-  - **Yes, operation occurred** → treat that Saturday like a normal weekday: its handoff volume goes into the numerator **and** its active-analyst count goes into the denominator.  
-  - **No operation occurred** (i.e. genuinely 0 analysts met the threshold that Saturday) → its handoff volume still goes into the numerator (same as Sunday), but its denominator contribution is 0 — there is no staffed capacity that day to attribute a per-analyst rate to.  
-  - **Always compute this by query (per-analyst, ≥10 threshold), never by inference from the day's total volume alone.** 2026-08-01 is a documented edge case: the ≥10-threshold query found 6 analysts crossing it, but Inside Sales confirms there was **no real staffed operation** that Saturday — the 6 are most likely residual/misattributed handoff events, not a genuine reduced shift. Where the automated threshold check and known ground-truth staffing disagree, **ground truth wins for the final number**, but **always show the calculation** (numerator, denominator, and which rule/branch was applied per day) so the reader can see exactly how it was built and override it themselves if their own operational knowledge differs. Transparency of the formula matters more than forcing every edge case to reconcile automatically.
-
-**Summary table (when the requester opts to include the weekend):**
-
-| Day | Numerator (handoff volume) | Denominator (active analysts) |
+| Column | Meaning | Type trap |
 | :---- | :---- | :---- |
-| Mon–Fri | Always included | Per Active Analyst Threshold, as normal |
-| Saturday | Always included | Only if that Saturday had a real operation (≥1 analyst over the threshold **and** not contradicted by known staffing); otherwise 0 |
-| Sunday | Always included | Always 0 (no shift ever runs) |
+| `data` | the calendar day | **`varchar`** — `CAST(data AS DATE)` |
+| `qtd_analistas` | how many analysts were active that day | **`varchar`** — `CAST(qtd_analistas AS INTEGER)` |
 
-- **State this explicitly** alongside the Active Analyst Threshold whenever a handoff-per-analyst question is answered: whether the weekend was asked about and included, and — if Saturday was included — whether operation was detected that day.  
-- This is distinct from `/DU` (business-day count from `dw_public.dim_date.is_brz_business_day`), which is used for Leads/DU, CD/DU, R$/DU — those are **not** affected by this rule, only handoff-per-analyst metrics are.
+Everything a per-analyst metric needs is in those two columns:
 
-### Handoff (business days) vs. Handoff (full week) — two different numbers by design
+- **Join on the day being measured**, never on the deal creation date.
+- **Weekends and holidays are already in the data.** Sunday is `0` on every Sunday; Saturday is `0` on most Saturdays and carries a real reduced headcount (~6 analysts) when there is a shift; weekday zeros are holidays. **There is no weekend rule to apply and nothing to ask the requester** — a day with no operation contributes 0 to the denominator because the sheet says so.
+- **The sheet runs ahead of today** (planned staffing for future dates). Scope any per-analyst metric to closed days, or the denominator mixes fact with plan.
+- Verified on 2026-09-09: 395 rows, one per day, no duplicates, covering 2025-09-01 to 2026-09-30.
 
-**Handoff (business days)** is the sum of handoff volume across Monday–Friday only, **before** any weekend days the requester may have opted to add per the Weekend Rule above — this is the default numerator base for **Handoff/Analyst/Day**. When the requester opts to include the weekend, report the resulting number as *handoff over business days plus the weekend*, rather than silently folding it back into the business-day figure.
+### Handoff — what counts as a handoff, per track
 
-**Handoff (full week)** is the sum of handoff volume across all 7 days of the week, with no exclusions — used for raw volume reporting, track segmentation (SDR Humano / SDR IA / SIMULATOR IA), and any other handoff read that is not per analyst.
+Handoff is where Conrado hands the deal to a human analyst, and **the milestone that marks it is different in each track**:
 
-**These two numbers will differ whenever there is Saturday/Sunday handoff activity, and that is expected, not an error.** When reporting either one, name it explicitly — in Portuguese answers use the labels `Handoff (dias úteis)` and `Handoff (semana total)` — so the two are never confused or silently swapped.
+| Track | Handoff happens when the deal reaches | Counted on |
+| :---- | :---- | :---- |
+| `SDR Humano` | **Lead** — there is no AI stage before it, so having a deal created is already a handoff | `ts_deal_created` |
+| `SDR IA` | **Simulação** (Simulation Sent) | `ts_simulation_sent` |
+| `SIMULATOR IA` | **Simulação Aceita** (Simulation Accepted) | `ts_simulation_accepted` |
+
+- Coincident, so each deal is counted **on the date of its own handoff milestone**, not on the cohort date.
+- A deal that never reached its track's milestone is not a handoff — it is still with Conrado.
+- Handoff is normally reported **split by track**, most often `SDR Humano` vs `SIMULATOR IA` (`SDR IA` is discontinued and its volume is residual).
+- `deal_milestone` also carries `is_handoff` / `ts_handoff`, which already encode this rule. Use them when the base is at deal grain; use the per-track expression above when you need the split explicit in the query.
 
 ### Handoff/Analyst/Day — Official Formula
 
-**Handoff/Analyst/Day is a weekly (or longer-period) figure, computed as a pooled rate — not an average of daily ratios:**
+**A pooled rate over the period — not an average of daily ratios:**
 
 ```
-Handoff/Analyst/Day (period) = SUM(daily handoff volume, over the included days)
-                                 / SUM(daily active-analyst count, over the included days)
+Handoff/Analyst/Day (period) = SUM(handoffs in the period)
+                                 / SUM(active analysts on each day of the period)
 ```
 
-- **Included days** \= Monday–Friday always; Saturday and Sunday only if the requester opts in per the Weekend Rule decision path above. That is the business-day figure vs. the business-day-plus-weekend figure defined above — neither is automatically the raw 7-day weekly total.  
-- **Numerator:** sum of handoff volume across the included days. Both Saturday and Sunday, when opted in, always contribute their full handoff volume to the numerator — this holds even when Saturday had no detected operation, and always for Sunday.  
-- **Denominator:** sum, across the included days, of the count of analysts who were "active" that day (≥10 handoffs — Active Analyst Threshold). This is a sum of daily headcounts, **not** a distinct-analyst count for the period (the same analyst active on 5 weekdays contributes 5 to this sum). Sunday always contributes 0 to this sum (no shift ever runs). Saturday contributes 0 unless that specific Saturday had a real operation — ≥1 analyst over the threshold **and** no ground-truth staffing information contradicting it (see the Weekend Rule; 2026-08-01 is the documented case where it does).  
-- **Do not** compute this as `AVG(daily_handoff / daily_active_analysts)` (average of daily ratios) — that method under-weights high-volume days and was explicitly rejected in favor of the pooled/summed formula above. If both are ever shown side by side for context, always label which is which; only the pooled formula is the official Handoff/Analyst/Day.  
-- **Worked example (week of 2026-07-27, weekend excluded per requester's answer):** 3,715 weekday handoffs ÷ 117 analyst-active-days \= **31.8** Handoff/Analyst/Day. Had the requester opted to include the weekend, this same week shows why the ground-truth override matters. Saturday (01/08) had 195 handoffs and the ≥10-threshold query returned 6 analysts, **but Inside Sales confirmed there was no staffed operation that day** — so, per the Weekend Rule, ground truth wins and Saturday contributes **0** to the denominator (its 195 handoffs still count in the numerator). Sunday (02/08) had 237 handoffs and always contributes 0 to the denominator. Numerator \= 3,715 \+ 195 \+ 237 \= 4,147; denominator \= 117 \+ 0 (Saturday, no real operation) \+ 0 (Sunday, forced) \= 117 → **4,147 ÷ 117 \= 35.4**. Always show this breakdown — the numerator, the denominator, and which branch was applied per day — so the reader can see that Saturday's 6 threshold-crossing analysts were deliberately excluded.
+- **Numerator:** all handoffs whose milestone date falls in the period, per the per-track table above. Every day in the range contributes its volume, weekend included — bot-driven tracks keep producing handoff on Saturday and Sunday.
+- **Denominator:** the sum of `qtd_analistas` across the days of the period. This is a **sum of daily headcounts**, not a distinct-analyst count: an analyst working 5 days contributes 5. Days with no operation contribute 0 on their own.
+- **Do not** compute it as `AVG(daily_handoff / daily_active_analysts)` — the average of daily ratios under-weights high-volume days. Only the pooled formula is official.
+- The same formula works for a single day, a week, a month or any date range: sum both sides over the range and divide.
+
+### Handoff (business days) vs. Handoff (full week)
+
+Handoff volume is produced every day of the week, including weekends, because the bot-driven tracks never stop. When reporting **raw handoff volume**, say which window it covers — `Handoff (dias úteis)` for Monday to Friday, `Handoff (semana total)` for all 7 days — so two reports of the same week are never compared across different windows.
+
+This distinction does **not** change Handoff/Analyst/Day: that metric sums both sides over whatever range was asked, and days with no staffed operation already contribute 0 to the denominator through the sheet.
 
 ### Stage inventory (*estoque*) — daily snapshot base
 
@@ -156,10 +153,10 @@ A deal that enters and leaves on the same day counts on both ends, which is what
 
 **Reading the inventory:**
 
-- The usual question — "what is the inventory right now" — is **the latest snapshot date, normally D-1**: filter `snapshot_date = <last closed day>` and `is_stock_eod`. Do not aggregate `is_stock_eod` across several days and call it inventory: that sums the same deal once per day it sat there.  
-- On the most recent snapshot, `date_exited IS NULL` means the deal has not left the stage at all.  
-- **Always state the snapshot date** — inventory is point-in-time and the same question on another day returns different numbers for the same deals.  
-- Aging is measured in **business days since entering the stage**, bucketed by `aging_band`: `1) 0-2`, `2) 3-5`, `3) 6-11`, `4) 12+` business days. The bands are what flag stalled deals.  
+- The usual question — "what is the inventory right now" — is **the latest snapshot date, normally D-1**: filter `snapshot_date = <last closed day>` and `is_stock_eod`. Do not aggregate `is_stock_eod` across several days and call it inventory: that sums the same deal once per day it sat there.
+- On the most recent snapshot, `date_exited IS NULL` means the deal has not left the stage at all.
+- **Always state the snapshot date** — inventory is point-in-time and the same question on another day returns different numbers for the same deals.
+- Aging is measured in **business days since entering the stage**, bucketed by `aging_band`: `1) 0-2`, `2) 3-5`, `3) 6-11`, `4) 12+` business days. The bands are what flag stalled deals.
 - Value sitting in the stage is `SUM(credit_value)` over the `is_stock_eod` rows.
 
 **Stages in scope.** Three stages are excluded **as the origin of a stay**, but kept **as a destination** when classifying an exit:
@@ -180,9 +177,9 @@ A deal that enters and leaves on the same day counts on both ends, which is what
 
 `credit_value` is the deal's potential credit amount, taken from the **most advanced value the funnel has filled in**, because different stages populate different fields:
 
-1. `deal_amount` — filled by the analyst at `Proposta Aceita` / `Contrato Emitido` (mandatory only at `Contrato Emitido`).  
-2. `negotiation_value` — filled by the analyst when the deal moves to `Proposta em Negociação`.  
-3. `last_simulation_amount` — the last simulated amount in Conrado; only populated from `Simulação` onward.  
+1. `deal_amount` — filled by the analyst at `Proposta Aceita` / `Contrato Emitido` (mandatory only at `Contrato Emitido`).
+2. `negotiation_value` — filled by the analyst when the deal moves to `Proposta em Negociação`.
+3. `last_simulation_amount` — the last simulated amount in Conrado; only populated from `Simulação` onward.
 4. `0` when none of the three is filled.
 
 ```sql
@@ -227,24 +224,24 @@ The **inventory base is different on purpose**: it keeps every stay (no `rn = 1`
 
 Reconciliation surfaced two distinct failure modes on `venda fechada` stage-entry rows in the raw stage history (originally found on `datalake_hubspot.deal_stage`; the same shapes carry into `datalake_consorcio.deal_stage`). Both **inflate** Closed Deals / GMV New / distort Avg Ticket if not filtered:
 
-1. **Reversed-in-month closes.** A deal enters `venda fechada`, is later moved back to an earlier stage (e.g. `Simulação`) within the same month. The stage-entry row for the original close still exists in `deal_stage` history, so a naive count double-attributes it as a real close. **Confirmed case:** one deal closed and reverted to `Simulação` on the same day, inflating that day's count from 15 to 16 and GMV by R$ 400k.  
-   - **Fix:** require the deal's *current* stage (`datalake_consorcio.deal.current_stage`) to still be `venda fechada` at query time — this is the guard already applied in the golden query's join.  
-2. **Duplicate stage-entry events.** The same `id_deal` gets two `venda fechada` stage-entry rows fired seconds-to-minutes apart (same amount, no intervening stage change) — most likely a duplicate webhook/event fire in the HubSpot integration, not two separate sales. **Confirmed cases:** two separate days each had one deal with a duplicate close event (44 seconds apart in one case), inflating each day's count by 1 and GMV by the deal's `deal_amount`.  
+1. **Reversed-in-month closes.** A deal enters `venda fechada`, is later moved back to an earlier stage (e.g. `Simulação`) within the same month. The stage-entry row for the original close still exists in `deal_stage` history, so a naive count double-attributes it as a real close. **Confirmed case:** one deal closed and reverted to `Simulação` on the same day, inflating that day's count from 15 to 16 and GMV by R$ 400k.
+   - **Fix:** require the deal's *current* stage (`datalake_consorcio.deal.current_stage`) to still be `venda fechada` at query time — this is the guard already applied in the golden query's join.
+2. **Duplicate stage-entry events.** The same `id_deal` gets two `venda fechada` stage-entry rows fired seconds-to-minutes apart (same amount, no intervening stage change) — most likely a duplicate webhook/event fire in the HubSpot integration, not two separate sales. **Confirmed cases:** two separate days each had one deal with a duplicate close event (44 seconds apart in one case), inflating each day's count by 1 and GMV by the deal's `deal_amount`.
    - **Fix:** dedupe to one row per `id_deal` — the first `venda fechada` entry, ordered by `ts_entered` ascending (the `rn = 1` window in the golden query).
 
 Both fixes are combined into a single filter (see Canonical Filter above): **first stage-entry per `id_deal` into `venda fechada`, AND current stage still `venda fechada`.** This has been validated against the official base for three separate days in the 2026-07-27 → 2026-08-08 window with a full match after the fix.
 
-**Not yet investigated:** whether the same duplicate-event pattern affects other stages (`leads`, `simulação`, `simulação aceita`, handoff stage-entries) — if so, **Leads**, **Handoff**, and **R$/Handoff** may need the same per-deal-per-stage dedup. Flag this to the Data Owner / Inside Sales before treating those metrics as clean.
+The same duplicate-event pattern affects other stages, mostly stages after handoff for `SIMULATOR IA` or the whole funnel for `SDR Humano` because the cards are moved manually by the analyst, therefore, **Leads**, **Handoff**, and **R$/Handoff** need the same per-deal-per-stage dedup.
 
 ### Nuances
 
-- **No Blip ticket data** — state this whenever a ticket/conversation/Blip-SLA read is requested.  
-- **Conversion defaults to Cohort** — only compute a coincident conversion when explicitly asked as coincident, or when the ask is volumes per day/week.  
-- **Handoff is track-aware** (same rule as the domain entity) — reported as `SDR IA/Analyst/Day`, `Simulador/Analyst/Day`, `Repescagem/Analyst/Day`, summing to `Handoff/Analyst/Day`.  
-- **Closed Deals / GMV New / Avg Ticket are deal-deduplicated, not row-counted** — see Known Data-Quality Issues. Never `COUNT(*)` or `SUM(deal_amount)` directly over raw `venda fechada` stage-entry rows without the per-deal dedup and current-stage check.  
-- **Handoff/Analyst/Day (and any handoff-per-analyst read) applies the Active Analyst Threshold (≥10 handoffs/day to count as active) and the Weekend Rule** — see the two subsections above. State both rules explicitly in the answer, every time.  
-- **Inventory needs a single snapshot date** — normally D-1. Summing `is_stock_eod` over a range counts the same deal repeatedly.  
-- **Inventory drops deals with no supervisor.** The inventory base requires `supervisor_name IS NOT NULL` and not `'n/a'`, because the report is an operational cut. This is a small exclusion (165 of 61,975 deals created in August 2026\) but it means inventory totals will not match an unfiltered stage count exactly.  
+- **No Blip ticket data** — state this whenever a ticket/conversation/Blip-SLA read is requested.
+- **Conversion defaults to Cohort** — only compute a coincident conversion when explicitly asked as coincident, or when the ask is volumes per day/week.
+- **Handoff is track-aware** (same rule as the domain entity) — reported as `SDR IA/Analyst/Day`, `Simulador/Analyst/Day`, `SDR Humano/Analyst/Day`, summing to `Handoff/Analyst/Day`.
+- **Closed Deals / GMV New / Avg Ticket are deal-deduplicated, not row-counted** — see Known Data-Quality Issues. Never `COUNT(*)` or `SUM(deal_amount)` directly over raw `venda fechada` stage-entry rows without the per-deal dedup and current-stage check.
+- **Handoff/Analyst/Day divides by the headcount table**, not by a heuristic — and the table already resolves weekends and holidays. State the period, the numerator and the denominator in the answer, every time.
+- **Inventory needs a single snapshot date** — normally D-1. Summing `is_stock_eod` over a range counts the same deal repeatedly.
+- **Inventory drops deals with no supervisor.** The inventory base requires `supervisor_name IS NOT NULL` and not `'n/a'`, because the report is an operational cut. This is a small exclusion (165 of 61,975 deals created in August 2026\) but it means inventory totals will not match an unfiltered stage count exactly.
 - **Cycle time is materialized in the cohort model, not here.** `datalake_consorcio.deal_milestone` now carries `business_days_from_created_to_*`; those are lead-anchored, first-hit measures and belong to the Cohort View. Coincident aging is computed on the stage visit (`business_days_in_stage`), which is a different clock.
 
 **Join key**: `CAST(deal.id_deal AS VARCHAR) = deal_stage.id_deal`. The base carries `analyst_name` / `analyst_role` / `supervisor_name` / `team` (straight from `deal`, resolved as of the deal creation date — no inline roster), `origin`, `segment`, `inside_sales_pipeline`, `deal_amount`, `negotiation_value`, `last_simulation_amount`, `stage_name`, `dt_stage_entered` / `dt_stage_exited`, and `ts_stage_entered` / `ts_stage_exited`.
@@ -255,31 +252,33 @@ Both fixes are combined into a single filter (see Canonical Filter above): **fir
 
 **Do:**
 
-- Count each metric by its **own stage timestamp** (production by close date, handoff by handoff-stage entry).  
-- Use the **track-aware handoff** for Handoff and R$/Handoff; divide by **business days** for `/DU`.  
-- Read operational metrics **by analyst, supervisor and team**; route **conversion** to the Cohort View unless coincident/volume-per-period is explicitly asked.  
-- For **Closed Deals / GMV New / Avg Ticket**, dedupe to one row per `id_deal` (first `venda fechada` entry) **and** require the deal's current stage to still be `venda fechada` before counting it.  
-- For **any handoff-per-analyst metric**, apply the **Active Analyst Threshold** (≥10 handoffs/day to count as active) and the **Weekend Rule** — Sunday's denominator is always 0 (but its volume counts if the weekend is opted in); Saturday's denominator depends on whether operation was detected that specific day — and say so explicitly in the answer.  
-- **Ask the requester whether to include the weekend** every time a Handoff/Analyst/Day period spans a Saturday or Sunday — never assume yes or no.  
-- For **stage inventory**, pick **one snapshot date** (normally D-1), filter `is_stock_eod`, name the **stage**, state the snapshot date, and say whether you are reporting the count of parked deals, the aging distribution, or the value in inventory.  
-- Check the identity `estoque_eod = estoque_bod + entradas - saidas` when an inventory or flow number looks off.  
+- Count each metric by its **own stage timestamp** (production by close date, handoff by handoff-stage entry).
+- Use the **track-aware handoff** for Handoff and R$/Handoff; divide by **business days** for `/DU`.
+- Read operational metrics **by analyst, supervisor and team**; route **conversion** to the Cohort View unless coincident/volume-per-period is explicitly asked.
+- For **Closed Deals / GMV New / Avg Ticket**, dedupe to one row per `id_deal` (first `venda fechada` entry) **and** require the deal's current stage to still be `venda fechada` before counting it.
+- For **any handoff-per-analyst metric**, take the denominator from `consorcio_daily_active_analysts` (casting `data` and `qtd_analistas`) and show numerator, denominator and period in the answer.
+- Use the **per-track handoff milestone** — Lead for `SDR Humano`, Simulação for `SDR IA`, Simulação Aceita for `SIMULATOR IA` — and report handoff split by track.
+- Restrict per-analyst metrics to **closed days**: the headcount sheet also carries planned future dates.
+- For **stage inventory**, pick **one snapshot date** (normally D-1), filter `is_stock_eod`, name the **stage**, state the snapshot date, and say whether you are reporting the count of parked deals, the aging distribution, or the value in inventory.
+- Check the identity `estoque_eod = estoque_bod + entradas - saidas` when an inventory or flow number looks off.
 - Label handoff totals explicitly — business days, business days plus weekend (both Handoff/Analyst/Day numerators), or full week (raw volume across all 7 days, no analyst denominator). In Portuguese answers these map to `Handoff (dias úteis)`, `Handoff (dias úteis + fim de semana)` and `Handoff (semana total)`. Never present one number without saying which it is.
 
 **Don't:**
 
-- Don't anchor coincident metrics on lead-creation cohort; don't use a non-track-aware handoff.  
-- Don't attempt Blip-ticket/conversation metrics (no data); don't count reversed in-month closes (already guarded).  
-- Don't default a bare "conversão" to coincident — that's cohort.  
-- Don't sum `is_stock_eod` across multiple snapshot dates and call it inventory — that counts the same deal once per day it was parked.  
-- Don't report inventory for `Descarte`, `Venda fechada` or `Carrinho Abandonado` — they are excluded as origin stages by design (terminal or out of scope).  
-- Don't count a deal that already left the stage as inventory — report those separately as time in stage.  
-- Don't read `value_source = 'negociado'` as "the contract amount is filled" — it also covers `negotiation_value`.  
-- Don't join a `date_trunc('day', ts_*)` expression to `dim_date.date` — `date_trunc` returns a timestamp, not a date, so it matches nothing; `CAST(... AS DATE)` is required.  
-- Don't `COUNT(*)` the coincident base for volumes — the calendar `LEFT JOIN` leaves NULL-padded rows for days with no events; count `id_deal` instead.  
-- Don't `COUNT(*)` or `SUM(deal_amount)` raw `venda fechada` stage-entry rows for Closed Deals/GMV/Avg Ticket — duplicate close events and reversed closes will inflate the numbers (see Known Data-Quality Issues).  
-- Don't count an analyst with fewer than 10 handoffs on a day as "active" for Handoff/Analyst/Day or similar.  
-- Don't attribute a per-analyst rate to **Sunday**, or to a **Saturday with no confirmed operation** — those days contribute **0 to the denominator** (their handoff volume still counts in the numerator when the weekend is opted in). What is always zero is the *denominator contribution of those specific days*, **not** the metric: a weekend-inclusive period figure is non-zero and legitimate.  
-- Don't silently apply the Active Analyst Threshold / Weekend Rule without mentioning them — they change the reported number and must be visible to whoever asked.
+- Don't anchor coincident metrics on lead-creation cohort; don't use a non-track-aware handoff.
+- Don't attempt Blip-ticket/conversation metrics (no data); don't count reversed in-month closes (already guarded).
+- Don't default a bare "conversão" to coincident — that's cohort.
+- Don't sum `is_stock_eod` across multiple snapshot dates and call it inventory — that counts the same deal once per day it was parked.
+- Don't report inventory for `Descarte`, `Venda fechada` or `Carrinho Abandonado` — they are excluded as origin stages by design (terminal or out of scope).
+- Don't count a deal that already left the stage as inventory — report those separately as time in stage.
+- Don't read `value_source = 'negociado'` as "the contract amount is filled" — it also covers `negotiation_value`.
+- Don't join a `date_trunc('day', ts_*)` expression to `dim_date.date` — `date_trunc` returns a timestamp, not a date, so it matches nothing; `CAST(... AS DATE)` is required.
+- Don't `COUNT(*)` the coincident base for volumes — the calendar `LEFT JOIN` leaves NULL-padded rows for days with no events; count `id_deal` instead.
+- Don't `COUNT(*)` or `SUM(deal_amount)` raw `venda fechada` stage-entry rows for Closed Deals/GMV/Avg Ticket — duplicate close events and reversed closes will inflate the numbers (see Known Data-Quality Issues).
+- Don't use the retired ≥10-handoffs heuristic to decide who was active — read the headcount table.
+- Don't count a `SIMULATOR IA` deal as handoff before Simulação Aceita, or an `SDR IA` deal before Simulação — the milestone differs per track.
+- Don't drop weekend handoff volume from the numerator — the bot keeps producing handoff on Saturday and Sunday, and the denominator already handles the missing shift by being 0 on those days.
+- Don't compute Handoff/Analyst/Day as an average of daily ratios; it is a pooled sum over sum.
 
 ## Golden Queries
 
@@ -289,8 +288,8 @@ One row per (deal, stage) at its **first entry** into that stage, joined to the 
 
 Two things to know before aggregating it:
 
-- **The date key must be `CAST(ts_entered AS DATE)`, not `date_trunc('day', ts_entered)`.** `date_trunc` returns a timestamp, not a date, so it does not compare equal to `dim_date.date` — the join then matches nothing and every calendar row comes back NULL-padded (verified: 31 July dates, 0 matches). With the cast the same window returns **208,941 rows, 0 NULL-padded, 254 closed deals and R$ 98.73M GMV — an exact match to the July figures reported in the Daily Digest**.  
-- The calendar is `LEFT JOIN`ed, so dates with no qualifying stage event still produce a row with all `ds.*` columns NULL. Use `COUNT(ds.id_deal)` or `SUM(CASE WHEN ... THEN 1 ELSE 0 END)` for volumes — a bare `COUNT(*)` would count those empty days too.  
+- **The date key must be `CAST(ts_entered AS DATE)`, not `date_trunc('day', ts_entered)`.** `date_trunc` returns a timestamp, not a date, so it does not compare equal to `dim_date.date` — the join then matches nothing and every calendar row comes back NULL-padded (verified: 31 July dates, 0 matches). With the cast the same window returns **208,941 rows, 0 NULL-padded, 254 closed deals and R$ 98.73M GMV — an exact match to the July figures reported in the Daily Digest**.
+- The calendar is `LEFT JOIN`ed, so dates with no qualifying stage event still produce a row with all `ds.*` columns NULL. Use `COUNT(ds.id_deal)` or `SUM(CASE WHEN ... THEN 1 ELSE 0 END)` for volumes — a bare `COUNT(*)` would count those empty days too.
 - `ts_stage_exited` is `NULL` while the deal is **still in the stage**. This base keeps only the first entry per stage, so for inventory and flow use Query 3 instead, which keeps every stay.
 
 ```sql
@@ -730,6 +729,44 @@ ORDER BY snapshot_date DESC, sp.funnel_order, analyst_name, id_deal
 
 **Reference numbers (snapshot 2026-08-31, `is_stock_eod`):** `Contato com Sucesso` 8,146 deals; `Simulação` 6,082 (R$ 656.7M); `Simulação Aceita` 4,837 (R$ 886.1M); `Proposta em Negociação` 139 (R$ 68.7M); `Proposta Aceita` 35 (R$ 16.7M); `Contrato Emitido` 48 (R$ 21.2M); `Deseja abordagem futura` 168 (R$ 260.0M). Use these to sanity-check a rewrite of the query, not as a reported figure.
 
+
+### Query 4 — Handoff/Analyst/Day
+
+```sql
+-- Handoff/Analyst/Day for any date range, total and by track.
+WITH handoff AS (
+    SELECT
+        CASE
+            WHEN d.inside_sales_pipeline = 'SDR Humano'   AND m.is_lead = 1                THEN CAST(m.ts_lead AS DATE)
+            WHEN d.inside_sales_pipeline = 'SDR IA'       AND m.is_simulation_sent = 1     THEN CAST(m.ts_simulation_sent AS DATE)
+            WHEN d.inside_sales_pipeline = 'SIMULATOR IA' AND m.is_simulation_accepted = 1 THEN CAST(m.ts_simulation_accepted AS DATE)
+        END AS dt_handoff,
+        d.inside_sales_pipeline AS track
+    FROM datalake_consorcio.deal d
+    JOIN datalake_consorcio.deal_milestone m ON m.id_deal = d.id_deal
+    WHERE YEAR(ts_handoff) = 2026 AND MONTH(ts_handoff) IN (7, 8)
+),
+h AS (
+    SELECT track, COUNT(*) AS handoffs
+    FROM handoff
+    WHERE dt_handoff BETWEEN DATE '2026-08-04' AND DATE '2026-08-10'
+    GROUP BY track
+),
+a AS (
+    SELECT SUM(CAST(qtd_analistas AS INTEGER)) AS analyst_days
+    FROM datalake_gsheets_clean.consorcio_daily_active_analysts
+    WHERE CAST(data AS DATE) BETWEEN DATE '2026-08-04' AND DATE '2026-08-10'
+)
+SELECT
+    (SELECT SUM(handoffs) FROM h)                                        AS handoff_total,
+    (SELECT SUM(handoffs) FROM h WHERE track = 'SIMULATOR IA')           AS handoff_simulator_ia,
+    (SELECT SUM(handoffs) FROM h WHERE track = 'SDR Humano')             AS handoff_sdr_humano,
+    (SELECT analyst_days FROM a)                                         AS analyst_days,
+    ROUND(1e0 * (SELECT SUM(handoffs) FROM h) / (SELECT analyst_days FROM a), 1) AS handoff_per_analyst_day
+```
+
+**Worked example — week of 2026-08-04 to 2026-08-10:** 3,265 handoffs (2,109 `SIMULATOR IA`, 1,121 `SDR Humano`, 35 `SDR IA`) over 97 analyst-days — 5 days with operation, Saturday and Sunday at 0 in the sheet. **3,265 ÷ 97 = 33.7** handoffs per analyst per day. Always show the numerator, the denominator and the period, so the reader can rebuild the number.
+
 ### Reference — Closed Deals / GMV New / Avg Ticket directly from Trino
 
 Production computed straight from the official source, with the dedup \+ reversal guard made explicit (useful when not going through the Superset dataset):
@@ -761,6 +798,5 @@ ORDER BY close_date
 
 ## Superset Golden Assets
 
-- **Funil Coincident \- Não Agregado \[Consorcio\]\[Fintech\]** — the canonical coincident deal × stage dataset (Query 1).  
+- **Funil Coincident \- Não Agregado \[Consorcio\]\[Fintech\]** — the canonical coincident deal × stage dataset (Query 1).
 - **Estoque \[Consorcio\]\[Fintech\]** — the stock reference dataset (Query 3)
-
