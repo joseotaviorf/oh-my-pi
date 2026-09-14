@@ -14,13 +14,13 @@
 
 **Consórcio Funnel — Cohort View** is the family of official **cohort** funnel metrics for Consórcio: conversions and cycle time anchored on the **lead creation date** and matured in **business days**. It is the canonical efficiency lens for the funnel (Daily, WBR, Fechamento Mensal, MBR). It differs from a naive read because every conversion is measured over the *cohort of leads that entered in a window* — not the volume that crossed a stage in the period (that is the Coincident View) — and maturation is counted in **business days**, not calendar days.
 
-**Measured from `Lead` onward** — top-of-funnel conversions (PV2L, Sent → Page View) and are out of scope.
+**Measured from `Lead` onward** — top-of-funnel conversions (PV2L, Sent → Page View) are out of scope.
 
-**Maturation is materialized.** Cycle times are no longer computed in the metric query: `datalake_consorcio.deal_milestone` ships one `business_days_from_created_to_*` column per milestone. Stage-to-stage windows are **derived by subtracting two of those columns** — the rule is in [Calculation](#calculation).
+**Maturation is materialized.** - `datalake_consorcio.deal_milestone` ships one `business_days_from_created_to_*` column per milestone. Stage-to-stage windows are **derived by subtracting two of those columns** — the rule is in [Calculation](#calculation).
 
 ## Related Domain Entities
 
-- Consórcio (Inside Sales Funnel)
+- Consórcio
 
 ## Catalog
 
@@ -38,17 +38,27 @@
 | OUN2OA (Offer Under Negotiation → Offer Accepted) | Health Metric |
 | OA2CC (Offer Accepted → Contract Created) | Health Metric |
 | CC2CD (Contract Created → Closed Deal) | Health Metric |
+| SC2SA (Successful Contact → Simulation Accepted) | Health Metric |
+| SC2CD (Successful Contact → Closed Deal) | Health Metric |
+| SA2OA (Simulation Accepted → Offer Accepted) | Health Metric |
+| SA2CC (Simulation Accepted → Contract Created) | Health Metric |
+| OUN2CD (Offer Under Negotiation → Closed Deal) | Health Metric |
+| OA2CD (Offer Accepted → Closed Deal) | Health Metric |
+| L2OUN / L2OA / L2CC (Lead → each late stage) | Health Metric |
+| Any other stage pair (e.g. SC2CC, SS2OA) | Health Metric |
 
 ## Glossary and Synonyms
 
-- **L2CD**, **Lead to Closed Deal**, **conversão lead→venda**, **eficiência do funil** → this metric family (Result)  
-- **L2SA**, **Lead to Simulation Accepted**, **conversão até o handoff** → L2SA  
-- **SA2CD**, **Simulation Accepted to Closed Deal**, **conversão da esteira comercial** → SA2CD  
-- **SS2CD**, **Simulation Sent to Closed Deal** → SS2CD  
-- **L2SC / SC2SS / L2SS / SS2SA** → top and middle of funnel (diagnostic)  
-- **SA2OUN / OUN2OA / OA2CC / CC2CD** → human journey (diagnostic)  
-- **conversão cohort**, **eficiência da safra**, **cohort D+n** → cohort reading of any of the above  
-- **maturação**, **aging de conversão** → the business-day distance between two milestones  
+- **L2CD**, **Lead to Closed Deal**, **conversão lead→venda**, **eficiência do funil** → this metric family (Result)
+- **L2SA**, **Lead to Simulation Accepted**, **conversão até o handoff** → L2SA
+- **SA2CD**, **Simulation Accepted to Closed Deal**, **conversão da esteira comercial** → SA2CD
+- **SS2CD**, **Simulation Sent to Closed Deal** → SS2CD
+- **L2SC / SC2SS / L2SS / SS2SA** → top and middle of funnel (diagnostic)
+- **SA2OUN / OUN2OA / OA2CC / CC2CD** → human journey (diagnostic)
+- **SC2SA / SC2CD / SA2OA / SA2CC / OUN2CD / OA2CD** → intermediate conversions, same rule as the named ones
+- **X2Y**, **conversão de \<etapa\> para \<etapa\>** → any stage pair; if it is not in the Catalog it is still computable — see *Any stage pair, on demand*
+- **conversão cohort**, **eficiência da safra**, **cohort D+n** → cohort reading of any of the above
+- **maturação**, **aging de conversão** → the business-day distance between two milestones
 - **DU** (*dia útil*) → business day on the Brazilian calendar
 
 ## Scope
@@ -87,9 +97,9 @@ over the lead cohort. Value metrics: `GMV New = SUM(deal_amount)` over Closed De
 
 Semantics that decide whether a formula is right:
 
-- **Created is the lead anchor.** `business_days_from_created_to_lead` is `0` across the base (validated on the July 2026 cohort: 56,324 of 56,324 rows), so creation date and lead date are the same anchor. Every `L2*` metric therefore reads its column directly, with no offset.  
-- **`NULL`, never `0`, when the milestone was not reached** — or when its date falls outside the calendar window. `0` always means a genuine **same-day** transition. This is why the maturation column also gates the numerator: it is non-null exactly when the stage flag is `1` (validated on July 2026: 43,619 non-null SC maturations against 43,619 `is_success_contact = 1`, and 5,995 against 5,995 for SA — zero mismatches).  
-- **Immutable once reached.** A `business_days_*` value never changes after its milestone happens, so a cohort number computed today is reproducible tomorrow.  
+- **Created is the lead anchor.** `business_days_from_created_to_lead` is `0` across the base (validated on the July 2026 cohort: 56,324 of 56,324 rows), so creation date and lead date are the same anchor. Every `L2*` metric therefore reads its column directly, with no offset.
+- **`NULL`, never `0`, when the milestone was not reached** — or when its date falls outside the calendar window. `0` always means a genuine **same-day** transition. This is why the maturation column also gates the numerator: it is non-null exactly when the stage flag is `1` (validated on July 2026: 43,619 non-null SC maturations against 43,619 `is_success_contact = 1`, and 5,995 against 5,995 for SA — zero mismatches).
+- **Immutable once reached.** A `business_days_*` value never changes after its milestone happens, so a cohort number computed today is reproducible tomorrow.
 - **`aging_opened_leads` and `days_in_current_stage` are the exception** — both are relative to the **run date** and only valid as of the last rebuild. Never use them inside a historical cohort comparison.
 
 ### Stage-to-stage maturation (derived)
@@ -109,10 +119,30 @@ General form, where `Y` is the later stage and `X` the earlier one:
 GREATEST(0, business_days_from_created_to_Y - business_days_from_created_to_X)
 ```
 
-- **`GREATEST(0, ...)` is an exception guard, not a modelling choice.** A negative result has no business meaning, so it is floored at 0\. It is rare: on the July 2026 cohort exactly **1 of 5,995** SC → SA pairs was negative (minimum `-2`), around 0.02%.  
-- **Null propagates, which is correct.** If either stage was not reached the subtraction is `NULL`, so the deal is excluded from the numerator and the pair is never counted as a 0-day conversion.  
-- Use the same derivation for every intermediate pair: `sc→ss`, `ss→sa`, `sa→oun`, `oun→oa`, `oa→cc`, `cc→cd`, `ss→cd`, `sa→cd`, `handoff→cd`.  
+- **`GREATEST(0, ...)` is an exception guard, not a modelling choice.** A negative result has no business meaning, so it is floored at 0\. It is rare: on the July 2026 cohort exactly **1 of 5,995** SC → SA pairs was negative (minimum `-2`), around 0.02%.
+- **Null propagates, which is correct.** If either stage was not reached the subtraction is `NULL`, so the deal is excluded from the numerator and the pair is never counted as a 0-day conversion.
+- Use the same derivation for every intermediate pair: `sc→ss`, `sc-sa`, `ss→sa`, `sa→oun`, `oun→oa`, `oa→cc`, `cc→cd`, `ss→cd`, `sa→cd`, `handoff→cd`.
 - **Although cohort membership is anchored on the lead creation date, conversions are not restricted to a lead anchor** — with this rule any `X2Y` can be matured from its own start stage `X`.
+
+### Any stage pair, on demand
+
+**The Catalog is not a closed list.** If someone asks for a conversion that is not named there — `SC2CC`, `SS2OA`, anything — it is still an official number, computed exactly like the named ones. Nothing new needs to be defined:
+
+1. Take the two stages from the funnel definition in the **Consórcio** business entity, and their two `is_*` flags.
+2. Denominator = `SUM(is_X)` — the deals that reached the start stage.
+3. Numerator = deals that reached `Y` within `n` business days of `X`, using the subtraction rule above.
+4. State the maturation used, since an unnamed pair has no canonical window — ask for `D+n`, or say which one you assumed.
+
+```sql
+-- SC2CC at D+14, as an example of a pair that is not in the Catalog
+100e0 * SUM(CASE WHEN is_contract_created = 1
+                  AND GREATEST(0, business_days_from_created_to_contract_created
+                                - business_days_from_created_to_success_contact) <= 14
+             THEN 1 END)
+      / NULLIF(SUM(is_success_contact), 0) AS sc2cc_d14
+```
+
+The only pairs that are **not** valid are the ones the funnel does not order: `Contact Attempt` is a branch, not a cumulative stage, so a `TC2*` conversion has a smaller and differently-shaped population than an `L2*` one — say so when reporting it. And any pair involving `OUN` or `CC` is only valid for cohorts on or after 2026-07-20.
 
 Metric hierarchy and canonical windows (from *\[Consórcio\] Novo Funil* — initial, to be calibrated):
 
@@ -121,8 +151,11 @@ Metric hierarchy and canonical windows (from *\[Consórcio\] Novo Funil* — ini
 | Result | L2CD | D14 | Leads |
 | Health | L2SA | D0–D2 | Leads |
 | Health | SA2CD / SS2CD | D7 / D14 | Reached SA / SS |
-| Diagnostic | L2SC, SC2SS, L2SS, SS2SA | D0–D1/D2 | Leads / reached start stage |
-| Diagnostic | SA2OUN, OUN2OA, OA2CC, CC2CD | D2 / D7 / D14 | Reached start stage |
+| Health | L2SC, SC2SS, SC2SA, L2SS, L2SA, SS2SA | D0–D1/D2 | Leads / reached start stage
+| Health | SA2OUN, OUN2OA, OA2CC, CC2CD | D2 / D7 / D14 | Reached start stage |
+| Health | SC2SA | D0–D2 | Reached SC |
+| Health | SC2CD, SA2OA, SA2CC, OUN2CD, OA2CD | D7 / D14 | Reached start stage |
+
 
 ### Canonical Filter
 
@@ -142,15 +175,16 @@ year = 2026 AND month = 7          -- partition pruning
 
 ### Nuances
 
-- **Open vs closed cohort — always ask.** An **open cohort** counts all conversions to date (no cap); a **closed cohort** caps at a fixed `D+n`. Do not assume the window; if you must, state the maturation used. Some conversions mature very fast (near-fully matured by roughly D2).  
-- **Handoff (canonical):** `Simulação Aceita` (`SIMULATOR IA`), `Simulação Enviada` (`SDR IA`), `Lead` (`SDR Humano`). Not a headline conversion — use SS2CD / SA2CD.  
-- **GMV** is usually read coincident (see Coincident View); available in cohort via `deal_amount`.  
-- **Contact initiation / abandoned cart (from 2026-08-10 only)** — `is_abandoned_cart = 1` (an `integer` flag) means the user did not send the first WhatsApp message, we sent the abandoned-cart template and the card moved to **TC**; a reply then advances it to **SC**. `0` means the user sent the first message and the deal went **straight to SC**. Exposed as `contact_type` (`company_initiated` / `user_initiated`). It is `NULL` for earlier cohorts — never segment a cohort by it before that date, and never compare a pre/post-2026-08-10 series on it.  
-- **Timestamps are already in BRT.** Every `ts_*` column is already converted to `America/Sao_Paulo`, and `dt_created` / `date` is already the local calendar date. Do **not** apply `AT_TIMEZONE(...)` again — a second conversion shifts the cohort date and can move deals across day/week/month boundaries.  
-- **OUN and CC valid only from 2026-07-20** — restrict conversions involving them to cohorts on or after that date.  
-- **Analyst, role, supervisor and team are resolved as of the deal creation date**, from the Operação IS sheet, so a cohort split by supervisor reflects the operation as it was — not as it is today. Deals owned by an analyst who received leads after their end date carry supervisor `other`.  
-- **Use `100e0`, not `100.0`, in a conversion ratio.** In Trino `100.0` is a `decimal(4,1)`, so the whole expression stays at scale 1 and `ROUND(x, 3)` cannot recover the lost digits — an L2CD of `0.582%` prints as `0.6%`. Multiplying by the double literal `100e0` keeps the precision. This matters for the sub-1% conversions (L2CD, SS2CD), not for the mid-funnel ones.  
-- **Parity with the previous model.** Recomputing the June 2026 cohort from the materialized columns returns 257 closed deals over 44,121 leads \= **0.582% L2CD matured**, matching the number produced by the old inline `dim_date` computation and the WBR cut.  
+- **Open vs closed cohort — always ask.** An **open cohort** counts all conversions to date (no cap); a **closed cohort** caps at a fixed `D+n`. Do not assume the window; if you must, state the maturation used. Some conversions mature very fast (near-fully matured by roughly D2).
+- **Handoff (canonical):** `Simulação Aceita` (`SIMULATOR IA`), `Simulação Enviada` (`SDR IA`), `Lead` (`SDR Humano`). Not a headline conversion — use SS2CD / SA2CD.
+- **GMV** is usually read coincident (see Coincident View); available in cohort via `deal_amount`.
+- **Intermediate Conversions**: For all full and intermediate conversions from Lead to Simulation Accepted (`L2SC`, `L2SS`, `L2SA`, `SC2SS`, `SC2SA`, `SS2SA`) deals from the SDR Humano pipeline should be excluded from the calculation since these are conversions to understand the AI Agent performance.
+- **Contact initiation / abandoned cart (from 2026-08-10 only)** — `is_abandoned_cart = 1` (an `integer` flag) means the user did not send the first WhatsApp message, we sent the abandoned-cart template and the card moved to **TC**; a reply then advances it to **SC**. `0` means the user sent the first message and the deal went **straight to SC**. Exposed as `contact_type` (`company_initiated` / `user_initiated`). It is `NULL` for earlier cohorts — never segment a cohort by it before that date, and never compare a pre/post-2026-08-10 series on it.
+- **Timestamps are already in BRT.** Every `ts_*` column is already converted to `America/Sao_Paulo`, and `dt_created` / `date` is already the local calendar date. Do **not** apply `AT_TIMEZONE(...)` again — a second conversion shifts the cohort date and can move deals across day/week/month boundaries.
+- **OUN and CC valid only from 2026-07-20** — restrict conversions involving them to cohorts on or after that date.
+- **Analyst, role, supervisor and team are resolved as of the deal creation date**, from the Operação IS sheet, so a cohort split by supervisor reflects the operation as it was — not as it is today. Deals owned by an analyst who received leads after their end date carry supervisor `other`.
+- **Use `100e0`, not `100.0`, in a conversion ratio.** In Trino `100.0` is a `decimal(4,1)`, so the whole expression stays at scale 1 and `ROUND(x, 3)` cannot recover the lost digits — an L2CD of `0.582%` prints as `0.6%`. Multiplying by the double literal `100e0` keeps the precision. This matters for the sub-1% conversions (L2CD, SS2CD), not for the mid-funnel ones.
+- **Parity with the previous model.** Recomputing the June 2026 cohort from the materialized columns returns 257 closed deals over 44,121 leads \= **0.582% L2CD matured**, matching the number produced by the old inline `dim_date` computation and the WBR cut.
 - **Renamed columns.** The base previously exposed inline `days_to_convert_from_*` columns. They are replaced by `business_days_from_created_to_*` plus the subtraction rule above; a saved query or chart still pointing at the old names must be remapped.
 
 **Official source**: the base dataset is built from `datalake_consorcio.deal` \+ `datalake_consorcio.deal_milestone` — the funnel business rules (pipeline filter, dedup to latest stage, test/duplicate exclusion, origin/segment mapping, analyst attribution, qualifier explosion, contact initiation, simulation aggregates and the business-day maturations) are applied in the table build, not in the metric query. Flag names follow the table: `is_lead`, `is_contact_attempted`, `is_success_contact`, `is_simulation_sent`, `is_simulation_accepted`, `is_offer_under_negotiation`, `is_offer_accepted`, `is_contract_created`, `is_closed_deal`, `is_handoff`, `is_discarded`; the value field is `deal_amount`.
@@ -163,19 +197,21 @@ year = 2026 AND month = 7          -- partition pruning
 
 **Do:**
 
-- Ask **open vs closed cohort (and days)** before answering; state the maturation if assumed.  
-- Read every conversion in **cohort** by lead creation date; mature in **business days**.  
-- Derive stage-to-stage windows with `GREATEST(0, business_days_from_created_to_Y - business_days_from_created_to_X)`.  
+- Ask **open vs closed cohort (and days)** before answering; state the maturation if assumed.
+- Read every conversion in **cohort** by lead creation date; mature in **business days**.
+- Derive stage-to-stage windows with `GREATEST(0, business_days_from_created_to_Y - business_days_from_created_to_X)`.
+- Answer **any** stage pair asked for, named in the Catalog or not — the derivation is the same; just state the maturation used.
 - Separate **mix vs intra-channel vs journey** when the aggregate moves.
 
 **Don't:**
 
-- Don't default a bare "conversão" question to coincident — it is cohort.  
-- Don't recompute maturation against `dw_public.dim_date` — it is materialized; recomputing risks a different business-day convention.  
-- Don't read a `0` maturation as "did not reach the stage" — absence is `NULL`; `0` is a same-day conversion.  
-- Don't use `aging_opened_leads` or `days_in_current_stage` in a historical comparison — both are relative to the last rebuild.  
-- Don't present GMV/ticket/R$-per-lead as cohort without confirming the view (usually coincident).  
+- Don't default a bare "conversão" question to coincident — it is cohort.
+- Don't recompute maturation against `dw_public.dim_date` — it is materialized; recomputing risks a different business-day convention.
+- Don't read a `0` maturation as "did not reach the stage" — absence is `NULL`; `0` is a same-day conversion.
+- Don't use `aging_opened_leads` or `days_in_current_stage` in a historical comparison — both are relative to the last rebuild.
+- Don't present GMV/ticket/R$-per-lead as cohort without confirming the view (usually coincident).
 - Don't analyze OUN/CC conversions before 2026-07-20; don't use a non-track-aware handoff.
+- Don't include `SDR Humano` pipeline for any conversion between the stages of Lead and Simulation Accepted
 
 ## Golden Queries
 
@@ -307,4 +343,3 @@ General pattern for any conversion `X2Y` at `D+n`:
 ## Superset Golden Assets
 
 - **Funil Cohort \- Não Agregado \[Consorcio\]\[Fintech\]** — the canonical cohort deal-grain dataset analysts consume; materialized by the Consórcio business entity's golden query. (Add the Superset dataset URN when available.)
-
