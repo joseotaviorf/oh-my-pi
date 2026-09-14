@@ -1,17 +1,28 @@
 WITH pipe_calendar AS (
-    SELECT DISTINCT
-        DATE_TRUNC('month', dt_reference) AS month,
-        LAST_DAY(dt_reference) AS month_end,
-        dt_pipe
+    SELECT
+        DATE_TRUNC('month', cwt.dt_reference) AS month,
+        LAST_DAY(cwt.dt_reference) AS month_end,
+        cwt.dt_pipe
     FROM
-        dw_collections_segmentation.fact_contract_wallet_timeline
+        dw_collections_segmentation.fact_contract_wallet_timeline AS cwt
     WHERE
-        MAKE_DATE(year, month, day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5' MONTH
+        cwt.dt_reference >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5' MONTH
+        AND (
+            cwt.year > YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5' MONTH)
+            OR (
+                cwt.year = YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5' MONTH)
+                AND cwt.month >= MONTH(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5' MONTH)
+            )
+        )
+    GROUP BY
+        1,
+        2,
+        3
     UNION
-    SELECT DISTINCT
-        DATE_TRUNC('month', dt_pipe) AS month,
-        LAST_DAY(dt_pipe) AS month_end,
-        dt_pipe
+    SELECT
+        DATE_TRUNC('month', hardcoded_pipe.dt_pipe) AS month,
+        LAST_DAY(hardcoded_pipe.dt_pipe) AS month_end,
+        hardcoded_pipe.dt_pipe
     FROM (
         VALUES
             (DATE '2026-06-08'),
@@ -21,7 +32,7 @@ WITH pipe_calendar AS (
             (DATE '2026-10-07'),
             (DATE '2026-11-09'),
             (DATE '2026-12-07')
-    ) AS t(dt_pipe)
+    ) AS hardcoded_pipe(dt_pipe)
 ),
 calendar_cardinal_points_ AS (
     SELECT
@@ -46,16 +57,15 @@ calendar_cardinal_points AS (
         ccp.next_eom
     FROM
         calendar_cardinal_points_ AS ccp
-    CROSS JOIN (
-        SELECT
-            MIN(dt_pipe) AS next_pipe_cutoff
-        FROM
-            calendar_cardinal_points_
-        WHERE
-            dt_pipe > CURRENT_DATE
-    ) AS cutoff
     WHERE
-        ccp.dt_pipe <= cutoff.next_pipe_cutoff
+        ccp.dt_pipe <= (
+            SELECT
+                MIN(dt_pipe)
+            FROM
+                calendar_cardinal_points_
+            WHERE
+                dt_pipe > CURRENT_DATE
+        )
 ),
 pipe_period_calendar AS (
     SELECT
@@ -69,16 +79,61 @@ pipe_period_calendar AS (
         ccp.next_pipe IS NOT NULL
         AND ccp.dt_pipe_turn <= ccp.next_pipe
 ),
+invoice_wallet_window AS (
+    SELECT
+        iwt.sk_invoice,
+        iwt.sk_contract,
+        iwt.dt_reference,
+        iwt.due_amount,
+        iwt.recovered_amount,
+        iwt.invoice_delay_t2
+    FROM
+        dw_collections_segmentation.fact_invoice_wallet_timeline AS iwt
+    WHERE
+        iwt.dt_reference >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND (
+            iwt.year > YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            OR (
+                iwt.year = YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+                AND iwt.month >= MONTH(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            )
+        )
+),
+contract_wallet_window AS (
+    SELECT
+        cwt.sk_contract,
+        cwt.dt_reference,
+        cwt.dt_pipe
+    FROM
+        dw_collections_segmentation.fact_contract_wallet_timeline AS cwt
+    WHERE
+        cwt.dt_reference >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND (
+            cwt.year > YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            OR (
+                cwt.year = YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+                AND cwt.month >= MONTH(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            )
+        )
+        AND cwt.wallet > 0
+),
 contract_features_normalized AS (
     SELECT
-        sk_contract,
-        dt_reference,
-        segmentation
+        cft.sk_contract,
+        cft.dt_reference,
+        cft.segmentation AS segmentation
     FROM
-        dw_collections_segmentation.fact_contract_features_timeline
+        dw_collections_segmentation.fact_contract_features_timeline AS cft
     WHERE
-        MAKE_DATE(year, month, day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
-        AND segmentation NOT IN ('active-current', 'ended-current')
+        cft.dt_reference >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND (
+            cft.year > YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            OR (
+                cft.year = YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+                AND cft.month >= MONTH(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            )
+        )
+        AND cft.segmentation NOT IN ('active-current', 'ended-current')
 ),
 invoice_pipe_boundaries AS (
     SELECT
@@ -95,22 +150,18 @@ invoice_pipe_boundaries AS (
         MAX(iwt.recovered_amount) AS recovered_amount,
         MAX(iwt.invoice_delay_t2) AS invoice_delay_t2
     FROM
-        dw_collections_segmentation.fact_invoice_wallet_timeline AS iwt
+        invoice_wallet_window AS iwt
     INNER JOIN
         pipe_period_calendar AS ppc
             ON iwt.dt_reference = ppc.dt_reference
-    LEFT JOIN
-        dw_collections_segmentation.fact_contract_wallet_timeline AS cwt
+    INNER JOIN
+        contract_wallet_window AS cwt
             ON cwt.dt_reference = iwt.dt_reference
             AND cwt.sk_contract = iwt.sk_contract
-            AND MAKE_DATE(cwt.year, cwt.month, cwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
     INNER JOIN
         contract_features_normalized AS cfn
             ON cfn.dt_reference = iwt.dt_reference
             AND cfn.sk_contract = iwt.sk_contract
-    WHERE
-        MAKE_DATE(iwt.year, iwt.month, iwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
-        AND cwt.wallet > 0
     GROUP BY 1, 2, 3, 4, 5
 ),
 invoice_pipe_daily_spine AS (
@@ -141,8 +192,9 @@ invoice_pipe_daily_spine AS (
 ),
 daily_accumulation AS (
     SELECT
-        dd.date AS dt_reference,
+        ipds.dt_reference,
         ipds.segmentation AS segment,
+        ipds.pipe_period_start,
         FIRST(ipds.dt_pipe_cwt) AS dt_pipe,
         COUNT(DISTINCT
             CASE
@@ -158,15 +210,15 @@ daily_accumulation AS (
         ) AS n_invoices_DT2_at_reference,
         COUNT(DISTINCT
             CASE
-                WHEN dd.date <= ipds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
-                WHEN dd.date > ipds.dt_max_view AND ipds.invoice_delay_t2 > 0 THEN ipds.sk_invoice
+                WHEN ipds.dt_reference <= ipds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
+                WHEN ipds.dt_reference > ipds.dt_max_view AND ipds.invoice_delay_t2 > 0 THEN ipds.sk_invoice
             END
         ) AS n_invoices_DT2_acc,
         COUNT(DISTINCT
             CASE
-                WHEN dd.date <= ipds.dt_max_view
+                WHEN ipds.dt_reference <= ipds.dt_max_view
                  AND iwt.recovered_amount > 0 AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
-                WHEN dd.date > ipds.dt_max_view
+                WHEN ipds.dt_reference > ipds.dt_max_view
                  AND ipds.recovered_amount > 0 AND ipds.invoice_delay_t2 > 0 THEN ipds.sk_invoice
             END
         ) AS recovered_invoices_DT2_acc,
@@ -178,54 +230,42 @@ daily_accumulation AS (
         ) AS due_amount_DT2_at_reference,
         SUM(
             CASE
-                WHEN dd.date <= ipds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN ABS(iwt.due_amount)
-                WHEN dd.date > ipds.dt_max_view AND ipds.invoice_delay_t2 > 0 THEN ABS(ipds.due_amount)
+                WHEN ipds.dt_reference <= ipds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN ABS(iwt.due_amount)
+                WHEN ipds.dt_reference > ipds.dt_max_view AND ipds.invoice_delay_t2 > 0 THEN ABS(ipds.due_amount)
             END
         ) AS due_amount_DT2_acc,
         SUM(
             CASE
-                WHEN dd.date <= ipds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.recovered_amount
-                WHEN dd.date > ipds.dt_max_view AND ipds.invoice_delay_t2 > 0 THEN ipds.recovered_amount
+                WHEN ipds.dt_reference <= ipds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.recovered_amount
+                WHEN ipds.dt_reference > ipds.dt_max_view AND ipds.invoice_delay_t2 > 0 THEN ipds.recovered_amount
             END
         ) AS recovered_amount_DT2_acc
     FROM
-        dw_public.dim_date AS dd
-    LEFT JOIN
         invoice_pipe_daily_spine AS ipds
-            ON dd.date = ipds.dt_reference
     LEFT JOIN
-        dw_collections_segmentation.fact_invoice_wallet_timeline AS iwt
-            ON iwt.dt_reference = dd.date
+        invoice_wallet_window AS iwt
+            ON iwt.dt_reference = ipds.dt_reference
             AND iwt.sk_invoice = ipds.sk_invoice
-            AND MAKE_DATE(iwt.year, iwt.month, iwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
     LEFT JOIN
         contract_features_normalized AS cfn
             ON cfn.dt_reference = iwt.dt_reference
             AND cfn.sk_contract = iwt.sk_contract
     WHERE
-        dd.date >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
-        AND dd.date <= CURRENT_DATE
-    GROUP BY 1, 2
-),
-pipe_period_lookup AS (
-    SELECT DISTINCT
-        segmentation,
-        pipe_period_start,
-        pipe_period_end
-    FROM
-        invoice_pipe_boundaries
+        ipds.dt_reference >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND ipds.dt_reference <= CURRENT_DATE
+    GROUP BY 1, 2, 3
 ),
 business_day_context AS (
     SELECT
         da.segment,
-        DATE_DIFF(da.dt_reference, ppl.pipe_period_start) + 1 AS days_to_pipe,
+        DATE_DIFF(da.dt_reference, da.pipe_period_start) + 1 AS days_to_pipe,
         COUNT(
             CASE
-                WHEN da.dt_reference >= ppl.pipe_period_start
+                WHEN da.dt_reference >= da.pipe_period_start
                  AND dd.is_brz_fintech_business_day THEN da.dt_reference
             END
         ) OVER (
-            PARTITION BY da.segment, ppl.pipe_period_start
+            PARTITION BY da.segment, da.pipe_period_start
             ORDER BY da.dt_reference ASC
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) - 1 AS n_business_days_since_pipe,
@@ -243,16 +283,11 @@ business_day_context AS (
         ) AS recovery_rate_amount_t2,
         dd.is_brz_fintech_business_day,
         dd.next_brz_fintech_business_day,
-        ppl.pipe_period_start AS dt_pipe_period_start,
+        da.pipe_period_start AS dt_pipe_period_start,
         da.dt_pipe,
         da.dt_reference
     FROM
         daily_accumulation AS da
-    LEFT JOIN
-        pipe_period_lookup AS ppl
-            ON da.dt_reference >= ppl.pipe_period_start
-            AND da.dt_reference <= ppl.pipe_period_end
-            AND da.segment = ppl.segmentation
     LEFT JOIN
         dw_public.dim_date AS dd
             ON dd.date = da.dt_reference
@@ -307,4 +342,3 @@ FROM
     final_ordering
 WHERE
     segment IS NOT NULL
-ORDER BY dt_reference ASC

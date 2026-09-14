@@ -1,13 +1,58 @@
 WITH contract_features_normalized AS (
     SELECT
-        sk_contract,
-        dt_reference,
-        major_segmentation AS segmentation
+        cft.sk_contract,
+        cft.dt_reference,
+        cft.major_segmentation AS segmentation
     FROM
-        dw_collections_segmentation.fact_contract_features_timeline
+        dw_collections_segmentation.fact_contract_features_timeline AS cft
     WHERE
-        MAKE_DATE(year, month, day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
-        AND segmentation NOT IN ('active-current', 'ended-current')
+        cft.dt_reference >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND (
+            cft.year > YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            OR (
+                cft.year = YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+                AND cft.month >= MONTH(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            )
+        )
+        AND cft.major_segmentation NOT IN ('active-current', 'ended-current')
+),
+invoice_wallet_window AS (
+    SELECT
+        iwt.sk_invoice,
+        iwt.sk_contract,
+        iwt.dt_reference,
+        iwt.due_amount,
+        iwt.recovered_amount,
+        iwt.invoice_delay_t2
+    FROM
+        dw_collections_segmentation.fact_invoice_wallet_timeline AS iwt
+    WHERE
+        iwt.dt_reference >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND (
+            iwt.year > YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            OR (
+                iwt.year = YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+                AND iwt.month >= MONTH(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            )
+        )
+),
+contract_wallet_window AS (
+    SELECT
+        cwt.sk_contract,
+        cwt.dt_reference,
+        cwt.dt_pipe
+    FROM
+        dw_collections_segmentation.fact_contract_wallet_timeline AS cwt
+    WHERE
+        cwt.dt_reference >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND (
+            cwt.year > YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            OR (
+                cwt.year = YEAR(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+                AND cwt.month >= MONTH(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS)
+            )
+        )
+        AND cwt.wallet > 0
 ),
 invoice_month_boundaries AS (
     SELECT
@@ -22,100 +67,109 @@ invoice_month_boundaries AS (
         MAX(iwt.recovered_amount) AS recovered_amount,
         MAX(iwt.invoice_delay_t2) AS invoice_delay_t2
     FROM
-        dw_collections_segmentation.fact_invoice_wallet_timeline AS iwt
-    LEFT JOIN
-        dw_collections_segmentation.fact_contract_wallet_timeline AS cwt
+        invoice_wallet_window AS iwt
+    INNER JOIN
+        contract_wallet_window AS cwt
             ON cwt.dt_reference = iwt.dt_reference
             AND cwt.sk_contract = iwt.sk_contract
-            AND MAKE_DATE(cwt.year, cwt.month, cwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
     INNER JOIN
         contract_features_normalized AS cfn
             ON cfn.dt_reference = iwt.dt_reference
             AND cfn.sk_contract = iwt.sk_contract
-    WHERE
-        MAKE_DATE(iwt.year, iwt.month, iwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
-        AND cwt.wallet > 0
     GROUP BY 1, 2, 3
+),
+invoice_month_daily_spine AS (
+    SELECT
+        imb.month_ref,
+        imb.segmentation,
+        imb.sk_invoice,
+        imb.dt_pipe,
+        imb.sk_contract,
+        imb.dt_min_view,
+        imb.dt_max_view,
+        imb.due_amount,
+        imb.recovered_amount,
+        imb.invoice_delay_t2,
+        EXPLODE(
+            SEQUENCE(
+                imb.dt_min_view,
+                LEAST(LAST_DAY(imb.month_ref), CURRENT_DATE),
+                INTERVAL 1 DAY
+            )
+        ) AS dt_reference
+    FROM
+        invoice_month_boundaries AS imb
+    WHERE
+        imb.dt_min_view <= LEAST(LAST_DAY(imb.month_ref), CURRENT_DATE)
 ),
 daily_accumulation AS (
     SELECT
-        dd.date AS dt_reference,
-        imb.segmentation AS segment,
-        FIRST(imb.dt_pipe) AS dt_pipe,
-        -- Contracts
+        imds.dt_reference,
+        imds.segmentation AS segment,
+        FIRST(imds.dt_pipe) AS dt_pipe,
         COUNT(DISTINCT
             CASE
-                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imb.segmentation THEN iwt.sk_contract
+                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imds.segmentation THEN iwt.sk_contract
                 ELSE NULL
             END
         ) AS n_contracts_at_reference,
-        COUNT(DISTINCT imb.sk_contract) AS n_contracts_acc,
-        -- Invoices in delay-T2
+        COUNT(DISTINCT imds.sk_contract) AS n_contracts_acc,
         COUNT(DISTINCT
             CASE
-                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imb.segmentation
+                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imds.segmentation
                  AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
                 ELSE NULL
             END
         ) AS n_invoices_DT2_at_reference,
         COUNT(DISTINCT
             CASE
-                WHEN dd.date <= imb.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
-                WHEN dd.date > imb.dt_max_view AND imb.invoice_delay_t2 > 0 THEN imb.sk_invoice
+                WHEN imds.dt_reference <= imds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
+                WHEN imds.dt_reference > imds.dt_max_view AND imds.invoice_delay_t2 > 0 THEN imds.sk_invoice
                 ELSE NULL
             END
         ) AS n_invoices_DT2_acc,
         COUNT(DISTINCT
             CASE
-                WHEN dd.date <= imb.dt_max_view
+                WHEN imds.dt_reference <= imds.dt_max_view
                  AND iwt.recovered_amount > 0
                  AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
-                WHEN dd.date > imb.dt_max_view
-                 AND imb.recovered_amount > 0
-                 AND imb.invoice_delay_t2 > 0 THEN imb.sk_invoice
+                WHEN imds.dt_reference > imds.dt_max_view
+                 AND imds.recovered_amount > 0
+                 AND imds.invoice_delay_t2 > 0 THEN imds.sk_invoice
                 ELSE NULL
             END
         ) AS recovered_invoices_DT2_acc,
-        -- Due / recovered amount in delay-T2
         SUM(
             CASE
-                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imb.segmentation
-                 AND iwt.invoice_delay_t2 > 0 THEN ABS(imb.due_amount)
+                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imds.segmentation
+                 AND iwt.invoice_delay_t2 > 0 THEN ABS(imds.due_amount)
                 ELSE NULL
             END
         ) AS due_amount_DT2_at_reference,
         SUM(
             CASE
-                WHEN dd.date <= imb.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN ABS(iwt.due_amount)
-                WHEN dd.date > imb.dt_max_view AND imb.invoice_delay_t2 > 0 THEN ABS(imb.due_amount)
+                WHEN imds.dt_reference <= imds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN ABS(iwt.due_amount)
+                WHEN imds.dt_reference > imds.dt_max_view AND imds.invoice_delay_t2 > 0 THEN ABS(imds.due_amount)
                 ELSE NULL
             END
         ) AS due_amount_DT2_acc,
         SUM(
             CASE
-                WHEN dd.date <= imb.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.recovered_amount
-                WHEN dd.date > imb.dt_max_view AND imb.invoice_delay_t2 > 0 THEN imb.recovered_amount
+                WHEN imds.dt_reference <= imds.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.recovered_amount
+                WHEN imds.dt_reference > imds.dt_max_view AND imds.invoice_delay_t2 > 0 THEN imds.recovered_amount
                 ELSE NULL
             END
         ) AS recovered_amount_DT2_acc
     FROM
-        dw_public.dim_date AS dd
+        invoice_month_daily_spine AS imds
     LEFT JOIN
-        invoice_month_boundaries AS imb
-            ON dd.date >= imb.dt_min_view
-            AND dd.month_start = imb.month_ref
-    LEFT JOIN
-        dw_collections_segmentation.fact_invoice_wallet_timeline AS iwt
-            ON iwt.dt_reference = dd.date
-            AND iwt.sk_invoice = imb.sk_invoice
-            AND MAKE_DATE(iwt.year, iwt.month, iwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        invoice_wallet_window AS iwt
+            ON iwt.dt_reference = imds.dt_reference
+            AND iwt.sk_invoice = imds.sk_invoice
     LEFT JOIN
         contract_features_normalized AS cfn
             ON cfn.dt_reference = iwt.dt_reference
             AND cfn.sk_contract = iwt.sk_contract
-    WHERE
-        dd.month_start >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
-        AND dd.date <= CURRENT_DATE
     GROUP BY 1, 2
 ),
 business_day_context AS (
