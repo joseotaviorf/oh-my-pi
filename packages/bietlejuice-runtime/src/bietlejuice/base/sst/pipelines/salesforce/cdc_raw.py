@@ -89,18 +89,6 @@ logger = QuintoAndarLogger("sst.pipelines.salesforce_raw")
             default=None,
             help="Salesforce API base endpoint URL (e.g. https://quintoandar.my.salesforce.com).",
         ),
-        dict(
-            name="appflow_assume_role_arn",
-            flags=["--appflow_assume_role_arn", "--appflow-assume-role-arn"],
-            type=str,
-            required=False,
-            default=None,
-            help=(
-                "IAM role ARN to assume for the AppFlow client only. Required on EMR "
-                "prod, where the cluster runs in the data account and the flows live "
-                "in the prod account. Leave empty on Databricks prod and on forno."
-            ),
-        ),
     ]
 )
 def salesforce_raw_pipeline(cfg):
@@ -136,9 +124,7 @@ def salesforce_raw_pipeline(cfg):
 
     flow_name = extract_flow_name(cfg.event_path)
     try:
-        appflow_status = get_latest_appflow_run(
-            flow_name, assume_role_arn=cfg.appflow_assume_role_arn
-        )
+        appflow_status = get_latest_appflow_run(flow_name)
     except Exception as exc:
         logger.warning(
             f"m=salesforce_raw_pipeline, msg=describe_flow failed for {flow_name}: "

@@ -24,7 +24,6 @@ Payload (JSON)::
 """
 
 import json
-import os
 from datetime import datetime, timezone
 from typing import Optional, Union
 
@@ -38,8 +37,6 @@ logger = QuintoAndarLogger("sst.core.appflow.marker")
 ACTIVE_STATUS = "Active"
 DEFAULT_REGION = "us-east-1"
 DEFAULT_MARKER_PREFIX = "sst_runtime/appflow_status"
-APPFLOW_ASSUME_ROLE_ARN_ENV = "APPFLOW_ASSUME_ROLE_ARN"
-APPFLOW_ROLE_SESSION_NAME = "bietlejuice-appflow"
 
 
 def extract_flow_name(event_path: str) -> str:
@@ -89,51 +86,9 @@ def read_status_marker(
     return json.loads(body.decode("utf-8"))
 
 
-def build_appflow_client(
-    region_name: str = DEFAULT_REGION,
-    assume_role_arn: Optional[str] = None,
-):
-    """Return a boto3 AppFlow client, optionally using an assumed role.
-
-    AppFlow APIs are account-scoped: the prod flows live in the prod account
-    (632540934959) while EMR runs in the data account (206390561754), so the
-    instance profile cannot see them. ``assume_role_arn`` swaps the credentials
-    of **this client only** -- every other client in the job keeps the instance
-    profile, which is what holds the S3/Glue/Delta permissions.
-
-    Falls back to the ``APPFLOW_ASSUME_ROLE_ARN`` env var, then to the default
-    credential chain. Same pattern as ``GlueClient``/``GLUE_ASSUME_ROLE_ARN``.
-    Leave it unset on Databricks prod and on forno, where the running identity
-    is already in the account that owns the flows.
-    """
-    role_arn = assume_role_arn or os.environ.get(APPFLOW_ASSUME_ROLE_ARN_ENV)
-    if not role_arn:
-        return boto3.client("appflow", region_name=region_name)
-
-    logger.info(f"m=build_appflow_client, msg=Assuming role {role_arn}")
-    sts = boto3.client("sts", region_name=region_name)
-    creds = sts.assume_role(
-        RoleArn=role_arn,
-        RoleSessionName=APPFLOW_ROLE_SESSION_NAME,
-    )["Credentials"]
-    return boto3.client(
-        "appflow",
-        region_name=region_name,
-        aws_access_key_id=creds["AccessKeyId"],
-        aws_secret_access_key=creds["SecretAccessKey"],
-        aws_session_token=creds["SessionToken"],
-    )
-
-
-def describe_flow_status(
-    flow_name: str,
-    region_name: str = DEFAULT_REGION,
-    assume_role_arn: Optional[str] = None,
-) -> str:
+def describe_flow_status(flow_name: str, region_name: str = DEFAULT_REGION) -> str:
     """Return the current ``flowStatus`` reported by AppFlow for ``flow_name``."""
-    client = build_appflow_client(
-        region_name=region_name, assume_role_arn=assume_role_arn
-    )
+    client = boto3.client("appflow", region_name=region_name)
     response = client.describe_flow(flowName=flow_name)
     return response.get("flowStatus", "")
 
@@ -181,14 +136,8 @@ def appflow_has_completed_hour(
     return completed_hour
 
 
-def get_latest_appflow_run(
-    flow_name: str,
-    region_name: str = DEFAULT_REGION,
-    assume_role_arn: Optional[str] = None,
-) -> dict:
-    client = build_appflow_client(
-        region_name=region_name, assume_role_arn=assume_role_arn
-    )
+def get_latest_appflow_run(flow_name: str, region_name: str = DEFAULT_REGION) -> dict:
+    client = boto3.client("appflow", region_name=region_name)
 
     request_time = standard_now()
     response = client.describe_flow(flowName=flow_name)

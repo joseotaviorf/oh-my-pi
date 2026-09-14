@@ -87,23 +87,26 @@ def test_metadata_milestones_registry_loads():
     assert registry["ACCREDITATION"]["params"]["action"] == "Accreditation"
     assert "TQC" in registry
     assert "TQC_TQA" not in registry
-    assert "TQA" not in registry
+    assert "TQA" in registry
     assert registry["TQC"]["params"]["business_context"] == "SALE"
+    assert registry["TQA"]["params"]["business_context"] == "RENT"
 
 
 def test_tqc_sql_renders_sale_business_context():
-    path = resolve_sql_path(str(STRATEGIES_ROOT), "demand_referral_events.sql")
-    text = path.read_text(encoding="utf-8")
-    out = _apply_sql_params(
-        text,
-        {"scan_predicate": "1 = 1", "business_context": "SALE"},
+    path = resolve_sql_path(
+        str(STRATEGIES_ROOT), "demand_acquisition_funnel_events.sql"
     )
-    assert "alr.business_context = 'SALE'" in out
+    text = path.read_text(encoding="utf-8")
+    base_params = {
+        "scan_predicate": "1 = 1",
+        "ts_expr": "valid_from",
+        "entity_expr": "id_referral",
+        "entity_type": "datalake_agent_performance.fact_agent_demand_acquisition.id_referral",
+        "same_agent_expr": "TRUE",
+    }
+    out = _apply_sql_params(text, {**base_params, "business_context": "SALE"})
+    assert "fada.business_context = 'SALE'" in out
     assert "{business_context}" not in out
     assert "{scan_predicate}" not in out
-    rent = _apply_sql_params(
-        text,
-        {"scan_predicate": "1 = 1", "business_context": "RENT"},
-    )
-    assert "alr.business_context = 'RENT'" in rent
-    assert "'RENT' = 'SALE'" in rent
+    rent = _apply_sql_params(text, {**base_params, "business_context": "RENT"})
+    assert "fada.business_context = 'RENT'" in rent

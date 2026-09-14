@@ -59,15 +59,6 @@ def events_case_recovery(
         f"{api_entity=} {full_target_table=} {salesforce_endpoint=}"
     )
 
-    # retrieve_token already rejects a falsy endpoint, but rstrip runs first and
-    # would surface as an opaque AttributeError on NoneType. A DAG that never
-    # passes --salesforce_endpoint only fails here, when AppFlow misses an hour.
-    if not salesforce_endpoint:
-        raise ValueError(
-            f"salesforce_endpoint is required to run recovery for {full_target_table}; "
-            f"set it in the DAG conf and forward it to the cdc_raw task"
-        )
-
     base_endpoint = salesforce_endpoint.rstrip("/")
     access_token = retrieve_token(endpoint=base_endpoint, env=env)
     headers = build_salesforce_table_description_header(access_token)
