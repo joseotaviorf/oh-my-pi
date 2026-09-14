@@ -18,7 +18,7 @@ This metric entity is a **separate document from the Cohort View** because of on
 
 ## Related Domain Entities
 
-- Consórcio (Inside Sales Funnel)
+- Consórcio
 
 **Source of truth:** `datalake_consorcio.deal` + `datalake_consorcio.deal_milestone`, joined 1:1 on `id_deal`. These tables already resolve the pipeline filter, the one-row-per-deal dedup, test/duplicate exclusion, origin/segment mapping, the funnel milestones and flags, and analyst attribution — none of that needs to be rebuilt in a query. Column names throughout this document are the **table** column names.
 
@@ -43,16 +43,17 @@ Terms analysts use to ask for these metrics (the Portuguese keys are the search 
 - **Régua**, **régua de repescagem**, **disparos** → the messaging cadence (`rehabilitation_trigger_count`)
 - **Taxa de repescagem**, **% de repescados** → Recapture Rate
 - **Entrou na régua**, **elegível** → `has_entered_rehabilitation = 'True'`
-- **Motivo de saída**, **por que não entrou** → `rehabilitation_exit_reason`
+- **Motivo de saída**, **por que não entrou** or, if it entered **porquê saiu** → `rehabilitation_exit_reason`
 - **Variante da régua**, **teste de régua** → `rehabilitation_variant`
 - **Etapa de descarte** → the stage the deal was in when discarded (`discarded_from_stage`)
 - **Pesquisa de descarte**, **feedback do descarte** → the `feedback_*` fields
+- **Data de Saída da régua** - when the deal exited the rehabilitation flow → `ts_rehabilitation_exited`
 
 ## Scope
 
-**Included**: all Consórcio deals that reached **`descarte`**, their eligibility outcome, their cadence journey, and the **recaptured deals** (`origin = 'repescagem'`) linked back to them.
+**Included**: all Consórcio deals that reached **`descarte`**, their eligibility outcome, their cadence journey, the **recaptured deals** (`origin = 'repescagem'`) linked back to them and the **conversion of a repescagem deal through the funnel when linking to a discarded deal**.
 
-**Excluded**: deals never discarded; test deals and duplicates (already excluded upstream); **conversion of a repescagem deal through the funnel** — that is the Cohort View. This entity covers the recapture event and the discarded-deal attributes, not the funnel conversion of the new deal.
+**Excluded**: deals never discarded; test deals and duplicates (already excluded upstream); To analyze conversion of recaptured deals without the need to link it to a discarded deal, use the Cohort View
 
 ## Calculation
 
@@ -70,7 +71,21 @@ The motion has three sequential populations. Every rate below is a ratio between
 | No other active deal    | customer has another open deal                               | `has_entered_rehabilitation = 'False'`, `rehabilitation_exit_reason = 'Contém Deal Ativo'`               |
 | No closed deal          | customer already bought, so they know the product end to end | `has_entered_rehabilitation = 'False'`, `rehabilitation_exit_reason = 'Possui Venda Fechada'`            |
 
-Passing all three ⇒ `has_entered_rehabilitation = 'True'`. The discard **stage** then routes a future return either to the AI agent or to a human analyst — human when the customer had already spoken to one in the discarded deal.
+Passing all three ⇒ `has_entered_rehabilitation = 'True'`. Where a future return lands — AI agent or human analyst — is decided by the routing rule below.
+
+### Routing on return — AI agent or human analyst
+
+The recaptured deal is assigned by **how far the discarded deal had progressed**, and the threshold depends on the track it came from:
+
+| Track of the discarded deal | Routed to a human analyst when it had reached | Otherwise |
+| :---- | :---- | :---- |
+| `SIMULATOR IA` | **Simulação Aceita** (Simulation Accepted) | AI Agent |
+| `SDR IA` | **Simulação** (Simulation Sent) | AI Agent |
+| `SDR Humano` | **Simulação Aceita** — *rule added on 2026-09-02* | Simulator |
+
+The logic is the same in all three: a customer who had already got far enough to be talking to a person goes back to a person; one who had not comes back to Conrado.
+
+**`SDR Humano` changed on 2026-09-02.** Until that date, every rehabilitated `SDR Humano` deal was routed **straight to a human analyst**, with no check on progress. From 2026-09-02 it also tests whether the deal reached Simulação Aceita — if it did, human analyst; if not, Simulator. This is a **break in the series**: a `SDR Humano` recapture before and after that date is not the same population, so never compare routing mix, analyst load or recapture-by-route across the boundary without splitting the periods.
 
 **Cadence:** the traditional variant fires the **first trigger 2 days after the discard**, incrementing `rehabilitation_trigger_count` (1 … 6). **Before each trigger** the active-deal and closed-deal checks run again as a guard — if the deal exits there, `ts_rehabilitation_exited` and `rehabilitation_exit_reason` (`Contém Deal Ativo` / `Possui Venda Fechada`) are stamped **but `has_entered_rehabilitation` stays `'True'`**. After the **6th trigger** (currently the last), the deal exits with `rehabilitation_exit_reason = 'Fim da régua'`.
 
@@ -89,6 +104,8 @@ Aging: creation → recapture = days between the discarded deal's creation and t
 
 Every discarded-deal attribute read on a recaptured deal — **original acquisition channel** (Meta, Google, …), **discard stage**, **discard aging**, **trigger count**, **variant**, qualifier answers, journey — comes from the **linked discarded deal**, never from the repescagem deal itself.
 
+Deals that were discarded→recaptured→discarded→recaptured will have the last discard-deal `origin = 'repescagem'`. This is not a data error, it is expected as part of the flow.
+
 ### Feedback fields
 
 `feedback_*` are the customer's answers to the **survey we send when a deal is discarded**, asking why it did not move forward:
@@ -102,7 +119,7 @@ Every discarded-deal attribute read on a recaptured deal — **original acquisit
 
 **The survey was introduced recently, so low volume is expected** — 78 answered discards in the Jun–Aug 2026 window. Report the base size alongside any feedback breakdown; the cuts are directional until volume builds up.
 
-(The `qualifier_*` fields — the customer's answers to Conrado's qualifying questions — are documented in the Consórcio domain entity.)
+(The `qualifier_*` fields — the customer's answers to Conrado's qualifying questions — are documented in the Consórcio business entity.)
 
 ### Canonical Filter
 
