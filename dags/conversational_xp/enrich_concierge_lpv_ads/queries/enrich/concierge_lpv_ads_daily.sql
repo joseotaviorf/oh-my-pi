@@ -17,8 +17,8 @@ WITH lpv_events AS (
         ut.id_person,
         CAST(ut.ts_event AS DATE) AS dt_event,
         lower(get_json_object(ut.event_properties, '$.business_context')) AS business_context,
-        lower(ut.egw_utm_source) AS utm_source,
-        lower(ut.egw_utm_medium) AS utm_medium,
+        lower(COALESCE(NULLIF(get_json_object(ut.event_properties, '$.utm_source'), ''), ut.egw_utm_source)) AS utm_source,
+        lower(COALESCE(NULLIF(get_json_object(ut.event_properties, '$.utm_medium'), ''), ut.egw_utm_medium)) AS utm_medium,
         -- phone used only to derive the A/B cell; not persisted downstream
         du.phone_number AS phone_for_ab,
         CASE
