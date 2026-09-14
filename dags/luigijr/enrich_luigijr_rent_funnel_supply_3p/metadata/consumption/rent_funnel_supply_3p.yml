@@ -1,0 +1,44 @@
+database_name: bi_metrics
+table_name: rent_funnel_supply_3p
+owner: carlos.lenko@quintoandar.com
+domain: Data Ops & Governance
+description: Table `rent_funnel_supply_3p` materialized on a schedule by Luigi from a user-provided SQL query (BI Metrics domain).
+columns:
+  sk_broker:
+    description: Column `sk_broker` produced by the scheduled materialization query.
+  broker_trade_name_tag:
+    description: Column `broker_trade_name_tag` produced by the scheduled materialization query.
+  city_group_broker:
+    description: Column `city_group_broker` produced by the scheduled materialization query.
+  account_manager:
+    description: Column `account_manager` produced by the scheduled materialization query.
+  sk_agent:
+    description: Column `sk_agent` produced by the scheduled materialization query.
+  sk_booking:
+    description: Column `sk_booking` produced by the scheduled materialization query.
+  sk_house:
+    description: Column `sk_house` produced by the scheduled materialization query.
+  is_organic:
+    description: Column `is_organic` produced by the scheduled materialization query.
+  is_ops:
+    description: Column `is_ops` produced by the scheduled materialization query.
+  is_3p_fr_test:
+    description: Column `is_3p_fr_test` produced by the scheduled materialization query.
+  is_bsp:
+    description: Column `is_bsp` produced by the scheduled materialization query.
+  business_model:
+    description: Column `business_model` produced by the scheduled materialization query.
+  date:
+    description: Column `date` produced by the scheduled materialization query.
+  visit_booked:
+    description: Column `visit_booked` produced by the scheduled materialization query.
+  visit_completed:
+    description: Column `visit_completed` produced by the scheduled materialization query.
+  offer_sent:
+    description: Column `offer_sent` produced by the scheduled materialization query.
+  offer_accepted:
+    description: Column `offer_accepted` produced by the scheduled materialization query.
+  credit_approved:
+    description: Column `credit_approved` produced by the scheduled materialization query.
+  contract_signed:
+    description: Column `contract_signed` produced by the scheduled materialization query.

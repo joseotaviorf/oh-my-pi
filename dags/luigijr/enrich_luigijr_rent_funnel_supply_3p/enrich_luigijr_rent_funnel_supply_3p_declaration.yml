@@ -1,0 +1,18 @@
+dag:
+  name: enrich_luigijr_rent_funnel_supply_3p
+  owner: BI Metrics
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:carlos.lenko
+  dataset_dependencies:
+  - dw_3p_supply.fact_lead_3p_flows:first-run-of-day
+  - dw_growth.obt_supply:first-run-of-day
+  - dw_rent.fact_rent_demand_events:first-run-of-day
+  - dw_rent.dim_rent_event_type:first-run-of-day
+  - dw_public.dim_date:first-run-of-day
+  - sandbox.dim_brokers_3p:first-run-of-day
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: bi_metrics
