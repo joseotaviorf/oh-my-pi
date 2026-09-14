@@ -9,7 +9,7 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: full
-  has_hive_sync: false
+  has_hive_sync: true
   bucket_config_name: people_bucket
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"

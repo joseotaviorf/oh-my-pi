@@ -5,7 +5,7 @@ dag:
 workflow:
   type: gsheets
   layer: raw
-  has_hive_sync: false
+  has_hive_sync: true
   credentials_scope: people
   bucket_config_name: people_bucket
   alert_channel: PEOPLE_ALERTS

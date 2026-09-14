@@ -9,7 +9,7 @@ dag:
 
 workflow:
   layer: raw
-  has_hive_sync: false
+  has_hive_sync: true
   type: custom_ingestion
   bucket_config_name: people_bucket
   load_spark_job: load_degreed_raw

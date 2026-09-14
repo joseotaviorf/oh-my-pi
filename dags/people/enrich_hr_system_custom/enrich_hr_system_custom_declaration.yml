@@ -19,7 +19,7 @@ workflow:
   - "{{ data_interval_start | ds }}"   # execution date
   tables_customization:
     management_hierarchy: {}
-  has_hive_sync: false
+  has_hive_sync: true
   bucket_config_name: people_bucket
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"

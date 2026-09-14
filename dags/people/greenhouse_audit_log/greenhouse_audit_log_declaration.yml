@@ -12,7 +12,7 @@ dag:
 
 workflow:
   layer: raw
-  has_hive_sync: false
+  has_hive_sync: true
   type: custom_ingestion
   default_extraction_type: "incremental"
   default_partitions: [year, month, day]

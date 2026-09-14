@@ -20,7 +20,7 @@ dag:
 workflow:
   layer: raw
   type: api_ingestion
-  has_hive_sync: false
+  has_hive_sync: true
   bucket_config_name: people_bucket
   credentials_scope: people
   custom_schema: oitchau

@@ -51,7 +51,7 @@ workflow:
   # raw schema instead of a shared "s3" one.
   custom_schema: s3
   bucket_config_name: people_bucket
-  has_hive_sync: false
+  has_hive_sync: true
   load_spark_job: load_s3_ingestion_raw
   default_extraction_type: incremental
   default_partitions: [year, month, day]

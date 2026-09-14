@@ -8,6 +8,7 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  has_hive_sync: true
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
   default_table_privileges:

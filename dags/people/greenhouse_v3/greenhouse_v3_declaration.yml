@@ -9,7 +9,7 @@ dag:
 
 workflow:
   layer: raw
-  has_hive_sync: false
+  has_hive_sync: true
   type: custom_ingestion
   max_tables_per_cluster: 99999
   execution_timeout_hours: 4

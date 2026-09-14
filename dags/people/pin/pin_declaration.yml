@@ -15,7 +15,7 @@ workflow:
   type: custom_ingestion
   max_tables_per_cluster: 99999
   bucket_config_name: people_bucket
-  has_hive_sync: false
+  has_hive_sync: true
   spark_session_configs:
     udfs:
     - SF_FORMAT_PROPER_NOUN
