@@ -1,0 +1,27 @@
+dag:
+  name: gsheets_luigijr_teste_gu_emr
+  schedule_interval: 0 8 * * *
+  owner: Data Life Cycle
+  tags:
+  - luigi
+  - luigi-type:gsheets
+  - generated-by:gustavo.akashi
+workflow:
+  type: gsheets_ingestion
+  layer: raw
+  custom_schema: gsheets
+  tables_customization:
+    teste_gu_emr:
+      sheet_id: 1F4g9OuWNpSCQJqLXPrDrpz3UG-9K-2i6llTLuBfe8Tw
+      sheet_name: aba_teste
+cluster:
+  type: emr_7_12_consolidation_xs_general_fleet_cluster
+  access_control_list:
+    group_name: luigijr
+    permission_level: CAN_MANAGE
+  custom_libraries:
+  - whl: '{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl'
+  - pypi:
+      package: google-auth==2.13.0
+  - pypi:
+      package: google-api-python-client==2.55.0
