@@ -1,9 +1,22 @@
 cluster:
-  type: emr_7_12_consolidation_s_general_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
+    step_concurrency_level: 1
     spark_conf:
       spark.metrics.namespace: data_products.conversational_xp
     core_nodes:
-      instance_count: 2
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+        - r6g.2xlarge
+        - r7g.2xlarge
+        - r6i.2xlarge
     task_nodes:
-      instance_count: 1
+      target_on_demand: 0
+      target_spot: 2
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+      instance_types:
+        - r6g.2xlarge
+        - r7g.2xlarge
+        - r6i.2xlarge
