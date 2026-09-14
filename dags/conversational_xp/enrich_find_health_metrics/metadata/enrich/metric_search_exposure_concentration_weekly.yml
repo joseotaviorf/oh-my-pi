@@ -1,0 +1,65 @@
+database_name: datalake_search
+table_name: metric_search_exposure_concentration_weekly
+owner: joseph.magiya@quintoandar.com.br
+domain: Conversational XP
+description: >-
+  Weekly exposure concentration by house impression rank bands. Houses are ranked
+  within each week and business_context by impression count, then rolled up into
+  top 1%, top 1-10%, top 10-50%, and bottom 50% bands.
+columns:
+  ts_search_event_week:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Start of the calendar week for the search impressions.
+  business_context:
+    lineage:
+      - datalake_search.metric_search_impression_base.business_context
+    description: Business context RENT or SALE for the concentration metrics.
+  exposure_band:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: House exposure band based on weekly impression rank percentile.
+  n_houses:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Number of distinct houses in the exposure band for the week.
+  n_impressions:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Total search impressions on houses in the exposure band.
+  n_impressions_week:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Total search impressions in the week and business_context.
+  share_of_impressions:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Share of weekly impressions contributed by the exposure band.
+  share_of_houses:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Share of distinct houses in the exposure band for the week.
+  avg_impressions_per_house:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Mean impression count per house within the exposure band.
+  median_impressions_per_house:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Median impression count per house within the exposure band.
+  max_impressions_per_house:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Maximum impression count for a single house in the exposure band.
+  year:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Year of the week start date.
+  month:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Month of the week start date.
+  day:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Day of the week start date.

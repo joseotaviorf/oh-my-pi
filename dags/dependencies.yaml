@@ -2780,6 +2780,10 @@ bietlejuice.enrich_find_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_base_metrics_service:load-enrich-recs-impressions-processed:first-run-of-day
   - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
+  - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
 bietlejuice.enrich_firestore:

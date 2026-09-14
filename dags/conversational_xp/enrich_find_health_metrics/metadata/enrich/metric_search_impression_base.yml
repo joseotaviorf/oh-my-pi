@@ -1,0 +1,108 @@
+database_name: datalake_search
+table_name: metric_search_impression_base
+owner: joseph.magiya@quintoandar.com.br
+domain: Conversational XP
+description: >-
+  One row per search listing impression, with funnel flags, listing age and price buckets,
+  rank model variant and the listing price in effect on the search day. Base table for
+  Find search health Superset charts and downstream weekly metric tables. Flattened from
+  the search_impressions JSON payload and priced from listing_price_change. Incremental
+  and partitioned by year/month/day (server processing time; use ts_search_event for
+  event-level analysis). Each run reads a rolling 30-day window, so recent partitions are
+  rebuilt and late-arriving source rows within that window are picked up.
+columns:
+  id_search:
+    lineage:
+      - datalake_search.search_impressions.ids
+    description: Unique identifier of the search session that produced the listing impression.
+  id_house:
+    lineage:
+      - datalake_search.search_impressions.ids
+    description: Identifier of the house shown in the search result.
+  id_user:
+    lineage:
+      - datalake_search.search_impressions.ids
+    description: Identifier of the user who performed the search.
+  business_context:
+    lineage:
+      - datalake_search.search_impressions.dimensions
+    description: Business context of the listing. Uppercase RENT or SALE.
+  house_city:
+    lineage:
+      - datalake_search.search_impressions.dimensions
+    description: City where the listed property is located.
+  platform:
+    lineage:
+      - datalake_search.search_impressions.dimensions
+    description: Client platform for the search event, such as app or web.
+  absolute_position:
+    lineage:
+      - datalake_search.search_impressions.dimensions
+    description: Absolute position of the listing in the search results page.
+  rank_model:
+    lineage:
+      - datalake_search.search_impressions.dimensions
+    description: Ranking model identifier used for the search result.
+  rank_model_variant:
+    lineage:
+      - datalake_search.search_impressions.dimensions
+    description: >-
+      Rank model broken out by platform for LTR (LTR map, LTR list, LTR other)
+      or the raw rank_model for other models.
+  listing_age:
+    lineage:
+      - datalake_search.search_impressions.dimensions
+    description: Age of the listing in days at search time.
+  listing_age_bucket:
+    lineage:
+      - datalake_search.search_impressions.dimensions
+    description: Binned listing age for CTR and percentile charts.
+  listing_price_at_search:
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.price
+    description: >-
+      Listing price effective on the search date, resolved once per house-day. Null when
+      the house has no price interval covering that day. When more than one interval
+      covers the day, the latest by ts_price_started wins.
+  listing_price_bucket:
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.price
+    description: Binned listing price at search time for the RENT or SALE context.
+  is_listing_clicked:
+    lineage:
+      - datalake_search.search_impressions.metrics
+    description: Whether the listing was clicked. Integer 0 or 1.
+  is_visit_booked:
+    lineage:
+      - datalake_search.search_impressions.metrics
+    description: Whether a visit was booked from the search session. Integer 0 or 1.
+  is_offer:
+    lineage:
+      - datalake_search.search_impressions.metrics
+    description: Whether an offer was submitted from the search session. Integer 0 or 1.
+  is_contract_signed:
+    lineage:
+      - datalake_search.search_impressions.metrics
+    description: Whether a contract was signed from the search session. Integer 0 or 1.
+  dt_search_event:
+    lineage:
+      - datalake_search.search_impressions.ts_event
+    description: >-
+      Date of the search impression event. Event date, which can precede the
+      year/month/day partition when an event arrives late.
+  ts_search_event:
+    lineage:
+      - datalake_search.search_impressions.ts_event
+    description: Timestamp when the search impression event occurred.
+  year:
+    lineage:
+      - datalake_search.search_impressions.year
+    description: Partition column. Year of server processing time. Filter for partition pruning.
+  month:
+    lineage:
+      - datalake_search.search_impressions.month
+    description: Partition column. Month of server processing time. Filter for partition pruning.
+  day:
+    lineage:
+      - datalake_search.search_impressions.day
+    description: Partition column. Day of server processing time. Filter for partition pruning.

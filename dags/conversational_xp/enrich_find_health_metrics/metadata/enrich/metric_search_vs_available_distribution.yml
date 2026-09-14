@@ -1,0 +1,117 @@
+database_name: datalake_search
+table_name: metric_search_vs_available_distribution
+owner: joseph.magiya@quintoandar.com.br
+domain: Conversational XP
+description: >-
+  Compares search-exposed listing price and age distributions to published
+  inventory. One row per period_type, period_start, business_context and stats
+  label (p10, p25, p50, p75, p90, mean). The week and month rows cover every
+  calendar period overlapping the run's start_date to end_date window, so a
+  daily run refreshes the current week and month while a run triggered with an
+  older load_start_date backfills every period since then; use
+  is_period_complete to exclude periods still in progress. The available rows
+  are a standalone daily snapshot of published inventory keyed on the run date
+  and never rewritten by later runs, which makes them the only place available
+  inventory accumulates history, since the available columns on week and month
+  rows are refreshed to the latest snapshot on every rebuild. Exposed columns
+  are null on available rows and available columns are populated on all rows.
+columns:
+  business_context:
+    lineage:
+      - datalake_search.metric_search_impression_base.business_context
+    description: Business context RENT or SALE for the distribution comparison.
+  period_type:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: >-
+      Row grain. week or month for an exposed reporting period, available for a
+      standalone daily snapshot of published inventory.
+  stats:
+    lineage:
+      - datalake_search.metric_search_impression_base.listing_price_at_search
+    description: Percentile or mean label for the distribution row.
+  exposed_price:
+    lineage:
+      - datalake_search.metric_search_impression_base.listing_price_at_search
+    description: Rounded price percentile or mean for search-exposed impressions.
+  available_listings_price:
+    lineage:
+      - datalake_ebdb_listing.house_listing.rent
+      - datalake_ebdb_listing.house.sale_price
+    description: Rounded price percentile or mean for currently published listings.
+  exposed_price_brl:
+    lineage:
+      - datalake_search.metric_search_impression_base.listing_price_at_search
+    description: Brazilian Real formatted string for exposed price.
+  available_listings_price_brl:
+    lineage:
+      - datalake_ebdb_listing.house_listing.rent
+      - datalake_ebdb_listing.house.sale_price
+    description: Brazilian Real formatted string for available listing price.
+  exposed_impressions_age_days:
+    lineage:
+      - datalake_search.metric_search_impression_base.listing_age
+    description: Rounded listing age percentile or mean for search-exposed impressions.
+  available_listings_age_days:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_publicated
+      - datalake_ebdb_listing.listing_business_context.ts_last_listing
+    description: >-
+      Rounded listing age percentile or mean for currently published listings,
+      measured from dt_available_snapshot.
+  n_exposed:
+    lineage:
+      - datalake_search.metric_search_impression_base.business_context
+    description: >-
+      Count of search impressions from period_start through dt_exposed_through.
+  n_available:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house
+      - datalake_ebdb_listing.listing_business_context.id_house
+    description: Count of published listings in the available snapshot.
+  is_period_complete:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: >-
+      True when the period had already ended at run time, so the exposed side
+      covers every day of it. False while the period is still in progress, and
+      always true on available rows.
+  period_start:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: >-
+      First day of the calendar period the exposed side aggregates, or the
+      snapshot date on available rows. Source of the partition columns.
+  period_end:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: >-
+      Last calendar day of the period, whether or not it has been reached yet.
+      Equals period_start on available rows.
+  dt_exposed_through:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: >-
+      Last day of impressions included in the exposed side. Equals period_end
+      for a complete period, the run date while the period is in progress, and
+      null on available rows.
+  dt_available_snapshot:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house
+      - datalake_ebdb_listing.listing_business_context.id_house
+    description: >-
+      Date the available inventory snapshot was taken. On week and month rows it
+      reflects run time rather than the period, so it does not describe
+      inventory during the period itself. Equals period_start on available rows.
+  year:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Year of period_start.
+  month:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Month of period_start.
+  day:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Day of period_start.

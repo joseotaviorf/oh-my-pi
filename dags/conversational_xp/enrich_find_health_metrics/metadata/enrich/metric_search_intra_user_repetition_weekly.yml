@@ -1,0 +1,65 @@
+database_name: datalake_search
+table_name: metric_search_intra_user_repetition_weekly
+owner: joseph.magiya@quintoandar.com.br
+domain: Conversational XP
+description: >-
+  Weekly intra-user listing repetition for users with at least two distinct
+  searches. Measures how often the same house reappears across searches within a
+  week and business_context.
+columns:
+  ts_search_event_week:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Start of the calendar week for the repetition analysis.
+  business_context:
+    lineage:
+      - datalake_search.metric_search_impression_base.business_context
+    description: Business context RENT or SALE for the repetition metrics.
+  n_users_multi_search:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_user
+    description: Count of users with at least two distinct searches in the week.
+  avg_searches_per_multi_search_user:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_search
+    description: Mean number of distinct searches per multi-search user.
+  avg_unique_houses_seen:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Mean number of distinct houses seen per multi-search user.
+  median_searches_per_multi_search_user:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_search
+    description: Median number of distinct searches per multi-search user.
+  median_unique_houses_seen:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: Median number of distinct houses seen per multi-search user.
+  impression_repetition_rate:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: >-
+      Average fraction of user-search-house pairs that are repeated appearances
+      beyond the first unique house per user.
+  houses_repetition_rate:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_house
+    description: >-
+      Average fraction of unique houses that appeared in two or more searches
+      for multi-search users.
+  pct_users_with_any_repetition:
+    lineage:
+      - datalake_search.metric_search_impression_base.id_user
+    description: Share of multi-search users with at least one repeated house appearance.
+  year:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Year of the week start date.
+  month:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Month of the week start date.
+  day:
+    lineage:
+      - datalake_search.metric_search_impression_base.ts_search_event
+    description: Partition column. Day of the week start date.

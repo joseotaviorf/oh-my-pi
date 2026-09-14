@@ -16,19 +16,31 @@ workflow:
     "days_past_45": 45
     "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    metric_search_vs_available_distribution:
+      - metric_search_impression_base
+    metric_search_exposure_concentration_weekly:
+      - metric_search_impression_base
+    metric_search_intra_user_repetition_weekly:
+      - metric_search_impression_base
   tables_customization:
     metric_recs_listing_page_viewed:
       partitions: [year, month, day]
-    metric_recs_conversion: 
+    metric_recs_conversion:
       merge_on: [id_unique]
       partitions: [year, month, day]
     metric_recs_click_through_rate:
       partitions: [year, month, day]
     metric_search_listing_page_viewed:
       partitions: [year, month, day]
-    metric_search_conversion: 
+    metric_search_conversion:
       merge_on: [id_unique]
       partitions: [year, month, day]
-    metric_search_click_through_rate:
+    metric_search_impression_base:
       partitions: [year, month, day]
-
+    metric_search_vs_available_distribution:
+      partitions: [year, month, day]
+    metric_search_exposure_concentration_weekly:
+      partitions: [year, month, day]
+    metric_search_intra_user_repetition_weekly:
+      partitions: [year, month, day]
