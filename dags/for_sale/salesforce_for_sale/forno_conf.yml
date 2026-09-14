@@ -13,6 +13,16 @@ dag_documentation:
 raw_schema: "datalake_salesforce_raw"
 clean_schema: "datalake_salesforce_clean"
 datalake_bucket: "5a-datalake-forno"
+# Base URL the cdc_raw recovery path calls when AppFlow has not delivered the
+# partition hour. Same org as salesforce_cdc, so the same endpoint per env.
+salesforce_endpoint: "https://quintoandar--fornov1.sandbox.my.salesforce.com"
+# Empty on purpose: the forno flows live in the same account as emr-forno
+# (713278628093), which carries the AppFlow permissions directly, so the
+# instance profile already sees them and no assume-role is needed. Declared
+# rather than omitted because get_config raises on a missing key; the DAG drops
+# the job parameter entirely when it is empty (EMR's command-runner.jar silently
+# discards empty-string step arguments -- see AEFR-7513).
+appflow_assume_role_arn: ""
 events_config:
   received_document:
     event_path: "raw/salesforce/ReceivedDocumentEvent"
