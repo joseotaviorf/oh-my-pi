@@ -12,8 +12,9 @@ dag:
       A shared datalake_agentic_platform.platform_events table reads and deduplicates
       the upstream source once; downstream projections fan out via
       inner_dependencies. Evaluation metrics are unpivoted into
-      eval_metric_observations (percentile source). Each run refreshes a
-      two-calendar-day CDP lookback so late events correct today's rows.
+      eval_metric_observations (percentile source). Each run reads the CDP
+      user_tracking date partition containing its Airflow interval and filters
+      events to that exact hour.
       Additive daily serving lives in metric_agentic_platform.
 workflow:
   type: query_delta
@@ -21,8 +22,8 @@ workflow:
   custom_schema: agentic_platform
   default_extraction_type: incremental
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start.strftime('%Y-%m-%d %H:00:00'), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end.strftime('%Y-%m-%d %H:00:00'), 'load_end_date') }}"
   tables_customization:
     platform_events:
       merge_on: [id_event]

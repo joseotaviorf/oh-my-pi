@@ -1,3 +1,6 @@
+-- Processes a single hour of a single date partition: {load_start_date} and
+-- {load_end_date} must be 'YYYY-MM-DD HH:00:00' timestamps one hour apart.
+-- A date-only value (e.g. from the Airflow trigger form) selects no rows.
 WITH ranked_events AS (
     SELECT
         id_event,
@@ -13,7 +16,11 @@ WITH ranked_events AS (
     FROM
         datalake_cdp_clean.user_tracking
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        year = YEAR('{load_start_date}')
+        AND month = MONTH('{load_start_date}')
+        AND day = DAY('{load_start_date}')
+        AND ts_event >= TIMESTAMP('{load_start_date}')
+        AND ts_event < TIMESTAMP('{load_end_date}')
         AND (
             event_name RLIKE '^agentic_platform_'
             OR event_name = 'agentic_tool_call_completed'
