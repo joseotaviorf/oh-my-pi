@@ -81,6 +81,10 @@ columns:
     lineage:
     - datalake_ebdb_clean.visit_aud.id_agent
     description: Last id_agent associated with visit. Data since 2015.
+  id_user_agent_vbba:
+    lineage:
+    - datalake_visit.visit_status_events.id_user_agent_vbba
+    description: ID of user who is related to the VBBA schedule. Data since 2025-11.
   id_user_visit_request:
     lineage:
     - datalake_visit.visit_status_events.id_author_user
@@ -349,7 +353,7 @@ columns:
   is_vbba:
     lineage:
     - datalake_visit.visit_status_events.channel
-    - datalake_visit.visit_status_events.application_source
+    - datalake_visit.visit_origin_unified.visit_request_application_source
     - datalake_visit.visit_status_events.event_type
     description: If this visit is a VBBA schedule. Data since 2015.
   has_entrance_problem:

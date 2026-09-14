@@ -40,6 +40,10 @@ columns:
     description: Is the sk_user of the last agent who was associated with the visit.
     lineage:
     - datalake_visit.visits.id_last_associated_agent
+  sk_user_agent_vbba:
+    description: User's id who is related to the VBBA schedule.
+    lineage:
+    - datalake_visit.visits.id_user_agent_vbba
   sk_fixed_agent:
     description: ID of the fixed agent associated with the visitor.
     lineage:
@@ -186,6 +190,10 @@ columns:
     description: Number of visit unsuccessful (CAST of is_unsuccessful as INTEGER). The sum aggregate function can be used to get the total number of unsuccessful visits grouped in some way.
     lineage:
     - datalake_visit.visits.is_unsuccessful
+  num_visit_stalled:
+    description: Number of visit stalled (CAST of is_stalled as INTEGER). The sum aggregate function can be used to get the total number of stalled visits grouped in some way.
+    lineage:
+    - datalake_visit.visits.is_stalled
   num_offer_submitted:
     description: Number of offer submitted.
     lineage:

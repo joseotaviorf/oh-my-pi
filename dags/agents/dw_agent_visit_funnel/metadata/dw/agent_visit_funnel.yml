@@ -3,395 +3,412 @@ database_name: "dw_agent_performance"
 table_name: "agent_visit_funnel"
 description: >
   Daily agent visit funnel table. Grain is one row per (uuid_person, date_ref),
-  where uuid_person is the visiting agent's person UUID and date_ref is the
-  visit-schedule/demand reference date. Aggregates visit-schedule funnel
-  counters (scheduled, rescheduled, canceled, completed, unsuccessful,
-  stalled, not finished, offer submitted/accepted, sale agreement signed)
-  sourced from dw_visit fact/dim tables, datalake_sale_offer.sale_offer and
-  dw_house.dim_house_entrance_history, split into four cuts: overall,
-  PFA (visiting agent is the house's fixed/preferred agent), CRCC (visiting
-  agent currently holds the house key per house_entrance_history) and VBBA
-  (visit booked by agent). Loaded incrementally (workflow.type: query_delta)
-  by DAG dw_agent_visit_funnel, merged on (uuid_person, date_ref).
+  where uuid_person is the agent's person UUID and date_ref is the visit
+  creation/demand reference date. Aggregates visit funnel counters (booked,
+  rescheduled, canceled, completed, unsuccessful, stalled, not finished, offer
+  submitted/accepted, sale agreement signed) sourced from dw_visit fact/dim
+  tables, datalake_sale_offer.sale_offer and dw_house.dim_house_entrance_history,
+  split into four cuts: overall, PFA (agent is the house's fixed/preferred
+  agent), CRCC (agent currently holds the house key per house_entrance_history)
+  and VBBA (visit booked by agent). The overall/PFA/CRCC cuts attribute a visit
+  to its last associated agent (fact_visits.sk_last_associated_agent); the VBBA
+  cut instead attributes it to the agent who booked the visit on the visitor's
+  behalf (fact_visits.sk_user_agent_vbba), which can be a different agent.
+  Loaded incrementally (workflow.type: query_delta) by DAG
+  dw_agent_visit_funnel, merged on sk_agent_visit_funnel (derived from
+  uuid_person, date_ref).
 domain: "Agents"
 owner: "guilherme.rocha@quintoandar.com.br"
 columns:
   sk_agent_visit_funnel:
     description: >
       Surrogate key for the row, computed as MD5(uuid_person || date_ref).
-      Deterministic given the grain and not used as the MERGE key (see
-      merge_on: [uuid_person, date_ref] in the declaration).
+      Deterministic given the grain and used as the MERGE key (see
+      merge_on: [sk_agent_visit_funnel] in the declaration).
     lineage:
       - dw_public.dim_user.uuid_person
       - dw_agent.fact_agent_daily.uuid_person
-      - dw_visit.dim_visit_schedule.ts_schedule_created
+      - dw_visit.dim_visit.dt_created
       - dw_agent.fact_agent_daily.dt_ref
   uuid_person:
     description: >
-      Person UUID of the visiting agent. Grain key alongside date_ref.
-      Sourced from dw_public.dim_user (joined on sk_user_agent) for
-      schedule-driven rows, and directly from dw_agent.fact_agent_daily for
-      days the agent was allowed to receive demand visits with no schedule
-      activity in the load window.
+      Person UUID of the agent. Grain key alongside date_ref. Sourced from
+      dw_public.dim_user (joined on the last associated agent's sk_user) for
+      visit-driven rows, and directly from dw_agent.fact_agent_daily for days
+      the agent was allowed to receive demand visits with no visit activity in
+      the load window.
     lineage:
       - dw_public.dim_user.uuid_person
       - dw_agent.fact_agent_daily.uuid_person
   date_ref:
     description: >
-      Reference date of the funnel snapshot. For schedule-driven rows, the
-      greatest of the schedule/visit/offer update timestamps found within the
-      load window; for demand-allowance rows with no schedule activity, the
+      Reference date of the funnel snapshot. For visit-driven rows, the visit
+      creation date, included when the greatest of the visit/offer update
+      timestamps falls within the load window and the visit's business
+      context is SALE; for demand-allowance rows with no visit activity, the
       fact_agent_daily reference date.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_schedule_created
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.dim_visit.ts_visit_done
-      - dw_visit.dim_visit.ts_visit_unsuccessful
-      - dw_visit.dim_visit.ts_visit_stalled
-      - dw_visit.dim_visit.ts_visit_canceled
+      - dw_visit.dim_visit.dt_created
+      - dw_visit.dim_visit.dt_updated
       - datalake_sale_offer.sale_offer.ts_updated
       - dw_agent.fact_agent_daily.dt_ref
-  total_schedule:
+  total_visit:
     description: >
-      Count of visit schedules (bookings) created by the agent on the
+      Count of visits booked by the agent whose creation date is the
       reference date.
     lineage:
-      - dw_visit.fact_visit_schedules.is_booking
+      - dw_visit.fact_visits.num_visit_booked
   total_reschedule:
     description: >
-      Count of visit schedules created on the reference date that were later
-      rescheduled to a new schedule.
+      Number of reschedules accumulated by visits created on the reference
+      date.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
+      - dw_visit.fact_visits.nbr_reschedule
   total_visit_canceled:
     description: >
-      Count of visits canceled among schedules created on the reference date
-      that were not rescheduled.
+      Count of visits canceled among visits created on the reference date.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_canceled
   total_visit_completed:
     description: >
-      Count of visits completed among schedules created on the reference date
-      that were not rescheduled.
+      Count of visits completed among visits created on the reference date.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_completed
   total_visit_unsuccessful:
     description: >
-      Count of visits marked unsuccessful among schedules created on the
-      reference date that were not rescheduled.
+      Count of visits marked unsuccessful among visits created on the
+      reference date.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_unsuccessful
   total_visit_stalled:
     description: >
-      Count of non-rescheduled visits marked as stalled among schedules
-      created on the reference date.
+      Count of visits marked as stalled among visits created on the reference
+      date.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.dim_visit.ts_visit_stalled
-  total_schedule_not_finished:
+      - dw_visit.fact_visits.num_visit_stalled
+  total_visit_not_finished:
     description: >
-      Count of non-rescheduled schedules created on the reference date that
-      have not yet reached a finisher status (completed, canceled,
-      unsuccessful or stalled).
+      Count of visits created on the reference date that have not yet reached
+      a finisher status (completed, canceled, unsuccessful or stalled).
     lineage:
       - dw_visit.dim_visit.has_visit_finisher_status
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
   total_offer_submitted:
     description: >
-      Count of non-rescheduled schedules created on the reference date where
-      the visitor submitted a sale offer, matched via the visit or the
-      fifty/reschedule visit external id.
+      Count of visits created on the reference date where the visitor
+      submitted a sale offer, matched via the visit or the fifty/reschedule
+      visit external id.
     lineage:
       - datalake_sale_offer.sale_offer.ts_offer_submitted
       - datalake_sale_offer.sale_offer.id_visit_external
       - datalake_sale_offer.sale_offer.id_visit_fifty_external
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
   total_offer_accepted:
     description: >
-      Count of non-rescheduled schedules created on the reference date where
-      the submitted sale offer was accepted.
+      Count of visits created on the reference date where the submitted sale
+      offer was accepted.
     lineage:
       - datalake_sale_offer.sale_offer.ts_offer_accepted
       - datalake_sale_offer.sale_offer.id_visit_external
       - datalake_sale_offer.sale_offer.id_visit_fifty_external
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
   total_agreement_signed:
     description: >
-      Count of non-rescheduled schedules created on the reference date where
-      a sale agreement was signed and not later canceled.
+      Count of visits created on the reference date where a sale agreement
+      was signed and not later canceled.
     lineage:
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_sale_offer.sale_offer.ts_sale_agreement_canceled
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-  total_schedule_pfa:
+  total_visit_pfa:
     description: >
-      Same as total_schedule, restricted to schedules where the visiting
-      agent is the house's fixed/preferred agent (PFA).
+      Same as total_visit, restricted to visits where the agent is the
+      house's fixed/preferred agent (PFA).
     lineage:
-      - dw_visit.fact_visit_schedules.is_booking
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
+      - dw_visit.fact_visits.num_visit_booked
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
   total_reschedule_pfa:
     description: >
-      Same as total_reschedule, restricted to PFA schedules.
+      Same as total_reschedule, restricted to PFA visits.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
+      - dw_visit.fact_visits.nbr_reschedule
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
   total_visit_canceled_pfa:
     description: >
-      Same as total_visit_canceled, restricted to PFA schedules.
+      Same as total_visit_canceled, restricted to PFA visits.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_canceled
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
+      - dw_visit.dim_visit.is_visit_canceled
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
   total_visit_completed_pfa:
     description: >
-      Same as total_visit_completed, restricted to PFA schedules.
+      Same as total_visit_completed, restricted to PFA visits.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_completed
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
+      - dw_visit.dim_visit.is_visit_completed
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
   total_visit_unsuccessful_pfa:
     description: >
-      Same as total_visit_unsuccessful, restricted to PFA schedules.
+      Same as total_visit_unsuccessful, restricted to PFA visits.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_unsuccessful
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
+      - dw_visit.dim_visit.is_visit_unsuccessful
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
   total_visit_stalled_pfa:
     description: >
-      Same as total_visit_stalled, restricted to PFA schedules.
+      Same as total_visit_stalled, restricted to PFA visits.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.dim_visit.ts_visit_stalled
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
-  total_schedule_not_finished_pfa:
+      - dw_visit.fact_visits.num_visit_stalled
+      - dw_visit.dim_visit.is_visit_stalled
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
+  total_visit_not_finished_pfa:
     description: >
-      Same as total_schedule_not_finished, restricted to PFA schedules.
+      Same as total_visit_not_finished, restricted to PFA visits.
     lineage:
       - dw_visit.dim_visit.has_visit_finisher_status
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
   total_offer_submitted_pfa:
     description: >
-      Same as total_offer_submitted, restricted to PFA schedules.
+      Same as total_offer_submitted, restricted to PFA visits.
     lineage:
       - datalake_sale_offer.sale_offer.ts_offer_submitted
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
   total_offer_accepted_pfa:
     description: >
-      Same as total_offer_accepted, restricted to PFA schedules.
+      Same as total_offer_accepted, restricted to PFA visits.
     lineage:
       - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
   total_agreement_signed_pfa:
     description: >
-      Same as total_agreement_signed, restricted to PFA schedules.
+      Same as total_agreement_signed, restricted to PFA visits.
     lineage:
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_sale_offer.sale_offer.ts_sale_agreement_canceled
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.sk_user_agent
-      - dw_visit.fact_visit_schedules.sk_user_fixed_agent
-  total_schedule_crcc:
+      - dw_visit.fact_visits.sk_last_associated_agent
+      - dw_visit.fact_visits.sk_user_fixed_agent
+  total_visit_crcc:
     description: >
-      Same as total_schedule, restricted to schedules where the visiting
-      agent currently holds the house key, per house_entrance_history
-      (key_location = AGENT, key holder is the visiting agent, event not
-      KEY_HOLDER_DEALLOCATED).
+      Same as total_visit, restricted to visits where the agent currently
+      holds the house key, per house_entrance_history (key_location = AGENT,
+      key holder is the agent, event not KEY_HOLDER_DEALLOCATED).
     lineage:
-      - dw_visit.fact_visit_schedules.is_booking
+      - dw_visit.fact_visits.num_visit_booked
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
   total_reschedule_crcc:
     description: >
-      Same as total_reschedule, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_reschedule, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
+      - dw_visit.fact_visits.nbr_reschedule
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
   total_visit_canceled_crcc:
     description: >
-      Same as total_visit_canceled, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_visit_canceled, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_canceled
+      - dw_visit.dim_visit.is_visit_canceled
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
   total_visit_completed_crcc:
     description: >
-      Same as total_visit_completed, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_visit_completed, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_completed
+      - dw_visit.dim_visit.is_visit_completed
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
   total_visit_unsuccessful_crcc:
     description: >
-      Same as total_visit_unsuccessful, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_visit_unsuccessful, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_unsuccessful
+      - dw_visit.dim_visit.is_visit_unsuccessful
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
   total_visit_stalled_crcc:
     description: >
-      Same as total_visit_stalled, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_visit_stalled, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.dim_visit.ts_visit_stalled
+      - dw_visit.fact_visits.num_visit_stalled
+      - dw_visit.dim_visit.is_visit_stalled
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
-  total_schedule_not_finished_crcc:
+  total_visit_not_finished_crcc:
     description: >
-      Same as total_schedule_not_finished, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_visit_not_finished, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
       - dw_visit.dim_visit.has_visit_finisher_status
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
   total_offer_submitted_crcc:
     description: >
-      Same as total_offer_submitted, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_offer_submitted, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
       - datalake_sale_offer.sale_offer.ts_offer_submitted
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
   total_offer_accepted_crcc:
     description: >
-      Same as total_offer_accepted, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_offer_accepted, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
       - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
   total_agreement_signed_crcc:
     description: >
-      Same as total_agreement_signed, restricted to CRCC schedules (see
-      total_schedule_crcc).
+      Same as total_agreement_signed, restricted to CRCC visits (see
+      total_visit_crcc).
     lineage:
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_sale_offer.sale_offer.ts_sale_agreement_canceled
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
+      - dw_visit.fact_visits.sk_house_entrance
+      - dw_visit.fact_visits.sk_last_associated_agent
       - dw_house.dim_house_entrance_history.key_location
       - dw_house.dim_house_entrance_history.sk_user_key_holder
       - dw_house.dim_house_entrance_history.event_type
-  total_schedule_vbba:
+  total_visit_vbba:
     description: >
-      Same as total_schedule, restricted to schedules flagged as VBBA
-      (Visit Booked By Agent).
+      Same as total_visit, restricted to visits flagged as VBBA (Visit Booked
+      By Agent). Attributed to fact_visits.sk_user_agent_vbba (the agent who
+      booked the visit), not to the visit's last associated agent.
     lineage:
-      - dw_visit.fact_visit_schedules.is_booking
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.fact_visits.num_visit_booked
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   total_reschedule_vbba:
     description: >
-      Same as total_reschedule, restricted to VBBA schedules.
+      Same as total_reschedule, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.fact_visits.nbr_reschedule
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   total_visit_canceled_vbba:
     description: >
-      Same as total_visit_canceled, restricted to VBBA schedules.
+      Same as total_visit_canceled, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_canceled
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.dim_visit.is_visit_canceled
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   total_visit_completed_vbba:
     description: >
-      Same as total_visit_completed, restricted to VBBA schedules.
+      Same as total_visit_completed, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_completed
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.dim_visit.is_visit_completed
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   total_visit_unsuccessful_vbba:
     description: >
-      Same as total_visit_unsuccessful, restricted to VBBA schedules.
+      Same as total_visit_unsuccessful, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
       - dw_visit.fact_visits.num_visit_unsuccessful
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.dim_visit.is_visit_unsuccessful
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   total_visit_stalled_vbba:
     description: >
-      Same as total_visit_stalled, restricted to VBBA schedules.
+      Same as total_visit_stalled, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.dim_visit.ts_visit_stalled
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
-  total_schedule_not_finished_vbba:
+      - dw_visit.fact_visits.num_visit_stalled
+      - dw_visit.dim_visit.is_visit_stalled
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
+  total_visit_not_finished_vbba:
     description: >
-      Same as total_schedule_not_finished, restricted to VBBA schedules.
+      Same as total_visit_not_finished, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
       - dw_visit.dim_visit.has_visit_finisher_status
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   total_offer_submitted_vbba:
     description: >
-      Same as total_offer_submitted, restricted to VBBA schedules.
+      Same as total_offer_submitted, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
       - datalake_sale_offer.sale_offer.ts_offer_submitted
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   total_offer_accepted_vbba:
     description: >
-      Same as total_offer_accepted, restricted to VBBA schedules.
+      Same as total_offer_accepted, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
       - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   total_agreement_signed_vbba:
     description: >
-      Same as total_agreement_signed, restricted to VBBA schedules.
+      Same as total_agreement_signed, restricted to VBBA visits (see
+      total_visit_vbba for the agent attribution rule).
     lineage:
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_sale_offer.sale_offer.ts_sale_agreement_canceled
-      - dw_visit.dim_visit_schedule.ts_next_schedule_created
-      - dw_visit.fact_visit_schedules.is_schedule_vbba
+      - dw_visit.dim_visit.is_vbba
+      - dw_visit.fact_visits.sk_user_agent_vbba
   year:
     description: >
       Year partition column, extracted from date_ref.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_schedule_created
+      - dw_visit.dim_visit.dt_created
       - dw_agent.fact_agent_daily.dt_ref
   month:
     description: >
       Month partition column, extracted from date_ref.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_schedule_created
+      - dw_visit.dim_visit.dt_created
       - dw_agent.fact_agent_daily.dt_ref
   day:
     description: >
       Day partition column, extracted from date_ref.
     lineage:
-      - dw_visit.dim_visit_schedule.ts_schedule_created
+      - dw_visit.dim_visit.dt_created
       - dw_agent.fact_agent_daily.dt_ref

@@ -32,6 +32,10 @@ columns:
     lineage:
     - datalake_ebdb_clean.visit.id_agent
     description: Agent user who is following the visit
+  id_user_agent_by_event:
+    lineage:
+    - datalake_ebdb_clean.visit_status_log.id_user_agent_by_event
+    description: User id of the user who is related to the event.
   id_author_user:
     lineage:
     - datalake_ebdb_clean.visits_status_log
