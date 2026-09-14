@@ -1,0 +1,23 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_fiador
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica GUARANTOR rows from lake_mirror. Treat as PII.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_pessoa_pes:
+    description: Vendor person id.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  nome_pes:
+    description: Guarantor name from vendor payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

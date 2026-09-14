@@ -1,0 +1,20 @@
+dag:
+  name: benvi_manager
+  schedule_start_date: 2026, 9, 14
+  schedule_interval: 0 8,12,21 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      CDC of benvi-manager Postgres table integration_superlogica.lake_mirror into the lake.
+      Clean layer projects one Superlogica resource_code per table for Trino.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: benvi_manager
+  source_schema: integration_superlogica
+  custom_schema: benvi_manager
+  lineage_product_database_name: benvi_manager
+  dbutils_secret_key: BENVI_MANAGER_DB
+  tables_customization:
+    lake_mirror: {}

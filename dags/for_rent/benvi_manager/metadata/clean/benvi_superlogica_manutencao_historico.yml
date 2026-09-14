@@ -1,0 +1,27 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_manutencao_historico
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica MAINTENANCE_HISTORY rows. vendor_natural_key is id_manutencao_man pipe id_historico_mhis.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  vendor_natural_key:
+    description: Pipe-joined maintenance and history ids.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_manutencao_man:
+    description: Parent maintenance id from the composite key.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_historico_mhis:
+    description: History event id from the composite key.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

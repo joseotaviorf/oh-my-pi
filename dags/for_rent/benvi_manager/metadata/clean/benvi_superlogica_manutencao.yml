@@ -1,0 +1,23 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_manutencao
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica MAINTENANCE rows from lake_mirror.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_manutencao_man:
+    description: Vendor maintenance id.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_imovel_imo:
+    description: Related property id from vendor payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at
