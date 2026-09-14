@@ -74,7 +74,21 @@ columns:
   incentive_system:
     lineage:
       - datalake_big_agent.earnings.incentive_system
-    description: Incentive system label that produced the payment (for example DEMAND_CONVERSION_FS).
+      - datalake_nazare_clean.revenue_share_by_participant.participant_role
+    description: >
+      Incentive system label that produced the payment. Big Agent rows keep the source
+      incentive_system from earnings; Nazaré rows map participant_role to role-specific
+      Sale labels (NEGOTIATION_FS, BUSINESS_OPERATOR_SUPPLY_CONVERSION_FS) or default
+      DEMAND_CONVERSION_FS / SUPPLY_ACQUISITION_FS.
+    categories:
+      DEMAND_CONVERSION_FS: Sale demand-conversion brokerage payment (Big Agent or default Nazaré demand role).
+      DEMAND_ACQUISITION_FS: Sale demand-acquisition bonus payment from Big Agent.
+      SUPPLY_ACQUISITION_FS: Sale supply-acquisition payment (Big Agent or Nazaré CIQ/SUPPLY role).
+      DEMAND_CONVERSION_FR: Rent demand-conversion payment from Big Agent.
+      DEMAND_ACQUISITION_FR: Rent demand-acquisition payment from Big Agent.
+      SUPPLY_ACQUISITION_FR: Rent supply-acquisition payment from Big Agent.
+      NEGOTIATION_FS: Nazaré negotiation-executive payment line (EXECUTIVO_NEGOCIACAO).
+      BUSINESS_OPERATOR_SUPPLY_CONVERSION_FS: Nazaré associated-executive payment line (EXECUTIVO_ASSOCIADO).
   calculated_from:
     lineage:
       - datalake_big_agent.earnings.calculated_from
@@ -164,6 +178,14 @@ columns:
       - datalake_big_agent.earnings.dt_tier_reference
       - datalake_big_agent.partner_tier.dt_validity_started
     description: Tier validity start date used as reference when assigning the partner tier.
+  ts_contract_signed:
+    lineage:
+      - datalake_sales_flow_clean.ccv.ts_signed
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_big_agent.earnings.ts_contract_signed
+    description: >
+      Contract signature timestamp for the linked sale CCV or rent contract; null when the
+      payment line has no signed contract in the source domain.
   ts_created:
     lineage:
       - datalake_big_agent.earnings.ts_created

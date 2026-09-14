@@ -116,7 +116,17 @@ columns:
   incentive_system:
     lineage:
       - datalake_big_agent_clean.new_earnings.incentive_system
-    description: Incentive system label that produced this earning (for example DEMAND_CONVERSION_FS).
+    description: >
+      Incentive system label that produced this earning from the Big Agent incentives engine.
+    categories:
+      DEMAND_CONVERSION_FS: Sale demand-conversion earning.
+      DEMAND_ACQUISITION_FS: Sale TQC demand-acquisition earning.
+      SUPPLY_ACQUISITION_FS: Sale CIQ supply-acquisition earning.
+      DEMAND_CONVERSION_FR: Rent demand-conversion earning.
+      DEMAND_ACQUISITION_FR: Rent TQA demand-acquisition earning.
+      SUPPLY_ACQUISITION_FR: Rent supply-acquisition earning.
+      NEGOTIATION_FS: Sale negotiation-executive earning when configured in Big Agent.
+      BUSINESS_OPERATOR_SUPPLY_CONVERSION_FS: Sale associated-executive earning when configured in Big Agent.
   calculated_from:
     lineage:
       - datalake_big_agent_clean.new_earnings.calculated_from
@@ -269,6 +279,13 @@ columns:
     lineage:
       - datalake_big_agent_clean.earning_sources.ts_sent_to_finance
     description: Timestamp when the earning was sent to finance in Big Agent.
+  ts_contract_signed:
+    lineage:
+      - datalake_sales_flow_clean.ccv.ts_signed
+      - datalake_ebdb_clean.contract.ts_signed
+    description: >
+      Contract signature timestamp from the linked sale CCV or rent contract; null when the
+      earning has no signed contract in the source domain.
   ts_updated:
     lineage:
       - datalake_big_agent_clean.new_earnings.ts_updated

@@ -32,15 +32,31 @@ WITH nazare_revenue_share AS (
         ts_invalidated IS NULL
         AND DATE(GREATEST(rs.ts_created, rs.ts_database_transaction)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
+sales_flow_offer AS (
+    SELECT
+        sfo.id_firestore AS id_offer,
+        sfo.id_sales_flow,
+        fee.brokerage_fee,
+        ccv.ts_signed AS ts_contract_signed
+    FROM
+        datalake_sales_flow_clean.offer AS sfo
+    LEFT JOIN
+        datalake_sales_flow_clean.brokerage AS fee
+            ON fee.id_sales_flow = sfo.id_sales_flow
+    LEFT JOIN
+        datalake_sales_flow_clean.ccv AS ccv
+            ON ccv.id_sales_flow = sfo.id_sales_flow
+),
 nazare_offer_agent AS (
     SELECT
         oa.id_offer_agent,
-        sfo.id_sales_flow,
         a.id_external AS id_user,
         o.id_external AS id_offer,
         o.id_business_unit,
+        sfo.id_sales_flow,
         a.uuid_external_person AS uuid_person,
-        fee.brokerage_fee
+        sfo.brokerage_fee,
+        sfo.ts_contract_signed
     FROM
         datalake_nazare_clean.offer_agent AS oa
     LEFT JOIN
@@ -50,17 +66,17 @@ nazare_offer_agent AS (
         datalake_nazare_clean.offer AS o
             ON o.id_offer = oa.id_offer
     LEFT JOIN
-        datalake_sales_flow_clean.offer AS sfo
-            ON sfo.id_firestore = o.id_external
-    LEFT JOIN
-        datalake_sales_flow_clean.brokerage AS fee
-            ON fee.id_sales_flow = sfo.id_sales_flow
+        sales_flow_offer AS sfo
+            ON sfo.id_offer = o.id_external
 ),
 nazare_offer_partner AS (
     SELECT
         op.id_offer_partner,
         o.id_external AS id_offer,
-        p.uuid_company
+        sfo.id_sales_flow,
+        p.uuid_company,
+        sfo.brokerage_fee,
+        sfo.ts_contract_signed
     FROM
         datalake_nazare_clean.offer_partner AS op
     LEFT JOIN
@@ -69,11 +85,15 @@ nazare_offer_partner AS (
     LEFT JOIN
         datalake_nazare_clean.offer AS o
             ON o.id_offer = op.id_offer
+    LEFT JOIN
+        sales_flow_offer AS sfo
+            ON sfo.id_offer = o.id_external
 ),
 union_nazare_incentives AS (
     SELECT
         rs.id_revenue_share,
         "SUPPLY_ACQUISITION_FS" AS incentive_system,
+        NULL AS replacement_incentive_system,
         IF(rs.is_3p_partnership IS TRUE, "COMPANY", "AGENT") AS revenue_receiver_type,
         COALESCE(
             rs.supply_acquisition_share,
@@ -88,6 +108,7 @@ union_nazare_incentives AS (
     SELECT
         rs.id_revenue_share,
         "DEMAND_ACQUISITION_FS" AS incentive_system,
+        NULL AS replacement_incentive_system,
         "AGENT" AS revenue_receiver_type,
         COALESCE(rs.tqc_bonus, 0) AS revenue_percentage,
         rs.ts_created
@@ -100,6 +121,11 @@ union_nazare_incentives AS (
     SELECT
         rs.id_revenue_share,
         "DEMAND_CONVERSION_FS" AS incentive_system,
+        CASE
+            WHEN rs.participant_role = "EXECUTIVO_NEGOCIACAO" THEN "NEGOTIATION_FS"
+            WHEN rs.participant_role = "EXECUTIVO_ASSOCIADO" THEN "BUSINESS_OPERATOR_SUPPLY_CONVERSION_FS"
+            ELSE "DEMAND_CONVERSION_FS"
+        END AS replacement_incentive_system,
         IF(rs.is_3p_partnership IS TRUE, "COMPANY", "AGENT") AS revenue_receiver_type,
         COALESCE(
             NULLIF(
@@ -140,14 +166,14 @@ nazare_earnings AS (
         ui.id_revenue_share,
         rs.id_house,
         NULL AS id_contract,
-        oa.id_sales_flow,
+        COALESCE(oa.id_sales_flow, op.id_sales_flow) AS id_sales_flow,
         COALESCE(oa.id_offer, op.id_offer) AS id_offer,
         oa.id_business_unit,
         COALESCE(pt_person.id_tier, pt_company.id_tier) AS id_tier,
         oa.id_user,
         oa.uuid_person,
         op.uuid_company,
-        ui.incentive_system,
+        COALESCE(ui.replacement_incentive_system, ui.incentive_system) AS incentive_system,
         NULL AS calculated_from,
         "SALE" AS business_context,
         CASE
@@ -166,8 +192,8 @@ nazare_earnings AS (
         IF(rs.participant_role IN ('CIQ', 'SUPPLY'), 'SUPPLY', 'DEMAND') AS revenue_role,
         NULL AS revenue_share_type,
         NULL AS revenue_share_value,
-        COALESCE(oa.brokerage_fee, rs.brokerage) AS brokerage_fee,
-        COALESCE(oa.brokerage_fee, rs.brokerage) * rs.sale_price AS brokerage_amount,
+        COALESCE(oa.brokerage_fee, op.brokerage_fee, rs.brokerage) AS brokerage_fee,
+        COALESCE(oa.brokerage_fee, op.brokerage_fee, rs.brokerage) * rs.sale_price AS brokerage_amount,
         rs.sale_price AS ticket_base_amount,
         ui.revenue_percentage,
         IF(
@@ -181,6 +207,7 @@ nazare_earnings AS (
         NULL AS is_tier_revenue_share,
         NULL AS is_manual_calculation,
         COALESCE(pt_person.dt_validity_started, pt_company.dt_validity_started) AS dt_tier_reference,
+        COALESCE(oa.ts_contract_signed, op.ts_contract_signed) AS ts_contract_signed,
         ui.ts_created,
         rs.ts_updated
     FROM
@@ -260,6 +287,7 @@ SELECT
     e.revenue_share_type = "TIER" AS is_tier_revenue_share,
     e.is_manual_calculation,
     e.dt_tier_reference,
+    e.ts_contract_signed,
     e.ts_created,
     e.ts_updated
 FROM
@@ -310,6 +338,7 @@ SELECT
     e.is_tier_revenue_share,
     e.is_manual_calculation,
     e.dt_tier_reference,
+    e.ts_contract_signed,
     e.ts_created,
     e.ts_updated
 FROM

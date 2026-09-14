@@ -63,30 +63,21 @@ columns:
       - core_brokers.brokers.uuid_company
       - datalake_agent_payments.partner_payments.uuid_company
     description: Surrogate key of the 3P broker company from the Brokers Core Model, resolved by uuid_company. -1 when the receiver company is not a registered 3P broker.
-  sk_user_fifty_agent:
-    lineage:
-      - datalake_sale_offer_flows.offer_specialists.id_user_fifty_agent
-      - datalake_agent_payments.partner_payments.id_offer
-      - datalake_agent_payments.partner_payments.is_fifty_revenue_share
-    description: Surrogate key (EBDB user id) of the Fifty agent who participated in the offer negotiation. Populated only when is_fifty_revenue_share is true; -1 otherwise or when no Fifty agent is assigned to the offer.
-  sk_negotiation_executive:
-    lineage:
-      - datalake_hub_services.member_hub_allocation.id_main_user
-      - datalake_hub_services.member_hub_allocation.id_parent_member_profile
-      - datalake_agent_payments.partner_payments.uuid_person
-      - datalake_agent_payments.partner_payments.ts_created
-    description: Surrogate key (main/admin user id) of the Negotiation Executive (EN) who is the direct manager, in Hub Services, of the receiving agent on the payment creation date. Exclusive to business_context SALE; -1 for RENT or when the agent has no recorded manager for that date.
-  sk_associated_executive:
-    lineage:
-      - datalake_hub_services.member_hub_allocation.id_main_user
-      - datalake_hub_services.member_hub_allocation.id_business_unit
-      - datalake_agent_payments.partner_payments.id_business_unit
-      - datalake_agent_payments.partner_payments.ts_created
-    description: Surrogate key (main/admin user id) of the Associated Executive (EA) responsible for the payment's business unit on the payment creation date. Exclusive to business_context SALE; -1 for RENT or when no EA is allocated to that hub on that date.
   incentive_system:
     lineage:
       - datalake_agent_payments.partner_payments.incentive_system
-    description: Incentive system label that produced this payment.
+    description: >
+      Incentive system label that produced this payment. Propagated from enrich
+      partner_payments, including Big Agent programs and Nazaré role-based Sale mappings.
+    categories:
+      DEMAND_CONVERSION_FS: Sale demand-conversion brokerage payment (Big Agent or default Nazaré demand role).
+      DEMAND_ACQUISITION_FS: Sale TQC demand-acquisition bonus payment from Big Agent.
+      SUPPLY_ACQUISITION_FS: Sale CIQ supply-acquisition payment (Big Agent or Nazaré CIQ/SUPPLY role).
+      DEMAND_CONVERSION_FR: Rent demand-conversion payment from Big Agent.
+      DEMAND_ACQUISITION_FR: Rent TQA demand-acquisition payment from Big Agent.
+      SUPPLY_ACQUISITION_FR: Rent supply-acquisition payment from Big Agent.
+      NEGOTIATION_FS: Nazaré negotiation-executive payment line (EXECUTIVO_NEGOCIACAO).
+      BUSINESS_OPERATOR_SUPPLY_CONVERSION_FS: Nazaré associated-executive payment line (EXECUTIVO_ASSOCIADO).
   business_context:
     lineage:
       - datalake_agent_payments.partner_payments.business_context
@@ -159,6 +150,10 @@ columns:
     lineage:
       - datalake_agent_payments.partner_payments.dt_tier_reference
     description: Tier validity start date used as reference when assigning the partner tier.
+  ts_contract_signed:
+    lineage:
+      - datalake_agent_payments.partner_payments.ts_contract_signed
+    description: Contract signature timestamp propagated from the enrich partner_payments table.
   ts_created:
     lineage:
       - datalake_agent_payments.partner_payments.ts_created
@@ -171,13 +166,13 @@ columns:
     description: Timestamp when this row was loaded into the DW fact table.
   year:
     lineage:
-      - datalake_agent_payments.partner_payments.ts_updated
-    description: Partition year derived from ts_updated.
+      - datalake_agent_payments.partner_payments.ts_created
+    description: Partition year derived from ts_created.
   month:
     lineage:
-      - datalake_agent_payments.partner_payments.ts_updated
-    description: Partition month derived from ts_updated.
+      - datalake_agent_payments.partner_payments.ts_created
+    description: Partition month derived from ts_created.
   day:
     lineage:
-      - datalake_agent_payments.partner_payments.ts_updated
-    description: Partition day derived from ts_updated.
+      - datalake_agent_payments.partner_payments.ts_created
+    description: Partition day derived from ts_created.

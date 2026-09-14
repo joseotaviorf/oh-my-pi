@@ -60,7 +60,8 @@ sales_flow_offer AS (
         o.id_firestore AS id_offer,
         h.id_external AS id_house,
         o.id_hub AS id_business_unit,
-        fee.brokerage_fee
+        fee.brokerage_fee,
+        ccv.ts_signed AS ts_contract_signed
     FROM
         datalake_sales_flow_clean.sales_flow AS sf
     LEFT JOIN
@@ -72,6 +73,9 @@ sales_flow_offer AS (
     LEFT JOIN
         datalake_sales_flow_clean.brokerage AS fee
             ON fee.id_sales_flow = sf.id
+    LEFT JOIN
+        datalake_sales_flow_clean.ccv AS ccv
+            ON ccv.id_sales_flow = sf.id
 )
 SELECT DISTINCT
     ne.id AS id_earning,
@@ -145,6 +149,7 @@ SELECT DISTINCT
     ne.ts_created,
     ei.ts_invalidated,
     es.ts_sent_to_finance,
+    COALESCE(sf.ts_contract_signed, c.ts_signed) AS ts_contract_signed,
     ne.ts_updated,
     YEAR(ne.ts_created) AS year,
     MONTH(ne.ts_created) AS month,
