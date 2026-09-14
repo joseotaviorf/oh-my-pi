@@ -74,12 +74,15 @@ def _load_raw_data(
         database_location=write_location,
         partitions=partition_cols,
     )
-    spark_metastore_service.create_new_partitions_from_df(
-        df=df,
-        database_name=write_database_name,
-        table_name=write_table_name,
-        partition_cols=partition_cols,
-    )
+    # Unpartitioned tables (extraction_type: full) would emit an empty
+    # ALTER TABLE ... ADD PARTITION ( ), which Spark rejects with a ParseException.
+    if partition_cols:
+        spark_metastore_service.create_new_partitions_from_df(
+            df=df,
+            database_name=write_database_name,
+            table_name=write_table_name,
+            partition_cols=partition_cols,
+        )
 
 
 def _read_incremental(
