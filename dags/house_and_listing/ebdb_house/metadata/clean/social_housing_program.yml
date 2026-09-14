@@ -1,0 +1,67 @@
+database_name: datalake_ebdb_clean
+table_name: social_housing_program
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: |
+  CDC mirror of the SocialHousingProgram reference table from EBDB. One row per regulated
+  housing program type (HIS_1, HIS_2, HMP) with sale/rent ceilings and income bands.
+  Used for HIS/HMP identification, takedown analytics, and Superset filtering.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.id
+    description: Surrogate primary key of the social housing program in EBDB.
+  type:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.type
+    description: Regulated program type identifier (business key, unique per program).
+    categories:
+      HIS_1: Habitação de Interesse Social tier 1 (São Paulo).
+      HIS_2: Habitação de Interesse Social tier 2 (São Paulo).
+      HMP: Mercado Popular (São Paulo).
+  max_sale_value:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.max_sale_value
+    description: Regulatory maximum sale price (BRL) for the program type.
+  max_rent_value:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.max_rent_value
+    description: Regulatory maximum rent price (BRL) for the program type.
+  max_family_income:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.max_family_income
+    description: Reference maximum family income (BRL) for the program type.
+  max_per_capita_income:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.max_per_capita_income
+    description: Reference maximum per-capita income (BRL) for the program type.
+  is_enabled:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.enabled
+    description: Whether the program type is active in the reference catalog.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.created_at
+    description: Timestamp when the program record was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.updated_at
+    description: Timestamp when the program record was last updated in EBDB.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond
+      precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.SocialHousingProgram.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.
