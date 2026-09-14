@@ -6,7 +6,6 @@ WITH listing_page_view_users AS (
     WHERE
         MAKE_DATE(tracking.year, tracking.month, tracking.day) >= DATE_SUB(CURRENT_DATE(), 30)
         AND tracking.id_user IS NOT NULL
-        AND MOD(tracking.id_user, 2) = 1
         AND tracking.event_name = 'listing_page_viewed'
         AND GET_JSON_OBJECT(tracking.event_properties, '$.business_context') = 'rent'
     GROUP BY
