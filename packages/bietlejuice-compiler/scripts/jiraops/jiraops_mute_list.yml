@@ -50,6 +50,7 @@ DAG:
   contains:
     - bietlejuice.gsheets_
     - bietlejuice.dw_datamarts_
+    - bietlejuice.enrich_luigijr_
     - quintoml.
 
 Task:

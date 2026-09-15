@@ -2,6 +2,13 @@
 # Required per entry: reason, deadline (YYYY-MM-DD or Never), created_by, approved_by.
 # deadline = last calendar day the exception remains valid (open-ended: Never).
 # DAGOwner.equals must document every DAGOwner listed in jiraops_mute_list.yml.
+#
+# Luigi Jr domain (dags/luigijr/): every DAG in this domain follows one of two
+# naming prefixes, both muted via `contains` rules below (gsheets_ and
+# enrich_luigijr_), so future Luigi Jr DAGs are auto-covered as long as they
+# keep following that convention. DAGOwner can't be used instead: Luigi Jr
+# DAGs reuse team-level owners (BI Metrics, Ops Finance, Data ForRent, etc.)
+# shared with hundreds of unrelated DE-owned DAGs.
 
 DAG:
   equals:
@@ -46,6 +53,11 @@ DAG:
       deadline: Never
       created_by: anne.macedo@quintoandar.com.br
       approved_by: carolina.cavalcante@quintoandar.com.br
+    bietlejuice.enrich_luigijr_:
+      reason: "Luigi Jr domain pipelines (dags/luigijr/) are owned and operated directly by the Luigi Jr squad, not Data Engineering. gsheets_luigijr_* DAGs are already covered by the bietlejuice.gsheets_ contains rule above; enrich_luigijr_ is the domain's only other naming prefix, so this rule auto-covers current and future non-gsheets Luigi Jr DAGs. DE on-call has no context or accountability over this domain."
+      deadline: Never
+      created_by: gustavo.akashi@quintoandar.com.br
+      approved_by: mario.abreu@quintoandar.com.br
     bietlejuice.dw_datamarts_:
       reason: "These DAGs generate analytical assets owned and maintained by domain teams. Failures should be routed to the respective owners, not the DE on-call."
       deadline: Never
