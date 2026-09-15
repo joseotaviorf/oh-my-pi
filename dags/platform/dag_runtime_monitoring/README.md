@@ -42,8 +42,11 @@ Metadata lookups join `task_instance` only for the filtered candidate `dag_run` 
 
 **SLA candidates:** active, unpaused DAGs with a real schedule (dataset or cron).
 Excluded by default: `migration_*` prefixes, `__validation` suffixes, and this DAG
-itself. Manual-only (`schedule_interval` null) DAGs are skipped. Wonka/`quintoml.*`
-stay in (same scope as the slowness check).
+itself. Manual-only (`schedule_interval` null) DAGs are skipped. MLOps DAGs
+(`quintoml.*`, `wonka*`, and the MLOps-owned `bietlejuice.` DAGs `emlio`,
+`enrich_emlio`, `batch_inference`, `evidently_ml_monitor`) never alert on either
+check — `alert_exclude_dag_prefixes` is applied to slowness, to SLA candidacy,
+and to ledger follow-up.
 
 **Root selection (missing-run).** Of the DAGs past their due time, only the *roots*
 are alerted on. A **confirmed** root is **not blocked on a dataset** and has no late
@@ -298,3 +301,5 @@ enabling Chat delivery in prod.
 uv run --python 3.12 --directory packages/bietlejuice-airflow \
   pytest test/unit/dags/platform/dag_runtime_monitoring -q
 ```
+
+[Showing lines 1-300 of 301. Use :301 to continue]

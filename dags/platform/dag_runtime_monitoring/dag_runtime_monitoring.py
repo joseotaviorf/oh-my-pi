@@ -145,8 +145,19 @@ _DEFAULT_CONFIG = {
     "sla_cycle_anchor_local_time": "20:55",
     "sla_exclude_dag_prefixes": ["migration_"],
     "sla_exclude_dag_suffixes": ["__validation"],
-    # No Chat/Jira alerts for these DAG namespaces (e.g. quintoml.* floods the channel).
-    "alert_exclude_dag_prefixes": ["quintoml"],
+    # No Chat/Jira alerts for MLOps-owned DAGs. Two shapes: the ML namespaces
+    # (quintoml.* floods the channel; wonka.* and wonka_freshness_check are the same
+    # platform) and the four MLOps-owned DAGs that live in the bietlejuice namespace.
+    # _matches_exclude_prefix matches per dot-separated part, so the __validation
+    # twins are covered without listing them.
+    "alert_exclude_dag_prefixes": [
+        "quintoml",
+        "wonka",
+        "batch_inference",
+        "emlio",
+        "enrich_emlio",
+        "evidently_ml_monitor",
+    ],
     # Blast-radius cap on missing-run roots reported in one tick. The readiness gate
     # already keeps a recovering cascade quiet, but it can only do so while the dataset
     # trigger state is readable — when that read fails the fallback deliberately opens

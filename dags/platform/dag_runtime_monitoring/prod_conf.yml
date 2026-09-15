@@ -1,7 +1,8 @@
 # Runtime-anomaly monitoring config (production).
 #
 # critical_dags: protected set that escalates to JiraOps (in addition to Chat).
-# Currently the 5 dw_* DAGs listed below.
+# The original 5 dw_* DAGs, extended with the DAGs behind the business-critical
+# tables and review-requested raw/clean, enrich, and DW DAGs (grouped below).
 #
 #   Every anomaly still alerts to Google Chat. When this list is non-empty:
 #     * slow findings page JiraOps if the DAG is on the list OR transitively
@@ -28,55 +29,53 @@ dag_runtime_monitoring:
     - bietlejuice.dw_repairs
     - bietlejuice.dw_listing
     - bietlejuice.dw_supply
-  # To enable on-call paging, replace `critical_dags: []` above with this list:
-  # critical_dags:
-  #   - bietlejuice.ebdb_location
-  #   - bietlejuice.ebdb_user_fast_lane
-  #   - bietlejuice.ebdb_house_fast_lane
-  #   - bietlejuice.company
-  #   - bietlejuice.ebdb_partner
-  #   - bietlejuice.ebdb_contract_fast_lane
-  #   - bietlejuice.ebdb_user
-  #   - bietlejuice.ebdb_administration
-  #   - bietlejuice.ebdb_agent
-  #   - bietlejuice.ebdb_proposal_fast_lane
-  #   - bietlejuice.enrich_ebdb_country
-  #   - bietlejuice.enrich_ebdb_user
-  #   - bietlejuice.ebdb_contract
-  #   - bietlejuice.ebdb_listing_fast_lane
-  #   - bietlejuice.enrich_company
-  #   - bietlejuice.enrich_hubspot_crm
-  #   - bietlejuice.hubspot
-  #   - bietlejuice.ebdb_condo
-  #   - bietlejuice.ebdb_house
-  #   - bietlejuice.ebdb_house_properties
-  #   - bietlejuice.ebdb_listing
-  #   - bietlejuice.ebdb_offer
-  #   - bietlejuice.ebdb_visit
-  #   - bietlejuice.enrich_consumption_bill
-  #   - bietlejuice.enrich_ebdb_listing
-  #   - bietlejuice.request_logging
-  #   - bietlejuice.terminator_fast_lane
-  #   - bietlejuice.core_region
-  #   - bietlejuice.core_region_history
-  #   - bietlejuice.hub_services
-  #   - bietlejuice.enrich_region
-  #   - bietlejuice.gsheets_for_rent
-  #   - bietlejuice.core_brokers
-  #   - bietlejuice.ebdb_visit_fast_lane
-  #   - bietlejuice.ebdb_proposal
-  #   - bietlejuice.enrich_business_model
-  #   - bietlejuice.enrich_visit
-  #   - bietlejuice.insider
-  #   - bietlejuice.big_agent_fast_lane
-  #   - bietlejuice.ebdb_lead
-  #   - bietlejuice.enrich_big_agent_incentives
-  #   - bietlejuice.amplitude_new
-  #   - bietlejuice.ebdb_photo_job_fast_lane
-  #   - bietlejuice.ebdb_rent_flow
-  #   - bietlejuice.enrich_ebdb_rent_flow
-  #   - bietlejuice.enrich_lead
-  #   - bietlejuice.rene_descartes
-  #   - bietlejuice.rental_management
-  #   - bietlejuice.enrich_ebdb_contract
-  #   - bietlejuice.amplitude_subpartitioned
+    # Fintech
+    - bietlejuice.dw_credit_analysis
+    - bietlejuice.retsuko
+    - bietlejuice.retsuko_fast_lane
+    - bietlejuice.ebdb_house_fast_lane
+    - bietlejuice.ebdb_contract_fast_lane
+    - bietlejuice.cyber
+    # Growth
+    - bietlejuice.dw_demand
+    - bietlejuice.dw_sale_ongoing_listings
+    - bietlejuice.dw_pricing
+    - bietlejuice.dw_brokers
+    - bietlejuice.dw_3p_supply
+    # For Rent
+    - bietlejuice.dw_offboarding_obt
+    # Single Station
+    - bietlejuice.dw_support_journey
+    - bietlejuice.dw_bpo_performance
+    - bietlejuice.salesforce_cdc
+    # Agents
+    - bietlejuice.dw_agent
+    - bietlejuice.dw_agent_payments
+    - bietlejuice.enrich_tiers
+    # For Sale
+    - bietlejuice.dw_house
+    - bietlejuice.dw_visit
+    # Raw/clean
+    - bietlejuice.amplitude_new
+    - bietlejuice.ebdb_user_fast_lane
+    - bietlejuice.ebdb_location
+    - bietlejuice.ebdb_partner
+    - bietlejuice.ebdb_user
+    - bietlejuice.ebdb_agent
+    - bietlejuice.ebdb_listing_fast_lane
+    - bietlejuice.ebdb_proposal_fast_lane
+    # Enrich
+    - bietlejuice.enrich_ebdb_listing
+    - bietlejuice.enrich_ebdb_user
+    - bietlejuice.enrich_ebdb_contract
+    - bietlejuice.enrich_visit
+    - bietlejuice.enrich_booking
+    - bietlejuice.enrich_ebdb_rent_flow
+    - bietlejuice.enrich_offer
+    - bietlejuice.enrich_rent_demand_events
+    - bietlejuice.enrich_chatbot
+    # DW
+    - bietlejuice.dw_region
+    - bietlejuice.dw_user
+    - bietlejuice.dw_contract
+    - bietlejuice.dw_rent_flow

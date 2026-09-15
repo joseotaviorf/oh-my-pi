@@ -1969,6 +1969,26 @@ class TestIsAlertExcludedDag:
     def test_keeps_regular_bietlejuice_dag(self):
         assert _is_alert_excluded_dag(_STANDARD_DAG, _CONFIG) is False
 
+    @pytest.mark.parametrize(
+        "dag_id",
+        [
+            "wonka.user_most_viewed_source",
+            "wonka_freshness_check",
+            "bietlejuice.enrich_emlio",
+            "bietlejuice.evidently_ml_monitor",
+        ],
+    )
+    def test_matches_mlops_owned_dags(self, dag_id):
+        assert _is_alert_excluded_dag(dag_id, _CONFIG) is True
+
+    def test_keeps_lookalike_bietlejuice_dag(self):
+        assert (
+            _is_alert_excluded_dag(
+                "bietlejuice.collections_score_batch_inference", _CONFIG
+            )
+            is False
+        )
+
 
 class TestDropAlertExcludedEntries:
     def test_drops_quintoml_ledger_entries(self):
