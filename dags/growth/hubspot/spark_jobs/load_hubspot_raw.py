@@ -83,9 +83,15 @@ class HubSpotSchemaEnum(Enum):
                                 "metadata", MapType(StringType(), StringType()), True
                             ),
                             StructField("id", StringType(), True),
-                            StructField("created_at", TimestampType(), True),
-                            StructField("archived_at", TimestampType(), True),
-                            StructField("updated_at", TimestampType(), True),
+                            # Stored as string (not TimestampType) because the EMR/Glue
+                            # OpenX JSON SerDe parses nested struct timestamps with a
+                            # strict Hive-only format ("yyyy-MM-dd HH:mm:ss[.f]") and
+                            # rejects the ISO-8601 ("...Z") strings HubSpot returns for
+                            # stage timestamps. Cast back to timestamp in the clean-layer
+                            # query, where Spark's own lenient parser is used instead.
+                            StructField("created_at", StringType(), True),
+                            StructField("archived_at", StringType(), True),
+                            StructField("updated_at", StringType(), True),
                             StructField("archived", BooleanType(), True),
                         ]
                     )
