@@ -273,8 +273,8 @@ Reason for the status change?
 
 | Deactivation type | `status_history` in gate | Examples of `status_change_reason` (gate identifier — use `deactivation_*` for reason detail when enriched) |
 |-------------------|--------------------------|-------------------------------------------------------------------------------------------------------------|
-| Unpublish (UNPUBLISH) | UNPUBLISHED | `OWNER_GAVE_UP_RENTING`, `OWNER_GAVE_UP_SALE`, `OWNER_ALREADY_SOLD_HOUSE`, … |
-| Temporary suspend (SUSPEND) | SUSPENDED | `OwnerTemporarilySuspended`, `OwnerReforming`, `OwnerTraveling`, … |
+| Unpublish (UNPUBLISH) | UNPUBLISHED | RENT: `OWNER_REQUESTED_TERMINATION`, `OWNER_GAVE_UP_RENTING`, `HOUSE_NOT_AVAILABLE`, `OWNER_OTHER`, … · SALE: `OWNER_GAVE_UP_SALE`, `OWNER_ALREADY_SOLD_HOUSE`, `HOUSE_NOT_AVAILABLE`, `OWNER_OTHER`, … |
+| Temporary suspend (SUSPEND) | SUSPENDED | `OWNER_GAVE_UP_RENTING` / `OWNER_GAVE_UP_SALE`, `OwnerTemporarilySuspended`, `OwnerReforming`, `OwnerTraveling`, … |
 
 **Scope of `deactivation_*`:** only **1P** listings (`is_rent_3p_supply` / `is_sale_3p_supply = false`) that pass the gate **and** match a log event within **±2 minutes** of `ts_status_started`. Post-launch match rate ~**74% RENT / 73% SALE**; remaining eligible rows keep **`status_change_reason`** as the reason source.
 

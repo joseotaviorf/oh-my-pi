@@ -2,11 +2,15 @@ WITH deactivation_legacy_gate AS (
     SELECT *
     FROM (
         VALUES
+            ('UNPUBLISH', 'UNPUBLISHED', 'HOUSE_NOT_AVAILABLE'),
+            ('UNPUBLISH', 'UNPUBLISHED', 'HOUSE_NOT_REACHABLE'),
             ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_ALREADY_SOLD_HOUSE'),
-            ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_GAVE_UP_SALE'),
-            ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_RENTED_HOUSE'),
-            ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_DOESNT_AGREE'),
             ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_CONSEQUENCES_MANAGEMENT'),
+            ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_DOESNT_AGREE'),
+            ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_GAVE_UP_SALE'),
+            ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_OTHER'),
+            ('UNPUBLISH', 'UNPUBLISHED', 'OWNER_RENTED_HOUSE'),
+            ('UNPUBLISH', 'UNPUBLISHED', 'REQUEST_BY_OWNER_REAL_STATE'),
             ('UNPUBLISH', 'UNPUBLISHED', 'OwnerConsequencesManagement'),
             ('SUSPEND', 'SUSPENDED', 'OWNER_GAVE_UP_SALE'),
             ('SUSPEND', 'SUSPENDED', 'OwnerConsequencesManagement'),
