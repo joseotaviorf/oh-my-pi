@@ -1,0 +1,234 @@
+---
+database_name: datalake_agent_performance
+table_name: visit_funnel_event
+description: >
+  Visit-grain building blocks for the agent visit funnel. One row per visit with
+  precomputed funnel flags (booked, canceled, completed, unsuccessful, stalled,
+  not finished, offer submitted/accepted, agreement signed, PFA, CRCC, VBBA),
+  event timestamps for each milestone, reschedule count (nbr_reschedule), and
+  agent identity keys. Agents are
+  identified by id_user and uuid_person for last-associated, VBBA booking and
+  fixed-agent cuts. Consumed by dw_agent_visit_funnel and other agent
+  performance analytics. Loaded incrementally by enrich_agent_performance.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_visit:
+    description: >
+      Primary key. Visit identifier from datalake_visit.visits; one row per visit.
+    lineage:
+      - datalake_visit.visits.id_visit
+  id_visitor:
+    description: >
+      Platform user id of the visitor linked to the visit.
+    lineage:
+      - datalake_visit.visits.id_visitor
+  id_house:
+    description: >
+      House identifier for the visited listing.
+    lineage:
+      - datalake_visit.visits.id_house
+  business_context:
+    description: >
+      Visit business context (RENT or SALE).
+    lineage:
+      - datalake_visit.visits.business_context
+  dt_visit_created:
+    description: >
+      Visit creation date (truncated from ts_created). Used as date_ref when
+      aggregating to agent_visit_funnel.
+    lineage:
+      - datalake_visit.visits.ts_created
+  dt_visit:
+    description: >
+      Scheduled visit date in local context.
+    lineage:
+      - datalake_visit.visits.dt_visit
+  id_user_last_associated_agent:
+    description: >
+      User id of the last agent associated with the visit (overall/PFA/CRCC
+      attribution agent).
+    lineage:
+      - datalake_visit.visits.id_last_associated_agent
+  uuid_person_last_associated_agent:
+    description: >
+      Person UUID of the last associated agent, resolved via agent_unified_identity.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+      - datalake_visit.visits.id_last_associated_agent
+  id_user_agent_vbba:
+    description: >
+      User id of the agent who booked the visit on behalf of the visitor (VBBA
+      cut). Derived from visit_status_events agent channels until
+      visits.id_user_agent_vbba is available upstream.
+    lineage:
+      - datalake_visit.visit_status_events.id_author_user
+      - datalake_visit.visits.id_first_associated_agent
+      - datalake_visit.visits.visit_request_application_source
+  uuid_person_agent_vbba:
+    description: >
+      Person UUID of the VBBA booking agent.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+  id_user_fixed_agent:
+    description: >
+      User id of the preferred fixed agent for the visitor in the visit region.
+    lineage:
+      - datalake_ebdb_agents.preferred_fixed_agent_history.id_user_agent
+  uuid_person_fixed_agent:
+    description: >
+      Person UUID of the preferred fixed agent.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+  is_visit_booked:
+    description: >
+      Visit booked flag (always 1 per row at visit grain). Sum to count visits.
+    lineage:
+      - datalake_visit.visits.id_visit
+  nbr_reschedule:
+    description: >
+      Number of reschedules accumulated by the visit.
+    lineage:
+      - datalake_visit.visits.nbr_reschedule
+  is_visit_canceled:
+    description: >
+      Flag (1/0) when the visit was canceled.
+    lineage:
+      - datalake_visit.visits.is_canceled
+  is_visit_completed:
+    description: >
+      Flag (1/0) when the visit was completed.
+    lineage:
+      - datalake_visit.visits.is_completed
+  is_visit_unsuccessful:
+    description: >
+      Flag (1/0) when the visit was unsuccessful.
+    lineage:
+      - datalake_visit.visits.is_unsuccessful
+  is_visit_stalled:
+    description: >
+      Flag (1/0) when the visit is stalled.
+    lineage:
+      - datalake_visit.visits.is_stalled
+  is_visit_not_finished:
+    description: >
+      Flag (1/0) when the visit has no finisher status (still open).
+    lineage:
+      - datalake_visit.visits.has_finisher_status
+  is_pfa_visit:
+    description: >
+      Flag (1/0) when last associated agent equals the preferred fixed agent.
+    lineage:
+      - datalake_visit.visits.id_last_associated_agent
+      - datalake_ebdb_agents.preferred_fixed_agent_history.id_user_agent
+  is_crcc_visit:
+    description: >
+      Flag (1/0) when last associated agent holds the house key per entrance
+      history at visit time (CRCC cut).
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.key_location
+      - datalake_ebdb_listing.house_entrance_history.key_holder_identifier
+      - datalake_ebdb_listing.house_entrance_history.event_type
+  is_vbba_visit:
+    description: >
+      Flag (1/0) when the visit is classified as VBBA (visit booked by agent).
+    lineage:
+      - datalake_visit.visits.is_vbba
+  is_offer_submitted:
+    description: >
+      Flag (1/0) when a sale offer was submitted for the visit.
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
+  is_offer_accepted:
+    description: >
+      Flag (1/0) when a submitted sale offer was accepted.
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_offer_accepted
+  is_agreement_signed:
+    description: >
+      Flag (1/0) when a sale agreement was signed and not later canceled.
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_canceled
+  ts_visit_created:
+    description: >
+      Timestamp when the visit was booked (visit record created).
+    lineage:
+      - datalake_visit.visits.ts_created
+  ts_visit:
+    description: >
+      Scheduled visit datetime.
+    lineage:
+      - datalake_visit.visits.ts_visit
+  ts_visit_rescheduled:
+    description: >
+      Timestamp of the last visit reschedule event.
+    lineage:
+      - datalake_visit.visits.ts_visit_rescheduled
+  ts_visit_canceled:
+    description: >
+      Timestamp when the visit was canceled. Null when not canceled.
+    lineage:
+      - datalake_visit.visits.ts_visit_canceled
+  ts_visit_done:
+    description: >
+      Timestamp when the visit was completed. Null when not completed.
+    lineage:
+      - datalake_visit.visits.ts_visit_done
+  ts_visit_unsuccessful:
+    description: >
+      Timestamp when the visit was marked unsuccessful. Null otherwise.
+    lineage:
+      - datalake_visit.visits.ts_visit_unsuccessful
+  ts_visit_stalled:
+    description: >
+      Timestamp when the visit was marked stalled. Null otherwise.
+    lineage:
+      - datalake_visit.visits.ts_visit_stalled
+  ts_offer_submitted:
+    description: >
+      Timestamp when a sale offer linked to the visit was submitted
+      (id_visit_external or id_visit_fifty_external). Null when no offer.
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
+  ts_offer_accepted:
+    description: >
+      Timestamp when the linked sale offer was accepted. Null when not accepted.
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_offer_accepted
+  ts_sale_agreement_signed:
+    description: >
+      Timestamp when the sale agreement was signed for the linked offer.
+      Null when not signed.
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+  ts_sale_agreement_canceled:
+    description: >
+      Timestamp when the sale agreement was canceled for the linked offer.
+      Null when not canceled.
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_canceled
+  ts_visit_updated:
+    description: >
+      Timestamp of the last visit update from datalake_visit.visits.
+    lineage:
+      - datalake_visit.visits.ts_updated
+  ts_source_updated:
+    description: >
+      Greatest update timestamp across visit and linked sale offers; drives
+      incremental reload window.
+    lineage:
+      - datalake_visit.visits.ts_updated
+      - datalake_sale_offer.sale_offer.ts_updated
+  year:
+    description: Year partition derived from dt_visit_created.
+    lineage:
+      - datalake_visit.visits.ts_created
+  month:
+    description: Month partition derived from dt_visit_created.
+    lineage:
+      - datalake_visit.visits.ts_created
+  day:
+    description: Day partition derived from dt_visit_created.
+    lineage:
+      - datalake_visit.visits.ts_created
