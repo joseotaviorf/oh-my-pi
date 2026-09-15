@@ -538,6 +538,7 @@ Prefer `pin_core` clean tables and `datalake_people` enrich tables instead. For 
 - `datalake_hr_system`, `datalake_hr_system_clean`
 - `datalake_employment`
 - `greenhouse` (v1) raw/clean — prefer `greenhouse_v3`
+- `datalake_people_analytics_sandbox` — notebook/sandbox CTAS (e.g. `performance_review_history`); use governed `pin_*`, `datalake_people`, `dw_*`, or `metric_*` sources
 
 **Prefer:** `datalake_pin_core_clean`, `datalake_people`, and other `pin_*` clean schemas.
 
