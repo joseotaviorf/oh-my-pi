@@ -42,4 +42,4 @@ workflow:
       extraction_type: incremental
       merge_on: [id_snapshot]
       partitions: [dt_reference]
-      z_order_by: [id_unified_agent, dt_reference]
+      z_order_by: [id_unified_agent, id_agent]
