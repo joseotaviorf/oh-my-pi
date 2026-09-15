@@ -94,7 +94,7 @@ SELECT
         WHEN UPPER(n.consultancy) IN ('019','G019', 'QA_MEETC') THEN 'MEETCALL'
         WHEN UPPER(n.consultancy) IN ('021','G021', 'QA_MONES') THEN 'MONEST'
         WHEN UPPER(n.consultancy) IN ('020','G020', 'QA_PELL') THEN 'PELLON'
-        WHEN UPPER(n.consultancy) IN ('013','G013', 'QA_PLC', 'QA_LLC') THEN 'PLC'
+        WHEN UPPER(n.consultancy) IN ('013','G013', 'QA_PLC', 'QA_LLC') THEN 'LLC'
         WHEN UPPER(n.consultancy) IN ('022','G022', 'QA_GONDIM') THEN 'GONDIM'
         WHEN UPPER(n.consultancy) IN ('023','G023', 'QA_NOVAQ') THEN 'NOVAQUEST'
         ELSE UPPER(n.consultancy)

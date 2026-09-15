@@ -213,7 +213,10 @@ SELECT
     END AS contract_category_at_registration,
     e.action_type AS action_type,
     e.action AS action,
-    e.office AS office,
+    CASE
+        WHEN e.office IN ('PLC', 'LLC') THEN 'LLC'
+        ELSE e.office
+    END AS office,
     CASE
         WHEN e.dt_registered < DATE('2025-10-17') AND e.dt_closure < DATE('2025-12-15') AND e.office = 'VZL' THEN 'PASCHOALOTTO'
         WHEN UPPER(COALESCE(ca.id_agency_group, '')) IN ('G224', '224') THEN 'BULGARELLI'
@@ -222,8 +225,8 @@ SELECT
         WHEN e.office = 'VZL' THEN 'BULGARELLI'
         WHEN e.office = 'GDM' THEN 'GONDIM'
         WHEN e.office = 'PLL' THEN 'PELLON'
-        WHEN e.office = 'PLC' THEN 'PLC'
-        WHEN e.office = 'LLC' THEN 'PLC'
+        WHEN e.office = 'PLC' THEN 'LLC'
+        WHEN e.office = 'LLC' THEN 'LLC'
         WHEN e.office = 'PSC' THEN 'PASCHOALOTTO'
         ELSE e.office
     END AS collection_agency,

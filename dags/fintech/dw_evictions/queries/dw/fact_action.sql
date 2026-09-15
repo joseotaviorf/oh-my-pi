@@ -1,7 +1,10 @@
 SELECT
     actfil.id_case AS sk_case,
     b.contract,
-    b.office,
+    CASE
+        WHEN b.office IN ('PLC', 'LLC') THEN 'LLC'
+        ELSE b.office
+    END AS office,
     b.last_stage,
     actfil.action,
     a.code_description AS action_description,

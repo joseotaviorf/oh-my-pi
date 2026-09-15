@@ -177,7 +177,10 @@ SELECT DISTINCT
     p.input_type,
     p.case_subtype AS action_type,
     p.original_process_type AS action,
-    p.agency_name AS office,
+    CASE
+        WHEN p.agency_name IN ('PLC', 'LLC') THEN 'LLC'
+        ELSE p.agency_name
+    END AS office,
     p.court_name AS chamber,
     p.state AS region,
     p.city,

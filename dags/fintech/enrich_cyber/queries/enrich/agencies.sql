@@ -4,7 +4,8 @@ agency AS (
         id_agency,
         CASE
             WHEN UPPER(agency_name) LIKE 'PASCH%' THEN 'PASCHOALOTTO'
-            WHEN UPPER(agency_name) LIKE '%LLC%' THEN 'PLC'
+            WHEN UPPER(agency_name) LIKE '%LLC%' THEN 'LLC'
+            WHEN UPPER(agency_name) LIKE '%PLC%' THEN 'LLC'
             ELSE UPPER(agency_name)
         END AS agency_name,
         agency_type,
