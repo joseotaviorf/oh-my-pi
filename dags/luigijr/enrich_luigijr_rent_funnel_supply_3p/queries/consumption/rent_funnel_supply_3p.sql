@@ -14,7 +14,7 @@ with leads_3p as(
   and fl.sk_house <> -1
   and date(fl.ts_first_listing) is not null
 
-  group by fl.sk_broker, fl.sk_lead_3p, fl.sk_house, fl.sk_region
+  group by all
 
 )
 , sk_house_rent as(
@@ -137,20 +137,7 @@ with leads_3p as(
   inner join sandbox.dim_brokers_3p cb
     on ec.sk_broker = cb.sk_broker
 
-  group by
-    ec.sk_broker,
-    cb.broker_trade_name_tag,
-    cb.city_group,
-    cb.account_manager,
-    ec.sk_agent,
-    ec.sk_booking,
-    ec.sk_house,
-    ec.is_organic,
-    ec.is_ops,
-    ec.is_3p_fr_test,
-    ec.is_bsp,
-    'supply',
-    ec.date
+  group by all
 
 )
 select 
