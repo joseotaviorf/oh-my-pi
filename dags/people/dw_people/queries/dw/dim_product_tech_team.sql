@@ -1,7 +1,7 @@
 -- Product & Tech team-formation attributes (wide), mirroring the roster sheet.
 -- Grain: one row per active employee currently listed in the team-formation sheet.
 -- Teams stay wide (team_1 … team_10) like the source workbook — not long/unpivoted.
--- Join sheet assignment_number to identifier_mapping (same contract as legacy org_chart).
+-- Join sheet assignment_number to identifier_mapping.
 -- Active-only: matches dw_people.dim_employee / fact_employees (assignment_snapshots is_current_for_employee + is_active).
 WITH team_formation_ranked AS (
     SELECT

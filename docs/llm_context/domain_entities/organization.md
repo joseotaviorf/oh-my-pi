@@ -46,7 +46,6 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 
 - `employee_details.md` — daily assignment snapshots and employee identity; join on `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version`.
 - `people_public.md` — **preferred** public active-workforce DW (`dw_people`) for current org placement, company-wide management hierarchy, and P&T team formation (P&T only: wide `dim_product_tech_team`; other areas use cost center from this entity).
-- `org_chart.md` — legacy denormalized current org chart (`datalake_people_public.org_chart`) during migration.
 
 ## Glossary and Synonyms
 

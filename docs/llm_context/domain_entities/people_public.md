@@ -13,12 +13,12 @@
 
 ## Overview
 
-- **Objective:** Public, **active-workforce-only** employee surface for identity, current org placement, management hierarchy, and Product & Tech team formation — the migration target that replaces `datalake_people_public.org_chart` for new consumers.
+- **Objective:** Public, **active-workforce-only** employee surface for identity, current org placement, management hierarchy, and Product & Tech team formation.
 - **Asset status / lifecycle:** **Active employees only.** Current state; no terminations, no inactive assignments, no history. Terminated / historical analysis belongs in `employee_details.md`.
 - **Typical actions / events:** Who works where **today** (active people); tenure and hire date; manager chain L0+; Product & Tech line/chapter/teams (P&T only).
 - **Common metrics:** Active headcount; tenure; span of control via hierarchy; headcount by cost center. Prefer person-level P&T attributes over squad rollups.
 - **Source systems:** PIN (identity, placement, hierarchy) and the Product & Tech team-formation Google Sheet (line/chapter/`team_1`…`team_10` — P&T roster only).
-- **Related entities:** For internal People DW depth (history, terminations, PII docs), see [`employee_details.md`](employee_details.md) — **People-team exclusive** (`dw_employee_details` access **only via IDN request**; not for general consumers). For cost center / BU / job catalogs, see [`organization.md`](organization.md). Legacy denormalized chart: [`org_chart.md`](org_chart.md) (prefer this entity for new queries). For project tags, allocated FTE, “pessoas alocadas”, or “tag de IPO”, see Workforce Allocation — not this schema.
+- **Related entities:** For internal People DW depth (history, terminations, PII docs), see [`employee_details.md`](employee_details.md) — **People-team exclusive** (`dw_employee_details` access **only via IDN request**; not for general consumers). For cost center / BU / job catalogs, see [`organization.md`](organization.md). For project tags, allocated FTE, “pessoas alocadas”, or “tag de IPO”, see Workforce Allocation — not this schema.
 
 **Business-facing schema guide:** `dags/people/dw_people/docs/dw_people.md`.
 
@@ -73,14 +73,13 @@ Users usually ask in business language — for example which team someone is on,
 | Who reports to this person? | `dim_management_hierarchy` where `person_number_manager` = that person |
 | Who is their manager? / L0+ chain | `dim_management_hierarchy` for that person’s row |
 
-Do **not** invent team-formation attributes outside Product & Tech. Do **not** run Product & Tech **headcount-by-squad** rollups from this wide table (teams are spread across `team_1`…`team_10`). Prefer person-level answers. Legacy wide columns on `org_chart` used `product_and_tech_team_*` names; public DW uses `team_*`.
+Do **not** invent team-formation attributes outside Product & Tech. Do **not** run Product & Tech **headcount-by-squad** rollups from this wide table (teams are spread across `team_1`…`team_10`). Prefer person-level answers.
 
 ## Related Domain Entities
 
 - `organization.md` — cost center, business unit, and job labels via fact FKs.
 - `employee_details.md` — full internal People DW (history, terminations, restricted attributes). **`dw_employee_details` is exclusive to the People team** — access **only on IDN request** with data-owner approval. **Do not** route general consumers here; use `dw_people`.
 - `workforce_allocation.md` — **planning** allocations (project tags, FTE, Allocation Tool Lines/teams). Use `dw_workforce_allocation.fact_workforce_allocations`, **not** `dw_people`, for those questions. Join `dim_employee` here only when an allocation answer needs a **name**.
-- `org_chart.md` — legacy denormalized enrich table; keep for continuity until cutover completes.
 
 ### Do not confuse `dw_people` with `dw_workforce_allocation`
 
@@ -104,9 +103,9 @@ Shared labels (`line`, `chapter`, `team`) mean **different things** in each sche
 
 | Term | Meaning | Notes |
 |------|---------|-------|
-| **People public / dw_people / quadro público** | Public **active-only** workforce schema | Prefer over `org_chart` for new analysis; no terminated people |
+| **People public / dw_people / quadro público** | Public **active-only** workforce schema | No terminated people |
 | **Active employee / colaborador ativo** | Person with an active PIN assignment today | Only this population appears in `dw_people` |
-| **Org chart / organograma** | Who works where today (active) | Prefer `dw_people` + `dw_organization`; legacy = `org_chart` |
+| **Org chart / organograma** | Who works where today (active) | Use `dw_people` + `dw_organization` |
 | **Person number / matrícula PIN** | Stable employee business key | `person_number` |
 | **Product & Tech team formation / time P&T** | Line, chapter, leaders + teams for **P&T only** | Wide `dim_product_tech_team` — not company-wide |
 | **Line / capítulo / chapter (P&T)** | P&T structure labels from the roster sheet | On `dim_product_tech_team`; distinct from Codex on cost center |
@@ -128,7 +127,6 @@ Shared labels (`line`, `chapter`, `team`) mean **different things** in each sche
 | Org / “time” outside P&T | Cost center + manager + direct reports — **not** the P&T dim |
 | Terminated or month-end history | employee_details.md — not this schema |
 | Project tags, allocation FTE, planning Lines/teams | [workforce_allocation.md](workforce_allocation.md) — not `dw_people` |
-| Legacy single-table org chart (during migration) | `datalake_people_public.org_chart` — see [org_chart.md](org_chart.md) |
 
 **Critical rules:**
 - **Active-only:** all `dw_people` tables exclude terminated / inactive people. Do **not** add `is_active = TRUE`.
@@ -159,15 +157,10 @@ Do **not** publish Product & Tech headcount-by-squad from this entity (wide slot
 
 - Same people appear in `dw_employee_details` for history and restricted attributes; public consumers should stay on `dw_people`.
 
-### Org Chart (legacy)
-
-- `org_chart` denormalizes identity + manager + Codex + wide P&T columns in one enrich table.
-- Replacement mapping: identity/manager/placement → `dw_people` + `dw_organization`; P&T → `dim_product_tech_team` (**wide** `team_1`…`team_10`); other areas → cost center + `dim_management_hierarchy`.
-
 ## Dos and Don'ts
 
 **Do:**
-- Prefer `dw_people` over `datalake_people_public.org_chart` for **new** queries about the **active** workforce.
+- Use `dw_people` for queries about the **active** workforce.
 - Use `dim_product_tech_team` for Product & Tech person attributes (`team_1` as primary squad).
 - For team / org-placement questions outside P&T: answer with **cost center**, **who they report to**, and **who they lead** (direct reports) — never invent a P&T squad.
 - Route historical / termination questions to `employee_details.md` **only when the requester is on the People team** (IDN access to `dw_employee_details`).

@@ -57,8 +57,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 ## Related Domain Entities
 
 - `organization.md` — cost center, business unit, and job reference dimensions joined via `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version` on the fact.
-- `people_public.md` — **preferred** public active-workforce DW (`dw_people`) replacing `org_chart` for new consumers; **Product & Tech team formation** lives there (`dim_product_tech_team`).
-- `org_chart.md` — legacy lightweight current org chart (`datalake_people_public.org_chart`) during migration.
+- `people_public.md` — **preferred** public active-workforce DW (`dw_people`); **Product & Tech team formation** lives there (`dim_product_tech_team`).
 - `workforce_allocation.md` — **project tags**, allocated FTE, “pessoas alocadas”, “tag de IPO”, Allocation Tool Lines/teams. This schema has **no** project tags — do not answer IPO / allocation-roster questions from assignment snapshots or Team Formation.
 
 ## Teams / org placement
