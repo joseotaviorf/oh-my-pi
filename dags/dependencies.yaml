@@ -2782,12 +2782,17 @@ bietlejuice.enrich_find_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_base_metrics_service:load-enrich-recs-impressions-processed:first-run-of-day
   - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions:first-run-of-day
+  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
+  - bietlejuice.enrich_concierge_health_metrics:load-enrich-concierge-indirect-vb:first-run-of-day
+  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
   - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-rent-offer:first-run-of-day
 bietlejuice.enrich_for_sale_experiment:

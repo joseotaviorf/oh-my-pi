@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This pipeline processes health metrics relevant to Find team. 
+This pipeline processes health metrics relevant to Find team.
 
 <details>
   <summary><strong> DAG details (click to expand)</strong></summary>
@@ -15,7 +15,7 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces the following output table on enrich layer: 
+This pipeline produces the following output table on enrich layer:
 
 - `metric_recs_listing_page_viewed`
 - `metric_recs_conversion`
@@ -26,5 +26,6 @@ This pipeline produces the following output table on enrich layer:
 - `metric_search_vs_available_distribution`
 - `metric_search_exposure_concentration_weekly`
 - `metric_search_intra_user_repetition_weekly`
+- `metric_sale_bp_cohort_funnel`
 
 </details>

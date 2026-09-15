@@ -1,0 +1,267 @@
+database_name: datalake_search
+table_name: metric_sale_bp_cohort_funnel
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: >-
+  Daily Find health snapshot of For Sale Buyer Prospect (BP) cohorts. Grain is one
+  row per report date (dt_snapshot), maturity window (4 or 8 weeks), cohort type
+  (calendar month or latest mature 31-day band), cohort period, and operation
+  channel, plus a Consolidado rollup per period. Each DAG run appends a new
+  snapshot so IBM-style month columns, Latest Mature Cohort, MoM, and YoY can be
+  rebuilt for any past report date. A BP is a sale CONVERSION event (first
+  activation or recovery) tied to a visit booking, not an offer-only or
+  Talk-to-Agent conversion, in the 120 calendar days before the report date
+  (DAG as-of / load end date), through the last date that has fully matured
+  for that window. Event dates, cohort bounds (dt_cohort_start / dt_cohort_end),
+  and funnel windows are calendar days in America/Sao_Paulo after converting
+  UTC source timestamps with FROM_UTC_TIMESTAMP. Most datalake tables keep
+  those timestamps in UTC; do not join this table to a UTC date grain without
+  converting. dt_snapshot is the DAG as-of calendar date (load end date), not a
+  converted event timestamp. MONTHLY only keeps calendar months that start on
+  or after that lookback so the first column is never a partial month; funnel
+  events are counted from the BP date through window_days-1. Older months remain
+  on earlier dt_snapshot partitions (use a year-ago snapshot for YoY).
+columns:
+  dt_snapshot:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Report date of this snapshot, equal to the DAG load end date. Filter to the
+      latest dt_snapshot for the current IBM view; keep older dates to replay the
+      same month columns and Latest Mature Cohort as they looked on that day.
+  cohort_window_weeks:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Maturity window applied to the cohort, in weeks. 4 means events are counted for
+      28 days after the BP (inclusive of the BP date); 8 means 56 days. Both windows
+      are built in the same run so 4-week and 8-week rates are not mixed in one row.
+    categories:
+      '4': Four-week (28-day) mature funnel window.
+      '8': Eight-week (56-day) mature funnel window.
+  cohort_type:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      How the BP cohort is cut. MONTHLY keeps the first BP per user in each calendar
+      month that has already fully matured. LATEST_MATURE keeps the first BP per user
+      in the most recent 31-day band that still has a complete window (ending
+      window_days before the DAG as-of date).
+    categories:
+      MONTHLY: First sale BP per user inside a fully mature calendar month.
+      LATEST_MATURE: First sale BP per user inside the latest fully mature 31-day band.
+  dt_cohort_start:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Inclusive start date of the cohort in America/Sao_Paulo. For MONTHLY this is the
+      first day of the BP month; for LATEST_MATURE it is last_mature_bp_date minus 30 days.
+  dt_cohort_end:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Inclusive end date of the cohort in America/Sao_Paulo. For MONTHLY this is the last
+      day of the BP month; for LATEST_MATURE it is the last BP date that still has a
+      complete funnel window (as-of date minus window_days).
+  cohort_label:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Short display label for the cohort. MONTHLY uses an abbreviated month-year
+      (for example Jan-25); LATEST_MATURE is the fixed text Latest Mature Cohort.
+  operation_channel:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.operation_channel
+      - datalake_demand_flows.prospect_daily_results.referral_type
+      - datalake_search.concierge_indirect_vb.id_visit
+    description: >-
+      Channel credited on this row. Origin-anchored metrics (bp_count through bp2ccv)
+      use the BP conversion channel; event-anchored visit metrics use the channel of
+      the first VISIT BOOKED on the visit. Agent and Rede are split by referral_type
+      into Agent, TQC 1P (Traz Quem Compra first-party), or TQC 3P (Traz Quem Compra
+      third-party). SelfService listing-page bookings in concierge_indirect_vb (sale)
+      are remapped to Concierge on both sides; Agent, Rede, and Secretaria are not.
+      Consolidado is the GROUPING SETS rollup across channels. Outside Consolidado,
+      event-anchored numerators and bp_count come from different populations and
+      should not be read as a within-channel conversion.
+    categories:
+      Consolidado: Rollup of all channels for the same window, type, and period.
+      SelfService: Prospect booked or converted without operational assistance, excluding listing-page bookings after a Concierge carousel (those are Concierge).
+      Agent: Agent-channel conversion whose referral_type is Agent.
+      TQC 1P: Agent or Rede conversion from Traz Quem Compra first-party (QuintoAndar TQC agents; referral_type TQC 1P).
+      TQC 3P: Agent or Rede conversion from Traz Quem Compra third-party (partner/Rede TQC; referral_type TQC 3P).
+      Concierge: Direct WhatsApp/native Concierge, plus SelfService listing-page bookings in concierge_indirect_vb (sale).
+      Secretaria: Conversion or first visit booked attributed to Secretaria.
+      Others/Lost Tracking: Channel or referral not in the labels above.
+  bp_count:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.event_name
+      - datalake_booking.booking.id_visitor
+    description: >-
+      Number of distinct sale BPs in the cohort after keeping the first conversion per
+      user inside the period. Denominator for BES rate, visits per BP, bp2os, bp2ccv,
+      and the event-anchored per-BP ratios.
+  bes_users:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+    description: >-
+      Count of BPs that meet Buyer Engaged Successfully inside the window: at least
+      three completed visits, or one or two completed visits plus at least one offer
+      submitted. BES rate is not comparable across the 4-week and 8-week windows.
+  bes_rate:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+      - datalake_demand_flows.prospect_daily_results.event_name
+    description: >-
+      Share of BPs in the row that meet the BES rule (bes_users / bp_count). Compare
+      only rows that share the same cohort_window_weeks.
+  total_vbs:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_booking
+      - datalake_demand_flows.prospect_daily_results.event_name
+    description: >-
+      Count of distinct VISIT BOOKED bookings tied to the BP user whose event date in
+      America/Sao_Paulo falls between the BP date and BP date plus window_days-1.
+      Origin-anchored: credited to the BP conversion channel, not to who booked the visit.
+  vb_per_bp:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_booking
+      - datalake_demand_flows.prospect_daily_results.event_name
+      - datalake_booking.booking.id_visitor
+    description: >-
+      Average origin-anchored visit bookings per BP in the row (total_vbs / bp_count).
+  total_vcs:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+      - datalake_sale_demand_events.sale_demand_events.event_name
+    description: >-
+      Count of distinct bookings with a VISIT_COMPLETED event for the BP user inside
+      the same inclusive window as total_vbs. Origin-anchored to the BP channel.
+  vc_per_bp:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_booking.booking.id_visitor
+    description: >-
+      Average origin-anchored completed visits per BP in the row (total_vcs / bp_count).
+  total_os:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+    description: >-
+      Count of OFFER_SUBMITTED events for the BP user inside the window. A user can
+      contribute more than one offer; this is not the distinct-user count (see os_users).
+  os_users:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_sale_demand_events.sale_demand_events.id_buyer
+    description: >-
+      Count of BPs with at least one OFFER_SUBMITTED event inside the window.
+  bp2os:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_sale_demand_events.sale_demand_events.id_buyer
+      - datalake_demand_flows.prospect_daily_results.event_name
+    description: >-
+      Share of BPs that submitted at least one offer inside the window (os_users / bp_count).
+  total_ccvs:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_offer
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: >-
+      Count of distinct signed sale agreements (CCV) linked through the BP user's
+      bookings whose signature date in America/Sao_Paulo falls inside the window.
+  ccv_users:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_offer
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+      - datalake_booking.booking.id_visitor
+    description: >-
+      Count of BPs with at least one signed CCV inside the window.
+  bp2ccv:
+    lineage:
+      - datalake_sale_offer.sale_offer.id_offer
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+      - datalake_demand_flows.prospect_daily_results.event_name
+    description: >-
+      Share of BPs with at least one signed CCV inside the window (ccv_users / bp_count).
+  cohort_period:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Display period for charts. MONTHLY repeats the month-year label; LATEST_MATURE
+      is the inclusive date range of the band formatted as dd/MM/yyyy–dd/MM/yyyy.
+  event_anchored_vb_visits:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_visit
+      - datalake_demand_flows.prospect_daily_results.operation_channel
+      - datalake_demand_flows.prospect_daily_results.referral_type
+      - datalake_search.concierge_indirect_vb.id_visit
+    description: >-
+      Count of visits whose first VISIT BOOKED (by sk_visit) falls inside the BP window
+      and belongs to a cohort user. Channel is who booked that first visit, not the BP
+      origin channel. Zero when the row has no matching visits.
+  event_anchored_vc_visits:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_visit
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_booking.booking.id_visit
+    description: >-
+      Among event_anchored_vb_visits, how many visits have a VISIT_COMPLETED event on
+      a booking for that visit inside the same window.
+  event_anchored_vb2vc:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_visit
+      - datalake_sale_demand_events.sale_demand_events.event_name
+    description: >-
+      Visit-level completion rate on the event-anchored side
+      (event_anchored_vc_visits / event_anchored_vb_visits). Null when there are no
+      event-anchored visit bookings on the row.
+  event_anchored_vb_per_bp:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_visit
+      - datalake_booking.booking.id_visitor
+    description: >-
+      Event-anchored visit bookings divided by bp_count on the same row. Outside
+      Consolidado the numerator is visits booked by that channel and the denominator
+      is BPs originated by that channel, so the ratio mixes two populations.
+  event_anchored_vc_per_bp:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_booking.booking.id_visitor
+    description: >-
+      Event-anchored completed visits divided by bp_count on the same row. Same
+      population caveat as event_anchored_vb_per_bp outside Consolidado.
+  os_no_3vc_users:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+    description: >-
+      Count of BPs that enter BES only through the offer path: one or two completed
+      visits plus at least one offer submitted, excluding BPs that already have three
+      or more completed visits.
+  os_no_3vc_rate:
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.event_name
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+      - datalake_demand_flows.prospect_daily_results.event_name
+    description: >-
+      Share of BPs in the row that enter BES only through 1-2 completed visits plus
+      an offer (os_no_3vc_users / bp_count). Present for both 4-week and 8-week windows.
+  year:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Calendar year of dt_snapshot, used as the Delta partition for this daily report.
+  month:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Calendar month of dt_snapshot, used as the Delta partition for this daily report.
+  day:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+    description: >-
+      Calendar day of dt_snapshot, used as the Delta partition for this daily report.
