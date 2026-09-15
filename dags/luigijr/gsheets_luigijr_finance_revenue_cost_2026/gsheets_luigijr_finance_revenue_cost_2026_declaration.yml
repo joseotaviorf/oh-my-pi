@@ -24,7 +24,7 @@ cluster:
       package: google-auth==2.13.0
   - pypi:
       package: google-api-python-client==2.55.0
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
