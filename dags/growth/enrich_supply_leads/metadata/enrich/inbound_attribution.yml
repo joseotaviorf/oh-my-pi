@@ -10,11 +10,11 @@ columns:
     lineage:
       - datalake_rene_descartes_clean.house_lead.id
   id_session:
-    description: The ID for the chat session in Sauron.
+    description: Sauron-compatible support session identifier used to join customer-support tasks and messaging channels; for post-migration SSS sessions this is the public session id.
     lineage:
       - datalake_sauron_clean.session.id
       - datalake_copilot_service_clean.session.id_sauron_session
-      - datalake_support_session_service_clean.support_session.id
+      - datalake_support_session_service_clean.support_session.public_id
   id_task:
     description: The ID for the lead creation task.
     lineage:

@@ -44,7 +44,7 @@ support_sessions AS (
   UNION ALL
 
   SELECT
-    s.id AS id_session,
+    s.public_id AS id_session,
     s.source_env AS source_environment,
     s.department,
     REGEXP_EXTRACT(COALESCE(s.user_phone, GET_JSON_OBJECT(s.user_data, '$.user_phone')), '[0-9]+', 0) AS phone_number,
@@ -70,6 +70,7 @@ support_tasks AS (
   SELECT
     ch.id_task,
     ch.id_session,
+    ch.id_sss_session,
     1 AS task_priority,
     ch.queue_name AS department,
     REGEXP_EXTRACT(ch.twilio_phone_number, '[0-9]+', 0) AS quinto_andar_phone_number,
@@ -80,6 +81,7 @@ support_tasks AS (
   SELECT
     ca.id_task,
     ca.id_session,
+    ca.id_sss_session,
     CASE
       WHEN ca.direction = 'inbound' THEN 2
       WHEN ca.direction = 'outbound' THEN 3
@@ -92,6 +94,27 @@ support_tasks AS (
     ca.ts_reservation_created AS ts_task_created
   FROM
     datalake_customer_support.calls AS ca
+),
+support_task_session_links AS (
+  SELECT
+    st.id_task,
+    ss.id_session
+  FROM
+    support_tasks AS st
+  INNER JOIN
+    support_sessions AS ss
+      ON st.id_session = ss.id_session
+
+  UNION
+
+  SELECT
+    st.id_task,
+    ss.id_session
+  FROM
+    support_tasks AS st
+  INNER JOIN
+    support_sessions AS ss
+      ON st.id_sss_session = ss.id_session
 ),
 attribution_by_task AS (
   SELECT
@@ -131,8 +154,11 @@ attribution_by_task AS (
       support_tasks
         ON support_tasks.id_task = inbound_leads.id_task
     INNER JOIN
+      support_task_session_links
+        ON support_task_session_links.id_task = support_tasks.id_task
+    INNER JOIN
       support_sessions
-        ON support_tasks.id_session = support_sessions.id_session
+        ON support_sessions.id_session = support_task_session_links.id_session
   )
   WHERE
     rn = 1
@@ -231,8 +257,11 @@ indirect_attribution AS ( -- when we don't have the identifier coming from sourc
           AND il.ts_created >= ss.ts_created - INTERVAL '30' MINUTES
           AND il.ts_created <= ss.ts_updated + INTERVAL '30' MINUTES
     INNER JOIN
+      support_task_session_links AS tsl
+        ON tsl.id_session = ss.id_session
+    INNER JOIN
       support_tasks AS st
-        ON st.id_session = ss.id_session
+        ON st.id_task = tsl.id_task
           AND il.ts_created > st.ts_task_created
           AND il.ts_created <= st.ts_task_created + INTERVAL '150' MINUTES
     LEFT JOIN
