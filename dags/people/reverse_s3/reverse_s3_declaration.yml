@@ -48,6 +48,15 @@ dag:
       columns as reverse_reports.all_5a_demographics (ALL5A1), without lake
       partition columns in the CSV.
 
+      Sixth export: comp_employee_roster — ZSTD Parquet to the Comp external access
+      point (`quintoandar/comp_employee_roster/year=…/month=…/day=…/`, us-east-2).
+      Fourth spark arg is the "None" ACL sentinel (EMR spark-submit drops empty
+      argv), fifth is the partition columns. Daily full snapshot per partition:
+      the job forces partitionOverwriteMode=dynamic so each run replaces only its
+      own day and the partner keeps the history. Writes via s3a:// — the partner
+      access point was provisioned against Hadoop 3.4.1 S3A, not EMRFS. Do not pin
+      the magic committer (Comp: its cleanup lists multipart uploads bucket-wide)
+      and do not add SSE headers (the bucket enforces its own AES256).
       IAM prerequisite per new destination bucket: this DAG runs on EMR under the People
       EMR instance profile (emr_instance_profile_arn_people / emr-people-prod role). Any
       new external bucket added to tables_customization must first grant that role
@@ -133,3 +142,11 @@ workflow:
         - "ritualsapp/list_of_employees.csv"
         - "csv"
         - "bucket-owner-full-control"
+    # Active-employee roster (Performa + Talent Review) — Comp external access point
+    comp_employee_roster:
+      extra_spark_job_arguments:
+        - "quintoandar-inbound-wikpng8fowgxahxxccrd8j6ogxydnuse2a-s3alias"
+        - "quintoandar/comp_employee_roster"
+        - "parquet"
+        - "None" # no canned ACL: the access point has ACLs disabled
+        - "year,month,day"
