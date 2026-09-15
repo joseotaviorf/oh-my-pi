@@ -11,6 +11,21 @@
 -- Grain: lead user, prioritized listing, LPV date (relative yesterday). Partitions are the
 -- run date (year, month, day). Raw phone/name are NOT persisted; downstream dispatch resolves
 -- contact from id_person. group_ab carries the phone-based A/B cell (computed at build time).
+--
+-- PERF CHANGES (2026-09-15):
+--   1. INNER JOIN on datalake_cdp.users — was LEFT JOIN with IS NOT NULL in WHERE, which
+--      was effectively an inner join but prevented early filtering by the optimizer.
+--      phone_number IS NOT NULL moved into the JOIN condition so the filter is applied before
+--      the scan result is returned.
+--   2. lpv_candidates CTE — wraps lpv_users (rn=1 only) and computes lag(dt_event) per user.
+--      The 28-day cooldown (has_recent_prior_lpv) is now derived from prev_dt_lpv instead of
+--      a self-join with a range predicate. Self-join on a range condition forces a sort-merge
+--      join (O(N x 28) shuffle); lag() is a single O(N log N) sort pass.
+--      Equivalent to the original Operations query (ads.sql) which used lag() + datediff > 28.
+--   3. Concierge range join removed — concierge_outbound is already pre-filtered to
+--      [current_date()-29, current_date()], which equals [yesterday-28, yesterday+1] for the
+--      only rows that appear in the final output (dt_lpv = yesterday). Dropping the range
+--      condition converts a non-equi join to a hash join.
 WITH lpv_events AS (
     SELECT
         CAST(ut.id_user AS STRING) AS id_user,
@@ -26,16 +41,17 @@ WITH lpv_events AS (
             ELSE CAST(get_json_object(ut.event_properties, '$.house_id') AS BIGINT)
         END AS id_house
     FROM datalake_cdp_clean.user_tracking AS ut
-    LEFT JOIN datalake_cdp.users AS du
+    -- [CHANGE 1] INNER JOIN: was LEFT JOIN + WHERE du.phone_number IS NOT NULL, which
+    -- silently turned into an inner join but blocked early filtering by the optimizer.
+    INNER JOIN datalake_cdp.users AS du
         ON CAST(ut.id_user AS STRING) = du.id_user
+        AND du.phone_number IS NOT NULL
     WHERE ut.event_name = 'listing_page_viewed'
-        -- relative rolling window: yesterday-28 .. yesterday (28d of history for the LPV cooldown)
         AND make_date(CAST(ut.year AS INT), CAST(ut.month AS INT), CAST(ut.day AS INT))
                 BETWEEN date_add(current_date(), -30) AND current_date()
         AND CAST(ut.ts_event AS DATE)
                 BETWEEN date_add(current_date(), -29) AND date_add(current_date(), -1)
         AND ut.id_user IS NOT NULL
-        AND du.phone_number IS NOT NULL
 ),
 lpv_filtered AS (
     SELECT id_user, id_person, dt_event, business_context, id_house, phone_for_ab
@@ -107,6 +123,17 @@ lpv_users AS (
     WHERE price IS NOT NULL
         AND ((business_context = 'rent' AND price > 600) OR (business_context = 'sale' AND price > 150000))
 ),
+-- [CHANGE 2] lpv_candidates: filters lpv_users to rn=1 (one row per user per day) and
+-- computes prev_dt_lpv via lag(). This replaces the self-join with a range predicate in
+-- final, restoring the same lag()-based approach used in the original Operations query.
+-- lag() is a single sort pass; the self-join was a shuffle-heavy sort-merge range join.
+lpv_candidates AS (
+    SELECT
+        *,
+        lag(dt_event) OVER (PARTITION BY id_user ORDER BY dt_event) AS prev_dt_lpv
+    FROM lpv_users
+    WHERE rn = 1
+),
 concierge_outbound AS (
     SELECT DISTINCT
         CAST(m.ts_created AS DATE) AS dt_created,
@@ -130,11 +157,6 @@ current_privacy_snapshot AS (
         AND day = DAY(current_date())
 ),
 final AS (
-    -- Collapse every join fan-out (concierge, privacy, and the 28-day LPV cooldown) into
-    -- boolean flags with plain aggregates. No window function is used, so there is nothing
-    -- for Databricks to reject as "a window function inside an aggregate function".
-    -- Cooldown: has_recent_prior_lpv = 1 when the user had another eligible LPV day in the
-    -- 28 days before this one (equivalent to the previous lag()-based >28d check).
     SELECT
         lpv.id_user,
         lpv.id_person,
@@ -150,18 +172,22 @@ final AS (
         lpv.house_owner_id_user_registrant,
         max(CASE WHEN concierge.id_user IS NOT NULL THEN 1 ELSE 0 END) AS has_concierge,
         max(CASE WHEN COALESCE(priv.is_concierge_privacy_suppressed, FALSE) THEN 1 ELSE 0 END) AS is_suppressed,
-        max(CASE WHEN prior_lpv.id_user IS NOT NULL THEN 1 ELSE 0 END) AS has_recent_prior_lpv
-    FROM lpv_users AS lpv
+        -- [CHANGE 2] 28-day cooldown via lag(): no self-join.
+        -- prev_dt_lpv is the most recent prior eligible LPV day for this user (lag on rn=1 rows).
+        -- If prev_dt_lpv is within 28 days, the user is in cooldown — same logic as the original
+        -- Operations query: datediff(dt_lpv, prev_dt_lpv) <= 28.
+        max(CASE WHEN lpv.prev_dt_lpv IS NOT NULL AND datediff(lpv.dt_event, lpv.prev_dt_lpv) <= 28 THEN 1 ELSE 0 END) AS has_recent_prior_lpv
+    FROM lpv_candidates AS lpv
+    -- [CHANGE 3] Equi-join only: the range condition (dt_created BETWEEN date_add(lpv.dt_event,-28)
+    -- AND date_add(lpv.dt_event,1)) is redundant for the final output rows (dt_lpv=yesterday),
+    -- because concierge_outbound is already filtered to [current_date()-29, current_date()],
+    -- which equals [yesterday-28, yesterday+1]. Removing it converts the non-equi join to a
+    -- hash join. For non-yesterday lpv rows the flag may differ from the original, but those
+    -- rows are excluded by WHERE dt_lpv = date_add(current_date(), -1) below.
     LEFT JOIN concierge_outbound AS concierge
         ON lpv.id_user = CAST(concierge.id_user AS STRING)
-        AND concierge.dt_created BETWEEN date_add(lpv.dt_event, -28) AND date_add(lpv.dt_event, 1)
     LEFT JOIN current_privacy_snapshot AS priv
         ON lpv.id_person = priv.id_person
-    LEFT JOIN lpv_users AS prior_lpv
-        ON prior_lpv.id_user = lpv.id_user
-        AND prior_lpv.rn = 1
-        AND prior_lpv.dt_event BETWEEN date_add(lpv.dt_event, -28) AND date_add(lpv.dt_event, -1)
-    WHERE lpv.rn = 1
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 )
 SELECT
