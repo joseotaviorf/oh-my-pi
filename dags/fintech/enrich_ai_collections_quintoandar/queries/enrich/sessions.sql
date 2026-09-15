@@ -11,8 +11,7 @@ WITH matthew_prod_traces AS (
             ON cs.id_langfuse_session = t.id_session
             AND cs.bot IN ('matthew', 'wall-e')
     WHERE
-        MAKE_DATE(t.year, t.month, t.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND t.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
+        t.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 2 DAY
         AND t.environment = 'prod'
         AND t.id_session IS NOT NULL
 ),
@@ -96,9 +95,8 @@ score_matthew AS (
             ON cs.id_langfuse_session = s.id_session
             AND cs.bot IN ('matthew', 'wall-e')
     WHERE
-        MAKE_DATE(s.year, s.month, s.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND s.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
-        AND s.name in ('SessionContainsMatthewAgentEvaluator', 'MatthewVersionEvaluator')
+        s.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 2 DAY
+        AND s.name IN ('SessionContainsMatthewAgentEvaluator', 'MatthewVersionEvaluator')
         AND s.id_session IS NOT NULL
     GROUP BY
         s.id_session

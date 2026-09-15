@@ -12,8 +12,7 @@ WITH voice_traces AS (
         AND ARRAY_CONTAINS(trc.tags, 'online_call')
         AND trc.environment = 'prod'
         AND trc.id_session IS NOT NULL
-        AND MAKE_DATE(trc.year, trc.month, trc.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND trc.ts_created >= TIMESTAMP('{load_start_date}')
+        AND trc.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 2 DAY
 ),
 voice_obs AS (
     SELECT
@@ -33,8 +32,7 @@ voice_obs AS (
         voice_traces AS vt
             ON vt.id_trace = obs.id_trace
     WHERE
-        MAKE_DATE(obs.year, obs.month, obs.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND obs.ts_started >= TIMESTAMP('{load_start_date}')
+        obs.ts_started >= TIMESTAMP('{load_start_date}') - INTERVAL 2 DAY
         AND obs.name IN (
             'user_speech',
             'input_speech_started',

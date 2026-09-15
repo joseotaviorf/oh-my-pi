@@ -41,8 +41,7 @@ tool_observations AS (
     FROM
         datalake_langfuse_clean.observations AS obs
     WHERE
-        MAKE_DATE(obs.year, obs.month, obs.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND obs.ts_started >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
+        obs.ts_started >= TIMESTAMP('{load_start_date}') - INTERVAL 2 DAY
         AND obs.type = 'TOOL'
         AND NOT (obs.level = 'ERROR' AND obs.output IS NULL)
         AND LOWER(obs.name) IN (
