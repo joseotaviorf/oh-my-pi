@@ -333,10 +333,6 @@ employee_base AS (
         tt.primary_team_tech_exclusive AS primary_team_tech_exclusive,
         CASE
             WHEN LOWER(es.status) = 'active'
-                AND LOWER(es.email_l1) IN (
-                    'paulo.golgher@quintoandar.com.br',
-                    'rafael.castro@quintoandar.com.br'
-                )
             THEN es.months_tenure_in_band
             ELSE NULL
         END AS tempo_na_banda_em_meses,
