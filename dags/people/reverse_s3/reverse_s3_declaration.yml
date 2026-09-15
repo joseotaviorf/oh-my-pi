@@ -31,7 +31,14 @@ dag:
       assignment number, L1 leader's work email) for the AI Adoption Portal
       (https://5a-ai-adoption-portal.base44.app/, `aiadoption/vertical_information.csv`).
 
-      Fourth export: allocationtool_org_roster — active-employee org/gestor roster
+      Fourth export: base_app_ai_tools_usage — monthly AI Tools Usage dataset
+      (cost, engagement, budget status, and People attributes) for the AI Adoption
+      Portal (`ai_tools_usage/ai_tools_usage.csv`). The export uses
+      current dw_people attributes for all reference
+      months and current Claude group membership; see its governance document for
+      the historical attribution caveats.
+
+      Fifth export: allocationtool_org_roster — active-employee org/gestor roster
       for the Allocation Tool app's import step, written to the same shared
       `5a-base44-office` bucket as the exports above, under `allocationtool/import/
       public_info.csv`. Same base query as reverse_reports.public_information.
@@ -102,6 +109,13 @@ workflow:
       extra_spark_job_arguments:
         - "5a-base44-office"
         - "aiadoption/vertical_information.csv"
+        - "csv"
+        - "bucket-owner-full-control"
+    # Monthly AI Tools Usage dataset — AI Adoption Portal
+    base_app_ai_tools_usage:
+      extra_spark_job_arguments:
+        - "5a-base44-office"
+        - "ai_tools_usage/ai_tools_usage.csv"
         - "csv"
         - "bucket-owner-full-control"
     # Active-employee org/gestor roster — Allocation Tool app import

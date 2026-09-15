@@ -4842,6 +4842,14 @@ bietlejuice.reverse_reports:
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
 bietlejuice.reverse_s3:
+  - bietlejuice.claude_admin_api:load-clean-group-members:first-run-of-day
+  - bietlejuice.claude_admin_api:load-clean-groups:first-run-of-day
+  - bietlejuice.dw_ai_usage:load-dw-ai-usage-dim-ai-budget:first-run-of-day
+  - bietlejuice.dw_ai_usage:load-dw-ai-usage-dim-ai-user:first-run-of-day
+  - bietlejuice.dw_ai_usage:load-dw-ai-usage-fact-ai-engagement-daily:first-run-of-day
+  - bietlejuice.dw_ai_usage:load-dw-ai-usage-fact-ai-spend-daily:first-run-of-day
+  - bietlejuice.dw_people:load-dw-people-dim-employee:first-run-of-day
+  - bietlejuice.dw_people:load-dw-people-dim-management-hierarchy:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-cycle-period:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
