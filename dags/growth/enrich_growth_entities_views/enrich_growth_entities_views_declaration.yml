@@ -4,10 +4,17 @@ dag:
   owner: Data Growth
   documentation:
     dag_purpose: |
-      Creates enriched views for growth entities: photo session and house draft.
-      Part of the CDP entities pipeline; consumed by enrich_transactional_entities via UNION ALL consolidation.
+      Creates enriched views for growth entities: photo session and house draft,
+      plus the CDP identity view datalake_cdp.person (EBDB user joined to Person
+      registry primary phone and email). Photo session and house draft feed
+      enrich_transactional_entities. person is consumed by
+      enrich_cdp_clickhouse_personas stream_persona_events for OWNER_PROSPECT
+      identity matching.
 workflow:
   type: query_view
   layer: enrich
   sync: [databricks]
   sql_dialect: databricks
+  tables_customization:
+    person:
+      custom_schema: cdp

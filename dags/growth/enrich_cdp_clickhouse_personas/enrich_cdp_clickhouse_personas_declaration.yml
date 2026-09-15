@@ -10,8 +10,8 @@ dag:
       Incrementally materializes CDP Persona datasets every 30 minutes as a
       batch replacement for stream_persona_clean and stream_persona_enrich.
       stream_persona_events rebuilds the latest EGW persona signal per user and
-      persona from datalake_cdp_clean.transactional filtered by year, month, and
-      day partitions in the load window. persona_events full-outer-joins
+      persona from datalake_cdp_clean.transactional_events filtered by
+      event_date partitions for calendar D-1 and D on every 30-minute run. persona_events full-outer-joins
       datalake_cdp.stream_persona_events with the historical snapshot in
       datalake_cdp_personas.persona using the same is_active COALESCE and
       last_journey_step CASE as stream_persona_enrich. Waits on
@@ -27,8 +27,8 @@ workflow:
   default_partitions: [year, month, day]
   execution_timeout_hours: 2
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=2)).strftime('%Y-%m-%d %H:00:00'), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, (data_interval_end + macros.timedelta(hours=1)).strftime('%Y-%m-%d %H:00:00'), 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, (data_interval_start - macros.timedelta(days=1)).strftime('%Y-%m-%d 00:00:00'), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start.strftime('%Y-%m-%d 23:59:59'), 'load_end_date') }}"
   inner_dependencies:
     persona_events:
       - stream_persona_events

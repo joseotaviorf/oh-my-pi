@@ -17,10 +17,10 @@ columns:
       Deterministic SHA-512 key for the user and persona pair, used as the
       primary key for incremental batch updates.
     lineage:
-      - datalake_cdp_clean.transactional.id_user
-      - datalake_cdp_clean.transactional.event_name
-      - datalake_cdp_clean.transactional.application
-      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional_events.id_user
+      - datalake_cdp_clean.transactional_events.event_name
+      - datalake_cdp_clean.transactional_events.application
+      - datalake_cdp_clean.transactional_events.event_properties
       - datalake_ebdb_clean.user.id
       - datalake_cdp.person.id_user
   id_user:
@@ -29,9 +29,9 @@ columns:
       may resolve it from the visitor payload, while owner-prospect events may
       resolve it through the CDP person identity table.
     lineage:
-      - datalake_cdp_clean.transactional.id_user
-      - datalake_cdp_clean.transactional.event_properties
-      - datalake_cdp_clean.transactional.user_properties
+      - datalake_cdp_clean.transactional_events.id_user
+      - datalake_cdp_clean.transactional_events.event_properties
+      - datalake_cdp_clean.transactional_events.user_properties
       - datalake_ebdb_clean.user.id
       - datalake_cdp.person.id_user
   uuid_person:
@@ -39,7 +39,7 @@ columns:
       Governed person UUID associated with the user when available from the
       event, EBDB user mapping, or CDP person identity match.
     lineage:
-      - datalake_cdp_clean.transactional.id_person
+      - datalake_cdp_clean.transactional_events.id_person
       - datalake_ebdb_clean.user.uuid_person
       - datalake_cdp.person.uuid_person
   persona:
@@ -47,15 +47,15 @@ columns:
       Business role inferred from the event and journey context, such as OWNER,
       OWNER_PROSPECT, TENANT_PROSPECT, or BUYER_PROSPECT.
     lineage:
-      - datalake_cdp_clean.transactional.event_name
-      - datalake_cdp_clean.transactional.application
-      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional_events.event_name
+      - datalake_cdp_clean.transactional_events.application
+      - datalake_cdp_clean.transactional_events.event_properties
   last_journey_step:
     description: |
       Journey step carried by the most recent transactional event selected for
       the user and persona pair.
     lineage:
-      - datalake_cdp_clean.transactional.journey_step
+      - datalake_cdp_clean.transactional_events.journey_step
   is_active:
     description: |
       Indicates that the event-derived persona signal is active. Event-derived
@@ -69,7 +69,7 @@ columns:
       UTC event timestamp of the latest signal for the user and persona pair,
       used to reject older incremental updates.
     lineage:
-      - datalake_cdp_clean.transactional.ts_event
+      - datalake_cdp_clean.transactional_events.ts_event
   ts_ended:
     description: |
       Reserved persona end timestamp. Event-derived signals do not currently
@@ -80,19 +80,19 @@ columns:
       for the current ingest window.
   year:
     description: |
-      Calendar year partition carried from the source transactional event,
-      used as the first Delta partition component.
+      Calendar year partition derived from event_date on the source
+      transactional event, used as the first Delta partition component.
     lineage:
-      - datalake_cdp_clean.transactional.year
+      - datalake_cdp_clean.transactional_events.event_date
   month:
     description: |
-      Calendar month partition carried from the source transactional event,
-      used as the second Delta partition component.
+      Calendar month partition derived from event_date on the source
+      transactional event, used as the second Delta partition component.
     lineage:
-      - datalake_cdp_clean.transactional.month
+      - datalake_cdp_clean.transactional_events.event_date
   day:
     description: |
-      Calendar day partition carried from the source transactional event,
-      used as the final Delta partition component.
+      Calendar day partition derived from event_date on the source
+      transactional event, used as the final Delta partition component.
     lineage:
-      - datalake_cdp_clean.transactional.day
+      - datalake_cdp_clean.transactional_events.event_date

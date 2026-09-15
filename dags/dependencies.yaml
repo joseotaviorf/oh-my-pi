@@ -1859,6 +1859,7 @@ bietlejuice.enrich_buyer_prospect_tof_segmentation_metrics:
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
 bietlejuice.enrich_cdp_clickhouse_personas:
+  - bietlejuice.cdp_clickhouse:load-clean-transactional-events:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.enrich_cdp_personas:load-enrich-persona:first-run-of-day
 bietlejuice.enrich_cdp_personas:

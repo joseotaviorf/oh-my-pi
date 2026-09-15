@@ -1,0 +1,79 @@
+---
+database_name: datalake_cdp
+table_name: person
+description: |
+  Identity resolution view with one row per QuintoAndar platform user (EBDB user.id).
+  Joins datalake_ebdb_clean.user to the Person service registry on uuid_person and
+  attaches the latest primary PHONE and EMAIL from datalake_person_clean.contact_info.
+  Consumed by enrich_cdp_clickhouse_personas stream_persona_events to match
+  OWNER_PROSPECT Event Gateway leads on phone or email. Replaces the Trino
+  hive.datalake_cdp.person view previously owned outside this repo.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_user:
+    description: |
+      QuintoAndar Main user identifier from EBDB Usuario, the grain of this view
+      and the key used to join persona signals back to a platform account.
+    lineage:
+      - datalake_ebdb_clean.user.id
+  uuid_person:
+    description: |
+      Governed Person service UUID stored on the EBDB user row, used to join the
+      Person registry and to stitch Event Gateway identity onto the user.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  phone_number:
+    description: |
+      Latest primary PHONE contact string for the matched Person record, selected
+      by ts_created among PRIMARY-priority phone contacts. Null when the user has
+      no person match or no primary phone.
+    lineage:
+      - datalake_person_clean.contact_info.contact_info
+      - datalake_person_clean.contact_info.category
+      - datalake_person_clean.contact_info.priority
+      - datalake_person_clean.contact_info.ts_created
+  email:
+    description: |
+      Latest primary EMAIL contact string for the matched Person record, selected
+      by ts_created among PRIMARY-priority email contacts. Null when the user has
+      no person match or no primary email.
+    lineage:
+      - datalake_person_clean.contact_info.contact_info
+      - datalake_person_clean.contact_info.category
+      - datalake_person_clean.contact_info.priority
+      - datalake_person_clean.contact_info.ts_created
+  is_blocked:
+    description: |
+      Whether the Person service currently blocks this natural person. Null when
+      the EBDB user has no matching person UUID in datalake_person_clean.person.
+    lineage:
+      - datalake_person_clean.person.is_blocked
+  ts_created:
+    description: |
+      Timestamp when the EBDB user account was created, not the Person registry
+      created time (see ts_created_person).
+    lineage:
+      - datalake_ebdb_clean.user.ts_created
+  ts_updated:
+    description: |
+      Timestamp when the EBDB user account was last updated, not the Person
+      registry updated time (see ts_updated_person).
+    lineage:
+      - datalake_ebdb_clean.user.ts_updated
+  ts_created_person:
+    description: |
+      Timestamp when the Person service registry row for this uuid_person was
+      created. Null when the user has no person match.
+    lineage:
+      - datalake_person_clean.person.ts_created
+  ts_updated_person:
+    description: |
+      Timestamp when the Person service registry row for this uuid_person was
+      last updated. Null when the user has no person match.
+    lineage:
+      - datalake_person_clean.person.ts_updated
+  ts_load:
+    description: |
+      Query-time timestamp of the current view evaluation, not a persisted ingest
+      watermark. Recalculated on every read of this view.

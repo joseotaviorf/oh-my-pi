@@ -1385,3 +1385,5 @@ bietlejuice.enrich_crawled_idactum_houses:
 bietlejuice.enrich_cdp_clickhouse_personas:
   add:
     - bietlejuice.enrich_cdp_personas:load-enrich-persona:first-run-of-day
+  remove:
+    - bietlejuice.enrich_growth_entities_views:load-enrich-person:first-run-of-day

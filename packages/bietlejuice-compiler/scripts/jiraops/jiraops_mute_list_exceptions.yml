@@ -10,6 +10,11 @@ DAG:
       deadline: Never
       created_by: william.angelo@quintoandar.com.br
       approved_by: william.angelo@quintoandar.com.br
+    bietlejuice.cdp_clickhouse:
+      reason: "ClickHouse CDP clean is still being validated. It is now upstream of enrich_cdp_clickhouse_personas (transactional_events); keep DE on-call muted until the batch path is the production source of truth."
+      deadline: Never
+      created_by: marcio.gomes@quintoandar.com.br
+      approved_by: marcio.gomes@quintoandar.com.br
     bietlejuice.demand_balancer_service:
       reason: "Pipeline owned by Data Science/MLOps teams."
       deadline: Never

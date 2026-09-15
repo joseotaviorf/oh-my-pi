@@ -23,21 +23,14 @@ WITH transactional_base AS (
         txn.event_properties,
         TRUE AS is_active,
         txn.ts_event,
-        txn.year,
-        txn.month,
-        txn.day
+        YEAR(TO_DATE(txn.event_date)) AS year,
+        MONTH(TO_DATE(txn.event_date)) AS month,
+        DAY(TO_DATE(txn.event_date)) AS day
     FROM
-        datalake_cdp_clean.transactional AS txn
+        datalake_cdp_clean.transactional_events AS txn
     WHERE
-        TO_DATE(
-            CONCAT_WS(
-                '-',
-                CAST(txn.year AS STRING),
-                LPAD(CAST(txn.month AS STRING), 2, '0'),
-                LPAD(CAST(txn.day AS STRING), 2, '0')
-            )
-        ) BETWEEN TO_DATE('{load_start_date}')
-        AND TO_DATE('{load_end_date}')
+        txn.event_date >= DATE_FORMAT(TO_DATE('{load_start_date}'), 'yyyy-MM-dd')
+        AND txn.event_date <= DATE_FORMAT(TO_DATE('{load_end_date}'), 'yyyy-MM-dd')
         AND (
             txn.event_name IN (
                 'answer_confirmed',
