@@ -16,6 +16,8 @@ workflow:
     accounting_entry: {}
     accounting_entry_balance:
       clean_primary_keys: ["id"]
+    accounting_entry_recon_removals:
+      clean_primary_keys: ["id"]
     accounting_entry_source: {}
     financial_data: {}
     payee: {}
