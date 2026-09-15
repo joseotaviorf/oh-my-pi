@@ -280,6 +280,7 @@ deal:
       - pipeline
       - cons_template_last_sent
       - cons_fup_inatividade_cycle_id
+      - hubspot_owner_id
     associations:
       - company
 ticket:
