@@ -440,67 +440,6 @@ case_bounds_with_non_working AS (
     GROUP BY 1, 2, 3, 4, 5, 6, 7
 ),
 
-case_solve_bounds AS (
-    SELECT
-        c.case_number,
-        CASE WHEN h.proximo_status IS NULL OR h.proximo_status IN ('Closed','Solved') THEN s.ts_event END AS ts_solved,
-        c.closed_date,
-        CASE WHEN h.proximo_status IS NULL OR h.proximo_status IN ('Closed','Solved') THEN s.email END AS agent_solved,
-        CAST(c.created_date AS TIMESTAMP) - INTERVAL 3 HOURS AS ts_created,
-        h.proximo_status,
-        c.last_modified_date,
-        CAST(CAST(c.created_date AS TIMESTAMP) - INTERVAL 3 HOURS AS DATE) AS dt_non_working_start,
-        CAST(COALESCE(
-            COALESCE(
-                (CASE WHEN h.proximo_status IS NULL OR h.proximo_status IN ('Closed','Solved') THEN s.ts_event END),
-                CAST(c.closed_date AS TIMESTAMP)
-            ),
-            CURRENT_DATE
-        ) AS DATE) AS dt_non_working_end
-    FROM events_case_dirty AS c
-    LEFT JOIN solved_date AS s
-        ON s.case_number = CAST(c.case_number AS INT)
-        AND s.rn = 1
-    LEFT JOIN status_historico AS h
-        ON h.case_number = CAST(c.case_number AS INT)
-        AND h.rn = 1
-),
-
-exploded_case_non_working_days AS (
-    SELECT
-        csb.case_number,
-        csb.ts_solved,
-        csb.closed_date,
-        csb.agent_solved,
-        csb.ts_created,
-        csb.proximo_status,
-        csb.last_modified_date,
-        EXPLODE_OUTER(
-            CASE
-                WHEN csb.dt_non_working_start <= csb.dt_non_working_end
-                THEN SEQUENCE(csb.dt_non_working_start, csb.dt_non_working_end)
-                ELSE ARRAY()
-            END
-        ) AS dt_interval
-    FROM case_solve_bounds AS csb
-),
-
-case_bounds_with_non_working AS (
-    SELECT
-        ec.case_number,
-        ec.ts_solved,
-        ec.closed_date,
-        ec.agent_solved,
-        ec.ts_created,
-        ec.proximo_status,
-        ec.last_modified_date,
-        COUNT(DISTINCT wh.dt_non_working) AS total_non_working
-    FROM exploded_case_non_working_days AS ec
-    LEFT JOIN weekends_and_holidays AS wh
-        ON wh.dt_non_working = ec.dt_interval
-    GROUP BY 1, 2, 3, 4, 5, 6, 7
-),
-
 solved_final AS (
     SELECT DISTINCT
         case_number,
