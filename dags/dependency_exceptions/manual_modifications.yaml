@@ -106,6 +106,8 @@ bietlejuice.dw_customer_support:
     - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
     - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
     - bietlejuice.enrich_zendesk:load-enrich-tickets:first-run-of-day
+    - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
+
 bietlejuice.dw_customer_support_view:
   remove:
     - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst:first-run-of-day

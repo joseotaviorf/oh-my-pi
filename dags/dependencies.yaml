@@ -525,7 +525,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_repairs:load-enrich-ongoing-repair-tickets:first-run-of-day
-  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_satisfaction_rating:load-enrich-chat-fup-surveys:first-run-of-day
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users:first-run-of-day
