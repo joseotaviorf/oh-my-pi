@@ -280,6 +280,94 @@ columns:
     lineage:
       - dw_offboarding.fact_terminations.ts_termination_finished
     description: Termination process completion date
+  minutes_first_reply_time_calendar:
+    lineage:
+      - dw_support_journey.fact_requests.ts_created
+      - datalake_salesforce_clean.events_email_message.message_date
+    description: Total calendar time in minutes between case creation and the first reply.
+  minutes_first_reply_open_time_business:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+      - datalake_salesforce_clean.events_email_message.message_date
+    description: Business time in minutes from the first case status movement until the first reply.
+  minutes_first_reply_open_time_calendar:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+      - datalake_salesforce_clean.events_email_message.message_date
+    description: Total calendar time in minutes from the first case status movement until the first reply.
+  minutes_first_reply_open_time_calendar:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+      - datalake_salesforce_clean.events_email_message.message_date
+    description: Total calendar time in minutes from the first case status movement until the first reply.
+  dt_first_open:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+    description: First date/time the status changed, indicating the start of handling.
+  dt_reopen:
+    lineage:
+      - datalake_salesforce_clean.events_case.reopened_at__c
+    description: Date and time when the ticket was reopened.   
+  last_customer_interaction:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_customer_interaction__c
+    description: Timestamp of the last contact/interaction made by the customer on the ticket.   
+  last_agent_interaction:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_agent_interaction__c
+    description: Timestamp of the last interaction made by an agent on the ticket. 
+  last_front_comment_date:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_front_comment_date__c
+    description: Date of the last comment inserted by the Front Office on the case.
+  untreated_front_comment:
+    lineage:
+      - datalake_salesforce_clean.events_case.untreated_front_comment__c
+    description: Flag indicating if there is a pending Front Office comment to be handled by the Backoffice.
+  journey_csi:
+    lineage:
+      - datalake_salesforce_clean.events_case.journey__c
+    description: The journey stage the customer is currently in.
+  case_to_be_handled:
+    lineage:
+      - datalake_salesforce_clean.events_case.case_to_be_handled__c
+    description: Marker indicating whether the case should be actively handled.
+  microtaxonomy_ra:
+    lineage:
+      - datalake_salesforce_clean.events_case.microtaxonomy__c
+    description: Granular classification of the subject/reason for the ticket.
+  csat_survey_sent:
+    lineage:
+      - datalake_salesforce_clean.events_case.csat_survey_sent__c
+    description: Flag indicating whether the CSAT survey has been sent.
+  dt_repair_service_provider_date:
+    lineage:
+      - datalake_salesforce_clean.events_case.repair_service_provider_date__c
+    description: Scheduled/recorded date for service execution by the provider.
+  dt_ra_public_response_date:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_public_response_date__c
+    description: Date the company's response was published on Reclame Aqui.
+  id_ra_external_id:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_external_id__c
+    description: External ID of the complaint on Reclame Aqui.
+  dt_ra_creation_date:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_creation_date__c
+    description: Official date the complaint was created on Reclame Aqui.
+  ra_resolved_issue:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_resolved_issue__c
+    description: Customer's response on Reclame Aqui regarding whether the issue was resolved.
+  ra_back_doing_business:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_back_doing_business__c
+    description: Customer's indication on Reclame Aqui whether they would do business again.
+  ra_rating:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_rating__c
+    description: Rating assigned by the customer to the service on Reclame Aqui.
   year:
     lineage:
       - datalake_salesforce_clean.events_case.created_date

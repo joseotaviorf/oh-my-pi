@@ -248,6 +248,7 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-dim-answer:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
+  - bietlejuice.dw_support_journey:load-dw-support-journey-dim-analyst:first-run-of-day
   - bietlejuice.dw_support_journey:load-dw-support-journey-fact-requests:first-run-of-day
   - bietlejuice.dw_support_journey:load-dw-support-journey-fact-services:first-run-of-day
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
