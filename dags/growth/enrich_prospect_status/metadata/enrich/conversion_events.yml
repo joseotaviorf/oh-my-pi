@@ -99,6 +99,14 @@ columns:
     description: Name of the prospect conversion milestone event in the growth funnel.
   business_context:
     description: Tells if the event is related to a sale or a rent flow.
+  sale_type:
+    description: Market type for sale-context events. Visit booked uses listing-side classification from sale_demand_events; offer submitted uses offer-side classification. Sale talk-to-agent rows use listing_sale_type on the house. NULL for rent.
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.sale_type
+      - datalake_sale_primary_market.listing_sale_type.sale_type
+    categories:
+      PRIMARY: New-build / primary market.
+      SECONDARY: Resale / secondary market.
   dt_event:
     description: Calendar date when the prospect conversion event occurred.
     lineage:

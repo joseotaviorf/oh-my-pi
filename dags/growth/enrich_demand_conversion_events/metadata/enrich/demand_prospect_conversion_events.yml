@@ -48,14 +48,14 @@ columns:
       - datalake_sale_demand_events.sale_demand_events.sk_event_type
       - datalake_rent_demand_events.rent_demand_events.id_event_type
   event_name:
-    description: "Name of the demand prospect conversion event"
+    description: Name of the prospect conversion milestone event in the growth funnel (e.g. VISIT_BOOKED, OFFER_SUBMITTED).
   id_booking:
     description: "Id of the visit booking."
     lineage:
       - datalake_sale_demand_events.sale_demand_events.id_booking
       - datalake_rent_demand_events.rent_demand_events.id_booking
   id_visit:
-    description: "Id of the visit."
+    description: Identifier of the executed visit tied to this prospect event, filled after a booking is confirmed and the visit takes place.
     lineage:
       - datalake_visit.visit_schedules.id_visit
   id_offer:
@@ -83,7 +83,7 @@ columns:
       - datalake_rent_demand_events.rent_demand_events.id_house
       - datalake_talk_to_agent.talk_to_agent.house_id
   id_region:
-    description: "Id of the house region."
+    description: Identifier of the geographic region of the listing involved in this prospect conversion event.
     lineage:
       - datalake_sale_demand_events.sale_demand_events.id_region
       - datalake_rent_demand_events.rent_demand_events.id_region
@@ -113,6 +113,13 @@ columns:
     description: "Context in which that conversion happened."
     lineage:
       - datalake_talk_to_agent.talk_to_agent.business_context
+  sale_type:
+    description: Market type for sale-context prospect conversion events, propagated from conversion_events without reclassification.
+    lineage:
+      - datalake_demand_flows.conversion_events.sale_type
+    categories:
+      PRIMARY: New-build / primary market.
+      SECONDARY: Resale / secondary market.
   booking_creator:
     description: "Person/team that scheduled the visit to the property."
     lineage:

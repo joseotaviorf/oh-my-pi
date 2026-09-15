@@ -3574,6 +3574,7 @@ bietlejuice.enrich_prospect_status:
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
+  - bietlejuice.enrich_sale_primary_market:load-enrich-listing-sale-type:first-run-of-day
 bietlejuice.enrich_public_date:
   - bietlejuice.google_calendar:load-clean-brazillian-holidays:first-run-of-day
   - bietlejuice.google_calendar:load-clean-mexican-holidays:first-run-of-day

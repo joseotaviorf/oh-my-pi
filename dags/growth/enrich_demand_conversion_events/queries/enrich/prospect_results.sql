@@ -28,6 +28,7 @@ adhoc_rules AS (
     dpce.id_demand_prospect_conversion_event,
     dpce.id_prospect,
     dpce.business_context,
+    dpce.sale_type,
     dpce.id_event_type,
     dpce.event_name,
     CASE
@@ -175,6 +176,7 @@ media_setup_ids AS (
     dpce.id_demand_prospect_conversion_event,
     dpce.id_prospect,
     dpce.business_context,
+    dpce.sale_type,
     dpce.id_event_type,
     dpce.event_name,
     dpce.utm_adhoc_rule AS media_setup_from_adhoc,
@@ -231,6 +233,7 @@ SELECT
   id_demand_prospect_conversion_event,
   id_prospect,
   business_context,
+  sale_type,
   id_event_type,
   event_name,
   media_setup_from_adhoc,

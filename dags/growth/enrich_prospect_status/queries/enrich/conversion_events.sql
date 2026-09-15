@@ -15,6 +15,7 @@ WITH
       id_seller AS id_owner,
       id_agent,
       "sale" AS business_context,
+      sale_type,
       dt_event,
       ts_event
     FROM
@@ -39,6 +40,7 @@ WITH
       id_seller AS id_owner,
       id_agent,
       "sale" AS business_context,
+      sale_type,
       dt_event,
       ts_event
     FROM
@@ -62,6 +64,7 @@ WITH
       id_owner,
       id_agent,
       "rent" AS business_context,
+      CAST(NULL AS STRING) AS sale_type,
       DATE(ts_event) AS dt_event,
       ts_event
     FROM
@@ -86,6 +89,7 @@ WITH
       id_owner,
       id_agent,
       "rent" AS business_context,
+      CAST(NULL AS STRING) AS sale_type,
       DATE(ts_event) AS dt_event,
       ts_event
     FROM
@@ -111,6 +115,9 @@ WITH
       h.id_user AS id_owner,
       a.agent_id AS id_agent,
       LOWER(a.business_context) AS business_context,
+      CASE
+        WHEN LOWER(a.business_context) = 'sale' THEN lst.sale_type
+      END AS sale_type,
       DATE(a.first_message_ts) AS dt_event,
       TO_TIMESTAMP(a.first_message_ts) AS ts_event
     FROM
@@ -118,6 +125,9 @@ WITH
     INNER JOIN
       datalake_ebdb_clean.house AS h
         ON h.id = a.house_id
+    LEFT JOIN
+      datalake_sale_primary_market.listing_sale_type AS lst
+        ON lst.id_house = INT(a.house_id)
     WHERE
       DATE(a.first_message_ts) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   )
@@ -147,6 +157,7 @@ SELECT
   id_agent,
   event_name,
   business_context,
+  sale_type,
   CAST(dt_event AS TIMESTAMP) AS dt_event,
   ts_event,
   YEAR(dt_event) AS year,

@@ -95,6 +95,13 @@ columns:
     description: "Context in which that conversion happened."
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.business_context
+  sale_type:
+    description: Market type for sale-context prospect flow events, propagated from demand_prospect_conversion_events.
+    lineage:
+      - datalake_demand_flows.demand_prospect_conversion_events.sale_type
+    categories:
+      PRIMARY: New-build / primary market.
+      SECONDARY: Resale / secondary market.
   booking_creator:
     description: "Person/team that scheduled the visit to the property."
     lineage:

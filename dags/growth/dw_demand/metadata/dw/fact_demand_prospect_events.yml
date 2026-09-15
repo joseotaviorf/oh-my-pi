@@ -125,6 +125,13 @@ columns:
     description: Flag indicating if the demand is from CQA (Casa QuintoAndar) business model.
     lineage:
       - datalake_demand_flows.prospect_daily_results.is_cqa_demand
+  sale_type:
+    description: Market type for sale-context prospect events. Visit flows use listing-side classification; offer flows use offer-side classification. NULL for rent.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.sale_type
+    categories:
+      PRIMARY: New-build / primary market.
+      SECONDARY: Resale / secondary market.
   operation_channel:
     description: Physical agent, internal or external, who performed the conversion in the funnel stage under analysis
     lineage:

@@ -78,6 +78,13 @@ columns:
     description: "Context in which that conversion happened."
     lineage:
       - datalake_demand_flows.prospect_results.business_context
+  sale_type:
+    description: Market type for sale-context prospect events. FLOW rows carry the conversion sale_type; CONVERSION status-change rows inherit it from the linked flow.
+    lineage:
+      - datalake_demand_flows.prospect_results.sale_type
+    categories:
+      PRIMARY: New-build / primary market.
+      SECONDARY: Resale / secondary market.
   product_origin:
     description: "System where the booking was registered"
     lineage:

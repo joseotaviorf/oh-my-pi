@@ -12,7 +12,8 @@ WITH bookings AS (
     esv.id_agent,
     esv.sk_company_supply,
     esv.sk_company_demand,
-    esv.id_business_unit
+    esv.id_business_unit,
+    esv.sale_type
   FROM
     datalake_sale_visit.sale_visit AS esv
 ),
@@ -33,7 +34,8 @@ offers AS (
     eso.id_agent,
     eso.id_company_supply AS sk_company_supply,
     eso.id_company_demand AS sk_company_demand,
-    eso.id_business_unit
+    eso.id_business_unit,
+    eso.sale_type
   FROM
     datalake_sale_offer.sale_offer AS eso
 ),
@@ -53,6 +55,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
+        sale_type,
         ts_booking_created AS ts_event
     FROM
         bookings
@@ -74,6 +77,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
+        sale_type,
         ts_visit_completed AS ts_event
     FROM
         bookings
@@ -95,6 +99,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
+        sale_type,
         ts_offer_submitted AS ts_event
     FROM
         offers
@@ -116,6 +121,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
+        sale_type,
         dt_offer_accepted AS ts_event
     FROM
         offers
@@ -137,6 +143,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
+        sale_type,
         CAST(dt_sale_agreement_created AS TIMESTAMP) AS ts_event
     FROM
         offers
@@ -158,6 +165,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
+        sale_type,
         dt_sale_agreement_signed AS ts_event
     FROM
         offers
@@ -179,6 +187,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
+        sale_type,
         ts_visit_canceled AS ts_event
     FROM
         bookings
@@ -200,6 +209,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
+        sale_type,
         CAST(dt_offer_dismissed AS TIMESTAMP) AS ts_event
     FROM
         offers
@@ -220,6 +230,7 @@ SELECT
   id_region,
   id_seller,
   event_name,
+  sale_type,
   dt_event,
   ts_event
 FROM

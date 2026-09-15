@@ -84,6 +84,14 @@ columns:
     - datalake_sale_visit.sale_visit.id_seller
     - datalake_sale_offer.sale_offer.id_owner
     description: Key of the seller's user. Can be joined with dw_public.dim_user.
+  sale_type:
+    description: Market type for this sale demand event. Visit milestones use listing-side classification from sale_visit; offer and CCV milestones use offer-side classification from sale_offer.
+    lineage:
+      - datalake_sale_visit.sale_visit.sale_type
+      - datalake_sale_offer.sale_offer.sale_type
+    categories:
+      PRIMARY: New-build / primary market.
+      SECONDARY: Resale / secondary market.
   event_name:
     description: Textual name of the demand funnel event this row represents (the label counterpart of sk_event_type). event_name = VISIT_BOOKED identifies a Buyer Prospect (BP) in For Sale demand-funnel metrics; SALE_AGREEMENT_SIGNED is the CCV milestone.
     categories:

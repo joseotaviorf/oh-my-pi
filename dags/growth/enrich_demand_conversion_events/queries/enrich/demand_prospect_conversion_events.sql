@@ -14,6 +14,7 @@ WITH conversion_events_filtered AS (
     id_agent,
     id_talk_to_agent,
     business_context,
+    sale_type,
     dt_event,
     ts_event
   FROM
@@ -81,6 +82,7 @@ booking_attribution AS (
       acc.final_attribution_origin,
       'old_attribution'
     ) AS final_attribution_origin,
+    bce.sale_type,
     bce.dt_event,
     bce.ts_event
   FROM
@@ -222,6 +224,7 @@ sale_offer_attribution AS (
       acc.final_attribution_origin,
       'old_attribution'
     ) AS final_attribution_origin,
+    soce.sale_type,
     soce.dt_event,
     soce.ts_event
   FROM
@@ -349,6 +352,7 @@ rent_offer_attribution AS (
       acc.final_attribution_origin,
       'old_attribution'
     ) AS final_attribution_origin,
+    roce.sale_type,
     roce.dt_event,
     roce.ts_event
   FROM
@@ -420,6 +424,7 @@ events_with_attribution AS (
     utm_content,
     entrance_uri,
     branded,
+    sale_type,
     dt_event,
     ts_event
   FROM
@@ -450,6 +455,7 @@ events_with_attribution AS (
     utm_content,
     entrance_uri,
     branded,
+    sale_type,
     dt_event,
     ts_event
   FROM
@@ -480,6 +486,7 @@ events_with_attribution AS (
     utm_content,
     entrance_uri,
     branded,
+    sale_type,
     dt_event,
     ts_event
   FROM
@@ -510,6 +517,7 @@ events_with_attribution AS (
     ldtta.utm_content,
     ldtta.entrance_uri,
     ldtta.branded,
+    ce.sale_type,
     ce.dt_event,
     ce.ts_event
   FROM
@@ -576,6 +584,7 @@ SELECT
   e.id_owner,
   e.id_agent,
   e.business_context,
+  e.sale_type,
   b.visit_code,
   b.user_booking_creator AS booking_creator,
   b.first_update_source AS product_origin,
