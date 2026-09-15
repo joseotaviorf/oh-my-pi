@@ -320,9 +320,12 @@ def update_df_with_missing_columns(
         table_name=schema_table_name,
         ignore_partition_keys=True,
     )
-    df_cols = set(df.columns)
-    datalake_cols = set([field for field in table_schema])
-    missing_cols = datalake_cols - df_cols
+    # Glue (the EMR primary metastore) lower-cases column names while the crawl CSVs
+    # carry Title Case headers, so a case-sensitive comparison reports every header as
+    # missing. Because spark.sql.caseSensitive is false, withColumn then replaces the
+    # populated column with NULL instead of adding a new one.
+    df_cols = {column.lower() for column in df.columns}
+    missing_cols = [field for field in table_schema if field.lower() not in df_cols]
     for field in missing_cols:
         df = df.withColumn(field, lit(None).cast("string"))
     return df
