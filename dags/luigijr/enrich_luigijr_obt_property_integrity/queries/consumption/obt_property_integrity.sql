@@ -182,11 +182,11 @@ invoice_discount_agg AS (
 -- since at least March 2026; see OBT Property Integrity.md Caveats.
 human_contestation_analysis_cdp AS (
     SELECT
-        json_extract_scalar(event_properties, '$.inspectionUuid') AS uuid_inspection,
+        get_json_object(event_properties, '$.inspectionUuid') AS uuid_inspection,
         MIN(ts_event) AS ts_human_contestation_analysis
     FROM datalake_cdp_clean.transactional
     WHERE event_name = 'create_offboarding_contestation_analysis'
-      AND json_extract_scalar(event_properties, '$.inspectionType') = 'offboarding'
+      AND get_json_object(event_properties, '$.inspectionType') = 'offboarding'
       AND year >= 2024
     GROUP BY 1
 )
