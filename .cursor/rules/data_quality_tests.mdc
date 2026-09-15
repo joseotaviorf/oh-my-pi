@@ -339,7 +339,7 @@ column_level_validations:
 
 The inmetro framework (PyDeequ/Databricks) validates constraints at DAG runtime — not at development time. **Before merging any DW or Enrich SQL change, run every `custom` constraint from the YAML directly against Trino.** This catches referential integrity failures that would otherwise only surface as DataHub assertion failures after the first prod run.
 
-**People domain exception:** People schemas (`datalake_people*`, `datalake_pin_*`, `dw_*` under `dags/people/`) are **not in Trino**. For those tables, run `custom` constraints via **Databricks CLI** on a running People test cluster — see **Ad-hoc SQL and pre-merge DQ validation** in `.cursor/rules/people/people_domain.mdc`.
+**People domain note:** People schemas (`datalake_people*`, `datalake_pin_*`, `datalake_gsheets_people*`, `dw_*` under `dags/people/`) are available in Trino the same as any other domain — validate `custom` constraints there directly. Fall back to **Databricks CLI** on a running People test cluster, or to an ad-hoc **EMR cluster** via **`emr-run`** (role `emr-people-prod`), only for a brand-new table not deployed to prod yet — see **Ad-hoc SQL and pre-merge DQ validation** in `.cursor/rules/people/people_domain.mdc`.
 
 How to validate depends on whether the target table already exists:
 

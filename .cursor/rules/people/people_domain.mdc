@@ -113,9 +113,11 @@ Every table from the **clean** layer onwards must have a corresponding data qual
 
 **Inmetro YAML** (Error vs Warning, check placement, custom keys, size floors, `has_size_variation`): always apply `.cursor/rules/people/people_data_quality.mdc`. When creating or editing `data_quality/*.yml` files, **also apply** `.cursor/rules/data_quality_tests.mdc` for Inmetro **syntax**. Use `alert_channel: PEOPLE_ALERTS` and `table_name` fully qualified (e.g. `dw_employee_details.fact_absence_requests`).
 
-### Ad-hoc SQL and pre-merge DQ validation — Databricks CLI (not Trino)
+### Ad-hoc SQL and pre-merge DQ validation — Trino first
 
-**People lake tables are not available in Trino.** For triaging Inmetro alerts, validating `custom` constraints from `data_quality/**/*.yml`, or any ad-hoc query against People schemas (`datalake_people*`, `datalake_pin_*`, `dw_*` People domains), use the **Databricks CLI** against **production** — not the Trino skill.
+**People lake tables are available in Trino.** Use **Trino** (`trino` skill / Trino MCP) as the **default** for triaging Inmetro alerts, validating `custom` constraints from `data_quality/**/*.yml`, or any ad-hoc query against People schemas (`datalake_people*`, `datalake_pin_*`, `datalake_gsheets_people*`, `dw_*` People domains) — no need to pre-check `list_tables` before trusting it.
+
+Fall back to the **Databricks CLI** against production below, or to an ad-hoc **EMR cluster** via the **`emr-run`** skill (`.cursor/skills/emr-run/SKILL.md`, role **`emr-people-prod`** for People data), only for a **brand-new** table that has not been deployed to prod yet (e.g. same-PR table, not merged/deployed), or if a Trino query unexpectedly errors with `TABLE_NOT_FOUND` / `SCHEMA_NOT_FOUND`.
 
 #### Workspace and authentication
 

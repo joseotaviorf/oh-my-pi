@@ -242,8 +242,7 @@ Do **not** leave bare `LOWER(es.hrbp_work_email)` as the sole HRBP source in new
 
 ### Validation runtime (mandatory)
 
-- **Databricks only** — full People lake/DW data for reverse exports is **not** in Trino. Tier 1–3 diff queries must run on Databricks against `reverse_reports.*`, `dw_*`, and legacy notebook outputs as applicable.
-- **Do not** suggest Trino for validation in this workflow — People data is incomplete in Trino; results would be incomplete or wrong.
+- **Prefer Databricks for this workflow's diffs.** `reverse_reports.*` and `dw_*` are available in Trino like any other People table (see `people_domain.mdc`). The **legacy notebook outputs** they are diffed against, however, are not DAG-builder tables — they only exist on Databricks. Since one side of every Tier 1–3 diff is a legacy notebook output, run the full diff on Databricks against `reverse_reports.*`, `dw_*`, and the legacy notebook outputs as applicable, rather than splitting the query across two engines.
 
 ### Validation (before Forno / PR)
 
@@ -302,7 +301,7 @@ Waivers must be explicit and documented in the PR body.
 | Declaration / service account | [`reverse_reports_declaration.yml`](../../../dags/people/reverse_reports/reverse_reports_declaration.yml) |
 | `load_to_gsheet` | [`load_to_gsheet.py`](../../../dags/people/reverse_reports/spark_jobs/load_to_gsheet.py) |
 | Examples | [`access_list_dp.md`](../../../dags/people/reverse_reports/docs/access_list_dp.md) (compact single-table format), [`demographics_analytic_report.md`](../../../dags/people/reverse_reports/docs/demographics_analytic_report.md) (clean/enrich exception + full URL + Jira link), [`salary_tables.md`](../../../dags/people/reverse_reports/docs/salary_tables.md), [`jobs.md`](../../../dags/people/reverse_reports/docs/jobs.md), [`organization_codex_pin_sync.md`](../../../dags/people/reverse_reports/docs/organization_codex_pin_sync.md) |
-| Validation playbook | [`exodus_validation_playbook.md`](../../../dags/people/reverse_reports/docs/exodus_validation_playbook.md) (Databricks; not Trino) |
+| Validation playbook | [`exodus_validation_playbook.md`](../../../dags/people/reverse_reports/docs/exodus_validation_playbook.md) (prefer Databricks — legacy notebook outputs are not in Trino) |
 | Cutover | [`exodus_migration_guide.md`](../../../dags/people/reverse_reports/docs/exodus_migration_guide.md) |
 | Local Airflow | [`run-dag-locally`](../run-dag-locally/SKILL.md) |
 | PR | [`review-pr`](../review-pr/SKILL.md), [`create-or-update-pr`](../create-or-update-pr/SKILL.md) |

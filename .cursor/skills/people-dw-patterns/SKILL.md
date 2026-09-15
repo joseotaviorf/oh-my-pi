@@ -55,7 +55,7 @@ Read those sections before implementing or reviewing. This skill is a **routing 
 ## Validation (People tables)
 
 - **Lineage / Yamale / FAIR:** `make validate-lineage-consistency`, `make validate-metadata-files-content`, `make validate-fair-metadata` with `CI_COMMIT_BRANCH` set.
-- **Ad-hoc SQL (prod):** Databricks CLI on a running People test cluster — see **`people_domain.mdc`** § ad-hoc SQL (not Trino).
+- **Ad-hoc SQL (prod):** Use Trino by default; fall back to Databricks CLI on a running People test cluster, or an ad-hoc EMR cluster via **`emr-run`** (role `emr-people-prod`), only for a brand-new table not deployed to prod yet — see **`people_domain.mdc`** § ad-hoc SQL.
 
 ---
 
