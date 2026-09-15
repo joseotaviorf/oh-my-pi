@@ -39,7 +39,7 @@ WITH for_sale AS (
         dw_sale.dim_sale_agreement AS sa
             ON sa.sk_offer = fo.sk_offer
     WHERE
-        dd.date BETWEEN TRUNC(ADD_MONTHS(CURRENT_DATE(), -1), "month") AND LAST_DAY(ADD_MONTHS(CURRENT_DATE(), -1))
+        dd.date BETWEEN TRUNC(ADD_MONTHS(CURRENT_DATE(), -1), 'month') AND LAST_DAY(ADD_MONTHS(CURRENT_DATE(), -1))
         AND LOWER(TRIM(dh.city)) IN ('são paulo', 'sao paulo')
         AND is_ccv_canceled = false
 ),
@@ -77,7 +77,7 @@ for_rent AS (
     WHERE
         con.type = 'FullService'
         AND LOWER(TRIM(imo.city)) IN ('são paulo', 'sao paulo')
-        AND TO_DATE(con.ts_signed, 'YYYY-MM-DD') BETWEEN TRUNC(ADD_MONTHS(CURRENT_DATE(), -1), "month") AND LAST_DAY(ADD_MONTHS(CURRENT_DATE(), -1))
+        AND TO_DATE(con.ts_signed, 'YYYY-MM-DD') BETWEEN TRUNC(ADD_MONTHS(CURRENT_DATE(), -1), 'month') AND LAST_DAY(ADD_MONTHS(CURRENT_DATE(), -1))
         AND con.status IN ('Ativo', 'Finalizado')
 )
 

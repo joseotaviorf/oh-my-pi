@@ -1,16 +1,16 @@
+import io
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
+from http.client import HTTPException
+from urllib.parse import urlparse
 
+import boto3
 from dateutil.relativedelta import relativedelta
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.loaders.s3_loader import S3Loader
 
-DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_data_into_xlsx_s3"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -24,7 +24,6 @@ if __name__ == "__main__":
     parser.add_argument("source", help="source name")
     parser.add_argument("query", help="query")
     parser.add_argument("output_path", help="output path value in forno/prod")
-    parser.add_argument("format_options", help="format_options for s3_loader")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -33,7 +32,6 @@ if __name__ == "__main__":
     output_path = args.output_path
     source = args.source
     query = args.query
-    format_options = args.format_options
     execution_date = args.execution_date
     dai_reference_date = datetime.strptime(execution_date, "%Y-%m-%d") - relativedelta(
         months=1
@@ -45,14 +43,30 @@ if __name__ == "__main__":
     )
 
     spark_client = SparkClient()
-    s3_consumer = S3Consumer(spark_client)
 
     df = spark_client.get_records(query)
 
-    df = SparkDataFrameService().input(df).output()
+    parsed_output_path = urlparse(output_path)
+    bucket = parsed_output_path.netloc
+    key = parsed_output_path.path.lstrip("/")
 
-    s3_loader = S3Loader()
+    with io.BytesIO() as xlsx_buffer:
+        df.toPandas().to_excel(xlsx_buffer, index=False, header=True, engine="openpyxl")
 
-    s3_loader.load_df(
-        df=df, s3_path=output_path, format_options=format_options, header="true"
-    )
+        response = boto3.client("s3").put_object(
+            Bucket=bucket,
+            Key=key,
+            Body=xlsx_buffer.getvalue(),
+            ACL="bucket-owner-full-control",
+        )
+
+    status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+
+    if status == 200:
+        logger.info(
+            f"m=__main__, message=successful S3 put_object for {source}, status={status}"
+        )
+    else:
+        raise HTTPException(
+            f"m=__main__, message=UNSUCCESSFULL S3 put_object for {source}, status={status}"
+        )

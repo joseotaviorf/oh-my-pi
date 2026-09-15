@@ -21,8 +21,4 @@ query_export_xlsx: "SELECT
   bathrooms AS qtyBaths
   FROM
   datalake_dai_report.dai_report;"
-format_options: com.crealytics.spark.excel
 out_path: "s3://5a-simba/prod/DAI/DAI_{}_{:02d}.xlsx"
-cluster_extra_libs:
-  - maven:
-      coordinates: "com.crealytics:spark-excel_2.12:3.2.1_0.16.5-pre2"

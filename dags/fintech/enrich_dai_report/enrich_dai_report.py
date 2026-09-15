@@ -3,29 +3,24 @@ from datetime import datetime
 
 import pendulum
 from airflow.models import DAG
-from airflow.operators.python_operator import ShortCircuitOperator
 from airflow.utils.helpers import chain
-from databricks_plugin import (
-    QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
-)
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
-    DAGRunDateValidators,
-)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
-from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import (
-    DatabricksGroupNameEnum,
+from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_job_cluster_engine_to_context,
 )
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
+)
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
+from bietlejuice.services.file_service import FileService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -39,31 +34,17 @@ jiraops_callback = JiraOpsCallback()
 
 config_service = ConfigurationService(DAG_NAME)
 datalake_bucket = config_service.get_config("datalake_bucket")
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-default_libraries = config_service.get_config("default_libraries")
-custom_libraries = config_service.get_config("cluster_extra_libs")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 DAI_CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/"
 
-CLUSTER_DESCRIPTION = config_service.get_config("consolidation_s_memory_cluster")
-
-
-CLUSTER_DESCRIPTION["num_workers"] = 3
-CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
-CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
-    "quintoandar_{{ var.value.environment }}"
+_cluster_file_path = DAGPackagesPathService.resolve_artifact_file_path(
+    artifact_type="dag_cluster", dag_name=DAG_NAME
 )
-DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
-    {
-        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
-        "permission_level": ClusterPermissionEnum.MANAGE,
-    }
-]
+CLUSTER_ARGS = FileService.get_dict_from_yaml_file(_cluster_file_path)["cluster"]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -81,36 +62,42 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    databricks_conn_id="databricks_new",
+dag_execution_context = DagExecutionContext(
     dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=default_libraries + custom_libraries,
+    environment=ENV,
+    bucket=datalake_bucket,
+    base_spark_jobs_path=databricks_bietlejuice_repo_path,
+    dag_args={},
+    workflow_args={},
+    cluster_args=CLUSTER_ARGS,
+)
+attach_job_cluster_engine_to_context(dag_execution_context, config_service)
+
+execute_job_cluster_task = (
+    dag_execution_context.job_cluster_engine.create_execute_cluster_task(
+        config_service=config_service,
+        minimum_cluster_runtime_version=None,
+        execute_job_cluster_local_id=None,
+    )
 )
 
 # Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
-DatasetAdder.attach_reprocessing_guard(create_cluster_task)
+DatasetAdder.attach_reprocessing_guard(execute_job_cluster_task, dag_execution_context)
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
-)
-
-skip_run_task = ShortCircuitOperator(
-    task_id="check-day-to-skip-execution",
-    python_callable=DAGRunDateValidators.check_is_specific_day_of_month,
-    op_args=["{{ macros.ds_add(data_interval_start | ds, 1) }}", 10],
+terminate_cluster_task = (
+    dag_execution_context.job_cluster_engine.create_emr_terminate_cluster_task(
+        execute_cluster_task_id=execute_job_cluster_task.task_id,
+        terminate_task_local_suffix=None,
+    )
 )
 
 datalake_task_group = DatalakeTaskGroup(
-    databricks_conn_id="databricks_new",
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=SPARK_JOBS_PATH,
-    athena_query_result_location=athena_query_results_bucket,
+    job_cluster_engine=dag_execution_context.job_cluster_engine,
 )
 
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
@@ -120,29 +107,22 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
 )
 
 query_export_xlsx = config_service.get_config("query_export_xlsx")
-format_options = config_service.get_config("format_options")
 out_path = config_service.get_config("out_path")
-load_data_into_s3 = QuintoAndarDatabricksSubmitRunOperator(
-    databricks_conn_id="databricks_new",
+load_data_into_s3 = dag_execution_context.job_cluster_engine.create_spark_python_task(
+    spark_job_path=f"{DAI_CUSTOM_SPARK_JOB_PATH}load_data_into_xlsx_s3.py",
     task_id=f"load-{SOURCE}-in-s3",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": DAI_CUSTOM_SPARK_JOB_PATH + "load_data_into_xlsx_s3.py",
-            "parameters": [
-                ENV,
-                SOURCE,
-                query_export_xlsx,
-                out_path,
-                format_options,
-                "{{ data_interval_start | ds}}",
-            ],
-        }
-    },
+    job_parameters=[
+        ENV,
+        SOURCE,
+        query_export_xlsx,
+        out_path,
+        "{{ data_interval_start | ds}}",
+    ],
+    execution_timeout_hours=1,
 )
 
-chain(  # skip_run_task,
-    create_cluster_task,
+chain(
+    execute_job_cluster_task,
     DatalakeTaskGroup.all_first_tasks(enrich_task_groups),
 )
 chain(
