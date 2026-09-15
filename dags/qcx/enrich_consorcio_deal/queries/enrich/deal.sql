@@ -53,14 +53,14 @@ origin_mapping AS (
 ),
 segment_mapping AS (
   SELECT
-    NULLIF(TRIM(utm_campaign), '') AS utm_campaign,
+    NULLIF(TRIM(LOWER(utm_campaign)), '') AS utm_campaign,
     MAX(NULLIF(TRIM(segment), '')) AS segment
   FROM
     datalake_gsheets_clean.consorcio_segment_mapping
   WHERE
     NULLIF(TRIM(utm_campaign), '') IS NOT NULL
   GROUP BY
-    NULLIF(TRIM(utm_campaign), '')
+    NULLIF(TRIM(LOWER(utm_campaign)), '')
 ),
 
 -- ----------------------------------------------------------------
@@ -513,7 +513,7 @@ LEFT JOIN
     ON origin_mapping.utm_source = base_deal.utm_source
 LEFT JOIN
   segment_mapping
-    ON segment_mapping.utm_campaign = base_deal.utm_campaign
+    ON segment_mapping.utm_campaign = LOWER(base_deal.utm_campaign)
 LEFT JOIN
   analyst_identity
     ON analyst_identity.id_owner = CAST(base_deal.id_hubspot_owner AS STRING)
