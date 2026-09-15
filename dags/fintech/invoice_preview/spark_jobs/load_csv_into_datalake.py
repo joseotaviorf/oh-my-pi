@@ -32,13 +32,13 @@ from bietlejuice.services.storage_services.s3_service import S3Service
 
 JOB_NAME = "load_invoice_preview_into_datalake"
 
-# SeuBarriga morning export ~01:00 BRT; afternoon export starts at 12:00 and may take
-# up to 4h30 on billing days (22nd through month-end). Files within
-# LATEST_EXPORT_BATCH_WINDOW_SECONDS of the day's max timestamp belong to the latest batch;
-# older files on the same calendar day are the morning batch. Morning DAG runs overwrite
-# the partition; afternoon runs append afternoon CSVs only when a separate afternoon batch
-# exists on S3 (days 1-21 usually have a single batch — afternoon run skips with no write).
-LATEST_EXPORT_BATCH_WINDOW_SECONDS = 5 * 3600
+# SeuBarriga morning export ~01:00 BRT and can last several hours; afternoon export
+# starts at 12:00 BRT on billing days (22nd through month-end). Batches are split by
+# the Unix timestamp prefix in the CSV name (hour BRT < 12 morning, else afternoon),
+# matching clean export_slot. Do not split a long morning dump by a sliding window:
+# that treated the first shards as "morning" and dropped the rest on the 09:00 overwrite.
+# Morning DAG runs overwrite the partition; afternoon runs append afternoon CSVs only
+# when a separate afternoon batch exists on S3 (days 1-21 usually skip the raw write).
 EXPORT_SLOT_MORNING = "morning"
 EXPORT_SLOT_AFTERNOON = "afternoon"
 EXPORT_SLOT_AUTO = "auto"
@@ -63,38 +63,30 @@ def _file_timestamp(path):
     return int(path.split("/")[-1].split("-")[0])
 
 
+def _file_datetime_brt(path):
+    return datetime.fromtimestamp(_file_timestamp(path), tz=timezone.utc).astimezone(
+        BRT
+    )
+
+
 def _select_latest_export_batch(file_paths):
-    if not file_paths:
-        return []
-
-    max_ts = max(_file_timestamp(path) for path in file_paths)
-    batch_threshold = max_ts - LATEST_EXPORT_BATCH_WINDOW_SECONDS
-    latest_batch = [
-        path for path in file_paths if _file_timestamp(path) >= batch_threshold
+    afternoon_batch = [
+        path for path in file_paths if _file_datetime_brt(path).hour >= 12
     ]
-
     logger.info(
         f"m=_select_latest_export_batch, total_files={len(file_paths)}, "
-        f"latest_batch_files={len(latest_batch)}, max_ts={max_ts}, "
-        f"batch_threshold={batch_threshold}, msg=Selected latest export batch."
+        f"afternoon_batch_files={len(afternoon_batch)}, "
+        f"msg=Selected afternoon export batch (hour BRT >= 12)."
     )
-    return latest_batch
+    return afternoon_batch
 
 
 def _select_morning_export_batch(file_paths):
-    if not file_paths:
-        return []
-
-    max_ts = max(_file_timestamp(path) for path in file_paths)
-    batch_threshold = max_ts - LATEST_EXPORT_BATCH_WINDOW_SECONDS
-    morning_batch = [
-        path for path in file_paths if _file_timestamp(path) < batch_threshold
-    ]
-
+    morning_batch = [path for path in file_paths if _file_datetime_brt(path).hour < 12]
     logger.info(
         f"m=_select_morning_export_batch, total_files={len(file_paths)}, "
-        f"morning_batch_files={len(morning_batch)}, max_ts={max_ts}, "
-        f"batch_threshold={batch_threshold}, msg=Selected morning export batch."
+        f"morning_batch_files={len(morning_batch)}, "
+        f"msg=Selected morning export batch (hour BRT < 12)."
     )
     return morning_batch
 
@@ -262,9 +254,7 @@ if __name__ == "__main__":
     by_day_files = defaultdict(list)
 
     for path in filtered_files:
-        yearmonthday = datetime.fromtimestamp(_file_timestamp(path)).strftime(
-            "%Y-%m-%d"
-        )
+        yearmonthday = _file_datetime_brt(path).strftime("%Y-%m-%d")
         by_day_files[yearmonthday].append(path)
 
     days_to_send_warning = []

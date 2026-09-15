@@ -10,9 +10,10 @@ dag:
       billing days (22nd through month-end); on days 1-21 the 16:00 run finds no separate
       afternoon batch on S3 and skips the raw write (morning snapshot preserved).
       This DAG ingests at 09:00 the morning export (partition overwrite) and at 16:00
-      the afternoon batch only when it exists (partition append). Clean derives export_slot
-      from the Unix timestamp prefix in invoice_filename (before 12:00 BRT morning, else
-      afternoon) — no new raw columns required. Stakeholders consume validation-ready
+      the afternoon batch only when it exists (partition append). Raw and clean both
+      split batches from the Unix timestamp prefix in invoice_filename (hour BRT before
+      12:00 morning, else afternoon) so a long morning dump is ingested in full.
+      Stakeholders consume validation-ready
       snapshots from datalake_invoice_preview.invoice_preview (enrich_invoice_preview DAG):
       morning export_slot only. The clean table keeps both batches for pipeline debugging.
     additional_information: |
