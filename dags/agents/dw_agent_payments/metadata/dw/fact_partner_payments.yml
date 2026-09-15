@@ -150,6 +150,14 @@ columns:
     lineage:
       - datalake_agent_payments.partner_payments.dt_tier_reference
     description: Tier validity start date used as reference when assigning the partner tier.
+  dt_closed_deal:
+    lineage:
+      - datalake_gsheets_clean.closed_deals.dt_closed_deal
+      - datalake_gsheets_clean.closed_deals.sk_offer
+      - datalake_agent_payments.partner_payments.id_offer
+    description: |
+      Earliest closed-deal date for the sale offer from the For Sale closed deals
+      spreadsheet, resolved by sk_offer. Null when the offer has no closed-deal record.
   ts_contract_signed:
     lineage:
       - datalake_agent_payments.partner_payments.ts_contract_signed

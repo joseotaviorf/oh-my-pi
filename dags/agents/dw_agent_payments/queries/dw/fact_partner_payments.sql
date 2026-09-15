@@ -1,3 +1,11 @@
+WITH closed_deal AS (
+    SELECT
+        cde.sk_offer,
+        MIN(cde.dt_closed_deal) AS dt_closed_deal
+    FROM
+        datalake_gsheets_clean.closed_deals AS cde
+    GROUP BY 1
+)
 SELECT
     ae.id_partner_payment AS sk_partner_payment,
     ae.id_earning AS sk_earning,
@@ -31,6 +39,7 @@ SELECT
     ae.is_crcc_revenue_share,
     ae.is_tier_revenue_share,
     ae.dt_tier_reference,
+    cd.dt_closed_deal,
     ae.ts_contract_signed,
     ae.ts_created,
     ae.ts_updated,
@@ -49,5 +58,8 @@ LEFT JOIN
 LEFT JOIN
     core_brokers.brokers AS cb
         ON ae.uuid_company = cb.uuid_company
+LEFT JOIN
+    closed_deal AS cd
+        ON ae.id_offer = cd.sk_offer
 WHERE
     DATE(ae.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

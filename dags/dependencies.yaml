@@ -137,6 +137,7 @@ bietlejuice.dw_agent_payments:
   - bietlejuice.enrich_big_agent_incentives:load-enrich-tier-rule:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
+  - bietlejuice.gsheets_for_sale:done-clean-closed-deals:first-run-of-day
 bietlejuice.dw_agent_visit_funnel:
   - bietlejuice.dw_agent_accreditation:load-dw-agent-fact-agent-daily:first-run-of-day
   - bietlejuice.dw_house:load-dw-house-dim-house-entrance-history:first-run-of-day
