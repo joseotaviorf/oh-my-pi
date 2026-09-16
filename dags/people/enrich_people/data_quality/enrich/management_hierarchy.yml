@@ -94,16 +94,19 @@ column_level_validations:
 
   current_hierarchy_l0_matches_ceo:
     custom:
-      # Since PIN go-live (2024-03-01): every non-test, non-CEO hierarchy version overlapping
-      # go-live→today must have L0 equal to a depth-0 CEO whose validity overlaps the same window.
-      # Test users are out of scope (employee and L0); residual failures are real non-CEO roots
-      # (typically null LINE_MANAGER upstream).
+      # Active employees and employees terminated on or after PIN go-live (2024-03-01)
+      # must have L0 equal to a depth-0 CEO whose validity overlaps the same window.
+      # Employees terminated before PIN go-live are historical and out of scope.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.management_hierarchy AS mh
          INNER JOIN datalake_people.identifier_mapping AS im
              ON im.assignment_number = mh.assignment_number
              AND NOT im.is_user_test
+             AND (
+               im.dt_actual_termination IS NULL
+               OR im.dt_actual_termination >= DATE('2024-03-01')
+             )
          LEFT JOIN datalake_people.identifier_mapping AS im_l0
              ON im_l0.assignment_number = mh.assignment_number_l0
          WHERE mh.hierarchy_depth > 0
