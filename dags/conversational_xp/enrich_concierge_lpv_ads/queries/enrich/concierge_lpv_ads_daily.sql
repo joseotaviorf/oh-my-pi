@@ -26,20 +26,25 @@
 --      [current_date()-29, current_date()], which equals [yesterday-28, yesterday+1] for the
 --      only rows that appear in the final output (dt_lpv = yesterday). Dropping the range
 --      condition converts a non-equi join to a hash join.
+-- PERF CHANGES (2026-09-16):
+--   4. from_json() replaces 4× get_json_object() calls in lpv_events — event_properties is
+--      parsed once per row into a typed struct; lpv_filtered dereferences struct fields.
+--      get_json_object() re-parses the JSON string on every call; a single from_json() parse
+--      is significantly cheaper at the scale of user_tracking.
 WITH lpv_events AS (
     SELECT
-        CAST(ut.id_user AS STRING) AS id_user,
+        CAST(ut.id_user AS STRING)  AS id_user,
         ut.id_person,
-        CAST(ut.ts_event AS DATE) AS dt_event,
-        lower(get_json_object(ut.event_properties, '$.business_context')) AS business_context,
-        lower(COALESCE(NULLIF(get_json_object(ut.event_properties, '$.utm_source'), ''), ut.egw_utm_source)) AS utm_source,
-        lower(COALESCE(NULLIF(get_json_object(ut.event_properties, '$.utm_medium'), ''), ut.egw_utm_medium)) AS utm_medium,
+        CAST(ut.ts_event AS DATE)   AS dt_event,
+        -- [CHANGE 4] Parse event_properties once; downstream CTEs dereference struct fields.
+        from_json(
+            ut.event_properties,
+            'STRUCT<business_context:STRING, utm_source:STRING, utm_medium:STRING, house_id:STRING>'
+        )                           AS ep,
+        ut.egw_utm_source,
+        ut.egw_utm_medium,
         -- phone used only to derive the A/B cell; not persisted downstream
-        du.phone_number AS phone_for_ab,
-        CASE
-            WHEN get_json_object(ut.event_properties, '$.house_id') LIKE '%.%' THEN NULL
-            ELSE CAST(get_json_object(ut.event_properties, '$.house_id') AS BIGINT)
-        END AS id_house
+        du.phone_number             AS phone_for_ab
     FROM datalake_cdp_clean.user_tracking AS ut
     -- [CHANGE 1] INNER JOIN: was LEFT JOIN + WHERE du.phone_number IS NOT NULL, which
     -- silently turned into an inner join but blocked early filtering by the optimizer.
@@ -54,10 +59,28 @@ WITH lpv_events AS (
         AND ut.id_user IS NOT NULL
 ),
 lpv_filtered AS (
-    SELECT id_user, id_person, dt_event, business_context, id_house, phone_for_ab
+    -- Dereference the parsed struct; apply lower() and COALESCE here, once.
+    SELECT
+        id_user,
+        id_person,
+        dt_event,
+        phone_for_ab,
+        lower(ep.business_context)                                                  AS business_context,
+        lower(COALESCE(NULLIF(ep.utm_source, ''), egw_utm_source))                 AS utm_source,
+        lower(COALESCE(NULLIF(ep.utm_medium, ''), egw_utm_medium))                 AS utm_medium,
+        CASE
+            WHEN ep.house_id LIKE '%.%' THEN NULL
+            ELSE CAST(ep.house_id AS BIGINT)
+        END                                                                         AS id_house
     FROM lpv_events
-    WHERE (utm_source = 'shared' AND utm_medium IN ('copy_share', 'custom_share'))
-       OR (utm_source IN ('facebook', 'criteo') AND utm_medium IN ('retargeting', 'retargeting-retention'))
+    WHERE (
+            lower(COALESCE(NULLIF(ep.utm_source, ''), egw_utm_source)) = 'shared'
+            AND lower(COALESCE(NULLIF(ep.utm_medium, ''), egw_utm_medium)) IN ('copy_share', 'custom_share')
+          )
+       OR (
+            lower(COALESCE(NULLIF(ep.utm_source, ''), egw_utm_source)) IN ('facebook', 'criteo')
+            AND lower(COALESCE(NULLIF(ep.utm_medium, ''), egw_utm_medium)) IN ('retargeting', 'retargeting-retention')
+          )
 ),
 lpv_users_aux AS (
     SELECT
