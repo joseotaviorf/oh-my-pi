@@ -11,7 +11,6 @@ from urllib.parse import urlparse
 import requests
 from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.oauth2 import service_account
-from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
@@ -30,6 +29,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
+JOB_NAME = "load_google_admin_raw"
 LOGGER = QuintoAndarLogger(__name__)
 
 DATABRICKS_SECRET_SCOPE = "quintoandar"
@@ -575,8 +575,8 @@ def main() -> None:
             f"count={len(api_data_list)}, table={table_name}"
         )
 
-        spark = SparkSession.builder.getOrCreate()
-        spark_client = SparkClient()
+        spark_client = SparkClient(app_name=JOB_NAME)
+        spark = spark_client.conn
 
         if api_data_list:
             df = json_to_dataframe(spark, api_data_list)
