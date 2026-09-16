@@ -50,6 +50,22 @@ CONSUMPTION_SCHEMAS = frozenset(
 )
 
 
+# Layers routed to this mapper. Single source for both the name and the path
+# dict comprehensions in ``get_all_datalake_info`` so the two cannot drift.
+_DATALAKE_LAYERS = (
+    LayerEnum.TRANSACTIONAL,
+    LayerEnum.RAW,
+    LayerEnum.CLEAN,
+    LayerEnum.CLEAN_STAGING,
+    LayerEnum.CORE,
+    LayerEnum.ENRICH,
+    LayerEnum.CONSUMPTION,
+    LayerEnum.WONKA,
+    LayerEnum.INGESTION,
+    LayerEnum.TRANSFORMATION,
+)
+
+
 def apply_naming_convention(source: str, database_name: str) -> str:
     """Drops the ``datalake_`` prefix for governed schemas that follow the new
     naming convention. No-op for every other schema/name."""
@@ -64,7 +80,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
     """Datalake properties mapping for Hive Metastore."""
 
     DATABASE_PATTERN = re.compile(
-        r"^(?:datalake_|core_)(?P<schema>[\w|_]+?)(?:_transactional|_raw|_clean|_clean_staging)?$"
+        r"^(?:datalake_|core_|transformation_)(?P<schema>[\w|_]+?)(?:_transactional|_raw|_clean|_clean_staging)?$"
     )
 
     def get_full_database_name(self, layer: LayerEnum = None) -> str:
@@ -79,6 +95,12 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             # Prefix-free schema name (not consumption_{source}).
             "consumption": f"{self.source}",
             "wonka": "wonka",
+            # Three-layer taxonomy. ``ingestion`` mirrors the transactional
+            # pattern; ``transformation`` gets its own prefix rather than reusing
+            # ``datalake_`` so schema-name classification can tell it apart from
+            # enrich (see LayerEnum docstring).
+            "ingestion": f"datalake_{self.source}_transactional",
+            "transformation": f"transformation_{self.source}",
         }[layer.value]
 
         # Consumption is already prefix-free (`{source}`); skip the enrich-era
@@ -121,6 +143,8 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             # Storage layout root only — not a schema prefix (schemas stay prefix-free).
             "consumption": f"s3a://{self.bucket}/consumption/{self.source}/",
             "wonka": f"s3a://{self.bucket}/wonka/historical/{self.source}/",
+            "ingestion": f"s3a://{self.bucket}/transactional/{self.source}/",
+            "transformation": f"s3a://{self.bucket}/transformation/{self.source}/",
         }[layer.value]
 
     def get_all_datalake_info(self):
@@ -131,29 +155,11 @@ class DatalakeMetastoreMapping(MetastoreMapping):
         """
         database_name = {
             f"db_{layer.value}_name": self.get_full_database_name(layer)
-            for layer in (
-                LayerEnum.TRANSACTIONAL,
-                LayerEnum.RAW,
-                LayerEnum.CLEAN,
-                LayerEnum.CLEAN_STAGING,
-                LayerEnum.CORE,
-                LayerEnum.ENRICH,
-                LayerEnum.CONSUMPTION,
-                LayerEnum.WONKA,
-            )
+            for layer in _DATALAKE_LAYERS
         }
         s3_files_path = {
             f"db_{layer.value}_path": self.get_full_database_path(layer)
-            for layer in (
-                LayerEnum.TRANSACTIONAL,
-                LayerEnum.RAW,
-                LayerEnum.CLEAN,
-                LayerEnum.CLEAN_STAGING,
-                LayerEnum.CORE,
-                LayerEnum.ENRICH,
-                LayerEnum.CONSUMPTION,
-                LayerEnum.WONKA,
-            )
+            for layer in _DATALAKE_LAYERS
         }
 
         metastore_info = {}

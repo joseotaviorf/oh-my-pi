@@ -33,7 +33,7 @@ def classify_schema_to_layer(schema: str) -> str:
     Aligns with bi-etl-ejuice metastore naming (see naming_conventions).
 
     Returns lowercase layer id: raw, clean, transactional, enrich, dw, metric, core,
-    qube, reverse, consumption, unknown.
+    qube, reverse, consumption, transformation, unknown.
     """
     if not schema:
         return "unknown"
@@ -51,6 +51,8 @@ def classify_schema_to_layer(schema: str) -> str:
         return "qube"
     if s.startswith("metric_"):
         return "metric"
+    if s.startswith("transformation_"):
+        return "transformation"
     if s.startswith("dw_"):
         return "dw"
     if s.startswith("core_"):

@@ -57,11 +57,27 @@ def test_consumption_allows_transformation_and_modeling_layers_not_raw():
     allowed = allowed_layers_for_output("consumption")
     assert allowed is not None
     assert allowed == frozenset(
-        {"clean", "enrich", "dw", "metric", "qube", "consumption"}
+        {"clean", "enrich", "dw", "metric", "qube", "consumption", "transformation"}
     )
     assert "raw" not in allowed
     assert "core" not in allowed
     assert "transactional" not in allowed
+
+
+def test_transformation_mirrors_enrich_and_allows_chaining():
+    """transformation is the new-taxonomy sibling of enrich: same inputs, plus itself."""
+    allowed = allowed_layers_for_output("transformation")
+    assert allowed is not None
+    assert allowed == frozenset(
+        {"transactional", "clean", "enrich", "core", "transformation"}
+    )
+    assert "raw" not in allowed
+
+
+def test_transformation_is_a_known_output_layer():
+    """A missing key makes allowed_layers_for_output return None, which the caller
+    treats as 'skip this DAG' — a silent CI pass rather than a failure."""
+    assert allowed_layers_for_output("transformation") is not None
 
 
 def test_qube_allows_clean_plus_layers_and_intra_qube_reads():

@@ -21,4 +21,6 @@ class TestLayerEnum:
             LayerEnum.QUBE.value,
             LayerEnum.CONSUMPTION.value,
             LayerEnum.WONKA.value,
+            LayerEnum.INGESTION.value,
+            LayerEnum.TRANSFORMATION.value,
         ]

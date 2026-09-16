@@ -36,9 +36,14 @@ class DatasetService:
         "core": "{schema}",
         "enrich": "datalake_{schema}",
         "dw": "dw_{schema}",
+        "dw_staging": "dw_{schema}_staging",
         "metric": "metric_{schema}",
         "reverse": "reverse_{schema}",
+        "qube": "qube_{schema}",
+        # Prefix-free, matching DatalakeMetastoreMapping.
+        "consumption": "{schema}",
         "wonka": "wonka",
+        "transformation": "transformation_{schema}",
     }
 
     @classmethod

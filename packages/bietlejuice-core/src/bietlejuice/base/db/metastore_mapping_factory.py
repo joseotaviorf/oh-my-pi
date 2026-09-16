@@ -28,4 +28,5 @@ class MetastoreMappingFactory:
             LayerEnum.QUBE: QubeMetastoreMapping,
             LayerEnum.WONKA: DatalakeMetastoreMapping,
             LayerEnum.CONSUMPTION: DatalakeMetastoreMapping,
+            LayerEnum.TRANSFORMATION: DatalakeMetastoreMapping,
         }[layer](source, bucket)

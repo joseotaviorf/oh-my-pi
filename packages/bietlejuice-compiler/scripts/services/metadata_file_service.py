@@ -28,6 +28,7 @@ _DB_NAME_FORMULA = {
     # Consumption is prefix-free: physical metastore DB name is the schema itself
     # (e.g. ops_finance.foo). No datalake_ / consumption_ layer prefix.
     "consumption": "{schema}",
+    "transformation": "transformation_{schema}",
 }
 
 _DAG_DIR_FROM_METADATA_PATH = re.compile(r"((?:.*/)?dags/[^/]+/[^/]+)/metadata/")
@@ -347,6 +348,8 @@ class MetadataFileService:
 
         if schema and schema.lower() in CONSUMPTION_SCHEMAS:
             return "consumption"
+        if re.match(r"^transformation_.*", schema):
+            return "transformation"
         if re.match(r".*_raw$", schema):
             return "raw"
         elif re.match(r".*_clean$", schema):
@@ -422,7 +425,7 @@ class MetadataFileService:
             return yamale.validate(self.schemas["clean"], yaml_data)
         elif layer == "core":
             return yamale.validate(self.schemas["core"], yaml_data)
-        elif layer in ["enrich", "dw", "consumption"]:
+        elif layer in ["enrich", "dw", "consumption", "transformation"]:
             return yamale.validate(self.schemas["enrich_dw"], yaml_data)
         elif layer == "metric":
             return self.validate_metric_file(file_path, yaml_data)
@@ -444,7 +447,16 @@ class MetadataFileService:
         table_info = MetadataFileService._get_info_from_path(file_path)
         layer = table_info.get("layer")
 
-        if layer in {"raw", "clean", "core", "enrich", "dw", "metric", "consumption"}:
+        if layer in {
+            "raw",
+            "clean",
+            "core",
+            "enrich",
+            "dw",
+            "metric",
+            "consumption",
+            "transformation",
+        }:
             return os.path.isfile(
                 file_path.replace("/queries/", "/metadata/").replace(".sql", ".yml")
             ) or os.path.isfile(

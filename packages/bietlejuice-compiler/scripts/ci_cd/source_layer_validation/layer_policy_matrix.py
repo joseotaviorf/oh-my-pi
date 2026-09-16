@@ -13,6 +13,13 @@ ALLOWED_SOURCE_LAYERS_BY_OUTPUT: Dict[str, FrozenSet[str]] = {
     "raw": frozenset({"raw"}),
     "clean": frozenset({"raw", "clean"}),
     "enrich": frozenset({"transactional", "clean", "enrich", "core"}),
+    # Three-layer taxonomy. Mirrors enrich's allow-list — it is the same kind of
+    # output — plus transformation itself for chained transformations. Without
+    # this key allowed_layers_for_output() returns None and the caller skips the
+    # DAG entirely, so a transformation DAG would pass CI unchecked.
+    "transformation": frozenset(
+        {"transactional", "clean", "enrich", "core", "transformation"}
+    ),
     "dw": frozenset({"clean", "enrich", "core", "dw"}),
     "metric": frozenset({"enrich", "core", "dw", "metric"}),
     # Dimensions/measures may read clean+ layers; metrics also read qube_dimensions/measures.
@@ -33,7 +40,7 @@ ALLOWED_SOURCE_LAYERS_BY_OUTPUT: Dict[str, FrozenSet[str]] = {
     # gain "consumption" as a temporary escape hatch — flip declarations to
     # layer: consumption instead (bulk enrich_luigijr_* migration).
     "consumption": frozenset(
-        {"clean", "enrich", "dw", "metric", "qube", "consumption"}
+        {"clean", "enrich", "dw", "metric", "qube", "consumption", "transformation"}
     ),
 }
 

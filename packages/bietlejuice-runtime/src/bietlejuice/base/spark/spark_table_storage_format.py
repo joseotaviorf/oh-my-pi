@@ -17,6 +17,11 @@ class SparkTableStorageFormat:
     # but TableLoaderPipeline.run() calls get_storage(self.layer) unconditionally
     # before dispatching, so every valid workflow layer needs an entry here.
     DEFAULT_CONSUMPTION = PARQUET
+    # Informational for the Delta write path (see CONSUMPTION), but get_storage()
+    # is called for every workflow layer, so an entry is mandatory. INGESTION is
+    # not a workflow layer yet (same as TRANSACTIONAL) and is intentionally
+    # absent — do not guess a CDC storage format here.
+    DEFAULT_TRANSFORMATION = PARQUET
 
     @classmethod
     def is_valid_storage(cls, storage):
@@ -35,6 +40,7 @@ class SparkTableStorageFormat:
             "metric",
             "reverse",
             "consumption",
+            "transformation",
         ]
 
     @classmethod
@@ -54,4 +60,5 @@ class SparkTableStorageFormat:
             "metric": cls.DEFAULT_METRIC,
             "reverse": cls.DEFAULT_REVERSE,
             "consumption": cls.DEFAULT_CONSUMPTION,
+            "transformation": cls.DEFAULT_TRANSFORMATION,
         }.get(storage)

@@ -47,6 +47,12 @@ class FactoryDispatcher:
         # Consumption reuses EnrichFactory: same query_delta / metadata path;
         # naming + source-layer policy differ via LayerEnum / CONSUMPTION_SCHEMAS.
         LayerEnum.CONSUMPTION: EnrichFactory,
+        # Transformation likewise reuses EnrichFactory — the execution path is
+        # identical to enrich; only naming and source-layer policy differ.
+        # INGESTION is deliberately absent: like TRANSACTIONAL it is not yet a
+        # workflow layer, so declaring it should fail loudly here until the CDC
+        # multi-layer design lands.
+        LayerEnum.TRANSFORMATION: EnrichFactory,
         LayerEnum.DW: DWFactory,
         LayerEnum.METRIC: MetricFactory,
         LayerEnum.REVERSE: ReverseFactory,

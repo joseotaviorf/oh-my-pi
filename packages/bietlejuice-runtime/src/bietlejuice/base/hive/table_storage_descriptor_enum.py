@@ -17,6 +17,7 @@ class TableStorageDescriptorEnum(Enum):
     ENRICH_FORMAT = TableFormatInfo().parquet
     DW = TableFormatInfo().parquet
     METRIC_FORMAT = TableFormatInfo().parquet
+    TRANSFORMATION_FORMAT = TableFormatInfo().parquet
 
     @staticmethod
     def from_layer(layer):
@@ -36,4 +37,5 @@ class TableStorageDescriptorEnum(Enum):
             LayerEnum.ENRICH: TableStorageDescriptorEnum.ENRICH_FORMAT.value,
             LayerEnum.DW: TableStorageDescriptorEnum.DW.value,
             LayerEnum.METRIC: TableStorageDescriptorEnum.METRIC_FORMAT.value,
+            LayerEnum.TRANSFORMATION: TableStorageDescriptorEnum.TRANSFORMATION_FORMAT.value,
         }.get(layer_enum_member)

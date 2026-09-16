@@ -47,6 +47,10 @@ class TestDatalakeMetastoreMapping:
             "db_transactional_path": "s3a://bucket-forno/transactional/_my_src_/",
             "db_wonka_name": "wonka",
             "db_wonka_path": "s3a://bucket-forno/wonka/historical/_my_src_/",
+            "db_ingestion_name": "datalake__my_src__transactional",
+            "db_ingestion_path": "s3a://bucket-forno/transactional/_my_src_/",
+            "db_transformation_name": "transformation__my_src_",
+            "db_transformation_path": "s3a://bucket-forno/transformation/_my_src_/",
         }
 
     def test_get_all_datalake_info_for_prod(self):
@@ -77,6 +81,10 @@ class TestDatalakeMetastoreMapping:
             "db_transactional_path": "s3a://5a-datalake-prod/transactional/_my_src_/",
             "db_wonka_name": "wonka",
             "db_wonka_path": "s3a://5a-datalake-prod/wonka/historical/_my_src_/",
+            "db_ingestion_name": "datalake__my_src__transactional",
+            "db_ingestion_path": "s3a://5a-datalake-prod/transactional/_my_src_/",
+            "db_transformation_name": "transformation__my_src_",
+            "db_transformation_path": "s3a://5a-datalake-prod/transformation/_my_src_/",
         }
         assert db_info_dict == expected
 
@@ -124,6 +132,30 @@ class TestDatalakeMetastoreMapping:
 
         # assert
         assert schema == "my_schema"
+
+    def test_get_schema_from_database_for_transformation(self):
+        # arrange
+        database = "transformation_my_schema"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
+
+    def test_transformation_database_name_round_trips_to_the_schema(self):
+        """The dependency-file generator derives task names by inverting the
+        database name; a None schema here silently corrupts dependencies.yaml."""
+        # arrange
+        source = "my_schema"
+        mapping = DatalakeMetastoreMapping(source, "a-bucket")
+
+        # act
+        database = mapping.get_full_database_name(LayerEnum.TRANSFORMATION)
+
+        # assert
+        assert database == "transformation_my_schema"
+        assert DatalakeMetastoreMapping.get_schema_from_database(database) == source
 
     def test_get_schema_from_database_for_core(self):
         # arrange
