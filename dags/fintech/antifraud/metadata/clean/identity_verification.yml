@@ -1,0 +1,75 @@
+---
+database_name: datalake_antifraud_clean
+table_name: identity_verification
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: One identity verification session and its lifecycle. The approve/reject verdict is NOT stored here — it lives in antifraud_decision. The status column only tracks where the session is in its lifecycle.
+columns:
+  id:
+    description: Primary key.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.id
+  capture_uuid:
+    description: Public id for the capture session, shared in the links and URLs sent to the user.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.capture_uuid
+  external_reference_uuid:
+    description: Id of who is being verified (e.g. the person).
+    lineage:
+      - datalake_antifraud_raw.identity_verification.external_reference_uuid
+  external_reference_type:
+    description: What external_reference_uuid points to.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.external_reference_type
+  identifier_type:
+    description: Type of the natural identifier we captured.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.identifier_type
+  identifier_hash:
+    description: Deterministic CPF digest (HMAC-SHA256/Base64 with Vault pepper) for equality-based history lookups. Same canonical CPF always yields the same digest.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.identifier_hash
+  requested_checks:
+    description: "Which checks this session must run: BIOMETRY, IDENTITY_DOCUMENT, or both. Must list at least one (enforced by a CHECK)."
+    lineage:
+      - datalake_antifraud_raw.identity_verification.requested_checks
+  context_action_type:
+    description: What the user was trying to do when verification was triggered. Audit context only, not used for routing.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.context_action_type
+  context_action_role:
+    description: The user's role in that action. Audit context only.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.context_action_role
+  status:
+    description: "Where the session is in its lifecycle: PENDING, STARTED, FINISHED or CANCELLED. This is not the verdict."
+    lineage:
+      - datalake_antifraud_raw.identity_verification.status
+  requested_by_service:
+    description: Which service asked for this verification.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.requested_by_service
+  capture_expires_at:
+    description: When the capture session expires and can no longer be used.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.capture_expires_at
+  cancelled_at:
+    description: When it was cancelled. Null unless status is CANCELLED.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.cancelled_at
+  cancel_reason:
+    description: Why it was cancelled. Null unless status is CANCELLED.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.cancel_reason
+  verification_motive:
+    description: Business reason the verification was requested. Closed catalog enforced by ck_iv_verification_motive_catalog.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.verification_motive
+  created_at:
+    description: When the row was created.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.created_at
+  updated_at:
+    description: When the row was last updated.
+    lineage:
+      - datalake_antifraud_raw.identity_verification.updated_at

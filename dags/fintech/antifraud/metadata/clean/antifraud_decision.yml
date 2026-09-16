@@ -1,0 +1,51 @@
+---
+database_name: datalake_antifraud_clean
+table_name: antifraud_decision
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: "The antifraud verdict for any subject (e.g. an identity verification). Rows are never updated: a manual-review override is a new row pointing back at the one it replaces via supersedes_id. The current verdict for a subject is the newest row, ordered by decided_at then id."
+columns:
+  id:
+    description: Primary key.
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.id
+  subject_type:
+    description: What kind of subject this decision is about (e.g. IDENTITY_VERIFICATION).
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.subject_type
+  subject_id:
+    description: Id of the subject in its own table (for IDENTITY_VERIFICATION, identity_verification.id).
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.subject_id
+  verdict:
+    description: "The verdict: APPROVED, REJECTED or UNDER_ANALYSIS."
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.verdict
+  verdict_reason:
+    description: Why this verdict was reached.
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.verdict_reason
+  decided_at:
+    description: When the decision was made. Used to pick the current (newest) decision.
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.decided_at
+  decided_by:
+    description: "Who made the decision: rules_engine or manual_review."
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.decided_by
+  rule_version:
+    description: Version of the ruleset/model in effect when the decision was made.
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.rule_version
+  supersedes_id:
+    description: The earlier decision this row overrides (manual-review chain). Null for original rules_engine decisions.
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.supersedes_id
+  created_at:
+    description: When the row was created.
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.created_at
+  updated_at:
+    description: When the row was last updated.
+    lineage:
+      - datalake_antifraud_raw.antifraud_decision.updated_at

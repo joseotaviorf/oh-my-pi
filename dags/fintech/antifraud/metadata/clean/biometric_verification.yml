@@ -1,0 +1,79 @@
+---
+database_name: datalake_antifraud_clean
+table_name: biometric_verification
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: One biometric check (via bureau partners) for an identity verification. Holds the selfie reference, the score, and the parked state while waiting on the bureau webhook. No row means the biometric check has not started yet.
+columns:
+  id:
+    description: Primary key.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.id
+  identity_verification_id:
+    description: The identity verification this check belongs to.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.identity_verification_id
+  capture_method:
+    description: How the biometric data was captured.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.capture_method
+  external_process_id:
+    description: The bureau's id for this process. Empty until the bureau assigns one.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.external_process_id
+  external_process_entity:
+    description: Which bureau process the external_process_id belongs to.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.external_process_entity
+  external_process_type:
+    description: "The bureau process flavour: BUREAU_ONBOARDING or BUREAU_TRANSACTIONAL."
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.external_process_type
+  status:
+    description: Where this check is in its lifecycle.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.status
+  face_match_result:
+    description: "Whether the face matched: YES, NO or INCONCLUSIVE."
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.face_match_result
+  liveness_result:
+    description: "Whether the person was live: YES, NO or NO_RESULT."
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.liveness_result
+  score:
+    description: Biometric score from 0 to 100 (for now, the bureau scale used as-is).
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.score
+  decision:
+    description: "Bureau decision from the results: APPROVED, REJECTED or INCONCLUSIVE."
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.decision
+  decision_reason:
+    description: Why the bureau decided that (e.g. LIVENESS_FAILED, FACEMATCH_FAILED, HARD_STOP_TIMEOUT).
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.decision_reason
+  decision_issued_at:
+    description: When the bureau issued its decision.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.decision_issued_at
+  force_new:
+    description: True when the journey forced a fresh capture instead of reusing an earlier one.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.force_new
+  result_deadline_at:
+    description: SLA deadline while parked awaiting async bureau result (Flow F hard-stop). NULL when not awaiting.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.result_deadline_at
+  selfie_document_reference:
+    description: Reference to the selfie image.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.selfie_document_reference
+  created_at:
+    description: When the row was created.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.created_at
+  updated_at:
+    description: When the row was last updated.
+    lineage:
+      - datalake_antifraud_raw.biometric_verification.updated_at

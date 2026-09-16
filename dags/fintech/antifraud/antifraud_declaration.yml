@@ -1,0 +1,34 @@
+dag:
+  name: antifraud
+  schedule_start_date: 2026, 09, 12
+  schedule_interval: 0 8 * * *
+  owner: Data Fintech
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: antifraud
+  source_schema: public
+  custom_schema: antifraud
+  lineage_product_database_name: antifraud
+  tables_customization:
+    identity_verification:
+      clean_table_name: identity_verification
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    biometric_verification:
+      clean_table_name: biometric_verification
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    document_verification:
+      clean_table_name: document_verification
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    antifraud_decision:
+      clean_table_name: antifraud_decision
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    consent:
+      clean_table_name: consent
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]

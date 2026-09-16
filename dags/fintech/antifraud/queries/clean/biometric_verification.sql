@@ -1,0 +1,21 @@
+SELECT
+    id,
+    identity_verification_id,
+    capture_method,
+    external_process_id,
+    external_process_entity,
+    external_process_type,
+    status,
+    face_match_result,
+    liveness_result,
+    score,
+    decision,
+    decision_reason,
+    decision_issued_at,
+    force_new,
+    result_deadline_at,
+    selfie_document_reference,
+    created_at,
+    updated_at
+FROM
+    datalake_antifraud_raw.biometric_verification

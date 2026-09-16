@@ -1,0 +1,20 @@
+SELECT
+    id,
+    capture_uuid,
+    external_reference_uuid,
+    external_reference_type,
+    identifier_type,
+    identifier_hash,
+    requested_checks,
+    context_action_type,
+    context_action_role,
+    status,
+    requested_by_service,
+    capture_expires_at,
+    cancelled_at,
+    cancel_reason,
+    verification_motive,
+    created_at,
+    updated_at
+FROM
+    datalake_antifraud_raw.identity_verification

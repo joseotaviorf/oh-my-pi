@@ -1,0 +1,24 @@
+SELECT
+    id,
+    identity_verification_id,
+    consent_id,
+    reused_from_document_verification_id,
+    status,
+    decision,
+    decision_reason,
+    decision_issued_at,
+    document_type,
+    capture_method,
+    external_process_id,
+    external_process_entity,
+    external_process_type,
+    classification_status,
+    ocr_status,
+    needs_manual_info_collection,
+    force_new,
+    document_front_reference,
+    document_back_reference,
+    created_at,
+    updated_at
+FROM
+    datalake_antifraud_raw.document_verification

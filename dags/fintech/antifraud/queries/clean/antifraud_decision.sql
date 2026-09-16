@@ -1,0 +1,14 @@
+SELECT
+    id,
+    subject_type,
+    subject_id,
+    verdict,
+    verdict_reason,
+    decided_at,
+    decided_by,
+    rule_version,
+    supersedes_id,
+    created_at,
+    updated_at
+FROM
+    datalake_antifraud_raw.antifraud_decision

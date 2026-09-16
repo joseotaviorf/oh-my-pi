@@ -1,0 +1,11 @@
+SELECT
+    id,
+    grantor_external_uuid,
+    grantor_external_type,
+    purpose,
+    status,
+    accepted_at,
+    created_at,
+    updated_at
+FROM
+    datalake_antifraud_raw.consent

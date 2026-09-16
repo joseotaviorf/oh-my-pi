@@ -1,0 +1,39 @@
+---
+database_name: datalake_antifraud_clean
+table_name: consent
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: Records whether a person agreed to reuse a document they captured before. Linked to a document attempt through document_verification.consent_id, not directly to identity_verification.
+columns:
+  id:
+    description: Primary key.
+    lineage:
+      - datalake_antifraud_raw.consent.id
+  grantor_external_uuid:
+    description: Id of who gave or refused consent (e.g. the person).
+    lineage:
+      - datalake_antifraud_raw.consent.grantor_external_uuid
+  grantor_external_type:
+    description: What kind of grantor this is.
+    lineage:
+      - datalake_antifraud_raw.consent.grantor_external_type
+  purpose:
+    description: What the consent covers.
+    lineage:
+      - datalake_antifraud_raw.consent.purpose
+  status:
+    description: "Current state: PENDING, ACCEPTED, DECLINED or REVOKED."
+    lineage:
+      - datalake_antifraud_raw.consent.status
+  accepted_at:
+    description: When consent was first accepted. Kept for audit even if it is later revoked.
+    lineage:
+      - datalake_antifraud_raw.consent.accepted_at
+  created_at:
+    description: When the row was created.
+    lineage:
+      - datalake_antifraud_raw.consent.created_at
+  updated_at:
+    description: When the row was last updated.
+    lineage:
+      - datalake_antifraud_raw.consent.updated_at

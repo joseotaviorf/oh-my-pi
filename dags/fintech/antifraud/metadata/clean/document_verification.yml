@@ -1,0 +1,91 @@
+---
+database_name: datalake_antifraud_clean
+table_name: document_verification
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: One document check (via bureau partners) for an identity verification. Holds the document type, how it was captured, the OCR result, and the consent link used for the prior-document-reuse path. No row means the document check has not started yet.
+columns:
+  id:
+    description: Primary key.
+    lineage:
+      - datalake_antifraud_raw.document_verification.id
+  identity_verification_id:
+    description: The identity verification this check belongs to.
+    lineage:
+      - datalake_antifraud_raw.document_verification.identity_verification_id
+  consent_id:
+    description: The consent that authorised this attempt. Only set on the prior-document-reuse path.
+    lineage:
+      - datalake_antifraud_raw.document_verification.consent_id
+  reused_from_document_verification_id:
+    description: If this document was reused, the earlier document_verification it came from.
+    lineage:
+      - datalake_antifraud_raw.document_verification.reused_from_document_verification_id
+  status:
+    description: Where this check is in its lifecycle.
+    lineage:
+      - datalake_antifraud_raw.document_verification.status
+  decision:
+    description: "Bureau decision for the document: APPROVED, REJECTED or INCONCLUSIVE."
+    lineage:
+      - datalake_antifraud_raw.document_verification.decision
+  decision_reason:
+    description: Why the bureau decided that.
+    lineage:
+      - datalake_antifraud_raw.document_verification.decision_reason
+  decision_issued_at:
+    description: When the bureau issued its decision.
+    lineage:
+      - datalake_antifraud_raw.document_verification.decision_issued_at
+  document_type:
+    description: "The kind of document: CNH, RG, RNE, RNMN or PASSPORT."
+    lineage:
+      - datalake_antifraud_raw.document_verification.document_type
+  capture_method:
+    description: "How the document was obtained: prior-image reuse, bureau live capture, or manual upload."
+    lineage:
+      - datalake_antifraud_raw.document_verification.capture_method
+  external_process_id:
+    description: The bureau's id for this process. Empty until the bureau assigns one.
+    lineage:
+      - datalake_antifraud_raw.document_verification.external_process_id
+  external_process_entity:
+    description: Which bureau process the external_process_id belongs to (document process or document analysis).
+    lineage:
+      - datalake_antifraud_raw.document_verification.external_process_entity
+  external_process_type:
+    description: Bureau workflow variant (e.g. PRIOR_DOCUMENT_REUSE, BUREAU_LIVE_CAPTURE, BUREAU_CNH_SERPRO).
+    lineage:
+      - datalake_antifraud_raw.document_verification.external_process_type
+  classification_status:
+    description: "Result of classifying the document: OK, FAILED or PENDING."
+    lineage:
+      - datalake_antifraud_raw.document_verification.classification_status
+  ocr_status:
+    description: "How complete the OCR extraction was: COMPLETE, PARTIAL, MISSING or NOT_APPLICABLE."
+    lineage:
+      - datalake_antifraud_raw.document_verification.ocr_status
+  needs_manual_info_collection:
+    description: True when the journey must ask the user to fill in missing fields by hand.
+    lineage:
+      - datalake_antifraud_raw.document_verification.needs_manual_info_collection
+  force_new:
+    description: True when the journey forced a fresh document instead of reusing an earlier one.
+    lineage:
+      - datalake_antifraud_raw.document_verification.force_new
+  document_front_reference:
+    description: Reference to the front image.
+    lineage:
+      - datalake_antifraud_raw.document_verification.document_front_reference
+  document_back_reference:
+    description: Reference to the back image.
+    lineage:
+      - datalake_antifraud_raw.document_verification.document_back_reference
+  created_at:
+    description: When the row was created.
+    lineage:
+      - datalake_antifraud_raw.document_verification.created_at
+  updated_at:
+    description: When the row was last updated.
+    lineage:
+      - datalake_antifraud_raw.document_verification.updated_at
