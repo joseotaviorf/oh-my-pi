@@ -85,6 +85,9 @@ def create_sst_task(
         "job_name": task_id,
         **parameters,
     }
+    # parse_parameters stringifies every value, so a None (e.g. partition_hour
+    # before the hourly cutover) must be omitted rather than sent as "None".
+    base_parameters = {k: v for k, v in base_parameters.items() if v is not None}
     entry_point = entry_point if entry_point.endswith(".py") else f"{entry_point}.py"
     base_parameters = parse_parameters(base_parameters)
     return dag_execution_context.job_cluster_engine.create_spark_python_task(
@@ -126,6 +129,14 @@ with DAG(
     clean_tasks: List = []
     for object_table, object_conf in OBJECTS_CONFIG.items():
         api_entity = object_conf["api_entity"]
+        # Per-object hourly cutover: only hourly objects receive --partition_hour
+        # (strftime("%H") is always two digits). Daily objects (hourly false or
+        # absent) get None, which create_sst_task drops from the job parameters.
+        partition_hour = (
+            "{{ data_interval_start.strftime('%H') }}"
+            if object_conf.get("hourly", False)
+            else None
+        )
 
         raw_task = create_sst_task(
             dag_execution_context=dag_execution_context,
@@ -135,6 +146,7 @@ with DAG(
             parameters={
                 "api_entity": api_entity,
                 "endpoint": SALESFORCE_ENDPOINT,
+                "partition_hour": partition_hour,
             },
         )
 
@@ -146,6 +158,7 @@ with DAG(
             parameters={
                 "source_schema": RAW_SCHEMA,
                 "sync_hive": "True",
+                "partition_hour": partition_hour,
             },
         )
 

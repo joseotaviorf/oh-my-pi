@@ -18,7 +18,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.sst.configs.salesforce import QUERY_ENDPOINT
 from bietlejuice.base.sst.core.api.request import get_request
 from bietlejuice.base.sst.core.utils.collections import get_chunks
-from bietlejuice.base.sst.core.utils.time import build_start_end_date
+from bietlejuice.base.sst.core.utils.time import (
+    build_hour_window,
+    build_start_end_date,
+)
 from bietlejuice.base.sst.domains.salesforce.api.headers import (
     build_authorization_header,
 )
@@ -273,13 +276,23 @@ def get_updated_lst_system_mod(
     api_entity,
     access_token,
     days=1,
+    partition_hour=None,
 ):
     """
     Some salesforce Objects doesn't support /updated /deleted endpoint.
     For those we're using SystemModStamp
     """
     logger.info("m=get_updated_lst_system_mod, msg=Retrieving UPDATE and DELETE ID's ")
-    start_ts, end_ts = build_start_end_date(partition_date=partition_date, days=days)
+    # "00" is a legitimate hour — always compare against None, never truthiness.
+    if partition_hour is not None:
+        # SOQL below is exclusive on end (< end_ts), so the full hour is correct.
+        start_ts, end_ts = build_hour_window(
+            partition_date, partition_hour, full_hour=True
+        )
+    else:
+        start_ts, end_ts = build_start_end_date(
+            partition_date=partition_date, days=days
+        )
 
     logger.info(
         f"m=get_updated_lst_system_mod, msg=Time range from {start_ts} to {end_ts}"
@@ -299,12 +312,23 @@ def get_updated_lst_system_mod(
 
 
 @logger(exclude_return=True, exclude=["endpoint", "access_token"])
-def get_updated_deleted_lst(endpoint, partition_date, access_token, days=1):
+def get_updated_deleted_lst(
+    endpoint, partition_date, access_token, days=1, partition_hour=None
+):
     updated_endpoint = f"{endpoint}/updated"
     deleted_endpoint = f"{endpoint}/deleted"
 
     logger.info("m=get_updated_deleted_lst, msg=Retrieving UPDATE and DELETE ID's ")
-    start_ts, end_ts = build_start_end_date(partition_date=partition_date, days=days)
+    if partition_hour is not None:
+        # /updated and /deleted treat ``end`` inclusively; stop at HH:59:59 to
+        # avoid double-counting the boundary with the next hour (recovery_flow does the same).
+        start_ts, end_ts = build_hour_window(
+            partition_date, partition_hour, full_hour=False
+        )
+    else:
+        start_ts, end_ts = build_start_end_date(
+            partition_date=partition_date, days=days
+        )
     logger.info(
         f"m=get_updated_deleted_lst, msg=Time range from {start_ts} to {end_ts}"
     )

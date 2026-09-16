@@ -12,15 +12,27 @@ dag_documentation:
 
 datalake_bucket: "5a-datalake-forno"
 
+# Per-object hourly cutover switch: when `hourly` is true the DAG passes
+# --partition_hour (two-digit HH) to that object's raw/clean jobs; when false or
+# absent the flag is omitted and the jobs run at daily granularity.
 objects_config:
   task_v2:
     api_entity: "Task"
+    hourly: false
   case_milestone_v2:
     api_entity: "CaseMilestone"
+    hourly: false
   record_type_v2:
     api_entity: "RecordType"
+    hourly: false
   case_feed_v2:
     api_entity: "CaseFeed"
+    hourly: false
+  # Hourly from day one: bootstraps hour-partitioned; while the DAG schedule is
+  # still daily, each run only covers the 00:00-01:00 window.
+  email_message_v2:
+    api_entity: "EmailMessage"
+    hourly: true
 
 
 cluster:

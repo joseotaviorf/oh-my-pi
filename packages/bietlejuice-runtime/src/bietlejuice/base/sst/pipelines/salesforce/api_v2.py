@@ -61,6 +61,15 @@ PARALELISM = 10
             help="Partition date (YYYY-MM-DD).",
         ),
         dict(
+            name="partition_hour",
+            flags=["--partition_hour", "--partition-hour"],
+            type=str,
+            required=False,
+            default=None,
+            help="Partition hour (HH). Optional; when omitted the job runs at "
+            "daily granularity.",
+        ),
+        dict(
             name="api_entity",
             flags=["--api_entity"],  # "--api-entity"],
             type=str,
@@ -107,6 +116,7 @@ def pipeline_api_raw(cfg):
             partition_date=cfg.partition_date,
             access_token=access_token,
             days=1,
+            partition_hour=cfg.partition_hour,
         )
     else:
         logger.info("m=pipeline_api_raw, msg=Calling SystemMod API endpoint")
@@ -116,6 +126,7 @@ def pipeline_api_raw(cfg):
             api_entity=cfg.api_entity,
             access_token=access_token,
             days=1,
+            partition_hour=cfg.partition_hour,
         )
 
     if len(updated_lst) == 0:
@@ -171,12 +182,14 @@ def pipeline_api_raw(cfg):
         .withColumn("ts_load", F.lit(now))
         .withColumn("partition_date", F.lit(cfg.partition_date))
     )
-    partition_filter = build_partition_filter(
-        {
-            "partition_date": cfg.partition_date,
-        }
-    )
+    partition_filter_cols = {"partition_date": cfg.partition_date}
     partition_cols = ["partition_date"]
+    # "00" is a legitimate hour — compare against None, never truthiness.
+    if cfg.partition_hour is not None:
+        result_df = result_df.withColumn("partition_hour", F.lit(cfg.partition_hour))
+        partition_filter_cols["partition_hour"] = cfg.partition_hour
+        partition_cols.append("partition_hour")
+    partition_filter = build_partition_filter(partition_filter_cols)
     logger.info(f"m=salesforce_raw_pipeline, msg=Partition columns: {partition_cols}")
 
     table_location = f"s3a://{cfg.bucket}/raw/salesforce/{cfg.target_table}"
@@ -203,6 +216,7 @@ def pipeline_api_raw(cfg):
         job_name=job_name,
         partition_date=cfg.partition_date,
         bucket=cfg.bucket,
+        partition_hour=cfg.partition_hour,
     )
     logger.info("m=salesforce_raw_pipeline, msg=All Done!")
 

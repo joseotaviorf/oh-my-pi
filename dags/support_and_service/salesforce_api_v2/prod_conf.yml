@@ -12,15 +12,33 @@ dag_documentation:
 
 datalake_bucket: "5a-datalake-prod"
 
+# Per-object hourly cutover switch: when `hourly` is true the DAG passes
+# --partition_hour (two-digit HH from data_interval_start) to that object's
+# raw/clean jobs; when false or absent the flag is omitted and the jobs run at
+# daily granularity. Before flipping an object to true: hourly schedule + 00:00
+# circuit-breaker, repartition of its raw *_v2 table to
+# [partition_date, partition_hour], and the partition_hour column on
+# datalake_sst_metrics.salesforce_api_logs.
 objects_config:
   task_v2:
     api_entity: "Task"
+    hourly: false
   case_milestone_v2:
     api_entity: "CaseMilestone"
+    hourly: false
   record_type_v2:
     api_entity: "RecordType"
+    hourly: false
   case_feed_v2:
     api_entity: "CaseFeed"
+    hourly: false
+  # Hourly from day one: the table bootstraps already partitioned by
+  # [partition_date, partition_hour], so no repartition is needed at cutover.
+  # NOTE: while the DAG schedule is still daily (00:00), each run only covers
+  # the 00:00-01:00 window — full coverage starts with the hourly-schedule PR.
+  email_message_v2:
+    api_entity: "EmailMessage"
+    hourly: true
 
 
 

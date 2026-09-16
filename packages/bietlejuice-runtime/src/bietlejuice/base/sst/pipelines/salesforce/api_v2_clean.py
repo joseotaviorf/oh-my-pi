@@ -62,6 +62,15 @@ MERGE_MATCH_FIELDS = ["id_record", "_effective_timestamp"]
             help="Partition date (YYYY-MM-DD).",
         ),
         dict(
+            name="partition_hour",
+            flags=["--partition_hour", "--partition-hour"],
+            type=str,
+            required=False,
+            default=None,
+            help="Partition hour (HH). Optional; when omitted the job runs at "
+            "daily granularity.",
+        ),
+        dict(
             name="bucket",
             flags=["--bucket"],
             type=str,
@@ -96,16 +105,21 @@ def salesforce_api_clean_pipeline(cfg):
     source_table = f"{cfg.source_schema}.{cfg.target_table}"
     target_table = f"{cfg.target_schema}.{cfg.target_table}"
 
-    if not partition_has_data(spark, source_table, cfg.partition_date):
+    if not partition_has_data(
+        spark, source_table, cfg.partition_date, cfg.partition_hour
+    ):
         logger.info(
             f"m=salesforce_api_clean_pipeline, msg=No raw data for {source_table} "
-            f"{cfg.partition_date}; exiting"
+            f"{cfg.partition_date} hour={cfg.partition_hour}; exiting"
         )
         return
 
     raw_df = spark.read.table(source_table).where(
         F.col("partition_date") == cfg.partition_date
     )
+    # "00" is a legitimate hour — compare against None, never truthiness.
+    if cfg.partition_hour is not None:
+        raw_df = raw_df.where(F.col("partition_hour") == cfg.partition_hour)
 
     conformed_df = conform_api_clean(raw_df, CONTEXT_COL)
     versioned_df = build_api_versioned_df(
@@ -151,10 +165,16 @@ def salesforce_api_clean_pipeline(cfg):
         )
 
     logger.info("m=salesforce_api_clean_pipeline, msg=Saving volume metric")
+    # Incremental runs align to the target's schema (safe_union_with_target_schema),
+    # so partition_hour only survives to out_df once the clean table carries it —
+    # hence the column-presence guard on top of the hour check.
+    metric_grain = ["partition_date"]
+    if cfg.partition_hour is not None and "partition_hour" in out_df.columns:
+        metric_grain.append("partition_hour")
     save_volume_metric(
         spark=spark,
         df=out_df,
-        grain=["partition_date"],
+        grain=metric_grain,
         metric_name="api_clean_volume",
         table_name=target_table,
         env=cfg.env,

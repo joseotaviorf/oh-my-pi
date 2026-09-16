@@ -109,6 +109,7 @@ def events_case_recovery(
             partition_date=partition_date,
             api_entity=api_entity,
             access_token=access_token,
+            partition_hour=partition_hour,
         )
 
     if not updated_lst and not deleted_lst:
