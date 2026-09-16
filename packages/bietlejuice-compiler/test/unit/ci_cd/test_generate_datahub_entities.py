@@ -593,6 +593,82 @@ class ExtractGoldenQuerySqlsTest(unittest.TestCase):
         md_path.unlink()
         tmp_dir.rmdir()
 
+    def test_per_metric_h4_queries_are_extracted(self) -> None:
+        """Bugbot regression: the redesigned template has no ``## Golden Queries``
+        H2 at all — one ``#### Golden Query`` per metric, nested in ``## Metrics``.
+        Both scanners must see it, or a migrated doc publishes zero Query entities
+        while EXCLUDE_H4_PATTERNS also keeps the SQL out of the description, so the
+        queries vanish from DataHub with nothing going red."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n## Metrics\n\n"
+            "### Metric A\n\n#### Slug\n\nmetric_a\n\n"
+            "#### Golden Query\n\nMonthly value.\n\n```sql\nSELECT 1\n```\n\n"
+            "### Metric B\n\n#### Slug\n\nmetric_b\n\n"
+            "#### Golden Query\n\n```sql\nSELECT 2\nFROM t\n```\n\n"
+            "## Targets and OKRs\n\nNone.\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(
+            g._extract_golden_query_sqls(md_path), ["SELECT 1", "SELECT 2\nFROM t"]
+        )
+        self.assertEqual(g._count_expected_golden_queries(md_path), 2)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_per_metric_queries_win_over_a_leftover_legacy_section(self) -> None:
+        """Bugbot regression: the publisher must apply the same precedence as
+        ``document_parser`` — per-metric queries are authoritative, the legacy H2 is
+        only a fallback. A doc part-way through migration carries both, and summing
+        them would publish the stale copy as an extra Query entity or trip the
+        completeness check against the count CI validated."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n"
+            "## Golden query: leftover from the old format\n\n"
+            "```sql\nSELECT 'stale'\n```\n\n"
+            "## Metrics\n\n### Metric A\n\n"
+            "#### Golden Query\n\n```sql\nSELECT 1\n```\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(g._extract_golden_query_sqls(md_path), ["SELECT 1"])
+        self.assertEqual(g._count_expected_golden_queries(md_path), 1)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_legacy_section_still_used_when_no_per_metric_query_exists(self) -> None:
+        """The fallback half of that precedence: an unmigrated doc is untouched."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n## Golden Queries\n\n"
+            "### Query 1\n\n```sql\nSELECT 1\n```\n\n"
+            "## Metrics\n\n### Metric A\n\n#### Slug\n\nmetric_a\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(g._extract_golden_query_sqls(md_path), ["SELECT 1"])
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_h4_zone_closes_at_the_next_metric_heading(self) -> None:
+        """An H4 zone holds exactly one query, so a fenced block belonging to a
+        later, non-query subsection must not be swept in."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n## Metrics\n\n### Metric A\n\n"
+            "#### Golden Query\n\n```sql\nSELECT 1\n```\n\n"
+            "#### Rules\n\n```sql\nSELECT 'not a golden query'\n```\n\n"
+            "### Metric B\n\n#### Description\n\nNo query here.\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(g._extract_golden_query_sqls(md_path), ["SELECT 1"])
+        self.assertEqual(g._count_expected_golden_queries(md_path), 1)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
     def test_count_matches_count_expected_golden_queries(self) -> None:
         """Invariant relied on by _inject_golden_query_sqls's positional injection."""
         tmp_dir = Path(tempfile.mkdtemp())
@@ -992,6 +1068,127 @@ class MbrTest(unittest.TestCase):
         self.assertRegex(out, r"data_product_type: metric\nmbr:\n")
 
 
+_METRICS_SECTION_MD = """\
+# Demo
+
+## Description
+
+Body.
+
+## Metrics
+
+### NPS True
+
+#### Slug
+
+nps_true
+
+#### Type
+
+OKR
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+Quality
+
+#### Golden Query
+
+Monthly value.
+
+```sql
+SELECT count(*) FROM dw.t
+```
+
+### NPS Onboarding
+
+#### Slug
+
+nps_onboarding
+
+#### Type
+
+health metric
+
+#### Golden Query
+
+```sql
+SELECT count(*) FROM dw.u
+```
+"""
+
+
+class MetricsSectionTest(unittest.TestCase):
+    """The redesigned ## Metrics section feeds the same structured properties as the
+    legacy ## Catalog table — the published Data Product must not change shape."""
+
+    def _md(self, body: str) -> Path:
+        tmp = Path(tempfile.mkdtemp()) / "entity.md"
+        tmp.write_text(body, encoding="utf-8")
+        return tmp
+
+    def test_extract_metrics_blocks_reads_name_and_type(self) -> None:
+        catalog, _ = g._extract_metrics_blocks(self._md(_METRICS_SECTION_MD))
+        self.assertEqual(
+            catalog,
+            [
+                {"name": "NPS True", "type": "OKR"},
+                # Type is normalized to the canonical spelling, as ## Catalog did.
+                {"name": "NPS Onboarding", "type": "Health Metric"},
+            ],
+        )
+
+    def test_extract_metrics_blocks_reads_per_metric_mbr_and_category(self) -> None:
+        _, mbrs = g._extract_metrics_blocks(self._md(_METRICS_SECTION_MD))
+        self.assertEqual(mbrs, [{"name": "Post Contract", "category": "Quality"}])
+
+    def test_extract_metrics_blocks_absent_section_returns_empty(self) -> None:
+        # This is what makes the caller fall back to the legacy ## Catalog path.
+        md_path = self._md("# Demo\n\n## Catalog\n\n| Metric | Type |\n")
+        self.assertEqual(g._extract_metrics_blocks(md_path), ([], []))
+
+    def test_extract_metrics_blocks_skips_unfilled_template_placeholders(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Metrics\n\n### {Metric Name A}\n\n#### Type\n\nOKR\n"
+        )
+        self.assertEqual(g._extract_metrics_blocks(md_path), ([], []))
+
+    def test_golden_query_is_kept_out_of_the_description(self) -> None:
+        # The redesigned template nests the SQL inside the metric block, out of reach
+        # of the ``## `` exclusions — it must not leak into the published description.
+        description = g._extract_description_from_md(self._md(_METRICS_SECTION_MD))
+        self.assertNotIn("SELECT count(*)", description)
+        self.assertNotIn("Golden Query", description)
+        # The narrative around it survives.
+        self.assertIn("### NPS True", description)
+        self.assertIn("Post Contract", description)
+
+    def test_per_metric_aliases_are_kept_out_of_the_description(self) -> None:
+        # Aliases are routing metadata, published as glossary terms. The entity-level
+        # ``## Glossary and Synonyms`` was always excluded; moving the list under each
+        # metric must not smuggle it into the narrative through ``## Metrics``.
+        md_path = self._md(
+            "# Demo\n\n## Metrics\n\n### NPS True\n\n#### Description\n\nBody.\n\n"
+            "#### Also Known As\n\n- **nota de satisfação**\n\n#### Rules\n\nFilter.\n"
+        )
+        description = g._extract_description_from_md(md_path)
+        self.assertNotIn("nota de satisfação", description)
+        self.assertNotIn("Also Known As", description)
+        self.assertIn("Body.", description)
+        self.assertIn("Filter.", description)
+
+    def test_domain_section_is_kept_out_of_the_description(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Domain\n\nFor Rent\n\n## Description\n\nBody.\n"
+        )
+        description = g._extract_description_from_md(md_path)
+        self.assertNotIn("For Rent", description)
+        self.assertIn("Body.", description)
+
+
 class CatalogTest(unittest.TestCase):
     def _md(self, body: str) -> Path:
         tmp = Path(tempfile.mkdtemp()) / "entity.md"
@@ -1292,7 +1489,9 @@ class GoldenQueryCompletenessTest(unittest.TestCase):
         actual = g._count_golden_queries_in_yaml(truncated_yaml)
         self.assertEqual(expected, 9)
         self.assertEqual(actual, 2)
-        self.assertLess(actual, expected)
+        error = g._golden_query_count_error(expected, actual)
+        self.assertIsNotNone(error)
+        self.assertIn("incomplete/truncated", error)
         md_path.unlink()
         md_path.parent.rmdir()
 
@@ -1307,8 +1506,24 @@ class GoldenQueryCompletenessTest(unittest.TestCase):
         expected = g._count_expected_golden_queries(md_path)
         actual = g._count_golden_queries_in_yaml(complete_yaml)
         self.assertEqual(expected, actual)
+        self.assertIsNone(g._golden_query_count_error(expected, actual))
         md_path.unlink()
         md_path.parent.rmdir()
+
+    def test_extra_query_in_yaml_blocks_publishing(self) -> None:
+        """Bugbot regression: the check used to fire only on too few. With H4-over-H2
+        precedence, a part-migrated doc yields fewer extracted queries than the model
+        emitted — positional SQL injection then bails on the 1:1 mismatch and every
+        query publishes with placeholder text, while the one-sided check stayed green
+        because 2 is not fewer than 1."""
+        error = g._golden_query_count_error(expected=1, actual=2)
+        self.assertIsNotNone(error)
+        self.assertIn("leftover", error)
+
+    def test_no_declared_queries_is_not_a_mismatch(self) -> None:
+        """An entity legitimately without golden queries is not held to the check."""
+        self.assertIsNone(g._golden_query_count_error(expected=0, actual=0))
+        self.assertIsNone(g._golden_query_count_error(expected=0, actual=2))
 
 
 class CallLlmTruncationTest(unittest.TestCase):

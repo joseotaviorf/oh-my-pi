@@ -45,57 +45,77 @@ _VALID_METRIC = """\
 **Data Steward:**
 - steward@quintoandar.com.br
 
-## Overview
+## Description
 
-My Metric is the official indicator for something, computed monthly.
+My Metric groups the official indicators for something, computed monthly.
+
+## Domain
+
+For Rent
+
+## Glossary and Synonyms
+
+- **My Metric** → My Metric
 
 ## Related Domain Entities
 
 - Contact
 
-## Catalog
+## Metrics
 
-| Metric | Type |
-| :---- | :---- |
-| My Metric | OKR |
+### My Metric
 
-## Glossary and Synonyms
+#### Slug
 
-- **My Metric** → this metric
+my_metric
 
-## Scope
+#### Description
 
-**Included**: everything relevant.
+My Metric is numerator / denominator, computed monthly.
 
-**Excluded**: test data.
+#### Also Known As
 
-## Calculation
+- **minha métrica**
 
-My Metric = numerator / denominator.
+#### Rules
 
-### Canonical Filter
+Canonical filter: status = 'active'. Never sum across segments.
 
-Apply on `schema.my_table`:
+#### Type
 
-```sql
-is_current = true
-```
+OKR
 
-### Nuances
+#### Direction
 
-No external weight table.
+Higher is better
 
-## Dos and Don'ts
+#### Grain
 
-**Do:**
+monthly
 
-- Use the canonical filter.
+#### Is Additive
 
-**Don't:**
+false
 
-- Don't hardcode weights.
+#### Business Stage
 
-## Golden Queries
+Post Contract
+
+#### Acronym
+
+MM
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+Quality
+
+#### Golden Query
+
+Monthly value of My Metric.
 
 ```sql
 SELECT count(*) FROM schema.my_table
@@ -195,7 +215,7 @@ def test_valid_domain_doc_has_no_errors(tmp_path: Path):
 # ── structural failures (reused validate_parsed_document) ───────────────────────
 
 
-def test_missing_h1_and_overview_are_errors(tmp_path: Path):
+def test_missing_h1_and_description_are_errors(tmp_path: Path):
     p = _write(
         tmp_path / "llm_context",
         "metric_entities",
@@ -204,7 +224,24 @@ def test_missing_h1_and_overview_are_errors(tmp_path: Path):
     )
     errors, _ = _validate_file(p)
     assert any("H1 title" in e for e in errors)
+    # No ## Metrics heading, so the legacy metric contract applies and the missing
+    # narrative section is named ## Overview rather than ## Description.
     assert any("Overview" in e for e in errors)
+
+
+def test_domain_outside_allowlist_is_an_error(tmp_path: Path):
+    # The allowlist check lives in this entrypoint, not in document_parser, because the
+    # parser is kept stdlib-only for tars-evals. Guard that it is actually wired in.
+    md = _VALID_METRIC.replace("## Domain\n\nFor Rent", "## Domain\n\nRenting")
+    p = _write(tmp_path / "llm_context", "metric_entities", "m.md", md)
+    errors, _ = _validate_file(p)
+    assert any("allowlist" in e for e in errors), errors
+
+
+def test_domain_inside_allowlist_is_accepted(tmp_path: Path):
+    p = _write(tmp_path / "llm_context", "metric_entities", "m.md", _VALID_METRIC)
+    errors, _ = _validate_file(p)
+    assert errors == []
 
 
 def test_domain_requires_tables_and_golden_queries(tmp_path: Path):
@@ -317,7 +354,9 @@ def test_output_labels_type_and_points_to_template_on_failure(tmp_path, capsys):
     combined = "".join(capsys.readouterr())
 
     assert rc == 1  # the bad doc fails the run
-    assert "Scope" in combined  # scope is spelled out
+    # A missing section is spelled out by name. Glossary is required by both the
+    # redesigned and the legacy metric contract, so the assertion holds either way.
+    assert "Glossary" in combined
     assert "(metric)" in combined  # the applied contract type is labelled
     # a failing doc points the author at the matching template
     assert "metric_entities/_TEMPLATE.md" in combined
@@ -344,15 +383,17 @@ def test_pr_comment_body_lists_each_failing_doc():
                 "docs/llm_context/metric_entities/x.md",
                 "metric",
                 [
-                    "The `## Scope` section is missing or empty.",
-                    "Missing ## Golden Queries",
+                    "Missing ## Description section",
+                    "Missing ## Metrics section with at least one ### metric subsection",
                 ],
             ),
         ]
     )
     assert "x.md" in body and "(metric)" in body
-    assert "- The `## Scope` section is missing or empty." in body
-    assert "- Missing ## Golden Queries" in body
+    assert "- Missing ## Description section" in body
+    assert (
+        "- Missing ## Metrics section with at least one ### metric subsection" in body
+    )
 
 
 def test_maybe_comment_posts_on_a_luigi_pr(monkeypatch):

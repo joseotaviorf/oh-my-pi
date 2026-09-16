@@ -16,11 +16,11 @@ This metric entity is a **separate document from the Cohort View** because of on
 
 **A reply is not necessarily caused by the cadence.** A customer can re-engage on WhatsApp in the 2-day gap before the first trigger (`rehabilitation_trigger_count = '0'`) or long after leaving the cadence. Read recapture by cadence stage rather than assuming attribution.
 
+**Source of truth:** `datalake_consorcio.deal` + `datalake_consorcio.deal_milestone`, joined 1:1 on `id_deal`. These tables already resolve the pipeline filter, the one-row-per-deal dedup, test/duplicate exclusion, origin/segment mapping, the funnel milestones and flags, and analyst attribution — none of that needs to be rebuilt in a query. Column names throughout this document are the **table** column names.
+
 ## Related Domain Entities
 
 - Consórcio
-
-**Source of truth:** `datalake_consorcio.deal` + `datalake_consorcio.deal_milestone`, joined 1:1 on `id_deal`. These tables already resolve the pipeline filter, the one-row-per-deal dedup, test/duplicate exclusion, origin/segment mapping, the funnel milestones and flags, and analyst attribution — none of that needs to be rebuilt in a query. Column names throughout this document are the **table** column names.
 
 ## Catalog
 

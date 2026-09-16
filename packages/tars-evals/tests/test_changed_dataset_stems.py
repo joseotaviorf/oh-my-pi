@@ -401,96 +401,33 @@ def test_build_reverse_index_empty_docs(cds):
 
 
 # --------------------------------------------------------------------------
-# parse_related_metric_entities
+# business_display_name / business_kebab_id
 # --------------------------------------------------------------------------
 
 
-def test_parse_related_metric_entities_bullets(cds):
-    markdown = (
-        "## Related Metric Entities\n\n- NPS FR\n- Offboard Human vs Digital Metrics\n"
+def test_business_display_name_reads_h1(cds):
+    assert cds.business_display_name("# Finance Revenue and Cost\n\n## Overview\n") == (
+        "Finance Revenue and Cost"
     )
-    assert cds.parse_related_metric_entities(markdown) == [
-        "nps_fr",
-        "offboard_human_vs_digital_metrics",
-    ]
 
 
-def test_parse_related_metric_entities_no_section(cds):
-    assert cds.parse_related_metric_entities("## Overview\n\nSome text.\n") is None
-
-
-def test_parse_related_metric_entities_present_but_empty_stays_unresolved(cds):
-    """A heading with nothing filled in is indistinguishable from an
-    unfinished template — must still return ``None`` (unresolved), matching
-    the orphan-fixture contract in
-    ``tests/fixtures/llm_context/business_orphan.md`` /
-    ``test_orphan_business_doc_fails_closed_and_budget_aborts``, which relies
-    on exactly this shape still failing closed."""
-    markdown = "## Related Metric Entities\n\n## Dos and Don'ts\n"
-    assert cds.parse_related_metric_entities(markdown) is None
-
-
-def test_parse_related_metric_entities_comment_only_stays_unresolved(cds):
-    """A bare note with no explicit 'None' sentinel must not resolve the
-    doc — only an explicit sentinel (see
-    ``test_parse_related_metric_entities_explicit_none_sentinel``) does."""
-    markdown = (
-        "## Related Metric Entities\n\n"
-        "<!-- TODO: fill this in. -->\n\n"
-        "## Dos and Don'ts\n"
-    )
-    assert cds.parse_related_metric_entities(markdown) is None
-
-
-def test_parse_related_metric_entities_explicit_none_sentinel(cds):
-    """An authored 'None' bullet is an unambiguous declaration of zero
-    relationships — must resolve to ``[]``, not ``None`` (see the Agents
-    domain, PR #27459, which has no related metric entities as of 2026-08)."""
-    markdown = (
-        "## Related Metric Entities\n\n"
-        "- None — no metric entity doc references this domain as of 2026-08.\n\n"
-        "## Dos and Don'ts\n"
-    )
-    assert cds.parse_related_metric_entities(markdown) == []
-
-
-def test_parse_related_metric_entities_none_sentinel_mixed_with_real_bullet(cds):
-    """A 'None' bullet alongside a real link is a doc-authoring mistake, but
-    the real link must still be honored — 'none' only suppresses itself."""
-    markdown = "## Related Metric Entities\n\n- NPS FR\n- (none)\n"
-    assert cds.parse_related_metric_entities(markdown) == ["nps_fr"]
-
-
-def test_parse_related_metric_entities_dedupes(cds):
-    markdown = "## Related Metric Entities\n\n- NPS FR\n- NPS FR\n"
-    assert cds.parse_related_metric_entities(markdown) == ["nps_fr"]
-
-
-def test_parse_related_metric_entities_strips_bold(cds):
-    markdown = "## Related Metric Entities\n\n- **NPS FR**\n"
-    assert cds.parse_related_metric_entities(markdown) == ["nps_fr"]
-
-
-def test_parse_related_metric_entities_case_insensitive_heading(cds):
-    markdown = "## related metric entities\n\n- NPS FR\n"
-    assert cds.parse_related_metric_entities(markdown) == ["nps_fr"]
-
-
-# --------------------------------------------------------------------------
-# business_kebab_id
-# --------------------------------------------------------------------------
+def test_business_display_name_ignores_h2_and_missing_h1(cds):
+    assert cds.business_display_name("## Overview\n\nSome text.\n") is None
 
 
 @pytest.mark.parametrize(
-    ("stem", "expected"),
+    ("name", "expected"),
     [
         ("house_and_listing", "house-and-listing"),
+        ("House and Listing", "house-and-listing"),
         ("nps", "nps"),
         ("fs-transact", "fs-transact"),
+        # Accents collapse, but identically on both sides, so they still match.
+        ("Consórcio", "cons-rcio"),
     ],
 )
-def test_business_kebab_id(cds, stem, expected):
-    assert cds.business_kebab_id(stem) == expected
+def test_business_kebab_id(cds, name, expected):
+    assert cds.business_kebab_id(name) == expected
 
 
 # --------------------------------------------------------------------------
@@ -500,108 +437,132 @@ def test_business_kebab_id(cds, stem, expected):
 
 def test_fan_out_resolves_via_reverse_index(cds):
     entry = _entry(cds, "M", "docs/llm_context/domain_entities/nps.md")
-    fanned, unresolved = cds.fan_out(
+    fanned = cds.fan_out(
         [entry],
         reverse_index={"nps": {"nps_fr"}},
-        read_business_doc=lambda e: "## Overview\n",
+        read_business_doc=lambda e: "# NPS\n",
     )
     assert fanned == {"nps_fr"}
-    assert unresolved == []
 
 
-def test_fan_out_resolves_via_own_backlinks(cds):
-    entry = _entry(cds, "A", "docs/llm_context/domain_entities/house_and_listing.md")
-    text = "## Related Metric Entities\n\n- Listing To Rental\n"
-    fanned, unresolved = cds.fan_out(
-        [entry], reverse_index={}, read_business_doc=lambda e: text
-    )
-    assert fanned == {"listing_to_rental"}
-    assert unresolved == []
-
-
-def test_fan_out_unions_both_sources(cds):
-    entry = _entry(cds, "M", "docs/llm_context/domain_entities/nps.md")
-    text = "## Related Metric Entities\n\n- Offboard Human vs Digital Metrics\n"
-    fanned, unresolved = cds.fan_out(
+def test_fan_out_resolves_via_h1_when_title_differs_from_filename(cds):
+    """``finance_revenue_cost.md`` is titled "Finance Revenue and Cost", which
+    is the name its five metric docs cite. Matching on the file stem alone
+    silently resolved it to zero."""
+    entry = _entry(cds, "M", "docs/llm_context/domain_entities/finance_revenue_cost.md")
+    fanned = cds.fan_out(
         [entry],
-        reverse_index={"nps": {"nps_fr"}},
-        read_business_doc=lambda e: text,
+        reverse_index={"finance-revenue-and-cost": {"ongoing_uc_fr"}},
+        read_business_doc=lambda e: "# Finance Revenue and Cost\n\n## Overview\n",
     )
-    assert fanned == {"nps_fr", "offboard_human_vs_digital_metrics"}
-    assert unresolved == []
+    assert fanned == {"ongoing_uc_fr"}
 
 
-def test_fan_out_unresolved_when_both_sources_empty(cds):
+def test_fan_out_no_related_metrics_is_silent_zero(cds):
+    """Most domain docs have no metric doc pointing at them — that is the
+    normal state, not an anomaly, so it resolves to zero without a warning."""
     entry = _entry(cds, "A", "docs/llm_context/domain_entities/brand_new.md")
-    fanned, unresolved = cds.fan_out(
-        [entry], reverse_index={}, read_business_doc=lambda e: "## Overview\n"
+    fanned = cds.fan_out(
+        [entry], reverse_index={}, read_business_doc=lambda e: "# Brand New\n"
     )
     assert fanned == set()
-    assert unresolved == ["brand_new"]
 
 
-def test_fan_out_empty_section_without_sentinel_still_unresolved(cds):
-    """A bare, empty '## Related Metric Entities' heading must still fall
-    back (matches the orphan-fixture contract) — only an explicit 'None'
-    sentinel resolves a domain to zero (see the next test)."""
-    entry = _entry(cds, "M", "docs/llm_context/domain_entities/orphan.md")
-    text = "## Related Metric Entities\n\n## Dos and Don'ts\n"
-    fanned, unresolved = cds.fan_out(
+def test_fan_out_ignores_own_related_metric_entities_section(cds):
+    """The domain side is no longer a source of the relationship: metric docs
+    declare it upward and CI inverts that."""
+    entry = _entry(cds, "M", "docs/llm_context/domain_entities/legacy.md")
+    text = "# Legacy\n\n## Related Metric Entities\n\n- Listing To Rental\n"
+    fanned = cds.fan_out(
         [entry], reverse_index={}, read_business_doc=lambda e: text
     )
     assert fanned == set()
-    assert unresolved == ["orphan"]
 
 
-def test_fan_out_explicit_none_sentinel_is_resolved_not_unresolved(cds):
-    """A domain with an explicit 'None' sentinel (e.g. Agents — see PR
-    #27459) must NOT fall back to the unresolved/evaluate-everything path."""
-    entry = _entry(cds, "M", "docs/llm_context/domain_entities/agents.md")
-    text = "## Related Metric Entities\n\n- None — no related metrics.\n"
-    fanned, unresolved = cds.fan_out(
-        [entry], reverse_index={}, read_business_doc=lambda e: text
-    )
-    assert fanned == set()
-    assert unresolved == []
-
-
-def test_fan_out_deleted_doc_still_resolves_via_reverse_index(cds):
+def test_fan_out_deleted_doc_still_resolves_via_stem(cds):
+    """A deleted doc can't be read, so the file stem is the only lookup left."""
     entry = _entry(cds, "D", "docs/llm_context/domain_entities/nps.md")
-    fanned, unresolved = cds.fan_out(
+    fanned = cds.fan_out(
         [entry], reverse_index={"nps": {"nps_fr"}}, read_business_doc=lambda e: None
     )
     assert fanned == {"nps_fr"}
-    assert unresolved == []
 
 
-def test_fan_out_rename_resolves_via_old_path_reverse_index(cds):
+def test_fan_out_rename_resolves_via_old_path(cds):
     entry = _entry(
         cds,
         "R",
         "docs/llm_context/domain_entities/renamed_entity.md",
         old_path="docs/llm_context/domain_entities/original_entity.md",
     )
-    fanned, unresolved = cds.fan_out(
+    fanned = cds.fan_out(
         [entry],
         reverse_index={"original-entity": {"related_metric"}},
-        read_business_doc=lambda e: "## Overview\n",
+        read_business_doc=lambda e: "# Renamed Entity\n",
     )
     assert fanned == {"related_metric"}
-    assert unresolved == []
 
 
-def test_fan_out_multiple_entries_mixed_resolution(cds):
+def test_fan_out_multiple_entries_unions_matches(cds):
     entries = [
         _entry(cds, "M", "docs/llm_context/domain_entities/nps.md"),
         _entry(cds, "A", "docs/llm_context/domain_entities/mystery.md"),
     ]
-    fanned, unresolved = cds.fan_out(
+    fanned = cds.fan_out(
         entries,
         reverse_index={"nps": {"nps_fr"}},
-        read_business_doc=lambda e: "## Overview\n",
+        read_business_doc=lambda e: "# Doc\n",
     )
     assert fanned == {"nps_fr"}
-    assert unresolved == ["mystery"]
+
+
+# --------------------------------------------------------------------------
+# load_business_ids / find_dangling_domain_references
+# --------------------------------------------------------------------------
+
+
+def test_load_business_ids_indexes_both_title_and_stem(cds, tmp_path):
+    (tmp_path / "finance_revenue_cost.md").write_text(
+        "# Finance Revenue and Cost\n", encoding="utf-8"
+    )
+    (tmp_path / "_TEMPLATE.md").write_text("# Template\n", encoding="utf-8")
+    assert cds.load_business_ids(tmp_path) == {
+        "finance-revenue-cost",
+        "finance-revenue-and-cost",
+    }
+
+
+def test_load_business_ids_missing_dir_is_empty(cds, tmp_path):
+    assert cds.load_business_ids(tmp_path / "nope") == set()
+
+
+def test_find_dangling_domain_references_flags_unknown_business_id(cds):
+    dangling = cds.find_dangling_domain_references(
+        {"consorcio_cohort"},
+        reverse_index={"cons-rcio-inside-sales-funnel": {"consorcio_cohort"}},
+        known_business_ids={"cons-rcio"},
+    )
+    assert dangling == [("cons-rcio-inside-sales-funnel", ["consorcio_cohort"])]
+
+
+def test_find_dangling_domain_references_ignores_known_business_id(cds):
+    dangling = cds.find_dangling_domain_references(
+        {"nps_fr"},
+        reverse_index={"nps": {"nps_fr"}},
+        known_business_ids={"nps"},
+    )
+    assert dangling == []
+
+
+def test_find_dangling_domain_references_scoped_to_changed_metric_docs(cds):
+    """A pre-existing bad bullet in an untouched doc must not warn on every
+    unrelated PR — only the PR that changes the citing doc."""
+    dangling = cds.find_dangling_domain_references(
+        {"nps_fr"},
+        reverse_index={"ghost-domain": {"some_other_metric"}, "nps": {"nps_fr"}},
+        known_business_ids={"nps"},
+    )
+    assert dangling == []
 
 
 # --------------------------------------------------------------------------

@@ -9,11 +9,15 @@ Two changed-doc directories are tracked:
 
 - ``docs/llm_context/metric_entities/<stem>.md`` maps 1:1 to a dataset stem.
 - ``docs/llm_context/domain_entities/<stem>.md`` fans out to related metric
-  stems via a reverse index over metric docs' ``## Related Domain Entities``
-  plus the business doc's own ``## Related Metric Entities`` back-links. When a
-  changed business doc resolves to zero metric stems, the run **warns and skips**
-  eval/drift for that doc (merge allowed) instead of fail-closed fan-out to every
-  dataset stem in the repo.
+  stems via a reverse index over metric docs' ``## Related Domain Entities``.
+  Metric docs declare the relationship upward and CI inverts it; that is the
+  only direction. A domain doc that matches no index key simply has no metric
+  doc pointing at it — the normal state for most domain docs — so it resolves
+  to zero stems and never fans out to every dataset stem in the repo.
+
+A metric doc citing a domain entity that no doc answers to is warned about on
+the PR that introduces it (see ``find_dangling_domain_references``), which is
+the only place the typo can be fixed.
 
 Two stem lists are emitted:
 
@@ -54,7 +58,7 @@ import os
 import re
 import subprocess
 import sys
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Collection, Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -440,24 +444,6 @@ def build_reverse_index(
 _H2_RE = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 
 
-def _split_h2_sections(markdown: str) -> dict[str, str]:
-    """Minimal local H2 splitter: lowercased heading -> body text.
-
-    Deliberately duplicated (not imported) from
-    ``document_parser._split_sections`` — that function is private API of a
-    module we don't own, and this only needs one heading, not the full
-    section-splitting behavior (DataHub escaping, H3 sub-parsing, etc).
-    """
-    matches = list(_H2_RE.finditer(markdown))
-    sections: dict[str, str] = {}
-    for idx, match in enumerate(matches):
-        title = match.group(1).strip().lower()
-        start = match.end()
-        end = matches[idx + 1].start() if idx + 1 < len(matches) else len(markdown)
-        sections[title] = markdown[start:end].strip()
-    return sections
-
-
 # --------------------------------------------------------------------------
 # eval-relevance filter (metadata-only edits)
 # --------------------------------------------------------------------------
@@ -693,71 +679,31 @@ def entry_is_contract_rename_only(
     return is_contract_rename_only(old_text, new_text)
 
 
-def parse_related_metric_entities(markdown: str) -> list[str] | None:
-    """Parse a business doc's own ``## Related Metric Entities`` bullets.
+_H1_RE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
 
-    Converts Title Case display names (e.g. ``- NPS FR``) into metric-doc
-    stems (``nps_fr``) using the same bullet syntax as
-    ``document_parser._parse_related_data_products``, but slugifying to
-    snake_case (matching metric filenames) instead of kebab-case.
 
-    Returns ``None`` when the heading is absent, OR when it is present but
-    empty (no bullets, or only comments/whitespace) — both are "no
-    information from this doc," and the caller must still fail closed. This
-    matches the orphan-fixture contract in
-    ``tests/fixtures/llm_context/business_orphan.md`` /
-    ``test_orphan_business_doc_fails_closed_and_budget_aborts``: a heading
-    with nothing filled in looks identical to an unfinished template, so it
-    is deliberately NOT treated as a resolved "zero relationships" answer.
+def business_display_name(markdown: str) -> str | None:
+    """A business doc's declared H1 title, or ``None`` when it has no H1.
 
-    Returns a list — possibly empty — only when the section contains an
-    explicit sentinel bullet whose text starts with "none" (case-insensitive,
-    optionally wrapped in ``()``/``**``, e.g. ``- None`` or
-    ``- None — no metric entity doc references this domain as of 2026-08.``).
-    That is an unambiguous, authored declaration of zero relationships,
-    distinct from an empty/omitted section, and lets ``fan_out`` resolve the
-    doc without falling back to evaluating every dataset stem in the repo
-    (see the Agents-domain incident this fixes: PR #27459).
-
-    A bare HTML comment line (``<!-- ... -->``) is ignored (not parsed as a
-    stem or a sentinel), so a doc can add supplementary notes without them
-    becoming bogus stems.
+    This is the name metric docs cite in their ``## Related Domain Entities``
+    bullets, and it does not always equal the filename — e.g.
+    ``finance_revenue_cost.md`` is titled "Finance Revenue and Cost", so
+    matching on the stem alone would miss the five metric docs that cite it.
     """
-    sections = _split_h2_sections(markdown)
-    if "related metric entities" not in sections:
-        return None
-    body = sections["related metric entities"]
-    stems: list[str] = []
-    seen: set[str] = set()
-    explicit_none = False
-    for line in body.splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        if stripped.startswith("<!--") and stripped.endswith("-->"):
-            continue
-        if stripped.startswith("- "):
-            name = stripped[2:].strip().strip("*").strip()
-        else:
-            name = stripped.strip("*").strip()
-        if name.strip("()").strip().lower().startswith("none"):
-            explicit_none = True
-            continue
-        stem = re.sub(r"[^a-zA-Z0-9]+", "_", name.strip().lower()).strip("_")
-        if stem and stem not in seen:
-            seen.add(stem)
-            stems.append(stem)
-    if not stems and not explicit_none:
-        return None
-    return stems
+    match = _H1_RE.search(markdown)
+    return match.group(1).strip() if match else None
 
 
-def business_kebab_id(stem: str) -> str:
-    """File-stem -> kebab business id, matching ``document_parser``'s
-    ``_display_name_to_product_id`` convention (e.g. ``house_and_listing`` ->
-    ``house-and-listing``, the id a metric doc's own bullet would produce).
+def business_kebab_id(name: str) -> str:
+    """Display name -> kebab business id, mirroring ``document_parser``'s
+    ``_display_name_to_product_id`` — the id a metric doc's bullet produces
+    (``House and Listing`` / ``house_and_listing`` -> ``house-and-listing``).
+
+    Non-ASCII letters collapse to ``-`` (``Consórcio`` -> ``cons-rcio``). That
+    is lossy but *identical* on both sides, since the metric doc's bullet goes
+    through the same slugifier, so accented names still match each other.
     """
-    return stem.replace("_", "-")
+    return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
 
 
 def fan_out(
@@ -765,40 +711,74 @@ def fan_out(
     *,
     reverse_index: Mapping[str, set[str]],
     read_business_doc: Callable[[DiffEntry], str | None],
-) -> tuple[set[str], list[str]]:
-    """Resolve changed business docs to metric stems.
+) -> set[str]:
+    """Resolve changed business docs to the metric stems that depend on them.
 
-    ``read_business_doc`` returns the current markdown text for a changed
-    business doc, or ``None`` when it can't be read (e.g. the doc was
-    deleted). Returns ``(fanned_out_metric_stems, unresolved_business_stems)``
-    — a non-empty ``unresolved_business_stems`` is surfaced as a CI warning and
-    does not expand scope to every dataset stem (see ``resolve_scope``).
+    The reverse index is the only source of the relationship: metric docs
+    declare it upward in ``## Related Domain Entities`` and CI inverts it.
+    A doc that matches no index key has no metric doc pointing at it, which is
+    the normal state for most domain docs (there are far more domain docs than
+    metric docs), so it resolves to zero stems without a warning. The typo case
+    — a metric doc naming a domain entity nobody answers to — is caught on the
+    metric side by ``find_dangling_domain_references``.
 
-    A doc whose ``## Related Metric Entities`` section contains an explicit
-    ``- None`` sentinel (``parse_related_metric_entities`` returns ``[]``, not
-    ``None``) is resolved with zero fanned-out stems and is never unresolved.
+    Lookup is by the display name the doc declares in its H1, because that is
+    the name metric docs cite; the file stem is tried too, for docs whose title
+    and filename agree and for deleted docs, which can't be read.
+    ``read_business_doc`` returns the doc's current markdown, or ``None`` when
+    it can't be read.
     """
     fanned: set[str] = set()
-    unresolved: list[str] = []
     for entry in business_entries:
-        lookup_stems = [Path(entry.path).stem]
-        if entry.old_path:
-            lookup_stems.append(Path(entry.old_path).stem)
         text = read_business_doc(entry)
-        own_backlinks = parse_related_metric_entities(text) if text else None
-        reverse_matches: set[str] = set()
-        for lookup_stem in lookup_stems:
-            reverse_matches |= set(
-                reverse_index.get(business_kebab_id(lookup_stem), ())
-            )
-        if own_backlinks is None:
-            matched = reverse_matches
-            if not matched:
-                unresolved.append(Path(entry.path).stem)
-        else:
-            matched = set(own_backlinks) | reverse_matches
-        fanned |= matched
-    return fanned, unresolved
+        lookup_names = [Path(entry.path).stem]
+        if entry.old_path:
+            lookup_names.append(Path(entry.old_path).stem)
+        title = business_display_name(text) if text else None
+        if title:
+            lookup_names.append(title)
+        for name in lookup_names:
+            fanned |= set(reverse_index.get(business_kebab_id(name), ()))
+    return fanned
+
+
+def load_business_ids(domain_entities_dir: Path) -> set[str]:
+    """I/O: every business id the domain docs on disk answer to (title + stem)."""
+    ids: set[str] = set()
+    if not domain_entities_dir.is_dir():
+        return ids
+    for md in sorted(domain_entities_dir.glob("*.md")):
+        if md.name == _TEMPLATE_NAME:
+            continue
+        ids.add(business_kebab_id(md.stem))
+        try:
+            title = business_display_name(md.read_text(encoding="utf-8"))
+        except OSError:
+            title = None
+        if title:
+            ids.add(business_kebab_id(title))
+    return ids
+
+
+def find_dangling_domain_references(
+    changed_metric_stems: Iterable[str],
+    *,
+    reverse_index: Mapping[str, set[str]],
+    known_business_ids: Collection[str],
+) -> list[tuple[str, list[str]]]:
+    """Business ids cited by a changed metric doc that no domain doc answers to.
+
+    Returns ``[(business_id, [citing_metric_stem, ...]), ...]``, surfaced as a
+    warning on the PR that introduces the bad bullet — the only place it can be
+    fixed. Scoped to *changed* metric docs so a pre-existing bad bullet
+    elsewhere doesn't warn on every unrelated PR.
+    """
+    changed = set(changed_metric_stems)
+    return sorted(
+        (business_id, sorted(stems & changed))
+        for business_id, stems in reverse_index.items()
+        if business_id not in known_business_ids and stems & changed
+    )
 
 
 # --------------------------------------------------------------------------
@@ -928,7 +908,7 @@ class ScopeResult:
     eval_stems: list[str]
     scope_stems: list[str]
     fallback_triggered: bool
-    fallback_reasons: list[str]
+    scope_warnings: list[str]
     metadata_only_stems: list[str] = field(default_factory=list)
     contract_rename_only_stems: list[str] = field(default_factory=list)
     diff_range_warnings: list[str] = field(default_factory=list)
@@ -976,7 +956,7 @@ def resolve_scope(
     changed_metric -= contract_only
 
     fanned: set[str] = set()
-    fallback_reasons: list[str] = []
+    scope_warnings: list[str] = []
     business_for_fanout = tuple(
         entry
         for entry in classified.business_entries
@@ -984,11 +964,13 @@ def resolve_scope(
             entry, repo_root=repo_root, old_ref=old_ref, run=run
         )
     )
-    if business_for_fanout:
-        metric_docs = load_metric_docs(
-            repo_root / "docs" / "llm_context" / "metric_entities"
-        )
+    llm_context = repo_root / "docs" / "llm_context"
+    reverse_index: dict[str, set[str]] = {}
+    if business_for_fanout or changed_metric:
+        metric_docs = load_metric_docs(llm_context / "metric_entities")
         reverse_index = build_reverse_index(metric_docs, parse_markdown=parse_markdown)
+
+    if business_for_fanout:
 
         def _read_business_doc(entry: DiffEntry) -> str | None:
             if entry.status == "D":
@@ -998,16 +980,23 @@ def resolve_scope(
             except OSError:
                 return None
 
-        fanned, unresolved = fan_out(
+        fanned = fan_out(
             business_for_fanout,
             reverse_index=reverse_index,
             read_business_doc=_read_business_doc,
         )
-        fallback_reasons = [
-            f"business doc '{stem}' changed but has no resolvable related metric "
-            "entities (neither the reverse index nor its own 'Related Metric "
-            "Entities' section) — skipping eval/drift for this doc (merge allowed)"
-            for stem in unresolved
+
+    if changed_metric:
+        scope_warnings = [
+            f"metric doc(s) {', '.join(stems)} cite domain entity "
+            f"'{business_id}', which matches no doc in "
+            "docs/llm_context/domain_entities/ — fix the '## Related Domain "
+            "Entities' bullet to match the target doc's title (merge allowed)"
+            for business_id, stems in find_dangling_domain_references(
+                changed_metric,
+                reverse_index=reverse_index,
+                known_business_ids=load_business_ids(llm_context / "domain_entities"),
+            )
         ]
 
     # Option 2: do not fail-closed to the full corpus. Unlinked domain-entity
@@ -1031,7 +1020,7 @@ def resolve_scope(
         eval_stems=eval_stems,
         scope_stems=scope_stems,
         fallback_triggered=fallback_triggered,
-        fallback_reasons=fallback_reasons,
+        scope_warnings=scope_warnings,
         metadata_only_stems=sorted(metadata_only),
         contract_rename_only_stems=sorted(contract_only),
         diff_range_warnings=diff_range_warnings,
@@ -1129,8 +1118,8 @@ def main(argv: list[str] | None = None) -> int:
 
     for warning in result.diff_range_warnings:
         print(f"WARN: {warning}", file=sys.stderr)
-    for reason in result.fallback_reasons:
-        print(f"WARN: {reason}", file=sys.stderr)
+    for warning in result.scope_warnings:
+        print(f"WARN: {warning}", file=sys.stderr)
 
     if result.metadata_only_stems:
         print(

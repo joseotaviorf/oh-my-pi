@@ -367,6 +367,44 @@ def test_validate_forbidden_spark_constructs_ignores_tokens_in_strings(sql):
     assert validate_forbidden_spark_constructs(sql, query_label="Query 1") == []
 
 
+@pytest.mark.parametrize(
+    "sql,construct",
+    [
+        ("SELECT date_diff('day', a, b) FROM dw.foo.t", "date_diff"),
+        ("SELECT format_datetime(ts, 'yyyy') FROM dw.foo.t", "format_datetime"),
+        ("SELECT strpos(s, 'a') FROM dw.foo.t", "strpos"),
+        ("SELECT arbitrary(x) FROM dw.foo.t", "arbitrary"),
+        ("SELECT approx_distinct(x) FROM dw.foo.t", "approx_distinct"),
+        ("SELECT x FROM dw.foo.t CROSS JOIN UNNEST(arr) AS u(v)", "UNNEST"),
+    ],
+)
+def test_trino_only_constructs_warn_but_do_not_block(sql, construct):
+    # Advisory during the migration: these run fine on Trino today and only break when
+    # the metric is materialized on EMR, so they must not fail a doc that is correct
+    # for the engine TARS actually queries.
+    errors, warnings = validate_trino_sql_syntax(sql, query_label="Query 1")
+    assert errors == []
+    assert any(construct in w for w in warnings), warnings
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        # Present in BOTH engines — flagging these would reject valid SQL. Verified
+        # against a real Spark 3.5 ``SHOW FUNCTIONS`` registry, not a transpiler.
+        "SELECT approx_percentile(x, 0.5) FROM dw.foo.t",
+        "SELECT cardinality(a) FROM dw.foo.t",
+        "SELECT array_agg(x) FROM dw.foo.t",
+        "SELECT regexp_like(s, 'a') FROM dw.foo.t",
+        "SELECT element_at(a, 1) FROM dw.foo.t",
+    ],
+)
+def test_functions_available_on_both_engines_are_not_flagged(sql):
+    errors, warnings = validate_trino_sql_syntax(sql, query_label="Query 1")
+    assert errors == []
+    assert warnings == []
+
+
 def test_validate_golden_query_sql_syntax_error_skips_metadata_checks(tmp_path: Path):
     _write_metadata(
         tmp_path,

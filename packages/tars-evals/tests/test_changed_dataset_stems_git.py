@@ -383,9 +383,57 @@ def test_business_doc_change_fans_out_via_reverse_index(
     assert not result.fallback_triggered
 
 
-def test_unresolvable_business_doc_change_skips_eval_and_drift(
+def test_business_doc_change_fans_out_via_h1_title_not_filename(
     cds, tmp_git_repo, parse_markdown
 ):
+    """The metric doc cites the domain's *title*, which need not equal its
+    filename — ``finance_revenue_cost.md`` is titled "Finance Revenue and
+    Cost". Matching on the stem alone lost its five metric docs."""
+    repo = tmp_git_repo
+    path = "docs/llm_context/domain_entities/finance_revenue_cost.md"
+    doc = "# Finance Revenue and Cost\n\n## Overview\n\nv1\n"
+    repo.write(
+        _METRIC_A,
+        _METRIC_A_DOC_V1.replace("- Biz NPS", "- Finance Revenue and Cost"),
+    )
+    repo.write(_DATASET_A, _DATASET_A_YAML)
+    repo.write(path, doc)
+    repo.commit("baseline: metric_a relates to finance revenue and cost")
+    repo.write(path, doc.replace("v1", "v2"))
+    repo.commit("modify the domain doc")
+
+    result = _resolve(cds, repo, env={}, parse_markdown=parse_markdown)
+
+    assert result.eval_stems == ["metric_a"]
+    assert result.scope_warnings == []
+
+
+def test_metric_doc_citing_unknown_domain_entity_warns(
+    cds, tmp_git_repo, parse_markdown
+):
+    """The typo is warned about on the metric side, where it can be fixed —
+    not on every domain doc that happens to have no metrics."""
+    repo = tmp_git_repo
+    repo.write(_DATASET_A, _DATASET_A_YAML)
+    repo.write(_BUSINESS_NPS, _BUSINESS_NPS_DOC)
+    repo.commit("baseline: domain doc present")
+    repo.write(_METRIC_A, _METRIC_A_DOC_V1.replace("- Biz NPS", "- Ghost Domain"))
+    repo.commit("add metric doc citing a domain nobody answers to")
+
+    result = _resolve(cds, repo, env={}, parse_markdown=parse_markdown)
+
+    assert result.eval_stems == ["metric_a"]
+    assert len(result.scope_warnings) == 1
+    assert "ghost-domain" in result.scope_warnings[0]
+    assert "metric_a" in result.scope_warnings[0]
+
+
+def test_unlinked_business_doc_change_skips_eval_and_drift_without_warning(
+    cds, tmp_git_repo, parse_markdown
+):
+    """A domain doc no metric doc points at resolves to zero stems quietly —
+    with 60 domain docs and 44 metric docs, having no link is the common case,
+    so warning about it drowned out the signal."""
     repo = tmp_git_repo
     repo.write(_DATASET_A, _DATASET_A_YAML)
     repo.commit("baseline: unrelated dataset present")
@@ -400,7 +448,7 @@ def test_unresolvable_business_doc_change_skips_eval_and_drift(
     assert not result.fallback_triggered
     assert result.eval_stems == []
     assert result.scope_stems == []
-    assert any("orphan" in reason for reason in result.fallback_reasons)
+    assert result.scope_warnings == []
 
 
 def test_deleted_business_doc_still_fans_out_via_reverse_index(

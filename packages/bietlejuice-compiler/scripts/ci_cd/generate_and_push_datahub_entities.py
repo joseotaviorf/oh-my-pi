@@ -117,6 +117,12 @@ _STABLE_URN_LINE_RE = re.compile(
 # output (see _count_expected_golden_queries / _count_golden_queries_in_yaml).
 _GOLDEN_QUERY_SINGULAR_HEADING_RE = re.compile(r"^## Golden [Qq]uery:\s*\S", re.M)
 _GOLDEN_QUERY_SECTION_HEADING_RE = re.compile(r"^## Golden [Qq]uer(y|ies)\b")
+# The redesigned metric template nests one golden query per metric, as an H4 inside
+# the ``### {Metric Name}`` block, so no ``## Golden Queries`` H2 exists at all. Both
+# scanners below must see it: EXCLUDE_H4_PATTERNS already keeps that SQL out of the
+# published description, so a doc in the new format would otherwise publish zero
+# Query entities and drop its queries from DataHub without anything going red.
+_GOLDEN_QUERY_H4_HEADING_RE = re.compile(r"^#### Golden [Qq]uer(y|ies)\b")
 # Sub-heading naming within a "## Golden Queries" section is inconsistent across
 # the ~50 existing entity docs ("### Query 1 — ...", "### 1. ...", or a bare
 # descriptive title with no numbering) and some entities append trailing
@@ -165,6 +171,23 @@ EXCLUDE_HEADING_PATTERNS = [
     re.compile(r"^## DataHub [Cc]atalog$"),
     re.compile(r"^## Related Domain Entities$", re.I),
     re.compile(r"^## Superset Golden Assets$", re.I),
+    # Routing metadata (drives the metadata `domain:` of the generated metric tables),
+    # not narrative content.
+    re.compile(r"^## Domain$", re.I),
+]
+
+# Nested per-metric headings dropped from the description. ``## Metrics`` itself stays —
+# each metric's Description/Rules is exactly the narrative a downstream agent needs —
+# but the redesigned template nests the golden query *inside* the metric block, where
+# the ``## `` exclusions above cannot reach it. Without this the SQL that the old
+# format kept out (under a top-level ``## Golden Queries``) would start landing in the
+# published Data Product description.
+EXCLUDE_H4_PATTERNS = [
+    re.compile(r"^#### Golden [Qq]uer(y|ies)\b.*$", re.I),
+    # Per-metric aliases replaced the entity-level ``## Glossary and Synonyms``, which
+    # the ``## `` exclusions above already keep out of the narrative: an alias list is
+    # routing metadata, published as glossary terms, not prose a downstream agent reads.
+    re.compile(r"^#### Also Known As\b.*$", re.I),
 ]
 
 # Matches the whole ``product_description:`` YAML block up to (but not including) the
@@ -348,22 +371,60 @@ def _count_expected_golden_queries(md_path: Path) -> int:
     published: the Cases Perspective incident had 9 queries here but only 2 reached
     DataHub with nothing detecting the gap.
     """
-    lines = md_path.read_text().splitlines()
+    return sum(
+        1
+        for line in _golden_query_zone_lines(md_path.read_text().splitlines())
+        if _SQL_FENCE_OPEN_RE.match(line.strip())
+    )
 
-    in_section = False
-    count = 0
+
+def _golden_query_zone_lines(lines: list[str]) -> list[str]:
+    """Every line inside a golden-query zone, in document order.
+
+    Per-metric queries win over a top-level section, mirroring ``document_parser``'s
+    ``parse_entity_markdown`` exactly: a document that defines its queries per metric
+    is authoritative about them, and a doc part-way through migration can still carry
+    a leftover ``## Golden query: …`` heading. Treating the two as additive would
+    publish that stale copy as an extra Query entity, or fail the completeness check
+    below against the count CI validated — which reads the per-metric queries alone.
+    """
+    per_metric = _golden_query_zone_lines_for(lines, h4_only=True)
+    if any(_SQL_FENCE_OPEN_RE.match(line.strip()) for line in per_metric):
+        return per_metric
+    return _golden_query_zone_lines_for(lines, h4_only=False)
+
+
+def _golden_query_zone_lines_for(lines: list[str], *, h4_only: bool) -> list[str]:
+    """Scan one zone shape, or both. Shared by the counter and the extractor so they
+    can never disagree about what counts as a query.
+
+    - an H2 zone (``## Golden query: {Name}`` or ``## Golden Queries``) stays open
+      across H3 sub-headings until the next H2, because sub-heading naming is
+      inconsistent across the ~50 legacy docs and some append a trailing
+      ``### Validation`` section;
+    - an H4 zone (``#### Golden Query``, one per metric in the redesigned template)
+      closes at the very next heading of any level — the following ``### {Metric}``
+      or ``## `` — since it holds exactly one query and nothing else.
+    """
+    out: list[str] = []
+    in_zone = False
+    h4_zone = False
     for line in lines:
-        if _GOLDEN_QUERY_SINGULAR_HEADING_RE.match(
-            line
-        ) or _GOLDEN_QUERY_SECTION_HEADING_RE.match(line):
-            in_section = True
+        if _GOLDEN_QUERY_H4_HEADING_RE.match(line):
+            in_zone, h4_zone = True, True
             continue
-        if in_section and line.startswith("## "):
-            in_section = False
+        if not h4_only and (
+            _GOLDEN_QUERY_SINGULAR_HEADING_RE.match(line)
+            or _GOLDEN_QUERY_SECTION_HEADING_RE.match(line)
+        ):
+            in_zone, h4_zone = True, False
             continue
-        if in_section and _SQL_FENCE_OPEN_RE.match(line.strip()):
-            count += 1
-    return count
+        if in_zone and (line.startswith("## ") or (h4_zone and line.startswith("#"))):
+            in_zone, h4_zone = False, False
+            continue
+        if in_zone:
+            out.append(line)
+    return out
 
 
 def _count_golden_queries_in_yaml(yaml_content: str) -> int:
@@ -371,35 +432,58 @@ def _count_golden_queries_in_yaml(yaml_content: str) -> int:
     return len(_STABLE_URN_LINE_RE.findall(yaml_content))
 
 
+def _golden_query_count_error(expected: int, actual: int) -> str | None:
+    """Why this entity must not be published, or ``None`` when the counts agree.
+
+    Both directions are fatal, for different reasons.
+
+    Too few is a truncated or incomplete model response: the Cases Perspective
+    incident declared 9 queries and published 2, with nothing detecting the gap.
+
+    Too many is the mirror case, and it is why the check cannot stay one-sided.
+    Extraction applies H4-over-H2 precedence, so a document part-way through
+    migration — per-metric queries plus a leftover legacy heading — yields fewer
+    queries than the model emitted. Positional SQL injection needs a 1:1 match and
+    bails out on the mismatch, so *every* query keeps the model's placeholder text,
+    and the stale extra gets published alongside the real ones. Refusing is the
+    lesser harm; the fix is to delete the leftover heading from the document.
+    """
+    if not expected or expected == actual:
+        return None
+    if actual < expected:
+        return (
+            f"Markdown declares {expected} golden querie(s) but the generated YAML "
+            f"only has {actual} — LLM output is likely incomplete/truncated. "
+            "Refusing to publish partial data. Re-run, or raise LITELLM_MAX_TOKENS "
+            "if this entity has many/large golden queries."
+        )
+    return (
+        f"Markdown declares {expected} golden querie(s) but the generated YAML has "
+        f"{actual} — the extra one is most likely a leftover top-level "
+        "'## Golden query:' heading in a document that already defines its queries "
+        "per metric under '## Metrics'. Refusing to publish: the count mismatch "
+        "disables SQL injection, so every query would publish with placeholder text. "
+        "Delete the leftover heading from the Markdown."
+    )
+
+
 def _extract_golden_query_sqls(md_path: Path) -> list[str]:
     """Extract the raw SQL text of every golden query, in document order.
 
-    Reuses the exact same golden-query-zone boundary logic as
-    ``_count_expected_golden_queries`` (any golden heading opens a zone that stays
-    open across H3 sub-headings until the next H2) — same count, same order — but
-    captures the full text of each fenced ```sql block instead of just counting
-    fence-open lines.
+    Shares ``_golden_query_zone_lines`` with ``_count_expected_golden_queries`` — same
+    zones, same count, same order — but captures the full text of each fenced ```sql
+    block instead of just counting fence-open lines.
 
     This is the single source of truth injected into each generated
     ``golden_query(ies)[i].sql`` by ``_inject_golden_query_sqls``: the LLM is asked
     for a short placeholder instead of reproducing the (potentially large) query
     text, so the query text itself can never be truncated or paraphrased.
     """
-    lines = md_path.read_text().splitlines()
-    in_section = False
     in_fence = False
     current: list[str] = []
     sqls: list[str] = []
-    for line in lines:
-        if _GOLDEN_QUERY_SINGULAR_HEADING_RE.match(
-            line
-        ) or _GOLDEN_QUERY_SECTION_HEADING_RE.match(line):
-            in_section = True
-            continue
-        if in_section and line.startswith("## "):
-            in_section = False
-            continue
-        if in_section and not in_fence and _SQL_FENCE_OPEN_RE.match(line.strip()):
+    for line in _golden_query_zone_lines(md_path.read_text().splitlines()):
+        if not in_fence and _SQL_FENCE_OPEN_RE.match(line.strip()):
             in_fence = True
             current = []
             continue
@@ -675,6 +759,81 @@ def _validate_catalog_types(catalog: list[dict[str, str]]) -> list[str]:
     return [
         row["name"] for row in catalog if row.get("type") not in _CATALOG_VALID_TYPES
     ]
+
+
+_METRIC_H3_RE = re.compile(r"(?m)^###\s+(.+)$")
+_METRIC_H4_RE = re.compile(r"(?m)^####\s+(.+)$")
+_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+
+
+def _metric_scalar(body: str) -> str:
+    """First meaningful line of a single-value ``####`` body, stripped of emphasis."""
+    for line in _HTML_COMMENT_RE.sub("", body or "").splitlines():
+        stripped = re.sub(r"[*`]+", "", line).strip().rstrip(".")
+        if stripped:
+            return stripped
+    return ""
+
+
+def _extract_metrics_blocks(
+    md_path: Path,
+) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    """Parse ``## Metrics`` into catalog rows and MBR entries (redesigned metric docs).
+
+    The redesigned template replaced the ``## Catalog`` table with one ``### {Metric
+    Name}`` block per metric, moving the OKR/Health classification into ``#### Type``
+    and MBR membership into per-metric ``#### MBR`` / ``#### Category``. Both feed the
+    exact same structured properties as before — ``data_product.metrics``,
+    ``data_product.mbr`` and ``data_product.mbr_category`` — so the published product is
+    byte-identical in shape; only the section the values are read from changed.
+
+    Returns ``([], [])`` for a document with no ``## Metrics`` section, which is how the
+    caller falls back to the legacy ``## Catalog`` / ``## MBR`` path.
+    """
+    section = _extract_section_body(md_path.read_text(), "metrics", exact_only=True)
+    if not section:
+        return [], []
+
+    catalog: list[dict[str, str]] = []
+    mbrs: list[dict[str, str]] = []
+    seen_metrics: set[str] = set()
+    seen_mbrs: set[str] = set()
+    h3_matches = list(_METRIC_H3_RE.finditer(section))
+    for idx, match in enumerate(h3_matches):
+        name = re.sub(r"[*`]+", "", match.group(1)).strip()
+        if _is_placeholder(name) or name.lower() in seen_metrics:
+            continue
+        seen_metrics.add(name.lower())
+        end = h3_matches[idx + 1].start() if idx + 1 < len(h3_matches) else len(section)
+        block = section[match.end() : end]
+
+        subs: dict[str, str] = {}
+        h4_matches = list(_METRIC_H4_RE.finditer(block))
+        for h4_idx, h4 in enumerate(h4_matches):
+            title = re.sub(r"[*_`]+", "", h4.group(1)).strip().lower()
+            h4_end = (
+                h4_matches[h4_idx + 1].start()
+                if h4_idx + 1 < len(h4_matches)
+                else len(block)
+            )
+            subs[title] = block[h4.end() : h4_end].strip()
+
+        row = {"name": name}
+        metric_type = _normalize_catalog_type(_metric_scalar(subs.get("type", "")))
+        if metric_type and not _is_placeholder(metric_type):
+            row["type"] = metric_type
+        catalog.append(row)
+
+        mbr_name = _metric_scalar(subs.get("mbr", ""))
+        if not mbr_name or _is_placeholder(mbr_name) or mbr_name.lower() in seen_mbrs:
+            continue
+        seen_mbrs.add(mbr_name.lower())
+        entry = {"name": mbr_name}
+        category = _metric_scalar(subs.get("category", ""))
+        if category and not _is_placeholder(category):
+            entry["category"] = category
+        mbrs.append(entry)
+    return catalog, mbrs
 
 
 def _inject_catalog(yaml_content: str, catalog: list[dict[str, str]]) -> str:
@@ -1010,10 +1169,17 @@ def _extract_description_from_md(md_path: Path) -> str:
     lines = md_path.read_text().split("\n")
     result: list[str] = []
     skip = False
+    skip_h4 = False
     for line in lines:
+        stripped = line.strip()
         if line.startswith("## "):
             skip = _should_exclude_heading(line)
-        if not skip:
+            skip_h4 = False
+        elif line.startswith("### "):
+            skip_h4 = False
+        elif line.startswith("#### "):
+            skip_h4 = any(p.match(stripped) for p in EXCLUDE_H4_PATTERNS)
+        if not skip and not skip_h4:
             result.append(line)
     content = "\n".join(result).strip()
     return re.sub(r"\n{3,}", "\n\n", content)
@@ -1126,10 +1292,17 @@ LIVE DATAHUB DOMAIN CATALOG ({domain_count} domains):
 {domains_block}
 
 - Emit ALL golden queries from the Markdown as a `golden_queries:` list (plural).
-  Domain docs may use `## Golden query: {{Name}}` (singular H2) or `## Golden Queries`
-  with `###` sub-headings; metric docs use `## Golden Queries`. For EACH query set
-  `stable_urn: "TBD"` — CI assigns the real deterministic URN per query.
-  Do NOT generate UUIDs yourself.
+  Where they live depends on the document's format, and getting this wrong makes CI
+  refuse to publish the entity on the resulting count mismatch:
+  * when the document has a `## Metrics` section, it is authoritative — emit exactly
+    one entry per `#### Golden Query` nested under it, and IGNORE any leftover
+    top-level `## Golden query:` / `## Golden Queries` heading the document may still
+    carry from before its migration;
+  * otherwise (older metric docs, and domain docs) use the top-level headings:
+    `## Golden query: {{Name}}` (singular H2) or `## Golden Queries` with `###`
+    sub-headings.
+  For EACH query set `stable_urn: "TBD"` — CI assigns the real deterministic URN per
+  query. Do NOT generate UUIDs yourself.
 - Do NOT hand-author each golden query's `sql:` text — CI overwrites it with the exact
   SQL from that query's fenced ```sql block in the Markdown, injected by position after
   generation (same pattern as `product_description`). Emit a short one-line placeholder
@@ -1181,11 +1354,18 @@ LIVE DATAHUB DOMAIN CATALOG ({domain_count} domains):
 - `## Superset Golden Assets` lists **reference assets** linked on the Data Product Summary in
   DataHub: Trino/Databricks `schema.table` pairs (materialized metric tables) AND Superset
   virtual-dataset URNs (in backticks). CI injects both into `datasets:` — do not drop either.{asset_rule}
-- Parse glossary from `## Glossary and Synonyms` bullet list (`- **term** → mapping`).
-- Do NOT emit an `mbr:` block — CI injects it from the optional `## MBR` section (the
-  `**Name**` / `**Category**` pairs; any hand-authored `mbr:` is discarded).
-- Do NOT emit a `catalog:` block — CI injects it from the `## Catalog` table (one
-  `{{name, type}}` row per official metric; any hand-authored `catalog:` is discarded).
+- Parse glossary from each metric's `#### Also Known As` bullet list under `## Metrics`
+  (`- **term**, **synonym**`, mapped to the `### {{Metric Name}}` it sits under; a bullet
+  with `→ near-miss — ...` maps to that correction instead). Pre-redesign documents carry
+  one entity-level `## Glossary and Synonyms` list (`- **term** → mapping`) instead — parse
+  whichever the document has, and both when it carries both.
+- Do NOT emit an `mbr:` block — CI injects it from each metric's `#### MBR` /
+  `#### Category` under `## Metrics`, falling back to the legacy top-level `## MBR`
+  section. Any hand-authored `mbr:` is discarded.
+- Do NOT emit a `catalog:` block — CI injects one `{{name, type}}` row per official
+  metric from the `### {{Metric Name}}` blocks under `## Metrics` (the type comes from
+  `#### Type`), falling back to the legacy `## Catalog` table. Any hand-authored
+  `catalog:` is discarded.
 - Do NOT hand-author `related_data_products` — CI injects from `## Related Domain Entities`.{related_rule}"""
         )
 
@@ -1477,15 +1657,13 @@ def main(argv: list[str] | None = None) -> int:
             yaml_content, _extract_golden_query_sqls(md_path)
         )
 
-        expected_gq = _count_expected_golden_queries(md_path)
-        actual_gq = _count_golden_queries_in_yaml(yaml_content)
-        if expected_gq and actual_gq < expected_gq:
+        gq_error = _golden_query_count_error(
+            _count_expected_golden_queries(md_path),
+            _count_golden_queries_in_yaml(yaml_content),
+        )
+        if gq_error:
             print(
-                f"   ERROR: Markdown declares {expected_gq} golden querie(s) but "
-                f"the generated YAML only has {actual_gq} — LLM output is likely "
-                "incomplete/truncated. Refusing to publish partial data. Re-run, "
-                "or raise LITELLM_MAX_TOKENS if this entity has many/large "
-                "golden queries.",
+                f"   ERROR: {gq_error}",
                 file=sys.stderr,
             )
             failed.append(entity_slug)
@@ -1504,19 +1682,38 @@ def main(argv: list[str] | None = None) -> int:
         yaml_content = _inject_owners(yaml_content, _extract_owners(md_path))
         if _md_to_data_product_type(md_path) == "metric":
             yaml_content = _inject_metric_datasets(yaml_content, md_path)
-            yaml_content = _inject_mbr(yaml_content, _extract_mbrs(md_path))
 
-            catalog = _extract_catalog(md_path)
+            # Redesigned template first, legacy ## Catalog / ## MBR as the fallback.
+            # Both formats are live during the migration, and which one a document uses
+            # is decided by the document itself.
+            catalog, mbrs = _extract_metrics_blocks(md_path)
+            if not catalog:
+                catalog = _extract_catalog(md_path)
+                mbrs = _extract_mbrs(md_path)
+            if not catalog:
+                # Neither section parsed a single metric. Publishing anyway would push a
+                # Data Product with an empty metric list over a populated one — a
+                # green run that quietly deletes the catalog in DataHub.
+                print(
+                    "   ERROR: no metrics found — a metric entity must define them "
+                    "under ## Metrics (### per metric) or a legacy ## Catalog table. "
+                    "Refusing to publish a metric product with an empty catalog.",
+                    file=sys.stderr,
+                )
+                failed.append(entity_slug)
+                continue
+
             unclassified = _validate_catalog_types(catalog)
             if unclassified:
                 print(
-                    "   ERROR: ## Catalog metric(s) missing a valid Type "
+                    "   ERROR: metric(s) missing a valid Type "
                     f"('OKR' or 'Health Metric'): {', '.join(unclassified)}. "
                     "Refusing to publish an unclassified metric catalog.",
                     file=sys.stderr,
                 )
                 failed.append(entity_slug)
                 continue
+            yaml_content = _inject_mbr(yaml_content, mbrs)
             yaml_content = _inject_catalog(yaml_content, catalog)
 
             yaml_content = _inject_related_data_products(

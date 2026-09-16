@@ -18,6 +18,35 @@ class GoldenQuery:
 
 
 @dataclass
+class ParsedMetric:
+    """One ``### {Metric Name}`` block inside the ``## Metrics`` section.
+
+    ``headings`` holds every ``####`` heading actually present (so a present-but-empty
+    optional heading can be rejected) and ``duplicate_headings`` the ones authored more
+    than once — the later body wins, which is worth a warning rather than a silent
+    overwrite.
+    """
+
+    name: str
+    slug: str = ""
+    description: str = ""
+    also_known_as: str = ""
+    rules: str = ""
+    metric_type: str = ""
+    direction: str = ""
+    grain: str = ""
+    is_additive: str = ""
+    business_stage: str = ""
+    acronym: str = ""
+    mbr: str = ""
+    category: str = ""
+    golden_query: GoldenQuery | None = None
+    glossary_terms: list[GlossaryTerm] = field(default_factory=list)
+    headings: set[str] = field(default_factory=set)
+    duplicate_headings: list[str] = field(default_factory=list)
+
+
+@dataclass
 class GlossaryTerm:
     term_id: str
     name: str
@@ -35,6 +64,8 @@ class ParsedEntityDocument:
     owners: dict[str, list[str]] = field(default_factory=dict)
     mbr: list[dict[str, str]] = field(default_factory=list)
     catalog: list[dict[str, str]] = field(default_factory=list)
+    metrics: list[ParsedMetric] = field(default_factory=list)
+    domain: str = ""
     related_data_products: list[str] = field(default_factory=list)
     has_ownership_section: bool = False
     has_related_domain_entities_section: bool = False
@@ -50,7 +81,11 @@ _MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()+\-#.!])")
 
 _SECTION_RE = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 _H3_RE = re.compile(r"^###\s+(.+)$", re.MULTILINE)
+_H4_RE = re.compile(r"^####\s+(.+)$", re.MULTILINE)
 _HEADING_RE = re.compile(r"^(#{2,3})\s+(.+)$", re.MULTILINE)
+# A single metric doc may hold a family of related metrics, but not without bound —
+# past ~10 the document stops being a coherent contract and should be split.
+_MAX_METRICS_PER_DOCUMENT = 10
 _GOLDEN_QUERY_INDIVIDUAL_HEADING_RE = re.compile(
     r"^golden quer(?:y|ies)\b(?:\s|$|[—:\-–(])",
     re.IGNORECASE,
@@ -121,8 +156,109 @@ _CATALOG_TYPE_ALIASES = {
 _CATALOG_VALID_TYPES = frozenset({_CATALOG_TYPE_OKR, _CATALOG_TYPE_HEALTH})
 _CATALOG_HEADER_NAMES = frozenset({"metric", "metrics", "metric name"})
 
+# Per-metric closed vocabularies. Each maps a lowercased authored spelling onto the one
+# canonical value, so a field authored in any reasonable case/phrasing lands on a single
+# filterable value downstream (structured property today, metric metadata YAML in the
+# generator phase). Anything outside the map is a blocking error, not a passthrough:
+# unlike ``## Catalog``'s Type — where an unknown value still reached a human reviewer in
+# DataHub — these feed generated files nobody re-reads.
+_METRIC_DIRECTION_ALIASES = {
+    "higher is better": "Higher is better",
+    "lower is better": "Lower is better",
+    "neutral": "Neutral",
+}
+_METRIC_GRAIN_ALIASES = {
+    "daily": "daily",
+    "weekly": "weekly",
+    "monthly": "monthly",
+    "quarterly": "quarterly",
+    "yearly": "yearly",
+    "annual": "yearly",
+}
+# Mirrors the ``business_stage`` values already in use across dags/**/metadata/metric/.
+_METRIC_BUSINESS_STAGES = {
+    "platform operations": "Platform Operations",
+    "demand": "Demand",
+    "supply": "Supply",
+    "collections": "Collections",
+    "offboarding": "Offboarding",
+    "cx": "CX",
+    "post contract": "Post Contract",
+    "other": "Other",
+}
+_METRIC_BOOLEAN_ALIASES = {
+    "true": "true",
+    "yes": "true",
+    "false": "false",
+    "no": "false",
+}
+# The slug is the stable key between this document and the metric table the generator
+# phase will materialize from it, so it has to survive a display-name rename: snake_case,
+# frozen at creation.
+_METRIC_SLUG_RE = re.compile(r"^[a-z][a-z0-9_]*$")
+
+# Required ``####`` headings inside a ``### {Metric Name}`` block, mapped to the
+# ``ParsedMetric`` attribute each one fills.
+_METRIC_REQUIRED_H4 = (
+    ("slug", "Slug"),
+    ("description", "Description"),
+    ("also_known_as", "Also Known As"),
+    ("rules", "Rules"),
+    ("metric_type", "Type"),
+    ("direction", "Direction"),
+    ("grain", "Grain"),
+    ("is_additive", "Is Additive"),
+)
+
+# Of those, the multi-line prose ones. ``_is_placeholder`` is a contains-a-brace
+# test written for scalar values like ``{MBR Name}``; in prose a brace is ordinary
+# content (a ``{start_date}`` parameter, JSON, set notation), so applying it here
+# would reject filled sections with a misleading "missing heading" error. A section
+# left as an actual stub is still caught by the file-level placeholder scan in
+# ``validate_datahub_context_entities``, which strips code fences first.
+_METRIC_PROSE_H4 = frozenset({"description", "rules", "also_known_as"})
+
 # Optional metric sections — omit entirely when N/A; an empty heading is invalid.
+# Per-metric ``#### MBR`` / ``#### Category`` are validated inside ``## Metrics``
+# (see ``_validate_metrics``), not here — this tuple lists only top-level ``##`` sections.
 _METRIC_OPTIONAL_SECTIONS = (
+    "related domain entities",
+    "targets and okrs",
+)
+# Per-metric optional H4 headings — present-but-empty is invalid, same rule as the
+# top-level optional sections above.
+#
+# ``acronym`` and ``business_stage`` are a step beyond optional: no template offers them
+# and no authoring flow emits them. They are tolerated so that a document already
+# carrying one keeps parsing, and so the eventual migration of the legacy corpus is a
+# deletion rather than a rejection. Both map to metric-layer columns that are optional
+# there too, and that the generator phase leaves blank on purpose.
+#
+# ``acronym`` — across the 696 metrics in ``dags/**/metadata/metric/`` the field is
+# ~100% filled, but 43% of the values are the metric name repeated ("Amount Contacts")
+# or a machine-built initialism nobody says out loud ("TWDATWOR"): the signature of a
+# mandatory field with no natural value. An abbreviation the business really uses is an
+# alias, so it goes in ``#### Also Known As``, which takes as many as the metric has
+# instead of forcing exactly one — and which is the list published as glossary terms.
+#
+# ``business_stage`` — well filled and classified with care, but with no reader. 6 of
+# the 7 domains map to exactly one stage: for 464 of the ~700 metrics the domain already
+# determines the answer, and values like ``Conversational XP`` are the domain name
+# restated. Only For Rent, with a long asset lifecycle, uses it as a real axis. Nothing
+# consumes it downstream either — it sits in ``optional_args`` of
+# ``upload_metadata_files_into_s3.py``, and no Superset dataset, chart, saved query or
+# SQL Lab query references the column. A present value is still vocabulary-checked.
+_METRIC_OPTIONAL_H4 = ("mbr", "category", "acronym", "business_stage")
+# Heading as authored, for error messages — the parsed key is lowercased.
+_METRIC_OPTIONAL_H4_LABELS = {
+    "mbr": "MBR",
+    "category": "Category",
+    "acronym": "Acronym",
+    "business_stage": "Business Stage",
+}
+# Optional sections of the *pre-redesign* metric template, still enforced for documents
+# that have not been migrated yet (see ``_validate_legacy_metric_document``).
+_LEGACY_METRIC_OPTIONAL_SECTIONS = (
     "mbr",
     "targets and okrs",
     "superset golden assets",
@@ -229,6 +365,48 @@ def _parse_glossary(section_text: str) -> list[GlossaryTerm]:
     for line in section_text.splitlines():
         term = _parse_glossary_bullet_line(line)
         if term:
+            terms.append(term)
+    return terms
+
+
+def _parse_metric_glossary(
+    section_text: str, *, metric_name: str
+) -> list[GlossaryTerm]:
+    """Parse a per-metric ``#### Also Known As`` bullet list into glossary terms.
+
+    The entity-level ``## Glossary and Synonyms`` needs an explicit ``→ {Metric Name}``
+    on every bullet, because one flat list serves every metric in the document — which
+    is also how an alias set silently ends up covering only the first metric. Nested
+    under ``### {Metric Name}`` the owner is structural, so a bare ``- **term**`` is
+    enough and the arrow is reserved for the case that still needs one: a **near-miss**,
+    a name that sounds like this metric but means something else, where the text after
+    the arrow is the correction rather than the owner.
+
+    Terms are flattened into the document-level list by :func:`parse_entity_markdown`,
+    so the published payload is identical either way.
+    """
+    terms: list[GlossaryTerm] = []
+    for line in (section_text or "").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("- "):
+            continue
+        term = _parse_glossary_bullet_line(stripped)
+        if term is None:
+            # No arrow: an alias of the metric it is nested under.
+            body = stripped[2:].strip()
+            bold = [found.strip() for found in re.findall(r"\*\*([^*]+)\*\*", body)]
+            if not bold:
+                plain = body.strip().strip(",").strip()
+                if not plain or "{" in plain:
+                    continue
+                bold = [plain]
+            primary, aliases = bold[0], bold[1:]
+            term = GlossaryTerm(
+                term_id=_slugify(primary),
+                name=f"{primary} ({', '.join(aliases)})" if aliases else primary,
+                description=metric_name,
+            )
+        if term.term_id:
             terms.append(term)
     return terms
 
@@ -520,6 +698,214 @@ def _parse_catalog(section_text: str) -> list[dict[str, str]]:
     return rows
 
 
+def _split_h4_sections(block: str) -> tuple[dict[str, str], list[str]]:
+    """Split a ``### {Metric Name}`` block into its ``#### `` subsections.
+
+    Returns ``({normalized_heading: body}, duplicate_headings)``. A heading is present as
+    a key even when its body is empty, so a present-but-empty optional heading
+    (``#### MBR`` with nothing under it) can be detected and rejected. When the same
+    heading is authored twice the last body wins and the heading is reported as a
+    duplicate — overwriting one silently is how a corrected value ends up ignored.
+    """
+    out: dict[str, str] = {}
+    duplicates: list[str] = []
+    matches = list(_H4_RE.finditer(block))
+    for idx, match in enumerate(matches):
+        title = _normalize_heading(match.group(1))
+        start = match.end()
+        end = matches[idx + 1].start() if idx + 1 < len(matches) else len(block)
+        if title in out and title not in duplicates:
+            duplicates.append(title)
+        out[title] = block[start:end].strip()
+    return out, duplicates
+
+
+def _scalar_field(body: str) -> str:
+    """First meaningful line of a single-value ``####`` body, stripped of emphasis.
+
+    The authoring template puts an HTML guidance comment under most headings, so the
+    value is rarely the literal first line.
+    """
+    cleaned = _HTML_COMMENT_RE.sub("", body or "")
+    for line in cleaned.splitlines():
+        stripped = re.sub(r"[*`]+", "", line).strip().rstrip(".")
+        if stripped:
+            return stripped
+    return ""
+
+
+def _parse_metrics(section_text: str) -> list[ParsedMetric]:
+    """Parse the ``## Metrics`` section into one :class:`ParsedMetric` per ``###`` block."""
+    metrics: list[ParsedMetric] = []
+    h3_matches = list(_H3_RE.finditer(section_text or ""))
+    for idx, match in enumerate(h3_matches):
+        name = re.sub(r"[*`]+", "", match.group(1)).strip()
+        start = match.end()
+        end = (
+            h3_matches[idx + 1].start()
+            if idx + 1 < len(h3_matches)
+            else len(section_text)
+        )
+        block = section_text[start:end]
+        subs, duplicates = _split_h4_sections(block)
+        gq_body = subs.get("golden query") or subs.get("golden queries") or ""
+        golden = _golden_query_from_block(name, gq_body, idx=idx) if gq_body else None
+        aka = subs.get("also known as", "")
+        metrics.append(
+            ParsedMetric(
+                name=name,
+                slug=_scalar_field(subs.get("slug", "")),
+                description=subs.get("description", ""),
+                also_known_as=aka,
+                rules=subs.get("rules", ""),
+                metric_type=_scalar_field(subs.get("type", "")),
+                direction=_scalar_field(subs.get("direction", "")),
+                grain=_scalar_field(subs.get("grain", "")),
+                is_additive=_scalar_field(subs.get("is additive", "")),
+                business_stage=_scalar_field(subs.get("business stage", "")),
+                acronym=_scalar_field(subs.get("acronym", "")),
+                mbr=subs.get("mbr", ""),
+                category=subs.get("category", ""),
+                golden_query=golden,
+                glossary_terms=_parse_metric_glossary(aka, metric_name=name),
+                headings=set(subs.keys()),
+                duplicate_headings=duplicates,
+            )
+        )
+    return metrics
+
+
+def _validate_metric_enum(
+    value: str,
+    aliases: dict[str, str],
+    *,
+    metric_label: str,
+    heading: str,
+) -> str | None:
+    """Return an error when ``value`` is outside the closed vocabulary, else ``None``."""
+    if aliases.get(value.strip().lower()):
+        return None
+    allowed = ", ".join(sorted({canonical for canonical in aliases.values()}))
+    return (
+        f"Metric '{metric_label}': #### {heading} is {value!r} — allowed values are "
+        f"{allowed}"
+    )
+
+
+def _validate_metrics(metrics: list[ParsedMetric]) -> tuple[list[str], list[str]]:
+    """Blocking errors + warnings for the ``## Metrics`` section (metric docs only).
+
+    Requires 1–10 ``### {Metric Name}`` subsections, each carrying every heading in
+    ``_METRIC_REQUIRED_H4`` plus a ``#### Golden Query`` SQL block. ``#### Type``,
+    ``#### Direction``, ``#### Grain``, ``#### Is Additive`` and ``#### Business Stage``
+    are closed vocabularies, checked whenever a value is present. ``#### MBR``,
+    ``#### Category``, ``#### Acronym`` and ``#### Business Stage`` are optional but
+    must not be present-and-empty.
+
+    Names and slugs must be unique within the document: the slug is the key the
+    generator phase will use to name the metric's table, and two metrics claiming it
+    would silently collapse into one.
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    if not metrics:
+        errors.append(
+            "Missing ## Metrics section with at least one ### metric subsection"
+        )
+        return errors, warnings
+    if len(metrics) > _MAX_METRICS_PER_DOCUMENT:
+        errors.append(
+            f"## Metrics defines {len(metrics)} metrics — the maximum is "
+            f"{_MAX_METRICS_PER_DOCUMENT} per document; split the extra metrics into "
+            "another metric entity"
+        )
+
+    seen_names: set[str] = set()
+    seen_slugs: set[str] = set()
+    for metric in metrics:
+        label = metric.name if not _is_placeholder(metric.name) else "(unnamed)"
+        if _is_placeholder(metric.name):
+            errors.append("A ### metric subsection is missing a real name")
+        elif metric.name.lower() in seen_names:
+            errors.append(
+                f"Duplicate metric name '{metric.name}' — each ### subsection must "
+                "name a distinct metric"
+            )
+        else:
+            seen_names.add(metric.name.lower())
+
+        for attr, heading in _METRIC_REQUIRED_H4:
+            value = getattr(metric, attr)
+            unfilled = not _section_has_content(value) or (
+                attr not in _METRIC_PROSE_H4 and _is_placeholder(value)
+            )
+            if unfilled:
+                errors.append(f"Metric '{label}' is missing a #### {heading}")
+
+        if metric.slug and not _is_placeholder(metric.slug):
+            if not _METRIC_SLUG_RE.match(metric.slug):
+                errors.append(
+                    f"Metric '{label}': #### Slug {metric.slug!r} must be snake_case "
+                    "(lowercase letters, digits and underscores, starting with a letter)"
+                )
+            elif metric.slug in seen_slugs:
+                errors.append(
+                    f"Duplicate metric slug '{metric.slug}' — the slug is the stable "
+                    "key for this metric and must be unique within the document"
+                )
+            else:
+                seen_slugs.add(metric.slug)
+
+        for attr, heading, aliases in (
+            ("metric_type", "Type", _CATALOG_TYPE_ALIASES),
+            ("direction", "Direction", _METRIC_DIRECTION_ALIASES),
+            ("grain", "Grain", _METRIC_GRAIN_ALIASES),
+            ("is_additive", "Is Additive", _METRIC_BOOLEAN_ALIASES),
+            ("business_stage", "Business Stage", _METRIC_BUSINESS_STAGES),
+        ):
+            value = getattr(metric, attr)
+            if not value or _is_placeholder(value):
+                continue
+            enum_error = _validate_metric_enum(
+                value, aliases, metric_label=label, heading=heading
+            )
+            if enum_error:
+                errors.append(enum_error)
+
+        if metric.golden_query is None:
+            errors.append(
+                f"Metric '{label}' is missing a #### Golden Query with a SQL block"
+            )
+
+        for optional in _METRIC_OPTIONAL_H4:
+            # ``headings`` is keyed by the normalized heading text, which only equals
+            # the attribute name for single-word fields — ``business_stage`` is authored
+            # as ``#### Business Stage``.
+            if _METRIC_OPTIONAL_H4_LABELS[
+                optional
+            ].lower() in metric.headings and not _section_has_content(
+                getattr(metric, optional)
+            ):
+                errors.append(
+                    f"Metric '{label}': optional #### {_METRIC_OPTIONAL_H4_LABELS[optional]} "
+                    "heading is present but empty — omit the heading when it does "
+                    "not apply"
+                )
+        for duplicate in metric.duplicate_headings:
+            warnings.append(
+                f"Metric '{label}': #### {duplicate} is authored more than once — only "
+                "the last block is read; merge them"
+            )
+        if _section_has_content(metric.category) and not _section_has_content(
+            metric.mbr
+        ):
+            warnings.append(
+                f"Metric '{label}': #### Category is set without a #### MBR — a "
+                "category is the block a metric occupies inside an MBR agenda"
+            )
+    return errors, warnings
+
+
 def _normalize_heading(text: str) -> str:
     """Strip Markdown emphasis and collapse whitespace for heading comparisons."""
     cleaned = re.sub(r"[*_`]+", "", text)
@@ -621,6 +1007,63 @@ def _validate_catalog_rows(catalog: list[dict[str, str]]) -> list[str]:
     return errors
 
 
+def _validate_legacy_metric_document(
+    parsed: ParsedEntityDocument,
+    sections: dict[str, str],
+) -> tuple[list[str], list[str]]:
+    """Validate a metric doc still written against the pre-redesign template.
+
+    The two formats are accepted side by side for the whole migration: the 46 documents
+    under ``docs/llm_context/metric_entities/`` are converted in a later pass, and until
+    then a legacy doc that someone touches for an unrelated reason must not fail CI.
+    It also decouples this repo's merge from the TARS authoring-plugin rollout — either
+    can ship first. This branch is deleted once the migration lands.
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    if not _section_has_content(_find_section(sections, "overview")):
+        errors.append("Missing ## Overview section")
+    dos_and_donts = _find_section(
+        sections, "dos and don'ts", "dos and don", "do's and don"
+    )
+    if not _section_has_content(dos_and_donts):
+        errors.append("Missing ## Dos and Don'ts section")
+    elif not _has_do_and_dont(dos_and_donts):
+        warnings.append("## Dos and Don'ts should list at least one Do and one Don't")
+    if not parsed.golden_queries:
+        errors.append("Missing ## Golden Queries with at least one SQL block")
+    errors.extend(_validate_catalog_rows(parsed.catalog))
+    if not parsed.has_related_domain_entities_section:
+        errors.append("Missing ## Related Domain Entities section")
+    elif not parsed.related_data_products:
+        errors.append(
+            "## Related Domain Entities section is present but no entities were parsed"
+        )
+    scope = _find_section(sections, "scope")
+    if not _section_has_content(scope):
+        errors.append("Missing ## Scope section")
+    elif not ("included" in scope.lower() and "excluded" in scope.lower()):
+        warnings.append(
+            "## Scope should list both what is Included and what is Excluded"
+        )
+    calculation = _find_section(sections, "calculation")
+    if not _section_has_content(calculation):
+        errors.append("Missing ## Calculation section")
+    else:
+        if not _has_h3_subsection(calculation, "canonical filter"):
+            errors.append(
+                "## Calculation must include a ### Canonical Filter subsection"
+            )
+        if not _has_h3_subsection(calculation, "nuances"):
+            errors.append("## Calculation must include a ### Nuances subsection")
+    errors.extend(
+        _validate_optional_sections_not_empty(
+            sections, optional_headings=_LEGACY_METRIC_OPTIONAL_SECTIONS
+        )
+    )
+    return errors, warnings
+
+
 def _section_has_content(body: str) -> bool:
     """True when section body has content beyond template HTML comments."""
     return bool(_HTML_COMMENT_RE.sub("", body or "").strip())
@@ -693,7 +1136,13 @@ def parse_entity_markdown(
         title = _stripped_fallback
     sections = _split_sections(markdown)
 
-    overview = _find_section(sections, "overview")
+    # ``## Description`` is the metric template's heading for what domain docs call
+    # ``## Overview``. Both land on ``overview`` so every downstream reader — the DataHub
+    # publisher, the tars-evals mock's product description and search text — keeps
+    # working across the two formats without knowing which one it was handed.
+    overview = _find_section(sections, "overview") or _find_section(
+        sections, "description", exact_only=True
+    )
     glossary_text = _find_section(sections, "glossary", "synonyms")
     tables_text = _find_section(sections, "tables", "where to query")
     golden_text = _find_section(
@@ -702,6 +1151,10 @@ def parse_entity_markdown(
     ownership_text = _find_section(sections, "ownership")
     mbr_text = _find_section(sections, "mbr")
     catalog_text = _find_section(sections, "catalog", exact_only=True)
+    metrics_text = _find_section(sections, "metrics", exact_only=True)
+    # ``exact_only`` — ``## Related Domain Entities`` contains "domain" and would
+    # otherwise be read as the entity's domain.
+    domain_text = _find_section(sections, "domain", exact_only=True)
     related_text = _find_section(sections, "related domain entities")
     superset_text = _find_section(sections, "superset golden assets", exact_only=True)
 
@@ -710,7 +1163,24 @@ def parse_entity_markdown(
     datasets = _parse_datasets(tables_text)
     if not datasets and not metric_dataset_rows:
         datasets = _parse_datasets(markdown)
-    golden_queries = _parse_golden_queries(golden_text)
+    metrics = _parse_metrics(metrics_text)
+    # New metric template: aliases live under each metric's ``#### Also Known As``
+    # instead of one entity-level ``## Glossary and Synonyms``. Flattening them into the
+    # same document-level list keeps the published payload identical, so nothing
+    # downstream has to know which template authored the document. A migrated document
+    # carrying both contributes both — the per-metric terms come second so an entity-level
+    # bullet stays first in the published order.
+    for metric in metrics:
+        glossary_terms.extend(metric.glossary_terms)
+    # New metric template: golden queries live under each metric's ``#### Golden Query``,
+    # not a top-level ``## Golden Queries`` section. They take precedence — a document
+    # that defines ``## Metrics`` is authoritative about its own queries, and falling
+    # back first would let one stray legacy ``## Golden query: …`` heading shadow every
+    # per-metric query, so the CI gate (which reads ``parsed.golden_queries``) would
+    # validate the leftover and skip the real ones.
+    golden_queries = [m.golden_query for m in metrics if m.golden_query]
+    if not golden_queries:
+        golden_queries = _parse_golden_queries(golden_text)
     if not golden_queries:
         golden_queries = _parse_golden_queries_from_markdown(markdown)
     owners = _parse_owners(ownership_text)
@@ -734,6 +1204,8 @@ def parse_entity_markdown(
         owners=owners,
         mbr=mbr,
         catalog=catalog,
+        metrics=metrics,
+        domain=_scalar_field(domain_text),
         related_data_products=related_data_products,
         has_ownership_section=has_ownership_section,
         has_related_domain_entities_section=has_related_domain_entities_section,
@@ -750,62 +1222,79 @@ def validate_parsed_document(
 
     The single authoritative gate for the template contract: the enforced required
     set is kept equal to the set documented in the authoring templates and
-    ``create-{metric,business}-entity-doc`` skills, so a doc the skill (or the Luigi
+    ``create-{metric,domain}-entity-doc`` skills, so a doc the skill (or the Luigi
     bot) tells an author to produce is exactly the doc this gate accepts.
 
-    Both types share the same core: H1, ``## Overview``, ``## Ownership`` (Data Owner
-    AND Data Steward), ``## Glossary and Synonyms``, ``## Dos and Don'ts`` and
-    ``## Golden Queries``. Only the type-specific sections differ — domain adds
-    ``## Tables`` (concrete ``schema.table``); metric adds ``## Related Domain
-    Entities``, ``## Scope`` and ``## Calculation``.
+    Both types share a small core: an H1 title, a ``## Ownership`` section and a
+    ``## Glossary and Synonyms`` section. The rest differs by type:
 
-    Legacy docs missing a newly-required section aren't retroactively broken: the CI
-    gate runs ``--changed-only`` and TARS sync skips an incomplete doc rather than
-    failing it.
+    - **domain** — requires ``## Overview``, a Data Steward (no Data Owner role),
+      ``## Tables`` (concrete ``schema.table``), ``## Key Metrics``,
+      ``## Relationships with other entities``, ``## Dos and Don'ts`` and at least one
+      ``## Golden Queries`` SQL block.
+    - **metric** — requires ``## Description``, ``## Domain``, a Data Steward AND a Data
+      Owner, and a ``## Metrics`` section holding 1–10 ``### {Metric Name}``
+      subsections, each with ``#### Slug``, ``#### Description``,
+      ``#### Also Known As``, ``#### Rules``, ``#### Type``, ``#### Direction``,
+      ``#### Grain``, ``#### Is Additive`` and ``#### Golden Query``. ``## Related
+      Domain Entities`` and ``## Targets and OKRs`` are optional; per-metric ``#### MBR``
+      / ``#### Category`` are optional. ``#### Acronym`` and ``#### Business Stage`` are
+      accepted for documents that carry them, but no template offers them.
+
+    Domain docs have no Data Owner role at all — the steward is the single point of
+    contact, and the template no longer offers the block. A Data Owner is still parsed
+    and published when present, because 42 of the 60 domain docs written under the old
+    template carry one and rejecting them would be a migration, not a validation.
+    Metric docs still require both roles.
+
+    A metric doc with no ``## Metrics`` heading is validated against the pre-redesign
+    template instead (``_validate_legacy_metric_document``). Both formats are accepted
+    for the whole migration window, so neither the doc migration nor the TARS authoring
+    plugin has to land in a particular order relative to this repo.
     """
     is_metric = data_product_type == DATA_PRODUCT_TYPE_METRIC
     errors: list[str] = []
     warnings: list[str] = []
     sections = _split_sections(parsed.raw_markdown or "")
 
-    # Required for BOTH entity types (kept in lockstep with Zordon's dp_validator):
-    # title, Overview, an Ownership section naming a Data Owner AND a Data Steward
-    # @quintoandar email, a Glossary, a Dos and Don'ts, and at least one Golden Query.
+    # Shared core: an H1 title, an Ownership section, and a Glossary. Ownership always
+    # needs a Data Steward; a Data Owner is a metric-doc role only. Domain docs dropped
+    # the role entirely, but one authored under the old template is still accepted.
     if not parsed.title or parsed.title == "Untitled Entity":
         errors.append("Missing H1 title")
-    if not _section_has_content(parsed.overview):
-        errors.append("Missing ## Overview section")
     if not parsed.has_ownership_section:
         errors.append("Missing ## Ownership section")
     else:
-        if not parsed.owners.get("data_owner"):
-            errors.append("Missing Data Owner email in ## Ownership section")
         if not parsed.owners.get("data_steward"):
             errors.append("Missing Data Steward email in ## Ownership section")
+        if is_metric and not parsed.owners.get("data_owner"):
+            errors.append("Missing Data Owner email in ## Ownership section")
+    # A redesigned metric document carries its aliases per metric, under
+    # ``#### Also Known As`` — the entity-level section is gone from that template, and
+    # each metric's field is required in ``_validate_metrics``, so demanding both here
+    # would reject every document the current questionnaire produces. Domain documents
+    # and pre-redesign metric documents still own an entity-level glossary.
     glossary = _find_section(sections, "glossary and synonyms", "glossary", "synonyms")
-    if not _section_has_content(glossary):
+    if not _section_has_content(glossary) and not (is_metric and parsed.metrics):
         errors.append("Missing ## Glossary and Synonyms section")
-    dos_and_donts = _find_section(
-        sections, "dos and don'ts", "dos and don", "do's and don"
-    )
-    if not _section_has_content(dos_and_donts):
-        errors.append("Missing ## Dos and Don'ts section")
-    elif not _has_do_and_dont(dos_and_donts):
-        # Advisory (non-blocking): the section is present and non-empty, but the
-        # authoring guidance asks for at least one Do AND one Don't. Left to the
-        # reviewer rather than blocked, so CI never diverges from Zordon's gate.
-        warnings.append("## Dos and Don'ts should list at least one Do and one Don't")
-    if not parsed.golden_queries:
-        errors.append("Missing ## Golden Queries with at least one SQL block")
-
-    errors.extend(
-        _validate_optional_sections_not_empty(
-            sections, optional_headings=_DOMAIN_OPTIONAL_SECTIONS
-        )
-    )
 
     if not is_metric:
-        # Domain-specific: routes by table, so it needs concrete schema.table refs.
+        # Domain-specific: narrative Overview, routing by table, and a Dos and Don'ts.
+        # Checked against the section, not ``parsed.overview`` — the latter also accepts
+        # a metric doc's ``## Description``, which is not the domain heading.
+        if not _section_has_content(_find_section(sections, "overview")):
+            errors.append("Missing ## Overview section")
+        dos_and_donts = _find_section(
+            sections, "dos and don'ts", "dos and don", "do's and don"
+        )
+        if not _section_has_content(dos_and_donts):
+            errors.append("Missing ## Dos and Don'ts section")
+        elif not _has_do_and_dont(dos_and_donts):
+            # Advisory (non-blocking): present and non-empty, but the authoring
+            # guidance asks for at least one Do AND one Don't. Left to the reviewer.
+            warnings.append(
+                "## Dos and Don'ts should list at least one Do and one Don't"
+            )
         if not parsed.datasets:
             errors.append("No schema.table references found in ## Tables section")
         key_metrics = _find_section(sections, "key metrics")
@@ -814,36 +1303,45 @@ def validate_parsed_document(
         relationships = _relationships_section(sections)
         if not _section_has_content(relationships):
             errors.append("Missing ## Relationships with other entities section")
+        if not parsed.golden_queries:
+            errors.append("Missing ## Golden Queries with at least one SQL block")
+        errors.extend(
+            _validate_optional_sections_not_empty(
+                sections, optional_headings=_DOMAIN_OPTIONAL_SECTIONS
+            )
+        )
         return errors, warnings
 
-    # Metric-specific: links to a domain entity and defines the calculation.
-    errors.extend(_validate_catalog_rows(parsed.catalog))
+    # Metric-specific. Which contract applies is decided by the presence of a
+    # ``## Metrics`` heading, not by a flag or a file list: a document carries its own
+    # format, so a legacy doc and a migrated one can sit side by side in the same commit.
+    if not _has_exact_section(sections, "metrics"):
+        legacy_errors, legacy_warnings = _validate_legacy_metric_document(
+            parsed, sections
+        )
+        errors.extend(legacy_errors)
+        warnings.extend(legacy_warnings)
+        return errors, warnings
+
+    # Redesigned template: an entity-level Description and Domain plus a ## Metrics
+    # section that holds one subsection per metric. Related Domain Entities is inferred
+    # and optional; the OKR/Health classification moved from the old ## Catalog table
+    # into each metric's #### Type, and ## Scope / ## Calculation are gone.
+    description = _find_section(sections, "description", exact_only=True)
+    if not _section_has_content(description):
+        errors.append("Missing ## Description section")
+    # Presence only. Whether the value is in the metadata domain allowlist is checked by
+    # the CI entrypoint, which can import the registry — this module is deliberately
+    # stdlib-only so tars-evals can load it by file path before any dependency install
+    # (enforced by test_document_parser_and_its_siblings_are_stdlib_only).
+    if not _section_has_content(parsed.domain) or _is_placeholder(parsed.domain):
+        errors.append("Missing ## Domain section with the entity's metadata domain")
+    metric_errors, metric_warnings = _validate_metrics(parsed.metrics)
+    errors.extend(metric_errors)
+    warnings.extend(metric_warnings)
     errors.extend(
         _validate_optional_sections_not_empty(
             sections, optional_headings=_METRIC_OPTIONAL_SECTIONS
         )
     )
-    if not parsed.has_related_domain_entities_section:
-        errors.append("Missing ## Related Domain Entities section")
-    elif not parsed.related_data_products:
-        errors.append(
-            "## Related Domain Entities section is present but no entities were parsed"
-        )
-    scope = _find_section(sections, "scope")
-    if not _section_has_content(scope):
-        errors.append("Missing ## Scope section")
-    elif not ("included" in scope.lower() and "excluded" in scope.lower()):
-        warnings.append(
-            "## Scope should list both what is Included and what is Excluded"
-        )
-    calculation = _find_section(sections, "calculation")
-    if not _section_has_content(calculation):
-        errors.append("Missing ## Calculation section")
-    else:
-        if not _has_h3_subsection(calculation, "canonical filter"):
-            errors.append(
-                "## Calculation must include a ### Canonical Filter subsection"
-            )
-        if not _has_h3_subsection(calculation, "nuances"):
-            errors.append("## Calculation must include a ### Nuances subsection")
     return errors, warnings

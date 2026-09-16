@@ -54,6 +54,10 @@ _GENERIC_PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z_][a-zA-Z0-9_]*\}")
 _STRING_LITERAL_RE = re.compile(r"'(?:''|[^'])*'|\"(?:\"\"|[^\"])*\"")
 _COMMENT_RE = re.compile(r"--.*$", re.MULTILINE)
 
+_DATEDIFF_UNITS = (
+    "YEAR|QUARTER|MONTH|WEEK|DAY|HOUR|MINUTE|SECOND|MILLISECOND|MICROSECOND"
+)
+
 # Spark/Databricks-only constructs forbidden in Tars golden queries (Trino dialect).
 _FORBIDDEN_GOLDEN_QUERY_CONSTRUCTS: list[tuple[str, re.Pattern[str]]] = [
     ("QUALIFY", re.compile(r"\bQUALIFY\b", re.IGNORECASE)),
@@ -71,6 +75,94 @@ _FORBIDDEN_GOLDEN_QUERY_CONSTRUCTS: list[tuple[str, re.Pattern[str]]] = [
     (
         "Variant accessor (column:key)",
         re.compile(r"\w+:(?!:)(?:\w|\[)", re.IGNORECASE),
+    ),
+]
+
+# Trino-only constructs forbidden for the mirror-image reason. A golden query is read on
+# Trino today (TARS runs there) but is also the seed for the metric table the generator
+# phase materializes on EMR Spark 3.5, so it has to sit in the intersection of the two
+# dialects. Without this list the Trino gate above passes and the Spark failure only
+# surfaces later, in a pipeline nobody is watching at authoring time.
+#
+# Membership was checked against a real Spark 3.5.1 ``SHOW FUNCTIONS`` registry, not
+# inferred from a transpiler: sqlglot rewrites ``approx_percentile`` → ``percentile_
+# approx`` and ``cardinality`` → ``size``, but Spark accepts both spellings, so treating
+# a rewrite as proof of absence would have made this gate reject valid SQL. Only names
+# genuinely absent from Spark 3.5 are listed. Two deliberate omissions: ``contains`` and
+# ``date_diff`` exist in both engines with different signatures, and no regex separates
+# the Trino call from the Spark one reliably enough to block on — except the quoted-unit
+# ``date_diff('day', …)`` form below, which is unambiguous.
+_FORBIDDEN_TRINO_ONLY_CONSTRUCTS: list[tuple[str, str, re.Pattern[str]]] = [
+    (
+        "date_diff() with a unit argument",
+        "datediff(end_date, start_date)",
+        # Spark 3.5 does have ``date_diff``, but only as ``date_diff(end, start)``.
+        # The unit-first form is Trino's alone; matched post-unquoting (see
+        # ``_DATEDIFF_QUOTED_UNIT_RE``).
+        re.compile(rf"\bdate_diff\s*\(\s*(?:{_DATEDIFF_UNITS})\s*,", re.IGNORECASE),
+    ),
+    (
+        "format_datetime()",
+        "date_format() (the pattern letters differ — re-check the format string)",
+        re.compile(r"\bformat_datetime\s*\(", re.IGNORECASE),
+    ),
+    (
+        "date_parse()",
+        "to_timestamp() (Spark uses Java patterns, not MySQL-style %Y)",
+        re.compile(r"\bdate_parse\s*\(", re.IGNORECASE),
+    ),
+    (
+        "parse_datetime()",
+        "to_timestamp()",
+        re.compile(r"\bparse_datetime\s*\(", re.IGNORECASE),
+    ),
+    ("to_unixtime()", "unix_timestamp()", re.compile(r"\bto_unixtime\s*\(", re.I)),
+    ("strpos()", "instr() or locate()", re.compile(r"\bstrpos\s*\(", re.IGNORECASE)),
+    ("arbitrary()", "any_value()", re.compile(r"\barbitrary\s*\(", re.IGNORECASE)),
+    (
+        "approx_distinct()",
+        "approx_count_distinct()",
+        re.compile(r"\bapprox_distinct\s*\(", re.IGNORECASE),
+    ),
+    (
+        "json_extract() / json_extract_scalar()",
+        "get_json_object()",
+        re.compile(r"\bjson_extract(?:_scalar)?\s*\(", re.IGNORECASE),
+    ),
+    (
+        "map_agg() / multimap_agg()",
+        "map_from_arrays() over collect_list()",
+        re.compile(r"\b(?:multi)?map_agg\s*\(", re.IGNORECASE),
+    ),
+    (
+        "at_timezone() / with_timezone()",
+        "from_utc_timestamp() or to_utc_timestamp()",
+        re.compile(r"\b(?:at|with)_timezone\s*\(", re.IGNORECASE),
+    ),
+    (
+        "last_day_of_month()",
+        "last_day()",
+        re.compile(r"\blast_day_of_month\s*\(", re.IGNORECASE),
+    ),
+    (
+        "url_extract_*()",
+        "parse_url()",
+        re.compile(r"\burl_extract_\w+\s*\(", re.IGNORECASE),
+    ),
+    (
+        "UNNEST",
+        "LATERAL VIEW explode()",
+        re.compile(r"\bUNNEST\s*\(", re.IGNORECASE),
+    ),
+    (
+        "WITH ORDINALITY",
+        "LATERAL VIEW posexplode()",
+        re.compile(r"\bWITH\s+ORDINALITY\b", re.IGNORECASE),
+    ),
+    (
+        "try()",
+        "try_cast() or an explicit CASE guard",
+        re.compile(r"\btry\s*\(", re.IGNORECASE),
     ),
 ]
 
@@ -177,10 +269,12 @@ def _sql_without_string_literals(sql: str) -> str:
     return _STRING_LITERAL_RE.sub("", sql)
 
 
+# The unit is a string literal, and the construct scan strips string literals before
+# matching — so unquote it first, or ``date_diff('day', a, b)`` reaches the patterns as
+# ``date_diff(, a, b)`` and neither the Spark nor the Trino check can see it. Covers both
+# spellings: Spark's ``DATEDIFF`` and Trino's ``DATE_DIFF``.
 _DATEDIFF_QUOTED_UNIT_RE = re.compile(
-    r"\bDATEDIFF\s*\(\s*'"
-    r"(YEAR|QUARTER|MONTH|WEEK|DAY|HOUR|MINUTE|SECOND|MILLISECOND|MICROSECOND)"
-    r"'\s*,",
+    rf"\b(DATEDIFF|DATE_DIFF)\s*\(\s*'({_DATEDIFF_UNITS})'\s*,",
     re.IGNORECASE,
 )
 
@@ -188,7 +282,7 @@ _DATEDIFF_QUOTED_UNIT_RE = re.compile(
 def _sql_for_spark_construct_scan(sql: str) -> str:
     """Return SQL with quoted literals and line comments removed for pattern checks."""
     text = _DATEDIFF_QUOTED_UNIT_RE.sub(
-        lambda match: f"DATEDIFF({match.group(1).upper()},", sql or ""
+        lambda match: f"{match.group(1).upper()}({match.group(2).upper()},", sql or ""
     )
     without_strings = _sql_without_string_literals(text)
     return _COMMENT_RE.sub("", without_strings)
@@ -209,6 +303,31 @@ def validate_forbidden_spark_constructs(
                 "Golden Queries — use Trino SQL (see entity template)"
             )
     return errors
+
+
+def validate_forbidden_trino_only_constructs(
+    sql: str,
+    *,
+    query_label: str,
+) -> list[str]:
+    """Return warnings for Trino-only SQL that would break on EMR Spark 3.5.
+
+    Advisory, not blocking — the inverse of ``validate_forbidden_spark_constructs``.
+    A Spark-only construct is broken *today*, on the engine TARS actually runs; a
+    Trino-only one runs fine today and only bites when the metric is materialized on
+    EMR. Blocking it now would fail golden queries already in production (several use
+    ``json_extract_scalar``) for a payoff that lands in a later phase. This becomes an
+    error once the documents are migrated and the generator is in place.
+    """
+    haystack = _sql_for_spark_construct_scan(sql)
+    warnings: list[str] = []
+    for name, replacement, pattern in _FORBIDDEN_TRINO_ONLY_CONSTRUCTS:
+        if pattern.search(haystack):
+            warnings.append(
+                f"{query_label}: Trino-only construct {name!r} does not run on EMR "
+                f"Spark 3.5 — prefer {replacement}, which both engines accept"
+            )
+    return warnings
 
 
 def parse_trino_golden_query_sql(
@@ -240,6 +359,9 @@ def validate_trino_sql_syntax(
         errors.append(f"{query_label}: {message}")
     errors.extend(
         validate_forbidden_spark_constructs(prepared, query_label=query_label)
+    )
+    warnings.extend(
+        validate_forbidden_trino_only_constructs(prepared, query_label=query_label)
     )
     if errors:
         return errors, warnings

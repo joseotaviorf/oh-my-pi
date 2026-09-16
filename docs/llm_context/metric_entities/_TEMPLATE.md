@@ -1,39 +1,39 @@
-# {Official Metric Name}
+# {Metric Entity Name}
 
 <!--
 WRITING GUIDE — delete this block before committing.
 
 Audience: TARS (text-to-SQL AI agent) and human analysts.
-Goal: define ONE official, named metric — its exact calculation, scope, canonical
-      filter, and weight/parameter sources — so TARS reproduces the source-of-truth
-      number instead of a naive approximation.
+Goal: define a metric entity — a group of one or more related official metrics — so
+      TARS reproduces the source-of-truth number for each instead of a naive
+      approximation.
 
 ROLE CONTRACT (this is what makes a metric entity different from a domain entity):
-  • A metric entity documents the OFFICIAL METRIC. The schema (tables, columns,
-    grain, joins) and the component/generic metric live in the linked
-    domain entity under ../domain_entities/. NEVER re-document columns or
-    re-teach the component calculation here — LINK to the domain entity instead.
-  • Keep this file thin on schema, thick on calculation: overview, scope,
-    exact formula, canonical filter, parameter/weight sources, dos/don'ts, and
-    the single golden query that produces the official number.
-  • Its Calculation / Canonical Filter / Dos and Don'ts OVERRIDE generic logic in the
-    domain entity when both touch the same domain.
+  • A metric entity documents OFFICIAL METRICS. The schema (tables, columns, grain,
+    joins) lives in the linked domain entity under ../domain_entities/. NEVER
+    re-document columns here — LINK to the domain entity instead.
+  • Keep this file thin on schema, thick on what each metric is and how to query it.
 
 Rules:
   • File name: lowercase_snake_case.md (e.g. nps_fr.md, gmv_fs.md).
-  • After creating: add a "Related Metric Entities" back-link from the related
-    domain entity(ies).
-  • **Product scope (RENT / SALE):** state explicitly in **Scope** and whenever citing
-    source tables — use **just rent** / **just sale** / **both** for table context (not
-    “RENT only” / “SALE only” for table scope). TARS must not classify a table as rent
-    or sale unless documented in this metric entity or the linked domain entity.
-  • Golden Query must use Trino SQL dialect (TARS runs on Trino). No Spark-only
-    constructs (QUALIFY, GROUP BY ALL, IFF, 3-arg DATEDIFF, variant `col:key`).
-  • Optional sections: MBR, Targets and OKRs (Budget and/or OKR lookup — see section
-    below; Budget = annual commitment fixed for the fiscal year; OKR = period
-    challenge that may change across quarters/semesters), Superset Golden Assets.
-  • Required section: Catalog — every named metric defined in this document, each
-    classified as OKR or Health Metric.
+  • A single document holds 1–10 related metrics under ## Metrics — one ### {Metric
+    Name} subsection each. Split into a second metric entity past 10.
+  • Each metric's Golden Query must be valid Trino SQL (TARS runs on Trino) AND run
+    unchanged on EMR Spark 3.5, because the same query seeds the materialized metric
+    table. Stay in the intersection of the two dialects:
+      – No Spark-only constructs: QUALIFY, GROUP BY ALL, IFF, 3-arg DATEDIFF,
+        variant `col:key`. These are blocking errors.
+      – Avoid Trino-only functions: date_parse, parse_datetime, format_datetime,
+        strpos, arbitrary, approx_distinct, json_extract(_scalar), map_agg,
+        at_timezone, to_unixtime, url_extract_*, try(), UNNEST, WITH ORDINALITY,
+        and date_diff('unit', a, b). CI warns on these; prefer the portable spelling
+        (to_timestamp, date_format, instr, any_value, approx_count_distinct,
+        get_json_object, …).
+      – Watch array indexing: Trino is 1-based, Spark is 0-based. Both run; only one
+        is right.
+  • Optional top-level sections: Related Domain Entities (inferred at authoring time),
+    Targets and OKRs. Optional per-metric headings: MBR, Category. Omit any optional
+    heading entirely when it does not apply — an empty heading is invalid.
 -->
 
 ## Ownership
@@ -41,10 +41,8 @@ Rules:
 <!--
 Data Owner: accountable for the business definition and approves changes (usually a
 manager/lead). Data Steward: maintains this document day-to-day and is the first point
-of contact for questions. At least one email is required in EACH category (they may
-overlap). Not folded into the DataHub Data Product description (see
-EXCLUDE_HEADING_PATTERNS in generate_and_push_datahub_entities.py) — it is routing
-metadata, not narrative content.
+of contact for questions. Metric docs require at least one email in EACH category (they
+may overlap). Routing metadata, not narrative content.
 -->
 
 **Data Owner:**
@@ -53,205 +51,234 @@ metadata, not narrative content.
 **Data Steward:**
 - {data_steward_email@quintoandar.com.br}
 
-## Overview
+## Description
 
-**{Name}** is {one-sentence definition}. {How it differs from the naive/component calculation / why the business rule exists}.
+<!-- 2–4 sentences: what this group of metrics measures, what it means, and why the
+     business tracks it. Bold any product-scope restriction that applies to the whole
+     entity. Per-metric nuances go in each metric's #### Description below. -->
 
-**{Product-scope restriction, if any — e.g. "Exists exclusively for For Rent."}**
+**{Metric entity name}** groups {what these metrics measure and why the business tracks them}. {How they relate to each other.}
+
+**{Entity-wide product-scope restriction, if any — e.g. "Exists exclusively for For Rent."}**
+
+## Domain
+
+<!--
+Required — the metadata domain that owns these metrics. Must match the allowlist
+exactly (it is written verbatim into the generated metric metadata, where CI accepts
+nothing else): Agents, Cross, Data Ops & Governance, Data Life Cycle, Fintech,
+For Rent, For Sale, Growth, International, Journey Optimizer, MLOps, People, QCX, Rede,
+Support and Services, Tech Platform, Data Platform, Conversational XP, DS Pricing,
+Atlas DB, Broker XP, House and Listing.
+-->
+
+{Domain}
 
 ## Related Domain Entities
 
 <!--
-Plain list of the domain entity NAMES this metric draws its schema from — no
-paths, no descriptions. Business entities live in ../domain_entities/, metric
-entities in ../metric_entities/ (one file per entity). Add back-links in the
-related domain entity's "Related Metric Entities" section. One bullet per
-related entity.
+Optional — inferred from the catalog at authoring time, not asked of the author. Plain
+list of the domain entity NAMES these metrics draw their schema from — no paths, no
+descriptions. Omit the whole section when no related domain entity is found.
 -->
 
 - {Domain Entity Name}
 
-## Catalog
-
-<!--
-Required — the inventory of every OFFICIAL metric this document defines. One row per
-metric, using the exact official name analysts see (the same name used in Overview /
-Calculation / Glossary). A single-metric document has exactly one row; a metric family
-has one row per member.
-
-Type classifies how the metric is used by the business:
-  • OKR           — the metric carries a period goal (quarter/semester) and is tracked
-                    as a company/area objective.
-  • Health Metric — the metric is monitored to watch operational health; it has no
-                    OKR goal of its own (it may still be a component of one).
-
-Not folded into the DataHub Data Product description (see EXCLUDE_HEADING_PATTERNS in
-generate_and_push_datahub_entities.py) — CI syncs the names to the
-`data_product.metrics` structured property and the types to `data_product.metric_type`
-(both multi-valued and filterable in DataHub). It is routing metadata, not narrative
-content.
--->
-
-| Metric | Type |
-| :---- | :---- |
-| {Official Metric Name} | {OKR \| Health Metric} |
-
-## MBR
-
-<!--
-Optional — include ONLY when this metric participates in one or more Monthly Business
-Reviews (MBRs). Grain is the Data Product: this flag marks the WHOLE document, so every
-metric defined here is considered part of the listed MBR(s). Repeat the Name/Category
-pair once per MBR (a metric may feed several). Omit the entire section if the metric is
-not part of any MBR.
-
-Name marks WHICH MBR the document feeds; Category marks the block the metric sits in
-inside that MBR's agenda. Name is required once the section is present; Category is
-optional — drop its line entirely when the block is unknown, rather than leaving the
-placeholder behind. Not folded into the DataHub Data Product description (see
-EXCLUDE_HEADING_PATTERNS in generate_and_push_datahub_entities.py) — CI syncs Name to
-the `data_product.mbr` structured property and Category to `data_product.mbr_category`
-(both filterable in DataHub), it is routing metadata, not narrative content.
--->
-
-**Name** {MBR Name}
-**Category** {category}
-
-## Glossary and Synonyms
-
-<!-- Names and terms analysts/stakeholders use to ASK for this metric. TARS uses these to route. -->
-
-- **{term}**, **{synonym}**, **{official name}** → this metric
-
-## Scope
-
-**Included**: {journeys, segments, audiences}
-
-**Excluded**: {what does NOT count — test campaigns, out-of-scope segments, etc.}
-
-## Calculation
-
-<!-- The official formula. If there is non-trivial pooling/weighting/aggregation, explain WHY the
-     naive path is wrong. This section is the source of truth and overrides the domain entity. -->
-
-{Explain the error of the naive path, if applicable.}
-
-The correct calculation is:
-
-```
-{Metric} = {formula, e.g. weighted sum of components}
-```
-
-where {definition of each term / component}.
-
-### Canonical Filter
-
-<!-- The EXACT set of filters that defines the metric's universe. List the mandatory fields and
-     warn about the common mistake of under-filtering. -->
-
-Apply on `{table/dim}`:
-
-```sql
-{field_1} = '{value}'
-AND {field_2} = '{value}'
-```
-
-**Warning**: {common mistake — e.g. filtering only on one field includes segments that do not compose the official metric}.
-
-### Nuances
-
-<!-- Weight/parameter sources (GSheets, etc.), fallback, deduplication, specific join keys. -->
-
-{Where the weights/parameters live. Never hardcode — always read from the source.}
-
-| Column | Description |
-| :---- | :---- |
-| `{column}` | {description / how to parse} |
-
-**Join key**: {how to match parameters to the components}
-
-**Fallback**: {what to do when a parameter is missing for a period}
-
-## Dos and Don'ts
-
-<!-- Traps SPECIFIC to the official metric. Do not repeat generic dos/don'ts from the domain entity. -->
-
-**Do:**
-
-- {Mandatory rule — e.g. apply the full canonical filter}
-- {Read parameters from the source, use fallback, deduplicate}
-
-**Don't:**
-
-- {Anti-pattern — e.g. directly pooling the components}
-- {Don't hardcode weights/parameters}
-- Don't state that a source table is **just rent** or **just sale** unless **Scope** or the linked domain entity **explicitly** documents that scope for that table. Do not use **“RENT only” / “SALE only”** for table scope.
-
 ## Targets and OKRs
 
 <!--
-Optional — include ONLY when this metric has an official Budget and/or OKR lookup path.
-Omit the entire section when neither exists.
+Optional — include ONLY when at least one metric has an official Budget and/or OKR
+that is QUERYABLE IN PRODUCTION. Omit the whole section when neither exists.
 
-Terminology (both optional within this section):
+Terminology:
   • Budget (Target) — annual commitment set at year start; fixed for the fiscal year.
-  • OKR — period challenge (quarter or semester), informed by trend indicators; may
-    change across periods within the year.
+  • OKR — period challenge (quarter or semester); may change across periods.
 
-Document HOW to fetch each value (source table, filter key, aliases, scope caveats
-when comparing actuals vs Budget/OKR). Do NOT duplicate the calculation formula.
-Folded INTO the DataHub product_description (unlike MBR / Golden Queries).
+Document HOW to fetch each value (source table, filter key, period grain, aliases).
+Name which metric each target belongs to when the entity has several.
+
+NEVER write the numbers themselves. A transcribed period list ("Oct: 27; Nov: 27.5")
+is stale the day the target is revised, and no pipeline can refresh it — this section
+says WHERE the number lives, not what it is today.
+
+Target exists but lives only outside production (a spreadsheet, a slide)? Omit the
+section. Publish the targets via Luigi into a gsheet ingested by this repo, then come
+back and add the lookup path. A blank section is recoverable; a hardcoded one rots.
 -->
 
-**Budget (Target)** — {one line: what the annual commitment represents for this metric, or omit this block}.
+**{Metric Name} — OKR** — {one line: what the period goal represents}.
 
 - **Source table:** `{schema}.{table}`
 - **Filter key / metric name:** `{exact name in source}`
-- **Aliases / search terms:** {PT-BR: orçamento, budget, target, …}
-- **Caveat:** {scope mismatch vs actuals, if any}
+- **Period grain:** {quarter / semester / month}
 
-**OKR** — {one line: what the period goal represents, or omit this block}.
+## Metrics
 
-- **Source table:** `{schema}.{table}` (may differ from Budget)
-- **Filter key / metric name:** `{exact name in source}`
-- **Period grain:** {quarter / semester / month — how the OKR is keyed in the source}
-- **Aliases / search terms:** {PT-BR: meta, OKR, …}
-- **Caveat:** {scope mismatch vs actuals, if any}
+<!--
+Required — one ### {Metric Name} subsection per official metric (1–10 total). Repeat
+the whole ### block per metric, keeping the heading order below.
 
-## Golden Queries
+Required per metric: Slug, Description, Also Known As, Rules, Type, Direction, Grain,
+Is Additive, Golden Query. Optional: MBR, Category.
 
-<!-- The single canonical query that PRODUCES the official metric. Reuse the component pattern from
-     the domain entity (reference it) and add ONLY the layer exclusive to this metric. Trino dialect. -->
+Two headings are still accepted when a document carries them, `Business Stage` and
+`Acronym`, but they are not part of this contract and no flow emits them. Both feed
+metric-layer columns that are optional there and that the future generator leaves blank
+on purpose: neither has a reader, and deriving a short form from `Also Known As` is how
+the current registry ended up with 43% of its acronyms holding the metric name instead.
+An abbreviation the business really uses is an alias — it belongs in Also Known As.
+-->
 
-{One sentence on what the query computes.} The component CTE reproduces the pattern already documented in the related domain entity; what is exclusive to this metric is {the weighting / official aggregation layer}.
+### {Metric Name A}
+
+#### Slug
+
+<!-- Required — snake_case, unique in this document, and FROZEN once chosen. It is the
+     stable key between this metric and the table that will be materialized from it, so
+     it must survive a rename of the display name above. Do not "improve" it later. -->
+
+{metric_name_a}
+
+#### Description
+
+<!-- What this metric measures and how it differs from the naive/component calculation.
+     Bold any per-metric scope restriction. -->
+
+**{Metric Name A}** is {one-sentence definition}. {How it differs from the naive/component calculation.}
+
+#### Also Known As
+
+<!-- Required — the PT-BR and internal names stakeholders use when they ask for THIS
+     metric; TARS routes on them. Nested here, the owning metric is structural, so a
+     plain bullet is enough and no arrow is needed.
+
+     Use the arrow only for a NEAR-MISS: a name that sounds like this metric but means
+     something else. Recording it here is what stops TARS from answering the closest
+     match instead of the right one. -->
+
+- **{term}**, **{synonym}**
+- **{near-miss term}** → near-miss — {what it actually refers to}, not this metric
+
+#### Rules
+
+<!--
+Required — everything needed to reproduce the official number rather than a plausible
+approximation. This is the guard-rail against under-filtering, which is the single most
+common way this metric gets computed wrong. Cover, when they apply:
+  • Canonical filter — the exact WHERE that defines the official population.
+  • The common mistake — which filter people forget, and what it inflates/deflates.
+  • Parameters and weights — WHERE they are read from (table/column). Never hardcode a
+    weight or threshold here; point at the source so the value stays correct over time.
+  • Fallback — what to do when a parameter is missing for a period.
+  • Deduplication — the grain that makes a row unique, and how duplicates are resolved.
+-->
+
+- **Canonical filter:** `{exact predicate}`
+- **Common mistake:** {which filter is forgotten and what it does to the number}
+- **Parameters:** read from `{schema}.{table}`.`{column}` — never hardcoded
+- **Fallback:** {behaviour when a parameter is absent for the period}
+- **Deduplication:** unique per {grain}; resolve duplicates by {rule}
+
+#### Type
+
+<!-- Required — OKR or Health Metric. -->
+
+{OKR | Health Metric}
+
+#### Direction
+
+<!-- Required — the metric's polarity. Exactly one of: Higher is better /
+     Lower is better / Neutral. -->
+
+{Higher is better | Lower is better | Neutral}
+
+#### Grain
+
+<!-- Required — the period one row of the metric covers. Default to monthly unless the
+     metric is genuinely tracked at another frequency; the Golden Query below must
+     aggregate at this same grain. One of: daily / weekly / monthly / quarterly /
+     yearly. -->
+
+monthly
+
+#### Is Additive
+
+<!-- Required — true when the metric can be summed across dimensions (counts, volumes),
+     false when it cannot (rates, ratios, averages, percentages). Getting this wrong is
+     how someone sums percentages and reports 340%. -->
+
+{true | false}
+
+#### MBR
+
+<!-- Optional — the Monthly Business Review(s) this metric feeds. Omit when none. -->
+
+{MBR Name}
+
+#### Category
+
+<!-- Optional — the MBR agenda block this metric occupies (e.g. Cost of Service). Only
+     meaningful alongside an MBR; omit when unknown. -->
+
+{MBR agenda block}
+
+#### Golden Query
+
+<!-- Required — one canonical query that PRODUCES this metric at the grain declared
+     above. One sentence on what it returns, then the SQL. Must run on Trino AND on EMR
+     Spark 3.5 (see the dialect rules in the writing guide at the top). -->
+
+{One sentence on what this query computes.}
 
 ```sql
-WITH component AS (
-    -- Component metric — same pattern as the related domain entity.
-    SELECT
-        {dimension},
-        {component_expression} AS component_value
-    FROM {schema}.{table}
-    WHERE {canonical_filter}
-    GROUP BY 1
-)
 SELECT
-    {dimension},
-    {official_expression} AS {metric_alias}
-FROM component
+    date_trunc('month', {date_column}) AS month,
+    {metric_expression} AS {metric_alias}
+FROM {schema}.{table}
+WHERE {canonical_filter}
 GROUP BY 1
 ORDER BY 1
 ```
 
-## Superset Golden Assets
+### {Metric Name B}
 
-<!--
-Optional. List Superset virtual datasets (and materialized Trino/Databricks tables they map to)
-that serve as the canonical starting point for this metric in Superset.
+#### Slug
 
-CI links both as reference assets on the Data Product Summary in DataHub — same pattern as
-nps-fr: Trino ``schema.table`` pairs (e.g. materialized ``sandbox.nps_fr``) AND Superset
-dataset URNs in backticks. Omit this section when no Superset asset exists for this metric.
--->
+{metric_name_b}
 
-- **{Asset Name}** — {one-sentence description}. Materialized in `{schema}.{table}` when applicable. URN: `urn:li:dataset:(urn:li:dataPlatform:superset,{id},PROD)`
+#### Description
+
+**{Metric Name B}** is {one-sentence definition}.
+
+#### Also Known As
+
+- **{term}**, **{synonym}**
+
+#### Rules
+
+- **Canonical filter:** `{exact predicate}`
+- **Common mistake:** {which filter is forgotten and what it does to the number}
+
+#### Type
+
+{OKR | Health Metric}
+
+#### Direction
+
+{Higher is better | Lower is better | Neutral}
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+{true | false}
+
+#### Golden Query
+
+{One sentence on what this query computes.}
+
+```sql
+{second_metric_query}
+```

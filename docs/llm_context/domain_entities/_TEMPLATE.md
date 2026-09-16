@@ -21,16 +21,13 @@ Rules:
 ## Ownership
 
 <!--
-Data Owner: accountable for the business definition and approves changes (usually a
-manager/lead). Data Steward: maintains this document day-to-day and is the first point
-of contact for questions. At least one email is required in EACH category (they may
-overlap). Not folded into the DataHub Data Product description (see
-EXCLUDE_HEADING_PATTERNS in generate_and_push_datahub_entities.py) — it is routing
-metadata, not narrative content.
+Data Steward: maintains this document day-to-day and is the first point of contact for
+questions — at least one email is REQUIRED. Domain docs have no Data Owner role: the
+steward is the single point of contact. (Metric docs still carry both, because there
+the Data Owner is accountable for the business definition of the number.) Not folded
+into the DataHub Data Product description (see EXCLUDE_HEADING_PATTERNS in
+generate_and_push_datahub_entities.py) — it is routing metadata, not narrative content.
 -->
-
-**Data Owner:**
-- {data_owner_email@quintoandar.com.br}
 
 **Data Steward:**
 - {data_steward_email@quintoandar.com.br}
@@ -50,21 +47,6 @@ data architecture, upstream source systems, and pointers to related entities.
 - **Common metrics:** {2–4 KPIs most often asked about.}
 - **Source systems:** {Upstream operational systems feeding this entity (e.g. Retsuko, Zendesk, Trato Feito).}
 - **Related entities:** For {adjacent concept}, see [`{sibling}.md`]({sibling}.md).
-
----
-
-## Related Metric Entities
-
-<!--
-List every metric entity that defines OFFICIAL metrics built on this domain entity's tables.
-One bullet per metric entity file — use markdown links so TARS can route to the exact
-calculation doc. Include a one-line description of what metrics live there.
-
-When a metric entity exists, its Calculation / Canonical Filter / Golden Query OVERRIDE
-generic logic in this domain entity's Key Metrics section.
--->
-
-- [{Official Metric Family Name}](../metric_entities/{metric_entity_slug}.md) — {one-line: which official metrics this file defines}
 
 ---
 
@@ -116,7 +98,7 @@ Split into two subsections when metric entities exist for this domain:
 If no metric entity exists yet, a single bullet list is fine.
 -->
 
-Use [Related Metric Entities](#related-metric-entities) when the question asks for an **official**, **MBR**, or **OKR** number.
+Use [Official metrics (metric entities)](#official-metrics-metric-entities) below when the question asks for an **official**, **MBR**, or **OKR** number.
 
 ### Official metrics (metric entities)
 

@@ -10,8 +10,8 @@
 
 ## Overview
 
-**Orphan Fixture Domain** intentionally has no metric relations so the
-scope resolver must fail closed.
+**Orphan Fixture Domain** intentionally has no metric doc pointing at it, so
+the scope resolver must resolve it to zero stems and stay quiet.
 
 ## Glossary and Synonyms
 
@@ -22,8 +22,6 @@ scope resolver must fail closed.
 | Table | Purpose |
 | --- | --- |
 | `dw_public.dim_date` | Calendar dates unused by any fixture metric |
-
-## Related Metric Entities
 
 ## Dos and Don'ts
 

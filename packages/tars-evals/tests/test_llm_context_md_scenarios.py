@@ -314,37 +314,40 @@ def test_domain_entity_edit_fans_out_without_dataset_drift(tmp_git_repo):
     )
 
 
-def test_backlinks_only_business_fan_out(tmp_git_repo):
-    """Business ``## Related Metric Entities`` alone is enough when reverse index misses."""
+def test_legacy_business_backlinks_no_longer_fan_out(tmp_git_repo):
+    """A legacy domain doc still carrying ``## Related Metric Entities`` is
+    ignored: the metric doc here declares no domain, so nothing points at this
+    domain and the edit fans out to nothing. Only the metric side declares the
+    relationship now."""
     repo = tmp_git_repo
     repo.write(METRIC_PATH, _fixture("metric_no_business_links.md"))
     _generate_seed_dataset(repo)
     repo.write(BUSINESS_PATH, _fixture("business_v1.md"))
     repo.commit("seed metric without reciprocal business link")
     repo.write(BUSINESS_PATH, _fixture("business_v2_overview_edit.md"))
-    repo.commit("edit business overview for backlinks-only fan-out")
+    repo.commit("edit business overview of a legacy-shaped domain doc")
 
     scope_result, eval_stems, scope_stems = _run_scope_cli(repo)
     assert scope_result.returncode == 0, scope_result.stderr
-    assert _read_stems(eval_stems) == [STEM]
-    assert _read_stems(scope_stems) == [STEM]
+    assert _read_stems(eval_stems) == []
+    assert _read_stems(scope_stems) == []
+    assert "WARN" not in scope_result.stderr
     assert "falling back to all stems" not in scope_result.stderr
-    _assert_ci_parity_drift(
-        repo, expect_blocking_failure=False, scope_stems=scope_stems
-    )
 
 
-def test_orphan_business_doc_warns_and_skips_eval(tmp_git_repo):
+def test_unlinked_business_doc_skips_eval_silently(tmp_git_repo):
+    """No metric doc points at this domain, which is the normal state for most
+    domain docs — it resolves to zero stems without warning about it."""
     repo = tmp_git_repo
     repo.write(METRIC_PATH, _fixture("metric_v1.md"))
     _generate_seed_dataset(repo)
     repo.commit("seed unrelated metric dataset")
     repo.write(ORPHAN_BUSINESS_PATH, _fixture("business_orphan.md"))
-    repo.commit("add orphan business fixture")
+    repo.commit("add unlinked business fixture")
 
     scope_result, eval_stems, scope_stems = _run_scope_cli(repo, max_samples=60)
     assert scope_result.returncode == 0, scope_result.stderr
-    assert "skipping eval/drift" in scope_result.stderr
+    assert "WARN" not in scope_result.stderr
     assert "falling back to all stems" not in scope_result.stderr
     assert _read_stems(eval_stems) == []
     assert _read_stems(scope_stems) == []

@@ -54,9 +54,16 @@ Once the dataset is committed, later edits to that doc run the normal blocking
 drift check and TARS eval gate. Existing datasets with committed YAML still
 fail CI when golden queries change without regenerating.
 
-Business-entity docs with no resolvable ``## Related Metric Entities`` (and
-no reverse link from a metric doc) also merge with a **warning** — CI does not
-fail-closed to every dataset stem.
+Which evals a domain-doc edit triggers is decided in one direction only: metric
+docs declare their dependencies in ``## Related Domain Entities`` and CI inverts
+that into a reverse index. A domain doc nothing points at resolves to zero stems
+and merges silently — with far more domain docs than metric docs, having no
+linked metric is the normal state, not an anomaly. CI never fail-closes to every
+dataset stem.
+
+Lookup uses the domain doc's H1 title, since that is the name metric docs cite,
+and falls back to the filename. A metric doc citing a domain entity that no doc
+answers to is a typo, and CI warns about it on the PR that introduces it.
 
 ## Running evals and gate orchestration
 

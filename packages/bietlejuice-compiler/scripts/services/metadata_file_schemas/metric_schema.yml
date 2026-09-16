@@ -21,9 +21,39 @@ column_with_metric:
 metric:
   name: str(min=1, max=280)
   description: str()
-  acronym: str()
+  # Optional: `upload_metadata_files_into_s3.py` already lists it under `optional_args`,
+  # so an absent key is simply left out of the DataHub payload — nothing downstream
+  # breaks. Required-but-unnatural is what produced the current state: of the 699
+  # metrics here, 686 carry an acronym and 162 of those (24%) are mechanically derived
+  # from the metric name — 66 repeat it verbatim and 96 string its initials together.
+  # Real abbreviations are captured as aliases in the metric entity template's glossary.
+  acronym: str(required=False)
   is_additive: bool()
-  business_stage: str()
-  hierarchy: str()
+  # Optional, and vocabulary-checked only when present — a metric materialized without
+  # it must not fail CI. The field is well filled today but has no reader: it sits in
+  # `optional_args` of `upload_metadata_files_into_s3.py`, and no Superset dataset,
+  # chart, saved query or SQL Lab query references the column. It is also largely
+  # redundant with `domain`: 6 of the 7 domains map to exactly one stage, so for 464 of
+  # the ~700 metrics the domain already determines the answer. Only For Rent uses it as
+  # a real axis. The metric entity questionnaire stops asking for it; documents that
+  # already carry it keep publishing it.
+  #
+  # Closed vocabulary: the eight canonical lifecycle stages, plus two legacy values
+  # that exist in production today and are tolerated only so that touching one of
+  # those files does not fail CI. Both are dropped once corrected, and neither is
+  # offered at authoring time — the metric entity template teaches the eight.
+  #   `Suply/Demand`      — typo, on 6 columns.
+  #   `Conversational XP` — a domain name used as a stage, on the 3 metric columns of
+  #                         conversational_xp/metric_agentic_platform/evals_daily.
+  #                         Reclassifying those is the owning team's call, not this PR's.
+  # `Supply` is kept despite having no user in production: it is the counterpart of
+  # `Demand`, and the `Suply/Demand` typo is evidence someone reached for it. Dropping
+  # a stage because it is historically unused would block a legitimate future one.
+  business_stage: regex('Platform Operations|Demand|Supply|Collections|Offboarding|CX|Post Contract|Other|Suply/Demand|Conversational XP', required=False)
+  # Optional: free-form, already drifted to ~20 near-duplicate spellings, and read by
+  # nobody — `upload_metadata_files_into_s3.py` looks for `hierarchy_level`, a key this
+  # schema never defined. Required-but-discarded is worse than absent, so the
+  # requirement is dropped rather than propagated into the metric entity template.
+  hierarchy: str(required=False)
   approved_by: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*')
   link_to_metric: str(required=False)

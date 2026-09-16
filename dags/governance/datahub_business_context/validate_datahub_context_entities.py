@@ -316,7 +316,32 @@ def _validate_file(path: Path) -> tuple[list[str], list[str]]:
     )
     errors.extend(struct_errors)
     warnings.extend(struct_warnings)
+    errors.extend(_domain_allowlist_errors(parsed.domain))
     return errors, warnings
+
+
+def _domain_allowlist_errors(domain: str) -> list[str]:
+    """Blocking error when ``## Domain`` is outside the metadata domain allowlist.
+
+    Lives here rather than in the parser because it needs the registry, and the parser
+    is kept stdlib-only so tars-evals can load it by file path. Reading the allowlist
+    from ``domain_registry`` instead of restating it keeps this from becoming a second
+    copy that drifts: the value is written verbatim into the metric metadata the
+    generator phase produces, where Yamale and the FAIR gate accept nothing else.
+    """
+    if not (domain or "").strip():
+        return []  # absence is already reported by validate_parsed_document
+    try:
+        from bietlejuice.governance.domain_registry import active_domains
+    except ImportError:  # pragma: no cover - bietlejuice-core is installed in CI
+        return []
+    allowed = active_domains()
+    if domain in allowed:
+        return []
+    return [
+        f"## Domain is {domain!r}, which is not in the metadata domain allowlist "
+        f"({', '.join(allowed)})"
+    ]
 
 
 def _pr_comment_body(failures: list[tuple[str, str, list[str]]]) -> str:
