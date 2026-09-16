@@ -1,0 +1,34 @@
+dag:
+  name: gsheets_luigijr_birdie_extraction
+  schedule_interval: 0 8 * * *
+  owner: ForRent PostContract
+  tags:
+  - luigi
+  - luigi-type:gsheets
+  - generated-by:diego.carvalho
+workflow:
+  type: gsheets_ingestion
+  layer: raw
+  custom_schema: luigijr_forrent_postcontract
+  tables_customization:
+    birdie_extraction:
+      sheet_id: 1-WUwSJHcilYt-FrY059cEg3Yrl3f4PnlFnYVKiOe-JM
+      sheet_name: extract_birdie
+cluster:
+  type: consolidation_xs_general_cluster
+  access_control_list:
+    group_name: luigijr
+    permission_level: CAN_MANAGE
+  custom_libraries:
+  - whl: '{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl'
+  - pypi:
+      package: google-auth==2.13.0
+  - pypi:
+      package: google-api-python-client==2.55.0
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
