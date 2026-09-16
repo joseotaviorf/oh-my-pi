@@ -264,8 +264,12 @@ SELECT
     ) AS dt_deed_update,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_da_transacao, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_da_transacao, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -274,8 +278,12 @@ SELECT
     ) AS transaction_amount,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(taxa_corretagem_ideal_6, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(taxa_corretagem_ideal_6, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -284,8 +292,12 @@ SELECT
     ) AS brokerage_rate,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_devido, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_devido, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -294,8 +306,12 @@ SELECT
     ) AS amount_due,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_do_acordo_corretagem_, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_do_acordo_corretagem_, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -320,8 +336,12 @@ SELECT
     NULLIF(TRIM(mes_do_ultimo_pagamento_), '') AS last_payment_month,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_a_vista_1a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_a_vista_1a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -330,8 +350,12 @@ SELECT
     ) AS installment_amount_1,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_1a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_1a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -380,8 +404,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_1a_parcela), '') AS installment_status_1,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_2a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_2a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -390,8 +418,12 @@ SELECT
     ) AS installment_amount_2,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_2a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_2a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -440,8 +472,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_2a_parcela), '') AS installment_status_2,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_3a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_3a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -450,8 +486,12 @@ SELECT
     ) AS installment_amount_3,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_3a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_3a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -500,8 +540,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_3a_parcela), '') AS installment_status_3,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_4a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_4a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -510,8 +554,12 @@ SELECT
     ) AS installment_amount_4,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_4a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_4a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -560,8 +608,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_4a_parcela), '') AS installment_status_4,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_5a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_5a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -570,8 +622,12 @@ SELECT
     ) AS installment_amount_5,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_5a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_5a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -620,8 +676,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_5a_parcela), '') AS installment_status_5,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_6a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_6a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -630,8 +690,12 @@ SELECT
     ) AS installment_amount_6,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_6a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_6a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -680,8 +744,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_6a_parcela), '') AS installment_status_6,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_7a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_7a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -690,8 +758,12 @@ SELECT
     ) AS installment_amount_7,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_7a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_7a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -740,8 +812,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_7a_parcela), '') AS installment_status_7,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_8a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_8a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -790,8 +866,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_8a_parcela), '') AS installment_status_8,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_9a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_9a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -800,8 +880,12 @@ SELECT
     ) AS installment_amount_9,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_9a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_9a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -850,8 +934,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_9a_parcela), '') AS installment_status_9,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_10a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_10a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -860,8 +948,12 @@ SELECT
     ) AS installment_amount_10,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_10a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_10a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -910,8 +1002,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_10a_parcela), '') AS installment_status_10,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_11a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_11a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -920,8 +1016,12 @@ SELECT
     ) AS installment_amount_11,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_11a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_juros_e_multa_se_houver_11a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -970,8 +1070,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_11a_parcela), '') AS installment_status_11,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_12a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_12a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1020,8 +1124,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_12a_parcela), '') AS installment_status_12,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_13a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_13a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1070,8 +1178,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_13a_parcela), '') AS installment_status_13,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_14a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_14a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1120,8 +1232,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_14a_parcela), '') AS installment_status_14,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_15a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_15a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1170,8 +1286,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_15a_parcela), '') AS installment_status_15,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_16a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_16a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1220,8 +1340,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_16a_parcela), '') AS installment_status_16,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_17a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_17a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1270,8 +1394,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_17a_parcela), '') AS installment_status_17,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_18a_parcela, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_18a_parcela, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1320,8 +1448,12 @@ SELECT
     NULLIF(TRIM(status_da_parcela_18a_parcela), '') AS installment_status_18,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_total_recebido, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_total_recebido, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1330,8 +1462,12 @@ SELECT
     ) AS total_received,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_do_acordo, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_do_acordo, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1340,8 +1476,12 @@ SELECT
     ) AS agreement_amount,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(comissao_escritorio_parceiro, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(comissao_escritorio_parceiro, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1350,8 +1490,12 @@ SELECT
     ) AS accounting_commission,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_a_ser_partilhado_entre_os_parceiros, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_a_ser_partilhado_entre_os_parceiros, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1360,8 +1504,12 @@ SELECT
     ) AS partner_share_amount,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(comissao_cr_175, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(comissao_cr_175, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1370,8 +1518,12 @@ SELECT
     ) AS brokerage_estate_agent_amount_1,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_comissao_en_4, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_comissao_en_4, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1380,8 +1532,12 @@ SELECT
     ) AS brokerage_estate_agent_amount_2,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_comissao_ea_05, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_comissao_ea_05, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1390,8 +1546,12 @@ SELECT
     ) AS brokerage_estate_agent_amount_3,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_comissao_ciq_667, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_comissao_ciq_667, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1400,8 +1560,12 @@ SELECT
     ) AS brokerage_estate_agent_amount_4,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_comissao_tqc_20, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_comissao_tqc_20, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1410,8 +1574,12 @@ SELECT
     ) AS brokerage_estate_agent_amount_5,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(comissao_quintoandar, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(comissao_quintoandar, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1420,8 +1588,12 @@ SELECT
     ) AS brokerage_quinto_andar_amount_without_accounting_commission,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_nf, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(valor_nf, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
@@ -1485,8 +1657,12 @@ SELECT
     NULLIF(TRIM(status_repasse_parceiros), '') AS payment_status,
     CAST(
         NULLIF(
-            REPLACE(
-                REGEXP_REPLACE(NULLIF(total_repassado, ''), '[^0-9,.-]', ''),
+            REGEXP_REPLACE(
+                REGEXP_REPLACE(
+                    REGEXP_REPLACE(NULLIF(total_repassado, ''), '[^0-9,.-]', ''),
+                    '\\.',
+                    ''
+                ),
                 ',',
                 '.'
             ),
