@@ -382,6 +382,16 @@ class TestIsScannedPythonPath:
             is False
         )
 
+    def test_layer_taxonomy_pilot_is_scanned(self):
+        # Pilot DAGs are EMR YAML with no hand-written Python, but they must
+        # not get a code-level bypass around databricks_cluster_exceptions.yml.
+        assert (
+            is_scanned_python_path(
+                "dags/governance/transformation_terminator_test/x_dag.py"
+            )
+            is True
+        )
+
     def test_sql_excluded(self):
         assert (
             is_scanned_python_path("dags/growth/semrush/queries/clean/x.sql") is False

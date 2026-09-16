@@ -29,6 +29,22 @@ class TestIgnoredDagIds:
             }
         )
 
+    def test_includes_layer_taxonomy_pilot_dags_only(self, tmp_path):
+        """Other DAGs under dags/governance/ are real pipelines and must stay tracked."""
+        # arrange
+        governance = tmp_path / "governance"
+        (governance / "transformation_terminator_test").mkdir(parents=True)
+        (governance / "consumption_offboarding_test").mkdir(parents=True)
+        (governance / "glue_table_version_cleanup").mkdir(parents=True)
+
+        # act / assert
+        assert ignored_dag_ids(str(tmp_path)) == frozenset(
+            {
+                "bietlejuice.transformation_terminator_test",
+                "bietlejuice.consumption_offboarding_test",
+            }
+        )
+
 
 class TestFilterIgnoredDagDependencies:
     def test_removes_ignored_dag_keys(self, tmp_path, monkeypatch):
