@@ -1,0 +1,23 @@
+dag:
+  name: enrich_luigijr_photo_jobs_house_o2l
+  owner: Ops Public
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:alexandre.gimenez
+  - luigi-engine:trino
+  schedule_interval: 0 8 * * *
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: ops_public
+  load_spark_job: load_trino_query
+  spark_job_arguments:
+  - '{environment}'
+  - '{bucket}'
+  - consumption
+  - '{schema}'
+  - '{dag_name}'
+  - '{table_name}'
+  - '{partitions}'
+  - '{load_end_date}'
