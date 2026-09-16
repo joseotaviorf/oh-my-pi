@@ -23,6 +23,119 @@ agent_identity AS (
     WHERE
         id_user IS NOT NULL
 ),
+offers_linked_to_visit AS (
+    SELECT
+        so.id_visit_external AS id_visit,
+        so.ts_offer_submitted,
+        so.ts_offer_accepted,
+        so.ts_sale_agreement_signed,
+        so.ts_sale_agreement_canceled,
+        so.ts_updated
+    FROM
+        datalake_sale_offer.sale_offer AS so
+    WHERE
+        so.id_visit_external IS NOT NULL
+    UNION ALL
+    SELECT
+        so.id_visit_fifty_external AS id_visit,
+        so.ts_offer_submitted,
+        so.ts_offer_accepted,
+        so.ts_sale_agreement_signed,
+        so.ts_sale_agreement_canceled,
+        so.ts_updated
+    FROM
+        datalake_sale_offer.sale_offer AS so
+    WHERE
+        so.id_visit_fifty_external IS NOT NULL
+),
+offer_by_visit AS (
+    SELECT
+        id_visit,
+        CAST(MAX(CASE WHEN ts_offer_submitted IS NOT NULL THEN 1 ELSE 0 END) AS INTEGER) AS is_offer_submitted,
+        CAST(MAX(CASE WHEN ts_offer_accepted IS NOT NULL THEN 1 ELSE 0 END) AS INTEGER) AS is_offer_accepted,
+        CAST(
+            MAX(
+                CASE
+                    WHEN ts_sale_agreement_signed IS NOT NULL
+                        AND ts_sale_agreement_canceled IS NULL
+                        THEN 1
+                    ELSE 0
+                END
+            ) AS INTEGER
+        ) AS is_agreement_signed,
+        MIN(ts_offer_submitted) AS ts_offer_submitted,
+        MIN(ts_offer_accepted) AS ts_offer_accepted,
+        MIN(ts_sale_agreement_signed) AS ts_sale_agreement_signed,
+        MAX(ts_sale_agreement_canceled) AS ts_sale_agreement_canceled,
+        MAX(ts_updated) AS ts_offer_updated
+    FROM
+        offers_linked_to_visit
+    GROUP BY
+        id_visit
+),
+pfa_at_visit AS (
+    SELECT
+        id_visit,
+        id_user_agent
+    FROM (
+        SELECT
+            v.id_visit,
+            pfa.id_user_agent,
+            ROW_NUMBER() OVER (
+                PARTITION BY v.id_visit
+                ORDER BY pfa.ts_status_started DESC
+            ) AS rn
+        FROM
+            datalake_visit.visits AS v
+        INNER JOIN
+            datalake_ebdb_listing.house AS h
+                ON v.id_house = h.id
+        INNER JOIN
+            datalake_region.region AS r
+                ON h.id_region = r.id
+        INNER JOIN
+            datalake_ebdb_agents.preferred_fixed_agent_history AS pfa
+                ON v.id_visitor = pfa.id_visitor
+                AND r.id_city = pfa.id_region
+                AND v.business_context = pfa.business_context
+                AND v.ts_created BETWEEN pfa.ts_status_started
+                    AND COALESCE(pfa.ts_status_ended, TIMESTAMP('{load_end_date}'))
+        WHERE
+            DATE(v.ts_created) BETWEEN DATE('{reprocess_start_date}') AND DATE('{load_end_date}')
+    ) AS ranked_pfa
+    WHERE
+        rn = 1
+),
+crcc_at_visit AS (
+    SELECT
+        v.id_visit,
+        CAST(
+            MAX(
+                CASE
+                    WHEN heh.key_location = 'AGENT'
+                        AND CAST(heh.key_holder_identifier AS BIGINT) = v.id_last_associated_agent
+                        AND heh.event_type <> 'KEY_HOLDER_DEALLOCATED'
+                        THEN 1
+                    ELSE 0
+                END
+            ) AS INTEGER
+        ) AS is_crcc_visit
+    FROM
+        datalake_visit.visits AS v
+    LEFT JOIN
+        datalake_ebdb_listing.house_entrance_history AS heh
+            ON heh.id_house = v.id_house
+            AND DATE(v.ts_visit) <= DATE('{load_end_date}')
+            AND v.ts_visit >= heh.ts_entrance_started
+            AND (
+                heh.ts_entrance_ended IS NULL
+                OR v.ts_visit < heh.ts_entrance_ended
+            )
+    WHERE
+        DATE(v.ts_created) BETWEEN DATE('{reprocess_start_date}') AND DATE('{load_end_date}')
+    GROUP BY
+        v.id_visit
+),
 visit_base AS (
     SELECT
         v.id_visit,
@@ -52,30 +165,11 @@ visit_base AS (
             1,
             0
         ) AS is_pfa_visit,
-        IF(
-            heh.key_location = 'AGENT'
-                AND CAST(heh.key_holder_identifier AS BIGINT) = v.id_last_associated_agent
-                AND heh.event_type <> 'KEY_HOLDER_DEALLOCATED',
-            1,
-            0
-        ) AS is_crcc_visit,
+        COALESCE(crcc.is_crcc_visit, 0) AS is_crcc_visit,
         IF(v.is_vbba, 1, 0) AS is_vbba_visit,
-        IF(
-            COALESCE(o_visit.ts_offer_submitted, o_fifty.ts_offer_submitted) IS NOT NULL,
-            1,
-            0
-        ) AS is_offer_submitted,
-        IF(
-            COALESCE(o_visit.ts_offer_accepted, o_fifty.ts_offer_accepted) IS NOT NULL,
-            1,
-            0
-        ) AS is_offer_accepted,
-        IF(
-            COALESCE(o_visit.ts_sale_agreement_signed, o_fifty.ts_sale_agreement_signed) IS NOT NULL
-                AND COALESCE(o_visit.ts_sale_agreement_canceled, o_fifty.ts_sale_agreement_canceled) IS NULL,
-            1,
-            0
-        ) AS is_agreement_signed,
+        COALESCE(obv.is_offer_submitted, 0) AS is_offer_submitted,
+        COALESCE(obv.is_offer_accepted, 0) AS is_offer_accepted,
+        COALESCE(obv.is_agreement_signed, 0) AS is_agreement_signed,
         v.ts_created AS ts_visit_created,
         v.ts_visit,
         v.ts_visit_rescheduled,
@@ -83,15 +177,14 @@ visit_base AS (
         v.ts_visit_done,
         v.ts_visit_unsuccessful,
         v.ts_visit_stalled,
-        COALESCE(o_visit.ts_offer_submitted, o_fifty.ts_offer_submitted) AS ts_offer_submitted,
-        COALESCE(o_visit.ts_offer_accepted, o_fifty.ts_offer_accepted) AS ts_offer_accepted,
-        COALESCE(o_visit.ts_sale_agreement_signed, o_fifty.ts_sale_agreement_signed) AS ts_sale_agreement_signed,
-        COALESCE(o_visit.ts_sale_agreement_canceled, o_fifty.ts_sale_agreement_canceled) AS ts_sale_agreement_canceled,
+        obv.ts_offer_submitted,
+        obv.ts_offer_accepted,
+        obv.ts_sale_agreement_signed,
+        obv.ts_sale_agreement_canceled,
         v.ts_updated AS ts_visit_updated,
         GREATEST(
             v.ts_updated,
-            COALESCE(o_visit.ts_updated, v.ts_updated),
-            COALESCE(o_fifty.ts_updated, v.ts_updated)
+            COALESCE(obv.ts_offer_updated, v.ts_updated)
         ) AS ts_source_updated
     FROM
         datalake_visit.visits AS v
@@ -99,33 +192,14 @@ visit_base AS (
         visit_booking_agent AS vba
             ON v.id_visit = vba.id_visit
     LEFT JOIN
-        datalake_ebdb_listing.house AS h
-            ON v.id_house = h.id
+        pfa_at_visit AS pfa
+            ON v.id_visit = pfa.id_visit
     LEFT JOIN
-        datalake_region.region AS r
-            ON h.id_region = r.id
+        crcc_at_visit AS crcc
+            ON v.id_visit = crcc.id_visit
     LEFT JOIN
-        datalake_ebdb_agents.preferred_fixed_agent_history AS pfa
-            ON v.id_visitor = pfa.id_visitor
-            AND r.id_city = pfa.id_region
-            AND v.business_context = pfa.business_context
-            AND v.ts_created BETWEEN pfa.ts_status_started
-                AND COALESCE(pfa.ts_status_ended, TIMESTAMP('{load_end_date}'))
-    LEFT JOIN
-        datalake_ebdb_listing.house_entrance_history AS heh
-            ON v.id_house = heh.id_house
-            AND DATE(v.ts_visit) <= DATE('{load_end_date}')
-            AND v.ts_visit >= heh.ts_entrance_started
-            AND (
-                heh.ts_entrance_ended IS NULL
-                OR v.ts_visit < heh.ts_entrance_ended
-            )
-    LEFT JOIN
-        datalake_sale_offer.sale_offer AS o_visit
-            ON v.id_visit = o_visit.id_visit_external
-    LEFT JOIN
-        datalake_sale_offer.sale_offer AS o_fifty
-            ON v.id_visit = o_fifty.id_visit_fifty_external
+        offer_by_visit AS obv
+            ON v.id_visit = obv.id_visit
     WHERE
         DATE(v.ts_created) BETWEEN DATE('{reprocess_start_date}') AND DATE('{load_end_date}')
 )
