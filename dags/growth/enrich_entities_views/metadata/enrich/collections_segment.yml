@@ -2,11 +2,12 @@ database_name: datalake_entities_views
 table_name: collections_segment
 description: |
   Enriched CDP entity view for collections segmentation (FR_COLLECTIONS_SEGMENT). Each row represents a
-  Trato Feito customer_segment_distribution record for a customer document, joined to the latest non-deleted
-  non-landlord trato_feito client for that document and to the priority contract via core_contract. Tracks
-  whether the customer has a late fee discount offer, is in pre-evictions (STOCK_RISK), is in evictions, or
-  has settled their debts. Feeds enrich_transactional_entities for AI initiatives such as Conv XP chatbots
-  and Datazord.
+  Trato Feito customer_segment_distribution record for a customer document, joined to the priority contract
+  via core_contract. id_user is resolved from the latest non-deleted non-landlord trato_feito client when
+  one exists, otherwise by matching ebdb.user.cpf to the distribution document hash. Tracks whether the
+  customer has a late fee discount offer, is in pre-evictions (ACTIVE_STOCK_RISK*), is in evictions
+  (EVICTIONS*), or has settled their debts. Feeds enrich_transactional_entities for AI initiatives such as
+  Conv XP chatbots and Datazord.
 domain: Fintech
 owner: erick.alexandre@quintoandar.com.br
 columns:
@@ -24,17 +25,20 @@ columns:
     description: Priority contract ID for this customer segment distribution, sourced from the core contract model via join on customer_segment_distribution.id_priority_contract.
   id_user:
     lineage:
+      - datalake_trato_feito_clean.customer_segment_distribution.customer_document_value
       - datalake_trato_feito_clean.client.id_external
       - datalake_ebdb_clean.user.cpf
       - datalake_ebdb_clean.user.id
     description: |
       Main EBDB user id for the segmented customer associated with this customer segment distribution.
-      Resolved from the latest non-deleted, non-landlord trato_feito client matching customer_document_type
-      and customer_document_value, using the first validated fallback in order: client.id_external (when it
-      exists in ebdb.user), or ebdb.user.cpf matched by exact document hash equality with
-      customer_document_value. Rows with null, empty, or unresolvable id_user are excluded. One row is
-      generated per customer_segment_distribution record; multiple segmented customers on the same contract
-      each get their own row with distinct id_entity and id_user.
+      Resolved by the first validated fallback in order: client.id_external, taken from the latest
+      non-deleted, non-landlord trato_feito client matching customer_document_type and
+      customer_document_value, and kept only when that id exists in ebdb.user; otherwise ebdb.user.cpf
+      matched by exact document hash equality against customer_segment_distribution.customer_document_value.
+      The second fallback reads the document directly from the distribution and so does not require a
+      trato_feito client row. Rows with an unresolvable id_user are excluded. One row is generated per
+      customer_segment_distribution record; multiple segmented customers on the same contract each get their
+      own row with distinct id_entity and id_user.
   entity:
     description: Entity type. Always 'FR_COLLECTIONS_SEGMENT' for all rows in this view, indicating a rental collections segment entity.
   persona:
@@ -55,23 +59,25 @@ columns:
       - datalake_trato_feito_clean.customer_segment_distribution.ts_created
     description: |
       JSON structure containing collections segment properties: status and creation timestamp (when).
-      status values: 'debts_settled' (customer document has no active customer_segment_distribution — customer left collections, is_active = FALSE),
-      'is_on_evictions' (segment name = EVICTIONS and segment is active),
-      'is_on_pre_evictions' (segment name in ACTIVE_STOCK_RISK_DEAL_LOW, ACTIVE_STOCK_RISK_DEAL_HIGH, ACTIVE_STOCK_RISK_NODEAL_LOW, ACTIVE_STOCK_RISK_NODEAL_HIGH and segment is active),
+      status values, evaluated in order: 'debts_settled' (customer_segment_distribution.is_active = FALSE — customer left collections),
+      'is_on_evictions' (segment name starts with EVICTIONS and the segment definition is active),
+      'is_on_pre_evictions' (segment name starts with ACTIVE_STOCK_RISK and the segment definition is active),
       'has_late_fee_discount' (audience has a negotiation option with 100% discount on fee and fine),
-      'is_segmented' (fallback — CSD is active but no specific segment condition matched, is_active = TRUE).
+      'is_segmented' (fallback — distribution is active but no specific segment condition matched).
+      The EVICTIONS and ACTIVE_STOCK_RISK prefixes cover every member of the corresponding macro-segment in
+      ChargeHub's ContractSegment enum, so segment splits within a macro-segment do not require a query change.
+      Distributions pointing at a deactivated segment definition fall through to has_late_fee_discount or
+      is_segmented; those rows are stale in the source and are deliberately not reported as evictions.
       Structure: {"status": "<status_value>", "when": "<ts_created>"}
   is_active:
     lineage:
       - datalake_trato_feito_clean.customer_segment_distribution.is_active
-      - datalake_trato_feito_clean.segment.name
-      - datalake_trato_feito_clean.segment.is_active
-      - datalake_trato_feito_clean.audience_negotiation_option.id_audience
     description: |
       Boolean flag indicating whether the collections segment entity is currently active.
       TRUE when the customer still has an active collections segmentation (status is not debts_settled).
-      FALSE only for debts_settled, when the customer document has no active customer_segment_distribution record.
-      Superseded inactive segment rows are excluded when the customer moved to another active segment.
+      FALSE only for debts_settled, when the customer document's customer_segment_distribution row has
+      is_active = FALSE. There is exactly one such row per customer document, guaranteed by a unique
+      constraint on (customer_document_type, customer_document_value).
   ts_created:
     lineage:
       - datalake_trato_feito_clean.customer_segment_distribution.ts_created

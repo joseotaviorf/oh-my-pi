@@ -246,7 +246,7 @@ columns:
       An invoice entity will be considered as active for status open, and inactive for statuses divergent-payment, not-payable, written-down, canceled, or paid.
       A PHOTO_SESSION entity will be considered as active for all statuses except PUBLICADO, CANCELADO, COMPLETADO, or FOTOSTIRADAS (case-insensitive, after UPPER and TRIM), which are considered inactive.
       A HOUSE_DRAFT entity will be considered as active for statuses 'EDITING' or 'PROCESSING', and inactive for all other statuses.
-      A FR_COLLECTIONS_SEGMENT entity is active when the segmented customer still has an active collections segmentation (status is not debts_settled). It is inactive only for debts_settled, when the customer has no active row in customer_segment_distribution. Superseded inactive segment rows are excluded when the customer moved to another active segment.
+      A FR_COLLECTIONS_SEGMENT entity is active when the segmented customer still has an active collections segmentation (status is not debts_settled). It is inactive only for debts_settled, when the customer document's customer_segment_distribution row has is_active = FALSE; there is exactly one such row per customer document.
   ts_inactive:
     lineage:
       - core_visit.visit.ts_updated
