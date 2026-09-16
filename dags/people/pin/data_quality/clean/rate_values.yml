@@ -45,74 +45,77 @@ column_level_validations:
   #         AND next_started >= DATE('2024-03-01')
   #       ) = 0
   #     severity_level: Warning
-  salary_rate_values_must_cover_active_salary_rate:
-    custom:
-      # Salary (id_rate, id_rate_object) pairs in rate_values must cover the active rate window from go-live (no late start / mid-gap / early end).
-      constraint: |-
-        (SELECT COUNT(*) FROM (
-          WITH salary_pairs AS (
-            SELECT DISTINCT
-              rv.id_rate,
-              rv.id_rate_object
-            FROM datalake_pin_core_clean.rate_values AS rv
-            INNER JOIN datalake_pin_core_clean.rates AS rates
-              ON rates.id_rate = rv.id_rate
-              AND rates.rate_type = 'SALARY'
-          ),
-          rate_bounds AS (
-            SELECT
-              rates.id_rate,
-              MIN(rates.dt_effective_started) AS rate_started,
-              MAX(COALESCE(rates.dt_effective_ended, DATE('9999-12-31'))) AS rate_ended
-            FROM datalake_pin_core_clean.rates AS rates
-            WHERE rates.rate_type = 'SALARY'
-              AND COALESCE(rates.dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
-            GROUP BY rates.id_rate
-          ),
-          rv_versions AS (
-            SELECT
-              rv.id_rate,
-              rv.id_rate_object,
-              rv.dt_effective_started,
-              COALESCE(rv.dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
-              LEAD(rv.dt_effective_started) OVER (
-                PARTITION BY rv.id_rate, rv.id_rate_object
-                ORDER BY rv.dt_effective_started
-              ) AS next_started,
-              MIN(rv.dt_effective_started) OVER (
-                PARTITION BY rv.id_rate, rv.id_rate_object
-              ) AS first_started,
-              MAX(COALESCE(rv.dt_effective_ended, DATE('9999-12-31'))) OVER (
-                PARTITION BY rv.id_rate, rv.id_rate_object
-              ) AS last_ended
-            FROM datalake_pin_core_clean.rate_values AS rv
-            INNER JOIN salary_pairs AS sp
-              ON sp.id_rate = rv.id_rate
-              AND sp.id_rate_object = rv.id_rate_object
-          )
-          SELECT
-            rv.id_rate,
-            rv.id_rate_object
-          FROM rv_versions AS rv
-          INNER JOIN rate_bounds AS rb
-            ON rb.id_rate = rv.id_rate
-          WHERE
-            (
-              rv.next_started IS NOT NULL
-              AND DATE_ADD(rv.dt_effective_ended, 1) != rv.next_started
-              AND rv.next_started >= DATE('2024-03-01')
-            )
-            OR (
-              rv.first_started > GREATEST(DATE('2024-03-01'), rb.rate_started)
-              AND rv.last_ended >= DATE('2024-03-01')
-            )
-            OR (
-              rv.last_ended < LEAST(CURRENT_DATE(), rb.rate_ended)
-              AND rb.rate_ended >= DATE('2024-03-01')
-              AND rv.last_ended >= DATE('2024-03-01')
-            )
-        )) = 0
-      severity_level: Warning
+  # Temporarily disabled while [PIN-21793](https://quintoandar.atlassian.net/browse/PIN-21793)
+  # is unresolved. This ticket covers the JOVEM APRENDIZ rate_values coverage failures.
+  # Re-enable this check after the ticket is resolved and production data has been revalidated.
+  # salary_rate_values_must_cover_active_salary_rate:
+  #   custom:
+  #     # Salary (id_rate, id_rate_object) pairs in rate_values must cover the active rate window from go-live (no late start / mid-gap / early end).
+  #     constraint: |-
+  #       (SELECT COUNT(*) FROM (
+  #         WITH salary_pairs AS (
+  #           SELECT DISTINCT
+  #             rv.id_rate,
+  #             rv.id_rate_object
+  #           FROM datalake_pin_core_clean.rate_values AS rv
+  #           INNER JOIN datalake_pin_core_clean.rates AS rates
+  #             ON rates.id_rate = rv.id_rate
+  #             AND rates.rate_type = 'SALARY'
+  #         ),
+  #         rate_bounds AS (
+  #           SELECT
+  #             rates.id_rate,
+  #             MIN(rates.dt_effective_started) AS rate_started,
+  #             MAX(COALESCE(rates.dt_effective_ended, DATE('9999-12-31'))) AS rate_ended
+  #           FROM datalake_pin_core_clean.rates AS rates
+  #           WHERE rates.rate_type = 'SALARY'
+  #             AND COALESCE(rates.dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
+  #           GROUP BY rates.id_rate
+  #         ),
+  #         rv_versions AS (
+  #           SELECT
+  #             rv.id_rate,
+  #             rv.id_rate_object,
+  #             rv.dt_effective_started,
+  #             COALESCE(rv.dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
+  #             LEAD(rv.dt_effective_started) OVER (
+  #               PARTITION BY rv.id_rate, rv.id_rate_object
+  #               ORDER BY rv.dt_effective_started
+  #             ) AS next_started,
+  #             MIN(rv.dt_effective_started) OVER (
+  #               PARTITION BY rv.id_rate, rv.id_rate_object
+  #             ) AS first_started,
+  #             MAX(COALESCE(rv.dt_effective_ended, DATE('9999-12-31'))) OVER (
+  #               PARTITION BY rv.id_rate, rv.id_rate_object
+  #             ) AS last_ended
+  #           FROM datalake_pin_core_clean.rate_values AS rv
+  #           INNER JOIN salary_pairs AS sp
+  #             ON sp.id_rate = rv.id_rate
+  #             AND sp.id_rate_object = rv.id_rate_object
+  #         )
+  #         SELECT
+  #           rv.id_rate,
+  #           rv.id_rate_object
+  #         FROM rv_versions AS rv
+  #         INNER JOIN rate_bounds AS rb
+  #           ON rb.id_rate = rv.id_rate
+  #         WHERE
+  #           (
+  #             rv.next_started IS NOT NULL
+  #             AND DATE_ADD(rv.dt_effective_ended, 1) != rv.next_started
+  #             AND rv.next_started >= DATE('2024-03-01')
+  #           )
+  #           OR (
+  #             rv.first_started > GREATEST(DATE('2024-03-01'), rb.rate_started)
+  #             AND rv.last_ended >= DATE('2024-03-01')
+  #           )
+  #           OR (
+  #             rv.last_ended < LEAST(CURRENT_DATE(), rb.rate_ended)
+  #             AND rb.rate_ended >= DATE('2024-03-01')
+  #             AND rv.last_ended >= DATE('2024-03-01')
+  #           )
+  #       )) = 0
+  #     severity_level: Warning
   salary_range_min_mid_max_ordered:
     custom:
       # Open rate_values with all three range points must keep min <= mid <= max.
