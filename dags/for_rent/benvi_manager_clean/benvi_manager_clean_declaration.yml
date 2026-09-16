@@ -1,0 +1,15 @@
+dag:
+  name: benvi_manager_clean
+  schedule_start_date: 2026, 9, 14
+  schedule_interval: 30 8,12,21 * * *
+  catchup: false
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Projects datalake_benvi_manager_raw.lake_mirror into one Superlogica resource
+      table per resource_code. Runs 30 minutes after bietlejuice.benvi_manager CDC.
+workflow:
+  type: query_delta
+  layer: clean
+  custom_schema: benvi_manager
+  default_extraction_type: full

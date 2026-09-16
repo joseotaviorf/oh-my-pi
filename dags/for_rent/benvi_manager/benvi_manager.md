@@ -4,4 +4,5 @@ CDC from `benvi_manager.integration_superlogica.lake_mirror` (Debezium connector
 
 Raw table: `datalake_benvi_manager_raw.lake_mirror`.
 
-Clean tables filter `resource_code` (polymorphic payload). See `queries/clean/`.
+CDC clean of this DAG is the dump table `datalake_benvi_manager_clean.lake_mirror`.
+Per-resource tables are `bietlejuice.benvi_manager_clean`.

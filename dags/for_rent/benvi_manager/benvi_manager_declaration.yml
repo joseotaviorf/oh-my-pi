@@ -6,7 +6,8 @@ dag:
   documentation:
     dag_purpose: |
       CDC of benvi-manager Postgres table integration_superlogica.lake_mirror into the lake.
-      Clean layer projects one Superlogica resource_code per table for Trino.
+      Clean of this DAG is the lake_mirror dump. Superlogica projections live in
+      bietlejuice.benvi_manager_clean.
 workflow:
   type: cdc
   layer: raw
@@ -17,4 +18,5 @@ workflow:
   lineage_product_database_name: benvi_manager
   dbutils_secret_key: BENVI_MANAGER_DB
   tables_customization:
-    lake_mirror: {}
+    lake_mirror:
+      clean_primary_keys: [id]

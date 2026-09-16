@@ -1,0 +1,28 @@
+database_name: datalake_benvi_manager_clean
+table_name: lake_mirror
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Full Superlogica dump from integration_superlogica.lake_mirror. Analysts should
+  use bietlejuice.benvi_manager_clean tables, not this dump, for resource-shaped rows.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  vendor_natural_key:
+    description: Vendor natural key for the Superlogica resource.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  resource_code:
+    description: Superlogica resource type discriminator.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.resource_code
+  payload:
+    description: Vendor JSON payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at
