@@ -29,28 +29,13 @@ agent_accreditation AS (
     FROM
         datalake_ebdb_agent_events.agent_accreditation_events AS events
 ),
-agent_history AS (
+agent_history_last_reference AS (
     SELECT
         id_unified_agent,
-        business_context,
-        is_passive_lead_receiver,
-        is_allow_supply_acquisition,
-        is_allow_demand_visit_management,
-        is_allow_demand_sale,
-        is_allow_demand_rent,
-        is_allow_demand_acquisition,
-        is_allow_supply_conversion_consultancy,
-        is_allow_supply_representative,
-        is_allow_supply_midia_management,
-        is_allow_supply_integrity_assurance,
-        is_allow_negociation,
-        has_sale_lead_referral,
-        has_sale_lead_referral_confirmed,
-        has_rent_lead_referral,
-        has_rent_lead_referral_confirmed,
-        ROW_NUMBER() OVER (PARTITION BY id_unified_agent ORDER BY dt_reference DESC) = 1 AS is_lastest_by_unified_agent
+        MAX(dt_reference) AS dt_lastest_reference
     FROM
         datalake_agent_accreditation.agent_history
+    GROUP BY 1
 )
 SELECT
     a.sk_person,
@@ -102,10 +87,13 @@ SELECT
     a.ts_updated
 FROM
     datalake_ebdb_agent_events.agent_unified_identity AS a
-JOIN
-    agent_history AS ac
-        ON a.id_unified_agent = ac.id_unified_agent
-        AND ac.is_lastest_by_unified_agent IS TRUE
+LEFT JOIN
+    agent_history_last_reference AS last_ref
+        ON a.id_unified_agent = last_ref.id_unified_agent
+LEFT JOIN
+    datalake_agent_accreditation.agent_history AS ac
+        ON last_ref.id_unified_agent = ac.id_unified_agent
+        AND last_ref.dt_lastest_reference = ac.dt_reference
 LEFT JOIN
     agent_accreditation_dates AS aad
         ON a.id_unified_agent = aad.id_unified_agent
