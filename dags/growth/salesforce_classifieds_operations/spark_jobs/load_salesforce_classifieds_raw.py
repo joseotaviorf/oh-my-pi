@@ -108,7 +108,7 @@ def get_access_token(url):
     dbutils = get_dbutils()
 
     api_credentials = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE_GROWTH)
+        dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE_CLASSIFIEDS)
     )
 
     req_url = f"{valid_url}/services/oauth2/token"
