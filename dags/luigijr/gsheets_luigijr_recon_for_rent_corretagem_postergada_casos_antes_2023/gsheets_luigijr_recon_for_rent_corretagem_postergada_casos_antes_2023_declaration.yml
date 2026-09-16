@@ -1,0 +1,34 @@
+dag:
+  name: gsheets_luigijr_recon_for_rent_corretagem_postergada_casos_antes_2023
+  schedule_interval: 0 8 * * *
+  owner: Data Fintech
+  tags:
+  - luigi
+  - luigi-type:gsheets
+  - generated-by:thais.ichihara
+workflow:
+  type: gsheets_ingestion
+  layer: raw
+  custom_schema: gsheets
+  tables_customization:
+    recon_for_rent_corretagem_postergada_casos_antes_2023:
+      sheet_id: 1EvruezmveuVMAy2D3JdbWppMlFveV0VZ0KhN4oFQMaM
+      sheet_name: casos_2023
+cluster:
+  type: consolidation_xs_general_cluster
+  access_control_list:
+    group_name: luigijr
+    permission_level: CAN_MANAGE
+  custom_libraries:
+  - whl: '{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl'
+  - pypi:
+      package: google-auth==2.13.0
+  - pypi:
+      package: google-api-python-client==2.55.0
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
