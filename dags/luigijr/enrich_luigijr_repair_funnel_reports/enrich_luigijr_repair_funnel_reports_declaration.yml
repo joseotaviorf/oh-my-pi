@@ -1,0 +1,12 @@
+dag:
+  name: enrich_luigijr_repair_funnel_reports
+  owner: ForRent PostContract
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:diego.carvalho
+  schedule_interval: 0 8 * * *
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: forrent_postcontract

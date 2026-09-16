@@ -1,0 +1,112 @@
+database_name: forrent_postcontract
+table_name: repair_funnel_reports
+owner: diego.carvalho@quintoandar.com.br
+domain: For Rent
+description: Table `repair_funnel_reports` materialized on a schedule by Luigi from a user-provided SQL query (ForRent PostContract domain).
+columns:
+  id_repair_request:
+    description: Column `id_repair_request` produced by the scheduled materialization query.
+  sk_contract:
+    description: Column `sk_contract` produced by the scheduled materialization query.
+  sk_client_side:
+    description: Column `sk_client_side` produced by the scheduled materialization query.
+  id_item_group:
+    description: Column `id_item_group` produced by the scheduled materialization query.
+  room_name:
+    description: Column `room_name` produced by the scheduled materialization query.
+  name:
+    description: Column `name` produced by the scheduled materialization query.
+  createdBy:
+    description: Column `createdBy` produced by the scheduled materialization query.
+  type:
+    description: Column `type` produced by the scheduled materialization query.
+  dt_created:
+    description: Column `dt_created` produced by the scheduled materialization query.
+  comment:
+    description: Column `comment` produced by the scheduled materialization query.
+  grantedBy:
+    description: Column `grantedBy` produced by the scheduled materialization query.
+  is_exempted:
+    description: Column `is_exempted` produced by the scheduled materialization query.
+  responsibility:
+    description: Column `responsibility` produced by the scheduled materialization query.
+  dt_granted_by:
+    description: Column `dt_granted_by` produced by the scheduled materialization query.
+  reason_iq:
+    description: Column `reason_iq` produced by the scheduled materialization query.
+  dt_created_iq:
+    description: Column `dt_created_iq` produced by the scheduled materialization query.
+  comment_iq:
+    description: Column `comment_iq` produced by the scheduled materialization query.
+  grantedBy_AC:
+    description: Column `grantedBy_AC` produced by the scheduled materialization query.
+  is_exempted_AC:
+    description: Column `is_exempted_AC` produced by the scheduled materialization query.
+  responsibility_AC:
+    description: Column `responsibility_AC` produced by the scheduled materialization query.
+  reason_AC:
+    description: Column `reason_AC` produced by the scheduled materialization query.
+  dt_granted_by_AC:
+    description: Column `dt_granted_by_AC` produced by the scheduled materialization query.
+  comment_AC:
+    description: Column `comment_AC` produced by the scheduled materialization query.
+  cost:
+    description: Column `cost` produced by the scheduled materialization query.
+  tags:
+    description: Column `tags` produced by the scheduled materialization query.
+  comments:
+    description: Column `comments` produced by the scheduled materialization query.
+  status_tags:
+    description: Column `status_tags` produced by the scheduled materialization query.
+  status_tags_pp:
+    description: Column `status_tags_pp` produced by the scheduled materialization query.
+  comment_count:
+    description: Column `comment_count` produced by the scheduled materialization query.
+  tag_count:
+    description: Column `tag_count` produced by the scheduled materialization query.
+  AR_email:
+    description: Column `AR_email` produced by the scheduled materialization query.
+  AC_email:
+    description: Column `AC_email` produced by the scheduled materialization query.
+  high_value_tag:
+    description: Column `high_value_tag` produced by the scheduled materialization query.
+  bytag?:
+    description: Column `bytag?` produced by the scheduled materialization query.
+  spoc_contracts:
+    description: Column `spoc_contracts` produced by the scheduled materialization query.
+  3pml:
+    description: Column `3pml` produced by the scheduled materialization query.
+  status_AR:
+    description: Column `status_AR` produced by the scheduled materialization query.
+  reviewer_type_iq:
+    description: Column `reviewer_type_iq` produced by the scheduled materialization query.
+  approval_reason_iq:
+    description: Column `approval_reason_iq` produced by the scheduled materialization query.
+  approval_comment_iq:
+    description: Column `approval_comment_iq` produced by the scheduled materialization query.
+  is_approved_iq:
+    description: Column `is_approved_iq` produced by the scheduled materialization query.
+  ts_updated_iq:
+    description: Column `ts_updated_iq` produced by the scheduled materialization query.
+  reviwer_type_pp:
+    description: Column `reviwer_type_pp` produced by the scheduled materialization query.
+  approval_reason_pp:
+    description: Column `approval_reason_pp` produced by the scheduled materialization query.
+  approval_comment_pp:
+    description: Column `approval_comment_pp` produced by the scheduled materialization query.
+  is_approved_pp:
+    description: Column `is_approved_pp` produced by the scheduled materialization query.
+  ts_updated_pp:
+    description: Column `ts_updated_pp` produced by the scheduled materialization query.
+  house_total_area:
+    description: Column `house_total_area` produced by the scheduled materialization query.
+  repair_service:
+    description: Column `repair_service` produced by the scheduled materialization query.
+  rent:
+    description: Column `rent` produced by the scheduled materialization query.
+  risk_category:
+    description: Column `risk_category` produced by the scheduled materialization query.
+  sk_inspection:
+    description: Column `sk_inspection` produced by the scheduled materialization query.
+  exempted_by_owner_from_ba:
+    description: Column `exempted_by_owner_from_ba` produced by the scheduled materialization query.
