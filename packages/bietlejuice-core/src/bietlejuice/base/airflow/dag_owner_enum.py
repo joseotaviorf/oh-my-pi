@@ -31,6 +31,7 @@ class DAGOwnerEnum:
     DATA_PP = "Data Planning and Performance"
     MLOPS = "MLOps"
     OPS_FINANCE = "Ops Finance"
+    OPS_FINTECH = "Ops Fintech"
     OPS_POC = "Ops POC"
     OPS_PUBLIC = "Ops Public"
     OPS_SS = "Ops SS"
