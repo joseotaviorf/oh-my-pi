@@ -1,0 +1,76 @@
+database_name: datalake_people
+table_name: ai_teva_survey_summary
+domain: People
+owner: isabella.araujo@quintoandar.com.br
+description: |
+  LiteLLM-generated Teva team-effectiveness narratives for closed surveys, one row per
+  survey_invite_id, produced by enrich_people_ai from datalake_people.teva_survey_inputs.
+  The Spark job skips invites already present in this table and merges new rows on
+  survey_invite_id. Legacy GSheet export mapping from datalake_people_analytics_sandbox.ai_teva_reports:
+  ai_executive_summary → resumo_executivo; ai_pillar_strategy_and_goals → pilar_1_2_estrategia_metas;
+  ai_pillar_roles_and_accountabilities → pilar_3_papeis_e_responsabilidades;
+  ai_pillar_protocols_and_ways_of_working → pilar_4_protocolos_trabalho;
+  ai_pillar_trust_and_relationships → pilar_5_confianca_relacoes;
+  ai_additional_comments_summary → comentarios_adicionais; survey_title → survey;
+  ts_ai_summary_generated → ts_load.
+columns:
+  survey_invite_id:
+    description: STRING merge key for the survey run (e.g. '2080ee81'); exactly one output row per invite.
+    lineage:
+      - datalake_people.teva_survey_inputs.survey_invite_id
+  survey_title:
+    description: STRING team or cycle label shown to requesters (e.g. 'SLA Leadership'); copied from inputs.
+    lineage:
+      - datalake_people.teva_survey_inputs.survey_title
+  requester_email:
+    description: STRING corporate email of the analyst who requested the survey (e.g. 'name.last_name@quintoandar.com.br').
+    lineage:
+      - datalake_people.teva_survey_inputs.requester_email
+  answered_count:
+    description: INT count of respondents included in the prompt for this invite (e.g. 12); not repeated inside AI text.
+    lineage:
+      - datalake_people.teva_survey_inputs.answered_count
+  ai_executive_summary:
+    description: STRING LiteLLM narrative in the survey answer language with overall sentiment (Positive, Negative, or Neutral), strongest Teva pillars, and largest development gaps; NULL when JSON parsing fails.
+    lineage:
+      - datalake_people.teva_survey_inputs.reference_guide_text
+      - datalake_people.teva_survey_inputs.strategic_goals_clarity_scores
+      - datalake_people.teva_survey_inputs.top_priorities_answers
+      - datalake_people.teva_survey_inputs.team_challenges_answers
+      - datalake_people.teva_survey_inputs.additional_comments_answers
+  ai_pillar_strategy_and_goals:
+    description: STRING LiteLLM narrative for Teva Pillars 1–2 (Strategy and Goals/Priorities)—themes, alignment, and blockers without numeric Likert averages.
+    lineage:
+      - datalake_people.teva_survey_inputs.reference_guide_text
+      - datalake_people.teva_survey_inputs.strategic_goals_clarity_scores
+      - datalake_people.teva_survey_inputs.top_priorities_answers
+      - datalake_people.teva_survey_inputs.team_challenges_answers
+  ai_pillar_roles_and_accountabilities:
+    description: STRING LiteLLM narrative for Pillar 3 (Roles, Accountabilities and Interdependencies)—role clarity and handoffs.
+    lineage:
+      - datalake_people.teva_survey_inputs.reference_guide_text
+      - datalake_people.teva_survey_inputs.own_role_clarity_scores
+      - datalake_people.teva_survey_inputs.others_role_clarity_scores
+      - datalake_people.teva_survey_inputs.current_teamwork_scores
+  ai_pillar_protocols_and_ways_of_working:
+    description: STRING LiteLLM narrative for Pillar 4 (Protocols and Ways of Working)—decisions, meetings, and habits toward high performance.
+    lineage:
+      - datalake_people.teva_survey_inputs.reference_guide_text
+      - datalake_people.teva_survey_inputs.decision_making_effectiveness_scores
+      - datalake_people.teva_survey_inputs.meeting_effectiveness_scores
+      - datalake_people.teva_survey_inputs.ideal_teamwork_answers
+  ai_pillar_trust_and_relationships:
+    description: STRING LiteLLM narrative for Pillar 5 (Working Relationships and Trust)—psychological safety, conflict, and candor.
+    lineage:
+      - datalake_people.teva_survey_inputs.reference_guide_text
+      - datalake_people.teva_survey_inputs.team_atmosphere_scores
+      - datalake_people.teva_survey_inputs.conflict_handling_scores
+      - datalake_people.teva_survey_inputs.openness_issues_answers
+      - datalake_people.teva_survey_inputs.leader_feedback_answers
+  ai_additional_comments_summary:
+    description: STRING LiteLLM synthesis of open comments outside the five pillar sections; empty or NULL when none apply.
+    lineage:
+      - datalake_people.teva_survey_inputs.additional_comments_answers
+      - datalake_people.teva_survey_inputs.leader_feedback_answers
+  ts_ai_summary_generated:
+    description: TIMESTAMP (UTC) set when generate_ai_teva_survey_summary merges the row; NOT NULL on persisted rows.

@@ -547,6 +547,10 @@ bietlejuice.enrich_people:
     - bietlejuice.gsheets_people:done-clean-questionnaire-requests:first-run-of-day
     - bietlejuice.gsheets_people:done-clean-survey-answers:first-run-of-day
     - bietlejuice.hr_system_custom:load-clean-workers-registration:first-run-of-day
+bietlejuice.enrich_people_ai:
+  # Spark job reads datalake_people.teva_survey_inputs; not inferred from query SQL.
+  add:
+    - bietlejuice.enrich_people:load-enrich-teva-survey-inputs:first-run-of-day
 bietlejuice.enrich_hr_system:
   remove:
     - bietlejuice.gsheets_people_static:load-clean-email-employee-mapping:first-run-of-day

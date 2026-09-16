@@ -1,0 +1,50 @@
+dag:
+  name: enrich_people_ai
+  owner: Data People
+  callback_by_task: False
+  schedule_start_date: 2026, 9, 10
+  documentation:
+    dag_purpose: |
+      People AI enrichments on EMR via the internal LiteLLM gateway
+      (`spark_jobs/lib/llm_client.py`), writing into `datalake_people` alongside
+      SQL enrich tables from `enrich_people`.
+
+      Current scope: Teva survey pillar summaries (`ai_teva_survey_summary`),
+      reading `datalake_people.teva_survey_inputs` from `enrich_people`.
+
+      `ai_teva_survey_summary` uses extraction_type full with merge on survey_invite_id;
+      the Spark job skips invites that already exist in the target table and caps LiteLLM
+      calls per run (`--max-calls-per-run`). `load_start_date` / `load_end_date` are passed
+      for framework compatibility but do not filter inputs today.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  bucket_config_name: people_bucket
+  custom_schema: people
+  has_hive_sync: false
+  credentials_scope: people
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  tables_customization:
+    ai_teva_survey_summary:
+      extraction_type: full
+      merge_on: [survey_invite_id]
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      load_spark_job: generate_ai_teva_survey_summary
+      py_files: true
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "--max-calls-per-run"
+        - "100"

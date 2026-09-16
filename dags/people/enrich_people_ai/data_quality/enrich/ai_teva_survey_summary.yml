@@ -1,0 +1,29 @@
+---
+table_name: datalake_people.ai_teva_survey_summary
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+
+column_level_validations:
+  survey_invite_id:
+    is_complete:
+      severity_level: Warning
+    is_unique:
+      severity_level: Error
+  one_row_per_survey_invite_id:
+    custom:
+      # Each survey_invite_id must appear at most once (merge grain).
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT survey_invite_id
+          FROM datalake_people.ai_teva_survey_summary
+          GROUP BY survey_invite_id
+          HAVING COUNT(*) > 1
+        ) duplicates) = 0
+      severity_level: Error
+  ts_ai_summary_generated:
+    is_complete:
+      severity_level: Warning

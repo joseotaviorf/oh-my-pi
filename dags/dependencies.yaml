@@ -3454,6 +3454,8 @@ bietlejuice.enrich_people:
   - bietlejuice.pin:load-clean-valid-grades:first-run-of-day
   - bietlejuice.s3_ingestion:load-clean-allocations:first-run-of-day
   - bietlejuice.s3_ingestion:load-clean-groups:first-run-of-day
+bietlejuice.enrich_people_ai:
+  - bietlejuice.enrich_people:load-enrich-teva-survey-inputs:first-run-of-day
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
