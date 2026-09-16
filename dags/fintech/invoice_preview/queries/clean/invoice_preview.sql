@@ -13,6 +13,7 @@ SELECT
     NULLIF(`last-modified-by-email`, '') AS last_modified_by_email,
     CAST(NULLIF(REPLACE(REPLACE(amount, '.', ''), ',', '.'), '') AS double) AS paid_amount,
     CAST(NULLIF(`blocked`, '') AS BOOLEAN) AS is_blocked,
+    CAST(NULLIF(`not-invoiceable`, '') AS BOOLEAN) AS is_not_invoiceable,
     CAST(NULLIF(`year-month`, '') AS bigint) AS entry_accrual_year_month,
     NULLIF(invoice_filename, '') AS invoice_filename,
     ELEMENT_AT(SPLIT(invoice_filename, '(invoice-preview-)|(-\\d{{2}}\\.csv)' ), -2) AS invoice_accrual_year_month,

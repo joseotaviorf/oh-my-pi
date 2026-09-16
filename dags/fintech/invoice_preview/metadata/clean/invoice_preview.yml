@@ -79,6 +79,10 @@ columns:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.blocked
     description: Indicates whether blocked applies to this financial record.
+  is_not_invoiceable:
+    description: Boolean flag indicating whether SeuBarriga marked this preview billing line as not invoiceable in the export snapshot.
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.not-invoiceable
   entry_accrual_year_month:
     description: Accrual year-month of the preview entry as an integer in YYYYMM format from the CSV export.
     lineage:

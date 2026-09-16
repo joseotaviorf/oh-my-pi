@@ -23,6 +23,10 @@ columns:
     description: Whether the contract is blocked from invoicing in the preview snapshot, aligned with SeuBarriga export naming.
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.is_blocked
+  is_not_invoiceable:
+    description: Whether SeuBarriga marked this preview billing line as not invoiceable, from the CSV not-invoiceable flag.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.is_not_invoiceable
   paid_from:
     description: Payer or origin side of the preview billing line as exported by SeuBarriga.
     lineage:

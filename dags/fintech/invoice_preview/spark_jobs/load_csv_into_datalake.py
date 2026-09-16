@@ -43,12 +43,13 @@ EXPORT_SLOT_MORNING = "morning"
 EXPORT_SLOT_AFTERNOON = "afternoon"
 EXPORT_SLOT_AUTO = "auto"
 BRT = timezone(timedelta(hours=-3))
-# SeuBarriga preview audit columns (CSV kebab-case). Older files may omit them;
-# fill nulls so unionAll across mixed schemas does not fail.
-PREVIEW_AUDIT_CSV_COLUMNS = (
+# SeuBarriga CSV columns that older files may omit; fill nulls so unionAll
+# across mixed schemas does not fail.
+OPTIONAL_CSV_COLUMNS = (
     "last-modified-by-name",
     "last-modified-by-email",
     "created-at",
+    "not-invoiceable",
 )
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -278,7 +279,7 @@ if __name__ == "__main__":
                 df = s3_consumer.get_data_from_file(
                     path=csv, format=format, options=options
                 )
-                df = _ensure_string_columns(df, PREVIEW_AUDIT_CSV_COLUMNS)
+                df = _ensure_string_columns(df, OPTIONAL_CSV_COLUMNS)
                 df = df.withColumn("invoice_filename", functions.lit(csv))
                 dfs.append(df)
 
