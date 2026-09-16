@@ -1,0 +1,30 @@
+---
+table_name: datalake_people.teva_survey_inputs
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -25
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  survey_invite_id:
+    is_complete:
+      severity_level: Warning
+    is_unique:
+      severity_level: Error
+  one_row_per_survey_invite_id:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT survey_invite_id
+          FROM datalake_people.teva_survey_inputs
+          GROUP BY survey_invite_id
+          HAVING COUNT(*) > 1
+        ) duplicates) = 0
+      severity_level: Error

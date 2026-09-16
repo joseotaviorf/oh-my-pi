@@ -1,0 +1,102 @@
+database_name: datalake_people
+table_name: teva_survey_inputs
+domain: People
+owner: isabella.araujo@quintoandar.com.br
+description: |
+  Closed AI Teva team-survey responses aggregated per survey run, prepared for
+  AI pillar analysis in `enrich_people_ai`. One row per survey_invite_id with every respondent's
+  quantitative scores concatenated as comma-separated strings and open-text
+  answers concatenated with a pipe separator, plus the few-shot reference guide
+  used to classify comments into pillars. Remapped from the legacy Daily
+  Pipeline notebook ai_teva_update to the DW 2.0 gsheets_people ingestion
+  (`datalake_gsheets_people_clean.survey_answers`, `.questionnaire_requests`,
+  `.few_shot_phrases`).
+columns:
+  survey_invite_id:
+    description: Unique identifier of the survey run; merge key joining every respondent's answers for the same team survey.
+    lineage:
+      - datalake_gsheets_people_clean.questionnaire_requests.survey_invite_id
+  survey_title:
+    description: Title identifying the surveyed team and cycle, carried through unchanged for downstream reporting.
+    lineage:
+      - datalake_gsheets_people_clean.questionnaire_requests.survey_title
+  requester_email:
+    description: Corporate email of the person who requested the survey, used for operational traceability in downstream exports.
+    lineage:
+      - datalake_gsheets_people_clean.questionnaire_requests.requester_email
+  answered_count:
+    description: Total number of team members who completed this survey run, used by the AI prompt to size the sample.
+    lineage:
+      - datalake_gsheets_people_clean.questionnaire_requests.answered_count
+  strategic_goals_clarity_scores:
+    description: Comma-separated 1-5 scores from every respondent on strategic goals clarity, used to infer pillar sentiment.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_strategic_goals_clarity
+  own_role_clarity_scores:
+    description: Comma-separated 1-5 scores from every respondent on clarity of their own role and accountabilities.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_own_role_clarity
+  others_role_clarity_scores:
+    description: Comma-separated 1-5 scores from every respondent on clarity of other team members' roles and accountabilities.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_others_role_clarity
+  current_teamwork_scores:
+    description: Comma-separated 1-5 scores from every respondent on how the team currently works together.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_current_teamwork
+  decision_making_effectiveness_scores:
+    description: Comma-separated 1-5 scores from every respondent on decision-making speed, quality, and clarity.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_decision_making_effectiveness
+  meeting_effectiveness_scores:
+    description: Comma-separated 1-5 scores from every respondent on how effective team meetings are.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_meeting_effectiveness
+  team_performance_scores:
+    description: Comma-separated 1-5 scores from every respondent on overall team performance.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_team_performance
+  team_atmosphere_scores:
+    description: Comma-separated 1-5 scores from every respondent on team atmosphere and psychological safety.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_team_atmosphere
+  conflict_handling_scores:
+    description: Comma-separated 1-5 scores from every respondent on how well conflicts are handled within the team.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.score_conflict_handling
+  top_priorities_answers:
+    description: Pipe-separated open-text answers from every respondent on the team's top priorities.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.open_top_priorities
+  team_challenges_answers:
+    description: Pipe-separated open-text answers from every respondent on challenges the team faces meeting its priorities.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.open_team_challenges
+  ideal_teamwork_answers:
+    description: Pipe-separated open-text answers from every respondent on how the team should ideally work together.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.open_ideal_teamwork
+  improvement_to_perfect_score_answers:
+    description: Pipe-separated open-text answers from every respondent on what would be needed to reach a perfect score.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.open_improvement_to_perfect_score
+  openness_issues_answers:
+    description: Pipe-separated open-text answers from every respondent on issues impacting openness within the team.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.open_openness_issues
+  team_adjective_answers:
+    description: Pipe-separated single-adjective answers from every respondent describing the team's current state.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.open_team_adjective
+  leader_feedback_answers:
+    description: Pipe-separated open-text answers from every respondent with feedback for the team leader.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.open_leader_feedback
+  additional_comments_answers:
+    description: Pipe-separated optional open-text comments from every respondent beyond the structured questions.
+    lineage:
+      - datalake_gsheets_people_clean.survey_answers.open_additional_comments
+  reference_guide_text:
+    description: Few-shot phrase guide, one line per example, used by the AI prompt to classify comments into pillars and sentiment.
+    lineage:
+      - datalake_gsheets_people_clean.few_shot_phrases.phrase

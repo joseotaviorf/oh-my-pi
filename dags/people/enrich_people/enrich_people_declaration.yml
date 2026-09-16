@@ -7,7 +7,8 @@ dag:
     dag_purpose: |
       Core enriched tables for People domain that can be used across multiple DWs.
       Contains foundational data such as action reasons, employee identifiers,
-      and other cross-domain reference tables.
+      and other cross-domain reference tables. Also prepares LLM input tables
+      consumed by `enrich_people_ai` (offboarding and Teva survey inputs).
 workflow:
   type: query_delta
   layer: enrich
@@ -89,5 +90,9 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     allocation_history:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    teva_survey_inputs:
+      extraction_type: full
       vacuum_retention_hours: 168
       vacuum_lite: true

@@ -543,6 +543,9 @@ bietlejuice.enrich_people:
   remove:
     - bietlejuice.gsheets_people:done-clean-codex-cost-centers:first-run-of-day
     - bietlejuice.gsheets_people:done-clean-codex-cost-informations:first-run-of-day
+    - bietlejuice.gsheets_people:done-clean-few-shot-phrases:first-run-of-day
+    - bietlejuice.gsheets_people:done-clean-questionnaire-requests:first-run-of-day
+    - bietlejuice.gsheets_people:done-clean-survey-answers:first-run-of-day
     - bietlejuice.hr_system_custom:load-clean-workers-registration:first-run-of-day
 bietlejuice.enrich_hr_system:
   remove:
