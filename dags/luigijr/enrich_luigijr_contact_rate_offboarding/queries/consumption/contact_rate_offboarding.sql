@@ -403,7 +403,7 @@ encarteiramento_inteligente_model AS (
         TRY_CAST(get_json_object(inputs, '$.request_id') AS bigint)  AS request_id,
         get_json_object(outputs, '$.prediction')                      AS model_prediction,
         service_version
-    FROM quintoandar_prod.cluster_validation.datalake_emlio_clean___emlio_logs
+    FROM datalake_emlio_clean.emlio_logs
     WHERE id_service = 'users-and-journeys-ml-service'
         AND year >= 2026
 ),
