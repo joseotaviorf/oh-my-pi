@@ -2,8 +2,16 @@
 database_name: datalake_inspection_services_clean
 table_name: item
 description: |
-  The item object found in the database refers to a sub-item or sub-conditions within an item,
-  for example breakdowns, humidity, door problem, etc.
+  One row per question the inspector app rendered inside an item_group during the inspection.
+  Most rows are damage sub-items or sub-conditions (breakdowns, humidity, door problem), but the
+  same structure also carries non-damage checklist questions — notably the water, gas and
+  electricity chips of the house_supply group (abastecimento), where item_group_type.type is
+  'house_supply' and item_type.type is water, gas or electricity.
+  A row proves the question was asked, not what the inspector answered. The answer lives in
+  item_issue (and its issue_type), one level deeper. Counting item rows as if they were answers
+  overstates fill rates, so always reach the answer before measuring completion.
+  Consumed by the enrich/DW inspection models and by analysts measuring property condition,
+  inspection quality and utilities-on rates.
 domain: For Rent
 owner: gustavo.silva@quintoandar.com.br
 columns:
@@ -46,11 +54,20 @@ columns:
   is_present:
     lineage:
       - datalake_inspection_services_raw.item.present
-    description: Indicates if the issue checklist item was checked by the inspector
+    description: >
+      Indicates if the issue checklist item was checked by the inspector. Only meaningful for
+      check-style questions (item_type.display_type CHECK or CHECK_DESCRIPTION). It is NULL for
+      chip-style questions such as the house_supply water/gas/electricity chips
+      (display_type CHIP_CHOICE_SINGLE), where the chosen option is recorded as an item_issue
+      row instead. Do not use this column as a general "the inspector answered" flag.
   is_active:
     lineage:
       - datalake_inspection_services_raw.item.active
-    description: Boolean information with the aim of indicating whether the item is active or not.
+    description: >
+      Boolean information with the aim of indicating whether the item is active or not. Not
+      populated for every kind of question — it is NULL on house_supply rows, for example, so
+      a WHERE is_active = TRUE filter silently returns no rows for those items. Filter on the
+      item and issue types you need instead of relying on this flag.
   ts_created:
     lineage:
       - datalake_inspection_services_raw.item.created_at

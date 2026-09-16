@@ -12,7 +12,11 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.room_type.type
-    description: Room type name, for example kitchen bedroom, etc
+    description: >
+      Room type name, for example kitchen or bedroom. Also covers non-physical rooms the app uses
+      to group property-wide questions — general_information holds the house_supply
+      (abastecimento) water, gas and electricity checklist, so it should not be read as an actual
+      room of the property.
   number_order:
     lineage:
       - datalake_inspection_services_raw.room_type.order

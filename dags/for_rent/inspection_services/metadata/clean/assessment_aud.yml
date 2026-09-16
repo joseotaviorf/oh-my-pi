@@ -36,7 +36,20 @@ columns:
   house_supplies:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.house_supplies
-    description: Indicates the operating condition of the water, gas and electricity supply. However, this field is no longer populated in the database, serving only for historical consultation.
+    description: >
+      Operating condition of the water, gas and electricity supply, as legacy assessment
+      JSON (consumeBills.*.workingStatus from the old Details "Supplies" widget).
+      Historical only: since around Apr 2025, when the room general_information exists,
+      Flutter hides that widget and records water/gas/electricity as HOUSE_SUPPLY
+      checklist items instead, leaving this column empty. Do not use it for current
+      "utilities on" rates — empty recent months mean the widget was retired, not that
+      inspectors stopped answering. Canonical source: the item graph in
+      datalake_inspection_services_clean (room → item_group → item_group_type with
+      type = 'house_supply' → item → item_type with water/gas/electricity), where the
+      answer itself lives one level deeper in item_issue → issue_type
+      (yes / no / it_was_not_possible_to_test). Distinct from consumeBills "contas de
+      consumo" (who pays the bill, condo vs concessionaire), which is not "is the
+      utility on?".
   scheduling_key_recovery:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.scheduling_key_recovery

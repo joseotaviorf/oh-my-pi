@@ -35,7 +35,11 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.item_type.type
-    description: Problem name
+    description: >
+      Name of what the item question is about. For damage items it is the problem name; for
+      non-damage checklist groups it is the subject being asked about — house_supply
+      (abastecimento) uses water, gas and electricity. This identifies the question only; the
+      inspector's answer is in item_issue and its issue_type.
   number_order:
     lineage:
       - datalake_inspection_services_raw.item_type.order

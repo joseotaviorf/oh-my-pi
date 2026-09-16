@@ -55,6 +55,9 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 - **Precificação automática de reparos / automatic repair pricing** → automatically prices the repairs in the laudo. Conceptually part of the **same Kirk project** — it is a test/pilot of what Kirk will eventually cover; for now Kirk only **creates** the laudo and pricing is not included in production. The two are separate **only in the data** (different sources): pricing is tracked via the `automatic-repair-pricing` annotation (rollout 2026-05-18; values `success` / `failed`), not exposed as its own column yet — it underlies `obt_offboarding.no_human_ar`.
 - **AR sem intervenção humana / no human AR** → `obt_offboarding.no_human_ar`. Boolean: TRUE when the repair analysis required no human intervention. **NULL when no exit inspection was performed** (`ts_inspected IS NULL`): a non-performed inspection generates no repair analysis, so the flag is "not applicable" — treat NULL as no AR, never as FALSE.
 - **Fluxo de identificação por tags (legado)** → older automatic flow that drafts repair requests from inspector tags (`ts_automatic_repair_processing`, `has_automatically_identified`). Predates Kirk and is unrelated to it and to automatic repair pricing.
+- **Abastecimento**, **HOUSE_SUPPLY**, **house_supply** → inspector checklist for whether water, electricity, and gas are **on** at the property during the visit. Live data is the inspections-service item graph in `datalake_inspection_services_clean` (`item_group_type.type = 'house_supply'`; `item_type.type` in `water` / `gas` / `electricity`). The **answer** is one level deeper: `item_issue` → `issue_type.type` in `yes` / `no` / `it_was_not_possible_to_test`. An `item` row is the question, an `item_issue` row is the answer — measure fill on the answer, never on the `item` row alone. Room: `general_information`. Persisted via `POST inspections-service-api/assessments/sync`.
+- **house_supplies** (column on `dim_assessment` / `assessment`) → **legacy only**. Old Details-screen widget (`consumeBills.*.workingStatus`). Stopped being populated around Apr 2025 when Flutter hid that widget for rooms with `general_information`. Do **not** use for current "% utilities on" metrics.
+- **Contas de consumo** (conta inclusa no condomínio / concessionária) → also under `consumeBills`, typically **not** on entry inspections. Answers **who pays the bill**, not **whether the utility is on**. Do not mix with `house_supply`.
 
 ## Tables
 
@@ -70,14 +73,18 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 | Reviewer approval data per party | `datalake_inspections.reviewer` (enrich) |
 | Automatic discount details | `datalake_inspections.automatic_discounts` (enrich) — JOIN via `fi.sk_client_side = ad.uuid_inspection` |
 | Repair cost at a specific stage (temporal) | `datalake_inspection_services_clean.repair_request_history` (clean) — tracks `cost` per repair over time with `origin` indicating the stage. Only source for per-stage monetary values. |
-| Assessment data | `dw_inspections.dim_assessment` — JOIN via `fi.sk_assessment` |
+| Assessment data | `dw_inspections.dim_assessment` — JOIN via the `sk_assessment` key. Column `house_supplies` is **historical only** (legacy `consumeBills.*.workingStatus`); do not use it for current utilities-on metrics. |
+| Whether water / electricity / gas were **on** at execution (abastecimento / HOUSE_SUPPLY) | Canonical clean graph: `datalake_inspection_services_clean.item`, `datalake_inspection_services_clean.item_group`, `datalake_inspection_services_clean.item_group_type` (`type = 'house_supply'`), `datalake_inspection_services_clean.item_type` (`water` / `gas` / `electricity`), `datalake_inspection_services_clean.item_issue`, `datalake_inspection_services_clean.issue_type` (`yes` / `no` / `it_was_not_possible_to_test`), `datalake_inspection_services_clean.room`, `datalake_inspection_services_clean.assessment`. Join executed inspection with `fi.sk_assessment = assessment.id_assessment` (UUID `sk_inspection = id_client_side` does not match). The answer is the `type` value in `issue_type`, reached through `item_issue` — an `item` row on its own only proves the question was rendered. Do **not** filter `is_active = TRUE`, and do **not** use the `is_present` flag on `item` (all three are `NULL` on house_supply rows, so any of those predicates returns zero rows). Do **not** use `dw_inspections.fact_item` for this metric (`item_type` / `item_group_type` are missing). See Golden Query 5. |
+| Same metric with fewer joins (enrich shortcut) | `datalake_inspections.item_issue` (`ii`) + `datalake_inspections.item` (`i`) — the enrich layer is already denormalized: `ii` carries `id_assessment`, `item_group_type` and the answer `issue_type`, and `i` supplies `item_type` (`water` / `gas` / `electricity`). Two joins reproduce Golden Query 5 **exactly** (same 97.3% answered, 94.2% water on, 88.5% electricity on, 32.8% gas on — verified in Trino) versus seven on the clean graph: `ii.id_assessment = fi.sk_assessment` + `i.id_item = ii.id_item`, filtering `ii.item_group_type = 'house_supply'`. Trade-off: enrich is rebuilt from clean, so it lags the 30-minute clean fast lane. Use the clean graph when you need the freshest data or the full item graph. |
 | Kirk AI flow flags (automatic laudo creation, control group, wave) — **preferred for exit inspections** | `dw_offboarding.obt_offboarding` — already pre-joined. Columns: `is_automated_ar` (boolean, already cast — Kirk succeeded), `automation_group` (varchar — `TRY_CAST AS BOOLEAN` to filter control group), `no_human_ar` (boolean — repair analysis required no human intervention). Use when the analysis is scoped to exit inspections tied to a termination (the most common case). |
 | Kirk AI flow flags — **when obt is not appropriate** (all exit inspections, not just terminated ones) | `dw_inspections.dim_inspection` (DW) — JOIN already needed for `inspection_type` filter. Columns: `repair_request_ai_flow` (varchar bool), `ai_repair_analysis_control_group` (varchar bool), `ai_repair_analysis_wave_name`, `ai_processing_failure_reason`. Use `TRY_CAST(col AS BOOLEAN) = TRUE`. Lineage: `datalake_inspections.inspection_booking`. |
 
 **Critical rules:**
-- **CAST rule**: `fact_inspection.sk_inspection` is **VARCHAR** — always apply `CAST(... AS VARCHAR)` on the opposite side of JOINs: `fi.sk_inspection = CAST(other.sk_inspection AS VARCHAR)`
+- **CAST rule**: the `sk_inspection` column on `fact_inspection` is **VARCHAR** — always apply `CAST(... AS VARCHAR)` on the opposite side of JOINs: `fi.sk_inspection = CAST(other.sk_inspection AS VARCHAR)`
 - **Dedup rule**: `fact_inspection` may have duplicates per contract — always apply `ROW_NUMBER() OVER(PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) AS rni` and filter `WHERE rni = 1`
-- Always filter by `dim_inspection.inspection_type` (`onboarding` / `offboarding`) when the query starts from inspections
+- Always filter by the `inspection_type` column on `dim_inspection` (`onboarding` / `offboarding`) when the query starts from inspections
+- **House supply join**: join the executed inspection on `sk_assessment = id_assessment`. Do not join HOUSE_SUPPLY items via `sk_inspection = id_client_side`. Do not filter the `is_active` flags on `item` / `item_issue`, nor the `is_present` flag on `item` — all three are `NULL` on every house_supply row.
+- **House supply answer grain**: the answer is the `type` value in `issue_type`, reached through `item_issue` — not the `item` row. Reach it with an `INNER JOIN` (or require a non-NULL answer) before counting an item as answered, so a rendered-but-unanswered question never counts as filled.
 - **Kirk boolean rule**: In `obt_offboarding`, `is_automated_ar` is already a proper `boolean` — use directly. When reading from `dim_inspection` directly, `repair_request_ai_flow` and `ai_repair_analysis_control_group` are stored as `varchar` in Trino — always use `TRY_CAST(col AS BOOLEAN) = TRUE`, never `col = TRUE`. The column `automation_group` in `obt_offboarding` is also varchar — apply `TRY_CAST` there too.
 
 
@@ -110,6 +117,7 @@ Most inspection-related metrics are anchored to the **Termination** entity, not 
 - Report access rate — percentage of inspections where landlord and/or tenant accessed the report (`fact_report_inspections.has_tenant_access_review`, `fact_report_inspections.has_owner_access_review`)
 - Inspection volume per month (filter by `inspection_type` and `status`)
 - SLA compliance: time between scheduling and execution (`fact_inspection.ldt_hours_execution`, `fact_inspection.is_sla_execution`) — generic SLA signal only; official SLA in [Inspection SLA](../metric_entities/inspection_sla.md)
+- Share of **executed onboarding** inspections where the inspector **answered** water / electricity / gas (coverage), and — among those — the share answered `yes` (abastecimento) — Golden Query 5. "Answered" means an `item_issue` / `issue_type` answer exists, not that the `item` row exists. Mind the denominators: coverage is over all executed onboarding inspections, while the on-rates are conditional on having answered, since a missing house_supply block means *unknown*, not *off*. Gas `yes` is much lower than water/electricity because of `it_was_not_possible_to_test`; do not read "% all three on" as "the property has no utilities".
 
 **Kirk / automatic laudo metrics:**
 - Kirk adoption rate — `COUNT_IF(is_automated_ar) / COUNT(*)` from `dw_offboarding.obt_offboarding` 
@@ -168,6 +176,14 @@ An inspection is linked to one house: `fi.sk_house`.
 - **Don't use `ts_automatic_repair_processing` for Kirk-related analyses** — this field tracks a separate tag-based identification process unrelated to Kirk (and unrelated to automatic repair pricing). It is not a proxy for the automatic laudo flow. Use `is_automated_ar` (in `obt_offboarding`) or `repair_request_ai_flow` (in `dim_inspection`) instead.
 - **Don't read `no_human_ar = TRUE` as "Kirk priced it automatically"** — TRUE also includes terminations with **no tenant AR repairs at all** (nothing to review). `FALSE` means repairs still required human handling: repairs outside the Kirk flow, or Kirk repairs without a successful automatic pricing. It is not a Kirk-vs-control flag — for the A/B split use `is_automated_ar` vs `automation_group`. **`NULL` means no exit inspection was performed** (`ts_inspected IS NULL`) so there was no repair analysis at all — filter `no_human_ar IS NOT NULL` when computing no-human AR rates, and never treat NULL as FALSE.
 - Don't compare `repair_request_ai_flow = TRUE` against `sem_dados_kirk` (inspections with no Kirk data) as the primary comparison — the `sem_dados_kirk` group contains older inspections that predate Kirk rollout, creating a confounding time effect. Prefer comparing against `ai_repair_analysis_control_group = TRUE` (same eligibility, A/B controlled).
+- **Don't use `dim_assessment.house_supplies` (or `assessment.house_supplies`) for current "% utilities on"** — the column is historical; empty recent months do not mean the inspector app stopped asking. Use the `house_supply` item graph in `datalake_inspection_services_clean` (Golden Query 5).
+- **Don't measure HOUSE_SUPPLY from `datalake_inspections.item` alone** — the enrich `item` table is fine and does reflect inspections-service / Flutter (it is built from the IS clean tables and carries fresh `item_group_type = 'house_supply'` rows), but it holds only the **question**. Without joining `datalake_inspections.item_issue` for the answer you get the same overstated fill rate as counting `item` rows on the clean graph.
+- **Don't use `dw_inspections.fact_item` for this metric** — it lacks `item_type` / `item_group_type`.
+- **Don't filter `is_active = TRUE`** on `item` / `item_issue` when measuring house supply — the column is `NULL` on every house_supply row, so the filter returns zero rows.
+- **Don't count an `item` row as a filled answer** — the `item` row is the question the app rendered; the answer is the `item_issue` → `issue_type.type` row. Counting `item_type.type = 'water'` alone would report a rendered-but-unanswered question as filled and overstate the fill rate. Require the `issue_type` answer (see Golden Query 5).
+- **Don't use `item.is_present` as the "inspector answered" flag** for house supply — it is `NULL` on all house_supply rows (it is meaningful for damage-checklist items, not for these chips).
+- **Don't treat "% water + electricity + gas all `yes`" as "the listing has no abastecimento"** — water and electricity are on in the large majority; gas pulls the "all three on" rate down (often `it_was_not_possible_to_test`).
+- **Don't mix HOUSE_SUPPLY (is it on?) with consumeBills "contas de consumo"** (who pays the bill / condo vs concessionaire).
 
 ## Golden Queries
 
@@ -279,4 +295,107 @@ WHERE obt.ts_termination_finished >= DATE '2025-01-01'
     AND obt.sk_inspection IS NOT NULL
 GROUP BY 1
 ORDER BY total DESC
+```
+
+### Query 5 — Onboarding utilities on (HOUSE_SUPPLY / abastecimento)
+
+Share of **executed entry inspections** where the inspector **answered** water, electricity, and gas, and the share answered `yes` (on). Canonical path is the inspections-service clean graph (`item_group_type.type = 'house_supply'`), joined to the executed visit on `sk_assessment = id_assessment`. Do not use `dim_assessment.house_supplies`. Do not filter `is_active` / `is_present`. One row per contract.
+
+Reading the result — **the two metrics use different denominators on purpose**:
+
+- `pct_answered` is **coverage**, over every executed onboarding inspection. It measures the answer, not the question: `item_issue` / `issue_type` are `INNER JOIN`ed on purpose, because an `item` row only proves the app rendered the chip. The remainder (`100 - pct_answered`) is inspections whose assessment has **no house_supply block at all** — a different app/template version, not an inspector who skipped the question.
+- `pct_water_on` and the other on-rates are **conditional on having answered**. An inspection with no house_supply block is *unknown*, not *utility off*, so it must not sit in the denominator. Dividing the on-rates by the full executed base instead would understate each of them by roughly 2-3 points and silently mix a coverage gap into a supply metric.
+- Gas `yes` is much lower than water/electricity because of `it_was_not_possible_to_test` — do not read "% all three on" as "no utilities".
+
+```sql
+WITH executed_onboarding AS (
+    SELECT
+        fi.sk_contract,
+        fi.sk_assessment,
+        ROW_NUMBER() OVER (
+            PARTITION BY fi.sk_contract
+            ORDER BY fi.ts_updated DESC
+        ) AS rni
+    FROM dw_inspections.fact_inspection AS fi
+    INNER JOIN dw_inspections.dim_inspection AS di
+        ON fi.sk_inspection = di.sk_inspection
+    WHERE di.inspection_type = 'onboarding'
+        AND fi.ts_inspected IS NOT NULL
+        AND fi.ts_inspected >= TIMESTAMP '2026-06-01 00:00:00'
+),
+base AS (
+    SELECT
+        sk_contract,
+        sk_assessment
+    FROM executed_onboarding
+    WHERE rni = 1
+),
+house_supply AS (
+    -- One row per contract. answered_* = the inspector gave an answer (item_issue ->
+    -- issue_type), not merely that the app rendered the item.
+    SELECT
+        base.sk_contract,
+        MAX(CASE WHEN it."type" = 'water' THEN 1 ELSE 0 END) AS answered_water,
+        MAX(CASE WHEN it."type" = 'electricity' THEN 1 ELSE 0 END) AS answered_electricity,
+        MAX(CASE WHEN it."type" = 'gas' THEN 1 ELSE 0 END) AS answered_gas,
+        MAX(CASE WHEN it."type" = 'water' AND ist."type" = 'yes' THEN 1 ELSE 0 END) AS water_on,
+        MAX(CASE WHEN it."type" = 'electricity' AND ist."type" = 'yes' THEN 1 ELSE 0 END) AS electricity_on,
+        MAX(CASE WHEN it."type" = 'gas' AND ist."type" = 'yes' THEN 1 ELSE 0 END) AS gas_on,
+        MAX(CASE WHEN it."type" = 'gas' AND ist."type" = 'it_was_not_possible_to_test' THEN 1 ELSE 0 END) AS gas_not_tested
+    FROM base
+    INNER JOIN datalake_inspection_services_clean.assessment AS assessment
+        ON CAST(base.sk_assessment AS VARCHAR) = CAST(assessment.id_assessment AS VARCHAR)
+    INNER JOIN datalake_inspection_services_clean.room AS room
+        ON room.id_assessment = assessment.id_assessment
+    INNER JOIN datalake_inspection_services_clean.item_group AS item_group
+        ON item_group.id_room = room.id_room
+    INNER JOIN datalake_inspection_services_clean.item_group_type AS item_group_type
+        ON item_group_type.id_item_group_type = item_group.id_type
+        AND item_group_type."type" = 'house_supply'
+    INNER JOIN datalake_inspection_services_clean.item AS item
+        ON item.id_item_group = item_group.id_item_group
+    INNER JOIN datalake_inspection_services_clean.item_type AS it
+        ON it.id_item_type = item.id_type
+    -- INNER JOIN: the answer is mandatory. An item row without an item_issue is a
+    -- rendered-but-unanswered question and must not count as filled.
+    INNER JOIN datalake_inspection_services_clean.item_issue AS item_issue
+        ON item_issue.id_item = item.id_item
+    INNER JOIN datalake_inspection_services_clean.issue_type AS ist
+        ON ist.id_issue_type = item_issue.id_type
+    GROUP BY base.sk_contract
+),
+flags AS (
+    SELECT
+        COALESCE(
+            hs.answered_water = 1
+            AND hs.answered_electricity = 1
+            AND hs.answered_gas = 1,
+            FALSE
+        ) AS answered_all,
+        COALESCE(hs.water_on = 1, FALSE) AS water_on,
+        COALESCE(hs.electricity_on = 1, FALSE) AS electricity_on,
+        COALESCE(hs.gas_on = 1, FALSE) AS gas_on,
+        COALESCE(hs.gas_not_tested = 1, FALSE) AS gas_not_tested
+    FROM base
+    LEFT JOIN house_supply AS hs
+        ON hs.sk_contract = base.sk_contract
+)
+SELECT
+    -- Coverage: denominator is every executed onboarding inspection.
+    COUNT(*) AS executed_onboarding_inspections,
+    COUNT_IF(answered_all) AS answered_water_gas_electricity,
+    ROUND(100.0 * COUNT_IF(answered_all) / COUNT(*), 1) AS pct_answered,
+    -- On-rates: denominator is only the inspections that answered. An inspection with no
+    -- house_supply block is "unknown", not "utility off", so it must stay out of the
+    -- denominator — leaving it in silently understates every on-rate.
+    ROUND(100.0 * COUNT_IF(water_on) / NULLIF(COUNT_IF(answered_all), 0), 1) AS pct_water_on,
+    ROUND(100.0 * COUNT_IF(electricity_on) / NULLIF(COUNT_IF(answered_all), 0), 1) AS pct_electricity_on,
+    ROUND(100.0 * COUNT_IF(gas_on) / NULLIF(COUNT_IF(answered_all), 0), 1) AS pct_gas_on,
+    ROUND(100.0 * COUNT_IF(gas_not_tested) / NULLIF(COUNT_IF(answered_all), 0), 1) AS pct_gas_not_tested,
+    ROUND(
+        100.0 * COUNT_IF(water_on AND electricity_on AND gas_on)
+        / NULLIF(COUNT_IF(answered_all), 0),
+        1
+    ) AS pct_all_three_on
+FROM flags
 ```

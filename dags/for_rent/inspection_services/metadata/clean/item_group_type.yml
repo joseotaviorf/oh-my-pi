@@ -12,7 +12,11 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.item_group_type.type
-    description: Name of the object evaluated in the inspection
+    description: >
+      Name of the object or checklist block evaluated in the inspection. Usually a physical object
+      (window, door, floor), but also non-physical blocks — house_supply groups the water, gas and
+      electricity questions (abastecimento) that the app renders in the general_information room.
+      This is the entry point for filtering the item graph down to a specific checklist block.
   review_instruction:
     lineage:
       - datalake_inspection_services_raw.item_group_type.review_instruction

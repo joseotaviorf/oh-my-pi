@@ -5,6 +5,12 @@ description: |
   This fact table relates room, item and item_group dimension data with the most granular information possible,
   so that it is possible to analyze and correlate volumetric indicators, property conditions and even inspection quality.
   Each row is a unique item, identified by the sk_item column.
+  It carries surrogate keys and inspection-quality flags only: it does not expose item_type,
+  item_group_type or the inspector's answer, so it cannot tell which checklist question a row
+  represents or what was answered. Analyses that need the question or the answer — for example
+  house_supply (abastecimento) water/gas/electricity utilities-on rates — must use
+  datalake_inspections.item plus datalake_inspections.item_issue, or the equivalent
+  datalake_inspection_services_clean item graph.
 domain: For Rent
 owner: gustavo.silva@quintoandar.com.br
 columns:

@@ -1,7 +1,14 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: item_issue
-description: Brings the sub problems that an item presents.
+description: |
+  One row per answer the inspector gave to an item question. For damage items the answer is the
+  sub-problem observed; for non-damage checklist questions it is the option selected — the
+  house_supply group (abastecimento) records here whether water, gas and electricity were on at
+  the visit, as issue_type.type in yes, no or it_was_not_possible_to_test.
+  This is the table that proves the inspector actually answered: an item row on its own only
+  proves the app rendered the question. Any fill-rate or utilities-on metric must be measured
+  here, not on item. Grain is one row per selected answer per item.
 domain: For Rent
 owner: gustavo.silva@quintoandar.com.br
 columns:
@@ -16,7 +23,10 @@ columns:
   id_type:
     lineage:
       - datalake_inspection_services_raw.item_issue.type_id
-    description: Indicates the type of problem
+    description: >
+      Foreign key to issue_type, which spells out the answer the inspector selected — a damage
+      sub-type for condition items, or yes / no / it_was_not_possible_to_test for the
+      house_supply (abastecimento) water, gas and electricity chips.
   uuid:
     lineage:
       - datalake_inspection_services_raw.item_issue.uuid
@@ -28,7 +38,11 @@ columns:
   is_active:
     lineage:
       - datalake_inspection_services_raw.item_issue.active
-    description: Boolean information with the aim of indicating whether the item issue is active or not.
+    description: >
+      Boolean information with the aim of indicating whether the item issue is active or not. Not
+      populated for every kind of answer — it is NULL on house_supply rows, for example, so a
+      WHERE is_active = TRUE filter silently returns no rows for those answers. Filter on the
+      item and issue types you need instead of relying on this flag.
   ts_created:
     lineage:
       - datalake_inspection_services_raw.item_issue.created_at

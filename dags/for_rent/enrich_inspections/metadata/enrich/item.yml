@@ -2,8 +2,15 @@
 database_name: datalake_inspections
 table_name: item
 description: |
-  The item object found in the database refers to a sub-item or sub-conditions within an item,
-  for example breakdowns, humidity, door problem, etc.
+  Denormalized, deduplicated view of the inspections-service item questions — one row per item
+  (latest ts_updated wins), already carrying item_type, item_group_type, room_name and the
+  assessment/inspection keys, so most analyses do not need to walk the clean item graph.
+  Rows are damage sub-items or sub-conditions (breakdowns, humidity, door problem) and also
+  non-damage checklist questions, including the house_supply (abastecimento) water, gas and
+  electricity chips — this table does reflect the current Flutter inspector app.
+  It holds the questions only. The inspector's answer is in datalake_inspections.item_issue
+  (column issue_type); measuring fill rates or utilities-on from this table alone counts
+  rendered questions as answered and overstates the result.
 domain: For Rent
 owner: gustavo.silva@quintoandar.com.br
 columns:
@@ -48,7 +55,11 @@ columns:
     lineage:
       - datalake_inspection_services_clean.item.uuid
   item_type:
-    description: Item problem name captured in the source operational system.
+    description: >
+      Name of what the item question is about, captured in the source operational system. For
+      damage items it is the problem name; for non-damage checklist groups it is the subject being
+      asked about — house_supply (abastecimento) uses water, gas and electricity. Identifies the
+      question only; the answer is issue_type in datalake_inspections.item_issue.
     lineage:
       - datalake_inspection_services_clean.item_type.type
   media_type:
@@ -87,7 +98,12 @@ columns:
     lineage:
       - datalake_inspection_services_clean.item.comment
   is_present:
-    description: Indicates if the issue checklist item was checked by the inspector.
+    description: >
+      Indicates if the issue checklist item was checked by the inspector. Only meaningful for
+      check-style questions (display_type CHECK or CHECK_DESCRIPTION). It is NULL for chip-style
+      questions such as the house_supply water/gas/electricity chips (display_type
+      CHIP_CHOICE_SINGLE), where the chosen option is an item_issue row instead. Do not use it as
+      a general "the inspector answered" flag.
     lineage:
       - datalake_inspection_services_clean.item.is_present
   count:
@@ -95,7 +111,10 @@ columns:
     lineage:
       - datalake_inspection_services_clean.item.count
   is_active:
-    description: Indicates if the object is active.
+    description: >
+      Indicates if the object is active. Not populated for every kind of question — it is NULL on
+      house_supply rows, for example, so a WHERE is_active = TRUE filter silently returns no rows
+      for those items. Filter on the item and issue types you need instead.
     lineage:
       - datalake_inspection_services_clean.item.is_active
   ts_created:

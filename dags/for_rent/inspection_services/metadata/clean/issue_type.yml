@@ -32,7 +32,12 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.issue_type.type
-    description: Specify the sub-type problem
+    description: >
+      Name of the answer the inspector can select for an item question. For damage items it is the
+      problem sub-type; for non-damage checklist groups it is the answer itself — house_supply
+      (abastecimento) uses yes, no and it_was_not_possible_to_test to state whether water, gas or
+      electricity was on at the visit. Which utility the answer refers to comes from
+      item_type.type, reached through item_issue.id_item.
   require_manual_analysis:
     lineage:
       - datalake_inspection_services_raw.issue_type.require_manual_analysis
