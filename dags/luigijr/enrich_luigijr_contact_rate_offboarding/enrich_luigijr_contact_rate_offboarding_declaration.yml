@@ -1,0 +1,21 @@
+dag:
+  name: enrich_luigijr_contact_rate_offboarding
+  owner: ForRent PostContract
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:diego.carvalho
+  dataset_dependencies:
+  - dw_offboarding.fact_terminations:first-run-of-day
+  - dw_rent.dim_contract:first-run-of-day
+  - dw_rent.fact_contracts:first-run-of-day
+  - dw_offboarding.obt_offboarding:first-run-of-day
+  - dw_customer_support.dim_department:first-run-of-day
+  - dw_customer_support.fact_customer_contacts:first-run-of-day
+  - dw_bpo_performance.cases_perspective:first-run-of-day
+  - datalake_chatbot.sessions:first-run-of-day
+  - cluster_validation.datalake_emlio_clean___emlio_logs:first-run-of-day
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: forrent_postcontract

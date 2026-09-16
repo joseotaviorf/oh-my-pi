@@ -1,0 +1,68 @@
+database_name: forrent_postcontract
+table_name: contact_rate_offboarding
+owner: diego.carvalho@quintoandar.com.br
+domain: For Rent
+description: Table `contact_rate_offboarding` materialized on a schedule by Luigi from a user-provided SQL query (ForRent PostContract domain).
+columns:
+  sk_contract:
+    description: Column `sk_contract` produced by the scheduled materialization query.
+  sk_termination:
+    description: Column `sk_termination` produced by the scheduled materialization query.
+  ts_termination_finished:
+    description: Column `ts_termination_finished` produced by the scheduled materialization query.
+  ts_offboarding_start:
+    description: Column `ts_offboarding_start` produced by the scheduled materialization query.
+  periodo_migracao:
+    description: Column `periodo_migracao` produced by the scheduled materialization query.
+  is_spoc_eligible:
+    description: Column `is_spoc_eligible` produced by the scheduled materialization query.
+  is_spoc:
+    description: Column `is_spoc` produced by the scheduled materialization query.
+  status:
+    description: Column `status` produced by the scheduled materialization query.
+  sk_tenant:
+    description: Column `sk_tenant` produced by the scheduled materialization query.
+  sk_owner:
+    description: Column `sk_owner` produced by the scheduled materialization query.
+  is_mediacao:
+    description: Column `is_mediacao` produced by the scheduled materialization query.
+  has_repairs:
+    description: Column `has_repairs` produced by the scheduled materialization query.
+  tickets_theme:
+    description: Column `tickets_theme` produced by the scheduled materialization query.
+  tickets_last_department:
+    description: Column `tickets_last_department` produced by the scheduled materialization query.
+  tickets_channel:
+    description: Column `tickets_channel` produced by the scheduled materialization query.
+  tickets_team:
+    description: Column `tickets_team` produced by the scheduled materialization query.
+  qtd_tickets:
+    description: Column `qtd_tickets` produced by the scheduled materialization query.
+  total_replies:
+    description: Column `total_replies` produced by the scheduled materialization query.
+  count_contact:
+    description: Column `count_contact` produced by the scheduled materialization query.
+  count_touch:
+    description: Column `count_touch` produced by the scheduled materialization query.
+  count_contact_front:
+    description: Column `count_contact_front` produced by the scheduled materialization query.
+  count_contact_back:
+    description: Column `count_contact_back` produced by the scheduled materialization query.
+  count_touch_front:
+    description: Column `count_touch_front` produced by the scheduled materialization query.
+  count_touch_back:
+    description: Column `count_touch_back` produced by the scheduled materialization query.
+  count_contact_legacy:
+    description: Column `count_contact_legacy` produced by the scheduled materialization query.
+  has_ticket:
+    description: Column `has_ticket` produced by the scheduled materialization query.
+  human_support_no_spoc:
+    description: Column `human_support_no_spoc` produced by the scheduled materialization query.
+  is_chatbot:
+    description: Column `is_chatbot` produced by the scheduled materialization query.
+  is_encarteiramento_inteligente_model:
+    description: Column `is_encarteiramento_inteligente_model` produced by the scheduled materialization query.
+  model_version:
+    description: Column `model_version` produced by the scheduled materialization query.
+  model_prediction:
+    description: Column `model_prediction` produced by the scheduled materialization query.
