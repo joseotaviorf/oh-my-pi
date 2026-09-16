@@ -19,7 +19,6 @@ DAG:
     - bietlejuice.enrich_crawler_loft
     - bietlejuice.enrich_crawler_olx
     - bietlejuice.enrich_demand_consolidated_targets
-
     - bietlejuice.enrich_find_health_metrics
     - bietlejuice.enrich_google_search_console_classified
     - bietlejuice.enrich_growth_automatic_daily_costs
@@ -44,8 +43,9 @@ DAG:
     - bietlejuice.reverse_sale_listings_report
     - bietlejuice.reverse_tracksale_access
     - bietlejuice.reverse_tracksale_test
+    - bietlejuice.salesforce_classifieds_commercial
+    - bietlejuice.salesforce_classifieds_operations
     - bietlejuice.services_integration_validations
-    - bietlejuice.signup
     - bietlejuice.vocs_machina_planning
   contains:
     - bietlejuice.gsheets_
