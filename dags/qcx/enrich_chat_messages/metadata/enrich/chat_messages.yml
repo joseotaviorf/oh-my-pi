@@ -6,7 +6,10 @@ domain: QCX
 description: >
   One row per Copilot chat message for the Conrado host, linked to Consórcio leads
   when Blip identity is available. Grain is id_message. Includes Blip identity
-  (id_bsp), optional Consórcio lead and HubSpot CRM ids from lead_external_data,
+  (id_bsp), optional Consórcio lead from the Blip identity bridge
+  (contact_property via lead.id_contact, falling back to the frozen
+  lead_external_data bsp column) and the HubSpot CRM id from
+  lead_external_data (crm_id is not a contact_property key),
   message role/content, and host_name from Langfuse tags (currently always conrado).
   Incremental merge on id_message twice daily; scheduled default is a rolling
   30-day load window (override load_start_date / load_end_date for backfill).
@@ -15,8 +18,17 @@ description: >
 columns:
   id_lead:
     lineage:
-      - datalake_consorcio_clean.lead_external_data.id_lead
-    description: Consórcio lead primary key when the Blip identity is linked in lead_external_data; null when no link exists.
+      - datalake_consorcio_clean.lead.id
+      - datalake_consorcio_clean.lead.id_contact
+      - datalake_consorcio_clean.contact_property.id_contact
+      - datalake_consorcio_clean.contact_property.property_value
+      - datalake_consorcio_clean.contact_property.property_key
+      - datalake_consorcio_clean.lead_external_data.id_bsp_conversation
+    description: >
+      Consórcio lead primary key when the Blip conversation id resolves to a
+      lead: contact_property BSP_CONVERSATION_ID via lead.id_contact, falling
+      back to the frozen lead_external_data bsp column for
+      pre-contact-identity history. Null when no link exists.
   id_bsp:
     lineage:
       - datalake_langfuse_clean.traces.id_user
@@ -24,7 +36,8 @@ columns:
   id_crm:
     lineage:
       - datalake_consorcio_clean.lead_external_data.id_crm
-    description: HubSpot CRM deal id linked to the lead via lead_external_data; null when no CRM link exists.
+      - datalake_consorcio_clean.lead_external_data.id_lead
+    description: HubSpot CRM deal id linked to the lead via lead_external_data.crm_id; null when no CRM link exists.
   id_message:
     lineage:
       - datalake_copilot_service_clean.message.id

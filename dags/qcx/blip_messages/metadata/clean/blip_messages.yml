@@ -11,19 +11,28 @@ description: >
   Blip JSONL has no Copilot session. id_bsp is the Blip tunnel identity
   (same semantic as chat_messages). Producer raw id_lead is mixed (numeric
   lead.id or lead.uuid); clean id_lead is always bigint lead.id, resolved
-  from producer first then lead_external_data (tunnel → contact). WhatsApp
-  contact and S3 provenance stay out of clean. Insert-only MERGE on
-  id_message; empty id_message excluded.
+  from producer first then the Blip identity bridge (tunnel → WhatsApp
+  contact), which reads contact_property via lead.id_contact and falls back
+  to the frozen lead_external_data bsp columns for pre-contact-identity
+  history. WhatsApp contact and S3 provenance stay out of clean.
+  Insert-only MERGE on id_message; empty id_message excluded.
 columns:
   id_lead:
     lineage:
       - datalake_consorcio_raw.blip_messages.id_lead
       - datalake_consorcio_clean.lead.id
-      - datalake_consorcio_clean.lead_external_data.id_lead
+      - datalake_consorcio_clean.lead.id_contact
+      - datalake_consorcio_clean.contact_property.id_contact
+      - datalake_consorcio_clean.contact_property.property_value
+      - datalake_consorcio_clean.contact_property.property_key
+      - datalake_consorcio_clean.lead_external_data.id_bsp_conversation
+      - datalake_consorcio_clean.lead_external_data.id_bsp_contact
     description: >
       Consórcio lead primary key (lead.id, bigint). From producer when raw
       id_lead is numeric, or via lead.uuid when raw id_lead is a UUID; otherwise
-      from lead_external_data (tunnel then WhatsApp contact). Null when
+      from the Blip identity bridge (tunnel then WhatsApp contact), which reads
+      contact_property via lead.id_contact and falls back to the frozen
+      lead_external_data bsp columns for pre-contact-identity history. Null when
       unresolved.
   id_bsp:
     lineage:
@@ -36,9 +45,11 @@ columns:
     lineage:
       - datalake_consorcio_raw.blip_messages.id_crm
       - datalake_consorcio_clean.lead_external_data.id_crm
+      - datalake_consorcio_clean.lead_external_data.id_lead
     description: >
-      HubSpot CRM deal id paired with the winning id_lead enrichment source;
-      null when no CRM link exists.
+      HubSpot CRM deal id paired with the winning id_lead enrichment source,
+      looked up on lead_external_data by id_lead (crm_id is not a
+      contact_property key); null when no CRM link exists.
   id_message:
     lineage:
       - datalake_consorcio_raw.blip_messages.id_message

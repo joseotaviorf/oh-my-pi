@@ -16,8 +16,13 @@
 -- id_lead resolution (paired with id_crm):
 --   1) numeric producer id_lead
 --   2) producer UUID → lead.id
---   3) lead_external via tunnel
---   4) lead_external via WhatsApp contact
+--   3) Blip identity via tunnel
+--   4) Blip identity via WhatsApp contact
+-- Blip identity resolves through contact_property (contact identity flag
+-- at 100%, so every new write lands there) and falls back to the frozen
+-- lead_external_data bsp columns for conversations that predate it.
+-- crm_id is not a contact_property key; it is read from
+-- lead_external_data by the winning id_lead.
 -- ================================================================
 WITH raw_in_window AS (
   SELECT
@@ -61,59 +66,122 @@ normalized AS (
   FROM
     raw_in_window
 ),
-lead_by_tunnel AS (
+-- Latest lead per contact. A contact owns every lead the same person
+-- produced (recapture creates a new lead, reusing the contact), so the
+-- newest lead wins — the same tie-break the LED bridge applied when a
+-- donated conversation id appeared on more than one lead.
+latest_lead_by_contact AS (
   SELECT
-    CASE
-      WHEN INSTR(lead_external.id_bsp_conversation, '@') > 0
-        THEN lead_external.id_bsp_conversation
-      ELSE CONCAT(lead_external.id_bsp_conversation, '@tunnel.msging.net')
-    END AS id_bsp,
+    consorcio_lead.id_contact,
+    consorcio_lead.id AS id_lead,
+    ROW_NUMBER() OVER (
+      PARTITION BY consorcio_lead.id_contact
+      ORDER BY
+        consorcio_lead.ts_updated DESC NULLS LAST,
+        consorcio_lead.ts_created DESC,
+        consorcio_lead.id DESC
+    ) AS rn
+  FROM
+    datalake_consorcio_clean.lead AS consorcio_lead
+  WHERE
+    consorcio_lead.id_contact IS NOT NULL
+),
+-- crm_id is not a contact_property key: consorcio-api keeps writing it to
+-- lead_external_data, so the deal id is always looked up by lead.
+crm_by_lead AS (
+  SELECT
     lead_external.id_lead,
     lead_external.id_crm,
     ROW_NUMBER() OVER (
-      PARTITION BY
+      PARTITION BY lead_external.id_lead
+      ORDER BY
+        lead_external.ts_updated DESC NULLS LAST,
+        lead_external.ts_created DESC
+    ) AS rn
+  FROM
+    datalake_consorcio_clean.lead_external_data AS lead_external
+  WHERE
+    lead_external.id_crm IS NOT NULL
+    AND TRIM(lead_external.id_crm) <> ''
+),
+-- Blip identity → lead, from both identity stores. contact_property is the
+-- current source of truth (contact identity flag at 100%); the LED bsp
+-- columns still carry the history written before it, and stay frozen from
+-- now on. source_priority makes contact_property win a disagreement.
+bsp_identity AS (
+  SELECT
+    property_kind,
+    id_bsp_value,
+    id_lead
+  FROM (
+    SELECT
+      ranked_identity.property_kind,
+      ranked_identity.id_bsp_value,
+      ranked_identity.id_lead,
+      ROW_NUMBER() OVER (
+        PARTITION BY
+          ranked_identity.property_kind,
+          ranked_identity.id_bsp_value
+        ORDER BY
+          ranked_identity.source_priority,
+          ranked_identity.id_lead DESC
+      ) AS rn_identity
+    FROM (
+      SELECT
+        contact_property.property_key AS property_kind,
+        CASE
+          WHEN INSTR(contact_property.property_value, '@') > 0
+            THEN contact_property.property_value
+          WHEN contact_property.property_key = 'BSP_CONVERSATION_ID'
+            THEN CONCAT(contact_property.property_value, '@tunnel.msging.net')
+          ELSE CONCAT(contact_property.property_value, '@wa.gw.msging.net')
+        END AS id_bsp_value,
+        latest_lead_by_contact.id_lead,
+        1 AS source_priority
+      FROM
+        datalake_consorcio_clean.contact_property AS contact_property
+      INNER JOIN
+        latest_lead_by_contact
+          ON latest_lead_by_contact.id_contact = contact_property.id_contact
+          AND latest_lead_by_contact.rn = 1
+      WHERE
+        contact_property.property_key IN ('BSP_CONVERSATION_ID', 'BSP_CONTACT_ID')
+        AND contact_property.property_value IS NOT NULL
+        AND TRIM(contact_property.property_value) <> ''
+      UNION ALL
+      SELECT
+        'BSP_CONVERSATION_ID' AS property_kind,
         CASE
           WHEN INSTR(lead_external.id_bsp_conversation, '@') > 0
             THEN lead_external.id_bsp_conversation
           ELSE CONCAT(lead_external.id_bsp_conversation, '@tunnel.msging.net')
-        END
-      ORDER BY
-        lead_external.ts_updated DESC NULLS LAST,
-        lead_external.ts_created DESC,
-        lead_external.id_lead DESC
-    ) AS rn
-  FROM
-    datalake_consorcio_clean.lead_external_data AS lead_external
-  WHERE
-    lead_external.id_bsp_conversation IS NOT NULL
-    AND TRIM(lead_external.id_bsp_conversation) <> ''
-),
-lead_by_contact AS (
-  SELECT
-    CASE
-      WHEN INSTR(lead_external.id_bsp_contact, '@') > 0
-        THEN lead_external.id_bsp_contact
-      ELSE CONCAT(lead_external.id_bsp_contact, '@wa.gw.msging.net')
-    END AS id_bsp_contact_normalized,
-    lead_external.id_lead,
-    lead_external.id_crm,
-    ROW_NUMBER() OVER (
-      PARTITION BY
+        END AS id_bsp_value,
+        lead_external.id_lead,
+        2 AS source_priority
+      FROM
+        datalake_consorcio_clean.lead_external_data AS lead_external
+      WHERE
+        lead_external.id_bsp_conversation IS NOT NULL
+        AND TRIM(lead_external.id_bsp_conversation) <> ''
+      UNION ALL
+      SELECT
+        'BSP_CONTACT_ID' AS property_kind,
         CASE
           WHEN INSTR(lead_external.id_bsp_contact, '@') > 0
             THEN lead_external.id_bsp_contact
           ELSE CONCAT(lead_external.id_bsp_contact, '@wa.gw.msging.net')
-        END
-      ORDER BY
-        lead_external.ts_updated DESC NULLS LAST,
-        lead_external.ts_created DESC,
-        lead_external.id_lead DESC
-    ) AS rn
-  FROM
-    datalake_consorcio_clean.lead_external_data AS lead_external
+        END AS id_bsp_value,
+        lead_external.id_lead,
+        2 AS source_priority
+      FROM
+        datalake_consorcio_clean.lead_external_data AS lead_external
+      WHERE
+        lead_external.id_bsp_contact IS NOT NULL
+        AND TRIM(lead_external.id_bsp_contact) <> ''
+    ) AS ranked_identity
+  ) AS deduped_identity
   WHERE
-    lead_external.id_bsp_contact IS NOT NULL
-    AND TRIM(lead_external.id_bsp_contact) <> ''
+    rn_identity = 1
 ),
 lead_by_uuid AS (
   SELECT
@@ -148,9 +216,9 @@ enriched AS (
         OR lead_uuid.id_lead IS NOT NULL
         THEN normalized.id_crm
       WHEN lead_tunnel.id_lead IS NOT NULL
-        THEN COALESCE(CAST(lead_tunnel.id_crm AS STRING), normalized.id_crm)
+        THEN COALESCE(crm_tunnel.id_crm, normalized.id_crm)
       WHEN lead_contact.id_lead IS NOT NULL
-        THEN COALESCE(CAST(lead_contact.id_crm AS STRING), normalized.id_crm)
+        THEN COALESCE(crm_contact.id_crm, normalized.id_crm)
       ELSE normalized.id_crm
     END AS id_crm,
     normalized.id_message,
@@ -169,13 +237,21 @@ enriched AS (
       AND lead_uuid.uuid_lead = normalized.producer_id_lead
       AND lead_uuid.rn = 1
   LEFT JOIN
-    lead_by_tunnel AS lead_tunnel
-      ON lead_tunnel.id_bsp = normalized.id_bsp
-      AND lead_tunnel.rn = 1
+    bsp_identity AS lead_tunnel
+      ON lead_tunnel.property_kind = 'BSP_CONVERSATION_ID'
+      AND lead_tunnel.id_bsp_value = normalized.id_bsp
   LEFT JOIN
-    lead_by_contact AS lead_contact
-      ON lead_contact.id_bsp_contact_normalized = normalized.id_bsp_contact_normalized
-      AND lead_contact.rn = 1
+    bsp_identity AS lead_contact
+      ON lead_contact.property_kind = 'BSP_CONTACT_ID'
+      AND lead_contact.id_bsp_value = normalized.id_bsp_contact_normalized
+  LEFT JOIN
+    crm_by_lead AS crm_tunnel
+      ON crm_tunnel.id_lead = lead_tunnel.id_lead
+      AND crm_tunnel.rn = 1
+  LEFT JOIN
+    crm_by_lead AS crm_contact
+      ON crm_contact.id_lead = lead_contact.id_lead
+      AND crm_contact.rn = 1
 ),
 ranked AS (
   SELECT

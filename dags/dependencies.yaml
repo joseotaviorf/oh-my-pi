@@ -4,6 +4,7 @@ bietlejuice.alias_classifieds:
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
 bietlejuice.blip_messages:
+  - bietlejuice.consorcio:load-clean-contact-property:first-run-of-day
   - bietlejuice.consorcio:load-clean-lead-external-data:first-run-of-day
   - bietlejuice.consorcio:load-clean-lead:first-run-of-day
 bietlejuice.concierge_propensity_model_service:
@@ -1886,11 +1887,14 @@ bietlejuice.enrich_cdp_personas:
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events:first-run-of-day
 bietlejuice.enrich_chat_messages:
+  - bietlejuice.consorcio:load-clean-contact-property:first-run-of-day
   - bietlejuice.consorcio:load-clean-lead-external-data:first-run-of-day
+  - bietlejuice.consorcio:load-clean-lead:first-run-of-day
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day
 bietlejuice.enrich_chat_tool_calls:
+  - bietlejuice.consorcio:load-clean-contact-property:first-run-of-day
   - bietlejuice.consorcio:load-clean-lead-external-data:first-run-of-day
   - bietlejuice.consorcio:load-clean-lead:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day

@@ -37,8 +37,10 @@ dag:
       (id_lead, id_bsp, id_crm, id_message, host_name, role, content,
       ts_created, partitions; no id_session). id_bsp is the Blip tunnel
       identity. Producer raw id_lead is mixed (numeric lead.id or UUID);
-      clean resolves bigint id_lead from producer first, then
-      lead_external_data (tunnel → contact). WhatsApp contact and S3/ops
+      clean resolves bigint id_lead from producer first, then the Blip
+      identity bridge (tunnel → contact): contact_property via
+      lead.id_contact, falling back to the frozen lead_external_data bsp
+      columns. WhatsApp contact and S3/ops
       columns stay in raw only. Indexes raw rows with ts_load >=
       load_start_date (default 7 days; override via DAG conf). Insert-only
       merge on id_message; empty id_message excluded.
