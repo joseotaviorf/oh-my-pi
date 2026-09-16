@@ -1,0 +1,12 @@
+SELECT
+    id,
+    created_at,
+    updated_at,
+    macro_rule_id,
+    rule_type,
+    decision_status,
+    decision_reason,
+    rule_version,
+    source_type
+FROM
+    datalake_kycp_orchestrator_raw.rule_evaluation

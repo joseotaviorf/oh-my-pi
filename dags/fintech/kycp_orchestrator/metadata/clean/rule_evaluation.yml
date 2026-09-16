@@ -1,0 +1,43 @@
+---
+database_name: datalake_kycp_orchestrator_clean
+table_name: rule_evaluation
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: Granular rule evaluation under a macro rule (inputs → provider fetch → parse/compute → decision).
+columns:
+  id:
+    description: Incremental primary key.
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.id
+  created_at:
+    description: Creation timestamp.
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.created_at
+  updated_at:
+    description: Last update timestamp.
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.updated_at
+  macro_rule_id:
+    description: Foreign key to macro_rule.id.
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.macro_rule_id
+  rule_type:
+    description: "Granular rule type: CPF_STATUS, IS_PEP, CRIMINAL_COMPLIANCE, etc."
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.rule_type
+  decision_status:
+    description: "Rule outcome: CREATED, APPROVED, REJECTED, MANUAL_ANALYSIS or DATA_STORED."
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.decision_status
+  decision_reason:
+    description: RuleEvaluationDecisionReason granular outcome (e.g. VALID, INVALID, INCONCLUSIVE).
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.decision_reason
+  rule_version:
+    description: Immutable rule version identifier.
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.rule_version
+  source_type:
+    description: "How the rule was evaluated: AUTOMATIC or MANUAL."
+    lineage:
+      - datalake_kycp_orchestrator_raw.rule_evaluation.source_type

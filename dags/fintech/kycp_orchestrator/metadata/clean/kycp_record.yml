@@ -1,0 +1,27 @@
+---
+database_name: datalake_kycp_orchestrator_clean
+table_name: kycp_record
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: KYCP record anchor for a person or company external reference. Groups screenings over time for the same external entity.
+columns:
+  id:
+    description: Incremental primary key.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_record.id
+  created_at:
+    description: Creation timestamp.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_record.created_at
+  updated_at:
+    description: Last update timestamp.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_record.updated_at
+  external_reference_uuid:
+    description: External reference identifier (Person UUID or Company UUID).
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_record.external_reference_uuid
+  external_reference_type:
+    description: "Type of external reference: PERSON or COMPANY."
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_record.external_reference_type

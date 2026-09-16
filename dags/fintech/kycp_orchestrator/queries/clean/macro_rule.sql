@@ -1,0 +1,16 @@
+SELECT
+    id,
+    created_at,
+    updated_at,
+    reference_hashed_key,
+    reference_type,
+    status,
+    decision_status,
+    decision_issued_at,
+    decision_expires_at,
+    macro_rule_type,
+    decision_reason,
+    source_type,
+    macro_rule_version
+FROM
+    datalake_kycp_orchestrator_raw.macro_rule

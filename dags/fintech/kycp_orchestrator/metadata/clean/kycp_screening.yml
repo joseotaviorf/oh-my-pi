@@ -1,0 +1,55 @@
+---
+database_name: datalake_kycp_orchestrator_clean
+table_name: kycp_screening
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: One KYCP screening lifecycle for a kycp_record. Aggregate decision and risk live here; granular rule outcomes are on macro_rule and rule_evaluation.
+columns:
+  id:
+    description: Incremental primary key.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.id
+  created_at:
+    description: Creation timestamp.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.created_at
+  updated_at:
+    description: Last update timestamp.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.updated_at
+  status:
+    description: "Pipeline status: CREATED, PROCESSING, AWAITING, VALIDATED, OUTDATED or INVALIDATED."
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.status
+  risk_category:
+    description: "Risk category when assigned: LOW, MEDIUM or HIGH."
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.risk_category
+  decision:
+    description: "Screening-level decision: APPROVED, REJECTED or UNDER_ANALYSIS."
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.decision
+  decision_reason:
+    description: Screening-level reason (distinct from rule/macro reason enums).
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.decision_reason
+  decision_issued_at:
+    description: When the screening decision was made.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.decision_issued_at
+  decision_expires_at:
+    description: Expiration of the screening decision; derived from linked macro rules (nullable).
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.decision_expires_at
+  source_type:
+    description: "How the screening was initiated: AUTOMATIC, PARTIALLY_AUTOMATIC, etc."
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.source_type
+  policy_version:
+    description: Immutable policy version identifier for this screening.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.policy_version
+  kycp_record_id:
+    description: Foreign key to kycp_record.id.
+    lineage:
+      - datalake_kycp_orchestrator_raw.kycp_screening.kycp_record_id

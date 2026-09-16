@@ -1,0 +1,34 @@
+dag:
+  name: kycp_orchestrator
+  schedule_start_date: 2026, 09, 12
+  schedule_interval: 0 8 * * *
+  owner: Data Fintech
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: kycp_orchestrator
+  source_schema: public
+  custom_schema: kycp_orchestrator
+  lineage_product_database_name: kycp_orchestrator
+  tables_customization:
+    kycp_record:
+      clean_table_name: kycp_record
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    kycp_screening:
+      clean_table_name: kycp_screening
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    macro_rule:
+      clean_table_name: macro_rule
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    rule_evaluation:
+      clean_table_name: rule_evaluation
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    screening_macro_rule:
+      clean_table_name: screening_macro_rule
+      raw_primary_keys: [kycp_screening_id,macro_rule_id]
+      clean_primary_keys: [kycp_screening_id,macro_rule_id]

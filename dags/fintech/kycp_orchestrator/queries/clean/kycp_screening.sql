@@ -1,0 +1,15 @@
+SELECT
+    id,
+    created_at,
+    updated_at,
+    status,
+    risk_category,
+    decision,
+    decision_reason,
+    decision_issued_at,
+    decision_expires_at,
+    source_type,
+    policy_version,
+    kycp_record_id
+FROM
+    datalake_kycp_orchestrator_raw.kycp_screening

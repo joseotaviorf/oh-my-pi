@@ -1,0 +1,59 @@
+---
+database_name: datalake_kycp_orchestrator_clean
+table_name: macro_rule
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: Macro-level KYCP rule execution for a hashed reference. Can be reused across screenings that share the same reference key.
+columns:
+  id:
+    description: Incremental primary key.
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.id
+  created_at:
+    description: Creation timestamp.
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.created_at
+  updated_at:
+    description: Last update timestamp.
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.updated_at
+  reference_hashed_key:
+    description: SHA-256 digest of the canonical reference value (Base64 via Sha256Digester). Deterministic reuse lookup key; one-way digest, not decryptable.
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.reference_hashed_key
+  reference_type:
+    description: "Type of reference digested: CPF, NAME, EMAIL, CNPJ, etc."
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.reference_type
+  status:
+    description: "Pipeline status: CREATED, PROCESSING, AWAITING, VALIDATED, OUTDATED or INVALIDATED."
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.status
+  decision_status:
+    description: "Aggregate macro outcome: APPROVED, UNDER_ANALYSIS, REJECTED or DATA_STORED (nullable until set)."
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.decision_status
+  decision_issued_at:
+    description: Wall-clock time when aggregate decision_status was first assigned on this macro rule (nullable until an outcome exists).
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.decision_issued_at
+  decision_expires_at:
+    description: Wall-clock time after which this macro outcome is no longer valid for reuse or linked screening validity checks (nullable).
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.decision_expires_at
+  macro_rule_type:
+    description: "Macro rule category: CPF_INTEGRITY, PEP, LAWSUITS, INTERNAL_BLOCKLIST, etc."
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.macro_rule_type
+  decision_reason:
+    description: MacroRuleDecisionReason aggregate outcome (e.g. ALL_RULES_PASSED, RULE_REJECTED).
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.decision_reason
+  source_type:
+    description: "How the macro rule was evaluated: AUTOMATIC, PARTIALLY_AUTOMATIC, etc."
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.source_type
+  macro_rule_version:
+    description: Immutable macro rule version identifier.
+    lineage:
+      - datalake_kycp_orchestrator_raw.macro_rule.macro_rule_version

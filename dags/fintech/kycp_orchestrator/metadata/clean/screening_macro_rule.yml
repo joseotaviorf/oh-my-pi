@@ -1,0 +1,15 @@
+---
+database_name: datalake_kycp_orchestrator_clean
+table_name: screening_macro_rule
+owner: gustavo.dambros@quintoandar.com.br
+domain: Fintech
+description: Junction linking KYCP screenings to macro rules. Enables journey analytics across record → screening → macro → rule_evaluation.
+columns:
+  kycp_screening_id:
+    description: Foreign key to kycp_screening.id (part of composite primary key).
+    lineage:
+      - datalake_kycp_orchestrator_raw.screening_macro_rule.kycp_screening_id
+  macro_rule_id:
+    description: Foreign key to macro_rule.id (part of composite primary key).
+    lineage:
+      - datalake_kycp_orchestrator_raw.screening_macro_rule.macro_rule_id
