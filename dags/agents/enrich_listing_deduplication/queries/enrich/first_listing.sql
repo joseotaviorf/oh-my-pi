@@ -15,7 +15,7 @@ WITH house_listing_consultant AS (
                     )
                 )
                 ELSE hlc.ts_enrollment_started
-            END AS STRING
+            END AS TIMESTAMP
         ) AS ts_enrollment_started
     FROM
         datalake_big_agent.house_listing_consultant AS hlc
@@ -51,7 +51,7 @@ first_listing AS (
         u.ts_first_unpublished,
         GREATEST(
             lbc.ts_first_listing,
-            TIMESTAMP(hlc.ts_enrollment_started),
+            hlc.ts_enrollment_started,
             COALESCE(so.ts_sale_agreement_signed, rde.ts_event),
             u.ts_first_unpublished
         ) AS ts_updated
