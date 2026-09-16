@@ -1,0 +1,28 @@
+dag:
+  name: reverse_security_findings_executive_summary
+  schedule_start_date: 2026, 9, 16
+  owner: Tech Platform Cyber Security
+  documentation:
+    dag_purpose: |
+      Publishes the Security Data Gateway findings executive summary (schema_version 1)
+      for the Base44 dashboard. Runs the allowlisted aggregate query from IDPLATF-8282
+      against datalake_security_data_gateway_clean.security_findings — KPI counts and
+      risk/PII-type/resource-type/source/day breakdowns only, no emails, resource ids,
+      names, or raw payloads — and overwrites
+      s3://5a-base44-office/security_data_gateway/executive_summary/current_summary.json.
+      No cron schedule: triggered automatically via dependencies.yaml lineage as soon
+      as the upstream security_data_gateway_findings DAG finishes its clean-layer load.
+      Depends on a follow-up to IDPLATF-8284 (not yet done): granting this DAG's
+      execution role s3:PutObject on that key. Until it lands, the upload step
+      fails with AccessDenied.
+workflow:
+  type: load_access
+  layer: reverse
+  custom_schema: security_findings_executive_summary
+  load_spark_job: load_executive_summary_to_s3
+  spark_job_arguments:
+    - "{environment}"
+    - "{{ data_interval_start | ds }}"
+  execution_timeout_hours: 1
+  tables_customization:
+    executive_summary: {}

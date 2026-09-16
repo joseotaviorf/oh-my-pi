@@ -1,0 +1,5 @@
+---
+# IDPLATF-8284: prod bucket + IAM user (owned by Base44). Forno writes to a
+# separate smoke-test bucket instead, see forno_conf.yml.
+executive_summary_s3_bucket: 5a-base44-office
+executive_summary_s3_key: security_data_gateway/executive_summary/current_summary.json

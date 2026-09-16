@@ -1,0 +1,7 @@
+---
+# IDPLATF-8285: forno-only smoke-test bucket, provisioned in
+# quintoandar/infrastructure#45315 (cloud/aws-accounts/forno-data/security-data-gateway/s3).
+# Not the prod destination (5a-base44-office): that bucket is owned by Base44 and
+# its policy denies every principal outside an allow-list that excludes emr-forno.
+executive_summary_s3_bucket: sdg-forno-executive-summary
+executive_summary_s3_key: security_data_gateway/executive_summary/current_summary.json

@@ -78,6 +78,7 @@ dags_out_of_pattern:
         "reverse_neighborhood_price_range_load",
         "reverse_neighborhood_price_range_access",
         "reverse_integration_cloudzero",
+        "reverse_security_findings_executive_summary",
         "reverse_listings_locations_load",
         "reverse_listings_locations_access",
         "reverse_reports",
