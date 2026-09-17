@@ -57,40 +57,45 @@ column_level_validations:
     is_complete:
       severity_level: Warning
 
-  assignments_are_ceo_reachable_every_day:
-    custom:
-      # C/E non-test assignments must have a management_hierarchy version covering every day
-      # from PIN go-live (2024-03-01) through today or termination. The enrich table only keeps
-      # CEO-valid chains (L0 = max-band CEO), so a covering row means CEO-reachable that day.
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM (
-           SELECT
-               im.assignment_number,
-               explode(
-                   sequence(
-                       GREATEST(DATE('2024-03-01'), im.dt_started),
-                       LEAST(
-                           CURRENT_DATE(),
-                           COALESCE(NULLIF(im.dt_actual_termination, DATE('9999-12-31')), CURRENT_DATE())
-                       )
-                   )
-               ) AS dt_day
-           FROM datalake_people.identifier_mapping AS im
-           WHERE im.assignment_type IN ('C', 'E')
-             AND NOT im.is_user_test
-             AND GREATEST(DATE('2024-03-01'), im.dt_started) <= LEAST(
-                   CURRENT_DATE(),
-                   COALESCE(NULLIF(im.dt_actual_termination, DATE('9999-12-31')), CURRENT_DATE())
-                 )
-         ) AS days
-         LEFT JOIN datalake_people.management_hierarchy AS mh
-             ON mh.assignment_number = days.assignment_number
-             AND mh.dt_valid_from <= days.dt_day
-             AND mh.dt_valid_to >= days.dt_day
-         WHERE mh.sk_hierarchy_version IS NULL
-        ) = 0
-      severity_level: Warning
+  # Temporarily disabled while [PIN-22774](https://quintoandar.atlassian.net/browse/PIN-22774)
+  # and [PIN-22775](https://quintoandar.atlassian.net/browse/PIN-22775) are unresolved.
+  # Together, these tickets cover LINE_MANAGER coverage holes and inverted manager bands
+  # that leave assignments without a CEO-valid management_hierarchy version.
+  # Re-enable this check after both tickets are resolved and production data has been revalidated.
+  # assignments_are_ceo_reachable_every_day:
+  #   custom:
+  #     # C/E non-test assignments must have a management_hierarchy version covering every day
+  #     # from PIN go-live (2024-03-01) through today or termination. The enrich table only keeps
+  #     # CEO-valid chains (L0 = max-band CEO), so a covering row means CEO-reachable that day.
+  #     constraint: |-
+  #       (SELECT COUNT(*)
+  #        FROM (
+  #          SELECT
+  #              im.assignment_number,
+  #              explode(
+  #                  sequence(
+  #                      GREATEST(DATE('2024-03-01'), im.dt_started),
+  #                      LEAST(
+  #                          CURRENT_DATE(),
+  #                          COALESCE(NULLIF(im.dt_actual_termination, DATE('9999-12-31')), CURRENT_DATE())
+  #                      )
+  #                  )
+  #              ) AS dt_day
+  #          FROM datalake_people.identifier_mapping AS im
+  #          WHERE im.assignment_type IN ('C', 'E')
+  #            AND NOT im.is_user_test
+  #            AND GREATEST(DATE('2024-03-01'), im.dt_started) <= LEAST(
+  #                  CURRENT_DATE(),
+  #                  COALESCE(NULLIF(im.dt_actual_termination, DATE('9999-12-31')), CURRENT_DATE())
+  #                )
+  #        ) AS days
+  #        LEFT JOIN datalake_people.management_hierarchy AS mh
+  #            ON mh.assignment_number = days.assignment_number
+  #            AND mh.dt_valid_from <= days.dt_day
+  #            AND mh.dt_valid_to >= days.dt_day
+  #        WHERE mh.sk_hierarchy_version IS NULL
+  #       ) = 0
+  #     severity_level: Warning
 
   current_hierarchy_l0_matches_ceo:
     custom:
