@@ -5,19 +5,40 @@ dag:
   schedule_interval: "0 6 * * *"
   documentation:
     dag_purpose: |
-      Agent visit funnel DW DAG. Tracks the visit funnel stages for agents
-      (e.g. scheduled, confirmed, completed) based on the agent_visit_funnel
-      query. Based on dw_agent_milestone configuration (owner, cluster).
+      Agent visit funnel DW DAG. PySpark job builds agent-day funnel metrics from
+      visit_funnel_event and fact_agent_daily.
+
+      Manual reprocess (Airflow Trigger DAG w/ config):
+        - write_mode: merge (default) — upsert on sk_agent_visit_funnel
+        - write_mode: batch — replace partitions present in the batch (no table drop)
+        - reprocess_start_date / load_end_date — widen or narrow the recompute window
+      Example batch reprocess:
+        {"write_mode": "batch", "reprocess_start_date": "2026-01-01", "load_end_date": "2026-03-31"}
 
 workflow:
   type: query_delta
   layer: dw
   custom_schema: agent_performance
   default_extraction_type: incremental
-  tables_customization:
-    agent_visit_funnel:
-      merge_on: [sk_agent_visit_funnel]
-      partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    reprocess_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -90), 'reprocess_start_date') }}"
+    write_mode: "{{ dag_run.conf.get('write_mode', 'merge') if dag_run.conf else 'merge' }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "prod"
+  tables_customization:
+    agent_visit_funnel:
+      load_spark_job: load_agent_visit_funnel
+      merge_on: [sk_agent_visit_funnel]
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -90), 'reprocess_start_date') }}"
+        - "{{ dag_run.conf.get('write_mode', 'merge') if dag_run.conf else 'merge' }}"

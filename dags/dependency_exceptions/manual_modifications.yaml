@@ -1251,6 +1251,10 @@ bietlejuice.dw_pricing:
   add:
     - bietlejuice.enrich_ebdb_pricing:load-enrich-house-suggestion-changes:first-run-of-day
     - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change:first-run-of-day
+bietlejuice.dw_agent_visit_funnel:
+  add:
+    - bietlejuice.dw_agent_accreditation:load-dw-agent-fact-agent-daily:first-run-of-day
+    - bietlejuice.enrich_agent_performance:load-enrich-visit-funnel-event:first-run-of-day
 bietlejuice.dw_pipeline:
   remove:
     - bietlejuice.enrich_pipeline:load-enrich-dag-run:first-run-of-day

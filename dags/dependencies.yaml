@@ -141,12 +141,7 @@ bietlejuice.dw_agent_payments:
   - bietlejuice.gsheets_for_sale:done-clean-closed-deals:first-run-of-day
 bietlejuice.dw_agent_visit_funnel:
   - bietlejuice.dw_agent_accreditation:load-dw-agent-fact-agent-daily:first-run-of-day
-  - bietlejuice.dw_house:load-dw-house-dim-house-entrance-history:first-run-of-day
-  - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
-  - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
-  - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
-  - bietlejuice.ebdb_visit:load-clean-visit-aud:first-run-of-day
-  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_agent_performance:load-enrich-visit-funnel-event:first-run-of-day
 bietlejuice.dw_agents_availability:
   - bietlejuice.ebdb_agenda_allocation:load-clean-mask-weekly-hour:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
