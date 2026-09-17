@@ -192,3 +192,91 @@ column_level_validations:
   #           AND h.hole_start <= h.hole_end
   #       )) = 0
   #     severity_level: Warning
+  # Temporarily disabled while [PIN-22775](https://quintoandar.atlassian.net/browse/PIN-22775)
+  # is unresolved. This ticket covers LINE_MANAGER relationships where the
+  # manager job band is lower than the employee's band, for active and
+  # terminated E assignments from PIN go-live (2024-03-01).
+  # Re-enable this check after the ticket is resolved and production data has been revalidated.
+  # manager_band_must_not_be_lower_than_direct_report:
+  #   custom:
+  #     # In-scope E assignments (active or terminated on/after PIN go-live)
+  #     # must not have a LINE_MANAGER whose job band is lower than the
+  #     # employee's job band on any overlapping day. Equal bands are allowed.
+  #     constraint: |-
+  #       (SELECT COUNT(*) FROM (
+  #         WITH emp_band AS (
+  #           SELECT
+  #             im.assignment_number,
+  #             im.id_assignment,
+  #             im.dt_started,
+  #             im.dt_actual_termination,
+  #             TRY_CAST(j.band AS INT) AS band,
+  #             GREATEST(aa.dt_effective_started, j.dt_valid_from) AS dt_from,
+  #             LEAST(
+  #               COALESCE(aa.dt_effective_ended, DATE('9999-12-31')),
+  #               COALESCE(j.dt_valid_to, DATE('9999-12-31'))
+  #             ) AS dt_to
+  #           FROM datalake_people.identifier_mapping AS im
+  #           INNER JOIN datalake_pin_core_clean.all_assignments AS aa
+  #             ON aa.assignment_number = im.assignment_number
+  #           INNER JOIN datalake_people.job_with_salary_table AS j
+  #             ON aa.id_job = j.id_job
+  #             AND aa.dt_effective_started <= COALESCE(j.dt_valid_to, DATE('9999-12-31'))
+  #             AND COALESCE(aa.dt_effective_ended, DATE('9999-12-31')) >= j.dt_valid_from
+  #           WHERE im.assignment_type = 'E'
+  #             AND NOT im.is_user_test
+  #             AND im.dt_started <= CURRENT_DATE()
+  #             AND TRY_CAST(j.band AS INT) IS NOT NULL
+  #             AND (
+  #               im.dt_actual_termination IS NULL
+  #               OR im.dt_actual_termination = DATE('9999-12-31')
+  #               OR im.dt_actual_termination >= DATE('2024-03-01')
+  #             )
+  #         ),
+  #         mgr_band AS (
+  #           SELECT
+  #             im.id_assignment,
+  #             TRY_CAST(j.band AS INT) AS band,
+  #             GREATEST(aa.dt_effective_started, j.dt_valid_from) AS dt_from,
+  #             LEAST(
+  #               COALESCE(aa.dt_effective_ended, DATE('9999-12-31')),
+  #               COALESCE(j.dt_valid_to, DATE('9999-12-31'))
+  #             ) AS dt_to
+  #           FROM datalake_people.identifier_mapping AS im
+  #           INNER JOIN datalake_pin_core_clean.all_assignments AS aa
+  #             ON aa.assignment_number = im.assignment_number
+  #           INNER JOIN datalake_people.job_with_salary_table AS j
+  #             ON aa.id_job = j.id_job
+  #             AND aa.dt_effective_started <= COALESCE(j.dt_valid_to, DATE('9999-12-31'))
+  #             AND COALESCE(aa.dt_effective_ended, DATE('9999-12-31')) >= j.dt_valid_from
+  #           WHERE im.assignment_type IN ('C', 'E')
+  #             AND NOT im.is_user_test
+  #             AND TRY_CAST(j.band AS INT) IS NOT NULL
+  #         )
+  #         SELECT DISTINCT emp.assignment_number
+  #         FROM datalake_pin_core_clean.assignment_supervisor AS supervisor
+  #         INNER JOIN emp_band AS emp
+  #           ON emp.id_assignment = supervisor.id_assignment
+  #         INNER JOIN mgr_band AS mgr
+  #           ON mgr.id_assignment = supervisor.id_manager_assignment
+  #         WHERE supervisor.manager_type = 'LINE_MANAGER'
+  #           AND supervisor.id_manager_assignment IS NOT NULL
+  #           AND mgr.band < emp.band
+  #           AND GREATEST(
+  #             DATE('2024-03-01'),
+  #             emp.dt_started,
+  #             supervisor.dt_effective_started,
+  #             emp.dt_from,
+  #             mgr.dt_from
+  #           ) <= LEAST(
+  #             CURRENT_DATE(),
+  #             COALESCE(
+  #               NULLIF(emp.dt_actual_termination, DATE('9999-12-31')),
+  #               CURRENT_DATE()
+  #             ),
+  #             supervisor.dt_effective_ended,
+  #             emp.dt_to,
+  #             mgr.dt_to
+  #           )
+  #       )) = 0
+  #     severity_level: Warning
