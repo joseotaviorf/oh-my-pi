@@ -10,27 +10,20 @@
 
 ## Overview
 
-If TARS cannot access the `datalake_sale_primary_market` enrich schema because
-the user lacks data-contract access, treat it as an access limitation. The team
-is working on the data-contract permissions.
+Primary Market **Development-domain** analytics are **DW-first**. Start from
+`dw_sale_primary_market` whenever the column exists there; fall back to
+`datalake_sale_primary_market` enrich only for columns not yet modeled in DW
+(main gap today: `listing_sale_type`).
 
-Until access is available, use the equivalent Primary Market enrich table in
-the `sandbox` schema with the naming convention:
+| Priority | Schema | Tables |
+| --- | --- | --- |
+| **1 — default** | `dw_sale_primary_market` | `dim_house_development`, `fact_development_negotiation` |
+| **2 — enrich SSOT** | `datalake_sale_primary_market` | `listing_sale_type`, `house_development`, `development_negotiation` when DW is unavailable or a column is enrich-only |
+| **3 — drill-down** | `datalake_ebdb_clean`, `datalake_company_clean` | `development*`, `company` — entity keys and attributes not yet on DW; not for analyst-facing cuts |
 
-```text
-sandbox.{schema}_{table_name}
-```
-
-Examples:
-
-```text
-sandbox.datalake_sale_primary_market_listing_sale_type
-sandbox.datalake_sale_primary_market_house_development
-sandbox.datalake_sale_primary_market_development_negotiation
-```
-
-Keep the same column names and filters, identify the sandbox source in the
-answer, and do not apply this fallback to DW or other schemas.
+Do **not** use `sandbox.*` mirrors. If access to `dw_sale_primary_market` or
+`datalake_sale_primary_market` fails because of data-contract permissions,
+report the access limitation — do not substitute another schema.
 
 ## TARS routing guide (read this first)
 
@@ -51,14 +44,14 @@ vs tipologia vs unidade), the wrong **`id_house`** (shell vs unit), or the wrong
 | User asks about… | Start here | Do **not** use |
 | --- | --- | --- |
 | Is this listing/visit/offer Primary or Secondary? | Native `sale_type` on the fact (see sale_type map) | `is_primary_market`, `is_sale_primary_market`, `listing_sale_model.is_primary_market` |
-| Empreendimento name, address, construction status, Órulo provider | `house_development` / `dim_house_development` | Counting houses as “anúncios” |
-| Incorporadora / builder company | `development.company_uuid` (UUID only — **no company name** in Development tables today) | `is_3p_supply`, price, or guessing from house owner |
-| Tipologia (bedrooms, m², floor plan SKU) | `house_development` or `development_typology` | Shell `id_house` count as physical apartments |
+| Empreendimento name, address, construction status, Órulo provider | **`dim_house_development`** (DW default) | Counting houses as “anúncios”; enrich `house_development` only if DW unavailable |
+| Incorporadora / builder company | **`dim_house_development.uuid_company`** + **`dim_house_development.company_name`** | Manual CASE mapping, `dim_company`, guessing from house owner |
+| Tipologia (bedrooms, m², floor plan SKU) | **`dim_house_development`** or `development_typology` | Shell `id_house` count as physical apartments |
 | Unidade / apartamento concreto / inventory de units | `development_typology_unit` | Shell listing `id_house` |
-| Visitas em um empreendimento | `dw_visit.fact_visits` + join `house_development` on **visit `sk_house`** (shell) | `id_visit` to find offers |
-| Ofertas / CCV em um empreendimento | `dw_sale.fact_offers` + join on **unit `id_house`** via `development_typology_unit` or `development_negotiation.id_house` | Visit shell `id_house` on offer facts |
-| Pré-OS / proposta antes da OS | `development_negotiation` (`actor = 'DEMAND'` for buyer-initiated) | Mixing AGENT and DEMAND rows |
-| Gestor ativo do empreendimento | `house_development.active_contact_uuid_person` | Random agent from visit |
+| Visitas em um empreendimento | `dw_visit.fact_visits` + join **`dim_house_development`** on **visit `sk_house`** (shell) | `id_visit` to find offers |
+| Ofertas / CCV em um empreendimento | `dw_sale.fact_offers` + join on **unit `id_house`** via `development_typology_unit` or `fact_development_negotiation.id_house` | Visit shell `id_house` on offer facts |
+| Pré-OS / proposta antes da OS | **`fact_development_negotiation`** (`actor = 'DEMAND'` for buyer-initiated) | Mixing AGENT and DEMAND rows; enrich `development_negotiation` only if DW unavailable |
+| Gestor ativo do empreendimento | **`dim_house_development.active_contact_uuid_person`** | Random agent from visit |
 | Piloto Órulo / estoque pilot SP | See **pilot scoping by grain** below | `sale_type = 'PRIMARY'` alone |
 
 ### Pilot scoping by grain (Órulo / Development domain)
@@ -68,19 +61,19 @@ the **question's grain**:
 
 | Question grain | Join on | Why |
 | --- | --- | --- |
-| Visits, shell listings, catalog, VB/VC | `house_development.id_house = visit/listing sk_house` | Visits book on **shell** houses (`house.id_development_typology`) |
+| Visits, shell listings, catalog, VB/VC | **`dim_house_development.id_house`** = visit/listing `sk_house` | Visits book on **shell** houses (`house.id_development_typology`) |
 | Offers, CCV, pré-OS unit, unit inventory count | `development_typology_unit.id_house = offer sk_house` | Negotiation mints a **unit** Imovel |
-| Empreendimento name on any linked house | `house_development` (either path) | Unifies shell + unit link paths |
+| Empreendimento name on any linked house | **`dim_house_development`** (either path) | Unifies shell + unit link paths |
 | Strict count of minted unit slots | `development_typology_unit` only | ~537 pilot units; excludes shell vitrine houses |
 
-Optional Órulo filter: `house_development.provider = 'ORULO'` (confirm enum in
+Optional Órulo filter: `dim_house_development.provider = 'ORULO'` (confirm enum in
 `datalake_ebdb_clean.development` before relying on spelling).
 
 ### Entity hierarchy (Development domain)
 
 ```text
 incorporadora (builder)
-  └── identified by development.company_uuid only (no denormalized name in lake)
+  └── dim_house_development.uuid_company + company_name (via datalake_company_clean.company)
 empreendimento (development)
   └── datalake_ebdb_clean.development  |  id_development, name, address, provider, construction_status
 tipologia (floor-plan SKU)
@@ -95,15 +88,16 @@ tipologia (floor-plan SKU)
 one **shell** `id_house`. Counting `id_house` as “number of anúncios” is wrong for
 Primary — count `id_development` or distinct tipologies instead.
 
-**Preferred analyst tables** (denormalized, one row per house):
+**Canonical analyst tables** (DW-first; one row per house or negotiation):
 
-| Grain | Enrich | DW |
+| Grain | **Use first (DW)** | Enrich fallback |
 | --- | --- | --- |
-| House + empreendimento + tipologia | `datalake_sale_primary_market.house_development` | `dw_sale_primary_market.dim_house_development` |
-| Pré-OS negotiation | `datalake_sale_primary_market.development_negotiation` | `dw_sale_primary_market.fact_development_negotiation` |
+| House + empreendimento + tipologia + incorporadora | `dw_sale_primary_market.dim_house_development` (`uuid_company`, `company_name`) | `datalake_sale_primary_market.house_development` |
+| Pré-OS negotiation | `dw_sale_primary_market.fact_development_negotiation` | `datalake_sale_primary_market.development_negotiation` |
+| Listing `sale_type` + price band | — (no DW table yet) | `datalake_sale_primary_market.listing_sale_type` |
 
-Raw clean tables (`datalake_ebdb_clean.development*`) are for drill-down or when
-enrich/DW is unavailable (sandbox fallback above).
+Raw clean tables (`datalake_ebdb_clean.development*`, `datalake_company_clean.company`)
+are for drill-down and keys not denormalized on `dim_house_development`.
 
 ### Two `id_house` paths (critical)
 
@@ -112,8 +106,8 @@ and offers often use **different** `id_house` values for the same buyer journey.
 
 | Path | Business meaning | When created | Typical status | Key columns |
 | --- | --- | --- | --- | --- |
-| **A — Shell / vitrine** | Tipologia exposed in catalog; visit books here | Tipologia published | **Published** (while typology active) | `visit.id_house`, `development_negotiation.id_house_development`, `house.id_development_typology` |
-| **B — Unit / oferta** | Concrete apartment minted for negotiation or offer | Negotiation / offer accept (anti-ghost inventory) | **Unpublished** (offer-only Imovel) | `development_typology_unit.id_house`, `development_negotiation.id_house`, `fact_offers.sk_house` |
+| **A — Shell / vitrine** | Tipologia exposed in catalog; visit books here | Tipologia published | **Published** (while typology active) | `visit.id_house`, `fact_development_negotiation.id_house_development`, `house.id_development_typology` |
+| **B — Unit / oferta** | Concrete apartment minted for negotiation or offer | Negotiation / offer accept (anti-ghost inventory) | **Unpublished** (offer-only Imovel) | `development_typology_unit.id_house`, `fact_development_negotiation.id_house`, `fact_offers.sk_house` |
 
 ```text
 Path A (visit):  visit.id_house  =  shell listing Imovel
@@ -123,11 +117,11 @@ Path B (offer):  offer house     =  development_typology_unit.id_house
 
 **Join rules TARS must apply:**
 
-- Visit metrics → join facts to `house_development` / `development` on the
+- Visit metrics → join facts to **`dim_house_development`** / `development` on the
   **house id visited** (`sk_house` / `id_house` from visit).
-- Offer / CCV metrics → join on **unit** `id_house` (`development_negotiation.id_house`
+- Offer / CCV metrics → join on **unit** `id_house` (`fact_development_negotiation.id_house`
   or `development_typology_unit.id_house`).
-- `development_negotiation` exposes **both** `id_house_development` (visit listing)
+- `fact_development_negotiation` exposes **both** `id_house_development` (visit listing)
   and `id_house` (unit) on one row — use it to link visit context to offer context.
 - **`id_visit` is not an offer key** — it is origin context only. Never match
   `id_visit` to `id_offer`.
@@ -135,7 +129,7 @@ Path B (offer):  offer house     =  development_typology_unit.id_house
   negotiation has **at most one** open unit (`DevelopmentNegotiationUnit` uniqueness).
 
 `listing_sale_type` classifies **listing-side** houses. Unit houses created only
-for offers may be **absent** from `listing_sale_type`; use `house_development` for
+for offers may be **absent** from `listing_sale_type`; use **`dim_house_development`** for
 empreendimento/tipologia on any `id_house`.
 
 ### `sale_type` map (three independent channels)
@@ -157,26 +151,49 @@ Do not assume one `sale_type` propagates everywhere. Pick the channel for the
 
 **When the fact has no `sale_type`:** join
 `datalake_sale_primary_market.listing_sale_type` on `id_house` / `sk_house`. If
-the house is a **unit** Imovel missing from that table, join `house_development`
+the house is a **unit** Imovel missing from that table, join **`dim_house_development`**
 instead for Development attributes (not for market enum).
 
 `NULL` in `sale_type` ≠ `SECONDARY`.
+
+### Incorporadora name (`company_name` on DW)
+
+Use **`dim_house_development.uuid_company`** and **`dim_house_development.company_name`**
+— denormalized in DW from `datalake_ebdb_clean.development.company_uuid` joined to
+`datalake_company_clean.company.uuid_company`. Do **not** use manual CASE mappings.
+
+Example at development grain (DW-first):
+
+```sql
+SELECT
+    id_development,
+    development_name,
+    uuid_company,
+    company_name,
+    COUNT(DISTINCT id_house) AS n_houses
+FROM dw_sale_primary_market.dim_house_development
+GROUP BY 1, 2, 3, 4
+ORDER BY n_houses DESC
+```
+
+`company_name` is NULL when `company_uuid` is missing or has no row in
+`datalake_company_clean.company` — report as unmapped; do not invent a name.
 
 ### Development entity catalog (where to find each thing)
 
 | Concept | Grain | Best table | Key fields |
 | --- | --- | --- | --- |
 | Empreendimento | 1 row / development | `datalake_ebdb_clean.development` | `id`, `name`, `company_uuid`, `provider`, `construction_status`, address fields |
-| Incorporadora | UUID on development | `development.company_uuid` | No legal name column in Development clean tables — say UUID-only if user asks nome |
+| Incorporadora | 1 row / builder company | **`dim_house_development`** (`uuid_company`, `company_name`) | Source join: `development.company_uuid` = `company.uuid_company` |
 | Tipologia | 1 row / floor plan | `datalake_ebdb_clean.development_typology` | `id`, `id_development`, `bedrooms`, `bathrooms`, `total_area`, `type` |
 | Shell house (vitrine) | 1 row / tipologia listing | `house` where `id_development_typology` set + published SALE listing | `house.id`, `listing_sale_type.sale_type`, `listing_sale_model.unit_count` for stock |
 | Unidade (inventory slot) | 1 row / physical unit slot | `datalake_ebdb_clean.development_typology_unit` | `id`, `id_development_typology`, `id_house` (unit Imovel) |
 | Unit published on catalog | optional | `datalake_ebdb_clean.development_listing_unit` | Links unit to `id_listing_business_context` when published |
-| Gestor ativo | 1 contact / development | `house_development.active_contact_uuid_person`, `active_contact_status` | Via `development.id_development_contact` |
-| Amenities | N / development | `house_development.amenities` (array) | Or `development_amenity` clean |
-| Tipologia attributes | N / typology | `house_development.typology_attributes` (array) | Or `development_typology_attribute` clean |
+| Gestor ativo | 1 contact / development | **`dim_house_development.active_contact_uuid_person`**, `active_contact_status` | Via `development.id_development_contact` |
+| Amenities | N / development | **`dim_house_development.amenities`** (array) | Or `development_amenity` clean |
+| Tipologia attributes | N / typology | **`dim_house_development.typology_attributes`** (array) | Or `development_typology_attribute` clean |
 | Market enum + price band | 1 row / house (SALE listing) | `listing_sale_type` | `sale_type`, `min_price`, `max_price` |
-| Pré-OS event | 1 row / negotiation | `development_negotiation` | `id_development`, `id_visit`, `id_house_development`, `id_house`, `actor`, `id_offer` |
+| Pré-OS event | 1 row / negotiation | **`fact_development_negotiation`** | `id_development`, `id_visit`, `id_house_development`, `id_house`, `actor`, `id_offer` |
 
 ### Overview context
 
@@ -209,19 +226,19 @@ classification because it is stale.
 1. **The new Órulo pilot** (this doc's actual subject) — houses in `datalake_ebdb_clean.development_typology_unit` (**537** houses), almost all of which also have `sale_type = 'PRIMARY'` on the strict raw enum (**536** — 1 house not yet classified).
 2. **Legacy pre-pilot houses previously identified by `is_primary_market = TRUE`** — builder-sold / test listings flagged under the old system. The flag is stale and is no longer a valid population filter.
 
-On that older snapshot, `dw_visit.fact_visits` with `sale_type = 'PRIMARY'` returned **37,407 visits booked** (90% VB2VC) across the mixed population, versus **23 visits booked** (5 completed, 17 distinct houses) when scoped to the 536/537-house pilot. **If a question is about the Órulo São Paulo pilot, filter by `development_typology_unit.id_house` (or join `house_development`), not by `sale_type = 'PRIMARY'` alone** — that remains the native Development-domain population.
+On that older snapshot, `dw_visit.fact_visits` with `sale_type = 'PRIMARY'` returned **37,407 visits booked** (90% VB2VC) across the mixed population, versus **23 visits booked** (5 completed, 17 distinct houses) when scoped to the 536/537-house pilot. **If a question is about the Órulo São Paulo pilot, filter by `development_typology_unit.id_house` (or join `dim_house_development`), not by `sale_type = 'PRIMARY'` alone** — that remains the native Development-domain population.
 
 ```sql
--- Pilot visits / shell listing facts (visit sk_house = shell vitrine)
-INNER JOIN datalake_sale_primary_market.house_development AS hd
-    ON hd.id_house = fact_table.sk_house
+-- Pilot visits / shell listing facts (visit sk_house = shell vitrine) — DW-first
+INNER JOIN dw_sale_primary_market.dim_house_development AS dhd
+    ON dhd.id_house = fact_table.sk_house
 
 -- Pilot offers / unit facts (offer sk_house = minted unit Imovel)
 INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
     ON dtu.id_house = fact_table.sk_house
 ```
 
-`sale_type = 'PRIMARY'` on refreshed `listing_sale_type`-sourced tables is enum PRIMARY only. Tables natively scoped to the Development domain (`house_development`, `development_negotiation`) remain the safest pilot-only sources. Downstream DW facts may still show the old mix until they re-run after this enrich DAG.
+`sale_type = 'PRIMARY'` on refreshed `listing_sale_type`-sourced tables is enum PRIMARY only. Tables natively scoped to the Development domain (`dim_house_development`, `fact_development_negotiation`) remain the safest pilot-only sources.
 
 ## Related Metric Entities
 
@@ -233,22 +250,25 @@ INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
 |------|---------|-------|
 | **Primary Market / Mercado Primário / MP** | New-build inventory sold by an incorporadora | `sale_type = 'PRIMARY'` is the listing-side enum filter; use `development_typology_unit.id_house` for strict Órulo-pilot scope |
 | **Secondary Market / Mercado Secundário** | Resale inventory between individuals (CPF sellers) | `listing_sale_type.sale_type = 'SECONDARY'` (NULL enum is filled as SECONDARY). A LEFT JOIN to `listing_sale_type` is NULL when the house has no SALE listing_sale_model row |
-| **Incorporadora / builder / developer company** | Legal entity behind the empreendimento | `datalake_ebdb_clean.development.company_uuid` only — **no incorporadora name** in Development lake tables; do not invent a name |
-| **Development / Empreendimento** | The real-estate project aggregate, containing multiple typologies | `datalake_ebdb_clean.development`; prefer `house_development` / `dim_house_development` at house grain |
-| **Typology / Tipologia** | A floor-plan / SKU within a development; exposed as one **shell house** for search and visit | `datalake_ebdb_clean.development_typology`; attributes denormalized on `house_development` |
+| **Incorporadora / builder / developer company** | Legal entity behind the empreendimento | **`dim_house_development.uuid_company`** + **`dim_house_development.company_name`** (from `datalake_company_clean.company`) |
+| **Development / Empreendimento** | The real-estate project aggregate, containing multiple typologies | **`dw_sale_primary_market.dim_house_development`** at house grain |
+| **Typology / Tipologia** | A floor-plan / SKU within a development; exposed as one **shell house** for search and visit | `datalake_ebdb_clean.development_typology`; attributes denormalized on **`dim_house_development`** |
 | **Shell house / Imóvel shell** | The house_id a typology is listed and visited on. **Not** a physical unit — one shell can represent many real apartments | Intent/visit key; kept unchanged per the funnel-attribution ADR (no visit rewrite) |
-| **Unit Imovel / unidade** | The real physical apartment slot; `id_house` minted for negotiation/offer (usually unpublished) | `datalake_ebdb_clean.development_typology_unit.id_house`; offer path uses `development_negotiation.id_house` and `fact_offers.sk_house` |
-| **`id_house_development`** | Shell listing where the **visit** was booked | `development_negotiation.id_house_development`, `visit.id_house` — not the offer house |
-| **DevelopmentNegotiation / pré-OS** | Pre-offer negotiation event on a typology unit, created by an agent or the buyer | `datalake_ebdb_clean.development_negotiation`; `actor` (`AGENT`/`DEMAND`) must be filtered to avoid broker-inflation of pré-OS counts |
+| **Unit Imovel / unidade** | The real physical apartment slot; `id_house` minted for negotiation/offer (usually unpublished) | `datalake_ebdb_clean.development_typology_unit.id_house`; offer path uses `fact_development_negotiation.id_house` and `fact_offers.sk_house` |
+| **`id_house_development`** | Shell listing where the **visit** was booked | `fact_development_negotiation.id_house_development`, `visit.id_house` — not the offer house |
+| **DevelopmentNegotiation / pré-OS** | Pre-offer negotiation event on a typology unit, created by an agent or the buyer | **`dw_sale_primary_market.fact_development_negotiation`**; `actor` (`AGENT`/`DEMAND`) must be filtered to avoid broker-inflation of pré-OS counts |
 | **EN, Executivo de Negociação, Deal Maker** | Negotiation Executive assigned to an offer's sales flow — in Primary, a conversion accelerator / developer liaison, not a price closer like Secondary | `datalake_sale_offer_flows.offer_specialists.id_user_consultant` |
 | **hub_bp** | The closing hub servicing an offer | `datalake_sales_flow_clean.offer.id_hub` — native Sales Flow field, same mechanism as Secondary |
 | **city_group** | Region grouping of a house | Resolved from `datalake_ebdb_clean.house.id_region` → `datalake_region.region.city_group` |
-| **Buyer activation `sale_type`** | Market classification of the house that triggered the buyer-prospect activation | `datalake_buyer_prospect.buyer_prospect_type.sale_type`; strict Primary pilot membership through `house_development` |
+| **Buyer activation `sale_type`** | Market classification of the house that triggered the buyer-prospect activation | `datalake_buyer_prospect.buyer_prospect_type.sale_type`; strict Primary pilot membership through **`dim_house_development`** |
 | **`bp_market_type`** | Buyer market-exclusivity segment, independent of NBP/RBP | `PRIMARY_EXCLUSIVE`, `NON_EXCLUSIVE`, or `SECONDARY_EXCLUSIVE` in `buyer_prospect_type` |
 | **DSP (`developers-supply-processor`)** | Product-side supply ledger for Primary inventory (Órulo sync) — **not** a DW/analytics source | See `datalake_ebdb_clean.development*` for the lake-side result of DSP → Main |
 | **BSP (`brokers-supply-processor`)** | Unrelated 3P broker-lead pipeline — orthogonal axis (who supplies), not Primary/Secondary market type | Do not conflate with Primary Market classification |
 
 ## Tables
+
+**DW-first for Development-domain cuts:** prefer `dw_sale_primary_market.dim_house_development`
+and `fact_development_negotiation` before enrich mirrors. Do not use `sandbox.*`.
 
 | You need... | Use this table |
 |-------------|-----------------|
@@ -265,9 +285,10 @@ INNER JOIN datalake_ebdb_clean.development_typology_unit AS dtu
 | Demand-funnel events | `dw_sale.fact_sale_demand_event` — visit events use `dw_sale.fact_visits.sale_type`; offer events use `dw_sale.fact_offers.sale_type`. |
 | Buyer-house sale flows | `dw_sale.fact_sale_flows` — offer-side `sale_type`; booking/TTA-only flows remain NULL. |
 | Buyer activation and market exclusivity | `datalake_buyer_prospect.buyer_prospect_type` — `sale_type` for the activation house and `bp_market_type` (`PRIMARY_EXCLUSIVE`, `NON_EXCLUSIVE`, `SECONDARY_EXCLUSIVE`). This is distinct from `bp_type` (`NBP`/`RBP`). |
-| Development / typology context for a house | `datalake_sale_primary_market.house_development` (enrich) or `dw_sale_primary_market.dim_house_development` (DW) — house-grain development and typology attributes. |
-| Pré-OS negotiation events | `datalake_sale_primary_market.development_negotiation` (enrich) or `dw_sale_primary_market.fact_development_negotiation` (DW) — visit house, unit house, offer, flow, and development keys. |
-| Primary-market pilot scope | `datalake_ebdb_clean.development_typology_unit.id_house` or the development house tables — native Órulo-pilot population. Prefer the development tables when the question is specifically about this pilot. |
+| Development / typology context for a house | **`dw_sale_primary_market.dim_house_development`** (default) — house-grain development and typology attributes. Enrich fallback: `datalake_sale_primary_market.house_development`. |
+| Pré-OS negotiation events | **`dw_sale_primary_market.fact_development_negotiation`** (default) — visit house, unit house, offer, flow, and development keys. Enrich fallback: `datalake_sale_primary_market.development_negotiation`. |
+| Incorporadora name by development | **`dim_house_development.company_name`** (with `uuid_company`) — see **Incorporadora name** section. |
+| Primary-market pilot scope | `datalake_ebdb_clean.development_typology_unit.id_house` or **`dim_house_development`** — native Órulo-pilot population. Prefer DW development tables for analyst cuts. |
 
 `datalake_visit.visit_schedules` does not have a native `sale_type`. Visit
 facts derive it from the house-level listing SSOT.
@@ -283,10 +304,10 @@ WHERE sale_type = 'PRIMARY'
 
 - **Primary listings:** `COUNT(DISTINCT sk_sale_listing)` where `dw_sale.dim_listing.sale_type = 'PRIMARY'`.
 - **Primary houses:** `COUNT(DISTINCT sk_house)` with the same filter.
-- **Primary visit volume (pilot-scoped):** `SUM(num_visit_booked)` on `dw_visit.fact_visits`, joined to `house_development` on **visit `sk_house`** (shell path — do **not** join `development_typology_unit` on visit `sk_house`). Do **not** filter by `sale_type = 'PRIMARY'` alone for strict pilot KPIs. See [`visits.md`](visits.md) for booked vs completed metric conventions.
+- **Primary visit volume (pilot-scoped):** `SUM(num_visit_booked)` on `dw_visit.fact_visits`, joined to **`dim_house_development`** on **visit `sk_house`** (shell path — do **not** join `development_typology_unit` on visit `sk_house`). Do **not** filter by `sale_type = 'PRIMARY'` alone for strict pilot KPIs. See [`visits.md`](visits.md) for booked vs completed metric conventions.
 - **Primary ongoing supply (daily stock):** `COUNT(DISTINCT sk_snapshot)` (or house count) on `dw_sale.fact_daily_ongoing_listing` where `sale_type = 'PRIMARY'`.
-- **Pré-OS volume (buyer-initiated only):** `COUNT(*)` on `datalake_sale_primary_market.development_negotiation` where `actor = 'DEMAND'` — filter `actor` to avoid broker-inflation from agent-created negotiations.
-- **Visit → pré-OS conversion:** join `dw_visit.fact_visits.sk_visit` to `development_negotiation.id_visit` (same ID space — see Golden Query 13). As of 2026-09-02: 1 of 23 pilot visits (1 of 5 completed) led to a negotiation — directional only at this volume.
+- **Pré-OS volume (buyer-initiated only):** `COUNT(*)` on **`dw_sale_primary_market.fact_development_negotiation`** where `actor = 'DEMAND'` — filter `actor` to avoid broker-inflation from agent-created negotiations.
+- **Visit → pré-OS conversion:** join `dw_visit.fact_visits.sk_visit` to **`fact_development_negotiation.id_visit`** (same ID space — see Golden Query 13). As of 2026-09-02: 1 of 23 pilot visits (1 of 5 completed) led to a negotiation — directional only at this volume.
 - **Buyer market exclusivity:** `COUNT(DISTINCT id_prospect)` on `datalake_buyer_prospect.buyer_prospect_type`, grouped by `bp_market_type` and filtered by `sale_type = 'PRIMARY'` for buyers activated by a Primary house.
 
 No official metric-entity file exists for Primary Market yet — all metrics above are component-level, not corporate/OKR definitions.
@@ -300,7 +321,7 @@ No official metric-entity file exists for Primary Market yet — all metrics abo
 ### Development (N:1 — typology → development)
 
 - `datalake_ebdb_clean.development_typology.id_development` → `datalake_ebdb_clean.development.id`.
-- Ops needs empreendimento-grain cuts (region → incorporadora → empreendimento). The accepted rule: **keep the intent `house_id`** on visits/offers; join to `id_development` at consume time via `house_development` (unifies shell and unit paths). Do **not** denormalize `id_development` onto facts.
+- Ops needs empreendimento-grain cuts (region → incorporadora → empreendimento). The accepted rule: **keep the intent `house_id`** on visits/offers; join to `id_development` at consume time via **`dim_house_development`** (unifies shell and unit paths; includes `company_name`). Do **not** denormalize `id_development` onto facts.
 
 ### Offer / CCV (`fs-transact.md`)
 
@@ -318,7 +339,7 @@ Source: SWE domain walkthrough. For each business question: how to answer it **t
 ### Q: How many visits were booked (VB) for a development?
 **Stage:** VB · **Status:** ⚠ manual cross-reference
 
-A visit is recorded in `dw_visit.fact_visit_schedules` by the house_id visited (the typology **shell**). Join `datalake_sale_primary_market.house_development` on that `id_house` / `sk_house` to resolve empreendimento and tipologia — do **not** join `development_typology_unit` on the visit house (unit path is a different `id_house`).
+A visit is recorded in `dw_visit.fact_visit_schedules` by the house_id visited (the typology **shell**). Join **`dw_sale_primary_market.dim_house_development`** on that `id_house` / `sk_house` to resolve empreendimento and tipologia — do **not** join `development_typology_unit` on the visit house (unit path is a different `id_house`).
 
 ### Q: Of those, how many were confirmed or completed (VC)?
 **Stage:** VC, VB2VC · **Status:** ⚠ manual cross-reference
@@ -328,7 +349,7 @@ Confirmation/completion is already flagged on `dw_visit.fact_visits` (`visit_sta
 ### Q: How many visits generated a proposal request?
 **Stage:** pré-OS · **Status:** ✓ native
 
-Immediate answer: `datalake_sale_primary_market.development_negotiation` is born with `id_development` and `id_visit` on the same row. Its DW evolution is `dw_sale_primary_market.fact_development_negotiation`. Unlike the questions above, no cross-reference is needed — that's the entire reason this table exists (see Service Architecture above).
+Immediate answer: **`dw_sale_primary_market.fact_development_negotiation`** is born with `id_development` and `id_visit` on the same row. Unlike the questions above, no cross-reference is needed — that's the entire reason this table exists (see Service Architecture above). Enrich fallback: `datalake_sale_primary_market.development_negotiation`.
 
 ### Q: How many proposals became a submitted offer (OS)?
 **Stage:** OS · **Status:** ⚠ outside the domain
@@ -348,37 +369,42 @@ The offer itself is not stored in the Development domain. `DevelopmentNegotiatio
 ### Q: Who is the active manager (gestor) responsible for a development?
 **Category:** operational · **Status:** ✓ native
 
-This question never leaves the Development domain: `DevelopmentContact` (exposed via `datalake_sale_primary_market.house_development` and `dw_sale_primary_market.dim_house_development`) stores the development contact fields, with no external table or data-warehouse join needed.
+This question never leaves the Development domain: `DevelopmentContact` (exposed via **`dw_sale_primary_market.dim_house_development`**) stores the development contact fields, with no external table or data-warehouse join needed.
 
 ## Dos and Don'ts
 
 **Do:**
 - Read **TARS routing guide** above before picking tables — especially shell vs unit `id_house`.
-- Prefer native `sale_type` on the fact/dimension being queried. At house/listing grain without a native column, join `listing_sale_type` (enum; NULL → `SECONDARY`). For unit Imovel missing from `listing_sale_type`, use `house_development` for Development attributes.
+- **Start from `dw_sale_primary_market`** (`dim_house_development`, `fact_development_negotiation`) for Development-domain analyst cuts; use enrich tables only when a column is enrich-only (e.g. `listing_sale_type`) or DW access fails.
+- Prefer native `sale_type` on the fact/dimension being queried. At house/listing grain without a native column, join `listing_sale_type` (enum; NULL → `SECONDARY`). For unit Imovel missing from `listing_sale_type`, use **`dim_house_development`** for Development attributes.
+- Read incorporadora **name** from **`dim_house_development.company_name`** — see **Incorporadora name** section.
 - Keep `dw_sale.dim_listing.is_primary_market` only for backward-compatible dashboards — it is derived from `sale_type`.
 - Treat the shell house_id as a **typology**, not a physical unit, when reasoning about Primary inventory counts.
-- Scope pilot **visits** via `house_development`; scope pilot **offers/units** via `development_typology_unit`.
-- Filter `development_negotiation.actor = 'DEMAND'` when counting buyer-initiated pré-OS to avoid broker inflation.
-- Scope any Órulo-pilot question via `development_typology_unit.id_house` (or `house_development`), not `sale_type = 'PRIMARY'` alone — see the population warning above.
-- Check the live physical schema after each DAG rollout; merged SQL and deployed columns can temporarily differ until the affected DAG runs. If access fails because of missing Primary Market data-contract permissions, use the sandbox fallback documented above.
+- Scope pilot **visits** via **`dim_house_development`**; scope pilot **offers/units** via `development_typology_unit`.
+- Filter **`fact_development_negotiation.actor = 'DEMAND'`** when counting buyer-initiated pré-OS to avoid broker inflation.
+- Scope any Órulo-pilot question via `development_typology_unit.id_house` (or **`dim_house_development`**), not `sale_type = 'PRIMARY'` alone — see the population warning above.
+- Check the live physical schema after each DAG rollout; merged SQL and deployed columns can temporarily differ until the affected DAG runs. If access fails because of missing Primary Market data-contract permissions, report the limitation — do **not** substitute `sandbox.*` or other schemas.
 
 **Do not:**
 - Do not use `is_3p_supply`, developer/company ownership, or price alone to infer Primary Market — these are orthogonal axes.
 - Do not treat the shell house as one physical apartment; use `unit_count` on `listing_sale_model` or the unit Imovel (`development_typology_unit.id_house`) for inventory-level questions.
 - Do not rewrite historical visit `house_id`s after an offer lands on a different typology, and do not expect synthetic "corrective" visits — neither exists by design.
-- Do not denormalize `id_development` onto funnel facts — join at consume time via `house_development` or the correct shell/unit path above.
+- Do not denormalize `id_development` onto funnel facts — join at consume time via **`dim_house_development`** or the correct shell/unit path above.
 - Do not treat `fact_offers.sale_type` as a listing classification; it is offer-side Sales Flow data.
 - Do not treat `house.is_sale_primary_market` and `listing_sale_type.sale_type` as interchangeable — BOOL_OR vs SSOT can disagree.
 - Do not join visit `id_house` to `fact_offers` expecting a match on Primary — visit is shell, offer is unit.
-- Do not answer incorporadora **name** from lake unless joining an external company dimension by `company_uuid` — Development tables expose UUID only.
+- Do not use manual incorporadora CASE mappings — use **`dim_house_development.company_name`** (resolved via `datalake_company_clean.company`).
+- Do not use `sandbox.*` mirrors for Primary Market analysis.
 - Do not use `dw_sale.fact_buyer_prospects` as if it had `sale_type`; use `datalake_buyer_prospect.buyer_prospect_type` for activation-level market segmentation and `bp_market_type` for buyer exclusivity.
 - Do not confuse `SalesFlow.sale_type` (offer-side, `datalake_sales_flow_clean.offer.sale_type`) with `ListingSaleModel.saleType` (listing-side, `datalake_ebdb_clean.listing_sale_model.sale_type`) — they are separate columns on separate tables, populated independently.
 
 ## Golden Queries
 
-Queries **1–10** mirror the Primary Market Hub examples. Queries **11–16** add
-pilot scoping, pré-OS, and shell-vs-unit patterns from the TARS routing guide
-above. Prefer `sale_type = 'PRIMARY'` over `is_primary_market` in new analyses.
+Queries **1–10** mirror the Primary Market Hub examples. Queries **11–17** add
+pilot scoping, pré-OS, incorporadora mapping, and shell-vs-unit patterns from
+the TARS routing guide above. Prefer `sale_type = 'PRIMARY'` over
+`is_primary_market` in new analyses. Default Development joins to
+`dim_house_development` / `fact_development_negotiation` (DW).
 
 ### Query 1 — Published Primary houses and listings (Hub Q1)
 
@@ -525,7 +551,7 @@ FROM unique_typologies
 ### Query 6 — Primary visit booked and completed (Hub Q6)
 
 General Primary Market visits (`sale_type` on the visit fact). For **Órulo pilot**
-scope, join `house_development` on `sk_house` instead — see Query 11.
+scope, join **`dim_house_development`** on `sk_house` instead — see Query 11.
 
 ```sql
 SELECT
@@ -612,7 +638,7 @@ ORDER BY bp_market_type, bp_type
 ### Query 11 — Primary visit volume by month (pilot-scoped)
 
 Counts Primary Market **pilot** visits booked and completed, monthly. Joins
-`house_development` because visits book on **shell** houses, not unit Imovels.
+**`dim_house_development`** because visits book on **shell** houses, not unit Imovels.
 **Deliberately does NOT filter `sale_type = 'PRIMARY'` alone** for strict pilot
 KPIs. Follows the same `SUM(num_visit_*)` convention as [`visits.md`](visits.md)
 — do not `COUNT(*)` rows for booked/completed totals.
@@ -623,8 +649,8 @@ SELECT
     SUM(fv.num_visit_booked) AS primary_visits_booked,
     SUM(fv.num_visit_completed) AS primary_visits_completed
 FROM dw_visit.fact_visits AS fv
-INNER JOIN datalake_sale_primary_market.house_development AS hd
-    ON hd.id_house = fv.sk_house
+INNER JOIN dw_sale_primary_market.dim_house_development AS dhd
+    ON dhd.id_house = fv.sk_house
 GROUP BY 1
 ORDER BY 1 DESC
 ```
@@ -634,17 +660,17 @@ ORDER BY 1 DESC
 ### Query 12 — Pilot VB2VC rate vs. Secondary (comparison)
 
 Compares visit-completion efficiency between the pilot and Secondary. Pilot
-segment uses `house_development` on visit `sk_house` (shell path).
+segment uses **`dim_house_development`** on visit `sk_house` (shell path).
 
 ```sql
 SELECT
-    CASE WHEN hd.id_house IS NOT NULL THEN 'PRIMARY_PILOT' ELSE fv.sale_type END AS segment,
+    CASE WHEN dhd.id_house IS NOT NULL THEN 'PRIMARY_PILOT' ELSE fv.sale_type END AS segment,
     SUM(fv.num_visit_booked) AS booked,
     SUM(fv.num_visit_completed) AS completed,
     CAST(SUM(fv.num_visit_completed) AS DOUBLE) / NULLIF(SUM(fv.num_visit_booked), 0) AS vb2vc_rate
 FROM dw_visit.fact_visits AS fv
-LEFT JOIN datalake_sale_primary_market.house_development AS hd
-    ON hd.id_house = fv.sk_house
+LEFT JOIN dw_sale_primary_market.dim_house_development AS dhd
+    ON dhd.id_house = fv.sk_house
 WHERE fv.sale_type IN ('PRIMARY', 'SECONDARY')
 GROUP BY 1
 ORDER BY 1
@@ -652,7 +678,7 @@ ORDER BY 1
 
 ### Query 13 — Visit → pré-OS conversion (pilot)
 
-How many pilot visits led to a negotiation (pré-OS)? `development_negotiation.id_visit` and `fact_visits.sk_visit` share the same ID space (both ultimately trace to `datalake_visit.visits.id_visit` / `datalake_ebdb_clean.visit.id`, which are kept in sync) — confirmed against the one known negotiation in production before relying on this join.
+How many pilot visits led to a negotiation (pré-OS)? `fact_development_negotiation.id_visit` and `fact_visits.sk_visit` share the same ID space (both ultimately trace to `datalake_visit.visits.id_visit` / `datalake_ebdb_clean.visit.id`, which are kept in sync) — confirmed against the one known negotiation in production before relying on this join.
 
 ```sql
 WITH pilot_visits AS (
@@ -661,16 +687,16 @@ WITH pilot_visits AS (
         fv.sk_house,
         fv.is_completed
     FROM dw_visit.fact_visits AS fv
-    INNER JOIN datalake_sale_primary_market.house_development AS hd
-        ON hd.id_house = fv.sk_house
+    INNER JOIN dw_sale_primary_market.dim_house_development AS dhd
+        ON dhd.id_house = fv.sk_house
 )
 SELECT
     COUNT(*) AS total_pilot_visits,
     SUM(CASE WHEN pv.is_completed THEN 1 ELSE 0 END) AS completed_pilot_visits,
-    COUNT(DISTINCT dn.id_visit) AS visits_with_negotiation
+    COUNT(DISTINCT fdn.id_visit) AS visits_with_negotiation
 FROM pilot_visits AS pv
-LEFT JOIN datalake_sale_primary_market.development_negotiation AS dn
-    ON dn.id_visit = pv.sk_visit
+LEFT JOIN dw_sale_primary_market.fact_development_negotiation AS fdn
+    ON fdn.id_visit = pv.sk_visit
 ```
 
 ### Query 14 — Visits by development (top N)
@@ -679,13 +705,13 @@ Which developments are getting visit traffic. Useful for spotting cold-start dev
 
 ```sql
 SELECT
-    hd.development_name,
-    hd.id_development,
+    dhd.development_name,
+    dhd.id_development,
     SUM(fv.num_visit_booked) AS booked,
     SUM(fv.num_visit_completed) AS completed
 FROM dw_visit.fact_visits AS fv
-INNER JOIN datalake_sale_primary_market.house_development AS hd
-    ON hd.id_house = fv.sk_house
+INNER JOIN dw_sale_primary_market.dim_house_development AS dhd
+    ON dhd.id_house = fv.sk_house
 GROUP BY 1, 2
 ORDER BY booked DESC
 LIMIT 10
@@ -705,15 +731,15 @@ SELECT
         WHEN dtu.id_house IS NOT NULL THEN 'UNIT_IMOVEL'
         ELSE 'NOT_IN_DEVELOPMENT_DOMAIN'
     END AS house_role,
-    hd.id_development,
-    hd.development_name,
-    hd.id_development_typology,
-    hd.bedrooms,
-    hd.total_area,
+    dhd.id_development,
+    dhd.development_name,
+    dhd.id_development_typology,
+    dhd.bedrooms,
+    dhd.total_area,
     lst.sale_type AS listing_sale_type
 FROM datalake_ebdb_clean.house AS h
-LEFT JOIN datalake_sale_primary_market.house_development AS hd
-    ON hd.id_house = h.id
+LEFT JOIN dw_sale_primary_market.dim_house_development AS dhd
+    ON dhd.id_house = h.id
 LEFT JOIN datalake_sale_primary_market.listing_sale_type AS lst
     ON lst.id_house = h.id
 LEFT JOIN datalake_ebdb_clean.development_typology_unit AS dtu
@@ -724,7 +750,7 @@ LEFT JOIN datalake_ebdb_clean.house AS shell
 WHERE h.id = 895686210  -- replace with the id_house in question
 ```
 
-Prefer `house_development` alone when you only need empreendimento/tipologia on
+Prefer **`dim_house_development`** alone when you only need empreendimento/tipologia on
 any linked house. Use this query when TARS must explain shell vs unit explicitly.
 
 ### Query 16 — Pilot houses never visited (supply not yet demonstrated)
@@ -741,13 +767,29 @@ SELECT
     COUNT(*) AS n_pilot_houses,
     COUNT(vh.sk_house) AS n_visited,
     COUNT(*) - COUNT(vh.sk_house) AS n_never_visited
-FROM datalake_sale_primary_market.house_development AS hd
+FROM dw_sale_primary_market.dim_house_development AS dhd
 LEFT JOIN visited_houses AS vh
-    ON vh.sk_house = hd.id_house
+    ON vh.sk_house = dhd.id_house
+```
+
+### Query 17 — Incorporadora name by development
+
+DW-first cut at development grain using denormalized `company_name`.
+
+```sql
+SELECT
+    id_development,
+    development_name,
+    uuid_company,
+    company_name,
+    COUNT(DISTINCT id_house) AS n_houses
+FROM dw_sale_primary_market.dim_house_development
+GROUP BY 1, 2, 3, 4
+ORDER BY n_houses DESC
 ```
 
 ## DataHub catalog
 
 - **Data Product:** Published from this Markdown by the repository DataHub metadata workflow.
 - **Datasets:** Tables in the Tables section are linked as DataHub assets. The same table may also appear on other Data Products.
-- **Golden queries:** The sixteen queries above (Hub Q1–Q10 plus pilot/TARS supplements) are published as DataHub Query entities.
+- **Golden queries:** The seventeen queries above (Hub Q1–Q10 plus pilot/TARS supplements) are published as DataHub Query entities.

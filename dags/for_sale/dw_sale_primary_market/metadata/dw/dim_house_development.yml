@@ -17,10 +17,18 @@ columns:
     lineage:
       - datalake_sale_primary_market.house_development.id_development_typology
     description: Typology (floor plan) the house belongs to. Resolved from the offer-created unit when present, otherwise from the typology shell listing.
+  uuid_company:
+    lineage:
+      - datalake_sale_primary_market.house_development.uuid_company
+    description: UUID of the incorporadora (builder company) behind the development. Join key to datalake_company_clean.company.uuid_company.
   development_name:
     lineage:
       - datalake_sale_primary_market.house_development.development_name
     description: Name of the development/empreendimento.
+  company_name:
+    lineage:
+      - datalake_company_clean.company.company_name
+    description: Legal name of the incorporadora (builder company) behind the development, resolved from development.company_uuid via datalake_company_clean.company.
   construction_status:
     lineage:
       - datalake_sale_primary_market.house_development.construction_status

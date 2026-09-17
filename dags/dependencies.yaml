@@ -1142,6 +1142,7 @@ bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.enrich_sale_primary_market:load-enrich-listing-sale-type:first-run-of-day
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event:first-run-of-day
 bietlejuice.dw_sale_primary_market:
+  - bietlejuice.company:load-clean-company:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day

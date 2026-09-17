@@ -57,6 +57,7 @@ SELECT
     ht.id_house,
     dt.id_development,
     ht.id_development_typology,
+    d.company_uuid AS uuid_company,
     d.name AS development_name,
     d.construction_status,
     d.provider,

@@ -1,12 +1,14 @@
 -- Grain: one row per house (same as enrich house_development). Adds id_region
--- (raw FK), city_group (resolved), and min/max price (from enrich
--- listing_sale_type, which already joins the SALE listing_sale_model)
--- so consumers don't repeat either join.
+-- (raw FK), city_group (resolved), incorporadora company_name (from company_clean
+-- via enrich uuid_company), and min/max price (from enrich listing_sale_type,
+-- which already joins the SALE listing_sale_model) so consumers don't repeat those joins.
 SELECT
     hd.id_house,
     hd.id_development,
     hd.id_development_typology,
+    hd.uuid_company,
     hd.development_name,
+    c.company_name,
     hd.construction_status,
     hd.provider,
     hd.postal_code,
@@ -33,6 +35,9 @@ SELECT
     lp.max_price
 FROM
     datalake_sale_primary_market.house_development AS hd
+LEFT JOIN
+    datalake_company_clean.company AS c
+        ON c.uuid_company = hd.uuid_company
 LEFT JOIN
     datalake_ebdb_clean.house AS h
         ON h.id = hd.id_house

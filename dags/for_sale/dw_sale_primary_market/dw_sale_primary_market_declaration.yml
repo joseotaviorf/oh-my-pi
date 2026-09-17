@@ -5,7 +5,7 @@ dag:
   schedule_interval: 0 21 * * *
   owner: Data ForSale
   documentation:
-    dag_purpose: This DAG builds Primary Market DW-layer tables — dim_house_development (house-grain evolution of enrich house_development, adding city_group) and fact_development_negotiation (negotiation-grain evolution of enrich development_negotiation, adding city_group, hub, and EN) — so consumers don't re-derive these segmentations per query.
+    dag_purpose: This DAG builds Primary Market DW-layer tables — dim_house_development (house-grain evolution of enrich house_development, adding city_group and incorporadora company_name) and fact_development_negotiation (negotiation-grain evolution of enrich development_negotiation, adding city_group, hub, and EN) — so consumers don't re-derive these segmentations per query.
 workflow:
   type: query_delta
   layer: dw

@@ -19,6 +19,10 @@ columns:
       - datalake_ebdb_clean.development_typology_unit.id_development_typology
       - datalake_ebdb_clean.house.id_development_typology
     description: Typology (floor plan) the house belongs to. Resolved from the offer-created unit when present, otherwise from the typology shell listing.
+  uuid_company:
+    lineage:
+      - datalake_ebdb_clean.development.company_uuid
+    description: UUID of the incorporadora (builder company) behind the development.
   development_name:
     lineage:
       - datalake_ebdb_clean.development.name
