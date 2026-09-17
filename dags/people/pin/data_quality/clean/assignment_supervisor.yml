@@ -25,3 +25,170 @@ column_level_validations:
       # No duplicate rows for the same (id_assignment_supervisor, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.assignment_supervisor GROUP BY id_assignment_supervisor, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
+  # Temporarily disabled while [PIN-22774](https://quintoandar.atlassian.net/browse/PIN-22774)
+  # is unresolved. This ticket covers LINE_MANAGER coverage holes for active and
+  # terminated E assignments from PIN go-live (2024-03-01).
+  # Re-enable this check after the ticket is resolved and production data has been revalidated.
+  # employees_must_have_line_manager:
+  #   custom:
+  #     # In-scope E assignments (active or terminated on/after PIN go-live, excluding
+  #     # the max-band CEO) must have LINE_MANAGER covering every day from
+  #     # max(2024-03-01, dt_started) through min(today, dt_actual_termination).
+  #     constraint: |-
+  #       (SELECT COUNT(*) FROM (
+  #         WITH in_scope AS (
+  #           SELECT
+  #             im.assignment_number,
+  #             im.id_assignment,
+  #             GREATEST(DATE('2024-03-01'), im.dt_started) AS expected_start,
+  #             LEAST(
+  #               CURRENT_DATE(),
+  #               COALESCE(
+  #                 NULLIF(im.dt_actual_termination, DATE('9999-12-31')),
+  #                 CURRENT_DATE()
+  #               )
+  #             ) AS expected_end
+  #           FROM datalake_people.identifier_mapping AS im
+  #           WHERE im.assignment_type = 'E'
+  #             AND NOT im.is_user_test
+  #             AND im.dt_started <= CURRENT_DATE()
+  #             AND GREATEST(DATE('2024-03-01'), im.dt_started) <= LEAST(
+  #               CURRENT_DATE(),
+  #               COALESCE(
+  #                 NULLIF(im.dt_actual_termination, DATE('9999-12-31')),
+  #                 CURRENT_DATE()
+  #               )
+  #             )
+  #             AND (
+  #               im.dt_actual_termination IS NULL
+  #               OR im.dt_actual_termination = DATE('9999-12-31')
+  #               OR im.dt_actual_termination >= DATE('2024-03-01')
+  #             )
+  #         ),
+  #         ceo_windows AS (
+  #           SELECT
+  #             aa.assignment_number,
+  #             GREATEST(aa.dt_effective_started, j.dt_valid_from) AS dt_from,
+  #             LEAST(
+  #               COALESCE(aa.dt_effective_ended, DATE('9999-12-31')),
+  #               COALESCE(j.dt_valid_to, DATE('9999-12-31'))
+  #             ) AS dt_to
+  #           FROM datalake_pin_core_clean.all_assignments AS aa
+  #           INNER JOIN datalake_people.job_with_salary_table AS j
+  #             ON aa.id_job = j.id_job
+  #             AND aa.dt_effective_started <= COALESCE(j.dt_valid_to, DATE('9999-12-31'))
+  #             AND COALESCE(aa.dt_effective_ended, DATE('9999-12-31')) >= j.dt_valid_from
+  #           WHERE TRY_CAST(j.band AS INT) = (
+  #             SELECT MAX(TRY_CAST(band AS INT))
+  #             FROM datalake_people.job_with_salary_table
+  #             WHERE TRY_CAST(band AS INT) IS NOT NULL
+  #           )
+  #         ),
+  #         lm_versions AS (
+  #           SELECT
+  #             im.assignment_number,
+  #             GREATEST(im.expected_start, supervisor.dt_effective_started) AS cov_from,
+  #             LEAST(im.expected_end, supervisor.dt_effective_ended) AS cov_to
+  #           FROM in_scope AS im
+  #           INNER JOIN datalake_pin_core_clean.assignment_supervisor AS supervisor
+  #             ON supervisor.id_assignment = im.id_assignment
+  #           WHERE supervisor.manager_type = 'LINE_MANAGER'
+  #             AND supervisor.id_manager_assignment IS NOT NULL
+  #             AND GREATEST(im.expected_start, supervisor.dt_effective_started)
+  #                 <= LEAST(im.expected_end, supervisor.dt_effective_ended)
+  #         ),
+  #         ordered AS (
+  #           SELECT
+  #             assignment_number,
+  #             cov_from,
+  #             cov_to,
+  #             LAG(cov_to) OVER (
+  #               PARTITION BY assignment_number
+  #               ORDER BY cov_from, cov_to
+  #             ) AS prev_to
+  #           FROM lm_versions
+  #         ),
+  #         islanded AS (
+  #           SELECT
+  #             assignment_number,
+  #             cov_from,
+  #             cov_to,
+  #             SUM(
+  #               CASE
+  #                 WHEN prev_to IS NULL OR cov_from > DATE_ADD(prev_to, 1) THEN 1
+  #                 ELSE 0
+  #               END
+  #             ) OVER (
+  #               PARTITION BY assignment_number
+  #               ORDER BY cov_from, cov_to
+  #               ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  #             ) AS island_id
+  #           FROM ordered
+  #         ),
+  #         merged AS (
+  #           SELECT
+  #             assignment_number,
+  #             MIN(cov_from) AS cov_from,
+  #             MAX(cov_to) AS cov_to
+  #           FROM islanded
+  #           GROUP BY assignment_number, island_id
+  #         ),
+  #         merged_ordered AS (
+  #           SELECT
+  #             assignment_number,
+  #             cov_from,
+  #             cov_to,
+  #             LEAD(cov_from) OVER (
+  #               PARTITION BY assignment_number
+  #               ORDER BY cov_from, cov_to
+  #             ) AS next_from,
+  #             MIN(cov_from) OVER (PARTITION BY assignment_number) AS first_from,
+  #             MAX(cov_to) OVER (PARTITION BY assignment_number) AS last_to
+  #           FROM merged
+  #         ),
+  #         holes AS (
+  #           SELECT
+  #             s.assignment_number,
+  #             s.expected_start AS hole_start,
+  #             s.expected_end AS hole_end
+  #           FROM in_scope AS s
+  #           LEFT JOIN merged AS m
+  #             ON m.assignment_number = s.assignment_number
+  #           WHERE m.assignment_number IS NULL
+  #           UNION ALL
+  #           SELECT DISTINCT
+  #             s.assignment_number,
+  #             s.expected_start,
+  #             DATE_ADD(mo.first_from, -1)
+  #           FROM in_scope AS s
+  #           INNER JOIN merged_ordered AS mo
+  #             ON mo.assignment_number = s.assignment_number
+  #           WHERE mo.first_from > s.expected_start
+  #           UNION ALL
+  #           SELECT
+  #             mo.assignment_number,
+  #             DATE_ADD(mo.cov_to, 1),
+  #             DATE_ADD(mo.next_from, -1)
+  #           FROM merged_ordered AS mo
+  #           WHERE mo.next_from IS NOT NULL
+  #             AND DATE_ADD(mo.cov_to, 1) < mo.next_from
+  #           UNION ALL
+  #           SELECT DISTINCT
+  #             s.assignment_number,
+  #             DATE_ADD(mo.last_to, 1),
+  #             s.expected_end
+  #           FROM in_scope AS s
+  #           INNER JOIN merged_ordered AS mo
+  #             ON mo.assignment_number = s.assignment_number
+  #           WHERE mo.last_to < s.expected_end
+  #         )
+  #         SELECT h.assignment_number
+  #         FROM holes AS h
+  #         LEFT JOIN ceo_windows AS ceo
+  #           ON ceo.assignment_number = h.assignment_number
+  #           AND ceo.dt_from <= h.hole_start
+  #           AND ceo.dt_to >= h.hole_end
+  #         WHERE ceo.assignment_number IS NULL
+  #           AND h.hole_start <= h.hole_end
+  #       )) = 0
+  #     severity_level: Warning
