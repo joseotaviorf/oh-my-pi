@@ -262,14 +262,10 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up:first-run-of-day
-  - bietlejuice.salesforce:load-clean-case-milestones:first-run-of-day
   - bietlejuice.salesforce:load-clean-cases:first-run-of-day
-  - bietlejuice.salesforce:load-clean-email-message:first-run-of-day
-  - bietlejuice.salesforce:load-clean-record-types:first-run-of-day
   - bietlejuice.salesforce:load-clean-relisting-context:first-run-of-day
   - bietlejuice.salesforce:load-clean-task:first-run-of-day
   - bietlejuice.salesforce:load-clean-terminations:first-run-of-day
-  - bietlejuice.salesforce:load-clean-users:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics:first-run-of-day
 bietlejuice.dw_braze_events_user_centric:

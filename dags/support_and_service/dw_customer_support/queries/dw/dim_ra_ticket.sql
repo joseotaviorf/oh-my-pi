@@ -1,6 +1,6 @@
 WITH ranked_tickets AS (
     -- customer_data is varchar but NOT valid JSON (unquoted keys/string values,
-    -- e.g. {name:Jane Doe, city:{name:Sao Paulo, id:768}, cpf:...}) — GET_JSON_OBJECT
+    -- e.g. {{name:Jane Doe, city:{{name:Sao Paulo, id:768}}, cpf:...}}) — GET_JSON_OBJECT
     -- silently returned NULL for every row on EMR. Databricks' `:` operator tolerates
     -- this loose format; EMR has no equivalent, so fields are regex-extracted here.
     -- Not validated against a live Databricks run — spot-check before merging,
@@ -13,12 +13,12 @@ WITH ranked_tickets AS (
         source["name"] AS source,
         complaint_title AS title,
         company.name AS company,
-        NULLIF(REGEXP_EXTRACT(customer_data, '[{ ]cpf:([^,}]+)', 1), '') AS customer_cpf,
-        NULLIF(REPLACE(REGEXP_EXTRACT(customer_data, '[{ ]city:(\\{[^}]*\\})', 1), 'name:', ''), '') AS customer_city,
-        NULLIF(REPLACE(REGEXP_EXTRACT(customer_data, '[{ ]state:(\\{[^}]*\\})', 1), 'name:', ''), '') AS customer_state,
-        NULLIF(REGEXP_EXTRACT(customer_data, '[{ ]email:([^,}]+)', 1), '') AS customer_email,
-        NULLIF(REGEXP_EXTRACT(customer_data, '[{ ]phone_numbers:([^,}]+)', 1), '') AS customer_phone_numbers,
-        NULLIF(REGEXP_EXTRACT(customer_data, '[{ ]tags:([^,}]+)', 1), '') AS customer_tags,
+        NULLIF(REGEXP_EXTRACT(customer_data, '[{{ ]cpf:([^,}}]+)', 1), '') AS customer_cpf,
+        NULLIF(REPLACE(REGEXP_EXTRACT(customer_data, '[{{ ]city:(\\{{[^}}]*\\}})', 1), 'name:', ''), '') AS customer_city,
+        NULLIF(REPLACE(REGEXP_EXTRACT(customer_data, '[{{ ]state:(\\{{[^}}]*\\}})', 1), 'name:', ''), '') AS customer_state,
+        NULLIF(REGEXP_EXTRACT(customer_data, '[{{ ]email:([^,}}]+)', 1), '') AS customer_email,
+        NULLIF(REGEXP_EXTRACT(customer_data, '[{{ ]phone_numbers:([^,}}]+)', 1), '') AS customer_phone_numbers,
+        NULLIF(REGEXP_EXTRACT(customer_data, '[{{ ]tags:([^,}}]+)', 1), '') AS customer_tags,
         moderation["status"] AS moderation_status,
         moderation["reason"] AS moderation_reason,
         ticket_moderations_count AS total_moderations,
