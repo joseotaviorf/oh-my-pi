@@ -254,6 +254,14 @@ workflow:
       extra_spark_job_arguments:
       - raw_custom_schema: pin_core
         date_column_to_partition: last_update_date
+    per_contact_relships_f:
+      clean_table_name: contact_relationship
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
     per_disabilities_f:
       clean_table_name: disability
       custom_schema: pin_core

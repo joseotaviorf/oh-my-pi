@@ -1,0 +1,63 @@
+---
+table_name: datalake_pin_core_clean.contact_relationship
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+column_level_validations:
+  id_contact_relationship:
+    is_complete:
+      severity_level: Warning
+  id_person:
+    is_complete:
+      severity_level: Warning
+  id_contact_person:
+    is_complete:
+      severity_level: Warning
+  id_business_group:
+    is_complete:
+      severity_level: Warning
+  contact_type:
+    is_complete:
+      severity_level: Warning
+  is_dependent:
+    is_complete:
+      severity_level: Warning
+  dt_effective_started:
+    is_complete:
+      severity_level: Warning
+  dt_effective_ended:
+    is_complete:
+      severity_level: Warning
+  one_row_per_contact_relationship_and_effective_period:
+    custom:
+      # Validate the composite effective-dated source key.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+             SELECT
+                 id_contact_relationship,
+                 dt_effective_started,
+                 dt_effective_ended
+             FROM datalake_pin_core_clean.contact_relationship
+             GROUP BY
+                 id_contact_relationship,
+                 dt_effective_started,
+                 dt_effective_ended
+             HAVING COUNT(*) > 1
+         )) = 0
+      severity_level: Error
+  effective_period_must_not_be_inverted:
+    custom:
+      # Validate that the effective period is not open with an inverted date range.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.contact_relationship
+         WHERE dt_effective_started > dt_effective_ended) = 0
+      severity_level: Warning

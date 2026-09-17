@@ -1,0 +1,116 @@
+database_name: datalake_pin_core_clean
+table_name: contact_relationship
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Effective-dated person-to-person relationships from PIN, including contact, dependent, beneficiary, and emergency-contact indicators.
+  One row per contact relationship and effective validity interval.
+  Covers relationships between employees or other people and their contacts, preserving the relationship type and dependent flags used by People reporting.
+  Downstream employee-dependent reports join the related person to person_name and national_identifiers for name, birth date, and CPF attributes.
+columns:
+  id_contact_relationship:
+    description: Unique identifier of the contact relationship record in PIN. The effective validity dates complete the source relationship key.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.contact_relationship_id
+  id_person:
+    description: Identifier of the first person in the relationship, typically the employee whose contact is being described.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.person_id
+  id_contact_person:
+    description: Identifier of the second person in the relationship. Joins to person-level name, birth-date, and identification records.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.contact_person_id
+  id_business_group:
+    description: Identifier of the PIN business group that owns the relationship record.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.business_group_id
+  id_end_life_reason:
+    description: Identifier of the reason associated with ending the contact relationship, when registered.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.end_life_reason_id
+  id_start_life_reason:
+    description: Identifier of the reason associated with starting the contact relationship, when registered.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.start_life_reason_id
+  legislation_code:
+    description: Legislation context associated with the contact relationship.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.legislation_code
+  contact_type:
+    description: PIN relationship type code describing how the two people are related.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.contact_type
+  statutory_dependent:
+    description: Localization-specific statutory-dependent value recorded for the contact relationship. The value may be null or use a configured legislative code.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.statutory_dependent
+  sequence_number:
+    description: Sequence number assigned to the relationship by PIN.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.sequence_number
+  created_by:
+    description: PIN user or process that created the relationship record.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.created_by
+  updated_by:
+    description: PIN user or process that last updated the relationship record.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.last_updated_by
+  object_version_number:
+    description: PIN optimistic-locking version number for the relationship record.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.object_version_number
+  is_dependent:
+    description: True when PIN marks the related contact as a dependent through the general dependent indicator.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.dependent_flag
+  is_beneficiary:
+    description: True when PIN marks the related contact as a beneficiary.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.beneficiary_flag
+  is_existing_person:
+    description: True when the contact relationship references a person already registered in PIN.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.existing_person
+  is_bondholder:
+    description: True when PIN marks the related person as a potential employee bondholder.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.bondholder_flag
+  is_personal_relationship:
+    description: True when PIN marks the relationship as personal.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.personal_flag
+  is_primary_contact:
+    description: True when the related person is the primary contact for the first person.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.primary_contact_flag
+  is_related_person_residing_with_designator:
+    description: True when PIN indicates that the related person resides with the first person.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.rltd_per_rsds_w_dsgntr_flag
+  is_third_party_pay:
+    description: True when PIN indicates that the related contact receives third-party payments from the first person.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.third_party_pay_flag
+  is_emergency_contact:
+    description: True when PIN identifies the relationship as an emergency contact relationship.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.emergency_contact_flag
+  dt_effective_started:
+    description: Date on which this version of the contact relationship becomes effective.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.effective_start_date
+  dt_effective_ended:
+    description: Date on which this version of the contact relationship ends. PIN's open-ended 4712-12-31 sentinel is normalized to 9999-12-31.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.effective_end_date
+  ts_created:
+    description: Timestamp when PIN created the contact relationship record.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.creation_date
+  ts_updated:
+    description: Timestamp when PIN last updated the contact relationship record.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.last_update_date
+  ts_load:
+    description: Timestamp when the relationship record was loaded into the clean layer.
