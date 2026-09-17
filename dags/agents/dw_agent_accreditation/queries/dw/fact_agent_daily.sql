@@ -37,10 +37,9 @@ accreditation_date AS (
 ),
 agent_accreditation AS (
     SELECT
-        ac.id_unified_agent,
-        ac.dt_reference,
-        ac.is_active IS TRUE AND DATE(ad.ts_first_activation) = ac.dt_reference AS is_first_activation,
-        ac.is_active IS TRUE AND DATE(ad.ts_first_activation) <> ac.dt_reference AS is_reactivated,
+        ac.id_snapshot,
+        MAX(ac.is_active IS TRUE AND COALESCE(DATE(ad.ts_first_activation) = ac.dt_reference, FALSE)) AS is_first_activation,
+        MAX(ac.is_active IS TRUE AND COALESCE(DATE(ad.ts_first_activation) <> ac.dt_reference, FALSE)) AS is_reactivated,
         MAX(events.event_reason IN ("LEGACY_AGENT_MIGRATION", "LEGACY_AGENT_MIGRATION_BACKFILL")) AS is_legacy_agent_migrated,
         MAX(events.event_reason = "AGENT_DEACCREDITATION") AS is_deaccredited,
         MAX(events.event_reason = "INACTIVE_AGENT_REENROLLMENT") AS is_agent_reenrolled
@@ -50,10 +49,10 @@ agent_accreditation AS (
         datalake_ebdb_agent_events.agent_accreditation_events AS events
             ON events.id_unified_agent = ac.id_unified_agent
             AND ac.dt_reference = DATE(events.ts_created)
-    JOIN
+    LEFT JOIN
         accreditation_date AS ad
             ON events.id_unified_agent = ad.id_unified_agent
-    GROUP BY 1, 2, 3, 4
+    GROUP BY 1
 ),
 tier AS (
     SELECT
@@ -118,8 +117,7 @@ JOIN
         ON a.id_unified_agent = ac.id_unified_agent
 LEFT JOIN
     agent_accreditation AS aa
-        ON a.id_unified_agent = aa.id_unified_agent
-        AND aa.dt_reference = ac.dt_reference
+        ON ac.id_snapshot = aa.id_snapshot
 LEFT JOIN
     tier AS t
         ON t.id_snapshot = ac.id_snapshot
