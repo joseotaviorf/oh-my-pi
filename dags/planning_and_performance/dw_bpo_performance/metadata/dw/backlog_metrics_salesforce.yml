@@ -150,6 +150,19 @@ columns:
       - sandbox.sla_target_salesforce.sla_tgt
       - datalake_salesforce_clean.case_milestones.target_response_in_days
     description: Integer flag (1/0) indicating whether the ticket backlog exceeded the SLA target on the reference date.
+  dt_first_open:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+    description: First date/time the status changed, indicating the start of handling.
+  ts_solved_closed:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+    description: The definitive timestamp of when a case was resolved or closed. The business rule consolidates the completion time by prioritizing first, a bug fix timestamp (for keys logistics cases) second, the exact timestamp of the first status transition to 'Solved' (via event history) and finally, the official 'Closed' date of the ticket.
+  is_backlog_not_in_time_3d:
+    lineage:
+      - dw_support_journey.fact_requests.ts_created
+      - datalake_salesforce_clean.events_case.last_modified_date
+    description: A binary flag (1 or 0) indicating whether the ticket's lifespan has exceeded 48 hours (approximately 3 operational days). If the ticket is still open, it compares the creation date against the start of the current day. If resolved, it compares the creation date against the resolution date (ts_solved_closed).
   year:
     lineage:
       - current_date
