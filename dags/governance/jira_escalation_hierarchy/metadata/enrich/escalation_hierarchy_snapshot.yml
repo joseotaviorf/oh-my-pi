@@ -1,0 +1,51 @@
+database_name: datalake_jira_reports
+table_name: escalation_hierarchy_snapshot
+owner: gustavo.rompe@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Notification log for jira_escalation_hierarchy — one row per escalation DM
+  actually attempted, not a resolution audit of every open DEI incident. A
+  row is written only when an issue's Criticality-scaled day threshold (see
+  EscalationPolicy in the spark job) was newly crossed this run: who
+  (id_issue, escalation_level, notified_email), when (notified_at,
+  year/month/day), what (notification_status, criticality, days_open that
+  triggered it). No Jira custom fields are written and no Jira Automation is
+  involved — Jira Cloud's outbound "Send web request" can't reach
+  Notification Hub Internal's internal-only /webhook/generic route, so this
+  job resolves identity (via dw_people, the "public" People subdomain) and
+  sends the DM itself.
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira.issues.id_issue
+    description: Jira issue key (e.g. DEI-1234) the escalation DM was sent for.
+  escalation_level:
+    lineage: []
+    description: The escalation *threshold* newly crossed this run (L0 = assignee, L4 = direct manager, L3 = manager's manager, L2 = one level above that) — see EscalationPolicy.LEVELS. The person actually DMed (notified_email) may correspond to an earlier level than this if the real target was a protected executive; see notified_email.
+  notified_email:
+    lineage:
+      - dw_people.dim_management_hierarchy.email_manager
+    description: Email the DM was actually sent to (or attempted for) — the assignee's own email for L0, otherwise the resolved manager email at that level. If a level's real manager has no HR chain entry that far up or is a protected executive (CEO/VP — see PROTECTED_EXECUTIVE_QUERY in the spark job), this repeats the nearest earlier level's already-resolved email instead, so it can differ from escalation_level's nominal target. Null when notification_status is 'skipped_no_email' (only possible for L0 with no resolvable assignee email).
+  notification_status:
+    lineage: []
+    description: "'sent' when the Notification Hub Internal DM succeeded and the escalation-notified property write was confirmed, 'sent_property_write_failed' when the DM succeeded but that write failed (the next run may resend this level), 'failed' when the DM itself errored, 'skipped_no_email' when the target level had no resolvable email."
+  criticality:
+    lineage:
+      - datalake_jira.issues.criticality
+    description: "The issue's Criticality field (Critical/High/Medium/Low) at notification time. Drives which day-threshold schedule (EscalationPolicy.DAYS_BY_CRITICALITY) applied; null/unrecognized falls back to the Medium schedule."
+  days_open:
+    lineage:
+      - datalake_jira.issues.ts_created
+    description: Days between ts_created and this run's logical timestamp — the value that crossed the criticality-specific day threshold and triggered this notification.
+  notified_at:
+    lineage: []
+    description: This run's logical timestamp (ISO-8601), i.e. when the notification was attempted.
+  year:
+    lineage: []
+    description: Year the sync DAG ran, used for Delta partitioning — filter for partition pruning.
+  month:
+    lineage: []
+    description: Month the sync DAG ran, used for Delta partitioning — filter for partition pruning.
+  day:
+    lineage: []
+    description: Day the sync DAG ran, used for Delta partitioning — filter for partition pruning.

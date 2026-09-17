@@ -1,0 +1,72 @@
+dag:
+  name: jira_escalation_hierarchy
+  owner: Data Governance
+  schedule_start_date: 2026, 9, 11
+  schedule_interval: "0 9 * * *"
+  documentation:
+    dag_purpose: |
+      DMs the org hierarchy when an open DEI incident (current_status_category
+      != 'Done') is stuck too long. No Jira custom fields are written and no
+      Jira Automation is involved — Jira Cloud's outbound "Send web request"
+      cannot reach Notification Hub Internal's internal-only /webhook/generic
+      route, only an internal caller like this Databricks/EMR job can, and
+      since nothing reads a Jira field for this anymore, identity lives only
+      in this job's resolution and the audit snapshot.
+      Escalation levels: L0 = assignee, L4 = assignee's direct manager, L3 =
+      that manager's manager, L2 = one level above that.
+      Identity resolution: datalake_jira.issues.assignee_account_id -> email
+      (Jira user API) -> a single SQL query joining dw_people.dim_employee to
+      dw_people.dim_management_hierarchy three times (one self-join per hop)
+      to get the whole L4/L3/L2 manager-email chain per employee in one
+      round trip, no per-issue Python graph walk. dw_people (not
+      dw_employee_details) is used deliberately: it's the "public" People
+      subdomain in the data contracts and was confirmed queryable, whereas
+      dw_employee_details returned PERMISSION_DENIED for a personal account.
+      L4/L3/L2 escalate normally to the real manager chain. If a level has
+      no HR hierarchy row that far up, or the resolved manager is a
+      protected executive (CEO or one of their direct reports/VPs — derived
+      each run from dim_management_hierarchy.email_l0/email_l1, company-wide
+      ~11 people, not a hardcoded name list), that level repeats the
+      *previous* level's already-resolved target instead of jumping to a
+      fixed fallback — escalation only ever reaches people already looped
+      in, never a VP/CEO, at least for now. FALLBACK_OWNER_EMAIL in the
+      spark job is only the seed used if even the assignee's own email
+      can't be resolved.
+      Day thresholds for reaching each level scale with the issue's
+      Criticality field (customfield_35959: Critical/High/Medium/Low) —
+      Critical incidents escalate in days, Low incidents over weeks (see
+      EscalationPolicy in the spark job; missing/unrecognized criticality
+      falls back to the Medium schedule). The newly-reached level is DMed
+      directly via NHI's /webhook/generic (the same route
+      jira_open_incidents_report already posts to) — NHI resolves the Gchat
+      user id itself and DMs (or @mention-falls-back to) that person; no
+      Google service account or Domain-Wide Delegation grant is needed on
+      our side. Idempotency is tracked via the "escalation-notified" Jira
+      Issue Property (last level DMed) so re-runs never re-send an
+      already-sent level.
+      Every card also previews the *next* escalation: how many days until
+      the following level's threshold is crossed and who that would notify
+      (reusing the same executive-protection cascade, so the preview never
+      names a VP/CEO either) — a heads-up so today's contact knows when and
+      to whom this escalates further if the incident stays open.
+      Every run re-queries the current assignee for every open issue and
+      unconditionally re-resolves identity (no incremental logic, no
+      cross-run cache), so a reassignment is corrected on the next scheduled
+      run — worst case ~24h given the daily cadence.
+      The Delta table this DAG writes is a notification log only (who/when/
+      what was actually DMed) — a row is written only when a level was newly
+      due this run, not one row per open issue per run.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: jira_reports
+  load_spark_job: sync_escalation_hierarchy
+  tables_customization:
+    escalation_hierarchy_snapshot:
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{{ data_interval_start }}"
+      partitions: [year, month, day]

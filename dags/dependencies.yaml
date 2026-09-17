@@ -4459,6 +4459,10 @@ bietlejuice.enrich_zscaler:
   - bietlejuice.zscaler:load-clean-managed-devices:first-run-of-day
 bietlejuice.ifrs:
   - quintoml.fintech.provision_assets.inference:first-run-of-day
+bietlejuice.jira_escalation_hierarchy:
+  - bietlejuice.dw_people:load-dw-people-dim-employee:first-run-of-day
+  - bietlejuice.dw_people:load-dw-people-dim-management-hierarchy:first-run-of-day
+  - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
 bietlejuice.jira_open_incidents_report:
   - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
 bietlejuice.metric_agentic_platform:

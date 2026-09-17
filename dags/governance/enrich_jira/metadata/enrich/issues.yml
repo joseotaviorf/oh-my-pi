@@ -46,6 +46,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Person currently assigned to the issue
+  assignee_account_id:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: Atlassian accountId of the currently assigned person, used to resolve identity across Jira Cloud APIs (e.g. email lookup) without relying on the display name.
   reporter:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -62,6 +66,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Priority level assigned to the issue
+  criticality:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "Custom 'Criticality' select field (customfield_35959): Critical/High/Medium/Low. Null for projects that don't have this field on their issue type (e.g. no allowedValues configured)."
   resolution:
     lineage:
       - datalake_jira_clean.issues.fields

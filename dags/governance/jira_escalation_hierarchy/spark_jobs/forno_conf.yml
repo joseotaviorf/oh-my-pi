@@ -1,0 +1,1 @@
+notification_hub_inmetro_webhook_base: "https://notification-hub-internal-api.apps.core-frn.habitat.zone/webhook/generic"
