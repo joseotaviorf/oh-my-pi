@@ -3744,6 +3744,7 @@ bietlejuice.enrich_reverses_monitoring:
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
 bietlejuice.enrich_robin_hood:
+  - bietlejuice.robin_hood:load-clean-accounting-entry-recon-removals:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-source:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry:first-run-of-day
   - bietlejuice.robin_hood:load-clean-payee:first-run-of-day
