@@ -13,7 +13,7 @@ workflow:
   tables_customization:
     airtable_leads_accreditation:
       sheet_id: 1wGHj3FSxSr3zqAUk7JCsjcNY813iWTkkqT-XTLnExyg
-      sheet_name: Página 1
+      sheet_name: Página1
 cluster:
   type: consolidation_xs_general_cluster
   access_control_list:
