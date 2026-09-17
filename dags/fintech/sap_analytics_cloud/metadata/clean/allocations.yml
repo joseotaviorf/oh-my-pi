@@ -1,0 +1,194 @@
+---
+database_name: datalake_sap_analytics_cloud_clean
+table_name: allocations
+description:
+  Clean-layer cost allocation lines from the SAP Analytics Cloud M002_Allocations
+  planning model, one row per allocation line and target combination, carrying the
+  allocated amount and the driver used to distribute it. Consumed by controllership to
+  compare planned cost allocations against SAP S/4HANA actual postings during the
+  monthly close.
+owner: tadeu.kanashiro@quintoandar.com.br
+domain: Fintech
+columns:
+  id_allocation:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.DIM_Allocation
+    description:
+      Identifier of the allocation rule that produced this line, defining which source
+      costs are distributed and to which target dimension combination.
+  id_allocation_line:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.DIM_AllocationLine
+    description:
+      Identifier of the individual step inside the allocation rule, distinguishing each
+      source-to-target distribution performed by the same rule.
+  id_driver:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.DIM_Driver
+    description:
+      Identifier of the allocation driver used as the distribution basis, determining
+      the proportion of the source amount each target receives.
+  id_l3d:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.DIM_L3D
+    description:
+      Identifier of the L3D dimension member assigned to the allocation line, used as
+      one of the target breakdown levels of the allocation model.
+  id_company:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Company_Code
+    description:
+      SAP company code identifying the legal entity that bears the allocated amount.
+  id_gl_account:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.GL_Account_Master
+    description:
+      SAP general ledger account master record that receives the allocated amount in
+      the chart of accounts.
+  id_profit_center:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Profit_Center_Master_Data
+    description:
+      SAP profit center master data assigned to the allocation line, used for
+      managerial result reporting by area of responsibility.
+  id_order_controlling:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Order_Controlling
+    description:
+      SAP Controlling internal order charged by the allocation line, used to accumulate
+      costs of a specific initiative or project.
+  id_supplier:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Supplier
+    description:
+      Supplier associated with the allocated cost when the allocation line traces back
+      to a vendor expense.
+  id_datasource:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.dim_datasource
+    description:
+      Source dataset that fed the record into the SAC planning model, distinguishing
+      actual postings imported from S/4HANA from amounts entered during planning.
+  version:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Version
+    description:
+      SAC planning version of the record, such as actual, budget, or forecast,
+      determining which planning scenario the allocation line belongs to.
+  accounting_group:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Accounting_Group
+    description:
+      Accounting grouping that classifies the allocated amount within the
+      controllership chart of accounts for aggregated reporting.
+  pnl:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.PnL
+    description:
+      Profit and loss line that the allocated amount rolls up to in the managerial
+      income statement.
+  functional_area:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Functional_Area
+    description:
+      SAP functional area classifying the allocated cost by business function, such as
+      sales, administration, or operations.
+  business:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Business
+    description:
+      Business unit dimension the allocation line is attributed to, used to split
+      allocated costs across QuintoAndar business lines.
+  fsc:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.FSC
+    description:
+      FSC dimension member assigned to the allocation line in the SAC planning model.
+  rdo:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.RDO
+    description:
+      RDO dimension member assigned to the allocation line in the SAC planning model.
+  target_allocation:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.F_TARGET_ALLOCATION
+    description:
+      Target side of the allocation, identifying the dimension combination that
+      receives the distributed amount.
+  source_allocation:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.F_SOURCE_ALLOCATION
+    description:
+      Source side of the allocation, identifying the dimension combination whose amount
+      is being distributed.
+  value_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_VALUE
+    description:
+      Monetary amount allocated to the target dimension combination on this line, in
+      the planning model currency.
+  driver_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_DRIVER
+    description:
+      Driver quantity used as the distribution basis for this allocation line, such as
+      headcount or square meters, before any proportional calculation.
+  driver_allocation_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_DRIVER_ALLOCATION
+    description:
+      Driver quantity resolved at allocation level, representing the share of the total
+      driver attributed to this allocation line.
+  driver_l3d_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_DRIVER_L3D
+    description:
+      Driver quantity resolved at L3D dimension level, used when the allocation is
+      distributed across L3D members.
+  driver_business_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_DRIVER_BUSINESS
+    description:
+      Driver quantity resolved at business unit level, used when the allocation is
+      distributed across business lines.
+  temp_value_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_TEMP_VALUE
+    description:
+      Intermediate allocated amount held by the planning model between allocation
+      steps, not a final allocation result.
+  temp_driver_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_TEMP_DRIVER
+    description:
+      Intermediate driver quantity held by the planning model between allocation steps,
+      not a final driver value.
+  hsl_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_HSL
+    description:
+      Allocated amount expressed in the company code local currency, following the SAP
+      HSL convention.
+  ml1_amount:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.K_ML1
+    description:
+      ML1 measure of the allocation line as calculated by the SAC planning model.
+  dt_allocation:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.Date
+    description:
+      Planning period date the allocation line refers to, used to align allocated costs
+      with the corresponding accounting month.
+  year:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.year
+    description: Year partition derived from the ingestion date for incremental loading.
+  month:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.month
+    description: Month partition derived from the ingestion date for incremental loading.
+  day:
+    lineage:
+      - datalake_sap_analytics_cloud_raw.allocations.day
+    description: Day partition derived from the ingestion date for incremental loading.
