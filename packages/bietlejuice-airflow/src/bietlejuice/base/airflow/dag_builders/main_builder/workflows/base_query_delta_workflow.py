@@ -73,7 +73,10 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
                 "bucket_config_name", "datalake_bucket"
             )
         bucket = self.config_service.get_config(bucket_config)
-        dag_execution_context = self._get_dag_execution_context(dag, bucket)
+        load_start_date, load_end_date = self._initialize_load_start_and_end_date()
+        dag_execution_context = self._get_dag_execution_context(
+            dag, bucket, load_start_date=load_start_date, load_end_date=load_end_date
+        )
         self._initialize_task_creators(dag_execution_context)
 
         tables = self._get_tables()
