@@ -1,0 +1,72 @@
+---
+database_name: datalake_search
+table_name: concierge_tof_lpv_events
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Incremental event-level listing-page-view cut for concierge top-of-funnel
+  targeting and downstream Shared/Retargeting ads eligibility. The table has
+  one row per listing-page-view event and refreshes the current and previous
+  event dates hourly. Retains a rolling 90 days of event dates; older event
+  dates are dropped.
+columns:
+  id_event:
+    description: Unique identifier of the listing-page-view event.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_event
+  id_user:
+    description: Application user identifier associated with the listing view.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_user
+  id_person:
+    description: Person identifier carried by the listing view when available.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_person
+  id_device:
+    description: Anonymous device identifier carried by the listing view when available.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_anonymous
+  id_house:
+    description: House identifier extracted from the listing event payload.
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+  business_context:
+    description: Business context carried by the listing-page-view event.
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+  utm_source:
+    description: |
+      Resolved UTM source for the listing-page-view event, falling back from
+      the event payload to the Event Gateway UTM source.
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_cdp_clean.user_tracking.egw_utm_source
+  utm_medium:
+    description: |
+      Resolved UTM medium for the listing-page-view event, falling back from
+      the event payload to the Event Gateway UTM medium.
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_cdp_clean.user_tracking.egw_utm_medium
+  dt_event:
+    description: Calendar date on which the listing-page-view event occurred.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  ts_event:
+    description: Timestamp when the listing-page-view event occurred.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  ts_load:
+    description: Timestamp when the listing-page-view event row was refreshed.
+  year:
+    description: Listing-page-view event year partition.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  month:
+    description: Listing-page-view event month partition.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  day:
+    description: Listing-page-view event day partition.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
