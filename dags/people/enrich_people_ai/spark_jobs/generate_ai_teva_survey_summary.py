@@ -250,6 +250,36 @@ def _generate_summary(row: dict, client: LiteLLMClient) -> Optional[dict]:
     return result
 
 
+def _collect_generated_summaries(pending_rows: list, client: LiteLLMClient) -> list:
+    """Call LiteLLM for each pending invite and keep parseable summaries.
+
+    LiteLLM HTTP/runtime failures propagate so the Spark job fails instead of
+    writing nothing and exiting 0. Unparseable model text is skipped per row;
+    if every pending row is skipped, this raises so Airflow still fails.
+
+    Args:
+        pending_rows: Input dicts, typically from ``teva_survey_inputs``.
+        client: Shared :class:`LiteLLMClient` instance.
+
+    Returns:
+        Non-empty list of output rows matching the Spark schema.
+
+    Raises:
+        RuntimeError: From :func:`_generate_summary` / :meth:`LiteLLMClient.complete`,
+            or when no pending row produced a parseable summary.
+    """
+    generated = []
+    for row in pending_rows:
+        result = _generate_summary(row, client)
+        if result:
+            generated.append(result)
+    if not generated:
+        raise RuntimeError(
+            "LiteLLM produced no parseable AI Teva summaries for this run."
+        )
+    return generated
+
+
 def parse_args() -> dict:
     """Parse CLI arguments for the standard bietlejuice Spark job entrypoint.
 
@@ -285,12 +315,12 @@ def main() -> None:
 
     Resolves the enrich write target from job args, anti-joins inputs against existing
     ``survey_invite_id`` values in the target table (or limits rows on first create),
-    invokes :func:`_generate_summary` for each pending row, and loads results with
-    :class:`DeltaLoader` merged on ``survey_invite_id``.
+    invokes :func:`_collect_generated_summaries` for each pending row, and loads
+    results with :class:`DeltaLoader` merged on ``survey_invite_id``.
 
-    Exits early without writing when there are no pending rows or every LiteLLM call
-    fails JSON parsing. Does not raise when individual rows fail parsing or when the
-    HTTP client exhausts retries for a single invite; those rows are skipped and logged.
+    Exits without writing when there are no pending rows. LiteLLM HTTP failures
+    fail the job. Unparseable model output is skipped per row; if that leaves
+    nothing to write, the job raises instead of succeeding with no table.
     """
     job_args = parse_args()
     db_info = DatalakeMetastoreService.get_db_info(
@@ -326,23 +356,7 @@ def main() -> None:
         return
 
     client = LiteLLMClient()
-    generated = []
-    for row in pending_rows:
-        try:
-            result = _generate_summary(row, client)
-        except RuntimeError as exc:
-            logger.warning(
-                "m=main, survey_invite_id=%s, msg=LiteLLM call failed, skipping row, error=%s",
-                row.get("survey_invite_id"),
-                exc,
-            )
-            continue
-        if result:
-            generated.append(result)
-
-    if not generated:
-        logger.info("LiteLLM produced no parseable AI Teva summaries for this run.")
-        return
+    generated = _collect_generated_summaries(pending_rows, client)
 
     output_schema = StructType(
         [

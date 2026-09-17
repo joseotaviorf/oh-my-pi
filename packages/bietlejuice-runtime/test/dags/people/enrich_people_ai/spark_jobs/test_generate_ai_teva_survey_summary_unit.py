@@ -14,6 +14,7 @@ _IMPORT_TIME_MOCKS = {
 with patch.dict(sys.modules, _IMPORT_TIME_MOCKS):
     from dags.people.enrich_people_ai.spark_jobs.generate_ai_teva_survey_summary import (  # noqa: E402
         _build_teva_prompt,
+        _collect_generated_summaries,
         _extract_json_object,
         _generate_summary,
         _survey_data_payload,
@@ -104,6 +105,40 @@ class TestGenerateSummary(unittest.TestCase):
         self.assertEqual(result["ai_executive_summary"], "Overall positive.")
         self.assertEqual(result["ai_pillar_trust_and_relationships"], "High trust.")
         self.assertIn("ts_ai_summary_generated", result)
+
+
+class TestCollectGeneratedSummaries(unittest.TestCase):
+    def test_propagates_litellm_runtime_error(self):
+        """DBP-2138: a LiteLLM HTTP failure must fail the job, not skip the row."""
+        client = MagicMock()
+        client.complete.side_effect = RuntimeError(
+            "LiteLLM request failed: HTTP Error 404: Not Found"
+        )
+        with self.assertRaisesRegex(RuntimeError, "HTTP Error 404"):
+            _collect_generated_summaries([SAMPLE_ROW], client)
+
+    def test_raises_when_every_row_is_unparseable(self):
+        client = MagicMock()
+        client.complete.return_value = "not json at all"
+        with self.assertRaises(RuntimeError) as ctx:
+            _collect_generated_summaries([SAMPLE_ROW], client)
+        self.assertIn("no parseable AI Teva summaries", str(ctx.exception))
+
+    def test_keeps_parseable_rows(self):
+        client = MagicMock()
+        client.complete.return_value = json.dumps(
+            {
+                "executive_summary": "Overall positive.",
+                "pillar_strategy_and_goals": "Aligned priorities.",
+                "pillar_roles_and_accountabilities": "Clear roles.",
+                "pillar_protocols_and_ways_of_working": "Fast decisions.",
+                "pillar_trust_and_relationships": "High trust.",
+                "additional_comments_summary": "No new themes.",
+            }
+        )
+        generated = _collect_generated_summaries([SAMPLE_ROW], client)
+        self.assertEqual(len(generated), 1)
+        self.assertEqual(generated[0]["ai_executive_summary"], "Overall positive.")
 
 
 if __name__ == "__main__":

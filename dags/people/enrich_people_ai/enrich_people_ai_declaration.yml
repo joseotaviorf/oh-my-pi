@@ -11,6 +11,10 @@ dag:
 
       Current scope: Teva survey pillar summaries (`ai_teva_survey_summary`),
       reading `datalake_people.teva_survey_inputs` from `enrich_people`.
+      The Spark job calls gpt-oss-20b through LiteLLM on Bedrock
+      (`bedrock/converse/us.openai.gpt-oss-20b-1:0`), the AWS-hosted equivalent
+      of Databricks `databricks-gpt-oss-20b`. Do not use `openai/gpt-oss-20b`:
+      that prefix routes to OpenAI Chat Completions and 404s.
 
       `ai_teva_survey_summary` uses extraction_type full with merge on survey_invite_id;
       the Spark job skips invites that already exist in the target table and caps LiteLLM

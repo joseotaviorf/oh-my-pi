@@ -16,20 +16,29 @@ from urllib import error, request
 from bietlejuice.base.spark import BaseDBUtils
 
 DEFAULT_BASE_URL = "https://litellm.apps.shared-prd.habitat.zone/v1"
-DEFAULT_MODEL = "openai/gpt-oss-20b"
+# Databricks notebooks used ai_query('databricks-gpt-oss-20b'). The LiteLLM
+# equivalent is AWS Bedrock gpt-oss-20b via Converse, not OpenAI Chat Completions.
+# `openai/gpt-oss-20b` is a pass-through to api.openai.com and 404s (model_not_found).
+# `us.openai.gpt-oss-20b-1:0` is the US cross-region inference profile (DBP-2042).
+DEFAULT_MODEL = "bedrock/converse/us.openai.gpt-oss-20b-1:0"
 DEFAULT_SECRET_SCOPE = "people"
 DEFAULT_SECRET_KEY = "PEOPLE_DATA_LITELLM_KEY"
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_TIMEOUT_SECONDS = 120
 DEFAULT_MAX_TOKENS = 4096
+# Match the Datahub LiteLLM client: retry rate limits and gateway failures only.
+_RETRYABLE_HTTP_STATUS = frozenset({429, 502, 503, 504})
+_HTTP_ERROR_BODY_MAX_CHARS = 500
 
 
 class LiteLLMClient:
     """OpenAI-compatible chat client for the internal LiteLLM proxy.
 
     Sends JSON POST requests to ``{base_url}/chat/completions`` with bearer auth,
-    fixed low temperature (0.2), and configurable ``max_tokens``. Retries transient
-    network and HTTP failures with exponential backoff capped at 10 seconds.
+    fixed low temperature (0.2), and configurable ``max_tokens``. Retries only
+    transient failures (429, 502, 503, 504, network, timeout, invalid JSON) with
+    exponential backoff capped at 10 seconds. Non-transient HTTP errors such as
+    404 are raised immediately so a misconfigured model cannot look like success.
     """
 
     def __init__(
@@ -53,7 +62,8 @@ class LiteLLMClient:
         Args:
             base_url: LiteLLM root URL without trailing slash; defaults to production
                 shared gateway unless ``LITELLM_BASE_URL`` is set.
-            model: Model id passed in the JSON body (e.g. ``openai/gpt-oss-20b``).
+            model: Model id passed in the JSON body (e.g.
+                ``bedrock/converse/us.openai.gpt-oss-20b-1:0``).
             api_key: Bearer token; when ``None``, loaded from Databricks secrets.
             secret_scope: Databricks secret scope name for API key lookup.
             secret_key: Secret key name within ``secret_scope``.
@@ -90,7 +100,8 @@ class LiteLLMClient:
             Non-empty assistant content string from the first choice.
 
         Raises:
-            RuntimeError: When the HTTP layer fails after all retries, the response
+            RuntimeError: When the HTTP layer fails (non-retryable errors fail
+                immediately; retryable errors fail after all retries), the response
                 has no ``choices``, or the first choice has no ``message.content``.
         """
         messages = []
@@ -124,8 +135,9 @@ class LiteLLMClient:
             Parsed JSON response as a dict.
 
         Raises:
-            RuntimeError: After ``max_retries`` failed attempts due to HTTP errors,
-                network errors, timeouts, or invalid JSON in the response body.
+            RuntimeError: On a non-retryable HTTP error, or after ``max_retries``
+                failed attempts due to retryable HTTP errors, network errors,
+                timeouts, or invalid JSON in the response body.
         """
         body = json.dumps(payload).encode("utf-8")
         headers = {
@@ -146,9 +158,40 @@ class LiteLLMClient:
                 json.JSONDecodeError,
             ) as exc:
                 last_error = exc
-                if attempt >= self.max_retries:
+                if not _is_retryable(exc) or attempt >= self.max_retries:
                     break
                 time.sleep(min(2**attempt, 10))
-        raise RuntimeError(
-            f"LiteLLM request failed after {self.max_retries} attempts: {last_error}"
-        )
+        raise RuntimeError(_format_request_failure(self.max_retries, last_error))
+
+
+def _is_retryable(exc: Exception) -> bool:
+    """Return True when the failure is worth retrying (rate limit, gateway, network)."""
+    if isinstance(exc, error.HTTPError):
+        return exc.code in _RETRYABLE_HTTP_STATUS
+    return isinstance(exc, (error.URLError, TimeoutError, json.JSONDecodeError))
+
+
+def _http_error_detail(exc: error.HTTPError) -> str:
+    """Include status, reason, and a truncated response body for Airflow logs."""
+    body = ""
+    try:
+        raw = exc.read()
+        if raw:
+            body = raw.decode("utf-8", errors="replace").strip()
+    except Exception:
+        body = ""
+    if len(body) > _HTTP_ERROR_BODY_MAX_CHARS:
+        body = body[:_HTTP_ERROR_BODY_MAX_CHARS] + "..."
+    detail = f"HTTP Error {exc.code}: {exc.reason}"
+    if body:
+        return f"{detail}: {body}"
+    return detail
+
+
+def _format_request_failure(max_retries: int, last_error: Optional[Exception]) -> str:
+    if isinstance(last_error, error.HTTPError):
+        detail = _http_error_detail(last_error)
+        if last_error.code in _RETRYABLE_HTTP_STATUS:
+            return f"LiteLLM request failed after {max_retries} attempts: {detail}"
+        return f"LiteLLM request failed: {detail}"
+    return f"LiteLLM request failed after {max_retries} attempts: {last_error}"
