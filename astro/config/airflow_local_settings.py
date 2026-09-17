@@ -200,7 +200,7 @@ def _declaration_prewarm_timeout(timeout_s: float | None) -> float:
 def _warm_dag_declarations(
     timeout_s: float | None = None,
 ) -> tuple[str, int, int, float]:
-    """Warm mtime-keyed declarations within a soft cumulative time budget.
+    """Warm content-hash-keyed declarations within a soft cumulative time budget.
 
     The budget is checked between local-file parses; it intentionally does not
     interrupt an in-flight YAML/Cerberus call because asynchronous interruption

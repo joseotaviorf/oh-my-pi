@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.caching import PARSE_CACHE_MAXSIZE
 from bietlejuice.base.db.datalake_metastore_mapping import apply_naming_convention
 from bietlejuice.base.paths import DAG_PACKAGES_ROOT, DATALAKE_METADATA_PATH
 from bietlejuice.base.pipeline import LayerEnum
@@ -317,7 +318,7 @@ class DAGMetadataService:
     METADATA_MANIFEST_FILENAME = ".metadata_manifest"
 
     @staticmethod
-    @lru_cache(maxsize=1024)
+    @lru_cache(maxsize=PARSE_CACHE_MAXSIZE)
     def list_metadata_table_paths(dag_name: str, layer: str) -> Set[str]:
         """
         Returns set of relative paths (without ext) for tables that have metadata files.

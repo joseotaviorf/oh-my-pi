@@ -1,5 +1,5 @@
+import hashlib
 from functools import lru_cache
-from os import stat
 from typing import Optional, Tuple
 
 from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_cluster_validator import (
@@ -8,6 +8,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_clus
 from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
     DAGDeclarationValidator,
 )
+from bietlejuice.base.caching import PARSE_CACHE_MAXSIZE
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.file_service import FileService
 
@@ -38,31 +39,41 @@ def resolve_validation_block(
     return raw_declaration.get("validation")
 
 
-def _file_mtime_ns(file_path: Optional[str]) -> Optional[int]:
+def _file_content_hash(file_path: Optional[str]) -> Optional[str]:
+    """Digest a declaration/cluster file for cache keying.
+
+    Content, not mtime: ``rsync -a`` preserves timestamps, so a DAG-only deploy
+    can change a declaration without moving its mtime, and an unrelated touch
+    can move the mtime without changing the declaration.
+
+    Returns None when the file is missing or unreadable, so the caller keeps the
+    parser's existing FileNotFoundError/error-message path.
+    """
     if file_path is None:
         return None
     try:
-        return stat(file_path).st_mtime_ns
+        with open(file_path, "rb") as stream:
+            return hashlib.sha256(stream.read()).hexdigest()
     except OSError:
-        # Preserve the parser's existing FileNotFoundError/error message path.
         return None
 
 
-@lru_cache(maxsize=1024)
+@lru_cache(maxsize=PARSE_CACHE_MAXSIZE)
 def _parse_dag_declaration_cached(
     dag_name: str,
     dag_declaration_file_path: str,
-    declaration_mtime_ns: Optional[int],
+    declaration_content_hash: Optional[str],
     dag_cluster_file_path: Optional[str],
-    cluster_mtime_ns: Optional[int],
+    cluster_content_hash: Optional[str],
 ) -> dict:
-    """Parse one declaration, keyed by both paths and modification times.
+    """Parse one declaration, keyed by both paths and content digests.
 
-    The mtime arguments are intentionally unused by the body: they form the
+    The hash arguments are intentionally unused by the body: they form the
     cache key so a dags-only deployment invalidates manager-prewarmed values
-    without requiring the dag-processor to restart.
+    without requiring the dag-processor to restart. A timestamp-only change no
+    longer forces a re-parse.
     """
-    del declaration_mtime_ns, cluster_mtime_ns
+    del declaration_content_hash, cluster_content_hash
     expected_cluster_path = DAGPackagesPathService.generate_artifact_file_path(
         artifact_type="dag_cluster", dag_name=dag_name, add_default_ext=False
     )
@@ -110,14 +121,14 @@ def _parse_dag_declaration(dag_name: str) -> dict:
     dag_cluster_file_path = DAGPackagesPathService.resolve_artifact_file_path(
         artifact_type="dag_cluster", dag_name=dag_name
     )
-    declaration_mtime_ns = _file_mtime_ns(dag_declaration_file_path)
-    cluster_mtime_ns = _file_mtime_ns(dag_cluster_file_path)
+    declaration_content_hash = _file_content_hash(dag_declaration_file_path)
+    cluster_content_hash = _file_content_hash(dag_cluster_file_path)
     return _parse_dag_declaration_cached(
         dag_name,
         dag_declaration_file_path,
-        declaration_mtime_ns,
+        declaration_content_hash,
         dag_cluster_file_path,
-        cluster_mtime_ns,
+        cluster_content_hash,
     )
 
 

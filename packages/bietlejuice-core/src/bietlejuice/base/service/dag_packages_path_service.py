@@ -8,6 +8,7 @@ from typing import Dict, Optional, Set
 
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
 
+from bietlejuice.base.caching import PARSE_CACHE_MAXSIZE
 from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT, DAG_PACKAGES_ROOT
 
 _LOG = logging.getLogger(__name__)
@@ -354,7 +355,7 @@ class DAGPackagesPathService:
         return intermediate_path
 
     @staticmethod
-    @lru_cache(maxsize=1024)
+    @lru_cache(maxsize=PARSE_CACHE_MAXSIZE)
     def get_dag_path(dag_name: str) -> str:
         """
         Gets the DAG's full path.
@@ -486,7 +487,7 @@ class DAGPackagesPathService:
     QUERY_MANIFEST_FILENAME = ".table_manifest"
 
     @staticmethod
-    @lru_cache(maxsize=1024)
+    @lru_cache(maxsize=PARSE_CACHE_MAXSIZE)
     def list_queries_files_in_composer(
         dag_name: str, layer: str, intermediate_path: str = ""
     ) -> tuple:
@@ -635,7 +636,7 @@ class DAGPackagesPathService:
     DATA_QUALITY_MANIFEST_FILENAME = ".data_quality_manifest"
 
     @staticmethod
-    @lru_cache(maxsize=1024)
+    @lru_cache(maxsize=PARSE_CACHE_MAXSIZE)
     def list_data_quality_table_paths_in_composer(dag_name: str, layer: str) -> set:
         """
         Returns set of relative paths (without ext) for tables that have data quality files.

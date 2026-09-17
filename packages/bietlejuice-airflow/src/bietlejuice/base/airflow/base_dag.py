@@ -8,6 +8,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.documentation import COMPOSER_DOCUMENTATION_PATH
 from bietlejuice.base.airflow.documentation.cron_descriptor import CronDescriptor
 from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
+from bietlejuice.base.caching import PARSE_CACHE_MAXSIZE
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
@@ -19,7 +20,7 @@ logger = QuintoAndarLogger("BaseDAG")
 
 class BaseDAG:
     @staticmethod
-    @lru_cache(maxsize=1024)
+    @lru_cache(maxsize=PARSE_CACHE_MAXSIZE)
     def get_dag_doc(dag_name, template_path=None):
         """
         :param dag_name: dag_name or tree_path to your doc.
