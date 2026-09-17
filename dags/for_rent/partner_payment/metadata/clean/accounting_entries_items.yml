@@ -1,0 +1,44 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: accounting_entries_items
+description: |
+  This table contains the detailed accounting entries items that compose the accounting entry to send to SAP.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.id
+    description: "ID of the table, it’s the primary key."
+  id_accounting_entry:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.accounting_entry_id
+    description: The id of the accounting entry of the record.
+  id_source:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.source_id
+    description: The id of the item in the origin table.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.version
+    description: Optimistic locking revision counter for concurrent update safety.
+  source:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.source
+    description: The name of the table that is the origin of the item, such as an operation (inspection / photo session), an additional, a jira ticket, etc.
+  amount:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.amount
+    description: The amount that entry accounts for.
+  currency:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.currency
+    description: The currency of the amount.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.created_at
+    description: Timestamp of the record creation action.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries_items.updated_at
+    description: Timestamp of the record update action.

@@ -1,0 +1,60 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: accounting_entries
+description: |
+  This table contains the aggregated accounting entries that are transmitted to SAP that divide the payment into rules, which are translated to cost centers in SAP.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.id
+    description: "ID of the table, it’s the primary key."
+  id_entry:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.entry_id
+    description: The unique id of the entry to send to SAP.
+  id_city:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.city_id
+    description: Identifier of the city associated with the accounting entry.
+  id_bill:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.bill_id
+    description: The id of the bill related to that record.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.version
+    description: Optimistic locking revision counter for concurrent update safety.
+  rule:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.rule
+    description: The rule referring to that entry, that will derive the cost center.
+  amount:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.amount
+    description: The amount that entry accounts for.
+  currency:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.currency
+    description: The currency of the amount.
+  original_amount:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.original_amount
+    description: The original amount before rebalancing, negative values are rebalanced into positive ones.
+  business_source:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.business_source
+    description: Indicates the business source of the entry.
+  accrual_year_month:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.accrual_year_month
+    description: The month of reference of the entry.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.created_at
+    description: Timestamp of the record creation action.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.accounting_entries.updated_at
+    description: Timestamp of the record update action.

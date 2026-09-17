@@ -37,3 +37,7 @@ workflow:
       clean_table_name: company_contract_type
     sap_audit_response:
       clean_table_name: sap_audit_response
+    accounting_entries:
+      clean_table_name: accounting_entries
+    accounting_entries_items:
+      clean_table_name: accounting_entries_items
