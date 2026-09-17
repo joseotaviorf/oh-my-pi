@@ -152,13 +152,16 @@ def sync_metastore_table_structure(
         f"table_name={table_name}, all_tables_flag={all_tables_flag}, "
         "msg=Job execution started."
     )
+    metastore_kwargs = {}
+    if layer == "transformation":
+        metastore_kwargs["transformation_grade"] = transformation_grade
     spark_ms = SparkMetastoreHelper(
         bucket,
         layer,
         schema,
         table_name,
         all_tables_flag,
-        transformation_grade=transformation_grade,
+        **metastore_kwargs,
     )
     spark_ms.validate_table_arguments()
 
@@ -201,13 +204,16 @@ def sync_metastore_table_partitions(
         "msg=Job execution started."
     )
 
+    metastore_kwargs = {}
+    if layer == "transformation":
+        metastore_kwargs["transformation_grade"] = transformation_grade
     spark_ms = SparkMetastoreHelper(
         bucket,
         layer,
         schema,
         table_name,
         all_tables_flag,
-        transformation_grade=transformation_grade,
+        **metastore_kwargs,
     )
     spark_ms.validate_table_arguments()
 
@@ -266,13 +272,16 @@ def sync_metastore_table_partitions_incremental(
         f"table_name={table_name}, partition_values={partition_values}, "
         "msg=Incremental partition sync started."
     )
+    metastore_kwargs = {}
+    if layer == "transformation":
+        metastore_kwargs["transformation_grade"] = transformation_grade
     spark_ms = SparkMetastoreHelper(
         bucket,
         layer,
         schema,
         table_name,
         False,
-        transformation_grade=transformation_grade,
+        **metastore_kwargs,
     )
     spark_ms.validate_table_arguments()
 

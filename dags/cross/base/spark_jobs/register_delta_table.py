@@ -93,13 +93,16 @@ if __name__ == "__main__":
     schema = args.schema
     table_name = args.table_name
 
+    metastore_kwargs = {}
+    if layer == "transformation":
+        metastore_kwargs["transformation_grade"] = args.transformation_grade
     spark_ms = SparkMetastoreHelper(
         bucket,
         layer,
         schema,
         table_name,
         all_tables=False,
-        transformation_grade=args.transformation_grade,
+        **metastore_kwargs,
     )
 
     trino_client = get_trino_client()

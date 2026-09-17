@@ -58,13 +58,16 @@ def main():
         ),
     )
 
+    metastore_kwargs = {}
+    if args.layer == "transformation":
+        metastore_kwargs["transformation_grade"] = args.transformation_grade
     spark_ms = SparkMetastoreHelper(
         args.bucket,
         args.layer,
         args.database_base_name,
         args.table_name,
         all_tables=False,
-        transformation_grade=args.transformation_grade,
+        **metastore_kwargs,
     )
     database_name = spark_ms.spark_database_name
     database_location = spark_ms.database_location.replace("s3a://", "s3://")

@@ -52,7 +52,20 @@ BASE_ARGV = [
 
 
 class TestSyncMetastoreTablePartitionsIncremental:
-    def test_adds_given_partitions_without_enumeration(self):
+    @pytest.mark.parametrize(
+        ("layer", "transformation_grade", "expected_kwargs"),
+        [
+            ("raw", None, {}),
+            (
+                "transformation",
+                "curated",
+                {"transformation_grade": "curated"},
+            ),
+        ],
+    )
+    def test_adds_given_partitions_without_enumeration(
+        self, layer, transformation_grade, expected_kwargs
+    ):
         partition_values = [["2026", "7", "3"]]
         with (
             patch.object(sync_metadata, "SparkMetastoreHelper") as helper_cls,
@@ -67,16 +80,21 @@ class TestSyncMetastoreTablePartitionsIncremental:
             helper.spark_database_name = "datalake_emlio_raw"
 
             sync_metadata.sync_metastore_table_partitions_incremental(
-                "test-bucket", "raw", "emlio", "emlio_logs", partition_values
+                "test-bucket",
+                layer,
+                "emlio",
+                "emlio_logs",
+                partition_values,
+                transformation_grade,
             )
 
             helper_cls.assert_called_once_with(
                 "test-bucket",
-                "raw",
+                layer,
                 "emlio",
                 "emlio_logs",
                 False,
-                transformation_grade=None,
+                **expected_kwargs,
             )
             helper.validate_table_arguments.assert_called_once()
             # No partition enumeration: the full-reconcile entry point is untouched.
