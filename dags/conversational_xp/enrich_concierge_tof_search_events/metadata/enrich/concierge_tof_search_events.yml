@@ -1,0 +1,57 @@
+---
+database_name: datalake_search
+table_name: concierge_tof_search_events
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Incremental event-level search cut for concierge top-of-funnel targeting.
+  The table has one row per search event and refreshes the current and previous
+  event dates hourly. Retains a rolling 90 days of event dates; older event
+  dates are dropped.
+columns:
+  id_event:
+    description: Unique identifier of the search event.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_event
+  id_user:
+    description: Application user identifier associated with the search event.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_user
+  id_person:
+    description: Person identifier carried by the search event when available.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_person
+  id_device:
+    description: Anonymous device identifier carried by the search event when available.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_anonymous
+  id_session:
+    description: Event Gateway session identifier extracted from the event payload.
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+  business_context:
+    description: Business context carried by the search event.
+    lineage:
+      - datalake_cdp_clean.user_tracking.event_properties
+  dt_event:
+    description: Calendar date on which the search event occurred.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  ts_event:
+    description: Timestamp when the search event occurred.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  ts_load:
+    description: Timestamp when the search event row was refreshed.
+  year:
+    description: Search event year partition.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  month:
+    description: Search event month partition.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
+  day:
+    description: Search event day partition.
+    lineage:
+      - datalake_cdp_clean.user_tracking.ts_event
