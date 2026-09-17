@@ -36,6 +36,10 @@ columns:
     description: Identifier of the tag assigned through the allocation.
     lineage:
       - datalake_allocation_tool_clean.allocations.id_tag
+  id_deactivated_by:
+    description: Allocation Tool identifier of the user who deactivated the allocation; NULL while the allocation remains active or the source did not provide an identifier.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.id_deactivated_by
   line_name:
     description: Display name of the macro group (Line) that owns the team in Resource Allocation 2.0 (e.g. For Rent). NULL when the team group has no Line in the export.
     lineage:
@@ -69,6 +73,10 @@ columns:
     description: Normalized allocation lifecycle status, with active source labels represented as active.
     lineage:
       - datalake_allocation_tool_clean.allocations.status
+  is_active:
+    description: Boolean indicating whether the allocation is active in the source application during the validity interval.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.is_active
   is_leader:
     description: Boolean indicating whether the allocation employee is marked as a leader.
     lineage:
@@ -107,6 +115,10 @@ columns:
     description: Timestamp when the allocation record was last updated.
     lineage:
       - datalake_allocation_tool_clean.allocations.ts_updated
+  ts_deactivated:
+    description: Timestamp when the source application deactivated the allocation; NULL while the allocation remains active or the source did not provide a timestamp.
+    lineage:
+      - datalake_allocation_tool_clean.allocations.ts_deactivated
   ts_version:
     description: Ordering key of the source export version that produced this state.
     lineage:

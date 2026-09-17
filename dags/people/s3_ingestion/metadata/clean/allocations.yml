@@ -32,6 +32,10 @@ columns:
     description: Allocation Tool identifier of the user who created the allocation.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].created_by_id
+  id_deactivated_by:
+    description: Allocation Tool identifier of the user who deactivated the allocation; NULL while the allocation remains active or the source did not provide an identifier.
+    lineage:
+      - datalake_allocation_tool_raw.allocation.raw_content.records[*].deactivated_by
   employee_name:
     description: Employee name captured by the Allocation Tool at the export point; not propagated beyond the clean layer.
     lineage:
@@ -64,6 +68,10 @@ columns:
     description: Allocation lifecycle status as labelled by the source application at this version.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].status
+  is_active:
+    description: Boolean indicating whether the allocation is active in the source application at this version.
+    lineage:
+      - datalake_allocation_tool_raw.allocation.raw_content.records[*].is_active
   export_type:
     description: Kind of source export this version came from. Always snapshot; downstream uses it to detect removals when an allocation is absent from a later full export.
     categories:
@@ -94,6 +102,10 @@ columns:
     description: Timestamp when the allocation record was last updated.
     lineage:
       - datalake_allocation_tool_raw.allocation.raw_content.records[*].updated_date
+  ts_deactivated:
+    description: Timestamp when the source application deactivated the allocation; NULL while the allocation remains active or the source did not provide a timestamp.
+    lineage:
+      - datalake_allocation_tool_raw.allocation.raw_content.records[*].deactivated_at
   ts_version:
     description: Ordering key of the version, taken from the export generation timestamp and falling back to the file modification timestamp when the export carries none.
     lineage:
