@@ -252,6 +252,37 @@ def test_task_failure_alert_uses_declared_task_criticality(
 
 
 @patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_task_failure_alert_tags_table_owner_when_declared(
+    mock_get_run_type, mock_airflow_variables, mock_jiraops_client, jiraops_callback
+):
+    mock_get_run_type.return_value = DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS
+    mock_client_class, mock_client_instance = mock_jiraops_client
+    context = mock_context()
+    context["params"]["owner"] = "table-owner@quintoandar.com.br"
+
+    jiraops_callback.task_failure_alert(context)
+
+    mock_client_instance.create_alert.assert_called_once()
+    _, kwargs = mock_client_instance.create_alert.call_args
+    assert kwargs["extra_properties"]["TableOwner"] == "table-owner@quintoandar.com.br"
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_task_failure_alert_omits_table_owner_when_undeclared(
+    mock_get_run_type, mock_airflow_variables, mock_jiraops_client, jiraops_callback
+):
+    mock_get_run_type.return_value = DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS
+    mock_client_class, mock_client_instance = mock_jiraops_client
+    context = mock_context()
+
+    jiraops_callback.task_failure_alert(context)
+
+    mock_client_instance.create_alert.assert_called_once()
+    _, kwargs = mock_client_instance.create_alert.call_args
+    assert "TableOwner" not in kwargs["extra_properties"]
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
 def test_dag_failure_alert_uses_dag_criticality(
     mock_get_run_type, mock_airflow_variables, mock_jiraops_client, jiraops_callback
 ):

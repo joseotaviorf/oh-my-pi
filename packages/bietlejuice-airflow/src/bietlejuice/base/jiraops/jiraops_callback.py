@@ -65,11 +65,13 @@ class JiraOpsCallback:
         self._current_dag_id = dag_id
         dag_owner = str(task_instance.task.owner)
         task_id = task_instance.task_id if include_task_id else None
+        params = context.get("params") or {}
         criticality = (
-            (context.get("params") or {}).get("criticality")
+            params.get("criticality")
             or self.dag_args.get("criticality")
             or CriticalityEnum.DEFAULT
         )
+        table_owner = params.get("owner")
         environment = Variable.get("environment")
         run_type = DatasetService._get_run_type(context)
 
@@ -91,6 +93,8 @@ class JiraOpsCallback:
                 "DAGOwner": dag_owner,
                 "Criticality": criticality,
             }
+            if table_owner:
+                extra_properties["TableOwner"] = table_owner
             tags = [dag_id, f"{alert_type} failed"]
 
             if include_task_id:

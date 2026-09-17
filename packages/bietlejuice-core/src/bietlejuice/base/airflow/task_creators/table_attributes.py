@@ -7,6 +7,8 @@ from bietlejuice.base.validation.target_resolver import (
     get_prod_database_name,
     resolve_validation_target,
 )
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
+from bietlejuice.services.file_service import FileService
 
 _VALID_COLUMN_MAPPING_MODES = {None, "none", "name", "id"}
 
@@ -43,6 +45,7 @@ class TableAttributes:
         )
         self.row_filter_function_name = self._get_row_filter_function_name()
         self.criticality = self._get_criticality()
+        self.owner = self._get_owner()
 
     @property
     def workflow_args(self) -> dict:
@@ -218,6 +221,29 @@ class TableAttributes:
             "criticality"
         )
         return CriticalityEnum.parse(declared, context=f"table {self.table_name!r}")
+
+    def _get_owner(self) -> Optional[str]:
+        """This table's own ``owner:`` from its metadata file, for auto-tagging
+        the JiraOps alert on failure (``JiraOpsCallback``) -- read once at DAG
+        build time, same as ``criticality``, rather than re-reading the YAML at
+        alert time.
+
+        Best-effort only: this is a cosmetic alert tag, not a data contract, so
+        any lookup/IO failure (metadata file missing, DAG path unresolvable in
+        a test/local context) degrades to ``None`` rather than breaking DAG
+        parsing.
+        """
+        try:
+            paths = DAGMetadataService.get_dag_metadata_file(
+                self._dag_args["name"], self.layer.value, self.table_name
+            )
+            if not paths:
+                return None
+            metadata = FileService.get_dict_from_yaml_file(paths[0])
+        except OSError:
+            return None
+        owner = metadata.get("owner") if isinstance(metadata, dict) else None
+        return owner or None
 
     def get_has_soft_delete(self) -> bool:
         """

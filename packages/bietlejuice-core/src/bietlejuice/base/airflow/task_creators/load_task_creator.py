@@ -52,6 +52,7 @@ class LoadTaskCreator(BaseTaskCreator, ABC):
                         else {}
                     ),
                     "criticality": table_attributes.criticality,
+                    "owner": table_attributes.owner,
                 }
             )
         return task

@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
@@ -610,6 +612,91 @@ class TestTableAttributes:
                 table_name=table_name,
                 table_customization=table_customization,
             )
+
+    @patch("bietlejuice.base.airflow.task_creators.table_attributes.FileService")
+    @patch("bietlejuice.base.airflow.task_creators.table_attributes.DAGMetadataService")
+    def test_owner_reads_metadata_file_owner_field(
+        self, mock_metadata_service, mock_file_service
+    ):
+        # arrange
+        mock_metadata_service.get_dag_metadata_file.return_value = [
+            "/dags/domain/dag_name/metadata/clean/table_name.yml"
+        ]
+        mock_file_service.get_dict_from_yaml_file.return_value = {
+            "owner": "someone@quintoandar.com.br"
+        }
+
+        # act
+        table_attributes = TableAttributes(
+            dag_args={"name": "dag_name"},
+            workflow_args={},
+            layer=LayerEnum.CLEAN,
+            table_name="table_name",
+        )
+
+        # assert
+        assert table_attributes.owner == "someone@quintoandar.com.br"
+        mock_metadata_service.get_dag_metadata_file.assert_called_once_with(
+            "dag_name", "clean", "table_name"
+        )
+
+    @patch("bietlejuice.base.airflow.task_creators.table_attributes.DAGMetadataService")
+    def test_owner_is_none_when_no_metadata_file_found(self, mock_metadata_service):
+        # arrange
+        mock_metadata_service.get_dag_metadata_file.return_value = []
+
+        # act
+        table_attributes = TableAttributes(
+            dag_args={"name": "dag_name"},
+            workflow_args={},
+            layer=LayerEnum.CLEAN,
+            table_name="table_name",
+        )
+
+        # assert
+        assert table_attributes.owner is None
+
+    @patch("bietlejuice.base.airflow.task_creators.table_attributes.FileService")
+    @patch("bietlejuice.base.airflow.task_creators.table_attributes.DAGMetadataService")
+    def test_owner_is_none_when_metadata_file_has_no_owner_key(
+        self, mock_metadata_service, mock_file_service
+    ):
+        # arrange
+        mock_metadata_service.get_dag_metadata_file.return_value = [
+            "/dags/domain/dag_name/metadata/clean/table_name.yml"
+        ]
+        mock_file_service.get_dict_from_yaml_file.return_value = {"description": "x"}
+
+        # act
+        table_attributes = TableAttributes(
+            dag_args={"name": "dag_name"},
+            workflow_args={},
+            layer=LayerEnum.CLEAN,
+            table_name="table_name",
+        )
+
+        # assert
+        assert table_attributes.owner is None
+
+    @patch("bietlejuice.base.airflow.task_creators.table_attributes.DAGMetadataService")
+    def test_owner_is_none_on_filesystem_error_instead_of_raising(
+        self, mock_metadata_service
+    ):
+        # arrange -- DAG path unresolvable (e.g. DAG_PACKAGES_ROOT missing, as in a bare test env)
+        mock_metadata_service.get_dag_metadata_file.side_effect = FileNotFoundError(
+            "No such file or directory"
+        )
+
+        # act
+        table_attributes = TableAttributes(
+            dag_args={"name": "dag_name"},
+            workflow_args={},
+            layer=LayerEnum.CLEAN,
+            table_name="table_name",
+        )
+
+        # assert
+        assert table_attributes.owner is None
 
 
 class TestTableAttributesTransformationGrade:
