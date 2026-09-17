@@ -1,0 +1,225 @@
+---
+database_name: datalake_aws_billed_cost
+table_name: daily_resource_billed_cost
+description: |
+  Shared CUR-derived billed cost enrich. One row per
+  (dt_usage, id_aws_account, resource_kind, id_resource, market) from
+  `cost_usage_reports.aws_costs_new`, covering AmazonEC2 BoxUsage / SpotUsage /
+  VolumeUsage and ElasticMapReduce fee lines.
+
+  `billed_cost_usd` is amortized: DiscountedUsage uses reservation_effective_cost,
+  SavingsPlanCoveredUsage uses savings_plan_savings_plan_effective_cost, else
+  line_item_unblended_cost. SavingsPlanNegation is excluded (it cancels
+  CoveredUsage). `billed_cost_usd` is gross of the enterprise discount and
+  `net_cost_usd` is net of it.
+
+  Databricks DBU is not in CUR and is not represented. Join Databricks spend on
+  `id_databricks_cluster` (never on `tag_provisioner`).
+
+  EMR EC2/EBS identity comes from cost-allocation tags
+  (`resource_tags_aws_elasticmapreduce_job_flow_id`, `resource_tags_user_dag_id`);
+  `id_emr_cluster` prefers the job-flow tag and falls back to fee-line ARN regexp.
+
+  Partitioned by dt_usage. Each DAG run overwrites the last 35 partitions so
+  AWS restatements of closed billing periods land automatically. Always filter
+  on dt_usage for partition pruning.
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  sk_resource_billed_cost:
+    description: |
+      Surrogate key XXHASH64 over (dt_usage, id_aws_account, resource_kind,
+      id_resource, market) — the table grain.
+  id_aws_account:
+    description: AWS usage account id (12-digit) that incurred the line.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_usage_account_id
+  resource_kind:
+    description: |
+      Resource class derived from product + resource id:
+      `ec2_instance` (i-…), `ebs_volume` (vol-…), `emr_fee` (ElasticMapReduce
+      cluster ARN), or `other`.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_product_code
+      - cost_usage_reports.aws_costs_new.line_item_resource_id
+  id_resource:
+    description: |
+      CUR resource id: EC2 instance id (`i-…`), EBS volume id (`vol-…`), or
+      EMR cluster ARN for fee lines.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_resource_id
+  id_databricks_cluster:
+    description: |
+      Databricks cluster id from `resource_tags_user_cluster_id` when
+      `resource_tags_user_vendor = 'Databricks'`. Null otherwise. Join Databricks
+      spend on this column, never on tag_provisioner.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_cluster_id
+      - cost_usage_reports.aws_costs_new.resource_tags_user_vendor
+  id_emr_cluster:
+    description: |
+      EMR cluster id (`j-…`). Prefers cost-allocation tag
+      `aws:elasticmapreduce:job-flow-id`; falls back to regexp on ElasticMapReduce
+      fee-line ARNs. Null when neither is present.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_aws_elasticmapreduce_job_flow_id
+      - cost_usage_reports.aws_costs_new.line_item_resource_id
+      - cost_usage_reports.aws_costs_new.line_item_product_code
+  market:
+    description: |
+      EC2 purchase market from usage type: `spot` (`%SpotUsage%`), `on_demand`
+      (`%BoxUsage%`), or `not_applicable` (EBS / EMR fee / other).
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_usage_type
+  instance_type:
+    description: EC2 instance type when present on the CUR row (null for EBS / fees).
+    lineage:
+      - cost_usage_reports.aws_costs_new.product_instance_type
+  instance_role:
+    description: |
+      EMR instance-group role from cost-allocation tag
+      `aws:elasticmapreduce:instance-group-role` (`MASTER` / `CORE` / `TASK`).
+      Null on non-EMR rows.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_aws_elasticmapreduce_instance_group_role
+  product_code:
+    description: AWS product code (`AmazonEC2` or `ElasticMapReduce`).
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_product_code
+  usage_amount:
+    description: Sum of CUR `line_item_usage_amount` across all included usage types (hours or GB).
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_usage_amount
+  usage_hours:
+    description: |
+      Instance-hours only: `line_item_usage_amount` gated on BoxUsage / SpotUsage
+      so DataTransfer gigabytes are not mixed in.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_usage_amount
+      - cost_usage_reports.aws_costs_new.line_item_usage_type
+  billed_cost_usd:
+    description: |
+      Amortized USD: reservation_effective_cost on DiscountedUsage,
+      savings_plan_savings_plan_effective_cost on SavingsPlanCoveredUsage,
+      else line_item_unblended_cost. Gross of the enterprise discount.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_unblended_cost
+      - cost_usage_reports.aws_costs_new.reservation_effective_cost
+      - cost_usage_reports.aws_costs_new.savings_plan_savings_plan_effective_cost
+      - cost_usage_reports.aws_costs_new.line_item_line_item_type
+  net_cost_usd:
+    description: |
+      Enterprise-discounted amortized USD: reservation_net_effective_cost on
+      DiscountedUsage, savings_plan_net_savings_plan_effective_cost on
+      SavingsPlanCoveredUsage, else line_item_net_unblended_cost (with gross
+      fallbacks via COALESCE). Net of enterprise discount.
+    lineage:
+      - cost_usage_reports.aws_costs_new.reservation_net_effective_cost
+      - cost_usage_reports.aws_costs_new.savings_plan_net_savings_plan_effective_cost
+      - cost_usage_reports.aws_costs_new.line_item_net_unblended_cost
+      - cost_usage_reports.aws_costs_new.reservation_effective_cost
+      - cost_usage_reports.aws_costs_new.savings_plan_savings_plan_effective_cost
+      - cost_usage_reports.aws_costs_new.line_item_unblended_cost
+      - cost_usage_reports.aws_costs_new.line_item_line_item_type
+  discount_usd:
+    description: |
+      Enterprise discount amount in USD: billed_cost_usd minus net_cost_usd.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_unblended_cost
+      - cost_usage_reports.aws_costs_new.reservation_effective_cost
+      - cost_usage_reports.aws_costs_new.savings_plan_savings_plan_effective_cost
+      - cost_usage_reports.aws_costs_new.reservation_net_effective_cost
+      - cost_usage_reports.aws_costs_new.savings_plan_net_savings_plan_effective_cost
+      - cost_usage_reports.aws_costs_new.line_item_net_unblended_cost
+      - cost_usage_reports.aws_costs_new.line_item_line_item_type
+  gross_cost_usd:
+    description: Sum of `line_item_unblended_cost` (zero on DiscountedUsage; audit vs billed).
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_unblended_cost
+  public_on_demand_cost_usd:
+    description: Sum of CUR public on-demand list cost for the same lines.
+    lineage:
+      - cost_usage_reports.aws_costs_new.pricing_public_on_demand_cost
+  is_ri_covered:
+    description: True when any contributing line is DiscountedUsage (RI).
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_line_item_type
+  is_sp_covered:
+    description: True when any contributing line is SavingsPlanCoveredUsage.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_line_item_type
+  tag_job_flow_id:
+    description: |
+      Cost-allocation tag `aws:elasticmapreduce:job-flow-id` (`j-…`). Null on
+      non-EMR rows. Grain-safe per id_resource per day.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_aws_elasticmapreduce_job_flow_id
+  tag_dag_id:
+    description: |
+      User cost-allocation tag `dag_id`. Present on EMR and Databricks clusters
+      that apply `cluster_custom_tags`. Null otherwise.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_dag_id
+  tag_vendor:
+    description: User cost-allocation tag `vendor` (e.g. Databricks).
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_vendor
+  tag_provisioner:
+    description: User cost-allocation tag `provisioner`. Empty on ~37% of Databricks spend.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_provisioner
+  tag_app:
+    description: User cost-allocation tag `app`.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_app
+  tag_owner:
+    description: User cost-allocation tag `owner`.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_owner
+  tag_environment:
+    description: User cost-allocation tag `environment`.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_environment
+  tag_ecosystem:
+    description: User cost-allocation tag `ecosystem`.
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_ecosystem
+  tag_cost_center:
+    description: |
+      User cost-allocation tag `cost_center`. Empty string coerced to NULL.
+      NULL before 2026-09-01 (cost-allocation-tag activation).
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_cost_center
+  tag_data_classification:
+    description: |
+      User cost-allocation tag `data_classification`. Empty string coerced to NULL.
+      NULL before 2026-09-01 (cost-allocation-tag activation).
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_data_classification
+  tag_sensitive_data:
+    description: |
+      User cost-allocation tag `sensitive_data`. Empty string coerced to NULL.
+      NULL before 2026-09-01 (cost-allocation-tag activation).
+    lineage:
+      - cost_usage_reports.aws_costs_new.resource_tags_user_sensitive_data
+  ts_first_usage:
+    description: |
+      Earliest CUR hourly usage-period start for this resource on this day.
+      Preserves CUR's native hourly grain inside the daily row so consumers
+      can align a resource with the Airflow run that created it.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_usage_start_date
+  ts_last_usage:
+    description: |
+      Latest CUR hourly usage-period end for this resource on this day. Upper
+      bound of the resource's billed window within the day.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_usage_end_date
+  ts_load:
+    description: Timestamp the row was written by the DAG.
+  dt_usage:
+    description: |
+      UTC usage date of the CUR line (`DATE(line_item_usage_start_date)`).
+      Partition column — always filter on dt_usage for partition pruning.
+    lineage:
+      - cost_usage_reports.aws_costs_new.line_item_usage_start_date

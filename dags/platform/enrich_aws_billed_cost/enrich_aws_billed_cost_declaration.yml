@@ -1,0 +1,39 @@
+dag:
+  name: enrich_aws_billed_cost
+  schedule_interval: "0 8 * * *"
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      Shared CUR-derived billed cost enrich. Scans
+      cost_usage_reports.aws_costs_new and writes one row per
+      (dt_usage, id_aws_account, resource_kind, id_resource, market) into
+      datalake_aws_billed_cost.daily_resource_billed_cost.
+
+      EC2/EBS/EMR-fee USD is amortized (DiscountedUsage uses
+      reservation_effective_cost, SavingsPlanCoveredUsage uses
+      savings_plan_savings_plan_effective_cost, else unblended). DBU cost is
+      out of scope — Databricks invoices DBU directly. billed_cost_usd is
+      gross of the enterprise discount; net_cost_usd is net of it.
+
+      Scheduled at 08:00 UTC on D+1 so the table is ready before
+      enrich_emr_health (09:00), dw_databricks_costs (09:00) and
+      dw_emr_health (10:00). Each run re-derives the last 35 dt_usage
+      partitions so AWS restatements of closed billing periods land
+      automatically.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: aws_billed_cost
+  default_extraction_type: incremental
+  has_hive_sync: true
+  execution_timeout_hours: 10
+  tables_customization:
+    daily_resource_billed_cost:
+      partitions: [ dt_usage ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -35), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1),  'load_end_date') }}"
+    environment:     "{{ var.value.environment }}"

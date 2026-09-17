@@ -1,0 +1,46 @@
+dag:
+  name: dw_emr_health
+  schedule_interval: "0 10 * * *"
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      Per-step and logical-Airflow-run health facts for EMR clusters tagged
+      `provisioner=emr` (emr_cluster_base). Joins
+      datalake_emr_health.emr_dag_task_spine with
+      datalake_emr_health.daily_emr_cluster_cost (billed CUR USD) and
+      datalake_emr_health.daily_emr_cluster_health (CloudWatch utilisation),
+      attributing USD/hours/util by step wall-clock share on each cluster-day.
+
+      One row per (id_emr_cluster, id_emr_step) in fact_emr_task_run; rolled up
+      to one row per (airflow_dag_id, minute bucket of cluster/step start) in
+      fact_emr_dag_run. Spark stage KPIs are intentionally NULL (v1 — no
+      eventLog.dir restore). DBU columns are zeroed for schema parity with
+      dw_databricks_health.
+
+      Scheduled at 10:00 UTC (after enrich_emr_health at 09:00). Powers the EMR
+      twin in metric_observability__dags.dag_health (Phase 4 UNION).
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: emr_health
+  default_extraction_type: incremental
+  has_hive_sync: true
+  execution_timeout_hours: 10
+  inner_dependencies:
+    fact_emr_dag_run:
+      - fact_emr_task_run
+  tables_customization:
+    fact_emr_task_run:
+      partitions: [ year, month, day ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+    fact_emr_dag_run:
+      partitions: [ year, month, day ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds,  1), 'load_end_date') }}"
+    environment:     "{{ var.value.environment }}"

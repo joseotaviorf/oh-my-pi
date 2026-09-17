@@ -6,8 +6,11 @@ description: |
   (airflow_dag_id, dt_window_end). Each headline metric is emitted as three
   columns: `_current_7d` (trailing 7 days ending on dt_window_end),
   `_previous_7d` (the 7 days immediately before that), and `_change_pct`
-  ((current − previous) / NULLIF(previous, 0) × 100). Reads exclusively from
-  dw_databricks_health.fact_databricks_dag_run over a 14-calendar-day slice.
+  ((current − previous) / NULLIF(previous, 0) × 100). Reads from
+  dw_databricks_health.fact_databricks_dag_run UNION ALL
+  dw_emr_health.fact_emr_dag_run over a 14-calendar-day slice (discriminate with
+  `provisioner`). EMR v1 has no Spark stage ingest — expect ~0% stage coverage
+  for provisioner='emr' rows (not an eventLog.dir incident).
 
   Use this table to see whether a cluster-spec or pipeline change from the last
   sprint moved cost, utilization, duration, or reliability relative to the week
@@ -27,6 +30,7 @@ columns:
   airflow_dag_id:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
+      - dw_emr_health.fact_emr_dag_run.airflow_dag_id
     description: Airflow / workload identifier (COALESCE chain on the fact).
     dimension: True
   team_owner:
@@ -173,36 +177,38 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_calculated_usd_current_7d:
+  total_ec2_cost_usd_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: Sum of task/dag-attributed calculated EC2 USD at logical DAG-run grain in the current window.
+      - dw_emr_health.fact_emr_dag_run.total_ec2_cost_usd
+    description: Sum of task/dag-attributed EC2 USD at logical DAG-run grain in the current window (Databricks seed-priced, EMR billed CUR).
     metric:
-      name: Total EC2 Cost Calculated USD Current 7d
-      description: Calculated EC2 for the trailing 7-day window.
-      acronym: total_ec2_calc_curr_7d
+      name: Total EC2 Cost USD Current 7d
+      description: Task/dag-attributed EC2 USD for the trailing 7-day window (Databricks from dim_ec2_price; EMR from billed CUR).
+      acronym: total_ec2_usd_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_calculated_usd_previous_7d:
+  total_ec2_cost_usd_previous_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: Sum of task/dag-attributed calculated EC2 USD in the previous window.
+      - dw_emr_health.fact_emr_dag_run.total_ec2_cost_usd
+    description: Sum of task/dag-attributed EC2 USD in the previous window (Databricks seed-priced, EMR billed CUR).
     metric:
-      name: Total EC2 Cost Calculated USD Previous 7d
-      description: Calculated EC2 for the prior 7-day window.
-      acronym: total_ec2_calc_prev_7d
+      name: Total EC2 Cost USD Previous 7d
+      description: Task/dag-attributed EC2 USD for the prior 7-day window (Databricks from dim_ec2_price; EMR from billed CUR).
+      acronym: total_ec2_usd_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_calculated_usd_change_pct:
-    description: Week-over-week percent change in task/dag-attributed calculated EC2 USD.
+  total_ec2_cost_usd_change_pct:
+    description: Week-over-week percent change in task/dag-attributed EC2 USD.
     metric:
-      name: Total EC2 Cost Calculated USD WoW Change Pct
-      description: Relative change in calculated EC2 USD vs the prior week.
-      acronym: total_ec2_calc_wow_chg_pct
+      name: Total EC2 Cost USD WoW Change Pct
+      description: Relative change in EC2 USD vs the prior week.
+      acronym: total_ec2_usd_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -213,7 +219,7 @@ columns:
     description: Sum of task/dag-attributed EC2 Spot node wall-clock hours in the current window (not DBU).
     metric:
       name: EC2 Spot Node Hours Current 7d
-      description: EC2 Spot node-hours priced via dim_ec2_price in the trailing 7-day window.
+      description: "EC2 Spot node-hours in the trailing 7-day window. EC2 node-hours split spot / on-demand (Databricks: `dim_ec2_price` availability; EMR: CUR `market`)."
       acronym: spot_hrs_curr_7d
       is_additive: False
       business_stage: Platform Operations
@@ -225,7 +231,7 @@ columns:
     description: Sum of EC2 Spot node wall-clock hours in the previous window (not DBU).
     metric:
       name: EC2 Spot Node Hours Previous 7d
-      description: EC2 Spot node-hours priced via dim_ec2_price in the prior 7-day window.
+      description: "EC2 Spot node-hours in the prior 7-day window. EC2 node-hours split spot / on-demand (Databricks: `dim_ec2_price` availability; EMR: CUR `market`)."
       acronym: spot_hrs_prev_7d
       is_additive: False
       business_stage: Platform Operations
@@ -247,7 +253,7 @@ columns:
     description: Sum of task/dag-attributed EC2 on-demand node wall-clock hours in the current window (not DBU).
     metric:
       name: EC2 On Demand Node Hours Current 7d
-      description: EC2 on-demand node-hours priced via dim_ec2_price in the trailing 7-day window.
+      description: "EC2 on-demand node-hours in the trailing 7-day window. EC2 node-hours split spot / on-demand (Databricks: `dim_ec2_price` availability; EMR: CUR `market`)."
       acronym: od_hrs_curr_7d
       is_additive: False
       business_stage: Platform Operations
@@ -259,7 +265,7 @@ columns:
     description: Sum of EC2 on-demand node wall-clock hours in the previous window (not DBU).
     metric:
       name: EC2 On Demand Node Hours Previous 7d
-      description: EC2 on-demand node-hours priced via dim_ec2_price in the prior 7-day window.
+      description: "EC2 on-demand node-hours in the prior 7-day window. EC2 node-hours split spot / on-demand (Databricks: `dim_ec2_price` availability; EMR: CUR `market`)."
       acronym: od_hrs_prev_7d
       is_additive: False
       business_stage: Platform Operations
@@ -288,12 +294,12 @@ columns:
   has_ec2_pricing_missing_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
-    description: True when any DAG-run in the current 7-day window had EC2 hours with missing dim_ec2_price coverage.
+    description: True when any DAG-run in the current 7-day window had EC2 hours with missing dim_ec2_price coverage. Databricks-only; always false for EMR rows.
     dimension: True
   has_ec2_pricing_missing_previous_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
-    description: True when any DAG-run in the previous 7-day window had EC2 hours with missing dim_ec2_price coverage.
+    description: True when any DAG-run in the previous 7-day window had EC2 hours with missing dim_ec2_price coverage. Databricks-only; always false for EMR rows.
     dimension: True
   total_cost_usd_current_7d:
     lineage:

@@ -1,0 +1,93 @@
+---
+database_name: datalake_emr_health
+table_name: emr_dag_task_spine
+description: |
+  Bridge from EMR clusters to the Airflow tasks that ran on them as EMR steps.
+  Cluster identity comes from `datalake_emr_health.emr_instance_timeline`;
+  tasks come from `datalake_airflow.task_instance` joined on the timeline's
+  resolved `(dag_id, run_id)`.
+
+  Step tasks are selected by operator — `QuintoAndarEmrSubmitStepsOperator` is
+  exactly the set of Airflow tasks submitted to a cluster as a step. Sensors,
+  short-circuits and non-EMR operators are excluded by construction, so
+  downstream cost proration cannot reach a task that never used the cluster.
+
+  One row per EMR step task. A run may hold up to 6 concurrent clusters and a
+  task's cluster is not recoverable from its task id, so each task is assigned
+  to exactly one cluster of its run (window containment first, then nearest
+  cluster start). Cost is therefore never multiplied across a run's clusters;
+  a mis-pick shifts cost between clusters of the same run and leaves
+  `fact_emr_dag_run` exact.
+
+  No EMR control-plane call, no S3 log listing and no XCom. Real EMR step ids
+  arrive on the forward lane via EventBridge (`exact_event`).
+
+  See docs/platform/emr_observability.md.
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  airflow_dag_id:
+    description: |
+      Matched Airflow DAG id (`id_dag`) for this EMR step; null when the
+      reconstruct join could not find a task_instance.
+    lineage:
+      - datalake_airflow.task_instance.id_dag
+      - datalake_emr_health.emr_instance_timeline.dag_id
+  airflow_run_id:
+    description: |
+      Airflow run id, taken from the timeline's create-task match rather than
+      parsed from the cluster name.
+    lineage:
+      - datalake_airflow.task_instance.id_run
+      - datalake_emr_health.emr_instance_timeline.run_id
+  airflow_task_id:
+    description: |
+      Airflow task id of the QuintoAndarEmrSubmitStepsOperator task that ran
+      this step on the cluster.
+    lineage:
+      - datalake_airflow.task_instance.id_task
+  id_emr_cluster:
+    description: |
+      AWS EMR cluster identifier (`j-…`) that owned this step; used to join
+      daily_emr_cluster_health cost/util onto the Airflow task.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.id_emr_cluster
+  id_emr_step:
+    description: |
+      Deterministic `synthetic-<sha256-16>` step identifier derived from
+      (id_emr_cluster, airflow_task_id). Always populated — part of the
+      fact_emr_task_run grain. Real `s-…` ids arrive on the forward lane.
+    lineage:
+      - datalake_airflow.task_instance.id_task
+      - datalake_emr_health.emr_instance_timeline.id_emr_cluster
+  ts_step_started:
+    description: UTC timestamp when the Airflow task started (proxy for EMR step RUNNING).
+    lineage:
+      - datalake_airflow.task_instance.ts_started
+  ts_step_ended:
+    description: UTC timestamp when the Airflow task ended; null while still running.
+    lineage:
+      - datalake_airflow.task_instance.ts_ended
+  step_state:
+    description: |
+      EMR-vocabulary step state mapped from Airflow task_state
+      (success→COMPLETED, failed→FAILED, upstream_failed/skipped→CANCELLED,
+      else UNKNOWN).
+    lineage:
+      - datalake_airflow.task_instance.task_state
+  ts_cluster_started:
+    description: UTC timestamp when the EMR cluster was created / became available.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.ts_cluster_started
+  ts_cluster_ended:
+    description: UTC timestamp when the EMR cluster terminated; null if still running.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.ts_cluster_ended
+  match_confidence:
+    description: |
+      synthetic — step id derived from cluster + task id (backfill lane);
+      exact_event — EventBridge step id (forward lane, Phase G).
+  ts_load:
+    description: Timestamp the spine row was written by enrich_emr_health.
+  dt_step:
+    description: UTC date of step start (partition column); cluster start fallback.

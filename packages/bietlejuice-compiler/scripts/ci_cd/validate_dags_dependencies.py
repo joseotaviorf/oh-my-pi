@@ -336,11 +336,13 @@ class CrossDAGDependenciesValidator:
                 if not dag_name or not layer:
                     continue
 
+                workflow_spark_job = workflow.get("load_spark_job")
                 tables_customization = workflow.get("tables_customization") or {}
                 for table_name, table_config in tables_customization.items():
-                    if isinstance(table_config, dict) and table_config.get(
-                        "load_spark_job"
-                    ):
+                    table_spark_job = isinstance(
+                        table_config, dict
+                    ) and table_config.get("load_spark_job")
+                    if workflow_spark_job or table_spark_job:
                         formatted_table = f"{layer}:{table_name}"
                         self.all_spark_job_tables_by_dag.setdefault(dag_name, [])
                         self.all_spark_job_tables_by_dag[dag_name].append(

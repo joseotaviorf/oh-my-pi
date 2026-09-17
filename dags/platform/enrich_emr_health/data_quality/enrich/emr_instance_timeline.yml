@@ -1,0 +1,30 @@
+---
+table_name: datalake_emr_health.emr_instance_timeline
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt_cluster_run
+  incremental_date_mask: yyyy-MM-dd
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_emr_cluster:
+    is_complete:
+      severity_level: Error
+  id_ec2_instance:
+    is_complete:
+      severity_level: Error
+  dt_cluster_run:
+    is_complete:
+      severity_level: Error
+  run_match:
+    is_contained_in:
+      values:
+        - event
+        - resolved
+        - ambiguous
+        - no_candidate
+      severity_level: Error

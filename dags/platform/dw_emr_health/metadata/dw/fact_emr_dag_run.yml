@@ -1,0 +1,446 @@
+---
+database_name: dw_emr_health
+table_name: fact_emr_dag_run
+description: |
+  Logical Airflow DAG execution grain rolled up from fact_emr_task_run.
+  One row per (airflow_dag_id, minute bucket of ts_run_started).
+
+  Column names mirror dw_databricks_health.fact_databricks_dag_run for Phase 4
+  UNION into metric_observability__dags.dag_health. Parallel EMR clusters in the
+  same minute bucket collapse to one row; billed CUR costs sum; P95 utilisation
+  metrics are weighted by execution_duration_seconds.
+
+  `n_databricks_job_runs` counts distinct EMR clusters (name kept for UNION parity).
+  Stage-backed columns are NULL/zero; DBU columns are zero.
+
+  Partitioned by year, month, day from dt_dag_run_started.
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  sk_databricks_dag_run:
+    description: |
+      Surrogate key — `xxhash64(airflow_dag_id, unix_ts(minute_bucket))`.
+      Column name matches fact_databricks_dag_run for Phase 4 UNION.
+  id_databricks_workspace:
+    description: Always NULL — EMR rows have no Databricks workspace; column kept for UNION parity.
+  airflow_dag_id:
+    description: |
+      Airflow DAG identifier for the logical run that launched this EMR cluster/step (includes framework prefix, e.g. bietlejuice.*).
+    lineage:
+    - datalake_emr_health.emr_dag_task_spine.airflow_dag_id
+  ts_logical_run_started:
+    description: Minute bucket — `date_trunc('MINUTE', ts_run_started)`.
+  cost_cohort:
+    description: |
+      MIN_BY rollup within the logical-run group using dim_cost_cohort precedence.
+      Zero-`other` enforced by data-quality check.
+  total_dbu_consumed:
+    description: Always 0 summed across steps — UNION parity column.
+  total_ec2_cost_usd:
+    description: Sum of step-attributed billed AmazonEC2 USD in the logical bucket.
+    lineage:
+      - dw_emr_health.fact_emr_task_run.total_ec2_cost_usd
+  total_ebs_cost_usd:
+    description: Sum of step-attributed billed EBS USD in the logical bucket.
+    lineage:
+      - dw_emr_health.fact_emr_task_run.total_ebs_cost_usd
+  total_emr_fee_cost_usd:
+    description: Sum of step-attributed billed ElasticMapReduce fee USD in the logical bucket.
+    lineage:
+      - dw_emr_health.fact_emr_task_run.total_emr_fee_cost_usd
+  total_cost_usd:
+    description: Sum of step total_cost_usd (EC2 + EBS + EMR fee) in the logical bucket.
+  total_ec2_net_cost_usd:
+    description: Sum of step-attributed enterprise-discounted AmazonEC2 USD in the logical bucket.
+    lineage:
+      - dw_emr_health.fact_emr_task_run.total_ec2_net_cost_usd
+  total_ebs_net_cost_usd:
+    description: Sum of step-attributed enterprise-discounted EBS USD in the logical bucket.
+    lineage:
+      - dw_emr_health.fact_emr_task_run.total_ebs_net_cost_usd
+  total_emr_fee_net_cost_usd:
+    description: Sum of step-attributed enterprise-discounted ElasticMapReduce fee USD in the logical bucket.
+    lineage:
+      - dw_emr_health.fact_emr_task_run.total_emr_fee_net_cost_usd
+  total_net_cost_usd:
+    description: Sum of step total_net_cost_usd (EC2 + EBS + EMR fee, net of enterprise discount) in the logical bucket.
+    lineage:
+      - dw_emr_health.fact_emr_task_run.total_net_cost_usd
+  total_discount_usd:
+    description: Sum of step total_discount_usd (gross minus net) in the logical bucket.
+    lineage:
+      - dw_emr_health.fact_emr_task_run.total_discount_usd
+  n_databricks_job_runs:
+    description: COUNT(DISTINCT id_emr_cluster) — EMR cluster count (Databricks column name retained).
+  n_task_runs:
+    description: Step rows rolled into this logical bucket.
+  n_task_runs_with_stage_data:
+    description: Always 0 — no Spark stage data for EMR v1.
+  weighted_avg_p95_driver_cpu_busy_percent:
+    description: P95 MASTER CPU weighted by execution_duration_seconds across steps.
+  weighted_avg_p95_worker_cpu_busy_percent:
+    description: P95 worker CPU weighted by execution_duration_seconds across steps.
+  dt_dag_run_started:
+    description: Calendar date of the logical run start minute bucket.
+  year:
+    description: Partition year from dt_dag_run_started.
+  month:
+    description: Partition month from dt_dag_run_started.
+  day:
+    description: Partition day from dt_dag_run_started.
+  cost_center:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.cost_center
+  data_classification:
+    description: LGPD / data-classification label — `FIRST IGNORE NULLS` within the logical-run group.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.data_classification
+  dbu_negotiated_price_missing:
+    description: |
+      TRUE when any task in the bucket fell back to the list DBU rate (no matching negotiated dim_dbu_price row).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.dbu_negotiated_price_missing
+  dbu_pricing_sku:
+    description: Dominant DBU billing SKU label — `FIRST` within the logical-run group.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.dbu_pricing_sku
+  dbu_rate_usd:
+    description: Dominant list USD-per-DBU — `FIRST` within the logical-run group.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.dbu_rate_usd
+  driver_node_type:
+    description: |
+      Driver instance type of the DBU-dominant cluster in the logical bucket (`MAX_BY` on total_dbu_consumed).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.driver_node_type
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed
+  ec2_on_demand_hours:
+    description: |
+      Sum of task-attributed CUR BoxUsage hours across tasks in the bucket (not DBU).
+    lineage:
+      - dw_emr_health.fact_emr_task_run.ec2_on_demand_hours
+  ec2_spot_hours:
+    description: |
+      Sum of task-attributed CUR SpotUsage hours across tasks in the bucket (not DBU).
+    lineage:
+      - dw_emr_health.fact_emr_task_run.ec2_spot_hours
+  cost_source:
+    description: |
+      Worst-wins rollup of fact_emr_task_run.cost_source across tasks in the bucket
+      (`missing` > `cur_partial` > `cur`).
+    lineage:
+      - dw_emr_health.fact_emr_task_run.cost_source
+  ecosystem:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.ecosystem
+  environment:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.environment
+  failed_stage_count:
+    description: Sum of failed Spark stage counts across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.failed_stage_count
+  is_any_databricks_run_failed:
+    description: True if any parent Databricks run in the bucket has `run_result_state = 'FAILED'`.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.run_result_state
+  is_any_local_nvme:
+    description: True when any task in the bucket used an instance type with local NVMe storage.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.has_local_nvme
+  is_any_photon:
+    description: True when any task in the bucket ran on a Photon DBR image.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_photon
+  is_any_pool_backed:
+    description: True when any task in the bucket used an instance-pool-backed cluster.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_pool_backed
+  is_any_sensitive_data:
+    description: True when any task in the bucket carried the sensitive-data cluster tag.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_sensitive_data
+  is_any_stage_attribution_ambiguous:
+    description: |
+      True when any task in the bucket had ambiguous Spark stage attribution (`spark_app_count > 1`).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_stage_attribution_ambiguous
+  is_any_task_failed:
+    description: True if any task in the bucket failed.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_failed
+  is_any_task_success:
+    description: True if any task in the bucket succeeded.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_success
+  is_job_on_interactive:
+    description: |
+      TRUE when any task in the bucket matches the interactive billing slice
+      (`ALL_PURPOSE` / `INTERACTIVE` DBU on the cluster, or `JOBS` on a UI/API cluster).
+      BOOL_OR rollup of `fact_databricks_task_run.is_job_on_interactive`. Filter
+      `NOT is_job_on_interactive` for the orchestrated slice.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_job_on_interactive
+  last_stage_failure_reason:
+    description: |
+      Failure reason from the most recent task with a non-null `last_stage_failure_reason` in the bucket (`MAX_BY` on `ts_task_ended`).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.last_stage_failure_reason
+    - dw_emr_health.fact_emr_task_run.ts_task_ended
+  max_cluster_startup_seconds:
+    description: Maximum cluster startup seconds among tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.cluster_startup_seconds
+  max_init_script_seconds:
+    description: Maximum init-script seconds among tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.init_script_seconds
+  max_jvm_heap_bytes:
+    description: Maximum JVM heap bytes among tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.max_jvm_heap_bytes
+  max_peak_execution_memory_bytes:
+    description: Maximum peak execution memory among tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.max_peak_execution_memory_bytes
+  max_post_init_script_seconds:
+    description: |
+      Maximum post-init-script seconds among tasks in the bucket (JVM warm-up after init scripts).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.post_init_script_seconds
+  max_pre_init_script_seconds:
+    description: |
+      Maximum pre-init-script seconds among tasks in the bucket (DBR pull / network setup before init scripts).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.pre_init_script_seconds
+  max_task_run_time_ms:
+    description: Slowest single-task wall-clock execution time among tasks in the bucket, in milliseconds.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.max_task_run_time_ms
+  max_task_skew_ratio:
+    description: Maximum task skew ratio among tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.max_task_skew_ratio
+  n_failed_databricks_job_runs:
+    description: Distinct parent Databricks runs with `run_result_state = 'FAILED'` in this logical bucket.
+    lineage:
+    - 'dw_emr_health.fact_emr_task_run.id_databricks_run (EMR v1: NULL/0 parity)'
+    - dw_emr_health.fact_emr_task_run.run_result_state
+  n_failed_task_runs:
+    description: Count of task runs with `is_failed` in this logical bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_failed
+  n_pool_acquisition_slow_tasks:
+    description: Count of tasks flagged `is_pool_acquisition_slow` in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_pool_acquisition_slow
+  n_stage_attribution_ambiguous_task_runs:
+    description: Count of task runs flagged `is_stage_attribution_ambiguous` in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.is_stage_attribution_ambiguous
+  peak_concurrent_workers:
+    description: |
+      Maximum peak concurrent worker count observed across tasks in the bucket (`MAX`). Reflects realised worker usage, not configuration.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.peak_concurrent_workers
+  primary_cluster_name:
+    description: |
+      Cluster name of the DBU-dominant cluster in the logical bucket (`MAX_BY` on total_dbu_consumed).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.cluster_name
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed
+  primary_cluster_source:
+    description: |
+      Cluster source of the DBU-dominant cluster (`MAX_BY` on total_dbu_consumed) — JOB, UI, API, etc.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.cluster_source
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed
+  primary_dbr_version:
+    description: DBR version of the DBU-dominant cluster (`MAX_BY` on total_dbu_consumed).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.dbr_version
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed
+  primary_max_autoscale_workers:
+    description: |
+      Autoscale upper bound of the DBU-dominant cluster (`MAX_BY` on total_dbu_consumed). Null for fixed-size clusters.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.max_autoscale_workers
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed
+  primary_min_autoscale_workers:
+    description: |
+      Autoscale lower bound of the DBU-dominant cluster (`MAX_BY` on total_dbu_consumed). Null for fixed-size clusters.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.min_autoscale_workers
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed
+  primary_run_type:
+    description: |
+      Databricks run type of the DBU-dominant parent run (`MAX_BY` on total_dbu_consumed) — JOB_RUN or SUBMIT_RUN.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.run_type
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed
+  provisioner:
+    description: |
+      Cluster provisioner discriminator; always the literal `emr` for rows in dw_emr_health so dag_health can UNION Databricks and EMR facts.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.provisioner
+  sk_dag_run_started_date:
+    description: Date surrogate key (`yyyyMMdd`) for the logical run start date.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.dt_task_started
+  spark_app_count:
+    description: Sum of distinct Spark application counts attributed to tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.spark_app_count
+  stage_count:
+    description: |
+      Sum of Spark stage counts across tasks in the bucket (NULL stage metrics on ambiguous tasks are excluded at task grain).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.stage_count
+  team_owner:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.team_owner
+  total_dbu_cost_usd:
+    description: Sum of task-level `total_dbu_cost_usd` (negotiated DBU USD) in the logical bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_dbu_cost_usd
+  total_dbu_list_cost_usd:
+    description: Sum of task-level `total_dbu_list_cost_usd` (list-rate USD audit) in the logical bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_dbu_list_cost_usd
+  total_disk_bytes_spilled:
+    description: Sum of disk bytes spilled across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_disk_bytes_spilled
+  total_execution_duration_seconds:
+    description: Sum of task execution durations in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  total_executor_cpu_time_ms:
+    description: Sum of executor CPU time milliseconds across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_executor_cpu_time_ms
+  total_executor_run_time_ms:
+    description: Sum of executor run-time milliseconds across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_executor_run_time_ms
+  total_gc_time_ms:
+    description: Sum of GC time milliseconds across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_gc_time_ms
+  total_input_bytes_read:
+    description: Sum of input bytes read across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_input_bytes_read
+  total_memory_bytes_spilled:
+    description: Sum of memory bytes spilled across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_memory_bytes_spilled
+  total_output_bytes_written:
+    description: Sum of output bytes written across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_output_bytes_written
+  total_setup_duration_seconds:
+    description: Sum of task setup durations in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.setup_duration_seconds
+  total_shuffle_bytes_read:
+    description: Sum of shuffle bytes read across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_shuffle_bytes_read
+  total_shuffle_bytes_written:
+    description: Sum of shuffle bytes written across tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.total_shuffle_bytes_written
+  total_wall_clock_seconds:
+    description: |
+      Wall span from earliest task start to latest task end in the bucket (`MAX(ts_task_ended) - MIN(ts_task_started)`).
+    lineage:
+    - dw_emr_health.fact_emr_task_run.ts_task_started
+    - dw_emr_health.fact_emr_task_run.ts_task_ended
+  ts_load:
+    description: UTC timestamp when this fact row was written by the dw_emr_health DAG.
+  ts_run_ended_max:
+    description: Latest `ts_run_ended` among tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.ts_run_ended
+  ts_run_started_min:
+    description: Earliest `ts_run_started` among tasks in the bucket.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.ts_run_started
+  weighted_avg_local_disk_utilization_pct_p95:
+    description: Local disk utilisation P95 weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.local_disk_utilization_pct_p95
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p50_driver_cpu_busy_percent:
+    description: |
+      P50 (median) driver CPU busy percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p50_driver_cpu_busy_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p50_driver_cpu_wait_percent:
+    description: |
+      P50 (median) driver I/O wait percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p50_driver_cpu_wait_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p50_driver_mem_used_percent:
+    description: |
+      P50 (median) driver memory used percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p50_driver_mem_used_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p50_worker_cpu_busy_percent:
+    description: |
+      P50 (median) worker CPU busy percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p50_worker_cpu_busy_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p50_worker_cpu_wait_percent:
+    description: |
+      P50 (median) worker I/O wait percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p50_worker_cpu_wait_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p50_worker_mem_used_percent:
+    description: |
+      P50 (median) worker memory used percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p50_worker_mem_used_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p95_driver_cpu_wait_percent:
+    description: P95 driver CPU I/O wait percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p95_driver_cpu_wait_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p95_driver_mem_used_percent:
+    description: P95 driver memory used percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p95_driver_mem_used_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p95_worker_cpu_wait_percent:
+    description: P95 worker CPU I/O wait percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p95_worker_cpu_wait_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  weighted_avg_p95_worker_mem_used_percent:
+    description: P95 worker memory used percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.p95_worker_mem_used_percent
+    - dw_emr_health.fact_emr_task_run.execution_duration_seconds
+  worker_count:
+    description: |
+      Configured fixed worker count of the DBU-dominant cluster (`MAX_BY` on total_dbu_consumed). Null when that cluster autoscales.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.worker_count
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed
+  worker_node_type:
+    description: |
+      Worker instance type of the DBU-dominant cluster in the logical bucket (`MAX_BY` on total_dbu_consumed). Null for single-node clusters.
+    lineage:
+    - dw_emr_health.fact_emr_task_run.worker_node_type
+    - dw_emr_health.fact_emr_task_run.total_dbu_consumed

@@ -1,0 +1,19 @@
+---
+table_name: datalake_emr_health.emr_dag_task_spine
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: dt_step
+  incremental_date_mask: yyyy-MM-dd
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  airflow_run_id:
+    is_complete:
+      severity_level: Error
+  id_emr_cluster:
+    is_complete:
+      severity_level: Error

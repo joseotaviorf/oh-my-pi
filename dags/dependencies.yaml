@@ -691,6 +691,10 @@ bietlejuice.dw_employee_details:
   - bietlejuice.pin:load-clean-person-name:first-run-of-day
   - bietlejuice.pin:load-clean-person:first-run-of-day
   - bietlejuice.pin:load-clean-phone:first-run-of-day
+bietlejuice.dw_emr_health:
+  - bietlejuice.enrich_emr_health:load-enrich-daily-emr-cluster-cost:first-run-of-day
+  - bietlejuice.enrich_emr_health:load-enrich-daily-emr-cluster-health:first-run-of-day
+  - bietlejuice.enrich_emr_health:load-enrich-emr-dag-task-spine:first-run-of-day
 bietlejuice.dw_equipment:
   - bietlejuice.plugify_api:load-clean-available-device:first-run-of-day
   - bietlejuice.plugify_api:load-clean-device-inventory:first-run-of-day
@@ -2751,6 +2755,10 @@ bietlejuice.enrich_employment:
   - bietlejuice.pin:load-clean-action-reason-translation:first-run-of-day
   - bietlejuice.pin:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin:load-clean-periods-of-service:first-run-of-day
+bietlejuice.enrich_emr_health:
+  - bietlejuice.emr_events:load-clean-events:first-run-of-day
+  - bietlejuice.enrich_airflow:load-enrich-task-instance:first-run-of-day
+  - bietlejuice.enrich_aws_billed_cost:load-enrich-daily-resource-billed-cost:first-run-of-day
 bietlejuice.enrich_emr_validation_test:
   - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
 bietlejuice.enrich_expected_contribution_margin:
@@ -4481,6 +4489,7 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
 bietlejuice.metric_observability__dags:
   - bietlejuice.dw_databricks_health:load-dw-databricks-health-fact-databricks-dag-run
+  - bietlejuice.dw_emr_health:load-dw-emr-health-fact-emr-dag-run:first-run-of-day
 bietlejuice.metric_people:
   - bietlejuice.dw_compensation:load-dw-compensation-dim-event-definition:first-run-of-day
   - bietlejuice.dw_compensation:load-dw-compensation-dim-job:first-run-of-day

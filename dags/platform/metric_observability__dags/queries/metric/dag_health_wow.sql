@@ -4,8 +4,8 @@
 -- Week-over-week comparison for Databricks DAG observability: each metric is
 -- computed over the trailing 7 days ending on load_start_date ("current") and
 -- the prior 7 days ("previous"), plus percent change. One row per
--- (airflow_dag_id, dt_window_end). Reads exclusively from
--- dw_databricks_health.fact_databricks_dag_run.
+-- (airflow_dag_id, dt_window_end). Reads from dw_databricks_health.fact_databricks_dag_run UNION ALL
+-- dw_emr_health.fact_emr_dag_run (filter via provisioner).
 --
 -- Window (14 calendar days):
 --   previous_7d: load_start_date - 13 days through load_start_date - 7 days
@@ -19,7 +19,7 @@
 -- numerator and denominator.
 -- ============================================================================
 WITH window_runs AS (
-    SELECT
+SELECT
         airflow_dag_id,
         team_owner,
         cost_center,
@@ -41,7 +41,7 @@ WITH window_runs AS (
         is_any_local_nvme,
         total_dbu_consumed,
         total_dbu_cost_usd,
-        total_ec2_cost_calculated_usd,
+        total_ec2_cost_calculated_usd AS total_ec2_cost_usd,
         ec2_spot_hours,
         ec2_on_demand_hours,
         is_ec2_estimated,
@@ -74,6 +74,66 @@ WITH window_runs AS (
             AND DATE('{load_start_date}') - INTERVAL 7 DAYS                      AS in_previous_7d
     FROM
         dw_databricks_health.fact_databricks_dag_run
+    WHERE
+        dt_dag_run_started >= DATE('{load_start_date}') - INTERVAL 13 DAYS
+        AND dt_dag_run_started <= DATE('{load_start_date}')
+        AND airflow_dag_id IS NOT NULL
+    UNION ALL
+SELECT
+        airflow_dag_id,
+        team_owner,
+        cost_center,
+        ecosystem,
+        environment,
+        provisioner,
+        cost_cohort,
+        data_classification,
+        primary_dbr_version,
+        n_databricks_job_runs,
+        n_task_runs,
+        n_failed_task_runs,
+        n_task_runs_with_stage_data,
+        n_stage_attribution_ambiguous_task_runs,
+        n_pool_acquisition_slow_tasks,
+        is_any_task_failed,
+        is_any_photon,
+        is_any_pool_backed,
+        is_any_local_nvme,
+        total_dbu_consumed,
+        total_dbu_cost_usd,
+        total_ec2_cost_usd,
+        ec2_spot_hours,
+        ec2_on_demand_hours,
+        FALSE AS is_ec2_estimated,
+        FALSE AS ec2_pricing_missing,
+        total_cost_usd,
+        total_wall_clock_seconds                           AS total_duration_seconds,
+        total_execution_duration_seconds                   AS execution_duration_seconds,
+        total_executor_run_time_ms,
+        weighted_avg_p95_driver_cpu_busy_percent           AS p95_driver_cpu_busy_percent,
+        weighted_avg_p95_worker_cpu_busy_percent           AS p95_worker_cpu_busy_percent,
+        weighted_avg_p95_driver_mem_used_percent           AS p95_driver_mem_used_percent,
+        weighted_avg_p95_worker_mem_used_percent           AS p95_worker_mem_used_percent,
+        weighted_avg_p95_driver_cpu_wait_percent           AS p95_driver_cpu_wait_percent,
+        weighted_avg_p95_worker_cpu_wait_percent           AS p95_worker_cpu_wait_percent,
+        weighted_avg_p50_driver_cpu_busy_percent           AS p50_driver_cpu_busy_percent,
+        weighted_avg_p50_worker_cpu_busy_percent           AS p50_worker_cpu_busy_percent,
+        weighted_avg_p50_driver_cpu_wait_percent           AS p50_driver_cpu_wait_percent,
+        weighted_avg_p50_worker_cpu_wait_percent           AS p50_worker_cpu_wait_percent,
+        weighted_avg_p50_driver_mem_used_percent           AS p50_driver_mem_used_percent,
+        weighted_avg_p50_worker_mem_used_percent           AS p50_worker_mem_used_percent,
+        weighted_avg_local_disk_utilization_pct_p95        AS local_disk_utilization_pct_p95,
+        stage_count,
+        failed_stage_count,
+        total_executor_cpu_time_ms,
+        total_output_bytes_written,
+        max_pre_init_script_seconds                        AS pre_init_script_seconds,
+        max_post_init_script_seconds                       AS post_init_script_seconds,
+        dt_dag_run_started >= DATE('{load_start_date}') - INTERVAL 6 DAYS           AS in_current_7d,
+        dt_dag_run_started BETWEEN DATE('{load_start_date}') - INTERVAL 13 DAYS
+            AND DATE('{load_start_date}') - INTERVAL 7 DAYS                      AS in_previous_7d
+    FROM
+        dw_emr_health.fact_emr_dag_run
     WHERE
         dt_dag_run_started >= DATE('{load_start_date}') - INTERVAL 13 DAYS
         AND dt_dag_run_started <= DATE('{load_start_date}')
@@ -274,23 +334,23 @@ SELECT
         2
     )                                                                                      AS avg_dbu_cost_usd_per_dag_run_change_pct,
     ROUND(
-        SUM(total_ec2_cost_calculated_usd)
+        SUM(total_ec2_cost_usd)
             FILTER (WHERE in_current_7d),
         4
-    )                                                                                      AS total_ec2_cost_calculated_usd_current_7d,
+    )                                                                                      AS total_ec2_cost_usd_current_7d,
     ROUND(
-        SUM(total_ec2_cost_calculated_usd)
+        SUM(total_ec2_cost_usd)
             FILTER (WHERE in_previous_7d),
         4
-    )                                                                                      AS total_ec2_cost_calculated_usd_previous_7d,
+    )                                                                                      AS total_ec2_cost_usd_previous_7d,
     ROUND(
         (
-            SUM(total_ec2_cost_calculated_usd) FILTER (WHERE in_current_7d)
-            - SUM(total_ec2_cost_calculated_usd) FILTER (WHERE in_previous_7d)
+            SUM(total_ec2_cost_usd) FILTER (WHERE in_current_7d)
+            - SUM(total_ec2_cost_usd) FILTER (WHERE in_previous_7d)
         ) * 100.0
-            / NULLIF(SUM(total_ec2_cost_calculated_usd) FILTER (WHERE in_previous_7d), 0),
+            / NULLIF(SUM(total_ec2_cost_usd) FILTER (WHERE in_previous_7d), 0),
         2
-    )                                                                                      AS total_ec2_cost_calculated_usd_change_pct,
+    )                                                                                      AS total_ec2_cost_usd_change_pct,
     ROUND(
         SUM(ec2_spot_hours)
             FILTER (WHERE in_current_7d),

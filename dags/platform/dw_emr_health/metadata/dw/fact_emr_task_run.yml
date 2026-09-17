@@ -1,0 +1,594 @@
+---
+database_name: dw_emr_health
+table_name: fact_emr_task_run
+description: |
+  Per EMR step health fact for Airflow-orchestrated clusters (`provisioner=emr`).
+  One row per (id_emr_cluster, id_emr_step) with matched Airflow keys
+  (`match_confidence` in tag_and_name / tag_only / name_only).
+
+  Joins datalake_emr_health.emr_dag_task_spine with
+  datalake_emr_health.daily_emr_cluster_cost (billed CUR USD) and
+  datalake_emr_health.daily_emr_cluster_health (CloudWatch utilisation).
+  USD and hours are attributed by each step's share of total step overlap
+  seconds on each overlapping cluster-day.
+
+  DBU columns are zeroed; Spark stage metrics are NULL (v1 — no eventLog.dir).
+  `cost_cohort` comes from datalake_databricks_pricing.dim_cost_cohort.
+
+  Partitioned by year, month, day from ts_step_started (exposed as dt_task_started).
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  sk_emr_task_run:
+    description: Surrogate key — `xxhash64(id_emr_cluster, id_emr_step)`.
+  sk_emr_cluster:
+    description: Surrogate key — `xxhash64(id_emr_cluster)`.
+  sk_emr_run:
+    description: Surrogate key — `xxhash64(airflow_dag_id, airflow_run_id)`.
+  sk_step_started_date:
+    description: Date surrogate key (`yyyyMMdd`) from step start date.
+  id_emr_cluster:
+    description: EMR cluster id (`j-…`). Part of the table grain.
+    lineage:
+    - datalake_emr_health.emr_dag_task_spine.id_emr_cluster
+  id_emr_step:
+    description: EMR step id (`s-…`). Part of the table grain.
+    lineage:
+    - datalake_emr_health.emr_dag_task_spine.id_emr_step
+  airflow_dag_id:
+    description: Matched Airflow DAG id from the EMR spine.
+    lineage:
+    - datalake_emr_health.emr_dag_task_spine.airflow_dag_id
+  airflow_run_id:
+    description: Matched Airflow run id from the EMR spine.
+    lineage:
+    - datalake_emr_health.emr_dag_task_spine.airflow_run_id
+  airflow_task_id:
+    description: Airflow task id for this EMR step (equals the EMR step Name submitted by EmrJobClusterEngine).
+    lineage:
+    - datalake_emr_health.emr_dag_task_spine.airflow_task_id
+  provisioner:
+    description: 'Cluster provisioner discriminator; always the literal `emr` for rows in dw_emr_health
+      so dag_health can UNION Databricks and EMR facts.
+
+      '
+  cost_cohort:
+    description: 'Initiative-level cost cohort from datalake_databricks_pricing.dim_cost_cohort
+
+      (lowest-priority matching rule on team_owner, provisioner, airflow_dag_id).
+
+      Falls back to `other` when no rule matches.
+
+      '
+    lineage:
+    - datalake_databricks_pricing.dim_cost_cohort.cost_cohort
+  cluster_name:
+    description: EMR cluster name from daily_emr_cluster_health.
+  driver_node_type:
+    description: MASTER instance type (mapped from master_instance_type).
+  worker_node_type:
+    description: CORE/TASK instance type from daily_emr_cluster_health.
+  worker_count:
+    description: Peak worker count observed on overlapping cluster-days.
+  task_result_state:
+    description: EMR step state for this task run (COMPLETED, FAILED, CANCELLED, …) from ListSteps.
+  total_duration_seconds:
+    description: Wall-clock duration of the EMR step in seconds (step end minus step start).
+  execution_duration_seconds:
+    description: Same as total_duration_seconds (no separate setup metric in v1).
+  p50_driver_cpu_busy_percent:
+    description: Overlap-weighted P50 MASTER CPUUtilization (CloudWatch).
+  p95_driver_cpu_busy_percent:
+    description: Overlap-weighted P95 MASTER CPUUtilization.
+  p50_worker_cpu_busy_percent:
+    description: Overlap-weighted P50 CORE/TASK CPUUtilization.
+  p95_worker_cpu_busy_percent:
+    description: Overlap-weighted P95 CORE/TASK CPUUtilization.
+  p50_worker_mem_used_percent:
+    description: Overlap-weighted P50 YARN memory used percent.
+  p95_worker_mem_used_percent:
+    description: Overlap-weighted P95 YARN memory used percent.
+  total_dbu_consumed:
+    description: Always 0 — EMR has no DBU billing in this fact.
+  total_dbu_cost_usd:
+    description: Always 0 — EMR has no DBU billing in this fact.
+  total_dbu_list_cost_usd:
+    description: Always 0 — list-rate DBU audit column kept for dag_health UNION parity.
+  total_ec2_cost_usd:
+    description: |
+      Step-attributed amortized AmazonEC2 USD from daily_emr_cluster_cost.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.total_ec2_cost_usd
+  total_ebs_cost_usd:
+    description: |
+      Step-attributed amortized EBS VolumeUsage USD from daily_emr_cluster_cost.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.total_ebs_cost_usd
+  total_emr_fee_cost_usd:
+    description: |
+      Step-attributed amortized ElasticMapReduce fee USD from daily_emr_cluster_cost.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.total_emr_fee_cost_usd
+  total_cost_usd:
+    description: total_ec2_cost_usd + total_ebs_cost_usd + total_emr_fee_cost_usd (DBU is 0).
+  total_ec2_net_cost_usd:
+    description: |
+      Step-attributed amortized AmazonEC2 net USD from daily_emr_cluster_cost
+      prorated using overlap_seconds / cluster_day_total_overlap_seconds.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.total_ec2_net_cost_usd
+  total_ebs_net_cost_usd:
+    description: |
+      Step-attributed amortized EBS VolumeUsage net USD from daily_emr_cluster_cost
+      prorated using overlap_seconds / cluster_day_total_overlap_seconds.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.total_ebs_net_cost_usd
+  total_emr_fee_net_cost_usd:
+    description: |
+      Step-attributed amortized ElasticMapReduce fee net USD from daily_emr_cluster_cost
+      prorated using overlap_seconds / cluster_day_total_overlap_seconds.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.total_emr_fee_net_cost_usd
+  total_net_cost_usd:
+    description: |
+      Sum of the three net cost measures (total_ec2_net_cost_usd + total_ebs_net_cost_usd + total_emr_fee_net_cost_usd).
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.total_ec2_net_cost_usd
+      - datalake_emr_health.daily_emr_cluster_cost.total_ebs_net_cost_usd
+      - datalake_emr_health.daily_emr_cluster_cost.total_emr_fee_net_cost_usd
+  total_discount_usd:
+    description: |
+      Step-attributed enterprise discount USD (gross minus net) from daily_emr_cluster_cost
+      prorated using overlap_seconds / cluster_day_total_overlap_seconds.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.total_discount_usd
+  cost_source:
+    description: |
+      Worst-wins rollup of daily_emr_cluster_cost.cost_source across overlapping
+      cluster-days (`missing` > `cur_partial` > `cur`).
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.cost_source
+  has_stage_data:
+    description: Always false — Spark stage metrics deferred in v1.
+  is_stage_attribution_ambiguous:
+    description: Always false — no stage attribution in v1.
+  dt_task_started:
+    description: UTC date of step start (alias of dt_step_started). Partition driver.
+  ts_task_started:
+    description: Step start timestamp (alias of ts_step_started).
+  ts_task_ended:
+    description: Step end timestamp (alias of ts_step_ended).
+  ts_run_started:
+    description: Cluster creation/start timestamp from emr_dag_task_spine for this task run.
+  ts_run_ended:
+    description: Cluster termination timestamp from emr_dag_task_spine; null if still running.
+  year:
+    description: Partition year from ts_step_started.
+  month:
+    description: Partition month from ts_step_started.
+  day:
+    description: Partition day from ts_step_started.
+  cluster_source:
+    description: 'How the cluster was created — JOB, UI, API, etc. JOB clusters have 1:1 task attribution;
+      non-JOB clusters share billing across concurrent tasks.
+
+      '
+    lineage:
+    - system.compute.clusters.cluster_source
+  cluster_startup_seconds:
+    description: 'Total wall-clock startup (`pre + init + post`) for the FIRST start of the
+
+      cluster on `dt_task_started`. Same cluster-day dedupe caveat applies.
+
+      Subsequent restarts within the same day are not captured.
+
+      '
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.cluster_startup_seconds
+  cost_center:
+    description: 'Internal cost-center code from the cluster `cost-center` tag when present.
+
+      NULL when not set on the cluster.
+
+      '
+    lineage:
+    - system.compute.clusters.tags
+  data_classification:
+    description: 'LGPD / data-classification label from the cluster `data-classification` tag
+
+      when present. NULL when not set.
+
+      '
+    lineage:
+    - system.compute.clusters.tags
+  dbr_version:
+    description: Databricks runtime version, e.g. `16.4.x-scala2.12` or `16.4.x-photon-scala2.12`.
+    lineage:
+    - system.compute.clusters.dbr_version
+  dbu_negotiated_price_missing:
+    description: 'TRUE when at least one DBU usage row on the cluster had no matching negotiated
+
+      `dim_dbu_price` rate and fell back to the list rate for `total_dbu_cost_usd`.
+
+      '
+    lineage:
+    - 'datalake_databricks_pricing.dim_dbu_price.usd_per_dbu (EMR v1: NULL/0 parity)'
+  dbu_pricing_sku:
+    description: 'Dominant Databricks DBU billing SKU on the cluster for the load window (SKU with the
+
+      largest summed `usage_quantity` among DBU rows for that cluster). Used with
+
+      `dbu_rate_usd` for audit; the task-level `total_dbu_consumed` / `total_dbu_cost_usd`
+
+      can still blend multiple SKUs at the cluster aggregate before pro-rating.
+
+      '
+    lineage:
+    - system.billing.usage.sku_name
+  dbu_rate_usd:
+    description: 'Usage-weighted USD-per-DBU list rate for the cluster''s matched
+
+      `system.billing.list_prices` validity windows. This is derived from
+
+      SUM(usage_quantity * list_rate) / SUM(usage_quantity), so it remains stable
+
+      when a load window spans more than one list-price validity period.
+
+      '
+    lineage:
+    - system.billing.list_prices.pricing
+  ec2_on_demand_hours:
+    description: |
+      Task-attributed share of CUR BoxUsage hours from daily_emr_cluster_cost.
+      Not wall-clock hours from ListInstances and not DBU usage quantity.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.ec2_on_demand_hours
+  ec2_spot_hours:
+    description: |
+      Task-attributed share of CUR SpotUsage hours from daily_emr_cluster_cost.
+      Not wall-clock hours from ListInstances and not DBU usage quantity.
+    lineage:
+      - datalake_emr_health.daily_emr_cluster_cost.ec2_spot_hours
+  ecosystem:
+    description: 'Logical ecosystem from the cluster `ecosystem` tag when present. NULL when
+
+      not set.
+
+      '
+    lineage:
+    - system.compute.clusters.tags
+  environment:
+    description: 'Value from the cluster `environment` tag when present (`forno`, `prod`, etc.).
+
+      NULL when not set.
+
+      '
+    lineage:
+    - system.compute.clusters.tags
+  failed_stage_count:
+    description: 'Number of Spark stages that ended with a non-NULL failure reason. A non-zero value combined
+      with `is_success = TRUE` typically means task-level retries succeeded after an early stage failure.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.is_stage_failed (EMR v1: NULL/0 parity)'
+  has_local_nvme:
+    description: 'TRUE when the worker or driver instance type typically includes physical NVMe
+
+      instance store (`d` before size separator, or storage/GPU families such as i3/g5),
+
+      derived from `driver_node_type` / `worker_node_type`. Does not read utilization.
+
+      '
+    lineage:
+    - system.compute.clusters.driver_node_type
+    - system.compute.clusters.worker_node_type
+  init_script_seconds:
+    description: '**Init-script execution duration in seconds.** Headline metric for the
+
+      "optimise-or-remove init scripts" workstream (DPLT-928). Same cluster-day
+
+      caveat as `pre_init_script_seconds`: dedupe to (id_cluster, dt_task_started)
+
+      before SUM. Fleet baseline is mean ~95s, p95 ~210s.
+
+      '
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.init_script_seconds
+  is_failed:
+    description: True when `task_result_state = 'FAILED'`.
+    lineage:
+    - dw_emr_health.fact_emr_task_run (parity column; often NULL/0 for EMR v1)
+  is_job_on_interactive:
+    description: 'TRUE when the cluster''s billing mix matches `fact_databricks_costs` interactive
+
+      bucket: any `ALL_PURPOSE` / `INTERACTIVE` DBU on the cluster, or `JOBS` DBU on a
+
+      `cluster_source IN (''UI'', ''API'')` cluster (the all-purpose leak). FALSE for
+
+      genuine orchestrated job clusters (`JOBS` billing on `JOB`-source clusters).
+
+      Filter `WHERE NOT is_job_on_interactive` to reconcile orchestrated DAG cost to
+
+      `dw_databricks_costs.fact_databricks_costs` `bucket=''orchestrated_jobs''`.
+
+      '
+    lineage:
+    - system.billing.usage.billing_origin_product
+    - system.compute.clusters.cluster_source
+  is_photon:
+    description: True when the cluster's DBR is a Photon image.
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.is_photon
+  is_pool_acquisition_slow:
+    description: 'True when `setup_duration_seconds > 90`. The 90s threshold is the O4 alerting line —
+      sustained high values mean the underlying pool is undersized.
+
+      '
+    lineage:
+    - dw_emr_health.fact_emr_task_run (parity column; often NULL/0 for EMR v1)
+  is_pool_backed:
+    description: True when the cluster has a `driver_instance_pool_id` or `worker_instance_pool_id` set.
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.is_pool_backed
+  is_sensitive_data:
+    description: 'True when the cluster `sensitive-data` tag is `''true''`. False or NULL when
+
+      unset or any other value.
+
+      '
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_cost.tag_sensitive_data
+  is_success:
+    description: True when `task_result_state = 'SUCCEEDED'`.
+    lineage:
+    - dw_emr_health.fact_emr_task_run (parity column; often NULL/0 for EMR v1)
+  last_stage_failure_reason:
+    description: 'Failure reason string of the most recent failed stage attributed to this task-run
+
+      (chronological by `ts_stage_completed`). NULL when no stage failed across any of
+
+      the task-run''s Spark applications. First-glance "what crashed?" answer for failed
+
+      runs without leaving the fact table; deeper drill-down (full stack trace, attempt
+
+      history) still requires `datalake_databricks_health.spark_stage_metrics`.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.stage_failure_reason (EMR v1: NULL/0 parity)'
+    - 'datalake_databricks_health.spark_stage_metrics.is_stage_failed (EMR v1: NULL/0 parity)'
+    - 'datalake_databricks_health.spark_stage_metrics.ts_stage_completed (EMR v1: NULL/0 parity)'
+  local_disk_utilization_pct_p95:
+    description: 'Alias of daily_cluster_health `nvme_utilization_pct_p95`: utilization of the
+
+      `/local_disk0` mount (Databricks ephemeral local disk — NVMe instance store on
+
+      `d`-family shapes, EBS-backed on others). 0–100 scale.
+
+      '
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.nvme_utilization_pct_p95
+  max_autoscale_workers:
+    description: Upper bound of the autoscale range. Null for fixed-size clusters.
+    lineage:
+    - system.compute.clusters.max_autoscale_workers
+  max_jvm_heap_bytes:
+    description: 'Maximum JVM heap memory used by any single executor in any stage of this task-run,
+
+      in bytes. From `spark_stage_metrics.max_jvm_heap_bytes`. Requires
+
+      `spark.eventLog.logStageExecutorMetrics=true` (enabled by PR #23078); will be
+
+      NULL for stages parsed before that landed. Useful for sizing
+
+      `spark.executor.memory`: a value approaching the configured heap suggests
+
+      executors are at risk of GC pressure or OOM.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.max_jvm_heap_bytes (EMR v1: NULL/0 parity)'
+  max_peak_execution_memory_bytes:
+    description: 'Maximum peak on-heap execution memory used by any single task in any stage of this task-run,
+      in bytes. Useful for sizing executor memory at the DAG / task level.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.peak_execution_memory_bytes (EMR v1: NULL/0 parity)'
+  max_task_run_time_ms:
+    description: 'Slowest single-task wall-clock execution time across all stages in this task-run,
+
+      in milliseconds. From `spark_stage_metrics.max_task_run_time_ms`. Combined with
+
+      `max_task_skew_ratio` for skew detection at the task-run level. Requires PR #23078.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.max_task_run_time_ms (EMR v1: NULL/0 parity)'
+  max_task_skew_ratio:
+    description: 'Maximum task-skew ratio (`max_task_run_time_ms / median_task_run_time_ms`) observed
+
+      in any stage of this task-run. From `spark_stage_metrics.task_skew_ratio`. Values
+
+      around 1 indicate balanced partitions; values above ~4 are a strong signal of
+
+      data skew worth investigating in at least one stage. Requires PR #23078.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.task_skew_ratio (EMR v1: NULL/0 parity)'
+  min_autoscale_workers:
+    description: Lower bound of the autoscale range. Null for fixed-size clusters.
+    lineage:
+    - system.compute.clusters.min_autoscale_workers
+  p50_driver_cpu_wait_percent:
+    description: Median driver I/O wait percent on the cluster-day.
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.p50_driver_cpu_wait_percent
+  p50_driver_mem_used_percent:
+    description: Median driver memory used percent on the cluster-day.
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.p50_driver_mem_used_percent
+  p50_worker_cpu_wait_percent:
+    description: Median worker I/O wait percent.
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.p50_worker_cpu_wait_percent
+  p95_driver_cpu_wait_percent:
+    description: 95th percentile driver I/O wait percent. Above ~5 suggests the driver is I/O bound.
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.p95_driver_cpu_wait_percent
+  p95_driver_mem_used_percent:
+    description: 95th percentile driver memory used percent. Above ~80 indicates driver memory pressure.
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.p95_driver_mem_used_percent
+  p95_worker_cpu_wait_percent:
+    description: '95th percentile worker I/O wait percent. Above ~5 suggests workers are I/O bound — keep
+      NVMe / consider Photon.
+
+      '
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.p95_worker_cpu_wait_percent
+  peak_concurrent_workers:
+    description: 'Maximum number of distinct worker instances observed in any single minute on the day
+      this task ran.
+
+      '
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.peak_concurrent_workers
+  post_init_script_seconds:
+    description: 'Seconds between INIT_SCRIPTS_FINISHED and the cluster entering RUNNING
+
+      (mostly Spark/JVM warm-up). Same cluster-day dedupe caveat applies.
+
+      '
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.post_init_script_seconds
+  pre_init_script_seconds:
+    description: 'Seconds spent in cluster STARTING before init scripts begin (DBR pull, network
+
+      setup, instance provisioning). Cluster-day attribute — every task run on the
+
+      same (id_cluster, dt_task_started) carries the same value, so SUM aggregations
+
+      at task-run grain over-count; dedupe to (id_cluster, dt_task_started) first.
+
+      '
+    lineage:
+    - datalake_emr_health.daily_emr_cluster_health.pre_init_script_seconds
+  run_result_state:
+    description: Final state of the parent Databricks run (`SUCCEEDED`, `FAILED`, `CANCELED`, ...).
+    lineage:
+    - system.lakeflow.job_run_timeline.result_state
+  run_type:
+    description: 'Databricks run type — `JOB_RUN` (scheduled / triggered job) or `SUBMIT_RUN` (one-off
+      API submission).
+
+      '
+    lineage:
+    - system.lakeflow.job_run_timeline.run_type
+  setup_duration_seconds:
+    description: 'Cluster cold-start time for this task in seconds — time spent acquiring instances and
+      bootstrapping before the first user code executes. Headline pool-effectiveness metric (O4). On pooled
+      clusters this is typically 30–60s; on non-pooled it is 4–8 minutes.
+
+      '
+    lineage:
+    - system.lakeflow.job_task_run_timeline.setup_duration_seconds
+  spark_app_count:
+    description: 'Distinct Spark application count attributed to this task-run by the dag_id + start-time-window
+      join. Always 1 for normal sequential-task DAGs; values > 1 fire `is_stage_attribution_ambiguous`
+      and indicate parallel tasks of the same dag_id whose Spark application start times overlap.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.id_spark_app (EMR v1: NULL/0 parity)'
+  stage_count:
+    description: 'Number of Spark stages observed for this task-run (sum across all attributed Spark applications).
+      Useful as a sanity check and as a denominator for "stages-per-task" rollups.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics (EMR v1: NULL/0 parity)'
+  team_owner:
+    description: 'Team or person responsible for the workload, lifted from the cluster `owner` tag
+
+      when present (e.g. bietlejuice-managed clusters). NULL when the tag is not set.
+
+      '
+    lineage:
+    - system.compute.clusters.tags
+  total_disk_bytes_spilled:
+    description: 'Sum of bytes spilled from memory to local disk (NVMe / EBS) across all stages in this
+      task-run. Non-zero values indicate memory pressure within the task; the headline NVMe-utilization
+      signal at task-run level.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.disk_bytes_spilled (EMR v1: NULL/0 parity)'
+  total_executor_cpu_time_ms:
+    description: 'Sum of executor CPU time across all stages in this task-run, in milliseconds (converted
+      from the underlying nanosecond accumulator). From `spark_stage_metrics.executor_cpu_time_ns / 1e6`.
+      Compare with `total_executor_run_time_ms` to compute CPU efficiency — values approaching 1 indicate
+      fully CPU-bound work; values much lower than 1 indicate I/O wait, GC, or scheduling overhead.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.executor_cpu_time_ns (EMR v1: NULL/0 parity)'
+  total_executor_run_time_ms:
+    description: 'Sum of executor wall-clock time across all stages in this task-run, in milliseconds.
+      From `spark_stage_metrics.executor_run_time_ms`. Useful as the denominator for GC-overhead and CPU-utilization
+      ratios at the task-run level.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.executor_run_time_ms (EMR v1: NULL/0 parity)'
+  total_gc_time_ms:
+    description: 'Total executor GC time (minor + major) across all stages in this task-run, in
+
+      milliseconds. From `spark_stage_metrics.total_gc_time_ms`. Compare with
+
+      `total_executor_run_time_ms` to compute GC overhead ratio — a healthy
+
+      task-run typically sits well under 10%. Requires PR #23078; NULL for older stages.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.total_gc_time_ms (EMR v1: NULL/0 parity)'
+  total_input_bytes_read:
+    description: 'Sum of bytes read from data sources (S3, JDBC, etc.) across all stages in this task-run.
+      From `spark_stage_metrics.input_bytes_read`.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.input_bytes_read (EMR v1: NULL/0 parity)'
+  total_memory_bytes_spilled:
+    description: 'Sum of bytes that would have been written to disk if no spill (logical pre-serialization
+      size) across all stages in this task-run. Always >= `total_disk_bytes_spilled`.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.memory_bytes_spilled (EMR v1: NULL/0 parity)'
+  total_output_bytes_written:
+    description: 'Sum of bytes written to data sinks (S3, JDBC, etc.) across all stages in this task-run.
+      From `spark_stage_metrics.output_bytes_written`.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.output_bytes_written (EMR v1: NULL/0 parity)'
+  total_shuffle_bytes_read:
+    description: 'Sum of bytes read from shuffle (local + remote) across all stages in this task-run.
+      From `spark_stage_metrics.shuffle_read_local_bytes + shuffle_read_remote_bytes`.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.shuffle_read_local_bytes (EMR v1: NULL/0 parity)'
+    - 'datalake_databricks_health.spark_stage_metrics.shuffle_read_remote_bytes (EMR v1: NULL/0 parity)'
+  total_shuffle_bytes_written:
+    description: 'Sum of bytes this task-run wrote to shuffle (consumed by downstream stages). From `spark_stage_metrics.shuffle_write_bytes`.
+
+      '
+    lineage:
+    - 'datalake_databricks_health.spark_stage_metrics.shuffle_write_bytes (EMR v1: NULL/0 parity)'
+  ts_load:
+    description: UTC timestamp when this fact row was written by the dw_emr_health DAG.

@@ -1,0 +1,158 @@
+---
+database_name: datalake_emr_health
+table_name: daily_emr_cluster_cost
+description: |
+  Per-cluster-day billed AWS CUR cost for Airflow-orchestrated EMR clusters
+  (`provisioner=emr`). Grain is (dt_cluster_run, id_emr_cluster).
+
+  Joins `datalake_aws_billed_cost.daily_resource_billed_cost` to
+  `datalake_emr_health.emr_instance_timeline`: EC2 on instance id, EBS via
+  exploded `ebs_volume_ids`, EMR service fee on `id_emr_cluster` from the
+  fee-line ARN. USD is the amortized `billed_cost_usd` already computed by
+  the shared CUR enrich — this table does not re-derive reservation /
+  Savings Plan effective cost.
+
+  `cost_source` is `cur` when EC2 billed cost is present, `cur_partial` when
+  only EBS and/or fee matched (ListInstances-empty fallback), `missing` when
+  a timeline cluster-day has no CUR rows. Fee-only days for clusters tagged
+  `provisioner=emr` (or seen on the timeline) are unioned in so spend is not
+  dropped when instance inventory is gone.
+
+  Each run overwrites the last 35 `dt_cluster_run` partitions so AWS
+  restatements land. Always filter on dt_cluster_run for partition pruning.
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  sk_emr_cluster_cost:
+    description: |
+      Surrogate key XXHASH64 over (dt_cluster_run, id_emr_cluster) — the table grain.
+  id_emr_cluster:
+    description: EMR cluster id (`j-…`). Part of the table grain.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.id_emr_cluster
+      - datalake_aws_billed_cost.daily_resource_billed_cost.id_emr_cluster
+  total_ec2_cost_usd:
+    description: |
+      Amortized AmazonEC2 BoxUsage/SpotUsage USD for instances on this
+      cluster-day, joined from CUR on `id_ec2_instance`. Zero when no EC2
+      CUR rows matched.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.billed_cost_usd
+      - datalake_emr_health.emr_instance_timeline.id_ec2_instance
+  total_ebs_cost_usd:
+    description: |
+      Amortized AmazonEC2 VolumeUsage USD for EBS volumes attached to this
+      cluster-day (`EXPLODE(ebs_volume_ids)`). Zero when no volume CUR rows
+      matched. Distinct volume ids so a shared volume is not double-counted.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.billed_cost_usd
+      - datalake_emr_health.emr_instance_timeline.ebs_volume_ids
+  total_emr_fee_cost_usd:
+    description: |
+      Amortized ElasticMapReduce service-fee USD for this cluster-day, joined
+      on `id_emr_cluster` extracted from the fee-line ARN. Zero when no fee
+      lines matched.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.billed_cost_usd
+      - datalake_aws_billed_cost.daily_resource_billed_cost.id_emr_cluster
+  total_ec2_net_cost_usd:
+    description: |
+      Enterprise-discounted AmazonEC2 BoxUsage/SpotUsage USD for instances on
+      this cluster-day, joined from CUR on `id_ec2_instance`. Zero when no EC2
+      CUR rows matched.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.net_cost_usd
+      - datalake_emr_health.emr_instance_timeline.id_ec2_instance
+  total_ebs_net_cost_usd:
+    description: |
+      Enterprise-discounted AmazonEC2 VolumeUsage USD for EBS volumes attached
+      to this cluster-day (`EXPLODE(ebs_volume_ids)`). Zero when no volume
+      CUR rows matched.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.net_cost_usd
+      - datalake_emr_health.emr_instance_timeline.ebs_volume_ids
+  total_emr_fee_net_cost_usd:
+    description: |
+      Enterprise-discounted ElasticMapReduce service-fee USD for this
+      cluster-day, joined on `id_emr_cluster` extracted from the fee-line ARN.
+      Zero when no fee lines matched.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.net_cost_usd
+      - datalake_aws_billed_cost.daily_resource_billed_cost.id_emr_cluster
+  total_discount_usd:
+    description: |
+      Total enterprise discount USD on this cluster-day: gross billed cost
+      (ec2 + ebs + fee) minus net cost (ec2 + ebs + fee).
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.billed_cost_usd
+      - datalake_aws_billed_cost.daily_resource_billed_cost.net_cost_usd
+  tag_owner:
+    description: |
+      Cluster tag `owner` COALESCE'd from timeline (EC2) with fee-lane fallback.
+      NULL when unset.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.tag_owner
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_owner
+  tag_cost_center:
+    description: |
+      Cluster tag `cost_center` COALESCE'd from timeline (EC2) with fee-lane fallback.
+      NULL when unset.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.tag_cost_center
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_cost_center
+  tag_ecosystem:
+    description: |
+      Cluster tag `ecosystem` COALESCE'd from timeline (EC2) with fee-lane fallback.
+      NULL when unset.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.tag_ecosystem
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_ecosystem
+  tag_environment:
+    description: |
+      Cluster tag `environment` COALESCE'd from timeline (EC2) with fee-lane fallback.
+      NULL when unset.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.tag_environment
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_environment
+  tag_data_classification:
+    description: |
+      Cluster tag `data_classification` COALESCE'd from timeline (EC2) with fee-lane fallback.
+      NULL when unset.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.tag_data_classification
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_data_classification
+  tag_sensitive_data:
+    description: |
+      Cluster tag `sensitive_data` COALESCE'd from timeline (EC2) with fee-lane fallback.
+      NULL when unset.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.tag_sensitive_data
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_sensitive_data
+  ec2_on_demand_hours:
+    description: |
+      CUR `usage_hours` on BoxUsage lines for instances mapped to this
+      cluster-day. Not wall-clock hours from ListInstances.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.usage_hours
+      - datalake_aws_billed_cost.daily_resource_billed_cost.market
+  ec2_spot_hours:
+    description: |
+      CUR `usage_hours` on SpotUsage lines for instances mapped to this
+      cluster-day. Not wall-clock hours from ListInstances.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.usage_hours
+      - datalake_aws_billed_cost.daily_resource_billed_cost.market
+  cost_source:
+    description: |
+      `cur` when EC2 billed cost is present; `cur_partial` when only EBS
+      and/or EMR fee matched; `missing` when a timeline cluster-day has no
+      CUR rows. Worst-wins rollup is MAX(cost_source), not MIN.
+  ts_load:
+    description: Timestamp the row was written by the DAG.
+  dt_cluster_run:
+    description: |
+      UTC cluster-day (equals CUR `dt_usage`). Partition column — always
+      filter on dt_cluster_run for partition pruning.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.dt_cluster_run
+      - datalake_aws_billed_cost.daily_resource_billed_cost.dt_usage

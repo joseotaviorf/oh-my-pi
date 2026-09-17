@@ -6,8 +6,10 @@ description: |
   per (airflow_dag_id, dt_window_end). Every metric column is duplicated with a
   `_7d` and `_28d` suffix — both windows are computed in a single SELECT over
   the same 28-day fact read, with 7d aggregates produced via `FILTER (WHERE
-  in_7d_window)`. Reads exclusively from
-  dw_databricks_health.fact_databricks_dag_run.
+  in_7d_window)`. Reads from dw_databricks_health.fact_databricks_dag_run UNION ALL
+  dw_emr_health.fact_emr_dag_run (discriminate with `provisioner`).
+  EMR v1 has no Spark stage ingest — expect ~0% stage coverage for
+  provisioner='emr' rows (not an eventLog.dir incident).
 
   Window choice rationale:
     - 7d  → "act this sprint". A regression yesterday shows up immediately;
@@ -61,6 +63,7 @@ columns:
   airflow_dag_id:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
+      - dw_emr_health.fact_emr_dag_run.airflow_dag_id
     description: Airflow DAG identifier as emitted by fact_databricks_dag_run — full canonical id including the framework prefix (e.g. bietlejuice.enrich_ebdb_booking, quintoml.wonka.user_activity).
     dimension: True
   team_owner:
@@ -194,26 +197,100 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_calculated_usd_7d:
+  total_ec2_cost_usd_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: Sum of task/dag-attributed calculated EC2 USD at logical DAG-run grain.
+      - dw_emr_health.fact_emr_dag_run.total_ec2_cost_usd
+    description: Sum of task/dag-attributed EC2 USD at logical DAG-run grain (Databricks seed-priced, EMR billed CUR).
     metric:
-      name: Total EC2 Cost Calculated USD (7d)
-      description: Task/dag-attributed EC2 from daily_cluster_health for the trailing 7-day window; may include billable_usage estimates before retained node_timeline coverage.
-      acronym: total_ec2_calc_usd_7d
+      name: Total EC2 Cost USD (7d)
+      description: Task/dag-attributed EC2 USD for the trailing 7-day window (Databricks from dim_ec2_price; EMR from billed CUR).
+      acronym: total_ec2_usd_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_calculated_usd_28d:
+  total_ec2_cost_usd_28d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: Sum of task/dag-attributed calculated EC2 USD at logical DAG-run grain over the 28-day window.
+      - dw_emr_health.fact_emr_dag_run.total_ec2_cost_usd
+    description: Sum of task/dag-attributed EC2 USD at logical DAG-run grain over the 28-day window (Databricks seed-priced, EMR billed CUR).
     metric:
-      name: Total EC2 Cost Calculated USD (28d)
-      description: Task/dag-attributed EC2 from daily_cluster_health for the trailing 28-day window; may include billable_usage estimates before retained node_timeline coverage.
-      acronym: total_ec2_calc_usd_28d
+      name: Total EC2 Cost USD (28d)
+      description: Task/dag-attributed EC2 USD for the trailing 28-day window (Databricks from dim_ec2_price; EMR from billed CUR).
+      acronym: total_ec2_usd_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_ec2_net_cost_usd_7d:
+    lineage:
+      - dw_emr_health.fact_emr_dag_run.total_ec2_net_cost_usd
+    description: Sum of task/dag-attributed EC2 net cost USD at logical DAG-run grain for the trailing 7-day window. NULL for provisioner = 'databricks' rows.
+    metric:
+      name: Total EC2 Net Cost USD (7d)
+      description: Task/dag-attributed EC2 net cost USD for the trailing 7-day window. NULL for provisioner = 'databricks' rows.
+      acronym: total_ec2_net_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_ec2_net_cost_usd_28d:
+    lineage:
+      - dw_emr_health.fact_emr_dag_run.total_ec2_net_cost_usd
+    description: Sum of task/dag-attributed EC2 net cost USD at logical DAG-run grain over the trailing 28-day window. NULL for provisioner = 'databricks' rows.
+    metric:
+      name: Total EC2 Net Cost USD (28d)
+      description: Task/dag-attributed EC2 net cost USD for the trailing 28-day window. NULL for provisioner = 'databricks' rows.
+      acronym: total_ec2_net_usd_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_net_cost_usd_7d:
+    lineage:
+      - dw_emr_health.fact_emr_dag_run.total_net_cost_usd
+    description: Total enterprise-discounted net cost USD for the trailing 7-day window. NULL for provisioner = 'databricks' rows.
+    metric:
+      name: Total Net Cost USD (7d)
+      description: Total enterprise-discounted net cost USD for the trailing 7-day window. NULL for provisioner = 'databricks' rows.
+      acronym: total_net_cost_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_net_cost_usd_28d:
+    lineage:
+      - dw_emr_health.fact_emr_dag_run.total_net_cost_usd
+    description: Total enterprise-discounted net cost USD for the trailing 28-day window. NULL for provisioner = 'databricks' rows.
+    metric:
+      name: Total Net Cost USD (28d)
+      description: Total enterprise-discounted net cost USD for the trailing 28-day window. NULL for provisioner = 'databricks' rows.
+      acronym: total_net_cost_usd_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_discount_usd_7d:
+    lineage:
+      - dw_emr_health.fact_emr_dag_run.total_discount_usd
+    description: Total enterprise discount USD (gross minus net) for the trailing 7-day window. NULL for provisioner = 'databricks' rows.
+    metric:
+      name: Total Discount USD (7d)
+      description: Total enterprise discount USD (gross minus net) for the trailing 7-day window. NULL for provisioner = 'databricks' rows.
+      acronym: total_discount_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_discount_usd_28d:
+    lineage:
+      - dw_emr_health.fact_emr_dag_run.total_discount_usd
+    description: Total enterprise discount USD (gross minus net) for the trailing 28-day window. NULL for provisioner = 'databricks' rows.
+    metric:
+      name: Total Discount USD (28d)
+      description: Total enterprise discount USD (gross minus net) for the trailing 28-day window. NULL for provisioner = 'databricks' rows.
+      acronym: total_discount_usd_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -224,7 +301,7 @@ columns:
     description: Sum of task/dag-attributed EC2 Spot node wall-clock hours in the 7-day window (not DBU).
     metric:
       name: EC2 Spot Node Hours (7d)
-      description: Trailing 7-day sum of EC2 node-hours priced at Spot via dim_ec2_price (0.37 × on-demand).
+      description: "Trailing 7-day sum of EC2 Spot node-hours. EC2 node-hours split spot / on-demand (Databricks: `dim_ec2_price` availability; EMR: CUR `market`)."
       acronym: spot_hrs_7d
       is_additive: False
       business_stage: Platform Operations
@@ -236,7 +313,7 @@ columns:
     description: Sum of task/dag-attributed EC2 Spot node wall-clock hours in the 28-day window (not DBU).
     metric:
       name: EC2 Spot Node Hours (28d)
-      description: Trailing 28-day sum of EC2 node-hours priced at Spot via dim_ec2_price.
+      description: "Trailing 28-day sum of EC2 Spot node-hours. EC2 node-hours split spot / on-demand (Databricks: `dim_ec2_price` availability; EMR: CUR `market`)."
       acronym: spot_hrs_28d
       is_additive: False
       business_stage: Platform Operations
@@ -248,7 +325,7 @@ columns:
     description: Sum of task/dag-attributed EC2 on-demand node wall-clock hours in the 7-day window (not DBU).
     metric:
       name: EC2 On Demand Node Hours (7d)
-      description: Trailing 7-day sum of EC2 node-hours priced on-demand via dim_ec2_price.
+      description: "Trailing 7-day sum of EC2 on-demand node-hours. EC2 node-hours split spot / on-demand (Databricks: `dim_ec2_price` availability; EMR: CUR `market`)."
       acronym: od_hrs_7d
       is_additive: False
       business_stage: Platform Operations
@@ -260,7 +337,7 @@ columns:
     description: Sum of task/dag-attributed EC2 on-demand node wall-clock hours in the 28-day window (not DBU).
     metric:
       name: EC2 On Demand Node Hours (28d)
-      description: Trailing 28-day sum of EC2 node-hours priced on-demand via dim_ec2_price.
+      description: "Trailing 28-day sum of EC2 on-demand node-hours. EC2 node-hours split spot / on-demand (Databricks: `dim_ec2_price` availability; EMR: CUR `market`)."
       acronym: od_hrs_28d
       is_additive: False
       business_stage: Platform Operations
@@ -279,12 +356,12 @@ columns:
   has_ec2_pricing_missing_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
-    description: True when any DAG-run in the 7-day window had EC2 hours with missing dim_ec2_price coverage.
+    description: True when any DAG-run in the 7-day window had EC2 hours with missing dim_ec2_price coverage. Databricks-only; always false for EMR rows.
     dimension: True
   has_ec2_pricing_missing_28d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
-    description: True when any DAG-run in the 28-day window had EC2 hours with missing dim_ec2_price coverage.
+    description: True when any DAG-run in the 28-day window had EC2 hours with missing dim_ec2_price coverage. Databricks-only; always false for EMR rows.
     dimension: True
   total_cost_usd_7d:
     lineage:
@@ -328,6 +405,30 @@ columns:
       name: Avg Total Cost USD per DAG Run (28d)
       description: Mean total USD per approximate DAG execution over the trailing 28-day window.
       acronym: avg_total_cost_per_dag_run_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_net_cost_usd_per_dag_run_7d:
+    lineage:
+      - dw_emr_health.fact_emr_dag_run.total_net_cost_usd
+    description: total_net_cost_usd_7d / total_dag_runs_7d. Mean net cost USD per DAG run over the trailing 7-day window. NULL for provisioner = 'databricks' rows.
+    metric:
+      name: Avg Net Cost USD per DAG Run (7d)
+      description: Mean enterprise-discounted net USD per approximate DAG execution over the trailing 7-day window. NULL for provisioner = 'databricks' rows.
+      acronym: avg_net_cost_per_dag_run_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_net_cost_usd_per_dag_run_28d:
+    lineage:
+      - dw_emr_health.fact_emr_dag_run.total_net_cost_usd
+    description: total_net_cost_usd_28d / total_dag_runs_28d. Mean net cost USD per DAG run over the trailing 28-day window. NULL for provisioner = 'databricks' rows.
+    metric:
+      name: Avg Net Cost USD per DAG Run (28d)
+      description: Mean enterprise-discounted net USD per approximate DAG execution over the trailing 28-day window. NULL for provisioner = 'databricks' rows.
+      acronym: avg_net_cost_per_dag_run_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost

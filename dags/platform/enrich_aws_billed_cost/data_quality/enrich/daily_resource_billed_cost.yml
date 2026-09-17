@@ -1,0 +1,44 @@
+---
+table_name: datalake_aws_billed_cost.daily_resource_billed_cost
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_resource_billed_cost:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  dt_usage:
+    is_complete:
+      severity_level: Error
+  id_aws_account:
+    is_complete:
+      severity_level: Error
+  resource_kind:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - ec2_instance
+        - ebs_volume
+        - emr_fee
+        - other
+      severity_level: Error
+  billed_cost_usd:
+    is_complete:
+      severity_level: Error
+  net_cost_usd:
+    is_complete:
+      severity_level: Error
+  market:
+    is_contained_in:
+      values:
+        - on_demand
+        - spot
+        - not_applicable
+      severity_level: Error

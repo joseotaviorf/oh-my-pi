@@ -1,0 +1,6 @@
+cluster:
+  type: emr_7_12_med_general_3_workers_fleet_cluster
+validation:
+  cluster:
+    type: emr_7_12_consolidation_m_memory_single_node_fleet_cluster
+  allow_custom_spark_job: true

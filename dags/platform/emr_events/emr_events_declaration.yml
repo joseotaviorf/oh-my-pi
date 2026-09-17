@@ -1,0 +1,52 @@
+dag:
+  name: emr_events
+  schedule_start_date: 2026, 08, 27
+  schedule_interval: 0 * * * *
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      Hourly clean of EMR lifecycle events landed by EventBridge → Firehose
+      on the artifacts bucket (`emr/events/`). Replaces EMR control-plane
+      polling for cluster/step state going forward.
+
+      Runs hourly and re-reads yesterday plus the current day so Firehose
+      objects that land after midnight self-heal under MERGE. A manual run
+      with conf `load_start_date` and `load_end_date` can backfill arbitrary
+      day windows.
+
+      One row per EventBridge envelope `id`. Cluster events and step events
+      share the table; `id_emr_step` is null on cluster-only types.
+workflow:
+  layer: clean
+  type: query_delta
+  load_spark_job: load_emr_events
+  custom_schema: emr_events
+  spark_job_arguments:
+    - "{dag_name}"
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{table_name}"
+    - "{partitions}"
+    - "--table-privileges"
+    - "{table_privileges}"
+    # Merge keys are passed explicitly because LoadCustomTaskCreator exposes no
+    # {merge_on} placeholder: for a load_spark_job table the tables_customization
+    # entry below is canonical but never reaches DeltaLoader, and without these
+    # keys every run dynamic-partition-overwrites an hour that late events had
+    # already populated. Keep the two lists identical.
+    - "--merge-on"
+    - '["year", "month", "day", "hour", "id_event"]'
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  default_extraction_type: incremental
+  default_partitions: [year, month, day, hour]
+  tables_customization:
+    events:
+      merge_on: [year, month, day, hour, id_event]
+  default_table_privileges:
+    data-platform-engineers:
+      - ALL PRIVILEGES

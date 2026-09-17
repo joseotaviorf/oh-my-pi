@@ -1,0 +1,39 @@
+---
+table_name: datalake_emr_health.daily_emr_cluster_cost
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_emr_cluster_cost:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  dt_cluster_run:
+    is_complete:
+      severity_level: Error
+  id_emr_cluster:
+    is_complete:
+      severity_level: Error
+  cost_source:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - cur
+        - cur_partial
+        - missing
+      severity_level: Error
+  total_ec2_cost_usd:
+    is_complete:
+      severity_level: Error
+  total_ebs_cost_usd:
+    is_complete:
+      severity_level: Error
+  total_emr_fee_cost_usd:
+    is_complete:
+      severity_level: Error

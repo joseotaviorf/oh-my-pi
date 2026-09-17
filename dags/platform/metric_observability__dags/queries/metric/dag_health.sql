@@ -3,8 +3,8 @@
 --
 -- Per-DAG rolling observability metrics computed daily over TWO trailing
 -- windows simultaneously: 7 days and 28 days. One row per
--- (airflow_dag_id, dt_window_end). Reads exclusively from
--- dw_databricks_health.fact_databricks_dag_run (logical Airflow run grain).
+-- (airflow_dag_id, dt_window_end). Reads from dw_databricks_health.fact_databricks_dag_run UNION ALL
+-- dw_emr_health.fact_emr_dag_run (logical Airflow run grain; provisioner discriminates).
 --
 -- Wide-form schema: every metric column is duplicated as `<metric>_7d` and
 -- `<metric>_28d`. Both windows share the same denominator data set (one read
@@ -31,7 +31,7 @@
 -- are excluded from both numerator and denominator.
 -- ============================================================================
 WITH window_runs AS (
-    SELECT
+SELECT
         airflow_dag_id,
         team_owner,
         cost_center,
@@ -63,7 +63,10 @@ WITH window_runs AS (
         max_cluster_startup_seconds                       AS cluster_startup_seconds,
         total_dbu_consumed,
         total_dbu_cost_usd,
-        total_ec2_cost_calculated_usd,
+        total_ec2_cost_calculated_usd AS total_ec2_cost_usd,
+        CAST(NULL AS DECIMAL(38, 4))                      AS total_ec2_net_cost_usd,
+        CAST(NULL AS DECIMAL(38, 4))                      AS total_net_cost_usd,
+        CAST(NULL AS DECIMAL(38, 4))                      AS total_discount_usd,
         ec2_spot_hours,
         ec2_on_demand_hours,
         is_ec2_estimated,
@@ -99,6 +102,82 @@ WITH window_runs AS (
         dt_dag_run_started >= DATE('{load_start_date}') - INTERVAL 6 DAYS AS in_7d_window
     FROM
         dw_databricks_health.fact_databricks_dag_run
+    WHERE
+        dt_dag_run_started >= DATE('{load_start_date}') - INTERVAL 27 DAYS
+        AND dt_dag_run_started <= DATE('{load_start_date}')
+        AND airflow_dag_id IS NOT NULL
+    UNION ALL
+SELECT
+        airflow_dag_id,
+        team_owner,
+        cost_center,
+        ecosystem,
+        environment,
+        provisioner,
+        cost_cohort,
+        data_classification,
+        primary_dbr_version,
+        n_databricks_job_runs,
+        n_task_runs,
+        n_failed_task_runs,
+        n_task_runs_with_stage_data,
+        n_stage_attribution_ambiguous_task_runs,
+        n_pool_acquisition_slow_tasks,
+        is_any_task_failed,
+        is_any_photon,
+        is_any_pool_backed,
+        is_any_local_nvme,
+        is_any_stage_attribution_ambiguous,
+        dt_dag_run_started,
+        ts_logical_run_started,
+        total_wall_clock_seconds                          AS total_duration_seconds,
+        total_execution_duration_seconds                  AS execution_duration_seconds,
+        total_setup_duration_seconds                      AS setup_duration_seconds,
+        max_pre_init_script_seconds                       AS pre_init_script_seconds,
+        max_init_script_seconds                           AS init_script_seconds,
+        max_post_init_script_seconds                      AS post_init_script_seconds,
+        max_cluster_startup_seconds                       AS cluster_startup_seconds,
+        total_dbu_consumed,
+        total_dbu_cost_usd,
+        total_ec2_cost_usd,
+        total_ec2_net_cost_usd,
+        total_net_cost_usd,
+        total_discount_usd,
+        ec2_spot_hours,
+        ec2_on_demand_hours,
+        FALSE AS is_ec2_estimated,
+        FALSE AS ec2_pricing_missing,
+        total_cost_usd,
+        weighted_avg_p95_driver_cpu_busy_percent          AS p95_driver_cpu_busy_percent,
+        weighted_avg_p95_worker_cpu_busy_percent          AS p95_worker_cpu_busy_percent,
+        weighted_avg_p95_driver_mem_used_percent          AS p95_driver_mem_used_percent,
+        weighted_avg_p95_worker_mem_used_percent          AS p95_worker_mem_used_percent,
+        weighted_avg_p95_driver_cpu_wait_percent          AS p95_driver_cpu_wait_percent,
+        weighted_avg_p95_worker_cpu_wait_percent          AS p95_worker_cpu_wait_percent,
+        weighted_avg_p50_driver_cpu_busy_percent          AS p50_driver_cpu_busy_percent,
+        weighted_avg_p50_worker_cpu_busy_percent          AS p50_worker_cpu_busy_percent,
+        weighted_avg_p50_driver_cpu_wait_percent          AS p50_driver_cpu_wait_percent,
+        weighted_avg_p50_worker_cpu_wait_percent          AS p50_worker_cpu_wait_percent,
+        weighted_avg_p50_driver_mem_used_percent          AS p50_driver_mem_used_percent,
+        weighted_avg_p50_worker_mem_used_percent          AS p50_worker_mem_used_percent,
+        weighted_avg_local_disk_utilization_pct_p95       AS local_disk_utilization_pct_p95,
+        stage_count,
+        failed_stage_count,
+        total_executor_run_time_ms,
+        total_executor_cpu_time_ms,
+        total_disk_bytes_spilled,
+        total_memory_bytes_spilled,
+        total_input_bytes_read,
+        total_output_bytes_written,
+        max_peak_execution_memory_bytes,
+        max_jvm_heap_bytes,
+        total_gc_time_ms,
+        max_task_skew_ratio,
+        total_shuffle_bytes_read,
+        total_shuffle_bytes_written,
+        dt_dag_run_started >= DATE('{load_start_date}') - INTERVAL 6 DAYS AS in_7d_window
+    FROM
+        dw_emr_health.fact_emr_dag_run
     WHERE
         dt_dag_run_started >= DATE('{load_start_date}') - INTERVAL 27 DAYS
         AND dt_dag_run_started <= DATE('{load_start_date}')
@@ -270,8 +349,14 @@ SELECT
         SUM(total_dbu_cost_usd) / NULLIF(COUNT(*), 0),
         4
     )                                                                                    AS avg_dbu_cost_usd_per_dag_run_28d,
-    ROUND(SUM(total_ec2_cost_calculated_usd) FILTER (WHERE in_7d_window), 4)             AS total_ec2_cost_calculated_usd_7d,
-    ROUND(SUM(total_ec2_cost_calculated_usd),                                  4)         AS total_ec2_cost_calculated_usd_28d,
+    ROUND(SUM(total_ec2_cost_usd) FILTER (WHERE in_7d_window), 4)             AS total_ec2_cost_usd_7d,
+    ROUND(SUM(total_ec2_cost_usd),                                  4)         AS total_ec2_cost_usd_28d,
+    ROUND(SUM(total_ec2_net_cost_usd) FILTER (WHERE in_7d_window), 4)  AS total_ec2_net_cost_usd_7d,
+    ROUND(SUM(total_ec2_net_cost_usd), 4)                              AS total_ec2_net_cost_usd_28d,
+    ROUND(SUM(total_net_cost_usd) FILTER (WHERE in_7d_window), 4)      AS total_net_cost_usd_7d,
+    ROUND(SUM(total_net_cost_usd), 4)                                  AS total_net_cost_usd_28d,
+    ROUND(SUM(total_discount_usd) FILTER (WHERE in_7d_window), 4)      AS total_discount_usd_7d,
+    ROUND(SUM(total_discount_usd), 4)                                  AS total_discount_usd_28d,
     ROUND(SUM(ec2_spot_hours) FILTER (WHERE in_7d_window), 4)                           AS ec2_spot_hours_7d,
     ROUND(SUM(ec2_spot_hours),                                  4)                     AS ec2_spot_hours_28d,
     ROUND(SUM(ec2_on_demand_hours) FILTER (WHERE in_7d_window), 4)                     AS ec2_on_demand_hours_7d,
@@ -291,6 +376,15 @@ SELECT
         SUM(total_cost_usd) / NULLIF(COUNT(*), 0),
         4
     )                                                                                    AS avg_total_cost_usd_per_dag_run_28d,
+    ROUND(
+        SUM(total_net_cost_usd) FILTER (WHERE in_7d_window)
+            / NULLIF(COUNT(*) FILTER (WHERE in_7d_window), 0),
+        4
+    )                                                                  AS avg_net_cost_usd_per_dag_run_7d,
+    ROUND(
+        SUM(total_net_cost_usd) / NULLIF(COUNT(*), 0),
+        4
+    )                                                                  AS avg_net_cost_usd_per_dag_run_28d,
     ROUND(
         SUM(total_cost_usd) FILTER (WHERE in_7d_window)
             / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_7d_window) AS DOUBLE) / 1000.0, 0),

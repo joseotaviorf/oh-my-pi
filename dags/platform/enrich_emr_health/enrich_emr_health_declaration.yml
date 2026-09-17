@@ -1,0 +1,71 @@
+dag:
+  name: enrich_emr_health
+  schedule_interval: "0 9 * * *"
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      Daily per-EMR-cluster health snapshot for Airflow-orchestrated clusters
+      tagged provisioner=emr (emr_cluster_base). Identity comes from CUR
+      (`emr_instance_timeline` over `daily_resource_billed_cost`); CloudWatch
+      utilization lives on daily_emr_cluster_health. Cost is billed CUR on
+      daily_emr_cluster_cost — this DAG does not call the EMR control plane
+      and does not read pricing seeds.
+
+      Also builds emr_dag_task_spine (SQL over emr_instance_timeline and
+      Airflow task_instance, EMR step tasks selected by operator).
+
+      One row per (id_emr_cluster, dt_cluster_run) in daily_emr_cluster_health.
+      Spark stage KPIs are intentionally out of scope (no eventLog.dir restore;
+      enrich_spark_event_logs stays paused).
+
+      Scheduled at 09:00 UTC on D+1 so CloudWatch has settled for calendar
+      day D and enrich_aws_billed_cost (08:00) has written CUR. Powers
+      fact_emr_* / dag_health EMR twin (see docs/platform/emr_observability.md).
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: emr_health
+  default_extraction_type: incremental
+  has_hive_sync: true
+  execution_timeout_hours: 10
+  inner_dependencies:
+    daily_emr_cluster_health:
+      - emr_instance_timeline
+    emr_dag_task_spine:
+      - emr_instance_timeline
+    daily_emr_cluster_cost:
+      - emr_instance_timeline
+  tables_customization:
+    emr_instance_timeline:
+      partitions: [ dt_cluster_run ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+    daily_emr_cluster_cost:
+      partitions: [ dt_cluster_run ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+    daily_emr_cluster_health:
+      load_spark_job: load_daily_emr_cluster_health
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+      partitions: [ dt_cluster_run ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+    emr_dag_task_spine:
+      partitions: [ dt_step ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1),  'load_end_date') }}"
+    environment:     "{{ var.value.environment }}"

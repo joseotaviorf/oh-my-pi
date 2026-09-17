@@ -1,0 +1,96 @@
+---
+database_name: datalake_emr_health
+table_name: daily_emr_cluster_health
+description: |
+  Daily per-EMR-cluster health snapshot for Airflow-orchestrated clusters
+  tagged `provisioner=emr` (`emr_cluster_base`). Cluster/instance identity
+  comes from `datalake_emr_health.emr_instance_timeline`; CloudWatch
+  (`AWS/ElasticMapReduce`, `AWS/EC2`) utilization lives in this job.
+
+  One row per (id_emr_cluster, dt_cluster_run). P50/P95 master/worker
+  `CPUUtilization` and YARN memory-used percent from CloudWatch. **Cost lives
+  in `daily_emr_cluster_cost` (billed CUR)**, not here.
+
+  Spark stage KPIs are intentionally absent (v1 — no eventLog.dir restore).
+  Partitioned by dt_cluster_run — always filter on it for partition pruning.
+
+  See docs/platform/emr_observability.md.
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  id_emr_cluster:
+    description: EMR cluster id (`j-…`). Part of the table grain.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.id_emr_cluster
+  dag_id:
+    description: Airflow DAG id from cluster tag `dag_id` (fallback parse of cluster name).
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.dag_id
+  cluster_name:
+    description: EMR cluster name (typically `{dag_id}_{run_id}`).
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.cluster_name
+      - AWS EMR DescribeCluster.Cluster.Name
+  master_instance_type:
+    description: MASTER instance type from emr_instance_timeline.instance_role.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.instance_type
+  worker_instance_type:
+    description: Modal CORE/TASK instance type on the cluster-day.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.instance_type
+  worker_count:
+    description: Distinct CORE+TASK instance count on the cluster-day.
+    lineage:
+      - datalake_emr_health.emr_instance_timeline.id_ec2_instance
+  cluster_uptime_minutes:
+    description: Wall-clock minutes between first and last instance observation overlapping dt_cluster_run.
+  ec2_on_demand_hours:
+    description: On-demand EC2 instance wall-clock hours on this cluster-day.
+  ec2_spot_hours:
+    description: Spot EC2 instance wall-clock hours on this cluster-day.
+  ec2_source:
+    description: "`cur_timeline` when instance inventory exists; `missing` otherwise."
+  is_ec2_estimated:
+    description: True when cluster end times were missing and hours were inferred from the load window.
+  p50_master_cpu_percent:
+    description: Median MASTER CPUUtilization on dt_cluster_run (CloudWatch AWS/EC2).
+  p95_master_cpu_percent:
+    description: 95th percentile MASTER CPUUtilization on dt_cluster_run.
+  p50_worker_cpu_percent:
+    description: Median CORE/TASK CPUUtilization on dt_cluster_run.
+  p95_worker_cpu_percent:
+    description: 95th percentile CORE/TASK CPUUtilization on dt_cluster_run.
+  p50_yarn_memory_used_percent:
+    description: |
+      Median YARN memory used percent =
+      100 * MemoryAllocatedMB / MemoryTotalMB (or 100 − YARNMemoryAvailablePercentage).
+  p95_yarn_memory_used_percent:
+    description: 95th percentile YARN memory used percent on dt_cluster_run.
+  total_network_in_bytes:
+    description: Sum of the NetworkIn `Sum` statistic across instances on dt_cluster_run.
+  total_network_out_bytes:
+    description: Sum of the NetworkOut `Sum` statistic across instances on dt_cluster_run.
+  total_ebs_read_bytes:
+    description: Sum of the EBSReadBytes `Sum` statistic across instances on dt_cluster_run.
+  total_ebs_write_bytes:
+    description: Sum of the EBSWriteBytes `Sum` statistic across instances on dt_cluster_run.
+  num_cw_datapoints:
+    description: Count of CloudWatch datapoints aggregated into util/network columns.
+  cw_period_seconds:
+    description: |
+      CloudWatch resolution used for this cluster-day: 300 within 60 days,
+      3600 beyond it (5-minute data expires at 63 days, hourly at 455). Byte
+      totals use the `Sum` statistic and are period-independent; CPU and YARN
+      percentiles are computed over `Average` datapoints, so values are only
+      comparable across rows sharing this period.
+  ts_cluster_started:
+    description: Cluster creation / start timestamp (UTC).
+  ts_cluster_ended:
+    description: Cluster end timestamp (UTC); NULL if still running at load time.
+  ts_load:
+    description: Timestamp the row was written by the DAG.
+  dt_cluster_run:
+    description: |
+      UTC date of the cluster-day observation. Partition column — always filter
+      on dt_cluster_run for partition pruning.

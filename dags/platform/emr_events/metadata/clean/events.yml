@@ -1,0 +1,92 @@
+---
+database_name: datalake_emr_events_clean
+table_name: events
+description: |
+  Clean EMR lifecycle events from the default EventBridge bus
+  (`source = aws.emr`), landed by Firehose on
+  `s3://artifacts.s3.data.quintoandar.com.br/emr/events/`.
+
+  One row per EventBridge envelope `id`. Cluster events and step events
+  share the table; `id_emr_step` is null on cluster-only detail types.
+  `detail.name` is split: cluster name on cluster events, step name on
+  `EMR Step Status Change`.
+
+  Partitioned by year, month, day, hour from `time`. Always filter on
+  those columns for partition pruning.
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  id_event:
+    description: EventBridge envelope id. Globally unique. Part of the table grain.
+    lineage:
+      - aws.emr.id
+  id_emr_cluster:
+    description: EMR cluster id (`j-…`) from the event detail.
+    lineage:
+      - aws.emr.detail.clusterId
+  id_emr_step:
+    description: |
+      EMR step id (`s-…`) on `EMR Step Status Change`. Null on cluster-only
+      detail types.
+    lineage:
+      - aws.emr.detail.stepId
+  detail_type:
+    description: |
+      EventBridge `detail-type` (for example `EMR Cluster State Change`,
+      `EMR Step Status Change`).
+    lineage:
+      - aws.emr.detail-type
+  event_state:
+    description: Cluster or step state from the event detail (`STARTING`, `RUNNING`, `TERMINATED`, …).
+    lineage:
+      - aws.emr.detail.state
+  state_change_reason:
+    description: Raw JSON text of `detail.stateChangeReason` (string or object).
+    lineage:
+      - aws.emr.detail.stateChangeReason
+  severity:
+    description: Event severity from the detail payload when present.
+    lineage:
+      - aws.emr.detail.severity
+  cluster_name:
+    description: |
+      Cluster name (`{dag_id}_{run_id}`) on cluster events. Null on
+      `EMR Step Status Change`.
+    lineage:
+      - aws.emr.detail.name
+  step_name:
+    description: Step name on `EMR Step Status Change`. Null on cluster events.
+    lineage:
+      - aws.emr.detail.name
+  message:
+    description: Optional human-readable message from the event detail.
+    lineage:
+      - aws.emr.detail.message
+  id_aws_account:
+    description: AWS account id that emitted the event (`account` on the envelope).
+    lineage:
+      - aws.emr.account
+  ts_event:
+    description: Event timestamp from the EventBridge envelope `time`, UTC.
+    lineage:
+      - aws.emr.time
+  ts_load:
+    description: Timestamp when the clean job wrote this row.
+    lineage:
+      - load_emr_events.ts_load
+  year:
+    description: Year of `ts_event`, partition key.
+    lineage:
+      - aws.emr.time
+  month:
+    description: Month of `ts_event`, partition key.
+    lineage:
+      - aws.emr.time
+  day:
+    description: Day of `ts_event`, partition key.
+    lineage:
+      - aws.emr.time
+  hour:
+    description: Hour of `ts_event`, partition key.
+    lineage:
+      - aws.emr.time

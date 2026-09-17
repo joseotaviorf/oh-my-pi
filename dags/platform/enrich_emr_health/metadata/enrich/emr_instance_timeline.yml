@@ -1,0 +1,177 @@
+---
+database_name: datalake_emr_health
+table_name: emr_instance_timeline
+description: |
+  Per-instance timeline for Airflow-orchestrated EMR clusters tagged
+  `provisioner=emr` (`emr_cluster_base`). Built from billed CUR
+  (`datalake_aws_billed_cost.daily_resource_billed_cost`) joined to
+  EventBridge events (`datalake_emr_events_clean.events`) and
+  `datalake_airflow.task_instance` for cluster identity (`{dag_id}_{run_id}`)
+  and the EMR create/terminate wall-clock window. Cluster identity resolves
+  events-first from EventBridge EMR Cluster State Change events (primary from
+  2026-08-28 onward). For pre-event clusters (before 2026-08-28), identity falls
+  back to an hour-bucket heuristic against Airflow task_instance lifecycle tasks
+  anchored to the first billed hour. `run_id` survives when resolved by event or
+  when candidate creates resolve to a single run; ambiguous clusters leave `run_id`
+  NULL. `run_match` records the resolution method (`event`, `resolved`, `ambiguous`,
+  `no_candidate`). Cluster identity is resolved over a wider scan (load_start - 7d
+  .. load_end + 2d) than the partitions written, so a cluster that started before
+  the window keeps its true first billed hour. This is the identity table that makes
+  EMR EC2/EBS CUR spend attributable at cluster grain.
+
+  One row per (dt_cluster_run, id_emr_cluster, id_ec2_instance). Restricted to
+  AWS account `206390561754`. `ts_instance_started` / `ts_instance_ended` equal
+  the cluster window — CUR has no per-instance timestamps. `ebs_volume_ids` is
+  the set of volume ids sharing `(id_emr_cluster, dt_usage)`; downstream
+  `daily_emr_cluster_cost` EXPLODEs then DISTINCT so repeating the cluster-day
+  list on every instance does not double-count.
+
+  Downstream `daily_emr_cluster_health` and `emr_dag_task_spine` read this table
+  instead of calling the EMR control plane.
+
+  Partitioned by dt_cluster_run — always filter on it for partition pruning.
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  id_emr_cluster:
+    description: EMR cluster id (`j-…`). Part of the table grain.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.id_emr_cluster
+  id_ec2_instance:
+    description: EC2 instance id (`i-…`) attached to the cluster on this day. Part of the table grain.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.id_resource
+  dag_id:
+    description: |
+      Airflow DAG id from CUR tag `dag_id`, falling back to EventBridge event
+      cluster name or the matched create-cluster task.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_dag_id
+      - datalake_emr_events_clean.events.cluster_name
+      - datalake_airflow.task_instance.id_dag
+  tag_dag_id:
+    description: Raw Airflow DAG id from CUR `tag_dag_id`; NULL when the tag was absent.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_dag_id
+  cluster_name:
+    description: |
+      EMR cluster name (`{dag_id}_{run_id}`) from EventBridge events, falling back
+      to reconstruction from the Airflow join.
+    lineage:
+      - datalake_emr_events_clean.events.cluster_name
+      - datalake_airflow.task_instance.id_dag
+      - datalake_airflow.task_instance.id_run
+  run_id:
+    description: |
+      Airflow run id extracted from EventBridge event cluster name, falling back to
+      the create task anchored to this cluster's first billed hour for pre-event clusters.
+      A create in the last quarter of an hour also anchors to the following hour as a
+      fallback. Populated only when resolved by event or when every closest-ranked candidate
+      resolves to a single run; NULL when no create anchors to the hour, or when two runs of
+      the DAG started in the same hour and CUR's hour grain cannot separate them. NULL rows carry
+      CUR identity only and are excluded from emr_dag_task_spine.
+    lineage:
+      - datalake_emr_events_clean.events.cluster_name
+      - datalake_airflow.task_instance.id_run
+  run_match:
+    description: |
+      How run_id was resolved: `event` (resolved directly from EventBridge `EMR Cluster
+      State Change` event), `resolved` (the closest-ranked candidates all point at one run),
+      `ambiguous` (two or more runs of the DAG started in that hour, so run_id is NULL by
+      choice), `no_candidate` (no event and no create task anchored to the hour).
+    lineage:
+      - datalake_emr_events_clean.events.cluster_name
+      - datalake_airflow.task_instance.id_run
+      - datalake_airflow.task_instance.id_task
+  instance_role:
+    description: Instance role on the cluster-day (`MASTER` / `CORE` / `TASK` / `UNKNOWN`).
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.instance_role
+  market:
+    description: Purchase market (`on_demand` or `spot`) from CUR usage type.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.market
+  instance_type:
+    description: EC2 instance type (e.g. m5.xlarge).
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.instance_type
+  ebs_volume_ids:
+    description: |
+      EBS volume ids (`vol-…`) billed to this cluster on dt_cluster_run.
+      Exact join key for CUR ebs_volume rows.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.id_resource
+  instance_hours_in_day:
+    description: CUR BoxUsage / SpotUsage hours for this instance on dt_cluster_run.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.usage_hours
+  ts_instance_started:
+    description: |
+      Instance start timestamp (UTC). Approximation: equals ts_cluster_started
+      because CUR has no per-instance timestamps.
+    lineage:
+      - datalake_emr_events_clean.events.ts_event
+      - datalake_airflow.task_instance.ts_started
+  ts_instance_ended:
+    description: |
+      Instance end timestamp (UTC). Approximation: equals ts_cluster_ended
+      because CUR has no per-instance timestamps.
+    lineage:
+      - datalake_emr_events_clean.events.ts_event
+      - datalake_emr_events_clean.events.event_state
+      - datalake_airflow.task_instance.ts_ended
+  ts_cluster_started:
+    description: |
+      Cluster creation timestamp (UTC) from the earliest EventBridge event; falls
+      back to the matched QuintoAndarEmrCreateClusterOperator task, then the first
+      CUR hourly usage-period start when no task matched.
+    lineage:
+      - datalake_emr_events_clean.events.ts_event
+      - datalake_airflow.task_instance.ts_started
+      - datalake_aws_billed_cost.daily_resource_billed_cost.ts_first_usage
+  ts_cluster_ended:
+    description: |
+      Cluster end timestamp (UTC) from the EventBridge TERMINATED/TERMINATED_WITH_ERRORS
+      event; falls back to the matched QuintoAndarEmrTerminateClusterOperator task, then
+      the last CUR hourly usage-period end when no task matched.
+    lineage:
+      - datalake_emr_events_clean.events.ts_event
+      - datalake_emr_events_clean.events.event_state
+      - datalake_airflow.task_instance.ts_ended
+      - datalake_aws_billed_cost.daily_resource_billed_cost.ts_last_usage
+  tag_provisioner:
+    description: Cluster tag `provisioner` (filter value `emr`).
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_provisioner
+  tag_owner:
+    description: Cluster tag `owner` when present.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_owner
+  tag_environment:
+    description: Cluster tag `environment` when present.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_environment
+  tag_cost_center:
+    description: Cluster tag `cost_center` when present.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_cost_center
+  tag_ecosystem:
+    description: Cluster tag `ecosystem` when present.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_ecosystem
+  tag_data_classification:
+    description: Cluster tag `data_classification` when present.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_data_classification
+  tag_sensitive_data:
+    description: Cluster tag `sensitive_data` when present.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.tag_sensitive_data
+  ts_load:
+    description: Timestamp the row was written by the DAG.
+  dt_cluster_run:
+    description: |
+      UTC date of the instance-day observation. Partition column — always filter
+      on dt_cluster_run for partition pruning.
+    lineage:
+      - datalake_aws_billed_cost.daily_resource_billed_cost.dt_usage

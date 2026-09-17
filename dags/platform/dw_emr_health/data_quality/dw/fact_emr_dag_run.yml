@@ -1,0 +1,17 @@
+---
+table_name: dw_emr_health.fact_emr_dag_run
+alert_channel: "#alerts-de-airflow-dags"
+
+column_level_validations:
+  cost_cohort:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_emr_health.fact_emr_dag_run
+         WHERE cost_cohort = 'other'
+           AND dt_dag_run_started >= DATE('2026-01-01')
+        ) = 0
+      severity_level: Error
+  total_net_cost_usd:
+    is_complete:
+      severity_level: Error
