@@ -26,7 +26,7 @@ closed_surveys AS (
     FROM
         datalake_gsheets_people_clean.questionnaire_requests
     WHERE
-        survey_status = 'Closed'
+        survey_status = 'Completed'
         AND answered_count > 0
 ),
 aggregated_answers AS (
