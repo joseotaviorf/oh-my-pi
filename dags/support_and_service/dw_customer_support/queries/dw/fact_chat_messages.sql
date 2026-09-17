@@ -150,7 +150,18 @@ inapp_messages AS (
       AND css.source = 'support_session'
   WHERE
     MAKE_DATE(icm.year, icm.month, icm.day) >= '{load_start_date}'
-  GROUP BY ALL
+  GROUP BY
+    icm.id_channel,
+    icm.id_message,
+    REPLACE(REPLACE(icm.id_user_external,'_2E', '.'), '_40', '@'),
+    icm.message,
+    icm.ts_created,
+    CASE
+      WHEN id_user_external = 'system' THEN 'Bot'
+      WHEN REPLACE(REPLACE(id_user_external,'_2E', '.'), '_40', '@')  LIKE '%@%' THEN 'Analyst'
+      WHEN id_user_external IS NOT NULL THEN 'User'
+      ELSE NULL
+    END
 ),
 messages AS (
   SELECT
@@ -186,8 +197,14 @@ messages_w_users AS (
     CASE
       WHEN m.user_sender = 'system' THEN -1
       WHEN m.user_type = 'Analyst' THEN u1.id
-      WHEN COALESCE(s_num.user_data:["user_id"], s_hash.user_data:["user_id"], ss.user_data:["user_id"]) IS NOT NULL
-        AND m.user_type = 'User' THEN COALESCE(s_num.user_data:["user_id"], s_hash.user_data:["user_id"], ss.user_data:["user_id"])
+      WHEN m.user_type = 'User' THEN COALESCE(
+        GET_JSON_OBJECT(s_num.user_data, '$.user_id'),
+        GET_JSON_OBJECT(s_hash.user_data, '$.user_id'),
+        GET_JSON_OBJECT(ss.user_data, '$.user_id'),
+        NULLIF(REGEXP_EXTRACT(s_num.user_data, 'user_id["'']?\\s*:\\s*["'']?([^,"''}}\\s]+)', 1), ''),
+        NULLIF(REGEXP_EXTRACT(s_hash.user_data, 'user_id["'']?\\s*:\\s*["'']?([^,"''}}\\s]+)', 1), ''),
+        NULLIF(REGEXP_EXTRACT(ss.user_data, 'user_id["'']?\\s*:\\s*["'']?([^,"''}}\\s]+)', 1), '')
+      )
       WHEN u1.id IS NOT NULL THEN u1.id
       WHEN STARTSWITH(m.user_sender, '+') THEN NULL
     END AS id_user,
@@ -203,7 +220,7 @@ messages_w_users AS (
   LEFT JOIN
     datalake_sauron_clean.session AS s_hash
       ON s_hash.public_id = m.id_sauron_session
-  LEFT JOIN 
+  LEFT JOIN
     datalake_support_session_service_clean.support_session AS ss
       ON ss.public_id = m.id_sss_session
   LEFT JOIN
@@ -226,14 +243,42 @@ spoc_session AS (
   GROUP BY
     c.id_session,
     c.id_sss_session
-  ),
-messages_w_tasks AS (
+),
+-- UNION of equi-joins reproduces the old OR filter: a message matching both
+-- keys still yields one id_message; two distinct SPOC rows each matching one
+-- key still yield that one message (downstream ROW_NUMBER is per id_message)
+spoc_message_ids AS (
+  SELECT
+    mw.id_message
+  FROM
+    messages_w_users AS mw
+  INNER JOIN
+    spoc_session AS ss
+      ON ss.id_session = mw.id_sauron_session
+  WHERE
+    ss.is_spoc_session = true
+  UNION
+  SELECT
+    mw.id_message
+  FROM
+    messages_w_users AS mw
+  INNER JOIN
+    spoc_session AS ss
+      ON ss.id_sss_session = mw.id_sss_session
+  WHERE
+    ss.is_spoc_session = true
+),
+messages_w_tasks_ranked AS (
 SELECT
     mw.id_channel,
     mw.id_message,
     mw.id_sauron_session AS id_session,
     mw.id_sss_session,
-    mw.id_user,
+    CASE
+      WHEN mw.user_type = 'Analyst' THEN mw.id_user
+      WHEN mw.user_type = 'Bot' THEN COALESCE(mw.id_user, -1)
+      ELSE COALESCE(mw.id_user, c_cast.id_user, c_hash.id_user, sss.id_user)
+    END AS id_user,
     mw.origin,
     mw.message,
     mw.user_type,
@@ -241,11 +286,12 @@ SELECT
     CASE
       WHEN LAG(mw.ts_created) OVER(PARTITION BY COALESCE(mw.id_sauron_session, mw.id_sss_session) ORDER BY mw.ts_created) IS NOT NULL
         AND LAG(mw.user_type) OVER(PARTITION BY COALESCE(mw.id_sauron_session, mw.id_sss_session) ORDER BY mw.ts_created) <> mw.user_type
-          THEN DATE_DIFF(SECOND, LAG(mw.ts_created) OVER (PARTITION BY COALESCE(mw.id_sauron_session, mw.id_sss_session) ORDER BY mw.ts_created), mw.ts_created)
+          THEN TIMESTAMPDIFF(SECOND, LAG(mw.ts_created) OVER (PARTITION BY COALESCE(mw.id_sauron_session, mw.id_sss_session) ORDER BY mw.ts_created), mw.ts_created)
       ELSE NULL
     END AS reply_time,
     COALESCE(c_cast.id_task, c_hash.id_task, sss.id_task) AS id_task,
-    COALESCE(c_cast.ts_created, c_hash.ts_created, sss.ts_created) AS ts_task_twilio_created
+    COALESCE(c_cast.ts_created, c_hash.ts_created, sss.ts_created) AS ts_task_twilio_created,
+    ROW_NUMBER() OVER (PARTITION BY mw.id_message ORDER BY COALESCE(c_cast.ts_created, c_hash.ts_created, sss.ts_created) DESC) AS rn
 FROM
   messages_w_users AS mw
 LEFT JOIN
@@ -269,16 +315,31 @@ LEFT JOIN
     AND mw.ts_created >= sss.ts_created
     AND mw.ts_created <= sss.ts_ended
     AND MAKE_DATE(sss.year, sss.month, sss.day) >= '{load_start_date}'
-LEFT JOIN spoc_session AS ss
-  ON ss.id_session = mw.id_sauron_session
-  OR ss.id_sss_session = mw.id_sss_session
-WHERE
-  ss.is_spoc_session = true
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY mw.id_message ORDER BY COALESCE(c_cast.ts_created, c_hash.ts_created, sss.ts_created) DESC) = 1
+INNER JOIN
+  spoc_message_ids AS sm
+    ON sm.id_message = mw.id_message
 ),
-ai_without_spoc AS (
-  SELECT DISTINCT
+messages_w_tasks AS (
+  SELECT
+    id_channel,
+    id_message,
+    id_session,
+    id_sss_session,
+    id_user,
+    origin,
+    message,
+    user_type,
+    ts_created,
+    reply_time,
+    id_task,
+    ts_task_twilio_created
+  FROM
+    messages_w_tasks_ranked
+  WHERE
+    rn = 1
+),
+ai_without_spoc_ranked AS (
+  SELECT
   COALESCE(c_cast.id_channel, c_hash.id_channel, c_sss.id_channel) AS id_channel,
   m.id_message,
   m.id_sauron_session AS id_session,
@@ -295,14 +356,15 @@ ai_without_spoc AS (
   m.reply_time,
   m.ts_created,
   NULL AS id_task,
-  NULL AS ts_task_twilio_created
+  NULL AS ts_task_twilio_created,
+  ROW_NUMBER() OVER (PARTITION BY m.id_message ORDER BY COALESCE(c_cast.ts_created, c_hash.ts_created, c_sss.ts_created) DESC) AS rn
 FROM
   datalake_chatbot.messages AS m
 LEFT JOIN
   datalake_customer_support.chats AS c_cast
     ON c_cast.id_session = TRY_CAST(m.id_sauron_session AS BIGINT)
     AND MAKE_DATE(c_cast.year, c_cast.month, c_cast.day) >= '{load_start_date}'
-LEFT JOIN 
+LEFT JOIN
   datalake_customer_support.chats AS c_hash
     ON c_hash.id_sss_session = m.id_sauron_session
     AND MAKE_DATE(c_hash.year, c_hash.month, c_hash.day) >= '{load_start_date}'
@@ -312,10 +374,28 @@ LEFT JOIN
     AND MAKE_DATE(c_sss.year, c_sss.month, c_sss.day) >= '{load_start_date}'
 WHERE
   m.conversation_type = 'HUMAN-AI'
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY m.id_message ORDER BY COALESCE(c_cast.ts_created, c_hash.ts_created, c_sss.ts_created) DESC) = 1
 ),
-human_without_spoc AS (
+ai_without_spoc AS (
+  SELECT DISTINCT
+    id_channel,
+    id_message,
+    id_session,
+    id_sss_session,
+    id_user,
+    origin,
+    message,
+    user_type,
+    conversation_type,
+    reply_time,
+    ts_created,
+    id_task,
+    ts_task_twilio_created
+  FROM
+    ai_without_spoc_ranked
+  WHERE
+    rn = 1
+),
+human_without_spoc_ranked AS (
   SELECT
   COALESCE(c_cast.id_channel, c_hash.id_channel, c_sss.id_channel) AS id_channel,
   m.id_message,
@@ -333,7 +413,8 @@ human_without_spoc AS (
   m.reply_time,
   m.ts_created,
   COALESCE(c_cast.id_task, c_hash.id_task, c_sss.id_task) AS id_task,
-  COALESCE(c_cast.ts_created, c_hash.ts_created, c_sss.ts_created) AS ts_task_twilio_created
+  COALESCE(c_cast.ts_created, c_hash.ts_created, c_sss.ts_created) AS ts_task_twilio_created,
+  ROW_NUMBER() OVER (PARTITION BY m.id_message ORDER BY COALESCE(c_cast.ts_created, c_hash.ts_created, c_sss.ts_created) DESC) AS rn
 FROM
   datalake_chatbot.messages AS m
 LEFT JOIN
@@ -342,7 +423,7 @@ LEFT JOIN
     AND m.ts_created >= c_cast.ts_created
     AND m.ts_created <= c_cast.ts_ended
     AND MAKE_DATE(c_cast.year, c_cast.month, c_cast.day) >= '{load_start_date}'
-LEFT JOIN 
+LEFT JOIN
   datalake_customer_support.chats AS c_hash
     ON c_hash.id_sss_session = m.id_sauron_session
     AND m.ts_created >= c_hash.ts_created
@@ -356,8 +437,26 @@ LEFT JOIN
     AND MAKE_DATE(c_sss.year, c_sss.month, c_sss.day) >= '{load_start_date}'
 WHERE
   m.conversation_type = 'HUMAN-HUMAN'
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY m.id_message ORDER BY COALESCE(c_cast.ts_created, c_hash.ts_created, c_sss.ts_created) DESC) = 1
+),
+human_without_spoc AS (
+  SELECT
+    id_channel,
+    id_message,
+    id_session,
+    id_sss_session,
+    id_user,
+    origin,
+    message,
+    user_type,
+    conversation_type,
+    reply_time,
+    ts_created,
+    id_task,
+    ts_task_twilio_created
+  FROM
+    human_without_spoc_ranked
+  WHERE
+    rn = 1
 ),
 all_without_spoc AS (
   SELECT
@@ -424,23 +523,44 @@ all_messages_with_tasks AS (
     ts_task_twilio_created
   FROM
     all_without_spoc
+),
+final_ranked AS (
+  SELECT
+    id_message,
+    id_channel AS sk_channel,
+    MD5(id_message) AS sk_message,
+    id_task AS sk_task,
+    id_session AS sk_session,
+    id_sss_session AS sk_support_session,
+    id_user AS sk_user_sender,
+    origin,
+    user_type,
+    message,
+    ROW_NUMBER() OVER(PARTITION BY COALESCE(id_session, id_sss_session) ORDER BY ts_created) AS message_index,
+    reply_time,
+    ts_created,
+    ts_task_twilio_created,
+    NOW() AS ts_load,
+    ROW_NUMBER() OVER(PARTITION BY id_message ORDER BY ts_created DESC) AS rn
+  FROM
+    all_messages_with_tasks
 )
 SELECT
-  id_channel AS sk_channel,
-  MD5(id_message) AS sk_message,
-  id_task AS sk_task,
-  id_session AS sk_session,
-  id_sss_session AS sk_support_session,
-  id_user AS sk_user_sender,
+  sk_channel,
+  sk_message,
+  sk_task,
+  sk_session,
+  sk_support_session,
+  sk_user_sender,
   origin,
   user_type,
   message,
-  ROW_NUMBER() OVER(PARTITION BY COALESCE(id_session, id_sss_session) ORDER BY ts_created) AS message_index,
+  message_index,
   reply_time,
   ts_created,
   ts_task_twilio_created,
-  NOW() AS ts_load
+  ts_load
 FROM
-  all_messages_with_tasks
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY id_message ORDER BY ts_created DESC) = 1
+  final_ranked
+WHERE
+  rn = 1

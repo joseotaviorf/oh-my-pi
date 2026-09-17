@@ -1,13 +1,21 @@
-WITH recontact_data AS (
+WITH recontact_data_ranked AS (
   SELECT
     t.id_ticket,
-    IF(t.ts_updated > t.ts_solved, TRUE, FALSE) AS is_recontact_ticket
+    IF(t.ts_updated > t.ts_solved, TRUE, FALSE) AS is_recontact_ticket,
+    ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) AS rn
   FROM
     datalake_customer_support.tickets AS t
   WHERE
     DATE(t.ts_solved) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1
+)
+,recontact_data AS (
+  SELECT
+    id_ticket,
+    is_recontact_ticket
+  FROM
+    recontact_data_ranked
+  WHERE
+    rn = 1
 )
 ,repair_ongoing AS (
   SELECT
@@ -16,7 +24,7 @@ WITH recontact_data AS (
     NULL AS csat_score,
     rt.replies AS replies,
     IF(rt.reopens > 0, 1, NULL) AS reopens,
-    DATE_DIFF(DAY, DATE(rt.ts_created_local), COALESCE(DATE(rt.ts_solved_local),DATE(rt.ts_closed_local))) AS frt,
+    DATEDIFF(COALESCE(DATE(rt.ts_solved_local),DATE(rt.ts_closed_local)), DATE(rt.ts_created_local)) AS frt,
     COALESCE(DATE(rt.ts_solved_local),DATE(rt.ts_closed_local)) AS dt_solved,    
     rt.ts_updated_local,
     NULL AS ts_csat_response_submitted
@@ -48,7 +56,7 @@ WITH recontact_data AS (
       OR  rt.tags like '%mvp_fup_iq_intermediacao_autosservico%')
     AND DATE(rt.ts_csat_response_submitted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
-,without_agg_infos AS (
+,wa_tickets_ranked AS (
   SELECT
     t.id_ticket,
     MD5(t.last_analyst_email) AS id_agent,
@@ -75,7 +83,8 @@ WITH recontact_data AS (
     IF(bmt.is_backlog_in_time OR bmt.is_backlog_not_in_time, TRUE, FALSE) AS is_backlog,
     NULL AS frt,
     csat.ts_first_response AS ts_csat_response,
-    DATE('{load_start_date}') AS dt_reference
+    DATE('{load_start_date}') AS dt_reference,
+    ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) AS rn
   FROM
     datalake_customer_support.tickets t
   LEFT JOIN
@@ -98,9 +107,34 @@ WITH recontact_data AS (
 		AND dc.team IS NOT NULL
 		AND t.last_analyst_email IS NOT NULL
 		AND DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  QUALIFY
-		ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1
-  UNION ALL
+)
+,wa_tickets AS (
+  SELECT
+    id_ticket,
+    id_agent,
+    team,
+    status,
+    resolution_survey,
+    reopened_tickets,
+    replied_tickets,
+    first_csat_score,
+    attendance_time,
+    is_recontact_ticket,
+    is_received_demand,
+    is_productive_ticket,
+    is_first_department_interaction,
+    is_backlog_in_time,
+    is_backlog_not_in_time,
+    is_backlog,
+    frt,
+    ts_csat_response,
+    dt_reference
+  FROM
+    wa_tickets_ranked
+  WHERE
+    rn = 1
+)
+,wa_zendesk_ranked AS (
   SELECT
     t.id_ticket,
     MD5(t.last_analyst_email) AS id_agent,
@@ -120,7 +154,8 @@ WITH recontact_data AS (
     NULL AS is_backlog,
     NULL AS frt,
     zes.ts_first_response AS ts_csat_response,
-    DATE('{load_start_date}') AS dt_reference
+    DATE('{load_start_date}') AS dt_reference,
+    ROW_NUMBER() OVER (PARTITION BY zes.id_ticket ORDER BY zes.ts_first_response DESC) AS rn
 	FROM
     datalake_survicate.zendesk_email_surveys AS zes
   LEFT JOIN
@@ -141,9 +176,34 @@ WITH recontact_data AS (
         'FINANCED_USING_FGTS'
       )
     AND t.last_analyst_email IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY zes.id_ticket ORDER BY zes.ts_first_response DESC) = 1
-  UNION ALL
+)
+,wa_zendesk AS (
+  SELECT
+    id_ticket,
+    id_agent,
+    team,
+    status,
+    resolution_survey,
+    reopened_tickets,
+    replied_tickets,
+    first_csat_score,
+    attendance_time,
+    is_recontact_ticket,
+    is_received_demand,
+    is_productive_ticket,
+    is_first_department_interaction,
+    is_backlog_in_time,
+    is_backlog_not_in_time,
+    is_backlog,
+    frt,
+    ts_csat_response,
+    dt_reference
+  FROM
+    wa_zendesk_ranked
+  WHERE
+    rn = 1
+)
+,wa_repair_ranked AS (
   SELECT
     ro.id_ticket,
     ro.id_agent,
@@ -163,14 +223,46 @@ WITH recontact_data AS (
     NULL AS is_backlog,
     ro.frt,
     ro.ts_csat_response_submitted AS ts_csat_response,
-    DATE('{load_start_date}') AS dt_reference
+    DATE('{load_start_date}') AS dt_reference,
+    ROW_NUMBER() OVER (PARTITION BY ro.id_ticket ORDER BY ro.ts_updated_local DESC) AS rn
   FROM
     repair_ongoing AS ro
   WHERE
     ro.id_agent IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ro.id_ticket ORDER BY ro.ts_updated_local DESC) = 1
-), pause_metrics AS 
+)
+,wa_repair AS (
+  SELECT
+    id_ticket,
+    id_agent,
+    team,
+    status,
+    resolution_survey,
+    reopened_tickets,
+    replied_tickets,
+    first_csat_score,
+    attendance_time,
+    is_recontact_ticket,
+    is_received_demand,
+    is_productive_ticket,
+    is_first_department_interaction,
+    is_backlog_in_time,
+    is_backlog_not_in_time,
+    is_backlog,
+    frt,
+    ts_csat_response,
+    dt_reference
+  FROM
+    wa_repair_ranked
+  WHERE
+    rn = 1
+)
+,without_agg_infos AS (
+  SELECT * FROM wa_tickets
+  UNION ALL
+  SELECT * FROM wa_zendesk
+  UNION ALL
+  SELECT * FROM wa_repair
+), pause_metrics AS
 (SELECT 
   DATE(ts_created) AS date,
   worker_email, 
@@ -317,4 +409,16 @@ LEFT JOIN twilio_metrics AS tm
 ON wa.id_agent = tm.id_agent
 AND wa.dt_reference = tm.date
 GROUP BY
-  ALL
+  wa.id_agent || dt_reference,
+  wa.id_agent,
+  COALESCE(CAST(DATE_FORMAT(wa.dt_reference,'yyyyMMdd') AS BIGINT), -1),
+  tm.total_activity_time,
+  tm.total_paused,
+  tm.total_offline,
+  tm.total_available,
+  tm.total_unavailable,
+  ROUND(tm.total_inactivity_time_sum, 2),
+  YEAR(wa.dt_reference),
+  MONTH(wa.dt_reference),
+  DAY(wa.dt_reference),
+  NOW()
