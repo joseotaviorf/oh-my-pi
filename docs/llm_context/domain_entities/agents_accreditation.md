@@ -83,7 +83,7 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 | UUIDs | `uuid_company`, `uuid_agent`, `uuid_person` |
 | CRECI / classification | `creci`, `creci_uf`, `affiliation_type` (`1P`/`3P`), `profile` |
 | State flags (point-in-time) | `is_agent_active`, `is_passive_lead_receiver`, `is_1p_partnership`, `is_3p_partnership` |
-| Capability flags (business function) | `is_allow_supply_acquisition`, `is_allow_supply_conversion_consultancy`, `is_allow_demand_visit_management`, `is_allow_demand_acquisition`, `is_allow_negotiation`, `is_allow_demand_sale`, `is_allow_demand_rent` |
+| Capability flags (business function) | `is_allow_supply_acquisition`, `is_allow_supply_conversion`, `is_allow_demand_visit`, `is_allow_demand_acquisition`, `is_allow_negotiation`, `is_allow_demand_sale`, `is_allow_demand_rent` |
 | Timing | `dt_ref`, `days_in_current_status`, `ts_last_status_changed`, `ts_created` |
 
 > Siblings in `dw_agent`: `dim_agent`, `dim_prospect_agent`, and `fact_visit_agent_performance` (⚠ **STALE since 2025-09-21** — historical only, no confirmed replacement as of 2026-06).

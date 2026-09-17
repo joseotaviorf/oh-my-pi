@@ -100,7 +100,7 @@ agent_capability AS (
         MAX(is_allow_supply_representative) AS is_allow_supply_representative,
         MAX(is_allow_supply_midia_management) AS is_allow_supply_midia_management,
         MAX(is_allow_supply_integrity_assurance) AS is_allow_supply_integrity_assurance,
-        MAX(is_allow_negociation) AS is_allow_negociation
+        MAX(is_allow_negotiation) AS is_allow_negotiation
     FROM 
         daily_capability
     PIVOT (
@@ -113,7 +113,7 @@ agent_capability AS (
             "SUPPLY_REPRESENTATIVE" AS is_allow_supply_representative,
             "SUPPLY_MIDIA_MANAGEMENT" AS is_allow_supply_midia_management,
             "SUPPLY_INTEGRITY_ASSURANCE" AS is_allow_supply_integrity_assurance,
-            "NEGOTIATION" AS is_allow_negociation
+            "NEGOTIATION" AS is_allow_negotiation
         )
     )
     GROUP BY 1, 2
@@ -215,7 +215,7 @@ SELECT
     MAX(COALESCE(agent_cap.is_allow_supply_representative, FALSE)) AS is_allow_supply_representative,
     MAX(COALESCE(agent_cap.is_allow_supply_midia_management, ag_type.profile = 'SessaoFotos', FALSE)) AS is_allow_supply_midia_management,
     MAX(COALESCE(agent_cap.is_allow_supply_integrity_assurance, ag_type.profile IN ('Vistoria', 'VistoriaQuarteirizada'), FALSE)) AS is_allow_supply_integrity_assurance,
-    MAX(COALESCE(agent_cap.is_allow_negociation, FALSE)) AS is_allow_negociation,
+    MAX(COALESCE(agent_cap.is_allow_negotiation, FALSE)) AS is_allow_negotiation,
     MAX(COALESCE(lead_referral.has_sale_lead_referral, FALSE)) AS has_sale_lead_referral,
     MAX(COALESCE(lead_referral.has_sale_lead_referral_confirmed, FALSE)) AS has_sale_lead_referral_confirmed,
     MAX(COALESCE(lead_referral.has_rent_lead_referral, FALSE)) AS has_rent_lead_referral,

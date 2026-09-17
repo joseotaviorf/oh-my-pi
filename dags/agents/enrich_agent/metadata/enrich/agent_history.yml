@@ -150,7 +150,7 @@ columns:
       True when supply integrity assurance capability is enabled on the reference date. Built
       from capability_events pivot or legacy Vistoria/VistoriaQuarteirizada profile types.
       Defaults to FALSE when no matching capability or profile row exists on the reference date.
-  is_allow_negociation:
+  is_allow_negotiation:
     lineage:
       - datalake_ebdb_agent_events.capability_events.is_capability_active
     description: |

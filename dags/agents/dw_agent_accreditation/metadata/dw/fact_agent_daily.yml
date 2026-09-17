@@ -5,192 +5,208 @@ domain: Agents
 owner: anne.macedo@quintoandar.com.br
 description: |
   Daily snapshot fact table with one row per agent per reference date. Expands each agent
-  from creation through the load window, reconstructs activation and capability flags from
-  agent event log history, and enriches attributes from agent_daily when available for the
-  same agent-day key. Profile is resolved from datalake_ebdb_agent_events.agent_product for
-  the latest valid product membership.
+  accreditation window from agent_history, enriches activation lifecycle flags from
+  accreditation events, resolves demand conversion tiers for active agents, and projects
+  profile attributes from agent_product. Consumed by Agents squad analytics for
+  point-in-time agent capability and accreditation monitoring.
 columns:
   sk_agent_daily:
     description: |
-      Primary key of the table. Built as MD5 of agent identifier and reference date,
-      uniquely identifying each agent-day snapshot row.
+      Primary key of the table. Built as XXHASH64 of unified agent identifier and reference
+      date from agent_history, uniquely identifying each agent-day snapshot row.
     lineage:
-      - datalake_agent_accreditation.agent.id_agent
-      - datalake_quintoandar.aux_date.date
+      - datalake_agent_accreditation.agent_history.id_snapshot
+  sk_person:
+    description: Person surrogate key from the unified agent identity registry.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.sk_person
   sk_agent:
     description: Natural key of the agent in the source transactional system.
     lineage:
-      - datalake_agent_accreditation.agent.id_agent
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent
   sk_agent_data:
-    description: |
-      Dados Agente identifier resolved from agent external references when type is
-      DADOS_AGENTE_ID. Prefers agent_daily snapshot when present, otherwise agent profile.
+    description: Dados Agente identifier from unified identity when type is DADOS_AGENTE_ID.
     lineage:
-      - datalake_agent_accreditation.agent_daily.id_agent_data
-      - datalake_agent_accreditation.agent.id_agent_data
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent_data
   sk_partner:
-    description: |
-      Partner identifier resolved from agent external references when type is PARTNER_ID.
-      Prefers agent_daily snapshot when present, otherwise agent profile.
+    description: Partner identifier from unified identity when type is PARTNER_ID.
     lineage:
-      - datalake_agent_accreditation.agent_daily.id_partner
-      - datalake_agent_accreditation.agent.id_partner
+      - datalake_ebdb_agent_events.agent_unified_identity.id_partner
   sk_user:
-    description: |
-      Main application user id linked to the agent via person UUID and main credential
-      reference. Prefers agent_daily snapshot when present, otherwise agent profile.
+    description: Main application user id linked to the agent via person UUID and main credential reference.
     lineage:
-      - datalake_agent_accreditation.agent_daily.id_user
-      - datalake_agent_accreditation.agent.id_user
+      - datalake_ebdb_agent_events.agent_unified_identity.id_user
   sk_broker:
     description: |
-      Surrogate key of the imobiliária (broker agency) in dw_brokers.dim_broker on the
-      reference date. Populated only when is_3p_partnership is TRUE for that day, resolved
-      via uuid_company and core_brokers.brokers. Returns -1 for non-3P agents or when no
-      broker match exists.
+      Surrogate key of the imobiliária (broker agency) resolved on unified identity for 3P
+      agents. Returns -1 when no broker linkage exists.
     lineage:
-      - core_brokers.brokers.sk_broker
+      - datalake_ebdb_agent_events.agent_unified_identity.sk_broker
+  uuid_person:
+    description: Person UUID anchor from unified agent identity on the reference date.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
   sk_tier_demand_conversion_fr:
-    description: Tier identifier for the for rent demand conversion incentive system. Only available for active agents.
+    description: |
+      Tier identifier for the for rent demand conversion incentive system. Populated only
+      when agent_history.is_active is TRUE on the reference date.
     lineage:
       - datalake_big_agent.partner_tier.id_tier
   sk_tier_demand_conversion_fs:
-    description: Tier identifier for the for sale demand conversion incentive system. Only available for active agents.
+    description: |
+      Tier identifier for the for sale demand conversion incentive system. Populated only
+      when agent_history.is_active is TRUE on the reference date.
     lineage:
       - datalake_big_agent.partner_tier.id_tier
-  uuid_company:
-    description: |
-      Company UUID when the agent partnership representative type is COMPANY_UUID on the
-      reference date. Prefers agent_daily snapshot when present.
-    lineage:
-      - datalake_agent_accreditation.agent_daily.uuid_company
-      - datalake_agent_accreditation.agent.uuid_company
-  uuid_agent:
-    description: Business UUID of the agent in the source system on the reference date.
-    lineage:
-      - datalake_agent_accreditation.agent_daily.uuid_agent
-      - datalake_agent_accreditation.agent.uuid_agent
-  uuid_person:
-    description: Person UUID associated with the agent in the person registry on the reference date.
-    lineage:
-      - datalake_agent_accreditation.agent_daily.uuid_person
-      - datalake_agent_accreditation.agent.uuid_person
-  creci:
-    description: CRECI license number from the last prospect person converted on the reference date.
-    lineage:
-      - datalake_agent_accreditation.agent_daily.creci
-      - datalake_agent_accreditation.agent.creci
-  creci_uf:
-    description: State (UF) of the CRECI license from the last prospect person converted.
-    lineage:
-      - datalake_agent_accreditation.agent_daily.creci_uf
-      - datalake_agent_accreditation.agent.creci_uf
-  affiliation_type:
-    description: Agent affiliation model (e.g., autonomous, company-managed) on the reference date.
-    lineage:
-      - datalake_agent_accreditation.agent_daily.affiliation_type
-      - datalake_agent_accreditation.agent.affiliation_type
   profile:
     description: |
-      Agent company product profile name from the latest valid agent_product membership
-      for the agent (is_valid_product and is_lastest_valid).
+      Agent company product profile name from the latest agent_product row for the agent
+      (is_lastest_valid).
     lineage:
       - datalake_ebdb_agent_events.agent_product.product_name
-  days_in_current_status:
-    description: |
-      Number of days the agent has remained in the current activation status as of the
-      reference date. Built as day difference between agent-level event start and dt_ref.
-    lineage:
-      - datalake_agent_accreditation.agent_event_log.ts_started
-      - datalake_quintoandar.aux_date.date
   is_agent_active:
     description: |
-      True when the agent was active on the reference date. Built from the latest
-      agent-level activation event on that day; null when no activation history exists.
+      True when the agent is in an active accreditation status window on the reference date,
+      propagated from agent_history.is_active (accreditation event-segment grain).
     lineage:
-      - datalake_agent_accreditation.agent_event_log.event_type
-      - datalake_agent_accreditation.agent_event_log.event_level
-  is_allow_supply_acquisition:
+      - datalake_agent_accreditation.agent_history.is_active
+  is_reactivated:
     description: |
-      True when supply acquisition capability was enabled on the reference date. Built
-      from capability events in agent event log; null when no matching capability history exists.
+      True on reference dates with an accreditation event when the agent is active and the
+      date is not the first ACTIVATED event. Null when no accreditation event occurred that day.
     lineage:
-      - datalake_agent_accreditation.agent_event_log.event_type
-      - datalake_agent_accreditation.agent_event_log.capability_type
-  is_allow_supply_conversion:
+      - datalake_agent_accreditation.agent_history.is_active
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  is_first_activation:
     description: |
-      True when supply conversion consultancy capability was enabled on the reference date.
-      Built from capability events in agent event log; null when no matching capability history exists.
+      True on reference dates with an accreditation event when the agent is active and the
+      date matches the first ACTIVATED event. Null when no accreditation event occurred that day.
     lineage:
-      - datalake_agent_accreditation.agent_event_log.event_type
-      - datalake_agent_accreditation.agent_event_log.capability_type
-  is_allow_demand_visit:
+      - datalake_agent_accreditation.agent_history.is_active
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  is_deaccredited:
     description: |
-      True when demand visit management capability was enabled on the reference date. Built
-      from capability events in agent event log; null when no matching capability history exists.
+      True when an AGENT_DEACCREDITATION event occurred on the reference date. Null when no
+      accreditation event occurred that day.
     lineage:
-      - datalake_agent_accreditation.agent_event_log.event_type
-      - datalake_agent_accreditation.agent_event_log.capability_type
-  is_allow_demand_acquisition:
+      - datalake_ebdb_agent_events.agent_accreditation_events.event_reason
+  is_legacy_agent_migrated:
     description: |
-      True when demand acquisition capability was enabled on the reference date. Built from
-      capability events in agent event log; null when no matching capability history exists.
+      True when a legacy agent migration event occurred on the reference date. Null when no
+      accreditation event occurred that day.
     lineage:
-      - datalake_agent_accreditation.agent_event_log.event_type
-      - datalake_agent_accreditation.agent_event_log.capability_type
-  is_allow_negotiation:
+      - datalake_ebdb_agent_events.agent_accreditation_events.event_reason
+  is_agent_reenrolled:
     description: |
-      True when negotiation capability was enabled on the reference date. Built from capability
-      events in agent event log; null when no matching capability history exists.
+      True when an inactive legacy agent reenrollment event occurred on the reference date.
+      Null when no accreditation event occurred that day.
     lineage:
-      - datalake_agent_accreditation.agent_event_log.event_type
-      - datalake_agent_accreditation.agent_event_log.capability_type
-  is_allow_demand_sale:
-    description: True when the agent is allowed to perform demand sale on the reference date.
-    lineage:
-      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.business_context
-  is_allow_demand_rent:
-    description: True when the agent is allowed to perform demand rent on the reference date.
-    lineage:
-      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.business_context
+      - datalake_ebdb_agent_events.agent_accreditation_events.event_reason
   is_passive_lead_receiver:
     description: True when the agent is configured to receive passive leads on the reference date.
     lineage:
-      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.passive_lead_receiver
+      - datalake_agent_accreditation.agent_history.is_passive_lead_receiver
+  is_allow_demand_acquisition:
+    description: True when demand acquisition capability was enabled on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_demand_acquisition
+  is_allow_demand_visit:
+    description: |
+      True when demand visit management capability was enabled on the reference date.
+      Renamed from is_allow_demand_visit_management in agent_history.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_demand_visit_management
+  is_allow_demand_sale:
+    description: True when the agent is allowed to perform demand sale on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_demand_sale
+  is_allow_demand_rent:
+    description: True when the agent is allowed to perform demand rent on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_demand_rent
+  is_allow_supply_acquisition:
+    description: True when supply acquisition capability was enabled on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_acquisition
+  is_allow_supply_conversion:
+    description: |
+      True when supply conversion consultancy capability was enabled on the reference date.
+      Renamed from is_allow_supply_conversion_consultancy in agent_history.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_conversion_consultancy
+  is_allow_supply_representative:
+    description: True when supply representative capability was enabled on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_representative
+  is_allow_supply_midia_management:
+    description: True when supply media management capability was enabled on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_midia_management
+  is_allow_supply_integrity_assurance:
+    description: True when supply integrity assurance capability was enabled on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_supply_integrity_assurance
+  is_allow_negotiation:
+    description: |
+      True when negotiation capability (EBDB capability.type = NEGOTIATION) was enabled on
+      the reference date. Renamed from is_allow_negotiation; column name follows agent_history
+      spelling (is_allow_negotiation).
+    lineage:
+      - datalake_agent_accreditation.agent_history.is_allow_negotiation
+      - datalake_ebdb_agent_events.capability_events.type
   is_1p_partnership:
     description: True when affiliation type is autonomous (1P-style partnership flag) on the reference date.
     lineage:
-      - datalake_agent_accreditation.agent_daily.is_1p_partnership
-      - datalake_agent_accreditation.agent.is_1p_partnership
+      - datalake_ebdb_agent_events.agent_unified_identity.is_1p_partnership
   is_3p_partnership:
     description: True when affiliation type is company-managed (3P-style partnership flag) on the reference date.
     lineage:
-      - datalake_agent_accreditation.agent_daily.is_3p_partnership
-      - datalake_agent_accreditation.agent.is_3p_partnership
-  dt_ref:
-    description: Reference calendar date of the daily snapshot. Joinable with dw_public.dim_date.
-    lineage:
-      - datalake_quintoandar.aux_date.date
-  ts_last_status_changed:
+      - datalake_ebdb_agent_events.agent_unified_identity.is_3p_partnership
+  has_rent_lead_referral:
     description: |
-      Timestamp when the current agent activation status started on the reference date,
-      as inferred from the latest agent-level event in agent event log.
+      True when the agent has at least one tenant lead referral invite on the reference date
+      (Traz Quem Aluga program).
     lineage:
-      - datalake_agent_accreditation.agent_event_log.ts_started
-  ts_created:
-    description: Timestamp when the agent record was created in the source system.
+      - datalake_agent_accreditation.agent_history.has_rent_lead_referral
+  has_rent_lead_referral_confirmed:
+    description: |
+      True when the agent has at least one confirmed tenant lead referral invite on the
+      reference date (Traz Quem Aluga program).
     lineage:
-      - datalake_agent_accreditation.agent_daily.ts_created
-      - datalake_agent_accreditation.agent.ts_created
+      - datalake_agent_accreditation.agent_history.has_rent_lead_referral_confirmed
+  has_sale_lead_referral:
+    description: |
+      True when the agent has at least one buyer lead referral invite on the reference date
+      (Traz Quem Compra program).
+    lineage:
+      - datalake_agent_accreditation.agent_history.has_sale_lead_referral
+  has_sale_lead_referral_confirmed:
+    description: |
+      True when the agent has at least one confirmed buyer lead referral invite on the
+      reference date (Traz Quem Compra program).
+    lineage:
+      - datalake_agent_accreditation.agent_history.has_sale_lead_referral_confirmed
+  dt_ref:
+    description: |
+      Legacy reference date column kept during stakeholder migration. Same value as
+      dt_reference. Scheduled for removal once downstream consumers migrate to dt_reference.
+    lineage:
+      - datalake_agent_accreditation.agent_history.dt_reference
+  dt_reference:
+    description: |
+      Canonical reference calendar date of the daily snapshot. Joinable with dw_public.dim_date.
+      Replaces dt_ref after the migration window.
+    lineage:
+      - datalake_agent_accreditation.agent_history.dt_reference
   year:
-    description: Partition year derived from the reference date.
+    description: Year partition derived from dt_reference.
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_agent_accreditation.agent_history.dt_reference
   month:
-    description: Partition month derived from the reference date.
+    description: Month partition derived from dt_reference.
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_agent_accreditation.agent_history.dt_reference
   day:
-    description: Partition day derived from the reference date.
+    description: Day partition derived from dt_reference.
     lineage:
-      - datalake_quintoandar.aux_date.date
+      - datalake_agent_accreditation.agent_history.dt_reference

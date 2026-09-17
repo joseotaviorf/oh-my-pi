@@ -111,8 +111,10 @@ columns:
     description: True when the agent is allowed to perform supply acquisition on the latest snapshot date.
     lineage:
       - datalake_agent_accreditation.agent_history.is_allow_supply_acquisition
-  is_allow_demand_visit_management:
-    description: True when the agent is allowed to perform demand visit management on the latest snapshot date.
+  is_allow_demand_visit:
+    description: |
+      True when the agent is allowed to perform demand visit management on the latest snapshot date.
+      Renamed from is_allow_demand_visit_management in agent_history.
     lineage:
       - datalake_agent_accreditation.agent_history.is_allow_demand_visit_management
   is_allow_demand_sale:
@@ -127,8 +129,10 @@ columns:
     description: True when the agent is allowed to perform demand acquisition on the latest snapshot date.
     lineage:
       - datalake_agent_accreditation.agent_history.is_allow_demand_acquisition
-  is_allow_supply_conversion_consultancy:
-    description: True when the agent is allowed to perform supply conversion consultancy on the latest snapshot date.
+  is_allow_supply_conversion:
+    description: |
+      True when the agent is allowed to perform supply conversion consultancy on the latest snapshot date.
+      Renamed from is_allow_supply_conversion_consultancy in agent_history.
     lineage:
       - datalake_agent_accreditation.agent_history.is_allow_supply_conversion_consultancy
   is_allow_supply_representative:
@@ -143,10 +147,13 @@ columns:
     description: True when the agent is allowed to perform supply integrity assurance on the latest snapshot date.
     lineage:
       - datalake_agent_accreditation.agent_history.is_allow_supply_integrity_assurance
-  is_allow_negociation:
-    description: True when the agent is allowed to perform negotiation on the latest snapshot date.
+  is_allow_negotiation:
+    description: |
+      True when negotiation capability (EBDB capability.type = NEGOTIATION) is enabled on
+      the latest snapshot date. Column name follows agent_history spelling (is_allow_negotiation).
     lineage:
-      - datalake_agent_accreditation.agent_history.is_allow_negociation
+      - datalake_agent_accreditation.agent_history.is_allow_negotiation
+      - datalake_ebdb_agent_events.capability_events.type
   is_1p_partnership:
     description: True when affiliation type is autonomous (1P-style partnership flag).
     lineage:
