@@ -1,5 +1,5 @@
 dag:
-  name: gsheets_luigijr_recon_for_rent_corretagem_postergada_casos_antes_2023
+  name: gsheets_luigijr_recon_rent_corr_post_antes_2023
   schedule_interval: 0 8 * * *
   owner: Data Fintech
   tags:
@@ -11,7 +11,7 @@ workflow:
   layer: raw
   custom_schema: gsheets
   tables_customization:
-    recon_for_rent_corretagem_postergada_casos_antes_2023:
+    recon_rent_corr_post_antes_2023:
       sheet_id: 1EvruezmveuVMAy2D3JdbWppMlFveV0VZ0KhN4oFQMaM
       sheet_name: casos_2023
 cluster:
