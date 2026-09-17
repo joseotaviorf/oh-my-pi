@@ -176,7 +176,12 @@ def pipeline_api_raw(cfg):
     logger.info("m=pipeline_api_raw, msg=Saving API response to logs")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     result_df = (
-        api_result_df.select("record.*")
+        # Error rows carry no record_json, so select("record.*") would turn
+        # each of them into an all-NULL record (null id_record/system_modstamp)
+        # in the raw table, which the clean layer's quality checks then reject.
+        # Errors belong in salesforce_api_logs (written below), not in raw.
+        api_result_df.where(F.col("error").isNull() & F.col("record_json").isNotNull())
+        .select("record.*")
         .withColumnRenamed("Id", "id_record")
         .withColumn("entity_type", F.lit(cfg.api_entity))
         .withColumn("ts_load", F.lit(now))
@@ -218,6 +223,19 @@ def pipeline_api_raw(cfg):
         bucket=cfg.bucket,
         partition_hour=cfg.partition_hour,
     )
+
+    # Fail AFTER the raw and log writes so the error details are queryable and
+    # a retry (idempotent replaceWhere on both tables) can refetch the records
+    # that errored. query_all_with_retry already retried per query, so an error
+    # surviving to here means those records are missing from this partition —
+    # succeeding silently would be data loss.
+    if api_errors_count > 0:
+        raise RuntimeError(
+            f"{api_errors_count} Salesforce API request(s) failed for "
+            f"{cfg.api_entity}; the affected records are missing from "
+            f"partition_date={cfg.partition_date}. See "
+            f"datalake_sst_metrics.salesforce_api_logs (job_name={job_name})."
+        )
     logger.info("m=salesforce_raw_pipeline, msg=All Done!")
 
 

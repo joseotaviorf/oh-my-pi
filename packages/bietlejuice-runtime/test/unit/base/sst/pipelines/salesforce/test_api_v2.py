@@ -81,6 +81,7 @@ def patched():
             build_filter=build_filter,
             validate_and_write=v_write,
             save_logs=save_logs,
+            api_result_df=api_result_df,
         )
 
 
@@ -116,3 +117,29 @@ class TestPipelineApiRawPartitioning:
 
         patched.updated_deleted.assert_not_called()
         assert patched.system_mod.call_args.kwargs["partition_hour"] == "05"
+
+
+class TestApiErrorRows:
+    """API error rows carry no record_json; they must never reach the raw
+    table (an all-NULL record breaks the clean layer's quality checks — the
+    2026-09-17 case_milestone_v2 prod incident) and, once logged, must fail
+    the run instead of silently dropping the affected records."""
+
+    def test_raw_write_reads_from_the_filtered_frame(self, patched):
+        pipeline.pipeline_api_raw(args=_args())
+
+        # select("record.*") must run on the filtered frame (post .where),
+        # never directly on the API result frame.
+        patched.api_result_df.where.return_value.select.assert_any_call("record.*")
+        patched.api_result_df.select.assert_not_called()
+
+    def test_api_errors_fail_the_run_after_both_writes(self, patched):
+        patched.api_result_df.where.return_value.count.return_value = 2
+
+        with pytest.raises(RuntimeError, match="2 Salesforce API request"):
+            pipeline.pipeline_api_raw(args=_args())
+
+        # Raw and log slices are written first so the retry (idempotent
+        # replaceWhere on both) refetches with full context queryable.
+        patched.validate_and_write.assert_called_once()
+        patched.save_logs.assert_called_once()

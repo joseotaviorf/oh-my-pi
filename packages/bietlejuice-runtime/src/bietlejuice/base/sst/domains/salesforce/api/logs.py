@@ -23,33 +23,35 @@ def conform_api_logs(
 ):
 
     utc_now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    logs_df = (
+    return (
         df.withColumn("status_code", F.get_json_object("api_logs", "$[0].status_code"))
         .withColumn("entity_type", F.lit(api_entity))
         .withColumn("target_table", F.lit(target_table))
         .withColumn("job_name", F.lit(job_name))
         .withColumn("load_ts", F.lit(utc_now))
         .withColumn("partition_date", F.lit(partition_date))
+        # Always present so the output schema is stable: the logs table carries
+        # the column, and validate_and_write projects the DataFrame to the
+        # target's columns (overwrite_schema=False), so omitting it on daily
+        # runs breaks the write with UNRESOLVED_COLUMN. NULL marks a daily-era
+        # row by design; hourly runs stamp the real hour.
+        .withColumn("partition_hour", F.lit(partition_hour).cast("string"))
         .withColumnRenamed("idx", "query_idx")
+        .select(
+            "id_record",
+            "entity_type",
+            "status_code",
+            "api_logs",
+            "query_idx",
+            "success",
+            "error",
+            "target_table",
+            "job_name",
+            "load_ts",
+            "partition_date",
+            "partition_hour",
+        )
     )
-    selected_cols = [
-        "id_record",
-        "entity_type",
-        "status_code",
-        "api_logs",
-        "query_idx",
-        "success",
-        "error",
-        "target_table",
-        "job_name",
-        "load_ts",
-        "partition_date",
-    ]
-    # "00" is a legitimate hour — compare against None, never truthiness.
-    if partition_hour is not None:
-        logs_df = logs_df.withColumn("partition_hour", F.lit(partition_hour))
-        selected_cols.append("partition_hour")
-    return logs_df.select(*selected_cols)
 
 
 def conform_and_save_api_logs(

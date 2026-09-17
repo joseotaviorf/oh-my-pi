@@ -34,7 +34,10 @@ def _input_df(spark_session):
 
 
 class TestConformApiLogs:
-    def test_daily_output_has_no_partition_hour(self, spark_session):
+    def test_daily_output_stamps_null_partition_hour(self, spark_session):
+        """The output schema is stable: the column is always present so
+        validate_and_write's projection to the (now hour-aware) logs table
+        columns resolves. NULL marks a daily-era row by design."""
         result_df = conform_api_logs(
             df=_input_df(spark_session),
             api_entity="Case",
@@ -43,8 +46,9 @@ class TestConformApiLogs:
             partition_date="2026-06-02",
         )
 
-        assert "partition_hour" not in result_df.columns
+        assert dict(result_df.dtypes)["partition_hour"] == "string"
         result = result_df.collect()[0]
+        assert result.partition_hour is None
         assert result.partition_date == "2026-06-02"
         assert result.entity_type == "Case"
         assert result.status_code == "200"

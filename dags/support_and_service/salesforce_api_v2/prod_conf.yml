@@ -4,21 +4,27 @@ salesforce_endpoint: "https://quintoandar.my.salesforce.com"
 
 dag_documentation:
   dag_purpose:
-    "Salesforce API_v2 ingestion DAG. Runs daily and, for each mapped Salesforce
-    object, pulls the incremental snapshot from the Salesforce REST API into the
-    raw layer (salesforce/api_v2) and then maintains an SCD Type 2 history table in
-    the clean layer (salesforce/api_v2_clean). Consumed downstream via clean-layer
+    "Salesforce API_v2 ingestion DAG. Runs hourly: objects marked hourly pull
+    each completed hour's incremental snapshot from the Salesforce REST API into
+    the raw layer (salesforce/api_v2) and then maintain an SCD Type 2 history
+    table in the clean layer (salesforce/api_v2_clean); daily objects are
+    short-circuited on every run except the one at daily_execution_hour, where
+    they process the previous complete day. Consumed downstream via clean-layer
     dataset events."
 
 datalake_bucket: "5a-datalake-prod"
 
-# Per-object hourly cutover switch: when `hourly` is true the DAG passes
-# --partition_hour (two-digit HH from data_interval_start) to that object's
-# raw/clean jobs; when false or absent the flag is omitted and the jobs run at
-# daily granularity. Before flipping an object to true: hourly schedule + 00:00
-# circuit-breaker, repartition of its raw *_v2 table to
-# [partition_date, partition_hour], and the partition_hour column on
-# datalake_sst_metrics.salesforce_api_logs.
+# Wall-clock UTC hour at which daily (hourly: false) objects run — the DAG-run
+# whose data_interval_end lands on this hour processes the previous complete
+# day; every other hourly run short-circuits the daily tasks.
+daily_execution_hour: 0
+
+# Per-object hourly cutover switch: when `hourly` is true the object's raw/clean
+# jobs run every hour with --partition_hour (two-digit HH from
+# data_interval_start); when false or absent the jobs run once a day at
+# daily_execution_hour, at daily granularity. Before flipping an object to true:
+# repartition of its raw *_v2 table to [partition_date, partition_hour], and the
+# partition_hour column on datalake_sst_metrics.salesforce_api_logs.
 objects_config:
   task_v2:
     api_entity: "Task"
@@ -34,8 +40,6 @@ objects_config:
     hourly: false
   # Hourly from day one: the table bootstraps already partitioned by
   # [partition_date, partition_hour], so no repartition is needed at cutover.
-  # NOTE: while the DAG schedule is still daily (00:00), each run only covers
-  # the 00:00-01:00 window — full coverage starts with the hourly-schedule PR.
   email_message_v2:
     api_entity: "EmailMessage"
     hourly: true
