@@ -77,6 +77,7 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
             "--table-properties",
             json.dumps(table_attributes.table_properties),
         ]
+        parameters.extend(table_attributes.spark_transformation_grade_args())
         if table_attributes.row_filter_column_key:
             parameters.extend(
                 [

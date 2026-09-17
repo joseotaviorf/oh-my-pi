@@ -70,6 +70,7 @@ class SyncMetadataTaskCreator(BaseTaskCreator):
             metadata_type.value,
             self.dag_execution_context.dag_args["name"],
         ]
+        parameters.extend(table_attributes.spark_transformation_grade_args())
         if table_attributes.layer == LayerEnum.RAW and product_database_name:
             parameters += self._get_raw_params(product_database_name)
         return parameters

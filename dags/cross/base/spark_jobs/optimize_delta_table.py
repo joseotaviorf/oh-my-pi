@@ -17,6 +17,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.optimize_delta_tables_cli import (
     decode_tables_config_from_cli,
 )
+from bietlejuice.base.db.datalake_metastore_mapping import require_transformation_grade
 from bietlejuice.base.db.metastore_mapping_factory import MetastoreMappingFactory
 from bietlejuice.base.delta.maintenance_state import (
     build_maintenance_payload,
@@ -298,7 +299,10 @@ def _filter_tables_already_maintained(
             remaining[table_name] = table_configs
             continue
         full_table_name = get_full_table_name(
-            table_configs.get("schema"), LayerEnum(layer), table_name
+            table_configs.get("schema"),
+            LayerEnum(layer),
+            table_name,
+            transformation_grade=table_configs.get("transformation_grade"),
         )
         if _maintenance_marker_exists(full_table_name, maintenance_state):
             logger.info(
@@ -338,7 +342,10 @@ def _apply_optimize_cadence(
             continue
 
         full_table_name = get_full_table_name(
-            table_configs.get("schema"), LayerEnum(layer), table_name
+            table_configs.get("schema"),
+            LayerEnum(layer),
+            table_name,
+            transformation_grade=table_configs.get("transformation_grade"),
         )
         cursor_payload = _read_optimize_cursor(full_table_name, maintenance_state)
         if is_optimize_due(cursor_payload, today, optimize_frequency_days):
@@ -479,7 +486,10 @@ def run_job(
     """Run OPTIMIZE/VACUUM for one table. Returns full table name when maintenance ran."""
 
     full_table_name = get_full_table_name(
-        table_configs.get("schema"), LayerEnum(layer), table_name
+        table_configs.get("schema"),
+        LayerEnum(layer),
+        table_name,
+        transformation_grade=table_configs.get("transformation_grade"),
     )
 
     run_optimize = table_configs.get("run_optimize", True)
@@ -511,13 +521,25 @@ def run_job(
     return full_table_name
 
 
-def get_full_table_name(schema: str, layer: LayerEnum, table_name: str) -> str:
+def get_full_table_name(
+    schema: str,
+    layer: LayerEnum,
+    table_name: str,
+    transformation_grade: Optional[str] = None,
+) -> str:
     """Returns the full table name in the format database_name.table_name."""
 
     metastore_mapping_factory = MetastoreMappingFactory.get_mapper_by_layer(
         layer, schema, ""
     )
-    database_name = metastore_mapping_factory.get_full_database_name(layer)
+    name_kwargs = {}
+    if layer == LayerEnum.TRANSFORMATION:
+        name_kwargs["transformation_grade"] = require_transformation_grade(
+            transformation_grade
+        )
+    database_name = metastore_mapping_factory.get_full_database_name(
+        layer, **name_kwargs
+    )
     return f"{database_name}.{table_name}"
 
 

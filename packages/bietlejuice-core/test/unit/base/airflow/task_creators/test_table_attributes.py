@@ -536,3 +536,55 @@ class TestTableAttributes:
                 table_name="table_name",
                 table_customization=table_customization,
             )
+
+
+class TestTableAttributesTransformationGrade:
+    def test_reads_grade_from_workflow_args(self):
+        table_attributes = TableAttributes(
+            dag_args={"name": "transformation_terminator_test"},
+            workflow_args={
+                "custom_schema": "terminator_test",
+                "transformation_grade": "clean",
+            },
+            layer=LayerEnum.TRANSFORMATION,
+            table_name="termination",
+        )
+
+        assert table_attributes.transformation_grade == "clean"
+        assert table_attributes.spark_transformation_grade_args() == [
+            "--transformation-grade",
+            "clean",
+        ]
+        assert (
+            table_attributes.get_prod_database_name()
+            == "transformation_terminator_test_clean"
+        )
+
+    def test_ignores_grade_on_table_customization(self):
+        table_attributes = TableAttributes(
+            dag_args={"name": "transformation_terminator_test"},
+            workflow_args={
+                "custom_schema": "terminator_test",
+                "transformation_grade": "clean",
+            },
+            layer=LayerEnum.TRANSFORMATION,
+            table_name="termination",
+            table_customization={"transformation_grade": "curated"},
+        )
+
+        assert table_attributes.transformation_grade == "clean"
+        assert table_attributes.spark_transformation_grade_args() == [
+            "--transformation-grade",
+            "clean",
+        ]
+
+    def test_spark_args_raise_when_transformation_grade_missing(self):
+        table_attributes = TableAttributes(
+            dag_args={"name": "transformation_terminator_test"},
+            workflow_args={"custom_schema": "terminator_test"},
+            layer=LayerEnum.TRANSFORMATION,
+            table_name="termination",
+        )
+
+        with pytest.raises(ValueError, match="transformation_grade"):
+            table_attributes.spark_transformation_grade_args()

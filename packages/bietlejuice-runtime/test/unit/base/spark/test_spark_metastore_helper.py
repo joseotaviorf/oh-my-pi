@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 
 
@@ -109,3 +110,47 @@ class TestSetTimestampsAsString:
         cols = OrderedDict([("stamps", "array<timestamp>")])
         result = SparkMetastoreHelper.set_timestamps_as_string(cols)
         assert result["stamps"] == "array<timestamp>"
+
+
+class TestGetMetastoresMetadataTransformationGrade:
+    @mock.patch("bietlejuice.base.spark.spark_metastore_helper.SparkMetastoreService")
+    @mock.patch("bietlejuice.base.spark.spark_metastore_helper.SparkClient")
+    def test_transformation_resolves_graded_name_and_path(
+        self, _mock_client, _mock_service
+    ):
+        helper = SparkMetastoreHelper(
+            "bucket-forno",
+            LayerEnum.TRANSFORMATION.value,
+            "terminator_test",
+            "termination",
+            False,
+            transformation_grade="clean",
+        )
+
+        assert helper.spark_database_name == "transformation_terminator_test_clean"
+        assert (
+            helper.database_location
+            == "s3a://bucket-forno/transformation/terminator_test/clean/"
+        )
+
+    @mock.patch("bietlejuice.base.spark.spark_metastore_helper.SparkMetastoreService")
+    @mock.patch("bietlejuice.base.spark.spark_metastore_helper.SparkClient")
+    def test_clean_layer_is_unchanged_without_grade(self, _mock_client, _mock_service):
+        helper = SparkMetastoreHelper(
+            "bucket-forno", "clean", "terminator", "termination", False
+        )
+
+        assert helper.spark_database_name == "datalake_terminator_clean"
+        assert helper.database_location == "s3a://bucket-forno/clean/terminator/"
+
+    @mock.patch("bietlejuice.base.spark.spark_metastore_helper.SparkMetastoreService")
+    @mock.patch("bietlejuice.base.spark.spark_metastore_helper.SparkClient")
+    def test_transformation_without_grade_raises(self, _mock_client, _mock_service):
+        with pytest.raises(ValueError, match="transformation_grade"):
+            SparkMetastoreHelper(
+                "bucket-forno",
+                LayerEnum.TRANSFORMATION.value,
+                "terminator_test",
+                "termination",
+                False,
+            )

@@ -18,6 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from bietlejuice.base.airflow.datasets.dataset_parser import DatasetParser
 from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
+from bietlejuice.base.db.datalake_metastore_mapping import TRANSFORMATION_GRADES
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
@@ -43,7 +44,7 @@ class DatasetService:
         # Prefix-free, matching DatalakeMetastoreMapping.
         "consumption": "{schema}",
         "wonka": "wonka",
-        "transformation": "transformation_{schema}",
+        "transformation": "transformation_{schema}_{transformation_grade}",
     }
 
     @classmethod
@@ -63,7 +64,13 @@ class DatasetService:
         template = cls._LAYER_TO_DATABASE_NAME.get(layer)
         if template is None:
             return None
-        database_name = template.format(schema=schema)
+        if layer == "transformation":
+            grade = params.get("transformation_grade")
+            if grade not in TRANSFORMATION_GRADES:
+                return None
+            database_name = template.format(schema=schema, transformation_grade=grade)
+        else:
+            database_name = template.format(schema=schema)
         return f"{database_name}.{table_name}".lower()
 
     @staticmethod

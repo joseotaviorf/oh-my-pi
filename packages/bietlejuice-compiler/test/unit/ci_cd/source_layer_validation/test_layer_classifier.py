@@ -52,6 +52,15 @@ class TestClassifySchemaToLayer:
         assert classify_schema_to_layer("qube_measures") == "qube"
         assert classify_schema_to_layer("core_listing") == "core"
         assert classify_schema_to_layer("reverse_foo") == "reverse"
+        assert classify_schema_to_layer("transformation_terminator_test") == (
+            "transformation"
+        )
+        assert classify_schema_to_layer("transformation_terminator_test_clean") == (
+            "transformation"
+        )
+        assert classify_schema_to_layer("transformation_terminator_test_curated") == (
+            "transformation"
+        )
 
     def test_consumption_registry_schemas(self):
         from bietlejuice.base.db.datalake_metastore_mapping import CONSUMPTION_SCHEMAS

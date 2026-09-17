@@ -10,6 +10,7 @@ from yamale import yamale
 from bietlejuice.base.db.datalake_metastore_mapping import (
     CONSUMPTION_SCHEMAS,
     apply_naming_convention,
+    require_transformation_grade,
 )
 from bietlejuice.services.file_service import FileService
 from dags import DAG_PACKAGES_ROOT
@@ -28,7 +29,7 @@ _DB_NAME_FORMULA = {
     # Consumption is prefix-free: physical metastore DB name is the schema itself
     # (e.g. ops_finance.foo). No datalake_ / consumption_ layer prefix.
     "consumption": "{schema}",
-    "transformation": "transformation_{schema}",
+    "transformation": "transformation_{schema}_{transformation_grade}",
 }
 
 _DAG_DIR_FROM_METADATA_PATH = re.compile(r"((?:.*/)?dags/[^/]+/[^/]+)/metadata/")
@@ -176,12 +177,19 @@ class MetadataFileService:
         formula = _DB_NAME_FORMULA.get(layer)
         if formula is None:
             return
-        expected_db = formula.format(schema=schema)
+        format_kwargs = {"schema": schema}
+        if layer == "transformation":
+            format_kwargs["transformation_grade"] = require_transformation_grade(
+                workflow_args.get("transformation_grade")
+            )
+        expected_db = formula.format(**format_kwargs)
         # Consumption is prefix-free by formula (`{schema}`); do not route it through
         # apply_naming_convention (enrich-era datalake_ exception list).
+        # Transformation names are transformation_{schema}_{grade} and never start
+        # with datalake_, so the helper is a no-op — skip it rather than depend on it.
         # Other layers still apply that convention so governed enrich schemas drop
         # the historical datalake_ prefix and match runtime metastore names.
-        if layer != "consumption":
+        if layer not in ("consumption", "transformation"):
             expected_db = apply_naming_convention(schema, expected_db)
         if declared_db != expected_db:
             raise DatabaseNameMismatchException(

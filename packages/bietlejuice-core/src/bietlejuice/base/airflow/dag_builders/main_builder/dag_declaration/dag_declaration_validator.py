@@ -22,6 +22,7 @@ from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissio
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
+from bietlejuice.base.db.datalake_metastore_mapping import TRANSFORMATION_GRADES
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.query_view_sync import (
     QueryViewSqlDialectEnum,
@@ -145,6 +146,14 @@ class DAGDeclarationValidator(Validator):
                     },
                 },
                 "has_hive_sync": {"type": "boolean", "empty": False, "required": False},
+                # Required only when layer is transformation; rejected on other layers
+                # in ``_check_transformation_grade``.
+                "transformation_grade": {
+                    "type": "string",
+                    "required": False,
+                    "empty": False,
+                    "allowed": ["clean", "curated"],
+                },
                 "observability": {
                     "type": "dict",
                     "empty": False,
@@ -675,6 +684,7 @@ class DAGDeclarationValidator(Validator):
                 f"{json.dumps(self.errors, indent=2)}",
             )
 
+        self._check_transformation_grade(dag_declaration)
         self._check_cluster_validation_config(dag_declaration)
         if dag_declaration.get("cluster"):
             self.validate_cluster_validation_cluster_diff(
@@ -692,6 +702,25 @@ class DAGDeclarationValidator(Validator):
             self._check_query_delta_datazord_config(dag_declaration)
         if workflow_type == WorkflowEnum.QUERY_DELTA_WORKFLOW.value:
             self._check_query_delta_rejects_datazord_config(dag_declaration)
+
+    def _check_transformation_grade(self, dag_declaration: dict) -> None:
+        workflow = dag_declaration.get("workflow") or {}
+        layer = workflow.get("layer")
+        grade = workflow.get("transformation_grade")
+        if layer == LayerEnum.TRANSFORMATION.value:
+            if grade not in TRANSFORMATION_GRADES:
+                raise AssertionError(
+                    "m=_check_transformation_grade, "
+                    "msg=workflow.transformation_grade is required when layer is "
+                    "transformation and must be 'clean' or 'curated'"
+                )
+            return
+        if grade is not None:
+            raise AssertionError(
+                "m=_check_transformation_grade, "
+                "msg=workflow.transformation_grade is only allowed when layer is "
+                "transformation"
+            )
 
     _PAGINATION_LOCATION_KEYS = (
         "cursor_location",
@@ -737,6 +766,12 @@ class DAGDeclarationValidator(Validator):
 
     def _validate_query_view_workflow(self, dag_declaration: dict) -> None:
         workflow = dag_declaration.get("workflow", {})
+        if workflow.get("layer") == LayerEnum.TRANSFORMATION.value:
+            raise AssertionError(
+                "m=_validate_query_view_workflow, "
+                "msg=workflow.type query_view is not supported when layer is "
+                "transformation"
+            )
         tables_customization = workflow.get("tables_customization", {})
 
         try:

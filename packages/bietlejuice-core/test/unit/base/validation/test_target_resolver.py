@@ -65,6 +65,20 @@ class TestGetProdDatabaseName:
     def test_all_layers_resolve_prod_database_name(self, layer, schema, expected):
         assert get_prod_database_name(layer, schema) == expected
 
+    def test_transformation_requires_grade(self):
+        with pytest.raises(ValueError, match="transformation_grade"):
+            get_prod_database_name(LayerEnum.TRANSFORMATION, "terminator_test")
+
+    def test_transformation_uses_grade_suffix(self):
+        assert (
+            get_prod_database_name(
+                LayerEnum.TRANSFORMATION,
+                "terminator_test",
+                transformation_grade="clean",
+            )
+            == "transformation_terminator_test_clean"
+        )
+
 
 class TestValidationDatabaseLocation:
     def test_under_validation_prefix(self):

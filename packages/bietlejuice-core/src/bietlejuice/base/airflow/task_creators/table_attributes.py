@@ -1,3 +1,6 @@
+from typing import Optional
+
+from bietlejuice.base.db.datalake_metastore_mapping import require_transformation_grade
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.validation.target_resolver import (
     get_prod_database_name,
@@ -225,8 +228,22 @@ class TableAttributes:
             return table_has_soft_delete.lower() == "true"
         return bool(table_has_soft_delete)
 
+    @property
+    def transformation_grade(self) -> Optional[str]:
+        return self._workflow_args.get("transformation_grade")
+
+    def spark_transformation_grade_args(self) -> list[str]:
+        if self.layer != LayerEnum.TRANSFORMATION:
+            return []
+        grade = require_transformation_grade(self.transformation_grade)
+        return ["--transformation-grade", grade]
+
     def get_prod_database_name(self) -> str:
-        return get_prod_database_name(self.layer, self.schema)
+        return get_prod_database_name(
+            self.layer,
+            self.schema,
+            transformation_grade=self.transformation_grade,
+        )
 
     def get_validation_write_target(self) -> tuple[str, str]:
         return resolve_validation_target(self.get_prod_database_name(), self.table_name)

@@ -21,6 +21,14 @@ def parse_args() -> Namespace:
     parser.add_argument("layer", type=str)
     parser.add_argument("schema", type=str)
     parser.add_argument("table_name", type=str)
+    parser.add_argument(
+        "--transformation-grade",
+        type=str,
+        choices=["clean", "curated"],
+        required=False,
+        default=None,
+        help="Required when layer is transformation: clean or curated",
+    )
 
     return parser.parse_args()
 
@@ -85,7 +93,14 @@ if __name__ == "__main__":
     schema = args.schema
     table_name = args.table_name
 
-    spark_ms = SparkMetastoreHelper(bucket, layer, schema, table_name, all_tables=False)
+    spark_ms = SparkMetastoreHelper(
+        bucket,
+        layer,
+        schema,
+        table_name,
+        all_tables=False,
+        transformation_grade=args.transformation_grade,
+    )
 
     trino_client = get_trino_client()
     # database_location ends with "/" from metastore mapping; avoid "//" in the path

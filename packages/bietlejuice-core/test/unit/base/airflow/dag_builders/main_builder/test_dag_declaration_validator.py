@@ -83,6 +83,71 @@ class TestDAGDeclarationValidator:
                 pytest.raises(AssertionError),
             ),
             ({"workflow": {}, "dag": {}}, pytest.raises(AssertionError)),
+            (
+                {
+                    "workflow": {
+                        "type": "query_delta",
+                        "layer": "transformation",
+                        "transformation_grade": "clean",
+                    },
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                },
+                does_not_raise(),
+            ),
+            (
+                {
+                    "workflow": {
+                        "type": "query_delta",
+                        "layer": "transformation",
+                        "transformation_grade": "curated",
+                    },
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                },
+                does_not_raise(),
+            ),
+            (
+                {
+                    "workflow": {
+                        "type": "query_delta",
+                        "layer": "transformation",
+                    },
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                },
+                pytest.raises(AssertionError),
+            ),
+            (
+                {
+                    "workflow": {
+                        "type": "query_delta",
+                        "layer": "consumption",
+                        "transformation_grade": "clean",
+                    },
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                },
+                pytest.raises(AssertionError),
+            ),
+            (
+                {
+                    "workflow": {
+                        "type": "query_delta",
+                        "layer": "enrich",
+                        "transformation_grade": "clean",
+                    },
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                },
+                pytest.raises(AssertionError),
+            ),
+            (
+                {
+                    "workflow": {
+                        "type": "query_view",
+                        "layer": "transformation",
+                        "transformation_grade": "clean",
+                    },
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                },
+                pytest.raises(AssertionError),
+            ),
         ],
     )
     def test_validate(self, dag_declaration_validator, dag_declaration, expectation):
@@ -784,6 +849,15 @@ class TestDAGDeclarationValidatorQueryViewWorkflow:
 
         # act & assert
         with pytest.raises(AssertionError, match=error_match):
+            dag_declaration_validator.validate(dag_declaration=base_declaration)
+
+    def test_validate_query_view_rejects_transformation_layer(
+        self, dag_declaration_validator, base_declaration
+    ):
+        base_declaration["workflow"]["layer"] = "transformation"
+        base_declaration["workflow"]["transformation_grade"] = "clean"
+
+        with pytest.raises(AssertionError, match="query_view"):
             dag_declaration_validator.validate(dag_declaration=base_declaration)
 
 

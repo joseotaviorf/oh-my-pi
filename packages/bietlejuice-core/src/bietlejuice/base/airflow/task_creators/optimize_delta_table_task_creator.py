@@ -12,6 +12,7 @@ from bietlejuice.base.airflow.optimize_delta_tables_cli import (
     make_optimize_emr_step_validator,
 )
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.db.datalake_metastore_mapping import require_transformation_grade
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.formatters.string_formatter import StringFormatter
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -430,6 +431,10 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 table_config["apply_partition_filter"] = apply_partition_filter
             elif apply_partition_filter:
                 table_config["apply_partition_filter"] = True
+            if table.layer == LayerEnum.TRANSFORMATION:
+                table_config["transformation_grade"] = require_transformation_grade(
+                    table.transformation_grade
+                )
             tables_config[table.table_name] = table_config
 
         return tables_config

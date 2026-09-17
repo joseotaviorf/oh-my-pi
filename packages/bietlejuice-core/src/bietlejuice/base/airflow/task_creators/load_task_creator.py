@@ -46,6 +46,11 @@ class LoadTaskCreator(BaseTaskCreator, ABC):
                     "storage_format": (
                         self.storage_format.value if self.storage_format else None
                     ),
+                    **(
+                        {"transformation_grade": table_attributes.transformation_grade}
+                        if table_attributes.transformation_grade
+                        else {}
+                    ),
                 }
             )
         return task

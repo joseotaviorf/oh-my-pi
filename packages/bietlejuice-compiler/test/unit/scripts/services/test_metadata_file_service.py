@@ -77,6 +77,96 @@ class TestValidateDatabaseNameConsumption:
         assert formula_name == mapping_name == schema
 
 
+class TestValidateDatabaseNameTransformation:
+    def test_transformation_clean_grade(self):
+        table = "termination"
+        content = {"database_name": "transformation_terminator_test_clean"}
+        table_info = {
+            "dag": "transformation_terminator_test",
+            "layer": "transformation",
+            "table_name": table,
+        }
+        with patch.object(
+            MetadataFileService,
+            "_load_declaration",
+            return_value={
+                "workflow": {
+                    "custom_schema": "terminator_test",
+                    "transformation_grade": "clean",
+                }
+            },
+        ):
+            MetadataFileService._validate_database_name(
+                "path/to.yml", content, table_info
+            )
+
+    def test_transformation_rejects_unsuffixed_name(self):
+        table = "termination"
+        content = {"database_name": "transformation_terminator_test"}
+        table_info = {
+            "dag": "transformation_terminator_test",
+            "layer": "transformation",
+            "table_name": table,
+        }
+        with patch.object(
+            MetadataFileService,
+            "_load_declaration",
+            return_value={
+                "workflow": {
+                    "custom_schema": "terminator_test",
+                    "transformation_grade": "clean",
+                }
+            },
+        ):
+            with pytest.raises(DatabaseNameMismatchException):
+                MetadataFileService._validate_database_name(
+                    "path/to.yml", content, table_info
+                )
+
+    def test_transformation_requires_workflow_grade(self):
+        table = "termination"
+        content = {"database_name": "transformation_terminator_test_clean"}
+        table_info = {
+            "dag": "transformation_terminator_test",
+            "layer": "transformation",
+            "table_name": table,
+        }
+        with patch.object(
+            MetadataFileService,
+            "_load_declaration",
+            return_value={"workflow": {"custom_schema": "terminator_test"}},
+        ):
+            with pytest.raises(ValueError, match="transformation_grade"):
+                MetadataFileService._validate_database_name(
+                    "path/to.yml", content, table_info
+                )
+
+    def test_transformation_ignores_table_customization_grade(self):
+        table = "termination"
+        content = {"database_name": "transformation_terminator_test_clean"}
+        table_info = {
+            "dag": "transformation_terminator_test",
+            "layer": "transformation",
+            "table_name": table,
+        }
+        with patch.object(
+            MetadataFileService,
+            "_load_declaration",
+            return_value={
+                "workflow": {
+                    "custom_schema": "terminator_test",
+                    "transformation_grade": "clean",
+                    "tables_customization": {
+                        table: {"transformation_grade": "curated"},
+                    },
+                }
+            },
+        ):
+            MetadataFileService._validate_database_name(
+                "path/to.yml", content, table_info
+            )
+
+
 class TestGetTableLayerConsumption:
     @pytest.mark.parametrize("schema", sorted(CONSUMPTION_SCHEMAS))
     def test_registered_schemas_are_consumption(self, schema):

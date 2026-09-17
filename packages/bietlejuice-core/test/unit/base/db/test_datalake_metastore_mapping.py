@@ -49,8 +49,10 @@ class TestDatalakeMetastoreMapping:
             "db_wonka_path": "s3a://bucket-forno/wonka/historical/_my_src_/",
             "db_ingestion_name": "datalake__my_src__transactional",
             "db_ingestion_path": "s3a://bucket-forno/transactional/_my_src_/",
-            "db_transformation_name": "transformation__my_src_",
-            "db_transformation_path": "s3a://bucket-forno/transformation/_my_src_/",
+            "db_transformation_clean_name": "transformation__my_src__clean",
+            "db_transformation_clean_path": "s3a://bucket-forno/transformation/_my_src_/clean/",
+            "db_transformation_curated_name": "transformation__my_src__curated",
+            "db_transformation_curated_path": "s3a://bucket-forno/transformation/_my_src_/curated/",
         }
 
     def test_get_all_datalake_info_for_prod(self):
@@ -83,8 +85,10 @@ class TestDatalakeMetastoreMapping:
             "db_wonka_path": "s3a://5a-datalake-prod/wonka/historical/_my_src_/",
             "db_ingestion_name": "datalake__my_src__transactional",
             "db_ingestion_path": "s3a://5a-datalake-prod/transactional/_my_src_/",
-            "db_transformation_name": "transformation__my_src_",
-            "db_transformation_path": "s3a://5a-datalake-prod/transformation/_my_src_/",
+            "db_transformation_clean_name": "transformation__my_src__clean",
+            "db_transformation_clean_path": "s3a://5a-datalake-prod/transformation/_my_src_/clean/",
+            "db_transformation_curated_name": "transformation__my_src__curated",
+            "db_transformation_curated_path": "s3a://5a-datalake-prod/transformation/_my_src_/curated/",
         }
         assert db_info_dict == expected
 
@@ -135,7 +139,7 @@ class TestDatalakeMetastoreMapping:
 
     def test_get_schema_from_database_for_transformation(self):
         # arrange
-        database = "transformation_my_schema"
+        database = "transformation_my_schema_clean"
 
         # act
         schema = DatalakeMetastoreMapping.get_schema_from_database(database)
@@ -143,7 +147,8 @@ class TestDatalakeMetastoreMapping:
         # assert
         assert schema == "my_schema"
 
-    def test_transformation_database_name_round_trips_to_the_schema(self):
+    @pytest.mark.parametrize("grade", ("clean", "curated"))
+    def test_transformation_database_name_round_trips_to_the_schema(self, grade):
         """The dependency-file generator derives task names by inverting the
         database name; a None schema here silently corrupts dependencies.yaml."""
         # arrange
@@ -151,11 +156,18 @@ class TestDatalakeMetastoreMapping:
         mapping = DatalakeMetastoreMapping(source, "a-bucket")
 
         # act
-        database = mapping.get_full_database_name(LayerEnum.TRANSFORMATION)
+        database = mapping.get_full_database_name(
+            LayerEnum.TRANSFORMATION, transformation_grade=grade
+        )
 
         # assert
-        assert database == "transformation_my_schema"
+        assert database == f"transformation_my_schema_{grade}"
         assert DatalakeMetastoreMapping.get_schema_from_database(database) == source
+
+    def test_transformation_requires_grade(self):
+        mapping = DatalakeMetastoreMapping("my_schema", "a-bucket")
+        with pytest.raises(ValueError, match="transformation_grade"):
+            mapping.get_full_database_name(LayerEnum.TRANSFORMATION)
 
     def test_get_schema_from_database_for_core(self):
         # arrange

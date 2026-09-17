@@ -15,7 +15,10 @@ class LayerEnum(Enum):
     Physical naming for the new members (see ``DatalakeMetastoreMapping``):
 
     - ``INGESTION``  -> ``datalake_{source}_transactional``, ``/transactional/{source}/``
-    - ``TRANSFORMATION`` -> ``transformation_{source}``, ``/transformation/{source}/``
+    - ``TRANSFORMATION`` -> ``transformation_{source}_{grade}``,
+      ``/transformation/{source}/{grade}/`` where ``grade`` is
+      ``workflow.transformation_grade`` (``clean`` or ``curated``). The field is
+      required only for this layer.
 
     ``TRANSFORMATION`` intentionally does **not** reuse the ``enrich`` naming
     (``datalake_{source}``). Source-layer policy classifies tables by schema name

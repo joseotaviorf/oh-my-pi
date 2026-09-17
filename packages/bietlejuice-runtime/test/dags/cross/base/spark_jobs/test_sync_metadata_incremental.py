@@ -71,7 +71,12 @@ class TestSyncMetastoreTablePartitionsIncremental:
             )
 
             helper_cls.assert_called_once_with(
-                "test-bucket", "raw", "emlio", "emlio_logs", False
+                "test-bucket",
+                "raw",
+                "emlio",
+                "emlio_logs",
+                False,
+                transformation_grade=None,
             )
             helper.validate_table_arguments.assert_called_once()
             # No partition enumeration: the full-reconcile entry point is untouched.
@@ -112,10 +117,10 @@ class TestMainDispatch:
         )
 
         structure.assert_called_once_with(
-            "test-bucket", "raw", "emlio", "emlio_logs", False
+            "test-bucket", "raw", "emlio", "emlio_logs", False, None
         )
         incremental.assert_called_once_with(
-            "test-bucket", "raw", "emlio", "emlio_logs", [["2026", "7", "3"]]
+            "test-bucket", "raw", "emlio", "emlio_logs", [["2026", "7", "3"]], None
         )
         full.assert_not_called()
 
@@ -123,7 +128,22 @@ class TestMainDispatch:
         structure, full, incremental = self._run_main(["--table-name", "emlio_logs"])
 
         structure.assert_called_once()
-        full.assert_called_once_with("test-bucket", "raw", "emlio", "emlio_logs", False)
+        full.assert_called_once_with(
+            "test-bucket", "raw", "emlio", "emlio_logs", False, None
+        )
+        incremental.assert_not_called()
+
+    def test_transformation_grade_reaches_hive_sync_jobs(self):
+        structure, full, incremental = self._run_main(
+            ["--table-name", "emlio_logs", "--transformation-grade", "curated"]
+        )
+
+        structure.assert_called_once_with(
+            "test-bucket", "raw", "emlio", "emlio_logs", False, "curated"
+        )
+        full.assert_called_once_with(
+            "test-bucket", "raw", "emlio", "emlio_logs", False, "curated"
+        )
         incremental.assert_not_called()
 
     def test_empty_partition_values_schedules_no_partition_job(self):

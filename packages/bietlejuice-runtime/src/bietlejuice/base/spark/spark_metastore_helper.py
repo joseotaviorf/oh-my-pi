@@ -16,12 +16,21 @@ logger = QuintoAndarLogger("SparkMetastoreHelper")
 
 
 class SparkMetastoreHelper:
-    def __init__(self, bucket, layer, db_name_part, table_name, all_tables) -> None:
+    def __init__(
+        self,
+        bucket,
+        layer,
+        db_name_part,
+        table_name,
+        all_tables,
+        transformation_grade=None,
+    ) -> None:
         self.bucket = bucket
         self.layer = layer
         self.db_name_part = db_name_part
         self.table_name = table_name
         self.all_tables = all_tables
+        self.transformation_grade = transformation_grade
         (
             self.spark_database_name,
             self.database_location,
@@ -34,14 +43,18 @@ class SparkMetastoreHelper:
 
         :return: the spark database name and the database location
         """
+        layer_enum = LayerEnum(self.layer)
         metastore_mapping_factory = MetastoreMappingFactory.get_mapper_by_layer(
-            LayerEnum(self.layer), self.db_name_part, self.bucket
+            layer_enum, self.db_name_part, self.bucket
         )
+        name_kwargs = {}
+        if layer_enum == LayerEnum.TRANSFORMATION:
+            name_kwargs["transformation_grade"] = self.transformation_grade
         spark_database_name = metastore_mapping_factory.get_full_database_name(
-            LayerEnum(self.layer)
+            layer_enum, **name_kwargs
         )
         database_location = metastore_mapping_factory.get_full_database_path(
-            LayerEnum(self.layer)
+            layer_enum, **name_kwargs
         )
 
         return spark_database_name, database_location

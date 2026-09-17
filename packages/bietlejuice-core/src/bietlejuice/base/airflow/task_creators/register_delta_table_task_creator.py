@@ -25,6 +25,7 @@ class RegisterDeltaTableTaskCreator(BaseTaskCreator):
             table_attributes.schema,
             table_attributes.table_name,
         ]
+        parameters.extend(table_attributes.spark_transformation_grade_args())
 
         return self._create_spark_job_task(
             self.SPARK_JOB_NAME,

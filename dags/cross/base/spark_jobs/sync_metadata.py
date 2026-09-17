@@ -143,14 +143,23 @@ def update_table_partitions(
 
 
 # hive sync funcions
-def sync_metastore_table_structure(bucket, layer, schema, table_name, all_tables_flag):
+def sync_metastore_table_structure(
+    bucket, layer, schema, table_name, all_tables_flag, transformation_grade=None
+):
     logger = set_logger("sync_metastore_table_structure")
     logger.info(
         f"m={logger.name}, bucket={bucket}, layer={layer}, schema={schema}, "
         f"table_name={table_name}, all_tables_flag={all_tables_flag}, "
         "msg=Job execution started."
     )
-    spark_ms = SparkMetastoreHelper(bucket, layer, schema, table_name, all_tables_flag)
+    spark_ms = SparkMetastoreHelper(
+        bucket,
+        layer,
+        schema,
+        table_name,
+        all_tables_flag,
+        transformation_grade=transformation_grade,
+    )
     spark_ms.validate_table_arguments()
 
     tables_metadata = spark_ms.get_all_tables_metadata()
@@ -182,7 +191,9 @@ def sync_metastore_table_structure(bucket, layer, schema, table_name, all_tables
     logger.info(f"m={logger.name}, msg=Finished synchronization.")
 
 
-def sync_metastore_table_partitions(bucket, layer, schema, table_name, all_tables_flag):
+def sync_metastore_table_partitions(
+    bucket, layer, schema, table_name, all_tables_flag, transformation_grade=None
+):
     logger = set_logger("sync_metastore_table_partitions")
     logger.info(
         f"m={logger.name}, bucket={bucket}, layer={layer}, schema={schema}, "
@@ -190,7 +201,14 @@ def sync_metastore_table_partitions(bucket, layer, schema, table_name, all_table
         "msg=Job execution started."
     )
 
-    spark_ms = SparkMetastoreHelper(bucket, layer, schema, table_name, all_tables_flag)
+    spark_ms = SparkMetastoreHelper(
+        bucket,
+        layer,
+        schema,
+        table_name,
+        all_tables_flag,
+        transformation_grade=transformation_grade,
+    )
     spark_ms.validate_table_arguments()
 
     tables_metadata = spark_ms.get_all_tables_metadata(get_partition_values=True)
@@ -233,7 +251,7 @@ def sync_metastore_table_partitions(bucket, layer, schema, table_name, all_table
 
 
 def sync_metastore_table_partitions_incremental(
-    bucket, layer, schema, table_name, partition_values
+    bucket, layer, schema, table_name, partition_values, transformation_grade=None
 ):
     """
     Adds the given partition values to the external Hive Metastore table without
@@ -248,7 +266,14 @@ def sync_metastore_table_partitions_incremental(
         f"table_name={table_name}, partition_values={partition_values}, "
         "msg=Incremental partition sync started."
     )
-    spark_ms = SparkMetastoreHelper(bucket, layer, schema, table_name, False)
+    spark_ms = SparkMetastoreHelper(
+        bucket,
+        layer,
+        schema,
+        table_name,
+        False,
+        transformation_grade=transformation_grade,
+    )
     spark_ms.validate_table_arguments()
 
     partitions = [
@@ -270,7 +295,9 @@ def sync_metastore_table_partitions_incremental(
 
 
 # propagate metadata function
-def propagate_metadata(layer, metadata_type, db_name_part, table_name):
+def propagate_metadata(
+    layer, metadata_type, db_name_part, table_name, transformation_grade=None
+):
     logger = set_logger("propagate_metadata")
     logger.info(
         f"m={logger.name}, layer={layer}, metadata_type={metadata_type}, db_name_part={db_name_part}, "
@@ -293,7 +320,9 @@ def propagate_metadata(layer, metadata_type, db_name_part, table_name):
         database_name, _ = metric_ms_mapping.get_metric_info()
     else:
         dl_ms_mapping = DatalakeMetastoreMapping(source=db_name_part, bucket="")
-        database_name, _ = dl_ms_mapping.get_datalake_info_from_layer(layer)
+        database_name, _ = dl_ms_mapping.get_datalake_info_from_layer(
+            layer, transformation_grade=transformation_grade
+        )
 
     LineageTagsPipeline(
         metadata_propagator_host=metadata_propagator_confs_json["host"],
@@ -510,6 +539,14 @@ def build_arg_parser():
             "partitions to the external Hive metastore (no drops)."
         ),
     )
+    parser.add_argument(
+        "--transformation-grade",
+        type=str,
+        choices=["clean", "curated"],
+        required=False,
+        default=None,
+        help="Required when layer is transformation: clean or curated",
+    )
 
     return parser
 
@@ -533,6 +570,7 @@ def main():
     product_database_name = args.product_database_name
     bypass_hive = args.bypass_hive
     bypass_propagate = args.bypass_propagate
+    transformation_grade = args.transformation_grade
 
     if layer == LayerEnum.RAW.value:
         propagate_job = propagate_raw_metadata
@@ -547,7 +585,13 @@ def main():
         ]
     else:
         propagate_job = propagate_metadata
-        propagate_params = [layer, metadata_type_value, schema, table_name]
+        propagate_params = [
+            layer,
+            metadata_type_value,
+            schema,
+            table_name,
+            transformation_grade,
+        ]
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -560,7 +604,14 @@ def main():
         jobs_to_run.append(
             {
                 "job": sync_metastore_table_structure,
-                "params": [bucket, layer, schema, table_name, all_tables_flag],
+                "params": [
+                    bucket,
+                    layer,
+                    schema,
+                    table_name,
+                    all_tables_flag,
+                    transformation_grade,
+                ],
             }
         )
         if args.partition_values:
@@ -579,6 +630,7 @@ def main():
                             schema,
                             table_name,
                             partition_values,
+                            transformation_grade,
                         ],
                     }
                 )
@@ -586,7 +638,14 @@ def main():
             jobs_to_run.append(
                 {
                     "job": sync_metastore_table_partitions,
-                    "params": [bucket, layer, schema, table_name, all_tables_flag],
+                    "params": [
+                        bucket,
+                        layer,
+                        schema,
+                        table_name,
+                        all_tables_flag,
+                        transformation_grade,
+                    ],
                 }
             )
     if not bypass_propagate:

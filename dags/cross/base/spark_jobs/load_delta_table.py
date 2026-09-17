@@ -64,6 +64,7 @@ def main():
         args.database_base_name,
         args.table_name,
         all_tables=False,
+        transformation_grade=args.transformation_grade,
     )
     database_name = spark_ms.spark_database_name
     database_location = spark_ms.database_location.replace("s3a://", "s3://")
@@ -271,6 +272,14 @@ def parse_arguments() -> Namespace:
         type=lambda arg: None if not arg else arg,
         required=False,
         default=None,
+    )
+    parser.add_argument(
+        "--transformation-grade",
+        type=str,
+        choices=["clean", "curated"],
+        required=False,
+        default=None,
+        help="Required when layer is transformation: clean or curated",
     )
 
     return parser.parse_args()

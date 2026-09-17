@@ -11,7 +11,12 @@ CLUSTER_VALIDATION_SCHEMA = "cluster_validation"
 _VALIDATION_TABLE_SEPARATOR = "___"
 
 
-def get_prod_database_name(layer: LayerEnum, schema: str, bucket: str = "") -> str:
+def get_prod_database_name(
+    layer: LayerEnum,
+    schema: str,
+    bucket: str = "",
+    transformation_grade: Optional[str] = None,
+) -> str:
     # bucket is only used by metastore path helpers; UC database names depend on layer/schema.
     if layer == LayerEnum.METRIC:
         return MetricMetastoreMapping(
@@ -31,7 +36,7 @@ def get_prod_database_name(layer: LayerEnum, schema: str, bucket: str = "") -> s
         ).get_full_database_name(layer)
     return DatalakeMetastoreMapping(
         bucket=bucket, source=schema
-    ).get_full_database_name(layer)
+    ).get_full_database_name(layer, transformation_grade=transformation_grade)
 
 
 def managed_table_fqn(

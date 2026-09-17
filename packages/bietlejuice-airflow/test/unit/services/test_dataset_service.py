@@ -551,6 +551,43 @@ class TestDatasetService:
             == "datalake_ebdb_raw.contrato_aud"
         )
 
+    def test_build_table_dataset_name_for_transformation_with_grade(self):
+        context = {
+            "params": {
+                "schema": "terminator_test",
+                "table_name": "termination",
+                "layer": "transformation",
+                "transformation_grade": "clean",
+            }
+        }
+        assert (
+            DatasetService._build_table_dataset_name(context)
+            == "transformation_terminator_test_clean.termination"
+        )
+
+    def test_build_table_dataset_name_for_transformation_without_grade(self):
+        context = {
+            "params": {
+                "schema": "terminator_test",
+                "table_name": "termination",
+                "layer": "transformation",
+            }
+        }
+        assert DatasetService._build_table_dataset_name(context) is None
+
+    def test_build_table_dataset_name_for_consumption_ignores_missing_grade(self):
+        context = {
+            "params": {
+                "schema": "offboarding_test",
+                "table_name": "dim_termination",
+                "layer": "consumption",
+            }
+        }
+        assert (
+            DatasetService._build_table_dataset_name(context)
+            == "offboarding_test.dim_termination"
+        )
+
 
 def dataset_equals(d1: BaseDataset, d2: BaseDataset) -> bool:
     """

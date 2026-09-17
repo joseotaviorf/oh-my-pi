@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 from bietlejuice.base.db.metastore_mapping import MetastoreMapping
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -52,8 +53,15 @@ CONSUMPTION_SCHEMAS = frozenset(
 )
 
 
+# Physical grade of a ``transformation`` writer. Required on
+# ``workflow.transformation_grade`` when ``layer: transformation``; ignored
+# (and rejected by the declaration validator) on every other layer.
+TRANSFORMATION_GRADES = frozenset({"clean", "curated"})
+
 # Layers routed to this mapper. Single source for both the name and the path
 # dict comprehensions in ``get_all_datalake_info`` so the two cannot drift.
+# ``TRANSFORMATION`` is omitted: names and paths are grade-suffixed
+# (``transformation_{source}_{grade}``) and emitted per grade below.
 _DATALAKE_LAYERS = (
     LayerEnum.TRANSACTIONAL,
     LayerEnum.RAW,
@@ -64,8 +72,17 @@ _DATALAKE_LAYERS = (
     LayerEnum.CONSUMPTION,
     LayerEnum.WONKA,
     LayerEnum.INGESTION,
-    LayerEnum.TRANSFORMATION,
 )
+
+
+def require_transformation_grade(transformation_grade: Optional[str]) -> str:
+    if transformation_grade not in TRANSFORMATION_GRADES:
+        raise ValueError(
+            "transformation_grade is required when layer is transformation and "
+            f"must be one of {sorted(TRANSFORMATION_GRADES)}, "
+            f"got {transformation_grade!r}"
+        )
+    return transformation_grade
 
 
 def apply_naming_convention(source: str, database_name: str) -> str:
@@ -82,11 +99,17 @@ class DatalakeMetastoreMapping(MetastoreMapping):
     """Datalake properties mapping for Hive Metastore."""
 
     DATABASE_PATTERN = re.compile(
-        r"^(?:datalake_|core_|transformation_)(?P<schema>[\w|_]+?)(?:_transactional|_raw|_clean|_clean_staging)?$"
+        r"^(?:datalake_|core_|transformation_)(?P<schema>[\w|_]+?)(?:_transactional|_raw|_clean|_clean_staging|_curated)?$"
     )
 
-    def get_full_database_name(self, layer: LayerEnum = None) -> str:
+    def get_full_database_name(
+        self, layer: LayerEnum = None, transformation_grade: Optional[str] = None
+    ) -> str:
         """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
+        if layer == LayerEnum.TRANSFORMATION:
+            grade = require_transformation_grade(transformation_grade)
+            return f"transformation_{self.source}_{grade}"
+
         database_name = {
             "transactional": f"datalake_{self.source}_transactional",
             "raw": f"datalake_{self.source}_raw",
@@ -102,7 +125,6 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             # ``datalake_`` so schema-name classification can tell it apart from
             # enrich (see LayerEnum docstring).
             "ingestion": f"datalake_{self.source}_transactional",
-            "transformation": f"transformation_{self.source}",
         }[layer.value]
 
         # Consumption is already prefix-free (`{source}`); skip the enrich-era
@@ -133,8 +155,13 @@ class DatalakeMetastoreMapping(MetastoreMapping):
                 return governed
         return None
 
-    def get_full_database_path(self, layer: LayerEnum = None):
+    def get_full_database_path(
+        self, layer: LayerEnum = None, transformation_grade: Optional[str] = None
+    ):
         """Following the pattern according to the layer, source and bucket (given in the constructor), returns the full file path."""
+        if layer == LayerEnum.TRANSFORMATION:
+            grade = require_transformation_grade(transformation_grade)
+            return f"s3a://{self.bucket}/transformation/{self.source}/{grade}/"
         return {
             "transactional": f"s3a://{self.bucket}/transactional/{self.source}/",
             "raw": f"s3a://{self.bucket}/raw/{self.source}/",
@@ -146,7 +173,6 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             "consumption": f"s3a://{self.bucket}/consumption/{self.source}/",
             "wonka": f"s3a://{self.bucket}/wonka/historical/{self.source}/",
             "ingestion": f"s3a://{self.bucket}/transactional/{self.source}/",
-            "transformation": f"s3a://{self.bucket}/transformation/{self.source}/",
         }[layer.value]
 
     def get_all_datalake_info(self):
@@ -163,20 +189,43 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             f"db_{layer.value}_path": self.get_full_database_path(layer)
             for layer in _DATALAKE_LAYERS
         }
+        for grade in sorted(TRANSFORMATION_GRADES):
+            database_name[f"db_transformation_{grade}_name"] = (
+                self.get_full_database_name(
+                    LayerEnum.TRANSFORMATION, transformation_grade=grade
+                )
+            )
+            s3_files_path[f"db_transformation_{grade}_path"] = (
+                self.get_full_database_path(
+                    LayerEnum.TRANSFORMATION, transformation_grade=grade
+                )
+            )
 
         metastore_info = {}
         metastore_info.update(database_name)
         metastore_info.update(s3_files_path)
         return metastore_info
 
-    def get_datalake_info_from_layer(self, layer):
+    def get_datalake_info_from_layer(self, layer, transformation_grade=None):
         """
         Gets database info for given layer.
 
-        :param layer: raw, clean, enrich or clean_staging layers
+        :param layer: raw, clean, enrich, transformation, ...
         :type layer: str
+        :param transformation_grade: required when layer is transformation
         :return: specified layer info
         """
+        if layer == LayerEnum.TRANSFORMATION.value:
+            grade = require_transformation_grade(transformation_grade)
+            return (
+                self.get_full_database_name(
+                    LayerEnum.TRANSFORMATION, transformation_grade=grade
+                ),
+                self.get_full_database_path(
+                    LayerEnum.TRANSFORMATION, transformation_grade=grade
+                ),
+            )
+
         metastore_info = self.get_all_datalake_info()
 
         datalake_database_name = metastore_info[f"db_{layer}_name"]
