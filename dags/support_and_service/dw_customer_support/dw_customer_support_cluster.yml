@@ -2,6 +2,6 @@ cluster:
   type: emr_7_12_consolidation_m_memory_cluster
   custom_configurations:
     core_nodes:
-      instance_count: 4
+      instance_count: 8
     spark_conf:
       spark.sql.broadcastTimeout: '600'
