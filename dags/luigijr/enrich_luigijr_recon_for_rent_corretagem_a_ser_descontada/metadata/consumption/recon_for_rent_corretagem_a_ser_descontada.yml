@@ -1,0 +1,68 @@
+database_name: ops_fintech
+table_name: recon_for_rent_corretagem_a_ser_descontada
+owner: thais.ichihara@quintoandar.com.br
+domain: Fintech
+description: Table `recon_for_rent_corretagem_a_ser_descontada` materialized on a schedule by Luigi from a user-provided SQL query (Ops Fintech domain).
+columns:
+  id_entry:
+    description: Column `id_entry` produced by the scheduled materialization query.
+  id_invoice:
+    description: Column `id_invoice` produced by the scheduled materialization query.
+  sk_contract:
+    description: Column `sk_contract` produced by the scheduled materialization query.
+  accounting_version:
+    description: Column `accounting_version` produced by the scheduled materialization query.
+  bill_item:
+    description: Column `bill_item` produced by the scheduled materialization query.
+  description:
+    description: Column `description` produced by the scheduled materialization query.
+  locale:
+    description: Column `locale` produced by the scheduled materialization query.
+  localidade:
+    description: Column `localidade` produced by the scheduled materialization query.
+  account_type:
+    description: Column `account_type` produced by the scheduled materialization query.
+  status:
+    description: Column `status` produced by the scheduled materialization query.
+  due_amount:
+    description: Column `due_amount` produced by the scheduled materialization query.
+  accrual_year_month:
+    description: Column `accrual_year_month` produced by the scheduled materialization query.
+  entry_accrual_year_month:
+    description: Column `entry_accrual_year_month` produced by the scheduled materialization query.
+  entry_created_date:
+    description: Column `entry_created_date` produced by the scheduled materialization query.
+  invoice_due_date:
+    description: Column `invoice_due_date` produced by the scheduled materialization query.
+  real_invoice_paid_date:
+    description: Column `real_invoice_paid_date` produced by the scheduled materialization query.
+  invoice_canceled_date:
+    description: Column `invoice_canceled_date` produced by the scheduled materialization query.
+  write_off_at:
+    description: Column `write_off_at` produced by the scheduled materialization query.
+  ended_before_started:
+    description: Column `ended_before_started` produced by the scheduled materialization query.
+  is_reversed:
+    description: Column `is_reversed` produced by the scheduled materialization query.
+  contract_status:
+    description: Column `contract_status` produced by the scheduled materialization query.
+  opposite_entries:
+    description: Column `opposite_entries` produced by the scheduled materialization query.
+  contract_balance:
+    description: Column `contract_balance` produced by the scheduled materialization query.
+  sinal:
+    description: Column `sinal` produced by the scheduled materialization query.
+  tipo:
+    description: Column `tipo` produced by the scheduled materialization query.
+  conta_numero:
+    description: Column `conta_numero` produced by the scheduled materialization query.
+  conta_nome:
+    description: Column `conta_nome` produced by the scheduled materialization query.
+  data_fim:
+    description: Column `data_fim` produced by the scheduled materialization query.
+  gerado_em:
+    description: Column `gerado_em` produced by the scheduled materialization query.
+  snapshot:
+    description: Column `snapshot` produced by the scheduled materialization query.
+  entra_no_saldo:
+    description: Column `entra_no_saldo` produced by the scheduled materialization query.
