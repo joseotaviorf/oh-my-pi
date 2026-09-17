@@ -32,6 +32,10 @@ workflow:
     SocialHousingProgram:
       clean_table_name: social_housing_program
       z_order_by: [type]
+    SocialHousingProgramClassification:
+      clean_table_name: social_housing_program_classification
+      raw_z_order_by: [imovel_id]
+      clean_z_order_by: [id_house]
     HouseRating:
       clean_table_name: house_rating
     HouseRating_RatingLabel:
