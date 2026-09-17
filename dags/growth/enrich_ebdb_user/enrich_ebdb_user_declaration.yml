@@ -2,6 +2,7 @@ dag:
   name: enrich_ebdb_user
   schedule_start_date: 2020, 7, 1
   owner: Data Growth
+  criticality: Critical
   documentation:
     dag_purpose: |
       'Creates enriched tables for the context `User` from ebdb.

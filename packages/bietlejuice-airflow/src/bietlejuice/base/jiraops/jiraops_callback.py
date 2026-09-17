@@ -7,6 +7,7 @@ from typing import List
 from airflow.models import Variable
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.airflow.enums.criticality_enum import CriticalityEnum
 from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
 from bietlejuice.base.incident_context_enrichers.enricher import IncidentContextEnricher
 from bietlejuice.base.jiraops.jiraops_client import JiraOpsClient
@@ -64,6 +65,11 @@ class JiraOpsCallback:
         self._current_dag_id = dag_id
         dag_owner = str(task_instance.task.owner)
         task_id = task_instance.task_id if include_task_id else None
+        criticality = (
+            (context.get("params") or {}).get("criticality")
+            or self.dag_args.get("criticality")
+            or CriticalityEnum.DEFAULT
+        )
         environment = Variable.get("environment")
         run_type = DatasetService._get_run_type(context)
 
@@ -80,7 +86,11 @@ class JiraOpsCallback:
             current_datetime = datetime.now()
             datetime_str = current_datetime.strftime("%Y-%m-%d %H:%M:%S %z")
 
-            extra_properties = {"DAG": dag_id, "DAGOwner": dag_owner}
+            extra_properties = {
+                "DAG": dag_id,
+                "DAGOwner": dag_owner,
+                "Criticality": criticality,
+            }
             tags = [dag_id, f"{alert_type} failed"]
 
             if include_task_id:
@@ -103,6 +113,7 @@ class JiraOpsCallback:
                 tags=tags,
                 extra_properties=extra_properties,
                 responder_team_id=self.responder_team_id,
+                priority=CriticalityEnum.to_opsgenie_priority(criticality),
             )
 
             try:

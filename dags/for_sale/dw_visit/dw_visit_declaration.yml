@@ -1,6 +1,7 @@
 dag:
     name: dw_visit
     owner: Data ForSale
+    criticality: Critical
     schedule_start_date: 2024, 1, 1
     documentation:
       dag_purpose:

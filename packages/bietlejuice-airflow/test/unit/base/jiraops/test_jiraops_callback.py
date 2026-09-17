@@ -221,6 +221,7 @@ def test_task_failure_alert_prod_environment(
         "TaskPath": "test_dag:test_task",
         "Task": "test_task",
         "DAGOwner": "testOwner",
+        "Criticality": "Medium",
     }
 
     mock_client_instance.create_alert.assert_called_once_with(
@@ -229,7 +230,45 @@ def test_task_failure_alert_prod_environment(
         tags=expected_tags,
         extra_properties=expected_extra_properties,
         responder_team_id=None,
+        priority="P3",
     )
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_task_failure_alert_uses_declared_task_criticality(
+    mock_get_run_type, mock_airflow_variables, mock_jiraops_client, jiraops_callback
+):
+    mock_get_run_type.return_value = DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS
+    mock_client_class, mock_client_instance = mock_jiraops_client
+    context = mock_context()
+    context["params"]["criticality"] = "Critical"
+
+    jiraops_callback.task_failure_alert(context)
+
+    mock_client_instance.create_alert.assert_called_once()
+    _, kwargs = mock_client_instance.create_alert.call_args
+    assert kwargs["priority"] == "P1"
+    assert kwargs["extra_properties"]["Criticality"] == "Critical"
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_dag_failure_alert_uses_dag_criticality(
+    mock_get_run_type, mock_airflow_variables, mock_jiraops_client, jiraops_callback
+):
+    from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+
+    mock_get_run_type.return_value = DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS
+    mock_client_class, mock_client_instance = mock_jiraops_client
+    context = mock_context()
+    context["params"] = {}
+
+    callback = JiraOpsCallback(dag_args={"criticality": "High"})
+    callback.dag_failure_alert(context)
+
+    mock_client_instance.create_alert.assert_called_once()
+    _, kwargs = mock_client_instance.create_alert.call_args
+    assert kwargs["priority"] == "P2"
+    assert kwargs["extra_properties"]["Criticality"] == "High"
 
 
 @patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")

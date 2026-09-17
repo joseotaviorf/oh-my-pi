@@ -952,3 +952,102 @@ class TestDAGDeclarationValidatorQueryDeltaDatazordWorkflow:
 
         with pytest.raises(AssertionError, match="query_delta_datazord"):
             dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+
+class TestDAGDeclarationValidatorCriticality:
+    def test_validate_criticality_bogus_raises(self, dag_declaration_validator):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "criticality": "Bogus",
+            },
+        }
+        with pytest.raises(AssertionError):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_criticality_sla_deadline_utc_invalid_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "sla_deadline_utc": "25:00",
+            },
+        }
+        with pytest.raises(AssertionError):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_criticality_sla_deadline_utc_valid_accepts(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "sla_deadline_utc": "07:30",
+            },
+        }
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )
+
+    def test_validate_criticality_valid_accepts(self, dag_declaration_validator):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "criticality": "Critical",
+            },
+        }
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )
+
+    def test_validate_criticality_and_sla_deadline_utc_accepts(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "criticality": "Critical",
+                "sla_deadline_utc": "07:30",
+            },
+        }
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )
+
+    def test_validate_table_criticality_bogus_raises(self, dag_declaration_validator):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {"dim_user": {"criticality": "Bogus"}},
+            },
+            "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+        }
+        with pytest.raises(AssertionError):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_table_criticality_valid_accepts(self, dag_declaration_validator):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {
+                    "dim_user": {"criticality": "High", "run_optimize": True}
+                },
+            },
+            "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+        }
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )

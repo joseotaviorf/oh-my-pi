@@ -2,6 +2,7 @@ dag:
   name: dw_offboarding_obt
   schedule_start_date: 2026, 7, 22
   owner: Data ForRent
+  criticality: Critical
   documentation:
     dag_purpose: |
       Loads dw_offboarding.obt_offboarding in a dedicated DAG, decoupled from

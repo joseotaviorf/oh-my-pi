@@ -2,6 +2,7 @@ dag:
   name: dw_house
   schedule_start_date: 2020,08,29
   owner: Data House and Listing
+  criticality: Critical
   documentation:
     dag_purpose: |
       Loads the house-related dimensional model into the data warehouse: dim_house, dim_house_amenities,

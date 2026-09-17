@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2024, 8, 1
   schedule_interval: 30 7 * * *
   owner: Data Fintech
+  criticality: Critical
   callback_by_task: False
   documentation:
     dag_purpose: |

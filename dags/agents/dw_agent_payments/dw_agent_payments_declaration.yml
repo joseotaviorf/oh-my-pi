@@ -3,6 +3,7 @@ dag:
   name: dw_agent_payments
   schedule_start_date: 2026, 6, 25
   owner: Data Agents
+  criticality: Critical
   documentation:
     dag_purpose: |
       DW layer for Big Agent Incentives Engine. Projects enrich_big_agent_incentives

@@ -1,16 +1,9 @@
 # Runtime-anomaly monitoring config (Forno / local).
 # Small sample list + a low min_history_runs so the logic is exercisable with little data.
-# critical_dags = escalate to JiraOps (+ Chat). Slow findings: membership or
-# transitively blocking these also get Chat+JiraOps. Missing-run findings: membership
-# only (a late upstream stays Chat-only). Other DAGs are Chat-only. Override via
-# trigger conf ``critical_dags`` for a single run.
+# Paging set is derived from DAG tags criticality:Critical|High (dag.criticality in each declaration); override per run via trigger conf critical_dags.
 dag_runtime_monitoring:
   lookback_days: 30
   min_history_runs: 15
   percentile: 99
   factor: 1.5
   min_alert_duration_minutes: 90
-  critical_dags:
-    - bietlejuice.ebdb_location
-    - bietlejuice.ebdb_user_fast_lane
-    - bietlejuice.amplitude_new

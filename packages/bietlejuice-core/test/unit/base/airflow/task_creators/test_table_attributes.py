@@ -537,6 +537,80 @@ class TestTableAttributes:
                 table_customization=table_customization,
             )
 
+    def test_criticality_table_override_wins_over_dag_criticality(self):
+        # arrange
+        dag_args = {"name": "dag_name", "criticality": "Low"}
+        workflow_args = {}
+        layer = LayerEnum.CLEAN
+        table_name = "table_name"
+        table_customization = {"criticality": "Critical"}
+
+        # act
+        table_attributes = TableAttributes(
+            dag_args=dag_args,
+            workflow_args=workflow_args,
+            layer=layer,
+            table_name=table_name,
+            table_customization=table_customization,
+        )
+
+        # assert
+        assert table_attributes.criticality == "Critical"
+
+    def test_criticality_falls_back_to_dag_criticality(self):
+        # arrange
+        dag_args = {"name": "dag_name", "criticality": "Low"}
+        workflow_args = {}
+        layer = LayerEnum.CLEAN
+        table_name = "table_name"
+
+        # act
+        table_attributes = TableAttributes(
+            dag_args=dag_args,
+            workflow_args=workflow_args,
+            layer=layer,
+            table_name=table_name,
+        )
+
+        # assert
+        assert table_attributes.criticality == "Low"
+
+    def test_criticality_defaults_to_medium_when_neither_specified(self):
+        # arrange
+        dag_args = {"name": "dag_name"}
+        workflow_args = {}
+        layer = LayerEnum.CLEAN
+        table_name = "table_name"
+
+        # act
+        table_attributes = TableAttributes(
+            dag_args=dag_args,
+            workflow_args=workflow_args,
+            layer=layer,
+            table_name=table_name,
+        )
+
+        # assert
+        assert table_attributes.criticality == "Medium"
+
+    def test_criticality_raises_value_error_on_bogus_table_criticality(self):
+        # arrange
+        dag_args = {"name": "dag_name"}
+        workflow_args = {}
+        layer = LayerEnum.CLEAN
+        table_name = "table_name"
+        table_customization = {"criticality": "Bogus"}
+
+        # act & assert
+        with pytest.raises(ValueError, match="Invalid criticality"):
+            TableAttributes(
+                dag_args=dag_args,
+                workflow_args=workflow_args,
+                layer=layer,
+                table_name=table_name,
+                table_customization=table_customization,
+            )
+
 
 class TestTableAttributesTransformationGrade:
     def test_reads_grade_from_workflow_args(self):

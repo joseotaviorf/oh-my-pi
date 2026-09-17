@@ -12,6 +12,10 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.builder_interface import (
     BuilderInterface,
 )
+from bietlejuice.base.airflow.enums.criticality_enum import (
+    CRITICALITY_TAG_PREFIX,
+    SLA_DEADLINE_TAG_PREFIX,
+)
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_job_cluster_engine_to_context,
 )
@@ -112,6 +116,15 @@ class BaseWorkflow(BuilderInterface):
         dag_tags = list(self.dag_args.get("tags", []))
         if self.is_validation and "cluster_validation" not in dag_tags:
             dag_tags.append("cluster_validation")
+        if not self.is_validation:
+            if self.dag_args.get("criticality"):
+                dag_tags.append(
+                    f"{CRITICALITY_TAG_PREFIX}{self.dag_args['criticality']}"
+                )
+            if self.dag_args.get("sla_deadline_utc"):
+                dag_tags.append(
+                    f"{SLA_DEADLINE_TAG_PREFIX}{self.dag_args['sla_deadline_utc']}"
+                )
 
         default_args = {
             "owner": self.dag_args["owner"],

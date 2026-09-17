@@ -2,6 +2,7 @@ dag:
   name: dw_rent_flow
   schedule_start_date: 2021,11,14
   owner: Data ForRent
+  criticality: Critical
 workflow:
   type: query_delta
   layer: dw

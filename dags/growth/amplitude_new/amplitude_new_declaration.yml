@@ -1,6 +1,7 @@
 dag:
   name: amplitude_new
   owner: Data Growth
+  criticality: Critical
   schedule_interval: 0 0 * * *
   documentation:
     dag_purpose: |

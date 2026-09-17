@@ -2,6 +2,7 @@ dag:
   name: dw_customer_support
   schedule_start_date: 2021,2,7
   owner: Data SS
+  criticality: Critical
   documentation:
     dag_purpose: |
       This DAG load the DW tables for Customer Support.

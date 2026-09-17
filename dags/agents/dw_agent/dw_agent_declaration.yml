@@ -1,6 +1,7 @@
 dag:
   name: dw_agent
   owner: Data Agents
+  criticality: Critical
   documentation:
     dag_purpose: This DAG creates tables that summarize the agent context models.
 workflow:

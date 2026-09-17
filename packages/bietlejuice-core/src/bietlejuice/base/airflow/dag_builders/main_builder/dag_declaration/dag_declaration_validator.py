@@ -15,6 +15,10 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum 
     WorkflowEnum,
 )
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.enums.criticality_enum import (
+    SLA_DEADLINE_PATTERN,
+    CriticalityEnum,
+)
 from bietlejuice.base.airflow.short_circuit_function_enum import (
     ShortCircuitFunctionEnum,
 )
@@ -54,6 +58,16 @@ class DAGDeclarationValidator(Validator):
                     "allowed": DAGOwnerEnum.get_available_enum_values(),
                 },
                 "max_active_tasks": {"type": "integer", "min": 1, "required": False},
+                "criticality": {
+                    "type": "string",
+                    "required": False,
+                    "allowed": CriticalityEnum.get_available_enum_values(),
+                },
+                "sla_deadline_utc": {
+                    "type": "string",
+                    "required": False,
+                    "regex": SLA_DEADLINE_PATTERN,
+                },
             },
         },
         "workflow": {
@@ -115,7 +129,21 @@ class DAGDeclarationValidator(Validator):
                 "default_raw_table_privileges": {"type": "dict"},
                 "default_clean_table_privileges": {"type": "dict"},
                 "extra_query_template_params": {"type": "dict", "empty": False},
-                "tables_customization": {"type": "dict", "empty": False},
+                "tables_customization": {
+                    "type": "dict",
+                    "empty": False,
+                    "valuesrules": {
+                        "type": "dict",
+                        "allow_unknown": True,
+                        "schema": {
+                            "criticality": {
+                                "type": "string",
+                                "required": False,
+                                "allowed": CriticalityEnum.get_available_enum_values(),
+                            },
+                        },
+                    },
+                },
                 "lineage_product_database_name": {"type": "string", "empty": False},
                 "short_circuit_customization": {
                     "type": "dict",

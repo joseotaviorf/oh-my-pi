@@ -51,6 +51,7 @@ class LoadTaskCreator(BaseTaskCreator, ABC):
                         if table_attributes.transformation_grade
                         else {}
                     ),
+                    "criticality": table_attributes.criticality,
                 }
             )
         return task

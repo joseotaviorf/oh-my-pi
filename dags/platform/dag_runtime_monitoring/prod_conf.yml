@@ -1,15 +1,6 @@
 # Runtime-anomaly monitoring config (production).
 #
-# critical_dags: protected set that escalates to JiraOps (in addition to Chat).
-# The original 5 dw_* DAGs, extended with the DAGs behind the business-critical
-# tables and review-requested raw/clean, enrich, and DW DAGs (grouped below).
-#
-#   Every anomaly still alerts to Google Chat. When this list is non-empty:
-#     * slow findings page JiraOps if the DAG is on the list OR transitively
-#       blocks one of these (via dependencies.yaml);
-#     * missing-run findings page JiraOps on membership only (a late upstream
-#       of a listed DAG stays Chat-only — the transitive expansion is an alert
-#       storm of ~28 chronically-late DAGs).
+# Paging set is derived from DAG tags criticality:Critical|High (dag.criticality in each declaration); override per run via trigger conf critical_dags.
 #
 # lookback_days:    time window (in days) of recent SUCCESS runs used for the baseline.
 # min_history_runs: skip DAGs with fewer successful runs in that window (avoids false alarms).
@@ -23,59 +14,4 @@ dag_runtime_monitoring:
   percentile: 99
   factor: 1.5
   min_alert_duration_minutes: 90
-  critical_dags:
-    - bietlejuice.dw_customer_support
-    - bietlejuice.dw_offboarding
-    - bietlejuice.dw_repairs
-    - bietlejuice.dw_listing
-    - bietlejuice.dw_supply
-    # Fintech
-    - bietlejuice.dw_credit_analysis
-    - bietlejuice.retsuko
-    - bietlejuice.retsuko_fast_lane
-    - bietlejuice.ebdb_house_fast_lane
-    - bietlejuice.ebdb_contract_fast_lane
-    - bietlejuice.cyber
-    # Growth
-    - bietlejuice.dw_demand
-    - bietlejuice.dw_sale_ongoing_listings
-    - bietlejuice.dw_pricing
-    - bietlejuice.dw_brokers
-    - bietlejuice.dw_3p_supply
-    # For Rent
-    - bietlejuice.dw_offboarding_obt
-    # Single Station
-    - bietlejuice.dw_support_journey
-    - bietlejuice.dw_bpo_performance
-    - bietlejuice.salesforce_cdc
-    # Agents
-    - bietlejuice.dw_agent
-    - bietlejuice.dw_agent_payments
-    - bietlejuice.enrich_tiers
-    # For Sale
-    - bietlejuice.dw_house
-    - bietlejuice.dw_visit
-    # Raw/clean
-    - bietlejuice.amplitude_new
-    - bietlejuice.ebdb_user_fast_lane
-    - bietlejuice.ebdb_location
-    - bietlejuice.ebdb_partner
-    - bietlejuice.ebdb_user
-    - bietlejuice.ebdb_agent
-    - bietlejuice.ebdb_listing_fast_lane
-    - bietlejuice.ebdb_proposal_fast_lane
-    # Enrich
-    - bietlejuice.enrich_ebdb_listing
-    - bietlejuice.enrich_ebdb_user
-    - bietlejuice.enrich_ebdb_contract
-    - bietlejuice.enrich_visit
-    - bietlejuice.enrich_booking
-    - bietlejuice.enrich_ebdb_rent_flow
-    - bietlejuice.enrich_offer
-    - bietlejuice.enrich_rent_demand_events
-    - bietlejuice.enrich_chatbot
-    # DW
-    - bietlejuice.dw_region
-    - bietlejuice.dw_user
-    - bietlejuice.dw_contract
-    - bietlejuice.dw_rent_flow
+

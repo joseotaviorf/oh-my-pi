@@ -13,6 +13,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _IMPACTED_DW_LIST_LIMIT,
     _JIRA_DESCRIPTION_MAX,
     _JIRA_MESSAGE_MAX,
+    _KIND_DEADLINE_MISS,
     _KIND_MISSING_RUN,
     _KIND_SLOW,
     _MISSING_DATASET_LIST_LIMIT,
@@ -37,18 +38,22 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _collect_sla_findings,
     _cycle_anchor,
     _dataset_blocked,
+    _deadline_at,
+    _deadline_run_id,
     _drop_alert_excluded_entries,
     _effective_work_start,
     _enrich_findings_with_dataset_state,
     _enrich_findings_with_dw_impact,
     _entry_from_finding,
     _evaluate_all,
+    _evaluate_deadline_misses,
     _evaluate_runtime,
     _evaluate_sla_missing_runs,
     _expected_offset_minutes,
     _failed_text,
     _fetch_dag_owners,
     _fetch_dataset_satisfaction,
+    _fetch_declared_criticality,
     _fetch_run_states,
     _fetch_sla_emitted,
     _follow_up_clock_start,
@@ -488,6 +493,20 @@ class TestFormatImpactedDwLine:
         )
 
 
+class TestFetchDeclaredCriticality:
+    def test_parses_tags_and_skips_malformed(self):
+        session = mock.MagicMock()
+        session.execute.return_value.fetchall.return_value = [
+            ("a", "criticality:Critical"),
+            ("b", "criticality:Low"),
+            ("c", "sla_deadline_utc:10:00"),
+            ("d", "criticality:Bogus"),
+        ]
+        criticality_by_dag, deadline_by_dag = _fetch_declared_criticality(session)
+        assert criticality_by_dag == {"a": "Critical", "b": "Low"}
+        assert deadline_by_dag == {"c": "10:00"}
+
+
 class TestFetchDagOwners:
     def test_parses_primary_owner(self):
         session = mock.MagicMock()
@@ -696,6 +715,26 @@ class TestAssignAlertTiers:
         _assign_alert_tiers(findings, [], self._INDEX)
         assert findings[0]["tier"] == "standard"
 
+    def _deadline_miss_finding(self, dag_id):
+        return {
+            "kind": _KIND_DEADLINE_MISS,
+            "dag_id": dag_id,
+            "run_id": "deadline::2026-09-16T23:55:00+00:00",
+            "tier": "standard",
+            "late_by_s": 3600.0,
+            "due_at": "2026-09-17T10:00:00+00:00",
+        }
+
+    def test_deadline_miss_member_pages_jira(self):
+        findings = [self._deadline_miss_finding(_CRITICAL_DAG)]
+        _assign_alert_tiers(findings, [_CRITICAL_DAG], self._INDEX)
+        assert findings[0]["tier"] == "critical"
+
+    def test_deadline_miss_upstream_of_critical_stays_standard(self):
+        findings = [self._deadline_miss_finding(_STANDARD_DAG)]
+        _assign_alert_tiers(findings, [_CRITICAL_DAG], self._INDEX)
+        assert findings[0]["tier"] == "standard"
+
 
 @mock.patch(
     f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
@@ -770,6 +809,12 @@ class TestNormalizeLedger:
         assert entry["dag_id"] == _CRITICAL_DAG
         assert entry["run_id"] == "r1"
         assert entry["tier"] == "critical"
+
+    def test_old_string_entry_deadline_run_id_sets_deadline_miss_kind(self):
+        key = f"{_CRITICAL_DAG}|deadline::2026-09-16T23:55:00+00:00"
+        raw = {key: "2026-09-17T11:00:00+00:00"}
+        entry = _normalize_ledger(raw)[key]
+        assert entry["kind"] == _KIND_DEADLINE_MISS
 
 
 # --------------------------------------------------------------------------- #
@@ -960,11 +1005,78 @@ class TestSendJiraAlertTruncation:
         assert "LateBy" in extra
         assert "PctOverBaseline" not in extra
 
+    @mock.patch(f"{_MODULE}.JiraOpsClient")
+    @mock.patch(f"{_MODULE}.Variable")
+    def test_priority_p1_when_criticality_critical(self, mock_var, mock_client_cls):
+        mock_var.get.return_value = json.dumps(
+            {"username": "u", "token": "t", "cloud_id": "c"}
+        )
+        client = mock_client_cls.return_value
+        client.create_alert.return_value = mock.MagicMock()
+        finding = {
+            "dag_id": _CRITICAL_DAG,
+            "run_id": "r1",
+            "elapsed_s": 3600,
+            "baseline_s": 600,
+            "percentile": 90,
+            "pct_over": 500,
+            "history_count": 3,
+            "owner": "Data Platform",
+            "criticality": "Critical",
+        }
+        from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
+            _send_jira_alert,
+        )
+
+        assert _send_jira_alert(finding) is True
+        kwargs = client.create_alert.call_args.kwargs
+        assert kwargs["priority"] == "P1"
+        assert kwargs["extra_properties"]["Criticality"] == "Critical"
+
+    @mock.patch(f"{_MODULE}.JiraOpsClient")
+    @mock.patch(f"{_MODULE}.Variable")
+    def test_priority_p2_when_criticality_absent(self, mock_var, mock_client_cls):
+        mock_var.get.return_value = json.dumps(
+            {"username": "u", "token": "t", "cloud_id": "c"}
+        )
+        client = mock_client_cls.return_value
+        client.create_alert.return_value = mock.MagicMock()
+        finding = {
+            "dag_id": _STANDARD_DAG,
+            "run_id": "r1",
+            "elapsed_s": 3600,
+            "baseline_s": 600,
+            "percentile": 90,
+            "pct_over": 500,
+            "history_count": 3,
+            "owner": "Data Platform",
+        }
+        from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
+            _send_jira_alert,
+        )
+
+        assert _send_jira_alert(finding) is True
+        kwargs = client.create_alert.call_args.kwargs
+        assert kwargs["priority"] == "P2"
+        assert "Criticality" not in kwargs["extra_properties"]
+
 
 def _db_session():
-    """Session mock whose execute().fetchall() is safe for ``_fetch_dag_owners``."""
+    """Session mock. Tag query returns Critical for ``_CRITICAL_DAG`` so
+    ``monitor_dag_runtimes`` rebuilds the paging set the way production does."""
     session = mock.MagicMock()
-    session.execute.return_value.fetchall.return_value = []
+
+    def _execute(query, *args, **kwargs):
+        result = mock.MagicMock()
+        if "dag_tag" in str(query).lower():
+            result.fetchall.return_value = [
+                (_CRITICAL_DAG, "criticality:Critical"),
+            ]
+        else:
+            result.fetchall.return_value = []
+        return result
+
+    session.execute.side_effect = _execute
     return session
 
 
@@ -1949,6 +2061,18 @@ class TestCycleAnchor:
         assert offset == pytest.approx(230.0)
 
 
+class TestDeadlineAt:
+    _CYCLE_START = datetime(2026, 9, 16, 23, 55, tzinfo=timezone.utc)
+
+    def test_deadline_before_cycle_start_resolves_to_next_day(self):
+        due = _deadline_at(self._CYCLE_START, "10:00")
+        assert due == datetime(2026, 9, 17, 10, 0, tzinfo=timezone.utc)
+
+    def test_deadline_after_cycle_start_same_day(self):
+        due = _deadline_at(self._CYCLE_START, "23:59")
+        assert due == datetime(2026, 9, 16, 23, 59, tzinfo=timezone.utc)
+
+
 class TestExpectedOffsetMinutes:
     def test_insufficient_history_returns_none(self):
         assert (
@@ -2273,6 +2397,70 @@ class TestEvaluateSlaMissingRuns:
         assert findings == []
 
 
+class TestEvaluateDeadlineMisses:
+    _CYCLE_START = datetime(2026, 9, 16, 23, 55, tzinfo=timezone.utc)
+    _DEADLINES = {_CRITICAL_DAG: "10:00"}
+    _HHMM = "20:55"
+
+    def test_now_before_due_returns_empty(self):
+        now = datetime(2026, 9, 17, 9, 0, tzinfo=timezone.utc)
+        findings = _evaluate_deadline_misses(
+            self._DEADLINES,
+            [],
+            now=now,
+            cycle_start=self._CYCLE_START,
+            hhmm=self._HHMM,
+        )
+        assert findings == []
+
+    def test_now_after_due_without_success_yields_finding(self):
+        now = datetime(2026, 9, 17, 11, 0, tzinfo=timezone.utc)
+        findings = _evaluate_deadline_misses(
+            self._DEADLINES,
+            [],
+            now=now,
+            cycle_start=self._CYCLE_START,
+            hhmm=self._HHMM,
+        )
+        assert len(findings) == 1
+        f = findings[0]
+        assert f["kind"] == _KIND_DEADLINE_MISS
+        assert f["tier"] == "standard"
+        assert f["run_id"].startswith("deadline::")
+        assert f["deadline_utc"] == "10:00"
+        assert f["late_by_s"] > 0
+
+    def test_now_after_due_with_successful_run_in_cycle_returns_empty(self):
+        now = datetime(2026, 9, 17, 11, 0, tzinfo=timezone.utc)
+        history = [
+            SimpleNamespace(
+                dag_id=_CRITICAL_DAG,
+                start_date=datetime(2026, 9, 17, 2, 0, tzinfo=timezone.utc),
+                state="success",
+            )
+        ]
+        findings = _evaluate_deadline_misses(
+            self._DEADLINES,
+            history,
+            now=now,
+            cycle_start=self._CYCLE_START,
+            hhmm=self._HHMM,
+        )
+        assert findings == []
+
+    def test_now_after_due_with_emitted_dag_returns_empty(self):
+        now = datetime(2026, 9, 17, 11, 0, tzinfo=timezone.utc)
+        findings = _evaluate_deadline_misses(
+            self._DEADLINES,
+            [],
+            now=now,
+            cycle_start=self._CYCLE_START,
+            hhmm=self._HHMM,
+            emitted={_CRITICAL_DAG},
+        )
+        assert findings == []
+
+
 class TestSlaMessagesAndLedger:
     def test_missing_run_initial_text(self):
         entry = {
@@ -2444,6 +2632,59 @@ class TestSlaMessagesAndLedger:
         assert key not in ledger
         assert post.call_count == 1
         assert "started at" in post.call_args.args[1]
+
+    def test_deadline_miss_succeeded_closes_entry(self):
+        now = datetime(2026, 9, 17, 12, 0, tzinfo=timezone.utc)
+        hhmm = _resolve_anchor_hhmm(_SLA_CONFIG.get("sla_cycle_anchor_local_time"))
+        anchor_dt = _cycle_anchor(now, hhmm=hhmm)
+        cycle_anchor = anchor_dt.isoformat()
+        run_id = _deadline_run_id(anchor_dt)
+        key = f"{_CRITICAL_DAG}|{run_id}"
+        due_at = datetime(2026, 9, 17, 10, 0, tzinfo=timezone.utc)
+        ledger = {
+            key: {
+                "kind": _KIND_DEADLINE_MISS,
+                "dag_id": _CRITICAL_DAG,
+                "run_id": run_id,
+                "cycle_anchor": cycle_anchor,
+                "due_at": due_at.isoformat(),
+                "deadline_utc": "10:00",
+                "owner": "Data ForRent",
+            }
+        }
+        succeeded = {_CRITICAL_DAG: datetime(2026, 9, 17, 10, 30, tzinfo=timezone.utc)}
+        with mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post:
+            _apply_sla_follow_up(
+                ledger, {}, "http://hook", now, _SLA_CONFIG, succeeded_by_dag=succeeded
+            )
+        assert key not in ledger
+        assert post.call_count == 1
+        assert "finished at" in post.call_args.args[1]
+
+    def test_deadline_miss_not_succeeded_keeps_entry_and_sends_update(self):
+        now = datetime(2026, 9, 17, 12, 0, tzinfo=timezone.utc)
+        hhmm = _resolve_anchor_hhmm(_SLA_CONFIG.get("sla_cycle_anchor_local_time"))
+        anchor_dt = _cycle_anchor(now, hhmm=hhmm)
+        cycle_anchor = anchor_dt.isoformat()
+        run_id = _deadline_run_id(anchor_dt)
+        key = f"{_CRITICAL_DAG}|{run_id}"
+        due_at = datetime(2026, 9, 17, 10, 0, tzinfo=timezone.utc)
+        ledger = {
+            key: {
+                "kind": _KIND_DEADLINE_MISS,
+                "dag_id": _CRITICAL_DAG,
+                "run_id": run_id,
+                "cycle_anchor": cycle_anchor,
+                "due_at": due_at.isoformat(),
+                "deadline_utc": "10:00",
+                "owner": "Data ForRent",
+            }
+        }
+        with mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post:
+            _apply_sla_follow_up(ledger, {}, "http://hook", now, _SLA_CONFIG)
+        assert key in ledger
+        assert post.call_count == 1
+        assert "still not finished" in post.call_args.args[1]
 
     def test_queries_are_task_instance_free(self):
         assert "task_instance" not in str(_SLA_CANDIDATES_QUERY)
@@ -3941,3 +4182,41 @@ class TestTwentyThreeHundredTickRegression:
         # The reprocessing twin is neither required nor counted as missing.
         assert all(f["dataset_required"] == 1 for f in findings)
         assert all(f["dataset_missing"] == [] for f in findings)
+
+
+class TestMonitorPagesDeadlineMiss:
+    """Covers the wiring the deadline_miss unit tests cannot reach."""
+
+    def test_declared_deadline_miss_pages_jira_end_to_end(self):
+        with (
+            mock.patch(f"{_MODULE}.ConfigurationService") as mock_cfg,
+            mock.patch(f"{_MODULE}.Variable") as mock_var,
+            mock.patch(f"{_MODULE}._load_downstream_index_safe", return_value={}),
+            mock.patch(f"{_MODULE}._fetch_running_runs", return_value=[]),
+            mock.patch(f"{_MODULE}._collect_sla_findings", return_value=[]),
+            mock.patch(
+                f"{_MODULE}._fetch_sla_candidates", return_value=[_CRITICAL_DAG]
+            ),
+            mock.patch(f"{_MODULE}._fetch_sla_history", return_value=[]),
+            mock.patch(f"{_MODULE}._fetch_sla_emitted", return_value={}),
+            mock.patch(f"{_MODULE}._fetch_run_states", return_value={}),
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True) as mock_post,
+            mock.patch(f"{_MODULE}._send_jira_alert", return_value=True) as mock_jira,
+            mock.patch(
+                f"{_MODULE}._fetch_declared_criticality",
+                return_value=({_CRITICAL_DAG: "Critical"}, {_CRITICAL_DAG: "10:00"}),
+            ),
+        ):
+            mock_cfg.return_value.get_config.side_effect = _config_get
+            mock_var.get.side_effect = _variable_get_factory(environment="prod")
+            monitor_dag_runtimes(session=_db_session(), run_conf={})
+
+        mock_jira.assert_called_once()
+        finding = mock_jira.call_args.args[0]
+        assert finding["kind"] == _KIND_DEADLINE_MISS
+        assert finding["dag_id"] == _CRITICAL_DAG
+        assert finding["tier"] == "critical"
+        assert finding["deadline_utc"] == "10:00"
+        assert finding["late_by_s"] > 0
+        assert finding["run_id"].startswith("deadline::")
+        mock_post.assert_called_once()

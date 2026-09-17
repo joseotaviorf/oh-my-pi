@@ -2,6 +2,7 @@ dag:
   name: dw_pricing
   schedule_start_date: 2022, 1, 1
   owner: Data House and Listing
+  criticality: Critical
   documentation:
     dag_purpose: "This DAG loads to DW the pricing modeling, i.e., all the changes made to a listing price."
 workflow:

@@ -2,6 +2,7 @@ dag:
   name: dw_listing
   schedule_start_date: 2021,08,02
   owner: Data House and Listing
+  criticality: Critical
 workflow:
   type: query_delta
   layer: dw

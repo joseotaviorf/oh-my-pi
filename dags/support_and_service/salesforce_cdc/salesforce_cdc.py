@@ -366,7 +366,7 @@ with DAG(
     schedule_interval="0 * * * *",
     start_date=datetime(2026, 3, 12),
     catchup=True,
-    tags=["SST", "SF", "salesforce"],  # better formatting
+    tags=["SST", "SF", "salesforce", "criticality:Critical"],  # better formatting
     on_failure_callback=gchat_callback.dag_failure_alert,
     # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # on_failure_callback=jiraops_callback.dag_failure_alert,

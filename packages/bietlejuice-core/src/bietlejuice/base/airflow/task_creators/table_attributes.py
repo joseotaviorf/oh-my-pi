@@ -1,5 +1,6 @@
 from typing import Optional
 
+from bietlejuice.base.airflow.enums.criticality_enum import CriticalityEnum
 from bietlejuice.base.db.datalake_metastore_mapping import require_transformation_grade
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.validation.target_resolver import (
@@ -41,6 +42,7 @@ class TableAttributes:
             "row_filter_column_key", ""
         )
         self.row_filter_function_name = self._get_row_filter_function_name()
+        self.criticality = self._get_criticality()
 
     @property
     def workflow_args(self) -> dict:
@@ -210,6 +212,12 @@ class TableAttributes:
             return "data_governance_policies.has_3p_access_control_row_filter"
 
         return ""
+
+    def _get_criticality(self) -> str:
+        declared = self.table_customization.get("criticality") or self._dag_args.get(
+            "criticality"
+        )
+        return CriticalityEnum.parse(declared, context=f"table {self.table_name!r}")
 
     def get_has_soft_delete(self) -> bool:
         """

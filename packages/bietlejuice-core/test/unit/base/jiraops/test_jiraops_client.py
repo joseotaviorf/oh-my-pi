@@ -35,8 +35,36 @@ def test_create_alert_omits_alias_by_default(mock_post, client):
 
     payload = _posted_payload(mock_post)
     assert "alias" not in payload
+    assert "priority" not in payload
     assert payload["message"] == "msg"
     assert payload["extraProperties"] == {"DAG": "dag_x"}
+
+
+@mock.patch("bietlejuice.base.jiraops.jiraops_client.requests.post")
+def test_create_alert_omits_priority_by_default(mock_post, client):
+    client.create_alert(
+        message="msg",
+        description="desc",
+        tags=["dag_x"],
+        extra_properties={"DAG": "dag_x"},
+    )
+
+    payload = _posted_payload(mock_post)
+    assert "priority" not in payload
+
+
+@mock.patch("bietlejuice.base.jiraops.jiraops_client.requests.post")
+def test_create_alert_includes_priority_when_provided(mock_post, client):
+    client.create_alert(
+        message="msg",
+        description="desc",
+        tags=["dag_x"],
+        extra_properties={"DAG": "dag_x"},
+        priority="P1",
+    )
+
+    payload = _posted_payload(mock_post)
+    assert payload["priority"] == "P1"
 
 
 @mock.patch("bietlejuice.base.jiraops.jiraops_client.requests.post")

@@ -2,6 +2,7 @@ dag:
   name: enrich_chatbot
   schedule_start_date: 2025, 5, 12
   owner: Data Conversational XP
+  criticality: Critical
   documentation:
     dag_purpose: |
       Support sessions and relevant chatbot data

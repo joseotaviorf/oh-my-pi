@@ -1,6 +1,7 @@
 dag:
   name: dw_sale_ongoing_listings
   owner: Data House and Listing
+  criticality: Critical
 workflow:
   type: query_delta
   layer: dw

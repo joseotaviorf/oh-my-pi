@@ -2,6 +2,7 @@ dag:
   name: dw_demand
   schedule_start_date: 2021,8,2
   owner: Data Growth
+  criticality: Critical
   documentation:
     dag_purpose: |
       This DAG dw tables related to the process of demand conversion in Growth context.

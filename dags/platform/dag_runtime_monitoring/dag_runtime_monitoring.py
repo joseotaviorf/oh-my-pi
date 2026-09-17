@@ -22,12 +22,12 @@ correctly. Missing-run alerts close when the DAG runs automatically *or* publish
 dataset event, which is how an operator's ``impact_downstream_dependents`` recovery
 run — invisible to the automatic-run filter — resolves the thread.
 
-Alerting is tiered by ``critical_dags`` (soft-launch: empty list → Chat only):
+Alerting is tiered by declared criticality (tags criticality:Critical|High):
   * Every over-baseline / missing-run DAG is reported to Google Chat and **tracked
     to closure** (threaded updates while running/missing, final message on resolve).
-  * Additionally, *slow* DAGs in ``critical_dags`` **or** that transitively block one
+  * Additionally, *slow* DAGs declaring criticality Critical/High **or** that transitively block one
     (via ``dependencies.yaml``) also open a JiraOps on-caller alert once.
-  * Missing-run findings in ``critical_dags`` (membership only — never the
+  * Missing-run findings for DAGs declaring criticality Critical/High (membership only — never the
     transitive-blocking expansion) also page JiraOps.
 
 Elapsed time and historical baselines for the slowness check are anchored on the
@@ -61,6 +61,11 @@ from airflow.utils.db import provide_session
 from sqlalchemy import bindparam, text
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.enums.criticality_enum import (
+    CRITICALITY_TAG_PREFIX,
+    SLA_DEADLINE_TAG_PREFIX,
+    CriticalityEnum,
+)
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
@@ -77,7 +82,9 @@ JIRA_OPS_VARIABLE = "JIRA_OPS_ONCALL_APIKEY"
 DEDUP_VARIABLE_KEY = "DAG_RUNTIME_MONITORING_ALERTED_RUNS"
 _KIND_SLOW = "slow"
 _KIND_MISSING_RUN = "missing_run"
+_KIND_DEADLINE_MISS = "deadline_miss"
 _SLA_RUN_ID_PREFIX = "sla::"
+_DEADLINE_RUN_ID_PREFIX = "deadline::"
 
 # Cap the DW blast-radius list in Chat / JiraOps messages.
 _IMPACTED_DW_LIST_LIMIT = 25
@@ -273,6 +280,14 @@ _OWNERS_QUERY = text(
     """
 ).bindparams(bindparam("dag_ids", expanding=True))
 
+_DAG_TAGS_QUERY = text(
+    """
+    SELECT t.dag_id, t.name
+    FROM dag_tag AS t
+    WHERE t.name LIKE :criticality_prefix OR t.name LIKE :deadline_prefix
+    """
+)
+
 # SLA start guard — dag / dag_run only (no task_instance; see #26399).
 # schedule_interval NULL / 'null' = manual-only (excluded). Dataset DAGs store "Dataset".
 _SLA_CANDIDATES_QUERY = text(
@@ -312,6 +327,17 @@ _SLA_STARTED_QUERY = text(
     WHERE dr.start_date IS NOT NULL
       AND dr.start_date >= :cycle_start
       AND {_REAL_RUN_FILTER_DR}
+      AND dr.dag_id IN :dag_ids
+    GROUP BY dr.dag_id
+    """
+).bindparams(bindparam("dag_ids", expanding=True))
+
+_SLA_SUCCEEDED_QUERY = text(
+    f"""
+    SELECT dr.dag_id, MIN(dr.end_date) AS first_success
+    FROM dag_run AS dr
+    WHERE dr.state = 'success' AND dr.end_date IS NOT NULL
+      AND dr.end_date >= :cycle_start AND {_REAL_RUN_FILTER_DR}
       AND dr.dag_id IN :dag_ids
     GROUP BY dr.dag_id
     """
@@ -646,10 +672,26 @@ def _sla_run_id(cycle_anchor: datetime) -> str:
     return f"{_SLA_RUN_ID_PREFIX}{cycle_anchor.isoformat()}"
 
 
+def _deadline_run_id(cycle_anchor: datetime) -> str:
+    return f"{_DEADLINE_RUN_ID_PREFIX}{cycle_anchor.isoformat()}"
+
+
+def _deadline_at(cycle_start: datetime, hhmm_utc: str) -> datetime:
+    hour, minute = _parse_anchor_hhmm(hhmm_utc)
+    candidate = (
+        pendulum.instance(cycle_start)
+        .in_timezone("UTC")
+        .replace(hour=hour, minute=minute, second=0, microsecond=0)
+    )
+    if candidate < cycle_start:
+        candidate = candidate.add(days=1)
+    return candidate
+
+
 def _is_sla_entry(entry: dict) -> bool:
-    return entry.get("kind") == _KIND_MISSING_RUN or str(
+    return entry.get("kind") in (_KIND_MISSING_RUN, _KIND_DEADLINE_MISS) or str(
         entry.get("run_id") or ""
-    ).startswith(_SLA_RUN_ID_PREFIX)
+    ).startswith((_SLA_RUN_ID_PREFIX, _DEADLINE_RUN_ID_PREFIX))
 
 
 def _matches_exclude_prefix(dag_id: str, prefix: str) -> bool:
@@ -1356,8 +1398,49 @@ def _evaluate_sla_missing_runs(
     return findings
 
 
+def _evaluate_deadline_misses(
+    deadline_by_dag: dict,
+    history_rows: list,
+    *,
+    now: datetime,
+    cycle_start: datetime,
+    hhmm: str,
+    emitted: Iterable | None = None,
+) -> list:
+    succeeded = _succeeded_this_cycle(
+        history_rows, hhmm=hhmm, cycle_key=cycle_start.isoformat(), emitted=emitted
+    )
+    findings = []
+    for dag_id, hhmm_utc in deadline_by_dag.items():
+        due_at = _deadline_at(cycle_start, hhmm_utc)
+        if now <= due_at or dag_id in succeeded:
+            continue
+        late_by_s = (now - due_at).total_seconds()
+        findings.append(
+            {
+                "kind": _KIND_DEADLINE_MISS,
+                "dag_id": dag_id,
+                "run_id": _deadline_run_id(cycle_start),
+                "tier": "standard",
+                "cycle_anchor": cycle_start.isoformat(),
+                "due_at": due_at.isoformat(),
+                "deadline_utc": hhmm_utc,
+                "late_by_s": late_by_s,
+                "elapsed_s": late_by_s,
+            }
+        )
+    print(
+        f"⏰ SLA deadline: {len(deadline_by_dag)} candidate(s), {len(findings)} missed."
+    )
+    return findings
+
+
 def _build_alert_text(finding: dict) -> str:
     """JiraOps / log description — dispatches by finding kind."""
+    if finding.get("kind") == _KIND_DEADLINE_MISS:
+        return _deadline_initial_text(
+            _entry_from_finding(finding), finding.get("late_by_s", 0)
+        )
     if finding.get("kind") == _KIND_MISSING_RUN:
         return _missing_run_initial_text(
             _entry_from_finding(finding), finding.get("late_by_s", 0)
@@ -1392,6 +1475,7 @@ def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dic
         "impacted_dw_dags": impacted,
         "impacted_dw_count": finding.get("impacted_dw_count", len(impacted)),
         "owner": finding.get("owner") or _UNKNOWN_OWNER,
+        "criticality": finding.get("criticality"),
     }
     if kind == _KIND_MISSING_RUN:
         entry.update(
@@ -1416,6 +1500,14 @@ def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dic
                     finding.get("dataset_blocking_dags") or []
                 ),
                 "dataset_verdict": finding.get("dataset_verdict"),
+            }
+        )
+    elif kind == _KIND_DEADLINE_MISS:
+        entry.update(
+            {
+                "cycle_anchor": finding.get("cycle_anchor"),
+                "due_at": finding.get("due_at"),
+                "deadline_utc": finding.get("deadline_utc"),
             }
         )
     else:
@@ -1588,6 +1680,8 @@ def _missing_run_body(
 
 
 def _initial_text(entry: dict, elapsed_s: float) -> str:
+    if entry.get("kind") == _KIND_DEADLINE_MISS:
+        return _deadline_initial_text(entry, elapsed_s)
     if _is_sla_entry(entry):
         return _missing_run_initial_text(entry, elapsed_s)
     return _slowness_body(
@@ -1612,6 +1706,8 @@ def _missing_run_initial_text(entry: dict, late_by_s: float) -> str:
 def _update_text(
     entry: dict, elapsed_s: float, *, impacted_dw_count: int | None = None
 ) -> str:
+    if entry.get("kind") == _KIND_DEADLINE_MISS:
+        return _deadline_update_text(entry, elapsed_s)
     if _is_sla_entry(entry):
         return _missing_run_update_text(
             entry, elapsed_s, also_waiting=entry.get("also_waiting_count")
@@ -1671,6 +1767,31 @@ def _missing_run_started_text(
         f"✅ *{entry['dag_id']}* started at {started} "
         f"(was {late} past SLA).\n"
         f"• Owner: {_owner_label(entry)}"
+    )
+
+
+def _deadline_initial_text(entry: dict, late_by_s: float) -> str:
+    return (
+        f"⏰ *{entry['dag_id']}* not finished by its "
+        f"{entry['deadline_utc']} UTC deadline\n"
+        f"• Owner: {_owner_label(entry)}\n"
+        f"• Late by: {_format_duration(late_by_s)}"
+    )
+
+
+def _deadline_update_text(entry: dict, late_by_s: float) -> str:
+    return (
+        f"⏰ *{entry['dag_id']}* still not finished — "
+        f"{_format_duration(late_by_s)} past its {entry['deadline_utc']} UTC deadline"
+    )
+
+
+def _deadline_finished_text(
+    entry: dict, finished_at: datetime, late_by_s: float
+) -> str:
+    return (
+        f"✅ *{entry['dag_id']}* finished at {_format_utc_hhmm(finished_at)}, "
+        f"{_format_duration(late_by_s)} after its {entry['deadline_utc']} UTC deadline."
     )
 
 
@@ -1743,13 +1864,14 @@ def _assign_alert_tiers(
 
     * Empty ``critical_dags`` → all ``standard`` (Chat only).
     * ``slow`` → ``critical`` when the DAG is in the set or transitively blocks one.
-    * ``missing_run`` → ``critical`` on **membership only**. The transitive expansion
-      the slow tier uses would page on the chronically-late upstream layer (~28 DAGs
-      late on 13-15 of 14 days) every night, so a late upstream stays Chat-only.
+    * ``missing_run`` and ``deadline_miss`` → ``critical`` on **membership only**.
+      The transitive expansion the slow tier uses would page on the chronically-late
+      upstream layer (~28 DAGs late on 13-15 of 14 days) every night, so a late
+      upstream stays Chat-only.
     """
     critical = set(critical_dags or ())
     for finding in findings:
-        if finding.get("kind") == _KIND_MISSING_RUN:
+        if finding.get("kind") in (_KIND_MISSING_RUN, _KIND_DEADLINE_MISS):
             finding["tier"] = (
                 "critical" if finding["dag_id"] in critical else "standard"
             )
@@ -1789,17 +1911,30 @@ def _send_jira_alert(
     """
     dag_id = finding.get("dag_id", "<unknown>")
     run_id = finding.get("run_id", "<unknown>")
-    is_missing_run = finding.get("kind") == _KIND_MISSING_RUN
-    kind_tag = "sla missing run" if is_missing_run else "runtime anomaly"
+    kind = finding.get("kind")
+    is_missing_run = kind == _KIND_MISSING_RUN
+    is_deadline_miss = kind == _KIND_DEADLINE_MISS
+    if is_deadline_miss:
+        kind_tag = "sla deadline miss"
+    elif is_missing_run:
+        kind_tag = "sla missing run"
+    else:
+        kind_tag = "runtime anomaly"
     tags = [dag_id, kind_tag, "critical"]
     if test:
         tags.append("test")
     try:
         # Title/description must stay inside try: a bad finding must not abort the
         # whole monitor_dag_runtimes task — log and skip this page instead.
-        headline = "DAG missed SLA start" if is_missing_run else "DAG runtime anomaly"
+        if is_deadline_miss:
+            headline = "DAG missed SLA deadline"
+        elif is_missing_run:
+            headline = "DAG missed SLA start"
+        else:
+            headline = "DAG runtime anomaly"
         title = _truncate_text(
-            f"{'[TEST] ' if test else ''}{headline}: {dag_id}", _JIRA_MESSAGE_MAX
+            f"{'[TEST] ' if test else ''}{headline}: {dag_id}",
+            _JIRA_MESSAGE_MAX,
         )
         description = _truncate_text(_build_alert_text(finding), _JIRA_DESCRIPTION_MAX)
         extra_properties = {
@@ -1807,11 +1942,18 @@ def _send_jira_alert(
             "RunId": run_id,
             "DAGOwner": _owner_label(finding),
         }
-        if is_missing_run:
+        if is_deadline_miss:
+            extra_properties["DeadlineUtc"] = finding["deadline_utc"]
+            extra_properties["LateBy"] = _format_duration(finding.get("late_by_s") or 0)
+        elif is_missing_run:
             extra_properties["DueAt"] = finding.get("due_at")
             extra_properties["LateBy"] = _format_duration(finding.get("late_by_s") or 0)
         else:
             extra_properties["PctOverBaseline"] = finding.get("pct_over")
+        level = finding.get("criticality")
+        priority = CriticalityEnum.to_opsgenie_priority(level or CriticalityEnum.HIGH)
+        if level:
+            extra_properties["Criticality"] = level
         creds = json.loads(Variable.get(JIRA_OPS_VARIABLE))
         client = JiraOpsClient(creds)
         response = client.create_alert(
@@ -1821,6 +1963,7 @@ def _send_jira_alert(
             extra_properties=extra_properties,
             responder_team_id=responder_team_id,
             alias=f"dag-runtime-{dag_id}-{run_id}",
+            priority=priority,
         )
         response.raise_for_status()
     except Exception as error:  # noqa: BLE001 - best-effort alerting, keep going
@@ -1934,6 +2077,46 @@ def _fetch_dag_owners(session, dag_ids) -> dict:
     return owners
 
 
+def _fetch_declared_criticality(session) -> tuple[dict, dict]:
+    """(criticality_by_dag, deadline_by_dag) from criticality:<Level> and
+    sla_deadline_utc:<HH:MM> DAG tags (set by BaseWorkflow.dag_instance)."""
+    rows = session.execute(
+        _DAG_TAGS_QUERY,
+        {
+            "criticality_prefix": f"{CRITICALITY_TAG_PREFIX}%",
+            "deadline_prefix": f"{SLA_DEADLINE_TAG_PREFIX}%",
+        },
+    ).fetchall()
+    criticality_by_dag = {}
+    deadline_by_dag = {}
+    valid_criticalities = set(CriticalityEnum.get_available_enum_values())
+    for row in rows:
+        if isinstance(row, (tuple, list)):
+            dag_id, name = row[0], row[1]
+        else:
+            dag_id = getattr(row, "dag_id", row[0])
+            name = getattr(row, "name", row[1])
+        if name.startswith(CRITICALITY_TAG_PREFIX):
+            val = name[len(CRITICALITY_TAG_PREFIX) :]
+            if val in valid_criticalities:
+                criticality_by_dag[dag_id] = val
+            else:
+                print(f"⚠️  Ignoring malformed tag {name!r} on {dag_id}")
+        elif name.startswith(SLA_DEADLINE_TAG_PREFIX):
+            val = name[len(SLA_DEADLINE_TAG_PREFIX) :]
+            try:
+                _parse_anchor_hhmm(val)
+                deadline_by_dag[dag_id] = val
+            except (TypeError, ValueError):
+                print(f"⚠️  Ignoring malformed tag {name!r} on {dag_id}")
+    return criticality_by_dag, deadline_by_dag
+
+
+def _attach_criticality(findings: list, criticality_by_dag: dict) -> None:
+    for finding in findings:
+        finding["criticality"] = criticality_by_dag.get(finding["dag_id"])
+
+
 def _attach_owners(findings: list, owners_by_dag: dict) -> None:
     for finding in findings:
         finding["owner"] = owners_by_dag.get(finding["dag_id"], _UNKNOWN_OWNER)
@@ -1993,6 +2176,16 @@ def _fetch_sla_started(session, dag_ids: list, cycle_start: datetime) -> dict:
         {"dag_ids": list(dag_ids), "cycle_start": cycle_start},
     ).fetchall()
     return {row.dag_id: row.first_start for row in rows}
+
+
+def _fetch_sla_succeeded(session, dag_ids: list, cycle_start: datetime) -> dict:
+    if not dag_ids:
+        return {}
+    rows = session.execute(
+        _SLA_SUCCEEDED_QUERY,
+        {"dag_ids": list(dag_ids), "cycle_start": cycle_start},
+    ).fetchall()
+    return {row.dag_id: row.first_success for row in rows}
 
 
 def _fetch_dataset_edges(session):
@@ -2198,11 +2391,12 @@ def _normalize_ledger(raw: dict, critical_dags=None) -> dict:
     for run_key, value in raw.items():
         dag_id, _, run_id = run_key.partition("|")
         default_tier = "critical" if dag_id in critical else "standard"
-        default_kind = (
-            _KIND_MISSING_RUN
-            if str(run_id).startswith(_SLA_RUN_ID_PREFIX)
-            else _KIND_SLOW
-        )
+        if str(run_id).startswith(_DEADLINE_RUN_ID_PREFIX):
+            default_kind = _KIND_DEADLINE_MISS
+        elif str(run_id).startswith(_SLA_RUN_ID_PREFIX):
+            default_kind = _KIND_MISSING_RUN
+        else:
+            default_kind = _KIND_SLOW
         if isinstance(value, dict):
             entry = dict(value)
             entry.setdefault("dag_id", dag_id)
@@ -2240,8 +2434,15 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
 
     service = ConfigurationService(dag_name=DAG_NAME)
     config = _resolve_config(service.get_config(DAG_NAME))
+    criticality_by_dag, deadline_by_dag = _fetch_declared_criticality(session)
     if opts["critical_dags"] is not None:
         config["critical_dags"] = opts["critical_dags"]
+    else:
+        config["critical_dags"] = sorted(
+            dag_id
+            for dag_id, level in criticality_by_dag.items()
+            if level in CriticalityEnum.PAGING
+        )
     webhook_key = service.get_config("notification_webhooks_keys").get(DAG_NAME)
     webhook_url = Variable.get(webhook_key, default_var=None) if webhook_key else None
     environment = Variable.get("environment", default_var="local")
@@ -2294,6 +2495,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
             findings = _synthetic_missing_run_findings(config, opts["simulate_dags"])
             _enrich_findings_with_dw_impact(findings, downstream_index)
             _assign_alert_tiers(findings, config["critical_dags"], downstream_index)
+            _attach_criticality(findings, criticality_by_dag)
             _attach_owners(
                 findings,
                 _fetch_dag_owners(session, {f["dag_id"] for f in findings}),
@@ -2327,6 +2529,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         findings = _synthetic_findings(config, opts["simulate_dags"])
         _enrich_findings_with_dw_impact(findings, downstream_index)
         _assign_alert_tiers(findings, config["critical_dags"], downstream_index)
+        _attach_criticality(findings, criticality_by_dag)
         _attach_owners(
             findings,
             _fetch_dag_owners(session, {f["dag_id"] for f in findings}),
@@ -2406,9 +2609,31 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         if sla_enabled
         else []
     )
+    deadline_candidates = {
+        dag_id: hhmm
+        for dag_id, hhmm in deadline_by_dag.items()
+        if dag_id in set(sla_candidates)
+    }
+    if opts["only_dags"]:
+        deadline_candidates = {
+            d: h for d, h in deadline_candidates.items() if d in set(opts["only_dags"])
+        }
+    deadline_findings = (
+        _evaluate_deadline_misses(
+            deadline_candidates,
+            _fetch_sla_history(session, list(deadline_candidates), sla_cycle_start),
+            now=now,
+            cycle_start=sla_cycle_start,
+            hhmm=_resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time")),
+            emitted=set(sla_emitted),
+        )
+        if sla_enabled and deadline_candidates
+        else []
+    )
 
-    all_findings = findings + sla_findings
+    all_findings = findings + sla_findings + deadline_findings
     _assign_alert_tiers(all_findings, config["critical_dags"], downstream_index)
+    _attach_criticality(all_findings, criticality_by_dag)
     _enrich_findings_with_dw_impact(all_findings, downstream_index)
     ledger = _normalize_ledger(
         _load_dedup_state(), critical_dags=config["critical_dags"]
@@ -2423,9 +2648,12 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         print(f"   • [{f['tier']}] {_build_alert_text(f)}")
     for f in sla_findings:
         print(f"   • [missing_run/{f['tier']}] {_build_alert_text(f)}")
+    for f in deadline_findings:
+        print(f"   • [deadline_miss/{f['tier']}] {_build_alert_text(f)}")
     print(
         f"⏱️ {len(findings)} anomalous run(s); "
         f"⏰ {len(sla_findings)} missing-run root(s); "
+        f"⏰ {len(deadline_findings)} deadline miss(es); "
         f"tracking {len(ledger)} run(s) for follow-up."
     )
 
@@ -2630,11 +2858,12 @@ def _follow_up_tracked_runs(
         return
 
     hhmm = _resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time"))
+    cycle_anchor = _cycle_anchor(now, hhmm=hhmm)
     tracked_dag_ids = [e["dag_id"] for e in sla_entries]
     started = _fetch_sla_started(
         session,
         tracked_dag_ids,
-        _cycle_anchor(now, hhmm=hhmm),
+        cycle_anchor,
     )
     # An operator's impact_downstream_dependents run is invisible to _SLA_STARTED_QUERY
     # (manual run types are filtered out), but its dataset emissions prove the chain
@@ -2643,7 +2872,17 @@ def _follow_up_tracked_runs(
         first_emit = (sla_emitted or {}).get(dag_id)
         if first_emit is not None:
             started.setdefault(dag_id, first_emit)
-    _apply_sla_follow_up(ledger, started, gchat_dest, now, config)
+    deadline_dag_ids = [
+        e["dag_id"] for e in sla_entries if e.get("kind") == _KIND_DEADLINE_MISS
+    ]
+    succeeded = _fetch_sla_succeeded(session, deadline_dag_ids, cycle_anchor)
+    for dag_id in deadline_dag_ids:
+        first_emit = (sla_emitted or {}).get(dag_id)
+        if first_emit is not None:
+            succeeded.setdefault(dag_id, first_emit)
+    _apply_sla_follow_up(
+        ledger, started, gchat_dest, now, config, succeeded_by_dag=succeeded
+    )
 
 
 def _drop_sla_entries(
@@ -2722,6 +2961,7 @@ def _apply_sla_follow_up(
     gchat_dest,
     now: datetime,
     config: dict,
+    succeeded_by_dag: dict | None = None,
 ) -> None:
     """Follow up tracked missing-run entries; mutate ledger in place.
 
@@ -2737,6 +2977,31 @@ def _apply_sla_follow_up(
         entry_anchor = entry.get("cycle_anchor")
         if entry_anchor and entry_anchor != current_anchor:
             del ledger[key]
+            continue
+
+        if entry.get("kind") == _KIND_DEADLINE_MISS:
+            finished_at = (succeeded_by_dag or {}).get(entry["dag_id"])
+            due_at = _parse_iso_datetime(entry.get("due_at"))
+            if finished_at is not None:
+                late_by_s = (
+                    (finished_at - due_at).total_seconds()
+                    if due_at is not None
+                    else 0.0
+                )
+                if not _post_gchat(
+                    gchat_dest,
+                    _deadline_finished_text(entry, finished_at, late_by_s),
+                    _thread_key(entry["dag_id"], entry["run_id"]),
+                ):
+                    continue
+                del ledger[key]
+                continue
+            late_by_s = (now - due_at).total_seconds() if due_at is not None else 0.0
+            _post_gchat(
+                gchat_dest,
+                _deadline_update_text(entry, late_by_s),
+                _thread_key(entry["dag_id"], entry["run_id"]),
+            )
             continue
 
         started_at = started_by_dag.get(entry["dag_id"])
@@ -2779,9 +3044,9 @@ with DAG(
         "Every 30 min, flags running DAGs whose elapsed time is anomalous vs their own "
         "recent successful runs, and DAGs that have not started by their historical SLA "
         "window (missing-run guard with dependency root suppression). "
-        "Every anomaly goes to Google Chat (tracked to closure); slow DAGs in "
-        "critical_dags or that block them also page JiraOps on-caller; "
-        "missing-run DAGs in critical_dags page too."
+        "Every anomaly goes to Google Chat (tracked to closure); slow DAGs declaring "
+        "criticality Critical/High or that block them also page JiraOps on-caller; "
+        "missing-run DAGs declaring criticality Critical/High page too."
     ),
     schedule="*/30 * * * *",
     catchup=False,

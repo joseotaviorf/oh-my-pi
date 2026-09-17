@@ -2,6 +2,7 @@ dag:
   name: dw_support_journey
   schedule_start_date: 2026, 6, 14
   owner: Data SS
+  criticality: Critical
   documentation:
     dag_purpose: |
       DW layer for the Support Journey domain, modeling human customer service on

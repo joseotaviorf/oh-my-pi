@@ -90,3 +90,5 @@ def test_callback_runs_jira_enricher_then_creates_alert(
     call_kwargs = mock_client_class.return_value.create_alert.call_args.kwargs
     assert call_kwargs["extra_properties"]["DAG"] == "test_dag"
     assert call_kwargs["extra_properties"]["DAGOwner"] == "Data Agents"
+    assert call_kwargs["extra_properties"]["Criticality"] == "Medium"
+    assert call_kwargs["priority"] == "P3"

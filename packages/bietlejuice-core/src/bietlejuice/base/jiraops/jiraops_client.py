@@ -32,6 +32,7 @@ class JiraOpsClient:
         extra_properties: dict,
         responder_team_id: str | None = None,
         alias: str | None = None,
+        priority: str | None = None,
     ) -> requests.Response:
         """
         Create an alert in JiraOps using the provided payload.
@@ -47,6 +48,7 @@ class JiraOpsClient:
                 de-duplicate alerts. When multiple alerts share the same alias,
                 JSM Ops groups them into a single open alert instead of opening
                 a new one. Omitted from the payload when not provided.
+            priority: OpsGenie priority P1–P5; omitted → JSM default (P3).
 
         Returns:
             Response: The response from the JiraOps API.
@@ -67,6 +69,9 @@ class JiraOpsClient:
 
         if alias is not None:
             payload["alias"] = alias
+
+        if priority is not None:
+            payload["priority"] = priority
 
         response = requests.post(
             url, data=json.dumps(payload), headers=headers, auth=auth
