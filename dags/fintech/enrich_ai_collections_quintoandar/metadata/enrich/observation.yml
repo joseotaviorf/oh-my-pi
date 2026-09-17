@@ -122,6 +122,14 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: "1 if the session reached the ongoing_deal_renegotiation_request_helper helper, signalling that the user requested to renegotiate an ongoing deal."
+  flag_outbound_responsibility_helper:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the Matthew host invoked outbound_debt_responsibility_denial_helper at least once in the session, signalling that the user denied responsibility for an outbound debt reminder; else 0."
+  flag_authentication_helper:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the Matthew host invoked authentication_helper at least once in the session, signalling WhatsApp login guidance after an auth failure or user login confusion; else 0. Distinct from authentication_failure_helper, which is the legacy helper still used by other hosts."
   flag_handle_non_tenant:
     lineage:
       - datalake_langfuse_clean.observations.name

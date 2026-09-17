@@ -68,6 +68,8 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'debt_summary_display_helper' THEN 1 ELSE 0 END) AS flag_debt_summary_display_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'original_invoice_values_disagreement_helper' THEN 1 ELSE 0 END) AS flag_original_invoice_values_disagreement_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'ongoing_deal_renegotiation_request_helper' THEN 1 ELSE 0 END) AS flag_ongoing_deal_renegotiation_request_helper,
+    MAX(CASE WHEN LOWER(obs.name) = 'outbound_debt_responsibility_denial_helper' THEN 1 ELSE 0 END) AS flag_outbound_responsibility_helper,
+    MAX(CASE WHEN LOWER(obs.name) = 'authentication_helper' THEN 1 ELSE 0 END) AS flag_authentication_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_non_tenant' THEN 1 ELSE 0 END) AS flag_handle_non_tenant,
     MAX(
         CASE
@@ -124,6 +126,8 @@ WHERE
             'debt_summary_display_helper',
             'original_invoice_values_disagreement_helper',
             'ongoing_deal_renegotiation_request_helper',
+            'outbound_debt_responsibility_denial_helper',
+            'authentication_helper',
             'handle_non_tenant',
             'handle_finance_fetch_error',
             'get_annual_tax_report_v1',

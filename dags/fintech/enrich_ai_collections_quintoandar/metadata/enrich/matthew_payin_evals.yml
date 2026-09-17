@@ -1,0 +1,53 @@
+database_name: datalake_ai_collections_quintoandar
+table_name: matthew_payin_evals
+description: Latest online LLM-as-a-judge Payin evaluation scores for Matthew WhatsApp sessions (bot = matthew), pivoted to one row per Langfuse session. Grain is id_langfuse_session. Only sessions sampled by the hourly online eval job appear here; join to fact_ai_agents_interaction and treat NULL eval columns as not judged, not as negatives. Source is datalake_langfuse_clean.scores with the latest score kept per (id_session, name).
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_langfuse_session:
+    lineage:
+      - datalake_langfuse_clean.scores.id_session
+    description: "Langfuse session identifier of the judged Matthew WhatsApp conversation. Joins to sessions.id_external and fact_ai_agents_interaction.id_external."
+  eval_payin_resolution:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+      - datalake_langfuse_clean.scores.name
+    description: "Latest PayinResolutionEvaluator numeric outcome for the session (1 = pay-in conversation resolved, 0 = not resolved). NULL when this evaluator did not score the session. Discrete 0/1 encoding — never average across sessions; use a rate of 1s among judged sessions."
+    categories:
+      "0": Pay-in conversation judged as not resolved.
+      "1": Pay-in conversation judged as resolved.
+  eval_payin_failure_diagnosis:
+    lineage:
+      - datalake_langfuse_clean.scores.string_value
+      - datalake_langfuse_clean.scores.name
+    description: "Latest PayinFailureDiagnosisEval categorical label for why the pay-in conversation failed or was out of scope. NULL when this evaluator did not score the session. Use the label, not the numeric encoding, for analysis."
+    categories:
+      FORA_DE_ESCOPO: Conversation judged out of Matthew pay-in scope.
+      SEM_CONTRATO: Failure attributed to no contract found.
+      SEM_CAPACIDADE: Failure attributed to Matthew lacking capability for the request.
+      FALHA_DE_COMPORTAMENTO: Failure attributed to agent behavior in the conversation.
+  eval_payin_frustration:
+    lineage:
+      - datalake_langfuse_clean.scores.string_value
+      - datalake_langfuse_clean.scores.name
+    description: "Latest PayinFrustrationEval categorical label for user frustration in the pay-in conversation. NULL when this evaluator did not score the session. Use the label, not the numeric encoding, for analysis."
+    categories:
+      SEM_FRUSTRACAO: No frustration detected.
+      FRUSTRACAO_GERAL: General frustration, not directed at the bot.
+      FRUSTRACAO_COM_O_BOT: Frustration directed at the bot.
+  ts_last_eval_created:
+    lineage:
+      - datalake_langfuse_clean.scores.ts_created
+    description: "Timestamp of the most recent Payin evaluator score kept for the session after latest-per-name deduplication. Source of the year/month/day partition columns."
+  year:
+    lineage:
+      - datalake_langfuse_clean.scores.ts_created
+    description: "Table partition calendar year from ts_last_eval_created."
+  month:
+    lineage:
+      - datalake_langfuse_clean.scores.ts_created
+    description: "Table partition calendar month from ts_last_eval_created."
+  day:
+    lineage:
+      - datalake_langfuse_clean.scores.ts_created
+    description: "Table partition calendar day of month from ts_last_eval_created."

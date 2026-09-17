@@ -127,8 +127,14 @@ SELECT
         ELSE 0
     END AS flag_no_contracts_mismatch,
     COALESCE(o.has_prorated_rent_error, 0) AS flag_has_prorated_rent,
+    COALESCE(o.flag_outbound_responsibility_helper, 0) AS flag_outbound_responsibility_helper,
+    COALESCE(o.flag_authentication_helper, 0) AS flag_authentication_helper,
+    payin.eval_payin_resolution,
+    payin.eval_payin_failure_diagnosis,
+    payin.eval_payin_frustration,
     -- LLM model, cost, latency and call-volume counters
     llm.matthew_model,
+    llm.matthew_host_version,
     llm.n_agent_messages,
     llm.n_llm_calls,
     llm.total_llm_cost,
@@ -176,4 +182,7 @@ LEFT JOIN
 LEFT JOIN
     datalake_ai_collections_quintoandar.matthew_llm_metrics AS llm
         ON llm.id_langfuse_session = s.id_external
+LEFT JOIN
+    datalake_ai_collections_quintoandar.matthew_payin_evals AS payin
+        ON payin.id_langfuse_session = s.id_external
 WHERE s.flag_session_with_trace

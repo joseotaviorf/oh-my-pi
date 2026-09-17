@@ -7,8 +7,10 @@ dag:
       Enrich layer for the Collections AI Agents (Matthew) analytics:
       builds session universe, per-session observation summary, an
       LLM-friendly agglutinated conversation string per id_sauron_session,
-      and Matthew voice call timeline/session tables (matthew_voice_events,
-      matthew_voice_sessions) for prod traces tagged matthew + online_call.
+      online Payin evaluator scores for Matthew WhatsApp sessions
+      (matthew_payin_evals), and Matthew voice call timeline/session
+      tables (matthew_voice_events, matthew_voice_sessions) for prod
+      traces tagged matthew + online_call.
 
 workflow:
   type: query_delta
@@ -36,6 +38,10 @@ workflow:
       partitions: [year, month, day]
       z_order_by: [id_langfuse_session]
     matthew_llm_metrics:
+      merge_on: [id_langfuse_session]
+      partitions: [year, month, day]
+      z_order_by: [id_langfuse_session]
+    matthew_payin_evals:
       merge_on: [id_langfuse_session]
       partitions: [year, month, day]
       z_order_by: [id_langfuse_session]

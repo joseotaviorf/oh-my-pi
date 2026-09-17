@@ -232,6 +232,38 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.observation.has_prorated_rent_error
     description: "1 when an annual-tax / paid-invoices report tool output in the session mentioned prorated-rent adjustments that prevent a clean invoice summary; else 0. Sourced from Langfuse TOOL output and available for V2 and V3-or-later sessions."
+  flag_outbound_responsibility_helper:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_outbound_responsibility_helper
+    description: "1 when the Matthew host invoked outbound_debt_responsibility_denial_helper at least once in the session (user denied responsibility for an outbound debt reminder); else 0. Matthew WhatsApp host signal only."
+  flag_authentication_helper:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_authentication_helper
+    description: "1 when the Matthew host invoked authentication_helper at least once in the session (WhatsApp login guidance after auth failure or user login confusion); else 0. Distinct from authentication_failure_helper. Matthew WhatsApp host signal only."
+  eval_payin_resolution:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_payin_evals.eval_payin_resolution
+    description: "Latest PayinResolutionEvaluator numeric outcome for Matthew WhatsApp sessions (1 = pay-in conversation resolved, 0 = not resolved). NULL when the session was not sampled by the online eval job or the evaluator did not run. Discrete 0/1 encoding — never average; compute the rate of 1s among judged sessions. Always NULL for Matthew-in-Chat."
+    categories:
+      "0": Pay-in conversation judged as not resolved.
+      "1": Pay-in conversation judged as resolved.
+  eval_payin_failure_diagnosis:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_payin_evals.eval_payin_failure_diagnosis
+    description: "Latest PayinFailureDiagnosisEval categorical label for why the pay-in conversation failed or was out of scope. NULL when the session was not judged. Always NULL for Matthew-in-Chat. Do not treat NULL as a negative."
+    categories:
+      FORA_DE_ESCOPO: Conversation judged out of Matthew pay-in scope.
+      SEM_CONTRATO: Failure attributed to no contract found.
+      SEM_CAPACIDADE: Failure attributed to Matthew lacking capability for the request.
+      FALHA_DE_COMPORTAMENTO: Failure attributed to agent behavior in the conversation.
+  eval_payin_frustration:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_payin_evals.eval_payin_frustration
+    description: "Latest PayinFrustrationEval categorical label for user frustration in the pay-in conversation. NULL when the session was not judged. Always NULL for Matthew-in-Chat. Do not treat NULL as a negative."
+    categories:
+      SEM_FRUSTRACAO: No frustration detected.
+      FRUSTRACAO_GERAL: General frustration, not directed at the bot.
+      FRUSTRACAO_COM_O_BOT: Frustration directed at the bot.
   is_notification_reply:
     lineage:
       - datalake_ai_collections_quintoandar.observation.is_notification_reply
@@ -296,6 +328,10 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_llm_metrics.matthew_model
     description: "LLM model used by the collections agent in the session (e.g. openai/gpt-4o-2024-11-20, openai/gpt-5.4-mini-2026-03-17). One model per session. Primary dimension for comparing Matthew across models. Distinct from matthew_version (agent architecture generation). NULL when no collections-agent LLM call was recorded."
+  matthew_host_version:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.matthew_host_version
+    description: "Matthew WhatsApp host planner version tag from the first Host - HostPlanner GENERATION in the session: V1 for openai/gpt-4o-2024-11-20, V2 for openai/gpt-5.6-luna. NULL for other host models, Matthew-in-Chat (Wall-e host), or when no host planner call exists. Distinct from matthew_version (collections-agent architecture) and matthew_model (collections-agent LLM)."
   n_agent_messages:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_llm_metrics.n_agent_messages

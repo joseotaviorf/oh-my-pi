@@ -332,6 +332,7 @@ bietlejuice.dw_collection_ai_agents:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-llm-metrics:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-mcp-observations:first-run-of-day
+  - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-payin-evals:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-voice-events:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-matthew-voice-sessions:first-run-of-day
   - bietlejuice.enrich_ai_collections_quintoandar:load-enrich-messages:first-run-of-day

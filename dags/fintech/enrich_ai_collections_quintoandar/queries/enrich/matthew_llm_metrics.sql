@@ -13,6 +13,7 @@ WITH obs AS (
         obs.provided_model_name,
         obs.cost_details.total AS cost_total,
         obs.latency,
+        obs.ts_started,
         COALESCE(obs.ts_ended, obs.ts_started) AS ts_ref
     FROM
         datalake_langfuse_clean.observations AS obs
@@ -33,6 +34,7 @@ WITH obs AS (
             OR LOWER(obs.name) = 'collectionsinput'
             OR LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+input$'
             OR LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+ - reactplanner$'
+            OR LOWER(obs.name) = 'host - hostplanner'
         )
 ),
 -- One row per collections-agent LLM call: the model, cost and latency come from the
@@ -147,10 +149,55 @@ session_model AS (
         matthew_model IS NOT NULL
     GROUP BY
         id_langfuse_session
+),
+-- Matthew WhatsApp host planner: first Host - HostPlanner GENERATION (ChatOpenAI or
+-- NormalizedChatOpenAI child) defines the host LLM version for the session.
+host_planner_calls AS (
+    SELECT
+        p.id_langfuse_session,
+        g.provided_model_name AS matthew_host_model,
+        p.ts_started AS ts_host_planner_started
+    FROM
+        obs AS p
+    INNER JOIN
+        obs AS g
+            ON g.id_parent_observation = p.id_observation
+    WHERE
+        p.name_l = 'host - hostplanner'
+        AND g.type = 'GENERATION'
+        AND g.name_l IN ('chatopenai', 'normalizedchatopenai')
+        AND g.provided_model_name IS NOT NULL
+),
+host_planner_first_ranked AS (
+    SELECT
+        id_langfuse_session,
+        matthew_host_model,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_langfuse_session
+            ORDER BY ts_host_planner_started ASC
+        ) AS rn
+    FROM
+        host_planner_calls
+),
+session_host AS (
+    SELECT
+        id_langfuse_session,
+        matthew_host_model,
+        CASE
+            WHEN matthew_host_model = 'openai/gpt-4o-2024-11-20' THEN 'V1'
+            WHEN matthew_host_model = 'openai/gpt-5.6-luna' THEN 'V2'
+            ELSE NULL
+        END AS matthew_host_version
+    FROM
+        host_planner_first_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     t.id_langfuse_session,
     MIN(sm.matthew_model) AS matthew_model,
+    MIN(sh.matthew_host_model) AS matthew_host_model,
+    MIN(sh.matthew_host_version) AS matthew_host_version,
     SUM(t.flag_agent_message) AS n_agent_messages,
     SUM(t.n_llm_calls) AS n_llm_calls,
     -- COST (USD)
@@ -170,5 +217,8 @@ FROM
 LEFT JOIN
     session_model AS sm
         ON sm.id_langfuse_session = t.id_langfuse_session
+LEFT JOIN
+    session_host AS sh
+        ON sh.id_langfuse_session = t.id_langfuse_session
 GROUP BY
     t.id_langfuse_session
