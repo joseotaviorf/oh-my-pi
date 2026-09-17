@@ -1,0 +1,31 @@
+---
+database_name: datalake_search
+table_name: concierge_chat_history_user_daily
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Daily WhatsApp concierge conversation recency and volume for targeting.
+  Grain is one user per snapshot among people with a chat message in 28 days.
+columns:
+  id_user:
+    description: "User who owns the concierge chat session."
+    lineage:
+      - datalake_copilot_service_clean.session.id_user
+  qty_chat_messages_7d:
+    description: "Concierge WhatsApp chat messages in the last 7 days."
+    lineage:
+      - datalake_copilot_service_clean.message.id
+  qty_chat_messages_28d:
+    description: "Concierge WhatsApp chat messages in the last 28 days."
+    lineage:
+      - datalake_copilot_service_clean.message.id
+  ts_last_chat_message:
+    description: "Timestamp of the most recent concierge WhatsApp chat message."
+    lineage:
+      - datalake_copilot_service_clean.message.ts_created
+  year:
+    description: "Snapshot year partition."
+  month:
+    description: "Snapshot month partition."
+  day:
+    description: "Snapshot day partition."

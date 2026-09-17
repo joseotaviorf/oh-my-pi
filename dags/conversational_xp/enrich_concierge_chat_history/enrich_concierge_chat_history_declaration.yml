@@ -1,0 +1,25 @@
+dag:
+  name: enrich_concierge_chat_history
+  schedule_start_date: 2026, 8, 21
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Daily WhatsApp concierge conversation recency and volume for targeting.
+      Grain is one user per snapshot among people with a chat message in 28 days.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: search
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    days_lookback_3: 3
+    days_lookback_7: 7
+    days_lookback_28: 28
+    days_lookback_60: 60
+  tables_customization:
+    concierge_chat_history_user_daily:
+      merge_on: [id_user]
+      partitions: [year, month, day]
+      z_order_by: [id_user]

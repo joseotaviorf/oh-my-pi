@@ -2055,6 +2055,9 @@ bietlejuice.enrich_concierge_audience:
   - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
   - bietlejuice.privacy_hub:load-clean-data-subject:first-run-of-day
   - bietlejuice.rede_platform:load-clean-buyer-company:first-run-of-day
+bietlejuice.enrich_concierge_chat_history:
+  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-session:first-run-of-day
 bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events:first-run-of-day
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
