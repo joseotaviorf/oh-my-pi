@@ -6,24 +6,18 @@ dag:
     dag_purpose: |
       Publishes changed Google Search Console page metrics to Internal Linking.
       It compares the D-7 7, 30, and 90 day snapshot with the last successfully
-      published state and sends only changed pages to SQS on Mondays, after the
-      weekly metrics load completes.
+      published state and sends only changed pages to SQS after
+      reverse_gsc_metrics_load completes.
 workflow:
   type: access
   layer: reverse
   custom_schema: gsc_metrics
   load_spark_job: load_into_sqs
-  extra_query_template_params:
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -7), 'load_end_date') }}"
   spark_job_arguments:
     - "{dag_name}"
     - "{bucket}"
     - "reverse_gsc_metrics"
     - "{table_name}"
     - "{load_end_date}"
-  short_circuit_customization:
-    function: CHECK_IS_SPECIFIC_WEEKDAY
-    function_params:
-      weekday: 0
   tables_customization:
     gsc_page_metrics: {}

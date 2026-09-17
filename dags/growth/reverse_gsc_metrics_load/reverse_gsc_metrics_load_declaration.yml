@@ -16,8 +16,6 @@ workflow:
   default_extraction_type: incremental
   default_partitions:
     - ref_date
-  extra_query_template_params:
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -7), 'load_end_date') }}"
   short_circuit_customization:
     function: CHECK_IS_SPECIFIC_WEEKDAY
     function_params:

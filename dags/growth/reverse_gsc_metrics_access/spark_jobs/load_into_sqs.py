@@ -1,7 +1,7 @@
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Dict, Iterable, Iterator, List, Optional, Tuple
 
 import boto3
@@ -25,6 +25,7 @@ MAX_ITEMS_PER_MESSAGE = 500
 MAX_MESSAGE_SIZE_BYTES = 246 * 1024
 METRIC_WINDOWS = ("7d", "30d", "90d")
 METRIC_FIELDS = ("click", "impression", "ctr", "position", "posimp")
+SNAPSHOT_LAG_DAYS = 7
 METRIC_COLUMNS = tuple(
     f"gsc_{window}_{field}" for window in METRIC_WINDOWS for field in METRIC_FIELDS
 )
@@ -41,10 +42,7 @@ def parse_arguments() -> Tuple[str, str, str, str, str, Optional[str], Optional[
     parser.add_argument("datalake_bucket", help="Environment datalake bucket")
     parser.add_argument("database_name", help="Reverse database containing metrics")
     parser.add_argument("table_name", help="Current GSC metrics table")
-    parser.add_argument(
-        "load_end_date",
-        help="Snapshot close date (D-7) matching reverse_gsc_metrics_load",
-    )
+    parser.add_argument("reference_date", help="DAG reference date")
     add_validation_target_args(parser)
     args = parser.parse_args()
     return (
@@ -52,7 +50,7 @@ def parse_arguments() -> Tuple[str, str, str, str, str, Optional[str], Optional[
         args.datalake_bucket,
         args.database_name,
         args.table_name,
-        args.load_end_date,
+        args.reference_date,
         args.target_database_name,
         args.target_table_name,
     )
@@ -154,15 +152,21 @@ def _with_metrics_hash(dataframe: DataFrame) -> DataFrame:
     )
 
 
+def _snapshot_ref_date(reference_date: str) -> date:
+    """Close the snapshot before GSC's seven-day mutable period."""
+    return date.fromisoformat(reference_date) - timedelta(days=SNAPSHOT_LAG_DAYS)
+
+
 def _current_snapshot(
-    database_name: str, table_name: str, load_end_date: str
+    database_name: str, table_name: str, reference_date: str
 ) -> DataFrame:
+    snapshot_ref_date = _snapshot_ref_date(reference_date)
     current = spark.table(f"{database_name}.{table_name}")
-    snapshot = current.filter(F.col("ref_date") == F.to_date(F.lit(load_end_date)))
+    snapshot = current.filter(F.col("ref_date") == F.lit(snapshot_ref_date))
     if snapshot.limit(1).count() == 0:
         raise ValueError(
             f"{database_name}.{table_name} has no GSC metrics rows for "
-            f"ref_date={load_end_date}"
+            f"ref_date={snapshot_ref_date}"
         )
     return _with_metrics_hash(snapshot)
 
@@ -215,11 +219,11 @@ def publish_changed_metrics(
     database_name: str,
     table_name: str,
     queue_url: str,
-    load_end_date: str,
+    reference_date: str,
 ) -> None:
     state_table = f"{database_name}.{STATE_TABLE_NAME}"
     changed = _changed_rows(
-        _current_snapshot(database_name, table_name, load_end_date),
+        _current_snapshot(database_name, table_name, reference_date),
         state_table,
     ).cache()
     changed_count = changed.count()
@@ -247,7 +251,7 @@ def main() -> None:
         datalake_bucket,
         database_name,
         table_name,
-        load_end_date,
+        reference_date,
         target_database_name,
         target_table_name,
     ) = parse_arguments()
@@ -260,7 +264,7 @@ def main() -> None:
         database_name,
         table_name,
         queue_url,
-        load_end_date,
+        reference_date,
     )
 
 
