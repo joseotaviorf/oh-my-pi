@@ -393,6 +393,14 @@ kodak_atlas_images_task = create_task(
     task_id="kodak_atlas_images",
 )
 
+# Enriches images from two sources. Kodak-backed sources come from the atlas;
+# ebdb_houses images are read straight from image_normalization because
+# images_upsert deliberately skips that source, so they never enter the atlas
+# and would otherwise never reach artifacts. Their bytes are fetched from the
+# listing bucket (the original upload behind quintoandar.com.br/img/), which
+# requires S3 read on listing-s3-quintoandar-com-br in the Vespucio instance
+# profile.
+#
 # Perceptual hashing is gated by the image_enrich_compute_phash ConfigCat flag
 # (fails closed: with the flag off or ConfigCat unreachable, phash/phash_64 stay
 # null and no S3 image bytes are fetched; hashes already in the output table are
@@ -401,6 +409,7 @@ image_enrich_step_task = create_task(
     entry_point="core_v2_image_enrich_step",
     parameters=[
         f"--input_source_kodak_atlas_images={Tables.source_kodak_atlas_images_v2}",
+        f"--input_image_normalized={Tables.image_normalization_step_v2}",
         "--overwrite_schema",
         f"--output_image_enrich={Tables.image_enrich_step_v2}",
         "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
@@ -594,7 +603,14 @@ registry_step_task >> general_normalization_step_task
 registry_step_task >> image_normalization_step_task
 address_normalization_step_task >> address_enrich_step_task
 image_normalization_step_task >> images_upsert_step_task
-kodak_atlas_images_task >> image_enrich_step_task
+# image_enrich reads image_normalization for ebdb images, and the step tolerates
+# the source_image_id column being absent by leaving ids null -- which would
+# silently cost a full re-fetch on the next run. This edge keeps the order
+# explicit rather than relying on it.
+[
+    kodak_atlas_images_task,
+    image_normalization_step_task,
+] >> image_enrich_step_task
 [
     address_enrich_step_task,
     general_normalization_step_task,
