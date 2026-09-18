@@ -6,7 +6,7 @@ alert_channel: GROWTH_ALERTS
 # and grew with it. Folding them into one partition-filtered constraint keeps the same
 # assertions but reads only the partition the run just wrote.
 #
-# Wall-clock caveat (same as `enrich_access_logs`): the framework does not template the run's
+# Wall-clock caveat: the framework does not template the run's
 # data interval into a constraint, so this is anchored on CURRENT_DATE() rather than on the
 # interval being processed. A backfill or a run that slips past midnight UTC therefore
 # validates the current calendar day, not the interval that triggered it.

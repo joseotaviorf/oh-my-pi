@@ -257,10 +257,6 @@ bietlejuice.dw_tenant_documentation:
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent:first-run-of-day
-bietlejuice.enrich_access_logs:
-  remove:
-    - bietlejuice.istio:load-clean-istio:first-run-of-day
-    - bietlejuice.opa:load-clean-opa:first-run-of-day
 bietlejuice.enrich_agent:
   add:
     - bietlejuice.ebdb_agent:load-clean-accreditation-contract-process

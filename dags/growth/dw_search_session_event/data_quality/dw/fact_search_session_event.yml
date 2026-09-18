@@ -6,7 +6,7 @@ alert_channel: GROWTH_ALERTS
 # partition the run just wrote keeps the assertion that matters (the new keys are unique and
 # complete) at a cost proportional to one day of data.
 #
-# Wall-clock caveat (same as `enrich_access_logs`): the framework does not template the run's
+# Wall-clock caveat: the framework does not template the run's
 # data interval into a constraint, so this is anchored on CURRENT_DATE() rather than on the
 # interval being processed. A backfill or a run that slips past midnight UTC therefore
 # validates the current calendar day, not the interval that triggered it.

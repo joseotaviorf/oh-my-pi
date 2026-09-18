@@ -2669,7 +2669,6 @@ class TestRealDagAcceptance:
             "langfuse",
             "enrich_search",
             "enrich_tracked_events",
-            "enrich_access_logs",
             "opa",
         ],
     )

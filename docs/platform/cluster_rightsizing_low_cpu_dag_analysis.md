@@ -78,10 +78,6 @@ Telemetry given as `p50 / p95 / IO-wait p95` worker CPU.
   `load_cdc_*.py` jobs `dbutils.fs.ls`-walk per-day gzip-JSON Debezium landing
   and write 4-level (y/m/d/h) partitions, 7 tables × 3 layers serially on one
   cluster.
-- **enrich_access_logs** (14.9 / 99 / 73) → `io_scan` (partition pruning).
-  Upstream istio/opa tables are partitioned y/m/d/**hour** but the query
-  filters `MAKE_DATE(year, month, day)` only → ~96 hot hour-partitions of
-  high-volume logs scanned, then a window-dedup shuffle. 247 min wall.
 - **enrich_search** (17.9 / 76 / 67) → `io_scan` (upstream compaction).
   Upstream `amplitude_subpartitioned` has `run_optimize: false` on the search
   event tables → many small Parquet files; full daily rebuild scans multiple
@@ -104,7 +100,7 @@ Telemetry given as `p50 / p95 / IO-wait p95` worker CPU.
 
 | Verdict | Fix | Example |
 | --- | --- | --- |
-| io_scan / pruning | Add the missing partition predicates (`hour`, full y/m/d) to the SQL | enrich_access_logs, dw_repairs |
+| io_scan / pruning | Add the missing partition predicates (`hour`, full y/m/d) to the SQL | dw_repairs |
 | io_scan / compaction | Enable `run_optimize` (or scheduled OPTIMIZE) on the upstream table | enrich_search ← amplitude_subpartitioned |
 | io_scan / batching | Replace per-file listing+read loops with coarser reads or pre-compacted landing | langfuse, house_listing_search |
 | shuffle_skew | AQE skew-join handling / repartition before the skewed `partitionBy`; NVMe does **not** help unless `total_disk_bytes_spilled > 0` | amplitude_new (~20k skewed `event_type` partitions) |

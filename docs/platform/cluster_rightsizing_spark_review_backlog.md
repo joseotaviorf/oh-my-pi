@@ -12,15 +12,15 @@ cannot fix. The recommender still right-sizes them where safe (see the cohort
 column), but each one needs a Spark-job / SQL-level fix to stop wasting the
 cluster in the first place.
 
-## Cohort A — `io_scan_review` (17 DAGs)
+## Cohort A — `io_scan_review` (16 DAGs)
 
 Workers spend the wall waiting on I/O (`wrk_wait_p95` > 40%) with a low CPU
 base (`wrk_cpu_p50` < 25%): small-file S3 scans, unpruned partition reads, or
 skewed shuffles. Typical fixes, in order of observed payoff:
 
 1. **Partition pruning** — push `hour`/`year/month/day` filters into the query
-   (e.g. `enrich_access_logs` reads ~96 hour-partitions because the SQL filters
-   `MAKE_DATE(year, month, day)` only, never `hour`).
+   (e.g. `dw_repairs` scans y/m/d-partitioned ticket tables without pushing
+   those partition columns into the predicates).
 2. **Upstream compaction** — enable `run_optimize` on upstream tables emitting
    many small Parquet files (e.g. `amplitude_subpartitioned` feeds
    `enrich_search` with `run_optimize: false` on the search event tables).
@@ -39,7 +39,6 @@ DAG here runs Photon, validate the drop with a shadow run before removing.
 | DAG | workers | n | cpu p50 | cpu p95 | io-wait p95 | wall p50 | cost 14d | Photon | recommender cohort |
 |---|---|---|---|---|---|---|---|---|---|
 | enrich_search | m6gd.4xlarge | 4 | 17.9% | 76.3% | 67.4% | 95.9m | $125 | yes | right_size_multi |
-| enrich_access_logs | m6g.2xlarge | 2 | 14.9% | 99.1% | 73.0% | 246.8m | $88 |  | right_size_multi |
 | dw_datamarts_growth_cross | m6g.8xlarge | 3 | 19.8% | 79.2% | 68.5% | 137.1m | $59 |  | right_size_multi |
 | enrich_chatbot | r6g.4xlarge | 6 | 13.8% | 67.8% | 67.8% | 22.7m | $33 |  | keep_multi_memory |
 | house_listing_search | r6g.4xlarge | 3 | 17.1% | 70.4% | 55.2% | 68.1m | $31 |  | right_size_multi |
@@ -105,7 +104,6 @@ cluster shape is wrong in kind, not in size:
 |---|---|---|
 | langfuse | io_scan (ingestion batching) | boto3 recursive bucket listing + `spark.read.json(file_list)` over many small exports; driver-bound REST enrichment with rate-limit sleeps |
 | house_listing_search | io_scan (CDC landing) | per-day `dbutils.fs.ls` over gzip-JSON Debezium landing; y/m/d/h output partitions; 7 tables x 3 layers serially |
-| enrich_access_logs | io_scan (partition pruning) | upstream istio/opa partitioned y/m/d/hour; query prunes date only -> ~96 hot partitions + window-dedup shuffle |
 | enrich_search | io_scan (upstream compaction) | upstream `run_optimize: false` -> small Parquet files; full daily rebuild, `year >= 2021` pruning only; Photon ON |
 | dw_repairs | io_scan (partition pruning) | unpruned scans of y/m/d tables (`fact_ticket_events`, `ticket_comments` full scan); 6+ window dedups |
 | greenhouse_v3 | driver_bound | driver paginates Greenhouse API; workers idle; p95 burst is the final JSON materialization |
