@@ -1,0 +1,81 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_despesa_atual
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica CONTRACT_EXPENSE rows from official GET /despesas (RAW
+  despesas_atuais). Grain is one launch per id_lancamento_imod. Vacant
+  launches stay on despesa_imovel_vago; despesa unions both codes.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_lancamento_imod:
+    description: Vendor launch id and CONTRACT_EXPENSE lake_mirror.vendor_natural_key.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_imovel_imo:
+    description: Property vendor id on the expense payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contrato_con:
+    description: Contract vendor id on the expense payload. Foreign key to contrato.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_recebimento_recb:
+    description: Related charge id when the expense is tied to a boleto.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_repasse_rep:
+    description: Related payout id when Superlogica already linked a repasse.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_acordo_aco:
+    description: Related agreement id when the expense belongs to an acordo.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_imod:
+    description: Vendor expense status flag from GET /despesas.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipo_imod:
+    description: Vendor expense type flag from GET /despesas.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_repassar_imod:
+    description: Whether Superlogica marked the expense to be repaid to the owner.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricao_prd:
+    description: Product description on the expense payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label_imod:
+    description: Expense label Superlogica shows on the launch.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_valor_imod:
+    description: Expense amount in BRL from vl_valor_imod.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_lancamento_imod:
+    description: Date Superlogica booked the launch.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_competencia_imod:
+    description: Competence month of the expense when the vendor sent one.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_referencia_imod:
+    description: Reference date of the expense when the vendor sent one.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_liquidacao_mov:
+    description: Movement settlement date when the expense was liquidated.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

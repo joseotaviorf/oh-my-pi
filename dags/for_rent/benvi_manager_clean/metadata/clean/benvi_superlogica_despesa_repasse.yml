@@ -1,0 +1,34 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_despesa_repasse
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Exploded CONTRACT_EXPENSE.payload.repasses. Grain is one nested payout
+  pointer per launch and array position. Parent key is id_lancamento_imod.
+  Distinct from PAYOUT rows in benvi_superlogica_repasse. Not a Superlogica
+  HTTP call.
+columns:
+  id:
+    description: Parent lake_mirror BIGSERIAL of the CONTRACT_EXPENSE row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_lancamento_imod:
+    description: Parent expense launch id. Join to despesa_atual.id_lancamento_imod.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  nr_item:
+    description: One-based position of this object inside payload.repasses.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_repasse_rep:
+    description: Nested payout id when Superlogica sent id_repasse_rep on the object.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  item_payload:
+    description: Full nested payout pointer as JSON for keys not projected.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed the parent CONTRACT_EXPENSE row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

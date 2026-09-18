@@ -1,0 +1,41 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_cobranca_componente
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Exploded CHARGE.payload.compo_recebimento lines. Grain is one composition
+  item per charge and array position. Parent key is id_recebimento_recb.
+  Remaining nested keys stay in item_payload. Not a Superlogica HTTP call.
+columns:
+  id:
+    description: Parent lake_mirror BIGSERIAL of the CHARGE row that owned the array.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_recebimento_recb:
+    description: Parent charge vendor id. Join to cobranca.id_recebimento_recb.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  nr_item:
+    description: One-based position of this composition object inside compo_recebimento.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_produto_prd:
+    description: Product id on the composition object when Superlogica sent one.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricao:
+    description: Composition line description when present on the nested object.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_valor:
+    description: Composition line amount as a vendor string when present.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  item_payload:
+    description: Full nested composition object as JSON for keys not projected.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed the parent CHARGE row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

@@ -6,11 +6,26 @@ dag:
   documentation:
     dag_purpose: |
       Projects datalake_benvi_manager_raw.lake_mirror into one Superlogica resource
-      table per resource_code. No cron. Dataset-triggered after
-      bietlejuice.benvi_manager:load-clean-lake-mirror succeeds on an Impact
-      Downstream Dependents (or reprocessing) run.
+      table per resource_code, plus exploded nested arrays and join tables for
+      CHARGE, CONTRACT_EXPENSE, PAYOUT, AGREEMENT, and DELINQUENCY. No cron.
+      Dataset-triggered after bietlejuice.benvi_manager:load-clean-lake-mirror
+      succeeds on an Impact Downstream Dependents (or reprocessing) run.
 workflow:
   type: query_delta
   layer: clean
   custom_schema: benvi_manager
   default_extraction_type: full
+  inner_dependencies:
+    benvi_superlogica_cobranca:
+      - benvi_superlogica_contrato
+      - benvi_superlogica_locatario
+    benvi_superlogica_repasse:
+      - benvi_superlogica_contrato
+      - benvi_superlogica_cobranca
+      - benvi_superlogica_locatario
+    benvi_superlogica_acordo:
+      - benvi_superlogica_cobranca
+      - benvi_superlogica_locatario
+    benvi_superlogica_inadimplencia:
+      - benvi_superlogica_contrato
+      - benvi_superlogica_locatario

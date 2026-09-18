@@ -1,0 +1,52 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_inadimplencia
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica DELINQUENCY rows from GET /inadimplencia?id=id_sacado_sac (RAW
+  inadimplencia). Grain is one tenant-contract pair per vendor_natural_key
+  (id_pessoa_pes | id_contrato_con). Joins locatario on the left key and
+  contrato on the right key. id_sacado_sac comes from the row or the parent
+  TENANT payload used as the query param.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  vendor_natural_key:
+    description: Pipe-joined tenant person id and contract id as landed in lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_pessoa_pes:
+    description: TENANT vendor person id (left half of the composite key). Foreign key to locatario.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_contrato_con:
+    description: Contract vendor id (right half of the composite key). Foreign key to contrato.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_recebimento_recb:
+    description: Related charge id when the delinquency row is charge-shaped.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_lancamento_imod:
+    description: Related expense launch id when the delinquency row is expense-shaped.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_sacado_sac:
+    description: Debtor id from the row payload, else from the joined TENANT parent payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+      - datalake_benvi_manager_clean.benvi_superlogica_locatario.id_sacado_sac
+  codigo_contrato:
+    description: Business contract code brought in from the joined contrato row.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_contrato.codigo_contrato
+  dt_vencimento_recb:
+    description: Delinquency due date from the vendor payload when present.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

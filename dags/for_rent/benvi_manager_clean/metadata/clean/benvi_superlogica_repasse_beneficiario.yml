@@ -1,0 +1,37 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_repasse_beneficiario
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Exploded PAYOUT.payload.proprietarios_beneficiarios. Grain is one owner
+  share per payout and array position. Parent key is id_repasse_rep. Remaining
+  nested keys stay in item_payload. Not a Superlogica HTTP call.
+columns:
+  id:
+    description: Parent lake_mirror BIGSERIAL of the PAYOUT row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_repasse_rep:
+    description: Parent payout vendor id. Join to repasse.id_repasse_rep.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  nr_item:
+    description: One-based position of this object inside proprietarios_beneficiarios.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_pessoa_pes:
+    description: Beneficiary owner person id when present on the nested object.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_fracao:
+    description: Owner share fraction as a vendor string when present.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  item_payload:
+    description: Full nested beneficiary object as JSON for keys not projected.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed the parent PAYOUT row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

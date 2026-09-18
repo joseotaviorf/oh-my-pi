@@ -1,0 +1,50 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_despesa
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  RAW despesas_full: UNION of CONTRACT_EXPENSE and VACANT_PROPERTY_EXPENSE on
+  id_lancamento_imod. Grain is one launch. When the same launch appears in
+  both resource_codes, the CONTRACT_EXPENSE row wins. resource_code says
+  which extractor produced the kept row.
+columns:
+  id:
+    description: lake_mirror BIGSERIAL of the kept expense row after dedupe.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_lancamento_imod:
+    description: Vendor launch id shared by GET /despesas and GET /imoveisdespesa.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_imovel_imo:
+    description: Property vendor id from the kept expense payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contrato_con:
+    description: Contract vendor id from the kept expense payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_recebimento_recb:
+    description: Related charge id when present on the kept expense payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_repasse_rep:
+    description: Related payout id when present on the kept expense payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  resource_code:
+    description: Which extractor produced the kept row, CONTRACT_EXPENSE or VACANT_PROPERTY_EXPENSE.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.resource_code
+  vl_valor_imod:
+    description: Expense amount in BRL from the kept launch payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_lancamento_imod:
+    description: Booking date of the kept launch.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed the kept vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

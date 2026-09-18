@@ -1,0 +1,54 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_repasse
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica PAYOUT rows from GET /repasses?status=realizados (RAW repasses).
+  Grain is one payout per id_repasse_rep. Joins contrato on id_contrato_con,
+  cobranca on id_recebimento_recb, and locatario on id_locatario_pes
+  (TENANT vendor_natural_key).
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_repasse_rep:
+    description: Vendor payout id and PAYOUT lake_mirror.vendor_natural_key.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_contrato_con:
+    description: Contract vendor id on the payout payload. Foreign key to contrato.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  codigo_contrato:
+    description: Business contract code brought in from the joined contrato row.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_contrato.codigo_contrato
+  id_recebimento_recb:
+    description: Charge vendor id on the payout payload. Foreign key to cobranca.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_sacado_sac:
+    description: Debtor id brought in from the joined cobranca row.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_cobranca.id_sacado_sac
+  id_locatario_pes:
+    description: Tenant person id on the payout payload. Foreign key to locatario.id_pessoa_pes.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_pes:
+    description: Tenant name brought in from the joined locatario row (PII).
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_locatario.nome_pes
+  fl_status_rep:
+    description: Payout status flag from the vendor payload (1 is realizado).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_repasse_rep:
+    description: Date Superlogica marked the payout as realized.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

@@ -3,16 +3,25 @@ table_name: benvi_superlogica_locatario
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica TENANT rows from lake_mirror. Name fields are PII.
+  Superlogica TENANT person rows from lake_mirror. Grain is one locatario per
+  id_pessoa_pes (vendor_natural_key). CHARGE, AGREEMENT, and DELINQUENCY join
+  this table: charges and agreements match payload id_sacado_sac, not the
+  person key. Name fields are PII.
 columns:
   id:
     description: Source BIGSERIAL from integration_superlogica.lake_mirror.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   id_pessoa_pes:
-    description: Vendor person id.
+    description: Vendor person id used as TENANT lake_mirror.vendor_natural_key.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_sacado_sac:
+    description: |
+      Debtor id from TENANT payload. CHARGE and AGREEMENT join here; the
+      delinquency extractor also queried GET /inadimplencia with this value.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   nome_pes:
     description: Tenant name from vendor payload (PII).
     lineage:

@@ -1,0 +1,45 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_despesa_movimentacao
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Exploded CONTRACT_EXPENSE.payload.movimentacoes. Grain is one movement per
+  launch and array position. Parent key is id_lancamento_imod. Remaining
+  nested keys stay in item_payload. Not a Superlogica HTTP call.
+columns:
+  id:
+    description: Parent lake_mirror BIGSERIAL of the CONTRACT_EXPENSE row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_lancamento_imod:
+    description: Parent expense launch id. Join to despesa_atual.id_lancamento_imod.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  nr_item:
+    description: One-based position of this movement object inside movimentacoes.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_movimentacao_mov:
+    description: Movement id when Superlogica sent id_movimentacao_mov on the object.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_recebimento_recb:
+    description: Charge id on the movement object when the vendor linked a boleto.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_mov:
+    description: Movement status flag when present on the nested object.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_valor_mov:
+    description: Movement amount as a vendor string when present.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  item_payload:
+    description: Full nested movement object as JSON for keys not projected.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed the parent CONTRACT_EXPENSE row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

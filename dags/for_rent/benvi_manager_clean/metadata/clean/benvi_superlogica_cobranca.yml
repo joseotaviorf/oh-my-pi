@@ -1,0 +1,90 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_cobranca
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica CHARGE rows (GET /cobrancas full history, RAW cobrancas_full).
+  Grain is one boleto per id_recebimento_recb. Joins contrato on
+  id_contrato_con and locatario on id_sacado_sac (not id_pessoa_pes). Debtor
+  name, document, email, and address columns are PII.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_recebimento_recb:
+    description: Vendor receipt id and CHARGE lake_mirror.vendor_natural_key.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_sacado_sac:
+    description: Debtor id on the charge. Foreign key to locatario.id_sacado_sac.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_pessoa_pes:
+    description: Resolved TENANT vendor person id via locatario.id_sacado_sac.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_locatario.id_pessoa_pes
+  id_contrato_con:
+    description: Contract vendor id on the charge payload. Foreign key to contrato.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  codigo_contrato:
+    description: Business contract code brought in from the joined contrato row.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_contrato.codigo_contrato
+  fl_status_recb:
+    description: Vendor charge status flag (0 is pending on the imobiliaria API).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_sac:
+    description: Debtor name on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cgc_sac:
+    description: Debtor CPF or CNPJ on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_sac:
+    description: Debtor email on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_sac:
+    description: Debtor street address on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_sac:
+    description: Debtor street number on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_sac:
+    description: Debtor address complement on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_sac:
+    description: Debtor neighborhood on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cidade_sac:
+    description: Debtor city on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estado_sac:
+    description: Debtor state on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cep_sac:
+    description: Debtor postal code on the charge payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_vencimento_recb:
+    description: Charge due date from the vendor payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_liquidacao_recb:
+    description: Settlement date when the charge was paid; empty while open.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at
