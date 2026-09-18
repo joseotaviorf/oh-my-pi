@@ -1,10 +1,17 @@
 -- Monthly AI Tools Usage export for the AI Adoption Portal.
 -- Spend and engagement are sourced from the conformed Claude facts and joined
--- at the normalized email/month grain. People attributes use current dw_people
--- dimensions for every reference month; Claude group membership is the latest
--- available snapshot. The current budget version is reused for every reference month.
--- load_start_date controls current-month status calculations and forecast; the
--- final projection stamps ts_load with the current query timestamp.
+-- at the normalized email/month grain. Months before 2026-09 stay activity-only
+-- (spend and/or engagement) because dim_ai_budget SCD2 coverage starts in
+-- September. From 2026-09 onward the grain is activity and/or a budget version
+-- in force that month, so unused seats still appear. People attributes use
+-- current dw_people dimensions for every reference month; Claude group
+-- membership is the latest available snapshot. Pre-2026-09 rows reuse the
+-- current budget version; 2026-09+ rows use the budget in force on the last
+-- day of that month. Current spend-limit rows often have a null dt_valid_from
+-- (vendor dt_started is missing); those versions are treated as valid from
+-- 2026-09-01, the start of budget SCD2 coverage. load_start_date controls
+-- current-month status and forecast; the final projection stamps ts_load with
+-- the current query timestamp.
 -- forecast_usd is a consumption-pace estimate for the current month and equals
 -- closed-month consumption for historical months.
 WITH spend_monthly AS (
@@ -55,7 +62,7 @@ engagement_monthly AS (
         dau.email_user,
         DATE_FORMAT(CAST(fae.dt_last_activity AS DATE), 'yyyy-MM')
 ),
-usage_monthly AS (
+activity_monthly AS (
     SELECT
         COALESCE(spend.email, engagement.email) AS email,
         COALESCE(spend.month, engagement.month) AS month,
@@ -77,25 +84,150 @@ usage_monthly AS (
             ON spend.email = engagement.email
             AND spend.month = engagement.month
 ),
+claude_monthly_budgets AS (
+    SELECT
+        dau.email_user AS email,
+        budget.sk_ai_user,
+        budget.dt_valid_from,
+        budget.dt_valid_to,
+        budget.is_current,
+        budget.sum_spend_limit_amount
+    FROM
+        dw_ai_usage.dim_ai_budget AS budget
+    INNER JOIN
+        dw_ai_usage.dim_ai_user AS dau
+            ON dau.sk_ai_user = budget.sk_ai_user
+    WHERE
+        budget.tool = 'claude'
+        AND budget.period_type = 'monthly'
+        AND budget.currency = 'USD'
+        AND budget.is_actor_deleted = FALSE
+        AND dau.tool = 'claude'
+        AND dau.email_user IS NOT NULL
+),
 current_budget_by_email AS (
     SELECT
-        budget_user.email_user AS email,
-        SUM(budget.sum_spend_limit_amount) AS total_limit_usd
+        email,
+        SUM(sum_spend_limit_amount) AS total_limit_usd
     FROM
-        dw_ai_usage.dim_ai_user AS budget_user
-    INNER JOIN
-        dw_ai_usage.dim_ai_budget AS budget
-            ON budget.sk_ai_user = budget_user.sk_ai_user
-            AND budget.tool = 'claude'
-            AND budget.period_type = 'monthly'
-            AND budget.currency = 'USD'
-            AND budget.is_actor_deleted = FALSE
-            AND budget.is_current = TRUE
+        claude_monthly_budgets
     WHERE
-        budget_user.tool = 'claude'
-        AND budget_user.email_user IS NOT NULL
+        is_current = TRUE
     GROUP BY
-        budget_user.email_user
+        email
+),
+budget_versions AS (
+    SELECT
+        email,
+        sk_ai_user,
+        COALESCE(
+            CAST(dt_valid_from AS DATE),
+            DATE('2026-09-01')
+        ) AS dt_valid_from,
+        CAST(dt_valid_to AS DATE) AS dt_valid_to,
+        sum_spend_limit_amount
+    FROM
+        claude_monthly_budgets
+    WHERE
+        DATE_TRUNC(
+            'MONTH',
+            COALESCE(
+                CAST(dt_valid_from AS DATE),
+                DATE('2026-09-01')
+            )
+        ) <= DATE_TRUNC('MONTH', DATE('{load_start_date}'))
+        AND DATE_TRUNC('MONTH', CAST(dt_valid_to AS DATE))
+            >= DATE('2026-09-01')
+),
+month_spine AS (
+    SELECT
+        EXPLODE(
+            SEQUENCE(
+                DATE('2026-09-01'),
+                DATE_TRUNC('MONTH', DATE('{load_start_date}')),
+                INTERVAL 1 MONTH
+            )
+        ) AS month_start
+),
+budget_history_months AS (
+    SELECT
+        budget_versions.email,
+        DATE_FORMAT(CAST(month_spine.month_start AS DATE), 'yyyy-MM') AS month,
+        LAST_DAY(CAST(month_spine.month_start AS DATE)) AS as_of_date,
+        budget_versions.dt_valid_from,
+        budget_versions.dt_valid_to,
+        budget_versions.sk_ai_user,
+        budget_versions.sum_spend_limit_amount
+    FROM
+        budget_versions
+    CROSS JOIN
+        month_spine
+    WHERE
+        month_spine.month_start
+            >= GREATEST(
+                DATE_TRUNC('MONTH', budget_versions.dt_valid_from),
+                DATE('2026-09-01')
+            )
+        AND month_spine.month_start
+            <= LEAST(
+                DATE_TRUNC('MONTH', budget_versions.dt_valid_to),
+                DATE_TRUNC('MONTH', DATE('{load_start_date}'))
+            )
+),
+budget_history_as_of AS (
+    SELECT
+        email,
+        month,
+        sk_ai_user,
+        sum_spend_limit_amount,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                sk_ai_user,
+                month
+            ORDER BY
+                dt_valid_from DESC
+        ) AS rn
+    FROM
+        budget_history_months
+    WHERE
+        as_of_date >= dt_valid_from
+        AND as_of_date <= dt_valid_to
+),
+budget_monthly AS (
+    SELECT
+        email,
+        month,
+        SUM(sum_spend_limit_amount) AS total_limit_usd
+    FROM
+        budget_history_as_of
+    WHERE
+        rn = 1
+    GROUP BY
+        email,
+        month
+),
+usage_monthly AS (
+    SELECT
+        COALESCE(activity.email, budget.email) AS email,
+        COALESCE(activity.month, budget.month) AS month,
+        activity.consumption_usd,
+        activity.chat_conversations,
+        activity.chat_messages,
+        activity.code_commits,
+        activity.code_prs,
+        activity.code_lines_added,
+        activity.code_lines_removed,
+        activity.cowork_messages,
+        activity.cowork_actions,
+        activity.cowork_dispatch_turns,
+        activity.active_days,
+        budget.total_limit_usd AS month_budget_usd
+    FROM
+        activity_monthly AS activity
+    FULL OUTER JOIN
+        budget_monthly AS budget
+            ON activity.email = budget.email
+            AND activity.month = budget.month
 ),
 claude_groups AS (
     SELECT
@@ -120,12 +252,37 @@ claude_groups AS (
     GROUP BY
         COALESCE(group_members.email, dau.email_user)
 ),
+usage_with_limit AS (
+    SELECT
+        usage.month,
+        usage.email,
+        usage.consumption_usd,
+        usage.chat_conversations,
+        usage.chat_messages,
+        usage.code_commits,
+        usage.code_prs,
+        usage.code_lines_added,
+        usage.code_lines_removed,
+        usage.cowork_messages,
+        usage.cowork_actions,
+        usage.cowork_dispatch_turns,
+        usage.active_days,
+        CASE
+            WHEN usage.month >= '2026-09' THEN usage.month_budget_usd
+            ELSE current_budget.total_limit_usd
+        END AS total_limit_usd
+    FROM
+        usage_monthly AS usage
+    LEFT JOIN
+        current_budget_by_email AS current_budget
+            ON current_budget.email = usage.email
+),
 calculated_usage AS (
     SELECT
         usage.month,
         usage.email,
         groups.group_name,
-        budget.total_limit_usd,
+        usage.total_limit_usd,
         usage.consumption_usd,
         CASE
             WHEN usage.consumption_usd IS NULL THEN NULL
@@ -137,10 +294,10 @@ calculated_usage AS (
             ELSE usage.consumption_usd
         END AS forecast_usd,
         CASE
-            WHEN budget.total_limit_usd > 0
+            WHEN usage.total_limit_usd > 0
                 THEN ROUND(
                     COALESCE(usage.consumption_usd, 0)
-                    / budget.total_limit_usd
+                    / usage.total_limit_usd
                     * 100,
                     1
                 )
@@ -165,10 +322,7 @@ calculated_usage AS (
         usage.cowork_dispatch_turns,
         usage.active_days
     FROM
-        usage_monthly AS usage
-    LEFT JOIN
-        current_budget_by_email AS budget
-            ON budget.email = usage.email
+        usage_with_limit AS usage
     LEFT JOIN
         claude_groups AS groups
             ON groups.email = usage.email

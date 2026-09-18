@@ -25,6 +25,13 @@
 - Spend and engagement are combined with a `FULL OUTER JOIN` on normalized
   `(email, month)`. A user present on only one side remains in the export and
   metrics missing from the other side remain `NULL`.
+- **Months before 2026-09** stay on that activity grain. Budget history in
+  `dw_ai_usage.dim_ai_budget` starts in September, so unused seats are not
+  invented for earlier months.
+- **Months from 2026-09 onward** also include emails with a monthly USD budget
+  version in force that month, even when spend and engagement are both `NULL`.
+  A seated user with no activity still contributes to People and Total Limit.
+  Members without a budget and without activity are not exported.
 - Email keys are canonicalized upstream in the AI usage and Claude
   group-membership sources. People email values are consumed as stored. This
   export does not repeat casing or whitespace normalization.
@@ -40,12 +47,16 @@
   all current group names sorted and joined with ` | `. Group membership is
   therefore current-state attribution for historical months; the source does
   not provide a versioned group history.
-- Monthly USD limits come from rows where `is_current = TRUE` in
-  `dw_ai_usage.dim_ai_budget`. The current limit for each Claude user is selected
-  and limits are summed at the email grain, then the current limit is reused for
-  every reference month. Historical limits may differ because the source does not
-  provide budget history; the AI Adoption Portal should communicate this
-  limitation.
+- Monthly USD limits for **months before 2026-09** still come from
+  `dim_ai_budget` rows where `is_current = TRUE`, summed at the email grain and
+  reused on those activity-only rows.
+- From **2026-09 onward**, the limit is the SCD2 version in force on the last
+  day of that month. Using month-end (not `{load_start_date}`) keeps seats
+  whose current version was first observed later in the month. Most current
+  `spend_limits` rows have a null `dt_started`, so `dt_valid_from` is coalesced
+  to 2026-09-01 (the start of budget SCD2 coverage). Deleted actors are
+  excluded. Multiple Claude seats that share an email are summed at the
+  email/month grain.
 
 ## Output contract
 
@@ -63,8 +74,9 @@ Columns are emitted in the order consumed by the AI Adoption Portal:
   values are normalized to `NULL`; the portal can fall back to email for name.
 - Numeric fields contain plain numeric values without currency symbols or
   thousands separators.
-- Metrics absent from one side of the full join remain `NULL`; consumers may
-  coalesce them to zero for aggregate calculations.
+- Metrics absent from activity or budget remain `NULL`; consumers may
+  coalesce them to zero for aggregate calculations. Budget-only rows from
+  2026-09 onward have `NULL` consumption, forecast, and engagement measures.
 - `ts_load` versions the snapshot using `CURRENT_TIMESTAMP()` from the final
   projection; it is the same value for all rows produced by one query execution.
 

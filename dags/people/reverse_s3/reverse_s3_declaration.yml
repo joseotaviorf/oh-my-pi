@@ -33,8 +33,9 @@ dag:
 
       Fourth export: base_app_ai_tools_usage — monthly AI Tools Usage dataset
       (cost, engagement, budget status, and People attributes) for the AI Adoption
-      Portal (`ai_tools_usage/ai_tools_usage.csv`). The export uses
-      current dw_people attributes for all reference
+      Portal (`ai_tools_usage/ai_tools_usage.csv`). Pre-2026-09 months are
+      activity-only; from 2026-09 the grain is activity and/or a budget in force
+      that month. The export uses current dw_people attributes for all reference
       months and current Claude group membership; see its governance document for
       the historical attribution caveats.
 
