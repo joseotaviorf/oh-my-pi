@@ -1178,6 +1178,8 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice-unified-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice-unified:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-postponed-brokerage-reverse:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-postponed-brokerage:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-postponement-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-postponement:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-provision-reverse:first-run-of-day

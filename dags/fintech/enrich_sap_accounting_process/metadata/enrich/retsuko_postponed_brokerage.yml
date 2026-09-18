@@ -1,0 +1,105 @@
+database_name: datalake_sap_accounting_process
+table_name: retsuko_postponed_brokerage
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description:
+  Table to track the accounting route of account 211412 (CORRETAGEM POSTERGADA - NOVO MODELO), fed exclusively by Seu Barriga. It holds the QuintoAndar brokerage fee that could not be collected when it was due because the landlord invoice had no balance left to cover it, so the amount is postponed to a later invoice. It anchors on the Retsuko entry and follows it through the SAP gateway into the ledger, so it reports whether every postponed brokerage the source created reached accounting.
+  A single bill item feeds the account - brokerage-quinto-andar-postponed - and only the pair that runs between the landlord account and the contract account reaches 211412. The same bill item also travels between the quinto-andar account and the contract account on roughly eighty thousand entries that produce no posting on any account, so that pair is left out of scope on purpose.
+  The account is designed to settle itself. The entry that runs from the landlord account to the contract account credits it and recognises the postponement, and the entry that runs back from the contract account to the landlord account debits it when the amount is finally collected on a later invoice. Each leg is carried by its own Retsuko entry and no entry ever carries both, so the direction of the entry is a deterministic discriminator and every entry in scope maps to exactly one posting, with the source amount carrying the opposite sign of the SAP amount and matching it to the cent.
+  Because both legs are in scope, summing sap_amount over the account reproduces the ledger balance, which is how the settlement can be monitored. Over the reconciled period the account moved around 363 million reais on each side and closed with a residual balance in the order of a hundred thousand reais.
+  Recognition happens at bill item creation only, so the funnel starts at entry.ts_created and the sap_entity leg is restricted to the 'new-accounting-entries' event.
+  The ledger is matched on the finance entity entry and, when the posting carries no entry id, on the gateway hash of the dispatch. Around twenty seven thousand postings reached SAP through the gateway but lost the entry key on the way, and matching only by entry would report them as 'sap not found' while the money is in fact in the account. The hash leg reads only the postings with no entry id, so the two legs never read the same ledger line, and it was measured to resolve one posting per entry rather than spreading one posting over several entries.
+  Entries that produced no posting on 211412 but were booked at payment time under the same bill item in another account, mainly 211406, are reported under the 'account divergence' status naming where they landed. That separates a difference in the moment of recognition from a posting that never happened at all.
+columns:
+  id_accounting_process:
+    description: Unique key for each record on this table, formatted as 'RTSK-PSTB-{id_finance_entity_entry}-{account_number}-{row_number}'.
+    lineage:
+      - datalake_retsuko.entry.id_external
+  id_business_entity:
+    description: Business key for the contract, taken from the Retsuko contract external id.
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  id_finance_entity:
+    description: Business key for the invoice that owns the postponed brokerage entry.
+    lineage:
+      - datalake_retsuko.invoice.id_external
+  id_finance_entity_entry:
+    description: Business key for the Retsuko entry. This is the grain of the table and the key the SAP ledger carries back in id_finance_entity_entry.
+    lineage:
+      - datalake_retsuko.entry.id_external
+  version:
+    description: Version of the accounting contract used by the source when dispatching the entry to the gateway.
+    lineage:
+      - datalake_retsuko_clean.sap_entity.version
+  business_unit:
+    description: Identifier created in this table to segment the business unit, fixed as for rent.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.business_unit
+  source_name:
+    description: Product responsible for sending the accounting information, fixed as seu barriga.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.source_name
+  accounting_type:
+    description: Type indicator used to segregate accounts, fixed as postponement, the same value used by the other postponement route.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.accounting_type
+  account_number:
+    description: Identifier of accounts used by controllership accounting process in SAP, fixed as 211412.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.account_number
+  accounting_name:
+    description: Human readable name for the SAP account, fixed as CORRETAGEM POSTERGADA - NOVO MODELO.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.accounting_name
+  source_amount:
+    description: Value of the postponed brokerage entry as recorded by Retsuko. It carries the opposite sign of sap_amount, since the credit leg of the account is fed by an entry running towards the contract and the debit leg by an entry running back to the landlord when the amount is collected.
+    lineage:
+      - datalake_retsuko.entry.amount
+  sap_amount:
+    description: Value recorded in SAP, summed over the 211412 ledger lines that share the same finance entity entry, or that carry the gateway hash of the dispatch when the posting has no entry id. Each entry in scope produces a single posting, so this is a one to one comparison against the source. Summed over the whole table it reproduces the balance of the account, which is expected to sit near zero.
+    lineage:
+      - datalake_pas.ledger.debit_credit
+  is_completeness:
+    description: Indicates whether the entry was found in the 211412 ledger. FALSE for dispatch failures and also for the entries booked in another account at payment time, since in neither case the amount reached this account.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.is_completeness
+  is_correctness:
+    description: TRUE if the deviation between source and SAP amounts is under R$0.05.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.is_correctness
+  is_temporality:
+    description: TRUE if the SAP reference date falls in the same month as the source trigger, or in the following month within three business days.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.is_temporality
+  is_compliance:
+    description: TRUE if completeness, correctness and temporality are all TRUE.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.is_compliance
+  accounting_process_status:
+    description: "Classification of accounting status. 'success' when the entry reached account 211412; 'account divergence' when the entry produced no posting on 211412 but was booked under the same bill item in another account at payment time, which is a difference in the moment of recognition rather than a missing posting; 'source failure', 'gateway failure' and 'unknown failure' follow the same meaning as the other Retsuko straws."
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.accounting_process_status
+  error_description:
+    description: "Textual reason for the outcome. 'accounted at payment time in {accounts} instead of 211412' names where a diverging entry was actually booked; the remaining values follow the standard funnel vocabulary of source not found, gateway not found, sap not found and the failure reason reported by the source or by the gateway webhook."
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.error_description
+  accrual_year_month:
+    description: Account reference in the format YYYYMM taken from the invoice.
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+  dt_source_trigger:
+    description: Creation date of the Retsuko entry, which is the event that starts this funnel.
+    lineage:
+      - datalake_retsuko.entry.ts_created
+  dt_sap_reference:
+    description: Reference date of the 211412 SAP posting.
+    lineage:
+      - datalake_pas.ledger.dt_reference
+  dt_sap_created:
+    description: Creation date of the 211412 SAP posting.
+    lineage:
+      - datalake_pas.ledger.dt_created
+  dt_filter_end:
+    description: Always NULL for this source. dt_filter_end means the date on which the position was settled or cancelled, and the collection of this postponement arrives as a separate Retsuko entry with its own row on this table, not as a second movement on the same key, so there is no settlement date to attach to the original record. Use dt_sap_reference when the posting date is what you need.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage.dt_filter_end

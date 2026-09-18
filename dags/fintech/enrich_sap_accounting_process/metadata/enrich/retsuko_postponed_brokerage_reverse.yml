@@ -1,0 +1,100 @@
+database_name: datalake_sap_accounting_process
+table_name: retsuko_postponed_brokerage_reverse
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description:
+  Table to track the reverse route of account 211412 (CORRETAGEM POSTERGADA - NOVO MODELO), identifying postings that exist in the SAP ledger but that the forward straw cannot see, since retsuko_postponed_brokerage starts from the Retsuko entry.
+  The anchor is the whole account rather than a list of accounting rules, on purpose - any rule that starts posting to 211412 surfaces here instead of disappearing from the reconciliation.
+  Two populations end up in this table. Postings whose finance entity entry is not a postponed brokerage entry running between the landlord and the contract account are reported at entry level. When the entry does belong to the bill item but travels on another account pair, the record is labelled 'account divergence' naming the pair, which separates a scope decision of the forward straw from a posting nobody can explain. Postings with no finance entity entry carry no key the entry level join could ever match, so they are grouped by transaction and split between loads that reached the gateway without an entry id and adjustments typed straight into SAP by a user, which have neither gateway hash nor entry.
+  Postings with no entry id whose gateway hash belongs to a dispatch of an entry already covered by retsuko_postponed_brokerage are excluded on purpose. They are not unexplained postings - they are the same accounting event the forward straw already reconciles, and reporting them here would count the amount twice and turn a reconciled entry into a false failure. This exclusion is what keeps around twenty seven thousand batch postings out of this table.
+  Together with retsuko_postponed_brokerage this table partitions account 211412 with no overlap and no gap, which was verified line by line against the ledger.
+  All four assertion flags are FALSE by construction, so the table is read through accounting_process_status and error_description for root-cause analysis.
+columns:
+  id_accounting_process:
+    description: Unique key for each record on this table, formatted as 'RE-RTSK-PSTB-{id_finance_entity_entry}' for entry level records and 'RE-RTSK-PSTB-MAN-{id_transaction}' for postings with no finance entity entry.
+    lineage:
+      - datalake_pas.ledger.id_finance_entity_entry
+  id_business_entity:
+    description: Business key for the contract as recorded in the SAP ledger.
+    lineage:
+      - datalake_pas.ledger.id_business_entity
+  id_finance_entity:
+    description: Business key for the invoice as recorded in the SAP ledger.
+    lineage:
+      - datalake_pas.ledger.id_finance_entity
+  id_finance_entity_entry:
+    description: Business key for the accounting entry in the SAP ledger. NULL for the records grouped by transaction, which have no entry id in the ledger.
+    lineage:
+      - datalake_pas.ledger.id_finance_entity_entry
+  version:
+    description: Version identifier from the source system, kept for schema compatibility with the forward straw. Always NULL here, since these records are read from SAP rather than from a source dispatch.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.version
+  business_unit:
+    description: Identifier created in this table to segment the business unit, fixed as for rent.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.business_unit
+  source_name:
+    description: Origin system label, fixed as S4 because these records are anchored on SAP rather than on a source event, following the convention of the other reverse straws.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.source_name
+  accounting_type:
+    description: Type indicator used to segregate accounts, fixed as postponement to match the forward straw.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.accounting_type
+  account_number:
+    description: Identifier of accounts used by controllership accounting process in SAP, fixed as 211412.
+    lineage:
+      - datalake_pas.ledger.account_number
+  accounting_name:
+    description: Human readable name for the SAP account, fixed as CORRETAGEM POSTERGADA - NOVO MODELO.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.accounting_name
+  source_amount:
+    description: Value from the source system. Always NULL here, since these postings have no postponed brokerage dispatch that this table can attribute to account 211412.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.source_amount
+  sap_amount:
+    description: Value recorded in SAP, summed over the 211412 ledger lines that share the same finance entity entry, or the same transaction for the records with no entry id.
+    lineage:
+      - datalake_pas.ledger.debit_credit
+  is_completeness:
+    description: Indicates whether the posting has a matching source dispatch on the postponed brokerage route. Always FALSE in this table.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.is_completeness
+  is_correctness:
+    description: TRUE if the deviation between source and SAP amounts is under R$0.05. Always FALSE here, since there is no source amount to compare against.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.is_correctness
+  is_temporality:
+    description: TRUE if the SAP reference date falls in the accepted window around the source trigger. Always FALSE here, since there is no source trigger date.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.is_temporality
+  is_compliance:
+    description: TRUE if completeness, correctness and temporality are all TRUE. Always FALSE here.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.is_compliance
+  accounting_process_status:
+    description: "Classification of accounting status. 'account divergence' when the posting belongs to a postponed brokerage entry travelling on an account pair the forward straw does not reconcile; 'reverse straw failure' for every other record, since the postponed brokerage route cannot explain it."
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.accounting_process_status
+  error_description:
+    description: "Textual reason for the outcome. 'postponed brokerage entry out of the reconciled account pair - {pair}' names the pair for the diverging records; 'source not dispatched by retsuko postponed brokerage' covers postings whose entry does not belong to the bill item; 'source dispatched without finance entity entry' covers batch loads that reached the gateway with no entry id; 'posting without gateway hash' covers adjustments typed straight into SAP, which have neither gateway hash nor entry. Both records grouped by transaction carry the SAP user that created the posting at the end of the description, so a manual adjustment can be traced back to its author; jobs that reached the gateway in error report the job type together with the webhook error or job status."
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.error_description
+  accrual_year_month:
+    description: Account reference in the format YYYYMM taken from the SAP ledger.
+    lineage:
+      - datalake_pas.ledger.accrual_year_month
+  dt_source_trigger:
+    description: Date of the source event that triggered the accounting entry. Always NULL here, since these postings have no source dispatch on the postponed brokerage route.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_postponed_brokerage_reverse.dt_source_trigger
+  dt_sap_reference:
+    description: Reference date of the 211412 SAP posting.
+    lineage:
+      - datalake_pas.ledger.dt_reference
+  dt_sap_created:
+    description: Creation date of the 211412 SAP posting.
+    lineage:
+      - datalake_pas.ledger.dt_created
