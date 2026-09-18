@@ -25,6 +25,12 @@ custom_cluster:
   aws_attributes:
     ebs_volume_size: 200
     instance_profile_arn: "{{ var.value.instance_profile_secret_arn_vespucio }}"
+  # Override base template region:"" — NativeEnvironment (render_template_as_native_obj)
+  # turns empty string into None and breaks _deep_string_coerce on execute-job-cluster.
+  init_scripts:
+    - s3:
+        destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+        region: us-east-1
   spark_conf:
     # Temporary: Vespúcio instance profile lacks S3 on the Databricks workspace bucket for
     # spark-event-logs/. Re-enable after IAM allows that prefix (same as default DE profile).
