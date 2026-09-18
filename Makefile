@@ -724,8 +724,8 @@ unit-tests:
 ## DAG spark-job tests under packages/bietlejuice-runtime/test/dags.
 ## Each top-level domain runs in its own pytest process so conftest sys.modules mocks
 ## (e.g. agents, cross) cannot leak into people/tech_platform suites.
-## Nested domains (tech_platform, mlops, for_rent) run each child dir separately
-## so a sibling job's pyspark stub cannot clobber a real-Spark suite.
+## Nested domains (tech_platform, mlops, for_rent, people) run each child dir
+## separately so a sibling job's pyspark stub cannot clobber a real-Spark suite.
 unit-tests-dags:
 	@echo ""
 	@echo "DAG spark job tests (runtime/test/dags)"
@@ -745,7 +745,7 @@ unit-tests-dags:
 	   $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest "$$dir" -W ignore::DeprecationWarning || FAILED=1; \
 	 }; \
 	 for suite in test/dags/*/; do \
-	   if [ "$$suite" = "test/dags/tech_platform/" ] || [ "$$suite" = "test/dags/mlops/" ] || [ "$$suite" = "test/dags/for_rent/" ]; then \
+	   if [ "$$suite" = "test/dags/tech_platform/" ] || [ "$$suite" = "test/dags/mlops/" ] || [ "$$suite" = "test/dags/for_rent/" ] || [ "$$suite" = "test/dags/people/" ]; then \
 	     for nested in "$$suite"*/; do _run_dag_suite "$$nested"; done; \
 	   else \
 	     _run_dag_suite "$$suite"; \

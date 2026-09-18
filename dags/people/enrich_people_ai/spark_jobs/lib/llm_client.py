@@ -1,8 +1,8 @@
 """HTTP client for QuintoAndar's internal LiteLLM OpenAI-compatible gateway.
 
 Provides a minimal ``/chat/completions`` wrapper used by People AI Spark jobs on
-Databricks and EMR. Authentication uses the Databricks ``people`` secret scope by
-default; tests and local runs can inject an explicit API key via the constructor.
+EMR. Authentication uses the Databricks ``people`` secret scope by default; tests
+and local runs can inject an explicit API key via the constructor.
 """
 
 from __future__ import annotations
@@ -16,11 +16,8 @@ from urllib import error, request
 from bietlejuice.base.spark import BaseDBUtils
 
 DEFAULT_BASE_URL = "https://litellm.apps.shared-prd.habitat.zone/v1"
-# Databricks notebooks used ai_query('databricks-gpt-oss-20b'). The LiteLLM
-# equivalent is AWS Bedrock gpt-oss-20b via Converse, not OpenAI Chat Completions.
-# `openai/gpt-oss-20b` is a pass-through to api.openai.com and 404s (model_not_found).
-# `us.openai.gpt-oss-20b-1:0` is the US cross-region inference profile (DBP-2042).
-DEFAULT_MODEL = "bedrock/converse/us.openai.gpt-oss-20b-1:0"
+# Shared LiteLLM catalog (chat mode).
+DEFAULT_MODEL = "vertex_ai/claude-opus-4-8"
 DEFAULT_SECRET_SCOPE = "people"
 DEFAULT_SECRET_KEY = "PEOPLE_DATA_LITELLM_KEY"
 DEFAULT_MAX_RETRIES = 3
@@ -63,7 +60,7 @@ class LiteLLMClient:
             base_url: LiteLLM root URL without trailing slash; defaults to production
                 shared gateway unless ``LITELLM_BASE_URL`` is set.
             model: Model id passed in the JSON body (e.g.
-                ``bedrock/converse/us.openai.gpt-oss-20b-1:0``).
+                ``vertex_ai/claude-opus-4-8``).
             api_key: Bearer token; when ``None``, loaded from Databricks secrets.
             secret_scope: Databricks secret scope name for API key lookup.
             secret_key: Secret key name within ``secret_scope``.

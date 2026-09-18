@@ -211,8 +211,13 @@ class TestWritePayloadInChunks(unittest.TestCase):
                 call("A6", [["5"]], raw=False),
             ]
         )
-        self.assertEqual(mock_sleep.call_count, 2)
-        mock_sleep.assert_called_with(job.GSHEETS_CHUNK_PAUSE_SECONDS)
+        # load_to_gsheet.time.sleep is stdlib time.sleep; ignore Spark thread calls.
+        pause_calls = [
+            c
+            for c in mock_sleep.call_args_list
+            if c == call(job.GSHEETS_CHUNK_PAUSE_SECONDS)
+        ]
+        self.assertEqual(len(pause_calls), 2)
 
     def test_payload_just_over_10k_uses_range_updates_not_append(self):
         mock_writer, mock_worksheet = self._build_writer_with_worksheet()

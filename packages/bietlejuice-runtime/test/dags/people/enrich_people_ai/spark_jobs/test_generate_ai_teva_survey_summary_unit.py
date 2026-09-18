@@ -109,7 +109,7 @@ class TestGenerateSummary(unittest.TestCase):
 
 class TestCollectGeneratedSummaries(unittest.TestCase):
     def test_propagates_litellm_runtime_error(self):
-        """DBP-2138: a LiteLLM HTTP failure must fail the job, not skip the row."""
+        """A LiteLLM HTTP failure must fail the job, not skip the row."""
         client = MagicMock()
         client.complete.side_effect = RuntimeError(
             "LiteLLM request failed: HTTP Error 404: Not Found"

@@ -57,11 +57,9 @@ class TestLiteLLMClient:
         Databricks-scope placeholder name."""
         assert DEFAULT_SECRET_KEY == "PEOPLE_DATA_LITELLM_KEY"
 
-    def test_default_model_is_bedrock_gpt_oss_not_openai_passthrough(self):
-        """DBP-2138: ``openai/gpt-oss-20b`` hits api.openai.com and 404s.
-        Databricks ``databricks-gpt-oss-20b`` is replaced by Bedrock Converse
-        on the shared LiteLLM proxy (IRSA has AmazonBedrockLimitedAccess)."""
-        assert DEFAULT_MODEL == "bedrock/converse/us.openai.gpt-oss-20b-1:0"
+    def test_default_model_is_vertex_claude_opus(self):
+        """The client defaults to the catalog chat model ``vertex_ai/claude-opus-4-8``."""
+        assert DEFAULT_MODEL == "vertex_ai/claude-opus-4-8"
         client = LiteLLMClient(api_key="explicit-key")
         assert client.model == DEFAULT_MODEL
 
@@ -106,15 +104,14 @@ class TestLiteLLMClient:
         with pytest.raises(RuntimeError, match="missing choices"):
             client.complete("prompt text")
 
-    @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.time.sleep")
+    @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.time")
     @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.request.urlopen")
-    def test_complete_does_not_retry_http_404(self, mocked_urlopen, mocked_sleep):
-        """DBP-2138: model_not_found 404 is not transient; retrying it 3x per
-        invite hid a misconfigured LiteLLM model behind a successful Spark job."""
+    def test_complete_does_not_retry_http_404(self, mocked_urlopen, mocked_time):
+        """HTTP 404 is not retryable; the client raises on the first attempt."""
         mocked_urlopen.side_effect = _http_error(
             404,
             "Not Found",
-            b'{"error":{"message":"The model `gpt-oss-20b` does not exist",'
+            b'{"error":{"message":"The model `unknown-model` does not exist",'
             b'"code":"model_not_found"}}',
         )
         client = LiteLLMClient(api_key="explicit-key", max_retries=3)
@@ -123,14 +120,12 @@ class TestLiteLLMClient:
             client.complete("prompt text")
 
         assert mocked_urlopen.call_count == 1
-        mocked_sleep.assert_not_called()
+        mocked_time.sleep.assert_not_called()
         assert "after 3 attempts" not in str(exc_info.value)
 
-    @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.time.sleep")
+    @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.time")
     @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.request.urlopen")
-    def test_complete_retries_http_429_then_succeeds(
-        self, mocked_urlopen, mocked_sleep
-    ):
+    def test_complete_retries_http_429_then_succeeds(self, mocked_urlopen, mocked_time):
         """Rate limits are retried, then a later success is returned."""
         success_body = json.dumps({"choices": [{"message": {"content": "ok"}}]}).encode(
             "utf-8"
@@ -147,4 +142,4 @@ class TestLiteLLMClient:
 
         assert client.complete("prompt text") == "ok"
         assert mocked_urlopen.call_count == 2
-        mocked_sleep.assert_called_once()
+        mocked_time.sleep.assert_called_once()
