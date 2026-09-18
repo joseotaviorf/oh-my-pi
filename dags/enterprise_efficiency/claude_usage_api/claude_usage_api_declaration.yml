@@ -13,7 +13,11 @@ dag:
       month, and day.
       Covers members returned by Analytics (usage, cost, activity, and summaries).
       Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo; usage
-      and cost use a 28-day trailing window with inclusive ending_at; summaries
+      uses a 28-day trailing window with exclusive ending_at equal to the
+      default load_end_date (interval day), so the latest included day is
+      interval day minus one; cost uses the same start and an exclusive
+      ending_at of interval day plus one so the latest included day is the
+      interval day (console/gsheets D-1); summaries
       use the same start and an exclusive ending_date equal to the default
       load_end_date (interval day), so the latest included day is interval day
       minus one and stays within vendor publish lag;
@@ -112,6 +116,12 @@ workflow:
         - id_user
         - currency
       date_filter_column: starting_at
+      # Vendor ending_at is exclusive. Shift load_end_date forward one day so
+      # the trailing window includes the interval day (D-1 of the 06:00 run).
+      # Repeat load_start_date: table extras replace the workflow dict.
+      extra_query_template_params:
+        load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -27), 'load_start_date') }}"
+        load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
       params:
         bucket_width: 1d
         starting_at: load_start_date
