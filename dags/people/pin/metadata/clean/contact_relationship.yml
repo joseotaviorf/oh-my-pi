@@ -24,14 +24,6 @@ columns:
     description: Identifier of the PIN business group that owns the relationship record.
     lineage:
       - datalake_pin_core_raw.per_contact_relships_f.business_group_id
-  id_end_life_reason:
-    description: Identifier of the reason associated with ending the contact relationship, when registered.
-    lineage:
-      - datalake_pin_core_raw.per_contact_relships_f.end_life_reason_id
-  id_start_life_reason:
-    description: Identifier of the reason associated with starting the contact relationship, when registered.
-    lineage:
-      - datalake_pin_core_raw.per_contact_relships_f.start_life_reason_id
   legislation_code:
     description: Legislation context associated with the contact relationship.
     lineage:
@@ -44,6 +36,10 @@ columns:
     description: Localization-specific statutory-dependent value recorded for the contact relationship. The value may be null or use a configured legislative code.
     lineage:
       - datalake_pin_core_raw.per_contact_relships_f.statutory_dependent
+  irrf_dependent_type_code:
+    description: PIN descriptive-flexfield code for Brazilian income-tax (IRRF) dependent type. Joins to foundation lookup values with lookup type QA_DEPENDENTE_IRRF.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.cont_attribute1
   sequence_number:
     description: Sequence number assigned to the relationship by PIN.
     lineage:
