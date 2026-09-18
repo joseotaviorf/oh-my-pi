@@ -89,7 +89,7 @@ No metric entity doc owns the Agents domain yet — use [Related Metric Entities
 ## Relationships with other entities
 
 - **Agents ↔ Accreditation (1:1 identity):** `dw_public.dim_agent.id_user = datalake_agent_accreditation.agent.id_user` (legacy → new Agent Domain). Do **not** join the two `sk_agent` columns — see [`agents_accreditation.md`](agents_accreditation.md).
-- **Agents ↔ Profile / hub (1:N daily allocation):** `agent.uuid_person = member_hub_allocation.uuid_person` (`is_active = true`) — see [`agents_profile.md`](agents_profile.md).
+- **Agents ↔ Profile / hub (1:N daily allocation):** `dw_agent.dim_agent.sk_user = member_hub_allocation.id_main_user` (`is_active = true`) — see [`agents_profile.md`](agents_profile.md). Do not join on `uuid_person`; that column is not on `dw_agent.dim_agent`.
 - **Agents ↔ Payments (1:N):** `sk_agent` / `sk_partner` on `dw_agent_payments.fact_earnings` and `fact_partner_payments` — see [`agents_payments.md`](agents_payments.md).
 - **Agents ↔ Performance (1:N listings):** `sk_user` on `id_ciq_user_sale` / `id_ciq_user_rent` in `datalake_listing_deduplication.valid_first_listing` — see [`agents_performance.md`](agents_performance.md).
 - **Agents ↔ Programs (1:N PFA/PPA):** `preferred_fixed_agent_history` / `preferred_property_agent_relation_history` — see [`agents_programs.md`](agents_programs.md).

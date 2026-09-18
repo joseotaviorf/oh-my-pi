@@ -145,6 +145,7 @@ Use [Related Metric Entities](#related-metric-entities) when the question asks f
 
 **Don't:**
 
+- Select `uuid_person` or `status` from `dw_agent.dim_agent` — those columns are not on that table; use `is_agent_active` for current accredited state and `sk_user` / `sk_person` for joins (hub: `sk_user = member_hub_allocation.id_main_user`).
 - Treat `member_hub_allocation.profile = 'Visita'` as equivalent to `agent.profile = 'AUTONOMOUS_BROKERAGE_AGENT'` — different columns, different semantics.
 - Use `datalake_hub_services.agent_hub_alocation` (deprecated, typo `alocation`) or `agent_hub_relation` (deprecated) — use `member_hub_allocation` with `is_active = true`.
 - Classify AI chatbots with these rules — see [`chatbot_sessions.md`](chatbot_sessions.md).

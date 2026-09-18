@@ -13,7 +13,7 @@
 ## Overview
 
 - **Objective:** Canonical agent identity, capabilities, the prospect/accreditation funnel, and the daily snapshots that answer "what state was this agent in on date X".
-- **Asset status / lifecycle:** prospect → CRECI validation → contract signature → accredited (`agent.status = 'ACTIVE'`) → activated (first commercial event) → churned/inactive.
+- **Asset status / lifecycle:** prospect → CRECI validation → contract signature → accredited (`datalake_agent_accreditation.agent.status = 'ACTIVE'`; on DW use `dw_agent.dim_agent.is_agent_active = TRUE`) → activated (first commercial event) → churned/inactive.
 - **Typical actions / events:** sign-up, qualification steps, contract signature, CRECI validation, EN association, activation.
 - **Common metrics:** active agents (via `dw_agent.fact_agent_daily`), days-in-current-status, prospect funnel blockers by step.
 - **Source systems:** EBDB (agent, prospect, qualification, contract), Amplitude (sign-up funnel). Consolidated 2026-06-19 (ADR: Instant Accreditation).
@@ -43,12 +43,14 @@
 | You need… | Schema / table |
 |-----------|----------------|
 | Canonical `id_agent` identity, CRECI, capability flags | `datalake_agent_accreditation.agent` |
+| Current-state identity, capabilities, and accreditation timestamps | `dw_agent.dim_agent` |
 | Point-in-time / daily capability and status history | `dw_agent.fact_agent_daily` |
 | Fine-grained capability status (per type, business context) | `datalake_ebdb_clean.capability` |
 | CRECI validation / contract / sign-up ops queue | `datalake_agent_accreditation.prospect_step_validation` |
 
 **Critical rules:**
 - **DW first for daily state:** use `dw_agent.fact_agent_daily` for per-day capability/status questions; use enrich `agent` only for canonical identity or columns not projected to DW.
+- **Do not copy enrich `agent` columns onto `dim_agent`.** `dw_agent.dim_agent` has **no** `uuid_person`, `status`, `affiliation_type`, `uuid_company`, or `company_product_name`. Current accredited state is `is_agent_active = TRUE`. For a person UUID, join `sk_person` to `dw_public.dim_person.uuid_person`, or query enrich `agent` / `fact_agent_daily` (those two tables do carry `uuid_person`).
 - There is **no longer** a published `agent_capability` table — its logic is folded into `agent`. For per-type detail, query the raw source `datalake_ebdb_clean.capability`; for `business_context` (RENT/SALE), join `demand_visit_management_capability_settings` on `id_capability` — that column does not exist on `capability` itself.
 - `fact_agent_daily` event-log intervals are keyed on `ts_occurred` (when the event happened), not `ts_created` (row insert time).
 
@@ -72,6 +74,24 @@ Grain: **one row per `id_agent`** (canonical identity). `id_agent` is the cross-
 
 **`prospect_step_validation`** — one row per actionable (prospect, step) state, full reload. Unions four workflows: CRECI validation queue (`step_name = 'CRECI_VALIDATION'`), contract blocked (`CONTRACT_SIGNATURE`), sign-up blocked (`SIGNUP_PROFILE_CONFLICT`), EN association (`EN_ASSOCIATION`). Columns: `id_prospect_agent`, `id_user`, `id_negotiation_executive_user`, `uuid_person`, `business_context_applied`, `agent_status`, `step_name`, `step_status`, `status_reason`, `ts_created`.
 
+## `dw_agent.dim_agent`
+
+Grain: **one current row per accredited agent**. Current-state projection of identity, capabilities, partnership flags, TQA/TQC referral flags, and accreditation lifecycle timestamps. **Pipeline:** `dw_agent_accreditation` DAG.
+
+| Topic | Fields |
+|-------|--------|
+| Keys | `sk_person`, `sk_agent`, `sk_prospect_agent`, `sk_agent_data`, `sk_partner`, `sk_partner_agent`, `sk_user`, `sk_broker`, `sk_affiliate`, `sk_photographer_data`, `sk_company` |
+| UUIDs | `uuid_agent` only — **no** `uuid_person` or `uuid_company` |
+| CRECI | `creci`, `creci_uf` |
+| Classification | `profile`, `is_1p_partnership`, `is_3p_partnership` — **no** `affiliation_type`, `status`, or `company_product_name` |
+| State | `is_agent_active` (not `status`), `is_photographer_active`, `is_affiliate_active`, `is_reactivated` |
+| Capability flags | `is_passive_lead_receiver`, `is_allow_supply_acquisition`, `is_allow_demand_visit`, `is_allow_demand_sale`, `is_allow_demand_rent`, `is_allow_demand_acquisition`, `is_allow_supply_conversion`, `is_allow_supply_representative`, `is_allow_supply_midia_management`, `is_allow_supply_integrity_assurance`, `is_allow_negotiation` |
+| TQA / TQC | `has_rent_lead_referral`, `has_rent_lead_referral_confirmed`, `has_sale_lead_referral`, `has_sale_lead_referral_confirmed` |
+| Product deactivation | `deactivation_reason`, `deactivation_sub_reason` |
+| Lifecycle timing | `days_in_current_status`, `ts_last_status_changed`, `ts_accreditation`, `ts_first_activation`, `ts_deaccreditation`, `ts_legacy_agent_migrated`, `ts_agent_reenrollment`, `ts_created`, `ts_updated` |
+
+**Schema traps vs enrich `agent`:** do not `SELECT uuid_person` or `status` from this table. Filter currently accredited agents with `is_agent_active = TRUE`. Person UUID lives on `dw_public.dim_person` (join `sk_person`), on enrich `datalake_agent_accreditation.agent`, and on `dw_agent.fact_agent_daily`. Hub allocation joins `sk_user` to `member_hub_allocation.id_main_user` — see [`agents_profile.md`](agents_profile.md).
+
 ## `dw_agent.fact_agent_daily`
 
 Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`. Activation and capability flags are reconstructed from the agent event-log history (point-in-time accurate per day). This is the reliable, current source for per-day agent state.
@@ -86,7 +106,7 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 | Capability flags (business function) | `is_allow_supply_acquisition`, `is_allow_supply_conversion`, `is_allow_demand_visit`, `is_allow_demand_acquisition`, `is_allow_negotiation`, `is_allow_demand_sale`, `is_allow_demand_rent` |
 | Timing | `dt_ref`, `days_in_current_status`, `ts_last_status_changed`, `ts_created` |
 
-> Siblings in `dw_agent`: `dim_agent`, `dim_prospect_agent`, and `fact_visit_agent_performance` (⚠ **STALE since 2025-09-21** — historical only, no confirmed replacement as of 2026-06).
+> Siblings in `dw_agent`: `dim_agent` (current state, documented above), `dim_prospect_agent`, and `fact_visit_agent_performance` (⚠ **STALE since 2025-09-21** — historical only, no confirmed replacement as of 2026-06). `fact_agent_daily` has `uuid_person` and `affiliation_type`; `dim_agent` does not.
 
 ---
 
@@ -118,11 +138,12 @@ Use [Related Metric Entities](#related-metric-entities) when the question asks f
 
 **Do:**
 
-- Use `datalake_agent_accreditation.agent` for canonical `id_agent` identity; for **daily state** prefer `dw_agent.fact_agent_daily`.
+- Use `datalake_agent_accreditation.agent` for canonical `id_agent` identity; for **current DW state** use `dw_agent.dim_agent`; for **daily state** prefer `dw_agent.fact_agent_daily`.
 - Translate legacy jargon ("Demand Agent", "CIQ-Only", "Independent Agent") to capability filters, not literal column values.
 
 **Don't:**
 
+- Select `uuid_person`, `status`, `affiliation_type`, or `uuid_company` from `dw_agent.dim_agent` — those columns are not on that table; use `is_agent_active`, `sk_person` / `sk_user`, and the enrich or daily tables when those fields are required.
 - Use `dw_agent.fact_visit_agent_performance` or any `datalake_visit_agent_performance.*` for current data — pipeline stopped **2025-09-21**; historical only.
 - Mix `sk_agent`/`id_agent` (new) with `sk_agent_data`/`id_agent_data` (legacy) — see the identity-migration warning in [`agents.md`](agents.md).
 - Expect a published `datalake_agent_accreditation.agent_capability` table — it was folded into `agent`; query raw `datalake_ebdb_clean.capability` for per-type detail.
