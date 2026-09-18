@@ -2,6 +2,7 @@ SELECT
     id,
     client_side_id AS id_client_side,
     original_lead_id AS id_original_lead,
+    lead_intent_id AS id_lead_intent,
     registrar,
     owners,
     details,

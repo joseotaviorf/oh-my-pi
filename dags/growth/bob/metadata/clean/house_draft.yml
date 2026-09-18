@@ -16,6 +16,10 @@ columns:
     lineage:
       - datalake_bob_raw.house_draft.original_lead_id
     description: Acquisition lead identifier linked when the draft was initiated. Populated on ~55% of drafts; joins to datalake_ebdb_clean.lead.id for ~99.4% of non-null values.
+  id_lead_intent:
+    lineage:
+      - datalake_bob_raw.house_draft.lead_intent_id
+    description: Cross-system reference to the Rene Descartes capture-form intent (`datalake_rene_descartes_clean.lead_intent.id_intent`, source `lead_intent.id_intent`). Set on S2S draft create for lead-management flows (SAL-639); nullable when the draft has no intent linkage. No FK in Bob.
   registrar:
     lineage:
       - datalake_bob_raw.house_draft.registrar

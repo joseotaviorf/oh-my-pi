@@ -16,6 +16,10 @@ columns:
     lineage:
       - datalake_bob_raw.house_draft_aud.original_lead_id
     description: Original lead identifier value in this revision.
+  id_lead_intent:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.lead_intent_id
+    description: Rene Descartes lead intent identifier (`lead_intent.id_intent`) value in this revision.
   rev:
     lineage:
       - datalake_bob_raw.house_draft_aud.rev
@@ -93,6 +97,10 @@ columns:
     lineage:
       - datalake_bob_raw.house_draft_aud.original_lead_id_mod
     description: Audit flag indicating whether original lead identifier changed in this revision (Hibernate Envers _mod column).
+  mod_id_lead_intent:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.lead_intent_id_mod
+    description: Audit flag indicating whether lead intent identifier changed in this revision (Hibernate Envers _mod column).
   mod_registrar:
     lineage:
       - datalake_bob_raw.house_draft_aud.registrar_mod
