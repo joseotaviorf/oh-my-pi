@@ -1,0 +1,74 @@
+database_name: datalake_rene_descartes_clean
+table_name: opportunity_event
+description: |
+  Append-only event log of supply publication opportunities in Rene Descartes. Replaces the former
+  current-state opportunity table: each row is one lifecycle event for a commercial opportunity
+  (id_opportunity), not a snapshot of the latest funnel stage. Grain is one row per event
+  (id_opportunity_event). A single customer trigger (for example a lead_intent) typically opens
+  two opportunities — one for_rent and one for_sale — sharing trigger and entity keys but with
+  distinct id_opportunity values. Reconstruct the journey by ordering events of the same
+  id_opportunity by ts_created. Sourced from PostgreSQL CDC of public.opportunity_event.
+  Consumed by Growth supply funnel analytics that previously read the opportunity entity.
+domain: Growth
+owner: gabriel.salla@quintoandar.com
+columns:
+  id_opportunity_event:
+    description: Sequential primary key of this opportunity event in Rene Descartes. Uniquely identifies one lifecycle row; do not treat it as the stable opportunity identity (use id_opportunity).
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.id
+  id_opportunity:
+    description: Stable UUID of the commercial opportunity this event belongs to. Remains constant as the same opportunity advances through funnel_step; use this key to rebuild the timeline that the old opportunity table represented as successive rows.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.opportunity_id
+  id_contact:
+    description: Foreign key to the Supply customer in contact_info (contact_info.id_contact). The owner whose publication opportunity this event belongs to.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.contact_id
+  id_trigger_event:
+    description: UUID of the upstream event that caused this opportunity event to be written (for example the lead_intent_created occurrence). Shared across the for_rent and for_sale opportunity rows opened from the same trigger.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.trigger_event_id
+  id_entity:
+    description: Identifier of the domain entity named in entity, stored as text (for example the lead_intent id). Interpret together with entity; it is not a single-table foreign key.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.entity_id
+  product:
+    description: Commercial product of this opportunity. A contact usually has one opportunity per product after the same trigger.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.product
+  conversion_status:
+    description: Conversion state of the opportunity immediately after this event was applied (sample traffic uses open for newly created opportunities).
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.conversion_status
+  funnel_step:
+    description: Funnel stage of the opportunity after this event. Early events start at contact_qualification; later stages follow the publication journey (property qualification, photos, listing) that used to live on the opportunity snapshot.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.funnel_step
+  event_type:
+    description: Kind of opportunity lifecycle event recorded on this row (source column type). Distinguishes creation from later funnel transitions; sample traffic uses lead_intent_created when the opportunity is opened from a contact-capture intent.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.type
+  trigger_event:
+    description: Name of the upstream trigger that produced this row, aligned with id_trigger_event (for example lead_intent_created).
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.trigger_event
+  entity:
+    description: Domain object type that id_entity refers to (for example lead_intent). Use with id_entity to join the producing record.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.entity
+  ts_created:
+    description: UTC timestamp when this opportunity event was persisted in Rene Descartes. Drives Hive partitions; order by this column within id_opportunity to rebuild the funnel timeline.
+    lineage:
+      - datalake_rene_descartes_raw.opportunity_event.ts_created
+  op_cdc:
+    description: Change operation emitted by the PostgreSQL CDC framework for this opportunity event (create, update, or delete).
+  ts_cdc_transaction:
+    description: UTC timestamp when the CDC framework captured this opportunity-event change transaction.
+  ts_database_transaction:
+    description: UTC timestamp when the source PostgreSQL database committed this opportunity-event change.
+  year:
+    description: Calendar year extracted from ts_created, used as a Hive partition for incremental reads.
+  month:
+    description: Calendar month extracted from ts_created, used as a Hive partition alongside year and day.
+  day:
+    description: Calendar day extracted from ts_created, used as a Hive partition alongside year and month.
