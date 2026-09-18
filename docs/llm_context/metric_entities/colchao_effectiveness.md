@@ -54,27 +54,49 @@ Apply on `sandbox.t2_fact_overdue_portfolio_timeline`:
 
 ```sql
 actionable_regularized_portfolio = TRUE
+AND status_evic = 'EM COBRANCA'
 ```
 
-**Note**: the example production query this entity was built from also added `status_evic = 'EM COBRANCA'` (excluding eviction-stage cases). Confirmed by the requester to be **specific to that particular chart, not a mandatory part of the official canonical filter** — treat `status_evic = 'EM COBRANCA'` as an optional refinement, not baked into this entity's core definition, unless told otherwise.
+**`status_evic = 'EM COBRANCA'` is the confirmed, mandatory, official exclusion — verified against the live production Superset golden query for this exact metric (chart slice 63832, "Efetividade de Acordos"), shared directly by the requester on 2026-09-18.** This supersedes an earlier, less precise fix in this same section that used `portfolio NOT LIKE '%eviction%'` instead: that condition is a *different* field (the invoice's `portfolio` bucket classification) and is close to, but not identical to, `status_evic` (a small set of invoices carry `status_evic = 'EVICTION'` while still classified outside the `m) evictions` portfolio bucket, and vice versa). Both catch the same broad problem — invoices in active eviction proceedings pulling the rate down — but only `status_evic = 'EM COBRANCA'` matches the real production chart exactly; the numeric difference between the two is small (≈0.1–0.3 percentage points in the months tested) but `status_evic` is the one to use going forward.
+
+**Without either exclusion, `actionable_regularized_portfolio = TRUE` alone is materially wrong** — invoices under active eviction proceedings blend into the numerator/denominator with a much lower on-time recovery rate. Confirmed magnitude for `contract_status = 'Active'`, using the correct `status_evic` filter: 2026-06 is 59.79% (vs. 55.72% with no exclusion at all); 2026-07 is 75.97% (vs. 54.99%) — large enough to flip the conclusion from *below* target to *above* target.
 
 ### Nuances
 
 - **Business-day alignment**: apply `is_last_business_days = TRUE` when comparing by `business_day` across months, same convention as the sibling entities on this table.
 - **Rolling window convention**: the example production queries scope to a trailing ~12 month window — a performance convention, adjustable per analysis.
 - **Mutually exclusive with Net Recovery**: a given invoice is either in the directly-collectable segment (Net Recovery) or the regularized/negotiated segment (this entity), never both at the same `dt_reference` — `collectable_delinquent_portfolio` and `actionable_regularized_portfolio` do not overlap.
+- **Performance vs. Target / OKR — confirmed.** `sandbox.planning_performance_fact_daily_targets` carries `active_effectiveness` / `ended_effectiveness` (decimal rate targets), joined by `dt_reference` — **confirmed by the requester as the official KPI target for Colchão Effectiveness.** These two columns are cut by `contract_status` (`Active` → `active_effectiveness`, `Finished` → `ended_effectiveness`), not by `actionable_regularized_portfolio` — do not ask the requester for the target value, derive it via this join. See the Golden Query below.
+- **Δ% vs. Target — confirmed formula, same convention as Net Recovery (`net_recovery_context.md`), not exclusive to that entity.** `Δ% Target = (result / target) - 1` — a **relative** difference (e.g., result 10% above target renders as `+10%`, not `+10 p.p.`). Do not confuse with the absolute percentage-point gap (`result - target`). The same formula applies to `Δ% M-1`, `Δ% YoY`, `Δ% BM 12M`, and the rolling-average `Δ% Méd. 3M/6M/12M` variants seen in the production reference chart (slice 63832) — each divides the current rate by the comparison rate (or trailing average) and subtracts 1.
+
+**Worked example — MTD locked to the same business day across months (2026-06 to 2026-09), confirmed live in Trino on 2026-09-18:**
+
+| Month | `contract_status` | % Colchão Effectiveness (MTD) | Target | Δ% Target |
+|---|---|---|---|---|
+| 2026-06 | Active | 40.40% | 41.46% | -2.56% |
+| 2026-06 | Finished | 40.22% | 40.55% | -0.81% |
+| 2026-07 | Active | 37.85% | 38.50% | -1.69% |
+| 2026-07 | Finished | 37.27% | 38.54% | -3.29% |
+| 2026-08 | Active | 40.48% | 31.76% | **+27.46%** |
+| 2026-08 | Finished | 40.95% | 38.95% | +5.14% |
+| 2026-09 (MTD) | Active | 42.38% | 39.07% | +8.47% |
+| 2026-09 (MTD) | Finished | 39.48% | 38.84% | +1.65% |
+
+All four months are locked to the same business-day ordinal (`business_day = mtd`), so they are directly comparable month-to-month. September is a partial (in-progress) month, not a closing snapshot.
 
 ## Dos and Don'ts
 
 **Do:**
-- Apply `actionable_regularized_portfolio = TRUE` as the canonical filter.
+- Apply `actionable_regularized_portfolio = TRUE` **and** `status_evic = 'EM COBRANCA'` as the canonical filter — both are mandatory, confirmed against the live production chart (slice 63832).
 - Apply `is_last_business_days = TRUE` when comparing by `business_day` across months.
 - Keep this entity separate from Net Recovery (different, complementary population) and from the Collections Actions Funnel's "% Acordo" (a conversion rate, not a currency amount).
 
 **Don't:**
 - Don't sum `due_amount` / `on_time_negotiation_installment_recovery` across multiple `dt_reference` values, or group by `business_day`, without first collapsing the daily fan-out.
-- Don't assume `status_evic = 'EM COBRANCA'` is a mandatory part of the canonical filter — it was chart-specific.
+- Don't compute this metric with only `actionable_regularized_portfolio = TRUE` and no `status_evic` filter — it silently blends in eviction-stage invoices and can materially understate the result (confirmed magnitude above).
+- Don't substitute `portfolio NOT LIKE '%eviction%'` for `status_evic = 'EM COBRANCA'` — they are close but not identical; only `status_evic` matches the official production chart exactly.
 - Don't assume the older and newer "Colchao Effectiveness" Superset charts use the same formula — confirm which version is current before citing a number from either.
+- Don't ask the requester for the target value when a target/OKR comparison is requested — join `sandbox.planning_performance_fact_daily_targets` via `contract_status` (confirmed mapping above).
 
 ## Golden Queries
 
@@ -90,7 +112,7 @@ FROM (
     SELECT * FROM sandbox.t2_fact_overdue_portfolio_timeline WHERE is_last_business_days = TRUE
 ) AS virtual_table
 WHERE actionable_regularized_portfolio = TRUE
-  AND status_evic IN ('EM COBRANCA') -- chart-specific refinement, not confirmed mandatory — see Canonical Filter note
+  AND status_evic = 'EM COBRANCA' -- mandatory, see Canonical Filter note
   AND date_trunc('month', dt_reference) BETWEEN date_add('month', -12, date_trunc('month', current_date)) AND date_add('day', -1, current_date)
 GROUP BY business_day, dt_month_end
 ORDER BY dt_month_end DESC
@@ -107,15 +129,51 @@ FROM (
     SELECT * FROM sandbox.t2_fact_overdue_portfolio_timeline WHERE is_last_business_days = TRUE
 ) AS virtual_table
 WHERE actionable_regularized_portfolio = TRUE
+  AND status_evic = 'EM COBRANCA' -- mandatory, see Canonical Filter note
   AND date_trunc('month', dt_reference) BETWEEN date_add('month', -12, date_trunc('month', current_date)) AND date_add('day', -1, current_date)
 GROUP BY business_day, dt_month_end
 ORDER BY dt_month_end DESC
+```
+
+**% Colchão Effectiveness vs. Target, by `contract_status`, MTD-locked, trailing 13 months** — run this when a target/OKR comparison is requested; do not ask the requester for the target value.
+
+```sql
+WITH colchao_data AS (
+    SELECT
+        dt_reference, dt_month_start, dt_month_end, business_day, mtd,
+        contract_status,
+        SUM(on_time_negotiation_installment_recovery) AS on_time_negotiation_installment_recovery,
+        SUM(due_amount) AS due_amount
+    FROM sandbox.t2_fact_overdue_portfolio_timeline
+    WHERE actionable_regularized_portfolio = TRUE
+      AND status_evic = 'EM COBRANCA' -- mandatory, see Canonical Filter note
+      AND is_last_business_days = TRUE
+    GROUP BY 1, 2, 3, 4, 5, 6
+),
+targets_data AS (
+    SELECT dt_reference, active_effectiveness, ended_effectiveness
+    FROM sandbox.planning_performance_fact_daily_targets
+)
+SELECT
+    c.contract_status,
+    date_trunc('month', c.dt_month_end) AS mes,
+    c.on_time_negotiation_installment_recovery * 1.0000 / c.due_amount AS pct_colchao_effectiveness,
+    CASE c.contract_status
+        WHEN 'Active' THEN t.active_effectiveness
+        WHEN 'Finished' THEN t.ended_effectiveness
+    END AS target
+FROM colchao_data AS c
+LEFT JOIN targets_data AS t ON c.dt_reference = t.dt_reference
+WHERE c.business_day = c.mtd
+  AND c.dt_reference >= date_add('month', -13, date_trunc('month', current_date))
+ORDER BY c.contract_status, mes DESC
 ```
 
 ## Superset Golden Assets
 
 Confirmed live via DataHub (chart-to-dashboard containment was not registered for these charts — no dashboard link available):
 
+- **"Efetividade de Acordos" reference chart** — slice **63832** — shared directly by the requester on 2026-09-18 as the source of the confirmed Canonical Filter (`actionable_regularized_portfolio = TRUE AND status_evic = 'EM COBRANCA'`) and the `effectiveness_target` join, grouped by `contract_status`. Treat this as the primary golden query for this entity going forward.
 - **Colchao Contracts QA** — slice 30775 — `urn:li:chart:(superset,chart.30775)`
 - **% Collection Colchao Effectiveness QA MTD** (older version) — slice 6907 — `urn:li:chart:(superset,chart.6907)`
 - **% Collection Colchao Effectiveness QA MOM** (older version) — slice 7042 — `urn:li:chart:(superset,chart.7042)`
