@@ -1,13 +1,12 @@
 cluster:
-  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
-    master_node_type_id: r6g.2xlarge
     core_nodes:
-      target_on_demand: 5
-      instance_types: # 128 Gb, 16 Cores
-        - r6g.4xlarge
-        - r7g.4xlarge
-        - r8g.4xlarge
+      target_on_demand: 7
+      instance_types: # 64 Gb, 8 Cores
+        - r6g.2xlarge
+        - r7g.2xlarge
+        - r8g.2xlarge
     spark_conf:
       spark.metrics.namespace: data_products.conversational_xp
       spark.executor.memory: 9g
@@ -15,7 +14,7 @@ cluster:
       spark.executor.cores: '2'
       spark.driver.memory: 16g # 3 Concurrent Jobs / Airflow tasks
       spark.driver.memoryOverhead: 4g
-      spark.dynamicAllocation.maxExecutors: '42'
+      spark.dynamicAllocation.maxExecutors: '28'
       spark.sql.shuffle.partitions: '768'
       spark.memory.fraction: '0.8'
       spark.memory.storageFraction: '0.3'
