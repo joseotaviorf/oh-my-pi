@@ -1,0 +1,23 @@
+dag:
+  name: enrich_luigijr_photo_job_house_aggregated
+  owner: Ops Growth
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:alexandre.gimenez
+  - luigi-engine:trino
+  schedule_interval: 30 9 * * *
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: ops_growth
+  load_spark_job: load_trino_query
+  spark_job_arguments:
+  - '{environment}'
+  - '{bucket}'
+  - consumption
+  - '{schema}'
+  - '{dag_name}'
+  - '{table_name}'
+  - '{partitions}'
+  - '{load_end_date}'

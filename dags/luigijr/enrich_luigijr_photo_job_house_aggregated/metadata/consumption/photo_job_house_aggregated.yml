@@ -1,0 +1,54 @@
+database_name: ops_growth
+table_name: photo_job_house_aggregated
+owner: alexandre.gimenez@quintoandar.com.br
+domain: Data Ops & Governance
+description: Table `photo_job_house_aggregated` materialized on a schedule by Luigi from a user-provided SQL query (Ops Growth domain).
+columns:
+  imovel_id:
+    description: Column `imovel_id` produced by the scheduled materialization query.
+  id_first_photo_job:
+    description: Column `id_first_photo_job` produced by the scheduled materialization query.
+  id_last_photo_job:
+    description: Column `id_last_photo_job` produced by the scheduled materialization query.
+  dt_first_job_created:
+    description: Column `dt_first_job_created` produced by the scheduled materialization query.
+  opportunity_channel:
+    description: Column `opportunity_channel` produced by the scheduled materialization query.
+  planning_operation:
+    description: Column `planning_operation` produced by the scheduled materialization query.
+  has_first_listing:
+    description: Column `has_first_listing` produced by the scheduled materialization query.
+  dt_first_listing:
+    description: Column `dt_first_listing` produced by the scheduled materialization query.
+  creation_origin_first_schedule:
+    description: Column `creation_origin_first_schedule` produced by the scheduled materialization query.
+  creation_origin_last_schedule:
+    description: Column `creation_origin_last_schedule` produced by the scheduled materialization query.
+  qty_schedules:
+    description: Column `qty_schedules` produced by the scheduled materialization query.
+  has_successful_job:
+    description: Column `has_successful_job` produced by the scheduled materialization query.
+  dt_first_successful_job:
+    description: Column `dt_first_successful_job` produced by the scheduled materialization query.
+  creation_origin_converted_listing:
+    description: Column `creation_origin_converted_listing` produced by the scheduled materialization query.
+  status_last_photo_job:
+    description: Column `status_last_photo_job` produced by the scheduled materialization query.
+  min_days_between_reschedules:
+    description: Column `min_days_between_reschedules` produced by the scheduled materialization query.
+  max_days_between_reschedules:
+    description: Column `max_days_between_reschedules` produced by the scheduled materialization query.
+  leadtime_days_first_schedule_to_conversion:
+    description: Column `leadtime_days_first_schedule_to_conversion` produced by the scheduled materialization query.
+  qty_cancel_by_owner:
+    description: Column `qty_cancel_by_owner` produced by the scheduled materialization query.
+  qty_cancel_by_photographer:
+    description: Column `qty_cancel_by_photographer` produced by the scheduled materialization query.
+  most_frequent_cancel_reason:
+    description: Column `most_frequent_cancel_reason` produced by the scheduled materialization query.
+  distinct_cancel_reason_count:
+    description: Column `distinct_cancel_reason_count` produced by the scheduled materialization query.
+  most_frequent_photographer_problem_reason:
+    description: Column `most_frequent_photographer_problem_reason` produced by the scheduled materialization query.
+  most_frequent_cancel_user_type:
+    description: Column `most_frequent_cancel_user_type` produced by the scheduled materialization query.
