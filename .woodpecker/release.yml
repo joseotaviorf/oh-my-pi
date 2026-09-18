@@ -25,7 +25,7 @@
 # skipped deps cascade-skip downstream steps):
 #
 #   Wheels (sequential): setup → make-package-python → prepare-release-* → export-releases-to-s3-*
-#   Init scripts (independent): plugins/s3 reads shell files from clone — no `depends_on`
+#   Init scripts (independent): 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3 reads shell files from clone — no `depends_on`
 #   DAG bag (hybrid): setup → create-dag-files (domain bundles) → upload-dags-*;
 #            prepare-clear-bietlejuice → clear-bietlejuice-s3-*; both → astronomer-deploy-dags-*
 #   Image: get-astro-credentials-{env} → deploy-astro-image-{env} (no trailing --dags)
@@ -71,7 +71,7 @@ when:
 
 clone:
   - name: clone
-    image: woodpeckerci/plugin-git
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/woodpeckerci/plugin-git:2.10.0
     settings:
       partial: false # We need to clone the entire history to find the changed files
 
@@ -200,7 +200,7 @@ steps:
     depends_on: [make-package-python]
 
   export-releases-to-s3-prod:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: dist/*.whl
@@ -215,7 +215,7 @@ steps:
     depends_on: [prepare-release-prod]
 
   export-core-init-scripts-to-s3-prod:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/*init_script.sh
@@ -234,7 +234,7 @@ steps:
         on_empty: false
 
   export-emr-custom-libraries-to-s3-prod:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/emr_custom_libraries.py
@@ -248,7 +248,7 @@ steps:
       path: *core_init_scripts_path
 
   export-sedona-init-script-to-s3-prod:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/sedona/sedona-init.sh
@@ -265,7 +265,7 @@ steps:
         on_empty: false
 
   export-wonka-init-scripts-to-s3-prod:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/wonka/*.sh
@@ -284,7 +284,7 @@ steps:
         on_empty: false
 
   export-anonymization-init-script-to-s3-prod:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/init_script_anonymization.sh
@@ -595,7 +595,7 @@ steps:
     depends_on: [make-package-python]
 
   export-releases-to-s3-forno:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: dist/*.whl
@@ -610,7 +610,7 @@ steps:
     depends_on: [prepare-release-forno]
 
   export-core-init-scripts-to-s3-forno:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/*init_script.sh
@@ -624,7 +624,7 @@ steps:
       path: *core_init_scripts_path
 
   export-emr-custom-libraries-to-s3-forno:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/emr_custom_libraries.py
@@ -638,7 +638,7 @@ steps:
       path: *core_init_scripts_path
 
   export-sedona-init-script-to-s3-forno:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/sedona/sedona-init.sh
@@ -652,7 +652,7 @@ steps:
       path: *sedona_init_script_path
 
   export-wonka-init-scripts-to-s3-forno:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/wonka/*.sh
@@ -666,7 +666,7 @@ steps:
       path: *wonka_init_scripts_path
 
   export-anonymization-init-script-to-s3-forno:
-    image: plugins/s3:1.4.0
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/third-party/plugins/s3:1.8.3
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: packages/bietlejuice-compiler/scripts/init_script_anonymization.sh
