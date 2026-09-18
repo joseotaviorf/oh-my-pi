@@ -1,0 +1,12 @@
+dag:
+  name: enrich_luigijr_recon_for_rent_corretagem_postergada
+  owner: Ops Fintech
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:thais.ichihara
+  schedule_interval: 0 8 * * *
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: ops_fintech
