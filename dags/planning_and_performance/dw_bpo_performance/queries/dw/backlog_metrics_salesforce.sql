@@ -172,7 +172,7 @@ first_reply_final as (
         dt_first_open,
         ts_first_reply,
         replies,
-        SUM(GREATEST(0, minutes_calc)) AS minutes_first_reply_time_business,
+        CAST(SUM(GREATEST(0, minutes_calc)) AS INT) AS minutes_first_reply_time_business,
         (CAST(ts_first_reply AS LONG) - CAST(ts_created AS LONG)) / 60.0 AS minutes_first_reply_time_calendar,
         SUM(GREATEST(0, minutes_calc_open)) AS minutes_first_reply_open_time_business,
         (CAST(ts_first_reply AS LONG) - CAST(dt_first_open AS LONG)) / 60.0 AS minutes_first_reply_open_time_calendar
@@ -489,15 +489,36 @@ exploded_backlog AS (
     FROM cases_perspective
 ),
 
-days_off AS (
+-- EMR-safe replacement for the BETWEEN range join: exploded_backlog already
+-- holds every day in [DATE(ts_created), dt_interval], so flagging each
+-- non-working day and taking a running SUM equals the old range count.
+marked_backlog AS (
     SELECT
         eb.case_number,
         eb.dt_interval,
-        COUNT(*) AS days_off
+        MAX(
+            CASE
+                WHEN nw.dt_non_working IS NOT NULL THEN 1
+                ELSE 0
+            END
+        ) AS is_non_working
     FROM exploded_backlog AS eb
-    INNER JOIN weekends_and_holidays AS nw
-        ON nw.dt_non_working BETWEEN CAST(eb.ts_created AS DATE) AND eb.dt_interval
-    GROUP BY eb.case_number, eb.dt_interval
+    LEFT JOIN weekends_and_holidays AS nw
+        ON nw.dt_non_working = eb.dt_interval
+    GROUP BY
+        eb.case_number,
+        eb.dt_interval
+),
+
+days_off AS (
+    SELECT
+        case_number,
+        dt_interval,
+        SUM(is_non_working) OVER (
+            PARTITION BY case_number
+            ORDER BY dt_interval
+        ) AS days_off
+    FROM marked_backlog
 )
 
 SELECT DISTINCT
