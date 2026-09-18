@@ -3,6 +3,8 @@ bietlejuice.alias_classifieds:
   - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.benvi_manager_clean:
+  - bietlejuice.benvi_manager:load-clean-lake-mirror
 bietlejuice.blip_messages:
   - bietlejuice.consorcio:load-clean-contact-property:first-run-of-day
   - bietlejuice.consorcio:load-clean-lead-external-data:first-run-of-day

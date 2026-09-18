@@ -1,11 +1,16 @@
 dag:
   name: benvi_manager
   schedule_start_date: 2026, 9, 14
-  schedule_interval: 0 8,12,21 * * *
+  schedule_interval: null
+  catchup: false
   owner: Data ForRent
   documentation:
     dag_purpose: |
       CDC of benvi-manager Postgres table integration_superlogica.lake_mirror into the lake.
+      Not clock-scheduled. Airflow REST (or UI Trigger DAG) starts a run after a
+      benvi-manager import SUCCEEDED or PARTIAL. Conf may be empty or include
+      import_run_id. To emit datasets and start bietlejuice.benvi_manager_clean,
+      pass run_type impact_downstream_dependents (UI default Test Run does not).
       Clean of this DAG is the lake_mirror dump. Superlogica projections live in
       bietlejuice.benvi_manager_clean.
 workflow:

@@ -1,3 +1,12 @@
+bietlejuice.benvi_manager_clean:
+  # Clean SQL reads datalake_benvi_manager_raw.lake_mirror. That raw table has no
+  # metadata file, so the query scanner cannot map it to a producer. Depend on
+  # the CDC DAG's load-clean-lake-mirror (dump after raw). The dependency
+  # validator only accepts tables that exist as query/metadata in the producer
+  # DAG. Use the plain URI so every import REST trigger can start projections,
+  # not only the first run of the day.
+  add:
+    - bietlejuice.benvi_manager:load-clean-lake-mirror
 bietlejuice.jira_open_incidents_report:
   # Spark job SQL is not scanned by the query-file dependency generator.
   add:
