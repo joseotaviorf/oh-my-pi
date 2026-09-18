@@ -1,0 +1,29 @@
+---
+dag:
+  name: transformation_hefesto_test
+  schedule_interval: null
+  schedule_start_date: 2026, 9, 11
+  owner: Data Governance
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Throwaway pilot copy of the spoc_offboarding_contracts table from
+      dags/support_and_service/enrich_hefesto, used to exercise the new
+      `transformation` layer (grade curated) without touching production.
+
+      Writes transformation_hefesto_test_curated.spoc_offboarding_contracts under
+      s3a://{bucket}/transformation/hefesto_test/curated/, colliding with
+      datalake_hefesto on neither database name nor S3 prefix. The query is a
+      byte-identical copy of the production enrich one (still reads
+      datalake_hefesto_clean), so hop-1 verification can diff this output against
+      datalake_hefesto and expect no difference.
+
+      Manual trigger only. Delete this DAG together with the pilot exclusion
+      constant in bietlejuice.governance.layer_taxonomy_pilot once the taxonomy
+      pilot is verified.
+workflow:
+  type: query_delta
+  layer: transformation
+  transformation_grade: curated
+  custom_schema: hefesto_test
+  has_hive_sync: true

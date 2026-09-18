@@ -1,0 +1,55 @@
+---
+dag:
+  name: consumption_offboarding_test
+  schedule_interval: null
+  schedule_start_date: 2026, 9, 11
+  owner: Data Governance
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Throwaway pilot copy of dags/for_rent/dw_offboarding, used to exercise the
+      `consumption` layer sitting on top of the new `transformation` layer without
+      touching production.
+
+      Writes the prefix-free database offboarding_test under
+      s3a://{bucket}/consumption/offboarding_test/, colliding with dw_offboarding on
+      neither database name nor S3 prefix.
+
+      The three queries read the pilot transformation curated tables
+      (transformation_terminator_test_curated, transformation_offboarding_test_curated,
+      transformation_hefesto_test_curated) rather than production enrich. That is the
+      point of the pilot: source-layer policy evaluates consumption ← transformation.
+      The remaining sources of fact_house_listing_terminations
+      (datalake_ebdb_contract.contract and datalake_ebdb_listing.house_listing) stay on
+      production and classify as enrich, which consumption already permits.
+
+      Trigger this only after the three transformation DAGs have run — they are chained
+      but carry no cross-DAG sensor, since pilot DAGs are excluded from
+      dependencies.yaml.
+
+      Trino registration is on for all three tables so TARS can query the complete
+      pilot slice. This also exercises the prefix-free consumption schema in the
+      Trino catalog.
+
+      Manual trigger only. Delete this DAG together with the pilot exclusion constant
+      in bietlejuice.governance.layer_taxonomy_pilot once the taxonomy pilot is
+      verified, dropping the Trino tables and schema first so the catalog is never
+      left holding a dangling reference.
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: offboarding_test
+  has_hive_sync: true
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    dim_termination:
+      z_order_by: [sk_termination]
+      merge_on: [sk_termination]
+    fact_terminations:
+      z_order_by: [sk_termination]
+      merge_on: [sk_termination]
+    fact_house_listing_terminations:
+      z_order_by: [sk_termination]
+      extraction_type: full
+      partitions: []

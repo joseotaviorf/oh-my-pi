@@ -1,0 +1,87 @@
+database_name: transformation_offboarding_test_curated
+table_name: mediations
+description: >-
+  Throwaway pilot copy of datalake_offboarding.mediations. Not byte-identical to production:
+  it reads transformation_terminator_test_curated.termination so source-layer policy evaluates
+  a transformation-reads-transformation edge. Not a production dataset — consumers should
+  read datalake_offboarding.mediations. Deleted at pilot teardown. Original description follows.
+  Enriched table that links completed terminations to their mediation tickets, cases, or SPOC tasks.
+  Combines four sources with platform priority aligned to Offboarding Perspective operations:
+  Salesforce Cases (primary), Salesforce Tasks for SPOC contact negotiation (secondary), and Zendesk
+  via Terminator or legacy direct tickets (fallback only). Salesforce cases assigned to Squad 7
+  (evictions) are excluded.   One mediation record is selected per contract according to that priority,
+  then joined to DONE terminations by contract. Salesforce Cases/Tasks match on
+  contract only (termination IDs are not populated on those sources); Zendesk
+  also matches on termination ID when available.
+domain: Data Ops & Governance
+owner: gustavo.alencar@quintoandar.com.br
+columns:
+  id_termination:
+    lineage:
+      - transformation_terminator_test_curated.termination.id_termination
+    description: Unique identifier for the termination.
+  id_contract:
+    lineage:
+      - transformation_terminator_test_curated.termination.id_contract
+    description: Contract identifier associated with the termination.
+  id_mediation_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+      - datalake_salesforce_clean.cases.case_number
+      - datalake_salesforce_clean.task.id_task
+    description: >-
+      Mediation reference from the winning source after platform priority (Salesforce Case, then
+      Salesforce SPOC Task, then Zendesk). Zendesk ticket ID for Zendesk-sourced records;
+      Salesforce case_number for Cases; Salesforce id_task for SPOC negotiation tasks.
+  squad:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+      - datalake_salesforce_clean.cases.omni_channel_queue
+    description: >-
+      Squad classification from the winning source: Zendesk ticket tags or Salesforce Case
+      omni-channel queue. NULL when the winning source is a Salesforce SPOC Task (no queue/tags).
+      Squad 7 (evictions) is excluded from Salesforce cases and is not counted in this table.
+  has_mediation_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+      - datalake_salesforce_clean.cases.case_number
+      - datalake_salesforce_clean.task.id_task
+    description: |
+      Flag indicating if a non-eviction mediation ticket, case, or SPOC task exists for the termination
+      after applying platform priority (Salesforce Cases > Salesforce SPOC Tasks > Zendesk).
+      Salesforce cases from Squad 7 (evictions) are not counted. The flag is only populated for
+      terminations that have already reached the DONE status (this query restricts the
+      terminations CTE to status = 'DONE'); it is not marked while the termination is still in
+      progress. Metrics that use this flag must scope the denominator to finished terminations
+      so numerator and denominator stay coherent — e.g. "% of terminations without mediation
+      and with repairs" should consider only terminations that already reached DONE.
+  is_ticket_opened_via_terminator:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+    description: >-
+      Indicates if the winning mediation reference was a Zendesk ticket opened via Terminator.
+      Always FALSE when the winning source is a Salesforce Case or Salesforce SPOC Task.
+  dt_mediation:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_salesforce_clean.cases.ts_created
+      - datalake_salesforce_clean.task.ts_created
+    description: >-
+      Date of mediation creation in BRT from the winning source (Case, SPOC Task, or Zendesk ticket).
+  dt_inspection:
+    lineage:
+      - datalake_inspections.inspection_booking.ts_synced
+      - transformation_terminator_test_curated.termination.ts_termination_request
+    description: Date of inspection (most recent after termination request).
+  ts_termination_request:
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_termination_request
+    description: Timestamp when the termination request was initiated.
+  ts_termination_finished:
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_termination_finished
+    description: Timestamp when the termination process was completed.
+  ts_termination_updated:
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_termination_updated
+    description: Timestamp when the termination was last updated.

@@ -1,0 +1,396 @@
+---
+database_name: transformation_terminator_test_curated
+table_name: termination
+description: |
+  Throwaway pilot copy of datalake_terminator.termination, gathering information from the
+  termination context at the granularity of the requested termination. It exists only to
+  exercise the transformation curated grade end to end; the query is byte-identical to
+  production enrich so hop-1 can diff the two. Not a production dataset — consumers
+  should read datalake_terminator.termination instead. Deleted at pilot teardown.
+domain: Data Ops & Governance
+owner: gustavo.alencar@quintoandar.com.br
+columns:
+  id_termination:
+    description: Unique termination identification key.
+    lineage:
+      - datalake_terminator_clean.termination.id
+  id_contract:
+    description: Contract identification key.
+    lineage:
+      - datalake_terminator_clean.termination.id_contract
+  id_exit_inspection:
+    description: Identification key for the exit inspection (offboarding).
+    lineage:
+      - datalake_terminator_clean.termination.id_exit_inspection
+      - datalake_inspections.inspection_booking.id_external
+  id_house:
+    description: House identification key.
+    lineage:
+      - datalake_ebdb_contract.contract.id_house
+  id_house_listing:
+    description: House listing identification key.
+    lineage:
+      - datalake_ebdb_contract.contract.id_house_listing
+  id_region:
+    description: Region identification key.
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_workflow_assignee:
+    description: Identification key of the user responsible for the workflow.
+    lineage:
+      - datalake_terminator_clean.termination_workflow.id_current_assignee
+  id_zendesk_task:
+    description: Ticket identification key generated in Zendesk.
+    lineage:
+      - datalake_terminator_clean.termination_task.id_external
+  team:
+    description: Name of the team responsible for the termination.
+    lineage:
+      - datalake_terminator_clean.termination.team
+  cancellation_info:
+    description: Data with json structure that indicates detailed information about canceling termination.
+    lineage:
+      - datalake_terminator_clean.termination.cancellation_info
+  category:
+    description: Descriptive information about the termination category.
+    lineage:
+      - datalake_terminator_clean.termination.category
+  requested_by:
+    description: Descriptive information that indicates the type of user who made the termination request.
+    lineage:
+      - datalake_terminator_clean.termination.requested_by
+  source:
+    description: Descriptive information that indicates the source of the termination request.
+    lineage:
+      - datalake_terminator_clean.termination.source
+  status:
+    description: Current termination status.
+    lineage:
+      - datalake_terminator_clean.termination.status
+  feedback:
+    description: Information in json format that indicates the home's output feedback.
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  reason:
+    description: |
+      Primary reason for the termination as extracted from the feedback JSON field
+      (datalake_terminator_clean.termination.feedback). Populated when the tenant
+      or owner provides a reason during the offboarding flow; null when no reason
+      was recorded.
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  rescheduling_history:
+    description: Json type data that indicates the termination rescheduling history.
+    lineage:
+      - datalake_terminator_clean.termination.rescheduling_history
+  workflow_current_step:
+    description: |
+      Current step in the termination workflow at load time (e.g. PENDING,
+      REPAIR_ANALYSIS, CONTESTATION_ANALYSIS, FINISHED). Sourced from
+      datalake_terminator_clean.termination_workflow.current_step; represents
+      the last recorded step for the termination at the moment the pipeline ran.
+    lineage:
+      - datalake_terminator_clean.termination_workflow.current_step
+  fee_negotiation_status:
+    description: |
+      Status of the early termination fee negotiation at load time (e.g. CONFIRMED,
+      PENDING, CANCELED). CONFIRMED indicates the negotiated amount is settled and
+      used as the final fee value; other statuses indicate the negotiation is still
+      in progress or was not finalized. Null when no fee negotiation exists for
+      the termination.
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.status
+  fee_payment_option:
+    description: Option to pay the termination fee.
+    lineage:
+      - datalake_terminator_clean.termination_fee.tenant_payment_method
+  checklist_item:
+    description: Descriptive information that indicates which checklist item the record is in the termination process.
+    lineage:
+      - datalake_terminator_clean.checklist_item.checklist_item
+  decline_person:
+    description: Column indicating who opted-out/declined the relisting.
+    lineage:
+      - datalake_ebdb_contract.contract_declined_relisting.decline_person
+    categories:
+      "DECLINED_BY_PP": The person who declined the relisting was the owner.
+      "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
+      "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
+  task_type:
+    description: Descriptive information that indicates the type of task related to the termination.
+    lineage:
+      - datalake_terminator_clean.termination_task.type
+  responsible_off_manager_email:
+    lineage:
+      - datalake_terminator_clean.termination.responsible_off_manager_email
+    description: Email of SPOC responsible analyst.
+  repair_resolution:
+    description: Classifies type of repair when there is one in the Offboarding process
+    lineage:
+      - datalake_terminator_clean.negotiation.repair_resolution
+  is_spoc:
+    description: Boolean information indicating whether the termination is part of the spoc control group.
+    lineage:
+      - datalake_terminator_clean.termination.is_spoc
+  is_spoc_eligible:
+    description: Boolean information indicating whether the termination is eligible for SPOC.
+    lineage:
+      - datalake_terminator_clean.termination.is_spoc_eligible
+  is_spoc_control_group:
+    description: Boolean information indicating whether the termination is part of the spoc control group.
+    lineage:
+      - datalake_terminator_clean.termination.is_spoc_control_group
+  is_relisting:
+    description: Boolean information that indicates whether the house is already being relisting.
+    lineage:
+      - datalake_terminator_clean.termination.is_relisting
+  has_automatically_closed_task:
+    description: Boolean information that indicates whether the termination task was closed automatically.
+    lineage:
+      - datalake_terminator_clean.termination_workflow.has_automatically_closed_task
+  is_contract_b2b:
+    description: Boolean information that indicates whether the contract is b2b.
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.is_contract_b2b
+  is_before_contract_start:
+    description: Boolean information that indicates whether the termination occurred before the contract began.
+  has_been_rescheduled:
+    description: Boolean information that indicates whether the termination was rescheduled.
+  is_checklist_active:
+    description: Boolean information that indicates if de checklit is active.
+    lineage:
+      - datalake_terminator_clean.checklist_item.is_active
+  is_checklist_done:
+    description: Boolean information that indicates if de checklit is done.
+    lineage:
+      - datalake_terminator_clean.checklist_item.is_done
+  is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_contract.contract_declined_relisting.is_relisting_enabled
+    description: Boolean flag indicating if the house can be relisted.
+  is_early_relisting_enabled:
+    lineage:
+      - datalake_ebdb_contract.contract_declined_relisting.is_early_relisting_enabled
+    description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
+  has_repair_by_tenant_needed:
+    lineage:
+      - datalake_terminator_clean.negotiation.needs_repair_by_tenant
+    description: Boolean flag indicating if needs repair by tenant.
+  is_exit_inspection_opt_out:
+    description: Boolean information that indicates whether the exit inspection is opted out.
+    lineage:
+      - datalake_terminator_clean.inspection_opted_out.is_exit_inspection_opt_out
+  has_early_termination_fee:
+    description: Boolean flag indicating whether an early termination fee applies. True when the resolved fee amount (confirmed negotiated amount or tenant amount) is greater than zero.
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.final_amount
+      - datalake_terminator_clean.termination_fee.tenant_amount
+  is_fee_prior_notice:
+    description: Boolean information that indicates whether the termination fee is prior notice.
+    lineage:
+      - datalake_terminator_clean.termination_fee.is_fee_prior_notice
+  has_automatic_repair_analysis:
+    lineage:
+      - datalake_terminator_clean.termination_characteristics.has_automatic_repair_analysis
+    description: |
+      Boolean flag related to the termination's automatic repair analysis routing. It should
+      not be used for analytical purposes, but it is preserved in case it becomes useful in
+      the future.
+  is_automatic_repair_analysis_opted_out:
+    lineage:
+      - datalake_terminator_clean.termination_characteristics.is_automatic_repair_analysis_opted_out
+    description: |
+      Boolean flag related to opting out of the termination's automatic repair analysis. It
+      should not be used for analytical purposes, but it is preserved in case it becomes useful
+      in the future.
+  has_bandaid:
+    description: Indicates whether the contract had a bandaid (discount_reviewed_value > 0).
+    lineage:
+      - datalake_inspections.automatic_discounts.id_contract
+      - datalake_inspections.automatic_discounts.discount_reviewed_value
+  has_landlord_comment:
+    description: Indicates whether the landlord has provided any comments related to the negotiation.
+    lineage:
+      - datalake_terminator_clean.negotiation.has_landlord_comment
+  has_repairs:
+    description: Indicates whether the termination had repairs.
+      It will be true if
+      (1) the count of tenant repairs in AC is greater than 0,
+      (2) if AC repairs = 0 but there were tenant repairs in review and the termination had early mediation, early both agree, or bandaid,
+      or (3) there were unset repairs.
+  leadtime_request_to_vacancy:
+    description: Numerical information that indicates the number of days between the request and the vacancy for termination.
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+      - datalake_terminator_clean.termination.dt_termination
+  fee_discount_percentage:
+    description: Numerical information that indicates the discount percentage for the termination fee.
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.discount_percentage
+  fee_discount_value:
+    description: Numerical information that indicates the discount value for the termination fee.
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.discount_value
+  fee_final_amount:
+    description: Numerical information that indicates the final value of the termination fee. Resolved as the confirmed negotiated amount when available, otherwise falls back to the tenant amount from the fee record.
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.final_amount
+      - datalake_terminator_clean.termination_fee.tenant_amount
+  fee_number_of_installments:
+    description: Numerical information that indicates the number of installments for the termination fee.
+    lineage:
+      - datalake_terminator_clean.termination_fee.tenant_payment_method
+  total_repairs_requested:
+    description: Total number of repairs requested for the contract.
+    lineage:
+      - datalake_inspections.repair_request
+  repairs_added_by_5a_review:
+    description: Total repairs added by the 5A team (ADMIN or INSPECTIONS_SERVICE) in the review.
+    lineage:
+      - datalake_inspections.repair_request.requester_type
+  repairs_added_by_owner_review:
+    description: Total repairs added by owner for review.
+    lineage:
+      - datalake_inspections.repair_request.requester_type
+  total_unset_repairs:
+    description: Total repairs for which the responsibility was undefined (UNSET or UNDEFINED) and has a comment.
+    lineage:
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.comment
+  repairs_exempted_in_ar:
+    description: Total repairs exempted during repair analysis (AR).
+    lineage:
+      - datalake_inspections.repair_request.exempted_on_ar
+  repairs_exempted_by_owner_review:
+    description: Total repairs exempted by the owner in the review.
+    lineage:
+      - datalake_inspections.repair_request.is_exempted_by_owner
+  total_tentant_repair_ar:
+    description: Total repairs with tenant's responsibility in repair analysis. Excludes automatically identified repairs that were not accepted, and filters by valid responsibilities.
+    lineage:
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.exempted_on_ar
+      - datalake_inspections.repair_request.requester_type
+  total_tentant_repair_review:
+    description: Total repairs under tenant's responsibility under review. Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.is_exempted_by_owner
+      - datalake_inspections.repair_request.exempted_on_ar
+  total_tenant_repair_review_cost:
+    description:
+      Total repair cost in BRL for repairs counted in total_tentant_repair_review,
+      using the AR-stage pricing (ar_cost) before any negotiation. Repairs without
+      AR-stage pricing contribute 0 to the sum.
+    lineage:
+      - datalake_inspections.repair_request.ar_cost
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.is_exempted_by_owner
+      - datalake_inspections.repair_request.exempted_on_ar
+  total_tenant_repair_review_contestation_cost:
+    description:
+      Total repair cost in BRL for repairs counted in total_tentant_repair_review
+      that were contested by the tenant in the review stage (total_tenant_contestation
+      greater than zero), using the AR-stage pricing (ar_cost). Repairs without
+      AR-stage pricing or without a tenant contestation contribute 0 to the sum.
+    lineage:
+      - datalake_inspections.repair_request.ar_cost
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.is_exempted_by_owner
+      - datalake_inspections.repair_request.exempted_on_ar
+      - datalake_inspections.repair_request.total_tenant_contestation
+  total_tenant_contestation:
+    description: Total repairs that had tenant contestation (total_tenant_contestation <> 0).
+    lineage:
+      - datalake_inspections.repair_request.total_tenant_contestation
+  repairs_exempted_ac:
+    description: Total repairs exempted in the contestation analysis.
+    lineage:
+      - datalake_inspections.repair_request.is_finished
+      - datalake_inspections.repair_request.is_exempted
+  repairs_absorbed_ac:
+    description: Total repairs absorbed in the contestation analysis. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.is_exempted_by_owner
+  total_tentant_repair_ac:
+    description:
+      Total repairs are the tenant's responsibility in the contestation analysis.
+      If the inspection has no contestation analysis step, the value will be 0.
+      Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.exempted_on_ar
+      - datalake_inspections.repair_request.is_exempted_by_owner
+  repair_cost:
+    description: Cost of Repair to be performed in the Offboarding process
+    lineage:
+      - datalake_terminator_clean.negotiation.repair_cost
+  spoc_wave:
+    description: Information of type int that indicates in which wave of the spoc the termination entered.
+    lineage:
+      - datalake_terminator_clean.termination.spoc_wave
+  dt_termination:
+    description: Date when the property became or will become vacant.
+    lineage:
+      - datalake_terminator_clean.termination.dt_vacancy
+  dt_original_termination:
+    description: Original date of when the property should become vacant.
+    lineage:
+      - datalake_terminator_clean.termination.rescheduling_history
+      - datalake_terminator_clean.termination.dt_vacancy
+  dt_last_rescheduled:
+    description: Date of last rescheduling of termination.
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_updated
+  ts_termination_request:
+    description: Date in timestamp format that indicates when the termination request occurred.
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+  ts_termination_updated:
+    description: Date in timestamp format that indicates when the termination request was updated.
+    lineage:
+      - datalake_terminator_clean.termination.ts_updated
+  ts_termination_canceled:
+    description: Date in timestamp format that indicates when the cancellation of the termination occurred.
+    lineage:
+      - datalake_terminator_clean.termination.ts_canceled
+  ts_termination_finished:
+    description: Date in timestamp format that indicates when termination was completed.
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_updated
+      - datalake_terminator_clean.negotiation.ts_updated
+  ts_fee_negotiation_created:
+    description: Date in timestamp format that indicates when the trade opening for the termination fee was created.
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.ts_created
+  ts_fee_negotiation_updated:
+    description: Date in timestamp format that indicates when the trade opening for the termination fee was updated.
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.ts_updated
+  ts_declined:
+    lineage:
+      - datalake_ebdb_contract.contract_declined_relisting.ts_declined
+    description: Timestamp of when the declined for relisting happened.
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - datalake_terminator_clean.termination.ts_updated
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - datalake_terminator_clean.termination.ts_updated
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - datalake_terminator_clean.termination.ts_updated

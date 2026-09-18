@@ -1,0 +1,34 @@
+---
+dag:
+  name: transformation_terminator_test
+  schedule_interval: null
+  schedule_start_date: 2026, 9, 11
+  owner: Data Governance
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Throwaway pilot copy of dags/for_rent/enrich_terminator, used to exercise the
+      new `transformation` layer (grade curated) — metastore mapping, storage
+      format, factory dispatch and source-layer policy — without touching production.
+
+      Writes transformation_terminator_test_curated.termination under
+      s3a://{bucket}/transformation/terminator_test/curated/, so it collides with
+      datalake_terminator on neither database name nor S3 prefix. The query is a
+      byte-identical copy of the production enrich one (still reads
+      datalake_terminator_clean), so hop-1 verification can diff this output
+      against datalake_terminator and expect no difference.
+
+      Manual trigger only. Delete this DAG together with the pilot exclusion
+      constant in bietlejuice.governance.layer_taxonomy_pilot once the taxonomy
+      pilot is verified.
+workflow:
+  type: query_delta
+  layer: transformation
+  transformation_grade: curated
+  custom_schema: terminator_test
+  has_hive_sync: true
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    termination:
+      merge_on: ["id_termination"]

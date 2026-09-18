@@ -1,0 +1,294 @@
+---
+database_name: offboarding_test
+table_name: fact_terminations
+description: |
+  Throwaway consumption-pilot copy of dw_offboarding.fact_terminations. Reads
+  transformation_terminator_test_curated and transformation_hefesto_test_curated
+  so source-layer policy evaluates consumption ← transformation. Not a production
+  dataset. Deleted at pilot teardown.
+  This table aims to store termination information, each line must contain the termination record in its most current state.
+domain: Data Ops & Governance
+owner: gustavo.alencar@quintoandar.com.br
+columns:
+  sk_termination:
+    description: Unique termination identification key.
+    lineage:
+      - transformation_terminator_test_curated.termination.id_termination
+  sk_contract:
+    description: Contract identification key.
+    lineage:
+      - transformation_terminator_test_curated.termination.id_contract
+  sk_exit_inspection:
+    description: Identification key for the exit inspection (offboarding).
+    lineage:
+      - transformation_terminator_test_curated.termination.id_exit_inspection
+  sk_house:
+    description: House identification key.
+    lineage:
+      - transformation_terminator_test_curated.termination.id_house
+  sk_house_listing:
+    lineage:
+      - transformation_terminator_test_curated.termination.id_house_listing
+    description: |
+      House listing identification key.
+  sk_region:
+    lineage:
+      - transformation_terminator_test_curated.termination.id_region
+    description: |
+      Region identification key.
+  sk_workflow_assignee:
+    description: Identification key of the user responsible for the workflow.
+    lineage:
+      - transformation_terminator_test_curated.termination.id_workflow_assignee
+  sk_zendesk_task:
+    description: Ticket identification key generated in Zendesk.
+    lineage:
+      - transformation_terminator_test_curated.termination.id_zendesk_task
+  sk_termination_date:
+    description: Date when the property became or will become vacant in sk format. If a rescheduling was made, this will be different from sk_original_termination_date.
+    lineage:
+      - transformation_terminator_test_curated.termination.dt_termination
+  sk_original_termination_date:
+    description: Original date when the property would become vacant in sk format.
+    lineage:
+      - transformation_terminator_test_curated.termination.dt_original_termination
+  sk_last_rescheduled_date:
+    description: Date of last rescheduling of termination in sk format.
+    lineage:
+      - transformation_terminator_test_curated.termination.dt_last_rescheduled
+  sk_analyst:
+    description: |
+      Surrogate key for the SPOC analyst assigned to the contract/termination pair.
+      Populated only for SPOC contracts in the test group (is_spoc_contract = true
+      and is_spoc_control_group = false); control-group contracts are always NULL.
+      Analyst assignment in the test group happens during termination processing, so
+      there may be a delay between the contract entering the SPOC rollout and an
+      analyst being assigned.
+    lineage:
+      - transformation_hefesto_test_curated.spoc_offboarding_contracts.id_analyst
+  sk_worker_twilio:
+    description: Twilio identification for the responsable analyst for the id_contract/id_termination based on SPOC contracts.
+    lineage:
+      - transformation_hefesto_test_curated.spoc_offboarding_contracts.id_worker_twilio
+  leadtime_request_to_vacancy:
+    description: Numerical information that indicates the number of days between the request and the vacancy for termination.
+    lineage:
+      - transformation_terminator_test_curated.termination.leadtime_request_to_vacancy
+  fee_discount_percentage:
+    description: Numerical information that indicates the discount percentage for the termination fee.
+    lineage:
+      - transformation_terminator_test_curated.termination.fee_discount_percentage
+  fee_discount_value:
+    description: Numerical information that indicates the discount value for the termination fee.
+    lineage:
+      - transformation_terminator_test_curated.termination.fee_discount_value
+  fee_final_amount:
+    description: Numerical information that indicates the final value of the termination fee.
+    lineage:
+      - transformation_terminator_test_curated.termination.fee_final_amount
+  fee_number_of_installments:
+    description: Numerical information that indicates the number of installments for the termination fee.
+    lineage:
+      - transformation_terminator_test_curated.termination.fee_number_of_installments
+  total_repairs_requested:
+    description: Total number of repairs requested for the contract.
+    lineage:
+      - transformation_terminator_test_curated.termination.total_repairs_requested
+  repairs_added_by_5a_review:
+    description: Total repairs added by the 5A team (ADMIN or INSPECTIONS_SERVICE) in the review.
+    lineage:
+      - transformation_terminator_test_curated.termination.repairs_added_by_5a_review
+  repairs_added_by_owner_review:
+    description: Total repairs added by owner for review.
+    lineage:
+      - transformation_terminator_test_curated.termination.repairs_added_by_owner_review
+  total_unset_repairs:
+    description: Total repairs for which the responsibility was undefined (UNSET or UNDEFINED) and has a comment.
+    lineage:
+      - transformation_terminator_test_curated.termination.total_unset_repairs
+  repairs_exempted_in_ar:
+    description: Total repairs exempted during repair analysis (AR).
+    lineage:
+      - transformation_terminator_test_curated.termination.repairs_exempted_in_ar
+  repairs_exempted_by_owner_review:
+    description: Total repairs exempted by the owner in the review.
+    lineage:
+      - transformation_terminator_test_curated.termination.repairs_exempted_by_owner_review
+  total_tentant_repair_ar:
+    description: Total repairs with tenant's responsibility in repair analysis. Excludes automatically identified repairs that were not accepted, and filters by valid responsibilities.
+    lineage:
+      - transformation_terminator_test_curated.termination.total_tentant_repair_ar
+  total_tentant_repair_review:
+    description: Total repairs under tenant's responsibility under review. Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - transformation_terminator_test_curated.termination.total_tentant_repair_review
+  total_tenant_repair_review_cost:
+    description:
+      Total repair cost in BRL for repairs under tenant's responsibility in the
+      review stage, using the AR-stage pricing before any negotiation. Mirrors the
+      same population as total_tentant_repair_review; repairs without AR-stage
+      pricing contribute 0 to the sum.
+    lineage:
+      - transformation_terminator_test_curated.termination.total_tenant_repair_review_cost
+  total_tenant_repair_review_contestation_cost:
+    description:
+      Total repair cost in BRL for repairs under tenant's responsibility in the
+      review stage that were also contested by the tenant, using the AR-stage
+      pricing before any negotiation. Subset of total_tenant_repair_review_cost
+      restricted to repairs with at least one tenant contestation.
+    lineage:
+      - transformation_terminator_test_curated.termination.total_tenant_repair_review_contestation_cost
+  total_tenant_contestation:
+    description: Total repairs that had tenant contestation.
+    lineage:
+      - transformation_terminator_test_curated.termination.total_tenant_contestation
+  repairs_exempted_ac:
+    description: Total repairs exempted in the contestation analysis.
+    lineage:
+      - transformation_terminator_test_curated.termination.repairs_exempted_ac
+  repairs_absorbed_ac:
+    description: Total repairs absorbed in the contestation analysis. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - transformation_terminator_test_curated.termination.repairs_absorbed_ac
+  total_tentant_repair_ac:
+    description:
+      Total repairs are the tenant's responsibility in the contestation analysis.
+      If the inspection has no contestation analysis step, the value will be 0.
+      Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - transformation_terminator_test_curated.termination.total_tentant_repair_ac
+  repair_cost:
+    description: Cost of Repair to be performed in the Offboarding process
+    lineage:
+      - transformation_terminator_test_curated.termination.repair_cost
+  spoc_wave:
+    description: Information of type int that indicates in which wave of the spoc the termination entered.
+    lineage:
+      - transformation_terminator_test_curated.termination.spoc_wave
+  is_spoc_contract:
+    description: |
+      Boolean flag indicating whether the termination is part of the SPOC rollout program,
+      including both test and control groups. Distinct from dw_offboarding.obt_offboarding.is_spoc_test_group_contract,
+      which flags only the SPOC test group (rollout minus control).
+    lineage:
+      - transformation_terminator_test_curated.termination.is_spoc
+  is_spoc_eligible:
+    description: Boolean information indicating whether the termination is eligible for SPOC.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_spoc_eligible
+  is_spoc_control_group:
+    description: Boolean information indicating whether the termination is part of the spoc control group.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_spoc_control_group
+  is_relisting:
+    description: Boolean information that indicates whether the house is already being relisting.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_relisting
+  has_automatically_closed_task:
+    description: Boolean information that indicates whether the termination task was closed automatically.
+    lineage:
+      - transformation_terminator_test_curated.termination.has_automatically_closed_task
+  is_contract_b2b:
+    description: Boolean information that indicates whether the contract is b2b.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_contract_b2b
+  is_before_contract_start:
+    description: Boolean information that indicates whether the termination occurred before the contract began.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_before_contract_start
+  has_been_rescheduled:
+    description: Boolean information that indicates whether the termination was rescheduled.
+    lineage:
+      - transformation_terminator_test_curated.termination.has_been_rescheduled
+  is_checklist_active:
+    description: Boolean information that indicates if de checklit is active.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_checklist_active
+  is_checklist_done:
+    description: Boolean information that indicates if de checklit is done.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_checklist_done
+  is_relisting_enabled:
+    lineage:
+      - transformation_terminator_test_curated.termination.is_relisting_enabled
+    description: Boolean flag indicating if the house can be relisted.
+  is_early_relisting_enabled:
+    lineage:
+      - transformation_terminator_test_curated.termination.is_early_relisting_enabled
+    description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
+  is_exit_inspection_opt_out:
+    description: Boolean information that indicates whether the exit inspection is opted out.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_exit_inspection_opt_out
+  has_early_termination_fee:
+    description: Boolean information that indicates whether the termination fee is early.
+    lineage:
+      - transformation_terminator_test_curated.termination.has_early_termination_fee
+  is_fee_prior_notice:
+    description: Boolean information that indicates whether the termination fee is prior notice.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_fee_prior_notice
+  has_automatic_repair_analysis:
+    description: |
+      Boolean flag related to the termination's automatic repair analysis routing. It should
+      not be used for analytical purposes, but it is preserved in case it becomes useful in
+      the future.
+    lineage:
+      - transformation_terminator_test_curated.termination.has_automatic_repair_analysis
+  is_automatic_repair_analysis_opted_out:
+    description: |
+      Boolean flag related to opting out of the termination's automatic repair analysis. It
+      should not be used for analytical purposes, but it is preserved in case it becomes useful
+      in the future.
+    lineage:
+      - transformation_terminator_test_curated.termination.is_automatic_repair_analysis_opted_out
+  has_repairs:
+    description: Indicates whether the termination had repairs.
+      It will be true if
+      (1) the count of tenant repairs in AC is greater than 0,
+      (2) if AC repairs = 0 but there were tenant repairs in review and the termination had early mediation, early both agree, or bandaid,
+      or (3) there were unset repairs.
+    lineage:
+      - transformation_terminator_test_curated.termination.has_repairs
+  ts_termination_request:
+    description: Date in timestamp format that indicates when the termination request occurred.
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_termination_request
+  ts_termination_updated:
+    description: Date in timestamp format that indicates when the termination request was updated.
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_termination_updated
+  ts_termination_canceled:
+    description: Date in timestamp format that indicates when the cancellation of the termination occurred.
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_termination_canceled
+  ts_termination_finished:
+    description: Date in timestamp format that indicates when termination was completed.
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_termination_finished
+  ts_fee_negotiation_created:
+    description: Date in timestamp format that indicates when the trade opening for the termination fee was created.
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_fee_negotiation_created
+  ts_fee_negotiation_updated:
+    description: Date in timestamp format that indicates when the trade opening for the termination fee was updated.
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_fee_negotiation_updated
+  ts_declined:
+    lineage:
+      - transformation_terminator_test_curated.termination.ts_declined
+    description: Timestamp of when the declined for relisting happened.
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_offboarding.
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - transformation_terminator_test_curated.termination.year
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - transformation_terminator_test_curated.termination.month
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - transformation_terminator_test_curated.termination.day
