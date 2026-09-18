@@ -1,0 +1,34 @@
+---
+database_name: datalake_search
+table_name: concierge_offer_user_daily
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Daily rent-offer facts for concierge targeting from rent_flows. Grain is one tenant prospect per snapshot day with last submitted offer house and recency flags.
+columns:
+  id_user:
+    description: "Tenant prospect who submitted a rent offer in the lookback."
+    lineage:
+      - datalake_rent_flows.rent_flows.id_tenant_prospect
+  has_rent_offer_1d:
+    description: "Whether a rent offer was submitted yesterday."
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+  has_rent_offer_7d:
+    description: "Whether a rent offer was submitted in the last 7 days. Always true for rows in this table."
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+  id_house_last_offer:
+    description: "House of the most recent submitted rent offer."
+    lineage:
+      - datalake_rent_flows.rent_flows.id_house
+  ts_last_offer:
+    description: "Timestamp of the most recent submitted rent offer."
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+  year:
+    description: "Snapshot year partition."
+  month:
+    description: "Snapshot month partition."
+  day:
+    description: "Snapshot day partition."

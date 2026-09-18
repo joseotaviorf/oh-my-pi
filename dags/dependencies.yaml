@@ -2073,6 +2073,8 @@ bietlejuice.enrich_concierge_lpv_ads:
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.enrich_concierge_privacy_facts:load-enrich-concierge-privacy-user:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
+bietlejuice.enrich_concierge_offer_facts:
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
 bietlejuice.enrich_concierge_placas_lpv_reproc:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_concierge_lpv_ads:load-enrich-concierge-lpv-ads-daily:first-run-of-day
