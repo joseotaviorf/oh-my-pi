@@ -91,6 +91,15 @@ exceptions:
       2026-08-18 prod run, no terminal state). Returns to EMR once the raw
       ingestion is optimized.
     approved_by: eduardo.soares@quintoandar.com.br
+  - dag: enrich_vespucio_images_upsert_backlog
+    path: dags/atlas_db/enrich_vespucio_images_upsert_backlog
+    reason: >-
+      Hand-written Vespúcio pipeline DAG: orchestrates Vespucio wheel entry points
+      (core_v2_images_upsert_backlog_*) on a dedicated Databricks job cluster
+      with the Vespucio instance profile, matching sibling DAGs
+      enrich_vespucio_pipeline_v2 and vespucio_pipeline_plugins. EMR migration
+      is out of scope for this cold-start backlog drain workflow (ADB-1661).
+    approved_by: jorge.brassara@quintoandar.com.br
   - dag: amplitude_subpartitioned
     path: dags/growth/amplitude_subpartitioned
     reason: >-

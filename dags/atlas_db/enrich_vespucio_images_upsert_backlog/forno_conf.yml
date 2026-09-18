@@ -1,0 +1,36 @@
+dag_documentation:
+  dag_purpose:
+    "Manual DAG that drains the Vespúcio v2 images-upsert cold-start backlog to Kodak.
+    It orchestrates `core_v2_images_upsert_backlog_build_step` (one-time queue build)
+    and `core_v2_images_upsert_backlog_step` (incremental drain). The build reads
+    normalized image/general tables and Kodak sources already materialized by
+    `enrich_vespucio_pipeline_v2`; it is gated by the `rebuild_backlog_queue` trigger
+    param (default **false**) because rebuilding resets drain progress. Routine runs
+    should leave that param off and only drain the existing queue. Forno omits the Kodak
+    SNS ARN and runs the drain step in dry-run mode, writing the would-be payload to
+    `images_upsert_backlog_dry_run_preview_table`. Upstream steps:
+    [vespucio#1496](https://github.com/quintoandar/vespucio/pull/1496)."
+callback_by_task_failure: True
+callback_by_task_success: False
+webhook_vespucio_pipeline_v2: WEBHOOK_VESPUCIO_PIPELINE_FORNO
+# Forno has no Kodak photo SNS publish target; drain runs in dry-run mode.
+kodak_photo_sns_arn: ""
+images_upsert_backlog_dry_run_preview_table: "vespucio_pipeline_delta.images_upsert_backlog_dry_run_preview"
+
+custom_cluster:
+  driver_node_type_id: m5d.large
+  node_type_id: m5d.large
+  num_workers: 1
+  spark_version: 16.4.x-scala2.12
+  aws_attributes:
+    ebs_volume_size: 200
+    instance_profile_arn: "{{ var.value.instance_profile_secret_arn_vespucio }}"
+  spark_conf:
+    # Temporary: Vespúcio instance profile lacks S3 on the Databricks workspace bucket for
+    # spark-event-logs/. Re-enable after IAM allows that prefix (same as default DE profile).
+    spark.eventLog.enabled: "false"
+    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.heartbeatInterval: "100s"
+    spark.network.timeout: "600s"
+    spark.metrics.appStatusSource.enabled: "true"

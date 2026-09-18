@@ -124,6 +124,13 @@ class Tables:
     kodak_photo_duplication_sent = (
         "vespucio_pipeline_delta.kodak_photo_duplication_sent"
     )
+    images_upsert_backlog_queue = "vespucio_pipeline_delta.images_upsert_backlog_queue"
+    images_upsert_backlog_progress = (
+        "vespucio_pipeline_delta.images_upsert_backlog_progress"
+    )
+    images_upsert_backlog_failed = (
+        "vespucio_pipeline_delta.images_upsert_backlog_failed"
+    )
 
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
 
