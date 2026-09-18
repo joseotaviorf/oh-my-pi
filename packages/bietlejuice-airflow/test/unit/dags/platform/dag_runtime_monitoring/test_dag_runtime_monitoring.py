@@ -94,6 +94,11 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
 
 _MODULE = "dags.platform.dag_runtime_monitoring.dag_runtime_monitoring"
 
+# Fixed instant for end-to-end monitor calls: past the 10:00 UTC deadline used by
+# TestMonitorPagesDeadlineMiss, matching the 12:00 UTC clock the unit-level
+# deadline tests already pin.
+_FROZEN_NOW = datetime(2026, 9, 17, 12, 0, tzinfo=timezone.utc)
+
 _WEBHOOK_KEY = "GCHAT_DAG_RUNTIME_MONITORING_WEBHOOK"
 _WEBHOOK_URL = "https://chat.example.com/hook?key=k&token=t"
 _CRITICAL_DAG = "bietlejuice.ebdb_location"
@@ -4184,11 +4189,25 @@ class TestTwentyThreeHundredTickRegression:
         assert all(f["dataset_missing"] == [] for f in findings)
 
 
+class _FrozenDatetime(datetime):
+    """``datetime`` whose ``now()`` is pinned, for end-to-end monitor calls.
+
+    ``monitor_dag_runtimes`` reads the wall clock once (``datetime.now(timezone.utc)``)
+    and derives both ``now`` and the cycle anchor from it, so an unpinned clock makes
+    deadline assertions depend on the time of day the suite happens to run.
+    """
+
+    @classmethod
+    def now(cls, tz=None):
+        return _FROZEN_NOW if tz is None else _FROZEN_NOW.astimezone(tz)
+
+
 class TestMonitorPagesDeadlineMiss:
     """Covers the wiring the deadline_miss unit tests cannot reach."""
 
     def test_declared_deadline_miss_pages_jira_end_to_end(self):
         with (
+            mock.patch(f"{_MODULE}.datetime", _FrozenDatetime),
             mock.patch(f"{_MODULE}.ConfigurationService") as mock_cfg,
             mock.patch(f"{_MODULE}.Variable") as mock_var,
             mock.patch(f"{_MODULE}._load_downstream_index_safe", return_value={}),
