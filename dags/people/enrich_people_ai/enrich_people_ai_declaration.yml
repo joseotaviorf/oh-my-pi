@@ -12,7 +12,7 @@ dag:
       Current scope: Teva survey pillar summaries (`ai_teva_survey_summary`),
       reading `datalake_people.teva_survey_inputs` from `enrich_people`.
       The Spark job calls LiteLLM chat completions with
-      `vertex_ai/claude-opus-4-8`.
+      `vertex_ai/claude-sonnet-4-5`.
 
       `ai_teva_survey_summary` uses extraction_type full with merge on survey_invite_id;
       the Spark job skips invites that already exist in the target table and caps LiteLLM

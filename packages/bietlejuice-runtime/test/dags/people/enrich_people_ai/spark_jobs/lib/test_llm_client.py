@@ -6,7 +6,6 @@ from urllib import error
 import pytest
 
 from dags.people.enrich_people_ai.spark_jobs.lib.llm_client import (
-    DEFAULT_MODEL,
     DEFAULT_SECRET_KEY,
     DEFAULT_SECRET_SCOPE,
     LiteLLMClient,
@@ -57,11 +56,18 @@ class TestLiteLLMClient:
         Databricks-scope placeholder name."""
         assert DEFAULT_SECRET_KEY == "PEOPLE_DATA_LITELLM_KEY"
 
-    def test_default_model_is_vertex_claude_opus(self):
-        """The client defaults to the catalog chat model ``vertex_ai/claude-opus-4-8``."""
-        assert DEFAULT_MODEL == "vertex_ai/claude-opus-4-8"
+    def test_constructor_model_overrides_default(self):
+        """An explicit ``model`` is stored as-is; tests do not pin the catalog default."""
+        client = LiteLLMClient(api_key="explicit-key", model="catalog/test-model")
+
+        assert client.model == "catalog/test-model"
+
+    def test_litellm_model_env_overrides_default(self, monkeypatch):
+        """``LITELLM_MODEL`` wins over the module default when ``model`` is omitted."""
+        monkeypatch.setenv("LITELLM_MODEL", "catalog/from-env")
         client = LiteLLMClient(api_key="explicit-key")
-        assert client.model == DEFAULT_MODEL
+
+        assert client.model == "catalog/from-env"
 
     @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.request.urlopen")
     def test_complete_returns_message_content(self, mocked_urlopen):
@@ -74,7 +80,7 @@ class TestLiteLLMClient:
         mocked_response.read.return_value = response_body
         mocked_urlopen.return_value.__enter__.return_value = mocked_response
 
-        client = LiteLLMClient(api_key="explicit-key")
+        client = LiteLLMClient(api_key="explicit-key", model="catalog/test-model")
         result = client.complete("prompt text", system_prompt="system context")
 
         assert result == "generated text"
@@ -88,7 +94,7 @@ class TestLiteLLMClient:
             "role": "user",
             "content": "prompt text",
         }
-        assert sent_payload["model"] == DEFAULT_MODEL
+        assert sent_payload["model"] == "catalog/test-model"
 
     @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.request.urlopen")
     def test_complete_raises_when_response_has_no_choices(self, mocked_urlopen):

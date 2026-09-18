@@ -17,7 +17,7 @@ from bietlejuice.base.spark import BaseDBUtils
 
 DEFAULT_BASE_URL = "https://litellm.apps.shared-prd.habitat.zone/v1"
 # Shared LiteLLM catalog (chat mode).
-DEFAULT_MODEL = "vertex_ai/claude-opus-4-8"
+DEFAULT_MODEL = "vertex_ai/claude-sonnet-4-5"
 DEFAULT_SECRET_SCOPE = "people"
 DEFAULT_SECRET_KEY = "PEOPLE_DATA_LITELLM_KEY"
 DEFAULT_MAX_RETRIES = 3
@@ -60,7 +60,7 @@ class LiteLLMClient:
             base_url: LiteLLM root URL without trailing slash; defaults to production
                 shared gateway unless ``LITELLM_BASE_URL`` is set.
             model: Model id passed in the JSON body (e.g.
-                ``vertex_ai/claude-opus-4-8``).
+                ``vertex_ai/claude-sonnet-4-5``).
             api_key: Bearer token; when ``None``, loaded from Databricks secrets.
             secret_scope: Databricks secret scope name for API key lookup.
             secret_key: Secret key name within ``secret_scope``.
