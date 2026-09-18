@@ -1,134 +1,283 @@
-WITH tof_events AS (
+WITH search_daily AS (
     SELECT
         id_event,
         id_user,
         id_person,
-        event_name,
-        GET_JSON_OBJECT(event_properties, '$.egw_session_id') AS id_session,
-        TRY_CAST(
-            GET_JSON_OBJECT(event_properties, '$.house_id') AS BIGINT
-        ) AS id_house,
-        UPPER(
-            GET_JSON_OBJECT(event_properties, '$.business_context')
-        ) AS business_context,
-        ts_event,
-        DATE(ts_event) AS dt_event
+        id_device,
+        id_session,
+        business_context,
+        dt_event,
+        ts_event
     FROM
-        datalake_cdp_clean.user_tracking
+        datalake_search.concierge_tof_search_events
     WHERE
         MAKE_DATE(year, month, day) >= DATE_SUB(
             CURRENT_DATE(),
             {days_lookback_60} - 1
         )
         AND MAKE_DATE(year, month, day) <= CURRENT_DATE()
-        AND event_name IN (
-            'search_page_viewed',
-            'search_results_page_viewed',
-            'listing_page_viewed',
-            'listing_favorite_set',
-            'schedule_page_viewed'
-        )
-        AND id_user IS NOT NULL
 ),
-ranked_people AS (
-    SELECT
-        id_user,
-        id_person,
-        ROW_NUMBER() OVER (
-            PARTITION BY id_user
-            ORDER BY
-                ts_event DESC,
-                id_person DESC
-        ) AS rn
-    FROM
-        tof_events
-    WHERE
-        id_person IS NOT NULL
-),
-person_by_user AS (
-    SELECT
-        id_user,
-        id_person
-    FROM
-        ranked_people
-    WHERE
-        rn = 1
-),
-search_events AS (
+search_sessions AS (
     SELECT
         id_user,
         id_session,
-        business_context,
-        dt_event
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_person
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_person
+                )
+            END
+        ) AS id_person,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_device
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_device
+                )
+            END
+        ) AS id_device,
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_event
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_person
+                )
+            END
+        ) AS id_event_last_identified,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_event
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_device
+                )
+            END
+        ) AS id_event_last_device,
+        MAX(
+            CASE
+                WHEN business_context = 'RENT' THEN 1
+                ELSE 0
+            END
+        ) = 1 AS has_rent,
+        MAX(
+            CASE
+                WHEN business_context = 'SALE' THEN 1
+                ELSE 0
+            END
+        ) = 1 AS has_sale,
+        MAX(dt_event) AS dt_last_search,
+        MAX(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN ts_event
+            END
+        ) AS ts_last_identified,
+        MAX(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN ts_event
+            END
+        ) AS ts_last_device
     FROM
-        tof_events
-    WHERE
-        event_name IN (
-            'search_page_viewed',
-            'search_results_page_viewed'
-        )
+        search_daily
+    GROUP BY
+        id_user,
+        id_session
 ),
 search_rollups AS (
     SELECT
         id_user,
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_person
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_last_identified,
+                    id_event_last_identified,
+                    id_person
+                )
+            END
+        ) AS id_person,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_device
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_last_device,
+                    id_event_last_device,
+                    id_device
+                )
+            END
+        ) AS id_device,
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_event_last_identified
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_last_identified,
+                    id_event_last_identified,
+                    id_person
+                )
+            END
+        ) AS id_event_last_identified,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_event_last_device
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_last_device,
+                    id_event_last_device,
+                    id_device
+                )
+            END
+        ) AS id_event_last_device,
         COUNT(
-            DISTINCT CASE
-                WHEN dt_event >= DATE_SUB(
+            CASE
+                WHEN dt_last_search >= DATE_SUB(
                     CURRENT_DATE(),
                     {days_lookback_7} - 1
                 )
-                THEN id_session
+                THEN 1
             END
         ) AS qty_search_sessions_7d,
-        COUNT(DISTINCT id_session) AS qty_search_sessions_60d,
-        COUNT(
-            DISTINCT CASE
-                WHEN business_context = 'RENT' THEN id_session
+        COUNT(*) AS qty_search_sessions_60d,
+        SUM(
+            CASE
+                WHEN has_rent THEN 1
+                ELSE 0
             END
         ) AS qty_search_rent_60d,
-        COUNT(
-            DISTINCT CASE
-                WHEN business_context = 'SALE' THEN id_session
+        SUM(
+            CASE
+                WHEN has_sale THEN 1
+                ELSE 0
             END
         ) AS qty_search_sale_60d,
-        MAX(dt_event) AS dt_last_search
+        MAX(dt_last_search) AS dt_last_search,
+        MAX(ts_last_identified) AS ts_last_identified,
+        MAX(ts_last_device) AS ts_last_device
     FROM
-        search_events
+        search_sessions
     GROUP BY
         id_user
 ),
-lpv_events AS (
+lpv_daily AS (
     SELECT
         id_event,
         id_user,
+        id_person,
+        id_device,
         id_house,
-        ts_event,
-        dt_event
+        dt_event,
+        ts_event
     FROM
-        tof_events
+        datalake_search.concierge_tof_lpv_events
     WHERE
-        event_name = 'listing_page_viewed'
-),
-lpv_by_house_3d AS (
-    SELECT
-        id_user,
-        id_house,
-        COUNT(DISTINCT id_event) AS qty_lpv_house_3d
-    FROM
-        lpv_events
-    WHERE
-        dt_event >= DATE_SUB(
+        MAKE_DATE(year, month, day) >= DATE_SUB(
             CURRENT_DATE(),
-            {days_lookback_3} - 1
+            {days_lookback_60} - 1
         )
-        AND id_house IS NOT NULL
-    GROUP BY
-        id_user,
-        id_house
+        AND MAKE_DATE(year, month, day) <= CURRENT_DATE()
 ),
 lpv_rollups AS (
     SELECT
         id_user,
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_person
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_person
+                )
+            END
+        ) AS id_person,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_device
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_device
+                )
+            END
+        ) AS id_device,
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_event
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_person
+                )
+            END
+        ) AS id_event_last_identified,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_event
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_device
+                )
+            END
+        ) AS id_event_last_device,
+        MAX_BY(
+            id_house,
+            STRUCT(ts_event, id_event, id_house)
+        ) AS id_house_last_lpv,
         COUNT(
             DISTINCT CASE
                 WHEN dt_event >= DATE_SUB(
@@ -146,37 +295,40 @@ lpv_rollups AS (
                 )
                 THEN id_house
             END
-        ) AS qty_houses_lpv_3d
+        ) AS qty_houses_lpv_3d,
+        MAX(ts_event) AS ts_last_lpv,
+        MAX(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN ts_event
+            END
+        ) AS ts_last_identified,
+        MAX(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN ts_event
+            END
+        ) AS ts_last_device
     FROM
-        lpv_events
+        lpv_daily
     GROUP BY
         id_user
 ),
-ranked_lpv AS (
+lpv_by_house_3d AS (
     SELECT
         id_user,
         id_house,
-        ts_event,
-        ROW_NUMBER() OVER (
-            PARTITION BY id_user
-            ORDER BY
-                ts_event DESC,
-                id_event DESC
-        ) AS rn
+        COUNT(DISTINCT id_event) AS qty_lpv_house_3d
     FROM
-        lpv_events
+        lpv_daily
     WHERE
-        id_house IS NOT NULL
-),
-last_lpv AS (
-    SELECT
+        dt_event >= DATE_SUB(
+            CURRENT_DATE(),
+            {days_lookback_3} - 1
+        )
+    GROUP BY
         id_user,
-        id_house AS id_house_last_lpv,
-        ts_event AS ts_last_lpv
-    FROM
-        ranked_lpv
-    WHERE
-        rn = 1
+        id_house
 ),
 ranked_lpv_houses AS (
     SELECT
@@ -207,164 +359,293 @@ top_lpv_houses AS (
     GROUP BY
         id_user
 ),
-favorite_events AS (
+intent_daily AS (
     SELECT
         id_event,
         id_user,
+        id_person,
+        id_device,
         id_house,
-        ts_event,
-        dt_event
+        event_name,
+        dt_event,
+        ts_event
     FROM
-        tof_events
+        datalake_search.concierge_tof_intent_events
     WHERE
-        event_name = 'listing_favorite_set'
-        AND dt_event >= DATE_SUB(
+        MAKE_DATE(year, month, day) >= DATE_SUB(
             CURRENT_DATE(),
-            {days_lookback_7} - 1
+            {days_lookback_60} - 1
         )
+        AND MAKE_DATE(year, month, day) <= CURRENT_DATE()
 ),
-favorite_rollups AS (
+intent_rollups AS (
     SELECT
         id_user,
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_person
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_person
+                )
+            END
+        ) AS id_person,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_device
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_device
+                )
+            END
+        ) AS id_device,
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_event
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_person
+                )
+            END
+        ) AS id_event_last_identified,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_event
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_device
+                )
+            END
+        ) AS id_event_last_device,
+        MAX_BY(
+            CASE
+                WHEN
+                    event_name = 'listing_favorite_set'
+                    AND dt_event >= DATE_SUB(
+                        CURRENT_DATE(),
+                        {days_lookback_7} - 1
+                    )
+                THEN id_house
+            END,
+            CASE
+                WHEN
+                    event_name = 'listing_favorite_set'
+                    AND dt_event >= DATE_SUB(
+                        CURRENT_DATE(),
+                        {days_lookback_7} - 1
+                    )
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_house
+                )
+            END
+        ) AS id_house_last_favorite,
+        MAX_BY(
+            CASE
+                WHEN
+                    event_name = 'schedule_page_viewed'
+                    AND dt_event >= DATE_SUB(
+                        CURRENT_DATE(),
+                        {days_lookback_7} - 1
+                    )
+                THEN id_house
+            END,
+            CASE
+                WHEN
+                    event_name = 'schedule_page_viewed'
+                    AND dt_event >= DATE_SUB(
+                        CURRENT_DATE(),
+                        {days_lookback_7} - 1
+                    )
+                THEN STRUCT(
+                    ts_event,
+                    id_event,
+                    id_house
+                )
+            END
+        ) AS id_house_last_schedule,
         COUNT(
             DISTINCT CASE
-                WHEN dt_event = CURRENT_DATE() THEN id_house
+                WHEN
+                    event_name = 'listing_favorite_set'
+                    AND dt_event = CURRENT_DATE()
+                THEN id_house
             END
         ) AS qty_favorites_1d,
-        COUNT(DISTINCT id_house) AS qty_favorites_7d
+        COUNT(
+            DISTINCT CASE
+                WHEN
+                    event_name = 'listing_favorite_set'
+                    AND dt_event >= DATE_SUB(
+                        CURRENT_DATE(),
+                        {days_lookback_7} - 1
+                    )
+                THEN id_house
+            END
+        ) AS qty_favorites_7d,
+        COUNT(
+            DISTINCT CASE
+                WHEN
+                    event_name = 'schedule_page_viewed'
+                    AND dt_event = CURRENT_DATE()
+                THEN id_event
+            END
+        ) AS qty_schedule_page_1d,
+        MAX(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN ts_event
+            END
+        ) AS ts_last_identified,
+        MAX(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN ts_event
+            END
+        ) AS ts_last_device
     FROM
-        favorite_events
+        intent_daily
     GROUP BY
         id_user
 ),
-ranked_favorites AS (
+identity_candidates AS (
     SELECT
         id_user,
-        id_house,
-        ROW_NUMBER() OVER (
-            PARTITION BY id_user
-            ORDER BY
-                ts_event DESC,
-                id_event DESC
-        ) AS rn
+        id_person,
+        id_device,
+        id_event_last_identified,
+        id_event_last_device,
+        ts_last_identified,
+        ts_last_device
     FROM
-        favorite_events
-    WHERE
-        id_house IS NOT NULL
+        search_rollups
+    UNION ALL
+    SELECT
+        id_user,
+        id_person,
+        id_device,
+        id_event_last_identified,
+        id_event_last_device,
+        ts_last_identified,
+        ts_last_device
+    FROM
+        lpv_rollups
+    UNION ALL
+    SELECT
+        id_user,
+        id_person,
+        id_device,
+        id_event_last_identified,
+        id_event_last_device,
+        ts_last_identified,
+        ts_last_device
+    FROM
+        intent_rollups
 ),
-last_favorite AS (
+user_identities AS (
     SELECT
         id_user,
-        id_house AS id_house_last_favorite
+        MAX_BY(
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN id_person
+            END,
+            CASE
+                WHEN id_person IS NOT NULL
+                THEN STRUCT(
+                    ts_last_identified,
+                    id_event_last_identified,
+                    id_person
+                )
+            END
+        ) AS id_person,
+        MAX_BY(
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN id_device
+            END,
+            CASE
+                WHEN id_device IS NOT NULL
+                THEN STRUCT(
+                    ts_last_device,
+                    id_event_last_device,
+                    id_device
+                )
+            END
+        ) AS id_device
     FROM
-        ranked_favorites
-    WHERE
-        rn = 1
+        identity_candidates
+    GROUP BY
+        id_user
 ),
-schedule_events AS (
-    SELECT
-        id_event,
-        id_user,
-        id_house,
-        ts_event,
-        dt_event
+intent_members AS (
+    -- Snapshot membership from intent is 7-day, matching the pre-refactor
+    -- favorite_rollups / schedule_rollups windows. intent_rollups itself stays
+    -- 60-day because identity resolution reads it; unioning it here would admit
+    -- users whose only intent activity is older than 7 days, giving them a
+    -- snapshot row with zero intent metrics.
+    SELECT DISTINCT
+        id_user
     FROM
-        tof_events
+        intent_daily
     WHERE
-        event_name = 'schedule_page_viewed'
-        AND dt_event >= DATE_SUB(
+        dt_event >= DATE_SUB(
             CURRENT_DATE(),
             {days_lookback_7} - 1
         )
-),
-schedule_rollups AS (
-    SELECT
-        id_user,
-        COUNT(
-            DISTINCT CASE
-                WHEN dt_event = CURRENT_DATE() THEN id_event
-            END
-        ) AS qty_schedule_page_1d
-    FROM
-        schedule_events
-    GROUP BY
-        id_user
-),
-ranked_schedules AS (
-    SELECT
-        id_user,
-        id_house,
-        ROW_NUMBER() OVER (
-            PARTITION BY id_user
-            ORDER BY
-                ts_event DESC,
-                id_event DESC
-        ) AS rn
-    FROM
-        schedule_events
-    WHERE
-        id_house IS NOT NULL
-),
-last_schedule AS (
-    SELECT
-        id_user,
-        id_house AS id_house_last_schedule
-    FROM
-        ranked_schedules
-    WHERE
-        rn = 1
 ),
 all_users AS (
     SELECT id_user FROM search_rollups
     UNION
     SELECT id_user FROM lpv_rollups
     UNION
-    SELECT id_user FROM favorite_rollups
-    UNION
-    SELECT id_user FROM schedule_rollups
+    SELECT id_user FROM intent_members
 )
 SELECT
     all_users.id_user,
-    person_by_user.id_person,
-    last_lpv.id_house_last_lpv,
-    last_favorite.id_house_last_favorite,
-    last_schedule.id_house_last_schedule,
-    COALESCE(
-        search_rollups.qty_search_sessions_7d,
-        0
-    ) AS qty_search_sessions_7d,
-    COALESCE(
-        search_rollups.qty_search_sessions_60d,
-        0
-    ) AS qty_search_sessions_60d,
-    COALESCE(
-        search_rollups.qty_search_rent_60d,
-        0
-    ) AS qty_search_rent_60d,
-    COALESCE(
-        search_rollups.qty_search_sale_60d,
-        0
-    ) AS qty_search_sale_60d,
+    user_identities.id_person,
+    user_identities.id_device,
+    lpv_rollups.id_house_last_lpv,
+    intent_rollups.id_house_last_favorite,
+    intent_rollups.id_house_last_schedule,
+    COALESCE(search_rollups.qty_search_sessions_7d, 0)
+        AS qty_search_sessions_7d,
+    COALESCE(search_rollups.qty_search_sessions_60d, 0)
+        AS qty_search_sessions_60d,
+    COALESCE(search_rollups.qty_search_rent_60d, 0)
+        AS qty_search_rent_60d,
+    COALESCE(search_rollups.qty_search_sale_60d, 0)
+        AS qty_search_sale_60d,
     COALESCE(lpv_rollups.qty_lpv_3d, 0) AS qty_lpv_3d,
-    COALESCE(
-        lpv_rollups.qty_houses_lpv_3d,
-        0
-    ) AS qty_houses_lpv_3d,
+    COALESCE(lpv_rollups.qty_houses_lpv_3d, 0) AS qty_houses_lpv_3d,
     top_lpv_houses.array_id_house_top_5_lpv_3d,
-    COALESCE(
-        favorite_rollups.qty_favorites_1d,
-        0
-    ) AS qty_favorites_1d,
-    COALESCE(
-        favorite_rollups.qty_favorites_7d,
-        0
-    ) AS qty_favorites_7d,
-    COALESCE(
-        schedule_rollups.qty_schedule_page_1d,
-        0
-    ) AS qty_schedule_page_1d,
+    COALESCE(intent_rollups.qty_favorites_1d, 0) AS qty_favorites_1d,
+    COALESCE(intent_rollups.qty_favorites_7d, 0) AS qty_favorites_7d,
+    COALESCE(intent_rollups.qty_schedule_page_1d, 0)
+        AS qty_schedule_page_1d,
     search_rollups.dt_last_search,
-    last_lpv.ts_last_lpv,
+    lpv_rollups.ts_last_lpv,
     CURRENT_TIMESTAMP() AS ts_load,
     YEAR(CURRENT_DATE()) AS year,
     MONTH(CURRENT_DATE()) AS month,
@@ -372,8 +653,8 @@ SELECT
 FROM
     all_users
 LEFT JOIN
-    person_by_user
-        ON all_users.id_user = person_by_user.id_user
+    user_identities
+        ON all_users.id_user = user_identities.id_user
 LEFT JOIN
     search_rollups
         ON all_users.id_user = search_rollups.id_user
@@ -381,20 +662,8 @@ LEFT JOIN
     lpv_rollups
         ON all_users.id_user = lpv_rollups.id_user
 LEFT JOIN
-    last_lpv
-        ON all_users.id_user = last_lpv.id_user
-LEFT JOIN
     top_lpv_houses
         ON all_users.id_user = top_lpv_houses.id_user
 LEFT JOIN
-    favorite_rollups
-        ON all_users.id_user = favorite_rollups.id_user
-LEFT JOIN
-    last_favorite
-        ON all_users.id_user = last_favorite.id_user
-LEFT JOIN
-    schedule_rollups
-        ON all_users.id_user = schedule_rollups.id_user
-LEFT JOIN
-    last_schedule
-        ON all_users.id_user = last_schedule.id_user
+    intent_rollups
+        ON all_users.id_user = intent_rollups.id_user

@@ -13,8 +13,6 @@ DAG:
     - bietlejuice.enrich_agentic_platform
     - bietlejuice.enrich_atlas_db_quality_metrics
     - bietlejuice.enrich_cdp_clickhouse_personas
-    - bietlejuice.enrich_concierge_tof_search_events
-    - bietlejuice.enrich_concierge_tof_lpv_events
     - bietlejuice.enrich_concierge_chat_history
     - bietlejuice.enrich_concierge_visit_facts
     - bietlejuice.enrich_crawler_chaves_na_mao

@@ -6,108 +6,121 @@ domain: Conversational XP
 description: |
   Hourly rolling top-of-funnel event facts for concierge targeting, with one
   row per application user and snapshot day. Search, listing-page-view,
-  favorite, and schedule-page activity comes from CDP user-tracking events.
+  favorite, and schedule-page activity comes from dedicated event-level cuts.
   The current day is included so hourly runs expose newly ingested behavior.
 columns:
   id_user:
     description: |
-      Application user identifier carried by the CDP event and used as the
+      Application user identifier carried by an event fact and used as the
       snapshot grain and merge key together with the partition date.
     lineage:
-      - datalake_cdp_clean.user_tracking.id_user
+      - datalake_search.concierge_tof_search_events.id_user
+      - datalake_search.concierge_tof_lpv_events.id_user
+      - datalake_search.concierge_tof_intent_events.id_user
   id_person:
     description: |
-      Latest non-null CDP person identifier observed for the application user
+      Latest non-null person identifier observed for the application user
       in the rolling event window. Null when identity resolution is unavailable.
     lineage:
-      - datalake_cdp_clean.user_tracking.id_person
+      - datalake_search.concierge_tof_search_events.id_person
+      - datalake_search.concierge_tof_lpv_events.id_person
+      - datalake_search.concierge_tof_intent_events.id_person
+  id_device:
+    description: |
+      Latest non-null anonymous device identifier observed for the application
+      user in the rolling event window. It is a separate fallback identity and
+      is never written into the person identifier.
+    lineage:
+      - datalake_search.concierge_tof_search_events.id_device
+      - datalake_search.concierge_tof_lpv_events.id_device
+      - datalake_search.concierge_tof_intent_events.id_device
   id_house_last_lpv:
     description: |
-      House identifier extracted from event_properties on the latest listing
-      page view in the rolling 60-day window.
+      House identifier on the latest listing page view in the rolling 60-day
+      window.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_lpv_events.id_house
   id_house_last_favorite:
     description: |
-      House identifier extracted from event_properties on the latest favorite
-      event in the rolling 7-day window.
+      House identifier on the latest favorite event in the rolling 7-day
+      window.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_intent_events.id_house
   id_house_last_schedule:
     description: |
-      House identifier extracted from event_properties on the latest schedule
-      page view in the rolling 7-day window.
+      House identifier on the latest schedule page view in the rolling 7-day
+      window.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_intent_events.id_house
   qty_search_sessions_7d:
     description: |
-      Distinct session identifiers extracted from search-page and search-results
-      event_properties during the current day and previous six days.
+      Distinct search sessions during the current day and previous six days.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_search_events.id_session
   qty_search_sessions_60d:
     description: |
-      Distinct session identifiers extracted from search-page and search-results
-      event_properties during the rolling 60-day window.
+      Distinct search sessions during the rolling 60-day window.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_search_events.id_session
   qty_search_rent_60d:
     description: |
-      Distinct rolling 60-day search sessions whose event_properties declare
-      RENT as the business context.
+      Distinct rolling 60-day search sessions containing rent activity.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_search_events.business_context
   qty_search_sale_60d:
     description: |
-      Distinct rolling 60-day search sessions whose event_properties declare
-      SALE as the business context.
+      Distinct rolling 60-day search sessions containing sale activity.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_search_events.business_context
   qty_lpv_3d:
     description: |
       Distinct listing_page_viewed events during the current day and previous
       two days.
     lineage:
-      - datalake_cdp_clean.user_tracking.id_event
+      - datalake_search.concierge_tof_lpv_events.id_event
   qty_houses_lpv_3d:
     description: |
-      Distinct houses extracted from listing-page-view event_properties during
-      the current day and previous two days.
+      Distinct houses with listing-page views during the current day and
+      previous two days.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_lpv_events.id_house
   array_id_house_top_5_lpv_3d:
     description: |
       Comma-separated identifiers of up to five houses with the most listing
       page views during the current day and previous two days.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_lpv_events.id_house
+      - datalake_search.concierge_tof_lpv_events.id_event
   qty_favorites_1d:
     description: |
       Distinct houses favorited on the current snapshot day.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_intent_events.id_house
+      - datalake_search.concierge_tof_intent_events.event_name
   qty_favorites_7d:
     description: |
       Distinct houses favorited during the current day and previous six days.
     lineage:
-      - datalake_cdp_clean.user_tracking.event_properties
+      - datalake_search.concierge_tof_intent_events.id_house
+      - datalake_search.concierge_tof_intent_events.event_name
   qty_schedule_page_1d:
     description: |
       Distinct schedule_page_viewed events on the current snapshot day.
     lineage:
-      - datalake_cdp_clean.user_tracking.id_event
+      - datalake_search.concierge_tof_intent_events.id_event
+      - datalake_search.concierge_tof_intent_events.event_name
   dt_last_search:
     description: |
       Calendar date of the most recent search-page or search-results event in
       the rolling 60-day window.
     lineage:
-      - datalake_cdp_clean.user_tracking.ts_event
+      - datalake_search.concierge_tof_search_events.dt_event
   ts_last_lpv:
     description: |
       Event timestamp of the most recent listing page view in the rolling
       60-day window.
     lineage:
-      - datalake_cdp_clean.user_tracking.ts_event
+      - datalake_search.concierge_tof_lpv_events.ts_event
   ts_load:
     description: |
       Timestamp of the hourly snapshot run. It prevents an older overlapping

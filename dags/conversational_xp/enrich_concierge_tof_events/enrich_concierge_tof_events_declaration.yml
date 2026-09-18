@@ -7,19 +7,71 @@ dag:
   documentation:
     dag_purpose: |
       Hourly search, listing-page-view, favorite, and schedule-page facts for
-      concierge top-of-funnel targeting. The pipeline reads CDP user-tracking
-      events and keeps one rolling snapshot per user and day.
+      concierge top-of-funnel targeting. The pipeline materializes the three
+      event-level cuts and then the rolling snapshot that aggregates them, so
+      one run publishes the whole chain. Each cut refreshes two event dates so
+      late-arriving CDP events are included, and drops event dates older than
+      90 days.
 workflow:
   type: query_delta
   layer: enrich
   custom_schema: search
-  default_extraction_type: full
+  default_extraction_type: incremental
   default_partitions: [year, month, day]
   extra_query_template_params:
+    # Two-day refresh window for the event cuts.
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+    # Rolling windows for the snapshot.
     days_lookback_3: 3
     days_lookback_7: 7
     days_lookback_60: 60
+  inner_dependencies:
+    # The snapshot reads all three cuts, so it must load after them.
+    concierge_tof_events:
+      - concierge_tof_search_events
+      - concierge_tof_lpv_events
+      - concierge_tof_intent_events
   tables_customization:
+    concierge_tof_search_events:
+      merge_on: [id_event, year, month, day]
+      when_matched_update_condition: source.ts_load > target.ts_load
+      when_not_matched_by_source_delete_condition: |
+        (
+          MAKE_DATE(target.year, target.month, target.day)
+          BETWEEN DATE('{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_start_date') }}')
+          AND DATE('{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}')
+        )
+        OR MAKE_DATE(target.year, target.month, target.day)
+           < DATE('{{ macros.ds_add(data_interval_end | ds, -89) }}')
+      partitions: [year, month, day]
+      z_order_by: [id_user, id_event]
+    concierge_tof_lpv_events:
+      merge_on: [id_event, year, month, day]
+      when_matched_update_condition: source.ts_load > target.ts_load
+      when_not_matched_by_source_delete_condition: |
+        (
+          MAKE_DATE(target.year, target.month, target.day)
+          BETWEEN DATE('{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_start_date') }}')
+          AND DATE('{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}')
+        )
+        OR MAKE_DATE(target.year, target.month, target.day)
+           < DATE('{{ macros.ds_add(data_interval_end | ds, -89) }}')
+      partitions: [year, month, day]
+      z_order_by: [id_user, id_event]
+    concierge_tof_intent_events:
+      merge_on: [id_event, year, month, day]
+      when_matched_update_condition: source.ts_load > target.ts_load
+      when_not_matched_by_source_delete_condition: |
+        (
+          MAKE_DATE(target.year, target.month, target.day)
+          BETWEEN DATE('{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_start_date') }}')
+          AND DATE('{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}')
+        )
+        OR MAKE_DATE(target.year, target.month, target.day)
+           < DATE('{{ macros.ds_add(data_interval_end | ds, -89) }}')
+      partitions: [year, month, day]
+      z_order_by: [id_user, id_event]
     concierge_tof_events:
       merge_on: [id_user, year, month, day]
       when_matched_update_condition: source.ts_load > target.ts_load
