@@ -15,8 +15,8 @@ cluster:
         - r6g.8xlarge
         - r7g.8xlarge
         - r6i.8xlarge
-      target_on_demand: 0
-      target_spot: 2
+      target_on_demand: 2
+      target_spot: 0
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
     spark_conf:
