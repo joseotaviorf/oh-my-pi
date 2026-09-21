@@ -11,7 +11,7 @@ dag:
       cannot reach Notification Hub Internal's internal-only /webhook/generic
       route, only an internal caller like this Databricks/EMR job can, and
       since nothing reads a Jira field for this anymore, identity lives only
-      in this job's resolution and the audit snapshot.
+      in this job's resolution and the escalation-notified Jira Issue Property.
       Escalation levels: L0 = assignee, L4 = assignee's direct manager, L3 =
       that manager's manager, L2 = one level above that.
       Identity resolution: datalake_jira.issues.assignee_account_id -> email
@@ -37,11 +37,15 @@ dag:
       Critical incidents escalate in days, Low incidents over weeks (see
       EscalationPolicy in the spark job; missing/unrecognized criticality
       falls back to the Medium schedule). The newly-reached level is DMed
-      directly via NHI's /webhook/generic (the same route
-      jira_open_incidents_report already posts to) — NHI resolves the Gchat
-      user id itself and DMs (or @mention-falls-back to) that person; no
-      Google service account or Domain-Wide Delegation grant is needed on
-      our side. Idempotency is tracked via the "escalation-notified" Jira
+      directly via NHI's /webhook/generic with info.email (DM to the assignee
+      or the resolved manager at the due escalation level). Intended end state:
+      DM first; if delivery fails, fall back to the DAG_Rotation space —
+      pending NHI support (today both space+email always posts to the channel,
+      so the job omits space and sends DM-only). @mention in the message is
+      also pending NHI (plain-text <users/id> before the card). Recipients must
+      have started a chat with "Notification Hub Internal" or the DM is dropped
+      until channel fallback exists. No Google service account or Domain-Wide
+      Delegation grant is needed on our side. Idempotency is tracked via the "escalation-notified" Jira
       Issue Property (last level DMed) so re-runs never re-send an
       already-sent level.
       Every card also previews the *next* escalation: how many days until
@@ -53,13 +57,13 @@ dag:
       unconditionally re-resolves identity (no incremental logic, no
       cross-run cache), so a reassignment is corrected on the next scheduled
       run — worst case ~24h given the daily cadence.
-      The Delta table this DAG writes is a notification log only (who/when/
-      what was actually DMed) — a row is written only when a level was newly
-      due this run, not one row per open issue per run.
+      No Delta audit table: idempotency and escalation state live in Jira only
+      (escalation-notified Issue Property). EMR logs record per-run counts.
 workflow:
   type: query_delta
   layer: enrich
   custom_schema: jira_reports
+  has_hive_sync: false
   load_spark_job: sync_escalation_hierarchy
   tables_customization:
     escalation_hierarchy_snapshot:
@@ -69,4 +73,5 @@ workflow:
         - "{dag_name}"
         - "{schema}"
         - "{{ data_interval_start }}"
-      partitions: [year, month, day]
+      run_optimize: false
+      run_vacuum: false

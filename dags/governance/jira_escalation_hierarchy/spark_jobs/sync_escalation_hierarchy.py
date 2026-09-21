@@ -2,7 +2,8 @@
 Automation, no Jira custom fields. (See PR #28669: Jira Cloud's outbound
 "Send web request" can't reach NHI's internal-only `/webhook/generic` route,
 so this job calls it directly; and since nothing reads a Jira field for
-this, identity lives only in this job's resolution and the notification log.)
+this, identity lives only in this job's resolution and the Jira escalation-notified
+property.)
 
 Full design rationale is documented in the DAG declaration's dag_purpose and
 PR #28669 — kept out of this docstring so `from __future__ import
@@ -23,7 +24,6 @@ from functools import cache
 
 import requests
 import yaml
-from pyspark.sql.types import IntegerType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
 from requests.auth import HTTPBasicAuth
 
@@ -31,13 +31,9 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "sync_escalation_hierarchy"
-TABLE_NAME = "escalation_hierarchy_snapshot"
 DEI_PROJECT_ID = "11446"
-PARTITION_COLS = ["year", "month", "day"]
 JIRA_SERVER = "https://quintoandar.atlassian.net"
 DATABRICKS_SCOPE = "quintoandar"
 REQUEST_TIMEOUT_SECONDS = 15
@@ -50,14 +46,10 @@ FALLBACK_OWNER_EMAIL = "gustavo.rompe@quintoandar.com.br"
 # issue. No UI representation — internal bookkeeping only, for idempotency.
 ESCALATION_NOTIFIED_PROPERTY_KEY = "escalation-notified"
 NOTIFICATION_HUB_WEBHOOK_BASE_KEY = "notification_hub_inmetro_webhook_base"
-GCHAT_SPACE = "DAG_Rotation"
-
-LEVEL_NOTICES = {
-    "L0": "You're the assignee of this incident.",
-    "L4": "You're the first level of escalation for this incident, as the assignee's manager.",
-    "L3": "You're the second level of escalation for this incident.",
-    "L2": "You're the third level of escalation for this incident.",
-}
+# Channel used only when NHI supports DM-first with space fallback on delivery
+# failure. Today omitted from the webhook payload so a successful DM does not
+# also post to DAG_Rotation (NHI currently posts to space whenever it is set).
+GCHAT_FALLBACK_SPACE = "DAG_Rotation"
 
 
 class EscalationPolicy:
@@ -109,7 +101,7 @@ class EscalationPolicy:
 
 
 OPEN_ISSUES_QUERY = f"""
-    SELECT id_issue, assignee_account_id, ts_created, summary, criticality
+    SELECT id_issue, assignee, assignee_account_id, ts_created, summary, criticality
     FROM datalake_jira.issues
     WHERE id_project = '{DEI_PROJECT_ID}'
       AND is_deleted = false
@@ -144,6 +136,7 @@ MANAGER_CHAIN_QUERY = """
     )
     SELECT
         e.work_email AS own_email,
+        e.name AS own_name,
         h1.email_manager AS l4_email,
         h2.email_manager AS l3_email,
         h3.email_manager AS l2_email
@@ -164,25 +157,6 @@ PROTECTED_EXECUTIVE_QUERY = """
     UNION
     SELECT DISTINCT email_l1 AS email FROM dw_people.dim_management_hierarchy WHERE email_l1 <> ''
 """
-
-# Notification log only — who (issue/level/email), when (year/month/day,
-# notified_at), what (status/criticality/days_open that triggered it). Not a
-# resolution audit of every open issue; only rows where a DM was actually due
-# this run are written.
-SNAPSHOT_SCHEMA = StructType(
-    [
-        StructField("id_issue", StringType(), True),
-        StructField("escalation_level", StringType(), True),
-        StructField("notified_email", StringType(), True),
-        StructField("notification_status", StringType(), True),
-        StructField("criticality", StringType(), True),
-        StructField("days_open", IntegerType(), True),
-        StructField("notified_at", StringType(), True),
-        StructField("year", IntegerType(), True),
-        StructField("month", IntegerType(), True),
-        StructField("day", IntegerType(), True),
-    ]
-)
 
 logging_logger = QuintoAndarLogger(JOB_NAME)
 
@@ -213,6 +187,66 @@ def _days_open(ts_created: datetime | None, as_of: datetime) -> int | None:
     if ts_created is None:
         return None
     return (as_of - ts_created).days
+
+
+def _build_employee_name_by_email(chain_rows: list[dict]) -> dict[str, str]:
+    """Lowercased work email -> display name from MANAGER_CHAIN_QUERY."""
+    lookup: dict[str, str] = {}
+    for row in chain_rows:
+        email = row.get("own_email")
+        name = row.get("own_name")
+        if not email or not name:
+            continue
+        lookup.setdefault(email.strip().lower(), str(name).strip())
+    return lookup
+
+
+def _format_assignee_display_name(
+    jira_assignee_name: str | None,
+    assignee_email: str | None,
+    employee_names_by_email: dict[str, str],
+) -> str:
+    """HTML-escaped assignee label for card copy (Jira displayName, then HR name)."""
+    if jira_assignee_name and str(jira_assignee_name).strip():
+        return html.escape(str(jira_assignee_name).strip())
+    if assignee_email:
+        key = assignee_email.strip().lower()
+        if key in employee_names_by_email:
+            return html.escape(employee_names_by_email[key])
+        local = assignee_email.split("@", 1)[0].replace(".", " ").title()
+        return html.escape(local)
+    return "the assignee"
+
+
+def _escalation_notice(effective_level: str, assignee_display_name: str) -> str:
+    """Level-specific body copy — always names the assignee and explains DEI context."""
+    if effective_level == "L0":
+        return (
+            f"<b>{assignee_display_name}</b>, you are the assignee of this open "
+            f"data incident (DEI card in Jira). It has stayed unresolved longer than "
+            f"the threshold for its criticality — please review the card and move it "
+            f"forward."
+        )
+    if effective_level == "L4":
+        return (
+            f"You are receiving this as the assignee's manager. "
+            f"<b>{assignee_display_name}</b> on your team is responsible for an open "
+            f"data incident (DEI card) that has not been resolved within the expected "
+            f"timeframe. Please help unblock or reassign."
+        )
+    if effective_level == "L3":
+        return (
+            f"You are the second level in QuintoAndar's automatic escalation for open "
+            f"data incidents (DEI cards). <b>{assignee_display_name}</b> on your team "
+            f"is still the assignee and has not resolved this card within the expected "
+            f"timeframe — your involvement is needed."
+        )
+    return (
+        f"You are the third level in QuintoAndar's automatic escalation for open "
+        f"data incidents (DEI cards). <b>{assignee_display_name}</b> on your team "
+        f"is still the assignee and has not resolved this card within the expected "
+        f"timeframe — please step in to unblock."
+    )
 
 
 def _build_manager_chain_by_email(chain_rows: list[dict]) -> dict[str, tuple]:
@@ -404,11 +438,16 @@ def _build_escalation_card(
     days_open: int,
     target_level: str,
     effective_level: str,
+    assignee_display_name: str,
     next_preview: tuple[int, str | None] | None,
 ) -> dict:
     issue_url = f"{JIRA_SERVER}/browse/{issue_key}"
     lines = [
-        f"<b>{issue_key}</b> has been open for {days_open} days without resolution."
+        (
+            f"<b>{issue_key}</b> is an open data incident (DEI) assigned to "
+            f"<b>{assignee_display_name}</b> that has been unresolved for "
+            f"{days_open} day(s)."
+        )
     ]
     if summary:
         # The card's other lines use literal HTML (<b>, <a href>), which Google
@@ -416,19 +455,20 @@ def _build_escalation_card(
         # — escape it so a crafted summary can't inject a link/tag into a DM
         # from the trusted Notification Hub bot.
         lines.append(html.escape(summary))
-    lines.append(LEVEL_NOTICES[effective_level])
+    lines.append(_escalation_notice(effective_level, assignee_display_name))
     if effective_level != target_level:
         lines.append(
-            "This incident has escalated further, but the next contact is "
-            "company leadership, so you're being notified again as the most "
-            "recent escalation contact."
+            f"This card has escalated further up the chain, but the next contact "
+            f"is company leadership, so you are being notified again as the most "
+            f"recent escalation contact for <b>{assignee_display_name}</b>'s team."
         )
     if next_preview:
         days_until_next, next_email = next_preview
         if next_email:
             lines.append(
-                f"Heads up: if this isn't resolved, it escalates further in "
-                f"{days_until_next} day(s) and will notify {next_email}."
+                f"Heads up: if <b>{assignee_display_name}</b>'s card is still open, "
+                f"it escalates further in {days_until_next} day(s) and will notify "
+                f"{html.escape(next_email)}."
             )
     lines.append(f'<a href="{issue_url}">Open in Jira</a>')
     text = "\n".join(lines)
@@ -441,8 +481,14 @@ def _build_escalation_card(
     }
 
 
-def _notify_hub(webhook_base: str, space: str, email: str, card: dict) -> bool:
-    payload = {"space": space, "cardsV2": [card], "info": {"email": [email]}}
+def _notify_hub(webhook_base: str, email: str, card: dict) -> bool:
+    # Target behaviour: DM the escalation target (assignee or manager chain via
+    # ``info.email`` → ``users`` in api/configs/generic.json); if DM delivery
+    # fails, fall back to ``GCHAT_FALLBACK_SPACE``. NHI does not expose delivery
+    # status on the webhook response (async SQS), and setting ``space`` today
+    # always posts to the channel even when DM succeeds — so we send DM-only
+    # until NHI implements conditional fallback (+ plain-text @mention in DM).
+    payload = {"cardsV2": [card], "info": {"email": [email]}}
     try:
         response = requests.post(
             webhook_base, json=payload, timeout=REQUEST_TIMEOUT_SECONDS
@@ -481,6 +527,7 @@ def _maybe_notify_escalation(
     days_open: int | None,
     criticality: str | None,
     assignee_email: str | None,
+    assignee_display_name: str,
     escalation_targets: tuple,
     webhook_base: str | None,
     summary: str | None,
@@ -524,9 +571,15 @@ def _maybe_notify_escalation(
         target_level, days_open, criticality, assignee_email, escalation_targets
     )
     card = _build_escalation_card(
-        issue_key, summary, days_open, target_level, effective_level, next_preview
+        issue_key,
+        summary,
+        days_open,
+        target_level,
+        effective_level,
+        assignee_display_name,
+        next_preview,
     )
-    if not _notify_hub(webhook_base, GCHAT_SPACE, target_email, card):
+    if not _notify_hub(webhook_base, target_email, card):
         return target_level, target_email, "failed"
 
     if not _put_escalation_notified_level(
@@ -551,6 +604,7 @@ def main() -> None:
     open_issues = [row.asDict() for row in spark.sql(OPEN_ISSUES_QUERY).collect()]
     chain_rows = [row.asDict() for row in spark.sql(MANAGER_CHAIN_QUERY).collect()]
     manager_chain_by_email = _build_manager_chain_by_email(chain_rows)
+    employee_names_by_email = _build_employee_name_by_email(chain_rows)
     protected_rows = [
         row.asDict() for row in spark.sql(PROTECTED_EXECUTIVE_QUERY).collect()
     ]
@@ -575,17 +629,24 @@ def main() -> None:
     def resolve_email(account_id: str) -> str | None:
         return _resolve_email(account_id, auth)
 
-    notification_rows = []
+    notification_counts: dict[str, int] = {}
 
     for issue in open_issues:
         issue_key = issue["id_issue"]
         assignee_account_id = issue["assignee_account_id"]
         assignee_email = resolve_email(assignee_account_id)
+        assignee_display_name = _format_assignee_display_name(
+            issue.get("assignee"),
+            assignee_email,
+            employee_names_by_email,
+        )
         summary = issue.get("summary")
         criticality = issue.get("criticality")
         days_open = _days_open(issue.get("ts_created"), logical_ts)
 
-        manager_emails = manager_chain_by_email.get(assignee_email, (None, None, None))
+        manager_emails = manager_chain_by_email.get(
+            (assignee_email or "").strip().lower(), (None, None, None)
+        )
         escalation_targets = _build_escalation_targets(
             assignee_email, manager_emails, protected_emails, issue_key
         )
@@ -595,6 +656,7 @@ def main() -> None:
             days_open,
             criticality,
             assignee_email,
+            assignee_display_name,
             escalation_targets,
             webhook_base,
             summary,
@@ -603,40 +665,14 @@ def main() -> None:
         )
         if result is None:
             continue
-        level_due, notified_email, notification_status = result
-
-        notification_rows.append(
-            {
-                "id_issue": issue_key,
-                "escalation_level": level_due,
-                "notified_email": notified_email,
-                "notification_status": notification_status,
-                "criticality": criticality,
-                "days_open": days_open,
-                "notified_at": logical_ts.isoformat(),
-                "year": logical_ts.year,
-                "month": logical_ts.month,
-                "day": logical_ts.day,
-            }
+        _level_due, _notified_email, notification_status = result
+        notification_counts[notification_status] = (
+            notification_counts.get(notification_status, 0) + 1
         )
 
-    notification_df = spark.createDataFrame(notification_rows, schema=SNAPSHOT_SCHEMA)
-
-    write_db = f"datalake_{args.schema}"
-    table = f"{write_db}.{TABLE_NAME}"
-    path = f"s3://{args.datalake_bucket}/enrich/{args.schema}/{TABLE_NAME}"
-    metastore = MetastoreServiceFactory.create_loader_metastore_service(spark_client)
-    metastore.create_database(write_db)
-    DeltaLoader(spark_client.conn).load_table(
-        table_name=table,
-        path=path,
-        source_df=notification_df,
-        partition_by=PARTITION_COLS,
-    )
-    metastore.refresh_table(write_db, TABLE_NAME)
     logging_logger.info(
-        f"m={JOB_NAME}, table={table}, open_issues={len(open_issues)}, "
-        f"notifications_sent={len(notification_rows)}"
+        f"m={JOB_NAME}, open_issues={len(open_issues)}, "
+        f"notification_counts={notification_counts}"
     )
 
 

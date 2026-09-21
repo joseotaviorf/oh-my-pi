@@ -265,7 +265,7 @@ def test_maybe_notify_escalation_sends_only_newly_reached_level_once(monkeypatch
         notified_state[issue_key] = level_name
         return True
 
-    def fake_notify(webhook_base, space, email, card):
+    def fake_notify(webhook_base, email, card):
         sent.append(email)
         return True
 
@@ -284,6 +284,7 @@ def test_maybe_notify_escalation_sends_only_newly_reached_level_once(monkeypatch
             days,
             "Medium",
             "assignee@x.com",
+            "Pat Assignee",
             targets,
             "http://fake",
             "summary",
@@ -324,7 +325,7 @@ def test_maybe_notify_escalation_repeats_previous_level_never_reaches_executive(
     monkeypatch.setattr(
         sync_escalation_hierarchy,
         "_notify_hub",
-        lambda webhook_base, space, email, card: sent.append(email) or True,
+        lambda webhook_base, email, card: sent.append(email) or True,
     )
 
     targets = _build_escalation_targets(
@@ -338,6 +339,7 @@ def test_maybe_notify_escalation_repeats_previous_level_never_reaches_executive(
         12,
         "Medium",
         "assignee@x.com",
+        "Pat Assignee",
         targets,
         "http://fake",
         "summary",
@@ -363,6 +365,7 @@ def test_maybe_notify_escalation_no_email_for_l0_reports_skipped(monkeypatch):
         5,
         "Medium",
         None,
+        "the assignee",
         targets,
         "http://fake",
         "summary",
@@ -379,6 +382,7 @@ def test_maybe_notify_escalation_no_webhook_configured_skips():
         8,
         "Medium",
         "assignee@x.com",
+        "Pat Assignee",
         targets,
         None,
         "summary",
@@ -406,7 +410,7 @@ def test_maybe_notify_escalation_skips_instead_of_resending_on_read_failure(
     monkeypatch.setattr(
         sync_escalation_hierarchy,
         "_notify_hub",
-        lambda webhook_base, space, email, card: sent.append(email) or True,
+        lambda webhook_base, email, card: sent.append(email) or True,
     )
 
     targets = (("l4@x.com", "L4"), ("l3@x.com", "L3"), ("l2@x.com", "L2"))
@@ -415,6 +419,7 @@ def test_maybe_notify_escalation_skips_instead_of_resending_on_read_failure(
         8,
         "Medium",
         "assignee@x.com",
+        "Pat Assignee",
         targets,
         "http://fake",
         "summary",
@@ -442,7 +447,7 @@ def test_maybe_notify_escalation_reports_write_failure_without_losing_the_send(
     monkeypatch.setattr(
         sync_escalation_hierarchy,
         "_notify_hub",
-        lambda webhook_base, space, email, card: True,
+        lambda webhook_base, email, card: True,
     )
 
     targets = (("l4@x.com", "L4"), ("l3@x.com", "L3"), ("l2@x.com", "L2"))
@@ -451,6 +456,7 @@ def test_maybe_notify_escalation_reports_write_failure_without_losing_the_send(
         8,
         "Medium",
         "assignee@x.com",
+        "Pat Assignee",
         targets,
         "http://fake",
         "summary",
@@ -487,16 +493,65 @@ def test_put_escalation_notified_level_retries_once_before_failing(monkeypatch):
     assert len(calls) == 2
 
 
+def test_escalation_notice_l3_names_assignee_and_explains_dei_context():
+    notice = sync_escalation_hierarchy._escalation_notice("L3", "Maria Silva")
+    assert "Maria Silva" in notice
+    assert "second level" in notice
+    assert "data incident" in notice
+    assert "DEI" in notice
+    assert "on your team" in notice
+
+
+def test_format_assignee_display_name_prefers_jira_then_hr():
+    names = {"ic@x.com": "HR Name"}
+    assert (
+        sync_escalation_hierarchy._format_assignee_display_name(
+            "Jira Name", "ic@x.com", names
+        )
+        == "Jira Name"
+    )
+    assert (
+        sync_escalation_hierarchy._format_assignee_display_name(None, "ic@x.com", names)
+        == "HR Name"
+    )
+
+
 def test_build_escalation_card_escapes_html_in_summary():
     """A crafted summary must not inject markup into the Chat card -- the
     card's own lines use literal <b>/<a href> HTML, so unescaped reporter
     text would render as a clickable link inside a trusted DM."""
     malicious_summary = '<a href="https://evil.example">click here</a>'
 
-    card = _build_escalation_card("DEI-1", malicious_summary, 5, "L4", "L4", None)
+    card = _build_escalation_card(
+        "DEI-1", malicious_summary, 5, "L4", "L4", "Pat Assignee", None
+    )
 
     text = card["card"]["sections"][0]["widgets"][0]["textParagraph"]["text"]
     assert '<a href="https://evil.example">' not in text
     assert "&lt;a href=" in text
     # The card's own trusted link (Open in Jira) must still render as real HTML.
     assert '<a href="https://quintoandar.atlassian.net/browse/DEI-1">' in text
+
+
+def test_notify_hub_posts_dm_only_without_space(monkeypatch):
+    captured = {}
+
+    class FakeResponse:
+        def raise_for_status(self):
+            return None
+
+    def fake_post(url, json, timeout):
+        captured["url"] = url
+        captured["payload"] = json
+        return FakeResponse()
+
+    monkeypatch.setattr(sync_escalation_hierarchy.requests, "post", fake_post)
+
+    card = {"cardId": "escalation-DEI-1-L0", "card": {"header": {"title": "x"}}}
+    assert sync_escalation_hierarchy._notify_hub("http://fake-hub", "ic@q.com", card)
+
+    assert captured["payload"] == {
+        "cardsV2": [card],
+        "info": {"email": ["ic@q.com"]},
+    }
+    assert "space" not in captured["payload"]
