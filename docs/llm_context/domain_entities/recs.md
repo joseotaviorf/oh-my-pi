@@ -1,5 +1,10 @@
 # Recs
 
+## Ownership
+
+**Data Steward:**
+- pedro.nogueira@quintoandar.com.br
+
 ## Overview
 
 Recs represents recommendation exposures shown to users across product surfaces, especially recommendation carousels tied to listing discovery. Use this entity to measure recommendation volume, click-through behavior, segment performance, AB-test variants, and downstream journey outcomes after an exposure.
@@ -24,6 +29,7 @@ Not all impressions lead to user interaction or conversion. Some recommendation 
 - **contexto de negocio** → recommendation context from `json_extract_scalar(dimensions, '$.business_context')`, usually `RENT` or `SALE`
 - **showcase** → recommendation surface/type from `dimensions.showcase`, for example `LISTING_SIMILAR_USER`
 - **usuario outlier** → high-activity users flagged in `dimensions.is_outlier_user`
+- **mercado primario**, **primary market** → house SALE listing classified as new-build from `dimensions.is_primary_market` (1 when the listing_sale_type SSOT is PRIMARY, else 0). Do not use the legacy `house.is_sale_primary_market` boolean.
 - **conversao de recs** → downstream outcomes after recommendation contact from `metrics.visit_booked`, `metrics.direct_offer`, `metrics.offer`, `metrics.contract_signed`, and matching timestamp fields in `timestamps`
 - **variant**, **AB test** → experiment assignment from `variants.<experiment_name>`
 - **search**, **busca**, **resultado de busca** → active search-result discovery tracked in [`search.md`](./search.md), not recommendation carousel exposure
@@ -169,6 +175,7 @@ Prompt-to-query mapping for this specific active test:
 - Don't aggregate RENT and SALE together by default; the conversion paths and baselines differ.
 - Don't add `showcase` to CTR result sets unless the requester directly asks for a showcase breakdown.
 - Don't join recs directly to downstream contract/visit tables without first defining the attribution grain (user-house, recset, or impression).
+- Don't join `listing_sale_type` or use `house.is_sale_primary_market` for recs-impression market cuts; use `dimensions.is_primary_market`.
 - Do not assume the business context for an experiment. Ask the user explicitly before deciding whether the analysis should focus on conversion, engagement, lead qualification, recommendation quality, operational performance, or another context.
 
 ## Golden Queries

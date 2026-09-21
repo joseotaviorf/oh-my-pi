@@ -78,6 +78,7 @@ global_user_recs_metrics AS (
               named_struct(
                 'business_context', all_users.business_context,
                 'city', house_cities.city,
+                'is_primary_market', CASE WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1 ELSE 0 END,
                 'is_outlier_user', all_users.is_outlier_user
               )
             ) AS dimensions,
@@ -128,6 +129,8 @@ global_user_recs_metrics AS (
                         AND all_users.business_context = 'sale'
                         AND ts_sale_flow_latest_event >= all_users.date
     LEFT JOIN house_cities ON COALESCE(rent_flow.id_house, sale_flow.id_house) = house_cities.id_house
+    LEFT JOIN datalake_sale_primary_market.listing_sale_type AS listing_sale_type
+        ON COALESCE(rent_flow.id_house, sale_flow.id_house) = listing_sale_type.id_house
 )
 
 SELECT

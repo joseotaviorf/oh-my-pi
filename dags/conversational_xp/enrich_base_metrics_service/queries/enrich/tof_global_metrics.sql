@@ -110,6 +110,11 @@ global_tof_metrics AS (
             NAMED_STRUCT(
                 'business_context', tof_users.business_context,
                 'city', house_cities.city,
+                'is_primary_market',
+                CASE
+                    WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1
+                    ELSE 0
+                END,
                 'is_outlier_user', tof_users.is_outlier_user,
                 'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
             )
@@ -187,6 +192,9 @@ global_tof_metrics AS (
     LEFT JOIN
         house_cities
         ON COALESCE(rent_flow.id_house, sale_flow.id_house) = house_cities.id_house
+    LEFT JOIN
+        datalake_sale_primary_market.listing_sale_type AS listing_sale_type
+        ON COALESCE(rent_flow.id_house, sale_flow.id_house) = listing_sale_type.id_house
 )
 SELECT
     ids,

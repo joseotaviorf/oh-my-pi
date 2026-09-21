@@ -21,11 +21,13 @@ columns:
     description: |
       A JSON object with dimensions for global user analysis, including business context, property city, and outlier classification.
       `visit_creation_origin` identifies the channel or source where that first attributed visit was created. It refers only to the first visit, because later visits may be booked by a different user or agent; it is used to identify who found the house.
+      `is_primary_market` is 1 when the attributed house SALE listing is PRIMARY in the listing_sale_type SSOT, and 0 otherwise, including houses with no SALE listing.
     lineage:
       - datalake_search.search_impressions.dimensions
       - datalake_search.rent_flow_past_30_days.id_house
       - datalake_search.sale_flow_past_30_days.id_house
       - wonka.house_main.city
+      - datalake_sale_primary_market.listing_sale_type.sale_type
       - datalake_search.rent_flow_past_30_days.visit_creation_origin
       - datalake_search.sale_flow_past_30_days.visit_creation_origin
   variants:

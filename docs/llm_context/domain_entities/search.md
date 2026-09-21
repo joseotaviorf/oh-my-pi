@@ -1,5 +1,10 @@
 # Search
 
+## Ownership
+
+**Data Steward:**
+- pedro.nogueira@quintoandar.com.br
+
 ## Overview
 
 Search represents listing discovery sessions where users view search result pages, see ranked listings, click listings, and may later progress to visits, offers, or contracts. Use this entity to answer questions about search volume, result exposure, click-through behavior, ranking position, AB-test variants, and downstream journey attribution after a search impression.
@@ -28,6 +33,7 @@ Not every search has a click or downstream conversion. Search metrics are at sea
 - **rendering type**, **SPV/SRPV** -> search page variant from `dimensions.search_rendering_type`
 - **contexto de negocio** -> search context from `json_extract_scalar(dimensions, '$.business_context')`, usually `rent` or `sale`
 - **usuario outlier** -> high-activity users flagged in `dimensions.is_outlier_user`
+- **mercado primario**, **primary market** -> house SALE listing classified as new-build from `dimensions.is_primary_market` (1 when the listing_sale_type SSOT is PRIMARY, else 0). Do not use the legacy `house.is_sale_primary_market` boolean.
 - **variant**, **AB test** -> experiment assignment from `variants.<experiment_name>`
 
 ## Tables
@@ -136,6 +142,7 @@ For requests like "search CTR for `<experiment_name>`", always route to search A
 
 - Use `ids.id_house` to connect search-result exposure to house/listing context.
 - Search rank and listing age are already available in `dimensions.absolute_position`, `dimensions.page_number`, `dimensions.page_position`, `dimensions.rank_model`, and `dimensions.listing_age`; avoid joining to listing tables just to recompute these fields.
+- Primary vs secondary sale market is already on `dimensions.is_primary_market` from `datalake_sale_primary_market.listing_sale_type`; do not join listing_sale_type or use `house.is_sale_primary_market` for search-impression cuts.
 
 ## Dos and Don'ts
 

@@ -73,6 +73,7 @@ global_user_metrics AS (
               named_struct(
                 'business_context', all_users.business_context,
                 'city', house_cities.city,
+                'is_primary_market', CASE WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1 ELSE 0 END,
                 'is_outlier_user', all_users.is_outlier_user,
                 'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
               )
@@ -124,6 +125,8 @@ global_user_metrics AS (
                         AND all_users.business_context = 'sale'
                         AND ts_sale_flow_latest_event >= all_users.date
     LEFT JOIN house_cities ON COALESCE(rent_flow.id_house, sale_flow.id_house) = house_cities.id_house
+    LEFT JOIN datalake_sale_primary_market.listing_sale_type AS listing_sale_type
+        ON COALESCE(rent_flow.id_house, sale_flow.id_house) = listing_sale_type.id_house
 ),
 
 ------------------------------------------------------------------------------------
@@ -184,25 +187,66 @@ house_published_repeated AS (
     houses_catalog
 ),
 
-houses_published AS (
+running_experiments AS (
+    SELECT
+        experiment_config.experiment_name,
+        experiment_config.config.begin_date AS begin_date,
+        experiment_config.config.end_date AS end_date
+    FROM
+        datalake_search.experiment_config AS experiment_config
+    WHERE
+        experiment_config.config.running IS TRUE
+),
+
+houses_eligible AS (
     SELECT
         id_house,
         business_context,
-        ts_house_published,
-        CONCAT('{{', array_join(array_agg(CONCAT('"', experiment_config.experiment_name, '":"all"')), ','), '}}') AS variants
+        ts_house_published
     FROM
         house_published_repeated
-    LEFT JOIN
-        datalake_search.experiment_config AS experiment_config
-        ON experiment_config.config.begin_date <= ts_house_published
-        AND (experiment_config.config.end_date >= ts_house_published OR experiment_config.config.end_date IS NULL)
-        AND experiment_config.config.running is True
     WHERE
         COALESCE(DATEDIFF(ts_house_published, ts_house_published_shift), 1000) > 84
+),
+
+-- Date-window match cannot live in JOIN ON: that shape has no hash key and
+-- EMR plans it as BroadcastNestedLoopJoin. Filter the small running-experiment
+-- set after a CROSS JOIN, then left-join back on house keys.
+matched_house_experiments AS (
+    SELECT
+        houses_eligible.id_house,
+        houses_eligible.business_context,
+        houses_eligible.ts_house_published,
+        running_experiments.experiment_name
+    FROM
+        houses_eligible
+    CROSS JOIN
+        running_experiments
+    WHERE
+        running_experiments.begin_date <= houses_eligible.ts_house_published
+        AND (
+            running_experiments.end_date >= houses_eligible.ts_house_published
+            OR running_experiments.end_date IS NULL
+        )
+),
+
+houses_published AS (
+    SELECT
+        houses_eligible.id_house,
+        houses_eligible.business_context,
+        houses_eligible.ts_house_published,
+        CONCAT('{{', ARRAY_JOIN(ARRAY_AGG(CONCAT('"', matched_house_experiments.experiment_name, '":"all"')), ','), '}}') AS variants
+    FROM
+        houses_eligible
+    LEFT JOIN
+        matched_house_experiments
+            ON houses_eligible.id_house = matched_house_experiments.id_house
+            AND houses_eligible.business_context = matched_house_experiments.business_context
+            AND houses_eligible.ts_house_published = matched_house_experiments.ts_house_published
     GROUP BY
-        id_house,
-        business_context,
-        ts_house_published
+        houses_eligible.id_house,
+        houses_eligible.business_context,
+        houses_eligible.ts_house_published
 ),
 
 parsed_houses_published AS (
@@ -210,6 +254,10 @@ parsed_houses_published AS (
         houses_published.id_house,
         houses_published.business_context,
         house_cities.city,
+        CASE
+            WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1
+            ELSE 0
+        END AS is_primary_market,
         variants,
         houses_published.ts_house_published,
         DATE(houses_published.ts_house_published) AS date,
@@ -221,6 +269,8 @@ parsed_houses_published AS (
       houses_published
     LEFT JOIN house_cities
         ON houses_published.id_house = house_cities.id_house
+    LEFT JOIN datalake_sale_primary_market.listing_sale_type AS listing_sale_type
+        ON houses_published.id_house = listing_sale_type.id_house
     WHERE houses_published.ts_house_published BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 ),
 
@@ -240,6 +290,7 @@ global_house_metrics AS (
             named_struct(
                 'business_context', houses_published.business_context,
                 'city', house_cities.city,
+                'is_primary_market', houses_published.is_primary_market,
                 'is_outlier_user', get_json_object(global_user_metrics.dimensions, '$.is_outlier_user'),
                 'visit_creation_origin', get_json_object(global_user_metrics.dimensions, '$.visit_creation_origin')
             )
@@ -301,7 +352,8 @@ house_published_all AS (
     to_json(
             named_struct(
                 'business_context', houses_published.business_context,
-                'city', house_cities.city
+                'city', house_cities.city,
+                'is_primary_market', houses_published.is_primary_market
             )
     ) AS dimensions,
 

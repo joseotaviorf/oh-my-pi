@@ -59,7 +59,8 @@ recs_house_published AS (
         recs_impressions.recset_id_fix,
         MAX(house_publication_dates.ts_house_published) AS ts_house_published,
         LAST(city) AS city,
-        LAST(is_classified) AS is_classified
+        LAST(is_classified) AS is_classified,
+        LAST(CASE WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1 ELSE 0 END) AS is_primary_market
     FROM datalake_search.recs_impressions
     LEFT JOIN datalake_search.house_publication_dates
         ON house_publication_dates.id_house = recs_impressions.id_house
@@ -67,6 +68,8 @@ recs_house_published AS (
         AND house_publication_dates.ts_house_published <= recs_impressions.ts_recommendation
     LEFT JOIN wonka.house_main
         ON house_main.id = recs_impressions.id_house
+    LEFT JOIN datalake_sale_primary_market.listing_sale_type AS listing_sale_type
+        ON recs_impressions.id_house = listing_sale_type.id_house
     WHERE MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     GROUP BY 1,2,3,4
 )
@@ -100,6 +103,7 @@ SELECT DISTINCT
             'origin', recs_impressions.origin,
             'listing_age', CAST(DATEDIFF(recs_impressions.ts_recommendation, recs_house_published.ts_house_published) AS INT),
             'is_classified', recs_house_published.is_classified,
+            'is_primary_market', recs_house_published.is_primary_market,
             'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END,
             'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
         )

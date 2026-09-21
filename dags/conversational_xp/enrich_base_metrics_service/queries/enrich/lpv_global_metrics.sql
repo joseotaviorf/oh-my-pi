@@ -121,6 +121,11 @@ global_lpv_metrics AS (
             NAMED_STRUCT(
                 'business_context', lpv_users.business_context,
                 'city', house_cities.city,
+                'is_primary_market',
+                CASE
+                    WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1
+                    ELSE 0
+                END,
                 'is_outlier_user',
                 CASE
                     WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1
@@ -218,6 +223,9 @@ global_lpv_metrics AS (
     LEFT JOIN
         house_cities
         ON lpv_users.id_house = house_cities.id_house
+    LEFT JOIN
+        datalake_sale_primary_market.listing_sale_type AS listing_sale_type
+        ON lpv_users.id_house = listing_sale_type.id_house
 )
 SELECT
     ids,

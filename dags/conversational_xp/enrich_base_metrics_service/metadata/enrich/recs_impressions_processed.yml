@@ -21,7 +21,7 @@ columns:
       - datalake_search.rent_flow_past_30_days.id_agent
       - datalake_search.sale_flow_past_30_days.id_agent
   dimensions:
-    description: "JSON object with analysis dimensions: business_context, city, platform, position, showcase, origin (chatbot the carousel was generated for, e.g. Julia/Mora/Bianca), listing_age (days since publication), is_classified, is_outlier_user, and visit_creation_origin (the channel where the first attributed visit was created)."
+    description: "JSON object with analysis dimensions: business_context, city, platform, position, showcase, origin (chatbot the carousel was generated for, e.g. Julia/Mora/Bianca), listing_age (days since publication), is_classified, is_primary_market (1 when the house SALE listing is PRIMARY in the listing_sale_type SSOT, else 0), is_outlier_user, and visit_creation_origin (the channel where the first attributed visit was created)."
     lineage:
       - datalake_search.recs_impressions.business_context
       - datalake_search.recs_impressions.platform
@@ -31,6 +31,7 @@ columns:
       - datalake_search.house_publication_dates.ts_house_published
       - wonka.house_main.city
       - wonka.house_main.is_classified
+      - datalake_sale_primary_market.listing_sale_type.sale_type
       - datalake_search.rent_outlier_users_past_30_days.id_user
       - datalake_search.sale_outlier_users_past_30_days.id_user
       - datalake_search.rent_flow_past_30_days.visit_creation_origin

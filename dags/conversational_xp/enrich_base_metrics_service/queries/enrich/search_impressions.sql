@@ -267,6 +267,10 @@ exploded_houses AS (
         houses_rank.id_house,
         house_cities.city,
         house_cities.is_classified,
+        CASE
+            WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1
+            ELSE 0
+        END AS is_primary_market,
         houses_rank.search_rendering_type,
         houses_rank.rank_model,
         houses_rank.absolute_position,
@@ -282,11 +286,17 @@ exploded_houses AS (
         AND houses_published.ts_house_published <= houses_rank.ts_search
     LEFT JOIN house_cities
         ON houses_rank.id_house = house_cities.id_house
+    LEFT JOIN datalake_sale_primary_market.listing_sale_type AS listing_sale_type
+        ON houses_rank.id_house = listing_sale_type.id_house
     GROUP BY
         houses_rank.id_search,
         houses_rank.id_house,
         house_cities.city,
         house_cities.is_classified,
+        CASE
+            WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1
+            ELSE 0
+        END,
         houses_rank.search_rendering_type,
         houses_rank.rank_model,
         houses_rank.absolute_position,
@@ -327,6 +337,7 @@ SELECT
             'page_position', exploded_houses.page_position,
             'listing_age', exploded_houses.listing_age,
             'is_classified', exploded_houses.is_classified,
+            'is_primary_market', exploded_houses.is_primary_market,
             'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END,
             'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
         )

@@ -24,6 +24,7 @@ columns:
       A JSON object describing the business context of the Top of Funnel action:
       - `business_context`: journey context for the action, either rent or sale.
       - `city`: attributed property city linked to the subsequent funnel event, when available.
+      - `is_primary_market`: 1 when the attributed house SALE listing is PRIMARY in the listing_sale_type SSOT, and 0 otherwise, including houses with no SALE listing.
       - `is_outlier_user`: flag indicating whether the user is treated as an outlier in the source ToF event.
       - `visit_creation_origin`: channel or source where the first attributed visit was created. The attribution refers only to the first visit, because later visits may be booked by a different user or agent; it identifies who found the house.
     lineage:
@@ -31,6 +32,7 @@ columns:
       - datalake_search.recs_impressions_processed.dimensions
       - datalake_search.lpv_global_metrics.dimensions
       - wonka.house_main.city
+      - datalake_sale_primary_market.listing_sale_type.sale_type
       - datalake_search.rent_flow_past_30_days.visit_creation_origin
       - datalake_search.sale_flow_past_30_days.visit_creation_origin
   variants:

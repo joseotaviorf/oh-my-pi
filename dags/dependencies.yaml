@@ -1702,6 +1702,7 @@ bietlejuice.enrich_base_metrics_service:
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
+  - bietlejuice.enrich_sale_primary_market:load-enrich-listing-sale-type:first-run-of-day
 bietlejuice.enrich_betopera:
   - bietlejuice.betopera:load-clean-certificate-request:first-run-of-day
   - bietlejuice.betopera:load-clean-certificate:first-run-of-day
