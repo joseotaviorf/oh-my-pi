@@ -10,7 +10,8 @@ cluster:
       target_on_demand: 2
       target_spot: 0
       # NVMe (gd) absorbs the inspector_reports fan-out spill; gp3 at 125 MB/s
-      # was the only scratch path. m6gd/m7gd → m6id when EMR_X86_FALLBACK is on.
+      # was the only scratch path. ARM-first alternate (m6gd/m7gd → m6id)
+      # taken on a capacity fallback.
       instance_types:
         - m6gd.8xlarge
         - m7gd.8xlarge

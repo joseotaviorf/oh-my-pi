@@ -38,3 +38,9 @@ SPOT_DECOMMISSION_PROPERTIES = {
     "spark.storage.decommission.shuffleBlocks.enabled": "true",
     "spark.storage.decommission.rddBlocks.enabled": "true",
 }
+
+# Required both for Priority to be honoured and to exceed the 5-instance-type fleet cap (up to 30).
+EMR_FLEET_ON_DEMAND_ALLOCATION_STRATEGY = "prioritized"
+
+# Airflow Variable name for Google Chat capacity failure alert webhook.
+EMR_CAPACITY_ALERT_WEBHOOK_VARIABLE = "GCHAT_BROKEN_DAG_WEBHOOK"

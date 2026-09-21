@@ -14,8 +14,8 @@ cluster:
       target_on_demand: 10
       target_spot: 0
       instance_types:
-        # Local NVMe (gd) — shuffle spill off EBS. x86_fallback maps
-        # r6gd/r7gd → r6id when EMR_X86_FALLBACK is on.
+        # Local NVMe (gd) — shuffle spill off EBS. ARM-first alternate
+        # (r6gd/r7gd → r6id) taken on a capacity fallback.
         - r6gd.4xlarge
         - r7gd.4xlarge
     task_nodes:

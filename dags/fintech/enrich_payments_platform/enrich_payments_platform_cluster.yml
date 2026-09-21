@@ -11,8 +11,8 @@ cluster:
       target_on_demand: 12
       target_spot: 0
       instance_types:
-      # Local NVMe (gd/id) — shuffle spill off EBS. x86_fallback maps
-      # r6gd/r7gd → r6id when EMR_X86_FALLBACK is on.
+      # Local NVMe (gd/id) — shuffle spill off EBS. ARM-first alternate
+      # (r6gd/r7gd → r6id) taken on a capacity fallback.
       - r6gd.2xlarge
       - r7gd.2xlarge
     spark_conf:

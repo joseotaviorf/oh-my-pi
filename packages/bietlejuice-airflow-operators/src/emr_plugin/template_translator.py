@@ -23,6 +23,7 @@ from typing import Tuple
 from emr_plugin.constants import (
     DEFAULT_MASTER_INSTANCE_TYPE,
     DEFAULT_SPOT_TIMEOUT_MINUTES,
+    EMR_FLEET_ON_DEMAND_ALLOCATION_STRATEGY,
     EMR_FLEET_SPOT_TIMEOUT_ACTION,
     EMR_INSTANCE_FLEET_NAME_CORE,
     EMR_INSTANCE_FLEET_NAME_MASTER,
@@ -32,7 +33,7 @@ from emr_plugin.constants import (
     EMR_INSTANCE_GROUP_NAME_TASK,
     SPOT_DECOMMISSION_PROPERTIES,
 )
-from emr_plugin.x86_fallback import apply_x86_fallback
+from emr_plugin.instance_alternates import with_alternates
 
 log = logging.getLogger(__name__)
 
@@ -124,7 +125,6 @@ def translate(config: dict) -> dict:
     :return: EMR job_flow_overrides dict.
     """
     cfg = copy.deepcopy(config)
-    apply_x86_fallback(cfg)
 
     overrides = {}
 
@@ -441,8 +441,13 @@ def _build_instance_type_configs(
     instance_types: list, ebs_config: dict = None, bid_price_percentage=None
 ) -> list:
     configs = []
-    for instance_type in instance_types:
-        entry = {"InstanceType": instance_type, "WeightedCapacity": 1}
+    expanded_types = with_alternates(instance_types)
+    for index, instance_type in enumerate(expanded_types):
+        entry = {
+            "InstanceType": instance_type,
+            "WeightedCapacity": 1,
+            "Priority": float(index),
+        }
         if bid_price_percentage is not None:
             entry["BidPriceAsPercentageOfOnDemandPrice"] = bid_price_percentage
         if ebs_config:
@@ -452,13 +457,21 @@ def _build_instance_type_configs(
 
 
 def _build_spot_specification(spec: dict) -> dict:
+    strategy = spec.get("allocation_strategy") or "capacity-optimized-prioritized"
     launch_spec = {
         "TimeoutDurationMinutes": spec["spot_timeout_minutes"],
         "TimeoutAction": EMR_FLEET_SPOT_TIMEOUT_ACTION,
+        "AllocationStrategy": strategy,
     }
-    if spec.get("allocation_strategy"):
-        launch_spec["AllocationStrategy"] = spec["allocation_strategy"]
     return {"SpotSpecification": launch_spec}
+
+
+def _build_on_demand_specification() -> dict:
+    return {
+        "OnDemandSpecification": {
+            "AllocationStrategy": EMR_FLEET_ON_DEMAND_ALLOCATION_STRATEGY,
+        }
+    }
 
 
 def _translate_instance_fleets(cfg: dict, overrides: dict):
@@ -515,6 +528,7 @@ def _translate_instance_fleets(cfg: dict, overrides: dict):
         "InstanceTypeConfigs": _build_instance_type_configs(
             [master_instance_type], ebs_config=ebs_config
         ),
+        "LaunchSpecifications": _build_on_demand_specification(),
     }
 
     fleets = [master_fleet]
@@ -531,8 +545,13 @@ def _translate_instance_fleets(cfg: dict, overrides: dict):
                 bid_price_percentage=core_spec["bid_price_percentage"],
             ),
         }
+        # Always configure OnDemandSpecification with 'prioritized' allocation strategy.
+        # This ensures Priority is respected not only when target_on_demand > 0, but also
+        # when Spot capacity times out and switches to On-Demand (SWITCH_TO_ON_DEMAND).
+        core_launch_specs = _build_on_demand_specification()
         if core_spec["target_spot"] > 0:
-            core_fleet["LaunchSpecifications"] = _build_spot_specification(core_spec)
+            core_launch_specs.update(_build_spot_specification(core_spec))
+        core_fleet["LaunchSpecifications"] = core_launch_specs
         fleets.append(core_fleet)
 
     if task_spec:
@@ -547,8 +566,12 @@ def _translate_instance_fleets(cfg: dict, overrides: dict):
                 bid_price_percentage=task_spec["bid_price_percentage"],
             ),
         }
+        # Always configure OnDemandSpecification with 'prioritized' allocation strategy
+        # so fallback On-Demand launches on Spot timeout honour ARM-first Priority.
+        task_launch_specs = _build_on_demand_specification()
         if task_spec["target_spot"] > 0:
-            task_fleet["LaunchSpecifications"] = _build_spot_specification(task_spec)
+            task_launch_specs.update(_build_spot_specification(task_spec))
+        task_fleet["LaunchSpecifications"] = task_launch_specs
         fleets.append(task_fleet)
 
     instances = {"InstanceFleets": fleets, "KeepJobFlowAliveWhenNoSteps": True}

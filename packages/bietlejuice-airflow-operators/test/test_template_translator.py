@@ -102,53 +102,6 @@ def _instance_types(fleet: dict) -> list:
     return [config["InstanceType"] for config in fleet["InstanceTypeConfigs"]]
 
 
-def test_graviton_fleets_translate_to_x86_instance_types():
-    # arrange
-    cfg = _fleet_base(
-        master_node_type_id="m7g.xlarge",
-        core_nodes={
-            "instance_types": ["r6g.xlarge", "r7g.xlarge", "r6i.xlarge"],
-            "target_on_demand": 1,
-            "target_spot": 0,
-        },
-        task_nodes={
-            "instance_types": ["m6gd.4xlarge", "m7gd.4xlarge"],
-            "target_on_demand": 0,
-            "target_spot": 2,
-        },
-    )
-
-    # act
-    out = translate(cfg)
-
-    # assert
-    master, core, task = out["Instances"]["InstanceFleets"]
-    assert _instance_types(master) == ["m7a.xlarge"]
-    assert _instance_types(core) == ["r6a.xlarge", "r7a.xlarge", "r6i.xlarge"]
-    assert _instance_types(task) == ["m6id.4xlarge"]
-
-
-def test_graviton_instance_groups_translate_to_x86_instance_types():
-    # arrange
-    cfg = {
-        "cluster_name": "test",
-        "spark_version": "emr-7.12.0",
-        "master_node_type_id": "m6g.xlarge",
-        "core_nodes": {"node_type_id": "r6g.2xlarge", "instance_count": 2},
-        "task_nodes": {"node_type_id": "c7g.4xlarge", "instance_count": 1},
-        "aws_attributes": {"availability": "ON_DEMAND"},
-    }
-
-    # act
-    out = translate(cfg)
-
-    # assert
-    master, core, task = out["Instances"]["InstanceGroups"]
-    assert master["InstanceType"] == "m6a.xlarge"
-    assert core["InstanceType"] == "r6a.2xlarge"
-    assert task["InstanceType"] == "c7a.4xlarge"
-
-
 def test_translate_does_not_mutate_the_caller_configuration():
     # translate() runs at DAG-parse and again at task-execute time on the same
     # cluster_configuration object held by the operator.
@@ -158,26 +111,6 @@ def test_translate_does_not_mutate_the_caller_configuration():
 
     assert cfg["master_node_type_id"] == "r6g.xlarge"
     assert cfg["core_nodes"]["instance_types"] == ["r6g.xlarge"]
-
-
-def test_emr_allow_graviton_keeps_the_declared_instance_types():
-    # arrange
-    cfg = _fleet_base(
-        emr_allow_graviton=True,
-        core_nodes={
-            "instance_types": ["r6g.xlarge"],
-            "target_on_demand": 2,
-            "target_spot": 0,
-        },
-    )
-
-    # act
-    out = translate(cfg)
-
-    # assert
-    master, core = out["Instances"]["InstanceFleets"]
-    assert _instance_types(master) == ["r6g.xlarge"]
-    assert _instance_types(core) == ["r6g.xlarge"]
 
 
 def _spark_defaults_props(out: dict) -> dict:
@@ -444,3 +377,131 @@ def test_spot_with_fallback_core_instance_group_injects_decommission_defaults():
     )
 
     assert _has_decommission_defaults(out)
+
+
+def test_translate_fleets_instance_type_priorities():
+    cfg = _fleet_base(master_node_type_id="r6g.xlarge")
+    out = translate(cfg)
+    master = out["Instances"]["InstanceFleets"][0]
+    expected_types = [
+        "r6g.xlarge",
+        "r7g.xlarge",
+        "r6a.xlarge",
+        "r6i.xlarge",
+        "r7i.xlarge",
+        "r7a.xlarge",
+    ]
+    assert _instance_types(master) == expected_types
+    for idx, config in enumerate(master["InstanceTypeConfigs"]):
+        assert config["Priority"] == float(idx)
+        assert config["WeightedCapacity"] == 1
+
+
+def test_translate_fleets_alternates_expansion():
+    cfg = _fleet_base(
+        core_nodes={
+            "instance_types": ["r6g.2xlarge", "r7g.2xlarge", "r6i.2xlarge"],
+            "target_on_demand": 2,
+            "target_spot": 0,
+        }
+    )
+    out = translate(cfg)
+    core = out["Instances"]["InstanceFleets"][1]
+    expected_types = [
+        "r6g.2xlarge",
+        "r7g.2xlarge",
+        "r6i.2xlarge",
+        "r6a.2xlarge",
+        "r7i.2xlarge",
+        "r7a.2xlarge",
+    ]
+    assert _instance_types(core) == expected_types
+    for idx, config in enumerate(core["InstanceTypeConfigs"]):
+        assert config["Priority"] == float(idx)
+
+
+def test_translate_fleets_on_demand_specification():
+    cfg = _fleet_base(
+        master_node_type_id="r6g.xlarge",
+        core_nodes={
+            "instance_types": ["r6g.xlarge"],
+            "target_on_demand": 2,
+            "target_spot": 0,
+        },
+    )
+    out = translate(cfg)
+    master = out["Instances"]["InstanceFleets"][0]
+    core = out["Instances"]["InstanceFleets"][1]
+    assert (
+        master["LaunchSpecifications"]["OnDemandSpecification"]["AllocationStrategy"]
+        == "prioritized"
+    )
+    assert (
+        core["LaunchSpecifications"]["OnDemandSpecification"]["AllocationStrategy"]
+        == "prioritized"
+    )
+
+
+def test_translate_fleets_custom_spot_allocation_strategy():
+    cfg_default = _fleet_base(
+        core_nodes={
+            "instance_types": ["r6g.xlarge"],
+            "target_on_demand": 0,
+            "target_spot": 2,
+        }
+    )
+    out_default = translate(cfg_default)
+    core_default = out_default["Instances"]["InstanceFleets"][1]
+    spot_spec_default = core_default["LaunchSpecifications"]["SpotSpecification"]
+    assert spot_spec_default["AllocationStrategy"] == "capacity-optimized-prioritized"
+    assert spot_spec_default["TimeoutAction"] == "SWITCH_TO_ON_DEMAND"
+
+    cfg_explicit = _fleet_base(
+        core_nodes={
+            "instance_types": ["r6g.xlarge"],
+            "target_on_demand": 0,
+            "target_spot": 2,
+            "allocation_strategy": "price-capacity-optimized",
+        }
+    )
+    out_explicit = translate(cfg_explicit)
+    core_explicit = out_explicit["Instances"]["InstanceFleets"][1]
+    spot_spec_explicit = core_explicit["LaunchSpecifications"]["SpotSpecification"]
+    assert spot_spec_explicit["AllocationStrategy"] == "price-capacity-optimized"
+    assert spot_spec_explicit["TimeoutAction"] == "SWITCH_TO_ON_DEMAND"
+
+
+def test_translate_fleets_spot_only_includes_on_demand_specification_for_timeout_fallback():
+    cfg = _fleet_base(
+        core_nodes={
+            "instance_types": ["r6g.xlarge"],
+            "target_on_demand": 0,
+            "target_spot": 2,
+        },
+        task_nodes={
+            "instance_types": ["m6g.xlarge"],
+            "target_on_demand": 0,
+            "target_spot": 4,
+        },
+    )
+    out = translate(cfg)
+    core = out["Instances"]["InstanceFleets"][1]
+    task = out["Instances"]["InstanceFleets"][2]
+
+    assert (
+        core["LaunchSpecifications"]["OnDemandSpecification"]["AllocationStrategy"]
+        == "prioritized"
+    )
+    assert (
+        core["LaunchSpecifications"]["SpotSpecification"]["TimeoutAction"]
+        == "SWITCH_TO_ON_DEMAND"
+    )
+
+    assert (
+        task["LaunchSpecifications"]["OnDemandSpecification"]["AllocationStrategy"]
+        == "prioritized"
+    )
+    assert (
+        task["LaunchSpecifications"]["SpotSpecification"]["TimeoutAction"]
+        == "SWITCH_TO_ON_DEMAND"
+    )

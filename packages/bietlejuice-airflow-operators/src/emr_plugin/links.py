@@ -28,6 +28,7 @@ EMR_CLUSTER_LOGS_XCOM_KEY = "quintoandar_emr_cluster_logs_url"
 EMR_STEP_LOGS_XCOM_KEY = "quintoandar_emr_step_logs_url"
 EMR_STEP_IDS_XCOM_KEY = "quintoandar_emr_step_ids"
 EMR_LOG_URI_XCOM_KEY = "quintoandar_emr_log_uri"
+EMR_CAPACITY_FALLBACK_XCOM_KEY = "quintoandar_emr_capacity_fallback"
 
 
 class QuintoAndarEmrClusterLogsLink(BaseOperatorLink):

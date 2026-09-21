@@ -16,20 +16,25 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-from copy import copy
+from copy import copy, deepcopy
 from typing import Optional
 
+import requests
 from airflow.exceptions import TaskDeferred
+from airflow.models import Variable
 from airflow.providers.amazon.aws.links.emr import EmrClusterLink
 from airflow.providers.amazon.aws.operators.emr import EmrCreateJobFlowOperator
 
+from emr_plugin.capacity_failure import classify_launch_failure, force_x86
 from emr_plugin.constants import (
+    EMR_CAPACITY_ALERT_WEBHOOK_VARIABLE,
     EMR_DEFAULT_POOL,
     EMR_DEFAULT_POOL_SLOTS,
     EMR_DEFAULT_WAITER_DELAY_SECONDS,
     EMR_DEFAULT_WAITER_MAX_ATTEMPTS,
 )
 from emr_plugin.links import (
+    EMR_CAPACITY_FALLBACK_XCOM_KEY,
     EMR_CLUSTER_LOGS_XCOM_KEY,
     QuintoAndarEmrClusterLogsLink,
     resolve_job_flow_id_from_ti,
@@ -136,24 +141,140 @@ class QuintoAndarEmrCreateClusterOperator(EmrCreateJobFlowOperator):
             **kwargs,
         )
 
+    @property
+    def hook(self):
+        if hasattr(self, "_custom_hook") and self._custom_hook is not None:
+            return self._custom_hook
+        try:
+            return super().hook
+        except AttributeError:
+            return self._emr_hook
+
+    @hook.setter
+    def hook(self, value):
+        self._custom_hook = value
+
+    @property
+    def _emr_hook(self):
+        if hasattr(self, "_custom_hook") and self._custom_hook is not None:
+            return self._custom_hook
+        try:
+            return super()._emr_hook
+        except AttributeError:
+            return self.hook
+
+    @_emr_hook.setter
+    def _emr_hook(self, value):
+        self._custom_hook = value
+
     def execute(self, context):
-        cfg = copy(self.cluster_configuration)
+        cfg = deepcopy(self.cluster_configuration)
         _ = cfg.pop("region_name", None)
+        ti = context.get("ti")
+        if ti:
+            fallback_reason = ti.xcom_pull(key=EMR_CAPACITY_FALLBACK_XCOM_KEY)
+            if fallback_reason:
+                remapped = force_x86(cfg)
+                if remapped:
+                    pairs = ", ".join(
+                        f"{s} -> {t}" for s, t in sorted(remapped.items())
+                    )
+                    self.log.warning(
+                        "EMR capacity/quota fallback active: %s.%s remapped to x86 (%s). Reason: %s",
+                        ti.dag_id,
+                        ti.task_id,
+                        pairs,
+                        fallback_reason,
+                    )
         self.job_flow_overrides = translate(cfg)
         try:
             job_flow_id = super().execute(context)
-            self._push_cluster_logs_link(context, job_flow_id)
-            return job_flow_id
         except TaskDeferred:
             self._push_cluster_logs_link(
                 context, resolve_job_flow_id_from_ti(context["ti"])
             )
             raise
-
-    def execute_complete(self, context, event=None):
-        job_flow_id = super().execute_complete(context, event)
+        except Exception:
+            self._handle_launch_failure(context)
+            raise
         self._push_cluster_logs_link(context, job_flow_id)
         return job_flow_id
+
+    def execute_complete(self, context, event=None):
+        try:
+            job_flow_id = super().execute_complete(context, event)
+        except Exception:
+            self._handle_launch_failure(context, event=event)
+            raise
+        self._push_cluster_logs_link(context, job_flow_id)
+        return job_flow_id
+
+    def _handle_launch_failure(self, context, event=None) -> None:
+        ti = context.get("ti")
+        if not ti:
+            return
+        cluster_id = (
+            getattr(self, "_job_flow_id", None)
+            or (event.get("job_flow_id") if isinstance(event, dict) else None)
+            or resolve_job_flow_id_from_ti(ti)
+        )
+        if not cluster_id:
+            return
+        try:
+            emr_client = self.hook.conn
+        except Exception:
+            emr_client = None
+        reason = classify_launch_failure(emr_client, cluster_id)
+        if not reason:
+            return
+
+        ti.xcom_push(key=EMR_CAPACITY_FALLBACK_XCOM_KEY, value=reason)
+        remapped = force_x86(deepcopy(self.cluster_configuration))
+        pairs = (
+            ", ".join(f"{s} -> {t}" for s, t in sorted(remapped.items()))
+            if remapped
+            else "none"
+        )
+        self.log.warning(
+            "EMR capacity/quota failure detected on cluster %s for %s.%s: %s. Flagging x86 retry (%s)",
+            cluster_id,
+            ti.dag_id,
+            ti.task_id,
+            reason,
+            pairs,
+        )
+        self._post_capacity_alert(context, reason, remapped)
+
+    def _post_capacity_alert(
+        self, context, reason: str, remapped: dict[str, str]
+    ) -> None:
+        try:
+            webhook_url = Variable.get(
+                EMR_CAPACITY_ALERT_WEBHOOK_VARIABLE, default_var=None
+            )
+            if not webhook_url:
+                self.log.warning(
+                    "EMR capacity alert webhook variable '%s' is not configured; skipping alert.",
+                    EMR_CAPACITY_ALERT_WEBHOOK_VARIABLE,
+                )
+                return
+
+            ti = context["ti"]
+            pairs = (
+                ", ".join(f"{s} -> {t}" for s, t in sorted(remapped.items()))
+                if remapped
+                else "none"
+            )
+            message = (
+                f"EMR capacity/quota fallback: {ti.dag_id}.{ti.task_id} retrying on x86 ({pairs}). "
+                f"Reason: {reason}"
+            )
+            response = requests.post(webhook_url, json={"text": message}, timeout=10)
+            response.raise_for_status()
+        except Exception as exc:
+            self.log.warning(
+                "Failed to post EMR capacity fallback alert to Google Chat: %s", exc
+            )
 
     def _push_cluster_logs_link(self, context, job_flow_id: Optional[str]) -> None:
         if not job_flow_id:
