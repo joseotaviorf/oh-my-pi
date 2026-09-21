@@ -1,0 +1,150 @@
+# Advisory People and enterprise_efficiency convention checks.
+# Each rule stays as a separate step for useful failure details, but failures
+# do not block merges.
+when:
+  - event: pull_request
+    branch:
+      exclude: [development]
+  - event: push
+    branch: [master, hotfix/*, forno, forno-luigijr]
+
+clone:
+  - name: clone
+    image: woodpeckerci/plugin-git
+    settings:
+      partial: false
+
+steps:
+  setup:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - uv sync
+    when:
+      - event: pull_request
+        path: &people_conventions_setup_paths
+          include:
+            - "dags/people/**"
+            - "dags/enterprise_efficiency/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/**"
+            - ".woodpecker/people_conventions.yml"
+            - "Makefile"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno, forno-luigijr]
+        path: *people_conventions_setup_paths
+
+  validate-people-data-quality-files-exist:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    failure: ignore
+    commands:
+      - make validate-people-data-quality-files-exist
+    when:
+      - event: pull_request
+        path: &people_dq_files_exist_path
+          include:
+            - "dags/people/**/queries/**"
+            - "dags/people/**/metadata/**"
+            - "dags/enterprise_efficiency/**/queries/**"
+            - "dags/enterprise_efficiency/**/metadata/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/validate_people_data_quality_files_exist.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_domain_scope.py"
+            - ".woodpecker/people_conventions.yml"
+            - "Makefile"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno, forno-luigijr]
+        path: *people_dq_files_exist_path
+    depends_on: [setup]
+
+  validate-people-dq-conventions:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    failure: ignore
+    commands:
+      - make validate-people-dq-conventions
+    when:
+      - event: pull_request
+        path: &people_dq_conventions_path
+          include:
+            - "dags/people/**/data_quality/**"
+            - "dags/enterprise_efficiency/**/data_quality/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_conventions_validator.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_domain_scope.py"
+            - ".woodpecker/people_conventions.yml"
+            - "Makefile"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno, forno-luigijr]
+        path: *people_dq_conventions_path
+    depends_on: [setup]
+
+  validate-people-sql-metadata-conventions:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    failure: ignore
+    commands:
+      - make validate-people-sql-metadata-conventions
+    when:
+      - event: pull_request
+        path: &people_sql_metadata_path
+          include:
+            - "dags/people/**/queries/**"
+            - "dags/people/**/metadata/**"
+            - "dags/enterprise_efficiency/**/queries/**"
+            - "dags/enterprise_efficiency/**/metadata/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_conventions_validator.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_domain_scope.py"
+            - ".woodpecker/people_conventions.yml"
+            - "Makefile"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno, forno-luigijr]
+        path: *people_sql_metadata_path
+    depends_on: [setup]
+
+  validate-people-sql-style-conventions:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    failure: ignore
+    commands:
+      - make validate-people-sql-style-conventions
+    when:
+      - event: pull_request
+        path: &people_sql_style_path
+          include:
+            - "dags/people/**/queries/**"
+            - "dags/enterprise_efficiency/**/queries/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_conventions_validator.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_domain_scope.py"
+            - ".woodpecker/people_conventions.yml"
+            - "Makefile"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno, forno-luigijr]
+        path: *people_sql_style_path
+    depends_on: [setup]
+
+  validate-people-deprecated-sources-conventions:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    failure: ignore
+    commands:
+      - make validate-people-deprecated-sources-conventions
+    when:
+      - event: pull_request
+        path: &people_deprecated_sources_path
+          include:
+            - "dags/people/**/queries/**"
+            - "dags/enterprise_efficiency/**/queries/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_conventions_validator.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_deprecated_sources.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/people_domain_scope.py"
+            - ".woodpecker/people_conventions.yml"
+            - "Makefile"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno, forno-luigijr]
+        path: *people_deprecated_sources_path
+    depends_on: [setup]

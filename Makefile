@@ -1207,6 +1207,91 @@ validate-join-shapes-all:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_join_shapes.py -a
 
+.PHONY: validate-people-data-quality-files-exist
+## People + enterprise_efficiency: every clean/enrich/dw/metric query or metadata file must have
+## data_quality/{layer}/{table}.yml (reverse and raw excluded in the validator).
+validate-people-data-quality-files-exist:
+	@echo ""
+	@echo "Validating scoped data_quality file pairing (dags/people, dags/enterprise_efficiency)"
+	@echo "=========="
+	@echo ""
+	@if [ -z "$(paths)" ]; then \
+		git fetch --no-tags origin +refs/heads/master; \
+	fi
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_people_data_quality_files_exist.py $(if $(paths),--paths $(paths),$(if $(CI_COMMIT_BRANCH),-b "$(CI_COMMIT_BRANCH)",-b "$$(git rev-parse --abbrev-ref HEAD)"))
+
+.PHONY: validate-people-dq-conventions
+## People data_quality YAML content rules (severity, has_size_variation, custom comments).
+validate-people-dq-conventions:
+	@echo ""
+	@echo "Validating People data_quality conventions"
+	@echo "=========="
+	@echo ""
+	@if [ -z "$(paths)" ]; then \
+		git fetch --no-tags origin +refs/heads/master; \
+	fi
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/people_conventions_validator.py --check dq $(if $(paths),--paths $(paths),$(if $(CI_COMMIT_BRANCH),-b "$(CI_COMMIT_BRANCH)",-b "$$(git rev-parse --abbrev-ref HEAD)"))
+
+.PHONY: validate-people-sql-metadata-conventions
+## People SQL/metadata pairing: column order and grain documentation.
+validate-people-sql-metadata-conventions:
+	@echo ""
+	@echo "Validating People SQL/metadata conventions"
+	@echo "=========="
+	@echo ""
+	@if [ -z "$(paths)" ]; then \
+		git fetch --no-tags origin +refs/heads/master; \
+	fi
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/people_conventions_validator.py --check sql-metadata $(if $(paths),--paths $(paths),$(if $(CI_COMMIT_BRANCH),-b "$(CI_COMMIT_BRANCH)",-b "$$(git rev-parse --abbrev-ref HEAD)"))
+
+.PHONY: validate-people-sql-style-conventions
+## People SQL style: avoid subqueries in FROM (prefer CTEs).
+validate-people-sql-style-conventions:
+	@echo ""
+	@echo "Validating People SQL style conventions"
+	@echo "=========="
+	@echo ""
+	@if [ -z "$(paths)" ]; then \
+		git fetch --no-tags origin +refs/heads/master; \
+	fi
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/people_conventions_validator.py --check sql-style $(if $(paths),--paths $(paths),$(if $(CI_COMMIT_BRANCH),-b "$(CI_COMMIT_BRANCH)",-b "$$(git rev-parse --abbrev-ref HEAD)"))
+
+.PHONY: validate-people-deprecated-sources-conventions
+## People SQL: block deprecated upstream schemas (legacy DAG folders exempt).
+validate-people-deprecated-sources-conventions:
+	@echo ""
+	@echo "Validating People deprecated SQL sources"
+	@echo "=========="
+	@echo ""
+	@if [ -z "$(paths)" ]; then \
+		git fetch --no-tags origin +refs/heads/master; \
+	fi
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/people_conventions_validator.py --check deprecated-sources $(if $(paths),--paths $(paths),$(if $(CI_COMMIT_BRANCH),-b "$(CI_COMMIT_BRANCH)",-b "$$(git rev-parse --abbrev-ref HEAD)"))
+
+.PHONY: validate-people-conventions
+## Local convenience: run all People convention groups (existence gate is separate).
+## CI runs validate-people-data-quality-files-exist + per-group convention steps.
+validate-people-conventions:
+	@echo ""
+	@echo "Validating all scoped domain repository conventions (people + enterprise_efficiency)"
+	@echo "=========="
+	@echo ""
+	@if [ -z "$(paths)" ]; then \
+		git fetch --no-tags origin +refs/heads/master; \
+	fi
+	@$(MAKE) validate-people-data-quality-files-exist paths="$(paths)" CI_COMMIT_BRANCH="$(CI_COMMIT_BRANCH)"
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/people_conventions_validator.py --check all $(if $(paths),--paths $(paths),$(if $(CI_COMMIT_BRANCH),-b "$(CI_COMMIT_BRANCH)",-b "$$(git rev-parse --abbrev-ref HEAD)"))
+
+.PHONY: validate-people-conventions-all
+## Audit every file under dags/people/** (local only; not used in CI).
+validate-people-conventions-all:
+	@echo ""
+	@echo "Auditing all scoped domain repository conventions"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_people_data_quality_files_exist.py -a
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/people_conventions_validator.py --check all -a
+
 MAKE_TARGET ?=
 MAKE_EXTRA_ARGS ?=
 .PHONY: run-domain-validation
