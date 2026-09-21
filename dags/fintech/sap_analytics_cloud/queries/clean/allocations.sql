@@ -37,4 +37,4 @@ SELECT
 FROM
     datalake_sap_analytics_cloud_raw.allocations
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    MAKE_DATE(year, month, day) = '{load_end_date}'

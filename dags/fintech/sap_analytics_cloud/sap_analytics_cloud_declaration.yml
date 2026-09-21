@@ -16,15 +16,13 @@ workflow:
   - "{bucket}"
   - "{dag_name}"
   - "{table_name}"
-  - "{load_start_date}"
   - "{load_end_date}"
   - "{partitions}"
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -7), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     allocations:
-      extraction_type: incremental
+      extraction_type: full
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
-      - table_api_path: "api/v1/dataexport/providers/sac/M002_Allocations"
+      - table_api_path: "api/v1/dataexport/providers/sac/Cvocdn23av1lgcbskqikj76rs38/FactData"
