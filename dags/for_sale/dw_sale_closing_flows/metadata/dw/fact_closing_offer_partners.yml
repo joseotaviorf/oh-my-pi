@@ -2,29 +2,44 @@ database_name: dw_sale
 table_name: fact_closing_offer_partners
 description: >-
   SLA/lead-time and status detail for the ATTA financing/credit proposal linked to an offer.
-  Grain: one row per sk_offer with at least one proposal in
-  dw_atta.fact_pre_analysis_proposal_flow, keeping only the most advanced proposal per
-  sk_pre_analysis (same selection logic as dim_closing_offer_partner, its companion dimension
-  table — both share the sk_offer/sk_pre_analysis keys). sk_offer is shared with
-  dw_sale.fact_offers and, transitively, with dw_sale.fact_closing_flows (also keyed by
-  sk_offer) for the same CCV. Brings offer-level milestones (submitted, accepted, CCV signed)
-  from dw_sale.fact_offers alongside the proposal's inspection, checklist, bank legal
-  analysis, financing contract and financing-ended milestones from
-  dw_atta.fact_pre_analysis_proposal_flow, plus precomputed day-count SLA metrics between
-  those milestones.
+  Grain: one row per sk_offer from dw_sale.fact_offers with ts_offer_submitted on/after
+  2023-02-01. Offers that have more than one pre-analysis (distinct sk_pre_analysis) in
+  dw_atta.fact_pre_analysis_proposal_flow on the same sk_offer are dropped from this table
+  entirely — Atta/ISolve can reuse a prior SalesFlow offer_id when the same applicant starts
+  a later credit analysis, and mixing those purchases on one offer row would make financing
+  dates inconsistent. Remaining ATTA keys (sk_pre_analysis, sk_proposal) and every
+  credit/financing milestone and SLA day-count on this table belong to that offer's single
+  most-advanced proposal (is_most_advanced = 1 in fact_pre_analysis_proposal_flow), not to
+  MIN/MAX across sibling proposals of the same pre-analysis. Offer-level milestones
+  (submitted, accepted, CCV signed) still come from dw_sale.fact_offers. sk_offer is shared
+  with dw_sale.fact_offers and, transitively, with dw_sale.fact_closing_flows for the same
+  CCV. Offers with no ATTA proposal still appear (ATTA columns null). Companion dimension
+  dw_sale.dim_closing_offer_partner is not rebuilt by this query and may still include the
+  excluded multi-pre-analysis offers.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_offer:
-    description: The unique identifier for the offer.
+    description: >-
+      Unique identifier of the For Sale offer. Primary key of this table. Offers with more
+      than one Atta pre-analysis on this key are not present (dropped to avoid mixing distinct
+      purchases that Atta attached to a reused offer_id).
     lineage:
     - dw_sale.fact_offers.sk_offer
   sk_pre_analysis:
-    description: The unique identifier for the pre-analysis.
+    description: >-
+      Identifier of the Atta pre-analysis of the offer's most advanced proposal
+      (is_most_advanced = 1). Null when the offer has no ATTA proposal. Offers with several
+      pre-analyses on the same sk_offer are excluded from the table, so this key is unique
+      per remaining offer when populated.
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.sk_pre_analysis
   sk_proposal:
-    description: The unique identifier for the proposal.
+    description: >-
+      Identifier of the offer's most advanced Atta financing proposal (is_most_advanced = 1
+      on fact_pre_analysis_proposal_flow). Null when the offer has no ATTA proposal. All
+      credit/financing dates on this row belong to this proposal, not to sibling proposals
+      of the same pre-analysis.
     lineage:
     - dw_atta.dim_proposal_atta.sk_proposal
   sk_closing_specialist:
@@ -40,7 +55,9 @@ columns:
     lineage:
     - dw_sale.fact_offers.sk_owner
   financing_value:
-    description: Principal financing amount requested excluding down payment and fees.
+    description: >-
+      Principal financing amount requested excluding down payment and fees, taken from the
+      offer's most advanced Atta proposal (is_most_advanced = 1).
     lineage:
     - dw_atta.dim_proposal_atta.financing_value
   internal_vendors_flag:
@@ -60,42 +77,59 @@ columns:
     lineage:
     - dw_sale.fact_offers.days_offer_submitted_to_sale_agreement_signed
   days_offer_submitted_to_credit_approved:
-    description: SLA metric for days from offer submitted to credit approved.
+    description: >-
+      SLA metric for days from offer submitted to credit approved on the offer's most
+      advanced Atta proposal (is_most_advanced = 1), using that proposal's last credit-letter
+      approval timestamp.
     lineage:
     - dw_sale.fact_offers.ts_offer_submitted
     - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
   days_offer_submitted_to_credit_ended:
-    description: SLA metric for days from offer submitted to credit ended.
+    description: >-
+      SLA metric for days from offer submitted to credit ended on the offer's most advanced
+      Atta proposal (is_most_advanced = 1).
     lineage:
     - dw_sale.fact_offers.ts_offer_submitted
     - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   days_offer_submitted_to_financing_ended:
-    description: SLA metric for days from offer submitted to financing ended.
+    description: >-
+      SLA metric for days from offer submitted to financing ended on the offer's most
+      advanced Atta proposal (is_most_advanced = 1).
     lineage:
     - dw_sale.fact_offers.ts_offer_submitted
     - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
   days_credit_ended_to_financing_ended:
-    description: SLA metric for days from credit ended to financing ended.
+    description: >-
+      SLA metric for days from credit ended to financing ended on the offer's most advanced
+      Atta proposal (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
     - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   days_credit_approved_to_financing_ended:
-    description: SLA metric for days from credit approved to financing ended.
+    description: >-
+      SLA metric for days from credit approved to financing ended on the offer's most
+      advanced Atta proposal (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
     - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
   days_CCV_to_credit_approved:
-    description: SLA metric for days from CCV signed to credit approved.
+    description: >-
+      SLA metric for days from CCV signed to credit approved on the offer's most advanced
+      Atta proposal (is_most_advanced = 1).
     lineage:
     - dw_sale.fact_offers.ts_sale_agreement_signed
     - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
   days_CCV_to_credit_ended:
-    description: SLA metric for days from CCV signed to credit ended.
+    description: >-
+      SLA metric for days from CCV signed to credit ended on the offer's most advanced Atta
+      proposal (is_most_advanced = 1).
     lineage:
     - dw_sale.fact_offers.ts_sale_agreement_signed
     - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   days_CCV_to_financing_ended:
-    description: SLA metric for days from CCV signed to financing ended.
+    description: >-
+      SLA metric for days from CCV signed to financing ended on the offer's most advanced
+      Atta proposal (is_most_advanced = 1).
     lineage:
     - dw_sale.fact_offers.ts_sale_agreement_signed
     - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
@@ -112,71 +146,106 @@ columns:
     lineage:
     - dw_sale.fact_offers.ts_sale_agreement_signed
   dt_first_pre_analysis:
-    description: Date of the first pre-analysis.
+    description: >-
+      Registration date of the offer's most advanced Atta proposal (is_most_advanced = 1),
+      not the earliest sibling proposal of the pre-analysis.
     lineage:
-    - dw_atta.fact_pre_analysis_proposal_flow.first_pre_analysis
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_registration
   dt_credit_started:
-    description: Date when the credit process started.
+    description: >-
+      Date when the credit letter stage started on the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_started
   dt_credit_approved:
-    description: Date when the credit was approved.
+    description: >-
+      Date when the credit letter was first approved on the offer's most advanced Atta
+      proposal (is_most_advanced = 1).
     lineage:
-    - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_approved
+    - dw_atta.fact_pre_analysis_proposal_flow.ts_min_credit_application_approval
   dt_credit_ended:
-    description: Date when the credit process ended.
+    description: >-
+      Date when the credit stage ended on the offer's most advanced Atta proposal
+      (is_most_advanced = 1). Not the MAX credit-ended date among sibling proposals.
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
   ts_first_inspection:
-    description: Timestamp of the first inspection.
+    description: >-
+      First inspection timestamp of the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_min_inspection
   ts_last_inspection:
-    description: Timestamp of the last inspection.
+    description: >-
+      Last inspection timestamp of the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_max_inspection
   ts_first_checklist:
-    description: Timestamp of the first checklist.
+    description: >-
+      First checklist timestamp of the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_min_checklist
   ts_last_checklist:
-    description: Timestamp of the last checklist.
+    description: >-
+      Last checklist timestamp of the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_max_checklist
   ts_first_bank_legal_analysis_started:
-    description: Timestamp when the first bank legal analysis started for the proposal.
+    description: >-
+      Timestamp when bank legal analysis started on the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_bank_legal_analysis_started
   ts_last_bank_legal_analysis_ended:
-    description: Timestamp when the last bank legal analysis ended for the proposal.
+    description: >-
+      Timestamp when bank legal analysis ended on the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_bank_legal_analysis_ended
   ts_first_financing_contract:
-    description: Timestamp of the first financing contract.
+    description: >-
+      First financing-contract (Conf/Emissão) timestamp of the offer's most advanced Atta
+      proposal (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_min_financing_contract
   ts_last_financing_contract:
-    description: Timestamp of the last financing contract.
+    description: >-
+      Last financing-contract (Conf/Emissão) timestamp of the offer's most advanced Atta
+      proposal (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_max_financing_contract
   ts_first_contracted:
-    description: Timestamp of the first contracted date.
+    description: >-
+      First contracted-stage timestamp of the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_min_contracted
   ts_last_contracted:
-    description: Timestamp of the last contracted date.
+    description: >-
+      Last contracted-stage timestamp of the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_max_contracted
   ts_first_financing_started:
-    description: Timestamp when the financing started.
+    description: >-
+      Timestamp when the financing stage started on the offer's most advanced Atta proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_started
   dt_financing_ended:
-    description: Date when the financing ended.
+    description: >-
+      Date when financing ended on the offer's most advanced Atta proposal
+      (is_most_advanced = 1). Not the MAX financing-ended date among sibling proposals of
+      the same pre-analysis.
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
   ts_last_updated_isolve:
-    description: Timestamp of the last update.
+    description: >-
+      Last-updated timestamp in Atta/ISolve of the offer's most advanced proposal
+      (is_most_advanced = 1).
     lineage:
     - dw_atta.fact_pre_analysis_proposal_flow.ts_last_updated
   dt_offer_submitted_week:

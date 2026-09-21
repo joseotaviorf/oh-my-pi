@@ -175,7 +175,6 @@ bietlejuice.dw_atta:
   - bietlejuice.atta:load-clean-financing-proposal-check:first-run-of-day
   - bietlejuice.atta:load-clean-financing-proposal:first-run-of-day
   - bietlejuice.atta:load-clean-franchise-info:first-run-of-day
-  - bietlejuice.atta:load-clean-partner-info:first-run-of-day
   - bietlejuice.atta:load-clean-pre-analysis:first-run-of-day
   - bietlejuice.atta:load-clean-product-info:first-run-of-day
   - bietlejuice.atta:load-clean-proposal:first-run-of-day
@@ -188,7 +187,6 @@ bietlejuice.dw_atta:
   - bietlejuice.enrich_atta:load-enrich-partner-info:first-run-of-day
   - bietlejuice.enrich_atta:load-enrich-proposal-dates:first-run-of-day
   - bietlejuice.enrich_atta:load-enrich-proposal-situation-changes:first-run-of-day
-  - bietlejuice.risk_and_mortgage:load-clean-offer-pre-analysis:first-run-of-day
   - bietlejuice.sales_flow_daily:load-clean-negotiation:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-offer:first-run-of-day
 bietlejuice.dw_audit_ifrs:

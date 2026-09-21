@@ -79,7 +79,13 @@ columns:
     - datalake_atta_raw.proposta.idpropostaext
     description: |
       Natural/external key linking this financing proposal to the corresponding For Sale
-      offer record in Sales Flow or other upstream sales services (e.g. EBDB).
+      offer record in Sales Flow or other upstream sales services (e.g. EBDB). As with
+      `pre_analysis.id_offer`, expected to be null for: (1) Varejo (retail/franchise)
+      proposals, which belong to franchises external to QuintoAndar and do not fill in
+      `id_offer` (nor `pre_analysis.id_user_5a`); and (2) QuintoAndar proposals whose
+      related pre-analysis has not yet had its CCV (purchase and sale agreement) signed,
+      i.e. `pre_analysis.status = 1` (PRE_ANALISE). Do not treat these nulls as data
+      quality issues.
   id_proposal_product:
     lineage:
     - datalake_atta_raw.proposta.idpropostaprd
@@ -126,20 +132,20 @@ columns:
       from the Atta source application; also documented per product in the track_step_detail
       table.
     categories:
-      "1": PRE_ANALISE (pre-analysis)
-      "2": CARTA_CREDITO (credit letter)
-      "3": VISTORIA (property inspection)
-      "4": CONTRATACAO (contracting)
-      "5": CONTRATADO (contracted)
-      "6": CHECKLIST (checklist)
-      "7": CONF_EMISSAO (issuance confirmation)
-      "8": DOCUMENTO_CADASTRO (registration document, legacy/unused)
-      "9": DADOS_CADASTRO (registration data, legacy/unused)
-      "10": COMISSAO_CADASTRO (commission registration, legacy/unused)
-      "11": ASSINATURA_CONTRATO (contract signature, legacy/unused)
-      "30": DOCUMENTO_ENVIADO_PARA_ASSINATURA (document sent for signature, legacy/unused)
-      "31": DOCUMENTO_ASSINADO (document signed, legacy/unused)
-      "32": CARTORIO (notary office)
+      "1": PRE_ANALISE (DEPRECATED)
+      "2": CARTA_CREDITO (step 1 in the flow)
+      "3": VISTORIA (DEPRECATED)
+      "4": CONTRATACAO (setp 3 in the flow)
+      "5": CONTRATADO (DEPRECATED)
+      "6": CHECKLIST (step 2 in the flow)
+      "7": CONF_EMISSAO (step 4 in the flow)
+      "8": DOCUMENTO_CADASTRO (DEPRECATED)
+      "9": DADOS_CADASTRO (DEPRECATED)
+      "10": COMISSAO_CADASTRO (DEPRECATED)
+      "11": ASSINATURA_CONTRATO (DEPRECATED)
+      "30": DOCUMENTO_ENVIADO_PARA_ASSINATURA (DEPRECATED)
+      "31": DOCUMENTO_ASSINADO (DEPRECATED)
+      "32": CARTORIO (step 5 in the flow)
   created_by:
     lineage:
     - datalake_atta_raw.proposta.CreatedBy
@@ -177,11 +183,17 @@ columns:
   ts_registration:
     lineage:
     - datalake_atta_raw.proposta.dtentrada
-    description: Timestamp when the proposal entered the financing pipeline (was registered).
+    description: |
+      Timestamp when the proposal entered the financing pipeline (was registered). Set once
+      at creation and never updated afterwards.
   ts_financing_ended:
     lineage:
     - datalake_atta_raw.proposta.dtfinalizacao
-    description: Timestamp when the financing proposal was finalized or closed, regardless of outcome.
+    description: |
+      Timestamp when the financing proposal was finalized or closed, regardless of outcome.
+      Can be set at creation time (e.g. proposals registered already finalized) or updated
+      later during bank reconciliation/closing. This field is manually input by the operator
+      and could be smaller then ts_registration. Filter out those cases on analysis.
   ts_last_updated:
     lineage:
     - datalake_atta_raw.proposta.dtultatu

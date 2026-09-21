@@ -47,7 +47,11 @@ columns:
   id_offer:
     description: |
       Natural/external identifier linking the pre-analysis to the corresponding offer
-      record in Sales Flow or other upstream sales services.
+      record in Sales Flow or other upstream sales services. Expected to be null for:
+      (1) Varejo (retail/franchise) pre-analyses, which belong to franchises external to
+      QuintoAndar and do not fill in either `id_offer` or `id_user_5a`; and (2) QuintoAndar
+      pre-analyses whose CCV (purchase and sale agreement) has not yet been signed, i.e.
+      `status = 1` (PRE_ANALISE). Do not treat these nulls as data quality issues.
     lineage:
     - datalake_atta_raw.consulta_score.idpreanaliseext
   id_registration_user:
@@ -65,22 +69,11 @@ columns:
       Current funnel/approval-pipeline step (esteira) that the pre-analysis is going
       through. Encoded with the same STATUS_ISOLVE enum used by the `proposal` table's
       id_proposal_status column, since pre-analysis is the earliest step of that same
-      workflow.
+      workflow. To propoerly track the proposal flow, use the proposal status instead.
     categories:
-      "1": PRE_ANALISE (pre-analysis)
-      "2": CARTA_CREDITO (credit letter)
-      "3": VISTORIA (property inspection)
-      "4": CONTRATACAO (contracting)
-      "5": CONTRATADO (contracted)
-      "6": CHECKLIST (checklist)
-      "7": CONF_EMISSAO (issuance confirmation)
-      "8": DOCUMENTO_CADASTRO (registration document, legacy/unused)
-      "9": DADOS_CADASTRO (registration data, legacy/unused)
-      "10": COMISSAO_CADASTRO (commission registration, legacy/unused)
-      "11": ASSINATURA_CONTRATO (contract signature, legacy/unused)
-      "30": DOCUMENTO_ENVIADO_PARA_ASSINATURA (document sent for signature, legacy/unused)
-      "31": DOCUMENTO_ASSINADO (document signed, legacy/unused)
-      "32": CARTORIO (notary office)
+      "0": UNDEFINED (This status seems to be a bug)
+      "1": PRE_ANALISE (Flow step 1)
+      "2": CARTA_CREDITO (Flow step 2)
     lineage:
     - datalake_atta_raw.consulta_score.status
   created_source:
@@ -152,7 +145,17 @@ columns:
     lineage:
     - datalake_atta_raw.consulta_score.archivedat
   ts_registration:
-    description: Timestamp indicating when the pre-analysis was registered or requested.
+    description: |
+      Timestamp indicating when the pre-analysis was registered or requested. Not an
+      immutable row-creation timestamp: the source column (`data_solicitacao`) is
+      overwritten with the current time whenever the client resubmits the multibank
+      intake form (income, property value, financed amount, down payment, term, etc.)
+      while the pre-analysis is still in its initial fill-out state, i.e.
+      `situation` = 1 (EM_PREENCHIMENTO) or 7 (LINK_COPIADO). Once the pre-analysis
+      advances past that state, later edits (banks, property/seller data,
+      proposal data, status changes) do not touch this column, so it becomes stable.
+      No column on this table reflects an immutable original creation timestamp; this
+      is the closest available signal, but it can shift forward during intake.
     lineage:
     - datalake_atta_raw.consulta_score.data_solicitacao
   mortgage_intention_uuid:
@@ -169,6 +172,8 @@ columns:
   id_user_5a:
     description: |
       Foreign key to the `users_info` table. Identifies the QuintoAndar (5a) user
-      associated with the pre-analysis.
+      associated with the pre-analysis. Expected to be null for Varejo (retail/franchise)
+      pre-analyses, which belong to franchises external to QuintoAndar and do not fill in
+      either `id_user_5a` or `id_offer`.
     lineage:
     - datalake_atta_raw.consulta_score.userId5a
