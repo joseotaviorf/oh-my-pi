@@ -1,0 +1,60 @@
+database_name: datalake_ebdb_clean
+table_name: price_index
+description: Price index rows from EBDB IGPM (entity PriceIndex). One row per published cycle and type (IGPM, IPCA, and others). Supports SOX and internal controls audits of extracted_from and author provenance fields.
+domain: For Rent
+owner: souza.lucas@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.igpm.id
+    description: Surrogate key of the price index row on EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.igpm.atualizadoem
+    description: Timestamp when the price index row was last updated on EBDB.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.igpm.criadoem
+    description: Timestamp when the price index row was created on EBDB.
+  monthly_rate:
+    lineage:
+      - datalake_ebdb_raw.igpm.mensal
+    description: Monthly price index rate for the reference month.
+  accumulated_rate:
+    lineage:
+      - datalake_ebdb_raw.igpm.acumulado
+    description: Accumulated price index rate used in rent readjustment calculations.
+  dt_index_month:
+    lineage:
+      - datalake_ebdb_raw.igpm.mes
+    description: Reference month of the published price index (not the contract anniversary month).
+  extracted_from:
+    lineage:
+      - datalake_ebdb_raw.igpm.extraidode
+    description: Data source that produced the row (for example bacen, consultasBR, or manual).
+  price_index_type:
+    lineage:
+      - datalake_ebdb_raw.igpm.type
+    description: Price index type discriminator (IGPM, IPCA, and others).
+  author:
+    lineage:
+      - datalake_ebdb_raw.igpm.autor
+    description: Identity that wrote the row (S2S service id, manual, or unknown).
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.igpm.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.igpm.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond
+      precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.igpm.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.
