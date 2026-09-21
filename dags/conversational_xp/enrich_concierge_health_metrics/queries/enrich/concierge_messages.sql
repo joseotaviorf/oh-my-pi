@@ -156,7 +156,9 @@ WITH concierge_trigger AS (
      ON o.id_copilot_session = m.id_session
      AND m.ts_created >= o.ts_message_sent
      AND m.role = 'HUMAN'
-  GROUP BY ALL
+  GROUP BY
+    o.id_notification,
+    o.id_copilot_session
 )
 
 , inbound_human_reply AS (
@@ -171,7 +173,9 @@ WITH concierge_trigger AS (
   JOIN datalake_copilot_service_clean.message m 
      ON i.id_copilot_session = m.id_session
      AND m.role = 'HUMAN'
-  GROUP BY ALL 
+  GROUP BY
+    i.id_message,
+    i.id_copilot_session
 )
 
 , in_outbound_users AS (
@@ -216,20 +220,8 @@ WITH concierge_trigger AS (
     ON bin.id_message = ihr.id_message
 )
 
-, phone2user AS (
-  SELECT DISTINCT
-    cr.id_reference AS id_user,
-    ci.contact_info AS phone
-  FROM datalake_person_clean.credential_reference cr
-  JOIN datalake_person_clean.contact_info ci
-    ON ci.id_person = cr.id_person
-  WHERE ci.category = 'PHONE'
-  AND priority = 'PRIMARY'
-  AND ci.contact_info IN (SELECT DISTINCT user_phone FROM in_outbound_users)
-)
-
-SELECT DISTINCT
-  COALESCE(NULLIF(iou.id_user, 0), p2u.id_user, -1) AS id_user,
+SELECT
+  COALESCE(NULLIF(NULLIF(iou.id_user, 0), -1),-1) AS id_user,
   iou.id_copilot_session,
   iou.id_langfuse_session,
   COALESCE(iou.id_notification, CAST(-1 AS BIGINT)) AS id_notification,
@@ -255,5 +247,3 @@ LEFT JOIN first_outbound_message fom
   ON iou.user_phone = fom.user_phone
 LEFT JOIN first_inbound_message fim
   ON iou.user_phone = fim.user_phone
-LEFT JOIN phone2user p2u
-  ON iou.user_phone = p2u.phone

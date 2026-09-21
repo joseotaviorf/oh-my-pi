@@ -32,10 +32,14 @@ workflow:
   tables_customization:
     concierge_messages:
       merge_on: [
-        id_notification, 
-        id_message, 
+        id_notification,
+        id_message,
         id_user
         ]
+      when_not_matched_by_source_delete_condition: |
+        MAKE_DATE(target.year, target.month, target.day)
+          BETWEEN DATE_SUB(DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}'), 30)
+          AND DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}')
       partitions: [
         year, 
         month, 
@@ -62,10 +66,15 @@ workflow:
         ]
     concierge_prospects_aux:
       merge_on: [
-        id_user, 
-        ts_concierge_contact, 
+        id_user,
+        id_phone_session,
+        ts_concierge_contact,
         concierge_flow_type
         ]
+      when_not_matched_by_source_delete_condition: |
+        MAKE_DATE(target.year, target.month, target.day)
+          BETWEEN DATE_SUB(DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}'), 30)
+          AND DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}')
       partitions: [
         year,
         month, 
@@ -73,7 +82,7 @@ workflow:
         ]
     concierge_demand:
       merge_on: [
-        id_user, 
+        id_user,
         id_notification, 
         id_phone_session, 
         visit_code,
@@ -81,6 +90,10 @@ workflow:
         ts_concierge_contact,
         ts_concierge_visit_event
         ]
+      when_not_matched_by_source_delete_condition: |
+        MAKE_DATE(target.year, target.month, target.day)
+          BETWEEN DATE_SUB(DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}'), 30)
+          AND DATE('{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}')
       partitions: [
         year, 
         month, 

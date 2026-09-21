@@ -2062,7 +2062,6 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events:first-run-of-day
-  - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events:first-run-of-day

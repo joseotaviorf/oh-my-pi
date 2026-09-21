@@ -27,7 +27,9 @@ columns:
   concierge_flow_type:
     lineage:
     - datalake_search.concierge_messages.concierge_flow_type
-    description: The type of the inbound/outbound message. E.g. 'Medium intent' (outbound), 'High intent' (inbound), 'Placas' (inbound), 'TTC' (inbound), etc. We are assigning 'Unknown' to the indirect visit bookings whose id_user cannot be found in the table datalake_search.concierge_messages. This means that the user who got the recommendation from the concierge is different from the user who scheduled the visit.
+    - datalake_person_clean.credential_reference.id_reference
+    - datalake_person_clean.contact_info.contact_info
+    description: The type of the inbound/outbound message. E.g. 'Medium intent' (outbound), 'High intent' (inbound), 'Placas' (inbound), 'TTC' (inbound), etc. We are assigning 'Unknown' to the indirect visit bookings whose Amplitude id_user cannot be matched to concierge_messages, even after mapping the message phone to credential_reference origin = main. This means that the user who got the recommendation from the concierge is different from the user who scheduled the visit.
   visit_request_channel:
     lineage:
     - dw_visit.dim_visit.visit_request_channel

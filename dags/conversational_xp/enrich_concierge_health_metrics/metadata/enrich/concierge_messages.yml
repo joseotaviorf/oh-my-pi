@@ -8,8 +8,7 @@ columns:
     lineage:
     - datalake_jaiminho_clean.user_notifications.id_user
     - datalake_copilot_service_clean.session.id_user
-    - datalake_person_clean.credential_reference.id_user
-    description: The id of the user who has interacted with the concierge. We retrieve this id from user_notifications (outbound messages) or from copliot tables (inbound messages), when the user wasn't registered in the moment of the conversation, we retrieve the id_user from "credential_reference" table joining with phone number. This field can be null when the user is not registered or their phone number is not associated to any quinto andar account.
+    description: The id of the user who has interacted with the concierge, as stored by Jaiminho (outbound) or Copilot session (inbound) at contact time. Values 0 and -1 mean the user was not registered then. This table does not fill id_user from phone; volume should be counted on user_phone. Phone-to-user mapping via Person origin = main is applied in concierge_prospects_aux, concierge_indirect_vb and concierge_demand.
   id_copilot_session:
     lineage:
     - datalake_copilot_service_clean.message.id_session
@@ -21,16 +20,16 @@ columns:
   id_notification:
     lineage:
     - datalake_jaiminho_clean.user_notifications.id
-    description: The id of the outbound notification.
+    description: The id of the outbound notification. Inbound rows use -1. Together with id_user and id_message this is the merge key.
   id_message:
     lineage:
     - datalake_copilot_service_clean.message.id
-    description: The id of the message in the copilot tables.
+    description: The id of the message in the copilot tables. Together with id_user and id_notification this is the merge key.
   user_phone:
     lineage:
     - datalake_jaiminho_clean.user_notifications.destination
     - datalake_sauron_clean.session.user_phone
-    description: The phone number of the user who has interacted with the concierge. This field don't have null values and should be used to count for volume of concierge users.
+    description: The phone number of the user who has interacted with the concierge. This field don't have null values and should be used to count for volume of concierge users. Not unique per person, one phone can map to more than one id_user.
   id_phone_session:
     lineage:
     - datalake_jaiminho_clean.user_notifications.destination

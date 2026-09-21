@@ -9,11 +9,13 @@ columns:
     - datalake_search.concierge_messages.id_user
     - datalake_search.concierge_direct_vb.id_user
     - datalake_search.concierge_indirect_vb.id_user
-    description: The id of the user who has interacted with concierge or has booked a visit through a listing page referred by concierge but didn't interact with concierge.
+    - datalake_person_clean.credential_reference.id_reference
+    - datalake_person_clean.contact_info.contact_info
+    description: Resolved user id for visit and ToF joins. Prefers a real Copilot/Jaiminho id, else the visit id, else a PRIMARY origin = main id for the phone when there is no visit, else -1. id_user_copilot keeps the unfilled source id.
   id_user_copilot:
     lineage:
     - datalake_search.concierge_messages.id_user
-    description: The id of the user in contact with concierge. Useful to check if the id_user differs from the id_user in visits.
+    description: The id of the user in contact with concierge as stored by Jaiminho/Copilot (0/-1 when unregistered). Useful to check if that source id differs from the id_user in visits.
   id_user_visit:
     lineage:
     - datalake_search.concierge_direct_vb.id_user

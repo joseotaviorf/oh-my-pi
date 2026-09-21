@@ -56,32 +56,75 @@ WITH visits AS (
 
 , prospect_activation_events AS (
     SELECT
-        p.sk_prospect,
-        p.sk_house,
-        u.telefone_principal,
+        sk_prospect,
+        sk_house,
         CASE
-            WHEN p.event_name = 'USER FIRST ACTIVATION' THEN 'new_prospect'
-            WHEN p.event_name IN ('USER RECOVERY', 'USER RECOVERY IN OTHER CITY GROUP') THEN 'recovered_prospect'
+            WHEN event_name = 'USER FIRST ACTIVATION' THEN 'new_prospect'
+            WHEN event_name IN ('USER RECOVERY', 'USER RECOVERY IN OTHER CITY GROUP') THEN 'recovered_prospect'
         END AS prospect_event_type,
-        p.ts_event AS ts_prospect_event,
-        p.sk_visit AS id_visit,
-        p.operation_channel,
-        UPPER(p.business_context) AS business_context
-    FROM dw_growth.fact_demand_prospect_events AS p
-    LEFT JOIN dw_public.dim_user u
-        ON p.sk_prospect = u.sk_user
-    WHERE p.event_name IN (
+        ts_event AS ts_prospect_event,
+        sk_visit AS id_visit,
+        operation_channel,
+        UPPER(business_context) AS business_context
+    FROM dw_growth.fact_demand_prospect_events
+    WHERE event_name IN (
             'USER FIRST ACTIVATION',
             'USER RECOVERY',
             'USER RECOVERY IN OTHER CITY GROUP'
         )
-        AND p.flow_order = 1
-        AND p.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+        AND flow_order = 1
+        AND ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+)
+
+, messages_in_window AS (
+  SELECT
+    id_user,
+    id_copilot_session,
+    id_langfuse_session,
+    id_notification,
+    id_phone_session,
+    user_phone,
+    concierge_flow,
+    concierge_flow_type,
+    has_human_reply,
+    has_audio,
+    n_human_replies,
+    n_audio_replies,
+    ts_first_outbound_contact,
+    ts_first_inbound_contact,
+    ts_first_concierge_contact,
+    ts_concierge_contact,
+    year,
+    month,
+    day
+  FROM datalake_search.concierge_messages
+  WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+)
+
+, phone2user AS (
+  SELECT DISTINCT
+    cr.id_reference AS id_user,
+    ci.contact_info AS phone
+  FROM datalake_person_clean.credential_reference cr
+  JOIN datalake_person_clean.contact_info ci
+    ON ci.id_person = cr.id_person
+  WHERE ci.category = 'PHONE'
+    AND ci.priority = 'PRIMARY'
+    AND cr.origin = 'main'
+    AND ci.contact_info IN (
+      SELECT DISTINCT user_phone
+      FROM messages_in_window
+    )
 )
 
 , concierge_demand_ranked AS (
 SELECT
-    COALESCE(m.id_user, v.id_user) AS id_user,
+    COALESCE(
+        NULLIF(NULLIF(m.id_user, 0), -1),
+        v.id_user,
+        p2u.id_user,
+        -1
+    ) AS id_user,
     m.id_user AS id_user_copilot,
     v.id_user AS id_user_visit,
     m.id_copilot_session,
@@ -129,14 +172,8 @@ SELECT
     COALESCE(m.year, v.year) AS year,
     COALESCE(m.month, v.month) AS month,
     COALESCE(m.day, v.day) AS day,
-    -- Dedup on the merge_on key: the joins above can fan out multiple rows that share the
-    -- merge_on key but differ in non-key columns (e.g. several prospect activation events
-    -- per visit), which breaks the Delta MERGE (DELTA_MULTIPLE_SOURCE_ROW_MATCHING_TARGET_ROW_IN_MERGE).
-    -- QUALIFY is not EMR-compatible, so we rank here and filter _row_num = 1 in the outer query,
-    -- keeping one row per merge_on key preferring the most recent prospect event.
     ROW_NUMBER() OVER (
         PARTITION BY
-            COALESCE(m.id_user, v.id_user),
             COALESCE(m.id_notification, CAST(-1 AS BIGINT)),
             COALESCE(m.id_phone_session, '-'),
             COALESCE(v.visit_code, '-'),
@@ -148,14 +185,19 @@ SELECT
             v.id_visit DESC NULLS LAST,
             pe.sk_prospect DESC NULLS LAST
     ) AS _row_num
-FROM datalake_search.concierge_messages m
-LEFT JOIN datalake_search.concierge_prospects_aux p
-    ON (m.id_user = p.id_user OR m.user_phone = p.prospect_phone)
-    AND m.ts_concierge_contact = p.ts_concierge_contact
+FROM messages_in_window m
 FULL JOIN visits v
     ON m.id_phone_session = v.id_phone_session
     AND m.ts_concierge_contact = v.ts_concierge_contact
     AND m.concierge_flow_type = v.concierge_flow_type
+LEFT JOIN phone2user p2u
+    ON m.user_phone = p2u.phone
+    AND NULLIF(NULLIF(m.id_user, 0), -1) IS NULL
+    AND v.id_user IS NULL
+LEFT JOIN datalake_search.concierge_prospects_aux p
+    ON COALESCE(NULLIF(NULLIF(m.id_user, 0), -1), v.id_user, p2u.id_user) = p.id_user
+    AND m.ts_concierge_contact = p.ts_concierge_contact
+    AND m.id_phone_session = p.id_phone_session
 LEFT JOIN prospect_activation_events pe -- joining the visits that activated users as prospects with visits from concierge to get concierge prospects. The visits from concierge are the ones scheduled through concierge (direct) or through a visit schedule page link recommended by concierge on the same day as the contact (indirect).
     ON v.id_visit = pe.id_visit
     AND v.business_context = pe.business_context

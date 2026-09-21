@@ -19,11 +19,11 @@ columns:
   id_phone_session:
     lineage:
     - datalake_search.concierge_messages.id_phone_session
-    description: Concatenation of the user phone number and the copilot conversation session.
+    description: Concatenation of the user phone number and the copilot conversation session. Together with id_user and ts_concierge_contact this is the merge key (one prospect snapshot per concierge contact and Copilot id).
   prospect_phone:
     lineage:
-    - dw_public.dim_user.telefone_principal
-    description: The phone number of the prospect. This phone number comes from dim_user table and not from copilot table. Is used here to join users that have different id_users in visits and in copilot.
+    - datalake_search.concierge_messages.user_phone
+    description: WhatsApp number of the concierge contact. The same number used to map a missing Copilot id (0 / -1 / null) to credential_reference origin = main before joining the prospect.
   concierge_flow_type:
     lineage:
     - datalake_search.concierge_messages.concierge_flow_type
@@ -43,7 +43,7 @@ columns:
   ts_concierge_contact:
     lineage:
     - datalake_search.concierge_messages.ts_concierge_contact
-    description: The timestamp of the outbound contact or the start of a session in inbound contact.
+    description: The timestamp of the outbound contact or the start of a session in inbound contact. Together with id_user and id_phone_session this is the merge key.
   ts_message_sent:
     lineage:
     - datalake_search.concierge_messages.ts_message_sent
