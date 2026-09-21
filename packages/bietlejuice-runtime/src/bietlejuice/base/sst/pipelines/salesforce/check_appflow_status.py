@@ -63,18 +63,6 @@ logger = QuintoAndarLogger("sst.pipelines.salesforce_check_appflow_status")
             help="AWS region for the AppFlow client.",
         ),
         dict(
-            name="appflow_assume_role_arn",
-            flags=["--appflow_assume_role_arn", "--appflow-assume-role-arn"],
-            type=str,
-            required=False,
-            default=None,
-            help=(
-                "IAM role ARN to assume for the AppFlow client only. Required on EMR "
-                "prod, where the cluster runs in the data account and the flows live "
-                "in the prod account. Leave empty on Databricks prod and on forno."
-            ),
-        ),
-        dict(
             name="marker_prefix",
             flags=["--marker_prefix", "--marker-prefix"],
             type=str,
@@ -122,11 +110,7 @@ def salesforce_check_appflow_status_pipeline(cfg):
     }
 
     try:
-        status = describe_flow_status(
-            flow_name,
-            region_name=cfg.region_name,
-            assume_role_arn=cfg.appflow_assume_role_arn,
-        )
+        status = describe_flow_status(flow_name, region_name=cfg.region_name)
         payload["status"] = status
         payload["error"] = None
         if status == ACTIVE_STATUS:

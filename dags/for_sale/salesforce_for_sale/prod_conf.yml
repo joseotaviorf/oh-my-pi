@@ -13,17 +13,6 @@ dag_documentation:
 raw_schema: "datalake_salesforce_raw"
 clean_schema: "datalake_salesforce_clean"
 datalake_bucket: "5a-datalake-prod"
-# Base URL the cdc_raw recovery path calls when AppFlow has not delivered the
-# partition hour. Same org as salesforce_cdc, so the same endpoint per env.
-salesforce_endpoint: "https://quintoandar.my.salesforce.com"
-# AppFlow APIs are account-scoped. The EMR cluster runs in the data account
-# (206390561754) while the Salesforce flows live in prod (632540934959), so
-# cdc_raw assumes this role for the AppFlow client only -- S3/Glue/Delta keep
-# using the emr-prod instance profile. Role lives in quintoandar/infrastructure
-# at cloud/aws-accounts/prod/iam/emr-prod-appflow-access.
-# Must be emptied if this DAG ever runs on Databricks again: that instance
-# profile is already in the prod account and is not trusted by this role.
-appflow_assume_role_arn: "arn:aws:iam::632540934959:role/emr-prod-appflow-access"
 events_config:
   received_document:
     event_path: "raw/salesforce/ReceivedDocumentEvent"
