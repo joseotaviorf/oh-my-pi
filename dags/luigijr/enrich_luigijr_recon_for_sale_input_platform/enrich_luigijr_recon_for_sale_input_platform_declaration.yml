@@ -1,0 +1,36 @@
+dag:
+  name: enrich_luigijr_recon_for_sale_input_platform
+  owner: Ops Fintech
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:lucas.prado
+  dataset_dependencies:
+  - datalake_sale_offer.sale_offer:first-run-of-day
+  - datalake_monopoly_clean.income_reference:first-run-of-day
+  - datalake_monopoly_clean.sale_transaction:first-run-of-day
+  - datalake_monopoly_clean.sale:first-run-of-day
+  - datalake_monopoly_clean.sale_revision:first-run-of-day
+  - datalake_nazare_clean.revenue_share_by_participant:first-run-of-day
+  - dw_sale.fact_offers:first-run-of-day
+  - dw_sale.fact_closing_flows:first-run-of-day
+  - dw_public.dim_date:first-run-of-day
+  - datalake_sales_flow_clean.ccv_termination:first-run-of-day
+  - datalake_sales_flow_clean.offer:first-run-of-day
+  - datalake_monopoly_clean.accounting_entry:first-run-of-day
+  - datalake_robin_hood.accounting_entry:first-run-of-day
+  - datalake_robin_hood_clean.accounting_entry_source:first-run-of-day
+  - datalake_robin_hood_clean.accounting_entry:first-run-of-day
+  - datalake_robin_hood_clean.accounting_entry_balance:first-run-of-day
+  - datalake_robin_hood_clean.payment_request:first-run-of-day
+  - datalake_robin_hood_clean.payee:first-run-of-day
+  - datalake_pas.ledger:first-run-of-day
+  - datalake_docx_clean.folder_reference:first-run-of-day
+  - datalake_docx_clean.folder_reference_type:first-run-of-day
+  - datalake_docx_clean.document:first-run-of-day
+  - datalake_docx_clean.document_type:first-run-of-day
+  - dw_public.dim_region:first-run-of-day
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: ops_fintech
