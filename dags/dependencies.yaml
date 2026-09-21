@@ -1723,7 +1723,7 @@ bietlejuice.enrich_big_agent:
   - bietlejuice.big_agent_fast_lane:load-clean-program:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
-  - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day
+  - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-unified-identity:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day

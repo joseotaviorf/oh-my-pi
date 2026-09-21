@@ -123,8 +123,18 @@ SELECT
     sf.agent_profile,
     CASE
         WHEN hbc.ts_first_publication_on_rent = hbc.ts_first_publication_on_sale THEN "HYBRID"
-        WHEN hbc.ts_first_publication_on_sale IS NULL AND hbc.ts_first_publication_on_rent IS NOT NULL THEN "RENT"
-        WHEN hbc.ts_first_publication_on_sale IS NOT NULL AND hbc.ts_first_publication_on_rent IS NULL THEN "SALE"
+        WHEN hbc.ts_first_publication_on_sale > hbc.ts_first_publication_on_rent
+            OR (
+                hbc.ts_first_publication_on_sale IS NULL 
+                AND hbc.ts_first_publication_on_rent IS NOT NULL 
+            )
+            THEN "RENT"
+        WHEN hbc.ts_first_publication_on_sale < hbc.ts_first_publication_on_rent
+            OR (
+                hbc.ts_first_publication_on_sale IS NOT NULL 
+                AND hbc.ts_first_publication_on_rent IS NULL 
+            )
+            THEN "SALE"
     END AS acquisition_business_context,
     sf.is_active,
     sf.ts_started,

@@ -1,16 +1,28 @@
-WITH enrollment AS (
+WITH updated_agents AS (
     SELECT
-        id AS id_enrollment,
-        id_agent,
-        id_program,
+        id_agent
+    FROM
+        datalake_big_agent_clean.enrollment
+    WHERE
+        ts_updated BETWEEN '{load_start_date}' AND '{load_end_date}'
+    GROUP BY 1
+),
+enrollment AS (
+    SELECT
+        e.id AS id_enrollment,
+        e.id_agent,
+        e.id_program,
         ROW_NUMBER() OVER(PARTITION BY e.id_agent ORDER BY e.ts_updated DESC) = 1 AS is_last_enrollment_by_agent,
-        ts_created AS ts_enrollment_started,
+        e.ts_created AS ts_enrollment_started,
         COALESCE(
-            LEAD(ts_updated) OVER(PARTITION BY e.id_agent ORDER BY e.ts_updated),
+            LEAD(e.ts_updated) OVER(PARTITION BY e.id_agent ORDER BY e.ts_updated),
             NOW()
         ) AS ts_enrollment_ended
     FROM
+        updated_agents AS u
+    JOIN
         datalake_big_agent_clean.enrollment AS e
+            ON u.id_agent = e.id_agent
 ),
 agent AS (
     SELECT
@@ -33,33 +45,34 @@ agent AS (
         a.month,
         a.day
     FROM
+        enrollment AS e
+    JOIN
         datalake_big_agent_clean.agent AS a
+            ON e.id_agent = a.id
     LEFT JOIN
         datalake_ebdb_clean.partner_agent AS pa
             ON GET_JSON_OBJECT(a.details, '$.partnerExternalId') = pa.id_partner 
-    LEFT JOIN
-        enrollment AS e
-            ON e.id_agent = a.id
     LEFT JOIN 
         datalake_big_agent_clean.program AS p
             ON e.id_program = p.id
-    WHERE
-        a.ts_updated BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
 agent_domain AS (
     SELECT
-        id_user,
+        id_unified_agent,
         id_agent,
         id_agent_data,
+        id_partner,
         uuid_agent,
-        uuid_person,
-        ROW_NUMBER() OVER(PARTITION BY id_user ORDER BY IF(status = 'ACTIVE', 1, 0) DESC, ts_updated DESC) = 1 AS is_last_agent_domain_by_user
+        uuid_person
     FROM
-        datalake_agent_accreditation.agent AS agent_domain
+        datalake_ebdb_agent_events.agent_unified_identity AS agent_domain
+    WHERE
+        is_partner_replace_key IS TRUE
 )
 SELECT DISTINCT
     CONCAT(a.id, '_', a.id_enrollment) AS id_agent_enrollment,
     a.id AS id_internal_agent,
+    ag.id_unified_agent,
     ag.id_agent,
     a.id_user,
     a.id_partner,
@@ -82,5 +95,4 @@ FROM
     agent AS a
 LEFT JOIN
     agent_domain AS ag
-        ON a.id_user = ag.id_user
-        AND ag.is_last_agent_domain_by_user = True
+        ON a.id_partner = ag.id_partner

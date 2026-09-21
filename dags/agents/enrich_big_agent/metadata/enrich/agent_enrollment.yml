@@ -2,9 +2,10 @@
 database_name: datalake_big_agent
 table_name: agent_enrollment
 description: |
-  Agent enrollment intervals enriched with EBDB user and partner identifiers, accreditation
-  agent-data key, program tier, and active-state flags. One row per agent enrollment version,
-  partitioned by agent update date for incremental loads.
+  Agent enrollment intervals enriched with EBDB user and partner identifiers, unified agent
+  identity keys, program tier, and active-state flags. Incremental loads select agents with
+  enrollment updates in the load window, then rebuild all enrollment intervals for those agents.
+  Identity attributes resolve via agent_unified_identity on id_partner (partner replace key).
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -17,12 +18,18 @@ columns:
     lineage:
       - datalake_big_agent_clean.agent.id
     description: Internal Big Agent identifier of the consultant agent record.
+  id_unified_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
+    description: |
+      Unified agent identity surrogate key from agent_unified_identity, resolved by joining the
+      preferred partner replace-key row for the agent's id_partner.
   id_agent:
     lineage:
-      - datalake_agent_accreditation.agent.id_agent
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent
     description: |
-      Agent-domain identifier from accreditation for the resolved user, using the latest
-      ACTIVE agent row per user to avoid fan-out into enrollment and downstream dim_user joins.
+      Agent Domain identifier from the preferred partner-keyed unified identity row for the
+      enrollment agent's partner, when a matching identity exists.
   id_user:
     lineage:
       - datalake_big_agent_clean.agent.details
@@ -35,8 +42,8 @@ columns:
     description: EBDB partner company identifier linked to the agent when available.
   id_agent_data:
     lineage:
-      - datalake_agent_accreditation.agent.id_agent_data
-    description: Dados Agente identifier from agent accreditation used to join EBDB agent dimensions.
+      - datalake_ebdb_agent_events.agent_unified_identity.id_agent_data
+    description: Dados Agente identifier from the preferred partner-keyed unified identity row.
   id_enrollment:
     lineage:
       - datalake_big_agent_clean.enrollment.id
@@ -47,12 +54,12 @@ columns:
     description: Program identifier assigned to the agent during this enrollment interval.
   uuid_agent:
     lineage:
-      - datalake_agent_accreditation.agent.uuid_agent
-    description: Business UUID of the agent in accreditation when the user id matches.
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_agent
+    description: Business UUID of the agent from the preferred partner-keyed unified identity row.
   uuid_person:
     lineage:
-      - datalake_agent_accreditation.agent.uuid_person
-    description: Person UUID of the agent in accreditation when the user id matches.
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
+    description: Person UUID from the preferred partner-keyed unified identity row.
   consultant_type:
     lineage:
       - datalake_big_agent_clean.program.name
@@ -83,16 +90,16 @@ columns:
   ts_agent_updated:
     lineage:
       - datalake_big_agent_clean.agent.ts_updated
-    description: Timestamp of the latest agent update that triggered this incremental row.
+    description: Timestamp of the latest agent update carried on the enrollment row.
   year:
     lineage:
       - datalake_big_agent_clean.agent.year
-    description: Partition year derived from agent ts_updated for incremental extraction.
+    description: Partition year derived from agent partitions for incremental extraction.
   month:
     lineage:
       - datalake_big_agent_clean.agent.month
-    description: Partition month derived from agent ts_updated for incremental extraction.
+    description: Partition month derived from agent partitions for incremental extraction.
   day:
     lineage:
       - datalake_big_agent_clean.agent.day
-    description: Partition day derived from agent ts_updated for incremental extraction.
+    description: Partition day derived from agent partitions for incremental extraction.
