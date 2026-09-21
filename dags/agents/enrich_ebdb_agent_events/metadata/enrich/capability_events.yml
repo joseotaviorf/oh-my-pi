@@ -17,8 +17,8 @@ columns:
     description: |
       Unique identifier for the capability event row, generated with XXHASH64 from
       id_capability and revision timestamp. Primary merge key together with id_agent.
-      Source rows are deduplicated to one revision per (id_agent, id_capability, ts_started),
-      preferring the settings-enriched row when a log-only row shares the same timestamp.
+      Incremental loads emit only rows where capability status or linked settings changed
+      on the reference date (mod_capability / mod_capability_settings).
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent_event_log.id_agent

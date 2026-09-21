@@ -18,9 +18,9 @@ capability_log AS (
         log.id_capability,
         log.id_agent,
         log.event_type IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED') AS is_capability_active,
-        ROW_NUMBER() OVER(PARTITION BY log.id_capability, DATE(log.ts_occurred) ORDER BY log.ts_occurred DESC) = 1 AS is_last_update_by_date,
+        ROW_NUMBER() OVER(PARTITION BY log.id_capability, DATE(log.ts_occurred) ORDER BY log.ts_occurred DESC, log.ts_cdc_transaction DESC) = 1 AS is_last_update_by_date,
         log.ts_occurred AS ts_started,
-        LEAD(log.ts_occurred) OVER(PARTITION BY log.id_capability ORDER BY log.ts_occurred) AS ts_ended
+        LEAD(log.ts_occurred) OVER(PARTITION BY log.id_capability ORDER BY log.ts_occurred, log.ts_cdc_transaction) AS ts_ended
     FROM
         capability_updated AS updated
     JOIN
@@ -49,59 +49,16 @@ capability_events AS (
         settings.business_context,
         settings.is_passive_lead_receiver,
         log.is_capability_active,
-        COALESCE(settings.ts_started, log.ts_started) AS ts_updated
+        COALESCE(LAG(log.is_capability_active) OVER (PARTITION BY log.id_capability ORDER BY log.dt_reference) <> log.is_capability_active, TRUE) AS mod_capability,
+        COALESCE(LAG(settings.ts_started) OVER (PARTITION BY log.id_capability ORDER BY log.dt_reference) <> settings.ts_started, settings.id_capability_settings IS NOT NULL) AS mod_capability_settings,
+        COALESCE(GREATEST(settings.ts_started, log.ts_started), log.ts_started, settings.ts_started) AS ts_updated
     FROM
         capability_daily AS log
     LEFT JOIN
         datalake_ebdb_agent_events.capability_settings AS settings
             ON settings.id_capability = log.id_capability
-            AND log.dt_reference BETWEEN DATE(settings.ts_started) AND DATE(COALESCE(settings.ts_ended, NOW()))
             AND settings.is_last_update_by_date IS TRUE
-    GROUP BY 1, 2, 3, 4, 5, 6, 7
-),
--- merge_on is (id_event_log, id_agent) with id_event_log = XXHASH64(id_capability, ts_updated).
--- The LEFT JOIN to settings can emit a log-only row and a settings-enriched row at the same
--- timestamp; keep the settings-enriched revision so Delta MERGE is unique.
-capability_events_ranked AS (
-    SELECT
-        id_agent,
-        id_capability,
-        id_capability_settings,
-        business_context,
-        is_passive_lead_receiver,
-        is_capability_active,
-        ts_updated,
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                id_agent,
-                id_capability,
-                ts_updated
-            ORDER BY
-                CASE
-                    WHEN id_capability_settings IS NOT NULL THEN 0
-                    ELSE 1
-                END,
-                CASE
-                    WHEN business_context IS NOT NULL THEN 0
-                    ELSE 1
-                END
-        ) AS event_rank
-    FROM
-        capability_events
-),
-capability_events_deduped AS (
-    SELECT
-        id_agent,
-        id_capability,
-        id_capability_settings,
-        business_context,
-        is_passive_lead_receiver,
-        is_capability_active,
-        ts_updated
-    FROM
-        capability_events_ranked
-    WHERE
-        event_rank = 1
+            AND log.dt_reference BETWEEN DATE(settings.ts_started) AND DATE(COALESCE(settings.ts_ended - INTERVAL 1 DAY, NOW()))
 )
 SELECT
     XXHASH64(event.id_capability, event.ts_updated) AS id_event_log,
@@ -118,7 +75,10 @@ SELECT
     event.ts_updated AS ts_started,
     LEAD(event.ts_updated) OVER(PARTITION BY event.id_capability ORDER BY event.ts_updated) AS ts_ended
 FROM
-    capability_events_deduped AS event
+    capability_events AS event
 JOIN
     datalake_ebdb_clean.capability AS c
         ON c.id = event.id_capability
+WHERE
+    event.mod_capability IS TRUE
+    OR event.mod_capability_settings IS TRUE
