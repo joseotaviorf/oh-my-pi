@@ -208,8 +208,8 @@ def pipeline_api_raw(cfg):
         partition_cols=partition_cols,
         overwrite_schema=True,
         table_location=table_location,
-        # sync_hive=False,
-        # sync_secondary_catalog=True,
+        sync_hive=False,
+        sync_secondary_catalog=True,
     )
 
     logger.info("m=salesforce_raw_pipeline, msg=Logging API results")

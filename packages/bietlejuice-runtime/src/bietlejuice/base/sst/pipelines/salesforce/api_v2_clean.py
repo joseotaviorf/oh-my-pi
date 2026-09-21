@@ -160,7 +160,7 @@ def salesforce_api_clean_pipeline(cfg):
             partition_cols=["_is_current"],
             overwrite_schema=True,
             table_location=table_location,
-            sync_hive=cfg.sync_hive,
+            sync_hive=True,
             sync_secondary_catalog=True,
         )
 
