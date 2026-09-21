@@ -1,6 +1,6 @@
 SELECT
     NULLIF(
-        NULLIF(TRIM(review.matricula_pk_assignment_number), ''),
+        NULLIF(TRIM(review.matricula), ''),
         '-'
     ) AS assignment_number,
     NULLIF(NULLIF(TRIM(review.nome), ''), '-') AS name,
@@ -12,7 +12,7 @@ SELECT
     NULLIF(NULLIF(TRIM(review.tr_criticidade), ''), '-') AS criticality,
     NULLIF(NULLIF(TRIM(review.tr_risco_de_perda), ''), '-') AS risk_of_loss,
     NULLIF(
-        NULLIF(TRIM(review.data_de_atualizacao_review_month), ''),
+        NULLIF(TRIM(review.data_de_atualizacao), ''),
         '-'
     ) AS review_month,
     review.ts_load

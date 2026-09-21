@@ -9,9 +9,9 @@ description: |
   Supports reconciliation of H2.26 talent ratings with the People employee and performance models; join to related datasets with assignment_number.
 columns:
   assignment_number:
-    description: Main business identifier of the employee assignment in PIN and the primary key of this worksheet record (e.g. '123456').
+    description: Main business identifier of the employee assignment in PIN and the primary key of this worksheet record (e.g. 'E123456').
     lineage:
-      - datalake_gsheets_people_raw.talent_review_h2_26.matricula_pk_assignment_number
+      - datalake_gsheets_people_raw.talent_review_h2_26.matricula
   name:
     description: Display name of the employee assessed in the H2.26 Talent Review worksheet.
     lineage:
@@ -47,7 +47,7 @@ columns:
   review_month:
     description: Month label associated with the review update, such as 'fev./26' or 'set./26'; NULL when the worksheet has no review month.
     lineage:
-      - datalake_gsheets_people_raw.talent_review_h2_26.data_de_atualizacao_review_month
+      - datalake_gsheets_people_raw.talent_review_h2_26.data_de_atualizacao
   ts_load:
     description: Timestamp when the worksheet record was loaded into the data lake.
     lineage:
