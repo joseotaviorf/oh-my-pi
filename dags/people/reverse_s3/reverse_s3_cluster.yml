@@ -4,6 +4,14 @@ cluster:
     autotermination_minutes: 180
     aws_attributes:
       instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
+    # Comp inbound AP lives in us-east-2; this cluster (and the rest of reverse_s3)
+    # writes 5A buckets in us-east-1. Per-bucket keys so Base44 CSV exports stay
+    # on the default region and keep BucketOwnerFullControl. Empty canned.acl
+    # overrides the repo-wide spark-submit ACL injection Comp rejects.
+    spark_conf:
+      spark.hadoop.fs.s3a.bucket.quintoandar-inbound-wikpng8fowgxahxxccrd8j6ogxydnuse2a-s3alias.endpoint.region: us-east-2
+      spark.hadoop.fs.s3a.bucket.quintoandar-inbound-wikpng8fowgxahxxccrd8j6ogxydnuse2a-s3alias.canned.acl: ""
+      spark.hadoop.fs.s3a.bucket.quintoandar-inbound-wikpng8fowgxahxxccrd8j6ogxydnuse2a-s3alias.acl.default: ""
     core_nodes:
       target_on_demand: 2
       target_spot: 0
