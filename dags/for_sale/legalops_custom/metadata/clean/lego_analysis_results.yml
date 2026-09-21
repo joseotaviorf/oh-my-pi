@@ -17,6 +17,15 @@ columns:
     description: Date when the contract analysis request was created.
     lineage:
     - datalake_legalops_raw.contract_analysis_request.ts_created
+  request_source:
+    description: >
+      Origin of the contract analysis request, extracted as a string from
+      analysis_metadata.request_source. Known values: screening-contract-requested,
+      screening-analyst-request-on-demand, screening-autonomous-post-apply,
+      docs-collection. NULL when analysis_metadata is absent or the key is missing
+      (no backfill for historical jobs).
+    lineage:
+    - datalake_legalops_raw.contract_analysis_request.analysis_metadata
   validation_id:
     description: Identifier of the Rule ID of the validation associated with this assessment (e.g. B01, SL01, HA12, H05). Comes from nested json attribute validation_id
     lineage:
