@@ -13,11 +13,10 @@ bietlejuice.jira_open_incidents_report:
     - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
 bietlejuice.jira_escalation_hierarchy:
   # Spark job SQL is not scanned by the query-file dependency generator (queries are
-  # inline Python, like jira_open_incidents_report). Reads datalake_jira.issues
-  # (enrich_jira) and dw_people.dim_employee / dw_people.dim_management_hierarchy
-  # (the "public" People subdomain — dw_employee_details is access-restricted).
-  # Documentation/lineage only — the DAG is cron-scheduled (09:00), not
-  # dataset-triggered.
+  # inline Python). Reads datalake_jira.issues (enrich_jira) and dw_people.dim_employee /
+  # dw_people.dim_management_hierarchy (the "public" People subdomain — dw_employee_details
+  # is access-restricted). Documentation/lineage only — the DAG is cron-scheduled (09:00),
+  # not dataset-triggered.
   add:
     - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
     - bietlejuice.dw_people:load-dw-people-dim-employee:first-run-of-day

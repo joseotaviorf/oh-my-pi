@@ -1,3 +1,6 @@
+-- Incremental merge on id_issue over {load_start_date}..{load_end_date} (scheduled
+-- default: rolling last 30 days of ingestion partitions, changed or not -- see
+-- dag_purpose for why this re-ingests the whole window instead of only changed rows).
 WITH record_selection AS (
   SELECT
     id_issue,
@@ -138,6 +141,8 @@ WITH record_selection AS (
       ) AS TIMESTAMP) AS ts_resolved, /* There was a failure with the automation of the field "resolutiondate", which we can identify when */ /* the issue's status category is done, but there is no resulution date. */ /* When that happens, we can use statuscategorychangedate, which was when the status category was changed to "Done" */
       ROW_NUMBER() OVER (PARTITION BY key ORDER BY GET_JSON_OBJECT(fields, '$.updated') DESC) AS row_num
     FROM datalake_jira_clean.issues
+    WHERE
+      MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   ) AS _t
   WHERE
     row_num = 1

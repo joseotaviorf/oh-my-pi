@@ -5,12 +5,38 @@ dag:
   documentation:
     dag_purpose: |
       This DAG creates the full table for Jira issues status change.
+
+      `issues` is an incremental merge on id_issue: scheduled runs reprocess a
+      rolling 30-day window of datalake_jira_clean.issues (by its year/month/day
+      ingestion partitions), regardless of whether a given card actually changed
+      in that window, and MERGE-upsert the result -- issues untouched for 30+
+      days keep their last computed state rather than being reprocessed. This
+      replaced a prior incremental attempt that filtered to only rows flagged as
+      changed and ended up missing board-state updates; re-ingesting the whole
+      window every run is the safety margin against that. Override
+      load_start_date/load_end_date in the DAG conf for a one-time historical
+      backfill (older rows are kept, not deleted, by MERGE).
+
+      DEI project note: #28849/DEI-26671 fixed the same class of missed-update
+      bug one layer upstream -- the daily raw Jira pull now also force-refreshes
+      every currently-open DEI card (regardless of its own updated timestamp)
+      into that run's ingestion partition. Since "today" is always inside this
+      DAG's 30-day window, that reconciliation keeps every open DEI card fresh
+      here too; jira_escalation_hierarchy depends on this table specifically for
+      DEI's current_status_category/criticality.
 workflow:
   observability:
     enabled: true
   type: query_delta
   layer: enrich
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
+    issues:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [id_issue]
     deleted_issues:
       load_spark_job: load_deleted_issues
       spark_job_arguments:

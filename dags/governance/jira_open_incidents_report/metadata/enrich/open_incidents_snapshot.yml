@@ -3,45 +3,45 @@ table_name: open_incidents_snapshot
 owner: gustavo.rompe@quintoandar.com.br
 domain: Data Ops & Governance
 description: >
-  Daily snapshot of open DEI incident cards (current_status_category != 'Done')
+  Daily snapshot of open DEI incident cards from Jira saved filter 31118 (DEI board)
   at the time the jira_open_incidents_report DAG ran. One row per open incident per report
   run — audit trail for the Google Chat digest sent to the DAG_Rotation space.
 columns:
   id_issue:
     lineage:
-      - datalake_jira.issues.id_issue
+      - jira_api.search.jql.key
     description: Jira issue key (e.g. DEI-1234) of the open incident.
   summary:
     lineage:
-      - datalake_jira.issues.summary
+      - jira_api.search.jql.fields.summary
     description: Incident card summary/title at the time of the report run.
   assignee:
     lineage:
-      - datalake_jira.issues.assignee
+      - jira_api.search.jql.fields.assignee.displayName
     description: Display name of the card's assignee at the time of the report run.
   incident_owner:
     lineage:
-      - datalake_jira.issues.incident_owner
+      - jira_api.search.jql.fields.customfield_31231.value
     description: Owning team/Line value (Jira custom field) at the time of the report run.
   ts_created:
     lineage:
-      - datalake_jira.issues.ts_created
+      - jira_api.search.jql.fields.created
     description: Timestamp the incident card was created, used to compute how long it has been open.
   issue_description:
     lineage:
-      - datalake_jira.issues.issue_description
+      - jira_api.search.jql.fields.description
     description: >
       Jira description body at report time (ADF JSON or markdown). Used to detect
       whether Problem/Cause/Solution is still the pre-filled on-call template.
   current_status:
     lineage:
-      - datalake_jira.issues.current_status
+      - jira_api.search.jql.fields.status.name
     description: >
       Jira card workflow status name at report time (Backlog, On going, Concluded,
       or locale equivalents such as Tarefas pendentes / Em andamento).
   current_status_category:
     lineage:
-      - datalake_jira.issues.current_status_category
+      - jira_api.search.jql.fields.status.statusCategory.name
     description: >
       Jira status category at report time. Open digest is To Do (backlog) plus
       In Progress (on going); Done (concluded) is excluded.
