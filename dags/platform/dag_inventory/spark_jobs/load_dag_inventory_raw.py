@@ -22,7 +22,6 @@ import boto3
 import botocore
 import pyspark.sql.functions as SF
 from pyspark.sql import DataFrame, Row
-from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -82,6 +81,7 @@ def enrich_table_dictionary_with_spark_metastore(content: dict) -> dict:
                 row["database"],
                 row["table"],
                 all_tables=row["table"] is None,
+                transformation_grade=row.get("transformation_grade"),
             )
             spark_ms.validate_table_arguments()
             database_name, database_location = spark_ms.get_metastores_metadata()
@@ -98,9 +98,11 @@ def enrich_table_dictionary_with_spark_metastore(content: dict) -> dict:
                         "is_delta": row["is_delta"],
                     }
                 )
-        except AnalysisException:
+        except Exception as error:
             logger.info(
-                f"Error finding {'table ' + row['table'] if row['table'] is not None else 'tables '} from database {row['database']}, layer {row['layer']}"
+                f"m=enrich_table_dictionary_with_spark_metastore, dag={row['dag']}, task={row['task']}, "
+                f"layer={row['layer']}, database={row['database']}, table={row['table']}, "
+                f"msg=Skipping row, error={error}"
             )
     return mapping
 
