@@ -24,7 +24,7 @@ workflow:
   layer: enrich
   bucket_config_name: people_bucket
   custom_schema: people
-  has_hive_sync: false
+  has_hive_sync: true
   credentials_scope: people
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
