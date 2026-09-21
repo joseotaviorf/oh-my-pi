@@ -10,22 +10,19 @@ cluster:
       spark.driver.memory: 16g
       spark.driver.memoryOverhead: 4g
       spark.yarn.am.memory: 4g
+    # MERGE on dim_inspector_report matches the target by sk_report with no
+    # partition prune. A 2-core + 1-spot fleet decommissioned executors
+    # mid-shuffle (YARN 20s window), causing FetchFailed retries that exceeded
+    # the 2h Airflow timeout. Keep cores on-demand so shuffle stays on nodes
+    # EMR will not reclaim; task_nodes is omitted so the preset default (no
+    # task nodes) applies and no spot executor is added.
     core_nodes:
-      target_on_demand: 2
+      target_on_demand: 4
       target_spot: 0
       instance_types:
       - r6g.xlarge
       - r7g.xlarge
       - r6i.xlarge
-    task_nodes:
-      target_on_demand: 0
-      target_spot: 1
-      instance_types:
-      - r6g.xlarge
-      - r7g.xlarge
-      - r6i.xlarge
-      allocation_strategy: price-capacity-optimized
-      bid_price_percentage: 100
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
