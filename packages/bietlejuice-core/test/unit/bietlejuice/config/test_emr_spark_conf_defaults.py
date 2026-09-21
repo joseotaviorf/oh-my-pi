@@ -16,6 +16,7 @@ _EXPECTED_SPARK_CONF_DEFAULTS = {
     "spark.sql.adaptive.coalescePartitions.enabled": "true",
     "spark.sql.files.maxPartitionBytes": "268435456",
     "spark.sql.adaptive.advisoryPartitionSizeInBytes": "268435456",
+    "spark.databricks.delta.optimizeWrite.enabled": "true",
 }
 
 

@@ -1744,6 +1744,15 @@ emr_cluster_base: &emr_cluster_anchor
         spark.sql.adaptive.coalescePartitions.enabled: "true"
         spark.sql.files.maxPartitionBytes: "268435456"
         spark.sql.adaptive.advisoryPartitionSizeInBytes: "268435456"
+        # Delta OSS writes one file per shuffle partition (100) per table partition, so a
+        # full-rewrite DAG emits 100k+ ~30KB files per run (dw_rent.fact_rent_demand_events:
+        # 100 files / 3.9MB per day partition, 456k files vacuumed daily). Databricks UC
+        # enabled optimized writes implicitly for partitioned tables; Delta OSS does not.
+        # optimizeWrite hash-partitions on the table partition columns before writing, so
+        # each partition gets ~1 right-sized file in the same commit. File layout only,
+        # table data unchanged. Per-DAG opt-out: set "false" under
+        # cluster.custom_configurations.spark_conf.
+        spark.databricks.delta.optimizeWrite.enabled: "true"
         spark.sql.adaptive.skewJoin.enabled: "true"
         spark.sql.adaptive.localShuffleReader.enabled: "true"
         spark.sql.shuffle.partitions: "100"

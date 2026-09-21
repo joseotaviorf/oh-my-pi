@@ -198,6 +198,7 @@ def test_oss_delta_spark_conf_keys_are_kept_in_spark_defaults():
             spark_conf={
                 "spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled": True,
                 "spark.databricks.delta.schema.autoMerge.enabled": "true",
+                "spark.databricks.delta.optimizeWrite.enabled": "true",
                 "spark.sql.shuffle.partitions": "200",
             }
         )
@@ -208,6 +209,7 @@ def test_oss_delta_spark_conf_keys_are_kept_in_spark_defaults():
         == "True"
     )
     assert props["spark.databricks.delta.schema.autoMerge.enabled"] == "true"
+    assert props["spark.databricks.delta.optimizeWrite.enabled"] == "true"
     assert props["spark.sql.shuffle.partitions"] == "200"
 
 
