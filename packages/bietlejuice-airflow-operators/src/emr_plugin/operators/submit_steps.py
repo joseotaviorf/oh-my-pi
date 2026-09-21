@@ -25,7 +25,7 @@ from airflow.providers.amazon.aws.operators.emr import EmrAddStepsOperator
 from emr_plugin.constants import (
     EMR_DEFAULT_POOL,
     EMR_DEFAULT_POOL_SLOTS,
-    EMR_DEFAULT_WAITER_DELAY_SECONDS,
+    EMR_DEFAULT_STEP_WAITER_DELAY_SECONDS,
     EMR_DEFAULT_WAITER_MAX_ATTEMPTS,
 )
 from emr_plugin.failure_logging import log_emr_step_failures, log_trigger_failure_event
@@ -107,7 +107,7 @@ class QuintoAndarEmrSubmitStepsOperator(EmrAddStepsOperator):
         wait_for_completion: bool = True,
         deferrable: bool = False,
         aws_conn_id: str = "aws_default",
-        check_interval: int = EMR_DEFAULT_WAITER_DELAY_SECONDS,
+        check_interval: int = EMR_DEFAULT_STEP_WAITER_DELAY_SECONDS,
         waiter_max_attempts: int = EMR_DEFAULT_WAITER_MAX_ATTEMPTS,
         **kwargs,
     ):

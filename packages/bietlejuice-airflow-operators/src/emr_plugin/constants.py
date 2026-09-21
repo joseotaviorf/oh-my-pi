@@ -3,9 +3,13 @@
 EMR_DEFAULT_POOL = "emr_api"
 EMR_DEFAULT_POOL_SLOTS = 1
 EMR_DEFAULT_WAITER_DELAY_SECONDS = 30
+# Step waits poll DescribeStep on this quantum; a 26-28s sync/register step showed as a
+# 62s Airflow task at 30s. 15s halves that overhead on ~470k short steps per fortnight.
+# Cluster create/terminate keep the 30s default (one call per DAG run).
+EMR_DEFAULT_STEP_WAITER_DELAY_SECONDS = 15
 # Set high on purpose so the Airflow task-level ``execution_timeout`` is what
 # ends a runaway EMR wait, not the boto waiter. With the default
-# ``waiter_delay=30``, this yields ~83h budget — larger than any realistic
+# ``waiter_delay=30`` (or 15 for steps, ~41h budget), this is larger than any realistic
 # ``execution_timeout_hours`` configured on bi-etl-ejuice DAGs. Callers can
 # still pass a smaller value per task.
 EMR_DEFAULT_WAITER_MAX_ATTEMPTS = 10000
