@@ -1,0 +1,35 @@
+# Metadata for clean considered_product_list
+database_name: datalake_gsheets_clean
+table_name: considered_product_list
+description: List of products, their line, name, SAP code, and renewable classification.
+domain: Growth
+columns:
+  source:
+    lineage:
+    - datalake_gsheets_raw.listado_productos.fuente
+    description: Data source from which product info was obtained.
+  product_line:
+    lineage:
+    - datalake_gsheets_raw.listado_productos.lineadeproducto
+    description: The product line or business area.
+  name:
+    lineage:
+    - datalake_gsheets_raw.listado_productos.nombre
+    description: Full name of the product.
+  id_product:
+    lineage:
+    - datalake_gsheets_raw.listado_productos.idproducto
+    description: Unique identifier of the product.
+  id_material_sap:
+    lineage:
+    - datalake_gsheets_raw.listado_productos.idmaterialsap
+    description: Unique SAP material number or identifier.
+  is_renewable:
+    lineage:
+    - datalake_gsheets_raw.listado_productos.Renovable
+    description: Yes/No flag indicating whether the product is renewable.
+  ts_load:
+    lineage:
+    - datalake_gsheets_raw.listado_productos.ts_load
+    description: Timestamp when the row was ingested into the datalake.
+owner: fabian.flores@quintoandar.com

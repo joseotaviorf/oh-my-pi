@@ -4,3 +4,8 @@ sheets_info:
     sheet_name: data
     clean_table_name: customer_size_ranges
     sheet_context: growth
+  listado_productos:
+    sheet_id: 1B0kCx5e4d50NQ2XYxpWd_KtXH3Fi5yjfl7Z4XXvVnOA
+    sheet_name: Hoja 1
+    clean_table_name: considered_product_list
+    sheet_context: growth

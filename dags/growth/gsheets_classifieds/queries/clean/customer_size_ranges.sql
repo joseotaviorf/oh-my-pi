@@ -7,8 +7,16 @@ SELECT
     NULLIF(big, '') AS big,
     NULLIF(medium, '') AS medium,
     NULLIF(small, '') AS small,
-    DATE(NULLIF(periodo_desde, '')) AS dt_period_start,
-    DATE(NULLIF(periodo_hasta, '')) AS dt_period_end,
+    CASE
+        WHEN length(NULLIF(periodo_desde, '')) = 6
+        THEN to_date(NULLIF(periodo_desde, ''), 'yyyyMM')
+        ELSE to_date(NULLIF(periodo_desde, ''))
+    END AS dt_period_start,
+    CASE
+        WHEN length(NULLIF(periodo_hasta, '')) = 6
+        THEN to_date(NULLIF(periodo_hasta, ''), 'yyyyMM')
+        ELSE to_date(NULLIF(periodo_hasta, ''))
+    END AS dt_period_end,
     ts_load
 FROM
     datalake_gsheets_raw.customer_size_ranges
