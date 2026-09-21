@@ -33,6 +33,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 EXECUTION_HOURS_TIMEOUT = 3.0
 
 REBUILD_BACKLOG_QUEUE_PARAM = "rebuild_backlog_queue"
+FORCE_REBUILD_PARAM = "force_rebuild"
 BUILD_STEP_TASK_ID = "core_v2_images_upsert_backlog_build_step"
 DRAIN_STEP_TASK_ID = "core_v2_images_upsert_backlog_step"
 
@@ -87,7 +88,7 @@ callback_by_task_success = config_service.get_config("callback_by_task_success")
 
 gchat_callback = GchatCallback(webhook_url_variable=webhook_vespucio_pipeline_v2)
 
-BUILD_STEP_PARAMETERS = [
+BUILD_STEP_BASE_PARAMETERS = [
     f"--input_image_normalized={Tables.image_normalization_step_v2}",
     f"--input_general_normalized={Tables.general_normalization_step_v2}",
     f"--input_kodak_photo={Tables.kodak_photo}",
@@ -97,6 +98,14 @@ BUILD_STEP_PARAMETERS = [
     f"--output_images_upsert_backlog_progress={Tables.images_upsert_backlog_progress}",
     f"--output_images_upsert_backlog_failed={Tables.images_upsert_backlog_failed}",
 ]
+
+
+def build_step_parameters(force_rebuild: bool = False) -> List[str]:
+    parameters = list(BUILD_STEP_BASE_PARAMETERS)
+    if force_rebuild:
+        parameters.append("--force_rebuild")
+    return parameters
+
 
 DRAIN_STEP_PARAMETERS = [
     f"--input_images_upsert_backlog_queue={Tables.images_upsert_backlog_queue}",
@@ -138,7 +147,7 @@ def _job_cluster_key(dag_id: str, run_id: str) -> str:
     )
 
 
-def job_tasks(rebuild: bool, dag_id: str, run_id: str) -> list:
+def job_tasks(rebuild: bool, force_rebuild: bool, dag_id: str, run_id: str) -> list:
     """Build the Databricks job task list submitted by execute-job-cluster.
 
     Must stay in sync with choose-monitor-branch: when rebuild is false the job
@@ -163,7 +172,8 @@ def job_tasks(rebuild: bool, dag_id: str, run_id: str) -> list:
         "libraries": LIBRARIES,
         "timeout_seconds": timeout_seconds,
         **_wheel_task_json(
-            "core_v2_images_upsert_backlog_build_step", BUILD_STEP_PARAMETERS
+            "core_v2_images_upsert_backlog_build_step",
+            build_step_parameters(force_rebuild),
         ),
     }
     drain_task["depends_on"] = [{"task_key": BUILD_STEP_TASK_ID}]
@@ -204,9 +214,23 @@ dag = DAG(
                 "Leave **false** (default) to drain the existing backlog queue only."
             ),
         ),
+        FORCE_REBUILD_PARAM: Param(
+            default=False,
+            type="boolean",
+            description_md=(
+                "Only applies when `rebuild_backlog_queue` is **true**. Passes "
+                "`--force_rebuild` to the build step so it overwrites the queue even "
+                "when drain progress already exists. **Resets all drain progress.** "
+                "Leave **false** (default) unless you intentionally need a full "
+                "backlog restart."
+            ),
+        ),
     },
     render_template_as_native_obj=True,
-    user_defined_macros={"job_tasks": job_tasks},
+    user_defined_macros={
+        "job_tasks": job_tasks,
+        "build_step_parameters": build_step_parameters,
+    },
     on_success_callback=(
         gchat_callback.dag_success_alert if not callback_by_task_success else None
     ),
@@ -225,23 +249,39 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
     tasks=(
         "{{ job_tasks("
         "dag_run.conf.get('rebuild_backlog_queue', params.rebuild_backlog_queue), "
+        "dag_run.conf.get('force_rebuild', params.force_rebuild), "
         "dag.dag_id, run_id) }}"
     ),
 )
 
 
-def create_task(entry_point: str, parameters: List[str], task_id: str = None):
-    return QuintoAndarDatabricksCheckJobTaskOperator(
-        databricks_conn_id="databricks_new",
-        dag=dag,
-        task_id=(task_id or entry_point).replace("-", "-"),
-        json={
+def create_task(
+    entry_point: str,
+    parameters: List[str] = None,
+    task_id: str = None,
+    parameters_expr: str = None,
+):
+    if parameters_expr:
+        task_json = (
+            "{{ {'python_wheel_task': {"
+            f"'package_name': '{VESPUCIO_PACKAGE_NAME}', "
+            f"'entry_point': '{entry_point}', "
+            f"'parameters': {parameters_expr}"
+            "}} }}"
+        )
+    else:
+        task_json = {
             "python_wheel_task": {
                 "package_name": VESPUCIO_PACKAGE_NAME,
                 "entry_point": entry_point,
                 "parameters": parameters,
             }
-        },
+        }
+    return QuintoAndarDatabricksCheckJobTaskOperator(
+        databricks_conn_id="databricks_new",
+        dag=dag,
+        task_id=(task_id or entry_point).replace("-", "-"),
+        json=task_json,
         execution_timeout=timedelta(hours=EXECUTION_HOURS_TIMEOUT),
     )
 
@@ -272,8 +312,10 @@ choose_monitor_branch_task = BranchPythonOperator(
 
 backlog_build_step_task = create_task(
     entry_point="core_v2_images_upsert_backlog_build_step",
-    parameters=BUILD_STEP_PARAMETERS,
     task_id=BUILD_STEP_TASK_ID,
+    parameters_expr=(
+        "build_step_parameters(dag_run.conf.get('force_rebuild', params.force_rebuild))"
+    ),
 )
 
 backlog_drain_step_task = create_task(

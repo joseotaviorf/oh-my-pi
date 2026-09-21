@@ -5,8 +5,10 @@ dag_documentation:
     and `core_v2_images_upsert_backlog_step` (incremental drain). The build reads
     normalized image/general tables and Kodak sources already materialized by
     `enrich_vespucio_pipeline_v2`; it is gated by the `rebuild_backlog_queue` trigger
-    param (default **false**) because rebuilding resets drain progress. Routine runs
-    should leave that param off and only drain the existing queue. Forno omits the Kodak
+    param (default **false**) because rebuilding resets drain progress. When rebuilding,
+    `force_rebuild` (default **false**) passes `--force_rebuild` to overwrite a queue
+    that already has drained buckets. Routine runs should leave both params off and only
+    drain the existing queue. Forno omits the Kodak
     SNS ARN and runs the drain step in dry-run mode, writing the would-be payload to
     `images_upsert_backlog_dry_run_preview_table`. Upstream steps:
     [vespucio#1496](https://github.com/quintoandar/vespucio/pull/1496)."
