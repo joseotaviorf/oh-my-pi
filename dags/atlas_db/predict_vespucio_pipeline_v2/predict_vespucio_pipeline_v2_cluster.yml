@@ -1,0 +1,29 @@
+cluster:
+  type: emr_7_12_med_general_fleet_cluster
+  custom_configurations:
+    # Lists replace preset values, so re-declare the shared bootstrap
+    # first, then the DAG-only Python 3.11 installer.
+    init_scripts:
+      - s3:
+          destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh"
+        args:
+          - "{{ var.value.artifacts_bucket }}"
+          - "{{ var.value.databricks_s3_bucket }}"
+          - "{{ dag.dag_id }}"
+      - s3:
+          destination: "s3://{{ var.value.databricks_s3_bucket }}/github-repos/bi-etl-ejuice/spark_jobs/predict_vespucio_pipeline_v2/emr_python311_init.sh"
+        args:
+          - "{{ var.value.artifacts_bucket }}"
+    spark_conf:
+      # Point Spark at EMR's Python 3.11, not the AMI default python3 (3.9).
+      spark.pyspark.driver.python: /usr/bin/python3.11
+      spark.pyspark.python: /usr/bin/python3.11
+      spark.yarn.appMasterEnv.PYTHONPATH: /opt/vespucio-python311
+      spark.executorEnv.PYTHONPATH: /opt/vespucio-python311
+    spark_env_vars:
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python3.11
+      PYSPARK_PYTHON: /usr/bin/python3.11
+      # Isolated site-packages from emr_python311_init.sh, not system 3.9.
+      PYTHONPATH: /opt/vespucio-python311
+  custom_libraries:
+    - whl: "{artifacts_bucket}/vespucio/vespucio-latest-py3-none-any.whl"

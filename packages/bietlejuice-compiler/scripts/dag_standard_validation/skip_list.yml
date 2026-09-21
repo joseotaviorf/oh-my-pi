@@ -22,6 +22,7 @@ dags_not_using_builder:
   - growth/enrich_marketing_costs_sharing_rules/enrich_marketing_costs_sharing_rules.py
   - atlas_db/enrich_vespucio_pipeline/enrich_vespucio_pipeline.py
   - atlas_db/enrich_vespucio_pipeline_v2/enrich_vespucio_pipeline_v2.py
+  - atlas_db/predict_vespucio_pipeline_v2/predict_vespucio_pipeline_v2.py
   - atlas_db/enrich_vespucio_images_upsert_backlog/enrich_vespucio_images_upsert_backlog.py
   - atlas_db/vespucio_pipeline_plugins/vespucio_pipeline_plugins.py
   - publisher_xp/alias_classifieds/alias_classifieds.py

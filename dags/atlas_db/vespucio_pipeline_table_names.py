@@ -113,6 +113,9 @@ class Tables:
     group_merges = "vespucio_pipeline_delta.group_merges"
     groups_step_v2 = "vespucio_pipeline_delta.groups_step"
     pins_step_v2 = "vespucio_pipeline_delta.pins_step"
+    typology_built_area_predictor = (
+        "vespucio_pipeline_delta.typology_built_area_predictor"
+    )
     condominium_pins_step_v2 = "vespucio_pipeline_delta.condominium_pins_step"
     condominium_step_v2 = "vespucio_pipeline_delta.condominium_step"
     resolved_identities_publish_checkpoint = (

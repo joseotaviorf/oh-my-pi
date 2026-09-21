@@ -1,0 +1,10 @@
+dag_documentation:
+  dag_purpose:
+    "Runs the Vespúcio v2 full-batch predictors.
+    Initially, this DAG orchestrates the built-area typology predictor,
+    which reads materialized v2 pipeline and source tables and updates
+    `vespucio_pipeline_delta.typology_built_area_predictor`. For more information,
+    see the GitHub [Vespucio Repository](https://github.com/quintoandar/vespucio)."
+callback_by_task_failure: True
+callback_by_task_success: False
+webhook_vespucio_pipeline_v2: WEBHOOK_VESPUCIO_PIPELINE_PROD
