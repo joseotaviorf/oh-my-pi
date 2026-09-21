@@ -240,3 +240,21 @@ sheets_info:
     sheet_name: "[base stilingue] midias sociais"
     clean_table_name: stilingue_data
     sheet_context: fintech
+
+  recon_ignored_cap_iptu:
+    sheet_id: 1lLl2YIcefmWoP2FNXyfikDDQKFF94YcU-BQE22s28-c
+    sheet_name: "[FR.BD.5] IPTU - Validação marcação"
+    clean_table_name: recon_ignored_cap_iptu
+    sheet_context: fintech
+
+  recon_ignored_cap_condominium:
+    sheet_id: 1BR3q89jqMt_kYbc1cjFawQRCWr9i-RleYvjdGk--Dfo
+    sheet_name: "[FR.BD.5] Condominio - Validação marcação"
+    clean_table_name: recon_ignored_cap_condominium
+    sheet_context: fintech
+
+  recon_ignored_cap_consumption:
+    sheet_id: 1lBUeuJzzXLORvWrOEfbR_buXEil26LGI_01jrA40YWQ
+    sheet_name: "[FR.BD.5] Contas de consumo - Validação marcação"
+    clean_table_name: recon_ignored_cap_consumption
+    sheet_context: fintech

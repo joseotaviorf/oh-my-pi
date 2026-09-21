@@ -1,0 +1,53 @@
+---
+database_name: datalake_gsheets_clean
+table_name: recon_ignored_cap_consumption
+description: >
+  Supplier-side (CAP) utility-bill (contas de consumo) movements the Recon
+  squad listed to exclude from financial tie-out. One row per CAP-grain
+  exception (contract, amount, and created date) after filtering
+  account_type = supplier. Used to stamp ignored-recon on matching
+  cap_union_invoice CAP rows so utility billed-vs-paid balances do not reopen
+  when Seu Barriga entries are already ignored.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  sk_contract:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.sk_contract
+    description: Rental contract identifier of the CAP utility payment the Recon squad wants ignored in tie-out.
+  id_entry:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.id_entry
+    description: Seu Barriga entry id when present; empty on supplier/CAP rows, which have no product entry id.
+  id_invoice:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.id_invoice
+    description: Seu Barriga invoice id when present; empty on supplier/CAP rows used for the CAP join key.
+  recon_account:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.conta
+    description: Recon account label from the sheet (contas de consumo), used to keep this exception list from mixing with IPTU or condominium.
+  account_type:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.account_type
+    description: Party on the movement; this clean table keeps only supplier, the CAP side of cap_union_invoice.
+  entry_status:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.entry_status
+    description: Status the squad recorded on the sheet (often ignored-recon or blank while marking is pending).
+  exclusion_reason:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.motivo_exclusao
+    description: Business reason the utility CAP movement is treated as historical noise and dropped from recon queries.
+  classification_label:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.classificacao
+    description: Squad QA label on the exception (for example whether the CAP mark is still pending).
+  due_amount:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.due_amount
+    description: Signed amount in BRL of the CAP utility movement; join to cap_union_invoice with ABS because CAP rows may invert the sign.
+  entry_created_date:
+    lineage:
+      - datalake_gsheets_raw.recon_ignored_cap_consumption.entry_created_date
+    description: Calendar date of the CAP movement as listed by Recon, used with contract and amount to match cap_union_invoice.
