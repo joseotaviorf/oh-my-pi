@@ -153,6 +153,7 @@ cluster_window AS (
 ),
 airflow_lifecycle AS (
     SELECT
+        id_task,
         id_dag,
         id_run,
         operator,
