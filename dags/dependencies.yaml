@@ -1371,6 +1371,9 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_sap:load-enrich-4hana-journal-entries-bank-account:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger-new-template:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-cod-locale:first-run-of-day
+  - bietlejuice.gsheets_fintech:done-clean-recon-ignored-cap-condominium:first-run-of-day
+  - bietlejuice.gsheets_fintech:done-clean-recon-ignored-cap-consumption:first-run-of-day
+  - bietlejuice.gsheets_fintech:done-clean-recon-ignored-cap-iptu:first-run-of-day
   - bietlejuice.monopoly:load-clean-accounting-entry:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-transaction:first-run-of-day

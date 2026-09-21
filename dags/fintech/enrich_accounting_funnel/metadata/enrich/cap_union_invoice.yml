@@ -103,7 +103,16 @@ columns:
   entry_status:
     lineage:
       - datalake_retsuko_clean.entry.status
-    description: "Retsuko entry status indicating if the entry is pending (not-invoiceable) or success; NULL on CAP rows without id_entry"
+      - datalake_gsheets_clean.recon_ignored_cap_iptu.sk_contract
+      - datalake_gsheets_clean.recon_ignored_cap_iptu.due_amount
+      - datalake_gsheets_clean.recon_ignored_cap_iptu.entry_created_date
+      - datalake_gsheets_clean.recon_ignored_cap_condominium.sk_contract
+      - datalake_gsheets_clean.recon_ignored_cap_condominium.due_amount
+      - datalake_gsheets_clean.recon_ignored_cap_condominium.entry_created_date
+      - datalake_gsheets_clean.recon_ignored_cap_consumption.sk_contract
+      - datalake_gsheets_clean.recon_ignored_cap_consumption.due_amount
+      - datalake_gsheets_clean.recon_ignored_cap_consumption.entry_created_date
+    description: "Retsuko status for invoice entries; CAP rows listed in the Recon exception sheets are marked ignored-recon by contract, absolute amount, and entry creation date."
   payment_status:
     lineage:
       - datalake_accounting_funnel.invoice_all.payment_status

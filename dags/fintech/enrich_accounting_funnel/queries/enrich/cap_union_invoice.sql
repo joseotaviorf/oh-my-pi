@@ -1,4 +1,32 @@
-WITH invoice_all AS (
+WITH recon_ignored_cap AS (
+        SELECT DISTINCT
+            sk_contract,
+            ABS(due_amount) AS due_amount,
+            entry_created_date
+        FROM (
+            SELECT
+                sk_contract,
+                due_amount,
+                entry_created_date
+            FROM
+                datalake_gsheets_clean.recon_ignored_cap_iptu
+            UNION ALL
+            SELECT
+                sk_contract,
+                due_amount,
+                entry_created_date
+            FROM
+                datalake_gsheets_clean.recon_ignored_cap_condominium
+            UNION ALL
+            SELECT
+                sk_contract,
+                due_amount,
+                entry_created_date
+            FROM
+                datalake_gsheets_clean.recon_ignored_cap_consumption
+        ) AS ignored_cap
+    ),
+    invoice_all AS (
         SELECT DISTINCT
         id_entry,
         CAST(sk_invoice_reversed_entry AS BIGINT) AS sk_invoice_reversed_entry,
@@ -249,7 +277,10 @@ WITH invoice_all AS (
         i.account_type,
         i.account_classification,
         i.status,
-        re.status AS entry_status,
+        CASE
+            WHEN ignored_cap.sk_contract IS NOT NULL THEN 'ignored-recon'
+            ELSE re.status
+        END AS entry_status,
         i.payment_status,
         i.reason,
         i.producer,
@@ -310,3 +341,9 @@ WITH invoice_all AS (
                     i.id_entry,
                     -2 - PMOD(HASH(i.sk_contract, i.accrual_year_month, i.due_amount, i.description), 4096)
                 )
+    LEFT JOIN
+        recon_ignored_cap AS ignored_cap
+            ON i.is_cap = TRUE
+            AND i.sk_contract = ignored_cap.sk_contract
+            AND ABS(i.due_amount) = ignored_cap.due_amount
+            AND i.entry_created_date = ignored_cap.entry_created_date
