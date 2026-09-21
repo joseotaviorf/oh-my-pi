@@ -414,4 +414,4 @@ LEFT JOIN datalake_search.rent_outlier_users_past_30_days as rent_outlier_users
 LEFT JOIN datalake_search.sale_outlier_users_past_30_days as sale_outlier_users
     ON searches.id_user = sale_outlier_users.id_user
     AND searches.business_context = 'sale'
-WHERE searches.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+WHERE DATE(searches.ts_event) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
