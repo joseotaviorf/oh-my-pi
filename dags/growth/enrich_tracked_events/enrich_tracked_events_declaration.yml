@@ -33,13 +33,4 @@ workflow:
     attribution_cross_channel:
       - cross_channel_full
   default_partitions: [year, month, day]
-  # EMR defaults run_optimize=false unless z_order_by is set (see
-  # docs/platform/emr_delta_optimize_cadence_decision.md). These two tables are
-  # full-overwrite + year/month/day; without OPTIMIZE, shuffle parallelism
-  # leaves ~1M tiny files and breaks downstream scans (e.g. dw_offer.dim_offer).
-  tables_customization:
-    cross_channel_full:
-      run_optimize: true
-    attribution_cross_channel:
-      run_optimize: true
 
