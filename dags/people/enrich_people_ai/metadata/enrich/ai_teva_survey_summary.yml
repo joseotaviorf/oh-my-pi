@@ -31,7 +31,7 @@ columns:
     lineage:
       - datalake_people.teva_survey_inputs.answered_count
   ai_executive_summary:
-    description: STRING LiteLLM narrative in the survey answer language with overall sentiment (Positive, Negative, or Neutral), strongest Teva pillars, and largest development gaps; NULL when JSON parsing fails.
+    description: STRING LiteLLM executive summary in English with overall sentiment (Positive, Negative, or Neutral), strongest Teva pillars, and largest development gaps; NULL when JSON parsing fails.
     lineage:
       - datalake_people.teva_survey_inputs.reference_guide_text
       - datalake_people.teva_survey_inputs.strategic_goals_clarity_scores

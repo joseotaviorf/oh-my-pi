@@ -54,21 +54,35 @@ class TestBuildTevaPrompt(unittest.TestCase):
     def test_includes_reference_guide_and_survey_payload(self):
         prompt = _build_teva_prompt(SAMPLE_ROW)
         self.assertIn(SAMPLE_ROW["reference_guide_text"], prompt)
-        self.assertIn("Grow the team | Ship faster", prompt)
+        self.assertIn("Grow the team", prompt)
         self.assertIn("executive_summary", prompt)
+
+    def test_keeps_notebook_contract_and_english_output(self):
+        prompt = _build_teva_prompt(SAMPLE_ROW)
+        self.assertIn("pillar_1_2_strategy_goals", prompt)
+        self.assertIn("P12: How clear are the strategic goals for this team?", prompt)
+        self.assertIn("1 and 2 infer negative", prompt)
+        self.assertIn("Write every JSON value in English", prompt)
+        self.assertNotIn("same language as the survey answers", prompt)
 
 
 class TestSurveyDataPayload(unittest.TestCase):
-    def test_serializes_all_expected_fields(self):
+    def test_serializes_question_titles_as_lists(self):
         payload = json.loads(_survey_data_payload(SAMPLE_ROW))
-        self.assertEqual(payload["strategic_goals_clarity_scores"], "4,5,3")
         self.assertEqual(
-            payload["top_priorities_answers"], "Grow the team | Ship faster"
+            payload["P12: How clear are the strategic goals for this team?"],
+            [4, 5, 3],
+        )
+        self.assertEqual(
+            payload["What are the top priorities for this team?"],
+            ["Grow the team", "Ship faster"],
         )
 
     def test_missing_fields_serialize_as_null(self):
         payload = json.loads(_survey_data_payload({"survey_invite_id": "x"}))
-        self.assertIsNone(payload["strategic_goals_clarity_scores"])
+        self.assertIsNone(
+            payload["P12: How clear are the strategic goals for this team?"]
+        )
 
 
 class TestGenerateSummary(unittest.TestCase):
@@ -93,11 +107,11 @@ class TestGenerateSummary(unittest.TestCase):
         client.complete.return_value = json.dumps(
             {
                 "executive_summary": "Overall positive.",
-                "pillar_strategy_and_goals": "Aligned priorities.",
-                "pillar_roles_and_accountabilities": "Clear roles.",
-                "pillar_protocols_and_ways_of_working": "Fast decisions.",
-                "pillar_trust_and_relationships": "High trust.",
-                "additional_comments_summary": "No new themes.",
+                "pillar_1_2_strategy_goals": "Aligned priorities.",
+                "pillar_3_roles": "Clear roles.",
+                "pillar_4_protocols": "Fast decisions.",
+                "pillar_5_trust": "High trust.",
+                "additional_comments": "No new themes.",
             }
         )
         result = _generate_summary(SAMPLE_ROW, client)
@@ -105,6 +119,22 @@ class TestGenerateSummary(unittest.TestCase):
         self.assertEqual(result["ai_executive_summary"], "Overall positive.")
         self.assertEqual(result["ai_pillar_trust_and_relationships"], "High trust.")
         self.assertIn("ts_ai_summary_generated", result)
+
+    def test_flattens_nested_pillar_objects_like_notebook(self):
+        client = MagicMock()
+        client.complete.return_value = json.dumps(
+            {
+                "executive_summary": "Positive.",
+                "pillar_5_trust": {
+                    "issues_impacting_openness": "Meetings too long",
+                    "feedback_for_team_leader": "More 1:1s",
+                },
+            }
+        )
+        result = _generate_summary(SAMPLE_ROW, client)
+        trust = result["ai_pillar_trust_and_relationships"]
+        self.assertIn("[issues_impacting_openness]: Meetings too long", trust)
+        self.assertIn("[feedback_for_team_leader]: More 1:1s", trust)
 
 
 class TestCollectGeneratedSummaries(unittest.TestCase):
@@ -129,11 +159,11 @@ class TestCollectGeneratedSummaries(unittest.TestCase):
         client.complete.return_value = json.dumps(
             {
                 "executive_summary": "Overall positive.",
-                "pillar_strategy_and_goals": "Aligned priorities.",
-                "pillar_roles_and_accountabilities": "Clear roles.",
-                "pillar_protocols_and_ways_of_working": "Fast decisions.",
-                "pillar_trust_and_relationships": "High trust.",
-                "additional_comments_summary": "No new themes.",
+                "pillar_1_2_strategy_goals": "Aligned priorities.",
+                "pillar_3_roles": "Clear roles.",
+                "pillar_4_protocols": "Fast decisions.",
+                "pillar_5_trust": "High trust.",
+                "additional_comments": "No new themes.",
             }
         )
         generated = _collect_generated_summaries([SAMPLE_ROW], client)

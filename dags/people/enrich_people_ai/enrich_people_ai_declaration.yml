@@ -12,7 +12,11 @@ dag:
       Current scope: Teva survey pillar summaries (`ai_teva_survey_summary`),
       reading `datalake_people.teva_survey_inputs` from `enrich_people`.
       The Spark job calls LiteLLM chat completions with
-      `vertex_ai/claude-sonnet-4-5`.
+      `vertex_ai/claude-sonnet-4-5` (Databricks `ai_query` / gpt-oss is not
+      on the homologated LiteLLM catalog). The user prompt matches the Daily
+      Pipeline notebook `ai_teva_update` (question-title JSON payload, Likert
+      1-2/3/4-5 sentiment rule, notebook JSON keys). Open answers are not
+      pre-translated; the prompt requires English output instead.
 
       `ai_teva_survey_summary` uses extraction_type full with merge on survey_invite_id;
       the Spark job skips invites that already exist in the target table and caps LiteLLM

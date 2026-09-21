@@ -35,6 +35,9 @@ from bietlejuice.base.validation.spark_args import (
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import MetastoreServiceFactory
+from dags.people.enrich_people_ai.spark_jobs.lib import (
+    teva_legacy_prompt as teva_prompt,
+)
 from dags.people.enrich_people_ai.spark_jobs.lib.llm_client import LiteLLMClient
 
 JOB_NAME = "generate_ai_teva_survey_summary"
@@ -52,9 +55,15 @@ metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
 
 _JSON_OBJECT_PATTERN = re.compile(r"\{[\s\S]*\}")
 
-# LiteLLM JSON root keys (prompt contract) → persisted Delta column names (ai_* = model text).
+# Notebook ``ai_query`` JSON root keys → Delta columns. Aliases keep the previous
+# LiteLLM contract parseable if a leftover run still emits those names.
 _LLM_JSON_KEY_TO_COLUMN = {
     "executive_summary": "ai_executive_summary",
+    "pillar_1_2_strategy_goals": "ai_pillar_strategy_and_goals",
+    "pillar_3_roles": "ai_pillar_roles_and_accountabilities",
+    "pillar_4_protocols": "ai_pillar_protocols_and_ways_of_working",
+    "pillar_5_trust": "ai_pillar_trust_and_relationships",
+    "additional_comments": "ai_additional_comments_summary",
     "pillar_strategy_and_goals": "ai_pillar_strategy_and_goals",
     "pillar_roles_and_accountabilities": "ai_pillar_roles_and_accountabilities",
     "pillar_protocols_and_ways_of_working": "ai_pillar_protocols_and_ways_of_working",
@@ -62,62 +71,37 @@ _LLM_JSON_KEY_TO_COLUMN = {
     "additional_comments_summary": "ai_additional_comments_summary",
 }
 
-_PILLAR_CONTEXT = (
-    "Between the `` is the theoretical context you will use to complete the task "
-    "and understand the pillars of analysis of the survey.\n\n"
-    "`Pillars 1 and 2 (Strategy and Goal/Priorities): High performance is maintained "
-    "if the team continues to have a deep understanding of and commitment to its "
-    "future direction, competitive advantage, and market/product choices, and keeps "
-    "daily work aligned with the most critical business goals.\n"
-    "Pillar 3 (Roles, Accountabilities & Interdependencies): High-performance teams "
-    "have clarity in roles, especially regarding interdependencies, and maintain a "
-    "routine of review and realignment whenever context, strategy, or team members "
-    "change.\n"
-    "Pillar 4 (Protocols & Ways of Working): Teams transform behaviors into deeply "
-    "rooted operational practices; decision-making, communication, and problem-"
-    "solving processes are fast and efficient, and meetings are dynamic and action-"
-    "oriented.\n"
-    "Pillar 5 (Working Relationships & Trust): Teams invest in trust and resolve "
-    "conflicts directly and constructively; members feel psychologically safe owning "
-    "mistakes, questioning, and disagreeing openly.`"
-)
 
-_OUTPUT_INSTRUCTIONS = (
-    "You are an AI People Analytics specialist. You will be provided with survey "
-    "data, consisting of lists of 1-5 Likert scale answers and open-ended answers "
-    "for a single team. Analyze the qualitative answers as the main focus, and use "
-    "the quantitative scores only to infer overall sentiment per pillar (do not show "
-    "any average grades or calculations to the final user).\n\n"
-    "You must produce, in the same language as the survey answers:\n"
-    "1. An executive summary stating overall team sentiment (Positive, Negative, or "
-    "Neutral), the strongest pillars, and the pillars with the most significant "
-    "opportunities for development, always naming pillars by their formal name.\n"
-    "2. Pillars 1 and 2 (Strategy and Goals/Priorities): most cited priority themes, "
-    "whether they are aligned across the team, and top blockers if any.\n"
-    "3. Pillar 3 (Roles, Accountabilities & Interdependencies): most cited themes "
-    "about roles and accountabilities.\n"
-    "4. Pillar 4 (Protocols and Ways of Working): main suggestions and actions the "
-    "team believes are necessary to operate as a high-performing team.\n"
-    "5. Pillar 5 (Working Relationships and Trust): main factors harming or "
-    "reinforcing trust, candor, and working relationships, if any.\n"
-    "6. A synthesis of any additional open comments introducing new themes not "
-    "covered above, if any.\n\n"
-    "If a pillar lacks sufficient data, state plainly that there is not enough data "
-    "to draw a conclusion for it; do not invent content.\n\n"
-    "CRITICAL: You MUST format your entire response as a single, valid JSON object "
-    "with exactly these root keys: `executive_summary`, `pillar_strategy_and_goals`, "
-    "`pillar_roles_and_accountabilities`, `pillar_protocols_and_ways_of_working`, "
-    "`pillar_trust_and_relationships`, `additional_comments_summary`. Each value is "
-    "the full text for that section."
-)
+def _split_score_list(value: Optional[str]) -> Optional[list]:
+    """Turn a comma-separated Likert string into a list (notebook ``COLLECT_LIST``)."""
+    if not value:
+        return None
+    parts = [part.strip() for part in str(value).split(",") if part.strip()]
+    if not parts:
+        return None
+    parsed = []
+    for part in parts:
+        try:
+            parsed.append(int(part))
+        except ValueError:
+            parsed.append(part)
+    return parsed
+
+
+def _split_answer_list(value: Optional[str]) -> Optional[list]:
+    """Turn pipe-separated open answers into a list (notebook ``COLLECT_LIST``)."""
+    if not value:
+        return None
+    parts = [part.strip() for part in str(value).split(" | ") if part.strip()]
+    return parts or None
 
 
 def _survey_data_payload(row: dict) -> str:
-    """Build the JSON blob appended to the LiteLLM user prompt with aggregated survey fields.
+    """Build the JSON blob appended to the LiteLLM user prompt.
 
-    The payload includes every comma-separated Likert score list and pipe-separated
-    open-text answer column from ``teva_survey_inputs`` that the model uses for analysis.
-    Keys match the field names on the input row so the model can correlate scores and text.
+    Keys are the survey question titles from the notebook ``ia_input`` STRUCT so
+    P12/P3/P4/P5 prefixes still drive pillar attribution. Score columns become
+    integer lists; open answers become string lists.
 
     Args:
         row: One ``teva_survey_inputs`` record as a plain dict (typically from
@@ -128,56 +112,100 @@ def _survey_data_payload(row: dict) -> str:
         missing optional fields.
     """
     payload = {
-        "strategic_goals_clarity_scores": row.get("strategic_goals_clarity_scores"),
-        "own_role_clarity_scores": row.get("own_role_clarity_scores"),
-        "others_role_clarity_scores": row.get("others_role_clarity_scores"),
-        "current_teamwork_scores": row.get("current_teamwork_scores"),
-        "decision_making_effectiveness_scores": row.get(
-            "decision_making_effectiveness_scores"
+        teva_prompt.PAYLOAD_KEY_STRATEGIC_GOALS: _split_score_list(
+            row.get("strategic_goals_clarity_scores")
         ),
-        "meeting_effectiveness_scores": row.get("meeting_effectiveness_scores"),
-        "team_performance_scores": row.get("team_performance_scores"),
-        "team_atmosphere_scores": row.get("team_atmosphere_scores"),
-        "conflict_handling_scores": row.get("conflict_handling_scores"),
-        "top_priorities_answers": row.get("top_priorities_answers"),
-        "team_challenges_answers": row.get("team_challenges_answers"),
-        "ideal_teamwork_answers": row.get("ideal_teamwork_answers"),
-        "improvement_to_perfect_score_answers": row.get(
-            "improvement_to_perfect_score_answers"
+        teva_prompt.PAYLOAD_KEY_PRIORITIES: _split_answer_list(
+            row.get("top_priorities_answers")
         ),
-        "openness_issues_answers": row.get("openness_issues_answers"),
-        "team_adjective_answers": row.get("team_adjective_answers"),
-        "leader_feedback_answers": row.get("leader_feedback_answers"),
-        "additional_comments_answers": row.get("additional_comments_answers"),
+        teva_prompt.PAYLOAD_KEY_CHALLENGES: _split_answer_list(
+            row.get("team_challenges_answers")
+        ),
+        teva_prompt.PAYLOAD_KEY_OWN_ROLE: _split_score_list(
+            row.get("own_role_clarity_scores")
+        ),
+        teva_prompt.PAYLOAD_KEY_OTHERS_ROLE: _split_score_list(
+            row.get("others_role_clarity_scores")
+        ),
+        teva_prompt.PAYLOAD_KEY_CURRENT_TEAMWORK: _split_score_list(
+            row.get("current_teamwork_scores")
+        ),
+        teva_prompt.PAYLOAD_KEY_IDEAL_TEAMWORK: _split_answer_list(
+            row.get("ideal_teamwork_answers")
+        ),
+        teva_prompt.PAYLOAD_KEY_DECISIONS: _split_score_list(
+            row.get("decision_making_effectiveness_scores")
+        ),
+        teva_prompt.PAYLOAD_KEY_MEETINGS: _split_score_list(
+            row.get("meeting_effectiveness_scores")
+        ),
+        teva_prompt.PAYLOAD_KEY_OPERATES: _split_score_list(
+            row.get("team_performance_scores")
+        ),
+        teva_prompt.PAYLOAD_KEY_TAKE_TO_BE_5: _split_answer_list(
+            row.get("improvement_to_perfect_score_answers")
+        ),
+        teva_prompt.PAYLOAD_KEY_ATMOSPHERE: _split_score_list(
+            row.get("team_atmosphere_scores")
+        ),
+        teva_prompt.PAYLOAD_KEY_OPENNESS: _split_answer_list(
+            row.get("openness_issues_answers")
+        ),
+        teva_prompt.PAYLOAD_KEY_CONFLICTS: _split_score_list(
+            row.get("conflict_handling_scores")
+        ),
+        teva_prompt.PAYLOAD_KEY_ADJECTIVE: _split_answer_list(
+            row.get("team_adjective_answers")
+        ),
+        teva_prompt.PAYLOAD_KEY_LEADER: _split_answer_list(
+            row.get("leader_feedback_answers")
+        ),
+        teva_prompt.PAYLOAD_KEY_ADDITIONAL: _split_answer_list(
+            row.get("additional_comments_answers")
+        ),
     }
     return json.dumps(payload, ensure_ascii=False)
 
 
 def _build_teva_prompt(row: dict) -> str:
-    """Assemble the full LiteLLM user message for one closed Teva survey.
+    """Assemble the LiteLLM user message matching notebook ``ai_query`` CONCAT order.
 
-    The prompt concatenates, in order: Teva pillar theory text, the few-shot
-    ``reference_guide_text`` from inputs, fixed output instructions (required JSON keys),
-    and the serialized survey payload from :func:`_survey_data_payload`.
+    Order: pillar theory + specialist intro, few-shot ``reference_guide_text``,
+    per-pillar tasks and JSON contract, English-output stand-in for
+    ``ai_translate``, then the question-title payload.
 
     Args:
-        row: One ``teva_survey_inputs`` record; must include ``reference_guide_text`` and
-            the score/answer columns consumed by :func:`_survey_data_payload`.
+        row: One ``teva_survey_inputs`` record; must include ``reference_guide_text``
+            and the score/answer columns consumed by :func:`_survey_data_payload`.
 
     Returns:
         A single string passed as the user message to :meth:`LiteLLMClient.complete`.
     """
     reference_guide = row.get("reference_guide_text") or ""
     return (
-        f"{_PILLAR_CONTEXT}\n\n"
-        "*** BONUS: REFERENCE GUIDE FOR CLASSIFICATION ***\n"
-        "Use the following examples to guide your classification of issues into "
-        "pillars and sentiment. If a comment is semantically similar to one of "
-        "these phrases, assign it to the corresponding pillar:\n"
+        f"{teva_prompt.PILLAR_THEORY_AND_SPECIALIST_INTRO}\n\n"
+        f"{teva_prompt.REFERENCE_GUIDE_HEADER}\n"
         f"{reference_guide}\n\n"
-        f"{_OUTPUT_INSTRUCTIONS}\n\n"
+        f"{teva_prompt.PILLAR_TASKS_AND_JSON_CONTRACT}\n\n"
+        f"{teva_prompt.ENGLISH_OUTPUT_INSTRUCTION}\n\n"
         f"{_survey_data_payload(row)}"
     )
+
+
+def _section_text(value) -> Optional[str]:
+    """Flatten a JSON section to STRING, including nested objects from older models."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        parts = []
+        for key, nested in value.items():
+            if nested is None or nested == "":
+                continue
+            parts.append(f"[{key}]: {nested}")
+        return "\n".join(parts) if parts else None
+    return str(value)
 
 
 def _extract_json_object(text: str) -> Optional[dict]:
@@ -245,8 +273,14 @@ def _generate_summary(row: dict, client: LiteLLMClient) -> Optional[dict]:
         "answered_count": row.get("answered_count"),
         "ts_ai_summary_generated": datetime.now(timezone.utc).replace(tzinfo=None),
     }
+    for column_name in _LLM_JSON_KEY_TO_COLUMN.values():
+        result.setdefault(column_name, None)
     for json_key, column_name in _LLM_JSON_KEY_TO_COLUMN.items():
-        result[column_name] = parsed.get(json_key)
+        if result.get(column_name) is not None:
+            continue
+        if json_key not in parsed:
+            continue
+        result[column_name] = _section_text(parsed.get(json_key))
     return result
 
 
@@ -285,8 +319,8 @@ def parse_args() -> dict:
 
     Positional args follow the DAG builder order: environment, bucket, dag_name,
     schema, table_name, partitions, load_start_date, load_end_date. Also accepts
-    ``--max-calls-per-run`` and validation target overrides from
-    :func:`add_validation_target_args`.
+    ``--max-calls-per-run``, ``--litellm-model``, and validation target overrides
+    from :func:`add_validation_target_args`.
 
     Returns:
         Namespace values as a dict suitable for ``main`` (includes ``max_calls_per_run``).
@@ -305,6 +339,12 @@ def parse_args() -> dict:
         type=int,
         default=DEFAULT_MAX_CALLS_PER_RUN,
         help="Cost guardrail: maximum LiteLLM calls per run.",
+    )
+    parser.add_argument(
+        "--litellm-model",
+        type=str,
+        default=None,
+        help="LiteLLM chat model id (overrides LITELLM_MODEL and the client default).",
     )
     add_validation_target_args(parser)
     return vars(parser.parse_args())
@@ -355,7 +395,7 @@ def main() -> None:
         logger.info("No new closed AI Teva surveys to summarize.")
         return
 
-    client = LiteLLMClient()
+    client = LiteLLMClient(model=job_args.get("litellm_model"))
     generated = _collect_generated_summaries(pending_rows, client)
 
     output_schema = StructType(
