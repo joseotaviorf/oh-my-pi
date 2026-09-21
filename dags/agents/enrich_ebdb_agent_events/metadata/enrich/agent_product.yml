@@ -54,7 +54,11 @@ columns:
   is_active:
     lineage:
       - datalake_company_clean.member_profile.status
-    description: True when member_profile status is ACTIVE for this company-product pair.
+      - datalake_company_clean.company_product.status
+      - datalake_company_clean.company_product.deactivation_reason
+    description: |
+      True when member_profile and company_product are both ACTIVE and company_product has
+      no deactivation_reason on the membership link.
   is_legacy_product:
     lineage:
       - datalake_company_clean.product.id
@@ -67,10 +71,14 @@ columns:
     description: |
       True when the product represents a valid agent profile membership, excluding legacy
       product ids (1, 32, 29) and product id 40 (Alias AI/ML).
-  is_lastest_valid:
+  is_lastest:
     description: |
-      True when this row is the preferred valid product for id_unified_agent, ranking by
-      valid product flag, active member_profile status, and unified identity update time.
+      True when this row is the preferred product for id_unified_agent on the current
+      snapshot, ranking by valid product flag, active membership, and latest update time.
+  is_lastest_by_date:
+    description: |
+      True when this row is the preferred product for id_unified_agent on the calendar day
+      of ts_started, used to reconstruct point-in-time profile in agent_history.
   ts_started:
     lineage:
       - datalake_company_clean.member_profile.ts_created

@@ -188,6 +188,32 @@ agent_lead_referral AS (
         datalake_ebdb_clean.user_revision_entity AS rev
             ON rev.id = aud.rev 
     GROUP BY 1, 6
+),
+agent_product AS (
+    SELECT
+        p.id_unified_agent,
+        p.id_agent_product,
+        p.product_name,
+        p.is_active,
+        p.ts_started,
+        EXPLODE(SEQUENCE(DATE(p.ts_started), DATE(COALESCE(p.ts_ended, '{load_end_date}')))) AS dt_reference
+    FROM
+        agent_base AS base
+    JOIN
+        datalake_ebdb_agent_events.agent_product AS p
+            ON base.id_unified_agent = p.id_unified_agent
+    WHERE
+        p.is_lastest_by_date IS TRUE
+),
+agent_product_daily AS (
+    SELECT
+        p.id_unified_agent,
+        p.id_agent_product,
+        p.product_name,
+        ROW_NUMBER() OVER(PARTITION BY p.id_unified_agent, DATE(p.dt_reference) ORDER BY p.is_active DESC,p.ts_started DESC) = 1 AS is_lastest_valid_by_date,
+        p.dt_reference
+    FROM
+        agent_product AS p
 )
 SELECT
     XXHASH64(base.id_unified_agent, base.dt_reference) AS id_snapshot,
@@ -197,8 +223,10 @@ SELECT
     base.id_agent_data,
     base.id_partner,
     base.id_user,
+    agent_product.id_agent_product,
     base.sk_broker,
     base.uuid_person,
+    agent_product.product_name AS profile,
     COALESCE(
         agent_cap.business_context, 
         IF(agent_bc.is_allow_demand_sale IS TRUE, 'SALE', NULL),
@@ -249,6 +277,11 @@ LEFT JOIN
     agent_lead_referral AS lead_referral
         ON base.id_agent_data = lead_referral.id_agent_data
         AND base.dt_reference >= lead_referral.dt_reference
+LEFT JOIN
+    agent_product_daily AS agent_product
+        ON base.id_unified_agent = agent_product.id_unified_agent
+        AND base.dt_reference = agent_product.dt_reference
+        AND agent_product.is_lastest_valid_by_date IS TRUE
 WHERE
     base.dt_reference BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 27
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 29

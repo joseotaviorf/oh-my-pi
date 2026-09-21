@@ -141,7 +141,7 @@ unified_identity AS (
                 AND COALESCE(agent.id_agent_data, agent.id_partner) IS NOT NULL 
                 THEN person.uuid_company
         END AS uuid_company,
-        person.uuid_person,
+        agent.uuid_person,
         agent.uuid_agent,
         agent.uuid_prospect,
         COALESCE(person.creci, prospect.creci) AS creci,
@@ -168,9 +168,9 @@ unified_identity AS (
         ) AS ts_created,
         GREATEST(agent.ts_updated, person.ts_updated) AS ts_updated
     FROM
-        person_data AS person
-    JOIN
         agent AS agent
+    LEFT JOIN
+        person_data AS person
             ON agent.uuid_person = person.uuid_person
     LEFT JOIN
         prospect_agent AS prospect
@@ -237,7 +237,7 @@ brokers_profile AS (
 )
 SELECT
     XXHASH64(
-        p.uuid_person,
+        COALESCE(p.uuid_person, ''),
         COALESCE(p.id_agent, -1),
         COALESCE(p.id_agent_data, -1),
         COALESCE(p.id_partner, -1)

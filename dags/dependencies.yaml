@@ -1438,6 +1438,7 @@ bietlejuice.enrich_agent:
   - bietlejuice.enrich_agent_accreditation:load-enrich-agent-profile:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-business-context:first-run-of-day
   - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-accreditation-events:first-run-of-day
+  - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-product:first-run-of-day
   - bietlejuice.enrich_ebdb_agent_events:load-enrich-agent-unified-identity:first-run-of-day
   - bietlejuice.enrich_ebdb_agent_events:load-enrich-capability-events:first-run-of-day
 bietlejuice.enrich_agent_accreditation:

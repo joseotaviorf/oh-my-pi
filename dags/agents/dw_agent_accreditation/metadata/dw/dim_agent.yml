@@ -7,8 +7,9 @@ description: |
   Agent dimension from the agent accreditation enrich layer, one row per accredited agent.
   Projects current profile, partnership flags, capability enablement, Traz Quem Aluga (TQA)
   and Traz Quem Compra (TQC) referral invite flags, broker linkage for 3P agents, and
-  accreditation lifecycle timestamps. Consumed by Agents squad analytics; join sk_broker
-  to dw_brokers.dim_broker for imobiliária attributes.
+  accreditation lifecycle timestamps including first activation, last reactivation,
+  last inactivation, and product/accreditation deaccreditation. Consumed by Agents squad
+  analytics; join sk_broker to dw_brokers.dim_broker for imobiliária attributes.
 columns:
   sk_person:
     description: Person surrogate key from the unified agent identity registry.
@@ -49,6 +50,10 @@ columns:
     description: Affiliate data identifier when the user has an affiliate profile.
     lineage:
       - datalake_ebdb_agent_events.agent_unified_identity.id_affiliate
+  uuid_person:
+    description: Person UUID anchor from the unified agent identity registry.
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
   sk_photographer_data:
     description: Photographer data identifier from the user record when applicable.
     lineage:
@@ -71,21 +76,24 @@ columns:
       - datalake_ebdb_agent_events.agent_unified_identity.creci_uf
   profile:
     description: |
-      Agent company product profile name from the latest valid agent_product membership
-      (is_valid_product and is_lastest_valid).
+      Agent company product profile name on the latest agent_history snapshot, with
+      fallback to the current is_lastest agent_product row when history is absent.
     lineage:
+      - datalake_agent_accreditation.agent_history.profile
       - datalake_ebdb_agent_events.agent_product.product_name
   deactivation_reason:
     description: |
-      Product deactivation reason from the latest valid agent_product membership when
-      the company-product link is inactive.
+      Product deactivation reason from the agent_product row linked to the latest
+      agent_history snapshot, with fallback to the current is_lastest agent_product row.
     lineage:
+      - datalake_agent_accreditation.agent_history.id_agent_product
       - datalake_ebdb_agent_events.agent_product.deactivation_reason
   deactivation_sub_reason:
     description: |
-      Product deactivation sub-reason from the latest valid agent_product membership when
-      the company-product link is inactive.
+      Product deactivation sub-reason from the agent_product row linked to the latest
+      agent_history snapshot, with fallback to the current is_lastest agent_product row.
     lineage:
+      - datalake_agent_accreditation.agent_history.id_agent_product
       - datalake_ebdb_agent_events.agent_product.deactivation_sub_reason
   is_reactivated:
     description: True when the agent was reactivated after a prior inactivation event.
@@ -209,10 +217,28 @@ columns:
     description: Timestamp of the first ACTIVATED accreditation event for the agent.
     lineage:
       - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
-  ts_deaccreditation:
-    description: Timestamp of the deaccreditation or inactivation event for the agent.
+  ts_last_reactivation:
+    description: Timestamp of the most recent REACTIVATED accreditation event for the agent.
     lineage:
       - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+  ts_last_inactivation:
+    description: |
+      Timestamp of the most recent INACTIVATED event or AGENT_DEACCREDITATION reason in
+      agent_accreditation_events, regardless of whether the unified identity is still active.
+    lineage:
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+      - datalake_ebdb_agent_events.agent_accreditation_events.event
+      - datalake_ebdb_agent_events.agent_accreditation_events.event_reason
+  ts_deaccreditation:
+    description: |
+      Timestamp when the agent left the active product/accreditation state. Prefers
+      agent_product.ts_ended from the latest agent_history product membership (or current
+      is_lastest product fallback), otherwise the latest AGENT_DEACCREDITATION event while
+      the unified identity is inactive.
+    lineage:
+      - datalake_ebdb_agent_events.agent_product.ts_ended
+      - datalake_ebdb_agent_events.agent_accreditation_events.ts_created
+      - datalake_ebdb_agent_events.agent_unified_identity.is_unified_agent_active
   ts_legacy_agent_migrated:
     description: Timestamp of the first MIGRATED event when the legacy agent was moved to Agent Domain.
     lineage:

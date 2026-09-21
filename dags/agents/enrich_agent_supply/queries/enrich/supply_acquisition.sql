@@ -20,7 +20,7 @@ WITH supply_acquisition AS (
     JOIN
         datalake_ebdb_agent_events.agent_product AS ap
             ON ap.id_unified_agent = au.id_unified_agent
-            AND ap.is_lastest_valid IS TRUE
+            AND ap.is_lastest IS TRUE
             AND ap.is_valid_product IS TRUE
     WHERE
         DATE(sf.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

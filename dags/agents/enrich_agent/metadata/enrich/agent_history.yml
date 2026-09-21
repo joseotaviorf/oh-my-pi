@@ -9,7 +9,8 @@ description: |
   segments (latest event per day) intersecting the load window, plus a single
   INACTIVATED day when deaccreditation falls in the window. Reconstructs capability
   enablement from capability_events, demand sale/rent flags from business_context revision
-  intervals, legacy profile types from agent_profile, partner autonomous-agent flags,
+  intervals, company product profile from agent_product (point-in-time via membership
+  validity window), legacy profile types from agent_profile, partner autonomous-agent flags,
   passive lead receiver history, and TQA/TQC referral invite status. Consumed by
   dw_agent_accreditation dim_agent and fact_agent_daily.
 columns:
@@ -44,6 +45,12 @@ columns:
     lineage:
       - datalake_ebdb_agent_events.agent_unified_identity.id_user
     description: Platform user identifier linked to the person behind the agent.
+  id_agent_product:
+    lineage:
+      - datalake_ebdb_agent_events.agent_product.id_agent_product
+    description: |
+      Foreign key to the agent_product row that is valid on the reference date, resolved
+      from the latest active company product membership per agent-day.
   sk_broker:
     lineage:
       - datalake_ebdb_agent_events.agent_unified_identity.sk_broker
@@ -52,6 +59,12 @@ columns:
     lineage:
       - datalake_ebdb_agent_events.agent_unified_identity.uuid_person
     description: Person UUID anchor for joining person-level models and tier tables.
+  profile:
+    lineage:
+      - datalake_ebdb_agent_events.agent_product.product_name
+    description: |
+      Agent company product profile name on the reference date, taken from the preferred
+      agent_product membership active on that day (is_lastest_by_date).
   business_context:
     lineage:
       - datalake_ebdb_agent_events.capability_events.business_context

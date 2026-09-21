@@ -4,7 +4,9 @@ WITH agent_accreditation_dates AS (
         MIN(events.ts_created) FILTER(WHERE events.event = "MIGRATED") AS ts_legacy_agent_migrated,
         MIN(events.ts_created) AS ts_accreditation,
         MIN(events.ts_created) FILTER(WHERE events.event = "ACTIVATED") AS ts_first_activation,
-        MAX(events.ts_created) FILTER(WHERE (aui.is_unified_agent_active IS FALSE AND events.event = "INACTIVATED") OR events.event_reason = "AGENT_DEACCREDITATION") AS ts_deaccreditation,
+        MAX(events.ts_created) FILTER(WHERE events.event = "REACTIVATED") AS ts_last_reactivation,
+        MAX(events.ts_created) FILTER(WHERE events.event = "INACTIVATED" OR events.event_reason = "AGENT_DEACCREDITATION") AS ts_last_inactivation,
+        MAX(events.ts_created) FILTER(WHERE aui.is_unified_agent_active IS FALSE AND events.event_reason = "AGENT_DEACCREDITATION") AS ts_deaccreditation,
         MIN(events.ts_created) FILTER(WHERE events.event_reason = "INACTIVE_AGENT_REENROLLMENT") AS ts_agent_reenrollment
     FROM
         datalake_ebdb_agent_events.agent_accreditation_events AS events
@@ -47,14 +49,15 @@ SELECT
     a.id_user AS sk_user,
     COALESCE(a.sk_broker, -1) AS sk_broker,
     a.id_affiliate AS sk_affiliate,
+    a.uuid_person,
     a.id_photographer_data AS sk_photographer_data,
     a.sk_company,
     a.uuid_agent,
     a.creci,
     a.creci_uf,
-    product.product_name AS profile,
-    product.deactivation_reason,
-    product.deactivation_sub_reason,
+    COALESCE(ac.profile, product_exception.product_name) AS profile,
+    COALESCE(product_deactivation.deactivation_reason, product_exception.deactivation_reason) AS deactivation_reason,
+    COALESCE(product_deactivation.deactivation_sub_reason, product_exception.deactivation_sub_reason) AS deactivation_sub_reason,
     aa.is_reactivated,
     a.is_agent_active,
     a.is_photographer_active,
@@ -80,7 +83,9 @@ SELECT
     aa.ts_last_status_changed,
     aad.ts_accreditation,
     aad.ts_first_activation,
-    aad.ts_deaccreditation,
+    aad.ts_last_reactivation,
+    aad.ts_last_inactivation,
+    COALESCE(product_deactivation.ts_ended, product_exception.ts_ended, aad.ts_deaccreditation) AS ts_deaccreditation,
     aad.ts_legacy_agent_migrated,
     aad.ts_agent_reenrollment,
     a.ts_created,
@@ -102,7 +107,10 @@ LEFT JOIN
         ON a.id_unified_agent = aa.id_unified_agent
         AND aa.is_lastest_event IS TRUE
 LEFT JOIN
-    datalake_ebdb_agent_events.agent_product AS product
-        ON a.id_agent = product.id_agent
-        AND product.is_valid_product IS TRUE
-        AND product.is_lastest_valid IS TRUE
+    datalake_ebdb_agent_events.agent_product AS product_deactivation
+        ON ac.id_agent_product = product_deactivation.id_agent_product
+LEFT JOIN
+    datalake_ebdb_agent_events.agent_product AS product_exception
+        ON a.id_unified_agent = product_exception.id_unified_agent
+        AND ac.id_agent_product IS NULL
+        AND product_exception.is_lastest IS TRUE

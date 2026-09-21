@@ -10,19 +10,21 @@ description: |
   and partner sources so downstream supply joins resolve identities outside the incremental window.
   Consolidates natural and surrogate keys (id_unified_agent, sk_person, sk_broker, sk_company),
   prospect/affiliate context, 1P/3P partnership flags, and 3P broker profile flags. Built from
-  a UNION of Agent Domain rows linked to legacy/partner references and standalone legacy/partner
-  rows without an Agent Domain agent. Downstream tables join on id_unified_agent.
+  a UNION of Agent Domain rows LEFT JOINed to person_sks (so agents without a person registry
+  match are retained) and standalone legacy/partner rows without an Agent Domain agent.
+  Downstream tables join on id_unified_agent.
 columns:
   id_unified_agent:
     lineage:
+      - datalake_ebdb_clean.agent.uuid_person
       - datalake_person.person_sks.uuid_person
       - datalake_ebdb_clean.agent.id
       - datalake_ebdb_clean.agent_data.id
       - datalake_ebdb_clean.partner.id
     description: |
-      Surrogate key for the unified identity row, generated with XXHASH64 from uuid_person,
-      id_agent, id_agent_data, and id_partner (each coalesced to -1 when absent). Primary merge
-      key for this table.
+      Surrogate key for the unified identity row, generated with XXHASH64 from uuid_person
+      (coalesced to empty string when null), id_agent, id_agent_data, and id_partner (each
+      coalesced to -1 when absent). Primary merge key for this table.
   sk_person:
     lineage:
       - datalake_person.person_sks.sk_person
@@ -73,8 +75,12 @@ columns:
     description: Photographer data identifier from the user record when applicable.
   uuid_person:
     lineage:
+      - datalake_ebdb_clean.agent.uuid_person
       - datalake_person.person_sks.uuid_person
-    description: Person UUID used as the cross-system join anchor for agent, prospect, and brokers_profile tables.
+    description: |
+      Person UUID used as the cross-system join anchor. Prefer Agent Domain agent.uuid_person
+      on Agent Domain rows (LEFT JOIN to person_sks), otherwise person_sks.uuid_person on
+      legacy/partner-only rows.
   uuid_company:
     lineage:
       - datalake_ebdb_clean.agent.id_partnership_representative

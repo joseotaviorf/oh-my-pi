@@ -1,0 +1,49 @@
+---
+table_name: dw_agent.fact_agent_daily_temp
+alert_channel: "#agents-data-alarms"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_agent_daily:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_agent:
+    is_complete:
+      severity_level: Error
+  dt_ref:
+    is_complete:
+      severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
+  sk_broker_only_for_3p_partnership:
+    custom:
+      # sk_broker is populated (not -1) only when is_3p_partnership is TRUE on dt_ref; non-3P rows must have sk_broker = -1.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_agent.fact_agent_daily_temp
+         WHERE (is_3p_partnership = TRUE AND sk_broker = -1)
+            OR (is_3p_partnership = FALSE AND sk_broker <> -1)
+        ) = 0
+      severity_level: Error
+  matching_sk_broker_dim_broker:
+    custom:
+      # Every sk_broker > -1 must exist in dw_brokers.dim_broker (no orphan broker FKs).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT sk_broker AS agent_broker_sk
+           FROM dw_agent.fact_agent_daily_temp
+           WHERE sk_broker > -1
+         ) AS agent_row
+         WHERE NOT EXISTS (
+           SELECT 1
+           FROM dw_brokers.dim_broker AS broker_dim
+           WHERE broker_dim.sk_broker = agent_row.agent_broker_sk
+         )
+        ) = 0
+      severity_level: Error
