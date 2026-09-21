@@ -25,5 +25,7 @@ cluster:
       PYSPARK_PYTHON: /usr/bin/python3.11
       # Isolated site-packages from emr_python311_init.sh, not system 3.9.
       PYTHONPATH: /opt/vespucio-python311
-  custom_libraries:
-    - whl: "{artifacts_bucket}/vespucio/vespucio-latest-py3-none-any.whl"
+  # No custom_libraries: emr_python311_init.sh already fetches and installs
+  # vespucio-latest-py3-none-any.whl itself. A whl entry here would make
+  # the shared bootstrap also install it under system Python 3.9 - a
+  # situation that was causing boostrap timeouts.
