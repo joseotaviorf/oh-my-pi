@@ -51,13 +51,13 @@ from bietlejuice.base.dependencies.file_dependency_generator import (
 from bietlejuice.base.dependencies.ignored_dag_ids import (
     filter_ignored_dag_dependencies,
 )
+from bietlejuice.ci.ci_diff_ref import fetch_diff_base, resolve_diff_from_ref
 from scripts.dependency_handling.automate_dependencies import (
     UNSTANDARD_DAGS_PATH,
     get_unstandard_dags_file_content,
 )
 from scripts.services.git_service import GitService
 
-DEFAULT_FROM_BRANCH = "origin/master"
 DEFAULT_TO_BRANCH = "HEAD"
 
 SEPARATOR = "=" * 70
@@ -365,19 +365,13 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--from-branch",
-        default=DEFAULT_FROM_BRANCH,
-        help=f"Branch used as the comparison base (default: {DEFAULT_FROM_BRANCH})",
+        default=resolve_diff_from_ref(os.environ.get("CI_COMMIT_BRANCH", "")),
+        help="Branch used as the comparison base (defaults to the CI target)",
     )
     parser.add_argument(
         "--to-branch",
         default=DEFAULT_TO_BRANCH,
         help=f"Branch being compared (default: {DEFAULT_TO_BRANCH})",
-    )
-    parser.add_argument(
-        "--fetch",
-        action="store_true",
-        default=False,
-        help="Fetch the base branch before comparing",
     )
     parser.add_argument(
         "--dump-cycles",
@@ -392,9 +386,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.dump_cycles:
         _dump_cycles(args.dump_cycles)
         return 0
-
-    if args.fetch:
-        GitService().fetch(args.from_branch.split("/")[-1])
+    fetch_diff_base(args.from_branch)
 
     base_commit = resolve_base_commit(args.from_branch, args.to_branch)
 

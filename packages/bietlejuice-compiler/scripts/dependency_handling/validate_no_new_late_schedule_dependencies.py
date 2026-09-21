@@ -26,10 +26,12 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (  # noq
     BietlejuiceDependencyHelper,
 )
 from bietlejuice.base.paths import DAG_PACKAGES_ROOT  # noqa: E402
+from bietlejuice.ci.ci_diff_ref import (  # noqa: E402
+    fetch_diff_base,
+    resolve_diff_from_ref,
+)
 from bietlejuice.services.file_service import FileService  # noqa: E402
-from scripts.services.git_service import GitService  # noqa: E402
 
-DEFAULT_FROM_BRANCH = "origin/master"
 DEFAULT_TO_BRANCH = "HEAD"
 DEPENDENCIES_PATH = "dags/dependencies.yaml"
 ALLOWLIST_PATH = os.path.join(
@@ -559,19 +561,13 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--from-branch",
-        default=DEFAULT_FROM_BRANCH,
-        help=f"Branch used as the comparison base (default: {DEFAULT_FROM_BRANCH})",
+        default=resolve_diff_from_ref(os.environ.get("CI_COMMIT_BRANCH", "")),
+        help="Branch used as the comparison base (defaults to the CI target)",
     )
     parser.add_argument(
         "--to-branch",
         default=DEFAULT_TO_BRANCH,
         help=f"Branch being compared (default: {DEFAULT_TO_BRANCH})",
-    )
-    parser.add_argument(
-        "--fetch",
-        action="store_true",
-        default=False,
-        help="Fetch the base branch before comparing",
     )
     return parser.parse_args(argv)
 
@@ -579,9 +575,7 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
 def main(argv: Optional[List[str]] = None) -> int:
     args = _parse_args(argv)
 
-    if args.fetch:
-        GitService().fetch(args.from_branch.split("/")[-1])
-
+    fetch_diff_base(args.from_branch)
     base_commit = resolve_base_commit(args.from_branch, args.to_branch)
 
     print("Looking for late-schedule DAG dependency changes...")

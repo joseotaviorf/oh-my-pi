@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
@@ -14,6 +15,7 @@ from scripts.ci_cd.validate_emr_runtime_clients import (  # noqa: E402
     RULE_SPARK_BUILDER,
     added_spark_jobs,
     check_source,
+    collect_violations,
     is_scanned_path,
 )
 
@@ -215,3 +217,20 @@ class TestAddedSparkJobs:
 
     def test_relevant_statuses_is_added_only(self):
         assert RELEVANT_STATUSES == frozenset({"A"})
+
+
+@mock.patch("scripts.ci_cd.validate_emr_runtime_clients.GitService")
+@mock.patch(
+    "scripts.ci_cd.validate_emr_runtime_clients.resolve_diff_from_ref",
+    return_value="origin/development",
+)
+def test_collect_violations_uses_resolved_base(mock_resolve, mock_git_service):
+    git_service = mock_git_service.return_value
+    git_service.get_modified_files_from_diff.return_value = {}
+
+    assert collect_violations("feature-branch") == []
+
+    mock_resolve.assert_called_once_with("feature-branch")
+    git_service.get_modified_files_from_diff.assert_called_once_with(
+        "origin/development", "HEAD"
+    )

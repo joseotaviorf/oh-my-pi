@@ -307,6 +307,7 @@ class TestMain:
         old_graph=None,
         load_old_graph_returns=_UNSET,
     ):
+        monkeypatch.setattr(mod, "fetch_diff_base", lambda _from: None)
         monkeypatch.setattr(mod, "resolve_base_commit", lambda _from, _to: "abc1234")
         if load_old_graph_returns is not self._UNSET:
             monkeypatch.setattr(
@@ -328,6 +329,13 @@ class TestMain:
             "find_late_schedule_findings",
             lambda *_args, **_kwargs: findings,
         )
+
+    def test_defaults_to_pr_target_branch(self, monkeypatch):
+        monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+        monkeypatch.setenv("CI_COMMIT_BRANCH", "development")
+        monkeypatch.delenv("CI_COMMIT_TARGET_BRANCH", raising=False)
+
+        assert mod._parse_args([]).from_branch == "origin/development"
 
     def test_fails_when_findings_remain(self, monkeypatch, capsys):
         self._stub_lookups(
@@ -365,6 +373,7 @@ class TestMain:
             )
             return None
 
+        monkeypatch.setattr(mod, "fetch_diff_base", lambda _from: None)
         monkeypatch.setattr(mod, "resolve_base_commit", lambda _from, _to: "abc1234")
         monkeypatch.setattr(mod, "load_dependencies_from_commit", missing_old_graph)
         monkeypatch.setattr(mod, "load_current_dependencies", lambda: {})

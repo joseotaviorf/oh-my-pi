@@ -18,6 +18,7 @@ for _p in (_REPO_ROOT, _COMPILER_ROOT):
         sys.path.insert(0, _p)
 
 from bietlejuice.base.pipeline.platform_resolver import resolve_platforms
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from bietlejuice.governance.domain_registry import catalog_mapping_for
 from scripts.services.git_service import GitService
 from scripts.services.metadata_file_info import MetadataFileInfo
@@ -85,13 +86,7 @@ def get_metadata_files(all_files, branch, from_commit, to_commit, file):
         return [(file, "M")]
     elif branch:
         git_service = GitService()
-        if branch == "master":
-            from_branch = "HEAD~1"
-        else:
-            from_branch = "origin/master"
-            git_service.fetch(
-                "master"
-            )  # We need to do this because Woodpecker will only fetch from the current branch.
+        from_branch = resolve_diff_from_ref(branch)
 
         changed_files = [
             (file, status)

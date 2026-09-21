@@ -782,7 +782,6 @@ core-model-tests:
 	@echo "Checking for core model changes"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@cd packages/bietlejuice-runtime && DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning test/core_model_dags/ src/bietlejuice/base/core_models/
 
 .PHONY: core-model-coverage
@@ -791,7 +790,6 @@ core-model-coverage:
 	@echo ""
 	@echo "Checking for core model changes"
 	@echo "=========="
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/core_models/check_core_model_changes.py -b "$(CI_COMMIT_BRANCH)" -v && exit 0 || \
 		(echo "" && \
 		 echo "Core Model Test Coverage Check" && \
@@ -809,8 +807,7 @@ transcript-sql-files:
 	@echo "Transcripting SQL files from Trino to Databricks syntax"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
-	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/sql_transcript.py --mode git-diff --from-branch origin/master --to-branch HEAD
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/sql_transcript.py --mode git-diff
 
 .PHONY: validate-dags-dependencies
 validate-dags-dependencies:
@@ -830,14 +827,13 @@ validate-dependency-file-correctness:
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/validate_dependency_file_correctness.py
 
 .PHONY: validate-no-new-cyclic-dependencies
-## fails when a change introduces a DAG dependency cycle that does not exist on master. A cycle makes
+## fails when a change introduces a DAG dependency cycle that does not exist on its target branch. A cycle makes
 ## the generator delete every dependency between the DAGs involved, silently losing their ordering.
 validate-no-new-cyclic-dependencies:
 	@echo ""
 	@echo "Validating that no new cyclic DAG dependencies were introduced"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/validate_no_new_cyclic_dependencies.py
 
 .PHONY: validate-no-new-late-schedule-dependencies
@@ -849,7 +845,6 @@ validate-no-new-late-schedule-dependencies:
 	@echo "Validating that no new late-schedule DAG dependencies were introduced"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/validate_no_new_late_schedule_dependencies.py
 
 level ?= warning
@@ -943,7 +938,6 @@ validate-metadata-files-content:
 	@echo "Validating if new/modified metadata files follow the metadata file schema"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_metadata_files_content.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 .PHONY: sync-domain-allowlist
@@ -968,7 +962,6 @@ validate-metadata-files-exist:
 	@echo "Validating if new/modified query files have corresponding metadata file defined"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 
@@ -983,7 +976,6 @@ validate-datahub-context-entities:
 	@echo "Validating changed DataHub context entity docs (domain + metric)"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run python dags/governance/datahub_business_context/validate_datahub_context_entities.py --changed-only -b "$(CI_COMMIT_BRANCH)"
 
 .PHONY: validate-entity-golden-queries-metadata
@@ -995,7 +987,6 @@ validate-entity-golden-queries-metadata:
 	@echo "Validating golden queries in changed entity docs (repo metadata gate)"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python dags/governance/datahub_business_context/validate_entity_golden_queries_metadata.py --changed-only -b "$(CI_COMMIT_BRANCH)"
 
 .PHONY: validate-llm-context-dag-impact
@@ -1006,7 +997,6 @@ validate-llm-context-dag-impact:
 	@echo "Validating llm_context golden-query impact of changed DAG metadata YAML files"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python dags/governance/datahub_business_context/validate_llm_context_dag_impact.py --changed-only -b "$(CI_COMMIT_BRANCH)"
 
 .PHONY: validate-fair-metadata
@@ -1015,7 +1005,6 @@ validate-fair-metadata:
 	@echo "Validating FAIR metadata (F2-01 table + F2-02 column substantive descriptions) on changed clean+ YAML"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-runtime python -m bietlejuice.governance.fairness_assessment.validate_metadata_cli -b "$(CI_COMMIT_BRANCH)"
 
 .PHONY: audit-fair-metadata-scope
@@ -1043,7 +1032,6 @@ validate-lineage-consistency:
 	@echo "Validating if metadata files are consistent with their SQL queries"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_lineage_consistency.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-lineage-consistency-all
@@ -1062,7 +1050,6 @@ validate-core-model-schemas:
 	@echo "Validating if new/modified core model tables have corresponding schema files"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_core_model_schemas.py -b "$(CI_COMMIT_BRANCH)" -v
 
 .PHONY: validate-core-model-schema-content
@@ -1072,7 +1059,6 @@ validate-core-model-schema-content:
 	@echo "Validating if new/modified core model schema files have correct content structure"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_core_model_schema_content.py -b "$(CI_COMMIT_BRANCH)" -v
 
 .PHONY: validate-core-model-schemas-all
@@ -1110,7 +1096,6 @@ validate-source-layer-policy:
 	@echo "Validating source-layer policy for changed DAGs"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -b "$(CI_COMMIT_BRANCH)" $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-source-layer-policy-all
@@ -1138,7 +1123,6 @@ validate-databricks-sql-constructs:
 	@echo "Validating SQL for Databricks-specific constructs (EMR compatibility)"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_databricks_sql_constructs.py -b "$(CI_COMMIT_BRANCH)"
 
 .PHONY: validate-databricks-sql-constructs-all
@@ -1157,7 +1141,6 @@ validate-no-new-databricks-clusters:
 	@echo "Validating no new Databricks production cluster introductions"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_no_new_databricks_clusters.py -b "$(CI_COMMIT_BRANCH)"
 
 .PHONY: validate-no-new-databricks-clusters-all
@@ -1176,7 +1159,6 @@ validate-dag-builds: generate-query-manifests generate-metadata-manifests genera
 	@echo "Validating changed DAGs build with prod config"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/validate_dag_builds.py -b "$(CI_COMMIT_BRANCH)"
 
 .PHONY: validate-dag-builds-all
@@ -1195,7 +1177,6 @@ validate-emr-runtime-clients:
 	@echo "Validating new spark jobs use the bietlejuice dual-runtime clients"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_emr_runtime_clients.py -b "$(CI_COMMIT_BRANCH)"
 
 .PHONY: validate-emr-runtime-clients-all
@@ -1215,9 +1196,6 @@ validate-join-shapes:
 	@echo "Validating join shapes (range / disjunctive joins that plan as BroadcastNestedLoopJoin on EMR)"
 	@echo "=========="
 	@echo ""
-	@if [ -z "$(paths)" ] && [ -z "$(domain)" ]; then \
-		git fetch --no-tags origin +refs/heads/master; \
-	fi
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_join_shapes.py $(if $(paths),--paths $(paths),$(if $(domain),--domain $(domain),-b "$(CI_COMMIT_BRANCH)"))
 
 .PHONY: validate-join-shapes-all

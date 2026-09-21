@@ -1,6 +1,9 @@
+import os
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
+
+os.environ.setdefault("ENVIRONMENT", "prod")
 
 # Put the repo root on sys.path before ANYTHING else in this test session runs.
 # bietlejuice.base.paths.DAG_PACKAGES_ROOT is computed once, at first import, by

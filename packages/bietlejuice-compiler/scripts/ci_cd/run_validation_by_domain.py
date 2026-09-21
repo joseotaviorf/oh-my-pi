@@ -63,23 +63,16 @@ def _current_branch() -> str:
     return branch
 
 
-def _fetch_master() -> None:
-    subprocess.run(
-        ["git", "fetch", "--no-tags", "origin", "+refs/heads/master"],
-        check=False,
-        capture_output=True,
-    )
-
-
 def _changed_files(branch: str) -> Optional[List[str]]:
-    """Returns paths of files changed in *branch* vs master, or None on error.
+    """Returns paths of files changed in *branch* vs its diff base, or None on error.
 
-    Woodpecker pull_request pipelines always use origin/master..HEAD (full PR diff).
+    Woodpecker pull_request pipelines diff the PR target branch (full PR diff).
     Push pipelines on long-lived branches (master, forno, hotfix/*) use HEAD~1..HEAD.
     Feature branches compare origin/master..HEAD.
     """
     git_service = GitService()
     from_ref = resolve_diff_from_ref(branch)
+
     try:
         diff = git_service.get_modified_files_from_diff(from_ref, "HEAD")
         return list(diff.keys())
@@ -186,7 +179,6 @@ def main() -> None:
 
     extra_args = args.make_extra_args.split() if args.make_extra_args else []
 
-    _fetch_master()
     branch = _current_branch()
 
     if args.all_domains:

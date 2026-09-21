@@ -23,6 +23,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
+
 _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
@@ -46,7 +48,6 @@ from validate_datahub_context_entities import (  # noqa: E402
     _maybe_comment_on_pr,
     _maybe_comment_success,
     _rel,
-    _resolve_diff_from_ref,
     _template_hint,
 )
 
@@ -128,7 +129,7 @@ def main(argv: list[str] | None = None) -> int:
         files = _all_entity_files()
         print(f"Scope           : every committed entity doc ({len(files)})")
     else:
-        from_ref = _resolve_diff_from_ref(args.branch)
+        from_ref = resolve_diff_from_ref(args.branch)
         print(
             f"Scope           : entity docs changed vs {from_ref} "
             f"({from_ref}...HEAD — whole branch delta, not just the last commit)"

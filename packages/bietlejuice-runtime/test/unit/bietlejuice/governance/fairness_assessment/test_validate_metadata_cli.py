@@ -193,10 +193,10 @@ def test_empty_table_description_uses_missing_code(
     "bietlejuice.governance.fairness_assessment.validate_metadata_cli.subprocess.check_output"
 )
 @mock.patch(
-    "bietlejuice.governance.fairness_assessment.validate_metadata_cli.subprocess.run"
+    "bietlejuice.governance.fairness_assessment.validate_metadata_cli.fetch_diff_base"
 )
 def test_git_branch_files_filters_metadata_paths(
-    mock_run: mock.MagicMock,
+    mock_fetch: mock.MagicMock,
     mock_check_output: mock.MagicMock,
 ) -> None:
     mock_check_output.return_value = (
@@ -213,7 +213,7 @@ def test_git_branch_files_filters_metadata_paths(
         Path("dags/foo/metadata/clean/table.yml"),
         Path("dags/bar/metadata/enrich/other.yml"),
     ]
-    mock_run.assert_called_once()
+    mock_fetch.assert_called_once_with("origin/master")
     assert mock_check_output.call_args[0][0] == [
         "git",
         "diff",
@@ -229,19 +229,39 @@ def test_git_branch_files_filters_metadata_paths(
     "bietlejuice.governance.fairness_assessment.validate_metadata_cli.subprocess.check_output"
 )
 @mock.patch(
-    "bietlejuice.governance.fairness_assessment.validate_metadata_cli.subprocess.run"
+    "bietlejuice.governance.fairness_assessment.validate_metadata_cli.fetch_diff_base"
 )
 def test_git_branch_files_uses_full_pr_diff_when_target_branch_is_master_on_pull_request(
-    mock_run: mock.MagicMock,
+    mock_fetch: mock.MagicMock,
     mock_check_output: mock.MagicMock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     mock_check_output.return_value = "M\tdags/foo/metadata/clean/table.yml\n"
     monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+    monkeypatch.delenv("CI_COMMIT_TARGET_BRANCH", raising=False)
     # Act
     _git_branch_files("master")
     # Assert — Woodpecker sets CI_COMMIT_BRANCH=master on PRs targeting master
     assert mock_check_output.call_args[0][0][-1] == "origin/master...HEAD"
+
+
+@mock.patch(
+    "bietlejuice.governance.fairness_assessment.validate_metadata_cli.subprocess.check_output"
+)
+@mock.patch(
+    "bietlejuice.governance.fairness_assessment.validate_metadata_cli.fetch_diff_base"
+)
+def test_git_branch_files_fetches_the_diff_base_it_compares_against(
+    mock_fetch: mock.MagicMock,
+    mock_check_output: mock.MagicMock,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    mock_check_output.return_value = "M\tdags/foo/metadata/clean/table.yml\n"
+    monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+    monkeypatch.setenv("CI_COMMIT_TARGET_BRANCH", "development")
+    _git_branch_files("development")
+    assert mock_check_output.call_args[0][0][-1] == "origin/development...HEAD"
+    mock_fetch.assert_called_once_with("origin/development")
 
 
 # --------------------------------------------------------------------------- #

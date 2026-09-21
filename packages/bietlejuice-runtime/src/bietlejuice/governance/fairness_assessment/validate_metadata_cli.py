@@ -34,7 +34,7 @@ from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Set, Tuple
 
 import yaml
 
-from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
+from bietlejuice.ci.ci_diff_ref import fetch_diff_base, resolve_diff_from_ref
 from bietlejuice.governance.fairness_assessment.constants import (
     CDC_PLUMBING_COLUMN_NAMES_LOWERCASE,
     PARTITION_COLUMN_NAMES_LOWERCASE,
@@ -450,11 +450,7 @@ def print_scope_audit_report(
 
 def _git_branch_files(branch: str) -> List[Path]:
     from_ref = resolve_diff_from_ref(branch)
-    subprocess.run(
-        ["git", "fetch", "--no-tags", "origin", "+refs/heads/master"],
-        check=False,
-        capture_output=True,
-    )
+    fetch_diff_base(from_ref)
     out = subprocess.check_output(
         [
             "git",
@@ -538,7 +534,7 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     mode.add_argument(
         "-b",
         "--branch",
-        help="Git branch name; validate metadata files changed vs origin/master",
+        help="Git branch name; validate metadata files changed vs the PR target branch",
     )
 
     scope = parser.add_argument_group(

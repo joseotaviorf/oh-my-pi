@@ -1,11 +1,9 @@
-# Path filters: pull_request = full PR diff (origin/master...HEAD via CI_PIPELINE_EVENT);
+# Path filters: pull_request = full PR diff (origin/<target>...HEAD via CI_PIPELINE_EVENT);
 # push = files in the pushed commit range (HEAD~1...HEAD on master/forno/hotfix).
 # Workflows always trigger (release depends_on); skipped steps = success.
 # setup runs only when at least one downstream step would run (union path).
 when:
   - event: pull_request
-    branch:
-      exclude: [development]
   - event: push
     branch: [master, hotfix/*, forno, forno-luigijr]
   - event: tag

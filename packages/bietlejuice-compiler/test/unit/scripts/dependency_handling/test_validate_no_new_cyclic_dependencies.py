@@ -143,12 +143,20 @@ class TestFindChangedFilesOfDags:
 
 class TestMain:
     def _stub_lookups(self, monkeypatch, cycles, base_commit_cycles):
+        monkeypatch.setattr(mod, "fetch_diff_base", lambda _from: None)
         monkeypatch.setattr(mod, "resolve_base_commit", lambda _from, _to: "abc1234")
         monkeypatch.setattr(mod, "find_cycles", lambda: cycles)
         monkeypatch.setattr(
             mod, "find_cycles_in_commit", lambda _commit: base_commit_cycles
         )
         monkeypatch.setattr(mod, "find_changed_files_of_dags", lambda *_args: [])
+
+    def test_defaults_to_pr_target_branch(self, monkeypatch):
+        monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+        monkeypatch.setenv("CI_COMMIT_BRANCH", "development")
+        monkeypatch.delenv("CI_COMMIT_TARGET_BRANCH", raising=False)
+
+        assert mod._parse_args([]).from_branch == "origin/development"
 
     def test_fails_when_a_new_cycle_was_introduced(self, monkeypatch, capsys):
         self._stub_lookups(monkeypatch, as_cycles(SUPPLY_CYCLE), {})

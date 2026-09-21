@@ -14,6 +14,7 @@ import pytest
 from validate_datahub_context_entities import (
     _data_product_type,
     _filter_entity_paths,
+    _git_changed_entity_files,
     _is_entity_md,
     _is_rename_contract_only,
     _maybe_comment_on_pr,
@@ -429,6 +430,21 @@ def test_maybe_comment_success_posts_on_every_luigi_pr_pass(monkeypatch):
     with patch("sync.pr_comment.post_validation_success", return_value=True) as done:
         _maybe_comment_success()
     done.assert_called_once_with("42")
+
+
+def test_changed_files_resolve_and_fetch_pr_target(monkeypatch):
+    monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+    monkeypatch.delenv("CI_COMMIT_TARGET_BRANCH", raising=False)
+    with (
+        patch("validate_datahub_context_entities.fetch_diff_base") as fetch,
+        patch("validate_datahub_context_entities.subprocess.run") as run,
+    ):
+        run.return_value.stdout = ""
+
+        assert _git_changed_entity_files("development") == []
+
+    fetch.assert_called_once_with("origin/development")
+    run.assert_called_once()
 
 
 def test_normalize_entity_rename_contract_maps_heading_and_paths():

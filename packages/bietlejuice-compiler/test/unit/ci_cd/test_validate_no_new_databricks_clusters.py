@@ -2,7 +2,7 @@
 
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
@@ -15,6 +15,7 @@ from scripts.ci_cd.validate_no_new_databricks_clusters import (  # noqa: E402
     affected_dag_roots,
     changed_python_modules,
     classify_prod_cluster,
+    collect_violations,
     databricks_imports,
     evaluate_python_module,
     extract_prod_cluster,
@@ -522,3 +523,24 @@ class TestEvaluatePythonModule:
             evaluate_python_module(relative, "origin/master", {"probe"}, set(), set())
             == []
         )
+
+
+@patch("scripts.ci_cd.validate_no_new_databricks_clusters.load_exceptions")
+@patch("scripts.ci_cd.validate_no_new_databricks_clusters.GitService")
+@patch(
+    "scripts.ci_cd.validate_no_new_databricks_clusters.resolve_diff_from_ref",
+    return_value="origin/development",
+)
+def test_collect_violations_uses_resolved_base(
+    mock_resolve, mock_git_service, mock_load_exceptions
+):
+    git_service = mock_git_service.return_value
+    git_service.get_modified_files_from_diff.return_value = {}
+    mock_load_exceptions.return_value = (set(), set(), set())
+
+    assert collect_violations("feature-branch") == ([], [])
+
+    mock_resolve.assert_called_once_with("feature-branch")
+    git_service.get_modified_files_from_diff.assert_called_once_with(
+        "origin/development", "HEAD"
+    )

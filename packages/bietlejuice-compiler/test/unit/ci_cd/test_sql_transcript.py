@@ -13,7 +13,7 @@ import pytest
 # Import the transpiler classes
 sys.path.append(".")
 try:
-    from scripts.ci_cd.sql_transcript import SQLTranspiler, SQLTranspilerRunner
+    from scripts.ci_cd.sql_transcript import SQLTranspiler, SQLTranspilerRunner, main
 except ImportError:
     pass
 
@@ -743,6 +743,32 @@ class TestSQLTranspilerRunnerRun:
             assert exit_code == 1
         finally:
             os.unlink(temp_file)
+
+
+class TestGitDiffDefaults:
+    def test_defaults_to_the_resolved_ci_target(self, monkeypatch):
+        monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+        monkeypatch.setenv("CI_COMMIT_BRANCH", "forno")
+        monkeypatch.delenv("CI_COMMIT_TARGET_BRANCH", raising=False)
+        captured = {}
+
+        class FakeRunner:
+            def __init__(self, args):
+                captured["from_branch"] = args.from_branch
+                captured["to_branch"] = args.to_branch
+
+            def run(self):
+                return 0
+
+        monkeypatch.setattr(
+            "scripts.ci_cd.sql_transcript.SQLTranspilerRunner", FakeRunner
+        )
+        monkeypatch.setattr(sys, "argv", ["sql_transcript.py", "--mode", "git-diff"])
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 0
+        assert captured["from_branch"] == "origin/forno"
+        assert captured["to_branch"] == "HEAD"
 
 
 # Pytest markers

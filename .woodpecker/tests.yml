@@ -2,7 +2,7 @@
 # Workflows always trigger (release depends_on); skipped steps = success.
 # setup runs only when at least one downstream step would run (union path).
 #
-# Domain validation and core-model coverage use git diff origin/master...HEAD;
+# Domain validation and core-model coverage use git diff origin/<target>...HEAD;
 # partial: false ensures the merge base exists (see validations.yml).
 when:
   - event: pull_request
@@ -60,6 +60,7 @@ steps:
     pull: true
     commands:
       - export AWS_DEFAULT_REGION=us-east-1
+      - export ENVIRONMENT=prod
       - make unit-tests
     when:
       - event: pull_request

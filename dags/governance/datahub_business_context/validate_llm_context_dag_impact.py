@@ -24,6 +24,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from bietlejuice.ci.ci_diff_ref import fetch_diff_base, resolve_diff_from_ref
+
 _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
@@ -34,13 +36,13 @@ from llm_context_dag_impact_validator import (  # noqa: E402
     filter_dag_impact_paths,
     validate_table_impacts,
 )
-from validate_datahub_context_entities import _resolve_diff_from_ref  # noqa: E402
 
 _REPO_ROOT = _SCRIPT_DIR.parents[2]
 
 
 def _git_changed_dag_paths(branch: str) -> list[str]:
-    from_ref = _resolve_diff_from_ref(branch)
+    from_ref = resolve_diff_from_ref(branch)
+    fetch_diff_base(from_ref)
     cmd = ["git", "diff", "--name-only", "--diff-filter=ACDMR", f"{from_ref}...HEAD"]
     result = subprocess.run(
         cmd, capture_output=True, text=True, check=True, cwd=_REPO_ROOT
@@ -91,7 +93,7 @@ def main(argv: list[str] | None = None) -> int:
         from_ref = "HEAD"
         print(f"Scope           : {len(changed)} explicitly-listed DAG path(s)")
     else:
-        from_ref = _resolve_diff_from_ref(args.branch)
+        from_ref = resolve_diff_from_ref(args.branch)
         print(
             f"Scope           : DAG metadata YAML changed vs {from_ref} "
             f"({from_ref}...HEAD — whole branch delta, not just the last commit)"

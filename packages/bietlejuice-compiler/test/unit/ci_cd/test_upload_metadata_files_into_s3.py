@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import yaml
 
 from scripts.ci_cd import upload_metadata_files_into_s3 as u
@@ -114,3 +116,40 @@ class TestGenerateDocumentationPayload:
         assert (
             payload["datahub_domain_urn"] == "urn:li:domain:growth-brokerxp-subdomain"
         )
+
+
+class TestGetMetadataFiles:
+    def test_branch_mode_diffs_the_resolved_pr_target(self, monkeypatch):
+        monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+        monkeypatch.delenv("CI_COMMIT_TARGET_BRANCH", raising=False)
+        git = MagicMock()
+        git.UPSERT_STATUS_CODES = ["M", "A"]
+        git.get_modified_files_from_diff.return_value = {
+            "dags/x/metadata/clean/t.yml": "M"
+        }
+        service = MagicMock()
+        service.filter_metadata_files.return_value = [
+            ("dags/x/metadata/clean/t.yml", "M")
+        ]
+        monkeypatch.setattr(u, "GitService", lambda: git)
+        monkeypatch.setattr(u, "MetadataFileService", lambda: service)
+
+        files = u.get_metadata_files(False, "forno", None, None, None)
+
+        git.get_modified_files_from_diff.assert_called_once_with("origin/forno", "HEAD")
+        git.fetch.assert_not_called()
+        assert files == [("dags/x/metadata/clean/t.yml", "M")]
+
+    def test_push_on_forno_diffs_head_minus_one(self, monkeypatch):
+        monkeypatch.setenv("CI_PIPELINE_EVENT", "push")
+        git = MagicMock()
+        git.UPSERT_STATUS_CODES = ["M", "A"]
+        git.get_modified_files_from_diff.return_value = {}
+        service = MagicMock()
+        service.filter_metadata_files.return_value = []
+        monkeypatch.setattr(u, "GitService", lambda: git)
+        monkeypatch.setattr(u, "MetadataFileService", lambda: service)
+
+        u.get_metadata_files(False, "forno", None, None, None)
+
+        git.get_modified_files_from_diff.assert_called_once_with("HEAD~1", "HEAD")

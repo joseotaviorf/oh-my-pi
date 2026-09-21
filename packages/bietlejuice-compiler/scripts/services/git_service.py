@@ -1,6 +1,8 @@
 import subprocess
 from typing import Dict
 
+from bietlejuice.ci.ci_diff_ref import fetch_diff_base
+
 
 class GitService:
     # list of status that indicate files being created or updated
@@ -22,17 +24,32 @@ class GitService:
         https://git-scm.com/docs/git-diff-tree#Documentation/git-diff-tree.txt---diff-filterACDMRTUXB82308203
         :rtype: Dict[str, str]
         """
+        # Woodpecker clones one branch. Fetch here so every caller gets the
+        # resolved origin/<target> ref, not only the few scripts that remember
+        # to call fetch_diff_base themselves.
+        fetch_diff_base(from_branch)
         diff_branches = f"{from_branch}...{to_branch}"
 
-        bash_command = (
-            f"git diff --no-commit-id --name-status --no-renames -r {diff_branches}"
+        # check=True is load-bearing: an unresolvable ref used to exit non-zero
+        # with empty stdout, which every caller read as "no files changed" and
+        # silently skipped its validation.
+        completed = subprocess.run(
+            [
+                "git",
+                "diff",
+                "--no-commit-id",
+                "--name-status",
+                "--no-renames",
+                "-r",
+                diff_branches,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
         )
-        process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
-        output, _ = process.communicate()
-        decoded_output = output.decode("utf-8").splitlines()
 
         result = {}
-        for entry in decoded_output:
+        for entry in completed.stdout.splitlines():
             status, filename = entry.split("\t")
             result[filename] = status
 

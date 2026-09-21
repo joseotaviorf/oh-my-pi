@@ -33,6 +33,7 @@ BI_ETL_EJUICE_ROOT = os.path.dirname(
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from scripts.services.git_service import GitService
 
 logger = logging.getLogger(__name__)
@@ -369,11 +370,14 @@ Examples:
 
     parser.add_argument(
         "--from-branch",
-        help="Source branch for git diff comparison (e.g., origin/master)",
+        default=resolve_diff_from_ref(os.environ.get("CI_COMMIT_BRANCH", "")),
+        help="Source branch for git diff comparison (defaults to the CI target)",
     )
 
     parser.add_argument(
-        "--to-branch", help="Target branch for git diff comparison (e.g., HEAD)"
+        "--to-branch",
+        default="HEAD",
+        help="Target branch for git diff comparison (default: HEAD)",
     )
 
     parser.add_argument("--file", help="Path to a single SQL file to transpile")
@@ -399,9 +403,7 @@ Examples:
     args = parser.parse_args()
 
     # Validate arguments based on mode
-    if args.mode == "git-diff" and (not args.from_branch or not args.to_branch):
-        parser.error("--from-branch and --to-branch are required for git-diff mode")
-    elif args.mode == "single-file" and not args.file:
+    if args.mode == "single-file" and not args.file:
         parser.error("--file is required for single-file mode")
     elif args.mode == "directory" and not args.directory:
         parser.error("--directory is required for directory mode")

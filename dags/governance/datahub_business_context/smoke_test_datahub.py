@@ -51,6 +51,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Optional
 
+from bietlejuice.ci.ci_diff_ref import fetch_diff_base, resolve_diff_from_ref
+
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _SCRIPT_DIR.parents[2]
 # Both business and metric entities are Data Products (mirrors the generate script).
@@ -176,10 +178,12 @@ def md_path_to_data_product_id(md_path: Path) -> str:
 
 
 def _git_merge_base() -> str:
-    """SHA of the merge-base between origin/master and HEAD, or empty string on failure."""
+    """SHA of the merge-base between the CI diff base and HEAD, or empty on failure."""
+    from_ref = resolve_diff_from_ref(os.environ.get("CI_COMMIT_BRANCH", ""))
+    fetch_diff_base(from_ref)
     try:
         r = subprocess.run(
-            ["git", "merge-base", "origin/master", "HEAD"],
+            ["git", "merge-base", from_ref, "HEAD"],
             capture_output=True,
             text=True,
             check=True,
@@ -226,7 +230,7 @@ def _git_added_mds() -> set[str]:
     from DataHub is still a real failure.
 
     When CI provides ``CI_PREV_COMMIT_SHA`` / ``CI_COMMIT_SHA`` we use those (single-push
-    range). Otherwise we diff against the merge-base with origin/master so that MDs added
+    range). Otherwise we diff against the merge-base with the PR target so that MDs added
     in earlier commits of a multi-commit PR are correctly flagged as ADDED.
     """
     prev_sha = os.environ.get("CI_PREV_COMMIT_SHA", "").strip()

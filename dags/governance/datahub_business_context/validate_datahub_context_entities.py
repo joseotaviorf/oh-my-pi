@@ -33,6 +33,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from bietlejuice.ci.ci_diff_ref import fetch_diff_base, resolve_diff_from_ref
+
 # Ensure the sibling ``sync`` package is importable when run as a script from any
 # cwd when run as a script from any working directory.
 _SCRIPT_DIR = Path(__file__).resolve().parent
@@ -64,19 +66,6 @@ _WRITING_GUIDE_RE = re.compile(r"WRITING GUIDE", re.IGNORECASE)
 _TBD_RE = re.compile(r"\bTBD\b", re.IGNORECASE)
 _MARKDOWN_LINK_RE = re.compile(r"\[[^\]]*\]\([^)]*\)")
 _URL_RE = re.compile(r"https?://\S+", re.IGNORECASE)
-
-
-def _resolve_diff_from_ref(branch: str) -> str:
-    """Diff base for ``<from_ref>...HEAD``. Inlined (not imported from
-    ``bietlejuice.ci.ci_diff_ref``) to keep this governance script dependency-free:
-    a ``pull_request`` validates the full PR diff (``origin/master``); a push to a
-    long-lived branch only its last commit (``HEAD~1``).
-    """
-    if os.environ.get("CI_PIPELINE_EVENT", "").strip() == "pull_request":
-        return "origin/master"
-    if branch in {"master", "forno"} or branch.startswith("hotfix/"):
-        return "HEAD~1"
-    return "origin/master"
 
 
 _LEGACY_DOMAIN_DIR = "docs/llm_context/business_entities"
@@ -145,7 +134,8 @@ def _is_rename_contract_only(path: Path, from_ref: str) -> bool:
 
 def _git_changed_entity_files(branch: str) -> list[Path]:
     """Repo-relative entity ``.md`` paths added/modified vs the diff base."""
-    from_ref = _resolve_diff_from_ref(branch)
+    from_ref = resolve_diff_from_ref(branch)
+    fetch_diff_base(from_ref)
     # --diff-filter=ACMR: added/copied/modified/renamed (never deleted files).
     cmd = ["git", "diff", "--name-only", "--diff-filter=ACMR", f"{from_ref}...HEAD"]
     result = subprocess.run(
@@ -457,7 +447,7 @@ def main(argv: list[str] | None = None) -> int:
         files = _all_entity_files()
         print(f"Scope           : every committed entity doc ({len(files)})")
     else:  # --changed-only
-        from_ref = _resolve_diff_from_ref(args.branch)
+        from_ref = resolve_diff_from_ref(args.branch)
         # Scope is the whole branch delta (<base>...HEAD), not just the last commit,
         # so a doc changed by an earlier commit on the branch is validated too.
         print(

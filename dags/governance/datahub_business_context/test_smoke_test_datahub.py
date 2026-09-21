@@ -73,3 +73,17 @@ class TestFetchAssetCountRetry:
         ):
             assert smoke._fetch_asset_count("urn:li:dataProduct:primary-market") == 2
         sleep_mock.assert_called()
+
+
+class TestGitMergeBase:
+    def test_fetches_and_diffs_the_pr_target(self, monkeypatch) -> None:
+        monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+        monkeypatch.setenv("CI_COMMIT_BRANCH", "forno")
+        monkeypatch.delenv("CI_COMMIT_TARGET_BRANCH", raising=False)
+        fetched: list[str] = []
+        monkeypatch.setattr(smoke, "fetch_diff_base", lambda ref: fetched.append(ref))
+        with patch.object(smoke.subprocess, "run") as run:
+            run.return_value.stdout = "abc123\n"
+            assert smoke._git_merge_base() == "abc123"
+        assert fetched == ["origin/forno"]
+        assert run.call_args.args[0][:3] == ["git", "merge-base", "origin/forno"]
