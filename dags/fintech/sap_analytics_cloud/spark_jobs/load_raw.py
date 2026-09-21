@@ -1,6 +1,9 @@
 import ast
 import json
 import logging
+import socket
+import ssl
+import time
 from argparse import ArgumentParser
 from datetime import datetime
 from urllib.parse import urlsplit
@@ -29,6 +32,15 @@ from bietlejuice.services.metastore_services import MetastoreServiceFactory
 JOB_NAME = "load_raw_sap_analytics_cloud"
 
 REQUEST_TIMEOUT_SECONDS = 300
+
+REQUEST_ATTEMPTS = 3
+REQUEST_RETRY_BACKOFF_SECONDS = 10
+
+HTTPS_PORT = 443
+EGRESS_PROBE_TIMEOUT_SECONDS = 10
+# Any always-on host outside the VPC works; it only has to prove that the
+# cluster can open a TLS connection to somewhere other than the tenant.
+EGRESS_PROBE_CONTROL_HOST = "www.google.com"
 
 PARTITION_OVERWRITE_MODE_KEY = "spark.sql.sources.partitionOverwriteMode"
 
@@ -73,8 +85,113 @@ def _get_credentials(secret_id, secret_region):
     return credentials
 
 
+def _tls_probe(address, sni):
+    """Try to complete a TLS handshake, announcing ``sni`` as the server name.
+
+    Trust is deliberately not enforced: the question is only whether the
+    packets reach a TLS server, and a certificate coming back already answers
+    it.
+    """
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+
+    try:
+        with socket.create_connection(
+            (address, HTTPS_PORT), timeout=EGRESS_PROBE_TIMEOUT_SECONDS
+        ) as sock:
+            with context.wrap_socket(sock, server_hostname=sni) as tls:
+                return f"reached ({tls.version()})"
+    except OSError as error:
+        return f"blocked ({type(error).__name__})"
+
+
+def _diagnose_egress(host):
+    """Report which side is dropping the connection to ``host``.
+
+    The step runs unattended and the cluster is torn down with it, so the only
+    chance to collect this is while the failing run is still up. Sending a
+    control server name to the tenant's own address is what separates the two
+    causes: a handshake that succeeds only when the name changes means the name
+    is being filtered on the way out, not the address being refused by SAP.
+    """
+    try:
+        address = socket.gethostbyname(host)
+    except OSError as error:
+        return f"{host} does not resolve from the cluster ({error})."
+
+    control = _tls_probe(EGRESS_PROBE_CONTROL_HOST, EGRESS_PROBE_CONTROL_HOST)
+    with_real_sni = _tls_probe(address, host)
+    with_control_sni = _tls_probe(address, EGRESS_PROBE_CONTROL_HOST)
+
+    if control.startswith("blocked"):
+        verdict = (
+            "the cluster cannot reach the public internet at all, so this is "
+            "not specific to the tenant."
+        )
+    elif with_control_sni.startswith("reached") and with_real_sni.startswith("blocked"):
+        verdict = (
+            "the tenant address accepts a handshake under another server name, "
+            "so the name is being filtered on the way out: the egress path has "
+            "to allow the tenant domains."
+        )
+    elif with_real_sni.startswith("blocked"):
+        verdict = (
+            "the tenant address refuses the handshake under any server name, "
+            "so the source address is being filtered: the tenant has to accept "
+            "this cluster's NAT address."
+        )
+    else:
+        verdict = "the probe did reach the tenant, so the failure is intermittent."
+
+    return (
+        f"Egress probe: {EGRESS_PROBE_CONTROL_HOST}={control}; "
+        f"{address} as {host}={with_real_sni}; "
+        f"{address} as {EGRESS_PROBE_CONTROL_HOST}={with_control_sni}. "
+        f"Reading: {verdict}"
+    )
+
+
+def _request(method, url, **kwargs):
+    """Issue an HTTP request, retrying transient failures to reach the tenant.
+
+    SAC is outside the VPC, so every run depends on the cluster's egress path.
+    When that path drops the connection, requests raises a bare ConnectionError
+    that surfaces in Airflow as "Unknown Error" and only becomes readable after
+    pulling the step's stdout out of S3. Name the host and the likely cause
+    instead: the credentials are already known-good by this point, so a
+    connection that dies before any HTTP response points at the network, not at
+    the secret.
+    """
+    host = urlsplit(url).netloc
+
+    for attempt in range(1, REQUEST_ATTEMPTS + 1):
+        try:
+            return requests.request(method, url, **kwargs)
+        except (requests.ConnectionError, requests.Timeout) as error:
+            if attempt == REQUEST_ATTEMPTS:
+                try:
+                    diagnosis = _diagnose_egress(host)
+                except Exception as probe_error:  # noqa: BLE001 - never mask the original failure
+                    diagnosis = f"Egress probe failed to run: {probe_error}."
+
+                raise RuntimeError(
+                    f"Could not reach {host} after {REQUEST_ATTEMPTS} attempts: "
+                    f"{error}. The request never got an HTTP response, so this is "
+                    f"the egress path rather than the SAC credentials. {diagnosis}"
+                ) from error
+
+            wait_seconds = REQUEST_RETRY_BACKOFF_SECONDS * attempt
+            logger.warning(
+                f"m=_request, host={host}, attempt={attempt}/{REQUEST_ATTEMPTS}, "
+                f"error={error}, msg=Retrying in {wait_seconds}s..."
+            )
+            time.sleep(wait_seconds)
+
+
 def _get_access_token(credentials):
-    response = requests.post(
+    response = _request(
+        "post",
         credentials["token_url"],
         data={
             "grant_type": "client_credentials",
@@ -120,7 +237,9 @@ def _fetch_records(*, odata_url, table_api_path, access_token):
 
     records = []
     while url:
-        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT_SECONDS)
+        response = _request(
+            "get", url, headers=headers, timeout=REQUEST_TIMEOUT_SECONDS
+        )
         if response.status_code != 200:
             raise RuntimeError(
                 f"SAC OData request failed: {response.status_code}, "
