@@ -1,0 +1,29 @@
+---
+table_name: datalake_gsheets_people_clean.talent_review_h2_26
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Error
+column_level_validations:
+  assignment_number:
+    is_complete:
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning
+  one_row_per_assignment_number:
+    custom:
+      # The static worksheet grain is one row per assignment number.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT assignment_number
+          FROM datalake_gsheets_people_clean.talent_review_h2_26
+          GROUP BY assignment_number
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error

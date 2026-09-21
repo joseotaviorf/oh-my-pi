@@ -29,3 +29,6 @@ workflow:
     legacy_performance_review:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    talent_review_h2_26:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

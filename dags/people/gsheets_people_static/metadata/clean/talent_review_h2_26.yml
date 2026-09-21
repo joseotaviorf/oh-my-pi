@@ -1,0 +1,54 @@
+database_name: datalake_gsheets_people_clean
+table_name: talent_review_h2_26
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |
+  Talent Review H2.26 assessments loaded from the People static Google Sheet.
+  One row per assignment_number in the H2.26 review snapshot.
+  Covers employees listed in the worksheet, including records associated with February or September 2026 review months.
+  Supports reconciliation of H2.26 talent ratings with the People employee and performance models; join to related datasets with assignment_number.
+columns:
+  assignment_number:
+    description: Main business identifier of the employee assignment in PIN and the primary key of this worksheet record (e.g. '123456').
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.matricula_pk_assignment_number
+  name:
+    description: Display name of the employee assessed in the H2.26 Talent Review worksheet.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.nome
+  work_email:
+    description: Work email address of the employee assessed in the H2.26 Talent Review worksheet.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.email
+  manager_name:
+    description: Display name of the employee's leader recorded in the H2.26 Talent Review worksheet.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.lider
+  evaluator_name:
+    description: Display name of the person recorded as the evaluator for the H2.26 Talent Review assessment.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.avaliador
+  potential:
+    description: Talent potential rating recorded for the employee in the H2.26 Talent Review assessment.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.tr_potencial
+  readiness:
+    description: Readiness rating recorded for the employee in the H2.26 Talent Review assessment.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.tr_prontidao
+  criticality:
+    description: Criticality rating recorded for the employee in the H2.26 Talent Review assessment.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.tr_criticidade
+  risk_of_loss:
+    description: Risk-of-loss rating recorded for the employee in the H2.26 Talent Review assessment.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.tr_risco_de_perda
+  review_month:
+    description: Month label associated with the review update, such as 'fev./26' or 'set./26'; NULL when the worksheet has no review month.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.data_de_atualizacao_review_month
+  ts_load:
+    description: Timestamp when the worksheet record was loaded into the data lake.
+    lineage:
+      - datalake_gsheets_people_raw.talent_review_h2_26.ts_load

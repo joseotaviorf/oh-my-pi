@@ -28,3 +28,9 @@ sheets_info:
     sheet_context: people
     sheet_id: 1yuoigACcuQKrJot3vYkfagcXtPc1_zqueI8eqxickl0
     sheet_name: legacy_performa
+
+  talent_review_h2_26:
+    clean_table_name: talent_review_h2_26
+    sheet_context: people
+    sheet_id: 1fO4h5N2j3b3Q2ChA1OrS1benrU4StFsV4JRT0liJzcw
+    sheet_name: "H2.26 - TR"
