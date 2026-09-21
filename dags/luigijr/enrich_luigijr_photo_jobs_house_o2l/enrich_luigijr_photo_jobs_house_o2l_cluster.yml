@@ -1,11 +1,24 @@
 cluster:
-  type: emr_7_12_consolidation_xs_general_single_node_cluster
+  type: databricks_16_4_small_general_fleet_xlarge_single_node
+  databricks_conn_id: databricks_new_env
+  access_control_list:
+    group_name: luigijr
+    permission_level: CAN_MANAGE
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   custom_libraries:
   - maven:
       coordinates: io.trino:trino-jdbc:457
 validation:
   cluster:
-    type: emr_7_12_consolidation_s_general_single_node_cluster
+    type: consolidation_s_general_single_node_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: luigijr
+      permission_level: CAN_MANAGE
     custom_libraries:
     - maven:
         coordinates: io.trino:trino-jdbc:457
