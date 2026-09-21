@@ -28,31 +28,29 @@ WITH closing_infos AS (
 ),
 ev AS (
     SELECT DISTINCT
-        dd.date AS dt_event,
-        sf.sk_house,
+        DATE(sof.dt_sale_agreement_signed) AS dt_event,
+        sof.id_house AS sk_house,
         fo.sk_offer,
-        sf.sk_seller,
-        sf.sk_buyer,
+        sof.id_seller AS sk_seller,
+        sof.id_buyer AS sk_buyer,
         ci.payment_method,
         ci.ts_house_registry_ended,
         DATE_ADD(DATE(ci.ts_house_registry_ended), 2) AS dt_cohort
     FROM
-        dw_sale.fact_sale_flows AS sf
-    INNER JOIN
-        dw_public.dim_region AS dr
-            ON sf.sk_region = dr.sk_region
-            AND dr.id_country = 1
-    INNER JOIN
-        dw_public.dim_date AS dd
-            ON sf.sk_sale_agreement_signed_date = dd.sk_date
+        datalake_sale_offer_flows.sale_offer_flows AS sof
     INNER JOIN
         dw_sale.fact_offers AS fo
-            ON sf.sk_sale_flow = CONCAT(fo.sk_buyer, '_', fo.sk_house)
+            ON sof.id_offer = fo.sk_offer
+    INNER JOIN
+        dw_public.dim_region AS dr
+            ON fo.sk_region = dr.sk_region
+            AND dr.id_country = 1
     LEFT JOIN
         closing_infos AS ci
             ON fo.sk_offer = ci.sk_offer
     WHERE
         fo.ts_sale_agreement_signed >= DATE('2020-01-01')
+        AND sof.dt_sale_agreement_signed IS NOT NULL
         AND ci.ccv_cancelled = FALSE
         AND ci.ccv_rescued = FALSE
 ),
