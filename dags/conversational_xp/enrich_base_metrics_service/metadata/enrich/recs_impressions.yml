@@ -67,11 +67,13 @@ columns:
       - datalake_amplitude_clean.170698_recset_impression_events.event_properties
       - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
   origin:
-    description: >
-      Chatbot for which the recommendation carousel was generated, taken from
-      Amplitude event_properties.origin on the recset_impression event (for example Julia/Mora/Bianca).
+    description: Chatbot for which the recommendation carousel was generated, taken from Amplitude event_properties.origin on the recset_impression event (for example Julia/Mora/Bianca).
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.event_properties
+  country:
+    description: Amplitude user_properties.country on the recset_impression event (for example BR).
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.user_properties
   user_properties:
     description: The user properties for the recommendation event. Holds the info related to which AB test the user was on
     lineage:

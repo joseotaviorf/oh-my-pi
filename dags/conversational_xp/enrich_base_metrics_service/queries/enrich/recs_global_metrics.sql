@@ -13,6 +13,7 @@ WITH all_users AS (
 SELECT id_user,
        business_context,
        is_outlier_user,
+       country,
        variants,
        date,
        week,
@@ -25,6 +26,7 @@ FROM
   SELECT get_json_object(ids, '$.id_user') AS id_user,
          get_json_object(dimensions, '$.business_context') AS business_context,
          get_json_object(dimensions, '$.is_outlier_user') AS is_outlier_user,
+         get_json_object(dimensions, '$.country') AS country,
          get_json_object(timestamps, '$.ts_recommendation') AS ts_recommendation,
          variants,
          date,
@@ -38,6 +40,7 @@ FROM
   group by id_user,
            business_context,
            is_outlier_user,
+           country,
            variants,
            date,
            week,
@@ -79,7 +82,8 @@ global_user_recs_metrics AS (
                 'business_context', all_users.business_context,
                 'city', house_cities.city,
                 'is_primary_market', CASE WHEN listing_sale_type.sale_type = 'PRIMARY' THEN 1 ELSE 0 END,
-                'is_outlier_user', all_users.is_outlier_user
+                'is_outlier_user', all_users.is_outlier_user,
+                'country', all_users.country
               )
             ) AS dimensions,
 

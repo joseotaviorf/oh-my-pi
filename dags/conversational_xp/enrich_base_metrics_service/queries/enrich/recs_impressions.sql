@@ -16,6 +16,7 @@ WITH recs_impressions_info AS (
         id_device,
         get_json_object(event_properties, '$.business_context') AS business_context,
         get_json_object(user_properties, '$.platform') AS device_type,
+        get_json_object(user_properties, '$.country') AS country,
         user_properties,
         ts_event AS ts_rec_impression_event,
         LEAD(ts_event) OVER (PARTITION BY id_user, id_session, get_json_object(event_properties, '$.recset_id') ORDER BY ts_event) AS ts_next_repeated_rec_impression,
@@ -24,7 +25,6 @@ WITH recs_impressions_info AS (
         day
     FROM datalake_amplitude_clean.170698_recset_impression_events
     WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-    AND get_json_object(user_properties, '$.country') = 'BR'
     AND id_user IS NOT NULL
     -- This carroussel only has user favourited items. We don't want to include it in our metrics
     AND get_json_object(event_properties, '$.recset_id') NOT IN ("FEED-FAVORITES-RENT", "FEED-FAVORITES-SALE")
@@ -40,7 +40,6 @@ recs_impressions AS (
         ts_event
     FROM datalake_amplitude_clean.170698_recset_impression_events
     WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-        AND get_json_object(user_properties, '$.country') = 'BR'
         AND id_user IS NOT NULL
         AND get_json_object(event_properties, '$.recset_id') NOT IN ("FEED-FAVORITES-RENT", "FEED-FAVORITES-SALE")
 
@@ -54,7 +53,6 @@ UNION ALL
         ts_event
     FROM datalake_amplitude_clean.170698_recset_viewed_events
     WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-        AND get_json_object(user_properties, '$.country') = 'BR'
         AND id_user IS NOT NULL
         AND get_json_object(event_properties, '$.recset_id') NOT IN ("FEED-FAVORITES-RENT", "FEED-FAVORITES-SALE")
 )
@@ -81,6 +79,7 @@ UNION ALL
         END AS platform,
         recs_impressions_info.showcase,
         recs_impressions_info.origin,
+        recs_impressions_info.country,
         recs_impressions_info.user_properties,
         recs_impressions.ts_event as ts_recommendation,
         recs_impressions_info.year,
@@ -110,10 +109,11 @@ SELECT
     platform,
     showcase,
     origin,
+    country,
     user_properties,
     MIN(ts_recommendation) AS ts_recommendation,
     year,
     month,
     day
 FROM recs_impressions_final
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18

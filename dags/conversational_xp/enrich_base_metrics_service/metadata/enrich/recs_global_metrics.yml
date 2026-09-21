@@ -12,7 +12,7 @@ columns:
       - datalake_search.rent_flow_past_30_days.id_house
       - datalake_search.sale_flow_past_30_days.id_house
   dimensions:
-    description: A json with all relevant dimensions for recommendations analysis. Ex. business_context, city, is_primary_market, is_outlier_user
+    description: A json with all relevant dimensions for recommendations analysis. Ex. business_context, city, is_primary_market, is_outlier_user, country
     lineage:
       - datalake_search.recs_impressions_processed.dimensions
       - wonka.house_main.city

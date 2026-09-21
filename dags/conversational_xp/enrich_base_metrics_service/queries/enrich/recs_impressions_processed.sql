@@ -101,6 +101,7 @@ SELECT DISTINCT
             'position', recs_impressions.position,
             'showcase', recs_impressions.showcase,
             'origin', recs_impressions.origin,
+            'country', recs_impressions.country,
             'listing_age', CAST(DATEDIFF(recs_impressions.ts_recommendation, recs_house_published.ts_house_published) AS INT),
             'is_classified', recs_house_published.is_classified,
             'is_primary_market', recs_house_published.is_primary_market,

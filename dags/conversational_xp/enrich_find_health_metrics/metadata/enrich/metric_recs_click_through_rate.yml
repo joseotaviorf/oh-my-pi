@@ -24,6 +24,10 @@ columns:
     lineage:
     - datalake_search.recs_impressions_processed.platform
     description: Platform from which the user is accessing. Can be WEB or APP.
+  country:
+    lineage:
+    - datalake_search.recs_impressions_processed.country
+    description: Amplitude user country on the recset impression (for example BR). Filter to BR to reproduce the previous Brazil-only recs CTR grain.
   listing_position_in_recset:
     lineage:
     - datalake_search.recs_impressions_processed.listing_position_in_recset
@@ -32,6 +36,10 @@ columns:
     lineage:
     - datalake_search.recs_impressions_processed.showcase
     description: Showcase of the recommendation set, e.g., "LISTING_SIMILAR_USER", "LISTING_SIMILAR_NEARBY" "FEED_RECENTLY_VIEWED_SIMILAR"
+  origin:
+    lineage:
+    - datalake_search.recs_impressions_processed.origin
+    description: Chatbot the recommendation carousel was generated for, taken from dimensions.origin (for example Julia/Mora/Bianca).
   listing_age:
     lineage:
     - datalake_search.recs_impressions_processed.listing_age
