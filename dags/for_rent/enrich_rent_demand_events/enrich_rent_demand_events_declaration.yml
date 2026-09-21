@@ -2,7 +2,8 @@ dag:
   name: enrich_rent_demand_events
   schedule_start_date: 2014, 6, 17
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       Creates an enriched table containing the ForRent demand events, in which each line is an event related to the scope.

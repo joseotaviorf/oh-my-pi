@@ -2,6 +2,8 @@ dag:
   name: dw_inspections
   schedule_start_date: 2021,2,7
   owner: Data ForRent
+  criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       This DAG loads the DW tables for Inspection Services and PWA data (old data).

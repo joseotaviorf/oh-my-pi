@@ -1,7 +1,8 @@
 dag:
   name: enrich_offer
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
+  sla_deadline_localtime: "08:00"
   schedule_start_date: 2020, 7, 1
   documentation:
     dag_purpose: |

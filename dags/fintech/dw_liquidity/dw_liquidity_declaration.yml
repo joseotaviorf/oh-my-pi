@@ -3,6 +3,8 @@ dag:
   schedule_start_date: 2026,04,16
   schedule_interval: 0 3 * * *
   owner: Data Fintech
+  criticality: High
+  sla_deadline_localtime: "11:00"
 workflow:
   type: query_delta
   layer: dw

@@ -29,6 +29,8 @@ Alerting is tiered by declared criticality (tags criticality:Critical|High):
     (via ``dependencies.yaml``) also open a JiraOps on-caller alert once.
   * Missing-run findings for DAGs declaring criticality Critical/High (membership only — never the
     transitive-blocking expansion) also page JiraOps.
+  * Deadline-miss findings for DAGs declaring criticality Critical/High and
+    sla_deadline_localtime:<HH:MM> (São Paulo) (membership only) also page JiraOps.
 
 Elapsed time and historical baselines for the slowness check are anchored on the
 earliest ``execute-job-cluster*`` task start when that task exists for the run
@@ -676,16 +678,16 @@ def _deadline_run_id(cycle_anchor: datetime) -> str:
     return f"{_DEADLINE_RUN_ID_PREFIX}{cycle_anchor.isoformat()}"
 
 
-def _deadline_at(cycle_start: datetime, hhmm_utc: str) -> datetime:
-    hour, minute = _parse_anchor_hhmm(hhmm_utc)
+def _deadline_at(cycle_start: datetime, hhmm_local: str) -> datetime:
+    hour, minute = _parse_anchor_hhmm(hhmm_local)
     candidate = (
         pendulum.instance(cycle_start)
-        .in_timezone("UTC")
+        .in_timezone(LOCAL_TZ)
         .replace(hour=hour, minute=minute, second=0, microsecond=0)
     )
     if candidate < cycle_start:
         candidate = candidate.add(days=1)
-    return candidate
+    return candidate.in_timezone("UTC")
 
 
 def _is_sla_entry(entry: dict) -> bool:
@@ -1411,8 +1413,8 @@ def _evaluate_deadline_misses(
         history_rows, hhmm=hhmm, cycle_key=cycle_start.isoformat(), emitted=emitted
     )
     findings = []
-    for dag_id, hhmm_utc in deadline_by_dag.items():
-        due_at = _deadline_at(cycle_start, hhmm_utc)
+    for dag_id, hhmm_local in deadline_by_dag.items():
+        due_at = _deadline_at(cycle_start, hhmm_local)
         if now <= due_at or dag_id in succeeded:
             continue
         late_by_s = (now - due_at).total_seconds()
@@ -1424,7 +1426,7 @@ def _evaluate_deadline_misses(
                 "tier": "standard",
                 "cycle_anchor": cycle_start.isoformat(),
                 "due_at": due_at.isoformat(),
-                "deadline_utc": hhmm_utc,
+                "deadline_localtime": hhmm_local,
                 "late_by_s": late_by_s,
                 "elapsed_s": late_by_s,
             }
@@ -1507,7 +1509,7 @@ def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dic
             {
                 "cycle_anchor": finding.get("cycle_anchor"),
                 "due_at": finding.get("due_at"),
-                "deadline_utc": finding.get("deadline_utc"),
+                "deadline_localtime": finding.get("deadline_localtime"),
             }
         )
     else:
@@ -1613,6 +1615,14 @@ def _format_utc_hhmm(value) -> str:
     if dt is None:
         return "unknown"
     return pendulum.instance(dt).in_timezone("UTC").format("HH:mm") + " UTC"
+
+
+def _format_local_hhmm(value) -> str:
+    """Render a datetime / ISO string as ``HH:MM`` São Paulo wall clock."""
+    dt = _parse_iso_datetime(value)
+    if dt is None:
+        return "unknown"
+    return pendulum.instance(dt).in_timezone(LOCAL_TZ).format("HH:mm") + " (São Paulo)"
 
 
 def _dataset_state_lines(entry: dict) -> list:
@@ -1773,7 +1783,7 @@ def _missing_run_started_text(
 def _deadline_initial_text(entry: dict, late_by_s: float) -> str:
     return (
         f"⏰ *{entry['dag_id']}* not finished by its "
-        f"{entry['deadline_utc']} UTC deadline\n"
+        f"{entry['deadline_localtime']} São Paulo deadline\n"
         f"• Owner: {_owner_label(entry)}\n"
         f"• Late by: {_format_duration(late_by_s)}"
     )
@@ -1782,7 +1792,8 @@ def _deadline_initial_text(entry: dict, late_by_s: float) -> str:
 def _deadline_update_text(entry: dict, late_by_s: float) -> str:
     return (
         f"⏰ *{entry['dag_id']}* still not finished — "
-        f"{_format_duration(late_by_s)} past its {entry['deadline_utc']} UTC deadline"
+        f"{_format_duration(late_by_s)} past its "
+        f"{entry['deadline_localtime']} São Paulo deadline"
     )
 
 
@@ -1790,8 +1801,9 @@ def _deadline_finished_text(
     entry: dict, finished_at: datetime, late_by_s: float
 ) -> str:
     return (
-        f"✅ *{entry['dag_id']}* finished at {_format_utc_hhmm(finished_at)}, "
-        f"{_format_duration(late_by_s)} after its {entry['deadline_utc']} UTC deadline."
+        f"✅ *{entry['dag_id']}* finished at {_format_local_hhmm(finished_at)}, "
+        f"{_format_duration(late_by_s)} after its "
+        f"{entry['deadline_localtime']} São Paulo deadline."
     )
 
 
@@ -1943,7 +1955,7 @@ def _send_jira_alert(
             "DAGOwner": _owner_label(finding),
         }
         if is_deadline_miss:
-            extra_properties["DeadlineUtc"] = finding["deadline_utc"]
+            extra_properties["DeadlineLocalTime"] = finding["deadline_localtime"]
             extra_properties["LateBy"] = _format_duration(finding.get("late_by_s") or 0)
         elif is_missing_run:
             extra_properties["DueAt"] = finding.get("due_at")
@@ -2079,7 +2091,7 @@ def _fetch_dag_owners(session, dag_ids) -> dict:
 
 def _fetch_declared_criticality(session) -> tuple[dict, dict]:
     """(criticality_by_dag, deadline_by_dag) from criticality:<Level> and
-    sla_deadline_utc:<HH:MM> DAG tags (set by BaseWorkflow.dag_instance)."""
+    sla_deadline_localtime:<HH:MM> (São Paulo) DAG tags (set by BaseWorkflow.dag_instance)."""
     rows = session.execute(
         _DAG_TAGS_QUERY,
         {

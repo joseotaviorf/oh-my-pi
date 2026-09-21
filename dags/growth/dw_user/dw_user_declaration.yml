@@ -2,7 +2,8 @@ dag:
   name: dw_user
   schedule_start_date: 2020,02,20
   owner: Data Growth
-  criticality: Critical
+  criticality: High
+  sla_deadline_localtime: "08:00"
 workflow:
   type: query_delta
   layer: dw

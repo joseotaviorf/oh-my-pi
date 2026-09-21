@@ -2,6 +2,7 @@ dag:
   name: dw_agent
   owner: Data Agents
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: This DAG creates tables that summarize the agent context models.
 workflow:

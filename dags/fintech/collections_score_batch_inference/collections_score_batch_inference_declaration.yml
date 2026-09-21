@@ -3,6 +3,8 @@ dag:
   schedule_start_date: 2026, 3, 12
   schedule_interval: 0 2 * * *
   owner: Data Fintech
+  criticality: High
+  sla_deadline_localtime: "11:00"
   documentation:
     dag_purpose: Loads batch inference collections data into our Data Lake.
 

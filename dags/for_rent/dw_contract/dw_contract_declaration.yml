@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2021,08,03
   owner: Data ForRent
   criticality: Critical
+  sla_deadline_localtime: "08:00"
 workflow:
   type: query_delta
   layer: dw

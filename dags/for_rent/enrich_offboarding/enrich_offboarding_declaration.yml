@@ -2,6 +2,8 @@ dag:
   name: enrich_offboarding
   schedule_start_date: 2020, 7, 1
   owner: Data ForRent
+  criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: Compile different tables of offboading context, to better elaborate questions about it.
 workflow:

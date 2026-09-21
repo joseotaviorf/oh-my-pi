@@ -2,7 +2,8 @@ dag:
   name: enrich_ebdb_rent_flow
   schedule_start_date: 2020, 7, 1
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       Creates enriched tables for the context `Rent Flow` of ebdb.

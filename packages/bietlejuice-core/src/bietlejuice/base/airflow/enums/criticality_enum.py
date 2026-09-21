@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import ClassVar
+
 
 class CriticalityEnum:
     CRITICAL = "Critical"
@@ -8,7 +10,12 @@ class CriticalityEnum:
     LOW = "Low"
     DEFAULT = MEDIUM
     PAGING = (CRITICAL, HIGH)
-    _OPSGENIE_PRIORITY = {CRITICAL: "P1", HIGH: "P2", MEDIUM: "P3", LOW: "P4"}
+    _OPSGENIE_PRIORITY: ClassVar[dict[str, str]] = {
+        CRITICAL: "P1",
+        HIGH: "P2",
+        MEDIUM: "P3",
+        LOW: "P4",
+    }
 
     @classmethod
     def get_available_enum_values(cls) -> list[str]:
@@ -31,5 +38,5 @@ class CriticalityEnum:
 
 
 CRITICALITY_TAG_PREFIX = "criticality:"
-SLA_DEADLINE_TAG_PREFIX = "sla_deadline_utc:"
+SLA_DEADLINE_TAG_PREFIX = "sla_deadline_localtime:"
 SLA_DEADLINE_PATTERN = r"^([01]\d|2[0-3]):[0-5]\d$"

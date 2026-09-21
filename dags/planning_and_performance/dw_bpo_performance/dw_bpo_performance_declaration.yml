@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2025, 11, 25
   owner: Data Planning and Performance
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       Creates tables for planning and performance datasets, related to customer support.

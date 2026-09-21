@@ -63,7 +63,7 @@ class DAGDeclarationValidator(Validator):
                     "required": False,
                     "allowed": CriticalityEnum.get_available_enum_values(),
                 },
-                "sla_deadline_utc": {
+                "sla_deadline_localtime": {
                     "type": "string",
                     "required": False,
                     "regex": SLA_DEADLINE_PATTERN,

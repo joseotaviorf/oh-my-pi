@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2024,5,23
   owner: Data Growth
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       This DAG is responsible for extracting and loading the supply data into the DW layer.

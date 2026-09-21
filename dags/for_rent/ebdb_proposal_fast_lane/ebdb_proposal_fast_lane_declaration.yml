@@ -3,7 +3,8 @@ dag:
   schedule_start_date: 2026, 5, 26
   schedule_interval: 0,30 * * * *
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       Fast lane DAG for Proposta tables, running every 30 minutes.

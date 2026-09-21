@@ -4,6 +4,7 @@ dag:
   schedule_start_date: 2024, 5, 22
   owner: Data Agents
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: Creates the basis for calculating metrics for agent tiering.
 workflow:

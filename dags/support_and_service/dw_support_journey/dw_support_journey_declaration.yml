@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2026, 6, 14
   owner: Data SS
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       DW layer for the Support Journey domain, modeling human customer service on

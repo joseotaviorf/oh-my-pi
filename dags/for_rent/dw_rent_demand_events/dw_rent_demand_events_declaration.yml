@@ -2,6 +2,8 @@ dag:
   name: dw_rent_demand_events
   schedule_start_date: 2014,06,17
   owner: Data ForRent
+  criticality: Critical
+  sla_deadline_localtime: "08:00"
 workflow:
   type: query_delta
   layer: dw

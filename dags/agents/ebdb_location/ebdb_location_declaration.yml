@@ -3,7 +3,8 @@ dag:
   schedule_start_date: 2021, 2, 20
   schedule_interval: 50 21,8,12  * * *
   owner: Data Agents
-  criticality: Critical
+  criticality: High
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: Extraction of EBDB tables related to Location into data lake. EBDB is the main database for QuintoAndar.
 workflow:

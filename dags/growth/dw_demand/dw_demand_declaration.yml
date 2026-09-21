@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2021,8,2
   owner: Data Growth
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       This DAG dw tables related to the process of demand conversion in Growth context.

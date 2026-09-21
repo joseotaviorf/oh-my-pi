@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2026, 3, 1
   owner: Data Broker XP
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       DW layer for 3P Supply: fact and dimensions for lead flows, conversion funnel,

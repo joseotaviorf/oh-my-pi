@@ -94,10 +94,9 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
 
 _MODULE = "dags.platform.dag_runtime_monitoring.dag_runtime_monitoring"
 
-# Fixed instant for end-to-end monitor calls: past the 10:00 UTC deadline used by
-# TestMonitorPagesDeadlineMiss, matching the 12:00 UTC clock the unit-level
-# deadline tests already pin.
-_FROZEN_NOW = datetime(2026, 9, 17, 12, 0, tzinfo=timezone.utc)
+# Fixed instant for end-to-end monitor calls: past the 10:00 São Paulo (13:00 UTC)
+# deadline used by TestMonitorPagesDeadlineMiss.
+_FROZEN_NOW = datetime(2026, 9, 17, 14, 0, tzinfo=timezone.utc)
 
 _WEBHOOK_KEY = "GCHAT_DAG_RUNTIME_MONITORING_WEBHOOK"
 _WEBHOOK_URL = "https://chat.example.com/hook?key=k&token=t"
@@ -504,7 +503,7 @@ class TestFetchDeclaredCriticality:
         session.execute.return_value.fetchall.return_value = [
             ("a", "criticality:Critical"),
             ("b", "criticality:Low"),
-            ("c", "sla_deadline_utc:10:00"),
+            ("c", "sla_deadline_localtime:10:00"),
             ("d", "criticality:Bogus"),
         ]
         criticality_by_dag, deadline_by_dag = _fetch_declared_criticality(session)
@@ -2071,11 +2070,15 @@ class TestDeadlineAt:
 
     def test_deadline_before_cycle_start_resolves_to_next_day(self):
         due = _deadline_at(self._CYCLE_START, "10:00")
-        assert due == datetime(2026, 9, 17, 10, 0, tzinfo=timezone.utc)
+        assert due == datetime(2026, 9, 17, 13, 0, tzinfo=timezone.utc)
+
+    def test_deadline_morning_sla_resolves_to_next_day_utc_offset(self):
+        due = _deadline_at(self._CYCLE_START, "08:00")
+        assert due == datetime(2026, 9, 17, 11, 0, tzinfo=timezone.utc)
 
     def test_deadline_after_cycle_start_same_day(self):
         due = _deadline_at(self._CYCLE_START, "23:59")
-        assert due == datetime(2026, 9, 16, 23, 59, tzinfo=timezone.utc)
+        assert due == datetime(2026, 9, 17, 2, 59, tzinfo=timezone.utc)
 
 
 class TestExpectedOffsetMinutes:
@@ -2419,7 +2422,7 @@ class TestEvaluateDeadlineMisses:
         assert findings == []
 
     def test_now_after_due_without_success_yields_finding(self):
-        now = datetime(2026, 9, 17, 11, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 9, 17, 14, 0, tzinfo=timezone.utc)
         findings = _evaluate_deadline_misses(
             self._DEADLINES,
             [],
@@ -2432,11 +2435,11 @@ class TestEvaluateDeadlineMisses:
         assert f["kind"] == _KIND_DEADLINE_MISS
         assert f["tier"] == "standard"
         assert f["run_id"].startswith("deadline::")
-        assert f["deadline_utc"] == "10:00"
+        assert f["deadline_localtime"] == "10:00"
         assert f["late_by_s"] > 0
 
     def test_now_after_due_with_successful_run_in_cycle_returns_empty(self):
-        now = datetime(2026, 9, 17, 11, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 9, 17, 14, 0, tzinfo=timezone.utc)
         history = [
             SimpleNamespace(
                 dag_id=_CRITICAL_DAG,
@@ -2454,7 +2457,7 @@ class TestEvaluateDeadlineMisses:
         assert findings == []
 
     def test_now_after_due_with_emitted_dag_returns_empty(self):
-        now = datetime(2026, 9, 17, 11, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 9, 17, 14, 0, tzinfo=timezone.utc)
         findings = _evaluate_deadline_misses(
             self._DEADLINES,
             [],
@@ -2653,7 +2656,7 @@ class TestSlaMessagesAndLedger:
                 "run_id": run_id,
                 "cycle_anchor": cycle_anchor,
                 "due_at": due_at.isoformat(),
-                "deadline_utc": "10:00",
+                "deadline_localtime": "10:00",
                 "owner": "Data ForRent",
             }
         }
@@ -2681,7 +2684,7 @@ class TestSlaMessagesAndLedger:
                 "run_id": run_id,
                 "cycle_anchor": cycle_anchor,
                 "due_at": due_at.isoformat(),
-                "deadline_utc": "10:00",
+                "deadline_localtime": "10:00",
                 "owner": "Data ForRent",
             }
         }
@@ -4235,7 +4238,7 @@ class TestMonitorPagesDeadlineMiss:
         assert finding["kind"] == _KIND_DEADLINE_MISS
         assert finding["dag_id"] == _CRITICAL_DAG
         assert finding["tier"] == "critical"
-        assert finding["deadline_utc"] == "10:00"
+        assert finding["deadline_localtime"] == "10:00"
         assert finding["late_by_s"] > 0
         assert finding["run_id"].startswith("deadline::")
         mock_post.assert_called_once()

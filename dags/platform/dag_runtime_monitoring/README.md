@@ -12,19 +12,32 @@ Every 30 minutes this DAG:
    (anchored at `sla_cycle_anchor_local_time`, default 20:55 America/Sao_Paulo),
    with dependency-based root-cause suppression so one stalled root produces one
    alert instead of hundreds of downstream noise.
+3. Flags DAGs that declare `dag.sla_deadline_localtime: "HH:MM"` and have not had a
+   successful run in the current cycle by that São Paulo wall-clock time. The clock is
+   local for the same reason the cron schedules are: that is how the business states
+   the SLA.
 
 **Every anomaly goes to Google Chat** and is tracked to closure (ledger Variable
 `DAG_RUNTIME_MONITORING_ALERTED_RUNS`: initial alert, 30-min updates, ✅/❌ close).
 
-When `critical_dags` is non-empty, findings also page JiraOps as follows:
+The paging set is **declared, not configured**: `dag.criticality` in each
+`*_declaration.yml` becomes the Airflow tag `criticality:<Level>`, and every cycle the
+monitor reads those tags out of `dag_tag` (`_fetch_declared_criticality`). `Critical`
+and `High` page JiraOps (`CriticalityEnum.PAGING`); `Medium` / `Low` / untagged are
+Chat-only. A `critical_dags` trigger conf still replaces the derived set for one run.
 
-- **slow**, in `critical_dags` or transitively blocking one → Chat **+** JiraOps
-- **missing-run**, in `critical_dags` → Chat **+** JiraOps
-- **missing-run**, blocking a critical DAG but not a member → Chat only
-  (the 208 transitive upstreams of the 5 prod critical DAGs include ~28 chronically
-  late DAGs — `ebdb_house`, `ebdb_listing`, `bob`, `wololo`, … — late 13–15 of 14
-  days; expanding paging to that layer would be an alert storm)
+- **slow**, declaring Critical/High or transitively blocking one → Chat **+** JiraOps
+- **missing-run**, declaring Critical/High → Chat **+** JiraOps
+- **missing-run**, blocking a paging DAG without declaring one itself → Chat only
+  (the transitive upstreams of the paging set include chronically late DAGs —
+  `ebdb_house`, `ebdb_listing`, `bob`, `wololo`, … — late 13–15 of 14 days; paging that
+  layer would be an alert storm)
+- **deadline-miss**, declaring Critical/High → Chat **+** JiraOps (membership only)
 - **everything else** → Chat only
+
+OpsGenie priority comes from the same declaration — Critical → P1, High → P2,
+Medium → P3, Low → P4 (`CriticalityEnum.to_opsgenie_priority`) — here and in
+`JiraOpsCallback` task/DAG failure alerts.
 
 Root suppression is unchanged: a priority DAG that is late because an upstream is
 late is not a root, produces no finding, and therefore no page. The upstream's own
@@ -46,7 +59,9 @@ itself. Manual-only (`schedule_interval` null) DAGs are skipped. MLOps DAGs
 (`quintoml.*`, `wonka*`, and the MLOps-owned `bietlejuice.` DAGs `emlio`,
 `enrich_emlio`, `batch_inference`, `evidently_ml_monitor`) never alert on either
 check — `alert_exclude_dag_prefixes` is applied to slowness, to SLA candidacy,
-and to ledger follow-up.
+and to ledger follow-up. Deadline-miss candidates are that same candidate set
+intersected with the DAGs carrying an `sla_deadline_localtime:` tag, so a paused
+or manual-only DAG never produces a deadline finding.
 
 **Root selection (missing-run).** Of the DAGs past their due time, only the *roots*
 are alerted on. A **confirmed** root is **not blocked on a dataset** and has no late
@@ -149,7 +164,7 @@ rollover. Emission likewise counts as "upstream succeeded" for root confirmation
 
 Real alerts are only delivered when `environment == prod`. Config lives in
 `prod_conf.yml` / `forno_conf.yml` (`lookback_days`, `min_history_runs`, `percentile`,
-`factor`, `min_alert_duration_minutes`, `critical_dags`). SLA keys
+`factor`, `min_alert_duration_minutes`). SLA keys
 (`sla_enabled`, `sla_lookback_days`, `sla_min_history_cycles`, `sla_percentile`,
 `sla_grace_minutes`, `sla_cycle_anchor_local_time`, `sla_exclude_dag_prefixes`,
 `sla_exclude_dag_suffixes`, `sla_max_missing_run_alerts`, `alert_exclude_dag_prefixes`)
@@ -220,7 +235,7 @@ exercise the full detect → route → deliver path without waiting for a real s
 | `test_webhook` | Send gchat to this throwaway webhook instead of the configured one. | — |
 | `test_responder_team_id` | Route critical JiraOps alerts to this **test** team (adds a `test` tag + `[TEST]` prefix). | — |
 | `only_dags` | Restrict real (non-simulated) evaluation to these dag_ids. | — |
-| `critical_dags` | Replace YAML `critical_dags` for this run only (string or list). | YAML value |
+| `critical_dags` | Replace YAML `critical_dags` for this run only (string or list). | derived from criticality: tags |
 
 **Safety rule:** when `force_send` is set, a *critical* finding is only **paged in
 JiraOps** if a `test_responder_team_id` is provided; otherwise Jira is skipped but
@@ -301,5 +316,3 @@ enabling Chat delivery in prod.
 uv run --python 3.12 --directory packages/bietlejuice-airflow \
   pytest test/unit/dags/platform/dag_runtime_monitoring -q
 ```
-
-[Showing lines 1-300 of 301. Use :301 to continue]

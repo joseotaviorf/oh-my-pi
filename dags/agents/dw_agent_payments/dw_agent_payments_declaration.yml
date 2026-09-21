@@ -4,6 +4,7 @@ dag:
   schedule_start_date: 2026, 6, 25
   owner: Data Agents
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       DW layer for Big Agent Incentives Engine. Projects enrich_big_agent_incentives

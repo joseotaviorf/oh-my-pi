@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2026, 7, 22
   owner: Data ForRent
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       Loads dw_offboarding.obt_offboarding in a dedicated DAG, decoupled from

@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2024, 05, 28
   owner: Data ForRent
   criticality: Critical
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       Dag for the purpose of consulting information related to terminations.

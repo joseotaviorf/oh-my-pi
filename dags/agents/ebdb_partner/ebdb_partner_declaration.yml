@@ -2,7 +2,8 @@ dag:
   name: ebdb_partner
   schedule_interval: 10 21,8,12 * * *
   owner: Data Agents
-  criticality: Critical
+  criticality: High
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       Extraction of EBDB tables related to Parters into data lake. EBDB is the main database for QuintoAndar.

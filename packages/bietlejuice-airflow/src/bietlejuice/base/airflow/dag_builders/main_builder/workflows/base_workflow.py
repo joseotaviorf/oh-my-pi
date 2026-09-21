@@ -121,9 +121,9 @@ class BaseWorkflow(BuilderInterface):
                 dag_tags.append(
                     f"{CRITICALITY_TAG_PREFIX}{self.dag_args['criticality']}"
                 )
-            if self.dag_args.get("sla_deadline_utc"):
+            if self.dag_args.get("sla_deadline_localtime"):
                 dag_tags.append(
-                    f"{SLA_DEADLINE_TAG_PREFIX}{self.dag_args['sla_deadline_utc']}"
+                    f"{SLA_DEADLINE_TAG_PREFIX}{self.dag_args['sla_deadline_localtime']}"
                 )
 
         default_args = {

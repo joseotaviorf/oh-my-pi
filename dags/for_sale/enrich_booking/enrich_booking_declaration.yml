@@ -3,7 +3,8 @@ dag:
   name: enrich_booking
   schedule_start_date: 2020, 7, 1
   owner: Data ForSale
-  criticality: Critical
+  criticality: High
+  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       Creates the enriched tables for the context `Booking` enriched from EBDB and gsheets.
