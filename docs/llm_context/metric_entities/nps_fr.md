@@ -9,391 +9,132 @@
 **Data Steward:**
 - victor.prado@quintoandar.com.br
 
-## Overview
+## Description
 
-**NPS FR** is the family of Net Promoter Score metrics for the For Rent product. The anchor
-metric — **NPS True** — is a **weighted average** of the NPS computed independently for each
-journey (onboarding, ongoing, offboarding), with quarterly weights defined by the CX team.
-Pooling all answers into a single flat pool produces a **systematically incorrect** number
-(per-journey volumes are very different, distorting the NPS by up to 5 points). The other
-metrics in this file (per-journey components, PP Multi, SPOC, AS IS / não-SPOC, and the
-interaction-type ones — Seamless / Digital Sup / Human Support) use the **same engine**
-(`% promoters − % detractors`) over different cuts of the same answer base.
-**All are breakable by IQ / PP / Total.**
+**NPS FR** groups the Net Promoter Score metrics of the For Rent product, from the official
+anchor (**NPS True**, a weighted average of the onboarding / ongoing / offboarding journeys)
+down to the per-journey components and the operational cuts the CX team follows. Every metric
+here runs the same engine — `% promoters − % detractors` over answered dispatches — applied to
+a different population: a single journey, the PP Multi base, the SPOC experiment, or the
+support-interaction type. What separates them is the population filter and, for the two
+weighted metrics, the quarterly weights read from `nps_target_share`.
 
-Offboarding NPS segmented by **digital** vs **human support** (U&J / Seamless ticket
-classification) is defined in
-[`offboard_human_vs_digital_metrics.md`](offboard_human_vs_digital_metrics.md) — this file does
-not redefine those cuts.
+Offboarding NPS segmented by digital vs human support (U&J / Seamless ticket classification) is
+defined in [`offboard_human_vs_digital_metrics.md`](offboard_human_vs_digital_metrics.md) — this
+document does not redefine those cuts.
 
-**This product exists exclusively for For Rent — there is no equivalent weighted NPS for FS
-or other products.**
+**This product exists exclusively for For Rent — there is no equivalent weighted NPS for For
+Sale or any other product.**
+
+## Domain
+
+For Rent
 
 ## Related Domain Entities
 
 - NPS
 
-## Related Metric Entities
-
-- Offboard Human vs Digital Metrics (offboarding digital / human-support NPS only)
-
-## Catalog
-
-| Metric | Type |
-| :---- | :---- |
-| NPS True | OKR |
-| NPS Onboarding | Health Metric |
-| NPS Ongoing | Health Metric |
-| NPS Offboarding | Health Metric |
-| NPS PP Multi (Up to 15 Properties) | Health Metric |
-| SPOC NPS | Health Metric |
-| AS IS NPS | Health Metric |
-| NPS Seamless | Health Metric |
-| NPS Digital Sup | Health Metric |
-| NPS Human Support | Health Metric |
-
-## MBR
-
-**Name** Post Contract
-**Category** FR XP
-
-## Glossary and Synonyms
-
-- **NPS FR**, **NPS True**, **official NPS**, **weighted NPS** → NPS True (weighted average of the journeys)
-- **NPS Onboarding**, **NPS Ongoing**, **NPS Offboarding** → single-journey component (not weighted)
-- **NPS PP Multi**, **NPS PPM**, **PP Multi (Up to 15 Properties)**, **N15** → NPS PP Multi
-- **SPOC NPS**, **NPS SPOC** → offboarding NPS with `is_spoc_test = TRUE`
-- **AS IS NPS**, **NPS AS IS**, **NPS BAU offboarding**, **NPS não SPOC**, **NPS no-spoc**, **NPS sem SPOC**, **NPS NOT SPOC (offboarding)** → offboarding NPS with `is_spoc_test = FALSE`
-- **NPS Offboarding cuts** (SPOC BAU/LAB, with/without Repairs, with Mediation, with Early Mediation, with Early Both Agree, with Repairs Contested PP/IQ, Ldt ≷ 15d, …) → sub-cuts of NPS Offboarding via `sandbox.nps_fr` flags (see Nuances)
-- **NPS Seamless**, **NPS Seamless (Onb./Ong.)**, **self-service NPS** → pooled NPS of onboarding+ongoing with `seamless_ticket_type = 'seamless'`
-- **NPS Digital Sup**, **NPS Digital Support (Onb./Ong.)** → pooled NPS of onboarding+ongoing with `seamless_ticket_type = 'digital_support'`
-- **NPS Human Support**, **NPS Human Support (Onb./Ong.)**, **NPS tickets** → pooled NPS of onboarding+ongoing with `seamless_ticket_type = 'tickets'`
-- **IQ** → tenant (`customer_type = 'IQ'`); **PP** → owner (`customer_type = 'PP'`); **Total** → IQ+PP pool
-
-## Scope
-
-**Included**: onboarding, ongoing, offboarding (NPS True and components); PP Multi journeys
-(`onb_ppm`, `ong_ppm`, `off_ppm`); offboarding segmented by SPOC/AS IS and by the
-**operational Ops cuts** (repairs, mediation, contestation, leadtime, etc. — see Nuances);
-onboarding+ongoing segmented by interaction type (`seamless` / `digital_support` /
-`tickets`) — IQ + PP, Brazil.
-
-**Excluded (global, applies to all)**: lost, po, international campaigns (mexico, bo),
-agents, brokers, test campaigns (`purpose = 'test'`).
-
-**Per-metric exclusions** (on top of the global ones):
-
-- **NPS True / components**: exclude `ppmulti` (all `*_ppm` campaigns and `currentpo`) —
-  PP Multi is its own metric, computed separately; it does not enter the weighted number.
-- **PP Multi**: excludes the legacy category `ppmulti_old` (`metric_group = 'currentpo'`); uses only
-  `onbppm` / `ongppm` / `offppm`.
-
-## Calculation
-
-The anchor metric (**NPS True**) is the weighted average of the three journeys:
-
-```
-NPS_True = NPS_onboarding  × weight_onboarding
-         + NPS_ongoing     × weight_ongoing
-         + NPS_offboarding × weight_offboarding
-```
-
-where each `NPS_journey = (promoters − detractors) / total_journey × 100`, classifying by
-`dim_nps_answer.score_category` (`promoter` 9–10, `passive` 7–8, `detractor` 0–6) and counting
-only effective answers (`fact_nps_dispatches.is_answered = true`). The **components**
-**NPS Onboarding / Ongoing / Offboarding** are exactly the `NPS_journey` above, reported
-without weighting.
-
-**NPS PP Multi (Up to 15 Properties)** — weighted average of the three PP Multi journeys,
-using the **same quarterly weights** as NPS True (`onb_ppm → onboarding`,
-`ong_ppm → ongoing`, `off_ppm → offboarding`):
-
-```
-NPS_PPMulti = NPS(onb_ppm, cnt_15_seg='<= 15') × weight_onboarding
-            + NPS(ong_ppm, cnt_15_seg='<= 15') × weight_ongoing
-            + NPS(off_ppm, cnt_15_seg='<= 15') × weight_offboarding
-```
-
-Population: in `sandbox.nps_fr`, `campanha_nps = 'ppmulti'` and
-`campanha_category IN ('onb_ppm','ong_ppm','off_ppm')` (excludes `currentpo`/`ppmulti_old`).
-PP Multi is owner-exclusive → in practice `PP = Total` and `IQ` is empty.
-
-**Rounding**: the team rounds each journey's NPS **to an integer** (`ROUND(…, 0)`) before
-applying the weights — reproduce it this way to match the official gsheets number. (This
-differs from NPS True, which rounds to 1 decimal.)
-
-**SPOC NPS / AS IS NPS (não-SPOC)** — **offboarding** NPS (`campanha_nps = 'offboarding'` in
-`sandbox.nps_fr`), **without weighting**, split by the `is_spoc_test` flag. The **only**
-difference between the two is the flag; within SPOC, `spoc_team` distinguishes **SPOC BAU**
-from **SPOC LAB**. **AS IS** is the team's label for the non-SPOC bucket — also called
-**NPS não SPOC**, **no-spoc**, or **sem SPOC**:
-
-```
-SPOC NPS       = offboarding NPS where is_spoc_test = TRUE
-AS IS NPS      = offboarding NPS where is_spoc_test = FALSE   -- same as não-SPOC / no-spoc / sem SPOC
-```
-
-**NPS by interaction type (Onb./Ong.)** — three sibling metrics with **identical
-calculation**, differing **only** by the filtered `seamless_ticket_type` value:
-
-- **NPS Seamless** → `seamless_ticket_type = 'seamless'`
-- **NPS Digital Sup** → `seamless_ticket_type = 'digital_support'`
-- **NPS Human Support** → `seamless_ticket_type = 'tickets'`
-
-All are **pooled** (unweighted) NPS of onboarding + ongoing: each journey's numerator and
-denominator are summed before dividing:
-
-```
-NPS = (num_onboarding + num_ongoing) / (den_onboarding + den_ongoing) × 100
-```
-
-where, over the answers of the chosen interaction type in each journey:
-`num_journey = COUNT(DISTINCT CASE WHEN score_category = 'promoter' THEN sk_nps_answer END)
-            − COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END)`
-and `den_journey = COUNT(DISTINCT sk_nps_answer)`. Population: the onb/ong answers already
-materialized in `sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort` (which internally scope
-the onboarding/ongoing `metric_group` and compute `seamless_ticket_type`). Since it is a
-direct pool, it is equivalent to the NPS over the union of that type's onb+ong answers
-(without weights).
-
-### Canonical Filter
-
-Apply on `dim_nps_campaign` (alias `dnc`) when joining with `fact_nps_dispatches`. This is the
-filter **for NPS True and the components only** (Onboarding / Ongoing / Offboarding):
-
-```sql
-business_context     = 'forRent'
-AND customer_journey = 'true'   -- lowercase string, not boolean (≠ nps_target_share, which uses 'TRUE')
-AND purpose          = 'main'
-```
-
-`customer_journey = 'true' AND purpose = 'main'` (always both together) selects exactly the
-`onboarding` / `ongoing` / `offboarding` campaigns — the **same population** the team's
-official dataset obtains via `metric_group IN ('iqonboarding','pponboarding','iqongoing',
-'ppongoing','iqoffboarding','ppoffboarding')`. If there is any divergence, the `metric_group`
-selection is the source of truth.
-
-**Warning**: filtering only by `business_context = 'forRent'` without the other two fields
-includes lost, ppm, po and other campaigns that do **not** compose the official NPS FR.
-
-**Each metric uses a different selection** (all keep `business_context = 'forRent'`):
-
-| Metric | Population selection |
-| :---- | :---- |
-| NPS True, Onboarding, Ongoing, Offboarding | `customer_journey = 'true'` AND `purpose = 'main'` |
-| PP Multi | `sandbox.nps_fr`: `campanha_category IN ('onb_ppm','ong_ppm','off_ppm')` + `cnt_15_seg='<= 15'` on all three journeys, including offboarding |
-| SPOC / AS IS + Ops cuts | `sandbox.nps_fr`: `campanha_nps = 'offboarding'` + the cut's flag (`is_spoc_test`, `spoc_team`, `com_ou_sem_reparos`, …) |
-| Seamless / Digital Sup / Human Support | materialized tables `sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort` |
-
-### Nuances
-
-Mechanics shared by the metrics in this file. (Tables/columns and the generic component
-calculation live in `domain_entities/nps.md` — here, only what is specific to these
-metrics.)
-
-**Campaign taxonomy** — dictionary mapping `dnc.metric_group` (raw value in
-`dim_nps_campaign`) to the **journey** label (`campanha_nps`) and the PP Multi
-**sub-category** (`campanha_category`). These are the same labels the team uses as criteria in
-the spreadsheet SUMIFS (columns A and B). The Golden Queries derive the journey inline from
-`metric_group` (`CASE WHEN metric_group LIKE '%onboarding%' …`), so these two columns are not
-materialized — use the table only as a reference for "which `metric_group` falls into which
-journey":
-
-| `metric_group` | journey (`campanha_nps`) | category (`campanha_category`) |
-| :---- | :---- | :---- |
-| `iqonboarding`, `pponboarding` | `onboarding` | — |
-| `iqongoing`, `ppongoing` | `ongoing` | — |
-| `iqoffboarding`, `ppoffboarding` | `offboarding` | — |
-| `currentpo` | `ppmulti` | `ppmulti_old` (legacy, **outside** the current PP Multi) |
-| `onbppm` / `ongppm` / `offppm` | `ppmulti` | `onb_ppm` / `ong_ppm` / `off_ppm` |
-
-**IQ / PP / Total breakdown** — via `dnc.customer_type`: `'IQ'` = tenant, `'PP'` = owner.
-IQ → `customer_type = 'IQ'`; PP → `customer_type = 'PP'`; **Total → pool of both populations in
-the same denominator** (NOT the average of the IQ and PP NPS). In weighted metrics (NPS True,
-PP Multi), compute each journey's NPS **per `customer_type`** before applying the weights.
-
-**Quarterly weights** — read from `datalake_gsheets_clean.nps_target_share`; **never
-hardcode**. The **same weights** serve NPS True and PP Multi.
-
-| Column | Description |
-| :---- | :---- |
-| `campaign_group` | Journey: `onboarding`, `ongoing`, `offboarding` |
-| `customer_journey` | Filter `= 'TRUE'` (UPPERCASE here — ≠ `dim_nps_campaign`, which uses lowercase `'true'`) for NPS FR weights |
-| `share` | Weight (string `'25%'`) — parse: `CAST(REPLACE(share, '%', '') AS DOUBLE) / 100.0` |
-| `dt_start`, `dt_end` | Quarterly validity |
-
-- **Join key**: `campaign_group` ↔ journey derived from `metric_group`.
-- **Date join**: `CAST(ref_month AS DATE) BETWEEN dt_start AND dt_end`.
-- **Fallback (expected behavior, not a data issue)**: a month without a registered quarter uses
-  the most recent weight per journey (`ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end
-  DESC)`). This is a **designed fallback**, not a data quality problem —
-  `weight_source = 'fallback'` on Query 1 / Query 3 is expected by itself and is not grounds to
-  flag the number as incomplete or at risk, no matter how outdated the fallback weight is or how
-  long the quarter it applies to has been closed without a registered weight. It is never
-  necessary to escalate or call attention to the weights used.
-
-**`is_spoc_test` flag** (SPOC / AS IS) — **already available in `sandbox.nps_fr`** (alongside
-`spoc_team` = `'BAU'`/`'LAB'`); consume the column directly. For reference, the derivation from
-`dw_offboarding.fact_terminations` (by `sk_contract`, most recent termination) is:
-
-```sql
-CASE
-    WHEN is_spoc_contract = true
-     AND (is_spoc_control_group = false OR is_spoc_control_group IS NULL)
-    THEN true ELSE false
-END AS is_spoc_test
-```
-
-**"Up to 15 Properties" segment** (PP Multi) — **already available as `cnt_15_seg` in
-`sandbox.nps_fr`** (values `'<= 15'` / `'> de 15'`); consume the column directly. For
-reference, at the source it comes from `datalake_pp_multi.pp_multi_classification_history`,
-`ACTIVE` records from **yesterday's snapshot** (partition `current_date - INTERVAL '1' day`),
-joined via `id_owner = sk_user`. The filter `cnt_15_seg = '<= 15'` applies to **all three**
-PP Multi journeys — `onb_ppm`, `ong_ppm`, and `off_ppm` — consistent with the metric's own name
-("Up to 15 Properties"). Owners missing from the snapshot fall into `> de 15` (excluded from
-all three journeys) — if yesterday's partition does not exist in the materialization, PP Multi
-goes to zero.
-
-**`seamless_ticket_type` flag** (NPS Seamless / Digital Sup / Human Support) — classifies
-each onb/ong answer by the **support interaction type** the customer had in the window
-`(dt_start − 30 days) … nps_answer_date` (where `dt_start` is the contract start and
-`nps_answer_date` is the answer date). It is a categorization of **4 mutually exclusive
-values**, evaluated **in this precedence order**:
-
-| Value | Rule (in order) | Metric that uses it |
-| :---- | :---- | :---- |
-| `seamless` | no ticket **and** no chatbot **and** no walle | NPS Seamless |
-| `tickets` | has a support ticket (specific categories) `> 0` | NPS Human Support |
-| `digital_support` | no ticket, but with chatbot/walle `> 0` | NPS Digital Sup |
-| `other` | none of the above | — |
-
-Precedence matters: whoever has **a ticket and** chatbot falls into `tickets` (not
-`digital_support`); `seamless` requires zero of all signals. (The exact ticket categories that
-compose `tickets` differ slightly between onb and ong — see the definition of
-`sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort`.)
-
-> **Materialized in sandbox (official path — use it for the team's number).**
-> `seamless_ticket_type` is materialized in **`sandbox.nps_onb_cohort`** (onboarding) and
-> **`sandbox.nps_ong_cohort`** (ongoing), at `sk_nps_answer` grain, already with
-> `customer_type`, `score_category`, `campanha_nps` and `data_resposta_nps`. **Consume these
-> tables directly** (see **Query 5**); do **not** rebuild the flag from the raw tables — the
-> exact `has_ticket` (ticket-category allowlist) only exists in the cohorts' logic. For
-> reference, the flag sums these signals in the window `(dt_start − 30 days) …
-> data_resposta_nps`, per `sk_user`:
->
-> | Signal | Source | Rule (in the window, per `sk_user`) |
-> | :---- | :---- | :---- |
-> | `has_ticket` | `dw_customer_support.fact_tickets` (+ `dim_department`/`dim_taxonomy`) | sum of ticket categories (moving, repairs, payments, ongoing) `> 0` |
-> | `has_chatbot_session` | `datalake_chatbot.sessions` | bot session without an associated ticket |
-> | `has_walle_session` | `datalake_chatbot.sessions` (`bot = 'wall-e'`) | walle session without an associated ticket |
-
-**Offboarding cuts (Ops)** — the operations team analyzes the Offboarding NPS by a series of
-cuts, all available as **ready-made flags in `sandbox.nps_fr`** (`sk_nps_answer` grain). Always
-filter `campanha_nps = 'offboarding'` and apply the cut's flag (combinable with the IQ/PP
-breakdown via `customer_type` and crossable with one another):
-
-| Cut | Column in `sandbox.nps_fr` | Filter |
-| :---- | :---- | :---- |
-| SPOC | `is_spoc_test` | `= true` |
-| w/o SPOC (AS IS / não-SPOC / no-spoc / sem SPOC) | `is_spoc_test` | `= false` |
-| SPOC BAU | `is_spoc_test` + `spoc_team` | `is_spoc_test AND spoc_team = 'BAU'` |
-| SPOC LAB | `is_spoc_test` + `spoc_team` | `is_spoc_test AND spoc_team = 'LAB'` |
-| w/ Repairs | `com_ou_sem_reparos` | `= true` |
-| w/o Repairs | `com_ou_sem_reparos` | `= false` |
-| w/ Mediation | `intermed` | `= 1` |
-| w/ Early Mediation | `has_early_mediation` | `= true` |
-| w/ Early Both Agree | `is_early_both_agree` | `= true` |
-| w/ Repairs Contested | `total_repair_contested` | `= 1` |
-| w/ Repairs Contested PP | `contest_owner` | `= 1` |
-| w/ Repairs Contested IQ | `contest_tenant` | `= 1` |
-| Ldt > 15d / ≤ 15d | `leadtime_total` (= `DATE_DIFF('day', dt_termination, dt_tf)`) | `> 15` / `<= 15` |
-| w/ Tkt Back | `ticket_off_escalado` | `= true` |
-
-**QUBE precompute (exploration only — not the official NPS FR number)**. `dags/qube/`
-materializes a scoped-down building block, not NPS FR itself:
-
-- Dimension: `qube_dimensions.nps_answer__score_category__*`
-- Measure: `qube_measures.nps_answer__total__*`
-- Metric: `qube_metrics.nps_answer__score_breakdown__*` — counts grouped by
-  `score_category` (promoter/passive/detractor), from which
-  `(promoters - detractors) / (promoters + passive + detractor)` can be derived at query
-  time, same pattern as `escalation_rate_walle`'s "rate at query time".
-
-**This is global across all NPS campaigns — it does NOT apply the `business_context =
-'forRent'`, `customer_journey = 'true'`, or `purpose = 'main'` filters**, and has no journey
-(onboarding/ongoing/offboarding), IQ/PP, or weighting dimension. It will not match NPS True,
-any journey component, PP Multi, SPOC/AS IS, or the interaction-type metrics in this file.
-
-**Why it's scoped down**: QUBE dimension/measure sources must be a single physical table
-(`clean`/`enrich`/`dw`/`metric`/`core`/`qube` layer, no joins — see
-`bietlejuice/qube/jobs/common/source_resolver.py`). The journey/business_context/purpose
-fields live on `dim_nps_campaign` (keyed by `sk_nps_campaign`), a different grain than
-`dim_nps_answer` (keyed by `sk_nps_answer`), so this measure reads `dim_nps_answer` alone
-(`dw_customer_satisfaction.dim_nps_answer`) with no campaign filter. Reproducing the real
-NPS FR population in QUBE requires a new `enrich`-layer table joining
-`fact_nps_dispatches` + `dim_nps_answer` + `dim_nps_campaign` first (not yet built — would
-be a new pipeline in `dw_customer_satisfaction`'s domain). The weighted NPS True / PP Multi
-composition and per-metric rounding rules also cannot be computed inside QUBE at all (it
-only produces `COUNT(DISTINCT entity_id)` per dimension cut) — that math stays downstream
-regardless.
-
-## Dos and Don'ts
-
-**Do:**
-
-- Classify by `score_category` (lowercase) and compute `% promoters − % detractors` over `is_answered = true`.
-- **NPS True / components**: apply `business_context = 'forRent'` AND `customer_journey = 'true'` AND `purpose = 'main'`; compute each journey before weighting.
-- **PP Multi**: in `sandbox.nps_fr`, select `campanha_category IN ('onb_ppm','ong_ppm','off_ppm')`; use the ready `cnt_15_seg = '<= 15'` on **all three** journeys, including offboarding; round each journey to an integer; reuse the `nps_target_share` weights.
-- **SPOC / AS IS**: in `sandbox.nps_fr`, filter `campanha_nps = 'offboarding'` and use the ready `is_spoc_test` / `spoc_team` (without re-joining `fact_terminations`).
-- **Offboarding cuts (Ops)**: in `sandbox.nps_fr`, filter `campanha_nps = 'offboarding'` and apply the cut's flag (see the map in Nuances).
-- **Seamless / Digital Sup / Human Support**: pool onboarding+ongoing (sum num/den before dividing) and filter the `seamless_ticket_type` value (`'seamless'` / `'digital_support'` / `'tickets'`); consume the flag directly from `sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort`.
-- **IQ/PP**: filter `customer_type`; for **Total**, pool (not the average of IQ and PP).
-- Read the weights from `nps_target_share` (`customer_journey = 'TRUE'`), use the fallback to the most recent quarter and deduplicate weights by `(ref_month, journey)`.
-
-**Don't:**
-
-- Don't filter only by `business_context = 'forRent'` in NPS True — it includes lost, ppm, po and others.
-- Don't pool the journeys directly in NPS True / PP Multi — use the weighted calculation.
-- Don't hardcode the weights (e.g. 25%, 53%, 22%) — always read from `nps_target_share`.
-- Don't skip `cnt_15_seg = '<= 15'` on `off_ppm` — the exception that let offboarding bypass the filter was a bug (fixed; see the correction note in Overview), not intended behavior.
-- Don't confuse SPOC with AS IS / não-SPOC — the only difference is `is_spoc_test` (TRUE vs FALSE), both in offboarding. AS IS, não-SPOC, no-spoc, and sem SPOC are the same metric.
-- Don't weight NPS Seamless / Digital Sup / Human Support — it is a direct pool of onb+ong (sum num/den), not a weighted average.
-- Don't try to rebuild `seamless_ticket_type` from the raw tables — always consume from `sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort` (the exact `has_ticket` only exists in the cohorts' logic).
-- Don't treat `tickets` and `digital_support` as overlapping — the categorization is exclusive and by precedence (`tickets` beats `digital_support`).
-- Don't use `MAX` to aggregate the weight source — use `MIN`, so `'fallback'` shows up when any journey lacks an official weight.
-- Don't treat **Total** as the average of the IQ and PP NPS — always pool the answers.
-
 ## Targets and OKRs
 
-**OKR** — monthly period NPS goal per journey, co-located with the official weights in
-the same GSheet table (informational — **not** used in the NPS calculation).
+**NPS Onboarding / NPS Ongoing / NPS Offboarding — OKR** — monthly period goal per journey,
+co-located with the official weights in the same GSheet table. Informational only: the target is
+**never** an input to any calculation in this document.
 
 - **Source table:** `datalake_gsheets_clean.target_service_kpis`
-- **Filter key / metric name:** `NPS For Rent` and match `campaign_group` to the journey
+- **Filter key / metric name:** `NPS For Rent`, matching `campaign_group` to the journey
   (onboarding = `NPS Onboarding`, ongoing = `NPS Ongoing`, offboarding = `NPS Offboarding`)
 - **Period grain:** month
-- **Value column:** `target` (period NPS target per journey)
+- **Value column:** `target`
 - **Aliases / search terms:** meta de NPS, target de NPS, meta NPS True, OKR NPS
-- **Caveat:** targets are informational only — never substitute target for computed NPS.
+- **Caveat:** never substitute a target for a computed NPS, and never report a target as if it
+  were the realized number.
 
-## Golden Queries
+## Metrics
 
-The per-journey NPS CTEs reproduce the component pattern already documented in
-`domain_entities/nps.md`; what is exclusive to these metrics is the weighting layer
-(NPS True, PP Multi) and the cuts (`is_spoc_test`, `cnt_15_seg`, `customer_type`).
+### NPS True
 
-**Answer counting — always `COUNT(DISTINCT sk_nps_answer)`** (numerator and denominator),
-across all sources. In the DW tables there is exactly 1 row per answer (1:1 join on
-`sk_nps_answer`), so `DISTINCT` is identical to `COUNT(*)`. But `sandbox.nps_fr` and the
-cohorts are built from **wide joins** (mediation, repairs, tickets, birdie…) and **may have
-more than one row per `sk_nps_answer`** (fanout); there `COUNT(*)` would inflate the count.
-Using `DISTINCT` everywhere keeps a single pattern and is always correct.
+#### Slug
 
-### Query 1 — NPS True (weighted)
+nps_true
 
-For the **IQ/PP** breakdown, add `dnc.customer_type` to the `journey_nps` CTE `GROUP BY` and
-propagate it to the final `SELECT` (grouping by `ref_month, customer_type`); for **Total**, run
-it as is (IQ+PP pool).
+#### Description
+
+**NPS True** is the official For Rent NPS: the weighted average of the NPS computed
+independently for the onboarding, ongoing and offboarding journeys, using quarterly weights set
+by the CX team. It differs from the naive calculation in that pooling every answer into one flat
+pool is **systematically wrong** — journey volumes are very different, and the flat pool distorts
+the result by up to 5 points.
+
+#### Also Known As
+
+- **NPS FR**, **official NPS**, **weighted NPS**, **NPS ponderado**
+- **QUBE NPS score breakdown** → near-miss — the `qube_metrics.nps_answer__score_breakdown__*`
+  precompute counts answers across **all** NPS campaigns with no `business_context`,
+  `customer_journey` or `purpose` filter and no journey weighting, so it never reproduces this
+  number.
+
+#### Rules
+
+- **Canonical filter:** `dnc.business_context = 'forRent' AND dnc.customer_journey = 'true' AND
+  dnc.purpose = 'main'`, over `fnd.is_answered = true`. The three predicates always travel
+  together — they select exactly the `onboarding` / `ongoing` / `offboarding` campaigns, the same
+  population the team's official dataset reaches via `metric_group IN ('iqonboarding',
+  'pponboarding', 'iqongoing', 'ppongoing', 'iqoffboarding', 'ppoffboarding')`. On any divergence,
+  the `metric_group` list is the source of truth.
+- **Common mistake:** filtering only on `business_context = 'forRent'`. That pulls in lost, po,
+  PP Multi, international and test campaigns and inflates the answer base well beyond the
+  official NPS FR population.
+- **Note on `customer_journey`:** in `dim_nps_campaign` it is the lowercase string `'true'`, not
+  a boolean — and not the UPPERCASE `'TRUE'` used by `nps_target_share`.
+- **Never pool the journeys:** compute each journey's NPS first, then weight. A direct pool is a
+  different number, not an approximation of this one.
+- **Excluded population:** lost, po, international campaigns (mexico, bo), agents, brokers,
+  `purpose = 'test'`, and all of PP Multi (`*_ppm` campaigns and `currentpo`) — PP Multi is its
+  own metric and does not enter the weighted number.
+- **Parameters:** weights read from `datalake_gsheets_clean.nps_target_share`.`share`, filtered
+  on `customer_journey = 'TRUE'` (UPPERCASE here) — never hardcoded. Parse as
+  `CAST(REPLACE(share, '%', '') AS DOUBLE) / 100.0`; join `campaign_group` to the journey and
+  `CAST(ref_month AS DATE) BETWEEN dt_start AND dt_end`.
+- **Fallback:** a month with no registered quarter falls back to the most recent weight per
+  journey (`ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end DESC)`). This is **designed
+  behavior, not a data problem** — `weight_source = 'fallback'` is expected on its own and is
+  never grounds to flag the number as incomplete or at risk, however old the fallback weight is.
+  Do not escalate or draw attention to it. Aggregate the flag with `MIN`, never `MAX`, so
+  `'fallback'` surfaces when any journey lacks an official weight.
+- **Deduplication:** unique per `sk_nps_answer`; always count with
+  `COUNT(DISTINCT sk_nps_answer)`, numerator and denominator alike.
+- **Query-time breakdowns (not materialized):** IQ / PP via `dnc.customer_type` (`'IQ'` = tenant,
+  `'PP'` = owner) — add it to the `journey_nps` grouping and to the final grouping. **Total is
+  the pool of both populations in one denominator, never the average of the IQ and PP NPS.**
+
+#### Type
+
+OKR
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly weighted NPS True, carrying the total answer volume and whether the weights
+came from a registered quarter or from the fallback.
 
 ```sql
 WITH journey_nps AS (
@@ -411,24 +152,24 @@ WITH journey_nps AS (
             / COUNT(DISTINCT dna.sk_nps_answer) * 100, 1
         ) AS nps_journey
     FROM dw_customer_satisfaction.fact_nps_dispatches AS fnd
-    INNER JOIN dw_customer_satisfaction.dim_nps_answer   AS dna
+    INNER JOIN dw_customer_satisfaction.dim_nps_answer AS dna
         ON fnd.sk_nps_answer = dna.sk_nps_answer
     INNER JOIN dw_customer_satisfaction.dim_nps_campaign AS dnc
         ON fnd.sk_nps_campaign = dnc.sk_nps_campaign
     WHERE fnd.is_answered = true
       AND dnc.business_context = 'forRent'
       AND dnc.customer_journey = 'true'
-      AND dnc.purpose          = 'main'
-      AND CAST(dna.ts_answered AS TIMESTAMP) >= CAST(date_add('month', -24, current_date) AS TIMESTAMP)
-      AND CAST(dna.ts_answered AS TIMESTAMP) <  CAST(current_date AS TIMESTAMP)
+      AND dnc.purpose = 'main'
+      AND CAST(dna.ts_answered AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+      AND CAST(dna.ts_answered AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
     GROUP BY 1, 2
 ),
 weights_raw AS (
     SELECT
-        campaign_group                                   AS journey,
-        CAST(dt_start AS DATE)                           AS dt_start,
-        CAST(dt_end   AS DATE)                           AS dt_end,
-        CAST(REPLACE(share, '%', '') AS DOUBLE) / 100.0  AS weight
+        campaign_group AS journey,
+        CAST(dt_start AS DATE) AS dt_start,
+        CAST(dt_end AS DATE) AS dt_end,
+        CAST(REPLACE(share, '%', '') AS DOUBLE) / 100.0 AS weight
     FROM datalake_gsheets_clean.nps_target_share
     WHERE customer_journey = 'TRUE'
       AND share IS NOT NULL
@@ -437,8 +178,10 @@ weights_raw AS (
 latest_weights AS (
     SELECT journey, weight
     FROM (
-        SELECT journey, weight,
-               ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end DESC) AS rn
+        SELECT
+            journey,
+            weight,
+            ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end DESC) AS rn
         FROM weights_raw
     ) AS sub
     WHERE rn = 1
@@ -450,73 +193,391 @@ journey_with_weight AS (
         jn.nps_journey,
         jn.total_answers,
         w.weight,
-        ROW_NUMBER() OVER (PARTITION BY jn.ref_month, jn.journey ORDER BY w.dt_start DESC, w.dt_end DESC) AS rn
+        ROW_NUMBER() OVER (
+            PARTITION BY jn.ref_month, jn.journey
+            ORDER BY w.dt_start DESC, w.dt_end DESC
+        ) AS rn
     FROM journey_nps AS jn
-    LEFT JOIN weights_raw AS w ON jn.journey = w.journey
-                               AND CAST(jn.ref_month AS DATE) BETWEEN w.dt_start AND w.dt_end
+    LEFT JOIN weights_raw AS w
+        ON jn.journey = w.journey
+       AND CAST(jn.ref_month AS DATE) BETWEEN w.dt_start AND w.dt_end
 )
 SELECT
     d.ref_month,
     ROUND(SUM(d.nps_journey * COALESCE(d.weight, lw.weight)), 1) AS nps_true,
     SUM(d.total_answers) AS total_answers,
-    MAX(CASE WHEN d.journey = 'onboarding'  THEN d.nps_journey END) AS nps_onboarding,
-    MAX(CASE WHEN d.journey = 'ongoing'     THEN d.nps_journey END) AS nps_ongoing,
-    MAX(CASE WHEN d.journey = 'offboarding' THEN d.nps_journey END) AS nps_offboarding,
     MIN(CASE WHEN d.weight IS NULL THEN 'fallback' ELSE 'official' END) AS weight_source
 FROM (SELECT * FROM journey_with_weight WHERE rn = 1) AS d
-LEFT JOIN latest_weights AS lw ON d.journey = lw.journey
+LEFT JOIN latest_weights AS lw
+    ON d.journey = lw.journey
 GROUP BY d.ref_month
 ORDER BY d.ref_month
 ```
 
-### Query 2 — Components by journey, by IQ/PP/Total
+### NPS Onboarding
 
-Component NPS (Onboarding/Ongoing/Offboarding) already broken down by `customer_type`. For the
-**Total** per journey, aggregate IQ+PP in the same pool (or run without `customer_type` in the
-`GROUP BY`).
+#### Slug
+
+nps_onboarding
+
+#### Description
+
+**NPS Onboarding** is the NPS of the onboarding journey alone, reported **without** weighting. It
+is one of the three components NPS True averages, so it is never the official For Rent number on
+its own.
+
+#### Also Known As
+
+- **NPS de onboarding**, **NPS entrada**
+- **NPS True** → near-miss — the weighted average of the three journeys, not this single
+  component.
+
+#### Rules
+
+- **Canonical filter:** `dnc.business_context = 'forRent' AND dnc.customer_journey = 'true' AND
+  dnc.purpose = 'main' AND dnc.metric_group IN ('iqonboarding', 'pponboarding')`, over
+  `fnd.is_answered = true`.
+- **Common mistake:** reporting this component as the official NPS FR. It carries no weight and
+  answers a different question — the official number is NPS True.
+- **Never weight it:** the quarterly `share` applies only when composing NPS True; the component
+  is reported raw.
+- **Classification:** `dim_nps_answer.score_category` — `promoter` (9–10), `passive` (7–8),
+  `detractor` (0–6), always lowercase.
+- **Deduplication:** unique per `sk_nps_answer`; count with `COUNT(DISTINCT sk_nps_answer)` in
+  numerator and denominator.
+- **Query-time breakdowns (not materialized):** IQ / PP via `dnc.customer_type`; **Total is the
+  pool of both, never the average of the two NPS values.**
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly unweighted NPS of the onboarding journey, with the promoter, detractor and
+total answer counts that make the rate re-aggregable over longer periods.
 
 ```sql
 SELECT
     date_trunc('month', CAST(dna.ts_answered AS TIMESTAMP)) AS ref_month,
-    CASE
-        WHEN dnc.metric_group LIKE '%onboarding%'  THEN 'onboarding'
-        WHEN dnc.metric_group LIKE '%ongoing%'     THEN 'ongoing'
-        WHEN dnc.metric_group LIKE '%offboarding%' THEN 'offboarding'
-    END AS journey,
-    dnc.customer_type,
+    COUNT(DISTINCT CASE WHEN dna.score_category = 'promoter'  THEN dna.sk_nps_answer END) AS promoters,
+    COUNT(DISTINCT CASE WHEN dna.score_category = 'detractor' THEN dna.sk_nps_answer END) AS detractors,
     COUNT(DISTINCT dna.sk_nps_answer) AS total_answers,
     ROUND(
         (CAST(COUNT(DISTINCT CASE WHEN dna.score_category = 'promoter'  THEN dna.sk_nps_answer END) AS DOUBLE)
        - CAST(COUNT(DISTINCT CASE WHEN dna.score_category = 'detractor' THEN dna.sk_nps_answer END) AS DOUBLE))
         / COUNT(DISTINCT dna.sk_nps_answer) * 100, 1
-    ) AS nps_journey
+    ) AS nps_onboarding
 FROM dw_customer_satisfaction.fact_nps_dispatches AS fnd
-INNER JOIN dw_customer_satisfaction.dim_nps_answer   AS dna
+INNER JOIN dw_customer_satisfaction.dim_nps_answer AS dna
     ON fnd.sk_nps_answer = dna.sk_nps_answer
 INNER JOIN dw_customer_satisfaction.dim_nps_campaign AS dnc
     ON fnd.sk_nps_campaign = dnc.sk_nps_campaign
 WHERE fnd.is_answered = true
   AND dnc.business_context = 'forRent'
-  AND dnc.customer_journey = 'true'   -- same canonical filter as Query 1: excludes purpose='test' and non-official campaigns
-  AND dnc.purpose          = 'main'
-  AND dnc.metric_group IN (
-        'iqonboarding','pponboarding',
-        'iqongoing','ppongoing',
-        'iqoffboarding','ppoffboarding'
-      )
-  AND CAST(dna.ts_answered AS TIMESTAMP) >= CAST(date_add('month', -24, current_date) AS TIMESTAMP)
-  AND CAST(dna.ts_answered AS TIMESTAMP) <  CAST(current_date AS TIMESTAMP)
-GROUP BY 1, 2, 3
-ORDER BY 1, 2, 3
+  AND dnc.customer_journey = 'true'
+  AND dnc.purpose = 'main'
+  AND dnc.metric_group IN ('iqonboarding', 'pponboarding')
+  AND CAST(dna.ts_answered AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+  AND CAST(dna.ts_answered AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
+GROUP BY 1
+ORDER BY 1
 ```
 
-### Query 3 — NPS PP Multi (Up to 15 Properties)
+### NPS Ongoing
 
-Reads directly from `sandbox.nps_fr` (which already brings `campanha_category` and `cnt_15_seg`
-ready), mapping the PP Multi categories to journeys and reusing the same quarterly weights as
-NPS True. Applies `cnt_15_seg = '<= 15'` to all three journeys (onb_ppm, ong_ppm, and off_ppm).
-**Each journey's NPS rounded to an integer before weighting** (`ROUND(…, 0)`), as in the team's
-gsheets.
+#### Slug
+
+nps_ongoing
+
+#### Description
+
+**NPS Ongoing** is the NPS of the ongoing journey alone — the tenancy period between move-in and
+termination — reported **without** weighting. It is one of the three components NPS True
+averages.
+
+#### Also Known As
+
+- **NPS de ongoing**, **NPS durante a locação**
+- **NPS True** → near-miss — the weighted average of the three journeys, not this single
+  component.
+
+#### Rules
+
+- **Canonical filter:** `dnc.business_context = 'forRent' AND dnc.customer_journey = 'true' AND
+  dnc.purpose = 'main' AND dnc.metric_group IN ('iqongoing', 'ppongoing')`, over
+  `fnd.is_answered = true`.
+- **Common mistake:** reporting this component as the official NPS FR. It carries no weight; the
+  official number is NPS True.
+- **Never weight it:** the quarterly `share` applies only when composing NPS True.
+- **Classification:** `dim_nps_answer.score_category` — `promoter` (9–10), `passive` (7–8),
+  `detractor` (0–6), always lowercase.
+- **Deduplication:** unique per `sk_nps_answer`; count with `COUNT(DISTINCT sk_nps_answer)` in
+  numerator and denominator.
+- **Query-time breakdowns (not materialized):** IQ / PP via `dnc.customer_type`; **Total is the
+  pool of both, never the average of the two NPS values.**
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly unweighted NPS of the ongoing journey, with the promoter, detractor and
+total answer counts that make the rate re-aggregable over longer periods.
+
+```sql
+SELECT
+    date_trunc('month', CAST(dna.ts_answered AS TIMESTAMP)) AS ref_month,
+    COUNT(DISTINCT CASE WHEN dna.score_category = 'promoter'  THEN dna.sk_nps_answer END) AS promoters,
+    COUNT(DISTINCT CASE WHEN dna.score_category = 'detractor' THEN dna.sk_nps_answer END) AS detractors,
+    COUNT(DISTINCT dna.sk_nps_answer) AS total_answers,
+    ROUND(
+        (CAST(COUNT(DISTINCT CASE WHEN dna.score_category = 'promoter'  THEN dna.sk_nps_answer END) AS DOUBLE)
+       - CAST(COUNT(DISTINCT CASE WHEN dna.score_category = 'detractor' THEN dna.sk_nps_answer END) AS DOUBLE))
+        / COUNT(DISTINCT dna.sk_nps_answer) * 100, 1
+    ) AS nps_ongoing
+FROM dw_customer_satisfaction.fact_nps_dispatches AS fnd
+INNER JOIN dw_customer_satisfaction.dim_nps_answer AS dna
+    ON fnd.sk_nps_answer = dna.sk_nps_answer
+INNER JOIN dw_customer_satisfaction.dim_nps_campaign AS dnc
+    ON fnd.sk_nps_campaign = dnc.sk_nps_campaign
+WHERE fnd.is_answered = true
+  AND dnc.business_context = 'forRent'
+  AND dnc.customer_journey = 'true'
+  AND dnc.purpose = 'main'
+  AND dnc.metric_group IN ('iqongoing', 'ppongoing')
+  AND CAST(dna.ts_answered AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+  AND CAST(dna.ts_answered AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
+GROUP BY 1
+ORDER BY 1
+```
+
+### NPS Offboarding
+
+#### Slug
+
+nps_offboarding
+
+#### Description
+
+**NPS Offboarding** is the NPS of the offboarding journey alone — the termination and move-out
+experience — reported **without** weighting. It is the component with the richest set of
+operational cuts, and the base from which SPOC NPS and AS IS NPS are split.
+
+#### Also Known As
+
+- **NPS de offboarding**, **NPS de saída**, **NPS de rescisão**
+- **NPS True** → near-miss — the weighted average of the three journeys, not this single
+  component.
+
+#### Rules
+
+- **Canonical filter:** `dnc.business_context = 'forRent' AND dnc.customer_journey = 'true' AND
+  dnc.purpose = 'main' AND dnc.metric_group IN ('iqoffboarding', 'ppoffboarding')`, over
+  `fnd.is_answered = true`. The equivalent population in `sandbox.nps_fr` is
+  `campanha_nps = 'offboarding'`.
+- **Common mistake:** reporting this component as the official NPS FR. It carries no weight; the
+  official number is NPS True.
+- **Never weight it:** the quarterly `share` applies only when composing NPS True.
+- **Deduplication:** unique per `sk_nps_answer`; count with `COUNT(DISTINCT sk_nps_answer)` in
+  numerator and denominator. This matters more here than elsewhere: `sandbox.nps_fr` is built
+  from wide joins (mediation, repairs, tickets, birdie) and **can carry more than one row per
+  `sk_nps_answer`**, so `COUNT(*)` would inflate the count.
+- **Query-time breakdowns (not materialized):** IQ / PP via `customer_type`, with **Total as the
+  pool, never the average**; plus the operational cuts below, all available as ready-made flags
+  in `sandbox.nps_fr` at `sk_nps_answer` grain. Always keep `campanha_nps = 'offboarding'` and
+  add the cut's predicate — the cuts combine with IQ/PP and with each other.
+
+  | Cut | Column in `sandbox.nps_fr` | Predicate |
+  | :---- | :---- | :---- |
+  | SPOC | `is_spoc_test` | `= true` |
+  | AS IS (não-SPOC) | `is_spoc_test` | `= false` |
+  | SPOC BAU | `is_spoc_test` + `spoc_team` | `is_spoc_test AND spoc_team = 'BAU'` |
+  | SPOC LAB | `is_spoc_test` + `spoc_team` | `is_spoc_test AND spoc_team = 'LAB'` |
+  | w/ Repairs | `com_ou_sem_reparos` | `= true` |
+  | w/o Repairs | `com_ou_sem_reparos` | `= false` |
+  | w/ Mediation | `intermed` | `= 1` |
+  | w/ Early Mediation | `has_early_mediation` | `= true` |
+  | w/ Early Both Agree | `is_early_both_agree` | `= true` |
+  | w/ Repairs Contested | `total_repair_contested` | `= 1` |
+  | w/ Repairs Contested PP | `contest_owner` | `= 1` |
+  | w/ Repairs Contested IQ | `contest_tenant` | `= 1` |
+  | Ldt > 15d / <= 15d | `leadtime_total` | `> 15` / `<= 15` |
+  | w/ Tkt Back | `ticket_off_escalado` | `= true` |
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly unweighted NPS of the offboarding journey, with the promoter, detractor and
+total answer counts that make the rate re-aggregable over longer periods.
+
+```sql
+SELECT
+    date_trunc('month', CAST(dna.ts_answered AS TIMESTAMP)) AS ref_month,
+    COUNT(DISTINCT CASE WHEN dna.score_category = 'promoter'  THEN dna.sk_nps_answer END) AS promoters,
+    COUNT(DISTINCT CASE WHEN dna.score_category = 'detractor' THEN dna.sk_nps_answer END) AS detractors,
+    COUNT(DISTINCT dna.sk_nps_answer) AS total_answers,
+    ROUND(
+        (CAST(COUNT(DISTINCT CASE WHEN dna.score_category = 'promoter'  THEN dna.sk_nps_answer END) AS DOUBLE)
+       - CAST(COUNT(DISTINCT CASE WHEN dna.score_category = 'detractor' THEN dna.sk_nps_answer END) AS DOUBLE))
+        / COUNT(DISTINCT dna.sk_nps_answer) * 100, 1
+    ) AS nps_offboarding
+FROM dw_customer_satisfaction.fact_nps_dispatches AS fnd
+INNER JOIN dw_customer_satisfaction.dim_nps_answer AS dna
+    ON fnd.sk_nps_answer = dna.sk_nps_answer
+INNER JOIN dw_customer_satisfaction.dim_nps_campaign AS dnc
+    ON fnd.sk_nps_campaign = dnc.sk_nps_campaign
+WHERE fnd.is_answered = true
+  AND dnc.business_context = 'forRent'
+  AND dnc.customer_journey = 'true'
+  AND dnc.purpose = 'main'
+  AND dnc.metric_group IN ('iqoffboarding', 'ppoffboarding')
+  AND CAST(dna.ts_answered AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+  AND CAST(dna.ts_answered AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
+GROUP BY 1
+ORDER BY 1
+```
+
+### NPS PP Multi (Up to 15 Properties)
+
+#### Slug
+
+nps_pp_multi
+
+#### Description
+
+**NPS PP Multi (Up to 15 Properties)** is the weighted NPS of owners holding at most 15
+properties, computed over the three PP Multi journeys (`onb_ppm`, `ong_ppm`, `off_ppm`) with the
+**same quarterly weights** as NPS True. It sits outside NPS True — PP Multi answers never enter
+the official weighted number — and it rounds each journey differently, to an integer rather than
+one decimal.
+
+#### Also Known As
+
+- **NPS PPM**, **PP Multi (Up to 15 Properties)**, **N15**
+- **NPS True** → near-miss — the official For Rent NPS, which **excludes** every PP Multi
+  campaign.
+
+#### Rules
+
+- **Canonical filter:** in `sandbox.nps_fr`, `campanha_nps = 'ppmulti' AND campanha_category IN
+  ('onb_ppm', 'ong_ppm', 'off_ppm')`, then `cnt_15_seg = '<= 15'`.
+- **Common mistake:** skipping `cnt_15_seg = '<= 15'` on `off_ppm`. The exception that let
+  offboarding bypass the segment filter was a bug, not intended behavior — the filter applies to
+  **all three** journeys, consistent with the metric's own name.
+- **Excluded population:** the legacy category `ppmulti_old` (`metric_group = 'currentpo'`) is
+  not part of the current PP Multi.
+- **Rounding:** each journey's NPS is rounded to an **integer** (`ROUND(…, 0)`) *before* the
+  weights are applied — this is what matches the team's gsheets, and it is the one place this
+  metric diverges from NPS True, which rounds to one decimal.
+- **Parameters:** the same weights as NPS True, from
+  `datalake_gsheets_clean.nps_target_share`.`share` with `customer_journey = 'TRUE'` — never
+  hardcoded. Map `onb_ppm → onboarding`, `ong_ppm → ongoing`, `off_ppm → offboarding`.
+- **Fallback:** identical to NPS True — most recent weight per journey when the month has no
+  registered quarter; `weight_source = 'fallback'` is expected behavior and not a reason to flag
+  the number. Aggregate with `MIN`, never `MAX`.
+- **Segment source:** `cnt_15_seg` is already materialized in `sandbox.nps_fr` (values `'<= 15'`
+  / `'> de 15'`) — consume it directly. At origin it comes from
+  `datalake_pp_multi.pp_multi_classification_history`, `ACTIVE` records of the previous day's
+  snapshot, joined `id_owner = sk_user`. Owners absent from the snapshot fall into `'> de 15'`
+  and drop out of all three journeys, so a missing partition sends PP Multi to zero.
+- **Deduplication:** unique per `sk_nps_answer`; `COUNT(DISTINCT sk_nps_answer)` everywhere —
+  `sandbox.nps_fr` can fan out.
+- **Query-time breakdowns (not materialized):** IQ / PP via `customer_type`, though PP Multi is
+  owner-exclusive in practice, so `PP = Total` and `IQ` is empty.
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly weighted PP Multi NPS restricted to owners with at most 15 properties,
+rounding each journey to an integer before weighting.
 
 ```sql
 WITH ppmulti_answers AS (
@@ -532,9 +593,9 @@ WITH ppmulti_answers AS (
         cnt_15_seg
     FROM sandbox.nps_fr
     WHERE campanha_nps = 'ppmulti'
-      AND campanha_category IN ('onb_ppm','ong_ppm','off_ppm')
-      AND CAST(ts_answered AS TIMESTAMP) >= CAST(date_add('month', -24, current_date) AS TIMESTAMP)
-      AND CAST(ts_answered AS TIMESTAMP) <  CAST(current_date AS TIMESTAMP)
+      AND campanha_category IN ('onb_ppm', 'ong_ppm', 'off_ppm')
+      AND CAST(ts_answered AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+      AND CAST(ts_answered AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
 ),
 journey_nps AS (
     SELECT
@@ -552,10 +613,10 @@ journey_nps AS (
 ),
 weights_raw AS (
     SELECT
-        campaign_group                                   AS journey,
-        CAST(dt_start AS DATE)                           AS dt_start,
-        CAST(dt_end   AS DATE)                           AS dt_end,
-        CAST(REPLACE(share, '%', '') AS DOUBLE) / 100.0  AS weight
+        campaign_group AS journey,
+        CAST(dt_start AS DATE) AS dt_start,
+        CAST(dt_end AS DATE) AS dt_end,
+        CAST(REPLACE(share, '%', '') AS DOUBLE) / 100.0 AS weight
     FROM datalake_gsheets_clean.nps_target_share
     WHERE customer_journey = 'TRUE'
       AND share IS NOT NULL
@@ -564,8 +625,10 @@ weights_raw AS (
 latest_weights AS (
     SELECT journey, weight
     FROM (
-        SELECT journey, weight,
-               ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end DESC) AS rn
+        SELECT
+            journey,
+            weight,
+            ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end DESC) AS rn
         FROM weights_raw
     ) AS sub
     WHERE rn = 1
@@ -577,138 +640,479 @@ journey_with_weight AS (
         jn.nps_journey,
         jn.total_answers,
         w.weight,
-        ROW_NUMBER() OVER (PARTITION BY jn.ref_month, jn.journey ORDER BY w.dt_start DESC, w.dt_end DESC) AS rn
+        ROW_NUMBER() OVER (
+            PARTITION BY jn.ref_month, jn.journey
+            ORDER BY w.dt_start DESC, w.dt_end DESC
+        ) AS rn
     FROM journey_nps AS jn
-    LEFT JOIN weights_raw AS w ON jn.journey = w.journey
-                               AND CAST(jn.ref_month AS DATE) BETWEEN w.dt_start AND w.dt_end
+    LEFT JOIN weights_raw AS w
+        ON jn.journey = w.journey
+       AND CAST(jn.ref_month AS DATE) BETWEEN w.dt_start AND w.dt_end
 )
 SELECT
     d.ref_month,
-    ROUND(SUM(d.nps_journey * COALESCE(d.weight, lw.weight)), 1) AS nps_pp_multi_n15,
+    ROUND(SUM(d.nps_journey * COALESCE(d.weight, lw.weight)), 1) AS nps_pp_multi,
     SUM(d.total_answers) AS total_answers,
-    MAX(CASE WHEN d.journey = 'onboarding'  THEN d.nps_journey END) AS nps_onb_ppm,
-    MAX(CASE WHEN d.journey = 'ongoing'     THEN d.nps_journey END) AS nps_ong_ppm,
-    MAX(CASE WHEN d.journey = 'offboarding' THEN d.nps_journey END) AS nps_off_ppm,
     MIN(CASE WHEN d.weight IS NULL THEN 'fallback' ELSE 'official' END) AS weight_source
 FROM (SELECT * FROM journey_with_weight WHERE rn = 1) AS d
-LEFT JOIN latest_weights AS lw ON d.journey = lw.journey
+LEFT JOIN latest_weights AS lw
+    ON d.journey = lw.journey
 GROUP BY d.ref_month
 ORDER BY d.ref_month
 ```
 
-### Query 4 — SPOC NPS and AS IS NPS (não-SPOC), by IQ/PP/Total
+### SPOC NPS
 
-Both metrics side by side, reading the ready `is_spoc_test` and `spoc_team` from
-`sandbox.nps_fr` — without re-joining `fact_terminations`. Already broken down by
-`customer_type` and by `spoc_team` (`'BAU'`/`'LAB'` within SPOC). For **Total**, remove
-`customer_type` from the `GROUP BY`; for SPOC/AS IS without the BAU/LAB breakdown, remove
-`spoc_team`. In the result set, `spoc_group = 'AS IS'` is the dashboard label for the
-**não-SPOC / no-spoc / sem SPOC** bucket (`is_spoc_test = FALSE`).
+#### Slug
+
+spoc_nps
+
+#### Description
+
+**SPOC NPS** is the offboarding NPS restricted to contracts in the SPOC experiment
+(`is_spoc_test = true`), reported **without** weighting. It is the treatment side of the SPOC
+comparison; the control side is AS IS NPS, and the two differ by nothing but that flag.
+
+#### Also Known As
+
+- **NPS SPOC**, **NPS do SPOC**
+- **AS IS NPS** → near-miss — the complementary bucket, `is_spoc_test = false`, not this metric.
+
+#### Rules
+
+- **Canonical filter:** in `sandbox.nps_fr`, `campanha_nps = 'offboarding' AND
+  is_spoc_test = true`.
+- **Common mistake:** forgetting `campanha_nps = 'offboarding'`. The SPOC flag exists on rows of
+  other journeys too, and without the journey predicate the population stops being comparable to
+  AS IS NPS.
+- **Never weight it:** SPOC and AS IS are single-journey metrics; the `nps_target_share` weights
+  do not apply.
+- **Flag source:** `is_spoc_test` is already materialized in `sandbox.nps_fr`, alongside
+  `spoc_team` (`'BAU'` / `'LAB'`) — consume the column directly, do not re-derive it by joining
+  `dw_offboarding.fact_terminations`.
+- **Deduplication:** unique per `sk_nps_answer`; `COUNT(DISTINCT sk_nps_answer)` everywhere —
+  `sandbox.nps_fr` can fan out.
+- **Query-time breakdowns (not materialized):** `spoc_team` splits SPOC into BAU and LAB; IQ / PP
+  via `customer_type`, with **Total as the pool, never the average**.
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly unweighted offboarding NPS for the SPOC test group, with the counts that
+make the rate re-aggregable over longer periods.
 
 ```sql
 SELECT
     date_trunc('month', CAST(ts_answered AS TIMESTAMP)) AS ref_month,
-    customer_type,
-    CASE WHEN is_spoc_test THEN 'SPOC' ELSE 'AS IS' END AS spoc_group,  -- 'AS IS' = não-SPOC
-    spoc_team,   -- 'BAU' / 'LAB' when SPOC; NULL in AS IS (não-SPOC)
+    COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS promoters,
+    COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS detractors,
     COUNT(DISTINCT sk_nps_answer) AS total_answers,
     ROUND(
         (CAST(COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS DOUBLE)
        - CAST(COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS DOUBLE))
         / COUNT(DISTINCT sk_nps_answer) * 100, 1
-    ) AS nps
+    ) AS spoc_nps
 FROM sandbox.nps_fr
 WHERE campanha_nps = 'offboarding'
-  AND CAST(ts_answered AS TIMESTAMP) >= CAST(date_add('month', -24, current_date) AS TIMESTAMP)
-  AND CAST(ts_answered AS TIMESTAMP) <  CAST(current_date AS TIMESTAMP)
-GROUP BY 1, 2, 3, 4
-ORDER BY 1, 2, 3, 4
+  AND is_spoc_test = true
+  AND CAST(ts_answered AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+  AND CAST(ts_answered AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
+GROUP BY 1
+ORDER BY 1
 ```
 
-### Query 5 — NPS by interaction type (Seamless / Digital Sup / Human Support), by IQ/PP/Total
+### AS IS NPS
 
-**Canonical path** — reproduces the team's number. The cohorts are materialized in
-`sandbox.nps_onb_cohort` and `sandbox.nps_ong_cohort` (`sk_nps_answer` grain), already with
-`seamless_ticket_type` computed; just pool onb+ong and compute the NPS on top. Returns
-**one row per `seamless_ticket_type`** — filter `'seamless'` (Seamless), `'tickets'`
-(Human Support) or `'digital_support'` (Digital Sup). IQ/PP breakdown via `customer_type`; for
-**Total**, remove `customer_type` from the `GROUP BY`. Queries 1–4 limit to 24 months; this one
-covers the whole period present in the sandbox tables — uncomment the date filter to align the
-window.
+#### Slug
+
+as_is_nps
+
+#### Description
+
+**AS IS NPS** is the offboarding NPS of contracts **outside** the SPOC experiment
+(`is_spoc_test = false`), reported **without** weighting. "AS IS" is the team's label for the
+control bucket; não-SPOC, no-spoc and sem SPOC all name this same metric.
+
+#### Also Known As
+
+- **NPS AS IS**, **NPS BAU offboarding**, **NPS não SPOC**, **NPS no-spoc**, **NPS sem SPOC**
+- **SPOC NPS** → near-miss — the complementary bucket, `is_spoc_test = true`, not this metric.
+- **SPOC BAU** → near-miss — a subdivision *inside* SPOC (`spoc_team = 'BAU'`), despite the "BAU"
+  wording; it is not the AS IS bucket.
+
+#### Rules
+
+- **Canonical filter:** in `sandbox.nps_fr`, `campanha_nps = 'offboarding' AND
+  is_spoc_test = false`.
+- **Common mistake:** conflating AS IS with SPOC BAU. `spoc_team = 'BAU'` lives *inside*
+  `is_spoc_test = true`; AS IS is the complement of the whole experiment.
+- **Watch the NULLs:** `is_spoc_test = false` is not the same as `NOT is_spoc_test` when the
+  column is nullable — keep the explicit equality so the population matches SPOC NPS's exact
+  complement.
+- **Never weight it:** SPOC and AS IS are single-journey metrics; the `nps_target_share` weights
+  do not apply.
+- **Flag source:** `is_spoc_test` is already materialized in `sandbox.nps_fr` — consume it
+  directly, do not re-derive it from `dw_offboarding.fact_terminations`.
+- **Deduplication:** unique per `sk_nps_answer`; `COUNT(DISTINCT sk_nps_answer)` everywhere.
+- **Query-time breakdowns (not materialized):** IQ / PP via `customer_type`, with **Total as the
+  pool, never the average**.
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly unweighted offboarding NPS for the non-SPOC control group, with the counts
+that make the rate re-aggregable over longer periods.
+
+```sql
+SELECT
+    date_trunc('month', CAST(ts_answered AS TIMESTAMP)) AS ref_month,
+    COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS promoters,
+    COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS detractors,
+    COUNT(DISTINCT sk_nps_answer) AS total_answers,
+    ROUND(
+        (CAST(COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS DOUBLE)
+       - CAST(COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS DOUBLE))
+        / COUNT(DISTINCT sk_nps_answer) * 100, 1
+    ) AS as_is_nps
+FROM sandbox.nps_fr
+WHERE campanha_nps = 'offboarding'
+  AND is_spoc_test = false
+  AND CAST(ts_answered AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+  AND CAST(ts_answered AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
+GROUP BY 1
+ORDER BY 1
+```
+
+### NPS Seamless
+
+#### Slug
+
+nps_seamless
+
+#### Description
+
+**NPS Seamless** is the pooled onboarding + ongoing NPS of customers who needed **no support at
+all** in the observation window — no ticket, no chatbot, no walle. It is a direct pool, not a
+weighted average: the two journeys' numerators and denominators are summed before dividing.
+
+#### Also Known As
+
+- **NPS Seamless (Onb./Ong.)**, **self-service NPS**, **NPS sem suporte**
+- **NPS Digital Sup** → near-miss — customers who used chatbot or walle, which is the opposite of
+  seamless.
+
+#### Rules
+
+- **Canonical filter:** `seamless_ticket_type = 'seamless'` over the union of
+  `sandbox.nps_onb_cohort` and `sandbox.nps_ong_cohort`.
+- **Common mistake:** weighting the two journeys. This metric is a **pool** —
+  `(num_onb + num_ong) / (den_onb + den_ong) × 100`. Applying the `nps_target_share` weights
+  produces a different number that no one reports.
+- **Do not rebuild the flag:** `seamless_ticket_type` is already computed inside the cohort
+  tables, which also scope the onboarding / ongoing `metric_group`. The exact ticket-category
+  allowlist behind `has_ticket` exists only in the cohorts' logic, so deriving the flag from
+  `dw_customer_support.fact_tickets` and `datalake_chatbot.sessions` will not reproduce it.
+- **Mutually exclusive categorization, evaluated by precedence:** `seamless` requires zero of all
+  signals; `tickets` wins over `digital_support` for anyone who has both a ticket and a chatbot
+  session. The four values never overlap.
+
+  | Value | Rule (in order) | Metric |
+  | :---- | :---- | :---- |
+  | `seamless` | no ticket **and** no chatbot **and** no walle | NPS Seamless |
+  | `tickets` | has a support ticket in the allowed categories `> 0` | NPS Human Support |
+  | `digital_support` | no ticket, but chatbot or walle `> 0` | NPS Digital Sup |
+  | `other` | none of the above | — |
+
+- **Observation window of the flag:** `(dt_start − 30 days) … nps_answer_date`, per `sk_user`,
+  where `dt_start` is the contract start.
+- **Date column:** the cohorts expose the answer date as `data_resposta_nps`, not `ts_answered`.
+- **Deduplication:** unique per `sk_nps_answer`; the cohorts are built from wide joins and can
+  fan out, so `COUNT(DISTINCT sk_nps_answer)` is required in numerator and denominator.
+- **Query-time breakdowns (not materialized):** IQ / PP via `customer_type`, with **Total as the
+  pool, never the average**; `campanha_nps` splits the pool back into onboarding and ongoing.
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly pooled onboarding + ongoing NPS of answers classified as seamless, with the
+counts that make the rate re-aggregable over longer periods.
 
 ```sql
 WITH seamless_base AS (
-    SELECT sk_nps_answer, customer_type, score_category, seamless_ticket_type, data_resposta_nps
+    SELECT sk_nps_answer, score_category, seamless_ticket_type, data_resposta_nps
     FROM sandbox.nps_onb_cohort
     UNION ALL
-    SELECT sk_nps_answer, customer_type, score_category, seamless_ticket_type, data_resposta_nps
+    SELECT sk_nps_answer, score_category, seamless_ticket_type, data_resposta_nps
     FROM sandbox.nps_ong_cohort
 )
 SELECT
     date_trunc('month', CAST(data_resposta_nps AS TIMESTAMP)) AS ref_month,
-    customer_type,
-    seamless_ticket_type,
-    COUNT(DISTINCT sk_nps_answer) AS den_answers,
-    COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END)
-  - COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS net_num,
-    ROUND(
-        (CAST(COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS DOUBLE)
-       - CAST(COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS DOUBLE))
-        / COUNT(DISTINCT sk_nps_answer) * 100, 1
-    ) AS nps
-FROM seamless_base
--- NPS Seamless → 'seamless'; NPS Human Support → 'tickets'; NPS Digital Sup → 'digital_support'
-WHERE seamless_ticket_type IN ('seamless', 'tickets', 'digital_support')
-  -- To align with the 24-month window of the other queries, uncomment:
-  -- AND CAST(data_resposta_nps AS TIMESTAMP) >= CAST(date_add('month', -24, current_date) AS TIMESTAMP)
-GROUP BY 1, 2, 3
-ORDER BY 1, 2, 3
-```
-
-### Query 6 — Offboarding NPS by Ops cut, by IQ/PP/Total
-
-Template for any operational cut of the Offboarding NPS (see the **Offboarding cuts** map in
-Nuances). Reads everything from `sandbox.nps_fr` filtering `campanha_nps = 'offboarding'` and
-the cut's flag. Here the cut appears as a **dimension** (`ops_cut`) to compare side by side; to
-isolate a single value, replace it with a `WHERE` on the flag. IQ/PP breakdown via
-`customer_type`; for **Total**, remove `customer_type` from the `GROUP BY`.
-
-```sql
-SELECT
-    date_trunc('month', CAST(ts_answered AS TIMESTAMP)) AS ref_month,
-    customer_type,
-    -- choose the cut to analyze (one at a time). Examples:
-    CASE WHEN com_ou_sem_reparos THEN 'w/ Repairs' ELSE 'w/o Repairs' END AS ops_cut,
-    -- SPOC BAU/LAB:        CASE WHEN is_spoc_test THEN spoc_team ELSE 'AS IS' END
-    -- w/ Mediation:        CASE WHEN intermed = 1 THEN 'w/ Mediation' ELSE 'w/o Mediation' END
-    -- w/ Early Mediation:  CASE WHEN has_early_mediation THEN 'w/ Early Mediation' ELSE 'w/o Early Mediation' END
-    -- w/ Early Both Agree: CASE WHEN is_early_both_agree THEN 'w/ Early Both Agree' ELSE 'w/o Early Both Agree' END
-    -- Repairs Contested:   CASE WHEN total_repair_contested = 1 THEN 'w/ Contested' ELSE 'w/o Contested' END
-    --   ... PP / IQ:       contest_owner = 1 / contest_tenant = 1
-    -- w/ Tkt Back:         CASE WHEN ticket_off_escalado THEN 'w/ Tkt Back' ELSE 'w/o Tkt Back' END
-    -- Ldt:                 CASE WHEN leadtime_total > 15 THEN '> 15d' ELSE '<= 15d' END
+    COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS promoters,
+    COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS detractors,
     COUNT(DISTINCT sk_nps_answer) AS total_answers,
     ROUND(
         (CAST(COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS DOUBLE)
        - CAST(COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS DOUBLE))
         / COUNT(DISTINCT sk_nps_answer) * 100, 1
-    ) AS nps
-FROM sandbox.nps_fr
-WHERE campanha_nps = 'offboarding'
-  AND CAST(ts_answered AS TIMESTAMP) >= CAST(date_add('month', -24, current_date) AS TIMESTAMP)
-  AND CAST(ts_answered AS TIMESTAMP) <  CAST(current_date AS TIMESTAMP)
-GROUP BY 1, 2, 3
-ORDER BY 1, 2, 3
+    ) AS nps_seamless
+FROM seamless_base
+WHERE seamless_ticket_type = 'seamless'
+  AND CAST(data_resposta_nps AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+  AND CAST(data_resposta_nps AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
+GROUP BY 1
+ORDER BY 1
 ```
 
-## Superset Golden Assets
+### NPS Digital Sup
 
-The three datasets below were born as **virtual datasets** (Superset) and **have already been
-materialized into sandbox tables** (`sk_nps_answer` grain) — **consume the tables directly**;
-the Superset URN remains only as the origin/documentation of the logic (the SQL is exposed in
-DataHub).
+#### Slug
 
-- **NPS For Rent Post Contract [Perf.] [Support and Services]** — canonical post-contract NPS base (all journeys + offboarding flags, `is_spoc_test`, `spoc_team`, `cnt_15_seg`, etc.). **Materialized in `sandbox.nps_fr`** (`sk_nps_answer` grain) — consume the table directly for PP Multi, SPOC/AS IS and the Offboarding cuts. URN (origin): `urn:li:dataset:(urn:li:dataPlatform:superset,16266,PROD)` ([link](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:%28urn:li:dataPlatform:superset,16266,PROD%29/Columns)).
-- **NPS ONB Cohort [Support and Services][VoC]** — origin of the `seamless_ticket_type` logic for the **onboarding** journey (`sk_nps_answer` grain). **Materialized in `sandbox.nps_onb_cohort`** — consume the table directly. URN (origin): `urn:li:dataset:(urn:li:dataPlatform:superset,15745,PROD)` ([link](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:%28urn:li:dataPlatform:superset,15745,PROD%29/Columns)).
-- **NPS ONG Cohort [Support and Services][VoC]** — equivalent for the **ongoing** journey (`sk_nps_answer` grain). **Materialized in `sandbox.nps_ong_cohort`** — consume the table directly. URN (origin): `urn:li:dataset:(urn:li:dataPlatform:superset,15749,PROD)` ([link](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:%28urn:li:dataPlatform:superset,15749,PROD%29/Columns)).
+nps_digital_sup
 
+#### Description
+
+**NPS Digital Sup** is the pooled onboarding + ongoing NPS of customers who resolved their need
+through **digital channels only** — chatbot or walle, with no support ticket. It uses the same
+pooled engine as NPS Seamless and NPS Human Support, differing only in the
+`seamless_ticket_type` value it filters.
+
+#### Also Known As
+
+- **NPS Digital Support (Onb./Ong.)**, **NPS suporte digital**
+- **NPS Human Support** → near-miss — customers who opened a ticket; the ticket takes precedence
+  over the digital signal, so the two populations never overlap.
+
+#### Rules
+
+- **Canonical filter:** `seamless_ticket_type = 'digital_support'` over the union of
+  `sandbox.nps_onb_cohort` and `sandbox.nps_ong_cohort`.
+- **Common mistake:** treating `digital_support` and `tickets` as overlapping sets and adding
+  them up. The categorization is exclusive and resolved by precedence — a customer with both a
+  ticket and a chatbot session is classified as `tickets`, never counted here.
+- **Never weight it:** this is a direct pool of the two journeys —
+  `(num_onb + num_ong) / (den_onb + den_ong) × 100`.
+- **Do not rebuild the flag:** consume `seamless_ticket_type` from the cohort tables; the
+  ticket-category allowlist behind `has_ticket` exists only in their logic.
+- **Observation window of the flag:** `(dt_start − 30 days) … nps_answer_date`, per `sk_user`.
+- **Date column:** the cohorts expose the answer date as `data_resposta_nps`, not `ts_answered`.
+- **Deduplication:** unique per `sk_nps_answer`; the cohorts can fan out, so
+  `COUNT(DISTINCT sk_nps_answer)` is required.
+- **Query-time breakdowns (not materialized):** IQ / PP via `customer_type`, with **Total as the
+  pool, never the average**; `campanha_nps` splits the pool back into onboarding and ongoing.
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly pooled onboarding + ongoing NPS of answers classified as digital support,
+with the counts that make the rate re-aggregable over longer periods.
+
+```sql
+WITH seamless_base AS (
+    SELECT sk_nps_answer, score_category, seamless_ticket_type, data_resposta_nps
+    FROM sandbox.nps_onb_cohort
+    UNION ALL
+    SELECT sk_nps_answer, score_category, seamless_ticket_type, data_resposta_nps
+    FROM sandbox.nps_ong_cohort
+)
+SELECT
+    date_trunc('month', CAST(data_resposta_nps AS TIMESTAMP)) AS ref_month,
+    COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS promoters,
+    COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS detractors,
+    COUNT(DISTINCT sk_nps_answer) AS total_answers,
+    ROUND(
+        (CAST(COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS DOUBLE)
+       - CAST(COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS DOUBLE))
+        / COUNT(DISTINCT sk_nps_answer) * 100, 1
+    ) AS nps_digital_sup
+FROM seamless_base
+WHERE seamless_ticket_type = 'digital_support'
+  AND CAST(data_resposta_nps AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+  AND CAST(data_resposta_nps AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
+GROUP BY 1
+ORDER BY 1
+```
+
+### NPS Human Support
+
+#### Slug
+
+nps_human_support
+
+#### Description
+
+**NPS Human Support** is the pooled onboarding + ongoing NPS of customers who opened a **support
+ticket** in the observation window. It uses the same pooled engine as NPS Seamless and NPS
+Digital Sup, differing only in the `seamless_ticket_type` value it filters — and it takes
+precedence over the digital classification whenever both signals are present.
+
+#### Also Known As
+
+- **NPS Human Support (Onb./Ong.)**, **NPS tickets**, **NPS suporte humano**
+- **NPS Digital Sup** → near-miss — chatbot or walle **without** a ticket; a customer with both
+  is counted here, not there.
+
+#### Rules
+
+- **Canonical filter:** `seamless_ticket_type = 'tickets'` over the union of
+  `sandbox.nps_onb_cohort` and `sandbox.nps_ong_cohort`. Note the value is the plural `'tickets'`,
+  not `'ticket'` or `'human_support'`.
+- **Common mistake:** assuming the population is "everyone who contacted support". Only ticket
+  categories in the cohorts' allowlist (moving, repairs, payments, ongoing) count; the exact list
+  differs slightly between the onboarding and ongoing cohorts.
+- **Never weight it:** this is a direct pool of the two journeys —
+  `(num_onb + num_ong) / (den_onb + den_ong) × 100`.
+- **Do not rebuild the flag:** consume `seamless_ticket_type` from the cohort tables; the
+  ticket-category allowlist behind `has_ticket` exists only in their logic.
+- **Observation window of the flag:** `(dt_start − 30 days) … nps_answer_date`, per `sk_user`.
+- **Date column:** the cohorts expose the answer date as `data_resposta_nps`, not `ts_answered`.
+- **Deduplication:** unique per `sk_nps_answer`; the cohorts can fan out, so
+  `COUNT(DISTINCT sk_nps_answer)` is required.
+- **Query-time breakdowns (not materialized):** IQ / PP via `customer_type`, with **Total as the
+  pool, never the average**; `campanha_nps` splits the pool back into onboarding and ongoing.
+
+#### Type
+
+Health Metric
+
+#### Direction
+
+Higher is better
+
+#### Grain
+
+monthly
+
+#### Is Additive
+
+false
+
+#### MBR
+
+Post Contract
+
+#### Category
+
+FR XP
+
+#### Golden Query
+
+Computes the monthly pooled onboarding + ongoing NPS of answers classified as human support, with
+the counts that make the rate re-aggregable over longer periods.
+
+```sql
+WITH seamless_base AS (
+    SELECT sk_nps_answer, score_category, seamless_ticket_type, data_resposta_nps
+    FROM sandbox.nps_onb_cohort
+    UNION ALL
+    SELECT sk_nps_answer, score_category, seamless_ticket_type, data_resposta_nps
+    FROM sandbox.nps_ong_cohort
+)
+SELECT
+    date_trunc('month', CAST(data_resposta_nps AS TIMESTAMP)) AS ref_month,
+    COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS promoters,
+    COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS detractors,
+    COUNT(DISTINCT sk_nps_answer) AS total_answers,
+    ROUND(
+        (CAST(COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS DOUBLE)
+       - CAST(COUNT(DISTINCT CASE WHEN score_category = 'detractor' THEN sk_nps_answer END) AS DOUBLE))
+        / COUNT(DISTINCT sk_nps_answer) * 100, 1
+    ) AS nps_human_support
+FROM seamless_base
+WHERE seamless_ticket_type = 'tickets'
+  AND CAST(data_resposta_nps AS TIMESTAMP) >= CAST(current_date - INTERVAL '24' MONTH AS TIMESTAMP)
+  AND CAST(data_resposta_nps AS TIMESTAMP) < CAST(current_date AS TIMESTAMP)
+GROUP BY 1
+ORDER BY 1
+```

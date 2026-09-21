@@ -1,0 +1,16 @@
+database_name: forrent_postcontract
+table_name: nps_onboarding
+owner: samia.lauar@quintoandar.com.br
+domain: For Rent
+description: NPS Onboarding is the NPS of the onboarding journey alone, reported without weighting. It is one of the three components NPS True averages, so it is never the official For Rent number on its own.
+columns:
+  ref_month:
+    description: Column `ref_month` produced by the scheduled materialization query.
+  promoters:
+    description: Column `promoters` produced by the scheduled materialization query.
+  detractors:
+    description: Column `detractors` produced by the scheduled materialization query.
+  total_answers:
+    description: Column `total_answers` produced by the scheduled materialization query.
+  nps_onboarding:
+    description: NPS Onboarding is the NPS of the onboarding journey alone, reported without weighting. It is one of the three components NPS True averages, so it is never the official For Rent number on its own.

@@ -1,0 +1,16 @@
+database_name: forrent_postcontract
+table_name: as_is_nps
+owner: samia.lauar@quintoandar.com.br
+domain: For Rent
+description: AS IS NPS is the offboarding NPS of contracts outside the SPOC experiment (is_spoc_test = false), reported without weighting. "AS IS" is the team's label for the control bucket; não-SPOC, no-spoc and sem SPOC all name this same metric.
+columns:
+  ref_month:
+    description: Column `ref_month` produced by the scheduled materialization query.
+  promoters:
+    description: Column `promoters` produced by the scheduled materialization query.
+  detractors:
+    description: Column `detractors` produced by the scheduled materialization query.
+  total_answers:
+    description: Column `total_answers` produced by the scheduled materialization query.
+  as_is_nps:
+    description: AS IS NPS is the offboarding NPS of contracts outside the SPOC experiment (is_spoc_test = false), reported without weighting. "AS IS" is the team's label for the control bucket; não-SPOC, no-spoc and sem SPOC all name this same metric.

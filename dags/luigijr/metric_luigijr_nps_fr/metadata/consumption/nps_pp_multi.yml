@@ -1,0 +1,14 @@
+database_name: forrent_postcontract
+table_name: nps_pp_multi
+owner: samia.lauar@quintoandar.com.br
+domain: For Rent
+description: NPS PP Multi (Up to 15 Properties) is the weighted NPS of owners holding at most 15 properties, computed over the three PP Multi journeys (onb_ppm, ong_ppm, off_ppm) with the same quarterly weights as NPS True. It sits outside NPS True — PP Multi answers never enter the official weighted number — and it rounds each journey differently, to an integer rather than one decimal.
+columns:
+  ref_month:
+    description: Column `ref_month` produced by the scheduled materialization query.
+  nps_pp_multi:
+    description: NPS PP Multi (Up to 15 Properties) is the weighted NPS of owners holding at most 15 properties, computed over the three PP Multi journeys (onb_ppm, ong_ppm, off_ppm) with the same quarterly weights as NPS True. It sits outside NPS True — PP Multi answers never enter the official weighted number — and it rounds each journey differently, to an integer rather than one decimal.
+  total_answers:
+    description: Column `total_answers` produced by the scheduled materialization query.
+  weight_source:
+    description: Column `weight_source` produced by the scheduled materialization query.

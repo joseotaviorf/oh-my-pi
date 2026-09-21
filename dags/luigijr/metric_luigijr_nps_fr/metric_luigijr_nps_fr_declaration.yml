@@ -1,0 +1,13 @@
+dag:
+  name: metric_luigijr_nps_fr
+  owner: ForRent PostContract
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - luigi-source:metric-document
+  - generated-by:gustavo.silva
+  schedule_interval: 0 8 * * *
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: forrent_postcontract

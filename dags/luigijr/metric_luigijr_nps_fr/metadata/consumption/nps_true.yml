@@ -1,0 +1,14 @@
+database_name: forrent_postcontract
+table_name: nps_true
+owner: samia.lauar@quintoandar.com.br
+domain: For Rent
+description: 'NPS True is the official For Rent NPS: the weighted average of the NPS computed independently for the onboarding, ongoing and offboarding journeys, using quarterly weights set by the CX team. It differs from the naive calculation in that pooling every answer into one flat pool is systematically wrong — journey volumes are very different, and the flat pool distorts the result by up to 5 points.'
+columns:
+  ref_month:
+    description: Column `ref_month` produced by the scheduled materialization query.
+  nps_true:
+    description: 'NPS True is the official For Rent NPS: the weighted average of the NPS computed independently for the onboarding, ongoing and offboarding journeys, using quarterly weights set by the CX team. It differs from the naive calculation in that pooling every answer into one flat pool is systematically wrong — journey volumes are very different, and the flat pool distorts the result by up to 5 points.'
+  total_answers:
+    description: Column `total_answers` produced by the scheduled materialization query.
+  weight_source:
+    description: Column `weight_source` produced by the scheduled materialization query.

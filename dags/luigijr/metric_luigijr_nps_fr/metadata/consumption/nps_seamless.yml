@@ -1,0 +1,16 @@
+database_name: forrent_postcontract
+table_name: nps_seamless
+owner: samia.lauar@quintoandar.com.br
+domain: For Rent
+description: 'NPS Seamless is the pooled onboarding + ongoing NPS of customers who needed **no support at all** in the observation window — no ticket, no chatbot, no walle. It is a direct pool, not a weighted average: the two journeys'' numerators and denominators are summed before dividing.'
+columns:
+  ref_month:
+    description: Column `ref_month` produced by the scheduled materialization query.
+  promoters:
+    description: Column `promoters` produced by the scheduled materialization query.
+  detractors:
+    description: Column `detractors` produced by the scheduled materialization query.
+  total_answers:
+    description: Column `total_answers` produced by the scheduled materialization query.
+  nps_seamless:
+    description: 'NPS Seamless is the pooled onboarding + ongoing NPS of customers who needed **no support at all** in the observation window — no ticket, no chatbot, no walle. It is a direct pool, not a weighted average: the two journeys'' numerators and denominators are summed before dividing.'
