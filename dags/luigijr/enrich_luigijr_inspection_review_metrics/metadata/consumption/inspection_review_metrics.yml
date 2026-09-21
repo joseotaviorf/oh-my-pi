@@ -1,0 +1,42 @@
+database_name: forrent_postcontract
+table_name: inspection_review_metrics
+owner: diego.carvalho@quintoandar.com.br
+domain: For Rent
+description: Table `inspection_review_metrics` materialized on a schedule by Luigi from a user-provided SQL query (ForRent PostContract domain).
+columns:
+  id_contract:
+    description: Column `id_contract` produced by the scheduled materialization query.
+  high_value_tag:
+    description: Column `high_value_tag` produced by the scheduled materialization query.
+  id_inspection:
+    description: Column `id_inspection` produced by the scheduled materialization query.
+  email:
+    description: Column `email` produced by the scheduled materialization query.
+  pp_open_dt:
+    description: Column `pp_open_dt` produced by the scheduled materialization query.
+  pp_open:
+    description: Column `pp_open` produced by the scheduled materialization query.
+  tenant_review:
+    description: Column `tenant_review` produced by the scheduled materialization query.
+  iq_open_dt:
+    description: Column `iq_open_dt` produced by the scheduled materialization query.
+  iq_open:
+    description: Column `iq_open` produced by the scheduled materialization query.
+  reviwed_date_pp:
+    description: Column `reviwed_date_pp` produced by the scheduled materialization query.
+  repair_created_by_owner:
+    description: Column `repair_created_by_owner` produced by the scheduled materialization query.
+  contest_iq:
+    description: Column `contest_iq` produced by the scheduled materialization query.
+  reviwed_date_iq:
+    description: Column `reviwed_date_iq` produced by the scheduled materialization query.
+  sent_to_owner_review_dt:
+    description: Column `sent_to_owner_review_dt` produced by the scheduled materialization query.
+  id_inspector:
+    description: Column `id_inspector` produced by the scheduled materialization query.
+  region_code_inspector:
+    description: Column `region_code_inspector` produced by the scheduled materialization query.
+  review_dt_final:
+    description: Column `review_dt_final` produced by the scheduled materialization query.
+  is_kirk:
+    description: Column `is_kirk` produced by the scheduled materialization query.

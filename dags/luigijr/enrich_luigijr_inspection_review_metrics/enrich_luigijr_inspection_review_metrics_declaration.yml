@@ -1,0 +1,30 @@
+dag:
+  name: enrich_luigijr_inspection_review_metrics
+  owner: ForRent PostContract
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:diego.carvalho
+  dataset_dependencies:
+  - dw_inspections.dim_assessment:first-run-of-day
+  - dw_inspections.fact_inspection:first-run-of-day
+  - dw_rent.fact_listing_rent_flows:first-run-of-day
+  - datalake_inspection_services_clean.inspection_aud:first-run-of-day
+  - dw_rent.dim_contract:first-run-of-day
+  - dw_public.dim_region:first-run-of-day
+  - datalake_inspection_services_clean.assessment:first-run-of-day
+  - datalake_inspection_services_clean.room:first-run-of-day
+  - datalake_inspection_services_clean.item_group:first-run-of-day
+  - datalake_inspection_services_clean.repair_request:first-run-of-day
+  - datalake_inspection_services_clean.contestation:first-run-of-day
+  - datalake_inspection_services_clean.reviewer:first-run-of-day
+  - dw_bpo_performance.cases_perspective:first-run-of-day
+  - datalake_amplitude_inspections.inspection_stages_access:first-run-of-day
+  - dw_inspections.dim_inspection:first-run-of-day
+  - dw_customer_support.fact_tickets:first-run-of-day
+  - dw_customer_support.dim_ticket:first-run-of-day
+  - dw_customer_support.dim_zendesk_user:first-run-of-day
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: forrent_postcontract
