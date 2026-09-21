@@ -93,7 +93,7 @@ columns:
   profile:
     description: |
       Agent company product profile name from the latest valid agent_product membership
-      for the agent (is_valid_product and is_lastest_valid).
+      for the agent (is_valid_product and is_lastest).
     lineage:
       - datalake_ebdb_agent_events.agent_product.product_name
   days_in_current_status:

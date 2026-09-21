@@ -286,7 +286,7 @@ FROM (
         datalake_ebdb_agent_events.agent_product AS product
             ON ds.id_agent = product.id_agent
             AND product.is_valid_product IS TRUE
-            AND product.is_lastest_valid IS TRUE
+            AND product.is_lastest IS TRUE
     WHERE
         ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')
         OR (ds.agent_status = 'AGENT_INACTIVATED' AND TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) < 1)
