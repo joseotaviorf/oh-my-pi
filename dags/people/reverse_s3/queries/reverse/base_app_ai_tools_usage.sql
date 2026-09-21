@@ -13,7 +13,9 @@
 -- current-month status and forecast; the final projection stamps ts_load with
 -- the current query timestamp.
 -- forecast_usd is a consumption-pace estimate for the current month and equals
--- closed-month consumption for historical months.
+-- closed-month consumption for historical months. Current-month projections are
+-- capped at the positive monthly limit without falling below recorded spend,
+-- because budget enforcement does not reverse usage already incurred.
 WITH spend_monthly AS (
     SELECT
         dau.email_user AS email,
@@ -286,6 +288,18 @@ calculated_usage AS (
         usage.consumption_usd,
         CASE
             WHEN usage.consumption_usd IS NULL THEN NULL
+            WHEN usage.month
+                = DATE_FORMAT(DATE('{load_start_date}'), 'yyyy-MM')
+                AND usage.total_limit_usd > 0
+                THEN GREATEST(
+                    usage.consumption_usd,
+                    LEAST(
+                        usage.consumption_usd
+                            * DAY(LAST_DAY(DATE('{load_start_date}')))
+                            / DAY(DATE('{load_start_date}')),
+                        usage.total_limit_usd
+                    )
+                )
             WHEN usage.month
                 = DATE_FORMAT(DATE('{load_start_date}'), 'yyyy-MM')
                 THEN usage.consumption_usd

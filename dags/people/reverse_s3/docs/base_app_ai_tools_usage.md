@@ -87,9 +87,10 @@ Columns are emitted in the order consumed by the AI Adoption Portal:
   limit is greater than zero, otherwise `0`. A missing cost-side row is treated
   as zero only for this derived field; the source metric remains `NULL`.
 - `forecast_usd` is a documented approximation: current-month consumption is
-  extrapolated from the elapsed day at `{load_start_date}` through the end of the month;
-  closed-month forecast equals observed consumption. It is not a vendor
-  forecast field.
+  extrapolated from the elapsed day at `{load_start_date}` through the end of the month
+  and capped at `total_limit_usd` when that limit is positive, without dropping
+  below observed `consumption_usd` if the limit has already been exceeded;
+  closed-month forecast equals observed consumption. It is not a vendor forecast field.
 - `status` uses the exact portal labels and evaluates the current-month
   elapsed percentage against `{load_start_date}`:
   - `No limit` when the limit is `NULL` or `0`;
