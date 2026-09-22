@@ -38,8 +38,8 @@ _EXECUTE_JOB_CLUSTER_TASK_ID = "execute-job-cluster"
 _CREATE_CLUSTER_TASK_ID = "create-cluster"
 _TERMINATE_CLUSTER_TASK_ID = "terminate-cluster"
 
-# Merged cluster YAML (preset + declaration ``custom_configurations``) may set this.
-# Governs opt-in deferrable wait mode for EMR Airflow operators when set true.
+# Merged cluster YAML (preset + declaration ``custom_configurations``) may set this to
+# ``false`` to opt a cluster OUT of deferrable EMR waits; deferrable is the default.
 # Stripped before EMR translate / create-cluster API payload. Not an EMR API field.
 _AIRFLOW_EMR_CREATE_CLUSTER_DEFERRABLE = "airflow_emr_create_cluster_deferrable"
 
@@ -521,12 +521,14 @@ class EmrJobClusterEngine(JobClusterEngine):
     def uses_emr_terminate_after_optimize(self) -> bool:
         return True
 
-    def _emr_deferrable_opt_in_kwargs(self) -> Dict[str, Any]:
-        if self._merged_cluster_configuration.get(
-            _AIRFLOW_EMR_CREATE_CLUSTER_DEFERRABLE
-        ):
-            return {"deferrable": True}
-        return {"deferrable": False}
+    def _emr_deferrable_kwargs(self) -> Dict[str, Any]:
+        return {
+            "deferrable": bool(
+                self._merged_cluster_configuration.get(
+                    _AIRFLOW_EMR_CREATE_CLUSTER_DEFERRABLE, True
+                )
+            )
+        }
 
     @staticmethod
     def _strip_emr_deferrable_key(cluster_configuration: Dict[str, Any]) -> None:
@@ -565,7 +567,7 @@ class EmrJobClusterEngine(JobClusterEngine):
                 hours=BaseTaskCreator._DEFAULT_EXECUTION_TIMEOUT_HOURS
             ),
             **self._emr_operator_retry_kwargs(),
-            **self._emr_deferrable_opt_in_kwargs(),
+            **self._emr_deferrable_kwargs(),
         )
 
     @staticmethod
@@ -633,7 +635,7 @@ class EmrJobClusterEngine(JobClusterEngine):
             "dag": self._ctx.dag,
             "execution_timeout": timedelta(hours=execution_timeout_hours),
             **self._emr_operator_retry_kwargs(),
-            **self._emr_deferrable_opt_in_kwargs(),
+            **self._emr_deferrable_kwargs(),
         }
         if pool is not None:
             operator_kwargs["pool"] = pool
@@ -660,7 +662,7 @@ class EmrJobClusterEngine(JobClusterEngine):
             trigger_rule="all_done",
             dag=self._ctx.dag,
             **self._emr_operator_retry_kwargs(),
-            **self._emr_deferrable_opt_in_kwargs(),
+            **self._emr_deferrable_kwargs(),
         )
 
 

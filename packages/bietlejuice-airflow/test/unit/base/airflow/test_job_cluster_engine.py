@@ -305,7 +305,7 @@ class TestEmrJobClusterEngineRetries:
         kwargs = mock_create.call_args.kwargs
         assert kwargs["retries"] == 3
         assert "retry_delay" not in kwargs
-        assert kwargs["deferrable"] is False
+        assert kwargs["deferrable"] is True
         assert (
             "airflow_emr_create_cluster_deferrable"
             not in kwargs["cluster_configuration"]
@@ -387,7 +387,7 @@ class TestEmrJobClusterEngineRetries:
             )
         kwargs = mock_submit.call_args.kwargs
         assert kwargs["retries"] == 1
-        assert kwargs["deferrable"] is False
+        assert kwargs["deferrable"] is True
 
     def test_submit_steps_deferrable_true_when_config_overrides(self, emr_ctx):
         mock_submit = MagicMock()
@@ -702,7 +702,7 @@ class TestEmrJobClusterEngineRetries:
         kwargs = mock_term.call_args.kwargs
         assert kwargs["retries"] == 3
         assert kwargs["retry_delay"] == timedelta(seconds=45)
-        assert kwargs["deferrable"] is False
+        assert kwargs["deferrable"] is True
 
     def test_terminate_deferrable_true_when_config_overrides(self, emr_ctx):
         mock_term = MagicMock()
