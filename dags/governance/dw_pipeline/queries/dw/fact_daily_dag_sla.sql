@@ -1,3 +1,4 @@
+-- Release trigger: replay SLA query artifacts after the original master build failed.
 WITH dag_rollup AS (
     SELECT
         ds.id_dag,

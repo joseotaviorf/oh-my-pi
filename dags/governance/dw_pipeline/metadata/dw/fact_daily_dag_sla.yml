@@ -1,4 +1,5 @@
 ---
+# Release trigger: replay SLA metadata artifacts after the original master build failed.
 database_name: dw_pipeline
 table_name: fact_daily_dag_sla
 description: >
