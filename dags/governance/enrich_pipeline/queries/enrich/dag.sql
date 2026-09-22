@@ -80,6 +80,28 @@ first_execution AS (
         id_dag LIKE 'bietlejuice%'
     GROUP BY 1
 ),
+declared_tags_ranked AS (
+    -- criticality / deadline are declared in *_declaration.yml and reach the lake only as
+    -- Airflow DAG tags inside the serialized DAG JSON.
+    SELECT
+        id_dag,
+        GET_JSON_OBJECT(json_data, '$.dag.tags') AS tags,
+        ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_last_updated DESC) AS rn
+    FROM
+        datalake_astro_clean.serialized_dag
+    WHERE
+        MAKE_DATE(year, month, day) >= DATE_SUB(CURRENT_DATE, 7)  -- daily full export
+),
+declared_tags AS (
+    SELECT
+        id_dag,
+        NULLIF(REGEXP_EXTRACT(tags, 'criticality:(Critical|High|Medium|Low)', 1), '') AS criticality,
+        NULLIF(REGEXP_EXTRACT(tags, 'sla_deadline_localtime:([0-2][0-9]:[0-5][0-9])', 1), '') AS sla_deadline_localtime
+    FROM
+        declared_tags_ranked
+    WHERE
+        rn = 1
+),
 base_amount_of_tasks AS (
     -- As some DAGs won't execute all its tasks everyday, like DAGs using short-circuit operators, we're assuming that the last run
     -- that had a cluster/job terminated is the one that we'll use to count the amount of tasks
@@ -200,6 +222,8 @@ base AS (
         s.is_in_sla_ignoring_list,
         s.is_inside_sla,
         d.is_datamart,
+        dt.criticality,
+        dt.sla_deadline_localtime,
         IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
         fe.ts_first_event,
         FROM_UTC_TIMESTAMP(fe.ts_first_event, 'America/Sao_Paulo') AS ts_first_event_brt,
@@ -238,6 +262,9 @@ base AS (
     LEFT JOIN
         amount_of_tasks AS ao
             ON ao.id_dag = d.id_dag
+    LEFT JOIN
+        declared_tags AS dt
+            ON dt.id_dag = d.id_dag
     JOIN
         datalake_pipeline.line AS l
             ON l.line_name = d.line_name
@@ -260,6 +287,8 @@ SELECT
     has_special_scheduler,
     is_in_sla_ignoring_list,
     is_datamart,
+    criticality,
+    sla_deadline_localtime,
     has_todays_run_happened,
     CASE
         WHEN has_todays_run_happened = TRUE AND is_inside_sla = TRUE AND is_in_sla_ignoring_list = FALSE THEN TRUE

@@ -77,6 +77,21 @@ columns:
       If it's null, it could be because the DAG is in our SLA exclusion list, it's not active or it's paused.
   is_datamart:
     description: Boolean flag indicating if the DAG is related to datamarts.
+  criticality:
+    lineage:
+      - datalake_astro_clean.serialized_dag.json_data
+    description: >
+      Declared criticality tier of the DAG, read from its Airflow tags. NULL when the DAG
+      declares no tier. A Critical table never raises this value.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  sla_deadline_localtime:
+    lineage:
+      - datalake_astro_clean.serialized_dag.json_data
+    description: Declared delivery deadline as São Paulo wall-clock HH:MM; NULL when the DAG declares no deadline.
   has_special_scheduler:
     description: Boolean flag indicating if the DAG doesn't run everyday and has a special scheduler 
       (such as only runs on fridays, only runs on the first day of the month, etc.).

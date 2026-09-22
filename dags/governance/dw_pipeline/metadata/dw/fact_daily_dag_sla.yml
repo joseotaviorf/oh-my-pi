@@ -1,0 +1,84 @@
+---
+database_name: dw_pipeline
+table_name: fact_daily_dag_sla
+description: >
+  One row per DAG that declares a criticality tier, per snapshot date. Delivery is judged
+  against the deadline declared on the DAG, collapsed so an intraday DAG counts once.
+  criticality is the DAG's own declared tier, which a Critical table never raises.
+domain: Data Ops & Governance
+owner: jose.rferreira@quintoandar.com
+columns:
+  sk_dag:
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+    description: DAG identifier; joins to dw_pipeline.dim_dag.
+  sk_line:
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_line
+    description: Surrogate key of the DAG owner line; joins to dw_pipeline.dim_line.
+  sk_snapshot_date:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Date key in yyyyMMdd format for the snapshot date.
+  criticality:
+    lineage:
+      - datalake_pipeline.dag_sla_information.criticality
+    description: >
+      The DAG's own declared tier. A Critical table produced by this DAG does not raise it.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  sla_deadline_localtime:
+    lineage:
+      - datalake_pipeline.dag_sla_information.sla_deadline_localtime
+    description: Declared delivery deadline as São Paulo wall-clock HH:MM; NULL when the DAG declares no deadline.
+  is_active_and_unpaused:
+    lineage:
+      - datalake_pipeline.dag_sla_information.is_active_and_unpaused
+    description: Whether the DAG was active and unpaused on the snapshot date.
+  is_in_ignoring_list:
+    lineage:
+      - datalake_pipeline.dag_sla_information.is_in_ignoring_list
+    description: Whether the DAG was excluded from the legacy SLA calculation on the snapshot date.
+  is_executed:
+    lineage:
+      - datalake_pipeline.dag_sla_information.is_executed
+    description: Whether the DAG had at least one run on the snapshot date.
+  is_run_successful:
+    lineage:
+      - datalake_pipeline.dag_sla_information.is_run_successful
+    description: Whether a run on the snapshot date ended in success.
+  is_inside_sla:
+    lineage:
+      - datalake_pipeline.dag_sla_information.is_inside_sla
+    description: Legacy fixed-hour SLA verdict, carried so both definitions can be charted together.
+  is_inside_declared_sla:
+    lineage:
+      - datalake_pipeline.dag_sla_information.is_inside_declared_sla
+    description: >
+      Whether delivery met the declared deadline. NULL means undecided: no deadline, the DAG
+      is paused, or the deadline has not been reached yet.
+  ts_first_successful_delivery_brt:
+    lineage:
+      - datalake_pipeline.dag_sla_information.ts_last_table_task_successful_brt
+    description: São Paulo timestamp of the earliest successful table delivery recorded for the snapshot date.
+  dt_snapshot:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Calendar date of the SLA snapshot.
+  ts_load:
+    description: Timestamp when this fact row was loaded by the dw_pipeline DAG.
+  year:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Year component of dt_snapshot, used for Hive partitioning.
+  month:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Month component of dt_snapshot, used for Hive partitioning.
+  day:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Day component of dt_snapshot, used for Hive partitioning.

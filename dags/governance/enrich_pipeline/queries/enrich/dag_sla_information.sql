@@ -127,6 +127,8 @@ dag_base AS (
         d.id_dag,
         d.id_line,
         d.layer,
+        d.criticality,
+        d.sla_deadline_localtime,
         d.is_datamart,
         COALESCE(
             ads.is_paused,
@@ -233,6 +235,8 @@ base AS (
     SELECT DISTINCT
         d.id_dag,
         d.id_line,
+        d.criticality,
+        d.sla_deadline_localtime,
         TRUE AS is_active,
         CASE
             WHEN d.is_paused = FALSE THEN TRUE
@@ -273,6 +277,17 @@ base AS (
             WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN FALSE
             ELSE NULL
         END AS is_inside_sla,
+        CASE
+            WHEN d.sla_deadline_localtime IS NULL OR d.is_paused = TRUE THEN NULL
+            WHEN db.ts_last_table_task_successful_brt IS NOT NULL
+                AND db.ts_last_table_task_successful_brt
+                    <= CAST(CONCAT(CAST(d.dt_event AS STRING), ' ', d.sla_deadline_localtime, ':00') AS TIMESTAMP) THEN TRUE
+            WHEN db.ts_last_table_task_successful_brt IS NOT NULL THEN FALSE
+            -- deadline not reached yet on the snapshot day: undecided, not a miss
+            WHEN FROM_UTC_TIMESTAMP(NOW(), 'America/Sao_Paulo')
+                    <= CAST(CONCAT(CAST(d.dt_event AS STRING), ' ', d.sla_deadline_localtime, ':00') AS TIMESTAMP) THEN NULL
+            ELSE FALSE
+        END AS is_inside_declared_sla,
         CASE
             WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN TRUE
             WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = TRUE THEN FALSE
@@ -335,6 +350,8 @@ base AS (
 SELECT
     id_dag,
     id_line,
+    criticality,
+    sla_deadline_localtime,
     is_active,
     is_active_and_unpaused,
     is_executed,
@@ -345,6 +362,7 @@ SELECT
     is_inside_sla,
     is_outside_sla,
     is_null_sla,
+    is_inside_declared_sla,
     is_run_successful,
     is_run_failed,
     is_manual_run,

@@ -16,6 +16,21 @@ columns:
     lineage:
       - datalake_pipeline.dag.id_line
     description: Surrogate key of the DAG owner line; joins to datalake_pipeline.line.
+  criticality:
+    lineage:
+      - datalake_pipeline.dag.criticality
+    description: >
+      Declared criticality tier of the DAG. NULL when the DAG declares no tier.
+      This is the DAG's own tier; a Critical table never raises it.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  sla_deadline_localtime:
+    lineage:
+      - datalake_pipeline.dag.sla_deadline_localtime
+    description: Declared delivery deadline as São Paulo wall-clock HH:MM; NULL when the DAG declares no deadline.
   is_active:
     lineage:
       - datalake_pipeline.dag.ts_first_event
@@ -75,6 +90,13 @@ columns:
       - datalake_gsheets_clean.dags_special_scheduler.id_dag
       - datalake_gsheets_clean.dags_sla_exclusion_list.dag
     description: Boolean flag indicating whether SLA status is null because the DAG is ignored or had no evaluable run.
+  is_inside_declared_sla:
+    lineage:
+      - datalake_pipeline.dag_run.ts_last_table_task_successful_brt
+      - datalake_pipeline.dag.sla_deadline_localtime
+    description: >
+      Whether the last table task succeeded by the DAG's declared São Paulo deadline.
+      NULL means undecided: no deadline, the DAG is paused, or the deadline has not been reached yet.
   has_possible_problem:
     lineage:
       - datalake_pipeline.dag_run.is_first_execution_inside_sla

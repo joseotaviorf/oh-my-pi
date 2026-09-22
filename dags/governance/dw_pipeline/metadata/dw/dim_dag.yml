@@ -21,6 +21,21 @@ columns:
       metric: 'Metric layer'
       raw/clean: 'Raw/clean layers'
       reverse: 'Reverse layer'
+  criticality:
+    lineage:
+      - datalake_pipeline.dag.criticality
+    description: >
+      Declared criticality tier of the DAG. NULL when the DAG declares no tier.
+      This is the DAG's own tier; a Critical table never raises it.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  sla_deadline_localtime:
+    lineage:
+      - datalake_pipeline.dag.sla_deadline_localtime
+    description: Declared delivery deadline as São Paulo wall-clock HH:MM; NULL when the DAG declares no deadline.
   schedule_interval:
     lineage:
       - datalake_pipeline.dag.schedule_interval
@@ -54,6 +69,10 @@ columns:
     lineage:
       - datalake_pipeline.dag.duration
     description: Total duration of the most recent DAG run, in minutes.
+  median_duration:
+    lineage:
+      - datalake_pipeline.dag.median_duration
+    description: Median duration of the DAG run, in minutes.
   is_active:
     lineage:
       - datalake_pipeline.dag.is_active
@@ -107,7 +126,7 @@ columns:
     description: The DAG's median timestamp of start in BRT timezone.
   ts_last_execution_ended:
     lineage:
-      -datalake_pipeline.dag.ts_last_run_ended
+      - datalake_pipeline.dag.ts_last_run_ended
     description: The UTC timestamp of when the DAG's last execution has ended.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.

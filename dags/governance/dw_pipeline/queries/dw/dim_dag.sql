@@ -1,6 +1,8 @@
 SELECT
     d.id_dag AS sk_dag,
     d.layer,
+    d.criticality,
+    d.sla_deadline_localtime,
     d.schedule_interval,
     d.state,
     d.utc_sla_hour,
