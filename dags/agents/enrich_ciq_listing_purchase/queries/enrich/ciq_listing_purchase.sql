@@ -91,16 +91,12 @@ house_listing_ciq AS (
         IF(cons.business_context = 'RENT', cons.id_listing, CAST(NULL AS BIGINT)) AS id_house_listing,
         cons.id_enrollment,
         cons.id_partner,
-        ae.id_internal_agent,
         cons.id_user,
         cons.consultant_type,
         cons.business_context,
         hr.ts_house_registration
     FROM
         datalake_big_agent.house_listing_consultant AS cons
-    LEFT JOIN
-        datalake_big_agent.agent_enrollment AS ae
-            ON ae.id_enrollment = cons.id_enrollment
     LEFT JOIN
         house_registration AS hr
             ON hr.id_house = cons.id_house
@@ -275,7 +271,6 @@ listing_purchase_rent AS (
         CAST(NULL AS BIGINT) AS id_offer,
         h.id_owner,
         ca.id_user AS id_ciq_user,
-        ca.id_internal_agent,
         ca.id_enrollment,
         ae.id AS id_accounting_entry,
         ld.id_address_parsed_short AS id_address_parsed_duplicity,
@@ -411,7 +406,6 @@ listing_purchase_sale AS (
         TRY_CAST(sa.id_offer AS BIGINT) AS id_offer,
         h.id_owner,
         ca.id_user AS id_ciq_user,
-        ca.id_internal_agent,
         ca.id_enrollment,
         CAST(NULL AS BIGINT) AS id_accounting_entry,
         ld.id_address_parsed_short AS id_address_parsed_duplicity,
@@ -490,7 +484,6 @@ listing_purchase AS (
         id_offer,
         id_owner,
         id_ciq_user,
-        id_internal_agent,
         id_enrollment,
         id_accounting_entry,
         id_address_parsed_duplicity,
@@ -545,7 +538,6 @@ listing_purchase AS (
         id_offer,
         id_owner,
         id_ciq_user,
-        id_internal_agent,
         id_enrollment,
         id_accounting_entry,
         id_address_parsed_duplicity,
@@ -600,7 +592,6 @@ SELECT
     id_offer,
     id_owner,
     id_ciq_user,
-    id_internal_agent,
     id_enrollment,
     id_accounting_entry,
     id_address_parsed_duplicity,

@@ -109,12 +109,10 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     CAST(u.id_facebook AS VARCHAR(255)) AS facebook_id,
     CAST(u.id_linkedin AS VARCHAR(255)) AS linkedin_id,
     NULLIF(CAST(u.id_google AS VARCHAR(255)), '') AS google_id,
-    CAST(acpr.id_partner AS BIGINT) AS id_partner,
     um.predecessor_user_list AS predecessor_user_list,
     u.country_code,
     CAST(u.is_active AS INTEGER) AS active,
     CAST(u.is_blocked AS INTEGER) AS bloqueado,
-    acpr.consultant_type,
     CAST(ad.is_active AS INTEGER) AS dadosafiliado_ativo,
     CAST(ag.is_active AS INTEGER) AS dadosagente_ativo,
     CAST(p.is_active AS INTEGER) AS dadosfotografo_ativo,
@@ -221,10 +219,6 @@ LEFT JOIN
 LEFT JOIN
     house_counts AS hc
         ON hc.id_owner = u.id
-LEFT JOIN
-    datalake_big_agent.agent_enrollment AS acpr
-        ON u.id = acpr.id_user
-        AND acpr.is_last_enrollment_by_agent = True
 LEFT JOIN
     datalake_ebdb_user.user_merge AS um
         ON u.id = um.id_user

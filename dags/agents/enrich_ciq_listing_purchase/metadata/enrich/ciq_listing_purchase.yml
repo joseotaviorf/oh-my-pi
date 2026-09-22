@@ -54,10 +54,6 @@ columns:
       id_ciq_user are not eligible for Compra de Carteira payment.
     lineage:
       - datalake_big_agent.house_listing_consultant.id_user
-  id_internal_agent:
-    description: Big-agent internal agent id linked to CIQ enrollment.
-    lineage:
-      - datalake_big_agent.agent_enrollment.id_internal_agent
   id_enrollment:
     description: Big-agent enrollment id for CIQ assignment.
     lineage:

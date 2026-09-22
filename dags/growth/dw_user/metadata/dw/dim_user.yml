@@ -54,10 +54,6 @@ columns:
     lineage:
     - datalake_ebdb_user.user.id_google
     description: Google ID registered when the user signs up using Google account.
-  id_partner:
-    lineage:
-    - datalake_big_agent.agent_enrollment.id_partner
-    description: Identifier of the B2B partner company associated with the user, when the user is a partner agent on their latest Big Agent enrollment. Joinable with dim_partner.
   predecessor_user_list:
     lineage:
     - datalake_ebdb_user.user_merge.predecessor_user_list
@@ -83,14 +79,6 @@ columns:
     categories:
       '1': True.
       '0': False.
-  consultant_type:
-    lineage:
-    - datalake_big_agent.agent_enrollment.consultant_type
-    description: Big Agent program tier of the user's latest enrollment (for example ASP, CIQ_FULL, or CIQ_MANAGER).
-    categories:
-      ASP: Owner advisor, it works a lot like CIQ Manage.
-      CIQ_FULL: Agent fully responsible for the property, publication and management.
-      CIQ_MANAGER: House belongs to a client but is managed by a CIQ.
   dadosafiliado_ativo:
     lineage:
     - datalake_ebdb_user.affiliate_data.is_active
