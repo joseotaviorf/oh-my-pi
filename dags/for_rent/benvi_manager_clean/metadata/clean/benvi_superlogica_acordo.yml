@@ -3,85 +3,220 @@ table_name: benvi_superlogica_acordo
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica AGREEMENT parcels from financeiro GET /acordos/index (RAW
-  acordos). Grain is one parcel per id_acordo_aco | id_recebimento_recb.
-  id_acordo_aco groups parcels of the same agreement. Joins cobranca on
-  id_recebimento_recb and locatario on id_sacado_sac. Debtor name, document,
-  email, and address columns are PII.
+  Superlogica AGREEMENT projection at one row per instalment of a debt settlement, widened to
+  the whole vendor payload so the RAW acordos spreadsheet tab becomes a lake query. The vendor
+  calls the instalment id id_parcela_acp while the spreadsheet calls it id_recebimento_recb;
+  both names are exposed and every value matches a benvi_superlogica_cobranca row. Debtor name
+  and document are personal detail governed by Trino column-level ACL.
 columns:
   id:
-    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   vendor_natural_key:
-    description: Pipe-joined agreement id and receipt id as landed in lake_mirror.
+    description: >-
+      Composite vendor key the ingestion assembles as settlement id joined to instalment id
+      with a pipe.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
   id_acordo_aco:
-    description: Agreement id (left half of the composite key). Groups parcels.
+    description: >-
+      Settlement agreement identifier. Groups the instalments that belong to one
+      renegotiation.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_parcela_acp:
+    description: >-
+      Vendor instalment identifier of the settlement. Every value resolves to a receivable in
+      benvi_superlogica_cobranca.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   id_recebimento_recb:
-    description: Parcel charge id. Foreign key to cobranca.id_recebimento_recb.
+    description: >-
+      Same instalment identifier under the name the extraction spreadsheet uses. Kept so a
+      query written against the spreadsheet ports without a rename.
     lineage:
-      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_recebimento_recb1:
+    description: >-
+      Duplicate of the instalment identifier the vendor portal emits twice. Reproduced so the
+      spreadsheet shape lines up column for column.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   id_sacado_sac:
-    description: Debtor id on the agreement payload. Foreign key to locatario.id_sacado_sac.
+    description: "Billed debtor of the settlement. Join to benvi_superlogica_locatario.id_sacado_sac."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   id_pessoa_pes:
-    description: Resolved TENANT vendor person id via locatario.id_sacado_sac.
+    description: >-
+      Tenant person resolved from the sacado so settlements read against the tenant
+      projection.
     lineage:
       - datalake_benvi_manager_clean.benvi_superlogica_locatario.id_pessoa_pes
   id_contrato_con:
-    description: Contract vendor id brought in from the joined cobranca row.
+    description: "Rental contract behind the instalment, denormalized from the charge projection."
     lineage:
       - datalake_benvi_manager_clean.benvi_superlogica_cobranca.id_contrato_con
-  st_nome_sac:
-    description: Debtor name on the agreement payload (PII).
+  nm_nfse_not:
+    description: >-
+      Vendor numeric value nfse held on the fiscal invoice inside the Superlogica AGREEMENT
+      payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
-  st_cgc_sac:
-    description: Debtor CPF or CNPJ on the agreement payload (PII).
+  nm_nfe_not:
+    description: >-
+      Vendor numeric value nfe held on the fiscal invoice inside the Superlogica AGREEMENT
+      payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
-  st_email_sac:
-    description: Debtor email on the agreement payload (PII).
+  id_nota_not:
+    description: >-
+      Vendor identifier nota held on the fiscal invoice inside the Superlogica AGREEMENT
+      payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
-  st_endereco_sac:
-    description: Debtor street address on the agreement payload (PII).
+  st_sincro_sac:
+    description: >-
+      Vendor text value sincro held on the sacado, the billed debtor inside the Superlogica
+      AGREEMENT payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
-  st_numero_sac:
-    description: Debtor street number on the agreement payload (PII).
+  fl_tipo_acoi:
+    description: "Vendor status or boolean flag tipo acoi as the Superlogica AGREEMENT payload spells it."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
-  st_complemento_sac:
-    description: Debtor address complement on the agreement payload (PII).
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
-  st_bairro_sac:
-    description: Debtor neighborhood on the agreement payload (PII).
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
-  st_cidade_sac:
-    description: Debtor city on the agreement payload (PII).
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
-  st_estado_sac:
-    description: Debtor state on the agreement payload (PII).
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
-  st_cep_sac:
-    description: Debtor postal code on the agreement payload (PII).
+  dt_competencia_recb:
+    description: >-
+      Calendar date competencia held on the receivable charge inside the Superlogica AGREEMENT
+      payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   dt_vencimento_recb:
-    description: Parcel due date from the vendor payload.
+    description: >-
+      Calendar date vencimento held on the receivable charge inside the Superlogica AGREEMENT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_total_recb:
+    description: >-
+      Monetary amount in BRL total held on the receivable charge inside the Superlogica
+      AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_liquidacao_recb:
+    description: >-
+      Calendar date liquidacao held on the receivable charge inside the Superlogica AGREEMENT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_recb:
+    description: >-
+      Vendor status or boolean flag status held on the receivable charge inside the
+      Superlogica AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label_recb:
+    description: >-
+      Vendor text value label held on the receivable charge inside the Superlogica AGREEMENT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_acordo_aco1:
+    description: "Vendor identifier acordo aco1 as the Superlogica AGREEMENT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricao_aco:
+    description: >-
+      Vendor text value descricao held on the debt settlement agreement inside the Superlogica
+      AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_empresa_emp:
+    description: >-
+      Vendor identifier empresa held on the vendor tenant company inside the Superlogica
+      AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_acordo_aco:
+    description: >-
+      Calendar date acordo held on the debt settlement agreement inside the Superlogica
+      AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_desfeito_aco:
+    description: >-
+      Calendar date desfeito held on the debt settlement agreement inside the Superlogica
+      AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_parcela_aco:
+    description: >-
+      Vendor numeric value parcela held on the debt settlement agreement inside the
+      Superlogica AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_itens_aco:
+    description: >-
+      Vendor free text itens held on the debt settlement agreement inside the Superlogica
+      AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_juros_aco:
+    description: >-
+      Vendor free text juros held on the debt settlement agreement inside the Superlogica
+      AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_transacao_ctr:
+    description: >-
+      Vendor identifier transacao held on the payment transaction inside the Superlogica
+      AGREEMENT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_formatado:
+    description: >-
+      Vendor attribute nome formatado as the Superlogica AGREEMENT payload spells it. Personal
+      or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cgc_sac:
+    description: >-
+      Vendor text value cgc held on the sacado, the billed debtor inside the Superlogica
+      AGREEMENT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_sac:
+    description: >-
+      Vendor text value nome held on the sacado, the billed debtor inside the Superlogica
+      AGREEMENT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomeref_sac:
+    description: >-
+      Vendor text value nomeref held on the sacado, the billed debtor inside the Superlogica
+      AGREEMENT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacaoexterna_recb:
+    description: >-
+      Vendor text value observacaoexterna held on the receivable charge inside the Superlogica
+      AGREEMENT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacaointerna_recb:
+    description: >-
+      Vendor text value observacaointerna held on the receivable charge inside the Superlogica
+      AGREEMENT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
-    description: When benvi-manager last landed this vendor row.
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

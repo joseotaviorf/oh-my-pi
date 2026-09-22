@@ -1,0 +1,262 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_contrato_inquilino
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  One row per tenant attached to a rental contract, exploded from the inquilinos array on the
+  Superlogica CONTRACT payload. This is the relationship the RAW contratos_inquilinos
+  spreadsheet tab holds and it had no lake table before. A contract can carry several tenants,
+  with fl_principal_inq marking the main one and nm_fracao_inq their share. Names, documents,
+  addresses and contact channels are personal detail governed by Trino column-level ACL.
+columns:
+  id:
+    description: >-
+      Source BIGSERIAL of the parent CONTRACT record in
+      datalake_benvi_manager_raw.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_contrato_con:
+    description: >-
+      Vendor identifier of the parent CONTRACT record the array hangs off. Join it back to the
+      parent projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_imovel_imo:
+    description: >-
+      Property unit the parent contract is signed on, carried down from the parent payload so
+      the entry reads without a second join.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nr_item:
+    description: >-
+      One based position of the entry inside the vendor array, so the original ordering
+      survives the explode.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_sacado_sac:
+    description: >-
+      Vendor identifier sacado held on the sacado, the billed debtor inside the Superlogica
+      CONTRACT inquilinos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_fantasia_pes:
+    description: >-
+      Vendor text value fantasia held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_pes:
+    description: >-
+      Vendor text value endereco held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_pes:
+    description: >-
+      Vendor text value numero held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_pes:
+    description: >-
+      Vendor text value complemento held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cidade_pes:
+    description: >-
+      Vendor text value cidade held on the person record inside the Superlogica CONTRACT
+      inquilinos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estado_pes:
+    description: >-
+      Vendor text value estado held on the person record inside the Superlogica CONTRACT
+      inquilinos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cep_pes:
+    description: >-
+      Vendor text value cep held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_pes:
+    description: >-
+      Vendor text value bairro held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cnpj_pes:
+    description: >-
+      Vendor text value cnpj held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_orgao_pes:
+    description: >-
+      Vendor text value orgao held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_expedicaorg_pes:
+    description: >-
+      Calendar date expedicaorg held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_rg_pes:
+    description: >-
+      Vendor text value rg held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nacionalidade_pes:
+    description: >-
+      Vendor text value nacionalidade held on the person record inside the Superlogica
+      CONTRACT inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_naturalidade_pes:
+    description: >-
+      Vendor text value naturalidade held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estadocivil_pes:
+    description: >-
+      Vendor text value estadocivil held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_profissao_pes:
+    description: >-
+      Vendor text value profissao held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_pes:
+    description: >-
+      Vendor text value email held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_telefone_pes:
+    description: >-
+      Vendor text value telefone held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_celular_pes:
+    description: >-
+      Vendor text value celular held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomeresp_pes:
+    description: >-
+      Vendor text value nomeresp held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_nascimento_pes:
+    description: >-
+      Calendar date nascimento held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_sexo_pes:
+    description: >-
+      Vendor text value sexo held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_coj:
+    description: >-
+      Vendor text value nome held on the spouse of the person inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cpf_coj:
+    description: >-
+      Vendor text value cpf held on the spouse of the person inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_statusconvitecartao_pes:
+    description: >-
+      Vendor status or boolean flag statusconvitecartao held on the person record inside the
+      Superlogica CONTRACT inquilinos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_razaoempresa_pes:
+    description: >-
+      Vendor text value razaoempresa held on the person record inside the Superlogica CONTRACT
+      inquilinos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_pessoa_pes:
+    description: >-
+      Vendor identifier pessoa held on the person record inside the Superlogica CONTRACT
+      inquilinos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_principal_inq:
+    description: >-
+      Vendor status or boolean flag principal held on the tenant link on the contract inside
+      the Superlogica CONTRACT inquilinos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_fracao_inq:
+    description: >-
+      Vendor numeric value fracao held on the tenant link on the contract inside the
+      Superlogica CONTRACT inquilinos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomeinquilino:
+    description: >-
+      Vendor text value nomeinquilino as the Superlogica CONTRACT inquilinos payload spells
+      it. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomeinquilino_formatado:
+    description: >-
+      Vendor text value nomeinquilino formatado as the Superlogica CONTRACT inquilinos payload
+      spells it. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  item_payload:
+    description: >-
+      Whole array entry re encoded as JSON, so a vendor key added later is still readable
+      before anyone widens this projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: >-
+      Wall clock moment benvi-manager last landed the parent vendor record into the raw
+      mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

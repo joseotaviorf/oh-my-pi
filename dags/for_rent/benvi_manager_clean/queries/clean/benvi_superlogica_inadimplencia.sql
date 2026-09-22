@@ -1,3 +1,5 @@
+-- Vendor dates arrive as MM/dd/yyyy, so TO_DATE needs the format;
+-- without it every date column on this projection landed null.
 -- Left half of vendor_natural_key is TENANT id_pessoa_pes; right half is id_contrato_con.
 -- Query used TENANT.payload.id_sacado_sac; expose it from the row or the parent tenant.
 WITH delinquency_row AS (
@@ -9,7 +11,10 @@ WITH delinquency_row AS (
         get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_recebimento_recb') AS id_recebimento_recb,
         get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_lancamento_imod') AS id_lancamento_imod,
         get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_sacado_sac') AS id_sacado_sac_row,
-        TO_DATE(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_vencimento_recb')) AS dt_vencimento_recb,
+        COALESCE(
+            TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_vencimento_recb'), 1, 10), 'MM/dd/yyyy'),
+            TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_vencimento_recb'), 1, 10), 'yyyy-MM-dd')
+        ) AS dt_vencimento_recb,
         lake_mirror.synced_at AS ts_synced
     FROM
         datalake_benvi_manager_raw.lake_mirror AS lake_mirror

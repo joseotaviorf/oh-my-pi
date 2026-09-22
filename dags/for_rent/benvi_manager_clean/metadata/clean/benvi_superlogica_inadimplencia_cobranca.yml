@@ -1,50 +1,34 @@
 database_name: datalake_benvi_manager_clean
-table_name: benvi_superlogica_cobranca
+table_name: benvi_superlogica_inadimplencia_cobranca
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica CHARGE projection at one row per receivable, widened to the whole vendor payload
-  so the RAW cobrancas_full spreadsheet tab becomes a lake query and the data team can finally
-  build the complete faturas view. Every monetary column the vendor sends is projected,
-  vl_total_recb and vl_emitido_recb included. Debtor name, document, email and address are
-  personal detail: the column exists here and Trino column-level ACL is the access control.
-  The only spreadsheet column with no vendor source is dt_recebimento_recb.
+  Parity projection for the RAW inadimplencia tab of the daily extraction spreadsheet, at one
+  row per overdue charge. The vendor delinquency endpoint answers at debtor grain, so the
+  spreadsheet tab is built by keeping the overdue unsettled charges of every flagged debtor.
+  That rule is reproduced here. The existing benvi_superlogica_inadimplencia keeps its
+  contract grain shape untouched because consumers already read it. dias_atraso recomputes
+  against the run date and valorcorrigido repeats the debtor total on each of their charges,
+  so it must never be summed across rows.
 columns:
   id:
-    description: >-
-      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
-      record.
+    description: "Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror of the underlying charge."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   id_recebimento_recb:
-    description: >-
-      Vendor receivable identifier, the CHARGE lake_mirror natural key and the payload
-      id_recebimento_recb. Grain of this projection.
+    description: "Vendor receivable identifier of the overdue charge and the grain of this projection."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
-      - datalake_benvi_manager_raw.lake_mirror.payload
   id_sacado_sac:
     description: >-
-      Vendor sacado identifier of the billed debtor. Join to
-      benvi_superlogica_locatario.id_sacado_sac, not to id_pessoa_pes.
+      Billed debtor the vendor delinquency report flagged. Join to
+      benvi_superlogica_locatario.id_sacado_sac.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
-  id_pessoa_pes:
-    description: >-
-      Tenant person identifier resolved from the sacado, so charges can be read against the
-      tenant projection without repeating the lookup.
-    lineage:
-      - datalake_benvi_manager_clean.benvi_superlogica_locatario.id_pessoa_pes
   id_contrato_con:
-    description: "Rental contract the charge was issued under. Join to benvi_superlogica_contrato."
+    description: "Rental contract the overdue charge was issued under. Join to benvi_superlogica_contrato."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
-  codigo_contrato:
-    description: >-
-      Business contract code denormalized from the contract projection so analysts can read a
-      charge without a second join.
-    lineage:
-      - datalake_benvi_manager_clean.benvi_superlogica_contrato.codigo_contrato
   st_nomeref_sac:
     description: >-
       Vendor text value nomeref held on the sacado, the billed debtor inside the Superlogica
@@ -152,12 +136,6 @@ columns:
     description: >-
       Vendor text value cartaobandeira held on the sacado, the billed debtor inside the
       Superlogica CHARGE payload.
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
-  dt_vencimento_recb:
-    description: >-
-      Calendar date vencimento held on the receivable charge inside the Superlogica CHARGE
-      payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   id_empresa_emp:
@@ -1087,7 +1065,29 @@ columns:
       as JSON.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_vencimento_recb:
+    description: "Due day of the overdue charge, parsed from the vendor MM/dd/yyyy or yyyy-MM-dd string."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  origem_extracao:
+    description: >-
+      Constant provenance label the extraction script stamps on every delinquency row. No
+      vendor key exists for it, so the literal is reproduced to keep the spreadsheet shape.
+    lineage:
+  dias_atraso:
+    description: >-
+      Whole days between the due day and the run date. The spreadsheet measures it against the
+      extraction moment, so a lake row recomputes it on every projection run.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  valorcorrigido:
+    description: >-
+      Corrected total the vendor delinquency report attributes to the whole sacado, repeated
+      on each of that debtor overdue charges exactly as the extraction script does. Do not sum
+      it across rows.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
-    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
+    description: "Wall clock moment benvi-manager last landed the underlying charge into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

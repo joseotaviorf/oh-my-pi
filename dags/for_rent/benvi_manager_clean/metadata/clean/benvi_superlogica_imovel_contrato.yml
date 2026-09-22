@@ -1,0 +1,254 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_imovel_contrato
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  One row per rental contract the vendor lists under a property unit, exploded from the
+  contratos array on the Superlogica PROPERTY payload. This is the relationship the RAW
+  imoveis_contratos spreadsheet tab holds and it had no lake table before. It gives the
+  letting history of a unit without scanning the contract projection, rent value, guarantee
+  and fire insurance window included.
+columns:
+  id:
+    description: >-
+      Source BIGSERIAL of the parent PROPERTY record in
+      datalake_benvi_manager_raw.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_imovel_imo:
+    description: >-
+      Vendor identifier of the parent PROPERTY record the array hangs off. Join it back to the
+      parent projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  nr_item:
+    description: >-
+      One based position of the entry inside the vendor array, so the original ordering
+      survives the explode.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contrato_con:
+    description: >-
+      Vendor identifier contrato held on the rental contract inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_ativo_con:
+    description: >-
+      Vendor status or boolean flag ativo held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_inicio_con:
+    description: >-
+      Calendar date inicio held on the rental contract inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_ocupacao_con:
+    description: >-
+      Calendar date ocupacao held on the rental contract inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_fim_con:
+    description: >-
+      Calendar date fim held on the rental contract inside the Superlogica PROPERTY contratos
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_locacoesimovel_con:
+    description: >-
+      Vendor numeric value locacoesimovel held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label_mens:
+    description: >-
+      Vendor text value label held on the billing message inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_adm_con:
+    description: >-
+      Vendor free text adm held on the rental contract inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txadmvalorfixo_con:
+    description: >-
+      Vendor status or boolean flag txadmvalorfixo held on the rental contract inside the
+      Superlogica PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_ultimoreajuste_con:
+    description: >-
+      Calendar date ultimoreajuste held on the rental contract inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_suspenso_con:
+    description: >-
+      Vendor status or boolean flag suspenso held on the rental contract inside the
+      Superlogica PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_con:
+    description: >-
+      Vendor status or boolean flag status held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_tipo_con:
+    description: >-
+      Vendor identifier tipo held on the rental contract inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_aluguel_con:
+    description: >-
+      Monetary amount in BRL aluguel held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_diarepasse_con:
+    description: >-
+      Vendor numeric value diarepasse held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_repassegarantido_con:
+    description: >-
+      Vendor numeric value repassegarantido held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_diafixorepasse_con:
+    description: >-
+      Vendor status or boolean flag diafixorepasse held on the rental contract inside the
+      Superlogica PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_seguroincendiofim_con:
+    description: >-
+      Calendar date seguroincendiofim held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_seguradora_seg:
+    description: >-
+      Vendor identifier seguradora held on the fire insurance carrier inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_seguroincendioidentificador_con:
+    description: >-
+      Vendor text value seguroincendioidentificador held on the rental contract inside the
+      Superlogica PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_split_con:
+    description: >-
+      Vendor status or boolean flag split held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_dimob_con:
+    description: >-
+      Vendor status or boolean flag dimob held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_diavencimento_con:
+    description: >-
+      Vendor numeric value diavencimento held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_garantia_con:
+    description: >-
+      Vendor status or boolean flag garantia held on the rental contract inside the
+      Superlogica PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricaogarantia_con:
+    description: >-
+      Vendor text value descricaogarantia held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_garantiafim_con:
+    description: >-
+      Calendar date garantiafim held on the rental contract inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_valorgarantia_con:
+    description: >-
+      Monetary amount in BRL valorgarantia held on the rental contract inside the Superlogica
+      PROPERTY contratos payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificadorgarantia_con:
+    description: >-
+      Vendor text value identificadorgarantia held on the rental contract inside the
+      Superlogica PROPERTY contratos payload. Personal or banking detail, read access governed
+      by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipocaucaogarantia_con:
+    description: >-
+      Vendor status or boolean flag tipocaucaogarantia held on the rental contract inside the
+      Superlogica PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_garantiaresponsavel_con:
+    description: >-
+      Vendor status or boolean flag garantiaresponsavel held on the rental contract inside the
+      Superlogica PROPERTY contratos payload. Personal or banking detail, read access governed
+      by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_garantiainicio_con:
+    description: >-
+      Calendar date garantiainicio held on the rental contract inside the Superlogica PROPERTY
+      contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_seguroincendioinicio_con:
+    description: >-
+      Calendar date seguroincendioinicio held on the rental contract inside the Superlogica
+      PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_contratodigital_con:
+    description: >-
+      Vendor status or boolean flag contratodigital held on the rental contract inside the
+      Superlogica PROPERTY contratos payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  codigo_contrato:
+    description: >-
+      Vendor attribute codigo contrato as the Superlogica PROPERTY contratos payload spells
+      it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  detalhes_contrato:
+    description: >-
+      Vendor attribute detalhes contrato as the Superlogica PROPERTY contratos payload spells
+      it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  item_payload:
+    description: >-
+      Whole array entry re encoded as JSON, so a vendor key added later is still readable
+      before anyone widens this projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: >-
+      Wall clock moment benvi-manager last landed the parent vendor record into the raw
+      mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

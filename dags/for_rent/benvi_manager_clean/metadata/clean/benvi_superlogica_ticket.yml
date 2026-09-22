@@ -133,6 +133,18 @@ columns:
     description: Date the ticket was closed; empty while open.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_inicioticket_tic:
+    description: >-
+      Moment work on the ticket started with the time of day kept. The date column next to it
+      loses the clock, which the Roll-Up ordering needs.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_encerrado_tic:
+    description: >-
+      Moment the ticket was closed with the time of day kept, used as the closing moment by the
+      Roll-Up model.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
     description: When benvi-manager last landed this vendor row.
     lineage:

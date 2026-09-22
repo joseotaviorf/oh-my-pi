@@ -1,0 +1,339 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_contrato_proprietario
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  One row per beneficiary owner attached to a rental contract, exploded from the
+  proprietarios_beneficiarios array on the Superlogica CONTRACT payload. This is the
+  relationship the RAW contratos_proprietarios spreadsheet tab holds and it had no lake table
+  before. It carries the ownership share in nm_fracao_prb and the whole payout instruction,
+  bank branch, account and pix key included. Those and the owner personal columns are governed
+  by Trino column-level ACL.
+columns:
+  id:
+    description: >-
+      Source BIGSERIAL of the parent CONTRACT record in
+      datalake_benvi_manager_raw.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_contrato_con:
+    description: >-
+      Vendor identifier of the parent CONTRACT record the array hangs off. Join it back to the
+      parent projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_imovel_imo:
+    description: >-
+      Property unit the parent contract is signed on, carried down from the parent payload so
+      the entry reads without a second join.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nr_item:
+    description: >-
+      One based position of the entry inside the vendor array, so the original ordering
+      survives the explode.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_fantasia_pes:
+    description: >-
+      Vendor text value fantasia held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_pes:
+    description: >-
+      Vendor text value nome held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cnpj_pes:
+    description: >-
+      Vendor text value cnpj held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_orgao_pes:
+    description: >-
+      Vendor text value orgao held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_expedicaorg_pes:
+    description: >-
+      Calendar date expedicaorg held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_rg_pes:
+    description: >-
+      Vendor text value rg held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nacionalidade_pes:
+    description: >-
+      Vendor text value nacionalidade held on the person record inside the Superlogica
+      CONTRACT proprietarios_beneficiarios payload. Personal or banking detail, read access
+      governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_naturalidade_pes:
+    description: >-
+      Vendor text value naturalidade held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estadocivil_pes:
+    description: >-
+      Vendor text value estadocivil held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_profissao_pes:
+    description: >-
+      Vendor text value profissao held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_pes:
+    description: >-
+      Vendor text value endereco held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_nascimento_pes:
+    description: >-
+      Calendar date nascimento held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_pes:
+    description: >-
+      Vendor text value numero held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_pes:
+    description: >-
+      Vendor text value bairro held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cidade_pes:
+    description: >-
+      Vendor text value cidade held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estado_pes:
+    description: >-
+      Vendor text value estado held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomeresp_pes:
+    description: >-
+      Vendor text value nomeresp held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_pes:
+    description: >-
+      Vendor text value email held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_celular_pes:
+    description: >-
+      Vendor text value celular held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_telefone_pes:
+    description: >-
+      Vendor text value telefone held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_descontosimplificadoir_pes:
+    description: >-
+      Vendor status or boolean flag descontosimplificadoir held on the person record inside
+      the Superlogica CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_formarecebimento_frp:
+    description: >-
+      Vendor identifier formarecebimento held on the payout method registered for the owner
+      inside the Superlogica CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_banco_frp:
+    description: >-
+      Vendor text value banco held on the payout method registered for the owner inside the
+      Superlogica CONTRACT proprietarios_beneficiarios payload. Personal or banking detail,
+      read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_agenciabanco_frp:
+    description: >-
+      Vendor text value agenciabanco held on the payout method registered for the owner inside
+      the Superlogica CONTRACT proprietarios_beneficiarios payload. Personal or banking
+      detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_conta_frp:
+    description: >-
+      Vendor text value conta held on the payout method registered for the owner inside the
+      Superlogica CONTRACT proprietarios_beneficiarios payload. Personal or banking detail,
+      read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_tipoconta_frp:
+    description: >-
+      Vendor text value tipoconta held on the payout method registered for the owner inside
+      the Superlogica CONTRACT proprietarios_beneficiarios payload. Personal or banking
+      detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomerecebedor_frp:
+    description: >-
+      Vendor text value nomerecebedor held on the payout method registered for the owner
+      inside the Superlogica CONTRACT proprietarios_beneficiarios payload. Personal or banking
+      detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cnpjrecebedor_frp:
+    description: >-
+      Vendor text value cnpjrecebedor held on the payout method registered for the owner
+      inside the Superlogica CONTRACT proprietarios_beneficiarios payload. Personal or banking
+      detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_pessoa_pes:
+    description: >-
+      Vendor identifier pessoa held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_forma_for:
+    description: >-
+      Vendor identifier forma for as the Superlogica CONTRACT proprietarios_beneficiarios
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_operacao_frp:
+    description: >-
+      Vendor text value operacao held on the payout method registered for the owner inside the
+      Superlogica CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_tarifabancaria_frp:
+    description: >-
+      Monetary amount in BRL tarifabancaria held on the payout method registered for the owner
+      inside the Superlogica CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_diarepasse_frp:
+    description: >-
+      Calendar date diarepasse held on the payout method registered for the owner inside the
+      Superlogica CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipochavepix_frp:
+    description: >-
+      Vendor status or boolean flag tipochavepix held on the payout method registered for the
+      owner inside the Superlogica CONTRACT proprietarios_beneficiarios payload. Personal or
+      banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_chavepix_frp:
+    description: >-
+      Vendor text value chavepix held on the payout method registered for the owner inside the
+      Superlogica CONTRACT proprietarios_beneficiarios payload. Personal or banking detail,
+      read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_fracao_prb:
+    description: >-
+      Vendor numeric value fracao held on the beneficiary owner link inside the Superlogica
+      CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_principal_prb:
+    description: >-
+      Vendor status or boolean flag principal held on the beneficiary owner link inside the
+      Superlogica CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_proprietario_prb:
+    description: >-
+      Vendor status or boolean flag proprietario held on the beneficiary owner link inside the
+      Superlogica CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_propsplit_pst:
+    description: >-
+      Vendor identifier propsplit held on the owner split rule inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_fracao_rcb:
+    description: >-
+      Vendor numeric value fracao held on the payout recipient inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_proprietario_pes:
+    description: >-
+      Vendor identifier proprietario held on the person record inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_usuario_usu:
+    description: >-
+      Vendor identifier usuario held on the back office user inside the Superlogica CONTRACT
+      proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_alteracao_prb:
+    description: >-
+      Calendar date alteracao held on the beneficiary owner link inside the Superlogica
+      CONTRACT proprietarios_beneficiarios payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_proprietario_formatado:
+    description: >-
+      Vendor attribute nome proprietario formatado as the Superlogica CONTRACT
+      proprietarios_beneficiarios payload spells it. Personal or banking detail, read access
+      governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  item_payload:
+    description: >-
+      Whole array entry re encoded as JSON, so a vendor key added later is still readable
+      before anyone widens this projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: >-
+      Wall clock moment benvi-manager last landed the parent vendor record into the raw
+      mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

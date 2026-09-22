@@ -3,52 +3,1055 @@ table_name: benvi_superlogica_repasse
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica PAYOUT rows from GET /repasses?status=realizados (RAW repasses).
-  Grain is one payout per id_repasse_rep. Joins contrato on id_contrato_con,
-  cobranca on id_recebimento_recb, and locatario on id_locatario_pes
-  (TENANT vendor_natural_key).
+  Superlogica PAYOUT projection at one row per owner payout, widened to the whole vendor
+  payload so the RAW repasses spreadsheet tab becomes a lake query. fonte_extracao is the
+  provenance constant the daily extraction stamps on every row and is reproduced here so the
+  shapes line up. Owner and tenant names plus bank account columns are personal or banking
+  detail governed by Trino column-level ACL.
 columns:
   id:
-    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   id_repasse_rep:
-    description: Vendor payout id and PAYOUT lake_mirror.vendor_natural_key.
+    description: "Vendor payout identifier, the PAYOUT lake_mirror natural key. Grain of this projection."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
   id_contrato_con:
-    description: Contract vendor id on the payout payload. Foreign key to contrato.
+    description: "Rental contract the payout settles. Join to benvi_superlogica_contrato."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   codigo_contrato:
-    description: Business contract code brought in from the joined contrato row.
+    description: >-
+      Business contract code denormalized from the contract projection so a payout reads
+      without a second join.
     lineage:
       - datalake_benvi_manager_clean.benvi_superlogica_contrato.codigo_contrato
   id_recebimento_recb:
-    description: Charge vendor id on the payout payload. Foreign key to cobranca.
+    description: "Receivable charge the payout derives from. Join to benvi_superlogica_cobranca."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   id_sacado_sac:
-    description: Debtor id brought in from the joined cobranca row.
+    description: "Billed debtor behind the originating charge, denormalized from the charge projection."
     lineage:
       - datalake_benvi_manager_clean.benvi_superlogica_cobranca.id_sacado_sac
   id_locatario_pes:
-    description: Tenant person id on the payout payload. Foreign key to locatario.id_pessoa_pes.
+    description: >-
+      Tenant person the payout traces back to. Join to
+      benvi_superlogica_locatario.id_pessoa_pes.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   nome_pes:
-    description: Tenant name brought in from the joined locatario row (PII).
+    description: >-
+      Tenant name denormalized from the tenant projection. Personal detail, read access
+      governed by Trino column-level ACL.
     lineage:
       - datalake_benvi_manager_clean.benvi_superlogica_locatario.nome_pes
+  id_imovel_imo:
+    description: >-
+      Vendor identifier imovel held on the property unit inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_tipo_imo:
+    description: "Vendor text value tipo held on the property unit inside the Superlogica PAYOUT payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificador_imo:
+    description: >-
+      Vendor text value identificador held on the property unit inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_imo:
+    description: >-
+      Vendor text value endereco held on the property unit inside the Superlogica PAYOUT
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_imo:
+    description: >-
+      Vendor text value bairro held on the property unit inside the Superlogica PAYOUT
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_imo:
+    description: >-
+      Vendor text value numero held on the property unit inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cep_imo:
+    description: >-
+      Vendor text value cep held on the property unit inside the Superlogica PAYOUT payload.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cidade_imo:
+    description: >-
+      Vendor text value cidade held on the property unit inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estado_imo:
+    description: >-
+      Vendor text value estado held on the property unit inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_imo:
+    description: >-
+      Vendor text value complemento held on the property unit inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_tipodimob_imo:
+    description: >-
+      Vendor text value tipodimob held on the property unit inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_tipo_con:
+    description: >-
+      Vendor identifier tipo held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_inicio_con:
+    description: "Calendar date inicio held on the rental contract inside the Superlogica PAYOUT payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_fim_con:
+    description: "Calendar date fim held on the rental contract inside the Superlogica PAYOUT payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_adm_con:
+    description: "Vendor free text adm held on the rental contract inside the Superlogica PAYOUT payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_aluguel_con:
+    description: >-
+      Monetary amount in BRL aluguel held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_diavencimento_con:
+    description: >-
+      Vendor numeric value diavencimento held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_indicereajuste_con:
+    description: >-
+      Vendor identifier indicereajuste held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txjuros_con:
+    description: >-
+      Vendor numeric value txjuros held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txmulta_con:
+    description: >-
+      Vendor numeric value txmulta held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txdesconto_con:
+    description: >-
+      Vendor numeric value txdesconto held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_locacao_con:
+    description: >-
+      Vendor free text locacao held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_corretor_con:
+    description: >-
+      Vendor identifier corretor held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_garantia_con:
+    description: >-
+      Vendor status or boolean flag garantia held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipocaucaogarantia_con:
+    description: >-
+      Vendor status or boolean flag tipocaucaogarantia held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricaogarantia_con:
+    description: >-
+      Vendor text value descricaogarantia held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificadorgarantia_con:
+    description: >-
+      Vendor text value identificadorgarantia held on the rental contract inside the
+      Superlogica PAYOUT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacaogarantia_con:
+    description: >-
+      Vendor text value observacaogarantia held on the rental contract inside the Superlogica
+      PAYOUT payload. Personal or banking detail, read access governed by Trino column-level
+      ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_valorgarantia_con:
+    description: >-
+      Monetary amount in BRL valorgarantia held on the rental contract inside the Superlogica
+      PAYOUT payload. Personal or banking detail, read access governed by Trino column-level
+      ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_diarepasse_con:
+    description: >-
+      Vendor numeric value diarepasse held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_mesreajuste_con:
+    description: >-
+      Vendor numeric value mesreajuste held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_rescisao_con:
+    description: >-
+      Calendar date rescisao held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_ativo_con:
+    description: >-
+      Vendor status or boolean flag ativo held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_garantiainicio_con:
+    description: >-
+      Calendar date garantiainicio held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_garantiafim_con:
+    description: >-
+      Calendar date garantiafim held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_garantiaresponsavel_con:
+    description: >-
+      Vendor status or boolean flag garantiaresponsavel held on the rental contract inside the
+      Superlogica PAYOUT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_garantiaparcelas_con:
+    description: >-
+      Vendor numeric value garantiaparcelas held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_garantiaparcela_con:
+    description: >-
+      Monetary amount in BRL garantiaparcela held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_seguroincendioinicio_con:
+    description: >-
+      Calendar date seguroincendioinicio held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_seguroincendiofim_con:
+    description: >-
+      Calendar date seguroincendiofim held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_seguroincendio_con:
+    description: >-
+      Monetary amount in BRL seguroincendio held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_seguroincendiodescricao_con:
+    description: >-
+      Vendor text value seguroincendiodescricao held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_seguroincendioidentificador_con:
+    description: >-
+      Vendor text value seguroincendioidentificador held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_responsavelcontrato_con:
+    description: >-
+      Vendor status or boolean flag responsavelcontrato held on the rental contract inside the
+      Superlogica PAYOUT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_seguroincendioplanocontrato_con:
+    description: >-
+      Vendor text value seguroincendioplanocontrato held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_seguroincendioobservacao_con:
+    description: >-
+      Vendor text value seguroincendioobservacao held on the rental contract inside the
+      Superlogica PAYOUT payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_seguroincendio_con:
+    description: >-
+      Vendor status or boolean flag seguroincendio held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_locacoesimovel_con:
+    description: >-
+      Vendor numeric value locacoesimovel held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_mensalidade_mens:
+    description: >-
+      Vendor identifier mensalidade held on the billing message inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_endcobranca_con:
+    description: >-
+      Vendor status or boolean flag endcobranca held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cep_con:
+    description: >-
+      Vendor text value cep held on the rental contract inside the Superlogica PAYOUT payload.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_con:
+    description: >-
+      Vendor text value endereco held on the rental contract inside the Superlogica PAYOUT
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_con:
+    description: >-
+      Vendor text value numero held on the rental contract inside the Superlogica PAYOUT
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_con:
+    description: >-
+      Vendor text value complemento held on the rental contract inside the Superlogica PAYOUT
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_con:
+    description: >-
+      Vendor text value bairro held on the rental contract inside the Superlogica PAYOUT
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cidade_con:
+    description: >-
+      Vendor text value cidade held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_ultimoreajuste_con:
+    description: >-
+      Calendar date ultimoreajuste held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estado_con:
+    description: >-
+      Vendor text value estado held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txadmvalorfixo_con:
+    description: >-
+      Vendor status or boolean flag txadmvalorfixo held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txlocacaovalorfixo_con:
+    description: >-
+      Vendor status or boolean flag txlocacaovalorfixo held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_parcelastxlocacao_con:
+    description: >-
+      Vendor numeric value parcelastxlocacao held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_repassegarantido_con:
+    description: >-
+      Vendor numeric value repassegarantido held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_cobrarnosegundoaluguel_con:
+    description: >-
+      Vendor status or boolean flag cobrarnosegundoaluguel held on the rental contract inside
+      the Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_primeiraparcela_con:
+    description: >-
+      Vendor identifier primeiraparcela held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reterir_con:
+    description: >-
+      Vendor status or boolean flag reterir held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label_mens:
+    description: >-
+      Vendor text value label held on the billing message inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_emitirnotafiscal_con:
+    description: >-
+      Vendor status or boolean flag emitirnotafiscal held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contabanco_cb:
+    description: "Vendor identifier contabanco cb as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_mesvencido_con:
+    description: >-
+      Vendor status or boolean flag mesvencido held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_diafixorepasse_con:
+    description: >-
+      Vendor status or boolean flag diafixorepasse held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_clausulas_con:
+    description: >-
+      Vendor text value clausulas held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_faturamento_con:
+    description: >-
+      Calendar date faturamento held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_multacontratual_con:
+    description: >-
+      Vendor free text multacontratual held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_tarifabancariarepasse_con:
+    description: >-
+      Monetary amount in BRL tarifabancariarepasse held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tarifabancariarepasse_con:
+    description: >-
+      Vendor status or boolean flag tarifabancariarepasse held on the rental contract inside
+      the Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_txbancaria_mens:
+    description: >-
+      Vendor identifier txbancaria held on the billing message inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_cobrartxbancaria_con:
+    description: >-
+      Vendor status or boolean flag cobrartxbancaria held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_endereco_sen:
+    description: "Vendor identifier endereco sen as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_con:
+    description: >-
+      Vendor status or boolean flag status held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipoentrega_con:
+    description: >-
+      Vendor status or boolean flag tipoentrega held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_suspenso_con:
+    description: >-
+      Vendor status or boolean flag suspenso held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_dimob_con:
+    description: >-
+      Vendor status or boolean flag dimob held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_desocupacao_con:
+    description: >-
+      Calendar date desocupacao held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_atividadecomercial_con:
+    description: >-
+      Vendor text value atividadecomercial held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txlocacao_con:
+    description: >-
+      Vendor status or boolean flag txlocacao held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_renovacao_con:
+    description: >-
+      Calendar date renovacao held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_irdeduzirtxadm_con:
+    description: >-
+      Vendor status or boolean flag irdeduzirtxadm held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_carencia_con:
+    description: >-
+      Vendor numeric value carencia held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_seguro_seg:
+    description: >-
+      Vendor identifier seguro held on the fire insurance carrier inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_mesfechado_con:
+    description: >-
+      Vendor status or boolean flag mesfechado held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_cadastro_con:
+    description: >-
+      Calendar date cadastro held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_filial_fil:
+    description: "Vendor identifier filial fil as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_split_con:
+    description: >-
+      Vendor status or boolean flag split held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_contratodigital_con:
+    description: >-
+      Vendor status or boolean flag contratodigital held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_arquivo_arq:
+    description: "Vendor identifier arquivo arq as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacaorecisao_con:
+    description: >-
+      Vendor text value observacaorecisao held on the rental contract inside the Superlogica
+      PAYOUT payload. Personal or banking detail, read access governed by Trino column-level
+      ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacao_con:
+    description: >-
+      Vendor text value observacao held on the rental contract inside the Superlogica PAYOUT
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_importanciaseguradaincendio_con:
+    description: >-
+      Monetary amount in BRL importanciaseguradaincendio held on the rental contract inside
+      the Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_premioseguroincendio_con:
+    description: >-
+      Monetary amount in BRL premioseguroincendio held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_seguradora_seg:
+    description: >-
+      Vendor identifier seguradora held on the fire insurance carrier inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_motivopausa_con:
+    description: >-
+      Vendor text value motivopausa held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_ultimapausa_con:
+    description: >-
+      Calendar date ultimapausa held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_parcelasseguroincendio_con:
+    description: >-
+      Vendor numeric value parcelasseguroincendio held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_seguradorafianca_con:
+    description: >-
+      Vendor identifier seguradorafianca held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_forma_pag:
+    description: "Vendor identifier forma pag as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_locacaodigital_con:
+    description: >-
+      Vendor status or boolean flag locacaodigital held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_previsaodesocupacao_con:
+    description: >-
+      Calendar date previsaodesocupacao held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_sincronizacaofaturamento_con:
+    description: >-
+      Calendar date sincronizacaofaturamento held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_linkpropostaexterna_con:
+    description: >-
+      Vendor text value linkpropostaexterna held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_propostaexterna_con:
+    description: >-
+      Vendor text value propostaexterna held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_mesesisencaomulta_con:
+    description: >-
+      Vendor numeric value mesesisencaomulta held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_ocupacao_con:
+    description: >-
+      Calendar date ocupacao held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_agentecomercial_con:
+    description: >-
+      Vendor identifier agentecomercial held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tiporepassegarantido_con:
+    description: >-
+      Vendor status or boolean flag tiporepassegarantido held on the rental contract inside
+      the Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contarepasse_con:
+    description: >-
+      Vendor identifier contarepasse held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_atualizacao_con:
+    description: >-
+      Calendar date atualizacao held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipoatividade_con:
+    description: >-
+      Vendor status or boolean flag tipoatividade held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_entregachaves_con:
+    description: >-
+      Calendar date entregachaves held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_gerente_con:
+    description: >-
+      Vendor identifier gerente held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_motivorescisao_con:
+    description: >-
+      Vendor status or boolean flag motivorescisao held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_garantia_grt:
+    description: "Vendor identifier garantia grt as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cotacao_grt:
+    description: "Vendor text value cotacao grt as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reterjurosemulta_con:
+    description: >-
+      Vendor status or boolean flag reterjurosemulta held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_multisplit_con:
+    description: >-
+      Vendor status or boolean flag multisplit held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_outromotivo_con:
+    description: >-
+      Vendor text value outromotivo held on the rental contract inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_seguroincendiostatus_con:
+    description: >-
+      Vendor status or boolean flag seguroincendiostatus held on the rental contract inside
+      the Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_identificadorimportacao_con:
+    description: >-
+      Vendor identifier identificadorimportacao held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_irporcentagemlocatario_con:
+    description: >-
+      Vendor status or boolean flag irporcentagemlocatario held on the rental contract inside
+      the Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_cobrarseguroaluguel_con:
+    description: >-
+      Vendor status or boolean flag cobrarseguroaluguel held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_renovacaoautomatica_con:
+    description: >-
+      Vendor status or boolean flag renovacaoautomatica held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_notificacaoocupacao_con:
+    description: >-
+      Calendar date notificacaoocupacao held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_notificacaodesocupacao_con:
+    description: >-
+      Calendar date notificacaodesocupacao held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_refproporcionalocupacao_con:
+    description: >-
+      Calendar date refproporcionalocupacao held on the rental contract inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_emailgarantia_con:
+    description: >-
+      Vendor text value emailgarantia held on the rental contract inside the Superlogica
+      PAYOUT payload. Personal or banking detail, read access governed by Trino column-level
+      ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_destinacaofiscal_con:
+    description: >-
+      Vendor status or boolean flag destinacaofiscal held on the rental contract inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_proc_rep:
+    description: "Calendar date proc held on the owner payout inside the Superlogica PAYOUT payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   fl_status_rep:
-    description: Payout status flag from the vendor payload (1 is realizado).
+    description: >-
+      Vendor status or boolean flag status held on the owner payout inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_liquidacao_recb:
+    description: >-
+      Calendar date liquidacao held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_credito_recb:
+    description: >-
+      Calendar date credito held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_total_recb:
+    description: >-
+      Monetary amount in BRL total held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_md5_recb:
+    description: >-
+      Vendor text value md5 held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_geracao_recb:
+    description: >-
+      Calendar date geracao held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_competencia_recb:
+    description: >-
+      Calendar date competencia held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_garantido_rep:
+    description: >-
+      Vendor status or boolean flag garantido held on the owner payout inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_vencimento_recb:
+    description: >-
+      Calendar date vencimento held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_aluguel_rep:
+    description: >-
+      Monetary amount in BRL aluguel held on the owner payout inside the Superlogica PAYOUT
+      payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   dt_repasse_rep:
-    description: Date Superlogica marked the payout as realized.
+    description: "Calendar date repasse held on the owner payout inside the Superlogica PAYOUT payload."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label3_recb:
+    description: >-
+      Vendor text value label3 held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label_recb:
+    description: >-
+      Vendor text value label held on the receivable charge inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_acordo_aco:
+    description: >-
+      Vendor identifier acordo held on the debt settlement agreement inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacaoexterna_rep:
+    description: >-
+      Vendor text value observacaoexterna held on the owner payout inside the Superlogica
+      PAYOUT payload. Personal or banking detail, read access governed by Trino column-level
+      ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_repassougarantido_rep:
+    description: >-
+      Vendor status or boolean flag repassougarantido held on the owner payout inside the
+      Superlogica PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_notafiscal_rep:
+    description: "Calendar date notafiscal held on the owner payout inside the Superlogica PAYOUT payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_repasseagrupado_rep:
+    description: >-
+      Vendor identifier repasseagrupado held on the owner payout inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_agrupado_rep:
+    description: >-
+      Vendor status or boolean flag agrupado held on the owner payout inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_split_rep:
+    description: >-
+      Vendor status or boolean flag split held on the owner payout inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_adm_rep:
+    description: "Vendor free text adm held on the owner payout inside the Superlogica PAYOUT payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txadmfixa_rep:
+    description: >-
+      Vendor status or boolean flag txadmfixa held on the owner payout inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_txadm_rep:
+    description: >-
+      Monetary amount in BRL txadm held on the owner payout inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_formapagamento_recb:
+    description: >-
+      Vendor identifier formapagamento held on the receivable charge inside the Superlogica
+      PAYOUT payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_atualizacao_rep:
+    description: >-
+      Calendar date atualizacao held on the owner payout inside the Superlogica PAYOUT
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_spliterro:
+    description: "Vendor status or boolean flag spliterro as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_splitindisponivel:
+    description: >-
+      Vendor status or boolean flag splitindisponivel as the Superlogica PAYOUT payload spells
+      it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_spl:
+    description: "Vendor status or boolean flag status spl as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_imovel_formatado:
+    description: >-
+      Vendor attribute nome imovel formatado as the Superlogica PAYOUT payload spells it.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_pagamento:
+    description: "Calendar date pagamento as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  erros_split:
+    description: >-
+      Nested array describing why a payment split could not be applied, carried verbatim as
+      JSON.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  imovel_formatado:
+    description: "Vendor attribute imovel formatado as the Superlogica PAYOUT payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  proprietarios_beneficiarios:
+    description: >-
+      Nested array of the beneficiary owners linked to this vendor record, carried verbatim as
+      JSON. Exploded one row per owner into the matching relationship projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  repasse_item:
+    description: >-
+      Nested array of the payout items, carried verbatim as JSON. Exploded one row per item
+      into benvi_superlogica_repasse_item.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  split_indisponivel:
+    description: >-
+      Nested vendor marker explaining that a payment split was unavailable, carried verbatim
+      as JSON.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fonte_extracao:
+    description: >-
+      Constant provenance label the daily extraction stamps on every payout row. No vendor key
+      exists for it, so the literal is reproduced here to keep the spreadsheet shape.
+    lineage:
   ts_synced:
-    description: When benvi-manager last landed this vendor row.
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

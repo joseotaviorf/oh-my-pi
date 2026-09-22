@@ -1,0 +1,94 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_despesa_full
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Parity projection for the RAW despesas_full tab of the daily extraction spreadsheet. Its 12
+  columns have no vendor keys behind them: the extraction script invents the names over the
+  union of contract expenses and vacant unit expenses, decodes the debit and credit party
+  codes into readable labels, and collapses recurring templates to one row each. All of that
+  is reproduced here so an analyst query written against the spreadsheet ports unchanged.
+columns:
+  id:
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_lancamento_imod:
+    description: >-
+      Vendor expense launch identifier, kept so a derived row can be traced back to
+      benvi_superlogica_despesa.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_despesa:
+    description: >-
+      Identifier the extraction spreadsheet keys the expense on. Recurring templates use the
+      template id, one off launches use the launch id.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tipo_registro:
+    description: >-
+      Tells a recurring expense template apart from a one off launch. The extraction script
+      labels a row recorrente when the vendor filled a recurrence template id and avulsa
+      otherwise.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tipo:
+    description: >-
+      Human readable kind of expense, falling back from the product description to the raw
+      product identifier exactly as the extraction script does.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  valor:
+    description: >-
+      Amount of the expense in BRL, taken from the one off launch amount, the recurring
+      template amount or the generic amount, in that order.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  quem_paga:
+    description: >-
+      Which party is debited, decoded to the same three labels the extraction spreadsheet
+      prints. An unmapped vendor code passes through unchanged.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  quem_recebe:
+    description: >-
+      Which party is credited, decoded to the same three labels the extraction spreadsheet
+      prints. An unmapped vendor code passes through unchanged.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  observacao:
+    description: >-
+      Free note the operator left on the expense. Falls back through the one off and recurring
+      note and complement slots. Free text, may carry personal detail.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  competencia:
+    description: >-
+      Accrual month of a one off launch. A recurring template has no single accrual month so
+      the extraction script writes the word recorrente, reproduced here.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_produto:
+    description: "Vendor billing product behind the expense."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contrato:
+    description: "Rental contract the expense is booked against. Join to benvi_superlogica_contrato."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_imovel:
+    description: "Property unit the expense is booked against. Join to benvi_superlogica_imovel."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  status:
+    description: >-
+      Vendor status flag of the expense, one off value first and recurring template value as
+      fallback.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

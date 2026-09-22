@@ -3,21 +3,824 @@ table_name: benvi_superlogica_fiador
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica GUARANTOR rows from lake_mirror. Treat as PII.
+  Superlogica GUARANTOR projection at one row per guarantor person, widened to the whole
+  vendor payload so the RAW fiadores spreadsheet tab maps straight onto this projection.
+  Names, documents, addresses, contact channels and bank account columns are personal or
+  banking detail: they are projected here and Trino column-level ACL is the access control,
+  the same rule benvi_superlogica_cobranca already applies to the debtor columns.
 columns:
   id:
-    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   id_pessoa_pes:
-    description: Vendor person id.
+    description: >-
+      Primary vendor key for this resource, mirrored from the GUARANTOR lake_mirror natural
+      key and identical to the payload id_pessoa_pes.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+      - datalake_benvi_manager_raw.lake_mirror.payload
   nome_pes:
-    description: Guarantor name from vendor payload (PII).
+    description: >-
+      Legacy alias of st_nome_pes kept for existing consumers. Full person name, personal
+      detail governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_pes:
+    description: >-
+      Vendor text value nome held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cnpj_pes:
+    description: >-
+      Vendor text value cnpj held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_fantasia_pes:
+    description: >-
+      Vendor text value fantasia held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_rg_pes:
+    description: >-
+      Vendor text value rg held on the person record inside the Superlogica GUARANTOR payload.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_orgao_pes:
+    description: >-
+      Vendor text value orgao held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_ie_pes:
+    description: "Vendor text value ie held on the person record inside the Superlogica GUARANTOR payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_inscmunicipal_pes:
+    description: >-
+      Vendor text value inscmunicipal held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_pes:
+    description: >-
+      Vendor text value endereco held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_pes:
+    description: >-
+      Vendor text value complemento held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_pes:
+    description: >-
+      Vendor text value numero held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cidade_pes:
+    description: >-
+      Vendor text value cidade held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estado_pes:
+    description: >-
+      Vendor text value estado held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cep_pes:
+    description: >-
+      Vendor text value cep held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_pes:
+    description: >-
+      Vendor text value bairro held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_pais_pes:
+    description: >-
+      Vendor text value pais held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_telefone_pes:
+    description: >-
+      Vendor text value telefone held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_celular_pes:
+    description: >-
+      Vendor text value celular held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_pes:
+    description: >-
+      Vendor text value email held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacao_pes:
+    description: >-
+      Vendor text value observacao held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nacionalidade_pes:
+    description: >-
+      Vendor text value nacionalidade held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_sexo_pes:
+    description: >-
+      Vendor text value sexo held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_nascimento_pes:
+    description: >-
+      Calendar date nascimento held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estadocivil_pes:
+    description: >-
+      Vendor text value estadocivil held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_profissao_pes:
+    description: >-
+      Vendor text value profissao held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_ramoatividade_pes:
+    description: >-
+      Vendor text value ramoatividade held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_trabalhocep_pes:
+    description: >-
+      Vendor text value trabalhocep held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_trabalhoendereco_pes:
+    description: >-
+      Vendor text value trabalhoendereco held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_trabalhonumero_pes:
+    description: >-
+      Vendor text value trabalhonumero held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_trabalhocomplemento_pes:
+    description: >-
+      Vendor text value trabalhocomplemento held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_trabalhobairro_pes:
+    description: >-
+      Vendor text value trabalhobairro held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_trabalhocidade_pes:
+    description: >-
+      Vendor text value trabalhocidade held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_trabalhoestado_pes:
+    description: >-
+      Vendor text value trabalhoestado held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_banco_pes:
+    description: >-
+      Vendor text value banco held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_forma_pag:
+    description: "Vendor identifier forma pag as the Superlogica GUARANTOR payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_agenciabanco_pes:
+    description: >-
+      Vendor text value agenciabanco held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_conta_pes:
+    description: >-
+      Vendor text value conta held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_sacado_sac:
+    description: >-
+      Vendor identifier sacado held on the sacado, the billed debtor inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_favorecido_fav:
+    description: "Vendor identifier favorecido held on the payee inside the Superlogica GUARANTOR payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_proprietariobeneficiario_pes:
+    description: >-
+      Vendor status or boolean flag proprietariobeneficiario held on the person record inside
+      the Superlogica GUARANTOR payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_locatario_pes:
+    description: >-
+      Vendor status or boolean flag locatario held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_corretor_pes:
+    description: >-
+      Vendor status or boolean flag corretor held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_fiador_pes:
+    description: >-
+      Vendor status or boolean flag fiador held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomerecebedor_pes:
+    description: >-
+      Vendor text value nomerecebedor held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cnpjrecebedor_pes:
+    description: >-
+      Vendor text value cnpjrecebedor held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_formarecebimento_pes:
+    description: >-
+      Vendor identifier formarecebimento held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificadorprop_pes:
+    description: >-
+      Vendor text value identificadorprop held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificadorloc_pes:
+    description: >-
+      Vendor text value identificadorloc held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_rendamensal_pes:
+    description: >-
+      Monetary amount in BRL rendamensal held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_coj:
+    description: >-
+      Vendor text value nome held on the spouse of the person inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cpf_coj:
+    description: >-
+      Vendor text value cpf held on the spouse of the person inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_rg_coj:
+    description: >-
+      Vendor text value rg held on the spouse of the person inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nacionalidade_coj:
+    description: >-
+      Vendor text value nacionalidade held on the spouse of the person inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_sexo_coj:
+    description: >-
+      Vendor text value sexo held on the spouse of the person inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_profissao_coj:
+    description: >-
+      Vendor text value profissao held on the spouse of the person inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_celular_coj:
+    description: >-
+      Vendor text value celular held on the spouse of the person inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_coj:
+    description: >-
+      Vendor text value email held on the spouse of the person inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacao_coj:
+    description: >-
+      Vendor text value observacao held on the spouse of the person inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_telefone_coj:
+    description: >-
+      Vendor text value telefone held on the spouse of the person inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_pes:
+    description: >-
+      Vendor status or boolean flag status held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_dependentes_pes:
+    description: >-
+      Vendor numeric value dependentes held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_tipoconta_pes:
+    description: >-
+      Vendor text value tipoconta held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_unidade_uni:
+    description: "Vendor identifier unidade uni as the Superlogica GUARANTOR payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomeresp_pes:
+    description: >-
+      Vendor text value nomeresp held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cpfresp_pes:
+    description: >-
+      Vendor text value cpfresp held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_telefoneresp_pes:
+    description: >-
+      Vendor text value telefoneresp held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_respcep_pes:
+    description: >-
+      Vendor text value respcep held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_respendereco_pes:
+    description: >-
+      Vendor text value respendereco held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_respnumero_pes:
+    description: >-
+      Vendor text value respnumero held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_respcomplemento_pes:
+    description: >-
+      Vendor text value respcomplemento held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_respbairro_pes:
+    description: >-
+      Vendor text value respbairro held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_respcidade_pes:
+    description: >-
+      Vendor text value respcidade held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_respestado_pes:
+    description: >-
+      Vendor text value respestado held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_respemail_pes:
+    description: >-
+      Vendor text value respemail held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_rgresp_pes:
+    description: >-
+      Vendor text value rgresp held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificadorfiador_pes:
+    description: >-
+      Vendor text value identificadorfiador held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_orgao_coj:
+    description: >-
+      Vendor text value orgao held on the spouse of the person inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_expedicaorg_pes:
+    description: >-
+      Calendar date expedicaorg held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_operacao_pes:
+    description: >-
+      Vendor text value operacao held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reterissqn_pes:
+    description: >-
+      Vendor status or boolean flag reterissqn held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reterinss_pes:
+    description: >-
+      Vendor status or boolean flag reterinss held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reterirrf_pes:
+    description: >-
+      Vendor status or boolean flag reterirrf held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reterpis_pes:
+    description: >-
+      Vendor status or boolean flag reterpis held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_retercofins_pes:
+    description: >-
+      Vendor status or boolean flag retercofins held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_retercontribuicaosocial_pes:
+    description: >-
+      Vendor status or boolean flag retercontribuicaosocial held on the person record inside
+      the Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_razaoempresa_pes:
+    description: >-
+      Vendor text value razaoempresa held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_telefoneempresa_pes:
+    description: >-
+      Vendor text value telefoneempresa held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_admissaoempresa_pes:
+    description: >-
+      Calendar date admissaoempresa held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_naodomiciliado_pes:
+    description: >-
+      Vendor status or boolean flag naodomiciliado held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_comprador_pes:
+    description: >-
+      Vendor status or boolean flag comprador held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_vistoriador_pes:
+    description: >-
+      Vendor status or boolean flag vistoriador held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificadorcorretor_pes:
+    description: >-
+      Vendor text value identificadorcorretor held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_foto_pes:
+    description: >-
+      Vendor identifier foto held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_creci_pes:
+    description: >-
+      Vendor text value creci held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_txissqn_pes:
+    description: >-
+      Monetary amount in BRL txissqn held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identidadeblockchain_pes:
+    description: >-
+      Vendor text value identidadeblockchain held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_naonotificar_pes:
+    description: >-
+      Vendor status or boolean flag naonotificar held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_fotourl_pes:
+    description: >-
+      Vendor text value fotourl held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomemae_pes:
+    description: >-
+      Vendor text value nomemae held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nomepai_pes:
+    description: >-
+      Vendor text value nomepai held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_naturalidade_pes:
+    description: >-
+      Vendor text value naturalidade held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_statusconvitecartao_pes:
+    description: >-
+      Vendor status or boolean flag statusconvitecartao held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_tarifabancaria_pes:
+    description: >-
+      Monetary amount in BRL tarifabancaria held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_diarepasse_pes:
+    description: >-
+      Calendar date diarepasse held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_atualizacao_pes:
+    description: >-
+      Calendar date atualizacao held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_testemunha_pes:
+    description: >-
+      Vendor status or boolean flag testemunha held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_contapessoa_pes:
+    description: >-
+      Vendor status or boolean flag contapessoa held on the person record inside the
+      Superlogica GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_gerente_pes:
+    description: >-
+      Vendor status or boolean flag gerente held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reembolsoiss_pes:
+    description: >-
+      Vendor status or boolean flag reembolsoiss held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_recolhimentodarf_pes:
+    description: >-
+      Vendor status or boolean flag recolhimentodarf held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_gestor_ges:
+    description: >-
+      Vendor identifier gestor held on the assigned property manager inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_saldobloqueado_pes:
+    description: >-
+      Monetary amount in BRL saldobloqueado held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reembolsarirrf_pes:
+    description: >-
+      Vendor status or boolean flag reembolsarirrf held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reembolsarpiscofins_pes:
+    description: >-
+      Vendor status or boolean flag reembolsarpiscofins held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipochavepix_pes:
+    description: >-
+      Vendor status or boolean flag tipochavepix held on the person record inside the
+      Superlogica GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_chavepix_pes:
+    description: >-
+      Vendor text value chavepix held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_descontosimplificadoir_pes:
+    description: >-
+      Vendor status or boolean flag descontosimplificadoir held on the person record inside
+      the Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codigocontabil_pes:
+    description: >-
+      Vendor text value codigocontabil held on the person record inside the Superlogica
+      GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_semrenda_pes:
+    description: >-
+      Vendor status or boolean flag semrenda held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_vinculoemprego_pes:
+    description: >-
+      Vendor status or boolean flag vinculoemprego held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_beneficio_pes:
+    description: >-
+      Vendor text value beneficio held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_outrosrendimentos_pes:
+    description: >-
+      Monetary amount in BRL outrosrendimentos held on the person record inside the
+      Superlogica GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cnpjempresa_pes:
+    description: >-
+      Vendor text value cnpjempresa held on the person record inside the Superlogica GUARANTOR
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_admissaoemprego_pes:
+    description: >-
+      Calendar date admissaoemprego held on the person record inside the Superlogica GUARANTOR
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_enviodemonstrativoemail_pes:
+    description: >-
+      Vendor text value enviodemonstrativoemail held on the person record inside the
+      Superlogica GUARANTOR payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_enviodemonstrativo_pes:
+    description: >-
+      Calendar date enviodemonstrativo held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_enviodemonstrativoinicio_pes:
+    description: >-
+      Calendar date enviodemonstrativoinicio held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_enviodemonstrativofim_pes:
+    description: >-
+      Calendar date enviodemonstrativofim held on the person record inside the Superlogica
+      GUARANTOR payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_formatado:
+    description: >-
+      Vendor attribute nome formatado as the Superlogica GUARANTOR payload spells it. Personal
+      or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  contratos:
+    description: >-
+      Nested array of the rental contracts linked to this vendor record, carried verbatim as
+      JSON. Exploded one row per contract into benvi_superlogica_imovel_contrato.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
-    description: When benvi-manager last landed this vendor row.
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

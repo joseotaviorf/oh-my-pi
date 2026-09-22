@@ -3,48 +3,791 @@ table_name: benvi_superlogica_despesa
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  RAW despesas_full: UNION of CONTRACT_EXPENSE and VACANT_PROPERTY_EXPENSE on
-  id_lancamento_imod. Grain is one launch. When the same launch appears in
-  both resource_codes, the CONTRACT_EXPENSE row wins. resource_code says
-  which extractor produced the kept row.
+  Union of the Superlogica contract expenses and the vacant unit expenses at one row per
+  expense entry, widened to every key either endpoint sends. When the same launch id arrives
+  from both endpoints the contract expense wins, which is the rule the daily extraction
+  already applies. resource_code records which endpoint produced the surviving row.
 columns:
   id:
-    description: lake_mirror BIGSERIAL of the kept expense row after dedupe.
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   id_lancamento_imod:
-    description: Vendor launch id shared by GET /despesas and GET /imoveisdespesa.
+    description: "Vendor expense launch identifier and the grain of this projection."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
-  id_imovel_imo:
-    description: Property vendor id from the kept expense payload.
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
-  id_contrato_con:
-    description: Contract vendor id from the kept expense payload.
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
-  id_recebimento_recb:
-    description: Related charge id when present on the kept expense payload.
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
-  id_repasse_rep:
-    description: Related payout id when present on the kept expense payload.
-    lineage:
-      - datalake_benvi_manager_raw.lake_mirror.payload
   resource_code:
-    description: Which extractor produced the kept row, CONTRACT_EXPENSE or VACANT_PROPERTY_EXPENSE.
+    description: >-
+      Which vendor endpoint produced the surviving row, contract expenses or vacant unit
+      expenses.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.resource_code
-  vl_valor_imod:
-    description: Expense amount in BRL from the kept launch payload.
+  competencia:
+    description: >-
+      Vendor attribute competencia as the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  credito_reembolso:
+    description: >-
+      Vendor attribute credito reembolso as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  despesas_parcela:
+    description: >-
+      Vendor attribute despesas parcela as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  detalhes_contrato:
+    description: >-
+      Vendor attribute detalhes contrato as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_atualizacao_imod:
+    description: >-
+      Calendar date atualizacao held on the expense entry booked against the unit inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_competencia_aux:
+    description: >-
+      Calendar date competencia aux as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_competencia_imod:
+    description: >-
+      Calendar date competencia held on the expense entry booked against the unit inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_fim_imodm:
+    description: >-
+      Calendar date fim held on the recurring expense template inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_inicio_imodm:
+    description: >-
+      Calendar date inicio held on the recurring expense template inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   dt_lancamento_imod:
-    description: Booking date of the kept launch.
+    description: >-
+      Calendar date lancamento held on the expense entry booked against the unit inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_liquidacao_imom:
+    description: >-
+      Calendar date liquidacao imom as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_liquidacao_mov:
+    description: >-
+      Calendar date liquidacao held on the financial movement inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_liquidacao_recb:
+    description: >-
+      Calendar date liquidacao held on the receivable charge inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_recebimento_recb:
+    description: >-
+      Calendar date recebimento held on the receivable charge inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_referencia_imod:
+    description: >-
+      Calendar date referencia held on the expense entry booked against the unit inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_referenciareembolso:
+    description: >-
+      Calendar date referenciareembolso as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_repasse_rep:
+    description: >-
+      Calendar date repasse held on the owner payout inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_vencimento_recb:
+    description: >-
+      Calendar date vencimento held on the receivable charge inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_agrupado_rep:
+    description: >-
+      Vendor status or boolean flag agrupado held on the owner payout inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_alterouvalor_imod:
+    description: >-
+      Vendor status or boolean flag alterouvalor held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_calcularproporcionalrescisao:
+    description: >-
+      Vendor status or boolean flag calcularproporcionalrescisao as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_calcularproporcionalrescisao_imod:
+    description: >-
+      Vendor status or boolean flag calcularproporcionalrescisao held on the expense entry
+      booked against the unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_cobrartxadm_imod:
+    description: >-
+      Vendor status or boolean flag cobrartxadm held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_cobrartxadm_imodm:
+    description: >-
+      Vendor status or boolean flag cobrartxadm held on the recurring expense template inside
+      the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_conciliado_imod:
+    description: >-
+      Vendor status or boolean flag conciliado held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_despesaalterada_imod:
+    description: >-
+      Vendor status or boolean flag despesaalterada held on the expense entry booked against
+      the unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_despesacaixaexcluida_imod:
+    description: >-
+      Vendor status or boolean flag despesacaixaexcluida held on the expense entry booked
+      against the unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_despesaproporcional:
+    description: >-
+      Vendor status or boolean flag despesaproporcional as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_despesaproporcional_imod:
+    description: >-
+      Vendor status or boolean flag despesaproporcional held on the expense entry booked
+      against the unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_elegivel_alterar_credito_imobiliaria:
+    description: >-
+      Vendor status or boolean flag elegivel alterar credito imobiliaria as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_especial_imod:
+    description: >-
+      Vendor status or boolean flag especial held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_especialfin_imod:
+    description: >-
+      Vendor status or boolean flag especialfin held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_exibir_imod:
+    description: >-
+      Vendor status or boolean flag exibir held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_garantida_imod:
+    description: >-
+      Vendor status or boolean flag garantida held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_pagtoantecipado_imod:
+    description: >-
+      Vendor status or boolean flag pagtoantecipado held on the expense entry booked against
+      the unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_parcelada:
+    description: >-
+      Vendor status or boolean flag parcelada as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_parcelada_imod:
+    description: >-
+      Vendor status or boolean flag parcelada held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_remessastatus_mov:
+    description: >-
+      Vendor status or boolean flag remessastatus held on the financial movement inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_repassar_imod:
+    description: >-
+      Vendor status or boolean flag repassar held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_retencao_imod:
+    description: >-
+      Vendor status or boolean flag retencao held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_imod:
+    description: >-
+      Vendor status or boolean flag status held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_mov:
+    description: >-
+      Vendor status or boolean flag status held on the financial movement inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_recb:
+    description: >-
+      Vendor status or boolean flag status held on the receivable charge inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_statusdebito_imod:
+    description: >-
+      Vendor status or boolean flag statusdebito held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_terceiroexcluido_desp:
+    description: >-
+      Vendor status or boolean flag terceiroexcluido desp as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipo_imod:
+    description: >-
+      Vendor status or boolean flag tipo held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipocompetencia:
+    description: >-
+      Vendor status or boolean flag tipocompetencia as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_acordo_aco:
+    description: >-
+      Vendor identifier acordo held on the debt settlement agreement inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contabanco_cb:
+    description: >-
+      Vendor identifier contabanco cb as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contrato_con:
+    description: >-
+      Vendor identifier contrato held on the rental contract inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_credito_imod:
+    description: >-
+      Vendor identifier credito held on the expense entry booked against the unit inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_credito_imodm:
+    description: >-
+      Vendor identifier credito held on the recurring expense template inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_debito_imod:
+    description: >-
+      Vendor identifier debito held on the expense entry booked against the unit inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_debito_imodm:
+    description: >-
+      Vendor identifier debito held on the recurring expense template inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_despesa:
+    description: >-
+      Vendor identifier despesa as the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_despesa_desp:
+    description: >-
+      Vendor identifier despesa desp as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_despesa_despm:
+    description: >-
+      Vendor identifier despesa despm as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_despesaorigem_imod:
+    description: >-
+      Vendor identifier despesaorigem held on the expense entry booked against the unit inside
+      the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_despesareembolso_imod:
+    description: >-
+      Vendor identifier despesareembolso held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_faturamento_comp:
+    description: >-
+      Vendor identifier faturamento held on the charge composition line inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_faturamento_facs:
+    description: >-
+      Vendor identifier faturamento facs as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_formapagamento_imod:
+    description: >-
+      Vendor identifier formapagamento held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_formapagamento_imodm:
+    description: >-
+      Vendor identifier formapagamento held on the recurring expense template inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_formarecebimento_frp:
+    description: >-
+      Vendor identifier formarecebimento held on the payout method registered for the owner
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_imovel_imo:
+    description: >-
+      Vendor identifier imovel held on the property unit inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_iptulancamento_iil:
+    description: >-
+      Vendor identifier iptulancamento iil as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_lancamento_imodm:
+    description: >-
+      Vendor identifier lancamento held on the recurring expense template inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_lancamentocredito_imod:
+    description: >-
+      Vendor identifier lancamentocredito held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_lancamentodebito_imod:
+    description: >-
+      Vendor identifier lancamentodebito held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_lanctoprogrealizado_lpr:
+    description: >-
+      Vendor identifier lanctoprogrealizado lpr as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_md5parcelamento_imod:
+    description: >-
+      Vendor identifier md5parcelamento held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_mensalidade_mens:
+    description: >-
+      Vendor identifier mensalidade held on the billing message inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_orcamento_morc:
+    description: >-
+      Vendor identifier orcamento morc as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_pagtoindevido_imod:
+    description: >-
+      Vendor identifier pagtoindevido held on the expense entry booked against the unit inside
+      the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_previsao_prt:
+    description: >-
+      Vendor identifier previsao prt as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_produto_prd:
+    description: >-
+      Vendor identifier produto held on the billing product inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_propdiferenca_imod:
+    description: >-
+      Vendor identifier propdiferenca held on the expense entry booked against the unit inside
+      the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_proprietariocredito_imod:
+    description: >-
+      Vendor identifier proprietariocredito held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_proprietariodebito_imod:
+    description: >-
+      Vendor identifier proprietariodebito held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_recebimento_recb:
+    description: >-
+      Vendor identifier recebimento held on the receivable charge inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_repasse_rep:
+    description: >-
+      Vendor identifier repasse held on the owner payout inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_seguro_seg:
+    description: >-
+      Vendor identifier seguro held on the fire insurance carrier inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_terceiro_fav:
+    description: >-
+      Vendor identifier terceiro held on the payee inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  imovel_formatado:
+    description: >-
+      Vendor attribute imovel formatado as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  movimentacoes:
+    description: >-
+      Nested array of the financial movements the vendor attaches to this record, carried
+      verbatim as JSON.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_diavencimento_con:
+    description: >-
+      Vendor numeric value diavencimento held on the rental contract inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_diavencimento_imodm:
+    description: >-
+      Vendor numeric value diavencimento held on the recurring expense template inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_locacoesimovel_con:
+    description: >-
+      Vendor numeric value locacoesimovel held on the rental contract inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_parcelas:
+    description: >-
+      Vendor numeric value parcelas as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_parcelas_fim:
+    description: >-
+      Vendor numeric value parcelas fim as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_tagcriacao:
+    description: >-
+      Vendor numeric value tagcriacao as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_tagcriacao_imod:
+    description: >-
+      Vendor numeric value tagcriacao held on the expense entry booked against the unit inside
+      the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_tagliquidacao:
+    description: >-
+      Vendor numeric value tagliquidacao as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_tagliquidacao_imod:
+    description: >-
+      Vendor numeric value tagliquidacao held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_tipo_imodm:
+    description: >-
+      Vendor numeric value tipo held on the recurring expense template inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_imovel:
+    description: >-
+      Vendor attribute nome imovel as the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload spells it. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_proprietariocredito:
+    description: >-
+      Vendor attribute nome proprietariocredito as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it. Personal or banking detail,
+      read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_proprietariodebito:
+    description: >-
+      Vendor attribute nome proprietariodebito as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it. Personal or banking detail,
+      read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  produto_opcional:
+    description: >-
+      Vendor attribute produto opcional as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  repasses:
+    description: >-
+      Nested array of the payouts the vendor attaches to this expense, carried verbatim as
+      JSON.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_imo:
+    description: >-
+      Vendor text value bairro held on the property unit inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload. Personal or banking detail, read
+      access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cep_imo:
+    description: >-
+      Vendor text value cep held on the property unit inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload. Personal or banking detail, read
+      access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codigobarras_mov:
+    description: >-
+      Vendor text value codigobarras held on the financial movement inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento:
+    description: >-
+      Vendor text value complemento as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it. Personal or banking detail,
+      read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_imo:
+    description: >-
+      Vendor text value complemento held on the property unit inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_imod:
+    description: >-
+      Vendor text value complemento held on the expense entry booked against the unit inside
+      the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload. Personal or banking
+      detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_conta_cont:
+    description: >-
+      Vendor text value conta cont as the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload spells it. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cpfcnpjpagadororiginal_imod:
+    description: >-
+      Vendor text value cpfcnpjpagadororiginal held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload. Personal
+      or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricao_prd:
+    description: >-
+      Vendor text value descricao held on the billing product inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_imo:
+    description: >-
+      Vendor text value endereco held on the property unit inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload. Personal or banking detail, read
+      access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_hashcomposicaoparcela_imod:
+    description: >-
+      Vendor text value hashcomposicaoparcela held on the expense entry booked against the
+      unit inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_hashdespesa_imod:
+    description: >-
+      Vendor text value hashdespesa held on the expense entry booked against the unit inside
+      the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificador_imo:
+    description: >-
+      Vendor text value identificador held on the property unit inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label3_recb:
+    description: >-
+      Vendor text value label3 held on the receivable charge inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label_imod:
+    description: >-
+      Vendor text value label held on the expense entry booked against the unit inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_label_recb:
+    description: >-
+      Vendor text value label held on the receivable charge inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_imo:
+    description: >-
+      Vendor text value numero held on the property unit inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_split_imod:
+    description: >-
+      Vendor text value split held on the expense entry booked against the unit inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_tipo_imo:
+    description: >-
+      Vendor text value tipo held on the property unit inside the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tem_composicao_alterada:
+    description: >-
+      Vendor attribute tem composicao alterada as the Superlogica
+      CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  valor:
+    description: >-
+      Vendor attribute valor as the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vencimento:
+    description: >-
+      Vendor attribute vencimento as the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_pagtoindevido_imod:
+    description: >-
+      Monetary amount in BRL pagtoindevido held on the expense entry booked against the unit
+      inside the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_valor_imod:
+    description: >-
+      Monetary amount in BRL valor held on the expense entry booked against the unit inside
+      the Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_valor_imodm:
+    description: >-
+      Monetary amount in BRL valor held on the recurring expense template inside the
+      Superlogica CONTRACT_EXPENSE/VACANT_PROPERTY_EXPENSE payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
-    description: When benvi-manager last landed the kept vendor row.
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

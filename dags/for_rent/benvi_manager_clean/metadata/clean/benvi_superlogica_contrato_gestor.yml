@@ -1,0 +1,74 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_contrato_gestor
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  One row per property manager assigned to a rental contract, exploded from the
+  imoveis_gestores array on the Superlogica CONTRACT payload. This is the relationship the RAW
+  contratos_gestores spreadsheet tab holds and it had no lake table before. The first entry of
+  the array is what benvi_superlogica_imovel exposes as the principal manager. Manager name,
+  work email and mobile are personal detail governed by Trino column-level ACL.
+columns:
+  id:
+    description: >-
+      Source BIGSERIAL of the parent CONTRACT record in
+      datalake_benvi_manager_raw.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_contrato_con:
+    description: >-
+      Vendor identifier of the parent CONTRACT record the array hangs off. Join it back to the
+      parent projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  nr_item:
+    description: >-
+      One based position of the entry inside the vendor array, so the original ordering
+      survives the explode.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_gestor_ges:
+    description: >-
+      Vendor identifier gestor held on the assigned property manager inside the Superlogica
+      CONTRACT imoveis_gestores payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_ges:
+    description: >-
+      Vendor text value nome held on the assigned property manager inside the Superlogica
+      CONTRACT imoveis_gestores payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_ges:
+    description: >-
+      Vendor text value email held on the assigned property manager inside the Superlogica
+      CONTRACT imoveis_gestores payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_celular_ges:
+    description: >-
+      Vendor text value celular held on the assigned property manager inside the Superlogica
+      CONTRACT imoveis_gestores payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_imovel_imo:
+    description: >-
+      Vendor identifier imovel held on the property unit inside the Superlogica CONTRACT
+      imoveis_gestores payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  item_payload:
+    description: >-
+      Whole array entry re encoded as JSON, so a vendor key added later is still readable
+      before anyone widens this projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: >-
+      Wall clock moment benvi-manager last landed the parent vendor record into the raw
+      mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

@@ -1,28 +1,17 @@
--- PII: st_nome_sac, st_cgc_sac, st_email_sac, and address fields.
--- PK is id_acordo_aco | id_recebimento_recb. id_acordo_aco groups parcels.
--- Join AGREEMENT.id_recebimento_recb to cobranca and id_sacado_sac to locatario.id_sacado_sac.
+-- Widened to the full AGREEMENT payload so RAW acordos in the extraction spreadsheet maps
+-- one to one onto this projection.
+-- The spreadsheet column id_recebimento_recb is the vendor key id_parcela_acp: all 78 values
+-- in production resolve to a CHARGE natural key. id_recebimento_recb1 is the duplicate the
+-- vendor portal returns, same value, kept so the shapes line up.
+-- PK is id_acordo_aco | id_parcela_acp; id_acordo_aco groups the instalments.
 WITH agreement_row AS (
     SELECT
         lake_mirror.id,
-        lake_mirror.vendor_natural_key AS vendor_natural_key,
-        split(lake_mirror.vendor_natural_key, '\\\\|')[0] AS id_acordo_aco,
-        COALESCE(
-            split(lake_mirror.vendor_natural_key, '\\\\|')[1],
-            get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_recebimento_recb')
-        ) AS id_recebimento_recb,
+        lake_mirror.vendor_natural_key,
+        CAST(lake_mirror.payload AS STRING) AS payload_json,
+        get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_parcela_acp') AS id_parcela_acp,
         get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_sacado_sac') AS id_sacado_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_nome_sac') AS st_nome_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_cgc_sac') AS st_cgc_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_email_sac') AS st_email_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_endereco_sac') AS st_endereco_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_numero_sac') AS st_numero_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_complemento_sac') AS st_complemento_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_bairro_sac') AS st_bairro_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_cidade_sac') AS st_cidade_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_estado_sac') AS st_estado_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_cep_sac') AS st_cep_sac,
-        TO_DATE(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_vencimento_recb')) AS dt_vencimento_recb,
-        lake_mirror.synced_at AS ts_synced
+        lake_mirror.synced_at
     FROM
         datalake_benvi_manager_raw.lake_mirror AS lake_mirror
     WHERE
@@ -44,23 +33,55 @@ tenant_by_sacado AS (
 SELECT
     agreement_row.id,
     agreement_row.vendor_natural_key,
-    agreement_row.id_acordo_aco,
-    agreement_row.id_recebimento_recb,
+    SPLIT(agreement_row.vendor_natural_key, '\\\\|')[0] AS id_acordo_aco,
+    agreement_row.id_parcela_acp,
+    agreement_row.id_parcela_acp AS id_recebimento_recb,
+    agreement_row.id_parcela_acp AS id_recebimento_recb1,
     agreement_row.id_sacado_sac,
     tenant_by_sacado.id_pessoa_pes,
     cobranca.id_contrato_con,
-    agreement_row.st_nome_sac,
-    agreement_row.st_cgc_sac,
-    agreement_row.st_email_sac,
-    agreement_row.st_endereco_sac,
-    agreement_row.st_numero_sac,
-    agreement_row.st_complemento_sac,
-    agreement_row.st_bairro_sac,
-    agreement_row.st_cidade_sac,
-    agreement_row.st_estado_sac,
-    agreement_row.st_cep_sac,
-    agreement_row.dt_vencimento_recb,
-    agreement_row.ts_synced
+    get_json_object(agreement_row.payload_json, '$.nm_nfse_not') AS nm_nfse_not,
+    get_json_object(agreement_row.payload_json, '$.nm_nfe_not') AS nm_nfe_not,
+    get_json_object(agreement_row.payload_json, '$.id_nota_not') AS id_nota_not,
+    get_json_object(agreement_row.payload_json, '$.st_sincro_sac') AS st_sincro_sac,
+    CAST(get_json_object(agreement_row.payload_json, '$.fl_tipo_acoi') AS INT) AS fl_tipo_acoi,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_competencia_recb'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_competencia_recb'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_competencia_recb,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_vencimento_recb'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_vencimento_recb'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_vencimento_recb,
+    CAST(get_json_object(agreement_row.payload_json, '$.vl_total_recb') AS DOUBLE) AS vl_total_recb,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_liquidacao_recb,
+    CAST(get_json_object(agreement_row.payload_json, '$.fl_status_recb') AS INT) AS fl_status_recb,
+    get_json_object(agreement_row.payload_json, '$.st_label_recb') AS st_label_recb,
+    get_json_object(agreement_row.payload_json, '$.id_acordo_aco1') AS id_acordo_aco1,
+    get_json_object(agreement_row.payload_json, '$.st_descricao_aco') AS st_descricao_aco,
+    get_json_object(agreement_row.payload_json, '$.id_empresa_emp') AS id_empresa_emp,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_acordo_aco'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_acordo_aco'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_acordo_aco,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_desfeito_aco'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(agreement_row.payload_json, '$.dt_desfeito_aco'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_desfeito_aco,
+    get_json_object(agreement_row.payload_json, '$.nm_parcela_aco') AS nm_parcela_aco,
+    get_json_object(agreement_row.payload_json, '$.tx_itens_aco') AS tx_itens_aco,
+    get_json_object(agreement_row.payload_json, '$.tx_juros_aco') AS tx_juros_aco,
+    get_json_object(agreement_row.payload_json, '$.id_transacao_ctr') AS id_transacao_ctr,
+    get_json_object(agreement_row.payload_json, '$.nome_formatado') AS nome_formatado,
+    get_json_object(agreement_row.payload_json, '$.st_cgc_sac') AS st_cgc_sac,
+    get_json_object(agreement_row.payload_json, '$.st_nome_sac') AS st_nome_sac,
+    get_json_object(agreement_row.payload_json, '$.st_nomeref_sac') AS st_nomeref_sac,
+    get_json_object(agreement_row.payload_json, '$.st_observacaoexterna_recb') AS st_observacaoexterna_recb,
+    get_json_object(agreement_row.payload_json, '$.st_observacaointerna_recb') AS st_observacaointerna_recb,
+    agreement_row.synced_at AS ts_synced
 FROM
     agreement_row AS agreement_row
 LEFT JOIN
@@ -69,4 +90,4 @@ LEFT JOIN
         AND tenant_by_sacado.rn = 1
 LEFT JOIN
     datalake_benvi_manager_clean.benvi_superlogica_cobranca AS cobranca
-        ON agreement_row.id_recebimento_recb = cobranca.id_recebimento_recb
+        ON agreement_row.id_parcela_acp = cobranca.id_recebimento_recb

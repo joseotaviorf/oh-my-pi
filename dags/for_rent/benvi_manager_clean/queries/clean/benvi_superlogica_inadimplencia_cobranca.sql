@@ -1,42 +1,86 @@
--- Widened to the full CHARGE payload so RAW cobrancas_full in the extraction spreadsheet
--- maps one to one onto this projection, monetary columns included.
--- dt_recebimento_recb is the one spreadsheet column absent from the vendor payload;
--- dt_liquidacao_recb is the settlement date the vendor does send.
--- Date strings arrive as MM/dd/yyyy or yyyy-MM-dd, so both shapes are parsed.
--- Join id_sacado_sac to locatario.id_sacado_sac, id_contrato_con to contrato.
-WITH charge_row AS (
+-- Parity projection for the RAW inadimplencia spreadsheet tab, which is charge grain.
+-- The existing benvi_superlogica_inadimplencia stays as it is: it projects the vendor
+-- DELINQUENCY summary at contract grain and downstream consumers already read it.
+-- This one reproduces build_inadimplencia_dataset: overdue unsettled charges belonging
+-- to a sacado that GET /inadimplencia flagged, which is what the spreadsheet tab holds.
+-- Overdue means past due, no settlement date, not cancelled and fl_status_recb not 1 or 3.
+-- origem_extracao is the script constant, dias_atraso is measured against the run date,
+-- and valorcorrigido is the sacado total carried over from the DELINQUENCY summary.
+-- The DELINQUENCY payload leaves id_sacado_sac empty, so the flagged debtor is
+-- resolved through the left half of its natural key, the tenant id, against
+-- benvi_superlogica_locatario.
+WITH charge_raw AS (
     SELECT
         lake_mirror.id,
         lake_mirror.vendor_natural_key,
         CAST(lake_mirror.payload AS STRING) AS payload_json,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_sacado_sac') AS id_sacado_sac,
-        get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_contrato_con') AS id_contrato_con,
         lake_mirror.synced_at
     FROM
         datalake_benvi_manager_raw.lake_mirror AS lake_mirror
     WHERE
         lake_mirror.resource_code = 'CHARGE'
 ),
-tenant_by_sacado AS (
+charge_row AS (
     SELECT
-        locatario.id_pessoa_pes,
-        locatario.id_sacado_sac,
-        ROW_NUMBER() OVER (
-            PARTITION BY locatario.id_sacado_sac
-            ORDER BY locatario.id
-        ) AS rn
+        charge_raw.id,
+        charge_raw.vendor_natural_key AS id_recebimento_recb,
+        charge_raw.payload_json,
+        get_json_object(charge_raw.payload_json, '$.id_sacado_sac') AS id_sacado_sac,
+        get_json_object(charge_raw.payload_json, '$.id_contrato_con') AS id_contrato_con,
+        CAST(get_json_object(charge_raw.payload_json, '$.fl_status_recb') AS INT) AS fl_status_recb,
+        COALESCE(
+            TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_vencimento_recb'), 1, 10), 'MM/dd/yyyy'),
+            TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_vencimento_recb'), 1, 10), 'yyyy-MM-dd')
+        ) AS dt_vencimento_recb,
+        COALESCE(
+            TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'MM/dd/yyyy'),
+            TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'yyyy-MM-dd')
+        ) AS dt_liquidacao_recb,
+        COALESCE(
+            TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_cancelamento_recb'), 1, 10), 'MM/dd/yyyy'),
+            TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_cancelamento_recb'), 1, 10), 'yyyy-MM-dd')
+        ) AS dt_cancelamento_recb,
+        charge_raw.synced_at AS ts_synced
     FROM
-        datalake_benvi_manager_clean.benvi_superlogica_locatario AS locatario
+        charge_raw AS charge_raw
+),
+delinquent_sacado AS (
+    SELECT
+        ranked.id_sacado_sac,
+        ranked.valorcorrigido
+    FROM (
+        SELECT
+            locatario.id_sacado_sac,
+            delinquency.valorcorrigido,
+            ROW_NUMBER() OVER (
+                PARTITION BY locatario.id_sacado_sac
+                ORDER BY delinquency.id DESC
+            ) AS rn
+        FROM (
+            SELECT
+                lake_mirror.id,
+                SPLIT(lake_mirror.vendor_natural_key, '\\\\|')[0] AS id_pessoa_pes,
+                get_json_object(CAST(lake_mirror.payload AS STRING), '$.valorcorrigido')
+                    AS valorcorrigido
+            FROM
+                datalake_benvi_manager_raw.lake_mirror AS lake_mirror
+            WHERE
+                lake_mirror.resource_code = 'DELINQUENCY'
+        ) AS delinquency
+        INNER JOIN
+            datalake_benvi_manager_clean.benvi_superlogica_locatario AS locatario
+                ON delinquency.id_pessoa_pes = locatario.id_pessoa_pes
+        WHERE
+            locatario.id_sacado_sac IS NOT NULL
+    ) AS ranked
     WHERE
-        locatario.id_sacado_sac IS NOT NULL
+        ranked.rn = 1
 )
 SELECT
     charge_row.id,
-    charge_row.vendor_natural_key AS id_recebimento_recb,
+    charge_row.id_recebimento_recb,
     charge_row.id_sacado_sac,
-    tenant_by_sacado.id_pessoa_pes,
     charge_row.id_contrato_con,
-    contrato.codigo_contrato,
     get_json_object(charge_row.payload_json, '$.st_nomeref_sac') AS st_nomeref_sac,
     get_json_object(charge_row.payload_json, '$.st_nome_sac') AS st_nome_sac,
     get_json_object(charge_row.payload_json, '$.st_sincro_sac') AS st_sincro_sac,
@@ -63,10 +107,6 @@ SELECT
     get_json_object(charge_row.payload_json, '$.st_banco_sac') AS st_banco_sac,
     get_json_object(charge_row.payload_json, '$.st_cgc_sac') AS st_cgc_sac,
     get_json_object(charge_row.payload_json, '$.st_cartaobandeira_sac') AS st_cartaobandeira_sac,
-    COALESCE(
-        TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_vencimento_recb'), 1, 10), 'MM/dd/yyyy'),
-        TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_vencimento_recb'), 1, 10), 'yyyy-MM-dd')
-    ) AS dt_vencimento_recb,
     get_json_object(charge_row.payload_json, '$.id_empresa_emp') AS id_empresa_emp,
     CAST(get_json_object(charge_row.payload_json, '$.fl_status_recb') AS INT) AS fl_status_recb,
     get_json_object(charge_row.payload_json, '$.st_observacao_recb') AS st_observacao_recb,
@@ -279,13 +319,18 @@ SELECT
     get_json_object(charge_row.payload_json, '$.compo_recebimento') AS compo_recebimento,
     get_json_object(charge_row.payload_json, '$.erros_split') AS erros_split,
     get_json_object(charge_row.payload_json, '$.split_indisponivel') AS split_indisponivel,
-    charge_row.synced_at AS ts_synced
+    charge_row.dt_vencimento_recb,
+    'inadimplencia_relatorio' AS origem_extracao,
+    DATEDIFF(CURRENT_DATE(), charge_row.dt_vencimento_recb) AS dias_atraso,
+    delinquent_sacado.valorcorrigido,
+    charge_row.ts_synced
 FROM
     charge_row AS charge_row
-LEFT JOIN
-    tenant_by_sacado AS tenant_by_sacado
-        ON charge_row.id_sacado_sac = tenant_by_sacado.id_sacado_sac
-        AND tenant_by_sacado.rn = 1
-LEFT JOIN
-    datalake_benvi_manager_clean.benvi_superlogica_contrato AS contrato
-        ON charge_row.id_contrato_con = contrato.id_contrato_con
+INNER JOIN
+    delinquent_sacado AS delinquent_sacado
+        ON charge_row.id_sacado_sac = delinquent_sacado.id_sacado_sac
+WHERE
+    charge_row.dt_vencimento_recb < CURRENT_DATE()
+    AND charge_row.dt_liquidacao_recb IS NULL
+    AND charge_row.dt_cancelamento_recb IS NULL
+    AND (charge_row.fl_status_recb IS NULL OR charge_row.fl_status_recb NOT IN (1, 3))

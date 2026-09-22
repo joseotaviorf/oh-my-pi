@@ -3,25 +3,64 @@ table_name: benvi_superlogica_manutencao_historico
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica MAINTENANCE_HISTORY rows. vendor_natural_key is id_manutencao_man pipe id_historico_mhis.
+  Superlogica MAINTENANCE_HISTORY projection at one row per note written on a maintenance
+  order, widened to the whole vendor payload so the RAW manutencoes_historico spreadsheet tab
+  becomes a lake query. Join id_manutencao_man to benvi_superlogica_manutencao.
 columns:
   id:
-    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   vendor_natural_key:
-    description: Pipe-joined maintenance and history ids.
+    description: "Composite vendor key the ingestion assembles by joining the parts below with a pipe."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
   id_manutencao_man:
-    description: Parent maintenance id from the composite key.
+    description: >-
+      Part 1 of the composite vendor key. Vendor identifier manutencao held on the maintenance
+      order inside the Superlogica MAINTENANCE_HISTORY payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
   id_historico_mhis:
-    description: History event id from the composite key.
+    description: >-
+      Part 2 of the composite vendor key. Vendor identifier historico held on the maintenance
+      history note inside the Superlogica MAINTENANCE_HISTORY payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  dt_data_mhis:
+    description: >-
+      Calendar date data held on the maintenance history note inside the Superlogica
+      MAINTENANCE_HISTORY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricao_mhis:
+    description: >-
+      Vendor text value descricao held on the maintenance history note inside the Superlogica
+      MAINTENANCE_HISTORY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_usu:
+    description: >-
+      Vendor text value email held on the back office user inside the Superlogica
+      MAINTENANCE_HISTORY payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipo_mhis:
+    description: >-
+      Vendor status or boolean flag tipo held on the maintenance history note inside the
+      Superlogica MAINTENANCE_HISTORY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricaoapp_mhis:
+    description: >-
+      Vendor text value descricaoapp held on the maintenance history note inside the
+      Superlogica MAINTENANCE_HISTORY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
-    description: When benvi-manager last landed this vendor row.
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

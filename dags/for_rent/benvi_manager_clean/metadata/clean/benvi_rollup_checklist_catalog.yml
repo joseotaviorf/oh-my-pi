@@ -1,0 +1,21 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_rollup_checklist_catalog
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Catalogue of the distinct checklist templates that appear on rental contracts, one row per
+  template. It is the Roll-Up all_checklists tab of the daily extraction spreadsheet and it is
+  what resolves a checklist name parsed out of a ticket title back to a checklist identifier.
+  Derived entirely from the contract checklist projection, so no vendor call is involved and
+  the lake can rebuild it whenever the modelling changes.
+columns:
+  id_checklist_chk:
+    description: "Vendor checklist template identifier, trimmed. Unique together with the template name."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato.id_checklist_chk
+  st_nome_chk:
+    description: >-
+      Checklist template name as the vendor spells it, trimmed. Ticket titles carry this name,
+      which is how a ticket is matched to a template.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato.st_nome_chk

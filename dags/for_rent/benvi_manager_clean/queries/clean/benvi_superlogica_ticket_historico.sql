@@ -1,3 +1,5 @@
+-- Vendor dates arrive as MM/dd/yyyy, so TO_DATE needs the format;
+-- without it every date column on this projection landed null.
 -- Fan-out per ticket. vendor_natural_key is the parent id_ticket_tic (cursor-resolved,
 -- not the row's own id_ticket_tic) pipe id_historico_tih, because history ids are not
 -- unique across tickets. Join id_ticket_tic back to benvi_superlogica_ticket.
@@ -19,7 +21,10 @@ SELECT
     get_json_object(CAST(payload AS STRING), '$.st_historico_tih') AS historico_tih,
     CAST(get_json_object(CAST(payload AS STRING), '$.fl_tipocontato_tih') AS INT) AS fl_tipocontato_tih,
     CAST(get_json_object(CAST(payload AS STRING), '$.fl_interno_tih') AS INT) AS fl_interno_tih,
-    TO_DATE(get_json_object(CAST(payload AS STRING), '$.dt_historico_tih')) AS dt_historico_tih,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(CAST(payload AS STRING), '$.dt_historico_tih'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(CAST(payload AS STRING), '$.dt_historico_tih'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_historico_tih,
     synced_at AS ts_synced
 FROM
     datalake_benvi_manager_raw.lake_mirror

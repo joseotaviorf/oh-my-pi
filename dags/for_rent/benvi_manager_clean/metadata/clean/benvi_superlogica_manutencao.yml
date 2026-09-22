@@ -3,21 +3,298 @@ table_name: benvi_superlogica_manutencao
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica MAINTENANCE rows from lake_mirror.
+  Superlogica MAINTENANCE projection at one row per maintenance order, widened to the whole
+  vendor payload so the RAW manutencoes spreadsheet tab becomes a lake query. Join
+  id_imovel_imo to benvi_superlogica_imovel and id_manutencao_man to
+  benvi_superlogica_manutencao_historico for the note trail.
 columns:
   id:
-    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   id_manutencao_man:
-    description: Vendor maintenance id.
+    description: >-
+      Primary vendor key for this resource, mirrored from the MAINTENANCE lake_mirror natural
+      key and identical to the payload id_manutencao_man.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+      - datalake_benvi_manager_raw.lake_mirror.payload
   id_imovel_imo:
-    description: Related property id from vendor payload.
+    description: >-
+      Vendor identifier imovel held on the property unit inside the Superlogica MAINTENANCE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificador_imo:
+    description: >-
+      Vendor text value identificador held on the property unit inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_tipo_imo:
+    description: >-
+      Vendor text value tipo held on the property unit inside the Superlogica MAINTENANCE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_imo:
+    description: >-
+      Vendor text value endereco held on the property unit inside the Superlogica MAINTENANCE
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_imo:
+    description: >-
+      Vendor text value numero held on the property unit inside the Superlogica MAINTENANCE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_imo:
+    description: >-
+      Vendor text value complemento held on the property unit inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_imo:
+    description: >-
+      Vendor text value bairro held on the property unit inside the Superlogica MAINTENANCE
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cidade_imo:
+    description: >-
+      Vendor text value cidade held on the property unit inside the Superlogica MAINTENANCE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estado_imo:
+    description: >-
+      Vendor text value estado held on the property unit inside the Superlogica MAINTENANCE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cep_imo:
+    description: >-
+      Vendor text value cep held on the property unit inside the Superlogica MAINTENANCE
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cartorio_imo:
+    description: >-
+      Vendor text value cartorio held on the property unit inside the Superlogica MAINTENANCE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_matriculacartorio_imo:
+    description: >-
+      Vendor text value matriculacartorio held on the property unit inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_cond:
+    description: >-
+      Vendor text value nome held on the condominium inside the Superlogica MAINTENANCE
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_orcamentos_pendentes_lancar_despesas:
+    description: >-
+      Vendor numeric value orcamentos pendentes lancar despesas as the Superlogica MAINTENANCE
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_arquivos:
+    description: "Vendor numeric value arquivos as the Superlogica MAINTENANCE payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificador_man:
+    description: >-
+      Vendor text value identificador held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_criacao_man:
+    description: >-
+      Calendar date criacao held on the maintenance order inside the Superlogica MAINTENANCE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_proprietario_imo:
+    description: >-
+      Vendor identifier proprietario held on the property unit inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_locatario_imo:
+    description: >-
+      Vendor identifier locatario held on the property unit inside the Superlogica MAINTENANCE
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contrato_con:
+    description: >-
+      Vendor identifier contrato held on the rental contract inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_descricao_man:
+    description: >-
+      Vendor text value descricao held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_motivo_man:
+    description: >-
+      Vendor text value motivo held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_prioridade_man:
+    description: >-
+      Vendor status or boolean flag prioridade held on the maintenance order inside the
+      Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_situacao_man:
+    description: >-
+      Vendor status or boolean flag situacao held on the maintenance order inside the
+      Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_solicitante_man:
+    description: >-
+      Vendor status or boolean flag solicitante held on the maintenance order inside the
+      Superlogica MAINTENANCE payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_proprietarionotificado_man:
+    description: >-
+      Vendor status or boolean flag proprietarionotificado held on the maintenance order
+      inside the Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_desativada_man:
+    description: >-
+      Vendor status or boolean flag desativada held on the maintenance order inside the
+      Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_previsaoentrega_man:
+    description: >-
+      Calendar date previsaoentrega held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_viaapp_man:
+    description: >-
+      Vendor status or boolean flag viaapp held on the maintenance order inside the
+      Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_categoria_man:
+    description: >-
+      Vendor status or boolean flag categoria held on the maintenance order inside the
+      Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_atualizacao_man:
+    description: >-
+      Calendar date atualizacao held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificadorexterno_man:
+    description: >-
+      Vendor text value identificadorexterno held on the maintenance order inside the
+      Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_linkexterno_man:
+    description: >-
+      Vendor text value linkexterno held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_terceirizada_man:
+    description: >-
+      Vendor text value terceirizada held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_motivocancelamento_man:
+    description: >-
+      Vendor status or boolean flag motivocancelamento held on the maintenance order inside
+      the Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_atualizacaoexterna_man:
+    description: >-
+      Vendor status or boolean flag atualizacaoexterna held on the maintenance order inside
+      the Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_responsavel_man:
+    description: >-
+      Vendor status or boolean flag responsavel held on the maintenance order inside the
+      Superlogica MAINTENANCE payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_origem_man:
+    description: >-
+      Vendor identifier origem held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_categoria:
+    description: "Vendor text value categoria as the Superlogica MAINTENANCE payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  detalhes_formatado:
+    description: "Vendor attribute detalhes formatado as the Superlogica MAINTENANCE payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_horaprevisaoentrega_man:
+    description: >-
+      Calendar date horaprevisaoentrega held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_solicitacao_man:
+    description: >-
+      Calendar date solicitacao held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_man:
+    description: >-
+      Vendor status or boolean flag status held on the maintenance order inside the
+      Superlogica MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacao_man:
+    description: >-
+      Vendor text value observacao held on the maintenance order inside the Superlogica
+      MAINTENANCE payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_titulo_man:
+    description: >-
+      Vendor text value titulo held on the maintenance order inside the Superlogica
+      MAINTENANCE payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  sugestao_execucao:
+    description: >-
+      Nested vendor suggestion block for how the maintenance order should be executed, carried
+      verbatim as JSON.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
-    description: When benvi-manager last landed this vendor row.
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

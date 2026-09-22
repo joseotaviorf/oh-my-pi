@@ -1,0 +1,163 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_rollup_ticket
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Roll-Up work item model at one row per service ticket or maintenance order, the DW tickets
+  tab of the daily extraction spreadsheet. Titles follow the Roll-Up convention of checklist
+  name, person type and contract code separated by a double colon, so the three parts are
+  parsed back out and the contract code is resolved to a contract identifier. Nothing consumes
+  this yet, so the shape is the modelling shape rather than a legacy contract.
+columns:
+  tipo:
+    description: "Which side of the union produced the row, a service ticket or a maintenance order."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  id_chave:
+    description: >-
+      Stable Roll-Up key built as the origin kind joined to the origin identifier with a
+      hyphen. Checklist lines point back at a ticket through this.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  id_origem:
+    description: >-
+      Identifier of the record in its own vendor resource, a ticket id or a maintenance order
+      id.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  id_ticket_tic:
+    description: "Vendor service ticket identifier. Empty on rows that came from a maintenance order."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+  st_nome_grpu:
+    description: >-
+      Department group handling the ticket. Empty on maintenance rows because the vendor does
+      not group maintenance orders.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+  st_titulo_tic:
+    description: >-
+      Roll-Up title. Service tickets carry it verbatim; maintenance orders get one assembled
+      from the description, the requester kind and the contract code.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  st_nome_usu:
+    description: >-
+      Back office user recorded on the ticket. Personal detail, read access governed by Trino
+      column-level ACL. Empty on maintenance rows.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+  fl_status_tic:
+    description: "Status flag, taken from the ticket status or from the maintenance situation flag."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  dt_inicioticket_tic:
+    description: >-
+      Moment work started, the ticket start for tickets and the creation moment for
+      maintenance orders.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  dt_encerrado_tic:
+    description: >-
+      Moment work closed, the ticket close for tickets and the last update for maintenance
+      orders.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  id_cliente_tic:
+    description: "Vendor client identifier on the ticket. Empty on maintenance rows."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+  fl_interno_tic:
+    description: "Flag marking the ticket as internal only. Empty on maintenance rows."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+  name_checklist:
+    description: "First segment of the Roll-Up title, the checklist this work belongs to."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  person_type:
+    description: >-
+      Second segment of the Roll-Up title, who the work is about. IQ is the tenant, PP the
+      owner and INT an internal actor.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  codigo_contrato:
+    description: >-
+      Third segment of the Roll-Up title, the business contract code. Maintenance rows prefer
+      the code resolved from their contract identifier.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+      - datalake_benvi_manager_clean.benvi_superlogica_contrato
+  id_contrato_con:
+    description: >-
+      Contract identifier resolved from the business code, empty when no contract matches the
+      code in the title.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  id_checklist_chk:
+    description: >-
+      Checklist template resolved from the title, matched against the Roll-Up catalogue. Empty
+      on maintenance rows and when no template matches.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_rollup_checklist_catalog
+  count_checklist_cs:
+    description: >-
+      Which repeat of the same title on the same contract this is, counted in chronological
+      order starting at 1. Ties fall back to the raw mirror id ascending because the lake does
+      not keep the vendor response order.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  id_checklist_cs:
+    description: >-
+      Roll-Up instance key. Tickets use the repeat count, the checklist template and the
+      contract; maintenance orders use the repeat count, the literal MAN and the order id.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  st_categoria:
+    description: "Maintenance category. Empty on ticket rows."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  st_descricao_man:
+    description: "Free description written on the maintenance order. Empty on ticket rows."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  st_identificador_man:
+    description: "Business code of the maintenance order. Empty on ticket rows."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  fl_prioridade_man:
+    description: "Priority flag of the maintenance order. Empty on ticket rows."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  dt_previsaoentrega_man:
+    description: "Promised delivery day of the maintenance order. Empty on ticket rows."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  checklist_lookup_name:
+    description: >-
+      Checklist name recovered from the title, everything before the final segment. Checklist
+      lines fall back to this when no stronger key matches.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  nr_ordem:
+    description: >-
+      Build order of the row, service tickets first and maintenance orders after. The pandas
+      model keeps the last ticket per lookup key, so the checklist model resolves ties by
+      taking the highest value here.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao

@@ -3,33 +3,755 @@ table_name: benvi_superlogica_imovel
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica PROPERTY rows from lake_mirror.
+  Superlogica PROPERTY projection at one row per managed unit, widened to the whole vendor
+  payload so the RAW imoveis spreadsheet tab becomes a lake query. The three gestor columns
+  are derived from the first entry of the imoveis_gestores array, reproducing the extraction
+  script rule Gestor principal, so the shape matches the spreadsheet exactly. Street address,
+  owner and manager contact columns are personal detail governed by Trino column-level ACL.
 columns:
   id:
-    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   id_imovel_imo:
-    description: Vendor property id.
+    description: >-
+      Primary vendor key for this resource, mirrored from the PROPERTY lake_mirror natural key
+      and identical to the payload id_imovel_imo.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_gestor_ges:
+    description: >-
+      Identifier of the principal property manager, taken from the first entry of the
+      imoveis_gestores array exactly as the extraction script derives it. Absent as a flat
+      vendor key.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_ges:
+    description: >-
+      Name of the principal property manager, derived from imoveis_gestores[0]. Personal
+      detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_ges:
+    description: >-
+      Work email of the principal property manager, derived from imoveis_gestores[0]. Personal
+      detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   identificador_imo:
-    description: Property identifier from vendor payload.
+    description: >-
+      Legacy alias of st_identificador_imo kept for existing consumers. Business code shown on
+      the unit.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   endereco_imo:
-    description: Property address from vendor payload.
+    description: >-
+      Legacy alias of st_endereco_imo kept for existing consumers. Street address of the unit,
+      personal detail.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   cidade_imo:
-    description: City from vendor payload.
+    description: "Legacy alias of st_cidade_imo kept for existing consumers. City the unit sits in."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   estado_imo:
-    description: State from vendor payload.
+    description: >-
+      Legacy alias of st_estado_imo kept for existing consumers. Two letter state the unit
+      sits in.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_filial_fil:
+    description: "Vendor identifier filial fil as the Superlogica PROPERTY payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_fil:
+    description: >-
+      Vendor text value nome fil as the Superlogica PROPERTY payload spells it. Personal or
+      banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificador_imo:
+    description: >-
+      Vendor text value identificador held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_aluguel_imo:
+    description: >-
+      Monetary amount in BRL aluguel held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_condominio_imo:
+    description: >-
+      Monetary amount in BRL condominio held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_parcelaiptu_imo:
+    description: >-
+      Monetary amount in BRL parcelaiptu held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_tipo_imo:
+    description: >-
+      Vendor text value tipo held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codigoiptu_imo:
+    description: >-
+      Vendor text value codigoiptu held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_parcelasiptu_imo:
+    description: >-
+      Vendor numeric value parcelasiptu held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txiptuproprietario_imo:
+    description: >-
+      Vendor numeric value txiptuproprietario held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txiptuinquilino_imo:
+    description: >-
+      Vendor numeric value txiptuinquilino held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_responsavelcondominio_imo:
+    description: >-
+      Vendor status or boolean flag responsavelcondominio held on the property unit inside the
+      Superlogica PROPERTY payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cep_imo:
+    description: >-
+      Vendor text value cep held on the property unit inside the Superlogica PROPERTY payload.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_endereco_imo:
+    description: >-
+      Vendor text value endereco held on the property unit inside the Superlogica PROPERTY
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_bairro_imo:
+    description: >-
+      Vendor text value bairro held on the property unit inside the Superlogica PROPERTY
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_complemento_imo:
+    description: >-
+      Vendor text value complemento held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cidade_imo:
+    description: >-
+      Vendor text value cidade held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_estado_imo:
+    description: >-
+      Vendor text value estado held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_numero_imo:
+    description: >-
+      Vendor text value numero held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_areautil_imo:
+    description: >-
+      Vendor text value areautil held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_areatotal_imo:
+    description: >-
+      Vendor text value areatotal held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_quartos_imo:
+    description: >-
+      Vendor numeric value quartos held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_suites_imo:
+    description: >-
+      Vendor numeric value suites held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_banheiros_imo:
+    description: >-
+      Vendor numeric value banheiros held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_salas_imo:
+    description: >-
+      Vendor numeric value salas held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_varandas_imo:
+    description: >-
+      Vendor numeric value varandas held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_garagens_imo:
+    description: >-
+      Vendor numeric value garagens held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_piscinas_imo:
+    description: >-
+      Vendor numeric value piscinas held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codagua_imo:
+    description: >-
+      Vendor text value codagua held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codenergia_imo:
+    description: >-
+      Vendor text value codenergia held on the property unit inside the Superlogica PROPERTY
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codgas_imo:
+    description: >-
+      Vendor text value codgas held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacao_imo:
+    description: >-
+      Vendor text value observacao held on the property unit inside the Superlogica PROPERTY
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cartorio_imo:
+    description: >-
+      Vendor text value cartorio held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_matriculacartorio_imo:
+    description: >-
+      Vendor text value matriculacartorio held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_cib_imo:
+    description: "Vendor text value cib held on the property unit inside the Superlogica PROPERTY payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_administradora_imo:
+    description: >-
+      Vendor text value administradora held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_condominio_imo:
+    description: >-
+      Vendor text value condominio held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_responsaveliptu_imo:
+    description: >-
+      Vendor status or boolean flag responsaveliptu held on the property unit inside the
+      Superlogica PROPERTY payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_responsavelagua_imo:
+    description: >-
+      Vendor status or boolean flag responsavelagua held on the property unit inside the
+      Superlogica PROPERTY payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txaguaproprietario_imo:
+    description: >-
+      Vendor numeric value txaguaproprietario held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txaguainquilino_imo:
+    description: >-
+      Vendor numeric value txaguainquilino held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_locacao_imo:
+    description: >-
+      Vendor free text locacao held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_repassegarantido_imo:
+    description: >-
+      Vendor numeric value repassegarantido held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_diafixorepasse_imo:
+    description: >-
+      Vendor status or boolean flag diafixorepasse held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_imo:
+    description: >-
+      Vendor status or boolean flag status held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_adm_imo:
+    description: "Vendor free text adm held on the property unit inside the Superlogica PROPERTY payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txadmvalorfixo_imo:
+    description: >-
+      Vendor status or boolean flag txadmvalorfixo held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txlocacaovalorfixo_imo:
+    description: >-
+      Vendor status or boolean flag txlocacaovalorfixo held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_parcelastxlocacao_imo:
+    description: >-
+      Vendor numeric value parcelastxlocacao held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_diarepasse_imo:
+    description: >-
+      Vendor numeric value diarepasse held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_venda_imo:
+    description: >-
+      Monetary amount in BRL venda held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codigosequencial_imo:
+    description: >-
+      Vendor text value codigosequencial held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codigocidadedimob_imo:
+    description: >-
+      Vendor text value codigocidadedimob held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_tipodimob_imo:
+    description: >-
+      Vendor text value tipodimob held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_identificadorimportacao_imo:
+    description: >-
+      Vendor text value identificadorimportacao held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_administradora_adm:
+    description: "Vendor identifier administradora adm as the Superlogica PROPERTY payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_iptugaragem_imo:
+    description: >-
+      Vendor text value iptugaragem held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_sincrofilial_imo:
+    description: >-
+      Vendor text value sincrofilial held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_split_imo:
+    description: >-
+      Vendor status or boolean flag split held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_foto_imo:
+    description: >-
+      Vendor identifier foto held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codigospu_imo:
+    description: >-
+      Vendor text value codigospu held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_gestor_imo:
+    description: >-
+      Vendor identifier gestor held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_txlixo_imo:
+    description: >-
+      Vendor text value txlixo held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codbombeiro_imo:
+    description: >-
+      Vendor text value codbombeiro held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_condominio_cond:
+    description: >-
+      Vendor identifier condominio held on the condominium inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_avaliacao_imo:
+    description: >-
+      Vendor text value avaliacao held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_detalhes_imo:
+    description: >-
+      Vendor text value detalhes held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_meseslocacao_imo:
+    description: >-
+      Vendor numeric value meseslocacao held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  tx_anual_imo:
+    description: >-
+      Vendor free text anual held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_destinacao_imo:
+    description: >-
+      Vendor text value destinacao held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_mesesisencaomulta_imo:
+    description: >-
+      Vendor numeric value mesesisencaomulta held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_imoveltombado_imo:
+    description: >-
+      Vendor status or boolean flag imoveltombado held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipoisencao_imo:
+    description: >-
+      Vendor status or boolean flag tipoisencao held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_admcondominio_imo:
+    description: >-
+      Vendor status or boolean flag admcondominio held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_contapessoa_imo:
+    description: >-
+      Vendor status or boolean flag contapessoa held on the property unit inside the
+      Superlogica PROPERTY payload. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_contapessoa_imo:
+    description: >-
+      Calendar date contapessoa held on the property unit inside the Superlogica PROPERTY
+      payload. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_atualizacao_imo:
+    description: >-
+      Calendar date atualizacao held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_motivorescisao_imo:
+    description: >-
+      Vendor status or boolean flag motivorescisao held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_rescisao_imo:
+    description: >-
+      Calendar date rescisao held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txanualcobrarmes_imo:
+    description: >-
+      Vendor numeric value txanualcobrarmes held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_cobrartxanual_imo:
+    description: >-
+      Vendor status or boolean flag cobrartxanual held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txanualcobrarsemcontrato_imo:
+    description: >-
+      Vendor status or boolean flag txanualcobrarsemcontrato held on the property unit inside
+      the Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txanualcobrarproporcional_imo:
+    description: >-
+      Vendor status or boolean flag txanualcobrarproporcional held on the property unit inside
+      the Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txanualcobrarvalordomes_imo:
+    description: >-
+      Vendor status or boolean flag txanualcobrarvalordomes held on the property unit inside
+      the Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_entrada_imo:
+    description: "Calendar date entrada held on the property unit inside the Superlogica PROPERTY payload."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_reembolsoiss_imo:
+    description: >-
+      Vendor status or boolean flag reembolsoiss held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_apelido_imo:
+    description: >-
+      Vendor text value apelido held on the property unit inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  vl_txadmvalorminimo_imo:
+    description: >-
+      Monetary amount in BRL txadmvalorminimo held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_integracaoimoveis_imo:
+    description: >-
+      Vendor identifier integracaoimoveis held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_codigocontribuinte_imo:
+    description: >-
+      Vendor text value codigocontribuinte held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_ligacaoeletrica_imo:
+    description: >-
+      Vendor status or boolean flag ligacaoeletrica held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_uuidassinaturapaybox_imo:
+    description: >-
+      Vendor text value uuidassinaturapaybox held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_ocultarowli_imo:
+    description: >-
+      Vendor status or boolean flag ocultarowli held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txanualcobrarsobre_imo:
+    description: >-
+      Vendor numeric value txanualcobrarsobre held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_txanualnmparcelas_imo:
+    description: >-
+      Vendor numeric value txanualnmparcelas held on the property unit inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_txanualconfigpadrao_imo:
+    description: >-
+      Vendor status or boolean flag txanualconfigpadrao held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_segurodesativado_imo:
+    description: >-
+      Vendor status or boolean flag segurodesativado held on the property unit inside the
+      Superlogica PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_cond:
+    description: >-
+      Vendor text value nome held on the condominium inside the Superlogica PROPERTY payload.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  endereco_formatado:
+    description: >-
+      Vendor attribute endereco formatado as the Superlogica PROPERTY payload spells it.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_formatado:
+    description: >-
+      Vendor attribute nome formatado as the Superlogica PROPERTY payload spells it. Personal
+      or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_proprietario:
+    description: >-
+      Vendor attribute nome proprietario as the Superlogica PROPERTY payload spells it.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  cnpj_proprietario:
+    description: >-
+      Vendor attribute cnpj proprietario as the Superlogica PROPERTY payload spells it.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_proprietario:
+    description: "Vendor identifier proprietario as the Superlogica PROPERTY payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nascimento_proprietario:
+    description: >-
+      Vendor attribute nascimento proprietario as the Superlogica PROPERTY payload spells it.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  celular_proprietario:
+    description: >-
+      Vendor attribute celular proprietario as the Superlogica PROPERTY payload spells it.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  email_proprietario:
+    description: >-
+      Vendor attribute email proprietario as the Superlogica PROPERTY payload spells it.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  identificador_formatado:
+    description: "Vendor attribute identificador formatado as the Superlogica PROPERTY payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_sacado_sac:
+    description: >-
+      Vendor identifier sacado held on the sacado, the billed debtor inside the Superlogica
+      PROPERTY payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_inquilino:
+    description: >-
+      Vendor attribute nome inquilino as the Superlogica PROPERTY payload spells it. Personal
+      or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  cnpj_inquilino:
+    description: >-
+      Vendor attribute cnpj inquilino as the Superlogica PROPERTY payload spells it. Personal
+      or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_inquilino:
+    description: "Vendor identifier inquilino as the Superlogica PROPERTY payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contrato_con:
+    description: >-
+      Vendor identifier contrato held on the rental contract inside the Superlogica PROPERTY
+      payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  contratos:
+    description: >-
+      Nested array of the rental contracts linked to this vendor record, carried verbatim as
+      JSON. Exploded one row per contract into benvi_superlogica_imovel_contrato.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  detalhes_formatado:
+    description: "Vendor attribute detalhes formatado as the Superlogica PROPERTY payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  imoveis_gestores:
+    description: >-
+      Nested array of the property managers assigned to this vendor record, carried verbatim
+      as JSON. Exploded one row per manager into the matching relationship projection.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  inquilinos:
+    description: >-
+      Nested array of the tenants linked to this vendor record, carried verbatim as JSON.
+      Exploded one row per tenant into benvi_superlogica_contrato_inquilino.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  proprietarios_beneficiarios:
+    description: >-
+      Nested array of the beneficiary owners linked to this vendor record, carried verbatim as
+      JSON. Exploded one row per owner into the matching relationship projection.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
-    description: When benvi-manager last landed this vendor row.
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

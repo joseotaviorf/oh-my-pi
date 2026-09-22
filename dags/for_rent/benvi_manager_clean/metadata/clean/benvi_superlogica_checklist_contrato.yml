@@ -3,29 +3,168 @@ table_name: benvi_superlogica_checklist_contrato
 domain: For Rent
 owner: arthur.andrade@quintoandar.com
 description: |
-  Superlogica CONTRACT_CHECKLIST_ITEM rows. Join to contrato downstream.
+  Superlogica CONTRACT_CHECKLIST_ITEM projection at one row per checklist line on a rental
+  contract, widened to the whole vendor payload so the RAW checklist_itens spreadsheet tab
+  becomes a lake query. Grain is contract by checklist by item, which is exactly the composite
+  vendor key the ingestion builds. Join id_contrato_con to benvi_superlogica_contrato.
 columns:
   id:
-    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    description: >-
+      Source BIGSERIAL from datalake_benvi_manager_raw.lake_mirror, one row per landed vendor
+      record.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.id
   vendor_natural_key:
-    description: Pipe-joined contract, checklist, and item ids.
+    description: "Composite vendor key the ingestion assembles by joining the parts below with a pipe."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
   id_contrato_con:
-    description: Parent contract id from the composite key.
+    description: >-
+      Part 1 of the composite vendor key. Vendor identifier contrato held on the rental
+      contract inside the Superlogica CONTRACT_CHECKLIST_ITEM payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
   id_checklist_chk:
-    description: Checklist id from the composite key.
+    description: >-
+      Part 2 of the composite vendor key. Vendor identifier checklist held on the contract
+      checklist inside the Superlogica CONTRACT_CHECKLIST_ITEM payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
   id_checklistitem_chi:
-    description: Checklist item id from the composite key.
+    description: >-
+      Part 3 of the composite vendor key. Vendor identifier checklistitem held on the
+      checklist item inside the Superlogica CONTRACT_CHECKLIST_ITEM payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  st_nome_chk:
+    description: >-
+      Vendor text value nome held on the contract checklist inside the Superlogica
+      CONTRACT_CHECKLIST_ITEM payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_notificar_chk:
+    description: >-
+      Vendor status or boolean flag notificar held on the contract checklist inside the
+      Superlogica CONTRACT_CHECKLIST_ITEM payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_imovel_imo:
+    description: >-
+      Vendor identifier imovel held on the property unit inside the Superlogica
+      CONTRACT_CHECKLIST_ITEM payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_principal_prb:
+    description: >-
+      Vendor status or boolean flag principal held on the beneficiary owner link inside the
+      Superlogica CONTRACT_CHECKLIST_ITEM payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_proprietario_prb:
+    description: >-
+      Vendor status or boolean flag proprietario held on the beneficiary owner link inside the
+      Superlogica CONTRACT_CHECKLIST_ITEM payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_proprietario_imo:
+    description: >-
+      Vendor text value nome proprietario held on the property unit inside the Superlogica
+      CONTRACT_CHECKLIST_ITEM payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_proprietario_imo:
+    description: >-
+      Vendor identifier proprietario held on the property unit inside the Superlogica
+      CONTRACT_CHECKLIST_ITEM payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_email_proprietario_imo:
+    description: >-
+      Vendor text value email proprietario held on the property unit inside the Superlogica
+      CONTRACT_CHECKLIST_ITEM payload. Personal or banking detail, read access governed by
+      Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_sacado_proprietario:
+    description: >-
+      Vendor identifier sacado proprietario as the Superlogica CONTRACT_CHECKLIST_ITEM payload
+      spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_cch:
+    description: >-
+      Vendor text value nome cch as the Superlogica CONTRACT_CHECKLIST_ITEM payload spells it.
+      Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_cch:
+    description: >-
+      Vendor status or boolean flag status cch as the Superlogica CONTRACT_CHECKLIST_ITEM
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_responsavel_cch:
+    description: >-
+      Vendor status or boolean flag responsavel cch as the Superlogica CONTRACT_CHECKLIST_ITEM
+      payload spells it. Personal or banking detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nm_periodonotificacao_cch:
+    description: >-
+      Vendor numeric value periodonotificacao cch as the Superlogica CONTRACT_CHECKLIST_ITEM
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tiponotificacao_cch:
+    description: >-
+      Vendor status or boolean flag tiponotificacao cch as the Superlogica
+      CONTRACT_CHECKLIST_ITEM payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_ultimanotificacao_cch:
+    description: >-
+      Calendar date ultimanotificacao cch as the Superlogica CONTRACT_CHECKLIST_ITEM payload
+      spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_observacao_cch:
+    description: >-
+      Vendor text value observacao cch as the Superlogica CONTRACT_CHECKLIST_ITEM payload
+      spells it. Personal or banking detail, read access governed by Trino column-level ACL.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_comprovanteobrigatorio_cch:
+    description: >-
+      Vendor status or boolean flag comprovanteobrigatorio cch as the Superlogica
+      CONTRACT_CHECKLIST_ITEM payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_exibirnoapp_cch:
+    description: >-
+      Vendor status or boolean flag exibirnoapp cch as the Superlogica CONTRACT_CHECKLIST_ITEM
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_entregalimite_cch:
+    description: >-
+      Calendar date entregalimite cch as the Superlogica CONTRACT_CHECKLIST_ITEM payload
+      spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_motivoreprovacao_cch:
+    description: >-
+      Vendor text value motivoreprovacao cch as the Superlogica CONTRACT_CHECKLIST_ITEM
+      payload spells it.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_envioapp_cch:
+    description: "Calendar date envioapp cch as the Superlogica CONTRACT_CHECKLIST_ITEM payload spells it."
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   ts_synced:
-    description: When benvi-manager last landed this vendor row.
+    description: "Wall clock moment benvi-manager last landed this vendor record into the raw mirror."
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.synced_at

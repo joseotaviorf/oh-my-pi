@@ -1,3 +1,5 @@
+-- Vendor dates arrive as MM/dd/yyyy, so TO_DATE needs the format;
+-- without it every date column on this projection landed null.
 SELECT
     lake_mirror.id,
     lake_mirror.vendor_natural_key AS id_lancamento_imod,
@@ -12,10 +14,22 @@ SELECT
     get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_descricao_prd') AS st_descricao_prd,
     get_json_object(CAST(lake_mirror.payload AS STRING), '$.st_label_imod') AS st_label_imod,
     CAST(get_json_object(CAST(lake_mirror.payload AS STRING), '$.vl_valor_imod') AS DOUBLE) AS vl_valor_imod,
-    TO_DATE(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_lancamento_imod')) AS dt_lancamento_imod,
-    TO_DATE(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_competencia_imod')) AS dt_competencia_imod,
-    TO_DATE(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_referencia_imod')) AS dt_referencia_imod,
-    TO_DATE(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_liquidacao_mov')) AS dt_liquidacao_mov,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_lancamento_imod'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_lancamento_imod'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_lancamento_imod,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_competencia_imod'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_competencia_imod'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_competencia_imod,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_referencia_imod'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_referencia_imod'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_referencia_imod,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_liquidacao_mov'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(CAST(lake_mirror.payload AS STRING), '$.dt_liquidacao_mov'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_liquidacao_mov,
     lake_mirror.synced_at AS ts_synced
 FROM
     datalake_benvi_manager_raw.lake_mirror AS lake_mirror

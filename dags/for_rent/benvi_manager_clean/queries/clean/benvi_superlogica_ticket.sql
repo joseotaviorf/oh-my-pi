@@ -1,3 +1,6 @@
+-- Vendor dates arrive as MM/dd/yyyy HH:mm:ss, so TO_DATE needs the format;
+-- without it every date column on this projection landed null.
+-- ts_inicioticket_tic and ts_encerrado_tic keep the clock the Roll-Up ordering needs.
 -- PII: st_solicitante_tic, st_solicitante_tic_formatado, st_responsavel_tic,
 -- st_nome_usu, st_nome_fav are person names, and st_telefone_tic, st_celular_tic,
 -- st_fax_tic, st_copia_tic are contact channels. Projected like the debtor columns
@@ -33,9 +36,34 @@ SELECT
     CAST(get_json_object(CAST(payload AS STRING), '$.fl_interno_tic') AS INT) AS fl_interno_tic,
     get_json_object(CAST(payload AS STRING), '$.atrasado') AS atrasado,
     get_json_object(CAST(payload AS STRING), '$.horas_atrasado') AS horas_atrasado,
-    TO_DATE(get_json_object(CAST(payload AS STRING), '$.dt_ticket_tic')) AS dt_ticket_tic,
-    TO_DATE(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic')) AS dt_inicioticket_tic,
-    TO_DATE(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic')) AS dt_encerrado_tic,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(CAST(payload AS STRING), '$.dt_ticket_tic'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(CAST(payload AS STRING), '$.dt_ticket_tic'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_ticket_tic,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_inicioticket_tic,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_encerrado_tic,
+    COALESCE(
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic'), 'MM/dd/yyyy HH:mm:ss'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic'), 'MM/dd/yyyy'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic'), 'yyyy-MM-dd HH:mm:ss'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic'), 'yyyy-MM-dd'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic'), 'dd/MM/yyyy HH:mm:ss'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_inicioticket_tic'), 'dd/MM/yyyy')
+    ) AS ts_inicioticket_tic,
+    COALESCE(
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic'), 'MM/dd/yyyy HH:mm:ss'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic'), 'MM/dd/yyyy'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic'), 'yyyy-MM-dd HH:mm:ss'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic'), 'yyyy-MM-dd'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic'), 'dd/MM/yyyy HH:mm:ss'),
+        TO_TIMESTAMP(get_json_object(CAST(payload AS STRING), '$.dt_encerrado_tic'), 'dd/MM/yyyy')
+    ) AS ts_encerrado_tic,
     synced_at AS ts_synced
 FROM
     datalake_benvi_manager_raw.lake_mirror

@@ -1,0 +1,120 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_rollup_checklist_item
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Roll-Up checklist model at one row per checklist step, the DW checklists tab of the daily
+  extraction spreadsheet. It unions the contract checklist lines with the maintenance order
+  notes and attaches the work item covering each step, trying the instance key first, then
+  checklist and contract, then checklist name and contract. Every line of one checklist
+  instance shares its creation day, so the instance counter is always 1 on the contract side.
+  Nothing consumes this yet, so the shape is the modelling shape rather than a legacy
+  contract.
+columns:
+  origem_checklist:
+    description: >-
+      Which side of the union produced the row, a contract checklist line or a maintenance
+      order note.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao_historico
+  id_checklist_cs:
+    description: >-
+      Roll-Up instance key the line belongs to, the same key benvi_rollup_ticket builds so the
+      two models join.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao_historico
+  id_contrato_con:
+    description: "Contract the checklist line hangs off. Maintenance notes inherit it from their order."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  codigo_contrato:
+    description: "Business contract code resolved from the contract identifier."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_contrato
+  name_checklist:
+    description: >-
+      Checklist this line belongs to, parsed from the template name or assembled from the
+      maintenance description and category.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  person_type:
+    description: "Who the line is about. IQ is the tenant, PP the owner and INT an internal actor."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  sub_item:
+    description: "The individual checklist step, or the text of the maintenance note."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao_historico
+  sub_item_done:
+    description: >-
+      Completion flag of the step. Maintenance notes are always complete because the note only
+      exists once the work happened.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao_historico
+  dt_sub_item_done:
+    description: >-
+      Moment the step was completed. For contract lines it is the first filled one of last
+      notification, app delivery and deadline, and only once the step is marked complete.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao_historico
+  dt_checklist_created:
+    description: >-
+      Day the checklist instance started, the earliest completion across the whole instance
+      for contract lines and the creation day of the order for maintenance notes.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  tipo_tkt:
+    description: "Kind of work item covering this line, empty when no ticket could be resolved."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_rollup_ticket
+  id_chave:
+    description: "Roll-Up key of the covering work item, empty when none resolved."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_rollup_ticket
+  id_origem_tkt:
+    description: "Origin identifier of the covering work item."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_rollup_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao_historico
+  id_ticket_tic:
+    description: >-
+      Service ticket identifier of the covering work item, empty when the cover is a
+      maintenance order.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_rollup_ticket
+  email_an_tkt:
+    description: >-
+      Back office user credited with the work. Personal detail, read access governed by Trino
+      column-level ACL.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_rollup_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao_historico
+  dt_ini_tkt:
+    description: "Moment the covering work item started."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_rollup_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  dt_fin_tkt:
+    description: "Moment the covering work item closed."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_rollup_ticket
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao
+  dt_user_tkt:
+    description: >-
+      Reserved by the Roll-Up model for a user supplied moment. The extraction script leaves
+      it empty and so does this projection.
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_checklist_contrato
+  id_historico_mhis:
+    description: "Maintenance note identifier, empty on contract checklist lines."
+    lineage:
+      - datalake_benvi_manager_clean.benvi_superlogica_manutencao_historico
