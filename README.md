@@ -197,7 +197,6 @@ For SQL style on `dags/`, see `make check-sql` / `make lint-sql` in the **Makefi
 To run a single package or DAG test folder:
 
 ```bash
-    uv run --directory packages/bietlejuice-runtime pytest test/dags/agents/enrich_agent_reports/spark_jobs/ -q
     uv run --directory packages/bietlejuice-core pytest test/unit/services/test_configuration_service.py -v
 ```
 

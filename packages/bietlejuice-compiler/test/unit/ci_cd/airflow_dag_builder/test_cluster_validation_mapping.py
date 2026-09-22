@@ -698,46 +698,6 @@ class TestBuildValidationClusterSpec:
         )
         assert spec is None
 
-    def test_enrich_agent_reports_validation_allows_nested_not_null_workaround(self):
-        declaration = {
-            "dag": {"name": "enrich_agent_reports"},
-            "workflow": {
-                "type": "query_delta",
-                "layer": "enrich",
-                "tables_customization": {
-                    "agent_status_by_month": {
-                        "load_spark_job": "load_agent_status_by_month",
-                    },
-                },
-            },
-            "cluster": {
-                "type": "databricks_16_4_med_general_cluster",
-                "databricks_conn_id": "databricks_new_env",
-            },
-            "validation": {
-                "cluster": {
-                    "custom_configurations": {
-                        "spark_conf": {
-                            "spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled": True,
-                        },
-                    },
-                },
-            },
-        }
-        spec = build_validation_cluster_spec(
-            cluster_args=declaration["cluster"],
-            declaration=declaration,
-        )
-        assert spec is not None
-        assert spec.allow_custom_spark_job is True
-        spark_conf = spec.custom_configurations["spark_conf"]
-        assert (
-            spark_conf[
-                "spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled"
-            ]
-            is True
-        )
-
     def test_existing_validation_custom_config_does_not_override_generated_values(self):
         declaration = {
             "validation": {

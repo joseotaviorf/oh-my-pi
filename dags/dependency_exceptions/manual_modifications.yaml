@@ -305,16 +305,6 @@ bietlejuice.enrich_agent_payments:
     - bietlejuice.sales_flow_fast_lane:load-clean-house:first-run-of-day
     - bietlejuice.sales_flow_fast_lane:load-clean-offer:first-run-of-day
     - bietlejuice.sales_flow_fast_lane:load-clean-sales-flow:first-run-of-day
-bietlejuice.enrich_agent_reports:
-  add:
-    - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
-    - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
-    - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
-    - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
-    - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
-    - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
-    - bietlejuice.enrich_ciq_users:load-enrich-ciq-users:first-run-of-day
-    - bietlejuice.enrich_tiers:load-enrich-ciq-first-listing:first-run-of-day
 bietlejuice.enrich_accounting_funnel:
   remove:
     - bietlejuice.sap:load-clean-users:first-run-of-day
