@@ -1,0 +1,22 @@
+database_name: ops_public
+table_name: sales_3p_buyer_prospect
+owner: carlos.lenko@quintoandar.com
+domain: Data Ops & Governance
+description: Table `sales_3p_buyer_prospect` materialized on a schedule by Luigi from a user-provided SQL query (Ops Public domain).
+columns:
+  sk_broker:
+    description: Column `sk_broker` produced by the scheduled materialization query.
+  id_visitor:
+    description: Column `id_visitor` produced by the scheduled materialization query.
+  id_agent:
+    description: Column `id_agent` produced by the scheduled materialization query.
+  sk_offer:
+    description: Column `sk_offer` produced by the scheduled materialization query.
+  ts_sale_agreement_signed:
+    description: Column `ts_sale_agreement_signed` produced by the scheduled materialization query.
+  business_model:
+    description: Column `business_model` produced by the scheduled materialization query.
+  data_cohort:
+    description: Column `data_cohort` produced by the scheduled materialization query.
+  segmentation_fiel:
+    description: Column `segmentation_fiel` produced by the scheduled materialization query.

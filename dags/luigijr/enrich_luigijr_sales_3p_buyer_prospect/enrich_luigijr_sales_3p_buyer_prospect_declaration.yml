@@ -1,0 +1,17 @@
+dag:
+  name: enrich_luigijr_sales_3p_buyer_prospect
+  owner: Ops Public
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:carlos.lenko
+  dataset_dependencies:
+  - dw_public.dim_booking:first-run-of-day
+  - datalake_visit.visit_business_model:first-run-of-day
+  - dw_sale.fact_offers:first-run-of-day
+  - dw_sale.fact_sale_demand_event:first-run-of-day
+  - dw_public.dim_region:first-run-of-day
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: ops_public
