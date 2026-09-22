@@ -14,7 +14,7 @@ WITH tof_aux AS (
     FROM datalake_amplitude_page_viewed_events.schedule_search_listing_events t
     LEFT JOIN tof_aux ta
         ON t.id_amplitude = ta.id_amplitude
-    WHERE t.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_60}) AND DATE('{end_date}')
+    WHERE DATE(t.ts_event) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_60}) AND DATE('{end_date}')
 )
 
 SELECT DISTINCT 

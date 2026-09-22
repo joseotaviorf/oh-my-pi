@@ -20,7 +20,7 @@ WITH prospects AS (
       'USER CHURN'
       ) -- These events indicate activation of the user (i.e. started a flow with a VB or DO) and the churn.
     AND flow_order = 1 -- Selecting the first event in that flow which is the combination of sk_prospect + sk_house.
-    AND ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_120}) AND DATE('{end_date}') -- We are going further back in time for the prospect events to ensure that at moment of concierge contact the user was not previously an active prospect.
+    AND DATE(ts_event) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_120}) AND DATE('{end_date}') -- We are going further back in time for the prospect events to ensure that at moment of concierge contact the user was not previously an active prospect.
 )
 
 , messages_in_window AS (

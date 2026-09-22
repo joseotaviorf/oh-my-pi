@@ -94,7 +94,7 @@ WITH concierge_trigger AS (
       OR (m.message_index = 0 AND m.role = 'HUMAN')
     )
     AND m.content IS DISTINCT FROM 'Pausar recomendações' -- IS DISTINCT FROM includes nulls. It's important to include them as they usually are midia content (e.g. image) and can have direct VB associated.
-    AND m.ts_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+    AND DATE(m.ts_created) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
 , first_outbound_message AS (

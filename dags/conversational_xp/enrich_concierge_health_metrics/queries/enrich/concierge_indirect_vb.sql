@@ -18,7 +18,7 @@ WITH concierge_indirect_vb AS (
   JOIN dw_visit.fact_visits fv
     ON dv.sk_visit = fv.sk_visit
   WHERE get_json_object(event_properties, '$.recset_showcase') = 'CONCIERGE_WHATSAPP'
-  AND dv.dt_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+  AND DATE(dv.dt_created) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
 , messages_in_window AS (

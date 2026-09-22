@@ -73,7 +73,7 @@ WITH visits AS (
             'USER RECOVERY IN OTHER CITY GROUP'
         )
         AND flow_order = 1
-        AND ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+        AND DATE(ts_event) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
 , messages_in_window AS (

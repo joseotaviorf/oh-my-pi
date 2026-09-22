@@ -92,7 +92,7 @@ direct_visits_ranked AS (
         AND vc.ts_message_sent <= vsl.ts_created
     WHERE vsl.channel IN ('CONVERSATIONAL - WHATSAPP_CONCIERGE', 'CONVERSATIONAL - NATIVE_CONCIERGE')
         AND vsl.event_type IN ('VISIT_SCHEDULED', 'VISIT_RESCHEDULED')
-        AND vsl.ts_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+        AND DATE(vsl.ts_created) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
 SELECT
