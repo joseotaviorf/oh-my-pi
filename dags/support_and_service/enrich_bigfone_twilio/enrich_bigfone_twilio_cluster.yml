@@ -1,3 +1,2 @@
 cluster:
-  type: consolidation_l_general_single_node_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_l_general_single_node_cluster
