@@ -24,4 +24,6 @@ SELECT
     MAX(dt_reference) AS dt_end
 FROM
     min_sla_per_day
-GROUP BY ALL
+GROUP BY
+    journey_step,
+    sla

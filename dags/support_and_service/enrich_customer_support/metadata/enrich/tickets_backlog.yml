@@ -1,0 +1,96 @@
+database_name: datalake_customer_support
+table_name: tickets_backlog
+description: >
+  Daily SLA backlog snapshot for Customer Support tickets. One row per ticket per
+  calendar day in the SLA window (id_ticket, dt_snapshot), used by Support operations
+  to track backlog aging in calendar and business days. Built from Zendesk tickets
+  plus SLA taxonomies (journey, theme, theme detail, tag) and the national
+  weekend/holiday calendar.
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+    description: Unique Zendesk ticket identifier. Grain key together with dt_snapshot.
+  dt_snapshot:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_zendesk.tickets_current.dt_budgeted
+    description: >
+      Calendar date of the backlog snapshot. Exploded from the SLA window spanning
+      ts_sla_started (or load_start_date) through ts_solved (or load_end_date).
+  dt_off:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: >
+      Non-working date matching dt_snapshot when that day is a weekend or a national
+      holiday. Null on working days.
+  days_elapsed_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_zendesk.tickets_current.dt_budgeted
+    description: >
+      Count of calendar days elapsed from the SLA start through dt_snapshot, including
+      weekends and holidays. Running count over the exploded day sequence minus one.
+  days_elapsed_off:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: >
+      Count of non-working days (weekends and national holidays) from the SLA start
+      through dt_snapshot. Used to convert calendar elapsed days into business days.
+  days_elapsed_business:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_quintoandar.aux_date.date
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: >
+      Business days elapsed from the SLA start through dt_snapshot. Built as
+      days_elapsed_calendar minus days_elapsed_off, floored at zero.
+  sla_target:
+    lineage:
+      - datalake_gsheets_clean.tag_sla_target.sla
+      - datalake_customer_support.sla_theme_detail.sla
+      - datalake_customer_support.sla_theme.sla
+      - datalake_customer_support.sla_journey.sla
+      - datalake_zendesk.tickets_current.group_name
+    description: >
+      SLA target in days for the ticket. Taken from tag, theme detail, theme, or
+      journey taxonomies, with a hardcoded 21-day target for Proteção QuintoAndar
+      and Rescisão Despejo queues.
+  is_solved:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+    description: >
+      True when dt_snapshot equals the ticket solve date. False for open tickets and
+      for snapshot days before the solve date.
+  is_backlog_in_time:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_gsheets_clean.tag_sla_target.sla
+      - datalake_customer_support.sla_theme_detail.sla
+      - datalake_customer_support.sla_theme.sla
+      - datalake_customer_support.sla_journey.sla
+      - datalake_quintoandar.aux_date.date
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: >
+      True when business days elapsed through dt_snapshot are still within sla_target.
+      Used to flag backlog days that remain inside the SLA.
+  ts_sla_started:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_zendesk.tickets_current.dt_budgeted
+    description: >
+      Timestamp when the SLA clock starts, in local time (UTC minus 3 hours). Uses
+      the budgeted timestamp when it falls between ticket creation and solve;
+      otherwise uses ts_created.
+  ts_solved:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+    description: Timestamp when the ticket was solved, shifted to local time (UTC minus 3 hours). Null while the ticket is still open.

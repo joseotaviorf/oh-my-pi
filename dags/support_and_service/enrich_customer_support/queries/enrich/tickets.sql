@@ -563,7 +563,9 @@ ticket_sla_target AS (
       )
       OR t.last_queue != 'Offboarding Reparos [OFF] [POS] [BACK]'
     )
-  GROUP BY ALL
+  GROUP BY
+    t.id_ticket,
+    t.ts_solved
 ),
 ticket_date_interval AS (
   SELECT

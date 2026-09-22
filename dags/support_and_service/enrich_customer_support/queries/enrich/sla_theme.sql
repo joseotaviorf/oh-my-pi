@@ -17,7 +17,10 @@ min_sla_per_day AS (
         MIN(sla) AS sla
     FROM
         exploded_theme_sla
-    GROUP BY ALL
+    GROUP BY
+        dt_reference,
+        journey_step,
+        theme
 )
 SELECT
     journey_step,
@@ -27,4 +30,7 @@ SELECT
     MAX(dt_reference) AS dt_end
 FROM
     min_sla_per_day
-GROUP BY ALL
+GROUP BY
+    journey_step,
+    theme,
+    sla

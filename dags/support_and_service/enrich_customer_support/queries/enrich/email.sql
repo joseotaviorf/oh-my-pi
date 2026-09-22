@@ -149,21 +149,40 @@ last_and_first_back_tickets_timestamps AS (
     back_tickets
   GROUP BY 1
 ),
-last_back_ticket AS (
+last_back_ticket_ranked AS (
   SELECT
-    bt.*,
+    bt.back_ticket,
+    bt.back_ticket_status,
+    bt.front_ticket,
+    bt.ts_ticket_started,
+    bt.ts_ticket_solved,
     lt.is_open_back_ticket,
     lt.back_ticket_list,
     lt.ts_first_created,
-    CAST((TO_UNIX_TIMESTAMP(lt.ts_last_solved) - TO_UNIX_TIMESTAMP(lt.ts_first_created))/60.0 AS DOUBLE) AS total_backoffice_minutes_time
+    CAST((TO_UNIX_TIMESTAMP(lt.ts_last_solved) - TO_UNIX_TIMESTAMP(lt.ts_first_created))/60.0 AS DOUBLE) AS total_backoffice_minutes_time,
+    ROW_NUMBER() OVER(PARTITION BY bt.front_ticket ORDER BY lt.ts_first_created DESC) AS rn
   FROM
-    back_tickets bt
+    back_tickets AS bt
   INNER JOIN
-    last_and_first_back_tickets_timestamps lt
+    last_and_first_back_tickets_timestamps AS lt
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_ticket_solved
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY bt.front_ticket ORDER BY lt.ts_first_created DESC) = 1
+),
+last_back_ticket AS (
+  SELECT
+    back_ticket,
+    back_ticket_status,
+    front_ticket,
+    ts_ticket_started,
+    ts_ticket_solved,
+    is_open_back_ticket,
+    back_ticket_list,
+    ts_first_created,
+    total_backoffice_minutes_time
+  FROM
+    last_back_ticket_ranked
+  WHERE
+    rn = 1
 )
 SELECT DISTINCT
   ze.id_ticket,

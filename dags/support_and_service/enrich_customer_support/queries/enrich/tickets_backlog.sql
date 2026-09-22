@@ -82,7 +82,9 @@ ticket_sla_target AS (
     datalake_customer_support.sla_journey AS jrs
       ON dc.journey_step = jrs.journey_step
       AND DATE(t.ts_created) BETWEEN jrs.dt_start AND COALESCE(jrs.dt_end, TIMESTAMP('{load_end_date}') + INTERVAL 1 DAY)
-  GROUP BY ALL
+  GROUP BY
+    t.id_ticket,
+    t.ts_solved
 ),
 ticket_date_intervals AS (
   SELECT

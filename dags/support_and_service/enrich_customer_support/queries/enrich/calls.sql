@@ -21,16 +21,27 @@ WITH sss_and_sauron_call_sessions AS (
     source in ('call_in_app', 'call')
     AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
     AND ts_created >= DATE('2025-11-10')
-), call_sessions AS ( 
+),
+call_sessions_ranked AS (
+  SELECT
+    source_identity,
+    id_session,
+    id_user,
+    id_sss_session,
+    ROW_NUMBER() OVER (PARTITION BY source_identity ORDER BY id_session) AS rn
+  FROM
+    sss_and_sauron_call_sessions
+),
+call_sessions AS (
   SELECT
     source_identity,
     id_session,
     id_user,
     id_sss_session
   FROM
-    sss_and_sauron_call_sessions
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY source_identity ORDER BY id_session) = 1
+    call_sessions_ranked
+  WHERE
+    rn = 1
 ),
 call_events AS (
   SELECT
@@ -60,6 +71,16 @@ call_events AS (
   WHERE
     MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY  AND "{load_end_date}"
 ),
+reservation_queues_ranked AS (
+  SELECT
+    id_task,
+    id_reservation,
+    id_queue,
+    queue_name,
+    ROW_NUMBER() OVER(PARTITION BY id_reservation ORDER BY ts_task_created) AS rn
+  FROM
+    call_events
+),
 reservation_queues AS (
   SELECT DISTINCT
     id_task,
@@ -67,9 +88,9 @@ reservation_queues AS (
     id_queue,
     queue_name
   FROM
-    call_events
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_reservation ORDER BY ts_task_created) = 1
+    reservation_queues_ranked
+  WHERE
+    rn = 1
 ),
 queues_per_reservation AS (
   SELECT
@@ -82,15 +103,24 @@ queues_per_reservation AS (
     id_reservation is not null
   GROUP BY 1, 2
 ),
+task_queues_ranked AS (
+  SELECT
+    id_task,
+    id_queue,
+    queue_name,
+    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_task_created) AS rn
+  FROM
+    call_events
+),
 task_queues AS (
   SELECT
     id_task,
     id_queue,
     queue_name
   FROM
-    call_events
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_task_created) = 1
+    task_queues_ranked
+  WHERE
+    rn = 1
 ),
 reservations AS (
   SELECT
@@ -141,7 +171,16 @@ reservations AS (
     call_events
   WHERE
     event_type LIKE 'reservation.%'
-  GROUP BY ALL
+  GROUP BY
+    id_task,
+    id_reservation,
+    id_worker,
+    direction,
+    channel_type,
+    worker_email,
+    from_phone_number,
+    to_phone_number,
+    waiting_time_sec
 ),
 call_answered_flag AS (
   SELECT
@@ -182,7 +221,12 @@ unanswered_calls AS (
     ce.direction IS NOT NULL
     AND ce.task_cancelation_reason IS NOT NULL
     AND r.id_task IS NULL
-  GROUP BY ALL
+  GROUP BY
+    ce.id_task,
+    ce.direction,
+    ce.channel_type,
+    ce.from_phone_number,
+    ce.to_phone_number
   HAVING COUNT(DISTINCT(ce.id_reservation)) < 1
 ),
 reservation_metrics AS (
@@ -288,6 +332,37 @@ calls AS (
     ts_task_created
   FROM
     unanswered_calls
+),
+call_session_matches AS (
+  SELECT
+    CONCAT_WS(
+      '|',
+      COALESCE(CAST(c.id_call AS STRING), ''),
+      COALESCE(CAST(c.id_task AS STRING), '')
+    ) AS call_match_key,
+    cs.id_session,
+    cs.id_sss_session,
+    cs.id_user
+  FROM
+    calls AS c
+  INNER JOIN
+    call_sessions AS cs
+      ON cs.source_identity = c.id_call
+  UNION
+  SELECT
+    CONCAT_WS(
+      '|',
+      COALESCE(CAST(c.id_call AS STRING), ''),
+      COALESCE(CAST(c.id_task AS STRING), '')
+    ) AS call_match_key,
+    cs.id_session,
+    cs.id_sss_session,
+    cs.id_user
+  FROM
+    calls AS c
+  INNER JOIN
+    call_sessions AS cs
+      ON cs.source_identity = c.id_task
 )
 SELECT DISTINCT
   c.id_call,
@@ -333,7 +408,10 @@ LEFT JOIN
     ON tq.id_task = c.id_task
     AND c.id_reservation IS NULL
 LEFT JOIN
-  call_sessions AS cs
-    ON cs.source_identity = c.id_call
-    OR cs.source_identity = c.id_task
+  call_session_matches AS cs
+    ON cs.call_match_key = CONCAT_WS(
+      '|',
+      COALESCE(CAST(c.id_call AS STRING), ''),
+      COALESCE(CAST(c.id_task AS STRING), '')
+    )
     

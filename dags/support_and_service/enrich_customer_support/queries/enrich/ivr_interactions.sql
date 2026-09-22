@@ -1,4 +1,4 @@
-WITH ivr AS (
+WITH ivr_ranked AS (
     SELECT
         id_task,
         id_call,
@@ -9,14 +9,26 @@ WITH ivr AS (
             '\\}},',
             ':\\{{'
         ) AS ivr_steps_map,
-        MIN(ts_created) OVER(PARTITION BY id_task) AS ts_ivr_started
+        MIN(ts_created) OVER(PARTITION BY id_task) AS ts_ivr_started,
+        ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created DESC) AS rn
     FROM
         datalake_bigfone_clean.event
     WHERE
         MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
         AND workflow_name = 'IVR Events'
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created DESC) = 1
+),
+ivr AS (
+    SELECT
+        id_task,
+        id_call,
+        from_phone_number,
+        to_phone_number,
+        ivr_steps_map,
+        ts_ivr_started
+    FROM
+        ivr_ranked
+    WHERE
+        rn = 1
 ),
 exploded_ivrs AS (
     SELECT
@@ -56,4 +68,13 @@ SELECT
     DAY(ts_ivr_started) AS day
 FROM
     exploded_events
-GROUP BY ALL
+GROUP BY
+    id_call,
+    id_task,
+    from_phone_number,
+    to_phone_number,
+    step_name,
+    ts_ivr_started,
+    YEAR(ts_ivr_started),
+    MONTH(ts_ivr_started),
+    DAY(ts_ivr_started)
