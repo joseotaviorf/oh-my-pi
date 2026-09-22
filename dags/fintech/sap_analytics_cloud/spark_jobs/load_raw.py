@@ -28,6 +28,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline import FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import MetastoreServiceFactory
+from bietlejuice.services.storage_services.s3_service import S3Service
 
 JOB_NAME = "load_raw_sap_analytics_cloud"
 
@@ -35,6 +36,9 @@ REQUEST_TIMEOUT_SECONDS = 300
 
 REQUEST_ATTEMPTS = 3
 REQUEST_RETRY_BACKOFF_SECONDS = 10
+
+# Scratch area for the raw export; cleared before staging and after the load.
+STAGING_PREFIX = "tmp/api_ingestion"
 
 HTTPS_PORT = 443
 EGRESS_PROBE_TIMEOUT_SECONDS = 10
@@ -227,15 +231,50 @@ def _tenant_base_url(odata_url):
     return f"{parts.scheme}://{parts.netloc}"
 
 
-def _fetch_records(*, odata_url, table_api_path, access_token):
-    """Read the whole fact data export, following OData server-driven paging."""
+def _staging_path(*, datalake_bucket, source, table_name, load_end_date):
+    """Where the raw export lands before Spark reads it."""
+    return (
+        f"s3://{datalake_bucket}/{STAGING_PREFIX}/{source}/{table_name}/{load_end_date}"
+    )
+
+
+def _clear_staging(s3_resource, staging_path):
+    """Drop anything left under ``staging_path``.
+
+    The task is retried, and a retry that finds pages from the attempt that
+    died would read them on top of the ones it writes and load the overlap
+    twice. The prefix is scoped to one table and one snapshot date, so nothing
+    else can live under it.
+    """
+    parts = urlsplit(staging_path)
+    s3_resource.Bucket(parts.netloc).objects.filter(
+        Prefix=parts.path.lstrip("/")
+    ).delete()
+
+
+def _stage_export(
+    *, odata_url, table_api_path, access_token, staging_path, storage_service
+):
+    """Stream the export into ``staging_path``, one object per page.
+
+    Collecting the whole export into a Python list is what killed the previous
+    run: the driver reached roughly 17 GB resident and the kernel took the
+    process down with no traceback. Writing each page out and dropping it keeps
+    driver memory bounded by a single page, and lets Spark read the result in
+    parallel instead of materialising it on the driver.
+
+    Returns the number of rows staged and every column seen across the export.
+    """
     url = f"{_tenant_base_url(odata_url)}/{table_api_path.lstrip('/')}"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Accept": "application/json",
     }
 
-    records = []
+    row_count = 0
+    pages = 0
+    exported_columns = set()
+
     while url:
         response = _request(
             "get", url, headers=headers, timeout=REQUEST_TIMEOUT_SECONDS
@@ -247,24 +286,43 @@ def _fetch_records(*, odata_url, table_api_path, access_token):
             )
 
         payload = response.json()
-        records.extend(payload.get("value", []))
+        rows = payload.get("value", [])
+
+        if rows:
+            pages += 1
+            # Accumulated across every page, not sampled from the first one:
+            # the export omits null properties, so a column that happens to be
+            # null throughout the first page is absent there and present later.
+            exported_columns.update(*(row.keys() for row in rows))
+
+            storage_service.upload_file(
+                "\n".join(json.dumps(row) for row in rows),
+                f"{staging_path}/page_{pages:06d}.json",
+            )
+            row_count += len(rows)
+            # The previous run spent 27 minutes paging without emitting a
+            # single line, so a stuck export looked exactly like a slow one.
+            logger.info(
+                f"m=_stage_export, pages={pages}, rows={row_count}, "
+                f"msg=Staged a page of the SAC export."
+            )
+
         # Every page must be followed before the export is considered complete:
         # a partially read export silently yields an incomplete snapshot.
         url = payload.get("@odata.nextLink")
 
-    return records
+    return row_count, exported_columns
 
 
-def _raise_if_schema_diverges(records, table_schema):
+def _raise_if_schema_diverges(exported_columns, table_schema):
     """Fail when the export does not carry every configured column.
 
     The export is addressed by an opaque provider id, so pointing the DAG at the
     wrong SAC model is easy to do and would otherwise load a table of nulls,
-    because the dataframe is built without schema verification.
+    because the dataframe is read without schema inference.
     """
     expected = {field.name for field in table_schema.fields}
-    exported = set().union(*(record.keys() for record in records))
-    missing = sorted(expected - exported)
+    missing = sorted(expected - exported_columns)
 
     if missing:
         raise RuntimeError(
@@ -274,13 +332,13 @@ def _raise_if_schema_diverges(records, table_schema):
         )
 
 
-def _raise_if_export_is_empty(records):
+def _raise_if_export_is_empty(row_count):
     """Refuse to publish an empty export.
 
     The load overwrites the table, so writing an empty export would replace a
     good snapshot with nothing.
     """
-    if not records:
+    if not row_count:
         raise RuntimeError(
             "The SAP Analytics Cloud export returned no rows. Refusing to "
             "overwrite the existing snapshot with an empty full load."
@@ -371,15 +429,35 @@ if __name__ == "__main__":
 
     _raise_unless_partition_overwrite_is_static(spark_client.conn)
 
-    records = _fetch_records(
+    s3_resource = boto3.resource("s3")
+    staging_path = _staging_path(
+        datalake_bucket=datalake_bucket,
+        source=source,
+        table_name=table_name,
+        load_end_date=load_end_date,
+    )
+
+    _clear_staging(s3_resource, staging_path)
+    row_count, exported_columns = _stage_export(
         odata_url=odata_url,
         table_api_path=table_api_path,
         access_token=access_token,
+        staging_path=staging_path,
+        storage_service=S3Service(s3_resource),
     )
-    _raise_if_export_is_empty(records)
-    _raise_if_schema_diverges(records, table_schema)
+    _raise_if_export_is_empty(row_count)
+    _raise_if_schema_diverges(exported_columns, table_schema)
 
-    df = spark_client.create_dataframe(records, table_schema, verify_schema=False)
+    # The schema is declared rather than inferred: inference would sample the
+    # staged JSON and is free to read a column as long on one run and double on
+    # the next, depending on the rows it happens to see. FAILFAST because the
+    # default would turn a value that does not fit its column into a null, and
+    # a financial measure that quietly becomes null is worse than a failed run.
+    df = (
+        spark_client.conn.read.schema(table_schema)
+        .option("mode", "FAILFAST")
+        .json(staging_path)
+    )
     df = (
         SparkDataFrameService()
         .input(df)
@@ -396,9 +474,14 @@ if __name__ == "__main__":
         partitions=partitions,
     ).load_and_register(df, format_options)
 
+    # Only now that the table is written can the staged pages go: the read
+    # above is lazy, so deleting any earlier would pull the input out from
+    # under the write.
+    _clear_staging(s3_resource, staging_path)
+
     logger.info(
         "m=load_raw, snapshot_dt=%s, rows=%s, msg=SAP Analytics Cloud raw full load "
         "completed successfully.",
         load_end_date,
-        len(records),
+        row_count,
     )
