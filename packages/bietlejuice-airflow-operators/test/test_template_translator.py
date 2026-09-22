@@ -179,10 +179,7 @@ def test_metrics_spark_conf_keys_are_forwarded_to_spark_defaults():
     out = translate(
         _fleet_base(
             spark_conf={
-                "spark.plugins": (
-                    "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,"
-                    "br.com.quintoandar.GangliaMetrics"
-                ),
+                "spark.plugins": "ch.cern.CloudFSMetrics,br.com.quintoandar.GangliaMetrics",
                 "spark.metrics.conf.*.sink.graphite.host": (
                     "graphite-exporter.apps.core-frn.habitat.zone"
                 ),
@@ -193,7 +190,7 @@ def test_metrics_spark_conf_keys_are_forwarded_to_spark_defaults():
     props = _spark_defaults_props(out)
     assert (
         props["spark.plugins"]
-        == "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
+        == "ch.cern.CloudFSMetrics,br.com.quintoandar.GangliaMetrics"
     )
     assert (
         props["spark.metrics.conf.*.sink.graphite.host"]
