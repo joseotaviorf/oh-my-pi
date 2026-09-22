@@ -61,7 +61,7 @@ class BaseTaskGroup:
     def build_task_group_from_sql_files(
         self,
         layer: LayerEnum,
-        tables_customization: Dict[str, Dict[str, str]] = None,
+        tables_customization: Optional[Dict[str, Dict[str, str]]] = None,
         **kwargs,
     ) -> dict:
         """

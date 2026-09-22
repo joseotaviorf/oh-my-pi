@@ -266,7 +266,7 @@ def test_full_tables_are_untouched_by_the_feature(tables_customization):
         for name, customization in tables_customization.items()
         if name not in INCREMENTAL_TABLES
     }
-    assert len(full_tables) == 20
+    assert len(full_tables) == 21
 
     for name, customization in full_tables.items():
         assert customization["extraction_type"] == "full", name
