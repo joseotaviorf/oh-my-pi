@@ -21,18 +21,31 @@ DEFAULT_MODEL = "vertex_ai/claude-sonnet-4-5"
 DEFAULT_SECRET_SCOPE = "people"
 DEFAULT_SECRET_KEY = "PEOPLE_DATA_LITELLM_KEY"
 DEFAULT_MAX_RETRIES = 3
-DEFAULT_TIMEOUT_SECONDS = 120
-DEFAULT_MAX_TOKENS = 4096
+DEFAULT_TIMEOUT_SECONDS = 180
+# 4096 truncated Teva JSON on EMR (finish_reason=length → unparseable object).
+# Sonnet 4.5 catalog max is 64K.
+DEFAULT_MAX_TOKENS = 16384
 # Match the Datahub LiteLLM client: retry rate limits and gateway failures only.
 _RETRYABLE_HTTP_STATUS = frozenset({429, 502, 503, 504})
 _HTTP_ERROR_BODY_MAX_CHARS = 500
+_PREVIEW_MAX_CHARS = 1500
+
+
+def preview_llm_text(value: Optional[object]) -> str:
+    """Collapse whitespace and truncate for Airflow/EMR warning lines."""
+    if value is None:
+        return ""
+    collapsed = " ".join(str(value).split())
+    if len(collapsed) > _PREVIEW_MAX_CHARS:
+        return collapsed[:_PREVIEW_MAX_CHARS] + "..."
+    return collapsed
 
 
 class LiteLLMClient:
     """OpenAI-compatible chat client for the internal LiteLLM proxy.
 
     Sends JSON POST requests to ``{base_url}/chat/completions`` with bearer auth,
-    fixed low temperature (0.2), and configurable ``max_tokens``. Retries only
+    temperature 0.2, and configurable ``max_tokens`` (default 16384). Retries only
     transient failures (429, 502, 503, 504, network, timeout, invalid JSON) with
     exponential backoff capped at 10 seconds. Non-transient HTTP errors such as
     404 are raised immediately so a misconfigured model cannot look like success.
@@ -47,7 +60,7 @@ class LiteLLMClient:
         secret_key: str = DEFAULT_SECRET_KEY,
         max_retries: int = DEFAULT_MAX_RETRIES,
         timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS,
-        max_tokens: int = DEFAULT_MAX_TOKENS,
+        max_tokens: Optional[int] = None,
     ) -> None:
         """Initialize gateway URL, model name, and credentials.
 
@@ -67,6 +80,8 @@ class LiteLLMClient:
             max_retries: Maximum POST attempts before raising :class:`RuntimeError`.
             timeout_seconds: Per-request socket timeout for ``urlopen``.
             max_tokens: ``max_tokens`` field sent to the chat completions API.
+                Resolution: argument, then ``LITELLM_MAX_TOKENS``, then
+                :data:`DEFAULT_MAX_TOKENS`.
         """
         self.base_url = (
             base_url or os.environ.get("LITELLM_BASE_URL") or DEFAULT_BASE_URL
@@ -74,7 +89,13 @@ class LiteLLMClient:
         self.model = model or os.environ.get("LITELLM_MODEL") or DEFAULT_MODEL
         self.max_retries = max_retries
         self.timeout_seconds = timeout_seconds
-        self.max_tokens = max_tokens
+        env_max_tokens = os.environ.get("LITELLM_MAX_TOKENS")
+        if max_tokens is not None:
+            self.max_tokens = max_tokens
+        elif env_max_tokens:
+            self.max_tokens = int(env_max_tokens)
+        else:
+            self.max_tokens = DEFAULT_MAX_TOKENS
         if api_key is not None:
             self.api_key = api_key
         else:
@@ -99,7 +120,8 @@ class LiteLLMClient:
         Raises:
             RuntimeError: When the HTTP layer fails (non-retryable errors fail
                 immediately; retryable errors fail after all retries), the response
-                has no ``choices``, or the first choice has no ``message.content``.
+                has no ``choices``, the first choice has no ``message.content``,
+                or ``finish_reason`` is ``length`` (truncated before valid JSON).
         """
         messages = []
         if system_prompt:
@@ -115,8 +137,16 @@ class LiteLLMClient:
         choices = response_json.get("choices") or []
         if not choices:
             raise RuntimeError("LiteLLM response missing choices")
-        message = choices[0].get("message") or {}
+        choice = choices[0]
+        finish_reason = choice.get("finish_reason")
+        message = choice.get("message") or {}
         content = message.get("content")
+        if finish_reason == "length":
+            preview = preview_llm_text(content)
+            raise RuntimeError(
+                "LiteLLM response truncated (finish_reason='length') before "
+                f"a complete reply. preview={preview!r}"
+            )
         if not content:
             raise RuntimeError("LiteLLM response missing message content")
         return str(content).strip()

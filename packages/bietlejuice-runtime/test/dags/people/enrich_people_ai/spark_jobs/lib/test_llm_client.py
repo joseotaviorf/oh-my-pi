@@ -6,9 +6,11 @@ from urllib import error
 import pytest
 
 from dags.people.enrich_people_ai.spark_jobs.lib.llm_client import (
+    DEFAULT_MAX_TOKENS,
     DEFAULT_SECRET_KEY,
     DEFAULT_SECRET_SCOPE,
     LiteLLMClient,
+    preview_llm_text,
 )
 
 
@@ -95,6 +97,45 @@ class TestLiteLLMClient:
             "content": "prompt text",
         }
         assert sent_payload["model"] == "catalog/test-model"
+        assert sent_payload["max_tokens"] == DEFAULT_MAX_TOKENS
+        assert sent_payload["temperature"] == 0.2
+
+    def test_default_max_tokens_is_above_previous_truncation_ceiling(self):
+        """4096 was too small for Teva JSON; the default must stay above that."""
+        assert DEFAULT_MAX_TOKENS == 16384
+
+    def test_litellm_max_tokens_env_overrides_default(self, monkeypatch):
+        monkeypatch.setenv("LITELLM_MAX_TOKENS", "32000")
+        client = LiteLLMClient(api_key="explicit-key")
+        assert client.max_tokens == 32000
+
+    @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.request.urlopen")
+    def test_complete_raises_when_finish_reason_is_length(self, mocked_urlopen):
+        """Truncated replies must fail closed instead of looking like prose JSON."""
+        response_body = json.dumps(
+            {
+                "choices": [
+                    {
+                        "finish_reason": "length",
+                        "message": {"content": '{"executive_summary": "cut off'},
+                    }
+                ]
+            }
+        ).encode("utf-8")
+        mocked_response = MagicMock()
+        mocked_response.read.return_value = response_body
+        mocked_urlopen.return_value.__enter__.return_value = mocked_response
+
+        client = LiteLLMClient(api_key="explicit-key", model="catalog/test-model")
+        with pytest.raises(RuntimeError, match="finish_reason='length'"):
+            client.complete("prompt text")
+
+    def test_preview_llm_text_collapses_whitespace_and_truncates(self):
+        assert preview_llm_text("a\n\nb") == "a b"
+        long_text = "x" * 1600
+        preview = preview_llm_text(long_text)
+        assert preview.endswith("...")
+        assert len(preview) == 1500 + 3
 
     @patch("dags.people.enrich_people_ai.spark_jobs.lib.llm_client.request.urlopen")
     def test_complete_raises_when_response_has_no_choices(self, mocked_urlopen):

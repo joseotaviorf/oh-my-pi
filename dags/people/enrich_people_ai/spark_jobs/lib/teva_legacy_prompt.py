@@ -1,8 +1,7 @@
-"""Verbatim Teva prompt text from the Daily Pipeline notebook ``ai_teva_update``.
+"""Teva survey prompt text and JSON payload key titles.
 
-Databricks ``ai_query('databricks-gpt-oss-20b', ...)`` is replaced by LiteLLM; the
-instruction body is kept. The only EMR-side addition is
-:data:`ENGLISH_OUTPUT_INSTRUCTION`, standing in for notebook ``ai_translate(..., 'en')``.
+The instruction body is the production prompt. The only EMR-side addition is
+:data:`ENGLISH_OUTPUT_INSTRUCTION` so JSON values are written in English.
 """
 
 PILLAR_THEORY_AND_SPECIALIST_INTRO = """\
@@ -79,13 +78,13 @@ You must follow these instructions precisely, analyzing each question set accord
 The root keys must be: 'executive_summary', 'pillar_1_2_strategy_goals','pillar_3_roles', 'pillar_4_protocols', 'pillar_5_trust', and 'additional_comments'.
 Each key's value should be the full text of your analysis for that section."""
 
-# EMR substitute for notebook ``ai_translate(..., 'en')`` on every open answer.
+# Ask the model to write every JSON value in English.
 ENGLISH_OUTPUT_INSTRUCTION = (
     "Write every JSON value in English, even when survey answers are in Portuguese "
     "or another language."
 )
 
-# Question titles as shown to responders (notebook ``ia_input`` STRUCT aliases).
+# Question titles as shown to responders.
 PAYLOAD_KEY_STRATEGIC_GOALS = "P12: How clear are the strategic goals for this team?"
 PAYLOAD_KEY_PRIORITIES = "What are the top priorities for this team?"
 PAYLOAD_KEY_CHALLENGES = (

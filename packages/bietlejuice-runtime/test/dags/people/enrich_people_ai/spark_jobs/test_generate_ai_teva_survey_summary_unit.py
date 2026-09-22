@@ -19,6 +19,9 @@ with patch.dict(sys.modules, _IMPORT_TIME_MOCKS):
         _generate_summary,
         _survey_data_payload,
     )
+    from dags.people.enrich_people_ai.spark_jobs.generate_ai_teva_survey_summary import (
+        logger as teva_job_logger,
+    )
 
 SAMPLE_ROW = {
     "survey_invite_id": "invite-123",
@@ -57,7 +60,7 @@ class TestBuildTevaPrompt(unittest.TestCase):
         self.assertIn("Grow the team", prompt)
         self.assertIn("executive_summary", prompt)
 
-    def test_keeps_notebook_contract_and_english_output(self):
+    def test_keeps_json_contract_and_english_output(self):
         prompt = _build_teva_prompt(SAMPLE_ROW)
         self.assertIn("pillar_1_2_strategy_goals", prompt)
         self.assertIn("P12: How clear are the strategic goals for this team?", prompt)
@@ -94,7 +97,12 @@ class TestGenerateSummary(unittest.TestCase):
     def test_returns_none_when_llm_response_is_not_parseable_json(self):
         client = MagicMock()
         client.complete.return_value = "not json at all"
+        teva_job_logger.warning.reset_mock()
         self.assertIsNone(_generate_summary(SAMPLE_ROW, client))
+        warning_args = teva_job_logger.warning.call_args[0]
+        self.assertIn("preview=%s", warning_args[0])
+        self.assertEqual(warning_args[1], "invite-123")
+        self.assertEqual(warning_args[2], "not json at all")
 
     def test_returns_none_when_llm_client_raises_runtime_error(self):
         client = MagicMock()
@@ -120,7 +128,7 @@ class TestGenerateSummary(unittest.TestCase):
         self.assertEqual(result["ai_pillar_trust_and_relationships"], "High trust.")
         self.assertIn("ts_ai_summary_generated", result)
 
-    def test_flattens_nested_pillar_objects_like_notebook(self):
+    def test_flattens_nested_pillar_objects(self):
         client = MagicMock()
         client.complete.return_value = json.dumps(
             {

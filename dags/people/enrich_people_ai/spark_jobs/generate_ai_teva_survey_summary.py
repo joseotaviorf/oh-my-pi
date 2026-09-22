@@ -1,9 +1,8 @@
 """Generate AI Teva survey summaries and load ``datalake_people.ai_teva_survey_summary``.
 
-This Spark job is the EMR/Databricks replacement for the legacy ``ai_teva_update``
-notebook. For each pending row in ``datalake_people.teva_survey_inputs`` it builds
-a structured LiteLLM prompt, expects a single JSON object in the model reply, maps
-that JSON into flat STRING pillar columns, and merges into Delta on ``survey_invite_id``.
+For each pending row in ``datalake_people.teva_survey_inputs`` the job builds a
+LiteLLM prompt, expects a single JSON object in the model reply, maps that JSON
+into flat STRING pillar columns, and merges into Delta on ``survey_invite_id``.
 
 Incremental behavior: invites already present in the target table are skipped.
 A per-run cap (``--max-calls-per-run``) limits LiteLLM cost.
@@ -38,7 +37,10 @@ from bietlejuice.services.metastore_services import MetastoreServiceFactory
 from dags.people.enrich_people_ai.spark_jobs.lib import (
     teva_legacy_prompt as teva_prompt,
 )
-from dags.people.enrich_people_ai.spark_jobs.lib.llm_client import LiteLLMClient
+from dags.people.enrich_people_ai.spark_jobs.lib.llm_client import (
+    LiteLLMClient,
+    preview_llm_text,
+)
 
 JOB_NAME = "generate_ai_teva_survey_summary"
 INPUT_DATABASE = "datalake_people"
@@ -55,8 +57,8 @@ metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
 
 _JSON_OBJECT_PATTERN = re.compile(r"\{[\s\S]*\}")
 
-# Notebook ``ai_query`` JSON root keys → Delta columns. Aliases keep the previous
-# LiteLLM contract parseable if a leftover run still emits those names.
+# LiteLLM JSON root keys → Delta columns. Aliases keep the previous contract
+# parseable if a leftover run still emits those names.
 _LLM_JSON_KEY_TO_COLUMN = {
     "executive_summary": "ai_executive_summary",
     "pillar_1_2_strategy_goals": "ai_pillar_strategy_and_goals",
@@ -73,7 +75,7 @@ _LLM_JSON_KEY_TO_COLUMN = {
 
 
 def _split_score_list(value: Optional[str]) -> Optional[list]:
-    """Turn a comma-separated Likert string into a list (notebook ``COLLECT_LIST``)."""
+    """Turn a comma-separated Likert string into a list."""
     if not value:
         return None
     parts = [part.strip() for part in str(value).split(",") if part.strip()]
@@ -89,7 +91,7 @@ def _split_score_list(value: Optional[str]) -> Optional[list]:
 
 
 def _split_answer_list(value: Optional[str]) -> Optional[list]:
-    """Turn pipe-separated open answers into a list (notebook ``COLLECT_LIST``)."""
+    """Turn pipe-separated open answers into a list."""
     if not value:
         return None
     parts = [part.strip() for part in str(value).split(" | ") if part.strip()]
@@ -99,9 +101,9 @@ def _split_answer_list(value: Optional[str]) -> Optional[list]:
 def _survey_data_payload(row: dict) -> str:
     """Build the JSON blob appended to the LiteLLM user prompt.
 
-    Keys are the survey question titles from the notebook ``ia_input`` STRUCT so
-    P12/P3/P4/P5 prefixes still drive pillar attribution. Score columns become
-    integer lists; open answers become string lists.
+    Keys are the survey question titles as shown to responders so P12/P3/P4/P5
+    prefixes still drive pillar attribution. Score columns become integer lists;
+    open answers become string lists.
 
     Args:
         row: One ``teva_survey_inputs`` record as a plain dict (typically from
@@ -168,11 +170,11 @@ def _survey_data_payload(row: dict) -> str:
 
 
 def _build_teva_prompt(row: dict) -> str:
-    """Assemble the LiteLLM user message matching notebook ``ai_query`` CONCAT order.
+    """Assemble the LiteLLM user message.
 
     Order: pillar theory + specialist intro, few-shot ``reference_guide_text``,
-    per-pillar tasks and JSON contract, English-output stand-in for
-    ``ai_translate``, then the question-title payload.
+    per-pillar tasks and JSON contract, English-output instruction, then the
+    question-title payload.
 
     Args:
         row: One ``teva_survey_inputs`` record; must include ``reference_guide_text``
@@ -262,8 +264,10 @@ def _generate_summary(row: dict, client: LiteLLMClient) -> Optional[dict]:
     parsed = _extract_json_object(raw_response)
     if parsed is None:
         logger.warning(
-            "m=_generate_summary, survey_invite_id=%s, msg=could not parse JSON from LiteLLM response",
+            "m=_generate_summary, survey_invite_id=%s, "
+            "msg=could not parse JSON from LiteLLM response, preview=%s",
             survey_invite_id,
+            preview_llm_text(raw_response),
         )
         return None
     result = {
