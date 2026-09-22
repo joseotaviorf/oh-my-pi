@@ -1,0 +1,139 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_ticket
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica TICKET rows (legacy financeiro GET /tickets, RAW tickets). Grain is
+  one service ticket per id_ticket_tic. Requester resolves to locatario or
+  proprietario through id_solicitante_tic, with the side given by
+  fl_tiposolicitante_tic, and nome_grpu joins departamento. Every field the vendor
+  puts in the payload is projected. Requester, assignee, user and payee names plus
+  the phone, mobile, fax and copy-list contact channels are PII, handled the same
+  way as the debtor columns on benvi_superlogica_cobranca: the column exists on
+  clean and Trino column-level ACL is the access control.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  id_ticket_tic:
+    description: Vendor ticket id, the TICKET lake_mirror.vendor_natural_key and the payload id_ticket_tic.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_solicitante_tic:
+    description: Requester vendor person id. Foreign key to locatario or proprietario.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tiposolicitante_tic:
+    description: Vendor flag telling which person table the requester id belongs to.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_solicitante_tic:
+    description: Requester name on the ticket payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_solicitante_tic_formatado:
+    description: Requester name as the vendor formats it for display (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_responsavel_tic:
+    description: Internal assignee user id on the ticket payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_responsavel_tic:
+    description: Internal assignee name on the ticket payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_usu:
+    description: Vendor user name recorded on the ticket (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_grupo_tic:
+    description: Department group id the ticket sits in. Foreign key to departamento.id_grupo_grpu.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_grpu:
+    description: Department group name denormalized on the ticket. Joins departamento.nome_grpu.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_cliente_tic:
+    description: Vendor client id on the ticket payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_condominio_cond:
+    description: Condominium id on the ticket payload when the ticket is condominium scoped.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_favorecido_fav:
+    description: Payee id on the ticket payload when the ticket points at one.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_nome_fav:
+    description: Payee name on the ticket payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  nome_tca:
+    description: Ticket category name on the vendor payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  titulo_tic:
+    description: Ticket title. Downstream parses codigo_contrato out of this free text.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  historico_tih:
+    description: Latest history snippet the vendor denormalizes onto the ticket (PII, free text).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  anexos:
+    description: Vendor attachment marker carried as a scalar on the ticket payload.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_telefone_tic:
+    description: Requester phone number on the ticket payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_celular_tic:
+    description: Requester mobile number on the ticket payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_fax_tic:
+    description: Requester fax number on the ticket payload (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_copia_tic:
+    description: Copy-list addresses the vendor notifies for the ticket (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_status_tic:
+    description: Vendor ticket status flag.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_interno_tic:
+    description: Vendor flag marking the ticket as internal only.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  atrasado:
+    description: Vendor computed late marker for the ticket.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  horas_atrasado:
+    description: Vendor computed hours the ticket is late by.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_ticket_tic:
+    description: Date the ticket was opened.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_inicioticket_tic:
+    description: Date work on the ticket started; empty while untouched.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_encerrado_tic:
+    description: Date the ticket was closed; empty while open.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

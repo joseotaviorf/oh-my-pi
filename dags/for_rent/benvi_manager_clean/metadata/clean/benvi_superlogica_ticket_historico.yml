@@ -1,0 +1,71 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_ticket_historico
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica TICKET_HISTORY rows (legacy financeiro GET /tickets/historico, RAW
+  ticket_historico), fanned out one call per ticket. Grain is one history event per
+  vendor_natural_key (id_ticket_tic pipe id_historico_tih), because history ids are
+  not unique across tickets. Join id_ticket_tic back to benvi_superlogica_ticket.
+  Every field the vendor puts in the payload is projected. Contact name and history
+  text are PII, kept on clean with Trino column-level ACL as the access control. The
+  vendor endpoint is read at a single page of 200 events, so a ticket with more
+  events is truncated upstream.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  vendor_natural_key:
+    description: Pipe-joined parent ticket id and history event id as landed in lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_ticket_tic:
+    description: Parent ticket id (left half of the composite key). Foreign key to ticket.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_historico_tih:
+    description: History event id (right half of the composite key) and the payload id_historico_tih. Unique only within a ticket.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_ticket_tic_row:
+    description: The row's own ticket id from the payload. Empty on some vendor rows; when set it always equals id_ticket_tic, because the extractor skips rows that disagree with the parent.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_solicitante_tic:
+    description: Requester vendor person id carried on the history row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_responsavel_tic:
+    description: Internal assignee user id carried on the history row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  id_contato_tih:
+    description: Vendor contact id the history event was exchanged with.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  contato_tih:
+    description: Contact name on the history event (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  historico_tih:
+    description: Free text body of the history event (PII).
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_tipocontato_tih:
+    description: Vendor flag for the contact channel of the history event.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_interno_tih:
+    description: Vendor flag marking the history event as internal only.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_historico_tih:
+    description: Date the history event was recorded.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at

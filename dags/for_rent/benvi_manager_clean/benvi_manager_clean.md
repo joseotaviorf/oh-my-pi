@@ -29,6 +29,31 @@ AGREEMENT, and DELINQUENCY once those rows land.
 | `benvi_superlogica_acordo` | AGREEMENT | acordos | `id_acordo_aco \| id_recebimento_recb` |
 | `benvi_superlogica_inadimplencia` | DELINQUENCY | inadimplencia | `id_pessoa_pes \| id_contrato_con` |
 
+## Support tickets and departments
+
+| Clean table | `resource_code` | RAW sheet | PK |
+|---|---|---|---|
+| `benvi_superlogica_ticket` | TICKET | tickets | `id_ticket_tic` |
+| `benvi_superlogica_ticket_historico` | TICKET_HISTORY | ticket_historico | `id_ticket_tic \| id_historico_tih` |
+| `benvi_superlogica_departamento` | USER_GROUP | departamentos | `st_nome_grpu` (no vendor id on the list endpoint) |
+
+Ticket history is a fan-out keyed per ticket, so its `vendor_natural_key` is the
+cursor-resolved parent ticket id piped with `id_historico_tih`. History ids repeat
+across tickets, so only the composite is unique. Same shape as
+`benvi_superlogica_manutencao_historico`: split the key, no join in the projection.
+
+`USER_GROUP` has no id on `GET /grupousuarios`, so the group name is the key. The
+vendor still ships `id_grupo_grpu` inside the payload as an unmapped field, and that
+is what `benvi_superlogica_ticket.id_grupo_tic` points at.
+
+All three project every field the vendor puts in `payload`, including the ones the
+SDK row models do not map explicitly and which reach `payload` through unmapped-field
+capture. Person names and contact channels are projected like the debtor columns on
+`benvi_superlogica_cobranca`: the column lives on clean and Trino column-level ACL is
+the access control. The only fields missing from `payload` at all are
+`st_apptoken_usu` and `st_linksenha_usu`, which `SuperlogicaSensitiveVendorFieldDenylist`
+strips upstream before landing.
+
 ## Nested arrays (explode, not extra extractors)
 
 | Clean table | Parent payload array |

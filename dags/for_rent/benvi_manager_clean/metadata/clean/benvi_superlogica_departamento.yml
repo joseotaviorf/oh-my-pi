@@ -1,0 +1,45 @@
+database_name: datalake_benvi_manager_clean
+table_name: benvi_superlogica_departamento
+domain: For Rent
+owner: arthur.andrade@quintoandar.com
+description: |
+  Superlogica USER_GROUP rows (legacy financeiro GET /grupousuarios, RAW
+  departamentos). These are the departments tickets are routed to. The list
+  endpoint exposes no vendor id, so the group name is the vendor_natural_key and a
+  rename in Superlogica orphans the row landed under the old name. Every field the
+  vendor puts in the payload is projected, including the ones the SDK does not map
+  explicitly and which arrive through unmapped-field capture. id_grupo_grpu is what
+  benvi_superlogica_ticket.id_grupo_tic points at.
+columns:
+  id:
+    description: Source BIGSERIAL from integration_superlogica.lake_mirror.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.id
+  nome_grpu:
+    description: Department group name and USER_GROUP lake_mirror.vendor_natural_key.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.vendor_natural_key
+  id_grupo_grpu:
+    description: Vendor group id from the payload. Foreign key target for ticket.id_grupo_tic.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  total_usuarios:
+    description: Number of users the vendor reports in the group.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  st_acessos_grpu:
+    description: Access scopes the vendor lists for the group.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  fl_visivelparaclientes_grpu:
+    description: Vendor flag telling whether the group is visible to clients.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_deletadoem_grpu:
+    description: Date the group was deleted in Superlogica; empty while active.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
+  ts_synced:
+    description: When benvi-manager last landed this vendor row.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.synced_at
