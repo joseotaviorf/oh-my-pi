@@ -308,6 +308,7 @@ claims_step_task = create_task(
         f"--input_source_ebdb_condo_description_inference={Tables.source_ebdb_condo_description_inference_v2}",
         f"--input_source_ebdb_house_amenities_kodak_inference={Tables.source_ebdb_house_amenities_kodak_inference_v2}",
         f"--input_source_ebdb_house_amenities_description_inference={Tables.source_ebdb_house_amenities_description_inference_v2}",
+        f"--input_typology_built_area_predictor={Tables.typology_built_area_predictor}",
         f"--output_claims={Tables.claims_step_v2}",
     ],
 )
@@ -512,6 +513,7 @@ groups_step_task = create_task(
         f"--input_artifacts={Tables.artifacts_v2}",
         f"--input_artifact_groups={Tables.artifact_groups}",
         f"--input_group_merges={Tables.group_merges}",
+        f"--input_claims={Tables.claims_step_v2}",
         f"--output_groups={Tables.groups_step_v2}",
     ],
 )
@@ -631,6 +633,7 @@ image_normalization_step_task >> images_upsert_step_task
 [
     resolve_groups_step_task,
     artifacts_step_task,
+    claims_step_task,
 ] >> groups_step_task
 groups_step_task >> vespucio_v2_pipeline_complete_task
 artifacts_step_task >> vespucio_v2_pipeline_complete_task
