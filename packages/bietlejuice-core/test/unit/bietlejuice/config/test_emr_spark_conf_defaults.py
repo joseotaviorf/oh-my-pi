@@ -19,6 +19,24 @@ _EXPECTED_SPARK_CONF_DEFAULTS = {
     "spark.databricks.delta.optimizeWrite.enabled": "true",
 }
 
+_EXPECTED_METRICS_KEYS = (
+    "spark.plugins",
+    "spark.cernSparkPlugin.cloudFsName",
+    "spark.cernSparkPlugin.registerOnDriver",
+    "spark.metrics.conf.*.sink.graphite.class",
+    "spark.metrics.conf.*.sink.graphite.host",
+    "spark.metrics.conf.*.sink.graphite.port",
+    "spark.metrics.conf.*.source.jvm.class",
+    "spark.metrics.namespace",
+)
+_EXPECTED_GRAPHITE_HOST = {
+    "prod_conf.yml": "graphite-exporter.svc.core-prd.habitat.zone",
+    "forno_conf.yml": "graphite-exporter.apps.core-frn.habitat.zone",
+}
+_EXPECTED_PLUGINS = (
+    "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
+)
+
 
 def _load_emr_cluster_base_spark_conf(conf_file_name: str) -> dict:
     path = _CONFIG_DIR / conf_file_name
@@ -38,3 +56,15 @@ class TestEmrClusterSparkConfDefaults:
                 f"{key} in {conf_file_name} is {spark_conf[key]!r}, "
                 f"expected {expected_value!r}"
             )
+
+    def test_metrics_plugin_keys_present(self, conf_file_name):
+        spark_conf = _load_emr_cluster_base_spark_conf(conf_file_name)
+
+        for key in _EXPECTED_METRICS_KEYS:
+            assert key in spark_conf, f"{key} missing from {conf_file_name}"
+
+        assert spark_conf["spark.plugins"] == _EXPECTED_PLUGINS
+        assert (
+            spark_conf["spark.metrics.conf.*.sink.graphite.host"]
+            == _EXPECTED_GRAPHITE_HOST[conf_file_name]
+        )

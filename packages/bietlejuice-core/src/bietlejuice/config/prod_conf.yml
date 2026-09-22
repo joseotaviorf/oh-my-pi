@@ -1830,6 +1830,23 @@ emr_cluster_base: &emr_cluster_anchor
         # node blips still find __spark_conf__.zip / pyspark.zip.
         # Recommend an S3 lifecycle rule on emr/spark-staging/.
         spark.yarn.stagingDir: "s3a://{{ var.value.artifacts_bucket | replace('s3://', '') }}/emr/spark-staging/{{ dag.dag_id }}"
+        # Cluster observability → graphite-exporter → Prometheus/Grafana. Mirrors the
+        # Databricks cluster_template spark_conf (prod_conf.yml:197-206). Plugin JARs
+        # (spark-measure, spark-plugins, spark-cluster-metrics=GangliaMetrics) are already
+        # staged on the EMR Spark classpath by emr_init_script.sh:892-911.
+        spark.plugins: "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
+        spark.cernSparkPlugin.cloudFsName: "s3a"
+        # spark-defaults applies to driver + executors; client-mode driver runs on master.
+        # Databricks sets registerOnDriver in its driver conf (init_script.sh:16); mirror here.
+        spark.cernSparkPlugin.registerOnDriver: "true"
+        spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
+        spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.svc.core-prd.habitat.zone"
+        spark.metrics.conf.*.sink.graphite.period: "15"
+        spark.metrics.conf.*.sink.graphite.port: "9109"
+        spark.metrics.conf.*.sink.graphite.unit: "seconds"
+        spark.metrics.conf.*.source.jvm.class: "org.apache.spark.metrics.source.JvmSource"
+        spark.metrics.namespace: "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}"
+
 
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"

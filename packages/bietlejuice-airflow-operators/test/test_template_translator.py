@@ -175,6 +175,34 @@ def test_unity_catalog_spark_conf_keys_are_stripped_from_spark_defaults():
     assert props["spark.sql.shuffle.partitions"] == "200"
 
 
+def test_metrics_spark_conf_keys_are_forwarded_to_spark_defaults():
+    out = translate(
+        _fleet_base(
+            spark_conf={
+                "spark.plugins": (
+                    "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,"
+                    "br.com.quintoandar.GangliaMetrics"
+                ),
+                "spark.metrics.conf.*.sink.graphite.host": (
+                    "graphite-exporter.apps.core-frn.habitat.zone"
+                ),
+                "spark.databricks.foo": "bar",
+            }
+        )
+    )
+    props = _spark_defaults_props(out)
+    assert (
+        props["spark.plugins"]
+        == "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
+    )
+    assert (
+        props["spark.metrics.conf.*.sink.graphite.host"]
+        == "graphite-exporter.apps.core-frn.habitat.zone"
+    )
+    assert "spark.databricks.foo" not in props
+    assert "spark.jars.packages" not in props
+
+
 def test_custom_emr_configurations_merge_with_spark_conf_delta_keys():
     # arrange — preset-like classifications must survive alongside spark_conf
     out = translate(
