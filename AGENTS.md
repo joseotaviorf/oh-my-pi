@@ -108,7 +108,7 @@ Cursor auto-loads `.cursor/rules/*.mdc` by path/glob and applies always-on ones 
   symlink. **Invoke by name (`/create-dag`) in either client**, or read the `SKILL.md` directly.
   Examples: `setup-local-environment`, `create-dag`, `run-dag-locally`, `create-metadata-files`,
   `fix-ci-failure`, `generate-unit-test`, `create-or-update-pr`, `review-pr`, `trino`,
-  `find-stale-dags`, `map-table-usage`, `people-*`, …
+  `find-stale-dags`, `map-table-usage`, `pipeline-health-report`, `people-*`, …
   A skill folder must sit **one level** under `.cursor/skills/`, its YAML `name` must match the
   folder, and `description` must stay under 1024 characters — otherwise Claude Code skips it
   silently. See `docs/cursor_ai_guide.md` §6.
