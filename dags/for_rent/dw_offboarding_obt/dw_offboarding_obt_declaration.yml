@@ -2,7 +2,7 @@ dag:
   name: dw_offboarding_obt
   schedule_start_date: 2026, 7, 22
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -27,4 +27,5 @@ workflow:
   default_partitions: []
   tables_customization:
     obt_offboarding:
+      criticality: Critical
       z_order_by: [sk_termination]

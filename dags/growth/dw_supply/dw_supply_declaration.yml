@@ -2,7 +2,7 @@ dag:
   name: dw_supply
   schedule_start_date: 2024,5,23
   owner: Data Growth
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -46,6 +46,7 @@ workflow:
       extraction_type: full
       vacuum_retention_hours: 168
     obt_supply:
+      criticality: Critical
       extraction_type: full
       vacuum_retention_hours: 168
   inner_dependencies:

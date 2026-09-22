@@ -2,7 +2,7 @@ dag:
   name: enrich_inspections
   schedule_start_date: 2022, 1, 19
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -28,6 +28,7 @@ workflow:
       - reviewer
   tables_customization:
     appointment_inspection:
+      criticality: Critical
       partitions: [year, month, day]
       extraction_type: incremental
       z_order_by: [id_appointment]
@@ -81,10 +82,12 @@ workflow:
       partitions: [year, month, day]
       extraction_type: incremental
     reviewer:
+      criticality: Critical
       partitions: [year, month, day]
       extraction_type: incremental
       merge_on: [id_reviewer]
     automatic_discounts:
+      criticality: Critical
       extraction_type: full
       merge_on: [id_contract]
 

@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2021, 2, 20
   schedule_interval: 30 6-19 * * *
   owner: Data Fintech
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -23,14 +23,17 @@ workflow:
   dbutils_secret_key: RETSUKO_DB
   tables_customization:
     account:
+      criticality: Critical
       clean_primary_keys: [ id ]
       clean_table_name: account
       clean_z_order_by: [ id_contract ]
     contract:
+      criticality: Critical
       clean_primary_keys: [ id ]
       clean_table_name: contract
       clean_z_order_by: [ ts_signature ]
     invoice:
+      criticality: Critical
       clean_primary_keys: [ id ]
       clean_table_name: invoice
       clean_z_order_by: [ id_contract, ts_due ]

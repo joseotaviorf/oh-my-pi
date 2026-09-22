@@ -2,7 +2,7 @@ dag:
   name: dw_house
   schedule_start_date: 2020,08,29
   owner: Data House and Listing
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -21,3 +21,5 @@ workflow:
   tables_customization:
     dim_house_status:
       custom_schema: rent
+    dim_house_entrance_history:
+      criticality: Critical

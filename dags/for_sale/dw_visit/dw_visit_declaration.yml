@@ -1,7 +1,7 @@
 dag:
     name: dw_visit
     owner: Data ForSale
-    criticality: Critical
+    criticality: High
     sla_deadline_localtime: "08:00"
     schedule_start_date: 2024, 1, 1
     documentation:
@@ -27,6 +27,12 @@ workflow:
       dim_visit_status:
         extraction_type: incremental
         merge_on: [ "status_name" ]
+      fact_visits:
+        criticality: Critical
+      fact_visit_schedules:
+        criticality: Critical
+      dim_post_visit_demand:
+        criticality: Critical
     inner_dependencies:
       fact_visit_events:
         - dim_event_type

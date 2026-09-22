@@ -19,6 +19,7 @@ workflow:
   execution_timeout_hours: 0.5
   tables_customization:
     Imovel:
+      criticality: Critical
       clean_primary_keys: [id]
       clean_table_name: house
       clean_z_order_by: [id_user, id_region, status]

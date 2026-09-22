@@ -6,6 +6,9 @@ dag:
   criticality: High
   sla_deadline_localtime: "11:00"
 workflow:
+  tables_customization:
+    fact_house_rent_liquidity:
+      criticality: Critical
   type: query_delta
   layer: dw
   custom_schema: liquidity

@@ -3,7 +3,7 @@ dag:
   name: dw_agent_payments
   schedule_start_date: 2026, 6, 25
   owner: Data Agents
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -35,5 +35,6 @@ workflow:
       merge_on: [sk_earning_source]
       z_order_by: [sk_contract, sk_sales_flow, domain_type]
     fact_partner_payments:
+      criticality: Critical
       merge_on: [sk_partner_payment]
       z_order_by: [sk_partner_payment, incentive_system]

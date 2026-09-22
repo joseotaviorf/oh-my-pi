@@ -26,6 +26,7 @@ workflow:
   default_extraction_type: incremental
   tables_customization:
     collections_score_v3_output:
+      criticality: Critical
       clean_partitions:
         - year
         - month

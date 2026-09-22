@@ -1,9 +1,12 @@
 dag:
   name: dw_proposal
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
 workflow:
+  tables_customization:
+    dim_proposal:
+      criticality: Critical
   type: query_delta
   layer: dw
   custom_schema: rent

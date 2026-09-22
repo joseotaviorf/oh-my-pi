@@ -3,9 +3,12 @@ dag:
   name: enrich_accounting_funnel
   schedule_start_date: 2020, 7, 1
   owner: Data Fintech
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
 workflow:
+  tables_customization:
+    invoice_all:
+      criticality: Critical
   type: query_delta
   layer: enrich
   inner_dependencies:

@@ -2,7 +2,7 @@ dag:
   name: dw_listing
   schedule_start_date: 2021,08,02
   owner: Data House and Listing
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
 workflow:
   type: query_delta
@@ -20,13 +20,16 @@ workflow:
       partitions: []
       custom_schema: public
     dim_house_listing:
+      criticality: Critical
       merge_on: [sk_house_listing]
     fact_house_listing_daily_available_hours:
       partitions: ["year", "month", "day"]
       extraction_type: incremental
       custom_schema: listing
     fact_house_listing_daily_infos:
+      criticality: Critical
       partitions: ["country_code", "year", "month", "day"]
       extraction_type: incremental
     fact_house_listings:
+      criticality: Critical
       merge_on: [sk_house_listing]

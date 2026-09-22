@@ -6,6 +6,7 @@ dag:
     dag_purpose: |
       DW layer for agent accreditation models. Projects enrich_agent_accreditation tables
       into dimensional and fact tables for analytics consumption.
+  criticality: High
 workflow:
   type: query_delta
   layer: dw
@@ -13,6 +14,7 @@ workflow:
   default_extraction_type: full
   tables_customization:
     fact_agent_daily:
+      criticality: Critical
       extraction_type: incremental
       merge_on: [sk_agent_daily]
       partitions: [year, month, day]

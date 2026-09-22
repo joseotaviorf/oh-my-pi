@@ -2,7 +2,7 @@ dag:
   name: dw_pricing
   schedule_start_date: 2022, 1, 1
   owner: Data House and Listing
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: "This DAG loads to DW the pricing modeling, i.e., all the changes made to a listing price."
@@ -24,12 +24,16 @@ workflow:
     - "prod"
   tables_customization:
     dim_pricing:
+      criticality: Critical
       load_spark_job: load_dim_pricing
     fact_price_changes:
+      criticality: Critical
       load_spark_job: load_fact_price_changes
     dim_price_suggested:
+      criticality: Critical
       load_spark_job: load_dim_price_suggested
       merge_on: ['sk_price_suggested']
     fact_price_suggested:
+      criticality: Critical
       load_spark_job: load_fact_price_suggested
       merge_on: ['sk_price_suggested']

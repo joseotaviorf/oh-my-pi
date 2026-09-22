@@ -2,7 +2,7 @@ dag:
   name: dw_rent_demand_events
   schedule_start_date: 2014,06,17
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
 workflow:
   type: query_delta
@@ -14,6 +14,7 @@ workflow:
     - fact_rent_demand_events
   tables_customization:
     fact_rent_demand_events:
+      criticality: Critical
       partitions: [country_code, year, month, day]
     fact_rent_cohort_conversions:
       partitions: [country_code]

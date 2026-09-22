@@ -2,7 +2,7 @@ dag:
   name: dw_3p_supply
   schedule_start_date: 2026, 3, 1
   owner: Data Broker XP
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -21,12 +21,14 @@ workflow:
   # matches in a Delta MERGE.
   tables_customization:
     fact_lead_3p_flows:
+      criticality: Critical
       partitions: [year, month, day]
       z_order_by: [sk_lead_3p_flow, sk_lead_3p]
     dim_current_conversion_funnel:
       partitions: [year, month, day]
       z_order_by: [sk_lead_3p_flow]
     dim_lead_3p:
+      criticality: Critical
       partitions: [year, month, day]
       z_order_by: [sk_lead_3p]
     dim_lead_3p_image_inspection:

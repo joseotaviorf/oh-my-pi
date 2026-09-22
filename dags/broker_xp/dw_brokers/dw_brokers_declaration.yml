@@ -2,7 +2,7 @@ dag:
   name: dw_brokers
   schedule_start_date: 2026, 3, 1
   owner: Data Broker XP
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -39,6 +39,7 @@ workflow:
   default_extraction_type: full
   tables_customization:
     dim_broker:
+      criticality: Critical
       partitions: []
       z_order_by: [sk_broker]
     dim_broker_products:

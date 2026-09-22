@@ -2,7 +2,7 @@ dag:
   name: dw_support_journey
   schedule_start_date: 2026, 6, 14
   owner: Data SS
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -25,9 +25,11 @@ workflow:
   default_partitions: []
   tables_customization:
     fact_requests:
+      criticality: Critical
       z_order_by: [sk_case, case_number]
       merge_on: [sk_event]
     fact_services:
+      criticality: Critical
       z_order_by: [sk_session, sk_task]
       merge_on: [sk_event]
     dim_record_type:

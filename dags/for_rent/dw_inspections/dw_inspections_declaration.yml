@@ -2,7 +2,7 @@ dag:
   name: dw_inspections
   schedule_start_date: 2021,2,7
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
@@ -73,6 +73,7 @@ workflow:
       z_order_by: [sk_item_issue]
       merge_on: [sk_item_issue]
     fact_inspection:
+      criticality: Critical
       extraction_type: full
     fact_inspector:
       z_order_by: [sk_report]
@@ -81,10 +82,12 @@ workflow:
       z_order_by: [sk_report]
       merge_on: [sk_report]
     fact_repair_request:
+      criticality: Critical
       extraction_type: full
       z_order_by: [sk_repair_request]
       merge_on: [sk_repair_request]
     fact_report_inspections:
+      criticality: Critical
       z_order_by: [sk_inspection]
       extraction_type: full
       partitions: []

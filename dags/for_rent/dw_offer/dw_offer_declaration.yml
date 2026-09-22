@@ -2,7 +2,7 @@ dag:
   name: dw_offer
   schedule_start_date: 2021,08,02
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
 workflow:
   type: query_delta
@@ -11,3 +11,5 @@ workflow:
   tables_customization:
     dim_offer:
       partitions: [country_code]
+    fact_offers:
+      criticality: Critical

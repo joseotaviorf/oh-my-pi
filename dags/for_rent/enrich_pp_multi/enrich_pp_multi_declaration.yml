@@ -2,13 +2,14 @@ dag:
   name: enrich_pp_multi
   schedule_start_date: 2025,08,28
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
 workflow:
   type: query_delta
   layer: enrich
   tables_customization:
     pp_multi_classification_history:
+      criticality: Critical
       partitions:
         - year
         - month

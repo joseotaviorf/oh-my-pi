@@ -90,6 +90,7 @@ workflow:
         - True
         - "[]"
     uda1:
+      criticality: Critical
       clean_table_name: contracts
       extraction_type: full
       partitions: []
@@ -162,6 +163,7 @@ workflow:
         - False
         - "[]"
     agency:
+      criticality: Critical
       clean_table_name: agency
       extraction_type: full
       partitions: []

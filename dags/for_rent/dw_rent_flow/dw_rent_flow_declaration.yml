@@ -2,7 +2,7 @@ dag:
   name: dw_rent_flow
   schedule_start_date: 2021,11,14
   owner: Data ForRent
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
 workflow:
   type: query_delta
@@ -16,4 +16,5 @@ workflow:
     fact_listing_rent_flows:
       partitions: [country_code]
     fact_rent_flows:
+      criticality: Critical
       partitions: [country_code]

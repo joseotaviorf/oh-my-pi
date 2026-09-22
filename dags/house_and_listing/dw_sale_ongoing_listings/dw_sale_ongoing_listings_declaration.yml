@@ -1,9 +1,12 @@
 dag:
   name: dw_sale_ongoing_listings
   owner: Data House and Listing
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
 workflow:
+  tables_customization:
+    fact_daily_ongoing_listing:
+      criticality: Critical
   type: query_delta
   layer: dw
   custom_schema: sale

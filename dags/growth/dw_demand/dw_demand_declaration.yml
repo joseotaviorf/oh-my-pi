@@ -2,12 +2,15 @@ dag:
   name: dw_demand
   schedule_start_date: 2021,8,2
   owner: Data Growth
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       This DAG dw tables related to the process of demand conversion in Growth context.
 workflow:
+  tables_customization:
+    fact_demand_prospect_events:
+      criticality: Critical
   type: query_delta
   layer: dw
   custom_schema: growth

@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2021, 2, 20
   schedule_interval: 30 7,12 * * *
   owner: Data Fintech
-  criticality: Critical
+  criticality: High
   sla_deadline_localtime: "11:00"
   documentation:
     dag_purpose: |
@@ -33,7 +33,8 @@ workflow:
     early_termination: {}
     early_termination_fee: {}
     early_termination_version: {}
-    entry: {}
+    entry:
+      criticality: Critical
     file: {}
     invoice_partitioned: {}
     invoice_entry:
@@ -45,4 +46,5 @@ workflow:
     recurrent_credit_card: {}
     recurring_expense: {}
     recurring_expense_entry: {}
-    sap_entity: {}
+    sap_entity:
+      criticality: Critical
