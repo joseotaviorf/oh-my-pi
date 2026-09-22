@@ -78,6 +78,14 @@ columns:
       - datalake_growth_costs.daily_costs.business_context
     description: Lowercase description of the business context surrounding the event.
     dimension: True
+  sale_type:
+    lineage:
+      - dw_growth.fact_demand_prospect_events.sale_type
+    description: |
+      Market type for sale-context prospect events (PRIMARY for new-build, SECONDARY for resale).
+      NA for rent-context rows; NULL on top-of-funnel-only rows where sale market classification
+      does not apply.
+    dimension: True
   funnel_side:
     lineage:
       - dw_growth.fact_demand_top_of_funnel_events.funnel_side

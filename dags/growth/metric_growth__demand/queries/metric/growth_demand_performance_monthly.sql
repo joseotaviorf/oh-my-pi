@@ -22,6 +22,7 @@ monthly_tof_metrics AS (
     CAST(NULL AS STRING) AS utm_content,
     fdtof.content_page,
     LOWER(fdtof.business_context) AS business_context,
+    CAST(NULL AS STRING) AS sale_type,
     fdtof.funnel_side,
     fdtof.campaign_business_context,
     fdtof.behavior_type,
@@ -65,7 +66,8 @@ monthly_prospect_metrics AS (
     fdpe.utm_term,
     fdpe.utm_content,
     fdpe.content_page,
-    LOWER(fdpe.business_context) AS business_context, 
+    LOWER(fdpe.business_context) AS business_context,
+    IFNULL(fdpe.sale_type, 'NA') AS sale_type,
     dms.funnel_side, 
     dms.campaign_business_context, 
     dms.campaign_strategy_intent, 
@@ -105,6 +107,7 @@ SELECT
   COALESCE(t.content_page, p.content_page) AS content_page,
   COALESCE(t.utm_campaign, p.utm_campaign) AS utm_campaign,
   COALESCE(t.business_context, p.business_context) AS business_context,
+  COALESCE(t.sale_type, p.sale_type) AS sale_type,
   COALESCE(t.funnel_side, p.funnel_side) AS funnel_side,
   COALESCE(t.campaign_business_context, p.campaign_business_context) AS campaign_business_context,
   COALESCE(t.behavior_type, p.behavior_type) AS behavior_type,
@@ -138,6 +141,7 @@ FROM
     AND t.content_page = p.content_page
     AND t.utm_campaign = p.utm_campaign
     AND t.business_context = p.business_context
+    AND t.sale_type = p.sale_type
     AND t.funnel_side = p.funnel_side
     AND t.campaign_business_context = p.campaign_business_context
     AND t.behavior_type = p.behavior_type
