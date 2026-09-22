@@ -20,6 +20,12 @@ workflow:
       extra_query_template_params:
           load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
           load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    table_sla_information:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      extra_query_template_params:
+          load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+          load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
     dag:
       extraction_type: full
     line:
@@ -33,5 +39,8 @@ workflow:
     dag_sla_information:
       - dag
       - dag_run
+    table_sla_information:
+      - dag_sla_information
+      - table
     table:
       - dag

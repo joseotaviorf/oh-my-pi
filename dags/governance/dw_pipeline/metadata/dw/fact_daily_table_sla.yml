@@ -1,0 +1,94 @@
+database_name: dw_pipeline
+table_name: fact_daily_table_sla
+owner: jose.rferreira@quintoandar.com
+domain: Data Ops & Governance
+description: >
+  Daily table delivery fact at one row per table, producing DAG, and snapshot date. Supports
+  declared-SLA reporting by table tier, DAG tier, and owner line.
+columns:
+  sk_table:
+    lineage:
+      - datalake_pipeline.table_sla_information.id_table
+    description: Fully qualified table identifier used as the table dimension key.
+  sk_dag:
+    lineage:
+      - datalake_pipeline.table_sla_information.id_dag
+    description: Airflow DAG identifier that produces the table.
+  sk_line:
+    lineage:
+      - datalake_pipeline.table_sla_information.id_line
+    description: Surrogate key of the producing DAG's owner line.
+  sk_snapshot_date:
+    lineage:
+      - datalake_pipeline.table_sla_information.dt_snapshot
+    description: Snapshot date key in yyyyMMdd format.
+  schema_name:
+    lineage:
+      - datalake_pipeline.table_sla_information.schema_name
+    description: Unqualified schema containing the produced table.
+  table_name:
+    lineage:
+      - datalake_pipeline.table_sla_information.table_name
+    description: Unqualified produced table name.
+  layer:
+    lineage:
+      - datalake_pipeline.table_sla_information.layer
+    description: Data platform layer containing the table.
+  table_criticality:
+    lineage:
+      - datalake_pipeline.table_sla_information.table_criticality
+    description: Resolved table tier; the table override when declared, otherwise its DAG's tier.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  dag_criticality:
+    lineage:
+      - datalake_pipeline.table_sla_information.dag_criticality
+    description: Producing DAG's own declared tier, independent of table overrides.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  sla_deadline_localtime:
+    lineage:
+      - datalake_pipeline.table_sla_information.sla_deadline_localtime
+    description: Declared delivery deadline as São Paulo wall-clock HH:MM.
+  is_delivered:
+    lineage:
+      - datalake_pipeline.table_sla_information.is_delivered
+    description: Whether the table emitted a Dataset event during the snapshot delivery cycle.
+  is_inside_declared_sla:
+    lineage:
+      - datalake_pipeline.table_sla_information.is_inside_declared_sla
+    description: >
+      Whether first delivery met the declared deadline; NULL while an undelivered deadline remains
+      in the future.
+  ts_first_delivery_brt:
+    lineage:
+      - datalake_pipeline.table_sla_information.ts_first_delivery_brt
+    description: First Dataset delivery timestamp in São Paulo time during the delivery cycle.
+  minutes_after_deadline:
+    lineage:
+      - datalake_pipeline.table_sla_information.minutes_after_deadline
+    description: Signed minutes from declared deadline to first delivery; negative means early.
+  dt_snapshot:
+    lineage:
+      - datalake_pipeline.table_sla_information.dt_snapshot
+    description: Date whose declared delivery deadline is being evaluated.
+  ts_load:
+    description: Timestamp when dw_pipeline wrote this fact row.
+  year:
+    lineage:
+      - datalake_pipeline.table_sla_information.dt_snapshot
+    description: Year component of dt_snapshot used for partition pruning.
+  month:
+    lineage:
+      - datalake_pipeline.table_sla_information.dt_snapshot
+    description: Month component of dt_snapshot used for partition pruning.
+  day:
+    lineage:
+      - datalake_pipeline.table_sla_information.dt_snapshot
+    description: Day component of dt_snapshot used for partition pruning.

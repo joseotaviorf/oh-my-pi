@@ -1,0 +1,4 @@
+database_name: dw_pipeline
+table_name: fact_daily_table_sla
+checks:
+  - type: empty_partition

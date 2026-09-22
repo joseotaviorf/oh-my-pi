@@ -960,6 +960,7 @@ bietlejuice.dw_pipeline:
   - bietlejuice.enrich_pipeline:load-enrich-dag-run
   - bietlejuice.enrich_pipeline:load-enrich-dag-sla-information
   - bietlejuice.enrich_pipeline:load-enrich-line
+  - bietlejuice.enrich_pipeline:load-enrich-table-sla-information
 bietlejuice.dw_pricing:
   - bietlejuice.enrich_ebdb_pricing:load-enrich-house-suggestion-changes:first-run-of-day
   - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change:first-run-of-day
@@ -3527,6 +3528,8 @@ bietlejuice.enrich_pin:
   - bietlejuice.pin:load-clean-grade:first-run-of-day
 bietlejuice.enrich_pipeline:
   - bietlejuice.astro:load-clean-dag:first-run-of-day
+  - bietlejuice.astro:load-clean-dataset-event:first-run-of-day
+  - bietlejuice.astro:load-clean-dataset:first-run-of-day
   - bietlejuice.astro:load-clean-serialized-dag:first-run-of-day
 bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-account:first-run-of-day

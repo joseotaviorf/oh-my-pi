@@ -1,0 +1,106 @@
+database_name: datalake_pipeline
+table_name: table_sla_information
+owner: jose.rferreira@quintoandar.com
+domain: Data Ops & Governance
+description: >
+  Daily delivery status against each producing DAG's declared deadline. Grain is one row per
+  table, producing DAG, and snapshot date for active tables whose DAG declares a deadline.
+columns:
+  id_table:
+    lineage:
+      - datalake_pipeline.table.id_table
+    description: Fully qualified table identifier emitted as the Airflow Dataset URI.
+  id_dag:
+    lineage:
+      - datalake_pipeline.table.id_dag
+    description: Airflow DAG identifier that produces the table.
+  id_task:
+    lineage:
+      - datalake_pipeline.table.id_task
+    description: Airflow load task that produces the table and emits its Dataset event.
+  id_line:
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_line
+    description: Surrogate key of the producing DAG's owner line.
+  schema_name:
+    lineage:
+      - datalake_pipeline.table.schema
+    description: Unqualified schema containing the produced table.
+  table_name:
+    lineage:
+      - datalake_pipeline.table.table_name
+    description: Unqualified name of the produced table.
+  layer:
+    lineage:
+      - datalake_pipeline.table.layer
+    description: Data platform layer containing the table.
+  table_criticality:
+    lineage:
+      - datalake_pipeline.table.criticality
+    description: Resolved table tier; the table override when declared, otherwise its DAG's tier.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  dag_criticality:
+    lineage:
+      - datalake_pipeline.dag_sla_information.criticality
+    description: >
+      Producing DAG's own declared tier. A High DAG remains High when it contains Critical tables.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  sla_deadline_localtime:
+    lineage:
+      - datalake_pipeline.dag_sla_information.sla_deadline_localtime
+    description: Declared delivery deadline as São Paulo wall-clock HH:MM.
+  is_intraday_dag:
+    lineage:
+      - datalake_pipeline.dag_sla_information.is_intraday_dag
+    description: Whether the producing DAG runs hourly or more frequently.
+  is_delivered:
+    lineage:
+      - datalake_astro_clean.dataset_event.ts_event_created
+    description: Whether the load task emitted a Dataset event during the snapshot delivery cycle.
+  is_inside_declared_sla:
+    lineage:
+      - datalake_astro_clean.dataset_event.ts_event_created
+      - datalake_pipeline.dag_sla_information.sla_deadline_localtime
+    description: >
+      Whether the first delivery met the declared deadline. NULL means the deadline has not yet
+      passed and no delivery exists; FALSE after the deadline or for a late delivery.
+  minutes_after_deadline:
+    lineage:
+      - datalake_astro_clean.dataset_event.ts_event_created
+      - datalake_pipeline.dag_sla_information.sla_deadline_localtime
+    description: Signed minutes from the declared deadline to first delivery; negative means early.
+  ts_deadline_brt:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+      - datalake_pipeline.dag_sla_information.sla_deadline_localtime
+    description: Snapshot deadline represented as a São Paulo wall-clock timestamp.
+  ts_first_delivery_brt:
+    lineage:
+      - datalake_astro_clean.dataset_event.ts_event_created
+    description: First Dataset delivery timestamp in São Paulo time during the delivery cycle.
+  dt_snapshot:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Date whose declared delivery deadline is being evaluated.
+  ts_load:
+    description: Timestamp when enrich_pipeline wrote this SLA snapshot.
+  year:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Year component of dt_snapshot used for partition pruning.
+  month:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Month component of dt_snapshot used for partition pruning.
+  day:
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Day component of dt_snapshot used for partition pruning.

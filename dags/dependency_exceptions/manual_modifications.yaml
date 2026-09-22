@@ -1280,11 +1280,13 @@ bietlejuice.dw_pipeline:
     - bietlejuice.enrich_pipeline:load-enrich-dag-sla-information:first-run-of-day
     - bietlejuice.enrich_pipeline:load-enrich-dag:first-run-of-day
     - bietlejuice.enrich_pipeline:load-enrich-line:first-run-of-day
+    - bietlejuice.enrich_pipeline:load-enrich-table-sla-information:first-run-of-day
   add:
     - bietlejuice.enrich_pipeline:load-enrich-dag-run
     - bietlejuice.enrich_pipeline:load-enrich-dag-sla-information
     - bietlejuice.enrich_pipeline:load-enrich-dag
     - bietlejuice.enrich_pipeline:load-enrich-line
+    - bietlejuice.enrich_pipeline:load-enrich-table-sla-information
 bietlejuice.conversation_explorer:
   add:
     - quintoml.chatbot.wall_e_session_categoriser.inference:first-run-of-day
