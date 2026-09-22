@@ -1,7 +1,7 @@
 dag:
   name: benvi_manager
   schedule_start_date: 2026, 9, 14
-  schedule_interval: null
+  schedule_interval: 0 10 * * *
   catchup: false
   owner: Data ForRent
   documentation:
@@ -14,6 +14,15 @@ dag:
       Clean of this DAG is the lake_mirror dump. Superlogica projections live in
       bietlejuice.benvi_manager_clean.
 workflow:
+  # The CDC default ends the load window at data_interval_start, which for a
+  # 10:00 daily cron is yesterday: the 09:00 import lands under today's
+  # year=/month=/day= prefix and would be skipped until the following day.
+  # data_interval_end is today for a scheduled run, and equals the logical date
+  # for a manual one, so both paths cover the write this schedule exists to
+  # ingest.
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
   type: cdc
   layer: raw
   database_type: postgres
