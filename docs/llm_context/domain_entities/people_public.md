@@ -45,7 +45,7 @@ There is **no** `is_active` column on the public fact — do **not** invent `WHE
 | `dw_people.dim_management_hierarchy` | **Active-only** company-wide reporting chain from CEO (L0) down. **PII** (manager names). |
 | `dw_people.dim_product_tech_team` | **Active Product & Tech only** — **wide** sheet mirror: one row per employee with `line`, `chapter`, `team_1`…`team_10`, `line_leader`, `team_leader`, `is_line_leader`, `is_team_leader`. |
 
-Join `organization.md` tables via `fact_employees.sk_job`, `sk_cost_center_version`, `sk_business_unit`.
+Join `organization.md` tables via `fact_employees.sk_job`, `sk_cost_center_version`, `sk_business_unit`. For P&T neotribe **mission / objective / scope**, use `dw_organization.dim_product_tech_neotribe` (catalog, not a person table).
 
 ### Answering “which team does this person belong to?”
 
@@ -69,6 +69,7 @@ Users usually ask in business language — for example which team someone is on,
 | Natural question | Route |
 |------------------|--------|
 | Team / line / chapter for a Product & Tech person | `dim_product_tech_team` (`team_1`…`team_10`) |
+| Mission / objective / scope of a P&T neotribe | `dw_organization.dim_product_tech_neotribe` — see [`organization.md`](organization.md) |
 | Team / org placement for Ops, Corp, non–P&T, or no dim row | Cost center + manager + direct reports |
 | Who reports to this person? | `dim_management_hierarchy` where `person_number_manager` = that person |
 | Who is their manager? / L0+ chain | `dim_management_hierarchy` for that person’s row |
@@ -77,7 +78,7 @@ Do **not** invent team-formation attributes outside Product & Tech. Do **not** r
 
 ## Related Domain Entities
 
-- `organization.md` — cost center, business unit, and job labels via fact FKs.
+- `organization.md` — cost center, business unit, job labels via fact FKs, and P&T neotribe mission/objective/scope (`dim_product_tech_neotribe`).
 - `employee_details.md` — full internal People DW (history, terminations, restricted attributes). **`dw_employee_details` is exclusive to the People team** — access **only on IDN request** with data-owner approval. **Do not** route general consumers here; use `dw_people`.
 - `workforce_allocation.md` — **planning** allocations (project tags, FTE, Allocation Tool Lines/teams). Use `dw_workforce_allocation.fact_workforce_allocations`, **not** `dw_people`, for those questions. Join `dim_employee` here only when an allocation answer needs a **name**.
 
@@ -88,6 +89,7 @@ Do **not** invent team-formation attributes outside Product & Tech. Do **not** r
 | Which **team** person X is on (org / squad) | `dw_people` — `dim_product_tech_team` or cost center + manager | `group_name` on the allocation fact |
 | Which **projects** person X is on (planning tags) | [`workforce_allocation.md`](workforce_allocation.md) → `fact_workforce_allocations` | `dim_product_tech_team` or `fact_employees` |
 | P&T **chapter** / **line** of person X (Team Formation) | `dim_product_tech_team` | `chapter` / `line_name` on the allocation fact |
+| P&T neotribe **mission / objective / scope** | [`organization.md`](organization.md) → `dw_organization.dim_product_tech_neotribe` | `dim_product_tech_team` (roster only) |
 | People on P&T **squad** / `team_1`…`team_10` | `dim_product_tech_team` | `fact_workforce_allocations` |
 | Who is active, manager, cost center, tenure | `dw_people` | `dw_workforce_allocation` |
 | Project tag, allocated FTE, “who is on IPO?”, allocation history | `fact_workforce_allocations` (requires Allocation data contract) | `dim_product_tech_team` as primary source |

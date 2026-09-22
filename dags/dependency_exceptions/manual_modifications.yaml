@@ -226,6 +226,12 @@ bietlejuice.dw_performance:
 bietlejuice.dw_offer:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
+bietlejuice.dw_organization:
+  remove:
+    - bietlejuice.gsheets_people:done-clean-product-tech-neotribe:first-run-of-day
+bietlejuice.dw_people:
+  remove:
+    - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
 bietlejuice.dw_photo_jobs:
   remove:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day

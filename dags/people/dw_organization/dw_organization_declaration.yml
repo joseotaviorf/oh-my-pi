@@ -5,7 +5,7 @@ dag:
   schedule_start_date: 2026, 2, 11
   documentation:
     dag_purpose: |
-      People Data Warehouse — organization structure. Delivers dimensions for business units, cost centers, jobs, and related org reference data for People.
+      People Data Warehouse — organization structure. Delivers dimensions for business units, cost centers, jobs, Product & Tech neotribe missions, and related org reference data for People.
       No sensitive or PII content. Access is limited to the people-analytics team until broader publication is approved.
 workflow:
   type: query_delta
@@ -31,6 +31,11 @@ workflow:
       table_properties:
         "delta.enableDeletionVectors": "false"
     dim_job:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
+    dim_product_tech_neotribe:
       vacuum_retention_hours: 168
       vacuum_lite: true
       table_properties:

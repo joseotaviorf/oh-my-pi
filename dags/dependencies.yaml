@@ -904,7 +904,6 @@ bietlejuice.dw_people:
   - bietlejuice.enrich_people:load-enrich-assignment-snapshots:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-management-hierarchy:first-run-of-day
-  - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
 bietlejuice.dw_performance:
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_performance:load-enrich-performa-calibration-evaluation:first-run-of-day

@@ -1,0 +1,37 @@
+---
+database_name: dw_organization
+table_name: dim_product_tech_neotribe
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Product and Technology neotribe catalog with planning objective, mission, and scope for each squad grouping.
+  One row per line × neotribe (current-state catalog).
+  Covers Product and Technology neotribes maintained in the P&T team-formation workbook.
+  Use this table for what a neotribe is responsible for (objective, mission, and scope). Person-level P&T squad membership is in dw_people.dim_product_tech_team.
+columns:
+  sk_product_tech_neotribe:
+    description: Unique key for the line and neotribe pair (e.g. 'a1b2c3d4e5f6...'). The unknown catalog row uses '-1'.
+    lineage:
+      - datalake_gsheets_people_clean.product_tech_neotribe.id_line_neotribe
+  line:
+    description: Product and Technology line that owns the neotribe (e.g. 'Tech Platform'). NULL on the unknown dimension row.
+    lineage:
+      - datalake_gsheets_people_clean.product_tech_neotribe.line
+  neotribe:
+    description: Neotribe name within the line (e.g. 'Broker XP'). NULL on the unknown dimension row.
+    lineage:
+      - datalake_gsheets_people_clean.product_tech_neotribe.neotribe
+  objective:
+    description: Planning-cycle outcome the neotribe is expected to drive (e.g. 'Increase qualified demand in the core marketplace'). NULL when blank in the workbook or on the unknown row.
+    lineage:
+      - datalake_gsheets_people_clean.product_tech_neotribe.objective
+  mission:
+    description: How the neotribe delivers value to users and the business (e.g. 'Own the broker activation journey end to end'). NULL when blank in the workbook or on the unknown row.
+    lineage:
+      - datalake_gsheets_people_clean.product_tech_neotribe.mission
+  scope:
+    description: Products, journeys, and systems owned by the neotribe (e.g. 'Agent marketplace, visits, and closing tools'). NULL when blank in the workbook or on the unknown row.
+    lineage:
+      - datalake_gsheets_people_clean.product_tech_neotribe.scope
+  ts_load:
+    description: Timestamp when this neotribe catalog row was loaded into the DW dimension (e.g. 2026-09-22 08:15:00).

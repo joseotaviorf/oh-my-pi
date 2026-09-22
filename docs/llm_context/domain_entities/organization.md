@@ -11,15 +11,15 @@
 
 ## Overview
 
-Organization (`dw_organization`) is the People DW schema for organizational reference data: cost centers and teams (with Codex attributes), business units, and the public job catalog. These dimensions classify headcount and power joins from `dw_employee_details.fact_assignment_snapshots` and `metric_people.employee_snapshots`.
+Organization (`dw_organization`) is the People DW schema for organizational reference data: cost centers and teams (with Codex attributes), business units, the public job catalog, and the Product & Tech neotribe catalog (mission, objective, and scope). These dimensions classify headcount and power joins from `dw_employee_details.fact_assignment_snapshots` and `metric_people.employee_snapshots`.
 
-**Sources:** PIN (HR org structures, jobs, core cost center attributes) and SAP/Codex (financial and planning taxonomy integrated into cost centers).
+**Sources:** PIN (HR org structures, jobs, core cost center attributes), SAP/Codex (financial and planning taxonomy integrated into cost centers), and the Product & Tech team-formation Google Sheet (neotribe mission catalog).
 
 **SLA:** D-1, available by 08:00 BRT. DAG: `bietlejuice.dw_organization`.
 
-**Temporal model:** `dim_cost_center` is SCD Type 2 (validity windows). `dim_business_unit` and `dim_job` are current-state catalogs only.
+**Temporal model:** `dim_cost_center` is SCD Type 2 (validity windows). `dim_business_unit`, `dim_job`, and `dim_product_tech_neotribe` are current-state catalogs only.
 
-**Out of scope:** job compensation bands → `dw_compensation`; individual employee records → `dw_employee_details`.
+**Out of scope:** job compensation bands → `dw_compensation`; individual employee records → `dw_employee_details`; person-level P&T roster (who sits on which squad) → `dw_people.dim_product_tech_team`.
 
 For the full business-facing schema guide, see `dags/people/dw_organization/docs/dw_organization.md`.
 
@@ -34,18 +34,19 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 
 **Status:** pilot — validate in Trino before broader publication. Access is limited to users who already have People analytical authorization.
 
-**Trino catalog:** `delta` — all three tables in this schema are in the pilot. No salary or compensation bands (`dw_compensation` is out of scope).
+**Trino catalog:** `delta` — all four tables in this schema are in the pilot. No salary or compensation bands (`dw_compensation` is out of scope).
 
 | Table | What it contains |
 |-------|------------------|
 | `dim_cost_center` | Teams, Codex taxonomy (vertical, chapter, squad), HRBP name/email, cost-center owner names. **PII** (HRBPs and L owners). |
 | `dim_business_unit` | Business unit code and name only. Reference data, no PII. |
 | `dim_job` | Job catalog: name, family, career track. No compensation bands. |
+| `dim_product_tech_neotribe` | Product & Tech neotribe catalog: line, neotribe, objective, mission, scope. No PII. Current-state only. |
 
 ## Related Domain Entities
 
 - `employee_details.md` — daily assignment snapshots and employee identity; join on `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version`.
-- `people_public.md` — **preferred** public active-workforce DW (`dw_people`) for current org placement, company-wide management hierarchy, and P&T team formation (P&T only: wide `dim_product_tech_team`; other areas use cost center from this entity).
+- `people_public.md` — **preferred** public active-workforce DW (`dw_people`) for current org placement, company-wide management hierarchy, and P&T team formation (P&T only: wide `dim_product_tech_team`; other areas use cost center from this entity). Neotribe **mission / objective / scope** live in this entity (`dim_product_tech_neotribe`), not on the person roster.
 
 ## Glossary and Synonyms
 
@@ -59,7 +60,7 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 - **Codex / financial taxonomy / planning taxonomy** → SAP/Codex attributes integrated into `dim_cost_center`; [official spreadsheet](https://docs.google.com/spreadsheets/d/1-85ApczFAw1B7ZfU59WJ_qwTaYGVmkw8efSa9K9umeA/edit?usp=sharing)
 - **Vertical / business vertical / tribe** → `dim_cost_center.vertical` (derived from `structure`)
 - **Chapter / guild / competency chapter** → `dim_cost_center.chapter` — variable attribute (can trigger new SCD2 version)
-- **Line / product line** → `dim_cost_center.line`
+- **Line / product line (cost center / Codex)** → `dim_cost_center.line` — HR/financial line on the cost center version; not the Product & Tech planning line on the neotribe catalog
 - **Structure / org structure** → `dim_cost_center.structure` — fixed attribute derived from `cost_center_code`
 - **Brand / product / business (Codex dimensions)** → `brand`, `product`, `business` on `dim_cost_center` — fixed within the same `cost_center_code`
 - **Headcount type / capacity vs overhead** → `dim_cost_center.headcount_type` (e.g. Capacity, Overhead)
@@ -72,6 +73,11 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 - **Active cost center** → `is_active = TRUE`
 - **Validity window / version period** → `dt_valid_from` / `dt_valid_to` on `dim_cost_center`; `9999-12-31` on `dt_valid_to` means current version
 - **Headcount by vertical / BU / cost center** → join `fact_assignment_snapshots` to these dimensions on `sk_cost_center_version`, `sk_business_unit`, `sk_job_version`
+- **Neotribe / tribe / missão / objetivo / escopo (P&T planning catalog)** → `dw_organization.dim_product_tech_neotribe` — one row per **line × neotribe**; current-state only; not a person roster
+- **Product & Tech line / linha P&T (neotribe catalog)** → `dim_product_tech_neotribe.line` (e.g. Tech Platform, For Rent) — planning line of the neotribe; distinct from `dim_cost_center.line`
+- **Mission / missão da neotribe** → `dim_product_tech_neotribe.mission`
+- **Objective / objetivo / goal da neotribe** → `dim_product_tech_neotribe.objective`
+- **Scope / escopo da neotribe** → `dim_product_tech_neotribe.scope`
 
 ## Tables
 
@@ -80,16 +86,18 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 | Cost center/team attributes and history | `dw_organization.dim_cost_center` (`cc`) — **TARS pilot**; grain: one row per cost center version (SCD2); filter `is_current = TRUE` unless time-traveling |
 | Business unit catalog | `dw_organization.dim_business_unit` (`bu`) — **TARS pilot**; grain: one row per active BU; join on `sk_business_unit` |
 | Job definitions (family, career track) | `dw_organization.dim_job` (`job`) — **TARS pilot**; grain: one row per active job; join on `sk_job` |
+| Product & Tech neotribe mission, objective, or scope | `dw_organization.dim_product_tech_neotribe` (`nt`) — **TARS pilot**; grain: one row per line × neotribe; current-state catalog; **not** a person roster |
 | Employee + org context | `dw_employee_details.fact_assignment_snapshots` joined to the dimensions above — see `employee_details.md` |
 
-**Main join identifiers:** `sk_cost_center_version` (versioned FK), `cost_center_code` (stable business key), `sk_business_unit`, `sk_job`.
+**Main join identifiers:** `sk_cost_center_version` (versioned FK), `cost_center_code` (stable business key), `sk_business_unit`, `sk_job`, `sk_product_tech_neotribe` (catalog key for line × neotribe).
 
 **Critical rules:**
-- **TARS pilot (Trino `delta`):** all three tables in this schema are in scope. No salary data. Restricted audience until pilot sign-off.
+- **TARS pilot (Trino `delta`):** all four tables in this schema are in scope. No salary data. Restricted audience until pilot sign-off.
 - Joining from `fact_assignment_snapshots`: use `fact.sk_cost_center_version = cc.sk_cost_center_version` only — the fact already carries the version SK for `dt_reference`; do not add `cc.is_current` on top of the SK join.
 - Querying `dim_cost_center` standalone (catalog browse): filter `is_current = TRUE` or a `dt_valid_from` / `dt_valid_to` window — otherwise SCD2 history duplicates rows.
 - `owner_l1_name` / `owner_l2_name` / `owner_l3_name` describe the cost center unit's leadership — all employees in the same cost center share the same L owners, but may have different personal L1/L2/L3 in `dim_management_hierarchy`.
 - Job compensation bands are in `dw_compensation`, not in `dim_job`.
+- P&T neotribe **mission / objective / scope** are in `dim_product_tech_neotribe`. Who belongs to which P&T squad is in `dw_people.dim_product_tech_team` (`people_public.md`). Do not treat neotribe catalog rows as people.
 - When an employee transfers business units, PIN creates a new assignment — do not expect BU changes on the same `assignment_number`.
 - **Data floor: 2024-03-01 (PIN go-live).** All organizational metrics and descriptive statistics (`MIN`, `MAX`, `AVG`, counts, percentiles, rates, distributions, and trends) must use only records from this date forward. See Known Limitations.
 
@@ -99,6 +107,7 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 - **Active cost centers** — `COUNT(*)` where `is_active = TRUE` and `is_current = TRUE`
 - **Cost centers by HRBP** — group `dim_cost_center` by `hrbp_name` with `is_current = TRUE`
 - **Employees per business unit** — join fact to `dim_business_unit`, count distinct `person_number`
+- **P&T neotribe missions** — read `dim_product_tech_neotribe` (no person join required for catalog questions)
 
 ## Relationships with Other Entities
 
@@ -125,6 +134,8 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 - Add `cc.is_current = TRUE` when joining from the fact via `sk_cost_center_version` — the SK already identifies the correct version.
 - Confuse cost-center L owners with employee hierarchy levels in `dim_management_hierarchy`.
 - Look for salary ranges in `dim_job` — use `dw_compensation`.
+- Use `dim_product_tech_neotribe` as a people roster or for non–P&T org units — it is the P&T planning catalog only.
+- Treat `dim_cost_center.line` (Codex/HR cost-center line) as the same field as `dim_product_tech_neotribe.line` (Product & Tech planning line).
 - Assume fixed attributes (`structure`, `brand`, etc.) change independently of the cost center code — they are derived from the code and stable within it.
 - Use deprecated People sources for new queries: `datalake_hr_system`, `datalake_employment`, `greenhouse` (v1), `enrich_employee`, `enrich_hr_system`, `enrich_pin`, or the legacy `dw_employee` DAG — prefer `datalake_pin_core_clean`, `datalake_people`, and `dw_*` schemas (see `people_domain.mdc`).
 - Include records before **2024-03-01** (PIN go-live) in any organizational metric or descriptive statistic, including `MIN`, `MAX`, `AVG`, counts, percentiles, rates, distributions, or trends; see Known Limitations.
@@ -148,9 +159,24 @@ WHERE cc.vertical = 'Tech'
 ORDER BY cc.cost_center_name
 ```
 
+### Query 2 — Product & Tech neotribe missions
+
+```sql
+SELECT
+    nt.line,
+    nt.neotribe,
+    nt.objective,
+    nt.mission,
+    nt.scope
+FROM dw_organization.dim_product_tech_neotribe AS nt
+WHERE nt.line IS NOT NULL
+  AND nt.sk_product_tech_neotribe <> '-1'
+ORDER BY nt.line, nt.neotribe
+```
+
 ## DataHub catalog
 
 - **Data Product:** [urn:li:dataProduct:organization](https://datahub.apps.data-prd.habitat.zone/dataProducts/urn%3Ali%3AdataProduct%3Aorganization)
-- **Datasets (TARS pilot):** `dw_organization.dim_cost_center`, `dim_business_unit`, `dim_job` — published to DataHub by CI from this Markdown (`organization.md` → `organization`).
+- **Datasets (TARS pilot):** `dw_organization.dim_cost_center`, `dim_business_unit`, `dim_job`, `dim_product_tech_neotribe` — published to DataHub by CI from this Markdown (`organization.md` → `organization`).
 - **People Data Catalog:** [People Data Catalog](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/5474320386/People+Data+Catalog)
 - **Codex reference:** [Codex spreadsheet](https://docs.google.com/spreadsheets/d/1-85ApczFAw1B7ZfU59WJ_qwTaYGVmkw8efSa9K9umeA/edit?usp=sharing)
