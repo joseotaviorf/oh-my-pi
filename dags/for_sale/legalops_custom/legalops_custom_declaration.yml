@@ -5,16 +5,29 @@ dag:
   owner: Data ForSale
   documentation:
     dag_purpose: |
-      "This DAG creates a custom CLEAN table from datalake_legalops_raw.contract_analysis_request in order to unpack a custom json from the source table"
+      CLEAN DAG that unpacks LegoContract JSON from
+      datalake_legalops_raw.contract_analysis_request into
+      lego_analysis_results, reading source year/month/day between
+      load_start_date and load_end_date and MERGEing on analysis_date.
+      lego_backtest_results is a full reload of
+      datalake_legalops_raw.lego_backtest_results (no date partition on
+      the target, so incremental MERGE is not used).
 workflow:
   type: query_delta
   layer: clean
   custom_schema: legalops
-  default_extraction_type: full
+  default_extraction_type: incremental
+  default_partitions: []
   tables_customization:
     lego_analysis_results:
+      merge_on:
+        - id_contract_analysis_job
+        - validation_id
+        - assessment_name
+        - analysis_date
       run_optimize: false
       run_vacuum: true
     lego_backtest_results:
+      extraction_type: full
       run_optimize: false
       run_vacuum: true

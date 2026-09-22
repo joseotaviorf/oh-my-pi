@@ -10,6 +10,9 @@ WITH base AS (
   FROM datalake_legalops_raw.contract_analysis_request
   WHERE
     status = 'DONE'
+    AND MAKE_DATE(year, month, day)
+        BETWEEN DATE('{load_start_date}')
+        AND DATE('{load_end_date}')
 ), parsed AS (
   SELECT
     id_contract_analysis_job,

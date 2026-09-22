@@ -1,12 +1,11 @@
 cluster:
-  type: emr_7_12_consolidation_m_memory_single_node_fleet_cluster
+  type: emr_7_12_consolidation_s_memory_single_node_fleet_cluster
   custom_configurations:
     spark_conf:
       spark.driver.memory: 2g
       spark.driver.memoryOverhead: 512m
-      spark.executor.memory: 16g
+      spark.executor.memory: 5g
       spark.executor.memoryOverhead: 2g
-      spark.executor.cores: "4"
+      spark.executor.cores: "1"
       spark.yarn.am.memory: 1g
-      spark.dynamicAllocation.minExecutors: "1"
       spark.dynamicAllocation.maxExecutors: "4"
