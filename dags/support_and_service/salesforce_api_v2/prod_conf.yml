@@ -49,8 +49,28 @@ objects_config:
 
 
 
+# Sizing here follows task slots and YARN AM admission, not CPU%: the raw step is
+# network-bound. api_v2.py fans out exactly PARALELISM=10 HTTP partitions through
+# mapInPandas, and the token / describe / updated-deleted calls block on the driver
+# before any Spark work, so executor CPU stays near idle at any instance size.
+#
+# The previous preset (emr_7_12_small_general_2xlarge_2_workers_cluster) is one of
+# the legacy emr_cluster_base presets: it declares no spark_conf of its own and so
+# inherits spark.yarn.am.memory: 8g. Against
+# yarn.scheduler.capacity.root.default.maximum-am-resource-percent: 0.2, two
+# m6g.2xlarge cores budget ~9.8 GB for application masters, which a single ~9 GB AM
+# consumes whole -- so the object steps serialized despite StepConcurrencyLevel
+# defaulting to 4, and an 8 GB AM crowded executors off its node. Every consolidation
+# tier overrides am.memory (1g here), which restores real step overlap at the
+# daily_execution_hour run and frees the node for executors.
+#
+# m6g.xlarge x 2 cores keeps the same ~6 concurrent task slots as before (4 vCPU per
+# node, 2 cores per executor) at half the EC2 footprint, which matters at 24 cluster
+# creations a day. If the clean-layer Delta MERGE starts spilling on the 4g executor
+# heap, step up to emr_7_12_consolidation_m_general_cluster -- same footprint as the
+# old preset, but with the AM budget fixed.
 cluster:
-  type: emr_7_12_small_general_2xlarge_2_workers_cluster
+  type: emr_7_12_consolidation_xs_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

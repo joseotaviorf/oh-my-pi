@@ -44,8 +44,10 @@ objects_config:
     hourly: true
 
 
+# Mirrors prod; see the rationale comment in prod_conf.yml. Forno provisions a
+# single core node for this tier.
 cluster:
-  type: emr_7_12_small_general_2xlarge_2_workers_cluster
+  type: emr_7_12_consolidation_xs_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
