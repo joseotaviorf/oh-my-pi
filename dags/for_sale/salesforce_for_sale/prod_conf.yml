@@ -14,10 +14,6 @@ raw_schema: "datalake_salesforce_raw"
 clean_schema: "datalake_salesforce_clean"
 datalake_bucket: "5a-datalake-prod"
 events_config:
-  received_document:
-    event_path: "raw/salesforce/ReceivedDocumentEvent"
-    skip_quality_contracts: true
-    api_entity: "ReceivedDocument__c"
   incident:
     event_path: "raw/salesforce/IncidentEvent"
     skip_quality_contracts: true
@@ -30,3 +26,15 @@ events_config:
     event_path: "raw/salesforce/PendencyEvent"
     skip_quality_contracts: true
     api_entity: "Pendency__c"
+  case_end_of_process:
+    event_path: "raw/salesforce/CaseEndOfProcessEvent"
+    skip_quality_contracts: true
+    api_entity: "CaseEndOfProcess__c"
+  follow_up:
+    event_path: "raw/salesforce/Follow_UpEvent"
+    skip_quality_contracts: true
+    api_entity: "Follow_Up__c"
+  purchase_sale_contract:
+    event_path: "raw/salesforce/PurchaseSaleContractEvent"
+    skip_quality_contracts: true
+    api_entity: "PurchaseSaleContract__c"
