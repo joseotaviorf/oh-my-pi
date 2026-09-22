@@ -1,6 +1,6 @@
 ---
 ecl_asset_runs:
-  source_root_path: s3://data-science.s3.data.quintoandar.com.br/batch-prediction/provision-ecl-prod/provision_ecl_asset
+  source_root_path: s3://artifacts.s3.data.quintoandar.com.br/quintoml/batch/provision-assets-inference/prod-adhoc/provision_ecl_asset
   format: delta
   partition_cols:
     - year
@@ -8,7 +8,7 @@ ecl_asset_runs:
     - day
   extraction_type: incremental
 ecl_liability_runs:
-  source_root_path: s3://data-science.s3.data.quintoandar.com.br/batch-prediction/provision-ecl-prod/provision_ecl_liability
+  source_root_path: s3://artifacts.s3.data.quintoandar.com.br/quintoml/batch/provision-assets-inference/prod-adhoc/provision_ecl_liability
   format: delta
   partition_cols:
     - year
@@ -16,7 +16,7 @@ ecl_liability_runs:
     - day
   extraction_type: incremental
 parameter_rule:
-  source_root_path: s3://data-science.s3.data.quintoandar.com.br/batch-prediction/provision-ecl-prod/provision_parameter_rule
+  source_root_path: s3://artifacts.s3.data.quintoandar.com.br/quintoml/batch/provision-assets-inference/prod-adhoc/provision_parameter_rule
   format: delta
   partition_cols: []
   extraction_type: full
