@@ -1,0 +1,41 @@
+dag:
+  name: enrich_luigijr_operational_error_pp
+  owner: ForRent PostContract
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:diego.carvalho
+  dataset_dependencies:
+  - dw_inspections.fact_inspection:first-run-of-day
+  - dw_inspections.dim_inspection:first-run-of-day
+  - dw_rent.dim_contract:first-run-of-day
+  - dw_inspections.dim_assessment:first-run-of-day
+  - dw_inspections.fact_repair_request:first-run-of-day
+  - dw_offboarding.fact_terminations:first-run-of-day
+  - datalake_inspection_services_clean.assessment:first-run-of-day
+  - datalake_inspection_services_clean.room:first-run-of-day
+  - datalake_inspection_services_clean.item_group:first-run-of-day
+  - datalake_inspection_services_clean.item:first-run-of-day
+  - datalake_inspection_services_clean.item_type:first-run-of-day
+  - datalake_inspection_services_clean.item_issue:first-run-of-day
+  - datalake_inspection_services_clean.issue_type:first-run-of-day
+  - dw_crm.fact_inspection_tasks:first-run-of-day
+  - dw_crm.dim_inspection_task:first-run-of-day
+  - datalake_date.workday_window:first-run-of-day
+  - dw_customer_support.fact_ticket_events:first-run-of-day
+  - datalake_amplitude_clean.170698_inspection_review_home_page_viewed_events:first-run-of-day
+  - datalake_inspections.inspection_booking:first-run-of-day
+  - dw_customer_support.fact_tickets:first-run-of-day
+  - dw_customer_support.dim_ticket:first-run-of-day
+  - dw_customer_support.dim_zendesk_user:first-run-of-day
+  - dw_customer_support.dim_analyst:first-run-of-day
+  - datalake_salesforce_clean.cases:first-run-of-day
+  - datalake_salesforce_clean.record_types:first-run-of-day
+  - datalake_salesforce_clean.users:first-run-of-day
+  - datalake_inspection_services_clean.repair_request:first-run-of-day
+  - datalake_inspection_services_clean.reviewer:first-run-of-day
+  - dw_public.dim_user:first-run-of-day
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: forrent_postcontract

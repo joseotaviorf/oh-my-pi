@@ -1,0 +1,26 @@
+database_name: forrent_postcontract
+table_name: operational_error_pp
+owner: diego.carvalho@quintoandar.com.br
+domain: For Rent
+description: Table `operational_error_pp` materialized on a schedule by Luigi from a user-provided SQL query (ForRent PostContract domain).
+columns:
+  dt_ac:
+    description: Column `dt_ac` produced by the scheduled materialization query.
+  dt_tf:
+    description: Column `dt_tf` produced by the scheduled materialization query.
+  dt_ancoragem:
+    description: Column `dt_ancoragem` produced by the scheduled materialization query.
+  sk_inspection:
+    description: Column `sk_inspection` produced by the scheduled materialization query.
+  sk_contract:
+    description: Column `sk_contract` produced by the scheduled materialization query.
+  pp_open:
+    description: Column `pp_open` produced by the scheduled materialization query.
+  pp_open_dt:
+    description: Column `pp_open_dt` produced by the scheduled materialization query.
+  valida_robo:
+    description: Column `valida_robo` produced by the scheduled materialization query.
+  erro_operacional_pp:
+    description: Column `erro_operacional_pp` produced by the scheduled materialization query.
+  edicao:
+    description: Column `edicao` produced by the scheduled materialization query.
