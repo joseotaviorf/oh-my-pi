@@ -39,6 +39,9 @@ dags_not_using_builder:
   - platform/astro/astro.py
   - platform/check_dags_dataset_queue/check_dags_dataset_queue.py
   - platform/clear_dataset_queue/clear_dataset_queue.py
+  # Metadata-DB size report and retention purge — talks to the Airflow
+  # metadata DB directly (run_cleanup), which the DAG Builder cannot express.
+  - platform/metadata_db_maintenance/metadata_db_maintenance.py
   - platform/dag_inventory/dag_inventory.py
   - platform/databricks_jobs_deletion/databricks_jobs_deletion.py
   - platform/fail_active_dag_runs/fail_active_dag_runs.py
