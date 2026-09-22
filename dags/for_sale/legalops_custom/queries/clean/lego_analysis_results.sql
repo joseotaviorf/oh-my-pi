@@ -3,7 +3,6 @@ WITH base AS (
     contract_analysis_job_id AS id_contract_analysis_job,
     sales_flow_id AS id_sales_flow,
     CAST(created_at AS DATE) AS analysis_date,
-    GET_JSON_OBJECT(analysis_metadata, '$.request_source') AS request_source,
     analysis_started_at AS ts_analysis_started,
     analysis_ended_at AS ts_analysis_end,
     full_analysis
@@ -18,7 +17,6 @@ WITH base AS (
     id_contract_analysis_job,
     id_sales_flow,
     analysis_date,
-    request_source,
     ts_analysis_started,
     ts_analysis_end,
     FROM_JSON(
@@ -31,7 +29,6 @@ WITH base AS (
     id_contract_analysis_job,
     id_sales_flow,
     analysis_date,
-    request_source,
     ts_analysis_started,
     ts_analysis_end,
     vr AS validation_result
@@ -43,7 +40,6 @@ SELECT
   id_contract_analysis_job,
   id_sales_flow,
   analysis_date,
-  request_source,
   assessment.validation_id AS validation_id,
   assessment.assessment_target AS assessment_name,
   assessment.assessment_status AS assessment_status,
