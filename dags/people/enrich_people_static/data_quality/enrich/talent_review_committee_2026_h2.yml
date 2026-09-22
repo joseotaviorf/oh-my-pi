@@ -1,0 +1,34 @@
+---
+table_name: datalake_people.talent_review_committee_2026_h2
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+
+column_level_validations:
+  one_row_per_meeting:
+    custom:
+      # One committee row per synthetic meeting id.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_people.talent_review_committee_2026_h2 GROUP BY id_meeting HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  one_row_per_review_month:
+    custom:
+      # Each workbook review month maps to one committee.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_people.talent_review_committee_2026_h2 GROUP BY review_month HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  review_month:
+    is_contained_in:
+      values: ['2026-02', '2026-09']
+      severity_level: Warning
+  meeting_type:
+    is_contained_in:
+      values: ['talent_review']
+      severity_level: Warning
+  committee_title:
+    is_complete:
+      severity_level: Warning
+  ts_meeting:
+    is_complete:
+      severity_level: Warning

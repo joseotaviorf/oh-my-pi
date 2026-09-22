@@ -3480,6 +3480,8 @@ bietlejuice.enrich_people_public:
   - bietlejuice.hr_system:load-clean-job-families:first-run-of-day
   - bietlejuice.hr_system:load-clean-jobs:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
+bietlejuice.enrich_people_static:
+  - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
 bietlejuice.enrich_performance:
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.pin:load-clean-all-assignments:first-run-of-day

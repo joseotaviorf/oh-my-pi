@@ -1,0 +1,39 @@
+---
+database_name: datalake_people
+table_name: talent_review_committee_2026_h2
+description: |
+  The two Talent Review 2026 H2 committees loaded from the compensation workbook.
+  One row per committee. 2026-02 carries the prior grade into this cycle. 2026-09 is the committee that evaluated the employee in September 2026.
+  Both meetings are dated in September 2026, after the September PIN committees, and the evaluated committee is the later of the two.
+domain: People
+owner: gabriel.berger@quintoandar.com.br
+columns:
+  id_meeting:
+    description: Synthetic meeting identifier for the H2 committee. Negative so it cannot collide with a PIN meeting id. -20260904 is the carried committee and -20260918 is the evaluated committee.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.review_month
+  review_month:
+    description: Workbook cohort that chooses the committee, stored as YYYY-MM. 2026-02 means the grade was carried from February 2026. 2026-09 means the employee was evaluated in September 2026. Rows with an empty review month are not loaded.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.review_month
+    categories:
+      "2026-02": Grade carried from February 2026 into Talent Review 2026 H2.
+      "2026-09": Employee evaluated in September 2026 for Talent Review 2026 H2.
+  committee_title:
+    description: Committee title parsed by dim_committee_meeting. Both titles contain H2 and no quarterly token, so the cycle resolves to Talent Review 2026 H2.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.review_month
+  meeting_type:
+    description: Meeting type stored for the committee dimension. Always talent_review for this table.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.review_month
+  meeting_status_code:
+    description: Meeting status from the source system. Null for these workbook committees because the workbook does not provide a status code.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.review_month
+  ts_meeting:
+    description: Timestamp of the committee. 2026-09-04 12:00:00 for the carried committee and 2026-09-18 12:00:00 for the evaluated committee. Both are after 2026-09-03 so this cycle is the latest meeting for the assignment.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.review_month
+  ts_load:
+    description: Timestamp when this row was loaded into the enrich table.

@@ -1,0 +1,27 @@
+dag:
+  name: enrich_people_static
+  owner: Data People
+  callback_by_task: False
+  schedule_start_date: 2026, 9, 21
+  documentation:
+    dag_purpose: |
+      Static enrich models for People sources that do not change daily.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: people
+  default_extraction_type: full
+  has_hive_sync: true
+  bucket_config_name: people_bucket
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  inner_dependencies:
+    talent_review_2026_h2:
+      - talent_review_committee_2026_h2
+  tables_customization:
+    talent_review_committee_2026_h2:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    talent_review_2026_h2:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

@@ -1,0 +1,55 @@
+---
+table_name: datalake_people.talent_review_2026_h2
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  one_row_per_period_of_service_and_meeting:
+    custom:
+      # Fact grain is one outcome per employment period and committee meeting.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_people.talent_review_2026_h2 GROUP BY id_period_of_service, id_meeting HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  one_row_per_assignment:
+    custom:
+      # The workbook contributes one H2 outcome per assignment.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_people.talent_review_2026_h2 GROUP BY assignment_number HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  assignment_number:
+    is_complete:
+      severity_level: Warning
+  calibrated_potential:
+    is_contained_in:
+      values: ['High', 'Medium', 'Low']
+      severity_level: Warning
+  calibrated_readiness:
+    is_contained_in:
+      values:
+        - 'Ready now'
+        - 'Ready in 6 months - 1 years'
+        - 'Ready in 1 - 2 years'
+        - 'Unlikely to be promoted'
+        - 'Attention - needs development'
+      severity_level: Warning
+  calibrated_criticality:
+    is_contained_in:
+      values: ['Yes', 'No']
+      severity_level: Warning
+  calibrated_risk_of_loss:
+    is_contained_in:
+      values: ['High', 'Medium', 'Low']
+      severity_level: Warning
+  has_calibrated_rating:
+    is_complete:
+      severity_level: Warning
+  dt_committee_meeting:
+    is_complete:
+      severity_level: Warning

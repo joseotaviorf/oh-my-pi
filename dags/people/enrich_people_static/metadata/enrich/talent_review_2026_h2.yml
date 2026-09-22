@@ -1,0 +1,127 @@
+---
+database_name: datalake_people
+table_name: talent_review_2026_h2
+description: |
+  Talent Review 2026 H2 outcomes from the compensation workbook, shaped like the PIN talent review enrich table so dw_performance can union them.
+  One row per assignment whose workbook review month is fev./26 or set./26, stored as 2026-02 or 2026-09. Empty review months are dropped.
+  The workbook grade is the calibrated rating, translated to the English labels and numeric scale already used in Talent Review. Manager ratings are null.
+domain: People
+owner: gabriel.berger@quintoandar.com.br
+columns:
+  id_period_of_service:
+    description: Employment period of service for the assignment, resolved from the People identifier mapping. This is the assignment key used by fact_talent_reviews.
+    lineage:
+      - datalake_people.identifier_mapping.id_period_of_service
+      - datalake_gsheets_people_clean.talent_review_h2_26.assignment_number
+  id_meeting:
+    description: H2 committee this review belongs to. Comes from talent_review_committee_2026_h2 for the workbook review month.
+    lineage:
+      - datalake_people.talent_review_committee_2026_h2.id_meeting
+      - datalake_gsheets_people_clean.talent_review_h2_26.review_month
+  assignment_number:
+    description: Assignment identifier from the workbook, including the E or C prefix (for example E123456). Matches identifier_mapping.assignment_number.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.assignment_number
+  initial_potential:
+    description: Manager potential before calibration. Null because the workbook has a single grade per dimension and that grade is stored as the calibrated rating.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.potential
+  initial_readiness:
+    description: Manager readiness before calibration. Null because the workbook has a single grade per dimension and that grade is stored as the calibrated rating.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.readiness
+  initial_criticality:
+    description: Manager criticality before calibration. Null because the workbook has a single grade per dimension and that grade is stored as the calibrated rating.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.criticality
+  initial_risk_of_loss:
+    description: Manager risk of loss before calibration. Null because the workbook has a single grade per dimension and that grade is stored as the calibrated rating.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.risk_of_loss
+  calibrated_potential:
+    description: Calibrated potential translated from the workbook. Alto, Médio, and Baixo become High, Medium, and Low.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.potential
+    categories:
+      High: Workbook value Alto.
+      Medium: Workbook value Médio.
+      Low: Workbook value Baixo.
+  calibrated_readiness:
+    description: Calibrated readiness translated from the workbook into the Talent Review promotion-readiness labels.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.readiness
+    categories:
+      Ready now: Workbook value Pronto agora.
+      Ready in 6 months - 1 years: Workbook value Pronto entre 6 meses e 1 ano.
+      Ready in 1 - 2 years: Workbook value Pronto entre 1 e 2 anos.
+      Unlikely to be promoted: Workbook value Sem perspectiva de promoção.
+      Attention - needs development: "Workbook value Atenção: necessita desenvolvimento."
+  calibrated_criticality:
+    description: Calibrated criticality translated from the workbook. Sim becomes Yes and Não becomes No.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.criticality
+    categories:
+      "Yes": Workbook value Sim. Numeric rating 1, the regrettable-loss criticality flag.
+      "No": Workbook value Não. Numeric rating 0.
+  calibrated_risk_of_loss:
+    description: Calibrated risk of loss translated from the workbook. Alto, Médio, and Baixo become High, Medium, and Low.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.risk_of_loss
+    categories:
+      High: Workbook value Alto.
+      Medium: Workbook value Médio.
+      Low: Workbook value Baixo.
+  initial_numeric_potential:
+    description: Numeric manager potential. Null because the workbook grade is stored only on the calibrated side.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.potential
+  initial_numeric_readiness:
+    description: Numeric manager readiness. Null because the workbook grade is stored only on the calibrated side.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.readiness
+  initial_numeric_criticality:
+    description: Numeric manager criticality. Null because the workbook grade is stored only on the calibrated side.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.criticality
+  initial_numeric_risk_of_loss:
+    description: Numeric manager risk of loss. Null because the workbook grade is stored only on the calibrated side.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.risk_of_loss
+  calibrated_numeric_potential:
+    description: Numeric calibrated potential on the Talent Review scale. High is 3, Medium is 2, and Low is 1.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.potential
+  calibrated_numeric_readiness:
+    description: Numeric calibrated readiness on the Talent Review scale, from 2 (needs development) through 10 (ready now).
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.readiness
+  calibrated_numeric_criticality:
+    description: Numeric calibrated criticality. Yes is 1 and No is 0.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.criticality
+  calibrated_numeric_risk_of_loss:
+    description: Numeric calibrated risk of loss. High is 3, Medium is 2, and Low is 1.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.risk_of_loss
+  has_calibrated_rating:
+    description: True when potential, readiness, criticality, and risk of loss all translated to a known Talent Review label. fact_talent_reviews keeps only these rows.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.potential
+      - datalake_gsheets_people_clean.talent_review_h2_26.readiness
+      - datalake_gsheets_people_clean.talent_review_h2_26.criticality
+      - datalake_gsheets_people_clean.talent_review_h2_26.risk_of_loss
+  dt_committee_meeting:
+    description: Date of the H2 committee for this review month. 2026-09-04 for 2026-02 and 2026-09-18 for 2026-09.
+    lineage:
+      - datalake_people.talent_review_committee_2026_h2.ts_meeting
+      - datalake_gsheets_people_clean.talent_review_h2_26.review_month
+  ts_created:
+    description: Timestamp when the workbook row was loaded into the clean table. The workbook has no separate creation timestamp.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.ts_load
+  ts_updated:
+    description: Timestamp when the workbook row was loaded into the clean table. The workbook has no separate update timestamp.
+    lineage:
+      - datalake_gsheets_people_clean.talent_review_h2_26.ts_load
+  ts_load:
+    description: Timestamp when this row was loaded into the enrich table.
