@@ -510,6 +510,20 @@ class TestFetchDeclaredCriticality:
         assert criticality_by_dag == {"a": "Critical", "b": "Low"}
         assert deadline_by_dag == {"c": "10:00"}
 
+    def test_effective_tier_raises_priority_and_deadline(self):
+        session = mock.MagicMock()
+        session.execute.return_value.fetchall.return_value = [
+            ("cyber", "criticality:High"),
+            ("cyber", "effective_tier:Critical"),
+            ("cyber", "sla_deadline_localtime:11:00"),
+            ("untagged_deadline", "effective_tier:Critical"),
+        ]
+        criticality_by_dag, deadline_by_dag = _fetch_declared_criticality(session)
+        assert criticality_by_dag["cyber"] == "Critical"
+        assert deadline_by_dag["cyber"] == "08:00"
+        assert criticality_by_dag["untagged_deadline"] == "Critical"
+        assert "untagged_deadline" not in deadline_by_dag
+
 
 class TestFetchDagOwners:
     def test_parses_primary_owner(self):

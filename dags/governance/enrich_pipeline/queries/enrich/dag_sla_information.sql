@@ -190,6 +190,7 @@ special_scheduler AS (
         dag_run_base AS dr
             ON dr.id_dag = ds.id_dag
             AND dr.dt_event = ad.date
+            AND dr.rn = 1
     WHERE
         ad.date BETWEEN ds.dt_added AND COALESCE(ds.dt_removed, CURRENT_DATE)
 ),
@@ -331,6 +332,7 @@ base AS (
         dag_run_base AS db
             ON d.id_dag = db.id_dag
             AND d.dt_event = db.dt_event
+            AND db.rn = 1
     LEFT JOIN
         special_scheduler AS ss
             ON ss.id_dag = d.id_dag

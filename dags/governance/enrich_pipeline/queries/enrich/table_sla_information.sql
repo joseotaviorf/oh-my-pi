@@ -1,4 +1,4 @@
-WITH expected AS (
+WITH scoped AS (
     SELECT DISTINCT
         t.id_table,
         t.id_dag,
@@ -6,32 +6,46 @@ WITH expected AS (
         t.schema AS schema_name,
         t.table_name,
         t.layer,
-        t.criticality AS table_criticality,
         ds.id_line,
         ds.dt_snapshot,
-        ds.criticality AS dag_criticality,
-        ds.sla_deadline_localtime,
         ds.is_intraday_dag,
-        CAST(
-            CONCAT(
-                CAST(ds.dt_snapshot AS STRING),
-                ' ',
-                ds.sla_deadline_localtime,
-                ':00'
-            ) AS TIMESTAMP
-        ) AS ts_deadline_brt
+        COALESCE(t.criticality, ds.criticality, 'Medium') AS table_criticality,
+        COALESCE(ds.criticality, 'Medium') AS dag_criticality,
+        ds.sla_deadline_localtime AS dag_sla_deadline_localtime
     FROM
         datalake_pipeline.table AS t
     JOIN
         datalake_pipeline.dag_sla_information AS ds
             ON ds.id_dag = t.id_dag
             AND ds.is_active_and_unpaused = TRUE
-            AND ds.is_in_ignoring_list = FALSE
     WHERE
         t.is_active = TRUE
-        AND ds.sla_deadline_localtime IS NOT NULL
         AND MAKE_DATE(ds.year, ds.month, ds.day)
             BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+expected AS (
+    SELECT
+        s.*,
+        CAST(
+            CONCAT(CAST(s.dt_snapshot AS STRING), ' ', s.sla_deadline_localtime, ':00')
+            AS TIMESTAMP
+        ) AS ts_deadline_brt
+    FROM (
+        SELECT
+            sc.*,
+            -- A table that inherits its DAG's tier honours the DAG's declared deadline.
+            -- A table that overrides the tier is judged by its own tier's default, because
+            -- the DAG's deadline belongs to the DAG's tier. Defaults mirror
+            -- CriticalityEnum.DEFAULT_DEADLINE_BY_TIER: Critical 08:00, everything else 11:00.
+            CASE
+                WHEN sc.table_criticality = sc.dag_criticality
+                    AND sc.dag_sla_deadline_localtime IS NOT NULL
+                    THEN sc.dag_sla_deadline_localtime
+                WHEN sc.table_criticality = 'Critical' THEN '08:00'
+                ELSE '11:00'
+            END AS sla_deadline_localtime
+        FROM scoped AS sc
+    ) AS s
 ),
 deliveries AS (
     SELECT

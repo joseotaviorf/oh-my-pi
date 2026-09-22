@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import ClassVar
 
 
@@ -10,12 +11,32 @@ class CriticalityEnum:
     LOW = "Low"
     DEFAULT = MEDIUM
     PAGING = (CRITICAL, HIGH)
+    DEFAULT_DEADLINE_BY_TIER: ClassVar[dict[str, str]] = {
+        CRITICAL: "08:00",
+        HIGH: "11:00",
+        MEDIUM: "11:00",
+        LOW: "11:00",
+    }
+    _TIER_ORDER: ClassVar[dict[str, int]] = {CRITICAL: 3, HIGH: 2, MEDIUM: 1, LOW: 0}
     _OPSGENIE_PRIORITY: ClassVar[dict[str, str]] = {
         CRITICAL: "P1",
         HIGH: "P2",
         MEDIUM: "P3",
         LOW: "P4",
     }
+
+    @classmethod
+    def highest(cls, values: Iterable[str | None]) -> str:
+        tiers = [value for value in values if value in cls._TIER_ORDER]
+        if not tiers:
+            return cls.DEFAULT
+        return max(tiers, key=lambda tier: cls._TIER_ORDER[tier])
+
+    @classmethod
+    def default_deadline(cls, tier: str | None) -> str:
+        return cls.DEFAULT_DEADLINE_BY_TIER.get(
+            tier, cls.DEFAULT_DEADLINE_BY_TIER[cls.MEDIUM]
+        )
 
     @classmethod
     def get_available_enum_values(cls) -> list[str]:
@@ -39,4 +60,8 @@ class CriticalityEnum:
 
 CRITICALITY_TAG_PREFIX = "criticality:"
 SLA_DEADLINE_TAG_PREFIX = "sla_deadline_localtime:"
+# Must not contain the substring "criticality:". dag.sql extracts the declared
+# tier with REGEXP_EXTRACT(tags, 'criticality:(Critical|High|Medium|Low)'), which
+# would match inside a tag such as effective_criticality:Critical.
+EFFECTIVE_TIER_TAG_PREFIX = "effective_tier:"
 SLA_DEADLINE_PATTERN = r"^([01]\d|2[0-3]):[0-5]\d$"

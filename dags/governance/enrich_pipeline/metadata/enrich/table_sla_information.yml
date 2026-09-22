@@ -3,8 +3,10 @@ table_name: table_sla_information
 owner: jose.rferreira@quintoandar.com
 domain: Data Ops & Governance
 description: >
-  Daily delivery status against each producing DAG's declared deadline. Grain is one row per
-  table, producing DAG, and snapshot date for active tables whose DAG declares a deadline.
+  Daily delivery status for every active table of every active, unpaused DAG. Each row is
+  judged against a resolved São Paulo deadline: the DAG's declared deadline when the table
+  inherits that DAG's tier, 08:00 for Critical, and 11:00 for every other tier. Grain is one
+  row per table, producing DAG, and snapshot date.
 columns:
   id_table:
     lineage:
@@ -37,7 +39,10 @@ columns:
   table_criticality:
     lineage:
       - datalake_pipeline.table.criticality
-    description: Resolved table tier; the table override when declared, otherwise its DAG's tier.
+      - datalake_pipeline.dag_sla_information.criticality
+    description: >
+      Resolved table tier, always resolved: can override the producing DAG when declared,
+      otherwise inherits the DAG tier, falling back to Medium.
     categories:
       Critical: 'Critical tier'
       High: 'High tier'
@@ -47,7 +52,8 @@ columns:
     lineage:
       - datalake_pipeline.dag_sla_information.criticality
     description: >
-      Producing DAG's own declared tier. A High DAG remains High when it contains Critical tables.
+      Producing DAG's own tier, Medium when the DAG declares none. A High DAG remains High
+      when it contains Critical tables.
     categories:
       Critical: 'Critical tier'
       High: 'High tier'
@@ -55,8 +61,13 @@ columns:
       Low: 'Low tier'
   sla_deadline_localtime:
     lineage:
+      - datalake_pipeline.table.criticality
+      - datalake_pipeline.dag_sla_information.criticality
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
-    description: Declared delivery deadline as São Paulo wall-clock HH:MM.
+    description: >
+      Resolved table delivery deadline as São Paulo wall-clock HH:MM, never NULL. The DAG's
+      declared deadline when the table tier matches the DAG tier; 08:00 when the table tier
+      is Critical; 11:00 otherwise.
   is_intraday_dag:
     lineage:
       - datalake_pipeline.dag_sla_information.is_intraday_dag
@@ -70,18 +81,20 @@ columns:
       - datalake_astro_clean.dataset_event.ts_event_created
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
     description: >
-      Whether the first delivery met the declared deadline. NULL means the deadline has not yet
-      passed and no delivery exists; FALSE after the deadline or for a late delivery.
+      Whether the first delivery met the resolved deadline. NULL only when that deadline has
+      not yet passed and no delivery exists; FALSE after the deadline or for a late delivery.
   minutes_after_deadline:
     lineage:
       - datalake_astro_clean.dataset_event.ts_event_created
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
-    description: Signed minutes from the declared deadline to first delivery; negative means early.
+    description: Signed minutes from the resolved deadline to first delivery; negative means early.
   ts_deadline_brt:
     lineage:
       - datalake_pipeline.dag_sla_information.dt_snapshot
+      - datalake_pipeline.table.criticality
+      - datalake_pipeline.dag_sla_information.criticality
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
-    description: Snapshot deadline represented as a São Paulo wall-clock timestamp.
+    description: Resolved snapshot deadline represented as a São Paulo wall-clock timestamp.
   ts_first_delivery_brt:
     lineage:
       - datalake_astro_clean.dataset_event.ts_event_created
@@ -89,7 +102,7 @@ columns:
   dt_snapshot:
     lineage:
       - datalake_pipeline.dag_sla_information.dt_snapshot
-    description: Date whose declared delivery deadline is being evaluated.
+    description: Date whose resolved delivery deadline is being evaluated.
   ts_load:
     description: Timestamp when enrich_pipeline wrote this SLA snapshot.
   year:

@@ -81,8 +81,8 @@ columns:
     lineage:
       - datalake_astro_clean.serialized_dag.json_data
     description: >
-      Declared criticality tier of the DAG, read from its Airflow tags. NULL when the DAG
-      declares no tier. A Critical table never raises this value.
+      DAG tier read from its Airflow tags. Untagged DAGs resolve to Medium.
+      A Critical table never raises this value.
     categories:
       Critical: 'Critical tier'
       High: 'High tier'

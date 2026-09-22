@@ -1051,3 +1051,58 @@ class TestDAGDeclarationValidatorCriticality:
         assert (
             dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
         )
+
+    def test_validate_fast_lane_dag_criticality_critical_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "retsuko_fast_lane",
+                "owner": "Data Engineering",
+                "criticality": "Critical",
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match=r"cannot declare criticality: Critical \(found on \['dag'\]\)",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_fast_lane_table_criticality_critical_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {"account": {"criticality": "Critical"}},
+            },
+            "dag": {
+                "name": "retsuko_fast_lane",
+                "owner": "Data Engineering",
+                "criticality": "High",
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match=r"cannot declare criticality: Critical \(found on \['account'\]\)",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_fast_lane_high_accepts(self, dag_declaration_validator):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {"account": {"criticality": "High"}},
+            },
+            "dag": {
+                "name": "retsuko_fast_lane",
+                "owner": "Data Engineering",
+                "criticality": "High",
+            },
+        }
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )

@@ -65,6 +65,7 @@ from sqlalchemy import bindparam, text
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.enums.criticality_enum import (
     CRITICALITY_TAG_PREFIX,
+    EFFECTIVE_TIER_TAG_PREFIX,
     SLA_DEADLINE_TAG_PREFIX,
     CriticalityEnum,
 )
@@ -286,7 +287,9 @@ _DAG_TAGS_QUERY = text(
     """
     SELECT t.dag_id, t.name
     FROM dag_tag AS t
-    WHERE t.name LIKE :criticality_prefix OR t.name LIKE :deadline_prefix
+    WHERE t.name LIKE :criticality_prefix
+       OR t.name LIKE :deadline_prefix
+       OR t.name LIKE :effective_prefix
     """
 )
 
@@ -2090,17 +2093,25 @@ def _fetch_dag_owners(session, dag_ids) -> dict:
 
 
 def _fetch_declared_criticality(session) -> tuple[dict, dict]:
-    """(criticality_by_dag, deadline_by_dag) from criticality:<Level> and
-    sla_deadline_localtime:<HH:MM> (São Paulo) DAG tags (set by BaseWorkflow.dag_instance)."""
+    """(criticality_by_dag, deadline_by_dag) from DAG tags.
+
+    criticality is the highest of the declared ``criticality:`` tag and the
+    ``effective_tier:`` tag. A ``sla_deadline_localtime:`` tag is overridden with
+    the resolved tier's default deadline only when that tier differs from the
+    declared DAG tier. A DAG with no deadline tag stays out of deadline alerting;
+    the tier alone never invents a deadline.
+    """
     rows = session.execute(
         _DAG_TAGS_QUERY,
         {
             "criticality_prefix": f"{CRITICALITY_TAG_PREFIX}%",
             "deadline_prefix": f"{SLA_DEADLINE_TAG_PREFIX}%",
+            "effective_prefix": f"{EFFECTIVE_TIER_TAG_PREFIX}%",
         },
     ).fetchall()
     criticality_by_dag = {}
     deadline_by_dag = {}
+    effective_by_dag = {}
     valid_criticalities = set(CriticalityEnum.get_available_enum_values())
     for row in rows:
         if isinstance(row, (tuple, list)):
@@ -2114,6 +2125,12 @@ def _fetch_declared_criticality(session) -> tuple[dict, dict]:
                 criticality_by_dag[dag_id] = val
             else:
                 print(f"⚠️  Ignoring malformed tag {name!r} on {dag_id}")
+        elif name.startswith(EFFECTIVE_TIER_TAG_PREFIX):
+            val = name[len(EFFECTIVE_TIER_TAG_PREFIX) :]
+            if val in valid_criticalities:
+                effective_by_dag[dag_id] = val
+            else:
+                print(f"⚠️  Ignoring malformed tag {name!r} on {dag_id}")
         elif name.startswith(SLA_DEADLINE_TAG_PREFIX):
             val = name[len(SLA_DEADLINE_TAG_PREFIX) :]
             try:
@@ -2121,6 +2138,12 @@ def _fetch_declared_criticality(session) -> tuple[dict, dict]:
                 deadline_by_dag[dag_id] = val
             except (TypeError, ValueError):
                 print(f"⚠️  Ignoring malformed tag {name!r} on {dag_id}")
+    for dag_id in set(criticality_by_dag) | set(effective_by_dag):
+        declared = criticality_by_dag.get(dag_id)
+        resolved = CriticalityEnum.highest([declared, effective_by_dag.get(dag_id)])
+        criticality_by_dag[dag_id] = resolved
+        if dag_id in deadline_by_dag and resolved != declared:
+            deadline_by_dag[dag_id] = CriticalityEnum.default_deadline(resolved)
     return criticality_by_dag, deadline_by_dag
 
 

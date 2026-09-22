@@ -222,7 +222,7 @@ base AS (
         s.is_in_sla_ignoring_list,
         s.is_inside_sla,
         d.is_datamart,
-        dt.criticality,
+        COALESCE(dt.criticality, 'Medium') AS criticality,
         dt.sla_deadline_localtime,
         IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
         fe.ts_first_event,

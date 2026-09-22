@@ -713,6 +713,7 @@ class DAGDeclarationValidator(Validator):
             )
 
         self._check_transformation_grade(dag_declaration)
+        self._check_fast_lane_criticality(dag_declaration)
         self._check_cluster_validation_config(dag_declaration)
         if dag_declaration.get("cluster"):
             self.validate_cluster_validation_cluster_diff(
@@ -730,6 +731,32 @@ class DAGDeclarationValidator(Validator):
             self._check_query_delta_datazord_config(dag_declaration)
         if workflow_type == WorkflowEnum.QUERY_DELTA_WORKFLOW.value:
             self._check_query_delta_rejects_datazord_config(dag_declaration)
+
+    def _check_fast_lane_criticality(self, dag_declaration: dict) -> None:
+        """fast_lane DAGs run intraday, so a daily Critical deadline is meaningless."""
+        dag = dag_declaration.get("dag") or {}
+        dag_name = dag.get("name") or ""
+        if "fast_lane" not in dag_name:
+            return
+
+        tables_customization = (dag_declaration.get("workflow") or {}).get(
+            "tables_customization"
+        ) or {}
+        offenders = [
+            table_name
+            for table_name, customization in tables_customization.items()
+            if isinstance(customization, dict)
+            and customization.get("criticality") == CriticalityEnum.CRITICAL
+        ]
+        if dag.get("criticality") == CriticalityEnum.CRITICAL:
+            offenders.insert(0, "dag")
+        if offenders:
+            raise AssertionError(
+                "m=_check_fast_lane_criticality, "
+                f"msg=fast_lane DAG '{dag_name}' cannot declare "
+                f"criticality: Critical (found on {offenders}); fast_lane DAGs run "
+                "intraday and may declare at most 'High'"
+            )
 
     def _check_transformation_grade(self, dag_declaration: dict) -> None:
         workflow = dag_declaration.get("workflow") or {}

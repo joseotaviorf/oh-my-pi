@@ -3,8 +3,9 @@ table_name: fact_daily_table_sla
 owner: jose.rferreira@quintoandar.com
 domain: Data Ops & Governance
 description: >
-  Daily table delivery fact at one row per table, producing DAG, and snapshot date. Supports
-  declared-SLA reporting by table tier, DAG tier, and owner line.
+  Daily table delivery fact at one row per active table, producing DAG, and snapshot date,
+  for every active table of an active unpaused DAG. Supports SLA reporting by table tier,
+  DAG tier, and owner line.
 columns:
   sk_table:
     lineage:
@@ -37,7 +38,9 @@ columns:
   table_criticality:
     lineage:
       - datalake_pipeline.table_sla_information.table_criticality
-    description: Resolved table tier; the table override when declared, otherwise its DAG's tier.
+    description: >
+      Resolved table tier, always resolved: can override the producing DAG when declared,
+      otherwise inherits the DAG tier, falling back to Medium.
     categories:
       Critical: 'Critical tier'
       High: 'High tier'
@@ -46,7 +49,7 @@ columns:
   dag_criticality:
     lineage:
       - datalake_pipeline.table_sla_information.dag_criticality
-    description: Producing DAG's own declared tier, independent of table overrides.
+    description: Producing DAG's own tier, Medium when untagged, independent of table overrides.
     categories:
       Critical: 'Critical tier'
       High: 'High tier'
@@ -55,7 +58,7 @@ columns:
   sla_deadline_localtime:
     lineage:
       - datalake_pipeline.table_sla_information.sla_deadline_localtime
-    description: Declared delivery deadline as São Paulo wall-clock HH:MM.
+    description: Resolved table delivery deadline as São Paulo wall-clock HH:MM, never NULL.
   is_delivered:
     lineage:
       - datalake_pipeline.table_sla_information.is_delivered
@@ -64,8 +67,8 @@ columns:
     lineage:
       - datalake_pipeline.table_sla_information.is_inside_declared_sla
     description: >
-      Whether first delivery met the declared deadline; NULL while an undelivered deadline remains
-      in the future.
+      Whether the first delivery met the resolved deadline. NULL only when that deadline has
+      not yet passed and no delivery exists; FALSE after the deadline or for a late delivery.
   ts_first_delivery_brt:
     lineage:
       - datalake_pipeline.table_sla_information.ts_first_delivery_brt
@@ -73,11 +76,11 @@ columns:
   minutes_after_deadline:
     lineage:
       - datalake_pipeline.table_sla_information.minutes_after_deadline
-    description: Signed minutes from declared deadline to first delivery; negative means early.
+    description: Signed minutes from the resolved deadline to first delivery; negative means early.
   dt_snapshot:
     lineage:
       - datalake_pipeline.table_sla_information.dt_snapshot
-    description: Date whose declared delivery deadline is being evaluated.
+    description: Date whose resolved delivery deadline is being evaluated.
   ts_load:
     description: Timestamp when dw_pipeline wrote this fact row.
   year:

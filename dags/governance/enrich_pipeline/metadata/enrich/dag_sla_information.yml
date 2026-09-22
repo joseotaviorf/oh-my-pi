@@ -20,7 +20,7 @@ columns:
     lineage:
       - datalake_pipeline.dag.criticality
     description: >
-      Declared criticality tier of the DAG. NULL when the DAG declares no tier.
+      DAG tier carried from datalake_pipeline.dag. Untagged DAGs are Medium.
       This is the DAG's own tier; a Critical table never raises it.
     categories:
       Critical: 'Critical tier'

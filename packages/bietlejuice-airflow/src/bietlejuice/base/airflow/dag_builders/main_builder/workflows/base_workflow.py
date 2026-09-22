@@ -14,7 +14,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.builder_interf
 )
 from bietlejuice.base.airflow.enums.criticality_enum import (
     CRITICALITY_TAG_PREFIX,
+    EFFECTIVE_TIER_TAG_PREFIX,
     SLA_DEADLINE_TAG_PREFIX,
+    CriticalityEnum,
 )
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_job_cluster_engine_to_context,
@@ -125,6 +127,18 @@ class BaseWorkflow(BuilderInterface):
                 dag_tags.append(
                     f"{SLA_DEADLINE_TAG_PREFIX}{self.dag_args['sla_deadline_localtime']}"
                 )
+            effective_tier = CriticalityEnum.highest(
+                [self.dag_args.get("criticality")]
+                + [
+                    customization.get("criticality")
+                    for customization in (
+                        self.workflow_args.get("tables_customization") or {}
+                    ).values()
+                    if isinstance(customization, dict)
+                ]
+            )
+            if effective_tier != CriticalityEnum.DEFAULT:
+                dag_tags.append(f"{EFFECTIVE_TIER_TAG_PREFIX}{effective_tier}")
 
         default_args = {
             "owner": self.dag_args["owner"],

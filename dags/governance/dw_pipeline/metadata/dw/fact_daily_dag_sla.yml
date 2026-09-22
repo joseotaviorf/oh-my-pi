@@ -2,9 +2,9 @@
 database_name: dw_pipeline
 table_name: fact_daily_dag_sla
 description: >
-  One row per DAG that declares a criticality tier, per snapshot date. Delivery is judged
-  against the deadline declared on the DAG, collapsed so an intraday DAG counts once.
-  criticality is the DAG's own declared tier, which a Critical table never raises.
+  One row per DAG on dag_sla_information per snapshot date, including DAGs that declare no
+  tier. is_inside_declared_sla rolls up every measured table of that DAG. criticality is the
+  DAG's own tier, Medium when untagged, which a Critical table never raises.
 domain: Data Ops & Governance
 owner: jose.rferreira@quintoandar.com
 columns:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_pipeline.dag_sla_information.criticality
     description: >
-      The DAG's own declared tier. A Critical table produced by this DAG does not raise it.
+      The DAG's own tier, Medium when untagged. A Critical table produced by this DAG does not raise it.
     categories:
       Critical: 'Critical tier'
       High: 'High tier'
@@ -56,14 +56,16 @@ columns:
     description: Legacy fixed-hour SLA verdict, carried so both definitions can be charted together.
   is_inside_declared_sla:
     lineage:
-      - datalake_pipeline.dag_sla_information.is_inside_declared_sla
+      - datalake_pipeline.table_sla_information.is_inside_declared_sla
     description: >
-      Whether delivery met the declared deadline. NULL means undecided: no deadline, the DAG
-      is paused, or the deadline has not been reached yet.
+      Rollup of measured tables: FALSE if any table missed, NULL if any table is still
+      undecided and none missed or if the DAG has no measured tables, otherwise TRUE.
   ts_first_successful_delivery_brt:
     lineage:
-      - datalake_pipeline.dag_sla_information.ts_last_table_task_successful_brt
-    description: São Paulo timestamp of the earliest successful table delivery recorded for the snapshot date.
+      - datalake_pipeline.table_sla_information.ts_first_delivery_brt
+    description: >
+      São Paulo timestamp when the DAG's last measured table first delivered.
+      NULL when the DAG has no measured tables.
   dt_snapshot:
     lineage:
       - datalake_pipeline.dag_sla_information.dt_snapshot
