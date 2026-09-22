@@ -13,28 +13,78 @@ column_level_validations:
     is_unique:
       severity_level: Error
   sk_broker:
-    is_complete:
+    custom:
+      # is_complete would fail on the SCD "-1" unknown-member row the framework injects on every
+      # full-extraction run for dim tables (DefaultRowAdditionPipeline); all non-key columns are
+      # null on that row by design, so it is excluded here instead of via is_complete.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND sk_broker IS NULL
+        ) = 0
       severity_level: Error
   has_3p_access_control:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND has_3p_access_control IS NULL
+        ) = 0
       severity_level: Error
   ts_load:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND ts_load IS NULL
+        ) = 0
       severity_level: Error
   year:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND year IS NULL
+        ) = 0
       severity_level: Error
   month:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND month IS NULL
+        ) = 0
       severity_level: Error
   day:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND day IS NULL
+        ) = 0
       severity_level: Error
   ts_start:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND ts_start IS NULL
+        ) = 0
       severity_level: Error
   sk_user_account_manager:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND sk_user_account_manager IS NULL
+        ) = 0
       severity_level: Error
   account_manager:
     custom:
@@ -47,17 +97,33 @@ column_level_validations:
         ) = 0
       severity_level: Warning
   business_context:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND business_context IS NULL
+        ) = 0
       severity_level: Error
   version:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND version IS NULL
+        ) = 0
       severity_level: Error
   is_current:
-    is_complete:
-      severity_level: Error
     custom:
+      # Combines the "-1" sentinel exclusion (see above) with the pre-existing at-most-one-current
+      # -per-lane check, since a column can only have one `custom` entry.
       constraint: |-
-        (SELECT COUNT(*) FROM (
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker_account_manager_history
+         WHERE sk_broker_account_manager_history != '-1'
+           AND is_current IS NULL
+        ) = 0
+        AND (SELECT COUNT(*) FROM (
           SELECT
             sk_broker,
             business_context,

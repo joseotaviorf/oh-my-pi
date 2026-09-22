@@ -12,23 +12,67 @@ column_level_validations:
     is_unique:
       severity_level: Error
   sk_lead_3p:
-    is_complete:
+    custom:
+      # is_complete would fail on the SCD -1 unknown-member row the framework injects on every
+      # full-extraction run for dim tables (DefaultRowAdditionPipeline); all non-key columns are
+      # null on that row by design, so it is excluded here instead of via is_complete.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_3p_supply.dim_lead_3p_image_inspection
+         WHERE sk_image_inspection != -1
+           AND sk_lead_3p IS NULL
+        ) = 0
       severity_level: Error
   has_3p_access_control:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_3p_supply.dim_lead_3p_image_inspection
+         WHERE sk_image_inspection != -1
+           AND has_3p_access_control IS NULL
+        ) = 0
       severity_level: Error
   ts_image_inspection_created:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_3p_supply.dim_lead_3p_image_inspection
+         WHERE sk_image_inspection != -1
+           AND ts_image_inspection_created IS NULL
+        ) = 0
       severity_level: Error
   ts_load:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_3p_supply.dim_lead_3p_image_inspection
+         WHERE sk_image_inspection != -1
+           AND ts_load IS NULL
+        ) = 0
       severity_level: Error
   year:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_3p_supply.dim_lead_3p_image_inspection
+         WHERE sk_image_inspection != -1
+           AND year IS NULL
+        ) = 0
       severity_level: Error
   month:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_3p_supply.dim_lead_3p_image_inspection
+         WHERE sk_image_inspection != -1
+           AND month IS NULL
+        ) = 0
       severity_level: Error
   day:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_3p_supply.dim_lead_3p_image_inspection
+         WHERE sk_image_inspection != -1
+           AND day IS NULL
+        ) = 0
       severity_level: Error

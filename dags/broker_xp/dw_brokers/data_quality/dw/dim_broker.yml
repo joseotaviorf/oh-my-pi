@@ -61,20 +61,58 @@ column_level_validations:
         ) AS inconsistent_am) = 0
       severity_level: Warning
   has_3p_access_control:
-    is_complete:
+    custom:
+      # is_complete would fail on the SCD "-1" unknown-member row the framework injects on every
+      # full-extraction run for dim tables (DefaultRowAdditionPipeline); all non-key columns are
+      # null on that row by design, so it is excluded here instead of via is_complete.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker
+         WHERE sk_broker != '-1'
+           AND has_3p_access_control IS NULL
+        ) = 0
       severity_level: Error
   qt_active_agents:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as has_3p_access_control above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker
+         WHERE sk_broker != '-1'
+           AND qt_active_agents IS NULL
+        ) = 0
       severity_level: Error
   qt_active_agents_in_lead_gen:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as has_3p_access_control above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker
+         WHERE sk_broker != '-1'
+           AND qt_active_agents_in_lead_gen IS NULL
+        ) = 0
       severity_level: Error
   qt_active_broker_admins:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as has_3p_access_control above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker
+         WHERE sk_broker != '-1'
+           AND qt_active_broker_admins IS NULL
+        ) = 0
       severity_level: Error
   has_active_agents_in_lead_gen:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as has_3p_access_control above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker
+         WHERE sk_broker != '-1'
+           AND has_active_agents_in_lead_gen IS NULL
+        ) = 0
       severity_level: Error
   ts_load:
-    is_complete:
+    custom:
+      # Same "-1" sentinel-row exclusion as has_3p_access_control above.
+      constraint: |-
+        (SELECT COUNT(*) FROM dw_brokers.dim_broker
+         WHERE sk_broker != '-1'
+           AND ts_load IS NULL
+        ) = 0
       severity_level: Error
