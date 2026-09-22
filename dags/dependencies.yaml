@@ -236,11 +236,14 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
   - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection:first-run-of-day
   - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-report-inspections:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
+  - bietlejuice.dw_offboarding_obt:load-dw-offboarding-obt-offboarding:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-dim-answer:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
@@ -255,6 +258,7 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
   - bietlejuice.enrich_date:load-enrich-workday-window:first-run-of-day
   - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts:first-run-of-day
+  - bietlejuice.enrich_inspections:load-enrich-repair-request:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks:first-run-of-day
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination:first-run-of-day

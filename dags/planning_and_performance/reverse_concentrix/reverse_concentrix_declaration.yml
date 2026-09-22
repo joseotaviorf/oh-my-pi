@@ -54,6 +54,4 @@ workflow:
     fcr_metric: {}
     customer_contacts_session: {}
     segments_perspective: {}
-
-
-
+    offboarding_perspective: {}
