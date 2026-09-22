@@ -1,9 +1,13 @@
 -- Active-employee roster for external Comp S3 (Parquet). Subset of talent_review_performa_base;
 -- omits display names and calculated fields derivable from assignment_number keys.
+-- Period-of-service gate: Performa, Talent Review, and last merit/promotion must not
+-- follow a person onto a later employment (rehire). Join those attributes only when
+-- dt_employee_hired is on or before the cycle's dt_valid_from (or the raise date).
 WITH
 talent_review_q1_26_ranked AS (
     SELECT
         tr.person_number,
+        dcp.dt_valid_from AS dt_cycle_valid_from,
         dtr.potential AS tr_q1_26_potential,
         dtr.readiness AS tr_q1_26_readiness,
         dtr.criticality AS tr_q1_26_criticality,
@@ -27,6 +31,7 @@ talent_review_q1_26_ranked AS (
 talent_review_q1_26 AS (
     SELECT
         person_number,
+        dt_cycle_valid_from,
         tr_q1_26_potential,
         tr_q1_26_readiness,
         tr_q1_26_criticality,
@@ -39,6 +44,7 @@ talent_review_q1_26 AS (
 talent_review_q3_25_ranked AS (
     SELECT
         tr.person_number,
+        dcp.dt_valid_from AS dt_cycle_valid_from,
         dtr.potential AS tr_q3_25_potential,
         dtr.readiness AS tr_q3_25_readiness,
         dtr.criticality AS tr_q3_25_criticality,
@@ -62,6 +68,7 @@ talent_review_q3_25_ranked AS (
 talent_review_q3_25 AS (
     SELECT
         person_number,
+        dt_cycle_valid_from,
         tr_q3_25_potential,
         tr_q3_25_readiness,
         tr_q3_25_criticality,
@@ -74,6 +81,7 @@ talent_review_q3_25 AS (
 talent_review_q1_25_ranked AS (
     SELECT
         tr.person_number,
+        dcp.dt_valid_from AS dt_cycle_valid_from,
         dtr.potential AS tr_q1_25_potential,
         dtr.readiness AS tr_q1_25_readiness,
         dtr.criticality AS tr_q1_25_criticality,
@@ -97,6 +105,7 @@ talent_review_q1_25_ranked AS (
 talent_review_q1_25 AS (
     SELECT
         person_number,
+        dt_cycle_valid_from,
         tr_q1_25_potential,
         tr_q1_25_readiness,
         tr_q1_25_criticality,
@@ -137,7 +146,8 @@ last_raise AS (
 latest_performa_score AS (
     SELECT
         fpc.person_number,
-        fpc.performa_score
+        fpc.performa_score,
+        dcp.dt_valid_from AS dt_cycle_valid_from
     FROM
         dw_performance.fact_performance_calibrations AS fpc
     INNER JOIN
@@ -188,18 +198,23 @@ FROM
 LEFT JOIN
     last_raise AS lr
         ON es.sk_employee = lr.sk_employee
+        AND lr.last_raise_date >= es.dt_employee_hired
 LEFT JOIN
     latest_performa_score AS pr
         ON es.person_number = pr.person_number
+        AND es.dt_employee_hired <= pr.dt_cycle_valid_from
 LEFT JOIN
     talent_review_q1_26 AS tr_q1_26
         ON tr_q1_26.person_number = es.person_number
+        AND es.dt_employee_hired <= tr_q1_26.dt_cycle_valid_from
 LEFT JOIN
     talent_review_q3_25 AS tr_q3_25
         ON tr_q3_25.person_number = es.person_number
+        AND es.dt_employee_hired <= tr_q3_25.dt_cycle_valid_from
 LEFT JOIN
     talent_review_q1_25 AS tr_q1_25
         ON tr_q1_25.person_number = es.person_number
+        AND es.dt_employee_hired <= tr_q1_25.dt_cycle_valid_from
 LEFT JOIN
     dw_compensation.fact_compensations AS fc
         ON fc.sk_employee = es.sk_employee
