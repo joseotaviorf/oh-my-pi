@@ -1,7 +1,7 @@
 dag:
   name: jaiminho
   schedule_start_date: 2021, 11, 30
-  schedule_interval: 0 3,8,12 * * *
+  schedule_interval: 0 0 * * *
   owner: Data SS
   documentation:
     dag_purpose: |
@@ -14,6 +14,9 @@ workflow:
   source_schema: jaiminho
   dbutils_secret_key: JAIMINHO_DB
   lineage_product_database_name: jaiminho
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_end_date') }}"
   tables_customization:
     user_notifications:
       clean_table_name: user_notifications
@@ -47,4 +50,3 @@ workflow:
       clean_table_name: notifications
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-
