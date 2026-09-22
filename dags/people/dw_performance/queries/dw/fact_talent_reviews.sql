@@ -1,4 +1,59 @@
 WITH
+talent_review_source AS (
+  SELECT
+    id_period_of_service,
+    id_meeting,
+    dt_committee_meeting,
+    has_calibrated_rating,
+    initial_criticality,
+    initial_potential,
+    initial_risk_of_loss,
+    initial_readiness,
+    calibrated_criticality,
+    calibrated_potential,
+    calibrated_risk_of_loss,
+    calibrated_readiness,
+    initial_numeric_criticality,
+    initial_numeric_potential,
+    initial_numeric_risk_of_loss,
+    initial_numeric_readiness,
+    calibrated_numeric_criticality,
+    calibrated_numeric_potential,
+    calibrated_numeric_risk_of_loss,
+    calibrated_numeric_readiness,
+    assignment_number,
+    ts_created,
+    ts_updated
+  FROM
+    datalake_performance.talent_review
+  UNION ALL
+  SELECT
+    id_period_of_service,
+    id_meeting,
+    dt_committee_meeting,
+    has_calibrated_rating,
+    initial_criticality,
+    initial_potential,
+    initial_risk_of_loss,
+    initial_readiness,
+    calibrated_criticality,
+    calibrated_potential,
+    calibrated_risk_of_loss,
+    calibrated_readiness,
+    initial_numeric_criticality,
+    initial_numeric_potential,
+    initial_numeric_risk_of_loss,
+    initial_numeric_readiness,
+    calibrated_numeric_criticality,
+    calibrated_numeric_potential,
+    calibrated_numeric_risk_of_loss,
+    calibrated_numeric_readiness,
+    assignment_number,
+    ts_created,
+    ts_updated
+  FROM
+    datalake_people.talent_review_2026_h2
+),
 rating_change AS (
   SELECT
     id_period_of_service,
@@ -21,7 +76,7 @@ rating_change AS (
         OVER (PARTITION BY id_period_of_service ORDER BY dt_committee_meeting, id_meeting) 
     AS dif_potential
   FROM
-    datalake_performance.talent_review
+    talent_review_source
   WHERE
     has_calibrated_rating = TRUE
 ),
@@ -142,7 +197,7 @@ SELECT
   tr.ts_updated,
   NOW() AS ts_load
 FROM
-  datalake_performance.talent_review AS tr
+  talent_review_source AS tr
 INNER JOIN
   rating_change AS rc
     ON tr.id_period_of_service = rc.id_period_of_service 

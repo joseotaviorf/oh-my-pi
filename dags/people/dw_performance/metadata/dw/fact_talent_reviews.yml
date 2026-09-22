@@ -12,19 +12,24 @@ columns:
     description: Surrogate key for the talent review record, generated from id_period_of_service and id_meeting.
     lineage:
     - datalake_performance.talent_review.id_meeting
+    - datalake_people.talent_review_2026_h2.id_meeting
     - datalake_performance.talent_review.id_period_of_service
+    - datalake_people.talent_review_2026_h2.id_period_of_service
   sk_assignment:
     description: Surrogate key for the employee's assignment (period of service). Links to a relevant employee/assignment dimension.
     lineage:
     - datalake_performance.talent_review.id_period_of_service
+    - datalake_people.talent_review_2026_h2.id_period_of_service
   sk_committee_meeting:
     description: Surrogate key for the committee meeting where the review took place. Links to dim_committee_meeting.
     lineage:
     - datalake_performance.talent_review.id_meeting
+    - datalake_people.talent_review_2026_h2.id_meeting
   sk_committee_meeting_date:
     description: Surrogate key for the date of the committee meeting, in 'yyyyMMdd' format. Defaults to -1 if the date is NULL. Links to a date dimension.
     lineage:
     - datalake_performance.talent_review.dt_committee_meeting
+    - datalake_people.talent_review_2026_h2.dt_committee_meeting
   sk_cycle_period:
     description: Surrogate key of the Talent Review review-period cycle (year and sub-period) this review belongs to. Use this to resolve the cycle and its release status via dim_cycle_period.
     lineage:
@@ -35,37 +40,60 @@ columns:
     description: Composite surrogate key representing the combination of initial talent ratings (criticality, potential, risk of loss, readiness) from the manager before calibration. Links to dim_talent_rating.
     lineage:
     - datalake_performance.talent_review.initial_criticality
+    - datalake_people.talent_review_2026_h2.initial_criticality
     - datalake_performance.talent_review.initial_potential
+    - datalake_people.talent_review_2026_h2.initial_potential
     - datalake_performance.talent_review.initial_readiness
+    - datalake_people.talent_review_2026_h2.initial_readiness
     - datalake_performance.talent_review.initial_risk_of_loss
+    - datalake_people.talent_review_2026_h2.initial_risk_of_loss
   sk_talent_rating_from_calibration:
     description: Composite surrogate key representing the combination of calibrated talent ratings (criticality, potential, risk of loss, readiness) after committee review. Links to dim_talent_rating.
     lineage:
     - datalake_performance.talent_review.calibrated_criticality
+    - datalake_people.talent_review_2026_h2.calibrated_criticality
     - datalake_performance.talent_review.calibrated_potential
+    - datalake_people.talent_review_2026_h2.calibrated_potential
     - datalake_performance.talent_review.calibrated_readiness
+    - datalake_people.talent_review_2026_h2.calibrated_readiness
     - datalake_performance.talent_review.calibrated_risk_of_loss
+    - datalake_people.talent_review_2026_h2.calibrated_risk_of_loss
   sk_talent_variation_period:
     description: Composite surrogate key indicating the trend (Increased, Decreased, Maintained) for each talent dimension compared to the previous review period. Links to dim_talent_variation.
     lineage:
     - datalake_performance.talent_review.calibrated_numeric_criticality
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_criticality
     - datalake_performance.talent_review.calibrated_numeric_potential
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_potential
     - datalake_performance.talent_review.calibrated_numeric_readiness
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_readiness
     - datalake_performance.talent_review.calibrated_numeric_risk_of_loss
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_risk_of_loss
     - datalake_performance.talent_review.dt_committee_meeting
+    - datalake_people.talent_review_2026_h2.dt_committee_meeting
     - datalake_performance.talent_review.id_meeting
+    - datalake_people.talent_review_2026_h2.id_meeting
     - datalake_performance.talent_review.id_period_of_service
+    - datalake_people.talent_review_2026_h2.id_period_of_service
   sk_talent_variation_calibration:
     description: Composite surrogate key indicating the trend (Increased, Decreased, Maintained) for each talent dimension from the initial (manager) to the calibrated assessment. Links to dim_talent_variation.
     lineage:
     - datalake_performance.talent_review.calibrated_numeric_criticality
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_criticality
     - datalake_performance.talent_review.calibrated_numeric_potential
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_potential
     - datalake_performance.talent_review.calibrated_numeric_readiness
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_readiness
     - datalake_performance.talent_review.calibrated_numeric_risk_of_loss
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_risk_of_loss
     - datalake_performance.talent_review.initial_numeric_criticality
+    - datalake_people.talent_review_2026_h2.initial_numeric_criticality
     - datalake_performance.talent_review.initial_numeric_potential
+    - datalake_people.talent_review_2026_h2.initial_numeric_potential
     - datalake_performance.talent_review.initial_numeric_readiness
+    - datalake_people.talent_review_2026_h2.initial_numeric_readiness
     - datalake_performance.talent_review.initial_numeric_risk_of_loss
+    - datalake_people.talent_review_2026_h2.initial_numeric_risk_of_loss
   person_number:
     description: Main business identifier of the employee in PIN for the reviewed assignment (e.g. '123456'). Links to dw_people.dim_employee; with is_latest_for_employee_in_cycle = TRUE, selects one official review per employee per cycle.
     lineage:
@@ -74,44 +102,55 @@ columns:
     description: Main business identifier of the assignment in PIN at the time of the review (e.g. 'E123456'). Links assignment-level People tables when assignment history is needed.
     lineage:
     - datalake_performance.talent_review.assignment_number
+    - datalake_people.talent_review_2026_h2.assignment_number
   numeric_risk_of_loss_from_manager:
     description: Initial numeric value for risk of loss assessment from the manager.
     lineage:
     - datalake_performance.talent_review.initial_numeric_risk_of_loss
+    - datalake_people.talent_review_2026_h2.initial_numeric_risk_of_loss
   numeric_risk_of_loss_from_calibration:
     description: Calibrated numeric value for risk of loss assessment after committee review.
     lineage:
     - datalake_performance.talent_review.calibrated_numeric_risk_of_loss
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_risk_of_loss
   numeric_criticality_from_manager:
     description: Initial numeric value for criticality assessment from the manager.
     lineage:
     - datalake_performance.talent_review.initial_numeric_criticality
+    - datalake_people.talent_review_2026_h2.initial_numeric_criticality
   numeric_criticality_from_calibration:
     description: Calibrated numeric value for criticality assessment after committee review.
     lineage:
     - datalake_performance.talent_review.calibrated_numeric_criticality
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_criticality
   numeric_readiness_from_manager:
     description: Initial numeric value for readiness assessment from the manager.
     lineage:
     - datalake_performance.talent_review.initial_numeric_readiness
+    - datalake_people.talent_review_2026_h2.initial_numeric_readiness
   numeric_readiness_from_calibration:
     description: Calibrated numeric value for readiness assessment after committee review.
     lineage:
     - datalake_performance.talent_review.calibrated_numeric_readiness
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_readiness
   numeric_potential_from_manager:
     description: Initial numeric value for potential assessment from the manager.
     lineage:
     - datalake_performance.talent_review.initial_numeric_potential
+    - datalake_people.talent_review_2026_h2.initial_numeric_potential
   numeric_potential_from_calibration:
     description: Calibrated numeric value for potential assessment after committee review.
     lineage:
     - datalake_performance.talent_review.calibrated_numeric_potential
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_potential
   is_regrettable_loss:
     description: |-
       Indicates if the employee is considered a regrettable loss. An employee is flagged as regrettable loss if they are assessed as 'Critical' (corresponds to calibrated_numeric_criticality = 1) OR 'High Potential' (corresponds to calibrated_numeric_potential = 3).
     lineage:
     - datalake_performance.talent_review.calibrated_numeric_criticality
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_criticality
     - datalake_performance.talent_review.calibrated_numeric_potential
+    - datalake_people.talent_review_2026_h2.calibrated_numeric_potential
     categories:
       'TRUE': Employee is considered a regrettable loss.
       'FALSE': Employee is not considered a regrettable loss.
@@ -119,13 +158,16 @@ columns:
     description: Boolean flag (TRUE/FALSE) indicating if this is the last recorded talent review cycle for the employee's assignment.
     lineage:
     - datalake_performance.talent_review.dt_committee_meeting
+    - datalake_people.talent_review_2026_h2.dt_committee_meeting
     - datalake_performance.talent_review.id_period_of_service
+    - datalake_people.talent_review_2026_h2.id_period_of_service
   is_latest_for_employee_in_cycle:
     description: True for exactly one review per person_number and cycle — the latest committee meeting in that cycle. Filter for the employee's official Talent Review rating in the cycle.
     lineage:
     - dw_performance.dim_committee_meeting.ts_meeting
     - datalake_people.identifier_mapping.person_number
     - datalake_performance.talent_review.id_meeting
+    - datalake_people.talent_review_2026_h2.id_meeting
   is_latest_for_employee:
     description: True for exactly one review per person_number — the latest official (is_latest_for_employee_in_cycle) review in a released cycle (dim_cycle_period.is_released). Filter for the employee's current Talent Review across cycles. Distinct from is_last_cycle (period-of-service grain) and is_latest_for_employee_in_cycle (person × cycle).
     lineage:
@@ -136,9 +178,11 @@ columns:
     description: Timestamp of when the original talent review record was created in the source.
     lineage:
     - datalake_performance.talent_review.ts_created
+    - datalake_people.talent_review_2026_h2.ts_created
   ts_updated:
     description: Timestamp of when the original talent review record was last updated in the source.
     lineage:
     - datalake_performance.talent_review.ts_updated
+    - datalake_people.talent_review_2026_h2.ts_updated
   ts_load:
     description: Timestamp indicating when the record was loaded into the fact table.

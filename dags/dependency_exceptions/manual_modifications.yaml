@@ -219,6 +219,10 @@ bietlejuice.dw_evictions:
 bietlejuice.dw_offboarding:
   add:
     - bietlejuice.enrich_inspections:load-enrich-repair-request:first-run-of-day
+bietlejuice.dw_performance:
+  remove:
+    - bietlejuice.enrich_people_static:load-enrich-talent-review-2026-h2:first-run-of-day
+    - bietlejuice.enrich_people_static:load-enrich-talent-review-committee-2026-h2:first-run-of-day
 bietlejuice.dw_offer:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day

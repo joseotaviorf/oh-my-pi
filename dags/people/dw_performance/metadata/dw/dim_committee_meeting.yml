@@ -9,29 +9,36 @@ columns:
     description: Surrogate key that uniquely identifies a committee meeting. Derived from the source meeting identifier.
     lineage:
     - datalake_pin_hr_review_clean.meeting.id_meeting
+    - datalake_people.talent_review_committee_2026_h2.id_meeting
   committee_title:
     description: Official title of the committee meeting as defined in the HR Review source system.
     lineage:
     - datalake_pin_hr_review_clean.meeting.meeting_title
+    - datalake_people.talent_review_committee_2026_h2.committee_title
   meeting_type:
     description: Discriminator that classifies the meeting as 'talent_review' or 'performance_calibration', derived from the dashboard template name associated with the meeting.
     lineage:
     - datalake_pin_hr_review_clean.dashboard_template_translation.name
+    - datalake_people.talent_review_committee_2026_h2.meeting_type
   reference_period:
     description: Reference period of the meeting (Q1, Q2, Q3, Q4, H1, H2), extracted from the committee title. NULL when no standard period pattern is found.
     lineage:
     - datalake_pin_hr_review_clean.meeting.meeting_title
+    - datalake_people.talent_review_committee_2026_h2.committee_title
   meeting_status_code:
     description: Status code of the committee meeting in the HR Review source system (e.g., OPEN, CLOSED).
     lineage:
     - datalake_pin_hr_review_clean.meeting.meeting_status_code
+    - datalake_people.talent_review_committee_2026_h2.meeting_status_code
   meeting_year:
     description: Calendar year when the committee meeting took place, extracted from the meeting timestamp.
     lineage:
     - datalake_pin_hr_review_clean.meeting.ts_meeting
+    - datalake_people.talent_review_committee_2026_h2.ts_meeting
   ts_meeting:
     description: Timestamp of the committee meeting in the HR Review source system. Used to resolve the canonical meeting when a person appears in more than one calibration committee in the same calendar year.
     lineage:
     - datalake_pin_hr_review_clean.meeting.ts_meeting
+    - datalake_people.talent_review_committee_2026_h2.ts_meeting
   ts_load:
     description: Timestamp indicating when the record was loaded into the dimension table.
