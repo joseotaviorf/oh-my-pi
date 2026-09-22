@@ -826,6 +826,7 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "deequ-${DEEQU_JAR_VERSION}-spark-${SPARK_VERSION}.jar" \
         "spark-measure_2.12-0.21.jar" \
         "spark-plugins_2.12-0.2.jar" \
+        "spark-plugins_2.12-0.5-SNAPSHOT.jar" \
         "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar" \
         "${KAFKA_CLIENTS_JAR}" \
         "${SPARK_SQL_KAFKA_JAR}" \
@@ -893,6 +894,7 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "deequ-${DEEQU_JAR_VERSION}-spark-${SPARK_VERSION}.jar" \
         "spark-measure_2.12-0.21.jar" \
         "spark-plugins_2.12-0.2.jar" \
+        "spark-plugins_2.12-0.5-SNAPSHOT.jar" \
         "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar" \
         "${KAFKA_CLIENTS_JAR}" \
         "${SPARK_SQL_KAFKA_JAR}" \

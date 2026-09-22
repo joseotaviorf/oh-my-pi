@@ -33,7 +33,9 @@ _EXPECTED_GRAPHITE_HOST = {
     "prod_conf.yml": "graphite-exporter.svc.core-prd.habitat.zone",
     "forno_conf.yml": "graphite-exporter.apps.core-frn.habitat.zone",
 }
-_EXPECTED_PLUGINS = "ch.cern.CloudFSMetrics,br.com.quintoandar.GangliaMetrics"
+_EXPECTED_PLUGINS = (
+    "ch.cern.CloudFSMetrics,br.com.quintoandar.GangliaMetrics,ch.cern.CgroupMetricsV2"
+)
 
 
 def _load_emr_cluster_base_spark_conf(conf_file_name: str) -> dict:

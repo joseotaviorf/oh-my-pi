@@ -1834,7 +1834,7 @@ emr_cluster_base: &emr_cluster_anchor
         # Databricks cluster_template spark_conf (prod_conf.yml:197-206). Plugin JARs
         # (spark-measure, spark-plugins, spark-cluster-metrics=GangliaMetrics) are already
         # staged on the EMR Spark classpath by emr_init_script.sh:892-911.
-        spark.plugins: "ch.cern.CloudFSMetrics,br.com.quintoandar.GangliaMetrics"
+        spark.plugins: "ch.cern.CloudFSMetrics,br.com.quintoandar.GangliaMetrics,ch.cern.CgroupMetricsV2"
         spark.cernSparkPlugin.cloudFsName: "s3a"
         # spark-defaults applies to driver + executors; client-mode driver runs on master.
         # Databricks sets registerOnDriver in its driver conf (init_script.sh:16); mirror here.
