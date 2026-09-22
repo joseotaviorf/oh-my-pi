@@ -3,6 +3,8 @@ from unittest import mock
 from bietlejuice.base.airflow.task_creators.data_quality_tests_task_creator import (
     DataQualityTestsTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
 class TestDataQualityTestsTaskCreator:
@@ -68,3 +70,30 @@ class TestDataQualityTestsTaskCreator:
         # no platforms -> no flag; params end at the tree-path arg
         assert "--platforms" not in params
         assert params[-1] == ""
+
+    def test_task_params_carry_resolved_table_criticality(self):
+        creator = self._creator()
+        task = mock.MagicMock()
+        task.params = {}
+        creator._create_spark_job_task = mock.MagicMock(return_value=task)
+
+        declared_critical = TableAttributes(
+            dag_args={"name": "test_dag", "criticality": "High"},
+            workflow_args={"type": "enrich"},
+            layer=LayerEnum.ENRICH,
+            table_name="listed_table",
+            table_customization={"criticality": "Critical"},
+        )
+        inherits_dag = TableAttributes(
+            dag_args={"name": "test_dag", "criticality": "High"},
+            workflow_args={"type": "enrich"},
+            layer=LayerEnum.ENRICH,
+            table_name="sibling_table",
+        )
+
+        assert (
+            creator.create_task(declared_critical).params["criticality"] == "Critical"
+        )
+        assert "table_name" not in creator.create_task(declared_critical).params
+        task.params = {}
+        assert creator.create_task(inherits_dag).params["criticality"] == "High"

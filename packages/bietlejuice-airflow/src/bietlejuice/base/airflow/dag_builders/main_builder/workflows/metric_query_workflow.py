@@ -72,6 +72,8 @@ class MetricQueryWorkflow(BaseWorkflow):
             spark_jobs_path=base_spark_jobs_path,
             databricks_conn_id=dag_execution_context.databricks_conn_id,
             job_cluster_engine=engine,
+            dag_args=self.dag_args,
+            workflow_args=self.workflow_args,
         )
 
         metric_task_group = task_group.build_task_group_from_sql_files(

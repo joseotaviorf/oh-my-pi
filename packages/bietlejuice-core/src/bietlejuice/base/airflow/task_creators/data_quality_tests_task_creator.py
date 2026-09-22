@@ -31,9 +31,13 @@ class DataQualityTestsTaskCreator(BaseTaskCreator):
         task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters(table_attributes)
 
-        return self._create_spark_job_task(
+        task = self._create_spark_job_task(
             self.DEFAULT_SPARK_JOB_NAME, task_id, parameters
         )
+        # JiraOpsCallback.task_failure_alert prefers params["criticality"] over the DAG's, so a
+        # DQ failure on a table declared Critical pages P1 just like its load task does.
+        task.params.update({"criticality": table_attributes.criticality})
+        return task
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         # DataHub platforms this table's DQ should reach (databricks+glue always,

@@ -59,3 +59,39 @@ class TestDatalakeTaskGroupJobClusterEngine:
             )
 
         submit_run.assert_called_once()
+
+    def test_metric_tasks_use_table_criticality_override(self):
+        engine = mock.MagicMock()
+        load_task = mock.MagicMock(params={})
+        data_quality_task = mock.MagicMock(params={})
+        engine.create_spark_python_task.side_effect = [load_task, data_quality_task]
+
+        with mock.patch(
+            "bietlejuice.base.airflow.task_groups.datalake_task_group.ConfigurationService"
+        ) as mock_config_service:
+            mock_config_service.return_value.get_config.return_value = "mock_bucket"
+            group = DatalakeTaskGroup(
+                dag=mock.MagicMock(),
+                env="prod",
+                datalake_bucket="prod-datalake",
+                relative_query_path="metric_foo",
+                spark_jobs_path="/spark_jobs/base/",
+                job_cluster_engine=engine,
+                dag_args={"name": "metric_foo", "criticality": "High"},
+                workflow_args={"type": "query", "layer": "metric"},
+            )
+
+        group._build_metadata_sync_task = mock.MagicMock(return_value=mock.MagicMock())
+        group._get_data_quality_tables = mock.MagicMock(return_value={"critical_table"})
+        with mock.patch(
+            "bietlejuice.base.airflow.task_groups.datalake_task_group.chain"
+        ):
+            group.build_metric_task_group(
+                source_database_base_name="metric_foo",
+                target_database_base_name="metric_foo",
+                table_name="critical_table",
+                table_customization={"criticality": "Critical"},
+            )
+
+        assert load_task.params["criticality"] == "Critical"
+        assert data_quality_task.params["criticality"] == "Critical"

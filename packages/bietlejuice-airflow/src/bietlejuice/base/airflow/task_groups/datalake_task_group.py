@@ -10,6 +10,7 @@ from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
+from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.airflow.validation_aware import validation_spark_extra_args
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
@@ -41,6 +42,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         default_table_privileges=None,
         is_validation: bool = False,
         job_cluster_engine=None,
+        dag_args: Optional[dict] = None,
+        workflow_args: Optional[dict] = None,
     ):
         """
         :param dag: main dag instance
@@ -68,6 +71,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         self.default_table_privileges = default_table_privileges
         self.is_validation = is_validation
         self.job_cluster_engine = job_cluster_engine
+        self.dag_args = dag_args
+        self.workflow_args = workflow_args
         self._config_services: Dict[str, ConfigurationService] = {}
         self._metadata_tables_cache: Dict[str, Set[str]] = {}
         self._dq_cache = DataQualityLayerCache(self.relative_query_path)
@@ -239,6 +244,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         source: str = None,
         tree_path: str = "",
         execution_date="{{ data_interval_start | ds }}",
+        criticality: str = None,
     ) -> list:
         data_quality_tasks = []
 
@@ -297,6 +303,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
                     databricks_conn_id=self.databricks_conn_id,
                 )
 
+            if criticality:
+                data_quality_task.params.update({"criticality": criticality})
             data_quality_tasks.append(data_quality_task)
 
         return data_quality_tasks
@@ -465,6 +473,15 @@ class DatalakeTaskGroup(BaseTaskGroup):
         layer = layer_enum.value
         partitions = partitions or []
         table_customization = table_customization or {}
+        criticality = None
+        if self.dag_args is not None and self.workflow_args is not None:
+            criticality = TableAttributes(
+                self.dag_args,
+                self.workflow_args,
+                layer_enum,
+                table_name,
+                table_customization,
+            ).criticality
         spark_session_configs = spark_session_configs or {}
         extra_query_template_params = extra_query_template_params or {}
         table_extraction_type = "incremental" if is_incremental else "full"
@@ -515,6 +532,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 "layer": layer,
                 "bucket": self.datalake_bucket,
                 "storage_format": StorageFormatEnum.PARQUET.value,
+                **({"criticality": criticality} if criticality else {}),
             }
         )
 
@@ -542,6 +560,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 table_name=table_name,
                 tree_path=tree_path,
                 execution_date=execution_date,
+                criticality=criticality,
             )
 
             load_table_task.set_downstream(quality_tasks)
