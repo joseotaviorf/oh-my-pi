@@ -1,5 +1,5 @@
 dag:
-  name: gsheets_luigijr_sale_eop_missing_salesforce_contracts
+  name: gsheets_luigijr_sale_eop_missing_sf_contract
   schedule_interval: 0 8 1-7 * 1-5
   owner: ForSale PostContract
   tags:
@@ -11,7 +11,7 @@ workflow:
   layer: raw
   custom_schema: luigijr_forsale_postcontract
   tables_customization:
-    sale_eop_missing_salesforce_contracts:
+    sale_eop_missing_sf_contract:
       sheet_id: 1eLM5vrSTKtfPme_-orNmTd66b13j1SLxW66D4JGWiM8
       sheet_name: Data
 cluster:
