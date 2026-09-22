@@ -9,9 +9,15 @@ Per-resource tables are `bietlejuice.benvi_manager_clean`.
 
 ## Trigger
 
-Daily cron at `0 10 * * *`. The benvi-manager import runs at 09:00 and takes
-around 11 minutes, so 10:00 leaves roughly 49 minutes for the Debezium and S3
-sink pipe to land that write before this DAG reads it. Every other CDC DAG in
+Cron at `0 1-23/2 * * *`, every two hours on the odd hours. The benvi-manager
+import runs `0 0 */2 * * *` (even hours) in the same `America/Sao_Paulo` zone
+and takes around 11 minutes, so each odd hour leaves roughly 49 minutes for the
+Debezium and S3 sink pipe to land that write before this DAG reads it.
+
+The two schedules are a pair. The import cadence is live-patchable through
+`PATCH /v1/managedPortfolios/{id}/syncSettings`, this one needs a pull request,
+so moving the import without moving this leaves runs that are never ingested
+until the next one. Change both together. Every other CDC DAG in
 this repo is cron-scheduled for the same reason: a fixed gap removes the race
 instead of defending against it.
 

@@ -1,7 +1,7 @@
 dag:
   name: benvi_manager
   schedule_start_date: 2026, 9, 14
-  schedule_interval: 0 10 * * *
+  schedule_interval: 0 1-23/2 * * *
   catchup: false
   owner: Data ForRent
   documentation:
