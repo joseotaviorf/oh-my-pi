@@ -12,6 +12,7 @@ SELECT
   REGEXP_EXTRACT(t.table, '(\\w+$)') AS table_name,
   REGEXP_EXTRACT(t.table, '(^\\w+)') AS schema,
   t.layer,
+  t.criticality,
   t.avg_file_size_in_bytes,
   t.is_delta,
   IF(l.dt_last_updated IS NOT NULL, TRUE, FALSE) AS is_active,

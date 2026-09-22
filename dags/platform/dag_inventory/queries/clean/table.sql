@@ -16,6 +16,7 @@ SELECT
     qty_bigger_than_1gb,
     total_modified_files_size_in_bytes,
     is_delta,
+    criticality,
     year,
     month,
     day

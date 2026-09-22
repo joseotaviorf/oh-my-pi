@@ -81,6 +81,7 @@ def test_enrich_passes_transformation_grade():
             "layer": "transformation",
             "bucket": "5a-datalake-prod",
             "is_delta": True,
+            "criticality": None,
         }
     ]
 
@@ -134,4 +135,5 @@ def test_enrich_skips_unresolvable_row_on_value_error():
         "layer": "clean",
         "bucket": "5a-datalake-prod",
         "is_delta": True,
+        "criticality": None,
     }

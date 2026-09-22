@@ -36,6 +36,18 @@ columns:
     lineage:
       - datalake_dag_inventory_clean.table.layer
     description: Data lake layer of the table (for example raw, clean, enrich, dw, or metric).
+  criticality:
+    lineage:
+      - datalake_dag_inventory_clean.table.criticality
+    description: >
+      Resolved criticality of the table: its tables_customization override when set,
+      otherwise the producing DAG's declared tier. NULL when the load task was built
+      before the param existed.
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
   avg_file_size_in_bytes:
     lineage:
       - datalake_dag_inventory_clean.table.avg_file_size_in_bytes

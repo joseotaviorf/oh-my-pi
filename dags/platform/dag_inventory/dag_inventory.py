@@ -119,6 +119,7 @@ def find_tables_generated_by_dag(dag_bag: DagBag) -> dict:
                     "table": task.params.get("table_name", "").lower() or None,
                     "layer": task.params.get("layer"),
                     "transformation_grade": task.params.get("transformation_grade"),
+                    "criticality": task.params.get("criticality"),
                     "bucket": task.params.get("bucket"),
                     "is_delta": task.params.get("storage_format")
                     == StorageFormatEnum.DELTA.value,

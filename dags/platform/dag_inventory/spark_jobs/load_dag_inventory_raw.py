@@ -96,6 +96,7 @@ def enrich_table_dictionary_with_spark_metastore(content: dict) -> dict:
                         "layer": row["layer"],
                         "bucket": row["bucket"],
                         "is_delta": row["is_delta"],
+                        "criticality": row.get("criticality"),
                     }
                 )
         except Exception as error:
@@ -285,6 +286,7 @@ def enrich_table_data_frame_with_file_size_infos(
         "qty_bigger_than_1gb",
         "total_modified_files_size_in_bytes",
         "is_delta",
+        "criticality",
         "year",
         "month",
         "day",

@@ -115,6 +115,18 @@ columns:
       plain Parquet/other format (false).
     lineage:
       - datalake_dag_inventory_raw.table.is_delta
+  criticality:
+    description: |
+      Resolved criticality of the table: its tables_customization override when set,
+      otherwise the producing DAG's declared tier. NULL when the load task was built
+      before the param existed.
+    lineage:
+      - datalake_dag_inventory_raw.table.criticality
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
   year:
     description: |
       Ingestion partition year (inventory scan date). Filter on year, month, and day
