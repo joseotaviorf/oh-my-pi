@@ -34,12 +34,17 @@ column_level_validations:
     is_complete:
       severity_level: Error
     is_contained_in:
+      # Aligned with backend-services ImageGroupStatus.java (kodak), which added the AI_ENHANCEMENT_*
+      # states (rows reaching these states would otherwise trip this check as they occur).
       values:
         - PENDING
         - GROUP_ANALYSIS
         - UPLOAD
         - WATERMARK_REMOVAL
         - COMPLETED
+        - AI_ENHANCEMENT_PENDING
+        - AI_ENHANCEMENT_FINALIZING
+        - AI_ENHANCEMENT_COMPLETED
       severity_level: Error
   ts_created:
     is_complete:

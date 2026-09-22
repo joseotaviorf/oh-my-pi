@@ -43,6 +43,7 @@ columns:
     categories:
       OPEN: Session created; no active chat orchestrator session yet.
       IN_PROGRESS: Chat session linked and conversation in progress.
+      IDLE: Session in progress with no recent activity.
       CLOSED: Session finished (resolved or abandoned).
   summary:
     description: |

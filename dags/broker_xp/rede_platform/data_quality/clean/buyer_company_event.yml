@@ -22,9 +22,14 @@ column_level_validations:
       severity_level: Error
   trigger_actor:
     is_contained_in:
+      # Aligned with backend-services TriggerActor.java (rede-platform), which added OPS, AGENT,
+      # and UNDEFINED (fallback for unrecognized values).
       values:
         - DEMAND
+        - OPS
+        - AGENT
         - SUPPLY
+        - UNDEFINED
       severity_level: Error
   year:
     is_complete:

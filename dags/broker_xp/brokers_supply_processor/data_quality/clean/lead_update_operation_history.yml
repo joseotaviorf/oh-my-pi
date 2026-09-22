@@ -24,11 +24,17 @@ column_level_validations:
     is_complete:
       severity_level: Error
     is_contained_in:
+      # Aligned with backend-services LeadOperation.java (brokers-supply-processor). This is an
+      # append-only history table, so retired values never disappear from old rows:
+      # HOUSE_CREATE_ENRICHMENT / HOUSE_UPDATE_ENRICHMENT were live May-Jun 2026 (#27207) and
+      # retired 2026-06-17 (#29499).
       values:
         - MERGE_UPDATE
         - HOUSE_ENRICHMENT
         - ADDRESS_REGION_NORMALIZATION
         - LEAD_DISCARDED
+        - HOUSE_CREATE_ENRICHMENT
+        - HOUSE_UPDATE_ENRICHMENT
       severity_level: Error
   metadata:
     is_complete:

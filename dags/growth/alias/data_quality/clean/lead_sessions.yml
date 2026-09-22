@@ -24,9 +24,11 @@ column_level_validations:
     is_complete:
       severity_level: Error
     is_contained_in:
+      # Aligned with backend-services LeadSessionStatus.kt (alias), which added IDLE.
       values:
         - OPEN
         - IN_PROGRESS
+        - IDLE
         - CLOSED
       severity_level: Error
   ts_created:

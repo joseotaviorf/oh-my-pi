@@ -37,17 +37,18 @@ column_level_validations:
         - "2"
       severity_level: Error
   status:
-    is_contained_in:
-      values:
-        - RECEIVED
-        - WAITING
-        - NOT_CONVERTED
-        - CONVERTED
-        - PROCESSING
-        - REGISTERED
-        - UNPUBLISHED
-        - DISCARDED
-        - SUSPENDED
+    custom:
+      # Aligned with backend-services LeadStatus.java (brokers-supply-processor), plus the retired
+      # legacy value QUEUE (2026-01-13, #17184). Null-tolerant: most rows are null because this field
+      # is marked DEPRECATED at the app level (status tracking moved to business_context_detail) and
+      # is no longer populated on most revisions, on top of the usual Hibernate Envers DELETE-revision
+      # nulls — is_contained_in would treat all of that as a violation.
+      constraint: |-
+        (SELECT COUNT(*) FROM datalake_brokers_supply_processor_clean.lead_3p_aud
+         WHERE status IS NOT NULL
+           AND status NOT IN ('RECEIVED', 'WAITING', 'NOT_CONVERTED', 'CONVERTED', 'PROCESSING',
+                               'REGISTERED', 'UNPUBLISHED', 'DISCARDED', 'SUSPENDED', 'QUEUE')
+        ) = 0
       severity_level: Warning
   year:
     is_complete:

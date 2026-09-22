@@ -41,6 +41,9 @@ columns:
       UPLOAD: 'Images being uploaded or processed'
       WATERMARK_REMOVAL: 'Watermark detection/removal in progress'
       COMPLETED: 'All analysis completed'
+      AI_ENHANCEMENT_PENDING: 'AI image enhancement not yet started'
+      AI_ENHANCEMENT_FINALIZING: 'AI image enhancement in progress'
+      AI_ENHANCEMENT_COMPLETED: 'AI image enhancement completed'
   bathrooms:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bathrooms

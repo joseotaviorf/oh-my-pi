@@ -38,17 +38,17 @@ column_level_validations:
         - SALE_PRIMARY_MARKET
       severity_level: Warning
   status:
-    is_contained_in:
-      values:
-        - RECEIVED
-        - WAITING
-        - NOT_CONVERTED
-        - CONVERTED
-        - PROCESSING
-        - REGISTERED
-        - UNPUBLISHED
-        - DISCARDED
-        - SUSPENDED
+    custom:
+      # Aligned with backend-services LeadStatus.java (brokers-supply-processor), plus the retired
+      # legacy value QUEUE (2026-01-13, #17184) since this is an append-only audit table. Hibernate
+      # Envers audit rows can legitimately be NULL (e.g. on a DELETE revision), so this uses a
+      # null-tolerant custom check instead of is_contained_in, which treats NULL as a violation.
+      constraint: |-
+        (SELECT COUNT(*) FROM datalake_brokers_supply_processor_clean.business_context_detail_aud
+         WHERE status IS NOT NULL
+           AND status NOT IN ('RECEIVED', 'WAITING', 'NOT_CONVERTED', 'CONVERTED', 'PROCESSING',
+                               'REGISTERED', 'UNPUBLISHED', 'DISCARDED', 'SUSPENDED', 'QUEUE')
+        ) = 0
       severity_level: Warning
   year:
     is_complete:

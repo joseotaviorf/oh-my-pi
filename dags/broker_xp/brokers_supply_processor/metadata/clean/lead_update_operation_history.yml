@@ -40,6 +40,8 @@ columns:
       HOUSE_ENRICHMENT: Property data enrichment by the pipeline.
       ADDRESS_REGION_NORMALIZATION: Lead address and region normalization.
       LEAD_DISCARDED: Lead marked as discarded by the system.
+      HOUSE_CREATE_ENRICHMENT: "Legacy: house-create enrichment step, live May-Jun 2026, retired 2026-06-17."
+      HOUSE_UPDATE_ENRICHMENT: "Legacy: house-update enrichment step, live May-Jun 2026, retired 2026-06-17."
   metadata:
     lineage:
       - datalake_brokers_supply_processor_raw.lead_update_operation_history.metadata

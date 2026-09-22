@@ -39,7 +39,10 @@ columns:
       - datalake_rede_platform_raw.buyer_company_event.trigger_actor
     categories:
       DEMAND: Event originated from the buyer/demand side (e.g. visit confirmed, offer sent).
+      OPS: Event originated from an internal QuintoAndar operations action.
+      AGENT: Event originated from an agent action.
       SUPPLY: Event originated from the listing/supply side (e.g. agent referral).
+      UNDEFINED: Fallback value when the source actor is missing or unrecognized.
   ts_event:
     description: The timestamp of the event.
     lineage:

@@ -95,9 +95,22 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.status
     description: >
-      Lead status at time of this revision (STRING, Nullable, DEPRECATED).
-      Historical field - current status tracking moved to business_context_detail table.
-      Preserved for legacy audit trail analysis.
+      Lead status at time of this revision (STRING, Nullable, DEPRECATED — current status
+      tracking moved to business_context_detail). Matches backend-services LeadStatus.java
+      (brokers-supply-processor) when populated, but is null on most rows: the app stopped
+      populating this field on most revisions once deprecated, on top of the usual Hibernate
+      Envers DELETE-revision nulls. Preserved for legacy audit trail analysis.
+    categories:
+      RECEIVED: "Initial status when a piece of lead information is received."
+      WAITING: "Passed partial validation; awaiting full validation to proceed to enrichment."
+      NOT_CONVERTED: "Failed validation; lead has pending issues to be resolved."
+      CONVERTED: "Passed all validations; ephemeral status transitioning to PROCESSING or REGISTERED."
+      PROCESSING: "Sent to Kodak for image analysis."
+      REGISTERED: "Approved; property published on the site."
+      UNPUBLISHED: "Previously converted lead now offline in the member's CRM."
+      DISCARDED: "Removed, e.g. via the deletion process or a member leaving Rede."
+      SUSPENDED: "Manually suspended, e.g. leads of a member that left Rede."
+      QUEUE: "Legacy: removed 2026-01-13 (backend-services #17184); preserved in old audit revisions."
   brokers:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.brokers

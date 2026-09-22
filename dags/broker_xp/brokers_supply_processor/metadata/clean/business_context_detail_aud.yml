@@ -80,12 +80,23 @@ columns:
       RENT: 'Rent context evaluation with rental-specific eligibility criteria and tenant protection rules'
   status:
     description: >
-      Lead processing status at time of revision (STRING, Nullable).
-      Captures status progression: RECEIVED → IN_ANALYSIS → APPROVED/REJECTED/CONVERTED.
-      Critical for analyzing lead processing funnel performance and status transition patterns.
-      Historical status values preserved for workflow evolution analysis.
+      Lead processing status at time of revision (STRING, Nullable), matching backend-services
+      LeadStatus.java (brokers-supply-processor). Not observed null today, but nullable in principle
+      on a DELETE revision under Hibernate Envers, where non-key fields are cleared — the table's
+      data quality check on this column is null-tolerant for that reason.
     lineage:
       - datalake_brokers_supply_processor_raw.business_context_detail_aud.status
+    categories:
+      RECEIVED: "Initial status when a piece of lead information is received."
+      WAITING: "Passed partial validation; awaiting full validation to proceed to enrichment."
+      NOT_CONVERTED: "Failed validation; lead has pending issues to be resolved."
+      CONVERTED: "Passed all validations; ephemeral status transitioning to PROCESSING or REGISTERED."
+      PROCESSING: "Sent to Kodak for image analysis."
+      REGISTERED: "Approved; property published on the site."
+      UNPUBLISHED: "Previously converted lead now offline in the member's CRM."
+      DISCARDED: "Removed, e.g. via the deletion process or a member leaving Rede."
+      SUSPENDED: "Manually suspended, e.g. leads of a member that left Rede."
+      QUEUE: "Legacy: removed 2026-01-13 (backend-services #17184); preserved in old audit revisions."
   status_reason:
     description: >
       Detailed reasoning for status at time of revision (JSON, Nullable).
