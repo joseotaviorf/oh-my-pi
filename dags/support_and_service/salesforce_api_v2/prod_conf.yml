@@ -38,6 +38,9 @@ objects_config:
   case_feed_v2:
     api_entity: "CaseFeed"
     hourly: false
+  integration_job_v2:
+    api_entity: "IntegrationJob__c"
+    hourly: false
   # Hourly from day one: the table bootstraps already partitioned by
   # [partition_date, partition_hour], so no repartition is needed at cutover.
   email_message_v2:

@@ -14,6 +14,8 @@ raw_schema: "datalake_salesforce_raw"
 clean_schema: "datalake_salesforce_clean"
 datalake_bucket: "5a-datalake-prod"
 events_config:
+  # IMPORTANT: Adding a new event requires a CREATE type event from salesforce, otherwise the clean layer will fail. 
+  # To make sure a CREATE event exists you need to manually run a backfill via Databricks notebook.
   incident:
     event_path: "raw/salesforce/IncidentEvent"
     skip_quality_contracts: true

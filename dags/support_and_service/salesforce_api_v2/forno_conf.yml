@@ -35,6 +35,9 @@ objects_config:
   case_feed_v2:
     api_entity: "CaseFeed"
     hourly: false
+  integration_job_v2:
+    api_entity: "IntegrationJob__c"
+    hourly: false
   # Hourly from day one: bootstraps hour-partitioned.
   email_message_v2:
     api_entity: "EmailMessage"
