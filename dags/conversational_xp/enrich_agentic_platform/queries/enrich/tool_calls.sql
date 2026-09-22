@@ -2,6 +2,7 @@ SELECT
     id_event,
     id_person,
     id_user,
+    id_anonymous,
     ts_event,
     GET_JSON_OBJECT(event_properties, '$.tool_name') AS tool_name,
     GET_JSON_OBJECT(event_properties, '$.tool_args') AS tool_args_json,

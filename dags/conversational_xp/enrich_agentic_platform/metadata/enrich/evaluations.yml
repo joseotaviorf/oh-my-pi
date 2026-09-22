@@ -26,6 +26,12 @@ columns:
       Current evaluation events identify users through id_person instead.
     lineage:
       - datalake_agentic_platform.platform_events.id_user
+  id_anonymous:
+    description: |
+      Anonymous device identifier carried by the CDP event before identity
+      resolution, when available.
+    lineage:
+      - datalake_agentic_platform.platform_events.id_anonymous
   eval_level:
     description: "Evaluation grain derived from the source event name: session or trace."
     lineage:

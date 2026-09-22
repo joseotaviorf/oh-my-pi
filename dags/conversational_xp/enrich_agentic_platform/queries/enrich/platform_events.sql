@@ -6,6 +6,7 @@ WITH ranked_events AS (
         id_event,
         id_person,
         id_user,
+        id_anonymous,
         event_name,
         event_properties,
         ts_event,
@@ -31,6 +32,7 @@ SELECT
     id_event,
     id_person,
     id_user,
+    id_anonymous,
     event_name,
     event_properties,
     ts_event

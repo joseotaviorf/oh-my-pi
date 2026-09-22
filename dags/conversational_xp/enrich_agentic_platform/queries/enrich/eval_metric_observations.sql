@@ -1,6 +1,9 @@
 WITH unpivoted AS (
     SELECT
         id_event,
+        id_user,
+        id_person,
+        id_anonymous,
         eval_level,
         id_session,
         id_trace,
@@ -23,6 +26,9 @@ WITH unpivoted AS (
 ranked AS (
     SELECT
         id_event,
+        id_user,
+        id_person,
+        id_anonymous,
         eval_level,
         id_session,
         id_trace,
@@ -72,6 +78,9 @@ SELECT
             )
     END AS id_observation,
     id_event,
+    id_user,
+    id_person,
+    id_anonymous,
     eval_level,
     id_session,
     id_trace,

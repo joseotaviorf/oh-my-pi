@@ -2,6 +2,7 @@ SELECT
     id_event,
     id_person,
     id_user,
+    id_anonymous,
     ts_event,
     CASE
         WHEN event_name = 'agentic_platform_session_evaluation' THEN 'session'

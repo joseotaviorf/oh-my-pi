@@ -19,6 +19,23 @@ columns:
     description: "CDP event identifier from the winning evaluation emit."
     lineage:
       - datalake_agentic_platform.evaluations.id_event
+  id_user:
+    description: |
+      Numeric application user identifier from the winning evaluation emit,
+      when available.
+    lineage:
+      - datalake_agentic_platform.evaluations.id_user
+  id_person:
+    description: |
+      Person UUID from the winning evaluation emit, when identity is available.
+    lineage:
+      - datalake_agentic_platform.evaluations.id_person
+  id_anonymous:
+    description: |
+      Anonymous device identifier from the winning evaluation emit, when
+      available.
+    lineage:
+      - datalake_agentic_platform.evaluations.id_anonymous
   eval_level:
     description: "Evaluation grain: session or trace."
     lineage:

@@ -21,6 +21,12 @@ columns:
     description: "Application user identifier carried by the CDP event, when available."
     lineage:
       - datalake_agentic_platform.platform_events.id_user
+  id_anonymous:
+    description: |
+      Anonymous device identifier carried by the CDP event before identity
+      resolution, when available.
+    lineage:
+      - datalake_agentic_platform.platform_events.id_anonymous
   tool_name:
     description: "Name of the tool that was invoked."
     lineage:

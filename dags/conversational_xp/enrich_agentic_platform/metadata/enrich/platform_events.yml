@@ -21,6 +21,12 @@ columns:
     description: "Application user identifier carried by the CDP event, when available."
     lineage:
       - datalake_cdp_clean.user_tracking.id_user
+  id_anonymous:
+    description: |
+      Anonymous device identifier for the user before identity resolution,
+      when carried by the CDP event.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_anonymous
   event_name:
     description: "CDP event name used to route rows into downstream projections."
     lineage:
