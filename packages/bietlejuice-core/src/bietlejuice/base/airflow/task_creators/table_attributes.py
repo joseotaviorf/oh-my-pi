@@ -45,6 +45,7 @@ class TableAttributes:
         )
         self.row_filter_function_name = self._get_row_filter_function_name()
         self.criticality = self._get_criticality()
+        self.sla_deadline_localtime = self._get_sla_deadline_localtime()
         self.owner = self._get_owner()
 
     @property
@@ -220,7 +221,33 @@ class TableAttributes:
         declared = self.table_customization.get("criticality") or self._dag_args.get(
             "criticality"
         )
-        return CriticalityEnum.parse(declared, context=f"table {self.table_name!r}")
+        resolved = CriticalityEnum.parse(declared, context=f"table {self.table_name!r}")
+        if resolved == CriticalityEnum.CRITICAL:
+            dag_name = self._dag_args.get("name", "") if self._dag_args else ""
+            if "fast_lane" in dag_name:
+                return CriticalityEnum.HIGH
+
+            if self._is_staging_copy():
+                dag_criticality = CriticalityEnum.parse(
+                    (self._dag_args or {}).get("criticality"),
+                    context=f"dag {dag_name!r}",
+                )
+                if dag_criticality != CriticalityEnum.CRITICAL:
+                    return dag_criticality
+                return CriticalityEnum.MEDIUM
+
+        return resolved
+
+    def _get_sla_deadline_localtime(self) -> Optional[str]:
+        # A declared deadline is an exception for the table the entry names. Its raw
+        # and transactional copies land ahead of it and keep the DAG deadline.
+        if self._is_staging_copy():
+            return None
+        return self.table_customization.get("sla_deadline_localtime")
+
+    def _is_staging_copy(self) -> bool:
+        layer = self.layer.value if isinstance(self.layer, LayerEnum) else self.layer
+        return layer in (LayerEnum.RAW.value, LayerEnum.TRANSACTIONAL.value)
 
     def _get_owner(self) -> Optional[str]:
         """This table's own ``owner:`` from its metadata file, for auto-tagging

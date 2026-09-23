@@ -4,7 +4,6 @@ dag:
   schedule_interval: 0,30 * * * *
   owner: Data House and Listing
   criticality: High
-  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       DAG containing tables from House context that are running every 30 minutes.

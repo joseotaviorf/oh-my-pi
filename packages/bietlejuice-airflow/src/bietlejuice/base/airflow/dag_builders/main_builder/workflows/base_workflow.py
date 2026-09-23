@@ -119,14 +119,16 @@ class BaseWorkflow(BuilderInterface):
         if self.is_validation and "cluster_validation" not in dag_tags:
             dag_tags.append("cluster_validation")
         if not self.is_validation:
-            if self.dag_args.get("criticality"):
-                dag_tags.append(
-                    f"{CRITICALITY_TAG_PREFIX}{self.dag_args['criticality']}"
-                )
-            if self.dag_args.get("sla_deadline_localtime"):
-                dag_tags.append(
-                    f"{SLA_DEADLINE_TAG_PREFIX}{self.dag_args['sla_deadline_localtime']}"
-                )
+            declared_criticality = self.dag_args.get("criticality")
+            if declared_criticality:
+                dag_tags.append(f"{CRITICALITY_TAG_PREFIX}{declared_criticality}")
+            sla_deadline_localtime = self.dag_args.get("sla_deadline_localtime") or (
+                CriticalityEnum.default_deadline(declared_criticality)
+                if declared_criticality
+                else None
+            )
+            if sla_deadline_localtime:
+                dag_tags.append(f"{SLA_DEADLINE_TAG_PREFIX}{sla_deadline_localtime}")
             effective_tier = CriticalityEnum.highest(
                 [self.dag_args.get("criticality")]
                 + [

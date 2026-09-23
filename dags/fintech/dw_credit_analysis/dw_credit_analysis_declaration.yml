@@ -3,7 +3,6 @@ dag:
   schedule_start_date: 2020,02,20
   owner: Data Fintech
   criticality: High
-  sla_deadline_localtime: "11:00"
 workflow:
   type: query_delta
   layer: dw
@@ -15,6 +14,7 @@ workflow:
       custom_schema: public
     fact_proposal_credit_flows:
       criticality: Critical
+      sla_deadline_localtime: "11:00"
   inner_dependencies:
     fact_proposal_credit_flows:
       - dim_drop_reason

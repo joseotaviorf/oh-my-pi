@@ -2,7 +2,6 @@ dag:
   name: dw_proposal
   owner: Data ForRent
   criticality: High
-  sla_deadline_localtime: "08:00"
 workflow:
   tables_customization:
     dim_proposal:

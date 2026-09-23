@@ -17,6 +17,7 @@ SELECT
     total_modified_files_size_in_bytes,
     is_delta,
     criticality,
+    sla_deadline_localtime,
     year,
     month,
     day

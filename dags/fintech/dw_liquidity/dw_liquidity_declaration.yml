@@ -4,11 +4,9 @@ dag:
   schedule_interval: 0 3 * * *
   owner: Data Fintech
   criticality: High
-  sla_deadline_localtime: "11:00"
 workflow:
   tables_customization:
-    fact_house_rent_liquidity:
-      criticality: Critical
+    fact_house_rent_liquidity: {}
   type: query_delta
   layer: dw
   custom_schema: liquidity

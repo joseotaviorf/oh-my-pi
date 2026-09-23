@@ -2096,10 +2096,10 @@ def _fetch_declared_criticality(session) -> tuple[dict, dict]:
     """(criticality_by_dag, deadline_by_dag) from DAG tags.
 
     criticality is the highest of the declared ``criticality:`` tag and the
-    ``effective_tier:`` tag. A ``sla_deadline_localtime:`` tag is overridden with
-    the resolved tier's default deadline only when that tier differs from the
-    declared DAG tier. A DAG with no deadline tag stays out of deadline alerting;
-    the tier alone never invents a deadline.
+    ``effective_tier:`` tag. The ``sla_deadline_localtime:`` tag is authoritative:
+    the DAG builder already emits the declared deadline, or the declared tier's
+    default when the declaration omits one. A DAG with no deadline tag stays out
+    of deadline alerting; the tier alone never invents a deadline.
     """
     rows = session.execute(
         _DAG_TAGS_QUERY,
@@ -2139,11 +2139,9 @@ def _fetch_declared_criticality(session) -> tuple[dict, dict]:
             except (TypeError, ValueError):
                 print(f"⚠️  Ignoring malformed tag {name!r} on {dag_id}")
     for dag_id in set(criticality_by_dag) | set(effective_by_dag):
-        declared = criticality_by_dag.get(dag_id)
-        resolved = CriticalityEnum.highest([declared, effective_by_dag.get(dag_id)])
-        criticality_by_dag[dag_id] = resolved
-        if dag_id in deadline_by_dag and resolved != declared:
-            deadline_by_dag[dag_id] = CriticalityEnum.default_deadline(resolved)
+        criticality_by_dag[dag_id] = CriticalityEnum.highest(
+            [criticality_by_dag.get(dag_id), effective_by_dag.get(dag_id)]
+        )
     return criticality_by_dag, deadline_by_dag
 
 

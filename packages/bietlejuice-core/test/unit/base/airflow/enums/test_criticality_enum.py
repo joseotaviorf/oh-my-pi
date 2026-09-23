@@ -19,5 +19,12 @@ class TestCriticalityEnum:
         assert CriticalityEnum.to_opsgenie_priority("Medium") == "P3"
         assert CriticalityEnum.to_opsgenie_priority("Low") == "P4"
 
+    def test_default_deadline_by_tier(self):
+        assert CriticalityEnum.default_deadline("Critical") == "08:00"
+        assert CriticalityEnum.default_deadline("High") == "08:00"
+        assert CriticalityEnum.default_deadline("Medium") == "11:00"
+        assert CriticalityEnum.default_deadline("Low") == "11:00"
+        assert CriticalityEnum.default_deadline(None) == "11:00"
+
     def test_paging_levels(self):
         assert CriticalityEnum.PAGING == ("Critical", "High")

@@ -1104,6 +1104,24 @@ class TestDAGDeclarationValidatorCriticality:
             dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
         )
 
+    @pytest.mark.parametrize(
+        "deadline, expectation",
+        [("09:00", does_not_raise()), ("25:00", pytest.raises(AssertionError))],
+    )
+    def test_validate_table_sla_deadline_localtime(
+        self, dag_declaration_validator, deadline, expectation
+    ):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {"table": {"sla_deadline_localtime": deadline}},
+            },
+            "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+        }
+        with expectation:
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
     def test_validate_criticality_valid_accepts(self, dag_declaration_validator):
         dag_declaration = {
             "workflow": {"type": "query", "layer": "dw"},

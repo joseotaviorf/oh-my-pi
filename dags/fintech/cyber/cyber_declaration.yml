@@ -4,7 +4,6 @@ dag:
   schedule_interval: 30 7 * * *
   owner: Data Fintech
   criticality: High
-  sla_deadline_localtime: "11:00"
   callback_by_task: False
   documentation:
     dag_purpose: |
@@ -90,8 +89,9 @@ workflow:
         - True
         - "[]"
     uda1:
-      criticality: Critical
       clean_table_name: contracts
+      criticality: Critical
+      sla_deadline_localtime: "11:00"
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
@@ -163,8 +163,9 @@ workflow:
         - False
         - "[]"
     agency:
-      criticality: Critical
       clean_table_name: agency
+      criticality: Critical
+      sla_deadline_localtime: "11:00"
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:

@@ -52,6 +52,7 @@ class LoadTaskCreator(BaseTaskCreator, ABC):
                         else {}
                     ),
                     "criticality": table_attributes.criticality,
+                    "sla_deadline_localtime": table_attributes.sla_deadline_localtime,
                     "owner": table_attributes.owner,
                 }
             )

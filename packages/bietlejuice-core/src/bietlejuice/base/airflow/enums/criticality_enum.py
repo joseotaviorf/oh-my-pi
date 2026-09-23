@@ -13,7 +13,7 @@ class CriticalityEnum:
     PAGING = (CRITICAL, HIGH)
     DEFAULT_DEADLINE_BY_TIER: ClassVar[dict[str, str]] = {
         CRITICAL: "08:00",
-        HIGH: "11:00",
+        HIGH: "08:00",
         MEDIUM: "11:00",
         LOW: "11:00",
     }

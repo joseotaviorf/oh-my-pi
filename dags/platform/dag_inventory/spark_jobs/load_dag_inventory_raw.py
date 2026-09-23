@@ -97,6 +97,7 @@ def enrich_table_dictionary_with_spark_metastore(content: dict) -> dict:
                         "bucket": row["bucket"],
                         "is_delta": row["is_delta"],
                         "criticality": row.get("criticality"),
+                        "sla_deadline_localtime": row.get("sla_deadline_localtime"),
                     }
                 )
         except Exception as error:
@@ -287,6 +288,7 @@ def enrich_table_data_frame_with_file_size_infos(
         "total_modified_files_size_in_bytes",
         "is_delta",
         "criticality",
+        "sla_deadline_localtime",
         "year",
         "month",
         "day",

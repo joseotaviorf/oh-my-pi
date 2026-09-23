@@ -4,7 +4,6 @@ dag:
   schedule_interval: 30 1,5 * * *
   owner: Data ForRent
   criticality: High
-  sla_deadline_localtime: "08:00"
   documentation:
     dag_purpose: |
       This DAG retrieves data from the rental_management database, which is a source of ForRent Post Contract data.

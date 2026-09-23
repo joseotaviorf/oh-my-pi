@@ -4,7 +4,6 @@ dag:
   schedule_interval: 0 2 * * *
   owner: Data Fintech
   criticality: High
-  sla_deadline_localtime: "11:00"
   documentation:
     dag_purpose: Loads batch inference collections data into our Data Lake.
 
@@ -26,7 +25,6 @@ workflow:
   default_extraction_type: incremental
   tables_customization:
     collections_score_v3_output:
-      criticality: Critical
       clean_partitions:
         - year
         - month

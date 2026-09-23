@@ -48,6 +48,10 @@ columns:
       High: 'High tier'
       Medium: 'Medium tier'
       Low: 'Low tier'
+  sla_deadline_localtime:
+    lineage:
+      - datalake_dag_inventory_clean.table.sla_deadline_localtime
+    description: Declared table-specific SLA deadline in São Paulo wall-clock time.
   avg_file_size_in_bytes:
     lineage:
       - datalake_dag_inventory_clean.table.avg_file_size_in_bytes

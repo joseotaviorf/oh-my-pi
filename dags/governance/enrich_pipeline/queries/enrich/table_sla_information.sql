@@ -6,6 +6,7 @@ WITH scoped AS (
         t.schema AS schema_name,
         t.table_name,
         t.layer,
+        t.sla_deadline_localtime AS table_sla_deadline_localtime,
         ds.id_line,
         ds.dt_snapshot,
         ds.is_intraday_dag,
@@ -33,15 +34,16 @@ expected AS (
     FROM (
         SELECT
             sc.*,
-            -- A table that inherits its DAG's tier honours the DAG's declared deadline.
-            -- A table that overrides the tier is judged by its own tier's default, because
-            -- the DAG's deadline belongs to the DAG's tier. Defaults mirror
-            -- CriticalityEnum.DEFAULT_DEADLINE_BY_TIER: Critical 08:00, everything else 11:00.
+            -- A table-specific deadline wins; otherwise inherit the DAG deadline
+            -- only when the table keeps the DAG tier. Tier defaults are 08:00 for
+            -- Critical and High, and 11:00 for Medium and Low.
             CASE
+                WHEN sc.table_sla_deadline_localtime IS NOT NULL
+                    THEN sc.table_sla_deadline_localtime
                 WHEN sc.table_criticality = sc.dag_criticality
                     AND sc.dag_sla_deadline_localtime IS NOT NULL
                     THEN sc.dag_sla_deadline_localtime
-                WHEN sc.table_criticality = 'Critical' THEN '08:00'
+                WHEN sc.table_criticality IN ('Critical', 'High') THEN '08:00'
                 ELSE '11:00'
             END AS sla_deadline_localtime
         FROM scoped AS sc

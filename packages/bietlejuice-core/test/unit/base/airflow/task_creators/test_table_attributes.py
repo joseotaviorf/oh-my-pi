@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
+from bietlejuice.base.airflow.enums.criticality_enum import CriticalityEnum
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
@@ -749,3 +750,72 @@ class TestTableAttributesTransformationGrade:
 
         with pytest.raises(ValueError, match="transformation_grade"):
             table_attributes.spark_transformation_grade_args()
+
+
+class TestTableAttributesCriticality:
+    def test_criticality_fast_lane_dag_with_table_critical_returns_high(self):
+        table_attributes = TableAttributes(
+            dag_args={"name": "retsuko_fast_lane", "criticality": "Medium"},
+            workflow_args={},
+            layer=LayerEnum.CLEAN,
+            table_name="entry",
+            table_customization={"criticality": "Critical"},
+        )
+        assert table_attributes.criticality == CriticalityEnum.HIGH
+
+    def test_criticality_raw_layer_with_table_critical_and_dag_medium_returns_medium(
+        self,
+    ):
+        table_attributes = TableAttributes(
+            dag_args={"name": "retsuko", "criticality": "Medium"},
+            workflow_args={},
+            layer=LayerEnum.RAW,
+            table_name="entry",
+            table_customization={"criticality": "Critical"},
+        )
+        assert table_attributes.criticality == CriticalityEnum.MEDIUM
+
+    def test_criticality_transactional_layer_with_table_critical_and_dag_medium_returns_medium(
+        self,
+    ):
+        table_attributes = TableAttributes(
+            dag_args={"name": "retsuko", "criticality": "Medium"},
+            workflow_args={},
+            layer=LayerEnum.TRANSACTIONAL,
+            table_name="entry",
+            table_customization={"criticality": "Critical"},
+        )
+        assert table_attributes.criticality == CriticalityEnum.MEDIUM
+
+    def test_criticality_clean_layer_with_table_critical_returns_critical(self):
+        table_attributes = TableAttributes(
+            dag_args={"name": "retsuko", "criticality": "Medium"},
+            workflow_args={},
+            layer=LayerEnum.CLEAN,
+            table_name="entry",
+            table_customization={"criticality": "Critical"},
+        )
+        assert table_attributes.criticality == CriticalityEnum.CRITICAL
+
+    @pytest.mark.parametrize(
+        ("layer", "expected_deadline"),
+        [
+            (LayerEnum.TRANSACTIONAL, None),
+            (LayerEnum.RAW, None),
+            (LayerEnum.CLEAN, "09:00"),
+        ],
+    )
+    def test_sla_deadline_localtime_applies_only_beyond_staging_layers(
+        self, layer, expected_deadline
+    ):
+        table_attributes = TableAttributes(
+            dag_args={"name": "retsuko", "criticality": "High"},
+            workflow_args={},
+            layer=layer,
+            table_name="entry",
+            table_customization={
+                "criticality": "Critical",
+                "sla_deadline_localtime": "09:00",
+            },
+        )
+        assert table_attributes.sla_deadline_localtime == expected_deadline

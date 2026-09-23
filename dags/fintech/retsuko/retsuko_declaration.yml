@@ -4,7 +4,6 @@ dag:
   schedule_interval: 30 7,12 * * *
   owner: Data Fintech
   criticality: High
-  sla_deadline_localtime: "11:00"
   documentation:
     dag_purpose: |
       Process data from Retsuko database (postgresql), retrieved using the CDC process. [Retsuko](https://github.com/quintoandar/retsuko) is responsible
@@ -35,6 +34,7 @@ workflow:
     early_termination_version: {}
     entry:
       criticality: Critical
+      sla_deadline_localtime: "09:00"
     file: {}
     invoice_partitioned: {}
     invoice_entry:
@@ -48,3 +48,4 @@ workflow:
     recurring_expense_entry: {}
     sap_entity:
       criticality: Critical
+      sla_deadline_localtime: "09:00"

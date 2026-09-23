@@ -12,6 +12,7 @@ from databricks_plugin import (
 )
 
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.notification.gchat_callback import GchatCallback
 from bietlejuice.base.sst.airflow.common.common import (
@@ -264,6 +265,17 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
         },
         pool=pool,
     )
+    if event == "case":
+        clean_task.params.update(
+            {
+                "schema": "salesforce",
+                "table_name": event_table,
+                "layer": "clean",
+                "bucket": bucket,
+                "storage_format": StorageFormatEnum.PARQUET.value,
+                "criticality": "Critical",
+            }
+        )
     # Clean still emits its own dataset for downstream consumers. Core Support
     # Journey's Case sensor now waits on ``dlq_events_case`` instead, so recovery
     # is already in clean before the core model reads it.

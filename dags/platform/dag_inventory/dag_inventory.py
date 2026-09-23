@@ -19,8 +19,10 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
 # Regex to identify the task that initializes the cluster
-# Matches create-cluster, execute-job-cluster, create-cluster-1, execute-job-cluster-1, etc.
-INIT_CLUSTER_REGEX = r"^(?:create|execute-job)-cluster(?:-\d+)?$"
+# Matches standard cluster tasks and Salesforce CDC lineage initializers.
+INIT_CLUSTER_REGEX = (
+    r"^(?:(?:create|execute-job)-cluster(?:-\d+)?|execute_cdc_cluster(?:_[\w-]+)?)$"
+)
 
 # Pipeline inputs
 SOURCE = "dag_inventory"
@@ -120,6 +122,7 @@ def find_tables_generated_by_dag(dag_bag: DagBag) -> dict:
                     "layer": task.params.get("layer"),
                     "transformation_grade": task.params.get("transformation_grade"),
                     "criticality": task.params.get("criticality"),
+                    "sla_deadline_localtime": task.params.get("sla_deadline_localtime"),
                     "bucket": task.params.get("bucket"),
                     "is_delta": task.params.get("storage_format")
                     == StorageFormatEnum.DELTA.value,

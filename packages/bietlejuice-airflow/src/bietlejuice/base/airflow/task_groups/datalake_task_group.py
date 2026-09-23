@@ -474,14 +474,17 @@ class DatalakeTaskGroup(BaseTaskGroup):
         partitions = partitions or []
         table_customization = table_customization or {}
         criticality = None
+        sla_deadline_localtime = None
         if self.dag_args is not None and self.workflow_args is not None:
-            criticality = TableAttributes(
+            table_attributes = TableAttributes(
                 self.dag_args,
                 self.workflow_args,
                 layer_enum,
                 table_name,
                 table_customization,
-            ).criticality
+            )
+            criticality = table_attributes.criticality
+            sla_deadline_localtime = table_attributes.sla_deadline_localtime
         spark_session_configs = spark_session_configs or {}
         extra_query_template_params = extra_query_template_params or {}
         table_extraction_type = "incremental" if is_incremental else "full"
@@ -533,6 +536,11 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 "bucket": self.datalake_bucket,
                 "storage_format": StorageFormatEnum.PARQUET.value,
                 **({"criticality": criticality} if criticality else {}),
+                **(
+                    {"sla_deadline_localtime": sla_deadline_localtime}
+                    if sla_deadline_localtime
+                    else {}
+                ),
             }
         )
 
