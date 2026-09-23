@@ -314,21 +314,8 @@ payment_classification AS (
         CASE
           WHEN max_delay_contaminated_contract_t2 > 30 OR macro_segmentation = 'active-stock-pre-evictions' THEN
             CASE
-              WHEN avg_days_overdue_invoices_paid_t1 <= 5
-                OR avg_days_overdue_invoices_paid_t1 > 40
-                OR (n_evictions_processes_lifetime >= 1 AND mob_months <= 6) THEN 'LOW'
-              WHEN mob_months <= 12
-                OR (
-                  n_evictions_processes_lifetime >= 1
-                  AND mob_months > 12
-                  AND avg_days_overdue_invoices_paid_t1 > 30
-                ) THEN 'MEDIUM'
-              WHEN (
-                n_evictions_processes_lifetime >= 1
-                AND mob_months > 12
-                AND avg_days_overdue_invoices_paid_t1 <= 30
-              )
-                OR (n_evictions_processes_lifetime = 0 AND mob_months > 12) THEN 'HIGH'
+              WHEN payment_probability_propagated >= 0.38 THEN 'HIGH'
+              WHEN payment_probability_propagated < 0.38 THEN 'LOW'
               ELSE 'NULL PROB ACTIVE [31+]'
             END
           WHEN max_delay_contaminated_contract_t2 <= 30 THEN
@@ -485,8 +472,8 @@ segmentation_features AS (
       WHEN macro_segmentation = 'evictions' AND payment_probability_at_entrance >= 0.223 AND n_evictions_processes_lifetime <= 1 THEN 'evictions-early-first-high'
       WHEN macro_segmentation = 'evictions' THEN 'evictions-undefined'
       WHEN reference_contract_status = 'Ativo' AND has_negotiation_in_contract AND max_delay_contaminated_contract_t1 <= 0 THEN 'active-ongoing-deal'
-      WHEN reference_contract_status = 'Ativo' AND macro_segmentation = 'active-stock-pre-evictions' AND flag_broken_global_deal AND prob_payment = 'LOW' THEN 'active-stock-risk-deal-low'
-      WHEN reference_contract_status = 'Ativo' AND macro_segmentation = 'active-stock-pre-evictions' AND flag_broken_global_deal AND prob_payment IN ('HIGH', 'MEDIUM') THEN 'active-stock-risk-deal-high'
+      WHEN reference_contract_status = 'Ativo' AND macro_segmentation = 'active-stock-pre-evictions' AND flag_broken_global_deal AND flag_broken_deal_by_new_original_debt THEN 'active-stock-risk-deal-new-monthly'
+      WHEN reference_contract_status = 'Ativo' AND macro_segmentation = 'active-stock-pre-evictions' AND flag_broken_global_deal AND flag_broken_installment_deal THEN 'active-stock-risk-deal-unpaid'
       WHEN reference_contract_status = 'Ativo' AND macro_segmentation = 'active-stock-pre-evictions' AND NOT flag_broken_global_deal AND prob_payment = 'LOW' THEN 'active-stock-risk-nodeal-low'
       WHEN reference_contract_status = 'Ativo' AND macro_segmentation = 'active-stock-pre-evictions' AND NOT flag_broken_global_deal AND prob_payment IN ('HIGH', 'MEDIUM') THEN 'active-stock-risk-nodeal-high'
       WHEN reference_contract_status = 'Ativo' AND max_delay_contaminated_contract_t2 > 30 AND (n_overdue_monthlys_t1 > 1 OR flag_broken_global_deal) THEN 'active-stock-pre-evictions-legacy'
@@ -603,8 +590,8 @@ SELECT
       'active-new-defaulter-early-low',
       'active-new-defaulter-late-low',
       'active-stock-hold',
-      'active-stock-risk-deal-high',
-      'active-stock-risk-deal-low',
+      'active-stock-risk-deal-unpaid',
+      'active-stock-risk-deal-new-monthly',
       'active-stock-risk-nodeal-high',
       'active-stock-risk-nodeal-low',
       'active-ongoing-deal'
@@ -638,6 +625,14 @@ SELECT
       'active-new-defaulter-late-low'
     ) THEN 'active-new-defaulter-low'
     WHEN segmentation IN ('active-new-defaulter-good-payers') THEN 'active-new-defaulter-high'
+    WHEN segmentation IN (
+      'active-stock-risk-deal-unpaid',
+      'active-stock-risk-deal-new-monthly'
+    ) THEN 'active-stock-risk-deal'
+    WHEN segmentation IN (
+      'active-stock-risk-nodeal-high',
+      'active-stock-risk-nodeal-low'
+    ) THEN 'active-stock-risk-nodeal'
     ELSE segmentation
   END AS clustered_segmentation,
   dt_reference,

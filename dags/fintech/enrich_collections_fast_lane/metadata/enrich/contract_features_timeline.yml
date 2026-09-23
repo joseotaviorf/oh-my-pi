@@ -11,8 +11,10 @@ columns:
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.id_contract
   segmentation:
-    description: Micro pocket segment assigned on the reference date from delay, deal, eviction and score
-      rules.
+    description: Micro pocket segment assigned on the reference date from delay, deal, eviction and frozen
+      score rules. Broken-deal stock uses active-stock-risk-deal-new-monthly when new original debt is
+      unpaid, including when both debt types are unpaid, and active-stock-risk-deal-unpaid when only the
+      deal installment is unpaid. No-deal stock keeps high and low labels from the frozen score band.
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
   macro_segmentation:
@@ -40,8 +42,9 @@ columns:
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.max_delay_contaminated_contract_t2
   prob_payment:
-    description: Payment-probability class frozen at macro-island entrance (HIGH, MEDIUM, LOW, VERY_HIGH,
-      VERY_LOW).
+    description: Payment-probability class frozen at macro-island entrance. Active stock (delay over 30
+      days or active-stock-pre-evictions) is HIGH when the propagated collections score is at least 0.38
+      and LOW below that. Other macros still use HIGH, MEDIUM, LOW, VERY_HIGH, and VERY_LOW.
     lineage:
     - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
   payment_probability_at_entrance:
@@ -112,8 +115,9 @@ columns:
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
   clustered_segmentation:
-    description: Micro segment collapsed into operational clusters (for example under-mob3 and new-defaulter
-      timing buckets).
+    description: Micro segment collapsed into operational clusters. Under-mob3 and new-defaulter timing
+      buckets roll up to their parent labels. Deal stock rolls up to active-stock-risk-deal and no-deal
+      stock rolls up to active-stock-risk-nodeal.
     lineage:
     - datalake_collections_fast_lane.contract_wallet_timeline.reference_contract_status
   dt_reference:
