@@ -3,7 +3,7 @@ dag:
   owner: Tech Platform Enterprise Engineering
   callback_by_task: False
   catchup: false
-  schedule_interval: 0 6 * * *
+  schedule_interval: 0 3 * * *
   schedule_start_date: "2026, 8, 18"
   documentation:
     dag_purpose: |
@@ -12,7 +12,7 @@ dag:
       One raw JSON payload per API record per daily load, partitioned by year,
       month, and day.
       Covers members returned by Analytics (usage, cost, activity, and summaries).
-      Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo; usage
+      Loads datalake_claude_usage_raw daily at 03:00 America/Sao_Paulo; usage
       uses a 28-day trailing window with exclusive ending_at equal to the
       default load_end_date (interval day), so the latest included day is
       interval day minus one; cost uses the same start and an exclusive
@@ -24,6 +24,10 @@ dag:
       activity requests the interval day minus two because the vendor
       publishes that endpoint a day behind and rejects unpublished dates,
       then date_expansion.load_window calls that date once on the schedule.
+      Cost and usage exports typically refresh within four hours, but the
+      vendor may revise recent values for up to 24 hours and later reconciliation
+      can revise historical values; the daily trailing window re-reads recent
+      dates to absorb those revisions.
       A triggered conf window (load_start_date / load_end_date) iterates
       every inclusive day so a backfill is not reduced to the end date.
       Auth is CLAUDE_ANALYTICS_API_KEY in the quintoandar secret scope (x-api-key)
@@ -117,7 +121,7 @@ workflow:
         - currency
       date_filter_column: starting_at
       # Vendor ending_at is exclusive. Shift load_end_date forward one day so
-      # the trailing window includes the interval day (D-1 of the 06:00 run).
+      # the trailing window includes the interval day (D-1 of the scheduled run).
       # Repeat load_start_date: table extras replace the workflow dict.
       extra_query_template_params:
         load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -27), 'load_start_date') }}"
@@ -148,10 +152,11 @@ workflow:
       date_format: "%Y-%m-%d"
       # "date" is only the request param name; the response field is last_activity_date.
       date_filter_column: last_activity_date
-      # Vendor publishes analytics/users a day behind and rejects unpublished
-      # dates with a 400; shift both ends back two days on scheduled runs so
-      # date_expansion.load_window still makes one call. A triggered conf
-      # window (load_start_date / load_end_date) iterates every inclusive day.
+      # Vendor typically exposes engagement snapshots around 17:00 UTC on the
+      # following day and rejects unpublished dates with a 400; shift both
+      # ends back two days on scheduled runs so date_expansion.load_window
+      # still makes one call. A triggered conf window (load_start_date /
+      # load_end_date) iterates every inclusive day.
       extra_query_template_params:
         load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
         load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_end_date') }}"
@@ -185,8 +190,10 @@ workflow:
       results_response_path: summaries
       date_filter_column: starting_at
       date_format: "%Y-%m-%d"
-      # Vendor ending_date is exclusive; default load_end_date (interval day) is
-      # sufficient — latest included day is interval day minus one.
+      # Vendor engagement snapshots typically become available around 17:00 UTC
+      # on the following day. ending_date is exclusive, so default
+      # load_end_date (interval day) keeps the latest included day behind that
+      # publication window.
       params:
         starting_date: load_start_date
         ending_date: load_end_date

@@ -3,7 +3,7 @@ dag:
   owner: Tech Platform Enterprise Engineering
   callback_by_task: False
   catchup: false
-  schedule_interval: 0 6 * * *
+  schedule_interval: 0 3 * * *
   schedule_start_date: "2026, 8, 18"
   documentation:
     dag_purpose: |
@@ -26,7 +26,7 @@ dag:
       excluded from the match-update, so re-observing an unchanged cap
       refreshes its other attributes without resetting when it started.
       Grain: id_user + id_spend_limit.
-      Loads datalake_claude_usage_raw daily at 06:00 America/Sao_Paulo. Auth is
+      Loads datalake_claude_usage_raw daily at 03:00 America/Sao_Paulo. Auth is
       CLAUDE_ADMIN_API_KEY in the quintoandar secret scope (x-api-key) plus
       anthropic-version 2023-06-01; group and group_members add anthropic-beta
       ce-user-management-2026-07-13. group_members expands from raw groups via
