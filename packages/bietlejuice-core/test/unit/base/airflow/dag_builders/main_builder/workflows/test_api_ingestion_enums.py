@@ -6,6 +6,7 @@ Tests the enum classes used by the API Ingestion workflow.
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.api_ingestion_enums import (
     AuthenticationStrategyEnum,
+    HttpMethodEnum,
     PaginationStrategyEnum,
     RateLimitingStrategyEnum,
 )
@@ -70,6 +71,14 @@ class TestPaginationStrategyEnum:
         assert "page_per_page" in values
         assert "none" in values
         assert len(values) == 4
+
+
+class TestHttpMethodEnum:
+    """Test suite for HttpMethodEnum."""
+
+    def test_get_available_enum_values(self):
+        """Test that get_available_enum_values returns get and post."""
+        assert HttpMethodEnum.get_available_enum_values() == ["get", "post"]
 
 
 class TestRateLimitingStrategyEnum:

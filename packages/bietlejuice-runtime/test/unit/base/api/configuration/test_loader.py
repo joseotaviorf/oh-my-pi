@@ -711,6 +711,52 @@ class TestAPIConfigurationLoaderCreatePaginator:
         assert paginator.per_page_param == "per_page"
         assert paginator.page_size == 50
 
+    def test_create_paginator_page_per_page_post_passes_body_and_response_options(
+        self,
+    ):
+        """POST tables pass method, body, total_pages_path and envelope_fields."""
+        # Arrange
+        workflow_config = {"api_base_url": "https://api.cursor.com"}
+        table_config = {
+            "endpoint_path": "teams/spend",
+            "http_method": "post",
+            "api_policies": {
+                "pagination": {
+                    "strategy": "page_per_page",
+                    "per_page_param": "pageSize",
+                    "page_size": 100,
+                    "results_response_path": "teamMemberSpend",
+                    "total_pages_path": "totalPages",
+                    "envelope_fields": ["subscriptionCycleStart"],
+                }
+            },
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        # Act
+        paginator = loader.create_paginator(
+            Mock(spec=BaseAPIClient), "teams/spend", {}, json_body={"foo": 1}
+        )
+
+        # Assert
+        assert paginator.http_method == "post"
+        assert paginator.json_body == {"foo": 1}
+        assert paginator.total_pages_path == "totalPages"
+        assert paginator.envelope_fields == ["subscriptionCycleStart"]
+
+    def test_create_paginator_post_with_cursor_strategy_raises_error(self):
+        """POST bodies are only wired into page_per_page pagination."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {
+            "endpoint_path": "events",
+            "http_method": "post",
+            "api_policies": {"pagination": {"strategy": "cursor"}},
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(ValueError, match="http_method 'post' is not supported"):
+            loader.create_paginator(Mock(spec=BaseAPIClient), "events", {})
+
     def test_create_paginator_invalid_strategy_raises_error(self):
         """Test that invalid pagination strategy raises ValueError."""
         workflow_config = {
@@ -850,6 +896,82 @@ class TestAPIConfigurationLoaderGetInitialParams:
 
         with pytest.raises(ValueError, match="date_format cannot be an empty string"):
             loader.get_initial_params("2025-01-01", "2025-01-31")
+
+    def test_get_initial_params_with_epoch_millis_date_format(self):
+        """epoch_millis resolves to inclusive UTC day bounds as integers."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {
+            "endpoint_path": "events",
+            "date_format": "epoch_millis",
+            "params": {"from": "load_start_date", "to": "load_end_date"},
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        params = loader.get_initial_params("2026-09-21", "2026-09-21")
+
+        assert params == {"from": 1789948800000, "to": 1790035199999}
+
+
+class TestAPIConfigurationLoaderGetHttpMethod:
+    """Test suite for get_http_method method."""
+
+    @pytest.mark.parametrize(
+        "table_config, expected",
+        [
+            ({}, "get"),
+            ({"http_method": "post"}, "post"),
+            ({"http_method": "POST"}, "post"),
+        ],
+    )
+    def test_get_http_method(self, table_config, expected):
+        loader = APIConfigurationLoader({}, table_config)
+
+        assert loader.get_http_method() == expected
+
+    def test_get_http_method_invalid_raises_error(self):
+        loader = APIConfigurationLoader({}, {"http_method": "put"})
+
+        with pytest.raises(ValueError, match="http_method 'put' not supported"):
+            loader.get_http_method()
+
+
+class TestAPIConfigurationLoaderGetRequestBody:
+    """Test suite for get_request_body method."""
+
+    def test_get_request_body_not_configured_returns_none(self):
+        loader = APIConfigurationLoader({}, {"endpoint_path": "events"})
+
+        assert loader.get_request_body("2026-09-21", "2026-09-21") is None
+
+    def test_get_request_body_resolves_date_placeholders(self):
+        # Arrange
+        table_config = {
+            "endpoint_path": "teams/daily-usage-data",
+            "http_method": "post",
+            "date_format": "epoch_millis",
+            "body": {
+                "startDate": "load_start_date",
+                "endDate": "load_end_date",
+                "team": "platform",
+            },
+        }
+        loader = APIConfigurationLoader({}, table_config)
+
+        # Act
+        body = loader.get_request_body("2026-09-21", "2026-09-21")
+
+        # Assert
+        assert body == {
+            "startDate": 1789948800000,
+            "endDate": 1790035199999,
+            "team": "platform",
+        }
+
+    def test_get_request_body_non_mapping_raises_error(self):
+        loader = APIConfigurationLoader({}, {"body": ["startDate"]})
+
+        with pytest.raises(ValueError, match="'body' must be a mapping"):
+            loader.get_request_body("2026-09-21", "2026-09-21")
 
 
 class TestAPIConfigurationLoaderGetDateColumnForPartitioning:

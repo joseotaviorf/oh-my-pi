@@ -1,4 +1,5 @@
 import json
+import re
 
 from cerberus import Validator
 
@@ -8,6 +9,7 @@ from bietlejuice.base.airflow.cluster_config_resolver import (
 )
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.api_ingestion_enums import (
     AuthenticationStrategyEnum,
+    HttpMethodEnum,
     PaginationStrategyEnum,
     RateLimitingStrategyEnum,
 )
@@ -38,6 +40,8 @@ from bietlejuice.base.validation.cluster_args import (
     CONSOLIDATION_PRESET_TYPE_PREFIXES,
 )
 from bietlejuice.services.configuration_service import ConfigurationService
+
+_DATE_OFFSET_PATTERN = re.compile(r"^load_(?:start|end)_date[+-]\d+$")
 
 
 class DAGDeclarationValidator(Validator):
@@ -489,6 +493,17 @@ class DAGDeclarationValidator(Validator):
                                     "empty": False,
                                     "required": False,
                                 },
+                                "total_pages_path": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "envelope_fields": {
+                                    "type": "list",
+                                    "empty": False,
+                                    "required": False,
+                                    "schema": {"type": "string", "empty": False},
+                                },
                             },
                         },
                         "error_handling": {
@@ -819,6 +834,84 @@ class DAGDeclarationValidator(Validator):
                     f"{list(self._ALLOWED_PAGINATION_LOCATIONS)}, got {location_value!r}"
                 )
 
+    def _check_http_method_and_body(
+        self, table_name: str, table_config: dict, pagination_config
+    ) -> None:
+        http_method = table_config.get("http_method")
+        if (
+            http_method is not None
+            and http_method not in HttpMethodEnum.get_available_enum_values()
+        ):
+            raise AssertionError(
+                "m=_validate_api_ingestion_workflow, "
+                f"msg='http_method' for table '{table_name}' must be one of "
+                f"{HttpMethodEnum.get_available_enum_values()}, got {http_method!r}"
+            )
+        is_post = http_method == HttpMethodEnum.POST.value
+
+        body = table_config.get("body")
+        if body is not None:
+            if not isinstance(body, dict) or not body:
+                raise AssertionError(
+                    "m=_validate_api_ingestion_workflow, "
+                    f"msg='body' for table '{table_name}' must be a non-empty mapping"
+                )
+            if not is_post:
+                raise AssertionError(
+                    "m=_validate_api_ingestion_workflow, "
+                    f"msg='body' for table '{table_name}' requires http_method: post"
+                )
+
+        if not is_post:
+            return
+        body_date_offset_path = self._find_body_date_offset(body)
+        if body_date_offset_path:
+            raise AssertionError(
+                "m=_validate_api_ingestion_workflow, "
+                f"msg=date offsets in 'body' are not supported for table "
+                f"'{table_name}' at {body_date_offset_path}; use "
+                "load_start_date or load_end_date without an offset"
+            )
+        if table_config.get("id_expansion") is not None:
+            raise AssertionError(
+                "m=_validate_api_ingestion_workflow, "
+                f"msg=http_method: post for table '{table_name}' is not supported with "
+                "id_expansion; use id_expansion.json_body_field for POST fan-out"
+            )
+        strategy = (
+            pagination_config.get("strategy")
+            if isinstance(pagination_config, dict)
+            else None
+        )
+        if strategy not in (
+            None,
+            PaginationStrategyEnum.PAGE_PER_PAGE.value,
+            PaginationStrategyEnum.NONE.value,
+        ):
+            raise AssertionError(
+                "m=_validate_api_ingestion_workflow, "
+                f"msg=http_method: post for table '{table_name}' supports only "
+                f"page_per_page or none pagination, got {strategy!r}"
+            )
+
+    def _find_body_date_offset(self, value, path: str = "body"):
+        """Returns the first JSON path containing an unsupported date offset."""
+        if isinstance(value, dict):
+            for key, nested_value in value.items():
+                found_path = self._find_body_date_offset(nested_value, f"{path}.{key}")
+                if found_path:
+                    return found_path
+        elif isinstance(value, list):
+            for index, nested_value in enumerate(value):
+                found_path = self._find_body_date_offset(
+                    nested_value, f"{path}[{index}]"
+                )
+                if found_path:
+                    return found_path
+        elif isinstance(value, str) and _DATE_OFFSET_PATTERN.fullmatch(value):
+            return path
+        return None
+
     def _validate_query_view_workflow(self, dag_declaration: dict) -> None:
         workflow = dag_declaration.get("workflow", {})
         if workflow.get("layer") == LayerEnum.TRANSFORMATION.value:
@@ -1072,6 +1165,9 @@ class DAGDeclarationValidator(Validator):
             ).get("pagination")
             self._check_pagination_locations(
                 table_pagination, f"for table '{table_name}'"
+            )
+            self._check_http_method_and_body(
+                table_name, table_config, table_pagination or workflow_pagination
             )
 
             endpoint_path = table_config.get("endpoint_path")

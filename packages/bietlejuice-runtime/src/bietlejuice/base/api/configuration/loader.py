@@ -19,11 +19,11 @@ offset_limit.py) are unreachable from production until that Spark entry-point is
 
 import logging
 import os
-from datetime import datetime
 from typing import Any, Dict, Optional
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.api_ingestion_enums import (
     AuthenticationStrategyEnum,
+    HttpMethodEnum,
     PaginationStrategyEnum,
     RateLimitingStrategyEnum,
 )
@@ -31,6 +31,11 @@ from bietlejuice.base.api.auth.api_key import APIKeyAuth
 from bietlejuice.base.api.auth.basic import BasicAuth
 from bietlejuice.base.api.auth.oauth2 import BasicAuthOAuth2ClientCredentials
 from bietlejuice.base.api.common.client import BaseAPIClient
+from bietlejuice.base.api.configuration.date_format import (
+    END_OF_DAY_SUFFIX,
+    START_OF_DAY_SUFFIX,
+    format_load_date,
+)
 from bietlejuice.base.api.pagination.base import BasePaginator
 from bietlejuice.base.api.pagination.cursor import CursorPaginator
 from bietlejuice.base.api.pagination.offset_limit import OffsetLimitPaginator
@@ -40,6 +45,7 @@ from bietlejuice.base.spark.base_spark import BaseDBUtils
 LOGGER = logging.getLogger(__name__)
 
 DEFAULT_MAX_RETRIES = 3
+DATE_PLACEHOLDERS = ("load_start_date", "load_end_date")
 
 
 class APIConfigurationLoader:
@@ -468,7 +474,11 @@ class APIConfigurationLoader:
         LOGGER.info("API key authentication configured")
 
     def create_paginator(
-        self, client: BaseAPIClient, endpoint: str, initial_params: Dict[str, Any]
+        self,
+        client: BaseAPIClient,
+        endpoint: str,
+        initial_params: Dict[str, Any],
+        json_body: Optional[Dict[str, Any]] = None,
     ) -> Optional[BasePaginator]:
         """
         Creates a paginator based on the pagination strategy configuration.
@@ -486,13 +496,17 @@ class APIConfigurationLoader:
             client: The configured API client with authentication applied
             endpoint: The API endpoint path to paginate
             initial_params: Initial query parameters for the first page request
+            json_body: Resolved request body for ``http_method: post`` tables
+                (see ``get_request_body``); only ``page_per_page`` supports POST.
 
         Returns:
             Optional[BasePaginator]: Configured paginator instance if pagination is enabled,
                                     None if no pagination strategy is configured
 
         Raises:
-            ValueError: If the pagination strategy is not supported
+            ValueError: If the pagination strategy is not supported, or if
+                ``http_method: post`` is combined with a strategy other than
+                ``page_per_page``
         """
         workflow_api_policies = self.workflow_config.get("api_policies", {})
         table_api_policies = self.table_config.get("api_policies", {})
@@ -523,6 +537,15 @@ class APIConfigurationLoader:
                 "Supported strategies: cursor, offset_limit, page_per_page, none"
             )
 
+        if self.get_http_method() == HttpMethodEnum.POST.value and strategy not in (
+            PaginationStrategyEnum.PAGE_PER_PAGE.value,
+            PaginationStrategyEnum.NONE.value,
+        ):
+            raise ValueError(
+                f"http_method 'post' is not supported with pagination strategy '{strategy}'. "
+                "Use page_per_page or none."
+            )
+
         if strategy == PaginationStrategyEnum.CURSOR.value:
             return self._create_cursor_paginator(
                 client, endpoint, initial_params, pagination_config
@@ -533,7 +556,7 @@ class APIConfigurationLoader:
             )
         elif strategy == PaginationStrategyEnum.PAGE_PER_PAGE.value:
             return self._create_page_per_page_paginator(
-                client, endpoint, initial_params, pagination_config
+                client, endpoint, initial_params, pagination_config, json_body
             )
         elif strategy == PaginationStrategyEnum.NONE.value:
             LOGGER.info("No pagination strategy configured. Fetching single page.")
@@ -700,9 +723,15 @@ class APIConfigurationLoader:
         endpoint: str,
         initial_params: Dict[str, Any],
         pagination_config: Dict[str, Any],
+        json_body: Optional[Dict[str, Any]] = None,
     ) -> PagePerPagePaginator:
         """
         Creates a PagePerPagePaginator for 1-based ``page`` / ``per_page`` style APIs.
+
+        Optional pagination keys: ``total_pages_path`` (dot path to the page count in
+        the response, e.g. ``pagination.totalPages``) and ``envelope_fields`` (root
+        response keys copied onto every row). With table ``http_method: post``, the
+        page and page size are sent in ``json_body``.
         """
         workflow_api_policies = self.workflow_config.get("api_policies", {})
         table_api_policies = self.table_config.get("api_policies", {})
@@ -751,6 +780,10 @@ class APIConfigurationLoader:
             page_size=page_size,
             page_delay=delay_seconds if delay_seconds > 0 else None,
             extract_results=extract_results,
+            http_method=self.get_http_method(),
+            json_body=json_body,
+            total_pages_path=pagination_config.get("total_pages_path"),
+            envelope_fields=pagination_config.get("envelope_fields"),
         )
 
     def get_endpoint_path(self) -> str:
@@ -788,77 +821,94 @@ class APIConfigurationLoader:
             Dict[str, Any]: Dictionary of query parameters with date placeholders replaced by
                            formatted timestamps.
         """
-        params = {}
-
         if "params" in self.table_config:
             table_params = self.table_config.get("params") or {}
-        else:
-            table_params = None
+            return self._resolve_date_placeholders(
+                table_params, load_start_date, load_end_date
+            )
 
+        return self._resolve_date_placeholders(
+            {"after_time": "load_start_date", "before_time": "load_end_date"},
+            load_start_date,
+            load_end_date,
+        )
+
+    def get_http_method(self) -> str:
+        """
+        Returns the table's HTTP method for data requests (``get`` or ``post``).
+
+        Raises:
+            ValueError: If ``http_method`` is not a supported value.
+        """
+        http_method = str(self.table_config.get("http_method", "get")).lower()
+        if http_method not in HttpMethodEnum.get_available_enum_values():
+            raise ValueError(
+                f"http_method '{http_method}' not supported. "
+                f"Supported methods: {HttpMethodEnum.get_available_enum_values()}"
+            )
+        return http_method
+
+    def get_request_body(
+        self, load_start_date: str, load_end_date: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Builds the JSON body for ``http_method: post`` tables, replacing date placeholders.
+
+        Values equal to ``load_start_date`` / ``load_end_date`` are formatted with the
+        same ``date_format`` as ``params``. Date offsets (``load_end_date+1``) are not
+        resolved in the body.
+
+        Returns:
+            Optional[Dict[str, Any]]: Resolved body, or None when ``body`` is not configured.
+
+        Raises:
+            ValueError: If ``body`` is not a mapping.
+        """
+        body = self.table_config.get("body")
+        if body is None:
+            return None
+        if not isinstance(body, dict):
+            raise ValueError("'body' must be a mapping of JSON field name to value")
+        return self._resolve_date_placeholders(body, load_start_date, load_end_date)
+
+    def _get_date_format(self) -> Optional[str]:
         table_date_format = self.table_config.get("date_format")
         if table_date_format == "":
             raise ValueError(
                 "date_format cannot be an empty string. "
                 "Use ISO-8601 format by omitting date_format or specify a valid strftime format."
             )
-
-        date_format = (
+        return (
             table_date_format
             if table_date_format
             else self.workflow_config.get("date_format")
             or self.workflow_config.get("date_format_mask")
         )
 
-        default_start_time = "T00:00:00.000Z"
-        default_end_time = "T23:59:59.999Z"
+    def _resolve_date_placeholders(
+        self, values: Dict[str, Any], load_start_date: str, load_end_date: str
+    ) -> Dict[str, Any]:
+        """
+        Replaces ``load_start_date`` / ``load_end_date`` values with formatted dates.
 
-        def format_date(date_str: str, time_suffix: str) -> str:
-            """
-            Formats a date string according to the configured date_format or ISO-8601 default.
-
-            Args:
-                date_str: Date string in YYYY-MM-DD format
-                time_suffix: Time suffix to append (for ISO-8601 format)
-
-            Returns:
-                Formatted date string according to date_format configuration
-            """
-            if date_format:
-                date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-                return date_obj.strftime(date_format)
+        A placeholder whose load date is empty is dropped from the result.
+        """
+        date_format = self._get_date_format()
+        placeholder_dates = {
+            "load_start_date": (load_start_date, START_OF_DAY_SUFFIX),
+            "load_end_date": (load_end_date, END_OF_DAY_SUFFIX),
+        }
+        resolved: Dict[str, Any] = {}
+        for key, value in values.items():
+            if isinstance(value, str) and value in DATE_PLACEHOLDERS:
+                load_date, time_suffix = placeholder_dates[value]
+                if load_date:
+                    resolved[key] = format_load_date(
+                        load_date, date_format, time_suffix
+                    )
             else:
-                return BaseAPIClient.format_iso_timestamp(date_str, time_suffix)
-
-        if table_params is not None:
-            for key, value in table_params.items():
-                if isinstance(value, str):
-                    if value == "load_start_date":
-                        if load_start_date:
-                            formatted_date = format_date(
-                                load_start_date, default_start_time
-                            )
-                            params[key] = formatted_date
-                    elif value == "load_end_date":
-                        if load_end_date:
-                            formatted_date = format_date(
-                                load_end_date, default_end_time
-                            )
-                            params[key] = formatted_date
-                    else:
-                        params[key] = value
-                else:
-                    params[key] = value
-            return params
-
-        if load_start_date:
-            formatted_date = format_date(load_start_date, default_start_time)
-            params["after_time"] = formatted_date
-
-        if load_end_date:
-            formatted_date = format_date(load_end_date, default_end_time)
-            params["before_time"] = formatted_date
-
-        return params
+                resolved[key] = value
+        return resolved
 
     def get_date_column_for_partitioning(self) -> Optional[str]:
         """

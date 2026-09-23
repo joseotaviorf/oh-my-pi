@@ -31,6 +31,19 @@ class PaginationStrategyEnum(Enum):
         return [member.value for member in cls]
 
 
+class HttpMethodEnum(Enum):
+    """
+    HTTP methods a table can use for its data requests in the API Ingestion workflow.
+    """
+
+    GET = "get"
+    POST = "post"
+
+    @classmethod
+    def get_available_enum_values(cls):
+        return [member.value for member in cls]
+
+
 class RateLimitingStrategyEnum(Enum):
     """
     Rate limiting strategies supported by the API Ingestion workflow.

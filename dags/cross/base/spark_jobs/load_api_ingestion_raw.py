@@ -18,10 +18,15 @@ from argparse import ArgumentParser, Namespace
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import date, timedelta
 from threading import Lock
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from pyspark.sql import SparkSession
 
+from bietlejuice.base.api.configuration.date_format import (
+    END_OF_DAY_SUFFIX,
+    START_OF_DAY_SUFFIX,
+    format_load_date,
+)
 from bietlejuice.base.api.configuration.declaration_loader import (
     load_api_ingestion_declaration,
     validate_api_ingestion_dag_name,
@@ -159,36 +164,34 @@ def _dates_last_n_days(anchor_iso: str, days: int) -> List[str]:
     return dates_out
 
 
-def _format_date_expansion_value(iso_date: str, date_format: Optional[str]) -> str:
+def _format_date_expansion_value(
+    iso_date: str, date_format: Optional[str]
+) -> Union[str, int]:
     """
     Formats an expanded calendar date the same way ``get_initial_params`` would.
 
     Args:
         iso_date: Date in ``YYYY-MM-DD``.
-        date_format: Optional strftime pattern from table/workflow ``date_format``.
-            When omitted, uses ISO-8601 with a start-of-day suffix (same default
-            family as ``APIConfigurationLoader.get_initial_params``).
+        date_format: Optional table/workflow ``date_format`` (strftime pattern or
+            ``epoch_millis``). When omitted, uses ISO-8601 with a start-of-day suffix
+            (same default family as ``APIConfigurationLoader.get_initial_params``).
 
     Returns:
-        Formatted date string for the query param.
+        Formatted date for the query param.
     """
-    if date_format:
-        return date.fromisoformat(iso_date).strftime(date_format)
-    return f"{iso_date}T00:00:00.000Z"
+    return format_load_date(iso_date, date_format, START_OF_DAY_SUFFIX)
 
 
 def _format_date_parameter_value(
     parameter_date: date,
     placeholder: str,
     date_format: Optional[str],
-) -> str:
+) -> Union[str, int]:
     """Formats an offset date using the same boundaries as the API loader."""
-    if date_format:
-        return parameter_date.strftime(date_format)
     time_suffix = (
-        "T00:00:00.000Z" if placeholder == "load_start_date" else "T23:59:59.999Z"
+        START_OF_DAY_SUFFIX if placeholder == "load_start_date" else END_OF_DAY_SUFFIX
     )
-    return f"{parameter_date.isoformat()}{time_suffix}"
+    return format_load_date(parameter_date.isoformat(), date_format, time_suffix)
 
 
 def _resolve_initial_params(
@@ -851,9 +854,10 @@ def _fetch_plain_once(
     table_name: str,
     endpoint: str,
     params: Dict[str, Any],
+    json_body: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     """One plain (non-id_expansion) fetch: paginated when configured, else single page."""
-    paginator = loader.create_paginator(client, endpoint, params)
+    paginator = loader.create_paginator(client, endpoint, params, json_body=json_body)
 
     results: List[Dict[str, Any]] = []
     if paginator:
@@ -879,7 +883,10 @@ def _fetch_plain_once(
         "m=_fetch_plain_once, table_name=%s msg=Fetching single page (no pagination)",
         table_name,
     )
-    response = client.get(endpoint, params=params)
+    if loader.get_http_method() == "post":
+        response = client.post(endpoint, params=params, json=json_body)
+    else:
+        response = client.get(endpoint, params=params)
     data = response.json() if hasattr(response, "json") else response
     if isinstance(data, dict):
         results_path = table_config.get("results_response_path", "results")
@@ -910,6 +917,7 @@ def _fetch_plain_with_availability_tolerance(
     fallback_params: Optional[Dict[str, Any]] = None,
     availability_patterns: Optional[List[str]] = None,
     date_value: Optional[str] = None,
+    json_body: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     """Fetches a plain endpoint with optional unavailable-date handling."""
     try:
@@ -920,6 +928,7 @@ def _fetch_plain_with_availability_tolerance(
             table_name=table_name,
             endpoint=endpoint,
             params=params,
+            json_body=json_body,
         )
     except Exception as exc:
         if not _availability_error_matches(exc, availability_patterns):
@@ -940,6 +949,7 @@ def _fetch_plain_with_availability_tolerance(
                     table_name=table_name,
                     endpoint=endpoint,
                     params=fallback_params,
+                    json_body=json_body,
                 )
             except Exception as fallback_exc:
                 if not _availability_error_matches(fallback_exc, availability_patterns):
@@ -1055,10 +1065,14 @@ def main() -> None:
             date_format=date_format,
             apply_offsets=False,
         )
+    request_body = loader.get_request_body(args.load_start_date, args.load_end_date)
     LOGGER.info(
-        "m=main, endpoint=%s, params=%s msg=API request configuration",
+        "m=main, endpoint=%s, http_method=%s, params=%s, body=%s "
+        "msg=API request configuration",
         endpoint,
+        loader.get_http_method(),
         initial_params,
+        request_body,
     )
 
     source_schema = workflow.get("custom_schema", dag_name)
@@ -1119,6 +1133,7 @@ def main() -> None:
                 fallback_params=fallback_call_params,
                 availability_patterns=availability_patterns,
                 date_value=date_value,
+                json_body=request_body,
             )
             all_results.extend(date_results)
             if date_value is not None:

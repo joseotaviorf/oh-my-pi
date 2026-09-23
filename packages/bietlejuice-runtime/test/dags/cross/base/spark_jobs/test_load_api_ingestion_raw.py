@@ -157,6 +157,9 @@ class TestDateExpansionHelpers:
             _format_date_expansion_value("2026-07-26", None)
             == "2026-07-26T00:00:00.000Z"
         )
+        assert _format_date_expansion_value("2026-09-21", "epoch_millis") == (
+            1789948800000
+        )
 
 
 class TestDateParameterOffsets:
@@ -826,7 +829,52 @@ class TestFetchPlainOnce:
 
         assert [row["id"] for row in rows] == [1, 2, 3]
         loader.create_paginator.assert_called_once_with(
-            client, "punches", {"from": "2026-08-07", "to": "2026-08-07"}
+            client,
+            "punches",
+            {"from": "2026-08-07", "to": "2026-08-07"},
+            json_body=None,
+        )
+        client.get.assert_not_called()
+
+    def test_paginated_fetch_passes_json_body_to_paginator(self):
+        loader = self._loader_with_pages([[{"id": 1}]])
+        client = MagicMock()
+        body = {"startDate": 1789948800000, "endDate": 1790035199999}
+
+        _fetch_plain_once(
+            client=client,
+            loader=loader,
+            table_config={},
+            table_name="daily_usage",
+            endpoint="teams/daily-usage-data",
+            params={},
+            json_body=body,
+        )
+
+        loader.create_paginator.assert_called_once_with(
+            client, "teams/daily-usage-data", {}, json_body=body
+        )
+
+    def test_single_page_post_sends_json_body(self):
+        loader = MagicMock()
+        loader.create_paginator.return_value = None
+        loader.get_http_method.return_value = "post"
+        client = MagicMock()
+        client.post.return_value.json.return_value = {"items": [{"id": 9}]}
+
+        rows = _fetch_plain_once(
+            client=client,
+            loader=loader,
+            table_config={"results_response_path": "items"},
+            table_name="events",
+            endpoint="events",
+            params={},
+            json_body={"startDate": 1789948800000},
+        )
+
+        assert rows == [{"id": 9}]
+        client.post.assert_called_once_with(
+            "events", params={}, json={"startDate": 1789948800000}
         )
         client.get.assert_not_called()
 

@@ -767,6 +767,114 @@ class TestDAGDeclarationValidatorIdExpansion:
         dag_declaration_validator.validate(dag_declaration=declaration)
 
 
+class TestDAGDeclarationValidatorHttpMethodAndBody:
+    """Test suite for http_method / body validation in api_ingestion workflow."""
+
+    @pytest.fixture
+    def dag_declaration_validator(self):
+        from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
+            DAGDeclarationValidator,
+        )
+
+        return DAGDeclarationValidator()
+
+    def _base_declaration(self, table_config, workflow_extras=None):
+        return {
+            "dag": {"name": "test_api_dag", "owner": "Data Engineering"},
+            "workflow": {
+                "type": "api_ingestion",
+                "layer": "raw",
+                "api_base_url": "https://api.example.com/",
+                "authentication": {"strategy": "none"},
+                "tables_customization": {"daily_usage": table_config},
+                **(workflow_extras or {}),
+            },
+        }
+
+    def test_post_with_body_and_page_per_page_passes(self, dag_declaration_validator):
+        declaration = self._base_declaration(
+            {
+                "endpoint_path": "teams/daily-usage-data",
+                "http_method": "post",
+                "date_format": "epoch_millis",
+                "body": {"startDate": "load_start_date", "endDate": "load_end_date"},
+                "api_policies": {
+                    "pagination": {
+                        "strategy": "page_per_page",
+                        "per_page_param": "pageSize",
+                        "total_pages_path": "pagination.totalPages",
+                    }
+                },
+            },
+            workflow_extras={
+                "api_policies": {
+                    "pagination": {
+                        "strategy": "page_per_page",
+                        "total_pages_path": "totalPages",
+                        "envelope_fields": ["subscriptionCycleStart"],
+                    }
+                }
+            },
+        )
+
+        dag_declaration_validator.validate(dag_declaration=declaration)
+
+    @pytest.mark.parametrize(
+        "table_config, workflow_extras, match",
+        [
+            (
+                {"endpoint_path": "x", "http_method": "put"},
+                None,
+                "'http_method'",
+            ),
+            (
+                {"endpoint_path": "x", "body": {"page": 1}},
+                None,
+                "requires http_method: post",
+            ),
+            (
+                {"endpoint_path": "x", "http_method": "post", "body": ["page"]},
+                None,
+                "non-empty mapping",
+            ),
+            (
+                {
+                    "endpoint_path": "x",
+                    "http_method": "post",
+                    "id_expansion": {
+                        "source_table": "employees",
+                        "id_field": "uuid",
+                        "param_name": "employeeUuid",
+                    },
+                },
+                None,
+                "not supported with id_expansion",
+            ),
+            (
+                {"endpoint_path": "x", "http_method": "post"},
+                {"api_policies": {"pagination": {"strategy": "cursor"}}},
+                "supports only page_per_page or none",
+            ),
+            (
+                {
+                    "endpoint_path": "x",
+                    "http_method": "post",
+                    "body": {"filters": [{"date": "load_end_date+1"}]},
+                },
+                None,
+                "date offsets in 'body'",
+            ),
+        ],
+    )
+    def test_invalid_http_method_or_body_raises(
+        self, dag_declaration_validator, table_config, workflow_extras, match
+    ):
+        declaration = self._base_declaration(table_config, workflow_extras)
+
+        with pytest.raises(AssertionError, match=match):
+            dag_declaration_validator.validate(dag_declaration=declaration)
+
+
 class TestDAGDeclarationValidatorQueryViewWorkflow:
     @pytest.fixture
     def dag_declaration_validator(self):
