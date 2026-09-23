@@ -1,0 +1,65 @@
+dag:
+  name: cursor_usage_api
+  owner: Tech Platform Enterprise Engineering
+  callback_by_task: False
+  catchup: false
+  schedule_interval: 0 6 * * *
+  schedule_start_date: "2026, 9, 23"
+  documentation:
+    dag_purpose: |
+      Ingests the Cursor Admin API member roster into
+      datalake_cursor_usage_raw and materializes daily historical member
+      snapshots in datalake_cursor_usage_clean. The members endpoint returns
+      the complete team roster, including removed seats, on every daily load.
+      Clean members are consumed by the AI-usage enrich and DW layers.
+
+workflow:
+  layer: raw
+  type: api_ingestion
+  custom_schema: cursor_usage
+  api_base_url: https://api.cursor.com
+  bucket_config_name: people_bucket
+  credentials_scope: quintoandar
+  has_hive_sync: true
+  default_extraction_type: incremental
+  default_raw_partitions:
+    - year
+    - month
+    - day
+  default_clean_extraction_type: incremental
+  default_clean_partitions:
+    - year
+    - month
+    - day
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+
+  authentication:
+    strategy: basic
+    secret_key: CURSOR_ADMIN_API_KEY
+    token_field: api_token
+
+  api_policies:
+    pagination:
+      strategy: none
+    rate_limiting:
+      strategy: fixed_delay
+      delay_seconds: 0.2
+
+  tables_customization:
+    members:
+      endpoint_path: teams/members
+      extraction_type: incremental
+      clean_extraction_type: incremental
+      params: {}
+      results_response_path: teamMembers
+      merge_on:
+        - id_user
+        - dt_snapshot
+      vacuum_retention_hours: 168
+      vacuum_lite: true

@@ -1,0 +1,6 @@
+cluster:
+  type: emr_7_12_consolidation_xs_general_single_node_cluster
+  custom_configurations:
+    autotermination_minutes: 180
+    aws_attributes:
+      instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'

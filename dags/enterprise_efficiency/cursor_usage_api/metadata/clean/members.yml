@@ -1,0 +1,60 @@
+database_name: datalake_cursor_usage_clean
+table_name: members
+owner: gabriel.berger@quintoandar.com.br
+domain: Enterprise Efficiency
+description: |
+  Cursor Admin API team roster snapshots for Enterprise Efficiency AI-usage reporting.
+  One row per id_user per dt_snapshot preserves the daily roster grain.
+  Covers all Cursor team seats returned by the endpoint, including seats marked as removed.
+  Daily incremental loads preserve historical membership snapshots for seat denominators
+  and member identity in the AI-usage enrich and DW layers.
+columns:
+  id_user:
+    description: Stable Cursor identifier for the team member or seat represented by the snapshot row.
+    lineage:
+      - datalake_cursor_usage_raw.members.payload
+
+  email_user:
+    description: Lowercase, trimmed work email associated with the member; empty vendor values are stored as NULL.
+    lineage:
+      - datalake_cursor_usage_raw.members.payload
+
+  name_user:
+    description: Display name returned by Cursor for the member or seat at the snapshot date.
+    lineage:
+      - datalake_cursor_usage_raw.members.payload
+
+  role:
+    description: Cursor team role assigned to the seat, such as member, owner, free-owner, or removed.
+    lineage:
+      - datalake_cursor_usage_raw.members.payload
+
+  is_removed:
+    description: Boolean flag indicating whether Cursor marks the seat as removed from the team.
+    lineage:
+      - datalake_cursor_usage_raw.members.payload
+
+  dt_snapshot:
+    description: UTC calendar date when the member roster snapshot was loaded.
+    lineage:
+      - datalake_cursor_usage_raw.members.ts_load
+
+  ts_load:
+    description: Timestamp when the API ingestion job wrote the member roster row to the raw layer.
+    lineage:
+      - datalake_cursor_usage_raw.members.ts_load
+
+  year:
+    description: Year partition derived from the raw ingestion load timestamp.
+    lineage:
+      - datalake_cursor_usage_raw.members.year
+
+  month:
+    description: Month partition derived from the raw ingestion load timestamp.
+    lineage:
+      - datalake_cursor_usage_raw.members.month
+
+  day:
+    description: Day partition derived from the raw ingestion load timestamp.
+    lineage:
+      - datalake_cursor_usage_raw.members.day
