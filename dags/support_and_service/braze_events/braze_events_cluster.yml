@@ -1,9 +1,18 @@
 cluster:
-  type: emr_7_12_consolidation_s_memory_single_node_fleet_cluster
+  # owners, tenants and indica_ai load in parallel. The single-node preset
+  # keeps maxExecutors at 1, so the second step stays YARN ACCEPTED and never
+  # gets a container. Three on-demand core nodes let each load take an executor.
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-validation:
-  cluster:
-    type: emr_7_12_consolidation_m_memory_single_node_fleet_cluster
-  allow_custom_spark_job: true
+    step_concurrency_level: 3
+    core_nodes:
+      target_on_demand: 3
+      target_spot: 0
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+    spark_conf:
+      spark.dynamicAllocation.maxExecutors: "2"
