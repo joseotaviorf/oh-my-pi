@@ -30,7 +30,7 @@ WITH cs_supply_resolved AS (
     AND cf.id_company_supply IS NULL
 )
 SELECT
-  id_offer AS sk_offer,
+  cf.id_offer AS sk_offer,
   id_buyer AS sk_buyer,
   id_owner AS sk_owner,
   id_house AS sk_house,
@@ -119,7 +119,7 @@ SELECT
   days_house_registry_ended_to_sale_transaction_paid,
   --
   cf.ts_updated,
-  ts_load AS ts_monday_load,
+  cf.ts_load AS ts_monday_load,
   NOW() AS ts_load
 FROM
     datalake_sale_closing_flows.closing_flow AS cf
