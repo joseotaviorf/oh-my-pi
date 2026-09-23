@@ -21,4 +21,7 @@ workflow:
       clean_table_name: chat_user
     chatusergroup:
       clean_table_name: chat_user_group
+    message: {}
+    stream_cx_escalations:
+      source_schema: chat_manager_service
 

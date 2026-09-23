@@ -1,0 +1,46 @@
+database_name: datalake_chatmanager_clean
+table_name: stream_cx_escalations
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "One row per Support Session Service handoff attempt from an agentic chat-manager stream. Links stream_id to support_session_id and tracks escalation lifecycle status (REQUESTED, READY, ENDED, FAILED) for CX human escalation analysis."
+columns:
+  id:
+    description: "Primary key UUID of the CX escalation handoff record in chat-manager."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.id
+  id_stream:
+    description: "UUID of the agentic stream that requested escalation to a human analyst."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.stream_id
+  id_support_session:
+    description: "UUID of the Support Session Service session created for this escalation, when available."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.support_session_id
+  escalation_data:
+    description: "JSON handoff context sent to Support Session Service, including department, client app, history summary, and optional escalation reason."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.escalation_data
+  status:
+    description: "Lifecycle status of the escalation attempt (REQUESTED, READY, ENDED, or FAILED)."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.status
+  ts_created:
+    description: "Timestamp when the escalation row was first created in chat-manager."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.created_at
+  ts_ready:
+    description: "Timestamp when the support session became ready for the escalation, if received."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.ready_at
+  ts_ended:
+    description: "Timestamp when the escalated support session ended, if received."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.ended_at
+  ts_failed:
+    description: "Timestamp when the escalation failed, if a failure event was received."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.failed_at
+  ts_updated:
+    description: "Timestamp of the most recent update to the escalation record."
+    lineage:
+      - datalake_chatmanager_raw.stream_cx_escalations.updated_at

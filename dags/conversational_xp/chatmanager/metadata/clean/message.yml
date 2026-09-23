@@ -1,0 +1,38 @@
+database_name: datalake_chatmanager_clean
+table_name: message
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "One row per transactional outbox message emitted by the chat-manager service. Captures destination, headers, payload, and publish status for async event delivery from chat-manager into Kafka."
+columns:
+  id:
+    description: "Outbox message identifier used as the primary key for the transactional message record."
+    lineage:
+      - datalake_chatmanager_raw.message.id
+  id_incremental:
+    description: "Monotonic sequence assigned when the outbox message row is inserted."
+    lineage:
+      - datalake_chatmanager_raw.message.incremental_id
+  destination:
+    description: "Kafka topic or downstream queue where the outbox message is dispatched after processing."
+    lineage:
+      - datalake_chatmanager_raw.message.destination
+  headers:
+    description: "Serialized headers attached to the outbox message before publish."
+    lineage:
+      - datalake_chatmanager_raw.message.headers
+  payload:
+    description: "Serialized body of the outbox message that is published downstream."
+    lineage:
+      - datalake_chatmanager_raw.message.payload
+  published:
+    description: "Publish status flag of the outbox message as stored in chat-manager."
+    lineage:
+      - datalake_chatmanager_raw.message.published
+  message_partition:
+    description: "Partition assigned to the outbox message when publishing to the destination topic."
+    lineage:
+      - datalake_chatmanager_raw.message.message_partition
+  ts_created:
+    description: "Timestamp when the outbox message was created, converted from epoch milliseconds."
+    lineage:
+      - datalake_chatmanager_raw.message.creation_time
