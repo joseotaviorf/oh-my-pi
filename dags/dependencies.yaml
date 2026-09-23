@@ -2073,6 +2073,10 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.person:load-clean-credential-reference:first-run-of-day
   - bietlejuice.request_logging:load-clean-visits:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
+bietlejuice.enrich_concierge_hls_facts:
+  - bietlejuice.house_listing_search:load-clean-search-profile-filters:first-run-of-day
+  - bietlejuice.house_listing_search:load-clean-search-profile:first-run-of-day
+  - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
 bietlejuice.enrich_concierge_lpv_ads:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day

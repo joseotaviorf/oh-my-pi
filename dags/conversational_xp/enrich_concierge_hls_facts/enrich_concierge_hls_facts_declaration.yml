@@ -1,0 +1,28 @@
+dag:
+  name: enrich_concierge_hls_facts
+  schedule_start_date: 2026, 8, 21
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Daily HLS search-cluster snapshot plus concierge WhatsApp send history for targeting and cooldown. Trigger history reads Jaiminho until house_listing_search CDCs concierge_trigger.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: search
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    days_lookback_3: 3
+    days_lookback_7: 7
+    days_lookback_28: 28
+    days_lookback_60: 60
+  tables_customization:
+    concierge_hls_user_daily:
+      merge_on: [id_user, year, month, day]
+      when_not_matched_by_source_delete_condition: |
+        target.year = YEAR(CURRENT_DATE())
+        AND target.month = MONTH(CURRENT_DATE())
+        AND target.day = DAY(CURRENT_DATE())
+      partitions: [year, month, day]
+      z_order_by: [id_user]

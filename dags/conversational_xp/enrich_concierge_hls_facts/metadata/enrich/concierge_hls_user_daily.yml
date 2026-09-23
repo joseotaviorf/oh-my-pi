@@ -1,0 +1,97 @@
+---
+database_name: datalake_search
+table_name: concierge_hls_user_daily
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Daily HLS search-cluster snapshot plus concierge WhatsApp send history for targeting and cooldown. Trigger history reads Jaiminho until house_listing_search CDCs concierge_trigger.
+columns:
+  id_user:
+    description: "User join key from the HLS USER search profile or Jaiminho notification recipient."
+    lineage:
+      - datalake_house_listing_search_clean.search_profile.id_profile_holder
+      - datalake_jaiminho_clean.user_notifications.id_user
+  cluster_events_count:
+    description: "Event count on the winning search-profile filter row."
+    lineage:
+      - datalake_house_listing_search_clean.search_profile_filters.events_count
+  cost_type:
+    description: "Rent versus sale cost type for the winning search cluster, always RENT or SALE. Taken from the filters JSON costType (RENT_PRICE and SALE_PRICE are normalized to RENT and SALE) and falling back to the profile business context when the JSON carries no recognized cost type."
+    lineage:
+      - datalake_house_listing_search_clean.search_profile_filters.filters_json
+      - datalake_house_listing_search_clean.search_profile.business_context
+  cluster_city:
+    description: "City extracted from the latest search-profile filters JSON."
+    lineage:
+      - datalake_house_listing_search_clean.search_profile_filters.filters_json
+  cluster_neighborhoods:
+    description: "Neighborhoods extracted from the latest search-profile filters JSON."
+    lineage:
+      - datalake_house_listing_search_clean.search_profile_filters.filters_json
+  cluster_max_price:
+    description: "Maximum price extracted from the latest search-profile filters JSON."
+    lineage:
+      - datalake_house_listing_search_clean.search_profile_filters.filters_json
+  cluster_bedrooms:
+    description: "Minimum bedrooms extracted from the latest search-profile filters JSON."
+    lineage:
+      - datalake_house_listing_search_clean.search_profile_filters.filters_json
+  ts_profile_updated:
+    description: "Timestamp when the winning search-profile filter row was last updated."
+    lineage:
+      - datalake_house_listing_search_clean.search_profile_filters.ts_updated
+  qty_low_7d:
+    description: "Low-intent concierge WhatsApp sends in the last 7 days."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  qty_med_7d:
+    description: "Medium-intent concierge WhatsApp sends in the last 7 days."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  qty_high_7d:
+    description: "High-intent concierge WhatsApp sends in the last 7 days."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  qty_low_lifetime:
+    description: "Lifetime low-intent concierge WhatsApp sends."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  qty_med_lifetime:
+    description: "Lifetime medium-intent concierge WhatsApp sends."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  qty_high_lifetime:
+    description: "Lifetime high-intent concierge WhatsApp sends."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  ts_last_low:
+    description: "Timestamp of the most recent low-intent concierge send."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.ts_sent
+  ts_last_med:
+    description: "Timestamp of the most recent medium-intent concierge send."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.ts_sent
+  ts_last_high:
+    description: "Timestamp of the most recent high-intent concierge send."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.ts_sent
+  last_template_family:
+    description: "Intent family of the most recent low, medium, or high concierge send."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  ts_last_shared_lpv_ads:
+    description: "Timestamp of the latest ConciergeSharedLpvAdsTrigger or placas reproc template."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.ts_sent
+      - datalake_jaiminho_clean.user_notifications.template
+  is_whatsapp_blocked:
+    description: "Whether WhatsApp delivery error code 21002, 21004, or 21007 was recorded for the user in the last 180 days, meaning the number cannot receive concierge messages. Read from error_code on failed notifications, matching the blocked-user logic in concierge_users."
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.error_code
+  year:
+    description: "Snapshot year partition."
+  month:
+    description: "Snapshot month partition."
+  day:
+    description: "Snapshot day partition."
