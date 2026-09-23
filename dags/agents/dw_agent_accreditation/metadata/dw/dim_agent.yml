@@ -58,10 +58,6 @@ columns:
     description: Photographer data identifier from the user record when applicable.
     lineage:
       - datalake_ebdb_agent_events.agent_unified_identity.id_photographer_data
-  sk_company:
-    description: Company surrogate key resolved from agent company UUID via company_sks.
-    lineage:
-      - datalake_ebdb_agent_events.agent_unified_identity.sk_company
   uuid_agent:
     description: Business UUID of the agent in the source system.
     lineage:

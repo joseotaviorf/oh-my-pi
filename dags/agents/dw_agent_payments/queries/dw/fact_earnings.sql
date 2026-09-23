@@ -9,7 +9,6 @@ SELECT
     e.id_tier AS sk_tier,
     e.id_partner_tier AS sk_partner_tier,
     person.sk_person AS sk_person,
-    company.sk_company AS sk_company,
     cart.id AS sk_cart,
     COALESCE(cb.sk_broker, -1) AS sk_broker,
     e.incentive_system,
@@ -51,9 +50,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_person.person_sks AS invalidation_author
         ON e.id_invalidation_author = invalidation_author.uuid_person
-LEFT JOIN
-    datalake_company.company_sks AS company
-        ON e.uuid_company = company.uuid_company
 LEFT JOIN
     datalake_cart_system_clean.cart AS cart
         ON e.uuid_cart = cart.uuid_cart

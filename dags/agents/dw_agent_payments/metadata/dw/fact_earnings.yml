@@ -51,11 +51,6 @@ columns:
       - datalake_person.person_sks.sk_person
       - datalake_big_agent.earnings.uuid_person
     description: Surrogate key of the partner person, resolved from the Person data model when the external partner type is PERSON.
-  sk_company:
-    lineage:
-      - datalake_company.company_sks.sk_company
-      - datalake_big_agent.earnings.uuid_company
-    description: Surrogate key of the partner company, resolved from the Company data model when the external partner type is COMPANY.
   sk_cart:
     lineage:
       - datalake_cart_system_clean.cart.id

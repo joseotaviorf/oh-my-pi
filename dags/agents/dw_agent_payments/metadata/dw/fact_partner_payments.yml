@@ -52,11 +52,6 @@ columns:
       - datalake_person.person_sks.sk_person
       - datalake_agent_payments.partner_payments.uuid_person
     description: Surrogate key of the person receiver, resolved from the Person data model.
-  sk_company:
-    lineage:
-      - datalake_company.company_sks.sk_company
-      - datalake_agent_payments.partner_payments.uuid_company
-    description: Surrogate key of the company receiver, resolved from the Company data model.
   sk_broker:
     lineage:
       - core_brokers.brokers.sk_broker

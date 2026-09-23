@@ -249,7 +249,6 @@ SELECT
     p.id_partner,
     p.id_partner_agent,
     b.sk_broker,
-    c.sk_company,
     p.id_prospect_agent,
     p.id_affiliate,
     p.id_photographer_data,
@@ -299,9 +298,6 @@ SELECT
     DAY(p.ts_created) AS day
 FROM
     unified_identity AS p
-LEFT JOIN
-    datalake_company.company_sks AS c
-        ON p.uuid_company = c.uuid_company
 LEFT JOIN
     core_brokers.brokers AS b
         ON b.uuid_company = p.uuid_company

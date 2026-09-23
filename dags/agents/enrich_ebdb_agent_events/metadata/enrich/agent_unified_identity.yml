@@ -8,7 +8,7 @@ description: |
   partner records. One row per person-agent-partner bridge with at least one agent identifier
   (id_agent, id_agent_data, or id_partner). Full reload each run from upstream agent, agent_data,
   and partner sources so downstream supply joins resolve identities outside the incremental window.
-  Consolidates natural and surrogate keys (id_unified_agent, sk_person, sk_broker, sk_company),
+  Consolidates natural and surrogate keys (id_unified_agent, sk_person, sk_broker),
   prospect/affiliate context, 1P/3P partnership flags, and 3P broker profile flags. Built from
   a UNION of Agent Domain rows LEFT JOINed to person_sks (so agents without a person registry
   match are retained) and standalone legacy/partner rows without an Agent Domain agent.
@@ -57,10 +57,6 @@ columns:
     lineage:
       - core_brokers.brokers.sk_broker
     description: Broker surrogate key resolved from uuid_company via core_brokers.brokers.
-  sk_company:
-    lineage:
-      - datalake_company.company_sks.sk_company
-    description: Company surrogate key resolved from agent, agent_data, or partner company UUID via company_sks.
   id_prospect_agent:
     lineage:
       - datalake_ebdb_clean.prospect_agent.id

@@ -16,10 +16,6 @@ columns:
     lineage:
     - datalake_ebdb_user.user.id
     description: Foreign key to user table. Returns -1 when no user is associated.
-  sk_company:
-    lineage:
-    - datalake_company.company_sks.sk_company
-    description: Foreign key to company dimension. Returns -1 when no company is associated.
   sk_broker:
     lineage:
     - core_brokers.brokers.sk_broker

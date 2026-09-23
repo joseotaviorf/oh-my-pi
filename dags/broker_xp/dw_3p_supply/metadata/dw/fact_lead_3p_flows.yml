@@ -38,10 +38,6 @@ columns:
     lineage:
       - core_brokers.brokers.sk_broker
     description: Surrogate key of the broker; -1 when not linked.
-  sk_company:
-    lineage:
-      - datalake_company.company_sks.sk_company
-    description: Surrogate key of the company; -1 when not linked.
   id_by_real_estate:
     lineage:
       - datalake_3p_supply.lead_3p.id_by_real_estate

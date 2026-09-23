@@ -51,7 +51,6 @@ SELECT
     a.id_affiliate AS sk_affiliate,
     a.uuid_person,
     a.id_photographer_data AS sk_photographer_data,
-    a.sk_company,
     a.uuid_agent,
     a.creci,
     a.creci_uf,

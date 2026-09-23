@@ -1,5 +1,15 @@
 # 3P Supply
 
+## Ownership
+
+**Data Owner:**
+- vitor.musachio@quintoandar.com.br
+
+**Data Steward:**
+- vitor.musachio@quintoandar.com.br
+
+---
+
 ## Overview
 
 3P Supply is the third-party (rede) sub-funnel of QuintoAndar's supply chain — properties brought into the platform by partner real-estate brokers via the **BSP (Broker Supply Platform)**. It tracks each partner-submitted lead from initial ingestion in the BSP, through business validation and availability checks, all the way to the first listing publication on the main system. The model is the source of truth for L2FL on the rede channel and for identifying actionable supply opportunities.
@@ -289,7 +299,7 @@ WITH classified AS (
     SELECT
         sk_lead_3p_flow,
         lead_hash,
-        sk_company,
+        sk_broker,
         business_context,
         ts_business_context_created,
         ts_first_listing,
@@ -307,7 +317,7 @@ attributed AS (
         is_valid_lead,
         ts_first_listing,
         LAST_VALUE(CASE WHEN is_valid_lead THEN sk_lead_3p_flow END) IGNORE NULLS OVER (
-            PARTITION BY lead_hash, sk_company, business_context
+            PARTITION BY lead_hash, sk_broker, business_context
             ORDER BY ts_business_context_created
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) AS sk_attributed_valid

@@ -7,7 +7,6 @@ SELECT
   COALESCE(lsc.sk_house_duplicated, -1) AS sk_house_duplicated,
   COALESCE(ps.sk_person, -1) AS sk_person_owner_agent,
   COALESCE(cb.sk_broker, -1) AS sk_broker,
-  COALESCE(cs.sk_company, -1) AS sk_company,
   l.id_by_real_estate,
   l.lead_hash,
   lsc.business_context,
@@ -61,9 +60,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_3p_supply.broker_lead_relationship AS blr
   ON lsc.sk_lead_3p_flow = blr.sk_lead_3p_flow
-LEFT JOIN
-  datalake_company.company_sks AS cs
-  ON l.uuid_company = cs.uuid_company
 LEFT JOIN
   datalake_person.person_sks AS ps
   ON l.owner_agent_person_uuid = ps.uuid_person

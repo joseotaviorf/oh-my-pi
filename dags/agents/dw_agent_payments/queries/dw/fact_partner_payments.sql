@@ -18,7 +18,6 @@ SELECT
     ae.id_tier AS sk_tier,
     ae.id_user AS sk_user,
     person.sk_person,
-    company.sk_company,
     COALESCE(cb.sk_broker, -1) AS sk_broker,
     ae.incentive_system,
     ae.business_context,
@@ -52,9 +51,6 @@ FROM
 LEFT JOIN
     datalake_person.person_sks AS person
         ON ae.uuid_person = person.uuid_person
-LEFT JOIN
-    datalake_company.company_sks AS company
-        ON ae.uuid_company = company.uuid_company
 LEFT JOIN
     core_brokers.brokers AS cb
         ON ae.uuid_company = cb.uuid_company

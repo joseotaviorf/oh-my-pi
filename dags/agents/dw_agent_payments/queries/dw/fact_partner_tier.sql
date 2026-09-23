@@ -3,7 +3,6 @@ SELECT
     pt.id_new_partner_tier AS sk_new_partner_tier,
     pt.id_tier AS sk_tier,
     person.sk_person AS sk_person,
-    company.sk_company AS sk_company,
     overwritten_by.sk_person AS sk_overwritten_by,
     COALESCE(cb.sk_broker, -1) AS sk_broker,
     pt.incentive_system,
@@ -29,9 +28,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_person.person_sks AS overwritten_by
         ON pt.uuid_overwritten_by = overwritten_by.uuid_person
-LEFT JOIN
-    datalake_company.company_sks AS company
-        ON pt.uuid_company = company.uuid_company
 LEFT JOIN
     core_brokers.brokers AS cb
         ON pt.uuid_company = cb.uuid_company

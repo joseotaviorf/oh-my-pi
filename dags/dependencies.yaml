@@ -75,7 +75,6 @@ bietlejuice.dw_3p_supply:
   - bietlejuice.enrich_3p_supply:load-enrich-lead-3p-status-changes:first-run-of-day
   - bietlejuice.enrich_3p_supply:load-enrich-lead-3p:first-run-of-day
   - bietlejuice.enrich_3p_supply:load-enrich-listing-draft-status:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
   - bietlejuice.kodak:load-clean-image-inspection-group:first-run-of-day
   - bietlejuice.kodak:load-clean-image-inspection:first-run-of-day
@@ -138,7 +137,6 @@ bietlejuice.dw_agent_payments:
   - bietlejuice.enrich_big_agent_incentives:load-enrich-earnings:first-run-of-day
   - bietlejuice.enrich_big_agent_incentives:load-enrich-partner-tier:first-run-of-day
   - bietlejuice.enrich_big_agent_incentives:load-enrich-tier-rule:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
   - bietlejuice.gsheets_for_sale:done-clean-closed-deals:first-run-of-day
 bietlejuice.dw_agent_visit_funnel:
@@ -2534,7 +2532,6 @@ bietlejuice.enrich_ebdb_agent_events:
   - bietlejuice.ebdb_photo_job:load-clean-photographer-data:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
   - bietlejuice.person:load-clean-identity-document:first-run-of-day
 bietlejuice.enrich_ebdb_agents_contracts:
