@@ -27,9 +27,6 @@ from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
-# Small targeted pull so DEI open cards stay current even when updated-only
-# incremental misses a status transition (see DEI-26671).
-DEI_OPEN_JQL = "project = DEI AND statusCategory != Done"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -39,22 +36,10 @@ def get_dbutils():
     return BaseDBUtils().get_dbutils()
 
 
-def _issue_updated(issue: dict) -> str:
-    fields = issue.get("fields") or {}
-    return str(fields.get("updated") or "")
-
-
-def _merge_issues_by_latest_updated(*issue_lists) -> list:
-    merged: dict[str, dict] = {}
-    for issues in issue_lists:
-        for issue in issues or []:
-            key = issue.get("key")
-            if not key:
-                continue
-            current = merged.get(key)
-            if current is None or _issue_updated(issue) >= _issue_updated(current):
-                merged[key] = issue
-    return list(merged.values())
+def build_updated_jql(load_start_date: str, load_end_date: str) -> str:
+    return (
+        f'updated >= "{load_start_date} 00:00" and updated <= "{load_end_date} 23:59"'
+    )
 
 
 if __name__ == "__main__":
@@ -83,7 +68,6 @@ if __name__ == "__main__":
 
     endpoint_enum = endpoint_params.get("endpoint_enum")
 
-    dt_start_execution = datetime.strptime(load_start_date, "%Y-%m-%d").date()
     dt_end_execution = datetime.strptime(load_end_date, "%Y-%m-%d").date()
 
     logger.info(
@@ -104,7 +88,7 @@ if __name__ == "__main__":
     )
     credentials = json.loads(json_credentials)
 
-    jql_query_filter = f'updated >= "{dt_start_execution} 00:00" and updated <= "{dt_end_execution} 23:59"'
+    jql_query_filter = build_updated_jql(load_start_date, load_end_date)
 
     params = {
         "jql": jql_query_filter,
@@ -119,20 +103,12 @@ if __name__ == "__main__":
     )
 
     consumer_instance = JiraJQLConsumer(jira_client)
-    api_daily = consumer_instance.sync(endpoint_enum=endpoint_enum, params=params) or []
-
-    dei_params = {
-        "jql": DEI_OPEN_JQL,
-        "fields": "*all",
-        "expand": "changelog",
-    }
-    api_dei_open = (
-        consumer_instance.sync(endpoint_enum=endpoint_enum, params=dei_params) or []
+    api_response = (
+        consumer_instance.sync(endpoint_enum=endpoint_enum, params=params) or []
     )
-    api_response = _merge_issues_by_latest_updated(api_daily, api_dei_open)
     logger.info(
-        f"m={JOB_NAME}, daily_issues={len(api_daily)}, dei_open_issues={len(api_dei_open)}, "
-        f"merged_issues={len(api_response)}, msg=merged incremental and DEI open pulls"
+        f"m={JOB_NAME}, updated_window_issues={len(api_response)}, "
+        "msg=loaded all issues updated in the execution window"
     )
 
     if not api_response:
