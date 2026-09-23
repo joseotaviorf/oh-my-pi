@@ -3307,6 +3307,9 @@ bietlejuice.enrich_monopoly:
   - bietlejuice.monopoly:load-clean-outcome-reference:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-transaction:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale:first-run-of-day
+bietlejuice.enrich_mora:
+  - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+  - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
 bietlejuice.enrich_nexxera:
   - bietlejuice.nexxera:load-clean-adjustments:first-run-of-day
   - bietlejuice.nexxera:load-clean-cnab-charges-341:first-run-of-day

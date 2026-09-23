@@ -1,0 +1,24 @@
+cluster:
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  custom_configurations:
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
+    task_nodes:
+      instance_types:
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
+      target_on_demand: 0
+      target_spot: 1
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    spark_conf:
+      spark.metrics.namespace: data_products.conversational_xp
+      spark.executor.cores: '2'
+      spark.sql.shuffle.partitions: '400'
+      spark.dynamicAllocation.maxExecutors: '3'

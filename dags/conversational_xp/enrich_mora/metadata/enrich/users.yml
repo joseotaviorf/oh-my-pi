@@ -1,0 +1,27 @@
+---
+database_name: datalake_mora
+table_name: users
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Active QuintoAndar app users with their Mora availability flag, used to track
+  the Mora rollout. Grain is one row per id_user and is_mora_enabled_on_app value,
+  built from app open, home, login and search page view Amplitude events of the
+  last 30 days. A user appears twice when the flag changed within the window.
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: QuintoAndar user identifier reported by Amplitude on the app events.
+  uuid_person:
+    lineage:
+      - datalake_person.person_sks.uuid_person
+    description: Person UUID linked to the user through the person identity table. NULL when the user has no main credential linked to a person.
+  is_mora_enabled_on_app:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Value of the isMoraEnabledOnApp Amplitude user property. NULL when the property is absent or not a boolean, which happens on app versions that predate the flag.
+  ts_last_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp of the most recent app event where the user was seen with this flag value.

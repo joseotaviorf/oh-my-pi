@@ -1,0 +1,21 @@
+dag:
+  name: enrich_mora
+  schedule_start_date: 2026, 9, 23
+  schedule_interval: 0 6 * * *
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Tracks the Mora rollout on the QuintoAndar app. Materializes active app
+      users with the isMoraEnabledOnApp Amplitude user property and the last
+      time each user was seen with each flag value.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+  default_partitions: []
+  extra_query_template_params:
+    days_lookback: 30
+  tables_customization:
+    users:
+      z_order_by: [id_user]
