@@ -186,8 +186,8 @@ maintenance_parsed AS (
         manutencao.dt_previsaoentrega_man,
         CAST(manutencao.fl_situacao_man AS STRING) AS fl_situacao_man,
         CAST(manutencao.fl_solicitante_man AS STRING) AS fl_solicitante_man,
-        manutencao.ts_criacao_man,
-        manutencao.ts_atualizacao_man,
+        manutencao.dt_criacao_man,
+        manutencao.dt_atualizacao_man,
         TRIM(REGEXP_REPLACE(
             TRIM(COALESCE(manutencao.st_descricao_man, '')), '(?i)^checklist\\s*-\\s*', ''
         )) AS descricao_norm
@@ -238,8 +238,8 @@ maintenance_row AS (
         titled.st_titulo_tic,
         '' AS st_nome_usu,
         titled.fl_situacao_man AS fl_status_tic,
-        titled.ts_criacao_man AS dt_inicioticket_tic,
-        titled.ts_atualizacao_man AS dt_encerrado_tic,
+        titled.dt_criacao_man AS dt_inicioticket_tic,
+        titled.dt_atualizacao_man AS dt_encerrado_tic,
         '' AS id_cliente_tic,
         '' AS fl_interno_tic,
         TRIM(COALESCE(SPLIT(titled.st_titulo_tic, ' :: ')[0], '')) AS name_checklist,
@@ -258,7 +258,7 @@ maintenance_row AS (
                         WHEN titled.codigo_from_contract <> '' THEN titled.codigo_from_contract
                         ELSE TRIM(COALESCE(SPLIT(titled.st_titulo_tic, ' :: ')[2], ''))
                     END
-                ORDER BY titled.ts_criacao_man ASC NULLS LAST, titled.id
+                ORDER BY titled.dt_criacao_man ASC NULLS LAST, titled.id
             ) AS INT
         ) AS count_checklist_cs,
         titled.st_categoria,

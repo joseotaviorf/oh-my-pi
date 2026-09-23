@@ -59,9 +59,9 @@ checklist_line AS (
         CASE
             WHEN checklist_item.fl_status_cch = 1
                 THEN COALESCE(
-                    checklist_item.ts_ultimanotificacao_cch,
-                    checklist_item.ts_envioapp_cch,
-                    checklist_item.ts_entregalimite_cch
+                    checklist_item.dt_ultimanotificacao_cch,
+                    checklist_item.dt_envioapp_cch,
+                    checklist_item.dt_entregalimite_cch
                 )
         END AS ts_sub_item_done,
         TRIM(REGEXP_REPLACE(
@@ -249,11 +249,11 @@ historico_row AS (
         TRIM(COALESCE(historico.id_historico_mhis, '')) AS id_historico_mhis,
         COALESCE(historico.st_descricao_mhis, '') AS sub_item,
         COALESCE(historico.st_email_usu, '') AS email_an_tkt,
-        historico.ts_data_mhis,
+        historico.dt_data_mhis,
         CAST(
             ROW_NUMBER() OVER (
                 PARTITION BY TRIM(COALESCE(historico.id_manutencao_man, ''))
-                ORDER BY historico.ts_data_mhis ASC NULLS LAST, historico.id
+                ORDER BY historico.dt_data_mhis ASC NULLS LAST, historico.id
             ) AS INT
         ) AS count_checklist_cs
     FROM
@@ -292,8 +292,8 @@ maintenance_side AS (
         END AS person_type,
         historico_row.sub_item,
         '1' AS sub_item_done,
-        historico_row.ts_data_mhis AS dt_sub_item_done,
-        TO_DATE(manutencao.ts_criacao_man) AS dt_checklist_created,
+        historico_row.dt_data_mhis AS dt_sub_item_done,
+        TO_DATE(manutencao.dt_criacao_man) AS dt_checklist_created,
         'manutencao' AS tipo_tkt,
         CASE
             WHEN historico_row.id_manutencao_man <> ''
@@ -303,8 +303,8 @@ maintenance_side AS (
         historico_row.id_manutencao_man AS id_origem_tkt,
         '' AS id_ticket_tic,
         historico_row.email_an_tkt,
-        manutencao.ts_criacao_man AS dt_ini_tkt,
-        manutencao.ts_atualizacao_man AS dt_fin_tkt,
+        manutencao.dt_criacao_man AS dt_ini_tkt,
+        manutencao.dt_atualizacao_man AS dt_fin_tkt,
         CAST(NULL AS TIMESTAMP) AS dt_user_tkt,
         historico_row.id_historico_mhis
     FROM
