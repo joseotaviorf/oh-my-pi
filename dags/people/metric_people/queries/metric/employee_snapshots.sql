@@ -311,7 +311,7 @@ SELECT
         ELSE FLOOR(MONTHS_BETWEEN(fas.dt_reference, fc.dt_valid_from))
     END AS months_since_last_raise,
     fc.amount_salary,
-    fc.range_position,
+    fc.salary_midpoint_ratio,
     job.salary_range_mid,
     COALESCE(job.target_plr, job.target_plr_salary_multiplier * fc.amount_salary) AS target_variable_pay,
     fc.amount_adjustment AS last_raise_amount,

@@ -52,8 +52,7 @@ SELECT
     cv.adjustment_amount AS amount_adjustment,
     cv.adjustment_percent AS pct_adjustment,
     -- Metrics - Salary positioning
-    cv.range_position,
-    cv.range_percentile,
+    cv.salary_midpoint_ratio,
     -- Metrics - Flags
     cv.is_salary_approved,
     CASE

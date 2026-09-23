@@ -24,7 +24,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 ## In Scope
 
-**✅ Salary history** : Approved salary records over time, with the adjustment amount, percentage variation, and where each salary sits inside the corresponding job's pay range (range position and range percentile).
+**✅ Salary history** : Approved salary records over time, with the adjustment amount, percentage variation, and each salary's ratio to the effective salary-table midpoint.
 
 **✅ Job versions** : Every meaningful change to a job (band, salary table, salary range, PLR target) opens a new version; identical consecutive versions are merged so the timeline stays clean.
 
@@ -82,7 +82,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 ### Domain logic and core concepts
 
 * **Salary history with job context** : `fact_compensations` carries one row per approved salary per assignment per job version. A new row opens whenever the salary changes **or** the underlying job version changes, even if the salary itself stayed the same: this keeps the link to the correct band, salary table, and PLR target across time.
-* **Range position (compa-ratio)** : `range_position` is the ratio of the salary to the midpoint of the pay range. A value around 1.0 means the salary is market-aligned; values below 1.0 are below midpoint and above 1.0 are above midpoint. It is the primary metric used in compensation reviews.
+* **Salary midpoint ratio** : `salary_midpoint_ratio` is the salary amount divided by the midpoint of the effective salary table for the compensation record. A value of 1.000 means the salary equals the midpoint; values below 1.000 are below midpoint and values above 1.000 are above midpoint. The value is NULL when the salary or midpoint is missing, or when the midpoint is not positive.
 * **Total cash** : `amount_total_cash` combines the annual salary with the PLR target read from person-level ICP entries in PIN. People with no PLR ICP entry have `NULL` PLR and `amount_total_cash` equals their annual salary.
 * **PLR target sources** : PLR targets come from person-level ICP entries (`PLR - Salary Multiple` or legacy `Annual Target - PLR(*)`): never from `dim_job` as a fallback. `dim_job` keeps the salary-table-level target for reference and for the salary table targets snapshot.
 * **PLR monthly engine** : `fact_plr_monthly` materializes the building blocks of the annual PLR (eligibility flags, IPA, corporate goals percentage, monthly target) on a monthly grain per assignment. The final monthly amount is `eligibility × IPA × corporate_goals × target`.
@@ -101,7 +101,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 ## Attention and Limitations
 
 * **Current vs historical salary rows** : A far-future value in `dt_valid_to` indicates the currently active salary record, not a closed period. Use `is_current = TRUE` to retrieve the latest valid row per assignment. When analyzing historical periods, scope both `dt_valid_from` and `dt_valid_to` against the reference date you need to avoid counting the same salary multiple times.
-* **Range percentile interpretation** : `range_percentile` measures where the salary sits inside the pay band (0 = at minimum, 1 = at maximum). Values below 0 mean the salary is under the band floor; values above 1 mean it exceeds the band ceiling. This is expected for out-of-range situations but can look surprising in aggregations.
+* **Salary midpoint ratio interpretation** : The ratio is calculated against the salary-table midpoint effective during the compensation record, so a changed midpoint can change the ratio even when the salary is unchanged.
 * **Range splits without a salary change** : A row in `fact_compensations` may exist purely because the job version changed (band, salary table, salary range, or PLR target). On these rows `amount_adjustment`, `pct_adjustment`, `is_promotion_movement`, and `sk_event_definition` are `NULL`: they are not real salary movements.
 * **`amount_total_cash` excludes SOP, RVV, and exceptional bonus** : Only annual salary plus PLR target are folded into `amount_total_cash` today. Variable pay components remain available as targets in `dim_job` and `fact_salary_table_targets` but are not summed into the total cash figure.
 * **Currency mismatch on PLR target** : When a PLR target is fixed (legacy `Annual Target - PLR`) and the salary is in a different currency, the calculation does not reconcile currencies. `plr_target_currency_code` is exposed so analysts can flag those cases.
@@ -132,8 +132,7 @@ SELECT
     fact_compensations.amount_salary,
     fact_compensations.amount_annual_salary,
     fact_compensations.amount_total_cash,
-    fact_compensations.range_position,
-    fact_compensations.range_percentile,
+    fact_compensations.salary_midpoint_ratio,
     dim_job.band,
     dim_job.salary_table,
     dim_job.country,
@@ -211,8 +210,7 @@ LIMIT 100
 * **SCD (Slowly Changing Dimension)** : A database design pattern used to store and manage both current and historical data over time.
 * **PLR (Profit and Results Sharing)** : Annual performance bonus paid to eligible employees, calculated from corporate goals achievement, individual performance (IPA), and a salary-derived target.
 * **IPA (Individual Performance Adjustment)** : Multiplier derived from the Performa score that scales each person's PLR target up or down.
-* **Range position (compa-ratio)** : Ratio between the salary and the midpoint of the pay range; around 1.0 means market alignment.
-* **Range percentile** : Position of the salary inside the pay band (0 = at minimum, 1 = at maximum); values outside that interval indicate a salary above or below the defined range.
+* **Salary midpoint ratio** : Unitless ratio of salary amount to the effective salary-table midpoint; 1.000 means the salary equals the midpoint.
 * **Band** : Seniority and salary level (for example 5, 6, 7, Estag1) used as the primary grouping for pay range and targets.
 * **Salary table** : Catalog of salary ranges (min, mid, max) by country and band that anchors compensation policy.
 

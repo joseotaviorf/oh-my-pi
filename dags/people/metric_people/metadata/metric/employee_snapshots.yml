@@ -746,11 +746,11 @@ columns:
     lineage:
       - dw_compensation.fact_compensations.amount_salary
 
-  range_position:
-    description: Snapshot attribute for range_position on the employee_snapshots wide metric table.
+  salary_midpoint_ratio:
+    description: Ratio of the employee's salary to the midpoint of the effective salary table. The value is unitless; 1.000 means the salary equals the midpoint. Use it to compare compensation positioning across snapshot records (e.g. 1.125). NULL means the salary or midpoint is unavailable or the midpoint is not positive.
     dimension: True
     lineage:
-      - dw_compensation.fact_compensations.range_position
+      - dw_compensation.fact_compensations.salary_midpoint_ratio
 
   salary_range_mid:
     description: Snapshot attribute for salary_range_mid on the employee_snapshots wide metric table.

@@ -93,17 +93,7 @@ SELECT
     LOWER(es.name_l4) AS l4_gestor,
     LOWER(es.hrbp_work_email) AS hrbp,
     es.marital_status AS estado_civil,
-    CASE
-        WHEN
-            es.amount_salary IS NULL
-            OR comp_job.salary_range_mid IS NULL
-            OR comp_job.salary_range_mid <= 0
-            THEN CAST(NULL AS DECIMAL(10, 3))
-        ELSE CAST(
-            CAST(es.amount_salary AS DECIMAL(18, 4))
-            / CAST(comp_job.salary_range_mid AS DECIMAL(18, 4)) AS DECIMAL(10, 3)
-        )
-    END AS pos_faixa,
+    es.salary_midpoint_ratio AS pos_faixa,
     CAST(comp_job.salary_range_mid AS DOUBLE) AS referencia,
     es.business_unit_name AS business_unit_name,
     es.dt_assignment_started AS dt_admissao_assignment,

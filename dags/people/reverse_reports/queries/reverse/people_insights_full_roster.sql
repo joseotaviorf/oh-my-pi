@@ -208,7 +208,10 @@ SELECT
     LOWER(es.last_raise_reason) AS motivo_ult_aumento,
     es.dt_last_raise AS dt_ultimo_aumento,
     CAST(es.months_since_last_raise AS DOUBLE) AS recency,
-    FORMAT_STRING('%.3f', ROUND(CAST(es.range_position AS DOUBLE) / 100.0, 3)) AS pos_faixa,
+    CASE
+        WHEN es.salary_midpoint_ratio IS NULL THEN CAST(NULL AS STRING)
+        ELSE FORMAT_STRING('%.3f', CAST(es.salary_midpoint_ratio AS DOUBLE))
+    END AS pos_faixa,
     CAST(es.salary_range_mid AS DOUBLE) AS referencia,
     es.has_clock_in AS registra_ponto,
     CASE

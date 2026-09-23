@@ -5,7 +5,7 @@ domain: People
 description: |
   Fact table containing historical and current compensation records for employees.
   This table stores approved salary proposals with their associated adjustments,
-  positioning metrics (range position, range percentile), and links to job and event dimensions.
+  the salary midpoint ratio, and links to job and event dimensions.
   The grain is one row per approved salary record per job validity period (SCD Type 2),
   created by intersecting salary periods with assignment job history.
   Key features:
@@ -131,19 +131,10 @@ columns:
       (only populated on the originating row where the salary actually changed).
     lineage:
       - datalake_people.compensation_versions.adjustment_percent
-  range_position:
-    description: |
-      Compensation ratio comparing actual salary to the midpoint of the pay range.
-      Formula: salary / mid_value. Values around 1.0 indicate market alignment.
-      Primary metric used by the business for compensation analysis.
+  salary_midpoint_ratio:
+    description: "Ratio of the salary amount to the midpoint of the effective salary table for the compensation record. The value is unitless; 1.000 means the salary equals the midpoint, values below 1.000 are below the midpoint, and values above 1.000 are above it. Use it for compensation positioning analysis (e.g. 1.125). NULL indicates a missing salary or midpoint, or a non-positive midpoint."
     lineage:
-      - datalake_people.compensation_versions.range_position
-  range_percentile:
-    description: |
-      Position of salary within the pay range as a percentage.
-      Formula: (salary - min) / (max - min). Can be negative (below min) or >100 (above max).
-    lineage:
-      - datalake_people.compensation_versions.range_percentile
+      - datalake_people.compensation_versions.salary_midpoint_ratio
   is_salary_approved:
     description: Boolean flag indicating if the salary proposal has been approved.
     lineage:

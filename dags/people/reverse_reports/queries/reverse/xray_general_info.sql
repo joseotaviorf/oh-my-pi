@@ -409,9 +409,7 @@ employee_base AS (
             WHEN es.months_employee_tenure <= 36 THEN 'F. 25 to 36 months'
             ELSE 'G. More than 36 months'
         END AS tenure,
-        -- Lake range_position is percent of midpoint (~98). Export the ratio
-        -- (0.98) so AppSheet/sheet can apply its own percent scale.
-        es.range_position / 100 AS pos_faixa,
+        es.salary_midpoint_ratio AS pos_faixa,
         es.salary_range_mid AS referencia,
         CASE
             WHEN es.talent_potential IS NULL OR TRIM(CAST(es.talent_potential AS STRING)) IN ('', '-', '-1')

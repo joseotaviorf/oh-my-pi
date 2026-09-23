@@ -94,8 +94,6 @@ WITH salary_with_person AS (
         sal.annual_salary,
         sal.adjustment_amount,
         sal.adjustment_percent,
-        sal.compa_ratio,
-        sal.range_position,
         sal.is_salary_approved,
         sal.dt_started,
         sal.dt_started AS dt_salary_original_started,
@@ -512,8 +510,6 @@ salary_with_assignment_job AS (
         sal.annual_salary,
         sal.adjustment_amount,
         sal.adjustment_percent,
-        sal.compa_ratio,
-        sal.range_position,
         sal.is_salary_approved,
         sal.id_action,
         sal.id_action_reason,
@@ -560,8 +556,6 @@ salary_with_job_version AS (
         sal.annual_salary,
         sal.adjustment_amount,
         sal.adjustment_percent,
-        sal.compa_ratio,
-        sal.range_position,
         sal.is_salary_approved,
         sal.id_action,
         sal.id_action_reason,
@@ -755,8 +749,6 @@ salary_with_plr_target AS (
         sal.annual_salary,
         sal.adjustment_amount,
         sal.adjustment_percent,
-        sal.compa_ratio,
-        sal.range_position,
         sal.is_salary_approved,
         sal.id_action,
         sal.id_action_reason,
@@ -823,8 +815,6 @@ salary_enriched AS (
             THEN sal.adjustment_percent
             ELSE NULL
         END AS adjustment_percent,
-        sal.compa_ratio,
-        sal.range_position,
         sal.is_salary_approved,
         sal.dt_started,
         sal.dt_ended,
@@ -865,8 +855,6 @@ salary_consolidation_base AS (
         annual_salary,
         adjustment_amount,
         adjustment_percent,
-        compa_ratio AS range_position,
-        range_position AS range_percentile,
         is_salary_approved,
         dt_started,
         COALESCE(dt_ended, DATE('9999-12-31')) AS dt_ended_normalized,
@@ -923,14 +911,6 @@ salary_consolidation_groups AS (
                         PARTITION BY id_person, id_assignment, id_period_of_service
                         ORDER BY dt_started, dt_ended_normalized
                     ) <=> adjustment_percent)
-                    OR NOT (LAG(range_position) OVER (
-                        PARTITION BY id_person, id_assignment, id_period_of_service
-                        ORDER BY dt_started, dt_ended_normalized
-                    ) <=> range_position)
-                    OR NOT (LAG(range_percentile) OVER (
-                        PARTITION BY id_person, id_assignment, id_period_of_service
-                        ORDER BY dt_started, dt_ended_normalized
-                    ) <=> range_percentile)
                     OR NOT (LAG(is_salary_approved) OVER (
                         PARTITION BY id_person, id_assignment, id_period_of_service
                         ORDER BY dt_started, dt_ended_normalized
@@ -1002,8 +982,6 @@ salary_consolidated AS (
         annual_salary,
         adjustment_amount,
         adjustment_percent,
-        range_position,
-        range_percentile,
         is_salary_approved,
         MIN(dt_started) AS dt_started,
         MAX(dt_ended_normalized) AS dt_ended_normalized,
@@ -1031,8 +1009,6 @@ salary_consolidated AS (
         annual_salary,
         adjustment_amount,
         adjustment_percent,
-        range_position,
-        range_percentile,
         is_salary_approved,
         id_event_definition,
         sk_job_version,
@@ -1088,8 +1064,16 @@ SELECT
     sal.annual_salary,
     sal.adjustment_amount,
     sal.adjustment_percent,
-    sal.range_position,
-    sal.range_percentile,
+    CASE
+        WHEN sal.salary_amount IS NULL
+            OR jst_band.salary_range_mid IS NULL
+            OR jst_band.salary_range_mid <= 0
+        THEN CAST(NULL AS DECIMAL(10, 3))
+        ELSE CAST(
+            CAST(sal.salary_amount AS DECIMAL(18, 4))
+            / CAST(jst_band.salary_range_mid AS DECIMAL(18, 4)) AS DECIMAL(10, 3)
+        )
+    END AS salary_midpoint_ratio,
     sal.is_salary_approved,
     sal.target_plr,
     sal.target_plr_salary_multiplier,

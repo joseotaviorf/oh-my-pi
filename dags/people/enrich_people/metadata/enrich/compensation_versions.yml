@@ -98,18 +98,11 @@ columns:
       Percentage increase of the salary adjustment over the base salary value. NULL on split rows.
     lineage:
       - datalake_pin_compensation_clean.salary.adjustment_percent
-  range_position:
-    description: |
-      Compensation ratio comparing actual salary to the midpoint of the pay range (salary / mid_value).
-      Values around 1.0 indicate market alignment. (Sourced from salary.compa_ratio.)
+  salary_midpoint_ratio:
+    description: Ratio calculated for each compensation period from salary amount and the salary-table midpoint effective during that period. A value of 1.000 means the salary equals the midpoint; NULL means the salary or midpoint is missing, or the midpoint is not positive.
     lineage:
-      - datalake_pin_compensation_clean.salary.compa_ratio
-  range_percentile:
-    description: |
-      Position of salary within the pay range as a percentage ((salary - min) / (max - min)). Can be
-      negative (below min) or >100 (above max).
-    lineage:
-      - datalake_pin_compensation_clean.salary.range_position
+      - datalake_pin_compensation_clean.salary.salary_amount
+      - datalake_people.job_with_salary_table.salary_range_mid
   is_salary_approved:
     description: Boolean flag indicating if the salary proposal has been approved (always TRUE here).
     lineage:
