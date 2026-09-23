@@ -7,12 +7,12 @@ description: |
   Daily snapshot of active QuintoAndar app users with their Mora availability
   flag, used to track the Mora rollout. Grain is one row per id_user and
   dt_snapshot: each snapshot day holds every user seen on app open, home, login
-  or search page view Amplitude events whose load date falls in the 30 days up
-  to and including the snapshot day, with the flag of the user's latest event in
-  that window. The scheduled run writes the previous calendar day, the last day
-  fully loaded from Amplitude. Loads merge on id_user and dt_snapshot and remove
-  users no longer present in the reprocessed days, so a rerun or backfill fully
-  replaces only the snapshot days in its load window.
+  or search page view Amplitude events whose load date is the snapshot day, with
+  the flag of the user's latest event of that day. The scheduled run writes the
+  previous calendar day, the last day fully loaded from Amplitude. Loads merge
+  on id_user and dt_snapshot and remove users no longer present in the
+  reprocessed days, so a rerun or backfill fully replaces only the snapshot days
+  in its load window.
 columns:
   id_user:
     lineage:
@@ -25,14 +25,14 @@ columns:
   is_mora_enabled_on_app:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-    description: Value of the isMoraEnabledOnApp Amplitude user property on the user's most recent qualifying event in the 30-day window. NULL when that event lacks the property or it is not a boolean, which happens on app versions that predate the flag, even if older events in the window carry it.
+    description: Value of the isMoraEnabledOnApp Amplitude user property on the user's most recent qualifying event of the snapshot day. NULL when that event lacks the property or it is not a boolean, which happens on app versions that predate the flag, even if earlier events of the day carry it.
   dt_snapshot:
     lineage:
       - datalake_amplitude_clean.events.year
       - datalake_amplitude_clean.events.month
       - datalake_amplitude_clean.events.day
-    description: Snapshot day. The row reflects user activity in the 30 days up to and including this date.
+    description: Snapshot day, the Amplitude load date of the user's qualifying app events.
   ts_last_event:
     lineage:
       - datalake_amplitude_clean.events.ts_event
-    description: Timestamp of the user's most recent qualifying app event in the 30-day window, the event that sets is_mora_enabled_on_app.
+    description: Timestamp of the user's most recent qualifying app event of the snapshot day, the event that sets is_mora_enabled_on_app.

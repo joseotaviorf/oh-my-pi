@@ -9,21 +9,18 @@ dag:
       Tracks the Mora rollout on the QuintoAndar app. Builds a daily snapshot of
       active app users with the isMoraEnabledOnApp Amplitude user property: each
       snapshot day holds every user seen on app open, home, login or search page
-      view events in the 30 days up to and including that day, with the flag of
-      the user's latest event. A scheduled run snapshots the previous calendar
-      day (the data interval start), the last day fully loaded by amplitude_new
-      at midnight. Each run merges on id_user and dt_snapshot and deletes target
-      rows of the snapshot days between load_start_date and load_end_date
-      (inclusive) that are missing from the run's output, so a rerun fully
-      replaces its day and a backfill triggered with load_start_date and
-      load_end_date in the run conf rewrites one snapshot per day in the range,
-      leaving every other day untouched.
+      view events on that day, with the flag of the user's latest event of the
+      day. A scheduled run snapshots the previous calendar day (the data interval
+      start), the last day fully loaded by amplitude_new at midnight. Each run
+      merges on id_user and dt_snapshot and deletes target rows of the snapshot
+      days between load_start_date and load_end_date (inclusive) that are missing
+      from the run's output, so a rerun fully replaces its day and a backfill
+      triggered with load_start_date and load_end_date in the run conf rewrites
+      one snapshot per day in the range, leaving every other day untouched.
 workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
-  extra_query_template_params:
-    days_lookback: 30
   tables_customization:
     users:
       merge_on: [id_user, dt_snapshot]
