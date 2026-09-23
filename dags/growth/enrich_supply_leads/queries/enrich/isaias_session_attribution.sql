@@ -37,7 +37,7 @@ session_message_anchors AS (
 cdp_events AS (
     -- Relevant CDP transactional events for the supply draft/publish/photo funnel
     SELECT
-        GET_JSON_OBJECT(user_properties, '$["egw_whatsapp.verifiedPhoneNumber"]') AS phone_number,
+        from_json(user_properties, 'MAP<STRING,STRING>')['egw_whatsapp.verifiedPhoneNumber'] AS phone_number,
         ts_event AS event_time,
         CAST(GET_JSON_OBJECT(event_properties, '$.lead_id') AS BIGINT) AS retrieved_lead_id,
         event_name
