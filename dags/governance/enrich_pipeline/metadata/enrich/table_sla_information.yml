@@ -74,18 +74,18 @@ columns:
     description: Whether the producing DAG runs hourly or more frequently.
   is_delivered:
     lineage:
-      - datalake_astro_clean.dataset_event.ts_event_created
-    description: Whether the load task emitted a Dataset event during the snapshot delivery cycle.
+      - datalake_airflow.log.ts_event
+    description: Whether the producing load task logged a success during the snapshot delivery cycle.
   is_inside_declared_sla:
     lineage:
-      - datalake_astro_clean.dataset_event.ts_event_created
+      - datalake_airflow.log.ts_event
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
     description: >
       Whether the first delivery met the resolved deadline. NULL only when that deadline has
       not yet passed and no delivery exists; FALSE after the deadline or for a late delivery.
   minutes_after_deadline:
     lineage:
-      - datalake_astro_clean.dataset_event.ts_event_created
+      - datalake_airflow.log.ts_event
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
     description: Signed minutes from the resolved deadline to first delivery; negative means early.
   ts_deadline_brt:
@@ -97,8 +97,8 @@ columns:
     description: Resolved snapshot deadline represented as a São Paulo wall-clock timestamp.
   ts_first_delivery_brt:
     lineage:
-      - datalake_astro_clean.dataset_event.ts_event_created
-    description: First Dataset delivery timestamp in São Paulo time during the delivery cycle.
+      - datalake_airflow.log.ts_event
+    description: First successful load-task completion timestamp in São Paulo time during the delivery cycle.
   dt_snapshot:
     lineage:
       - datalake_pipeline.dag_sla_information.dt_snapshot

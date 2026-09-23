@@ -53,41 +53,29 @@ deliveries AS (
         e.id_dag,
         e.dt_snapshot,
         MIN(
-            FROM_UTC_TIMESTAMP(
-                ev.ts_event_created,
-                'America/Sao_Paulo'
-            )
+            FROM_UTC_TIMESTAMP(TIMESTAMP(l.ts_event), 'America/Sao_Paulo')
         ) AS ts_first_delivery_brt
     FROM
         expected AS e
     JOIN
-        datalake_astro_clean.dataset AS d
-            ON d.uri = e.id_table
-    JOIN
-        datalake_astro_clean.dataset_event AS ev
-            ON ev.id_dataset = d.id
-            AND ev.id_source_dag = e.id_dag
-            AND ev.id_source_task = e.id_task
-            AND FROM_UTC_TIMESTAMP(
-                ev.ts_event_created,
-                'America/Sao_Paulo'
-            ) >= CAST(
+        datalake_airflow.log AS l
+            ON l.id_dag = e.id_dag
+            AND l.id_task = e.id_task
+            AND l.event = 'success'
+            AND FROM_UTC_TIMESTAMP(TIMESTAMP(l.ts_event), 'America/Sao_Paulo') >= CAST(
                 CONCAT(
                     CAST(DATE_SUB(e.dt_snapshot, 1) AS STRING),
                     ' 20:55:00'
                 ) AS TIMESTAMP
             )
-            AND FROM_UTC_TIMESTAMP(
-                ev.ts_event_created,
-                'America/Sao_Paulo'
-            ) < CAST(
+            AND FROM_UTC_TIMESTAMP(TIMESTAMP(l.ts_event), 'America/Sao_Paulo') < CAST(
                 CONCAT(
                     CAST(e.dt_snapshot AS STRING),
                     ' 20:55:00'
                 ) AS TIMESTAMP
             )
     WHERE
-        MAKE_DATE(ev.year, ev.month, ev.day)
+        MAKE_DATE(l.year, l.month, l.day)
             BETWEEN DATE_SUB(DATE('{load_start_date}'), 1)
             AND DATE('{load_end_date}')
     GROUP BY
