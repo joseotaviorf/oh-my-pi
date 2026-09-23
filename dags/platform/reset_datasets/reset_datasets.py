@@ -8,7 +8,7 @@ from airflow.operators.python_operator import PythonOperator
 DAG_NAME = "reset_datasets"
 
 
-def reset_dataset_queues(**kwargs):
+def reset_dataset_queues(**_kwargs):
     from airflow.models.dataset import DatasetDagRunQueue, DatasetModel
     from airflow.utils.db import create_session
     from sqlalchemy import delete, func, select
@@ -50,12 +50,12 @@ def reset_dataset_queues(**kwargs):
     return f"OK — deleted {result.rowcount} rows"
 
 
-def reset_dataset_events(**kwargs):
+def archive_and_reset_dataset_events(**_kwargs):
     from airflow.models.dataset import DatasetEvent, DatasetModel
     from airflow.utils.db import create_session
     from sqlalchemy import delete, func, select
 
-    logging.info("Starting reset of DatasetEvent")
+    logging.info("Starting archive and reset of DatasetEvent")
     try:
         with create_session() as session:
             stmt = (
@@ -81,22 +81,73 @@ def reset_dataset_events(**kwargs):
             for uri, count in dataset_counts:
                 logging.info(f"  dataset_uri={uri}, events={count}")
 
-            result = session.execute(delete(DatasetEvent))
-            logging.info(f"Deleted {result.rowcount} rows from DatasetEvent")
+            rows_stmt = (
+                select(
+                    DatasetEvent.id,
+                    DatasetModel.uri,
+                    DatasetEvent.source_dag_id,
+                    DatasetEvent.source_task_id,
+                    DatasetEvent.source_run_id,
+                    DatasetEvent.source_map_index,
+                    DatasetEvent.extra,
+                    DatasetEvent.timestamp,
+                )
+                .select_from(DatasetEvent)
+                .outerjoin(
+                    DatasetModel,
+                    DatasetEvent.dataset_id == DatasetModel.id,
+                )
+            )
+            raw_events = session.execute(rows_stmt).all()
+            events = [
+                {
+                    "id": row.id,
+                    "uri": row.uri,
+                    "source_dag_id": row.source_dag_id,
+                    "source_task_id": row.source_task_id,
+                    "source_run_id": row.source_run_id,
+                    "source_map_index": row.source_map_index,
+                    "extra": row.extra,
+                    "timestamp": row.timestamp.isoformat()
+                    if hasattr(row.timestamp, "isoformat")
+                    else str(row.timestamp),
+                }
+                for row in raw_events
+            ]
+
+            if not events:
+                logging.info("No events to archive or delete")
+                return "OK — 0 events to archive"
+
+            from bietlejuice.services.dataset_service import DatasetService
+
+            object_key = DatasetService.archive_dataset_events_to_s3(events)
+            logging.info(f"Archived {len(events)} events to s3 object {object_key}")
+
+            archived_ids = [row.id for row in raw_events]
+            chunk_size = 500
+            total_deleted = 0
+            for i in range(0, len(archived_ids), chunk_size):
+                chunk = archived_ids[i : i + chunk_size]
+                res = session.execute(
+                    delete(DatasetEvent).where(DatasetEvent.id.in_(chunk))
+                )
+                total_deleted += res.rowcount
+            logging.info(f"Deleted {total_deleted} rows from DatasetEvent")
 
             remaining = session.execute(
                 select(func.count()).select_from(DatasetEvent)
             ).scalar()
             logging.info(f"DatasetEvent remaining rows: {remaining}")
             if remaining != 0:
-                logging.warning(
-                    f"Expected 0 rows in DatasetEvent after delete, found {remaining}"
+                logging.info(
+                    f"DatasetEvent has {remaining} unarchived rows remaining (new events created during archive)"
                 )
     except Exception as e:
         logging.error(f"Failed to reset DatasetEvent: {e}")
         raise
 
-    return f"OK — deleted {result.rowcount} rows"
+    return f"OK — archived {len(events)} events to {object_key} and deleted {total_deleted} rows"
 
 
 with DAG(
@@ -114,6 +165,6 @@ with DAG(
     )
     reset_events_task = PythonOperator(
         task_id="reset_dataset_events",
-        python_callable=reset_dataset_events,
+        python_callable=archive_and_reset_dataset_events,
     )
     reset_queues_task >> reset_events_task

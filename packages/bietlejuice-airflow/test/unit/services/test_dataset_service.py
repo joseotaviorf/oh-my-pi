@@ -5,6 +5,7 @@ from unittest import mock
 import pendulum
 import pytest
 from airflow.datasets import BaseDataset, Dataset, DatasetAll, DatasetAny
+from airflow.exceptions import AirflowException
 
 from bietlejuice.services.dataset_service import DatasetService
 
@@ -587,6 +588,68 @@ class TestDatasetService:
             DatasetService._build_table_dataset_name(context)
             == "offboarding_test.dim_termination"
         )
+
+    @mock.patch("bietlejuice.services.dataset_service.Variable.get")
+    @mock.patch.object(DatasetService, "_get_boto3_session_for_dataset_events")
+    def test_archive_dataset_events_to_s3_success(self, mock_get_session, mock_var_get):
+        mock_var_get.return_value = "test-bucket"
+        mock_session = mock.MagicMock()
+        mock_s3_client = mock.MagicMock()
+        mock_session.client.return_value = mock_s3_client
+        mock_get_session.return_value = mock_session
+
+        events = [
+            {"id": 1, "uri": "test://table1", "source_dag_id": "dag1"},
+            {"id": 2, "uri": "test://table2", "source_dag_id": "dag2"},
+        ]
+
+        key = DatasetService.archive_dataset_events_to_s3(events)
+
+        assert key.startswith("airflow_datasets/dataset_events_reset_archive/year=")
+        assert key.endswith(".json")
+        mock_s3_client.put_object.assert_called_once()
+        call_kwargs = mock_s3_client.put_object.call_args.kwargs
+        assert call_kwargs["Bucket"] == "test-bucket"
+        assert call_kwargs["Key"] == key
+        assert call_kwargs["ContentType"] == "application/json"
+        body_events = json.loads(call_kwargs["Body"])
+        assert len(body_events) == 2
+        assert body_events[0]["uri"] == "test://table1"
+
+    @mock.patch("bietlejuice.services.dataset_service.Variable.get")
+    @mock.patch.object(DatasetService, "_get_boto3_session_for_dataset_events")
+    def test_archive_dataset_events_to_s3_raises_when_bucket_unset(
+        self, mock_get_session, mock_var_get
+    ):
+        mock_var_get.return_value = None
+        mock_session = mock.MagicMock()
+        mock_get_session.return_value = mock_session
+
+        events = [{"id": 1, "uri": "test://table1"}]
+
+        with pytest.raises(
+            AirflowException, match="Variable DATASET_EVENTS_S3_BUCKET is not set"
+        ):
+            DatasetService.archive_dataset_events_to_s3(events)
+
+        mock_session.client.assert_not_called()
+
+    @mock.patch("bietlejuice.services.dataset_service.Variable.get")
+    @mock.patch.object(DatasetService, "_get_boto3_session_for_dataset_events")
+    def test_archive_dataset_events_to_s3_propagates_s3_exception(
+        self, mock_get_session, mock_var_get
+    ):
+        mock_var_get.return_value = "test-bucket"
+        mock_session = mock.MagicMock()
+        mock_s3_client = mock.MagicMock()
+        mock_s3_client.put_object.side_effect = RuntimeError("S3 PutObject failure")
+        mock_session.client.return_value = mock_s3_client
+        mock_get_session.return_value = mock_session
+
+        events = [{"id": 1, "uri": "test://table1"}]
+
+        with pytest.raises(RuntimeError, match="S3 PutObject failure"):
+            DatasetService.archive_dataset_events_to_s3(events)
 
 
 def dataset_equals(d1: BaseDataset, d2: BaseDataset) -> bool:

@@ -465,6 +465,32 @@ class DatasetService:
                 f"m=write_dataset_events_to_s3, msg=Failed to write dataset events to S3. bucket={bucket!r}, key={object_key!r}, error={e}"
             )
 
+    @staticmethod
+    def archive_dataset_events_to_s3(events: List[Dict[str, Any]]) -> str:
+        """Durably archive DatasetEvent rows to S3 as one JSON array before deletion.
+        Raises if the bucket is unset or the write fails, so callers can skip deletion.
+        Returns the written object key. Path:
+        airflow_datasets/dataset_events_reset_archive/year=YYYY/month=MM/day=DD/reset_<ts>.json
+        """
+        bucket = Variable.get("DATASET_EVENTS_S3_BUCKET", None)
+        if not bucket:
+            raise AirflowException(
+                "Variable DATASET_EVENTS_S3_BUCKET is not set; cannot archive dataset events"
+            )
+        session = DatasetService._get_boto3_session_for_dataset_events()
+        ts = datetime.utcnow().isoformat() + "Z"
+        year, month, day = ts[:4], ts[5:7], ts[8:10]
+        ts_safe = re.sub(r"[^\w\-.:]", "_", ts)[:26]
+        object_key = f"airflow_datasets/dataset_events_reset_archive/year={year}/month={month}/day={day}/reset_{ts_safe}.json"
+        body = json.dumps(events, default=str)
+        session.client("s3").put_object(
+            Bucket=bucket,
+            Key=object_key,
+            Body=body,
+            ContentType="application/json",
+        )
+        return object_key
+
     @classmethod
     def update_datasets(cls, context: Context) -> None:
         """
