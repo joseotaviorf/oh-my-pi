@@ -27,25 +27,19 @@ columns:
       - core_brokers.brokers.uuid_company
     description: The surrogate key of the broker in Rede QuintoAndar associated with the agent visitor (demand side). Only populated when business_model LIKE '%3P_DEMAND%' OR '%3P_LEAD_GEN%'. Can be joined with dw_brokers.dim_broker.
   id_company_supply:
-    lineage:
-      - datalake_company.company_sks.sk_company
-      - datalake_ebdb_listing.house.uuid_company
-    description: The surrogate key of the company in Rede QuintoAndar associated with the house (supply side). Only populated when business_model LIKE '%3P_SUPPLY%'. Can be joined with dw_rede.dim_company.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_supply and dw_brokers.dim_broker instead.
   id_company_demand:
-    lineage:
-      - datalake_company.company_sks.sk_company
-      - datalake_ebdb_clean.visitor.uuid_company
-    description: The surrogate key of the company in Marketplace QuintoAndar associated with the agent visitor (demand side). Only populated when business_model LIKE '%3P_DEMAND%' OR '%3P_LEAD_GEN%'. Can be joined with dw_rede.dim_company.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_demand and dw_brokers.dim_broker instead.
   partner_3p_supply:
     lineage:
-      - datalake_company.company_sks.company_name
+      - core_brokers.brokers.broker_name
       - datalake_ebdb_listing.house.uuid_company
-    description: The name of the company in Marketplace QuintoAndar associated with the house (supply side). Only populated when business_model LIKE '%3P_SUPPLY%'. Can be joined with dw_rede.dim_company.
+    description: The name of the 3P broker partner in Rede QuintoAndar associated with the house (supply side). Only populated when business_model LIKE '%3P_SUPPLY%'. Same broker as sk_broker_supply (dw_brokers.dim_broker).
   partner_3p_demand:
     lineage:
-      - datalake_company.company_sks.company_name
+      - core_brokers.brokers.broker_name
       - datalake_ebdb_clean.visitor.uuid_company
-    description: The name of the company in Marketplace QuintoAndar associated with the agent visitor (demand side). Only populated when business_model LIKE '%3P_DEMAND%' OR '%3P_LEAD_GEN%'. Retrieved from visitor where type = 'Agent', using the most recent record per visit. Can be joined with dw_rede.dim_company.
+    description: The name of the 3P broker partner in Rede QuintoAndar associated with the agent visitor (demand side). Only populated when business_model LIKE '%3P_DEMAND%' OR '%3P_LEAD_GEN%'. Retrieved from visitor where type = 'Agent', using the most recent record per visit. Same broker as sk_broker_demand (dw_brokers.dim_broker).
   business_model:
     lineage:
       - datalake_ebdb_clean.visit_business_model.business_model

@@ -35,19 +35,21 @@ columns:
   id_company_supply:
     lineage:
     - datalake_sale_offer.sale_offer.id_company_supply
-    description: Id of the supply partner in HubSpot
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_demand / uuid_company_supply and dw_brokers.dim_broker instead.
   uuid_company_supply:
     lineage:
-    - datalake_company.company_sks.uuid_company
-    description: UUID of the supply partner in the company domain
+    - datalake_sale_offer.sale_offer.sk_broker_supply
+    - core_brokers.brokers.uuid_company
+    description: UUID of the supply partner company, resolved from the supply-side broker (sale_offer.sk_broker_supply) in core_brokers.brokers.
   id_company_demand:
     lineage:
     - datalake_sale_offer.sale_offer.id_company_demand
-    description: Id of the demand partner
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_demand and dw_brokers.dim_broker instead.
   sk_broker_demand:
     lineage:
+    - datalake_sale_offer.sale_offer.sk_broker_demand
     - core_brokers.brokers.sk_broker
-    description: Surrogate key of the 3P broker partner on the demand side, resolved from the same company UUID as id_company_demand. Canonical replacement for the legacy company_sks-based key; prefer this for joins to core_brokers.brokers/dw_brokers.dim_broker.
+    description: Surrogate key of the 3P broker partner on the demand side. Canonical replacement for the legacy company_sks-based key; prefer this for joins to core_brokers.brokers/dw_brokers.dim_broker.
   id_closing_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_consultant
@@ -100,11 +102,11 @@ columns:
     description: Identification key of the QuintoAndar employee (real estate register specialist) who handled the property registry (cartório) step. Composite text value, prefixed 'ID_VENDAS_' (current sales-flow system) or 'ID_MONDAY_' (legacy Firestore/Monday system, inactive since 2024) — not a plain foreign-key integer.
   partner_3p_supply:
     lineage:
-    - datalake_company.company_sks.company_name
+    - core_brokers.brokers.broker_name
     description: Name of the third-party (3P) partner company, from QuintoAndar's real-estate partner network ("Rede"), that supplied (listed) this property, when the sale involves a 3P supply partner.
   partner_3p_demand:
     lineage:
-    - datalake_company.company_sks.company_name
+    - core_brokers.brokers.broker_name
     description: Name of the third-party (3P) partner company, from QuintoAndar's real-estate partner network ("Rede"), that brought the buyer's demand for this property, when the sale involves a 3P demand partner.
   is_3p_supply:
     lineage:

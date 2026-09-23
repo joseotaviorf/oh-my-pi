@@ -42,16 +42,13 @@ FROM (
       cbd.sk_broker,
       NULL
     ) AS sk_broker_demand,
-    IF(cv.business_model LIKE '%3P_SUPPLY%', cs.sk_company, NULL) AS id_company_supply,
+    -- id_company_* deprecated with datalake_company.company_sks (enrich_company); kept as NULL for schema compatibility.
+    CAST(NULL AS BIGINT) AS id_company_supply,
+    CAST(NULL AS BIGINT) AS id_company_demand,
+    IF(cv.business_model LIKE '%3P_SUPPLY%', cbs.broker_name, NULL) AS partner_3p_supply,
     IF(
       cv.business_model LIKE '%3P_DEMAND%' OR cv.business_model LIKE '%3P_LEAD_GEN%',
-      cd.sk_company,
-      NULL
-    ) AS id_company_demand,
-    IF(cv.business_model LIKE '%3P_SUPPLY%', cs.company_name, NULL) AS partner_3p_supply,
-    IF(
-      cv.business_model LIKE '%3P_DEMAND%' OR cv.business_model LIKE '%3P_LEAD_GEN%',
-      cd.company_name,
+      cbd.broker_name,
       NULL
     ) AS partner_3p_demand,
     cv.business_model,
@@ -70,10 +67,6 @@ FROM (
     ON cv.id_visit = vt.id_visit AND vt.type = 'Agent'
   LEFT JOIN datalake_ebdb_listing.house AS h
     ON cv.id_house = h.id
-  LEFT JOIN datalake_company.company_sks AS cs
-    ON h.uuid_company = cs.uuid_company
-  LEFT JOIN datalake_company.company_sks AS cd
-    ON vt.uuid_company = cd.uuid_company
   LEFT JOIN core_brokers.brokers AS cbs
     ON h.uuid_company = cbs.uuid_company
   LEFT JOIN core_brokers.brokers AS cbd

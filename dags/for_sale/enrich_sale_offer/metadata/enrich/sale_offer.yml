@@ -64,11 +64,11 @@ columns:
   id_company_supply:
     lineage:
     - datalake_visit.visits.id_company_supply
-    description: Identification key of the supply partner company in HubSpot.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_supply and dw_brokers.dim_broker instead.
   id_company_demand:
     lineage:
     - datalake_visit.visits.id_company_demand
-    description: Identification key of the demand partner company.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_demand and dw_brokers.dim_broker instead.
   sk_broker_supply:
     lineage:
     - datalake_visit.visit_schedules.sk_broker_supply

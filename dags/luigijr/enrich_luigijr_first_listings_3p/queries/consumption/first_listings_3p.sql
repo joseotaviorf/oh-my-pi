@@ -58,7 +58,6 @@ WITH obt_with_flag AS (
 bsp_sale AS (
     SELECT
         CAST(sk_house AS BIGINT) AS sk_house,
-        sk_company,
         sk_broker,
         ROW_NUMBER() OVER(PARTITION BY sk_house ORDER BY sk_lead_3p DESC) AS rn
     FROM dw_3p_supply.fact_lead_3p_flows

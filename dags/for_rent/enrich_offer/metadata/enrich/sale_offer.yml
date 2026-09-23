@@ -128,7 +128,7 @@ columns:
   id_company_supply:
     lineage:
       - datalake_visit.visit_business_model.id_company_supply
-    description: ID of the supply partner from the company domain. Obtained from booking table which gets it from visit_business_model.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_supply and dw_brokers.dim_broker instead.
   uuid_company_supply:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
@@ -136,7 +136,7 @@ columns:
   id_company_demand:
     lineage:
       - datalake_visit.visit_business_model.id_company_demand
-    description: Id of the demand partner. Obtained from visit_business_model which consolidates demand partner data.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_demand and dw_brokers.dim_broker instead.
   pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency

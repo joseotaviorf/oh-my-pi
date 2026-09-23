@@ -1331,9 +1331,14 @@ bietlejuice.core_region_history:
     - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
     - bietlejuice.hub_services:load-clean-business-unit-region:first-run-of-day
 bietlejuice.dw_sale_closing_flows:
+  # sk_company_supply (legacy, kept for schema compatibility) still LEFT-resolves through
+  # datalake_company.company_sks, but enrich_company is being deprecated: read whatever
+  # snapshot is there instead of waiting for it. Canonical keys are sk_broker_supply/demand.
   add:
     - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
     - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
+  remove:
+    - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
 bietlejuice.enrich_3p_supply:
   add:
     - bietlejuice.brokers_supply_processor:load-clean-lead-3p:first-run-of-day

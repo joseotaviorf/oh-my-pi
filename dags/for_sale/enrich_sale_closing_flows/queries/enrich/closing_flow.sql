@@ -170,7 +170,7 @@ WITH last_method_change AS (
     so.id_owner,
     so.id_house,
     so.id_company_supply,
-    cs.uuid_company AS uuid_company_supply,
+    cb_supply.uuid_company AS uuid_company_supply,
     so.id_company_demand,
     cb_demand.sk_broker AS sk_broker_demand,
     COALESCE('ID_VENDAS_' || sof.id_consultant, 'ID_MONDAY_' || m.id_closing_specialist) AS id_closing_specialist,
@@ -198,8 +198,8 @@ WITH last_method_change AS (
       'ID_VENDAS_' || sof.id_real_estate_register_specialist,
       'ID_MONDAY_' || m.id_real_estate_register_specialist
     ) AS id_real_estate_register_specialist,
-    cs.company_name AS partner_3p_supply,
-    cd.company_name AS partner_3p_demand,
+    cb_supply.broker_name AS partner_3p_supply,
+    cb_demand.broker_name AS partner_3p_demand,
     so.is_3p_supply,
     so.is_3p_demand,
     so.is_3p_lead_gen,
@@ -248,12 +248,10 @@ WITH last_method_change AS (
     ON ms.id_offer = so.id_offer
   LEFT JOIN payment_rule AS pr
     ON pr.id_offer = so.id_offer
-  LEFT JOIN datalake_company.company_sks AS cs
-    ON so.id_company_supply = cs.sk_company
-  LEFT JOIN datalake_company.company_sks AS cd
-    ON so.id_company_demand = cd.sk_company
+  LEFT JOIN core_brokers.brokers AS cb_supply
+    ON so.sk_broker_supply = cb_supply.sk_broker
   LEFT JOIN core_brokers.brokers AS cb_demand
-    ON cd.uuid_company = cb_demand.uuid_company
+    ON so.sk_broker_demand = cb_demand.sk_broker
   WHERE
     NOT so.ts_sale_agreement_signed IS NULL
 )

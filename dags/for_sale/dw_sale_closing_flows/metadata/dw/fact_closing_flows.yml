@@ -34,11 +34,11 @@ columns:
   sk_company_supply:
     lineage:
     - datalake_company.company_sks.sk_company
-    description: Surrogate key for Rede companies. -1 if it is not a member.
+    description: DEPRECATED - legacy surrogate key for Rede companies, -1 if it is not a member. datalake_company.company_sks is no longer refreshed (enrich_company deprecation), so new partners may resolve to -1; use sk_broker_supply instead.
   sk_company_demand:
     lineage:
-    - datalake_company.company_sks.sk_company
-    description: Surrogate key for Rede companies. -1 if it is not a member.
+    - datalake_sale_closing_flows.closing_flow.id_company_demand
+    description: DEPRECATED - always -1 since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_demand instead.
   sk_broker_supply:
     lineage:
     - core_brokers.brokers.sk_broker

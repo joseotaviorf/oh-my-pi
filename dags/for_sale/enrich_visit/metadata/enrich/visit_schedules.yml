@@ -66,11 +66,11 @@ columns:
   id_company_supply:
     lineage:
     - datalake_visit.visit_business_model.id_company_supply
-    description: ID of the supply partner from the company domain. Obtained from visit_business_model which consolidates supply partner data. Data since 2020.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_supply and dw_brokers.dim_broker instead.
   id_company_demand:
     lineage:
     - datalake_visit.visit_business_model.id_company_demand
-    description: ID of the demand partner from Hubspot. Obtained from visit_business_model which consolidates demand partner data. Data since 2023.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. Use sk_broker_demand and dw_brokers.dim_broker instead.
   is_3p_supply:
     lineage:
     - datalake_visit.visit_business_model.is_3p_supply

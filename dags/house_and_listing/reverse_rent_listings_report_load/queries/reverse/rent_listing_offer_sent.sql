@@ -27,7 +27,7 @@ SELECT
   CONCAT(dl.id_house, dd.year, dd.month, dd.day) AS business_id,
   dl.id_house AS property_id,
   fdi.sk_region AS location_id,
-  IF(fdi.sk_company_supply = -1, '1P', fdi.sk_company_supply) AS company_uuid,
+  IF(fdi.sk_broker_supply = '-1', '1P', fdi.sk_broker_supply) AS company_uuid,
   'RENT' AS business_context,
   COUNT(DISTINCT rf.sk_offer) AS offers_sent_count,
   TIMESTAMP(dd.date) AS ts_event,

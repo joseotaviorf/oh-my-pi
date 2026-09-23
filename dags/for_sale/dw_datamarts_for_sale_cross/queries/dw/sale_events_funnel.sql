@@ -77,9 +77,9 @@ SELECT
         WHEN (eso.current_payment_method = 'FINANCED' AND eso.has_used_fgts_in_payment = TRUE) OR eso.current_payment_method = 'FINANCED_WITH_FGTS' THEN 'Financiado + FGTS'
 	ELSE 'Other'END AS form_of_payment,
     eso.is_3p_supply,
-    COALESCE(eso.id_company_supply, '') AS supply_3p_partner,
+    COALESCE(dbs.broker_name, '') AS supply_3p_partner,
     eso.is_3p_demand,
-    COALESCE(eso.id_company_demand, '') AS demand_3p_partner,
+    COALESCE(dbd.broker_name, '') AS demand_3p_partner,
     DATE(eso.ts_offer_submitted) AS dt_offer_sent,
     COALESCE(ddq.dt_deal_qualified, m.dt_deal_qualified) AS dt_deal_qualified,
     eso.ts_offer_accepted AS dt_offer_accepted,
@@ -117,6 +117,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_firestore.monday AS m
       ON eso.id_offer = m.id_offer
+LEFT JOIN
+    dw_brokers.dim_broker AS dbs
+      ON eso.sk_broker_supply = dbs.sk_broker
+LEFT JOIN
+    dw_brokers.dim_broker AS dbd
+      ON eso.sk_broker_demand = dbd.sk_broker
 )
 ,
 sale_bookings_base AS (

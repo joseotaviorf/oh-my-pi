@@ -11,14 +11,16 @@ WITH rent_daily_info AS (
     MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
 ), sale_daily_info AS (
   SELECT
-    id_house,
-    year,
-    month,
-    day,
-    sk_company
-  FROM datalake_sale_ongoing_listings.ongoing_listings_daily_info
+    oldi.id_house,
+    oldi.year,
+    oldi.month,
+    oldi.day,
+    IF(h.is_sale_3p_supply, h.uuid_company, NULL) AS uuid_company
+  FROM datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi
+  LEFT JOIN datalake_ebdb_listing.house AS h
+    ON oldi.id_house = h.id
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+    MAKE_DATE(oldi.year, oldi.month, oldi.day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
 )
 SELECT
   id,
@@ -125,7 +127,7 @@ FROM (
   WHERE
     MAKE_DATE(hms.year, hms.month, hms.day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
     AND rdi.uuid_company IS NULL
-    AND sdi.sk_company IS NULL
+    AND sdi.uuid_company IS NULL
 ) AS _t
 WHERE
   _w = 1

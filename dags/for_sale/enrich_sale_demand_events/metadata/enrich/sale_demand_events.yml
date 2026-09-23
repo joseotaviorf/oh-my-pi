@@ -10,8 +10,8 @@ description: >-
   Buyer Prospect). id_sale_flow is the same buyer/house key used by enrich_sale_flows.sale_flow
   (both built from the sale_visit/sale_offer/talk-to-agent event sources) — join the two to
   connect a demand event to its full discovery-journey record. id_buyer/id_seller can be joined
-  with dw_public.dim_user, id_house with dw_house.dim_house, and sk_company_supply/sk_company_demand
-  with dw_rede.dim_company. Caution: id_offer here is sourced from datalake_sale_offer.sale_offer
+  with dw_public.dim_user, id_house with dw_house.dim_house (sk_company_supply/sk_company_demand are
+  deprecated and always NULL). Caution: id_offer here is sourced from datalake_sale_offer.sale_offer
   (this DAG's own schema) and is NOT the same key space as id_offer in
   enrich_sale_offer_flows.sale_offer_flows, which is sourced from the separate
   datalake_sales_flow_clean.offer schema — do not join the two id_offer columns directly.
@@ -31,14 +31,12 @@ columns:
       '8': The offer was rejected or dismissed before acceptance (OFFER_REJECTED).
   sk_company_supply:
     lineage:
-    - datalake_sale_visit.sale_visit.sk_company_supply
     - datalake_sale_offer.sale_offer.id_company_supply
-    description: Key of the listing's origin company in Rede Supply, if that is the case. It can be joined with dw_rede.dim_company.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. For the 3P supply partner use sk_broker_supply in datalake_sale_visit.sale_visit / datalake_sale_offer.sale_offer and dw_brokers.dim_broker.
   sk_company_demand:
     lineage:
-    - datalake_sale_visit.sale_visit.sk_company_demand
     - datalake_sale_offer.sale_offer.id_company_demand
-    description: Key of the agents's company in Rede Demand at the start of the funnel, if that is the case. It can be joined with dw_rede.dim_company.
+    description: DEPRECATED - always NULL since the datalake_company.company_sks (enrich_company) deprecation; kept for schema compatibility. For the 3P demand partner use sk_broker_demand in datalake_sale_visit.sale_visit / datalake_sale_offer.sale_offer and dw_brokers.dim_broker.
   id_sale_flow:
     lineage:
     - datalake_sale_visit.sale_visit.id_sale_flow

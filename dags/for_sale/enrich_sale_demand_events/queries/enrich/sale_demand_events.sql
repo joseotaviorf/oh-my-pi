@@ -10,8 +10,8 @@ WITH bookings AS (
     esv.id_buyer,
     esv.id_seller,
     esv.id_agent,
-    esv.sk_company_supply,
-    esv.sk_company_demand,
+    CAST(NULL AS BIGINT) AS sk_company_supply, -- deprecated: removed from sale_visit (enrich_company deprecation)
+    CAST(NULL AS BIGINT) AS sk_company_demand, -- deprecated: removed from sale_visit (enrich_company deprecation)
     esv.id_business_unit,
     esv.sale_type
   FROM

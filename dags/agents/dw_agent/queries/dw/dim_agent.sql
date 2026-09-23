@@ -11,7 +11,7 @@ WITH ranked AS (
     ad.agent_type AS agent_type_main,
     REGEXP_REPLACE(wc.contract_name, '[\\[\\]]', '') AS contract_name,
     ad.creci_number,
-    c.extracted_3p_tag AS rede_partner,
+    cb.broker_name_tag AS rede_partner,
     ad.is_active AS is_agent_active,
     u.is_active AS is_user_active,
     u.is_blocked,
@@ -53,9 +53,6 @@ WITH ranked AS (
   LEFT JOIN
     datalake_person.person_sks AS p
       ON p.uuid_person = u.uuid_person
-  LEFT JOIN
-    datalake_company.company_sks AS c
-      ON ad.uuid_company = c.uuid_company
   LEFT JOIN
     core_brokers.brokers AS cb
       ON ad.uuid_company = cb.uuid_company
