@@ -106,7 +106,7 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 | Capability flags (business function) | `is_allow_supply_acquisition`, `is_allow_supply_conversion`, `is_allow_demand_visit`, `is_allow_demand_acquisition`, `is_allow_negotiation`, `is_allow_demand_sale`, `is_allow_demand_rent` |
 | Timing | `dt_ref`, `days_in_current_status`, `ts_last_status_changed`, `ts_created` |
 
-> Siblings in `dw_agent`: `dim_agent` (current state, documented above), `dim_prospect_agent`, and `fact_visit_agent_performance` (⚠ **STALE since 2025-09-21** — historical only, no confirmed replacement as of 2026-06). `fact_agent_daily` has `uuid_person` and `affiliation_type`; `dim_agent` does not.
+> Siblings in `dw_agent`: `dim_agent` (current state, documented above), `dim_prospect_agent`, and `fact_visit_agent_performance` (⚠ **STALE since 2025-09-21** — historical only). **Current** visit funnel, TQC/TQA, and milestones: [`agents_performance.md`](agents_performance.md) (`dw_agent_performance` / `datalake_agent_performance`). `fact_agent_daily` has `uuid_person` and `affiliation_type`; `dim_agent` does not.
 
 ---
 
@@ -144,7 +144,7 @@ Use [Related Metric Entities](#related-metric-entities) when the question asks f
 **Don't:**
 
 - Select `uuid_person`, `status`, `affiliation_type`, or `uuid_company` from `dw_agent.dim_agent` — those columns are not on that table; use `is_agent_active`, `sk_person` / `sk_user`, and the enrich or daily tables when those fields are required.
-- Use `dw_agent.fact_visit_agent_performance` or any `datalake_visit_agent_performance.*` for current data — pipeline stopped **2025-09-21**; historical only.
+- Use `dw_agent.fact_visit_agent_performance` or any `datalake_visit_agent_performance.*` for **current** data — pipeline stopped **2025-09-21**; use [`agents_performance.md`](agents_performance.md) instead.
 - Mix `sk_agent`/`id_agent` (new) with `sk_agent_data`/`id_agent_data` (legacy) — see the identity-migration warning in [`agents.md`](agents.md).
 - Expect a published `datalake_agent_accreditation.agent_capability` table — it was folded into `agent`; query raw `datalake_ebdb_clean.capability` for per-type detail.
 

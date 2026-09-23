@@ -64,9 +64,9 @@ This domain is split by topic so an analyst (or TARS) loads only what a question
 | **Who is the agent / what type** (business profile classification), hub/NE allocation, tier performance metrics | `dw_agent.dim_agent`, `datalake_hub_services.member_hub_allocation`, `datalake_tiers.agent_performance` | [`agents_profile.md`](agents_profile.md) |
 | Canonical agent identity, capabilities, prospect/accreditation funnel, daily state | `datalake_agent_accreditation.agent`, `dw_agent.fact_agent_daily` | [`agents_accreditation.md`](agents_accreditation.md) |
 | BigAgent earnings, tiers, partner payments (Sale + Rent), Nazaré | `dw_agent_payments.fact_earnings`, `fact_partner_payments` | [`agents_payments.md`](agents_payments.md) |
-| Valid First Listing / property dedup, CIQ Compra de Carteira (pricing, portfolio loss, eligibility) | `datalake_listing_deduplication.valid_first_listing`, `dw_ciq.fact_ciq_listing_purchase` | [`agents_performance.md`](agents_performance.md) |
+| Visit funnel, TQC/TQA conversion, milestones, valid first listing, CIQ Compra de Carteira | `dw_agent_performance.*`, `datalake_agent_performance.*`, `datalake_listing_deduplication.valid_first_listing`, `dw_ciq.fact_ciq_listing_purchase` | [`agents_performance.md`](agents_performance.md) |
 | PFA/PPA relation and eligibility, TQC/TQA acquisition | `datalake_ebdb_agents.preferred_property_agent_relation_history`, `preferred_fixed_agent_history` | [`agents_programs.md`](agents_programs.md) |
-| Visit funnel / completion metrics | `dw_visit.fact_visits` | [`visits.md`](visits.md) |
+| Visit product / scheduling (not agent KPI rollups) | `dw_visit.fact_visits` | [`visits.md`](visits.md) |
 | Leads distributed to agent | `dw_visit.dim_visit` (`sk_visitor` is the lead and `sk_first_associated_agent` is the agent receiving this lead in visits where `visit_request_user_role <> 'AGENT'`) | [`visits.md`](visits.md) |
 
 **Critical rules:**
@@ -93,6 +93,7 @@ No metric entity doc owns the Agents domain yet — use [Related Metric Entities
 - **Agents ↔ Payments (1:N):** `sk_agent` / `sk_partner` on `dw_agent_payments.fact_earnings` and `fact_partner_payments` — see [`agents_payments.md`](agents_payments.md).
 - **Agents ↔ Performance (1:N listings):** `sk_user` on `id_ciq_user_sale` / `id_ciq_user_rent` in `datalake_listing_deduplication.valid_first_listing` — see [`agents_performance.md`](agents_performance.md).
 - **Agents ↔ Programs (1:N PFA/PPA):** `preferred_fixed_agent_history` / `preferred_property_agent_relation_history` — see [`agents_programs.md`](agents_programs.md).
+- **Agents ↔ Performance (visit funnel, TQC, supply/CIQ):** see [`agents_performance.md`](agents_performance.md).
 - **Agents ↔ Visits (1:N):** `dw_visit.fact_visits` / `dim_visit.sk_visitor` — see [`visits.md`](visits.md).
 - **Agents ↛ Chatbot sessions:** Wall-E, Matthew, Sauron, Dominic/Matias are **not** field agents — see [`chatbot_sessions.md`](chatbot_sessions.md).
 

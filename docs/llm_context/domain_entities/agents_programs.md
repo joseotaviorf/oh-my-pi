@@ -45,7 +45,9 @@
 | PPA relation history (listing-side) | `datalake_ebdb_agents.preferred_property_agent_relation_history` |
 | PPA program eligibility | `datalake_ebdb_agents.preferred_property_agent_program_eligibility` |
 | PFA relation history (lead/visitor-side) | `datalake_ebdb_agents.preferred_fixed_agent_history` |
-| TQC/TQA lead referral | `datalake_ebdb_clean.agent_lead_referral` |
+| TQC/TQA lead referral (raw invite) | `datalake_ebdb_clean.agent_lead_referral` |
+| TQC/TQA referral funnel, same-agent conversion, first events | `datalake_agent_performance.fact_agent_demand_acquisition` (see [`agents_performance.md`](agents_performance.md)) |
+| TQC/TQA first/last milestone timestamps | `dw_agent_performance.dim_agent_milestone` (see [`agents_performance.md`](agents_performance.md)) |
 | TQC/TQA payment lines | `dw_agent_payments.fact_partner_payments` (see [`agents_payments.md`](agents_payments.md)) |
 
 **Critical rules:**
@@ -78,7 +80,7 @@ Grain: **one row per PFA status period** — a timeline of agent-visitor prefere
 
 ## TQC / TQA
 
-No dedicated table — identified via capability `DEMAND_ACQUISITION` and rows in `datalake_ebdb_clean.agent_lead_referral` (`business_context = 'SALE'` for TQC, `'RENT'` for TQA). Payment lines land on `dw_agent_payments.fact_partner_payments` with `incentive_system = DEMAND_ACQUISITION_FS` / `DEMAND_ACQUISITION_FR`.
+Identified via capability `DEMAND_ACQUISITION` and rows in `datalake_ebdb_clean.agent_lead_referral` (`business_context = 'SALE'` for TQC, `'RENT'` for TQA). For **conversion analytics** (progression, same-agent attribution, first event structs), use `datalake_agent_performance.fact_agent_demand_acquisition` — see [`agents_performance.md`](agents_performance.md). Payment lines land on `dw_agent_payments.fact_partner_payments` with `incentive_system = DEMAND_ACQUISITION_FS` / `DEMAND_ACQUISITION_FR`.
 
 ## Key Metrics
 
@@ -113,7 +115,7 @@ Use [Related Metric Entities](#related-metric-entities) when the question asks f
 
 - Assume PFA and PPA share one table — a query joining `preferred_property_agent_relation_history` expecting an `origin` or `is_enabled` column will fail; those live on `preferred_fixed_agent_history` only.
 - Assume `ts_relation_started` (PPA) is a true creation timestamp for rows created on 2025-06-03 — it is backfilled.
-- Expect a dedicated TQC/TQA table — both are `agent_lead_referral` rows split by `business_context`.
+- Use `agent_lead_referral` alone when the question is only the **raw invite** — for referral **funnel and same-agent metrics**, use `fact_agent_demand_acquisition` per [`agents_performance.md`](agents_performance.md).
 
 ---
 
