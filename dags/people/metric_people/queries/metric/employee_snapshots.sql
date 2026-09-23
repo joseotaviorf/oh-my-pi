@@ -10,6 +10,54 @@ primary_monthly_snapshots_ranked AS (
     WHERE
         fas.is_monthly_snapshot_for_employee = TRUE
         AND fas.sk_employee <> '-1'
+),
+cycle_period_months AS (
+    -- Bucket the temporal ranges before applying the exact as-of predicate.
+    -- The month equality restores an EMR hash key without changing range semantics.
+    SELECT
+        cp.sk_cycle_period,
+        cp.meeting_type,
+        cp.is_released,
+        cp.dt_valid_from,
+        cp.dt_valid_to,
+        EXPLODE(
+            SEQUENCE(
+                CAST(DATE_TRUNC('MONTH', cp.dt_valid_from) AS DATE),
+                CAST(
+                    DATE_TRUNC(
+                        'MONTH',
+                        LEAST(
+                            cp.dt_valid_to,
+                            (
+                                SELECT
+                                    MAX(dt_reference)
+                                FROM
+                                    primary_monthly_snapshots_ranked
+                            )
+                        )
+                    ) AS DATE
+                ),
+                INTERVAL 1 MONTH
+            )
+        ) AS dt_cycle_month
+    FROM
+        dw_performance.dim_cycle_period AS cp
+    WHERE
+        cp.meeting_type IN ('performance_calibration', 'talent_review')
+        AND cp.dt_valid_from IS NOT NULL
+        AND cp.dt_valid_to IS NOT NULL
+        AND cp.dt_valid_from <= (
+            SELECT
+                MAX(dt_reference)
+            FROM
+                primary_monthly_snapshots_ranked
+        )
+        AND cp.dt_valid_to >= (
+            SELECT
+                MIN(dt_reference)
+            FROM
+                primary_monthly_snapshots_ranked
+        )
 )
 SELECT
     fas.sk_cost_center_version,
@@ -370,16 +418,22 @@ LEFT JOIN
     dw_compensation.dim_event_definition AS ev_raise
         ON ev_raise.sk_event_definition = fc.sk_event_definition
 LEFT JOIN
-    dw_performance.dim_cycle_period AS cp_calibration
+    cycle_period_months AS cp_calibration
         ON cp_calibration.meeting_type = 'performance_calibration'
+        AND cp_calibration.dt_cycle_month = CAST(
+            DATE_TRUNC('MONTH', fas.dt_reference) AS DATE
+        )
         AND fas.dt_reference BETWEEN cp_calibration.dt_valid_from AND cp_calibration.dt_valid_to
 LEFT JOIN
     dw_performance.fact_performance_calibrations AS pcc
         ON pcc.person_number = fas.person_number
         AND pcc.sk_cycle_period = cp_calibration.sk_cycle_period
 LEFT JOIN
-    dw_performance.dim_cycle_period AS cp_talent
+    cycle_period_months AS cp_talent
         ON cp_talent.meeting_type = 'talent_review'
+        AND cp_talent.dt_cycle_month = CAST(
+            DATE_TRUNC('MONTH', fas.dt_reference) AS DATE
+        )
         AND fas.dt_reference BETWEEN cp_talent.dt_valid_from AND cp_talent.dt_valid_to
 LEFT JOIN
     dw_performance.fact_talent_reviews AS ftr
