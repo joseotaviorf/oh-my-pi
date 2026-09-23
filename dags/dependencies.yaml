@@ -4859,8 +4859,11 @@ bietlejuice.reverse_reports:
   - bietlejuice.gsheets_people:done-clean-turnover-user-roles:first-run-of-day
   - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
   - bietlejuice.pin:load-clean-allocated-task-translation:first-run-of-day
+  - bietlejuice.pin:load-clean-contact-relationship:first-run-of-day
   - bietlejuice.pin:load-clean-foundation-lookup-value:first-run-of-day
+  - bietlejuice.pin:load-clean-national-identifiers:first-run-of-day
   - bietlejuice.pin:load-clean-person-name:first-run-of-day
+  - bietlejuice.pin:load-clean-person:first-run-of-day
   - bietlejuice.pin:load-clean-question-answer-translation:first-run-of-day
   - bietlejuice.pin:load-clean-question-base:first-run-of-day
   - bietlejuice.pin:load-clean-question-response:first-run-of-day

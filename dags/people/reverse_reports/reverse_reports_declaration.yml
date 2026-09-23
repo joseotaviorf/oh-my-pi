@@ -147,6 +147,11 @@ workflow:
       extra_spark_job_arguments:
         - "1il9Cl7fuyXQ7AKrso-AQVN0A4LDEE1-vtgcv-rqSEDU"
         - "base"
+    employee_dependents_tax_benefits:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "19wejhwGjx6YCFg3At5Jfnw-90TpMOkyTr5Cl3bhsIzw"
+        - "dependentes"
     access_list_bps:
       extra_spark_job_arguments:
         - "1Wi7zrUxlhdNCX4SgBvylURm1uD0V-daDMPziuEUnjrE"

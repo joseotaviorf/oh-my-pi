@@ -40,6 +40,10 @@ columns:
     description: PIN descriptive-flexfield code for Brazilian income-tax (IRRF) dependent type. Joins to foundation lookup values with lookup type QA_DEPENDENTE_IRRF.
     lineage:
       - datalake_pin_core_raw.per_contact_relships_f.cont_attribute1
+  family_allowance_dependent_type_code:
+    description: PIN descriptive-flexfield code for Brazilian family-allowance (salário-família) dependent type. Joins to foundation lookup values with lookup type QA_SALARIO_FAMILIA.
+    lineage:
+      - datalake_pin_core_raw.per_contact_relships_f.cont_attribute2
   sequence_number:
     description: Sequence number assigned to the relationship by PIN.
     lineage:

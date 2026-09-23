@@ -8,6 +8,7 @@ SELECT
     contact_type,
     statutory_dependent,
     cont_attribute1 AS irrf_dependent_type_code,
+    cont_attribute2 AS family_allowance_dependent_type_code,
     CAST(sequence_number AS INT) AS sequence_number,
     created_by,
     last_updated_by AS updated_by,
