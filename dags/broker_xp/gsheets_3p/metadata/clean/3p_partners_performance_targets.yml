@@ -12,7 +12,7 @@ columns:
   company_cluster:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.company_cluster
-    description: Clusterization of brokers in the marketplace operations. Sourced from a legacy HubSpot-derived attribute (still exposed by dw_public.dim_company_3p_partners.company_cluster); there is no direct equivalent in the canonical dw_brokers.dim_broker yet.
+    description: Clusterization of brokers in the marketplace operations. Sourced from a legacy HubSpot-derived attribute; there is no direct equivalent in the canonical dw_brokers.dim_broker yet.
   account_manager:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.account_manager

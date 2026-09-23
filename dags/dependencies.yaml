@@ -294,7 +294,6 @@ bietlejuice.dw_brokers:
   - bietlejuice.alias:load-clean-ai-agents:first-run-of-day
   - bietlejuice.alias:load-clean-brokers:first-run-of-day
   - bietlejuice.alias:load-clean-crm-integrations:first-run-of-day
-  - bietlejuice.company:load-clean-address:first-run-of-day
   - bietlejuice.company:load-clean-company:first-run-of-day
   - bietlejuice.company:load-clean-tier:first-run-of-day
   - bietlejuice.core_brokers:load-core-brokers-product:first-run-of-day
@@ -307,9 +306,7 @@ bietlejuice.dw_brokers:
   - bietlejuice.enrich_brokers:load-enrich-broker-account-manager-history:first-run-of-day
   - bietlejuice.enrich_brokers:load-enrich-broker-status-history:first-run-of-day
   - bietlejuice.enrich_brokers:load-enrich-hubspot-brokers-history:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
-  - bietlejuice.enrich_hubspot_crm:load-enrich-company-members:first-run-of-day
   - bietlejuice.enrich_hubspot_management:load-enrich-owner:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
 bietlejuice.dw_business_unit_region:

@@ -328,9 +328,7 @@ columns:
       - dw_customer_support.dim_ticket.group_name
     description: Group name associated with the ticket.
   company_name:
-    lineage:
-      - dw_public.dim_company_3p_partners.company_name
-    description: Company name resolved from the customer contact.
+    description: Company name resolved from the customer contact. Always NULL today — no source is currently joined for this column.
   transfer_reason:
     lineage:
       - dw_customer_support.fact_customer_contacts.status

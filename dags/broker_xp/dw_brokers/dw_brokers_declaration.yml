@@ -21,10 +21,7 @@ dag:
       intervals per person and profile type), dim_broker_tier_history (tier assignment periods per
       broker product from core_brokers.broker_tiers_history joined to datalake_company_clean.tier),
       dim_broker_integrator_partner_history (integrator partner UUID periods from
-      core_brokers.broker_products_history resolved to company name via datalake_company_clean.company),
-      and dim_company_3p_partners (legacy partner-company dimension in dw_public describing QuintoAndar's
-      Rede Companies enriched with HubSpot information; kept in the dw_public schema while the rest of
-      the DAG outputs to dw_brokers).
+      core_brokers.broker_products_history resolved to company name via datalake_company_clean.company).
       Upstreams: core_brokers, core_brokers_history (broker_tiers_history, broker_products_history),
       core_region, datalake_brokers (hubspot_brokers_history, broker_status_history,
       broker_account_manager_history),
@@ -63,5 +60,3 @@ workflow:
     dim_broker_integrator_partner_history:
       partitions: [year, month, day]
       z_order_by: [sk_broker_product]
-    dim_company_3p_partners:
-      custom_schema: public
