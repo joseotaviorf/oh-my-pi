@@ -3,7 +3,7 @@ database_name: dw_fintech_snapshot_recon
 table_name: robin_hood_accounting_entry_snapshot
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Monthly snapshot of Robin Hood accounting entries for selected brokerage-related sources, enriched with contract and locale context for reconciliation."
+description: "Monthly snapshot of Robin Hood accounting entries for selected brokerage-related sources, enriched with contract and locale context for reconciliation, plus the latest backoffice recon-removal reason and timestamp when the entry was flagged to skip."
 columns:
   id_accounting_entry:
     lineage:
@@ -44,6 +44,14 @@ columns:
     lineage:
       - datalake_robin_hood.accounting_entry.ts_created
     description: "Calendar date of accounting entry creation in Robin Hood."
+  recon_removals_reason:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry_recon_removals.reason
+    description: "Backoffice free-text justification for excluding this accounting entry from Robin Hood reconciliation. Taken from the latest accounting_entry_recon_removals row for the entry (by ts_created, then ts_cdc_transaction, then id). Null when the entry was never flagged to skip reconciliation."
+  ts_created_recon_removals:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry_recon_removals.ts_created
+    description: "Timestamp when the backoffice registered the latest reconciliation exclusion for this accounting entry in Robin Hood. Null when the entry has no active recon-removal record."
   ts_snapshot:
     description: "Timestamp when the snapshot job ran (NOW)."
   year:

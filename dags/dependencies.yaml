@@ -753,6 +753,7 @@ bietlejuice.dw_fintech_snapshot_recon:
   - bietlejuice.rental_guarantee:load-clean-guarantee:first-run-of-day
   - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance:first-run-of-day
+  - bietlejuice.robin_hood:load-clean-accounting-entry-recon-removals:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-source:first-run-of-day
   - bietlejuice.robin_hood:load-clean-payment-request:first-run-of-day
   - bietlejuice.wall_street_fast_lane:load-clean-charge:first-run-of-day

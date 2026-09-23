@@ -33,9 +33,30 @@ rh_contract_info AS (
             ON ie.sk_invoice_entry = fie.sk_invoice_entry
 ),
 
-rh_all AS (
+recon_removal AS (
     SELECT
         id_accounting_entry,
+        reason,
+        ts_created
+    FROM (
+        SELECT
+            id_accounting_entry,
+            reason,
+            ts_created,
+            ROW_NUMBER() OVER (
+                PARTITION BY id_accounting_entry
+                ORDER BY ts_created DESC, ts_cdc_transaction DESC, id DESC
+            ) AS rni
+        FROM
+            datalake_robin_hood_clean.accounting_entry_recon_removals
+    )
+    WHERE
+        rni = 1
+),
+
+rh_all AS (
+    SELECT
+        eb.id_accounting_entry,
         CAST(NULL AS BIGINT) AS id_entry,
         CAST(NULL AS BIGINT) AS id_invoice,
         TRY_CAST(COALESCE(ae.id_contract, regexp_replace(ae.description, '[^0-9]', '')) AS BIGINT) AS sk_contract,
@@ -70,7 +91,9 @@ rh_all AS (
         c.contract_annulment,
         CASE WHEN c.contract_start <= c.contract_annulment THEN false ELSE true END AS ended_before_started,
         c.status AS contract_status,
-        aes.source_name AS type
+        aes.source_name AS type,
+        rr.reason AS reason,
+        rr.ts_created AS ts_created
     FROM
         datalake_robin_hood.accounting_entry AS ae
     INNER JOIN
@@ -94,6 +117,9 @@ rh_all AS (
     LEFT JOIN
         dw_public.dim_region AS r
             ON r.sk_region = rf.sk_region
+    LEFT JOIN
+        recon_removal AS rr
+            ON rr.id_accounting_entry = ae.id
     WHERE
         aes.source_name IN (
             'Corretagem de aluguel',
@@ -113,6 +139,8 @@ SELECT DISTINCT
     status,
     type,
     entry_created_date,
+    reason AS recon_removals_reason,
+    ts_created AS ts_created_recon_removals,
     NOW() AS ts_snapshot,
     YEAR(CURRENT_DATE()) AS year,
     MONTH(CURRENT_DATE()) AS month,
