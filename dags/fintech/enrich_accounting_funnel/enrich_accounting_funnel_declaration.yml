@@ -4,7 +4,7 @@ dag:
   schedule_start_date: 2020, 7, 1
   owner: Data Fintech
   criticality: High
-  sla_deadline_localtime: "08:00"
+  sla_deadline_localtime: "11:00"
 workflow:
   tables_customization:
     invoice_all:
