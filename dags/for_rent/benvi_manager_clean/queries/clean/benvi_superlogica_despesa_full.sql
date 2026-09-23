@@ -37,7 +37,9 @@ WITH expense_row AS (
         get_json_object(CAST(lake_mirror.payload AS STRING), '$.fl_status_imodm') AS fl_status_imodm,
         lake_mirror.synced_at,
         ROW_NUMBER() OVER (
-            PARTITION BY COALESCE(
+            -- resource_code is part of the key: a recurring template id and a one-off
+            -- launch id live in different vendor sequences and routinely share a number.
+            PARTITION BY lake_mirror.resource_code, COALESCE(
                 NULLIF(get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_lancamento_imodm'), ''),
                 NULLIF(get_json_object(CAST(lake_mirror.payload AS STRING), '$.id_recorrencia'), ''),
                 lake_mirror.vendor_natural_key

@@ -1,7 +1,7 @@
 -- Widened to the full CHARGE payload so RAW cobrancas_full in the extraction spreadsheet
 -- maps one to one onto this projection, monetary columns included.
--- dt_recebimento_recb is the one spreadsheet column absent from the vendor payload;
--- dt_liquidacao_recb is the settlement date the vendor does send.
+-- dt_liquidacao_recb and dt_recebimento_recb are separate vendor dates; benvi-manager
+-- lands both since it stopped folding dt_recebimento_recb into dt_liquidacao_recb.
 -- Date strings arrive as MM/dd/yyyy or yyyy-MM-dd, so both shapes are parsed.
 -- Join id_sacado_sac to locatario.id_sacado_sac, id_contrato_con to contrato.
 WITH charge_row AS (
@@ -116,6 +116,10 @@ SELECT
         TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'MM/dd/yyyy'),
         TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'yyyy-MM-dd')
     ) AS dt_liquidacao_recb,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_recebimento_recb'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_recebimento_recb'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_recebimento_recb,
     CAST(get_json_object(charge_row.payload_json, '$.fl_protestado_recb') AS INT) AS fl_protestado_recb,
     CAST(get_json_object(charge_row.payload_json, '$.fl_cartao_recb') AS INT) AS fl_cartao_recb,
     get_json_object(charge_row.payload_json, '$.tx_cartaomensagem_recb') AS tx_cartaomensagem_recb,

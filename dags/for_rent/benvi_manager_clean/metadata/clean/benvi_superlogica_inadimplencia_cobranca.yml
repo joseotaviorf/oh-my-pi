@@ -321,6 +321,13 @@ columns:
       payload.
     lineage:
       - datalake_benvi_manager_raw.lake_mirror.payload
+  dt_recebimento_recb:
+    description: >-
+      Calendar date recebimento held on the receivable charge inside the Superlogica CHARGE
+      payload. A separate vendor date from dt_liquidacao_recb; either one marks the charge as
+      settled.
+    lineage:
+      - datalake_benvi_manager_raw.lake_mirror.payload
   fl_protestado_recb:
     description: >-
       Vendor status or boolean flag protestado held on the receivable charge inside the

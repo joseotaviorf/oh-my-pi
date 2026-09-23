@@ -3,7 +3,10 @@
 -- DELINQUENCY summary at contract grain and downstream consumers already read it.
 -- This one reproduces build_inadimplencia_dataset: overdue unsettled charges belonging
 -- to a sacado that GET /inadimplencia flagged, which is what the spreadsheet tab holds.
--- Overdue means past due, no settlement date, not cancelled and fl_status_recb not 1 or 3.
+-- Overdue means past due, neither dt_liquidacao_recb nor dt_recebimento_recb set, not
+-- cancelled and fl_status_recb not 1, 3 or 4. The script treats either date as settled,
+-- and it reads charges from GET /cobrancas?status=pendentes, which leaves out charges
+-- renegotiated into an agreement (fl_status_recb 4, dt_acordo_recb set).
 -- origem_extracao is the script constant, dias_atraso is measured against the run date,
 -- and valorcorrigido is the sacado total carried over from the DELINQUENCY summary.
 -- The DELINQUENCY payload leaves id_sacado_sac empty, so the flagged debtor is
@@ -36,6 +39,10 @@ charge_row AS (
             TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'MM/dd/yyyy'),
             TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'yyyy-MM-dd')
         ) AS dt_liquidacao_recb,
+        COALESCE(
+            TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_recebimento_recb'), 1, 10), 'MM/dd/yyyy'),
+            TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_recebimento_recb'), 1, 10), 'yyyy-MM-dd')
+        ) AS dt_recebimento_recb,
         COALESCE(
             TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_cancelamento_recb'), 1, 10), 'MM/dd/yyyy'),
             TO_DATE(SUBSTR(get_json_object(charge_raw.payload_json, '$.dt_cancelamento_recb'), 1, 10), 'yyyy-MM-dd')
@@ -156,6 +163,10 @@ SELECT
         TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'MM/dd/yyyy'),
         TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_liquidacao_recb'), 1, 10), 'yyyy-MM-dd')
     ) AS dt_liquidacao_recb,
+    COALESCE(
+        TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_recebimento_recb'), 1, 10), 'MM/dd/yyyy'),
+        TO_DATE(SUBSTR(get_json_object(charge_row.payload_json, '$.dt_recebimento_recb'), 1, 10), 'yyyy-MM-dd')
+    ) AS dt_recebimento_recb,
     CAST(get_json_object(charge_row.payload_json, '$.fl_protestado_recb') AS INT) AS fl_protestado_recb,
     CAST(get_json_object(charge_row.payload_json, '$.fl_cartao_recb') AS INT) AS fl_cartao_recb,
     get_json_object(charge_row.payload_json, '$.tx_cartaomensagem_recb') AS tx_cartaomensagem_recb,
@@ -332,5 +343,6 @@ INNER JOIN
 WHERE
     charge_row.dt_vencimento_recb < CURRENT_DATE()
     AND charge_row.dt_liquidacao_recb IS NULL
+    AND charge_row.dt_recebimento_recb IS NULL
     AND charge_row.dt_cancelamento_recb IS NULL
-    AND (charge_row.fl_status_recb IS NULL OR charge_row.fl_status_recb NOT IN (1, 3))
+    AND (charge_row.fl_status_recb IS NULL OR charge_row.fl_status_recb NOT IN (1, 3, 4))

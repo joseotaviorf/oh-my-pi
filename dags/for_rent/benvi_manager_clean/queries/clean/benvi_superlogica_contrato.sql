@@ -244,10 +244,15 @@ SELECT
     CAST(get_json_object(payload_json, '$.fl_isencaomulta_con') AS INT) AS fl_isencaomulta_con,
     get_json_object(payload_json, '$.mes_refproporcionalocupacao') AS mes_refproporcionalocupacao,
     get_json_object(payload_json, '$.nome_proprietario') AS nome_proprietario,
-    get_json_object(payload_json, '$.id_gestor_ges') AS id_gestor_ges,
-    get_json_object(payload_json, '$.st_nome_ges') AS st_nome_ges,
-    get_json_object(payload_json, '$.st_email_ges') AS st_email_ges,
-    get_json_object(payload_json, '$.status_contrato') AS status_contrato,
+    -- The vendor payload has no top-level manager or status. Both are derived the way the
+    -- manual script does: first entry of imoveis_gestores, and fl_ativo_con as Ativo/Inativo.
+    get_json_object(payload_json, '$.imoveis_gestores[0].id_gestor_ges') AS id_gestor_ges,
+    get_json_object(payload_json, '$.imoveis_gestores[0].st_nome_ges') AS st_nome_ges,
+    get_json_object(payload_json, '$.imoveis_gestores[0].st_email_ges') AS st_email_ges,
+    CASE get_json_object(payload_json, '$.fl_ativo_con')
+        WHEN '1' THEN 'Ativo'
+        WHEN '0' THEN 'Inativo'
+    END AS status_contrato,
     CAST(get_json_object(payload_json, '$.fl_tiposeguradora_seg') AS INT) AS fl_tiposeguradora_seg,
     get_json_object(payload_json, '$.st_nome_seg') AS st_nome_seg,
     get_json_object(payload_json, '$.st_telefone_seg') AS st_telefone_seg,
