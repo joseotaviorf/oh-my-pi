@@ -35,6 +35,7 @@ _FLEET_ONLY_NODE_BLOCK_KEYS = frozenset(
         "instance_types",
         "bid_price_percentage",
         "spot_timeout_minutes",
+        "max_nodes",
     }
 )
 
@@ -310,8 +311,13 @@ class DAGClusterValidator(Validator):
                 f"{sorted(present_fleet_keys)}; use one style or the other, not both"
             )
 
+        if block.get("max_nodes") is not None:
+            cls._assert_emr_fleet_max_nodes(block, name)
+
         if cls._is_emr_fleet_block(block):
             cls._assert_emr_fleet_block(block, name)
+        elif present_fleet_keys:
+            cls._assert_emr_partial_fleet_override(block, name)
         else:
             cls._assert_emr_group_block(block, name, min_count=min_count)
 
@@ -338,6 +344,103 @@ class DAGClusterValidator(Validator):
                 )
 
     @staticmethod
+    def _assert_emr_fleet_max_nodes(block: dict, name: str) -> None:
+        max_nodes = block.get("max_nodes")
+        if max_nodes is None:
+            return
+        if (
+            not isinstance(max_nodes, int)
+            or isinstance(max_nodes, bool)
+            or max_nodes < 1
+        ):
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                f"msg='{name}.max_nodes' must be an integer >= 1"
+            )
+        target_on_demand = int(block.get("target_on_demand", 0) or 0)
+        target_spot = int(block.get("target_spot", 0) or 0)
+        initial = target_on_demand + target_spot
+        if initial > 0 and max_nodes < initial:
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                f"msg='{name}.max_nodes' ({max_nodes}) must be >= "
+                f"target_on_demand+target_spot ({initial})"
+            )
+
+    @classmethod
+    def _assert_emr_partial_fleet_override(cls, block: dict, name: str) -> None:
+        """Fleet keys in a declaration override without instance_types (merged at runtime)."""
+        cls._assert_emr_fleet_target_fields(block, name)
+        allocation_strategy = block.get("allocation_strategy")
+        if allocation_strategy is not None and (
+            not isinstance(allocation_strategy, str)
+            or allocation_strategy not in _EMR_FLEET_ALLOCATION_STRATEGIES
+        ):
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                f"msg='{name}.allocation_strategy' must be one of "
+                f"{sorted(_EMR_FLEET_ALLOCATION_STRATEGIES)}"
+            )
+        bid_price_percentage = block.get("bid_price_percentage")
+        if bid_price_percentage is not None:
+            if (
+                not isinstance(bid_price_percentage, (int, float))
+                or isinstance(bid_price_percentage, bool)
+                or bid_price_percentage <= 0
+            ):
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.bid_price_percentage' must be a positive number"
+                )
+        spot_timeout_minutes = block.get("spot_timeout_minutes")
+        if spot_timeout_minutes is not None:
+            if (
+                not isinstance(spot_timeout_minutes, int)
+                or isinstance(spot_timeout_minutes, bool)
+                or not (5 <= spot_timeout_minutes <= 1440)
+            ):
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.spot_timeout_minutes' must be an integer between "
+                    "5 and 1440"
+                )
+
+    @staticmethod
+    def _assert_emr_fleet_target_fields(
+        block: dict, name: str, *, validate_defaults: bool = False
+    ) -> None:
+        max_nodes = block.get("max_nodes")
+        for field_name in ("target_on_demand", "target_spot"):
+            if field_name not in block and not validate_defaults:
+                continue
+            value = block.get(field_name, 0)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.{field_name}' must be a non-negative integer"
+                )
+        if validate_defaults or "target_on_demand" in block or "target_spot" in block:
+            tod = int(block.get("target_on_demand", 0) or 0)
+            tsp = int(block.get("target_spot", 0) or 0)
+            if tod + tsp <= 0:
+                if name == "core_nodes":
+                    raise AssertionError(
+                        "m=_check_emr_cluster_configuration, "
+                        "msg='core_nodes' target_on_demand+target_spot must be >= 1; "
+                        "max_nodes does not allow core to scale from zero"
+                    )
+                if max_nodes is None:
+                    raise AssertionError(
+                        "m=_check_emr_cluster_configuration, "
+                        f"msg='{name}' must set target_on_demand and/or target_spot > 0"
+                        + (
+                            " or set max_nodes for scale-from-zero"
+                            if not validate_defaults
+                            else ""
+                        )
+                    )
+
+    @staticmethod
     def _assert_emr_fleet_block(block: dict, name: str) -> None:
         instance_types = block.get("instance_types")
         if not isinstance(instance_types, list) or not instance_types:
@@ -351,22 +454,9 @@ class DAGClusterValidator(Validator):
                 f"msg='{name}.instance_types' entries must be non-empty strings"
             )
 
-        target_on_demand = block.get("target_on_demand", 0)
-        target_spot = block.get("target_spot", 0)
-        for field_name, value in (
-            ("target_on_demand", target_on_demand),
-            ("target_spot", target_spot),
-        ):
-            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
-                raise AssertionError(
-                    "m=_check_emr_cluster_configuration, "
-                    f"msg='{name}.{field_name}' must be a non-negative integer"
-                )
-        if int(target_on_demand) + int(target_spot) <= 0:
-            raise AssertionError(
-                "m=_check_emr_cluster_configuration, "
-                f"msg='{name}' must set target_on_demand and/or target_spot > 0"
-            )
+        DAGClusterValidator._assert_emr_fleet_target_fields(
+            block, name, validate_defaults=True
+        )
 
         allocation_strategy = block.get("allocation_strategy")
         if allocation_strategy is not None and (

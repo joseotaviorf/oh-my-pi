@@ -18,7 +18,7 @@
 #
 import copy
 import logging
-from typing import Tuple
+from typing import Optional, Tuple
 
 from emr_plugin.constants import (
     DEFAULT_MASTER_INSTANCE_TYPE,
@@ -112,6 +112,7 @@ _FLEET_ONLY_BLOCK_KEYS = frozenset(
         "instance_types",
         "bid_price_percentage",
         "spot_timeout_minutes",
+        "max_nodes",
     }
 )
 
@@ -324,6 +325,9 @@ def _uses_spot_capacity(overrides: dict) -> bool:
     for fleet in instances.get("InstanceFleets") or []:
         if int(fleet.get("TargetSpotCapacity") or 0) > 0:
             return True
+        launch_specs = fleet.get("LaunchSpecifications") or {}
+        if launch_specs.get("SpotSpecification"):
+            return True
     for group in instances.get("InstanceGroups") or []:
         if group.get("Market") == "SPOT" and int(group.get("InstanceCount") or 0) > 0:
             return True
@@ -407,22 +411,197 @@ def _uses_instance_fleets(cfg: dict) -> bool:
     return True
 
 
+def _parse_fleet_max_nodes(block: dict, fleet_name: str) -> Optional[int]:
+    raw = block.get("max_nodes")
+    if raw is None:
+        return None
+    if isinstance(raw, bool) or not isinstance(raw, int):
+        raise ValueError(f"{fleet_name}.max_nodes must be an integer >= 1 when set")
+    if raw < 1:
+        raise ValueError(f"{fleet_name}.max_nodes must be >= 1")
+    return raw
+
+
+def _fleet_initial_units(spec: dict) -> int:
+    return int(spec["target_on_demand"]) + int(spec["target_spot"])
+
+
+def _fleet_launch_targets(
+    spec: dict, aws_attrs: dict, *, is_task: bool
+) -> Tuple[int, int]:
+    """Targets sent to RunJobFlow; EMR requires at least one unit per fleet."""
+    on_demand = int(spec["target_on_demand"])
+    spot = int(spec["target_spot"])
+    if on_demand > 0 or spot > 0:
+        return on_demand, spot
+    if _fleet_scale_out_uses_spot(spec, aws_attrs, is_task=is_task):
+        return 0, 1
+    return 1, 0
+
+
+def _fleet_effective_initial_units(
+    spec: dict, aws_attrs: dict, *, is_task: bool
+) -> int:
+    on_demand, spot = _fleet_launch_targets(spec, aws_attrs, is_task=is_task)
+    return on_demand + spot
+
+
+def _fleet_autoscale_requested(core_spec: dict, task_spec: dict) -> bool:
+    if core_spec.get("max_nodes") is not None:
+        return True
+    return bool(task_spec) and task_spec.get("max_nodes") is not None
+
+
+def _fleet_max_units(initial: int, max_nodes: Optional[int]) -> int:
+    if max_nodes is None:
+        return initial
+    return max_nodes
+
+
+def _fleet_max_on_demand_units(
+    spec: dict,
+    initial: int,
+    fleet_max: int,
+    *,
+    zero_capacity_market: Optional[str] = None,
+) -> int:
+    """On-demand unit ceiling for one fleet under managed scaling."""
+    if fleet_max <= 0:
+        return 0
+    if initial == 0:
+        if zero_capacity_market == "ON_DEMAND":
+            return fleet_max
+        return 0
+    on_demand = int(spec["target_on_demand"])
+    spot = int(spec["target_spot"])
+    if on_demand == 0:
+        return 0
+    if spot == 0:
+        return fleet_max
+    return min(fleet_max, max(on_demand, int(round(fleet_max * on_demand / initial))))
+
+
+def _fleet_scale_out_uses_spot(spec: dict, aws_attrs: dict, *, is_task: bool) -> bool:
+    initial = _fleet_initial_units(spec)
+    if initial > 0:
+        if int(spec["target_spot"]) > 0:
+            return True
+        return False
+    if not is_task:
+        availability = aws_attrs.get("availability", "ON_DEMAND")
+        return AVAILABILITY_MAP.get(availability, "ON_DEMAND") == "SPOT"
+    return _task_market(aws_attrs) == "SPOT"
+
+
+def _build_fleet_managed_scaling_policy(
+    core_spec: dict, task_spec: dict, aws_attrs: dict
+) -> dict:
+    core_initial = _fleet_effective_initial_units(core_spec, aws_attrs, is_task=False)
+    task_initial = (
+        _fleet_effective_initial_units(task_spec, aws_attrs, is_task=True)
+        if task_spec
+        else 0
+    )
+
+    core_max_nodes = core_spec.get("max_nodes")
+    task_max_nodes = task_spec.get("max_nodes") if task_spec else None
+
+    core_declared = _fleet_initial_units(core_spec)
+    task_declared = _fleet_initial_units(task_spec) if task_spec else 0
+    if core_max_nodes is not None and core_max_nodes < core_declared:
+        raise ValueError(
+            "core_nodes.max_nodes must be >= core_nodes target_on_demand+target_spot"
+        )
+    if task_spec and task_max_nodes is not None and task_max_nodes < task_declared:
+        raise ValueError(
+            "task_nodes.max_nodes must be >= task_nodes target_on_demand+target_spot"
+        )
+
+    core_max = _fleet_max_units(core_initial, core_max_nodes)
+    task_max = _fleet_max_units(task_initial, task_max_nodes) if task_spec else 0
+
+    min_units = core_initial + task_initial
+    max_units = core_max + task_max
+
+    core_od_max = _fleet_max_on_demand_units(
+        core_spec, core_initial, core_max, zero_capacity_market=None
+    )
+    task_od_max = 0
+    if task_spec:
+        task_launch_od, task_launch_spot = _fleet_launch_targets(
+            task_spec, aws_attrs, is_task=True
+        )
+        task_od_max = _fleet_max_on_demand_units(
+            {
+                **task_spec,
+                "target_on_demand": task_launch_od,
+                "target_spot": task_launch_spot,
+            },
+            task_initial,
+            task_max,
+            zero_capacity_market=None,
+        )
+
+    return {
+        "ComputeLimits": {
+            "UnitType": "InstanceFleetUnits",
+            "MinimumCapacityUnits": min_units,
+            "MaximumCapacityUnits": max_units,
+            "MaximumCoreCapacityUnits": core_max,
+            "MaximumOnDemandCapacityUnits": core_od_max + task_od_max,
+        }
+    }
+
+
+def _warn_fleet_autoscale_spark_conf(cfg: dict) -> None:
+    spark_conf = cfg.get("spark_conf") or {}
+    enabled = str(spark_conf.get("spark.dynamicAllocation.enabled", "true")).lower()
+    if enabled in ("false", "0", "no"):
+        log.warning(
+            "Fleet max_nodes autoscaling uses EMR managed scaling driven by YARN "
+            "pending demand; spark.dynamicAllocation.enabled is false — scaling "
+            "may not occur."
+        )
+    max_executors = spark_conf.get("spark.dynamicAllocation.maxExecutors")
+    if max_executors is None:
+        return
+    max_str = str(max_executors).strip()
+    if not max_str or max_str.lower() in ("inf", "infinity"):
+        return
+    try:
+        if int(max_str) < 2**31:
+            log.warning(
+                "Fleet max_nodes autoscaling may be limited by "
+                "spark.dynamicAllocation.maxExecutors=%s",
+                max_executors,
+            )
+    except ValueError:
+        pass
+
+
 def _resolve_fleet_topology(cfg: dict) -> Tuple[dict, dict]:
     """Pop and normalize core_nodes/task_nodes fleet blocks.
 
     Returns (core_fleet_spec, task_fleet_spec); either is {} if absent or has no
-    target capacity.
+    target capacity and no max_nodes autoscale.
     """
     core_block = cfg.pop("core_nodes", None) or {}
     task_block = cfg.pop("task_nodes", None) or {}
 
-    def _normalize(block: dict) -> dict:
+    def _normalize(block: dict, fleet_name: str) -> dict:
         if not block:
             return {}
         target_on_demand = int(block.get("target_on_demand", 0) or 0)
         target_spot = int(block.get("target_spot", 0) or 0)
-        if target_on_demand == 0 and target_spot == 0:
+        max_nodes = _parse_fleet_max_nodes(block, fleet_name)
+        has_capacity = target_on_demand > 0 or target_spot > 0
+        if not has_capacity and max_nodes is None:
             return {}
+        if not has_capacity and not block.get("instance_types"):
+            raise ValueError(
+                f"{fleet_name} with max_nodes requires instance_types when "
+                "target_on_demand and target_spot are both 0"
+            )
         return {
             "instance_types": list(block.get("instance_types") or []),
             "target_on_demand": target_on_demand,
@@ -432,9 +611,10 @@ def _resolve_fleet_topology(cfg: dict) -> Tuple[dict, dict]:
             "spot_timeout_minutes": int(
                 block.get("spot_timeout_minutes", DEFAULT_SPOT_TIMEOUT_MINUTES)
             ),
+            "max_nodes": max_nodes,
         }
 
-    return _normalize(core_block), _normalize(task_block)
+    return _normalize(core_block, "core_nodes"), _normalize(task_block, "task_nodes")
 
 
 def _build_instance_type_configs(
@@ -482,9 +662,22 @@ def _translate_instance_fleets(cfg: dict, overrides: dict):
     if autoscale and isinstance(autoscale, dict):
         raise ValueError(
             "autoscale is not supported with EMR Instance Fleets (core_nodes/"
-            "task_nodes use instance_types); use target_on_demand/target_spot "
-            "instead, or switch back to group-style core_nodes/task_nodes"
+            "task_nodes use instance_types); use max_nodes on core_nodes/"
+            "task_nodes for EMR managed scaling, or switch back to group-style "
+            "core_nodes/task_nodes with autoscale"
         )
+
+    aws_attrs_for_policy = cfg.get("aws_attributes") or {}
+    if _fleet_autoscale_requested(core_spec, task_spec):
+        if not core_spec or _fleet_initial_units(core_spec) < 1:
+            raise ValueError(
+                "max_nodes fleet autoscaling requires a CORE fleet with "
+                "target_on_demand+target_spot >= 1"
+            )
+        overrides["ManagedScalingPolicy"] = _build_fleet_managed_scaling_policy(
+            core_spec, task_spec, aws_attrs_for_policy
+        )
+        _warn_fleet_autoscale_spark_conf(cfg)
 
     if task_spec and not core_spec:
         raise ValueError(
@@ -549,17 +742,22 @@ def _translate_instance_fleets(cfg: dict, overrides: dict):
         # This ensures Priority is respected not only when target_on_demand > 0, but also
         # when Spot capacity times out and switches to On-Demand (SWITCH_TO_ON_DEMAND).
         core_launch_specs = _build_on_demand_specification()
-        if core_spec["target_spot"] > 0:
+        if core_spec["target_spot"] > 0 or _fleet_scale_out_uses_spot(
+            core_spec, aws_attrs, is_task=False
+        ):
             core_launch_specs.update(_build_spot_specification(core_spec))
         core_fleet["LaunchSpecifications"] = core_launch_specs
         fleets.append(core_fleet)
 
     if task_spec:
+        task_launch_od, task_launch_spot = _fleet_launch_targets(
+            task_spec, aws_attrs, is_task=True
+        )
         task_fleet = {
             "Name": EMR_INSTANCE_FLEET_NAME_TASK,
             "InstanceFleetType": "TASK",
-            "TargetOnDemandCapacity": task_spec["target_on_demand"],
-            "TargetSpotCapacity": task_spec["target_spot"],
+            "TargetOnDemandCapacity": task_launch_od,
+            "TargetSpotCapacity": task_launch_spot,
             "InstanceTypeConfigs": _build_instance_type_configs(
                 task_spec["instance_types"],
                 ebs_config=ebs_config,
@@ -569,7 +767,9 @@ def _translate_instance_fleets(cfg: dict, overrides: dict):
         # Always configure OnDemandSpecification with 'prioritized' allocation strategy
         # so fallback On-Demand launches on Spot timeout honour ARM-first Priority.
         task_launch_specs = _build_on_demand_specification()
-        if task_spec["target_spot"] > 0:
+        if task_spec["target_spot"] > 0 or _fleet_scale_out_uses_spot(
+            task_spec, aws_attrs, is_task=True
+        ):
             task_launch_specs.update(_build_spot_specification(task_spec))
         task_fleet["LaunchSpecifications"] = task_launch_specs
         fleets.append(task_fleet)

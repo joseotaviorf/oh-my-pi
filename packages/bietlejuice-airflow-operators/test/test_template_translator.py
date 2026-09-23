@@ -530,3 +530,159 @@ def test_translate_fleets_spot_only_includes_on_demand_specification_for_timeout
         task["LaunchSpecifications"]["SpotSpecification"]["TimeoutAction"]
         == "SWITCH_TO_ON_DEMAND"
     )
+
+
+def test_fleet_without_max_nodes_omits_managed_scaling_policy():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 0,
+            }
+        )
+    )
+    assert "ManagedScalingPolicy" not in out
+
+
+def test_fleet_core_max_nodes_emits_managed_scaling_policy():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 0,
+                "max_nodes": 6,
+            }
+        )
+    )
+    limits = out["ManagedScalingPolicy"]["ComputeLimits"]
+    assert limits["UnitType"] == "InstanceFleetUnits"
+    assert limits["MinimumCapacityUnits"] == 2
+    assert limits["MaximumCapacityUnits"] == 6
+    assert limits["MaximumCoreCapacityUnits"] == 6
+    assert limits["MaximumOnDemandCapacityUnits"] == 6
+
+
+def test_fleet_task_max_nodes_from_zero_emits_task_fleet_and_spot_launch_spec():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 0,
+            },
+            task_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 0,
+                "target_spot": 0,
+                "max_nodes": 12,
+            },
+        )
+    )
+    assert len(out["Instances"]["InstanceFleets"]) == 3
+    task = out["Instances"]["InstanceFleets"][2]
+    assert task["TargetOnDemandCapacity"] == 0
+    assert task["TargetSpotCapacity"] == 1
+    assert "SpotSpecification" in task["LaunchSpecifications"]
+    limits = out["ManagedScalingPolicy"]["ComputeLimits"]
+    assert limits["MinimumCapacityUnits"] == 3
+    assert limits["MaximumCapacityUnits"] == 14
+    assert limits["MaximumOnDemandCapacityUnits"] == 2
+    assert _has_decommission_defaults(out)
+
+
+def test_fleet_mixed_core_targets_on_demand_cap_from_max_nodes_ratio():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 2,
+                "max_nodes": 10,
+            },
+            task_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 0,
+                "target_spot": 0,
+            },
+        )
+    )
+    limits = out["ManagedScalingPolicy"]["ComputeLimits"]
+    assert limits["MaximumOnDemandCapacityUnits"] == 5
+    assert limits["MaximumCapacityUnits"] == 10
+    assert limits["MaximumCoreCapacityUnits"] == 10
+    assert limits["MinimumCapacityUnits"] == 4
+
+
+def test_fleet_task_max_nodes_on_demand_includes_task_in_on_demand_cap():
+    out = translate(
+        _fleet_base(
+            core_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 2,
+                "target_spot": 0,
+            },
+            task_nodes={
+                "instance_types": ["r6g.xlarge"],
+                "target_on_demand": 0,
+                "target_spot": 0,
+                "max_nodes": 8,
+            },
+            aws_attributes={
+                "availability": "ON_DEMAND",
+                "task_availability": "ON_DEMAND",
+                "instance_profile_arn": "arn:aws:iam::123:instance-profile/x",
+                "ebs_volume_count": 1,
+                "ebs_volume_size": 100,
+                "ebs_volume_type": "gp3",
+            },
+        )
+    )
+    task = out["Instances"]["InstanceFleets"][2]
+    assert task["TargetOnDemandCapacity"] == 1
+    assert task["TargetSpotCapacity"] == 0
+    limits = out["ManagedScalingPolicy"]["ComputeLimits"]
+    assert limits["MaximumOnDemandCapacityUnits"] == 10
+
+
+def test_fleet_autoscale_rejects_top_level_autoscale_dict():
+    with pytest.raises(ValueError, match="autoscale is not supported"):
+        translate(
+            _fleet_base(
+                autoscale={"min_workers": 2, "max_workers": 10},
+                core_nodes={
+                    "instance_types": ["r6g.xlarge"],
+                    "target_on_demand": 2,
+                    "target_spot": 0,
+                },
+            )
+        )
+
+
+def test_fleet_autoscale_requires_core_capacity():
+    with pytest.raises(ValueError, match="requires a CORE fleet"):
+        translate(
+            _fleet_base(
+                core_nodes={
+                    "instance_types": ["r6g.xlarge"],
+                    "target_on_demand": 0,
+                    "target_spot": 0,
+                    "max_nodes": 4,
+                }
+            )
+        )
+
+
+def test_fleet_max_nodes_below_initial_targets_raises():
+    with pytest.raises(ValueError, match="max_nodes"):
+        translate(
+            _fleet_base(
+                core_nodes={
+                    "instance_types": ["r6g.xlarge"],
+                    "target_on_demand": 4,
+                    "target_spot": 0,
+                    "max_nodes": 2,
+                }
+            )
+        )

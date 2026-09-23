@@ -392,6 +392,110 @@ class TestEmrInstanceFleetConfiguration:
         with pytest.raises(AssertionError, match="TASK capacity"):
             dag_cluster_validator.validate_cluster(dag_declaration=declaration)
 
+    def test_emr_fleet_max_nodes_partial_override_passes(self, dag_cluster_validator):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "core_nodes": {"max_nodes": 6},
+                },
+            }
+        )
+        dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
+    def test_emr_fleet_core_zero_targets_with_max_nodes_raises(
+        self, dag_cluster_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "core_nodes": {
+                        "target_on_demand": 0,
+                        "target_spot": 0,
+                        "max_nodes": 6,
+                        "instance_types": ["m6i.4xlarge"],
+                    },
+                },
+            }
+        )
+        with pytest.raises(AssertionError, match="core to scale from zero"):
+            dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
+    def test_emr_fleet_task_zero_targets_with_max_nodes_passes(
+        self, dag_cluster_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "core_nodes": {
+                        "target_on_demand": 2,
+                        "instance_types": ["m6i.4xlarge"],
+                    },
+                    "task_nodes": {
+                        "target_on_demand": 0,
+                        "target_spot": 0,
+                        "max_nodes": 12,
+                        "instance_types": ["m6i.4xlarge"],
+                    },
+                },
+            }
+        )
+        dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
+    def test_emr_fleet_max_nodes_below_targets_raises(self, dag_cluster_validator):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "core_nodes": {
+                        "target_on_demand": 4,
+                        "instance_types": ["m6i.4xlarge"],
+                        "max_nodes": 2,
+                    },
+                },
+            }
+        )
+        with pytest.raises(AssertionError, match="max_nodes"):
+            dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
+    def test_emr_fleet_max_nodes_mixed_with_instance_count_raises(
+        self, dag_cluster_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "core_nodes": {
+                        "instance_count": 2,
+                        "max_nodes": 6,
+                        "node_type_id": "m5.xlarge",
+                    },
+                },
+            }
+        )
+        with pytest.raises(AssertionError, match="mixes instance-group keys"):
+            dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
+    @pytest.mark.parametrize(
+        "invalid_max_nodes",
+        ["6", 6.5, True],
+    )
+    def test_emr_fleet_max_nodes_non_integer_raises(
+        self, dag_cluster_validator, invalid_max_nodes
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "core_nodes": {"max_nodes": invalid_max_nodes},
+                },
+            }
+        )
+        with pytest.raises(AssertionError, match="max_nodes"):
+            dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
     @pytest.mark.parametrize(
         "legacy_key, legacy_value",
         [
