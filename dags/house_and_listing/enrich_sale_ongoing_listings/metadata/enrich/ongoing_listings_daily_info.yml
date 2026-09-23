@@ -31,11 +31,6 @@ columns:
     description: ID of the region of the house.
     lineage:
       - datalake_ebdb_clean.house.id_region
-  sk_company:
-    description: Key of the company in Rede QuintoAndar associated with the house.
-      Can be joined with dw_rede.dim_company.
-    lineage:
-      - datalake_company.company_sks.sk_company
   id_suggestion_change:
     description: The Id of the suggestion change record from the pricing model.
     lineage:

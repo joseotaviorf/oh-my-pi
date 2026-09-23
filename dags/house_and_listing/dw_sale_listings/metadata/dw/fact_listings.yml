@@ -36,16 +36,10 @@ columns:
     categories:
       PRIMARY: Listing for a Primary Market (new-build) unit.
       SECONDARY: Listing for a Secondary Market (resale) property.
-  sk_company:
-    lineage:
-      - datalake_company.company_sks.sk_company
-    description: Foreign key of the company associated with the event. Can be joined with
-      dw_rede.dim_company.
   sk_broker:
     lineage:
       - core_brokers.brokers.sk_broker
-    description: Surrogate key of the 3P broker partner for the same company as sk_company when
-      is_sale_3p_supply; '-1' when not 3P supply or company is not in core_brokers.brokers.
+    description: Surrogate key of the 3P broker partner when is_sale_3p_supply; '-1' when not 3P supply or company is not in core_brokers.brokers.
   price:
     lineage:
       - datalake_ebdb_clean.house.sale_price

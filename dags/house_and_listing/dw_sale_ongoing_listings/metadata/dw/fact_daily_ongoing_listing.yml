@@ -32,10 +32,6 @@ columns:
     description: Key of the region of the house. Can be joined with dw_public.dim_region.
     lineage:
       - datalake_sale_listings.sale_listing_status.id_region
-  sk_company:
-    description: Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
-    lineage:
-      - datalake_company.company_sks.sk_company
   sk_broker:
     description: Surrogate key of the 3P broker partner for the supply-side company of the house. Joinable with dw_brokers.dim_broker.
       Returns -1 when the house is not associated with a 3P broker (i.e. 1P listings or companies without active 3P products).

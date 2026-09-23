@@ -25,8 +25,6 @@ SELECT
     COALESCE(sv.id_house, -1) AS sk_house,
     COALESCE(sv.id_region, -1) AS sk_region,
     COALESCE(id_business_unit, -1) AS sk_business_unit,
-    COALESCE(sk_company_supply, -1) AS sk_company_supply,
-    COALESCE(sk_company_demand, -1) AS sk_company_demand,
     COALESCE(sk_broker_supply, -1) AS sk_broker_supply,
     COALESCE(sk_broker_demand, -1) AS sk_broker_demand,
     COALESCE(id_agent, -1) AS sk_agent,

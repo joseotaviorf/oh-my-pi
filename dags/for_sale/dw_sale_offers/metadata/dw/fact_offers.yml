@@ -38,14 +38,6 @@ columns:
     lineage:
     - datalake_sale_offer.sale_offer.id_business_unit
     description: Surrogate key of the business unit that originated the offer. Defaults to -1 when not assigned.
-  sk_company_supply:
-    lineage:
-    - datalake_sale_offer.sale_offer.id_company_supply
-    description: Surrogate key of the company in Rede QuintoAndar associated with the supply side (property). Populated only for 3P supply transactions. Can be joined with dw_rede.dim_company. Defaults to -1 when not applicable.
-  sk_company_demand:
-    lineage:
-    - datalake_sale_offer.sale_offer.id_company_demand
-    description: Surrogate key of the company in Rede QuintoAndar associated with the demand side (buyer's agent). Populated only for 3P demand transactions. Can be joined with dw_rede.dim_company. Defaults to -1 when not applicable.
   sk_broker_supply:
     lineage:
     - datalake_sale_offer.sale_offer.sk_broker_supply
@@ -169,14 +161,14 @@ columns:
     description: >
       True if the offer has a 3P supply partner — a partner company (imobiliária) that listed the property
       on the QuintoAndar platform (Rede QuintoAndar). 3P supply transactions follow a different flow
-      from 1P; always separate them in analyses. See also sk_company_supply and sk_broker_supply.
+      from 1P; always separate them in analyses. See also sk_broker_supply.
   is_3p_demand:
     lineage:
     - datalake_sale_offer.sale_offer.is_3p_demand
     description: >
       True if the offer has a 3P demand partner — a partner company that brought the buyer to the
       QuintoAndar platform (Rede QuintoAndar). 3P demand transactions follow a different flow
-      from 1P; always separate them in analyses. See also sk_company_demand and sk_broker_demand.
+      from 1P; always separate them in analyses. See also sk_broker_demand.
   is_3p_lead_gen:
     lineage:
     - datalake_sale_offer.sale_offer.is_3p_lead_gen

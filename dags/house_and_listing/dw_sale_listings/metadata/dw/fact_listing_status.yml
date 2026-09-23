@@ -19,10 +19,6 @@ columns:
     lineage:
     - datalake_sale_listings.sale_listing_status.id_region
     description: Foreign key of region where house listing is located in. Can be joined with dw_public.dim_region.
-  sk_company:
-    lineage:
-    - datalake_company.company_sks.sk_company
-    description: Key of company that owned the listing at that point in time.
   sk_broker:
     lineage:
       - core_brokers.brokers.sk_broker

@@ -24,14 +24,6 @@ columns:
     lineage:
     - datalake_sale_visit_hubs.sale_visit_hubs.id_business_unit
     description: ID of the business unit associated with the booking. Can be joined with datalake_hub_services_clean.business_unit.
-  sk_company_supply:
-    lineage:
-    - datalake_booking.booking.id_company_supply
-    description: Surrogate Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
-  sk_company_demand:
-    lineage:
-    - datalake_booking.booking.id_company_demand
-    description: Surrogate Key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
   sk_broker_supply:
     lineage:
     - datalake_booking.booking.sk_broker_supply

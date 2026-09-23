@@ -68,14 +68,6 @@ columns:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_business_unit
     description: Key of the agent's business context at the start of the funnel. There are no associated dimensions yet, but it can be joined with datalake_hub_services_clean.business_unit.
-  sk_company_supply:
-    lineage:
-    - dw_sale.fact_sale_demand_event.sk_company_supply
-    description: Key of the listing's origin company in Rede Supply, if that is the case. It can be joined with dw_rede.dim_company.
-  sk_company_demand:
-    lineage:
-    - dw_sale.fact_sale_demand_event.sk_company_demand
-    description: Key of the agents's company in Rede Demand at the start of the funnel, if that is the case. It can be joined with dw_rede.dim_company.
   sk_broker_supply:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_broker_supply

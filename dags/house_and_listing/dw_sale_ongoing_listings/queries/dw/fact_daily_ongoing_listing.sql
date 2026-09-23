@@ -140,7 +140,6 @@ SELECT
   sk_sale_listing,
   sk_house,
   sk_region,
-  sk_company,
   sk_broker,
   sk_sale_price_segment,
   sk_suggestion_change,
@@ -170,7 +169,6 @@ FROM (
     dol.sk_sale_listing,
     dol.sk_house,
     COALESCE(dol.sk_region, -1) AS sk_region,
-    COALESCE(CASE WHEN h.is_sale_3p_supply THEN cs_supply.sk_company END, -1) AS sk_company,
     COALESCE(CASE WHEN h.is_sale_3p_supply THEN cb_supply.sk_broker END, -1) AS sk_broker,
     COALESCE(dsps.sk_sale_price_segment, -1) AS sk_sale_price_segment,
     COALESCE(hsc.id_suggestion_change, -1) AS sk_suggestion_change,
@@ -221,8 +219,6 @@ FROM (
     ON dol.sk_house = lst.id_house
   LEFT JOIN datalake_ebdb_listing.house AS h
     ON dol.sk_house = h.id
-  LEFT JOIN datalake_company.company_sks AS cs_supply
-    ON cs_supply.uuid_company = h.uuid_company
   LEFT JOIN core_brokers.brokers AS cb_supply
     ON cb_supply.uuid_company = h.uuid_company
 ) AS _t

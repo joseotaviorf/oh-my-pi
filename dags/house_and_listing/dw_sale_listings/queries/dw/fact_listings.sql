@@ -5,12 +5,6 @@ SELECT
   CAST(hlco.id_user AS BIGINT) AS sk_user_consultant,
   h.id_region AS sk_region, 
   lst.sale_type,
-  COALESCE(
-    CASE
-      WHEN h.is_sale_3p_supply THEN cs_supply.sk_company
-    END,
-    -1
-  ) AS sk_company,
   IF(h.is_sale_3p_supply IS NOT NULL, cb.sk_broker, '-1') AS sk_broker,
   NULLIF(h.sale_price, 0) AS price,
   h.sale_price/h.total_area AS price_m2,
@@ -57,10 +51,6 @@ LEFT JOIN
     ON hlco.id_listing = sl.id_sale_listing
     AND hlco.business_context = 'SALE'
     AND hlco.is_last_ciq_on_listing = True
-LEFT JOIN
-  datalake_company.company_sks AS cs_supply
-    ON h.uuid_company IS NOT NULL
-    AND h.uuid_company = cs_supply.uuid_company
 LEFT JOIN
   core_brokers.brokers AS cb
     ON h.uuid_company = cb.uuid_company

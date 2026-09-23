@@ -2,7 +2,6 @@ SELECT
   sls.id_sale_listing AS sk_sale_listing,
   COALESCE(sls.id_user_revision, -1) AS sk_user_revision,
   COALESCE(sls.id_region, -1) AS sk_region,
-  COALESCE(cs_supply.sk_company, -1) AS sk_company,
   COALESCE(cb.sk_broker, '-1') AS sk_broker,
   COALESCE(BIGINT(DATE_FORMAT(sls.ts_first_publication, 'yyyyMMdd')), -1) AS sk_first_publication_date,
   COALESCE(BIGINT(DATE_FORMAT(sls.ts_status_started, 'yyyyMMdd')), -1) AS sk_status_start_date,
@@ -20,10 +19,6 @@ SELECT
   NOW() AS ts_load
 FROM 
   datalake_sale_listings.sale_listing_status AS sls
-LEFT JOIN
-  datalake_company.company_sks AS cs_supply
-    ON sls.uuid_company IS NOT NULL
-    AND sls.uuid_company = cs_supply.uuid_company
 LEFT JOIN
   core_brokers.brokers AS cb
     ON sls.uuid_company = cb.uuid_company

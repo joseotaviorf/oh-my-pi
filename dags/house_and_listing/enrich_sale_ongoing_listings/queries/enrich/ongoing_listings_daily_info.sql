@@ -170,43 +170,6 @@ WITH lpv AS (
   FROM published_days AS pd
   JOIN datalake_quintoandar.aux_date AS d
     ON d.date = pd.dt_snapshot
-), company_sk_resolved AS (
-  -- Prioritized fallback (uuid → hubspot → 3p tag) as UNION of equi-joins (§9).
-  SELECT
-    h.id AS id_house,
-    cs.sk_company
-  FROM datalake_ebdb_listing.house AS h
-  INNER JOIN datalake_company.company_sks AS cs
-    ON h.uuid_company = cs.uuid_company
-  WHERE
-    h.is_sale_3p_supply
-    AND h.uuid_company IS NOT NULL
-
-  UNION
-
-  SELECT
-    h.id AS id_house,
-    cs.sk_company
-  FROM datalake_ebdb_listing.house AS h
-  INNER JOIN datalake_company.company_sks AS cs
-    ON h.id_company_hubspot = cs.id_hubspot
-  WHERE
-    h.is_sale_3p_supply
-    AND h.uuid_company IS NULL
-    AND h.id_company_hubspot IS NOT NULL
-
-  UNION
-
-  SELECT
-    h.id AS id_house,
-    cs.sk_company
-  FROM datalake_ebdb_listing.house AS h
-  INNER JOIN datalake_company.company_sks AS cs
-    ON h.partner_3p_supply = cs.extracted_3p_tag
-  WHERE
-    h.is_sale_3p_supply
-    AND h.uuid_company IS NULL
-    AND h.id_company_hubspot IS NULL
 )
 SELECT
   id_snapshot,
@@ -214,7 +177,6 @@ SELECT
   id_sale_listing,
   id_house,
   id_region,
-  sk_company,
   id_suggestion_change,
   sale_type,
   sale_price,
@@ -254,7 +216,6 @@ FROM (
     dol.id_sale_listing,
     dol.id_house,
     dol.id_region,
-    cs_supply.sk_company,
     hsc.id_suggestion_change,
     lst.sale_type,
     lpc.price AS sale_price,
@@ -330,8 +291,6 @@ FROM (
     AND hsc.business_context = 'SALE'
   LEFT JOIN datalake_sale_primary_market.listing_sale_type AS lst
     ON dol.id_house = lst.id_house
-  LEFT JOIN company_sk_resolved AS cs_supply
-    ON dol.id_house = cs_supply.id_house
 ) AS _t
 WHERE
   _w = 1

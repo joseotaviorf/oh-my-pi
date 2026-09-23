@@ -44,12 +44,6 @@ column_level_validations:
   sk_business_unit:
     is_complete:
       severity_level: Error
-  sk_company_supply:
-    is_complete:
-      severity_level: Error
-  sk_company_demand:
-    is_complete:
-      severity_level: Error
   sk_broker_supply:
     is_complete:
       severity_level: Error
