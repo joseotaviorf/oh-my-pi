@@ -5,6 +5,8 @@ WITH supply_acquisition AS (
         sf.id_property AS id_house,
         au.id_agent,
         au.id_user,
+        au.id_unified_agent,
+        au.uuid_agent,
         "SUPPLY_ACQUISITION" AS source,
         ap.product_name AS agent_profile,
         COALESCE(sf.status = "ACTIVE", FALSE) AS is_active,
@@ -31,6 +33,8 @@ legacy_supply_acquisition AS (
         -1 AS id_supply_acquisition,
         legacy.id_house,
         au.id_agent,
+        au.id_unified_agent,
+        au.uuid_agent,
         COALESCE(au.id_user, legacy.id_user) AS id_user,
         "LEGACY_AGENCY" AS source,
         CASE
@@ -49,13 +53,8 @@ legacy_supply_acquisition AS (
         datalake_ebdb_agent_events.agent_unified_identity AS au
             ON au.id_partner = legacy.id_partner
             AND au.is_partner_replace_key IS TRUE
-    LEFT JOIN
-        supply_acquisition AS current
-            ON current.id_house = legacy.id_house
-            AND current.id_user = COALESCE(au.id_user, legacy.id_user)
     WHERE
-        current.id_house IS NULL
-        AND legacy.is_last_status_of_day IS TRUE
+        legacy.is_last_status_of_day IS TRUE
         AND legacy.consultant_type IN ("PRO_ACQUIRER", "CIQ_FULL")
         AND legacy.ts_enrollment_started < DATE('2026-09-01')
         AND DATE(COALESCE(legacy.ts_enrollment_ended, legacy.ts_enrollment_started)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
@@ -67,6 +66,8 @@ union_supply_acquisition AS (
         sf.id_house,
         sf.id_agent,
         sf.id_user,
+        sf.id_unified_agent,
+        sf.uuid_agent,
         sf.source,
         sf.agent_profile,
         sf.is_active,
@@ -86,11 +87,13 @@ union_supply_acquisition AS (
         sf.id_house,
         sf.id_agent,
         sf.id_user,
+        sf.id_unified_agent,
+        sf.uuid_agent,
         sf.source,
         sf.agent_profile,
         sf.is_active,
-        sf.ts_started,
-        sf.ts_ended,
+        CAST(sf.ts_started AS TIMESTAMP) AS ts_started,
+        CAST(sf.ts_ended AS TIMESTAMP) AS ts_ended,
         sf.ts_created,
         sf.ts_updated,
         YEAR(sf.ts_updated) AS year,
@@ -98,8 +101,17 @@ union_supply_acquisition AS (
         DAY(sf.ts_updated) AS day
     FROM
         legacy_supply_acquisition AS sf
+    LEFT JOIN
+        datalake_ebdb_agent_events.agent_unified_identity AS au
+            ON au.id_user = sf.id_user
+            AND au.uuid_agent IS NOT NULL
+    LEFT JOIN
+        datalake_ebdb_clean.supply_acquisition AS current
+            ON current.id_property = sf.id_house
+            AND current.uuid_agent = COALESCE(sf.uuid_agent, au.uuid_agent)
     WHERE
-        sf.is_first_enrollment IS TRUE
+        current.id_property IS NULL
+        AND sf.is_first_enrollment IS TRUE
 ),
 house_business_context AS (
     SELECT
@@ -119,6 +131,8 @@ SELECT
     sf.id_house,
     sf.id_agent,
     sf.id_user,
+    sf.id_unified_agent,
+    sf.uuid_agent,
     sf.source,
     sf.agent_profile,
     CASE

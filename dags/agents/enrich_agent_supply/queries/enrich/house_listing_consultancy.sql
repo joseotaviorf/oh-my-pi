@@ -35,7 +35,7 @@ union_supply_attribution AS (
             AND scc.dt_reference BETWEEN DATE(hl.ts_listing_version_start) AND DATE(COALESCE(hl.ts_listing_version_end, NOW()))
             AND scc.ts_ended > hl.ts_listing_version_start
             AND scc.ts_started < COALESCE(hl.ts_listing_version_end, NOW())
-    UNION ALL
+    UNION
     SELECT
         sl.id_sale_listing AS id_house_listing,
         sl.id_house,
@@ -65,8 +65,8 @@ SELECT
     sl.agent_profile,
     sl.business_context,
     sl.is_active AS is_consultancy_active,
-    ROW_NUMBER() OVER(PARTITION BY sl.id_house_listing ORDER BY sl.is_active DESC, sl.ts_started DESC) = 1 AS is_lastest_on_listing,
-    ROW_NUMBER() OVER(PARTITION BY sl.id_house_listing ORDER BY sl.ts_started) = 1 AS is_first_on_listing,
+    ROW_NUMBER() OVER(PARTITION BY sl.id_house_listing, sl.business_context ORDER BY sl.is_active DESC, sl.ts_started DESC) = 1 AS is_lastest_on_listing,
+    ROW_NUMBER() OVER(PARTITION BY sl.id_house_listing, sl.business_context ORDER BY sl.ts_started) = 1 AS is_first_on_listing,
     sl.ts_started,
     sl.ts_ended,
     sl.ts_first_publication,

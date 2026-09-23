@@ -41,6 +41,19 @@ columns:
       - datalake_ebdb_agent_events.agent_unified_identity.id_user
       - datalake_big_agent.house_consultant_history.id_user
     description: Platform user identifier of the acquisition consultant.
+  id_unified_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.id_unified_agent
+    description: >
+      Unified agent surrogate key from agent_unified_identity, used to dedupe legacy agency rows
+      against modern EBDB supply_acquisition on the same house and agent.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_agent_events.agent_unified_identity.uuid_agent
+      - datalake_ebdb_clean.supply_acquisition.uuid_agent
+    description: >
+      Agent Domain UUID used to join modern EBDB supply_acquisition rows and to exclude legacy
+      agency rows that already have a matching modern acquisition for the house.
   source:
     description: Origin system label for the acquisition interval row.
     categories:
