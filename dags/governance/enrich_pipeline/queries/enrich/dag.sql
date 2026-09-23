@@ -147,11 +147,17 @@ dag_info AS (
         is_active,
         is_paused,
         IF(d.id_dag LIKE '%datamarts%', TRUE, FALSE) AS is_datamart,
-        IF(
-            de.dag IS NOT NULL OR endswith(d.id_dag, '__validation'),
-            TRUE,
-            FALSE
-        ) AS is_in_exclusion_list,
+        -- Validation and migration DAGs check the platform itself and never count toward any SLA.
+        endswith(d.id_dag, '__validation')
+            OR startswith(d.id_dag, 'bietlejuice.migration_')
+            OR d.id_dag IN (
+                'bietlejuice.enrich_agents_validation',
+                'bietlejuice.enrich_anonymization_validation',
+                'bietlejuice.enrich_emr_validation_test',
+                'bietlejuice.release_validations_tests',
+                'bietlejuice.services_integration_validations'
+            ) AS is_validation_or_migration_dag,
+        de.dag IS NOT NULL AS is_in_sheet_exclusion_list,
         IF(ds.id_dag IS NOT NULL, TRUE, FALSE) AS has_special_scheduler
     FROM
         datalake_airflow.dag AS d
@@ -175,13 +181,13 @@ sla_base AS (
         me.duration,
         d.is_active,
         d.is_paused,
-        d.is_in_exclusion_list,
+        d.is_in_sheet_exclusion_list OR d.is_validation_or_migration_dag AS is_in_exclusion_list,
         d.has_special_scheduler,
         CASE
             WHEN d.is_active = TRUE AND d.is_paused = FALSE THEN    -- Only considering DAGs that are active and not paused
             CASE
-                WHEN d.is_in_exclusion_list = TRUE THEN TRUE
-                WHEN d.is_in_exclusion_list = FALSE AND d.has_special_scheduler = FALSE THEN FALSE
+                WHEN d.is_in_sheet_exclusion_list OR d.is_validation_or_migration_dag THEN TRUE
+                WHEN d.has_special_scheduler = FALSE THEN FALSE
                 WHEN d.has_special_scheduler = TRUE AND mc.ts_first_execution_success IS NULL THEN TRUE
                 WHEN d.has_special_scheduler = TRUE AND DATE(mc.ts_first_execution_success) < CURRENT_DATE THEN TRUE -- DAGs with special scheduler that didn't run today
                 WHEN d.has_special_scheduler = TRUE AND DATE(mc.ts_first_execution_success) = CURRENT_DATE THEN FALSE -- DAGs with special scheduler that had a run today
@@ -219,7 +225,8 @@ base AS (
         m.median_duration,
         d.is_active,
         d.is_paused,
-        d.is_in_exclusion_list,
+        s.is_in_exclusion_list,
+        d.is_validation_or_migration_dag,
         d.has_special_scheduler,
         s.is_in_sla_ignoring_list,
         s.is_inside_sla,
@@ -288,6 +295,7 @@ SELECT
     is_active,
     is_paused,
     is_in_exclusion_list,
+    is_validation_or_migration_dag,
     has_special_scheduler,
     is_in_sla_ignoring_list,
     is_datamart,

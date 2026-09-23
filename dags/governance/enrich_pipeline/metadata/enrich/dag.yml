@@ -67,9 +67,19 @@ columns:
       - datalake_airflow.dag.is_paused
     description: Boolean flag indicating if the DAG is currently paused on Airflow, which means that it is turned off.
   is_in_exclusion_list:
+    lineage:
+      - datalake_gsheets_clean.dags_sla_exclusion_list.dag
+      - datalake_airflow.dag.id_dag
     description: >
       Boolean flag indicating if the DAG is present in the SLA exclusion list gsheet
-      or has the __validation name suffix (shadow/validation DAGs).
+      or is a validation or migration DAG (see is_validation_or_migration_dag).
+  is_validation_or_migration_dag:
+    lineage:
+      - datalake_airflow.dag.id_dag
+    description: >
+      Boolean flag indicating if the DAG checks the platform itself rather than delivering data:
+      the __validation suffix, the migration_ prefix, or a named validation DAG. These DAGs are
+      excluded from every SLA calculation.
   is_inside_sla:
     lineage:
       - datalake_pipeline.dag_run.is_first_execution_inside_sla

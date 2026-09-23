@@ -152,6 +152,7 @@ dag_base AS (
             AND ad.date BETWEEN DATE(pc.ts_event) AND COALESCE(DATE(pc.ts_next_event), CURRENT_DATE)
     WHERE
         ad.date BETWEEN DATE(d.ts_first_event) AND DATE(dd.ts_last_scheduler_ran) -- Active DAGs only
+        AND d.is_validation_or_migration_dag = FALSE
 ),
 sla_exclusion_list AS (
     SELECT
@@ -163,15 +164,6 @@ sla_exclusion_list AS (
         load_dates AS ad
     WHERE
         ad.date BETWEEN dt_dag_added AND COALESCE(dt_dag_removed, CURRENT_DATE)
-    UNION
-    -- Shadow/validation DAGs (cluster.validation): manual-only, never in Data SLA
-    SELECT
-        id_dag,
-        dt_event
-    FROM
-        dag_base
-    WHERE
-        endswith(id_dag, '__validation')
 ),
 special_scheduler AS (
     SELECT
