@@ -41,6 +41,22 @@ class TestBasicAuth(unittest.TestCase):
         self.assertIsNone(auth.password_field)
 
     @patch("bietlejuice.base.api.auth.base.BaseDBUtils")
+    def test_initialization_with_raw_token(self, mock_base_dbutils):
+        """Test BasicAuth encodes a raw token with an empty password."""
+        raw_token = "crsr_test_token"
+        mock_dbutils_instance = MagicMock()
+        mock_dbutils_instance.secrets.get.return_value = raw_token
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils_instance
+
+        auth = BasicAuth(
+            databricks_scope=self.databricks_scope,
+            secret_key=self.secret_key,
+        )
+
+        expected_token = base64.b64encode(f"{raw_token}:".encode()).decode("utf-8")
+        self.assertEqual(auth._encoded_token, expected_token)
+
+    @patch("bietlejuice.base.api.auth.base.BaseDBUtils")
     def test_initialization_with_username_password(self, mock_base_dbutils):
         """Test BasicAuth initialization with username and password."""
         username = "testuser"

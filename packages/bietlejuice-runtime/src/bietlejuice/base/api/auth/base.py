@@ -19,15 +19,27 @@ class AuthBase(ABC):
         self.databricks_scope = databricks_scope
         self.secret_key = secret_key
 
-    def _get_secrets_from_dbutils(self) -> Dict[str, Any]:
-        """Retrieves and parses a secret from Databricks Secrets."""
+    def _get_raw_secret(self) -> str:
+        """Retrieves the unparsed secret value from the active secret backend."""
         try:
             base_dbutils = BaseDBUtils()
             dbutils = base_dbutils.get_dbutils()
-            raw_secret = dbutils.secrets.get(
-                scope=self.databricks_scope, key=self.secret_key
+            return dbutils.secrets.get(scope=self.databricks_scope, key=self.secret_key)
+        except Exception as e:
+            LOGGER.error(
+                f"Failed to retrieve secret '{self.secret_key}' from scope "
+                f"'{self.databricks_scope}': {e}",
+                exc_info=True,
             )
-            return json.loads(raw_secret)
+            raise
+
+    def _get_secrets_from_dbutils(self) -> Dict[str, Any]:
+        """Retrieves and parses a secret from Databricks Secrets."""
+        try:
+            secret = json.loads(self._get_raw_secret())
+            if not isinstance(secret, dict):
+                raise ValueError("Secret must contain a JSON object")
+            return secret
         except Exception as e:
             LOGGER.error(
                 f"Failed to retrieve secret '{self.secret_key}' from scope '{self.databricks_scope}': {e}",

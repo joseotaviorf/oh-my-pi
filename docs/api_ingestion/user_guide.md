@@ -606,6 +606,7 @@ For **`strategy: basic`**:
 - **`authentication.token_field`** string (optional, default: `api_token`): field in secret JSON holding the (pre-encoded) token.
 - **`authentication.username_field`** string (optional): if set together with `password_field`, builds token from `username:password`.
 - **`authentication.password_field`** string (optional): see above.
+- A raw secret string is also accepted when username/password fields are not configured; it is encoded as `<raw_token>:` for the Basic Auth header.
 
 For **`strategy: oauth2_client_credentials`**:
 

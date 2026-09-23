@@ -1,4 +1,5 @@
 import base64
+import json
 import logging
 from typing import Optional
 
@@ -19,6 +20,7 @@ class BasicAuth(AuthBase, RequestsAuthBase):
 
     The token can be stored in the secret as:
     - A single field (e.g., "api_token") that is already Base64-encoded
+    - A raw token string, which is encoded as "<token>:"
     - Or username:password format that will be encoded
     """
 
@@ -55,9 +57,17 @@ class BasicAuth(AuthBase, RequestsAuthBase):
     def _load_token(self):
         """Loads and encodes the token from Databricks Secrets."""
         try:
-            secrets = self._get_secrets_from_dbutils()
+            raw_secret = self._get_raw_secret()
+            try:
+                secrets = json.loads(raw_secret)
+            except json.JSONDecodeError:
+                secrets = raw_secret
 
-            if self.username_field and self.password_field:
+            if (
+                isinstance(secrets, dict)
+                and self.username_field
+                and self.password_field
+            ):
                 username = secrets.get(self.username_field)
                 password = secrets.get(self.password_field)
 
@@ -72,7 +82,7 @@ class BasicAuth(AuthBase, RequestsAuthBase):
                     auth_string.encode("utf-8")
                 ).decode("utf-8")
                 LOGGER.info("Basic Auth token created from username:password")
-            else:
+            elif isinstance(secrets, dict):
                 # Use pre-encoded token
                 token = secrets.get(self.token_field)
                 if not token:
@@ -82,6 +92,22 @@ class BasicAuth(AuthBase, RequestsAuthBase):
                     )
                 self._encoded_token = token
                 LOGGER.info("Basic Auth token loaded from secret")
+            elif isinstance(secrets, str) and not (
+                self.username_field or self.password_field
+            ):
+                raw_token = secrets.strip()
+                if not raw_token:
+                    raise ValueError(
+                        f"Secret '{self.secret_key}' contains an empty token"
+                    )
+                self._encoded_token = base64.b64encode(f"{raw_token}:".encode()).decode(
+                    "utf-8"
+                )
+                LOGGER.info("Basic Auth token created from raw secret")
+            else:
+                raise ValueError(
+                    f"Secret '{self.secret_key}' must contain a JSON object or raw token"
+                )
 
         except Exception as e:
             LOGGER.error(
