@@ -4,6 +4,8 @@ dag:
   schedule_interval: 0,30 * * * *
   owner: Data House and Listing
   criticality: High
+  freshness_max_staleness_minutes: 90
+  freshness_active_window_localtime: "06:00-22:00"
   documentation:
     dag_purpose: |
       DAG containing tables from House context that are running every 30 minutes.
@@ -18,6 +20,7 @@ workflow:
   execution_timeout_hours: 0.5
   tables_customization:
     Imovel:
+      criticality: Critical
       clean_primary_keys: [id]
       clean_table_name: house
       clean_z_order_by: [id_user, id_region, status]

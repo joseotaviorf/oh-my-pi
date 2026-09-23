@@ -4,6 +4,8 @@ dag:
   schedule_interval: 0,30 * * * *
   owner: Data ForRent
   criticality: High
+  freshness_max_staleness_minutes: 90
+  freshness_active_window_localtime: "06:00-22:00"
   documentation:
     dag_purpose: |
       This DAG retrieves data from the Rental Offer project (database rental_transact), which is a source of ForRent offers and negotiation.
@@ -20,7 +22,7 @@ workflow:
   execution_timeout_hours: 0.5
   tables_customization:
     offer:
-      criticality: High
+      criticality: Critical
       clean_table_name: offer
       raw_primary_keys: [id]
       clean_primary_keys: [id]
