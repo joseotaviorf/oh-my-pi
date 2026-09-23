@@ -330,19 +330,41 @@ employee_base AS (
         NULLIF(LOWER(es.team), '-1') AS team_raw,
         INITCAP(NULLIF(LOWER(es.business), '-1')) AS business,
         INITCAP(NULLIF(LOWER(es.product), '-1')) AS product,
+        INITCAP(NULLIF(LOWER(es.chapter), '-1')) AS chapter,
         tt.primary_team_tech_exclusive AS primary_team_tech_exclusive,
         CASE
             WHEN LOWER(es.status) = 'active'
             THEN es.months_tenure_in_band
             ELSE NULL
         END AS tempo_na_banda_em_meses,
-        INITCAP(NULLIF(es.name_l1, '')) AS L1,
-        INITCAP(NULLIF(es.name_l2, '')) AS L2,
-        INITCAP(NULLIF(es.name_l3, '')) AS L3,
-        INITCAP(NULLIF(es.name_l4, '')) AS L4,
-        INITCAP(NULLIF(es.name_l5, '')) AS L5,
-        INITCAP(NULLIF(es.name_l6, '')) AS L6,
-        INITCAP(NULLIF(es.name_l7, '')) AS L7,
+        CASE
+            WHEN es.name_l1 = es.name THEN NULL
+            ELSE INITCAP(NULLIF(es.name_l1, ''))
+        END AS L1,
+        CASE
+            WHEN es.name_l2 = es.name THEN NULL
+            ELSE INITCAP(NULLIF(es.name_l2, ''))
+        END AS L2,
+        CASE
+            WHEN es.name_l3 = es.name THEN NULL
+            ELSE INITCAP(NULLIF(es.name_l3, ''))
+        END AS L3,
+        CASE
+            WHEN es.name_l4 = es.name THEN NULL
+            ELSE INITCAP(NULLIF(es.name_l4, ''))
+        END AS L4,
+        CASE
+            WHEN es.name_l5 = es.name THEN NULL
+            ELSE INITCAP(NULLIF(es.name_l5, ''))
+        END AS L5,
+        CASE
+            WHEN es.name_l6 = es.name THEN NULL
+            ELSE INITCAP(NULLIF(es.name_l6, ''))
+        END AS L6,
+        CASE
+            WHEN es.name_l7 = es.name THEN NULL
+            ELSE INITCAP(NULLIF(es.name_l7, ''))
+        END AS L7,
         LOWER(
             COALESCE(
                 es.hrbp_work_email,
@@ -489,6 +511,7 @@ employee_base AS (
     LEFT JOIN
         dw_organization.dim_cost_center AS cc_current
             ON cc_current.id_organization = cc.id_organization
+            AND LOWER(cc_current.cost_center_code) = LOWER(cc.cost_center_code)
             AND cc_current.is_current = TRUE
     LEFT JOIN
         current_hrbp_by_code AS hrbp_by_code
@@ -544,6 +567,7 @@ SELECT
     ) AS team,
     eb.business,
     eb.product,
+    eb.chapter,
     eb.primary_team_tech_exclusive,
     eb.tempo_na_banda_em_meses,
     eb.L1,
@@ -599,6 +623,7 @@ LEFT JOIN
 LEFT JOIN
     last_compensation_movement AS lcm
         ON eb.matricula = lcm.person_number
+        AND lcm.dt_ultimo_movimento >= eb.dt_inicio
 LEFT JOIN
     first_non_pwd_leader_org AS fnpl
         ON eb.id_colaborador = fnpl.assignment_number

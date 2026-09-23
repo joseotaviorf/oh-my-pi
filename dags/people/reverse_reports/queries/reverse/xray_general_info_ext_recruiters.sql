@@ -18,6 +18,7 @@ SELECT
     gi.team,
     gi.business,
     gi.product,
+    gi.chapter,
     gi.primary_team_tech_exclusive,
     gi.tempo_na_banda_em_meses,
     gi.L1,
