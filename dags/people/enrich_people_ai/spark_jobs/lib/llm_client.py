@@ -45,7 +45,7 @@ class LiteLLMClient:
     """OpenAI-compatible chat client for the internal LiteLLM proxy.
 
     Sends JSON POST requests to ``{base_url}/chat/completions`` with bearer auth,
-    temperature 0.2, and configurable ``max_tokens`` (default 16384). Retries only
+    configurable temperature and ``max_tokens`` (default 16384). Retries only
     transient failures (429, 502, 503, 504, network, timeout, invalid JSON) with
     exponential backoff capped at 10 seconds. Non-transient HTTP errors such as
     404 are raised immediately so a misconfigured model cannot look like success.
@@ -61,6 +61,7 @@ class LiteLLMClient:
         max_retries: int = DEFAULT_MAX_RETRIES,
         timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS,
         max_tokens: Optional[int] = None,
+        temperature: float = 0.2,
     ) -> None:
         """Initialize gateway URL, model name, and credentials.
 
@@ -82,6 +83,7 @@ class LiteLLMClient:
             max_tokens: ``max_tokens`` field sent to the chat completions API.
                 Resolution: argument, then ``LITELLM_MAX_TOKENS``, then
                 :data:`DEFAULT_MAX_TOKENS`.
+            temperature: Sampling temperature sent to the chat completions API.
         """
         self.base_url = (
             base_url or os.environ.get("LITELLM_BASE_URL") or DEFAULT_BASE_URL
@@ -96,6 +98,7 @@ class LiteLLMClient:
             self.max_tokens = int(env_max_tokens)
         else:
             self.max_tokens = DEFAULT_MAX_TOKENS
+        self.temperature = temperature
         if api_key is not None:
             self.api_key = api_key
         else:
@@ -131,7 +134,7 @@ class LiteLLMClient:
             "model": self.model,
             "messages": messages,
             "max_tokens": self.max_tokens,
-            "temperature": 0.2,
+            "temperature": self.temperature,
         }
         response_json = self._post_json("/chat/completions", payload)
         choices = response_json.get("choices") or []

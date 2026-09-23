@@ -1,11 +1,13 @@
-"""Generate AI Teva survey summaries and load ``datalake_people.ai_teva_survey_summary``.
+"""Run a configured People AI product and load its enrich table.
 
-For each pending row in ``datalake_people.teva_survey_inputs`` the job builds a
-LiteLLM prompt, expects a single JSON object in the model reply, maps that JSON
-into flat STRING pillar columns, and merges into Delta on ``survey_invite_id``.
+The generic entrypoint resolves a product from ``products/registry.py``. The
+product supplies its input table, prompt builder, response parser, output schema,
+classification column, and merge grain. Operational LiteLLM settings come from
+``products/ai_products.yml``.
 
-Incremental behavior: invites already present in the target table are skipped.
-A per-run cap (``--max-calls-per-run``) limits LiteLLM cost.
+The DAG selects one of three processing modes: ``new_only`` processes absent
+merge keys, ``unclassified`` processes absent or unclassified target rows, and
+``all`` reprocesses every input row. A per-run call cap limits model cost.
 """
 
 from __future__ import annotations
@@ -17,13 +19,7 @@ from argparse import ArgumentParser
 from datetime import datetime, timezone
 from typing import Optional
 
-from pyspark.sql.types import (
-    IntegerType,
-    StringType,
-    StructField,
-    StructType,
-    TimestampType,
-)
+from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -37,15 +33,16 @@ from bietlejuice.services.metastore_services import MetastoreServiceFactory
 from dags.people.enrich_people_ai.spark_jobs.lib import (
     teva_legacy_prompt as teva_prompt,
 )
+from dags.people.enrich_people_ai.spark_jobs.lib.ai_enrichment import (
+    collect_generated_rows,
+)
 from dags.people.enrich_people_ai.spark_jobs.lib.llm_client import (
     LiteLLMClient,
     preview_llm_text,
 )
+from dags.people.enrich_people_ai.spark_jobs.products.registry import get_product
 
 JOB_NAME = "generate_ai_teva_survey_summary"
-INPUT_DATABASE = "datalake_people"
-INPUT_TABLE = "teva_survey_inputs"
-DEFAULT_MAX_CALLS_PER_RUN = 100
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -54,6 +51,9 @@ spark = spark_client.conn
 metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
     spark_client
 )
+
+_PROCESSING_MODES = frozenset({"new_only", "unclassified", "all"})
+_CLASSIFICATION_STATUS_COLUMN = "__ai_classification_status"
 
 _JSON_OBJECT_PATTERN = re.compile(r"\{[\s\S]*\}")
 
@@ -318,16 +318,79 @@ def _collect_generated_summaries(pending_rows: list, client: LiteLLMClient) -> l
     return generated
 
 
+def _build_pending_df(inputs_df, existing_df, product, processing_mode, max_calls):
+    """Select rows according to the DAG-configured reprocessing mode.
+
+    Args:
+        inputs_df: DataFrame containing the product's prepared inputs.
+        existing_df: Existing target DataFrame, or ``None`` on first creation.
+        product: Product contract containing merge and classification columns.
+        processing_mode: One of ``new_only``, ``unclassified``, or ``all``.
+        max_calls: Maximum number of rows to select for model calls.
+
+    Returns:
+        A bounded DataFrame containing only rows eligible for processing.
+
+    Raises:
+        ValueError: If the mode is unknown or ``unclassified`` lacks a
+            classification column.
+    """
+    if processing_mode not in _PROCESSING_MODES:
+        available_modes = ", ".join(sorted(_PROCESSING_MODES))
+        raise ValueError(
+            f"Unknown processing mode '{processing_mode}'. "
+            f"Available modes: {available_modes}."
+        )
+    if existing_df is None or processing_mode == "all":
+        return inputs_df.orderBy(
+            *[F.col(key).asc_nulls_last() for key in product.merge_on]
+        ).limit(max_calls)
+    if processing_mode == "new_only":
+        return (
+            inputs_df.join(
+                existing_df.select(*product.merge_on),
+                on=product.merge_on,
+                how="left_anti",
+            )
+            .orderBy(*[F.col(key).asc_nulls_last() for key in product.merge_on])
+            .limit(max_calls)
+        )
+    if not product.classification_column:
+        raise ValueError(
+            f"Product '{product.key}' does not define a classification column "
+            "for processing mode 'unclassified'."
+        )
+    existing_status_df = existing_df.select(
+        *product.merge_on,
+        F.col(product.classification_column).alias(_CLASSIFICATION_STATUS_COLUMN),
+    )
+    return (
+        inputs_df.join(existing_status_df, on=product.merge_on, how="left")
+        .where(
+            F.col(_CLASSIFICATION_STATUS_COLUMN).isNull()
+            | (F.trim(F.col(_CLASSIFICATION_STATUS_COLUMN)) == "")
+        )
+        .orderBy(
+            F.when(F.col(_CLASSIFICATION_STATUS_COLUMN).isNull(), 0).otherwise(1),
+            *[F.col(key).asc_nulls_last() for key in product.merge_on],
+        )
+        .drop(_CLASSIFICATION_STATUS_COLUMN)
+        .limit(max_calls)
+    )
+
+
 def parse_args() -> dict:
     """Parse CLI arguments for the standard bietlejuice Spark job entrypoint.
 
     Positional args follow the DAG builder order: environment, bucket, dag_name,
     schema, table_name, partitions, load_start_date, load_end_date. Also accepts
-    ``--max-calls-per-run``, ``--litellm-model``, and validation target overrides
+    ``--max-calls-per-run``, ``--litellm-model``, ``--product``, and validation
+    target overrides
     from :func:`add_validation_target_args`.
 
     Returns:
-        Namespace values as a dict suitable for ``main`` (includes ``max_calls_per_run``).
+        Namespace values suitable for ``main``. CLI values override the product
+        YAML configuration when supplied.
     """
     parser = ArgumentParser()
     parser.add_argument("environment", type=str)
@@ -341,8 +404,8 @@ def parse_args() -> dict:
     parser.add_argument(
         "--max-calls-per-run",
         type=int,
-        default=DEFAULT_MAX_CALLS_PER_RUN,
-        help="Cost guardrail: maximum LiteLLM calls per run.",
+        default=None,
+        help="Optional override for the product YAML call limit.",
     )
     parser.add_argument(
         "--litellm-model",
@@ -350,23 +413,38 @@ def parse_args() -> dict:
         default=None,
         help="LiteLLM chat model id (overrides LITELLM_MODEL and the client default).",
     )
+    parser.add_argument(
+        "--product",
+        type=str,
+        default="teva",
+        help="AI enrichment product key registered in products/registry.py.",
+    )
+    parser.add_argument(
+        "--processing-mode",
+        choices=sorted(_PROCESSING_MODES),
+        default=None,
+        help=(
+            "Optional override for the product YAML mode: new_only, "
+            "unclassified, or all."
+        ),
+    )
     add_validation_target_args(parser)
     return vars(parser.parse_args())
 
 
 def main() -> None:
-    """Entrypoint: summarize pending Teva surveys and merge into Delta.
+    """Run the selected product and merge its output into Delta.
 
-    Resolves the enrich write target from job args, anti-joins inputs against existing
-    ``survey_invite_id`` values in the target table (or limits rows on first create),
-    invokes :func:`_collect_generated_summaries` for each pending row, and loads
-    results with :class:`DeltaLoader` merged on ``survey_invite_id``.
+    The job selects pending inputs using the configured processing mode, invokes
+    the shared AI collector, and loads results with :class:`DeltaLoader` using
+    the product merge grain.
 
-    Exits without writing when there are no pending rows. LiteLLM HTTP failures
-    fail the job. Unparseable model output is skipped per row; if that leaves
-    nothing to write, the job raises instead of succeeding with no table.
+    The job exits without writing when there are no eligible rows. LiteLLM
+    request failures fail the task. Unparseable model output is skipped per row;
+    if no row remains valid, the task raises instead of succeeding with no table.
     """
     job_args = parse_args()
+    product = get_product(job_args["product"])
     db_info = DatalakeMetastoreService.get_db_info(
         job_args["environment"],
         job_args["schema"],
@@ -380,44 +458,54 @@ def main() -> None:
         target_database=job_args.get("target_database_name"),
         target_table=job_args.get("target_table_name"),
     )
-    max_calls = int(job_args.get("max_calls_per_run") or DEFAULT_MAX_CALLS_PER_RUN)
+    max_calls = int(
+        job_args.get("max_calls_per_run") or product.config.max_calls_per_run
+    )
+    processing_mode = job_args.get("processing_mode") or product.config.processing_mode
 
-    inputs_df = spark.table(f"{INPUT_DATABASE}.{INPUT_TABLE}")
+    inputs_df = spark.table(f"{product.input_database}.{product.input_table}")
     full_table_name = f"{database_name}.{table_name}"
     if spark.catalog.tableExists(full_table_name):
         existing_df = spark.table(full_table_name)
-        pending_df = inputs_df.join(
-            existing_df.select("survey_invite_id"),
-            on="survey_invite_id",
-            how="left_anti",
-        ).limit(max_calls)
     else:
-        pending_df = inputs_df.limit(max_calls)
+        existing_df = None
+    pending_df = _build_pending_df(
+        inputs_df=inputs_df,
+        existing_df=existing_df,
+        product=product,
+        processing_mode=processing_mode,
+        max_calls=max_calls,
+    )
 
     pending_rows = [row.asDict(recursive=True) for row in pending_df.collect()]
     if not pending_rows:
-        logger.info("No new closed AI Teva surveys to summarize.")
+        logger.info("No new AI %s rows to summarize.", product.key)
         return
 
-    client = LiteLLMClient(model=job_args.get("litellm_model"))
-    generated = _collect_generated_summaries(pending_rows, client)
-
-    output_schema = StructType(
-        [
-            StructField("survey_invite_id", StringType(), False),
-            StructField("survey_title", StringType(), True),
-            StructField("requester_email", StringType(), True),
-            StructField("answered_count", IntegerType(), True),
-            StructField("ai_executive_summary", StringType(), True),
-            StructField("ai_pillar_strategy_and_goals", StringType(), True),
-            StructField("ai_pillar_roles_and_accountabilities", StringType(), True),
-            StructField("ai_pillar_protocols_and_ways_of_working", StringType(), True),
-            StructField("ai_pillar_trust_and_relationships", StringType(), True),
-            StructField("ai_additional_comments_summary", StringType(), True),
-            StructField("ts_ai_summary_generated", TimestampType(), False),
-        ]
+    client = LiteLLMClient(
+        model=job_args.get("litellm_model") or product.config.model,
+        max_retries=product.config.max_retries,
+        timeout_seconds=product.config.timeout_seconds,
+        max_tokens=product.config.max_tokens,
+        temperature=product.config.temperature,
     )
-    output_df = spark.createDataFrame(generated, schema=output_schema)
+    logger.info(
+        "Using AI product=%s, model=%s, prompt_version=%s, processing_mode=%s.",
+        product.key,
+        client.model,
+        product.config.prompt_version,
+        processing_mode,
+    )
+    generated = collect_generated_rows(
+        pending_rows=pending_rows,
+        client=client,
+        product=product,
+        logger=logger,
+    )
+    output_df = spark.createDataFrame(
+        generated,
+        schema=product.build_output_schema(),
+    )
 
     s3_path = f"{write_location}{table_name}"
     metastore_service.create_database(database_name)
@@ -425,10 +513,10 @@ def main() -> None:
         table_name=full_table_name,
         path=s3_path,
         source_df=output_df,
-        merge_on=["survey_invite_id"],
+        merge_on=product.merge_on,
     )
     metastore_service.refresh_table(database_name, table_name)
-    logger.info("Merged %s AI Teva survey summaries.", len(generated))
+    logger.info("Merged %s AI %s rows.", len(generated), product.key)
 
 
 if __name__ == "__main__":

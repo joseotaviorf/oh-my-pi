@@ -1,0 +1,12 @@
+products:
+  teva:
+    model: vertex_ai/claude-sonnet-4-5
+    max_calls_per_run: 100
+    max_concurrency: 4
+    prompt_version: v1
+    processing_mode: new_only
+    request:
+      temperature: 0.2
+      max_tokens: 4096
+      timeout_seconds: 120
+      max_retries: 3

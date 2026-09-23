@@ -9,18 +9,24 @@ dag:
       (`spark_jobs/lib/llm_client.py`), writing into `datalake_people` alongside
       SQL enrich tables from `enrich_people`.
 
-      Current scope: Teva survey pillar summaries (`ai_teva_survey_summary`),
-      reading `datalake_people.teva_survey_inputs` from `enrich_people`.
-      The Spark job calls LiteLLM chat completions with
-      `vertex_ai/claude-sonnet-4-5`. The user prompt uses question-title JSON
-      payload keys, the Likert 1-2/3/4-5 sentiment rule, and the JSON root keys
-      mapped in the Spark job. Open answers are not pre-translated; the prompt
-      requires English output instead.
+      The current registered product is the Teva survey pillar summary
+      (`ai_teva_survey_summary`), reading
+      `datalake_people.teva_survey_inputs` from `enrich_people`. Product-specific
+      prompt, parser, output schema, and classification rules live under
+      `spark_jobs/products/`; operational LiteLLM settings live in
+      `spark_jobs/products/ai_products.yml`.
 
-      `ai_teva_survey_summary` uses extraction_type full with merge on survey_invite_id;
-      the Spark job skips invites that already exist in the target table and caps LiteLLM
-      calls per run (`--max-calls-per-run`). `load_start_date` / `load_end_date` are passed
-      for framework compatibility but do not filter inputs today.
+      `ai_teva_survey_summary` has one row per survey_invite_id and merges on that key.
+      Its declaration uses processing mode `unclassified`, which processes missing
+      target rows and rows whose `ai_executive_summary` is empty. Change the
+      `--processing-mode` argument to `new_only` to process only absent keys, or to
+      `all` to intentionally regenerate existing summaries. Every mode remains
+      bounded by the product `max_calls_per_run` setting.
+
+      The Teva prompt uses question-title JSON payload keys, the Likert 1-2/3/4-5
+      sentiment rule, and fixed JSON root keys. Open answers are not pre-translated;
+      the prompt requires English output. `load_start_date` / `load_end_date` are
+      passed for framework compatibility but do not filter inputs today.
 
 workflow:
   type: query_delta
@@ -40,7 +46,7 @@ workflow:
       merge_on: [survey_invite_id]
       vacuum_retention_hours: 168
       vacuum_lite: true
-      load_spark_job: generate_ai_teva_survey_summary
+      load_spark_job: run_ai_enrichment
       py_files: true
       spark_job_arguments:
         - "{environment}"
@@ -51,5 +57,7 @@ workflow:
         - "{partitions}"
         - "{load_start_date}"
         - "{load_end_date}"
-        - "--max-calls-per-run"
-        - "100"
+        - "--product"
+        - "teva"
+        - "--processing-mode"
+        - "unclassified"

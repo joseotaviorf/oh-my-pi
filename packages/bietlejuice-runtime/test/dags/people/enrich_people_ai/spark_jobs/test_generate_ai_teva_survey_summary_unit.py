@@ -13,6 +13,7 @@ _IMPORT_TIME_MOCKS = {
 }
 with patch.dict(sys.modules, _IMPORT_TIME_MOCKS):
     from dags.people.enrich_people_ai.spark_jobs.generate_ai_teva_survey_summary import (  # noqa: E402
+        _build_pending_df,
         _build_teva_prompt,
         _collect_generated_summaries,
         _extract_json_object,
@@ -177,6 +178,36 @@ class TestCollectGeneratedSummaries(unittest.TestCase):
         generated = _collect_generated_summaries([SAMPLE_ROW], client)
         self.assertEqual(len(generated), 1)
         self.assertEqual(generated[0]["ai_executive_summary"], "Overall positive.")
+
+
+class TestProcessingMode(unittest.TestCase):
+    def test_all_mode_limits_inputs_without_reading_existing_rows(self):
+        inputs_df = MagicMock()
+        inputs_df.orderBy.return_value.limit.return_value = "limited-inputs"
+        product = MagicMock()
+        product.merge_on = ["survey_invite_id"]
+
+        result = _build_pending_df(
+            inputs_df=inputs_df,
+            existing_df=MagicMock(),
+            product=product,
+            processing_mode="all",
+            max_calls=10,
+        )
+
+        self.assertEqual(result, "limited-inputs")
+        inputs_df.orderBy.assert_called_once()
+        inputs_df.orderBy.return_value.limit.assert_called_once_with(10)
+
+    def test_rejects_unknown_processing_mode(self):
+        with self.assertRaisesRegex(ValueError, "Unknown processing mode"):
+            _build_pending_df(
+                inputs_df=MagicMock(),
+                existing_df=None,
+                product=MagicMock(),
+                processing_mode="sometimes",
+                max_calls=10,
+            )
 
 
 if __name__ == "__main__":

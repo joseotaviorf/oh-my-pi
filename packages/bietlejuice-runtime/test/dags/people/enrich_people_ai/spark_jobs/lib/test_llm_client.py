@@ -60,7 +60,11 @@ class TestLiteLLMClient:
 
     def test_constructor_model_overrides_default(self):
         """An explicit ``model`` is stored as-is; tests do not pin the catalog default."""
-        client = LiteLLMClient(api_key="explicit-key", model="catalog/test-model")
+        client = LiteLLMClient(
+            api_key="explicit-key",
+            model="catalog/test-model",
+            temperature=0.7,
+        )
 
         assert client.model == "catalog/test-model"
 
@@ -82,7 +86,11 @@ class TestLiteLLMClient:
         mocked_response.read.return_value = response_body
         mocked_urlopen.return_value.__enter__.return_value = mocked_response
 
-        client = LiteLLMClient(api_key="explicit-key", model="catalog/test-model")
+        client = LiteLLMClient(
+            api_key="explicit-key",
+            model="catalog/test-model",
+            temperature=0.7,
+        )
         result = client.complete("prompt text", system_prompt="system context")
 
         assert result == "generated text"
@@ -97,8 +105,8 @@ class TestLiteLLMClient:
             "content": "prompt text",
         }
         assert sent_payload["model"] == "catalog/test-model"
+        assert sent_payload["temperature"] == 0.7
         assert sent_payload["max_tokens"] == DEFAULT_MAX_TOKENS
-        assert sent_payload["temperature"] == 0.2
 
     def test_default_max_tokens_is_above_previous_truncation_ceiling(self):
         """4096 was too small for Teva JSON; the default must stay above that."""
