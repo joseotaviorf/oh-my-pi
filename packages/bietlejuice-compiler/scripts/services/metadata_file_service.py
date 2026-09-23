@@ -35,17 +35,6 @@ _DB_NAME_FORMULA = {
 _DAG_DIR_FROM_METADATA_PATH = re.compile(r"((?:.*/)?dags/[^/]+/[^/]+)/metadata/")
 
 
-class ReverseMetadataFileException(Exception):
-    def __init__(self, file, layer):
-        self.data = file
-        self.errors = [
-            "Error: Reverse layer do not need metadata files. Remove this file"
-        ]
-        super().__init__(
-            f"file={file}, layer={layer}, msg=Reverse layer do not need metadata files. Remove this file"
-        )
-
-
 class MetricValidateLayerException(Exception):
     def __init__(self, file, table, layer):
         self.data = file
@@ -438,7 +427,8 @@ class MetadataFileService:
         elif layer == "metric":
             return self.validate_metric_file(file_path, yaml_data)
         elif layer == "reverse":
-            raise ReverseMetadataFileException(file_path, layer)
+            # Reverse metadata is optional and does not have a standard schema.
+            return [file_path]
 
     def sql_file_has_equivalent_metadata_file(
         self, file_path: str, status: str

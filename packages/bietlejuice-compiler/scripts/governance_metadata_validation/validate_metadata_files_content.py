@@ -16,7 +16,6 @@ from scripts.services.metadata_file_service import (
     DatabaseNameMismatchException,
     MetadataFileService,
     MetricValidateLayerException,
-    ReverseMetadataFileException,
     TableNameMismatchException,
 )
 
@@ -174,8 +173,6 @@ def main():
                 result = metadata_file_service.validate_file(file, status)
                 results["passed"].append(result[0])
             except YamaleError as error:
-                results["failed"].append(error)
-            except ReverseMetadataFileException as error:
                 results["failed"].append(error)
             except MetricValidateLayerException as error:
                 results["failed"].append(error)
