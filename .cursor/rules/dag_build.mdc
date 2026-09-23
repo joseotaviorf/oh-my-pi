@@ -220,6 +220,30 @@ cluster:
             instance_count: 3
 ```
 
+#### EMR instance fleets and `max_nodes` (managed scaling)
+
+Most new EMR DAGs use presets named `emr_7_12_*_fleet_cluster`. Fleet blocks use **`instance_types`**, **`target_on_demand`**, and **`target_spot`** (not `node_type_id` / `instance_count`). Consolidation presets often define **task** targets as **0/0** with `instance_types` only; that is intentional, not a broken override.
+
+**Opt-in autoscaling:** set **`max_nodes`** on `core_nodes` and/or `task_nodes` under `custom_configurations`. That attaches EMR **managed scaling** (`ManagedScalingPolicy`, `InstanceFleetUnits`). Omit `max_nodes` to keep fixed capacity at launch targets.
+
+- **Floor:** `target_on_demand + target_spot` per fleet (merged preset + YAML).
+- **Ceiling:** `max_nodes` per fleet. Unset `max_nodes` on a fleet pins it at the floor.
+- **CORE** must launch with at least one unit when using `max_nodes`. **TASK** may stay 0/0 in YAML; the translator launches **one** task unit at create when EMR requires it (see platform doc).
+- **Not on fleets:** top-level `autoscale` / CloudWatch `rules` (instance groups only).
+- **Scale-out market:** follows launch targets (or `task_availability` for 0/0 task). Mixed on-demand/spot keeps a similar ratio up to `max_nodes`.
+
+Full reference: [docs/platform/emr_fleet_autoscaling.md](../../docs/platform/emr_fleet_autoscaling.md).
+
+```yaml
+cluster:
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
+  custom_configurations:
+    core_nodes:
+      max_nodes: 6
+    task_nodes:
+      max_nodes: 12
+```
+
 #### Metric layer cluster specifics
 
 Metric DAGs always use `USER_ISOLATION` (not `SINGLE_USER`) and `databricks_new`:

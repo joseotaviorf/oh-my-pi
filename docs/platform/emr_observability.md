@@ -1,7 +1,7 @@
 # EMR DAG observability
 
 Bring Databricks-parity cost and utilization visibility to Airflow-orchestrated
-EMR DAGs from this repo (`emr_cluster_base`, tag `provisioner: emr`).
+EMR DAGs from this repo (`emr_cluster_base`, tag `provisioner: emr`). For fleet **managed scaling** (`max_nodes` on `core_nodes` / `task_nodes`), see [emr_fleet_autoscaling.md](emr_fleet_autoscaling.md).
 
 - **Status:** In progress (stacked PRs Phases 0–4)
 - **Related code:** `dags/platform/enrich_emr_health/`, `dags/platform/dw_emr_health/`,
