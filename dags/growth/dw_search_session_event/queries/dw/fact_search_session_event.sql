@@ -7,13 +7,6 @@ SELECT
     COALESCE(h.id_region, -1) AS sk_house_region,
     COALESCE(
         CASE
-            WHEN UPPER(sse.business_context) = 'SALE' AND h.is_sale_3p_supply THEN cs_supply.sk_company
-            WHEN UPPER(sse.business_context) = 'RENT' AND h.is_rent_3p_supply THEN cs_supply.sk_company
-        END,
-        -1
-    ) AS sk_company,
-    COALESCE(
-        CASE
             WHEN UPPER(sse.business_context) = 'SALE' AND h.is_sale_3p_supply THEN cb_supply.sk_broker
             WHEN UPPER(sse.business_context) = 'RENT' AND h.is_rent_3p_supply THEN cb_supply.sk_broker
         END,
@@ -46,9 +39,6 @@ JOIN
 JOIN
     datalake_ebdb_listing.house AS h
         ON h.id = sse.id_house
-LEFT JOIN
-    datalake_company.company_sks AS cs_supply
-        ON cs_supply.uuid_company = h.uuid_company
 LEFT JOIN
     core_brokers.brokers AS cb_supply
         ON cb_supply.uuid_company = h.uuid_company

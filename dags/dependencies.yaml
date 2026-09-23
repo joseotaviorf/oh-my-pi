@@ -1206,7 +1206,6 @@ bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_survicate:load-enrich-single-station-surveys:first-run-of-day
 bietlejuice.dw_search_session_event:
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event:first-run-of-day
 bietlejuice.dw_smart_price:
