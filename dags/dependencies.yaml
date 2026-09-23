@@ -4827,7 +4827,6 @@ bietlejuice.reverse_reports:
   - bietlejuice.dw_compensation:load-dw-compensation-fact-compensations:first-run-of-day
   - bietlejuice.dw_compensation:load-dw-compensation-fact-salary-table-targets:first-run-of-day
   - bietlejuice.dw_demographics:load-dw-demographics-dim-employee-disability:first-run-of-day
-  - bietlejuice.dw_employee:load-dw-employee-dim-job:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-contact:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-documentation:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-employee:first-run-of-day

@@ -86,7 +86,7 @@ SELECT
         END,
         0
     ) AS target_rv,
-    LOWER(emp_job.comp_ladder_directorate) AS tabela_salarial,
+    LOWER(comp_job.salary_table) AS tabela_salarial,
     LOWER(es.name_l1) AS l1_gestor,
     LOWER(es.name_l2) AS l2_gestor,
     LOWER(es.name_l3) AS l3_gestor,
@@ -128,8 +128,5 @@ LEFT JOIN
 LEFT JOIN
     dw_organization.dim_job AS org_job
         ON comp_job.id_job = org_job.sk_job
-LEFT JOIN
-    dw_employee.dim_job AS emp_job
-        ON emp_job.sk_job = comp_job.id_job
 WHERE
     es.is_current_for_employee = TRUE
