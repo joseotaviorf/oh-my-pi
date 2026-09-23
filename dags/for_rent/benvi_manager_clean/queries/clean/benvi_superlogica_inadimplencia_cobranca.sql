@@ -59,7 +59,7 @@ delinquent_sacado AS (
         FROM (
             SELECT
                 lake_mirror.id,
-                SPLIT(lake_mirror.vendor_natural_key, '\\\\|')[0] AS id_pessoa_pes,
+                SPLIT(lake_mirror.vendor_natural_key, '\\|')[0] AS id_pessoa_pes,
                 get_json_object(CAST(lake_mirror.payload AS STRING), '$.valorcorrigido')
                     AS valorcorrigido
             FROM

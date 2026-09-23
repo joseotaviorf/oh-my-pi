@@ -33,7 +33,7 @@ tenant_by_sacado AS (
 SELECT
     agreement_row.id,
     agreement_row.vendor_natural_key,
-    SPLIT(agreement_row.vendor_natural_key, '\\\\|')[0] AS id_acordo_aco,
+    get_json_object(agreement_row.payload_json, '$.id_acordo_aco') AS id_acordo_aco,
     agreement_row.id_parcela_acp,
     agreement_row.id_parcela_acp AS id_recebimento_recb,
     agreement_row.id_parcela_acp AS id_recebimento_recb1,

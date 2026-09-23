@@ -14,8 +14,8 @@ WITH maintenance_history_row AS (
 SELECT
     id,
     vendor_natural_key,
-    SPLIT(vendor_natural_key, '\\\\|')[0] AS id_manutencao_man,
-    SPLIT(vendor_natural_key, '\\\\|')[1] AS id_historico_mhis,
+    get_json_object(payload_json, '$.id_manutencao_man') AS id_manutencao_man,
+    get_json_object(payload_json, '$.id_historico_mhis') AS id_historico_mhis,
     COALESCE(
         TO_DATE(SUBSTR(get_json_object(payload_json, '$.dt_data_mhis'), 1, 10), 'MM/dd/yyyy'),
         TO_DATE(SUBSTR(get_json_object(payload_json, '$.dt_data_mhis'), 1, 10), 'yyyy-MM-dd')

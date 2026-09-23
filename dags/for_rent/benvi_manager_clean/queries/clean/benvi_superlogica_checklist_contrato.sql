@@ -15,9 +15,9 @@ WITH checklist_row AS (
 SELECT
     id,
     vendor_natural_key,
-    SPLIT(vendor_natural_key, '\\\\|')[0] AS id_contrato_con,
-    SPLIT(vendor_natural_key, '\\\\|')[1] AS id_checklist_chk,
-    SPLIT(vendor_natural_key, '\\\\|')[2] AS id_checklistitem_chi,
+    get_json_object(payload_json, '$.id_contrato_con') AS id_contrato_con,
+    get_json_object(payload_json, '$.id_checklist_chk') AS id_checklist_chk,
+    get_json_object(payload_json, '$.id_checklistitem_chi') AS id_checklistitem_chi,
     get_json_object(payload_json, '$.st_nome_chk') AS st_nome_chk,
     CAST(get_json_object(payload_json, '$.fl_notificar_chk') AS INT) AS fl_notificar_chk,
     get_json_object(payload_json, '$.id_imovel_imo') AS id_imovel_imo,
